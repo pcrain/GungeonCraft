@@ -4,13 +4,15 @@
 		{
       "file_exclude_patterns":
       [
-        "gungy-cwaffing.sublime-project",
+        "*.sublime-project",
         "packages.config",
+        "*~",
       ],
       "folder_exclude_patterns":
       [
-          "./bin",
-          "./obj",
+          "_old/",
+          "bin/",
+          "obj/",
       ],
 			"path": "."
 		}
@@ -19,15 +21,15 @@
   [
       {
           "name": "MSBuild",
-          "shell_cmd": "msbuild /home/pretzel/workspace/gungy-cwaffing/CwaffingItems.csproj"
+          "shell_cmd": "msbuild $project_path/CwaffingItems.csproj"
       },
       {
           "name": "MSBuild (clean)",
-          "shell_cmd": "msbuild -t:clean /home/pretzel/workspace/gungy-cwaffing/CwaffingItems.csproj"
+          "shell_cmd": "msbuild -t:clean $project_path/CwaffingItems.csproj"
       },
       {
           "name": "Regenerate Project Files",
-          "shell_cmd": "./genproject"
+          "shell_cmd": "$project_path/genproject"
       }
   ]
 }
