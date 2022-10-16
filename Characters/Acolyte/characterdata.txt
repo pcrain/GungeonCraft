@@ -1,0 +1,16 @@
+base: Pilot
+name: The Acolyte
+name short: Acolyte
+nickname: wiz
+
+<loadout>
+	nn:gunjurers_staff
+</loadout>
+
+<altGuns>
+    nn:elder_magnum
+</altGuns>
+
+<stats>
+	
+</stats>

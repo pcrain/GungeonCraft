@@ -1,0 +1,2558 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Alexandria</name>
+    </assembly>
+    <members>
+        <member name="M:Alexandria.CharacterAPI.SpriteHandler.SpriteFromTexture(UnityEngine.Texture2D,UnityEngine.GameObject)">
+            <summary>
+            Returns an object with a tk2dSprite component with the texture provided
+            </summary>
+        </member>
+        <member name="M:Alexandria.CharacterAPI.SpriteHandler.ConstructDefinition(UnityEngine.Texture2D,UnityEngine.Material)">
+            <summary>
+            Constructs a new tk2dSpriteDefinition with the given texture
+            </summary>
+            <returns>A new sprite definition with the given texture</returns>
+        </member>
+        <member name="M:Alexandria.CharacterAPI.SpriteHandler.AddSpriteToCollection(UnityEngine.Texture2D,tk2dSpriteCollectionData,System.String)">
+            <summary>
+            Adds a sprite (from a texture) to a collection
+            </summary>
+            <returns>The spriteID of the defintion in the collection</returns>
+        </member>
+        <member name="M:Alexandria.CharacterAPI.SpriteHandler.AddSpriteToCollectionWithAnchor(UnityEngine.Texture2D,tk2dSpriteCollectionData,tk2dBaseSprite.Anchor,System.String)">
+            <summary>
+            Adds a sprite (from a texture) to a collection
+            </summary>
+            <returns>The spriteID of the defintion in the collection</returns>
+        </member>
+        <member name="M:Alexandria.CharacterAPI.SpriteHandler.AddSpriteToCollection(UnityEngine.Texture2D,tk2dSpriteCollectionData,UnityEngine.Material,System.String)">
+            <summary>
+            Adds a sprite (from a texture) to a collection
+            </summary>
+            <returns>The spriteID of the defintion in the collection</returns>
+        </member>
+        <member name="M:Alexandria.CharacterAPI.ToolsCharApi.AddNewItemToAtlas(dfAtlas,UnityEngine.Texture2D,System.String)">
+            <summary>
+            Builds and adds a new <see cref="T:dfAtlas.ItemInfo"/> to <paramref name="atlas"/> with the texture of <paramref name="tex"/> and the name of <paramref name="name"/>.
+            </summary>
+            <param name="atlas">The <see cref="T:dfAtlas"/> to add the new <see cref="T:dfAtlas.ItemInfo"/> to.</param>
+            <param name="tex">The texture of the new <see cref="T:dfAtlas.ItemInfo"/>.</param>
+            <param name="name">The name of the new <see cref="T:dfAtlas.ItemInfo"/>. If <see langword="null"/>, it will default to <paramref name="tex"/>'s name.</param>
+            <returns>The built <see cref="T:dfAtlas.ItemInfo"/>.</returns>
+        </member>
+        <member name="M:Alexandria.CharacterAPI.ToolsCharApi.GetPixelRegions(dfAtlas)">
+            <summary>
+            Gets the pixel regions of <paramref name="atlas"/>.
+            </summary>
+            <param name="atlas">The <see cref="T:dfAtlas"/> to get the pixel regions from.</param>
+            <returns>A list with all pixel regions in <paramref name="atlas"/></returns>
+        </member>
+        <member name="M:Alexandria.CharacterAPI.ToolsCharApi.Convert``2(System.Collections.Generic.List{``0},System.Func{``0,``1})">
+            <summary>
+            Converts a list of the type <typeparamref name="T"/> to a list of the type <typeparamref name="T2"/> using <paramref name="convertor"/>.
+            </summary>
+            <typeparam name="T">The type of the <paramref name="self"/> list.</typeparam>
+            <typeparam name="T2">The type to convert the <paramref name="self"/> list to.</typeparam>
+            <param name="self">The original list.</param>
+            <param name="convertor">A delegate that converts an element of type <typeparamref name="T"/> to an element of a type <typeparamref name="T2"/>.</param>
+            <returns>The converted list of type <typeparamref name="T2"/></returns>
+        </member>
+        <member name="M:Alexandria.CharacterAPI.ToolsCharApi.FindFirstValidEmptySpace(dfAtlas,IntVector2)">
+            <summary>
+            Gets the first empty space in <paramref name="atlas"/> that has at least the size of <paramref name="pixelScale"/>.
+            </summary>
+            <param name="atlas">The <see cref="T:dfAtlas"/> to find the empty space in.</param>
+            <param name="pixelScale">The required size of the empty space.</param>
+            <returns>The rect of the empty space divided by the atlas texture's size.</returns>
+        </member>
+        <member name="M:Alexandria.CharacterAPI.ToolsCharApi.ResizeAtlas(dfAtlas,IntVector2)">
+            <summary>
+            Resizes <paramref name="atlas"/> and all of it's <see cref="T:dfAtlas.ItemInfo"/>s.
+            </summary>
+            <param name="atlas">The <see cref="T:dfAtlas"/> to resize/</param>
+            <param name="newDimensions"><paramref name="atlas"/>'s new size.</param>
+        </member>
+        <member name="M:Alexandria.CharacterAPI.ToolsCharApi.ResizeBetter(UnityEngine.Texture2D,System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            Resizes <paramref name="tex"/> without it losing it's pixel information.
+            </summary>
+            <param name="tex">The <see cref="T:UnityEngine.Texture2D"/> to resize.</param>
+            <param name="width">The <paramref name="tex"/>'s new width.</param>
+            <param name="height">The <paramref name="tex"/>'s new height.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Alexandria.CharacterAPI.ToolsCharApi.ToVector2Int(IntVector2)">
+            <summary>
+            Converts <paramref name="vector"/> to a <see cref="T:UnityEngine.Vector2Int"/>.
+            </summary>
+            <param name="vector">The <see cref="T:IntVector2"/> to convert.</param>
+            <returns><paramref name="vector"/> converted to <see cref="T:UnityEngine.Vector2Int"/>.</returns>
+        </member>
+        <member name="M:Alexandria.ChestAPI.ChestUtility.AddFuse(Chest)">
+            <summary>
+            Attaches a fuse to the chest, and ignites it. Does nothing if the chest is already fused.
+            </summary>
+            <param name="chest">The chest to be fused.</param>
+        </member>
+        <member name="M:Alexandria.ChestAPI.ChestUtility.GetFuse(Chest)">
+            <summary>
+            Returns the fuse attached to a chest, if one is present. NOTE: If you're using the stripped DLL, you can simply use 'chest.extantFuse'
+            </summary>
+            <param name="chest">The chest to be checked.</param>
+        </member>
+        <member name="M:Alexandria.ChestAPI.ChestUtility.SpawnChestEasy(IntVector2,Alexandria.ChestAPI.ChestUtility.ChestTier,System.Boolean,Chest.GeneralChestType,Alexandria.Misc.ThreeStateValue,Alexandria.Misc.ThreeStateValue)">
+            <summary>
+            A simple, advanced method for spawning reward chests. 
+            </summary>
+            <param name="location">The position at which the chest should be spawned.</param>
+            <param name="tier">The tier of chest that should be spawned. Includes edge cases such as Glitched, Rainbow, Secret Rainbow, and Rat, but cannot spawn Truth Chests.</param>
+            <param name="locked">Whether or not the chest should be locked.</param>
+            <param name="type">Whether the chest should spawn an item, gun, or be random.</param>
+            <param name="mimic">Whether the chest should be a mimic. Leave UNSPECIFIED for regular chances.</param>
+            <param name="fused">Whether the chest should be fused.</param>
+        </member>
+        <member name="M:Alexandria.ChestAPI.ChestUtility.GetChestTier(Chest)">
+            <summary>
+            Returns the quality of a chest in the form of the custom ChestTier enum. Chests which do not meet any of the other requirements will return type 'OTHER'.
+            </summary>
+            <param name="chest">The chest to be checked.</param>
+        </member>
+        <member name="M:Alexandria.DungeonAPI.MasteryOverrideHandler.Init">
+            <summary>
+            Initialises the hooks which allow the mastery override system to function.
+            DO NOT CALL THIS METHOD YOURSELF. IT WILL BREAK.
+            </summary>
+        </member>
+        <member name="M:Alexandria.DungeonAPI.MasteryOverrideHandler.RegisterFloorForMasterySpawn(Alexandria.DungeonAPI.MasteryOverrideHandler.ViableRegisterFloors)">
+            <summary>
+            'Registers' the specified floor to spawn a master round. 
+            By default, will spawn the Keep Master Round. Use 'OnRewardPedestalDetermineContents' in CustomActions to change this.
+            </summary>
+            <param name="floorToRegister">The floor you want to register. Only three of the five floors without masteries are supported, due to Dodge Roll hardcoding boss rewards.</param>
+        </member>
+        <member name="M:Alexandria.DungeonAPI.MasteryOverrideHandler.GetOrLoadByNameHook(System.Func{System.String,Dungeonator.Dungeon},System.String)">
+            <summary>
+            The hook method which allows the mastery override system to function.
+            DO NOT CALL THIS METHOD YOURSELF. IT WILL BREAK.
+            </summary>
+            <param name="orig">The original method.</param>
+            <param name="name">The dungeon name being loaded..</param>
+        </member>
+        <member name="M:Alexandria.DungeonAPI.MasteryOverrideHandler.ContainsMasteryTokenForCurrentLevel(RewardPedestal)">
+            <summary>
+            Returns true if the target pedestal contains the default Master Round item for the current level definition.
+            </summary>
+            <param name="pedestal">The target pedestal.</param>
+        </member>
+        <member name="M:Alexandria.DungeonAPI.MasteryOverrideHandler.GetOrLoadByName_Orig(System.String)">
+            <summary>
+            Loads a specified Dungeon prefab based on the string name. DO NOT USE IF YOU DONT KNOW WHAT YOU'RE DOING.
+            </summary>
+            <param name="name">The name of the Dungeon.</param>
+        </member>
+        <member name="M:Alexandria.EnemyAPI.AIActorUtility.DeleteOwnedBullets(GameActor,System.Single,System.Boolean)">
+            <summary>
+            Deletes all bullets belonging to the GameActor.
+            </summary>
+            <param name="enemy">The target actor.</param>
+            <param name="chancePerProjectile">The individual chance per bullet for it to be deleted. 100% by default.</param>
+            <param name="deleteBulletLimbs">If true 'bullet limbs' belonging to the actor will also be deleted. Bullet limbs exist on Misfire Beasts, Revolvenants, and others.</param>
+        </member>
+        <member name="M:Alexandria.EnemyAPI.AIActorUtility.DoCorrectForWalls(AIActor)">
+            <summary>
+            Updates the position of the AIActor to hopefully prevent it from becoming stuck in a wall. NOT FOOLPROOF.
+            </summary>
+            <param name="enemy">The target AIActor.</param>       
+        </member>
+        <member name="M:Alexandria.EnemyAPI.AIActorUtility.IsInMinecart(AIActor)">
+            <summary>
+            Returns true if the AIActor is riding in a minecart.
+            </summary>
+            <param name="target">The target AIActor.</param>
+        </member>
+        <member name="M:Alexandria.EnemyAPI.AIActorUtility.ClosestPointOnEnemy(AIActor,UnityEngine.Vector2)">
+            <summary>
+            Returns The closest Vector2 position on the enemy's hitbox to the given position.
+            </summary>
+            <param name="target">The target AIActor.</param>
+            <param name="pointComparison">The Vector2 position to which the closest point on the enemy's hitbox should be calculated.</param>
+        </member>
+        <member name="M:Alexandria.EnemyAPI.AIActorUtility.ClosestPointOnRigidBody(SpeculativeRigidbody,UnityEngine.Vector2)">
+            <summary>
+            Returns The closest Vector2 position on the SpeculativeRigidbody's hitbox to the given position.
+            </summary>
+            <param name="target">The target SpeculativeRigidbody.</param>
+            <param name="pointComparison">The Vector2 position to which the closest point on the SpeculativeRigidbody's hitbox should be calculated.</param>
+        </member>
+        <member name="M:Alexandria.EnemyAPI.AIActorUtility.IsSecretlyTheMineFlayer(AIActor)">
+            <summary>
+            Returns true AIActor is 'secretly' the Mine Flayer as part of the Mine Flayer's bell shell-game attack.
+            </summary>
+            <param name="target">The AIActor to be checked.</param>
+        </member>
+        <member name="M:Alexandria.EnemyAPI.AIActorUtility.ApplyGlitter(AIActor)">
+            <summary>
+            Applies the 'Glitter' visual effect from the Mailbox to the AIActor.
+            </summary>
+            <param name="target">The AIActor to be glittered.</param>
+        </member>
+        <member name="M:Alexandria.EnemyAPI.AIActorUtility.DoGeniePunch(AIActor,PlayerController)">
+            <summary>
+            Causes a Genie to punch the AIActor, like the effect of the Magic Lamp.
+            </summary>
+            <param name="enemy">The AIActor to be punched.</param>
+            <param name="owner">The owner of the Genie.</param>
+        </member>
+        <member name="M:Alexandria.EnemyAPI.AIActorUtility.GetDirectionalAnimation(AIAnimator,System.String)">
+            <summary>
+            Returns a directional animation on the AIAnimator corresponding to the given animation name.
+            </summary>
+            <param name="self">The AIAnimator to be checked.</param>
+            <param name="animName">The name of the animation being checked for.</param>
+        </member>
+        <member name="M:Alexandria.EnemyAPI.AIActorUtility.AdvancedTransmogrify(AIActor,AIActor,UnityEngine.GameObject,System.String,System.Boolean,System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String},System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
+            <summary>
+            A more advanced method of transmogrifying an enemy into another enemy. Returns the resulting enemy. Returns null if the original enemy could not be transmogrified.
+            </summary>
+            <param name="startEnemy">The enemy who will be transmogrified.</param>
+            <param name="EnemyPrefab">The prefab of the enemy that the original will be transmogrified into.</param>
+            <param name="EffectVFX">The VFX to be played at the position of the transmogrification.</param>
+            <param name="audioEvent">The audio to be played when the transmogrification occurs.</param>
+            <param name="ignoreAlreadyTransmogged">If true, will be unable to transmogrify enemies who have already been transmogrified.</param>
+            <param name="guidsToIgnore">If the target's guid is present in this list, it cannot be transmogrified.</param>
+            <param name="tagsToIgnore">If the target has any of the tags present in this list, it cannot be transmogrified.</param>
+            <param name="defuseExplosives">If true, enemies set to explode upon death will not explode when transmogrified.</param>
+            <param name="carryOverRewards">If true, the loot drops of the old enemy will carry over to the new enemy.</param>
+            <param name="maintainHealthPercent">If true, the new enemy's percentage of remaining HP will be the same as the old enemy's percentage of remaining HP.</param>
+            <param name="maintainsJammedState">If true, the jamedness of the new enemy depends on the jamedness of the old enemy.</param>
+            <param name="giveIsTransmogrifiedBool">If true, sets the new actor's 'IsTransmogrified' bool to true. If false, there will be no way to tell that the actor has been transmogrified.</param>
+            <param name="logEverything">If true, non-essential information about why enemies were unable to be transmogged will be added to the log. Do not leave true in release builds.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.LabelablePlayerItemSetup.InitLabelHook">
+            <summary>
+            Initialises the hooks necessary to make labelable player items functional. DO NOT RUN THIS METHOD.
+            </summary>
+        </member>
+        <member name="M:Alexandria.ItemAPI.LabelablePlayerItemSetup.UpdateCustomLabelHook(System.Action{GameUIItemController,PlayerItem,System.Collections.Generic.List{PlayerItem}},GameUIItemController,PlayerItem,System.Collections.Generic.List{PlayerItem})">
+            <summary>
+            A hook method involved in making labelable player items functional. DO NOT RUN THIS METHOD.
+            </summary>
+        </member>
+        <member name="T:Alexandria.ItemAPI.AdvancedGunBehavior">
+            <summary>
+            Advanced version of a GunBehaviour. Still has all methods of a GunBehaviour, but also has some new ones.
+            </summary>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.Update">
+            <summary>
+            Update() is called every tick when the gun is the player's current gun or is dropped.
+            </summary>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.InheritData(Gun)">
+            <summary>
+            Inherits data from another gun. Inherit the variables you want to be saved here!
+            </summary>
+            <param name="source">The source gun.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.MidGameSerialize(System.Collections.Generic.List{System.Object},System.Int32)">
+            <summary>
+            Saves the data of the gun to a list. Save the variables you want to be saved here!
+            </summary>
+            <param name="data">The list.</param>
+            <param name="dataIndex">DataIndex. You don't need to use this argument.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.MidGameDeserialize(System.Collections.Generic.List{System.Object},System.Int32@)">
+            <summary>
+            Sets the data of the gun to the contents of a list. Set the variables you want to be saved here!
+            </summary>
+            <param name="data">The list.</param>
+            <param name="dataIndex">DataIndex. Add a number equal to the amount of your data to it.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.Start">
+            <summary>
+            Start() is called when the gun is created. It's also called when the player picks up or drops the gun.
+            </summary>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.NonCurrentGunUpdate">
+            <summary>
+            NonCurrentGunUpdate() is called every tick EVEN IF THE GUN ISN'T ENABLED. That means it's able to run even if the player's current gun isn't this beh
+            </summary>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.OnInitializedWithOwner(GameActor)">
+            <summary>
+            OnInitializedWithOwner() is called when a GunInventory creates a gun to add (for example when the player picks the gun up.) 
+            </summary>
+            <param name="actor">The gun's owner.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.PostProcessProjectile(Projectile)">
+            <summary>
+            PostProcessProjectile() is called right after the gun shoots a projectile. If you want to change properties of a projectile in runtime, this is the place to do it.
+            </summary>
+            <param name="projectile">The target projectile.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.PostProcessVolley(ProjectileVolleyData)">
+            <summary>
+            PostProcessVolley() is called when PlayerStats rebuilds a gun's volley. It's used by things like VolleyModificationSynergyProcessor to change the gun's volley if the player has a synergy.
+            </summary>
+            <param name="volley">The target volley.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.OnDropped">
+            <summary>
+            OnDropped() is called when an a player drops the gun. gun.CurrentOwner is set to null before this method is even called, so I wouldn't reccomend using it.
+            </summary>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.OnAutoReload(PlayerController,Gun)">
+            <summary>
+            OnAutoReload() is called when a player reloads the gun with an empty clip.
+            </summary>
+            <param name="player">The player that reloaded the gun. Will be null if the gun's owner isn't a player.</param>
+            <param name="gun">The gun.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.OnAutoReloadSafe(PlayerController,Gun)">
+            <summary>
+            OnAutoReloadSafe() is called when a player reloads the gun with an empty clip and the gun's owner is a player.
+            </summary>
+            <param name="player">The player that reloaded the gun. Can't be null.</param>
+            <param name="gun">The gun.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.OnReloadPressed(PlayerController,Gun,System.Boolean)">
+            <summary>
+            OnReloadPressed() is called when the owner reloads the gun or the player presses the reload key.
+            </summary>
+            <param name="player">The player that reloaded the gun/pressed the reload key. Will be null if the gun's owner isn't a player.</param>
+            <param name="gun">The gun.</param>
+            <param name="manualReload">True if the owner reloaded the gun by pressing the reload key. False if the owner reloaded the gun by firing with an empty clip.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.OnGunsChanged(Gun,Gun,System.Boolean)">
+            <summary>
+            OnGunsChanged() is called when the player changes the current gun.
+            </summary>
+            <param name="previous">The previous current gun.</param>
+            <param name="current">The new current gun.</param>
+            <param name="newGun">True if the gun was changed because player picked up a new gun.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.OnSwitchedToThisGun">
+            <summary>
+            OnSwitchedToThisGun() when the player switches to this behaviour's affected gun.
+            </summary>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.OnSwitchedAwayFromThisGun">
+            <summary>
+            OnSwitchedToThisGun() when the player switches away from this behaviour's affected gun.
+            </summary>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.OnReloadPressedSafe(PlayerController,Gun,System.Boolean)">
+            <summary>
+            OnReloadPressedSafe() is called when the owner reloads the gun or the player presses the reload key and the gun's owner is a player.
+            </summary>
+            <param name="player">The player that reloaded the gun/pressed the reload key. Can't be null.</param>
+            <param name="gun">The gun.</param>
+            <param name="manualReload">True if the owner reloaded the gun by pressing the reload key. False if the owner reloaded the gun by firing with an empty clip.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.OnReload(PlayerController,Gun)">
+            <summary>
+            OnReload() is called when the gun is reloaded.
+            </summary>
+            <param name="player">The player that reloaded the gun. Will be null if the gun's owner isn't a player.</param>
+            <param name="gun">The gun.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.OnReloadEnded(PlayerController,Gun)">
+            <summary>
+            OnReloadEnded() is called at the end of reload.
+            </summary>
+            <param name="player">The player that reloaded the gun. Will be null if the gun's owner isn't a player.</param>
+            <param name="gun">The gun.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.OnReloadEndedSafe(PlayerController,Gun)">
+            <summary>
+            OnReloadEndedSafe() is called at the end of reload and if the gun's owner is a player.
+            </summary>
+            <param name="player">The player that reloaded the gun. Can't be null.</param>
+            <param name="gun">The gun.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.OnReloadSafe(PlayerController,Gun)">
+            <summary>
+            OnReloadSafe() is called when the gun is reloaded and the gun's owner is a player.
+            </summary>
+            <param name="player">The player that reloaded the gun. Can't be null.</param>
+            <param name="gun">The gun.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.OnFinishAttack(PlayerController,Gun)">
+            <summary>
+            OnFinishAttack() is called when the gun finishes firing, for example when the player releases the Shoot key or the gun's clip empties and if the owner is a player.
+            </summary>
+            <param name="player">The player. Can't be null.</param>
+            <param name="gun">The gun.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.OnPostFired(PlayerController,Gun)">
+            <summary>
+            OnPostFired() is called after the gun fired and if the owner is a player.
+            </summary>
+            <param name="player">The player. Can't be null.</param>
+            <param name="gun">The gun.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.OnHeroSwordCooldownStarted(PlayerController,Gun)">
+            <summary>
+            OnHeroSwordCooldownStarted() when the gun's Sword Slash started and if the gun is a HeroSword (if gun.IsHeroSword = true).
+            </summary>
+            <param name="player"></param>
+            <param name="gun"></param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.OnAmmoChanged(PlayerController,Gun)">
+            <summary>
+            OnAmmoChanged() is called when the gun's ammo amount increases/decreases.
+            </summary>
+            <param name="player">The player. Will be null if the gun's owner isn't a player.</param>
+            <param name="gun">The gun.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.OnAmmoChangedSafe(PlayerController,Gun)">
+            <summary>
+            OnAmmoChangedSafe() is called when the gun's ammo amount increases/decreases and if the gun's owner is a player.
+            </summary>
+            <param name="player">The player. Can't be null.</param>
+            <param name="gun">The gun.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.OnBurstContinued(PlayerController,Gun)">
+            <summary>
+            OnBurstContinued() is called when the gun continues a burst (attacks while bursting).
+            </summary>
+            <param name="player">The player. Will be null if the gun's owner isn't a player.</param>
+            <param name="gun">The gun.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.OnBurstContinuedSafe(PlayerController,Gun)">
+            <summary>
+            OnBurstContinuedSafe() is called when the gun continues a burst (attacks while bursting) and if the gun's owner is a player.
+            </summary>
+            <param name="player">The player. Can't be null.</param>
+            <param name="gun">The gun.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.CollectedAmmoPickup(PlayerController,Gun,AmmoPickup)">
+            <summary>
+            This method is called when the player attempts to interact with an ammo box. If true is returned, the original code to attempt to collect the box will run. If false is returned, the original code for collecting the ammo box will not run (ideal if you want to do something different on ammo pickup, and remove the box manually).
+            </summary>
+            <param name="player">The player. Can't be null.</param>
+            <param name="self">The gun.</param>
+            <param name="pickup">The ammo pickup being interacted with.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.OnPreFireProjectileModifier(Gun,Projectile,ProjectileModule)">
+            <summary>
+            OnPreFireProjectileModifier() is called before the gun shoots a projectile. If the method returns something that's not the projectile argument, the projectile the gun will shoot will be replaced with the returned projectile.
+            </summary>
+            <param name="gun">The gun.</param>
+            <param name="projectile">Original projectile.</param>
+            <param name="mod">Target ProjectileModule.</param>
+            <returns>The replacement projectile.</returns>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.OnPickup(GameActor)">
+            <summary>
+            OnPickup() is called when an actor picks the gun up.
+            </summary>
+            <param name="owner">The actor that picked up the gun.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.OnPostDrop(GameActor)">
+            <summary>
+            OnPostDrop() is called AFTER the owner drops the gun.
+            </summary>
+            <param name="owner">The actor that dropped the gun.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.OnPickedUpByPlayer(PlayerController)">
+            <summary>
+            OnPickup() is called when a player picks the gun up.
+            </summary>
+            <param name="player">The player that picked up the gun.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.OnPostDroppedByPlayer(PlayerController)">
+            <summary>
+            OnPostDrop() is called AFTER the player drops the gun. If you modify player's stats here, don't forget to call player.stats.RecalculateStats()!
+            </summary>
+            <param name="player">The player that dropped the gun.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.OnPickedUpByEnemy(AIActor)">
+            <summary>
+            OnPickup() is called when an enemy picks the gun up.
+            </summary>
+            <param name="enemy">The enemy that picked up the gun.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AdvancedGunBehavior.OnPostDroppedByEnemy(AIActor)">
+            <summary>
+            OnPostDrop() is called AFTER the enemy drops the gun.
+            </summary>
+            <param name="enemy">The enemy that dropped the gun.</param>
+        </member>
+        <member name="P:Alexandria.ItemAPI.AdvancedGunBehavior.PickedUp">
+            <summary>
+            Returns true if the gun's current owner isn't null.
+            </summary>
+        </member>
+        <member name="P:Alexandria.ItemAPI.AdvancedGunBehavior.Player">
+            <summary>
+            If the gun's owner is a player, returns the gun's current owner as a player.
+            </summary>
+        </member>
+        <member name="P:Alexandria.ItemAPI.AdvancedGunBehavior.HeroSwordCooldown">
+            <summary>
+            Returns the HeroSwordCooldown of the gun if it isn't null. If it's null, returns -1.
+            </summary>
+        </member>
+        <member name="P:Alexandria.ItemAPI.AdvancedGunBehavior.Owner">
+            <summary>
+            Returns the gun's current owner.
+            </summary>
+        </member>
+        <member name="P:Alexandria.ItemAPI.AdvancedGunBehavior.PickedUpByPlayer">
+            <summary>
+            Returns true if the gun's owner isn't null and is a player.
+            </summary>
+        </member>
+        <member name="F:Alexandria.ItemAPI.AdvancedGunBehavior.everPickedUpByPlayer">
+            <summary>
+            Returns true if the gun was ever picked up by a player.
+            </summary>
+        </member>
+        <member name="F:Alexandria.ItemAPI.AdvancedGunBehavior.everPickedUp">
+            <summary>
+            Returns true if the gun was ever picked up.
+            </summary>
+        </member>
+        <member name="F:Alexandria.ItemAPI.AdvancedGunBehavior.hasReloaded">
+            <summary>
+            Returns the gun this behaviour is applied to.
+            </summary>
+        </member>
+        <member name="F:Alexandria.ItemAPI.AdvancedGunBehavior.preventNormalFireAudio">
+            <summary>
+            If true, prevents the gun's normal fire audio.
+            </summary>
+        </member>
+        <member name="F:Alexandria.ItemAPI.AdvancedGunBehavior.preventNormalReloadAudio">
+            <summary>
+            If true, prevents the gun's normal reload audio.
+            </summary>
+        </member>
+        <member name="F:Alexandria.ItemAPI.AdvancedGunBehavior.overrideNormalFireAudio">
+            <summary>
+            The gun's override fire audio. Only works if preventNormalFireAudio is true.
+            </summary>
+        </member>
+        <member name="F:Alexandria.ItemAPI.AdvancedGunBehavior.overrideNormalReloadAudio">
+            <summary>
+            The gun's override reload audio. Only works if preventNormalReloadAudio is true.
+            </summary>
+        </member>
+        <member name="M:Alexandria.ItemAPI.BeamAPI.PosIsNearAnyBoneOnBeam(BasicBeamController,UnityEngine.Vector2,System.Single)">
+            <summary>
+            Returns true if the given position is within the given distance of any of the beam's bones.
+            </summary>
+            <param name="beam">The beam whose bones should be checked.</param>
+            <param name="positionToCheck">The position whose distance is being calculated.</param>
+            <param name="distance">The radius within which a bone must be to the position in order to return true.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.BeamAPI.GetBoneCount(BasicBeamController)">
+            <summary>
+            Returns the total number of bones which makes up the given beam.
+            </summary>
+            <param name="beam">The beam whose bones should be counted.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.BeamAPI.GetFinalBoneDirection(BasicBeamController)">
+            <summary>
+            Returns the angle of the final bone in the beam.
+            </summary>
+            <param name="beam">The beam to be checked.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.BeamAPI.GetIndexedBone(BasicBeamController,System.Int32)">
+            <summary>
+            Returns the bone at the given index on the beam.        
+            </summary>
+            <param name="beam">The beam to be checked.</param>
+            <param name="boneIndex">The index whose bone should be returned..</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.BeamAPI.GetIndexedBonePosition(BasicBeamController,System.Int32)">
+            <summary>
+            Returns the position of the bone at the given index on the beam. Can be used to get positions at various distances along the beam's length.
+            IE: Using GetBoneCount to get the count of all bones, halving it, rounding up, and then getting the position of the bone at that index will get the position halfway along the beam.
+            </summary>
+            <param name="beam">The beam to be checked.</param>
+            <param name="boneIndex">The index whose bone position should be returned..</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.BeamAPI.GetBonePosition(BasicBeamController,BasicBeamController.BeamBone)">
+            <summary>
+            Returns the position of the specified bone on the given beam.
+            </summary>
+            <param name="beam">The beam to be checked.</param>
+            <param name="bone">The bone whose position should be returned.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.BeamAPI.GenerateBeamPrefab(Projectile,System.String,UnityEngine.Vector2,UnityEngine.Vector2,System.Collections.Generic.List{System.String},System.Int32,System.Collections.Generic.List{System.String},System.Int32,System.Nullable{UnityEngine.Vector2},System.Nullable{UnityEngine.Vector2},System.Collections.Generic.List{System.String},System.Int32,System.Nullable{UnityEngine.Vector2},System.Nullable{UnityEngine.Vector2},System.Collections.Generic.List{System.String},System.Int32,System.Nullable{UnityEngine.Vector2},System.Nullable{UnityEngine.Vector2},System.Single,System.Single)">
+            <summary>
+            Constructs and returns a prefab for a beam projectile, based off the given regular projectile.
+            NOTE THAT ALL BEAM SPRITES MUST BE PERFECTLY SQUARE, AND ALL ANIMATIONS SHOULD HAVE THE SAME DIMENSIONS.
+            </summary>
+            <param name="projectile">The regular projectile that the beam is based off. Gets the regular projectile's stats and effects by default, where applicable.</param>
+            <param name="spritePath">A path to an embedded sprite representing the 'default' state of the beam. Should ideally be the first frame of the midsection animation.</param>
+            <param name="colliderDimensions">The X and Y dimensions of the beam's midsection hitbox per-section.</param>
+            <param name="colliderOffsets">The X and Y offsets of the beam's midsection hitbox per-section. Offsets are relative to the bottom right.</param>
+            <param name="beamAnimationPaths">A list of sprite paths for the beam's midsection animation. Can be any length.</param>
+            <param name="beamFPS">The frames per second  of the beam midsection.</param>
+            <param name="impactVFXAnimationPaths">A list of sprite paths for the impact VFX. Can be any length. Note, impact is NOT the same as Beam End. Leave null for no impact VFX.</param>
+            <param name="beamImpactFPS">The frames per second of the beam's impact VFX.</param>
+            <param name="impactVFXColliderDimensions">The X and Y dimensions of the beam's impact VFX collider. Note that the impact vfx cannot actually hit anything, so collider dimensions are largely arbitrary.</param>
+            <param name="impactVFXColliderOffsets">The X and Y offsets of the beam's impact VFX collider. As with the dimensions, this is largely arbitrary.</param>
+            <param name="endVFXAnimationPaths">A list of sprite paths for the beam's ending animation, which plays as the beam's final segment. Can be any length. If null, will default to a copy of the midsection.</param>
+            <param name="beamEndFPS">The frames per second  of the beam ending section.</param>
+            <param name="endVFXColliderDimensions">The X and Y dimensions of the beam's ending section hitbox.</param>
+            <param name="endVFXColliderOffsets">The X and Y offsets of the beam's ending section hitbox. Offsets are relative to the bottom right.</param>
+            <param name="muzzleVFXAnimationPaths">A list of sprite paths for the beam's starting animation, which plays as the beam's first segment. Can be any length. If null, will default to a copy of the midsection.</param>
+            <param name="beamMuzzleFPS">The frames per second  of the beam's first segment.</param>
+            <param name="muzzleVFXColliderDimensions">The X and Y dimensions of the beam's first section hitbox.</param>
+            <param name="muzzleVFXColliderOffsets">The X and Y offsets of the beam's first section hitbox. Offsets are relative to the bottom right.</param>
+            <param name="glowAmount">The intensity with which the beam should glow.</param>
+            <param name="emissivecolouramt">The intensity of the beam's emissive colour power.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.BeamAPI.SetupBeamPart(tk2dSpriteAnimation,System.Collections.Generic.List{System.String},System.String,System.Int32,System.Nullable{UnityEngine.Vector2},System.Nullable{UnityEngine.Vector2},UnityEngine.Vector3[])">
+            <summary>
+            Used during beam prefab generation to initialise various segments of the beam. ONLY USE IF YOU KNOW WHAT YOU ARE DOING.
+            </summary>
+            <param name="beamAnimation">The animation to be added to.</param>
+            <param name="animSpritePaths">The sprite paths of the segment's animations.</param>
+            <param name="animationName">The name of the animation.</param>
+            <param name="fps">The frames per second of the segment's animation.</param>
+            <param name="colliderDimensions">The dimensions of the segment's pixel collider.</param>
+            <param name="colliderOffsets">The offsets of the segment's pixel collider. Offsets are calculated from the bottom left.</param>
+            <param name="overrideVertices">A set of override colliders, if applicable.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.BeamAPI.FreeFireBeamFromAnywhere(Projectile,PlayerController,UnityEngine.GameObject,UnityEngine.Vector2,System.Single,System.Single,System.Boolean,System.Boolean,System.Single)">
+            <summary>
+            Fires and maintains a beam from the specified object or position for the specified time.
+            </summary>
+            <param name="projectileToSpawn">The Beam Prefab to be created.</param>
+            <param name="owner">The owner of the new beam.</param>
+            <param name="otherShooter">If set, rather than being fired from a set position, the beam will be fired from the center of the set gameobject's rigid body, and will update it's position for it's duration..</param>
+            <param name="fixedPosition">The position the beam should be spawned at. No effect if otherShooter is set.</param>
+            <param name="targetAngle">The initial angle of the beam.</param>
+            <param name="duration">How many seconds the beam should fire for.</param>
+            <param name="skipChargeTime">If true, the beam will not need to 'charge' before firing, like the Disintegrator.</param>
+            <param name="followDirOnProjectile">If true and otherShooter is a projectile, the angle of the beam will be dynamically updated to the projectile's current direction.</param>
+            <param name="angleOffsetFromProjectileAngle">If followDirOnProjectile is true, this sets an amount of fixed offset from the projectile's direction in the beam's dynamic angle.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.FakePrefab.IsFakePrefab(UnityEngine.Object)">
+            <summary>
+            Checks if an object is marked as a fake prefab.
+            </summary>
+            <returns><c>true</c>, if object is in the list of fake prefabs, <c>false</c> otherwise.</returns>
+            <param name="o">Unity object to test.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.FakePrefab.MarkAsFakePrefab(UnityEngine.GameObject)">
+            <summary>
+            Marks an object as a fake prefab.
+            </summary>
+            <param name="obj">GameObject to add to the list.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.FakePrefab.Clone(UnityEngine.GameObject)">
+            <summary>
+            Clones a real prefab or a fake prefab into a new fake prefab.
+            </summary>
+            <returns>The new game object.</returns>
+            <param name="obj">GameObject to clone.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.FakePrefab.Instantiate(UnityEngine.Object,UnityEngine.Object)">
+            <summary>
+            Activates objects that have been created from a fake prefab, otherwise simply returns them.
+            </summary>
+            <returns>The same Unity object as the one passed in <c>new_o</c>, activated if <c>o</c> is a fake prefab..</returns>
+            <param name="o">Original object.</param>
+            <param name="new_o">The object instantiated from the original object.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.FakePrefab.InstantiateAndFakeprefab(UnityEngine.GameObject)">
+            <summary>
+            Instantiates a copy of the given gameobject, marks it as a fake prefab, prevents it from being destroyed on load, and sets it as inactive. Returns the copy.
+            </summary>
+            <param name="target">The gameobject to be instantiated and fakeprefabbed.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.FakePrefab.MakeFakePrefab(UnityEngine.GameObject)">
+            <summary>
+            Marks the given object as a Fake Prefab, prevents it from despawning on load, and sets it as inactive.
+            </summary>
+            <param name="target">The gameobject to be fakeprefabbed.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.FakePrefabExtensions.MakeFakePrefab(UnityEngine.GameObject)">
+            <summary>
+            Marks the given object as a Fake Prefab, prevents it from despawning on load, and sets it as inactive.
+            </summary>
+            <param name="target">The gameobject to be fakeprefabbed.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.FakePrefabExtensions.InstantiateAndFakeprefab(UnityEngine.GameObject)">
+            <summary>
+            Instantiates a copy of the given gameobject, marks it as a fake prefab, prevents it from being destroyed on load, and sets it as inactive. Returns the copy.
+            </summary>
+            <param name="target">The gameobject to be instantiated and fakeprefabbed.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.ItemBuilder.Init">
+            <summary>
+            Initializes hooks and grabs necessary assets for building items
+            </summary>
+        </member>
+        <member name="M:Alexandria.ItemAPI.ItemBuilder.LoadShopTables">
+            <summary>
+            Loads the loot tables of shops for later modification.
+            </summary>
+        </member>
+        <member name="M:Alexandria.ItemAPI.ItemBuilder.LoadShopTable(System.String)">
+            <summary>
+            Gets a loot table from shared_auto_001 from name
+            </summary>
+        </member>
+        <member name="M:Alexandria.ItemAPI.ItemBuilder.AddSpriteToObject(System.String,System.String,UnityEngine.GameObject,System.Reflection.Assembly)">
+            <summary>
+            Adds a tk2dSprite component to an object and adds that sprite to the 
+            ammonomicon for later use. If obj is null, returns a new GameObject with the sprite
+            </summary>
+        </member>
+        <member name="M:Alexandria.ItemAPI.ItemBuilder.SetupItem(PickupObject,System.String,System.String,System.String)">
+            <summary>
+            Finishes the item setup, adds it to the item databases, adds an encounter trackable 
+            blah, blah, blah
+            </summary>
+        </member>
+        <member name="M:Alexandria.ItemAPI.ItemBuilder.SetCooldownType(PlayerItem,Alexandria.ItemAPI.ItemBuilder.CooldownType,System.Single)">
+            <summary>
+            Sets the cooldown type and length of a PlayerItem, and resets all other cooldown types
+            </summary>
+        </member>
+        <member name="M:Alexandria.ItemAPI.ItemBuilder.AddPassiveStatModifier(PickupObject,PlayerStats.StatType,System.Single,StatModifier.ModifyMethod)">
+            <summary>
+            Adds a passive player stat modifier to a PlayerItem or PassiveItem
+            </summary>
+        </member>
+        <member name="M:Alexandria.ItemAPI.ResourceExtractor.GetTexturesFromDirectory(System.String)">
+            <summary>
+            Converts all png's in a folder to a list of Texture2D objects
+            </summary>
+        </member>
+        <member name="M:Alexandria.ItemAPI.ResourceExtractor.GetTextureFromFile(System.String,System.String)">
+            <summary>
+            Creates a Texture2D from a file in the sprites directory
+            </summary>
+        </member>
+        <member name="M:Alexandria.ItemAPI.ResourceExtractor.GetCollectionFiles">
+            <summary>
+            Retuns a list of sprite collections in the sprite folder
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Alexandria.ItemAPI.ResourceExtractor.BytesToTexture(System.Byte[],System.String)">
+            <summary>
+            Converts a byte array into a Texture2D
+            </summary>
+        </member>
+        <member name="M:Alexandria.ItemAPI.ResourceExtractor.GetResourceFolders">
+            <summary>
+            Returns a list of folders in the ETG resources directory
+            </summary>
+        </member>
+        <member name="M:Alexandria.ItemAPI.ResourceExtractor.ExtractEmbeddedResource(System.String,System.Reflection.Assembly)">
+            <summary>
+            Converts an embedded resource to a byte array
+            </summary>
+        </member>
+        <member name="M:Alexandria.ItemAPI.ResourceExtractor.GetTextureFromResource(System.String,System.Reflection.Assembly)">
+            <summary>
+            Converts an embedded resource to a Texture2D object
+            </summary>
+        </member>
+        <member name="M:Alexandria.ItemAPI.ResourceExtractor.GetResourceNames(System.Reflection.Assembly)">
+            <summary>
+            Returns a list of the names of all embedded resources
+            </summary>
+        </member>
+        <member name="M:Alexandria.ItemAPI.SpriteBuilder.SpriteFromFile(System.String,UnityEngine.GameObject)">
+            <summary>
+            Returns an object with a tk2dSprite component with the 
+            texture of a file in the sprites folder
+            </summary>
+        </member>
+        <member name="M:Alexandria.ItemAPI.SpriteBuilder.SpriteFromResource(System.String,UnityEngine.GameObject,System.Reflection.Assembly)">
+            <summary>
+            Returns an object with a tk2dSprite component with the 
+            texture of an embedded resource
+            </summary>
+        </member>
+        <member name="M:Alexandria.ItemAPI.SpriteBuilder.SpriteFromTexture(UnityEngine.Texture2D,System.String,UnityEngine.GameObject)">
+            <summary>
+            Returns an object with a tk2dSprite component with the texture provided
+            </summary>
+        </member>
+        <member name="M:Alexandria.ItemAPI.SpriteBuilder.AddSpriteToCollection(System.String,tk2dSpriteCollectionData,System.Reflection.Assembly)">
+            <summary>
+            Adds a sprite (from a resource) to a collection
+            </summary>
+            <returns>The spriteID of the defintion in the collection</returns>
+        </member>
+        <member name="M:Alexandria.ItemAPI.SpriteBuilder.AddSpriteToCollection(tk2dSpriteDefinition,tk2dSpriteCollectionData)">
+            <summary>
+            Adds a sprite from a definition to a collection
+            </summary>
+            <returns>The spriteID of the defintion in the collection</returns>
+        </member>
+        <member name="M:Alexandria.ItemAPI.SpriteBuilder.AddToAmmonomicon(tk2dSpriteDefinition,System.String)">
+            <summary>
+            Adds a sprite definition to the Ammonomicon sprite collection
+            </summary>
+            <returns>The spriteID of the defintion in the ammonomicon collection</returns>
+        </member>
+        <member name="M:Alexandria.ItemAPI.TrailAPI.AddTrailToProjectile(Projectile,System.String,UnityEngine.Vector2,UnityEngine.Vector2,System.Collections.Generic.List{System.String},System.Int32,System.Collections.Generic.List{System.String},System.Int32,System.Single,System.Single,System.Single,System.Boolean)">
+            <summary>
+            Adds a tiled trail to the Projectile
+            </summary>
+            <param name="timeTillAnimStart">How long after spawning until the trail will begin to play it's animation, if it has one.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AlexandriaTags.InitGenericTags">
+            <summary>
+            The setup method which adds tags to basegame items and enemies. DO NOT CALL THIS METHOD.
+            </summary>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AlexandriaTags.SetTag(PickupObject,System.String)">
+            <summary>
+            Adds the specified tag to the PickupObject.
+            </summary>
+            <param name="item">The item to which the tag should be added.</param>
+            <param name="tag">The tag which should be added.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AlexandriaTags.SetTag(System.Int32,System.String)">
+            <summary>
+            Adds the specified tag to the PickupObject corresponding to the given ID.
+            </summary>
+            <param name="id">The ID of the item to which the tag should be added.</param>
+            <param name="tag">The tag which should be added.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AlexandriaTags.HasTag(PickupObject,System.String)">
+            <summary>
+            Returns true if the PickupObject has the specified tag.
+            </summary>
+            <param name="item">The item which is being checked for the tag.</param>
+            <param name="tag">The tag which is being checked for.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AlexandriaTags.GetAllItemsIdsWithTag(System.String)">
+            <summary>
+            Returns a list of all item IDs which have the specified tag.
+            </summary>
+            <param name="tag">The tag to be searched for.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AlexandriaTags.GetAllItemsWithTag(System.String)">
+            <summary>
+            Returns a list of all PickupObjects in the PickupObjectDatabase which have the specified tag.
+            </summary>
+            <param name="tag">The tag to be searched for.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AlexandriaTags.SetTag(AIActor,System.String)">
+            <summary>
+            Adds the specified tag to the AIActor.
+            </summary>
+            <param name="aiActor">The AIActor to be tagged.</param>
+            <param name="tag">The tag to be added.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AlexandriaTags.SetTag(System.String,System.String)">
+            <summary>
+            Adds the specified tag to the AIActor with the given GUID.
+            </summary>
+            <param name="guid">The guid corresponding to the AIActor to be tagged.</param>
+            <param name="tag">The tag to be added.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AlexandriaTags.HasTag(System.String,System.String)">
+            <summary>
+            Returns true if the AIActor corresponding to the given GUID has the specified tag.
+            </summary>
+            <param name="guid">The guid corresponding to the AIActor to be checked for the tag.</param>
+            <param name="tag">The tag to be checked for.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AlexandriaTags.HasTag(AIActor,System.String)">
+            <summary>
+            Returns true if the AIActor has the specified tag.
+            </summary>
+            <param name="aiActor">The AIActor being checked.</param>
+            <param name="tag">The tag to be checked for.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AlexandriaTags.GetAllEnemyGuidsWithTag(System.String)">
+            <summary>
+            Returns a list of all enemy guids of AIActors with the specified tag.
+            </summary>
+            <param name="tag">The tag to be searched for.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AlexandriaTags.GetAllEnemiesWithTag(System.String)">
+            <summary>
+            Returns a list of all AIActors in the EnemyDatabase with the specified tag.
+            </summary>
+            <param name="tag">The tag to be searched for.</param>
+        </member>
+        <member name="M:Alexandria.ItemAPI.AlexandriaTags.HasTags(AIActor,System.Collections.Generic.List{System.String},System.Boolean)">
+            <summary>
+            Returns true if the AIActor has any of the tags in the provided list.
+            </summary>
+            <param name="aiActor">The AIActor to be checked.</param>
+            <param name="tags">The list of tags to be checked for.</param>
+            <param name="reqAll">If true, the AIActor must have ALL specified tags to return true. If false, the AIActor must only have one.</param>
+        </member>
+        <member name="F:Alexandria.Misc.CustomActions.OnRunStart">
+            <summary>
+            Runs whenever the player begins a new run. Triggers in all gamemodes, including shortcuts and bossrush.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.CustomActions.PostDungeonTrueStart">
+            <summary>
+            Runs whenever a new Dungeon is created.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.CustomActions.OnNewPlayercontrollerSpawned">
+            <summary>
+            Runs whenever a new PlayerController is created.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.CustomActions.OnRewardPedestalSpawned">
+            <summary>
+            Runs whenever a new Reward Pedestal (IE: The pedestals created by bosses) is spawned.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.CustomActions.OnShrineUsed">
+            <summary>
+            Runs whenever a shrine of the type AdvancedShrineController is used. Pending improvement.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.CustomActions.OnShopItemStarted">
+            <summary>
+            Runs whenever a new ShopItemController is created.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.CustomActions.OnRatMazeFailed">
+            <summary>
+            Runs whenever a player fails in the Rat Maze, taking a wrong turn.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.CustomActions.OnRewardPedestalDetermineContents">
+            <summary>
+            Runs just before a reward pedestal determines it's contents. 
+            Can be used to modify the contents by adding to the 'overrideItemPool' list in 'ValidPedestalContents'.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.CustomActions.OnChestPostSpawn">
+            <summary>
+            Runs when a new chest spawns. With room-reward chests, runs just after the chest has settled itself on the ground.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.CustomActions.OnChestPreOpen">
+            <summary>
+            Runs between the player interacting with a chest, and the chest opening.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.CustomActions.OnChestBroken">
+            <summary>
+            Runs whenever a chest is broken.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.CustomActions.OnAnyHealthHaverDie">
+            <summary>
+            Runs whenever any HealthHaver is killed.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.CustomActions.OnAnyPlayerCollectedAmmo">
+            <summary>
+            Runs whenever any PlayerController collects an ammo box.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.CustomActions.OnAnyPlayerCollectedKey">
+            <summary>
+            Runs whenever any player collects a key pickup. Note that Rat Keys count as keys.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.CustomActions.OnAnyPlayerCollectedHealth">
+            <summary>
+            Runs whenever any player collects an HP pickup. Note that Armor pickups count as HP.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.CustomActions.OnAnyPlayerNudgedHealth">
+            <summary>
+            Runs whenever any player touches an HP Pickup. Occurs before pickup, and will still run even if the player's HP is full and they are unable to collect the pickup.
+            Note that armor counts as an HP pickup.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.CustomActions.OnAnyPlayerCollectedBlank">
+            <summary>
+            Runs whenever the any player player collects a blank.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.CustomActions.OnBossKilled">
+            <summary>
+            Runs whenever any Boss HealthHaver is killed.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.CustomActions.OnExplosionComplex">
+            <summary>
+            Runs whenever an explosion occurs. Contains more information about the explosion than the vanilla action.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.CustomActions.OnLOTJSpawned">
+            <summary>
+            Runs when the Lord of the Jammed spawns.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.CustomActions.OnPostProcessItemSpawn">
+            <summary>
+            Runs when a loot item spawned by the Loot Engine becomes grounded and registered.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.CustomActions.ValidPedestalContents.overrideItemPool">
+            <summary>
+            A list of tuples which will be converted into an override loot pool for the pedestal if set. 
+            The first value is an integer, and represents an item id, while the second is a float an represents the weight.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.ExtendedPlayerComponent.PreProcessSlash">
+            <summary>
+            Runs just before a melee slash belonging to the attached player occurs, containing information about the slash and facilitating modification.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.ExtendedPlayerComponent.PostProcessSlash">
+            <summary>
+            Runs after a melee slash belonging to the attached player occurs.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.ExtendedPlayerComponent.OnSlashHitEnemy">
+            <summary>
+            Runs when an AIActor is hit by a melee slash belonging to the attached player. Ideal for transferring bullet effects.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.ExtendedPlayerComponent.OnPickedUpAmmo">
+            <summary>
+            Runs whenever the attached player collects an ammo box.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.ExtendedPlayerComponent.OnPickedUpKey">
+            <summary>
+            Runs whenever the attached player collects a key pickup. Note, Rat Keys count as Keys.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.ExtendedPlayerComponent.OnPickedUpHP">
+            <summary>
+            Runs whenever the attached player collects HP. Note, Armor is counted as HP.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.ExtendedPlayerComponent.OnNudgedHP">
+            <summary>
+            Runs whenever the attached player touches HP. Occurs before pickup, and will still run if the player nudges a heart pickup at full HP.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.ExtendedPlayerComponent.OnPickedUpBlank">
+            <summary>
+            Runs whenever the attached player collects a blank.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.ExtendedPlayerComponent.OnCompanionSpawnedBullet">
+            <summary>
+            Runs whenever a companion belonging to the attached player spawns a projectile.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.ExtendedPlayerComponent.OnCompanionStatsQueried">
+            <summary>
+            Runs whenever a QueryCompanionStats is called. Useful for modifying companion stats not accessible via OnCompanionSpawnedBullet.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.ExtendedPlayerComponent.OnBlessedGunChanged">
+            <summary>
+            Runs whenever the player's gun changes in Blessed Mode.
+            </summary>
+        </member>
+        <member name="F:Alexandria.Misc.ExtendedPlayerComponent.OnActiveItemPreDrop">
+            <summary>
+            Runs just before the attached player drops their active item, for any reason.
+            </summary>
+        </member>
+        <member name="M:Alexandria.Misc.ExtendedPlayerComponent.Enrage(System.Single,System.Boolean)">
+            <summary>
+            Triggers a rage effect (like the Enraging Photo) for the specified duration. Rage gives double damage, and comes with associated visual effects.
+            </summary>
+            <param name="dur">The length of the desired rage.</param>
+            <param name="resetExisting">If true, the given rage duration will override the duration of existing rage (if the player is already enraged) instead of adding to it. Can be used to cancel rage by setting duration to zero.</param>
+        </member>
+        <member name="M:Alexandria.Misc.ExtendedPlayerComponent.TriggerInvulnerableFrames(System.Single,System.Boolean)">
+            <summary>
+            Triggers blinking invulnerability frames for the specified duration. Does not trigger if the player is already invulnerable from basegame I-frames.
+            </summary>
+            <param name="incorporealityTime">The length of the desired invulnerability.</param>
+            <param name="resetExisting">If true, the given incorporeality duration will override the duration of existing incorporeality (if the player is already invulnerable) instead of adding to it. Can be used to cancel I-frames by setting duration to zero.</param>
+        </member>
+        <member name="M:Alexandria.Misc.GameManagerUtility.GetPlayerWithItemID(GameManager,System.Int32,System.Boolean)">
+            <summary>
+            Returns the playercontroller with the specified item ID, if there is one. Returns null if no players have the item ID.
+            </summary>
+            <param name="managerInstance">The instance Gamemanager.</param>
+            <param name="id">The item ID being searched for.</param>
+            <param name="randomIfBoth">If true, and BOTH players have the specified item, the returned player will be random. If false in the same situation of both players having the item, prioritises the Primary Player.</param>
+        </member>
+        <member name="M:Alexandria.Misc.GameManagerUtility.AnyPlayerHasActiveSynergy(GameManager,System.String)">
+            <summary>
+            Returns true if the Primary Player OR the Secondary Player have the specified synergy. Does not check the secondary player if the secondary player does not exist.
+            </summary>
+            <param name="managerInstance">The instance Gamemanager.</param>
+            <param name="synergyID">The synergy name string to check for.</param>        
+        </member>
+        <member name="M:Alexandria.Misc.GameManagerUtility.AnyPlayerHasPickupID(GameManager,System.Int32)">
+            <summary>
+            Returns true if the Primary Player OR the Secondary Player have the specified item ID in their inventory. Does not check the secondary player if the secondary player does not exist.
+            </summary>
+            <param name="managerInstance">The instance Gamemanager.</param>
+            <param name="itemID">The item ID to check for.</param>        
+        </member>
+        <member name="M:Alexandria.Misc.GameManagerUtility.GetCombinedPlayersStatAmount(GameManager,PlayerStats.StatType)">
+            <summary>
+            Returns the total stat value of the specified stat shared between both players. Does not check players that do not exist.
+            </summary>
+            <param name="managerInstance">The instance Gamemanager.</param>
+            <param name="stat">The specified stat to return the combined total of.</param>        
+        </member>
+        <member name="M:Alexandria.Misc.PlayerUtility.RemoveItemFromInventory(PlayerController,PickupObject)">
+            <summary>
+            Removes the given pickupobject from the player's inventory if it is present in the player's inventory. Works on passives, actives, and guns.
+            </summary>
+            <param name="player">The target player.</param>
+            <param name="item">The item or gun to be removed.</param>
+        </member>
+        <member name="M:Alexandria.Misc.PlayerUtility.IsStarterItem(PlayerController,System.Int32)">
+            <summary>
+            Returns true if the given ID corresponds to one of the target player's starting items.
+            </summary>
+            <param name="player">The target player.</param>
+            <param name="id">The item ID being checked.</param>
+        </member>
+        <member name="M:Alexandria.Misc.PlayerUtility.GetNumberOfItemInInventory(PlayerController,System.Int32)">
+            <summary>
+            Returns an integer value corresponding to the number of copies of a given passive or active item present in the player's inventory. 
+            </summary>
+            <param name="player">The target player.</param>
+            <param name="itemID">The item ID being counted.</param>
+        </member>
+        <member name="M:Alexandria.Misc.PlayerUtility.RemovePassiveItemAtIndex(PlayerController,System.Int32)">
+            <summary>
+            Removes the item at the given index in the target player's inventory.
+            </summary>
+            <param name="player">The target player.</param>
+            <param name="index">The index at which the item should be removed.</param>
+        </member>
+        <member name="M:Alexandria.Misc.PlayerUtility.GetExtComp(PlayerController)">
+            <summary>
+            Returns the ExtendedPlayerComponent present on the specified player. Returns null if the ExtendedPlayerComponent is not present, however this should never happen.
+            </summary>
+            <param name="owner">The target player.</param>
+        </member>
+        <member name="M:Alexandria.Misc.PlayerUtility.PositionInDistanceFromAimDir(PlayerController,System.Single)">
+            <summary>
+            Returns a Vector2 position corresponding to the specified distance from the player in the direction they are currently aiming.
+            </summary>
+            <param name="player">The target player.</param>
+            <param name="distance">The distance from the player that the returned position ought to be.</param>
+        </member>
+        <member name="M:Alexandria.Misc.PlayerUtility.GetCursorPosition(PlayerController,System.Single)">
+            <summary>
+            Returns the position of the target player's cursor. Returned Vector2 is nullable, and will be null if the target player is using a controller.
+            </summary>
+            <param name="user">The target player.</param>
+            <param name="fallbackAimDirDistance">If the player does not have a cursor, and fallbackAimDirDistance is greater than zero, returns a position the specified distance in the direction being aimed.</param>
+        </member>
+        <member name="M:Alexandria.Misc.PlayerUtility.NextHitWillKillPlayer(PlayerController,System.Single)">
+            <summary>
+            Returns true if the specified damage amount will kill the target player. Rudimentary, use with caution.
+            </summary>
+            <param name="player">The target player.</param>
+            <param name="damageAmount">The damage amount to be checked against the player's current HP.</param>
+        </member>
+        <member name="M:Alexandria.Misc.PlayerUtility.GiveAmmoToGunNotInHand(PlayerController,System.Int32,System.Int32)">
+            <summary>
+            Gives the specified amount of ammo to the gun in the target player's inventory with the specified ID. Does nothing if the gun corresponding to the ID is not in the player's inventory.
+            </summary>
+            <param name="player">The target player.</param>
+            <param name="idToGive">The target gun ID to restore ammo to.</param>
+            <param name="AmmoToGive">The amount of ammo to restore.</param>
+        </member>
+        <member name="M:Alexandria.Misc.PlayerUtility.RecalculateOrbitals(PlayerController)">
+            <summary>
+            Recalculates the orbital tier and orbital index of the specified player's orbitals. Can resolve issues arising from spawning, deleting, or altering orbitals.
+            </summary>
+            <param name="player">The target player.</param>
+        </member>
+        <member name="M:Alexandria.Misc.PlayerUtility.TriggerInvulnerableFrames(PlayerController,System.Single)">
+            <summary>
+            Shorthand extension to trigger the invulnerability frame function of the ExtendedPlayerComponent.
+            </summary>
+            <param name="player">The target player.</param>
+            <param name="incorporealityTime">How long the invulnerability frames should last.</param>
+        </member>
+        <member name="M:Alexandria.Misc.PlayerUtility.DoEasyBlank(PlayerController,UnityEngine.Vector2,Alexandria.Misc.EasyBlankType)">
+            <summary>
+            Simple shorthand to trigger a blank effect belonging to the target player at a specified position.
+            </summary>
+            <param name="blankOwner">The target player, who the blank effect belongs to.</param>
+            <param name="blankPosition">The position of the blank effect.</param>
+            <param name="type">The 'type' of blank. Set to FULL for a full room blank, or MINI for a microblank, like the effect of Blank Bullets.</param>
+        </member>
+        <member name="M:Alexandria.Misc.RuntimeRoomhandlerUtility.GetXEnemiesInRoom(Dungeonator.RoomHandler,System.Int32,System.Boolean,System.Boolean)">
+            <summary>
+            Returns a specified number of unique enemies in the target room. Returns a list of AIActors.
+            </summary>
+            <param name="room">The target room.</param>
+            <param name="numOfEnemiesToReturn">How many enemies the returned list should contain. May return fewer than the specified amount if there are not enough valid enemies in the room.</param>
+            <param name="reqForRoomClear">If true, will only return enemies which are required for room clear.</param>
+            <param name="canReturnBosses">If false, returned list of AIActors cannot contain bosses.</param>
+        </member>
+        <member name="M:Alexandria.Misc.RuntimeRoomhandlerUtility.RoomContainsMineFlayer(Dungeonator.RoomHandler)">
+            <summary>
+            Returns true if the target room contains the Mine Flayer boss, or another AIActor (such as a bell) who is 'secretly' the Mine Flayer.
+            </summary>
+            <param name="room">The target room.</param>
+        </member>
+        <member name="M:Alexandria.Misc.ShadowBulletDoer.SpawnChainedShadowBullets(Projectile,System.Int32,System.Single,System.Single,Projectile,System.Boolean)">
+            <summary>
+            Spawns a chain of Shadow Bullets style 'shadow' projectiles behind the original bullet. 
+            </summary>
+            <param name="source">The target projectile.</param>
+            <param name="numberInChain">How many shadow bullets should be spawned.</param>
+            <param name="pauseLength">How long the pause should be between each shadow bullet in the chain spawning.</param>
+            <param name="chainScaleMult">A scale multiplier automatically applied to the spawned clones.</param>
+            <param name="overrideProj">If set, the shadow bullet chain will be made up of copies of the override projectile instead of the original projectile.</param>
+            <param name="shadowcolour">If true, applies the shadowy colouration from the Shadow Bullets item to the clones.</param>
+        </member>
+        <member name="M:Alexandria.Misc.ShadowBulletDoer.SpawnShadowBullet(Projectile,UnityEngine.Vector3,System.Single,System.Single,System.Boolean)">
+            <summary>
+            Creates a duplicate 'shadow' bullet with the same parameters as the original at a set position and with a set rotation. Returns the spawned clone for additional modification.
+            </summary>
+            <param name="obj">The target projectile.</param>
+            <param name="position">The position that the 'shadow' bullet should be spawned at.</param>
+            <param name="rotation">The rotation of the 'shadow' bullet. Used to determine angle. 0 is equivalent to directly to the right.</param>
+            <param name="chainScaleMult">A scale multiplier automatically applied to the spawned clone.</param>
+            <param name="shadowcolour">If true, applies the shadowy colouration from the Shadow Bullets item to the clone.</param>
+        </member>
+        <member name="M:Alexandria.Misc.SupplyDropDoer.SpawnSupplyDrop(UnityEngine.Vector2,System.Int32,System.Single,System.Boolean)">
+            <summary>
+            Spawns a falling crate (like the Supply Drop item) at the specified position. Returns the spawned crate's crate behaviour. Returned behaviour contains an OnCrateLanded action for custom effects.
+            </summary>
+            <param name="position">The position the crate should be spawned at.</param>
+            <param name="lootIDToSpawn">An item or gun ID to be dropped by the crate. Leave as -1 for no item.</param>
+            <param name="crateDespawnDelay">How long after opening should the crate wait to despawn. If left as -1, the crate will despawn when the spawned loot is collected (if the loot spawn ID was set).</param>
+            <param name="preventAutoDespawn">If true, prevents the crate from despawning automatically. Call RemoveCrate() to remove manually.</param>
+        </member>
+        <member name="M:Alexandria.Misc.SupplyDropDoer.SimplerCrateBehaviour.RemoveCrate">
+            <summary>
+            Causes the crate to play it's despawn animation, and disappear.
+            </summary>
+        </member>
+        <member name="M:Alexandria.Misc.SupplyDropDoer.SimplerCrateBehaviour.ClearLandingTarget">
+            <summary>
+            Removes the crate's landing target VFX, if one is present.
+            </summary>
+        </member>
+        <member name="M:Alexandria.Misc.ProjectileUtility.ProjectilePlayerOwner(Projectile)">
+            <summary>
+            Fetches the PlayerController of the player who owns the projectile. If the projectile is not owned by a player, returns null.
+            </summary>
+            <param name="bullet">The target projectile</param>
+        </member>
+        <member name="M:Alexandria.Misc.ProjectileUtility.InstantiateAndFireTowardsPosition(Projectile,UnityEngine.Vector2,UnityEngine.Vector2,System.Single,System.Single,PlayerController)">
+            <summary>
+            Instantiates a projectile and fires it in the direction of a given Vector2 position. Returns the instantiated projectile for further modification.
+            </summary>
+            <param name="projectile">The projectile prefab to be instantiated.</param>
+            <param name="startingPosition">The position the projectile should be spawned at.</param>
+            <param name="targetPosition">The target position that the projectile should be fired towards.</param>
+            <param name="angleOffset">The amount of degrees that the projectile's trajectory should be offset by. For example, '45' will cause the projectile to be fired 45 degrees to the left of the target. Leave 0 for a direct shot.</param>
+            <param name="angleVariance">The amount of degrees the projectile's angle can vary from the final angle. Essentially accuracy/spread.</param>
+            <param name="playerToScaleAccuracyOff">If set to a player controller, that player's accuracy stat will affect the angle variance of the instantiated projectile.</param>
+        </member>
+        <member name="M:Alexandria.Misc.ProjectileUtility.InstantiateAndFireInDirection(Projectile,UnityEngine.Vector2,System.Single,System.Single,PlayerController)">
+            <summary>
+            Instantiates a projectile and fires it along a given angle. Returns the instantiated projectile for further modification.
+            </summary>
+            <param name="projectile">The projectile prefab to be instantiated.</param>
+            <param name="startingPosition">The position the projectile should be spawned at.</param>
+            <param name="angle">The angle the projectile should be fired. 0 corresponds with directly to the right. 180 corresponds with directly to the left.</param>
+            <param name="angleVariance">The amount of degrees the projectile's angle can vary from the given angle. Essentially accuracy/spread.</param>
+            <param name="playerToScaleAccuracyOff">If set to a player controller, that player's accuracy stat will affect the angle variance of the instantiated projectile.</param>
+        </member>
+        <member name="M:Alexandria.Misc.ProjectileUtility.GetAbsoluteRoom(Projectile)">
+            <summary>
+            Returns the RoomHandler of the room that the projectile is inside.
+            </summary>
+            <param name="bullet">The target projectile.</param>
+        </member>
+        <member name="M:Alexandria.Misc.ProjectileUtility.SendInRandomDirection(Projectile)">
+            <summary>
+            Sends the bullet flying in a random direction.
+            </summary>
+            <param name="bullet">The target projectile.</param>
+        </member>
+        <member name="M:Alexandria.Misc.ProjectileUtility.GetVectorToNearestEnemy(Projectile,System.Boolean,Dungeonator.RoomHandler.ActiveEnemyType,System.Collections.Generic.List{AIActor},System.Func{AIActor,System.Boolean})">
+            <summary>
+            Returns a vector corresponding to the direction of the nearest enemy to the projectile's position.
+            </summary>
+            <param name="bullet">The target projectile</param>
+            <param name="checkIsWorthShooting">If true, the projectile will ignore enemies with IsWorthShootingAt set to false, such as Mountain Cubes.</param>
+            <param name="type">Determines whether or not the projectile should take into account if an enemy needs to be killed for room clear.</param>
+            <param name="overrideValidityCheck">A function which allows for the setting of custom parameters for whether or not an enemy is valid.</param>
+        </member>
+        <member name="M:Alexandria.Misc.ProjectileUtility.ReflectBullet(Projectile,System.Boolean,GameActor,System.Single,System.Boolean,System.Single,System.Single,System.Single,System.String)">
+            <summary>
+            Changes the trajectory of the targeted projectile and assigns it a new owner, 'reflecting' it as with the effect of Rolling Eye.
+            </summary>
+            <param name="p">The target projectile</param>
+            <param name="retargetReflectedBullet">If true, the reflected bullet will be automatically sent back in the direction of it's previous owner.</param>
+            <param name="newOwner">The intended new owner of the projectile. Can be a player or an enemy.</param>
+            <param name="minReflectedBulletSpeed">The minimum speed of the projectile once it is reflected. If it's current speed is less than the minimum, it will be accelerated to the minimum.</param>
+            <param name="doPostProcessing">If true, and the newOwner is a player, the reflected bullet will scale with the new owner's stats and will be post processed by their items.</param>
+            <param name="scaleModifier">A scale multiplier which will be applied to the projectile as it is reflected.</param>
+            <param name="baseDamage">The damage that the reflected projectile should deal.</param>
+            <param name="spread">How many degrees the projectile's trajectory can vary by if it is retargeted towards it's previous owner.</param>
+            <param name="sfx">A sound effect which is played when the projectile is reflected.</param>
+        </member>
+        <member name="M:Alexandria.Misc.ProjectileUtility.SetupProjectile(System.Int32)">
+            <summary>
+            Automatically instantiates and fakeprefabs the first projectile of the default module of the given gun ID and returns the new fake prefab.
+            </summary>
+            <param name="id">The gun ID whose first, default projectile you wish to return a clone of</param>
+        </member>
+        <member name="M:Alexandria.Misc.ProjectileUtility.InstantiateAndFakeprefab(Projectile)">
+            <summary>
+            Automatically instantiates and fakeprefabs the given projectile and returns the new fake prefab.
+            </summary>
+            <param name="projToCopy">The original projectile which you intend to return a clone of</param>
+        </member>
+        <member name="M:Alexandria.Misc.ProjectileUtility.ApplyClonedShaderProjModifier(Projectile,ShaderProjModifier)">
+            <summary>
+            Clones an existing ShadeProjModifier and applies it to the target projectile. ShadeProjModifiers are visual effects like that of the Tangler.
+            </summary>
+            <param name="self">The target projectile</param>
+            <param name="shaderToClone">The original ShaderProjModifier which you intend to clone onto the target.</param>
+        </member>
+        <member name="M:Alexandria.Misc.ProjectileUtility.RemoveFromPool(Projectile)">
+            <summary>
+            Prevents the bullet from pooling and being recycled by enemies. Use on enemy bullets that you apply strange effects to.
+            </summary>
+            <param name="proj">The target projectile.</param>
+        </member>
+        <member name="M:Alexandria.Misc.ProjectileUtility.ConvertToHelixMotion(Projectile,System.Boolean)">
+            <summary>
+            Easily converts a bullet to the Helix Bullets projectile motion, including compensating for the presence of orbital bullets.
+            </summary>
+            <param name="bullet">The target projectile.</param>
+            <param name="isInverted">Whether or not the helix motion should go left or right to start off.</param>
+        </member>
+        <member name="M:Alexandria.Misc.ProjectileUtility.ApplyCompanionModifierToBullet(Projectile,PlayerController)">
+            <summary>
+            Applies companion modifiers easily to a target projectile. By default includes the multipliers from Battle Standard and the Lute.
+            </summary>
+            <param name="bullet">The target projectile</param>
+            <param name="owner">The player whose companion modifiers should be taken into account.</param>
+        </member>
+        <member name="M:Alexandria.Misc.ProjectileUtility.GetFullListOfStatusEffects(Projectile,System.Boolean)">
+            <summary>
+            Conglomerates all status effects that a projectile will apply into a single list.
+            </summary>
+            <param name="bullet">The target projectile</param>
+            <param name="ignoresProbability">If false, the method will only return a status effect if a random value is equal or less than it's chance to apply. If true, it will ignore the status effect's chance to apply and return it regardless.</param>
+        </member>
+        <member name="M:Alexandria.Misc.ProjectileUtility.ReturnRealDamageWithModifiers(Projectile,HealthHaver)">
+            <summary>
+            Approximates the damage that the projectile would apply to a given target, applying both boss damage multipliers and jammed damage multipliers. General shorthand.
+            </summary>
+            <param name="bullet">Target projectile</param>
+            <param name="target">The enemy whom the potential damage against is being calculated</param>
+        </member>
+        <member name="M:Alexandria.Misc.EnumSaveData.GetValueAsObject``1(System.String,System.String)">
+            <summary>
+            Get the value of a key as an object in the save data.
+            </summary>
+            <param name="guid">The GUID of the mod.</param>
+            <param name="key">The key to get the value of.</param>
+            <returns>The value of the key as an object.</returns>
+            <typeparam name="T">The type of object you are getting.</typeparam>
+        </member>
+        <member name="M:Alexandria.Misc.EnumSaveData.GetValue(System.String,System.String)">
+            <summary>
+            Get the value of a key as a string in the save data.
+            </summary>
+            <param name="guid">The GUID of the mod.</param>
+            <param name="key">The key to get the value of.</param>
+            <returns>The value of the key as a string.</returns>
+        </member>
+        <member name="M:Alexandria.Misc.EnumSaveData.GetValueAsInt(System.String,System.String)">
+            <summary>
+            Get the value of a key as an integer in the save data.
+            </summary>
+            <param name="guid">The GUID of the mod.</param>
+            <param name="key">The key to get the value of.</param>
+            <returns>The value of the key as an integer.</returns>
+        </member>
+        <member name="M:Alexandria.Misc.EnumSaveData.GetValueAsFloat(System.String,System.String)">
+            <summary>
+            Get the value of a key as a float in the save data.
+            </summary>
+            <param name="guid">The GUID of the mod.</param>
+            <param name="key">The key to get the value of.</param>
+            <returns>The value of the key as a float.</returns>
+        </member>
+        <member name="M:Alexandria.Misc.EnumSaveData.GetValueAsBoolean(System.String,System.String)">
+            <summary>
+            Get the value of a key as a boolean in the save data.
+            </summary>
+            <param name="guid">The GUID of the mod.</param>
+            <param name="key">The key to get the value of.</param>
+            <returns>The value of the key as a boolean.</returns>
+        </member>
+        <member name="M:Alexandria.Misc.EnumSaveData.SetValueAsObject``1(System.String,System.String,``0)">
+            <summary>
+            Set the value of a key as an object in the save data,
+            It's recommended to not save an object that implements Unity's Object class as it can cause a infinite recursion and crash the game.
+            </summary>
+            <param name="guid">The GUID of the mod.</param>
+            <param name="key">The key to set the value of.</param>
+            <param name="value">The object value to set.</param>
+            <typeparam name="T">The type of object you are setting.</typeparam>
+        </member>
+        <member name="M:Alexandria.Misc.EnumSaveData.SetValue(System.String,System.String,System.Object)">
+            <summary>
+            Set the value of a key in the save data.
+            </summary>
+            <param name="guid">The GUID of the mod.</param>
+            <param name="key">The key to set the value of.</param>
+            <param name="value">The value to set.</param>
+        </member>
+        <member name="M:Alexandria.Misc.LootUtility.CreateLootTable(System.Collections.Generic.List{GenericLootTable},DungeonPrerequisite[])">
+            <summary>
+            Creates a new blank loot table
+            </summary>
+            <param name="includedLootTables">i think this litterally dose fuck all</param> 
+            <param name="prerequisites">the prerequisites of the loot table... whatever the fuck that means</param>
+            <returns></returns>
+        </member>
+        <member name="M:Alexandria.Misc.LootUtility.AddItemToPool(GenericLootTable,PickupObject,System.Single)">
+            <summary>
+            Adds an item to a loot table via PickupObject
+            </summary>
+            <param name="lootTable">The loot table you want to add to</param> 
+            <param name="po">The PickupObject you're adding</param>
+            <param name="weight">The Weight of the item you're adding (default is 1)</param>
+            <returns></returns>
+        </member>
+        <member name="M:Alexandria.Misc.LootUtility.AddItemToPool(GenericLootTable,System.Int32[])">
+            <summary>
+            Adds an item to a loot table via PickupObject
+            </summary>
+            <param name="lootTable">The loot table you want to add to</param> 
+            <param name="po">The PickupObject you're adding</param>
+            <param name="weight">The Weight of the item you're adding (default is 1)</param>
+            <returns></returns>
+        </member>
+        <member name="M:Alexandria.Misc.LootUtility.AddItemToPool(GenericLootTable,System.Int32,System.Single)">
+            <summary>
+            Adds an item to a loot table via PickupObjectId
+            </summary>
+            <param name="lootTable">The loot table you want to add to</param> 
+            <param name="poID">The id of the PickupObject you're adding</param>
+            <param name="weight">The Weight of the item you're adding (default is 1)</param>
+            <returns></returns>
+        </member>
+        <member name="M:Alexandria.Misc.LootUtility.RemovePickupFromLootTables(PickupObject)">
+            <summary>
+            Removes a pickup object from the default guns and items loot table
+            </summary>
+            <param name="po">The pickup object you want to remove</param> 
+            <returns></returns>
+        </member>
+        <member name="M:Alexandria.Misc.LootUtility.FindWeightedGameObjectInCollection(WeightedGameObjectCollection,PickupObject)">
+            <summary>
+            Finds a weighted game object corresponding to a given pickup object in a weighted game object collection.
+            </summary>
+            <param name="collection">The collection you are searching</param> 
+            <param name="po">The pickup object you want to find</param> 
+            <returns></returns>
+        </member>
+        <member name="M:Alexandria.Misc.LootUtility.FindWeightedGameObjectInCollection(WeightedGameObjectCollection,System.Int32)">
+            <summary>
+            Finds a weighted game object corresponding to a given pickup object id in a weighted game object collection.
+            </summary>
+            <param name="collection">The collection you are searching</param> 
+            <param name="id">The id of the pickup object you want to find</param> 
+            <returns></returns>
+        </member>
+        <member name="M:Alexandria.Misc.LootUtility.FindWeightedGameObjectInCollection(WeightedGameObjectCollection,UnityEngine.GameObject)">
+            <summary>
+            Finds a weighted game object corresponding to a given gameobject in a weighted game object collection.
+            </summary>
+            <param name="collection">The collection you are searching</param> 
+            <param name="obj">The gameobject you want to find</param> 
+            <returns></returns>
+        </member>
+        <member name="M:Alexandria.Misc.MathsAndLogicHelper.CalculateVectorBetween(UnityEngine.Vector2,UnityEngine.Vector2)">
+            <summary>
+            Returns a Vector2 value corresponding to the direction between the first and second positions. Useful for trajectories.
+            </summary>
+            <param name="startVector">The starting position in the trajectory.</param>
+            <param name="endVector">The ending position in the trajectory.</param>
+        </member>
+        <member name="M:Alexandria.Misc.MathsAndLogicHelper.CalculateVectorBetween(UnityEngine.Vector3,UnityEngine.Vector3)">
+            <summary>
+            Returns a Vector2 value corresponding to the direction between the first and second positions. Useful for trajectories.
+            </summary>
+            <param name="startVector">The starting position in the trajectory.</param>
+            <param name="endVector">The ending position in the trajectory.</param>
+        </member>
+        <member name="M:Alexandria.Misc.MathsAndLogicHelper.RadianToVector2(System.Single)">
+            <summary>
+            Converts a given radian into a Vector2.
+            </summary>
+            <param name="radian">The radian to convert.</param>
+        </member>
+        <member name="M:Alexandria.Misc.MathsAndLogicHelper.DegreeToVector2(System.Single)">
+            <summary>
+            Converts an angle degree into a Vector2.
+            </summary>
+            <param name="degree">The degree to convert.</param>
+        </member>
+        <member name="M:Alexandria.Misc.MathsAndLogicHelper.DegreeToVector2(System.Int32)">
+            <summary>
+            Converts an angle degree into a Vector2.
+            </summary>
+            <param name="degree">The degree to convert.</param>
+        </member>
+        <member name="M:Alexandria.Misc.MathsAndLogicHelper.isEven(System.Single)">
+            <summary>
+            Returns true if the given float is even.
+            </summary>
+            <param name="number">The float to check.</param>
+        </member>
+        <member name="M:Alexandria.Misc.MathsAndLogicHelper.isEven(System.Int32)">
+            <summary>
+            Returns true if the given integer is even.
+            </summary>
+            <param name="number">The integer to check.</param>
+        </member>
+        <member name="M:Alexandria.Misc.MathsAndLogicHelper.IsBetweenRange(System.Single,System.Single,System.Single)">
+            <summary>
+            Returns true if the given float is between the provided number range.
+            </summary>
+            <param name="numberToCheck">The float to check.</param>
+            <param name="bottom">The low end of the given range to check.</param>
+            <param name="top">The high end of the given range to check.</param>
+        </member>
+        <member name="M:Alexandria.Misc.MathsAndLogicHelper.GetAccuracyAngled(System.Single,System.Single,PlayerController)">
+            <summary>
+            Takes a float which represents an angle, and returns that same angle with a random degree of variance, similarly to gun accuracy.
+            </summary>
+            <param name="startFloat">The starting angle.</param>
+            <param name="variance">The amount by which the starting angle may vary in either direction.</param>
+            <param name="playerToScaleAccuracyOff">If set, the amount of variance will be affected by the given player's accuracy stat.</param>
+        </member>
+        <member name="M:Alexandria.Misc.MathsAndLogicHelper.RemoveInvalidIDListEntries(System.Collections.Generic.List{System.Int32},System.Boolean,System.Boolean)">
+            <summary>
+            Takes a list of item IDs. Removes 'invalid' entries based on set criteria, and returns the modified list.
+            </summary>
+            <param name="starterList">The list to be checked. Should only contain existing item IDs.</param>
+            <param name="checkPlayerInventories">Removes item IDs that are currently in a player's inventory.</param>
+            <param name="checkUnlocked">Removes item IDs which have not yet been unlocked.</param>
+        </member>
+        <member name="M:Alexandria.Misc.MathsAndLogicHelper.GetRandomQuality(PickupObjectDatabase,System.Single,System.Single,System.Single,System.Single)">
+            <summary>
+            Returns a random item quality between D and S, with decreasing probability. Configurable probability. If one tier chance is set, all must be set. D tier is not set, as it is the default if no other tiers are chosen.
+            </summary>
+            <param name="dat">The pickupobjectdatabase.</param>
+            <param name="cChance">The chance for the returned item to be C Tier.</param>
+            <param name="bChance">The chance for the returned item to be B Tier.</param>
+            <param name="aChance">The chance for the returned item to be A Tier.</param>
+            <param name="sChance">The chance for the returned item to be S Tier.</param>
+        </member>
+        <member name="M:Alexandria.Misc.MathsAndLogicHelper.GetNearestEnemyToPosition(UnityEngine.Vector2,System.Boolean,Dungeonator.RoomHandler.ActiveEnemyType,System.Collections.Generic.List{AIActor},System.Func{AIActor,System.Boolean})">
+            <summary>
+            Returns the AIActor of the nearest enemy to the Vector2 position.
+            By default, will only return engaged enemies with HealthHavers who are alive and vulnerable. Use overrideValidityCheck if this is not what you want.
+            </summary>
+            <param name="position">The position to check.</param>
+            <param name="checkIsWorthShootingAt">If true, will ignore enemies such as Mountain Cubes.</param>
+            <param name="type">Controls whether or not the check should ignore enemies who are not required for room clear.</param>
+            <param name="excludedActors">AIactors on this list will be ignored.</param>
+            <param name="overrideValidityCheck">A func which allows the manual checking of custom parameters for enemy validity.</param>
+        </member>
+        <member name="M:Alexandria.Misc.MathsAndLogicHelper.GetNearestEnemyToPosition(IntVector2,System.Boolean,Dungeonator.RoomHandler.ActiveEnemyType,System.Collections.Generic.List{AIActor},System.Func{AIActor,System.Boolean})">
+            <summary>
+            Returns the AIActor of the nearest enemy to the IntVector2 position.
+            By default, will only return engaged enemies with HealthHavers who are alive and vulnerable. Use overrideValidityCheck if this is not what you want.
+            </summary>
+            <param name="position">The position to check.</param>
+            <param name="checkIsWorthShootingAt">If true, will ignore enemies such as Mountain Cubes.</param>
+            <param name="type">Controls whether or not the check should ignore enemies who are not required for room clear.</param>
+            <param name="excludedActors">AIactors on this list will be ignored.</param>
+            <param name="overrideValidityCheck">A func which allows the manual checking of custom parameters for enemy validity.</param>
+        </member>
+        <member name="M:Alexandria.Misc.MathsAndLogicHelper.GetVectorToNearestEnemy(UnityEngine.Vector2,System.Boolean,Dungeonator.RoomHandler.ActiveEnemyType,System.Collections.Generic.List{AIActor},System.Func{AIActor,System.Boolean})">
+            <summary>
+            Returns a Vector2 corresponding to the direction towards the nearest enemy to the initial position.
+            By default, will only return engaged enemies with HealthHavers who are alive and vulnerable. Use overrideValidityCheck if this is not what you want.
+            </summary>
+            <param name="position">The position to check.</param>
+            <param name="checkIsWorthShooting">If true, will ignore enemies such as Mountain Cubes.</param>
+            <param name="type">Controls whether or not the check should ignore enemies who are not required for room clear.</param>
+            <param name="excludedActors">AIactors on this list will be ignored.</param>
+            <param name="overrideValidityCheck">A func which allows the manual checking of custom parameters for enemy validity.</param>
+        </member>
+        <member name="M:Alexandria.Misc.MathsAndLogicHelper.GetPositionOfNearestEnemy(UnityEngine.Vector2,Alexandria.Misc.ActorCenter,System.Boolean,Dungeonator.RoomHandler.ActiveEnemyType,System.Collections.Generic.List{AIActor},System.Func{AIActor,System.Boolean})">
+            <summary>
+            Returns a Vector2 corresponding to position of the nearest enemy to the original position.
+            By default, will only return engaged enemies with HealthHavers who are alive and vulnerable. Use overrideValidityCheck if this is not what you want.
+            Returns Vector2.zero if there is not a valid enemy in the room, or it did not have the required component for the centerType.
+            </summary>
+            <param name="position">The position to check.</param>
+            <param name="centerType">How the position of the enemy should be determined. RIGIDBODY will return the SpecRigidBody UnitCenter, SPRITE will return the Sprite.WorldCenter, and TRANSFORM will return the Transform position.</param>
+            <param name="checkIsWorthShootingAt">If true, will ignore enemies such as Mountain Cubes.</param>
+            <param name="type">Controls whether or not the check should ignore enemies who are not required for room clear.</param>
+            <param name="excludedActors">AIactors on this list will be ignored.</param>
+            <param name="overrideValidityCheck">A func which allows the manual checking of custom parameters for enemy validity.</param>
+        </member>
+        <member name="M:Alexandria.Misc.MathsAndLogicHelper.KeyByValue``2(System.Collections.Generic.Dictionary{``0,``1},``1)">
+            <summary>
+            Searches a dictionary for a specific value, and returns the corresponding key. Essentially a reverse dictionary search.
+            </summary>
+            <param name="dict">The dictionary to be searched.</param>
+            <param name="val">The value being searched for.</param>
+        </member>
+        <member name="M:Alexandria.Misc.MathsAndLogicHelper.GetCenteredLookingPosForObj(UnityEngine.Vector2,SpeculativeRigidbody,System.Boolean,System.Boolean)">
+            <summary>
+            Returns a position relative to the initial Vector2 where the provided SpeculativeRigidBody may be spawned such that it's center will be centered upon the original position.
+            </summary>
+            <param name="originalValue">The original position, where the given rigidbody is desired to be centered upon.</param>
+            <param name="rigidBody">The rigidbody whose dimensions are being compensated for.</param>
+            <param name="centerX">If true, will return a position which will center the rigidbody along the X coordinate.</param>
+            <param name="centerY">If true, will return a position which will center the rigidbody along the Y coordinate.</param>
+        </member>
+        <member name="M:Alexandria.Misc.RandomEnum`1.Get">
+            <summary>
+            Returns a random value of the Enum.
+            </summary>
+        </member>
+        <member name="F:Alexandria.NPCAPI.CustomDiscountManager.DiscountsToAdd">
+            <summary>
+            The list you add your ShopDiscounts to. These will be added automatically when ShopDiscountController starts anywhere.
+            </summary>
+        </member>
+        <member name="F:Alexandria.NPCAPI.ShopDiscount.IdentificationKey">
+            <summary>
+            The name of your discount. Mostly just for organization and other things.
+            </summary>
+        </member>
+        <member name="F:Alexandria.NPCAPI.ShopDiscount.PriceMultiplier">
+            <summary>
+            Price multipler, self explanatory. Set it to 0.5f and whatever items you set it to will be half price!
+            </summary>
+        </member>
+        <member name="F:Alexandria.NPCAPI.ShopDiscount.ItemIsValidForDiscount">
+            <summary>
+            A list of item IDs you want to be discounted when the discount condition is active.
+            </summary>
+        </member>
+        <member name="F:Alexandria.NPCAPI.ShopDiscount.CanDiscountCondition">
+            <summary>
+            A function for your *condition* in which your discount will be active. Make sure to return it as TRUE when it should be active.
+            </summary>
+        </member>
+        <member name="F:Alexandria.NPCAPI.ShopDiscount.CustomPriceMultiplier">
+            <summary>
+            A function that lets you give a *custom* price multipler, for more dynamic price reductions..
+            </summary>
+        </member>
+        <member name="M:Alexandria.NPCAPI.ShopDiscount.GetOverride">
+            <summary>
+            Returns the current override value. Your discount will NOT be active while the override value is TRUE.
+            </summary>
+        </member>
+        <member name="M:Alexandria.NPCAPI.ShopDiscount.SetOverride(System.Boolean)">
+            <summary>
+            Sets the override value. Your discount will NOT be active while the override value is TRUE.
+            </summary>
+        </member>
+        <member name="M:Alexandria.NPCAPI.ShopDiscount.CanBeDiscounted">
+            <summary>
+            Returns TRUE if your discount is active.
+            </summary>
+        </member>
+        <member name="M:Alexandria.NPCAPI.ShopDiscountController.DisableSetShopDiscount(System.String,System.Boolean)">
+            <summary>
+            Sets the override for a ShopDiscount with a specific IdentificationKey.
+            </summary>
+        </member>
+        <member name="M:Alexandria.NPCAPI.ShopDiscountController.ReturnShopDiscountFromController(System.String)">
+            <summary>
+            Returns a ShopDiscount with a specific IdentificationKey.
+            </summary>
+        </member>
+        <member name="M:Alexandria.NPCAPI.NpcTools.AddNewItemToAtlas(dfAtlas,UnityEngine.Texture2D,System.String)">
+            <summary>
+            Builds and adds a new <see cref="T:dfAtlas.ItemInfo"/> to <paramref name="atlas"/> with the texture of <paramref name="tex"/> and the name of <paramref name="name"/>.
+            </summary>
+            <param name="atlas">The <see cref="T:dfAtlas"/> to add the new <see cref="T:dfAtlas.ItemInfo"/> to.</param>
+            <param name="tex">The texture of the new <see cref="T:dfAtlas.ItemInfo"/>.</param>
+            <param name="name">The name of the new <see cref="T:dfAtlas.ItemInfo"/>. If <see langword="null"/>, it will default to <paramref name="tex"/>'s name.</param>
+            <returns>The built <see cref="T:dfAtlas.ItemInfo"/>.</returns>
+        </member>
+        <member name="M:Alexandria.NPCAPI.NpcTools.GetPixelRegions(dfAtlas)">
+            <summary>
+            Gets the pixel regions of <paramref name="atlas"/>.
+            </summary>
+            <param name="atlas">The <see cref="T:dfAtlas"/> to get the pixel regions from.</param>
+            <returns>A list with all pixel regions in <paramref name="atlas"/></returns>
+        </member>
+        <member name="M:Alexandria.NPCAPI.NpcTools.Convert``2(System.Collections.Generic.List{``0},System.Func{``0,``1})">
+            <summary>
+            Converts a list of the type <typeparamref name="T"/> to a list of the type <typeparamref name="T2"/> using <paramref name="convertor"/>.
+            </summary>
+            <typeparam name="T">The type of the <paramref name="self"/> list.</typeparam>
+            <typeparam name="T2">The type to convert the <paramref name="self"/> list to.</typeparam>
+            <param name="self">The original list.</param>
+            <param name="convertor">A delegate that converts an element of type <typeparamref name="T"/> to an element of a type <typeparamref name="T2"/>.</param>
+            <returns>The converted list of type <typeparamref name="T2"/></returns>
+        </member>
+        <member name="M:Alexandria.NPCAPI.NpcTools.FindFirstValidEmptySpace(dfAtlas,IntVector2)">
+            <summary>
+            Gets the first empty space in <paramref name="atlas"/> that has at least the size of <paramref name="pixelScale"/>.
+            </summary>
+            <param name="atlas">The <see cref="T:dfAtlas"/> to find the empty space in.</param>
+            <param name="pixelScale">The required size of the empty space.</param>
+            <returns>The rect of the empty space divided by the atlas texture's size.</returns>
+        </member>
+        <member name="M:Alexandria.NPCAPI.NpcTools.ResizeAtlas(dfAtlas,IntVector2)">
+            <summary>
+            Resizes <paramref name="atlas"/> and all of it's <see cref="T:dfAtlas.ItemInfo"/>s.
+            </summary>
+            <param name="atlas">The <see cref="T:dfAtlas"/> to resize/</param>
+            <param name="newDimensions"><paramref name="atlas"/>'s new size.</param>
+        </member>
+        <member name="M:Alexandria.NPCAPI.NpcTools.ResizeBetter(UnityEngine.Texture2D,System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            Resizes <paramref name="tex"/> without it losing it's pixel information.
+            </summary>
+            <param name="tex">The <see cref="T:UnityEngine.Texture2D"/> to resize.</param>
+            <param name="width">The <paramref name="tex"/>'s new width.</param>
+            <param name="height">The <paramref name="tex"/>'s new height.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Alexandria.NPCAPI.NpcTools.ToVector2Int(IntVector2)">
+            <summary>
+            Converts <paramref name="vector"/> to a <see cref="T:UnityEngine.Vector2Int"/>.
+            </summary>
+            <param name="vector">The <see cref="T:IntVector2"/> to convert.</param>
+            <returns><paramref name="vector"/> converted to <see cref="T:UnityEngine.Vector2Int"/>.</returns>
+        </member>
+        <member name="M:Alexandria.NPCAPI.ShopAPI.SetUpShop(System.String,System.String,System.Collections.Generic.List{System.String},System.Int32,System.Collections.Generic.List{System.String},System.Int32,GenericLootTable,Alexandria.NPCAPI.CustomShopItemController.ShopCurrencyType,System.String,System.String,System.String,System.String,System.String,System.String,System.String,UnityEngine.Vector3,UnityEngine.Vector3,Alexandria.NPCAPI.ShopAPI.VoiceBoxes,UnityEngine.Vector3[],System.Single,System.Boolean,StatModifier[],System.Func{Alexandria.NPCAPI.CustomShopController,PlayerController,System.Int32,System.Boolean},System.Func{Alexandria.NPCAPI.CustomShopController,PlayerController,System.Int32,System.Int32},System.Func{Alexandria.NPCAPI.CustomShopController,Alexandria.NPCAPI.CustomShopItemController,PickupObject,System.Int32},System.Func{PlayerController,PickupObject,System.Int32,System.Boolean},System.Func{PlayerController,PickupObject,System.Int32,System.Boolean},System.String,System.String,System.Boolean,System.Boolean,System.String,System.Nullable{UnityEngine.Vector2},System.Boolean,System.String,System.Boolean,System.Single,DungeonPrerequisite[],System.Single,Alexandria.NPCAPI.CustomShopController.ShopItemPoolType,System.Boolean,System.Nullable{IntVector2},System.Nullable{IntVector2})">
+             <summary>
+             Creates a shop object along with an npc
+             </summary>
+             <param name="name">Name of the npc</param> 
+             <param name="prefix">Mod prefix (for example Bot)</param> 
+             
+             <param name="idleSpritePaths">List of *FULL* sprite paths for the idle animation</param> 
+             <param name="idleFps">Fps of the idle animation (base game tends to use around 6)</param> 
+             
+             <param name="talkSpritePaths">List of *FULL* sprite paths for the talk animation</param> 
+             <param name="talkFps">Fps of the talk animation (base game tends to use around 8)</param> 
+             
+             <param name="lootTable">Shop loot table</param> 
+             <param name="currency">What is used to buy items at the shop</param> 
+             
+             <param name="runBasedMultilineGenericStringKey">String key for normal convos</param> 
+             <param name="runBasedMultilineStopperStringKey">String key for if you try talking to an npc to much</param> 
+             <param name="purchaseItemStringKey">String key for when the player buys something</param> 
+             <param name="purchaseItemFailedStringKey">String key for when the player tries but fails to buy something</param> 
+             <param name="introStringKey">String key for when the player enters the room</param> 
+             <param name="attackedStringKey">String key for when the player shoots at the npc</param> 
+             <param name="costModifier">The multiplier for shop prices</param> 
+             <param name="itemPositions">The offset for the item(s) sold by your npc, the amount of items sold is based off how many offsets you add here (if you just want the 3 normally items spots you can use ItsDaFuckinShopApi.defaultItemPositions)</param> 
+             <param name="giveStatsOnPurchase">Whether the shop modifies stats after the player buys an item for example how cursula gives curse</param> 
+             <param name="statsToGiveOnPurchase"> The stats given when the player buys an item (will be ingored if statsToGiveOnPurchase is false)</param> 
+             
+             <param name="CustomCanBuy">The method that gets called to check if the player can buy an item (useless if currency isnt set to CUSTOM)</param> 
+             <param name="CustomRemoveCurrency">The method that gets called remove currency from the player (useless if currency isnt set to CUSTOM)</param> 
+             <param name="CustomPrice">The method that gets called to get the price of an item (useless if currency isnt set to CUSTOM)</param> 
+             
+             <param name="currencyIconPath">Sprite path for your custom currency sprite</param> 
+             <param name="currencyName">The name you want your custom currecy sprite to have (i should probably remove this...)</param> 
+            
+             <param name="hasCarpet">Whether the shop has a carpet or something else that they sit on</param> 
+             <param name="carpetSpritePath">Sprite path for the carpet or whatever</param> 
+                     
+             <param name="hasMinimapIcon">Whether the shop has a minimap icon to show what room theyre in</param> 
+             <param name="minimapIconSpritePath">Sprite path minimap icon leave blank to just use deafult smiley face</param> 
+             
+             <param name="addToMainNpcPool">Whether the shop should be added to the pool of npcs that show up in the main shop a long side bello</param> 
+             <param name="percentChanceForMainPool">How likely it is for the shop to show up in the main pool base game shops use 0.1</param> 
+             
+             <param name="prerequisites">These do unlocks and shit</param> 
+             <param name="fortunesFavorRadius">The radius of the fortunes favor effect.</param> 
+             <param name="poolType">Determines how your shop pool will pick items. DEFAULT is how basegame does it, DUPES allows your shop to sell deplicates and DUPES_AND_NOEXCLUSION allows your shop to sell duplicate items and EXCLUDED tier items.</param> 
+             <param name="RainbowModeImmunity">Enables/Disables immunity to the dreaded capitalism killer, Rainbow mode.</param> 
+            <returns></returns>
+            
+        </member>
+        <member name="M:Alexandria.NPCAPI.ShopAPI.AddAdditionalAnimationsToShop(UnityEngine.GameObject,System.Collections.Generic.List{System.String},System.Single,System.Collections.Generic.List{System.String},System.Single,System.Collections.Generic.List{System.String},System.Single)">
+            <summary>
+            Adds additional animations to certain events to your NPC. To Note, the aanimation names that are used here for certain animations (If the NPC will have one) are called: 
+            
+            On Purchase Animation Name: purchase
+            
+            On Denied Purchase Animation Name: denied
+            
+            On Stolen From Animation Name: stolen
+            </summary>
+            <param name="self">The GameObject SetUpShop() returns.</param> 
+            <param name="purchaseSpritePaths">Your purchase animation sprite paths.</param> 
+            <param name="purchaseAnimFPS">Your purchase animation FPS.</param> 
+            <param name="denyPurchaseSpritePaths">Your purchase denied animation sprite paths.</param> 
+            <param name="denyPurchaseAnimFPS">Your purchase denied animation FPS.</param> 
+            <param name="stealSpritePaths">Your on stolen from animation sprite paths.</param> 
+            <param name="stealAnimFPS">Your on stolen from animation FPS.</param> 
+        </member>
+        <member name="M:Alexandria.NPCAPI.ShopAPI.ChangeVoiceBox(UnityEngine.GameObject,Alexandria.NPCAPI.ShopAPI.VoiceBoxes)">
+            <summary>
+            Changes the voice that your NPC makes
+            </summary>
+            <param name="self">The GameObject SetUpShop() returns.</param> 
+            <param name="voicebox">The given VoiceBox to change to.</param> 
+        </member>
+        <member name="M:Alexandria.NPCAPI.ShopAPI.AddParentedAnimationToShop(UnityEngine.GameObject,System.Collections.Generic.List{System.String},System.Single,System.String)">
+            <summary>
+            Add a new DIRECTIONAL animation to your NPC. You can then play it when you need to using CustomShopController.TryPlayAnimation()
+            </summary>
+            <param name="self">The GameObject SetUpShop() returns.</param> 
+            <param name="yourPaths">The sprite paths for your animation.</param> 
+            <param name="YourAnimFPS">Your animations FPS.</param> 
+            <param name="AnimationName">Your DIRECTIONAL animations name, along with the animations name.</param> 
+        </member>
+        <member name="M:Alexandria.NPCAPI.ShopAPI.AddUnparentedAnimationToShop(UnityEngine.GameObject,System.Collections.Generic.List{System.String},System.Single,System.String)">
+            <summary>
+            Add a new animation to your NPC. This animation is NOT a directional one, but can still be played via switching a pre-existing directional animations AnimNames with this animations name or other means.
+            </summary>
+            <param name="self">The GameObject SetUpShop() returns.</param> 
+            <param name="yourPaths">The sprite paths for your animation.</param> 
+            <param name="YourAnimFPS">Your animations FPS.</param> 
+            <param name="AnimationName">Your NON DIRECTIONAL animations name.</param> 
+        </member>
+        <member name="M:Alexandria.NPCAPI.ShopAPI.ModifyPreExistingDirectionalAnimation(UnityEngine.GameObject,System.String,System.String)">
+            <summary>
+            Modifies a pre-existing directional animation in your NPC to use a different NON-Directional animation that it ALSO has.
+            </summary>
+            <param name="self">The GameObject SetUpShop() returns.</param> 
+            <param name="DirectionalAnimationPrefixToModify">The Prefix of your DIRECTIONAL animation.</param> 
+            <param name="YourNonDirectionalAnimationName">The NAME of your NON DIRECTIONAL animation.</param> 
+        </member>
+        <member name="T:Alexandria.Properties.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:Alexandria.Properties.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:Alexandria.Properties.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="T:Alexandria.TranslationAPI.CustomStringDBTable">
+            <summary>
+            Handles custom strings for UI and synergy tables.
+            </summary>
+        </member>
+        <member name="P:Alexandria.TranslationAPI.CustomStringDBTable.Table">
+            <summary>
+            The string table.
+            </summary>
+        </member>
+        <member name="P:Alexandria.TranslationAPI.CustomStringDBTable.Item(System.String)">
+            <summary>
+            Gets a string with the key of <paramref name="key"/> from the table.
+            </summary>
+            <param name="key">The string's key</param>
+            <returns>The string with the key of <paramref name="key"/>.</returns>
+        </member>
+        <member name="M:Alexandria.TranslationAPI.CustomStringDBTable.SetValue(System.String,StringTableManager.StringCollection)">
+            <summary>
+            Sets a string with the key of <paramref name="key"/> in the table.
+            </summary>
+            <param name="key">The string's key.</param>
+            <param name="value">The string value.</param>
+        </member>
+        <member name="M:Alexandria.TranslationAPI.CustomStringDBTable.#ctor(System.Func{System.Collections.Generic.Dictionary{System.String,StringTableManager.StringCollection}})">
+            <summary>
+            Builds a new <see cref="T:Alexandria.TranslationAPI.CustomStringDBTable"/> with the table get function of <paramref name="getTable"/>.
+            </summary>
+            <param name="getTable">The function that gets the table for this <see cref="T:Alexandria.TranslationAPI.CustomStringDBTable"/></param>
+        </member>
+        <member name="M:Alexandria.TranslationAPI.CustomStringDBTable.ContainsKey(System.String)">
+            <summary>
+            Returns <see langword="true"/> if the table contains <paramref name="key"/>.
+            </summary>
+            <param name="key">The key to check</param>
+            <returns><see langword="true"/> if the table contains <paramref name="key"/>.</returns>
+        </member>
+        <member name="M:Alexandria.TranslationAPI.CustomStringDBTable.Set(System.String,System.String)">
+            <summary>
+            Sets a string with the key of <paramref name="key"/> in the table.
+            </summary>
+            <param name="key">The string's key.</param>
+            <param name="value">The string value.</param>
+        </member>
+        <member name="M:Alexandria.TranslationAPI.CustomStringDBTable.Get(System.String)">
+            <summary>
+            Gets a string with the key of <paramref name="key"/>.
+            </summary>
+            <param name="key">The string's key.</param>
+            <returns>The string with the key of <paramref name="key"/>.</returns>
+        </member>
+        <member name="M:Alexandria.TranslationAPI.CustomStringDBTable.LanguageChanged">
+            <summary>
+            Applies all the string changes to the tables of the new language.
+            </summary>
+        </member>
+        <member name="T:Alexandria.TranslationAPI.StringTableType">
+            <summary>
+            Type of string tables.
+            </summary>
+        </member>
+        <member name="F:Alexandria.TranslationAPI.StringTableType.Core">
+            <summary>
+            Core strings.
+            </summary>
+        </member>
+        <member name="F:Alexandria.TranslationAPI.StringTableType.Items">
+            <summary>
+            Item strings.
+            </summary>
+        </member>
+        <member name="F:Alexandria.TranslationAPI.StringTableType.Enemies">
+            <summary>
+            Enemy strings.
+            </summary>
+        </member>
+        <member name="F:Alexandria.TranslationAPI.StringTableType.UI">
+            <summary>
+            UI strings.
+            </summary>
+        </member>
+        <member name="F:Alexandria.TranslationAPI.StringTableType.Intro">
+            <summary>
+            Intro strings.
+            </summary>
+        </member>
+        <member name="F:Alexandria.TranslationAPI.StringTableType.Synergy">
+            <summary>
+            Synergy strings.
+            </summary>
+        </member>
+        <member name="T:Alexandria.TranslationAPI.Translation">
+            <summary>
+            Handles translations for various string tables of various languages.
+            </summary>
+        </member>
+        <member name="P:Alexandria.TranslationAPI.Translation.Table">
+            <summary>
+            The current language's string table.
+            </summary>
+        </member>
+        <member name="M:Alexandria.TranslationAPI.Translation.UpdateLanguage(System.Nullable{StringTableManager.GungeonSupportedLanguages})">
+            <summary>
+            If the current language or <paramref name="overrideLang"/> are equal to <see cref="F:Alexandria.TranslationAPI.Translation.language"/> of this translation, apply the translation changes.
+            </summary>
+            <param name="overrideLang">If not <see langword="null"/>, will be used instead of the current language to check if the translations should be applied.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Alexandria.TranslationAPI.Translation.AddStringTranslation(System.String,System.String)">
+            <summary>
+            Adds a new string to this translation and if the current language is equal to <see cref="F:Alexandria.TranslationAPI.Translation.language"/> of this translation, applies the change.
+            </summary>
+            <param name="key">The key to string.</param>
+            <param name="value">The translated string.</param>
+        </member>
+        <member name="F:Alexandria.TranslationAPI.Translation.type">
+            <summary>
+            Type of table this translation applies to.
+            </summary>
+        </member>
+        <member name="F:Alexandria.TranslationAPI.Translation.language">
+            <summary>
+            The language this translation applies to.
+            </summary>
+        </member>
+        <member name="F:Alexandria.TranslationAPI.Translation.strings">
+            <summary>
+            Translated strings.
+            </summary>
+        </member>
+        <member name="F:Alexandria.TranslationAPI.Translation.getTable">
+            <summary>
+            Method that gets the current language's string table.
+            </summary>
+        </member>
+        <member name="T:Alexandria.TranslationAPI.TranslationManager">
+            <summary>
+            The core class of TranslationAPI that can add new translations.
+            </summary>
+        </member>
+        <member name="M:Alexandria.TranslationAPI.TranslationManager.Init">
+            <summary>
+            Inits TranslationAPI. You're not required to call this method, it should be called automatically when you try to add a translation.
+            </summary>
+        </member>
+        <member name="M:Alexandria.TranslationAPI.TranslationManager.Unload">
+            <summary>
+            Unloads TranslationAPI and removes all added translations.
+            </summary>
+        </member>
+        <member name="M:Alexandria.TranslationAPI.TranslationManager.TranslateItemName(PickupObject,StringTableManager.GungeonSupportedLanguages,System.String)">
+            <summary>
+            Adds a new translation for <paramref name="item"/>'s name.
+            </summary>
+            <param name="item">The <see cref="T:PickupObject"/> to add the translation to.</param>
+            <param name="language">The language to which the translation will be applied.</param>
+            <param name="translation">The translated text.</param>
+        </member>
+        <member name="M:Alexandria.TranslationAPI.TranslationManager.TranslateItemShortDescription(PickupObject,StringTableManager.GungeonSupportedLanguages,System.String)">
+            <summary>
+            Adds a new translation for <paramref name="item"/>'s short description.
+            </summary>
+            <param name="item">The <see cref="T:PickupObject"/> to add the translation to.</param>
+            <param name="language">The language to which the translation will be applied.</param>
+            <param name="translation">The translated text.</param>
+        </member>
+        <member name="M:Alexandria.TranslationAPI.TranslationManager.TranslateItemLongDescription(PickupObject,StringTableManager.GungeonSupportedLanguages,System.String)">
+            <summary>
+            Adds a new translation for <paramref name="item"/>'s long description.
+            </summary>
+            <param name="item">The <see cref="T:PickupObject"/> to add the translation to.</param>
+            <param name="language">The language to which the translation will be applied.</param>
+            <param name="translation">The translated text.</param>
+        </member>
+        <member name="M:Alexandria.TranslationAPI.TranslationManager.TranslateEnemyName(AIActor,StringTableManager.GungeonSupportedLanguages,System.String)">
+            <summary>
+            Adds a new translation for <paramref name="enemy"/>'s name.
+            </summary>
+            <param name="enemy">The <see cref="T:AIActor"/> to add the translation to.</param>
+            <param name="language">The language to which the translation will be applied.</param>
+            <param name="translation">The translated text.</param>
+        </member>
+        <member name="M:Alexandria.TranslationAPI.TranslationManager.TranslateEnemyShortDescription(AIActor,StringTableManager.GungeonSupportedLanguages,System.String)">
+            <summary>
+            Adds a new translation for <paramref name="enemy"/>'s short description.
+            </summary>
+            <param name="enemy">The <see cref="T:AIActor"/> to add the translation to.</param>
+            <param name="language">The language to which the translation will be applied.</param>
+            <param name="translation">The translated text.</param>
+        </member>
+        <member name="M:Alexandria.TranslationAPI.TranslationManager.TranslateEnemyLongDescription(AIActor,StringTableManager.GungeonSupportedLanguages,System.String)">
+            <summary>
+            Adds a new translation for <paramref name="enemy"/>'s long description.
+            </summary>
+            <param name="enemy">The <see cref="T:AIActor"/> to add the translation to.</param>
+            <param name="language">The language to which the translation will be applied.</param>
+            <param name="translation">The translated text.</param>
+        </member>
+        <member name="M:Alexandria.TranslationAPI.TranslationManager.TranslateName(EncounterTrackable,StringTableManager.GungeonSupportedLanguages,System.String)">
+            <summary>
+            Adds a new translation for <paramref name="track"/>'s name.
+            </summary>
+            <param name="track">The <see cref="T:EncounterTrackable"/> to add the translation to.</param>
+            <param name="language">The language to which the translation will be applied.</param>
+            <param name="translation">The translated text.</param>
+        </member>
+        <member name="M:Alexandria.TranslationAPI.TranslationManager.TranslateShortDescription(EncounterTrackable,StringTableManager.GungeonSupportedLanguages,System.String)">
+            <summary>
+            Adds a new translation for <paramref name="track"/>'s short description.
+            </summary>
+            <param name="track">The <see cref="T:EncounterTrackable"/> to add the translation to.</param>
+            <param name="language">The language to which the translation will be applied.</param>
+            <param name="translation">The translated text.</param>
+        </member>
+        <member name="M:Alexandria.TranslationAPI.TranslationManager.TranslateLongDescription(EncounterTrackable,StringTableManager.GungeonSupportedLanguages,System.String)">
+            <summary>
+            Adds a new translation for <paramref name="track"/>'s long description.
+            </summary>
+            <param name="track">The <see cref="T:EncounterTrackable"/> to add the translation to.</param>
+            <param name="language">The language to which the translation will be applied.</param>
+            <param name="translation">The translated text.</param>
+        </member>
+        <member name="M:Alexandria.TranslationAPI.TranslationManager.AddTranslation(StringTableManager.GungeonSupportedLanguages,System.String,System.String,Alexandria.TranslationAPI.StringTableType)">
+            <summary>
+            Adds a new translation for an individual string.
+            </summary>
+            <param name="language">The language to which the translation will be applied.</param>
+            <param name="key">The string's key</param>
+            <param name="value">The string</param>
+            <param name="tableType">Type of the table in which <paramref name="value"/> is in.</param>
+        </member>
+        <member name="M:Alexandria.TranslationAPI.TranslationManager.ForceUpdateTranslation">
+            <summary>
+            Force updates the translations.
+            </summary>
+        </member>
+        <member name="P:Alexandria.TranslationAPI.TranslationManager.SynergyTable">
+            <summary>
+            The table with all the synergy strings.
+            </summary>
+        </member>
+        <member name="P:Alexandria.TranslationAPI.TranslationManager.UITable">
+            <summary>
+            The table with all the UI strings.
+            </summary>
+        </member>
+        <member name="F:Alexandria.TranslationAPI.TranslationManager.translations">
+            <summary>
+            The list of all table translations.
+            </summary>
+        </member>
+        <member name="F:Alexandria.TranslationAPI.TranslationManager.UIStrings">
+            <summary>
+            The <see cref="T:Alexandria.TranslationAPI.CustomStringDBTable"/> for UI strings.
+            </summary>
+        </member>
+        <member name="F:Alexandria.TranslationAPI.TranslationManager.SynergyStrings">
+            <summary>
+            The <see cref="T:Alexandria.TranslationAPI.CustomStringDBTable"/> for synergy strings.
+            </summary>
+        </member>
+        <member name="F:TexturePacker.dfTexturePackingMethod.RectBestShortSideFit">
+            <summary> Positions the rectangle against the short side of a free rectangle into which it fits the best </summary>
+        </member>
+        <member name="F:TexturePacker.dfTexturePackingMethod.RectBestLongSideFit">
+            <summary> Positions the rectangle against the long side of a free rectangle into which it fits the best </summary>
+        </member>
+        <member name="F:TexturePacker.dfTexturePackingMethod.RectBestAreaFit">
+            <summary> Positions the rectangle into the smallest free rect into which it fits </summary>
+        </member>
+        <member name="F:TexturePacker.dfTexturePackingMethod.RectBottomLeftRule">
+            <summary> Does the Tetris placement </summary>
+        </member>
+        <member name="F:TexturePacker.dfTexturePackingMethod.RectContactPointRule">
+            <summary>  the placement where the rectangle touches other rects as much as possible </summary>
+        </member>
+        <member name="M:TexturePacker.MaxRectsBinPack.Occupancy">
+            Computes the ratio of used surface area.
+        </member>
+        <member name="M:TexturePacker.MaxRectsBinPack.CommonIntervalLength(System.Int32,System.Int32,System.Int32,System.Int32)">
+            Returns 0 if the two intervals i1 and i2 are disjoint, or the length of their overlap otherwise.
+        </member>
+        <member name="T:SevenZip.DataErrorException">
+            <summary>
+            The exception that is thrown when an error in input stream occurs during decoding.
+            </summary>
+        </member>
+        <member name="T:SevenZip.InvalidParamException">
+            <summary>
+            The exception that is thrown when the value of an argument is outside the allowable range.
+            </summary>
+        </member>
+        <member name="M:SevenZip.ICodeProgress.SetProgress(System.Int64,System.Int64)">
+            <summary>
+            Callback progress.
+            </summary>
+            <param name="inSize">
+            input size. -1 if unknown.
+            </param>
+            <param name="outSize">
+            output size. -1 if unknown.
+            </param>
+        </member>
+        <member name="M:SevenZip.ICoder.Code(System.IO.Stream,System.IO.Stream,System.Int64,System.Int64,SevenZip.ICodeProgress)">
+            <summary>
+            Codes streams.
+            </summary>
+            <param name="inStream">
+            input Stream.
+            </param>
+            <param name="outStream">
+            output Stream.
+            </param>
+            <param name="inSize">
+            input Size. -1 if unknown.
+            </param>
+            <param name="outSize">
+            output Size. -1 if unknown.
+            </param>
+            <param name="progress">
+            callback progress reference.
+            </param>
+            <exception cref="T:SevenZip.DataErrorException">
+            if input stream is not valid
+            </exception>
+        </member>
+        <member name="T:SevenZip.CoderPropID">
+            <summary>
+            Provides the fields that represent properties idenitifiers for compressing.
+            </summary>
+        </member>
+        <member name="F:SevenZip.CoderPropID.DefaultProp">
+            <summary>
+            Specifies default property.
+            </summary>
+        </member>
+        <member name="F:SevenZip.CoderPropID.DictionarySize">
+            <summary>
+            Specifies size of dictionary.
+            </summary>
+        </member>
+        <member name="F:SevenZip.CoderPropID.UsedMemorySize">
+            <summary>
+            Specifies size of memory for PPM*.
+            </summary>
+        </member>
+        <member name="F:SevenZip.CoderPropID.Order">
+            <summary>
+            Specifies order for PPM methods.
+            </summary>
+        </member>
+        <member name="F:SevenZip.CoderPropID.BlockSize">
+            <summary>
+            Specifies Block Size.
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "F:SevenZip.CoderPropID.PosStateBits" -->
+        <!-- Badly formed XML comment ignored for member "F:SevenZip.CoderPropID.LitContextBits" -->
+        <!-- Badly formed XML comment ignored for member "F:SevenZip.CoderPropID.LitPosBits" -->
+        <member name="F:SevenZip.CoderPropID.NumFastBytes">
+            <summary>
+            Specifies number of fast bytes for LZ*.
+            </summary>
+        </member>
+        <member name="F:SevenZip.CoderPropID.MatchFinder">
+            <summary>
+            Specifies match finder. LZMA: "BT2", "BT4" or "BT4B".
+            </summary>
+        </member>
+        <member name="F:SevenZip.CoderPropID.MatchFinderCycles">
+            <summary>
+            Specifies the number of match finder cyckes.
+            </summary>
+        </member>
+        <member name="F:SevenZip.CoderPropID.NumPasses">
+            <summary>
+            Specifies number of passes.
+            </summary>
+        </member>
+        <member name="F:SevenZip.CoderPropID.Algorithm">
+            <summary>
+            Specifies number of algorithm.
+            </summary>
+        </member>
+        <member name="F:SevenZip.CoderPropID.NumThreads">
+            <summary>
+            Specifies the number of threads.
+            </summary>
+        </member>
+        <member name="F:SevenZip.CoderPropID.EndMarker">
+            <summary>
+            Specifies mode with end marker.
+            </summary>
+        </member>
+        <member name="T:LZ4.LZ4Codec">
+            <summary>
+                LZ4 codec selecting best implementation depending on platform.
+            </summary>
+        </member>
+        <member name="F:LZ4.LZ4Codec.Encoder">
+            <summary>Encoding service.</summary>
+        </member>
+        <member name="F:LZ4.LZ4Codec.EncoderHC">
+            <summary>Encoding service for HC algorithm.</summary>
+        </member>
+        <member name="F:LZ4.LZ4Codec.Decoder">
+            <summary>Decoding service.</summary>
+        </member>
+        <member name="M:LZ4.LZ4Codec.#cctor">
+            <summary>Initializes the <see cref="T:LZ4.LZ4Codec" /> class.</summary>
+        </member>
+        <member name="M:LZ4.LZ4Codec.AutoTest(LZ4.ILZ4Service)">
+            <summary>Performs the quick auto-test on given compression service.</summary>
+            <param name="service">The service.</param>
+            <returns>A service or <c>null</c> if it failed.</returns>
+        </member>
+        <member name="M:LZ4.LZ4Codec.Try(System.Action)">
+            <summary>Tries to execute specified action. Ignores exception if it failed.</summary>
+            <param name="method">The method.</param>
+        </member>
+        <member name="M:LZ4.LZ4Codec.Try``1(System.Func{``0},``0)">
+            <summary>Tries to execute specified action. Ignores exception if it failed.</summary>
+            <typeparam name="T">Type of result.</typeparam>
+            <param name="method">The method.</param>
+            <param name="defaultValue">The default value, returned when action fails.</param>
+            <returns>Result of given method, or default value.</returns>
+        </member>
+        <member name="M:LZ4.LZ4Codec.TryService``1">
+            <summary>Tries to create a specified <seealso cref="T:LZ4.ILZ4Service" /> and tests it.</summary>
+            <typeparam name="T">Concrete <seealso cref="T:LZ4.ILZ4Service" /> type.</typeparam>
+            <returns>A service if succeeded or <c>null</c> if it failed.</returns>
+        </member>
+        <member name="P:LZ4.LZ4Codec.CodecName">
+            <summary>Gets the name of selected codec(s).</summary>
+            <value>The name of the codec.</value>
+        </member>
+        <member name="M:LZ4.LZ4Codec.MaximumOutputLength(System.Int32)">
+            <summary>Get maximum output length.</summary>
+            <param name="inputLength">Input length.</param>
+            <returns>Output length.</returns>
+        </member>
+        <member name="M:LZ4.LZ4Codec.Encode(System.Byte[],System.Int32,System.Int32,System.Byte[],System.Int32,System.Int32)">
+            <summary>Encodes the specified input.</summary>
+            <param name="input">The input.</param>
+            <param name="inputOffset">The input offset.</param>
+            <param name="inputLength">Length of the input.</param>
+            <param name="output">The output.</param>
+            <param name="outputOffset">The output offset.</param>
+            <param name="outputLength">Length of the output.</param>
+            <returns>Number of bytes written.</returns>
+        </member>
+        <member name="M:LZ4.LZ4Codec.Encode(System.Byte[],System.Int32,System.Int32)">
+            <summary>Encodes the specified input.</summary>
+            <param name="input">The input.</param>
+            <param name="inputOffset">The input offset.</param>
+            <param name="inputLength">Length of the input.</param>
+            <returns>Compressed buffer.</returns>
+        </member>
+        <member name="M:LZ4.LZ4Codec.EncodeHC(System.Byte[],System.Int32,System.Int32,System.Byte[],System.Int32,System.Int32)">
+            <summary>Encodes the specified input.</summary>
+            <param name="input">The input.</param>
+            <param name="inputOffset">The input offset.</param>
+            <param name="inputLength">Length of the input.</param>
+            <param name="output">The output.</param>
+            <param name="outputOffset">The output offset.</param>
+            <param name="outputLength">Length of the output.</param>
+            <returns>Number of bytes written.</returns>
+        </member>
+        <member name="M:LZ4.LZ4Codec.EncodeHC(System.Byte[],System.Int32,System.Int32)">
+            <summary>Encodes the specified input.</summary>
+            <param name="input">The input.</param>
+            <param name="inputOffset">The input offset.</param>
+            <param name="inputLength">Length of the input.</param>
+            <returns>Compressed buffer.</returns>
+        </member>
+        <member name="M:LZ4.LZ4Codec.Decode(System.Byte[],System.Int32,System.Int32,System.Byte[],System.Int32,System.Int32,System.Boolean)">
+            <summary>Decodes the specified input.</summary>
+            <param name="input">The input.</param>
+            <param name="inputOffset">The input offset.</param>
+            <param name="inputLength">Length of the input.</param>
+            <param name="output">The output.</param>
+            <param name="outputOffset">The output offset.</param>
+            <param name="outputLength">Length of the output.</param>
+            <param name="knownOutputLength">Set it to <c>true</c> if output length is known.</param>
+            <returns>Number of bytes written.</returns>
+        </member>
+        <member name="M:LZ4.LZ4Codec.Decode(System.Byte[],System.Int32,System.Int32,System.Int32)">
+            <summary>Decodes the specified input.</summary>
+            <param name="input">The input.</param>
+            <param name="inputOffset">The input offset.</param>
+            <param name="inputLength">Length of the input.</param>
+            <param name="outputLength">Length of the output.</param>
+            <returns>Decompressed buffer.</returns>
+        </member>
+        <member name="M:LZ4.LZ4Codec.Poke4(System.Byte[],System.Int32,System.UInt32)">
+            <summary>Sets uint32 value in byte buffer.</summary>
+            <param name="buffer">The buffer.</param>
+            <param name="offset">The offset.</param>
+            <param name="value">The value.</param>
+        </member>
+        <member name="M:LZ4.LZ4Codec.Peek4(System.Byte[],System.Int32)">
+            <summary>Gets uint32 from byte buffer.</summary>
+            <param name="buffer">The buffer.</param>
+            <param name="offset">The offset.</param>
+            <returns>The value.</returns>
+        </member>
+        <member name="M:LZ4.LZ4Codec.Wrap(System.Byte[],System.Int32,System.Int32,System.Boolean)">
+            <summary>Compresses and wraps given input byte buffer.</summary>
+            <param name="inputBuffer">The input buffer.</param>
+            <param name="inputOffset">The input offset.</param>
+            <param name="inputLength">Length of the input.</param>
+            <param name="highCompression">if set to <c>true</c> uses high compression.</param>
+            <returns>Compressed buffer.</returns>
+            <exception cref="T:System.ArgumentException">inputBuffer size of inputLength is invalid</exception>
+        </member>
+        <member name="M:LZ4.LZ4Codec.Wrap(System.Byte[],System.Int32,System.Int32)">
+            <summary>Compresses and wraps given input byte buffer.</summary>
+            <param name="inputBuffer">The input buffer.</param>
+            <param name="inputOffset">The input offset.</param>
+            <param name="inputLength">Length of the input.</param>
+            <returns>Compressed buffer.</returns>
+            <exception cref="T:System.ArgumentException">inputBuffer size of inputLength is invalid</exception>
+        </member>
+        <member name="M:LZ4.LZ4Codec.WrapHC(System.Byte[],System.Int32,System.Int32)">
+            <summary>Compresses (with high compression algorithm) and wraps given input byte buffer.</summary>
+            <param name="inputBuffer">The input buffer.</param>
+            <param name="inputOffset">The input offset.</param>
+            <param name="inputLength">Length of the input.</param>
+            <returns>Compressed buffer.</returns>
+            <exception cref="T:System.ArgumentException">inputBuffer size of inputLength is invalid</exception>
+        </member>
+        <member name="M:LZ4.LZ4Codec.Unwrap(System.Byte[],System.Int32)">
+            <summary>Unwraps the specified compressed buffer.</summary>
+            <param name="inputBuffer">The input buffer.</param>
+            <param name="inputOffset">The input offset.</param>
+            <returns>Uncompressed buffer.</returns>
+            <exception cref="T:System.ArgumentException">
+                inputBuffer size is invalid or inputBuffer size is invalid or has been corrupted
+            </exception>
+        </member>
+        <member name="M:LZ4.LZ4Codec.Has2015Runtime">
+            <summary>Determines whether VS2015 runtime is installed. 
+            Note, on Mono the Registry class is not available at all, 
+            so access to it have to be isolated.</summary>
+            <returns><c>true</c> it VS2010 runtime is installed, <c>false</c> otherwise.</returns>
+        </member>
+        <member name="M:LZ4.LZ4Codec.InitializeLZ4mm">
+            <summary>Initializes codecs from LZ4mm.</summary>
+        </member>
+        <member name="M:LZ4.LZ4Codec.InitializeLZ4cc">
+            <summary>Initializes codecs from LZ4cc.</summary>
+        </member>
+        <member name="M:LZ4.LZ4Codec.InitializeLZ4n">
+            <summary>Initializes codecs from LZ4n.</summary>
+        </member>
+        <member name="M:LZ4.LZ4Codec.InitializeLZ4s">
+            <summary>Initializes codecs from LZ4s.</summary>
+        </member>
+        <member name="T:LZ4ps.LZ4Codec">
+            <summary>Safe LZ4 codec.</summary>
+        </member>
+        <member name="F:LZ4ps.LZ4Codec.MEMORY_USAGE">
+            <summary>
+            Memory usage formula : N->2^N Bytes (examples : 10 -> 1KB; 12 -> 4KB ; 16 -> 64KB; 20 -> 1MB; etc.)
+            Increasing memory usage improves compression ratio
+            Reduced memory usage can improve speed, due to cache effect
+            Default value is 14, for 16KB, which nicely fits into Intel x86 L1 cache
+            </summary>
+        </member>
+        <member name="F:LZ4ps.LZ4Codec.NOTCOMPRESSIBLE_DETECTIONLEVEL">
+            <summary>
+            Decreasing this value will make the algorithm skip faster data segments considered "incompressible"
+            This may decrease compression ratio dramatically, but will be faster on incompressible data
+            Increasing this value will make the algorithm search more before declaring a segment "incompressible"
+            This could improve compression a bit, but will be slower on incompressible data
+            The default value (6) is recommended
+            </summary>
+        </member>
+        <member name="F:LZ4ps.LZ4Codec.BLOCK_COPY_LIMIT">
+            <summary>Buffer length when Buffer.BlockCopy becomes faster than straight loop.
+            Please note that safe implementation REQUIRES it to be greater (not even equal) than 8.</summary>
+        </member>
+        <member name="M:LZ4ps.LZ4Codec.MaximumOutputLength(System.Int32)">
+            <summary>Gets maximum the length of the output.</summary>
+            <param name="inputLength">Length of the input.</param>
+            <returns>Maximum number of bytes needed for compressed buffer.</returns>
+        </member>
+        <member name="M:LZ4ps.LZ4Codec.Encode32(System.Byte[],System.Int32,System.Int32,System.Byte[],System.Int32,System.Int32)">
+            <summary>Encodes the specified input.</summary>
+            <param name="input">The input.</param>
+            <param name="inputOffset">The input offset.</param>
+            <param name="inputLength">Length of the input.</param>
+            <param name="output">The output.</param>
+            <param name="outputOffset">The output offset.</param>
+            <param name="outputLength">Length of the output.</param>
+            <returns>Number of bytes written.</returns>
+        </member>
+        <member name="M:LZ4ps.LZ4Codec.Encode32(System.Byte[],System.Int32,System.Int32)">
+            <summary>Encodes the specified input.</summary>
+            <param name="input">The input.</param>
+            <param name="inputOffset">The input offset.</param>
+            <param name="inputLength">Length of the input.</param>
+            <returns>Compressed buffer.</returns>
+        </member>
+        <member name="M:LZ4ps.LZ4Codec.Encode64(System.Byte[],System.Int32,System.Int32,System.Byte[],System.Int32,System.Int32)">
+            <summary>Encodes the specified input.</summary>
+            <param name="input">The input.</param>
+            <param name="inputOffset">The input offset.</param>
+            <param name="inputLength">Length of the input.</param>
+            <param name="output">The output.</param>
+            <param name="outputOffset">The output offset.</param>
+            <param name="outputLength">Length of the output.</param>
+            <returns>Number of bytes written.</returns>
+        </member>
+        <member name="M:LZ4ps.LZ4Codec.Encode64(System.Byte[],System.Int32,System.Int32)">
+            <summary>Encodes the specified input.</summary>
+            <param name="input">The input.</param>
+            <param name="inputOffset">The input offset.</param>
+            <param name="inputLength">Length of the input.</param>
+            <returns>Compressed buffer.</returns>
+        </member>
+        <member name="M:LZ4ps.LZ4Codec.Decode32(System.Byte[],System.Int32,System.Int32,System.Byte[],System.Int32,System.Int32,System.Boolean)">
+            <summary>Decodes the specified input.</summary>
+            <param name="input">The input.</param>
+            <param name="inputOffset">The input offset.</param>
+            <param name="inputLength">Length of the input.</param>
+            <param name="output">The output.</param>
+            <param name="outputOffset">The output offset.</param>
+            <param name="outputLength">Length of the output.</param>
+            <param name="knownOutputLength">Set it to <c>true</c> if output length is known.</param>
+            <returns>Number of bytes written.</returns>
+        </member>
+        <member name="M:LZ4ps.LZ4Codec.Decode32(System.Byte[],System.Int32,System.Int32,System.Int32)">
+            <summary>Decodes the specified input.</summary>
+            <param name="input">The input.</param>
+            <param name="inputOffset">The input offset.</param>
+            <param name="inputLength">Length of the input.</param>
+            <param name="outputLength">Length of the output.</param>
+            <returns>Decompressed buffer.</returns>
+        </member>
+        <member name="M:LZ4ps.LZ4Codec.Decode64(System.Byte[],System.Int32,System.Int32,System.Byte[],System.Int32,System.Int32,System.Boolean)">
+            <summary>Decodes the specified input.</summary>
+            <param name="input">The input.</param>
+            <param name="inputOffset">The input offset.</param>
+            <param name="inputLength">Length of the input.</param>
+            <param name="output">The output.</param>
+            <param name="outputOffset">The output offset.</param>
+            <param name="outputLength">Length of the output.</param>
+            <param name="knownOutputLength">Set it to <c>true</c> if output length is known.</param>
+            <returns>Number of bytes written.</returns>
+        </member>
+        <member name="M:LZ4ps.LZ4Codec.Decode64(System.Byte[],System.Int32,System.Int32,System.Int32)">
+            <summary>Decodes the specified input.</summary>
+            <param name="input">The input.</param>
+            <param name="inputOffset">The input offset.</param>
+            <param name="inputLength">Length of the input.</param>
+            <param name="outputLength">Length of the output.</param>
+            <returns>Decompressed buffer.</returns>
+        </member>
+        <member name="M:LZ4ps.LZ4Codec.Encode32HC(System.Byte[],System.Int32,System.Int32,System.Byte[],System.Int32,System.Int32)">
+            <summary>Encodes the specified input using HC codec.</summary>
+            <param name="input">The input.</param>
+            <param name="inputOffset">The input offset.</param>
+            <param name="inputLength">Length of the input.</param>
+            <param name="output">The output.</param>
+            <param name="outputOffset">The output offset.</param>
+            <param name="outputLength">Length of the output.</param>
+            <returns>Number of bytes written. NOTE: when output buffer is too small it returns negative value.</returns>
+        </member>
+        <member name="M:LZ4ps.LZ4Codec.Encode32HC(System.Byte[],System.Int32,System.Int32)">
+            <summary>Encodes the specified input using HC codec.</summary>
+            <param name="input">The input.</param>
+            <param name="inputOffset">The input offset.</param>
+            <param name="inputLength">Length of the input.</param>
+            <returns>Buffer with compressed data (NOTE: it can be bigger than input).</returns>
+        </member>
+        <member name="M:LZ4ps.LZ4Codec.Encode64HC(System.Byte[],System.Int32,System.Int32,System.Byte[],System.Int32,System.Int32)">
+            <summary>Encodes the specified input using HC codec.</summary>
+            <param name="input">The input.</param>
+            <param name="inputOffset">The input offset.</param>
+            <param name="inputLength">Length of the input.</param>
+            <param name="output">The output.</param>
+            <param name="outputOffset">The output offset.</param>
+            <param name="outputLength">Length of the output.</param>
+            <returns>Number of bytes written. NOTE: when output buffer is too small it returns negative value.</returns>
+        </member>
+        <member name="M:LZ4ps.LZ4Codec.Encode64HC(System.Byte[],System.Int32,System.Int32)">
+            <summary>Encodes the specified input using HC codec.</summary>
+            <param name="input">The input.</param>
+            <param name="inputOffset">The input offset.</param>
+            <param name="inputLength">Length of the input.</param>
+            <returns>Buffer with compressed data (NOTE: it can be bigger than input).</returns>
+        </member>
+    </members>
+</doc>

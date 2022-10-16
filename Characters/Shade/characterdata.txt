@@ -1,0 +1,18 @@
+base: Robot
+name: The Shade
+name short: Shade
+nickname: phantasm
+
+<loadout>
+	nn:elder_magnum
+	nn:hand_of_night
+	nn:shade_heart
+</loadout>
+
+<altGuns>
+    nn:elder_magnum
+</altGuns>
+
+<stats>
+	
+</stats>
