@@ -114,6 +114,7 @@
     <Compile Include="src\StandardAPI\GungeonAPI\Dungeon Code\ShrineTools.cs"/>
     <Compile Include="src\StandardAPI\GungeonAPI\Dungeon Code\DungeonHooks.cs"/>
     <Compile Include="src\Class1.cs"/>
+    <Compile Include="src\Cwaff-Guns\BasicGun.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\ProjSpawnHelper.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\WhereTheMagicHappens.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\ExoticPlaceables.cs"/>

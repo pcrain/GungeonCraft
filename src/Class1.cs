@@ -508,6 +508,7 @@ namespace CwaffingTheGungy
                     // //GUNS
 
                     // //CHARACTERSTARTERS
+                    BasicGun.Add();
                     // ElderMagnum.Add();
 
                     // //REVOLVERS

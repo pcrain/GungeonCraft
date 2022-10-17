@@ -137,4 +137,9 @@ if [ $? -gt 0 ]; then
   echo -e "[${RED}@${BLN}] Build failed! D: Check errors above"
 else
   echo -e "[${GRN}>${BLN}] Build succeeded! :D"
+  if [ $# -gt 0 ] && [ "$1" == "-g" ]; then
+    ./importmod
+    gungy-modded
+  fi
 fi
+
