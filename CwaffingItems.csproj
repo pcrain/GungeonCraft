@@ -35,7 +35,6 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="packages.config"/>
-    <Reference Include="System"/>
     <Compile Include="src\StandardAPI\NPCAPI\LootTableTools.cs"/>
     <Compile Include="src\StandardAPI\NPCAPI\Examples.cs"/>
     <Compile Include="src\StandardAPI\NPCAPI\Hooks.cs"/>

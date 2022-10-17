@@ -16,13 +16,13 @@ includes=()
 
 #Manually populated includes
 includes+=('<None Include="packages.config" />')
-includes+=('<Reference Include="System" />')
+# includes+=('<Reference Include="System" />')
 # includes+=('<Folder Include="Characters\Acolyte\newspritesetup\custom\" />')
 # includes+=('<Folder Include="Characters\Shade\newspritesetup\custom\" />')
 # includes+=('<Reference Include="Ionic.Zip, Version=1.9.1.8"/>')
 
 #Source files
-echo -e "[${GRN}>${BLN}] Scanning for source file"
+echo -e "[${GRN}>${BLN}] Scanning for source files"
 while read -r line; do
   includes+=("<Compile Include=\"${line}\" />")
 done <<< $(find "src" -type f -not -path "src/StandardAPI/ItemAPI/Examples/*" -not -path "src/StandardAPI/ItemAPI/FakePrefab/*" -not -path "src/SpriteBuilder.cs" | sed -r 's@/@\\@g')
@@ -43,13 +43,13 @@ done <<< $(find "Resources" -type f | sed -r 's@/@\\@g')
 echo -e "[${GRN}>${BLN}] Scanning for EtG DLLs"
 while read -r line; do
   includes+=("<Reference Include=\"$(echo "$line" | rev | cut -f 1 -d '\' | cut -f 2- -d '.' | rev)\"/>")
-done <<< $(find "packages/EtG.UnityEngine.1.0.0" -type f -path "*.dll" | sed -r 's@/@\\@g')
+done <<< $(find "packages/EtG.UnityEngine.1.0.0" -path "*.dll" | sed -r 's@/@\\@g')
 
 #Versioned packages, net35
 echo -e "[${GRN}>${BLN}] Scanning for net35 DLLs"
 while read -r line; do
   includes+=("<Reference Include=\"$(echo "$line" | rev | cut -f 1 -d '\' | cut -f 2- -d '.' | rev)\"/>")
-done <<< $(find "packages" -type f -path "*net35*.dll" | sed -r 's@/@\\@g')
+done <<< $(find "packages" -path "*net35*.dll" | sed -r 's@/@\\@g')
 
 #Generate the template .csproj file
 echo -e "[${GRN}>${BLN}] Generating .csproj template"
