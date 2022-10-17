@@ -3,3 +3,4 @@ _old/*
 bin/*
 obj/*
 *.sublime-workspace
+src2/*
