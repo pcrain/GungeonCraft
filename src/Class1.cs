@@ -51,21 +51,21 @@ namespace CwaffingTheGungy
                 instance = this;
 
                 //Bepin bullshit
-                // ETGMod.Assets.SetupSpritesFromFolder(System.IO.Path.Combine(this.FolderPath(), "sprites"));
+                ETGMod.Assets.SetupSpritesFromFolder(System.IO.Path.Combine(this.FolderPath(), "sprites"));
 
                 //Tools and Toolboxes
-                // StaticReferences.Init();
+                StaticReferences.Init();
                 // ExoticPlaceables.Init();
                 // DungeonHandler.Init();
-                // Tools.Init();
+                Tools.Init();
                 // ShrineFakePrefabHooks.Init();
 
                 // ShrineFactory.Init();
                 // OldShrineFactory.Init();
 
-                // FakePrefabHooks.Init();
+                FakePrefabHooks.Init();
 
-                // ItemBuilder.Init();
+                ItemBuilder.Init();
                 // CustomClipAmmoTypeToolbox.Init();
                 // EnemyTools.Init();
                 // NpcApi.Hooks.Init();
@@ -508,8 +508,8 @@ namespace CwaffingTheGungy
                     // //GUNS
 
                     // //CHARACTERSTARTERS
-                    BasicGun.Add();
                     // ElderMagnum.Add();
+                    BasicGun.Add();
 
                     // //REVOLVERS
                     // FlayedRevolver.Add();

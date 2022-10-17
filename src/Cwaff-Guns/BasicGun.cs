@@ -93,6 +93,7 @@ namespace CwaffingTheGungy
 
             // Every modded gun has base projectile it works with that is borrowed from other guns in the game.
             // The gun names are the names from the JSON dump! While most are the same, some guns named completely different things. If you need help finding gun names, ask a modder on the Gungeon discord.
+            // gun.AddProjectileModuleFrom(PickupObjectDatabase.GetById(80) as Gun, true, false);
             gun.AddProjectileModuleFrom("ak-47", true, false);
              // Here we just take the default projectile module and change its settings how we want it to be.
             gun.DefaultModule.ammoCost = 1;
@@ -110,6 +111,10 @@ namespace CwaffingTheGungy
             projectile.gameObject.SetActive(false);
             FakePrefab.MarkAsFakePrefab(projectile.gameObject);
             UnityEngine.Object.DontDestroyOnLoad(projectile);
+
+            // projectile.hitEffects.overrideMidairDeathVFX = EasyVFXDatabase.RedLaserCircleVFX;
+            projectile.hitEffects.alwaysUseMidair = true;
+
             gun.DefaultModule.projectiles[0] = projectile;
              //projectile.baseData allows you to modify the base properties of your projectile module.
             //In our case, our gun uses modified projectiles from the ak-47.
@@ -120,6 +125,7 @@ namespace CwaffingTheGungy
             //This determines what sprite you want your projectile to use. Note this isn't necessary if you don't want to have a custom projectile sprite.
             //The x and y values determine the size of your custom projectile
             // projectile.SetProjectileSpriteRight("build_projectile", 2, 2, null, null);
+            // projectile.SetProjectileSpriteRight("build_projectile", 5, 5, true, tk2dBaseSprite.Anchor.MiddleCenter, 4, 4);
             projectile.SetProjectileSpriteRight("build_projectile", 5, 5, true, tk2dBaseSprite.Anchor.MiddleCenter, 4, 4);
             ETGMod.Databases.Items.Add(gun, false, "ANY");
 
