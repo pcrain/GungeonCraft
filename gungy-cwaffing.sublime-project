@@ -22,11 +22,11 @@
   [
       {
           "name": "MSBuild",
-          "shell_cmd": "msbuild $project_path/CwaffingItems.csproj"
+          "shell_cmd": "msbuild -noLogo -warnAsMessage:'CS0414' -v:minimal -clp:'Summary;Verbosity=minimal' $project_path/CwaffingItems.csproj"
       },
       {
           "name": "MSBuild (clean)",
-          "shell_cmd": "msbuild -t:clean $project_path/CwaffingItems.csproj"
+          "shell_cmd": "msbuild -noLogo -warnAsMessage:'CS0414' -v:minimal -clp:'Summary;Verbosity=minimal'  -t:clean $project_path/CwaffingItems.csproj"
       },
       {
           "name": "Regenerate Project Files",
