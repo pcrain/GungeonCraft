@@ -117,14 +117,26 @@ printf "$template" "$namespace" "$projectname" "$replace" | xmllint --format - >
 #Get new checksum of generated csproj file
 newchecksum="$(md5sum "${projfile}.new" | cut -f 1 -d ' ')"
 
-if [ "$oldchecksum" == "$newchecksum" ]; then
-  echo -e "[${GRN}>${BLN}]   No changes to .csproj file!"
-  /bin/rm "${projfile}.new"
-else
-  echo -e "[${GRN}>${BLN}]   New .csproj file generated, rebuilding project"
-  /bin/cp "${projfile}.new" "${projfile}"
-fi
+#Compare checksums and clobber the old .csproj file as necessary
+# if [ "$oldchecksum" == "$newchecksum" ]; then
+#   echo -e "[${GRN}>${BLN}]   No changes to .csproj file!"
+#   /bin/rm "${projfile}.new"
+# else
+#   echo -e "[${GRN}>${BLN}]   New .csproj file generated, rebuilding project"
+#   /bin/rm "${projfile}"
+#   /bin/cp "${projfile}.new" "${projfile}"
+# fi
+/bin/cp "${projfile}.new" "${projfile}"
 
+#Don't warn about unused variables
+nowarn="CS0414;CS0414"
+
+#Finally rebuild the project
 echo -e "[${GRN}>${BLN}] Building project"
-msbuild
+msbuild -noLogo -warnAsMessage:"${nowarn}" -v:minimal -clp:"Summary;Verbosity=minimal"
 
+if [ $? -gt 0 ]; then
+  echo -e "[${RED}@${BLN}] Build failed! D: Check errors above"
+else
+  echo -e "[${GRN}>${BLN}] Build succeeded! :D"
+fi

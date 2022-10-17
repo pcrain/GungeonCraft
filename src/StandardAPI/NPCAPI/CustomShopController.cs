@@ -78,7 +78,7 @@ namespace NpcApi
 			return false;
 		}
 
-		public void LockItems()
+		public new void LockItems()
 		{
 			for (int i = 0; i < this.m_itemControllers.Count; i++)
 			{

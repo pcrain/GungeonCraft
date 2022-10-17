@@ -101,7 +101,7 @@ namespace NpcApi
 			}
 		}
 
-		public void InitializeInternal(PickupObject i)
+		public new void InitializeInternal(PickupObject i)
 		{
 			this.item = i;
 			if (this.item && this.item.encounterTrackable)
@@ -211,14 +211,14 @@ namespace NpcApi
 				this.ForceOutOfStock();
 			}
 		}
-		private void ItemOnPreRigidbodyCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
+		private new void ItemOnPreRigidbodyCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
 		{
 			if (!otherRigidbody || otherRigidbody.PrimaryPixelCollider == null || otherRigidbody.PrimaryPixelCollider.CollisionLayer != CollisionLayer.Projectile)
 			{
 				PhysicsEngine.SkipCollision = true;
 			}
 		}
-		private void Update()
+		private new void Update()
 		{
 			if (this.m_baseParentShop && this.m_baseParentShop.baseShopType == BaseShopController.AdditionalShopType.CURSE && !this.pickedUp && base.sprite)
 			{
@@ -399,7 +399,7 @@ namespace NpcApi
 			return -1f;
 		}
 
-		private bool ShouldSteal(PlayerController player)
+		private new bool ShouldSteal(PlayerController player)
 		{
 			return GameManager.Instance.CurrentLevelOverrideState != GameManager.LevelOverrideState.FOYER && ((this.m_baseParentShop.IsCapableOfBeingStolenFrom) || player.IsCapableOfStealing) && this.m_baseParentShop.canBeRobbed;
 		}
@@ -618,12 +618,12 @@ namespace NpcApi
 		public new GungeonFlags FlagToSetOnSteal;
 		public new bool IsResourcefulRatKey;
 
-		private bool pickedUp;
-		private CustomShopController m_parentShop;
-		private CustomShopController m_baseParentShop;
-		private float THRESHOLD_CUTOFF_PRIMARY;
-		private float THRESHOLD_CUTOFF_SECONDARY;
-		private GameObject m_shadowObject;
+		private new bool pickedUp;
+		// private new CustomShopController m_parentShop;
+		private new CustomShopController m_baseParentShop;
+		private new float THRESHOLD_CUTOFF_PRIMARY;
+		private new float THRESHOLD_CUTOFF_SECONDARY;
+		private new GameObject m_shadowObject;
 		public new enum ShopCurrencyType
 		{
 			COINS,
