@@ -16,32 +16,44 @@ includes+=('<Folder Include="Characters\Acolyte\newspritesetup\custom\" />')
 includes+=('<Folder Include="Characters\Shade\newspritesetup\custom\" />')
 includes+=('<Reference Include="Ionic.Zip, Version=1.9.1.8"/>')
 
+#Easy colors (condensed)
+  BLN="\e[0m"   ; UND="\e[1;4m" ; INV="\e[1;7m" ; CRT="\e[1;41m";
+  BLK="\e[1;30m"; RED="\e[1;31m"; GRN="\e[1;32m"; YLW="\e[1;33m";
+  BLU="\e[1;34m"; MGN="\e[1;35m"; CYN="\e[1;36m"; WHT="\e[1;37m";
+  CLR="\033[2K";
+
 #Source files
+echo -e "[${GRN}>${BLN}] Scanning for source file"
 while read -r line; do
   includes+=("<Compile Include=\"${line}\" />")
 done <<< $(find "src" -type f -not -path "src/StandardAPI/ItemAPI/Examples/*" -not -path "src/StandardAPI/ItemAPI/FakePrefab/*" -not -path "src/SpriteBuilder.cs" | sed -r 's@/@\\@g')
 
 #Custom Character Embedded resources
+echo -e "[${GRN}>${BLN}] Scanning for custom characters"
 while read -r line; do
   includes+=("<EmbeddedResource Include=\"${line}\" />")
 done <<< $(find "Characters" -type f | sed -r 's@/@\\@g')
 
 #Normal Embedded resources
+echo -e "[${GRN}>${BLN}] Scanning for resources"
 while read -r line; do
   includes+=("<EmbeddedResource Include=\"${line}\" />")
 done <<< $(find "Resources" -type f | sed -r 's@/@\\@g')
 
 #Unversioned EtG Unity Packages (skipping version numbers because there's no way to tell just by looking and it was causing problems)
+echo -e "[${GRN}>${BLN}] Scanning for EtG DLLs"
 while read -r line; do
   includes+=("<Reference Include=\"$(echo "$line" | rev | cut -f 1 -d '\' | cut -f 2- -d '.' | rev)\"/>")
 done <<< $(find "packages/EtG.UnityEngine.1.0.0" -type f -path "*.dll" | sed -r 's@/@\\@g')
 
 #Versioned packages, net35
+echo -e "[${GRN}>${BLN}] Scanning for net35 DLLs"
 while read -r line; do
   includes+=("<Reference Include=\"$(echo "$line" | rev | cut -f 1 -d '\' | cut -f 2- -d '.' | rev)\"/>")
 done <<< $(find "packages" -type f -path "*net35*.dll" | sed -r 's@/@\\@g')
 
 #Generate the template .csproj file
+echo -e "[${GRN}>${BLN}] Generating .csproj template"
 template=`cat <<'HERE'
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
@@ -96,8 +108,23 @@ HERE`
 template="$(echo "$template" | sed -r 's@\\@\\\\@g')"
 #Generate our substitution from our includes array
 replace="$(printf "%s\n" "${includes[@]}")"
-#Invoke the substitution and create our projects file
-printf "$template" "$namespace" "$projectname" "$replace" | xmllint --format - > "$projfile"
 
-#Run msbuild for good measure
-# msbuild
+echo -e "[${GRN}>${BLN}] Substituting .csproj template"
+#Get old checksum of generated csproj file
+oldchecksum="$(md5sum "$projfile" | cut -f 1 -d ' ')"
+#Invoke the substitution and create our projects file
+printf "$template" "$namespace" "$projectname" "$replace" | xmllint --format - > "${projfile}.new"
+#Get new checksum of generated csproj file
+newchecksum="$(md5sum "${projfile}.new" | cut -f 1 -d ' ')"
+
+if [ "$oldchecksum" == "$newchecksum" ]; then
+  echo -e "[${GRN}>${BLN}]   No changes to .csproj file!"
+  /bin/rm "${projfile}.new"
+else
+  echo -e "[${GRN}>${BLN}]   New .csproj file generated, rebuilding project"
+  /bin/cp "${projfile}.new" "${projfile}"
+fi
+
+echo -e "[${GRN}>${BLN}] Building project"
+msbuild
+
