@@ -2,7 +2,7 @@
 #Helper script for generating my gungeon mod's .csproj file
 
 #Important top level variables
-namespace="NevernamedsItems"      #namespace used throughout source code; need to change for my own mod eventually
+namespace="CwaffingTheGungy"      #namespace used throughout source code; need to change for my own mod eventually
 projectname="CwaffingTheGungy"    #name of the DLL to create
 projfile="./CwaffingItems.csproj" #the name of the csproj file to generate
 
@@ -126,8 +126,8 @@ else
   /bin/cp "${projfile}.new" "${projfile}"
 fi
 
-#Don't warn about unused variables
-nowarn="CS0414;CS0414"
+#Don't warn about unused variables (semicolon delimited)
+nowarn="CS0414"
 
 #Finally rebuild the project
 echo -e "[${GRN}>${BLN}] Building project"

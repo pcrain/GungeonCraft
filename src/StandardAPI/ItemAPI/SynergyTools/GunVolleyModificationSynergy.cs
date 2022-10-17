@@ -5,7 +5,7 @@ using System.Text;
 using UnityEngine;
 using Alexandria.ItemAPI;
 
-namespace NevernamedsItems
+namespace CwaffingTheGungy
 {
     class GunVolleyModificationSynergy : MonoBehaviour
     {

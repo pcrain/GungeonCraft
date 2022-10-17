@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using UnityEngine.Events;
 
-namespace NevernamedsItems
+namespace CwaffingTheGungy
 {
     public static class PersistentCallToolbox
     {

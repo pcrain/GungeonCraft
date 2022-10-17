@@ -22,7 +22,7 @@ using Alexandria.CharacterAPI;
 using BepInEx;
 using Alexandria;
 
-namespace NevernamedsItems
+namespace CwaffingTheGungy
 {
     [BepInPlugin(GUID, "Cwaffing the Gungy", "0.0.1")]
     [BepInDependency(ETGModMainBehaviour.GUID)]
@@ -789,7 +789,7 @@ namespace NevernamedsItems
                 // GoodMimic.Add();
 
                 //Characters
-                // var data = Loader.BuildCharacter("NevernamedsItems/Characters/Shade",
+                // var data = Loader.BuildCharacter("CwaffingTheGungy/Characters/Shade",
                 //    "nevernamed.etg.omitb",
                 //     new Vector3(12.3f, 21.3f),
                 //     false,
@@ -853,7 +853,7 @@ namespace NevernamedsItems
 
                 // OMITBChars.Shade = ETGModCompatibility.ExtendEnum<PlayableCharacters>(Initialisation.GUID, "Shade");
 
-                ETGModConsole.Log("(Also finished DelayedInitialisation)");
+                // ETGModConsole.Log("(Also finished DelayedInitialisation)");
             }
             catch (Exception e)
             {

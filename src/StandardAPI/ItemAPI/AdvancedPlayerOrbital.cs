@@ -5,7 +5,7 @@ using System.Text;
 using ItemAPI;
 using UnityEngine;
 
-namespace NevernamedsItems
+namespace CwaffingTheGungy
 {
     public class AdvancedPlayerOrbitalItem : PassiveItem
     {

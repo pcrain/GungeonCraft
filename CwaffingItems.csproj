@@ -7,7 +7,7 @@
     <ProjectGuid>{52A82040-5BED-4ACB-9894-41A595F284CB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NevernamedsItems</RootNamespace>
+    <RootNamespace>CwaffingTheGungy</RootNamespace>
     <AssemblyName>CwaffingTheGungy</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -36,9 +36,6 @@
   <ItemGroup>
     <None Include="packages.config"/>
     <Reference Include="System"/>
-    <Folder Include="Characters\Acolyte\newspritesetup\custom\"/>
-    <Folder Include="Characters\Shade\newspritesetup\custom\"/>
-    <Reference Include="Ionic.Zip, Version=1.9.1.8"/>
     <Compile Include="src\StandardAPI\NPCAPI\LootTableTools.cs"/>
     <Compile Include="src\StandardAPI\NPCAPI\Examples.cs"/>
     <Compile Include="src\StandardAPI\NPCAPI\Hooks.cs"/>
