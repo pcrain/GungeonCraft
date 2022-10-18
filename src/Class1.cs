@@ -22,6 +22,8 @@ using Alexandria.CharacterAPI;
 using BepInEx;
 using Alexandria;
 
+using UnityEngine.Networking;
+
 namespace CwaffingTheGungy
 {
     [BepInPlugin(GUID, "Cwaffing the Gungy", "0.0.1")]
@@ -830,6 +832,7 @@ namespace CwaffingTheGungy
                 // ETGModConsole.Commands.AddUnit("nndebugflow", (args) => { DungeonHandler.debugFlow = !DungeonHandler.debugFlow; string status = DungeonHandler.debugFlow ? "enabled" : "disabled"; string color = DungeonHandler.debugFlow ? "00FF00" : "FF0000"; ETGModConsole.Log($"OMITB flow {status}", false); });
 
                 ETGMod.StartGlobalCoroutine(this.delayedstarthandler());
+
                 ETGModConsole.Log("Yay! :D");
             }
             catch (Exception e)
@@ -855,12 +858,40 @@ namespace CwaffingTheGungy
 
                 // OMITBChars.Shade = ETGModCompatibility.ExtendEnum<PlayableCharacters>(Initialisation.GUID, "Shade");
 
-                // ETGModConsole.Log("(Also finished DelayedInitialisation)");
+                ETGMod.StartGlobalCoroutine(GetAudioClip2("file:///usr/lib/libreoffice/share/gallery/sounds/beam.wav"));
+
+                ETGModConsole.Log("(Also finished DelayedInitialization)");
+
             }
             catch (Exception e)
             {
                 ETGModConsole.Log(e.Message);
                 ETGModConsole.Log(e.StackTrace);
+            }
+        }
+
+        IEnumerator GetAudioClip2(string fullPath)
+        {
+            ETGModConsole.Log("Fetching audio...");
+            AudioSource audioSource = GetComponent<AudioSource>();
+            using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(fullPath, AudioType.WAV))
+            {
+                ETGModConsole.Log("Really fetching audio..");
+                yield return www.SendWebRequest();
+
+                if (www.isNetworkError || www.isHttpError)
+                {
+                    ETGModConsole.Log("Nope :(");
+                    // Debug.Log(www.error);
+                }
+                else
+                {
+                    AudioClip myClip = DownloadHandlerAudioClip.GetContent(www);
+                    ETGModConsole.Log("Mayyyyyybe :O");
+                    audioSource.clip = myClip;
+                    audioSource.Play();
+                    ETGModConsole.Log("It played in theory o.o");
+                }
             }
         }
     }
