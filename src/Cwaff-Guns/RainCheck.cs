@@ -11,6 +11,10 @@ using System.Text;
 
 using Alexandria.Misc;
 
+using MonoMod.RuntimeDetour;
+using System.Reflection;
+
+
 namespace CwaffingTheGungy
 {
 
@@ -23,7 +27,7 @@ namespace CwaffingTheGungy
             Gun gun = ETGMod.Databases.Items.NewGun("Rain Check", "eldermagnum2");
             // "kp:basic_gun determines how you spawn in your gun through the console. You can change this command to whatever you want, as long as it follows the "name:itemname" template.
             Game.Items.Rename("outdated_gun_mods:rain_check", "kp:rain_check");
-            var comp = gun.gameObject.AddComponent<BasicGun>();
+            var comp = gun.gameObject.AddComponent<RainCheck>();
             //These two lines determines the description of your gun, ".SetShortDescription" being the description that appears when you pick up the gun and ".SetLongDescription" being the description in the Ammonomicon entry.
             gun.SetShortDescription("For a Rainy Day");
             gun.SetLongDescription("(Upon firing, bullets are delayed from moving for 2 seconds.)");
@@ -50,7 +54,7 @@ namespace CwaffingTheGungy
             gun.DefaultModule.sequenceStyle = ProjectileModule.ProjectileSequenceStyle.Random;
             gun.reloadTime = 1.1f;
             gun.DefaultModule.cooldownTime = 0.1f;
-            gun.DefaultModule.numberOfShotsInClip = 6;
+            gun.DefaultModule.numberOfShotsInClip = 8;
             gun.SetBaseMaxAmmo(250);
             // Here we just set the quality of the gun and the "EncounterGuid", which is used by Gungeon to identify the gun.
             gun.quality = PickupObject.ItemQuality.D;
@@ -85,37 +89,54 @@ namespace CwaffingTheGungy
 
         public override void OnPostFired(PlayerController player, Gun gun)
         {
+            base.OnPostFired(player, gun);
             //This determines what sound you want to play when you fire a gun.
             //Sounds names are based on the Gungeon sound dump, which can be found at EnterTheGungeon/Etg_Data/StreamingAssets/Audio/GeneratedSoundBanks/Windows/sfx.txt
-            gun.PreventNormalFireAudio = true;
-            AkSoundEngine.PostEvent("Play_WPN_smileyrevolver_shot_01", gameObject);
+            // gun.PreventNormalFireAudio = true;
+            // AkSoundEngine.PostEvent("Play_WPN_smileyrevolver_shot_01", gameObject);
         }
-        private bool HasReloaded;
+        // private bool HasReloaded;
         //This block of code allows us to change the reload sounds.
-        protected new void Update()
+        protected override void Update()
         {
-            if (gun.CurrentOwner)
-            {
+            base.Update();
+            // if (gun.CurrentOwner)
+            // {
 
-                if (!gun.PreventNormalFireAudio)
-                {
-                    this.gun.PreventNormalFireAudio = true;
-                }
-                if (!gun.IsReloading && !HasReloaded)
-                {
-                    this.HasReloaded = true;
-                }
-            }
+            //     if (!gun.PreventNormalFireAudio)
+            //     {
+            //         this.gun.PreventNormalFireAudio = true;
+            //     }
+            //     if (!gun.IsReloading && !HasReloaded)
+            //     {
+            //         this.HasReloaded = true;
+            //     }
+            // }
         }
 
-        public override void OnReloadPressed(PlayerController player, Gun gun, bool bSOMETHING)
+        public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
         {
-            if (gun.IsReloading && this.HasReloaded)
+            base.OnReloadPressed(player, gun, manualReload);
+            // if (gun.IsReloading && this.HasReloaded)
+            // {
+            //     HasReloaded = false;
+            //     AkSoundEngine.PostEvent("Stop_WPN_All", base.gameObject);
+            //     base.OnReloadPressed(player, gun, bSOMETHING);
+            //     AkSoundEngine.PostEvent("Play_WPN_SAA_reload_01", base.gameObject);
+            // }
+        }
+
+        public override void OnReload(PlayerController player, Gun gun)
+        {
+            base.OnReload(player, gun);
+            int num_found = 0;
+            for (int i = 0; i < StaticReferenceManager.AllProjectiles.Count; i++)
             {
-                HasReloaded = false;
-                AkSoundEngine.PostEvent("Stop_WPN_All", base.gameObject);
-                base.OnReloadPressed(player, gun, bSOMETHING);
-                AkSoundEngine.PostEvent("Play_WPN_SAA_reload_01", base.gameObject);
+                Projectile projectile = StaticReferenceManager.AllProjectiles[i];
+                if (projectile && projectile.Owner == gun.CurrentOwner && projectile.GetComponent<RainCheckBullets>())
+                {
+                    projectile.GetComponent<RainCheckBullets>().ForceMove(++num_found);
+                }
             }
         }
 
@@ -134,31 +155,54 @@ namespace CwaffingTheGungy
 
     public class RainCheckBullets : MonoBehaviour
     {
+        private const float RAINCHECK_MAX_TIMEOUT  = 10f;
+        private const float RAINCHECK_LAUNCH_DELAY = 0.025f;
+
         private Projectile self;
         private PlayerController owner;
         private float initialSpeed;
+        private float moveTimer;
+        private bool  forceMove;
         private void Start()
         {
             this.self           = base.GetComponent<Projectile>();
             this.owner          = self.ProjectilePlayerOwner();
             this.initialSpeed   = self.baseData.speed;
+            this.moveTimer      = RAINCHECK_MAX_TIMEOUT;
+            this.forceMove      = false;
             self.baseData.speed = 0.0f;
             self.UpdateSpeed();
+
+            int num_found = 0;
+
+            // Reset the timers of all of our other RainCheckBullets, with a small 0.02s delay
+            for (int i = 0; i < StaticReferenceManager.AllProjectiles.Count; i++)
+            {
+                Projectile projectile = StaticReferenceManager.AllProjectiles[i];
+                if (projectile && projectile.Owner == self.Owner && projectile.GetComponent<RainCheckBullets>())
+                {
+                    projectile.GetComponent<RainCheckBullets>().moveTimer =
+                        RAINCHECK_MAX_TIMEOUT - RAINCHECK_LAUNCH_DELAY * num_found;
+                    ++num_found;
+                }
+            }
 
             StartCoroutine(DoSpeedChange());
         }
         private IEnumerator DoSpeedChange()
         {
-            float realTime = 2f;
-            float elapsed  = 0f;
-            while (elapsed < realTime)
+            while (this.moveTimer > 0)
             {
-                elapsed += BraveTime.DeltaTime;
+                this.moveTimer -= BraveTime.DeltaTime;
                 if (!self) break;
                 yield return null;
             }
             self.baseData.speed = this.initialSpeed;
             self.UpdateSpeed();
+        }
+        public void ForceMove(int index)
+        {
+            this.moveTimer = index*RAINCHECK_LAUNCH_DELAY;
         }
     }
 }
