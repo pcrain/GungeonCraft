@@ -77,6 +77,7 @@ namespace CwaffingTheGungy
                 // CurseManager.Init();
                 // ETGModMainBehaviour.Instance.gameObject.AddComponent<GlobalUpdate>();
                 // ETGModMainBehaviour.Instance.gameObject.AddComponent<CustomDarknessHandler>();
+                ETGModMainBehaviour.Instance.gameObject.AddComponent<AudioSource>();
                 // GameOfLifeHandler.Init();
 
                 //Challenges
@@ -873,24 +874,34 @@ namespace CwaffingTheGungy
         IEnumerator GetAudioClip2(string fullPath)
         {
             ETGModConsole.Log("Fetching audio...");
-            AudioSource audioSource = GetComponent<AudioSource>();
-            using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(fullPath, AudioType.WAV))
+            AudioSource audioSource = ETGModMainBehaviour.Instance.gameObject.GetComponent<AudioSource>();
+            if (!audioSource)
             {
-                ETGModConsole.Log("Really fetching audio..");
-                yield return www.SendWebRequest();
+                ETGModConsole.Log("AAAAAAAAA");
+                yield return null;
+            }
+            else
+            {
+                using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(fullPath, AudioType.WAV))
+                {
+                    ETGModConsole.Log("Really fetching audio..");
+                    yield return www.SendWebRequest();
 
-                if (www.isNetworkError || www.isHttpError)
-                {
-                    ETGModConsole.Log("Nope :(");
-                    // Debug.Log(www.error);
-                }
-                else
-                {
-                    AudioClip myClip = DownloadHandlerAudioClip.GetContent(www);
-                    ETGModConsole.Log("Mayyyyyybe :O");
-                    audioSource.clip = myClip;
-                    audioSource.Play();
-                    ETGModConsole.Log("It played in theory o.o");
+                    if (www.isNetworkError || www.isHttpError)
+                    {
+                        ETGModConsole.Log("Nope :(");
+                    }
+                    else
+                    {
+                        AudioClip myClip = DownloadHandlerAudioClip.GetContent(www);
+                        ETGModConsole.Log("Mayyyyyybe :O");
+                        audioSource.clip = myClip;
+                        ETGModConsole.Log("We got it O:");
+                        audioSource.volume = 1.0f;
+                        audioSource.Play(); //very very bad hang D:
+                        ETGModConsole.Log("It played in theory o.o");
+                        yield return null;
+                    }
                 }
             }
         }
