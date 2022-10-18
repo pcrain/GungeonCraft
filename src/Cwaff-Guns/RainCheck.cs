@@ -30,7 +30,7 @@ namespace CwaffingTheGungy
             var comp = gun.gameObject.AddComponent<RainCheck>();
             //These two lines determines the description of your gun, ".SetShortDescription" being the description that appears when you pick up the gun and ".SetLongDescription" being the description in the Ammonomicon entry.
             gun.SetShortDescription("For a Rainy Day");
-            gun.SetLongDescription("(Upon firing, bullets are delayed from moving until reloading, then move towards player.)");
+            gun.SetLongDescription("(Upon firing, bullets are delayed from moving until reloading, then move towards player. Switching away from this gun keeps bullets in stasis until switching back to this gun.)");
             // This is required, unless you want to use the sprites of the base gun.
             // That, by default, is the pea shooter.
             // SetupSprite sets up the default gun sprite for the ammonomicon and the "gun get" popup.
@@ -95,23 +95,11 @@ namespace CwaffingTheGungy
             // gun.PreventNormalFireAudio = true;
             // AkSoundEngine.PostEvent("Play_WPN_smileyrevolver_shot_01", gameObject);
         }
-        // private bool HasReloaded;
+
         //This block of code allows us to change the reload sounds.
         protected override void Update()
         {
             base.Update();
-            // if (gun.CurrentOwner)
-            // {
-
-            //     if (!gun.PreventNormalFireAudio)
-            //     {
-            //         this.gun.PreventNormalFireAudio = true;
-            //     }
-            //     if (!gun.IsReloading && !HasReloaded)
-            //     {
-            //         this.HasReloaded = true;
-            //     }
-            // }
         }
 
         public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
@@ -132,11 +120,18 @@ namespace CwaffingTheGungy
             LaunchAllBullets();
         }
 
-        public override void OnGunsChanged(Gun previous, Gun current, bool newGun)
+        public override void OnSwitchedToThisGun()
         {
-            base.OnGunsChanged(previous, current, newGun);
+            base.OnSwitchedToThisGun();
             LaunchAllBullets();
         }
+
+        public override void OnSwitchedAwayFromThisGun()
+        {
+            base.OnSwitchedAwayFromThisGun();
+            PutAllBulletsInStasis();
+        }
+
 
         private void LaunchAllBullets()
         {
@@ -147,6 +142,19 @@ namespace CwaffingTheGungy
                 if (projectile && projectile.Owner == gun.CurrentOwner && projectile.GetComponent<RainCheckBullets>())
                 {
                     projectile.GetComponent<RainCheckBullets>().ForceMove(++num_found);
+                }
+            }
+        }
+
+        private void PutAllBulletsInStasis()
+        {
+            int num_found = 0;
+            for (int i = 0; i < StaticReferenceManager.AllProjectiles.Count; i++)
+            {
+                Projectile projectile = StaticReferenceManager.AllProjectiles[i];
+                if (projectile && projectile.Owner == gun.CurrentOwner && projectile.GetComponent<RainCheckBullets>())
+                {
+                    projectile.GetComponent<RainCheckBullets>().PutInStasis();
                 }
             }
         }
@@ -173,41 +181,46 @@ namespace CwaffingTheGungy
         private PlayerController owner;
         private float initialSpeed;
         private float moveTimer;
+        private bool launchSequenceStarted;
+        private bool inStasis;
         private void Start()
         {
-            this.self           = base.GetComponent<Projectile>();
-            this.owner          = self.ProjectilePlayerOwner();
-            this.initialSpeed   = self.baseData.speed;
-            this.moveTimer      = RAINCHECK_MAX_TIMEOUT;
+            this.self                  = base.GetComponent<Projectile>();
+            this.owner                 = self.ProjectilePlayerOwner();
+            this.initialSpeed          = self.baseData.speed;
+            this.moveTimer             = RAINCHECK_MAX_TIMEOUT;
+            this.launchSequenceStarted = false;
+            this.inStasis              = false;
 
-            self.baseData.speed = 0.0f;
+            self.baseData.speed = 0.1f;
             self.UpdateSpeed();
 
             // Reset the timers of all of our other RainCheckBullets, with a small delay
-            int num_found = 0;
+            int numRainProjectiles = 0;
             for (int i = 0; i < StaticReferenceManager.AllProjectiles.Count; i++)
             {
                 Projectile projectile = StaticReferenceManager.AllProjectiles[i];
                 if (projectile && projectile.Owner == self.Owner && projectile.GetComponent<RainCheckBullets>())
                 {
                     projectile.GetComponent<RainCheckBullets>().moveTimer =
-                        RAINCHECK_MAX_TIMEOUT - RAINCHECK_LAUNCH_DELAY * num_found;
-                    ++num_found;
+                        RAINCHECK_MAX_TIMEOUT - RAINCHECK_LAUNCH_DELAY * numRainProjectiles;
+                    ++numRainProjectiles;
                 }
             }
 
             StartCoroutine(DoSpeedChange());
         }
+
         private IEnumerator DoSpeedChange()
         {
-            while (this.moveTimer > 0)
+            while (this.inStasis || this.moveTimer > 0)
             {
                 this.moveTimer -= BraveTime.DeltaTime;
                 if (!self) break;
                 yield return null;
             }
-            // this.owner.specRigidbody.Position
-            self.baseData.speed = this.initialSpeed;
+            this.launchSequenceStarted = true;
+            self.baseData.speed        = this.initialSpeed;
             if (this.owner)
             {
                 Vector2 dirToPlayer = self.sprite.WorldCenter.CalculateVectorBetween(this.owner.sprite.WorldCenter);
@@ -215,9 +228,20 @@ namespace CwaffingTheGungy
             }
             self.UpdateSpeed();
         }
+
         public void ForceMove(int index)
         {
-            this.moveTimer = index*RAINCHECK_LAUNCH_DELAY;
+            if (!this.launchSequenceStarted)
+            {  //no resetting our timers after this function has been called once
+                this.launchSequenceStarted = true;
+                this.moveTimer             = index * RAINCHECK_LAUNCH_DELAY;
+                this.inStasis              = false;
+            }
+        }
+
+        public void PutInStasis()
+        {
+            this.inStasis = true;
         }
     }
 }
