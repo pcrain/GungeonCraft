@@ -30,7 +30,7 @@ namespace CwaffingTheGungy
             var comp = gun.gameObject.AddComponent<RainCheck>();
             //These two lines determines the description of your gun, ".SetShortDescription" being the description that appears when you pick up the gun and ".SetLongDescription" being the description in the Ammonomicon entry.
             gun.SetShortDescription("For a Rainy Day");
-            gun.SetLongDescription("(Upon firing, bullets are delayed from moving for 2 seconds.)");
+            gun.SetLongDescription("(Upon firing, bullets are delayed from moving until reloading, then move towards player.)");
             // This is required, unless you want to use the sprites of the base gun.
             // That, by default, is the pea shooter.
             // SetupSprite sets up the default gun sprite for the ammonomicon and the "gun get" popup.
@@ -49,12 +49,12 @@ namespace CwaffingTheGungy
             // gun.AddProjectileModuleFrom(PickupObjectDatabase.GetById(80) as Gun, true, false);
             gun.AddProjectileModuleFrom("ak-47", true, false);
              // Here we just take the default projectile module and change its settings how we want it to be.
-            gun.DefaultModule.ammoCost = 1;
-            gun.DefaultModule.shootStyle = ProjectileModule.ShootStyle.SemiAutomatic;
-            gun.DefaultModule.sequenceStyle = ProjectileModule.ProjectileSequenceStyle.Random;
-            gun.reloadTime = 1.1f;
-            gun.DefaultModule.cooldownTime = 0.1f;
-            gun.DefaultModule.numberOfShotsInClip = 8;
+            gun.DefaultModule.ammoCost            = 1;
+            gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
+            gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+            gun.reloadTime                        = 1.1f;
+            gun.DefaultModule.cooldownTime        = 0.1f;
+            gun.DefaultModule.numberOfShotsInClip = 20;
             gun.SetBaseMaxAmmo(250);
             // Here we just set the quality of the gun and the "EncounterGuid", which is used by Gungeon to identify the gun.
             gun.quality = PickupObject.ItemQuality.D;
@@ -129,6 +129,17 @@ namespace CwaffingTheGungy
         public override void OnReload(PlayerController player, Gun gun)
         {
             base.OnReload(player, gun);
+            LaunchAllBullets();
+        }
+
+        public override void OnGunsChanged(Gun previous, Gun current, bool newGun)
+        {
+            base.OnGunsChanged(previous, current, newGun);
+            LaunchAllBullets();
+        }
+
+        private void LaunchAllBullets()
+        {
             int num_found = 0;
             for (int i = 0; i < StaticReferenceManager.AllProjectiles.Count; i++)
             {
@@ -162,20 +173,18 @@ namespace CwaffingTheGungy
         private PlayerController owner;
         private float initialSpeed;
         private float moveTimer;
-        private bool  forceMove;
         private void Start()
         {
             this.self           = base.GetComponent<Projectile>();
             this.owner          = self.ProjectilePlayerOwner();
             this.initialSpeed   = self.baseData.speed;
             this.moveTimer      = RAINCHECK_MAX_TIMEOUT;
-            this.forceMove      = false;
+
             self.baseData.speed = 0.0f;
             self.UpdateSpeed();
 
+            // Reset the timers of all of our other RainCheckBullets, with a small delay
             int num_found = 0;
-
-            // Reset the timers of all of our other RainCheckBullets, with a small 0.02s delay
             for (int i = 0; i < StaticReferenceManager.AllProjectiles.Count; i++)
             {
                 Projectile projectile = StaticReferenceManager.AllProjectiles[i];
@@ -197,7 +206,13 @@ namespace CwaffingTheGungy
                 if (!self) break;
                 yield return null;
             }
+            // this.owner.specRigidbody.Position
             self.baseData.speed = this.initialSpeed;
+            if (this.owner)
+            {
+                Vector2 dirToPlayer = self.sprite.WorldCenter.CalculateVectorBetween(this.owner.sprite.WorldCenter);
+                self.SendInDirection(dirToPlayer, true);
+            }
             self.UpdateSpeed();
         }
         public void ForceMove(int index)
