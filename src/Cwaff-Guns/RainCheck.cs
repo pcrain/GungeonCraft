@@ -26,7 +26,7 @@ namespace CwaffingTheGungy
             // Let's just call it "Basic Gun", and use "jpxfrd" for all sprites and as "codename" All sprites must begin with the same word as the codename. For example, your firing sprite would be named "jpxfrd_fire_001".
             Gun gun = ETGMod.Databases.Items.NewGun("Rain Check", "eldermagnum2");
             // "kp:basic_gun determines how you spawn in your gun through the console. You can change this command to whatever you want, as long as it follows the "name:itemname" template.
-            Game.Items.Rename("outdated_gun_mods:rain_check", "kp:rain_check");
+            Game.Items.Rename("outdated_gun_mods:rain_check", "cg:rain_check");
             var comp = gun.gameObject.AddComponent<RainCheck>();
             //These two lines determines the description of your gun, ".SetShortDescription" being the description that appears when you pick up the gun and ".SetLongDescription" being the description in the Ammonomicon entry.
             gun.SetShortDescription("For a Rainy Day");
@@ -148,7 +148,6 @@ namespace CwaffingTheGungy
 
         private void PutAllBulletsInStasis()
         {
-            int num_found = 0;
             for (int i = 0; i < StaticReferenceManager.AllProjectiles.Count; i++)
             {
                 Projectile projectile = StaticReferenceManager.AllProjectiles[i];
@@ -183,6 +182,7 @@ namespace CwaffingTheGungy
         private float moveTimer;
         private bool launchSequenceStarted;
         private bool inStasis;
+        private bool wasEverInStasis;
         private void Start()
         {
             this.self                  = base.GetComponent<Projectile>();
@@ -191,6 +191,7 @@ namespace CwaffingTheGungy
             this.moveTimer             = RAINCHECK_MAX_TIMEOUT;
             this.launchSequenceStarted = false;
             this.inStasis              = false;
+            this.wasEverInStasis       = false;
 
             self.baseData.speed = 0.1f;
             self.UpdateSpeed();
@@ -200,11 +201,15 @@ namespace CwaffingTheGungy
             for (int i = 0; i < StaticReferenceManager.AllProjectiles.Count; i++)
             {
                 Projectile projectile = StaticReferenceManager.AllProjectiles[i];
-                if (projectile && projectile.Owner == self.Owner && projectile.GetComponent<RainCheckBullets>())
+                if (projectile && projectile.Owner == self.Owner)
                 {
-                    projectile.GetComponent<RainCheckBullets>().moveTimer =
-                        RAINCHECK_MAX_TIMEOUT - RAINCHECK_LAUNCH_DELAY * numRainProjectiles;
-                    ++numRainProjectiles;
+                    var p = projectile.GetComponent<RainCheckBullets>();
+                    if (p && !p.launchSequenceStarted)
+                    {
+                        p.moveTimer =
+                            RAINCHECK_MAX_TIMEOUT - RAINCHECK_LAUNCH_DELAY * numRainProjectiles;
+                        ++numRainProjectiles;
+                    }
                 }
             }
 
@@ -241,7 +246,11 @@ namespace CwaffingTheGungy
 
         public void PutInStasis()
         {
-            this.inStasis = true;
+            if (!this.wasEverInStasis)
+            {
+                this.inStasis        = true;
+                this.wasEverInStasis = true;
+            }
         }
     }
 }
