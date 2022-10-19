@@ -73,7 +73,7 @@ namespace CwaffingTheGungy
                 // NpcApi.Hooks.Init();
                 // EnemyAPI.Hooks.Init();
                 // SaveAPIManager.Setup("nn");
-                // AudioResourceLoader.InitAudio();
+                AudioResourceLoader.InitAudio();
                 // CurseManager.Init();
                 // ETGModMainBehaviour.Instance.gameObject.AddComponent<GlobalUpdate>();
                 // ETGModMainBehaviour.Instance.gameObject.AddComponent<CustomDarknessHandler>();
@@ -834,6 +834,8 @@ namespace CwaffingTheGungy
 
                 ETGMod.StartGlobalCoroutine(this.delayedstarthandler());
 
+                AkSoundEngine.PostEvent("Play_ClownHonk", ETGModMainBehaviour.Instance.gameObject);
+
                 ETGModConsole.Log("Yay! :D");
             }
             catch (Exception e)
@@ -895,6 +897,7 @@ namespace CwaffingTheGungy
                     {
                         AudioClip myClip = DownloadHandlerAudioClip.GetContent(www);
                         ETGModConsole.Log("Mayyyyyybe :O");
+                        audioSource.playOnAwake = true;
                         audioSource.clip = myClip;
                         ETGModConsole.Log("We got it O:");
                         audioSource.volume = 1.0f;
