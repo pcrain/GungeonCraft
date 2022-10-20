@@ -836,7 +836,9 @@ namespace CwaffingTheGungy
 
                 // AkSoundEngine.PostEvent("Play_ClownHonk", ETGModMainBehaviour.Instance.gameObject);
                 // AkSoundEngine.PostEvent(3881984263, ETGModMainBehaviour.Instance.gameObject);
-                AkSoundEngine.PostEvent(1000000001, ETGModMainBehaviour.Instance.gameObject);
+                // AkSoundEngine.PostEvent(1000000001, ETGModMainBehaviour.Instance.gameObject);
+                // AkSoundEngine.PostEvent(1000000002, ETGModMainBehaviour.Instance.gameObject);
+                AkSoundEngine.PostEvent(1000000003, ETGModMainBehaviour.Instance.gameObject);
 
                 ETGModConsole.Log("Yay! :D");
             }

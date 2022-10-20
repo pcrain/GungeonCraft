@@ -23,6 +23,8 @@ BNK_IN  = "/home/pretzel/workspace/gungy/resources/wem-reverse-engineering/OMITB
 BNK_OUT = f"{BNK_IN}.out"
 
 TEST_WAV = "/home/pretzel/workspace/gungy/resources/wem-reverse-engineering/kirby.wav"
+TEST_WAV_2 = "/home/pretzel/workspace/gungy/resources/wem-reverse-engineering/kirby2.wav"
+TEST_WAV_3 = "/home/pretzel/workspace/gungy/resources/wem-reverse-engineering/kirby3.wav"
 TEST_WAV = "/home/pretzel/workspace/gungy/resources/wem-reverse-engineering/kirby-stereo.wav"
 TEST_BNK = "/home/pretzel/workspace/gungy-cwaffing/Resources/Sounds/CwaffingTheGungy.new.bnk"
 
@@ -478,6 +480,8 @@ class WEMParser(Parser):
 class BNKParser(Parser):
   def __init__(self):
     super(BNKParser, self).__init__()
+    self.num_waves = 0
+    self.wemoff    = 0
 
   def parse(self,decoder,root,mode):
     super(BNKParser, self).parse(decoder,root,mode)
@@ -655,12 +659,15 @@ class BNKParser(Parser):
     bus_id        = 3803692087 # magic, needs to be shared among sounds
     rtpc_x        = 3273357900 # magic, needs to be shared among rtpcs
 
+    self.num_waves += 1
+    i = self.num_waves
+
     # Set up unique generated ids
-    event_id      = 1000000001 # non-magic, needs to be unique
-    wemid         = 300001     # non-magic, needs to be unique (can't be less than 300,000???)
-    sfx_id        = 200001     # non-magic, needs to be unique
-    rtpc_curve_id = 900001     # non-magic, needs to be unique
-    action_id     = 100001     # non-magic, needs to be unique
+    event_id      = i+1000000000 # non-magic, needs to be unique
+    wemid         = i+300000     # non-magic, needs to be unique (can't be less than 300,000???)
+    sfx_id        = i+200000     # non-magic, needs to be unique
+    rtpc_curve_id = i+900000     # non-magic, needs to be unique
+    action_id     = i+100000     # non-magic, needs to be unique
 
     # Load the wavfile as a WEM
     wp = WEMParser().createFromWav(wavfile)
@@ -669,8 +676,9 @@ class BNKParser(Parser):
     root["didx-seclen"] += 12
     wfi                  = Ref({})
     wfi["wemid"]         = wemid
-    wfi["wemoff"]        = 0        # needs to be updated for each wem
+    wfi["wemoff"]        = self.wemoff # needs to be updated for each wem
     wfi["wemlen"]        = int(wp.root["wem_length"])+8
+    self.wemoff += int(wfi["wemlen"])
     root["wemfileinfo"].append(wfi.val)
 
     # Create the wem data
@@ -820,7 +828,8 @@ def testCreateBnk():
     os.remove(TEST_BNK)
   bp = BNKParser().createMinimal()
   bp.embedFromWav(TEST_WAV)
-  # bp.root.dump()
+  bp.embedFromWav(TEST_WAV_2)
+  bp.embedFromWav(TEST_WAV_3)
   bp.saveTo(TEST_BNK)
 
   bp2 = BNKParser().loadFrom(TEST_BNK)

@@ -24,6 +24,7 @@ includes+=('<None Include="packages.config" />')
 #Regenerate audio sources
 echo -e "[${GRN}>${BLN}] Regenerating audio bank"
 ./genaudio
+
 #Source files
 echo -e "[${GRN}>${BLN}] Scanning for source files"
 while read -r line; do
