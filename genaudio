@@ -24,7 +24,7 @@ BNK_OUT = f"{BNK_IN}.out"
 
 TEST_WAV = "/home/pretzel/workspace/gungy/resources/wem-reverse-engineering/kirby.wav"
 TEST_WAV = "/home/pretzel/workspace/gungy/resources/wem-reverse-engineering/kirby-stereo.wav"
-TEST_BNK = "/home/pretzel/workspace/gungy-cwaffing/Resources/Sounds/OMITBSoundbank.new.bnk"
+TEST_BNK = "/home/pretzel/workspace/gungy-cwaffing/Resources/Sounds/CwaffingTheGungy.new.bnk"
 
 # Easy colors (print)
 class col:
