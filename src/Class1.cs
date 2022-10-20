@@ -834,12 +834,7 @@ namespace CwaffingTheGungy
 
                 ETGMod.StartGlobalCoroutine(this.delayedstarthandler());
 
-                // does not work with new sound bank, only one sound bank at a time
-                // AkSoundEngine.PostEvent("Play_ClownHonk", ETGModMainBehaviour.Instance.gameObject);
-                // AkSoundEngine.PostEvent(3881984263, ETGModMainBehaviour.Instance.gameObject);
-                // AkSoundEngine.PostEvent(1000000001, ETGModMainBehaviour.Instance.gameObject);
-                // AkSoundEngine.PostEvent(1000000002, ETGModMainBehaviour.Instance.gameObject);
-                // AkSoundEngine.PostEvent(1000000003, ETGModMainBehaviour.Instance.gameObject);
+                // test sound effects, comment out later
                 AkSoundEngine.PostEvent("kirby-stereo", ETGModMainBehaviour.Instance.gameObject);
                 AkSoundEngine.PostEvent("kirby2", ETGModMainBehaviour.Instance.gameObject);
                 AkSoundEngine.PostEvent("kirby3", ETGModMainBehaviour.Instance.gameObject);
@@ -869,8 +864,6 @@ namespace CwaffingTheGungy
 
                 // OMITBChars.Shade = ETGModCompatibility.ExtendEnum<PlayableCharacters>(Initialisation.GUID, "Shade");
 
-                // ETGMod.StartGlobalCoroutine(GetAudioClip2("file:///usr/lib/libreoffice/share/gallery/sounds/beam.wav"));
-
                 ETGModConsole.Log("(Also finished DelayedInitialization)");
 
             }
@@ -878,42 +871,6 @@ namespace CwaffingTheGungy
             {
                 ETGModConsole.Log(e.Message);
                 ETGModConsole.Log(e.StackTrace);
-            }
-        }
-
-        IEnumerator GetAudioClip2(string fullPath)
-        {
-            ETGModConsole.Log("Fetching audio...");
-            AudioSource audioSource = ETGModMainBehaviour.Instance.gameObject.GetComponent<AudioSource>();
-            if (!audioSource)
-            {
-                ETGModConsole.Log("AAAAAAAAA");
-                yield return null;
-            }
-            else
-            {
-                using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(fullPath, AudioType.WAV))
-                {
-                    ETGModConsole.Log("Really fetching audio..");
-                    yield return www.SendWebRequest();
-
-                    if (www.isNetworkError || www.isHttpError)
-                    {
-                        ETGModConsole.Log("Nope :(");
-                    }
-                    else
-                    {
-                        AudioClip myClip = DownloadHandlerAudioClip.GetContent(www);
-                        ETGModConsole.Log("Mayyyyyybe :O");
-                        audioSource.playOnAwake = true;
-                        audioSource.clip = myClip;
-                        ETGModConsole.Log("We got it O:");
-                        audioSource.volume = 1.0f;
-                        audioSource.Play(); //very very bad hang D:
-                        ETGModConsole.Log("It played in theory o.o");
-                        yield return null;
-                    }
-                }
             }
         }
     }
