@@ -1,0 +1,838 @@
+#!/usr/bin/python3.9
+#WEM file reverse engineering attempts D:
+#WEM Reference: https://github.com/WolvenKit/wwise-audio-tools/blob/master/ksy/wem.ksy
+#BNK Reference: https://wiki.xentax.com/index.php/Wwise_SoundBank_(*.bnk)
+#Python Property Reference: https://docs.python.org/3/library/functions.html#property
+#little endian
+
+# todo
+#  - add support for multiple sounds
+#  - add support for mono tracks
+
+import sys, os, struct, wave
+from io import BytesIO
+import pyaudio
+
+CHUNK        = 256  # Chunk size
+BUFFSIZE     = 1024 # Buffer size
+
+WEMDIR="/home/pretzel/workspace/gungy/resources/wem-reverse-engineering/OMITBSoundbank-extracted"
+# WEMDIR="/home/pretzel/workspace/gungy/resources/wem-reverse-engineering/gungeon-sfx-extracted"
+
+BNK_IN  = "/home/pretzel/workspace/gungy/resources/wem-reverse-engineering/OMITBSoundbank.bnk"
+BNK_OUT = f"{BNK_IN}.out"
+
+TEST_WAV = "/home/pretzel/workspace/gungy/resources/wem-reverse-engineering/kirby.wav"
+TEST_WAV = "/home/pretzel/workspace/gungy/resources/wem-reverse-engineering/kirby-stereo.wav"
+TEST_BNK = "/home/pretzel/workspace/gungy-cwaffing/Resources/Sounds/OMITBSoundbank.new.bnk"
+
+# Easy colors (print)
+class col:
+  BLN = '\033[0m'    # Blank
+  UND = '\033[1;4m'  # Underlined
+  INV = '\033[1;7m'  # Inverted
+  CRT = '\033[1;41m' # Critical
+  BLK = '\033[1;30m' # Black
+  RED = '\033[1;31m' # Red
+  GRN = '\033[1;32m' # Green
+  YLW = '\033[1;33m' # Yellow
+  BLU = '\033[1;34m' # Blue
+  MGN = '\033[1;35m' # Magenta
+  CYN = '\033[1;36m' # Cyan
+  WHT = '\033[1;37m' # White
+
+def hexform(x):
+  slash = "\\x"
+  return ''.join("\\x"+hex(letter)[2:].zfill(2) for letter in x)
+
+def hexprint(x):
+  print(hexform(x))
+
+def playWEM(wp):
+  playWav(
+    wp["wav_data"].val,
+    wp["channels"].val,
+    wp["sample_rate"].val,
+    wp["sample_width"].val)
+
+def playWav(data,channels,rate,samplebits):
+  tmpfile = "/tmp/tmptest.wav"
+  width = samplebits//8
+  with wave.open(tmpfile, "wb") as fout:
+      fout.setnchannels(channels)
+      fout.setsampwidth(width) # number of bytes
+      fout.setframerate(rate)
+      fout.writeframesraw(data)
+
+  with wave.open(tmpfile, "rb") as wf:
+
+    # suppress errors
+    devnull = os.open(os.devnull, os.O_WRONLY)
+    old_stderr = os.dup(2)
+    sys.stderr.flush()
+    os.dup2(devnull, 2)
+    os.close(devnull)
+
+    # open player
+    player = pyaudio.PyAudio()
+
+    # unsuppress errors
+    os.dup2(old_stderr, 2)
+    os.close(old_stderr)
+
+    # open output stream
+    stream = player.open(
+        format   = player.get_format_from_width(width),
+        channels = channels,
+        rate     = rate,
+        output   = True)
+    # playback loop
+    while more := wf.readframes(CHUNK):
+      stream.write(more)
+    stream.close()
+    player.terminate()
+
+class Ref(object):
+  def __init__(self,val={},mode="read"):
+    self._val         = val
+    self.mode         = mode
+    self.autokeycount = 0
+    self.autoindex    = 0
+
+  def __getitem__(self, key):
+    if isinstance(self.val,list):
+      return self.val[key]
+    if isinstance(self.val,dict):
+      if key == "":
+        self.autokeycount += 1
+        key = f"[auto-{self.autokeycount}]"
+      # print(f"GET {key}")
+      if not key in self.val:
+        self.val[key] = Ref(None,self.mode)
+      return self.val[key]
+
+  def __setitem__(self, key, value):
+    if isinstance(self.val,list):
+      self.val[key] = Ref(value,self.mode)
+    elif isinstance(self.val,dict):
+      if key == "":
+        self.autokeycount += 1
+        key = f"[auto-{self.autokeycount}]"
+      self.val[key] = Ref(value,self.mode)
+    return self.val[key]
+
+  def __add__(self,other):
+    return self.val + other
+
+  def __sub__(self,other):
+    return self.val - other
+
+  def __mul__(self,other):
+    return self.val * other
+
+  def __truediv__(self,other):
+    return self.val / other
+
+  def __floordiv__(self,other):
+    return self.val // other
+
+  def __int__(self):
+    return int(self.val)
+
+  def __eq__(self, other):
+    return self.val == other
+
+  def next(self):
+    if self.val is None:
+      self.val = []
+    if isinstance(self.val,list):
+      i = self.autoindex
+      self.autoindex += 1
+      if i >= len(self.val):
+        self.append({})
+      return self.val[i]
+
+  def append(self,other):
+    if self.val is None:
+      self.val = []
+    if isinstance(self.val,list):
+      v = Ref(other,self.mode)
+      self.val.append(v)
+      return v
+
+  def dump(self,indent=0):
+    newindent = indent+2
+    if isinstance(self.val,dict):
+      print("{")
+      for k,v in self.val.items():
+        print(f"""{'':>{newindent}s}{k:20s} : """,end='')
+        v.dump(newindent)
+      print(f"""{'':>{indent}s}"""+"}")
+    elif isinstance(self.val,list):
+      print("[")
+      for i,v in enumerate(self.val):
+        print(f"""{'':>{newindent}s}{i:<5d} : """,end='')
+        v.dump(newindent)
+      print(f"""{'':>{indent}s}"""+"]")
+    elif isinstance(self.val,bytes) and len(self.val) > 4:
+      print(f"[array of {len(self.val)} bytes]")
+    elif self.val is None:
+      print(col.CRT+str(self.val)+col.BLN)
+    else:
+      print(str(self.val))
+
+  @property
+  def val(self):
+      return self._val
+
+  @val.setter
+  def val(self, value):
+      self._val = value
+      return self._val
+
+  @val.deleter
+  def val(self):
+      del self._val
+
+  def setMode(self,mode):
+    if mode == "read":
+      self.updatefunc = self.set
+    elif mode == "write":
+      self.updatefunc = self.get
+    self.mode = mode
+    if isinstance(self.val,dict):
+      for k in self.val.keys():
+        self[k].setMode(mode)
+
+  #reset counters for self and all children
+  def resetState(self):
+    self.autokeycount = 0
+    self.autoindex = 0
+
+    if isinstance(self.val,dict):
+      for k,v in self.val.items():
+        v.resetState()
+    elif isinstance(self.val,list):
+      for i,v in enumerate(self.val):
+        v.resetState()
+
+class Decoder(object):
+  def __init__(self,data,iomode="read"):
+    self.data      = data
+    self.len       = 0 if self.data is None else len(self.data)
+    self.io        = BytesIO(self.data)
+    self.indent    = 2
+    self.iomode    = iomode
+    self.printmode = self.pprint
+    self.labelpos  = 20
+    self.failed    = False
+    self.cmap   = {
+      "discard" : col.BLU,
+      "good"    : col.GRN,
+      "bad"     : col.CRT,
+      "mixed"   : col.YLW,
+      "any"     : col.WHT,
+    }
+
+    self.bytes_read = 0
+    # print(f"File is {self.len} bytes")
+
+  def dontPrint(self):
+    self.printmode = self.noprint
+
+  def noprint(self,x,outcome,tag=None):
+    return
+
+  def pprint(self,x,outcome,tag=None):
+    if isinstance(x,bytes) and len(x) > 8:
+      xp = f"[bytes x {len(x)}]"
+    else:
+      xp = hexform(x) if (outcome == "discard" and isinstance(x,bytes)) else x
+    pad = self.labelpos - len(str(xp))
+    print(f"{self.cmap[outcome]}{xp}{col.BLN}{' '*pad}{'' if tag is None else (col.YLW if '?' in tag else col.CYN)+tag+col.BLN}")
+
+  def readAndEval(self,ref,nbytes,fapply,*,val=None,tag=None):
+    if self.iomode == "read":
+      x       = fapply(self.read(nbytes))
+      ref.val = x
+    elif self.iomode == "write":
+      x = ref.val
+      self.write(fapply(x))
+    else:
+      raise Exception("Unsupported io")
+    if val is None:
+      outcome = "any"
+    elif (x == val) or (isinstance(val,list) and x in val):
+      outcome = "good"
+    else:
+      raise Exception(f"required value not matched: {col.CRT}{x} != {val}{col.BLN}")
+      outcome = "bad"
+      self.failed = True
+    self.printmode(x,outcome,tag)
+    if outcome == "bad":
+      print(f"  Expected: {val}")
+    return x
+
+  def asConst(self,ref,*,val=None,tag=None):
+    return self.readAndEval(ref, len(val), lambda x: x, val=val, tag=tag)
+
+  def asByte(self,ref,*,val=None,tag=None):
+    if self.iomode == "read":
+      cb = lambda x: int.from_bytes(struct.unpack('c', x)[0],'little')
+    else:
+      cb = lambda x: struct.pack('c',x.to_bytes(1,"little",signed=False))
+    return self.readAndEval(ref, 1, cb, val=val, tag=tag)
+
+  def asUnsigned(self,ref,*,val=None,tag=None):
+    if self.iomode == "read":
+      cb = lambda x: struct.unpack('<I', x)[0]
+    else:
+      cb = lambda x: struct.pack('<I', int(x))
+    return self.readAndEval(ref, 4, cb, val=val, tag=tag)
+
+  def asFloat(self,ref,*,val=None,tag=None):
+    if self.iomode == "read":
+      cb = lambda x: struct.unpack('<f', x)[0]
+    else:
+      cb = lambda x: struct.pack('<f', int(x))
+    return self.readAndEval(ref, 4, cb, val=val, tag=tag)
+
+  def asSigned(self,ref,*,val=None,tag=None):
+    if self.iomode == "read":
+      cb = lambda x: struct.unpack('<i', x)[0]
+    elif self.iomode == "write":
+      cb = lambda x: struct.pack('<i', int(x))
+    return self.readAndEval(ref, 4, cb, val=val, tag=tag)
+
+  def asShort(self,ref,*,val=None,tag=None):
+    if self.iomode == "read":
+      cb = lambda x: struct.unpack('<h', x)[0]
+    else:
+      cb = lambda x: struct.pack('<h', int(x))
+    return self.readAndEval(ref, 2, cb, val=val, tag=tag)
+
+  def asAny(self,ref,n,*,tag=None):
+    return self.readAndEval(ref, n, lambda x: x, val=None, tag=tag)
+
+  def read(self,n):
+    self.bytes_read += n
+    return self.io.read(n)
+
+  def write(self,data):
+    self.bytes_read += self.io.write(data)
+    return data
+
+  def peek(self,n):
+    orig = self.io.tell()
+    x = self.io.read(n)
+    self.io.seek(orig)
+    return x
+
+class Parser(object):
+  def __init__(self):
+    super(Parser, self).__init__()
+    self.root     = Ref({})
+    self._valid   = False
+    self.filename = None
+
+  def valid(self):
+    return self._valid
+
+  def loadFrom(self,file):
+    self.filename = file
+    self.root = Ref()
+    with open(file,'rb') as fin:
+      data = fin.read()
+
+    decoder = Decoder(data,"read")
+    decoder.printmode = decoder.noprint
+
+    self.parse(decoder,self.root,"read")
+    return self
+
+  def saveTo(self,file):
+    self.filename = file
+    if os.path.exists(file):
+      os.remove(file)
+    self.root.resetState()
+
+    decoder = Decoder(None,"write")
+    decoder.printmode = decoder.noprint
+
+    data = self.parse(decoder,self.root,"write")
+    with open(file,'wb') as fout:
+      fout.write(data)
+
+  def parse(self,decoder,root,mode):
+    if root.val is None:
+      root.val = {}
+
+class WEMParser(Parser):
+  def __init__(self):
+    super(WEMParser, self).__init__()
+
+  def parse(self,decoder,root,mode):
+    super(WEMParser, self).parse(decoder,root,mode)
+
+    bs = decoder
+    bs.asConst(root["wem_header"],  val=b"RIFF",  tag="'RIFF'")
+    # bs.asSigned(root["wem_length"], val=bs.len-8, tag="bytes remaining") #can't compute if nested
+    bs.asSigned(root["wem_length"], tag="bytes remaining")
+    bs.asConst(root["wem_WAVE"],    val=b"WAVE",  tag="'WAVE'")
+
+    bs.asConst(root["fmt_header"], val=b"fmt ",tag="format chunk")
+    # cc = bs.asShort([24,66], tag="????? always 24 or 66")
+    cc = bs.asShort(root[""], val=24, tag="????? always 24 for our purposes")
+
+    bs.asShort(root[""],val=0, tag="????? always 0")
+    # cc = bs.asShort([-2,-1,2], tag="compression code, always 2, -1, or -2 (flat bitrate / no compression)")
+    cc = bs.asShort(root["compression_code"],val=-2, tag="compression code, always -2 for flat bitrate / no compression")
+
+    bs.asShort(root["channels"],val=[1,2], tag="number of audio channels (1-2)")
+    bs.asSigned(root["sample_rate"],val=[36000,44100,48000], tag="samples / second")
+    bs.asSigned(root["avg_byte_rate"],tag="avg. bytes / second")
+
+    # dcsm = bs.asShort([0,2,4,36,72], tag="block align")
+    dcsm = bs.asShort(root["block_align"],val=[2,4], tag="block align? (2 or 4 for our purposes)")
+    if cc == -2: # no compression
+      sample_width = int(root["avg_byte_rate"]) / int(root["sample_rate"]) / int(root["channels"]) * 8
+      bs.asShort(root["sample_width"],val=sample_width, tag="bits per sample")
+    else:
+      bs.asShort(root["sample_width"],tag="bits per sample")
+
+    # bs.asSigned([6,48], tag="extra byte count? always 6 or 48")
+    bs.asSigned(root["extra_bytes"],val=6, tag="extra byte count? always 6 for our purposes")
+    bs.asSigned(root["valid_bits"],val=[12546,16641], tag="valid bits per sample? always 12546 or 16641")
+
+    bs.asConst(root["JUNK_header"],val=b"JUNK",tag="junk chunk")
+    bs.asSigned(root[""],val=4, tag="????? always 4?")
+    bs.asSigned(root[""],val=0, tag="????? always 0?")
+
+    bs.asConst(root["data_header"],val=b"data",tag="data chunk")
+    # dsize = bs.asSigned(root["data_chunk_size"],val=bs.len - 64, tag="data chunk size")
+    bs.asSigned(root["data_chunk_size"], tag="data chunk size") #can't compute size if nested
+
+    bs.asAny(root["wav_data"],int(root["data_chunk_size"]),tag="WAV data")
+
+    return bs.io.getvalue()
+
+  def createMinimal(self):
+    root                     = self.root
+    root["wem_header"]       = b"RIFF"
+    root["wem_length"]       = None
+    root["wem_WAVE"]         = b"WAVE"
+    root["fmt_header"]       = b"fmt "
+    root[""]                 = 24
+    root[""]                 = 0
+    root["compression_code"] = -2      # no compression
+    root["channels"]         = None
+    root["sample_rate"]      = None
+    root["avg_byte_rate"]    = None
+    root["block_align"]      = 4
+    root["sample_width"]     = None
+    root["extra_bytes"]      = 6
+    root["valid_bits"]       = 12546
+    root["JUNK_header"]      = b"JUNK"
+    root[""]                 = 4
+    root[""]                 = 0
+    root["data_header"]      = b"data"
+    root["data_chunk_size"]  = None
+    root["wav_data"]         = None
+    return self
+
+  def createFromWav(self,file):
+    self.createMinimal()
+    root = self.root
+
+    wf        = wave.open(file, 'rb')
+    rate      = wf.getframerate()
+    total     = wf.getnframes()
+    channels  = wf.getnchannels()
+    sampwidth = wf.getsampwidth()
+
+    wavdata   = wf.readframes(total)
+
+    root["channels"]        = channels
+    root["sample_width"]    = sampwidth*8
+    root["sample_rate"]     = rate
+
+    root["avg_byte_rate"]   = sampwidth * rate * channels
+
+    root["data_chunk_size"] = len(wavdata)
+    root["wav_data"]        = wavdata
+
+    root["wem_length"]      = root["data_chunk_size"] + 56
+
+    return self
+
+  def saveToWav(self,file):
+    root = self.root
+    wf = wave.open(file, 'wb')
+
+    wf.setframerate(int(root["sample_rate"]))
+    wf.setnchannels(int(root["channels"]))
+    wf.setsampwidth(int(root["sample_width"]//8))
+
+    wf.writeframes(root["wav_data"].val)
+
+class BNKParser(Parser):
+  def __init__(self):
+    super(BNKParser, self).__init__()
+
+  def parse(self,decoder,root,mode):
+    super(BNKParser, self).parse(decoder,root,mode)
+
+    bs = decoder
+
+    bs.asConst(root["bnk-head"] ,val=b'BKHD',tag="bkhd header")
+    bs.asSigned(root["seclen"]  ,val=24,tag="section length")
+    bs.asSigned(root["version"]  ,tag="bank version")
+    bs.asSigned(root["bankid"]   ,tag="bank id")
+    bs.asSigned(root[""]         ,tag="?????")
+    bs.asSigned(root[""]         ,tag="?????")
+    bs.asSigned(root[""]         ,tag="?????")
+    bs.asSigned(root[""]         ,tag="?????")
+
+    bs.asConst(root["didx-head"],val=b'DIDX',tag="didx header")
+    bs.asSigned(root["didx-seclen"],tag="section length")
+    wemfiles            = root["didx-seclen"] // 12
+    wemids              = []
+    wemlengths          = []
+    wemoffs             = []
+    # root["wemfileinfo"] = []
+    for i in range(wemfiles):
+      w = root["wemfileinfo"].next()
+      bs.asSigned(w["wemid"],tag=f"wem {i} id")
+      bs.asSigned(w["wemoff"],tag=f"wem {i} offset")
+      bs.asSigned(w["wemlen"],tag=f"wem {i} length")
+      wemids.append(w["wemid"])
+      wemoffs.append(w["wemoff"])
+      wemlengths.append(w["wemlen"])
+
+    bs.asConst(root["data-head"],val=b'DATA',tag="data header")
+    bs.asSigned(root["data-seclen"],tag="section length")
+    wem_start = bs.bytes_read
+    for i in range(wemfiles):
+      w     = root["wemfiledata"].next()
+      extra = wemoffs[i]+wem_start-bs.bytes_read
+      if extra > 0:
+        bs.asAny(w["extra_bytes"],extra)
+
+      WEMParser().parse(bs,w,mode) # parse WEM substructure
+      # playWEM(w["wem-data"])
+
+    bs.asConst(root["hirc-head"],val=b'HIRC',tag="hirc header")
+    bs.asSigned(root["hirc-seclen"],tag="section length")
+    bs.asSigned(root["hirc-numobjects"],tag="number of objects")
+    for i in range(int(root["hirc-numobjects"])):
+      h         = root["hircobjects"].next()
+      bs.asByte(h["type"],tag=f"obj {i} type")
+
+      if h["type"] == 2: #sound effect
+        bs.asSigned(h["subseclen"]      ,tag=f"SFX {i} subsection length")
+        bs.asSigned(h["sfx_id"]         ,tag=f"SFX {i} ID")
+        bs.asSigned(h["plugin_id"]      ,val=65537,tag=f"SFX {i} PluginID (65537 = PCM)")
+         # PAC_NOTE:  here
+        bs.asByte(h["external_state"] ,val=0,tag=f"SFX {i} external state (should be 0 == embedded)")
+        if h["external_state"] == 0:
+          bs.asSigned(h["wem_file_id"]        ,val=wemids,tag=f"SFX {i} WEM file id")
+          bs.asSigned(h["wem_file_num_bytes"] ,val=wemlengths,tag=f"SFX {i} in-memory byte length")
+        else:
+          raise Exception("don't know how to handle this event type")
+        bs.asByte(h[""] ,val=0,tag=f"SFX {i} source bits (usually 0, see uSourceBits in XML)")
+        # print()
+
+        #begin sound structure section
+        bs.asByte(h["sfx_override_parent"]  ,val=0,tag=f"SFX {i} override parent")
+        bs.asByte(h["num_fx"]               ,tag=f"SFX {i} number of effects")
+        for i in range(int(h["num_fx"])):
+          raise Exception("don't know how to handle this event type")
+        bs.asByte(h["override_attachments"] ,tag=f"SFX {i} override attachments")
+        bs.asUnsigned(h["bus_id"]               ,tag=f"SFX {i} bus id")
+        bs.asSigned(h["parent_id"]            ,tag=f"SFX {i} parent object id")
+        bs.asByte(h["misc_flags"]           ,tag=f"SFX {i} misc. flags")
+        bs.asByte(h["num_params"]           ,tag=f"SFX {i} num additional parameters")
+        for j in range(int(h["num_params"])):
+          p = h["param_type_list"].next()
+          bs.asByte(p,tag=f"SFX {i} param {j} type")
+        for j in range(int(h["num_params"])):
+          p = h["param_list"].next()
+          t = h["param_type_list"][j]
+          if t == 0: #volume
+            bs.asFloat(p["volume"],tag=f"SFX {i} param {j} volume (float)")
+          elif t == 58: #loop
+            bs.asSigned(p["num_loops"],tag=f"SFX {i} param {j} num loops (float, 0 == inf)")
+          else:
+            bs.asAny(p["param_value"] ,val=4,tag=f"SFX {i} param {j} value")
+
+        bs.asByte(h["property_bundle"]  ,tag=f"SFX {i} property bundle")
+        bs.asByte(h["positioning_data"] ,tag=f"SFX {i} positioning data (7 is good)")
+
+        bs.asByte(h["aux_params"]           ,tag=f"SFX {i} aux parameters")
+        bs.asByte(h["priority_tiebreak"]    ,tag=f"SFX {i} priority tiebreaker + other bits")
+        bs.asByte(h["virt_queue_behavior"]  ,tag=f"SFX {i} virtual queue behavior (1 == use virtual voice)")
+        bs.asShort(h["max_sounds"]           ,tag=f"SFX {i} max sound limit (0 == no limit)")
+        bs.asByte(h["below_thres_behavior"] ,tag=f"SFX {i} below threshold behavior (0 == continue to play)")
+        bs.asByte(h["envelope"]             ,tag=f"SFX {i} envelope bits")
+        bs.asByte(h["num_state_props"]      ,val=0,tag=f"SFX {i} number of state props (needs to be 0)")
+        bs.asByte(h["num_state_groups"]     ,val=0,tag=f"SFX {i} number of state groups (needs to be 0)")
+        bs.asShort(h["num_rtpcs"]            ,tag=f"SFX {i} num RTPCs")
+        for j in range(int(h["num_rtpcs"])):
+          r                    = h["rtpcs"].next()
+          bs.asUnsigned(r["x_axis"]          ,tag=f"SFX {i} RTPC {j} x-axis game parameter id")
+          bs.asByte(r["rtpc_type"]       ,val=0,tag=f"SFX {i} RTPC {j} type (0 == gameparameter)")
+          bs.asByte(r["rtpc_accum"]      ,val=2,tag=f"SFX {i} RTPC {j} accum (2 == additive)")
+          bs.asByte(r["rtpc_param"]      ,val=0,tag=f"SFX {i} RTPC {j} parameter id (0 == volume)")
+          bs.asSigned(r["rtpc_curve_id"]   ,tag=f"SFX {i} RTPC {j} curve id")
+          bs.asByte(r["rtpc_scaling"]    ,val=2,tag=f"SFX {i} RTPC {j} scaling (2 == decibels)")
+          bs.asShort(r["num_rtpc_points"] ,tag=f"SFX {i} RTPC {j} num points")
+          for k in range(int(r["num_rtpc_points"])):
+            p           = r["rtpc_points"].next()
+            bs.asFloat(p["x"]      , tag=f"SFX {i} RTPC {j} point {k} x coord")
+            bs.asFloat(p["y"]      , tag=f"SFX {i} RTPC {j} point {k} y coord")
+            bs.asSigned(p["interp"] , tag=f"SFX {i} RTPC {j} point {k} interpolation type (4 == linear)")
+
+      elif h["type"] == 3: #action
+        bs.asSigned(h["subseclen"]       ,tag=f"Action {i} subsection length")
+        bs.asSigned(h["action_id"]       ,tag=f"Action {i} ID")
+        bs.asByte(h["action_scope"]    ,tag=f"Action {i} action scope (3 == game object, 2 = global)")
+        bs.asByte(h["action_type"]     ,val=[4,1],tag=f"Action {i} action type (4 == play, 1 == stop)")
+        bs.asSigned(h["action_sfx_id"]   ,tag=f"Action {i} game object (SFX) id")
+        bs.asByte(h["action_bus_bits"] ,tag=f"Action {i} bus bits")
+        bs.asByte(h["action_props_1"]  ,val=0,tag=f"Action {i} props (needs to be 0)")
+        bs.asByte(h["action_props_2"]  ,val=0,tag=f"Action {i} props 2 (needs to be 0)")
+        if int(h["action_type"]) == 4: #play
+          bs.asByte(h["action_play_fade_curve"] ,tag=f"Action {i} play fade curve (4 == linear)")
+          bs.asSigned(h["bank_id"] ,val=root["bankid"],tag=f"Action {i} bank id")
+        elif int(h["action_type"]) == 1: #stop
+          bs.asByte(h["action_stop_fade_curve"]     ,tag=f"Action {i} stop fade curve (4 == linear)")
+          bs.asByte(h["action_stop_flags"]          ,val=6,tag=f"Action {i} stop bit flags (6 == expected)")
+          bs.asByte(h["action_stop_num_exceptions"] ,val=0,tag=f"Action {i} stop exception list size (needs to be 0)")
+        else:
+          raise Exception("don't know how to handle this event type")
+
+      elif h["type"] == 4: #event
+        bs.asSigned(h["subseclen"] ,tag=f"Event {i} subsection length")
+        bs.asUnsigned(h["event_id"] ,tag=f"Event {i} id")
+        bs.asByte(h["num_events"] ,tag=f"Event {i} num actions")
+        for j in range(int(h["num_events"])):
+          e = h["events"].next()
+          bs.asSigned(e,tag=f"Event {i} action {j} id")
+
+    self._valid = not bs.failed
+    return bs.io.getvalue()
+
+  def createMinimal(self):
+    root                    = self.root
+    root["bnk-head"]        = b'BKHD'
+    root["seclen"]          = 24
+    root["version"]         = 128
+    root["bankid"]          = 3857271 #can change?
+    root[""]                = 393239870 #magic number
+    root[""]                = 0
+    root[""]                = 0
+    root[""]                = 0
+
+    root["didx-head"]       = b'DIDX'
+    root["didx-seclen"]     = 0
+    root["wemfileinfo"]     = []
+
+    root["data-head"]       = b'DATA'
+    root["data-seclen"]     = 0
+    root["wemfiledata"]     = []
+
+    root["hirc-head"]       = b'HIRC'
+    root["hirc-seclen"]     = 4 #length of hirc-numobjects
+    root["hirc-numobjects"] = 0
+    root["hircobjects"]     = []
+
+    return self
+
+  def embedFromWav(self,wavfile):
+    root = self.root
+
+    # Set up shared magic ids (can always use these exact values for gungeon)
+    bus_id        = 3803692087 # magic, needs to be shared among sounds
+    rtpc_x        = 3273357900 # magic, needs to be shared among rtpcs
+
+    # Set up unique generated ids
+    event_id      = 1000000001 # non-magic, needs to be unique
+    wemid         = 300001     # non-magic, needs to be unique (can't be less than 300,000???)
+    sfx_id        = 200001     # non-magic, needs to be unique
+    rtpc_curve_id = 900001     # non-magic, needs to be unique
+    action_id     = 100001     # non-magic, needs to be unique
+
+    # Load the wavfile as a WEM
+    wp = WEMParser().createFromWav(wavfile)
+
+    # Create the wem info header
+    root["didx-seclen"] += 12
+    wfi                  = Ref({})
+    wfi["wemid"]         = wemid
+    wfi["wemoff"]        = 0        # needs to be updated for each wem
+    wfi["wemlen"]        = int(wp.root["wem_length"])+8
+    root["wemfileinfo"].append(wfi.val)
+
+    # Create the wem data
+    root["data-seclen"] += int(wfi["wemlen"]) #todo: might need padding
+    root["wemfiledata"].append(wp.root.val)
+
+    # Create the hirc SFX data
+    h                       = Ref({})
+    h["type"]               = 2 #2 == sound fx
+    h["subseclen"]          = 43 #minimum length of subsection
+      # +1 if num_effects > 0
+      # + (5 * num_effects)
+      # + (7 * num_effects)
+      # + (5 * num_params)
+      # + (total size of rtpcs)
+      #     (each rtpc is 15 + 12*num_points bytes)
+    h["sfx_id"]             = sfx_id
+    h["plugin_id"]          = 65537 #always 65537
+    h["external_state"]     = 0 # 0 == embedded
+    h["wem_file_id"]        = int(wfi["wemid"])
+    h["wem_file_num_bytes"] = int(wfi["wemlen"])
+    h[""] = 0
+    h["sfx_override_parent"] = 0
+    h["num_fx"] = 0
+    h["override_attachments"] = 0
+    h["bus_id"] = bus_id
+    h["parent_id"] = 0
+    h["misc_flags"] = 0
+    h["num_params"] = 1 #set to 1 if you want volume
+    if (int(h["num_params"]) == 1):
+      h["param_type_list"].append(0) #volume type
+      vol = h["param_list"].next()
+      vol["volume"] = 2.0 #volume value
+      h["subseclen"] += 5
+    h["property_bundle"]      = 0
+    h["positioning_data"]     = 7
+    h["aux_params"]           = 0
+    h["priority_tiebreak"]    = 0
+    h["virt_queue_behavior"]  = 1
+    h["max_sounds"]           = 0
+    h["below_thres_behavior"] = 0
+    h["envelope"]             = 0
+    h["num_state_props"]      = 0
+    h["num_state_groups"]     = 0
+    h["num_rtpcs"]            = 1
+    if (int(h["num_rtpcs"]) == 1):
+      r                    = h["rtpcs"].next()
+      r["x_axis"]          = rtpc_x
+      r["rtpc_type"]       = 0 # 0 == gameparameter
+      r["rtpc_accum"]      = 2 # 2 == additive
+      r["rtpc_param"]      = 0
+      r["rtpc_curve_id"]   = rtpc_curve_id
+      r["rtpc_scaling"]    = 2
+      r["num_rtpc_points"] = 2
+
+      r1                   = r["rtpc_points"].next()
+      r1["x"]              = 0.0
+      r1["y"]              = -1.0
+      r1["interp"]         = 4 #linear
+
+      r2                   = r["rtpc_points"].next()
+      r2["x"]              = 100.0
+      r2["y"]              = 0.0
+      r2["interp"]         = 4 #linear
+
+      h["subseclen"]      += 39
+    root["hirc-seclen"]     += 1                   #hircobject->type
+    root["hirc-seclen"]     += 4                   #hircobject->subseclen
+    root["hirc-seclen"]     += int(h["subseclen"]) #total length of fields added above
+    root["hirc-numobjects"] += 1
+    root["hircobjects"].append(h.val)
+
+    # Create the action
+    h                           = Ref({})
+    h["type"]                   = 3 #3 == action
+    h["subseclen"]              = 18 #always 18?
+    h["action_id"]              = action_id
+    h["action_scope"]           = 3 # 3 == game object, 2 == global
+    h["action_type"]            = 4 # 4 == play, 1 == stop
+    h["action_sfx_id"]          = sfx_id
+    h["action_bus_bits"]        = 0
+    h["action_props_1"]         = 0
+    h["action_props_2"]         = 0
+    h["action_play_fade_curve"] = 4 # 4 == linear
+    h["bank_id"] = int(root["bankid"])
+    root["hirc-seclen"]     += 1                   #hircobject->type
+    root["hirc-seclen"]     += 4                   #hircobject->subseclen
+    root["hirc-seclen"]     += int(h["subseclen"]) #total length of fields added above
+    root["hirc-numobjects"] += 1
+    root["hircobjects"].append(h.val)
+
+    # Create the event
+    h               = Ref({})
+    h["type"]       = 4 #4 == event
+    h["subseclen"]  = 9 #always 9?
+    h["event_id"]   = event_id
+    h["num_events"] = 1
+    h["events"].append(action_id)
+    root["hirc-seclen"]     += 1                   #hircobject->type
+    root["hirc-seclen"]     += 4                   #hircobject->subseclen
+    root["hirc-seclen"]     += int(h["subseclen"]) #total length of fields added above
+    root["hirc-numobjects"] += 1
+    root["hircobjects"].append(h.val)
+
+    return self
+
+def parseBNK():
+  bp = BNKParser().loadFrom(BNK_IN)
+  if not bp.valid():
+    print("Failed to read D:")
+    return
+
+  # print(f"\n{col.CYN}Read success :D{col.BLN}\n")
+  # bp.root.dump()
+  # root["wemfileinfo"].dump()
+  # root["version"] = 100
+  # can edit the bnk file however you want from here
+
+  bp.saveTo(BNK_OUT)
+  print(f"{col.GRN}Success! :D If the below checksums match you win forever O:{col.BLN}")
+  os.system(f"/bin/md5sum {BNK_IN} {BNK_OUT}")
+
+def parseWEMs():
+  files = sorted([f for f in os.listdir(WEMDIR) if "wem" in f])
+  for i,f in enumerate(files):
+    inpath = os.path.join(WEMDIR, f)
+    wp     = WEMParser().loadFrom(inpath)
+    print(f"Playing {f}")
+    playWEM(wp.root)
+
+def testCreateWem():
+  outfile  = TEST_WAV+".wem"
+  outfile2 = TEST_WAV+".new.wav"
+
+  wp = WEMParser().createFromWav(TEST_WAV)
+  wp.saveTo(outfile)
+
+  wp2 = WEMParser().loadFrom(outfile)
+  # playWEM(wp2.root)
+
+  wp2.saveToWav(outfile2)
+  print(f"{col.GRN}Success! :D If the below checksums match you win forever O:{col.BLN}")
+  os.system(f"/bin/md5sum {TEST_WAV} {outfile2}")
+
+def testCreateBnk():
+  if os.path.exists(TEST_BNK):
+    os.remove(TEST_BNK)
+  bp = BNKParser().createMinimal()
+  bp.embedFromWav(TEST_WAV)
+  # bp.root.dump()
+  bp.saveTo(TEST_BNK)
+
+  bp2 = BNKParser().loadFrom(TEST_BNK)
+  print(f"  > Created {col.YLW}{TEST_BNK}{col.BLN} :D")
+  # bp2.root.dump()
+
+def main():
+  # parseBNK()
+  # parseWEMs()
+  # testCreateWem()
+  testCreateBnk()
+  pass
+
+if __name__ == "__main__":
+  main()

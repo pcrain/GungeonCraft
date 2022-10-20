@@ -23,7 +23,7 @@ includes+=('<None Include="packages.config" />')
 
 #Regenerate audio sources
 echo -e "[${GRN}>${BLN}] Regenerating audio bank"
-/home/pretzel/workspace/gungy/resources/wem-reverse-engineering/revengboi
+./genaudio
 #Source files
 echo -e "[${GRN}>${BLN}] Scanning for source files"
 while read -r line; do
