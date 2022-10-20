@@ -23,7 +23,12 @@ includes+=('<None Include="packages.config" />')
 
 #Regenerate audio sources
 echo -e "[${GRN}>${BLN}] Regenerating audio bank"
-./genaudio
+./gen-gungeon-audio-bank.py -Or "./Resources/Sounds" "${namespace}"
+
+if [ $? -gt 0 ]; then
+  echo -e "[${RED}@${BLN}] Audio generation failed for some reason"
+  exit
+fi
 
 #Source files
 echo -e "[${GRN}>${BLN}] Scanning for source files"
@@ -41,7 +46,7 @@ done <<< $(find "Characters" -type f | sed -r 's@/@\\@g')
 echo -e "[${GRN}>${BLN}] Scanning for resources"
 while read -r line; do
   includes+=("<EmbeddedResource Include=\"${line}\" />")
-done <<< $(find "Resources" -type f | sed -r 's@/@\\@g')
+done <<< $(find "Resources" -type f -not -path "*.wav" | sed -r 's@/@\\@g')
 
 #Unversioned EtG Unity Packages (skipping version numbers because there's no way to tell just by looking and it was causing problems)
 echo -e "[${GRN}>${BLN}] Scanning for EtG DLLs"
