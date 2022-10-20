@@ -21,6 +21,9 @@ includes+=('<None Include="packages.config" />')
 # includes+=('<Folder Include="Characters\Shade\newspritesetup\custom\" />')
 # includes+=('<Reference Include="Ionic.Zip, Version=1.9.1.8"/>')
 
+#Regenerate audio sources
+echo -e "[${GRN}>${BLN}] Regenerating audio bank"
+/home/pretzel/workspace/gungy/resources/wem-reverse-engineering/revengboi
 #Source files
 echo -e "[${GRN}>${BLN}] Scanning for source files"
 while read -r line; do

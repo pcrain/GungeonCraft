@@ -834,7 +834,9 @@ namespace CwaffingTheGungy
 
                 ETGMod.StartGlobalCoroutine(this.delayedstarthandler());
 
-                AkSoundEngine.PostEvent("Play_ClownHonk", ETGModMainBehaviour.Instance.gameObject);
+                // AkSoundEngine.PostEvent("Play_ClownHonk", ETGModMainBehaviour.Instance.gameObject);
+                // AkSoundEngine.PostEvent(3881984263, ETGModMainBehaviour.Instance.gameObject);
+                AkSoundEngine.PostEvent(1000000001, ETGModMainBehaviour.Instance.gameObject);
 
                 ETGModConsole.Log("Yay! :D");
             }
@@ -861,7 +863,7 @@ namespace CwaffingTheGungy
 
                 // OMITBChars.Shade = ETGModCompatibility.ExtendEnum<PlayableCharacters>(Initialisation.GUID, "Shade");
 
-                ETGMod.StartGlobalCoroutine(GetAudioClip2("file:///usr/lib/libreoffice/share/gallery/sounds/beam.wav"));
+                // ETGMod.StartGlobalCoroutine(GetAudioClip2("file:///usr/lib/libreoffice/share/gallery/sounds/beam.wav"));
 
                 ETGModConsole.Log("(Also finished DelayedInitialization)");
 
