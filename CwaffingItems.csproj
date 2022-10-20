@@ -2930,6 +2930,7 @@
     <EmbeddedResource Include="Resources\CurseIcons\darkness_icon.png"/>
     <EmbeddedResource Include="Resources\CurseIcons\butterfingers_icon.png"/>
     <EmbeddedResource Include="Resources\Sounds\CwaffingTheGungy.new.bnk"/>
+    <EmbeddedResource Include="Resources\Sounds\OMITBSoundbank.bnk"/>
     <EmbeddedResource Include="Resources\frostkey_icon.png"/>
     <EmbeddedResource Include="Resources\greyguon_ingame.png"/>
     <EmbeddedResource Include="Resources\cliponammopouch_icon.png"/>

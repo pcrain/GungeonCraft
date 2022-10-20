@@ -3,6 +3,7 @@
 #WEM Reference: https://github.com/WolvenKit/wwise-audio-tools/blob/master/ksy/wem.ksy
 #BNK Reference: https://wiki.xentax.com/index.php/Wwise_SoundBank_(*.bnk)
 #Python Property Reference: https://docs.python.org/3/library/functions.html#property
+#AkSoundEngine.PostEvent():
 #little endian
 
 # todo
@@ -631,7 +632,7 @@ class BNKParser(Parser):
     root["bnk-head"]        = b'BKHD'
     root["seclen"]          = 24
     root["version"]         = 128
-    root["bankid"]          = 3857271 #can change?
+    root["bankid"]          = 9999999 #can change?
     root[""]                = 393239870 #magic number
     root[""]                = 0
     root[""]                = 0

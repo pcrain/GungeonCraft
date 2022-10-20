@@ -834,7 +834,8 @@ namespace CwaffingTheGungy
 
                 ETGMod.StartGlobalCoroutine(this.delayedstarthandler());
 
-                // AkSoundEngine.PostEvent("Play_ClownHonk", ETGModMainBehaviour.Instance.gameObject);
+                // does not work with new sound bank, only one sound bank at a time
+                AkSoundEngine.PostEvent("Play_ClownHonk", ETGModMainBehaviour.Instance.gameObject);
                 // AkSoundEngine.PostEvent(3881984263, ETGModMainBehaviour.Instance.gameObject);
                 // AkSoundEngine.PostEvent(1000000001, ETGModMainBehaviour.Instance.gameObject);
                 // AkSoundEngine.PostEvent(1000000002, ETGModMainBehaviour.Instance.gameObject);
