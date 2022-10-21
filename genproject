@@ -23,7 +23,9 @@ includes+=('<None Include="packages.config" />')
 
 #Regenerate audio sources
 echo -e "[${GRN}>${BLN}] Regenerating audio bank"
-./gen-gungeon-audio-bank.py -Or "./Resources/Sounds" "${namespace}"
+# ./gen-gungeon-audio-bank.py -Or "./Resources/Sounds" "${namespace}"
+# ./gen-gungeon-audio-bank.py --skipchecks -Ovr "/home/pretzel/downloads/kirby" "/home/pretzel/workspace/gungy-cwaffing/Resources/Sounds/CwaffingTheGungy.bnk"
+./gen-gungeon-audio-bank.py -Or "/home/pretzel/downloads/kirby" "/home/pretzel/workspace/gungy-cwaffing/Resources/Sounds/CwaffingTheGungy.bnk"
 
 if [ $? -gt 0 ]; then
   echo -e "[${RED}@${BLN}] Audio generation failed for some reason"
