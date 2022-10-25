@@ -15,22 +15,28 @@
           "obj/",
           "packages/",
       ],
-			"path": "."
+			"path": ".",
 		}
-	],
+  ],
   "build_systems":
   [
       {
           "name": "MSBuild",
-          "shell_cmd": "msbuild -noLogo -warnAsMessage:'CS0414' -v:minimal -clp:'Summary;Verbosity=minimal' $project_path/CwaffingItems.csproj"
+          "shell_cmd": "msbuild -noLogo -warnAsMessage:'CS0414' -v:minimal -clp:'Summary;Verbosity=minimal' $project_path/CwaffingItems.csproj",
       },
       {
           "name": "MSBuild (clean)",
-          "shell_cmd": "msbuild -noLogo -warnAsMessage:'CS0414' -v:minimal -clp:'Summary;Verbosity=minimal'  -t:clean $project_path/CwaffingItems.csproj"
+          "shell_cmd": "msbuild -noLogo -warnAsMessage:'CS0414' -v:minimal -clp:'Summary;Verbosity=minimal'  -t:clean $project_path/CwaffingItems.csproj",
       },
       {
           "name": "Regenerate Project Files",
-          "shell_cmd": "$project_path/genproject"
-      }
-  ]
+          "shell_cmd": "$project_path/genproject",
+      },
+    {
+			"file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
+			"name": "Anaconda Python Builder",
+			"selector": "source.python",
+			"shell_cmd": "\"/usr/bin/python\" -u \"$file\""
+		},
+  ],
 }

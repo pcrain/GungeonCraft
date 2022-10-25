@@ -117,6 +117,7 @@
     <Compile Include="src\Class1.cs"/>
     <Compile Include="src\Cwaff-Guns\BasicGun.cs"/>
     <Compile Include="src\Cwaff-Guns\RainCheck.cs"/>
+    <Compile Include="src\Cwaff-Guns\Natasha.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\ProjSpawnHelper.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\WhereTheMagicHappens.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\ExoticPlaceables.cs"/>

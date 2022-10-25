@@ -514,6 +514,7 @@ namespace CwaffingTheGungy
                     // ElderMagnum.Add();
                     BasicGun.Add();
                     RainCheck.Add();
+                    Natasha.Add();
 
                     // //REVOLVERS
                     // FlayedRevolver.Add();
