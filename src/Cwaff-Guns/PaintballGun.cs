@@ -16,47 +16,44 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = ETGMod.Databases.Items.NewGun("Paintball Gun", "paintballgun");
-
             Game.Items.Rename("outdated_gun_mods:paintball_gun", "nn:paintball_gun");
             gun.gameObject.AddComponent<PaintballGun>();
-            gun.SetShortDescription("The Colours, Duke!");
-            gun.SetLongDescription("Small rubbery pellets loaded with lethal old-school lead paint."+"\n\nBrought to the Gungeon by an amateur artist who wished to flee his debts.");
-
+            gun.SetShortDescription("Taste the Rainbow");
+            gun.SetLongDescription("(shoots colored projectiles with colored goop that colors enemies...colors)");
             gun.SetupSprite(null, "paintballgun_idle_001", 8);
             gun.SetAnimationFPS(gun.shootAnimation, 14);
-
             gun.AddProjectileModuleFrom(PickupObjectDatabase.GetById(86) as Gun, true, false);
-            gun.DefaultModule.ammoCost = 1;
-            gun.DefaultModule.shootStyle = ProjectileModule.ShootStyle.SemiAutomatic;
-            gun.DefaultModule.sequenceStyle = ProjectileModule.ProjectileSequenceStyle.Random;
-            gun.reloadTime = 1.1f;
-            gun.DefaultModule.cooldownTime = 0.1f;
-            gun.DefaultModule.numberOfShotsInClip = 10;
             gun.SetBaseMaxAmmo(300);
-            gun.gunClass = GunClass.PISTOL;
+            gun.DefaultModule.ammoCost                  = 1;
+            gun.DefaultModule.shootStyle                = ProjectileModule.ShootStyle.SemiAutomatic;
+            gun.DefaultModule.sequenceStyle             = ProjectileModule.ProjectileSequenceStyle.Random;
+            gun.reloadTime                              = 1.1f;
+            gun.DefaultModule.cooldownTime              = 0.1f;
+            gun.DefaultModule.numberOfShotsInClip       = 10;
+            gun.gunClass                                = GunClass.PISTOL;
+            gun.quality                                 = PickupObject.ItemQuality.C;
 
-            //BULLET STATS
-            Projectile projectile = ProjectileUtility.SetupProjectile(86);
-            gun.DefaultModule.projectiles[0] = projectile;
-            projectile.baseData.damage = 7.5f;
-            RandomiseProjectileColourComponent paintballController = projectile.gameObject.AddComponent<RandomiseProjectileColourComponent>();
+            Projectile projectile                       = ProjectileUtility.SetupProjectile(86);
+            projectile.baseData.damage                  = 7.5f;
+            gun.DefaultModule.projectiles[0]            = projectile;
+
+            PaintballColorizer paintballController      = projectile.gameObject.AddComponent<PaintballColorizer>();
             paintballController.ApplyColourToHitEnemies = true;
-            paintballController.paintballGun = true;
-            gun.quality = PickupObject.ItemQuality.C;
+            paintballController.paintballGun            = true;
 
             ETGMod.Databases.Items.Add(gun, false, "ANY");
 
         }
         public override void PostProcessProjectile(Projectile projectile)
         {
-            RandomiseProjectileColourComponent rpcc =
-                projectile.gameObject.GetComponent<RandomiseProjectileColourComponent>();
+            PaintballColorizer pbc =
+                projectile.gameObject.GetComponent<PaintballColorizer>();
 
             GoopModifier goopmod         = projectile.gameObject.AddComponent<GoopModifier>();
             goopmod.SpawnGoopOnCollision = true;
             goopmod.CollisionSpawnRadius = 2f;
             goopmod.SpawnGoopInFlight    = false;
-            goopmod.goopDefinition       = rpcc.setColorAndGetGoop();
+            goopmod.goopDefinition       = pbc.setColorAndGetGoop();
 
             base.PostProcessProjectile(projectile);
         }
@@ -66,78 +63,23 @@ namespace CwaffingTheGungy
         }
     }
 
-    public class ColorSplash : MonoBehaviour
+    public class PaintballColorizer : MonoBehaviour
     {
-        public ColorSplash()
-        {
-        }
-        public void Start()
-        {
-            this.m_projectile = base.GetComponent<Projectile>();
-            // if (this.m_projectile)
-            // {
-            //     this.m_projectile.specRigidbody.OnPreRigidbodyCollision += this.PrepareToExplode;
-            //     // this.m_projectile.OnDestruction += this.Explode;
-            // }
-        }
-
-        // private void PrepareToExplode(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
-        // {
-        //     GoopModifier goopmod         = m_projectile.gameObject.AddComponent<GoopModifier>();
-        //     goopmod.SpawnGoopOnCollision = true;
-        //     goopmod.CollisionSpawnRadius = 2f;
-        //     goopmod.SpawnGoopInFlight    = false;
-        //     goopmod.goopDefinition       = EasyGoopDefinitions.WaterGoop;
-        // }
-
-        // private void Explode(Projectile me)
-        // {
-        //     ETGModConsole.Log("Gooper o:");
-        //     var ddgm = DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.WaterGoop);
-        //     ddgm.AddGoopCircle(m_projectile.sprite.WorldCenter, 4f);
-        // }
+        public  bool       ApplyColourToHitEnemies;
+        public  int        tintPriority;
+        public  bool       paintballGun;
+        public  Color      selectedColour;
         private Projectile m_projectile;
-    }
-
-    public class RandomiseProjectileColourComponent : MonoBehaviour
-    {
-        public static List<Color>          ListOfColors;
-        public static List<GoopDefinition> ListOfGoops;
-        public        bool                 ApplyColourToHitEnemies;
-        public        int                  tintPriority;
-        public        bool                 paintballGun;
-        public        Color                selectedColour;
-        private       Projectile           m_projectile;
-        public RandomiseProjectileColourComponent()
+        public PaintballColorizer()
         {
-            ListOfColors = new List<Color> {
-                ExtendedColours.pink,
-                Color.red,
-                ExtendedColours.orange,
-                Color.yellow,
-                Color.green,
-                Color.blue,
-                ExtendedColours.purple,
-                Color.cyan,
-            };
-            ListOfGoops = new List<GoopDefinition> {
-                EasyGoopDefinitions.PinkWater,
-                EasyGoopDefinitions.RedWater,
-                EasyGoopDefinitions.OrangeWater,
-                EasyGoopDefinitions.YellowWater,
-                EasyGoopDefinitions.GreenWater,
-                EasyGoopDefinitions.BlueWater,
-                EasyGoopDefinitions.PurpleWater,
-                EasyGoopDefinitions.CyanWater,
-            };
             ApplyColourToHitEnemies = false;
             tintPriority            = 1;
             paintballGun            = false;
         }
         public GoopDefinition setColorAndGetGoop() {
-            int selectedIndex = UnityEngine.Random.Range(0, ListOfColors.Count);
-            selectedColour = ListOfColors[selectedIndex];
-            return ListOfGoops[selectedIndex];
+            int selectedIndex = UnityEngine.Random.Range(0, EasyGoopDefinitions.ColorGoopColors.Count);
+            selectedColour = EasyGoopDefinitions.ColorGoopColors[selectedIndex];
+            return EasyGoopDefinitions.ColorGoops[selectedIndex];
         }
         private void Start()
         {
@@ -161,5 +103,5 @@ namespace CwaffingTheGungy
             };
             enemy.aiActor.ApplyEffect(tint);
         }
-    } //Randomises the colour of the projectile, and can make it apply the colour to enemies.
+    }
 }

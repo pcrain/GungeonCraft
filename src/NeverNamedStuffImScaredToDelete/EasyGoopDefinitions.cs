@@ -22,14 +22,6 @@ namespace CwaffingTheGungy
 
 
         //Custom Goops
-        public static GoopDefinition PinkWater;
-        public static GoopDefinition RedWater;
-        public static GoopDefinition OrangeWater;
-        public static GoopDefinition YellowWater;
-        public static GoopDefinition GreenWater;
-        public static GoopDefinition BlueWater;
-        public static GoopDefinition PurpleWater;
-        public static GoopDefinition CyanWater;
         // public static GoopDefinition PropulsionGoop;
         // public static GoopDefinition PlayerFriendlyWebGoop;
         // public static GoopDefinition PlagueGoop;
@@ -40,6 +32,10 @@ namespace CwaffingTheGungy
         // public static GoopDefinition PlayerFriendlyPoisonGoop;
         // public static GoopDefinition PlayerFriendlyFireGoop;
         // public static GoopDefinition PlayerFriendlyHoneyGoop;
+
+        public static List<GoopDefinition> ColorGoops;
+        public static List<Color> ColorGoopColors;
+
         public static void DefineDefaultGoops()
         {
             //Sets up the goops that have to be extracted from asset bundles
@@ -72,32 +68,24 @@ namespace CwaffingTheGungy
 
             //Colored Water Water
             #region Colored Water
-                GoopDefinition g1 = UnityEngine.Object.Instantiate<GoopDefinition>(WaterGoop);
-                GoopDefinition g2 = UnityEngine.Object.Instantiate<GoopDefinition>(WaterGoop);
-                GoopDefinition g3 = UnityEngine.Object.Instantiate<GoopDefinition>(WaterGoop);
-                GoopDefinition g4 = UnityEngine.Object.Instantiate<GoopDefinition>(WaterGoop);
-                GoopDefinition g5 = UnityEngine.Object.Instantiate<GoopDefinition>(WaterGoop);
-                GoopDefinition g6 = UnityEngine.Object.Instantiate<GoopDefinition>(WaterGoop);
-                GoopDefinition g7 = UnityEngine.Object.Instantiate<GoopDefinition>(WaterGoop);
-                GoopDefinition g8 = UnityEngine.Object.Instantiate<GoopDefinition>(WaterGoop);
-
-                g1.baseColor32 = ExtendedColours.pink;
-                g2.baseColor32 = Color.red;
-                g3.baseColor32 = ExtendedColours.orange;
-                g4.baseColor32 = Color.yellow;
-                g5.baseColor32 = Color.green;
-                g6.baseColor32 = Color.blue;
-                g7.baseColor32 = ExtendedColours.purple;
-                g8.baseColor32 = Color.cyan;
-
-                PinkWater   = g1;
-                RedWater    = g2;
-                OrangeWater = g3;
-                YellowWater = g4;
-                GreenWater  = g5;
-                BlueWater   = g6;
-                PurpleWater = g7;
-                CyanWater   = g8;
+                ColorGoopColors = new List<Color> {
+                    ExtendedColours.pink,
+                    Color.red,
+                    ExtendedColours.orange,
+                    Color.yellow,
+                    Color.green,
+                    Color.blue,
+                    ExtendedColours.purple,
+                    Color.cyan,
+                };
+                ColorGoops      = new List<GoopDefinition>();
+                for (int i = 0; i < ColorGoopColors.Count; i++)
+                {
+                    GoopDefinition g   = UnityEngine.Object.Instantiate<GoopDefinition>(WaterGoop);
+                    g.CanBeElectrified = false;
+                    g.baseColor32      = ColorGoopColors[i];
+                    ColorGoops.Add(g);
+                }
             #endregion
 
             // //HONEY GOOP - An Amber Goop that slows enemies and players
