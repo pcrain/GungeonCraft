@@ -118,9 +118,12 @@
     <Compile Include="src\Cwaff-Guns\BasicGun.cs"/>
     <Compile Include="src\Cwaff-Guns\RainCheck.cs"/>
     <Compile Include="src\Cwaff-Guns\Natasha.cs"/>
+    <Compile Include="src\Cwaff-Guns\PaintballGun.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\ProjSpawnHelper.cs"/>
+    <Compile Include="src\NeverNamedStuffImScaredToDelete\EasyGoopDefinitions.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\WhereTheMagicHappens.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\ExoticPlaceables.cs"/>
+    <Compile Include="src\NeverNamedStuffImScaredToDelete\ExtendedColours.cs"/>
     <EmbeddedResource Include="Characters\Shade\icon.png"/>
     <EmbeddedResource Include="Characters\Shade\characterdata.txt"/>
     <EmbeddedResource Include="Characters\Shade\facecard.png"/>

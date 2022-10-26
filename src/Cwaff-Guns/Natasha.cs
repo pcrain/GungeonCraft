@@ -30,7 +30,7 @@ namespace CwaffingTheGungy
         {
             // Get yourself a new gun "base" first.
             // Let's just call it "Basic Gun", and use "jpxfrd" for all sprites and as "codename" All sprites must begin with the same word as the codename. For example, your firing sprite would be named "jpxfrd_fire_001".
-            Gun gun = ETGMod.Databases.Items.NewGun("Natasha", "eldermagnum2");
+            Gun gun = ETGMod.Databases.Items.NewGun("Natasha", "accelerator");
             // "kp:basic_gun determines how you spawn in your gun through the console. You can change this command to whatever you want, as long as it follows the "name:itemname" template.
             Game.Items.Rename("outdated_gun_mods:natasha", "cg:natasha");
             var comp = gun.gameObject.AddComponent<Natasha>();
@@ -42,7 +42,7 @@ namespace CwaffingTheGungy
             // SetupSprite sets up the default gun sprite for the ammonomicon and the "gun get" popup.
             // WARNING: Add a copy of your default sprite to Ammonomicon Encounter Icon Collection!
             // That means, "sprites/Ammonomicon Encounter Icon Collection/defaultsprite.png" in your mod .zip. You can see an example of this with inside the mod folder.
-            gun.SetupSprite(null, "eldermagnum2_idle_001", 8);
+            gun.SetupSprite(null, "accelerator_idle_001", 8);
             // ETGMod automatically checks which animations are available.
             // The numbers next to "shootAnimation" determine the animation fps. You can also tweak the animation fps of the reload animation and idle animation using this method.
             gun.SetAnimationFPS(gun.shootAnimation, 24);

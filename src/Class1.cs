@@ -102,7 +102,7 @@ namespace CwaffingTheGungy
                 // Confusion.Init();
 
                 //Goop Setup
-                // EasyGoopDefinitions.DefineDefaultGoops();
+                EasyGoopDefinitions.DefineDefaultGoops();
                 // DoGoopEffectHook.Init();
 
                 //Commands and Other Console Utilities
@@ -515,6 +515,7 @@ namespace CwaffingTheGungy
                     BasicGun.Add();
                     RainCheck.Add();
                     Natasha.Add();
+                    PaintballGun.Add();
 
                     // //REVOLVERS
                     // FlayedRevolver.Add();
