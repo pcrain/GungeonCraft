@@ -44,44 +44,18 @@ namespace CwaffingTheGungy
             paintballController.paintballGun = true;
             gun.quality = PickupObject.ItemQuality.C;
 
-            // ColorSplash colorSplashController = projectile.gameObject.AddComponent<ColorSplash>();
-
-            // GoopModifier goopmod         = projectile.gameObject.AddComponent<GoopModifier>();
-            // goopmod.SpawnGoopOnCollision = true;
-            // goopmod.CollisionSpawnRadius = 2f;
-            // goopmod.SpawnGoopInFlight    = false;
-            // goopmod.goopDefinition       = EasyGoopDefinitions.WaterGoop;
-
             ETGMod.Databases.Items.Add(gun, false, "ANY");
 
         }
         public override void PostProcessProjectile(Projectile projectile)
         {
-            // if (projectile.ProjectilePlayerOwner())
-            // {
-            //   ProjectileSlashingBehaviour slash =  projectile.gameObject.AddComponent<ProjectileSlashingBehaviour>();
-            //     slash.DestroyBaseAfterFirstSlash = false;
-            //     slash.timeBetweenSlashes = 1;
-            //     slash.SlashDamageUsesBaseProjectileDamage = true;
-            //     slash.slashParameters.playerKnockbackForce = 0;
-            // }
-
             RandomiseProjectileColourComponent rpcc =
                 projectile.gameObject.GetComponent<RandomiseProjectileColourComponent>();
-
-            if (rpcc != null)
-            {
-                // ETGModConsole.Log("Gooper o:");
-            }
 
             GoopModifier goopmod         = projectile.gameObject.AddComponent<GoopModifier>();
             goopmod.SpawnGoopOnCollision = true;
             goopmod.CollisionSpawnRadius = 2f;
             goopmod.SpawnGoopInFlight    = false;
-            // goopmod.goopDefinition       = EasyGoopDefinitions.WaterGoop;
-            // GoopDefinition colorWater    = UnityEngine.Object.Instantiate<GoopDefinition>(EasyGoopDefinitions.WaterGoop);
-            // colorWater.baseColor32       = rpcc.selectedColour;
-            // goopmod.goopDefinition       = rpcc.selectedGoop;
             goopmod.goopDefinition       = rpcc.setColorAndGetGoop();
 
             base.PostProcessProjectile(projectile);
@@ -127,9 +101,16 @@ namespace CwaffingTheGungy
 
     public class RandomiseProjectileColourComponent : MonoBehaviour
     {
+        public static List<Color>          ListOfColors;
+        public static List<GoopDefinition> ListOfGoops;
+        public        bool                 ApplyColourToHitEnemies;
+        public        int                  tintPriority;
+        public        bool                 paintballGun;
+        public        Color                selectedColour;
+        private       Projectile           m_projectile;
         public RandomiseProjectileColourComponent()
         {
-            ListOfColours = new List<Color> {
+            ListOfColors = new List<Color> {
                 ExtendedColours.pink,
                 Color.red,
                 ExtendedColours.orange,
@@ -153,28 +134,18 @@ namespace CwaffingTheGungy
             tintPriority            = 1;
             paintballGun            = false;
         }
-        public static List<Color> ListOfColours;
-        public static List<GoopDefinition> ListOfGoops;
-        public bool ApplyColourToHitEnemies;
-        public int tintPriority;
-        public bool paintballGun;
         public GoopDefinition setColorAndGetGoop() {
-            this.selectedIndex = UnityEngine.Random.Range(0, ListOfColours.Count);
-            return EasyGoopDefinitions.rainbowGoopDefs[this.selectedIndex];
+            int selectedIndex = UnityEngine.Random.Range(0, ListOfColors.Count);
+            selectedColour = ListOfColors[selectedIndex];
+            return ListOfGoops[selectedIndex];
         }
         private void Start()
         {
             this.m_projectile = base.GetComponent<Projectile>();
-            ETGModConsole.Log("Selected Index is"+this.selectedIndex);
-            selectedColour = ListOfColours[this.selectedIndex];
-            selectedGoop   = EasyGoopDefinitions.rainbowGoopDefs[this.selectedIndex];
-            m_projectile.AdjustPlayerProjectileTint(selectedColour, tintPriority);
-            if (ApplyColourToHitEnemies) m_projectile.OnHitEnemy += this.OnHitEnemy;
+            this.m_projectile.AdjustPlayerProjectileTint(selectedColour, tintPriority);
+            if (ApplyColourToHitEnemies)
+                this.m_projectile.OnHitEnemy += this.OnHitEnemy;
         }
-        private Projectile m_projectile;
-        public Color selectedColour;
-        public GoopDefinition selectedGoop;
-        public int selectedIndex = -1;
         private void OnHitEnemy(Projectile bullet, SpeculativeRigidbody enemy, bool what)
         {
             GameActorHealthEffect tint = new GameActorHealthEffect()
@@ -189,10 +160,6 @@ namespace CwaffingTheGungy
                 effectIdentifier         = "ProjectileAppliedTint",
             };
             enemy.aiActor.ApplyEffect(tint);
-        }
-        private void Update()
-        {
-
         }
     } //Randomises the colour of the projectile, and can make it apply the colour to enemies.
 }

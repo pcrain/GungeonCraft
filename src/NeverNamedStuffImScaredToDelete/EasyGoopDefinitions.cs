@@ -72,8 +72,6 @@ namespace CwaffingTheGungy
 
             //Colored Water Water
             #region Colored Water
-                EasyGoopDefinitions.rainbowGoopDefs = new List<GoopDefinition>();
-
                 GoopDefinition g1 = UnityEngine.Object.Instantiate<GoopDefinition>(WaterGoop);
                 GoopDefinition g2 = UnityEngine.Object.Instantiate<GoopDefinition>(WaterGoop);
                 GoopDefinition g3 = UnityEngine.Object.Instantiate<GoopDefinition>(WaterGoop);
@@ -100,15 +98,6 @@ namespace CwaffingTheGungy
                 BlueWater   = g6;
                 PurpleWater = g7;
                 CyanWater   = g8;
-
-                EasyGoopDefinitions.rainbowGoopDefs.Add(g1);
-                EasyGoopDefinitions.rainbowGoopDefs.Add(g2);
-                EasyGoopDefinitions.rainbowGoopDefs.Add(g3);
-                EasyGoopDefinitions.rainbowGoopDefs.Add(g4);
-                EasyGoopDefinitions.rainbowGoopDefs.Add(g5);
-                EasyGoopDefinitions.rainbowGoopDefs.Add(g6);
-                EasyGoopDefinitions.rainbowGoopDefs.Add(g7);
-                EasyGoopDefinitions.rainbowGoopDefs.Add(g8);
             #endregion
 
             // //HONEY GOOP - An Amber Goop that slows enemies and players
@@ -244,7 +233,6 @@ namespace CwaffingTheGungy
             "assets/data/goops/water goop.asset",
         };
         private static List<GoopDefinition> goopDefs;
-        public static List<GoopDefinition> rainbowGoopDefs;
     }
 
 }
