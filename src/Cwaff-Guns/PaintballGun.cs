@@ -49,11 +49,13 @@ namespace CwaffingTheGungy
             PaintballColorizer pbc =
                 projectile.gameObject.GetComponent<PaintballColorizer>();
 
-            GoopModifier goopmod         = projectile.gameObject.AddComponent<GoopModifier>();
-            goopmod.SpawnGoopOnCollision = true;
-            goopmod.CollisionSpawnRadius = 2f;
-            goopmod.SpawnGoopInFlight    = false;
-            goopmod.goopDefinition       = pbc.setColorAndGetGoop();
+            GoopModifier goopmod           = projectile.gameObject.AddComponent<GoopModifier>();
+            goopmod.SpawnGoopOnCollision   = true;
+            goopmod.CollisionSpawnRadius   = 1f;
+            goopmod.SpawnGoopInFlight      = true;
+            goopmod.InFlightSpawnRadius    = 0.4f;
+            goopmod.InFlightSpawnFrequency = 0.01f;
+            goopmod.goopDefinition         = pbc.setColorAndGetGoop();
 
             base.PostProcessProjectile(projectile);
         }
