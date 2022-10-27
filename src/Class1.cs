@@ -84,7 +84,7 @@ namespace CwaffingTheGungy
                 // Challenges.Init();
 
                 //Hooks n Shit
-                // PlayerToolsSetup.Init();
+                PlayerToolsSetup.Init();
                 // CompanionisedEnemyUtility.InitHooks();
 
                 // FloorAndGenerationToolbox.Init();
@@ -109,8 +109,8 @@ namespace CwaffingTheGungy
                 // Commands.Init();
 
                 //Hats
-                // HatUtility.NecessarySetup();
-                // HatDefinitions.Init();
+                HatUtility.NecessarySetup();
+                HatDefinitions.Init();
 
                 //Gamemodes
                 // AllJammedState.Init();
@@ -644,7 +644,7 @@ namespace CwaffingTheGungy
                     // WoodenHorse.Add();
                     // AgarGun.Add();
                     // //KNIVES AND BLADES
-                    // Carnwennan.Add();
+                    MasterSword.Add();
                     // MantidAugment.Add();
                     // //REALISTIC GUNS
                     // HeatRay.Add();

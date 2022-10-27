@@ -40,7 +40,7 @@ namespace CwaffingTheGungy
                         bool flag6 = text2.IndexOf(Path.DirectorySeparatorChar) == 0;
                         if (flag6) { text2 = text2.Substring(1); }
                         text2 = prefix + ":" + text2;
-                        Console.WriteLine(string.Format("{0}: Soundbank found, attempting to autoload: name='{1}' resource='{2}'", "hi", text2, text));
+                        // Console.WriteLine(string.Format("{0}: Soundbank found, attempting to autoload: name='{1}' resource='{2}'", "hi", text2, text));
                         using (Stream manifestResourceStream = assembly.GetManifestResourceStream(text))
                         {
                             LoadSoundbankFromStream(manifestResourceStream, text2);
