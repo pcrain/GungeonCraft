@@ -13,6 +13,9 @@ namespace CwaffingTheGungy
 {
     public class Lazy
     {
+        /// <summary>
+        /// Perform basic initialization for a new gun definition.
+        /// </summary>
         public static Gun InitGunFromStrings(
           string gunName, string spriteName, string projectileName, string shortDescription, string longDescription)
         {
@@ -34,6 +37,9 @@ namespace CwaffingTheGungy
 
             return gun;
         }
+        /// <summary>
+        /// Perform basic initialization for a new projectile definition.
+        /// </summary>
         public static Projectile PrefabProjectileFromGun(Gun gun)
         {
             //actually instantiate the projectile
