@@ -1,29 +1,32 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Collections;
-using Gungeon;
-using MonoMod;
-using ItemAPI;
+using System.Reflection;
+
 using UnityEngine;
+using MonoMod;
+using MonoMod.RuntimeDetour;
+using Gungeon;
 using Alexandria.Misc;
+using Alexandria.ItemAPI;
 
 namespace CwaffingTheGungy
 {
     public class PaintballGun : GunBehaviour
     {
+        public static string gunName          = "Paintball Gun";
+        public static string spriteName       = "paintballgun";
+        public static string projectileName   = "86"; //marine sidearm
+        public static string shortDescription = "Taste the Rainbow";
+        public static string longDescription  = "(shoots colored projectiles with colored goop that colors enemies...colors)";
+
         public static void Add()
         {
-            Gun gun = ETGMod.Databases.Items.NewGun("Paintball Gun", "paintballgun");
-            Game.Items.Rename("outdated_gun_mods:paintball_gun", "nn:paintball_gun");
-            gun.gameObject.AddComponent<PaintballGun>();
-            gun.SetShortDescription("Taste the Rainbow");
-            gun.SetLongDescription("(shoots colored projectiles with colored goop that colors enemies...colors)");
-            gun.SetupSprite(null, "paintballgun_idle_001", 8);
-            gun.SetAnimationFPS(gun.shootAnimation, 14);
-            gun.AddProjectileModuleFrom(PickupObjectDatabase.GetById(86) as Gun, true, false);
-            gun.SetBaseMaxAmmo(300);
+            Gun gun = Lazy.InitGunFromStrings(gunName, spriteName, projectileName, shortDescription, longDescription);
+            var comp = gun.gameObject.AddComponent<PaintballGun>();
+
             gun.DefaultModule.ammoCost                  = 1;
             gun.DefaultModule.shootStyle                = ProjectileModule.ShootStyle.SemiAutomatic;
             gun.DefaultModule.sequenceStyle             = ProjectileModule.ProjectileSequenceStyle.Random;
@@ -32,18 +35,16 @@ namespace CwaffingTheGungy
             gun.DefaultModule.numberOfShotsInClip       = 10;
             gun.gunClass                                = GunClass.PISTOL;
             gun.quality                                 = PickupObject.ItemQuality.C;
+            gun.SetBaseMaxAmmo(300);
+            gun.SetAnimationFPS(gun.shootAnimation, 14);
 
-            Projectile projectile                       = ProjectileUtility.SetupProjectile(86);
-            projectile.baseData.damage                  = 7.5f;
-            gun.DefaultModule.projectiles[0]            = projectile;
+            Projectile projectile                       = Lazy.PrefabProjectileFromGun(gun);
 
             PaintballColorizer paintballController      = projectile.gameObject.AddComponent<PaintballColorizer>();
             paintballController.ApplyColourToHitEnemies = true;
             paintballController.paintballGun            = true;
-
-            ETGMod.Databases.Items.Add(gun, false, "ANY");
-
         }
+
         public override void PostProcessProjectile(Projectile projectile)
         {
             PaintballColorizer pbc =
@@ -58,10 +59,6 @@ namespace CwaffingTheGungy
             goopmod.goopDefinition         = pbc.setColorAndGetGoop();
 
             base.PostProcessProjectile(projectile);
-        }
-        public PaintballGun()
-        {
-
         }
     }
 

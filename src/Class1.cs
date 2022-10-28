@@ -106,7 +106,7 @@ namespace CwaffingTheGungy
                 // DoGoopEffectHook.Init();
 
                 //Commands and Other Console Utilities
-                // Commands.Init();
+                Commands.Init();
 
                 //Hats
                 HatUtility.NecessarySetup();

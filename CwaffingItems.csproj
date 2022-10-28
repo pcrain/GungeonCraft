@@ -35,6 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="packages.config"/>
+    <Compile Include="src\Commands.cs"/>
     <Compile Include="src\AudioResourceLoader.cs"/>
     <Compile Include="src\StandardAPI\NPCAPI\LootTableTools.cs"/>
     <Compile Include="src\StandardAPI\NPCAPI\Examples.cs"/>
@@ -115,6 +116,8 @@
     <Compile Include="src\StandardAPI\GungeonAPI\Dungeon Code\ShrineTools.cs"/>
     <Compile Include="src\StandardAPI\GungeonAPI\Dungeon Code\DungeonHooks.cs"/>
     <Compile Include="src\Class1.cs"/>
+    <Compile Include="src\GlobalIDs.cs"/>
+    <Compile Include="src\Common.cs"/>
     <Compile Include="src\HatClassesThatWereAlsoStolen\HatController.cs"/>
     <Compile Include="src\HatClassesThatWereAlsoStolen\PlayerToolbox.cs"/>
     <Compile Include="src\HatClassesThatWereAlsoStolen\HatUtility.cs"/>
@@ -125,6 +128,7 @@
     <Compile Include="src\Cwaff-Guns\Natasha.cs"/>
     <Compile Include="src\Cwaff-Guns\MasterSword.cs"/>
     <Compile Include="src\Cwaff-Guns\Carnwennan.cs"/>
+    <Compile Include="src\Cwaff-Guns\_GenericGunReference.cs"/>
     <Compile Include="src\Cwaff-Guns\PaintballGun.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\ProjSpawnHelper.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\EasyGoopDefinitions.cs"/>
