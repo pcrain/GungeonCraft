@@ -35,7 +35,7 @@ namespace CwaffingTheGungy
             gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.Automatic;
             gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
             gun.reloadTime                        = 1.1f;
-            gun.DefaultModule.angleVariance       = 20.0f;
+            gun.DefaultModule.angleVariance       = 15.0f;
             gun.DefaultModule.cooldownTime        = baseCooldownTime;
             gun.DefaultModule.numberOfShotsInClip = 1000;
             gun.quality                           = PickupObject.ItemQuality.D;
@@ -91,7 +91,7 @@ namespace CwaffingTheGungy
             if (!(this.gun && this.gun.GunPlayerOwner()))
                 return;
             this.gun.RemoveStatFromGun(PlayerStats.StatType.MovementSpeed);
-            this.gun.AddStatToGun(PlayerStats.StatType.MovementSpeed, this.speedmult, StatModifier.ModifyMethod.MULTIPLICATIVE);
+            this.gun.AddStatToGun(PlayerStats.StatType.MovementSpeed, (float)Math.Sqrt(this.speedmult), StatModifier.ModifyMethod.MULTIPLICATIVE);
             this.gun.GunPlayerOwner().stats.RecalculateStats(gun.GunPlayerOwner()); // TODO: this resets the gun's cooldown time??? need it first for now
             this.gun.DefaultModule.cooldownTime = this.speedmult * baseCooldownTime;
         }
@@ -99,11 +99,15 @@ namespace CwaffingTheGungy
 
     public class NatashaBullets : MonoBehaviour
     {
-        private const float NATASHA_PROJECTILE_SCALE  = 0.5f;
+        private const float NATASHA_PROJECTILE_SCALE = 0.5f;
         private void Start()
         {
             Projectile self = base.GetComponent<Projectile>();
-            self.RuntimeUpdateScale(NATASHA_PROJECTILE_SCALE);
+            if (self && self.Owner is PlayerController && self.Owner != null)
+            {
+                PlayerController owner = self.Owner as PlayerController;
+                self.RuntimeUpdateScale(NATASHA_PROJECTILE_SCALE * owner.stats.GetStatValue(PlayerStats.StatType.PlayerBulletScale));
+            }
         }
     }
 }

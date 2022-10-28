@@ -1,37 +1,31 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Collections;
 using System.Reflection;
-using Gungeon;
-using MonoMod;
+
 using UnityEngine;
-using ItemAPI;
-using SaveAPI;
+using MonoMod;
+using MonoMod.RuntimeDetour;
+using Gungeon;
 using Alexandria.Misc;
+using Alexandria.ItemAPI;
 
 namespace CwaffingTheGungy
 {
-
     public class MasterSword : AdvancedGunBehavior
     {
+        public static string gunName          = "Master Sword";
+        public static string spriteName       = "carnwennan";
+        public static string projectileName   = "86"; //marine sidearm
+        public static string shortDescription = "Dangerous Alone";
+        public static string longDescription  = "(shoots beams until you get hit, stylish hat)";
+
         public static void Add()
         {
-
-            Gun gun = ETGMod.Databases.Items.NewGun("Master Sword", "carnwennan");
-            Game.Items.Rename("outdated_gun_mods:master_sword", "cg:master_sword");
-            var behav = gun.gameObject.AddComponent<MasterSword>();
-
-            gun.gunSwitchGroup = (PickupObjectDatabase.GetById(417) as Gun).gunSwitchGroup;
-
-            gun.SetShortDescription("Dangerous Alone");
-            gun.SetLongDescription("(shoots beams until you get hit, stylish hat)");
-            gun.SetupSprite(null, "carnwennan_idle_001", 8);
-            gun.SetAnimationFPS(gun.shootAnimation, 12);
-            gun.AddProjectileModuleFrom(PickupObjectDatabase.GetById(86) as Gun, true, false);
-            gun.SetBaseMaxAmmo(50);
-            // gun.AddPassiveStatModifier(PlayerStats.StatType.Curse, 1f, StatModifier.ModifyMethod.ADDITIVE);
+            Gun gun = Lazy.InitGunFromStrings(gunName, spriteName, projectileName, shortDescription, longDescription);
+            var comp = gun.gameObject.AddComponent<MasterSword>();
 
             gun.DefaultModule.ammoCost               = 1;
             gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
@@ -44,17 +38,16 @@ namespace CwaffingTheGungy
             gun.quality                              = PickupObject.ItemQuality.D;
             gun.gunClass                             = GunClass.SILLY;
             gun.DefaultModule.ammoType               = GameUIAmmoType.AmmoType.BEAM;
+            gun.gunSwitchGroup                       = (PickupObjectDatabase.GetById(417) as Gun).gunSwitchGroup;
+            gun.InfiniteAmmo                         = true;
+            gun.SetAnimationFPS(gun.shootAnimation, 12);
 
-            //BULLET STATS
-            Projectile projectile               = ProjectileUtility.SetupProjectile(86);
-            gun.DefaultModule.projectiles[0]    = projectile;
-            gun.InfiniteAmmo                    = true;
-            projectile.baseData.damage          = 4f;
+            Projectile projectile              = Lazy.PrefabProjectileFromGun(gun);
+            projectile.baseData.damage         = 4f;
             projectile.baseData.speed          *= 1.2f;
-            projectile.sprite.renderer.enabled  = false;
+            projectile.sprite.renderer.enabled = false;
 
-
-            CarnwennanSlashModifier slash              = projectile.gameObject.AddComponent<CarnwennanSlashModifier>();
+            ProjectileSlashingBehaviour slash          = projectile.gameObject.AddComponent<ProjectileSlashingBehaviour>();
             slash.DestroyBaseAfterFirstSlash           = true;
             slash.slashParameters                      = new SlashData();
             slash.slashParameters.soundEvent           = null;
@@ -83,28 +76,6 @@ namespace CwaffingTheGungy
                 {
                     def.MakeOffset(new Vector2(-0.81f, -2.18f));
                 }
-            }
-
-            ETGMod.Databases.Items.Add(gun, false, "ANY");
-            ID = gun.PickupObjectId;
-
-            // gun.SetupUnlockOnCustomFlag(CustomDungeonFlags.BOSSRUSH_BULLET, true);
-        }
-        public MasterSword() {
-
-        }
-        public static int ID;
-        public class CarnwennanSlashModifier : ProjectileSlashingBehaviour
-        {
-            public override void SlashHitTarget(GameActor target, bool fatal)
-            {
-                // float ran = UnityEngine.Random.value;
-                // //ETGModConsole.Log(ran.ToString());
-                // if (fatal && ran <= 0.25f)
-                //     {
-                //     LootEngine.SpawnItem(PickupObjectDatabase.GetById(BraveUtility.RandomElement(LootEngineItem.validIDs)).gameObject, target.sprite.WorldCenter, Vector2.zero, 0, true, true);
-                //     }
-                base.SlashHitTarget(target, fatal);
             }
         }
     }
