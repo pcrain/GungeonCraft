@@ -2887,6 +2887,7 @@
     <EmbeddedResource Include="Resources\keybulleteffigy_icon.png"/>
     <EmbeddedResource Include="Resources\trueblank_icon.png"/>
     <EmbeddedResource Include="Resources\goldguonstone_ingame.png"/>
+    <EmbeddedResource Include="Resources\ProjectileSprites\train_projectile.png"/>
     <EmbeddedResource Include="Resources\rando1_icon.png"/>
     <EmbeddedResource Include="Resources\AnimatedItemSprites\witheringchamber_icon_003.png"/>
     <EmbeddedResource Include="Resources\AnimatedItemSprites\witheringchamber_icon_004.png"/>

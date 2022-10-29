@@ -106,8 +106,8 @@ namespace CwaffingTheGungy
             // beamComp.penetration               += 100;
             gun.DefaultModule.projectiles[0]   = projectile;
 
-            BulletFromBeam squirt = projectile.gameObject.AddComponent<BulletFromBeam>();
-
+            var railcomp = projectile.gameObject.AddComponent<ReplaceBulletWithRail>();
+            var spawntrain = projectile.gameObject.AddComponent<SpawnTrainBehavior>();
 
             Projectile projectile2 = UnityEngine.Object.Instantiate<Projectile>((PickupObjectDatabase.GetById(86) as Gun).DefaultModule.projectiles[0]);
             BasicBeamController beamComp2 = projectile2.GenerateBeamPrefab(
@@ -130,67 +130,79 @@ namespace CwaffingTheGungy
                 // /*muzzle vfx collider offsets */   new Vector2(0, 4),
                 // /*emissive color*/                 0
                 );
-            projectile2.gameObject.SetActive(false);
             projectile2.baseData.damage = 0;
             projectile2.baseData.force = 0;
             projectile2.baseData.range *= 200;
+            projectile2.gameObject.SetActive(false);
             FakePrefab.MarkAsFakePrefab(projectile2.gameObject);
             UnityEngine.Object.DontDestroyOnLoad(projectile2);
-            // beamComp2.boneType = BasicBeamController.BeamBoneType.Straight;
-            beamComp2.boneType = BasicBeamController.BeamBoneType.Projectile;
-            beamComp2.interpolateStretchedBones = true;
+            beamComp2.boneType = BasicBeamController.BeamBoneType.Straight;
+            // beamComp2.boneType = BasicBeamController.BeamBoneType.Projectile;
+            // beamComp2.interpolateStretchedBones = true;
             // beamComp2.ContinueBeamArtToWall = true;
-            simpleBeam = projectile2;
+            railBeam = projectile2;
+
+            Projectile train = UnityEngine.Object.Instantiate<Projectile>((PickupObjectDatabase.GetById(86) as Gun).DefaultModule.projectiles[0]);
+            train.SetProjectileSpriteRight("train_projectile", 30, 30, true, tk2dBaseSprite.Anchor.MiddleCenter, 20, 20);
+            train.gameObject.SetActive(false);
+            FakePrefab.MarkAsFakePrefab(train.gameObject);
+            UnityEngine.Object.DontDestroyOnLoad(train);
+            // Resources/ProjectileSprites/
+            // train.sprite
+            trainProjectile = train;
         }
-        public static Projectile simpleBeam;
+        public static Projectile railBeam;
+        public static Projectile trainProjectile;
 
-        private GameObject Spawn(GameObject objectToSpawn, Vector2 positionToSpawn, float tossForce = 5f, bool canBounce = true)
-        {
-            GameObject spawnedObject = UnityEngine.Object.Instantiate<GameObject>(objectToSpawn, positionToSpawn, Quaternion.identity);
-            tk2dBaseSprite spawnedSprite = spawnedObject.GetComponent<tk2dBaseSprite>();
-            if (spawnedSprite) { spawnedSprite.PlaceAtPositionByAnchor(positionToSpawn, tk2dBaseSprite.Anchor.MiddleCenter); }
+        // private GameObject Spawn(GameObject objectToSpawn, Vector2 positionToSpawn, float tossForce = 5f, bool canBounce = true)
+        // {
+        //     GameObject spawnedObject = UnityEngine.Object.Instantiate<GameObject>(objectToSpawn, positionToSpawn, Quaternion.identity);
+        //     tk2dBaseSprite spawnedSprite = spawnedObject.GetComponent<tk2dBaseSprite>();
+        //     if (spawnedSprite) { spawnedSprite.PlaceAtPositionByAnchor(positionToSpawn, tk2dBaseSprite.Anchor.MiddleCenter); }
 
-            // DebrisObject debrisObject = LootEngine.DropItemWithoutInstantiating(spawnedObject, spawnedObject.transform.position, UnityEngine.Random.insideUnitCircle, tossForce, false, false, true, false);
-            // debrisObject.IsAccurateDebris = true;
-            // debrisObject.Priority         = EphemeralObject.EphemeralPriority.Critical;
-            // debrisObject.bounceCount      = canBounce ? 1 : 0;
+        //     // DebrisObject debrisObject = LootEngine.DropItemWithoutInstantiating(spawnedObject, spawnedObject.transform.position, UnityEngine.Random.insideUnitCircle, tossForce, false, false, true, false);
+        //     // debrisObject.IsAccurateDebris = true;
+        //     // debrisObject.Priority         = EphemeralObject.EphemeralPriority.Critical;
+        //     // debrisObject.bounceCount      = canBounce ? 1 : 0;
 
-            return spawnedObject;
-        }
+        //     return spawnedObject;
+        // }
 
         public override void OnPostFired(PlayerController player, Gun gun)
         {
-            return;
             base.OnPostFired(player, gun); //called when a gun is fired
-            GameObject g = Spawn(EasyPlaceableObjects.TableVertical, player.specRigidbody.UnitCenter.ToIntVector2().ToVector3(),5,true);
+            // GameObject g = Spawn(EasyPlaceableObjects.TableVertical, player.specRigidbody.UnitCenter.ToIntVector2().ToVector3(),5,true);
             // SpawnObjectManager.SpawnObject(
             //     EasyPlaceableObjects.TableVertical, player.specRigidbody.UnitCenter.ToIntVector2().ToVector3(), null);
-            BeamController beam2 = BeamAPI.FreeFireBeamFromAnywhere(
-                simpleBeam, player, g, Vector2.zero, gun.CurrentAngle, 1, true, true);
-                // simpleBeam, player, player.gameObject, Vector2.zero, gun.CurrentAngle, 1, true, true);
+            // BeamController beam2 = BeamAPI.FreeFireBeamFromAnywhere(
+            //     railBeam, player, player.gameObject, Vector2.zero, gun.CurrentAngle, 1, true, true);
+                // railBeam, player, g, Vector2.zero, gun.CurrentAngle, 1, true, true);
         }
-        // protected override void PostProcessBeam(BeamController beam)
+
+        // public override void Pickup(PlayerController player)
         // {
-        //     // if (beam && beam.projectile && beam.projectile.ProjectilePlayerOwner() && beam.projectile.ProjectilePlayerOwner().PlayerHasActiveSynergy("Absolute Radiance"))
-        //     // {
-        //     //     BeamSplittingModifier split = beam.gameObject.GetOrAddComponent<BeamSplittingModifier>();
-        //     //     split.dmgMultOnSplit = 0.25f;
-        //     //     split.amtToSplitTo += 10;
-        //     //     split.distanceTilSplit = 1;
-        //     //     split.splitAngles = 90;
-        //     // }
-        //     // if (beam && beam.projectile && beam.projectile.ProjectilePlayerOwner())
-        //     // {
-        //     //     int angle = 135;
-        //     //     PlayerController pc = beam.projectile.ProjectilePlayerOwner();
-        //     //     BeamController beam2 = BeamAPI.FreeFireBeamFromAnywhere(
-        //     //         simpleBeam, pc, pc.gameObject, Vector2.zero,  angle, 1, true, true);
-        //     // }
-        //     base.PostProcessBeam(beam);
+        //     // player.PostProcessProjectile += this.PostProcessProj;
+        //     player.PostProcessBeam += this.PostProcessBeam;
+        //     base.Pickup(player);
+        // }
+        // private void PostProcessBeam(BeamController beam)
+        // {
+        // SpawnProjectileAtBeamPoint beamspawner =   beam.gameObject.GetOrAddComponent<SpawnProjectileAtBeamPoint>();
+        //     beamspawner.addFromBulletWithGunComponent = true;
+        //     beamspawner.doPostProcess = true;
+        //     if (Owner.PlayerHasActiveSynergy("Bullets With Knives")) beamspawner.projectileToFire = swordProjectile;
+        //     else beamspawner.projectileToFire = projectileToSpawn;
+        // }
+        // public override DebrisObject Drop(PlayerController player)
+        // {
+        //     // player.PostProcessProjectile -= this.PostProcessProj;
+        //     player.PostProcessBeam -= this.PostProcessBeam;
+
+        //     return base.Drop(player);
         // }
     }
 
-    public class BulletFromBeam : MonoBehaviour
+    public class SpawnTrainBehavior : MonoBehaviour
     {
         private Projectile m_projectile;
         private PlayerController m_owner;
@@ -203,20 +215,61 @@ namespace CwaffingTheGungy
             {
                 this.m_owner = this.m_projectile.Owner as PlayerController;
                 this.m_angle = this.m_owner.CurrentGun.CurrentAngle;
+                if (this.m_angle > 180)
+                {
+                    this.m_angle -= 180;
+                }
+                else {
+                    this.m_angle += 180;
+                }
+            }
+            // BeginBeamFire();
+            // this.m_projectile.enabled = false;
+            // Invoke("SpawnTheTrain", 3f); // make sure this is at least as long as the rail's lifetime
+        }
+        public void SpawnTheTrain(Vector2 position)
+        {
+            SpawnManager.SpawnProjectile(RailGun.trainProjectile.gameObject, position, Quaternion.Euler(0f, 0f, this.m_angle), true);
+        }
+    }
+
+    public class ReplaceBulletWithRail : MonoBehaviour
+    {
+        private Projectile m_projectile;
+        private PlayerController m_owner;
+        private float m_angle;
+        private BeamController m_beam;
+        private SpawnTrainBehavior m_spawn;
+
+        private void Start()
+        {
+            this.m_projectile = base.GetComponent<Projectile>();
+            this.m_spawn = this.m_projectile.GetComponent<SpawnTrainBehavior>();
+            if (this.m_projectile.Owner && this.m_projectile.Owner is PlayerController)
+            {
+                this.m_owner = this.m_projectile.Owner as PlayerController;
+                this.m_angle = this.m_owner.CurrentGun.CurrentAngle;
             }
             BeginBeamFire();
-            // Invoke("BeginBeamFire", 0.5f);
-            Invoke("Die", 3f);
+            this.m_projectile.enabled = false;
+            Invoke("Expire", 30f); // make sure this is at least as long as the rail's lifetime
         }
         private void BeginBeamFire()
         {
-            BeamController beam = BeamAPI.FreeFireBeamFromAnywhere(
-                RailGun.simpleBeam, this.m_owner, this.m_projectile.gameObject, Vector2.zero, this.m_angle, 1, true, true);
-            // this.m_projectile.DieInAir(true,false,false,true);
-            // UnityEngine.Object.Destroy(this.m_projectile.gameObject);
+            m_beam = BeamAPI.FreeFireBeamFromAnywhere(
+                RailGun.railBeam, this.m_owner, this.m_projectile.gameObject, Vector2.zero, this.m_angle, 5, true, true);
+            Invoke("CallUponTheTrain", 3f);
         }
-        private void Die()
+        private void CallUponTheTrain()
         {
+            // SpawnManager.SpawnProjectile(
+            //     RailGun.trainProjectile.gameObject, this.m_projectile.sprite.WorldCenter, Quaternion.Euler(0f, 0f, this.m_angle), true);
+            this.m_spawn.SpawnTheTrain(m_beam.GetComponent<BasicBeamController>(
+                    ).GetPointOnBeam(0.9f));
+        }
+        private void Expire()
+        {
+            // this.m_projectile.DieInAir(true,false,false,true);
             UnityEngine.Object.Destroy(this.m_projectile.gameObject);
         }
     }
