@@ -610,7 +610,7 @@ namespace CwaffingTheGungy
                     // YBeam.Add();
                     // WallRay.Add();
                     // BolaGun.Add();
-                    RailGun.Add();
+                    DerailGun.Add();
                     // Glazerbeam.Add();
                     // StasisRifle.Add();
                     // Gravitron.Add();

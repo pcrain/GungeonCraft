@@ -11,9 +11,9 @@ using Alexandria.Misc;
 
 namespace CwaffingTheGungy
 {
-    public class RailGun : AdvancedGunBehavior
+    public class DerailGun : AdvancedGunBehavior
     {
-        public static string gunName          = "Rail Gun";
+        public static string gunName          = "Derail Gun";
         public static string spriteName       = "alphabeam";
         public static string projectileName   = "86"; //marine sidearm
         public static string shortDescription = "I Choo Choose You";
@@ -22,7 +22,7 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.InitGunFromStrings(gunName, spriteName, projectileName, shortDescription, longDescription);
-            var comp = gun.gameObject.AddComponent<RailGun>();
+            var comp = gun.gameObject.AddComponent<DerailGun>();
             // comp.preventNormalFireAudio = true;
 
             gun.isAudioLoop                          = true;
@@ -162,14 +162,14 @@ namespace CwaffingTheGungy
         private void BeginBeamFire()
         {
             m_beam = BeamAPI.FreeFireBeamFromAnywhere(
-                RailGun.railBeam, this.m_owner, this.m_projectile.gameObject,
+                DerailGun.railBeam, this.m_owner, this.m_projectile.gameObject,
                 Vector2.zero, this.m_angle, 5, true, true);
             Invoke("CallUponTheTrain", 3f);
         }
         private void CallUponTheTrain()
         {
             SpawnManager.SpawnProjectile(
-                RailGun.trainProjectile.gameObject,
+                DerailGun.trainProjectile.gameObject,
                 m_beam.GetComponent<BasicBeamController>().GetPointOnBeam(0.9f),
                 Quaternion.Euler(0f, 0f, this.return_angle),
                 true);

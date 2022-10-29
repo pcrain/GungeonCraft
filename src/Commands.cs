@@ -18,7 +18,7 @@ namespace CwaffingTheGungy
             ETGModConsole.Commands.AddGroup("gg", delegate (string[] args)
             {
                 LootEngine.SpawnItem(
-                    PickupObjectDatabase.GetById(IDs.Guns["rail_gun"]).gameObject,
+                    PickupObjectDatabase.GetById(IDs.Guns["derail_gun"]).gameObject,
                     GameManager.Instance.PrimaryPlayer.CenterPosition,
                     Vector2.zero,
                     0);
