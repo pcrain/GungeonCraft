@@ -34,7 +34,6 @@ namespace CwaffingTheGungy
             gun.reloadTime                           = 1f;
             gun.muzzleFlashEffects.type              = VFXPoolType.None;
             gun.DefaultModule.cooldownTime           = 0.5f;
-            // gun.DefaultModule.cooldownTime           = 0.001f;
             gun.DefaultModule.numberOfShotsInClip    = -1;
             // gun.DefaultModule.ammoType               = GameUIAmmoType.AmmoType.BEAM;
             gun.DefaultModule.ammoType               = GameUIAmmoType.AmmoType.MEDIUM_BULLET;
@@ -97,13 +96,12 @@ namespace CwaffingTheGungy
             // beamComp.interpolateStretchedBones = false;
 
             var railcomp = projectile.gameObject.AddComponent<ReplaceBulletWithRail>();
-            var spawntrain = projectile.gameObject.AddComponent<SpawnTrainBehavior>();
 
-            Projectile projectile2 = Lazy.PrefabProjectileFromGun(PickupObjectDatabase.GetById(86) as Gun, false);
-            projectile2.baseData.damage = 0;
-            projectile2.baseData.force  = 0;
-            projectile2.baseData.range *= 200;
-            BasicBeamController beamComp2 = projectile2.GenerateBeamPrefab(
+            Projectile projectile2         = Lazy.PrefabProjectileFromGun(PickupObjectDatabase.GetById(86) as Gun, false);
+            projectile2.baseData.damage    = 0;
+            projectile2.baseData.force     = 0;
+            projectile2.baseData.range    *= 200;
+            BasicBeamController beamComp2  = projectile2.GenerateBeamPrefab(
                 /*sprite path*/                    "CwaffingTheGungy/Resources/BeamSprites/railbeam_mid_001",
                 /*collider dimensions*/            new Vector2(15, 7),
                 /*collider offsets*/               new Vector2(0, 4),
@@ -123,16 +121,16 @@ namespace CwaffingTheGungy
                 // /*muzzle vfx collider offsets */   new Vector2(0, 4),
                 // /*emissive color*/                 0
                 );
-            beamComp2.boneType         = BasicBeamController.BeamBoneType.Straight;
-            beamComp2.startAudioEvent  = "Play_WPN_radiationlaser_shot_01";
-            beamComp2.endAudioEvent    = "Stop_WPN_All";
-            beamComp2.penetration     += 100;
+            beamComp2.boneType             = BasicBeamController.BeamBoneType.Straight;
+            beamComp2.startAudioEvent      = "Play_WPN_radiationlaser_shot_01";
+            beamComp2.endAudioEvent        = "Stop_WPN_All";
+            beamComp2.penetration          = 100;
             // beamComp2.boneType = BasicBeamController.BeamBoneType.Projectile;
             // beamComp2.interpolateStretchedBones = true;
             // beamComp2.ContinueBeamArtToWall = true;
             railBeam = projectile2;
 
-            Projectile train = Lazy.PrefabProjectileFromGun(PickupObjectDatabase.GetById(56) as Gun, false);
+            Projectile train = Lazy.PrefabProjectileFromGun(PickupObjectDatabase.GetById(56) as Gun, false); //id 56 == 38 special
             train.SetProjectileSpriteRight("train_projectile", 30, 30, true, tk2dBaseSprite.Anchor.MiddleCenter, 20, 20);
             trainProjectile = train;
         }
@@ -140,51 +138,22 @@ namespace CwaffingTheGungy
         public static Projectile trainProjectile;
     }
 
-    public class SpawnTrainBehavior : MonoBehaviour
-    {
-        private Projectile m_projectile;
-        private PlayerController m_owner;
-        private float m_angle;
-
-        private void Start()
-        {
-            this.m_projectile = base.GetComponent<Projectile>();
-            if (this.m_projectile.Owner && this.m_projectile.Owner is PlayerController)
-            {
-                this.m_owner = this.m_projectile.Owner as PlayerController;
-                this.m_angle = this.m_owner.CurrentGun.CurrentAngle;
-                if (this.m_angle > 180)
-                {
-                    this.m_angle -= 180;
-                }
-                else
-                {
-                    this.m_angle += 180;
-                }
-            }
-        }
-        public void SpawnTheTrain(Vector2 position)
-        {
-            SpawnManager.SpawnProjectile(RailGun.trainProjectile.gameObject, position, Quaternion.Euler(0f, 0f, this.m_angle), true);
-        }
-    }
-
     public class ReplaceBulletWithRail : MonoBehaviour
     {
         private Projectile m_projectile;
         private PlayerController m_owner;
         private float m_angle;
+        private float return_angle;
         private BeamController m_beam;
-        private SpawnTrainBehavior m_spawn;
 
         private void Start()
         {
             this.m_projectile = base.GetComponent<Projectile>();
-            this.m_spawn = this.m_projectile.GetComponent<SpawnTrainBehavior>();
             if (this.m_projectile.Owner && this.m_projectile.Owner is PlayerController)
             {
-                this.m_owner = this.m_projectile.Owner as PlayerController;
-                this.m_angle = this.m_owner.CurrentGun.CurrentAngle;
+                this.m_owner      = this.m_projectile.Owner as PlayerController;
+                this.m_angle      = this.m_owner.CurrentGun.CurrentAngle;
+                this.return_angle = this.m_angle + (this.m_angle > 180 ? 180 : (-180));
             }
             BeginBeamFire();
             this.m_projectile.enabled = false;
@@ -193,12 +162,17 @@ namespace CwaffingTheGungy
         private void BeginBeamFire()
         {
             m_beam = BeamAPI.FreeFireBeamFromAnywhere(
-                RailGun.railBeam, this.m_owner, this.m_projectile.gameObject, Vector2.zero, this.m_angle, 5, true, true);
+                RailGun.railBeam, this.m_owner, this.m_projectile.gameObject,
+                Vector2.zero, this.m_angle, 5, true, true);
             Invoke("CallUponTheTrain", 3f);
         }
         private void CallUponTheTrain()
         {
-            this.m_spawn.SpawnTheTrain(m_beam.GetComponent<BasicBeamController>().GetPointOnBeam(0.9f));
+            SpawnManager.SpawnProjectile(
+                RailGun.trainProjectile.gameObject,
+                m_beam.GetComponent<BasicBeamController>().GetPointOnBeam(0.9f),
+                Quaternion.Euler(0f, 0f, this.return_angle),
+                true);
         }
         private void Expire()
         {
