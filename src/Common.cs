@@ -40,14 +40,15 @@ namespace CwaffingTheGungy
         /// <summary>
         /// Perform basic initialization for a new projectile definition.
         /// </summary>
-        public static Projectile PrefabProjectileFromGun(Gun gun)
+        public static Projectile PrefabProjectileFromGun(Gun gun, bool setGunDefaultProjectile = true)
         {
             //actually instantiate the projectile
             Projectile projectile = UnityEngine.Object.Instantiate<Projectile>(gun.DefaultModule.projectiles[0]);
             projectile.gameObject.SetActive(false); //make sure the projectile isn't an active game object
             FakePrefab.MarkAsFakePrefab(projectile.gameObject);  //mark the projectile as a prefab
             UnityEngine.Object.DontDestroyOnLoad(projectile); //make sure the projectile isn't destroyed when loaded as a prefab
-            gun.DefaultModule.projectiles[0] = projectile; //reset the gun's default projectile
+            if (setGunDefaultProjectile)
+                gun.DefaultModule.projectiles[0] = projectile; //reset the gun's default projectile
             return projectile;
         }
     }
