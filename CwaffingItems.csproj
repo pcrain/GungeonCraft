@@ -131,9 +131,11 @@
     <Compile Include="src\Cwaff-Guns\_GenericGunReference.cs"/>
     <Compile Include="src\Cwaff-Guns\RailGun.cs"/>
     <Compile Include="src\Cwaff-Guns\PaintballGun.cs"/>
+    <Compile Include="src\NeverNamedStuffImScaredToDelete\SimpleToolbox.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\ProjSpawnHelper.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\EasyGoopDefinitions.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\SlashDoer.cs"/>
+    <Compile Include="src\NeverNamedStuffImScaredToDelete\PlaceableObjectDatabase.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\WhereTheMagicHappens.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\ProjectileSlashingBehaviour.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\BeamComponents.cs"/>
