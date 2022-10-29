@@ -3063,6 +3063,7 @@
     <EmbeddedResource Include="Resources\purpleprose_icon.png"/>
     <EmbeddedResource Include="Resources\powerarmour_icon.png"/>
     <EmbeddedResource Include="Resources\tierbullets_c_icon.png"/>
+    <EmbeddedResource Include="Resources\BeamSprites\railbeam_mid_001.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\carrion2_end_001.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\alphabeam_end_002.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\stormrodbeam_mid_004.png"/>
