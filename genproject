@@ -7,20 +7,21 @@ projectname="CwaffingTheGungy"              #name of the DLL to create
 projfile="./CwaffingItems.csproj"           #the name of the csproj file to generate
 sourcechecksums="./_${namespace}-checksums" #file containing checksums of all source files to determing recompilation
 
+#Base directory we're copying our plugin to
+plugindir="/xmedia/pretzel/Steam/steamapps/common/Enter the Gungeon/BepInEx/plugins"
+pluginspritesdir="${plugindir}/sprites" #plugin sprite directory
+
 #Easy colors (condensed)
   BLN="\e[0m"   ; UND="\e[1;4m" ; INV="\e[1;7m" ; CRT="\e[1;41m";
   BLK="\e[1;30m"; RED="\e[1;31m"; GRN="\e[1;32m"; YLW="\e[1;33m";
   BLU="\e[1;34m"; MGN="\e[1;35m"; CYN="\e[1;36m"; WHT="\e[1;37m";
 
-
-#Variable tracking if anything actually needs to be rebuild
+#Variable tracking if anything actually needs to be rebuilt
 rebuild=0
 
-#Array of source files
-sources=()
-
-#Array of items to include in the base project file
-includes=()
+sources=()  #Array of source files
+includes=() #Array of items to include in the base project file
+externs=()  #Array of external resource to copy over to the EtG plugins/sprites directory
 
 #Manually populated includes
 includes+=('<None Include="packages.config" />')
@@ -70,6 +71,19 @@ echo -e "[${GRN}>${BLN}] Scanning for net35 DLLs"
 while read -r line; do
   includes+=("<Reference Include=\"$(echo "$line" | rev | cut -f 1 -d '\' | cut -f 2- -d '.' | rev)\"/>")
 done <<< $(find "packages" -path "*net35*.dll" | sed -r 's@/@\\@g')
+
+#Copy over external resources as necessary
+echo -e "[${GRN}>${BLN}] Copying over updated external resources"
+while read -r line; do
+  localrelpath="$(echo "${line}" | cut -f 2- -d '/')"
+  externpath="${pluginspritesdir}/${localrelpath}"
+  externmodtime="$(stat -c '%y' "${externpath}")"
+  localmodtime="$(stat -c '%y' "${line}")"
+  if [[ "$localmodtime" > "$externmodtime" ]]; then
+    echo -e "[${GRN}>${BLN}]   Copying ${localrelpath}"
+    /bin/cp "${line}" "${externpath}"
+  fi
+done <<< $(find "ResourcesExternal" -type f)
 
 #Generate the template .csproj file
 echo -e "[${GRN}>${BLN}] Generating .csproj template"
@@ -143,7 +157,7 @@ if [ "$oldchecksum" == "$newchecksum" ]; then
 else
   echo -e "[${GRN}>${BLN}]   New .csproj file generated, rebuilding project"
   /bin/rm "${projfile}"
-  /bin/cp "${projfile}.new" "${projfile}"
+  /bin/mv "${projfile}.new" "${projfile}"
   rebuild=1
 fi
 
@@ -176,7 +190,7 @@ if [ $rebuild -eq 1 ]; then
   #Don't warn about unused variables (semicolon delimited)
   nowarn="CS0414"
 
-  #Finally rebuild the project
+  #Actually rebuild the project
   echo -e "[${GRN}>${BLN}] Building project"
   msbuild -noLogo -warnAsMessage:"${nowarn}" -v:minimal -clp:"Summary;Verbosity=minimal"
   if [ $? -gt 0 ]; then
@@ -185,11 +199,16 @@ if [ $rebuild -eq 1 ]; then
   else
     echo -e "[${GRN}>${BLN}] Build succeeded! :D"
   fi
+
+  #Import the mod into the plugins folder
+  dllname="./bin/Debug/${projectname}.dll" #DLL name is directly based on the project name
+  echo -e "[${GRN}>${BLN}] Importing ${dllname} to EtG plugins directory"
+  /bin/cp "$dllname" "$plugindir"
 fi
 
 #Launch the game if "-g" flag was passed
 if [ $# -gt 0 ] && [ "$1" == "-g" ]; then
-  ./importmod
+  echo -e "[${GRN}>${BLN}] Launching!"
   gungy-modded
 fi
 
