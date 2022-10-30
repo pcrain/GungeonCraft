@@ -41,6 +41,7 @@ namespace CwaffingTheGungy
 
             return gun;
         }
+
         /// <summary>
         /// Perform basic initialization for a new projectile definition.
         /// </summary>
@@ -54,6 +55,35 @@ namespace CwaffingTheGungy
             if (setGunDefaultProjectile)
                 gun.DefaultModule.projectiles[0] = projectile; //reset the gun's default projectile
             return projectile;
+        }
+
+        /// <summary>
+        /// Perform basic initialization for a copied projectile definition.
+        /// </summary>
+        public static Projectile PrefabProjectileFromExistingProjectile(Projectile baseProjectile)
+        {
+            //actually instantiate the projectile
+            Projectile projectile = UnityEngine.Object.Instantiate<Projectile>(baseProjectile);
+            projectile.gameObject.SetActive(false); //make sure the projectile isn't an active game object
+            FakePrefab.MarkAsFakePrefab(projectile.gameObject);  //mark the projectile as a prefab
+            UnityEngine.Object.DontDestroyOnLoad(projectile); //make sure the projectile isn't destroyed when loaded as a prefab
+            return projectile;
+        }
+
+        /// <summary>
+        /// Post a custom item pickup notification to the bottom of the screen
+        /// </summary>
+        public static void CustomNotification(string header, string text)
+        {
+            var sprite = GameUIRoot.Instance.notificationController.notificationObjectSprite;
+            GameUIRoot.Instance.notificationController.DoCustomNotification(
+                header,
+                text,
+                sprite.Collection,
+                sprite.spriteId,
+                UINotificationController.NotificationColor.PURPLE,
+                false,
+                false);
         }
     }
 }

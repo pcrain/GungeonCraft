@@ -124,10 +124,10 @@
     <Compile Include="src\HatClassesThatWereAlsoStolen\HatUtility.cs"/>
     <Compile Include="src\HatClassesThatWereAlsoStolen\Hat.cs"/>
     <Compile Include="src\HatClassesThatWereAlsoStolen\HatDefinitions.cs"/>
-    <Compile Include="src\Cwaff-Guns\BasicGun.cs"/>
     <Compile Include="src\Cwaff-Guns\PopcornGun.cs"/>
     <Compile Include="src\Cwaff-Guns\RainCheck.cs"/>
     <Compile Include="src\Cwaff-Guns\Natasha.cs"/>
+    <Compile Include="src\Cwaff-Guns\LastResort.cs"/>
     <Compile Include="src\Cwaff-Guns\MasterSword.cs"/>
     <Compile Include="src\Cwaff-Guns\_GenericGunReference.cs"/>
     <Compile Include="src\Cwaff-Guns\DerailGun.cs"/>

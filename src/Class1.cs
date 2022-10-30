@@ -512,12 +512,12 @@ namespace CwaffingTheGungy
 
                     // //CHARACTERSTARTERS
                     // ElderMagnum.Add();
-                    BasicGun.Add();
                     RainCheck.Add();
                     Natasha.Add();
                     PaintballGun.Add();
                     PopcornGun.Add();
                     Tranquilizer.Add();
+                    LastResort.Add();
 
                     // //REVOLVERS
                     // FlayedRevolver.Add();
