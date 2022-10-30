@@ -11,6 +11,10 @@ using ItemAPI;
 
 namespace CwaffingTheGungy
 {
+    public class C // constants
+    {
+        public const float PIXELS_PER_TILE = 16f;
+    }
     public class Lazy
     {
         /// <summary>

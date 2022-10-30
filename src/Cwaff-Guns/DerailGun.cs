@@ -11,13 +11,13 @@ using Alexandria.Misc;
 
 /*
 TODO (hardest to easiest):
-    - create goop at end of the line
+    - align train to tracks
     - add explosion at end of the line
-    - fix train sprite colors
-    - find better train sprites
     - shake screen as train is moving
+    - create goop at end of the line
     - shake train as its moving
     - find and add sound effects
+    - tweak stats
 */
 
 namespace CwaffingTheGungy
@@ -122,7 +122,18 @@ namespace CwaffingTheGungy
             railBeam = projectile2;
 
             Projectile train = Lazy.PrefabProjectileFromGun(PickupObjectDatabase.GetById(56) as Gun, false); //id 56 == 38 special
-            train.SetProjectileSpriteRight("train_projectile", trainSpriteDiameter, trainSpriteDiameter, true, tk2dBaseSprite.Anchor.MiddleCenter, 20, 20);
+            train.SetProjectileSpriteRight("train_projectile_001", trainSpriteDiameter, trainSpriteDiameter, true, tk2dBaseSprite.Anchor.MiddleCenter, 20, 20);
+
+            train.AnimateProjectile(
+                new List<string> {
+                    "train_projectile_001",
+                    "train_projectile_002",
+                }, 6, true, new List<IntVector2> {
+                    new IntVector2(trainSpriteDiameter, trainSpriteDiameter), //1
+                    new IntVector2(trainSpriteDiameter, trainSpriteDiameter), //2
+                },
+                false, tk2dBaseSprite.Anchor.MiddleCenter, true, false, null, null, null, null);
+
             train.PenetratesInternalWalls = true;
             train.pierceMinorBreakables = true;
             PierceProjModifier pierce = train.gameObject.GetOrAddComponent<PierceProjModifier>();
@@ -165,7 +176,7 @@ namespace CwaffingTheGungy
             Vector2 endOfBeam =
                 m_beam.GetComponent<BasicBeamController>().GetPointOnBeam(1.0f);
             Vector2 dontImmediatelyCollideWithWallOffset =
-                BraveMathCollege.DegreesToVector(this.return_angle, (DerailGun.trainSpriteDiameter/2)/16f);
+                BraveMathCollege.DegreesToVector(this.return_angle, DerailGun.trainSpriteDiameter/C.PIXELS_PER_TILE);  //16f = tile size
             Vector2 spawnPoint =
                 endOfBeam + dontImmediatelyCollideWithWallOffset;
             // spawnPoint = endOfBeam;
