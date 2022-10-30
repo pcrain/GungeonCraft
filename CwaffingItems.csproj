@@ -140,6 +140,7 @@
     <Compile Include="src\NeverNamedStuffImScaredToDelete\ProjectileSlashingBehaviour.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\BeamComponents.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\ExoticPlaceables.cs"/>
+    <Compile Include="src\NeverNamedStuffImScaredToDelete\DataCloners.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\ExtendedColours.cs"/>
     <EmbeddedResource Include="Characters\Shade\icon.png"/>
     <EmbeddedResource Include="Characters\Shade\characterdata.txt"/>

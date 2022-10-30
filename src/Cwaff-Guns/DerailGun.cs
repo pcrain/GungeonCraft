@@ -11,11 +11,7 @@ using Alexandria.Misc;
 
 /*
 TODO (hardest to easiest):
-    - align train to tracks
-    - add explosion at end of the line
-    - shake screen as train is moving
     - create goop at end of the line
-    - shake train as its moving
     - find and add sound effects
     - tweak stats
 */
@@ -32,6 +28,8 @@ namespace CwaffingTheGungy
 
         public static Projectile railBeam;
         public static Projectile trainProjectile;
+        public static ExplosionData trainExplosion;
+
         public static int trainSpriteDiameter = 30;
 
         public static void Add()
@@ -132,14 +130,58 @@ namespace CwaffingTheGungy
                     new IntVector2(trainSpriteDiameter, trainSpriteDiameter), //1
                     new IntVector2(trainSpriteDiameter, trainSpriteDiameter), //2
                 },
-                false, tk2dBaseSprite.Anchor.MiddleCenter, true, false, null, null, null, null);
+                false, tk2dBaseSprite.Anchor.LowerCenter, true, false, null, null, null, null);
 
             train.PenetratesInternalWalls = true;
-            train.pierceMinorBreakables = true;
-            PierceProjModifier pierce = train.gameObject.GetOrAddComponent<PierceProjModifier>();
-            pierce.penetration = 100;
-            pierce.penetratesBreakables = true;
-            trainProjectile = train;
+            train.pierceMinorBreakables   = true;
+            trainProjectile               = train;
+
+            ExplosionData defaultExplosion = GameManager.Instance.Dungeon.sharedSettingsPrefab.DefaultExplosionData;
+            trainExplosion = new ExplosionData()
+            {
+                damageRadius           = 2.5f,
+                damageToPlayer         = 10f,
+                doDamage               = true,
+                damage                 = 25,
+                doDestroyProjectiles   = false,
+                doForce                = true,
+                debrisForce            = 30f,
+                preventPlayerForce     = false,
+                explosionDelay         = 0.01f,
+                usesComprehensiveDelay = false,
+                doScreenShake          = true,
+                playDefaultSFX         = true,
+                effect                 = defaultExplosion.effect,
+                ignoreList             = defaultExplosion.ignoreList,
+            };
+
+            // ScreenShakeSettings shakesettings = new ScreenShakeSettings(0.25f, 7f, 0.1f, 0.3f);
+            // GameManager.Instance.MainCameraController.DoScreenShake(shakesettings, new Vector2?(Owner.specRigidbody.UnitCenter), false);
+
+
+            PierceProjModifier pierce     = train.gameObject.GetOrAddComponent<PierceProjModifier>();
+            pierce.penetration            = 100;
+            pierce.penetratesBreakables   = true;
+
+            ExplodeOnImpact explode       = train.gameObject.GetOrAddComponent<ExplodeOnImpact>();
+        }
+    }
+
+    public class ExplodeOnImpact : MonoBehaviour
+    {
+        private Projectile m_projectile;
+        private PlayerController m_owner;
+        private void Start()
+        {
+            this.m_projectile = base.GetComponent<Projectile>();
+            if (this.m_projectile.Owner && this.m_projectile.Owner is PlayerController)
+                this.m_owner = this.m_projectile.Owner as PlayerController;
+            this.m_projectile.OnDestruction += this.OnDestruction;
+        }
+        private void OnDestruction(Projectile obj)
+        {
+            Vector2 deathPos = this.m_projectile.sprite.WorldCenter;
+            Exploder.Explode(deathPos, DerailGun.trainExplosion, Vector2.zero);
         }
     }
 
@@ -169,7 +211,24 @@ namespace CwaffingTheGungy
             m_beam = BeamAPI.FreeFireBeamFromAnywhere(
                 DerailGun.railBeam, this.m_owner, this.m_projectile.gameObject,
                 Vector2.zero, this.m_angle, 5, true, true);
-            Invoke("CallUponTheTrain", 3f);
+            Invoke("BeginScreenShake", 2f);
+        }
+        private void BeginScreenShake()
+        {
+            ScreenShakeSettings ss = new ScreenShakeSettings
+            {
+                magnitude               = 5f,
+                speed                   = 6.5f,
+                time                    = 3,
+                falloff                 = 0,
+                direction               = Vector2.zero,
+                vibrationType           = ScreenShakeSettings.VibrationType.Auto,
+                simpleVibrationStrength = Vibration.Strength.Hard,
+                simpleVibrationTime     = Vibration.Time.Slow
+            };
+            GameManager.Instance.MainCameraController.DoScreenShake(
+                ss, new Vector2?(this.m_owner.specRigidbody.UnitCenter), false);
+            Invoke("CallUponTheTrain", 1.5f);
         }
         private void CallUponTheTrain()
         {
@@ -179,7 +238,7 @@ namespace CwaffingTheGungy
                 BraveMathCollege.DegreesToVector(this.return_angle, DerailGun.trainSpriteDiameter/C.PIXELS_PER_TILE);  //16f = tile size
             Vector2 spawnPoint =
                 endOfBeam + dontImmediatelyCollideWithWallOffset;
-            // spawnPoint = endOfBeam;
+            Exploder.Explode(spawnPoint, DerailGun.trainExplosion, Vector2.zero);
             SpawnManager.SpawnProjectile(
                 DerailGun.trainProjectile.gameObject,
                 spawnPoint,
