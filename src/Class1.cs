@@ -516,6 +516,7 @@ namespace CwaffingTheGungy
                     RainCheck.Add();
                     Natasha.Add();
                     PaintballGun.Add();
+                    PopcornGun.Add();
 
                     // //REVOLVERS
                     // FlayedRevolver.Add();

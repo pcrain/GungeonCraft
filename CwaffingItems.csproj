@@ -125,6 +125,7 @@
     <Compile Include="src\HatClassesThatWereAlsoStolen\Hat.cs"/>
     <Compile Include="src\HatClassesThatWereAlsoStolen\HatDefinitions.cs"/>
     <Compile Include="src\Cwaff-Guns\BasicGun.cs"/>
+    <Compile Include="src\Cwaff-Guns\PopcornGun.cs"/>
     <Compile Include="src\Cwaff-Guns\RainCheck.cs"/>
     <Compile Include="src\Cwaff-Guns\Natasha.cs"/>
     <Compile Include="src\Cwaff-Guns\MasterSword.cs"/>
