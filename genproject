@@ -2,10 +2,11 @@
 #Helper script for generating my gungeon mod's .csproj file
 
 #Important top level variables
-namespace="CwaffingTheGungy"                #namespace used throughout source code; need to change for my own mod eventually
-projectname="CwaffingTheGungy"              #name of the DLL to create
-projfile="./CwaffingItems.csproj"           #the name of the csproj file to generate
-sourcechecksums="./_${namespace}-checksums" #file containing checksums of all source files to determing recompilation
+namespace="CwaffingTheGungy"                     #namespace used throughout source code; need to change for my own mod eventually
+projectname="CwaffingTheGungy"                   #name of the DLL to create
+projfile="./CwaffingItems.csproj"                #the name of the csproj file to generate
+sourcechecksums="./_${namespace}-checksums-src"  #file containing checksums of all source files to determing recompilation
+audiochecksums="./_${namespace}-checksums-audio" #file containing checksums of all source files to determing recompilation
 
 #Base directory we're copying our plugin to
 plugindir="/xmedia/pretzel/Steam/steamapps/common/Enter the Gungeon/BepInEx/plugins"
@@ -30,15 +31,38 @@ includes+=('<Reference Include="System" />') #needed for LinkedList
 # includes+=('<Folder Include="Characters\Shade\newspritesetup\custom\" />')
 # includes+=('<Reference Include="Ionic.Zip, Version=1.9.1.8"/>')
 
-#Regenerate audio sources (skip for now)
-# echo -e "[${GRN}>${BLN}] Regenerating audio bank"
-# # ./gen-gungeon-audio-bank.py -Or "./Resources/Sounds" "${namespace}"
-# # ./gen-gungeon-audio-bank.py --skipchecks -Ovr "/home/pretzel/downloads/kirby" "/home/pretzel/workspace/gungy-cwaffing/Resources/Sounds/CwaffingTheGungy.bnk"
-# ./gen-gungeon-audio-bank.py -Or "/home/pretzel/downloads/kirby" "/home/pretzel/workspace/gungy-cwaffing/Resources/Sounds/CwaffingTheGungy.bnk"
+#Regenerate audio sources
 
-if [ $? -gt 0 ]; then
-  echo -e "[${RED}@${BLN}] Audio generation failed for some reason"
-  exit
+echo -e "[${GRN}>${BLN}] Checking for changes to audio files"
+updateaudio=0
+if [ ! -e "${audiochecksums}" ]; then
+  echo -e "[${GRN}>${BLN}]   Audio checksum file does not exist, regenerating sound bank"
+  updateaudio=1
+else
+  #Checksum all files in the audio directory, then take a checksum of the checksum file
+  #  and compare it to the existing checksum file
+  find "Resources" -type f -path "*.wav" -exec md5sum '{}' \; > "${audiochecksums}.new"
+  c1="$(md5sum "${audiochecksums}" | cut -f 1 -d ' ')"
+  c2="$(md5sum "${audiochecksums}.new" | cut -f 1 -d ' ')"
+  /bin/rm "${audiochecksums}.new"
+  if [[ "${c1}" != "${c2}" ]]; then
+    echo -e "[${GRN}>${BLN}]   At least one audio file was changed, rebuilding sound bank and project"
+    updateaudio=1
+    rebuild=1
+  else
+    echo -e "[${GRN}>${BLN}]   No audio files changed, skipping sound bank generation"
+  fi
+fi
+
+if [ $updateaudio -eq 1 ]; then
+  echo -e "[${GRN}>${BLN}] Regenerating audio bank"
+  ./gen-gungeon-audio-bank.py -Or "./Resources/Sounds" "${namespace}"
+
+  echo -e "[${GRN}>${BLN}]   Regenerating checksums for audio files"
+  /bin/rm -f "${audiochecksums}"
+  while read -r afile; do
+    echo "$(md5sum "${afile}")" >> "${audiochecksums}"
+  done <<< $(find "Resources" -type f -path "*.wav")
 fi
 
 #Source files
