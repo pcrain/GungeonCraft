@@ -92,6 +92,7 @@ namespace CwaffingTheGungy
                 // ReloadBreachShrineHooks.Init();
 
                 //VFX Setup
+                OverheadVFX.Init();
                 // VFXToolbox.InitVFX();
                 // EasyVFXDatabase.Init(); //Needs to occur before goop definition
                 // ShadeFlightHookFix.Init();

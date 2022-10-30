@@ -38,6 +38,7 @@
     <Reference Include="System"/>
     <Compile Include="src\Commands.cs"/>
     <Compile Include="src\AudioResourceLoader.cs"/>
+    <Compile Include="src\OverHeadVFX.cs"/>
     <Compile Include="src\StandardAPI\NPCAPI\LootTableTools.cs"/>
     <Compile Include="src\StandardAPI\NPCAPI\Examples.cs"/>
     <Compile Include="src\StandardAPI\NPCAPI\Hooks.cs"/>
@@ -144,6 +145,7 @@
     <Compile Include="src\NeverNamedStuffImScaredToDelete\ExoticPlaceables.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\DataCloners.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\ExtendedColours.cs"/>
+    <Compile Include="src\VFXToolbox.cs"/>
     <EmbeddedResource Include="Characters\Shade\icon.png"/>
     <EmbeddedResource Include="Characters\Shade\characterdata.txt"/>
     <EmbeddedResource Include="Characters\Shade\facecard.png"/>

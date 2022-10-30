@@ -22,6 +22,7 @@ namespace CwaffingTheGungy
         public static string shortDescription = "Way Past Plan B";
         public static string longDescription  = "(Gains stats for every ammo-less gun you have in your inventory.)";
 
+        public static List<string> lastResortLevelSprites;
         public static List<Projectile> lastResortProjectiles;
         public static Projectile lastResortBaseProjectile;
         public PlayerController owner;
@@ -46,6 +47,7 @@ namespace CwaffingTheGungy
             gun.DefaultModule.numberOfShotsInClip = 10;
 
             lastResortProjectiles = new List<Projectile>();
+            lastResortLevelSprites = new List<string>();
 
             Projectile projectile       = Lazy.PrefabProjectileFromGun(gun);
             projectile.baseData.damage  = 0f;  //dummy value to check when stats need to be recalculated
@@ -67,6 +69,7 @@ namespace CwaffingTheGungy
                 pi.baseData.speed  = po.baseData.speed * 2;
                 pi.baseData.range  = po.baseData.range * 2;
                 lastResortProjectiles.Add(pi);
+                lastResortLevelSprites.Add("PumpChargeMeter"+i);
             }
 
             lastResortBaseProjectile = projectile;
@@ -102,6 +105,12 @@ namespace CwaffingTheGungy
             this.owner = player;
             ComputeLastResortStats();
             AkSoundEngine.PostEvent("Play_OBJ_silenceblank_small_01", this.gameObject);
+            // owner.ShowOverheadAnimatedVFX("PumpChargeAnimated", 2);
+        }
+
+        protected override void OnPickup(GameActor owner)
+        {
+            base.OnPickup(owner);
         }
 
         private void ComputeLastResortStats()
@@ -121,8 +130,8 @@ namespace CwaffingTheGungy
             this.gun.DefaultModule.cooldownTime        = 0.4f / (float)Math.Pow(1.5,ammoless);
             this.gun.DefaultModule.numberOfShotsInClip = 4 * (1+ammoless);
             this.overrideNormalFireAudio = "Play_WPN_blasphemy_shot_01";
-            // this.gun.PreventNormalFireAudio = true;
-            // this.gun.OverrideNormalFireAudioEvent = "Play_WPN_blasphemy_shot_01";
+            if (ammoless > 0)
+                this.owner.ShowOverheadVFX(lastResortLevelSprites[ammoless-1], 1);
         }
     }
 }
