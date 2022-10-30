@@ -164,7 +164,7 @@ namespace CwaffingTheGungy
         }
         // Simpler version of the above method assuming most elements are repeated
         public static void AnimateProjectile(this Projectile proj, List<string> names, int fps, bool loops, List<IntVector2> pixelSizes, bool lighteneds, tk2dBaseSprite.Anchor anchors, bool anchorsChangeColliders,
-            bool fixesScales, Vector3? manualOffsets, IntVector2? overrideColliderPixelSizes, IntVector2? overrideColliderOffsets, Projectile overrideProjectilesToCopyFrom)
+            bool fixesScales, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null, IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null)
         {
             int n = names.Count;
             proj.AnimateProjectile(

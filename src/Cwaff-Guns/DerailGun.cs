@@ -11,7 +11,6 @@ using Alexandria.Misc;
 
 /*
 TODO (hardest to easiest):
-    - create goop at end of the line
     - find and add sound effects
     - tweak stats
 */
@@ -28,7 +27,8 @@ namespace CwaffingTheGungy
 
         public static Projectile railBeam;
         public static Projectile trainProjectile;
-        public static ExplosionData trainExplosion;
+        public static ExplosionData smallTrainExplosion;
+        public static ExplosionData bigTrainExplosion;
 
         public static int trainSpriteDiameter = 30;
 
@@ -120,8 +120,7 @@ namespace CwaffingTheGungy
             railBeam = projectile2;
 
             Projectile train = Lazy.PrefabProjectileFromGun(PickupObjectDatabase.GetById(56) as Gun, false); //id 56 == 38 special
-            train.SetProjectileSpriteRight("train_projectile_001", trainSpriteDiameter, trainSpriteDiameter, true, tk2dBaseSprite.Anchor.MiddleCenter, 20, 20);
-
+            // train.SetProjectileSpriteRight("train_projectile_001", trainSpriteDiameter, trainSpriteDiameter, true, tk2dBaseSprite.Anchor.MiddleCenter, 20, 20);
             train.AnimateProjectile(
                 new List<string> {
                     "train_projectile_001",
@@ -130,15 +129,22 @@ namespace CwaffingTheGungy
                     new IntVector2(trainSpriteDiameter, trainSpriteDiameter), //1
                     new IntVector2(trainSpriteDiameter, trainSpriteDiameter), //2
                 },
-                false, tk2dBaseSprite.Anchor.LowerCenter, true, false, null, null, null, null);
-
+                false, tk2dBaseSprite.Anchor.LowerCenter, true, false);
             train.PenetratesInternalWalls = true;
             train.pierceMinorBreakables   = true;
             trainProjectile               = train;
 
+            GoopModifier goopmod           = train.gameObject.AddComponent<GoopModifier>();
+            goopmod.SpawnGoopOnCollision   = true;
+            goopmod.CollisionSpawnRadius   = 6.5f;
+            goopmod.SpawnGoopInFlight      = false;
+            goopmod.goopDefinition         = EasyGoopDefinitions.FireDef;
+
             ExplosionData defaultExplosion = GameManager.Instance.Dungeon.sharedSettingsPrefab.DefaultExplosionData;
-            trainExplosion = new ExplosionData()
+            smallTrainExplosion = new ExplosionData()
             {
+                forceUseThisRadius     = true,
+                pushRadius             = 2.5f,
                 damageRadius           = 2.5f,
                 damageToPlayer         = 10f,
                 doDamage               = true,
@@ -154,16 +160,41 @@ namespace CwaffingTheGungy
                 effect                 = defaultExplosion.effect,
                 ignoreList             = defaultExplosion.ignoreList,
             };
+            bigTrainExplosion = new ExplosionData()
+            {
+                forceUseThisRadius     = true,
+                pushRadius             = 5f,
+                damageRadius           = 5f,
+                damageToPlayer         = 10f,
+                doDamage               = true,
+                damage                 = 25,
+                doDestroyProjectiles   = false,
+                doForce                = true,
+                debrisForce            = 30f,
+                preventPlayerForce     = false,
+                explosionDelay         = 0.01f,
+                usesComprehensiveDelay = false,
+                doScreenShake          = true,
+                playDefaultSFX         = true,
+                effect                 = defaultExplosion.effect,
+                ignoreList             = defaultExplosion.ignoreList,
+                ss                     = new ScreenShakeSettings
+                {
+                    magnitude               = 7.5f,
+                    speed                   = 6.5f,
+                    time                    = 1f,
+                    falloff                 = 0,
+                    direction               = Vector2.zero,
+                    vibrationType           = ScreenShakeSettings.VibrationType.Auto,
+                    simpleVibrationStrength = Vibration.Strength.Hard,
+                    simpleVibrationTime     = Vibration.Time.Slow
+                },
+            };
 
-            // ScreenShakeSettings shakesettings = new ScreenShakeSettings(0.25f, 7f, 0.1f, 0.3f);
-            // GameManager.Instance.MainCameraController.DoScreenShake(shakesettings, new Vector2?(Owner.specRigidbody.UnitCenter), false);
-
-
+            ExplodeOnImpact explode       = train.gameObject.GetOrAddComponent<ExplodeOnImpact>();
             PierceProjModifier pierce     = train.gameObject.GetOrAddComponent<PierceProjModifier>();
             pierce.penetration            = 100;
             pierce.penetratesBreakables   = true;
-
-            ExplodeOnImpact explode       = train.gameObject.GetOrAddComponent<ExplodeOnImpact>();
         }
     }
 
@@ -181,7 +212,7 @@ namespace CwaffingTheGungy
         private void OnDestruction(Projectile obj)
         {
             Vector2 deathPos = this.m_projectile.sprite.WorldCenter;
-            Exploder.Explode(deathPos, DerailGun.trainExplosion, Vector2.zero);
+            Exploder.Explode(deathPos, DerailGun.bigTrainExplosion, Vector2.zero);
         }
     }
 
@@ -219,7 +250,7 @@ namespace CwaffingTheGungy
             {
                 magnitude               = 5f,
                 speed                   = 6.5f,
-                time                    = 3,
+                time                    = 1.75f,
                 falloff                 = 0,
                 direction               = Vector2.zero,
                 vibrationType           = ScreenShakeSettings.VibrationType.Auto,
@@ -238,7 +269,7 @@ namespace CwaffingTheGungy
                 BraveMathCollege.DegreesToVector(this.return_angle, DerailGun.trainSpriteDiameter/C.PIXELS_PER_TILE);  //16f = tile size
             Vector2 spawnPoint =
                 endOfBeam + dontImmediatelyCollideWithWallOffset;
-            Exploder.Explode(spawnPoint, DerailGun.trainExplosion, Vector2.zero);
+            Exploder.Explode(spawnPoint, DerailGun.smallTrainExplosion, Vector2.zero);
             SpawnManager.SpawnProjectile(
                 DerailGun.trainProjectile.gameObject,
                 spawnPoint,
