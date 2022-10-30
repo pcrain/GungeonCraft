@@ -9,6 +9,17 @@ using UnityEngine;
 using Alexandria.ItemAPI;
 using Alexandria.Misc;
 
+/*
+TODO (hardest to easiest):
+    - create goop at end of the line
+    - add explosion at end of the line
+    - fix train sprite colors
+    - find better train sprites
+    - shake screen as train is moving
+    - shake train as its moving
+    - find and add sound effects
+*/
+
 namespace CwaffingTheGungy
 {
     public class DerailGun : AdvancedGunBehavior
@@ -18,6 +29,10 @@ namespace CwaffingTheGungy
         public static string projectileName   = "86"; //marine sidearm
         public static string shortDescription = "I Choo Choose You";
         public static string longDescription  = "(o:)";
+
+        public static Projectile railBeam;
+        public static Projectile trainProjectile;
+        public static int trainSpriteDiameter = 30;
 
         public static void Add()
         {
@@ -71,30 +86,6 @@ namespace CwaffingTheGungy
             projectile.baseData.range          = 200;
             projectile.sprite.renderer.enabled = false;
 
-            //BasicBeamController beamComp = projectile.GenerateBeamPrefab(
-            //    /*sprite path*/                    "CwaffingTheGungy/Resources/BeamSprites/railbeam_mid_001",
-            //    /*collider dimensions*/            new Vector2(15, 7),
-            //    /*collider offsets*/               new Vector2(0, 4),
-            //    /*beam sprites*/                   BeamAnimPaths,
-            //    /*beam fps*/                       13,
-            //    /*impact vfx sprites*/             BeamImpactPaths,
-            //    /*beam impact fps */               13,
-            //    /*impact vfx collider dimensions*/ new Vector2(7, 7),
-            //    /*impact vfx collider offsets */   new Vector2(4, 4),
-            //    /*end vfx sprites*/                BeamEndPaths,
-            //    /*beam end fps */                  13,
-            //    /*end vfx collider dimensions*/    new Vector2(15, 7),
-            //    /*end vfx collider offsets */      new Vector2(0, 4),
-            //    /*muzzle (start) vfx sprites*/     BeamStartPaths,
-            //    /*beam muzzle fps */               13,
-            //    /*muzzle vfx collider dimensions*/ new Vector2(15, 7),
-            //    /*muzzle vfx collider offsets */   new Vector2(0, 4),
-            //    /*emissive color*/                 0
-            //    );
-            // beamComp.boneType = BasicBeamController.BeamBoneType.Projectile;
-            // beamComp.boneType                  = BasicBeamController.BeamBoneType.Straight;
-            // beamComp.interpolateStretchedBones = false;
-
             var railcomp = projectile.gameObject.AddComponent<ReplaceBulletWithRail>();
 
             Projectile projectile2         = Lazy.PrefabProjectileFromGun(PickupObjectDatabase.GetById(86) as Gun, false);
@@ -131,11 +122,14 @@ namespace CwaffingTheGungy
             railBeam = projectile2;
 
             Projectile train = Lazy.PrefabProjectileFromGun(PickupObjectDatabase.GetById(56) as Gun, false); //id 56 == 38 special
-            train.SetProjectileSpriteRight("train_projectile", 30, 30, true, tk2dBaseSprite.Anchor.MiddleCenter, 20, 20);
+            train.SetProjectileSpriteRight("train_projectile", trainSpriteDiameter, trainSpriteDiameter, true, tk2dBaseSprite.Anchor.MiddleCenter, 20, 20);
+            train.PenetratesInternalWalls = true;
+            train.pierceMinorBreakables = true;
+            PierceProjModifier pierce = train.gameObject.GetOrAddComponent<PierceProjModifier>();
+            pierce.penetration = 100;
+            pierce.penetratesBreakables = true;
             trainProjectile = train;
         }
-        public static Projectile railBeam;
-        public static Projectile trainProjectile;
     }
 
     public class ReplaceBulletWithRail : MonoBehaviour
@@ -168,9 +162,16 @@ namespace CwaffingTheGungy
         }
         private void CallUponTheTrain()
         {
+            Vector2 endOfBeam =
+                m_beam.GetComponent<BasicBeamController>().GetPointOnBeam(1.0f);
+            Vector2 dontImmediatelyCollideWithWallOffset =
+                BraveMathCollege.DegreesToVector(this.return_angle, (DerailGun.trainSpriteDiameter/2)/16f);
+            Vector2 spawnPoint =
+                endOfBeam + dontImmediatelyCollideWithWallOffset;
+            // spawnPoint = endOfBeam;
             SpawnManager.SpawnProjectile(
                 DerailGun.trainProjectile.gameObject,
-                m_beam.GetComponent<BasicBeamController>().GetPointOnBeam(0.9f),
+                spawnPoint,
                 Quaternion.Euler(0f, 0f, this.return_angle),
                 true);
         }
