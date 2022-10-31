@@ -39,7 +39,7 @@ namespace CwaffingTheGungy
             gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
             gun.quality                           = PickupObject.ItemQuality.C;
             gun.DefaultModule.ammoCost            = 1;
-            gun.SetBaseMaxAmmo(1000);
+            gun.SetBaseMaxAmmo(300);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
 
             gun.reloadTime                        = 2.0f;
@@ -96,7 +96,6 @@ namespace CwaffingTheGungy
         {
             base.OnSwitchedToThisGun();
             ComputeLastResortStats();
-            AkSoundEngine.PostEvent("Play_OBJ_silenceblank_small_01", this.gameObject);
         }
 
         protected override void OnPickedUpByPlayer(PlayerController player)
@@ -104,8 +103,6 @@ namespace CwaffingTheGungy
             base.OnPickedUpByPlayer(player);
             this.owner = player;
             ComputeLastResortStats();
-            AkSoundEngine.PostEvent("Play_OBJ_silenceblank_small_01", this.gameObject);
-            // owner.ShowOverheadAnimatedVFX("PumpChargeAnimated", 2);
         }
 
         protected override void OnPickup(GameActor owner)
@@ -131,7 +128,11 @@ namespace CwaffingTheGungy
             this.gun.DefaultModule.numberOfShotsInClip = 4 * (1+ammoless);
             this.overrideNormalFireAudio = "Play_WPN_blasphemy_shot_01";
             if (ammoless > 0)
+            {
+                AkSoundEngine.PostEvent("Play_OBJ_silenceblank_small_01", this.gameObject);
                 this.owner.ShowOverheadVFX(lastResortLevelSprites[ammoless-1], 1);
+                // this.owner.ShowOverheadAnimatedVFX("PumpChargeAnimated", 2);
+            }
         }
     }
 }
