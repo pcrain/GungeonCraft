@@ -519,6 +519,7 @@ namespace CwaffingTheGungy
                     PopcornGun.Add();
                     Tranquilizer.Add();
                     LastResort.Add();
+                    Encircler.Add();
 
                     // //REVOLVERS
                     // FlayedRevolver.Add();
