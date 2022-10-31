@@ -184,12 +184,12 @@ namespace CwaffingTheGungy
             else if(genericType == typeof(GameObject)) animations[name] = Obj;
         }
 
-        public static void ShowOverheadVFX(this GameActor gunOwner, string name, int timeout)
+        public static void ShowOverheadVFX(this GameActor gunOwner, string name, float timeout)
         {
             gunOwner.StartCoroutine(ShowVFXCoroutine(gunOwner, name, 2));
         }
 
-        public static void ShowOverheadAnimatedVFX(this GameActor gunOwner, string name, int timeout)
+        public static void ShowOverheadAnimatedVFX(this GameActor gunOwner, string name, float timeout)
         {
             gunOwner.StartCoroutine(ShowAnimatedVFXCoroutine(gunOwner, name, 2));
         }
@@ -241,7 +241,7 @@ namespace CwaffingTheGungy
             return vfxObjectToPoolMap[vfx];
         }
 
-        private static IEnumerator ShowVFXCoroutine(this GameActor gunOwner, string name, int timeout)
+        private static IEnumerator ShowVFXCoroutine(this GameActor gunOwner, string name, float timeout)
         {
             if (!(extantSprites.ContainsKey(gunOwner)))
                 extantSprites[gunOwner] = new List<GameObject>();
@@ -278,7 +278,7 @@ namespace CwaffingTheGungy
             }
         }
 
-        private static IEnumerator ShowAnimatedVFXCoroutine(this GameActor gunOwner, string name, int timeout)
+        private static IEnumerator ShowAnimatedVFXCoroutine(this GameActor gunOwner, string name, float timeout)
         {
             if (!(extantSprites.ContainsKey(gunOwner)))
                 extantSprites[gunOwner] = new List<GameObject>();
