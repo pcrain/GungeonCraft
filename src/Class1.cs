@@ -520,6 +520,7 @@ namespace CwaffingTheGungy
                     Tranquilizer.Add();
                     LastResort.Add();
                     Encircler.Add();
+                    Nug.Add();
 
                     // //REVOLVERS
                     // FlayedRevolver.Add();
