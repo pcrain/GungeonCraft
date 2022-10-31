@@ -96,6 +96,55 @@ namespace CwaffingTheGungy
         {
             base.OnSwitchedToThisGun();
             ComputeLastResortStats();
+            // GlobalSparksDoer.DoRandomParticleBurst(
+            //     30, this.owner.sprite.WorldBottomLeft.ToVector3ZisY(-1f),
+            //     this.owner.sprite.WorldTopRight.ToVector3ZisY(-1f),
+            //     Vector3.up, 90f, 0.5f, null, null, null, GlobalSparksDoer.SparksType.);
+
+            // var blood =
+            //     FakePrefab.Clone(
+            //         PickupObjectDatabase
+            //             .GetById(449)
+            //             .GetComponent<TeleporterPrototypeItem>()
+            //             .TelefragVFXPrefab.gameObject)
+            //             .GetComponent<ParticleSystem>();
+            // blood.emission.SetBurst(0, new ParticleSystem.Burst { count = 10, time = 0, cycleCount = 1, repeatInterval = 0.010f, maxCount = 10, minCount = 10 });
+            // var burst = UnityEngine.Object.Instantiate(blood.gameObject,this.owner.sprite.WorldCenter,Quaternion.identity);
+            // burst.SetActive(true);
+
+            Gun g = (PickupObjectDatabase.GetById(0) as Gun);
+            // Gun g = (PickupObjectDatabase.GetById(45) as Gun);
+            // Gun g = (PickupObjectDatabase.GetById(89) as Gun);
+            // VFXPool    v = (PickupObjectDatabase.GetById(0) as Gun).muzzleFlashEffects;
+            // VFXPool    v = (PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.enemy;
+            // VFXPool    v = (PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.tileMapVertical;
+            // VFXPool    v = (PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.tileMapHorizontal;
+            // GameObject v = (PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX;
+            //   (overrideMidairDeathVFX will make implicit use of CreatePoolFromVFXGameObject)
+            VFXPool v = VFX.CreatePoolFromVFXGameObject((PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
+
+
+            // VFXPool VFX      = (PickupObjectDatabase.GetById(0) as Gun).projectile.hitEffects.deathEnemy;
+            // Vector2 ppos     = this.owner.sprite.WorldCenter;
+            // float pangle     = this.owner.CurrentGun.gunAngle;
+            // for (int i = 0; i < 5; ++i)
+            // {
+            //     Vector2 finalpos = ppos + Lazy.AngleToVector(pangle+72*i,3);
+            //     VFX.SpawnAtPosition(
+            //         finalpos.ToVector3ZisY(-1f), /* -1 = above player sprite */
+            //         pangle,
+            //         null, null, null, -0.05f);
+            // }
+
+            Vector2 ppos = this.owner.sprite.WorldCenter;
+            float pangle = this.owner.CurrentGun.gunAngle;
+            int numInCircle = 7;
+            for (int i = 0; i < numInCircle; ++i)
+            {
+                Vector2 finalpos = ppos + Lazy.AngleToVector(pangle+(360/numInCircle)*i,3);
+                VFX.SpawnVFXPool(v,finalpos, degAngle: pangle);
+                // VFX.SpawnVFXPool("Rebar",finalpos, degAngle: pangle, relativeTo: this.owner.gameObject);
+            }
         }
 
         protected override void OnPickedUpByPlayer(PlayerController player)
@@ -131,8 +180,9 @@ namespace CwaffingTheGungy
             {
                 AkSoundEngine.PostEvent("Play_OBJ_silenceblank_small_01", this.gameObject);
                 this.owner.ShowOverheadVFX(lastResortLevelSprites[ammoless-1], 1);
-                // this.owner.ShowOverheadAnimatedVFX("PumpChargeAnimated", 2);
             }
+            this.owner.ShowOverheadAnimatedVFX("PumpChargeAnimated", 2);
+            // this.owner.ShowOverheadAnimatedVFX("FriendlyOverhead", 2);
         }
     }
 }

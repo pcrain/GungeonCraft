@@ -6,7 +6,6 @@
       [
         "*.sublime-project",
         "packages.config",
-        "_*",
         "*~",
       ],
       "folder_exclude_patterns":

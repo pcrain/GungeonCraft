@@ -7,6 +7,7 @@ projectname="CwaffingTheGungy"                   #name of the DLL to create
 projfile="./CwaffingItems.csproj"                #the name of the csproj file to generate
 sourcechecksums="./_${namespace}-checksums-src"  #file containing checksums of all source files to determing recompilation
 audiochecksums="./_${namespace}-checksums-audio" #file containing checksums of all source files to determing recompilation
+dllname="./bin/Debug/${projectname}.dll"         #DLL name is directly based on the project name
 
 #Base directory we're copying our plugin to
 plugindir="/xmedia/pretzel/Steam/steamapps/common/Enter the Gungeon/BepInEx/plugins"
@@ -197,12 +198,20 @@ if [ $rebuild -eq 0 ]; then
       echo -e "[${GRN}>${BLN}]   At least one source file was changed, rebuilding project"
       rebuild=1
     else
-      echo -e "[${GRN}>${BLN}]   No source files changed, skipping rebuild"
+      echo -e "[${GRN}>${BLN}]   No source files changed"
     fi
   fi
 fi
 
+if [ ! -e "${dllname}" ]; then
+  echo -e "[${GRN}>${BLN}] ${dllname} does not exist, forcing rebuild"
+  rebuild=1
+fi
+
 if [ $rebuild -eq 1 ]; then
+  #Remove old DLL file
+  /bin/rm -f "${dllname}"
+
   #Recompute checksums for source file
   echo -e "[${GRN}>${BLN}] Recomputing source file checksums"
   /bin/rm -f "${sourcechecksums}"
@@ -225,7 +234,6 @@ if [ $rebuild -eq 1 ]; then
   fi
 
   #Import the mod into the plugins folder
-  dllname="./bin/Debug/${projectname}.dll" #DLL name is directly based on the project name
   echo -e "[${GRN}>${BLN}] Importing ${dllname} to EtG plugins directory"
   /bin/cp "$dllname" "$plugindir"
 fi

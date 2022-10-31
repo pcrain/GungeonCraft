@@ -85,6 +85,16 @@ namespace CwaffingTheGungy
                 false,
                 false);
         }
+
+        /// <summary>
+        /// Calculate a vector from a given angle in degrees
+        /// </summary>
+        public static Vector2 AngleToVector(float angleInDegrees, float magnitude = 1)
+        {
+            Vector2 offset = new Vector2(
+                Mathf.Cos(angleInDegrees*Mathf.PI/180),Mathf.Sin(angleInDegrees*Mathf.PI/180));
+            return magnitude*offset;
+        }
     }
 }
 
