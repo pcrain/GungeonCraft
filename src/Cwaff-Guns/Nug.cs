@@ -18,12 +18,14 @@ namespace CwaffingTheGungy
     {
         public static string gunName          = "Nug";
         public static string spriteName       = "flayedrevolver";
-        public static string projectileName   = "ak-47";
+        public static string projectileName   = "magnum"; //38
         public static string shortDescription = "Noegnug Eht Retne";
         public static string longDescription  = "(everything's backwards D:)";
 
         public static Projectile gunprojectile;
         public static Projectile fakeprojectile;
+
+        private int oldammo = 1;
 
         public static void Add()
         {
@@ -32,7 +34,7 @@ namespace CwaffingTheGungy
             var comp = gun.gameObject.AddComponent<Nug>();
             comp.preventNormalFireAudio = true;
 
-            gun.muzzleFlashEffects.type = VFXPoolType.None;
+            gun.muzzleFlashEffects.type           = VFXPoolType.None;
             gun.gunSwitchGroup                    = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup;
             gun.DefaultModule.ammoCost            = 0;
             gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
@@ -47,14 +49,15 @@ namespace CwaffingTheGungy
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
             projectile.baseData.speed   = 200.0f;
             Projectile projectile2 = Lazy.PrefabProjectileFromGun(gun, false);
-            projectile2.baseData.speed   = 10.0f;
-            Projectile projectile3 = Lazy.PrefabProjectileFromGun(PickupObjectDatabase.GetById(86) as Gun, false);
+            projectile2.baseData.speed   = 20.0f;
+            Projectile projectile3 = Lazy.PrefabProjectileFromGun(PickupObjectDatabase.GetById(38) as Gun, false);
             projectile3.baseData.speed = 0.0f;
-            projectile3.sprite.renderer.enabled = false;
 
             // Ordering is important here, we don't want the secondary projectile to have the NugBehavior
-            NugBehavior pop = projectile.gameObject.AddComponent<NugBehavior>();
-            NugRedBehavior pop2 = projectile2.gameObject.AddComponent<NugRedBehavior>();
+            projectile.gameObject.AddComponent<NugBehavior>();
+            projectile.gameObject.AddComponent<FakeProjectileComponent>();
+            projectile2.gameObject.AddComponent<NugRedBehavior>();
+            projectile3.gameObject.AddComponent<FakeProjectileComponent>();
 
             gunprojectile = projectile2;
             fakeprojectile = projectile3;
@@ -86,12 +89,42 @@ namespace CwaffingTheGungy
                     gun.CurrentAmmo = 1;
                 }
             }
+            player.PostProcessProjectile += this.PostProcessFakeProjectile;
+            // player.OnReloadedGun += this.OnPostReload;
         }
+
         public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
         {
-
+            if (gun != this.gun)
+            {
+                base.OnReloadPressed(player, gun, manualReload);
+                return;
+            }
+            if (!manualReload)
+                return;
+            if (gun.ClipShotsRemaining < gun.DefaultModule.numberOfShotsInClip)
+                return;
+            gun.ClipShotsRemaining = 1;
+            gun.CurrentAmmo = 1;
+            AkSoundEngine.PostEvent("Play_WPN_crossbow_reload_01", gameObject);
+            base.OnReloadPressed(player, gun, manualReload);
         }
 
+        private void PostProcessFakeProjectile(Projectile bullet, float eventchancescaler)
+        {
+            FakeProjectileComponent f = bullet.GetComponent<FakeProjectileComponent>();
+            if (f) bullet.damageTypes &= (~CoreDamageTypes.Electric);
+        }
+
+    }
+
+    public class FakeProjectileComponent : MonoBehaviour
+    {
+        // dummy compponent
+        private void Start()
+        {
+            base.GetComponent<Projectile>().sprite.renderer.enabled = false;
+        }
     }
 
 
@@ -103,6 +136,7 @@ namespace CwaffingTheGungy
         {
             this.m_projectile = base.GetComponent<Projectile>();
             this.m_projectile.AdjustPlayerProjectileTint(Color.red, 2);
+            AkSoundEngine.PostEvent("Play_WPN_smileyrevolver_shot_01", this.m_projectile.gameObject);
         }
     }
 
@@ -137,10 +171,9 @@ namespace CwaffingTheGungy
             SpeculativeRigidbody specRigidbody = this.m_projectile.specRigidbody;
             specRigidbody.OnCollision -= this.OnCollision;
 
-            BulletLifeTimer orAddComponent = m_projectile.gameObject.GetOrAddComponent<BulletLifeTimer>();
-            orAddComponent.secondsTillDeath = 1;
 
-            Vector2 spawnPoint = this.m_projectile.sprite.WorldCenter;
+            // Vector2 spawnPoint = this.m_projectile.sprite.WorldCenter;
+            Vector2 spawnPoint = tileCollision.PostCollisionUnitCenter;
             GameObject spawn = SpawnManager.SpawnProjectile(
                 Nug.gunprojectile.gameObject,
                 spawnPoint,
@@ -154,7 +187,12 @@ namespace CwaffingTheGungy
                 proj.Owner = this.m_owner;
                 proj.AdjustPlayerProjectileTint(Color.red, 1);
                 proj.Owner = null;
+                proj.BulletScriptSettings.surviveTileCollisions = true;
+                BulletLifeTimer timer = proj.gameObject.GetOrAddComponent<BulletLifeTimer>();
+                timer.secondsTillDeath = 3;
             }
+
+            this.m_projectile.DieInAir();
         }
     }
 
