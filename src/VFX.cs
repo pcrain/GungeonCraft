@@ -61,6 +61,14 @@ namespace CwaffingTheGungy
                     "CwaffingTheGungy/Resources/MiscVFX/friendlyoverhead_vfx_005",
                 }, 10, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter);
 
+            RegisterVFX<GameObject>("PlagueOverhead", new List<string>() {
+                    "CwaffingTheGungy/Resources/StatusEffectVFX/plaguevfxframe_001",
+                    "CwaffingTheGungy/Resources/StatusEffectVFX/plaguevfxframe_002",
+                    "CwaffingTheGungy/Resources/StatusEffectVFX/plaguevfxframe_003",
+                    "CwaffingTheGungy/Resources/StatusEffectVFX/plaguevfxframe_004",
+                    "CwaffingTheGungy/Resources/StatusEffectVFX/plaguevfxframe_005",
+                }, 4, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter);
+
             RegisterVFX<VFXPool>("Rebar", new List<string>() {
                     "CwaffingTheGungy/Resources/MiscVFX/GunVFX/RebarGunImpactVFX2_001",
                     "CwaffingTheGungy/Resources/MiscVFX/GunVFX/RebarGunImpactVFX2_002",

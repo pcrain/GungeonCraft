@@ -100,6 +100,7 @@ namespace CwaffingTheGungy
                 //Status Effect Setup
                 // StaticStatusEffects.InitCustomEffects();
                 // PlagueStatusEffectSetup.Init();
+                SoulLinkStatusEffectSetup.Init();
                 // Confusion.Init();
 
                 //Goop Setup
@@ -516,11 +517,13 @@ namespace CwaffingTheGungy
                     RainCheck.Add();
                     Natasha.Add();
                     PaintballGun.Add();
+                    DerailGun.Add();
                     PopcornGun.Add();
                     Tranquilizer.Add();
                     LastResort.Add();
                     Encircler.Add();
                     Nug.Add();
+                    SoulKaliber.Add();
 
                     // //REVOLVERS
                     // FlayedRevolver.Add();
@@ -615,7 +618,6 @@ namespace CwaffingTheGungy
                     // YBeam.Add();
                     // WallRay.Add();
                     // BolaGun.Add();
-                    DerailGun.Add();
                     // Glazerbeam.Add();
                     // StasisRifle.Add();
                     // Gravitron.Add();

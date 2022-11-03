@@ -131,12 +131,14 @@
     <Compile Include="src\Cwaff-Guns\RainCheck.cs"/>
     <Compile Include="src\Cwaff-Guns\Natasha.cs"/>
     <Compile Include="src\Cwaff-Guns\LastResort.cs"/>
+    <Compile Include="src\Cwaff-Guns\SoulKaliber.cs"/>
     <Compile Include="src\Cwaff-Guns\Encircler.cs"/>
     <Compile Include="src\Cwaff-Guns\MasterSword.cs"/>
     <Compile Include="src\Cwaff-Guns\_GenericGunReference.cs"/>
     <Compile Include="src\Cwaff-Guns\DerailGun.cs"/>
     <Compile Include="src\Cwaff-Guns\Tranquilizer.cs"/>
     <Compile Include="src\Cwaff-Guns\PaintballGun.cs"/>
+    <Compile Include="src\Cwaff-Misc\SoulLinkStatusEffect.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\SimpleToolbox.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\ProjSpawnHelper.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\EasyGoopDefinitions.cs"/>
