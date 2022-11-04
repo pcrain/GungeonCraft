@@ -132,6 +132,7 @@
     <Compile Include="src\Cwaff-Guns\Natasha.cs"/>
     <Compile Include="src\Cwaff-Guns\LastResort.cs"/>
     <Compile Include="src\Cwaff-Guns\SoulKaliber.cs"/>
+    <Compile Include="src\Cwaff-Guns\GamblersFallacy.cs"/>
     <Compile Include="src\Cwaff-Guns\Encircler.cs"/>
     <Compile Include="src\Cwaff-Guns\MasterSword.cs"/>
     <Compile Include="src\Cwaff-Guns\_GenericGunReference.cs"/>
@@ -150,6 +151,7 @@
     <Compile Include="src\NeverNamedStuffImScaredToDelete\ExoticPlaceables.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\DataCloners.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\ExtendedColours.cs"/>
+    <Compile Include="src\NeverNamedStuffImScaredToDelete\EnemyGuidDatabase.cs"/>
     <EmbeddedResource Include="Characters\Shade\icon.png"/>
     <EmbeddedResource Include="Characters\Shade\characterdata.txt"/>
     <EmbeddedResource Include="Characters\Shade\facecard.png"/>

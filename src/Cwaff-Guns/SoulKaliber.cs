@@ -114,6 +114,7 @@ namespace CwaffingTheGungy
                 enemyHH.ApplyDamage(1f, new Vector2(10f,0f), "Soul Link",
                     CoreDamageTypes.Magic, DamageCategory.Collision,
                     false, null, false);
+                enemyHH.knockbackDoer.ApplyKnockback(new Vector2(10f,0f), 2f);
 
                 Vector2 ppos = this.m_enemy.sprite.WorldCenter;
                 for (int i = 0; i < 3; ++i)

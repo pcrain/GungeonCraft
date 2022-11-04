@@ -23,9 +23,12 @@ namespace CwaffingTheGungy
         public static Gun InitGunFromStrings(
           string gunName, string spriteName, string projectileName, string shortDescription, string longDescription)
         {
-            string baseGunName = gunName.Replace(" ", "_").ToLower();  //get sane gun name for commands
+            string newGunName  = gunName.Replace("'", "").Replace("-", "");  //get sane gun for item rename
+            string baseGunName = newGunName.Replace(" ", "_").ToLower();  //get saner gun name for commands
 
-            Gun gun = ETGMod.Databases.Items.NewGun(gunName, spriteName);  //create a new gun using specified sprite name
+            ETGModConsole.Log("Lazy Initializing Gun: "+baseGunName);
+
+            Gun gun = ETGMod.Databases.Items.NewGun(newGunName, spriteName);  //create a new gun using specified sprite name
             Game.Items.Rename("outdated_gun_mods:"+baseGunName, "cg:"+baseGunName);  //rename the gun for commands
             gun.encounterTrackable.EncounterGuid = baseGunName+"-"+spriteName; //create a unique guid for the gun
             gun.SetShortDescription(shortDescription); //set the gun's short description
