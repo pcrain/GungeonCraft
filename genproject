@@ -35,8 +35,11 @@ includes+=('<Reference Include="System" />') #needed for LinkedList
 #Regenerate audio sources
 
 echo -e "[${GRN}>${BLN}] Checking for changes to audio files"
-updateaudio=0
-if [ ! -e "${audiochecksums}" ]; then
+updateaudio=1
+if [ ! -e "./Resources/Sounds/${namespace}.bnk" ]; then
+  echo -e "[${GRN}>${BLN}]   Audio bank does not exist, regenerating sound bank"
+  updateaudio=1
+elif [ ! -e "${audiochecksums}" ]; then
   echo -e "[${GRN}>${BLN}]   Audio checksum file does not exist, regenerating sound bank"
   updateaudio=1
 else
@@ -49,15 +52,15 @@ else
   if [[ "${c1}" != "${c2}" ]]; then
     echo -e "[${GRN}>${BLN}]   At least one audio file was changed, rebuilding sound bank and project"
     updateaudio=1
-    rebuild=1
   else
     echo -e "[${GRN}>${BLN}]   No audio files changed, skipping sound bank generation"
   fi
 fi
 
 if [ $updateaudio -eq 1 ]; then
+  rebuild=1
   echo -e "[${GRN}>${BLN}] Regenerating audio bank"
-  ./gen-gungeon-audio-bank.py -Or "./Resources/Sounds" "${namespace}"
+  ./gen-gungeon-audio-bank.py -Or -s "./Resources/Sounds/sound_info.csv" "./Resources/Sounds" "${namespace}"
 
   echo -e "[${GRN}>${BLN}]   Regenerating checksums for audio files"
   /bin/rm -f "${audiochecksums}"
@@ -83,7 +86,7 @@ done <<< $(find "Characters" -type f | sed -r 's@/@\\@g')
 echo -e "[${GRN}>${BLN}] Scanning for resources"
 while read -r line; do
   includes+=("<EmbeddedResource Include=\"${line}\" />")
-done <<< $(find "Resources" -type f -not -path "*.wav" | sed -r 's@/@\\@g')
+done <<< $(find "Resources" -type f -not -path "*.wav" -not -path "*.csv" | sed -r 's@/@\\@g')
 
 #Unversioned EtG Unity Packages (skipping version numbers because there's no way to tell just by looking and it was causing problems)
 echo -e "[${GRN}>${BLN}] Scanning for EtG DLLs"
