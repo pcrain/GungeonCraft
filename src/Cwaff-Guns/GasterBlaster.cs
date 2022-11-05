@@ -115,7 +115,7 @@ namespace CwaffingTheGungy
                 new Vector2(15, 7),
                 new Vector2(0, 4),
                 //Other Variables
-                10
+                0
                 );
 
             beamComp.boneType = BasicBeamController.BeamBoneType.Projectile;
@@ -144,9 +144,15 @@ namespace CwaffingTheGungy
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, false);
 
 
-            var rotatecomp = blaster.gameObject.AddComponent<RotateIntoPositionBehavior>();
+            blaster.PenetratesInternalWalls       = true;
+            blaster.pierceMinorBreakables         = true;
+            PierceProjModifier pierce             = blaster.gameObject.GetOrAddComponent<PierceProjModifier>();
+            pierce.penetration                    = 100;
+            pierce.penetratesBreakables           = true;
 
-            gasterBlastLauncher = blaster;
+            RotateIntoPositionBehavior rotatecomp = blaster.gameObject.AddComponent<RotateIntoPositionBehavior>();
+
+            gasterBlastLauncher                   = blaster;
         }
     }
 
@@ -233,7 +239,7 @@ namespace CwaffingTheGungy
                 true).GetComponent<Projectile>();
 
             RotateIntoPositionBehavior rotcomp = this.m_blaster.GetComponent<RotateIntoPositionBehavior>();
-            rotcomp.m_radius                   = 12f;
+            rotcomp.m_radius                   = 16f;
             rotcomp.m_fulcrum                  = this.m_spawn + Lazy.AngleToVector(this.m_angle,rotcomp.m_radius);
             rotcomp.m_start_angle              = this.m_angle;
             rotcomp.m_end_angle                = this.return_angle;
