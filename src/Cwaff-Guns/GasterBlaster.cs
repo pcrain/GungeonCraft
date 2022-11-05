@@ -20,6 +20,7 @@ namespace CwaffingTheGungy
         public static string longDescription  = "(O_O)";
 
         public static Projectile gasterBlast;
+        public static Projectile gasterBlastLauncher;
 
         public static int trainSpriteDiameter = 30;
 
@@ -127,14 +128,83 @@ namespace CwaffingTheGungy
             projectile2.baseData.speed *= 4;
 
             gasterBlast = projectile2;
+
+            Projectile blaster = Lazy.PrefabProjectileFromGun(PickupObjectDatabase.GetById(56) as Gun, false);
+            blaster.baseData.damage         = 0f;
+            blaster.baseData.force          = 0f;
+            blaster.baseData.speed          = 0.0f;
+            blaster.baseData.range          = 200;
+
+            blaster.AnimateProjectile(
+                new List<string> {
+                    "gaster_blaster",
+                }, 6, true, new List<IntVector2> {
+                    new IntVector2(48, 36), //1
+                },
+                false, tk2dBaseSprite.Anchor.MiddleCenter, true, false);
+
+
+            var rotatecomp = blaster.gameObject.AddComponent<RotateIntoPositionBehavior>();
+
+            gasterBlastLauncher = blaster;
+        }
+    }
+
+    public class RotateIntoPositionBehavior : MonoBehaviour
+    {
+        public Vector2 m_fulcrum;
+        public float m_radius;
+        public float m_start_angle;
+        public float m_end_angle;
+        public float m_rotate_time;
+
+        private Projectile m_projectile;
+        private float timer;
+        private float angle_delta;
+        private bool has_been_init = false;
+
+        private void Start()
+        {
+        }
+
+        public void Setup()
+        {
+            this.m_projectile  = base.GetComponent<Projectile>();
+            this.timer         = 0;
+            this.angle_delta   = this.m_end_angle - this.m_start_angle;
+            this.has_been_init = true;
+            this.Relocate();
+        }
+
+        private void Update()
+        {
+            if ((!this.has_been_init) || (this.timer > m_rotate_time))
+                return;
+            this.timer += BraveTime.DeltaTime;
+            if (this.timer > this.m_rotate_time)
+                this.timer = this.m_rotate_time;
+            this.Relocate();
+        }
+
+        private void Relocate()
+        {
+            float percentDone  = this.timer / this.m_rotate_time;
+            // float curAngle     = this.m_start_angle + percentDone * this.angle_delta;
+            float curAngle     = this.m_start_angle + (float)Math.Tanh(percentDone*Mathf.PI) * this.angle_delta;
+            Vector2 curPos     = this.m_fulcrum + Lazy.AngleToVector(curAngle, this.m_radius);
+            this.m_projectile.transform.position = curPos.ToVector3ZisY(-1f);
+            this.m_projectile.transform.rotation =
+                Quaternion.Euler(0f, 0f, curAngle + (curAngle > 180 ? 180 : (-180)));
         }
     }
 
     public class ReplaceBulletWithGasterBlaster : MonoBehaviour
     {
         private Projectile m_projectile;
+        private Projectile m_blaster;
         private PlayerController m_owner;
         private float m_angle;
+        private Vector2 m_spawn;
         private float return_angle;
         private BeamController m_beam;
 
@@ -146,21 +216,42 @@ namespace CwaffingTheGungy
                 this.m_owner      = this.m_projectile.Owner as PlayerController;
                 this.m_angle      = this.m_owner.CurrentGun.CurrentAngle;
                 this.return_angle = this.m_angle + (this.m_angle > 180 ? 180 : (-180));
+                this.m_spawn      = this.m_projectile.sprite.WorldBottomCenter;
+
+                BeginGasterRotate();
+                this.m_projectile.enabled = false;
+                Invoke("BeginBeamFire", 0.75f); // make sure this is at least as long as the rail's lifetime
+                Invoke("Expire", 2f); // make sure this is at least as long as the rail's lifetime
             }
-            BeginBeamFire();
-            this.m_projectile.enabled = false;
-            Invoke("Expire", 3f); // make sure this is at least as long as the rail's lifetime
+        }
+        private void BeginGasterRotate()
+        {
+            this.m_blaster = SpawnManager.SpawnProjectile(
+                GasterBlaster.gasterBlastLauncher.gameObject,
+                this.m_spawn,
+                Quaternion.Euler(0f, 0f, this.m_angle),
+                true).GetComponent<Projectile>();
+
+            RotateIntoPositionBehavior rotcomp = this.m_blaster.GetComponent<RotateIntoPositionBehavior>();
+            rotcomp.m_radius                   = 12f;
+            rotcomp.m_fulcrum                  = this.m_spawn + Lazy.AngleToVector(this.m_angle,rotcomp.m_radius);
+            rotcomp.m_start_angle              = this.m_angle;
+            rotcomp.m_end_angle                = this.return_angle;
+            rotcomp.m_rotate_time              = 0.5f;
+            rotcomp.Setup();
+
+            AkSoundEngine.PostEvent("gaster_blaster_sound_effect", this.m_projectile.gameObject);
         }
         private void BeginBeamFire()
         {
             m_beam = BeamAPI.FreeFireBeamFromAnywhere(
                 GasterBlaster.gasterBlast, this.m_owner, this.m_projectile.gameObject,
-                Vector2.zero, this.m_angle, 2f, true, true);
-            AkSoundEngine.PostEvent("gaster_blaster_sound_effect", this.m_projectile.gameObject);
+                Vector2.zero, this.m_angle, 0.75f, true, true);
         }
         private void Expire()
         {
             this.m_projectile.DieInAir(true,false,false,true);
+            this.m_blaster.DieInAir(true,false,false,true);
             // UnityEngine.Object.Destroy(this.m_projectile.gameObject);
         }
     }
