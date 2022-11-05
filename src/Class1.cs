@@ -526,6 +526,7 @@ namespace CwaffingTheGungy
                     SoulKaliber.Add();
                     GamblersFallacy.Add();
                     GasterBlaster.Add();
+                    Commitment.Add();
 
                     // //REVOLVERS
                     // FlayedRevolver.Add();
