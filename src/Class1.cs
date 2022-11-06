@@ -527,7 +527,8 @@ namespace CwaffingTheGungy
                     GamblersFallacy.Add();
                     GasterBlaster.Add();
                     Commitment.Add();
-                    HeadCannon.Add();
+                    // HeadCannon.Add();
+                    Telefragger.Add();
 
                     // //REVOLVERS
                     // FlayedRevolver.Add();
