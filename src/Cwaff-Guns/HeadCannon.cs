@@ -33,15 +33,15 @@ namespace CwaffingTheGungy
             gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
             gun.reloadTime                        = 1.1f;
             gun.DefaultModule.angleVariance       = 15.0f;
-            gun.DefaultModule.cooldownTime        = 0.75f;
+            gun.DefaultModule.cooldownTime        = 0.7f;
             gun.DefaultModule.numberOfShotsInClip = 1000;
             gun.quality                           = PickupObject.ItemQuality.D;
             gun.SetBaseMaxAmmo(1000);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
 
             Projectile projectile       = Lazy.PrefabProjectileFromGun(gun);
-            projectile.baseData.damage  = 3f;
-            projectile.baseData.speed   = 20.0f;
+            projectile.baseData.damage  = 20f;
+            projectile.baseData.speed   = 30.0f;
             projectile.transform.parent = gun.barrelOffset;
 
             projectile.gameObject.AddComponent<HeadCannonBullets>();
@@ -75,23 +75,23 @@ namespace CwaffingTheGungy
 
         private void OnCollision(CollisionData tileCollision)
         {
-            this.m_projectile.baseData.speed *= 0f;
-            this.m_projectile.UpdateSpeed();
-            float hitNormal = tileCollision.Normal.ToAngle();
-            PhysicsEngine.PostSliceVelocity = new Vector2?(default(Vector2));
-            SpeculativeRigidbody specRigidbody = this.m_projectile.specRigidbody;
-            specRigidbody.OnCollision -= this.OnCollision;
 
-            // Vector2 spawnPoint = this.m_projectile.specRigidbody.Position.GetPixelVector2();
-            Vector2 spawnPoint = tileCollision.PostCollisionUnitCenter;
-                // tileCollision.PostCollisionUnitCenter + Lazy.AngleToVector(hitNormal,2f);
+            if (
+                tileCollision.OtherRigidbody &&
+                tileCollision.OtherRigidbody.gameObject &&
+                tileCollision.OtherRigidbody.gameObject.GetComponent<AIActor>() != null
+                )
+                return; //ignore collisions with enemies, we only care about walls
 
-            this.TeleportPlayerToPosition(this.m_owner, spawnPoint, hitNormal);
+            PhysicsEngine.PostSliceVelocity     = new Vector2?(default(Vector2));
+            SpeculativeRigidbody specRigidbody  = this.m_projectile.specRigidbody;
+            specRigidbody.OnCollision          -= this.OnCollision;
 
+            this.TeleportPlayerToPosition(this.m_owner, tileCollision.PostCollisionUnitCenter);
             this.m_projectile.DieInAir();
         }
 
-        private void TeleportPlayerToPosition(PlayerController player, Vector2 position, float normal)
+        private void TeleportPlayerToPosition(PlayerController player, Vector2 position)
         {
             int num_steps = 100;
 
@@ -99,6 +99,7 @@ namespace CwaffingTheGungy
             Vector2 targetPos   = position;
             Vector2 deltaPos    = (targetPos - playerPos)/((float)(num_steps));
             Vector2 adjustedPos = Vector2.zero;
+
             // magic code that slowly moves the player out of walls
             for (int i = 0; i < num_steps; ++i)
             {
@@ -110,9 +111,8 @@ namespace CwaffingTheGungy
                 }
                 adjustedPos = player.transform.position;
             }
-            // DoPlayerTeleport(player,playerPos,adjustedPos,0.5f);
 
-            player.StartCoroutine(DoPlayerTeleport(player, playerPos, adjustedPos, 0.15f));
+            player.StartCoroutine(DoPlayerTeleport(player, playerPos, adjustedPos, 0.125f));
         }
 
         private IEnumerator DoPlayerTeleport(PlayerController player, Vector2 start, Vector2 end, float duration)
@@ -139,15 +139,16 @@ namespace CwaffingTheGungy
                 GameManager.Instance.MainCameraController.OverridePosition = interPos;
                 yield return null;
             }
+
             AkSoundEngine.PostEvent("Play_OBJ_chestwarp_use_01", player.gameObject);
             vfx.SpawnAtPosition(end.ToVector3ZisY(-1f), 0, null, null, null, -0.05f);
+            this.m_owner.DoEasyBlank(end, EasyBlankType.MINI);
 
             GameManager.Instance.MainCameraController.SetManualControl(false, true);
             player.transform.position = end;
             player.sprite.renderer.enabled = true;
             player.specRigidbody.enabled = true;
             player.specRigidbody.Reinitialize();
-
 
             yield break;
         }
