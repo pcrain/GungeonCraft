@@ -135,6 +135,7 @@
     <Compile Include="src\Cwaff-Guns\GamblersFallacy.cs"/>
     <Compile Include="src\Cwaff-Guns\Encircler.cs"/>
     <Compile Include="src\Cwaff-Guns\Commitment.cs"/>
+    <Compile Include="src\Cwaff-Guns\HeadCannon.cs"/>
     <Compile Include="src\Cwaff-Guns\MasterSword.cs"/>
     <Compile Include="src\Cwaff-Guns\GasterBlaster.cs"/>
     <Compile Include="src\Cwaff-Guns\_GenericGunReference.cs"/>
