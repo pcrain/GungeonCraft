@@ -89,7 +89,7 @@ namespace CwaffingTheGungy
                     gun.CurrentAmmo = 1;
                 }
             }
-            player.PostProcessProjectile += this.PostProcessFakeProjectile;
+            // player.PostProcessProjectile += this.PostProcessFakeProjectile;
             // player.OnReloadedGun += this.OnPostReload;
         }
 
@@ -110,11 +110,11 @@ namespace CwaffingTheGungy
             base.OnReloadPressed(player, gun, manualReload);
         }
 
-        private void PostProcessFakeProjectile(Projectile bullet, float eventchancescaler)
-        {
-            FakeProjectileComponent f = bullet.GetComponent<FakeProjectileComponent>();
-            if (f) bullet.damageTypes &= (~CoreDamageTypes.Electric);
-        }
+        // private void PostProcessFakeProjectile(Projectile bullet, float eventchancescaler)
+        // {
+        //     FakeProjectileComponent f = bullet.GetComponent<FakeProjectileComponent>();
+        //     if (f) bullet.damageTypes &= (~CoreDamageTypes.Electric);
+        // }
 
     }
 
@@ -123,7 +123,9 @@ namespace CwaffingTheGungy
         // dummy compponent
         private void Start()
         {
-            base.GetComponent<Projectile>().sprite.renderer.enabled = false;
+            Projectile p = base.GetComponent<Projectile>();
+            p.sprite.renderer.enabled = false;
+            p.damageTypes &= (~CoreDamageTypes.Electric);
         }
     }
 
