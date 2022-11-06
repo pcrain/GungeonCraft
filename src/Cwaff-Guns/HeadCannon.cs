@@ -54,9 +54,15 @@ namespace CwaffingTheGungy
         private Projectile m_projectile;
         private PlayerController m_owner;
 
+        private static VFXPool vfx = null;
+
         private void Start()
         {
+            if (vfx == null)
+                vfx = VFX.CreatePoolFromVFXGameObject((PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
+
             this.m_projectile = base.GetComponent<Projectile>();
+            // this.m_projectile.BulletScriptSettings.surviveTileCollisions = true;
             if (this.m_projectile.Owner && this.m_projectile.Owner is PlayerController)
             {
                 this.m_owner      = this.m_projectile.Owner as PlayerController;
@@ -87,21 +93,63 @@ namespace CwaffingTheGungy
 
         private void TeleportPlayerToPosition(PlayerController player, Vector2 position, float normal)
         {
-            Vector2 playerPos = player.transform.position;
-            // ETGModConsole.Log("Player at "+playerPos.x+","+playerPos.y);
-            Vector2 targetPos = position;
-            // ETGModConsole.Log("Target at "+targetPos.x+","+targetPos.y);
-            Vector2 deltaPos = (targetPos - playerPos)/100.0f;
-            // ETGModConsole.Log("Delta/100 is "+deltaPos.x+","+deltaPos.y);
-            for (int i = 100; i > 0; --i)
+            int num_steps = 100;
+
+            Vector2 playerPos   = player.transform.position;
+            Vector2 targetPos   = position;
+            Vector2 deltaPos    = (targetPos - playerPos)/((float)(num_steps));
+            Vector2 adjustedPos = Vector2.zero;
+            // magic code that slowly moves the player out of walls
+            for (int i = 0; i < num_steps; ++i)
             {
                 player.transform.position = playerPos + i * deltaPos;
                 player.specRigidbody.Reinitialize();
-                if (!PhysicsEngine.Instance.OverlapCast(player.specRigidbody, null, true, false, null, null, false, null, null))
+                if (PhysicsEngine.Instance.OverlapCast(player.specRigidbody, null, true, false, null, null, false, null, null))
+                {
                     break;
+                }
+                adjustedPos = player.transform.position;
             }
+            // DoPlayerTeleport(player,playerPos,adjustedPos,0.5f);
 
-            // player.TeleportToPoint(position,false);
+            player.StartCoroutine(DoPlayerTeleport(player, playerPos, adjustedPos, 0.15f));
+        }
+
+        private IEnumerator DoPlayerTeleport(PlayerController player, Vector2 start, Vector2 end, float duration)
+        {
+            float timer = 0;
+
+            GameManager.Instance.MainCameraController.SetManualControl(true, true);
+            Vector2 startCamPos = GameManager.Instance.MainCameraController.GetIdealCameraPosition();
+            Vector2 endCamPos   = end;
+            Vector2 deltaPos    = (endCamPos - startCamPos);
+
+            player.transform.position = start;
+            player.specRigidbody.Reinitialize();
+            player.sprite.renderer.enabled = false;
+            player.specRigidbody.enabled = false;
+
+            AkSoundEngine.PostEvent("Play_OBJ_chestwarp_use_01", player.gameObject);
+            vfx.SpawnAtPosition(start.ToVector3ZisY(-1f), 0, null, null, null, -0.05f);
+
+            while (timer < duration)
+            {
+                timer += BraveTime.DeltaTime;
+                Vector2 interPos = startCamPos + (timer/duration)*deltaPos;
+                GameManager.Instance.MainCameraController.OverridePosition = interPos;
+                yield return null;
+            }
+            AkSoundEngine.PostEvent("Play_OBJ_chestwarp_use_01", player.gameObject);
+            vfx.SpawnAtPosition(end.ToVector3ZisY(-1f), 0, null, null, null, -0.05f);
+
+            GameManager.Instance.MainCameraController.SetManualControl(false, true);
+            player.transform.position = end;
+            player.sprite.renderer.enabled = true;
+            player.specRigidbody.enabled = true;
+            player.specRigidbody.Reinitialize();
+
+
+            yield break;
         }
     }
 }
