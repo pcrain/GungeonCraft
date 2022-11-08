@@ -9,6 +9,13 @@ using UnityEngine;
 using Alexandria.ItemAPI;
 using Alexandria.Misc;
 
+/*
+    - figure out projectile interpolation so it doesn't whiff when moving too fast
+        (hack for now, just make projectile bigger)
+    - make knockback actually send enemies in the right direction
+    - add visuals for the chains
+*/
+
 namespace CwaffingTheGungy
 {
     public class SpinCycle : AdvancedGunBehavior
@@ -43,18 +50,18 @@ namespace CwaffingTheGungy
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
 
             Projectile ball = Lazy.PrefabProjectileFromGun(gun,false);
-            ball.BulletScriptSettings.surviveTileCollisions = true;
+            ball.BulletScriptSettings.surviveTileCollisions      = true;
             ball.BulletScriptSettings.surviveRigidbodyCollisions = true;
-            ball.baseData.speed = 0.0001f;
-            ball.baseData.force  = 10f;
-            ball.baseData.damage = 10f;
-            ball.baseData.range = 1000000f;
+            ball.baseData.speed          = 0.0001f;
+            ball.baseData.force          = 100f;
+            ball.baseData.damage         = 100f;
+            ball.baseData.range          = 1000000f;
             ball.PenetratesInternalWalls = true;
             ball.pierceMinorBreakables   = true;
 
-            PierceProjModifier pierce     = ball.gameObject.GetOrAddComponent<PierceProjModifier>();
-            pierce.penetration            = 100000;
-            pierce.penetratesBreakables   = true;
+            PierceProjModifier pierce    = ball.gameObject.GetOrAddComponent<PierceProjModifier>();
+            pierce.penetration           = 100000;
+            pierce.penetratesBreakables  = true;
 
             theProtoBall = ball;
 
@@ -67,62 +74,87 @@ namespace CwaffingTheGungy
                 theProtoBall.gameObject, p.sprite.WorldCenter, Quaternion.Euler(0f, 0f, 0f), true
                 ).GetComponent<Projectile>();
             theCurBall.Owner = p;
+            theCurBall.Shooter = p.specRigidbody;
+            theCurBall.RuntimeUpdateScale(3.0f);
 
             this.forcedDirection = p.FacingDirection;
             this.facingLast      = p.FacingDirection;
-            // this.curTurnSpeed    = minTurnSpeed;
             this.curMomentum     = 0;
             p.m_overrideGunAngle = this.forcedDirection;
-            base.OnSwitchedToThisGun();
         }
 
         public override void OnSwitchedToThisGun()
         {
             SetupBallAndChain(this.gun.CurrentOwner as PlayerController);
+            base.OnSwitchedToThisGun();
         }
 
-        protected override void OnPickup(GameActor owner)
+        protected override void OnPickedUpByPlayer(PlayerController player)
         {
-            if (!(owner is PlayerController))
-                return;
-            if (this.gun == owner.CurrentGun)
-                SetupBallAndChain(owner as PlayerController);
+            base.OnPickedUpByPlayer(player);
+            player.OnRollStarted += this.OnDodgeRoll;
+            if (this.gun == player.CurrentGun)
+                SetupBallAndChain(player);
+        }
+
+        private void OnDodgeRoll(PlayerController player, Vector2 dirVec)
+        {
+            if (this.theCurBall != null)
+            {
+                this.theCurBall.DieInAir(true,false,false,true);
+                this.theCurBall = null;
+            }
+        }
+
+        protected override void OnPostDroppedByPlayer(PlayerController player)
+        {
+            base.OnPostDroppedByPlayer(player);
+            player.OnRollStarted -= this.OnDodgeRoll;
         }
 
         public override void OnSwitchedAwayFromThisGun()
         {
-            if (theCurBall != null)
+            if (this.theCurBall != null)
             {
                 this.theCurBall.DieInAir(true,false,false,true);
-                theCurBall = null;
+                this.theCurBall = null;
             }
             if (!(this.gun.CurrentOwner && this.gun.CurrentOwner is PlayerController))
                 return;
             PlayerController p = this.gun.CurrentOwner as PlayerController;
             p.m_overrideGunAngle = null;
+            RecomputePlayerSpeed(p,1.0f);
             base.OnSwitchedAwayFromThisGun();
         }
 
-        public override void PostProcessProjectile(Projectile projectile)
-        {
-            base.PostProcessProjectile(projectile);
-            return;
-            // projectile.angularVelocity = 10f;
-            // projectile.UpdateSpeed();
-            // projectile.SendInDirection(Lazy.AngleToVector(90f), true);
-            // projectile.UpdateSpeed();
-        }
+        private static float maxMomentum         = 18f;  //3.0 rotations per second @60FPS
+        private static float ballWeight          = 75f;  //full speed in 0.5 seconds @60FPS
+        private static float maxChainLength      = 6.0f;
+        private static float airFriction         = 0.995f;
+        private static bool relativeToLastFacing = true;
+        private static float maxAccel            = maxMomentum/ballWeight;
 
-        private static float maxMomentum      = 18f;  //3.0 rotations per second @60FPS
-        private static float ballWeight       = 30f;  //full speed in 0.5 seconds @60FPS
-        private static float maxChainLength   = 6.0f;
-        private static float maxAccel         = maxMomentum/ballWeight;
-        private static float airFriction      = 0.99f;
-        private static bool relativeToReticle = false; //if false, ...need better documentation
+        private static bool influencePlayerMomentum  = true;
+        private static float minPlayerMomentum       = 0.5f;
+        private static float maxPlayerMomentum       = 1.5f;
+        private static float playerMomentumDelta     = maxPlayerMomentum - minPlayerMomentum;
+        private static int chainSegments             = 5;
 
         private float facingLast      = 0f;
         private float forcedDirection = 0f;
         private float curMomentum     = 0f;
+
+        private void RecomputePlayerSpeed(PlayerController p, float speed)
+        {
+            StatModifier m = new StatModifier
+            {
+                amount      = speed,
+                statToBoost = PlayerStats.StatType.MovementSpeed,
+                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE
+            };
+            this.gun.passiveStatModifiers = (new StatModifier[] { m }).ToArray();
+            p.stats.RecalculateStats(p, false, false);
+        }
 
         protected override void Update()
         {
@@ -130,15 +162,20 @@ namespace CwaffingTheGungy
             if (!(this.gun.CurrentOwner && this.gun.CurrentOwner is PlayerController))
                 return;
 
-            // prevent the gun from firing entirely
-            this.gun.RuntimeModuleData[this.gun.DefaultModule].onCooldown = true;
-
             // get the owner of the gun
             PlayerController p = this.gun.CurrentOwner as PlayerController;
 
+            if (theCurBall == null)
+            {
+                SetupBallAndChain(p);
+            }
+
+            // prevent the gun from normal firing entirely
+            this.gun.RuntimeModuleData[this.gun.DefaultModule].onCooldown = true;
+
             // determine the angle delta between the reticle and our current forced direction
             float deltaToTarget =
-                p.FacingDirection - (relativeToReticle ? this.forcedDirection : this.facingLast);
+                p.FacingDirection - (relativeToLastFacing ? this.facingLast : this.forcedDirection);
             if (deltaToTarget > 180)
                 deltaToTarget -= 360f;
             else if (deltaToTarget < -180)
@@ -161,23 +198,29 @@ namespace CwaffingTheGungy
             p.m_overrideGunAngle = this.forcedDirection;
 
             // update chain length
-            float curChainLength = maxChainLength * (this.curMomentum / maxMomentum);
+            float curChainLength = maxChainLength * (Mathf.Abs(this.curMomentum) / maxMomentum);
+
+            // update speed of owner as appropriate
+            if (influencePlayerMomentum)
+            {
+                RecomputePlayerSpeed(p,minPlayerMomentum+playerMomentumDelta*(curChainLength/maxChainLength));
+            }
 
             // draw VFX showing the ball's current momentum
-            DrawVFXWithRespectToPlayerAngle(p,this.forcedDirection,curChainLength);
+            DrawVFXWithRespectToPlayerAngle(p,this.forcedDirection,curChainLength,this.chainSegments);
 
-            // draw the ball itself
-            if (theCurBall != null)
-            {
-                theCurBall.collidesWithEnemies = true;
-                theCurBall.collidesWithPlayer = false;
-                Vector2 ppos = (p.sprite.WorldCenter+Lazy.AngleToVector(this.forcedDirection,curChainLength)
-                    ).ToVector3ZisY(-1f);
-                theCurBall.specRigidbody.Position = new Position(ppos);
-            }
+            // update and draw the ball itself
+            theCurBall.collidesWithEnemies = true;
+            theCurBall.collidesWithPlayer = false;
+            Vector2 ppos = (p.sprite.WorldCenter+Lazy.AngleToVector(this.forcedDirection,curChainLength)
+                ).ToVector3ZisY(-1f);
+
+            Vector2 oldPos = theCurBall.specRigidbody.Position.GetPixelVector2();
+            theCurBall.specRigidbody.Position = new Position(ppos);
+            theCurBall.SendInDirection(ppos-oldPos,true,true);
         }
 
-        private void DrawVFXWithRespectToPlayerAngle(PlayerController p, float angle, float mag)
+        private void DrawVFXWithRespectToPlayerAngle(PlayerController p, float angle, float mag, float segments)
         {
             Vector2 ppos = p.sprite.WorldCenter;
             vfx.SpawnAtPosition((ppos+Lazy.AngleToVector(angle,mag)).ToVector3ZisY(-1f),
