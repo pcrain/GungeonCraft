@@ -109,13 +109,6 @@ namespace CwaffingTheGungy
             AkSoundEngine.PostEvent("Play_WPN_crossbow_reload_01", gameObject);
             base.OnReloadPressed(player, gun, manualReload);
         }
-
-        // private void PostProcessFakeProjectile(Projectile bullet, float eventchancescaler)
-        // {
-        //     FakeProjectileComponent f = bullet.GetComponent<FakeProjectileComponent>();
-        //     if (f) bullet.damageTypes &= (~CoreDamageTypes.Electric);
-        // }
-
     }
 
     public class NugRedBehavior : MonoBehaviour
@@ -184,39 +177,5 @@ namespace CwaffingTheGungy
 
             this.m_projectile.DieInAir();
         }
-    }
-
-    public class BulletLifeTimer : MonoBehaviour
-    {
-        public BulletLifeTimer()
-        {
-            this.secondsTillDeath = 1;
-            this.eraseInsteadOfDie = false;
-        }
-        private void Start()
-        {
-            timer = secondsTillDeath;
-            this.m_projectile = base.GetComponent<Projectile>();
-
-        }
-        private void FixedUpdate()
-        {
-            if (this.m_projectile != null)
-            {
-                if (timer > 0)
-                {
-                    timer -= BraveTime.DeltaTime;
-                }
-                if (timer <= 0)
-                {
-                    if (eraseInsteadOfDie) UnityEngine.Object.Destroy(this.m_projectile.gameObject);
-                    else this.m_projectile.DieInAir();
-                }
-            }
-        }
-        public float secondsTillDeath;
-        public bool eraseInsteadOfDie;
-        private float timer;
-        private Projectile m_projectile;
     }
 }

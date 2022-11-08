@@ -530,6 +530,7 @@ namespace CwaffingTheGungy
                     // HeadCannon.Add();
                     Telefragger.Add();
                     Kinsurrection.Add();
+                    SpinCycle.Add();
 
                     // //REVOLVERS
                     // FlayedRevolver.Add();

@@ -51,7 +51,7 @@ namespace CwaffingTheGungy
             pierce.penetration                    = 3;
             pierce.penetratesBreakables           = true;
 
-            // projectile.gameObject.AddComponent<FakeProjectileComponent>();
+            projectile.gameObject.AddComponent<FakeProjectileComponent>();
             projectile.gameObject.AddComponent<BulletKinLauncher>();
             projectile.gameObject.AddComponent<EnemyIsTheProjectileBehavior>();
         }
@@ -65,11 +65,12 @@ namespace CwaffingTheGungy
         private AIActor m_bullet_kin;
         private float m_angle;
 
+        private static AIActor bulletkin =
+            EnemyDatabase.GetOrLoadByGuid(EnemyGuidDatabase.Entries["bullet_kin"]);
+
         private void Start()
         {
             this.m_projectile = base.GetComponent<Projectile>();
-            // this.m_projectile.enabled                 = false;
-            // this.m_projectile.sprite.renderer.enabled = false;
             if (this.m_projectile.Owner && this.m_projectile.Owner is PlayerController)
             {
                 this.m_owner = this.m_projectile.Owner as PlayerController;
@@ -78,11 +79,10 @@ namespace CwaffingTheGungy
 
             SpeculativeRigidbody specRigidBody = this.m_projectile.specRigidbody;
 
-            var enemyToSpawn = EnemyDatabase.GetOrLoadByGuid(EnemyGuidDatabase.Entries["bullet_kin"]);
             Vector2 position = this.m_projectile.sprite.WorldCenter;
 
             this.m_bullet_kin = AIActor.Spawn(
-                enemyToSpawn, position, GameManager.Instance.Dungeon.data.GetAbsoluteRoomFromPosition(
+                bulletkin, position, GameManager.Instance.Dungeon.data.GetAbsoluteRoomFromPosition(
                     position.ToIntVector2()), true, AIActor.AwakenAnimationType.Spawn, true);
             this.m_bullet_kin.CollisionDamage            = 10f;
             this.m_bullet_kin.CollisionKnockbackStrength = 100f;
@@ -128,12 +128,6 @@ namespace CwaffingTheGungy
             }
             this.m_projectile.specRigidbody.Position =
                 new Position(this.target_enemy.sprite.WorldCenter);
-            // this.m_projectile.transform.position =
-            //     this.target_enemy.sprite.WorldCenter;
-
-            // this.m_projectile.baseData.speed =
-            //     (this.target_enemy.sprite.WorldCenter -
-            //         this.m_projectile.specRigidbody.m_position.GetPixelVector2()).magnitude;
         }
 
         public void Initialize(AIActor target)

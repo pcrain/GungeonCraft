@@ -20,5 +20,39 @@ namespace CwaffingTheGungy
             p.damageTypes &= (~CoreDamageTypes.Electric);
         }
     }
+
+    public class BulletLifeTimer : MonoBehaviour
+    {
+        public BulletLifeTimer()
+        {
+            this.secondsTillDeath = 1;
+            this.eraseInsteadOfDie = false;
+        }
+        private void Start()
+        {
+            timer = secondsTillDeath;
+            this.m_projectile = base.GetComponent<Projectile>();
+
+        }
+        private void FixedUpdate()
+        {
+            if (this.m_projectile != null)
+            {
+                if (timer > 0)
+                {
+                    timer -= BraveTime.DeltaTime;
+                }
+                if (timer <= 0)
+                {
+                    if (eraseInsteadOfDie) UnityEngine.Object.Destroy(this.m_projectile.gameObject);
+                    else this.m_projectile.DieInAir();
+                }
+            }
+        }
+        public float secondsTillDeath;
+        public bool eraseInsteadOfDie;
+        private float timer;
+        private Projectile m_projectile;
+    }
 }
 
