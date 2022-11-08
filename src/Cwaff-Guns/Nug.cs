@@ -118,18 +118,6 @@ namespace CwaffingTheGungy
 
     }
 
-    public class FakeProjectileComponent : MonoBehaviour
-    {
-        // dummy compponent
-        private void Start()
-        {
-            Projectile p = base.GetComponent<Projectile>();
-            p.sprite.renderer.enabled = false;
-            p.damageTypes &= (~CoreDamageTypes.Electric);
-        }
-    }
-
-
     public class NugRedBehavior : MonoBehaviour
     {
         private Projectile m_projectile;

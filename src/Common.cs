@@ -15,7 +15,7 @@ namespace CwaffingTheGungy
     {
         public const float PIXELS_PER_TILE = 16f;
     }
-    public class Lazy
+    public static class Lazy
     {
         /// <summary>
         /// Perform basic initialization for a new gun definition.

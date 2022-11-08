@@ -529,6 +529,7 @@ namespace CwaffingTheGungy
                     Commitment.Add();
                     // HeadCannon.Add();
                     Telefragger.Add();
+                    Kinsurrection.Add();
 
                     // //REVOLVERS
                     // FlayedRevolver.Add();

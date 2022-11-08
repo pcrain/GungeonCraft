@@ -119,6 +119,7 @@
     <Compile Include="src\StandardAPI\GungeonAPI\Dungeon Code\DungeonHooks.cs"/>
     <Compile Include="src\Class1.cs"/>
     <Compile Include="src\GlobalIDs.cs"/>
+    <Compile Include="src\SharedGunBehaviors.cs"/>
     <Compile Include="src\_Reference.cs"/>
     <Compile Include="src\Common.cs"/>
     <Compile Include="src\HatClassesThatWereAlsoStolen\HatController.cs"/>
@@ -137,11 +138,13 @@
     <Compile Include="src\Cwaff-Guns\Commitment.cs"/>
     <Compile Include="src\Cwaff-Guns\HeadCannon.cs"/>
     <Compile Include="src\Cwaff-Guns\MasterSword.cs"/>
+    <Compile Include="src\Cwaff-Guns\Kinsurrection.cs"/>
     <Compile Include="src\Cwaff-Guns\GasterBlaster.cs"/>
     <Compile Include="src\Cwaff-Guns\_GenericGunReference.cs"/>
     <Compile Include="src\Cwaff-Guns\DerailGun.cs"/>
     <Compile Include="src\Cwaff-Guns\Tranquilizer.cs"/>
     <Compile Include="src\Cwaff-Guns\PaintballGun.cs"/>
+    <Compile Include="src\Cwaff-Guns\Telefragger.cs"/>
     <Compile Include="src\Cwaff-Misc\SoulLinkStatusEffect.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\SimpleToolbox.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\ProjSpawnHelper.cs"/>
