@@ -26,8 +26,6 @@ namespace CwaffingTheGungy
             string newGunName  = gunName.Replace("'", "").Replace("-", "");  //get sane gun for item rename
             string baseGunName = newGunName.Replace(" ", "_").ToLower();  //get saner gun name for commands
 
-            ETGModConsole.Log("Lazy Initializing Gun: "+baseGunName);
-
             Gun gun = ETGMod.Databases.Items.NewGun(newGunName, spriteName);  //create a new gun using specified sprite name
             Game.Items.Rename("outdated_gun_mods:"+baseGunName, "cg:"+baseGunName);  //rename the gun for commands
             gun.encounterTrackable.EncounterGuid = baseGunName+"-"+spriteName; //create a unique guid for the gun
@@ -42,6 +40,7 @@ namespace CwaffingTheGungy
             ETGMod.Databases.Items.Add(gun, false, "ANY");  //register the gun in the EtG database
             IDs.Guns[baseGunName] = gun.PickupObjectId; //register gun in my ID database
 
+            ETGModConsole.Log("Lazy Initialized Gun: "+baseGunName);
             return gun;
         }
 
@@ -97,6 +96,39 @@ namespace CwaffingTheGungy
             Vector2 offset = new Vector2(
                 Mathf.Cos(angleInDegrees*Mathf.PI/180),Mathf.Sin(angleInDegrees*Mathf.PI/180));
             return magnitude*offset;
+        }
+
+        /// <summary>
+        /// Perform basic initialization for a new passive item definition. Stolen and modified from Noonum.
+        /// </summary>
+        public static PickupObject SetupItem<T>(string itemName, string spritePath, string shortDescription, string longDescription, string idPool = "ItemAPI")
+            where T : PickupObject
+        {
+            GameObject obj = new GameObject(itemName);
+            PickupObject item = obj.AddComponent<T>();
+            ItemBuilder.AddSpriteToObject(itemName, spritePath, obj);
+
+            item.encounterTrackable = null;
+
+            ETGMod.Databases.Items.SetupItem(item, item.name);
+            SpriteBuilder.AddToAmmonomicon(item.sprite.GetCurrentSpriteDef());
+            item.encounterTrackable.journalData.AmmonomiconSprite = item.sprite.GetCurrentSpriteDef().name;
+
+            item.SetName(item.name);
+            item.SetShortDescription(shortDescription);
+            item.SetLongDescription(longDescription);
+
+            if (item is PlayerItem)
+                (item as PlayerItem).consumable = false;
+
+            string newItemName  = itemName.Replace("'", "").Replace("-", "");  //get sane item for item rename
+            string baseItemName = newItemName.Replace(" ", "_").ToLower();  //get saner item name for commands
+            Gungeon.Game.Items.Add(idPool + ":" + baseItemName, item);
+            ETGMod.Databases.Items.Add(item);
+            IDs.Passives[baseItemName] = item.PickupObjectId; //register item in my ID database
+
+            ETGModConsole.Log("Lazy Initialized Passive: "+baseItemName);
+            return item;
         }
     }
 }

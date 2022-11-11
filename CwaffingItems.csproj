@@ -36,6 +36,7 @@
   <ItemGroup>
     <None Include="packages.config"/>
     <Reference Include="System"/>
+    <Compile Include="src\Cwaff-Passives\Shine.cs"/>
     <Compile Include="src\Commands.cs"/>
     <Compile Include="src\AudioResourceLoader.cs"/>
     <Compile Include="src\VFX.cs"/>

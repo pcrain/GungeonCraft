@@ -138,6 +138,8 @@ namespace CwaffingTheGungy
 
                 //-----------------------------------------------------ITEMS GET INITIALISED
                 #region ItemInitialisation
+                    Shine.Init();
+
                     // //Character Starters
                     // ShadeHand.Init();
                     // ShadeHeart.Init();
