@@ -1059,6 +1059,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\spared_vfx_009.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter5.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\shine.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\spared_vfx_005.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter1.png"/>
@@ -1218,6 +1219,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\RainbowGuonPoofs\orangepoof_005.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\shittyarcsplosion_001.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\bigwhitepoof_003.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\shine2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\CompanionVFX\loveburstaoe_vfx_003.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\CompanionVFX\loveburstaoe_vfx_001.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\CompanionVFX\loveburstaoe_vfx_004.png"/>

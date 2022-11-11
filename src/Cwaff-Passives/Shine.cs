@@ -21,6 +21,7 @@ namespace CwaffingTheGungy
 
         private bool isShining = false;
         private PlayerController owner = null;
+        private GameObject theShine = null;
 
         public static void Init()
         {
@@ -38,13 +39,6 @@ namespace CwaffingTheGungy
         {
             if (this.isShining && this.owner)
                 ShineOff(this.owner);
-        }
-        private void OnPreDodgeRoll(PlayerController player)
-        {
-            // player.ClearDodgeRollState();
-            // player.ForceStopDodgeRoll();
-            // player.m_dodgeRollTimer = -1f;
-            // player.m_dodgeRollState = PlayerController.DodgeRollState.Blink;
         }
         private void OnRollStarted(PlayerController player, Vector2 direction)
         {
@@ -64,16 +58,34 @@ namespace CwaffingTheGungy
                 return;
 
             ETGModConsole.Log("Shining");
-            // SND_CHR_dodge_roll_01
             player.ClearDodgeRollState();
             player.ForceStopDodgeRoll();
             // player.StartCoroutine(TemporarilyDisableInput(player,0.03f));
+            // Relevant sounds: SND_CHR_dodge_roll_01 / 02 / 03
         }
+
+        // private static IEnumerator TemporarilyDisableInput(PlayerController player, float timeout)
+        // {
+        //     PlayerInputState oldInputState = player.CurrentInputState;
+        //     player.CurrentInputState = PlayerInputState.NoMovement;
+        //     yield return new WaitForSeconds(timeout);
+        //     player.CurrentInputState = oldInputState;
+        //     yield break;
+        // }
 
         bool m_usedOverrideMaterial;
         private void ShineOn(PlayerController player)
         {
             this.isShining = true;
+            theShine = Instantiate<GameObject>(
+                VFX.animations["Shine"], player.specRigidbody.sprite.WorldCenter, Quaternion.identity, player.specRigidbody.transform);
+            this.Update();
+            // VFX.SpawnVFXPool("Shine",player.specRigidbody.sprite.WorldCenter, relativeTo: player.gameObject);
+            // VFX.SpawnVFXPool("Shine", player.specRigidbody.sprite.WorldCenter);
+            // VFX.SpawnVFXPool("Rebar", player.sprite.WorldCenter, degAngle: 0, relativeTo: player.gameObject);
+            // VFX.SpawnVFXPool("Rebar", this.owner.sprite.WorldCenter, degAngle: 0, relativeTo: this.owner.gameObject);
+
+            // theShine = Instantiate<GameObject>(VFX.animations["Shine"], player.sprite.WorldCenter, Quaternion.identity, player.specRigidbody.transform);
             m_usedOverrideMaterial = player.sprite.usesOverrideMaterial;
             player.sprite.usesOverrideMaterial = true;
             player.SetOverrideShader(ShaderCache.Acquire("Brave/ItemSpecific/MetalSkinShader"));
@@ -84,12 +96,26 @@ namespace CwaffingTheGungy
             if (this) AkSoundEngine.PostEvent("Play_OBJ_metalskin_end_01", base.gameObject);
         }
 
+
+        public override void Update()
+        {
+            if (!theShine)
+                return;
+            float curscale = 0.25f+0.25f*Mathf.Abs(Mathf.Sin(20*BraveTime.ScaledTimeSinceStartup));
+            theShine.transform.localScale = new Vector3(curscale,curscale,curscale);
+        }
+
         private void ShineOff(PlayerController player)
         {
             if (!player)
                 return;
 
             this.isShining = false;
+            if (theShine != null)
+            {
+                UnityEngine.Object.Destroy(theShine);
+                // theShine = Instantiate<GameObject>(VFX.animations["Shine"], player.sprite.WorldCenter, Quaternion.identity, player.transform);
+            }
             player.healthHaver.IsVulnerable = true;
             player.ClearOverrideShader();
             player.sprite.usesOverrideMaterial = this.m_usedOverrideMaterial;
@@ -120,20 +146,10 @@ namespace CwaffingTheGungy
             p.stats.RecalculateStats(p, false, false);
         }
 
-        private static IEnumerator TemporarilyDisableInput(PlayerController player, float timeout)
-        {
-            PlayerInputState oldInputState = player.CurrentInputState;
-            player.CurrentInputState = PlayerInputState.NoMovement;
-            yield return new WaitForSeconds(timeout);
-            player.CurrentInputState = oldInputState;
-            yield break;
-        }
-
         public override void Pickup(PlayerController player)
         {
             this.owner = player;
             player.PostProcessProjectile += PostProcessProjectile;
-            player.OnPreDodgeRoll += this.OnPreDodgeRoll;
             player.OnRollStarted += this.OnRollStarted;
             player.OnIsRolling += this.OnIsRolling;
             base.Pickup(player);
@@ -143,7 +159,6 @@ namespace CwaffingTheGungy
         {
             this.owner = null;
             player.PostProcessProjectile -= PostProcessProjectile;
-            player.OnPreDodgeRoll -= this.OnPreDodgeRoll;
             player.OnRollStarted -= this.OnRollStarted;
             player.OnIsRolling -= this.OnIsRolling;
             isShining = false;

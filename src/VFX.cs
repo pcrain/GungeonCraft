@@ -69,6 +69,10 @@ namespace CwaffingTheGungy
                     "CwaffingTheGungy/Resources/StatusEffectVFX/plaguevfxframe_005",
                 }, 4, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter);
 
+            RegisterVFX<GameObject>("Shine", new List<string>() {
+                    "CwaffingTheGungy/Resources/MiscVFX/shine2",
+                }, 1, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 100);
+
             RegisterVFX<VFXPool>("Rebar", new List<string>() {
                     "CwaffingTheGungy/Resources/MiscVFX/GunVFX/RebarGunImpactVFX2_001",
                     "CwaffingTheGungy/Resources/MiscVFX/GunVFX/RebarGunImpactVFX2_002",
@@ -103,7 +107,10 @@ namespace CwaffingTheGungy
             UnityEngine.Object.DontDestroyOnLoad(Obj);
 
             tk2dBaseSprite baseSprite = Obj.GetComponent<tk2dBaseSprite>();
-            baseSprite.GetCurrentSpriteDef().ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.LowerCenter, baseSprite.GetCurrentSpriteDef().position3);
+            tk2dSpriteDefinition baseDef = baseSprite.GetCurrentSpriteDef();
+            baseDef.ConstructOffsetsFromAnchor(
+                tk2dBaseSprite.Anchor.LowerCenter,
+                baseDef.position3);
 
             tk2dSpriteCollectionData VFXSpriteCollection = SpriteBuilder.ConstructCollection(Obj, (name + "_Pool"));
             int spriteID = SpriteBuilder.AddSpriteToCollection(spritePaths[0], VFXSpriteCollection);
