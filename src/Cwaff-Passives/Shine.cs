@@ -57,7 +57,6 @@ namespace CwaffingTheGungy
             if (!this.isShining)
                 return;
 
-            ETGModConsole.Log("Shining");
             player.ClearDodgeRollState();
             player.ForceStopDodgeRoll();
             // player.StartCoroutine(TemporarilyDisableInput(player,0.03f));
@@ -93,7 +92,7 @@ namespace CwaffingTheGungy
             specRigidbody.OnPreRigidbodyCollision = (SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate)Delegate.Combine(specRigidbody.OnPreRigidbodyCollision, new SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate(this.OnPreCollision));
             player.healthHaver.IsVulnerable = false;
             RecomputePlayerSpeed(player);
-            if (this) AkSoundEngine.PostEvent("Play_OBJ_metalskin_end_01", base.gameObject);
+            if (this) AkSoundEngine.PostEvent("reflector", base.gameObject);
         }
 
 
@@ -122,7 +121,7 @@ namespace CwaffingTheGungy
             SpeculativeRigidbody specRigidbody2 = player.specRigidbody;
             specRigidbody2.OnPreRigidbodyCollision = (SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate)Delegate.Remove(specRigidbody2.OnPreRigidbodyCollision, new SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate(this.OnPreCollision));
             RecomputePlayerSpeed(player);
-            if (this) AkSoundEngine.PostEvent("Play_OBJ_metalskin_end_01", base.gameObject);
+            // if (this) AkSoundEngine.PostEvent("Play_OBJ_metalskin_end_01", base.gameObject);
         }
 
         private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherCollider)
