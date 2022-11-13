@@ -138,6 +138,9 @@ namespace CwaffingTheGungy
 
                 //-----------------------------------------------------ITEMS GET INITIALISED
                 #region ItemInitialisation
+                    // Actives
+                    BorrowedTime.Init();
+                    // Passives
                     Shine.Init();
 
                     // //Character Starters

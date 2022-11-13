@@ -123,6 +123,7 @@
     <Compile Include="src\SharedGunBehaviors.cs"/>
     <Compile Include="src\_Reference.cs"/>
     <Compile Include="src\Common.cs"/>
+    <Compile Include="src\Cwaff-Actives\BorrowedTime.cs"/>
     <Compile Include="src\HatClassesThatWereAlsoStolen\HatController.cs"/>
     <Compile Include="src\HatClassesThatWereAlsoStolen\PlayerToolbox.cs"/>
     <Compile Include="src\HatClassesThatWereAlsoStolen\HatUtility.cs"/>

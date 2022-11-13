@@ -131,6 +131,39 @@ namespace CwaffingTheGungy
             ETGModConsole.Log("Lazy Initialized Passive: "+baseItemName);
             return item;
         }
+
+        /// <summary>
+        /// Perform basic initialization for a new active item definition.
+        /// </summary>
+        public static PlayerItem SetupActive<T>(string itemName, string spritePath, string shortDescription, string longDescription, string idPool = "ItemAPI")
+            where T : PlayerItem
+        {
+            GameObject obj = new GameObject(itemName);
+            PlayerItem item = obj.AddComponent<T>();
+            ItemBuilder.AddSpriteToObject(itemName, spritePath, obj);
+
+            item.encounterTrackable = null;
+
+            ETGMod.Databases.Items.SetupItem(item, item.name);
+            SpriteBuilder.AddToAmmonomicon(item.sprite.GetCurrentSpriteDef());
+            item.encounterTrackable.journalData.AmmonomiconSprite = item.sprite.GetCurrentSpriteDef().name;
+
+            item.SetName(item.name);
+            item.SetShortDescription(shortDescription);
+            item.SetLongDescription(longDescription);
+
+            if (item is PlayerItem)
+                (item as PlayerItem).consumable = false;
+
+            string newItemName  = itemName.Replace("'", "").Replace("-", "");  //get sane item for item rename
+            string baseItemName = newItemName.Replace(" ", "_").ToLower();  //get saner item name for commands
+            Gungeon.Game.Items.Add(idPool + ":" + baseItemName, item);
+            ETGMod.Databases.Items.Add(item);
+            IDs.Actives[baseItemName] = item.PickupObjectId; //register item in my ID database
+
+            ETGModConsole.Log("Lazy Initialized Active: "+baseItemName);
+            return item;
+        }
     }
     public static class Dissect
     {
