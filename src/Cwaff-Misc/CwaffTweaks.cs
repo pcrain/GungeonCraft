@@ -18,10 +18,25 @@ namespace CwaffingTheGungy
         {
             GetDogPettingAnimation();
 
+            string[] testPet = new string[] {
+                "CwaffingTheGungy/Resources/Companions/DroneCompanion/drone_idle_001", //0
+                "CwaffingTheGungy/Resources/Companions/DroneCompanion/drone_idle_002", //1
+                "CwaffingTheGungy/Resources/Companions/DroneCompanion/drone_idle_003", //2
+                "CwaffingTheGungy/Resources/Companions/DroneCompanion/drone_idle_004", //3
+                "CwaffingTheGungy/Resources/Companions/DroneCompanion/drone_idle_005", //4
+                "CwaffingTheGungy/Resources/Companions/DroneCompanion/drone_idle_006", //5
+            };
+
             //Make Wolf pettable
-            ETGModConsole.Log("Making wolfyboi pettable");
-            Gungeon.Game.Items["wolf"].GetComponent<CompanionItem>().MakePettable(
-                spritePaths);
+            string[] defaultCompanions = new string[] {
+                "wolf","junkan","turkey","baby_good_mimic","baby_good_shelleton","super_space_turtle",
+                "r2g2","blank_companions_ring","badge","pig","chicken_flute",
+            };
+            foreach(string c in defaultCompanions)
+            {
+                ETGModConsole.Log("Making "+c+" pettable");
+                Gungeon.Game.Items[c].GetComponent<CompanionItem>().MakePettable(testPet);
+            }
         }
 
         private static void GetDogPettingAnimation()
@@ -39,16 +54,6 @@ namespace CwaffingTheGungy
             }
         }
 
-        private static string[] spritePaths = new string[]
-        {
-            "CwaffingTheGungy/Resources/Companions/DroneCompanion/drone_idle_001", //0
-            "CwaffingTheGungy/Resources/Companions/DroneCompanion/drone_idle_002", //1
-            "CwaffingTheGungy/Resources/Companions/DroneCompanion/drone_idle_003", //2
-            "CwaffingTheGungy/Resources/Companions/DroneCompanion/drone_idle_004", //3
-            "CwaffingTheGungy/Resources/Companions/DroneCompanion/drone_idle_005", //4
-            "CwaffingTheGungy/Resources/Companions/DroneCompanion/drone_idle_006", //5
-
-        };
         public static void MakePettable(this CompanionItem ci, string[] pettingAnimation = null)
         {
             // Get the companion controller for the companion
