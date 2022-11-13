@@ -2578,6 +2578,7 @@
     <EmbeddedResource Include="Resources\Companions\DroneCompanion\drone_idle_004.png"/>
     <EmbeddedResource Include="Resources\Companions\DroneCompanion\drone_run_left_003.png"/>
     <EmbeddedResource Include="Resources\Companions\DroneCompanion\drone_run_left_001.png"/>
+    <EmbeddedResource Include="Resources\Companions\DroneCompanion\drone_pet_001.png"/>
     <EmbeddedResource Include="Resources\Companions\DroneCompanion\drone_run_right_002.png"/>
     <EmbeddedResource Include="Resources\Companions\DroneCompanion\drone_run_right_003.png"/>
     <EmbeddedResource Include="Resources\Companions\DroneCompanion\drone_run_right_001.png"/>
