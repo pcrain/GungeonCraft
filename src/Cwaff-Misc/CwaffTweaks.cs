@@ -20,7 +20,8 @@ namespace CwaffingTheGungy
 
             //Make Wolf pettable
             ETGModConsole.Log("Making wolfyboi pettable");
-            Gungeon.Game.Items["wolf"].GetComponent<CompanionItem>().MakePettable();
+            Gungeon.Game.Items["wolf"].GetComponent<CompanionItem>().MakePettable(
+                spritePaths);
         }
 
         private static void GetDogPettingAnimation()
@@ -46,46 +47,35 @@ namespace CwaffingTheGungy
             "CwaffingTheGungy/Resources/Companions/DroneCompanion/drone_idle_004", //3
             "CwaffingTheGungy/Resources/Companions/DroneCompanion/drone_idle_005", //4
             "CwaffingTheGungy/Resources/Companions/DroneCompanion/drone_idle_006", //5
-            "CwaffingTheGungy/Resources/Companions/DroneCompanion/drone_run_right_001", //6
-            "CwaffingTheGungy/Resources/Companions/DroneCompanion/drone_run_right_002", //7
-            "CwaffingTheGungy/Resources/Companions/DroneCompanion/drone_run_right_003", //8
-            "CwaffingTheGungy/Resources/Companions/DroneCompanion/drone_run_left_001", //9
-            "CwaffingTheGungy/Resources/Companions/DroneCompanion/drone_run_left_002", //10
-            "CwaffingTheGungy/Resources/Companions/DroneCompanion/drone_run_left_003", //11
-            "CwaffingTheGungy/Resources/Companions/DroneCompanion/drone_pet_001", //12
 
         };
-        public static void MakePettable(this CompanionItem ci)
+        public static void MakePettable(this CompanionItem ci, string[] pettingAnimation = null)
         {
-            AIActor cai            = EnemyDatabase.GetOrLoadByGuid(ci.CompanionGuid);
-            CompanionController cc = cai.gameObject.GetOrAddComponent<CompanionController>();
-            cc.CanBePet            = true;
-            AIAnimator can         = cc.sprite.aiAnimator;
+            // Get the companion controller for the companion
+            CompanionController cc =
+                EnemyDatabase.GetOrLoadByGuid(ci.CompanionGuid).gameObject.GetOrAddComponent<CompanionController>();
 
-            // can.OtherAnimations.Add(new AIAnimator.NamedDirectionalAnimation {
-            //     name = "pet",
-            //     anim = dogPettingAnimation,
-            // });
+            // Make it pettable
+            cc.CanBePet = true;
 
-            // tk2dSpriteCollectionData cta = cc.GetComponent<tk2dSpriteCollectionData>();
-            // if(cta == null)
-            //     cta = SpriteBuilder.ConstructCollection(cc.sprite.gameObject, ("wolf" + "_Pool"));
-
-            int startindex = 0;
-            for (int i = 0; i < spritePaths.Length; i++)
+            // Give it a petting animation
+            if (pettingAnimation != null)
             {
-                startindex = SpriteBuilder.AddSpriteToCollection(spritePaths[i], cc.sprite.Collection);
+                List<int> animIndices = new List<int>{};
+                for (int i = 0; i < pettingAnimation.Length; i++)
+                    animIndices.Add(SpriteBuilder.AddSpriteToCollection(pettingAnimation[i], cc.sprite.Collection));
+                SpriteBuilder.AddAnimation(cc.sprite.spriteAnimator, cc.sprite.Collection, animIndices,
+                    "pet", tk2dSpriteAnimationClip.WrapMode.Loop).fps = 8f;
             }
-            //Idling Animation
-            SpriteBuilder.AddAnimation(cc.sprite.spriteAnimator, cc.sprite.Collection, new List<int>
+            else //...or just copy it from the dog while testing
             {
-                startindex,
-            }, "pet", tk2dSpriteAnimationClip.WrapMode.Loop).fps = 8f;
+                cc.sprite.aiAnimator.OtherAnimations.Add(new AIAnimator.NamedDirectionalAnimation {
+                    name = "pet",
+                    anim = dogPettingAnimation,
+                });
+            }
 
-            // cai.gameObject.AddAnimation("pet", "CwaffingTheGungy/Resources/Companions/DroneCompanion/", 8,
-            //     CompanionBuilder.AnimationType.Other);
 
-            // CompanionBuilder.BuildAnimation(can, pet, spriteDirectory, fps);
             // wolfyboiai.animationAudioEvents = doggoai.animationAudioEvents;
         }
     }
