@@ -147,6 +147,7 @@
     <Compile Include="src\Cwaff-Guns\PaintballGun.cs"/>
     <Compile Include="src\Cwaff-Guns\SpinCycle.cs"/>
     <Compile Include="src\Cwaff-Guns\Telefragger.cs"/>
+    <Compile Include="src\Cwaff-Misc\CwaffTweaks.cs"/>
     <Compile Include="src\Cwaff-Misc\SoulLinkStatusEffect.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\SimpleToolbox.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\ProjSpawnHelper.cs"/>
