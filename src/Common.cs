@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
+using System.ComponentModel;  //debug
 
 using UnityEngine;
 using Gungeon;
@@ -129,6 +130,62 @@ namespace CwaffingTheGungy
 
             ETGModConsole.Log("Lazy Initialized Passive: "+baseItemName);
             return item;
+        }
+    }
+    public static class Dissect
+    {
+        public static void DumpComponents(this GameObject g)
+        {
+            foreach (var c in g.GetComponents(typeof(object)))
+            {
+                ETGModConsole.Log("  "+c.GetType().Name);
+            }
+
+        }
+
+        public static void DumpFieldsAndProperties<T>(T o)
+        {
+            // Type type = o.GetType();
+            Type type = typeof(T);
+            foreach (var f in type.GetFields()) {
+                Console.WriteLine(
+                    String.Format("field {0} = {1}", f.Name, f.GetValue(o)));
+            }
+            foreach(PropertyDescriptor d in TypeDescriptor.GetProperties(o))
+            {
+                string name = d.Name;
+                object value = d.GetValue(o);
+                Console.WriteLine(" prop {0} = {1}", name, value);
+            }
+        }
+
+        public static void CompareFieldsAndProperties<T>(T o1, T o2)
+        {
+            // Type type = o.GetType();
+            Type type = typeof(T);
+            foreach (var f in type.GetFields()) {
+                if (f.GetValue(o1) == null)
+                {
+                    if (f.GetValue(o2) == null)
+                        continue;
+                }
+                else if (f.GetValue(o2) != null && f.GetValue(o1).Equals(f.GetValue(o2)))
+                    continue;
+                Console.WriteLine(
+                    String.Format("field {0} = {1} -> {2}", f.Name, f.GetValue(o1), f.GetValue(o2)));
+            }
+            foreach(PropertyDescriptor f in TypeDescriptor.GetProperties(o1))
+            {
+                if (f.GetValue(o1) == null)
+                {
+                    if (f.GetValue(o2) == null)
+                        continue;
+                }
+                else if (f.GetValue(o2) != null && f.GetValue(o1).Equals(f.GetValue(o2)))
+                    continue;
+                string name = f.Name;
+                Console.WriteLine(" prop {0} = {1} -> {2}", name, f.GetValue(o1), f.GetValue(o2));
+            }
         }
     }
 }

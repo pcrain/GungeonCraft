@@ -848,6 +848,9 @@ namespace CwaffingTheGungy
 
                 // KillUnlockHandler.Init();
 
+                //Misc. Tweaks
+                CwaffTweaks.Init();
+
                 // ETGModConsole.Commands.AddUnit("nndebugflow", (args) => { DungeonHandler.debugFlow = !DungeonHandler.debugFlow; string status = DungeonHandler.debugFlow ? "enabled" : "disabled"; string color = DungeonHandler.debugFlow ? "00FF00" : "FF0000"; ETGModConsole.Log($"OMITB flow {status}", false); });
 
                 ETGMod.StartGlobalCoroutine(this.delayedstarthandler());
