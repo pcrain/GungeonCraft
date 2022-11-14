@@ -40,6 +40,15 @@ namespace CwaffingTheGungy
             UnityEngine.Object.DontDestroyOnLoad(VFXScapegoat);
             UnityEngine.Object.DontDestroyOnLoad(OverheadVFXCollection);
 
+            for (int i = 0; i < 10; ++i)
+            {
+                string istring = i.ToString();
+                // RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/Numbers/"+i.ToString());
+                RegisterVFX<GameObject>(istring, new List<string>() {
+                        "CwaffingTheGungy/Resources/MiscVFX/Numbers/"+i.ToString(),
+                    }, 1, loops: false, anchor: tk2dBaseSprite.Anchor.LowerCenter, persist: true);
+            }
+
             RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/PumpChargeMeter1");
             RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/PumpChargeMeter2");
             RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/PumpChargeMeter3");
@@ -201,12 +210,12 @@ namespace CwaffingTheGungy
 
         public static void ShowOverheadVFX(this GameActor gunOwner, string name, float timeout)
         {
-            gunOwner.StartCoroutine(ShowVFXCoroutine(gunOwner, name, 2));
+            gunOwner.StartCoroutine(ShowVFXCoroutine(gunOwner, name, timeout));
         }
 
         public static void ShowOverheadAnimatedVFX(this GameActor gunOwner, string name, float timeout)
         {
-            gunOwner.StartCoroutine(ShowAnimatedVFXCoroutine(gunOwner, name, 2));
+            gunOwner.StartCoroutine(ShowAnimatedVFXCoroutine(gunOwner, name, timeout));
         }
 
         /// <summary>

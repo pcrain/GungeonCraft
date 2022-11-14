@@ -536,6 +536,7 @@ namespace CwaffingTheGungy
                     Telefragger.Add();
                     Kinsurrection.Add();
                     SpinCycle.Add();
+                    TimingGun.Add();
 
                     // //REVOLVERS
                     // FlayedRevolver.Add();

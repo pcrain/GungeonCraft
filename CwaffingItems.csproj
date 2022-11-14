@@ -141,6 +141,7 @@
     <Compile Include="src\Cwaff-Guns\HeadCannon.cs"/>
     <Compile Include="src\Cwaff-Guns\MasterSword.cs"/>
     <Compile Include="src\Cwaff-Guns\Kinsurrection.cs"/>
+    <Compile Include="src\Cwaff-Guns\TimingGun.cs"/>
     <Compile Include="src\Cwaff-Guns\GasterBlaster.cs"/>
     <Compile Include="src\Cwaff-Guns\_GenericGunReference.cs"/>
     <Compile Include="src\Cwaff-Guns\DerailGun.cs"/>
@@ -1163,6 +1164,16 @@
     <EmbeddedResource Include="Resources\MiscVFX\LeadSoulVFX\leadsouloverhead_006.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\LeadSoulVFX\leadsouloverhead_017.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\LeadSoulVFX\leadsouloverhead_001.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\Numbers\8.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\Numbers\3.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\Numbers\2.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\Numbers\1.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\Numbers\5.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\Numbers\7.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\Numbers\6.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\Numbers\9.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\Numbers\4.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\Numbers\0.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\bigwhitepoof_002.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\RainbowGuonPoofs\greypoof_001.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\RainbowGuonPoofs\brownpoof_004.png"/>
