@@ -125,10 +125,8 @@ namespace CwaffingTheGungy
                 new List<string> {
                     "train_projectile_001",
                     "train_projectile_002",
-                }, 6, true, new List<IntVector2> {
-                    new IntVector2(trainSpriteDiameter, trainSpriteDiameter), //1
-                    new IntVector2(trainSpriteDiameter, trainSpriteDiameter), //2
                 },
+                6, true, new IntVector2(trainSpriteDiameter, trainSpriteDiameter),
                 false, tk2dBaseSprite.Anchor.LowerCenter, true, false);
             train.PenetratesInternalWalls = true;
             train.pierceMinorBreakables   = true;

@@ -163,12 +163,13 @@ namespace CwaffingTheGungy
             proj.sprite.spriteAnimator.deferNextStartClip = false;
         }
         // Simpler version of the above method assuming most elements are repeated
-        public static void AnimateProjectile(this Projectile proj, List<string> names, int fps, bool loops, List<IntVector2> pixelSizes, bool lighteneds, tk2dBaseSprite.Anchor anchors, bool anchorsChangeColliders,
+        public static void AnimateProjectile(this Projectile proj, List<string> names, int fps, bool loops, IntVector2 pixelSizes, bool lighteneds, tk2dBaseSprite.Anchor anchors, bool anchorsChangeColliders,
             bool fixesScales, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null, IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null)
         {
             int n = names.Count;
             proj.AnimateProjectile(
-                names,fps,loops,pixelSizes,
+                names,fps,loops,
+                Enumerable.Repeat(pixelSizes,n).ToList(),
                 Enumerable.Repeat(lighteneds,n).ToList(),
                 Enumerable.Repeat(anchors,n).ToList(),
                 Enumerable.Repeat(anchorsChangeColliders,n).ToList(),

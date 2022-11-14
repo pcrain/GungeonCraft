@@ -130,6 +130,7 @@
     <Compile Include="src\HatClassesThatWereAlsoStolen\Hat.cs"/>
     <Compile Include="src\HatClassesThatWereAlsoStolen\HatDefinitions.cs"/>
     <Compile Include="src\Cwaff-Guns\PopcornGun.cs"/>
+    <Compile Include="src\Cwaff-Guns\KiBlast.cs"/>
     <Compile Include="src\Cwaff-Guns\Nug.cs"/>
     <Compile Include="src\Cwaff-Guns\RainCheck.cs"/>
     <Compile Include="src\Cwaff-Guns\Natasha.cs"/>

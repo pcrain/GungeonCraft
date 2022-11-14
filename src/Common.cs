@@ -39,7 +39,8 @@ namespace CwaffingTheGungy
             else
                 gun.AddProjectileModuleFrom(projectileName, true, false); //set the gun's default projectile to inherit
             ETGMod.Databases.Items.Add(gun, false, "ANY");  //register the gun in the EtG database
-            IDs.Guns[baseGunName] = gun.PickupObjectId; //register gun in my ID database
+            IDs.Guns[baseGunName] = gun.PickupObjectId; //register gun in gun ID database
+            IDs.Pickups[baseGunName] = gun.PickupObjectId; //register gun in pickup ID database
 
             ETGModConsole.Log("Lazy Initialized Gun: "+baseGunName);
             return gun;
@@ -126,7 +127,8 @@ namespace CwaffingTheGungy
             string baseItemName = newItemName.Replace(" ", "_").ToLower();  //get saner item name for commands
             Gungeon.Game.Items.Add(idPool + ":" + baseItemName, item);
             ETGMod.Databases.Items.Add(item);
-            IDs.Passives[baseItemName] = item.PickupObjectId; //register item in my ID database
+            IDs.Passives[baseItemName] = item.PickupObjectId; //register item in passive ID database
+            IDs.Pickups[baseItemName] = item.PickupObjectId; //register item in pickup ID database
 
             ETGModConsole.Log("Lazy Initialized Passive: "+baseItemName);
             return item;
@@ -159,7 +161,8 @@ namespace CwaffingTheGungy
             string baseItemName = newItemName.Replace(" ", "_").ToLower();  //get saner item name for commands
             Gungeon.Game.Items.Add(idPool + ":" + baseItemName, item);
             ETGMod.Databases.Items.Add(item);
-            IDs.Actives[baseItemName] = item.PickupObjectId; //register item in my ID database
+            IDs.Actives[baseItemName] = item.PickupObjectId; //register item in active ID database
+            IDs.Pickups[baseItemName] = item.PickupObjectId; //register item in pickup ID database
 
             ETGModConsole.Log("Lazy Initialized Active: "+baseItemName);
             return item;

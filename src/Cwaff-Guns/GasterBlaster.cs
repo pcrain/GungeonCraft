@@ -138,9 +138,7 @@ namespace CwaffingTheGungy
             blaster.AnimateProjectile(
                 new List<string> {
                     "gaster_blaster",
-                }, 6, true, new List<IntVector2> {
-                    new IntVector2(48, 36), //1
-                },
+                }, 6, true, new IntVector2(48, 36),
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, false);
 
 

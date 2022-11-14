@@ -14,7 +14,7 @@ namespace CwaffingTheGungy
     {
         public static string passiveName      = "Shine";
         public static string spritePath       = "CwaffingTheGungy/Resources/NeoItemSprites/88888888_icon";
-        public static string shortDescription = "Blip Blip";
+        public static string shortDescription = "That Ain't Falco";
         public static string longDescription  = "(Melee)";
 
         private static StatModifier noSpeed;
