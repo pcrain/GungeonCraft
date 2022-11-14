@@ -32,6 +32,7 @@ namespace CwaffingTheGungy
         {
             Gun gun = Lazy.InitGunFromStrings(gunName, spriteName, projectileName, shortDescription, longDescription);
             var comp = gun.gameObject.AddComponent<KiBlast>();
+            comp.preventNormalReloadAudio = true;
             comp.preventNormalFireAudio = true;
             comp.overrideNormalFireAudio = "Play_WPN_Vorpal_Shot_Critical_01";
 
@@ -40,6 +41,7 @@ namespace CwaffingTheGungy
             gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
             gun.DefaultModule.cooldownTime        = 0.1f;
             gun.DefaultModule.numberOfShotsInClip = 99999;
+            gun.reloadTime                        = 0f;
             gun.quality                           = PickupObject.ItemQuality.D;
             gun.InfiniteAmmo                      = true;
             gun.SetBaseMaxAmmo(99999);
@@ -57,6 +59,19 @@ namespace CwaffingTheGungy
             blast.gameObject.AddComponent<KiBlastBehavior>();
 
             vfx = VFX.CreatePoolFromVFXGameObject((PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
+        }
+
+        public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
+        {
+            base.OnReloadPressed(player, gun, manualReload);
+            for (int i = 0; i < StaticReferenceManager.AllProjectiles.Count; i++)
+            {
+                Projectile p = StaticReferenceManager.AllProjectiles[i];
+                KiBlastBehavior k = p.GetComponent<KiBlastBehavior>();
+                if (k == null || (!k.reflected))
+                    continue;
+                k.ReturnToPlayer(player);
+            }
         }
 
         protected override void Update()
@@ -104,6 +119,8 @@ namespace CwaffingTheGungy
         private static float maxAngleVariance  = 60f;
         private static float minSpeed = 15.0f;
 
+        public bool reflected = false;
+
         private Projectile m_projectile;
         private PlayerController m_owner;
         private Vector2 targetPos;
@@ -139,7 +156,7 @@ namespace CwaffingTheGungy
             }
         }
 
-        private void SetNewTarget(Vector2 target, float secsToReachTarget)
+        public void SetNewTarget(Vector2 target, float secsToReachTarget)
         {
             this.lifetime = 0;
             this.targetPos = target;
@@ -156,18 +173,40 @@ namespace CwaffingTheGungy
 
         private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
         {
-            AIActor enemy = otherRigidbody.GetComponent<AIActor>();
+            if (!this.reflected)
+            {
+                AIActor enemy = otherRigidbody.GetComponent<AIActor>();
+                if (enemy == null)
+                    return;
+                PhysicsEngine.SkipCollision = true;
+
+                Projectile p = this.m_projectile;
+                p.AdjustPlayerProjectileTint(Color.red, 2, 0.1f);
+                p.Owner = enemy;
+                p.collidesWithPlayer = true;
+                p.collidesWithEnemies = false;
+                this.reflected = true;
+
+                AkSoundEngine.PostEvent("Play_WPN_Vorpal_Shot_Critical_01", enemy.gameObject);
+                SetNewTarget(this.m_owner.sprite.WorldCenter, this.timeToReachTarget);
+            }
+        }
+
+        public void ReturnToPlayer(PlayerController player)
+        {
+            if (!this.reflected)
+                return;
+            Projectile p = this.m_projectile;
+            AIActor enemy = p.Owner as AIActor;
             if (enemy == null)
                 return;
-            PhysicsEngine.SkipCollision = true;
-
-            Projectile p = this.m_projectile;
-            p.AdjustPlayerProjectileTint(Color.red, 2, 0.1f);
-            p.Owner = enemy;
-            p.collidesWithPlayer = true;
-            p.collidesWithEnemies = false;
+            p.Owner = player;
+            p.AdjustPlayerProjectileTint(Color.green, 2, 0.1f);
+            p.collidesWithPlayer = false;
+            p.collidesWithEnemies = true;
+            this.reflected = false;
             AkSoundEngine.PostEvent("Play_WPN_Vorpal_Shot_Critical_01", enemy.gameObject);
-            SetNewTarget(this.m_owner.sprite.WorldCenter, this.timeToReachTarget);
+            SetNewTarget(enemy.sprite.WorldCenter, this.timeToReachTarget);
         }
 
         private void Update()
@@ -180,6 +219,11 @@ namespace CwaffingTheGungy
                 float newAngle = this.targetAngle + inflection * this.angleVariance;
                 this.m_projectile.SendInDirection(Lazy.AngleToVector(newAngle), true);
             }
+            this.m_projectile.HasDefaultTint = true;
+            if (this.m_projectile.Owner == this.m_owner)
+               this.m_projectile.DefaultTintColor = Color.green;
+           else
+               this.m_projectile.DefaultTintColor = Color.red;
         }
     }
 }
