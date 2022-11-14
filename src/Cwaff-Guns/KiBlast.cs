@@ -36,18 +36,16 @@ namespace CwaffingTheGungy
             comp.overrideNormalFireAudio = "Play_WPN_Vorpal_Shot_Critical_01";
 
             gun.gunSwitchGroup                    = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup;
-            gun.DefaultModule.ammoCost            = 1;
             gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
             gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
-            gun.reloadTime                        = 1.1f;
             gun.DefaultModule.cooldownTime        = 0.1f;
-            gun.DefaultModule.numberOfShotsInClip = 250;
+            gun.DefaultModule.numberOfShotsInClip = 99999;
             gun.quality                           = PickupObject.ItemQuality.D;
-            gun.SetBaseMaxAmmo(250);
+            gun.InfiniteAmmo                      = true;
+            gun.SetBaseMaxAmmo(99999);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
 
-
-            Projectile blast       = Lazy.PrefabProjectileFromGun(gun);
+            Projectile blast = Lazy.PrefabProjectileFromGun(gun);
             blast.AnimateProjectile(
                 new List<string> {
                     "ki_blast_001",
@@ -56,7 +54,6 @@ namespace CwaffingTheGungy
                     "ki_blast_004",
                 }, 12, true, new IntVector2(16, 16),
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
-
             blast.gameObject.AddComponent<KiBlastBehavior>();
 
             vfx = VFX.CreatePoolFromVFXGameObject((PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
@@ -103,9 +100,9 @@ namespace CwaffingTheGungy
 
     public class KiBlastBehavior : MonoBehaviour
     {
-        private static float secsToReachTarget = 0.5f;
+        private static float defaultSecsToReachTarget = 0.5f;
         private static float maxAngleVariance  = 60f;
-        private static float minSpeed = 5.0f;
+        private static float minSpeed = 15.0f;
 
         private Projectile m_projectile;
         private PlayerController m_owner;
@@ -113,6 +110,8 @@ namespace CwaffingTheGungy
         private float targetAngle;
         private float angleVariance;
         private float lifetime = 0;
+        private float timeToReachTarget;
+        private float actualTimeToReachTarget;
 
         private void Start()
         {
@@ -125,22 +124,56 @@ namespace CwaffingTheGungy
                     this.m_owner.sprite.WorldCenter,
                     this.targetAngle);
 
-                KiBlast k = this.m_owner.CurrentGun.GetComponent<KiBlast>();
-                this.angleVariance = UnityEngine.Random.value*maxAngleVariance*k.nextKiBlastSign;
-                k.nextKiBlastSign *= -1;
+                this.m_projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
 
-                // Make sure the projectile hits the wall in exactly 60 frames
-                float distanceToTarget = Vector2.Distance(this.m_owner.sprite.WorldCenter,this.targetPos);
-                this.m_projectile.baseData.speed = Mathf.Max(distanceToTarget / secsToReachTarget,minSpeed);
-                this.m_projectile.UpdateSpeed();
-                this.m_projectile.SendInDirection(Lazy.AngleToVector(this.targetAngle-this.angleVariance), true);
+                KiBlast k = this.m_owner.CurrentGun.GetComponent<KiBlast>();
+                if (k != null)
+                {
+                    this.angleVariance = UnityEngine.Random.value*maxAngleVariance*k.nextKiBlastSign;
+                    k.nextKiBlastSign *= -1;
+                }
+                else
+                    ETGModConsole.Log("that should never happen o.o");
+
+                SetNewTarget(this.targetPos, defaultSecsToReachTarget);
             }
+        }
+
+        private void SetNewTarget(Vector2 target, float secsToReachTarget)
+        {
+            this.lifetime = 0;
+            this.targetPos = target;
+            this.timeToReachTarget = secsToReachTarget;
+            Vector2 curpos = this.m_projectile.specRigidbody.Position.GetPixelVector2();
+            Vector2 delta  = (this.targetPos-curpos);
+            this.targetAngle = delta.ToAngle();
+            float distanceToTarget = Vector2.Distance(curpos,this.targetPos);
+            this.m_projectile.baseData.speed = Mathf.Max(distanceToTarget / this.timeToReachTarget,minSpeed);
+            this.actualTimeToReachTarget = distanceToTarget / this.m_projectile.baseData.speed;
+            this.m_projectile.UpdateSpeed();
+            this.m_projectile.SendInDirection(Lazy.AngleToVector(this.targetAngle-this.angleVariance), true);
+        }
+
+        private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
+        {
+            AIActor enemy = otherRigidbody.GetComponent<AIActor>();
+            if (enemy == null)
+                return;
+            PhysicsEngine.SkipCollision = true;
+
+            Projectile p = this.m_projectile;
+            p.AdjustPlayerProjectileTint(Color.red, 2, 0.1f);
+            p.Owner = enemy;
+            p.collidesWithPlayer = true;
+            p.collidesWithEnemies = false;
+            AkSoundEngine.PostEvent("Play_WPN_Vorpal_Shot_Critical_01", enemy.gameObject);
+            SetNewTarget(this.m_owner.sprite.WorldCenter, this.timeToReachTarget);
         }
 
         private void Update()
         {
             this.lifetime += BraveTime.DeltaTime;
-            float percentDoneTurning = this.lifetime / secsToReachTarget;
+            float percentDoneTurning = this.lifetime / this.actualTimeToReachTarget;
             if (percentDoneTurning <= 1.0f)
             {
                 float inflection = (2.0f*percentDoneTurning) - 1.0f;
