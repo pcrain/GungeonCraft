@@ -95,7 +95,7 @@ namespace CwaffingTheGungy
             List<bool> fixesScales, List<Vector3?> manualOffsets, List<IntVector2?> overrideColliderPixelSizes, List<IntVector2?> overrideColliderOffsets, List<Projectile> overrideProjectilesToCopyFrom)
         {
             tk2dSpriteAnimationClip clip = new tk2dSpriteAnimationClip();
-            clip.name = "idle";
+            clip.name = names[0]+"_clip";
             clip.fps = fps;
             List<tk2dSpriteAnimationFrame> frames = new List<tk2dSpriteAnimationFrame>();
             for (int i = 0; i < names.Count; i++)
@@ -144,10 +144,29 @@ namespace CwaffingTheGungy
             clip.frames = frames.ToArray();
             return clip;
         }
+        public static tk2dSpriteAnimationClip CreateProjectileAnimation(List<string> names, int fps, bool loops, IntVector2 pixelSizes, bool lighteneds, tk2dBaseSprite.Anchor anchors, bool anchorsChangeColliders,
+            bool fixesScales, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null, IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null)
+        {
+            int n = names.Count;
+            return CreateProjectileAnimation(
+                names,fps,loops,
+                Enumerable.Repeat(pixelSizes,n).ToList(),
+                Enumerable.Repeat(lighteneds,n).ToList(),
+                Enumerable.Repeat(anchors,n).ToList(),
+                Enumerable.Repeat(anchorsChangeColliders,n).ToList(),
+                Enumerable.Repeat(fixesScales,n).ToList(),
+                Enumerable.Repeat<Vector3?>(manualOffsets,n).ToList(),
+                Enumerable.Repeat<IntVector2?>(overrideColliderPixelSizes,n).ToList(),
+                Enumerable.Repeat<IntVector2?>(overrideColliderOffsets,n).ToList(),
+                Enumerable.Repeat<Projectile>(overrideProjectilesToCopyFrom,n).ToList());
+        }
         public static void SetAnimation(this Projectile proj, tk2dSpriteAnimationClip clip)
         {
-            proj.GetAnySprite().SetSprite(
-                clip.frames[0].spriteCollection, clip.frames[0].spriteId);
+            // proj.GetAnySprite().SetSprite(
+            //     clip.frames[0].spriteCollection, clip.frames[0].spriteId);
+            proj.sprite.spriteAnimator.currentClip = clip;
+            // proj.sprite.spriteAnimator.deferNextStartClip = false;
+            // proj.sprite.spriteAnimator.DefaultClipId = proj.sprite.spriteAnimator.Library.GetClipIdByName(clip.name);
         }
         public static void AddAnimation(this Projectile proj, tk2dSpriteAnimationClip clip)
         {

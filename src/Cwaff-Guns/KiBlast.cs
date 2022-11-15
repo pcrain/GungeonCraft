@@ -22,10 +22,12 @@ namespace CwaffingTheGungy
         public static string shortDescription = "Dragunball Z";
         public static string longDescription  = "(dakka)";
 
-        private static float kiReflectRange = 3.0f;
+        public static tk2dSpriteAnimationClip kisprite;
+        public static tk2dSpriteAnimationClip kispritered;
 
         public float nextKiBlastSign = 1;  //1 to deviate right, -1 to deviate left
 
+        private static float kiReflectRange = 3.0f;
         private static VFXPool vfx  = null;
         private PlayerController owner = null;
         private Vector2 currentTarget = Vector2.zero;
@@ -50,7 +52,7 @@ namespace CwaffingTheGungy
             gun.SetAnimationFPS(gun.shootAnimation, 24);
 
             Projectile blast = Lazy.PrefabProjectileFromGun(gun);
-            blast.AnimateProjectile(
+            kisprite = AnimateBullet.CreateProjectileAnimation(
                 new List<string> {
                     "ki_blast_001",
                     "ki_blast_002",
@@ -58,6 +60,18 @@ namespace CwaffingTheGungy
                     "ki_blast_004",
                 }, 12, true, new IntVector2(10, 10),
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
+            blast.AddAnimation(kisprite);
+            kispritered = AnimateBullet.CreateProjectileAnimation(
+                new List<string> {
+                    "ki_blast_red_001",
+                    "ki_blast_red_002",
+                    "ki_blast_red_003",
+                    "ki_blast_red_004",
+                }, 12, true, new IntVector2(10, 10),
+                false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
+            blast.AddAnimation(kispritered);
+            blast.SetAnimation(kisprite);
+
             blast.gameObject.AddComponent<KiBlastBehavior>();
 
             vfx = VFX.CreatePoolFromVFXGameObject((PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
@@ -199,6 +213,7 @@ namespace CwaffingTheGungy
                 p.collidesWithEnemies = false;
                 this.reflected = true;
 
+                p.SetAnimation(KiBlast.kispritered);
                 AkSoundEngine.PostEvent("Play_WPN_Vorpal_Shot_Critical_01", enemy.gameObject);
                 SetNewTarget(this.m_owner.sprite.WorldCenter, this.timeToReachTarget);
             }
@@ -217,6 +232,8 @@ namespace CwaffingTheGungy
             p.collidesWithPlayer = false;
             p.collidesWithEnemies = true;
             this.reflected = false;
+
+            p.SetAnimation(KiBlast.kisprite);
             AkSoundEngine.PostEvent("Play_WPN_Vorpal_Shot_Critical_01", enemy.gameObject);
             SetNewTarget(enemy.sprite.WorldCenter, this.timeToReachTarget);
         }
