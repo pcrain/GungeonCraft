@@ -160,13 +160,11 @@ namespace CwaffingTheGungy
                 Enumerable.Repeat<IntVector2?>(overrideColliderOffsets,n).ToList(),
                 Enumerable.Repeat<Projectile>(overrideProjectilesToCopyFrom,n).ToList());
         }
-        public static void SetAnimation(this Projectile proj, tk2dSpriteAnimationClip clip)
+        public static void SetAnimation(this Projectile proj, tk2dSpriteAnimationClip clip, int frame = -1)
         {
-            // proj.GetAnySprite().SetSprite(
-            //     clip.frames[0].spriteCollection, clip.frames[0].spriteId);
             proj.sprite.spriteAnimator.currentClip = clip;
-            // proj.sprite.spriteAnimator.deferNextStartClip = false;
-            // proj.sprite.spriteAnimator.DefaultClipId = proj.sprite.spriteAnimator.Library.GetClipIdByName(clip.name);
+            if (frame >= 0)
+                proj.sprite.spriteAnimator.SetFrame(frame);
         }
         public static void AddAnimation(this Projectile proj, tk2dSpriteAnimationClip clip)
         {
@@ -183,7 +181,6 @@ namespace CwaffingTheGungy
             }
 
             proj.sprite.spriteAnimator.Library.clips = proj.sprite.spriteAnimator.Library.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
-            // proj.sprite.spriteAnimator.DefaultClipId = proj.sprite.spriteAnimator.Library.GetClipIdByName("idle");
             proj.sprite.spriteAnimator.deferNextStartClip = false;
         }
         public static void AnimateProjectile(this Projectile proj, List<string> names, int fps, bool loops, List<IntVector2> pixelSizes, List<bool> lighteneds, List<tk2dBaseSprite.Anchor> anchors, List<bool> anchorsChangeColliders,

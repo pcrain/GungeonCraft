@@ -71,6 +71,7 @@ namespace CwaffingTheGungy
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
             blast.AddAnimation(kispritered);
             blast.SetAnimation(kisprite);
+            blast.baseData.damage = 4f;
 
             blast.gameObject.AddComponent<KiBlastBehavior>();
 
@@ -155,10 +156,13 @@ namespace CwaffingTheGungy
         private float lifetime = 0;
         private float timeToReachTarget;
         private float actualTimeToReachTarget;
+        private int numReflections = 0;
+        private float startingDamage;
 
         private void Start()
         {
             this.m_projectile = base.GetComponent<Projectile>();
+            this.startingDamage = this.m_projectile.baseData.damage;
             if (this.m_projectile.Owner && this.m_projectile.Owner is PlayerController)
             {
                 this.m_owner      = this.m_projectile.Owner as PlayerController;
@@ -167,7 +171,9 @@ namespace CwaffingTheGungy
                     this.m_owner.sprite.WorldCenter,
                     this.targetAngle);
 
+                this.m_projectile.OnHitEnemy += this.OnHitEnemy;
                 this.m_projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
+                // this.m_projectile.specRigidbody.OnCollision += this.OnCollision;
 
                 KiBlast k = this.m_owner.CurrentGun.GetComponent<KiBlast>();
                 if (k != null)
@@ -178,6 +184,8 @@ namespace CwaffingTheGungy
                 else
                     ETGModConsole.Log("that should never happen o.o");
 
+                AkSoundEngine.PostEvent("ki_blast_sound_stop_all", this.m_projectile.gameObject);
+                AkSoundEngine.PostEvent("ki_blast_sound", this.m_projectile.gameObject);
                 SetNewTarget(this.targetPos, defaultSecsToReachTarget);
             }
         }
@@ -197,28 +205,54 @@ namespace CwaffingTheGungy
             this.m_projectile.SendInDirection(Lazy.AngleToVector(this.targetAngle-this.angleVariance), true);
         }
 
+        private void OnHitEnemy(Projectile self, SpeculativeRigidbody enemy, bool fatal)
+        {
+            if (enemy && enemy.aiActor)
+            {
+                if (fatal)
+                    ETGModConsole.Log("Killed enemy with "+self.baseData.damage+" damage");
+                else
+                    ETGModConsole.Log("Failed to kill enemy with "+self.baseData.damage+" damage");
+            }
+            else
+                ETGModConsole.Log("Failed to HIT enemy with "+self.baseData.damage+" damage");
+
+        }
+
         private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
         {
+            AIActor enemy = otherRigidbody.GetComponent<AIActor>();
+            // Leaving this out for now because I think it's funny if enemies can team kill
+            // if (this.reflected && enemy != null)
+            // {
+            //     PhysicsEngine.SkipCollision = true;
+            //     return;
+            // }
             if (!this.reflected)
             {
-                AIActor enemy = otherRigidbody.GetComponent<AIActor>();
                 if (enemy == null)
                     return;
+
+                if (this.m_projectile.baseData.damage >= enemy.healthHaver.GetCurrentHealth())
+                    return;
+
                 PhysicsEngine.SkipCollision = true;
 
                 Projectile p = this.m_projectile;
-                // p.AdjustPlayerProjectileTint(Color.red, 2, 0.1f);
                 p.Owner = enemy;
                 p.collidesWithPlayer = true;
                 p.collidesWithEnemies = false;
                 this.reflected = true;
 
                 p.SetAnimation(KiBlast.kispritered);
-                AkSoundEngine.PostEvent("Play_WPN_Vorpal_Shot_Critical_01", enemy.gameObject);
+                // AkSoundEngine.PostEvent("Play_WPN_Vorpal_Shot_Critical_01", enemy.gameObject);
+                // AkSoundEngine.PostEvent("ki_blast_return_sound_stop_all", this.m_projectile.gameObject);
+                AkSoundEngine.PostEvent("ki_blast_return_sound", this.m_projectile.gameObject);
                 SetNewTarget(this.m_owner.sprite.WorldCenter, this.timeToReachTarget);
             }
         }
 
+        // TODO: misnomer, we're returning *from* the player
         public void ReturnToPlayer(PlayerController player)
         {
             if (!this.reflected)
@@ -234,7 +268,13 @@ namespace CwaffingTheGungy
             this.reflected = false;
 
             p.SetAnimation(KiBlast.kisprite);
-            AkSoundEngine.PostEvent("Play_WPN_Vorpal_Shot_Critical_01", enemy.gameObject);
+            // AkSoundEngine.PostEvent("Play_WPN_Vorpal_Shot_Critical_01", enemy.gameObject);
+            ++this.numReflections;
+            this.m_projectile.baseData.damage = this.startingDamage*Mathf.Pow(2,this.numReflections);
+            AkSoundEngine.PostEvent("ki_blast_return_sound", this.m_projectile.gameObject);
+            int enemiesToCheck = 10;
+            while (enemy.healthHaver.currentHealth <= 0 && --enemiesToCheck >= 0)
+                enemy = enemy.GetAbsoluteParentRoom().GetRandomActiveEnemy(false);
             SetNewTarget(enemy.sprite.WorldCenter, this.timeToReachTarget);
         }
 
@@ -248,11 +288,6 @@ namespace CwaffingTheGungy
                 float newAngle = this.targetAngle + inflection * this.angleVariance;
                 this.m_projectile.SendInDirection(Lazy.AngleToVector(newAngle), true);
             }
-           //  this.m_projectile.HasDefaultTint = true;
-           //  if (this.m_projectile.Owner == this.m_owner)
-           //     this.m_projectile.DefaultTintColor = Color.green;
-           // else
-           //     this.m_projectile.DefaultTintColor = Color.red;
         }
     }
 }
