@@ -22,6 +22,8 @@ namespace CwaffingTheGungy
         public static string shortDescription = "Dragunball Z";
         public static string longDescription  = "(dakka)";
 
+        private static float kiReflectRange = 3.0f;
+
         public float nextKiBlastSign = 1;  //1 to deviate right, -1 to deviate left
 
         private static VFXPool vfx  = null;
@@ -54,7 +56,7 @@ namespace CwaffingTheGungy
                     "ki_blast_002",
                     "ki_blast_003",
                     "ki_blast_004",
-                }, 12, true, new IntVector2(16, 16),
+                }, 12, true, new IntVector2(10, 10),
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
             blast.gameObject.AddComponent<KiBlastBehavior>();
 
@@ -64,14 +66,24 @@ namespace CwaffingTheGungy
         public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
         {
             base.OnReloadPressed(player, gun, manualReload);
+            float closestDistance = 999f;
+            KiBlastBehavior closestBlast = null;
             for (int i = 0; i < StaticReferenceManager.AllProjectiles.Count; i++)
             {
                 Projectile p = StaticReferenceManager.AllProjectiles[i];
                 KiBlastBehavior k = p.GetComponent<KiBlastBehavior>();
                 if (k == null || (!k.reflected))
                     continue;
-                k.ReturnToPlayer(player);
+                float distanceToPlayer = Vector2.Distance(player.sprite.WorldCenter,p.sprite.WorldCenter);
+                if (distanceToPlayer > kiReflectRange)
+                    continue;
+                if (distanceToPlayer > closestDistance)
+                    continue;
+                closestDistance = distanceToPlayer;
+                closestBlast = k;
             }
+            if (closestBlast != null)
+                closestBlast.ReturnToPlayer(player);
         }
 
         protected override void Update()
@@ -181,7 +193,7 @@ namespace CwaffingTheGungy
                 PhysicsEngine.SkipCollision = true;
 
                 Projectile p = this.m_projectile;
-                p.AdjustPlayerProjectileTint(Color.red, 2, 0.1f);
+                // p.AdjustPlayerProjectileTint(Color.red, 2, 0.1f);
                 p.Owner = enemy;
                 p.collidesWithPlayer = true;
                 p.collidesWithEnemies = false;
@@ -201,7 +213,7 @@ namespace CwaffingTheGungy
             if (enemy == null)
                 return;
             p.Owner = player;
-            p.AdjustPlayerProjectileTint(Color.green, 2, 0.1f);
+            // p.AdjustPlayerProjectileTint(Color.green, 2, 0.1f);
             p.collidesWithPlayer = false;
             p.collidesWithEnemies = true;
             this.reflected = false;
@@ -219,11 +231,11 @@ namespace CwaffingTheGungy
                 float newAngle = this.targetAngle + inflection * this.angleVariance;
                 this.m_projectile.SendInDirection(Lazy.AngleToVector(newAngle), true);
             }
-            this.m_projectile.HasDefaultTint = true;
-            if (this.m_projectile.Owner == this.m_owner)
-               this.m_projectile.DefaultTintColor = Color.green;
-           else
-               this.m_projectile.DefaultTintColor = Color.red;
+           //  this.m_projectile.HasDefaultTint = true;
+           //  if (this.m_projectile.Owner == this.m_owner)
+           //     this.m_projectile.DefaultTintColor = Color.green;
+           // else
+           //     this.m_projectile.DefaultTintColor = Color.red;
         }
     }
 }

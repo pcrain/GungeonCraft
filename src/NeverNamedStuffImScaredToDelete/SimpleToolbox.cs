@@ -91,7 +91,7 @@ namespace CwaffingTheGungy
     }
     public static class AnimateBullet//----------------------------------------------------------------------------------------------
     {
-        public static void AnimateProjectile(this Projectile proj, List<string> names, int fps, bool loops, List<IntVector2> pixelSizes, List<bool> lighteneds, List<tk2dBaseSprite.Anchor> anchors, List<bool> anchorsChangeColliders,
+        public static tk2dSpriteAnimationClip CreateProjectileAnimation(List<string> names, int fps, bool loops, List<IntVector2> pixelSizes, List<bool> lighteneds, List<tk2dBaseSprite.Anchor> anchors, List<bool> anchorsChangeColliders,
             List<bool> fixesScales, List<Vector3?> manualOffsets, List<IntVector2?> overrideColliderPixelSizes, List<IntVector2?> overrideColliderOffsets, List<Projectile> overrideProjectilesToCopyFrom)
         {
             tk2dSpriteAnimationClip clip = new tk2dSpriteAnimationClip();
@@ -139,28 +139,43 @@ namespace CwaffingTheGungy
                 def.position1 += manualOffset.Value;
                 def.position2 += manualOffset.Value;
                 def.position3 += manualOffset.Value;
-                if (i == 0)
-                {
-                    proj.GetAnySprite().SetSprite(frame.spriteCollection, frame.spriteId);
-                }
             }
             clip.wrapMode = loops ? tk2dSpriteAnimationClip.WrapMode.Loop : tk2dSpriteAnimationClip.WrapMode.Once;
             clip.frames = frames.ToArray();
+            return clip;
+        }
+        public static void SetAnimation(this Projectile proj, tk2dSpriteAnimationClip clip)
+        {
+            proj.GetAnySprite().SetSprite(
+                clip.frames[0].spriteCollection, clip.frames[0].spriteId);
+        }
+        public static void AddAnimation(this Projectile proj, tk2dSpriteAnimationClip clip)
+        {
             if (proj.sprite.spriteAnimator == null)
             {
                 proj.sprite.spriteAnimator = proj.sprite.gameObject.AddComponent<tk2dSpriteAnimator>();
             }
             proj.sprite.spriteAnimator.playAutomatically = true;
-            bool flag = proj.sprite.spriteAnimator.Library == null;
-            if (flag)
+            if (proj.sprite.spriteAnimator.Library == null)
             {
                 proj.sprite.spriteAnimator.Library = proj.sprite.spriteAnimator.gameObject.AddComponent<tk2dSpriteAnimation>();
                 proj.sprite.spriteAnimator.Library.clips = new tk2dSpriteAnimationClip[0];
                 proj.sprite.spriteAnimator.Library.enabled = true;
             }
+
             proj.sprite.spriteAnimator.Library.clips = proj.sprite.spriteAnimator.Library.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
-            proj.sprite.spriteAnimator.DefaultClipId = proj.sprite.spriteAnimator.Library.GetClipIdByName("idle");
+            // proj.sprite.spriteAnimator.DefaultClipId = proj.sprite.spriteAnimator.Library.GetClipIdByName("idle");
             proj.sprite.spriteAnimator.deferNextStartClip = false;
+        }
+        public static void AnimateProjectile(this Projectile proj, List<string> names, int fps, bool loops, List<IntVector2> pixelSizes, List<bool> lighteneds, List<tk2dBaseSprite.Anchor> anchors, List<bool> anchorsChangeColliders,
+            List<bool> fixesScales, List<Vector3?> manualOffsets, List<IntVector2?> overrideColliderPixelSizes, List<IntVector2?> overrideColliderOffsets, List<Projectile> overrideProjectilesToCopyFrom)
+        {
+            tk2dSpriteAnimationClip clip = CreateProjectileAnimation(
+                names, fps, loops, pixelSizes, lighteneds, anchors, anchorsChangeColliders,
+                fixesScales, manualOffsets, overrideColliderPixelSizes, overrideColliderOffsets,
+                overrideProjectilesToCopyFrom);
+            proj.AddAnimation(clip);
+            proj.SetAnimation(clip);
         }
         // Simpler version of the above method assuming most elements are repeated
         public static void AnimateProjectile(this Projectile proj, List<string> names, int fps, bool loops, IntVector2 pixelSizes, bool lighteneds, tk2dBaseSprite.Anchor anchors, bool anchorsChangeColliders,
