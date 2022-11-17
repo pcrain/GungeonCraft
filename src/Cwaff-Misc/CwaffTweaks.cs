@@ -19,12 +19,21 @@ namespace CwaffingTheGungy
             GetDogPettingAnimation();
 
             string[] testPet = new string[] {
-                "CwaffingTheGungy/Resources/Companions/DroneCompanion/drone_idle_001", //0
-                "CwaffingTheGungy/Resources/Companions/DroneCompanion/drone_idle_002", //1
-                "CwaffingTheGungy/Resources/Companions/DroneCompanion/drone_idle_003", //2
-                "CwaffingTheGungy/Resources/Companions/DroneCompanion/drone_idle_004", //3
-                "CwaffingTheGungy/Resources/Companions/DroneCompanion/drone_idle_005", //4
-                "CwaffingTheGungy/Resources/Companions/DroneCompanion/drone_idle_006", //5
+                "CwaffingTheGungy/Resources/Companions/Wolf/wolf_pet_001",
+                "CwaffingTheGungy/Resources/Companions/Wolf/wolf_pet_002",
+                "CwaffingTheGungy/Resources/Companions/Wolf/wolf_pet_003",
+                "CwaffingTheGungy/Resources/Companions/Wolf/wolf_pet_004",
+                "CwaffingTheGungy/Resources/Companions/Wolf/wolf_pet_005",
+                "CwaffingTheGungy/Resources/Companions/Wolf/wolf_pet_006",
+            };
+
+            string[] testPet2 = new string[] {
+                "CwaffingTheGungy/Resources/Companions/Wolf/wolf_pet_left_001",
+                "CwaffingTheGungy/Resources/Companions/Wolf/wolf_pet_left_002",
+                "CwaffingTheGungy/Resources/Companions/Wolf/wolf_pet_left_003",
+                "CwaffingTheGungy/Resources/Companions/Wolf/wolf_pet_left_004",
+                "CwaffingTheGungy/Resources/Companions/Wolf/wolf_pet_left_005",
+                "CwaffingTheGungy/Resources/Companions/Wolf/wolf_pet_left_006",
             };
 
             //Make Wolf pettable
@@ -35,7 +44,7 @@ namespace CwaffingTheGungy
             foreach(string c in defaultCompanions)
             {
                 ETGModConsole.Log("Making "+c+" pettable");
-                Gungeon.Game.Items[c].GetComponent<CompanionItem>().MakePettable(testPet);
+                Gungeon.Game.Items[c].GetComponent<CompanionItem>().MakePettable(testPet,testPet2);
             }
         }
 
@@ -54,7 +63,7 @@ namespace CwaffingTheGungy
             }
         }
 
-        public static void MakePettable(this CompanionItem ci, string[] pettingAnimation = null)
+        public static void MakePettable(this CompanionItem ci, string[] pettingAnimation = null, string[] pettingAnimationLeft = null)
         {
             // Get the companion controller for the companion
             CompanionController cc =
@@ -66,11 +75,42 @@ namespace CwaffingTheGungy
             // Give it a petting animation
             if (pettingAnimation != null)
             {
-                List<int> animIndices = new List<int>{};
+                List<int> animIndicesRight = new List<int>{};
                 for (int i = 0; i < pettingAnimation.Length; i++)
-                    animIndices.Add(SpriteBuilder.AddSpriteToCollection(pettingAnimation[i], cc.sprite.Collection));
-                SpriteBuilder.AddAnimation(cc.sprite.spriteAnimator, cc.sprite.Collection, animIndices,
-                    "pet", tk2dSpriteAnimationClip.WrapMode.Loop).fps = 8f;
+                    animIndicesRight.Add(SpriteBuilder.AddSpriteToCollection(pettingAnimation[i], cc.sprite.Collection));
+                tk2dSpriteAnimationClip anim_right = SpriteBuilder.AddAnimation(cc.sprite.spriteAnimator, cc.sprite.Collection, animIndicesRight,
+                    "pet_right", tk2dSpriteAnimationClip.WrapMode.Loop);
+                anim_right.fps = 8f;
+
+               List<int> animIndicesLeft = new List<int>{};
+                for (int i = 0; i < pettingAnimationLeft.Length; i++)
+                    animIndicesLeft.Add(SpriteBuilder.AddSpriteToCollection(pettingAnimationLeft[i], cc.sprite.Collection));
+                tk2dSpriteAnimationClip anim_left = SpriteBuilder.AddAnimation(cc.sprite.spriteAnimator, cc.sprite.Collection, animIndicesLeft,
+                    "pet_left", tk2dSpriteAnimationClip.WrapMode.Loop);
+                anim_left.fps = 8f;
+
+                // BIG TODO: figure out why mirroring doesn't work for sprites loaded from the same path
+                AIAnimator.NamedDirectionalAnimation newOtheranim = new AIAnimator.NamedDirectionalAnimation
+                {
+                    name = "pet",
+                    anim = new DirectionalAnimation
+                    {
+                        Prefix = "pet",
+                        Type = DirectionalAnimation.DirectionType.TwoWayHorizontal,
+                        Flipped = new DirectionalAnimation.FlipType[]{
+                            DirectionalAnimation.FlipType.None,
+                            DirectionalAnimation.FlipType.None,
+                            // DirectionalAnimation.FlipType.Mirror,
+                            // DirectionalAnimation.FlipType.Mirror,
+                        },
+                        AnimNames = new string[2]{"pet_right","pet_left"},
+                    }
+                };
+
+                if (cc.sprite.aiAnimator.OtherAnimations == null)
+                    cc.sprite.aiAnimator.OtherAnimations = new List<AIAnimator.NamedDirectionalAnimation>();
+                cc.sprite.aiAnimator.OtherAnimations.Add(newOtheranim);
+
             }
             else //...or just copy it from the dog while testing
             {

@@ -132,6 +132,8 @@ namespace CwaffingTheGungy
                 return true; //true == exclude projectiles
             if (s.GetComponent<MinorBreakable>() != null)
                 return true; //true == exclude minor breakables
+            if (s.GetComponent<MajorBreakable>() != null)
+                return true; //true == exclude major breakables
             if (s.GetComponent<FlippableCover>() != null)
                 return true; //true == exclude tables
             return false; //false == don't exclude
@@ -158,8 +160,8 @@ namespace CwaffingTheGungy
         private static float defaultSecsToReachTarget = 0.5f;
         private static float maxAngleVariance  = 60f;
         private static float minSpeed = 15.0f;
-
-        public bool reflected = false;
+        private static float minReflectableLifetime = 0.4f;
+        private static SlashData basicSlashData = null;
 
         private Projectile m_projectile;
         private PlayerController m_owner;
@@ -167,14 +169,19 @@ namespace CwaffingTheGungy
         private float targetAngle;
         private float angleVariance;
         private float lifetime = 0;
+        private float timeSinceLastReflect = 0;
         private float timeToReachTarget;
         private float actualTimeToReachTarget;
         private int numReflections = 0;
         private float startingDamage;
         private float scaling = 1.5f;
 
+        public bool reflected = false;
+
         private void Start()
         {
+            if (basicSlashData == null)
+                basicSlashData = new SlashData();
             this.m_projectile = base.GetComponent<Projectile>();
             this.startingDamage = this.m_projectile.baseData.damage;
             if (this.m_projectile.Owner && this.m_projectile.Owner is PlayerController)
@@ -250,6 +257,9 @@ namespace CwaffingTheGungy
                 if (this.m_projectile.baseData.damage >= enemy.healthHaver.GetCurrentHealth())
                     return;
 
+                if (this.timeSinceLastReflect < minReflectableLifetime)
+                    return; //don't want enemies to just be able to spam reflect
+
                 // Apply damage to the enemy
                 enemy.healthHaver.ApplyDamage(this.m_projectile.baseData.damage, this.m_projectile.Direction, "Ki Blast",
                     CoreDamageTypes.None, DamageCategory.Collision,
@@ -302,6 +312,7 @@ namespace CwaffingTheGungy
             trail.UpdateTrail();
             // AkSoundEngine.PostEvent("Play_WPN_Vorpal_Shot_Critical_01", enemy.gameObject);
             ++this.numReflections;
+            this.timeSinceLastReflect = 0.0f;
             this.m_projectile.baseData.damage = this.startingDamage*Mathf.Pow(this.scaling,this.numReflections);
             AkSoundEngine.PostEvent("ki_blast_return_sound_stop_all", this.m_projectile.gameObject);
             AkSoundEngine.PostEvent("ki_blast_sound_stop_all", this.m_projectile.gameObject);
@@ -314,12 +325,14 @@ namespace CwaffingTheGungy
                 player.sprite.WorldCenter,
                 (enemy.sprite.WorldCenter-player.sprite.WorldCenter).ToAngle(),
                 p.Owner,
-                new SlashData());
+                basicSlashData);
         }
 
         private void Update()
         {
-            this.lifetime += BraveTime.DeltaTime;
+            float deltatime = BraveTime.DeltaTime;
+            this.lifetime += deltatime;
+            this.timeSinceLastReflect += deltatime;
             float percentDoneTurning = this.lifetime / this.actualTimeToReachTarget;
             if (percentDoneTurning <= 1.0f)
             {
