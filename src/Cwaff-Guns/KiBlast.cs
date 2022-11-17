@@ -58,7 +58,7 @@ namespace CwaffingTheGungy
                     "ki_blast_002",
                     "ki_blast_003",
                     "ki_blast_004",
-                }, 12, true, new IntVector2(10, 10),
+                }, 12, true, new IntVector2(8, 8),
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
             blast.AddAnimation(kisprite);
             kispritered = AnimateBullet.CreateProjectileAnimation(
@@ -67,13 +67,22 @@ namespace CwaffingTheGungy
                     "ki_blast_red_002",
                     "ki_blast_red_003",
                     "ki_blast_red_004",
-                }, 12, true, new IntVector2(10, 10),
+                }, 12, true, new IntVector2(8, 8),
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
             blast.AddAnimation(kispritered);
             blast.SetAnimation(kisprite);
             blast.baseData.damage = 4f;
+            blast.ignoreDamageCaps = true;
 
             blast.gameObject.AddComponent<KiBlastBehavior>();
+
+            EasyTrailBullet trail = blast.gameObject.AddComponent<EasyTrailBullet>();
+            trail.TrailPos = trail.transform.position;
+            trail.StartWidth = 0.2f;
+            trail.EndWidth = 0f;
+            trail.LifeTime = 0.1f;
+            trail.BaseColor = Color.cyan;
+            trail.EndColor = Color.cyan;
 
             vfx = VFX.CreatePoolFromVFXGameObject((PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
         }
@@ -115,12 +124,16 @@ namespace CwaffingTheGungy
 
         private static RaycastResult hit;
 
-        private static bool ExcludePlayersAndProjectilesFromRaycasting(SpeculativeRigidbody s)
+        private static bool ExcludeAllButWallsAndEnemiesFromRaycasting(SpeculativeRigidbody s)
         {
             if (s.GetComponent<PlayerController>() != null)
                 return true; //true == exclude players
             if (s.GetComponent<Projectile>() != null)
                 return true; //true == exclude projectiles
+            if (s.GetComponent<MinorBreakable>() != null)
+                return true; //true == exclude minor breakables
+            if (s.GetComponent<FlippableCover>() != null)
+                return true; //true == exclude tables
             return false; //false == don't exclude
         }
 
@@ -128,7 +141,7 @@ namespace CwaffingTheGungy
         {
             if (PhysicsEngine.Instance.Raycast(
               pos+Lazy.AngleToVector(angle,minDistance), Lazy.AngleToVector(angle), 200, out hit,
-              rigidbodyExcluder: ExcludePlayersAndProjectilesFromRaycasting))
+              rigidbodyExcluder: ExcludeAllButWallsAndEnemiesFromRaycasting))
                 return hit.Contact;
             return pos+Lazy.AngleToVector(angle,minDistance);
         }
@@ -158,6 +171,7 @@ namespace CwaffingTheGungy
         private float actualTimeToReachTarget;
         private int numReflections = 0;
         private float startingDamage;
+        private float scaling = 1.5f;
 
         private void Start()
         {
@@ -184,6 +198,7 @@ namespace CwaffingTheGungy
                 else
                     ETGModConsole.Log("that should never happen o.o");
 
+                AkSoundEngine.PostEvent("ki_blast_return_sound_stop_all", this.m_projectile.gameObject);
                 AkSoundEngine.PostEvent("ki_blast_sound_stop_all", this.m_projectile.gameObject);
                 AkSoundEngine.PostEvent("ki_blast_sound", this.m_projectile.gameObject);
                 SetNewTarget(this.targetPos, defaultSecsToReachTarget);
@@ -207,16 +222,15 @@ namespace CwaffingTheGungy
 
         private void OnHitEnemy(Projectile self, SpeculativeRigidbody enemy, bool fatal)
         {
-            if (enemy && enemy.aiActor)
-            {
-                if (fatal)
-                    ETGModConsole.Log("Killed enemy with "+self.baseData.damage+" damage");
-                else
-                    ETGModConsole.Log("Failed to kill enemy with "+self.baseData.damage+" damage");
-            }
-            else
-                ETGModConsole.Log("Failed to HIT enemy with "+self.baseData.damage+" damage");
-
+            // if (enemy && enemy.aiActor)
+            // {
+            //     if (fatal)
+            //         ETGModConsole.Log("Killed enemy with "+self.baseData.damage+" damage");
+            //     else
+            //         ETGModConsole.Log("Failed to kill enemy with "+self.baseData.damage+" damage");
+            // }
+            // else
+            //     ETGModConsole.Log("Failed to HIT enemy with "+self.baseData.damage+" damage");
         }
 
         private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
@@ -236,17 +250,31 @@ namespace CwaffingTheGungy
                 if (this.m_projectile.baseData.damage >= enemy.healthHaver.GetCurrentHealth())
                     return;
 
+                // Apply damage to the enemy
+                enemy.healthHaver.ApplyDamage(this.m_projectile.baseData.damage, this.m_projectile.Direction, "Ki Blast",
+                    CoreDamageTypes.None, DamageCategory.Collision,
+                    false, null, true);
+                enemy.healthHaver.knockbackDoer.ApplyKnockback(this.m_projectile.Direction, this.m_projectile.baseData.force);
+
+                // Skip the normal collision
                 PhysicsEngine.SkipCollision = true;
 
+                // Make the projectile belong to the enemy and return it towards the player
                 Projectile p = this.m_projectile;
                 p.Owner = enemy;
                 p.collidesWithPlayer = true;
                 p.collidesWithEnemies = false;
                 this.reflected = true;
 
+                // Update sounds and animations
                 p.SetAnimation(KiBlast.kispritered);
+                EasyTrailBullet trail = p.gameObject.GetComponent<EasyTrailBullet>();
+                trail.BaseColor = Color.red;
+                trail.EndColor = Color.red;
+                trail.UpdateTrail();
                 // AkSoundEngine.PostEvent("Play_WPN_Vorpal_Shot_Critical_01", enemy.gameObject);
-                // AkSoundEngine.PostEvent("ki_blast_return_sound_stop_all", this.m_projectile.gameObject);
+                AkSoundEngine.PostEvent("ki_blast_return_sound_stop_all", this.m_projectile.gameObject);
+                AkSoundEngine.PostEvent("ki_blast_sound_stop_all", this.m_projectile.gameObject);
                 AkSoundEngine.PostEvent("ki_blast_return_sound", this.m_projectile.gameObject);
                 SetNewTarget(this.m_owner.sprite.WorldCenter, this.timeToReachTarget);
             }
@@ -268,14 +296,25 @@ namespace CwaffingTheGungy
             this.reflected = false;
 
             p.SetAnimation(KiBlast.kisprite);
+            EasyTrailBullet trail = p.gameObject.GetComponent<EasyTrailBullet>();
+            trail.BaseColor = Color.cyan;
+            trail.EndColor = Color.cyan;
+            trail.UpdateTrail();
             // AkSoundEngine.PostEvent("Play_WPN_Vorpal_Shot_Critical_01", enemy.gameObject);
             ++this.numReflections;
-            this.m_projectile.baseData.damage = this.startingDamage*Mathf.Pow(2,this.numReflections);
+            this.m_projectile.baseData.damage = this.startingDamage*Mathf.Pow(this.scaling,this.numReflections);
+            AkSoundEngine.PostEvent("ki_blast_return_sound_stop_all", this.m_projectile.gameObject);
+            AkSoundEngine.PostEvent("ki_blast_sound_stop_all", this.m_projectile.gameObject);
             AkSoundEngine.PostEvent("ki_blast_return_sound", this.m_projectile.gameObject);
             int enemiesToCheck = 10;
             while (enemy.healthHaver.currentHealth <= 0 && --enemiesToCheck >= 0)
                 enemy = enemy.GetAbsoluteParentRoom().GetRandomActiveEnemy(false);
             SetNewTarget(enemy.sprite.WorldCenter, this.timeToReachTarget);
+            SlashDoer.DoSwordSlash(
+                player.sprite.WorldCenter,
+                (enemy.sprite.WorldCenter-player.sprite.WorldCenter).ToAngle(),
+                p.Owner,
+                new SlashData());
         }
 
         private void Update()
