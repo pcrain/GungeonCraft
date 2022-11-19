@@ -153,6 +153,7 @@
     <Compile Include="src\Cwaff-Guns\Telefragger.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffTweaks.cs"/>
     <Compile Include="src\Cwaff-Misc\SoulLinkStatusEffect.cs"/>
+    <Compile Include="src\Cwaff-Misc\CwaffHUD.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\SimpleToolbox.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\ProjSpawnHelper.cs"/>
     <Compile Include="src\NeverNamedStuffImScaredToDelete\EasyGoopDefinitions.cs"/>
@@ -3085,6 +3086,8 @@
     <EmbeddedResource Include="Resources\heartpadlock_icon.png"/>
     <EmbeddedResource Include="Resources\rando6_icon.png"/>
     <EmbeddedResource Include="Resources\pocketchest_green_icon.png"/>
+    <EmbeddedResource Include="Resources\HUD\Coolness.png"/>
+    <EmbeddedResource Include="Resources\HUD\Curse.png"/>
     <EmbeddedResource Include="Resources\crossbullets_icon.png"/>
     <EmbeddedResource Include="Resources\timefuddlersrobe_icon.png"/>
     <EmbeddedResource Include="Resources\goomperorscrown_icon.png"/>

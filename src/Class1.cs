@@ -66,6 +66,7 @@ namespace CwaffingTheGungy
                 // OldShrineFactory.Init();
 
                 FakePrefabHooks.Init();
+                HUDController.Init(); //Need to load early
 
                 ItemBuilder.Init();
                 // CustomClipAmmoTypeToolbox.Init();
