@@ -152,11 +152,14 @@ namespace CwaffingTheGungy
 
         public bool active = false;
 
+        public Func<HUDElement,bool> updater = null;
+
         private static Texture2D defaultIcon =
             ResourceExtractor.GetTextureFromResource("CwaffingTheGungy/Resources/HUD/Coolness.png");
 
         public HUDElement(string name, string initText = null, string initIconPath = null, bool addImmediately = true)
         {
+            // this.updater = (_) => { return true; };
             if (initText != null)
                 text = new SLabel(initText);
             else
@@ -209,9 +212,12 @@ namespace CwaffingTheGungy
             this.active = false;
         }
 
-        public virtual void Update()
+        public bool Update()
         {
+            if (this.updater != null)
+                this.updater(this);
             text.Update();
+            return true;
         }
     }
 }

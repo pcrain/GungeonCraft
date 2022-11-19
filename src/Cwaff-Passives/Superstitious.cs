@@ -21,45 +21,49 @@ namespace CwaffingTheGungy
         public static string longDescription  = "(6s and 7s)";
 
         private static HUDController hud => HUDController.Instance;
+        private static List<HUDElement> els = new List<HUDElement>();
 
-        private static HUDElement he, he2, he3;
+        private PlayerController owner;
 
         public static void Init()
         {
             PickupObject item = Lazy.SetupItem<Superstitious>(passiveName, spritePath, shortDescription, longDescription, "cg");
             item.quality      = PickupObject.ItemQuality.C;
 
-            he = new SuperstitiousHUDElement("Coolness","","CwaffingTheGungy/Resources/HUD/Coolness.png");
-            he2 = new SuperstitiousHUDElement("Curse","","CwaffingTheGungy/Resources/HUD/Curse.png");
-            he3 = new HUDElement("Basic2","basic text",null);
+            els.Add(new HUDElement("Coolness","","CwaffingTheGungy/Resources/HUD/Coolness.png"));
+            els.Add(new HUDElement("Curse","","CwaffingTheGungy/Resources/HUD/Curse.png"));
+            els.Add(new HUDElement("Basic2","basic text",null));
         }
 
         public override void Pickup(PlayerController player)
         {
-            he.Activate();
-            he2.Activate();
-            he3.Activate();
+            this.owner = player;
+            foreach (HUDElement el in els)
+            {
+                el.updater = HUDUpdater;
+                el.Activate();
+            }
             base.Pickup(player);
         }
 
         public override DebrisObject Drop(PlayerController player)
         {
-            he.Deactivate();
-            he2.Deactivate();
-            he3.Deactivate();
+            this.owner = null;
+            foreach (HUDElement el in els)
+            {
+                el.updater = null;
+                el.Activate();
+            }
             return base.Drop(player);
         }
-    }
 
-    public class SuperstitiousHUDElement : HUDElement
-    {
-        public SuperstitiousHUDElement(string initText, string initIconPath, string initLabel)
-            : base(initText, initIconPath, initLabel) {}
-
-        public override void Update()
+        private bool HUDUpdater(HUDElement self)
         {
-            text.Text = BraveTime.DeltaTime.ToString();
-            base.Update();
+            if (this.owner != null)
+                self.text.Text = this.owner.carriedConsumables.Currency.ToString();
+            else
+                self.text.Text = BraveTime.DeltaTime.ToString();
+            return true;
         }
     }
 }
