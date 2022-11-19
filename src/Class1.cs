@@ -142,6 +142,7 @@ namespace CwaffingTheGungy
                     BorrowedTime.Init();
                     // Passives
                     Shine.Init();
+                    Superstitious.Init();
 
                     // //Character Starters
                     // ShadeHand.Init();

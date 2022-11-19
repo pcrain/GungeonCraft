@@ -28,7 +28,7 @@ namespace CwaffingTheGungy
             };
 
             string[] testPet2 = new string[] {
-                "CwaffingTheGungy/Resources/Companions/Wolf/wolf_pet_left_001",
+                "CwaffingTheGungy/Resources/Companions/Wolf/wolf_pet_left_001",  //TODO: testing jankiness
                 "CwaffingTheGungy/Resources/Companions/Wolf/wolf_pet_left_002",
                 "CwaffingTheGungy/Resources/Companions/Wolf/wolf_pet_left_003",
                 "CwaffingTheGungy/Resources/Companions/Wolf/wolf_pet_left_004",
