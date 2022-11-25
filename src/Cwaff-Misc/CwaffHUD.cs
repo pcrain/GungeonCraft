@@ -145,21 +145,18 @@ namespace CwaffingTheGungy
     {
         public SGroup container;
         public SGroup layout;
-
         public SImage icon = null;
-        // public SLabel label = null;
         public SLabel text = null;
-
         public bool active = false;
-
         public Func<HUDElement,bool> updater = null;
+        public float updateFreq = 1.0f/60.0f;
 
+        private float timeSinceLastUpdate = 0f;
         private static Texture2D defaultIcon =
             ResourceExtractor.GetTextureFromResource("CwaffingTheGungy/Resources/HUD/Coolness.png");
 
         public HUDElement(string name, string initText = null, string initIconPath = null, bool addImmediately = true)
         {
-            // this.updater = (_) => { return true; };
             if (initText != null)
                 text = new SLabel(initText);
             else
@@ -167,13 +164,6 @@ namespace CwaffingTheGungy
                 text = new SLabel("");
                 text.Visible = false;
             }
-            // if (initLabel != null)
-            //     label = new SLabel(initLabel);
-            // else
-            // {
-            //     label = new SLabel("");
-            //     label.Visible = false;
-            // }
             if (initIconPath != null)
             {
                 Texture2D itex = ResourceExtractor.GetTextureFromResource(initIconPath);
@@ -192,7 +182,6 @@ namespace CwaffingTheGungy
             layout = new SGroup() { Background = Color.clear, Size = container.Size, AutoLayoutVerticalStretch = false };
             layout.Children.Add(new SRect(Color.clear) { Size = Vector2.zero.WithX(8) });
             layout.Children.Add(icon);
-            // layout.Children.Add(label);
             layout.Children.Add(text);
             layout.AutoLayout = (SGroup g) => new Action<int, SElement>(g.AutoLayoutHorizontal);
             container.Children.Add(layout);
@@ -214,8 +203,12 @@ namespace CwaffingTheGungy
 
         public bool Update()
         {
-            if (this.updater != null)
+            this.timeSinceLastUpdate += BraveTime.DeltaTime;
+            if (this.timeSinceLastUpdate >= this.updateFreq && this.updater != null)
+            {
+                this.timeSinceLastUpdate = 0.0f;
                 this.updater(this);
+            }
             text.Update();
             return true;
         }
