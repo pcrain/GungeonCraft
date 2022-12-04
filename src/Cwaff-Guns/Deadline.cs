@@ -17,9 +17,7 @@ namespace CwaffingTheGungy
 
     /* TODO:
         - disable auto aim
-        - add nicer graphics
-        - add nicer sounds
-        - make sure start point is attached to wall (2nd hitscan?)
+        - fix rare hitscan issues
     */
 
     public class Deadline : AdvancedGunBehavior
@@ -28,7 +26,9 @@ namespace CwaffingTheGungy
         public static string spriteName       = "bullatterer";
         public static string projectileName   = "38_special";
         public static string shortDescription = "Pythagoras Would be Proud";
-        public static string longDescription  = "(intersecting lines instakil)";
+        public static string longDescription  = "(intersecting lines create explosions)";
+
+        private static ExplosionData deadlineExplosion = null;
 
         private List <DeadlineLaser> myLasers;
         // public List<GameObject> myLasers;
@@ -43,11 +43,43 @@ namespace CwaffingTheGungy
             var comp = gun.gameObject.AddComponent<Deadline>();
             comp.preventNormalReloadAudio = true;
             comp.preventNormalFireAudio = true;
-            comp.overrideNormalFireAudio = "Play_WPN_Vorpal_Shot_Critical_01";
+            comp.overrideNormalFireAudio = "Play_WPN_stdissuelaser_shot_01";
 
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
             projectile.collidesWithEnemies = false;
             projectile.gameObject.AddComponent<DeadlineProjectile>();
+
+            ExplosionData defaultExplosion = GameManager.Instance.Dungeon.sharedSettingsPrefab.DefaultExplosionData;
+            deadlineExplosion = new ExplosionData()
+            {
+                forceUseThisRadius     = true,
+                pushRadius             = 3f,
+                damageRadius           = 3f,
+                damageToPlayer         = 1f,
+                doDamage               = true,
+                damage                 = 100,
+                doDestroyProjectiles   = false,
+                doForce                = true,
+                debrisForce            = 30f,
+                preventPlayerForce     = false,
+                explosionDelay         = 0.01f,
+                usesComprehensiveDelay = false,
+                doScreenShake          = true,
+                playDefaultSFX         = true,
+                effect                 = defaultExplosion.effect,
+                ignoreList             = defaultExplosion.ignoreList,
+                ss                     = new ScreenShakeSettings
+                {
+                    magnitude               = 2.5f,
+                    speed                   = 2.5f,
+                    time                    = 1f,
+                    falloff                 = 0,
+                    direction               = Vector2.zero,
+                    vibrationType           = ScreenShakeSettings.VibrationType.Auto,
+                    simpleVibrationStrength = Vibration.Strength.Light,
+                    simpleVibrationTime     = Vibration.Time.Quick
+                },
+            };
         }
 
         public Deadline()
@@ -82,7 +114,11 @@ namespace CwaffingTheGungy
         public void CreateALaser(Vector2 position, float angle)
         {
             Vector2 target = Raycast.ToNearestWallOrObject(position, angle, minDistance: C.PIXELS_PER_TILE);
-            this.myLasers.Add(new DeadlineLaser(position,target,angle));
+            // raycast backwards to snap to wall
+            Vector2 invtarget = Raycast.ToNearestWallOrObject(position, angle + (angle < 180 ? 180 : -180), minDistance: 0);
+            this.myLasers.Add(new DeadlineLaser(invtarget,target,angle));
+            if ((this.gun && this.gun.GunPlayerOwner()))
+                AkSoundEngine.PostEvent("Play_WPN_moonscraperLaser_shot_01", this.gun.GunPlayerOwner().gameObject);
             this.CheckForLaserIntersections();
         }
 
@@ -123,7 +159,7 @@ namespace CwaffingTheGungy
                 myLasers[closestIndex].InitiateDeathSequenceAt(closestPosition.ToVector3ZisY(-1f),true);
                 AkSoundEngine.PostEvent("gaster_blaster_sound_effect", ETGModMainBehaviour.Instance.gameObject);
 
-                new FakeExplosion(Instantiate<GameObject>(VFX.animations["Shine"], closestPosition, Quaternion.identity));
+                new FakeExplosion(Instantiate<GameObject>(VFX.animations["Splode"], closestPosition, Quaternion.identity));
             }
 
             for (int i = myLasers.Count - 1; i >= 0; i--)
@@ -140,7 +176,7 @@ namespace CwaffingTheGungy
             private float startScale = 0.0f;
             private float startRotate = 0.0f;
 
-            private float endScale = 2.0f;
+            private float endScale = 1.5f;
             private float rps = 1080.0f;
 
             private float lifeTime = 0.0f;
@@ -254,7 +290,7 @@ namespace CwaffingTheGungy
                 yield return new WaitForSeconds(explosionDelay);
 
                 if (explode)
-                    Exploder.Explode(this.ipoint, DerailGun.bigTrainExplosion, Vector2.zero);
+                    Exploder.Explode(this.ipoint, deadlineExplosion, Vector2.zero);
                 this.DestroyLaser();
                 yield return null;
             }

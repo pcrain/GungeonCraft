@@ -82,6 +82,15 @@ namespace CwaffingTheGungy
                     "CwaffingTheGungy/Resources/MiscVFX/shine2",
                 }, 1, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 100);
 
+            RegisterVFX<GameObject>("Splode", new List<string>() {
+                    "CwaffingTheGungy/Resources/MiscVFX/Explosions/splode1",
+                    "CwaffingTheGungy/Resources/MiscVFX/Explosions/splode2",
+                    "CwaffingTheGungy/Resources/MiscVFX/Explosions/splode3",
+                    "CwaffingTheGungy/Resources/MiscVFX/Explosions/splode4",
+                    "CwaffingTheGungy/Resources/MiscVFX/Explosions/splode5",
+                    "CwaffingTheGungy/Resources/MiscVFX/Explosions/splode6",
+                }, 18, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 300, emissiveColour: Color.cyan);
+
             RegisterVFX<VFXPool>("Rebar", new List<string>() {
                     "CwaffingTheGungy/Resources/MiscVFX/GunVFX/RebarGunImpactVFX2_001",
                     "CwaffingTheGungy/Resources/MiscVFX/GunVFX/RebarGunImpactVFX2_002",
@@ -163,9 +172,11 @@ namespace CwaffingTheGungy
                 frameDef.colliderVertices = defaultDef.colliderVertices;
                 if (emissivePower > 0) {
                     frameDef.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-                    frameDef.material.SetFloat("_EmissiveColorPower", emissivePower);
+                    frameDef.material.SetFloat("_EmissivePower", emissivePower);
+                    frameDef.material.SetFloat("_EmissiveColorPower", 1.55f);
                     frameDef.materialInst.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-                    frameDef.materialInst.SetFloat("_EmissiveColorPower", emissivePower);
+                    frameDef.materialInst.SetFloat("_EmissivePower", emissivePower);
+                    frameDef.materialInst.SetFloat("_EmissiveColorPower", 1.55f);
                 }
                 if (emissiveColour != null)
                 {
@@ -176,7 +187,8 @@ namespace CwaffingTheGungy
             }
             if (emissivePower > 0) {
                 sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-                sprite.renderer.material.SetFloat("_EmissiveColorPower", emissivePower);
+                sprite.renderer.material.SetFloat("_EmissivePower", emissivePower);
+                sprite.renderer.material.SetFloat("_EmissiveColorPower", 1.55f);
             }
             if (emissiveColour != null)
                 sprite.renderer.material.SetColor("_EmissiveColor", (Color)emissiveColour);
