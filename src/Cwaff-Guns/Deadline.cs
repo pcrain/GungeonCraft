@@ -17,7 +17,9 @@ namespace CwaffingTheGungy
 
     /* TODO:
         - disable auto aim
-        - add nicer fx
+        - add nicer graphics
+        - add nicer sounds
+        - make sure start point is attached to wall (2nd hitscan?)
     */
 
     public class Deadline : AdvancedGunBehavior
@@ -89,15 +91,13 @@ namespace CwaffingTheGungy
             if (myLasers.Count < 2)
                 return;
 
-            // if we call this function every time a new laser is created, we only have to check
-            //   for intersections with the newest laser
-            DeadlineLaser newest = myLasers[myLasers.Count-1];
-
 
             float closest = 9999f;
             int closestIndex = -1;
             Vector2 closestPosition = Vector2.zero;
 
+            // find the nearest laser we'd collide with
+            DeadlineLaser newest = myLasers[myLasers.Count-1];
             for (int i = 0; i < myLasers.Count-1; ++i)
             {
                 if (myLasers[i].markedForDestruction)
@@ -122,6 +122,8 @@ namespace CwaffingTheGungy
                 // myLasers[closestIndex].UpdateEndPoint(closestPosition);
                 myLasers[closestIndex].InitiateDeathSequenceAt(closestPosition.ToVector3ZisY(-1f),true);
                 AkSoundEngine.PostEvent("gaster_blaster_sound_effect", ETGModMainBehaviour.Instance.gameObject);
+
+                new FakeExplosion(Instantiate<GameObject>(VFX.animations["Shine"], closestPosition, Quaternion.identity));
             }
 
             for (int i = myLasers.Count - 1; i >= 0; i--)
@@ -131,9 +133,45 @@ namespace CwaffingTheGungy
             }
         }
 
+        private class FakeExplosion
+        {
+            private GameObject theExplosion;
+
+            private float startScale = 0.0f;
+            private float startRotate = 0.0f;
+
+            private float endScale = 2.0f;
+            private float rps = 1080.0f;
+
+            private float lifeTime = 0.0f;
+            private float maxLifeTime = 1.0f;
+
+            public FakeExplosion(GameObject go)
+            {
+                this.theExplosion = go;
+                GameManager.Instance.StartCoroutine(Explode());
+            }
+
+            private IEnumerator Explode()
+            {
+                while(lifeTime < maxLifeTime)
+                {
+                    this.lifeTime += BraveTime.DeltaTime;
+                    float curScale = this.endScale*(this.lifeTime/this.maxLifeTime);
+                    this.theExplosion.transform.localScale = new Vector3(curScale,curScale,curScale);
+                    this.theExplosion.transform.rotation = Quaternion.Euler(0,0,this.rps*this.lifeTime);
+                    yield return null;
+                }
+                UnityEngine.Object.Destroy(this.theExplosion);
+                yield return null;
+            }
+
+        }
+
         private class DeadlineLaser
         {
             private static float growthTime = 0.15f;
+            private static float explosionDelay = 1.0f;
 
             private float length;
             private float angle;
@@ -213,21 +251,7 @@ namespace CwaffingTheGungy
             private IEnumerator ExplodeViolentlyAt(bool explode)
             {
                 UpdateLaser(color : Color.cyan);
-
-                // TODO: could maybe figure out why this doesn't work some day and optimize things
-                //   current solution seems rather slow
-                // tk2dTiledSprite comp = laserVfx.GetComponent<tk2dTiledSprite>();
-                // comp.usesOverrideMaterial = true;
-                // comp.sprite.renderer.material.SetColor("_OverrideColor", Color.cyan);
-                // comp.sprite.renderer.material.SetColor("_EmissiveColor", Color.cyan);
-                // comp.sprite.UpdateMaterial();
-                // comp.sprite.ForceUpdateMaterial();
-                // comp.dimensions = new Vector2(length, newWidth);
-                // comp.sprite.renderer
-                // comp.sprite.renderer.material.SetFloat("_EmissivePower", 100);
-                // comp.sprite.renderer.material.SetFloat("_EmissiveColorPower", 1.55f);
-
-                yield return new WaitForSeconds(1.0f);
+                yield return new WaitForSeconds(explosionDelay);
 
                 if (explode)
                     Exploder.Explode(this.ipoint, DerailGun.bigTrainExplosion, Vector2.zero);
@@ -267,11 +291,6 @@ namespace CwaffingTheGungy
             {
                 this.m_owner = this.m_projectile.Owner as PlayerController;
                 m_gun = this.m_owner.CurrentGun.GetComponent<Deadline>();
-                if (m_gun == null)
-                    ETGModConsole.Log("this is a problem, Deadline is null o.o");
-            }
-            else{
-                ETGModConsole.Log("our owner is not a player O_O");
             }
 
             SpeculativeRigidbody specRigidBody = this.m_projectile.specRigidbody;
@@ -300,16 +319,10 @@ namespace CwaffingTheGungy
             SpeculativeRigidbody specRigidbody = this.m_projectile.specRigidbody;
             specRigidbody.OnCollision -= this.OnCollision;
 
-            // Vector2 spawnPoint = this.m_projectile.sprite.WorldCenter;
             Vector2 spawnPoint = tileCollision.PostCollisionUnitCenter;
 
-            if (m_gun == null)
-            {
-                ETGModConsole.Log("this is a problem, Deadline is null o.o");
-                return;
-            }
-
-            m_gun.CreateALaser(spawnPoint,m_hitNormal);
+            if (m_gun != null)
+                m_gun.CreateALaser(spawnPoint,m_hitNormal);
 
             this.m_projectile.DieInAir();
         }
