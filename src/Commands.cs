@@ -21,7 +21,8 @@ namespace CwaffingTheGungy
                     // PickupObjectDatabase.GetById(IDs.Actives["borrowed_time"]).gameObject,
                     // PickupObjectDatabase.GetById(IDs.Passives["shine"]).gameObject,
                     // PickupObjectDatabase.GetById(IDs.Guns["ki_blast"]).gameObject,
-                    PickupObjectDatabase.GetById(IDs.Pickups["superstitious"]).gameObject,
+                    // PickupObjectDatabase.GetById(IDs.Pickups["superstitious"]).gameObject,
+                    PickupObjectDatabase.GetById(IDs.Pickups["deadline"]).gameObject,
                     GameManager.Instance.PrimaryPlayer.CenterPosition,
                     Vector2.zero,
                     0);

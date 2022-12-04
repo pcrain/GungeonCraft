@@ -540,6 +540,7 @@ namespace CwaffingTheGungy
                     SpinCycle.Add();
                     TimingGun.Add();
                     KiBlast.Add();
+                    Deadline.Add();
 
                     // //REVOLVERS
                     // FlayedRevolver.Add();

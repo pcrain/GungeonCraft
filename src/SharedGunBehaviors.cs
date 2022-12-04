@@ -54,5 +54,33 @@ namespace CwaffingTheGungy
         private float timer;
         private Projectile m_projectile;
     }
+
+    public class Raycast
+    {
+        private static bool ExcludeAllButWallsAndEnemiesFromRaycasting(SpeculativeRigidbody s)
+        {
+            if (s.GetComponent<PlayerController>() != null)
+                return true; //true == exclude players
+            if (s.GetComponent<Projectile>() != null)
+                return true; //true == exclude projectiles
+            if (s.GetComponent<MinorBreakable>() != null)
+                return true; //true == exclude minor breakables
+            if (s.GetComponent<MajorBreakable>() != null)
+                return true; //true == exclude major breakables
+            if (s.GetComponent<FlippableCover>() != null)
+                return true; //true == exclude tables
+            return false; //false == don't exclude
+        }
+
+        public static Vector2 ToNearestWallOrEnemyOrObject(Vector2 pos, float angle, float minDistance = 1)
+        {
+            RaycastResult hit;
+            if (PhysicsEngine.Instance.Raycast(
+              pos+Lazy.AngleToVector(angle,minDistance), Lazy.AngleToVector(angle), 200, out hit,
+              rigidbodyExcluder: ExcludeAllButWallsAndEnemiesFromRaycasting))
+                return hit.Contact;
+            return pos+Lazy.AngleToVector(angle,minDistance);
+        }
+    }
 }
 

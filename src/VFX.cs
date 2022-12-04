@@ -90,6 +90,8 @@ namespace CwaffingTheGungy
                     "CwaffingTheGungy/Resources/MiscVFX/GunVFX/RebarGunImpactVFX2_005",
                     "CwaffingTheGungy/Resources/MiscVFX/GunVFX/RebarGunImpactVFX2_006",
                 }, 6, loops: false);
+
+            laserSightPrefab = LoadHelper.LoadAssetFromAnywhere("assets/resourcesbundle/global vfx/vfx_lasersight.prefab") as GameObject;
         }
 
         /// <summary>
@@ -350,6 +352,29 @@ namespace CwaffingTheGungy
                 extantSprites[gunOwner].Clear();
             }
         }
+
+        // Blatantly stolen from Noonum
+        public static GameObject laserSightPrefab;
+        public static GameObject RenderLaserSight(Vector2 position, float length, float width, float angle, Color? colour = null)
+        {
+            GameObject gameObject = SpawnManager.SpawnVFX(laserSightPrefab, position, Quaternion.Euler(0, 0, angle));
+
+            tk2dTiledSprite component2 = gameObject.GetComponent<tk2dTiledSprite>();
+            float newWidth = 1f;
+            if (width != -1) newWidth = width;
+            component2.dimensions = new Vector2(length, newWidth);
+            if (colour != null)
+            {
+                component2.usesOverrideMaterial = true;
+                component2.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+                component2.sprite.renderer.material.SetColor("_OverrideColor", (Color)colour);
+                component2.sprite.renderer.material.SetColor("_EmissiveColor", (Color)colour);
+                component2.sprite.renderer.material.SetFloat("_EmissivePower", 100);
+                component2.sprite.renderer.material.SetFloat("_EmissiveColorPower", 1.55f);
+            }
+            return gameObject;
+        }
+
     }
 }
 

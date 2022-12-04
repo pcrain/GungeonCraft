@@ -137,6 +137,7 @@
     <Compile Include="src\Cwaff-Guns\Natasha.cs"/>
     <Compile Include="src\Cwaff-Guns\LastResort.cs"/>
     <Compile Include="src\Cwaff-Guns\SoulKaliber.cs"/>
+    <Compile Include="src\Cwaff-Guns\Deadline.cs"/>
     <Compile Include="src\Cwaff-Guns\GamblersFallacy.cs"/>
     <Compile Include="src\Cwaff-Guns\Encircler.cs"/>
     <Compile Include="src\Cwaff-Guns\Commitment.cs"/>

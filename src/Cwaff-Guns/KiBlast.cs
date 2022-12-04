@@ -116,36 +116,10 @@ namespace CwaffingTheGungy
             if (!(this.gun && this.gun.GunPlayerOwner()))
                 return;
             PlayerController p = this.gun.GunPlayerOwner();
-            this.currentTarget = RaycastToNearestWallOrEnemyOrObject(
+            this.currentTarget = Raycast.ToNearestWallOrEnemyOrObject(
                 p.sprite.WorldCenter,p.CurrentGun.CurrentAngle);
             vfx.SpawnAtPosition(this.currentTarget.ToVector3ZisY(-1f),
                 p.CurrentGun.CurrentAngle,null, null, null, -0.05f);
-        }
-
-        private static RaycastResult hit;
-
-        private static bool ExcludeAllButWallsAndEnemiesFromRaycasting(SpeculativeRigidbody s)
-        {
-            if (s.GetComponent<PlayerController>() != null)
-                return true; //true == exclude players
-            if (s.GetComponent<Projectile>() != null)
-                return true; //true == exclude projectiles
-            if (s.GetComponent<MinorBreakable>() != null)
-                return true; //true == exclude minor breakables
-            if (s.GetComponent<MajorBreakable>() != null)
-                return true; //true == exclude major breakables
-            if (s.GetComponent<FlippableCover>() != null)
-                return true; //true == exclude tables
-            return false; //false == don't exclude
-        }
-
-        public static Vector2 RaycastToNearestWallOrEnemyOrObject(Vector2 pos, float angle, float minDistance = 1)
-        {
-            if (PhysicsEngine.Instance.Raycast(
-              pos+Lazy.AngleToVector(angle,minDistance), Lazy.AngleToVector(angle), 200, out hit,
-              rigidbodyExcluder: ExcludeAllButWallsAndEnemiesFromRaycasting))
-                return hit.Contact;
-            return pos+Lazy.AngleToVector(angle,minDistance);
         }
 
         public override void PostProcessProjectile(Projectile projectile)
@@ -188,7 +162,7 @@ namespace CwaffingTheGungy
             {
                 this.m_owner      = this.m_projectile.Owner as PlayerController;
                 this.targetAngle  = this.m_owner.CurrentGun.CurrentAngle;
-                this.targetPos    = KiBlast.RaycastToNearestWallOrEnemyOrObject(
+                this.targetPos    = Raycast.ToNearestWallOrEnemyOrObject(
                     this.m_owner.sprite.WorldCenter,
                     this.targetAngle);
 
