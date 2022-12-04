@@ -14,6 +14,12 @@ using Alexandria.ItemAPI;
 
 namespace CwaffingTheGungy
 {
+
+    /* TODO:
+        - disable auto aim
+        - add nicer fx
+    */
+
     public class Deadline : AdvancedGunBehavior
     {
         public static string gunName          = "Deadline";
@@ -31,6 +37,7 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.InitGunFromStrings(gunName, spriteName, projectileName, shortDescription, longDescription);
+
             var comp = gun.gameObject.AddComponent<Deadline>();
             comp.preventNormalReloadAudio = true;
             comp.preventNormalFireAudio = true;
@@ -176,20 +183,31 @@ namespace CwaffingTheGungy
                 if (this.dead)
                     return;
 
-                if (color.HasValue)
-                    this.color = color.Value;
-                if (emissivePower.HasValue)
-                    this.power = emissivePower.Value;
-
                 this.lifeTime += BraveTime.DeltaTime;
                 float curLength = this.length * Mathf.Min(1,this.lifeTime/growthTime);
 
-                if (this.laserVfx != null)
-                    UnityEngine.Object.Destroy(this.laserVfx);
-                this.laserVfx = VFX.RenderLaserSight(this.start,curLength,1,this.angle,this.color,this.power);
+                bool needToRecreate = false;
+                if (color.HasValue)
+                {
+                    this.color = color.Value;
+                    needToRecreate = true;
+                }
+                if (emissivePower.HasValue)
+                    this.power = emissivePower.Value;
 
-                this.laserComp = laserVfx.GetComponent<tk2dTiledSprite>();
-                this.laserMat  = this.laserComp.sprite.renderer.material;
+                if(needToRecreate || this.laserVfx == null)
+                {
+                    if (this.laserVfx != null)
+                        UnityEngine.Object.Destroy(this.laserVfx);
+                    this.laserVfx = VFX.RenderLaserSight(this.start,curLength,1,this.angle,this.color,this.power);
+                    this.laserComp = laserVfx.GetComponent<tk2dTiledSprite>();
+                    this.laserMat  = this.laserComp.sprite.renderer.material;
+                }
+                else
+                {
+                    this.laserComp.dimensions = new Vector2(curLength, 1);
+                    this.laserMat.SetFloat("_EmissivePower", this.power);
+                }
             }
 
             private IEnumerator ExplodeViolentlyAt(bool explode)
