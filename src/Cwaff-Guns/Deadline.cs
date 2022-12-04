@@ -22,7 +22,8 @@ namespace CwaffingTheGungy
         public static string shortDescription = "Pythagoras Would be Proud";
         public static string longDescription  = "(intersecting lines instakil)";
 
-        public List<GameObject> myLasers;
+        private List <DeadlineLaser> myLasers;
+        // public List<GameObject> myLasers;
         public List<Vector2> laserEndpoints;
 
         public static void Add()
@@ -39,12 +40,10 @@ namespace CwaffingTheGungy
 
         public Deadline()
         {
-            laserEndpoints = new List<Vector2>();
-            myLasers = new List<GameObject>();
+            myLasers = new List<DeadlineLaser>();
         }
 
         private GameObject myLaser = null;
-
         protected override void Update()
         {
             base.Update();
@@ -62,36 +61,120 @@ namespace CwaffingTheGungy
             myLaser.transform.parent = this.gun.transform;
         }
 
+        public void CreateALaser(Vector2 position, float angle)
+        {
+            Vector2 target = Raycast.ToNearestWallOrEnemyOrObject(position, angle, 1);
+            this.myLasers.Add(new DeadlineLaser(position,target,angle));
+            this.CheckForLaserIntersections();
+        }
+
         public void CheckForLaserIntersections()
         {
-            ETGModConsole.Log("checking for laser intersections");
-            if (laserEndpoints.Count < 4)
-            {
-                ETGModConsole.Log("not enough lasers");
+            // ETGModConsole.Log("checking for laser intersections");
+            if (myLasers.Count < 2)
                 return;
-            }
-            if (laserEndpoints.Count % 2 != 0)
+
+            // if we call this function every time a new laser is created, we only have to check
+            //   for intersections with the newest laser
+            bool playedSound = false;
+            DeadlineLaser newest = myLasers[myLasers.Count-1];
+            for (int i = 0; i < myLasers.Count-1; ++i)
             {
-                ETGModConsole.Log("odd number of laser endpoints, you messed up o.o");
-                return;
+                if (myLasers[i].markedForDestruction)
+                    continue; //if we're already trying to explode, don't
+                Vector2? ipoint = newest.Intersects(myLasers[i]);
+                if (ipoint.HasValue)
+                {
+                    myLasers[i].InitiateDeathSequenceAt(ipoint.Value.ToVector3ZisY(-1f),true);
+                    newest.InitiateDeathSequenceAt(Vector2.zero,false);
+                    if (!playedSound)
+                        AkSoundEngine.PostEvent("gaster_blaster_sound_effect", ETGModMainBehaviour.Instance.gameObject);
+                    playedSound = true;
+                }
             }
-            Vector2 ipoint = Vector2.zero;
-            BraveUtility.LineIntersectsLine(laserEndpoints[0],laserEndpoints[1],laserEndpoints[2],laserEndpoints[3],out ipoint);
-            if (ipoint != Vector2.zero)
+
+            for (int i = myLasers.Count - 1; i >= 0; i--)
             {
-                ETGModConsole.Log("found intersection at"+ipoint.x+","+ipoint.y);
-                Exploder.Explode(ipoint, DerailGun.bigTrainExplosion, Vector2.zero);
+                if (myLasers[i].markedForDestruction)
+                    myLasers.RemoveAt(i);
             }
-            else
+        }
+
+        private class DeadlineLaser
+        {
+            private Vector2 start;
+            private Vector2 end;
+            private float length;
+            private float angle;
+            private GameObject laserVfx = null;
+            private Vector3 ipoint;
+
+            public bool markedForDestruction = false;
+
+            // TODO: angle technically redundant here
+            public DeadlineLaser(Vector2 p1, Vector2 p2, float angle)
             {
-                ETGModConsole.Log("no intersection found");
+                this.start        = p1;
+                this.end          = p2;
+                this.length       = C.PIXELS_PER_TILE*Vector2.Distance(start,end);
+                this.angle        = angle;
+                SpawnLaserWithColor(Color.red);
             }
-            for (int i = 0; i < myLasers.Count; i++)
+
+            public void InitiateDeathSequenceAt(Vector3 ipoint, bool explode = false)
             {
-                UnityEngine.Object.Destroy(myLasers[i]);
+                if (markedForDestruction)
+                    return;
+                this.markedForDestruction = true;
+                this.ipoint = ipoint;
+                GameManager.Instance.StartCoroutine(ExplodeViolentlyAt(explode));
             }
-            myLasers.Clear();
-            laserEndpoints.Clear();
+
+            private void SpawnLaserWithColor(Color c)
+            {
+                if (this.laserVfx != null)
+                    UnityEngine.Object.Destroy(this.laserVfx);
+                this.laserVfx = VFX.RenderLaserSight(this.start,this.length,1,this.angle,c);
+            }
+
+            private IEnumerator ExplodeViolentlyAt(bool explode)
+            {
+                SpawnLaserWithColor(Color.cyan);
+
+                // tk2dTiledSprite comp = laserVfx.GetComponent<tk2dTiledSprite>();
+                // comp.usesOverrideMaterial = true;
+                // comp.sprite.renderer.material.SetColor("_OverrideColor", Color.cyan);
+                // comp.sprite.renderer.material.SetColor("_EmissiveColor", Color.cyan);
+                // comp.sprite.UpdateMaterial();
+                // comp.sprite.ForceUpdateMaterial();
+                // comp.dimensions = new Vector2(length, newWidth);
+                // comp.sprite.renderer
+                // comp.sprite.renderer.material.SetFloat("_EmissivePower", 100);
+                // comp.sprite.renderer.material.SetFloat("_EmissiveColorPower", 1.55f);
+
+                yield return new WaitForSeconds(1);
+
+                if (explode)
+                    Exploder.Explode(this.ipoint, DerailGun.bigTrainExplosion, Vector2.zero);
+                this.Destroy();
+                yield return null;
+            }
+
+            private void Destroy()
+            {
+                this.markedForDestruction = true;
+                UnityEngine.Object.Destroy(this.laserVfx);
+                this.laserVfx = null;
+            }
+
+            public Vector2? Intersects(DeadlineLaser other)
+            {
+                Vector2 ipoint = Vector2.zero;
+                BraveUtility.LineIntersectsLine(start,end,other.start,other.end,out ipoint);
+                if (ipoint != Vector2.zero)
+                    return ipoint;
+                return null;
+            }
         }
     }
 
@@ -133,27 +216,15 @@ namespace CwaffingTheGungy
             // Vector2 spawnPoint = this.m_projectile.sprite.WorldCenter;
             Vector2 spawnPoint = tileCollision.PostCollisionUnitCenter;
 
-            CreateALaser(spawnPoint,m_hitNormal);
-
-            this.m_projectile.DieInAir();
-        }
-
-        private void CreateALaser(Vector2 position, float angle, float width = 1)
-        {
-            Vector2 target = Raycast.ToNearestWallOrEnemyOrObject(position, angle, 1);
-            float length = C.PIXELS_PER_TILE*Vector2.Distance(position,target);
-            GameObject theLaser = VFX.RenderLaserSight(position,length,width,angle);
-
             if (m_gun == null)
             {
                 ETGModConsole.Log("this is a problem, Deadline is null o.o");
                 return;
             }
 
-            m_gun.laserEndpoints.Add(position);
-            m_gun.laserEndpoints.Add(target);
-            m_gun.myLasers.Add(theLaser);
-            m_gun.CheckForLaserIntersections();
+            m_gun.CreateALaser(spawnPoint,m_hitNormal);
+
+            this.m_projectile.DieInAir();
         }
     }
 }
