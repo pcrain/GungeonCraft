@@ -26,6 +26,8 @@ namespace CwaffingTheGungy
         // public List<GameObject> myLasers;
         public List<Vector2> laserEndpoints;
 
+        private float myTimer = 0;
+
         public static void Add()
         {
             Gun gun = Lazy.InitGunFromStrings(gunName, spriteName, projectileName, shortDescription, longDescription);
@@ -59,6 +61,16 @@ namespace CwaffingTheGungy
             float length = C.PIXELS_PER_TILE*Vector2.Distance(p.sprite.WorldCenter,target);
             myLaser = VFX.RenderLaserSight(p.sprite.WorldCenter,length,2,this.gun.CurrentAngle);
             myLaser.transform.parent = this.gun.transform;
+
+            myTimer += BraveTime.DeltaTime;
+            float power = 200.0f+400.0f*Mathf.Abs(Mathf.Sin(16*myTimer));
+
+            for (int i = 0; i < myLasers.Count; ++i)
+            {
+                if (myLasers[i].dead)
+                    continue;
+                myLasers[i].SetLaserColorAndPower(power : power);
+            }
         }
 
         public void CreateALaser(Vector2 position, float angle)
@@ -70,7 +82,6 @@ namespace CwaffingTheGungy
 
         public void CheckForLaserIntersections()
         {
-            // ETGModConsole.Log("checking for laser intersections");
             if (myLasers.Count < 2)
                 return;
 
@@ -95,7 +106,7 @@ namespace CwaffingTheGungy
 
             for (int i = myLasers.Count - 1; i >= 0; i--)
             {
-                if (myLasers[i].markedForDestruction)
+                if (myLasers[i].dead)
                     myLasers.RemoveAt(i);
             }
         }
@@ -108,8 +119,13 @@ namespace CwaffingTheGungy
             private float angle;
             private GameObject laserVfx = null;
             private Vector3 ipoint;
+            private Color color;
+            private float power = 0;
 
+            public tk2dTiledSprite laserComp = null;
+            public Material laserMat = null;
             public bool markedForDestruction = false;
+            public bool dead = false;
 
             // TODO: angle technically redundant here
             public DeadlineLaser(Vector2 p1, Vector2 p2, float angle)
@@ -118,7 +134,9 @@ namespace CwaffingTheGungy
                 this.end          = p2;
                 this.length       = C.PIXELS_PER_TILE*Vector2.Distance(start,end);
                 this.angle        = angle;
-                SpawnLaserWithColor(Color.red);
+                this.color        = Color.red;
+                this.power        = 0;
+                SetLaserColorAndPower();
             }
 
             public void InitiateDeathSequenceAt(Vector3 ipoint, bool explode = false)
@@ -130,16 +148,24 @@ namespace CwaffingTheGungy
                 GameManager.Instance.StartCoroutine(ExplodeViolentlyAt(explode));
             }
 
-            private void SpawnLaserWithColor(Color c)
+            public void SetLaserColorAndPower(Color? color = null, float? power = null)
             {
+                if (color.HasValue)
+                    this.color = color.Value;
+                if (power.HasValue)
+                    this.power = power.Value;
+
                 if (this.laserVfx != null)
                     UnityEngine.Object.Destroy(this.laserVfx);
-                this.laserVfx = VFX.RenderLaserSight(this.start,this.length,1,this.angle,c);
+
+                this.laserVfx = VFX.RenderLaserSight(this.start,this.length,1,this.angle,this.color,this.power);
+                this.laserComp = laserVfx.GetComponent<tk2dTiledSprite>();
+                this.laserMat  = this.laserComp.sprite.renderer.material;
             }
 
             private IEnumerator ExplodeViolentlyAt(bool explode)
             {
-                SpawnLaserWithColor(Color.cyan);
+                SetLaserColorAndPower(color : Color.cyan);
 
                 // tk2dTiledSprite comp = laserVfx.GetComponent<tk2dTiledSprite>();
                 // comp.usesOverrideMaterial = true;
@@ -152,7 +178,7 @@ namespace CwaffingTheGungy
                 // comp.sprite.renderer.material.SetFloat("_EmissivePower", 100);
                 // comp.sprite.renderer.material.SetFloat("_EmissiveColorPower", 1.55f);
 
-                yield return new WaitForSeconds(1);
+                yield return new WaitForSeconds(1.0f);
 
                 if (explode)
                     Exploder.Explode(this.ipoint, DerailGun.bigTrainExplosion, Vector2.zero);
@@ -162,6 +188,7 @@ namespace CwaffingTheGungy
 
             private void Destroy()
             {
+                this.dead = true;
                 this.markedForDestruction = true;
                 UnityEngine.Object.Destroy(this.laserVfx);
                 this.laserVfx = null;

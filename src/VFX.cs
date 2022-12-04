@@ -355,7 +355,7 @@ namespace CwaffingTheGungy
 
         // Blatantly stolen from Noonum
         public static GameObject laserSightPrefab;
-        public static GameObject RenderLaserSight(Vector2 position, float length, float width, float angle, Color? colour = null)
+        public static GameObject RenderLaserSight(Vector2 position, float length, float width, float angle, Color? colour = null, float power = 0)
         {
             GameObject gameObject = SpawnManager.SpawnVFX(laserSightPrefab, position, Quaternion.Euler(0, 0, angle));
 
@@ -369,7 +369,7 @@ namespace CwaffingTheGungy
                 component2.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
                 component2.sprite.renderer.material.SetColor("_OverrideColor", (Color)colour);
                 component2.sprite.renderer.material.SetColor("_EmissiveColor", (Color)colour);
-                component2.sprite.renderer.material.SetFloat("_EmissivePower", 100);
+                component2.sprite.renderer.material.SetFloat("_EmissivePower", power);
                 component2.sprite.renderer.material.SetFloat("_EmissiveColorPower", 1.55f);
             }
             return gameObject;
