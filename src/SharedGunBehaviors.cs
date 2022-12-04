@@ -72,12 +72,34 @@ namespace CwaffingTheGungy
             return false; //false == don't exclude
         }
 
+        private static bool ExcludeAllButWallsFromRaycasting(SpeculativeRigidbody s)
+        {
+            // if (s.GetComponent<AIActor>() != null)
+            //     return true; //true == exclude enemies
+            // return ExcludeAllButWallsAndEnemiesFromRaycasting(s);
+
+            // TODO: fails to collide with some unexpected things, including statue in starting rom
+            if (s.PrimaryPixelCollider.IsTileCollider)
+                return false;
+            return true;
+        }
+
         public static Vector2 ToNearestWallOrEnemyOrObject(Vector2 pos, float angle, float minDistance = 1)
         {
             RaycastResult hit;
             if (PhysicsEngine.Instance.Raycast(
               pos+Lazy.AngleToVector(angle,minDistance), Lazy.AngleToVector(angle), 200, out hit,
               rigidbodyExcluder: ExcludeAllButWallsAndEnemiesFromRaycasting))
+                return hit.Contact;
+            return pos+Lazy.AngleToVector(angle,minDistance);
+        }
+
+        public static Vector2 ToNearestWallOrObject(Vector2 pos, float angle, float minDistance = 1)
+        {
+            RaycastResult hit;
+            if (PhysicsEngine.Instance.Raycast(
+              pos+Lazy.AngleToVector(angle,minDistance), Lazy.AngleToVector(angle), 200, out hit,
+              rigidbodyExcluder: ExcludeAllButWallsFromRaycasting))
                 return hit.Contact;
             return pos+Lazy.AngleToVector(angle,minDistance);
         }
