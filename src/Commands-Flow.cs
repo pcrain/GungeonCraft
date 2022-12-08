@@ -6,11 +6,12 @@ using Dungeonator;
 namespace CwaffingTheGungy {
 
   // A slightly rewritten version of old Anywhere Mod by stellatedHexahedron
-  public class DungeonFlowModule {
+    // blatantly stolen from Apache by me o:
+    public class FlowCommands {
         private static List<string> knownFlows = new List<string>();
         private static List<string> knownTilesets = new List<string>();
-        private static List<string> knownScenes = new List<string>();   
-        
+        private static List<string> knownScenes = new List<string>();
+
         private static string[] ReturnMatchesFromList(string matchThis, List<string> inThis) {
             List<string> result = new List<string>();
             string matchString = matchThis.ToLower();
@@ -20,10 +21,9 @@ namespace CwaffingTheGungy {
                 if (flag) { result.Add(textString); }
             }
             return result.ToArray();
-    }
-    
-    public static void Install() {
+        }
 
+        public static void Install() {
             if (CwaffDungeonFlow.KnownFlows != null && CwaffDungeonFlow.KnownFlows.Count > 0) {
                 foreach (DungeonFlow flow in CwaffDungeonFlow.KnownFlows) {
                     if (flow.name != null && flow.name != string.Empty) { knownFlows.Add(flow.name.ToLower()); }
@@ -38,18 +38,18 @@ namespace CwaffingTheGungy {
                     knownScenes.Add(dungeonFloors.dungeonSceneName.ToLower());
                 }
             }
-            
+
             foreach (GameLevelDefinition customFloors in GameManager.Instance.customFloors) {
                 if (customFloors.dungeonPrefabPath != null && customFloors.dungeonPrefabPath != string.Empty) {
                     knownTilesets.Add(customFloors.dungeonPrefabPath.ToLower());
                 }
                 if (customFloors.dungeonSceneName != null && customFloors.dungeonSceneName != string.Empty) {
                     knownScenes.Add(customFloors.dungeonSceneName.ToLower());
-                }                
+                }
             }
-            
+
             ETGModConsole.Commands.AddUnit("load_flow", new Action<string[]>(LoadFlowFunction), new AutocompletionSettings(delegate(int index, string input) {
-        if (index == 0) {
+                if (index == 0) {
                     return ReturnMatchesFromList(input.ToLower(), knownFlows);
                 } else if (index == 1) {
                     return ReturnMatchesFromList(input.ToLower(), knownTilesets);
@@ -59,12 +59,12 @@ namespace CwaffingTheGungy {
                     return new string[0];
                 }
             }));
-        } 
-  
-    public static void LoadFlowFunction(string[] args) {
-      if (args == null | args.Length == 0 | args[0].ToLower() == "help") {
-        ETGModConsole.Log("WARNING: this command can crash gungeon! \nIf the game hangs on loading screen, use console to load a different level!\nUsage: load_flow [FLOW NAME] [TILESET NAME]. [TILESET NAME] is optional. Press tab for a list of each.\nOnce you run the command and you press escape, you should see the loading screen. If nothing happens when you use the command, the flow you tried to load doesn't exist or the path to it needs to be manually specified. Example: \"load_flow NPCParadise\".\nIf it hangs on loading screen then the tileset you tried to use doesn't exist, is no longer functional, or the flow uses rooms that are not compatible with the chosen tileset.\nAlso, you should probably know that if you run this command from the breach, the game never gives you the ability to shoot or use active items, so you should probably start a run first.");
-      } else if (args != null && args.Length > 3) {
+        }
+
+        public static void LoadFlowFunction(string[] args) {
+            if (args == null | args.Length == 0 | args[0].ToLower() == "help") {
+            ETGModConsole.Log("WARNING: this command can crash gungeon! \nIf the game hangs on loading screen, use console to load a different level!\nUsage: load_flow [FLOW NAME] [TILESET NAME]. [TILESET NAME] is optional. Press tab for a list of each.\nOnce you run the command and you press escape, you should see the loading screen. If nothing happens when you use the command, the flow you tried to load doesn't exist or the path to it needs to be manually specified. Example: \"load_flow NPCParadise\".\nIf it hangs on loading screen then the tileset you tried to use doesn't exist, is no longer functional, or the flow uses rooms that are not compatible with the chosen tileset.\nAlso, you should probably know that if you run this command from the breach, the game never gives you the ability to shoot or use active items, so you should probably start a run first.");
+            } else if (args != null && args.Length > 3) {
                 ETGModConsole.Log("ERROR: Too many arguments specified! DungoenFlow name, dungoen prefab name, and dungoen scene name are the expected arguments!");
             } else {
                 bool tilesetSpecified = args.Length > 1;
@@ -110,7 +110,7 @@ namespace CwaffingTheGungy {
                     }
                 }
             }
-        } 
+        }
     }
 }
 

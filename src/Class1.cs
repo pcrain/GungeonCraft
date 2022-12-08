@@ -864,13 +864,13 @@ namespace CwaffingTheGungy
 
                 try {
                     // Init Prefab Databases
-                    ExpandPrefabs.InitCustomPrefabs(sharedAssets, sharedAssets2, braveResources, enemiesBase);
+                    CwaffDungeonPrefabs.InitCustomPrefabs(sharedAssets, sharedAssets2, braveResources, enemiesBase);
                     // Init Custom Enemy Prefabs
                     // ExpandCustomEnemyDatabase.InitPrefabs(expandSharedAssets1);
                     // Init Custom Room Prefabs
                     // ExpandRoomPrefabs.InitCustomRooms(sharedAssets, sharedAssets2, braveResources, enemiesBase);
                     // Init Custom DungeonFlow(s)
-                    CwaffDungeonFlow.InitDungeonFlows(sharedAssets2);
+                    CwaffDungeonFlow.InitDungeonFlowsAndHooks(sharedAssets2);
                 } catch (Exception ex) {
                     ETGModConsole.Log("[CtG] ERROR: Exception occured while building prefabs!", true);
                     Debug.LogException(ex);
@@ -888,8 +888,8 @@ namespace CwaffingTheGungy
                 enemiesBase = null;
                 #endregion
 
-                // Modified version of Anywhere mod, stolen from Apache
-                DungeonFlowModule.Install();
+                // Modified version of Anywhere mod, further stolen and modified from Apache's version
+                FlowCommands.Install();
 
                 //Misc. Tweaks
                 CwaffTweaks.Init();

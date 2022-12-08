@@ -2,15 +2,13 @@ using Dungeonator;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-// using ExpandTheGungeon.ExpandComponents;
-// using ExpandTheGungeon.ExpandUtilities;
-// using ExpandTheGungeon.ExpandDungeonFlows;
 using System.Reflection;
 using FullInspector;
 
 namespace CwaffingTheGungy {
 
-    public class ExpandPrefabs {
+    // yay stolen code (thanks apache)
+    public class CwaffDungeonPrefabs {
 
         // Materials
         public static Material SpaceFog;        

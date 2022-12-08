@@ -16,7 +16,7 @@ namespace CwaffingTheGungy {
                 roomCategory = PrototypeDungeonRoom.RoomCategory.CONNECTOR,
                 percentChance = 1f,
                 priority = DungeonFlowNode.NodePriority.MANDATORY,
-                overrideExactRoom = ExpandPrefabs.elevator_entrance,
+                overrideExactRoom = CwaffDungeonPrefabs.elevator_entrance,
                 overrideRoomTable = null,
                 capSubchain = false,
                 subchainIdentifier = string.Empty,
@@ -49,7 +49,7 @@ namespace CwaffingTheGungy {
                 roomCategory = PrototypeDungeonRoom.RoomCategory.EXIT,
                 percentChance = 1f,
                 priority = DungeonFlowNode.NodePriority.MANDATORY,
-                overrideExactRoom = ExpandPrefabs.exit_room_basic,
+                overrideExactRoom = CwaffDungeonPrefabs.exit_room_basic,
                 overrideRoomTable = null,
                 capSubchain = false,
                 subchainIdentifier = string.Empty,
@@ -79,7 +79,7 @@ namespace CwaffingTheGungy {
 
             m_CachedFlow.name = "Simplest";
             // m_CachedFlow.fallbackRoomTable = BossrushFlows.Bossrush_01_Castle.fallbackRoomTable;
-            m_CachedFlow.fallbackRoomTable = ExpandPrefabs.SewersRoomTable;
+            m_CachedFlow.fallbackRoomTable = CwaffDungeonPrefabs.SewersRoomTable;
             m_CachedFlow.subtypeRestrictions = new List<DungeonFlowSubtypeRestriction>(0);
             m_CachedFlow.flowInjectionData = new List<ProceduralFlowModifierData>(0);
             m_CachedFlow.sharedInjectionData = new List<SharedInjectionData>(0);
