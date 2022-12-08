@@ -41,6 +41,14 @@
     <Compile Include="src\Commands.cs"/>
     <Compile Include="src\AudioResourceLoader.cs"/>
     <Compile Include="src\VFX.cs"/>
+    <Compile Include="src\Cwaff-Rooms\ApacheComplexFlowTest.cs"/>
+    <Compile Include="src\Cwaff-Rooms\DungeonFlowModule.cs"/>
+    <Compile Include="src\Cwaff-Rooms\FlowHelpers.cs"/>
+    <Compile Include="src\Cwaff-Rooms\ExpandPrefabs.cs"/>
+    <Compile Include="src\Cwaff-Rooms\FlowSimpleAsItGets.cs"/>
+    <Compile Include="src\Cwaff-Rooms\CwaffGungeonFlows.cs"/>
+    <Compile Include="src\Cwaff-Rooms\ExpandUtility.cs"/>
+    <Compile Include="src\Cwaff-NPCs\Boomhildr.cs"/>
     <Compile Include="src\StandardAPI\NPCAPI\LootTableTools.cs"/>
     <Compile Include="src\StandardAPI\NPCAPI\Examples.cs"/>
     <Compile Include="src\StandardAPI\NPCAPI\Hooks.cs"/>

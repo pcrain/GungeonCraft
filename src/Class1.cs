@@ -811,7 +811,7 @@ namespace CwaffingTheGungy
                 #region NPCInitialisation
                 // Rusty.Init();
                 // Ironside.Init();
-                // Boomhildr.Init();
+                Boomhildr.Init();
                 #endregion
 
                 // ChromaGun.Add();
@@ -855,6 +855,41 @@ namespace CwaffingTheGungy
                 // LeadOfLifeInitCompanions.BuildPrefabs();
 
                 // KillUnlockHandler.Init();
+
+                #region Flow stuff stolen from Apache
+                AssetBundle sharedAssets = ResourceManager.LoadAssetBundle("shared_auto_001");
+                AssetBundle sharedAssets2 = ResourceManager.LoadAssetBundle("shared_auto_002");
+                AssetBundle braveResources = ResourceManager.LoadAssetBundle("brave_resources_001");
+                AssetBundle enemiesBase = ResourceManager.LoadAssetBundle("enemies_base_001");
+
+                try {
+                    // Init Prefab Databases
+                    ExpandPrefabs.InitCustomPrefabs(sharedAssets, sharedAssets2, braveResources, enemiesBase);
+                    // Init Custom Enemy Prefabs
+                    // ExpandCustomEnemyDatabase.InitPrefabs(expandSharedAssets1);
+                    // Init Custom Room Prefabs
+                    // ExpandRoomPrefabs.InitCustomRooms(sharedAssets, sharedAssets2, braveResources, enemiesBase);
+                    // Init Custom DungeonFlow(s)
+                    CwaffDungeonFlow.InitDungeonFlows(sharedAssets2);
+                } catch (Exception ex) {
+                    ETGModConsole.Log("[CtG] ERROR: Exception occured while building prefabs!", true);
+                    Debug.LogException(ex);
+                    sharedAssets = null;
+                    sharedAssets2 = null;
+                    braveResources = null;
+                    enemiesBase = null;
+                    return;
+                }
+
+                // Null bundles when done with them to avoid game crash issues
+                sharedAssets = null;
+                sharedAssets2 = null;
+                braveResources = null;
+                enemiesBase = null;
+                #endregion
+
+                // Modified version of Anywhere mod, stolen from Apache
+                DungeonFlowModule.Install();
 
                 //Misc. Tweaks
                 CwaffTweaks.Init();
