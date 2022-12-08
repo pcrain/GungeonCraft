@@ -43,6 +43,39 @@ namespace CwaffingTheGungy {
                 guidAsString = Guid.NewGuid().ToString(),
                 flow = m_CachedFlow,
             };
+
+            DungeonFlowNode CustomShopNode = new DungeonFlowNode(m_CachedFlow) {
+                isSubchainStandin = false,
+                nodeType = DungeonFlowNode.ControlNodeType.ROOM,
+                roomCategory = PrototypeDungeonRoom.RoomCategory.CONNECTOR,
+                percentChance = 1f,
+                priority = DungeonFlowNode.NodePriority.MANDATORY,
+                overrideExactRoom = Boomhildr.shopRoom,
+                overrideRoomTable = null,
+                capSubchain = false,
+                subchainIdentifier = string.Empty,
+                limitedCopiesOfSubchain = false,
+                maxCopiesOfSubchain = 1,
+                subchainIdentifiers = new List<string>(0),
+                receivesCaps = false,
+                isWarpWingEntrance = false,
+                handlesOwnWarping = false,
+                forcedDoorType = DungeonFlowNode.ForcedDoorType.NONE,
+                loopForcedDoorType = DungeonFlowNode.ForcedDoorType.NONE,
+                nodeExpands = false,
+                initialChainPrototype = "n",
+                chainRules = new List<ChainRule>(0),
+                minChainLength = 3,
+                maxChainLength = 8,
+                minChildrenToBuild = 1,
+                maxChildrenToBuild = 1,
+                canBuildDuplicateChildren = false,
+                parentNodeGuid = string.Empty,
+                childNodeGuids = new List<string>(0),
+                loopTargetNodeGuid = string.Empty,
+                loopTargetIsOneWay = false,
+                guidAsString = Guid.NewGuid().ToString(),
+            };
             DungeonFlowNode Node_99 = new DungeonFlowNode(m_CachedFlow) {
                 isSubchainStandin = false,
                 nodeType = DungeonFlowNode.ControlNodeType.ROOM,
@@ -87,7 +120,8 @@ namespace CwaffingTheGungy {
             m_CachedFlow.Initialize();
 
             m_CachedFlow.AddNodeToFlow(Node_00, null);
-            m_CachedFlow.AddNodeToFlow(Node_99, Node_00);
+            m_CachedFlow.AddNodeToFlow(CustomShopNode, Node_00);
+            m_CachedFlow.AddNodeToFlow(Node_99, CustomShopNode);
 
             m_CachedFlow.FirstNode = Node_00;
 

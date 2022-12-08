@@ -11,6 +11,7 @@ namespace CwaffingTheGungy
 {
     public static class Boomhildr
     {
+        public static PrototypeDungeonRoom shopRoom;
         public static GenericLootTable BoomhildrLootTable;
         public static void Init()
         {
@@ -166,13 +167,13 @@ namespace CwaffingTheGungy
                          false,
                          null,
                          true,
-                         "NevernamedsItems/Resources/NPCSprites/Boomhildr/boomhildr_mapicon",
+                         "CwaffingTheGungy/Resources/NPCSprites/Boomhildr/boomhildr_mapicon",
                          true,
                          0.1f
                          );
 
-            PrototypeDungeonRoom Mod_Shop_Room = RoomFactory.BuildFromResource("CwaffingTheGungy/Resources/EmbeddedRooms/BoomhildrRoom.room").room;
-            ItsDaFuckinShopApi.RegisterShopRoom(boomhildrObj, Mod_Shop_Room, new UnityEngine.Vector2(9f, 11));
+            shopRoom = RoomFactory.BuildFromResource("CwaffingTheGungy/Resources/EmbeddedRooms/BoomhildrRoom.room").room;
+            ItsDaFuckinShopApi.RegisterShopRoom(boomhildrObj, shopRoom, new UnityEngine.Vector2(9f, 11));
         }
     }
 }
