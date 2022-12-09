@@ -7,6 +7,7 @@ using Gungeon;
 using Dungeonator;
 using SaveAPI;
 using System.Collections;
+using NpcApi;
 
 namespace CwaffingTheGungy
 {
@@ -27,6 +28,61 @@ namespace CwaffingTheGungy
                     Vector2.zero,
                     0);
                 // ETGModConsole.Log("<size=100><color=#ff0000ff>Please specify a command. Type 'nn help' for a list of commands.</color></size>", false);
+            });
+            // Another base command for loading my latest debug flow
+            ETGModConsole.Commands.AddGroup("ff", delegate (string[] args)
+            {
+                FlowCommands.LoadFlowFunction(new string[]{"simplest"});
+            });
+            // Another base command for testing npc shenanigans
+            ETGModConsole.Commands.AddGroup("tt", delegate (string[] args)
+            {
+                var bundle = ResourceManager.LoadAssetBundle("shared_auto_001");
+                // foreach (string s in bundle.GetAllAssetNames())
+                //     ETGModConsole.Log(s);
+                GameObject gk = bundle.LoadAsset<GameObject>("npc_gunslingking");
+                bundle = null;
+                // return;
+                PlayerController p1 = GameManager.Instance.PrimaryPlayer;
+                // TalkDoer td = new TalkDoer();
+                // td.BeginConversation(p1);
+                // GameObject go = ItsDaFuckinShopApi.SetUpGenericNpc(
+                //     "Boomhildr",
+                //      "cg",
+                //      new List<string>() {
+                //         "CwaffingTheGungy/Resources/NPCSprites/Boomhildr/boomhildr_idle_001",
+                //         "CwaffingTheGungy/Resources/NPCSprites/Boomhildr/boomhildr_idle_002",
+                //         "CwaffingTheGungy/Resources/NPCSprites/Boomhildr/boomhildr_idle_003",
+                //         "CwaffingTheGungy/Resources/NPCSprites/Boomhildr/boomhildr_idle_004",
+                //         "CwaffingTheGungy/Resources/NPCSprites/Boomhildr/boomhildr_idle_005",
+                //      },
+                //      new List<string>()
+                //      {
+                //     "CwaffingTheGungy/Resources/NPCSprites/Boomhildr/boomhildr_talk_001",
+                //     "CwaffingTheGungy/Resources/NPCSprites/Boomhildr/boomhildr_talk_002",
+                //      },
+                //      7,
+                //      new Vector3(0.5f, 4, 0)
+                // );
+                // UnityEngine.Object.Instantiate(go,p1.sprite.WorldCenter+(new Vector2(2,2)),Quaternion.identity);
+                // GameObject npc = UnityEngine.Object.Instantiate(go,p1.sprite.WorldCenter,Quaternion.identity);
+
+                // GameObject npc = UnityEngine.Object.Instantiate(Boomhildr.boomhildrNPCObj,p1.sprite.WorldCenter,Quaternion.identity);
+                // TalkDoerLite td = npc.GetComponent<TalkDoerLite>();
+                // td.ForceTimedSpeech(":D");
+                // Dissect.DumpFieldsAndProperties<TalkDoerLite>(td);
+                // ScriptableObject.CreateInstance<DungeonPlaceable>()
+
+                // GameObject npc = UnityEngine.Object.Instantiate(gk,p1.sprite.WorldCenter,Quaternion.identity);
+                // // Dissect.DumpFieldsAndProperties<GameObject>(npc);
+                // // Dissect.DumpComponents(npc);
+                // // Dissect.DumpFieldsAndProperties<TalkDoerLite>(npc.GetComponent<TalkDoerLite>());
+                // TalkDoerLite td  = npc.GetComponent<TalkDoerLite>();
+                // td.ShowText(p1.sprite.WorldCenter,td.sprite.transform,1f,"testaroo");
+
+                SpawnObjectManager.SpawnObject(gk,p1.CurrentRoom.GetRandomVisibleClearSpot(1, 1).ToVector3());
+
+                // gk.GetComponent<TalkDoerLite>().InstantiateObject(p1.CurrentRoom,p1.CurrentRoom.GetRandomVisibleClearSpot(1, 1));
             });
         }
     }

@@ -13,7 +13,7 @@ namespace CwaffingTheGungy
 {
     public class SpawnObjectManager : MonoBehaviour //----------------------------------------------------------------------------------------------------------------------------
     {
-        public static void SpawnObject(GameObject thingToSpawn, Vector3 convertedVector, GameObject SpawnVFX, bool correctForWalls = false)
+        public static void SpawnObject(GameObject thingToSpawn, Vector3 convertedVector, GameObject SpawnVFX = null, bool correctForWalls = false)
         {
             Vector2 Vector2Position = convertedVector;
 

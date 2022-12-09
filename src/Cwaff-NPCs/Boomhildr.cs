@@ -13,6 +13,7 @@ namespace CwaffingTheGungy
     {
         public static PrototypeDungeonRoom shopRoom;
         public static GenericLootTable BoomhildrLootTable;
+        public static GameObject boomhildrNPCObj;
         public static void Init()
         {
             ETGMod.Databases.Strings.Core.AddComplex("#BOOMHILDR_GENERIC_TALK", "Explosions are the spice of life! ...and death.");
@@ -170,6 +171,33 @@ namespace CwaffingTheGungy
                          "CwaffingTheGungy/Resources/NPCSprites/Boomhildr/boomhildr_mapicon",
                          true,
                          0.1f
+                         );
+
+            boomhildrNPCObj = ItsDaFuckinShopApi.SetUpGenericNPCObject(
+                         "Boomhildr",
+                         "cg",
+                         new List<string>()
+                         {
+                        "CwaffingTheGungy/Resources/NPCSprites/Boomhildr/boomhildr_idle_001",
+                        "CwaffingTheGungy/Resources/NPCSprites/Boomhildr/boomhildr_idle_002",
+                        "CwaffingTheGungy/Resources/NPCSprites/Boomhildr/boomhildr_idle_003",
+                        "CwaffingTheGungy/Resources/NPCSprites/Boomhildr/boomhildr_idle_004",
+                        "CwaffingTheGungy/Resources/NPCSprites/Boomhildr/boomhildr_idle_005",
+                         },
+                         7,
+                         new List<string>()
+                         {
+                        "CwaffingTheGungy/Resources/NPCSprites/Boomhildr/boomhildr_talk_001",
+                        "CwaffingTheGungy/Resources/NPCSprites/Boomhildr/boomhildr_talk_002",
+                         },
+                         3,
+                         "#BOOMHILDR_GENERIC_TALK",
+                         "#BOOMHILDR_STOPPER_TALK",
+                         "#BOOMHILDR_PURCHASE_TALK",
+                         "#BOOMHILDR_NOSALE_TALK",
+                         "#BOOMHILDR_INTRO_TALK",
+                         "#BOOMHILDR_ATTACKED_TALK",
+                         new Vector3(0.5f, 4, 0)
                          );
 
             shopRoom = RoomFactory.BuildFromResource("CwaffingTheGungy/Resources/EmbeddedRooms/BoomhildrRoom.room").room;
