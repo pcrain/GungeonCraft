@@ -445,57 +445,44 @@ namespace NpcApi
 
                 SpeculativeRigidbody rigidbody = GenerateOrAddToRigidBody(npcObj, CollisionLayer.BulletBlocker, PixelCollider.PixelColliderGeneration.Manual, true, true, true, false, false, false, false, true, new IntVector2(20, 18), new IntVector2(5, 0));
 
-                TalkDoerLite talkDoer = npcObj.AddComponent<TalkDoerLite>();
-                    talkDoer.placeableWidth = 4;
-                    talkDoer.placeableHeight = 3;
-                    talkDoer.difficulty = 0;
-                    talkDoer.isPassable = true;
-                    talkDoer.usesOverrideInteractionRegion = false;
-                    talkDoer.overrideRegionOffset = Vector2.zero;
-                    talkDoer.overrideRegionDimensions = Vector2.zero;
-                    talkDoer.overrideInteractionRadius = -1;
-                    talkDoer.PreventInteraction = false;
-                    talkDoer.AllowPlayerToPassEventually = true;
-                    talkDoer.speakPoint = SpeechPoint.transform;
-                    talkDoer.SpeaksGleepGlorpenese = false;
-                    talkDoer.audioCharacterSpeechTag = "oldman";
-                    talkDoer.playerApproachRadius = 5;
-                    talkDoer.conversationBreakRadius = 5;
-                    talkDoer.echo1 = null;
-                    talkDoer.echo2 = null;
-                    talkDoer.PreventCoopInteraction = false;
-                    talkDoer.IsPaletteSwapped = false;
-                    talkDoer.PaletteTexture = null;
-                    talkDoer.OutlineDepth = 0.5f;
-                    talkDoer.OutlineLuminanceCutoff = 0.05f;
-                    talkDoer.MovementSpeed = 3;
-                    talkDoer.PathableTiles = CellTypes.FLOOR;
+                // TalkDoerCustom talkDoer = npcObj.AddComponent<TalkDoerCustom>();
+                //     talkDoer.placeableWidth = 4;
+                //     talkDoer.placeableHeight = 3;
+                //     talkDoer.difficulty = 0;
+                //     talkDoer.isPassable = true;
+                //     talkDoer.usesOverrideInteractionRegion = false;
+                //     talkDoer.overrideRegionOffset = Vector2.zero;
+                //     talkDoer.overrideRegionDimensions = Vector2.zero;
+                //     talkDoer.overrideInteractionRadius = -1;
+                //     talkDoer.PreventInteraction = false;
+                //     talkDoer.AllowPlayerToPassEventually = true;
+                //     talkDoer.speakPoint = SpeechPoint.transform;
+                //     talkDoer.SpeaksGleepGlorpenese = false;
+                //     talkDoer.audioCharacterSpeechTag = "oldman";
+                //     talkDoer.playerApproachRadius = 5;
+                //     talkDoer.conversationBreakRadius = 5;
+                //     talkDoer.echo1 = null;
+                //     talkDoer.echo2 = null;
+                //     talkDoer.PreventCoopInteraction = false;
+                //     talkDoer.IsPaletteSwapped = false;
+                //     talkDoer.PaletteTexture = null;
+                //     talkDoer.OutlineDepth = 0.5f;
+                //     talkDoer.OutlineLuminanceCutoff = 0.05f;
+                //     talkDoer.MovementSpeed = 3;
+                //     talkDoer.PathableTiles = CellTypes.FLOOR;
 
-                // TalkDoer talkDoerExtreme  = npcObj.AddComponent<TalkDoer>();
-                //     talkDoerExtreme.placeableWidth = 4;
-                //     talkDoerExtreme.placeableHeight = 3;
-                //     talkDoerExtreme.difficulty = 0;
-                //     talkDoerExtreme.isPassable = true;
-                //     talkDoerExtreme.usesOverrideInteractionRegion = false;
-                //     talkDoerExtreme.overrideRegionOffset = Vector2.zero;
-                //     talkDoerExtreme.overrideRegionDimensions = Vector2.zero;
-                //     // talkDoerExtreme.overrideInteractionRadius = -1;
-                //     // talkDoerExtreme.PreventInteraction = false;
-                //     // talkDoerExtreme.AllowPlayerToPassEventually = true;
-                //     talkDoerExtreme.speakPoint = SpeechPoint.transform;
-                //     // talkDoerExtreme.SpeaksGleepGlorpenese = false;
-                //     talkDoerExtreme.audioCharacterSpeechTag = "oldman";
-                //     // talkDoerExtreme.playerApproachRadius = 5;
-                //     talkDoerExtreme.conversationBreakRadius = 5;
-                //     talkDoerExtreme.echo1 = null;
-                //     talkDoerExtreme.echo2 = null;
-                //     // talkDoerExtreme.PreventCoopInteraction = false;
-                //     // talkDoerExtreme.IsPaletteSwapped = false;
-                //     // talkDoerExtreme.PaletteTexture = null;
-                //     // talkDoerExtreme.OutlineDepth = 0.5f;
-                //     // talkDoerExtreme.OutlineLuminanceCutoff = 0.05f;
-                //     // talkDoerExtreme.MovementSpeed = 3;
-                //     // talkDoerExtreme.PathableTiles = CellTypes.FLOOR;
+                CwaffingTheGungy.CustomInteractible ci = npcObj.AddComponent<CwaffingTheGungy.CustomInteractible>();
+
+                // talkDoer.Interact()
+                // IPlayerInteractable ia = talkDoer as IPlayerInteractable;
+
+                // // Stolen fromm elsewhere, but we need a hook for loading flows
+                // // TODO: this should be relocated
+                // loadCustomFlowHook = new Hook(
+                //     typeof(FlowDatabase).GetMethod("GetOrLoadByName", BindingFlags.Public | BindingFlags.Static),
+                //     typeof(CwaffDungeonFlow).GetMethod("LoadCustomFlow", BindingFlags.Public | BindingFlags.Static)
+                // );
+
 
                 UltraFortunesFavor dreamLuck = npcObj.AddComponent<UltraFortunesFavor>();
                     dreamLuck.goopRadius = 2;
@@ -551,155 +538,10 @@ namespace NpcApi
             }
         }
 
-        // public static GameObject SetUpGenericNpc(string name, string prefix, List<string> idleSpritePaths, List<string> talkSpritePaths, int idleFps, Vector3 talkPointOffset/*, GungeonFlags flag*/)
-        // {
-        //     var shared_auto_001 = ResourceManager.LoadAssetBundle("shared_auto_001");
-        //     var shared_auto_002 = ResourceManager.LoadAssetBundle("shared_auto_002");
-        //     var SpeechPoint = new GameObject("SpeechPoint");
-        //     SpeechPoint.transform.position = talkPointOffset;
-
-        //     var npcObj = SpriteBuilder.SpriteFromResource(idleSpritePaths[0], new GameObject(prefix + ":" + name));
-
-        //     FakePrefab.MarkAsFakePrefab(npcObj);
-        //     UnityEngine.Object.DontDestroyOnLoad(npcObj);
-        //     npcObj.SetActive(false);
-
-        //     npcObj.layer = 22;
-
-        //     var collection = npcObj.GetComponent<tk2dSprite>().Collection;
-        //     SpeechPoint.transform.parent = npcObj.transform;
-
-        //     FakePrefab.MarkAsFakePrefab(SpeechPoint);
-        //     UnityEngine.Object.DontDestroyOnLoad(SpeechPoint);
-        //     SpeechPoint.SetActive(true);
-
-        //     var idleIdsList = new List<int>();
-        //     var talkIdsList = new List<int>();
-
-        //     foreach (string sprite in idleSpritePaths)
-        //     {
-        //         idleIdsList.Add(SpriteBuilder.AddSpriteToCollection(sprite, collection));
-        //     }
-
-        //     foreach (string sprite in talkSpritePaths)
-        //     {
-        //         talkIdsList.Add(SpriteBuilder.AddSpriteToCollection(sprite, collection));
-        //     }
-
-        //     tk2dSpriteAnimator spriteAnimator = npcObj.AddComponent<tk2dSpriteAnimator>();
-
-        //     SpriteBuilder.AddAnimation(spriteAnimator, collection, idleIdsList, name + "_idle", tk2dSpriteAnimationClip.WrapMode.Loop, idleFps);
-        //     SpriteBuilder.AddAnimation(spriteAnimator, collection, talkIdsList, name + "_talk", tk2dSpriteAnimationClip.WrapMode.Loop, idleFps);
-
-        //     SpeculativeRigidbody rigidbody = GenerateOrAddToRigidBody(npcObj, CollisionLayer.BulletBlocker, PixelCollider.PixelColliderGeneration.Manual, true, true, true, false, false, false, false, true, new IntVector2(20, 18), new IntVector2(5, 0));
-
-        //     var basenpc = ResourceManager.LoadAssetBundle("shared_auto_001").LoadAsset<GameObject>("Merchant_Key").transform.Find("NPC_Key").gameObject;
-        //     PlayMakerFSM iHaveNoFuckingClueWhatThisIs = npcObj.AddComponent<PlayMakerFSM>();
-        //     UnityEngine.JsonUtility.FromJsonOverwrite(UnityEngine.JsonUtility.ToJson(basenpc.GetComponent<PlayMakerFSM>()), iHaveNoFuckingClueWhatThisIs);
-        //     FieldInfo fsmStringParams = typeof(ActionData).GetField("fsmStringParams", BindingFlags.NonPublic | BindingFlags.Instance);
-        //         (fsmStringParams.GetValue(iHaveNoFuckingClueWhatThisIs.FsmStates[1].ActionData) as List<FsmString>)[0].Value = "#COOP_REBUKE";
-        //         (fsmStringParams.GetValue(iHaveNoFuckingClueWhatThisIs.FsmStates[1].ActionData) as List<FsmString>)[1].Value = "#COOP_REBUKE";
-        //         (fsmStringParams.GetValue(iHaveNoFuckingClueWhatThisIs.FsmStates[4].ActionData) as List<FsmString>)[0].Value = "#COOP_REBUKE";
-        //         (fsmStringParams.GetValue(iHaveNoFuckingClueWhatThisIs.FsmStates[5].ActionData) as List<FsmString>)[0].Value = "#COOP_REBUKE";
-        //         (fsmStringParams.GetValue(iHaveNoFuckingClueWhatThisIs.FsmStates[7].ActionData) as List<FsmString>)[0].Value = "#COOP_REBUKE";
-        //         (fsmStringParams.GetValue(iHaveNoFuckingClueWhatThisIs.FsmStates[8].ActionData) as List<FsmString>)[0].Value = "#COOP_REBUKE";
-        //         (fsmStringParams.GetValue(iHaveNoFuckingClueWhatThisIs.FsmStates[9].ActionData) as List<FsmString>)[0].Value = "#SUBSHOP_GENERIC_CAUGHT_STEALING";
-        //         (fsmStringParams.GetValue(iHaveNoFuckingClueWhatThisIs.FsmStates[10].ActionData) as List<FsmString>)[0].Value = "#SHOP_GENERIC_NO_SALE_LABEL";
-        //         (fsmStringParams.GetValue(iHaveNoFuckingClueWhatThisIs.FsmStates[12].ActionData) as List<FsmString>)[0].Value = "#COOP_REBUKE";
-
-        //     // PlayMakerFSM nightmareNightmareNightmare = npcObj.AddComponent<PlayMakerFSM>();
-
-        //     // var basenpc = shared_auto_002.LoadAsset<GameObject>("NPC_Key_Jailed");
-
-        //     // UnityEngine.JsonUtility.FromJsonOverwrite(UnityEngine.JsonUtility.ToJson(basenpc.GetComponent<PlayMakerFSM>()), nightmareNightmareNightmare);
-
-        //     // foreach (var state in nightmareNightmareNightmare.Fsm.FsmComponent.FsmStates)
-        //     // {
-        //     //     foreach (var action in state.Actions)
-        //     //     {
-        //     //         if (action is SetSaveFlag)
-        //     //         {
-        //     //             ((SetSaveFlag)action).targetFlag = flag;
-        //     //         }
-        //     //     }
-        //     // }
-
-        //     npcObj.name = prefix + ":" + name;
-
-        //     AIAnimator aIAnimator = GenerateBlankAIAnimator(npcObj);
-        //     aIAnimator.spriteAnimator = spriteAnimator;
-        //     aIAnimator.IdleAnimation = new DirectionalAnimation
-        //     {
-        //         Type = DirectionalAnimation.DirectionType.Single,
-        //         Prefix = name + "_idle",
-        //         AnimNames = new string[]
-        //         {
-        //                 ""
-        //         },
-        //         Flipped = new DirectionalAnimation.FlipType[]
-        //         {
-        //                 DirectionalAnimation.FlipType.None
-        //         }
-
-        //     };
-
-        //     TalkDoerLite talkDoer = npcObj.AddComponent<TalkDoerLite>();
-
-        //     talkDoer.placeableWidth = 4;
-        //     talkDoer.placeableHeight = 3;
-        //     talkDoer.difficulty = 0;
-        //     talkDoer.isPassable = true;
-        //     talkDoer.usesOverrideInteractionRegion = false;
-        //     talkDoer.overrideRegionOffset = Vector2.zero;
-        //     talkDoer.overrideRegionDimensions = Vector2.zero;
-        //     talkDoer.overrideInteractionRadius = -1;
-        //     talkDoer.PreventInteraction = false;
-        //     talkDoer.AllowPlayerToPassEventually = true;
-        //     talkDoer.speakPoint = SpeechPoint.transform;
-        //     talkDoer.SpeaksGleepGlorpenese = false;
-        //     talkDoer.audioCharacterSpeechTag = "oldman";
-        //     talkDoer.playerApproachRadius = 5;
-        //     talkDoer.conversationBreakRadius = 5;
-        //     talkDoer.echo1 = null;
-        //     talkDoer.echo2 = null;
-        //     talkDoer.PreventCoopInteraction = false;
-        //     talkDoer.IsPaletteSwapped = false;
-        //     talkDoer.PaletteTexture = null;
-        //     talkDoer.OutlineDepth = 0.5f;
-        //     talkDoer.OutlineLuminanceCutoff = 0.05f;
-        //     talkDoer.MovementSpeed = 3;
-        //     talkDoer.PathableTiles = CellTypes.FLOOR;
-
-        //     talkDoer.IsInteractable = true;
-        //     talkDoer.ShowOutlines = true;
-
-        //     UltraFortunesFavor dreamLuck = npcObj.AddComponent<UltraFortunesFavor>();
-
-        //     dreamLuck.goopRadius = 2;
-        //     dreamLuck.beamRadius = 2;
-        //     dreamLuck.bulletRadius = 2;
-        //     dreamLuck.bulletSpeedModifier = 0.8f;
-
-        //     dreamLuck.vfxOffset = 0.625f;
-        //     dreamLuck.sparkOctantVFX = shared_auto_001.LoadAsset<GameObject>("FortuneFavor_VFX_Spark");
-
-        //     // NPCInteractable ia = npcObj.AddComponent<NPCInteractable>();
-        //     // ia.conversation = new List<string>(){ "hi there o:" };
-
-        //     // npcObj.SetActive(true);
-
-        //     return npcObj;
-        // }
-
         public static string AddCustomCurrencyType(string ammoTypeSpritePath, string name)
         {
             return GameUIRoot.Instance.ConversationBar.portraitSprite.Atlas.AddNewItemToAtlas(NpcTools.GetTextureFromResource(ammoTypeSpritePath), name).name;
         }
-
-
-
-
-
 
         public static void RegisterShopRoom(GameObject shop, PrototypeDungeonRoom protoroom, Vector2 vector)
         {
@@ -918,4 +760,12 @@ namespace NpcApi
         }
 
     }
+
+    // public class TalkDoerCustom : TalkDoerLite
+    // {
+    //     public override void Interact(PlayerController pc)
+    //     {
+    //         return;
+    //     }
+    // }
 }

@@ -23,6 +23,7 @@ namespace CwaffingTheGungy
             Component[] componentsInChildren = newObject.GetComponentsInChildren(typeof(IPlayerInteractable));
             for (int i = 0; i < componentsInChildren.Length; i++)
             {
+                // ETGModConsole.Log(" == "+componentsInChildren[i].GetType());
                 IPlayerInteractable interactable = componentsInChildren[i] as IPlayerInteractable;
                 if (interactable != null)
                 {
