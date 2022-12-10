@@ -812,6 +812,7 @@ namespace CwaffingTheGungy
                 // Rusty.Init();
                 // Ironside.Init();
                 Boomhildr.Init();
+                CwaffNPC.InitAllNPCs();
                 #endregion
 
                 // ChromaGun.Add();
