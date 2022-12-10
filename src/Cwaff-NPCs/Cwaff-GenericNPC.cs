@@ -40,7 +40,8 @@ namespace CwaffingTheGungy
                    "CwaffingTheGungy/Resources/NPCSprites/Boomhildr/boomhildr_talk_002",
                    },
                 talkFps         : 3,
-                talkPointOffset : new Vector3(0.5f, 4, 0)
+                talkPointOffset : new Vector3(0.5f, 0, 0)
+                // talkPointOffset : new Vector3(0.5f, 4, 0)
                 );
         }
 
@@ -73,8 +74,8 @@ namespace CwaffingTheGungy
                         talkIdsList.Add(SpriteBuilder.AddSpriteToCollection(sprite, collection));
 
                 tk2dSpriteAnimator spriteAnimator = npcObj.AddComponent<tk2dSpriteAnimator>();
-                    SpriteBuilder.AddAnimation(spriteAnimator, collection, idleIdsList, name + "_idle", tk2dSpriteAnimationClip.WrapMode.Loop, idleFps);
-                    SpriteBuilder.AddAnimation(spriteAnimator, collection, talkIdsList, name + "_talk", tk2dSpriteAnimationClip.WrapMode.Loop, talkFps);
+                    SpriteBuilder.AddAnimation(spriteAnimator, collection, idleIdsList, "idle", tk2dSpriteAnimationClip.WrapMode.Loop, idleFps);
+                    SpriteBuilder.AddAnimation(spriteAnimator, collection, talkIdsList, "talk", tk2dSpriteAnimationClip.WrapMode.Loop, talkFps);
 
                 SpeculativeRigidbody rigidbody = ItsDaFuckinShopApi.GenerateOrAddToRigidBody(npcObj, CollisionLayer.BulletBlocker, PixelCollider.PixelColliderGeneration.Manual, true, true, true, false, false, false, false, true, new IntVector2(20, 18), new IntVector2(5, 0));
 
@@ -93,7 +94,7 @@ namespace CwaffingTheGungy
                     aIAnimator.IdleAnimation = new DirectionalAnimation
                     {
                         Type = DirectionalAnimation.DirectionType.Single,
-                        Prefix = name + "_idle",
+                        Prefix = "idle",
                         AnimNames = new string[] {""},
                         Flipped = new DirectionalAnimation.FlipType[]{DirectionalAnimation.FlipType.None}
                     };
@@ -101,7 +102,7 @@ namespace CwaffingTheGungy
                     aIAnimator.TalkAnimation = new DirectionalAnimation
                     {
                         Type = DirectionalAnimation.DirectionType.Single,
-                        Prefix = name + "_talk",
+                        Prefix = "talk",
                         AnimNames = new string[] {""},
                         Flipped = new DirectionalAnimation.FlipType[]{DirectionalAnimation.FlipType.None}
                     };
@@ -122,83 +123,112 @@ namespace CwaffingTheGungy
 
         // Token: 0x0400003C RID: 60
         protected bool m_canUse = true;
+        protected PlayerController m_interactor;
+
+        private Vector3 talkPointOffset;
+
+        // minimum amount of time to show textboxes during interactive dialogue
+        private const float MIN_TEXTBOX_TIME = 0.5f;
 
         private void Start()
         {
-            // this.talkPoint = base.transform.Find("talkpoint");
             this.talkPoint = base.transform;
+            // base.sprite.SetSprite(base.sprite.GetSpriteIdByName("talk"));
+            Vector3 size = base.sprite.GetCurrentSpriteDef().position3;
+            // base.sprite.SetSprite(base.sprite.GetSpriteIdByName("idle"));
+            this.talkPointOffset = new Vector3(size.x / 2, size.y, 0);
             SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black);
-            this.m_canUse = true;
-            // base.spriteAnimator.Play("idle");
-            // base.spriteAnimator.Play("Boomhildr_talk");
         }
 
         public void Interact(PlayerController interactor)
         {
             if (TextBoxManager.HasTextBox(this.talkPoint))
                 return;
-            if (!this.m_canUse)
+            if (this.m_interactor != null)
+                return;
+            base.StartCoroutine(this.HandleConversation(interactor));
+        }
+
+        protected void ShowText(string convoLine, float autoContinueTimer = -1f)
+        {
+            if (this.m_interactor == null)
             {
-                base.spriteAnimator.PlayForDuration("talk", 2f, "idle", false);
-                TextBoxManager.ShowTextBox(this.talkPoint.position, this.talkPoint, 2f, "No... not this time.", interactor.characterAudioSpeechTag, false, TextBoxManager.BoxSlideOrientation.NO_ADJUSTMENT, false, false);
+                ETGModConsole.Log("trying to talk with null interactor!");
                 return;
             }
-            base.StartCoroutine(this.HandleConversation(interactor));
+            TextBoxManager.ShowTextBox(
+                this.talkPoint.position + this.talkPointOffset,
+                this.talkPoint,
+                autoContinueTimer,
+                convoLine,
+                this.m_interactor.characterAudioSpeechTag,
+                instant: false,
+                showContinueText: true
+                );
         }
 
         private IEnumerator HandleConversation(PlayerController interactor)
         {
+            // Verify we can actually interact with this interactible
+            this.m_interactor = interactor;
+            if (!this.m_canUse)
+            {
+                base.aiAnimator.PlayForDuration("talk", 2f);
+                this.ShowText("I have nothing to say right now.", 2f);
+                this.m_interactor = null;
+                yield break;
+            }
+
+            // Set up input overrides and letterboxing
             SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black);
-            base.spriteAnimator.PlayForDuration("Boomhildr_talk", -1f, "Boomhildr_talk");
-            interactor.SetInputOverride("npcConversation");
+            this.m_interactor.SetInputOverride("npcConversation");
             Pixelator.Instance.LerpToLetterbox(0.35f, 0.25f);
             yield return null;
 
-            List<string> conversation = new List<string>
-            {
-                "All things wise and wonderful...",
-                "All creatures great and small...",
-                "All things bright and beautiful...",
-                "I've cursed them, one and all..."
-            };
+            // Run the actual script
+            IEnumerator script = NPCTalkingScript();
+            while(script.MoveNext())
+                yield return script.Current;
 
-            var conversationToUse = conversation;
-            int conversationIndex = 0;
-            while (conversationIndex < conversationToUse.Count - 1)
+            // Tear down input overrides and letterboxing
+            TextBoxManager.ClearTextBox(this.talkPoint);
+            this.m_interactor.ClearInputOverride("npcConversation");
+            Pixelator.Instance.LerpToLetterbox(1, 0.25f);
+            base.aiAnimator.PlayUntilCancelled("idle");
+            this.m_interactor = null;  //if this method is overridden, needs to be set to null after conversation is done
+        }
+
+        protected virtual IEnumerator NPCTalkingScript()
+        {
+            List<string> conversation = new List<string> {
+                "Hey guys!",
+                "Got custom NPCs working o:",
+                "Neat huh?",
+                };
+
+            for (int ci = 0; ci < conversation.Count - 1; ci++)
             {
                 TextBoxManager.ClearTextBox(this.talkPoint);
-                // base.spriteAnimator.PlayForDuration("talk", talkDuration, "talk");
-                // base.spriteAnimator.PlayForDuration("Boomhildr_talk",-1f,"Boomhildr_talk");
-                base.aiAnimator.PlayUntilCancelled("Boomhildr_talk");
-                string convoLine = conversationToUse[conversationIndex];
-                TextBoxManager.ShowTextBox(
-                    this.talkPoint.position,
-                    this.talkPoint,
-                    -1f,
-                    convoLine,
-                    interactor.characterAudioSpeechTag,
-                    instant: false,
-                    showContinueText: true
-                    );
-                float minDuration = 2.0f;
+                base.aiAnimator.PlayUntilCancelled("talk");
+                this.ShowText(conversation[ci]);
                 float timer = 0;
-                while (!BraveInput.GetInstanceForPlayer(interactor.PlayerIDX).ActiveActions.GetActionFromType(GungeonActions.GungeonActionType.Interact).WasPressed || timer < minDuration)
+                while (!BraveInput.GetInstanceForPlayer(this.m_interactor.PlayerIDX).ActiveActions.GetActionFromType(GungeonActions.GungeonActionType.Interact).WasPressed || timer < MIN_TEXTBOX_TIME)
                 {
                     timer += BraveTime.DeltaTime;
                     bool npcIsTalking = TextBoxManager.TextBoxCanBeAdvanced(this.talkPoint);
-                    if(timer >= minDuration && !npcIsTalking)
-                        base.aiAnimator.PlayUntilCancelled("Boomhildr_idle");
+                    if (timer >= MIN_TEXTBOX_TIME && !npcIsTalking)
+                        base.aiAnimator.PlayUntilCancelled("idle");
                     yield return null;
                 }
-                base.aiAnimator.PlayUntilCancelled("Boomhildr_idle");
-                conversationIndex++;
+                base.aiAnimator.PlayUntilCancelled("idle");
             }
-            m_allowMeToIntroduceMyself = false;
-            TextBoxManager.ShowTextBox(this.talkPoint.position, this.talkPoint, -1f, conversationToUse[conversationToUse.Count - 1], interactor.characterAudioSpeechTag, instant: false, showContinueText: true);
+            this.ShowText(conversation[conversation.Count-1]);
 
-            var acceptanceTextToUse = "i accept" + " (" + 5 + "[sprite \"ui_coin\"])";
-            var declineTextToUse = "i decline" + " (" + 5 + "[sprite \"hbux_text_icon\"])";
-            GameUIRoot.Instance.DisplayPlayerConversationOptions(interactor, null, acceptanceTextToUse, declineTextToUse);
+            // var acceptanceTextToUse = "i accept" + " (" + 5 + "[sprite \"ui_coin\"])";
+            // var declineTextToUse = "i decline" + " (" + 5 + "[sprite \"hbux_text_icon\"])";
+            var acceptanceTextToUse = "Very neat! :D";
+            var declineTextToUse = "Not impressed. :/";
+            GameUIRoot.Instance.DisplayPlayerConversationOptions(this.m_interactor, null, acceptanceTextToUse, declineTextToUse);
             int selectedResponse = -1;
             while (!GameUIRoot.Instance.GetPlayerConversationResponse(out selectedResponse))
                 yield return null;
@@ -217,62 +247,37 @@ namespace CwaffingTheGungy
                 // OnDecline?.Invoke(interactor, this.gameObject);
                 // TextBoxManager.ClearTextBox(this.talkPoint);
             }
-
-            TextBoxManager.ClearTextBox(this.talkPoint);
-
-            // // Free player and run OnAccept/OnDecline actions
-            interactor.ClearInputOverride("npcConversation");
-            Pixelator.Instance.LerpToLetterbox(1, 0.25f);
-            // base.spriteAnimator.Play("idle");
-            base.spriteAnimator.Play("Boomhildr_talk");
-            ETGModConsole.Log("donezo");
         }
 
-        // Token: 0x06000062 RID: 98 RVA: 0x0000556A File Offset: 0x0000376A
         public void OnEnteredRange(PlayerController interactor)
         {
             SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.white, 1f, 0f, SpriteOutlineManager.OutlineType.NORMAL);
             base.sprite.UpdateZDepth();
         }
 
-        // Token: 0x06000063 RID: 99 RVA: 0x00005595 File Offset: 0x00003795
         public void OnExitRange(PlayerController interactor)
         {
             SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black, 1f, 0f, SpriteOutlineManager.OutlineType.NORMAL);
         }
 
-        // Token: 0x06000064 RID: 100 RVA: 0x000055B4 File Offset: 0x000037B4
         public string GetAnimationState(PlayerController interactor, out bool shouldBeFlipped)
         {
             shouldBeFlipped = false;
             return string.Empty;
         }
 
-        // Token: 0x06000065 RID: 101 RVA: 0x000055D0 File Offset: 0x000037D0
         public float GetDistanceToPoint(Vector2 point)
         {
-            bool flag = base.sprite == null;
-            float result;
-            if (flag)
-            {
-                result = 100f;
-            }
-            else
-            {
-                Vector3 v = BraveMathCollege.ClosestPointOnRectangle(point, base.specRigidbody.UnitBottomLeft, base.specRigidbody.UnitDimensions);
-                result = Vector2.Distance(point, v) / 1.5f;
-            }
-            return result;
+            if (base.sprite == null)
+                return 100f;
+            Vector3 v = BraveMathCollege.ClosestPointOnRectangle(point, base.specRigidbody.UnitBottomLeft, base.specRigidbody.UnitDimensions);
+            return Vector2.Distance(point, v) / 1.5f;
         }
 
-        // Token: 0x06000066 RID: 102 RVA: 0x00005630 File Offset: 0x00003830
         public float GetOverrideMaxDistance()
         {
             return -1f;
         }
-
-        // Token: 0x0400002D RID: 45
-        private bool m_allowMeToIntroduceMyself = true;
     }
 }
 
