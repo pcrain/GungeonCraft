@@ -167,7 +167,30 @@ namespace CwaffingTheGungy
             ETGModConsole.Log("Lazy Initialized Active: "+baseItemName);
             return item;
         }
+
+        /// <summary>
+        /// Create a basic list of named directional animations given a list of animation names previously setup with SpriteBuilder.AddSpriteToCollection
+        /// </summary>
+        public static List<AIAnimator.NamedDirectionalAnimation> EasyNamedDirectionalAnimations(string[] animNameList)
+        {
+            var theList = new List<AIAnimator.NamedDirectionalAnimation>();
+            for(int i = 0; i < animNameList.Count(); ++i)
+            {
+                string anim = animNameList[i];
+                theList.Add(new AIAnimator.NamedDirectionalAnimation() {
+                    name = anim,
+                    anim = new DirectionalAnimation() {
+                        Type = DirectionalAnimation.DirectionType.Single,
+                        Prefix = anim,
+                        AnimNames = new string[] {anim},
+                        Flipped = new DirectionalAnimation.FlipType[]{DirectionalAnimation.FlipType.None}
+                    }
+                });
+            }
+            return theList;
+        }
     }
+
     public static class Dissect
     {
         public static void DumpComponents(this GameObject g)

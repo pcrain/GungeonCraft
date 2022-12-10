@@ -58,14 +58,26 @@ namespace CwaffingTheGungy
                 tk2dSpriteCollectionData collection = npcObj.GetComponent<tk2dSprite>().Collection;
                     var idleIdsList = new List<int>();
                     foreach (string sprite in idleSpritePaths)
-                        idleIdsList.Add(SpriteBuilder.AddSpriteToCollection(sprite, collection));
+                    {
+                        int fid = SpriteBuilder.AddSpriteToCollection(sprite, collection);
+                        idleIdsList.Add(fid);
+                        collection.spriteDefinitions[fid].ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.LowerCenter);
+                    }
                     var talkIdsList = new List<int>();
                     foreach (string sprite in talkSpritePaths)
-                        talkIdsList.Add(SpriteBuilder.AddSpriteToCollection(sprite, collection));
+                    {
+                        int fid = SpriteBuilder.AddSpriteToCollection(sprite, collection);
+                        talkIdsList.Add(fid);
+                        collection.spriteDefinitions[fid].ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.LowerCenter);
+                    }
 
                 tk2dSpriteAnimator spriteAnimator = npcObj.AddComponent<tk2dSpriteAnimator>();
-                    SpriteBuilder.AddAnimation(spriteAnimator, collection, idleIdsList, "idle", tk2dSpriteAnimationClip.WrapMode.Loop, idleFps);
-                    SpriteBuilder.AddAnimation(spriteAnimator, collection, talkIdsList, "talk", tk2dSpriteAnimationClip.WrapMode.Loop, talkFps);
+                    SpriteBuilder.AddAnimation(spriteAnimator, collection, idleIdsList, "idler", tk2dSpriteAnimationClip.WrapMode.Loop, idleFps);
+                    SpriteBuilder.AddAnimation(spriteAnimator, collection, talkIdsList, "talker", tk2dSpriteAnimationClip.WrapMode.Loop, talkFps);
+
+                AIAnimator aIAnimator = ItsDaFuckinShopApi.GenerateBlankAIAnimator(npcObj);
+                    aIAnimator.spriteAnimator  = spriteAnimator;
+                    aIAnimator.OtherAnimations = Lazy.EasyNamedDirectionalAnimations(new string[]{"idler","talker"});
 
                 SpeculativeRigidbody rigidbody = ItsDaFuckinShopApi.GenerateOrAddToRigidBody(npcObj, CollisionLayer.BulletBlocker, PixelCollider.PixelColliderGeneration.Manual, true, true, true, false, false, false, false, true, new IntVector2(20, 18), new IntVector2(5, 0));
 
@@ -79,24 +91,6 @@ namespace CwaffingTheGungy
                     dreamLuck.bulletSpeedModifier = 0.8f;
                     dreamLuck.vfxOffset = 0.625f;
                     dreamLuck.sparkOctantVFX = shared_auto_001.LoadAsset<GameObject>("FortuneFavor_VFX_Spark");
-
-                AIAnimator aIAnimator = ItsDaFuckinShopApi.GenerateBlankAIAnimator(npcObj);
-                    aIAnimator.spriteAnimator = spriteAnimator;
-                    aIAnimator.IdleAnimation = new DirectionalAnimation
-                    {
-                        Type = DirectionalAnimation.DirectionType.Single,
-                        Prefix = "idle",
-                        AnimNames = new string[] {""},
-                        Flipped = new DirectionalAnimation.FlipType[]{DirectionalAnimation.FlipType.None}
-                    };
-
-                    aIAnimator.TalkAnimation = new DirectionalAnimation
-                    {
-                        Type = DirectionalAnimation.DirectionType.Single,
-                        Prefix = "talk",
-                        AnimNames = new string[] {""},
-                        Flipped = new DirectionalAnimation.FlipType[]{DirectionalAnimation.FlipType.None}
-                    };
 
                 shared_auto_001 = null; //this fixes crashes apparently
                 return npcObj;
@@ -130,6 +124,7 @@ namespace CwaffingTheGungy
             // base.sprite.SetSprite(base.sprite.GetSpriteIdByName("idle"));
             this.talkPointOffset = new Vector3(size.x / 2, size.y, 0) + this.talkPointAdjustment;
             SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black);
+            base.aiAnimator.PlayUntilCancelled("idler");
         }
 
         public void Interact(PlayerController interactor)
@@ -165,7 +160,7 @@ namespace CwaffingTheGungy
             this.m_interactor = interactor;
             if (!this.m_canUse)
             {
-                base.aiAnimator.PlayForDuration("talk", 2f);
+                base.aiAnimator.PlayForDuration("talker", 2f);
                 this.ShowText("I have nothing to say right now.", 2f);
                 this.m_interactor = null;
                 yield break;
@@ -186,7 +181,7 @@ namespace CwaffingTheGungy
             // TextBoxManager.ClearTextBox(this.talkPoint);
             this.m_interactor.ClearInputOverride("npcConversation");
             Pixelator.Instance.LerpToLetterbox(1, 0.25f);
-            base.aiAnimator.PlayUntilCancelled("idle");
+            base.aiAnimator.PlayUntilCancelled("idler");
             this.m_interactor = null;  //if this method is overridden, needs to be set to null after conversation is done
         }
 
@@ -201,7 +196,8 @@ namespace CwaffingTheGungy
             for (int ci = 0; ci < conversation.Count - 1; ci++)
             {
                 TextBoxManager.ClearTextBox(this.talkPoint);
-                base.aiAnimator.PlayUntilCancelled("talk");
+                base.aiAnimator.PlayUntilCancelled("talker");
+                base.sprite.FlipX = true;
                 this.ShowText(conversation[ci]);
                 float timer = 0;
                 bool playingTalkingAnimation = true;
@@ -212,11 +208,12 @@ namespace CwaffingTheGungy
                     if (playingTalkingAnimation && timer >= MIN_TEXTBOX_TIME && !npcIsTalking)
                     {
                         playingTalkingAnimation = false;
-                        base.aiAnimator.PlayUntilCancelled("idle");
+                        base.aiAnimator.PlayUntilCancelled("idler");
+                        base.sprite.FlipX = false;
                     }
                     yield return null;
                 }
-                base.aiAnimator.PlayUntilCancelled("idle");
+                base.aiAnimator.PlayUntilCancelled("idler");
             }
             this.ShowText(conversation[conversation.Count-1]);
 
@@ -238,12 +235,6 @@ namespace CwaffingTheGungy
                     yield return null;
                     yield return null;
                 }
-                // TextBoxManager.ClearTextBox(this.talkPoint);
-                // base.spriteAnimator.PlayForDuration("do_effect", -1, "talk");
-                // OnAccept?.Invoke(interactor, this.gameObject);
-                // base.spriteAnimator.Play("talk");
-                // TextBoxManager.ShowTextBox(this.talkPoint.position, this.talkPoint, 1f, "It is done...", interactor.characterAudioSpeechTag, instant: false);
-                // yield return new WaitForSeconds(1f);
             }
             else
             {
@@ -256,10 +247,8 @@ namespace CwaffingTheGungy
                 this.ShowText("...........",1f);
                 yield return new WaitForSeconds(1f);
                 GameManager.Options.TextSpeed = oldTextSpeed;
-                this.ShowText("WHO ASKED YOU?!",2f);
+                this.ShowText("WELL WHO ASKED YOU?!",2f);
                 Exploder.Explode(this.talkPoint.position, DerailGun.bigTrainExplosion, Vector2.zero);
-                // OnDecline?.Invoke(interactor, this.gameObject);
-                // TextBoxManager.ClearTextBox(this.talkPoint);
             }
         }
 
