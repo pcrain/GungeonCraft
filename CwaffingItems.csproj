@@ -3089,6 +3089,10 @@
     <EmbeddedResource Include="Resources\NPCSprites\Rusty\rusty_buy_003.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\Rusty\rusty_talk_003.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\Rusty\rusty_idle_006.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\Bombo\bombo-idle2.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\Bombo\bombo-idle1.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\Bombo\bombo-peeved.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\Bombo\bombo-annoyed.png"/>
     <EmbeddedResource Include="Resources\recyclinder_icon.png"/>
     <EmbeddedResource Include="Resources\ivoryammolet_icon.png"/>
     <EmbeddedResource Include="Resources\furiousammolet_icon.png"/>

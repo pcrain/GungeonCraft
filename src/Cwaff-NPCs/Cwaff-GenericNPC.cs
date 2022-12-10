@@ -25,31 +25,28 @@ namespace CwaffingTheGungy
         public static void InitAllNPCs()
         {
             testNPCObj = CwaffNPC.SetUpGenericNPCObject(
-                name            : "Boomhildr",
+                name            : "Bombo",
                 prefix          : "cg",
                 idleSpritePaths : new List<string>() {
-                   "CwaffingTheGungy/Resources/NPCSprites/Boomhildr/boomhildr_idle_001",
-                   "CwaffingTheGungy/Resources/NPCSprites/Boomhildr/boomhildr_idle_002",
-                   "CwaffingTheGungy/Resources/NPCSprites/Boomhildr/boomhildr_idle_003",
-                   "CwaffingTheGungy/Resources/NPCSprites/Boomhildr/boomhildr_idle_004",
-                   "CwaffingTheGungy/Resources/NPCSprites/Boomhildr/boomhildr_idle_005",
+                   "CwaffingTheGungy/Resources/NPCSprites/Bombo/bombo-idle1",
+                   "CwaffingTheGungy/Resources/NPCSprites/Bombo/bombo-idle2",
                    },
-                idleFps         : 7,
+                idleFps         : 2,
                 talkSpritePaths : new List<string>() {
-                   "CwaffingTheGungy/Resources/NPCSprites/Boomhildr/boomhildr_talk_001",
-                   "CwaffingTheGungy/Resources/NPCSprites/Boomhildr/boomhildr_talk_002",
+                   "CwaffingTheGungy/Resources/NPCSprites/Bombo/bombo-idle1",
+                   "CwaffingTheGungy/Resources/NPCSprites/Bombo/bombo-idle2",
                    },
-                talkFps         : 3,
-                talkPointOffset : new Vector3(0.5f, 0, 0)
-                // talkPointOffset : new Vector3(0.5f, 4, 0)
+                talkFps         : 8
+                // talkPointAdjust : new Vector3(2.5f, 2.5f, 0)
                 );
         }
 
-        public static GameObject SetUpGenericNPCObject(string name, string prefix, List<string> idleSpritePaths, int idleFps, List<string> talkSpritePaths, int talkFps, Vector3 talkPointOffset)
+        public static GameObject SetUpGenericNPCObject(string name, string prefix, List<string> idleSpritePaths, int idleFps, List<string> talkSpritePaths, int talkFps, Vector3? talkPointAdjust = null)
         {
+            AssetBundle shared_auto_001 = null;
             try
             {
-                AssetBundle shared_auto_001 = ResourceManager.LoadAssetBundle("shared_auto_001");
+                shared_auto_001 = ResourceManager.LoadAssetBundle("shared_auto_001");
 
                 GameObject npcObj = SpriteBuilder.SpriteFromResource(idleSpritePaths[0], new GameObject(prefix + ":" + name));
                     FakePrefab.MarkAsFakePrefab(npcObj);
@@ -57,13 +54,6 @@ namespace CwaffingTheGungy
                     npcObj.SetActive(false);
                     npcObj.layer = 22;
                     npcObj.name = prefix + ":" + name;
-
-                GameObject SpeechPoint = new GameObject("SpeechPoint");
-                    SpeechPoint.transform.position = talkPointOffset;
-                    SpeechPoint.transform.parent = npcObj.transform;
-                    FakePrefab.MarkAsFakePrefab(SpeechPoint);
-                    UnityEngine.Object.DontDestroyOnLoad(SpeechPoint);
-                    SpeechPoint.SetActive(true);
 
                 tk2dSpriteCollectionData collection = npcObj.GetComponent<tk2dSprite>().Collection;
                     var idleIdsList = new List<int>();
@@ -80,6 +70,7 @@ namespace CwaffingTheGungy
                 SpeculativeRigidbody rigidbody = ItsDaFuckinShopApi.GenerateOrAddToRigidBody(npcObj, CollisionLayer.BulletBlocker, PixelCollider.PixelColliderGeneration.Manual, true, true, true, false, false, false, false, true, new IntVector2(20, 18), new IntVector2(5, 0));
 
                 CustomInteractible ci = npcObj.AddComponent<CustomInteractible>();
+                    ci.talkPointAdjustment = talkPointAdjust.HasValue ? talkPointAdjust.Value : Vector3.zero;
 
                 UltraFortunesFavor dreamLuck = npcObj.AddComponent<UltraFortunesFavor>();
                     dreamLuck.goopRadius = 2;
@@ -107,21 +98,22 @@ namespace CwaffingTheGungy
                         Flipped = new DirectionalAnimation.FlipType[]{DirectionalAnimation.FlipType.None}
                     };
 
+                shared_auto_001 = null; //this fixes crashes apparently
                 return npcObj;
             }
             catch (Exception message)
             {
                 ETGModConsole.Log(message.ToString());
+                shared_auto_001 = null; //this fixes crashes apparently
                 return null;
             }
         }
     }
     public class CustomInteractible : BraveBehaviour, IPlayerInteractable
     {
-        // Token: 0x04000034 RID: 52
         public Transform talkPoint;
+        public Vector3 talkPointAdjustment;
 
-        // Token: 0x0400003C RID: 60
         protected bool m_canUse = true;
         protected PlayerController m_interactor;
 
@@ -136,7 +128,7 @@ namespace CwaffingTheGungy
             // base.sprite.SetSprite(base.sprite.GetSpriteIdByName("talk"));
             Vector3 size = base.sprite.GetCurrentSpriteDef().position3;
             // base.sprite.SetSprite(base.sprite.GetSpriteIdByName("idle"));
-            this.talkPointOffset = new Vector3(size.x / 2, size.y, 0);
+            this.talkPointOffset = new Vector3(size.x / 2, size.y, 0) + this.talkPointAdjustment;
             SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black);
         }
 
@@ -191,7 +183,7 @@ namespace CwaffingTheGungy
                 yield return script.Current;
 
             // Tear down input overrides and letterboxing
-            TextBoxManager.ClearTextBox(this.talkPoint);
+            // TextBoxManager.ClearTextBox(this.talkPoint);
             this.m_interactor.ClearInputOverride("npcConversation");
             Pixelator.Instance.LerpToLetterbox(1, 0.25f);
             base.aiAnimator.PlayUntilCancelled("idle");
@@ -212,12 +204,16 @@ namespace CwaffingTheGungy
                 base.aiAnimator.PlayUntilCancelled("talk");
                 this.ShowText(conversation[ci]);
                 float timer = 0;
+                bool playingTalkingAnimation = true;
                 while (!BraveInput.GetInstanceForPlayer(this.m_interactor.PlayerIDX).ActiveActions.GetActionFromType(GungeonActions.GungeonActionType.Interact).WasPressed || timer < MIN_TEXTBOX_TIME)
                 {
                     timer += BraveTime.DeltaTime;
                     bool npcIsTalking = TextBoxManager.TextBoxCanBeAdvanced(this.talkPoint);
-                    if (timer >= MIN_TEXTBOX_TIME && !npcIsTalking)
+                    if (playingTalkingAnimation && timer >= MIN_TEXTBOX_TIME && !npcIsTalking)
+                    {
+                        playingTalkingAnimation = false;
                         base.aiAnimator.PlayUntilCancelled("idle");
+                    }
                     yield return null;
                 }
                 base.aiAnimator.PlayUntilCancelled("idle");
@@ -227,7 +223,7 @@ namespace CwaffingTheGungy
             // var acceptanceTextToUse = "i accept" + " (" + 5 + "[sprite \"ui_coin\"])";
             // var declineTextToUse = "i decline" + " (" + 5 + "[sprite \"hbux_text_icon\"])";
             var acceptanceTextToUse = "Very neat! :D";
-            var declineTextToUse = "Not impressed. :/";
+            var declineTextToUse = "Not impressed. :/" + " (pay " + 99 + "[sprite \"hbux_text_icon\"] to disagree)";
             GameUIRoot.Instance.DisplayPlayerConversationOptions(this.m_interactor, null, acceptanceTextToUse, declineTextToUse);
             int selectedResponse = -1;
             while (!GameUIRoot.Instance.GetPlayerConversationResponse(out selectedResponse))
@@ -235,6 +231,13 @@ namespace CwaffingTheGungy
 
             if (selectedResponse == 0)
             {
+                this.ShowText("Yay! :D Have some money!",2f);
+                for(int i = 0; i < 30; ++i)
+                {
+                    LootEngine.SpawnCurrency(this.talkPoint.position, 1, false, Lazy.AngleToVector(360f*UnityEngine.Random.value), 0, 4);
+                    yield return null;
+                    yield return null;
+                }
                 // TextBoxManager.ClearTextBox(this.talkPoint);
                 // base.spriteAnimator.PlayForDuration("do_effect", -1, "talk");
                 // OnAccept?.Invoke(interactor, this.gameObject);
@@ -244,6 +247,17 @@ namespace CwaffingTheGungy
             }
             else
             {
+                var oldTextSpeed = GameManager.Options.TextSpeed;
+                GameManager.Options.TextSpeed = GameOptions.GenericHighMedLowOption.LOW;
+                this.ShowText("...........",1f);
+                yield return new WaitForSeconds(1f);
+                this.ShowText("...........",1f);
+                yield return new WaitForSeconds(1f);
+                this.ShowText("...........",1f);
+                yield return new WaitForSeconds(1f);
+                GameManager.Options.TextSpeed = oldTextSpeed;
+                this.ShowText("WHO ASKED YOU?!",2f);
+                Exploder.Explode(this.talkPoint.position, DerailGun.bigTrainExplosion, Vector2.zero);
                 // OnDecline?.Invoke(interactor, this.gameObject);
                 // TextBoxManager.ClearTextBox(this.talkPoint);
             }
