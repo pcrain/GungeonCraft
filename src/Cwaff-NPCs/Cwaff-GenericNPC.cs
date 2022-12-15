@@ -18,70 +18,71 @@ using static NpcApi.CustomShopController;
 
 namespace CwaffingTheGungy
 {
-    public static class CwaffNPC
+    public struct SimpleAnimationData
     {
-        public static GameObject testNPCObj;
-
-        public static void InitAllNPCs()
+        public SimpleAnimationData(string name, int fps, List<string> paths)
         {
-            testNPCObj = CwaffNPC.SetUpGenericNPCObject(
-                name            : "Bombo",
-                prefix          : "cg",
-                idleSpritePaths : new List<string>() {
-                   "CwaffingTheGungy/Resources/NPCSprites/Bombo/bombo-idle1",
-                   "CwaffingTheGungy/Resources/NPCSprites/Bombo/bombo-idle2",
-                   },
-                idleFps         : 2,
-                talkSpritePaths : new List<string>() {
-                   "CwaffingTheGungy/Resources/NPCSprites/Bombo/bombo-idle1",
-                   "CwaffingTheGungy/Resources/NPCSprites/Bombo/bombo-idle2",
-                   },
-                talkFps         : 8
-                // talkPointAdjust : new Vector3(2.5f, 2.5f, 0)
-                );
+            this.animName  = name;
+            this.animFPS   = fps;
+            this.animPaths = paths;
         }
+        public string animName { get; set; }
+        public int animFPS { get; set; }
+        public List<string> animPaths { get; set; }
+    }
 
-        public static GameObject SetUpGenericNPCObject(string name, string prefix, List<string> idleSpritePaths, int idleFps, List<string> talkSpritePaths, int talkFps, Vector3? talkPointAdjust = null)
+    public class FancyNPC : BraveBehaviour, IPlayerInteractable
+    {
+        public Transform talkPoint;
+        public Vector3 talkPointAdjustment;
+
+        protected bool m_canUse = true;
+        protected PlayerController m_interactor;
+
+        protected Vector3 talkPointOffset;
+        protected bool autoFlipSprite = true;
+
+        // minimum amount of time to show textboxes during interactive dialogue
+        protected const float MIN_TEXTBOX_TIME = 0.5f;
+
+        public static GameObject Setup<T>(string name, string prefix, List<SimpleAnimationData> animationData, Vector3? talkPointAdjust = null)
+            where T : FancyNPC
         {
             AssetBundle shared_auto_001 = null;
             try
             {
                 shared_auto_001 = ResourceManager.LoadAssetBundle("shared_auto_001");
 
-                GameObject npcObj = SpriteBuilder.SpriteFromResource(idleSpritePaths[0], new GameObject(prefix + ":" + name));
+                GameObject npcObj = SpriteBuilder.SpriteFromResource(animationData[0].animPaths[0], new GameObject(prefix + ":" + name));
                     FakePrefab.MarkAsFakePrefab(npcObj);
                     UnityEngine.Object.DontDestroyOnLoad(npcObj);
                     npcObj.SetActive(false);
                     npcObj.layer = 22;
                     npcObj.name = prefix + ":" + name;
 
-                tk2dSpriteCollectionData collection = npcObj.GetComponent<tk2dSprite>().Collection;
-                    var idleIdsList = new List<int>();
-                    foreach (string sprite in idleSpritePaths)
-                    {
-                        int fid = SpriteBuilder.AddSpriteToCollection(sprite, collection);
-                        idleIdsList.Add(fid);
-                        collection.spriteDefinitions[fid].ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.LowerCenter);
-                    }
-                    var talkIdsList = new List<int>();
-                    foreach (string sprite in talkSpritePaths)
-                    {
-                        int fid = SpriteBuilder.AddSpriteToCollection(sprite, collection);
-                        talkIdsList.Add(fid);
-                        collection.spriteDefinitions[fid].ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.LowerCenter);
-                    }
-
                 tk2dSpriteAnimator spriteAnimator = npcObj.AddComponent<tk2dSpriteAnimator>();
-                    SpriteBuilder.AddAnimation(spriteAnimator, collection, idleIdsList, "idler", tk2dSpriteAnimationClip.WrapMode.Loop, idleFps);
-                    SpriteBuilder.AddAnimation(spriteAnimator, collection, talkIdsList, "talker", tk2dSpriteAnimationClip.WrapMode.Loop, talkFps);
+                tk2dSpriteCollectionData collection = npcObj.GetComponent<tk2dSprite>().Collection;
+                    List<string> animNames = new List<string>();
+                    foreach (SimpleAnimationData ad in animationData)
+                    {
+                        var idList = new List<int>();
+                        foreach (string sprite in ad.animPaths)
+                        {
+                            int fid = SpriteBuilder.AddSpriteToCollection(sprite, collection);
+                            idList.Add(fid);
+                            collection.spriteDefinitions[fid].ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.LowerCenter);
+                        }
+                        SpriteBuilder.AddAnimation(spriteAnimator, collection, idList, ad.animName, tk2dSpriteAnimationClip.WrapMode.Loop, ad.animFPS);
+                        animNames.Add(ad.animName);
+                    }
 
                 AIAnimator aIAnimator = ItsDaFuckinShopApi.GenerateBlankAIAnimator(npcObj);
                     aIAnimator.spriteAnimator  = spriteAnimator;
-                    aIAnimator.OtherAnimations = Lazy.EasyNamedDirectionalAnimations(new string[]{"idler","talker"});
+                    aIAnimator.OtherAnimations = Lazy.EasyNamedDirectionalAnimations(animNames.ToArray());
 
                 SpeculativeRigidbody rigidbody = ItsDaFuckinShopApi.GenerateOrAddToRigidBody(npcObj, CollisionLayer.BulletBlocker, PixelCollider.PixelColliderGeneration.Manual, true, true, true, false, false, false, false, true, new IntVector2(20, 18), new IntVector2(5, 0));
 
-                CustomInteractible ci = npcObj.AddComponent<CustomInteractible>();
+                FancyNPC ci = npcObj.AddComponent<T>() as FancyNPC;
                     ci.talkPointAdjustment = talkPointAdjust.HasValue ? talkPointAdjust.Value : Vector3.zero;
 
                 UltraFortunesFavor dreamLuck = npcObj.AddComponent<UltraFortunesFavor>();
@@ -102,22 +103,10 @@ namespace CwaffingTheGungy
                 return null;
             }
         }
-    }
-    public class CustomInteractible : BraveBehaviour, IPlayerInteractable
-    {
-        public Transform talkPoint;
-        public Vector3 talkPointAdjustment;
-
-        protected bool m_canUse = true;
-        protected PlayerController m_interactor;
-
-        private Vector3 talkPointOffset;
-
-        // minimum amount of time to show textboxes during interactive dialogue
-        private const float MIN_TEXTBOX_TIME = 0.5f;
 
         private void Start()
         {
+            this.m_canUse = true;
             this.talkPoint = base.transform;
             // base.sprite.SetSprite(base.sprite.GetSpriteIdByName("talk"));
             Vector3 size = base.sprite.GetCurrentSpriteDef().position3;
@@ -185,8 +174,18 @@ namespace CwaffingTheGungy
             this.m_interactor = null;  //if this method is overridden, needs to be set to null after conversation is done
         }
 
+        private void Update()
+        {
+            if (autoFlipSprite)
+            {
+                base.sprite.FlipX = (GameManager.Instance.PrimaryPlayer.CenterPosition.x < base.transform.position.x);
+            }
+        }
+
         protected virtual IEnumerator NPCTalkingScript()
         {
+            //NOTE: this should rarely be called directly, should generally be called from the inherited child; use as reference only
+
             List<string> conversation = new List<string> {
                 "Hey guys!",
                 "Got custom NPCs working o:",
@@ -197,7 +196,6 @@ namespace CwaffingTheGungy
             {
                 TextBoxManager.ClearTextBox(this.talkPoint);
                 base.aiAnimator.PlayUntilCancelled("talker");
-                base.sprite.FlipX = true;
                 this.ShowText(conversation[ci]);
                 float timer = 0;
                 bool playingTalkingAnimation = true;
@@ -209,7 +207,6 @@ namespace CwaffingTheGungy
                     {
                         playingTalkingAnimation = false;
                         base.aiAnimator.PlayUntilCancelled("idler");
-                        base.sprite.FlipX = false;
                     }
                     yield return null;
                 }
@@ -226,30 +223,7 @@ namespace CwaffingTheGungy
             while (!GameUIRoot.Instance.GetPlayerConversationResponse(out selectedResponse))
                 yield return null;
 
-            if (selectedResponse == 0)
-            {
-                this.ShowText("Yay! :D Have some money!",2f);
-                for(int i = 0; i < 30; ++i)
-                {
-                    LootEngine.SpawnCurrency(this.talkPoint.position, 1, false, Lazy.AngleToVector(360f*UnityEngine.Random.value), 0, 4);
-                    yield return null;
-                    yield return null;
-                }
-            }
-            else
-            {
-                var oldTextSpeed = GameManager.Options.TextSpeed;
-                GameManager.Options.TextSpeed = GameOptions.GenericHighMedLowOption.LOW;
-                this.ShowText("...........",1f);
-                yield return new WaitForSeconds(1f);
-                this.ShowText("...........",1f);
-                yield return new WaitForSeconds(1f);
-                this.ShowText("...........",1f);
-                yield return new WaitForSeconds(1f);
-                GameManager.Options.TextSpeed = oldTextSpeed;
-                this.ShowText("WELL WHO ASKED YOU?!",2f);
-                Exploder.Explode(this.talkPoint.position, DerailGun.bigTrainExplosion, Vector2.zero);
-            }
+            this.ShowText((selectedResponse == 0) ? "Yay!" : "Aw ):",2f);
         }
 
         public void OnEnteredRange(PlayerController interactor)

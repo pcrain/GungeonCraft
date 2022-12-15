@@ -45,6 +45,8 @@
     <Compile Include="src\Cwaff-Rooms\FlowSimpleAsItGets.cs"/>
     <Compile Include="src\Cwaff-Rooms\CwaffDungeonFlows.cs"/>
     <Compile Include="src\Cwaff-Rooms\FlowPrefabs.cs"/>
+    <Compile Include="src\Cwaff-NPCs\Bombo.cs"/>
+    <Compile Include="src\Cwaff-NPCs\FakeShopItem.cs"/>
     <Compile Include="src\Cwaff-NPCs\Boomhildr.cs"/>
     <Compile Include="src\Cwaff-NPCs\Cwaff-GenericNPC.cs"/>
     <Compile Include="src\StandardAPI\NPCAPI\LootTableTools.cs"/>

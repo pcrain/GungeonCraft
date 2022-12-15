@@ -8,6 +8,8 @@ using Dungeonator;
 using SaveAPI;
 using System.Collections;
 
+using ItemAPI;
+
 namespace CwaffingTheGungy
 {
     public class Commands
@@ -82,7 +84,27 @@ namespace CwaffingTheGungy
                 // SpawnObjectManager.SpawnObject(gk,p1.CurrentRoom.GetRandomVisibleClearSpot(1, 1).ToVector3());
                 // IPlayerInteractable ia;
                 // ia.Interact()
-                SpawnObjectManager.SpawnObject(CwaffNPC.testNPCObj,p1.CurrentRoom.GetRandomVisibleClearSpot(1, 1).ToVector3());
+                Vector3 v3 = p1.CurrentRoom.GetRandomVisibleClearSpot(1, 1).ToVector3();
+                ETGModConsole.Log("v3 = "+v3.x+","+v3.y+","+v3.z);
+                GameObject bombyboi = SpawnObjectManager.SpawnObject(Bombo.npcobj,v3);
+                GameObject bombyPos = new GameObject("ItemPoint3");
+                    bombyPos.transform.parent = bombyboi.transform;
+                    bombyPos.transform.position = v3 + new Vector3(2.625f, 1f, 1f);
+                    FakePrefab.MarkAsFakePrefab(bombyPos);
+                    UnityEngine.Object.DontDestroyOnLoad(bombyPos);
+                    bombyPos.SetActive(true);
+                GameObject bombyItem = new GameObject("Fake shop item test");
+                bombyItem.transform.parent = bombyPos.transform;
+                bombyItem.transform.localPosition = Vector3.zero;
+                bombyItem.transform.position = Vector3.zero;
+                // bombyItem.transform.localPosition = new Vector3(16*16,16*16,0);
+                // bombyItem.transform.position = bombyboi.transform.position + new Vector3(2.625f, 1f, 1);
+                FakeShopItem fsi = bombyItem.AddComponent<FakeShopItem>();
+                if (!p1.CurrentRoom.IsRegistered(fsi))
+                    p1.CurrentRoom.RegisterInteractable(fsi);
+                GameObject bombyPickup = PickupObjectDatabase.GetById(IDs.Pickups["natasha"]).gameObject;
+                PickupObject po = bombyPickup.GetComponent<PickupObject>();
+                fsi.Initialize(po);
 
                 // gk.GetComponent<TalkDoerLite>().InstantiateObject(p1.CurrentRoom,p1.CurrentRoom.GetRandomVisibleClearSpot(1, 1));
             });

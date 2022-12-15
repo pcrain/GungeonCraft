@@ -808,11 +808,14 @@ namespace CwaffingTheGungy
                 #endregion
 
                 //-----------------------------------------------------NPCS GET INITIALISED
-                #region NPCInitialisation
+                #region NPCInitialisation (shops)
                 // Rusty.Init();
                 // Ironside.Init();
                 Boomhildr.Init();
-                CwaffNPC.InitAllNPCs();
+                #endregion
+
+                #region NPCInitialisation (fancy)
+                Bombo.Init();
                 #endregion
 
                 // ChromaGun.Add();

@@ -13,7 +13,7 @@ namespace CwaffingTheGungy
 {
     public class SpawnObjectManager : MonoBehaviour //----------------------------------------------------------------------------------------------------------------------------
     {
-        public static void SpawnObject(GameObject thingToSpawn, Vector3 convertedVector, GameObject SpawnVFX = null, bool correctForWalls = false)
+        public static GameObject SpawnObject(GameObject thingToSpawn, Vector3 convertedVector, GameObject SpawnVFX = null, bool correctForWalls = false)
         {
             Vector2 Vector2Position = convertedVector;
 
@@ -51,6 +51,8 @@ namespace CwaffingTheGungy
                 UnityEngine.Object.Instantiate<GameObject>(SpawnVFX, ObjectSpecRigidBody.sprite.WorldCenter, Quaternion.identity);
             }
             if (correctForWalls) CorrectForWalls(newObject);
+
+            return newObject;
         }
         private static void CorrectForWalls(GameObject portal)
         {
