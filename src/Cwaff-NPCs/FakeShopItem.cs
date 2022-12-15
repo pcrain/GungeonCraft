@@ -275,17 +275,26 @@ public class FakeShopItem : BraveBehaviour, IPlayerInteractable
 
   public void Interact(PlayerController player)
   {
-    ETGModConsole.Log("interact success :D");
     LastInteractingPlayer = player;
-    pickedUp = true; //TODO: remove later
     if (pickedUp)
       return;
     pickedUp = true;
     LootEngine.GivePrefabToPlayer(item.gameObject, player);
     // TODO: apply debuffs
     // player.HandleItemPurchased(this);  //not applicable
+
     GameUIRoot.Instance.DeregisterDefaultLabel(base.transform);
     AkSoundEngine.PostEvent("Play_OBJ_item_purchase_01", base.gameObject);
+
+    GameObject gameObject2 = (GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global VFX/VFX_Item_Spawn_Poof"));
+    tk2dBaseSprite component2 = gameObject2.GetComponent<tk2dBaseSprite>();
+    component2.PlaceAtPositionByAnchor(base.sprite.WorldCenter.ToVector3ZUp(0f), tk2dBaseSprite.Anchor.MiddleCenter);
+    component2.transform.position = component2.transform.position.Quantize(0.0625f);
+    component2.HeightOffGround = 5f;
+    component2.UpdateZDepth();
+    player.CurrentRoom.DeregisterInteractable(this);
+    UnityEngine.Object.Destroy(base.gameObject);
+
   }
 
   public string GetAnimationState(PlayerController interactor, out bool shouldBeFlipped)
