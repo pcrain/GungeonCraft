@@ -18,9 +18,21 @@ using static NpcApi.CustomShopController;
 
 namespace CwaffingTheGungy
 {
+    public enum OhNoMy
+    {
+        EYES,
+        ARMS,
+        LEGS,
+        FINGERS,
+        HEART,
+        LUNGS,
+        _last
+    }
     public class Bombo : FancyNPC
     {
         public static GameObject npcobj;
+
+        private bool strikingADeal = false;
 
         public static void Init()
         {
@@ -112,6 +124,88 @@ namespace CwaffingTheGungy
                 this.ShowText("WELL WHO ASKED YOU?!",2f);
                 Exploder.Explode(this.talkPoint.position, DerailGun.bigTrainExplosion, Vector2.zero);
             }
+        }
+
+        private void CutStat(PlayerController chump, PlayerStats.StatType stat, float amount)
+        {
+            StatModifier statModifier = new StatModifier();
+                statModifier.statToBoost = stat;
+                statModifier.amount = amount;
+                statModifier.modifyType = StatModifier.ModifyMethod.MULTIPLICATIVE;
+                chump.ownerlessStatModifiers.Add(statModifier);
+                chump.stats.RecalculateStats(chump, false, false);
+        }
+
+        private void RandomSacrifice(PlayerController chump)
+        {
+            OhNoMy sacrifice = (OhNoMy)UnityEngine.Random.Range(0, (int)OhNoMy._last);
+            sacrifice        = OhNoMy.LUNGS;
+            switch(sacrifice)
+            {
+                case OhNoMy.EYES:
+                    CutStat(chump,PlayerStats.StatType.Accuracy,2.0f);
+                    ETGModConsole.Log("lost your eyes"); break;
+                case OhNoMy.ARMS:
+                    CutStat(chump,PlayerStats.StatType.Damage,0.5f);
+                    ETGModConsole.Log("lost your arms"); break;
+                case OhNoMy.FINGERS:
+                    CutStat(chump,PlayerStats.StatType.ReloadSpeed,0.75f);
+                    CutStat(chump,PlayerStats.StatType.RateOfFire,0.75f);
+                    ETGModConsole.Log("lost your fingers"); break;
+                case OhNoMy.LEGS:
+                    CutStat(chump,PlayerStats.StatType.MovementSpeed,0.6f);
+                    ETGModConsole.Log("lost your legs"); break;
+                case OhNoMy.HEART:
+                    if (chump.characterIdentity == PlayableCharacters.Robot)
+                        chump.healthHaver.Armor = 1;
+                    else
+                    {
+                        chump.healthHaver.Armor = 0;
+                        chump.healthHaver.currentHealth = 0.5f;
+                    }
+                    ETGModConsole.Log("lost your heart"); break;
+                case OhNoMy.LUNGS:
+                    chump.OnPreDodgeRoll += Bombo.DodgeRollsAreExhausting;
+                    ETGModConsole.Log("lost your lungs"); break;
+            }
+        }
+
+        public static void DodgeRollsAreExhausting(PlayerController wimp)
+        {
+            wimp.StartCoroutine(Bombo.PreventDodgeRolling(wimp,0.5f));
+        }
+
+        public static IEnumerator PreventDodgeRolling(PlayerController wimp, float timer)
+        {
+            wimp.SetInputOverride("exhausted");
+            yield return null;
+            while (wimp.IsDodgeRolling)
+                yield return null;
+            yield return new WaitForSeconds(timer);
+            wimp.ClearInputOverride("exhausted");
+        }
+
+        public IEnumerator StrikeADealScript(FakeShopItem f, PlayerController p)
+        {
+            if (this.m_interactor != null)
+                yield break;
+            this.m_interactor = p;
+            this.m_interactor.SetInputOverride("npcConversation");
+
+            GameUIRoot.Instance.DisplayPlayerConversationOptions(this.m_interactor, null, "do it", "don't do it");
+            int selectedResponse = -1;
+            while (!GameUIRoot.Instance.GetPlayerConversationResponse(out selectedResponse))
+                yield return null;
+
+            if (selectedResponse == 0) //accept
+            {
+                RandomSacrifice(p);
+                // f.Purchased(p);
+            }
+
+            this.m_interactor.ClearInputOverride("npcConversation");
+            this.m_interactor = null;
+            yield break;
         }
     }
 }

@@ -20,12 +20,12 @@ public class FakeShopItem : BraveBehaviour, IPlayerInteractable
 {
   public PickupObject item;
 
+  public delegate IEnumerator PurchasingScript(FakeShopItem f, PlayerController p);
+  public PurchasingScript purchasingScript;
+
   public bool UseOmnidirectionalItemFacing;
 
   public DungeonData.Direction itemFacing = DungeonData.Direction.SOUTH;
-
-  [NonSerialized]
-  public PlayerController LastInteractingPlayer;
 
   public int CurrentPrice = -1;
 
@@ -157,10 +157,8 @@ public class FakeShopItem : BraveBehaviour, IPlayerInteractable
 
   public void OnExitRange(PlayerController interactor)
   {
-    ETGModConsole.Log("almost exited range S:");
     if (!this)
       return;
-    ETGModConsole.Log("  exited range D:");
     SpriteOutlineManager.RemoveOutlineFromSprite(base.sprite);
     SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black, 0.1f, 0.05f);
     GameUIRoot.Instance.DeregisterDefaultLabel(base.transform);
@@ -275,13 +273,17 @@ public class FakeShopItem : BraveBehaviour, IPlayerInteractable
 
   public void Interact(PlayerController player)
   {
-    LastInteractingPlayer = player;
     if (pickedUp)
       return;
-    pickedUp = true;
-    LootEngine.GivePrefabToPlayer(item.gameObject, player);
     // TODO: apply debuffs
-    // player.HandleItemPurchased(this);  //not applicable
+    player.StartCoroutine(purchasingScript(this,player));
+  }
+
+  public void Purchased(PlayerController purchaser)
+  {
+    ETGModConsole.Log("    purchased!");
+    pickedUp = true;
+    LootEngine.GivePrefabToPlayer(item.gameObject, purchaser);
 
     GameUIRoot.Instance.DeregisterDefaultLabel(base.transform);
     AkSoundEngine.PostEvent("Play_OBJ_item_purchase_01", base.gameObject);
@@ -292,9 +294,8 @@ public class FakeShopItem : BraveBehaviour, IPlayerInteractable
     component2.transform.position = component2.transform.position.Quantize(0.0625f);
     component2.HeightOffGround = 5f;
     component2.UpdateZDepth();
-    player.CurrentRoom.DeregisterInteractable(this);
+    purchaser.CurrentRoom.DeregisterInteractable(this);
     UnityEngine.Object.Destroy(base.gameObject);
-
   }
 
   public string GetAnimationState(PlayerController interactor, out bool shouldBeFlipped)

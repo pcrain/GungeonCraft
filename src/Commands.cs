@@ -93,11 +93,12 @@ namespace CwaffingTheGungy
                     bombyItem.transform.parent        = bombyPos.transform;
                     bombyItem.transform.localPosition = Vector3.zero;
                     bombyItem.transform.position      = Vector3.zero;
+                GameObject bombyPickup = PickupObjectDatabase.GetById(IDs.Pickups["natasha"]).gameObject;
+                    PickupObject po = bombyPickup.GetComponent<PickupObject>();
                 FakeShopItem fsi = bombyItem.AddComponent<FakeShopItem>();
                     if (!p1.CurrentRoom.IsRegistered(fsi))
                         p1.CurrentRoom.RegisterInteractable(fsi);
-                GameObject bombyPickup = PickupObjectDatabase.GetById(IDs.Pickups["natasha"]).gameObject;
-                    PickupObject po = bombyPickup.GetComponent<PickupObject>();
+                    fsi.purchasingScript = bombyboi.GetComponent<Bombo>().StrikeADealScript;
                     fsi.Initialize(po);
 
                 // gk.GetComponent<TalkDoerLite>().InstantiateObject(p1.CurrentRoom,p1.CurrentRoom.GetRandomVisibleClearSpot(1, 1));
