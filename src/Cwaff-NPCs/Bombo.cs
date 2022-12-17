@@ -16,6 +16,8 @@ using ItemAPI;
 using System.Reflection;
 using static NpcApi.CustomShopController;
 
+using Alexandria.Misc;
+
 namespace CwaffingTheGungy
 {
     public enum OhNoMy
@@ -26,6 +28,7 @@ namespace CwaffingTheGungy
         FINGERS,
         HEART,
         LUNGS,
+        STOMACH,
         _last
     }
     public class Bombo : FancyNPC
@@ -139,7 +142,7 @@ namespace CwaffingTheGungy
         private void RandomSacrifice(PlayerController chump)
         {
             OhNoMy sacrifice = (OhNoMy)UnityEngine.Random.Range(0, (int)OhNoMy._last);
-            sacrifice        = OhNoMy.LUNGS;
+            sacrifice        = OhNoMy.STOMACH;
             switch(sacrifice)
             {
                 case OhNoMy.EYES:
@@ -149,7 +152,7 @@ namespace CwaffingTheGungy
                     CutStat(chump,PlayerStats.StatType.Damage,0.5f);
                     ETGModConsole.Log("lost your arms"); break;
                 case OhNoMy.FINGERS:
-                    CutStat(chump,PlayerStats.StatType.ReloadSpeed,0.75f);
+                    CutStat(chump,PlayerStats.StatType.ReloadSpeed,1.5f);
                     CutStat(chump,PlayerStats.StatType.RateOfFire,0.75f);
                     ETGModConsole.Log("lost your fingers"); break;
                 case OhNoMy.LEGS:
@@ -165,14 +168,33 @@ namespace CwaffingTheGungy
                     }
                     ETGModConsole.Log("lost your heart"); break;
                 case OhNoMy.LUNGS:
+                    chump.OnPreDodgeRoll -= Bombo.DodgeRollsAreExhausting;
                     chump.OnPreDodgeRoll += Bombo.DodgeRollsAreExhausting;
                     ETGModConsole.Log("lost your lungs"); break;
+                case OhNoMy.STOMACH:
+                    chump.GetExtComp().OnPickedUpHP -= Bombo.AppetiteLoss;
+                    chump.GetExtComp().OnPickedUpHP += Bombo.AppetiteLoss;
+                    LootEngine.SpawnItem(PickupObjectDatabase.GetById(73).gameObject, chump.CurrentRoom.GetRandomVisibleClearSpot(1, 1).ToVector3(), Vector2.zero, 1f, false, true, false);
+                    LootEngine.SpawnItem(PickupObjectDatabase.GetById(85).gameObject, chump.CurrentRoom.GetRandomVisibleClearSpot(1, 1).ToVector3(), Vector2.zero, 1f, false, true, false);
+                    LootEngine.SpawnItem(PickupObjectDatabase.GetById(120).gameObject, chump.CurrentRoom.GetRandomVisibleClearSpot(1, 1).ToVector3(), Vector2.zero, 1f, false, true, false);
+                    ETGModConsole.Log("lost your stomach"); break;
             }
         }
 
         public static void DodgeRollsAreExhausting(PlayerController wimp)
         {
             wimp.StartCoroutine(Bombo.PreventDodgeRolling(wimp,0.5f));
+        }
+
+        public static void AppetiteLoss(PlayerController wimp, HealthPickup hp)
+        {
+            // ETGModConsole.Log(hp.armorAmount+" armor, "+hp.healAmount+" health");
+            if (hp.armorAmount > 0)
+                wimp.healthHaver.Armor -= hp.armorAmount;
+            if (hp.healAmount > 0)
+                wimp.healthHaver.currentHealth -= hp.healAmount;
+            wimp.PlayEffectOnActor(ResourceCache.Acquire("Global VFX/VFX_Curse") as GameObject, Vector3.zero);
+            // wimp.StartCoroutine(Bombo.PreventDodgeRolling(wimp,0.5f));
         }
 
         public static IEnumerator PreventDodgeRolling(PlayerController wimp, float timer)

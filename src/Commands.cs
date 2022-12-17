@@ -93,7 +93,8 @@ namespace CwaffingTheGungy
                     bombyItem.transform.parent        = bombyPos.transform;
                     bombyItem.transform.localPosition = Vector3.zero;
                     bombyItem.transform.position      = Vector3.zero;
-                GameObject bombyPickup = PickupObjectDatabase.GetById(IDs.Pickups["natasha"]).gameObject;
+                GameObject bombyPickup = LootEngine.GetItemOfTypeAndQuality<PickupObject>(
+                  PickupObject.ItemQuality.S, GameManager.Instance.RewardManager.GunsLootTable, false).gameObject;
                     PickupObject po = bombyPickup.GetComponent<PickupObject>();
                 FakeShopItem fsi = bombyItem.AddComponent<FakeShopItem>();
                     if (!p1.CurrentRoom.IsRegistered(fsi))
