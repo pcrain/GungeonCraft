@@ -62,6 +62,9 @@ namespace CwaffingTheGungy
 
     private float myTimer = 0;
 
+    public OhNoMy sacType;
+    private string sacName;
+
     public void Initialize(PickupObject i)
     {
       InitializeInternal(i);
@@ -86,6 +89,9 @@ namespace CwaffingTheGungy
     private void InitializeInternal(PickupObject i)
     {
       this.effect = (PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.tileMapVertical;
+      sacType = (OhNoMy)UnityEngine.Random.Range(0, (int)OhNoMy._last);
+      sacName = Bombo.sacNames[(int)sacType];
+      ETGModConsole.Log("initialized with sac type "+sacName);
 
       item = i;
       CurrentPrice = item.PurchasePrice;
@@ -168,7 +174,8 @@ namespace CwaffingTheGungy
       // string name = (component == null) ? item.DisplayName : component.journalData.GetPrimaryDisplayName();
       string name = item.DisplayName;
       string price = ModifiedPrice.ToString() + "[sprite \"ui_coin\"]";
-      string label = string.Format("[color red]{0}: {1}[/color]", name, price);
+      price = "your [color #ff8888]"+Bombo.sacNames[(int)sacType]+"[/color]";
+      string label = string.Format("{0}: {1}", name, price);
       GameObject gameObject = GameUIRoot.Instance.RegisterDefaultLabel(base.transform, offset, label);
       dfLabel componentInChildren = gameObject.GetComponentInChildren<dfLabel>();
       componentInChildren.ColorizeSymbols = false;

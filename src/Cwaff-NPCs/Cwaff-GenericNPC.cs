@@ -111,7 +111,8 @@ namespace CwaffingTheGungy
             // base.sprite.SetSprite(base.sprite.GetSpriteIdByName("talk"));
             Vector3 size = base.sprite.GetCurrentSpriteDef().position3;
             // base.sprite.SetSprite(base.sprite.GetSpriteIdByName("idle"));
-            this.talkPointOffset = new Vector3(size.x / 2, size.y, 0) + this.talkPointAdjustment;
+            // this.talkPointOffset = new Vector3(size.x / 2, size.y, 0) + this.talkPointAdjustment;
+            this.talkPointOffset = new Vector3(0, size.y, 0) + this.talkPointAdjustment;
             SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black);
             base.aiAnimator.PlayUntilCancelled("idler");
         }

@@ -3074,6 +3074,16 @@
     <EmbeddedResource Include="Resources\NPCSprites\Ironside\ironside_talk_002.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\Ironside\armourcurrency_icon.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\Ironside\ironside_carpet.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\GrinReaper\grin-allsprites8.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\GrinReaper\grin-allsprites5.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\GrinReaper\grin-allsprites3.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\GrinReaper\grin-allsprites4.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\GrinReaper\grin-allsprites2.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\GrinReaper\grin-allsprites1.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\GrinReaper\grin-allsprites7.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\GrinReaper\grin-allsprites6.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\GrinReaper\grin-allsprites10.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\GrinReaper\grin-allsprites9.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\Rusty\rusty_buy_002.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\Rusty\rusty_buy_004.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\Rusty\rusty_mapicon.png"/>
