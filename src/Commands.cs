@@ -91,7 +91,7 @@ namespace CwaffingTheGungy
                     if (a.IsLegendaryHeroShrine && a.transform.position.GetAbsoluteRoom() == p1.CurrentRoom)
                     {
                         ETGModConsole.Log("found it!");
-                        v3 = a.transform.position + new Vector2(0,-3).ToVector3YUp(0);
+                        v3 = a.transform.position + (new Vector2(a.sprite.GetCurrentSpriteDef().position3.x/2,-8)).ToVector3YUp(0);
                     }
                 }
 

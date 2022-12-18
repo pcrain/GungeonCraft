@@ -141,8 +141,8 @@ namespace CwaffingTheGungy
 
     private void Update()
     {
-      const float RADIUS      = 1;
-      const int NUM_VFX       = 5;
+      const float RADIUS      = 1.3f;
+      const int NUM_VFX       = 10;
       const float ANGLE_DELTA = 360f / NUM_VFX;
       const float VFX_FREQ    = 0.4f;
 

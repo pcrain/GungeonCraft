@@ -15,6 +15,7 @@ using HutongGames.PlayMaker.Actions;
 using ItemAPI;
 using System.Reflection;
 using static NpcApi.CustomShopController;
+using MonoMod.RuntimeDetour;
 
 using Alexandria.Misc;
 
@@ -39,8 +40,13 @@ namespace CwaffingTheGungy
         public static List<string> sacNames        = new List<string> ( new string[(int)OhNoMy._last] );
         public static List<string> sacDescriptions = new List<string> ( new string[(int)OhNoMy._last] );
 
-        private bool strikingADeal = false;
+        private bool strikingADeal;
+        private bool hasBeenTalkedTo;
+        private bool hasAppeared;
 
+        private FakeShopItem item;
+
+        public static Hook bomboHook;
         public static void Init()
         {
             sacNames[(int)OhNoMy.EYES]    = "eyes";
@@ -82,49 +88,175 @@ namespace CwaffingTheGungy
                 }
                 // talkPointAdjust : new Vector3(2.5f, 2.5f, 0)
                 );
+
+            // Add a hook to spawn near the hero shrine at the beginning of the run
+            bomboHook = new Hook(
+                // typeof(PlayerController).GetMethod("Start", BindingFlags.Public | BindingFlags.Instance),
+                typeof(Dungeon).GetMethod("FloorReached", BindingFlags.Public | BindingFlags.Instance),
+                typeof(Bombo).GetMethod("SpawnNearHeroShrine"));
+        }
+
+        public static void SpawnNearHeroShrine(Action<Dungeon> orig, Dungeon self)
+        {
+            orig(self);
+            ETGModConsole.Log("trying to spawn!");
+            GameManager.Instance.PrimaryPlayer.StartCoroutine(SpawnInOnFirstFloor());
+        }
+
+        private static IEnumerator SpawnInOnFirstFloor()
+        {
+            PlayerController p1 = GameManager.Instance.PrimaryPlayer;
+            while (!p1.AcceptingAnyInput)
+                yield return null;  //wait for level to fully load
+
+            Vector3 v3 = Vector3.zero;
+            bool found = false;
+            foreach (AdvancedShrineController a in StaticReferenceManager.AllAdvancedShrineControllers)
+            {
+                if (a.IsLegendaryHeroShrine && a.transform.position.GetAbsoluteRoom() == p1.CurrentRoom)
+                {
+                    ETGModConsole.Log("found it!");
+                    found = true;
+                    v3 = a.transform.position + (new Vector2(a.sprite.GetCurrentSpriteDef().position3.x/2,-8)).ToVector3YUp(0);
+                }
+            }
+            if (!found)
+                yield break; //no hero shrine found, not the 1st floor
+
+            Bombo bombyboi = SpawnObjectManager.SpawnObject(Bombo.npcobj,v3).GetComponent<Bombo>();
+
+            // yield return null;
+            // bombyboi.GetComponent<Bombo>().AppearInAPuffOfSmoke();
+        }
+
+        protected override void Start()
+        {
+            base.Start();
+            base.renderer.enabled = false;
+            this.canInteract      = false;
+            this.hasBeenTalkedTo  = false;
+            this.strikingADeal    = false;
+            this.hasAppeared      = false;
         }
 
         protected override IEnumerator NPCTalkingScript()
         {
+            if (this.hasBeenTalkedTo)
+                yield break;
+
+            this.hasBeenTalkedTo = true;
+            GameObject bombyPickup;
+                if (UnityEngine.Random.Range(0,2) == 0)
+                    bombyPickup = LootEngine.GetItemOfTypeAndQuality<PickupObject>(
+                                    PickupObject.ItemQuality.S, GameManager.Instance.RewardManager.GunsLootTable, false).gameObject;
+                else
+                    bombyPickup = LootEngine.GetItemOfTypeAndQuality<PickupObject>(
+                                    PickupObject.ItemQuality.S, GameManager.Instance.RewardManager.ItemsLootTable, false).gameObject;
+            PickupObject po = bombyPickup.GetComponent<PickupObject>();
+
             List<string> conversation = new List<string> {
-                "Hey guys!",
-                "Got custom NPCs working o:",
-                "Neat huh?",
+                "Hey buddy, what's good!",
+                "Listen up, I've got a *real* nice item for you.",
                 };
 
             yield return StartCoroutine(Converse(conversation,"talker","idler"));
 
-            yield return StartCoroutine(Prompt(
-              "Very neat! :D",
-              "Not impressed. :/" + " (pay " + 99 + "[sprite \"hbux_text_icon\"] to disagree)"
-              ));
+            GameObject bombyPos = new GameObject("ItemPoint3");
+                bombyPos.transform.parent = this.transform;
+                bombyPos.transform.position = this.transform.position + new Vector3(0f, -5f, 0f);
+            GameObject bombyItem = new GameObject("Fake shop item test");
+                bombyItem.transform.parent        = bombyPos.transform;
+                bombyItem.transform.localPosition = Vector3.zero;
+                bombyItem.transform.position      = Vector3.zero;
+            item = bombyItem.AddComponent<FakeShopItem>();
+                if (!this.transform.position.GetAbsoluteRoom().IsRegistered(item))
+                    this.transform.position.GetAbsoluteRoom().RegisterInteractable(item);
+                item.purchasingScript = this.StrikeADealScript;
+                item.Initialize(po);
+            AkSoundEngine.PostEvent("Play_ENM_spawn_appear_01", base.gameObject);
 
-            if (PromptResult() == 0)
-            {
-                base.aiAnimator.PlayUntilCancelled("point");
-                this.ShowText("Yay! :D Have some money!",2f);
-                for(int i = 0; i < 30; ++i)
-                {
-                    LootEngine.SpawnCurrency(this.talkPoint.position, 1, false, Lazy.AngleToVector(360f*UnityEngine.Random.value), 0, 4);
-                    yield return new WaitForSeconds(1.0f/30.0f);
-                }
-            }
-            else
-            {
-                var oldTextSpeed = GameManager.Options.TextSpeed;
-                GameManager.Options.TextSpeed = GameOptions.GenericHighMedLowOption.LOW;
-                base.aiAnimator.PlayUntilCancelled("sad");
-                this.ShowText("...........",1f);
-                yield return new WaitForSeconds(1f);
-                this.ShowText("...........",1f);
-                yield return new WaitForSeconds(1f);
-                this.ShowText("...........",1f);
-                yield return new WaitForSeconds(1f);
-                GameManager.Options.TextSpeed = oldTextSpeed;
-                base.aiAnimator.PlayUntilCancelled("idler");
-                this.ShowText("WELL WHO ASKED YOU?!",2f);
-                Exploder.Explode(this.talkPoint.position, DerailGun.bigTrainExplosion, Vector2.zero);
-            }
+            GameObject smoke = (GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global VFX/VFX_Item_Spawn_Poof"));
+            tk2dBaseSprite smokesprite = smoke.GetComponent<tk2dBaseSprite>();
+            smokesprite.PlaceAtPositionByAnchor(po.sprite.WorldCenter.ToVector3ZUp(0f), tk2dBaseSprite.Anchor.MiddleCenter);
+            smokesprite.transform.position = bombyItem.transform.parent.position.Quantize(0.0625f);
+            smokesprite.HeightOffGround = 5f;
+            smokesprite.UpdateZDepth();
+
+            yield return new WaitForSeconds(0.8f);
+
+            List<string> conversation2 = new List<string> {
+                "Looks good doesn't it?",
+                "It won't cost you any shells, keys, blanks, or anything like that!",
+                "No no, all I ask for in return...",
+                };
+
+            yield return StartCoroutine(Converse(conversation2,"point"));
+            base.aiAnimator.PlayUntilCancelled("sad");
+            yield return new WaitForSeconds(1.25f);
+
+            List<string> conversation3 = new List<string> {
+                "...is a little bit of your " + sacNames[(int)item.sacType] + "!",
+                "Of course I mean that figuratively, not literally.",
+                };
+            yield return StartCoroutine(Converse(conversation3,"point"));
+
+            this.ShowText("...........",1.5f);
+            yield return new WaitForSeconds(1.5f);
+
+            List<string> conversation4 = new List<string> {
+                "So whaddaya say?",
+                };
+            yield return StartCoroutine(Converse(conversation4,"point"));
+
+            yield break;
+
+            // yield return StartCoroutine(Converse(conversation,"talker","idler"));
+
+            // yield return StartCoroutine(Prompt(
+            //   "Very neat! :D",
+            //   "Not impressed. :/" + " (pay " + 99 + "[sprite \"hbux_text_icon\"] to disagree)"
+            //   ));
+
+            // if (PromptResult() == 0)
+            // {
+            //     base.aiAnimator.PlayUntilCancelled("point");
+            //     this.ShowText("Yay! :D Have some money!",2f);
+            //     for(int i = 0; i < 30; ++i)
+            //     {
+            //         LootEngine.SpawnCurrency(this.talkPoint.position, 1, false, Lazy.AngleToVector(360f*UnityEngine.Random.value), 0, 4);
+            //         yield return new WaitForSeconds(1.0f/30.0f);
+            //     }
+            // }
+            // else
+            // {
+            //     var oldTextSpeed = GameManager.Options.TextSpeed;
+            //     GameManager.Options.TextSpeed = GameOptions.GenericHighMedLowOption.LOW;
+            //     base.aiAnimator.PlayUntilCancelled("sad");
+            //     this.ShowText("...........",1f);
+            //     yield return new WaitForSeconds(1f);
+            //     this.ShowText("...........",1f);
+            //     yield return new WaitForSeconds(1f);
+            //     this.ShowText("...........",1f);
+            //     yield return new WaitForSeconds(1f);
+            //     GameManager.Options.TextSpeed = oldTextSpeed;
+            //     base.aiAnimator.PlayUntilCancelled("idler");
+            //     this.ShowText("WELL WHO ASKED YOU?!",2f);
+            //     Exploder.Explode(this.talkPoint.position, DerailGun.bigTrainExplosion, Vector2.zero);
+            // }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            if (this.hasAppeared)
+                return;
+            float dist = Vector2.Distance(base.sprite.WorldCenter,GameManager.Instance.PrimaryPlayer.sprite.WorldCenter);
+            if (dist < 5f)
+                return;
+            this.AppearInAPuffOfSmoke();
+            this.hasAppeared      = true;
+            this.canInteract      = true;
+            base.renderer.enabled = true;
         }
 
         private void CutStat(PlayerController chump, PlayerStats.StatType stat, float amount)
@@ -185,7 +317,7 @@ namespace CwaffingTheGungy
 
         public static void DodgeRollsAreExhausting(PlayerController wimp)
         {
-            wimp.StartCoroutine(Bombo.PreventDodgeRolling(wimp,0.5f));
+            wimp.StartCoroutine(Bombo.PreventDodgeRolling(wimp,0.65f));
         }
 
         public static void AppetiteLoss(PlayerController wimp, HealthPickup hp)
@@ -196,7 +328,6 @@ namespace CwaffingTheGungy
             if (hp.healAmount > 0)
                 wimp.healthHaver.currentHealth -= hp.healAmount;
             wimp.PlayEffectOnActor(ResourceCache.Acquire("Global VFX/VFX_Curse") as GameObject, Vector3.zero);
-            // wimp.StartCoroutine(Bombo.PreventDodgeRolling(wimp,0.5f));
         }
 
         public static IEnumerator PreventDodgeRolling(PlayerController wimp, float timer)
@@ -247,7 +378,7 @@ namespace CwaffingTheGungy
             BeginConversation(p);
 
             yield return StartCoroutine(Prompt(
-                "sacrifice your [color #ff8888]\""+sacNames[(int)f.sacType]+"\"[/color] ("+sacDescriptions[(int)f.sacType]+")",
+                "sacrifice your [color #ff8888]"+sacNames[(int)f.sacType]+"[/color] ("+sacDescriptions[(int)f.sacType]+")",
                 "actually I rather like having my "+sacNames[(int)f.sacType]
                 ));
 

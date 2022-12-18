@@ -36,6 +36,7 @@ namespace CwaffingTheGungy
         public Transform talkPoint;
         public Vector3 talkPointAdjustment;
 
+        protected bool canInteract;
         protected bool m_canUse = true;
         protected PlayerController m_interactor;
 
@@ -50,6 +51,8 @@ namespace CwaffingTheGungy
 
         // minimum amount of time to show textboxes during interactive dialogue
         protected const float MIN_TEXTBOX_TIME = 0.2f;
+        // minimum amount of time to play talking animation assuming instant text is enabled
+        protected const float MIN_ANIMATION_TIME = 1.0f;
 
         public static GameObject Setup<T>(string name, string prefix, List<SimpleAnimationData> animationData, Vector3? talkPointAdjust = null)
             where T : FancyNPC
@@ -110,8 +113,9 @@ namespace CwaffingTheGungy
             }
         }
 
-        private void Start()
+        protected virtual void Start()
         {
+            this.canInteract = true;
             this.m_canUse = true;
             this.talkPoint = base.transform;
             // base.sprite.SetSprite(base.sprite.GetSpriteIdByName("talk"));
@@ -119,8 +123,10 @@ namespace CwaffingTheGungy
             // base.sprite.SetSprite(base.sprite.GetSpriteIdByName("idle"));
             // this.talkPointOffset = new Vector3(size.x / 2, size.y, 0) + this.talkPointAdjustment;
             this.talkPointOffset = new Vector3(0, size.y, 0) + this.talkPointAdjustment;
-            SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black);
+            // SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black);
             base.aiAnimator.PlayUntilCancelled("idler");
+            // base.aiAnimator.sprite.color = base.aiAnimator.sprite.color.WithAlpha(0f);
+            // base.renderer.enabled = false;
         }
 
         protected bool CanBeginConversation()
@@ -128,6 +134,8 @@ namespace CwaffingTheGungy
             if (TextBoxManager.HasTextBox(this.talkPoint))
                 return false;
             if (this.m_interactor != null)
+                return false;
+            if (!this.canInteract)
                 return false;
             return true;
         }
@@ -148,6 +156,16 @@ namespace CwaffingTheGungy
             this.m_interactor = null;  //if this method is overridden, needs to be set to null after conversation is done
         }
 
+        public void AppearInAPuffOfSmoke()
+        {
+          GameObject gameObject2 = (GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global VFX/VFX_Item_Spawn_Poof"));
+          tk2dBaseSprite sprite = gameObject2.GetComponent<tk2dBaseSprite>();
+          sprite.PlaceAtPositionByAnchor(base.sprite.WorldCenter.ToVector3ZUp(0f), tk2dBaseSprite.Anchor.MiddleCenter);
+          sprite.transform.position = sprite.transform.position.Quantize(0.0625f);
+          sprite.HeightOffGround = 5f;
+          sprite.UpdateZDepth();
+        }
+
         protected void VanishInAPuffOfSmoke()
         {
           GameObject gameObject2 = (GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global VFX/VFX_Item_Spawn_Poof"));
@@ -156,10 +174,7 @@ namespace CwaffingTheGungy
           sprite.transform.position = sprite.transform.position.Quantize(0.0625f);
           sprite.HeightOffGround = 5f;
           sprite.UpdateZDepth();
-          if (this.m_interactor != null)
-            this.m_interactor.CurrentRoom.DeregisterInteractable(this);
-          else
-            GameManager.Instance.PrimaryPlayer.CurrentRoom.DeregisterInteractable(this);
+          this.transform.position.GetAbsoluteRoom().DeregisterInteractable(this);
           UnityEngine.Object.Destroy(base.gameObject);
         }
 
@@ -229,7 +244,7 @@ namespace CwaffingTheGungy
                 {
                     timer += BraveTime.DeltaTime;
                     bool npcIsTalking = TextBoxManager.TextBoxCanBeAdvanced(this.talkPoint);
-                    if (playingTalkingAnimation && timer >= MIN_TEXTBOX_TIME && !npcIsTalking)
+                    if (playingTalkingAnimation && timer >= MIN_ANIMATION_TIME && !npcIsTalking)
                     {
                         playingTalkingAnimation = false;
                         if (pauseAnimation != null)
@@ -240,6 +255,8 @@ namespace CwaffingTheGungy
                 if (pauseAnimation != null)
                     base.aiAnimator.PlayUntilCancelled(pauseAnimation);
             }
+            TextBoxManager.ClearTextBox(this.talkPoint);
+            yield break;
         }
 
         // protected void Block(IEnumerator script)
@@ -259,12 +276,10 @@ namespace CwaffingTheGungy
             yield break;
         }
 
-        private void Update()
+        protected virtual void Update()
         {
             if (autoFlipSprite)
-            {
                 base.sprite.FlipX = (GameManager.Instance.PrimaryPlayer.CenterPosition.x < base.transform.position.x);
-            }
         }
 
         protected virtual IEnumerator NPCTalkingScript()
