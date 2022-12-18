@@ -43,6 +43,7 @@ namespace CwaffingTheGungy
         private bool strikingADeal;
         private bool hasBeenTalkedTo;
         private bool hasAppeared;
+        private Vector2 itemCamPosition;
 
         private FakeShopItem item;
 
@@ -142,7 +143,10 @@ namespace CwaffingTheGungy
         protected override IEnumerator NPCTalkingScript()
         {
             if (this.hasBeenTalkedTo)
+            {
+                this.ShowText("You like it? Go on, check it out!",1.0f);
                 yield break;
+            }
 
             this.hasBeenTalkedTo = true;
             GameObject bombyPickup;
@@ -163,7 +167,7 @@ namespace CwaffingTheGungy
 
             GameObject bombyPos = new GameObject("ItemPoint3");
                 bombyPos.transform.parent = this.transform;
-                bombyPos.transform.position = this.transform.position + new Vector3(0f, -5f, 0f);
+                bombyPos.transform.position = this.transform.position + new Vector3(0f, -3f, 0f);
             GameObject bombyItem = new GameObject("Fake shop item test");
                 bombyItem.transform.parent        = bombyPos.transform;
                 bombyItem.transform.localPosition = Vector3.zero;
@@ -181,6 +185,10 @@ namespace CwaffingTheGungy
             smokesprite.transform.position = bombyItem.transform.parent.position.Quantize(0.0625f);
             smokesprite.HeightOffGround = 5f;
             smokesprite.UpdateZDepth();
+
+            itemCamPosition = (bombyItem.transform.parent.PositionVector2() + new Vector2(0f,3.5f));
+            GameManager.Instance.MainCameraController.OverridePosition = itemCamPosition;
+            GameManager.Instance.MainCameraController.SetManualControl(true, true);
 
             yield return new WaitForSeconds(0.8f);
 
@@ -208,41 +216,9 @@ namespace CwaffingTheGungy
                 };
             yield return StartCoroutine(Converse(conversation4,"point"));
 
+            GameManager.Instance.MainCameraController.SetManualControl(false, true);
+
             yield break;
-
-            // yield return StartCoroutine(Converse(conversation,"talker","idler"));
-
-            // yield return StartCoroutine(Prompt(
-            //   "Very neat! :D",
-            //   "Not impressed. :/" + " (pay " + 99 + "[sprite \"hbux_text_icon\"] to disagree)"
-            //   ));
-
-            // if (PromptResult() == 0)
-            // {
-            //     base.aiAnimator.PlayUntilCancelled("point");
-            //     this.ShowText("Yay! :D Have some money!",2f);
-            //     for(int i = 0; i < 30; ++i)
-            //     {
-            //         LootEngine.SpawnCurrency(this.talkPoint.position, 1, false, Lazy.AngleToVector(360f*UnityEngine.Random.value), 0, 4);
-            //         yield return new WaitForSeconds(1.0f/30.0f);
-            //     }
-            // }
-            // else
-            // {
-            //     var oldTextSpeed = GameManager.Options.TextSpeed;
-            //     GameManager.Options.TextSpeed = GameOptions.GenericHighMedLowOption.LOW;
-            //     base.aiAnimator.PlayUntilCancelled("sad");
-            //     this.ShowText("...........",1f);
-            //     yield return new WaitForSeconds(1f);
-            //     this.ShowText("...........",1f);
-            //     yield return new WaitForSeconds(1f);
-            //     this.ShowText("...........",1f);
-            //     yield return new WaitForSeconds(1f);
-            //     GameManager.Options.TextSpeed = oldTextSpeed;
-            //     base.aiAnimator.PlayUntilCancelled("idler");
-            //     this.ShowText("WELL WHO ASKED YOU?!",2f);
-            //     Exploder.Explode(this.talkPoint.position, DerailGun.bigTrainExplosion, Vector2.zero);
-            // }
         }
 
         protected override void Update()
@@ -250,13 +226,17 @@ namespace CwaffingTheGungy
             base.Update();
             if (this.hasAppeared)
                 return;
+
             float dist = Vector2.Distance(base.sprite.WorldCenter,GameManager.Instance.PrimaryPlayer.sprite.WorldCenter);
             if (dist < 5f)
                 return;
+
             this.AppearInAPuffOfSmoke();
             this.hasAppeared      = true;
             this.canInteract      = true;
             base.renderer.enabled = true;
+            base.aiAnimator.PlayUntilCancelled("talker");
+            this.ShowText("Hey buddy! Over here!", 1f);
         }
 
         private void CutStat(PlayerController chump, PlayerStats.StatType stat, float amount)
@@ -377,20 +357,56 @@ namespace CwaffingTheGungy
                 yield break;
             BeginConversation(p);
 
+            ETGModConsole.Log("here1");
+            GameManager.Instance.MainCameraController.OverridePosition = itemCamPosition;
+            GameManager.Instance.MainCameraController.SetManualControl(true, true);
+            ETGModConsole.Log("here2");
+
+            List<string> conversation = new List<string> {
+                "You like it, huh?",
+                "So we got a deal?",
+                };
+            ETGModConsole.Log("here3");
+            yield return StartCoroutine(Converse(conversation,"point"));
+            ETGModConsole.Log("here4");
+
             yield return StartCoroutine(Prompt(
                 "sacrifice your [color #ff8888]"+sacNames[(int)f.sacType]+"[/color] ("+sacDescriptions[(int)f.sacType]+")",
                 "actually I rather like having my "+sacNames[(int)f.sacType]
                 ));
 
-            if (PromptResult() == 0) //accept
+            if (PromptResult() == 1) //decline
             {
-                RandomSacrifice(p,f.sacType);
-                f.Purchased(p);
-                yield return StartCoroutine(SacrificeCutsceneScript(p));
-                VanishInAPuffOfSmoke();
+                this.ShowText("Alright, suit yourself!", 1f);
+                GameManager.Instance.MainCameraController.SetManualControl(false, true);
+                EndConversation();
+                yield break;
             }
 
+            f.Purchased(p);
+            List<string> conversation2 = new List<string> {
+                "Excellent!",
+                "I'm just gonna perform a quick little ritual to take your "+sacNames[(int)f.sacType]+" and you'll be on your way.",
+                "It shouldn't hurt a bit!",
+                "...at least nobody's ever complained about it, anyhow.",
+                "Here we go",
+                };
+            yield return StartCoroutine(Converse(conversation2,"point"));
+
+            yield return StartCoroutine(SacrificeCutsceneScript(p));
+            RandomSacrifice(p,f.sacType);
+
+            GameManager.Instance.MainCameraController.SetManualControl(false, true);
             EndConversation();
+
+            this.ShowText("Pleasure working with ya!", 1f);
+            AppearInAPuffOfSmoke();
+            this.renderer.enabled = false;
+            SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.white);  //hack to make the sprite immediately disappear
+            this.transform.position.GetAbsoluteRoom().DeregisterInteractable(this);
+            yield return new WaitForSeconds(1.1f);
+
+            UnityEngine.Object.Destroy(base.gameObject);
             yield break;
         }
     }

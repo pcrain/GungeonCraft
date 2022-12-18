@@ -151,9 +151,11 @@ namespace CwaffingTheGungy
         protected void EndConversation()
         {
             // TextBoxManager.ClearTextBox(this.talkPoint);
+            SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.white);
             this.m_interactor.ClearInputOverride("npcConversation");
             Pixelator.Instance.LerpToLetterbox(1, 0.25f);
             this.m_interactor = null;  //if this method is overridden, needs to be set to null after conversation is done
+            GameManager.Instance.MainCameraController.SetManualControl(false, true);
         }
 
         public void AppearInAPuffOfSmoke()
@@ -187,6 +189,8 @@ namespace CwaffingTheGungy
 
         protected void ShowText(string convoLine, float autoContinueTimer = -1f)
         {
+            if (TextBoxManager.HasTextBox(this.talkPoint))
+                TextBoxManager.ClearTextBox(this.talkPoint);
             // if (this.m_interactor == null)
             // {
             //     ETGModConsole.Log("trying to talk with null interactor!");
