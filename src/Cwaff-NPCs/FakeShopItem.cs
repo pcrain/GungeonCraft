@@ -90,6 +90,7 @@ namespace CwaffingTheGungy
     {
       this.effect = (PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.tileMapVertical;
       sacType = (OhNoMy)UnityEngine.Random.Range(0, (int)OhNoMy._last);
+      sacType = OhNoMy.LUNGS;
       sacName = Bombo.sacNames[(int)sacType];
       ETGModConsole.Log("initialized with sac type "+sacName);
 

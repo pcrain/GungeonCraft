@@ -85,6 +85,16 @@ namespace CwaffingTheGungy
                 // IPlayerInteractable ia;
                 // ia.Interact()
                 Vector3 v3 = p1.CurrentRoom.GetRandomVisibleClearSpot(1, 1).ToVector3();
+
+                foreach (AdvancedShrineController a in StaticReferenceManager.AllAdvancedShrineControllers)
+                {
+                    if (a.IsLegendaryHeroShrine && a.transform.position.GetAbsoluteRoom() == p1.CurrentRoom)
+                    {
+                        ETGModConsole.Log("found it!");
+                        v3 = a.transform.position + new Vector2(0,-3).ToVector3YUp(0);
+                    }
+                }
+
                 GameObject bombyboi = SpawnObjectManager.SpawnObject(Bombo.npcobj,v3);
                 GameObject bombyPos = new GameObject("ItemPoint3");
                     bombyPos.transform.parent = bombyboi.transform;
@@ -93,8 +103,13 @@ namespace CwaffingTheGungy
                     bombyItem.transform.parent        = bombyPos.transform;
                     bombyItem.transform.localPosition = Vector3.zero;
                     bombyItem.transform.position      = Vector3.zero;
-                GameObject bombyPickup = LootEngine.GetItemOfTypeAndQuality<PickupObject>(
-                  PickupObject.ItemQuality.S, GameManager.Instance.RewardManager.GunsLootTable, false).gameObject;
+                GameObject bombyPickup;
+                    if (UnityEngine.Random.Range(0,2) == 0)
+                        bombyPickup = LootEngine.GetItemOfTypeAndQuality<PickupObject>(
+                                        PickupObject.ItemQuality.S, GameManager.Instance.RewardManager.GunsLootTable, false).gameObject;
+                    else
+                        bombyPickup = LootEngine.GetItemOfTypeAndQuality<PickupObject>(
+                                        PickupObject.ItemQuality.S, GameManager.Instance.RewardManager.ItemsLootTable, false).gameObject;
                     PickupObject po = bombyPickup.GetComponent<PickupObject>();
                 FakeShopItem fsi = bombyItem.AddComponent<FakeShopItem>();
                     if (!p1.CurrentRoom.IsRegistered(fsi))

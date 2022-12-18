@@ -92,46 +92,21 @@ namespace CwaffingTheGungy
                 "Neat huh?",
                 };
 
-            for (int ci = 0; ci < conversation.Count - 1; ci++)
-            {
-                TextBoxManager.ClearTextBox(this.talkPoint);
-                base.aiAnimator.PlayUntilCancelled("talker");
-                this.ShowText(conversation[ci]);
-                float timer = 0;
-                bool playingTalkingAnimation = true;
-                while (!BraveInput.GetInstanceForPlayer(this.m_interactor.PlayerIDX).ActiveActions.GetActionFromType(GungeonActions.GungeonActionType.Interact).WasPressed || timer < MIN_TEXTBOX_TIME)
-                {
-                    timer += BraveTime.DeltaTime;
-                    bool npcIsTalking = TextBoxManager.TextBoxCanBeAdvanced(this.talkPoint);
-                    if (playingTalkingAnimation && timer >= MIN_TEXTBOX_TIME && !npcIsTalking)
-                    {
-                        playingTalkingAnimation = false;
-                        base.aiAnimator.PlayUntilCancelled("idler");
-                    }
-                    yield return null;
-                }
-                base.aiAnimator.PlayUntilCancelled("idler");
-            }
-            this.ShowText(conversation[conversation.Count-1]);
+            yield return StartCoroutine(Converse(conversation,"talker","idler"));
 
-            // var acceptanceTextToUse = "i accept" + " (" + 5 + "[sprite \"ui_coin\"])";
-            // var declineTextToUse = "i decline" + " (" + 5 + "[sprite \"hbux_text_icon\"])";
-            var acceptanceTextToUse = "Very neat! :D";
-            var declineTextToUse = "Not impressed. :/" + " (pay " + 99 + "[sprite \"hbux_text_icon\"] to disagree)";
-            GameUIRoot.Instance.DisplayPlayerConversationOptions(this.m_interactor, null, acceptanceTextToUse, declineTextToUse);
-            int selectedResponse = -1;
-            while (!GameUIRoot.Instance.GetPlayerConversationResponse(out selectedResponse))
-                yield return null;
+            yield return StartCoroutine(Prompt(
+              "Very neat! :D",
+              "Not impressed. :/" + " (pay " + 99 + "[sprite \"hbux_text_icon\"] to disagree)"
+              ));
 
-            if (selectedResponse == 0)
+            if (PromptResult() == 0)
             {
                 base.aiAnimator.PlayUntilCancelled("point");
                 this.ShowText("Yay! :D Have some money!",2f);
                 for(int i = 0; i < 30; ++i)
                 {
                     LootEngine.SpawnCurrency(this.talkPoint.position, 1, false, Lazy.AngleToVector(360f*UnityEngine.Random.value), 0, 4);
-                    yield return null;
-                    yield return null;
+                    yield return new WaitForSeconds(1.0f/30.0f);
                 }
             }
             else
@@ -234,73 +209,57 @@ namespace CwaffingTheGungy
             wimp.ClearInputOverride("exhausted");
         }
 
+        private IEnumerator SacrificeCutsceneScript(PlayerController p)
+        {
+            // Make some fancy particle effects
+            VFXPool v  = VFX.CreatePoolFromVFXGameObject((PickupObjectDatabase.GetById(45) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
+            VFXPool v2 = (PickupObjectDatabase.GetById(519) as Gun).DefaultModule.projectiles[0].hitEffects.tileMapVertical;
+            GameManager.Instance.MainCameraController.DoScreenShake(new ScreenShakeSettings(0.35f,6f,2.0f,0f), null);
+            for (int i = 0; i < 30; ++i)
+            {
+                Vector2 ppos = p.sprite.WorldCenter + Lazy.AngleToVector(i*UnityEngine.Random.Range(0f,360f),2f);
+                v.SpawnAtPosition(ppos.ToVector3ZisY(-1f), 0, null, null, null, -0.05f);
+                // AkSoundEngine.PostEvent("Play_OBJ_crystal_shatter_01", base.gameObject);
+                AkSoundEngine.PostEvent("Play_ENM_cannonball_explode_01", p.gameObject);
+
+                if (i % 3 == 0)
+                {
+                    if (i % 6 == 0)
+                        Pixelator.Instance.CustomFade(0.1875f, 0f, Color.black, Color.black, 1.0f, 0.5f);
+                    else
+                        Pixelator.Instance.CustomFade(0.1875f, 0f, Color.black, Color.black, 0.5f, 1.0f);
+                }
+                yield return new WaitForSeconds(0.0625f);
+            }
+            Vector2 ppos2 = p.sprite.WorldCenter + new Vector2(0f,-0.05f);
+            v2.SpawnAtPosition(ppos2.ToVector3ZisY(1f), 0, null, null, null, 5f);
+            AkSoundEngine.PostEvent("Play_OBJ_lightning_flash_01", base.gameObject);
+            Pixelator.Instance.FadeToColor(0.5f, Color.white, false, 0f);
+            yield return new WaitForSeconds(0.5f);
+            Pixelator.Instance.FadeToColor(0.5f, Color.white, true, 0f);
+            yield return new WaitForSeconds(0.5f);
+        }
+
         public IEnumerator StrikeADealScript(FakeShopItem f, PlayerController p)
         {
-            if (this.m_interactor != null)
+            if (!(CanBeginConversation()))
                 yield break;
-            this.m_interactor = p;
-            this.m_interactor.SetInputOverride("npcConversation");
+            BeginConversation(p);
 
-            GameUIRoot.Instance.DisplayPlayerConversationOptions(
-                this.m_interactor,
-                null,
+            yield return StartCoroutine(Prompt(
                 "sacrifice your [color #ff8888]\""+sacNames[(int)f.sacType]+"\"[/color] ("+sacDescriptions[(int)f.sacType]+")",
                 "actually I rather like having my "+sacNames[(int)f.sacType]
-                );
-            int selectedResponse = -1;
-            while (!GameUIRoot.Instance.GetPlayerConversationResponse(out selectedResponse))
-                yield return null;
+                ));
 
-            if (selectedResponse == 0) //accept
+            if (PromptResult() == 0) //accept
             {
                 RandomSacrifice(p,f.sacType);
                 f.Purchased(p);
-
-                VFXPool v  = VFX.CreatePoolFromVFXGameObject((PickupObjectDatabase.GetById(45) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
-                // VFXPool v2 = (PickupObjectDatabase.GetById(45) as Gun).DefaultModule.projectiles[0].hitEffects.enemy;
-                VFXPool v2 = (PickupObjectDatabase.GetById(519) as Gun).DefaultModule.projectiles[0].hitEffects.tileMapVertical;
-                for (int i = 0; i < 33; ++i)
-                {
-                    Vector2 ppos = p.sprite.WorldCenter + Lazy.AngleToVector(i*UnityEngine.Random.Range(0f,360f),2f);
-                    v.SpawnAtPosition(ppos.ToVector3ZisY(-1f), 0, null, null, null, -0.05f);
-                    // AkSoundEngine.PostEvent("Play_OBJ_crystal_shatter_01", base.gameObject);
-                    AkSoundEngine.PostEvent("Play_ENM_cannonball_explode_01", p.gameObject);
-
-                    Pixelator.Instance.FadeToColor(0.03f, Color.black, true, 0.03f);
-                    yield return new WaitForSeconds(0.0625f);
-                }
-                Vector2 ppos2 = p.sprite.WorldCenter + new Vector2(0f,-0.05f);
-                // v2.effects[0].effects[0].zHeight
-                v2.SpawnAtPosition(ppos2.ToVector3ZisY(1f), 0, null, null, null, 5f);
-                // AkSoundEngine.PostEvent("Play_OBJ_crystal_shatter_01", base.gameObject);
-                // AkSoundEngine.PostEvent("Play_BOSS_dragun_thunder_01", base.gameObject);
-
-                AkSoundEngine.PostEvent("Play_OBJ_lightning_flash_01", base.gameObject);
-                // AkSoundEngine.PostEvent("Play_ENV_thunder_flash_01", base.gameObject);
-                Pixelator.Instance.FadeToColor(0.1f, Color.white, true, 0.05f);
-                yield return new WaitForSeconds(0.15f);
-                Pixelator.Instance.FadeToColor(0.1f, Color.white, true, 0.05f);
-                yield return new WaitForSeconds(0.1f);
-                GameManager.Instance.MainCameraController.DoScreenShake(new ScreenShakeSettings(), null);
-                // GameManager.Instance.MainCameraController.DoScreenShake(ThunderShake, null);
-                yield return null;
+                yield return StartCoroutine(SacrificeCutsceneScript(p));
+                VanishInAPuffOfSmoke();
             }
 
-            this.m_interactor.ClearInputOverride("npcConversation");
-            this.m_interactor = null;
-
-            // vanish in a puff of smoke
-            if (selectedResponse == 0)
-            {
-                  GameObject gameObject2 = (GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global VFX/VFX_Item_Spawn_Poof"));
-                  tk2dBaseSprite component2 = gameObject2.GetComponent<tk2dBaseSprite>();
-                  component2.PlaceAtPositionByAnchor(base.sprite.WorldCenter.ToVector3ZUp(0f), tk2dBaseSprite.Anchor.MiddleCenter);
-                  component2.transform.position = component2.transform.position.Quantize(0.0625f);
-                  component2.HeightOffGround = 5f;
-                  component2.UpdateZDepth();
-                  p.CurrentRoom.DeregisterInteractable(this);
-                  UnityEngine.Object.Destroy(base.gameObject);
-            }
+            EndConversation();
             yield break;
         }
     }

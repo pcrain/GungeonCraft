@@ -41,9 +41,15 @@ namespace CwaffingTheGungy
 
         protected Vector3 talkPointOffset;
         protected bool autoFlipSprite = true;
+        protected int PromptResult()
+        {
+            return LastResponse;
+        }
+
+        private int LastResponse { get; set; }
 
         // minimum amount of time to show textboxes during interactive dialogue
-        protected const float MIN_TEXTBOX_TIME = 0.5f;
+        protected const float MIN_TEXTBOX_TIME = 0.2f;
 
         public static GameObject Setup<T>(string name, string prefix, List<SimpleAnimationData> animationData, Vector3? talkPointAdjust = null)
             where T : FancyNPC
@@ -117,28 +123,67 @@ namespace CwaffingTheGungy
             base.aiAnimator.PlayUntilCancelled("idler");
         }
 
-        public void Interact(PlayerController interactor)
+        protected bool CanBeginConversation()
         {
             if (TextBoxManager.HasTextBox(this.talkPoint))
-                return;
+                return false;
             if (this.m_interactor != null)
+                return false;
+            return true;
+        }
+
+        protected void BeginConversation(PlayerController interactor)
+        {
+            this.m_interactor = interactor;
+            SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black);
+            this.m_interactor.SetInputOverride("npcConversation");
+            Pixelator.Instance.LerpToLetterbox(0.35f, 0.25f);
+        }
+
+        protected void EndConversation()
+        {
+            // TextBoxManager.ClearTextBox(this.talkPoint);
+            this.m_interactor.ClearInputOverride("npcConversation");
+            Pixelator.Instance.LerpToLetterbox(1, 0.25f);
+            this.m_interactor = null;  //if this method is overridden, needs to be set to null after conversation is done
+        }
+
+        protected void VanishInAPuffOfSmoke()
+        {
+          GameObject gameObject2 = (GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global VFX/VFX_Item_Spawn_Poof"));
+          tk2dBaseSprite sprite = gameObject2.GetComponent<tk2dBaseSprite>();
+          sprite.PlaceAtPositionByAnchor(base.sprite.WorldCenter.ToVector3ZUp(0f), tk2dBaseSprite.Anchor.MiddleCenter);
+          sprite.transform.position = sprite.transform.position.Quantize(0.0625f);
+          sprite.HeightOffGround = 5f;
+          sprite.UpdateZDepth();
+          if (this.m_interactor != null)
+            this.m_interactor.CurrentRoom.DeregisterInteractable(this);
+          else
+            GameManager.Instance.PrimaryPlayer.CurrentRoom.DeregisterInteractable(this);
+          UnityEngine.Object.Destroy(base.gameObject);
+        }
+
+        public void Interact(PlayerController interactor)
+        {
+            if (!(CanBeginConversation()))
                 return;
             base.StartCoroutine(this.HandleConversation(interactor));
         }
 
         protected void ShowText(string convoLine, float autoContinueTimer = -1f)
         {
-            if (this.m_interactor == null)
-            {
-                ETGModConsole.Log("trying to talk with null interactor!");
-                return;
-            }
+            // if (this.m_interactor == null)
+            // {
+            //     ETGModConsole.Log("trying to talk with null interactor!");
+            //     return;
+            // }
             TextBoxManager.ShowTextBox(
                 this.talkPoint.position + this.talkPointOffset,
                 this.talkPoint,
                 autoContinueTimer,
                 convoLine,
-                this.m_interactor.characterAudioSpeechTag,
+                audioTag: "",
+                // this.m_interactor.characterAudioSpeechTag,
                 instant: false,
                 showContinueText: true
                 );
@@ -147,19 +192,17 @@ namespace CwaffingTheGungy
         private IEnumerator HandleConversation(PlayerController interactor)
         {
             // Verify we can actually interact with this interactible
-            this.m_interactor = interactor;
             if (!this.m_canUse)
             {
-                base.aiAnimator.PlayForDuration("talker", 2f);
-                this.ShowText("I have nothing to say right now.", 2f);
-                this.m_interactor = null;
+                // base.aiAnimator.PlayForDuration("talker", 2f);
+                if (this.m_interactor == null)
+                    this.ShowText("I have nothing to say right now.", 2f);
+                // this.m_interactor = null;
                 yield break;
             }
 
             // Set up input overrides and letterboxing
-            SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black);
-            this.m_interactor.SetInputOverride("npcConversation");
-            Pixelator.Instance.LerpToLetterbox(0.35f, 0.25f);
+            BeginConversation(interactor);
             yield return null;
 
             // Run the actual script
@@ -168,11 +211,52 @@ namespace CwaffingTheGungy
                 yield return script.Current;
 
             // Tear down input overrides and letterboxing
-            // TextBoxManager.ClearTextBox(this.talkPoint);
-            this.m_interactor.ClearInputOverride("npcConversation");
-            Pixelator.Instance.LerpToLetterbox(1, 0.25f);
             base.aiAnimator.PlayUntilCancelled("idler");
-            this.m_interactor = null;  //if this method is overridden, needs to be set to null after conversation is done
+            EndConversation();
+        }
+
+        protected IEnumerator Converse(List<string> dialogue, string talkAnimation = null, string pauseAnimation = null)
+        {
+            for (int ci = 0; ci < dialogue.Count; ++ci)
+            {
+                TextBoxManager.ClearTextBox(this.talkPoint);
+                if (talkAnimation != null)
+                    base.aiAnimator.PlayUntilCancelled(talkAnimation);
+                this.ShowText(dialogue[ci]);
+                float timer = 0;
+                bool playingTalkingAnimation = true;
+                while (!BraveInput.GetInstanceForPlayer(this.m_interactor.PlayerIDX).ActiveActions.GetActionFromType(GungeonActions.GungeonActionType.Interact).WasPressed || timer < MIN_TEXTBOX_TIME)
+                {
+                    timer += BraveTime.DeltaTime;
+                    bool npcIsTalking = TextBoxManager.TextBoxCanBeAdvanced(this.talkPoint);
+                    if (playingTalkingAnimation && timer >= MIN_TEXTBOX_TIME && !npcIsTalking)
+                    {
+                        playingTalkingAnimation = false;
+                        if (pauseAnimation != null)
+                            base.aiAnimator.PlayUntilCancelled(pauseAnimation);
+                    }
+                    yield return null;
+                }
+                if (pauseAnimation != null)
+                    base.aiAnimator.PlayUntilCancelled(pauseAnimation);
+            }
+        }
+
+        // protected void Block(IEnumerator script)
+        // {
+        //     while(script.MoveNext())
+        //         yield return script.Current;
+        //     yield break;
+        // }
+
+        protected IEnumerator Prompt(string optionA, string optionB)
+        {
+            int selectedResponse = -1;
+            GameUIRoot.Instance.DisplayPlayerConversationOptions(this.m_interactor, null, optionA, optionB);
+            while (!GameUIRoot.Instance.GetPlayerConversationResponse(out selectedResponse))
+                yield return null;
+            LastResponse = selectedResponse;
+            yield break;
         }
 
         private void Update()
@@ -193,27 +277,9 @@ namespace CwaffingTheGungy
                 "Neat huh?",
                 };
 
-            for (int ci = 0; ci < conversation.Count - 1; ci++)
-            {
-                TextBoxManager.ClearTextBox(this.talkPoint);
-                base.aiAnimator.PlayUntilCancelled("talker");
-                this.ShowText(conversation[ci]);
-                float timer = 0;
-                bool playingTalkingAnimation = true;
-                while (!BraveInput.GetInstanceForPlayer(this.m_interactor.PlayerIDX).ActiveActions.GetActionFromType(GungeonActions.GungeonActionType.Interact).WasPressed || timer < MIN_TEXTBOX_TIME)
-                {
-                    timer += BraveTime.DeltaTime;
-                    bool npcIsTalking = TextBoxManager.TextBoxCanBeAdvanced(this.talkPoint);
-                    if (playingTalkingAnimation && timer >= MIN_TEXTBOX_TIME && !npcIsTalking)
-                    {
-                        playingTalkingAnimation = false;
-                        base.aiAnimator.PlayUntilCancelled("idler");
-                    }
-                    yield return null;
-                }
-                base.aiAnimator.PlayUntilCancelled("idler");
-            }
-            this.ShowText(conversation[conversation.Count-1]);
+            IEnumerator script = Converse(conversation,"talker","idler");
+            while(script.MoveNext())
+                yield return script.Current;
 
             // var acceptanceTextToUse = "i accept" + " (" + 5 + "[sprite \"ui_coin\"])";
             // var declineTextToUse = "i decline" + " (" + 5 + "[sprite \"hbux_text_icon\"])";
@@ -223,6 +289,10 @@ namespace CwaffingTheGungy
             int selectedResponse = -1;
             while (!GameUIRoot.Instance.GetPlayerConversationResponse(out selectedResponse))
                 yield return null;
+
+            IEnumerator prompt = Prompt("Very neat! :D","Not impressed. :/" + " (pay " + 99 + "[sprite \"hbux_text_icon\"] to disagree)");
+            while(prompt.MoveNext())
+                yield return prompt.Current;
 
             this.ShowText((selectedResponse == 0) ? "Yay!" : "Aw ):",2f);
         }
