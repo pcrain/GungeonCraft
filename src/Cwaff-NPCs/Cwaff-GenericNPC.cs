@@ -263,13 +263,6 @@ namespace CwaffingTheGungy
             yield break;
         }
 
-        // protected void Block(IEnumerator script)
-        // {
-        //     while(script.MoveNext())
-        //         yield return script.Current;
-        //     yield break;
-        // }
-
         protected IEnumerator Prompt(string optionA, string optionB)
         {
             int selectedResponse = -1;

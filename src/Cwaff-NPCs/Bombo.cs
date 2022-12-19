@@ -98,8 +98,10 @@ namespace CwaffingTheGungy
 
             // Set up sweat particles
             sweat = FakePrefab.Clone(PickupObjectDatabase.GetById(449).GetComponent<TeleporterPrototypeItem>().TelefragVFXPrefab.gameObject).GetComponent<ParticleSystem>();
-            sweat.startLifetime = 0.3f;
-            sweat.startColor = Color.cyan;
+            #pragma warning disable 0618 //disable deprecation warnings for a bit
+                sweat.startLifetime = 0.3f;
+                sweat.startColor = Color.cyan;
+            #pragma warning restore 0618
             sweat.emission.SetBurst(0, new ParticleSystem.Burst { count = 5, time = 0, cycleCount = 1, repeatInterval = 0.010f, maxCount = 5, minCount = 5 });
             sweat.gameObject.SetActive(false);
             FakePrefab.MarkAsFakePrefab(sweat.gameObject);
@@ -107,7 +109,6 @@ namespace CwaffingTheGungy
 
             // Add a hook to spawn near the hero shrine at the beginning of the run
             bomboHook = new Hook(
-                // typeof(PlayerController).GetMethod("Start", BindingFlags.Public | BindingFlags.Instance),
                 typeof(Dungeon).GetMethod("FloorReached", BindingFlags.Public | BindingFlags.Instance),
                 typeof(Bombo).GetMethod("HandleNewFloor"));
         }
@@ -167,9 +168,6 @@ namespace CwaffingTheGungy
 
             // reset state from last run if necessary
             ETGMod.AIActor.OnPreStart -= ICantSee;
-            // GameUIRoot.Instance.ShowCoreUI("brainless");
-            // GameUIRoot.Instance.ForceHideGunPanel = true;
-            // GameUIRoot.Instance.ForceHideItemPanel = true;
         }
 
         protected override IEnumerator NPCTalkingScript()
@@ -192,7 +190,7 @@ namespace CwaffingTheGungy
 
             List<string> conversation = new List<string> {
                 "Hey buddy, what's good!",
-                "Listen up, I've got a *real* nice item for you.",
+                "Listen, I've got a *real* nice item for you.",
                 };
 
             yield return StartCoroutine(Converse(conversation,"talker","idler"));
@@ -222,37 +220,34 @@ namespace CwaffingTheGungy
             GameManager.Instance.MainCameraController.OverridePosition = itemCamPosition;
             GameManager.Instance.MainCameraController.SetManualControl(true, true);
 
-            yield return new WaitForSeconds(0.8f);
+            yield return new WaitForSeconds(0.75f);
 
             List<string> conversation2 = new List<string> {
-                "Looks good doesn't it?",
-                "It won't cost you any shells, keys, blanks, or anything like that!",
-                "No no, all I ask for in return...",
+                "Looks good, eh? It won't cost you any shells, keys, blanks, or anything like that!",
+                "No no, all I ask in return for this beautiful treasure...",
                 };
 
             yield return StartCoroutine(Converse(conversation2,"point"));
             base.aiAnimator.PlayUntilCancelled("sad");
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.4f);
 
             List<string> conversation3 = new List<string> {
-                "...is a little bit of self-sacrifice!",
-                "Specifically your " + sacNames[(int)item.sacType] + "!",
+                "...is a little bit of self-sacrifice! Specifically your *" + sacNames[(int)item.sacType] + "*!",
                 "Of course I mean that figuratively, not literally.",
-                "Kinda...",
-                "...........",
-                "So whaddaya say?",
                 };
             yield return StartCoroutine(Converse(conversation3,"point"));
 
-            // this.ShowText("...........",0.75f);
-            // yield return new WaitForSeconds(1.5f);
-            // List<string> conversation4 = new List<string> {
-            //     "So whaddaya say?",
-            //     };
-            // yield return StartCoroutine(Converse(conversation4,"point"));
+            List<string> conversation3b = new List<string> {
+                "(...kinda..............)",
+                };
+            yield return StartCoroutine(Converse(conversation3b,"sad"));
+
+            List<string> conversation3c = new List<string> {
+                "So whaddaya say?",
+                };
+            yield return StartCoroutine(Converse(conversation3c,"point"));
 
             GameManager.Instance.MainCameraController.SetManualControl(false, true);
-
             yield break;
         }
 
@@ -268,15 +263,12 @@ namespace CwaffingTheGungy
             if (dist < 3f)
                 return;
 
-            // if (ppos.y < mepos.y) //shift down a bit to compensate
-            //     base.transform.position += new Vector2(0,-2f).ToVector3ZisY(0);
-
             this.AppearInAPuffOfSmoke();
             this.hasAppeared      = true;
             this.canInteract      = true;
             base.renderer.enabled = true;
             base.aiAnimator.PlayUntilCancelled("talker");
-            this.ShowText("Hey buddy! Over here!", 1f);
+            this.ShowText("Pssst! Over here!", 1f);
         }
 
         private void CutStat(PlayerController chump, PlayerStats.StatType stat, float amount)
@@ -291,7 +283,6 @@ namespace CwaffingTheGungy
 
         private static void ICantSee(AIActor enemy)
         {
-            ETGModConsole.Log("seeing is hard");
             enemy.RegisterOverrideColor(Color.black, "blindness");
             enemy.StartCoroutine(ImInvisible(enemy));
         }
@@ -308,27 +299,7 @@ namespace CwaffingTheGungy
                 self.sprite.usesOverrideMaterial = true;
                 self.renderer.material.shader = ShaderCache.Acquire("Brave/LitBlendUber");
                 self.renderer.material.SetFloat("_VertexColor", 1f);
-                // self.sprite.color = self.sprite.color.WithAlpha(0.1f);
                 self.sprite.color = self.sprite.color.WithAlpha(0.0f);
-                // self.sprite.renderer.material = newmat;
-                // self.sprite.renderer.material.SetColor("_OverrideColor", Color.black);
-                // self.sprite.OverrideMaterialMode = tk2dBaseSprite.SpriteMaterialOverrideMode.OVERRIDE_MATERIAL_SIMPLE;
-                // self.sprite.renderer.material.SetFloat("_Opacity", 0.1f);
-
-                // Material sharedMaterial = self.sprite.renderer.sharedMaterial;
-                // sharedMaterial.SetFloat("_EmissivePower", 1f);
-                // sharedMaterial.SetFloat("_Opacity", 0.1f);
-
-                // self.sprite.renderer.material.SetColor(Shader.PropertyToID("_OverrideColor"), Color.red);
-                // self.sprite.renderer.material.SetFloat(Shader.PropertyToID("_BrightnessMultiply"), 0.2f);
-
-                // self.sprite.renderer.material.SetColor("_OverrideColor", Color.black);
-                // self.RegisterOverrideColor(Color.black, "blindness")
-                // enemy.sprite.renderer.material
-                // enemy.sprite.renderer.enabled = false;
-                // self.sprite.UpdateZDepth();
-                // self.sprite.renderer.enabled = false;
-                // SpriteOutlineManager.AddOutlineToSprite(self.sprite, Color.black);
             }
         }
 
@@ -339,7 +310,6 @@ namespace CwaffingTheGungy
                 sacrifice = (OhNoMy)UnityEngine.Random.Range(0, (int)OhNoMy._last);
             else
                 sacrifice = sacType;
-            // sacrifice        = OhNoMy.STOMACH;
             switch(sacrifice)
             {
                 case OhNoMy.BRAIN:
@@ -385,7 +355,6 @@ namespace CwaffingTheGungy
 
         public static void MightDropTheGun(Projectile p, float f)
         {
-            // const float CHANCE_TO_DROP = 0.05f;
             const int AVG_NUM_TIMES_TO_DROP = 10;
             PlayerController klutz = p.ProjectilePlayerOwner();
             if (klutz.CurrentGun == null || !klutz.CurrentGun.CanBeDropped)
@@ -394,7 +363,6 @@ namespace CwaffingTheGungy
             Gun gunToSlip = klutz.CurrentGun;
             int maxammo = gunToSlip.AdjustedMaxAmmo;
 
-            // if (UnityEngine.Random.Range(0,maxammo) < (int)(maxammo*CHANCE_TO_DROP))
             if (UnityEngine.Random.Range(0,maxammo) < AVG_NUM_TIMES_TO_DROP)
             {
                 // stealing from NN again oh boy
@@ -413,12 +381,18 @@ namespace CwaffingTheGungy
 
         public static void AppetiteLoss(PlayerController wimp, HealthPickup hp)
         {
-            // ETGModConsole.Log(hp.armorAmount+" armor, "+hp.healAmount+" health");
             if (hp.armorAmount > 0)
                 wimp.healthHaver.Armor -= hp.armorAmount;
             if (hp.healAmount > 0)
                 wimp.healthHaver.currentHealth -= hp.healAmount;
-            wimp.PlayEffectOnActor(ResourceCache.Acquire("Global VFX/VFX_Curse") as GameObject, Vector3.zero);
+            wimp.StartCoroutine(PlayNotHungryEffect(wimp));
+        }
+
+        public static IEnumerator PlayNotHungryEffect(PlayerController wimp)
+        {
+            var o = wimp.PlayEffectOnActor(ResourceCache.Acquire("Global VFX/VFX_Fear") as GameObject, new Vector3(0,1f,0));
+            yield return new WaitForSeconds(1.25f);
+            UnityEngine.Object.Destroy(o);
         }
 
         public static IEnumerator PreventDodgeRolling(PlayerController wimp, float timer)
@@ -447,7 +421,7 @@ namespace CwaffingTheGungy
             GameManager.Instance.MainCameraController.DoScreenShake(new ScreenShakeSettings(0.35f,6f,2.0f,0f), null);
             for (int i = 0; i < 30; ++i)
             {
-                Vector2 ppos = p.sprite.WorldCenter + Lazy.AngleToVector(i*UnityEngine.Random.Range(0f,360f),2f);
+                Vector2 ppos = p.sprite.WorldCenter + Lazy.AngleToVector(i*UnityEngine.Random.Range(0f,360f),1.75f);
                 v.SpawnAtPosition(ppos.ToVector3ZisY(-1f), 0, null, null, null, -0.05f);
                 // AkSoundEngine.PostEvent("Play_OBJ_crystal_shatter_01", base.gameObject);
                 AkSoundEngine.PostEvent("Play_ENM_cannonball_explode_01", p.gameObject);
@@ -480,8 +454,7 @@ namespace CwaffingTheGungy
             GameManager.Instance.MainCameraController.SetManualControl(true, true);
 
             List<string> conversation = new List<string> {
-                "You like it, huh?",
-                "So we got a deal?",
+                "You like it, huh? So we got a deal?",
                 };
             yield return StartCoroutine(Converse(conversation,"point"));
 
@@ -500,10 +473,8 @@ namespace CwaffingTheGungy
 
             f.Purchased(p);
             List<string> conversation2 = new List<string> {
-                "Excellent!",
-                "I'm just gonna perform a quick little ritual to take your \""+sacNames[(int)f.sacType]+"\" and you'll be on your way.",
-                "It shouldn't hurt a bit!",
-                "...at least nobody's ever complained about it, anyhow.",
+                "Excellent! I'm just gonna perform a quick little ritual to take your *"+sacNames[(int)f.sacType]+"* and you'll be on your way.",
+                "It shouldn't hurt a bit! (...at least nobody's ever complained about it, anyhow.)",
                 "Here we go!!!",
                 };
             yield return StartCoroutine(Converse(conversation2,"point"));
