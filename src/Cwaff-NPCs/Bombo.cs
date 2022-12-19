@@ -24,6 +24,7 @@ namespace CwaffingTheGungy
     public enum OhNoMy
     {
         _random = -1,
+        BRAIN,
         EYES,
         ARMS,
         LEGS,
@@ -48,10 +49,12 @@ namespace CwaffingTheGungy
         private FakeShopItem item;
 
         private static ParticleSystem sweat;
+        private static bool brainless;
 
         public static Hook bomboHook;
         public static void Init()
         {
+            sacNames[(int)OhNoMy.BRAIN]   = "brain";
             sacNames[(int)OhNoMy.EYES]    = "eyes";
             sacNames[(int)OhNoMy.ARMS]    = "arms";
             sacNames[(int)OhNoMy.LEGS]    = "legs";
@@ -60,7 +63,8 @@ namespace CwaffingTheGungy
             sacNames[(int)OhNoMy.LUNGS]   = "lungs";
             sacNames[(int)OhNoMy.STOMACH] = "stomach";
 
-            sacDescriptions[(int)OhNoMy.EYES]    = "lower accuracy & enemy visibility";
+            sacDescriptions[(int)OhNoMy.BRAIN]   = "remove most UI information";
+            sacDescriptions[(int)OhNoMy.EYES]    = "lower shot accuracy & enemy visibility";
             sacDescriptions[(int)OhNoMy.ARMS]    = "damage, reload speed, & fire rate down";
             sacDescriptions[(int)OhNoMy.LEGS]    = "movement speed down";
             sacDescriptions[(int)OhNoMy.FINGERS] = "chance to drop gun upon firing";
@@ -105,13 +109,29 @@ namespace CwaffingTheGungy
             bomboHook = new Hook(
                 // typeof(PlayerController).GetMethod("Start", BindingFlags.Public | BindingFlags.Instance),
                 typeof(Dungeon).GetMethod("FloorReached", BindingFlags.Public | BindingFlags.Instance),
-                typeof(Bombo).GetMethod("SpawnNearHeroShrine"));
+                typeof(Bombo).GetMethod("HandleNewFloor"));
         }
 
-        public static void SpawnNearHeroShrine(Action<Dungeon> orig, Dungeon self)
+        public static void HandleNewFloor(Action<Dungeon> orig, Dungeon self)
         {
             orig(self);
             GameManager.Instance.PrimaryPlayer.StartCoroutine(SpawnInOnFirstFloor());
+            if (brainless)
+                BecomeBrainless();
+        }
+
+        private static void BecomeBrainless()
+        {
+            brainless = true;
+            GameUIRoot.Instance.HideCoreUI("brainless");
+            GameUIRoot.Instance.ForceHideGunPanel = true;
+            GameUIRoot.Instance.ForceHideItemPanel = true;
+            GameUIRoot.Instance.UpdatePlayerBlankUI(GameManager.Instance.PrimaryPlayer);
+
+            // removing the map completely makes the game too hard imo
+            // Minimap.Instance.ToggleMinimap(false);
+            // Minimap.Instance.TemporarilyPreventMinimap = true;
+            // Minimap.Instance.UIMinimap.RatTaunty.IsVisible = true;
         }
 
         private static IEnumerator SpawnInOnFirstFloor()
@@ -139,12 +159,17 @@ namespace CwaffingTheGungy
         protected override void Start()
         {
             base.Start();
-            base.renderer.enabled = false;
-            this.canInteract      = false;
-            this.hasBeenTalkedTo  = false;
-            this.strikingADeal    = false;
-            this.hasAppeared      = false;
-            ETGMod.AIActor.OnPreStart -= ICantSee;  // reset state from last run if necessary
+            base.renderer.enabled      = false;
+            this.canInteract           = false;
+            this.hasBeenTalkedTo       = false;
+            this.strikingADeal         = false;
+            this.hasAppeared           = false;
+
+            // reset state from last run if necessary
+            ETGMod.AIActor.OnPreStart -= ICantSee;
+            // GameUIRoot.Instance.ShowCoreUI("brainless");
+            // GameUIRoot.Instance.ForceHideGunPanel = true;
+            // GameUIRoot.Instance.ForceHideItemPanel = true;
         }
 
         protected override IEnumerator NPCTalkingScript()
@@ -317,9 +342,12 @@ namespace CwaffingTheGungy
             // sacrifice        = OhNoMy.STOMACH;
             switch(sacrifice)
             {
+                case OhNoMy.BRAIN:
+                    BecomeBrainless();
+                    ETGModConsole.Log("lost your brain"); break;
                 case OhNoMy.EYES:
                     CutStat(chump,PlayerStats.StatType.Accuracy,2.0f);
-                    ETGMod.AIActor.OnPreStart += ICantSee;
+                    ETGMod.AIActor.OnPreStart += Bombo.ICantSee;
                     ETGModConsole.Log("lost your eyes"); break;
                 case OhNoMy.ARMS:
                     CutStat(chump,PlayerStats.StatType.Damage,0.6f);
