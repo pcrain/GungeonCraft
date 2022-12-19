@@ -223,8 +223,8 @@ if [ $rebuild -eq 1 ]; then
     echo "$(md5sum "${s}")" >> "${sourcechecksums}"
   done
 
-  #Don't warn about unused variables (semicolon delimited)
-  nowarn="CS0414"
+  #Don't warn about unused variables or deprecations (semicolon delimited)
+  nowarn="CS0414;CS0618"
 
   #Actually rebuild the project
   echo -e "[${GRN}>${BLN}] Building project"

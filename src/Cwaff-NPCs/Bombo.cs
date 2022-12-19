@@ -47,6 +47,8 @@ namespace CwaffingTheGungy
 
         private FakeShopItem item;
 
+        private static ParticleSystem sweat;
+
         public static Hook bomboHook;
         public static void Init()
         {
@@ -58,13 +60,13 @@ namespace CwaffingTheGungy
             sacNames[(int)OhNoMy.LUNGS]   = "lungs";
             sacNames[(int)OhNoMy.STOMACH] = "stomach";
 
-            sacDescriptions[(int)OhNoMy.EYES]    = "shot accuracy down";
-            sacDescriptions[(int)OhNoMy.ARMS]    = "damage down";
+            sacDescriptions[(int)OhNoMy.EYES]    = "lower accuracy & enemy visibility";
+            sacDescriptions[(int)OhNoMy.ARMS]    = "damage, reload speed, & fire rate down";
             sacDescriptions[(int)OhNoMy.LEGS]    = "movement speed down";
-            sacDescriptions[(int)OhNoMy.FINGERS] = "fire & reload speed down";
-            sacDescriptions[(int)OhNoMy.HEART]   = "down to 1 HP";
+            sacDescriptions[(int)OhNoMy.FINGERS] = "chance to drop gun upon firing";
+            sacDescriptions[(int)OhNoMy.HEART]   = "lose most of your health & armor";
             sacDescriptions[(int)OhNoMy.LUNGS]   = "dodge rolls require rest";
-            sacDescriptions[(int)OhNoMy.STOMACH] = "no healing from health and armor";
+            sacDescriptions[(int)OhNoMy.STOMACH] = "no healing from health & armor";
 
             npcobj = FancyNPC.Setup<Bombo>(
                 name          : "Bombo",
@@ -90,6 +92,15 @@ namespace CwaffingTheGungy
                 // talkPointAdjust : new Vector3(2.5f, 2.5f, 0)
                 );
 
+            // Set up sweat particles
+            sweat = FakePrefab.Clone(PickupObjectDatabase.GetById(449).GetComponent<TeleporterPrototypeItem>().TelefragVFXPrefab.gameObject).GetComponent<ParticleSystem>();
+            sweat.startLifetime = 0.3f;
+            sweat.startColor = Color.cyan;
+            sweat.emission.SetBurst(0, new ParticleSystem.Burst { count = 5, time = 0, cycleCount = 1, repeatInterval = 0.010f, maxCount = 5, minCount = 5 });
+            sweat.gameObject.SetActive(false);
+            FakePrefab.MarkAsFakePrefab(sweat.gameObject);
+            UnityEngine.Object.DontDestroyOnLoad(sweat.gameObject);
+
             // Add a hook to spawn near the hero shrine at the beginning of the run
             bomboHook = new Hook(
                 // typeof(PlayerController).GetMethod("Start", BindingFlags.Public | BindingFlags.Instance),
@@ -100,7 +111,6 @@ namespace CwaffingTheGungy
         public static void SpawnNearHeroShrine(Action<Dungeon> orig, Dungeon self)
         {
             orig(self);
-            ETGModConsole.Log("trying to spawn!");
             GameManager.Instance.PrimaryPlayer.StartCoroutine(SpawnInOnFirstFloor());
         }
 
@@ -116,18 +126,14 @@ namespace CwaffingTheGungy
             {
                 if (a.IsLegendaryHeroShrine && a.transform.position.GetAbsoluteRoom() == p1.CurrentRoom)
                 {
-                    ETGModConsole.Log("found it!");
                     found = true;
-                    v3 = a.transform.position + (new Vector2(a.sprite.GetCurrentSpriteDef().position3.x/2,-8)).ToVector3YUp(0);
+                    v3 = a.transform.position + (new Vector2(a.sprite.GetCurrentSpriteDef().position3.x/2,-3f)).ToVector3ZisY(0);
                 }
             }
             if (!found)
                 yield break; //no hero shrine found, not the 1st floor
 
             Bombo bombyboi = SpawnObjectManager.SpawnObject(Bombo.npcobj,v3).GetComponent<Bombo>();
-
-            // yield return null;
-            // bombyboi.GetComponent<Bombo>().AppearInAPuffOfSmoke();
         }
 
         protected override void Start()
@@ -138,6 +144,7 @@ namespace CwaffingTheGungy
             this.hasBeenTalkedTo  = false;
             this.strikingADeal    = false;
             this.hasAppeared      = false;
+            ETGMod.AIActor.OnPreStart -= ICantSee;  // reset state from last run if necessary
         }
 
         protected override IEnumerator NPCTalkingScript()
@@ -200,21 +207,24 @@ namespace CwaffingTheGungy
 
             yield return StartCoroutine(Converse(conversation2,"point"));
             base.aiAnimator.PlayUntilCancelled("sad");
-            yield return new WaitForSeconds(1.25f);
+            yield return new WaitForSeconds(0.5f);
 
             List<string> conversation3 = new List<string> {
-                "...is a little bit of your " + sacNames[(int)item.sacType] + "!",
+                "...is a little bit of self-sacrifice!",
+                "Specifically your " + sacNames[(int)item.sacType] + "!",
                 "Of course I mean that figuratively, not literally.",
+                "Kinda...",
+                "...........",
+                "So whaddaya say?",
                 };
             yield return StartCoroutine(Converse(conversation3,"point"));
 
-            this.ShowText("...........",1.5f);
-            yield return new WaitForSeconds(1.5f);
-
-            List<string> conversation4 = new List<string> {
-                "So whaddaya say?",
-                };
-            yield return StartCoroutine(Converse(conversation4,"point"));
+            // this.ShowText("...........",0.75f);
+            // yield return new WaitForSeconds(1.5f);
+            // List<string> conversation4 = new List<string> {
+            //     "So whaddaya say?",
+            //     };
+            // yield return StartCoroutine(Converse(conversation4,"point"));
 
             GameManager.Instance.MainCameraController.SetManualControl(false, true);
 
@@ -227,9 +237,14 @@ namespace CwaffingTheGungy
             if (this.hasAppeared)
                 return;
 
-            float dist = Vector2.Distance(base.sprite.WorldCenter,GameManager.Instance.PrimaryPlayer.sprite.WorldCenter);
-            if (dist < 5f)
+            Vector2 mepos = base.sprite.WorldCenter;
+            Vector2 ppos  = GameManager.Instance.PrimaryPlayer.sprite.WorldCenter;
+            float dist = Vector2.Distance(mepos,ppos);
+            if (dist < 3f)
                 return;
+
+            // if (ppos.y < mepos.y) //shift down a bit to compensate
+            //     base.transform.position += new Vector2(0,-2f).ToVector3ZisY(0);
 
             this.AppearInAPuffOfSmoke();
             this.hasAppeared      = true;
@@ -249,6 +264,49 @@ namespace CwaffingTheGungy
                 chump.stats.RecalculateStats(chump, false, false);
         }
 
+        private static void ICantSee(AIActor enemy)
+        {
+            ETGModConsole.Log("seeing is hard");
+            enemy.RegisterOverrideColor(Color.black, "blindness");
+            enemy.StartCoroutine(ImInvisible(enemy));
+        }
+
+        private static IEnumerator ImInvisible(AIActor self)
+        {
+            Material newmat = BraveResources.Load("Global VFX/WhiteMaterial", ".mat") as Material;
+            while (true)
+            {
+                yield return null;
+                if (self.healthHaver != null && !self.healthHaver.IsAlive)
+                    continue;
+
+                self.sprite.usesOverrideMaterial = true;
+                self.renderer.material.shader = ShaderCache.Acquire("Brave/LitBlendUber");
+                self.renderer.material.SetFloat("_VertexColor", 1f);
+                // self.sprite.color = self.sprite.color.WithAlpha(0.1f);
+                self.sprite.color = self.sprite.color.WithAlpha(0.0f);
+                // self.sprite.renderer.material = newmat;
+                // self.sprite.renderer.material.SetColor("_OverrideColor", Color.black);
+                // self.sprite.OverrideMaterialMode = tk2dBaseSprite.SpriteMaterialOverrideMode.OVERRIDE_MATERIAL_SIMPLE;
+                // self.sprite.renderer.material.SetFloat("_Opacity", 0.1f);
+
+                // Material sharedMaterial = self.sprite.renderer.sharedMaterial;
+                // sharedMaterial.SetFloat("_EmissivePower", 1f);
+                // sharedMaterial.SetFloat("_Opacity", 0.1f);
+
+                // self.sprite.renderer.material.SetColor(Shader.PropertyToID("_OverrideColor"), Color.red);
+                // self.sprite.renderer.material.SetFloat(Shader.PropertyToID("_BrightnessMultiply"), 0.2f);
+
+                // self.sprite.renderer.material.SetColor("_OverrideColor", Color.black);
+                // self.RegisterOverrideColor(Color.black, "blindness")
+                // enemy.sprite.renderer.material
+                // enemy.sprite.renderer.enabled = false;
+                // self.sprite.UpdateZDepth();
+                // self.sprite.renderer.enabled = false;
+                // SpriteOutlineManager.AddOutlineToSprite(self.sprite, Color.black);
+            }
+        }
+
         private void RandomSacrifice(PlayerController chump, OhNoMy sacType = OhNoMy._random)
         {
             OhNoMy sacrifice;
@@ -261,13 +319,15 @@ namespace CwaffingTheGungy
             {
                 case OhNoMy.EYES:
                     CutStat(chump,PlayerStats.StatType.Accuracy,2.0f);
+                    ETGMod.AIActor.OnPreStart += ICantSee;
                     ETGModConsole.Log("lost your eyes"); break;
                 case OhNoMy.ARMS:
                     CutStat(chump,PlayerStats.StatType.Damage,0.6f);
-                    ETGModConsole.Log("lost your arms"); break;
-                case OhNoMy.FINGERS:
                     CutStat(chump,PlayerStats.StatType.ReloadSpeed,1.5f);
                     CutStat(chump,PlayerStats.StatType.RateOfFire,0.75f);
+                    ETGModConsole.Log("lost your arms"); break;
+                case OhNoMy.FINGERS:
+                    chump.PostProcessProjectile += Bombo.MightDropTheGun;
                     ETGModConsole.Log("lost your fingers"); break;
                 case OhNoMy.LEGS:
                     CutStat(chump,PlayerStats.StatType.MovementSpeed,0.6f);
@@ -295,6 +355,29 @@ namespace CwaffingTheGungy
             }
         }
 
+        public static void MightDropTheGun(Projectile p, float f)
+        {
+            // const float CHANCE_TO_DROP = 0.05f;
+            const int AVG_NUM_TIMES_TO_DROP = 10;
+            PlayerController klutz = p.ProjectilePlayerOwner();
+            if (klutz.CurrentGun == null || !klutz.CurrentGun.CanBeDropped)
+                return;
+
+            Gun gunToSlip = klutz.CurrentGun;
+            int maxammo = gunToSlip.AdjustedMaxAmmo;
+
+            // if (UnityEngine.Random.Range(0,maxammo) < (int)(maxammo*CHANCE_TO_DROP))
+            if (UnityEngine.Random.Range(0,maxammo) < AVG_NUM_TIMES_TO_DROP)
+            {
+                // stealing from NN again oh boy
+                klutz.inventory.RemoveGunFromInventory(gunToSlip);
+                gunToSlip.ForceThrowGun();
+                // yield return new WaitForSeconds(0.1f);
+                // gunToSlip.ToggleRenderers(true);
+                // gunToSlip.RegisterMinimapIcon();
+            }
+        }
+
         public static void DodgeRollsAreExhausting(PlayerController wimp)
         {
             wimp.StartCoroutine(Bombo.PreventDodgeRolling(wimp,0.65f));
@@ -316,7 +399,15 @@ namespace CwaffingTheGungy
             yield return null;
             while (wimp.IsDodgeRolling)
                 yield return null;
-            yield return new WaitForSeconds(timer);
+
+            var burst = UnityEngine.Object.Instantiate(sweat.gameObject,wimp.sprite.WorldTopCenter,Quaternion.identity);
+            burst.SetActive(true);
+            ParticleSystem ps = burst.GetComponent<ParticleSystem>();
+            yield return new WaitForSeconds(0.5f);
+            ps.Clear(true);  //hack to prevent old blood splotches from appearing on the ground
+
+            if (timer > 0.5f)
+                yield return new WaitForSeconds(timer-0.5f);
             wimp.ClearInputOverride("exhausted");
         }
 
@@ -357,18 +448,14 @@ namespace CwaffingTheGungy
                 yield break;
             BeginConversation(p);
 
-            ETGModConsole.Log("here1");
             GameManager.Instance.MainCameraController.OverridePosition = itemCamPosition;
             GameManager.Instance.MainCameraController.SetManualControl(true, true);
-            ETGModConsole.Log("here2");
 
             List<string> conversation = new List<string> {
                 "You like it, huh?",
                 "So we got a deal?",
                 };
-            ETGModConsole.Log("here3");
             yield return StartCoroutine(Converse(conversation,"point"));
-            ETGModConsole.Log("here4");
 
             yield return StartCoroutine(Prompt(
                 "sacrifice your [color #ff8888]"+sacNames[(int)f.sacType]+"[/color] ("+sacDescriptions[(int)f.sacType]+")",
@@ -386,10 +473,10 @@ namespace CwaffingTheGungy
             f.Purchased(p);
             List<string> conversation2 = new List<string> {
                 "Excellent!",
-                "I'm just gonna perform a quick little ritual to take your "+sacNames[(int)f.sacType]+" and you'll be on your way.",
+                "I'm just gonna perform a quick little ritual to take your \""+sacNames[(int)f.sacType]+"\" and you'll be on your way.",
                 "It shouldn't hurt a bit!",
                 "...at least nobody's ever complained about it, anyhow.",
-                "Here we go",
+                "Here we go!!!",
                 };
             yield return StartCoroutine(Converse(conversation2,"point"));
 
