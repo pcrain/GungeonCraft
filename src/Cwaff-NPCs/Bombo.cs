@@ -116,6 +116,8 @@ namespace CwaffingTheGungy
         public static void HandleNewFloor(Action<Dungeon> orig, Dungeon self)
         {
             orig(self);
+            if (GameManager.Instance?.PrimaryPlayer == null)
+                return;
             GameManager.Instance.PrimaryPlayer.StartCoroutine(SpawnInOnFirstFloor());
             if (brainless)
                 BecomeBrainless();
