@@ -19,6 +19,7 @@ namespace CwaffingTheGungy
 
         private static StatModifier noSpeed;
 
+        private bool dodgeButtonHeld = false;
         private bool isShining = false;
         private PlayerController owner = null;
         private GameObject theShine = null;
@@ -98,6 +99,24 @@ namespace CwaffingTheGungy
 
         public override void Update()
         {
+            if (!this.owner)
+                return;
+            BraveInput instanceForPlayer = BraveInput.GetInstanceForPlayer(this.owner.PlayerIDX);
+            if (instanceForPlayer.ActiveActions.DodgeRollAction.IsPressed)
+            {
+                instanceForPlayer.ConsumeButtonDown(GungeonActions.GungeonActionType.DodgeRoll);
+                if (!(dodgeButtonHeld || this.isShining))
+                {
+                    this.dodgeButtonHeld = true;
+                    ShineOn(this.owner);
+                }
+            }
+            else
+            {
+                this.dodgeButtonHeld = false;
+                if (this.isShining)
+                    ShineOff(this.owner);
+            }
             if (!theShine)
                 return;
             float curscale = 0.25f+0.25f*Mathf.Abs(Mathf.Sin(20*BraveTime.ScaledTimeSinceStartup));
