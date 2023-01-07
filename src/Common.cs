@@ -12,13 +12,13 @@ using UnityEngine;
 using Gungeon;
 using ItemAPI;
 
-
 namespace CwaffingTheGungy
 {
     public class C // constants
     {
         public const float PIXELS_PER_TILE = 16f;
     }
+
     public class IDs // global IDs for this mod's guns and items
     {
         public static Dictionary<string, int> Pickups  { get; set; } = new Dictionary<string, int>();
@@ -26,6 +26,7 @@ namespace CwaffingTheGungy
         public static Dictionary<string, int> Actives  { get; set; } = new Dictionary<string, int>();
         public static Dictionary<string, int> Passives { get; set; } = new Dictionary<string, int>();
     }
+
     public static class Lazy  // all-purpose helper methods for being a lazy dumdum
     {
         /// <summary>
@@ -199,7 +200,22 @@ namespace CwaffingTheGungy
             }
             return theList;
         }
+
+        // Stolen from NN, seems important for StandardAPI
+        public static bool PlayerHasActiveSynergy(this PlayerController player, string synergyNameToCheck)
+        {
+            foreach (int index in player.ActiveExtraSynergies)
+            {
+                AdvancedSynergyEntry synergy = GameManager.Instance.SynergyManager.synergies[index];
+                if (synergy.NameKey == synergyNameToCheck)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
+
     public static class Dissect  // reflection helper methods for being a lazy dumdum
     {
         public static void DumpComponents(this GameObject g)
