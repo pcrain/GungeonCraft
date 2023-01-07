@@ -295,7 +295,7 @@ namespace CwaffingTheGungy
             while (true)
             {
                 yield return null;
-                if (self.healthHaver != null && !self.healthHaver.IsAlive)
+                if (!(self.healthHaver?.IsAlive ?? true))
                     continue;
 
                 self.sprite.usesOverrideMaterial = true;
@@ -359,7 +359,7 @@ namespace CwaffingTheGungy
         {
             const int AVG_NUM_TIMES_TO_DROP = 10;
             PlayerController klutz = p.ProjectilePlayerOwner();
-            if (klutz.CurrentGun == null || !klutz.CurrentGun.CanBeDropped)
+            if (!(klutz.CurrentGun?.CanBeDropped ?? false))
                 return;
 
             Gun gunToSlip = klutz.CurrentGun;

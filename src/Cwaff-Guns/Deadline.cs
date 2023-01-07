@@ -338,7 +338,7 @@ namespace CwaffingTheGungy
         // Only collide with tiles
         private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
         {
-            if (!otherRigidbody || otherRigidbody.PrimaryPixelCollider == null || !otherRigidbody.PrimaryPixelCollider.IsTileCollider)
+            if (!(otherRigidbody?.PrimaryPixelCollider?.IsTileCollider ?? false))
             {
                 PhysicsEngine.SkipCollision = true;
                 return;
@@ -357,8 +357,7 @@ namespace CwaffingTheGungy
 
             Vector2 spawnPoint = tileCollision.PostCollisionUnitCenter;
 
-            if (m_gun != null)
-                m_gun.CreateALaser(spawnPoint,m_hitNormal);
+            m_gun?.CreateALaser(spawnPoint,m_hitNormal);
 
             this.m_projectile.DieInAir();
         }

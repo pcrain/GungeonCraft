@@ -98,8 +98,7 @@ namespace CwaffingTheGungy
 
         private void Start()
         {
-            if (vfx == null)
-                vfx = VFX.CreatePoolFromVFXGameObject((PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
+            vfx ??= VFX.CreatePoolFromVFXGameObject((PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
             this.m_enemy = base.GetComponent<AIActor>();
             this.m_cooldown = 0;
             // dummy class

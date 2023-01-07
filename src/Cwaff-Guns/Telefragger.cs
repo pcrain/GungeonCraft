@@ -58,12 +58,11 @@ namespace CwaffingTheGungy
 
         private void Start()
         {
-            if (vfx == null)
-                vfx = VFX.CreatePoolFromVFXGameObject((PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
+            vfx ??= VFX.CreatePoolFromVFXGameObject((PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
 
             this.m_projectile = base.GetComponent<Projectile>();
             // this.m_projectile.BulletScriptSettings.surviveTileCollisions = true;
-            if (this.m_projectile.Owner && this.m_projectile.Owner is PlayerController)
+            if (this.m_projectile?.Owner is PlayerController)
             {
                 this.m_owner      = this.m_projectile.Owner as PlayerController;
             }
@@ -76,11 +75,7 @@ namespace CwaffingTheGungy
         private void OnCollision(CollisionData tileCollision)
         {
 
-            if (
-                tileCollision.OtherRigidbody &&
-                tileCollision.OtherRigidbody.gameObject &&
-                tileCollision.OtherRigidbody.gameObject.GetComponent<AIActor>() != null
-                )
+            if (tileCollision?.OtherRigidbody?.gameObject?.GetComponent<AIActor>() != null)
                 return; //ignore collisions with enemies, we only care about walls
 
             PhysicsEngine.PostSliceVelocity     = new Vector2?(default(Vector2));

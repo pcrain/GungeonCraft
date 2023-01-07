@@ -76,11 +76,7 @@
 //         private void OnCollision(CollisionData tileCollision)
 //         {
 
-//             if (
-//                 tileCollision.OtherRigidbody &&
-//                 tileCollision.OtherRigidbody.gameObject &&
-//                 tileCollision.OtherRigidbody.gameObject.GetComponent<AIActor>() != null
-//                 )
+//             if (tileCollision.OtherRigidbody?.gameObject?.GetComponent<AIActor>() != null)
 //                 return; //ignore collisions with enemies, we only care about walls
 
 //             PhysicsEngine.PostSliceVelocity     = new Vector2?(default(Vector2));

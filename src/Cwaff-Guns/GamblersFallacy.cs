@@ -67,9 +67,8 @@ namespace CwaffingTheGungy
                 {
                     ETGModConsole.Log("1 in 33 O:");
                     // deal damage
-                    if (vfx == null)
-                        vfx = VFX.CreatePoolFromVFXGameObject(
-                            (PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
+                    vfx ??= VFX.CreatePoolFromVFXGameObject(
+                        (PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
 
                     Vector2 position = player.sprite.WorldCenter;
                     for (int i = 0; i < 4; ++i)

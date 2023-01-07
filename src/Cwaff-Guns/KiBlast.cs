@@ -106,8 +106,7 @@ namespace CwaffingTheGungy
                 closestDistance = distanceToPlayer;
                 closestBlast = k;
             }
-            if (closestBlast != null)
-                closestBlast.ReturnToPlayer(player);
+            closestBlast?.ReturnToPlayer(player);
         }
 
         protected override void Update()
@@ -154,8 +153,7 @@ namespace CwaffingTheGungy
 
         private void Start()
         {
-            if (basicSlashData == null)
-                basicSlashData = new SlashData();
+            basicSlashData ??= new SlashData();
             this.m_projectile = base.GetComponent<Projectile>();
             this.startingDamage = this.m_projectile.baseData.damage;
             if (this.m_projectile.Owner && this.m_projectile.Owner is PlayerController)
@@ -203,7 +201,7 @@ namespace CwaffingTheGungy
 
         private void OnHitEnemy(Projectile self, SpeculativeRigidbody enemy, bool fatal)
         {
-            // if (enemy && enemy.aiActor)
+            // if (enemy?.aiActor != null)
             // {
             //     if (fatal)
             //         ETGModConsole.Log("Killed enemy with "+self.baseData.damage+" damage");

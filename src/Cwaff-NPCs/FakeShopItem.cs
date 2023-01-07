@@ -98,8 +98,7 @@ namespace CwaffingTheGungy
       CurrentPrice = item.PurchasePrice;
       base.gameObject.AddComponent<tk2dSprite>();
       tk2dSprite tk2dSprite2 = i.GetComponent<tk2dSprite>();
-      if (tk2dSprite2 == null)
-        tk2dSprite2 = i.GetComponentInChildren<tk2dSprite>();
+      tk2dSprite2 ??= i.GetComponentInChildren<tk2dSprite>();
       base.sprite.SetSprite(tk2dSprite2.Collection, tk2dSprite2.spriteId);
       base.sprite.IsPerpendicular = !UseOmnidirectionalItemFacing;
       base.sprite.HeightOffGround = 1f;
@@ -108,10 +107,7 @@ namespace CwaffingTheGungy
       base.sprite.transform.position = base.sprite.transform.position.Quantize(0.0625f);
       DepthLookupManager.ProcessRenderer(base.sprite.renderer);
       tk2dSprite componentInParent = base.transform.parent.gameObject.GetComponentInParent<tk2dSprite>();
-      if (componentInParent != null)
-      {
-        componentInParent.AttachRenderer(base.sprite);
-      }
+      componentInParent?.AttachRenderer(base.sprite);
       SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black, 0.1f, 0.05f);
       base.sprite.UpdateZDepth();
 
@@ -133,7 +129,7 @@ namespace CwaffingTheGungy
 
     private void ItemOnPreRigidbodyCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
     {
-      if (!otherRigidbody || otherRigidbody.PrimaryPixelCollider == null || otherRigidbody.PrimaryPixelCollider.CollisionLayer != CollisionLayer.Projectile)
+      if (otherRigidbody?.PrimaryPixelCollider?.CollisionLayer != CollisionLayer.Projectile)
       {
         PhysicsEngine.SkipCollision = true;
       }

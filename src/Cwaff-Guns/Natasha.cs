@@ -103,7 +103,7 @@ namespace CwaffingTheGungy
         private void Start()
         {
             Projectile self = base.GetComponent<Projectile>();
-            if (self && self.Owner is PlayerController && self.Owner != null)
+            if (self?.Owner is PlayerController)
             {
                 PlayerController owner = self.Owner as PlayerController;
                 self.RuntimeUpdateScale(NATASHA_PROJECTILE_SCALE * owner.stats.GetStatValue(PlayerStats.StatType.PlayerBulletScale));

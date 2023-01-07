@@ -483,7 +483,7 @@ namespace CwaffingTheGungy
                 for (int k = allMinorBreakables.Count - 1; k >= 0; k--)
                 {
                     MinorBreakable minorBreakable = allMinorBreakables[k];
-                    if (minorBreakable && minorBreakable.specRigidbody)
+                    if (minorBreakable?.specRigidbody)
                     {
                         if (!minorBreakable.IsBroken && minorBreakable.sprite)
                         {
