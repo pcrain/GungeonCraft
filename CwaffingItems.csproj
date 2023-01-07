@@ -39,7 +39,6 @@
     <Compile Include="src\Cwaff-Passives\Superstitious.cs"/>
     <Compile Include="src\Cwaff-Passives\Shine.cs"/>
     <Compile Include="src\Commands.cs"/>
-    <Compile Include="src\AudioResourceLoader.cs"/>
     <Compile Include="src\VFX.cs"/>
     <Compile Include="src\Cwaff-Rooms\FlowHelpers.cs"/>
     <Compile Include="src\Cwaff-Rooms\FlowSimpleAsItGets.cs"/>
@@ -127,9 +126,7 @@
     <Compile Include="src\StandardAPI\GungeonAPI\Dungeon Code\SampleFlow.cs"/>
     <Compile Include="src\StandardAPI\GungeonAPI\Dungeon Code\ShrineTools.cs"/>
     <Compile Include="src\StandardAPI\GungeonAPI\Dungeon Code\DungeonHooks.cs"/>
-    <Compile Include="src\ApacheStuffImScaredToDelete\ReflectionHelpers.cs"/>
     <Compile Include="src\Class1.cs"/>
-    <Compile Include="src\GlobalIDs.cs"/>
     <Compile Include="src\SharedGunBehaviors.cs"/>
     <Compile Include="src\_Reference.cs"/>
     <Compile Include="src\Common.cs"/>

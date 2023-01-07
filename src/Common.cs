@@ -5,10 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.ComponentModel;  //debug
+using System.IO;
+using System.Runtime.InteropServices;
 
 using UnityEngine;
 using Gungeon;
 using ItemAPI;
+
 
 namespace CwaffingTheGungy
 {
@@ -16,7 +19,14 @@ namespace CwaffingTheGungy
     {
         public const float PIXELS_PER_TILE = 16f;
     }
-    public static class Lazy
+    public class IDs // global IDs for this mod's guns and items
+    {
+        public static Dictionary<string, int> Pickups  { get; set; } = new Dictionary<string, int>();
+        public static Dictionary<string, int> Guns     { get; set; } = new Dictionary<string, int>();
+        public static Dictionary<string, int> Actives  { get; set; } = new Dictionary<string, int>();
+        public static Dictionary<string, int> Passives { get; set; } = new Dictionary<string, int>();
+    }
+    public static class Lazy  // all-purpose helper methods for being a lazy dumdum
     {
         /// <summary>
         /// Perform basic initialization for a new gun definition.
@@ -190,8 +200,7 @@ namespace CwaffingTheGungy
             return theList;
         }
     }
-
-    public static class Dissect
+    public static class Dissect  // reflection helper methods for being a lazy dumdum
     {
         public static void DumpComponents(this GameObject g)
         {
@@ -245,6 +254,91 @@ namespace CwaffingTheGungy
                 string name = f.Name;
                 Console.WriteLine(" prop {0} = {1} -> {2}", name, f.GetValue(o1), f.GetValue(o2));
             }
+        }
+    }
+
+    public static class ReflectionHelpers {  // reflection helpers ultimately stolen from apache
+        public static T ReflectGetField<T>(Type classType, string fieldName, object o = null) {
+            FieldInfo field = classType.GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | ((o != null) ? BindingFlags.Instance : BindingFlags.Static));
+            return (T)field.GetValue(o);
+        }
+
+        public static void ReflectSetField<T>(Type classType, string fieldName, T value, object o = null) {
+            FieldInfo field = classType.GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | ((o != null) ? BindingFlags.Instance : BindingFlags.Static));
+            field.SetValue(o, value);
+        }
+    }
+
+    public class AudioResourceLoader // example audio resource loading class and functions
+    {
+
+        public static void InitAudio() { AutoloadFromAssembly(Assembly.GetExecutingAssembly(), "CwaffingTheGungy"); }
+
+        public static void AutoloadFromAssembly(Assembly assembly, string prefix)
+        {
+            bool flag = assembly == null;
+            if (flag) { throw new ArgumentNullException("assembly", "Assembly cannot be null."); }
+            bool flag2 = prefix == null;
+            if (flag2) { throw new ArgumentNullException("prefix", "Prefix name cannot be null."); }
+            prefix = prefix.Trim();
+            bool flag3 = prefix == "";
+            if (flag3) { throw new ArgumentException("Prefix name cannot be an empty (or whitespace only) string.", "prefix"); }
+            List<string> list = new List<string>(assembly.GetManifestResourceNames());
+            for (int i = 0; i < list.Count; i++)
+            {
+                string text = list[i];
+                string text2 = text;
+                text2 = text2.Replace('/', Path.DirectorySeparatorChar);
+                text2 = text2.Replace('\\', Path.DirectorySeparatorChar);
+                bool flag4 = text2.IndexOf(prefix) != 0;
+                if (!flag4)
+                {
+                    text2 = text2.Substring(text2.IndexOf(prefix) + prefix.Length);
+                    bool flag5 = text2.LastIndexOf(".bnk") != text2.Length - ".bnk".Length;
+                    if (!flag5)
+                    {
+                        text2 = text2.Substring(0, text2.Length - ".bnk".Length);
+                        bool flag6 = text2.IndexOf(Path.DirectorySeparatorChar) == 0;
+                        if (flag6) { text2 = text2.Substring(1); }
+                        text2 = prefix + ":" + text2;
+                        // Console.WriteLine(string.Format("{0}: Soundbank found, attempting to autoload: name='{1}' resource='{2}'", "hi", text2, text));
+                        using (Stream manifestResourceStream = assembly.GetManifestResourceStream(text))
+                        {
+                            LoadSoundbankFromStream(manifestResourceStream, text2);
+                        }
+                    }
+                }
+            }
+        }
+
+        private static void LoadSoundbankFromStream(Stream stream, string name)
+        {
+            byte[] array = StreamToByteArray(stream);
+            IntPtr intPtr = Marshal.AllocHGlobal(array.Length);
+            try
+            {
+                Marshal.Copy(array, 0, intPtr, array.Length);
+                uint num;
+                AKRESULT akresult = AkSoundEngine.LoadAndDecodeBankFromMemory(intPtr, (uint)array.Length, false, name, false, out num);
+                // Console.WriteLine(string.Format("Result of soundbank load: {0}.", akresult));
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(intPtr);
+            }
+        }
+
+        public static byte[] StreamToByteArray(Stream input)
+        {
+            byte[] array = new byte[16384];
+            byte[] result;
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                int count;
+                while ((count = input.Read(array, 0, array.Length)) > 0) { memoryStream.Write(array, 0, count); }
+                result = memoryStream.ToArray();
+            }
+            return result;
         }
     }
 }
