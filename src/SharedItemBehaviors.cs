@@ -766,6 +766,7 @@ namespace CwaffingTheGungy
     {
         public GameObject linkPrefab;
         public float DamagePerTick;
+        public float disownTimer = -1f;
         private GameActor owner;
         private tk2dTiledSprite extantLink;
         private Projectile self;
@@ -791,6 +792,12 @@ namespace CwaffingTheGungy
         }
         private void Update()
         {
+            if (disownTimer > 0)
+            {
+                disownTimer -= BraveTime.DeltaTime;
+                if (disownTimer <= 0)
+                    owner = null;
+            }
             if (self && owner && this.extantLink == null)
             {
                 tk2dTiledSprite component = SpawnManager.SpawnVFX(linkPrefab, false).GetComponent<tk2dTiledSprite>();
@@ -800,7 +807,7 @@ namespace CwaffingTheGungy
             {
                 UpdateLink(owner, this.extantLink);
             }
-            else if (extantLink != null)
+            else if ((!self) && extantLink != null)
             {
                 SpawnManager.Despawn(extantLink.gameObject);
                 extantLink = null;
