@@ -41,28 +41,23 @@ namespace CwaffingTheGungy
             if (this.isShining && this.owner)
                 ShineOff(this.owner);
         }
-        private void OnRollStarted(PlayerController player, Vector2 direction)
-        {
-            // player.ClearDodgeRollState();
-            // player.ForceStopDodgeRoll();
-            // player.m_dodgeRollTimer = -1f;
-            // player.m_dodgeRollState = PlayerController.DodgeRollState.Blink;
-            // player.m_dodgeRollState = PlayerController.DodgeRollState.Blink; //Blink, None, AdditionalDelay, InAir, OnGround, PreRollDelay
-            if (this.isShining)
-                ShineOff(player);
-            else
-                ShineOn(player);
-        }
-        private void OnIsRolling(PlayerController player)
-        {
-            if (!this.isShining)
-                return;
 
-            player.ClearDodgeRollState();
-            player.ForceStopDodgeRoll();
-            // player.StartCoroutine(TemporarilyDisableInput(player,0.03f));
-            // Relevant sounds: SND_CHR_dodge_roll_01 / 02 / 03
-        }
+        // NOTE: no longer necessary as we have custom roll logic now
+        // private void OnRollStarted(PlayerController player, Vector2 direction)
+        // {
+        //     if (this.isShining)
+        //         ShineOff(player);
+        //     else
+        //         ShineOn(player);
+        // }
+        // private void OnIsRolling(PlayerController player)
+        // {
+        //     if (!this.isShining)
+        //         return;
+
+        //     player.ClearDodgeRollState();
+        //     player.ForceStopDodgeRoll();
+        // }
 
         // private static IEnumerator TemporarilyDisableInput(PlayerController player, float timeout)
         // {
@@ -105,7 +100,7 @@ namespace CwaffingTheGungy
             if (instanceForPlayer.ActiveActions.DodgeRollAction.IsPressed)
             {
                 instanceForPlayer.ConsumeButtonDown(GungeonActions.GungeonActionType.DodgeRoll);
-                if (!(dodgeButtonHeld || this.isShining))
+                if (!(this.owner.IsDodgeRolling || dodgeButtonHeld || this.isShining))
                 {
                     this.dodgeButtonHeld = true;
                     ShineOn(this.owner);
@@ -115,7 +110,10 @@ namespace CwaffingTheGungy
             {
                 this.dodgeButtonHeld = false;
                 if (this.isShining)
+                {
                     ShineOff(this.owner);
+                    this.owner.ForceStartDodgeRoll();
+                }
             }
             if (!theShine)
                 return;
@@ -168,8 +166,8 @@ namespace CwaffingTheGungy
         {
             this.owner = player;
             player.PostProcessProjectile += PostProcessProjectile;
-            player.OnRollStarted += this.OnRollStarted;
-            player.OnIsRolling += this.OnIsRolling;
+            // player.OnRollStarted += this.OnRollStarted;
+            // player.OnIsRolling += this.OnIsRolling;
             base.Pickup(player);
         }
 
@@ -177,8 +175,8 @@ namespace CwaffingTheGungy
         {
             this.owner = null;
             player.PostProcessProjectile -= PostProcessProjectile;
-            player.OnRollStarted -= this.OnRollStarted;
-            player.OnIsRolling -= this.OnIsRolling;
+            // player.OnRollStarted -= this.OnRollStarted;
+            // player.OnIsRolling -= this.OnIsRolling;
             isShining = false;
             return base.Drop(player);
         }
