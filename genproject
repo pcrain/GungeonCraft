@@ -76,11 +76,11 @@ while read -r line; do
   sources+=("${line}")
 done <<< $(find "src" -type f -not -path "src/StandardAPI/ItemAPI/Examples/*" -not -path "src/StandardAPI/ItemAPI/FakePrefab/*" -not -path "src/SpriteBuilder.cs" | sed -r 's@/@\\@g')
 
-#Custom Character Embedded resources
-echo -e "[${GRN}>${BLN}] Scanning for custom characters"
-while read -r line; do
-  includes+=("<EmbeddedResource Include=\"${line}\" />")
-done <<< $(find "Characters" -type f | sed -r 's@/@\\@g')
+#Custom Character Embedded resources (none for now)
+# echo -e "[${GRN}>${BLN}] Scanning for custom characters"
+# while read -r line; do
+#   includes+=("<EmbeddedResource Include=\"${line}\" />")
+# done <<< $(find "Characters" -type f | sed -r 's@/@\\@g')
 
 #Normal Embedded resources
 echo -e "[${GRN}>${BLN}] Scanning for resources"
