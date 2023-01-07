@@ -588,7 +588,7 @@ namespace GungeonAPI
         }
         public static Dictionary<string, GameObject> overrideRoomPlaceables = new Dictionary<string, GameObject>()
         {
-            {"secret_room_skeleton", ExoticPlaceables.SecretRoomSkeleton},
+            // {"secret_room_skeleton", ExoticPlaceables.SecretRoomSkeleton},
         };
 
         public struct RoomData

@@ -13,7 +13,7 @@ namespace CwaffingTheGungy
     public class Shine : PassiveItem
     {
         public static string passiveName      = "Shine";
-        public static string spritePath       = "CwaffingTheGungy/Resources/NeoItemSprites/88888888_icon";
+        public static string spritePath       = "CwaffingTheGungy/Resources/ItemSprites/88888888_icon";
         public static string shortDescription = "That Ain't Falco";
         public static string longDescription  = "(Melee)";
 

@@ -45,7 +45,13 @@ namespace SynergyTools
                         if (projToFire != null)
                         {
                             Vector2 gunbarrel = gun.barrelOffset.position;
-                            float angle = ProjSpawnHelper.GetAccuracyAngled(gun.CurrentAngle, angleVariance, player);
+
+                            if (player != null) angleVariance *= player.stats.GetStatValue(PlayerStats.StatType.Accuracy);
+                            float positiveVariance = angleVariance * 0.5f;
+                            float negativeVariance = positiveVariance * -1f;
+                            float finalVariance = UnityEngine.Random.Range(negativeVariance, positiveVariance);
+                            float angle = gun.CurrentAngle + finalVariance;
+
                             GameObject gameObject = SpawnManager.SpawnProjectile(projToFire.gameObject, gunbarrel, Quaternion.Euler(0f, 0f, angle), true);
                             Projectile component = gameObject.GetComponent<Projectile>();
                             if (component != null)

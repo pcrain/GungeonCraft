@@ -12,7 +12,7 @@ namespace CwaffingTheGungy
     class BorrowedTime : PlayerItem
     {
         public static string activeName       = "Borrowed Time";
-        public static string spritePath       = "CwaffingTheGungy/Resources/NeoItemSprites/88888888_icon";
+        public static string spritePath       = "CwaffingTheGungy/Resources/ItemSprites/88888888_icon";
         public static string shortDescription = "Clock's Ticking";
         public static string longDescription  = "(insta clear any room, but enemies will all respawn in boss room with increased jam chance. cannot pick up bosses or jammed enemies)";
 

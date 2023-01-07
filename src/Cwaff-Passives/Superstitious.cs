@@ -16,7 +16,7 @@ namespace CwaffingTheGungy
     public class Superstitious : PassiveItem
     {
         public static string passiveName      = "Superstitious";
-        public static string spritePath       = "CwaffingTheGungy/Resources/NeoItemSprites/88888888_icon";
+        public static string spritePath       = "CwaffingTheGungy/Resources/ItemSprites/88888888_icon";
         public static string shortDescription = "Writings on the HUD";
         public static string longDescription  = "(6s and 7s)";
 
