@@ -76,9 +76,12 @@ namespace CwaffingTheGungy
                 #region Passives
                     Shine.Init();
                     Superstitious.Init();
+                    HLD.Init();
                 #endregion
 
                 #region Guns
+                    TestLightning.Add();
+
                     RainCheck.Add();
                     Natasha.Add();
                     PaintballGun.Add();
