@@ -106,6 +106,10 @@ namespace CwaffingTheGungy
                     MasterSword.Add();
                 #endregion
 
+                #region Synergies
+                    CwaffSynergies.Init();
+                #endregion
+
                 #region Shop NPCs
                     Boomhildr.Init();
                 #endregion

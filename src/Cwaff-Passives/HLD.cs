@@ -21,6 +21,7 @@ namespace CwaffingTheGungy
 
         private bool dodgeButtonHeld = false;
         private bool isDashing = false;
+        private bool isHyped = false;
         private PlayerController owner = null;
 
         private static GameObject LinkVFXPrefab;
@@ -101,30 +102,36 @@ namespace CwaffingTheGungy
             const float FADE_TIME = 0.5f; // Amount of time lightning persists after being disowned
 
             this.isDashing = true;
-            Projectile p = SpawnManager.SpawnProjectile(
-              TestLightning.defaultProjectile.gameObject,
-              player.sprite.WorldCenter,
-              Quaternion.Euler(0f, 0f, player.m_currentGunAngle),
-              true).GetComponent<Projectile>();
-                p.Owner = player;
-                p.Shooter = player.specRigidbody;
 
-                p.gameObject.AddComponent<FakeProjectileComponent>();
-                p.gameObject.AddComponent<Expiration>().expirationTimer = DISOWN_TIME+FADE_TIME;
+            if (this.isHyped)
+            {
+                Projectile p = SpawnManager.SpawnProjectile(
+                  TestLightning.defaultProjectile.gameObject,
+                  player.sprite.WorldCenter,
+                  Quaternion.Euler(0f, 0f, player.m_currentGunAngle),
+                  true).GetComponent<Projectile>();
+                    p.Owner = player;
+                    p.Shooter = player.specRigidbody;
 
-                OwnerConnectLightningModifier oclm = p.gameObject.AddComponent<OwnerConnectLightningModifier>();
-                    oclm.linkPrefab = LinkVFXPrefab;
-                    oclm.disownTimer = DISOWN_TIME;
-                    oclm.fadeTimer = FADE_TIME;
-                    oclm.MakeGlowy();
+                    p.gameObject.AddComponent<FakeProjectileComponent>();
+                    p.gameObject.AddComponent<Expiration>().expirationTimer = DISOWN_TIME+FADE_TIME;
 
-            player.StartCoroutine(DoDash(player, DASH_SPEED, DASH_TIME));
+                    OwnerConnectLightningModifier oclm = p.gameObject.AddComponent<OwnerConnectLightningModifier>();
+                        oclm.linkPrefab = LinkVFXPrefab;
+                        oclm.disownTimer = DISOWN_TIME;
+                        oclm.fadeTimer = FADE_TIME;
+                        oclm.MakeGlowy();
+            }
+
+            player.StartCoroutine(DoDash(player, DASH_SPEED * (this.isHyped ? 1.2f : 1.0f), DASH_TIME));
         }
 
         public override void Update()
         {
             if (!this.owner)
                 return;
+
+            this.isHyped = this.owner.PlayerHasActiveSynergy("Hype Yourself Up");
 
             BraveInput instanceForPlayer = BraveInput.GetInstanceForPlayer(this.owner.PlayerIDX);
             if (instanceForPlayer.ActiveActions.DodgeRollAction.IsPressed)
@@ -143,25 +150,28 @@ namespace CwaffingTheGungy
 
         private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherCollider)
         {
-            // TODO: uncomment this later if we want to be invulnerable while dashing
-            // if(!isDashing)
-            //     return;
-            // Projectile component = otherRigidbody.GetComponent<Projectile>();
-            // if (component != null && !(component.Owner is PlayerController))
-            // {
-            //     PassiveReflectItem.ReflectBullet(component, true, Owner.specRigidbody.gameActor, 10f, 1f, 1f, 0f);
-            //     PhysicsEngine.SkipCollision = true;
-            // }
+            if(!(this.isDashing && this.isHyped))  // reflect projectiles with hyped synergy
+                return;
+            Projectile component = otherRigidbody.GetComponent<Projectile>();
+            if (component != null && !(component.Owner is PlayerController))
+            {
+                PassiveReflectItem.ReflectBullet(component, true, Owner.specRigidbody.gameActor, 10f, 1f, 1f, 0f);
+                PhysicsEngine.SkipCollision = true;
+            }
         }
 
         public override void Pickup(PlayerController player)
         {
             this.owner = player;
+            SpeculativeRigidbody specRigidbody = player.specRigidbody;
+            specRigidbody.OnPreRigidbodyCollision = (SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate)Delegate.Combine(specRigidbody.OnPreRigidbodyCollision, new SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate(this.OnPreCollision));
             base.Pickup(player);
         }
 
         public override DebrisObject Drop(PlayerController player)
         {
+            SpeculativeRigidbody specRigidbody2 = player.specRigidbody;
+            specRigidbody2.OnPreRigidbodyCollision = (SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate)Delegate.Remove(specRigidbody2.OnPreRigidbodyCollision, new SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate(this.OnPreCollision));
             this.owner = null;
             isDashing = false;
             return base.Drop(player);

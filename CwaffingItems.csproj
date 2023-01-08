@@ -163,6 +163,7 @@
     <Compile Include="src\SharedItemBehaviors.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffTweaks.cs"/>
     <Compile Include="src\Cwaff-Misc\SoulLinkStatusEffect.cs"/>
+    <Compile Include="src\Cwaff-Misc\CwaffSynergies.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffHUD.cs"/>
     <Compile Include="src\VFXToolbox.cs"/>
     <Compile Include="src\Main.cs"/>
