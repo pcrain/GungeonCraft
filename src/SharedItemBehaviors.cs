@@ -1029,7 +1029,8 @@ namespace CwaffingTheGungy
 
     public static class AfterImageHelpers
     {
-        public static Color afterImageBlue = new Color(160 / 255f, 160f / 255f, 255f / 255f);
+        public static Color afterImageBlue   = new Color(160f / 255f, 160f / 255f, 255f / 255f);
+        public static Color afterImageYellow = new Color(255f / 255f, 255f / 255f, 120f / 255f);
 
         public static void PlayerAfterImage(this PlayerController player)
         {
@@ -1070,7 +1071,7 @@ namespace CwaffingTheGungy
                     flickerTimer = 0;
                     flickerOn = !flickerOn;
                 }
-                sprite.color = afterImageBlue.WithAlpha(flickerOn ? 1.0f : 0.35f);
+                sprite.color = afterImageYellow.WithAlpha(flickerOn ? 1.0f : 0.35f);
                 yield return null;
             }
             UnityEngine.Object.Destroy(obj);

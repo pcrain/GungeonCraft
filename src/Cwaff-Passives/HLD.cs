@@ -45,8 +45,6 @@ namespace CwaffingTheGungy
             player.SetInputOverride("hld");
             player.SetIsFlying(true, "hld");
 
-            // player.PlayerAfterImage();
-
             DustUpVFX dusts = GameManager.Instance.Dungeon.dungeonDustups;
             for (int i = 0; i < 16; ++i)
             {
@@ -77,6 +75,7 @@ namespace CwaffingTheGungy
             }
             if (!interrupted)
             {
+                player.PlayerAfterImage();
                 for (int i = 0; i < 8; ++i)
                 {
                     float dir = UnityEngine.Random.Range(0.0f,360.0f);
