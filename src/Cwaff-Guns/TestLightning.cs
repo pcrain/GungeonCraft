@@ -39,7 +39,7 @@ namespace CwaffingTheGungy
             gun.SetBaseMaxAmmo(250);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
 
-            Projectile projectile       = Lazy.PrefabProjectileFromGun();
+            Projectile projectile       = Lazy.PrefabProjectileFromGun(gun);
             projectile.baseData.damage  = 5f;
             // projectile.baseData.speed   = 50.0f;
             projectile.baseData.speed   = 0.001f;

@@ -70,9 +70,8 @@ namespace CwaffingTheGungy
         /// <summary>
         /// Perform basic initialization for a new projectile definition.
         /// </summary>
-        public static Projectile PrefabProjectileFromGun(Gun gun = null, bool setGunDefaultProjectile = true)
+        public static Projectile PrefabProjectileFromGun(Gun gun, bool setGunDefaultProjectile = true)
         {
-            gun ??= PickupObjectDatabase.GetById(86) as Gun; // default to marine sidearm
             //actually instantiate the projectile
             Projectile projectile = UnityEngine.Object.Instantiate<Projectile>(gun.DefaultModule.projectiles[0]);
             projectile.gameObject.SetActive(false); //make sure the projectile isn't an active game object

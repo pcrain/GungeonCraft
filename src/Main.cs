@@ -81,7 +81,7 @@ namespace CwaffingTheGungy
                 #endregion
 
                 #region Guns
-                    TestLightning.Add();
+                    // TestLightning.Add();
 
                     RainCheck.Add();
                     Natasha.Add();
