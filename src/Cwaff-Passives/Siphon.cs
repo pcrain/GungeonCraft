@@ -59,7 +59,6 @@ namespace CwaffingTheGungy
         {
             this.owner = player;
             player.PostProcessProjectile += this.PostProcessProjectile;
-            // player.OnReloadedGun += this.HandleGunReloaded;
             base.Pickup(player);
         }
 
@@ -74,42 +73,34 @@ namespace CwaffingTheGungy
              if (this.doFreeze)
              {
                 ETGModConsole.Log("would freeze");
-
              }
              if (this.doFire)
              {
                 ETGModConsole.Log("would fire");
-
              }
              if (this.doGreenFire)
              {
                 ETGModConsole.Log("would green fire");
-
              }
              if (this.doPoison)
              {
                 ETGModConsole.Log("would poison");
-
              }
              if (this.doLockdown)
              {
                 ETGModConsole.Log("would lockdown");
-
              }
              if (this.doCharm)
              {
                 ETGModConsole.Log("would charm");
-
              }
              if (this.doCheese)
              {
                 ETGModConsole.Log("would cheese");
-
              }
              if (this.doInstakill)
              {
                 ETGModConsole.Log("would instakill");
-
              }
         }
 
@@ -117,12 +108,7 @@ namespace CwaffingTheGungy
         {
             this.owner = null;
             player.PostProcessProjectile -= this.PostProcessProjectile;
-            // player.OnReloadedGun -= this.HandleGunReloaded;
             return base.Drop(player);
-        }
-
-        private void HandleGunReloaded(PlayerController player, Gun playerGun)
-        {
         }
 
         public override void Update()
@@ -211,13 +197,13 @@ namespace CwaffingTheGungy
             this.doFire      = (currentGoopManager.IsPositionOnFire(this.owner.specRigidbody.UnitCenter));
             this.doGreenFire = this.doFire && currentGoopDef.UsesGreenFire;
             this.doFreeze    = (cellFloorType == CellVisualData.CellFloorType.Ice || currentGoopManager.IsPositionFrozen(this.owner.specRigidbody.UnitCenter));
-            this.doInstakill = currentGoopDef.DrainsAmmo || this.owner.CurseIsDecaying; // standing in ammo drain goop or curse goop
+            this.doInstakill = currentGoopDef.DrainsAmmo || (this.owner.CurrentCurseMeterValue > 0f && this.owner.CurseIsDecaying); // standing in ammo drain goop or curse goop
 
             // lazy immunity to most goop effects
-            this.owner.CurrentFireMeterValue   = 0;
-            this.owner.CurrentPoisonMeterValue = 0;
-            this.owner.CurrentDrainMeterValue  = 0;
-            this.owner.CurrentCurseMeterValue  = 0;
+            this.owner.CurrentFireMeterValue   = Mathf.Min(0.01f,this.owner.CurrentFireMeterValue);
+            this.owner.CurrentPoisonMeterValue = Mathf.Min(0.01f,this.owner.CurrentPoisonMeterValue);
+            this.owner.CurrentDrainMeterValue  = Mathf.Min(0.01f,this.owner.CurrentDrainMeterValue);
+            this.owner.CurrentCurseMeterValue  = Mathf.Min(0.01f,this.owner.CurrentCurseMeterValue);
         }
     }
 }
