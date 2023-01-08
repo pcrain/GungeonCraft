@@ -1042,7 +1042,6 @@ namespace CwaffingTheGungy
 
             obj.SetActive(false);
             FakePrefab.MarkAsFakePrefab(obj);
-            UnityEngine.Object.DontDestroyOnLoad(obj);
 
             GameObject g = UnityEngine.Object.Instantiate(obj, player.sprite.WorldBottomCenter, Quaternion.identity);
             tk2dSprite gsprite = g.GetComponent<tk2dSprite>();
@@ -1072,8 +1071,6 @@ namespace CwaffingTheGungy
                     flickerOn = !flickerOn;
                 }
                 sprite.color = afterImageBlue.WithAlpha(flickerOn ? 1.0f : 0.35f);
-                // sprite.color = sprite.color.WithAlpha(flickerOn ? 1.0f : 0.35f);
-                // flicker
                 yield return null;
             }
             UnityEngine.Object.Destroy(obj);
