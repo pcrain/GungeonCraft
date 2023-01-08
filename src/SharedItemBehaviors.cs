@@ -762,7 +762,7 @@ namespace CwaffingTheGungy
         public bool debugLogging;
     }
 
-    public class OwnerConnectLightningModifier : MonoBehaviour // stolen from NN
+    public class OwnerConnectLightningModifier : MonoBehaviour // mostly stolen from NN
     {
         public GameObject linkPrefab;
         public float DamagePerTick;
@@ -1024,6 +1024,60 @@ namespace CwaffingTheGungy
               rigidbodyExcluder: ExcludeAllButWallsFromRaycasting))
                 return hit.Contact;
             return pos+Lazy.AngleToVector(angle,minDistance);
+        }
+    }
+
+    public static class AfterImageHelpers
+    {
+        public static Color afterImageBlue = new Color(160 / 255f, 160f / 255f, 255f / 255f);
+
+        public static void PlayerAfterImage(this PlayerController player)
+        {
+            GameObject obj = new GameObject();
+            tk2dSprite sprite = obj.AddComponent<tk2dSprite>();
+
+            sprite.SetSprite(player.sprite.collection, player.sprite.spriteId);
+            sprite.FlipX = player.sprite.FlipX;
+            obj.GetComponent<BraveBehaviour>().sprite = sprite;
+
+            obj.SetActive(false);
+            FakePrefab.MarkAsFakePrefab(obj);
+            UnityEngine.Object.DontDestroyOnLoad(obj);
+
+            GameObject g = UnityEngine.Object.Instantiate(obj, player.sprite.WorldBottomCenter, Quaternion.identity);
+            tk2dSprite gsprite = g.GetComponent<tk2dSprite>();
+                gsprite.PlaceAtPositionByAnchor(
+                    player.sprite.transform.position,
+                    sprite.FlipX ? tk2dBaseSprite.Anchor.LowerRight : tk2dBaseSprite.Anchor.LowerLeft);
+
+            const float LIFETIME = 0.5f;
+            g.GetComponent<BraveBehaviour>().StartCoroutine(Fade(g,LIFETIME));
+        }
+
+        private static IEnumerator Fade(GameObject obj, float fadeTime, float flickerRate = 0.05f)
+        {
+            tk2dSprite sprite = obj.GetComponent<tk2dSprite>();
+            sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitBlendUber");
+            sprite.renderer.material.SetFloat("_VertexColor", 1f);
+
+            bool flickerOn = true;
+            float flickerTimer = 0.0f;
+            for (float timer = 0.0f; timer < fadeTime; )
+            {
+                timer += BraveTime.DeltaTime;
+                flickerTimer += BraveTime.DeltaTime;
+                if (flickerTimer > flickerRate)
+                {
+                    flickerTimer = 0;
+                    flickerOn = !flickerOn;
+                }
+                sprite.color = afterImageBlue.WithAlpha(flickerOn ? 1.0f : 0.35f);
+                // sprite.color = sprite.color.WithAlpha(flickerOn ? 1.0f : 0.35f);
+                // flicker
+                yield return null;
+            }
+            UnityEngine.Object.Destroy(obj);
+            yield break;
         }
     }
 }

@@ -45,6 +45,8 @@ namespace CwaffingTheGungy
             player.SetInputOverride("hld");
             player.SetIsFlying(true, "hld");
 
+            // player.PlayerAfterImage();
+
             DustUpVFX dusts = GameManager.Instance.Dungeon.dungeonDustups;
             for (int i = 0; i < 16; ++i)
             {
@@ -60,6 +62,7 @@ namespace CwaffingTheGungy
             bool interrupted = false;
             for (float timer = 0.0f; timer < dashtime; )
             {
+                player.PlayerAfterImage();
                 timer += BraveTime.DeltaTime;
                 player.specRigidbody.Velocity = vel;
                 GameManager.Instance.Dungeon.dungeonDustups.InstantiateLandDustup(player.sprite.WorldCenter);

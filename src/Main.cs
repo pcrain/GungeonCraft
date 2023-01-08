@@ -111,7 +111,7 @@ namespace CwaffingTheGungy
                 #endregion
 
                 #region Fancy NPCs
-                    Bombo.Init();
+                    // Bombo.Init();  //disabled for now until i can find a better way to turn him off within game
                 #endregion
 
                 #region Flow stuff stolen from Apache
