@@ -291,7 +291,7 @@ namespace CwaffingTheGungy
 
         private static IEnumerator ImInvisible(AIActor self)
         {
-            Material newmat = BraveResources.Load("Global VFX/WhiteMaterial", ".mat") as Material;
+            // Material newmat = BraveResources.Load("Global VFX/WhiteMaterial", ".mat") as Material;
             while (true)
             {
                 yield return null;

@@ -767,9 +767,12 @@ namespace CwaffingTheGungy
         public GameObject linkPrefab;
         public float DamagePerTick;
         public float disownTimer = -1f;
+        public float fadeTimer = -1f;
         private GameActor owner;
         private tk2dTiledSprite extantLink;
         private Projectile self;
+        private bool makeGlowy = false;
+        private bool fading = false;
         public OwnerConnectLightningModifier()
         {
             // linkPrefab = St4ke.LinkVFXPrefab;
@@ -790,6 +793,10 @@ namespace CwaffingTheGungy
                 if (self.Owner) owner = self.Owner;
             }
         }
+        public void MakeGlowy()
+        {
+            this.makeGlowy = true;
+        }
         private void Update()
         {
             if (disownTimer > 0)
@@ -798,20 +805,95 @@ namespace CwaffingTheGungy
                 if (disownTimer <= 0)
                     owner = null;
             }
-            if (self && owner && this.extantLink == null)
+            if (self && owner)
             {
-                tk2dTiledSprite component = SpawnManager.SpawnVFX(linkPrefab, false).GetComponent<tk2dTiledSprite>();
-                this.extantLink = component;
+                if (this.extantLink == null)
+                {
+                    tk2dTiledSprite component = SpawnManager.SpawnVFX(linkPrefab, false).GetComponent<tk2dTiledSprite>();
+                    this.extantLink = component;
+
+                    if (makeGlowy)
+                    {
+                        Shader glowshader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
+                        // this.extantLink.usesOverrideMaterial = true;
+                        this.extantLink.renderer.material.shader = glowshader;
+                        this.extantLink.renderer.material.DisableKeyword("BRIGHTNESS_CLAMP_ON");
+                        this.extantLink.renderer.material.EnableKeyword("BRIGHTNESS_CLAMP_OFF");
+                        this.extantLink.renderer.material.SetFloat("_EmissivePower", 100.0f);
+                        this.extantLink.renderer.material.SetFloat("_EmissiveColorPower", 1.55f);
+                        this.extantLink.renderer.material.SetColor("_EmissiveColor", ExtendedColours.paleYellow);
+                        this.extantLink.color = ExtendedColours.paleYellow;
+
+                        // foreach (tk2dSpriteDefinition frameDef in component.sprite.collection.spriteDefinitions)
+                        // {
+                        //     frameDef.material.EnableKeyword("BRIGHTNESS_CLAMP_ON");
+                        //     frameDef.material.SetFloat("_EmissivePower", 10.0f);
+                        //     frameDef.material.SetFloat("_EmissiveColorPower", 1.55f);
+                        //     frameDef.material.SetColor("_EmissiveColor", ExtendedColours.paleYellow);
+                        //     frameDef.materialInst.EnableKeyword("BRIGHTNESS_CLAMP_ON");
+                        //     frameDef.materialInst.SetFloat("_EmissivePower", 10.0f);
+                        //     frameDef.materialInst.SetFloat("_EmissiveColorPower", 1.55f);
+                        //     frameDef.materialInst.SetColor("_EmissiveColor", ExtendedColours.paleYellow);
+                        // }
+
+                        // this.extantLink.renderer.materialInst.EnableKeyword("BRIGHTNESS_CLAMP_ON");
+                        // this.extantLink.renderer.materialInst.DisableKeyword("BRIGHTNESS_CLAMP_OFF");
+                        // this.extantLink.renderer.materialInst.SetFloat("_EmissivePower", 100.0f);
+                        // this.extantLink.renderer.materialInst.SetFloat("_EmissiveColorPower", 1.55f);
+                        // this.extantLink.renderer.materialInst.SetColor("_EmissiveColor", ExtendedColours.paleYellow);
+                    }
+                }
+                else
+                    UpdateLink(owner, this.extantLink);
             }
-            else if (self && owner && this.extantLink != null)
+            else if (!owner && !fading)
             {
-                UpdateLink(owner, this.extantLink);
+                fading = true;
+                if (fadeTimer > 0)
+                    StartCoroutine(FadeOut());
+                else
+                    DestroyExtantLink();
             }
-            else if ((!self) && extantLink != null)
+            else if (!self)
             {
+                DestroyExtantLink();
+            }
+        }
+        private void DestroyExtantLink()
+        {
+            if (extantLink != null)
                 SpawnManager.Despawn(extantLink.gameObject);
-                extantLink = null;
+            extantLink = null;
+        }
+        private IEnumerator FadeOut()
+        {
+            float halftimer = fadeTimer / 2.0f;
+            float timer = halftimer;
+            bool halfway = false;
+            while (timer > 0)
+            {
+                timer -= BraveTime.DeltaTime;
+                if (timer < 0 && !halfway) //change from emissive to fading halfway through
+                {
+                    halfway = true;
+                    // this.extantLink.usesOverrideMaterial = true;
+
+                    this.extantLink.renderer.material.shader = ShaderCache.Acquire("Brave/LitBlendUber");
+                    this.extantLink.renderer.material.SetFloat("_VertexColor", 1f);
+                    timer = halftimer;
+                }
+                if (halfway)
+                {
+                    this.extantLink.color = this.extantLink.color.WithAlpha(timer/halftimer);
+                }
+                else {
+                    this.extantLink.renderer.material.SetFloat("_EmissivePower", 100.0f*(timer/halftimer));
+                    this.extantLink.renderer.material.SetFloat("_EmissiveColorPower", 1.55f*(timer/halftimer));
+                }
+                yield return null;
             }
+            DestroyExtantLink();
+            yield break;
         }
         private void UpdateLink(GameActor target, tk2dTiledSprite m_extantLink)
         {
