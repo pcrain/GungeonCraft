@@ -77,6 +77,7 @@ namespace CwaffingTheGungy
                     Shine.Init();
                     Superstitious.Init();
                     HLD.Init();
+                    Siphon.Init();
                 #endregion
 
                 #region Guns

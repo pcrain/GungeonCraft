@@ -53,7 +53,10 @@ namespace CwaffingTheGungy
             gun.SetupSprite(null, spriteName+"_idle_001", 8); //set the gun's ammonomicon sprit
             int projectileId = 0;
             if (int.TryParse(projectileName, out projectileId))
-                gun.AddProjectileModuleFrom(PickupObjectDatabase.GetById(projectileId) as Gun, true, false); //set the gun's default projectile to inherit
+            {
+                ETGModConsole.Log("  pid "+projectileName);
+                gun.AddProjectileModuleFrom(PickupObjectDatabase.GetById(projectileId) as Gun, true, true); //set the gun's default projectile to inherit
+            }
             else
                 gun.AddProjectileModuleFrom(projectileName, true, false); //set the gun's default projectile to inherit
             ETGMod.Databases.Items.Add(gun, false, "ANY");  //register the gun in the EtG database
@@ -209,16 +212,13 @@ namespace CwaffingTheGungy
             return theList;
         }
 
-        // Stolen from NN, seems important for StandardAPI
+        // Stolen from NN
         public static bool PlayerHasActiveSynergy(this PlayerController player, string synergyNameToCheck)
         {
             foreach (int index in player.ActiveExtraSynergies)
             {
-                AdvancedSynergyEntry synergy = GameManager.Instance.SynergyManager.synergies[index];
-                if (synergy.NameKey == synergyNameToCheck)
-                {
+                if (GameManager.Instance.SynergyManager.synergies[index].NameKey == synergyNameToCheck)
                     return true;
-                }
             }
             return false;
         }
