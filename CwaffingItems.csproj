@@ -201,6 +201,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\friendlyoverhead_vfx_001.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\88888888_icon.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\yellow_bandana_icon.png"/>
     <EmbeddedResource Include="Resources\Companions\Wolf\wolf_pet_002.png"/>
     <EmbeddedResource Include="Resources\Companions\Wolf\wolf_pet_001.png"/>
     <EmbeddedResource Include="Resources\Companions\Wolf\wolf_pet_003.png"/>
