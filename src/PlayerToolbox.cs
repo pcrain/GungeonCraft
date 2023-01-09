@@ -1,41 +1,48 @@
-using Alexandria.Misc;
-using Dungeonator;
-using MonoMod.RuntimeDetour;
-using SaveAPI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+
 using UnityEngine;
+using MonoMod.RuntimeDetour;
+
+using ItemAPI;
+using SaveAPI;
+using Alexandria.Misc;
+using Dungeonator;
 
 namespace CwaffingTheGungy
 {
     public static class PlayerToolsSetup  // hooks and stuff for PlayerControllers on game start
     {
         public static Hook playerStartHook;
+        public static Hook enemySpawnHook;
 
         public static void Init()
         {
             playerStartHook = new Hook(
                 typeof(PlayerController).GetMethod("Start", BindingFlags.Public | BindingFlags.Instance),
                 typeof(PlayerToolsSetup).GetMethod("DoSetup"));
+            enemySpawnHook = new Hook(
+                typeof(AIActor).GetMethod("Start", BindingFlags.Public | BindingFlags.Instance),
+                typeof(CwaffToolbox).GetMethod("OnEnemyPreSpawn"));
         }
         public static void DoSetup(Action<PlayerController> action, PlayerController player)
         {
             action(player);
             if (player.GetComponent<HatController>() == null) player.gameObject.AddComponent<HatController>();
-            if (player.GetComponent<PlayerToolbox>() == null) player.gameObject.AddComponent<PlayerToolbox>();
+            if (player.GetComponent<CwaffToolbox>() == null) player.gameObject.AddComponent<CwaffToolbox>();
         }
     }
 
-    class PlayerToolbox : MonoBehaviour
+    class CwaffToolbox : MonoBehaviour
     {
         private PlayerController m_attachedPlayer;
         private bool isSecondaryPlayer;
 
-        public static string enemyWithoutAFuture = "";
+        public static string enemyWithoutAFuture = "01972dee89fc4404a5c408d50007dad5";
 
         private void Start()
         {
@@ -46,10 +53,109 @@ namespace CwaffingTheGungy
 
         private void Update()
         {
-            if (enemyWithoutAFuture != "")
+        }
+
+        public static void OnEnemyPreSpawn(Action<AIActor> action, AIActor enemy)
+        {
+            ETGModConsole.Log("spawning "+enemy.GetActorName() + " ("+enemy.EnemyGuid+")");
+            if (true || enemy.EnemyGuid == enemyWithoutAFuture)
             {
-                ETGModConsole.Log("futureless: " + enemyWithoutAFuture);
-                enemyWithoutAFuture = "";
+                // ETGModConsole.Log("  ded o.o");
+                Memorialize(enemy);
+                UnityEngine.Object.Destroy(enemy.gameObject);
+                return;
+            }
+            action(enemy);
+        }
+
+        public static void Memorialize(AIActor enemy)
+        {
+            GameObject obj = new GameObject();
+            obj.SetActive(false);
+            FakePrefab.MarkAsFakePrefab(obj);
+            GameObject g = UnityEngine.Object.Instantiate(obj, enemy.sprite.WorldBottomCenter, Quaternion.identity);
+
+            int bestMatchStrength = 0;
+            int bestSpriteId = -1;
+            tk2dSpriteDefinition[] defs = enemy.sprite.collection.spriteDefinitions;
+            for (int i = 0; i < defs.Length; ++i)
+            {
+                tk2dSpriteDefinition sd = defs[i];
+                int matchStrength = 0;
+                if (sd.name.Contains("001"))
+                {
+                    if (sd.name.Contains("idle_right"))
+                        matchStrength = 4;
+                    else if (sd.name.Contains("idle_f") || sd.name.Contains("idle_l") || sd.name.Contains("idle_r"))
+                        matchStrength = 3;
+                    else if (sd.name.Contains("idle") || sd.name.Contains("fire") || sd.name.Contains("run_right") || sd.name.Contains("right_run"))
+                        matchStrength = 2;
+                    else if (sd.name.Contains("death"))
+                        matchStrength = 1;
+                    if (matchStrength > bestMatchStrength)
+                    {
+                      bestMatchStrength = matchStrength;
+                      bestSpriteId = i;
+                      if (bestMatchStrength == 4)
+                        break;
+                    }
+                }
+            }
+            if (bestSpriteId == -1)
+            {
+                bestSpriteId = enemy.sprite.spriteId;
+                ETGModConsole.Log("  no matches, options: ");
+                for (int i = 0; i < defs.Length; ++i)
+                {
+                    tk2dSpriteDefinition sd = defs[i];
+                    if (sd.name.Contains("001"))
+                        ETGModConsole.Log("    "+sd.name);
+                }
+            }
+            else
+            {
+                ETGModConsole.Log("  found "+defs[bestSpriteId].name);
+            }
+
+            tk2dBaseSprite sprite = g.AddComponent<tk2dSprite>();
+                sprite.SetSprite(enemy.sprite.collection, bestSpriteId);
+                // sprite.SetSprite(enemy.sprite.collection, enemy.sprite.collection.GetSpriteIdByName("idle"));
+                // ETGModConsole.Log(sprite.name);
+                sprite.FlipX = enemy.sprite.FlipX;
+                sprite.depthUsesTrimmedBounds = true;
+                sprite.PlaceAtPositionByAnchor(
+                    enemy.sprite.transform.position,
+                    sprite.FlipX ? tk2dBaseSprite.Anchor.LowerRight : tk2dBaseSprite.Anchor.LowerLeft);
+                // sprite.allowDefaultLayer
+            g.GetComponent<BraveBehaviour>().sprite = sprite;
+
+            g.GetComponent<BraveBehaviour>().StartCoroutine(Flicker(g));
+        }
+
+        public static IEnumerator Flicker(GameObject g)
+        {
+            tk2dSprite gsprite = g.GetComponent<tk2dSprite>();
+            gsprite.renderer.enabled = true;
+            gsprite.OverrideMaterialMode = tk2dBaseSprite.SpriteMaterialOverrideMode.OVERRIDE_MATERIAL_COMPLEX;
+            // gsprite.usesOverrideMaterial = false;
+            gsprite.usesOverrideMaterial = true;
+            gsprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitBlendUber");
+            gsprite.renderer.material.SetFloat("_VertexColor", 1f);
+            gsprite.renderer.sharedMaterial.shader = ShaderCache.Acquire("Brave/LitBlendUber");
+            gsprite.renderer.sharedMaterial.SetFloat("_VertexColor", 1f);
+            gsprite.color = AfterImageHelpers.afterImageGray.WithAlpha(1.0f);
+            // gsprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
+            // gsprite.renderer.sharedMaterial.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
+            // bool flickerOn = true;
+            gsprite.enabled = true;
+            gsprite.UpdateZDepth();
+            while (true)
+            {
+                for(int i = 0; i < 10; ++i)
+                    yield return null;
+                gsprite.color = AfterImageHelpers.afterImageGray.WithAlpha(0.5f);
+                yield return null;
+                gsprite.color = AfterImageHelpers.afterImageGray.WithAlpha(0.15f);
             }
         }
     }

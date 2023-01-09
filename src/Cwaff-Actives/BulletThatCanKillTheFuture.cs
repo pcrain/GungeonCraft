@@ -28,8 +28,8 @@ namespace CwaffingTheGungy
             item.quality    = PickupObject.ItemQuality.C;
 
             //Set the cooldown type and duration of the cooldown
-            ItemBuilder.SetCooldownType(item, ItemBuilder.CooldownType.Timed, 1);
-            item.consumable   = false;
+            ItemBuilder.SetCooldownType(item, ItemBuilder.CooldownType.PerRoom, 1);
+            item.consumable   = true;
             item.quality      = ItemQuality.S;
             item.CanBeDropped = true;
         }
@@ -58,7 +58,7 @@ namespace CwaffingTheGungy
                 this.isUsable = !(this.m_owner.InExitCell || this.inBossRoom);
                 if (this.isUsable)
                 {
-                    this.validEnemies = CheckForValidEnemies();
+                    this.validEnemies = CheckForValidEnemies(this.m_owner);
                     this.isUsable = this.validEnemies.Count > 0;
                 }
             }
@@ -84,10 +84,10 @@ namespace CwaffingTheGungy
             return false;
         }
 
-        private List<AIActor> CheckForValidEnemies()
+        private static List<AIActor> CheckForValidEnemies(PlayerController player)
         {
             List<AIActor> candidates = new List<AIActor>();
-            List<AIActor> activeEnemies = this.m_owner.GetAbsoluteParentRoom().GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
+            List<AIActor> activeEnemies = player.GetAbsoluteParentRoom().GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
             if (activeEnemies == null || activeEnemies.Count == 0)
                 return candidates;
 
@@ -104,16 +104,16 @@ namespace CwaffingTheGungy
         public override void DoEffect(PlayerController user)
         {
             base.DoEffect(user);
-            user.StartCoroutine(Futureless());
+            user.StartCoroutine(Futureless(user));
         }
 
-        private Vector2 GetTargetClockhairPosition(BraveInput input, Vector2 currentClockhairPosition)
+        private static Vector2 GetTargetClockhairPosition(BraveInput input, Vector2 currentClockhairPosition)
         {
             Vector2 rhs2 = Vector2.Max(rhs: (!input.IsKeyboardAndMouse()) ? (currentClockhairPosition + input.ActiveActions.Aim.Vector * 10f * BraveTime.DeltaTime) : (GameManager.Instance.MainCameraController.Camera.ScreenToWorldPoint(Input.mousePosition).XY() + new Vector2(0.375f, -0.25f)), lhs: GameManager.Instance.MainCameraController.MinVisiblePoint);
             return Vector2.Min(GameManager.Instance.MainCameraController.MaxVisiblePoint, rhs2);
         }
 
-        private void PointGunAtClockhair(PlayerController interactor, Transform clockhairTransform)
+        private static void PointGunAtClockhair(PlayerController interactor, Transform clockhairTransform)
         {
             Vector2 centerPosition = interactor.CenterPosition;
             Vector2 vector = clockhairTransform.position.XY() - centerPosition;
@@ -124,26 +124,25 @@ namespace CwaffingTheGungy
         }
 
 
-        public void FreezeInPlace(SpeculativeRigidbody myRigidbody)
+        public static void FreezeInPlace(SpeculativeRigidbody myRigidbody)
         {
             myRigidbody.Velocity = Vector2.zero;
         }
 
         // Stolen from HandleClockhair() in ArkController.cs
-        private IEnumerator Futureless()
+        private static IEnumerator Futureless(PlayerController interactor)
         {
             // Extra stuff to make this work properly outside the intended cutscene
             Pixelator.Instance.DoFinalNonFadedLayer = true;
             Pixelator.Instance.DoRenderGBuffer = true;
-            PlayerController interactor = this.m_owner;
-                interactor.SetInputOverride("future");
-                interactor.specRigidbody.CollideWithTileMap = false;
-                interactor.specRigidbody.CollideWithOthers = false;
-
+            interactor.SetInputOverride("future");
+            interactor.specRigidbody.CollideWithTileMap = false;
+            interactor.specRigidbody.CollideWithOthers = false;
 
             // Figure out which enemies we should freeze in place
             Dictionary<AIActor,AIActor.ActorState> frozenEnemies = new Dictionary<AIActor,AIActor.ActorState>();
-            foreach (AIActor a in validEnemies)
+            List<AIActor> curEnemies = CheckForValidEnemies(interactor);
+            foreach (AIActor a in curEnemies)
             {
                 if (a.healthHaver.IsDead)
                     continue;
@@ -214,7 +213,7 @@ namespace CwaffingTheGungy
                     if (!m_isPlayingChargeAudio)
                     {
                         m_isPlayingChargeAudio = true;
-                        AkSoundEngine.PostEvent("Play_OBJ_pastkiller_charge_01", base.gameObject);
+                        AkSoundEngine.PostEvent("Play_OBJ_pastkiller_charge_01", interactor.gameObject);
                     }
                     shotTargetTime += BraveTime.DeltaTime;
                 }
@@ -224,7 +223,7 @@ namespace CwaffingTheGungy
                     if (m_isPlayingChargeAudio)
                     {
                         m_isPlayingChargeAudio = false;
-                        AkSoundEngine.PostEvent("Stop_OBJ_pastkiller_charge_01", base.gameObject);
+                        AkSoundEngine.PostEvent("Stop_OBJ_pastkiller_charge_01", interactor.gameObject);
                     }
                 }
                 if (currentInput.ActiveActions.UseItemAction.WasReleased && shotTargetTime > holdDuration && !GameManager.Instance.IsPaused)
@@ -278,7 +277,9 @@ namespace CwaffingTheGungy
             }
             if (victim != null)
             {
-                PlayerToolbox.enemyWithoutAFuture = victim.EnemyGuid;
+                CwaffToolbox.enemyWithoutAFuture = victim.EnemyGuid;
+                Lazy.CustomNotification("Future Erased",victim.GetActorName());
+                ETGModConsole.Log("future erased for "+victim.EnemyGuid);
                 VFXPool vfx = VFX.CreatePoolFromVFXGameObject((PickupObjectDatabase.GetById(0) as Gun
                     ).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
                     vfx.SpawnAtPosition(
@@ -289,8 +290,10 @@ namespace CwaffingTheGungy
             else
             {
                 // TODO: make fun of the player for wasting the bullet
+                // Lazy.CustomNotification("You Missed","");
             }
 
+            // finish up the base original script
             BraveInput.DoSustainedScreenShakeVibration(0f);
             BraveInput.DoVibrationForAllPlayers(Vibration.Time.Normal, Vibration.Strength.Hard);
             clockhair.StartCoroutine(clockhair.WipeoutDistortionAndFade(0.5f));
@@ -304,6 +307,7 @@ namespace CwaffingTheGungy
 
             yield return null;
 
+            // clean up our mess
             interactor.ClearInputOverride("future");
             interactor.specRigidbody.CollideWithTileMap = true;
             interactor.specRigidbody.CollideWithOthers = true;

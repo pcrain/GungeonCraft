@@ -1029,6 +1029,7 @@ namespace CwaffingTheGungy
 
     public static class AfterImageHelpers
     {
+        public static Color afterImageGray   = new Color( 32f / 255f,  32f / 255f,  32f / 255f);
         public static Color afterImageBlue   = new Color(160f / 255f, 160f / 255f, 255f / 255f);
         public static Color afterImageYellow = new Color(255f / 255f, 255f / 255f, 120f / 255f);
 
