@@ -44,11 +44,15 @@ namespace CwaffingTheGungy
 
         public static string enemyWithoutAFuture = "01972dee89fc4404a5c408d50007dad5";
 
+        public static Texture2D eeveeTexture;
+
         private void Start()
         {
             m_attachedPlayer = base.GetComponent<PlayerController>();
             if (m_attachedPlayer)
                 isSecondaryPlayer = (GameManager.Instance.SecondaryPlayer == m_attachedPlayer);
+
+            eeveeTexture = ResourceManager.LoadAssetBundle("shared_auto_001").LoadAsset<Texture2D>("nebula_reducednoise");
         }
 
         private void Update()
@@ -90,7 +94,7 @@ namespace CwaffingTheGungy
                         matchStrength = 3;
                     else if (sd.name.Contains("idle") || sd.name.Contains("fire") || sd.name.Contains("run_right") || sd.name.Contains("right_run"))
                         matchStrength = 2;
-                    else if (sd.name.Contains("death"))
+                    else if (sd.name.Contains("death") || sd.name.Contains("left") || sd.name.Contains("right"))
                         matchStrength = 1;
                     if (matchStrength > bestMatchStrength)
                     {
@@ -139,23 +143,33 @@ namespace CwaffingTheGungy
             gsprite.OverrideMaterialMode = tk2dBaseSprite.SpriteMaterialOverrideMode.OVERRIDE_MATERIAL_COMPLEX;
             // gsprite.usesOverrideMaterial = false;
             gsprite.usesOverrideMaterial = true;
-            gsprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitBlendUber");
-            gsprite.renderer.material.SetFloat("_VertexColor", 1f);
-            gsprite.renderer.sharedMaterial.shader = ShaderCache.Acquire("Brave/LitBlendUber");
-            gsprite.renderer.sharedMaterial.SetFloat("_VertexColor", 1f);
-            gsprite.color = AfterImageHelpers.afterImageGray.WithAlpha(1.0f);
-            // gsprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
-            // gsprite.renderer.sharedMaterial.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
-            // bool flickerOn = true;
+            // gsprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitBlendUber");
+            // gsprite.renderer.material.SetFloat("_VertexColor", 1f);
+            // gsprite.renderer.sharedMaterial.shader = ShaderCache.Acquire("Brave/LitBlendUber");
+            // gsprite.renderer.sharedMaterial.SetFloat("_VertexColor", 1f);
+            // gsprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/HologramShader");
+            // gsprite.renderer.sharedMaterial.shader = ShaderCache.Acquire("Brave/Internal/HologramShader");
+
+            gsprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/GlitchEevee");
+                gsprite.renderer.material.SetTexture("_EeveeTex", eeveeTexture);
+                gsprite.renderer.material.SetFloat("_WaveIntensity", 0.9f);
+                gsprite.renderer.material.SetFloat("_ColorIntensity", 0.95f);
+            gsprite.renderer.sharedMaterial.shader = ShaderCache.Acquire("Brave/Internal/GlitchEevee");
+                gsprite.renderer.sharedMaterial.SetTexture("_EeveeTex", eeveeTexture);
+                gsprite.renderer.sharedMaterial.SetFloat("_WaveIntensity", 0.9f);
+                gsprite.renderer.sharedMaterial.SetFloat("_ColorIntensity", 0.95f);
+
+            gsprite.color = AfterImageHelpers.afterImageGray.WithAlpha(0.5f);
             gsprite.enabled = true;
             gsprite.UpdateZDepth();
             while (true)
             {
-                for(int i = 0; i < 10; ++i)
-                    yield return null;
-                gsprite.color = AfterImageHelpers.afterImageGray.WithAlpha(0.5f);
+                yield return new WaitForSeconds(0.05f);
+                gsprite.renderer.enabled = true;
+                // gsprite.color = AfterImageHelpers.afterImageGray.WithAlpha(0.5f);
                 yield return null;
-                gsprite.color = AfterImageHelpers.afterImageGray.WithAlpha(0.15f);
+                gsprite.renderer.enabled = false;
+                // gsprite.color = AfterImageHelpers.afterImageGray.WithAlpha(0.15f);
             }
         }
     }
