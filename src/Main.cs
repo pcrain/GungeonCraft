@@ -71,6 +71,7 @@ namespace CwaffingTheGungy
 
                 #region Actives
                     BorrowedTime.Init();
+                    BulletThatCanKillTheFuture.Init();
                 #endregion
 
                 #region Passives

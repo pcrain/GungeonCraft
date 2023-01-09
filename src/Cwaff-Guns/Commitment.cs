@@ -13,6 +13,8 @@ using Alexandria.Misc;
     Need to prevent:
         - dodge rolling
         - stopping firing
+
+        m_player.inventory.GunLocked.SetOverride("spren gun", true);
 */
 
 namespace CwaffingTheGungy

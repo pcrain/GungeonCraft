@@ -221,6 +221,18 @@ namespace CwaffingTheGungy
             }
             return false;
         }
+
+        // Select a random element from an array
+        public static T ChooseRandom<T>(this T[] source)
+        {
+            return source[UnityEngine.Random.Range(0,source.Length)];
+        }
+
+        // Select a random element from a list
+        public static T ChooseRandom<T>(this List<T> source)
+        {
+            return source[UnityEngine.Random.Range(0,source.Count)];
+        }
     }
 
     public static class Dissect // reflection helper methods for being a lazy dumdum
@@ -372,23 +384,6 @@ namespace CwaffingTheGungy
                     return;
                 }
             }
-        }
-    }
-
-    public static class PlayerToolsSetup  // hooks and stuff for PlayerControllers on game start
-    {
-        public static Hook playerStartHook;
-
-        public static void Init()
-        {
-            playerStartHook = new Hook(
-                typeof(PlayerController).GetMethod("Start", BindingFlags.Public | BindingFlags.Instance),
-                typeof(PlayerToolsSetup).GetMethod("DoSetup"));
-        }
-        public static void DoSetup(Action<PlayerController> action, PlayerController player)
-        {
-            action(player);
-            if (player.GetComponent<HatController>() == null) player.gameObject.AddComponent<HatController>();
         }
     }
 
