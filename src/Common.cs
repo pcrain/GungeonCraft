@@ -54,7 +54,6 @@ namespace CwaffingTheGungy
             int projectileId = 0;
             if (int.TryParse(projectileName, out projectileId))
             {
-                ETGModConsole.Log("  pid "+projectileName);
                 gun.AddProjectileModuleFrom(PickupObjectDatabase.GetById(projectileId) as Gun, true, true); //set the gun's default projectile to inherit
             }
             else

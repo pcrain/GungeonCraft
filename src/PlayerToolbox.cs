@@ -42,7 +42,8 @@ namespace CwaffingTheGungy
         private PlayerController m_attachedPlayer;
         private bool isSecondaryPlayer;
 
-        public static string enemyWithoutAFuture = "01972dee89fc4404a5c408d50007dad5";
+        // public static string enemyWithoutAFuture = "01972dee89fc4404a5c408d50007dad5"; // bullet kin for testing
+        public static string enemyWithoutAFuture = "";
 
         public static Texture2D eeveeTexture;
 
@@ -61,8 +62,9 @@ namespace CwaffingTheGungy
 
         public static void OnEnemyPreSpawn(Action<AIActor> action, AIActor enemy)
         {
-            ETGModConsole.Log("spawning "+enemy.GetActorName() + " ("+enemy.EnemyGuid+")");
-            if (true || enemy.EnemyGuid == enemyWithoutAFuture)
+            // ETGModConsole.Log("spawning "+enemy.GetActorName() + " ("+enemy.EnemyGuid+")");
+            // if (true || enemy.EnemyGuid == enemyWithoutAFuture)
+            if (enemy.EnemyGuid == enemyWithoutAFuture)
             {
                 // ETGModConsole.Log("  ded o.o");
                 Memorialize(enemy);
@@ -108,17 +110,17 @@ namespace CwaffingTheGungy
             if (bestSpriteId == -1)
             {
                 bestSpriteId = enemy.sprite.spriteId;
-                ETGModConsole.Log("  no matches, options: ");
+                // ETGModConsole.Log("  no matches, options: ");
                 for (int i = 0; i < defs.Length; ++i)
                 {
                     tk2dSpriteDefinition sd = defs[i];
-                    if (sd.name.Contains("001"))
-                        ETGModConsole.Log("    "+sd.name);
+                    // if (sd.name.Contains("001"))
+                    //     ETGModConsole.Log("    "+sd.name);
                 }
             }
             else
             {
-                ETGModConsole.Log("  found "+defs[bestSpriteId].name);
+                // ETGModConsole.Log("  found "+defs[bestSpriteId].name);
             }
 
             tk2dBaseSprite sprite = g.AddComponent<tk2dSprite>();
