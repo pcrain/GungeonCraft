@@ -80,6 +80,7 @@ namespace CwaffingTheGungy
                     HLD.Init();
                     Siphon.Init();
                     ZoolandersDiary.Init();
+                    RatPoison.Init();
                 #endregion
 
                 #region Guns

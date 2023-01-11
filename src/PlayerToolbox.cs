@@ -54,6 +54,8 @@ namespace CwaffingTheGungy
                 isSecondaryPlayer = (GameManager.Instance.SecondaryPlayer == m_attachedPlayer);
 
             eeveeTexture = ResourceManager.LoadAssetBundle("shared_auto_001").LoadAsset<Texture2D>("nebula_reducednoise");
+
+            enemyWithoutAFuture = ""; //reset so enemies don't stay dead between runs
         }
 
         private void Update()
