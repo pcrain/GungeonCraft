@@ -45,6 +45,7 @@
     <Compile Include="src\Cwaff-Passives\RatPoison.cs"/>
     <Compile Include="src\Cwaff-Passives\ZoolandersDiary.cs"/>
     <Compile Include="src\Cwaff-Passives\HLD.cs"/>
+    <Compile Include="src\Cwaff-Passives\JohnsWick.cs"/>
     <Compile Include="src\Commands.cs"/>
     <Compile Include="src\HatsStolenFromNN\HatController.cs"/>
     <Compile Include="src\HatsStolenFromNN\HatUtility.cs"/>
@@ -206,6 +207,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\friendlyoverhead_vfx_003.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\friendlyoverhead_vfx_001.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\johns_wick_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\rat_poison_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\future_killing_bullet_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\88888888_icon.png"/>

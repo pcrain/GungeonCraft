@@ -36,6 +36,7 @@ namespace CwaffingTheGungy
         {
             try
             {
+                var watch = System.Diagnostics.Stopwatch.StartNew();
                 ETGModConsole.Log("Cwaffing the Gungy initialising...");
 
                 instance = this;
@@ -81,6 +82,7 @@ namespace CwaffingTheGungy
                     Siphon.Init();
                     ZoolandersDiary.Init();
                     RatPoison.Init();
+                    JohnsWick.Init();
                 #endregion
 
                 #region Guns
@@ -160,10 +162,11 @@ namespace CwaffingTheGungy
                 //Misc. Tweaks
                 CwaffTweaks.Init();
 
-                ETGMod.StartGlobalCoroutine(this.delayedstarthandler());
+                // ETGMod.StartGlobalCoroutine(this.delayedstarthandler());
 
+                watch.Stop();
                 AkSoundEngine.PostEvent("vc_kirby_appeal01", ETGModMainBehaviour.Instance.gameObject);
-                ETGModConsole.Log("Yay! :D");
+                ETGModConsole.Log("  Yay! :D CtG initialized in "+(watch.ElapsedMilliseconds/1000.0f)+" seconds");
             }
             catch (Exception e)
             {
@@ -172,28 +175,28 @@ namespace CwaffingTheGungy
             }
         }
 
-        public IEnumerator delayedstarthandler()
-        {
-            yield return null;
-            this.DelayedInitialisation();
-            yield break;
-        }
-        public void DelayedInitialisation()
-        {
-            try
-            {
-                // CrossmodNPCLootPoolSetup.CheckItems();
+        // public IEnumerator delayedstarthandler()
+        // {
+        //     yield return null;
+        //     this.DelayedInitialisation();
+        //     yield break;
+        // }
+        // public void DelayedInitialisation()
+        // {
+        //     try
+        //     {
+        //         // CrossmodNPCLootPoolSetup.CheckItems();
 
-                // OMITBChars.Shade = ETGModCompatibility.ExtendEnum<PlayableCharacters>(Initialisation.GUID, "Shade");
+        //         // OMITBChars.Shade = ETGModCompatibility.ExtendEnum<PlayableCharacters>(Initialisation.GUID, "Shade");
 
-                ETGModConsole.Log("(Also finished DelayedInitialization)");
-            }
-            catch (Exception e)
-            {
-                ETGModConsole.Log(e.Message);
-                ETGModConsole.Log(e.StackTrace);
-            }
-        }
+        //         ETGModConsole.Log("(Also finished DelayedInitialization)");
+        //     }
+        //     catch (Exception e)
+        //     {
+        //         ETGModConsole.Log(e.Message);
+        //         ETGModConsole.Log(e.StackTrace);
+        //     }
+        // }
     }
 }
 
