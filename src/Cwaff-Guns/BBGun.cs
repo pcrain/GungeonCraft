@@ -26,6 +26,8 @@ namespace CwaffingTheGungy
 
         private static readonly float[] CHARGE_LEVELS = {0.5f,1.0f,2.0f};
 
+        private static Projectile fakeProjectile;
+
         public static void Add()
         {
             Gun gun = Lazy.InitGunFromStrings(gunName, spriteName, projectileName, shortDescription, longDescription);
@@ -46,16 +48,11 @@ namespace CwaffingTheGungy
             gun.SetAnimationFPS(gun.chargeAnimation, 8);
             gun.gunClass = GunClass.CHARGE;
 
-            Gun projectileBase = PickupObjectDatabase.GetById(83) as Gun;
-            // Lazy.InitGunFromStrings already handles the first one
-            for (int i = 1; i < CHARGE_LEVELS.Length; i++)
-                gun.AddProjectileModuleFrom(projectileBase, true, false);
+            gun.DefaultModule.shootStyle = ProjectileModule.ShootStyle.Charged;
+            gun.DefaultModule.sequenceStyle = ProjectileModule.ProjectileSequenceStyle.Ordered;
 
             //GUN STATS
-            int n = 0;
-            foreach (ProjectileModule mod in gun.Volley.projectiles)
-            {
-                ++n;
+            ProjectileModule mod = gun.DefaultModule;
                 mod.ammoCost            = 1;
                 mod.shootStyle          = ProjectileModule.ShootStyle.Charged;
                 mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Ordered;
@@ -63,59 +60,44 @@ namespace CwaffingTheGungy
                 mod.angleVariance       = 20f;
                 mod.numberOfShotsInClip = 3;
 
+            List<ProjectileModule.ChargeProjectile> tempChargeProjectiles =
+                new List<ProjectileModule.ChargeProjectile>();
+
+            for (int i = 0; i < CHARGE_LEVELS.Length; i++)
+            {
                 Projectile projectile = UnityEngine.Object.Instantiate<Projectile>(mod.projectiles[0]);
-                mod.projectiles[0] = projectile;
+                if (i < mod.projectiles.Count)
+                    mod.projectiles[i] = projectile;
+                else
+                    mod.projectiles.Add(projectile);
                 projectile.gameObject.SetActive(false);
                 FakePrefab.MarkAsFakePrefab(projectile.gameObject);
                 UnityEngine.Object.DontDestroyOnLoad(projectile);
 
-                Expiration expire = projectile.gameObject.AddComponent<Expiration>();
                 TheBB bb = projectile.gameObject.AddComponent<TheBB>();
-                bb.chargeLevel = n;
+                bb.chargeLevel = i+1;
 
-                if (mod != gun.DefaultModule) { mod.ammoCost = 0; }
+                // if (mod != gun.DefaultModule) { mod.ammoCost = 0; }
                 ProjectileModule.ChargeProjectile chargeProj = new ProjectileModule.ChargeProjectile
                 {
                     Projectile = projectile,
-                    ChargeTime = CHARGE_LEVELS[n-1],
+                    ChargeTime = CHARGE_LEVELS[i],
                 };
-                mod.chargeProjectiles = new List<ProjectileModule.ChargeProjectile> { chargeProj };
+                tempChargeProjectiles.Add(chargeProj);
             }
+            mod.chargeProjectiles = tempChargeProjectiles;
             gun.reloadTime = 1f;
             gun.SetBaseMaxAmmo(100);
 
             gun.quality = PickupObject.ItemQuality.B;
-        }
 
-        public override Projectile OnPreFireProjectileModifier(Gun gun, Projectile projectile, ProjectileModule mod)
-        {
-            // ETGModConsole.Log("charge is "+this.gun.GetChargeFraction());
-            // ETGModConsole.Log("last charge was "+lastCharge);
-
-            TheBB bb = projectile.gameObject.GetComponent<TheBB>();
-            // ETGModConsole.Log("  attempting to create projectile with level "+bb.chargeLevel);
-
-            if (bb.chargeLevel == CHARGE_LEVELS.Length)
-            {
-                // ETGModConsole.Log("    creating fully charged projectile");
-                return base.OnPreFireProjectileModifier(gun,projectile,mod); //if we're the final projectile, there's nothing to do
-            }
-            // determine how much charge we need to create the next projectile on a scale of 0 to 1
-            float nextCharge = CHARGE_LEVELS[bb.chargeLevel] / CHARGE_LEVELS[CHARGE_LEVELS.Length - 1];
-            if (nextCharge > lastCharge) // if we're not able to create the next level projectile yet, there's nothing to do
-            {
-                // ETGModConsole.Log("    creating projectile with level "+bb.chargeLevel+"/"+CHARGE_LEVELS.Length);
-                return base.OnPreFireProjectileModifier(gun,projectile,mod);
-            }
-
-            // another stronger charged projectile is available, so get rid of this one
-            projectile.gameObject.AddComponent<FakeProjectileComponent>();
-
-            return base.OnPreFireProjectileModifier(gun,projectile,mod);
+            fakeProjectile = Lazy.PrefabProjectileFromGun(gun);
+            fakeProjectile.gameObject.AddComponent<FakeProjectileComponent>();
         }
 
         public override void PostProcessProjectile(Projectile projectile)
         {
+            ETGModConsole.Log("for speed, last charge was "+lastCharge);
             projectile.baseData.speed *= lastCharge;
             base.PostProcessProjectile(projectile);
         }
@@ -137,6 +119,7 @@ namespace CwaffingTheGungy
         public int chargeLevel = 0;
         private void Start()
         {
+            ETGModConsole.Log("created projectile with charge level "+chargeLevel);
             // Projectile self = base.GetComponent<Projectile>();
             // if (self?.Owner is PlayerController)
             // {
