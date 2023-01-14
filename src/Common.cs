@@ -42,7 +42,7 @@ namespace CwaffingTheGungy
         public static Gun InitGunFromStrings(
           string gunName, string spriteName, string projectileName, string shortDescription, string longDescription)
         {
-            string newGunName  = gunName.Replace("'", "").Replace("-", "");  //get sane gun for item rename
+            string newGunName  = gunName.Replace("'", "").Replace("-", "").Replace(".", "");  //get sane gun for item rename
             string baseGunName = newGunName.Replace(" ", "_").ToLower();  //get saner gun name for commands
 
             Gun gun = ETGMod.Databases.Items.NewGun(newGunName, spriteName);  //create a new gun using specified sprite name

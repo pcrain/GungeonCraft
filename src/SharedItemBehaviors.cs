@@ -24,6 +24,8 @@ namespace CwaffingTheGungy
             Projectile p = base.GetComponent<Projectile>();
             p.sprite.renderer.enabled = false;
             p.damageTypes &= (~CoreDamageTypes.Electric);
+            p.collidesWithEnemies = false;
+            p.collidesWithProjectiles = false;
         }
     }
 
@@ -35,8 +37,6 @@ namespace CwaffingTheGungy
         private void Start()
         {
             Projectile p = base.GetComponent<Projectile>();
-            p.sprite.renderer.enabled = false;
-            p.damageTypes &= (~CoreDamageTypes.Electric);
             Invoke("Expire", expirationTimer);
         }
 

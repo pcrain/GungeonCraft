@@ -108,6 +108,7 @@ namespace CwaffingTheGungy
                     TimingGun.Add();
                     KiBlast.Add();
                     Deadline.Add();
+                    BBGun.Add();
 
                     MasterSword.Add();
                 #endregion
