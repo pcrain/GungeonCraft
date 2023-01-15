@@ -100,7 +100,6 @@ namespace CwaffingTheGungy
     {
       if (!this)
         return;
-      ETGModConsole.Log("entered");
       SpriteOutlineManager.RemoveOutlineFromSprite(base.sprite);
       SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.white);
     }
@@ -109,7 +108,6 @@ namespace CwaffingTheGungy
     {
       if (!this)
         return;
-      ETGModConsole.Log("exited");
       SpriteOutlineManager.RemoveOutlineFromSprite(base.sprite);
       SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black, 0.1f, 0.05f);
     }
@@ -141,7 +139,7 @@ namespace CwaffingTheGungy
 
     public static IEnumerator DefaultInteractionScript(MiniInteractable i, PlayerController p)
     {
-      ETGModConsole.Log("interacted!");
+      ETGModConsole.Log("interacted! now override this and actually do something o:");
       i.interacting = false;
       yield break;
     }
@@ -152,7 +150,7 @@ namespace CwaffingTheGungy
       return string.Empty;
     }
 
-    public static void CreateInteractableAtPosition(tk2dBaseSprite sprite, Vector2 position, InteractionScript iscript = null)
+    public static MiniInteractable CreateInteractableAtPosition(tk2dBaseSprite sprite, Vector2 position, InteractionScript iscript = null)
     {
         GameObject iPos = new GameObject("Mini interactible position test");
             iPos.transform.position = position.ToVector3ZisY();
@@ -160,11 +158,12 @@ namespace CwaffingTheGungy
             iMini.transform.parent        = iPos.transform;
             iMini.transform.localPosition = Vector3.zero;
             iMini.transform.position      = Vector3.zero;
-        var mini = iMini.AddComponent<MiniInteractable>();
+        MiniInteractable mini = iMini.AddComponent<MiniInteractable>();
             // NOTE: the below transform position absolutely has to be linked to a game object
             iPos.transform.position.GetAbsoluteRoom().RegisterInteractable(mini);
             mini.interactionScript = iscript ?? DefaultInteractionScript;
             mini.Initialize(sprite);
+        return mini;
     }
   }
 }

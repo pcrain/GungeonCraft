@@ -80,16 +80,16 @@ namespace CwaffingTheGungy
                 projectile.baseData.speed = 20f;
                 projectile.AnimateProjectile(
                     new List<string> {
-                        "bb1",
-                        "bb2",
-                        "bb3",
-                        "bb4",
-                        "bb5",
-                        "bb6",
-                        "bb7",
-                        "bb8",
-                        "bb9",
-                        "bb10",
+                        "bball1",
+                        "bball2",
+                        "bball3",
+                        "bball4",
+                        "bball5",
+                        "bball6",
+                        "bball7",
+                        "bball8",
+                        // "bb9",
+                        // "bb10",
                     },
                     20, true, new IntVector2(bbSpriteDiameter, bbSpriteDiameter),
                     false, tk2dBaseSprite.Anchor.MiddleCenter, true, false);
@@ -146,6 +146,7 @@ namespace CwaffingTheGungy
         private Projectile m_projectile;
         private PlayerController m_owner;
         private float lifetime = 0f;
+        private float maxSpeed = 0f;
 
         private void Start()
         {
@@ -155,6 +156,13 @@ namespace CwaffingTheGungy
                 this.m_owner = this.m_projectile.Owner as PlayerController;
 
             this.m_projectile.collidesWithPlayer = true;
+            this.maxSpeed = this.m_projectile.baseData.speed;
+
+            this.m_projectile.sprite.usesOverrideMaterial = true;
+            this.m_projectile.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+                this.m_projectile.sprite.renderer.material.SetFloat("_EmissivePower", 1000f);
+                this.m_projectile.sprite.renderer.material.SetFloat("_EmissiveColorPower", 1.55f);
+                this.m_projectile.sprite.renderer.material.SetColor("_EmissiveColor", Color.magenta);
 
             BounceProjModifier bounce = this.m_projectile.gameObject.GetOrAddComponent<BounceProjModifier>();
                 bounce.numberOfBounces     = Mathf.Max(bounce.numberOfBounces, 999);
@@ -177,16 +185,32 @@ namespace CwaffingTheGungy
             float deltatime = BraveTime.DeltaTime;
             lifetime += deltatime;
             this.m_projectile.UpdateSpeed();
-            this.m_projectile.baseData.speed = Mathf.Max(
+            float newSpeed = Mathf.Max(
                 this.m_projectile.baseData.speed-BB_SPEED_DECAY*deltatime,0.0001f);
+            this.m_projectile.baseData.speed = newSpeed;
             this.m_projectile.UpdateSpeed();
+
+            this.m_projectile.sprite.renderer.material.SetFloat(
+                "_EmissivePower", 300.0f+1000.0f*(newSpeed/maxSpeed));
+            // this.m_projectile.sprite.renderer.material.SetFloat(
+            //     "_EmissiveColorPower", 1.55f*(newSpeed/maxSpeed));
+            this.m_projectile.sprite.renderer.material.SetFloat(
+                "_Cutoff", 0.1f);
+            // this.m_projectile.sprite.renderer.material.SetFloat(
+            //     "_VertexColor", 1.0f*(newSpeed/maxSpeed));
 
             if (this.m_projectile.baseData.speed < 1)
             {
-                MiniInteractable.CreateInteractableAtPosition(
+                MiniInteractable mi = MiniInteractable.CreateInteractableAtPosition(
                     this.m_projectile.sprite,
                     this.m_projectile.sprite.WorldCenter,
                     BBInteractScript);
+                    mi.sprite.usesOverrideMaterial = true;
+                    mi.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+                        mi.sprite.renderer.material.SetFloat("_EmissivePower", 300f);
+                        mi.sprite.renderer.material.SetFloat("_EmissiveColorPower", 1.55f);
+                        mi.sprite.renderer.material.SetColor("_EmissiveColor", Color.magenta);
+
                 this.m_projectile.DieInAir(true,false,false,true);
                 return;
             }
@@ -213,10 +237,10 @@ namespace CwaffingTheGungy
                 AkSoundEngine.PostEvent("Play_OBJ_item_pickup_01", p.gameObject);
                 GameObject original = (GameObject)ResourceCache.Acquire("Global VFX/VFX_Item_Pickup");
                   GameObject gameObject = UnityEngine.Object.Instantiate(original);
-                    tk2dSprite component = gameObject.GetComponent<tk2dSprite>();
-                    component.PlaceAtPositionByAnchor(i.sprite.WorldCenter, tk2dBaseSprite.Anchor.MiddleCenter);
-                    component.HeightOffGround = 6f;
-                    component.UpdateZDepth();
+                    tk2dSprite sprite = gameObject.GetComponent<tk2dSprite>();
+                        sprite.PlaceAtPositionByAnchor(i.sprite.WorldCenter, tk2dBaseSprite.Anchor.MiddleCenter);
+                        sprite.HeightOffGround = 6f;
+                        sprite.UpdateZDepth();
 
                 UnityEngine.Object.Destroy(i.gameObject);
                 yield break;
