@@ -18,7 +18,8 @@ namespace CwaffingTheGungy
     {
         public static string gunName          = "B. B. Gun";
         public static string spriteName       = "embercannon";
-        public static string projectileName   = "83";
+        // public static string projectileName   = "83";
+        public static string projectileName   = "ak-47";
         public static string shortDescription = "Spare No One";
         public static string longDescription  = "(Three Strikes)";
 
@@ -54,11 +55,11 @@ namespace CwaffingTheGungy
             //GUN STATS
             ProjectileModule mod = gun.DefaultModule;
                 mod.ammoCost            = 1;
+                mod.numberOfShotsInClip = 1;
                 mod.shootStyle          = ProjectileModule.ShootStyle.Charged;
                 mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Ordered;
                 mod.cooldownTime        = 0.70f;
-                mod.angleVariance       = 20f;
-                mod.numberOfShotsInClip = 3;
+                mod.angleVariance       = 10f;
 
             List<ProjectileModule.ChargeProjectile> tempChargeProjectiles =
                 new List<ProjectileModule.ChargeProjectile>();
@@ -74,6 +75,9 @@ namespace CwaffingTheGungy
                 FakePrefab.MarkAsFakePrefab(projectile.gameObject);
                 UnityEngine.Object.DontDestroyOnLoad(projectile);
 
+                projectile.baseData.range = 999999f;
+                projectile.baseData.speed = 20f;
+
                 TheBB bb = projectile.gameObject.AddComponent<TheBB>();
                 bb.chargeLevel = i+1;
 
@@ -86,8 +90,9 @@ namespace CwaffingTheGungy
                 tempChargeProjectiles.Add(chargeProj);
             }
             mod.chargeProjectiles = tempChargeProjectiles;
-            gun.reloadTime = 1f;
-            gun.SetBaseMaxAmmo(100);
+            gun.reloadTime = 0.01f;
+            gun.CanGainAmmo = false;
+            gun.SetBaseMaxAmmo(1);
 
             gun.quality = PickupObject.ItemQuality.B;
 
@@ -117,15 +122,103 @@ namespace CwaffingTheGungy
     public class TheBB : MonoBehaviour
     {
         public int chargeLevel = 0;
+
+        private Projectile m_projectile;
+        private PlayerController m_owner;
+
         private void Start()
         {
             ETGModConsole.Log("created projectile with charge level "+chargeLevel);
-            // Projectile self = base.GetComponent<Projectile>();
-            // if (self?.Owner is PlayerController)
+            this.m_projectile = base.GetComponent<Projectile>();
+            if (this.m_projectile.Owner && this.m_projectile.Owner is PlayerController)
+                this.m_owner = this.m_projectile.Owner as PlayerController;
+
+            this.m_projectile.collidesWithPlayer = true;
+
+            BounceProjModifier bounce = this.m_projectile.gameObject.GetOrAddComponent<BounceProjModifier>();
+                bounce.numberOfBounces     = Mathf.Max(bounce.numberOfBounces, 999);
+                bounce.chanceToDieOnBounce = 0f;
+                bounce.onlyBounceOffTiles  = true;
+
+            PierceProjModifier pierce = this.m_projectile.gameObject.GetOrAddComponent<PierceProjModifier>();
+                pierce.penetration = Mathf.Max(pierce.penetration,999);
+                pierce.penetratesBreakables = true;
+
+            SpeculativeRigidbody specRigidBody = this.m_projectile.specRigidbody;
+            // this.m_projectile.BulletScriptSettings.surviveRigidbodyCollisions = true;
+            // this.m_projectile.BulletScriptSettings.surviveTileCollisions = true;
+            // specRigidBody.OnCollision += this.OnCollision;
+            // specRigidBody.OnPreRigidbodyCollision += this.OnPreCollision;
+        }
+
+        private void Update()
+        {
+            float deltatime = BraveTime.DeltaTime;
+            this.m_projectile.baseData.speed = Mathf.Max(this.m_projectile.baseData.speed-3*deltatime,0.0001f);
+            this.m_projectile.UpdateSpeed();
+            if (this.m_projectile.baseData.speed < 1)
+            {
+                MiniInteractable.CreateInteractableAtPosition(
+                    this.m_projectile.sprite,this.m_projectile.sprite.WorldCenter);
+                this.m_projectile.DieInAir(true,false,false,true);
+            }
+            // ETGModConsole.Log("speed is now "+this.m_projectile.Speed);
+            // this.lifetime += deltatime;
+            // this.timeSinceLastReflect += deltatime;
+            // float percentDoneTurning = this.lifetime / this.actualTimeToReachTarget;
+            // if (percentDoneTurning <= 1.0f)
             // {
-            //     PlayerController owner = self.Owner as PlayerController;
-            //     self.RuntimeUpdateScale(NATASHA_PROJECTILE_SCALE * owner.stats.GetStatValue(PlayerStats.StatType.PlayerBulletScale));
+            //     float inflection = (2.0f*percentDoneTurning) - 1.0f;
+            //     float newAngle = this.targetAngle + inflection * this.angleVariance;
+            //     this.m_projectile.SendInDirection(Lazy.AngleToVector(newAngle), true);
             // }
+        }
+
+        private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
+        {
+            ETGModConsole.Log("PRECOLLISION");
+            PlayerController player = otherRigidbody?.GetComponent<PlayerController>();
+            if (player)
+            {
+                if (player == this.m_owner)
+                {
+                    ETGModConsole.Log("ran into player with speed "+this.m_projectile.Speed);
+                    if (this.m_projectile.Speed < 1f)
+                    {
+                        foreach (Gun gun in this.m_owner.inventory.AllGuns)
+                        {
+                            if (!gun.GetComponent<BBGun>())
+                                continue;
+                            gun.GainAmmo(1);
+                            gun.CurrentAmmo = 1;
+                            gun.ClipShotsRemaining = 1;
+                            // gun.relo
+                            break;
+                        }
+                    }
+                }
+                PhysicsEngine.SkipCollision = true;
+            }
+        }
+
+        private void OnCollision(CollisionData rigidbodyCollision)
+        {
+
+            // if (tileCollision.)
+            // float m_hitNormal = tileCollision.Normal.ToAngle();
+            // PhysicsEngine.PostSliceVelocity = new Vector2?(default(Vector2));
+            // SpeculativeRigidbody specRigidbody = this.m_projectile.specRigidbody;
+            // specRigidbody.OnCollision -= this.OnCollision;
+
+            // // Vector2 spawnPoint = this.m_projectile.sprite.WorldCenter;
+            // Vector2 spawnPoint = tileCollision.PostCollisionUnitCenter;
+            // GameObject spawn = SpawnManager.SpawnProjectile(
+            //     Nug.gunprojectile.gameObject,
+            //     spawnPoint,
+            //     Quaternion.Euler(0f, 0f, this.targetAngle),
+            //     true);
+
+            // this.m_projectile.DieInAir();
         }
     }
 }

@@ -172,6 +172,7 @@
     <Compile Include="src\Cwaff-Misc\SoulLinkStatusEffect.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffSynergies.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffHUD.cs"/>
+    <Compile Include="src\Cwaff-Misc\MiniInteractable.cs"/>
     <Compile Include="src\VFXToolbox.cs"/>
     <Compile Include="src\Main.cs"/>
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter3.png"/>
