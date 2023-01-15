@@ -285,7 +285,7 @@ namespace CwaffingTheGungy
                     vfx.SpawnAtPosition(
                         victim.sprite.WorldCenter.ToVector3ZisY(-1f), /* -1 = above player sprite */
                         0, null, null, null, -0.05f);
-                victim.EraseFromExistence(true);
+                victim.healthHaver.ApplyDamage(10000f,Vector2.zero,"Future Bullet",ignoreDamageCaps: true);
             }
             else
             {
