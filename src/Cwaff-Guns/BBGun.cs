@@ -25,7 +25,7 @@ namespace CwaffingTheGungy
 
         private float lastCharge = 0.0f;
 
-        private static readonly float[] CHARGE_LEVELS = {0.5f,1.0f,2.0f};
+        private static readonly float[] CHARGE_LEVELS = {0.25f,0.5f,1.0f,2.0f};
 
         private static Projectile fakeProjectile;
 
@@ -75,8 +75,24 @@ namespace CwaffingTheGungy
                 FakePrefab.MarkAsFakePrefab(projectile.gameObject);
                 UnityEngine.Object.DontDestroyOnLoad(projectile);
 
+                const int bbSpriteDiameter = 20;
                 projectile.baseData.range = 999999f;
                 projectile.baseData.speed = 20f;
+                projectile.AnimateProjectile(
+                    new List<string> {
+                        "bb1",
+                        "bb2",
+                        "bb3",
+                        "bb4",
+                        "bb5",
+                        "bb6",
+                        "bb7",
+                        "bb8",
+                        "bb9",
+                        "bb10",
+                    },
+                    20, true, new IntVector2(bbSpriteDiameter, bbSpriteDiameter),
+                    false, tk2dBaseSprite.Anchor.MiddleCenter, true, false);
 
                 TheBB bb = projectile.gameObject.AddComponent<TheBB>();
                 bb.chargeLevel = i+1;
@@ -103,7 +119,7 @@ namespace CwaffingTheGungy
         public override void PostProcessProjectile(Projectile projectile)
         {
             ETGModConsole.Log("for speed, last charge was "+lastCharge);
-            projectile.baseData.speed *= lastCharge;
+            projectile.baseData.speed = 100*lastCharge;
             base.PostProcessProjectile(projectile);
         }
 
@@ -121,10 +137,15 @@ namespace CwaffingTheGungy
 
     public class TheBB : MonoBehaviour
     {
+        private const float BB_DAMAGE_SCALE = 2.0f;
+        private const float BB_FORCE_SCALE = 2.0f;
+        private const float BB_SPEED_DECAY = 3.0f;
+
         public int chargeLevel = 0;
 
         private Projectile m_projectile;
         private PlayerController m_owner;
+        private float lifetime = 0f;
 
         private void Start()
         {
@@ -139,86 +160,68 @@ namespace CwaffingTheGungy
                 bounce.numberOfBounces     = Mathf.Max(bounce.numberOfBounces, 999);
                 bounce.chanceToDieOnBounce = 0f;
                 bounce.onlyBounceOffTiles  = true;
+                bounce.OnBounce += OnBounce;
 
             PierceProjModifier pierce = this.m_projectile.gameObject.GetOrAddComponent<PierceProjModifier>();
                 pierce.penetration = Mathf.Max(pierce.penetration,999);
                 pierce.penetratesBreakables = true;
+        }
 
-            SpeculativeRigidbody specRigidBody = this.m_projectile.specRigidbody;
-            // this.m_projectile.BulletScriptSettings.surviveRigidbodyCollisions = true;
-            // this.m_projectile.BulletScriptSettings.surviveTileCollisions = true;
-            // specRigidBody.OnCollision += this.OnCollision;
-            // specRigidBody.OnPreRigidbodyCollision += this.OnPreCollision;
+        private void OnBounce()
+        {
+            this.m_projectile.baseData.speed *= 0.9f;
         }
 
         private void Update()
         {
             float deltatime = BraveTime.DeltaTime;
-            this.m_projectile.baseData.speed = Mathf.Max(this.m_projectile.baseData.speed-3*deltatime,0.0001f);
+            lifetime += deltatime;
             this.m_projectile.UpdateSpeed();
+            this.m_projectile.baseData.speed = Mathf.Max(
+                this.m_projectile.baseData.speed-BB_SPEED_DECAY*deltatime,0.0001f);
+            this.m_projectile.UpdateSpeed();
+
             if (this.m_projectile.baseData.speed < 1)
             {
                 MiniInteractable.CreateInteractableAtPosition(
-                    this.m_projectile.sprite,this.m_projectile.sprite.WorldCenter);
+                    this.m_projectile.sprite,
+                    this.m_projectile.sprite.WorldCenter,
+                    BBInteractScript);
                 this.m_projectile.DieInAir(true,false,false,true);
+                return;
             }
-            // ETGModConsole.Log("speed is now "+this.m_projectile.Speed);
-            // this.lifetime += deltatime;
-            // this.timeSinceLastReflect += deltatime;
-            // float percentDoneTurning = this.lifetime / this.actualTimeToReachTarget;
-            // if (percentDoneTurning <= 1.0f)
-            // {
-            //     float inflection = (2.0f*percentDoneTurning) - 1.0f;
-            //     float newAngle = this.targetAngle + inflection * this.angleVariance;
-            //     this.m_projectile.SendInDirection(Lazy.AngleToVector(newAngle), true);
-            // }
+
+            this.m_projectile.baseData.damage = BB_DAMAGE_SCALE * this.m_projectile.baseData.speed;
+            this.m_projectile.baseData.force = BB_FORCE_SCALE * this.m_projectile.baseData.speed;
         }
 
-        private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
+        public IEnumerator BBInteractScript(MiniInteractable i, PlayerController p)
         {
-            ETGModConsole.Log("PRECOLLISION");
-            PlayerController player = otherRigidbody?.GetComponent<PlayerController>();
-            if (player)
+            if (p != this.m_owner)
             {
-                if (player == this.m_owner)
-                {
-                    ETGModConsole.Log("ran into player with speed "+this.m_projectile.Speed);
-                    if (this.m_projectile.Speed < 1f)
-                    {
-                        foreach (Gun gun in this.m_owner.inventory.AllGuns)
-                        {
-                            if (!gun.GetComponent<BBGun>())
-                                continue;
-                            gun.GainAmmo(1);
-                            gun.CurrentAmmo = 1;
-                            gun.ClipShotsRemaining = 1;
-                            // gun.relo
-                            break;
-                        }
-                    }
-                }
-                PhysicsEngine.SkipCollision = true;
+                i.interacting = false;
+                yield break;
             }
-        }
+            foreach (Gun gun in this.m_owner.inventory.AllGuns)
+            {
+                if (!gun.GetComponent<BBGun>())
+                    continue;
+                // gun.GainAmmo(1);
+                // gun.ClipShotsRemaining = 1;
+                gun.CurrentAmmo = 1;
+                gun.ForceImmediateReload();
+                AkSoundEngine.PostEvent("Play_OBJ_item_pickup_01", p.gameObject);
+                GameObject original = (GameObject)ResourceCache.Acquire("Global VFX/VFX_Item_Pickup");
+                  GameObject gameObject = UnityEngine.Object.Instantiate(original);
+                    tk2dSprite component = gameObject.GetComponent<tk2dSprite>();
+                    component.PlaceAtPositionByAnchor(i.sprite.WorldCenter, tk2dBaseSprite.Anchor.MiddleCenter);
+                    component.HeightOffGround = 6f;
+                    component.UpdateZDepth();
 
-        private void OnCollision(CollisionData rigidbodyCollision)
-        {
-
-            // if (tileCollision.)
-            // float m_hitNormal = tileCollision.Normal.ToAngle();
-            // PhysicsEngine.PostSliceVelocity = new Vector2?(default(Vector2));
-            // SpeculativeRigidbody specRigidbody = this.m_projectile.specRigidbody;
-            // specRigidbody.OnCollision -= this.OnCollision;
-
-            // // Vector2 spawnPoint = this.m_projectile.sprite.WorldCenter;
-            // Vector2 spawnPoint = tileCollision.PostCollisionUnitCenter;
-            // GameObject spawn = SpawnManager.SpawnProjectile(
-            //     Nug.gunprojectile.gameObject,
-            //     spawnPoint,
-            //     Quaternion.Euler(0f, 0f, this.targetAngle),
-            //     true);
-
-            // this.m_projectile.DieInAir();
+                UnityEngine.Object.Destroy(i.gameObject);
+                yield break;
+            }
+            i.interacting = false;
         }
     }
 }

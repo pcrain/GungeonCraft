@@ -15,15 +15,13 @@ namespace CwaffingTheGungy
     public delegate IEnumerator InteractionScript(MiniInteractable i, PlayerController p);
     public InteractionScript interactionScript = DefaultInteractionScript;
 
-    public bool UseOmnidirectionalItemFacing;
+    public bool interacting = false;
 
     public DungeonData.Direction itemFacing = DungeonData.Direction.SOUTH;
 
     private VFXPool effect;
 
     private float myTimer = 0;
-
-    private bool interacting = false;
 
     public void Initialize(tk2dBaseSprite i)
     {
@@ -39,7 +37,7 @@ namespace CwaffingTheGungy
 
       base.gameObject.AddComponent<tk2dSprite>();
       base.sprite.SetSprite(sprite.Collection, sprite.spriteId);
-      base.sprite.IsPerpendicular = !UseOmnidirectionalItemFacing;
+      base.sprite.IsPerpendicular = true;
       base.sprite.HeightOffGround = 1f;
       base.sprite.PlaceAtPositionByAnchor(base.transform.parent.position, tk2dBaseSprite.Anchor.MiddleCenter);
       base.sprite.transform.position = base.sprite.transform.position.Quantize(0.0625f);
@@ -154,7 +152,7 @@ namespace CwaffingTheGungy
       return string.Empty;
     }
 
-    public static void CreateInteractableAtPosition(tk2dBaseSprite sprite, Vector2 position)
+    public static void CreateInteractableAtPosition(tk2dBaseSprite sprite, Vector2 position, InteractionScript iscript = null)
     {
         GameObject iPos = new GameObject("Mini interactible position test");
             iPos.transform.position = position.ToVector3ZisY();
@@ -165,7 +163,7 @@ namespace CwaffingTheGungy
         var mini = iMini.AddComponent<MiniInteractable>();
             // NOTE: the below transform position absolutely has to be linked to a game object
             iPos.transform.position.GetAbsoluteRoom().RegisterInteractable(mini);
-            mini.interactionScript = DefaultInteractionScript;
+            mini.interactionScript = iscript ?? DefaultInteractionScript;
             mini.Initialize(sprite);
     }
   }
