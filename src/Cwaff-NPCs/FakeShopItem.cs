@@ -92,7 +92,7 @@ namespace CwaffingTheGungy
       sacType = (OhNoMy)UnityEngine.Random.Range(0, (int)OhNoMy._last);
       // sacType = OhNoMy.STOMACH;
       sacName = Bombo.sacNames[(int)sacType];
-      ETGModConsole.Log("initialized with sac type "+sacName);
+      // ETGModConsole.Log("initialized with sac type "+sacName);
 
       item = i;
       CurrentPrice = item.PurchasePrice;

@@ -118,18 +118,22 @@ namespace CwaffingTheGungy
             orig(self);
             if (GameManager.Instance?.PrimaryPlayer == null)
                 return;
-            GameManager.Instance.PrimaryPlayer.StartCoroutine(SpawnInOnFirstFloor());
-            if (brainless)
-                BecomeBrainless();
+            GameManager.Instance.PrimaryPlayer.StartCoroutine(HandleFirstFloor());
+
         }
 
         private static void BecomeBrainless()
         {
+            OhTheresMyBrain();
             brainless = true;
             GameUIRoot.Instance.HideCoreUI("brainless");
             GameUIRoot.Instance.ForceHideGunPanel = true;
             GameUIRoot.Instance.ForceHideItemPanel = true;
-            GameUIRoot.Instance.UpdatePlayerBlankUI(GameManager.Instance.PrimaryPlayer);
+            foreach (PlayerController p in GameManager.Instance.AllPlayers)
+            {
+                GameUIRoot.Instance.UpdatePlayerBlankUI(p);
+                GameUIRoot.Instance.UpdatePlayerHealthUI(p, p.healthHaver);
+            }
 
             // removing the map completely makes the game too hard imo
             // Minimap.Instance.ToggleMinimap(false);
@@ -137,10 +141,25 @@ namespace CwaffingTheGungy
             // Minimap.Instance.UIMinimap.RatTaunty.IsVisible = true;
         }
 
-        private static IEnumerator SpawnInOnFirstFloor()
+        private static void OhTheresMyBrain()
+        {
+            if (!brainless)
+                return;
+            brainless = false;
+            GameUIRoot.Instance.ShowCoreUI("brainless");
+            GameUIRoot.Instance.ForceHideGunPanel = false;
+            GameUIRoot.Instance.ForceHideItemPanel = false;
+            foreach (PlayerController p in GameManager.Instance.AllPlayers)
+            {
+                GameUIRoot.Instance.UpdatePlayerBlankUI(p);
+                GameUIRoot.Instance.UpdatePlayerHealthUI(p, p.healthHaver);
+            }
+        }
+
+        private static IEnumerator HandleFirstFloor()
         {
             PlayerController p1 = GameManager.Instance.PrimaryPlayer;
-            while (!p1.AcceptingAnyInput)
+            while (GameManager.Instance.IsLoadingLevel)
                 yield return null;  //wait for level to fully load
 
             Vector3 v3 = Vector3.zero;
@@ -153,10 +172,21 @@ namespace CwaffingTheGungy
                     v3 = a.transform.position + (new Vector2(a.sprite.GetCurrentSpriteDef().position3.x/2,-3f)).ToVector3ZisY(0);
                 }
             }
-            if (!found)
-                yield break; //no hero shrine found, not the 1st floor
-
-            Bombo bombyboi = SpawnObjectManager.SpawnObject(Bombo.npcobj,v3).GetComponent<Bombo>();
+            if (found) // hero shrine found, so we're on the 1st floor
+            {
+                // Reset brainless status on first floor on first floor
+                OhTheresMyBrain();
+                // Spawn Bombo on first floor
+                while (!p1.AcceptingAnyInput)
+                    yield return null;  //wait for player to touch down
+                Bombo bombyboi = SpawnObjectManager.SpawnObject(Bombo.npcobj,v3).GetComponent<Bombo>();
+            }
+            else
+            {
+                if (brainless) // become brainless if necessary
+                    BecomeBrainless();
+            }
+            yield break;
         }
 
         protected override void Start()
@@ -291,11 +321,11 @@ namespace CwaffingTheGungy
 
         private static IEnumerator ImInvisible(AIActor self)
         {
-            // Material newmat = BraveResources.Load("Global VFX/WhiteMaterial", ".mat") as Material;
+            Material newmat = BraveResources.Load("Global VFX/WhiteMaterial", ".mat") as Material;
             while (true)
             {
                 yield return null;
-                if (!(self.healthHaver?.IsAlive ?? true))
+                if (self.healthHaver != null && !self.healthHaver.IsAlive)
                     continue;
 
                 self.sprite.usesOverrideMaterial = true;
@@ -316,22 +346,27 @@ namespace CwaffingTheGungy
             {
                 case OhNoMy.BRAIN:
                     BecomeBrainless();
-                    ETGModConsole.Log("lost your brain"); break;
+                    // ETGModConsole.Log("lost your brain");
+                    break;
                 case OhNoMy.EYES:
                     CutStat(chump,PlayerStats.StatType.Accuracy,2.0f);
                     ETGMod.AIActor.OnPreStart += Bombo.ICantSee;
-                    ETGModConsole.Log("lost your eyes"); break;
+                    // ETGModConsole.Log("lost your eyes");
+                    break;
                 case OhNoMy.ARMS:
                     CutStat(chump,PlayerStats.StatType.Damage,0.6f);
                     CutStat(chump,PlayerStats.StatType.ReloadSpeed,1.5f);
                     CutStat(chump,PlayerStats.StatType.RateOfFire,0.75f);
-                    ETGModConsole.Log("lost your arms"); break;
+                    // ETGModConsole.Log("lost your arms");
+                    break;
                 case OhNoMy.FINGERS:
                     chump.PostProcessProjectile += Bombo.MightDropTheGun;
-                    ETGModConsole.Log("lost your fingers"); break;
+                    // ETGModConsole.Log("lost your fingers");
+                    break;
                 case OhNoMy.LEGS:
                     CutStat(chump,PlayerStats.StatType.MovementSpeed,0.6f);
-                    ETGModConsole.Log("lost your legs"); break;
+                    // ETGModConsole.Log("lost your legs");
+                    break;
                 case OhNoMy.HEART:
                     if (chump.characterIdentity == PlayableCharacters.Robot)
                         chump.healthHaver.Armor = 1;
@@ -340,18 +375,21 @@ namespace CwaffingTheGungy
                         chump.healthHaver.Armor = 0;
                         chump.healthHaver.currentHealth = 0.5f;
                     }
-                    ETGModConsole.Log("lost your heart"); break;
+                    // ETGModConsole.Log("lost your heart");
+                    break;
                 case OhNoMy.LUNGS:
                     chump.OnPreDodgeRoll -= Bombo.DodgeRollsAreExhausting;
                     chump.OnPreDodgeRoll += Bombo.DodgeRollsAreExhausting;
-                    ETGModConsole.Log("lost your lungs"); break;
+                    // ETGModConsole.Log("lost your lungs");
+                    break;
                 case OhNoMy.STOMACH:
                     chump.GetExtComp().OnPickedUpHP -= Bombo.AppetiteLoss;
                     chump.GetExtComp().OnPickedUpHP += Bombo.AppetiteLoss;
                     LootEngine.SpawnItem(PickupObjectDatabase.GetById(73).gameObject, chump.CurrentRoom.GetRandomVisibleClearSpot(1, 1).ToVector3(), Vector2.zero, 1f, false, true, false);
                     LootEngine.SpawnItem(PickupObjectDatabase.GetById(85).gameObject, chump.CurrentRoom.GetRandomVisibleClearSpot(1, 1).ToVector3(), Vector2.zero, 1f, false, true, false);
                     LootEngine.SpawnItem(PickupObjectDatabase.GetById(120).gameObject, chump.CurrentRoom.GetRandomVisibleClearSpot(1, 1).ToVector3(), Vector2.zero, 1f, false, true, false);
-                    ETGModConsole.Log("lost your stomach"); break;
+                    // ETGModConsole.Log("lost your stomach");
+                    break;
             }
         }
 
@@ -359,7 +397,7 @@ namespace CwaffingTheGungy
         {
             const int AVG_NUM_TIMES_TO_DROP = 10;
             PlayerController klutz = p.ProjectilePlayerOwner();
-            if (!(klutz.CurrentGun?.CanBeDropped ?? false))
+            if (klutz.CurrentGun == null || !klutz.CurrentGun.CanBeDropped)
                 return;
 
             Gun gunToSlip = klutz.CurrentGun;
