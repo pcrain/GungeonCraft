@@ -19,12 +19,11 @@ namespace CwaffingTheGungy
         public static string shortDescription = "Hyper Light Dasher";
         public static string longDescription  = "(Pyoooom)";
 
-        private bool dodgeButtonHeld = false;
-        private bool isDashing = false;
-        private bool isHyped = false;
         private PlayerController owner = null;
+        private HLDRoll dodgeRoller = null;
 
-        private static GameObject LinkVFXPrefab;
+        internal static GameObject LinkVFXPrefab;
+        internal static Projectile lightningProjectile;
 
         public static void Init()
         {
@@ -34,123 +33,28 @@ namespace CwaffingTheGungy
             LinkVFXPrefab = FakePrefab.Clone(Game.Items["shock_rounds"].GetComponent<ComplexProjectileModifier>().ChainLightningVFX);
             FakePrefab.MarkAsFakePrefab(LinkVFXPrefab);
             UnityEngine.Object.DontDestroyOnLoad(LinkVFXPrefab);
-        }
 
-        private IEnumerator DoDash(PlayerController player, float dashspeed, float dashtime)
-        {
-            Vector2 vel = dashspeed * player.m_lastNonzeroCommandedDirection.normalized;
-            string anim = (Mathf.Abs(vel.y) > Mathf.Abs(vel.x)) ? (vel.y > 0 ? "slide_up" : "slide_down") : "slide_right";
-            bool hasAnim = player.spriteAnimator.GetClipByName(anim) != null;
+            var comp = item.gameObject.AddComponent<HLDRoll>();
 
-            AkSoundEngine.PostEvent("teledash", player.gameObject);
-            player.SetInputOverride("hld");
-            player.SetIsFlying(true, "hld");
-
-            DustUpVFX dusts = GameManager.Instance.Dungeon.dungeonDustups;
-            for (int i = 0; i < 16; ++i)
-            {
-                float dir = UnityEngine.Random.Range(0.0f,360.0f);
-                float rot = UnityEngine.Random.Range(0.0f,360.0f);
-                float mag = UnityEngine.Random.Range(0.3f,1.25f);
-                SpawnManager.SpawnVFX(
-                    dusts.rollLandDustup,
-                    player.sprite.WorldCenter + Lazy.AngleToVector(dir, mag),
-                    Quaternion.Euler(0f, 0f, rot));
-            }
-
-            bool interrupted = false;
-            for (float timer = 0.0f; timer < dashtime; )
-            {
-                player.PlayerAfterImage();
-                timer += BraveTime.DeltaTime;
-                player.specRigidbody.Velocity = vel;
-                GameManager.Instance.Dungeon.dungeonDustups.InstantiateLandDustup(player.sprite.WorldCenter);
-                // if (hasAnim && !player.spriteAnimator.IsPlaying(anim))
-                //     player.spriteAnimator.Play(anim);  //TODO: the sliding animation itself causes the player to be invincible??? (QueryGroundedFrame())
-                yield return null;
-                if (player.IsFalling)
-                {
-                    interrupted = true;
-                    break;
-                }
-            }
-            if (!interrupted)
-            {
-                player.PlayerAfterImage();
-                for (int i = 0; i < 8; ++i)
-                {
-                    float dir = UnityEngine.Random.Range(0.0f,360.0f);
-                    float rot = UnityEngine.Random.Range(0.0f,360.0f);
-                    float mag = UnityEngine.Random.Range(0.3f,1.0f);
-                    SpawnManager.SpawnVFX(
-                        dusts.rollLandDustup,
-                        player.sprite.WorldCenter + Lazy.AngleToVector(dir, mag),
-                        Quaternion.Euler(0f, 0f, rot));
-                }
-            }
-            player.spriteAnimator.Stop();
-            player.SetIsFlying(false, "hld");
-            player.ClearInputOverride("hld");
-            this.isDashing = false;
-        }
-
-        private void StartDash(PlayerController player)
-        {
-            const float DASH_SPEED = 50.0f; // Speed of our dash
-            const float DASH_TIME = 0.1f; // Time we spend dashing
-            const float DISOWN_TIME = DASH_TIME+0.05f; // Amount of time after our dash starts before lightning is no longer connected
-            const float FADE_TIME = 0.5f; // Amount of time lightning persists after being disowned
-
-            this.isDashing = true;
-
-            if (this.isHyped)
-            {
-                Projectile p = SpawnManager.SpawnProjectile(
-                  TestLightning.defaultProjectile.gameObject,
-                  player.sprite.WorldCenter,
-                  Quaternion.Euler(0f, 0f, player.m_currentGunAngle),
-                  true).GetComponent<Projectile>();
-                    p.Owner = player;
-                    p.Shooter = player.specRigidbody;
-
-                    p.gameObject.AddComponent<FakeProjectileComponent>();
-                    p.gameObject.AddComponent<Expiration>().expirationTimer = DISOWN_TIME+FADE_TIME;
-
-                    OwnerConnectLightningModifier oclm = p.gameObject.AddComponent<OwnerConnectLightningModifier>();
-                        oclm.linkPrefab = LinkVFXPrefab;
-                        oclm.disownTimer = DISOWN_TIME;
-                        oclm.fadeTimer = FADE_TIME;
-                        oclm.MakeGlowy();
-            }
-
-            player.StartCoroutine(DoDash(player, DASH_SPEED * (this.isHyped ? 1.2f : 1.0f), DASH_TIME));
+            lightningProjectile = Lazy.PrefabProjectileFromGun((PickupObjectDatabase.GetById(198) as Gun));
+                lightningProjectile.baseData.damage = 5f;
+                lightningProjectile.baseData.speed  = 0.001f;
         }
 
         public override void Update()
         {
+            base.Update();
+
             if (!this.owner)
                 return;
 
-            this.isHyped = this.owner.PlayerHasActiveSynergy("Hype Yourself Up");
-
-            BraveInput instanceForPlayer = BraveInput.GetInstanceForPlayer(this.owner.PlayerIDX);
-            if (instanceForPlayer.ActiveActions.DodgeRollAction.IsPressed)
-            {
-                instanceForPlayer.ConsumeButtonDown(GungeonActions.GungeonActionType.DodgeRoll);
-                // if (!(this.owner.IsDodgeRolling || this.owner.IsFalling || this.owner.IsInputOverridden || this.dodgeButtonHeld || this.isDashing))
-                if (this.owner.AcceptingNonMotionInput && !(this.owner.IsDodgeRolling || this.dodgeButtonHeld || this.isDashing))
-                {
-                    this.dodgeButtonHeld = true;
-                    StartDash(this.owner);
-                }
-            }
-            else
-                this.dodgeButtonHeld = false;
+            dodgeRoller.isHyped =
+                this.owner.PlayerHasActiveSynergy("Hype Yourself Up");
         }
 
         private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherCollider)
         {
-            if(!(this.isDashing && this.isHyped))  // reflect projectiles with hyped synergy
+            if(!(dodgeRoller.isDashing && dodgeRoller.isHyped))  // reflect projectiles with hyped synergy
                 return;
             Projectile component = otherRigidbody.GetComponent<Projectile>();
             if (component != null && !(component.Owner is PlayerController))
@@ -163,6 +67,8 @@ namespace CwaffingTheGungy
         public override void Pickup(PlayerController player)
         {
             this.owner = player;
+            dodgeRoller = this.gameObject.GetComponent<HLDRoll>();
+            dodgeRoller.owner = this.owner;
             SpeculativeRigidbody specRigidbody = player.specRigidbody;
             specRigidbody.OnPreRigidbodyCollision = (SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate)Delegate.Combine(specRigidbody.OnPreRigidbodyCollision, new SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate(this.OnPreCollision));
             base.Pickup(player);
@@ -173,14 +79,106 @@ namespace CwaffingTheGungy
             SpeculativeRigidbody specRigidbody2 = player.specRigidbody;
             specRigidbody2.OnPreRigidbodyCollision = (SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate)Delegate.Remove(specRigidbody2.OnPreRigidbodyCollision, new SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate(this.OnPreCollision));
             this.owner = null;
-            isDashing = false;
+            dodgeRoller.AbortDodgeRoll();
             return base.Drop(player);
         }
 
         public override void OnDestroy()
         {
-            isDashing = false;
+            dodgeRoller.AbortDodgeRoll();
             base.OnDestroy();
+        }
+    }
+
+    public class HLDRoll : CustomDodgeRoll
+    {
+        const float DASH_SPEED  = 50.0f; // Speed of our dash
+        const float DASH_TIME   = 0.1f; // Time we spend dashing
+        const float DISOWN_TIME = DASH_TIME+0.05f; // Amount of time after our dash starts before lightning is no longer connected
+        const float FADE_TIME   = 0.5f; // Amount of time lightning persists after being disowned
+
+        public bool isHyped = false;  // whether the hyped synergy is active
+
+        public override void BeginDodgeRoll()
+        {
+            if (!(this.isHyped && this.owner))
+                return;
+            Projectile p = SpawnManager.SpawnProjectile(
+              HLD.lightningProjectile.gameObject,
+              this.owner.sprite.WorldCenter,
+              Quaternion.Euler(0f, 0f, this.owner.m_currentGunAngle),
+              true).GetComponent<Projectile>();
+                p.Owner = this.owner;
+                p.Shooter = this.owner.specRigidbody;
+
+                p.gameObject.AddComponent<FakeProjectileComponent>();
+                p.gameObject.AddComponent<Expiration>().expirationTimer = DISOWN_TIME+FADE_TIME;
+
+                OwnerConnectLightningModifier oclm = p.gameObject.AddComponent<OwnerConnectLightningModifier>();
+                    oclm.linkPrefab = HLD.LinkVFXPrefab;
+                    oclm.disownTimer = DISOWN_TIME;
+                    oclm.fadeTimer = FADE_TIME;
+                    oclm.MakeGlowy();
+        }
+
+        public override IEnumerator ContinueDodgeRoll()
+        {
+            float dashspeed = DASH_SPEED * (this.isHyped ? 1.2f : 1.0f);
+            float dashtime = DASH_TIME;
+
+            Vector2 vel = dashspeed * this.owner.m_lastNonzeroCommandedDirection.normalized;
+            // string anim = (Mathf.Abs(vel.y) > Mathf.Abs(vel.x)) ? (vel.y > 0 ? "slide_up" : "slide_down") : "slide_right";
+            // bool hasAnim = player.spriteAnimator.GetClipByName(anim) != null;
+
+            AkSoundEngine.PostEvent("teledash", this.owner.gameObject);
+            this.owner.SetInputOverride("hld");
+            this.owner.SetIsFlying(true, "hld");
+
+            DustUpVFX dusts = GameManager.Instance.Dungeon.dungeonDustups;
+            for (int i = 0; i < 16; ++i)
+            {
+                float dir = UnityEngine.Random.Range(0.0f,360.0f);
+                float rot = UnityEngine.Random.Range(0.0f,360.0f);
+                float mag = UnityEngine.Random.Range(0.3f,1.25f);
+                SpawnManager.SpawnVFX(
+                    dusts.rollLandDustup,
+                    this.owner.sprite.WorldCenter + Lazy.AngleToVector(dir, mag),
+                    Quaternion.Euler(0f, 0f, rot));
+            }
+
+            bool interrupted = false;
+            for (float timer = 0.0f; timer < dashtime; )
+            {
+                this.owner.PlayerAfterImage();
+                timer += BraveTime.DeltaTime;
+                this.owner.specRigidbody.Velocity = vel;
+                GameManager.Instance.Dungeon.dungeonDustups.InstantiateLandDustup(this.owner.sprite.WorldCenter);
+                // if (hasAnim && !this.owner.spriteAnimator.IsPlaying(anim))
+                //     this.owner.spriteAnimator.Play(anim);  //TODO: the sliding animation itself causes the player to be invincible??? (QueryGroundedFrame())
+                yield return null;
+                if (this.owner.IsFalling)
+                {
+                    interrupted = true;
+                    break;
+                }
+            }
+            if (!interrupted)
+            {
+                this.owner.PlayerAfterImage();
+                for (int i = 0; i < 8; ++i)
+                {
+                    float dir = UnityEngine.Random.Range(0.0f,360.0f);
+                    float rot = UnityEngine.Random.Range(0.0f,360.0f);
+                    float mag = UnityEngine.Random.Range(0.3f,1.0f);
+                    SpawnManager.SpawnVFX(
+                        dusts.rollLandDustup,
+                        this.owner.sprite.WorldCenter + Lazy.AngleToVector(dir, mag),
+                        Quaternion.Euler(0f, 0f, rot));
+                }
+            }
+            this.owner.spriteAnimator.Stop();
+            this.owner.SetIsFlying(false, "hld");
+            this.owner.ClearInputOverride("hld");
         }
     }
 }
