@@ -36,6 +36,49 @@ namespace CwaffingTheGungy
         public bool canDash      => true;
         public bool canMultidash => false;
 
+        private static Hook customDodgeRollHook = null;
+
+        public static void InitCustomDodgeRollHooks()
+        {
+            customDodgeRollHook = new Hook(
+                typeof(PlayerController).GetMethod("HandleStartDodgeRoll", BindingFlags.NonPublic | BindingFlags.Instance),
+                typeof(CustomDodgeRoll).GetMethod("CustomDodgeRollHook"));
+        }
+
+        public static bool CustomDodgeRollHook(Func<PlayerController,Vector2,bool> orig, PlayerController player, Vector2 direction)
+        {
+            CustomDodgeRoll overrideDodgeRoll = null;
+            foreach (PassiveItem p in player.passiveItems)
+            {
+                overrideDodgeRoll = p.GetComponent<CustomDodgeRoll>();
+                if (overrideDodgeRoll)
+                    break;
+            }
+            if (!overrideDodgeRoll)  // fall back to default behavior if we don't have overrides
+                return orig(player,direction);
+
+            BraveInput instanceForPlayer = BraveInput.GetInstanceForPlayer(player.PlayerIDX);
+            if (instanceForPlayer.ActiveActions.DodgeRollAction.IsPressed)
+            {
+                instanceForPlayer.ConsumeButtonDown(GungeonActions.GungeonActionType.DodgeRoll);
+                // if (!(this.owner.IsDodgeRolling || this.owner.IsFalling || this.owner.IsInputOverridden || this.dodgeButtonHeld || this.isDashing))
+                // if (player.AcceptingNonMotionInput && !(player.IsDodgeRolling || this.dodgeButtonHeld || this.isDashing))
+                if (player.AcceptingNonMotionInput && !(player.IsDodgeRolling || overrideDodgeRoll.dodgeButtonHeld))
+                {
+                    overrideDodgeRoll.dodgeButtonHeld = true;
+                    return overrideDodgeRoll.TryDodgeRoll();
+                }
+            }
+            else
+                overrideDodgeRoll.dodgeButtonHeld = false;
+            return false;
+        }
+
+        // handled by MonoBehavior
+        private void Update()
+        {
+        }
+
         public virtual void BeginDodgeRoll()
         {
             // any dash setup code should be here
@@ -70,46 +113,13 @@ namespace CwaffingTheGungy
             yield break;
         }
 
-        private void TryDodgeRoll()
+        private bool TryDodgeRoll()
         {
             if (!owner || !canDash || (isDashing && !canMultidash))
-                return;
+                return false;
             owner.StartCoroutine(DoDodgeRollWrapper());
+            return true;
         }
-
-        // handled by MonoBehavior
-        private void Update()
-        {
-            if (!this.owner)
-                return;
-
-            BraveInput instanceForPlayer = BraveInput.GetInstanceForPlayer(this.owner.PlayerIDX);
-            if (instanceForPlayer.ActiveActions.DodgeRollAction.IsPressed)
-            {
-                instanceForPlayer.ConsumeButtonDown(GungeonActions.GungeonActionType.DodgeRoll);
-                // if (!(this.owner.IsDodgeRolling || this.owner.IsFalling || this.owner.IsInputOverridden || this.dodgeButtonHeld || this.isDashing))
-                if (this.owner.AcceptingNonMotionInput && !(this.owner.IsDodgeRolling || this.dodgeButtonHeld || this.isDashing))
-                {
-                    this.dodgeButtonHeld = true;
-                    TryDodgeRoll();
-                }
-            }
-            else
-                this.dodgeButtonHeld = false;
-        }
-
-        // public override DebrisObject Drop(PlayerController player)
-        // {
-        //     AbortDash();
-        //     this.owner = null;
-        //     return base.Drop(player);
-        // }
-
-        // public override void OnDestroy()
-        // {
-        //     AbortDash();
-        //     base.OnDestroy();
-        // }
     }
 }
 

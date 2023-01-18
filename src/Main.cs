@@ -161,6 +161,7 @@ namespace CwaffingTheGungy
                 FlowCommands.Install();
 
                 //Misc. Tweaks
+                CustomDodgeRoll.InitCustomDodgeRollHooks();
                 CwaffTweaks.Init();
 
                 // ETGMod.StartGlobalCoroutine(this.delayedstarthandler());
