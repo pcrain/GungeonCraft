@@ -1,12 +1,12 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Collections;
-using ItemAPI;
+using System.Reflection;
+
 using UnityEngine;
 using MonoMod.RuntimeDetour;
-using System.Reflection;
 
 using Gungeon;
 
@@ -15,26 +15,26 @@ namespace CwaffingTheGungy
     public interface ICustomDodgeRoll
     {
         public bool dodgeButtonHeld   { get; set; }
-        public bool isDashing         { get; set; }
+        public bool isDodging         { get; set; }
         public PlayerController owner { get; set; }
 
-        public bool canDash      { get; }
-        public bool canMultidash { get; }
+        public bool canDodge      { get; }  // if false, disables a CustomDodgeRoll from activating
+        public bool canMultidodge { get; }  // if true, enables dodging while already mid-dodge
 
-        public void BeginDodgeRoll();
-        public IEnumerator ContinueDodgeRoll();
-        public void FinishDodgeRoll();
-        public void AbortDodgeRoll();
+        public void BeginDodgeRoll();  // called once before a dodge roll begins
+        public IEnumerator ContinueDodgeRoll();  // called every frame until dodge roll ends
+        public void FinishDodgeRoll(); // called once after a dodge roll ends
+        public void AbortDodgeRoll(); // called if the dodge roll is interrupted prematurely
     }
 
     public class CustomDodgeRoll : MonoBehaviour, ICustomDodgeRoll
     {
         public bool dodgeButtonHeld   { get; set; }
-        public bool isDashing         { get; set; }
+        public bool isDodging         { get; set; }
         public PlayerController owner { get; set; }
 
-        public bool canDash      => true;
-        public bool canMultidash => false;
+        public virtual bool canDodge      => true;
+        public virtual bool canMultidodge => false;
 
         private static Hook customDodgeRollHook = null;
 
@@ -47,52 +47,56 @@ namespace CwaffingTheGungy
 
         public static bool CustomDodgeRollHook(Func<PlayerController,Vector2,bool> orig, PlayerController player, Vector2 direction)
         {
-            CustomDodgeRoll overrideDodgeRoll = null;
+            List<CustomDodgeRoll> overrides = new List<CustomDodgeRoll>();
             foreach (PassiveItem p in player.passiveItems)
             {
-                overrideDodgeRoll = p.GetComponent<CustomDodgeRoll>();
+                CustomDodgeRoll overrideDodgeRoll = p.GetComponent<CustomDodgeRoll>();
                 if (overrideDodgeRoll)
-                    break;
+                    overrides.Add(overrideDodgeRoll);
             }
-            if (!overrideDodgeRoll)  // fall back to default behavior if we don't have overrides
+            if (overrides.Count == 0)  // fall back to default behavior if we don't have overrides
                 return orig(player,direction);
 
             BraveInput instanceForPlayer = BraveInput.GetInstanceForPlayer(player.PlayerIDX);
             if (instanceForPlayer.ActiveActions.DodgeRollAction.IsPressed)
             {
                 instanceForPlayer.ConsumeButtonDown(GungeonActions.GungeonActionType.DodgeRoll);
-                // if (!(this.owner.IsDodgeRolling || this.owner.IsFalling || this.owner.IsInputOverridden || this.dodgeButtonHeld || this.isDashing))
-                // if (player.AcceptingNonMotionInput && !(player.IsDodgeRolling || this.dodgeButtonHeld || this.isDashing))
-                if (player.AcceptingNonMotionInput && !(player.IsDodgeRolling || overrideDodgeRoll.dodgeButtonHeld))
+                // if (!(this.owner.IsDodgeRolling || this.owner.IsFalling || this.owner.IsInputOverridden || this.dodgeButtonHeld || this.isDodging))
+                // if (player.AcceptingNonMotionInput && !(player.IsDodgeRolling || this.dodgeButtonHeld || this.isDodging))
+                if (player.AcceptingNonMotionInput && !player.IsDodgeRolling)
                 {
-                    overrideDodgeRoll.dodgeButtonHeld = true;
-                    return overrideDodgeRoll.TryDodgeRoll();
+                    foreach (CustomDodgeRoll customDodgeRoll in overrides)
+                    {
+                        if (customDodgeRoll.dodgeButtonHeld)
+                            continue;
+                        customDodgeRoll.dodgeButtonHeld = true;
+                        customDodgeRoll.TryDodgeRoll();
+                    }
+                    return true;
                 }
             }
             else
-                overrideDodgeRoll.dodgeButtonHeld = false;
+            {
+                foreach (CustomDodgeRoll customDodgeRoll in overrides)
+                    customDodgeRoll.dodgeButtonHeld = false;
+            }
             return false;
-        }
-
-        // handled by MonoBehavior
-        private void Update()
-        {
         }
 
         public virtual void BeginDodgeRoll()
         {
-            // any dash setup code should be here
+            // any dodge setup code should be here
         }
 
         public virtual void FinishDodgeRoll()
         {
-            // any succesful dash cleanup code should be here
+            // any succesful dodge cleanup code should be here
         }
 
         public virtual void AbortDodgeRoll()
         {
-            // any aborted dash cleanup code should be here
-            isDashing = false;
+            // any aborted dodge cleanup code should be here
+            isDodging = false;
         }
 
         public virtual IEnumerator ContinueDodgeRoll()
@@ -103,19 +107,19 @@ namespace CwaffingTheGungy
 
         private IEnumerator DoDodgeRollWrapper()
         {
-            isDashing = true;
+            isDodging = true;
             BeginDodgeRoll();
             IEnumerator script = ContinueDodgeRoll();
-            while(isDashing && script.MoveNext())
+            while(isDodging && script.MoveNext())
                 yield return script.Current;
             FinishDodgeRoll();
-            isDashing = false;
+            isDodging = false;
             yield break;
         }
 
         private bool TryDodgeRoll()
         {
-            if (!owner || !canDash || (isDashing && !canMultidash))
+            if (!owner || !canDodge || (isDodging && !canMultidodge))
                 return false;
             owner.StartCoroutine(DoDodgeRollWrapper());
             return true;

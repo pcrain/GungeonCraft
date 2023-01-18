@@ -54,7 +54,7 @@ namespace CwaffingTheGungy
 
         private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherCollider)
         {
-            if(!(dodgeRoller.isDashing && dodgeRoller.isHyped))  // reflect projectiles with hyped synergy
+            if(!(dodgeRoller.isDodging && dodgeRoller.isHyped))  // reflect projectiles with hyped synergy
                 return;
             Projectile component = otherRigidbody.GetComponent<Projectile>();
             if (component != null && !(component.Owner is PlayerController))
