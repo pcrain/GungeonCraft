@@ -25,7 +25,7 @@ namespace CwaffingTheGungy
                     // PickupObjectDatabase.GetById(IDs.Guns["ki_blast"]).gameObject,
                     // PickupObjectDatabase.GetById(IDs.Pickups["superstitious"]).gameObject,
                     // PickupObjectDatabase.GetById(IDs.Pickups["deadline"]).gameObject,
-                    PickupObjectDatabase.GetById(IDs.Passives["hld"]).gameObject,
+                    // PickupObjectDatabase.GetById(IDs.Passives["hld"]).gameObject,
                     // PickupObjectDatabase.GetById(IDs.Passives["siphon"]).gameObject,
                     // PickupObjectDatabase.GetById(IDs.Actives["bullet_that_can_kill_the_future"]).gameObject,
                     // PickupObjectDatabase.GetById(IDs.Passives["zoolanders_diary"]).gameObject,
@@ -34,6 +34,7 @@ namespace CwaffingTheGungy
                     // PickupObjectDatabase.GetById(IDs.Guns["testlightning"]).gameObject,
                     // PickupObjectDatabase.GetById(IDs.Guns["b_b_gun"]).gameObject,
                     // PickupObjectDatabase.GetById(IDs.Guns["test_gun"]).gameObject,
+                    PickupObjectDatabase.GetById(IDs.Passives["gyroscope"]).gameObject,
                     GameManager.Instance.PrimaryPlayer.CenterPosition,
                     Vector2.zero,
                     0);

@@ -83,6 +83,7 @@ namespace CwaffingTheGungy
                     ZoolandersDiary.Init();
                     RatPoison.Init();
                     JohnsWick.Init();
+                    Gyroscope.Init();
                 #endregion
 
                 #region Guns
