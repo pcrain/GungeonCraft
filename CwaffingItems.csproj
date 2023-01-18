@@ -45,6 +45,7 @@
     <Compile Include="src\Cwaff-Passives\RatPoison.cs"/>
     <Compile Include="src\Cwaff-Passives\ZoolandersDiary.cs"/>
     <Compile Include="src\Cwaff-Passives\HLD.cs"/>
+    <Compile Include="src\Cwaff-Passives\Gyroscope.cs"/>
     <Compile Include="src\Cwaff-Passives\JohnsWick.cs"/>
     <Compile Include="src\Commands.cs"/>
     <Compile Include="src\HatsStolenFromNN\HatController.cs"/>
@@ -56,9 +57,7 @@
     <Compile Include="src\Cwaff-Rooms\CwaffDungeonFlows.cs"/>
     <Compile Include="src\Cwaff-Rooms\FlowPrefabs.cs"/>
     <Compile Include="src\Cwaff-NPCs\Bombo.cs"/>
-    <Compile Include="src\Cwaff-NPCs\FakeShopItem.cs"/>
     <Compile Include="src\Cwaff-NPCs\Boomhildr.cs"/>
-    <Compile Include="src\Cwaff-NPCs\Cwaff-GenericNPC.cs"/>
     <Compile Include="src\StandardAPI\NPCAPI\LootTableTools.cs"/>
     <Compile Include="src\StandardAPI\NPCAPI\Examples.cs"/>
     <Compile Include="src\StandardAPI\NPCAPI\Hooks.cs"/>
@@ -166,6 +165,9 @@
     <Compile Include="src\Cwaff-Guns\SpinCycle.cs"/>
     <Compile Include="src\Cwaff-Guns\Telefragger.cs"/>
     <Compile Include="src\PlayerToolbox.cs"/>
+    <Compile Include="src\NonstandardApi\FakeShopItem.cs"/>
+    <Compile Include="src\NonstandardApi\CustomDodgeRoll.cs"/>
+    <Compile Include="src\NonstandardApi\Cwaff-GenericNPC.cs"/>
     <Compile Include="src\Databases.cs"/>
     <Compile Include="src\SharedItemBehaviors.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffTweaks.cs"/>
@@ -214,6 +216,7 @@
     <EmbeddedResource Include="Resources\ItemSprites\future_killing_bullet_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\88888888_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\zoolander_icon.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\gyroscope_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\yellow_bandana_icon.png"/>
     <EmbeddedResource Include="Resources\Companions\Wolf\wolf_pet_002.png"/>
     <EmbeddedResource Include="Resources\Companions\Wolf\wolf_pet_001.png"/>
