@@ -72,6 +72,7 @@ namespace CwaffingTheGungy
     {
         const float DASH_SPEED  = 20.0f; // Speed of our dash
         const float DASH_TIME   = 4.0f; // Time we spend dashing
+        const float MAX_ROT     = 180.0f; // Max rotation per second
 
         private Vector2 targetVelocity = Vector2.zero;
 
@@ -136,15 +137,30 @@ namespace CwaffingTheGungy
 
             #region The Dash
                 this.owner.specRigidbody.OnCollision += BounceOffWalls;
-                this.targetVelocity = Lazy.AngleToVector(forcedDirection,DASH_SPEED);
+                this.targetVelocity = Lazy.AngleToVector(this.owner.FacingDirection,DASH_SPEED);
                 for (float timer = 0.0f; timer < DASH_TIME; )
                 {
                     if (this.owner.IsFalling)
                         break;
                     timer += BraveTime.DeltaTime;
                     this.owner.PlayerAfterImage();
+
+                    // adjust angle / velocity of spin if necessary
+                    float maxRot = MAX_ROT * BraveTime.DeltaTime;
+                    float velangle = this.targetVelocity.ToAngle();
+                    float newangle = velangle;
+                    float deltaToTarget = this.owner.FacingDirection - velangle;
+                    if (deltaToTarget > 180)
+                        deltaToTarget -= 360f;
+                    else if (deltaToTarget < -180)
+                        deltaToTarget += 360f;
+                    if (Mathf.Abs(deltaToTarget) <= maxRot)
+                        newangle = this.owner.FacingDirection;
+                    else
+                        newangle += Mathf.Sign(deltaToTarget)*maxRot;
+                    this.targetVelocity = Lazy.AngleToVector(newangle,DASH_SPEED);
                     this.owner.specRigidbody.Velocity = this.targetVelocity;
-                    this.owner.specRigidbody.Reinitialize();
+
                     dusts.InstantiateLandDustup(this.owner.sprite.WorldCenter);
                     // if (hasAnim && !this.owner.spriteAnimator.IsPlaying(anim))
                     //     this.owner.spriteAnimator.Play(anim);  //TODO: the sliding animation itself causes the player to be invincible??? (QueryGroundedFrame())
@@ -157,12 +173,12 @@ namespace CwaffingTheGungy
             #endregion
 
             #region Cleanup
+                this.owner.m_overrideGunAngle = null;
                 this.owner.sprite.renderer.material.shader = oldShader;
                 this.owner.sprite.usesOverrideMaterial = false;
                 this.owner.spriteAnimator.Stop();
                 this.owner.SetIsFlying(false, "gyro");
                 // this.owner.ClearInputOverride("gyro");
-                this.owner.m_overrideGunAngle = null;
             #endregion
 
             yield break;
