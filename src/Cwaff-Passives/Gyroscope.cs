@@ -70,10 +70,13 @@ namespace CwaffingTheGungy
 
     public class GyroscopeRoll : CustomDodgeRoll
     {
-        const float DASH_SPEED  = 20.0f; // Speed of our dash
-        const float DASH_TIME   = 4.0f; // Time we spend dashing
-        const float MAX_ROT     = 180.0f; // Max rotation per second
+        const float DASH_SPEED    = 20.0f;  // Speed of our dash
+        const float DASH_TIME     = 4.0f;   // Time we spend dashing
+        const float MAX_ROT       = 180.0f; // Max rotation per second
+        const float MAX_DRIFT     = 40.0f;  // Max drift per second
+        const float GYRO_FRICTION = 0.99f;  // Friction coefficient
 
+        private bool useDriftMechanics = true;
         private Vector2 targetVelocity = Vector2.zero;
 
         private Vector4 GetCenterPointInScreenUV(Vector2 centerPoint)
@@ -146,19 +149,31 @@ namespace CwaffingTheGungy
                     this.owner.PlayerAfterImage();
 
                     // adjust angle / velocity of spin if necessary
-                    float maxRot = MAX_ROT * BraveTime.DeltaTime;
-                    float velangle = this.targetVelocity.ToAngle();
-                    float newangle = velangle;
-                    float deltaToTarget = this.owner.FacingDirection - velangle;
-                    if (deltaToTarget > 180)
-                        deltaToTarget -= 360f;
-                    else if (deltaToTarget < -180)
-                        deltaToTarget += 360f;
-                    if (Mathf.Abs(deltaToTarget) <= maxRot)
-                        newangle = this.owner.FacingDirection;
-                    else
-                        newangle += Mathf.Sign(deltaToTarget)*maxRot;
-                    this.targetVelocity = Lazy.AngleToVector(newangle,DASH_SPEED);
+                    if (this.useDriftMechanics)
+                    {
+                        float maxDrift = MAX_DRIFT * BraveTime.DeltaTime;
+                        Vector2 drift = maxDrift*instanceForPlayer.ActiveActions.Move.Value;
+                        this.targetVelocity += drift;
+                        if (this.targetVelocity.magnitude > DASH_SPEED)
+                            this.targetVelocity = DASH_SPEED * this.targetVelocity.normalized;
+                    }
+                    else // use turn mechanics
+                    {
+                        float maxRot = MAX_ROT * BraveTime.DeltaTime;
+                        float velangle = this.targetVelocity.ToAngle();
+                        float newangle = velangle;
+                        float deltaToTarget = this.owner.FacingDirection - velangle;
+                        if (deltaToTarget > 180)
+                            deltaToTarget -= 360f;
+                        else if (deltaToTarget < -180)
+                            deltaToTarget += 360f;
+                        if (Mathf.Abs(deltaToTarget) <= maxRot)
+                            newangle = this.owner.FacingDirection;
+                        else
+                            newangle += Mathf.Sign(deltaToTarget)*maxRot;
+                        this.targetVelocity = Lazy.AngleToVector(newangle,DASH_SPEED);
+                    }
+                    this.targetVelocity *= GYRO_FRICTION;
                     this.owner.specRigidbody.Velocity = this.targetVelocity;
 
                     dusts.InstantiateLandDustup(this.owner.sprite.WorldCenter);
@@ -189,7 +204,7 @@ namespace CwaffingTheGungy
             float velangle = (-this.targetVelocity).ToAngle();
             float normangle = tileCollision.Normal.ToAngle();
             float newangle = BraveMathCollege.ClampAngle360(velangle + 2f * (normangle - velangle));
-            this.targetVelocity = Lazy.AngleToVector(newangle,DASH_SPEED);
+            this.targetVelocity = Lazy.AngleToVector(newangle,this.targetVelocity.magnitude);
             this.owner.specRigidbody.Velocity = this.targetVelocity;
         }
     }
