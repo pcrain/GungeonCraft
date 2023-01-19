@@ -94,11 +94,11 @@ namespace CwaffingTheGungy
 
             Shader oldShader = this.owner.sprite.renderer.material.shader;
 
-            // this.owner.sprite.usesOverrideMaterial = true;
-            // this.owner.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-            //     this.owner.sprite.renderer.material.SetFloat("_EmissivePower", 300f);
-            //     this.owner.sprite.renderer.material.SetFloat("_EmissiveColorPower", 1.55f);
-            //     this.owner.sprite.renderer.material.SetColor("_EmissiveColor", Color.magenta);
+            this.owner.sprite.usesOverrideMaterial = true;
+            this.owner.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+                this.owner.sprite.renderer.material.SetFloat("_EmissivePower", 1.55f);
+                this.owner.sprite.renderer.material.SetFloat("_EmissiveColorPower", 1.55f);
+                this.owner.sprite.renderer.material.SetColor("_EmissiveColor", Color.magenta);
 
             // this.owner.sprite.usesOverrideMaterial = true;
             //     this.owner.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/HighPriestAfterImage");
@@ -106,6 +106,7 @@ namespace CwaffingTheGungy
             //     this.owner.sprite.renderer.sharedMaterial.SetFloat("_Opacity", 0.5f);
             //     this.owner.sprite.renderer.sharedMaterial.SetColor("_DashColor", Color.magenta);
 
+            // /* doesn't work */
             // this.owner.sprite.usesOverrideMaterial = true;
             //     this.owner.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/DistortionRadius");
             //     this.owner.sprite.renderer.material.SetFloat("_Strength", 0.1f);
@@ -113,34 +114,52 @@ namespace CwaffingTheGungy
             //     this.owner.sprite.renderer.material.SetFloat("_RadiusFactor", 0.1f);
             //     this.owner.sprite.renderer.material.SetVector("_WaveCenter", GetCenterPointInScreenUV(this.owner.sprite.WorldCenter));
 
+            // /* doesn't work */
             // this.owner.sprite.usesOverrideMaterial = true;
             //     this.owner.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/DistortionWave");
             //     this.owner.sprite.renderer.material.SetVector("_WaveCenter", GetCenterPointInScreenUV(this.owner.sprite.WorldCenter));
             //     this.owner.sprite.renderer.material.SetFloat("_DistortProgress", UnityEngine.Random.Range(0.0f,1.0f));
 
             // /* doesn't work */
-            this.owner.sprite.usesOverrideMaterial = true;
-                this.owner.sprite.renderer.material.shader = Pixelator.Instance.GetComponent<SENaturalBloomAndDirtyLens>().shader;
-                this.owner.sprite.renderer.material.SetFloat("_BlurSize", 10.5f);
-                this.owner.sprite.renderer.material.SetFloat("_BloomIntensity", Mathf.Exp(2.0f) - 1f);
-                this.owner.sprite.renderer.material.SetFloat("_LensDirtIntensity", Mathf.Exp(2.0f) - 1f);
+            // this.owner.sprite.usesOverrideMaterial = true;
+            //     this.owner.sprite.renderer.material.shader = Pixelator.Instance.GetComponent<SENaturalBloomAndDirtyLens>().shader;
+            //     this.owner.sprite.renderer.material.SetFloat("_BlurSize", 10.5f);
+            //     this.owner.sprite.renderer.material.SetFloat("_BloomIntensity", Mathf.Exp(2.0f) - 1f);
+            //     this.owner.sprite.renderer.material.SetFloat("_LensDirtIntensity", Mathf.Exp(2.0f) - 1f);
 
             // this.owner.sprite.usesOverrideMaterial = true;
             //     this.owner.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/MeduziWaterCaustics");
 
-            // work, but not sure how to use well
-                // this.owner.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/GoopShader");
-                // this.owner.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Effects/PixelFog");
+            // seems to work, but not sure how to use well
+            // this.owner.sprite.usesOverrideMaterial = true;
+            //     this.owner.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/GoopShader");
+            //     this.owner.sprite.renderer.material.SetColor("_TintColor", new Color(1.0f,1.0f,0.0f,0.5f));
+            //     this.owner.sprite.renderer.material.SetFloat("_OpaquenessMultiply", 0.5f);
+            //     this.owner.sprite.renderer.material.SetFloat("_BrightnessMultiply", 1.0f);
+            //     this.owner.sprite.renderer.material.SetFloat("_OilGoop", 0.0f);
 
+            // seems to work, but not sure how to use well
+            // this.owner.sprite.usesOverrideMaterial = true;
+            //     this.owner.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Effects/PixelFog");
+            //     this.owner.sprite.renderer.material.SetColor("_Color", new Color(1.0f,1.0f,0.0f,0.5f));
+            //     this.owner.sprite.renderer.sharedMaterial.SetColor("_Color", new Color(1.0f,1.0f,0.0f,0.5f));
+
+            // this.owner.sprite.usesOverrideMaterial = true;
+            //     this.owner.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/DisplacerBeast");
+            //     this.owner.sprite.renderer.material.SetFloat("_CircleAmount", 1.0f);
+            //     this.owner.sprite.renderer.material.SetFloat("_DisplacerFade", 1.0f);
+            //     this.owner.sprite.renderer.material.SetColor("_OverrideColor", new Color(1.0f,1.0f,0.0f,0.5f));
+
+            float totalTime = 0.0f;
             float forcedDirection = this.owner.FacingDirection;
             this.owner.m_overrideGunAngle = forcedDirection;
             while (instanceForPlayer.ActiveActions.DodgeRollAction.IsPressed)
             {
+                totalTime += BraveTime.DeltaTime;
+                Exploder.DoDistortionWave(this.owner.sprite.WorldCenter, 1.8f, 0.01f, 0.5f, 0.1f);
                 forcedDirection += 720.0f*BraveTime.DeltaTime; //2 rotations per second
                 while (forcedDirection > 180)
                     forcedDirection -= 360;
-                while (forcedDirection < -180)
-                    forcedDirection += 360;
 
                 this.owner.m_overrideGunAngle = forcedDirection;
                 float dir = UnityEngine.Random.Range(0.0f,360.0f);
