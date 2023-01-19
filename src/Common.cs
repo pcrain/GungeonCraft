@@ -232,6 +232,29 @@ namespace CwaffingTheGungy
         {
             return source[UnityEngine.Random.Range(0,source.Count)];
         }
+
+        public static void MovePlayerTowardsPositionUntilHittingWall(PlayerController player, Vector2 position)
+        {
+            int num_steps = 100;
+
+            Vector2 playerPos   = player.transform.position;
+            Vector2 targetPos   = position;
+            Vector2 deltaPos    = (targetPos - playerPos)/((float)(num_steps));
+            Vector2 adjustedPos = Vector2.zero;
+
+            // magic code that slowly moves the player out of walls
+            for (int i = 0; i < num_steps; ++i)
+            {
+                player.transform.position = (playerPos + i * deltaPos).ToVector3ZisY();
+                player.specRigidbody.Reinitialize();
+                if (PhysicsEngine.Instance.OverlapCast(player.specRigidbody, null, true, false, null, null, false, null, null))
+                {
+                    player.transform.position = adjustedPos;
+                    break;
+                }
+                adjustedPos = player.transform.position;
+            }
+        }
     }
 
     public static class Dissect // reflection helper methods for being a lazy dumdum

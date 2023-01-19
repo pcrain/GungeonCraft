@@ -70,8 +70,10 @@ namespace CwaffingTheGungy
 
     public class GyroscopeRoll : CustomDodgeRoll
     {
-        const float DASH_SPEED  = 50.0f; // Speed of our dash
-        const float DASH_TIME   = 0.1f; // Time we spend dashing
+        const float DASH_SPEED  = 20.0f; // Speed of our dash
+        const float DASH_TIME   = 4.0f; // Time we spend dashing
+
+        private Vector2 targetVelocity = Vector2.zero;
 
         private Vector4 GetCenterPointInScreenUV(Vector2 centerPoint)
         {
@@ -81,24 +83,23 @@ namespace CwaffingTheGungy
 
         public override IEnumerator ContinueDodgeRoll()
         {
-            // string anim = (Mathf.Abs(vel.y) > Mathf.Abs(vel.x)) ? (vel.y > 0 ? "slide_up" : "slide_down") : "slide_right";
-            // bool hasAnim = player.spriteAnimator.GetClipByName(anim) != null;
+            #region Initialization
+                // string anim = (Mathf.Abs(vel.y) > Mathf.Abs(vel.x)) ? (vel.y > 0 ? "slide_up" : "slide_down") : "slide_right";
+                // bool hasAnim = player.spriteAnimator.GetClipByName(anim) != null;
+                // this.owner.SetInputOverride("gyro");
+                this.owner.SetIsFlying(true, "gyro");
+                DustUpVFX dusts = GameManager.Instance.Dungeon.dungeonDustups;
+                BraveInput instanceForPlayer = BraveInput.GetInstanceForPlayer(this.owner.PlayerIDX);
+            #endregion
 
-            AkSoundEngine.PostEvent("teledash", this.owner.gameObject);
-            // this.owner.SetInputOverride("gyro");
-            this.owner.SetIsFlying(true, "gyro");
-
-            DustUpVFX dusts = GameManager.Instance.Dungeon.dungeonDustups;
-
-            BraveInput instanceForPlayer = BraveInput.GetInstanceForPlayer(this.owner.PlayerIDX);
-
-            Shader oldShader = this.owner.sprite.renderer.material.shader;
-
-            this.owner.sprite.usesOverrideMaterial = true;
-            this.owner.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-                this.owner.sprite.renderer.material.SetFloat("_EmissivePower", 1.55f);
-                this.owner.sprite.renderer.material.SetFloat("_EmissiveColorPower", 1.55f);
-                this.owner.sprite.renderer.material.SetColor("_EmissiveColor", Color.magenta);
+            #region Shader Setup
+                Shader oldShader = this.owner.sprite.renderer.material.shader;
+                this.owner.sprite.usesOverrideMaterial = true;
+                this.owner.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+                    this.owner.sprite.renderer.material.SetFloat("_EmissivePower", 1.55f);
+                    this.owner.sprite.renderer.material.SetFloat("_EmissiveColorPower", 1.55f);
+                    this.owner.sprite.renderer.material.SetColor("_EmissiveColor", Color.magenta);
+            #endregion
 
             // this.owner.sprite.usesOverrideMaterial = true;
             //     this.owner.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/HighPriestAfterImage");
@@ -106,93 +107,74 @@ namespace CwaffingTheGungy
             //     this.owner.sprite.renderer.sharedMaterial.SetFloat("_Opacity", 0.5f);
             //     this.owner.sprite.renderer.sharedMaterial.SetColor("_DashColor", Color.magenta);
 
-            // /* doesn't work */
-            // this.owner.sprite.usesOverrideMaterial = true;
-            //     this.owner.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/DistortionRadius");
-            //     this.owner.sprite.renderer.material.SetFloat("_Strength", 0.1f);
-            //     this.owner.sprite.renderer.material.SetFloat("_TimePulse", 0.1f);
-            //     this.owner.sprite.renderer.material.SetFloat("_RadiusFactor", 0.1f);
-            //     this.owner.sprite.renderer.material.SetVector("_WaveCenter", GetCenterPointInScreenUV(this.owner.sprite.WorldCenter));
-
-            // /* doesn't work */
-            // this.owner.sprite.usesOverrideMaterial = true;
-            //     this.owner.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/DistortionWave");
-            //     this.owner.sprite.renderer.material.SetVector("_WaveCenter", GetCenterPointInScreenUV(this.owner.sprite.WorldCenter));
-            //     this.owner.sprite.renderer.material.SetFloat("_DistortProgress", UnityEngine.Random.Range(0.0f,1.0f));
-
-            // /* doesn't work */
-            // this.owner.sprite.usesOverrideMaterial = true;
-            //     this.owner.sprite.renderer.material.shader = Pixelator.Instance.GetComponent<SENaturalBloomAndDirtyLens>().shader;
-            //     this.owner.sprite.renderer.material.SetFloat("_BlurSize", 10.5f);
-            //     this.owner.sprite.renderer.material.SetFloat("_BloomIntensity", Mathf.Exp(2.0f) - 1f);
-            //     this.owner.sprite.renderer.material.SetFloat("_LensDirtIntensity", Mathf.Exp(2.0f) - 1f);
-
-            // this.owner.sprite.usesOverrideMaterial = true;
-            //     this.owner.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/MeduziWaterCaustics");
-
-            // seems to work, but not sure how to use well
-            // this.owner.sprite.usesOverrideMaterial = true;
-            //     this.owner.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/GoopShader");
-            //     this.owner.sprite.renderer.material.SetColor("_TintColor", new Color(1.0f,1.0f,0.0f,0.5f));
-            //     this.owner.sprite.renderer.material.SetFloat("_OpaquenessMultiply", 0.5f);
-            //     this.owner.sprite.renderer.material.SetFloat("_BrightnessMultiply", 1.0f);
-            //     this.owner.sprite.renderer.material.SetFloat("_OilGoop", 0.0f);
-
-            // seems to work, but not sure how to use well
-            // this.owner.sprite.usesOverrideMaterial = true;
-            //     this.owner.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Effects/PixelFog");
-            //     this.owner.sprite.renderer.material.SetColor("_Color", new Color(1.0f,1.0f,0.0f,0.5f));
-            //     this.owner.sprite.renderer.sharedMaterial.SetColor("_Color", new Color(1.0f,1.0f,0.0f,0.5f));
-
-            // this.owner.sprite.usesOverrideMaterial = true;
-            //     this.owner.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/DisplacerBeast");
-            //     this.owner.sprite.renderer.material.SetFloat("_CircleAmount", 1.0f);
-            //     this.owner.sprite.renderer.material.SetFloat("_DisplacerFade", 1.0f);
-            //     this.owner.sprite.renderer.material.SetColor("_OverrideColor", new Color(1.0f,1.0f,0.0f,0.5f));
-
-            float totalTime = 0.0f;
-            float forcedDirection = this.owner.FacingDirection;
-            this.owner.m_overrideGunAngle = forcedDirection;
-            while (instanceForPlayer.ActiveActions.DodgeRollAction.IsPressed)
-            {
-                totalTime += BraveTime.DeltaTime;
-                Exploder.DoDistortionWave(this.owner.sprite.WorldCenter, 1.8f, 0.01f, 0.5f, 0.1f);
-                forcedDirection += 720.0f*BraveTime.DeltaTime; //2 rotations per second
-                while (forcedDirection > 180)
-                    forcedDirection -= 360;
-
+            #region The Charge
+                float totalTime = 0.0f;
+                float forcedDirection = this.owner.FacingDirection;
                 this.owner.m_overrideGunAngle = forcedDirection;
-                float dir = UnityEngine.Random.Range(0.0f,360.0f);
-                // float rot = UnityEngine.Random.Range(0.0f,360.0f);
-                float rot = forcedDirection;
-                float mag = UnityEngine.Random.Range(0.3f,1.25f);
-                SpawnManager.SpawnVFX(
-                    dusts.rollLandDustup,
-                    this.owner.sprite.WorldCenter + Lazy.AngleToVector(dir, mag),
-                    Quaternion.Euler(0f, 0f, rot));
-                yield return null;
-            }
+                while (instanceForPlayer.ActiveActions.DodgeRollAction.IsPressed)
+                {
+                    totalTime += BraveTime.DeltaTime;
+                    Exploder.DoDistortionWave(this.owner.sprite.WorldCenter, 1.8f, 0.01f, 0.5f, 0.1f);
+                    forcedDirection += 720.0f*BraveTime.DeltaTime; //2 rotations per second
+                    while (forcedDirection > 180)
+                    {
+                        AkSoundEngine.PostEvent("teledash", this.owner.gameObject);
+                        forcedDirection -= 360;
+                    }
 
-            Vector2 vel = Lazy.AngleToVector(forcedDirection,DASH_SPEED);
-            for (float timer = 0.0f; timer < DASH_TIME; )
-            {
-                this.owner.PlayerAfterImage();
-                timer += BraveTime.DeltaTime;
-                this.owner.specRigidbody.Velocity = vel;
-                dusts.InstantiateLandDustup(this.owner.sprite.WorldCenter);
-                // if (hasAnim && !this.owner.spriteAnimator.IsPlaying(anim))
-                //     this.owner.spriteAnimator.Play(anim);  //TODO: the sliding animation itself causes the player to be invincible??? (QueryGroundedFrame())
-                yield return null;
-                if (this.owner.IsFalling)
-                    break;
-            }
+                    this.owner.m_overrideGunAngle = forcedDirection;
+                    float dir = UnityEngine.Random.Range(0.0f,360.0f);
+                    float rot = forcedDirection;
+                    float mag = UnityEngine.Random.Range(0.3f,1.25f);
+                    SpawnManager.SpawnVFX(
+                        dusts.rollLandDustup,
+                        this.owner.sprite.WorldCenter + Lazy.AngleToVector(dir, mag),
+                        Quaternion.Euler(0f, 0f, rot));
+                    yield return null;
+                }
+            #endregion
 
-            this.owner.sprite.renderer.material.shader = oldShader;
-            this.owner.sprite.usesOverrideMaterial = false;
-            this.owner.spriteAnimator.Stop();
-            this.owner.SetIsFlying(false, "gyro");
-            // this.owner.ClearInputOverride("gyro");
-            this.owner.m_overrideGunAngle = null;
+            #region The Dash
+                this.owner.specRigidbody.OnCollision += BounceOffWalls;
+                this.targetVelocity = Lazy.AngleToVector(forcedDirection,DASH_SPEED);
+                for (float timer = 0.0f; timer < DASH_TIME; )
+                {
+                    if (this.owner.IsFalling)
+                        break;
+                    timer += BraveTime.DeltaTime;
+                    this.owner.PlayerAfterImage();
+                    this.owner.specRigidbody.Velocity = this.targetVelocity;
+                    this.owner.specRigidbody.Reinitialize();
+                    dusts.InstantiateLandDustup(this.owner.sprite.WorldCenter);
+                    // if (hasAnim && !this.owner.spriteAnimator.IsPlaying(anim))
+                    //     this.owner.spriteAnimator.Play(anim);  //TODO: the sliding animation itself causes the player to be invincible??? (QueryGroundedFrame())
+                    yield return null;
+                }
+                this.owner.specRigidbody.OnCollision -= BounceOffWalls;
+            #endregion
+
+            #region The Stumble
+            #endregion
+
+            #region Cleanup
+                this.owner.sprite.renderer.material.shader = oldShader;
+                this.owner.sprite.usesOverrideMaterial = false;
+                this.owner.spriteAnimator.Stop();
+                this.owner.SetIsFlying(false, "gyro");
+                // this.owner.ClearInputOverride("gyro");
+                this.owner.m_overrideGunAngle = null;
+            #endregion
+
+            yield break;
+        }
+
+        private void BounceOffWalls(CollisionData tileCollision)
+        {
+            float velangle = (-this.targetVelocity).ToAngle();
+            float normangle = tileCollision.Normal.ToAngle();
+            float newangle = BraveMathCollege.ClampAngle360(velangle + 2f * (normangle - velangle));
+            this.targetVelocity = Lazy.AngleToVector(newangle,DASH_SPEED);
+            this.owner.specRigidbody.Velocity = this.targetVelocity;
         }
     }
 }

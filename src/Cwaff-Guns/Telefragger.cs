@@ -88,26 +88,10 @@ namespace CwaffingTheGungy
 
         private void TeleportPlayerToPosition(PlayerController player, Vector2 position)
         {
-            int num_steps = 100;
-
-            Vector2 playerPos   = player.transform.position;
-            Vector2 targetPos   = position;
-            Vector2 deltaPos    = (targetPos - playerPos)/((float)(num_steps));
-            Vector2 adjustedPos = Vector2.zero;
-
-            // magic code that slowly moves the player out of walls
-            for (int i = 0; i < num_steps; ++i)
-            {
-                player.transform.position = playerPos + i * deltaPos;
-                player.specRigidbody.Reinitialize();
-                if (PhysicsEngine.Instance.OverlapCast(player.specRigidbody, null, true, false, null, null, false, null, null))
-                {
-                    break;
-                }
-                adjustedPos = player.transform.position;
-            }
-
-            player.StartCoroutine(DoPlayerTeleport(player, playerPos, adjustedPos, 0.125f));
+            Vector2 startPosition = player.transform.position;
+            Lazy.MovePlayerTowardsPositionUntilHittingWall(player, position);
+            Vector2 endPosition = player.transform.position;
+            player.StartCoroutine(DoPlayerTeleport(player, startPosition, endPosition, 0.125f));
         }
 
         private IEnumerator DoPlayerTeleport(PlayerController player, Vector2 start, Vector2 end, float duration)
