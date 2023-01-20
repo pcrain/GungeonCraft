@@ -312,6 +312,12 @@ namespace CwaffingTheGungy
                 Console.WriteLine(" prop {0} = {1} -> {2}", name, f.GetValue(o1), f.GetValue(o2));
             }
         }
+
+        public static void PrintSpriteCollectionNames(tk2dSpriteCollectionData theCollection)
+        {
+            for (int i = 0; i < theCollection.spriteDefinitions.Length; ++i)
+                ETGModConsole.Log(theCollection.spriteDefinitions[i].name);
+        }
     }
 
     public static class ReflectionHelpers // reflection helpers ultimately stolen from apache

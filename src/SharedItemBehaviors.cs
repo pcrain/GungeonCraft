@@ -1039,7 +1039,8 @@ namespace CwaffingTheGungy
             GameObject obj = new GameObject();
             tk2dSprite sprite = obj.AddComponent<tk2dSprite>();
 
-            sprite.SetSprite(player.sprite.collection, player.sprite.spriteId);
+            // sprite.SetSprite(player.sprite.collection, player.sprite.spriteId);
+            sprite.SetSprite(player.spriteAnimator.CurrentClip.frames[0].spriteCollection, player.spriteAnimator.CurrentClip.frames[player.spriteAnimator.CurrentFrame].spriteId);
             sprite.FlipX = player.sprite.FlipX;
             obj.GetComponent<BraveBehaviour>().sprite = sprite;
 

@@ -67,22 +67,49 @@ namespace CwaffingTheGungy
             base.OnDestroy();
         }
     }
-
     public class GyroscopeRoll : CustomDodgeRoll
     {
         const float DASH_SPEED    = 20.0f;  // Speed of our dash
-        const float DASH_TIME     = 4.0f;   // Time we spend dashing
+        const float DASH_TIME     = 1.0f;   // Time we spend dashing
         const float MAX_ROT       = 180.0f; // Max rotation per second
         const float MAX_DRIFT     = 40.0f;  // Max drift per second
         const float GYRO_FRICTION = 0.99f;  // Friction coefficient
+        const float STUMBLE_TIME  = 1.0f;  // Amount of time we stumble for after spinning
 
         private bool useDriftMechanics = true;
         private Vector2 targetVelocity = Vector2.zero;
+        private float forcedDirection = 0.0f;
 
         private Vector4 GetCenterPointInScreenUV(Vector2 centerPoint)
         {
             Vector3 vector = GameManager.Instance.MainCameraController.Camera.WorldToViewportPoint(centerPoint.ToVector3ZUp());
             return new Vector4(vector.x, vector.y, 0f, 0f);
+        }
+
+        private void UpdateForcedDirection(float newDirection)
+        {
+            this.forcedDirection = newDirection;
+            if (this.forcedDirection > 180)
+            {
+                AkSoundEngine.PostEvent("teledash", this.owner.gameObject);
+                this.forcedDirection -= 360;
+            }
+
+            string animName = GetBaseIdleAnimationName(this.owner,this.forcedDirection);
+            if (!this.owner.spriteAnimator.IsPlaying(animName))
+                this.owner.spriteAnimator.Play(animName);
+            bool lastFlipped = this.owner.sprite.FlipX;
+            this.owner.sprite.FlipX = (this.forcedDirection > 90f || this.forcedDirection < -90f);
+            if (this.owner.sprite.FlipX != lastFlipped)
+            {
+                if (this.owner.sprite.FlipX)
+                    this.owner.sprite.gameObject.transform.localPosition = new Vector3(this.owner.sprite.GetUntrimmedBounds().size.x, 0f, 0f);
+                else
+                    this.owner.sprite.gameObject.transform.localPosition = Vector3.zero;
+                this.owner.sprite.UpdateZDepth();
+            }
+
+            this.owner.m_overrideGunAngle = this.forcedDirection;
         }
 
         public override IEnumerator ContinueDodgeRoll()
@@ -103,30 +130,26 @@ namespace CwaffingTheGungy
                     this.owner.sprite.renderer.material.SetFloat("_EmissivePower", 1.55f);
                     this.owner.sprite.renderer.material.SetFloat("_EmissiveColorPower", 1.55f);
                     this.owner.sprite.renderer.material.SetColor("_EmissiveColor", Color.magenta);
+                // this.owner.sprite.usesOverrideMaterial = true;
+                //     this.owner.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/HighPriestAfterImage");
+                //     this.owner.sprite.renderer.sharedMaterial.SetFloat("_EmissivePower", 100f);
+                //     this.owner.sprite.renderer.sharedMaterial.SetFloat("_Opacity", 0.5f);
+                //     this.owner.sprite.renderer.sharedMaterial.SetColor("_DashColor", Color.magenta);
             #endregion
-
-            // this.owner.sprite.usesOverrideMaterial = true;
-            //     this.owner.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/HighPriestAfterImage");
-            //     this.owner.sprite.renderer.sharedMaterial.SetFloat("_EmissivePower", 100f);
-            //     this.owner.sprite.renderer.sharedMaterial.SetFloat("_Opacity", 0.5f);
-            //     this.owner.sprite.renderer.sharedMaterial.SetColor("_DashColor", Color.magenta);
 
             #region The Charge
                 float totalTime = 0.0f;
-                float forcedDirection = this.owner.FacingDirection;
+                forcedDirection = this.owner.FacingDirection;
                 this.owner.m_overrideGunAngle = forcedDirection;
+                Vector3 chargeStartPosition = this.owner.transform.position;
                 while (instanceForPlayer.ActiveActions.DodgeRollAction.IsPressed)
                 {
                     totalTime += BraveTime.DeltaTime;
                     Exploder.DoDistortionWave(this.owner.sprite.WorldCenter, 1.8f, 0.01f, 0.5f, 0.1f);
-                    forcedDirection += 720.0f*BraveTime.DeltaTime; //2 rotations per second
-                    while (forcedDirection > 180)
-                    {
-                        AkSoundEngine.PostEvent("teledash", this.owner.gameObject);
-                        forcedDirection -= 360;
-                    }
+                    UpdateForcedDirection(this.forcedDirection+720.0f*BraveTime.DeltaTime);  //2.0 RPS
+                    this.owner.transform.position = chargeStartPosition;
+                    this.owner.specRigidbody.Reinitialize();
 
-                    this.owner.m_overrideGunAngle = forcedDirection;
                     float dir = UnityEngine.Random.Range(0.0f,360.0f);
                     float rot = forcedDirection;
                     float mag = UnityEngine.Random.Range(0.3f,1.25f);
@@ -141,12 +164,13 @@ namespace CwaffingTheGungy
             #region The Dash
                 this.owner.specRigidbody.OnCollision += BounceOffWalls;
                 this.targetVelocity = Lazy.AngleToVector(this.owner.FacingDirection,DASH_SPEED);
-                for (float timer = 0.0f; timer < DASH_TIME; )
+                for (float timer = 0.0f; timer < DASH_TIME; timer += BraveTime.DeltaTime)
                 {
                     if (this.owner.IsFalling)
                         break;
-                    timer += BraveTime.DeltaTime;
-                    this.owner.PlayerAfterImage();
+                    // this.owner.PlayerAfterImage();
+                    Exploder.DoDistortionWave(this.owner.sprite.WorldCenter, 1.8f, 0.01f, 0.5f, 0.1f);
+                    UpdateForcedDirection(this.forcedDirection+720.0f*BraveTime.DeltaTime);  //2.0 RPS
 
                     // adjust angle / velocity of spin if necessary
                     if (this.useDriftMechanics)
@@ -185,19 +209,89 @@ namespace CwaffingTheGungy
             #endregion
 
             #region The Stumble
+                AkSoundEngine.PostEvent("Play_Fall", this.owner.gameObject);
+                // Dissect.PrintSpriteCollectionNames(this.owner.sprite.collection);
+                this.owner.SetIsFlying(false, "gyro");
+                this.owner.sprite.renderer.material.shader = oldShader;
+                this.owner.sprite.usesOverrideMaterial = false;
+
+                this.owner.SetInputOverride("gyrostumble");
+                tk2dSpriteAnimationClip stumbleAnim = (
+                    (this.owner.spriteAnimator.GetClipByName("chest_recover") == null)
+                    ? this.owner.spriteAnimator.GetClipByName((!this.owner.UseArmorlessAnim) ? "pitfall_return" : "pitfall_return_armorless")
+                    : this.owner.spriteAnimator.GetClipByName((!this.owner.UseArmorlessAnim) ? "chest_recover" : "chest_recover_armorless"));
+                this.owner.spriteAnimator.Stop();
+                // this.owner.spriteAnimator.PlayForDuration(stumbleAnim.name, STUMBLE_TIME, stumbleAnim.name, true);
+                if (true || this.owner.characterIdentity == PlayableCharacters.Robot)
+                {
+                    this.owner.QueueSpecificAnimation(this.owner.spriteAnimator.GetClipByName("dodge_side").name);
+                    // this.owner.QueueSpecificAnimation(this.owner.spriteAnimator.GetClipByName("spit_out").name);
+                    // this.owner.QueueSpecificAnimation(this.owner.spriteAnimator.GetClipByName("spinfall").name);
+                    // this.owner.QueueSpecificAnimation(this.owner.spriteAnimator.GetClipByName("timefall").name);
+                    this.owner.spriteAnimator.SetFrame(0, false);
+                    // this.owner.spriteAnimator.SetFrame(4, false);
+                    // this.owner.spriteAnimator.Play(this.owner.spriteAnimator.GetClipByName("dodge_side"), 0f, 8, true);
+                }
+                else
+                    this.owner.QueueSpecificAnimation(stumbleAnim.name);
+                // this.owner.QueueSpecificAnimation("pitfall_front");
+                for (float timer = 0.0f; timer < STUMBLE_TIME; timer += BraveTime.DeltaTime)
+                {
+                    this.owner.specRigidbody.Velocity = Vector2.zero;
+                    yield return null;
+                }
+                this.owner.ClearInputOverride("gyrostumble");
             #endregion
 
             #region Cleanup
                 this.owner.m_overrideGunAngle = null;
-                this.owner.sprite.renderer.material.shader = oldShader;
-                this.owner.sprite.usesOverrideMaterial = false;
                 this.owner.spriteAnimator.Stop();
-                this.owner.SetIsFlying(false, "gyro");
                 // this.owner.ClearInputOverride("gyro");
             #endregion
 
             yield break;
         }
+
+
+        protected virtual string GetBaseIdleAnimationName(PlayerController p, float gunAngle)
+        {
+            string anim = string.Empty;
+            bool hasgun = p.CurrentGun != null;
+            bool invertThresholds = false;
+            if (GameManager.Instance.CurrentLevelOverrideState == GameManager.LevelOverrideState.END_TIMES)
+            {
+                hasgun = false;
+            }
+            float num = 155f;
+            float num2 = 25f;
+            if (invertThresholds)
+            {
+                num = -155f;
+                num2 = -25f;
+            }
+            float num3 = 120f;
+            float num4 = 60f;
+            float num5 = -60f;
+            float num6 = -120f;
+            bool flag2 = gunAngle <= num && gunAngle >= num2;
+            if (invertThresholds)
+                flag2 = gunAngle <= num || gunAngle >= num2;
+            if (flag2)
+            {
+                if (gunAngle < num3 && gunAngle >= num4)
+                    anim = (((!hasgun) && !p.ForceHandless) ? "idle_backward_twohands" : ((!p.RenderBodyHand) ? "idle_backward" : "idle_backward_hand"));
+                else
+                    anim = ((hasgun || p.ForceHandless) ? "idle_bw" : "idle_bw_twohands");
+            }
+            else if (gunAngle <= num5 && gunAngle >= num6)
+                anim = (((!hasgun) && !p.ForceHandless) ? "idle_forward_twohands" : ((!p.RenderBodyHand) ? "idle_forward" : "idle_forward_hand"));
+            else
+                anim = (((!hasgun) && !p.ForceHandless) ? "idle_twohands" : ((!p.RenderBodyHand) ? "idle" : "idle_hand"));
+            if (p.UseArmorlessAnim)
+                anim += "_armorless";
+            return anim;
+        }
+
 
         private void BounceOffWalls(CollisionData tileCollision)
         {
