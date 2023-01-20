@@ -12,15 +12,11 @@ using Gungeon;
 
 /*
     TODO:
-      - allow projectile / enemy collisions during charge state
-      - allow projectile / enemy collisions during stumble state
       - add random gun fire direction
 
       - add proper charge mechanics (incremental rev up / rev down)
       - possibly replace input overrides with 0 velocity passive stat boost like natasha
-
-      - polish blurring effect
-      - polish other graphical effects
+      - polish graphical effects
 
       - balance all mechanics
 */
@@ -89,7 +85,7 @@ namespace CwaffingTheGungy
         const float MAX_ROT       = 180.0f; // Max rotation per second
         const float MAX_DRIFT     = 40.0f;  // Max drift per second
         const float GYRO_FRICTION = 0.99f;  // Friction coefficient
-        const float STUMBLE_TIME  = 1.0f;  // Amount of time we stumble for after spinning
+        const float STUMBLE_TIME  = 10.0f;  // Amount of time we stumble for after spinning
 
         public bool reflectingProjectiles { get; private set; }
 
@@ -249,7 +245,6 @@ namespace CwaffingTheGungy
                 this.owner.QueueSpecificAnimation(this.owner.spriteAnimator.GetClipByName("spinfall"/*"timefall"*/).name);
                 this.owner.spriteAnimator.SetFrame(0, false);
                 AkSoundEngine.PostEvent("Play_Fall", this.owner.gameObject);
-                // while (this.owner.spriteAnimator.IsPlaying("spinfall"))
                 for (float timer = 0.0f; timer < 0.65f; timer += BraveTime.DeltaTime)
                 {
                     if (this.tookDamageDuringDodgeRoll)
@@ -258,7 +253,8 @@ namespace CwaffingTheGungy
                 }
 
                 this.owner.spriteAnimator.Stop();
-                this.owner.QueueSpecificAnimation(this.owner.spriteAnimator.GetClipByName(stumbleAnim).name);
+                tk2dSpriteAnimationClip stumbleClip = this.owner.spriteAnimator.GetClipByName(stumbleAnim);
+                this.owner.QueueSpecificAnimation(stumbleClip.name);
                 this.owner.spriteAnimator.SetFrame(0, false);
                 this.owner.spriteAnimator.ClipFps = 24.0f;
 
@@ -269,15 +265,25 @@ namespace CwaffingTheGungy
                     this.owner.sprite.gameObject.transform.localPosition = Vector3.zero;
                 this.owner.sprite.UpdateZDepth();
 
+                // hacky nonsense to make the player vulnerable during a roll animation frame
+                List<bool> wasFrameInvulnerable = new List<bool>();
+                foreach (var frame in stumbleClip.frames)
+                {
+                    wasFrameInvulnerable.Add(frame.invulnerableFrame);
+                    frame.invulnerableFrame = false;
+                }
                 for (float timer = 0.0f; timer < STUMBLE_TIME; timer += BraveTime.DeltaTime)
                 {
                     if (this.tookDamageDuringDodgeRoll)
-                        yield break;
+                        break;
                     this.owner.specRigidbody.Velocity = Vector2.zero;
                     if (this.owner.spriteAnimator.CurrentFrame > 3)
                         this.owner.spriteAnimator.Stop();
                     yield return null;
                 }
+                int i = 0;
+                foreach (var frame in stumbleClip.frames)
+                    frame.invulnerableFrame = wasFrameInvulnerable[i++];
             #endregion
 
             yield break;
