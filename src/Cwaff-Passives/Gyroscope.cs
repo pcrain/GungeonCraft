@@ -209,43 +209,50 @@ namespace CwaffingTheGungy
             #endregion
 
             #region The Stumble
-                AkSoundEngine.PostEvent("Play_Fall", this.owner.gameObject);
                 // Dissect.PrintSpriteCollectionNames(this.owner.sprite.collection);
+                string tumbleAnim = GetBaseDodgeAnimationName(this.owner,this.owner.specRigidbody.Velocity);
+                this.owner.specRigidbody.Velocity = Vector2.zero;
+
                 this.owner.SetIsFlying(false, "gyro");
                 this.owner.sprite.renderer.material.shader = oldShader;
                 this.owner.sprite.usesOverrideMaterial = false;
 
                 this.owner.SetInputOverride("gyrostumble");
+                this.owner.ToggleGunRenderers(false,"gyrostumble");
+                this.owner.ToggleHandRenderers(false,"gyrostumble");
                 tk2dSpriteAnimationClip stumbleAnim = (
                     (this.owner.spriteAnimator.GetClipByName("chest_recover") == null)
                     ? this.owner.spriteAnimator.GetClipByName((!this.owner.UseArmorlessAnim) ? "pitfall_return" : "pitfall_return_armorless")
                     : this.owner.spriteAnimator.GetClipByName((!this.owner.UseArmorlessAnim) ? "chest_recover" : "chest_recover_armorless"));
+
                 this.owner.spriteAnimator.Stop();
-                // this.owner.spriteAnimator.PlayForDuration(stumbleAnim.name, STUMBLE_TIME, stumbleAnim.name, true);
-                if (true || this.owner.characterIdentity == PlayableCharacters.Robot)
-                {
-                    this.owner.QueueSpecificAnimation(this.owner.spriteAnimator.GetClipByName("dodge_side").name);
-                    // this.owner.QueueSpecificAnimation(this.owner.spriteAnimator.GetClipByName("spit_out").name);
-                    // this.owner.QueueSpecificAnimation(this.owner.spriteAnimator.GetClipByName("spinfall").name);
-                    // this.owner.QueueSpecificAnimation(this.owner.spriteAnimator.GetClipByName("timefall").name);
-                    this.owner.spriteAnimator.SetFrame(0, false);
-                    // this.owner.spriteAnimator.SetFrame(4, false);
-                    // this.owner.spriteAnimator.Play(this.owner.spriteAnimator.GetClipByName("dodge_side"), 0f, 8, true);
-                }
-                else
-                    this.owner.QueueSpecificAnimation(stumbleAnim.name);
-                // this.owner.QueueSpecificAnimation("pitfall_front");
+                this.owner.QueueSpecificAnimation(this.owner.spriteAnimator.GetClipByName("spinfall"/*"timefall"*/).name);
+                this.owner.spriteAnimator.SetFrame(0, false);
+                AkSoundEngine.PostEvent("Play_Fall", this.owner.gameObject);
+                // while (this.owner.spriteAnimator.IsPlaying("spinfall"))
+                for (float timer = 0.0f; timer < 0.65f; timer += BraveTime.DeltaTime)
+                    yield return null;
+
+                this.owner.spriteAnimator.Stop();
+                this.owner.QueueSpecificAnimation(this.owner.spriteAnimator.GetClipByName(tumbleAnim).name);
+                this.owner.spriteAnimator.SetFrame(0, false);
+                this.owner.spriteAnimator.ClipFps = 24.0f;
                 for (float timer = 0.0f; timer < STUMBLE_TIME; timer += BraveTime.DeltaTime)
                 {
                     this.owner.specRigidbody.Velocity = Vector2.zero;
+                    if (this.owner.spriteAnimator.CurrentFrame > 3)
+                        this.owner.spriteAnimator.Stop();
                     yield return null;
                 }
+                this.owner.ToggleHandRenderers(true,"gyrostumble");
+                this.owner.ToggleGunRenderers(true,"gyrostumble");
                 this.owner.ClearInputOverride("gyrostumble");
             #endregion
 
             #region Cleanup
                 this.owner.m_overrideGunAngle = null;
                 this.owner.spriteAnimator.Stop();
+                this.owner.spriteAnimator.Play(this.owner.spriteAnimator.GetClipByName("idle_front"));
                 // this.owner.ClearInputOverride("gyro");
             #endregion
 
@@ -279,19 +286,23 @@ namespace CwaffingTheGungy
             if (flag2)
             {
                 if (gunAngle < num3 && gunAngle >= num4)
-                    anim = (((!hasgun) && !p.ForceHandless) ? "idle_backward_twohands" : ((!p.RenderBodyHand) ? "idle_backward" : "idle_backward_hand"));
+                    anim = (((!hasgun) && !p.ForceHandless) ? "_backward_twohands" : ((!p.RenderBodyHand) ? "_backward" : "_backward_hand"));
                 else
-                    anim = ((hasgun || p.ForceHandless) ? "idle_bw" : "idle_bw_twohands");
+                    anim = ((hasgun || p.ForceHandless) ? "_bw" : "_bw_twohands");
             }
             else if (gunAngle <= num5 && gunAngle >= num6)
-                anim = (((!hasgun) && !p.ForceHandless) ? "idle_forward_twohands" : ((!p.RenderBodyHand) ? "idle_forward" : "idle_forward_hand"));
+                anim = (((!hasgun) && !p.ForceHandless) ? "_forward_twohands" : ((!p.RenderBodyHand) ? "_forward" : "_forward_hand"));
             else
-                anim = (((!hasgun) && !p.ForceHandless) ? "idle_twohands" : ((!p.RenderBodyHand) ? "idle" : "idle_hand"));
+                anim = (((!hasgun) && !p.ForceHandless) ? "_twohands" : ((!p.RenderBodyHand) ? "" : "_hand"));
             if (p.UseArmorlessAnim)
                 anim += "_armorless";
             return anim;
         }
 
+        protected virtual string GetBaseDodgeAnimationName(PlayerController p, Vector2 vector)
+        {
+            return ((!(Mathf.Abs(vector.x) < 0.1f)) ? (((!(vector.y > 0.1f)) ? "dodge_left" : "dodge_left_bw") + ((!p.UseArmorlessAnim) ? string.Empty : "_armorless")) : (((!(vector.y > 0.1f)) ? "dodge" : "dodge_bw") + ((!p.UseArmorlessAnim) ? string.Empty : "_armorless")));
+        }
 
         private void BounceOffWalls(CollisionData tileCollision)
         {
