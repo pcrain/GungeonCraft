@@ -12,8 +12,6 @@ using Gungeon;
 
 /*
     TODO:
-      - add random gun fire direction
-
       - add proper charge mechanics (incremental rev up / rev down)
       - possibly replace input overrides with 0 velocity passive stat boost like natasha
       - polish graphical effects
@@ -81,11 +79,11 @@ namespace CwaffingTheGungy
     public class GyroscopeRoll : CustomDodgeRoll
     {
         const float DASH_SPEED    = 20.0f;  // Speed of our dash
-        const float DASH_TIME     = 1.0f;   // Time we spend dashing
+        const float DASH_TIME     = 4.0f;   // Time we spend dashing
         const float MAX_ROT       = 180.0f; // Max rotation per second
         const float MAX_DRIFT     = 40.0f;  // Max drift per second
         const float GYRO_FRICTION = 0.99f;  // Friction coefficient
-        const float STUMBLE_TIME  = 10.0f;  // Amount of time we stumble for after spinning
+        const float STUMBLE_TIME  = 1.0f;  // Amount of time we stumble for after spinning
 
         public bool reflectingProjectiles { get; private set; }
 
@@ -125,6 +123,11 @@ namespace CwaffingTheGungy
             }
 
             this.owner.m_overrideGunAngle = this.forcedDirection;
+            // this.owner.m_currentGunAngle = this.forcedDirection;
+            // this.owner.CurrentGun.HandleAimRotation(Lazy.AngleToVector(this.forcedDirection));
+            // this.owner.ForceStaticFaceDirection(Lazy.AngleToVector(this.forcedDirection));
+            // this.owner.ForceIdleFacePoint(Lazy.AngleToVector(this.forcedDirection));
+            this.owner.forceAimPoint = this.owner.sprite.WorldCenter + Lazy.AngleToVector(this.forcedDirection);
         }
 
         private void OnReceivedDamage(PlayerController p)
@@ -303,6 +306,7 @@ namespace CwaffingTheGungy
                 this.owner.ToggleGunRenderers(true,"gyrostumble");
                 this.owner.ClearInputOverride("gyrostumble");
                 this.owner.m_overrideGunAngle = null;
+                this.owner.forceAimPoint = null;
                 this.owner.spriteAnimator.Stop();
                 this.owner.spriteAnimator.Play(this.owner.spriteAnimator.GetClipByName("idle_front"));
                 // this.owner.ClearInputOverride("gyro");
