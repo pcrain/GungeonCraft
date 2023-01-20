@@ -255,6 +255,50 @@ namespace CwaffingTheGungy
                 adjustedPos = player.transform.position;
             }
         }
+
+        public static string GetBaseIdleAnimationName(PlayerController p, float gunAngle)
+        {
+            string anim = string.Empty;
+            bool hasgun = p.CurrentGun != null;
+            bool invertThresholds = false;
+            if (GameManager.Instance.CurrentLevelOverrideState == GameManager.LevelOverrideState.END_TIMES)
+            {
+                hasgun = false;
+            }
+            float num = 155f;
+            float num2 = 25f;
+            if (invertThresholds)
+            {
+                num = -155f;
+                num2 = -25f;
+            }
+            float num3 = 120f;
+            float num4 = 60f;
+            float num5 = -60f;
+            float num6 = -120f;
+            bool flag2 = gunAngle <= num && gunAngle >= num2;
+            if (invertThresholds)
+                flag2 = gunAngle <= num || gunAngle >= num2;
+            if (flag2)
+            {
+                if (gunAngle < num3 && gunAngle >= num4)
+                    anim = (((!hasgun) && !p.ForceHandless) ? "_backward_twohands" : ((!p.RenderBodyHand) ? "_backward" : "_backward_hand"));
+                else
+                    anim = ((hasgun || p.ForceHandless) ? "_bw" : "_bw_twohands");
+            }
+            else if (gunAngle <= num5 && gunAngle >= num6)
+                anim = (((!hasgun) && !p.ForceHandless) ? "_forward_twohands" : ((!p.RenderBodyHand) ? "_forward" : "_forward_hand"));
+            else
+                anim = (((!hasgun) && !p.ForceHandless) ? "_twohands" : ((!p.RenderBodyHand) ? "" : "_hand"));
+            if (p.UseArmorlessAnim)
+                anim += "_armorless";
+            return anim;
+        }
+
+        public static string GetBaseDodgeAnimationName(PlayerController p, Vector2 vector)
+        {
+            return ((!(Mathf.Abs(vector.x) < 0.1f)) ? (((!(vector.y > 0.1f)) ? "dodge_left" : "dodge_left_bw") + ((!p.UseArmorlessAnim) ? string.Empty : "_armorless")) : (((!(vector.y > 0.1f)) ? "dodge" : "dodge_bw") + ((!p.UseArmorlessAnim) ? string.Empty : "_armorless")));
+        }
     }
 
     public static class Dissect // reflection helper methods for being a lazy dumdum
