@@ -120,11 +120,12 @@ namespace CwaffingTheGungy
             }
 
             string animName = Lazy.GetBaseIdleAnimationName(this.owner,this.forcedDirection);
+            // ETGModConsole.Log("should play "+animName);
             if (!this.owner.spriteAnimator.IsPlaying(animName))
             {
                 this.owner.spriteAnimator.Stop();
                 this.owner.spriteAnimator.Play(animName);
-                this.owner.spriteAnimator.SetFrame(0, false);
+                // this.owner.spriteAnimator.SetFrame(0, false);
             }
             bool lastFlipped = this.owner.sprite.FlipX;
             this.owner.sprite.FlipX = (this.forcedDirection > 90f || this.forcedDirection < -90f);
@@ -199,6 +200,8 @@ namespace CwaffingTheGungy
                 tk2dSpriteAnimator tornadoAnimator = this.tornadoVFX.GetComponent<tk2dSpriteAnimator>();
                     tornadoAnimator.sprite.transform.parent = this.owner.transform;
                     // tornadoAnimator.sprite.transform.position = Vector2.zero;
+                    tornadoAnimator.sprite.transform.position = this.owner.sprite.WorldBottomCenter;
+                    // tornadoAnimator.sprite.transform.position = new Vector2(this.owner.sprite.GetCurrentSpriteDef().position3.x/2,0);
                     tornadoAnimator.sprite.usesOverrideMaterial = true;
                 Renderer tornadoRenderer = tornadoAnimator.renderer;
                     tornadoRenderer.material.shader = Shader.Find("Brave/Internal/SimpleAlphaFadeUnlit");
@@ -236,6 +239,10 @@ namespace CwaffingTheGungy
                     this.owner.stats.RecalculateStats(this.owner);
                     this.owner.specRigidbody.Reinitialize();
 
+                    // string curAnimation = Lazy.GetBaseIdleAnimationName
+                    // if (!this.owner.spriteAnimator.IsPlaying("spinfall"))
+                    //     this.owner.GetBaseAnimationName()
+
                     if (UnityEngine.Random.Range(0.0f,100.0f) < 10)
                     {
                         float dir = forcedDirection;
@@ -249,6 +256,7 @@ namespace CwaffingTheGungy
                     if (chargePercent > DIZZY_THRES)
                     {
                         tornadoCurAlpha = TORNADO_ALPHA * (chargePercent - DIZZY_THRES) / (1.0f - DIZZY_THRES);
+                        tornadoAnimator.sprite.transform.position = this.owner.sprite.WorldBottomCenter;
                         tornadoRenderer.material.SetFloat("_Fade", tornadoCurAlpha);
                     }
 
@@ -317,6 +325,8 @@ namespace CwaffingTheGungy
                             this.owner.sprite.WorldCenter - Lazy.AngleToVector(dir, mag),
                             Quaternion.Euler(0f, 0f, rot));
                     }
+
+                    tornadoAnimator.sprite.transform.position = this.owner.sprite.WorldBottomCenter;
                     yield return null;
                 }
                 this.owner.specRigidbody.OnPreRigidbodyCollision -= BounceAwayEnemies;
@@ -347,13 +357,15 @@ namespace CwaffingTheGungy
                     float spinTimer = 0.65f;
                     for (float timer = spinTimer; timer > 0; timer -= BraveTime.DeltaTime)
                     {
-                        tornadoRenderer.material.SetFloat("_Fade", tornadoCurAlpha * (timer / spinTimer));
                         if (this.tookDamageDuringDodgeRoll)
                             yield break;
+                        tornadoRenderer.material.SetFloat("_Fade", tornadoCurAlpha * (timer / spinTimer));
+                        tornadoAnimator.sprite.transform.position = this.owner.sprite.WorldBottomCenter;
                         this.targetVelocity *= STOP_FRICTION;
                         this.owner.specRigidbody.Velocity = this.targetVelocity;
                         yield return null;
                     }
+                    UnityEngine.Object.Destroy(this.tornadoVFX);
                     this.owner.spriteAnimator.Stop();
 
                     if (chargePercent >= STUMBLE_THRES)
@@ -424,7 +436,6 @@ namespace CwaffingTheGungy
 
                 if (this.tornadoVFX)
                     UnityEngine.Object.Destroy(this.tornadoVFX);
-                // this.owner.ClearInputOverride("gyro");
             #endregion
         }
 

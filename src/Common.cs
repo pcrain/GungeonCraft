@@ -292,7 +292,7 @@ namespace CwaffingTheGungy
                 anim = (((!hasgun) && !p.ForceHandless) ? "_twohands" : ((!p.RenderBodyHand) ? "" : "_hand"));
             if (p.UseArmorlessAnim)
                 anim += "_armorless";
-            return anim;
+            return "idle"+anim;
         }
 
         public static string GetBaseDodgeAnimationName(PlayerController p, Vector2 vector)
