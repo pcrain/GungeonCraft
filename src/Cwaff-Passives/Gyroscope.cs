@@ -3,22 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections;
-using ItemAPI;
-using UnityEngine;
-using MonoMod.RuntimeDetour;
 using System.Reflection;
 
+using UnityEngine;
+using MonoMod.RuntimeDetour;
+
 using Gungeon;
-
-/*
-    TODO:
-      - polish graphical effects
-        - sounds for bouncing off enemies
-        - vfx for charging
-        - vfx for dashing
-
-      - balance all mechanics
-*/
+using ItemAPI;
 
 namespace CwaffingTheGungy
 {
@@ -42,12 +33,13 @@ namespace CwaffingTheGungy
 
         private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherCollider)
         {
-            if(!(dodgeRoller.isDodging && dodgeRoller.reflectingProjectiles))  // reflect projectiles with hyped synergy
+            if(!dodgeRoller.isDodging)  // reflect projectiles with hyped synergy
                 return;
             Projectile component = otherRigidbody.GetComponent<Projectile>();
             if (component != null && !(component.Owner is PlayerController))
             {
-                PassiveReflectItem.ReflectBullet(component, true, Owner.specRigidbody.gameActor, 10f, 1f, 1f, 0f);
+                if (dodgeRoller.reflectingProjectiles)
+                    PassiveReflectItem.ReflectBullet(component, true, Owner.specRigidbody.gameActor, 10f, 1f, 1f, 0f);
                 PhysicsEngine.SkipCollision = true;
             }
         }
@@ -82,7 +74,7 @@ namespace CwaffingTheGungy
         const float MAX_DASH_TIME  = 4.0f;   // Max time we spend dashing
         const float MIN_DASH_TIME  = 1.0f;   // Min time we spend dashing
         const float MAX_ROT        = 180.0f; // Max rotation per second
-        const float MAX_DRIFT      = 40.0f;  // Max drift per second
+        const float MAX_DRIFT      = 60.0f;  // Max drift per second
         const float GYRO_FRICTION  = 0.99f;  // Friction coefficient
         const float MIN_SPIN       = 2*360.0f; // Starting spin speed (2RPS)
         const float MAX_SPIN       = 6*360.0f; // Ending spin speed (6RPS)
@@ -90,19 +82,21 @@ namespace CwaffingTheGungy
         const float CHARGE_TIME    = 3.0f;    // Time it takes to reach MAX_SPIN speed
         const float DIZZY_THRES    = 0.5f;    // Percent charge required to be dizzy after stop
         const float STUMBLE_THRES  = 0.75f;    // Percent charge required to stumble after stop
-        const float STUMBLE_TIME   = 1.5f;   // Amount of time we stumble for after spinning
+        const float STUMBLE_TIME   = 1.25f;   // Amount of time we stumble for after spinning
         const float STOP_FRICTION  = 0.9f;   // Friction when sliding to a halt
         const float TORNADO_ALPHA  = 0.5f;   // Max alpha of tornado VFX
 
         public bool reflectingProjectiles { get; private set; }
 
-        private bool useDriftMechanics         = true;
-        private bool isSpeedModifierActive     = false;
-        private bool tookDamageDuringDodgeRoll = false;
-        private float forcedDirection          = 0.0f;
-        private StatModifier speedModifier     = null;
-        private GameObject tornadoVFX          = null;
-        private Vector2 targetVelocity         = Vector2.zero;
+        private bool useDriftMechanics          = true;
+        private bool isSpeedModActive           = false;
+        private bool isRollModActive            = false;
+        private bool tookDamageDuringDodgeRoll  = false;
+        private float forcedDirection           = 0.0f;
+        private StatModifier speedModifier      = null;
+        private StatModifier rollDamageModifier = null;
+        private GameObject tornadoVFX           = null;
+        private Vector2 targetVelocity          = Vector2.zero;
 
         private Vector4 GetCenterPointInScreenUV(Vector2 centerPoint)
         {
@@ -179,6 +173,9 @@ namespace CwaffingTheGungy
             aIActor.knockbackDoer.ApplyKnockback(theirNewVelocity, C.PIXELS_PER_TILE * halfTotalMagnitude);
             this.targetVelocity = this.targetVelocity.magnitude * myNewVelocity.normalized;
             this.owner.specRigidbody.Velocity = myNewVelocity;
+
+            this.rollDamageModifier.amount = Mathf.Pow(this.targetVelocity.magnitude,0.5f);
+            this.owner.stats.RecalculateStats(this.owner,true);
             this.owner.ApplyRollDamage(aIActor);
             AkSoundEngine.PostEvent("undertale_damage", this.owner.gameObject);
         }
@@ -186,7 +183,7 @@ namespace CwaffingTheGungy
         public override IEnumerator ContinueDodgeRoll()
         {
             float minDashSpeed = GetDodgeRollSpeed();    // Min speed of our dash
-            float maxDashSpeed = minDashSpeed * 4.0f;  // Max speed of our dash
+            float maxDashSpeed = minDashSpeed * 5.0f;  // Max speed of our dash
 
             #region Initialization
                 DustUpVFX dusts = GameManager.Instance.Dungeon.dungeonDustups;
@@ -216,12 +213,19 @@ namespace CwaffingTheGungy
                 this.owner.m_overrideGunAngle = forcedDirection;
                 Vector3 chargeStartPosition = this.owner.transform.position;
 
+                this.rollDamageModifier = new StatModifier();
+                    this.rollDamageModifier.statToBoost = PlayerStats.StatType.DodgeRollDamage;
+                    this.rollDamageModifier.modifyType = StatModifier.ModifyMethod.MULTIPLICATIVE;
+                    this.rollDamageModifier.amount = 1.0f;
+                    this.owner.ownerlessStatModifiers.Add(rollDamageModifier);
                 this.speedModifier = new StatModifier();
                     this.speedModifier.statToBoost = PlayerStats.StatType.MovementSpeed;
                     this.speedModifier.modifyType = StatModifier.ModifyMethod.MULTIPLICATIVE;
                     this.speedModifier.amount = 1.0f;
-                this.isSpeedModifierActive = true;
-                this.owner.ownerlessStatModifiers.Add(speedModifier);
+                    this.owner.ownerlessStatModifiers.Add(speedModifier);
+                this.isSpeedModActive = true;
+                this.isRollModActive = true;
+                this.owner.stats.RecalculateStats(this.owner);
 
                 float chargePercent = 0.0f;
                 while (instanceForPlayer.ActiveActions.DodgeRollAction.IsPressed)
@@ -236,7 +240,7 @@ namespace CwaffingTheGungy
                     // Exploder.DoDistortionWave(this.owner.sprite.WorldCenter, 1.8f, 0.01f, 0.5f, 0.1f);
                     UpdateForcedDirection(this.forcedDirection+curSpinSpeed*BraveTime.DeltaTime);
                     this.speedModifier.amount = 1.0f - (chargePercent*chargePercent);
-                    this.owner.stats.RecalculateStats(this.owner);
+                    this.owner.stats.RecalculateStats(this.owner,true);
                     this.owner.specRigidbody.Reinitialize();
 
                     // string curAnimation = Lazy.GetBaseIdleAnimationName
@@ -262,21 +266,20 @@ namespace CwaffingTheGungy
 
                     yield return null;
                 }
-                this.owner.ownerlessStatModifiers.Remove(speedModifier);
-                this.isSpeedModifierActive = false;
+                this.owner.ownerlessStatModifiers.Remove(this.speedModifier);
+                this.isSpeedModActive = false;
                 this.owner.stats.RecalculateStats(this.owner);
             #endregion
 
             #region The Dash
                 this.owner.SetIsFlying(true, "gyro", false, false);
-                this.reflectingProjectiles = true;
+                this.reflectingProjectiles = chargePercent > DIZZY_THRES;
                 this.owner.specRigidbody.OnPreRigidbodyCollision += BounceAwayEnemies;
                 this.owner.specRigidbody.OnCollision += BounceOffWalls;
                 this.owner.healthHaver.IsVulnerable = false;
+
                 float dash_speed    = minDashSpeed  + chargePercent * (maxDashSpeed  - minDashSpeed);
                 float dash_time     = MIN_DASH_TIME + chargePercent * (MAX_DASH_TIME - MIN_DASH_TIME);
-
-                // this.targetVelocity = Lazy.AngleToVector(this.owner.FacingDirection,dash_speed);
                 this.targetVelocity = dash_speed*instanceForPlayer.ActiveActions.Move.Value;
                 for (float timer = 0.0f; timer < dash_time; timer += BraveTime.DeltaTime)
                 {
@@ -333,6 +336,10 @@ namespace CwaffingTheGungy
                 this.owner.specRigidbody.OnCollision -= BounceOffWalls;
                 this.owner.healthHaver.IsVulnerable = true;
                 this.reflectingProjectiles = false;
+
+                this.owner.ownerlessStatModifiers.Remove(this.rollDamageModifier);
+                this.isRollModActive = false;
+                this.owner.stats.RecalculateStats(this.owner);
             #endregion
 
             #region The Stumble
@@ -427,12 +434,13 @@ namespace CwaffingTheGungy
                 this.owner.spriteAnimator.Play(this.owner.spriteAnimator.GetClipByName("idle_front"));
                 this.owner.healthHaver.IsVulnerable = true;
 
-                if (this.isSpeedModifierActive)
-                {
+                if (this.isSpeedModActive)
                     this.owner.ownerlessStatModifiers.Remove(this.speedModifier);
-                    this.isSpeedModifierActive = false;
-                    this.owner.stats.RecalculateStats(this.owner);
-                }
+                if (this.isRollModActive)
+                    this.owner.ownerlessStatModifiers.Remove(this.rollDamageModifier);
+                this.isSpeedModActive = false;
+                this.isRollModActive = false;
+                this.owner.stats.RecalculateStats(this.owner);
 
                 if (this.tornadoVFX)
                     UnityEngine.Object.Destroy(this.tornadoVFX);
