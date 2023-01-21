@@ -83,13 +83,13 @@ namespace CwaffingTheGungy
         const float MAX_ROT        = 180.0f; // Max rotation per second
         const float MAX_DRIFT      = 40.0f;  // Max drift per second
         const float GYRO_FRICTION  = 0.99f;  // Friction coefficient
-        const float STUMBLE_TIME   = 1.0f;   // Amount of time we stumble for after spinning
-        const float MIN_SPIN       = 720.0f; // Starting spin speed
-        const float MAX_SPIN       = 2160.0f; // Ending spin speed
+        const float MIN_SPIN       = 2*360.0f; // Starting spin speed (2RPS)
+        const float MAX_SPIN       = 6*360.0f; // Ending spin speed (6RPS)
         const float SPIN_DELTA     = MAX_SPIN - MIN_SPIN;
         const float CHARGE_TIME    = 3.0f;    // Time it takes to reach MAX_SPIN speed
         const float DIZZY_THRES    = 0.5f;    // Percent charge required to be dizzy after stop
         const float STUMBLE_THRES  = 0.75f;    // Percent charge required to stumble after stop
+        const float STUMBLE_TIME   = 1.5f;   // Amount of time we stumble for after spinning
 
         public bool reflectingProjectiles { get; private set; }
 
@@ -140,7 +140,6 @@ namespace CwaffingTheGungy
 
         private void OnReceivedDamage(PlayerController p)
         {
-            ETGModConsole.Log("ouch");
             this.FinishDodgeRoll();
             this.tookDamageDuringDodgeRoll = true;
         }
@@ -190,30 +189,34 @@ namespace CwaffingTheGungy
                         yield break;
                     totalTime += BraveTime.DeltaTime;
                     chargePercent = Mathf.Min(1.0f,totalTime / CHARGE_TIME);
-                    curSpinSpeed = (totalTime >= CHARGE_TIME)
-                        ? MAX_SPIN : MIN_SPIN + Mathf.Pow(totalTime/CHARGE_TIME,2.0f) * SPIN_DELTA;
+                    curSpinSpeed = MIN_SPIN + SPIN_DELTA * (chargePercent*chargePercent);
                     // this.owner.sprite.renderer.material.SetFloat("_EmissivePower", 20.0f*Mathf.Abs(Mathf.Sin(totalTime*4.0f*totalTime/CHARGE_TIME)));
                     // TODO: DoDistortionWave() lags the game horrendously if you die
                     // Exploder.DoDistortionWave(this.owner.sprite.WorldCenter, 1.8f, 0.01f, 0.5f, 0.1f);
                     UpdateForcedDirection(this.forcedDirection+curSpinSpeed*BraveTime.DeltaTime);
-                    // this.owner.specRigidbody.Velocity = Vector2.zero;
-                    this.speedModifier.amount = 1.0f - chargePercent;
+                    this.speedModifier.amount = 1.0f - (chargePercent*chargePercent);
                     this.owner.stats.RecalculateStats(this.owner);
                     this.owner.specRigidbody.Reinitialize();
 
-                    float dir = forcedDirection;
-                    float rot = UnityEngine.Random.Range(0.0f,360.0f);
-                    float mag = UnityEngine.Random.Range(0.3f,1.25f);
-                    SpawnManager.SpawnVFX(
-                        dusts.rollLandDustup,
-                        this.owner.sprite.WorldCenter - Lazy.AngleToVector(dir, mag),
-                        Quaternion.Euler(0f, 0f, rot));
+                    if (UnityEngine.Random.Range(0.0f,100.0f) < 10)
+                    {
+                        float dir = forcedDirection;
+                        float rot = UnityEngine.Random.Range(0.0f,360.0f);
+                        float mag = UnityEngine.Random.Range(0.3f,1.25f);
+                        SpawnManager.SpawnVFX(
+                            dusts.rollLandDustup,
+                            this.owner.sprite.WorldCenter - Lazy.AngleToVector(dir, mag),
+                            Quaternion.Euler(0f, 0f, rot));
+                    }
                     yield return null;
                 }
+                this.owner.ownerlessStatModifiers.Remove(speedModifier);
+                this.isSpeedModifierActive = false;
+                this.owner.stats.RecalculateStats(this.owner);
             #endregion
 
             #region The Dash
-                // this.owner.SetIsFlying(true, "gyro", false, false);
+                this.owner.SetIsFlying(true, "gyro", false, false);
                 this.reflectingProjectiles = true;
                 this.owner.specRigidbody.OnCollision += BounceOffWalls;
                 float dash_speed    = minDashSpeed  + chargePercent * (maxDashSpeed  - minDashSpeed);
@@ -258,9 +261,16 @@ namespace CwaffingTheGungy
                     this.targetVelocity *= GYRO_FRICTION;
                     this.owner.specRigidbody.Velocity = this.targetVelocity;
 
-                    dusts.InstantiateLandDustup(this.owner.sprite.WorldCenter);
-                    // if (hasAnim && !this.owner.spriteAnimator.IsPlaying(anim))
-                    //     this.owner.spriteAnimator.Play(anim);  //TODO: the sliding animation itself causes the player to be invincible??? (QueryGroundedFrame())
+                    if (UnityEngine.Random.Range(0.0f,100.0f) < 10)
+                    {
+                        float dir = forcedDirection;
+                        float rot = UnityEngine.Random.Range(0.0f,360.0f);
+                        float mag = UnityEngine.Random.Range(0.3f,1.25f);
+                        SpawnManager.SpawnVFX(
+                            dusts.rollLandDustup,
+                            this.owner.sprite.WorldCenter - Lazy.AngleToVector(dir, mag),
+                            Quaternion.Euler(0f, 0f, rot));
+                    }
                     yield return null;
                 }
                 this.owner.specRigidbody.OnCollision -= BounceOffWalls;
