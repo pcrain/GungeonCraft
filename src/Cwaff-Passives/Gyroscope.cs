@@ -12,9 +12,10 @@ using Gungeon;
 
 /*
     TODO:
-      - add proper charge mechanics (incremental rev up / rev down)
-      - possibly replace input overrides with 0 velocity passive stat boost like natasha
       - polish graphical effects
+        - sounds for bouncing off enemies
+        - vfx for charging
+        - vfx for dashing
 
       - balance all mechanics
 */
@@ -91,16 +92,17 @@ namespace CwaffingTheGungy
         const float STUMBLE_THRES  = 0.75f;    // Percent charge required to stumble after stop
         const float STUMBLE_TIME   = 1.5f;   // Amount of time we stumble for after spinning
         const float STOP_FRICTION  = 0.9f;   // Friction when sliding to a halt
+        const float TORNADO_ALPHA  = 0.5f;   // Max alpha of tornado VFX
 
         public bool reflectingProjectiles { get; private set; }
 
-        private bool useDriftMechanics = true;
-        private Vector2 targetVelocity = Vector2.zero;
-        private float forcedDirection = 0.0f;
-        private Shader oldShader = null;
+        private bool useDriftMechanics         = true;
+        private bool isSpeedModifierActive     = false;
         private bool tookDamageDuringDodgeRoll = false;
-        private StatModifier speedModifier = null;
-        private bool isSpeedModifierActive = false;
+        private float forcedDirection          = 0.0f;
+        private StatModifier speedModifier     = null;
+        private GameObject tornadoVFX          = null;
+        private Vector2 targetVelocity         = Vector2.zero;
 
         private Vector4 GetCenterPointInScreenUV(Vector2 centerPoint)
         {
@@ -177,6 +179,7 @@ namespace CwaffingTheGungy
             this.targetVelocity = this.targetVelocity.magnitude * myNewVelocity.normalized;
             this.owner.specRigidbody.Velocity = myNewVelocity;
             this.owner.ApplyRollDamage(aIActor);
+            AkSoundEngine.PostEvent("undertale_damage", this.owner.gameObject);
         }
 
         public override IEnumerator ContinueDodgeRoll()
@@ -187,20 +190,25 @@ namespace CwaffingTheGungy
             #region Initialization
                 DustUpVFX dusts = GameManager.Instance.Dungeon.dungeonDustups;
                 BraveInput instanceForPlayer = BraveInput.GetInstanceForPlayer(this.owner.PlayerIDX);
-                this.oldShader = this.owner.sprite.renderer.material.shader;
-                // this.owner.sprite.usesOverrideMaterial = true;
-                // this.owner.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-                //     this.owner.sprite.renderer.material.SetFloat("_EmissivePower", 1.55f);
-                //     this.owner.sprite.renderer.material.SetFloat("_EmissiveColorPower", 1.55f);
-                //     this.owner.sprite.renderer.material.SetColor("_EmissiveColor", Color.magenta);
                 this.tookDamageDuringDodgeRoll = false;
                 this.owner.OnReceivedDamage += this.OnReceivedDamage;
                 this.owner.OnRealPlayerDeath += this.OnReceivedDamage;
+
+                this.tornadoVFX = Instantiate<GameObject>(
+                    VFX.animations["Tornado"], this.owner.specRigidbody.UnitBottomCenter, Quaternion.identity);
+                tk2dSpriteAnimator tornadoAnimator = this.tornadoVFX.GetComponent<tk2dSpriteAnimator>();
+                    tornadoAnimator.sprite.transform.parent = this.owner.transform;
+                    // tornadoAnimator.sprite.transform.position = Vector2.zero;
+                    tornadoAnimator.sprite.usesOverrideMaterial = true;
+                Renderer tornadoRenderer = tornadoAnimator.renderer;
+                    tornadoRenderer.material.shader = Shader.Find("Brave/Internal/SimpleAlphaFadeUnlit");
+                    tornadoRenderer.material.SetFloat("_Fade", 0.0f);
             #endregion
 
             #region The Charge
                 float totalTime = 0.0f;
                 float curSpinSpeed = 0.0f;
+                float tornadoCurAlpha = 0.0f;
                 forcedDirection = this.owner.FacingDirection;
                 this.owner.m_overrideGunAngle = forcedDirection;
                 Vector3 chargeStartPosition = this.owner.transform.position;
@@ -238,6 +246,12 @@ namespace CwaffingTheGungy
                             this.owner.sprite.WorldCenter - Lazy.AngleToVector(dir, mag),
                             Quaternion.Euler(0f, 0f, rot));
                     }
+                    if (chargePercent > DIZZY_THRES)
+                    {
+                        tornadoCurAlpha = TORNADO_ALPHA * (chargePercent - DIZZY_THRES) / (1.0f - DIZZY_THRES);
+                        tornadoRenderer.material.SetFloat("_Fade", tornadoCurAlpha);
+                    }
+
                     yield return null;
                 }
                 this.owner.ownerlessStatModifiers.Remove(speedModifier);
@@ -320,7 +334,6 @@ namespace CwaffingTheGungy
                     // this.owner.specRigidbody.Velocity = Vector2.zero;
 
                     this.owner.SetIsFlying(false, "gyro", false, false);
-                    this.owner.sprite.renderer.material.shader = this.oldShader;
                     this.owner.sprite.usesOverrideMaterial = false;
 
                     this.owner.SetInputOverride("gyrostumble");
@@ -331,8 +344,10 @@ namespace CwaffingTheGungy
                     this.owner.QueueSpecificAnimation(this.owner.spriteAnimator.GetClipByName("spinfall"/*"timefall"*/).name);
                     this.owner.spriteAnimator.SetFrame(0, false);
                     AkSoundEngine.PostEvent("Play_Fall", this.owner.gameObject);
-                    for (float timer = 0.0f; timer < 0.65f; timer += BraveTime.DeltaTime)
+                    float spinTimer = 0.65f;
+                    for (float timer = spinTimer; timer > 0; timer -= BraveTime.DeltaTime)
                     {
+                        tornadoRenderer.material.SetFloat("_Fade", tornadoCurAlpha * (timer / spinTimer));
                         if (this.tookDamageDuringDodgeRoll)
                             yield break;
                         this.targetVelocity *= STOP_FRICTION;
@@ -390,7 +405,6 @@ namespace CwaffingTheGungy
                 this.owner.specRigidbody.OnCollision -= BounceOffWalls;
                 this.owner.ClearInputOverride("gyro");
                 this.owner.SetIsFlying(false, "gyro", false, false);
-                this.owner.sprite.renderer.material.shader = this.oldShader;
                 this.owner.sprite.usesOverrideMaterial = false;
                 this.owner.ToggleHandRenderers(true,"gyrostumble");
                 this.owner.ToggleGunRenderers(true,"gyrostumble");
@@ -407,6 +421,9 @@ namespace CwaffingTheGungy
                     this.isSpeedModifierActive = false;
                     this.owner.stats.RecalculateStats(this.owner);
                 }
+
+                if (this.tornadoVFX)
+                    UnityEngine.Object.Destroy(this.tornadoVFX);
                 // this.owner.ClearInputOverride("gyro");
             #endregion
         }

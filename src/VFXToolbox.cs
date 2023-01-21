@@ -100,6 +100,19 @@ namespace CwaffingTheGungy
                     "CwaffingTheGungy/Resources/MiscVFX/GunVFX/RebarGunImpactVFX2_006",
                 }, 6, loops: false);
 
+            RegisterVFX<GameObject>("Tornado", new List<string>() {
+                    "CwaffingTheGungy/Resources/MiscVFX/Tornado/tornado1",
+                    "CwaffingTheGungy/Resources/MiscVFX/Tornado/tornado2",
+                    "CwaffingTheGungy/Resources/MiscVFX/Tornado/tornado3",
+                    "CwaffingTheGungy/Resources/MiscVFX/Tornado/tornado4",
+                    "CwaffingTheGungy/Resources/MiscVFX/Tornado/tornado5",
+                    "CwaffingTheGungy/Resources/MiscVFX/Tornado/tornado6",
+                    "CwaffingTheGungy/Resources/MiscVFX/Tornado/tornado7",
+                    "CwaffingTheGungy/Resources/MiscVFX/Tornado/tornado8",
+                    "CwaffingTheGungy/Resources/MiscVFX/Tornado/tornado9",
+                    "CwaffingTheGungy/Resources/MiscVFX/Tornado/tornado10",
+                }, 20, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter);
+
             laserSightPrefab = LoadHelper.LoadAssetFromAnywhere("assets/resourcesbundle/global vfx/vfx_lasersight.prefab") as GameObject;
         }
 

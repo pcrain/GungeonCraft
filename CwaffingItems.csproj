@@ -185,6 +185,16 @@
     <EmbeddedResource Include="Resources\MiscVFX\friendlyoverhead_vfx_002.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\friendlyoverhead_vfx_004.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\friendlyoverhead_vfx_005.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\Tornado\tornado7.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\Tornado\tornado8.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\Tornado\tornado5.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\Tornado\tornado6.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\Tornado\tornado2.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\Tornado\tornado10.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\Tornado\tornado4.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\Tornado\tornado1.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\Tornado\tornado3.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\Tornado\tornado9.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\GunVFX\RebarGunImpactVFX2_001.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\GunVFX\RebarGunImpactVFX2_004.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\GunVFX\RebarGunImpactVFX2_006.png"/>
