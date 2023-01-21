@@ -90,6 +90,7 @@ namespace CwaffingTheGungy
         const float DIZZY_THRES    = 0.5f;    // Percent charge required to be dizzy after stop
         const float STUMBLE_THRES  = 0.75f;    // Percent charge required to stumble after stop
         const float STUMBLE_TIME   = 1.5f;   // Amount of time we stumble for after spinning
+        const float STOP_FRICTION  = 0.9f;   // Friction when sliding to a halt
 
         public bool reflectingProjectiles { get; private set; }
 
@@ -149,6 +150,35 @@ namespace CwaffingTheGungy
             return (this.owner.rollStats.GetModifiedTime(this.owner) / this.owner.rollStats.GetModifiedDistance(this.owner)) / BraveTime.DeltaTime;
         }
 
+        private void DoElasticCollision(SpeculativeRigidbody b1, SpeculativeRigidbody b2, out Vector2 newv1, out Vector2 newv2, bool ignoreOtherVelocity = false)
+        {
+            Vector2 x1 = b1.UnitCenter;
+            Vector2 x2 = b2.UnitCenter;
+            Vector2 v1 = b1.Velocity;
+            Vector2 v2 = ignoreOtherVelocity ? Vector2.zero : b2.Velocity;
+            float distNorm = (x1-x2).sqrMagnitude;
+            if (distNorm < 0.1f)
+                distNorm = 0.1f;
+            newv1 = v1 - (Vector2.Dot(v1-v2,x1-x2) / distNorm) * (x1-x2);
+            newv2 = v2 - (Vector2.Dot(v2-v1,x2-x1) / distNorm) * (x2-x1);
+        }
+
+        private void BounceAwayEnemies(SpeculativeRigidbody myRigidbody, PixelCollider myCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherCollider)
+        {
+            if (!otherRigidbody?.aiActor?.healthHaver)
+                return;
+            if (otherRigidbody.aiActor.healthHaver.IsDead)
+                return;
+            AIActor aIActor = otherRigidbody.aiActor;
+            Vector2 myNewVelocity, theirNewVelocity;
+            DoElasticCollision(myRigidbody,otherRigidbody,out myNewVelocity,out theirNewVelocity, true);
+            float halfTotalMagnitude = 0.5f * (theirNewVelocity.magnitude + myNewVelocity.magnitude);
+            aIActor.knockbackDoer.ApplyKnockback(theirNewVelocity, C.PIXELS_PER_TILE * halfTotalMagnitude);
+            this.targetVelocity = this.targetVelocity.magnitude * myNewVelocity.normalized;
+            this.owner.specRigidbody.Velocity = myNewVelocity;
+            this.owner.ApplyRollDamage(aIActor);
+        }
+
         public override IEnumerator ContinueDodgeRoll()
         {
             float minDashSpeed = GetDodgeRollSpeed();    // Min speed of our dash
@@ -185,7 +215,7 @@ namespace CwaffingTheGungy
                 float chargePercent = 0.0f;
                 while (instanceForPlayer.ActiveActions.DodgeRollAction.IsPressed)
                 {
-                    if (this.tookDamageDuringDodgeRoll)
+                    if (this.owner.IsFalling || this.tookDamageDuringDodgeRoll)
                         yield break;
                     totalTime += BraveTime.DeltaTime;
                     chargePercent = Mathf.Min(1.0f,totalTime / CHARGE_TIME);
@@ -218,7 +248,9 @@ namespace CwaffingTheGungy
             #region The Dash
                 this.owner.SetIsFlying(true, "gyro", false, false);
                 this.reflectingProjectiles = true;
+                this.owner.specRigidbody.OnPreRigidbodyCollision += BounceAwayEnemies;
                 this.owner.specRigidbody.OnCollision += BounceOffWalls;
+                this.owner.healthHaver.IsVulnerable = false;
                 float dash_speed    = minDashSpeed  + chargePercent * (maxDashSpeed  - minDashSpeed);
                 float dash_time     = MIN_DASH_TIME + chargePercent * (MAX_DASH_TIME - MIN_DASH_TIME);
 
@@ -273,7 +305,9 @@ namespace CwaffingTheGungy
                     }
                     yield return null;
                 }
+                this.owner.specRigidbody.OnPreRigidbodyCollision -= BounceAwayEnemies;
                 this.owner.specRigidbody.OnCollision -= BounceOffWalls;
+                this.owner.healthHaver.IsVulnerable = true;
                 this.reflectingProjectiles = false;
             #endregion
 
@@ -283,7 +317,7 @@ namespace CwaffingTheGungy
                     // Dissect.PrintSpriteCollectionNames(this.owner.sprite.collection);
                     string stumbleAnim = Lazy.GetBaseDodgeAnimationName(this.owner,this.owner.specRigidbody.Velocity);
                     float stumbleAngle = this.owner.specRigidbody.Velocity.ToAngle();
-                    this.owner.specRigidbody.Velocity = Vector2.zero;
+                    // this.owner.specRigidbody.Velocity = Vector2.zero;
 
                     this.owner.SetIsFlying(false, "gyro", false, false);
                     this.owner.sprite.renderer.material.shader = this.oldShader;
@@ -301,6 +335,8 @@ namespace CwaffingTheGungy
                     {
                         if (this.tookDamageDuringDodgeRoll)
                             yield break;
+                        this.targetVelocity *= STOP_FRICTION;
+                        this.owner.specRigidbody.Velocity = this.targetVelocity;
                         yield return null;
                     }
                     this.owner.spriteAnimator.Stop();
@@ -350,6 +386,7 @@ namespace CwaffingTheGungy
             #region Cleanup
                 this.owner.OnReceivedDamage -= this.OnReceivedDamage;
                 this.reflectingProjectiles = false;
+                this.owner.specRigidbody.OnPreRigidbodyCollision -= BounceAwayEnemies;
                 this.owner.specRigidbody.OnCollision -= BounceOffWalls;
                 this.owner.ClearInputOverride("gyro");
                 this.owner.SetIsFlying(false, "gyro", false, false);
@@ -362,6 +399,7 @@ namespace CwaffingTheGungy
                 this.owner.forceAimPoint = null;
                 this.owner.spriteAnimator.Stop();
                 this.owner.spriteAnimator.Play(this.owner.spriteAnimator.GetClipByName("idle_front"));
+                this.owner.healthHaver.IsVulnerable = true;
 
                 if (this.isSpeedModifierActive)
                 {
