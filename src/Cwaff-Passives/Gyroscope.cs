@@ -71,20 +71,20 @@ namespace CwaffingTheGungy
     }
     public class GyroscopeRoll : CustomDodgeRoll
     {
-        const float MAX_DASH_TIME  = 4.0f;   // Max time we spend dashing
-        const float MIN_DASH_TIME  = 1.0f;   // Min time we spend dashing
-        const float MAX_ROT        = 180.0f; // Max rotation per second
-        const float MAX_DRIFT      = 60.0f;  // Max drift per second
-        const float GYRO_FRICTION  = 0.99f;  // Friction coefficient
+        const float MAX_DASH_TIME  = 4.0f;     // Max time we spend dashing
+        const float MIN_DASH_TIME  = 1.0f;     // Min time we spend dashing
+        const float MAX_ROT        = 180.0f;   // Max rotation per second
+        const float MAX_DRIFT      = 60.0f;    // Max drift per second
+        const float GYRO_FRICTION  = 0.99f;    // Friction coefficient
         const float MIN_SPIN       = 2*360.0f; // Starting spin speed (2RPS)
         const float MAX_SPIN       = 6*360.0f; // Ending spin speed (6RPS)
-        const float SPIN_DELTA     = MAX_SPIN - MIN_SPIN;
-        const float CHARGE_TIME    = 3.0f;    // Time it takes to reach MAX_SPIN speed
-        const float DIZZY_THRES    = 0.5f;    // Percent charge required to be dizzy after stop
+        const float CHARGE_TIME    = 3.0f;     // Time it takes to reach MAX_SPIN speed
+        const float DIZZY_THRES    = 0.4f;     // Percent charge required to be dizzy after stop
         const float STUMBLE_THRES  = 0.75f;    // Percent charge required to stumble after stop
-        const float STUMBLE_TIME   = 1.25f;   // Amount of time we stumble for after spinning
-        const float STOP_FRICTION  = 0.9f;   // Friction when sliding to a halt
-        const float TORNADO_ALPHA  = 0.5f;   // Max alpha of tornado VFX
+        const float STUMBLE_TIME   = 1.25f;    // Amount of time we stumble for after spinning
+        const float STOP_FRICTION  = 0.9f;     // Friction when sliding to a halt
+        const float TORNADO_ALPHA  = 0.5f;     // Max alpha of tornado VFX
+        const float SPIN_DELTA     = MAX_SPIN - MIN_SPIN;
 
         public bool reflectingProjectiles { get; private set; }
 
@@ -98,11 +98,8 @@ namespace CwaffingTheGungy
         private GameObject tornadoVFX           = null;
         private Vector2 targetVelocity          = Vector2.zero;
 
-        private Vector4 GetCenterPointInScreenUV(Vector2 centerPoint)
-        {
-            Vector3 vector = GameManager.Instance.MainCameraController.Camera.WorldToViewportPoint(centerPoint.ToVector3ZUp());
-            return new Vector4(vector.x, vector.y, 0f, 0f);
-        }
+        private tk2dSpriteAnimationClip stumbleClip = null; // animation to use for stumbling
+        private List<bool> wasFrameInvulnerable = new List<bool>(); // cache for whether stumble frames were vulnerable
 
         private void UpdateForcedDirection(float newDirection)
         {
@@ -114,12 +111,10 @@ namespace CwaffingTheGungy
             }
 
             string animName = Lazy.GetBaseIdleAnimationName(this.owner,this.forcedDirection);
-            // ETGModConsole.Log("should play "+animName);
             if (!this.owner.spriteAnimator.IsPlaying(animName))
             {
                 this.owner.spriteAnimator.Stop();
                 this.owner.spriteAnimator.Play(animName);
-                // this.owner.spriteAnimator.SetFrame(0, false);
             }
             bool lastFlipped = this.owner.sprite.FlipX;
             this.owner.sprite.FlipX = (this.forcedDirection > 90f || this.forcedDirection < -90f);
@@ -177,13 +172,14 @@ namespace CwaffingTheGungy
             this.rollDamageModifier.amount = Mathf.Pow(this.targetVelocity.magnitude,0.5f);
             this.owner.stats.RecalculateStats(this.owner,true);
             this.owner.ApplyRollDamage(aIActor);
+            AkSoundEngine.PostEvent("undertale_damage_stop", this.owner.gameObject);
             AkSoundEngine.PostEvent("undertale_damage", this.owner.gameObject);
         }
 
         public override IEnumerator ContinueDodgeRoll()
         {
-            float minDashSpeed = GetDodgeRollSpeed();    // Min speed of our dash
-            float maxDashSpeed = minDashSpeed * 5.0f;  // Max speed of our dash
+            float minDashSpeed = GetDodgeRollSpeed(); // Min speed of our dash
+            float maxDashSpeed = minDashSpeed * 5.0f; // Max speed of our dash
 
             #region Initialization
                 DustUpVFX dusts = GameManager.Instance.Dungeon.dungeonDustups;
@@ -191,14 +187,13 @@ namespace CwaffingTheGungy
                 this.tookDamageDuringDodgeRoll = false;
                 this.owner.OnReceivedDamage += this.OnReceivedDamage;
                 this.owner.OnRealPlayerDeath += this.OnReceivedDamage;
+                this.stumbleClip = null;
 
                 this.tornadoVFX = Instantiate<GameObject>(
                     VFX.animations["Tornado"], this.owner.specRigidbody.UnitBottomCenter, Quaternion.identity);
                 tk2dSpriteAnimator tornadoAnimator = this.tornadoVFX.GetComponent<tk2dSpriteAnimator>();
                     tornadoAnimator.sprite.transform.parent = this.owner.transform;
-                    // tornadoAnimator.sprite.transform.position = Vector2.zero;
                     tornadoAnimator.sprite.transform.position = this.owner.sprite.WorldBottomCenter;
-                    // tornadoAnimator.sprite.transform.position = new Vector2(this.owner.sprite.GetCurrentSpriteDef().position3.x/2,0);
                     tornadoAnimator.sprite.usesOverrideMaterial = true;
                 Renderer tornadoRenderer = tornadoAnimator.renderer;
                     tornadoRenderer.material.shader = Shader.Find("Brave/Internal/SimpleAlphaFadeUnlit");
@@ -235,17 +230,10 @@ namespace CwaffingTheGungy
                     totalTime += BraveTime.DeltaTime;
                     chargePercent = Mathf.Min(1.0f,totalTime / CHARGE_TIME);
                     curSpinSpeed = MIN_SPIN + SPIN_DELTA * (chargePercent*chargePercent);
-                    // this.owner.sprite.renderer.material.SetFloat("_EmissivePower", 20.0f*Mathf.Abs(Mathf.Sin(totalTime*4.0f*totalTime/CHARGE_TIME)));
-                    // TODO: DoDistortionWave() lags the game horrendously if you die
-                    // Exploder.DoDistortionWave(this.owner.sprite.WorldCenter, 1.8f, 0.01f, 0.5f, 0.1f);
                     UpdateForcedDirection(this.forcedDirection+curSpinSpeed*BraveTime.DeltaTime);
                     this.speedModifier.amount = 1.0f - (chargePercent*chargePercent);
                     this.owner.stats.RecalculateStats(this.owner,true);
                     this.owner.specRigidbody.Reinitialize();
-
-                    // string curAnimation = Lazy.GetBaseIdleAnimationName
-                    // if (!this.owner.spriteAnimator.IsPlaying("spinfall"))
-                    //     this.owner.GetBaseAnimationName()
 
                     if (UnityEngine.Random.Range(0.0f,100.0f) < 10)
                     {
@@ -257,7 +245,7 @@ namespace CwaffingTheGungy
                             this.owner.sprite.WorldCenter - Lazy.AngleToVector(dir, mag),
                             Quaternion.Euler(0f, 0f, rot));
                     }
-                    if (chargePercent > DIZZY_THRES)
+                    if (chargePercent >= DIZZY_THRES)
                     {
                         tornadoCurAlpha = TORNADO_ALPHA * (chargePercent - DIZZY_THRES) / (1.0f - DIZZY_THRES);
                         tornadoAnimator.sprite.transform.position = this.owner.sprite.WorldBottomCenter;
@@ -273,7 +261,7 @@ namespace CwaffingTheGungy
 
             #region The Dash
                 this.owner.SetIsFlying(true, "gyro", false, false);
-                this.reflectingProjectiles = chargePercent > DIZZY_THRES;
+                this.reflectingProjectiles = chargePercent >= DIZZY_THRES;
                 this.owner.specRigidbody.OnPreRigidbodyCollision += BounceAwayEnemies;
                 this.owner.specRigidbody.OnCollision += BounceOffWalls;
                 this.owner.healthHaver.IsVulnerable = false;
@@ -285,9 +273,6 @@ namespace CwaffingTheGungy
                 {
                     if (this.owner.IsFalling || this.tookDamageDuringDodgeRoll)
                         yield break;
-                    // this.owner.PlayerAfterImage();
-                    // TODO: DoDistortionWave() lags the game horrendously if you die
-                    // Exploder.DoDistortionWave(this.owner.sprite.WorldCenter, 1.8f, 0.01f, 0.5f, 0.1f);
                     UpdateForcedDirection(this.forcedDirection+curSpinSpeed*BraveTime.DeltaTime);  //2.0 RPS
 
                     // adjust angle / velocity of spin if necessary
@@ -303,17 +288,15 @@ namespace CwaffingTheGungy
                     {
                         float maxRot = MAX_ROT * BraveTime.DeltaTime;
                         float velangle = this.targetVelocity.ToAngle();
-                        float newangle = velangle;
                         float deltaToTarget = this.owner.FacingDirection - velangle;
                         if (deltaToTarget > 180)
                             deltaToTarget -= 360f;
                         else if (deltaToTarget < -180)
                             deltaToTarget += 360f;
                         if (Mathf.Abs(deltaToTarget) <= maxRot)
-                            newangle = this.owner.FacingDirection;
+                            this.targetVelocity = Lazy.AngleToVector(this.owner.FacingDirection,dash_speed);
                         else
-                            newangle += Mathf.Sign(deltaToTarget)*maxRot;
-                        this.targetVelocity = Lazy.AngleToVector(newangle,dash_speed);
+                            this.targetVelocity = Lazy.AngleToVector(velangle+Mathf.Sign(deltaToTarget)*maxRot,dash_speed);
                     }
                     this.targetVelocity *= GYRO_FRICTION;
                     this.owner.specRigidbody.Velocity = this.targetVelocity;
@@ -340,19 +323,12 @@ namespace CwaffingTheGungy
                 this.owner.ownerlessStatModifiers.Remove(this.rollDamageModifier);
                 this.isRollModActive = false;
                 this.owner.stats.RecalculateStats(this.owner);
+                this.owner.SetIsFlying(false, "gyro", false, false);
             #endregion
 
             #region The Stumble
                 if (chargePercent >= DIZZY_THRES)
                 {
-                    // Dissect.PrintSpriteCollectionNames(this.owner.sprite.collection);
-                    string stumbleAnim = Lazy.GetBaseDodgeAnimationName(this.owner,this.owner.specRigidbody.Velocity);
-                    float stumbleAngle = this.owner.specRigidbody.Velocity.ToAngle();
-                    // this.owner.specRigidbody.Velocity = Vector2.zero;
-
-                    this.owner.SetIsFlying(false, "gyro", false, false);
-                    this.owner.sprite.usesOverrideMaterial = false;
-
                     this.owner.SetInputOverride("gyrostumble");
                     this.owner.ToggleGunRenderers(false,"gyrostumble");
                     this.owner.ToggleHandRenderers(false,"gyrostumble");
@@ -377,10 +353,20 @@ namespace CwaffingTheGungy
 
                     if (chargePercent >= STUMBLE_THRES)
                     {
-                        tk2dSpriteAnimationClip stumbleClip = this.owner.spriteAnimator.GetClipByName(stumbleAnim);
+                        string stumbleAnim = Lazy.GetBaseDodgeAnimationName(this.owner,this.owner.specRigidbody.Velocity);
+                        float stumbleAngle = this.owner.specRigidbody.Velocity.ToAngle();
+
+                        this.stumbleClip = this.owner.spriteAnimator.GetClipByName(stumbleAnim);
                         this.owner.QueueSpecificAnimation(stumbleClip.name);
                         this.owner.spriteAnimator.SetFrame(0, false);
                         this.owner.spriteAnimator.ClipFps = 24.0f;
+                        // hacky nonsense to make the player vulnerable during a roll animation frame
+                        this.wasFrameInvulnerable = new List<bool>();
+                        foreach (var frame in this.stumbleClip.frames)
+                        {
+                            this.wasFrameInvulnerable.Add(frame.invulnerableFrame);
+                            frame.invulnerableFrame = false;
+                        }
 
                         this.owner.sprite.FlipX = (stumbleAngle > 90f || stumbleAngle < -90f);
                         if (this.owner.sprite.FlipX)
@@ -389,13 +375,6 @@ namespace CwaffingTheGungy
                             this.owner.sprite.gameObject.transform.localPosition = Vector3.zero;
                         this.owner.sprite.UpdateZDepth();
 
-                        // hacky nonsense to make the player vulnerable during a roll animation frame
-                        List<bool> wasFrameInvulnerable = new List<bool>();
-                        foreach (var frame in stumbleClip.frames)
-                        {
-                            wasFrameInvulnerable.Add(frame.invulnerableFrame);
-                            frame.invulnerableFrame = false;
-                        }
                         for (float timer = 0.0f; timer < STUMBLE_TIME; timer += BraveTime.DeltaTime)
                         {
                             if (this.tookDamageDuringDodgeRoll)
@@ -405,9 +384,6 @@ namespace CwaffingTheGungy
                                 this.owner.spriteAnimator.Stop();
                             yield return null;
                         }
-                        int i = 0;
-                        foreach (var frame in stumbleClip.frames)
-                            frame.invulnerableFrame = wasFrameInvulnerable[i++];
                     }
                 }
             #endregion
@@ -418,13 +394,18 @@ namespace CwaffingTheGungy
         public override void FinishDodgeRoll()
         {
             #region Cleanup
+                if (this.stumbleClip != null)
+                {
+                    for (int i = 0; i < this.stumbleClip.frames.Length; ++i)
+                        this.stumbleClip.frames[i].invulnerableFrame = this.wasFrameInvulnerable[i];
+                }
+
                 this.owner.OnReceivedDamage -= this.OnReceivedDamage;
                 this.reflectingProjectiles = false;
                 this.owner.specRigidbody.OnPreRigidbodyCollision -= BounceAwayEnemies;
                 this.owner.specRigidbody.OnCollision -= BounceOffWalls;
                 this.owner.ClearInputOverride("gyro");
                 this.owner.SetIsFlying(false, "gyro", false, false);
-                this.owner.sprite.usesOverrideMaterial = false;
                 this.owner.ToggleHandRenderers(true,"gyrostumble");
                 this.owner.ToggleGunRenderers(true,"gyrostumble");
                 this.owner.ClearInputOverride("gyrostumble");
