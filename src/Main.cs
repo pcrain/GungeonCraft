@@ -111,7 +111,7 @@ namespace CwaffingTheGungy
                     Deadline.Add();
                     BBGun.Add();
 
-                    MasterSword.Add();
+                    // MasterSword.Add();
                 #endregion
 
                 #region Synergies
