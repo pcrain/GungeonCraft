@@ -265,10 +265,10 @@ namespace CwaffingTheGungy
                 // fancy computations to compute direction based on momentum
                 float chainTargetDirection = this.forcedDirection +
                     this.curMomentum * curChainLength;  //TODO: 0.75 is magic, do real math later
-                // theCurChain.Direction = Lazy.AngleToVector(chainTargetDirection);
+                // theCurChain.Direction = BraveMathCollege.DegreesToVector(chainTargetDirection);
                 foreach (BasicBeamController.BeamBone b in theCurChain.m_bones)
                 {
-                    b.Velocity = Lazy.AngleToVector(chainTargetDirection,curChainLength*C.PIXELS_PER_TILE);
+                    b.Velocity = BraveMathCollege.DegreesToVector(chainTargetDirection,curChainLength*C.PIXELS_PER_TILE);
                     lastBone   = b;
                 }
             }
@@ -286,7 +286,7 @@ namespace CwaffingTheGungy
             // update and draw the ball itself
             theCurBall.collidesWithEnemies = true;
             theCurBall.collidesWithPlayer = false;
-            Vector2 ppos = (p.sprite.WorldCenter+Lazy.AngleToVector(this.forcedDirection,curChainLength+15f/C.PIXELS_PER_TILE) // 15 == beam sprite length
+            Vector2 ppos = (p.sprite.WorldCenter+BraveMathCollege.DegreesToVector(this.forcedDirection,curChainLength+15f/C.PIXELS_PER_TILE) // 15 == beam sprite length
                 ).ToVector3ZisY(-1f);
 
             Vector2 oldPos = theCurBall.specRigidbody.Position.GetPixelVector2();
@@ -303,9 +303,9 @@ namespace CwaffingTheGungy
             float segments = Mathf.Floor(Mathf.Min(maxChainSegments,mag/minGapBetweenChainSegments));
             float gap      = mag/segments;
             for(int i = 0 ; i < segments; ++i )
-                vfx2.SpawnAtPosition((ppos+Lazy.AngleToVector(angle,i*gap)).ToVector3ZisY(-1f),
+                vfx2.SpawnAtPosition((ppos+BraveMathCollege.DegreesToVector(angle,i*gap)).ToVector3ZisY(-1f),
                     angle,null, null, null, -0.05f);
-            vfx.SpawnAtPosition((ppos+Lazy.AngleToVector(angle,mag)).ToVector3ZisY(-1f),
+            vfx.SpawnAtPosition((ppos+BraveMathCollege.DegreesToVector(angle,mag)).ToVector3ZisY(-1f),
                 angle,null, null, null, -0.05f);
         }
     }

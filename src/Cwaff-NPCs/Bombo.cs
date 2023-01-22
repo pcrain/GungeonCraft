@@ -461,7 +461,7 @@ namespace CwaffingTheGungy
             GameManager.Instance.MainCameraController.DoScreenShake(new ScreenShakeSettings(0.35f,6f,2.0f,0f), null);
             for (int i = 0; i < 30; ++i)
             {
-                Vector2 ppos = p.sprite.WorldCenter + Lazy.AngleToVector(i*UnityEngine.Random.Range(0f,360f),1.75f);
+                Vector2 ppos = p.sprite.WorldCenter + BraveMathCollege.DegreesToVector(i*UnityEngine.Random.Range(0f,360f),1.75f);
                 v.SpawnAtPosition(ppos.ToVector3ZisY(-1f), 0, null, null, null, -0.05f);
                 // AkSoundEngine.PostEvent("Play_OBJ_crystal_shatter_01", base.gameObject);
                 AkSoundEngine.PostEvent("Play_ENM_cannonball_explode_01", p.gameObject);

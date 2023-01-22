@@ -93,28 +93,27 @@ namespace CwaffingTheGungy
                     this.m_projectile.sprite.WorldCenter,
                     Quaternion.Euler(0f, 0f, otherAngle),
                     true).GetComponent<Projectile>();
+                if (!other)
+                    return;
 
-                if (other != null)
-                {
-                    other.Owner = this.m_owner;
-                    other.Shooter = this.m_owner.specRigidbody;
-                    this.m_owner.DoPostProcessProjectile(other);
+                other.Owner = this.m_owner;
+                other.Shooter = this.m_owner.specRigidbody;
+                this.m_owner.DoPostProcessProjectile(other);
 
-                    PopcornBehavior otherPop         = other.GetComponent<PopcornBehavior>();
-                    otherPop.currentAngle            = otherAngle;
-                    otherPop.popCurrent              = this.popCurrent;
-                    otherPop.speedFalloff            = this.speedFalloff;
-                    float newspeed                   = this.speed*this.speedFalloff;
-                    this.speed                       = newspeed;
-                    otherPop.speed                   = newspeed;
-                    this.m_projectile.baseData.speed = newspeed;
-                    other.baseData.speed             = newspeed;
-                    this.m_projectile.UpdateSpeed();
-                    other.UpdateSpeed();
+                PopcornBehavior otherPop         = other.GetComponent<PopcornBehavior>();
+                otherPop.currentAngle            = otherAngle;
+                otherPop.popCurrent              = this.popCurrent;
+                otherPop.speedFalloff            = this.speedFalloff;
+                float newspeed                   = this.speed*this.speedFalloff;
+                this.speed                       = newspeed;
+                otherPop.speed                   = newspeed;
+                this.m_projectile.baseData.speed = newspeed;
+                other.baseData.speed             = newspeed;
+                this.m_projectile.UpdateSpeed();
+                other.UpdateSpeed();
 
-                    AkSoundEngine.PostEvent("Play_WPN_smileyrevolver_shot_01", this.m_projectile.gameObject);
-                    Invoke("DoPop",popTimer);
-                }
+                AkSoundEngine.PostEvent("Play_WPN_smileyrevolver_shot_01", this.m_projectile.gameObject);
+                Invoke("DoPop",popTimer);
             }
         }
     }

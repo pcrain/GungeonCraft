@@ -91,12 +91,11 @@ namespace CwaffingTheGungy
             this.m_bullet_kin.specRigidbody.RegisterSpecificCollisionException(
                 this.m_projectile.specRigidbody);
             this.m_bullet_kin.healthHaver.knockbackDoer.ApplyKnockback(
-                Lazy.AngleToVector(this.m_angle), 100f);
+                BraveMathCollege.DegreesToVector(this.m_angle), 100f);
 
             EnemyIsTheProjectileBehavior comp =
                 this.m_projectile.gameObject.GetComponent<EnemyIsTheProjectileBehavior>();
             comp.Initialize(this.m_bullet_kin);
-            // GetComponent<KilledEnemiesBecomeProjectileModifier>();
         }
 
     }

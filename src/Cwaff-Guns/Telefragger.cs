@@ -61,11 +61,8 @@ namespace CwaffingTheGungy
             vfx ??= VFX.CreatePoolFromVFXGameObject((PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
 
             this.m_projectile = base.GetComponent<Projectile>();
-            // this.m_projectile.BulletScriptSettings.surviveTileCollisions = true;
             if (this.m_projectile?.Owner is PlayerController)
-            {
-                this.m_owner      = this.m_projectile.Owner as PlayerController;
-            }
+                this.m_owner = this.m_projectile.Owner as PlayerController;
 
             SpeculativeRigidbody specRigidBody = this.m_projectile.specRigidbody;
             // this.m_projectile.BulletScriptSettings.surviveTileCollisions = true;

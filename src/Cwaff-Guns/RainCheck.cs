@@ -79,7 +79,6 @@ namespace CwaffingTheGungy
             PutAllBulletsInStasis();
         }
 
-
         private void LaunchAllBullets()
         {
             int num_found = 0;
@@ -171,21 +170,20 @@ namespace CwaffingTheGungy
 
         public void ForceMove(int index)
         {
-            if (!this.launchSequenceStarted)
-            {  //no resetting our timers after this function has been called once
-                this.launchSequenceStarted = true;
-                this.moveTimer             = index * RAINCHECK_LAUNCH_DELAY;
-                this.inStasis              = false;
-            }
+            if (this.launchSequenceStarted)
+                return;
+            //no resetting our timers after this function has been called once
+            this.launchSequenceStarted = true;
+            this.moveTimer             = index * RAINCHECK_LAUNCH_DELAY;
+            this.inStasis              = false;
         }
 
         public void PutInStasis()
         {
-            if (!this.wasEverInStasis)
-            {
-                this.inStasis        = true;
-                this.wasEverInStasis = true;
-            }
+            if (this.wasEverInStasis)
+                return;
+            this.inStasis        = true;
+            this.wasEverInStasis = true;
         }
     }
 }

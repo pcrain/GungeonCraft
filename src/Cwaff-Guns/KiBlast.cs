@@ -164,9 +164,7 @@ namespace CwaffingTheGungy
                     this.m_owner.sprite.WorldCenter,
                     this.targetAngle);
 
-                this.m_projectile.OnHitEnemy += this.OnHitEnemy;
                 this.m_projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
-                // this.m_projectile.specRigidbody.OnCollision += this.OnCollision;
 
                 KiBlast k = this.m_owner.CurrentGun.GetComponent<KiBlast>();
                 if (k != null)
@@ -196,20 +194,7 @@ namespace CwaffingTheGungy
             this.m_projectile.baseData.speed = Mathf.Max(distanceToTarget / this.timeToReachTarget,minSpeed);
             this.actualTimeToReachTarget = distanceToTarget / this.m_projectile.baseData.speed;
             this.m_projectile.UpdateSpeed();
-            this.m_projectile.SendInDirection(Lazy.AngleToVector(this.targetAngle-this.angleVariance), true);
-        }
-
-        private void OnHitEnemy(Projectile self, SpeculativeRigidbody enemy, bool fatal)
-        {
-            // if (enemy?.aiActor != null)
-            // {
-            //     if (fatal)
-            //         ETGModConsole.Log("Killed enemy with "+self.baseData.damage+" damage");
-            //     else
-            //         ETGModConsole.Log("Failed to kill enemy with "+self.baseData.damage+" damage");
-            // }
-            // else
-            //     ETGModConsole.Log("Failed to HIT enemy with "+self.baseData.damage+" damage");
+            this.m_projectile.SendInDirection(BraveMathCollege.DegreesToVector(this.targetAngle-this.angleVariance), true);
         }
 
         private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
@@ -282,7 +267,6 @@ namespace CwaffingTheGungy
             trail.BaseColor = Color.cyan;
             trail.EndColor = Color.cyan;
             trail.UpdateTrail();
-            // AkSoundEngine.PostEvent("Play_WPN_Vorpal_Shot_Critical_01", enemy.gameObject);
             ++this.numReflections;
             this.timeSinceLastReflect = 0.0f;
             this.m_projectile.baseData.damage = this.startingDamage*Mathf.Pow(this.scaling,this.numReflections);
@@ -310,7 +294,7 @@ namespace CwaffingTheGungy
             {
                 float inflection = (2.0f*percentDoneTurning) - 1.0f;
                 float newAngle = this.targetAngle + inflection * this.angleVariance;
-                this.m_projectile.SendInDirection(Lazy.AngleToVector(newAngle), true);
+                this.m_projectile.SendInDirection(BraveMathCollege.DegreesToVector(newAngle), true);
             }
         }
     }

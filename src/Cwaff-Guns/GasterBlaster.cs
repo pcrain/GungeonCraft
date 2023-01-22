@@ -195,7 +195,7 @@ namespace CwaffingTheGungy
             float percentDone  = this.timer / this.m_rotate_time;
             // float curAngle     = this.m_start_angle + percentDone * this.angle_delta;
             float curAngle     = this.m_start_angle + (float)Math.Tanh(percentDone*Mathf.PI) * this.angle_delta;
-            Vector2 curPos     = this.m_fulcrum + Lazy.AngleToVector(curAngle, this.m_radius);
+            Vector2 curPos     = this.m_fulcrum + BraveMathCollege.DegreesToVector(curAngle, this.m_radius);
             this.m_projectile.transform.position = curPos.ToVector3ZisY(-1f);
             this.m_projectile.transform.rotation =
                 Quaternion.Euler(0f, 0f, curAngle + (curAngle > 180 ? 180 : (-180)));
@@ -238,7 +238,7 @@ namespace CwaffingTheGungy
 
             RotateIntoPositionBehavior rotcomp = this.m_blaster.GetComponent<RotateIntoPositionBehavior>();
             rotcomp.m_radius                   = 16f;
-            rotcomp.m_fulcrum                  = this.m_spawn + Lazy.AngleToVector(this.m_angle,rotcomp.m_radius);
+            rotcomp.m_fulcrum                  = this.m_spawn + BraveMathCollege.DegreesToVector(this.m_angle,rotcomp.m_radius);
             rotcomp.m_start_angle              = this.m_angle;
             rotcomp.m_end_angle                = this.return_angle;
             rotcomp.m_rotate_time              = 0.5f;
@@ -257,7 +257,6 @@ namespace CwaffingTheGungy
         {
             this.m_projectile.DieInAir(true,false,false,true);
             this.m_blaster.DieInAir(true,false,false,true);
-            // UnityEngine.Object.Destroy(this.m_projectile.gameObject);
         }
     }
 }

@@ -142,7 +142,7 @@ namespace CwaffingTheGungy
                 float mag = UnityEngine.Random.Range(0.3f,1.25f);
                 SpawnManager.SpawnVFX(
                     dusts.rollLandDustup,
-                    this.owner.sprite.WorldCenter + Lazy.AngleToVector(dir, mag),
+                    this.owner.sprite.WorldCenter + BraveMathCollege.DegreesToVector(dir, mag),
                     Quaternion.Euler(0f, 0f, rot));
             }
 
@@ -172,7 +172,7 @@ namespace CwaffingTheGungy
                     float mag = UnityEngine.Random.Range(0.3f,1.0f);
                     SpawnManager.SpawnVFX(
                         dusts.rollLandDustup,
-                        this.owner.sprite.WorldCenter + Lazy.AngleToVector(dir, mag),
+                        this.owner.sprite.WorldCenter + BraveMathCollege.DegreesToVector(dir, mag),
                         Quaternion.Euler(0f, 0f, rot));
                 }
             }

@@ -51,14 +51,14 @@ namespace CwaffingTheGungy
             dodgeRoller = this.gameObject.GetComponent<GyroscopeRoll>();
             dodgeRoller.owner = this.owner;
             SpeculativeRigidbody specRigidbody = player.specRigidbody;
-            specRigidbody.OnPreRigidbodyCollision = (SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate)Delegate.Combine(specRigidbody.OnPreRigidbodyCollision, new SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate(this.OnPreCollision));
+            specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
             base.Pickup(player);
         }
 
         public override DebrisObject Drop(PlayerController player)
         {
             SpeculativeRigidbody specRigidbody2 = player.specRigidbody;
-            specRigidbody2.OnPreRigidbodyCollision = (SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate)Delegate.Remove(specRigidbody2.OnPreRigidbodyCollision, new SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate(this.OnPreCollision));
+            specRigidbody.OnPreRigidbodyCollision -= this.OnPreCollision;
             this.owner = null;
             dodgeRoller.AbortDodgeRoll();
             return base.Drop(player);
@@ -117,10 +117,9 @@ namespace CwaffingTheGungy
                 this.owner.spriteAnimator.Stop();
                 this.owner.spriteAnimator.Play(animName);
             }
-            bool lastFlipped = this.owner.sprite.FlipX;
-            this.owner.sprite.FlipX = (this.forcedDirection > 90f || this.forcedDirection < -90f);
-            if (this.owner.sprite.FlipX != lastFlipped)
+            if (this.owner.sprite.FlipX != (Mathf.Abs(this.forcedDirection) > 90f))
             {
+                this.owner.sprite.FlipX ^= true;
                 if (this.owner.sprite.FlipX)
                     this.owner.sprite.gameObject.transform.localPosition = new Vector3(this.owner.sprite.GetUntrimmedBounds().size.x, 0f, 0f);
                 else
@@ -129,7 +128,7 @@ namespace CwaffingTheGungy
             }
 
             this.owner.m_overrideGunAngle = this.forcedDirection;
-            this.owner.forceAimPoint = this.owner.sprite.WorldCenter + Lazy.AngleToVector(this.forcedDirection);
+            this.owner.forceAimPoint = this.owner.sprite.WorldCenter + BraveMathCollege.DegreesToVector(this.forcedDirection);
         }
 
         private void OnReceivedDamage(PlayerController p)
@@ -149,18 +148,14 @@ namespace CwaffingTheGungy
             Vector2 x2 = b2.UnitCenter;
             Vector2 v1 = b1.Velocity;
             Vector2 v2 = ignoreOtherVelocity ? Vector2.zero : b2.Velocity;
-            float distNorm = (x1-x2).sqrMagnitude;
-            if (distNorm < 0.1f)
-                distNorm = 0.1f;
+            float distNorm = Mathf.Max(0.1f,(x1-x2).sqrMagnitude);
             newv1 = v1 - (Vector2.Dot(v1-v2,x1-x2) / distNorm) * (x1-x2);
             newv2 = v2 - (Vector2.Dot(v2-v1,x2-x1) / distNorm) * (x2-x1);
         }
 
         private void BounceAwayEnemies(SpeculativeRigidbody myRigidbody, PixelCollider myCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherCollider)
         {
-            if (!otherRigidbody?.aiActor?.healthHaver)
-                return;
-            if (otherRigidbody.aiActor.healthHaver.IsDead)
+            if (!otherRigidbody?.aiActor?.healthHaver || otherRigidbody.aiActor.healthHaver.IsDead)
                 return;
             AIActor aIActor = otherRigidbody.aiActor;
             Vector2 myNewVelocity, theirNewVelocity;
@@ -170,7 +165,7 @@ namespace CwaffingTheGungy
             this.targetVelocity = this.targetVelocity.magnitude * myNewVelocity.normalized;
             this.owner.specRigidbody.Velocity = myNewVelocity;
 
-            this.rollDamageModifier.amount = Mathf.Pow(this.targetVelocity.magnitude,0.5f);
+            this.rollDamageModifier.amount = Mathf.Sqrt(this.targetVelocity.magnitude);
             this.owner.stats.RecalculateStats(this.owner,true);
             this.owner.ApplyRollDamage(aIActor);
             AkSoundEngine.PostEvent("undertale_damage_stop", this.owner.gameObject);
@@ -196,9 +191,7 @@ namespace CwaffingTheGungy
                     tornadoAnimator.sprite.transform.parent = this.owner.transform;
                     tornadoAnimator.sprite.transform.position = this.owner.sprite.WorldBottomCenter;
                     tornadoAnimator.sprite.usesOverrideMaterial = true;
-                Renderer tornadoRenderer = tornadoAnimator.renderer;
-                    tornadoRenderer.material.shader = Shader.Find("Brave/Internal/SimpleAlphaFadeUnlit");
-                    tornadoRenderer.material.SetFloat("_Fade", 0.0f);
+                    tornadoAnimator.renderer.SetAlpha(0.0f);
             #endregion
 
             #region The Charge
@@ -243,14 +236,14 @@ namespace CwaffingTheGungy
                         float mag = UnityEngine.Random.Range(0.3f,1.25f);
                         SpawnManager.SpawnVFX(
                             dusts.rollLandDustup,
-                            this.owner.sprite.WorldCenter - Lazy.AngleToVector(dir, mag),
+                            this.owner.sprite.WorldCenter - BraveMathCollege.DegreesToVector(dir, mag),
                             Quaternion.Euler(0f, 0f, rot));
                     }
                     if (chargePercent >= DIZZY_THRES)
                     {
                         tornadoCurAlpha = TORNADO_ALPHA * (chargePercent - DIZZY_THRES) / (1.0f - DIZZY_THRES);
                         tornadoAnimator.sprite.transform.position = this.owner.sprite.WorldBottomCenter;
-                        tornadoRenderer.material.SetFloat("_Fade", tornadoCurAlpha);
+                        tornadoAnimator.renderer.SetAlpha(tornadoCurAlpha);
                     }
 
                     yield return null;
@@ -289,15 +282,11 @@ namespace CwaffingTheGungy
                     {
                         float maxRot = MAX_ROT * BraveTime.DeltaTime;
                         float velangle = this.targetVelocity.ToAngle();
-                        float deltaToTarget = this.owner.FacingDirection - velangle;
-                        if (deltaToTarget > 180)
-                            deltaToTarget -= 360f;
-                        else if (deltaToTarget < -180)
-                            deltaToTarget += 360f;
+                        float deltaToTarget = BraveMathCollege.ClampAngle180(this.owner.FacingDirection - velangle);
                         if (Mathf.Abs(deltaToTarget) <= maxRot)
-                            this.targetVelocity = Lazy.AngleToVector(this.owner.FacingDirection,dash_speed);
+                            this.targetVelocity = BraveMathCollege.DegreesToVector(this.owner.FacingDirection,dash_speed);
                         else
-                            this.targetVelocity = Lazy.AngleToVector(velangle+Mathf.Sign(deltaToTarget)*maxRot,dash_speed);
+                            this.targetVelocity = BraveMathCollege.DegreesToVector(velangle+Mathf.Sign(deltaToTarget)*maxRot,dash_speed);
                     }
                     this.targetVelocity *= GYRO_FRICTION;
                     this.owner.specRigidbody.Velocity = this.targetVelocity;
@@ -309,7 +298,7 @@ namespace CwaffingTheGungy
                         float mag = UnityEngine.Random.Range(0.3f,1.25f);
                         SpawnManager.SpawnVFX(
                             dusts.rollLandDustup,
-                            this.owner.sprite.WorldCenter - Lazy.AngleToVector(dir, mag),
+                            this.owner.sprite.WorldCenter - BraveMathCollege.DegreesToVector(dir, mag),
                             Quaternion.Euler(0f, 0f, rot));
                     }
 
@@ -343,7 +332,7 @@ namespace CwaffingTheGungy
                     {
                         if (this.tookDamageDuringDodgeRoll)
                             yield break;
-                        tornadoRenderer.material.SetFloat("_Fade", tornadoCurAlpha * (timer / spinTimer));
+                        tornadoAnimator.renderer.SetAlpha(tornadoCurAlpha * (timer / spinTimer));
                         tornadoAnimator.sprite.transform.position = this.owner.sprite.WorldBottomCenter;
                         this.targetVelocity *= STOP_FRICTION;
                         this.owner.specRigidbody.Velocity = this.targetVelocity;
@@ -431,7 +420,7 @@ namespace CwaffingTheGungy
             float velangle = (-this.targetVelocity).ToAngle();
             float normangle = tileCollision.Normal.ToAngle();
             float newangle = BraveMathCollege.ClampAngle360(velangle + 2f * (normangle - velangle));
-            this.targetVelocity = Lazy.AngleToVector(newangle,this.targetVelocity.magnitude);
+            this.targetVelocity = BraveMathCollege.DegreesToVector(newangle,this.targetVelocity.magnitude);
             this.owner.specRigidbody.Velocity = this.targetVelocity;
         }
     }

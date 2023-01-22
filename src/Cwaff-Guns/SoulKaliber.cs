@@ -101,38 +101,34 @@ namespace CwaffingTheGungy
             vfx ??= VFX.CreatePoolFromVFXGameObject((PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
             this.m_enemy = base.GetComponent<AIActor>();
             this.m_cooldown = 0;
-            // dummy class
         }
 
         public void TryApplyDamage(HealthHaver enemyHH)
         {
-            if (this.m_cooldown <= 0)
-            {
-                this.m_cooldown = 0.1f;
-                // Vector2 directionToPlayer = bouncer.projectile.Owner.specRigidbody.UnitCenter - bouncer.specRigidbody.UnitCenter;
-                enemyHH.ApplyDamage(1f, new Vector2(10f,0f), "Soul Link",
-                    CoreDamageTypes.Magic, DamageCategory.Collision,
-                    false, null, false);
-                enemyHH.knockbackDoer.ApplyKnockback(new Vector2(10f,0f), 2f);
+            if (this.m_cooldown > 0)
+                return;
+            this.m_cooldown = 0.1f;
+            // Vector2 directionToPlayer = bouncer.projectile.Owner.specRigidbody.UnitCenter - bouncer.specRigidbody.UnitCenter;
+            enemyHH.ApplyDamage(1f, new Vector2(10f,0f), "Soul Link",
+                CoreDamageTypes.Magic, DamageCategory.Collision,
+                false, null, false);
+            enemyHH.knockbackDoer.ApplyKnockback(new Vector2(10f,0f), 2f);
 
-                Vector2 ppos = this.m_enemy.sprite.WorldCenter;
-                for (int i = 0; i < 3; ++i)
-                {
-                    Vector2 finalpos = ppos + Lazy.AngleToVector(120*i,1);
-                    vfx.SpawnAtPosition(
-                        finalpos.ToVector3ZisY(-1f), /* -1 = above player sprite */
-                        120*i,
-                        null, null, null, -0.05f);
-                }
+            Vector2 ppos = this.m_enemy.sprite.WorldCenter;
+            for (int i = 0; i < 3; ++i)
+            {
+                Vector2 finalpos = ppos + BraveMathCollege.DegreesToVector(120*i,1);
+                vfx.SpawnAtPosition(
+                    finalpos.ToVector3ZisY(-1f), /* -1 = above player sprite */
+                    120*i,
+                    null, null, null, -0.05f);
             }
         }
 
         private void Update()
         {
             if (this.m_cooldown > 0f)
-            {
                 this.m_cooldown -= BraveTime.DeltaTime;
-            }
         }
     }
 }

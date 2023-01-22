@@ -22,8 +22,6 @@ namespace CwaffingTheGungy
         public static string shortDescription = "This Time for Sure!";
         public static string longDescription  = "(1/30 chance of exploding and self-destructing, taking health in the process)";
 
-        // public static Projectile gunprojectile;
-
         private static VFXPool vfx = null;
 
         public static void Add()
@@ -48,8 +46,6 @@ namespace CwaffingTheGungy
             projectile.baseData.damage  = 3f;
             projectile.baseData.speed   = 20.0f;
             projectile.transform.parent = gun.barrelOffset;
-
-            // gunprojectile = projectile;
         }
 
         public override void OnPostFired(PlayerController player, Gun gun)
@@ -73,11 +69,10 @@ namespace CwaffingTheGungy
                     Vector2 position = player.sprite.WorldCenter;
                     for (int i = 0; i < 4; ++i)
                     {
-                        Vector2 finalpos = position + Lazy.AngleToVector(90*i,1);
+                        Vector2 finalpos = position + BraveMathCollege.DegreesToVector(90*i,1);
                         vfx.SpawnAtPosition(
                             finalpos.ToVector3ZisY(-1f), /* -1 = above player sprite */
-                            90*i,
-                            null, null, null, -0.05f);
+                            90*i, null, null, null, -0.05f);
                     }
 
                      player.healthHaver.ApplyDamage(0.5f, Vector2.zero, "Gambling Addiction :/", CoreDamageTypes.None, DamageCategory.Normal, true, null, false);
@@ -87,7 +82,6 @@ namespace CwaffingTheGungy
                     ETGModConsole.Log("1 in 10 O:");
                     var enemyToSpawn = EnemyDatabase.GetOrLoadByGuid(EnemyGuidDatabase.Entries["gunreaper"]);
                     Vector2 position = player.sprite.WorldCenter;
-                    // Instantiate<GameObject>(EasyVFXDatabase.SpiratTeleportVFX, position, Quaternion.identity);
                     AIActor TargetActor = AIActor.Spawn(
                         enemyToSpawn, position, GameManager.Instance.Dungeon.data.GetAbsoluteRoomFromPosition(
                             position.ToIntVector2()), true, AIActor.AwakenAnimationType.Default, true);

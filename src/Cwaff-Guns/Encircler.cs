@@ -22,8 +22,6 @@ namespace CwaffingTheGungy
         public static string shortDescription = "Sir Cumference's Own";
         public static string longDescription  = "(circles)";
 
-        // public static Projectile gunprojectile;
-
         public static void Add()
         {
             Gun gun = Lazy.InitGunFromStrings(gunName, spriteName, projectileName, shortDescription, longDescription);
@@ -40,18 +38,11 @@ namespace CwaffingTheGungy
             gun.SetBaseMaxAmmo(250);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
 
-            // Projectile projectile       = Lazy.PrefabProjectileFromGun(gun);
-            // projectile.baseData.damage  = 5f;
-            // projectile.baseData.speed   = 20.0f;
-            // projectile.transform.parent = gun.barrelOffset;
-
             int numProjectiles = 7;
 
             // Lazy.InitGunFromStrings already handles the first one
             for (int i = 1; i < numProjectiles; i++)
-            {
                 gun.AddProjectileModuleFrom("ak-47", true, false);
-            }
 
             int iterator = 0;
             //GUN STATS
@@ -79,9 +70,6 @@ namespace CwaffingTheGungy
                 if (mod != gun.DefaultModule) { mod.ammoCost = 0; }
                 iterator++;
             }
-
-
-            // gunprojectile = projectile;
         }
     }
 
@@ -134,9 +122,9 @@ namespace CwaffingTheGungy
                 this.m_projectile.UpdateSpeed();
 
                 Vector2 circularComponent =
-                    Lazy.AngleToVector(this.offsetAngle+angularSpeed*(this.lifetime - Mathf.Floor(this.lifetime)),newspeed);
+                    BraveMathCollege.DegreesToVector(this.offsetAngle+angularSpeed*(this.lifetime - Mathf.Floor(this.lifetime)),newspeed);
                 Vector2 straightComponent =
-                    Lazy.AngleToVector(this.targetAngle,this.driftSpeed);
+                    BraveMathCollege.DegreesToVector(this.targetAngle,this.driftSpeed);
 
                 this.m_projectile.SendInDirection(circularComponent+straightComponent, true);
             }
@@ -147,7 +135,7 @@ namespace CwaffingTheGungy
             this.runningInCircles = false;
             this.m_projectile.baseData.speed = this.launchSpeed;
             this.m_projectile.UpdateSpeed();
-            this.m_projectile.SendInDirection(Lazy.AngleToVector(this.targetAngle), true);
+            this.m_projectile.SendInDirection(BraveMathCollege.DegreesToVector(this.targetAngle), true);
             AkSoundEngine.PostEvent("Play_WPN_blasphemy_shot_01", this.m_projectile.gameObject);
         }
     }

@@ -399,6 +399,15 @@ namespace CwaffingTheGungy
             }
             return gameObject;
         }
+
+        // Opacity management
+        public static void SetAlpha(this Renderer renderer, float newAlpha = 1.0f)
+        {
+            // NOTE: might need to also make sure sprite has override material
+            if (renderer.material.shader.name != "Brave/Internal/SimpleAlphaFadeUnlit")
+                renderer.material.shader = Shader.Find("Brave/Internal/SimpleAlphaFadeUnlit");
+            renderer.material.SetFloat("_Fade", newAlpha);
+        }
     }
 }
 

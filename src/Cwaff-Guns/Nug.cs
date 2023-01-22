@@ -89,8 +89,6 @@ namespace CwaffingTheGungy
                     gun.CurrentAmmo = 1;
                 }
             }
-            // player.PostProcessProjectile += this.PostProcessFakeProjectile;
-            // player.OnReloadedGun += this.OnPostReload;
         }
 
         public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
@@ -142,7 +140,6 @@ namespace CwaffingTheGungy
             SpeculativeRigidbody specRigidBody = this.m_projectile.specRigidbody;
             this.m_projectile.BulletScriptSettings.surviveTileCollisions = true;
             specRigidBody.OnCollision += this.OnCollision;
-            // this.m_projectile.AdjustPlayerProjectileTint(Color.green, 2);
         }
 
         private void OnCollision(CollisionData tileCollision)
@@ -154,8 +151,6 @@ namespace CwaffingTheGungy
             SpeculativeRigidbody specRigidbody = this.m_projectile.specRigidbody;
             specRigidbody.OnCollision -= this.OnCollision;
 
-
-            // Vector2 spawnPoint = this.m_projectile.sprite.WorldCenter;
             Vector2 spawnPoint = tileCollision.PostCollisionUnitCenter;
             GameObject spawn = SpawnManager.SpawnProjectile(
                 Nug.gunprojectile.gameObject,

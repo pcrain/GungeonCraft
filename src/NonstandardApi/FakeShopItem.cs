@@ -150,7 +150,7 @@ namespace CwaffingTheGungy
       myTimer = 0;
       for (int i = 0; i < NUM_VFX; ++i)
       {
-        Vector2 ppos = base.sprite.WorldCenter + Lazy.AngleToVector(i*ANGLE_DELTA,RADIUS);
+        Vector2 ppos = base.sprite.WorldCenter + BraveMathCollege.DegreesToVector(i*ANGLE_DELTA,RADIUS);
         effect.SpawnAtPosition(ppos.ToVector3ZisY(1f), 0, null, null, null, -0.05f);
       }
     }

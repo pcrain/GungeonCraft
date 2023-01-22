@@ -230,8 +230,6 @@ namespace CwaffingTheGungy
             {
                 if (!gun.GetComponent<BBGun>())
                     continue;
-                // gun.GainAmmo(1);
-                // gun.ClipShotsRemaining = 1;
                 gun.CurrentAmmo = 1;
                 gun.ForceImmediateReload();
                 AkSoundEngine.PostEvent("Play_OBJ_item_pickup_01", p.gameObject);
