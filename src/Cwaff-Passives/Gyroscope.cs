@@ -40,7 +40,8 @@ namespace CwaffingTheGungy
             {
                 if (dodgeRoller.reflectingProjectiles)
                     PassiveReflectItem.ReflectBullet(component, true, Owner.specRigidbody.gameActor, 10f, 1f, 1f, 0f);
-                PhysicsEngine.SkipCollision = true;
+                if (!this.owner.healthHaver.IsVulnerable)
+                    PhysicsEngine.SkipCollision = true;
             }
         }
 
@@ -354,21 +355,18 @@ namespace CwaffingTheGungy
                     if (chargePercent >= STUMBLE_THRES)
                     {
                         string stumbleAnim = Lazy.GetBaseDodgeAnimationName(this.owner,this.owner.specRigidbody.Velocity);
-                        float stumbleAngle = this.owner.specRigidbody.Velocity.ToAngle();
-
                         this.stumbleClip = this.owner.spriteAnimator.GetClipByName(stumbleAnim);
                         this.owner.QueueSpecificAnimation(stumbleClip.name);
                         this.owner.spriteAnimator.SetFrame(0, false);
                         this.owner.spriteAnimator.ClipFps = 24.0f;
-                        // hacky nonsense to make the player vulnerable during a roll animation frame
                         this.wasFrameInvulnerable = new List<bool>();
-                        foreach (var frame in this.stumbleClip.frames)
+                        foreach (var frame in this.stumbleClip.frames) // hack to make player vulnerable during roll animation frames
                         {
                             this.wasFrameInvulnerable.Add(frame.invulnerableFrame);
                             frame.invulnerableFrame = false;
                         }
 
-                        this.owner.sprite.FlipX = (stumbleAngle > 90f || stumbleAngle < -90f);
+                        this.owner.sprite.FlipX = (Mathf.Abs(this.owner.specRigidbody.Velocity.ToAngle()) > 90f);
                         if (this.owner.sprite.FlipX)
                             this.owner.sprite.gameObject.transform.localPosition = new Vector3(this.owner.sprite.GetUntrimmedBounds().size.x, 0f, 0f);
                         else
