@@ -127,8 +127,6 @@ namespace CwaffingTheGungy
             float dashtime = DASH_TIME;
 
             Vector2 vel = dashspeed * this.owner.m_lastNonzeroCommandedDirection.normalized;
-            // string anim = (Mathf.Abs(vel.y) > Mathf.Abs(vel.x)) ? (vel.y > 0 ? "slide_up" : "slide_down") : "slide_right";
-            // bool hasAnim = player.spriteAnimator.GetClipByName(anim) != null;
 
             AkSoundEngine.PostEvent("teledash", this.owner.gameObject);
             this.owner.SetInputOverride("hld");
@@ -153,8 +151,6 @@ namespace CwaffingTheGungy
                 timer += BraveTime.DeltaTime;
                 this.owner.specRigidbody.Velocity = vel;
                 GameManager.Instance.Dungeon.dungeonDustups.InstantiateLandDustup(this.owner.sprite.WorldCenter);
-                // if (hasAnim && !this.owner.spriteAnimator.IsPlaying(anim))
-                //     this.owner.spriteAnimator.Play(anim);  //TODO: the sliding animation itself causes the player to be invincible??? (QueryGroundedFrame())
                 yield return null;
                 if (this.owner.IsFalling)
                 {

@@ -48,9 +48,7 @@ namespace CwaffingTheGungy
             if (this.owner == null)
                 return;
 
-            float gunAngle = this.owner.m_currentGunAngle;
-            while (gunAngle > 180)  gunAngle -= 360;
-            while (gunAngle < -180) gunAngle += 360;
+            float gunAngle = BraveMathCollege.ClampAngle180(this.owner.m_currentGunAngle);
             if (Math.Abs(gunAngle) < 45)
                 proj.baseData.damage *= 3;
             else if (Math.Abs(gunAngle) > 135)

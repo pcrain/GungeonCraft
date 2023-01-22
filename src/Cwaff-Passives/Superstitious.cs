@@ -100,10 +100,7 @@ namespace CwaffingTheGungy
         private bool HUDUpdater(HUDElement self)
         {
             if (this.owner != null)
-            {
-                // self.text.Text = numbers+"->"+sixes.ToString()+","+sevens.ToString();
                 self.text.Text = sixes.ToString()+","+sevens.ToString();
-            }
             return true;
         }
     }

@@ -62,11 +62,10 @@ namespace CwaffingTheGungy
             Vector2 pos = this.owner.specRigidbody.UnitCenter;
             for (int i = 0; i < roomGoops.Count; i++)
             {
-                if (roomGoops[i].IsPositionInGoop(pos))
-                {
-                    currentGoopManager = roomGoops[i];
-                    break;
-                }
+                if (!roomGoops[i].IsPositionInGoop(pos))
+                    continue;
+                currentGoopManager = roomGoops[i];
+                break;
             }
             if (currentGoopManager == null)
                 return;

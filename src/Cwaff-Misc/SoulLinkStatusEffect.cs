@@ -41,15 +41,6 @@ namespace CwaffingTheGungy
             };
             return soulLink;
         }
-
-        public static List<string> PlagueVFXPaths = new List<string>()
-        {
-            "CwaffingTheGungy/Resources/StatusEffectVFX/plaguevfxframe_001",
-            "CwaffingTheGungy/Resources/StatusEffectVFX/plaguevfxframe_002",
-            "CwaffingTheGungy/Resources/StatusEffectVFX/plaguevfxframe_003",
-            "CwaffingTheGungy/Resources/StatusEffectVFX/plaguevfxframe_004",
-            "CwaffingTheGungy/Resources/StatusEffectVFX/plaguevfxframe_005",
-        };
     }
     public class GameActorSoulLinkEffect : GameActorHealthEffect
     {
@@ -61,16 +52,11 @@ namespace CwaffingTheGungy
             this.AppliesTint              = true;
             this.AppliesDeathTint         = true;
         }
+
         public override void EffectTick(GameActor actor, RuntimeGameActorEffectData effectData)
         {
-            // if (EasyGoopDefinitions.PlagueGoop != null)
-            // {
-            //     DeadlyDeadlyGoopManager goop = DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.PlagueGoop);
-            //     goop.TimedAddGoopCircle(actor.specRigidbody.UnitCenter, 1.5f, 0.75f, true);
-            // }
             base.EffectTick(actor, effectData);
         }
-
     }
 }
 

@@ -89,7 +89,6 @@ namespace CwaffingTheGungy
             int num = 1;
             Vector3 minPosition = s.HitboxPixelCollider.UnitBottomLeft.ToVector3ZisY();
             Vector3 maxPosition = s.HitboxPixelCollider.UnitTopRight.ToVector3ZisY();
-            // ETGModConsole.Log(minPosition);
             float angleVariance = 15f;
             float baseMagnitude = 2.25f;
             float magnitudeVariance = 1f;

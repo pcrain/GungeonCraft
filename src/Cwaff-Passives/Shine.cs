@@ -42,32 +42,6 @@ namespace CwaffingTheGungy
                 ShineOff(this.owner);
         }
 
-        // NOTE: no longer necessary as we have custom roll logic now
-        // private void OnRollStarted(PlayerController player, Vector2 direction)
-        // {
-        //     if (this.isShining)
-        //         ShineOff(player);
-        //     else
-        //         ShineOn(player);
-        // }
-        // private void OnIsRolling(PlayerController player)
-        // {
-        //     if (!this.isShining)
-        //         return;
-
-        //     player.ClearDodgeRollState();
-        //     player.ForceStopDodgeRoll();
-        // }
-
-        // private static IEnumerator TemporarilyDisableInput(PlayerController player, float timeout)
-        // {
-        //     PlayerInputState oldInputState = player.CurrentInputState;
-        //     player.CurrentInputState = PlayerInputState.NoMovement;
-        //     yield return new WaitForSeconds(timeout);
-        //     player.CurrentInputState = oldInputState;
-        //     yield break;
-        // }
-
         bool m_usedOverrideMaterial;
         private void ShineOn(PlayerController player)
         {
@@ -77,8 +51,6 @@ namespace CwaffingTheGungy
             this.Update();
             // VFX.SpawnVFXPool("Shine",player.specRigidbody.sprite.WorldCenter, relativeTo: player.gameObject);
             // VFX.SpawnVFXPool("Shine", player.specRigidbody.sprite.WorldCenter);
-            // VFX.SpawnVFXPool("Rebar", player.sprite.WorldCenter, degAngle: 0, relativeTo: player.gameObject);
-            // VFX.SpawnVFXPool("Rebar", this.owner.sprite.WorldCenter, degAngle: 0, relativeTo: this.owner.gameObject);
 
             // theShine = Instantiate<GameObject>(VFX.animations["Shine"], player.sprite.WorldCenter, Quaternion.identity, player.specRigidbody.transform);
             m_usedOverrideMaterial = player.sprite.usesOverrideMaterial;
@@ -127,18 +99,14 @@ namespace CwaffingTheGungy
                 return;
 
             this.isShining = false;
-            if (theShine != null)
-            {
+            if (theShine)
                 UnityEngine.Object.Destroy(theShine);
-                // theShine = Instantiate<GameObject>(VFX.animations["Shine"], player.sprite.WorldCenter, Quaternion.identity, player.transform);
-            }
             player.healthHaver.IsVulnerable = true;
             player.ClearOverrideShader();
             player.sprite.usesOverrideMaterial = this.m_usedOverrideMaterial;
             SpeculativeRigidbody specRigidbody2 = player.specRigidbody;
             specRigidbody2.OnPreRigidbodyCollision = (SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate)Delegate.Remove(specRigidbody2.OnPreRigidbodyCollision, new SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate(this.OnPreCollision));
             RecomputePlayerSpeed(player);
-            // if (this) AkSoundEngine.PostEvent("Play_OBJ_metalskin_end_01", base.gameObject);
         }
 
         private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherCollider)
@@ -166,8 +134,6 @@ namespace CwaffingTheGungy
         {
             this.owner = player;
             player.PostProcessProjectile += PostProcessProjectile;
-            // player.OnRollStarted += this.OnRollStarted;
-            // player.OnIsRolling += this.OnIsRolling;
             base.Pickup(player);
         }
 
@@ -175,8 +141,6 @@ namespace CwaffingTheGungy
         {
             this.owner = null;
             player.PostProcessProjectile -= PostProcessProjectile;
-            // player.OnRollStarted -= this.OnRollStarted;
-            // player.OnIsRolling -= this.OnIsRolling;
             isShining = false;
             return base.Drop(player);
         }
@@ -184,9 +148,7 @@ namespace CwaffingTheGungy
         public override void OnDestroy()
         {
             if (Owner)
-            {
                 Owner.PostProcessProjectile -= PostProcessProjectile;
-            }
             isShining = false;
             base.OnDestroy();
         }

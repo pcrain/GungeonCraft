@@ -33,20 +33,18 @@ namespace CwaffingTheGungy
 
             ratPoisonId        = IDs.Passives["rat_poison"];
             ratPoisonSpawnHook = new Hook(
-                    typeof(LootEngine).GetMethod("PostprocessItemSpawn", BindingFlags.Static | BindingFlags.NonPublic),
-                    typeof(RatPoison).GetMethod("OnItemSpawn", BindingFlags.Static | BindingFlags.Public)
+                typeof(LootEngine).GetMethod("PostprocessItemSpawn", BindingFlags.Static | BindingFlags.NonPublic),
+                typeof(RatPoison).GetMethod("OnItemSpawn", BindingFlags.Static | BindingFlags.Public)
                 );
         }
 
         public static void OnItemSpawn(Action<DebrisObject> orig, DebrisObject spawnedItem)
         {
             orig(spawnedItem);
-            if (GameManager.Instance.AnyPlayerHasPickupID(ratPoisonId))
-            {
-                spawnedItem.GetComponent<PickupObject>().IgnoredByRat = true;
-                spawnedItem.GetComponent<PickupObject>().ClearIgnoredByRatFlagOnPickup = false;
-                // ETGModConsole.Log("rat no ratting");
-            }
+            if (!GameManager.Instance.AnyPlayerHasPickupID(ratPoisonId))
+                return;
+            spawnedItem.GetComponent<PickupObject>().IgnoredByRat = true;
+            spawnedItem.GetComponent<PickupObject>().ClearIgnoredByRatFlagOnPickup = false;
         }
     }
 }
