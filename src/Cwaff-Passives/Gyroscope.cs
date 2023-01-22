@@ -32,10 +32,11 @@ namespace CwaffingTheGungy
 
         private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherCollider)
         {
-            if(!dodgeRoller.isDodging)  // reflect projectiles with hyped synergy
+            if(!dodgeRoller.isDodging)
                 return;
             Projectile component = otherRigidbody.GetComponent<Projectile>();
-            if (component?.Owner is PlayerController)
+
+            if (component == null || component.Owner is PlayerController)
                 return;
             if (dodgeRoller.reflectingProjectiles)
                 PassiveReflectItem.ReflectBullet(component, true, Owner.specRigidbody.gameActor, 10f, 1f, 1f, 0f);
