@@ -12,8 +12,6 @@ using System.Collections;
 using ItemAPI;
 using Alexandria.Misc; // GetFullListOfStatusEffects
 
-
-
 namespace CwaffingTheGungy
 {
     public class FakeProjectileComponent : MonoBehaviour

@@ -1,20 +1,16 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Reflection;
+
 using UnityEngine;
+
 using Gungeon;
 using Dungeonator;
-using SaveAPI;
-using System.Collections;
-using NpcApi;
-
-using GungeonAPI;
-using HutongGames.PlayMaker;
-using HutongGames.PlayMaker.Actions;
 using ItemAPI;
-using System.Reflection;
-using static NpcApi.CustomShopController;
+// using SaveAPI;
 
 namespace CwaffingTheGungy
 {

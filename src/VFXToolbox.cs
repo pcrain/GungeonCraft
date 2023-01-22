@@ -6,7 +6,6 @@ using System.Text;
 using System.Reflection;
 
 using UnityEngine;
-using Gungeon;
 using ItemAPI;
 
 namespace CwaffingTheGungy

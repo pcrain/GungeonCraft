@@ -6,18 +6,14 @@ using System.Text;
 using System.Reflection;
 using System.ComponentModel;  //debug
 using System.IO;
-using System.Runtime.InteropServices;
+using System.Runtime.InteropServices; // audio loading
 
 using UnityEngine;
 using MonoMod.RuntimeDetour;
 
 using Gungeon;
-using ItemAPI;
-
 using Dungeonator;
-
-// using Alexandria.ItemAPI;
-using Alexandria.Misc;
+using ItemAPI;
 
 namespace CwaffingTheGungy
 {

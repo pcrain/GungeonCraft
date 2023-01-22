@@ -8,8 +8,6 @@ using System.Reflection;
 using UnityEngine;
 using MonoMod.RuntimeDetour;
 
-using Gungeon;
-
 namespace CwaffingTheGungy
 {
     public interface ICustomDodgeRoll

@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections;
-using ItemAPI;
-using UnityEngine;
-using MonoMod.RuntimeDetour;
 using System.Reflection;
 
-using ETGGUI;
+using UnityEngine;
+using MonoMod.RuntimeDetour;
+
+using ItemAPI; // ResourceExtractor()
+
+// using ETGGUI;
 using SGUI;
 
 namespace CwaffingTheGungy

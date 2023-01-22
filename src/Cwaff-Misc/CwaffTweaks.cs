@@ -3,10 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Reflection;  //debug
+using System.ComponentModel;  //debug
+
 using UnityEngine;
 
-using System.ComponentModel;  //debug
-using System.Reflection;  //debug
 
 namespace CwaffingTheGungy
 {
