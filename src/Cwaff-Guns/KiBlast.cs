@@ -6,11 +6,9 @@ using System.Text;
 using System.Reflection;
 
 using UnityEngine;
-using MonoMod;
-using MonoMod.RuntimeDetour;
+
 using Gungeon;
-using Alexandria.Misc;
-using Alexandria.ItemAPI;
+using ItemAPI;
 
 namespace CwaffingTheGungy
 {
@@ -112,13 +110,12 @@ namespace CwaffingTheGungy
         protected override void Update()
         {
             base.Update();
-            if (!(this.gun && this.gun.GunPlayerOwner()))
+            if (!this.Player)
                 return;
-            PlayerController p = this.gun.GunPlayerOwner();
             this.currentTarget = Raycast.ToNearestWallOrEnemyOrObject(
-                p.sprite.WorldCenter,p.CurrentGun.CurrentAngle);
+                this.Player.sprite.WorldCenter,this.Player.CurrentGun.CurrentAngle);
             vfx.SpawnAtPosition(this.currentTarget.ToVector3ZisY(-1f),
-                p.CurrentGun.CurrentAngle,null, null, null, -0.05f);
+                this.Player.CurrentGun.CurrentAngle,null, null, null, -0.05f);
         }
 
         public override void PostProcessProjectile(Projectile projectile)

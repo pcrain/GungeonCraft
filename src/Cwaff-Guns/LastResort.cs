@@ -6,11 +6,10 @@ using System.Text;
 using System.Reflection;
 
 using UnityEngine;
-using MonoMod;
-using MonoMod.RuntimeDetour;
+
 using Gungeon;
-using Alexandria.Misc;
 using Alexandria.ItemAPI;
+using Alexandria.Misc;
 
 namespace CwaffingTheGungy
 {
@@ -25,7 +24,6 @@ namespace CwaffingTheGungy
         public static List<string> lastResortLevelSprites;
         public static List<Projectile> lastResortProjectiles;
         public static Projectile lastResortBaseProjectile;
-        public PlayerController owner;
 
         public static void Add()
         {
@@ -84,9 +82,8 @@ namespace CwaffingTheGungy
         protected override void Update()
         {
             base.Update();
-            if (!(this.gun && this.gun.GunPlayerOwner()))
+            if (!this.Player)
                 return;
-            this.owner = this.gun.GunPlayerOwner();
             // TODO: hack to detect reset gun stat changes, find a better way later
             if (this.gun.DefaultModule.projectiles[0].baseData.damage == 0f)
                 ComputeLastResortStats();
@@ -101,8 +98,8 @@ namespace CwaffingTheGungy
             // overrideMidairDeathVFX will make implicit use of CreatePoolFromVFXGameObject
             VFXPool v = VFX.CreatePoolFromVFXGameObject((PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
 
-            Vector2 ppos = this.owner.sprite.WorldCenter;
-            float pangle = this.owner.CurrentGun.gunAngle;
+            Vector2 ppos = this.Player.sprite.WorldCenter;
+            float pangle = this.Player.CurrentGun.gunAngle;
             int numInCircle = 7;
             for (int i = 0; i < numInCircle; ++i)
             {
@@ -114,21 +111,15 @@ namespace CwaffingTheGungy
         protected override void OnPickedUpByPlayer(PlayerController player)
         {
             base.OnPickedUpByPlayer(player);
-            this.owner = player;
             ComputeLastResortStats();
-        }
-
-        protected override void OnPickup(GameActor owner)
-        {
-            base.OnPickup(owner);
         }
 
         private void ComputeLastResortStats()
         {
-            if (!(this.gun && this.gun.GunPlayerOwner()))
+            if (!this.Player)
                 return;
             int ammoless = 0;
-            foreach (Gun gun in this.owner.inventory.AllGuns)
+            foreach (Gun gun in this.Player.inventory.AllGuns)
             {
                 if (!(gun == this.gun || gun.InfiniteAmmo || gun.ammo > 0))
                     ++ammoless;
@@ -142,9 +133,9 @@ namespace CwaffingTheGungy
             if (ammoless > 0)
             {
                 AkSoundEngine.PostEvent("Play_OBJ_silenceblank_small_01", this.gameObject);
-                this.owner.ShowOverheadVFX(lastResortLevelSprites[ammoless-1], 1);
+                this.Player.ShowOverheadVFX(lastResortLevelSprites[ammoless-1], 1);
             }
-            this.owner.ShowOverheadAnimatedVFX("PumpChargeAnimated", 2);
+            this.Player.ShowOverheadAnimatedVFX("PumpChargeAnimated", 2);
         }
     }
 }

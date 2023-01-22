@@ -21,8 +21,6 @@ namespace CwaffingTheGungy
         public static string shortDescription = "Super Gooper";
         public static string longDescription  = "Immunity to all negative goops; projectiles fired while standing in goops spread during flight";
 
-        private PlayerController owner;
-
         // private enum GoopStatus
         // {
         //     None,       //No Goop
@@ -44,22 +42,21 @@ namespace CwaffingTheGungy
 
         public override void Pickup(PlayerController player)
         {
-            this.owner = player;
-            player.PostProcessProjectile += this.PostProcessProjectile;
             base.Pickup(player);
+            player.PostProcessProjectile += this.PostProcessProjectile;
         }
 
         private void PostProcessProjectile(Projectile proj, float effectChanceScalar)
         {
-            if (this.owner == null)
+            if (this.Owner == null)
                 return;
 
-            List<DeadlyDeadlyGoopManager> roomGoops = this.owner.GetAbsoluteParentRoom().RoomGoops;
+            List<DeadlyDeadlyGoopManager> roomGoops = this.Owner.GetAbsoluteParentRoom().RoomGoops;
             if (roomGoops == null)
                 return;
 
             DeadlyDeadlyGoopManager currentGoopManager = null;
-            Vector2 pos = this.owner.specRigidbody.UnitCenter;
+            Vector2 pos = this.Owner.specRigidbody.UnitCenter;
             for (int i = 0; i < roomGoops.Count; i++)
             {
                 if (!roomGoops[i].IsPositionInGoop(pos))
@@ -81,7 +78,6 @@ namespace CwaffingTheGungy
 
         public override DebrisObject Drop(PlayerController player)
         {
-            this.owner = null;
             player.PostProcessProjectile -= this.PostProcessProjectile;
             return base.Drop(player);
         }
@@ -90,14 +86,14 @@ namespace CwaffingTheGungy
         {
             base.Update();
 
-            if (!this.owner)
+            if (!this.Owner)
                 return;
 
             // lazy pseudo-immunity to most goop effects
-            this.owner.CurrentFireMeterValue   = Mathf.Min(0.01f,this.owner.CurrentFireMeterValue);
-            this.owner.CurrentPoisonMeterValue = Mathf.Min(0.01f,this.owner.CurrentPoisonMeterValue);
-            this.owner.CurrentDrainMeterValue  = Mathf.Min(0.01f,this.owner.CurrentDrainMeterValue);
-            this.owner.CurrentCurseMeterValue  = Mathf.Min(0.01f,this.owner.CurrentCurseMeterValue);
+            this.Owner.CurrentFireMeterValue   = Mathf.Min(0.01f,this.Owner.CurrentFireMeterValue);
+            this.Owner.CurrentPoisonMeterValue = Mathf.Min(0.01f,this.Owner.CurrentPoisonMeterValue);
+            this.Owner.CurrentDrainMeterValue  = Mathf.Min(0.01f,this.Owner.CurrentDrainMeterValue);
+            this.Owner.CurrentCurseMeterValue  = Mathf.Min(0.01f,this.Owner.CurrentCurseMeterValue);
         }
     }
 }

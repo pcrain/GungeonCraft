@@ -6,11 +6,10 @@ using System.Text;
 using System.Reflection;
 
 using UnityEngine;
-using MonoMod;
-using MonoMod.RuntimeDetour;
+
 using Gungeon;
-using Alexandria.Misc;
-using Alexandria.ItemAPI;
+using ItemAPI;
+// using Alexandria.Misc;
 
 namespace CwaffingTheGungy
 {
@@ -86,9 +85,8 @@ namespace CwaffingTheGungy
         protected override void Update()
         {
             base.Update();
-            if (!(this.gun && this.gun.GunPlayerOwner()))
+            if (!this.Player)
                 return;
-            this.owner = this.gun.GunPlayerOwner();
 
             if (++this.curSpin != spinSpeed)
                 return;
@@ -99,9 +97,9 @@ namespace CwaffingTheGungy
                 UnityEngine.Object.Destroy(theCounter);
             theCounter = Instantiate<GameObject>(
                             VFX.animations[curCharge.ToString()],
-                            this.owner.specRigidbody.sprite.WorldTopCenter + new Vector2(0f,0.5f),
+                            this.Player.specRigidbody.sprite.WorldTopCenter + new Vector2(0f,0.5f),
                             Quaternion.identity,
-                            this.owner.specRigidbody.transform);
+                            this.Player.specRigidbody.transform);
             theCounter.transform.localScale = new Vector3(0.2f,0.2f,0.2f);
         }
     }

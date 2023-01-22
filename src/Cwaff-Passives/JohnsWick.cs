@@ -23,7 +23,6 @@ namespace CwaffingTheGungy
         public static string shortDescription = "No Dogs Harmed";
         public static string longDescription  = "(Move faster and do triple damage while on fire; take damage from fire more slowly.)";
 
-        private PlayerController owner;
         private float lastFireMeterValue = 0f;
         private const float MAX_FIRE_INCREASE = 0.166f; // base game increases by 0.66f
 
@@ -39,8 +38,8 @@ namespace CwaffingTheGungy
 
         public override void Pickup(PlayerController player)
         {
-            if (flameOff == null)
-                flameOff = (new StatModifier[] {}).ToArray();
+            base.Pickup(player);
+            flameOff ??= (new StatModifier[] {}).ToArray();
             if (flameOn == null)
             {
                 StatModifier s1 = new StatModifier {
@@ -55,22 +54,19 @@ namespace CwaffingTheGungy
             }
             this.flaming = false;
             this.passiveStatModifiers = flameOff;
-            this.owner = player;
-            this.owner.PostProcessProjectile += this.PostProcessProjectile;
-            lastFireMeterValue = this.owner.CurrentFireMeterValue;
-            base.Pickup(player);
+            player.PostProcessProjectile += this.PostProcessProjectile;
+            lastFireMeterValue = player.CurrentFireMeterValue;
         }
 
         public override DebrisObject Drop(PlayerController player)
         {
-            this.owner = null;
-            this.owner.PostProcessProjectile -= this.PostProcessProjectile;
+            player.PostProcessProjectile -= this.PostProcessProjectile;
             return base.Drop(player);
         }
 
         private void PostProcessProjectile(Projectile proj, float effectChanceScalar)
         {
-            if (this.owner == null || (!this.flaming))
+            if (!(this.Owner && this.flaming))
                 return;
             proj.StartCoroutine(GetWickedCR(proj.specRigidbody));
         }
@@ -104,20 +100,20 @@ namespace CwaffingTheGungy
         {
             base.Update();
 
-            if (!this.owner)
+            if (!this.Owner)
                 return;
 
             float maxCurrentFireMeterValue = lastFireMeterValue + (MAX_FIRE_INCREASE * BraveTime.DeltaTime);
-            this.owner.CurrentFireMeterValue = Mathf.Min(this.owner.CurrentFireMeterValue,maxCurrentFireMeterValue);
-            lastFireMeterValue = this.owner.CurrentFireMeterValue;
+            this.Owner.CurrentFireMeterValue = Mathf.Min(this.Owner.CurrentFireMeterValue,maxCurrentFireMeterValue);
+            lastFireMeterValue = this.Owner.CurrentFireMeterValue;
 
-            if (!this.owner.IsOnFire)
+            if (!this.Owner.IsOnFire)
             {
                 if (this.flaming)
                 {
                     this.flaming = false;
                     this.passiveStatModifiers = flameOff;
-                    this.owner.stats.RecalculateStats(this.owner, false, false);
+                    this.Owner.stats.RecalculateStats(this.Owner, false, false);
                 }
                 return;
             }
@@ -125,9 +121,9 @@ namespace CwaffingTheGungy
             {
                 this.flaming = true;
                 this.passiveStatModifiers = flameOn;
-                this.owner.stats.RecalculateStats(this.owner, false, false);
+                this.Owner.stats.RecalculateStats(this.Owner, false, false);
             }
-            GetWicked(this.owner.specRigidbody);
+            GetWicked(this.Owner.specRigidbody);
         }
     }
 }

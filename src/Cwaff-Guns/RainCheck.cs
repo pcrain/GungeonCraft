@@ -6,11 +6,9 @@ using System.Text;
 using System.Reflection;
 
 using UnityEngine;
-using MonoMod;
-using MonoMod.RuntimeDetour;
+
 using Gungeon;
-using Alexandria.Misc;
-using Alexandria.ItemAPI;
+using ItemAPI;
 
 namespace CwaffingTheGungy
 {
@@ -44,21 +42,6 @@ namespace CwaffingTheGungy
             projectile.transform.parent = gun.barrelOffset;
 
             projectile.gameObject.AddComponent<RainCheckBullets>();
-        }
-
-        public override void OnPostFired(PlayerController player, Gun gun)
-        {
-            base.OnPostFired(player, gun);
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-        }
-
-        public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
-        {
-            base.OnReloadPressed(player, gun, manualReload);
         }
 
         public override void OnReload(PlayerController player, Gun gun)
@@ -120,7 +103,7 @@ namespace CwaffingTheGungy
         private void Start()
         {
             this.self                  = base.GetComponent<Projectile>();
-            this.owner                 = self.ProjectilePlayerOwner();
+            this.owner                 = self.Owner as PlayerController;
             this.initialSpeed          = self.baseData.speed;
             this.moveTimer             = RAINCHECK_MAX_TIMEOUT;
             this.launchSequenceStarted = false;
@@ -162,7 +145,7 @@ namespace CwaffingTheGungy
             self.baseData.speed        = this.initialSpeed;
             if (this.owner)
             {
-                Vector2 dirToPlayer = self.sprite.WorldCenter.CalculateVectorBetween(this.owner.sprite.WorldCenter);
+                Vector2 dirToPlayer = this.owner.sprite.WorldCenter - self.sprite.WorldCenter;
                 self.SendInDirection(dirToPlayer, true);
             }
             self.UpdateSpeed();

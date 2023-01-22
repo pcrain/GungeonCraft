@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections;
-using Gungeon;
-using MonoMod;
+
 using UnityEngine;
+
+using Gungeon;
 using Alexandria.ItemAPI;
-using Alexandria.Misc;
 
 /*
     Need to prevent:
@@ -83,13 +83,11 @@ namespace CwaffingTheGungy
         protected override void Update()
         {
             base.Update();
-            if (!(gun.CurrentOwner && gun.CurrentOwner is PlayerController))
+            if (!this.Player)
                 return;
-
-            PlayerController p       = gun.CurrentOwner as PlayerController;
             bool forceOn             = this.committed && (this.gun.CurrentAmmo > 0);
-            p.m_preventItemSwitching = forceOn;
-            p.forceFireDown          = forceOn;
+            this.Player.m_preventItemSwitching = forceOn;
+            this.Player.forceFireDown          = forceOn;
 
             // p.forceFire = true;
             // p.m_handleDodgeRollStartThisFrame = false;
@@ -103,17 +101,6 @@ namespace CwaffingTheGungy
             // }
         }
 
-        public override bool CollectedAmmoPickup(PlayerController player, Gun self, AmmoPickup pickup)
-        {
-            ETGModConsole.Log("Collected Ammo");
-            return base.CollectedAmmoPickup(player, self, pickup);
-        }
-
-        protected override void OnPickedUpByPlayer(PlayerController player)
-        {
-            base.OnPickedUpByPlayer(player);
-            ETGModConsole.Log("Picked up gun");
-        }
         protected override void OnPostDroppedByPlayer(PlayerController player)
         {
             if (this.committed)
@@ -125,20 +112,12 @@ namespace CwaffingTheGungy
             ETGModConsole.Log("Dropped gun");
         }
 
-        public override void OnSwitchedToThisGun()
-        {
-            // this.gun.ClipShotsRemaining = this.gun.CurrentAmmo; //makes gun stuck in unreloaded state
-            base.OnSwitchedToThisGun();
-            ETGModConsole.Log("Switched to gun");
-        }
-
         public override void OnSwitchedAwayFromThisGun()
         {
-            if (this.committed && this.gun.CurrentOwner && this.gun.CurrentOwner is PlayerController)
+            if (this.committed && this.Player)
             {
-                PlayerController p = this.gun.CurrentOwner as PlayerController;
-                while (p.inventory.CurrentGun.PickupObjectId != this.gun.PickupObjectId)
-                    p.inventory.ChangeGun(1, false, false);
+                while (this.Player.inventory.CurrentGun.PickupObjectId != this.gun.PickupObjectId)
+                    this.Player.inventory.ChangeGun(1, false, false);
                 ETGModConsole.Log("Forcing gun back to Commitment");
             }
             base.OnSwitchedAwayFromThisGun();

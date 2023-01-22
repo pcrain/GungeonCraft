@@ -6,10 +6,8 @@ using System.Text;
 using System.Reflection;
 
 using UnityEngine;
-using MonoMod;
-using MonoMod.RuntimeDetour;
+
 using Gungeon;
-using Alexandria.Misc;
 using Alexandria.ItemAPI;
 
 namespace CwaffingTheGungy
@@ -53,13 +51,10 @@ namespace CwaffingTheGungy
         public override void OnPostFired(PlayerController player, Gun gun)
         {
             base.OnPostFired(player, gun);
-            if (gun && gun.GunPlayerOwner())
+            if (this.speedmult > 0.15f)
             {
-                if (this.speedmult > 0.15f)
-                {
-                    this.speedmult *= 0.85f;
-                    this.RecalculateGunStats();
-                }
+                this.speedmult *= 0.85f;
+                this.RecalculateGunStats();
             }
         }
 
@@ -88,11 +83,11 @@ namespace CwaffingTheGungy
 
         private void RecalculateGunStats()
         {
-            if (!(this.gun && this.gun.GunPlayerOwner()))
+            if (!this.Player)
                 return;
             this.gun.RemoveStatFromGun(PlayerStats.StatType.MovementSpeed);
             this.gun.AddStatToGun(PlayerStats.StatType.MovementSpeed, (float)Math.Sqrt(this.speedmult), StatModifier.ModifyMethod.MULTIPLICATIVE);
-            this.gun.GunPlayerOwner().stats.RecalculateStats(gun.GunPlayerOwner()); // TODO: this resets the gun's cooldown time??? need it first for now
+            this.Player.stats.RecalculateStats(this.Player); // TODO: this resets the gun's cooldown time??? need it first for now
             this.gun.DefaultModule.cooldownTime = this.speedmult * baseCooldownTime;
         }
     }

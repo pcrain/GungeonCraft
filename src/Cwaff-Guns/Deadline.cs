@@ -6,11 +6,9 @@ using System.Text;
 using System.Reflection;
 
 using UnityEngine;
-using MonoMod;
-using MonoMod.RuntimeDetour;
+
 using Gungeon;
-using Alexandria.Misc;
-using Alexandria.ItemAPI;
+using ItemAPI;
 
 namespace CwaffingTheGungy
 {
@@ -92,16 +90,15 @@ namespace CwaffingTheGungy
         {
             base.Update();
 
-            if (!(this.gun && this.gun.GunPlayerOwner()))
+            if (!this.Player)
                 return;
-            PlayerController p = this.gun.GunPlayerOwner();
 
             if (myLaser != null)
                 UnityEngine.Object.Destroy(myLaser);
 
-            Vector2 target = Raycast.ToNearestWallOrObject(p.sprite.WorldCenter, this.gun.CurrentAngle, minDistance: 1);
-            float length = C.PIXELS_PER_TILE*Vector2.Distance(p.sprite.WorldCenter,target);
-            myLaser = VFX.RenderLaserSight(p.sprite.WorldCenter,length,2,this.gun.CurrentAngle);
+            Vector2 target = Raycast.ToNearestWallOrObject(this.Player.sprite.WorldCenter, this.gun.CurrentAngle, minDistance: 1);
+            float length = C.PIXELS_PER_TILE*Vector2.Distance(this.Player.sprite.WorldCenter,target);
+            myLaser = VFX.RenderLaserSight(this.Player.sprite.WorldCenter,length,2,this.gun.CurrentAngle);
             myLaser.transform.parent = this.gun.transform;
 
             myTimer += BraveTime.DeltaTime;
@@ -117,8 +114,8 @@ namespace CwaffingTheGungy
             // raycast backwards to snap to wall
             Vector2 invtarget = Raycast.ToNearestWallOrObject(position, angle + (angle < 180 ? 180 : -180), minDistance: 0);
             this.myLasers.Add(new DeadlineLaser(invtarget,target,angle));
-            if ((this.gun && this.gun.GunPlayerOwner()))
-                AkSoundEngine.PostEvent("Play_WPN_moonscraperLaser_shot_01", this.gun.GunPlayerOwner().gameObject);
+            if (this.Player)
+                AkSoundEngine.PostEvent("Play_WPN_moonscraperLaser_shot_01", this.Player.gameObject);
             this.CheckForLaserIntersections();
         }
 
@@ -126,7 +123,6 @@ namespace CwaffingTheGungy
         {
             if (myLasers.Count < 2)
                 return;
-
 
             float closest = 9999f;
             int closestIndex = -1;

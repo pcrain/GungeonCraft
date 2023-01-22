@@ -19,7 +19,6 @@ namespace CwaffingTheGungy
         public static string shortDescription = "Hyper Light Dasher";
         public static string longDescription  = "(Pyoooom)";
 
-        private PlayerController owner = null;
         private HLDRoll dodgeRoller = null;
 
         internal static GameObject LinkVFXPrefab;
@@ -45,11 +44,11 @@ namespace CwaffingTheGungy
         {
             base.Update();
 
-            if (!this.owner)
+            if (!this.Owner)
                 return;
 
             dodgeRoller.isHyped =
-                this.owner.PlayerHasActiveSynergy("Hype Yourself Up");
+                this.Owner.PlayerHasActiveSynergy("Hype Yourself Up");
         }
 
         private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherCollider)
@@ -66,19 +65,15 @@ namespace CwaffingTheGungy
 
         public override void Pickup(PlayerController player)
         {
-            this.owner = player;
-            dodgeRoller = this.gameObject.GetComponent<HLDRoll>();
-            dodgeRoller.owner = this.owner;
-            SpeculativeRigidbody specRigidbody = player.specRigidbody;
-            specRigidbody.OnPreRigidbodyCollision = (SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate)Delegate.Combine(specRigidbody.OnPreRigidbodyCollision, new SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate(this.OnPreCollision));
             base.Pickup(player);
+            dodgeRoller = this.gameObject.GetComponent<HLDRoll>();
+                dodgeRoller.owner = player;
+            player.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
         }
 
         public override DebrisObject Drop(PlayerController player)
         {
-            SpeculativeRigidbody specRigidbody2 = player.specRigidbody;
-            specRigidbody2.OnPreRigidbodyCollision = (SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate)Delegate.Remove(specRigidbody2.OnPreRigidbodyCollision, new SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate(this.OnPreCollision));
-            this.owner = null;
+            player.specRigidbody.OnPreRigidbodyCollision -= this.OnPreCollision;
             dodgeRoller.AbortDodgeRoll();
             return base.Drop(player);
         }

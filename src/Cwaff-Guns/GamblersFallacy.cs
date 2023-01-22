@@ -6,11 +6,9 @@ using System.Text;
 using System.Reflection;
 
 using UnityEngine;
-using MonoMod;
-using MonoMod.RuntimeDetour;
+
 using Gungeon;
-using Alexandria.Misc;
-using Alexandria.ItemAPI;
+using ItemAPI;
 
 namespace CwaffingTheGungy
 {
@@ -51,41 +49,40 @@ namespace CwaffingTheGungy
         public override void OnPostFired(PlayerController player, Gun gun)
         {
             base.OnPostFired(player, gun);
-            if (gun && gun.GunPlayerOwner())
+            if (!(gun && player))
+                return;
+            int percent = UnityEngine.Random.Range(0, 100);
+            if (percent < 1)
             {
-                int percent = UnityEngine.Random.Range(0, 100);
-                if (percent < 1)
-                {
-                    ETGModConsole.Log("1 in 100 O:");
-                    player.inventory.DestroyCurrentGun();
-                }
-                else if (percent < 3)
-                {
-                    ETGModConsole.Log("1 in 33 O:");
-                    // deal damage
-                    vfx ??= VFX.CreatePoolFromVFXGameObject(
-                        (PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
+                ETGModConsole.Log("1 in 100 O:");
+                player.inventory.DestroyCurrentGun();
+            }
+            else if (percent < 3)
+            {
+                ETGModConsole.Log("1 in 33 O:");
+                // deal damage
+                vfx ??= VFX.CreatePoolFromVFXGameObject(
+                    (PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
 
-                    Vector2 position = player.sprite.WorldCenter;
-                    for (int i = 0; i < 4; ++i)
-                    {
-                        Vector2 finalpos = position + BraveMathCollege.DegreesToVector(90*i,1);
-                        vfx.SpawnAtPosition(
-                            finalpos.ToVector3ZisY(-1f), /* -1 = above player sprite */
-                            90*i, null, null, null, -0.05f);
-                    }
-
-                     player.healthHaver.ApplyDamage(0.5f, Vector2.zero, "Gambling Addiction :/", CoreDamageTypes.None, DamageCategory.Normal, true, null, false);
-                }
-                else if (percent < 10)
+                Vector2 position = player.sprite.WorldCenter;
+                for (int i = 0; i < 4; ++i)
                 {
-                    ETGModConsole.Log("1 in 10 O:");
-                    var enemyToSpawn = EnemyDatabase.GetOrLoadByGuid(EnemyGuidDatabase.Entries["gunreaper"]);
-                    Vector2 position = player.sprite.WorldCenter;
-                    AIActor TargetActor = AIActor.Spawn(
-                        enemyToSpawn, position, GameManager.Instance.Dungeon.data.GetAbsoluteRoomFromPosition(
-                            position.ToIntVector2()), true, AIActor.AwakenAnimationType.Default, true);
+                    Vector2 finalpos = position + BraveMathCollege.DegreesToVector(90*i,1);
+                    vfx.SpawnAtPosition(
+                        finalpos.ToVector3ZisY(-1f), /* -1 = above player sprite */
+                        90*i, null, null, null, -0.05f);
                 }
+
+                 player.healthHaver.ApplyDamage(0.5f, Vector2.zero, "Gambling Addiction :/", CoreDamageTypes.None, DamageCategory.Normal, true, null, false);
+            }
+            else if (percent < 10)
+            {
+                ETGModConsole.Log("1 in 10 O:");
+                var enemyToSpawn = EnemyDatabase.GetOrLoadByGuid(EnemyGuidDatabase.Entries["gunreaper"]);
+                Vector2 position = player.sprite.WorldCenter;
+                AIActor TargetActor = AIActor.Spawn(
+                    enemyToSpawn, position, GameManager.Instance.Dungeon.data.GetAbsoluteRoomFromPosition(
+                        position.ToIntVector2()), true, AIActor.AwakenAnimationType.Default, true);
             }
         }
 

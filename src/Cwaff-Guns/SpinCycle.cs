@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections;
-using Gungeon;
-using MonoMod;
+
 using UnityEngine;
+
+using Gungeon;
 using Alexandria.ItemAPI;
-using Alexandria.Misc;
 
 /*
     - figure out projectile interpolation so it doesn't whiff when moving too fast
@@ -172,11 +172,10 @@ namespace CwaffingTheGungy
         public override void OnSwitchedAwayFromThisGun()
         {
             DestroyBallAndChain();
-            if (!(this.gun.CurrentOwner && this.gun.CurrentOwner is PlayerController))
+            if (!this.Player)
                 return;
-            PlayerController p = this.gun.CurrentOwner as PlayerController;
-            p.m_overrideGunAngle = null;
-            RecomputePlayerSpeed(p,1.0f);
+            this.Player.m_overrideGunAngle = null;
+            RecomputePlayerSpeed(this.Player,1.0f);
             base.OnSwitchedAwayFromThisGun();
         }
 

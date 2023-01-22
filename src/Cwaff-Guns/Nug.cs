@@ -6,11 +6,9 @@ using System.Text;
 using System.Reflection;
 
 using UnityEngine;
-using MonoMod;
-using MonoMod.RuntimeDetour;
+
 using Gungeon;
-using Alexandria.Misc;
-using Alexandria.ItemAPI;
+using ItemAPI;
 
 namespace CwaffingTheGungy
 {
@@ -93,14 +91,7 @@ namespace CwaffingTheGungy
 
         public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
         {
-            if (gun != this.gun)
-            {
-                base.OnReloadPressed(player, gun, manualReload);
-                return;
-            }
-            if (!manualReload)
-                return;
-            if (gun.ClipShotsRemaining < gun.DefaultModule.numberOfShotsInClip)
+            if (!manualReload || (gun.ClipShotsRemaining < gun.DefaultModule.numberOfShotsInClip))
                 return;
             gun.ClipShotsRemaining = 1;
             gun.CurrentAmmo = 1;

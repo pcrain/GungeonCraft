@@ -6,7 +6,6 @@ using System.Collections;
 using System.Reflection;
 
 using UnityEngine;
-using MonoMod.RuntimeDetour;
 
 using Gungeon;
 using ItemAPI;
@@ -36,30 +35,25 @@ namespace CwaffingTheGungy
             if(!dodgeRoller.isDodging)  // reflect projectiles with hyped synergy
                 return;
             Projectile component = otherRigidbody.GetComponent<Projectile>();
-            if (component != null && !(component.Owner is PlayerController))
-            {
-                if (dodgeRoller.reflectingProjectiles)
-                    PassiveReflectItem.ReflectBullet(component, true, Owner.specRigidbody.gameActor, 10f, 1f, 1f, 0f);
-                if (!this.owner.healthHaver.IsVulnerable)
-                    PhysicsEngine.SkipCollision = true;
-            }
+            if (component?.Owner is PlayerController)
+                return;
+            if (dodgeRoller.reflectingProjectiles)
+                PassiveReflectItem.ReflectBullet(component, true, Owner.specRigidbody.gameActor, 10f, 1f, 1f, 0f);
+            if (!this.Owner.healthHaver.IsVulnerable)
+                PhysicsEngine.SkipCollision = true;
         }
 
         public override void Pickup(PlayerController player)
         {
-            this.owner = player;
-            dodgeRoller = this.gameObject.GetComponent<GyroscopeRoll>();
-            dodgeRoller.owner = this.owner;
-            SpeculativeRigidbody specRigidbody = player.specRigidbody;
-            specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
             base.Pickup(player);
+            dodgeRoller = this.gameObject.GetComponent<GyroscopeRoll>();
+                dodgeRoller.owner = player;
+            player.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
         }
 
         public override DebrisObject Drop(PlayerController player)
         {
-            SpeculativeRigidbody specRigidbody2 = player.specRigidbody;
-            specRigidbody.OnPreRigidbodyCollision -= this.OnPreCollision;
-            this.owner = null;
+            player.specRigidbody.OnPreRigidbodyCollision -= this.OnPreCollision;
             dodgeRoller.AbortDodgeRoll();
             return base.Drop(player);
         }

@@ -21,7 +21,6 @@ namespace CwaffingTheGungy
 
         private bool dodgeButtonHeld = false;
         private bool isShining = false;
-        private PlayerController owner = null;
         private GameObject theShine = null;
 
         public static void Init()
@@ -38,8 +37,8 @@ namespace CwaffingTheGungy
         }
         private void PostProcessProjectile(Projectile bullet, float thing)
         {
-            if (this.isShining && this.owner)
-                ShineOff(this.owner);
+            if (this.isShining && this.Owner)
+                ShineOff(this.Owner);
         }
 
         bool m_usedOverrideMaterial;
@@ -66,16 +65,16 @@ namespace CwaffingTheGungy
 
         public override void Update()
         {
-            if (!this.owner)
+            if (!this.Owner)
                 return;
-            BraveInput instanceForPlayer = BraveInput.GetInstanceForPlayer(this.owner.PlayerIDX);
+            BraveInput instanceForPlayer = BraveInput.GetInstanceForPlayer(this.Owner.PlayerIDX);
             if (instanceForPlayer.ActiveActions.DodgeRollAction.IsPressed)
             {
                 instanceForPlayer.ConsumeButtonDown(GungeonActions.GungeonActionType.DodgeRoll);
-                if (!(this.owner.IsDodgeRolling || dodgeButtonHeld || this.isShining))
+                if (!(this.Owner.IsDodgeRolling || dodgeButtonHeld || this.isShining))
                 {
                     this.dodgeButtonHeld = true;
-                    ShineOn(this.owner);
+                    ShineOn(this.Owner);
                 }
             }
             else
@@ -83,8 +82,8 @@ namespace CwaffingTheGungy
                 this.dodgeButtonHeld = false;
                 if (this.isShining)
                 {
-                    ShineOff(this.owner);
-                    this.owner.ForceStartDodgeRoll();
+                    ShineOff(this.Owner);
+                    this.Owner.ForceStartDodgeRoll();
                 }
             }
             if (!theShine)
@@ -116,7 +115,7 @@ namespace CwaffingTheGungy
             Projectile component = otherRigidbody.GetComponent<Projectile>();
             if (component != null && !(component.Owner is PlayerController))
             {
-                PassiveReflectItem.ReflectBullet(component, true, Owner.specRigidbody.gameActor, 10f, 1f, 1f, 0f);
+                PassiveReflectItem.ReflectBullet(component, true, this.Owner.specRigidbody.gameActor, 10f, 1f, 1f, 0f);
                 PhysicsEngine.SkipCollision = true;
             }
         }
@@ -132,24 +131,22 @@ namespace CwaffingTheGungy
 
         public override void Pickup(PlayerController player)
         {
-            this.owner = player;
-            player.PostProcessProjectile += PostProcessProjectile;
             base.Pickup(player);
+            player.PostProcessProjectile += PostProcessProjectile;
         }
 
         public override DebrisObject Drop(PlayerController player)
         {
-            this.owner = null;
             player.PostProcessProjectile -= PostProcessProjectile;
-            isShining = false;
+            this.isShining = false;
             return base.Drop(player);
         }
 
         public override void OnDestroy()
         {
-            if (Owner)
-                Owner.PostProcessProjectile -= PostProcessProjectile;
-            isShining = false;
+            if (this.Owner)
+                this.Owner.PostProcessProjectile -= PostProcessProjectile;
+            this.isShining = false;
             base.OnDestroy();
         }
     }

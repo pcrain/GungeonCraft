@@ -23,7 +23,6 @@ namespace CwaffingTheGungy
         private static HUDController hud => HUDController.Instance;
         private static List<HUDElement> els = new List<HUDElement>();
 
-        private PlayerController owner;
         private StatModifier superstitionBuff = null;
         private int sixes, sevens;
 
@@ -39,7 +38,7 @@ namespace CwaffingTheGungy
 
         public override void Pickup(PlayerController player)
         {
-            this.owner = player;
+            base.Pickup(player);
             foreach (HUDElement el in els)
             {
                 el.updater = HUDUpdater;
@@ -47,12 +46,10 @@ namespace CwaffingTheGungy
                 el.Activate();
             }
             player.OnReloadedGun += this.HandleGunReloaded;
-            base.Pickup(player);
         }
 
         public override DebrisObject Drop(PlayerController player)
         {
-            this.owner = null;
             foreach (HUDElement el in els)
             {
                 el.updater = null;
@@ -86,12 +83,12 @@ namespace CwaffingTheGungy
         public override void Update()
         {
             base.Update();
-            string shells = this.owner.carriedConsumables.Currency.ToString();
-            string ammo = this.owner.CurrentGun.InfiniteAmmo
+            string shells = this.Owner.carriedConsumables.Currency.ToString();
+            string ammo = this.Owner.CurrentGun.InfiniteAmmo
                 ? ""
-                : this.owner.CurrentGun.CurrentAmmo.ToString()+this.owner.CurrentGun.AdjustedMaxAmmo.ToString();
-            string keys = this.owner.carriedConsumables.KeyBullets.ToString();
-            string blanks = this.owner.Blanks.ToString();
+                : this.Owner.CurrentGun.CurrentAmmo.ToString()+this.Owner.CurrentGun.AdjustedMaxAmmo.ToString();
+            string keys = this.Owner.carriedConsumables.KeyBullets.ToString();
+            string blanks = this.Owner.Blanks.ToString();
             string numbers = shells+ammo+keys+blanks;
             this.sixes = numbers.Count(x => x == '6');
             this.sevens = numbers.Count(x => x == '7');
@@ -99,7 +96,7 @@ namespace CwaffingTheGungy
 
         private bool HUDUpdater(HUDElement self)
         {
-            if (this.owner != null)
+            if (this.Owner)
                 self.text.Text = sixes.ToString()+","+sevens.ToString();
             return true;
         }

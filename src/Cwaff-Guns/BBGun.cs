@@ -6,11 +6,9 @@ using System.Text;
 using System.Reflection;
 
 using UnityEngine;
-using MonoMod;
-using MonoMod.RuntimeDetour;
+
 using Gungeon;
-using Alexandria.Misc;
-using Alexandria.ItemAPI;
+using ItemAPI;
 
 namespace CwaffingTheGungy
 {
@@ -126,7 +124,7 @@ namespace CwaffingTheGungy
         protected override void Update()
         {
             base.Update();
-            if (!(this.gun.CurrentOwner && this.gun.CurrentOwner is PlayerController))
+            if (!this.Player)
                 return;
             if (this.gun.IsCharging)
                 lastCharge = this.gun.GetChargeFraction();
