@@ -13,6 +13,11 @@ using Dungeonator;
 using ItemAPI;
 using Alexandria.Misc;
 
+/*
+    TODO:
+        - handle teleporting out of rooms or otherwise leaving them unceremoniously
+*/
+
 namespace CwaffingTheGungy
 {
     public class CuratorsBadge : PassiveItem
@@ -34,14 +39,19 @@ namespace CwaffingTheGungy
 
         public override void Pickup(PlayerController player)
         {
-            base.Pickup(player);
             player.OnEnteredCombat += this.OnEnteredCombat;
+
+            if (this.m_pickedUpThisRun)
+            {
+                base.Pickup(player);
+                return;
+            }
+            base.Pickup(player);
 
             string s = String.Join("\n",new[]{
                 "Hey! Thanks for joining the curation crew! We like to keep an orderly Gungeon, so make sure you keep those mischievous Gundead from breaking everything.",
                 "- Your Boss [sprite \"resourceful_rat_icon_001\"]"
                 });
-
             CustomNoteDoer.CreateNote(player.sprite.WorldCenter, s);
         }
 

@@ -46,6 +46,7 @@
     <Compile Include="src\Cwaff-Passives\ZoolandersDiary.cs"/>
     <Compile Include="src\Cwaff-Passives\HLD.cs"/>
     <Compile Include="src\Cwaff-Passives\CuratorsBadge.cs"/>
+    <Compile Include="src\Cwaff-Passives\CreditCard.cs"/>
     <Compile Include="src\Cwaff-Passives\Gyroscope.cs"/>
     <Compile Include="src\Cwaff-Passives\JohnsWick.cs"/>
     <Compile Include="src\Commands.cs"/>
@@ -231,6 +232,7 @@
     <EmbeddedResource Include="Resources\ItemSprites\note_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\gyroscope_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\yellow_bandana_icon.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\credit_card_icon.png"/>
     <EmbeddedResource Include="Resources\Companions\Wolf\wolf_pet_002.png"/>
     <EmbeddedResource Include="Resources\Companions\Wolf\wolf_pet_001.png"/>
     <EmbeddedResource Include="Resources\Companions\Wolf\wolf_pet_003.png"/>

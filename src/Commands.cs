@@ -33,7 +33,8 @@ namespace CwaffingTheGungy
                     // PickupObjectDatabase.GetById(IDs.Guns["b_b_gun"]).gameObject,
                     // PickupObjectDatabase.GetById(IDs.Guns["test_gun"]).gameObject,
                     // PickupObjectDatabase.GetById(IDs.Passives["gyroscope"]).gameObject,
-                    PickupObjectDatabase.GetById(IDs.Passives["curators_badge"]).gameObject,
+                    // PickupObjectDatabase.GetById(IDs.Passives["curators_badge"]).gameObject,
+                    PickupObjectDatabase.GetById(IDs.Passives["credit_card"]).gameObject,
                     GameManager.Instance.PrimaryPlayer.CenterPosition,
                     Vector2.zero,
                     0);
