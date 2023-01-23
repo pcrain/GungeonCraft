@@ -1079,5 +1079,48 @@ namespace CwaffingTheGungy
             yield break;
         }
     }
+
+    public static class CustomNoteDoer
+    {
+        private static NoteDoer prefab = null;
+
+        public static void Init()
+        {
+            GameObject noteSpriteObject = SpriteBuilder.SpriteFromResource("CwaffingTheGungy/Resources/ItemSprites/zoolander_icon", null);
+                FakePrefab.MarkAsFakePrefab(noteSpriteObject);
+                tk2dSprite noteSprite = noteSpriteObject.GetComponent<tk2dSprite>();
+
+            GameObject noteItem = new GameObject("Custom Note Item");
+            tk2dSprite noteSpriteComp = noteItem.GetOrAddComponent<tk2dSprite>();
+                noteSpriteComp.SetSprite(noteSprite.Collection, noteSprite.spriteId);
+                noteSpriteComp.PlaceAtPositionByAnchor(noteItem.transform.position, tk2dBaseSprite.Anchor.LowerCenter);
+            prefab = noteItem.AddComponent<NoteDoer>();
+            prefab.gameObject.SetActive(false);
+            FakePrefab.MarkAsFakePrefab(prefab.gameObject);
+            UnityEngine.Object.DontDestroyOnLoad(prefab);
+        }
+
+        public static NoteDoer CreateNote(Vector2 position, string formattedNoteText, NoteDoer.NoteBackgroundType background = NoteDoer.NoteBackgroundType.NOTE, bool destroyOnRead = true, bool doPoof = true, tk2dSprite customSprite = null)
+        {
+            NoteDoer noteDoer = UnityEngine.Object.Instantiate(
+                prefab.gameObject,
+                position.ToVector3ZisY(-1f),
+                Quaternion.identity).GetComponent<NoteDoer>();
+
+            if (customSprite != null)
+                noteDoer.sprite.SetSprite(customSprite.Collection,customSprite.spriteId);
+            noteDoer.alreadyLocalized   = true;
+            noteDoer.textboxSpawnPoint  = noteDoer.transform;
+            noteDoer.stringKey          = formattedNoteText;
+            noteDoer.noteBackgroundType = background;
+            noteDoer.DestroyedOnFinish  = destroyOnRead;
+            position.GetAbsoluteRoom().RegisterInteractable(noteDoer);
+
+            if (doPoof)
+                LootEngine.DoDefaultItemPoof(noteDoer.sprite.WorldCenter);
+
+            return noteDoer;
+        }
+    }
 }
 

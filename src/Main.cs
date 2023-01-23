@@ -163,6 +163,7 @@ namespace CwaffingTheGungy
                 FlowCommands.Install();
 
                 //Misc. Tweaks
+                CustomNoteDoer.Init();
                 CustomDodgeRoll.InitCustomDodgeRollHooks();
                 CwaffTweaks.Init();
 

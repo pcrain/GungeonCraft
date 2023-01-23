@@ -36,12 +36,8 @@ namespace CwaffingTheGungy
             base.Pickup(player);
             player.OnEnteredCombat += this.OnEnteredCombat;
 
-            GenerateNoteAtPosition(player.sprite.WorldCenter,"hello, world C:", this.GetComponent<tk2dSprite>());
-
-            // GameObject debrisObject = SpriteBuilder.SpriteFromResource("CwaffingTheGungy/Resources/ItemSprites/zoolander_icon", null);
-            // FakePrefab.MarkAsFakePrefab(debrisObject);
-            // tk2dSprite tk2dsprite = debrisObject.GetComponent<tk2dSprite>();
-            // GenerateNoteAtPosition(player.sprite.WorldCenter,"hello, world C:", tk2dsprite);
+            CustomNoteDoer.CreateNote(player.sprite.WorldCenter, "hello, world C:",
+                customSprite: this.GetComponent<tk2dSprite>());
         }
 
         public override DebrisObject Drop(PlayerController player)
@@ -77,27 +73,6 @@ namespace CwaffingTheGungy
         private void HandleBroken(MinorBreakable mb)
         {
             --this.curRoomBreakables;
-        }
-
-        public void GenerateNoteAtPosition(Vector2 position, String formattedNoteText, tk2dSprite noteSprite)
-        {
-            GameObject noteItem = new GameObject("Custom Note Item");
-            tk2dSprite noteSpriteComp = noteItem.GetOrAddComponent<tk2dSprite>();
-                noteSpriteComp.SetSprite(noteSprite.Collection, noteSprite.spriteId);
-                noteSpriteComp.PlaceAtPositionByAnchor(noteItem.transform.position, tk2dBaseSprite.Anchor.LowerCenter);
-            NoteDoer noteDoerProto = noteItem.AddComponent<NoteDoer>();
-
-            noteDoerProto.gameObject.SetActive(false);
-            FakePrefab.MarkAsFakePrefab(noteDoerProto.gameObject);
-            UnityEngine.Object.DontDestroyOnLoad(noteDoerProto);
-
-            NoteDoer noteDoer = UnityEngine.Object.Instantiate(noteDoerProto.gameObject,position.ToVector3ZisY(-1f),Quaternion.identity).GetComponent<NoteDoer>();
-                noteDoer.stringKey = formattedNoteText;
-                noteDoer.DestroyedOnFinish = true;
-                noteDoer.alreadyLocalized = true;
-                noteDoer.textboxSpawnPoint = noteDoer.transform;
-                noteDoer.noteBackgroundType = NoteDoer.NoteBackgroundType.NOTE;
-                position.GetAbsoluteRoom().RegisterInteractable(noteDoer);
         }
     }
 }
