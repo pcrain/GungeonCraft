@@ -35,7 +35,13 @@ namespace CwaffingTheGungy
         {
             base.Pickup(player);
             player.OnEnteredCombat += this.OnEnteredCombat;
+
             GenerateNoteAtPosition(player.sprite.WorldCenter,"hello, world C:", this.GetComponent<tk2dSprite>());
+
+            // GameObject debrisObject = SpriteBuilder.SpriteFromResource("CwaffingTheGungy/Resources/ItemSprites/zoolander_icon", null);
+            // FakePrefab.MarkAsFakePrefab(debrisObject);
+            // tk2dSprite tk2dsprite = debrisObject.GetComponent<tk2dSprite>();
+            // GenerateNoteAtPosition(player.sprite.WorldCenter,"hello, world C:", tk2dsprite);
         }
 
         public override DebrisObject Drop(PlayerController player)
@@ -76,36 +82,37 @@ namespace CwaffingTheGungy
         public void GenerateNoteAtPosition(Vector2 position, String formattedNoteText, tk2dSprite noteSprite)
         {
             GameObject posObject = new GameObject("Position Object");
-                // posObject.transform.parent = this.transform;
-                posObject.transform.position = position.ToVector3ZisY();
+                posObject.transform.position = position.ToVector3ZisY(-1f);
             GameObject noteItem = new GameObject("Position Object Note Item");
                 noteItem.transform.parent        = posObject.transform;
                 noteItem.transform.localPosition = Vector3.zero;
                 noteItem.transform.position      = Vector3.zero;
-            tk2dSprite noteSpriteComp = noteItem.AddComponent<tk2dSprite>();
+            tk2dSprite noteSpriteComp = noteItem.GetOrAddComponent<tk2dSprite>();
                 noteSpriteComp.SetSprite(noteSprite.Collection, noteSprite.spriteId);
-                noteSpriteComp.PlaceAtPositionByAnchor(noteItem.transform.parent.position, tk2dBaseSprite.Anchor.MiddleCenter);
-                noteSpriteComp.transform.position = noteSpriteComp.transform.position.Quantize(0.0625f);
-                DepthLookupManager.ProcessRenderer(noteSpriteComp.renderer);
-                noteSpriteComp.UpdateZDepth();
-                // noteSpriteComp.renderer.SetAlpha();
-                // noteItem.transform.parent.gameObject.GetComponentInParent<tk2dSprite>()?.AttachRenderer(noteSpriteComp);
-                // SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black, 0.1f, 0.05f);
+                noteSpriteComp.PlaceAtPositionByAnchor(noteItem.transform.parent.position, tk2dBaseSprite.Anchor.LowerCenter);
+                // noteSpriteComp.transform.position = noteSpriteComp.transform.position.Quantize(0.0625f);
+                // noteSpriteComp.renderLayer += 1;
+                // noteSpriteComp.depthUsesTrimmedBounds = true;
+                // noteSpriteComp.HeightOffGround = 1.25f;
+                // noteSpriteComp.UpdateZDepth();
+                // DepthLookupManager.ProcessRenderer(noteSpriteComp.renderer);
 
-            // noteItem.SetActive(false); //make sure the projectile isn't an active game object
-            // FakePrefab.MarkAsFakePrefab(noteItem);  //mark the projectile as a prefab
-            // UnityEngine.Object.DontDestroyOnLoad(noteItem); //make sure the projectile isn't destroyed when loaded as a prefab
-
-            // GameObject newNote = SpawnObjectManager.SpawnObject(noteItem, position.ToVector3ZisY());
-                // NoteDoer noteDoer = newNote.AddComponent<NoteDoer>();
                 NoteDoer noteDoer = noteItem.AddComponent<NoteDoer>();
                     noteDoer.stringKey = formattedNoteText;
-                    noteDoer.alreadyLocalized = true;
                     noteDoer.DestroyedOnFinish = true;
-                    // noteDoer.textboxSpawnPoint = newNote.transform;
+                    noteDoer.alreadyLocalized = true;
                     noteDoer.textboxSpawnPoint = noteItem.transform;
                     noteDoer.noteBackgroundType = NoteDoer.NoteBackgroundType.NOTE;
                     position.GetAbsoluteRoom().RegisterInteractable(noteDoer);
+
+                SpriteOutlineManager.ToggleOutlineRenderers(noteSpriteComp, false);
+
+                // GameObject gameObject2 = (GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global VFX/VFX_Item_Spawn_Poof"));
+                // tk2dBaseSprite component2 = gameObject2.GetComponent<tk2dBaseSprite>();
+                // component2.PlaceAtPositionByAnchor(item.sprite.WorldCenter.ToVector3ZUp(), tk2dBaseSprite.Anchor.MiddleCenter);
+                // component2.transform.position = component2.transform.position.Quantize(0.0625f);
+                // component2.HeightOffGround = 5f;
+                // component2.UpdateZDepth();
         }
     }
 }
