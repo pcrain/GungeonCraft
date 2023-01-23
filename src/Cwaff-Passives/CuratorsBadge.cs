@@ -81,38 +81,23 @@ namespace CwaffingTheGungy
 
         public void GenerateNoteAtPosition(Vector2 position, String formattedNoteText, tk2dSprite noteSprite)
         {
-            GameObject posObject = new GameObject("Position Object");
-                posObject.transform.position = position.ToVector3ZisY(-1f);
-            GameObject noteItem = new GameObject("Position Object Note Item");
-                noteItem.transform.parent        = posObject.transform;
-                noteItem.transform.localPosition = Vector3.zero;
-                noteItem.transform.position      = Vector3.zero;
+            GameObject noteItem = new GameObject("Custom Note Item");
             tk2dSprite noteSpriteComp = noteItem.GetOrAddComponent<tk2dSprite>();
                 noteSpriteComp.SetSprite(noteSprite.Collection, noteSprite.spriteId);
-                noteSpriteComp.PlaceAtPositionByAnchor(noteItem.transform.parent.position, tk2dBaseSprite.Anchor.LowerCenter);
-                // noteSpriteComp.transform.position = noteSpriteComp.transform.position.Quantize(0.0625f);
-                // noteSpriteComp.renderLayer += 1;
-                // noteSpriteComp.depthUsesTrimmedBounds = true;
-                // noteSpriteComp.HeightOffGround = 1.25f;
-                // noteSpriteComp.UpdateZDepth();
-                // DepthLookupManager.ProcessRenderer(noteSpriteComp.renderer);
+                noteSpriteComp.PlaceAtPositionByAnchor(noteItem.transform.position, tk2dBaseSprite.Anchor.LowerCenter);
+            NoteDoer noteDoerProto = noteItem.AddComponent<NoteDoer>();
 
-                NoteDoer noteDoer = noteItem.AddComponent<NoteDoer>();
-                    noteDoer.stringKey = formattedNoteText;
-                    noteDoer.DestroyedOnFinish = true;
-                    noteDoer.alreadyLocalized = true;
-                    noteDoer.textboxSpawnPoint = noteItem.transform;
-                    noteDoer.noteBackgroundType = NoteDoer.NoteBackgroundType.NOTE;
-                    position.GetAbsoluteRoom().RegisterInteractable(noteDoer);
+            noteDoerProto.gameObject.SetActive(false);
+            FakePrefab.MarkAsFakePrefab(noteDoerProto.gameObject);
+            UnityEngine.Object.DontDestroyOnLoad(noteDoerProto);
 
-                SpriteOutlineManager.ToggleOutlineRenderers(noteSpriteComp, false);
-
-                // GameObject gameObject2 = (GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global VFX/VFX_Item_Spawn_Poof"));
-                // tk2dBaseSprite component2 = gameObject2.GetComponent<tk2dBaseSprite>();
-                // component2.PlaceAtPositionByAnchor(item.sprite.WorldCenter.ToVector3ZUp(), tk2dBaseSprite.Anchor.MiddleCenter);
-                // component2.transform.position = component2.transform.position.Quantize(0.0625f);
-                // component2.HeightOffGround = 5f;
-                // component2.UpdateZDepth();
+            NoteDoer noteDoer = UnityEngine.Object.Instantiate(noteDoerProto.gameObject,position.ToVector3ZisY(-1f),Quaternion.identity).GetComponent<NoteDoer>();
+                noteDoer.stringKey = formattedNoteText;
+                noteDoer.DestroyedOnFinish = true;
+                noteDoer.alreadyLocalized = true;
+                noteDoer.textboxSpawnPoint = noteDoer.transform;
+                noteDoer.noteBackgroundType = NoteDoer.NoteBackgroundType.NOTE;
+                position.GetAbsoluteRoom().RegisterInteractable(noteDoer);
         }
     }
 }
