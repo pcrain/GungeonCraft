@@ -1086,7 +1086,7 @@ namespace CwaffingTheGungy
 
         public static void Init()
         {
-            GameObject noteSpriteObject = SpriteBuilder.SpriteFromResource("CwaffingTheGungy/Resources/ItemSprites/zoolander_icon", null);
+            GameObject noteSpriteObject = SpriteBuilder.SpriteFromResource("CwaffingTheGungy/Resources/ItemSprites/note_icon", null);
                 FakePrefab.MarkAsFakePrefab(noteSpriteObject);
                 tk2dSprite noteSprite = noteSpriteObject.GetComponent<tk2dSprite>();
 
@@ -1100,7 +1100,7 @@ namespace CwaffingTheGungy
             UnityEngine.Object.DontDestroyOnLoad(prefab);
         }
 
-        public static NoteDoer CreateNote(Vector2 position, string formattedNoteText, NoteDoer.NoteBackgroundType background = NoteDoer.NoteBackgroundType.NOTE, bool destroyOnRead = true, bool doPoof = true, tk2dSprite customSprite = null)
+        public static NoteDoer CreateNote(Vector2 position, string formattedNoteText, NoteDoer.NoteBackgroundType background = NoteDoer.NoteBackgroundType.NOTE, bool destroyOnRead = true, bool poofIn = true, tk2dSprite customSprite = null)
         {
             NoteDoer noteDoer = UnityEngine.Object.Instantiate(
                 prefab.gameObject,
@@ -1110,13 +1110,13 @@ namespace CwaffingTheGungy
             if (customSprite != null)
                 noteDoer.sprite.SetSprite(customSprite.Collection,customSprite.spriteId);
             noteDoer.alreadyLocalized   = true;
-            noteDoer.textboxSpawnPoint  = noteDoer.transform;
+            noteDoer.textboxSpawnPoint  = noteDoer.sprite.transform;
             noteDoer.stringKey          = formattedNoteText;
             noteDoer.noteBackgroundType = background;
             noteDoer.DestroyedOnFinish  = destroyOnRead;
             position.GetAbsoluteRoom().RegisterInteractable(noteDoer);
 
-            if (doPoof)
+            if (poofIn)
                 LootEngine.DoDefaultItemPoof(noteDoer.sprite.WorldCenter);
 
             return noteDoer;
