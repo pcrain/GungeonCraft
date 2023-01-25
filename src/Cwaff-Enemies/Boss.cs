@@ -31,82 +31,79 @@ public class RoomMimic : AIActor
   public static void BuildPrefab()
   {
     // source = EnemyDatabase.GetOrLoadByGuid("c50a862d19fc4d30baeba54795e8cb93");
-    bool flag = prefab != null || BossBuilder.Dictionary.ContainsKey(guid);
-    bool flag2 = flag;
-    if (!flag2)
+    if (prefab != null || BossBuilder.Dictionary.ContainsKey(guid))
+      return;
+    prefab = BossBuilder.BuildPrefab("Room Mimic", guid, spritePaths[0], new IntVector2(0, 0), new IntVector2(8, 9), false, true);
+    var companion = prefab.AddComponent<EnemyBehavior>();
+    companion.aiActor.knockbackDoer.weight = 200;
+    companion.aiActor.MovementSpeed = 2f;
+    companion.aiActor.healthHaver.PreventAllDamage = false;
+    companion.aiActor.CollisionDamage = 1f;
+    companion.aiActor.HasShadow = false;
+    companion.aiActor.IgnoreForRoomClear = false;
+    companion.aiActor.aiAnimator.HitReactChance = 0.05f;
+    companion.aiActor.specRigidbody.CollideWithOthers = true;
+    companion.aiActor.specRigidbody.CollideWithTileMap = true;
+    companion.aiActor.PreventFallingInPitsEver = true;
+    companion.aiActor.healthHaver.ForceSetCurrentHealth(500f);
+    companion.aiActor.healthHaver.SetHealthMaximum(1000f);
+    companion.aiActor.CollisionKnockbackStrength = 5f;
+    companion.aiActor.procedurallyOutlined = false;
+    companion.aiActor.CanTargetPlayers = true;
+    ETGMod.Databases.Strings.Enemies.Set("#ROOM_MIMIC", "Roomimic");
+    ETGMod.Databases.Strings.Enemies.Set("#????", "???");
+    ETGMod.Databases.Strings.Enemies.Set("#SUBTITLE", "Face Off!");
+    ETGMod.Databases.Strings.Enemies.Set("#QUOTE", "");
+    companion.aiActor.healthHaver.overrideBossName = "#ROOM_MIMIC";
+    companion.aiActor.OverrideDisplayName = "#ROOM_MIMIC";
+    companion.aiActor.ActorName = "#ROOM_MIMIC";
+    companion.aiActor.name = "#ROOM_MIMIC";
+    prefab.name = companion.aiActor.OverrideDisplayName;
+    GenericIntroDoer miniBossIntroDoer = prefab.AddComponent<GenericIntroDoer>();
+    prefab.AddComponent<RoomMimicIntro>();
+    miniBossIntroDoer.triggerType = GenericIntroDoer.TriggerType.PlayerEnteredRoom;
+    miniBossIntroDoer.initialDelay = 0.15f;
+    miniBossIntroDoer.cameraMoveSpeed = 14;
+    miniBossIntroDoer.specifyIntroAiAnimator = null;
+    miniBossIntroDoer.BossMusicEvent = "Play_MUS_Boss_Theme_Beholster";
+    miniBossIntroDoer.PreventBossMusic = false;
+    miniBossIntroDoer.InvisibleBeforeIntroAnim = true;
+    miniBossIntroDoer.preIntroAnim = string.Empty;
+    miniBossIntroDoer.preIntroDirectionalAnim = string.Empty;
+    miniBossIntroDoer.introAnim = "intro";
+    miniBossIntroDoer.introDirectionalAnim = string.Empty;
+    miniBossIntroDoer.continueAnimDuringOutro = false;
+    miniBossIntroDoer.cameraFocus = null;
+    miniBossIntroDoer.roomPositionCameraFocus = Vector2.zero;
+    miniBossIntroDoer.restrictPlayerMotionToRoom = false;
+    miniBossIntroDoer.fusebombLock = false;
+    miniBossIntroDoer.AdditionalHeightOffset = 0;
+    miniBossIntroDoer.portraitSlideSettings = new PortraitSlideSettings()
     {
-      prefab = BossBuilder.BuildPrefab("Room Mimic", guid, spritePaths[0], new IntVector2(0, 0), new IntVector2(8, 9), false, true);
-      var companion = prefab.AddComponent<EnemyBehavior>();
-      companion.aiActor.knockbackDoer.weight = 200;
-      companion.aiActor.MovementSpeed = 2f;
-      companion.aiActor.healthHaver.PreventAllDamage = false;
-      companion.aiActor.CollisionDamage = 1f;
-      companion.aiActor.HasShadow = false;
-      companion.aiActor.IgnoreForRoomClear = false;
-      companion.aiActor.aiAnimator.HitReactChance = 0.05f;
-      companion.aiActor.specRigidbody.CollideWithOthers = true;
-      companion.aiActor.specRigidbody.CollideWithTileMap = true;
-      companion.aiActor.PreventFallingInPitsEver = true;
-      companion.aiActor.healthHaver.ForceSetCurrentHealth(500f);
-      companion.aiActor.healthHaver.SetHealthMaximum(1000f);
-      companion.aiActor.CollisionKnockbackStrength = 5f;
-      companion.aiActor.procedurallyOutlined = false;
-      companion.aiActor.CanTargetPlayers = true;
-      ETGMod.Databases.Strings.Enemies.Set("#ROOM_MIMIC", "Roomimic");
-      ETGMod.Databases.Strings.Enemies.Set("#????", "???");
-      ETGMod.Databases.Strings.Enemies.Set("#SUBTITLE", "Face Off!");
-      ETGMod.Databases.Strings.Enemies.Set("#QUOTE", "");
-      companion.aiActor.healthHaver.overrideBossName = "#ROOM_MIMIC";
-      companion.aiActor.OverrideDisplayName = "#ROOM_MIMIC";
-      companion.aiActor.ActorName = "#ROOM_MIMIC";
-      companion.aiActor.name = "#ROOM_MIMIC";
-      prefab.name = companion.aiActor.OverrideDisplayName;
-      GenericIntroDoer miniBossIntroDoer = prefab.AddComponent<GenericIntroDoer>();
-      prefab.AddComponent<RoomMimicIntro>();
-      miniBossIntroDoer.triggerType = GenericIntroDoer.TriggerType.PlayerEnteredRoom;
-      miniBossIntroDoer.initialDelay = 0.15f;
-      miniBossIntroDoer.cameraMoveSpeed = 14;
-      miniBossIntroDoer.specifyIntroAiAnimator = null;
-      miniBossIntroDoer.BossMusicEvent = "Play_MUS_Boss_Theme_Beholster";
-      miniBossIntroDoer.PreventBossMusic = false;
-      miniBossIntroDoer.InvisibleBeforeIntroAnim = true;
-      miniBossIntroDoer.preIntroAnim = string.Empty;
-      miniBossIntroDoer.preIntroDirectionalAnim = string.Empty;
-      miniBossIntroDoer.introAnim = "intro";
-      miniBossIntroDoer.introDirectionalAnim = string.Empty;
-      miniBossIntroDoer.continueAnimDuringOutro = false;
-      miniBossIntroDoer.cameraFocus = null;
-      miniBossIntroDoer.roomPositionCameraFocus = Vector2.zero;
-      miniBossIntroDoer.restrictPlayerMotionToRoom = false;
-      miniBossIntroDoer.fusebombLock = false;
-      miniBossIntroDoer.AdditionalHeightOffset = 0;
-      miniBossIntroDoer.portraitSlideSettings = new PortraitSlideSettings()
-      {
-        bossNameString = "#ROOM_MIMIC",
-        bossSubtitleString = "#SUBTITLE",
-        bossQuoteString = "#QUOTE",
-        bossSpritePxOffset = IntVector2.Zero,
-        topLeftTextPxOffset = IntVector2.Zero,
-        bottomRightTextPxOffset = IntVector2.Zero,
-        bgColor = Color.cyan
-      };
-      if (BossCardTexture)
-      {
-        miniBossIntroDoer.portraitSlideSettings.bossArtSprite = BossCardTexture;
-        miniBossIntroDoer.SkipBossCard = false;
-        companion.aiActor.healthHaver.bossHealthBar = HealthHaver.BossBarType.MainBar;
-      }
-      else
-      {
-        miniBossIntroDoer.SkipBossCard = true;
-        companion.aiActor.healthHaver.bossHealthBar = HealthHaver.BossBarType.SubbossBar;
-      }
-      miniBossIntroDoer.SkipFinalizeAnimation = true;
-      miniBossIntroDoer.RegenerateCache();
-      companion.aiActor.healthHaver.SetHealthMaximum(1000f, null, false);
-      companion.aiActor.specRigidbody.PixelColliders.Clear();
-      companion.aiActor.specRigidbody.PixelColliders.Add(new PixelCollider
-
+      bossNameString = "#ROOM_MIMIC",
+      bossSubtitleString = "#SUBTITLE",
+      bossQuoteString = "#QUOTE",
+      bossSpritePxOffset = IntVector2.Zero,
+      topLeftTextPxOffset = IntVector2.Zero,
+      bottomRightTextPxOffset = IntVector2.Zero,
+      bgColor = Color.cyan
+    };
+    if (BossCardTexture)
+    {
+      miniBossIntroDoer.portraitSlideSettings.bossArtSprite = BossCardTexture;
+      miniBossIntroDoer.SkipBossCard = false;
+      companion.aiActor.healthHaver.bossHealthBar = HealthHaver.BossBarType.MainBar;
+    }
+    else
+    {
+      miniBossIntroDoer.SkipBossCard = true;
+      companion.aiActor.healthHaver.bossHealthBar = HealthHaver.BossBarType.SubbossBar;
+    }
+    miniBossIntroDoer.SkipFinalizeAnimation = true;
+    miniBossIntroDoer.RegenerateCache();
+    companion.aiActor.healthHaver.SetHealthMaximum(1000f, null, false);
+    companion.aiActor.specRigidbody.PixelColliders.Clear();
+    companion.aiActor.specRigidbody.PixelColliders.Add(new PixelCollider
       {
         ColliderGenerationMode = PixelCollider.PixelColliderGeneration.Manual,
         CollisionLayer = CollisionLayer.EnemyCollider,
@@ -124,7 +121,7 @@ public class RoomMimic : AIActor
         ManualRightX = 0,
         ManualRightY = 0
       });
-      companion.aiActor.specRigidbody.PixelColliders.Add(new PixelCollider
+    companion.aiActor.specRigidbody.PixelColliders.Add(new PixelCollider
       {
 
         ColliderGenerationMode = PixelCollider.PixelColliderGeneration.Manual,
@@ -142,395 +139,144 @@ public class RoomMimic : AIActor
         ManualLeftY = 0,
         ManualRightX = 0,
         ManualRightY = 0,
-
-
-
       });
-      companion.aiActor.CorpseObject = EnemyDatabase.GetOrLoadByGuid("01972dee89fc4404a5c408d50007dad5").CorpseObject;
-      companion.aiActor.PreventBlackPhantom = false;
-      AIAnimator aiAnimator = companion.aiAnimator;
-      aiAnimator.IdleAnimation = new DirectionalAnimation
+    companion.aiActor.CorpseObject = EnemyDatabase.GetOrLoadByGuid("01972dee89fc4404a5c408d50007dad5").CorpseObject;
+    companion.aiActor.PreventBlackPhantom = false;
+
+    AIAnimator aiAnimator = companion.aiAnimator;
+    aiAnimator.IdleAnimation = new DirectionalAnimation
+    {
+      Type = DirectionalAnimation.DirectionType.Single,
+      Prefix = "idle",
+      AnimNames = new string[1],
+      Flipped = new DirectionalAnimation.FlipType[1]
+    };
+    if (RoomMimiicCollection == null)
+    {
+      RoomMimiicCollection = SpriteBuilder.ConstructCollection(prefab, "Room_Mimic_Collection");
+      UnityEngine.Object.DontDestroyOnLoad(RoomMimiicCollection);
+      for (int i = 0; i < spritePaths.Length; i++)
       {
-        Type = DirectionalAnimation.DirectionType.Single,
-        Prefix = "idle",
-        AnimNames = new string[1],
-        Flipped = new DirectionalAnimation.FlipType[1]
-      };
-      DirectionalAnimation anim = new DirectionalAnimation
-      {
-        Type = DirectionalAnimation.DirectionType.TwoWayHorizontal,
-        AnimNames = new string[]
-        {
-          "swirl",
-
-        },
-        Flipped = new DirectionalAnimation.FlipType[2]
-      };
-      aiAnimator.OtherAnimations = new List<AIAnimator.NamedDirectionalAnimation>
-      {
-        new AIAnimator.NamedDirectionalAnimation
-        {
-          name = "swirl",
-          anim = anim
-        }
-      };
-      DirectionalAnimation anim2 = new DirectionalAnimation
-      {
-        Type = DirectionalAnimation.DirectionType.TwoWayHorizontal,
-        AnimNames = new string[]
-        {
-          "scream",
-
-        },
-        Flipped = new DirectionalAnimation.FlipType[2]
-      };
-      aiAnimator.OtherAnimations = new List<AIAnimator.NamedDirectionalAnimation>
-      {
-        new AIAnimator.NamedDirectionalAnimation
-        {
-          name = "scream",
-          anim = anim2
-        }
-      };
-      DirectionalAnimation anim3 = new DirectionalAnimation
-      {
-        Type = DirectionalAnimation.DirectionType.Single,
-        AnimNames = new string[]
-        {
-          "tell",
-
-        },
-        Flipped = new DirectionalAnimation.FlipType[1]
-      };
-      aiAnimator.OtherAnimations = new List<AIAnimator.NamedDirectionalAnimation>
-      {
-        new AIAnimator.NamedDirectionalAnimation
-        {
-          name = "tell",
-          anim = anim3
-        }
-      };
-      DirectionalAnimation Itworked = new DirectionalAnimation
-      {
-        Type = DirectionalAnimation.DirectionType.Single,
-        Prefix = "tell2",
-        AnimNames = new string[1],
-        Flipped = new DirectionalAnimation.FlipType[1]
-      };
-      aiAnimator.OtherAnimations = new List<AIAnimator.NamedDirectionalAnimation>
-      {
-        new AIAnimator.NamedDirectionalAnimation
-        {
-          name = "tell2",
-          anim = Itworked
-        }
-      };
-      DirectionalAnimation Hurray = new DirectionalAnimation
-      {
-        Type = DirectionalAnimation.DirectionType.Single,
-        Prefix = "puke",
-        AnimNames = new string[1],
-        Flipped = new DirectionalAnimation.FlipType[1]
-      };
-      aiAnimator.OtherAnimations = new List<AIAnimator.NamedDirectionalAnimation>
-      {
-        new AIAnimator.NamedDirectionalAnimation
-        {
-          name = "puke",
-          anim = Hurray
-        }
-      };
-      DirectionalAnimation almostdone = new DirectionalAnimation
-      {
-        Type = DirectionalAnimation.DirectionType.Single,
-        Prefix = "intro",
-        AnimNames = new string[1],
-        Flipped = new DirectionalAnimation.FlipType[1]
-      };
-      aiAnimator.OtherAnimations = new List<AIAnimator.NamedDirectionalAnimation>
-      {
-        new AIAnimator.NamedDirectionalAnimation
-        {
-          name = "intro",
-          anim = almostdone
-        }
-      };
-      DirectionalAnimation done = new DirectionalAnimation
-      {
-        Type = DirectionalAnimation.DirectionType.Single,
-        Prefix = "die",
-        AnimNames = new string[1],
-        Flipped = new DirectionalAnimation.FlipType[1]
-      };
-      aiAnimator.OtherAnimations = new List<AIAnimator.NamedDirectionalAnimation>
-      {
-        new AIAnimator.NamedDirectionalAnimation
-        {
-          name = "die",
-          anim = done
-        }
-      };
-      DirectionalAnimation JUSTFUCKINGWORKCOMETHEFUCKON = new DirectionalAnimation
-      {
-        Type = DirectionalAnimation.DirectionType.Single,
-        Prefix = "suck",
-        AnimNames = new string[1],
-        Flipped = new DirectionalAnimation.FlipType[1]
-      };
-      aiAnimator.OtherAnimations = new List<AIAnimator.NamedDirectionalAnimation>
-      {
-        new AIAnimator.NamedDirectionalAnimation
-        {
-          name = "suck",
-          anim = JUSTFUCKINGWORKCOMETHEFUCKON
-        }
-      };
-      bool flag3 = RoomMimiicCollection == null;
-      if (flag3)
-      {
-        RoomMimiicCollection = SpriteBuilder.ConstructCollection(prefab, "Room_Mimic_Collection");
-        UnityEngine.Object.DontDestroyOnLoad(RoomMimiicCollection);
-        for (int i = 0; i < spritePaths.Length; i++)
-        {
-          SpriteBuilder.AddSpriteToCollection(spritePaths[i], RoomMimiicCollection);
-        }
-        SpriteBuilder.AddAnimation(companion.spriteAnimator, RoomMimiicCollection, new List<int>
-        {
-
-          0,
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-
-        }, "idle", tk2dSpriteAnimationClip.WrapMode.Loop).fps = 7f;
-        SpriteBuilder.AddAnimation(companion.spriteAnimator, RoomMimiicCollection, new List<int>
-        {
-
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-
-
-        }, "swirl", tk2dSpriteAnimationClip.WrapMode.Loop).fps = 9f;
-        SpriteBuilder.AddAnimation(companion.spriteAnimator, RoomMimiicCollection, new List<int>
-        {
-
-          16,
-          17,
-          18,
-          19
-
-
-        }, "scream", tk2dSpriteAnimationClip.WrapMode.Loop).fps = 5.3f;
-        SpriteBuilder.AddAnimation(companion.spriteAnimator, RoomMimiicCollection, new List<int>
-        {
-
-          20,
-          21,
-          22,
-          23,
-          24
-
-
-        }, "tell", tk2dSpriteAnimationClip.WrapMode.Once).fps = 8f;
-        SpriteBuilder.AddAnimation(companion.spriteAnimator, RoomMimiicCollection, new List<int>
-        {
-          25,
-          26,
-          27,
-          28,
-          29,
-          30,
-          31,
-          32,
-          33,
-          34,
-          35,
-          36,
-          37,
-          38,
-          39,
-          40,
-          41
-
-
-
-        }, "suck", tk2dSpriteAnimationClip.WrapMode.Once).fps = 4f;
-        SpriteBuilder.AddAnimation(companion.spriteAnimator, RoomMimiicCollection, new List<int>
-        {
-          42,
-          43,
-          44,
-          45,
-          46,
-          47,
-
-        }, "tell2", tk2dSpriteAnimationClip.WrapMode.Once).fps = 6f;
-        SpriteBuilder.AddAnimation(companion.spriteAnimator, RoomMimiicCollection, new List<int>
-        {
-          48,
-          49,
-          50,
-          51,
-          52,
-          53,
-          54,
-        }, "puke", tk2dSpriteAnimationClip.WrapMode.Once).fps = 7f;
-        SpriteBuilder.AddAnimation(companion.spriteAnimator, RoomMimiicCollection, new List<int>
-        {
-          55,
-          56,
-          57,
-          58,
-          59,
-          60,
-          61,
-          62,
-          63,
-          64,
-          65,
-          66,
-          67,
-          68,
-          69,
-          70,
-          71,
-          72,
-          73,
-          74,
-          75
-        }, "intro", tk2dSpriteAnimationClip.WrapMode.Once).fps = 11f;
-        SpriteBuilder.AddAnimation(companion.spriteAnimator, RoomMimiicCollection, new List<int>
-        {
-          76,
-          77,
-          78,
-          79,
-          80,
-          81,
-          82,
-          83,
-          84,
-          85,
-          86
-        }, "die", tk2dSpriteAnimationClip.WrapMode.Once).fps = 6f;
-
+        SpriteBuilder.AddSpriteToCollection(spritePaths[i], RoomMimiicCollection);
       }
-      var bs = prefab.GetComponent<BehaviorSpeculator>();
-      BehaviorSpeculator behaviorSpeculator = EnemyDatabase.GetOrLoadByGuid("01972dee89fc4404a5c408d50007dad5").behaviorSpeculator;
-      bs.OverrideBehaviors = behaviorSpeculator.OverrideBehaviors;
-      bs.OtherBehaviors = behaviorSpeculator.OtherBehaviors;
-      shootpoint = new GameObject("attach");
-      shootpoint.transform.parent = companion.transform;
-      shootpoint.transform.position = companion.sprite.WorldCenter;
-      GameObject m_CachedGunAttachPoint = companion.transform.Find("attach").gameObject;
-      bs.TargetBehaviors = new List<TargetBehaviorBase>
-      {
-        new TargetPlayerBehavior
-        {
-          Radius = 35f,
-          LineOfSight = false,
-          ObjectPermanence = true,
-          SearchInterval = 0.25f,
-          PauseOnTargetSwitch = false,
-          PauseTime = 0.25f
-        }
-      };
-      bs.AttackBehaviorGroup.AttackBehaviors = new List<AttackBehaviorGroup.AttackGroupItem>
-      {
-
-        new AttackBehaviorGroup.AttackGroupItem()
-        {
-
-          Probability = 1,
-          Behavior = new ShootBehavior {
-            ShootPoint = m_CachedGunAttachPoint,
-            BulletScript = new CustomBulletScriptSelector(typeof(SwirlScript)),
-            LeadAmount = 0f,
-            AttackCooldown = 3.5f,
-            FireAnimation = "swirl",
-            RequiresLineOfSight = false,
-            StopDuring = ShootBehavior.StopType.Attack,
-            Uninterruptible = true
-          },
-          NickName = "Swirl Whirly"
-
-        },
-        new AttackBehaviorGroup.AttackGroupItem()
-        {
-          Probability = 1,
-          Behavior = new ShootBehavior {
-            ShootPoint = m_CachedGunAttachPoint,
-            BulletScript = new CustomBulletScriptSelector(typeof(AAAAAAAAAAAAAAScript)),
-            LeadAmount = 0f,
-            AttackCooldown = 3.5f,
-            FireAnimation = "scream",
-            RequiresLineOfSight = false,
-            StopDuring = ShootBehavior.StopType.Attack,
-            Uninterruptible = true
-          },
-          NickName = "SCREAMMMMMMMM AAAAAAAAAHHHHHHHHH"
-        },
-        new AttackBehaviorGroup.AttackGroupItem()
-        {
-          Probability = 1,
-          Behavior = new ShootBehavior {
-            ShootPoint = m_CachedGunAttachPoint,
-            BulletScript = new CustomBulletScriptSelector(typeof(SkeletonBulletScript)),
-            LeadAmount = 0f,
-            MaxUsages = 2,
-            AttackCooldown = 5f,
-            TellAnimation = "tell2",
-            FireAnimation = "puke",
-            RequiresLineOfSight = false,
-            StopDuring = ShootBehavior.StopType.Attack,
-            Uninterruptible = true
-          },
-          NickName = "Skeleton Spookerino Wowie Zowie AHHHHH AHH, The Skeletons Are Eating Me, AHHHHHHH, man this name is stupid as hell. Stop reading my shit. Stop posting this on the Discord AHHH. At least hope you enjoy the mod tho."
-        },
-        new AttackBehaviorGroup.AttackGroupItem()
-        {
-          Probability = 1,
-          Behavior = new ShootBehavior {
-            ShootPoint = m_CachedGunAttachPoint,
-            BulletScript = new CustomBulletScriptSelector(typeof(SpitUpScript)),
-            LeadAmount = 0f,
-            AttackCooldown = 4.5f,
-            TellAnimation = "tell",
-            FireAnimation = "suck",
-            RequiresLineOfSight = false,
-            StopDuring = ShootBehavior.StopType.Attack,
-            Uninterruptible = true
-          },
-          NickName = "Cuck and Suck"
-        },
-
-      };
-      bs.InstantFirstTick = behaviorSpeculator.InstantFirstTick;
-      bs.TickInterval = behaviorSpeculator.TickInterval;
-      bs.PostAwakenDelay = behaviorSpeculator.PostAwakenDelay;
-      bs.RemoveDelayOnReinforce = behaviorSpeculator.RemoveDelayOnReinforce;
-      bs.OverrideStartingFacingDirection = behaviorSpeculator.OverrideStartingFacingDirection;
-      bs.StartingFacingDirection = behaviorSpeculator.StartingFacingDirection;
-      bs.SkipTimingDifferentiator = behaviorSpeculator.SkipTimingDifferentiator;
-      Game.Enemies.Add("kp:room_mimic", companion.aiActor);
+      SpriteBuilder.AddAnimation(companion.spriteAnimator, RoomMimiicCollection,
+        BH.Range(0,7), "idle", tk2dSpriteAnimationClip.WrapMode.Loop).fps = 7f;
+      SpriteBuilder.AddAnimation(companion.spriteAnimator, RoomMimiicCollection,
+        BH.Range(8,15), "swirl", tk2dSpriteAnimationClip.WrapMode.Loop).fps = 9f;
+      SpriteBuilder.AddAnimation(companion.spriteAnimator, RoomMimiicCollection,
+        BH.Range(16,19), "scream", tk2dSpriteAnimationClip.WrapMode.Loop).fps = 5.3f;
+      SpriteBuilder.AddAnimation(companion.spriteAnimator, RoomMimiicCollection,
+        BH.Range(20,24), "tell", tk2dSpriteAnimationClip.WrapMode.Once).fps = 8f;
+      SpriteBuilder.AddAnimation(companion.spriteAnimator, RoomMimiicCollection,
+        BH.Range(25,41), "suck", tk2dSpriteAnimationClip.WrapMode.Once).fps = 4f;
+      SpriteBuilder.AddAnimation(companion.spriteAnimator, RoomMimiicCollection,
+        BH.Range(42,47), "tell2", tk2dSpriteAnimationClip.WrapMode.Once).fps = 6f;
+      SpriteBuilder.AddAnimation(companion.spriteAnimator, RoomMimiicCollection,
+        BH.Range(48,54), "puke", tk2dSpriteAnimationClip.WrapMode.Once).fps = 7f;
+      SpriteBuilder.AddAnimation(companion.spriteAnimator, RoomMimiicCollection,
+        BH.Range(55,75), "intro", tk2dSpriteAnimationClip.WrapMode.Once).fps = 11f;
+      SpriteBuilder.AddAnimation(companion.spriteAnimator, RoomMimiicCollection,
+        BH.Range(76,86), "die", tk2dSpriteAnimationClip.WrapMode.Once).fps = 6f;
 
     }
+    var bs = prefab.GetComponent<BehaviorSpeculator>();
+    BehaviorSpeculator behaviorSpeculator = EnemyDatabase.GetOrLoadByGuid("01972dee89fc4404a5c408d50007dad5").behaviorSpeculator;
+    bs.OverrideBehaviors = behaviorSpeculator.OverrideBehaviors;
+    bs.OtherBehaviors = behaviorSpeculator.OtherBehaviors;
+    shootpoint = new GameObject("attach");
+    shootpoint.transform.parent = companion.transform;
+    shootpoint.transform.position = companion.sprite.WorldCenter;
+    GameObject m_CachedGunAttachPoint = companion.transform.Find("attach").gameObject;
+    bs.TargetBehaviors = new List<TargetBehaviorBase>
+    {
+      new TargetPlayerBehavior
+      {
+        Radius = 35f,
+        LineOfSight = false,
+        ObjectPermanence = true,
+        SearchInterval = 0.25f,
+        PauseOnTargetSwitch = false,
+        PauseTime = 0.25f
+      }
+    };
+    bs.AttackBehaviorGroup.AttackBehaviors = new List<AttackBehaviorGroup.AttackGroupItem>
+    {
+      new AttackBehaviorGroup.AttackGroupItem()
+      {
+
+        Probability = 1,
+        Behavior = new ShootBehavior {
+          ShootPoint = m_CachedGunAttachPoint,
+          BulletScript = new CustomBulletScriptSelector(typeof(SwirlScript)),
+          LeadAmount = 0f,
+          AttackCooldown = 3.5f,
+          FireAnimation = "swirl",
+          RequiresLineOfSight = false,
+          StopDuring = ShootBehavior.StopType.Attack,
+          Uninterruptible = true
+        },
+        NickName = "Swirl Whirly"
+
+      },
+      new AttackBehaviorGroup.AttackGroupItem()
+      {
+        Probability = 1,
+        Behavior = new ShootBehavior {
+          ShootPoint = m_CachedGunAttachPoint,
+          BulletScript = new CustomBulletScriptSelector(typeof(AAAAAAAAAAAAAAScript)),
+          LeadAmount = 0f,
+          AttackCooldown = 3.5f,
+          FireAnimation = "scream",
+          RequiresLineOfSight = false,
+          StopDuring = ShootBehavior.StopType.Attack,
+          Uninterruptible = true
+        },
+        NickName = "SCREAMMMMMMMM AAAAAAAAAHHHHHHHHH"
+      },
+      new AttackBehaviorGroup.AttackGroupItem()
+      {
+        Probability = 1,
+        Behavior = new ShootBehavior {
+          ShootPoint = m_CachedGunAttachPoint,
+          BulletScript = new CustomBulletScriptSelector(typeof(SkeletonBulletScript)),
+          LeadAmount = 0f,
+          MaxUsages = 2,
+          AttackCooldown = 5f,
+          TellAnimation = "tell2",
+          FireAnimation = "puke",
+          RequiresLineOfSight = false,
+          StopDuring = ShootBehavior.StopType.Attack,
+          Uninterruptible = true
+        },
+        NickName = "Skeleton Spookerino Wowie Zowie AHHHHH AHH, The Skeletons Are Eating Me, AHHHHHHH, man this name is stupid as hell. Stop reading my shit. Stop posting this on the Discord AHHH. At least hope you enjoy the mod tho."
+      },
+      new AttackBehaviorGroup.AttackGroupItem()
+      {
+        Probability = 1,
+        Behavior = new ShootBehavior {
+          ShootPoint = m_CachedGunAttachPoint,
+          BulletScript = new CustomBulletScriptSelector(typeof(SpitUpScript)),
+          LeadAmount = 0f,
+          AttackCooldown = 4.5f,
+          TellAnimation = "tell",
+          FireAnimation = "suck",
+          RequiresLineOfSight = false,
+          StopDuring = ShootBehavior.StopType.Attack,
+          Uninterruptible = true
+        },
+        NickName = "Cuck and Suck"
+      },
+
+    };
+    bs.InstantFirstTick                = behaviorSpeculator.InstantFirstTick;
+    bs.TickInterval                    = behaviorSpeculator.TickInterval;
+    bs.PostAwakenDelay                 = behaviorSpeculator.PostAwakenDelay;
+    bs.RemoveDelayOnReinforce          = behaviorSpeculator.RemoveDelayOnReinforce;
+    bs.OverrideStartingFacingDirection = behaviorSpeculator.OverrideStartingFacingDirection;
+    bs.StartingFacingDirection         = behaviorSpeculator.StartingFacingDirection;
+    bs.SkipTimingDifferentiator        = behaviorSpeculator.SkipTimingDifferentiator;
+    Game.Enemies.Add("kp:room_mimic", companion.aiActor);
   }
-
-
-
-
-
 
   private static string[] spritePaths = new string[]
   {
