@@ -16,6 +16,8 @@ namespace CwaffingTheGungy
 {
 public class RoomMimic : AIActor
 {
+  const string BULLET_KIN_GUID = "01972dee89fc4404a5c408d50007dad5";
+
   public static GameObject prefab;
   public static readonly string guid = "Room Mimic";
   public static GameObject shootpoint;
@@ -32,48 +34,28 @@ public class RoomMimic : AIActor
       companion.aiActor.MovementSpeed = 2f;
       companion.aiActor.CollisionDamage = 1f;
       companion.aiActor.aiAnimator.HitReactChance = 0.05f;
-      companion.aiActor.healthHaver.ForceSetCurrentHealth(500f);
       companion.aiActor.healthHaver.SetHealthMaximum(1000f);
+      companion.aiActor.healthHaver.ForceSetCurrentHealth(1000f);
       companion.aiActor.CollisionKnockbackStrength = 5f;
-    companion.aiActor.specRigidbody.SetDefaultColliders(101,27);
-    companion.aiActor.CorpseObject = EnemyDatabase.GetOrLoadByGuid("01972dee89fc4404a5c408d50007dad5").CorpseObject;
+      companion.aiActor.specRigidbody.SetDefaultColliders(101,27);
+      companion.aiActor.CorpseObject = EnemyDatabase.GetOrLoadByGuid(BULLET_KIN_GUID).CorpseObject;
 
+    // Add custom animation to the generic intro doer, and add a specific intro doer as well
     GenericIntroDoer miniBossIntroDoer = prefab.GetComponent<GenericIntroDoer>();
       miniBossIntroDoer.introAnim = "intro"; //TODO: check if this actually exists
       prefab.AddComponent<RoomMimicIntro>();
 
-    AIAnimator aiAnimator = companion.aiAnimator;
-    aiAnimator.IdleAnimation = new DirectionalAnimation
-    {
-      Type = DirectionalAnimation.DirectionType.Single,
-      Prefix = "idle",
-      AnimNames = new string[1],
-      Flipped = new DirectionalAnimation.FlipType[1]
-    };
-    tk2dSpriteCollectionData RoomMimiicCollection = SpriteBuilder.ConstructCollection(prefab, "Room_Mimic_Collection");
-    UnityEngine.Object.DontDestroyOnLoad(RoomMimiicCollection);
-    for (int i = 0; i < spritePaths.Length; i++)
-    {
-      SpriteBuilder.AddSpriteToCollection(spritePaths[i], RoomMimiicCollection);
-    }
-    SpriteBuilder.AddAnimation(companion.spriteAnimator, RoomMimiicCollection,
-      BH.Range(0,7), "idle", tk2dSpriteAnimationClip.WrapMode.Loop).fps = 7f;
-    SpriteBuilder.AddAnimation(companion.spriteAnimator, RoomMimiicCollection,
-      BH.Range(8,15), "swirl", tk2dSpriteAnimationClip.WrapMode.Loop).fps = 9f;
-    SpriteBuilder.AddAnimation(companion.spriteAnimator, RoomMimiicCollection,
-      BH.Range(16,19), "scream", tk2dSpriteAnimationClip.WrapMode.Loop).fps = 5.3f;
-    SpriteBuilder.AddAnimation(companion.spriteAnimator, RoomMimiicCollection,
-      BH.Range(20,24), "tell", tk2dSpriteAnimationClip.WrapMode.Once).fps = 8f;
-    SpriteBuilder.AddAnimation(companion.spriteAnimator, RoomMimiicCollection,
-      BH.Range(25,41), "suck", tk2dSpriteAnimationClip.WrapMode.Once).fps = 4f;
-    SpriteBuilder.AddAnimation(companion.spriteAnimator, RoomMimiicCollection,
-      BH.Range(42,47), "tell2", tk2dSpriteAnimationClip.WrapMode.Once).fps = 6f;
-    SpriteBuilder.AddAnimation(companion.spriteAnimator, RoomMimiicCollection,
-      BH.Range(48,54), "puke", tk2dSpriteAnimationClip.WrapMode.Once).fps = 7f;
-    SpriteBuilder.AddAnimation(companion.spriteAnimator, RoomMimiicCollection,
-      BH.Range(55,75), "intro", tk2dSpriteAnimationClip.WrapMode.Once).fps = 11f;
-    SpriteBuilder.AddAnimation(companion.spriteAnimator, RoomMimiicCollection,
-      BH.Range(76,86), "die", tk2dSpriteAnimationClip.WrapMode.Once).fps = 6f;
+    // Set up sprites, using BH.Range for easy consecutively-numbered sprites
+    tk2dSpriteCollectionData bossSprites = BH.LoadSpriteCollection(prefab,spritePaths);
+      companion.AddAnimation(bossSprites, BH.Range(0, 7 ), "idle",     7f, true, DirectionalAnimation.DirectionType.Single);
+      companion.AddAnimation(bossSprites, BH.Range(8, 15), "swirl",    9f, true);
+      companion.AddAnimation(bossSprites, BH.Range(16,19), "scream", 5.3f, true);
+      companion.AddAnimation(bossSprites, BH.Range(20,24), "tell",     8f, false);
+      companion.AddAnimation(bossSprites, BH.Range(25,41), "suck",     4f, false);
+      companion.AddAnimation(bossSprites, BH.Range(42,47), "tell2",    6f, false);
+      companion.AddAnimation(bossSprites, BH.Range(48,54), "puke",     7f, false);
+      companion.AddAnimation(bossSprites, BH.Range(55,75), "intro",   11f, false);
+      companion.AddAnimation(bossSprites, BH.Range(76,86), "die",      6f, false);
 
     shootpoint = new GameObject("attach");
     shootpoint.transform.parent = companion.transform;
@@ -81,7 +63,7 @@ public class RoomMimic : AIActor
     GameObject m_CachedGunAttachPoint = companion.transform.Find("attach").gameObject;
 
     BehaviorSpeculator bs = prefab.GetComponent<BehaviorSpeculator>();
-      bs.CopySaneDefaultBehavior(EnemyDatabase.GetOrLoadByGuid("01972dee89fc4404a5c408d50007dad5").behaviorSpeculator);
+      bs.CopySaneDefaultBehavior(EnemyDatabase.GetOrLoadByGuid(BULLET_KIN_GUID).behaviorSpeculator);
       bs.TargetBehaviors = new List<TargetBehaviorBase>
       {
         new TargetPlayerBehavior

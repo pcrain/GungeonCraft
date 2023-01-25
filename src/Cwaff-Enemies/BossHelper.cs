@@ -88,11 +88,12 @@ namespace CwaffingTheGungy
         companion.aiActor.CanTargetPlayers = true;
         companion.aiActor.PreventBlackPhantom = false;
 
+      // prefab.name = tableId+"_NAME";
+      prefab.name = name;
       string tableId = "#"+name.Replace(" ","_").ToUpper();
       ETGMod.Databases.Strings.Enemies.Set(tableId+"_NAME", name);
       ETGMod.Databases.Strings.Enemies.Set(tableId+"_SUBTITLE", subtitle);
       ETGMod.Databases.Strings.Enemies.Set(tableId+"_QUOTE", string.Empty);
-      prefab.name = tableId+"_NAME";
       companion.aiActor.healthHaver.overrideBossName = tableId+"_NAME";
       companion.aiActor.OverrideDisplayName = tableId+"_NAME";
       companion.aiActor.ActorName = tableId+"_NAME";
@@ -151,6 +152,32 @@ namespace CwaffingTheGungy
       return miniBossIntroDoer;
     }
 
+    public static void AddAnimation(this EnemyBehavior self, tk2dSpriteCollectionData collection, List<int> ids, string name, float fps, bool loop, DirectionalAnimation.DirectionType direction = DirectionalAnimation.DirectionType.None)
+    {
+      tk2dSpriteAnimationClip.WrapMode loopMode = loop
+        ? tk2dSpriteAnimationClip.WrapMode.Loop
+        : tk2dSpriteAnimationClip.WrapMode.Once;
+      SpriteBuilder.AddAnimation(self.spriteAnimator, collection, ids, name, loopMode).fps = fps;
+      if (direction != DirectionalAnimation.DirectionType.None)
+      {
+        self.aiAnimator.IdleAnimation = new DirectionalAnimation
+        {
+          Type = direction,
+          Prefix = name,
+          AnimNames = new string[1], // TODO: this might not be one if our directional type is not single
+          Flipped = new DirectionalAnimation.FlipType[1]
+        };
+      }
+    }
+
+    public static tk2dSpriteCollectionData LoadSpriteCollection(GameObject prefab, string[] spritePaths)
+    {
+      tk2dSpriteCollectionData bossSprites = SpriteBuilder.ConstructCollection(prefab, (prefab.name+" Collection").Replace(" ","_"));
+      UnityEngine.Object.DontDestroyOnLoad(bossSprites);
+      for (int i = 0; i < spritePaths.Length; i++)
+        SpriteBuilder.AddSpriteToCollection(spritePaths[i], bossSprites);
+      return bossSprites;
+    }
 
     public static IEnumerator WaitForSecondsInvariant(float time)
     {
