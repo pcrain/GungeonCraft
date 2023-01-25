@@ -52,11 +52,10 @@ public class RoomMimic : AIActor
       companion.aiActor.CollisionKnockbackStrength = 5f;
       companion.aiActor.procedurallyOutlined = false;
       companion.aiActor.CanTargetPlayers = true;
-      ///
-      // CwaffingTheGungy.Strings.Enemies.Set("#ROOM_MIMIC", "Roomimic");
-      // CwaffingTheGungy.Strings.Enemies.Set("#????", "???");
-      // CwaffingTheGungy.Strings.Enemies.Set("#SUBTITLE", "Face Off!");
-      // CwaffingTheGungy.Strings.Enemies.Set("#QUOTE", "");
+      ETGMod.Databases.Strings.Enemies.Set("#ROOM_MIMIC", "Roomimic");
+      ETGMod.Databases.Strings.Enemies.Set("#????", "???");
+      ETGMod.Databases.Strings.Enemies.Set("#SUBTITLE", "Face Off!");
+      ETGMod.Databases.Strings.Enemies.Set("#QUOTE", "");
       companion.aiActor.healthHaver.overrideBossName = "#ROOM_MIMIC";
       companion.aiActor.OverrideDisplayName = "#ROOM_MIMIC";
       companion.aiActor.ActorName = "#ROOM_MIMIC";
