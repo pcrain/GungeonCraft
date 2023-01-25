@@ -12,6 +12,7 @@ using MonoMod.Utils;
 
 using GungeonAPI;
 using ItemAPI;
+using EnemyAPI;
 
 namespace CwaffingTheGungy
 {
@@ -159,6 +160,10 @@ namespace CwaffingTheGungy
                     braveResources = null;
                     enemiesBase = null;
                 #endregion
+
+                // Bosses yo
+                BossBuilder.Init();
+                RoomMimic.Init();
 
                 // Modified version of Anywhere mod, further stolen and modified from Apache's version
                 FlowCommands.Install();

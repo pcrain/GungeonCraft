@@ -104,17 +104,6 @@ public class RoomMimic : AIActor
       }
       miniBossIntroDoer.SkipFinalizeAnimation = true;
       miniBossIntroDoer.RegenerateCache();
-      //BehaviorSpeculator aIActor = EnemyDatabase.GetOrLoadByGuid("465da2bb086a4a88a803f79fe3a27677").behaviorSpeculator;
-      //Tools.DebugInformation(aIActor);
-
-      /////
-
-
-
-
-
-
-
       companion.aiActor.healthHaver.SetHealthMaximum(1000f, null, false);
       companion.aiActor.specRigidbody.PixelColliders.Clear();
       companion.aiActor.specRigidbody.PixelColliders.Add(new PixelCollider
@@ -632,8 +621,8 @@ public class RoomMimic : AIActor
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_intro_020",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_intro_021",
     //die
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_die_001",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_die_002",
+    "CwaffingTheGungy/Resources/room_mimic/room_mimic_die_003",
+    "CwaffingTheGungy/Resources/room_mimic/room_mimic_die_003",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_die_003",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_die_004",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_die_005",
@@ -878,11 +867,3 @@ public class RoomMimicIntro : SpecificIntroDoer
 }
 
 }
-
-
-
-
-
-
-
-

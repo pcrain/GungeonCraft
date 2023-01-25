@@ -40,6 +40,14 @@ namespace CwaffingTheGungy
                     0);
                 // ETGModConsole.Log("<size=100><color=#ff0000ff>Please specify a command. Type 'nn help' for a list of commands.</color></size>", false);
             });
+            // Boss time o.o
+            ETGModConsole.Commands.AddGroup("bb", delegate (string[] args)
+            {
+              PlayerController player = GameManager.Instance.PrimaryPlayer;
+              AIActor orLoadByGuid = EnemyDatabase.GetOrLoadByGuid(RoomMimic.guid);
+              AIActor aiactor = AIActor.Spawn(orLoadByGuid, player.gameObject.transform.position, player.gameObject.transform.position.GetAbsoluteRoom(), true, AIActor.AwakenAnimationType.Default, true);
+              aiactor.GetComponent<GenericIntroDoer>().TriggerSequence(player);
+            });
             // Another base command for loading my latest debug flow
             ETGModConsole.Commands.AddGroup("ff", delegate (string[] args)
             {
