@@ -54,6 +54,7 @@
     <Compile Include="src\HatsStolenFromNN\HatUtility.cs"/>
     <Compile Include="src\HatsStolenFromNN\Hat.cs"/>
     <Compile Include="src\HatsStolenFromNN\HatDefinitions.cs"/>
+    <Compile Include="src\Cwaff-Enemies\Boss.cs"/>
     <Compile Include="src\Cwaff-Rooms\FlowHelpers.cs"/>
     <Compile Include="src\Cwaff-Rooms\FlowSimpleAsItGets.cs"/>
     <Compile Include="src\Cwaff-Rooms\CwaffDungeonFlows.cs"/>
