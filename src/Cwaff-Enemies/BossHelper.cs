@@ -20,5 +20,142 @@ namespace CwaffingTheGungy
     {
       return Enumerable.Range(start, end-start+1).ToList();
     }
+
+    public static void CopySaneDefaultBehavior(this BehaviorSpeculator self, BehaviorSpeculator other)
+    {
+      self.OverrideBehaviors               = other.OverrideBehaviors;
+      self.OtherBehaviors                  = other.OtherBehaviors;
+      self.InstantFirstTick                = other.InstantFirstTick;
+      self.TickInterval                    = other.TickInterval;
+      self.PostAwakenDelay                 = other.PostAwakenDelay;
+      self.RemoveDelayOnReinforce          = other.RemoveDelayOnReinforce;
+      self.OverrideStartingFacingDirection = other.OverrideStartingFacingDirection;
+      self.StartingFacingDirection         = other.StartingFacingDirection;
+      self.SkipTimingDifferentiator        = other.SkipTimingDifferentiator;
+    }
+
+    public static void SetDefaultColliders(this SpeculativeRigidbody self, int width, int height)
+    {
+      self.PixelColliders.Clear();
+      self.PixelColliders.Add(new PixelCollider
+        {
+          ColliderGenerationMode = PixelCollider.PixelColliderGeneration.Manual,
+          CollisionLayer = CollisionLayer.EnemyCollider,
+          IsTrigger = false,
+          BagleUseFirstFrameOnly = false,
+          SpecifyBagelFrame = string.Empty,
+          BagelColliderNumber = 0,
+          ManualOffsetX = 0,
+          ManualOffsetY = 10,
+          ManualWidth = 101,
+          ManualHeight = 27,
+          ManualDiameter = 0,
+          ManualLeftX = 0,
+          ManualLeftY = 0,
+          ManualRightX = 0,
+          ManualRightY = 0
+        });
+      self.PixelColliders.Add(new PixelCollider
+        {
+          ColliderGenerationMode = PixelCollider.PixelColliderGeneration.Manual,
+          CollisionLayer = CollisionLayer.EnemyHitBox,
+          IsTrigger = false,
+          BagleUseFirstFrameOnly = false,
+          SpecifyBagelFrame = string.Empty,
+          BagelColliderNumber = 0,
+          ManualOffsetX = 0,
+          ManualOffsetY = 10,
+          ManualWidth = 101,
+          ManualHeight = 27,
+          ManualDiameter = 0,
+          ManualLeftX = 0,
+          ManualLeftY = 0,
+          ManualRightX = 0,
+          ManualRightY = 0,
+        });
+    }
+
+    public static EnemyBehavior AddSaneDefaultBossBehavior(GameObject prefab, string name, string subtitle, string bossCardPath = "")
+    {
+      EnemyBehavior companion = prefab.AddComponent<EnemyBehavior>();
+        companion.aiActor.healthHaver.PreventAllDamage = false;
+        companion.aiActor.HasShadow = false;
+        companion.aiActor.IgnoreForRoomClear = false;
+        companion.aiActor.specRigidbody.CollideWithOthers = true;
+        companion.aiActor.specRigidbody.CollideWithTileMap = true;
+        companion.aiActor.PreventFallingInPitsEver = true;
+        companion.aiActor.procedurallyOutlined = false;
+        companion.aiActor.CanTargetPlayers = true;
+        companion.aiActor.PreventBlackPhantom = false;
+
+      string tableId = "#"+name.Replace(" ","_").ToUpper();
+      ETGMod.Databases.Strings.Enemies.Set(tableId+"_NAME", name);
+      ETGMod.Databases.Strings.Enemies.Set(tableId+"_SUBTITLE", subtitle);
+      ETGMod.Databases.Strings.Enemies.Set(tableId+"_QUOTE", string.Empty);
+      prefab.name = tableId+"_NAME";
+      companion.aiActor.healthHaver.overrideBossName = tableId+"_NAME";
+      companion.aiActor.OverrideDisplayName = tableId+"_NAME";
+      companion.aiActor.ActorName = tableId+"_NAME";
+      companion.aiActor.name = tableId+"_NAME";
+      GenericIntroDoer miniBossIntroDoer = BH.AddSaneDefaultIntroDoer(prefab);
+        if (!String.IsNullOrEmpty(bossCardPath))
+        {
+          Texture2D bossCardTexture = ResourceExtractor.GetTextureFromResource(bossCardPath);
+          miniBossIntroDoer.portraitSlideSettings = new PortraitSlideSettings()
+          {
+            bossNameString = tableId+"_NAME",
+            bossSubtitleString = tableId+"_SUBTITLE",
+            bossQuoteString = tableId+"_QUOTE",
+            bossSpritePxOffset = IntVector2.Zero,
+            topLeftTextPxOffset = IntVector2.Zero,
+            bottomRightTextPxOffset = IntVector2.Zero,
+            bgColor = Color.cyan
+          };
+          miniBossIntroDoer.portraitSlideSettings.bossArtSprite = bossCardTexture;
+          miniBossIntroDoer.SkipBossCard = false;
+          prefab.GetComponent<EnemyBehavior>().aiActor.healthHaver.bossHealthBar = HealthHaver.BossBarType.MainBar;
+        }
+        else
+        {
+          miniBossIntroDoer.SkipBossCard = true;
+          prefab.GetComponent<EnemyBehavior>().aiActor.healthHaver.bossHealthBar = HealthHaver.BossBarType.SubbossBar;
+        }
+        miniBossIntroDoer.SkipFinalizeAnimation = true;
+        miniBossIntroDoer.RegenerateCache();
+
+
+      return companion;
+    }
+
+    public static GenericIntroDoer AddSaneDefaultIntroDoer(GameObject prefab)
+    {
+      GenericIntroDoer miniBossIntroDoer = prefab.AddComponent<GenericIntroDoer>();
+        miniBossIntroDoer.triggerType = GenericIntroDoer.TriggerType.PlayerEnteredRoom;
+        miniBossIntroDoer.specifyIntroAiAnimator = null;
+        miniBossIntroDoer.initialDelay = 0.15f;
+        miniBossIntroDoer.cameraMoveSpeed = 14;
+        miniBossIntroDoer.introAnim = string.Empty;
+        // miniBossIntroDoer.introAnim = "intro"; //TODO: check if this actually exists
+        miniBossIntroDoer.introDirectionalAnim = string.Empty;
+        miniBossIntroDoer.continueAnimDuringOutro = false;
+        miniBossIntroDoer.BossMusicEvent = "Play_MUS_Boss_Theme_Beholster";
+        miniBossIntroDoer.PreventBossMusic = false;
+        miniBossIntroDoer.InvisibleBeforeIntroAnim = true;
+        miniBossIntroDoer.preIntroAnim = string.Empty;
+        miniBossIntroDoer.preIntroDirectionalAnim = string.Empty;
+        miniBossIntroDoer.cameraFocus = null;
+        miniBossIntroDoer.roomPositionCameraFocus = Vector2.zero;
+        miniBossIntroDoer.restrictPlayerMotionToRoom = false;
+        miniBossIntroDoer.fusebombLock = false;
+        miniBossIntroDoer.AdditionalHeightOffset = 0;
+      return miniBossIntroDoer;
+    }
+
+
+    public static IEnumerator WaitForSecondsInvariant(float time)
+    {
+      for (float elapsed = 0f; elapsed < time; elapsed += GameManager.INVARIANT_DELTA_TIME) { yield return null; }
+      yield break;
+    }
   }
 }
