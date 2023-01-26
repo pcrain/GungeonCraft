@@ -276,9 +276,6 @@ namespace CwaffingTheGungy
 
     public static void AddBossToFirstFloorPool(this GameObject self)
     {
-      ETGModConsole.Log("trying");
-      /*
-      */
         AssetBundle sharedAssets = ResourceManager.LoadAssetBundle("shared_auto_001");
         GenericRoomTable bosstable_01_gatlinggull = sharedAssets.LoadAsset<GenericRoomTable>("bosstable_01_gatlinggull");
         List<PrototypeDungeonRoom> m_GatlingGullRooms = new List<PrototypeDungeonRoom>();
@@ -295,8 +292,10 @@ namespace CwaffingTheGungy
         sharedAssets = null;
         // RoomBuilder.AddObjectToRoom(Expand_Belly_BossRoom, new Vector2(20, 19), EnemyBehaviourGuid: ExpandCustomEnemyDatabase.ParasiteBossGUID);
 
-        // IndividualBossFloorEntry testIndividualBossFloorEntry = new IndividualBossFloorEntry()
-        castleGeonBosses.Add(new IndividualBossFloorEntry()
+        if (theBossMan == null)
+          theBossMan = GameManager.Instance.BossManager;
+
+        IndividualBossFloorEntry entry = new IndividualBossFloorEntry()
         {
           BossWeight = 99f,
           TargetRoomTable = StaticReferences.RoomTables["bulletking"],
@@ -320,31 +319,22 @@ namespace CwaffingTheGungy
                   statToCheck = TrackedStats.GUNBERS_MUNCHED
               }
           }
-        });
+        };
+        // castleGeonBosses.Add(entry);
 
-        // BossFloorEntry testBossFloorEntry = new BossFloorEntry()
-        // {
-        //   Annotation = "IDK what this does",
-        //   AssociatedTilesets = GlobalDungeonData.ValidTilesets.CASTLEGEON, /* Can OR | these together */
-        //   Bosses = new List<IndividualBossFloorEntry>{testIndividualBossFloorEntry}
-        // };
-
-        // foreach (BossFloorEntry b in GameManager.Instance.BossManager.BossFloorData)
-        // {
-        //   if ((b.AssociatedTilesets & GlobalDungeonData.ValidTilesets.CASTLEGEON) > 0)
-        //   {
-        //     foreach (IndividualBossFloorEntry i in b.Bosses)
-        //     {
-        //       i.BossWeight = 0f;
-        //       ETGModConsole.Log($"    {i.TargetRoomTable.name} -> {i.BossWeight}");
-        //     }
-        //     b.Bosses.Add(testIndividualBossFloorEntry);
-        //     ETGModConsole.Log($"  {b.Annotation}: {b.AssociatedTilesets}");
-        //   }
-        // }
-
-        // GameManager.Instance.BossManager.BossFloorData.Clear();
-        // GameManager.Instance.BossManager.BossFloorData.Add(testBossFloorEntry);
+        foreach (BossFloorEntry b in theBossMan.BossFloorData)
+        {
+          if ((b.AssociatedTilesets & GlobalDungeonData.ValidTilesets.CASTLEGEON) > 0)
+          {
+            foreach (IndividualBossFloorEntry i in b.Bosses)
+            {
+              i.BossWeight = 0f;
+              ETGModConsole.Log($"    {i.TargetRoomTable.name} -> {i.BossWeight}");
+            }
+            b.Bosses.Add(entry);
+            ETGModConsole.Log($"  {b.Annotation}: {b.AssociatedTilesets}");
+          }
+        }
 
         //Add rooms to vanilla room tables
         // StaticReferences.RoomTables["triggertwins"].includedRooms = StaticReferences.RoomTables["gull"].includedRooms;
@@ -353,12 +343,17 @@ namespace CwaffingTheGungy
         // ETGModConsole.Log(StaticReferences.RoomTables["boss2"]);//.includedRooms.Add(wRoom);
         // ETGModConsole.Log(StaticReferences.RoomTables["boss3"]);//.includedRooms.Add(wRoom);
 
-        new Hook(
-          typeof(BossFloorEntry).GetMethod("SelectBoss", BindingFlags.Public | BindingFlags.Instance),
-          typeof(BH).GetMethod("SelectBossHook", BindingFlags.Public | BindingFlags.Static));
-
+        if (selectBossHook == null)
+        {
+          selectBossHook = new Hook(
+            typeof(BossFloorEntry).GetMethod("SelectBoss", BindingFlags.Public | BindingFlags.Instance),
+            typeof(BH).GetMethod("SelectBossHook", BindingFlags.Public | BindingFlags.Static));
+        }
     }
 
+    private static BossManager theBossMan = null;
+
+    private static Hook selectBossHook = null;
     private static List<IndividualBossFloorEntry> castleGeonBosses =
       new List<IndividualBossFloorEntry>();
     private static List<IndividualBossFloorEntry> sewerGeonBosses =
@@ -374,18 +369,32 @@ namespace CwaffingTheGungy
 
     public static IndividualBossFloorEntry SelectBossHook(Func<BossFloorEntry, IndividualBossFloorEntry> orig, BossFloorEntry self)
     {
-      if ((self.AssociatedTilesets & GlobalDungeonData.ValidTilesets.CASTLEGEON) > 0)
-        self.Bosses.AddRange(castleGeonBosses);
-      if ((self.AssociatedTilesets & GlobalDungeonData.ValidTilesets.SEWERGEON) > 0)
-        self.Bosses.AddRange(sewerGeonBosses);
-      if ((self.AssociatedTilesets & GlobalDungeonData.ValidTilesets.GUNGEON) > 0)
-        self.Bosses.AddRange(gunGeonBosses);
-      if ((self.AssociatedTilesets & GlobalDungeonData.ValidTilesets.CATHEDRALGEON) > 0)
-        self.Bosses.AddRange(cathedralGeonBosses);
-      if ((self.AssociatedTilesets & GlobalDungeonData.ValidTilesets.MINEGEON) > 0)
-        self.Bosses.AddRange(mineGeonBosses);
-      if ((self.AssociatedTilesets & GlobalDungeonData.ValidTilesets.CATACOMBGEON) > 0)
-        self.Bosses.AddRange(catacombGeonBosses);
+      // if ((self.AssociatedTilesets & GlobalDungeonData.ValidTilesets.CASTLEGEON) > 0)
+      //   self.Bosses.AddRange(castleGeonBosses);
+      // if ((self.AssociatedTilesets & GlobalDungeonData.ValidTilesets.SEWERGEON) > 0)
+      //   self.Bosses.AddRange(sewerGeonBosses);
+      // if ((self.AssociatedTilesets & GlobalDungeonData.ValidTilesets.GUNGEON) > 0)
+      //   self.Bosses.AddRange(gunGeonBosses);
+      // if ((self.AssociatedTilesets & GlobalDungeonData.ValidTilesets.CATHEDRALGEON) > 0)
+      //   self.Bosses.AddRange(cathedralGeonBosses);
+      // if ((self.AssociatedTilesets & GlobalDungeonData.ValidTilesets.MINEGEON) > 0)
+      //   self.Bosses.AddRange(mineGeonBosses);
+      // if ((self.AssociatedTilesets & GlobalDungeonData.ValidTilesets.CATACOMBGEON) > 0)
+      //   self.Bosses.AddRange(catacombGeonBosses);
+
+      // foreach (BossFloorEntry b in GameManager.Instance.BossManager.BossFloorData)
+      // {
+      //   if ((b.AssociatedTilesets & GlobalDungeonData.ValidTilesets.CASTLEGEON) > 0)
+      //   {
+      //     foreach (IndividualBossFloorEntry i in b.Bosses)
+      //     {
+      //       i.BossWeight = 0f;
+      //       ETGModConsole.Log($"    {i.TargetRoomTable.name} -> {i.BossWeight}");
+      //     }
+      //     b.Bosses.Add(testIndividualBossFloorEntry);
+      //     ETGModConsole.Log($"  {b.Annotation}: {b.AssociatedTilesets}");
+      //   }
+      // }
 
       foreach (IndividualBossFloorEntry i in self.Bosses)
         ETGModConsole.Log($"    {i.TargetRoomTable.name} -> {i.BossWeight}");
