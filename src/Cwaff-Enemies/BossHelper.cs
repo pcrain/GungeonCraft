@@ -18,11 +18,50 @@ using MonoMod.RuntimeDetour;
 
 namespace CwaffingTheGungy
 {
+  public enum Floors // Matches GlobalDungeonData.ValidTilesets
+  {
+    GUNGEON = 1,
+    CASTLEGEON = 2,
+    SEWERGEON = 4,
+    CATHEDRALGEON = 8,
+    MINEGEON = 0x10,
+    CATACOMBGEON = 0x20,
+    FORGEGEON = 0x40,
+    HELLGEON = 0x80,
+    SPACEGEON = 0x100,
+    PHOBOSGEON = 0x200,
+    WESTGEON = 0x400,
+    OFFICEGEON = 0x800,
+    BELLYGEON = 0x1000,
+    JUNGLEGEON = 0x2000,
+    FINALGEON = 0x4000,
+    RATGEON = 0x8000
+  }
+
   public static class BH
   {
+    // Used for loading a sane default behavior speculator
+    public const string BULLET_KIN_GUID = "01972dee89fc4404a5c408d50007dad5";
+
+    // Per Apache, need reference to BossManager or Unity will muck with the prefab
+    private static BossManager theBossMan = null;
+
+    // Little variable for storing our generic boss room prefab for testing
+    private static PrototypeDungeonRoom genericBossRoomPrefab = null;
+
+    // Regular expression for teasing apart animation names in a folder
+    public static Regex rx_anim = new Regex(@"^(?:(.*?)_)?([^_]*?)_([0-9]+)\.png$",
+          RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
     public static List<int> Range(int start, int end)
     {
       return Enumerable.Range(start, end-start+1).ToList();
+    }
+
+    public static IEnumerator WaitForSecondsInvariant(float time)
+    {
+      for (float elapsed = 0f; elapsed < time; elapsed += GameManager.INVARIANT_DELTA_TIME) { yield return null; }
+      yield break;
     }
 
     public static void CopySaneDefaultBehavior(this BehaviorSpeculator self, BehaviorSpeculator other)
@@ -79,9 +118,10 @@ namespace CwaffingTheGungy
         });
     }
 
-    public static EnemyBehavior AddSaneDefaultBossBehavior(GameObject prefab, string name, string subtitle, string bossCardPath = "")
+    public static T AddSaneDefaultBossBehavior<T>(GameObject prefab, string name, string subtitle, string bossCardPath = "")
+      where T : BraveBehaviour
     {
-      EnemyBehavior companion = prefab.AddComponent<EnemyBehavior>();
+      BraveBehaviour companion = prefab.AddComponent<T>();
         companion.aiActor.healthHaver.PreventAllDamage = false;
         companion.aiActor.HasShadow = false;
         companion.aiActor.IgnoreForRoomClear = false;
@@ -91,6 +131,7 @@ namespace CwaffingTheGungy
         companion.aiActor.procedurallyOutlined = false;
         companion.aiActor.CanTargetPlayers = true;
         companion.aiActor.PreventBlackPhantom = false;
+        companion.aiActor.CorpseObject = EnemyDatabase.GetOrLoadByGuid(BULLET_KIN_GUID).CorpseObject;
 
       // prefab.name = tableId+"_NAME";
       prefab.name = name;
@@ -128,8 +169,9 @@ namespace CwaffingTheGungy
         miniBossIntroDoer.SkipFinalizeAnimation = true;
         miniBossIntroDoer.RegenerateCache();
 
-
-      return companion;
+      BehaviorSpeculator bs = prefab.GetComponent<BehaviorSpeculator>();
+        bs.CopySaneDefaultBehavior(EnemyDatabase.GetOrLoadByGuid(BULLET_KIN_GUID).behaviorSpeculator);
+      return companion as T;
     }
 
     public static GenericIntroDoer AddSaneDefaultIntroDoer(GameObject prefab)
@@ -195,9 +237,6 @@ namespace CwaffingTheGungy
       }
     }
 
-    public static Regex rx_anim = new Regex(@"^(?:(.*?)_)?([^_]*?)_([0-9]+)\.png$",
-          RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
     public static void InitSpritesFromResourcePath(this EnemyBehavior self, string resourcePath, int defaultFps = 15)
     {
       // TODO: maybe add warning if a path isn't added as a resource?
@@ -251,7 +290,7 @@ namespace CwaffingTheGungy
           dir = DirectionalAnimation.DirectionType.Single;
         else
           dir = DirectionalAnimation.DirectionType.None;
-        ETGModConsole.Log($"calling self.AddAnimation(bossSprites, BH.Range({firstAnim}, {lastAnim-1}), \"{entry.Key}\", {defaultFps}, {true}, {dir});");
+        // ETGModConsole.Log($"calling self.AddAnimation(bossSprites, BH.Range({firstAnim}, {lastAnim-1}), \"{entry.Key}\", {defaultFps}, {true}, {dir});");
         self.AddAnimation(bossSprites, BH.Range(firstAnim, lastAnim-1), entry.Key, defaultFps, true, dir);
       }
 
@@ -266,12 +305,6 @@ namespace CwaffingTheGungy
       for (int i = 0; i < spritePaths.Length; i++)
         SpriteBuilder.AddSpriteToCollection(spritePaths[i], bossSprites);
       return bossSprites;
-    }
-
-    public static IEnumerator WaitForSecondsInvariant(float time)
-    {
-      for (float elapsed = 0f; elapsed < time; elapsed += GameManager.INVARIANT_DELTA_TIME) { yield return null; }
-      yield break;
     }
 
     //Stolen from Apache
@@ -320,24 +353,14 @@ namespace CwaffingTheGungy
         return new WeightedRoom() { room = Room, weight = Weight, limitedCopies = LimitedCopies, maxCopies = MaxCopies, additionalPrerequisites = AdditionalPrerequisites };
     }
 
-    private static PrototypeDungeonRoom genericBossRoomPrefab = null;
-
     public static PrototypeDungeonRoom GetGenericBossRoom()
     {
       // Load gatling gull's boss room as a prototype
-      if (genericBossRoomPrefab == null)
+      if (genericBossRoomPrefab == null) //TODO: might need prefabs?
       {
         AssetBundle sharedAssets = ResourceManager.LoadAssetBundle("shared_auto_001");
-        GenericRoomTable bosstable_01_gatlinggull = sharedAssets.LoadAsset<GenericRoomTable>("bosstable_01_gatlinggull");
-        foreach (WeightedRoom wRoom in bosstable_01_gatlinggull.includedRooms.elements)
-        {
-          genericBossRoomPrefab = wRoom.room;
-          break;
-          // genericBossRoomPrefab.gameObject.SetActive(false);
-          // FakePrefab.MarkAsFakePrefab(genericBossRoomPrefab.gameObject);
-          // UnityEngine.Object.DontDestroyOnLoad(genericBossRoomPrefab);
-          // break;
-        }
+        GenericRoomTable bossTable = sharedAssets.LoadAsset<GenericRoomTable>("bosstable_01_gatlinggull");
+        genericBossRoomPrefab = bossTable.includedRooms.elements[0].room;
         sharedAssets = null;
       }
       // Instantiate and clear out the room for our personal use
@@ -354,128 +377,83 @@ namespace CwaffingTheGungy
       return p;
     }
 
-    public static void AddBossToFirstFloorPool(this GameObject self)
+    /*
+      Legal tilesets:
+        CASTLEGEON, SEWERGEON, GUNGEON, CATHEDRALGEON, MINEGEON, CATACOMBGEON, FORGEGEON, HELLGEON
+      Illegal tilesets:
+        SPACEGEON, PHOBOSGEON, WESTGEON, OFFICEGEON, BELLYGEON, JUNGLEGEON, FINALGEON, RATGEON
+    */
+    public static void AddBossToFloorPool(this GameObject self, string guid, float weight = 1f, Floors floors = Floors.CASTLEGEON)
     {
+        // Load our boss manager if it's not loaded already
         if (theBossMan == null)
           theBossMan = GameManager.Instance.BossManager;
 
+        // Convert our Floors enum to a GlobalDungeonData.ValidTilesets enum
+        GlobalDungeonData.ValidTilesets allowedFloors =
+          (GlobalDungeonData.ValidTilesets)Enum.Parse(typeof(GlobalDungeonData.ValidTilesets), floors.ToString());
+
+        // Get a generic boss room and add it to the center of the room
         PrototypeDungeonRoom p = GetGenericBossRoom();
           Vector2 roomCenter = new Vector2(p.Width/2.0f, p.Height/2.0f);
           Vector2 spriteCenter = self.GetComponent<tk2dSpriteAnimator>().GetAnySprite().WorldCenter;
-        AddObjectToRoom(p, roomCenter - spriteCenter, EnemyBehaviourGuid: RoomMimic.guid);
+        AddObjectToRoom(p, roomCenter - spriteCenter, EnemyBehaviourGuid: guid);
 
+        // Create a new table and add our new boss room
         GenericRoomTable theRoomTable = ScriptableObject.CreateInstance<GenericRoomTable>();
           theRoomTable.name = self.name+" Boss Table";
           theRoomTable.includedRooms = new WeightedRoomCollection();
           theRoomTable.includedRooms.elements = new List<WeightedRoom>(){GenerateWeightedRoom(p)};
           theRoomTable.includedRoomTables = new List<GenericRoomTable>(0);
 
-        IndividualBossFloorEntry entry = new IndividualBossFloorEntry()
-        {
-          BossWeight = 99f,
-          TargetRoomTable = theRoomTable,
+        // Make a new floor entry for our boss
+        IndividualBossFloorEntry entry = new IndividualBossFloorEntry() {
+          BossWeight              = weight,
+          TargetRoomTable         = theRoomTable,
           GlobalBossPrerequisites = new DungeonPrerequisite[] {
-              new DungeonPrerequisite() {
-                  prerequisiteOperation = DungeonPrerequisite.PrerequisiteOperation.EQUAL_TO,
-                  prerequisiteType = DungeonPrerequisite.PrerequisiteType.TILESET,
-                  requiredTileset = GlobalDungeonData.ValidTilesets.CASTLEGEON,
-                  requireTileset = true,
-                  comparisonValue = 1,
-                  encounteredObjectGuid = string.Empty,
-                  maxToCheck = TrackedMaximums.MOST_KEYS_HELD,
-                  requireDemoMode = false,
-                  requireCharacter = false,
-                  requiredCharacter = PlayableCharacters.Pilot,
-                  requireFlag = false,
-                  useSessionStatValue = false,
-                  encounteredRoom = null,
-                  requiredNumberOfEncounters = -1,
-                  saveFlagToCheck = GungeonFlags.TUTORIAL_COMPLETED,
-                  statToCheck = TrackedStats.GUNBERS_MUNCHED
-              }
+            new DungeonPrerequisite() {
+              prerequisiteOperation = DungeonPrerequisite.PrerequisiteOperation.EQUAL_TO,
+              prerequisiteType = DungeonPrerequisite.PrerequisiteType.TILESET,
+              requiredTileset = allowedFloors,
+              requireTileset = true,
+              comparisonValue = 1,
+              encounteredObjectGuid = string.Empty,
+              maxToCheck = TrackedMaximums.MOST_KEYS_HELD,
+              requireDemoMode = false,
+              requireCharacter = false,
+              requiredCharacter = PlayableCharacters.Pilot,
+              requireFlag = false,
+              useSessionStatValue = false,
+              encounteredRoom = null,
+              requiredNumberOfEncounters = -1,
+              saveFlagToCheck = GungeonFlags.TUTORIAL_COMPLETED,
+              statToCheck = TrackedStats.GUNBERS_MUNCHED
+            }
           }
         };
 
+        // Add the new floor entry to all allowed floors
         foreach (BossFloorEntry b in theBossMan.BossFloorData)
         {
-          if ((b.AssociatedTilesets & GlobalDungeonData.ValidTilesets.CASTLEGEON) > 0)
-          {
-            foreach (IndividualBossFloorEntry i in b.Bosses)
-            {
-              i.BossWeight = 0f;
-              ETGModConsole.Log($"    {i.TargetRoomTable.name} -> {i.BossWeight}");
-            }
+          if ((b.AssociatedTilesets & allowedFloors) > 0)
             b.Bosses.Add(entry);
-            ETGModConsole.Log($"  {b.Annotation}: {b.AssociatedTilesets}");
-          }
         }
-
-        //Add rooms to vanilla room tables
-        // StaticReferences.RoomTables["triggertwins"].includedRooms = StaticReferences.RoomTables["gull"].includedRooms;
-        // StaticReferences.RoomTables["bulletking"].includedRooms = StaticReferences.RoomTables["gull"].includedRooms;
-        // ETGModConsole.Log(StaticReferences.RoomTables["boss1"]);//.includedRooms.Add(wRoom);
-        // ETGModConsole.Log(StaticReferences.RoomTables["boss2"]);//.includedRooms.Add(wRoom);
-        // ETGModConsole.Log(StaticReferences.RoomTables["boss3"]);//.includedRooms.Add(wRoom);
-
-        // if (selectBossHook == null)
-        // {
-        //   selectBossHook = new Hook(
-        //     typeof(BossFloorEntry).GetMethod("SelectBoss", BindingFlags.Public | BindingFlags.Instance),
-        //     typeof(BH).GetMethod("SelectBossHook", BindingFlags.Public | BindingFlags.Static));
-        // }
     }
 
-    private static BossManager theBossMan = null;
-
     private static Hook selectBossHook = null;
-    private static List<IndividualBossFloorEntry> castleGeonBosses =
-      new List<IndividualBossFloorEntry>();
-    private static List<IndividualBossFloorEntry> sewerGeonBosses =
-      new List<IndividualBossFloorEntry>();
-    private static List<IndividualBossFloorEntry> gunGeonBosses =
-      new List<IndividualBossFloorEntry>();
-    private static List<IndividualBossFloorEntry> cathedralGeonBosses =
-      new List<IndividualBossFloorEntry>();
-    private static List<IndividualBossFloorEntry> mineGeonBosses =
-      new List<IndividualBossFloorEntry>();
-    private static List<IndividualBossFloorEntry> catacombGeonBosses =
-      new List<IndividualBossFloorEntry>();
+    public static void InitSelectBossHook()
+    {
+        if (selectBossHook != null)
+          return;
+        selectBossHook = new Hook(
+          typeof(BossFloorEntry).GetMethod("SelectBoss", BindingFlags.Public | BindingFlags.Instance),
+          typeof(BH).GetMethod("SelectBossHook", BindingFlags.Public | BindingFlags.Static));
+    }
 
     public static IndividualBossFloorEntry SelectBossHook(Func<BossFloorEntry, IndividualBossFloorEntry> orig, BossFloorEntry self)
     {
-      // if ((self.AssociatedTilesets & GlobalDungeonData.ValidTilesets.CASTLEGEON) > 0)
-      //   self.Bosses.AddRange(castleGeonBosses);
-      // if ((self.AssociatedTilesets & GlobalDungeonData.ValidTilesets.SEWERGEON) > 0)
-      //   self.Bosses.AddRange(sewerGeonBosses);
-      // if ((self.AssociatedTilesets & GlobalDungeonData.ValidTilesets.GUNGEON) > 0)
-      //   self.Bosses.AddRange(gunGeonBosses);
-      // if ((self.AssociatedTilesets & GlobalDungeonData.ValidTilesets.CATHEDRALGEON) > 0)
-      //   self.Bosses.AddRange(cathedralGeonBosses);
-      // if ((self.AssociatedTilesets & GlobalDungeonData.ValidTilesets.MINEGEON) > 0)
-      //   self.Bosses.AddRange(mineGeonBosses);
-      // if ((self.AssociatedTilesets & GlobalDungeonData.ValidTilesets.CATACOMBGEON) > 0)
-      //   self.Bosses.AddRange(catacombGeonBosses);
-
-      // foreach (BossFloorEntry b in GameManager.Instance.BossManager.BossFloorData)
-      // {
-      //   if ((b.AssociatedTilesets & GlobalDungeonData.ValidTilesets.CASTLEGEON) > 0)
-      //   {
-      //     foreach (IndividualBossFloorEntry i in b.Bosses)
-      //     {
-      //       i.BossWeight = 0f;
-      //       ETGModConsole.Log($"    {i.TargetRoomTable.name} -> {i.BossWeight}");
-      //     }
-      //     b.Bosses.Add(testIndividualBossFloorEntry);
-      //     ETGModConsole.Log($"  {b.Annotation}: {b.AssociatedTilesets}");
-      //   }
-      // }
-
       foreach (IndividualBossFloorEntry i in self.Bosses)
         ETGModConsole.Log($"    {i.TargetRoomTable.name} -> {i.BossWeight}");
-      // if (!testIndividualBossFloorEntry.GlobalPrereqsValid())
-      //   ETGModConsole.Log("failed prerequisite check");
-      // if (testIndividualBossFloorEntry != null)
-      //   return testIndividualBossFloorEntry;
       return orig(self);
     }
   }

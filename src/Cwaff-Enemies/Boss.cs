@@ -4,32 +4,30 @@ using Gungeon;
 using ItemAPI;
 using EnemyAPI;
 using UnityEngine;
-//using DirectionType = DirectionalAnimation.DirectionType;
-// using AnimationType = ItemAPI.BossBuilder.AnimationType;
 using System.Collections;
 using Dungeonator;
 using System.Linq;
 using Brave.BulletScript;
-// using GungeonAPI;
 
 namespace CwaffingTheGungy
 {
 public class RoomMimic : AIActor
 {
-  const string BULLET_KIN_GUID = "01972dee89fc4404a5c408d50007dad5";
-
   public static GameObject prefab;
-  public const string guid = "Room Mimic";
-  public static GameObject shootpoint;
-  private static string baseSpritePath = "CwaffingTheGungy/Resources/room_mimic/room_mimic_idle_001";
-  private static string bossCardPath = "CwaffingTheGungy/Resources/roomimic_bosscard.png";
+  public  const string guid          = "Room Mimic";
+  private const string name          = guid;
+  private const string subtitle      = "Face Off!";
+  private const string spritePath    = "CwaffingTheGungy/Resources/room_mimic";
+  private const string defaultSprite = "room_mimic_idle_001";
+  private const string bossCardPath  = "CwaffingTheGungy/Resources/roomimic_bosscard.png";
   public static void Init()
   {
-    if (prefab != null || BossBuilder.Dictionary.ContainsKey(guid))
-      return;
-    prefab = BossBuilder.BuildPrefab("Room Mimic", guid, baseSpritePath,
+    // Use the old BossBuilder.BuildPrefab to start off with
+    prefab = BossBuilder.BuildPrefab(name, guid, $"{spritePath}/{defaultSprite}",
       new IntVector2(0, 0), new IntVector2(8, 9), false, true);
-    EnemyBehavior companion = BH.AddSaneDefaultBossBehavior(prefab,"Room Mimic","Face Off!",bossCardPath);
+
+    // Get a sane default BraveBehaviour using our custom EnemyBehavior override class
+    EnemyBehavior companion = BH.AddSaneDefaultBossBehavior<EnemyBehavior>(prefab,name,subtitle,bossCardPath);
       companion.aiActor.knockbackDoer.weight = 200;
       companion.aiActor.MovementSpeed = 2f;
       companion.aiActor.CollisionDamage = 1f;
@@ -37,9 +35,8 @@ public class RoomMimic : AIActor
       companion.aiActor.healthHaver.SetHealthMaximum(1000f);
       companion.aiActor.healthHaver.ForceSetCurrentHealth(1000f);
       companion.aiActor.CollisionKnockbackStrength = 5f;
-      companion.aiActor.specRigidbody.SetDefaultColliders(101,27);
-      companion.aiActor.CorpseObject = EnemyDatabase.GetOrLoadByGuid(BULLET_KIN_GUID).CorpseObject;
-      companion.InitSpritesFromResourcePath("CwaffingTheGungy/Resources/room_mimic");
+      companion.aiActor.specRigidbody.SetDefaultColliders(101,27); //should be width and height of sprite most times
+      companion.InitSpritesFromResourcePath(spritePath);
         companion.AdjustAnimation("idle",     7f, true);
         companion.AdjustAnimation("swirl",    9f, true);
         companion.AdjustAnimation("scream", 5.3f, true);
@@ -51,17 +48,15 @@ public class RoomMimic : AIActor
         companion.AdjustAnimation("die",      6f, false);
 
     // Add custom animation to the generic intro doer, and add a specific intro doer as well
-    GenericIntroDoer miniBossIntroDoer = prefab.GetComponent<GenericIntroDoer>();
-      miniBossIntroDoer.introAnim = "intro"; //TODO: check if this actually exists
-      prefab.AddComponent<RoomMimicIntro>();
+    prefab.GetComponent<GenericIntroDoer>().introAnim = "intro"; //TODO: check if this actually exists
+    prefab.AddComponent<RoomMimicIntro>();
 
-    shootpoint = new GameObject("attach");
-    shootpoint.transform.parent = companion.transform;
-    shootpoint.transform.position = companion.sprite.WorldCenter;
-    GameObject m_CachedGunAttachPoint = companion.transform.Find("attach").gameObject;
-
+    // Set up the boss's attacking behavior scripts as necessary
     BehaviorSpeculator bs = prefab.GetComponent<BehaviorSpeculator>();
-      bs.CopySaneDefaultBehavior(EnemyDatabase.GetOrLoadByGuid(BULLET_KIN_GUID).behaviorSpeculator);
+      GameObject shootpoint = new GameObject("attach");
+        shootpoint.transform.parent = companion.transform;
+        shootpoint.transform.position = companion.sprite.WorldCenter;
+      GameObject m_CachedGunAttachPoint = companion.transform.Find("attach").gameObject;
       bs.TargetBehaviors = new List<TargetBehaviorBase>
       {
         new TargetPlayerBehavior
@@ -142,8 +137,10 @@ public class RoomMimic : AIActor
           NickName = "Cuck and Suck"
         },
       };
+
+    // Add our boss to the enemy database and to the first floor's boss pool
     Game.Enemies.Add("kp:room_mimic", companion.aiActor);
-    prefab.AddBossToFirstFloorPool();
+    prefab.AddBossToFloorPool(guid: guid, weight: 99f, floors: Floors.CASTLEGEON);
   }
 }
 
@@ -339,8 +336,6 @@ public class EnemyBehavior : BraveBehaviour
     }; ;
     this.aiActor.knockbackDoer.SetImmobile(true, "laugh");
   }
-
-
 }
 
 [RequireComponent(typeof(GenericIntroDoer))]
