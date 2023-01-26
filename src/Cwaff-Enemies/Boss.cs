@@ -19,17 +19,17 @@ public class RoomMimic : AIActor
   const string BULLET_KIN_GUID = "01972dee89fc4404a5c408d50007dad5";
 
   public static GameObject prefab;
-  public static readonly string guid = "Room Mimic";
+  public const string guid = "Room Mimic";
   public static GameObject shootpoint;
-  private static string BossCardPath = "CwaffingTheGungy/Resources/roomimic_bosscard.png";
-  public static string TargetVFX;
+  private static string baseSpritePath = "CwaffingTheGungy/Resources/room_mimic/room_mimic_idle_001";
+  private static string bossCardPath = "CwaffingTheGungy/Resources/roomimic_bosscard.png";
   public static void Init()
   {
-    // source = EnemyDatabase.GetOrLoadByGuid("c50a862d19fc4d30baeba54795e8cb93");
     if (prefab != null || BossBuilder.Dictionary.ContainsKey(guid))
       return;
-    prefab = BossBuilder.BuildPrefab("Room Mimic", guid, spritePaths[0], new IntVector2(0, 0), new IntVector2(8, 9), false, true);
-    EnemyBehavior companion = BH.AddSaneDefaultBossBehavior(prefab,"Room Mimic","Face Off!",BossCardPath);
+    prefab = BossBuilder.BuildPrefab("Room Mimic", guid, baseSpritePath,
+      new IntVector2(0, 0), new IntVector2(8, 9), false, true);
+    EnemyBehavior companion = BH.AddSaneDefaultBossBehavior(prefab,"Room Mimic","Face Off!",bossCardPath);
       companion.aiActor.knockbackDoer.weight = 200;
       companion.aiActor.MovementSpeed = 2f;
       companion.aiActor.CollisionDamage = 1f;
@@ -39,34 +39,21 @@ public class RoomMimic : AIActor
       companion.aiActor.CollisionKnockbackStrength = 5f;
       companion.aiActor.specRigidbody.SetDefaultColliders(101,27);
       companion.aiActor.CorpseObject = EnemyDatabase.GetOrLoadByGuid(BULLET_KIN_GUID).CorpseObject;
+      companion.InitSpritesFromResourcePath("CwaffingTheGungy/Resources/room_mimic");
+        companion.AdjustAnimation("idle",     7f, true);
+        companion.AdjustAnimation("swirl",    9f, true);
+        companion.AdjustAnimation("scream", 5.3f, true);
+        companion.AdjustAnimation("tell",     8f, false);
+        companion.AdjustAnimation("suck",     4f, false);
+        companion.AdjustAnimation("tell2",    6f, false);
+        companion.AdjustAnimation("puke",     7f, false);
+        companion.AdjustAnimation("intro",   11f, false);
+        companion.AdjustAnimation("die",      6f, false);
 
     // Add custom animation to the generic intro doer, and add a specific intro doer as well
     GenericIntroDoer miniBossIntroDoer = prefab.GetComponent<GenericIntroDoer>();
       miniBossIntroDoer.introAnim = "intro"; //TODO: check if this actually exists
       prefab.AddComponent<RoomMimicIntro>();
-
-    // Set up sprites, using BH.Range for easy consecutively-numbered sprites
-    // tk2dSpriteCollectionData bossSprites = BH.LoadSpriteCollection(prefab,spritePaths);
-    //   companion.AddAnimation(bossSprites, BH.Range(0, 7 ), "idle",     7f, true, DirectionalAnimation.DirectionType.Single);
-    //   companion.AddAnimation(bossSprites, BH.Range(8, 15), "swirl",    9f, true);
-    //   companion.AddAnimation(bossSprites, BH.Range(16,19), "scream", 5.3f, true);
-    //   companion.AddAnimation(bossSprites, BH.Range(20,24), "tell",     8f, false);
-    //   companion.AddAnimation(bossSprites, BH.Range(25,41), "suck",     4f, false);
-    //   companion.AddAnimation(bossSprites, BH.Range(42,47), "tell2",    6f, false);
-    //   companion.AddAnimation(bossSprites, BH.Range(48,54), "puke",     7f, false);
-    //   companion.AddAnimation(bossSprites, BH.Range(55,75), "intro",   11f, false);
-    //   companion.AddAnimation(bossSprites, BH.Range(76,86), "die",      6f, false);
-
-    companion.InitSpritesFromResourcePath("CwaffingTheGungy/Resources/room_mimic");
-      companion.AdjustAnimation("idle",     7f, true);
-      companion.AdjustAnimation("swirl",    9f, true);
-      companion.AdjustAnimation("scream", 5.3f, true);
-      companion.AdjustAnimation("tell",     8f, false);
-      companion.AdjustAnimation("suck",     4f, false);
-      companion.AdjustAnimation("tell2",    6f, false);
-      companion.AdjustAnimation("puke",     7f, false);
-      companion.AdjustAnimation("intro",   11f, false);
-      companion.AdjustAnimation("die",      6f, false);
 
     shootpoint = new GameObject("attach");
     shootpoint.transform.parent = companion.transform;
@@ -157,108 +144,6 @@ public class RoomMimic : AIActor
       };
     Game.Enemies.Add("kp:room_mimic", companion.aiActor);
   }
-
-  private static string[] spritePaths = new string[]
-  {
-
-    //idles (0-7)
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_idle_001",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_idle_002",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_idle_003",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_idle_004",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_idle_005",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_idle_006",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_idle_007",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_idle_008",
-    //swirl (8-15)
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_swirl_001",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_swirl_002",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_swirl_003",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_swirl_004",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_swirl_005",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_swirl_006",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_swirl_007",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_swirl_008",
-    //scream (16-19)
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_scream_001",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_scream_002",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_scream_003",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_scream_004",
-    //tell (20-24)
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_tell_001",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_tell_002",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_tell_003",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_tell_004",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_tell_005",
-    //suck (25-41)
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_suck_001",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_suck_002",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_suck_003",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_suck_004",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_suck_005",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_suck_006",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_suck_007",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_suck_008",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_suck_009",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_suck_010",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_suck_011",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_suck_012",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_suck_013",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_suck_014",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_suck_015",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_suck_016",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_suck_017",
-    //tell2 (42-47)
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_tell2_001",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_tell2_002",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_tell2_003",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_tell2_004",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_tell2_005",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_tell2_006",
-    //puke (48-54)
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_puke_001",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_puke_002",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_puke_003",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_puke_004",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_puke_005",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_puke_006",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_puke_007",
-    //intro (55-75)
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_intro_001",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_intro_002",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_intro_003",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_intro_004",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_intro_005",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_intro_006",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_intro_007",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_intro_008",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_intro_009",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_intro_010",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_intro_011",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_intro_012",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_intro_013",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_intro_014",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_intro_015",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_intro_016",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_intro_017",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_intro_018",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_intro_019",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_intro_020",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_intro_021",
-    //die (76-86)
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_die_003",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_die_003",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_die_003",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_die_004",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_die_005",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_die_006",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_die_007",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_die_008",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_die_009",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_die_010",
-    "CwaffingTheGungy/Resources/room_mimic/room_mimic_die_011",
-
-  };
 }
 
 public class SwirlScript : Script // This BulletScript is just a modified version of the script BulletManShroomed, which you can find with dnSpy.
