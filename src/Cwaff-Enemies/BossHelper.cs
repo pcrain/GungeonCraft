@@ -274,6 +274,7 @@ namespace CwaffingTheGungy
       yield break;
     }
 
+    //Stolen from Apache
     public static void AddObjectToRoom(PrototypeDungeonRoom room, Vector2 position, DungeonPlaceable PlacableContents = null, DungeonPlaceableBehaviour NonEnemyBehaviour = null, string EnemyBehaviourGuid = null, float SpawnChance = 1f, int xOffset = 0, int yOffset = 0, int layer = 0, int PathID = -1, int PathStartNode = 0) {
         if (room == null) { return; }
         if (room.placedObjects == null) { room.placedObjects = new List<PrototypePlacedObjectData>(); }
@@ -312,44 +313,56 @@ namespace CwaffingTheGungy
         return;
     }
 
+    //Also stolen from Apache
     public static WeightedRoom GenerateWeightedRoom(PrototypeDungeonRoom Room, float Weight = 1, bool LimitedCopies = true, int MaxCopies = 1, DungeonPrerequisite[] AdditionalPrerequisites = null) {
         if (Room == null) { return null; }
         if (AdditionalPrerequisites == null) { AdditionalPrerequisites = new DungeonPrerequisite[0]; }
         return new WeightedRoom() { room = Room, weight = Weight, limitedCopies = LimitedCopies, maxCopies = MaxCopies, additionalPrerequisites = AdditionalPrerequisites };
     }
 
-    public static void AddBossToFirstFloorPool(this GameObject self)
+    private static PrototypeDungeonRoom genericBossRoomPrefab = null;
+
+    public static PrototypeDungeonRoom GetGenericBossRoom()
     {
+      // Load gatling gull's boss room as a prototype
+      if (genericBossRoomPrefab == null)
+      {
         AssetBundle sharedAssets = ResourceManager.LoadAssetBundle("shared_auto_001");
         GenericRoomTable bosstable_01_gatlinggull = sharedAssets.LoadAsset<GenericRoomTable>("bosstable_01_gatlinggull");
-        List<PrototypeDungeonRoom> m_GatlingGullRooms = new List<PrototypeDungeonRoom>();
         foreach (WeightedRoom wRoom in bosstable_01_gatlinggull.includedRooms.elements)
-          m_GatlingGullRooms.Add(UnityEngine.Object.Instantiate(wRoom.room));
-        PrototypeDungeonRoom[] gatlinggull_noTileVisualOverrides = m_GatlingGullRooms.ToArray();
-        foreach (PrototypeDungeonRoom room in gatlinggull_noTileVisualOverrides) {
-
-            // if (room.name.StartsWith("GatlingGullRoom04") | room.name.StartsWith("GatlingGullRoom05")) {
-            //     bosstable_01_gatlinggull_custom.includedRooms.elements.Add(ExpandRoomPrefabs.GenerateWeightedRoom(room, 0.5f));
-            // } else {
-            //     bosstable_01_gatlinggull_custom.includedRooms.elements.Add(ExpandRoomPrefabs.GenerateWeightedRoom(room));
-            // }
+        {
+          genericBossRoomPrefab = wRoom.room;
+          break;
+          // genericBossRoomPrefab.gameObject.SetActive(false);
+          // FakePrefab.MarkAsFakePrefab(genericBossRoomPrefab.gameObject);
+          // UnityEngine.Object.DontDestroyOnLoad(genericBossRoomPrefab);
+          // break;
         }
         sharedAssets = null;
+      }
+      // Instantiate and clear out the room for our personal use
+      PrototypeDungeonRoom p = UnityEngine.Object.Instantiate(genericBossRoomPrefab);
+        p.placedObjects.Clear();
+        p.placedObjectPositions.Clear();
+        p.ClearAllObjectData();
+        p.additionalObjectLayers = new List<PrototypeRoomObjectLayer>();
+        p.eventTriggerAreas = new List<PrototypeEventTriggerArea>();
+        p.roomEvents = new List<RoomEventDefinition>();
+        p.paths = new List<SerializedPath>();
+        p.prerequisites = new List<DungeonPrerequisite>();
+        p.rectangularFeatures = new List<PrototypeRectangularFeature>();
+      return p;
+    }
 
+    public static void AddBossToFirstFloorPool(this GameObject self)
+    {
         if (theBossMan == null)
           theBossMan = GameManager.Instance.BossManager;
 
-        PrototypeDungeonRoom p = m_GatlingGullRooms[0];
-          p.placedObjects.Clear();
-          p.placedObjectPositions.Clear();
-          p.ClearAllObjectData();
-          p.additionalObjectLayers = new List<PrototypeRoomObjectLayer>();
-          p.eventTriggerAreas = new List<PrototypeEventTriggerArea>();
-          p.roomEvents = new List<RoomEventDefinition>();
-          p.paths = new List<SerializedPath>();
-          p.prerequisites = new List<DungeonPrerequisite>();
-          p.rectangularFeatures = new List<PrototypeRectangularFeature>();
-        AddObjectToRoom(p, new Vector2(p.Width/2.0f, p.Height/2.0f), EnemyBehaviourGuid: RoomMimic.guid);
+        PrototypeDungeonRoom p = GetGenericBossRoom();
+          Vector2 roomCenter = new Vector2(p.Width/2.0f, p.Height/2.0f);
+          Vector2 spriteCenter = self.GetComponent<tk2dSpriteAnimator>().GetAnySprite().WorldCenter;
+        AddObjectToRoom(p, roomCenter - spriteCenter, EnemyBehaviourGuid: RoomMimic.guid);
 
         GenericRoomTable theRoomTable = ScriptableObject.CreateInstance<GenericRoomTable>();
           theRoomTable.name = self.name+" Boss Table";
@@ -382,7 +395,6 @@ namespace CwaffingTheGungy
               }
           }
         };
-        // castleGeonBosses.Add(entry);
 
         foreach (BossFloorEntry b in theBossMan.BossFloorData)
         {
