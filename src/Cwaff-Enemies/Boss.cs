@@ -143,6 +143,7 @@ public class RoomMimic : AIActor
         },
       };
     Game.Enemies.Add("kp:room_mimic", companion.aiActor);
+    prefab.AddBossToFirstFloorPool();
   }
 }
 

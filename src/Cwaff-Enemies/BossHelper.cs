@@ -11,7 +11,8 @@ using Dungeonator;
 using System.Linq;
 using Brave.BulletScript;
 using System.Text.RegularExpressions;
-// using GungeonAPI;
+using ResourceExtractor = ItemAPI.ResourceExtractor;
+using GungeonAPI;
 
 namespace CwaffingTheGungy
 {
@@ -269,6 +270,35 @@ namespace CwaffingTheGungy
     {
       for (float elapsed = 0f; elapsed < time; elapsed += GameManager.INVARIANT_DELTA_TIME) { yield return null; }
       yield break;
+    }
+
+    public static void AddBossToFirstFloorPool(this GameObject self)
+    {
+      ETGModConsole.Log("trying");
+      /*
+      */
+        AssetBundle sharedAssets = ResourceManager.LoadAssetBundle("shared_auto_001");
+        GenericRoomTable bosstable_01_gatlinggull = sharedAssets.LoadAsset<GenericRoomTable>("bosstable_01_gatlinggull");
+        List<PrototypeDungeonRoom> m_GatlingGullRooms = new List<PrototypeDungeonRoom>();
+        foreach (WeightedRoom wRoom in bosstable_01_gatlinggull.includedRooms.elements)
+          m_GatlingGullRooms.Add(UnityEngine.Object.Instantiate(wRoom.room));
+        PrototypeDungeonRoom[] gatlinggull_noTileVisualOverrides = m_GatlingGullRooms.ToArray();
+        foreach (PrototypeDungeonRoom room in gatlinggull_noTileVisualOverrides) {
+            // if (room.name.StartsWith("GatlingGullRoom04") | room.name.StartsWith("GatlingGullRoom05")) {
+            //     bosstable_01_gatlinggull_custom.includedRooms.elements.Add(ExpandRoomPrefabs.GenerateWeightedRoom(room, 0.5f));
+            // } else {
+            //     bosstable_01_gatlinggull_custom.includedRooms.elements.Add(ExpandRoomPrefabs.GenerateWeightedRoom(room));
+            // }
+        }
+        sharedAssets = null;
+        // RoomBuilder.AddObjectToRoom(Expand_Belly_BossRoom, new Vector2(20, 19), EnemyBehaviourGuid: ExpandCustomEnemyDatabase.ParasiteBossGUID);
+
+        //Add rooms to vanilla room tables
+        StaticReferences.RoomTables["triggertwins"].includedRooms = StaticReferences.RoomTables["gull"].includedRooms;
+        StaticReferences.RoomTables["bulletking"].includedRooms = StaticReferences.RoomTables["gull"].includedRooms;
+        // ETGModConsole.Log(StaticReferences.RoomTables["boss1"]);//.includedRooms.Add(wRoom);
+        // ETGModConsole.Log(StaticReferences.RoomTables["boss2"]);//.includedRooms.Add(wRoom);
+        // ETGModConsole.Log(StaticReferences.RoomTables["boss3"]);//.includedRooms.Add(wRoom);
     }
   }
 }
