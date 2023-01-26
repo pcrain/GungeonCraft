@@ -274,6 +274,50 @@ namespace CwaffingTheGungy
       yield break;
     }
 
+    public static void AddObjectToRoom(PrototypeDungeonRoom room, Vector2 position, DungeonPlaceable PlacableContents = null, DungeonPlaceableBehaviour NonEnemyBehaviour = null, string EnemyBehaviourGuid = null, float SpawnChance = 1f, int xOffset = 0, int yOffset = 0, int layer = 0, int PathID = -1, int PathStartNode = 0) {
+        if (room == null) { return; }
+        if (room.placedObjects == null) { room.placedObjects = new List<PrototypePlacedObjectData>(); }
+        if (room.placedObjectPositions == null) { room.placedObjectPositions = new List<Vector2>(); }
+
+        PrototypePlacedObjectData m_NewObjectData = new PrototypePlacedObjectData() {
+            placeableContents = null,
+            nonenemyBehaviour = null,
+            spawnChance = SpawnChance,
+            unspecifiedContents = null,
+            enemyBehaviourGuid = string.Empty,
+            contentsBasePosition = position,
+            layer = layer,
+            xMPxOffset = xOffset,
+            yMPxOffset = yOffset,
+            fieldData = new List<PrototypePlacedObjectFieldData>(0),
+            instancePrerequisites = new DungeonPrerequisite[0],
+            linkedTriggerAreaIDs = new List<int>(0),
+            assignedPathIDx = PathID,
+            assignedPathStartNode = PathStartNode
+        };
+
+        if (PlacableContents != null) {
+            m_NewObjectData.placeableContents = PlacableContents;
+        } else if (NonEnemyBehaviour != null) {
+            m_NewObjectData.nonenemyBehaviour = NonEnemyBehaviour;
+        } else if (EnemyBehaviourGuid != null) {
+            m_NewObjectData.enemyBehaviourGuid = EnemyBehaviourGuid;
+        } else {
+            // All possible object fields were left null? Do nothing and return if this is the case.
+            return;
+        }
+
+        room.placedObjects.Add(m_NewObjectData);
+        room.placedObjectPositions.Add(position);
+        return;
+    }
+
+    public static WeightedRoom GenerateWeightedRoom(PrototypeDungeonRoom Room, float Weight = 1, bool LimitedCopies = true, int MaxCopies = 1, DungeonPrerequisite[] AdditionalPrerequisites = null) {
+        if (Room == null) { return null; }
+        if (AdditionalPrerequisites == null) { AdditionalPrerequisites = new DungeonPrerequisite[0]; }
+        return new WeightedRoom() { room = Room, weight = Weight, limitedCopies = LimitedCopies, maxCopies = MaxCopies, additionalPrerequisites = AdditionalPrerequisites };
+    }
+
     public static void AddBossToFirstFloorPool(this GameObject self)
     {
         AssetBundle sharedAssets = ResourceManager.LoadAssetBundle("shared_auto_001");
@@ -283,6 +327,7 @@ namespace CwaffingTheGungy
           m_GatlingGullRooms.Add(UnityEngine.Object.Instantiate(wRoom.room));
         PrototypeDungeonRoom[] gatlinggull_noTileVisualOverrides = m_GatlingGullRooms.ToArray();
         foreach (PrototypeDungeonRoom room in gatlinggull_noTileVisualOverrides) {
+
             // if (room.name.StartsWith("GatlingGullRoom04") | room.name.StartsWith("GatlingGullRoom05")) {
             //     bosstable_01_gatlinggull_custom.includedRooms.elements.Add(ExpandRoomPrefabs.GenerateWeightedRoom(room, 0.5f));
             // } else {
@@ -290,15 +335,32 @@ namespace CwaffingTheGungy
             // }
         }
         sharedAssets = null;
-        // RoomBuilder.AddObjectToRoom(Expand_Belly_BossRoom, new Vector2(20, 19), EnemyBehaviourGuid: ExpandCustomEnemyDatabase.ParasiteBossGUID);
 
         if (theBossMan == null)
           theBossMan = GameManager.Instance.BossManager;
 
+        PrototypeDungeonRoom p = m_GatlingGullRooms[0];
+          p.placedObjects.Clear();
+          p.placedObjectPositions.Clear();
+          p.ClearAllObjectData();
+          p.additionalObjectLayers = new List<PrototypeRoomObjectLayer>();
+          p.eventTriggerAreas = new List<PrototypeEventTriggerArea>();
+          p.roomEvents = new List<RoomEventDefinition>();
+          p.paths = new List<SerializedPath>();
+          p.prerequisites = new List<DungeonPrerequisite>();
+          p.rectangularFeatures = new List<PrototypeRectangularFeature>();
+        AddObjectToRoom(p, new Vector2(p.Width/2.0f, p.Height/2.0f), EnemyBehaviourGuid: RoomMimic.guid);
+
+        GenericRoomTable theRoomTable = ScriptableObject.CreateInstance<GenericRoomTable>();
+          theRoomTable.name = self.name+" Boss Table";
+          theRoomTable.includedRooms = new WeightedRoomCollection();
+          theRoomTable.includedRooms.elements = new List<WeightedRoom>(){GenerateWeightedRoom(p)};
+          theRoomTable.includedRoomTables = new List<GenericRoomTable>(0);
+
         IndividualBossFloorEntry entry = new IndividualBossFloorEntry()
         {
           BossWeight = 99f,
-          TargetRoomTable = StaticReferences.RoomTables["bulletking"],
+          TargetRoomTable = theRoomTable,
           GlobalBossPrerequisites = new DungeonPrerequisite[] {
               new DungeonPrerequisite() {
                   prerequisiteOperation = DungeonPrerequisite.PrerequisiteOperation.EQUAL_TO,
@@ -343,12 +405,12 @@ namespace CwaffingTheGungy
         // ETGModConsole.Log(StaticReferences.RoomTables["boss2"]);//.includedRooms.Add(wRoom);
         // ETGModConsole.Log(StaticReferences.RoomTables["boss3"]);//.includedRooms.Add(wRoom);
 
-        if (selectBossHook == null)
-        {
-          selectBossHook = new Hook(
-            typeof(BossFloorEntry).GetMethod("SelectBoss", BindingFlags.Public | BindingFlags.Instance),
-            typeof(BH).GetMethod("SelectBossHook", BindingFlags.Public | BindingFlags.Static));
-        }
+        // if (selectBossHook == null)
+        // {
+        //   selectBossHook = new Hook(
+        //     typeof(BossFloorEntry).GetMethod("SelectBoss", BindingFlags.Public | BindingFlags.Instance),
+        //     typeof(BH).GetMethod("SelectBossHook", BindingFlags.Public | BindingFlags.Static));
+        // }
     }
 
     private static BossManager theBossMan = null;
