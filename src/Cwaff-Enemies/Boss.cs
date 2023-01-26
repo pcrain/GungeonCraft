@@ -46,16 +46,27 @@ public class RoomMimic : AIActor
       prefab.AddComponent<RoomMimicIntro>();
 
     // Set up sprites, using BH.Range for easy consecutively-numbered sprites
-    tk2dSpriteCollectionData bossSprites = BH.LoadSpriteCollection(prefab,spritePaths);
-      companion.AddAnimation(bossSprites, BH.Range(0, 7 ), "idle",     7f, true, DirectionalAnimation.DirectionType.Single);
-      companion.AddAnimation(bossSprites, BH.Range(8, 15), "swirl",    9f, true);
-      companion.AddAnimation(bossSprites, BH.Range(16,19), "scream", 5.3f, true);
-      companion.AddAnimation(bossSprites, BH.Range(20,24), "tell",     8f, false);
-      companion.AddAnimation(bossSprites, BH.Range(25,41), "suck",     4f, false);
-      companion.AddAnimation(bossSprites, BH.Range(42,47), "tell2",    6f, false);
-      companion.AddAnimation(bossSprites, BH.Range(48,54), "puke",     7f, false);
-      companion.AddAnimation(bossSprites, BH.Range(55,75), "intro",   11f, false);
-      companion.AddAnimation(bossSprites, BH.Range(76,86), "die",      6f, false);
+    // tk2dSpriteCollectionData bossSprites = BH.LoadSpriteCollection(prefab,spritePaths);
+    //   companion.AddAnimation(bossSprites, BH.Range(0, 7 ), "idle",     7f, true, DirectionalAnimation.DirectionType.Single);
+    //   companion.AddAnimation(bossSprites, BH.Range(8, 15), "swirl",    9f, true);
+    //   companion.AddAnimation(bossSprites, BH.Range(16,19), "scream", 5.3f, true);
+    //   companion.AddAnimation(bossSprites, BH.Range(20,24), "tell",     8f, false);
+    //   companion.AddAnimation(bossSprites, BH.Range(25,41), "suck",     4f, false);
+    //   companion.AddAnimation(bossSprites, BH.Range(42,47), "tell2",    6f, false);
+    //   companion.AddAnimation(bossSprites, BH.Range(48,54), "puke",     7f, false);
+    //   companion.AddAnimation(bossSprites, BH.Range(55,75), "intro",   11f, false);
+    //   companion.AddAnimation(bossSprites, BH.Range(76,86), "die",      6f, false);
+
+    companion.InitSpritesFromResourcePath("CwaffingTheGungy/Resources/room_mimic");
+      companion.AdjustAnimation("idle",     7f, true);
+      companion.AdjustAnimation("swirl",    9f, true);
+      companion.AdjustAnimation("scream", 5.3f, true);
+      companion.AdjustAnimation("tell",     8f, false);
+      companion.AdjustAnimation("suck",     4f, false);
+      companion.AdjustAnimation("tell2",    6f, false);
+      companion.AdjustAnimation("puke",     7f, false);
+      companion.AdjustAnimation("intro",   11f, false);
+      companion.AdjustAnimation("die",      6f, false);
 
     shootpoint = new GameObject("attach");
     shootpoint.transform.parent = companion.transform;
@@ -150,7 +161,7 @@ public class RoomMimic : AIActor
   private static string[] spritePaths = new string[]
   {
 
-    //idles
+    //idles (0-7)
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_idle_001",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_idle_002",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_idle_003",
@@ -159,7 +170,7 @@ public class RoomMimic : AIActor
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_idle_006",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_idle_007",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_idle_008",
-    //swirl
+    //swirl (8-15)
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_swirl_001",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_swirl_002",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_swirl_003",
@@ -168,18 +179,18 @@ public class RoomMimic : AIActor
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_swirl_006",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_swirl_007",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_swirl_008",
-    //scream
+    //scream (16-19)
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_scream_001",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_scream_002",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_scream_003",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_scream_004",
-    //tell
+    //tell (20-24)
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_tell_001",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_tell_002",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_tell_003",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_tell_004",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_tell_005",
-    //suck
+    //suck (25-41)
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_suck_001",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_suck_002",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_suck_003",
@@ -197,14 +208,14 @@ public class RoomMimic : AIActor
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_suck_015",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_suck_016",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_suck_017",
-    //tell2
+    //tell2 (42-47)
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_tell2_001",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_tell2_002",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_tell2_003",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_tell2_004",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_tell2_005",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_tell2_006",
-    //puke
+    //puke (48-54)
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_puke_001",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_puke_002",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_puke_003",
@@ -212,7 +223,7 @@ public class RoomMimic : AIActor
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_puke_005",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_puke_006",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_puke_007",
-    //intro
+    //intro (55-75)
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_intro_001",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_intro_002",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_intro_003",
@@ -234,7 +245,7 @@ public class RoomMimic : AIActor
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_intro_019",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_intro_020",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_intro_021",
-    //die
+    //die (76-86)
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_die_003",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_die_003",
     "CwaffingTheGungy/Resources/room_mimic/room_mimic_die_003",

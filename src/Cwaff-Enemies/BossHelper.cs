@@ -10,6 +10,7 @@ using System.Collections;
 using Dungeonator;
 using System.Linq;
 using Brave.BulletScript;
+using System.Text.RegularExpressions;
 // using GungeonAPI;
 
 namespace CwaffingTheGungy
@@ -160,14 +161,99 @@ namespace CwaffingTheGungy
       SpriteBuilder.AddAnimation(self.spriteAnimator, collection, ids, name, loopMode).fps = fps;
       if (direction != DirectionalAnimation.DirectionType.None)
       {
-        self.aiAnimator.IdleAnimation = new DirectionalAnimation
+        if (name == "idle")
         {
-          Type = direction,
-          Prefix = name,
-          AnimNames = new string[1], // TODO: this might not be one if our directional type is not single
-          Flipped = new DirectionalAnimation.FlipType[1]
-        };
+          self.aiAnimator.IdleAnimation = new DirectionalAnimation
+          {
+            Type = direction,
+            Prefix = name,
+            AnimNames = new string[1], // TODO: this might not be one if our directional type is not single
+            Flipped = new DirectionalAnimation.FlipType[1]
+          };
+        }
       }
+    }
+
+    public static void AdjustAnimation(this EnemyBehavior self, string name, float? fps = null, bool? loop = null)
+    {
+      tk2dSpriteAnimationClip clip = self.spriteAnimator.GetClipByName(name);
+      if (clip == null)
+      {
+        ETGModConsole.Log($"tried to modify sprite {name} which does not exist");
+        return;
+      }
+      if (fps.HasValue)
+        clip.fps = fps.Value;
+      if (loop.HasValue)
+      {
+        clip.wrapMode = loop.Value
+          ? tk2dSpriteAnimationClip.WrapMode.Loop
+          : tk2dSpriteAnimationClip.WrapMode.Once;
+      }
+    }
+
+    public static Regex rx_anim = new Regex(@"^(?:(.*?)_)?([^_]*?)_([0-9]+)\.png$",
+          RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+    public static void InitSpritesFromResourcePath(this EnemyBehavior self, string resourcePath, int defaultFps = 15)
+    {
+      // TODO: maybe add warning if a path isn't added as a resource?
+      string realPath = resourcePath.Replace('/', '.') + ".";
+
+      // Load all of our sprites into a dictionary of ordered lists of names
+      Dictionary<string,string[]> spriteMaps = new Dictionary<string,string[]>();
+      foreach (string s in ResourceExtractor.GetResourceNames())
+      {
+        if (!s.StartsWith(realPath))
+          continue;
+        string name = s.Substring(realPath.Length);  // get name of resource relative to the path
+        MatchCollection matches = rx_anim.Matches(name);
+        foreach (Match match in matches)
+        {
+          string spriteName = match.Groups[1].Value;  //TODO: verification?
+          string animName   = match.Groups[2].Value;
+          string animIndex  = match.Groups[3].Value;
+          if (!spriteMaps.ContainsKey(animName))
+            spriteMaps[animName] = new string[0];
+          int index = Int32.Parse(animIndex);
+          if (index >= spriteMaps[animName].Length)
+          {
+            string[] sa = spriteMaps[animName];
+            Array.Resize(ref sa, index+1);
+            spriteMaps[animName] = sa;
+          }
+          spriteMaps[animName][index] = name;
+        }
+      }
+
+      // create the sprite collection itself
+      tk2dSpriteCollectionData bossSprites = SpriteBuilder.ConstructCollection(
+        self.gameObject, (self.gameObject.name+" Collection").Replace(" ","_"));
+      UnityEngine.Object.DontDestroyOnLoad(bossSprites);
+      int lastAnim = 0;
+      foreach(KeyValuePair<string, string[]> entry in spriteMaps)
+      {
+        int firstAnim = lastAnim;
+        // ETGModConsole.Log($"Showing sprites for {entry.Key}");
+        foreach(string v in entry.Value)
+        {
+          if (String.IsNullOrEmpty(v))
+            continue;
+          // ETGModConsole.Log($"  {v}");
+          SpriteBuilder.AddSpriteToCollection($"{resourcePath}/{v}", bossSprites);
+          ++lastAnim;
+        }
+        DirectionalAnimation.DirectionType dir;
+        if (entry.Key == "idle")
+          dir = DirectionalAnimation.DirectionType.Single;
+        else
+          dir = DirectionalAnimation.DirectionType.None;
+        ETGModConsole.Log($"calling self.AddAnimation(bossSprites, BH.Range({firstAnim}, {lastAnim-1}), \"{entry.Key}\", {defaultFps}, {true}, {dir});");
+        self.AddAnimation(bossSprites, BH.Range(firstAnim, lastAnim-1), entry.Key, defaultFps, true, dir);
+      }
+
+      // string [] fileEntries = Directory.GetFiles(targetDirectory);
+      //   foreach(string fileName in fileEntries)
     }
 
     public static tk2dSpriteCollectionData LoadSpriteCollection(GameObject prefab, string[] spritePaths)
