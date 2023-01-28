@@ -13,7 +13,6 @@ namespace CwaffingTheGungy
 {
 public class RoomMimic : AIActor
 {
-  public static GameObject prefab;
   public  const string guid          = "Room Mimic";
   private const string bossname      = guid;
   private const string subtitle      = "Face Off!";
@@ -22,64 +21,37 @@ public class RoomMimic : AIActor
   private const string bossCardPath  = "CwaffingTheGungy/Resources/roomimic_bosscard.png";
   public static void Init()
   {
-    // Use the old BossBuilder.BuildPrefab to start off with
-    prefab = BossBuilder.BuildPrefab(bossname, guid, $"{spritePath}/{defaultSprite}",
-      new IntVector2(0, 0), new IntVector2(8, 9), false, true);
-
-    // Get a sane default BraveBehaviour using our custom EnemyBehavior override class
-    EnemyBehavior companion = BH.AddSaneDefaultBossBehavior<EnemyBehavior>(prefab,bossname,subtitle,bossCardPath);
-      companion.aiActor.knockbackDoer.weight = 200;
-      companion.aiActor.MovementSpeed = 2f;
-      companion.aiActor.CollisionDamage = 1f;
-      companion.aiActor.aiAnimator.HitReactChance = 0.05f;
-      companion.aiActor.healthHaver.SetHealthMaximum(1000f);
-      companion.aiActor.healthHaver.ForceSetCurrentHealth(1000f);
-      companion.aiActor.CollisionKnockbackStrength = 5f;
-      companion.aiActor.specRigidbody.SetDefaultColliders(101,27); //should be width and height of sprite most times
-      companion.InitSpritesFromResourcePath(spritePath);
-        companion.AdjustAnimation("idle",     7f, true);
-        companion.AdjustAnimation("swirl",    9f, true);
-        companion.AdjustAnimation("scream", 5.3f, true);
-        companion.AdjustAnimation("tell",     8f, false);
-        companion.AdjustAnimation("suck",     4f, false);
-        companion.AdjustAnimation("tell2",    6f, false);
-        companion.AdjustAnimation("puke",     7f, false);
-        companion.AdjustAnimation("intro",   11f, false);
-        companion.AdjustAnimation("die",      6f, false);
-
+    // Create our build-a-boss
+    BuildABoss bb = BuildABoss.LetsMakeABoss<EnemyBehavior>(
+      bossname, guid, $"{spritePath}/{defaultSprite}", new IntVector2(8, 9), subtitle, bossCardPath);
+    // Set our stats
+    bb.SetStats(health: 1000f, weight: 200f, speed: 2f, collisionDamage: 1f,
+      hitReactChance: 0.05f, collisionKnockbackStrength: 5f);
+    // Set up our animations
+    bb.InitSpritesFromResourcePath(spritePath);
+      bb.AdjustAnimation("idle",   fps:   7f, loop: true);
+      bb.AdjustAnimation("swirl",  fps:   9f, loop: true);
+      bb.AdjustAnimation("scream", fps: 5.3f, loop: true);
+      bb.AdjustAnimation("tell",   fps:   8f, loop: false);
+      bb.AdjustAnimation("suck",   fps:   4f, loop: false);
+      bb.AdjustAnimation("tell2",  fps:   6f, loop: false);
+      bb.AdjustAnimation("puke",   fps:   7f, loop: false);
+      bb.AdjustAnimation("intro",  fps:  11f, loop: false);
+      bb.AdjustAnimation("die",    fps:   6f, loop: false);
+    // Set our defaulf pixel colliders (TODO: should automatically be set from sprite width and height)
+    bb.SetDefaultColliders(101,27);
     // Add custom animation to the generic intro doer, and add a specific intro doer as well
-    prefab.GetComponent<GenericIntroDoer>().introAnim = "intro";
-    prefab.AddComponent<RoomMimicIntro>();
-
-    // Set up the boss's attacking behavior scripts as necessary
-    BehaviorSpeculator bs = prefab.GetComponent<BehaviorSpeculator>();
-      GameObject shootpoint = new GameObject("attach");
-        shootpoint.transform.parent = companion.transform;
-        shootpoint.transform.position = companion.sprite.WorldCenter;
-      GameObject m_CachedGunAttachPoint = companion.transform.Find("attach").gameObject;
-      bs.TargetBehaviors = new List<TargetBehaviorBase>
-      {
-        new TargetPlayerBehavior
-        {
-          Radius = 35f,
-          LineOfSight = false,
-          ObjectPermanence = true,
-          SearchInterval = 0.25f,
-          PauseOnTargetSwitch = false,
-          PauseTime = 0.25f
-        }
-      };
-      bs.AttackBehaviorGroup.AttackBehaviors = new List<AttackBehaviorGroup.AttackGroupItem>
-      {
-        BH.CreateAttack<SwirlScript>(m_CachedGunAttachPoint, fireAnim: "swirl", cooldown: 3.5f),
-        BH.CreateAttack<AAAAAAAAAAAAAAScript>(m_CachedGunAttachPoint, fireAnim: "scream", cooldown: 3.5f),
-        BH.CreateAttack<SkeletonBulletScript>(m_CachedGunAttachPoint, tellAnim: "tell2", fireAnim: "puke", cooldown: 5f, maxUsages: 2),
-        BH.CreateAttack<SpitUpScript>(m_CachedGunAttachPoint, tellAnim: "tell", fireAnim: "suck", cooldown: 4.5f),
-      };
-
+    bb.SetIntroAnimation("intro");
+    bb.AddCustomIntro<RoomMimicIntro>();
+    // Set up the boss's targeting and attacking scripts
+    bb.TargetPlayer();
+    bb.CreateAttack<SwirlScript>(fireAnim: "swirl", cooldown: 3.5f);
+    bb.CreateAttack<AAAAAAAAAAAAAAScript>(fireAnim: "scream", cooldown: 3.5f);
+    bb.CreateAttack<SkeletonBulletScript>(tellAnim: "tell2", fireAnim: "puke", cooldown: 5f, maxUsages: 2);
+    bb.CreateAttack<SpitUpScript>(tellAnim: "tell", fireAnim: "suck", cooldown: 4.5f);
     // Add our boss to the enemy database and to the first floor's boss pool
-    Game.Enemies.Add("kp:room_mimic", companion.aiActor);
-    prefab.AddBossToFloorPool(guid: guid, weight: 99f, floors: Floors.CASTLEGEON);
+    bb.AddBossToGameEnemies("kp:room_mimic");
+    bb.AddBossToFloorPool(weight: 99f, floors: Floors.CASTLEGEON);
   }
 }
 
@@ -148,7 +120,6 @@ public class SpawnSkeletonBullet : Bullet
 
 }
 
-
 public class AAAAAAAAAAAAAAScript : Script // This BulletScript is just a modified version of the script BulletManShroomed, which you can find with dnSpy.
 {
   public override IEnumerator Top()
@@ -195,7 +166,6 @@ public class SpitUpScript : Script // This BulletScript is just a modified versi
     yield break;
   }
 }
-
 
 public class BurstBullet : Bullet
 {
@@ -263,16 +233,12 @@ public class EnemyBehavior : BraveBehaviour
     base.aiActor.healthHaver.OnPreDeath += (obj) =>
     {
       AkSoundEngine.PostEvent("Play_ENM_beholster_death_01", base.aiActor.gameObject);
-      //Chest chest2 = GameManager.Instance.RewardManager.SpawnTotallyRandomChest(spawnspot);
-      //chest2.IsLocked = false;
-
     };
     base.healthHaver.healthHaver.OnDeath += (obj) =>
     {
       Chest chest2 = GameManager.Instance.RewardManager.SpawnTotallyRandomChest(GameManager.Instance.PrimaryPlayer.CurrentRoom.GetRandomVisibleClearSpot(1, 1));
       chest2.IsLocked = false;
-
-    }; ;
+    };
     this.aiActor.knockbackDoer.SetImmobile(true, "laugh");
   }
 }

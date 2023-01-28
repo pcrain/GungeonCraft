@@ -38,6 +38,136 @@ namespace CwaffingTheGungy
     RATGEON = 0x8000
   }
 
+  public class BuildABoss
+  {
+    public GameObject prefab = null;
+    private GameObject defaultGunAttachPoint = null;
+
+    // Enemy behavior info
+    private BraveBehaviour enemyBehavior = null;
+
+    // Misc private variables
+    private string guid = "";
+
+    // Private constructor
+    private BuildABoss() {}
+
+    public static BuildABoss LetsMakeABoss<T>(string bossname, string guid, string defaultSprite, IntVector2 hitboxSize, string subtitle, string bossCardPath)
+      where T : BraveBehaviour
+    {
+      BuildABoss bb = new BuildABoss();
+
+      bb.guid = guid;
+
+      bb.prefab = BossBuilder.BuildPrefab(bossname, bb.guid, defaultSprite,
+        IntVector2.Zero, hitboxSize, false, true);
+
+      bb.enemyBehavior = BH.AddSaneDefaultBossBehavior<T>(bb.prefab,bossname,subtitle,bossCardPath);
+
+      GameObject shootpoint = new GameObject("attach");
+        shootpoint.transform.parent = bb.enemyBehavior.transform;
+        shootpoint.transform.position = bb.enemyBehavior.sprite.WorldCenter;
+      bb.defaultGunAttachPoint = bb.enemyBehavior.transform.Find("attach").gameObject;
+
+      return bb;
+    }
+
+    public void SetStats(float? health = null, float? weight = null, float? speed = null, float? collisionDamage = null, float? collisionKnockbackStrength = null, float? hitReactChance = null)
+    {
+      if (health.HasValue)
+      {
+        this.enemyBehavior.aiActor.healthHaver.SetHealthMaximum(health.Value);
+        this.enemyBehavior.aiActor.healthHaver.ForceSetCurrentHealth(health.Value);
+      }
+      if (weight.HasValue)
+        this.enemyBehavior.aiActor.knockbackDoer.weight = weight.Value;
+      if (speed.HasValue)
+        this.enemyBehavior.aiActor.MovementSpeed = speed.Value;
+      if (collisionDamage.HasValue)
+        this.enemyBehavior.aiActor.CollisionDamage = collisionDamage.Value;
+      if (collisionKnockbackStrength.HasValue)
+        this.enemyBehavior.aiActor.CollisionKnockbackStrength = collisionKnockbackStrength.Value;
+      if (hitReactChance.HasValue)
+        this.enemyBehavior.aiActor.aiAnimator.HitReactChance = hitReactChance.Value;
+    }
+
+    public AttackBehaviorGroup.AttackGroupItem CreateAttack<T>(GameObject shootPoint = null, string fireAnim = null, string tellAnim = null, float cooldown = -1f, float leadAmount = 0f, float probability = 1f, int maxUsages = -1, bool requiresLineOfSight = false, bool interruptible = false, float lead = 0)
+      where T : Script
+    {
+      if (shootPoint == null)
+        shootPoint = this.defaultGunAttachPoint;
+      AttackBehaviorGroup.AttackGroupItem theAttack = new AttackBehaviorGroup.AttackGroupItem()
+        {
+          Probability = probability,
+          NickName = typeof(T).AssemblyQualifiedName,
+          Behavior = new ShootBehavior {
+            ShootPoint = shootPoint,
+            BulletScript = new CustomBulletScriptSelector(typeof(T)),
+            AttackCooldown = cooldown,
+            LeadAmount = leadAmount,
+            MaxUsages = maxUsages,
+            FireAnimation = fireAnim,
+            TellAnimation = tellAnim,
+            RequiresLineOfSight = requiresLineOfSight,
+            StopDuring = ShootBehavior.StopType.Attack,
+            Uninterruptible = !interruptible
+          }
+        };
+      this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors.Add(theAttack);
+      return theAttack;
+    }
+
+    public TargetPlayerBehavior TargetPlayer(float radius = 35f, float searchInterval = 0.25f, float pauseTime = 0.25f, bool pauseOnTargetSwitch = false, bool lineOfSight = false, bool objectPermanence = true)
+    {
+      TargetPlayerBehavior t = new TargetPlayerBehavior
+      {
+        Radius = radius,
+        LineOfSight = lineOfSight,
+        ObjectPermanence = objectPermanence,
+        SearchInterval = searchInterval,
+        PauseOnTargetSwitch = pauseOnTargetSwitch,
+        PauseTime = pauseTime
+      };
+      this.prefab.GetComponent<BehaviorSpeculator>().TargetBehaviors.Add(t);
+      return t;
+    }
+
+    public void SetDefaultColliders(int width, int height)
+    {
+      this.enemyBehavior.aiActor.specRigidbody.SetDefaultColliders(width,height); //TODO: should be automatically set from sprite
+    }
+
+    public void InitSpritesFromResourcePath(string spritePath)
+    {
+      this.enemyBehavior.InitSpritesFromResourcePath(spritePath);
+    }
+
+    public void AdjustAnimation(string name, float? fps = null, bool? loop = null)
+    {
+      this.enemyBehavior.AdjustAnimation(name, fps, loop);
+    }
+
+    public void SetIntroAnimation(string name)
+    {
+      this.prefab.GetComponent<GenericIntroDoer>().introAnim = name;
+    }
+
+    public void AddBossToGameEnemies(string name)
+    {
+      Game.Enemies.Add(name, this.enemyBehavior.aiActor);
+    }
+
+    public void AddCustomIntro<T>() where T: SpecificIntroDoer
+    {
+      this.prefab.AddComponent<T>();
+    }
+
+    public void AddBossToFloorPool(float weight, Floors floors)
+    {
+      this.prefab.AddBossToFloorPool(guid: this.guid, weight: weight, floors: floors);
+    }
+  }
+
   public static class BH
   {
     // Used for loading a sane default behavior speculator
@@ -132,6 +262,14 @@ namespace CwaffingTheGungy
         companion.aiActor.CanTargetPlayers = true;
         companion.aiActor.PreventBlackPhantom = false;
         companion.aiActor.CorpseObject = EnemyDatabase.GetOrLoadByGuid(BULLET_KIN_GUID).CorpseObject;
+        // set some sane stats
+        companion.aiActor.healthHaver.SetHealthMaximum(1000f);
+        companion.aiActor.healthHaver.ForceSetCurrentHealth(1000f);
+        companion.aiActor.knockbackDoer.weight = 100;
+        companion.aiActor.MovementSpeed = 1f;
+        companion.aiActor.CollisionDamage = 1f;
+        companion.aiActor.aiAnimator.HitReactChance = 0.05f;
+        companion.aiActor.CollisionKnockbackStrength = 5f;
 
       // prefab.name = tableId+"_NAME";
       prefab.name = name;
@@ -159,18 +297,20 @@ namespace CwaffingTheGungy
           };
           miniBossIntroDoer.portraitSlideSettings.bossArtSprite = bossCardTexture;
           miniBossIntroDoer.SkipBossCard = false;
-          prefab.GetComponent<EnemyBehavior>().aiActor.healthHaver.bossHealthBar = HealthHaver.BossBarType.MainBar;
+          prefab.GetComponent<BraveBehaviour>().aiActor.healthHaver.bossHealthBar = HealthHaver.BossBarType.MainBar;
         }
         else
         {
           miniBossIntroDoer.SkipBossCard = true;
-          prefab.GetComponent<EnemyBehavior>().aiActor.healthHaver.bossHealthBar = HealthHaver.BossBarType.SubbossBar;
+          prefab.GetComponent<BraveBehaviour>().aiActor.healthHaver.bossHealthBar = HealthHaver.BossBarType.SubbossBar;
         }
         miniBossIntroDoer.SkipFinalizeAnimation = true;
         miniBossIntroDoer.RegenerateCache();
 
       BehaviorSpeculator bs = prefab.GetComponent<BehaviorSpeculator>();
         bs.CopySaneDefaultBehavior(EnemyDatabase.GetOrLoadByGuid(BULLET_KIN_GUID).behaviorSpeculator);
+        bs.AttackBehaviorGroup.AttackBehaviors = new List<AttackBehaviorGroup.AttackGroupItem>();
+        bs.TargetBehaviors = new List<TargetBehaviorBase>();
       return companion as T;
     }
 
@@ -198,7 +338,7 @@ namespace CwaffingTheGungy
       return miniBossIntroDoer;
     }
 
-    public static void AddAnimation(this EnemyBehavior self, tk2dSpriteCollectionData collection, List<int> ids, string name, float fps, bool loop, DirectionalAnimation.DirectionType direction = DirectionalAnimation.DirectionType.None)
+    public static void AddAnimation(this BraveBehaviour self, tk2dSpriteCollectionData collection, List<int> ids, string name, float fps, bool loop, DirectionalAnimation.DirectionType direction = DirectionalAnimation.DirectionType.None)
     {
       tk2dSpriteAnimationClip.WrapMode loopMode = loop
         ? tk2dSpriteAnimationClip.WrapMode.Loop
@@ -219,7 +359,7 @@ namespace CwaffingTheGungy
       }
     }
 
-    public static void AdjustAnimation(this EnemyBehavior self, string name, float? fps = null, bool? loop = null)
+    public static void AdjustAnimation(this BraveBehaviour self, string name, float? fps = null, bool? loop = null)
     {
       tk2dSpriteAnimationClip clip = self.spriteAnimator.GetClipByName(name);
       if (clip == null)
@@ -237,7 +377,7 @@ namespace CwaffingTheGungy
       }
     }
 
-    public static void InitSpritesFromResourcePath(this EnemyBehavior self, string resourcePath, int defaultFps = 15)
+    public static void InitSpritesFromResourcePath(this BraveBehaviour self, string resourcePath, int defaultFps = 15)
     {
       // TODO: maybe add warning if a path isn't added as a resource?
       string realPath = resourcePath.Replace('/', '.') + ".";
@@ -438,28 +578,6 @@ namespace CwaffingTheGungy
           if ((b.AssociatedTilesets & allowedFloors) > 0)
             b.Bosses.Add(entry);
         }
-    }
-
-    public static AttackBehaviorGroup.AttackGroupItem CreateAttack<T>(GameObject shootPoint, string fireAnim = null, string tellAnim = null, float cooldown = -1f, float leadAmount = 0f, float probability = 1f, int maxUsages = -1, bool requiresLineOfSight = false, bool interruptible = false, float lead = 0)
-      where T : Script
-    {
-      return new AttackBehaviorGroup.AttackGroupItem()
-        {
-          Probability = probability,
-          NickName = typeof(T).AssemblyQualifiedName,
-          Behavior = new ShootBehavior {
-            ShootPoint = shootPoint,
-            BulletScript = new CustomBulletScriptSelector(typeof(T)),
-            AttackCooldown = cooldown,
-            LeadAmount = leadAmount,
-            MaxUsages = maxUsages,
-            FireAnimation = fireAnim,
-            TellAnimation = tellAnim,
-            RequiresLineOfSight = requiresLineOfSight,
-            StopDuring = ShootBehavior.StopType.Attack,
-            Uninterruptible = !interruptible
-          }
-        };
     }
 
     private static Hook selectBossHook = null;
