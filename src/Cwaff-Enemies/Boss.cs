@@ -15,7 +15,7 @@ public class RoomMimic : AIActor
 {
   public static GameObject prefab;
   public  const string guid          = "Room Mimic";
-  private const string name          = guid;
+  private const string bossname      = guid;
   private const string subtitle      = "Face Off!";
   private const string spritePath    = "CwaffingTheGungy/Resources/room_mimic";
   private const string defaultSprite = "room_mimic_idle_001";
@@ -23,11 +23,11 @@ public class RoomMimic : AIActor
   public static void Init()
   {
     // Use the old BossBuilder.BuildPrefab to start off with
-    prefab = BossBuilder.BuildPrefab(name, guid, $"{spritePath}/{defaultSprite}",
+    prefab = BossBuilder.BuildPrefab(bossname, guid, $"{spritePath}/{defaultSprite}",
       new IntVector2(0, 0), new IntVector2(8, 9), false, true);
 
     // Get a sane default BraveBehaviour using our custom EnemyBehavior override class
-    EnemyBehavior companion = BH.AddSaneDefaultBossBehavior<EnemyBehavior>(prefab,name,subtitle,bossCardPath);
+    EnemyBehavior companion = BH.AddSaneDefaultBossBehavior<EnemyBehavior>(prefab,bossname,subtitle,bossCardPath);
       companion.aiActor.knockbackDoer.weight = 200;
       companion.aiActor.MovementSpeed = 2f;
       companion.aiActor.CollisionDamage = 1f;
@@ -48,7 +48,7 @@ public class RoomMimic : AIActor
         companion.AdjustAnimation("die",      6f, false);
 
     // Add custom animation to the generic intro doer, and add a specific intro doer as well
-    prefab.GetComponent<GenericIntroDoer>().introAnim = "intro"; //TODO: check if this actually exists
+    prefab.GetComponent<GenericIntroDoer>().introAnim = "intro";
     prefab.AddComponent<RoomMimicIntro>();
 
     // Set up the boss's attacking behavior scripts as necessary
@@ -71,71 +71,10 @@ public class RoomMimic : AIActor
       };
       bs.AttackBehaviorGroup.AttackBehaviors = new List<AttackBehaviorGroup.AttackGroupItem>
       {
-        new AttackBehaviorGroup.AttackGroupItem()
-        {
-
-          Probability = 1,
-          Behavior = new ShootBehavior {
-            ShootPoint = m_CachedGunAttachPoint,
-            BulletScript = new CustomBulletScriptSelector(typeof(SwirlScript)),
-            LeadAmount = 0f,
-            AttackCooldown = 3.5f,
-            FireAnimation = "swirl",
-            RequiresLineOfSight = false,
-            StopDuring = ShootBehavior.StopType.Attack,
-            Uninterruptible = true
-          },
-          NickName = "Swirl Whirly"
-
-        },
-        new AttackBehaviorGroup.AttackGroupItem()
-        {
-          Probability = 1,
-          Behavior = new ShootBehavior {
-            ShootPoint = m_CachedGunAttachPoint,
-            BulletScript = new CustomBulletScriptSelector(typeof(AAAAAAAAAAAAAAScript)),
-            LeadAmount = 0f,
-            AttackCooldown = 3.5f,
-            FireAnimation = "scream",
-            RequiresLineOfSight = false,
-            StopDuring = ShootBehavior.StopType.Attack,
-            Uninterruptible = true
-          },
-          NickName = "SCREAMMMMMMMM AAAAAAAAAHHHHHHHHH"
-        },
-        new AttackBehaviorGroup.AttackGroupItem()
-        {
-          Probability = 1,
-          Behavior = new ShootBehavior {
-            ShootPoint = m_CachedGunAttachPoint,
-            BulletScript = new CustomBulletScriptSelector(typeof(SkeletonBulletScript)),
-            LeadAmount = 0f,
-            MaxUsages = 2,
-            AttackCooldown = 5f,
-            TellAnimation = "tell2",
-            FireAnimation = "puke",
-            RequiresLineOfSight = false,
-            StopDuring = ShootBehavior.StopType.Attack,
-            Uninterruptible = true
-          },
-          NickName = "Skeleton Spookerino Wowie Zowie AHHHHH AHH, The Skeletons Are Eating Me, AHHHHHHH, man this name is stupid as hell. Stop reading my shit. Stop posting this on the Discord AHHH. At least hope you enjoy the mod tho."
-        },
-        new AttackBehaviorGroup.AttackGroupItem()
-        {
-          Probability = 1,
-          Behavior = new ShootBehavior {
-            ShootPoint = m_CachedGunAttachPoint,
-            BulletScript = new CustomBulletScriptSelector(typeof(SpitUpScript)),
-            LeadAmount = 0f,
-            AttackCooldown = 4.5f,
-            TellAnimation = "tell",
-            FireAnimation = "suck",
-            RequiresLineOfSight = false,
-            StopDuring = ShootBehavior.StopType.Attack,
-            Uninterruptible = true
-          },
-          NickName = "Cuck and Suck"
-        },
+        BH.CreateAttack<SwirlScript>(m_CachedGunAttachPoint, fireAnim: "swirl", cooldown: 3.5f),
+        BH.CreateAttack<AAAAAAAAAAAAAAScript>(m_CachedGunAttachPoint, fireAnim: "scream", cooldown: 3.5f),
+        BH.CreateAttack<SkeletonBulletScript>(m_CachedGunAttachPoint, tellAnim: "tell2", fireAnim: "puke", cooldown: 5f, maxUsages: 2),
+        BH.CreateAttack<SpitUpScript>(m_CachedGunAttachPoint, tellAnim: "tell", fireAnim: "suck", cooldown: 4.5f),
       };
 
     // Add our boss to the enemy database and to the first floor's boss pool

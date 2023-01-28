@@ -440,6 +440,28 @@ namespace CwaffingTheGungy
         }
     }
 
+    public static AttackBehaviorGroup.AttackGroupItem CreateAttack<T>(GameObject shootPoint, string fireAnim = null, string tellAnim = null, float cooldown = -1f, float leadAmount = 0f, float probability = 1f, int maxUsages = -1, bool requiresLineOfSight = false, bool interruptible = false, float lead = 0)
+      where T : Script
+    {
+      return new AttackBehaviorGroup.AttackGroupItem()
+        {
+          Probability = probability,
+          NickName = typeof(T).AssemblyQualifiedName,
+          Behavior = new ShootBehavior {
+            ShootPoint = shootPoint,
+            BulletScript = new CustomBulletScriptSelector(typeof(T)),
+            AttackCooldown = cooldown,
+            LeadAmount = leadAmount,
+            MaxUsages = maxUsages,
+            FireAnimation = fireAnim,
+            TellAnimation = tellAnim,
+            RequiresLineOfSight = requiresLineOfSight,
+            StopDuring = ShootBehavior.StopType.Attack,
+            Uninterruptible = !interruptible
+          }
+        };
+    }
+
     private static Hook selectBossHook = null;
     public static void InitSelectBossHook()
     {
