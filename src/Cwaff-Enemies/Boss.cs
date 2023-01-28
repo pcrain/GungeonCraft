@@ -38,8 +38,8 @@ public class RoomMimic : AIActor
       bb.AdjustAnimation("puke",   fps:   7f, loop: false);
       bb.AdjustAnimation("intro",  fps:  11f, loop: false);
       bb.AdjustAnimation("die",    fps:   6f, loop: false);
-    // Set our defaulf pixel colliders (TODO: should automatically be set from sprite width and height)
-    bb.SetDefaultColliders(101,27);
+    // Set our default pixel colliders
+    bb.SetDefaultColliders(101,27,0,10);
     // Add custom animation to the generic intro doer, and add a specific intro doer as well
     bb.SetIntroAnimation("intro");
     bb.AddCustomIntro<RoomMimicIntro>();

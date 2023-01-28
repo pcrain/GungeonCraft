@@ -55,15 +55,22 @@ namespace CwaffingTheGungy
     public static BuildABoss LetsMakeABoss<T>(string bossname, string guid, string defaultSprite, IntVector2 hitboxSize, string subtitle, string bossCardPath)
       where T : BraveBehaviour
     {
+      // Do some basic boss prefab / guid setup
       BuildABoss bb = new BuildABoss();
-
       bb.guid = guid;
-
       bb.prefab = BossBuilder.BuildPrefab(bossname, bb.guid, defaultSprite,
         IntVector2.Zero, hitboxSize, false, true);
 
+      // Add sane default behavior
       bb.enemyBehavior = BH.AddSaneDefaultBossBehavior<T>(bb.prefab,bossname,subtitle,bossCardPath);
 
+      // Set up default colliders from the default sprite
+      var sprite = bb.prefab.GetComponent<HealthHaver>().GetAnySprite();
+      Vector2 spriteSize = (16f * sprite.GetBounds().size);
+      ETGModConsole.Log(spriteSize);
+      bb.SetDefaultColliders((int)spriteSize.x,(int)spriteSize.y,0,0);
+
+      // Set up a default shoot point from the center of our sprite
       GameObject shootpoint = new GameObject("attach");
         shootpoint.transform.parent = bb.enemyBehavior.transform;
         shootpoint.transform.position = bb.enemyBehavior.sprite.WorldCenter;
@@ -132,9 +139,9 @@ namespace CwaffingTheGungy
       return t;
     }
 
-    public void SetDefaultColliders(int width, int height)
+    public void SetDefaultColliders(int width, int height, int xoff = 0, int yoff = 0)
     {
-      this.enemyBehavior.aiActor.specRigidbody.SetDefaultColliders(width,height); //TODO: should be automatically set from sprite
+      this.enemyBehavior.aiActor.specRigidbody.SetDefaultColliders(width,height,xoff,yoff); //TODO: should be automatically set from sprite
     }
 
     public void InitSpritesFromResourcePath(string spritePath)
@@ -207,7 +214,7 @@ namespace CwaffingTheGungy
       self.SkipTimingDifferentiator        = other.SkipTimingDifferentiator;
     }
 
-    public static void SetDefaultColliders(this SpeculativeRigidbody self, int width, int height)
+    public static void SetDefaultColliders(this SpeculativeRigidbody self, int width, int height, int xoff = 0, int yoff = 0)
     {
       self.PixelColliders.Clear();
       self.PixelColliders.Add(new PixelCollider
@@ -218,10 +225,10 @@ namespace CwaffingTheGungy
           BagleUseFirstFrameOnly = false,
           SpecifyBagelFrame = string.Empty,
           BagelColliderNumber = 0,
-          ManualOffsetX = 0,
-          ManualOffsetY = 10,
-          ManualWidth = 101,
-          ManualHeight = 27,
+          ManualOffsetX = xoff,
+          ManualOffsetY = yoff,
+          ManualWidth = width,
+          ManualHeight = height,
           ManualDiameter = 0,
           ManualLeftX = 0,
           ManualLeftY = 0,
@@ -236,10 +243,10 @@ namespace CwaffingTheGungy
           BagleUseFirstFrameOnly = false,
           SpecifyBagelFrame = string.Empty,
           BagelColliderNumber = 0,
-          ManualOffsetX = 0,
-          ManualOffsetY = 10,
-          ManualWidth = 101,
-          ManualHeight = 27,
+          ManualOffsetX = xoff,
+          ManualOffsetY = yoff,
+          ManualWidth = width,
+          ManualHeight = height,
           ManualDiameter = 0,
           ManualLeftX = 0,
           ManualLeftY = 0,
