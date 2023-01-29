@@ -51,11 +51,16 @@ public class SecretBoss : AIActor
     // Add some named vfx pools to our bank of VFX
     bb.AddNamedVFX(VFX.vfxpool["Tornado"], "mytornado");
 
-    bb.CreateTeleportAttack<TeleportBehavior>(outAnim: "scream", inAnim: "swirl", attackCooldown: 3.5f);
-    bb.CreateBulletAttack<SwirlScript>(fireAnim: "swirl", attackCooldown: 3.5f, fireVfx: "mytornado");
-    // bb.CreateBulletAttack<AAAAAAAAAAAAAAScript>(fireAnim: "scream", attackCooldown: 3.5f);
-    // bb.CreateBulletAttack<SkeletonBulletScript>(tellAnim: "tell2", fireAnim: "puke", attackCooldown: 5f, maxUsages: 2);
-    // bb.CreateBulletAttack<SpitUpScript>(tellAnim: "tell", fireAnim: "suck", attackCooldown: 4.5f);
+    // bb.CreateTeleportAttack<TeleportBehavior>(outAnim: "scream", inAnim: "swirl", attackCooldown: 3.5f);
+    // bb.CreateBulletAttack<SwirlScript>(fireAnim: "swirl", attackCooldown: 3.5f, fireVfx: "mytornado");
+    bb.CreateSimultaneousAttack(new List<AttackBehaviorBase>(){
+      bb.CreateBulletAttack<RichochetScript> (add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
+      bb.CreateBulletAttack<RichochetScript2>(add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
+      });
+    bb.CreateSequentialAttack(new List<AttackBehaviorBase>(){
+      bb.CreateBulletAttack<RichochetScript> (add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
+      bb.CreateBulletAttack<RichochetScript2>(add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
+      });
     // Add our boss to the enemy database and to the first floor's boss pool
     bb.AddBossToGameEnemies("cg:secretboss");
     bb.AddBossToFloorPool(weight: 9999f, floors: Floors.CASTLEGEON);
@@ -133,6 +138,52 @@ public class SecretBoss : AIActor
       yield return StartCoroutine(BH.WaitForSecondsInvariant(1.8f));
       AkSoundEngine.PostEvent("Play_BOSS_doormimic_lick_01", base.aiActor.gameObject);
       yield break;
+    }
+  }
+
+  internal class RichochetScript : Script  //Stolen and modified from base game DraGunGlockRicochet1
+  {
+    private bool firstTime = true;
+    public override IEnumerator Top()
+    {
+      if (this.BulletBank?.aiActor?.TargetRigidbody == null)
+        return null;
+
+      if (firstTime)
+      {
+        firstTime = false;
+        base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid(EnemyGuidDatabase.Entries["dragun"]).bulletBank.GetBullet("ricochet"));
+      }
+
+      int count = 8;
+      float start = -45f;
+      float delta = 90f / (float)(count - 1);
+      for (int j = 0; j < count; j++)
+        Fire(new Direction(start + (float)j * delta, DirectionType.Aim), new Speed(9f), new Bullet("ricochet"));
+      return null;
+    }
+  }
+
+  internal class RichochetScript2 : Script  //Stolen and modified from base game DraGunGlockRicochet1
+  {
+    private bool firstTime = true;
+    public override IEnumerator Top()
+    {
+      if (this.BulletBank?.aiActor?.TargetRigidbody == null)
+        return null;
+
+      if (firstTime)
+      {
+        firstTime = false;
+        base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid(EnemyGuidDatabase.Entries["dragun"]).bulletBank.GetBullet("ricochet"));
+      }
+
+      int count = 8;
+      float start = 135f;
+      float delta = 90f / (float)(count - 1);
+      for (int j = 0; j < count; j++)
+        Fire(new Direction(start + (float)j * delta, DirectionType.Aim), new Speed(9f), new Bullet("ricochet"));
+      return null;
     }
   }
 

@@ -110,6 +110,7 @@ namespace CwaffingTheGungy
 
     /// <summary>Adds a new ShootBehavior attack with a custom Brave.BraveBulletScript.Script to a custom boss.</summary>
     /// <typeparam name="T">A Brave Bullet Script or derived class thereof.</typeparam>
+    /// <param name="add">Whether to add this to our base attack pool. Set to false for attacks nested in simultaneous / sequential attacks.</param>
     /// <param name="cooldown">Time before THIS behavior may be run again.</param>
     /// <param name="cooldownVariance">Time variance added to the base cooldown.</param>
     /// <param name="attackCooldown">Time before ATTACK behaviors may be run again.</param>
@@ -141,9 +142,9 @@ namespace CwaffingTheGungy
     /// <param name="fireVfx">VFX to spawn when firing this attack.</param>
     /// <param name="tellVfx">VFX to spawn when forecasting this attack.</param>
     /// <param name="chargeVfx">VFX to spawn when charging this attack.</param>
-    /// <returns>AttackBehaviorGroup.AttackGroupItem</returns>
-    public AttackBehaviorGroup.AttackGroupItem CreateBulletAttack<T>(
-      float cooldown = 0f, float cooldownVariance = 0f, float attackCooldown = 0f, float globalCooldown = 0f,
+    /// <returns>A ShootBehavior with sane defaults initalized according to the parameters</returns>
+    public ShootBehavior CreateBulletAttack<T>(
+      bool add = true, float cooldown = 0f, float cooldownVariance = 0f, float attackCooldown = 0f, float globalCooldown = 0f,
       float initialCooldown = 0.5f, float initialCooldownVariance = 0f,
       float probability = 1f, int maxUsages = -1, bool requiresLineOfSight = false,
       float minHealth = 0f, float maxHealth = 1f, float[] healthThresholds = null, bool accumulateHealthThresholds = true,
@@ -163,11 +164,7 @@ namespace CwaffingTheGungy
         String.IsNullOrEmpty(fireVfx) &&
         String.IsNullOrEmpty(tellVfx) &&
         String.IsNullOrEmpty(chargeVfx)));
-      AttackBehaviorGroup.AttackGroupItem theAttack = new AttackBehaviorGroup.AttackGroupItem()
-      {
-        Probability = probability,
-        NickName    = typeof(T).AssemblyQualifiedName,
-        Behavior    = new ShootBehavior {
+      ShootBehavior bangbang = new ShootBehavior {
           Cooldown                   = cooldown,
           CooldownVariance           = cooldownVariance,
           AttackCooldown             = attackCooldown,
@@ -202,15 +199,24 @@ namespace CwaffingTheGungy
           FireVfx                    = fireVfx,
           TellVfx                    = tellVfx,
           ChargeVfx                  = chargeVfx,
-        }
-      };
-      this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors.Add(theAttack);
+        };
+      if (add)
+      {
+        AttackBehaviorGroup.AttackGroupItem theAttack = new AttackBehaviorGroup.AttackGroupItem()
+        {
+          Probability = probability,
+          NickName    = typeof(T).AssemblyQualifiedName,
+          Behavior    = bangbang
+        };
+        this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors.Add(theAttack);
+      }
       // this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviors.Add(); // TODO: could also just do this
-      return theAttack;
+      return bangbang;
     }
 
     /// <summary>Adds a new TeleportBehavior attack to a custom boss.</summary>
     /// <typeparam name="T">A TeleportBehavior or derived class thereof.</typeparam>
+    /// <param name="add">Whether to add this to our base attack pool. Set to false for attacks nested in simultaneous / sequential attacks.</param>
     /// <param name="cooldown">Time before THIS behavior may be run again.</param>
     /// <param name="cooldownVariance">Time variance added to the base cooldown.</param>
     /// <param name="attackCooldown">Time before ATTACK behaviors may be run again.</param>
@@ -239,9 +245,9 @@ namespace CwaffingTheGungy
     /// <param name="inAnim">Named animation to play when teleporting back in. (WARNING: cannot be looped)</param>
     /// <param name="outScript">Bullet scripts to run when initiating teleport. (WARNING: cannot be looped)</param>
     /// <param name="inScript">Bullet scripts to run when finishing teleport.</param>
-    /// <returns>AttackBehaviorGroup.AttackGroupItem</returns>
-    public AttackBehaviorGroup.AttackGroupItem CreateTeleportAttack<T>(
-      float cooldown = 0f, float cooldownVariance = 0f, float attackCooldown = 0f, float globalCooldown = 0f,
+    /// <returns>A TeleportBehavior with sane defaults initalized according to the parameters</returns>
+    public TeleportBehavior CreateTeleportAttack<T>(
+      bool add = true, float cooldown = 0f, float cooldownVariance = 0f, float attackCooldown = 0f, float globalCooldown = 0f,
       float initialCooldown = 0.5f, float initialCooldownVariance = 0f,
       float probability = 1f, int maxUsages = -1, bool requiresLineOfSight = false,
       float minHealth = 0f, float maxHealth = 1f, float[] healthThresholds = null, bool accumulateHealthThresholds = true,
@@ -262,11 +268,7 @@ namespace CwaffingTheGungy
         (inScript != null && inScript.IsSubclassOf(typeof(Bullet)))
         ? new CustomBulletScriptSelector(inScript)
         : null;
-      AttackBehaviorGroup.AttackGroupItem theAttack = new AttackBehaviorGroup.AttackGroupItem()
-      {
-        Probability = probability,
-        NickName = typeof(T).AssemblyQualifiedName,
-        Behavior = new T() {
+      TeleportBehavior blipblip = new T() {
           Cooldown                        = cooldown,
           CooldownVariance                = cooldownVariance,
           AttackCooldown                  = attackCooldown,
@@ -298,15 +300,24 @@ namespace CwaffingTheGungy
           teleportInAnim                  = inAnim,
           teleportOutBulletScript         = outScript_,
           teleportInBulletScript          = inScript_,
-        }
-      };
-      this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors.Add(theAttack);
+        };
+      if (add)
+      {
+        AttackBehaviorGroup.AttackGroupItem theAttack = new AttackBehaviorGroup.AttackGroupItem()
+        {
+          Probability = probability,
+          NickName = typeof(T).AssemblyQualifiedName,
+          Behavior = blipblip
+        };
+        this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors.Add(theAttack);
+      }
       // this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviors.Add(theAttack.Behavior); // TODO: could also just do this
-      return theAttack;
+      return blipblip;
     }
 
     /// <summary>Adds a new BasicAttackBehavior attack to a custom boss.</summary>
     /// <typeparam name="T">A BasicAttackBehavior or derived class thereof.</typeparam>
+    /// <param name="add">Whether to add this to our base attack pool. Set to false for attacks nested in simultaneous / sequential attacks.</param>
     /// <param name="cooldown">Time before THIS behavior may be run again.</param>
     /// <param name="cooldownVariance">Time variance added to the base cooldown.</param>
     /// <param name="attackCooldown">Time before ATTACK behaviors may be run again.</param>
@@ -323,9 +334,9 @@ namespace CwaffingTheGungy
     /// <param name="minRange">Minimum range</param>
     /// <param name="range">Range</param>
     /// <param name="minWallDist">Minimum distance from a wall</param>
-    /// <returns>AttackBehaviorGroup.AttackGroupItem</returns>
-    public AttackBehaviorGroup.AttackGroupItem CreateBasicAttack<T>(
-      float cooldown = 0f, float cooldownVariance = 0f, float attackCooldown = 0f, float globalCooldown = 0f,
+    /// <returns>A BasicAttackBehavior with sane defaults initalized according to the parameters</returns>
+    public BasicAttackBehavior CreateBasicAttack<T>(
+      bool add = true, float cooldown = 0f, float cooldownVariance = 0f, float attackCooldown = 0f, float globalCooldown = 0f,
       float initialCooldown = 0.5f, float initialCooldownVariance = 0f,
       float probability = 1f, int maxUsages = -1, bool requiresLineOfSight = false,
       float minHealth = 0f, float maxHealth = 1f, float[] healthThresholds = null, bool accumulateHealthThresholds = true,
@@ -334,11 +345,7 @@ namespace CwaffingTheGungy
     {
       if (healthThresholds == null)
         healthThresholds = new float[0];
-      AttackBehaviorGroup.AttackGroupItem theAttack = new AttackBehaviorGroup.AttackGroupItem()
-      {
-        Probability = probability,
-        NickName = typeof(T).AssemblyQualifiedName,
-        Behavior = new T() {
+      BasicAttackBehavior basicAttack = new T() {
           Cooldown                   = cooldown,
           CooldownVariance           = cooldownVariance,
           AttackCooldown             = attackCooldown,
@@ -355,11 +362,56 @@ namespace CwaffingTheGungy
           Range                      = range,
           MinWallDistance            = minWallDist,
           targetAreaStyle            = null,
-        }
-      };
-      this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors.Add(theAttack);
+        };
+      if (add)
+      {
+        AttackBehaviorGroup.AttackGroupItem theAttack = new AttackBehaviorGroup.AttackGroupItem()
+        {
+          Probability = probability,
+          NickName = typeof(T).AssemblyQualifiedName,
+          Behavior = basicAttack
+        };
+        this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors.Add(theAttack);
+      }
       // this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviors.Add(); // TODO: could also just do this
-      return theAttack;
+      return basicAttack;
+    }
+
+    public SimultaneousAttackBehaviorGroup CreateSimultaneousAttack(List<AttackBehaviorBase> attacks, bool add = true, float probability = 1f)
+    {
+      SimultaneousAttackBehaviorGroup theGroup = new SimultaneousAttackBehaviorGroup(){AttackBehaviors = attacks};
+      if (add)
+      {
+        AttackBehaviorGroup.AttackGroupItem theAttack = new AttackBehaviorGroup.AttackGroupItem()
+        {
+          Probability = probability,
+          // NickName = typeof(T).AssemblyQualifiedName,
+          Behavior = theGroup
+        };
+        this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors.Add(theAttack);
+      }
+      return theGroup;
+    }
+
+    public SequentialAttackBehaviorGroup CreateSequentialAttack(List<AttackBehaviorBase> attacks, List<float> cooldownOverrides = null, bool add = true, float probability = 1f)
+    {
+      if (cooldownOverrides != null && cooldownOverrides.Count != attacks.Count)
+        cooldownOverrides = null;
+      SequentialAttackBehaviorGroup theGroup = new SequentialAttackBehaviorGroup(){
+        AttackBehaviors = attacks,
+        OverrideCooldowns = cooldownOverrides,
+        };
+      if (add)
+      {
+        AttackBehaviorGroup.AttackGroupItem theAttack = new AttackBehaviorGroup.AttackGroupItem()
+        {
+          Probability = probability,
+          // NickName = typeof(T).AssemblyQualifiedName,
+          Behavior = theGroup
+        };
+        this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors.Add(theAttack);
+      }
+      return theGroup;
     }
 
     public TargetPlayerBehavior TargetPlayer(float radius = 35f, float searchInterval = 0.25f, float pauseTime = 0.25f, bool pauseOnTargetSwitch = false, bool lineOfSight = false, bool objectPermanence = true)
