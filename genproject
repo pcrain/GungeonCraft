@@ -72,6 +72,7 @@ fi
 #Source files
 echo -e "[${GRN}>${BLN}] Scanning for source files"
 while read -r line; do
+  [[ "$line" =~ \\_ ]] && continue; # skip any filename beginning with an underscore
   includes+=("<Compile Include=\"${line}\" />")
   sources+=("${line}")
 done <<< $(find "src" -type f -not -path "src/StandardAPI/ItemAPI/Examples/*" -not -path "src/StandardAPI/ItemAPI/FakePrefab/*" -not -path "src/SpriteBuilder.cs" | sed -r 's@/@\\@g')

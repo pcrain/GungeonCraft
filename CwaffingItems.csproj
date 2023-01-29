@@ -141,7 +141,6 @@
     <Compile Include="src\StandardAPI\GungeonAPI\Dungeon Code\SampleFlow.cs"/>
     <Compile Include="src\StandardAPI\GungeonAPI\Dungeon Code\ShrineTools.cs"/>
     <Compile Include="src\StandardAPI\GungeonAPI\Dungeon Code\DungeonHooks.cs"/>
-    <Compile Include="src\_Reference.cs"/>
     <Compile Include="src\Common.cs"/>
     <Compile Include="src\Cwaff-Actives\BulletThatCanKillTheFuture.cs"/>
     <Compile Include="src\Cwaff-Actives\BorrowedTime.cs"/>
@@ -162,7 +161,6 @@
     <Compile Include="src\Cwaff-Guns\TimingGun.cs"/>
     <Compile Include="src\Cwaff-Guns\BBGun.cs"/>
     <Compile Include="src\Cwaff-Guns\GasterBlaster.cs"/>
-    <Compile Include="src\Cwaff-Guns\_GenericGunReference.cs"/>
     <Compile Include="src\Cwaff-Guns\DerailGun.cs"/>
     <Compile Include="src\Cwaff-Guns\Tranquilizer.cs"/>
     <Compile Include="src\Cwaff-Guns\TestLightning.cs"/>
