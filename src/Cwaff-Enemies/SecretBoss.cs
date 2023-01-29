@@ -9,6 +9,9 @@ using Dungeonator;
 using System.Linq;
 using Brave.BulletScript;
 
+using MonoMod.RuntimeDetour;
+using System.Reflection;
+
 namespace CwaffingTheGungy
 {
 public class SecretBoss : AIActor
@@ -30,8 +33,8 @@ public class SecretBoss : AIActor
     // Set up our animations
     bb.InitSpritesFromResourcePath(spritePath);
       bb.AdjustAnimation("idle",   fps:   7f, loop: true);
-      bb.AdjustAnimation("swirl",  fps:   9f, loop: true);
-      bb.AdjustAnimation("scream", fps: 5.3f, loop: true);
+      bb.AdjustAnimation("swirl",  fps:   9f, loop: false);
+      bb.AdjustAnimation("scream", fps: 5.3f, loop: false);
       bb.AdjustAnimation("tell",   fps:   8f, loop: false);
       bb.AdjustAnimation("suck",   fps:   4f, loop: false);
       bb.AdjustAnimation("tell2",  fps:   6f, loop: false);
@@ -45,6 +48,7 @@ public class SecretBoss : AIActor
     bb.AddCustomIntro<BossIntro>();
     // Set up the boss's targeting and attacking scripts
     bb.TargetPlayer();
+    bb.CreateTeleportAttack<TeleportBehavior>(outAnim: "scream", inAnim: "swirl", attackCooldown: 3.5f);
     // bb.CreateBulletAttack<SwirlScript>(fireAnim: "swirl", attackCooldown: 3.5f);
     // bb.CreateBulletAttack<AAAAAAAAAAAAAAScript>(fireAnim: "scream", attackCooldown: 3.5f);
     // bb.CreateBulletAttack<SkeletonBulletScript>(tellAnim: "tell2", fireAnim: "puke", attackCooldown: 5f, maxUsages: 2);
@@ -52,7 +56,47 @@ public class SecretBoss : AIActor
     // Add our boss to the enemy database and to the first floor's boss pool
     bb.AddBossToGameEnemies("cg:secretboss");
     bb.AddBossToFloorPool(weight: 9999f, floors: Floors.CASTLEGEON);
+
+    // new Hook(
+    //     typeof(TeleportBehavior).GetMethod("Update", BindingFlags.Public | BindingFlags.Instance),
+    //     typeof(SecretBoss).GetMethod("UpdateHook", BindingFlags.Public | BindingFlags.Static));
+
+    // new Hook(
+    //     typeof(TeleportBehavior).GetMethod("ContinuousUpdate", BindingFlags.Public | BindingFlags.Instance),
+    //     typeof(SecretBoss).GetMethod("ContinuousUpdateHook", BindingFlags.Public | BindingFlags.Static));
   }
+
+  // public static BehaviorResult UpdateHook(Func<TeleportBehavior, BehaviorResult> orig, TeleportBehavior self)
+  // {
+  //   ETGModConsole.Log($"tryin normal!");
+  //   BehaviorResult result = BehaviorResult.Continue;
+  //   try
+  //   {
+  //     result = orig(self);
+  //   }
+  //   catch (Exception e)
+  //   {
+  //     ETGModConsole.Log(e);
+  //   }
+  //   ETGModConsole.Log($"did {result}");
+  //   return result;
+  // }
+
+  // public static ContinuousBehaviorResult ContinuousUpdateHook(Func<TeleportBehavior, ContinuousBehaviorResult> orig, TeleportBehavior self)
+  // {
+  //   ETGModConsole.Log($"trying continuous!");
+  //   ContinuousBehaviorResult result = ContinuousBehaviorResult.Continue;
+  //   try
+  //   {
+  //     result = orig(self);
+  //   }
+  //   catch (Exception e)
+  //   {
+  //     ETGModConsole.Log(e);
+  //   }
+  //   ETGModConsole.Log($"did {result}");
+  //   return result;
+  // }
 
   internal class BossBehavior : BraveBehaviour
   {
@@ -68,7 +112,8 @@ public class SecretBoss : AIActor
         Chest chest2 = GameManager.Instance.RewardManager.SpawnTotallyRandomChest(GameManager.Instance.PrimaryPlayer.CurrentRoom.GetRandomVisibleClearSpot(1, 1));
         chest2.IsLocked = false;
       };
-      this.aiActor.knockbackDoer.SetImmobile(true, "laugh");
+
+      // this.aiActor.knockbackDoer.SetImmobile(true, "laugh");
     }
   }
 

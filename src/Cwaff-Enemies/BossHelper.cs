@@ -67,7 +67,6 @@ namespace CwaffingTheGungy
       // Set up default colliders from the default sprite
       var sprite = bb.prefab.GetComponent<HealthHaver>().GetAnySprite();
       Vector2 spriteSize = (16f * sprite.GetBounds().size);
-      // ETGModConsole.Log($"spriteSize = {spriteSize}");
       bb.SetDefaultColliders((int)spriteSize.x,(int)spriteSize.y,0,0);
 
       // Set up a default shoot point from the center of our sprite
@@ -75,6 +74,16 @@ namespace CwaffingTheGungy
         shootpoint.transform.parent = bb.enemyBehavior.transform;
         shootpoint.transform.position = bb.enemyBehavior.sprite.WorldCenter;
       bb.defaultGunAttachPoint = bb.enemyBehavior.transform.Find("attach").gameObject;
+
+      // Set up a default shadow so teleportation doesn't throw exceptions
+      if (bb.enemyBehavior.aiActor.ShadowObject == null)
+      {
+        GameObject defaultShadow = (GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("DefaultShadowSprite"));
+        defaultShadow.SetActive(false);
+        FakePrefab.MarkAsFakePrefab(defaultShadow);
+        UnityEngine.Object.DontDestroyOnLoad(defaultShadow);
+        bb.enemyBehavior.aiActor.ShadowObject = defaultShadow;
+      }
 
       return bb;
     }
@@ -114,6 +123,9 @@ namespace CwaffingTheGungy
     /// <param name="maxHealth">The maximum amount of health an enemy can have and still use this attack.\n(Lowering this means the enemy wont use this attack until they lose health)</param>
     /// <param name="healthThresholds">The attack can only be used once each time a new health threshold is met</param>
     /// <param name="accumulateHealthThresholds">If true, the attack can build up multiple uses by passing multiple thresholds in quick succession</param>
+    /// <param name="minRange">Minimum range</param>
+    /// <param name="range">Range</param>
+    /// <param name="minWallDist">Minimum distance from a wall</param>
 
     /// <param name="shootPoint">Object to use for the relative transform of where the attack is fired from.</param>
     /// <param name="fireAnim">Named animation used when the attack is in progress.</param>
@@ -135,6 +147,7 @@ namespace CwaffingTheGungy
       float initialCooldown = 0.5f, float initialCooldownVariance = 0f,
       float probability = 1f, int maxUsages = -1, bool requiresLineOfSight = false,
       float minHealth = 0f, float maxHealth = 1f, float[] healthThresholds = null, bool accumulateHealthThresholds = true,
+      float minRange = 0f, float range = 0f, float minWallDist = 0f,
       GameObject shootPoint = null, string fireAnim = null, string tellAnim = null,
       string chargeAnim = null, string finishAnim = null, float lead = 0f, float chargeTime = 0f,
       bool interruptible = false, bool clearGoop = false, float clearRadius = 2f,
@@ -167,6 +180,10 @@ namespace CwaffingTheGungy
           MaxHealthThreshold         = maxHealth,
           HealthThresholds           = healthThresholds,
           AccumulateHealthThresholds = accumulateHealthThresholds,
+          MinRange                   = minRange,
+          Range                      = range,
+          MinWallDistance            = minWallDist,
+          targetAreaStyle            = null,
 
           ShootPoint                 = shootPoint,
           BulletScript               = new CustomBulletScriptSelector(typeof(T)),
@@ -207,6 +224,10 @@ namespace CwaffingTheGungy
     /// <param name="maxHealth">The maximum amount of health an enemy can have and still use this attack.\n(Lowering this means the enemy wont use this attack until they lose health)</param>
     /// <param name="healthThresholds">The attack can only be used once each time a new health threshold is met</param>
     /// <param name="accumulateHealthThresholds">If true, the attack can build up multiple uses by passing multiple thresholds in quick succession</param>
+    /// <param name="minRange">Minimum range</param>
+    /// <param name="range">Range</param>
+    /// <param name="minWallDist">Minimum distance from a wall</param>
+
     /// <param name="vulnerable">Whether we're vulnerable during teleportation.</param>
     /// <param name="avoidWalls">Whether teleportation avoids walls.</param>
     /// <param name="stayOnScreen">If false, we're allowed to teleport off screen</param>
@@ -214,28 +235,32 @@ namespace CwaffingTheGungy
     /// <param name="maxDist">Maximum distance from player we must be before teleporting.</param>
     /// <param name="goneTime">Amont of time we're teleporting for.</param>
     /// <param name="onlyIfUnreachable">If true, only teleport if we can't pathfind our way to the player.</param>
-    /// <param name="teleportOutScript">Bullet scripts to run when initiating teleport.</param>
-    /// <param name="teleportInScript">Bullet scripts to run when finishing teleport.</param>
+    /// <param name="outAnim">Named animation to play when teleporting out.</param>
+    /// <param name="inAnim">Named animation to play when teleporting back in. (WARNING: cannot be looped)</param>
+    /// <param name="outScript">Bullet scripts to run when initiating teleport. (WARNING: cannot be looped)</param>
+    /// <param name="inScript">Bullet scripts to run when finishing teleport.</param>
     /// <returns>AttackBehaviorGroup.AttackGroupItem</returns>
     public AttackBehaviorGroup.AttackGroupItem CreateTeleportAttack<T>(
       float cooldown = 0f, float cooldownVariance = 0f, float attackCooldown = 0f, float globalCooldown = 0f,
       float initialCooldown = 0.5f, float initialCooldownVariance = 0f,
       float probability = 1f, int maxUsages = -1, bool requiresLineOfSight = false,
       float minHealth = 0f, float maxHealth = 1f, float[] healthThresholds = null, bool accumulateHealthThresholds = true,
-      bool vulnerable = false, bool avoidWalls = false, bool stayOnScreen = false, float minDist = 4f, float maxDist = -1f,
-      float goneTime = 1f, bool onlyIfUnreachable = false, Type teleportOutScript = null, Type teleportInScript = null
+      float minRange = 0f, float range = 0f, float minWallDist = 0f,
+      bool vulnerable = false, bool avoidWalls = false, bool stayOnScreen = false, float minDist = 0f, float maxDist = 0f,
+      float goneTime = 1f, bool onlyIfUnreachable = false,  string outAnim = null, string inAnim = null,
+      Type outScript = null, Type inScript = null
       )
       where T : TeleportBehavior, new()
     {
       if (healthThresholds == null)
         healthThresholds = new float[0];
-      CustomBulletScriptSelector outScript =
-        (teleportOutScript != null && teleportOutScript.IsSubclassOf(typeof(Bullet)))
-        ? new CustomBulletScriptSelector(teleportOutScript)
+      CustomBulletScriptSelector outScript_ =
+        (outScript != null && outScript.IsSubclassOf(typeof(Bullet)))
+        ? new CustomBulletScriptSelector(outScript)
         : null;
-      CustomBulletScriptSelector inScript =
-        (teleportInScript != null && teleportInScript.IsSubclassOf(typeof(Bullet)))
-        ? new CustomBulletScriptSelector(teleportInScript)
+      CustomBulletScriptSelector inScript_ =
+        (inScript != null && inScript.IsSubclassOf(typeof(Bullet)))
+        ? new CustomBulletScriptSelector(inScript)
         : null;
       AttackBehaviorGroup.AttackGroupItem theAttack = new AttackBehaviorGroup.AttackGroupItem()
       {
@@ -254,7 +279,14 @@ namespace CwaffingTheGungy
           MaxHealthThreshold              = maxHealth,
           HealthThresholds                = healthThresholds,
           AccumulateHealthThresholds      = accumulateHealthThresholds,
+          MinRange                        = minRange,
+          Range                           = range,
+          MinWallDistance                 = minWallDist,
+          targetAreaStyle                 = null,
 
+          AllowCrossRoomTeleportation     = false,
+          ManuallyDefineRoom              = false,
+          MaxEnemiesInRoom                = 0,
           AttackableDuringAnimation       = vulnerable,
           AvoidWalls                      = avoidWalls,
           StayOnScreen                    = stayOnScreen,
@@ -262,12 +294,14 @@ namespace CwaffingTheGungy
           MaxDistanceFromPlayer           = maxDist,
           GoneTime                        = goneTime,
           OnlyTeleportIfPlayerUnreachable = onlyIfUnreachable,
-          teleportOutBulletScript         = outScript,
-          teleportInBulletScript          = inScript,
+          teleportOutAnim                 = outAnim,
+          teleportInAnim                  = inAnim,
+          teleportOutBulletScript         = outScript_,
+          teleportInBulletScript          = inScript_,
         }
       };
       this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors.Add(theAttack);
-      // this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviors.Add(); // TODO: could also just do this
+      // this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviors.Add(theAttack.Behavior); // TODO: could also just do this
       return theAttack;
     }
 
@@ -286,12 +320,16 @@ namespace CwaffingTheGungy
     /// <param name="maxHealth">The maximum amount of health an enemy can have and still use this attack.\n(Lowering this means the enemy wont use this attack until they lose health)</param>
     /// <param name="healthThresholds">The attack can only be used once each time a new health threshold is met</param>
     /// <param name="accumulateHealthThresholds">If true, the attack can build up multiple uses by passing multiple thresholds in quick succession</param>
+    /// <param name="minRange">Minimum range</param>
+    /// <param name="range">Range</param>
+    /// <param name="minWallDist">Minimum distance from a wall</param>
     /// <returns>AttackBehaviorGroup.AttackGroupItem</returns>
     public AttackBehaviorGroup.AttackGroupItem CreateBasicAttack<T>(
       float cooldown = 0f, float cooldownVariance = 0f, float attackCooldown = 0f, float globalCooldown = 0f,
       float initialCooldown = 0.5f, float initialCooldownVariance = 0f,
       float probability = 1f, int maxUsages = -1, bool requiresLineOfSight = false,
-      float minHealth = 0f, float maxHealth = 1f, float[] healthThresholds = null, bool accumulateHealthThresholds = true)
+      float minHealth = 0f, float maxHealth = 1f, float[] healthThresholds = null, bool accumulateHealthThresholds = true,
+      float minRange = 0f, float range = 0f, float minWallDist = 0f)
       where T : BasicAttackBehavior, new()
     {
       if (healthThresholds == null)
@@ -313,6 +351,10 @@ namespace CwaffingTheGungy
           MaxHealthThreshold         = maxHealth,
           HealthThresholds           = healthThresholds,
           AccumulateHealthThresholds = accumulateHealthThresholds,
+          MinRange                   = minRange,
+          Range                      = range,
+          MinWallDistance            = minWallDist,
+          targetAreaStyle            = null,
         }
       };
       this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors.Add(theAttack);
@@ -474,6 +516,7 @@ namespace CwaffingTheGungy
         companion.aiActor.CollisionDamage = 1f;
         companion.aiActor.aiAnimator.HitReactChance = 0.05f;
         companion.aiActor.CollisionKnockbackStrength = 5f;
+        // companion.aiActor.ShadowObject = (GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("DefaultShadowSprite"));
 
       // prefab.name = tableId+"_NAME";
       prefab.name = name;
