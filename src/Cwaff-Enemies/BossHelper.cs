@@ -105,7 +105,7 @@ namespace CwaffingTheGungy
       float chargeTime = 0f, float probability = 1f, int maxUsages = -1, bool requiresLineOfSight = false,
       bool interruptible = false, float lead = 0, bool clearGoop = false, float clearRadius = 2f,
       string vfx = null, string fireVfx = null, string tellVfx = null, string chargeVfx = null)
-      where T : Script
+      where T : Brave.BulletScript.Script
     {
       if (shootPoint == null)
         shootPoint = this.defaultGunAttachPoint;
@@ -115,33 +115,48 @@ namespace CwaffingTheGungy
         String.IsNullOrEmpty(tellVfx) &&
         String.IsNullOrEmpty(chargeVfx)));
       AttackBehaviorGroup.AttackGroupItem theAttack = new AttackBehaviorGroup.AttackGroupItem()
-        {
-          Probability = probability,
-          NickName = typeof(T).AssemblyQualifiedName,
-          Behavior = new ShootBehavior {
-            ShootPoint = shootPoint,
-            BulletScript = new CustomBulletScriptSelector(typeof(T)),
-            AttackCooldown = cooldown,
-            LeadAmount = leadAmount,
-            MaxUsages = maxUsages,
-            ChargeTime = chargeTime,
-            FireAnimation = fireAnim,
-            TellAnimation = tellAnim,
-            ChargeAnimation = chargeAnim,
-            PostFireAnimation = finishAnim,
-            RequiresLineOfSight = requiresLineOfSight,
-            StopDuring = ShootBehavior.StopType.Attack,
-            Uninterruptible = !interruptible,
-            ClearGoop = clearGoop,
-            ClearGoopRadius = clearRadius,
-            UseVfx = anyVFx,
-            Vfx = vfx,
-            FireVfx = fireVfx,
-            TellVfx = tellVfx,
-            ChargeVfx = chargeVfx,
-          }
-        };
+      {
+        Probability = probability,
+        NickName = typeof(T).AssemblyQualifiedName,
+        Behavior = new ShootBehavior {
+          ShootPoint = shootPoint,
+          BulletScript = new CustomBulletScriptSelector(typeof(T)),
+          AttackCooldown = cooldown,
+          LeadAmount = leadAmount,
+          MaxUsages = maxUsages,
+          ChargeTime = chargeTime,
+          FireAnimation = fireAnim,
+          TellAnimation = tellAnim,
+          ChargeAnimation = chargeAnim,
+          PostFireAnimation = finishAnim,
+          RequiresLineOfSight = requiresLineOfSight,
+          StopDuring = ShootBehavior.StopType.Attack,
+          Uninterruptible = !interruptible,
+          ClearGoop = clearGoop,
+          ClearGoopRadius = clearRadius,
+          UseVfx = anyVFx,
+          Vfx = vfx,
+          FireVfx = fireVfx,
+          TellVfx = tellVfx,
+          ChargeVfx = chargeVfx,
+        }
+      };
       this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors.Add(theAttack);
+      // this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviors.Add(); // TODO: could also just do this
+      return theAttack;
+    }
+
+    public AttackBehaviorGroup.AttackGroupItem CreateBasicAttack<T>(float probability = 1f)
+      where T : BasicAttackBehavior, new()
+    {
+      AttackBehaviorGroup.AttackGroupItem theAttack = new AttackBehaviorGroup.AttackGroupItem()
+      {
+        Probability = probability,
+        NickName = typeof(T).AssemblyQualifiedName,
+        Behavior = new T()
+      };
+      this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors.Add(theAttack);
+      // this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviors.Add(); // TODO: could also just do this
       return theAttack;
     }
 
