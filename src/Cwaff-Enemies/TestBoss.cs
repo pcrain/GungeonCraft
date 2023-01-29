@@ -45,10 +45,10 @@ public class RoomMimic : AIActor
     bb.AddCustomIntro<RoomMimicIntro>();
     // Set up the boss's targeting and attacking scripts
     bb.TargetPlayer();
-    bb.CreateAttack<SwirlScript>(fireAnim: "swirl", cooldown: 3.5f);
-    bb.CreateAttack<AAAAAAAAAAAAAAScript>(fireAnim: "scream", cooldown: 3.5f);
-    bb.CreateAttack<SkeletonBulletScript>(tellAnim: "tell2", fireAnim: "puke", cooldown: 5f, maxUsages: 2);
-    bb.CreateAttack<SpitUpScript>(tellAnim: "tell", fireAnim: "suck", cooldown: 4.5f);
+    bb.CreateBulletAttack<SwirlScript>(fireAnim: "swirl", attackCooldown: 3.5f);
+    bb.CreateBulletAttack<AAAAAAAAAAAAAAScript>(fireAnim: "scream", attackCooldown: 3.5f);
+    bb.CreateBulletAttack<SkeletonBulletScript>(tellAnim: "tell2", fireAnim: "puke", attackCooldown: 5f, maxUsages: 2);
+    bb.CreateBulletAttack<SpitUpScript>(tellAnim: "tell", fireAnim: "suck", attackCooldown: 4.5f);
     // Add our boss to the enemy database and to the first floor's boss pool
     bb.AddBossToGameEnemies("kp:room_mimic");
     bb.AddBossToFloorPool(weight: 99f, floors: Floors.CASTLEGEON);

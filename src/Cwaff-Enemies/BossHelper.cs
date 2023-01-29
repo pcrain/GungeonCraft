@@ -67,7 +67,7 @@ namespace CwaffingTheGungy
       // Set up default colliders from the default sprite
       var sprite = bb.prefab.GetComponent<HealthHaver>().GetAnySprite();
       Vector2 spriteSize = (16f * sprite.GetBounds().size);
-      ETGModConsole.Log($"spriteSize = {spriteSize}");
+      // ETGModConsole.Log($"spriteSize = {spriteSize}");
       bb.SetDefaultColliders((int)spriteSize.x,(int)spriteSize.y,0,0);
 
       // Set up a default shoot point from the center of our sprite
@@ -99,16 +99,52 @@ namespace CwaffingTheGungy
         this.enemyBehavior.aiActor.aiAnimator.HitReactChance = hitReactChance.Value;
     }
 
-    public AttackBehaviorGroup.AttackGroupItem CreateAttack<T>(
+    /// <summary>Adds a new ShootBehavior attack with a custom Brave.BraveBulletScript.Script to a custom boss.</summary>
+    /// <typeparam name="T">A Brave Bullet Script or derived class thereof.</typeparam>
+    /// <param name="cooldown">Time before THIS behavior may be run again.</param>
+    /// <param name="cooldownVariance">Time variance added to the base cooldown.</param>
+    /// <param name="attackCooldown">Time before ATTACK behaviors may be run again.</param>
+    /// <param name="globalCooldown">Time before ANY behavior may be run again.</param>
+    /// <param name="initialCooldown">Time after the enemy becomes active before this attack can be used for the first time.</param>
+    /// <param name="initialCooldownVariance">Time variance added to the initial cooldown.</param>
+    /// <param name="probability">The probability of using this attack relative to other attacks.</param>
+    /// <param name="maxUsages">This attack can only be used this number of times.</param>
+    /// <param name="requiresLineOfSight">Require line of sight to target. Expensive! Use for companions.</param>
+    /// <param name="minHealth">The minimum amount of health an enemy can have and still use this attack.\n(Raising this means the enemy wont use this attack at low health)</param>
+    /// <param name="maxHealth">The maximum amount of health an enemy can have and still use this attack.\n(Lowering this means the enemy wont use this attack until they lose health)</param>
+    /// <param name="healthThresholds">The attack can only be used once each time a new health threshold is met</param>
+    /// <param name="accumulateHealthThresholds">If true, the attack can build up multiple uses by passing multiple thresholds in quick succession</param>
+
+    /// <param name="shootPoint">Object to use for the relative transform of where the attack is fired from.</param>
+    /// <param name="fireAnim">Named animation used when the attack is in progress.</param>
+    /// <param name="tellAnim">Named animation used when the attack is being forecasted.</param>
+    /// <param name="chargeAnim">Named animation used when the attack is being charged.</param>
+    /// <param name="finishAnim">Named animation used when the attack is complete.</param>
+    /// <param name="lead">(Unknown) How far in front of the target the attack will be aimed / predicted.</param>
+    /// <param name="chargeTime">Amount of time the attack takes to charge.</param>
+    /// <param name="interruptible">Whether this attack is interruptible.</param>
+    /// <param name="clearGoop">Whether this attack clears goop.</param>
+    /// <param name="clearRadius">Radius around the bullets for which this attack clears goops.</param>
+    /// <param name="vfx">VFX to spawn when using this attack.</param>
+    /// <param name="fireVfx">VFX to spawn when firing this attack.</param>
+    /// <param name="tellVfx">VFX to spawn when forecasting this attack.</param>
+    /// <param name="chargeVfx">VFX to spawn when charging this attack.</param>
+    /// <returns>AttackBehaviorGroup.AttackGroupItem</returns>
+    public AttackBehaviorGroup.AttackGroupItem CreateBulletAttack<T>(
+      float cooldown = 0f, float cooldownVariance = 0f, float attackCooldown = 0f, float globalCooldown = 0f,
+      float initialCooldown = 0.5f, float initialCooldownVariance = 0f,
+      float probability = 1f, int maxUsages = -1, bool requiresLineOfSight = false,
+      float minHealth = 0f, float maxHealth = 1f, float[] healthThresholds = null, bool accumulateHealthThresholds = true,
       GameObject shootPoint = null, string fireAnim = null, string tellAnim = null,
-      string chargeAnim = null, string finishAnim = null, float cooldown = -1f, float leadAmount = 0f,
-      float chargeTime = 0f, float probability = 1f, int maxUsages = -1, bool requiresLineOfSight = false,
-      bool interruptible = false, float lead = 0, bool clearGoop = false, float clearRadius = 2f,
+      string chargeAnim = null, string finishAnim = null, float lead = 0f, float chargeTime = 0f,
+      bool interruptible = false, bool clearGoop = false, float clearRadius = 2f,
       string vfx = null, string fireVfx = null, string tellVfx = null, string chargeVfx = null)
       where T : Brave.BulletScript.Script
     {
       if (shootPoint == null)
         shootPoint = this.defaultGunAttachPoint;
+      if (healthThresholds == null)
+        healthThresholds = new float[0];
       bool anyVFx = (!(
         String.IsNullOrEmpty(vfx)     &&
         String.IsNullOrEmpty(fireVfx) &&
@@ -117,28 +153,38 @@ namespace CwaffingTheGungy
       AttackBehaviorGroup.AttackGroupItem theAttack = new AttackBehaviorGroup.AttackGroupItem()
       {
         Probability = probability,
-        NickName = typeof(T).AssemblyQualifiedName,
-        Behavior = new ShootBehavior {
-          ShootPoint = shootPoint,
-          BulletScript = new CustomBulletScriptSelector(typeof(T)),
-          AttackCooldown = cooldown,
-          LeadAmount = leadAmount,
-          MaxUsages = maxUsages,
-          ChargeTime = chargeTime,
-          FireAnimation = fireAnim,
-          TellAnimation = tellAnim,
-          ChargeAnimation = chargeAnim,
-          PostFireAnimation = finishAnim,
-          RequiresLineOfSight = requiresLineOfSight,
-          StopDuring = ShootBehavior.StopType.Attack,
-          Uninterruptible = !interruptible,
-          ClearGoop = clearGoop,
-          ClearGoopRadius = clearRadius,
-          UseVfx = anyVFx,
-          Vfx = vfx,
-          FireVfx = fireVfx,
-          TellVfx = tellVfx,
-          ChargeVfx = chargeVfx,
+        NickName    = typeof(T).AssemblyQualifiedName,
+        Behavior    = new ShootBehavior {
+          Cooldown                   = cooldown,
+          CooldownVariance           = cooldownVariance,
+          AttackCooldown             = attackCooldown,
+          GlobalCooldown             = globalCooldown,
+          InitialCooldown            = initialCooldown,
+          InitialCooldownVariance    = initialCooldownVariance,
+          MaxUsages                  = maxUsages,
+          RequiresLineOfSight        = requiresLineOfSight,
+          MinHealthThreshold         = minHealth,
+          MaxHealthThreshold         = maxHealth,
+          HealthThresholds           = healthThresholds,
+          AccumulateHealthThresholds = accumulateHealthThresholds,
+
+          ShootPoint                 = shootPoint,
+          BulletScript               = new CustomBulletScriptSelector(typeof(T)),
+          LeadAmount                 = lead,
+          ChargeTime                 = chargeTime,
+          FireAnimation              = fireAnim,
+          TellAnimation              = tellAnim,
+          ChargeAnimation            = chargeAnim,
+          PostFireAnimation          = finishAnim,
+          StopDuring                 = ShootBehavior.StopType.Attack,
+          Uninterruptible            = !interruptible,
+          ClearGoop                  = clearGoop,
+          ClearGoopRadius            = clearRadius,
+          UseVfx                     = anyVFx,
+          Vfx                        = vfx,
+          FireVfx                    = fireVfx,
+          TellVfx                    = tellVfx,
+          ChargeVfx                  = chargeVfx,
         }
       };
       this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors.Add(theAttack);
@@ -146,14 +192,128 @@ namespace CwaffingTheGungy
       return theAttack;
     }
 
-    public AttackBehaviorGroup.AttackGroupItem CreateBasicAttack<T>(float probability = 1f)
-      where T : BasicAttackBehavior, new()
+    /// <summary>Adds a new TeleportBehavior attack to a custom boss.</summary>
+    /// <typeparam name="T">A TeleportBehavior or derived class thereof.</typeparam>
+    /// <param name="cooldown">Time before THIS behavior may be run again.</param>
+    /// <param name="cooldownVariance">Time variance added to the base cooldown.</param>
+    /// <param name="attackCooldown">Time before ATTACK behaviors may be run again.</param>
+    /// <param name="globalCooldown">Time before ANY behavior may be run again.</param>
+    /// <param name="initialCooldown">Time after the enemy becomes active before this attack can be used for the first time.</param>
+    /// <param name="initialCooldownVariance">Time variance added to the initial cooldown.</param>
+    /// <param name="probability">The probability of using this attack relative to other attacks.</param>
+    /// <param name="maxUsages">This attack can only be used this number of times.</param>
+    /// <param name="requiresLineOfSight">Require line of sight to target. Expensive! Use for companions.</param>
+    /// <param name="minHealth">The minimum amount of health an enemy can have and still use this attack.\n(Raising this means the enemy wont use this attack at low health)</param>
+    /// <param name="maxHealth">The maximum amount of health an enemy can have and still use this attack.\n(Lowering this means the enemy wont use this attack until they lose health)</param>
+    /// <param name="healthThresholds">The attack can only be used once each time a new health threshold is met</param>
+    /// <param name="accumulateHealthThresholds">If true, the attack can build up multiple uses by passing multiple thresholds in quick succession</param>
+    /// <param name="vulnerable">Whether we're vulnerable during teleportation.</param>
+    /// <param name="avoidWalls">Whether teleportation avoids walls.</param>
+    /// <param name="stayOnScreen">If false, we're allowed to teleport off screen</param>
+    /// <param name="minDist">Minimum distance from player we must be before teleporting.</param>
+    /// <param name="maxDist">Maximum distance from player we must be before teleporting.</param>
+    /// <param name="goneTime">Amont of time we're teleporting for.</param>
+    /// <param name="onlyIfUnreachable">If true, only teleport if we can't pathfind our way to the player.</param>
+    /// <param name="teleportOutScript">Bullet scripts to run when initiating teleport.</param>
+    /// <param name="teleportInScript">Bullet scripts to run when finishing teleport.</param>
+    /// <returns>AttackBehaviorGroup.AttackGroupItem</returns>
+    public AttackBehaviorGroup.AttackGroupItem CreateTeleportAttack<T>(
+      float cooldown = 0f, float cooldownVariance = 0f, float attackCooldown = 0f, float globalCooldown = 0f,
+      float initialCooldown = 0.5f, float initialCooldownVariance = 0f,
+      float probability = 1f, int maxUsages = -1, bool requiresLineOfSight = false,
+      float minHealth = 0f, float maxHealth = 1f, float[] healthThresholds = null, bool accumulateHealthThresholds = true,
+      bool vulnerable = false, bool avoidWalls = false, bool stayOnScreen = false, float minDist = 4f, float maxDist = -1f,
+      float goneTime = 1f, bool onlyIfUnreachable = false, Type teleportOutScript = null, Type teleportInScript = null
+      )
+      where T : TeleportBehavior, new()
     {
+      if (healthThresholds == null)
+        healthThresholds = new float[0];
+      CustomBulletScriptSelector outScript =
+        (teleportOutScript != null && teleportOutScript.IsSubclassOf(typeof(Bullet)))
+        ? new CustomBulletScriptSelector(teleportOutScript)
+        : null;
+      CustomBulletScriptSelector inScript =
+        (teleportInScript != null && teleportInScript.IsSubclassOf(typeof(Bullet)))
+        ? new CustomBulletScriptSelector(teleportInScript)
+        : null;
       AttackBehaviorGroup.AttackGroupItem theAttack = new AttackBehaviorGroup.AttackGroupItem()
       {
         Probability = probability,
         NickName = typeof(T).AssemblyQualifiedName,
-        Behavior = new T()
+        Behavior = new T() {
+          Cooldown                        = cooldown,
+          CooldownVariance                = cooldownVariance,
+          AttackCooldown                  = attackCooldown,
+          GlobalCooldown                  = globalCooldown,
+          InitialCooldown                 = initialCooldown,
+          InitialCooldownVariance         = initialCooldownVariance,
+          MaxUsages                       = maxUsages,
+          RequiresLineOfSight             = requiresLineOfSight,
+          MinHealthThreshold              = minHealth,
+          MaxHealthThreshold              = maxHealth,
+          HealthThresholds                = healthThresholds,
+          AccumulateHealthThresholds      = accumulateHealthThresholds,
+
+          AttackableDuringAnimation       = vulnerable,
+          AvoidWalls                      = avoidWalls,
+          StayOnScreen                    = stayOnScreen,
+          MinDistanceFromPlayer           = minDist,
+          MaxDistanceFromPlayer           = maxDist,
+          GoneTime                        = goneTime,
+          OnlyTeleportIfPlayerUnreachable = onlyIfUnreachable,
+          teleportOutBulletScript         = outScript,
+          teleportInBulletScript          = inScript,
+        }
+      };
+      this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors.Add(theAttack);
+      // this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviors.Add(); // TODO: could also just do this
+      return theAttack;
+    }
+
+    /// <summary>Adds a new BasicAttackBehavior attack to a custom boss.</summary>
+    /// <typeparam name="T">A BasicAttackBehavior or derived class thereof.</typeparam>
+    /// <param name="cooldown">Time before THIS behavior may be run again.</param>
+    /// <param name="cooldownVariance">Time variance added to the base cooldown.</param>
+    /// <param name="attackCooldown">Time before ATTACK behaviors may be run again.</param>
+    /// <param name="globalCooldown">Time before ANY behavior may be run again.</param>
+    /// <param name="initialCooldown">Time after the enemy becomes active before this attack can be used for the first time.</param>
+    /// <param name="initialCooldownVariance">Time variance added to the initial cooldown.</param>
+    /// <param name="probability">The probability of using this attack relative to other attacks.</param>
+    /// <param name="maxUsages">This attack can only be used this number of times.</param>
+    /// <param name="requiresLineOfSight">Require line of sight to target. Expensive! Use for companions.</param>
+    /// <param name="minHealth">The minimum amount of health an enemy can have and still use this attack.\n(Raising this means the enemy wont use this attack at low health)</param>
+    /// <param name="maxHealth">The maximum amount of health an enemy can have and still use this attack.\n(Lowering this means the enemy wont use this attack until they lose health)</param>
+    /// <param name="healthThresholds">The attack can only be used once each time a new health threshold is met</param>
+    /// <param name="accumulateHealthThresholds">If true, the attack can build up multiple uses by passing multiple thresholds in quick succession</param>
+    /// <returns>AttackBehaviorGroup.AttackGroupItem</returns>
+    public AttackBehaviorGroup.AttackGroupItem CreateBasicAttack<T>(
+      float cooldown = 0f, float cooldownVariance = 0f, float attackCooldown = 0f, float globalCooldown = 0f,
+      float initialCooldown = 0.5f, float initialCooldownVariance = 0f,
+      float probability = 1f, int maxUsages = -1, bool requiresLineOfSight = false,
+      float minHealth = 0f, float maxHealth = 1f, float[] healthThresholds = null, bool accumulateHealthThresholds = true)
+      where T : BasicAttackBehavior, new()
+    {
+      if (healthThresholds == null)
+        healthThresholds = new float[0];
+      AttackBehaviorGroup.AttackGroupItem theAttack = new AttackBehaviorGroup.AttackGroupItem()
+      {
+        Probability = probability,
+        NickName = typeof(T).AssemblyQualifiedName,
+        Behavior = new T() {
+          Cooldown                   = cooldown,
+          CooldownVariance           = cooldownVariance,
+          AttackCooldown             = attackCooldown,
+          GlobalCooldown             = globalCooldown,
+          InitialCooldown            = initialCooldown,
+          InitialCooldownVariance    = initialCooldownVariance,
+          MaxUsages                  = maxUsages,
+          RequiresLineOfSight        = requiresLineOfSight,
+          MinHealthThreshold         = minHealth,
+          MaxHealthThreshold         = maxHealth,
+          HealthThresholds           = healthThresholds,
+          AccumulateHealthThresholds = accumulateHealthThresholds,
+        }
       };
       this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors.Add(theAttack);
       // this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviors.Add(); // TODO: could also just do this
@@ -353,7 +513,6 @@ namespace CwaffingTheGungy
 
       BehaviorSpeculator bs = prefab.GetComponent<BehaviorSpeculator>();
         bs.CopySaneDefaultBehavior(EnemyDatabase.GetOrLoadByGuid(BULLET_KIN_GUID).behaviorSpeculator);
-        ETGModConsole.Log(bs.AttackBehaviorGroup.ShareCooldowns);
         bs.AttackBehaviorGroup.ShareCooldowns = true; //NOTE: this defaults to false
         bs.AttackBehaviorGroup.AttackBehaviors = new List<AttackBehaviorGroup.AttackGroupItem>();
         bs.TargetBehaviors = new List<TargetBehaviorBase>();
