@@ -227,11 +227,13 @@ namespace CwaffingTheGungy
             complex.effects            = new VFXObject[] { vfObj };
             pool.effects               = new VFXComplex[] { complex };
 
-            Type genericType = typeof(T);
-
-            if(genericType == typeof(VFXPool))         vfxpool[name]    = pool;
-            else if(genericType == typeof(VFXComplex)) vfxcomplex[name] = complex;
-            else if(genericType == typeof(GameObject)) animations[name] = Obj;
+            // Type genericType = typeof(T);
+            // if(genericType == typeof(VFXPool))         vfxpool[name]    = pool;
+            // else if(genericType == typeof(VFXComplex)) vfxcomplex[name] = complex;
+            // else if(genericType == typeof(GameObject)) animations[name] = Obj;
+            vfxpool[name]    = pool;
+            vfxcomplex[name] = complex;
+            animations[name] = Obj;
         }
 
         public static void ShowOverheadVFX(this GameActor gunOwner, string name, float timeout)

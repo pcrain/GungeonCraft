@@ -377,6 +377,28 @@ namespace CwaffingTheGungy
       return t;
     }
 
+    public void AddNamedVFX(VFXObject vfxobj, string name, Transform transformAnchor = null)
+    {
+        VFXComplex complex = new VFXComplex();
+        complex.effects    = new VFXObject[] { vfxobj };
+        AddNamedVFX(complex, name, transformAnchor);
+    }
+
+    public void AddNamedVFX(VFXComplex complex, string name, Transform transformAnchor = null)
+    {
+        VFXPool pool = new VFXPool();
+        pool.type    = VFXPoolType.All;
+        pool.effects = new VFXComplex[] { complex };
+        AddNamedVFX(pool, name, transformAnchor);
+    }
+
+    public void AddNamedVFX(VFXPool pool, string name, Transform transformAnchor = null)
+    {
+      if (this.enemyBehavior.aiAnimator.OtherVFX == null)
+        this.enemyBehavior.aiAnimator.OtherVFX = new List<AIAnimator.NamedVFXPool>();
+      this.enemyBehavior.aiAnimator.OtherVFX.Add(new AIAnimator.NamedVFXPool(){name = name, vfxPool = pool, anchorTransform = transformAnchor});
+    }
+
     public void SetDefaultColliders(int width, int height, int xoff = 0, int yoff = 0)
     {
       this.enemyBehavior.aiActor.specRigidbody.SetDefaultColliders(width,height,xoff,yoff); //TODO: should be automatically set from sprite

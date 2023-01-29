@@ -48,8 +48,11 @@ public class SecretBoss : AIActor
     bb.AddCustomIntro<BossIntro>();
     // Set up the boss's targeting and attacking scripts
     bb.TargetPlayer();
+    // Add some named vfx pools to our bank of VFX
+    bb.AddNamedVFX(VFX.vfxpool["Tornado"], "mytornado");
+
     bb.CreateTeleportAttack<TeleportBehavior>(outAnim: "scream", inAnim: "swirl", attackCooldown: 3.5f);
-    // bb.CreateBulletAttack<SwirlScript>(fireAnim: "swirl", attackCooldown: 3.5f);
+    bb.CreateBulletAttack<SwirlScript>(fireAnim: "swirl", attackCooldown: 3.5f, fireVfx: "mytornado");
     // bb.CreateBulletAttack<AAAAAAAAAAAAAAScript>(fireAnim: "scream", attackCooldown: 3.5f);
     // bb.CreateBulletAttack<SkeletonBulletScript>(tellAnim: "tell2", fireAnim: "puke", attackCooldown: 5f, maxUsages: 2);
     // bb.CreateBulletAttack<SpitUpScript>(tellAnim: "tell", fireAnim: "suck", attackCooldown: 4.5f);
@@ -131,6 +134,176 @@ public class SecretBoss : AIActor
       AkSoundEngine.PostEvent("Play_BOSS_doormimic_lick_01", base.aiActor.gameObject);
       yield break;
     }
+  }
+
+  internal class SwirlScript : Script // This BulletScript is just a modified version of the script BulletManShroomed, which you can find with dnSpy.
+  {
+    public override IEnumerator Top()
+    {
+      if (this.BulletBank && this.BulletBank.aiActor && this.BulletBank.aiActor.TargetRigidbody)
+      {
+        base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("796a7ed4ad804984859088fc91672c7f").bulletBank.GetBullet("default"));
+        base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("1bc2a07ef87741be90c37096910843ab").bulletBank.GetBullet("reversible"));
+      }
+      for (int i = 0; i < 195; i++)
+      {
+
+        base.Fire(new Direction(360 - (i * 20), DirectionType.Absolute, -1f), new Speed(8f, SpeedType.Absolute), new WallBullet());
+        yield return this.Wait(4);
+        if (i % 10 == 9)
+        {
+          this.Fire(new Direction(0f, DirectionType.Aim, -1f), new Speed(8f, SpeedType.Absolute), new BurstBullet());
+        }
+      }
+
+      yield break;
+    }
+
+  }
+
+  internal class SkeletonBulletScript : Script
+  {
+    public override IEnumerator Top()
+    {
+      if (this.BulletBank && this.BulletBank.aiActor && this.BulletBank.aiActor.TargetRigidbody)
+      {
+        base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("5288e86d20184fa69c91ceb642d31474").bulletBank.GetBullet("skull"));
+      }
+      AkSoundEngine.PostEvent("Play_BOSS_doormimic_vomit_01", this.BulletBank.aiActor.gameObject);
+      yield return this.Wait(22);
+      base.Fire(new Direction(-40f, DirectionType.Aim, -1f), new Speed(11f, SpeedType.Absolute), new SpawnSkeletonBullet());
+      base.Fire(new Direction(40f, DirectionType.Aim, -1f), new Speed(11f, SpeedType.Absolute), new SpawnSkeletonBullet());
+      yield break;
+    }
+  }
+
+  internal class SpawnSkeletonBullet : Bullet
+  {
+    // Token: 0x06000A99 RID: 2713 RVA: 0x000085A7 File Offset: 0x000067A7
+    public SpawnSkeletonBullet() : base("skull", false, false, false)
+    {
+    }
+
+    public override void OnBulletDestruction(Bullet.DestroyType destroyType, SpeculativeRigidbody hitRigidbody, bool preventSpawningProjectiles)
+    {
+      if (preventSpawningProjectiles)
+      {
+        return;
+      }
+      var list = new List<string> {
+        //"shellet",
+        "336190e29e8a4f75ab7486595b700d4a"
+      };
+      string guid = BraveUtility.RandomElement<string>(list);
+      var Enemy = EnemyDatabase.GetOrLoadByGuid(guid);
+      AIActor.Spawn(Enemy.aiActor, this.Projectile.sprite.WorldCenter, GameManager.Instance.PrimaryPlayer.CurrentRoom, true, AIActor.AwakenAnimationType.Default, true);
+    }
+
+  }
+
+  internal class AAAAAAAAAAAAAAScript : Script // This BulletScript is just a modified version of the script BulletManShroomed, which you can find with dnSpy.
+  {
+    public override IEnumerator Top()
+    {
+      if (this.BulletBank && this.BulletBank.aiActor && this.BulletBank.aiActor.TargetRigidbody)
+      {
+        base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("796a7ed4ad804984859088fc91672c7f").bulletBank.GetBullet("default"));
+      }
+      AkSoundEngine.PostEvent("Play_ENM_beholster_intro_01", this.BulletBank.aiActor.gameObject);
+      for (int k = 0; k < 70; k++)
+      {
+        this.Fire(new Direction((float)k * 360f / 64f, DirectionType.Absolute, -1f), new Speed (10f, SpeedType.Absolute), new WallBullet());
+      }
+      yield return Wait(70);
+      AkSoundEngine.PostEvent("Play_ENM_beholster_intro_01", this.BulletBank.aiActor.gameObject);
+      for (int k = 0; k < 70; k++)
+      {
+        this.Fire(new Direction((float)k * 360f / 64f, DirectionType.Absolute, -1f), new Speed(10f, SpeedType.Absolute), new WallBullet());
+      }
+      yield return Wait(70);
+      AkSoundEngine.PostEvent("Play_ENM_beholster_intro_01", this.BulletBank.aiActor.gameObject);
+      for (int k = 0; k < 70; k++)
+      {
+        this.Fire(new Direction((float)k * 360f / 64f, DirectionType.Absolute, -1f), new Speed(10f, SpeedType.Absolute), new WallBullet());
+      }
+      yield break;
+    }
+
+  }
+
+  internal class SpitUpScript : Script // This BulletScript is just a modified version of the script BulletManShroomed, which you can find with dnSpy.
+  {
+    public override IEnumerator Top()
+    {
+      if (this.BulletBank && this.BulletBank.aiActor && this.BulletBank.aiActor.TargetRigidbody)
+      {
+        base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("1bc2a07ef87741be90c37096910843ab").bulletBank.GetBullet("reversible"));
+      }
+      AkSoundEngine.PostEvent("Play_ENM_beholster_intro_01", this.BulletBank.aiActor.gameObject);
+      for (int k = 0; k < 70; k++)
+      {
+        this.Fire(new Direction(UnityEngine.Random.Range(0f, 360f), DirectionType.Aim, -1f), new Speed(UnityEngine.Random.Range(8f, 13f), SpeedType.Absolute), new ReverseBullet());
+      }
+      yield break;
+    }
+  }
+
+  internal class BurstBullet : Bullet
+  {
+    // Token: 0x06000A99 RID: 2713 RVA: 0x000085A7 File Offset: 0x000067A7
+    public BurstBullet() : base("reversible", false, false, false)
+    {
+    }
+
+    public override IEnumerator Top()
+    {
+      this.Projectile.spriteAnimator.Play();
+      yield break;
+    }
+    public override void OnBulletDestruction(Bullet.DestroyType destroyType, SpeculativeRigidbody hitRigidbody, bool preventSpawningProjectiles)
+    {
+      if (preventSpawningProjectiles)
+      {
+        return;
+      }
+      for (int i = 0; i < 4; i++)
+      {
+        base.Fire(new Direction((float)(i * 45), DirectionType.Absolute, -1f), new Speed(7f, SpeedType.Absolute), new WallBullet());
+      }
+    }
+  }
+
+  internal class ReverseBullet : Bullet
+  {
+    // Token: 0x06000A91 RID: 2705 RVA: 0x00030B38 File Offset: 0x0002ED38
+    public ReverseBullet() : base("reversible", false, false, false)
+    {
+    }
+
+    // Token: 0x06000A92 RID: 2706 RVA: 0x00030B48 File Offset: 0x0002ED48
+    public override IEnumerator Top()
+    {
+      float speed = this.Speed;
+      yield return this.Wait(100);
+      this.ChangeSpeed(new Speed(0f, SpeedType.Absolute), 20);
+      yield return this.Wait(40);
+      this.Direction += 180f;
+      this.Projectile.spriteAnimator.Play();
+      yield return this.Wait(60);
+      this.ChangeSpeed(new Speed(speed, SpeedType.Absolute), 40);
+      yield return this.Wait(130);
+      this.Vanish(true);
+      yield break;
+    }
+  }
+
+  internal class WallBullet : Bullet
+  {
+    // Token: 0x06000A91 RID: 2705 RVA: 0x00030B38 File Offset: 0x0002ED38
+    public WallBullet() : base("default", false, false, false)
+    {
+    }
+
   }
 
 }
