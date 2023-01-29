@@ -67,7 +67,7 @@ namespace CwaffingTheGungy
       // Set up default colliders from the default sprite
       var sprite = bb.prefab.GetComponent<HealthHaver>().GetAnySprite();
       Vector2 spriteSize = (16f * sprite.GetBounds().size);
-      ETGModConsole.Log(spriteSize);
+      ETGModConsole.Log($"spriteSize = {spriteSize}");
       bb.SetDefaultColliders((int)spriteSize.x,(int)spriteSize.y,0,0);
 
       // Set up a default shoot point from the center of our sprite
@@ -84,7 +84,8 @@ namespace CwaffingTheGungy
       if (health.HasValue)
       {
         this.enemyBehavior.aiActor.healthHaver.SetHealthMaximum(health.Value);
-        this.enemyBehavior.aiActor.healthHaver.ForceSetCurrentHealth(health.Value);
+        this.enemyBehavior.aiActor.healthHaver.FullHeal();
+        // this.enemyBehavior.aiActor.healthHaver.ForceSetCurrentHealth(health.Value);
       }
       if (weight.HasValue)
         this.enemyBehavior.aiActor.knockbackDoer.weight = weight.Value;
@@ -98,11 +99,21 @@ namespace CwaffingTheGungy
         this.enemyBehavior.aiActor.aiAnimator.HitReactChance = hitReactChance.Value;
     }
 
-    public AttackBehaviorGroup.AttackGroupItem CreateAttack<T>(GameObject shootPoint = null, string fireAnim = null, string tellAnim = null, float cooldown = -1f, float leadAmount = 0f, float probability = 1f, int maxUsages = -1, bool requiresLineOfSight = false, bool interruptible = false, float lead = 0)
+    public AttackBehaviorGroup.AttackGroupItem CreateAttack<T>(
+      GameObject shootPoint = null, string fireAnim = null, string tellAnim = null,
+      string chargeAnim = null, string finishAnim = null, float cooldown = -1f, float leadAmount = 0f,
+      float chargeTime = 0f, float probability = 1f, int maxUsages = -1, bool requiresLineOfSight = false,
+      bool interruptible = false, float lead = 0, bool clearGoop = false, float clearRadius = 2f,
+      string vfx = null, string fireVfx = null, string tellVfx = null, string chargeVfx = null)
       where T : Script
     {
       if (shootPoint == null)
         shootPoint = this.defaultGunAttachPoint;
+      bool anyVFx = (!(
+        String.IsNullOrEmpty(vfx)     &&
+        String.IsNullOrEmpty(fireVfx) &&
+        String.IsNullOrEmpty(tellVfx) &&
+        String.IsNullOrEmpty(chargeVfx)));
       AttackBehaviorGroup.AttackGroupItem theAttack = new AttackBehaviorGroup.AttackGroupItem()
         {
           Probability = probability,
@@ -113,11 +124,21 @@ namespace CwaffingTheGungy
             AttackCooldown = cooldown,
             LeadAmount = leadAmount,
             MaxUsages = maxUsages,
+            ChargeTime = chargeTime,
             FireAnimation = fireAnim,
             TellAnimation = tellAnim,
+            ChargeAnimation = chargeAnim,
+            PostFireAnimation = finishAnim,
             RequiresLineOfSight = requiresLineOfSight,
             StopDuring = ShootBehavior.StopType.Attack,
-            Uninterruptible = !interruptible
+            Uninterruptible = !interruptible,
+            ClearGoop = clearGoop,
+            ClearGoopRadius = clearRadius,
+            UseVfx = anyVFx,
+            Vfx = vfx,
+            FireVfx = fireVfx,
+            TellVfx = tellVfx,
+            ChargeVfx = chargeVfx,
           }
         };
       this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors.Add(theAttack);
@@ -271,7 +292,8 @@ namespace CwaffingTheGungy
         companion.aiActor.CorpseObject = EnemyDatabase.GetOrLoadByGuid(BULLET_KIN_GUID).CorpseObject;
         // set some sane stats
         companion.aiActor.healthHaver.SetHealthMaximum(1000f);
-        companion.aiActor.healthHaver.ForceSetCurrentHealth(1000f);
+        companion.aiActor.healthHaver.FullHeal();
+        // companion.aiActor.healthHaver.ForceSetCurrentHealth(1000f);
         companion.aiActor.knockbackDoer.weight = 100;
         companion.aiActor.MovementSpeed = 1f;
         companion.aiActor.CollisionDamage = 1f;
@@ -316,6 +338,8 @@ namespace CwaffingTheGungy
 
       BehaviorSpeculator bs = prefab.GetComponent<BehaviorSpeculator>();
         bs.CopySaneDefaultBehavior(EnemyDatabase.GetOrLoadByGuid(BULLET_KIN_GUID).behaviorSpeculator);
+        ETGModConsole.Log(bs.AttackBehaviorGroup.ShareCooldowns);
+        bs.AttackBehaviorGroup.ShareCooldowns = true; //NOTE: this defaults to false
         bs.AttackBehaviorGroup.AttackBehaviors = new List<AttackBehaviorGroup.AttackGroupItem>();
         bs.TargetBehaviors = new List<TargetBehaviorBase>();
       return companion as T;
@@ -542,9 +566,9 @@ namespace CwaffingTheGungy
 
         // Get a generic boss room and add it to the center of the room
         PrototypeDungeonRoom p = GetGenericBossRoom();
-          Vector2 roomCenter = new Vector2(p.Width/2.0f, p.Height/2.0f);
-          Vector2 spriteCenter = self.GetComponent<tk2dSpriteAnimator>().GetAnySprite().WorldCenter;
-        AddObjectToRoom(p, roomCenter - spriteCenter, EnemyBehaviourGuid: guid);
+          Vector2 roomCenter = new Vector2(0.5f*p.Width, 0.5f*p.Height);
+          tk2dBaseSprite anySprite = self.GetComponent<tk2dSpriteAnimator>().GetAnySprite();
+        AddObjectToRoom(p, roomCenter - anySprite.WorldCenter, EnemyBehaviourGuid: guid);
 
         // Create a new table and add our new boss room
         GenericRoomTable theRoomTable = ScriptableObject.CreateInstance<GenericRoomTable>();
