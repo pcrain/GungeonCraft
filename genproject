@@ -8,6 +8,8 @@ projfile="./CwaffingItems.csproj"                #the name of the csproj file to
 sourcechecksums="./_${namespace}-checksums-src"  #file containing checksums of all source files to determing recompilation
 audiochecksums="./_${namespace}-checksums-audio" #file containing checksums of all source files to determing recompilation
 dllname="./bin/Debug/${projectname}.dll"         #DLL name is directly based on the project name
+USEXTERNALASSEMBLY=0                             #Whether to use the external Assembly-Csharp.dll or the one bundled in the source directory
+#Could not get the external assembly working ):
 
 #Base directory we're copying our plugin to
 plugindir="/xmedia/pretzel/Steam/steamapps/common/Enter the Gungeon/BepInEx/plugins"
@@ -98,8 +100,19 @@ done <<< $(find "packages/EtG.UnityEngine.1.0.0" -path "*.dll" | sed -r 's@/@\\@
 #Versioned packages, net35
 echo -e "[${GRN}>${BLN}] Scanning for net35 DLLs"
 while read -r line; do
+  if [ $USEXTERNALASSEMBLY -eq 1 ] && [[ "$line" =~ Assembly-CSharp ]]; then
+    continue
+  fi
   includes+=("<Reference Include=\"$(echo "$line" | rev | cut -f 1 -d '\' | cut -f 2- -d '.' | rev)\"/>")
 done <<< $(find "packages" -path "*net35*.dll" | sed -r 's@/@\\@g')
+
+#Manually add Assembly-CSharp.dll from base Gungeon path
+# maindll=$(echo -e "<Reference Include=\"Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL\">\n  <SpecificVersion>False</SpecificVersion>\n  <HintPath>./packages/EtG.GameLibs.2.1.9.1/lib/net35/Assembly-CSharp.dll</HintPath>\n</Reference>")
+  # maindll=$(echo -e "<Reference Include=\"Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL\">\n  <SpecificVersion>False</SpecificVersion>\n  <HintPath>/home/pretzel/workspace/gungy-cwaffing/packages/EtG.GameLibs.2.1.9.1/lib/net35/Assembly-CSharp.dll</HintPath>\n</Reference>")
+if [ $USEXTERNALASSEMBLY -eq 1 ]; then
+  maindll=$(echo -e "<Reference Include=\"Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL\">\n  <SpecificVersion>False</SpecificVersion>\n  <HintPath>/xmedia/pretzel/Steam/steamapps/common/Enter the Gungeon/EtG_Data/Managed/Assembly-CSharp.dll</HintPath>\n</Reference>")
+  includes+=("${maindll}")
+fi
 
 #Copy over external resources as necessary
 echo -e "[${GRN}>${BLN}] Copying over updated external resources"
@@ -227,8 +240,12 @@ if [ $rebuild -eq 1 ]; then
     echo "$(md5sum "${s}")" >> "${sourcechecksums}"
   done
 
-  #Don't warn about unused variables (semicolon delimited)
+  #Don't warn about unused variables
+  #  (list is semicolon delimited))
   nowarn="CS0414"
+  if [ $USEXTERNALASSEMBLY -eq 1 ]; then
+    nowarn="${nowarn};CS0109" #CustomShopController issues warnings about unnecessary new with the real game's assembly
+  fi
 
   #Actually rebuild the project
   echo -e "[${GRN}>${BLN}] Building project"

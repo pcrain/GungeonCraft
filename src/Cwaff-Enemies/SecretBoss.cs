@@ -118,21 +118,20 @@ public class SecretBoss : AIActor
         yield break;
 
       if (firstTime)
-      {
-        firstTime = false;
         base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid(EnemyGuidDatabase.Entries["dragun"]).bulletBank.GetBullet("ricochet"));
-      }
 
-      Rect roomBounds = GameManager.Instance.PrimaryPlayer.CurrentRoom.GetBoundingRect();
+      firstTime = false;
+      Rect roomBounds = this.BulletBank.aiActor.GetAbsoluteParentRoom().GetBoundingRect();
       float offset = roomBounds.width / (float)COUNT;
       for (int j = 0; j < COUNT; j++)
       {
         Vector2 spawnPoint = new Vector2(roomBounds.xMin + j*offset, roomBounds.yMax - 1f);
-        Fire(Offset.OverridePosition(spawnPoint), new Direction(-90f, DirectionType.Absolute), new Speed(9f), new Bullet("ricochet"));
-        // AkSoundEngine.PostEvent("teledash", this.BulletBank.aiActor.gameObject);
+        Fire(Offset.OverridePosition(spawnPoint), new Direction(-90f, DirectionType.Absolute), new Speed(9f), new Rickyboi());
+        // Fire(Offset.OverridePosition(spawnPoint), new Direction(-90f, DirectionType.Absolute), new Speed(9f), new Bullet("ricochet"));
+        AkSoundEngine.PostEvent("Play_WPN_golddoublebarrelshotgun_shot_01", this.BulletBank.aiActor.gameObject);
         yield return this.Wait(10);
       }
-      yield break;;
+      yield break;
     }
   }
 
@@ -179,6 +178,28 @@ public class SecretBoss : AIActor
       for (int j = 0; j < count; j++)
         Fire(new Direction(start + (float)j * delta, DirectionType.Aim), new Speed(9f), new Bullet("ricochet"));
       return null;
+    }
+  }
+
+  internal class Rickyboi : Bullet
+  {
+    // Token: 0x06000A99 RID: 2713 RVA: 0x000085A7 File Offset: 0x000067A7
+    public Rickyboi() : base("ricochet", false, false, false)
+    {
+      ResetProjectile();
+    }
+    public override IEnumerator Top()
+    {
+      ETGModConsole.Log("trying");
+      ResetProjectile();
+      ETGModConsole.Log("well you tried");
+      // this.Projectile.spriteAnimator.Play();
+      yield break;
+    }
+    private void ResetProjectile()
+    {
+      Gun gun = (PickupObjectDatabase.GetById(59) as Gun); //hegemony rifle
+      this.Projectile = UnityEngine.Object.Instantiate<Projectile>(gun.DefaultModule.projectiles[0]);
     }
   }
 
