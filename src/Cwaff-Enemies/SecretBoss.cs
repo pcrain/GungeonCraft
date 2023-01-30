@@ -28,7 +28,7 @@ public class SecretBoss : AIActor
     BuildABoss bb = BuildABoss.LetsMakeABoss<BossBehavior>(
       bossname, guid, $"{spritePath}/{defaultSprite}", new IntVector2(8, 9), subtitle, bossCardPath);
     // Set our stats
-    bb.SetStats(health: 1000f, weight: 200f, speed: 2f, collisionDamage: 1f,
+    bb.SetStats(health: 100f, weight: 200f, speed: 2f, collisionDamage: 1f,
       hitReactChance: 0.05f, collisionKnockbackStrength: 5f);
     // Set up our animations
     bb.InitSpritesFromResourcePath(spritePath);
@@ -122,8 +122,12 @@ public class SecretBoss : AIActor
       {
         AIBulletBank.Entry reversible = EnemyDatabase.GetOrLoadByGuid("1bc2a07ef87741be90c37096910843ab").bulletBank.GetBullet("reversible");
         AIBulletBank.Entry e = new AIBulletBank.Entry(reversible);
-          e.Name = "spicyboi";
+          e.Name         = "spicyboi";
           e.BulletObject = (PickupObjectDatabase.GetById(59) as Gun).DefaultModule.projectiles[0].gameObject; // hegemony rifle
+          e.PlayAudio    = true;
+          e.AudioEvent   = "Play_WPN_golddoublebarrelshotgun_shot_01";
+          e.AudioLimitOncePerAttack = false;
+          e.AudioLimitOncePerFrame = false;
         this.BulletBank.Bullets.Add(e);
       }
 
@@ -134,7 +138,7 @@ public class SecretBoss : AIActor
       {
         Vector2 spawnPoint = new Vector2(roomBounds.xMin + j*offset, roomBounds.yMax - 1f);
         this.Fire(Offset.OverridePosition(spawnPoint), new Direction(-90f, DirectionType.Absolute), new Speed(9f), new Bullet("spicyboi"));
-        AkSoundEngine.PostEvent("Play_WPN_golddoublebarrelshotgun_shot_01", this.BulletBank.aiActor.gameObject);
+        // AkSoundEngine.PostEvent("Play_WPN_golddoublebarrelshotgun_shot_01", this.BulletBank.aiActor.gameObject);
         yield return this.Wait(10);
       }
       yield break;

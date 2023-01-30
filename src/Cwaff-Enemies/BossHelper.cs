@@ -836,6 +836,14 @@ namespace CwaffingTheGungy
         p.paths = new List<SerializedPath>();
         p.prerequisites = new List<DungeonPrerequisite>();
         p.rectangularFeatures = new List<PrototypeRectangularFeature>();
+
+      // Make sure it still seals when we enter
+        p.roomEvents.Add(new RoomEventDefinition(RoomEventTriggerCondition.ON_ENTER_WITH_ENEMIES, RoomEventTriggerAction.SEAL_ROOM));
+        p.roomEvents.Add(new RoomEventDefinition(RoomEventTriggerCondition.ON_ENEMIES_CLEARED, RoomEventTriggerAction.UNSEAL_ROOM));
+      // TODO: figure out how to create the smaller secondary boss door
+      // TODO: add custom music
+        // p.UseCustomMusic = true;
+        // p.CustomMusicEvent = "";
       return p;
     }
 
