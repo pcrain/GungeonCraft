@@ -78,7 +78,35 @@ public class SecretBoss : AIActor
   internal static void InitPrefabs()
   {
     AssetBundle sharedAssets2 = ResourceManager.LoadAssetBundle("shared_auto_002");
-    napalmReticle = sharedAssets2.LoadAsset<GameObject>("NapalmStrikeReticle");
+    GameObject prefabReticle = sharedAssets2.LoadAsset<GameObject>("NapalmStrikeReticle");
+    napalmReticle = UnityEngine.Object.Instantiate(prefabReticle);
+    tk2dSlicedSprite m_extantReticleQuad = napalmReticle.GetComponent<tk2dSlicedSprite>();
+        m_extantReticleQuad.SetSprite(VFX.SpriteCollection, VFX.sprites["reticle-white"]);
+
+    napalmReticle.SetActive(false); //make sure the projectile isn't an active game object
+    FakePrefab.MarkAsFakePrefab(napalmReticle);  //mark the projectile as a prefab
+    UnityEngine.Object.DontDestroyOnLoad(napalmReticle); //make sure the projectile isn't destroyed when loaded as a prefab
+  }
+
+  internal class Expiration : MonoBehaviour  // kill projectile after a fixed amount of time
+  {
+      // dummy component
+      // private void Start()
+      // {
+      //     Projectile p = base.GetComponent<Projectile>();
+      //     Invoke("Expire", expirationTimer);
+      // }
+
+      public void ExpireIn(float seconds)
+      {
+        this.StartCoroutine(Expire(seconds));
+      }
+
+      private IEnumerator Expire(float seconds)
+      {
+        yield return new WaitForSeconds(seconds);
+        UnityEngine.Object.Destroy(this.gameObject);
+      }
   }
 
   internal class BossBehavior : BraveBehaviour
@@ -158,7 +186,7 @@ public class SecretBoss : AIActor
         const float initialWidth = 4f;
         GameObject reticle = UnityEngine.Object.Instantiate(napalmReticle);
         tk2dSlicedSprite m_extantReticleQuad = reticle.GetComponent<tk2dSlicedSprite>();
-          m_extantReticleQuad.SetSprite(VFX.SpriteCollection, VFX.sprites["reticle-white"]);
+          reticle.AddComponent<Expiration>().ExpireIn(3f);
           m_extantReticleQuad.dimensions = new Vector2(attackLength * 16f, initialWidth * 16f);
           m_extantReticleQuad.transform.localRotation = Quaternion.Euler(0f, 0f, -45f);
           // m_extantReticleQuad.transform.localRotation = Quaternion.Euler(0f, 0f, BraveMathCollege.Atan2Degrees(normalized));
