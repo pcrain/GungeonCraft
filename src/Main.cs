@@ -132,9 +132,34 @@ namespace CwaffingTheGungy
                 #region Flow stuff stolen from Apache
                     AssetBundle sharedAssets = ResourceManager.LoadAssetBundle("shared_auto_001");
                     AssetBundle sharedAssets2 = ResourceManager.LoadAssetBundle("shared_auto_002");
+                    AssetBundle sharedBase = ResourceManager.LoadAssetBundle("shared_base_001");
                     AssetBundle braveResources = ResourceManager.LoadAssetBundle("brave_resources_001");
                     AssetBundle enemiesBase = ResourceManager.LoadAssetBundle("enemies_base_001");
 
+                    // ETGModConsole.Log("Trying to load some stuff");
+                    // try
+                    // {
+                    //     ETGModConsole.Log($"  we got {sharedAssets.LoadAsset<GameObject>("NapalmStrike")?.name ?? "null"}");
+                    //     ETGModConsole.Log($"  we got {sharedAssets2.LoadAsset<GameObject>("NapalmStrike")?.name ?? "null"}");
+                    //     ETGModConsole.Log($"  we got {braveResources.LoadAsset<GameObject>("NapalmStrike")?.name ?? "null"}");
+                    //     ETGModConsole.Log($"  we got {enemiesBase.LoadAsset<GameObject>("NapalmStrike")?.name ?? "null"}");
+                    //     ETGModConsole.Log($"  we got {sharedBase.LoadAsset<GameObject>("NapalmStrike")?.name ?? "null"}");
+                    //     ETGModConsole.Log($"  we got {sharedAssets.LoadAsset<GameObject>("NapalmStrikeReticle")?.name ?? "null"}");
+                    //     ETGModConsole.Log($"  we got {sharedAssets2.LoadAsset<GameObject>("NapalmStrikeReticle")?.name ?? "null"}");
+                    //     ETGModConsole.Log($"  we got {braveResources.LoadAsset<GameObject>("NapalmStrikeReticle")?.name ?? "null"}");
+                    //     ETGModConsole.Log($"  we got {enemiesBase.LoadAsset<GameObject>("NapalmStrikeReticle")?.name ?? "null"}");
+                    //     ETGModConsole.Log($"  we got {sharedBase.LoadAsset<GameObject>("NapalmStrikeReticle")?.name ?? "null"}");
+
+                    //     // GameObject napalm = sharedAssets.LoadAsset<GameObject>("NapalmStrike");
+                    //     // if (napalm != null)
+                    //     //     ETGModConsole.Log($"  we got {napalm}");
+                    //     // else
+                    //     //     ETGModConsole.Log("  nullyboi o.o");
+                    // }
+                    // catch (Exception ex)
+                    // {
+                    //     ETGModConsole.Log($"  you broke it: {ex}");
+                    // }
                     try {
                         // Init Prefab Databases
                         CwaffDungeonPrefabs.InitCustomPrefabs(sharedAssets, sharedAssets2, braveResources, enemiesBase);

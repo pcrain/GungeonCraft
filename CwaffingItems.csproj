@@ -198,6 +198,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\Tornado\tornado1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\Tornado\tornado3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\Tornado\tornado9.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\reticle-white.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\GunVFX\RebarGunImpactVFX2_001.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\GunVFX\RebarGunImpactVFX2_004.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\GunVFX\RebarGunImpactVFX2_006.png"/>

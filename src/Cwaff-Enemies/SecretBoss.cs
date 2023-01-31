@@ -22,6 +22,8 @@ public class SecretBoss : AIActor
   private const string spritePath    = "CwaffingTheGungy/Resources/room_mimic";
   private const string defaultSprite = "room_mimic_idle_001";
   private const string bossCardPath  = "CwaffingTheGungy/Resources/roomimic_bosscard.png";
+
+  internal static GameObject napalmReticle = null;
   public static void Init()
   {
     // Create our build-a-boss
@@ -70,6 +72,13 @@ public class SecretBoss : AIActor
     bb.AddBossToGameEnemies("cg:secretboss");
     bb.AddBossToFloorPool(weight: 9999f, floors: Floors.CASTLEGEON);
 
+    InitPrefabs();  // Do miscellaneous prefab loading
+  }
+
+  internal static void InitPrefabs()
+  {
+    AssetBundle sharedAssets2 = ResourceManager.LoadAssetBundle("shared_auto_002");
+    napalmReticle = sharedAssets2.LoadAsset<GameObject>("NapalmStrikeReticle");
   }
 
   internal class BossBehavior : BraveBehaviour
@@ -139,6 +148,22 @@ public class SecretBoss : AIActor
         Vector2 spawnPoint = new Vector2(roomBounds.xMin + j*offset, roomBounds.yMax - 1f);
         this.Fire(Offset.OverridePosition(spawnPoint), new Direction(-90f, DirectionType.Absolute), new Speed(9f), new Bullet("spicyboi"));
         // AkSoundEngine.PostEvent("Play_WPN_golddoublebarrelshotgun_shot_01", this.BulletBank.aiActor.gameObject);
+
+        Vector2 target = spawnPoint - new Vector2(0f,10f);
+        float startDistance = (target - spawnPoint).magnitude;
+        Vector2 normalized = (target - spawnPoint).normalized;
+
+        // Stealing from DirectionalAttackActiveItem
+        const float attackLength = 8f;
+        const float initialWidth = 4f;
+        GameObject reticle = UnityEngine.Object.Instantiate(napalmReticle);
+        tk2dSlicedSprite m_extantReticleQuad = reticle.GetComponent<tk2dSlicedSprite>();
+          m_extantReticleQuad.SetSprite(VFX.SpriteCollection, VFX.sprites["reticle-white"]);
+          m_extantReticleQuad.dimensions = new Vector2(attackLength * 16f, initialWidth * 16f);
+          m_extantReticleQuad.transform.localRotation = Quaternion.Euler(0f, 0f, -45f);
+          // m_extantReticleQuad.transform.localRotation = Quaternion.Euler(0f, 0f, BraveMathCollege.Atan2Degrees(normalized));
+        Vector2 vector = spawnPoint + normalized * startDistance + (Quaternion.Euler(0f, 0f, -90f) * normalized * (initialWidth / 2f)).XY();
+        m_extantReticleQuad.transform.position = vector;
         yield return this.Wait(10);
       }
       yield break;

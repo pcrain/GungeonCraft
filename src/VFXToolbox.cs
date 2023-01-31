@@ -25,6 +25,11 @@ namespace CwaffingTheGungy
 
         private static Dictionary<GameObject,VFXPool> vfxObjectToPoolMap;
 
+        public static tk2dSpriteCollectionData SpriteCollection
+        {
+            get { return OverheadVFXCollection; }
+        }
+
         public static void Init()
         {
             sprites               = new Dictionary<string,int>();
@@ -53,6 +58,8 @@ namespace CwaffingTheGungy
             RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/PumpChargeMeter3");
             RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/PumpChargeMeter4");
             RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/PumpChargeMeter5");
+
+            RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/reticle-white");
 
             RegisterVFX<GameObject>("PumpChargeAnimated", new List<string>() {
                     "CwaffingTheGungy/Resources/MiscVFX/PumpChargeMeter1",
