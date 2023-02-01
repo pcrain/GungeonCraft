@@ -167,7 +167,7 @@ public class SecretBoss : AIActor
         Vector2 spawnPoint = new Vector2(roomBounds.xMin + j*offset, roomBounds.yMax - 1f);
         this.Fire(Offset.OverridePosition(spawnPoint), new Direction(-90f, DirectionType.Absolute), new Speed(9f), new Bullet("getboned"));
         DoomZone(spawnPoint, spawnPoint - new Vector2(0f,10f), 1f, 3f);
-        yield return this.Wait(10);
+        yield return this.Wait(4);
       }
       yield break;
     }
@@ -175,22 +175,25 @@ public class SecretBoss : AIActor
 
   internal class RichochetScript : Script  //Stolen and modified from base game DraGunGlockRicochet1
   {
-    protected void Fire(float start)
-    {
+    protected float start = -45f;
+    public override IEnumerator Top() {
       if (this.BulletBank?.aiActor?.TargetRigidbody == null)
-        return;
+        return null;
       base.BulletBank.AddBulletFromEnemy("dragun","ricochet");
       int count = 8;
       float delta = 90f / (float)(count - 1);
       for (int j = 0; j < count; j++)
         Fire(new Direction(start + (float)j * delta, DirectionType.Aim), new Speed(9f), new Bullet("ricochet"));
+      return null;
     }
-    public override IEnumerator Top() { Fire(-45f); return null; }
   }
 
   internal class RichochetScript2 : RichochetScript
   {
-    public override IEnumerator Top() { Fire(135f); return null; }
+    public override IEnumerator Top() {
+      start = 135f;
+      return base.Top();
+    }
   }
 }
 
