@@ -481,9 +481,9 @@ namespace CwaffingTheGungy
       this.prefab.AddComponent<T>();
     }
 
-    public void AddBossToFloorPool(float weight, Floors floors)
+    public void AddBossToFloorPool(Floors floors, float weight = 1f)
     {
-      this.prefab.AddBossToFloorPool(guid: this.guid, weight: weight, floors: floors);
+      this.prefab.AddBossToFloorPool(guid: this.guid, floors: floors, weight: weight);
     }
   }
 
@@ -853,7 +853,7 @@ namespace CwaffingTheGungy
       Illegal tilesets:
         SPACEGEON, PHOBOSGEON, WESTGEON, OFFICEGEON, BELLYGEON, JUNGLEGEON, FINALGEON, RATGEON
     */
-    public static void AddBossToFloorPool(this GameObject self, string guid, float weight = 1f, Floors floors = Floors.CASTLEGEON)
+    public static void AddBossToFloorPool(this GameObject self, string guid, Floors floors = Floors.CASTLEGEON, float weight = 1f)
     {
         // Load our boss manager if it's not loaded already
         if (theBossMan == null)
