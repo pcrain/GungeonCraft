@@ -1,16 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.Collections;
+using System.Linq;
+using System.Reflection;
+
+using UnityEngine;
+using MonoMod.RuntimeDetour;
+using Brave.BulletScript;
+
 using Gungeon;
 using ItemAPI;
 using EnemyAPI;
-using UnityEngine;
-using System.Collections;
 using Dungeonator;
-using System.Linq;
-using Brave.BulletScript;
-
-using MonoMod.RuntimeDetour;
-using System.Reflection;
 
 namespace CwaffingTheGungy
 {
@@ -23,7 +24,7 @@ public class SecretBoss : AIActor
   private const string defaultSprite = "room_mimic_idle_001";
   private const string bossCardPath  = "CwaffingTheGungy/Resources/roomimic_bosscard.png";
 
-  internal static GameObject napalmReticle = null;
+  internal static GameObject napalmReticle      = null;
   internal static AIBulletBank.Entry boneBullet = null;
   public static void Init()
   {
@@ -57,13 +58,14 @@ public class SecretBoss : AIActor
     // Add a random teleportation behavior
     // bb.CreateTeleportAttack<TeleportBehavior>(outAnim: "scream", inAnim: "swirl", attackCooldown: 3.5f);
     // Add a basic bullet attack
-    bb.CreateBulletAttack<CeilingBulletsScript>(fireAnim: "swirl", attackCooldown: 3.5f, fireVfx: "mytornado");
+    // bb.CreateBulletAttack<CeilingBulletsScript>(fireAnim: "swirl", attackCooldown: 3.5f, fireVfx: "mytornado");
     // bb.CreateBulletAttack<SwirlScript>(fireAnim: "swirl", attackCooldown: 3.5f, fireVfx: "mytornado");
-    // // Add a bunch of simultaenous bullet attacks
-    // bb.CreateSimultaneousAttack(new(){
-    //   bb.CreateBulletAttack<RichochetScript> (add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
-    //   bb.CreateBulletAttack<RichochetScript2>(add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
-    //   });
+    // Add a bunch of simultaenous bullet attacks
+    bb.CreateSimultaneousAttack(new(){
+      bb.CreateBulletAttack<RichochetScript> (add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
+      bb.CreateBulletAttack<RichochetScript2>(add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
+      bb.CreateBulletAttack<CeilingBulletsScript>(add: false, fireAnim: "swirl", attackCooldown: 3.5f, fireVfx: "mytornado"),
+      });
     // // Add a sequential bullet attacks
     // bb.CreateSequentialAttack(new(){
     //   bb.CreateBulletAttack<RichochetScript> (add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
@@ -118,7 +120,6 @@ public class SecretBoss : AIActor
   {
     private void Start()
     {
-      //base.aiActor.HasBeenEngaged = true;
       base.aiActor.healthHaver.OnPreDeath += (obj) =>
       {
         AkSoundEngine.PostEvent("Play_ENM_beholster_death_01", base.aiActor.gameObject);
@@ -128,7 +129,6 @@ public class SecretBoss : AIActor
         Chest chest2 = GameManager.Instance.RewardManager.SpawnTotallyRandomChest(GameManager.Instance.PrimaryPlayer.CurrentRoom.GetRandomVisibleClearSpot(1, 1));
         chest2.IsLocked = false;
       };
-
       // this.aiActor.knockbackDoer.SetImmobile(true, "laugh");
     }
   }
@@ -166,7 +166,6 @@ public class SecretBoss : AIActor
       {
         Vector2 spawnPoint = new Vector2(roomBounds.xMin + j*offset, roomBounds.yMax - 1f);
         this.Fire(Offset.OverridePosition(spawnPoint), new Direction(-90f, DirectionType.Absolute), new Speed(9f), new Bullet("getboned"));
-        // AkSoundEngine.PostEvent("Play_WPN_golddoublebarrelshotgun_shot_01", this.BulletBank.aiActor.gameObject);
         DoomZone(spawnPoint, spawnPoint - new Vector2(0f,10f), 1f, 3f);
         yield return this.Wait(10);
       }
@@ -176,38 +175,22 @@ public class SecretBoss : AIActor
 
   internal class RichochetScript : Script  //Stolen and modified from base game DraGunGlockRicochet1
   {
-    public override IEnumerator Top()
+    protected void Fire(float start)
     {
       if (this.BulletBank?.aiActor?.TargetRigidbody == null)
-        return null;
-
+        return;
       base.BulletBank.AddBulletFromEnemy("dragun","ricochet");
-
       int count = 8;
-      float start = -45f;
       float delta = 90f / (float)(count - 1);
       for (int j = 0; j < count; j++)
         Fire(new Direction(start + (float)j * delta, DirectionType.Aim), new Speed(9f), new Bullet("ricochet"));
-      return null;
     }
+    public override IEnumerator Top() { Fire(-45f); return null; }
   }
 
-  internal class RichochetScript2 : Script  //Stolen and modified from base game DraGunGlockRicochet1
+  internal class RichochetScript2 : RichochetScript
   {
-    public override IEnumerator Top()
-    {
-      if (this.BulletBank?.aiActor?.TargetRigidbody == null)
-        return null;
-
-      base.BulletBank.AddBulletFromEnemy("dragun","ricochet");
-
-      int count = 8;
-      float start = 135f;
-      float delta = 90f / (float)(count - 1);
-      for (int j = 0; j < count; j++)
-        Fire(new Direction(start + (float)j * delta, DirectionType.Aim), new Speed(9f), new Bullet("ricochet"));
-      return null;
-    }
+    public override IEnumerator Top() { Fire(135f); return null; }
   }
 }
 
