@@ -26,6 +26,7 @@ public class SecretBoss : AIActor
 
   internal static GameObject napalmReticle      = null;
   internal static AIBulletBank.Entry boneBullet = null;
+  internal static VFXPool bonevfx               = null;
   public static void Init()
   {
     // Create our build-a-boss
@@ -60,7 +61,8 @@ public class SecretBoss : AIActor
     // Add a basic bullet attack
     // bb.CreateBulletAttack<CeilingBulletsScript>(fireAnim: "swirl", attackCooldown: 3.5f, fireVfx: "mytornado");
     // bb.CreateBulletAttack<SwirlScript>(fireAnim: "swirl", attackCooldown: 3.5f, fireVfx: "mytornado");
-    bb.CreateBulletAttack<FancyBulletsScript>(fireAnim: "swirl", attackCooldown: 3.5f, fireVfx: "mytornado");
+    // bb.CreateBulletAttack<FancyBulletsScript>(fireAnim: "swirl", attackCooldown: 3.5f, fireVfx: "mytornado");
+    bb.CreateBulletAttack<HesitantBulletWallScript>(fireAnim: "swirl", attackCooldown: 3.5f, fireVfx: "mytornado");
     // Add a bunch of simultaenous bullet attacks
     // bb.CreateSimultaneousAttack(new(){
     //   bb.CreateBulletAttack<RichochetScript> (add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
@@ -89,6 +91,9 @@ public class SecretBoss : AIActor
         m_extantReticleQuad.SetSprite(VFX.SpriteCollection, VFX.sprites["reticle-white"]);
     napalmReticle.RegisterPrefab();
 
+    // Bone bullet Spawn VFX
+    bonevfx = VFX.CreatePoolFromVFXGameObject((PickupObjectDatabase.GetById(29) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
+
     // Bone bullet
     AIBulletBank.Entry reversible = EnemyDatabase.GetOrLoadByGuid("1bc2a07ef87741be90c37096910843ab").bulletBank.GetBullet("reversible");
     boneBullet = new AIBulletBank.Entry(reversible);
@@ -101,6 +106,7 @@ public class SecretBoss : AIActor
       boneBullet.AudioEvent   = "Play_WPN_golddoublebarrelshotgun_shot_01";
       boneBullet.AudioLimitOncePerAttack = false;
       boneBullet.AudioLimitOncePerFrame = false;
+      boneBullet.MuzzleFlashEffects = bonevfx;
   }
 
   // Creates a napalm-strike=esque danger zone
@@ -151,6 +157,72 @@ public class SecretBoss : AIActor
     }
   }
 
+  internal class HesitantBulletWallScript : Script
+  {
+    public class HesitantBullet : Bullet
+    {
+
+      private const int LAUNCH_WAIT_FRAMES = 60;
+      public HesitantBullet() : base("getboned")
+      {
+      }
+
+      public override void Initialize()
+      {
+        this.Projectile.ChangeTintColorShader(0f,new Color(1.0f,0.5f,0.5f,0.5f));
+        base.Initialize();
+      }
+
+      public override IEnumerator Top()
+      {
+        AkSoundEngine.PostEvent("Play_OBJ_turret_set_01", GameManager.Instance.PrimaryPlayer.gameObject);
+        float initSpeed = this.Speed;
+        this.ChangeSpeed(new Speed(0,SpeedType.Absolute),LAUNCH_WAIT_FRAMES);
+        yield return Wait(LAUNCH_WAIT_FRAMES);
+        this.ChangeSpeed(new Speed(initSpeed*2,SpeedType.Absolute));
+        AkSoundEngine.PostEvent("Play_WPN_spacerifle_shot_01", GameManager.Instance.PrimaryPlayer.gameObject);
+        yield return Wait(120);
+        Vanish();
+        yield break;
+      }
+    }
+
+    private const int COUNT       = 10;
+    private const float WALLWIDTH = 10f;
+    private const float DISTANCE  = 7f;
+    private const float SPEED     = 10f;
+    private const float SPACING   = WALLWIDTH / COUNT;
+    public override IEnumerator Top()
+    {
+
+      if (this.BulletBank?.aiActor?.TargetRigidbody == null)
+        yield break;
+
+      this.BulletBank.Bullets.Add(boneBullet);
+
+      Vector2 playerpos = GameManager.Instance.PrimaryPlayer.CenterPosition;
+      RoomHandler room = GameManager.Instance.PrimaryPlayer.CurrentRoom;
+
+      float incidentDirection;
+      Vector2 centerPoint;
+      do
+      {
+        incidentDirection = UnityEngine.Random.Range(-180f,180f);
+        centerPoint = playerpos + DISTANCE * incidentDirection.ToVector();
+      } while(IsPointInTile(centerPoint));
+      for (int j = -COUNT/2; j <= COUNT/2; j++)
+      {
+        float offset = j*SPACING;
+        Vector2 spawnPoint = centerPoint + (offset * BraveMathCollege.ClampAngle180(incidentDirection - 90f).ToVector());
+        Bullet b = new HesitantBullet();
+        this.Fire(Offset.OverridePosition(spawnPoint), new Direction(BraveMathCollege.ClampAngle180(incidentDirection+180f),DirectionType.Absolute), new Speed(SPEED,SpeedType.Absolute), b);
+        yield return this.Wait(5);
+      }
+      yield return this.Wait(120);
+      yield break;
+    }
+  }
+
   internal class FancyBulletsScript : Script
   {
 
@@ -184,10 +256,11 @@ public class SecretBoss : AIActor
         this.Projectile.BulletScriptSettings.surviveTileCollisions = true;
         this.Projectile.specRigidbody.OnPreTileCollision += (_,_,_,_) => { PhysicsEngine.SkipCollision = true; };
         this.Projectile.ChangeTintColorShader(0f,new Color(1.0f,0.5f,0.5f,0.5f));
+
         this.initialTarget = this.center + this.radius * this.captureAngle.ToVector();
         this.delta = this.initialTarget - this.Position;
-        ChangeDirection(new Direction(delta.ToAngle(),DirectionType.Absolute));
-        ChangeSpeed(new Speed(C.PIXELS_PER_CELL * delta.magnitude / framesToApproach,SpeedType.Absolute));
+        ChangeDirection(new Direction(delta.ToAngle(), DirectionType.Absolute));
+        ChangeSpeed(new Speed(C.PIXELS_PER_CELL * delta.magnitude / framesToApproach, SpeedType.Absolute));
         base.Initialize();
       }
 

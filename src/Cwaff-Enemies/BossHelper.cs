@@ -648,6 +648,7 @@ namespace CwaffingTheGungy
         miniBossIntroDoer.introDirectionalAnim = string.Empty;
         miniBossIntroDoer.continueAnimDuringOutro = false;
         miniBossIntroDoer.BossMusicEvent = "Play_MUS_Boss_Theme_Beholster";
+        // miniBossIntroDoer.BossMusicEvent = "sans";
         miniBossIntroDoer.PreventBossMusic = false;
         miniBossIntroDoer.InvisibleBeforeIntroAnim = true;
         miniBossIntroDoer.preIntroAnim = string.Empty;
