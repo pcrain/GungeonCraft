@@ -2,8 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 
 using UnityEngine;
+using MonoMod.RuntimeDetour;
 
 using Dungeonator;
+using ItemAPI;
 
 namespace CwaffingTheGungy
 {
@@ -39,6 +41,20 @@ namespace CwaffingTheGungy
     public static void AddBulletFromEnemy(this AIBulletBank self, string enemyName, string bulletName)
     {
       self.Bullets.Add(EnemyDatabase.GetOrLoadByGuid(EnemyGuidDatabase.Entries[enemyName]).bulletBank.GetBullet(bulletName));
+    }
+
+    // Register a game object as a prefab
+    public static void RegisterPrefab(this GameObject self)
+    {
+      self.gameObject.SetActive(false);
+      FakePrefab.MarkAsFakePrefab(self.gameObject);
+      UnityEngine.Object.DontDestroyOnLoad(self);
+    }
+
+    // Convert degrees to a Vector2 angle
+    public static Vector2 ToVector(this float self)
+    {
+      return (Vector2)(Quaternion.Euler(0f, 0f, self) * Vector2.right);
     }
   }
 }

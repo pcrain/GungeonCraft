@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
+using System.Runtime;
+
 
 using BepInEx;
 using UnityEngine;
@@ -39,6 +41,8 @@ namespace CwaffingTheGungy
             {
                 var watch = System.Diagnostics.Stopwatch.StartNew();
                 ETGModConsole.Log("Cwaffing the Gungy initialising...");
+
+                // BraveMemory.EnsureHeapSize(1024*1024); ETGModConsole.Log("Ensured 1GB heap...");
 
                 instance = this;
 

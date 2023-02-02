@@ -60,12 +60,13 @@ public class SecretBoss : AIActor
     // Add a basic bullet attack
     // bb.CreateBulletAttack<CeilingBulletsScript>(fireAnim: "swirl", attackCooldown: 3.5f, fireVfx: "mytornado");
     // bb.CreateBulletAttack<SwirlScript>(fireAnim: "swirl", attackCooldown: 3.5f, fireVfx: "mytornado");
+    bb.CreateBulletAttack<FancyBulletsScript>(fireAnim: "swirl", attackCooldown: 3.5f, fireVfx: "mytornado");
     // Add a bunch of simultaenous bullet attacks
-    bb.CreateSimultaneousAttack(new(){
-      bb.CreateBulletAttack<RichochetScript> (add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
-      bb.CreateBulletAttack<RichochetScript2>(add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
-      bb.CreateBulletAttack<CeilingBulletsScript>(add: false, fireAnim: "swirl", attackCooldown: 3.5f, fireVfx: "mytornado"),
-      });
+    // bb.CreateSimultaneousAttack(new(){
+    //   bb.CreateBulletAttack<RichochetScript> (add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
+    //   bb.CreateBulletAttack<RichochetScript2>(add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
+    //   bb.CreateBulletAttack<CeilingBulletsScript>(add: false, fireAnim: "swirl", attackCooldown: 3.5f, fireVfx: "mytornado"),
+    //   });
     // // Add a sequential bullet attacks
     // bb.CreateSequentialAttack(new(){
     //   bb.CreateBulletAttack<RichochetScript> (add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
@@ -86,16 +87,17 @@ public class SecretBoss : AIActor
     napalmReticle = UnityEngine.Object.Instantiate(prefabReticle);
     tk2dSlicedSprite m_extantReticleQuad = napalmReticle.GetComponent<tk2dSlicedSprite>();
         m_extantReticleQuad.SetSprite(VFX.SpriteCollection, VFX.sprites["reticle-white"]);
-    napalmReticle.SetActive(false);
-    FakePrefab.MarkAsFakePrefab(napalmReticle);
-    UnityEngine.Object.DontDestroyOnLoad(napalmReticle);
+    napalmReticle.RegisterPrefab();
 
     // Bone bullet
     AIBulletBank.Entry reversible = EnemyDatabase.GetOrLoadByGuid("1bc2a07ef87741be90c37096910843ab").bulletBank.GetBullet("reversible");
     boneBullet = new AIBulletBank.Entry(reversible);
       boneBullet.Name         = "getboned";
-      boneBullet.BulletObject = (PickupObjectDatabase.GetById(59) as Gun).DefaultModule.projectiles[0].gameObject; // hegemony rifle
+      GameObject fancyBullet = UnityEngine.Object.Instantiate((PickupObjectDatabase.GetById(59) as Gun).DefaultModule.projectiles[0].gameObject); // hegemony rifle
+        fancyBullet.RegisterPrefab();
+        boneBullet.BulletObject = fancyBullet;
       boneBullet.PlayAudio    = true;
+      boneBullet.PlayAudio    = false;
       boneBullet.AudioEvent   = "Play_WPN_golddoublebarrelshotgun_shot_01";
       boneBullet.AudioLimitOncePerAttack = false;
       boneBullet.AudioLimitOncePerFrame = false;
@@ -145,6 +147,97 @@ public class SecretBoss : AIActor
     {
       yield return StartCoroutine(BH.WaitForSecondsInvariant(1.8f));
       AkSoundEngine.PostEvent("Play_BOSS_doormimic_lick_01", base.aiActor.gameObject);
+      yield break;
+    }
+  }
+
+  internal class FancyBulletsScript : Script
+  {
+
+    public class FancyBullet : Bullet
+    {
+      private Vector2 center;
+      private float radius;
+      private float captureAngle;
+      private float framesToApproach;
+      private float degreesToOrbit;
+      private float framesToOrbit;
+      private float releaseAngle;
+
+      private Vector2 initialTarget;
+      private Vector2 delta;
+
+      public FancyBullet(Vector2 center, float radius, float captureAngle, float framesToApproach, float degreesToOrbit, float framesToOrbit, float releaseAngle)
+        : base("getboned")
+      {
+        this.center           = center;
+        this.radius           = radius;
+        this.captureAngle     = captureAngle;
+        this.framesToApproach = framesToApproach;
+        this.degreesToOrbit   = degreesToOrbit;
+        this.framesToOrbit    = framesToOrbit;
+        this.releaseAngle     = releaseAngle;
+      }
+
+      public override void Initialize()
+      {
+        this.Projectile.BulletScriptSettings.surviveTileCollisions = true;
+        this.Projectile.specRigidbody.OnPreTileCollision += (_,_,_,_) => { PhysicsEngine.SkipCollision = true; };
+        this.Projectile.ChangeTintColorShader(0f,new Color(1.0f,0.5f,0.5f,0.5f));
+        this.initialTarget = this.center + this.radius * this.captureAngle.ToVector();
+        this.delta = this.initialTarget - this.Position;
+        ChangeDirection(new Direction(delta.ToAngle(),DirectionType.Absolute));
+        ChangeSpeed(new Speed(C.PIXELS_PER_CELL * delta.magnitude / framesToApproach,SpeedType.Absolute));
+        base.Initialize();
+      }
+
+      public override IEnumerator Top()
+      {
+        IEnumerator[] scripts = {OrbitAndScatter(),OrbitAndScatter()};
+        foreach(IEnumerator e in scripts)
+          while(e.MoveNext())
+            yield return e.Current;
+        Vanish();
+      }
+
+      public IEnumerator OrbitAndScatter()
+      {
+        yield return Wait(framesToApproach);
+        float degreesPerFrame = degreesToOrbit / framesToOrbit;
+        float curAngle = captureAngle;
+        for (int i = 0; i < framesToOrbit; ++i)
+        {
+          curAngle = BraveMathCollege.ClampAngle180(curAngle+degreesPerFrame);
+          Vector2 newTarget = center + radius * curAngle.ToVector();
+          this.Position = newTarget;
+          yield return Wait(1);
+        }
+        ChangeDirection(new Direction(curAngle,DirectionType.Absolute));
+        yield return Wait(60);
+      }
+    }
+
+    private const int COUNT = 16;
+    private const float OUTER_RADIUS = 7f;
+    private const float INNER_RADIUS = 3f;
+
+    public override IEnumerator Top()
+    {
+      if (this.BulletBank?.aiActor?.TargetRigidbody == null)
+        yield break;
+
+      this.BulletBank.Bullets.Add(boneBullet);
+
+      Vector2 playerpos = GameManager.Instance.PrimaryPlayer.CenterPosition;
+      float angleDelta = 360.0f / COUNT;
+      for (int j = 0; j < COUNT; j++)
+      {
+        float realAngle = BraveMathCollege.ClampAngle180(j*angleDelta);
+        Bullet b = new FancyBullet(playerpos, INNER_RADIUS, realAngle, 120f, 720f, 120f, -1);
+        Vector2 spawnPoint = playerpos + OUTER_RADIUS * realAngle.ToVector();
+        this.Fire(Offset.OverridePosition(spawnPoint), b);
+      }
+      yield return this.Wait(120);
       yield break;
     }
   }
