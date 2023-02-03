@@ -175,12 +175,14 @@ public class SecretBoss : AIActor
 
       public override IEnumerator Top()
       {
+        AkSoundEngine.PostEvent("sans_pause", GameManager.Instance.DungeonMusicController.gameObject);
         AkSoundEngine.PostEvent("Play_OBJ_turret_set_01", GameManager.Instance.PrimaryPlayer.gameObject);
         float initSpeed = this.Speed;
         this.ChangeSpeed(new Speed(0,SpeedType.Absolute),LAUNCH_WAIT_FRAMES);
         yield return Wait(LAUNCH_WAIT_FRAMES);
         this.ChangeSpeed(new Speed(initSpeed*2,SpeedType.Absolute));
         AkSoundEngine.PostEvent("Play_WPN_spacerifle_shot_01", GameManager.Instance.PrimaryPlayer.gameObject);
+        AkSoundEngine.PostEvent("sans_resume", GameManager.Instance.DungeonMusicController.gameObject);
         yield return Wait(120);
         Vanish();
         yield break;
