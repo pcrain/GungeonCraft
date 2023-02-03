@@ -20,9 +20,10 @@ public class SecretBoss : AIActor
   public  const string guid          = "Secret Boss";
   private const string bossname      = "Bossyboi";
   private const string subtitle      = "It's Literally Just a...";
-  private const string spritePath    = "CwaffingTheGungy/Resources/room_mimic";
-  private const string defaultSprite = "room_mimic_idle_001";
-  private const string bossCardPath  = "CwaffingTheGungy/Resources/roomimic_bosscard.png";
+  // private const string spritePath    = "CwaffingTheGungy/Resources/room_mimic";
+  private const string spritePath    = "CwaffingTheGungy/Resources/bossyboi";
+  private const string defaultSprite = "bossyboi_idle_001";
+  private const string bossCardPath  = "CwaffingTheGungy/Resources/bossyboi_bosscard.png";
 
   internal static GameObject napalmReticle      = null;
   internal static AIBulletBank.Entry boneBullet = null;
@@ -32,22 +33,23 @@ public class SecretBoss : AIActor
     // Create our build-a-boss
     BuildABoss bb = BuildABoss.LetsMakeABoss<BossBehavior>(
       bossname, guid, $"{spritePath}/{defaultSprite}", new IntVector2(8, 9), subtitle, bossCardPath);
+      // bossname, guid, $"{spritePath}/{defaultSprite}", new IntVector2(8, 9), subtitle, bossCardPath);
     // Set our stats
     bb.SetStats(health: 100f, weight: 200f, speed: 2f, collisionDamage: 1f,
       hitReactChance: 0.05f, collisionKnockbackStrength: 5f);
     // Set up our animations
     bb.InitSpritesFromResourcePath(spritePath);
       bb.AdjustAnimation("idle",   fps:   7f, loop: true);
-      bb.AdjustAnimation("swirl",  fps:   9f, loop: false);
-      bb.AdjustAnimation("scream", fps: 5.3f, loop: false);
-      bb.AdjustAnimation("tell",   fps:   8f, loop: false);
-      bb.AdjustAnimation("suck",   fps:   4f, loop: false);
-      bb.AdjustAnimation("tell2",  fps:   6f, loop: false);
-      bb.AdjustAnimation("puke",   fps:   7f, loop: false);
-      bb.AdjustAnimation("intro",  fps:  11f, loop: false);
-      bb.AdjustAnimation("die",    fps:   6f, loop: false);
+      // bb.AdjustAnimation("swirl",  fps:   9f, loop: false);
+      // bb.AdjustAnimation("scream", fps: 5.3f, loop: false);
+      // bb.AdjustAnimation("tell",   fps:   8f, loop: false);
+      // bb.AdjustAnimation("suck",   fps:   4f, loop: false);
+      // bb.AdjustAnimation("tell2",  fps:   6f, loop: false);
+      // bb.AdjustAnimation("puke",   fps:   7f, loop: false);
+      // bb.AdjustAnimation("intro",  fps:  11f, loop: false);
+      // bb.AdjustAnimation("die",    fps:   6f, loop: false);
     // Set our default pixel colliders
-    bb.SetDefaultColliders(101,27,0,10);
+    // bb.SetDefaultColliders(101,27,0,10);
     // Add custom animation to the generic intro doer, and add a specific intro doer as well
     bb.SetIntroAnimation("intro");
     bb.AddCustomIntro<BossIntro>();
@@ -59,10 +61,9 @@ public class SecretBoss : AIActor
     // Add a random teleportation behavior
     // bb.CreateTeleportAttack<TeleportBehavior>(outAnim: "scream", inAnim: "swirl", attackCooldown: 3.5f);
     // Add a basic bullet attack
-    // bb.CreateBulletAttack<CeilingBulletsScript>(fireAnim: "swirl", attackCooldown: 3.5f, fireVfx: "mytornado");
-    // bb.CreateBulletAttack<SwirlScript>(fireAnim: "swirl", attackCooldown: 3.5f, fireVfx: "mytornado");
-    // bb.CreateBulletAttack<FancyBulletsScript>(fireAnim: "swirl", attackCooldown: 3.5f, fireVfx: "mytornado");
-    bb.CreateBulletAttack<HesitantBulletWallScript>(fireAnim: "swirl", attackCooldown: 3.5f, fireVfx: "mytornado");
+    bb.CreateBulletAttack<CeilingBulletsScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
+    bb.CreateBulletAttack<FancyBulletsScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
+    bb.CreateBulletAttack<HesitantBulletWallScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
     // Add a bunch of simultaenous bullet attacks
     // bb.CreateSimultaneousAttack(new(){
     //   bb.CreateBulletAttack<RichochetScript> (add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
@@ -162,9 +163,10 @@ public class SecretBoss : AIActor
     public class HesitantBullet : Bullet
     {
 
-      private const int LAUNCH_WAIT_FRAMES = 60;
-      public HesitantBullet() : base("getboned")
+      private int waitFrames;
+      public HesitantBullet(int waitFrames = 60) : base("getboned")
       {
+        this.waitFrames = waitFrames;
       }
 
       public override void Initialize()
@@ -175,14 +177,14 @@ public class SecretBoss : AIActor
 
       public override IEnumerator Top()
       {
-        AkSoundEngine.PostEvent("sans_pause", GameManager.Instance.DungeonMusicController.gameObject);
+        // AkSoundEngine.PostEvent("megalo_pause", GameManager.Instance.DungeonMusicController.gameObject);
         AkSoundEngine.PostEvent("Play_OBJ_turret_set_01", GameManager.Instance.PrimaryPlayer.gameObject);
         float initSpeed = this.Speed;
-        this.ChangeSpeed(new Speed(0,SpeedType.Absolute),LAUNCH_WAIT_FRAMES);
-        yield return Wait(LAUNCH_WAIT_FRAMES);
+        this.ChangeSpeed(new Speed(0,SpeedType.Absolute),waitFrames);
+        yield return Wait(waitFrames);
         this.ChangeSpeed(new Speed(initSpeed*2,SpeedType.Absolute));
         AkSoundEngine.PostEvent("Play_WPN_spacerifle_shot_01", GameManager.Instance.PrimaryPlayer.gameObject);
-        AkSoundEngine.PostEvent("sans_resume", GameManager.Instance.DungeonMusicController.gameObject);
+        // AkSoundEngine.PostEvent("megalo_resume", GameManager.Instance.DungeonMusicController.gameObject);
         yield return Wait(120);
         Vanish();
         yield break;
@@ -216,11 +218,10 @@ public class SecretBoss : AIActor
       {
         float offset = j*SPACING;
         Vector2 spawnPoint = centerPoint + (offset * BraveMathCollege.ClampAngle180(incidentDirection - 90f).ToVector());
-        Bullet b = new HesitantBullet();
+        Bullet b = new HesitantBullet(60);
         this.Fire(Offset.OverridePosition(spawnPoint), new Direction(BraveMathCollege.ClampAngle180(incidentDirection+180f),DirectionType.Absolute), new Speed(SPEED,SpeedType.Absolute), b);
         yield return this.Wait(5);
       }
-      yield return this.Wait(120);
       yield break;
     }
   }
@@ -236,12 +237,12 @@ public class SecretBoss : AIActor
       private float framesToApproach;
       private float degreesToOrbit;
       private float framesToOrbit;
-      private float releaseAngle;
+      private int delay;
 
       private Vector2 initialTarget;
       private Vector2 delta;
 
-      public FancyBullet(Vector2 center, float radius, float captureAngle, float framesToApproach, float degreesToOrbit, float framesToOrbit, float releaseAngle)
+      public FancyBullet(Vector2 center, float radius, float captureAngle, float framesToApproach, float degreesToOrbit, float framesToOrbit, int delay)
         : base("getboned")
       {
         this.center           = center;
@@ -250,7 +251,7 @@ public class SecretBoss : AIActor
         this.framesToApproach = framesToApproach;
         this.degreesToOrbit   = degreesToOrbit;
         this.framesToOrbit    = framesToOrbit;
-        this.releaseAngle     = releaseAngle;
+        this.delay            = delay;
       }
 
       public override void Initialize()
@@ -262,13 +263,18 @@ public class SecretBoss : AIActor
         this.initialTarget = this.center + this.radius * this.captureAngle.ToVector();
         this.delta = this.initialTarget - this.Position;
         ChangeDirection(new Direction(delta.ToAngle(), DirectionType.Absolute));
-        ChangeSpeed(new Speed(C.PIXELS_PER_CELL * delta.magnitude / framesToApproach, SpeedType.Absolute));
+        ChangeSpeed(new Speed(0, SpeedType.Absolute));
+
         base.Initialize();
       }
 
       public override IEnumerator Top()
       {
-        IEnumerator[] scripts = {OrbitAndScatter(),OrbitAndScatter()};
+        AkSoundEngine.PostEvent("Play_OBJ_turret_set_01", GameManager.Instance.PrimaryPlayer.gameObject);
+        yield return Wait(this.delay);
+        ChangeSpeed(new Speed(C.PIXELS_PER_CELL * delta.magnitude / framesToApproach, SpeedType.Absolute));
+        // IEnumerator[] scripts = {OrbitAndScatter(),OrbitAndScatter()};
+        IEnumerator[] scripts = {OrbitAndScatter()};
         foreach(IEnumerator e in scripts)
           while(e.MoveNext())
             yield return e.Current;
@@ -287,6 +293,7 @@ public class SecretBoss : AIActor
           this.Position = newTarget;
           yield return Wait(1);
         }
+        AkSoundEngine.PostEvent("Play_WPN_spacerifle_shot_01", GameManager.Instance.PrimaryPlayer.gameObject);
         ChangeDirection(new Direction(curAngle,DirectionType.Absolute));
         yield return Wait(60);
       }
@@ -295,6 +302,7 @@ public class SecretBoss : AIActor
     private const int COUNT = 16;
     private const float OUTER_RADIUS = 7f;
     private const float INNER_RADIUS = 3f;
+    private const int SPAWN_GAP = 5;
 
     public override IEnumerator Top()
     {
@@ -308,11 +316,11 @@ public class SecretBoss : AIActor
       for (int j = 0; j < COUNT; j++)
       {
         float realAngle = BraveMathCollege.ClampAngle180(j*angleDelta);
-        Bullet b = new FancyBullet(playerpos, INNER_RADIUS, realAngle, 120f, 720f, 120f, -1);
+        Bullet b = new FancyBullet(playerpos, INNER_RADIUS, realAngle, 30f, 720f, 60f, SPAWN_GAP*(COUNT-j));
         Vector2 spawnPoint = playerpos + OUTER_RADIUS * realAngle.ToVector();
         this.Fire(Offset.OverridePosition(spawnPoint), b);
+        yield return this.Wait(SPAWN_GAP);
       }
-      yield return this.Wait(120);
       yield break;
     }
   }
@@ -332,6 +340,7 @@ public class SecretBoss : AIActor
       float offset = roomBounds.width / (float)COUNT;
       for (int j = 0; j < COUNT; j++)
       {
+        AkSoundEngine.PostEvent("Play_OBJ_turret_set_01", GameManager.Instance.PrimaryPlayer.gameObject);
         Vector2 spawnPoint = new Vector2(roomBounds.xMin + j*offset, roomBounds.yMax - 1f);
         this.Fire(Offset.OverridePosition(spawnPoint), new Direction(-90f, DirectionType.Absolute), new Speed(9f), new Bullet("getboned"));
         DoomZone(spawnPoint, spawnPoint - new Vector2(0f,10f), 1f, 3f);

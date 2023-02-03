@@ -7,3 +7,4 @@ src2/*
 *.csproj.new
 # .bnk files double the size if we're already including the .wav files
 *.bnk
+Resources/Sounds/*.wav

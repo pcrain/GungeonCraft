@@ -226,6 +226,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\friendlyoverhead_vfx_003.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\friendlyoverhead_vfx_001.png"/>
+    <EmbeddedResource Include="Resources\bossyboi_bosscard_orig.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\johns_wick_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\rat_poison_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\curators_badge_icon.png"/>
@@ -236,6 +237,7 @@
     <EmbeddedResource Include="Resources\ItemSprites\gyroscope_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\yellow_bandana_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\credit_card_icon.png"/>
+    <EmbeddedResource Include="Resources\bossyboi_bosscard.png"/>
     <EmbeddedResource Include="Resources\Companions\Wolf\wolf_pet_002.png"/>
     <EmbeddedResource Include="Resources\Companions\Wolf\wolf_pet_001.png"/>
     <EmbeddedResource Include="Resources\Companions\Wolf\wolf_pet_003.png"/>
@@ -249,6 +251,7 @@
     <EmbeddedResource Include="Resources\Companions\Wolf\wolf_pet_004.png"/>
     <EmbeddedResource Include="Resources\Companions\Wolf\wolf_pet_left_004.png"/>
     <EmbeddedResource Include="Resources\EmbeddedRooms\BoomhildrRoom.room"/>
+    <EmbeddedResource Include="Resources\bossyboi\bossyboi_idle_001.png"/>
     <EmbeddedResource Include="Resources\Sounds\CwaffingTheGungy.bnk"/>
     <EmbeddedResource Include="Resources\StatusEffectVFX\plaguevfxframe_004.png"/>
     <EmbeddedResource Include="Resources\StatusEffectVFX\plaguevfxframe_002.png"/>
