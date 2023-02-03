@@ -61,9 +61,10 @@ public class SecretBoss : AIActor
     // Add a random teleportation behavior
     // bb.CreateTeleportAttack<TeleportBehavior>(outAnim: "scream", inAnim: "swirl", attackCooldown: 3.5f);
     // Add a basic bullet attack
-    bb.CreateBulletAttack<CeilingBulletsScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
-    bb.CreateBulletAttack<FancyBulletsScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
-    bb.CreateBulletAttack<HesitantBulletWallScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
+    // bb.CreateBulletAttack<CeilingBulletsScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
+    // bb.CreateBulletAttack<FancyBulletsScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
+    // bb.CreateBulletAttack<HesitantBulletWallScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
+    bb.CreateBulletAttack<SquareBulletScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
     // Add a bunch of simultaenous bullet attacks
     // bb.CreateSimultaneousAttack(new(){
     //   bb.CreateBulletAttack<RichochetScript> (add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
@@ -158,6 +159,78 @@ public class SecretBoss : AIActor
     }
   }
 
+  internal class SquareBulletScript : Script
+  {
+    public class SquareBullet : Bullet
+    {
+      private int goFrames;
+      private int waitFrames;
+      public SquareBullet(int goFrames = 30, int waitFrames = 60) : base("getboned")
+      {
+        this.waitFrames = waitFrames;
+        this.goFrames = goFrames;
+      }
+
+      public override void Initialize()
+      {
+        this.Projectile.ChangeTintColorShader(0f,new Color(1.0f,0.5f,0.5f,0.5f));
+        base.Initialize();
+      }
+
+      public override IEnumerator Top()
+      {
+        AkSoundEngine.PostEvent("Play_WPN_spacerifle_shot_01", GameManager.Instance.PrimaryPlayer.gameObject);
+        yield return Wait(this.goFrames);
+        float initSpeed = this.Speed;
+        this.ChangeSpeed(new Speed(0,SpeedType.Absolute));
+        yield return Wait(this.waitFrames);
+        this.ChangeSpeed(new Speed(initSpeed,SpeedType.Absolute));
+        this.ChangeDirection(new Direction(this.DirToNearestPlayer(),DirectionType.Absolute));
+        AkSoundEngine.PostEvent("Play_WPN_spacerifle_shot_01", GameManager.Instance.PrimaryPlayer.gameObject);
+        yield return Wait(120);
+        Vanish();
+        yield break;
+      }
+    }
+
+    private const int SIDES        = 4;
+    private const int COUNTPERSIDE = 3;
+    private const float SPREAD     = 0.5f; // percent of each side filled with bullets
+    private const float SPEED      = 25f;
+    private const int GOFRAMES     = 15;
+    private const int SHOTDELAY    = 5;
+    private const int SIDEDELAY    = 10;
+
+    private const float SIDESPAN   = 360.0f / SIDES;
+    private const float SPREADSPAN = SPREAD * SIDESPAN;
+    private const float OFFSET     = 0.5f * (COUNTPERSIDE - 1);
+    private const int FINALDELAY   = ((SHOTDELAY * COUNTPERSIDE) + SIDEDELAY) * SIDES;
+    public override IEnumerator Top()
+    {
+
+      if (this.BulletBank?.aiActor?.TargetRigidbody == null)
+        yield break;
+
+      this.BulletBank.Bullets.Add(boneBullet);
+
+      float initAngle = UnityEngine.Random.Range(-180f,180f);
+      for (int i = 0; i < SIDES; ++i)
+      {
+        float sideAngle = (initAngle + i * SIDESPAN).Clamp180();
+        for (int j = 0; j < COUNTPERSIDE; ++j)
+        {
+          float launchAngle = sideAngle + SPREADSPAN * ((float)(j + 1) / (float)(COUNTPERSIDE+1) - 0.5f);
+          this.Fire(new Direction(launchAngle.Clamp180(),DirectionType.Absolute), new Speed(SPEED,SpeedType.Absolute), new SquareBullet(GOFRAMES, FINALDELAY));
+          yield return this.Wait(SHOTDELAY);
+        }
+        yield return this.Wait(SIDEDELAY);
+      }
+      yield return this.Wait(60);
+      yield break;
+    }
+
+  }
+
   internal class HesitantBulletWallScript : Script
   {
     public class HesitantBullet : Bullet
@@ -217,9 +290,9 @@ public class SecretBoss : AIActor
       for (int j = -COUNT/2; j <= COUNT/2; j++)
       {
         float offset = j*SPACING;
-        Vector2 spawnPoint = centerPoint + (offset * BraveMathCollege.ClampAngle180(incidentDirection - 90f).ToVector());
+        Vector2 spawnPoint = centerPoint + (offset * (incidentDirection - 90f).Clamp180().ToVector());
         Bullet b = new HesitantBullet(60);
-        this.Fire(Offset.OverridePosition(spawnPoint), new Direction(BraveMathCollege.ClampAngle180(incidentDirection+180f),DirectionType.Absolute), new Speed(SPEED,SpeedType.Absolute), b);
+        this.Fire(Offset.OverridePosition(spawnPoint), new Direction((incidentDirection+180f).Clamp180(),DirectionType.Absolute), new Speed(SPEED,SpeedType.Absolute), b);
         yield return this.Wait(5);
       }
       yield break;
@@ -288,7 +361,7 @@ public class SecretBoss : AIActor
         float curAngle = captureAngle;
         for (int i = 0; i < framesToOrbit; ++i)
         {
-          curAngle = BraveMathCollege.ClampAngle180(curAngle+degreesPerFrame);
+          curAngle = (curAngle+degreesPerFrame).Clamp180();
           Vector2 newTarget = center + radius * curAngle.ToVector();
           this.Position = newTarget;
           yield return Wait(1);
@@ -315,7 +388,7 @@ public class SecretBoss : AIActor
       float angleDelta = 360.0f / COUNT;
       for (int j = 0; j < COUNT; j++)
       {
-        float realAngle = BraveMathCollege.ClampAngle180(j*angleDelta);
+        float realAngle = (j*angleDelta).Clamp180();
         Bullet b = new FancyBullet(playerpos, INNER_RADIUS, realAngle, 30f, 720f, 60f, SPAWN_GAP*(COUNT-j));
         Vector2 spawnPoint = playerpos + OUTER_RADIUS * realAngle.ToVector();
         this.Fire(Offset.OverridePosition(spawnPoint), b);

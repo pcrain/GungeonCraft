@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using UnityEngine;
 using MonoMod.RuntimeDetour;
+using Brave.BulletScript;
 
 using Dungeonator;
 using ItemAPI;
@@ -55,6 +56,18 @@ namespace CwaffingTheGungy
     public static Vector2 ToVector(this float self)
     {
       return (Vector2)(Quaternion.Euler(0f, 0f, self) * Vector2.right);
+    }
+
+    // Clamp a floating point angle in degrees to [-180,180]
+    public static float Clamp180(this float self)
+    {
+      return BraveMathCollege.ClampAngle180(self);
+    }
+
+    // Get a bullet's direction to the primary player
+    public static float DirToNearestPlayer(this Bullet self)
+    {
+      return (GameManager.Instance.GetPlayerClosestToPoint(self.Position).CenterPosition - self.Position).ToAngle();
     }
   }
 }
