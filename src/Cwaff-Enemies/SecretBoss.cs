@@ -405,10 +405,8 @@ public class SecretBoss : AIActor
 
         this.initialTarget = this.center + this.radius * this.captureAngle.ToVector();
         this.delta = this.initialTarget - this.Position;
-        this.UpdatePosition();
         ChangeDirection(new Direction(delta.ToAngle(), DirectionType.Absolute));
         ChangeSpeed(new Speed(0, SpeedType.Absolute));
-        this.UpdateVelocity();
 
         base.Initialize();
       }
@@ -417,9 +415,6 @@ public class SecretBoss : AIActor
       {
         AkSoundEngine.PostEvent("Play_OBJ_turret_set_01", GameManager.Instance.PrimaryPlayer.gameObject);
         yield return Wait(this.delay);
-        // ChangeSpeed(new Speed(C.PIXELS_PER_CELL * delta.magnitude / framesToApproach, SpeedType.Absolute));
-        // fta 10 = 54.0
-        // ChangeSpeed(new Speed((60.0f - 60.0f/framesToApproach) * delta.magnitude / framesToApproach, SpeedType.Absolute));
         ChangeSpeed(new Speed(60.0f * delta.magnitude / (framesToApproach+1), SpeedType.Absolute));
         // IEnumerator[] scripts = {OrbitAndScatter(),OrbitAndScatter()};
         IEnumerator[] scripts = {OrbitAndScatter()};
@@ -433,24 +428,18 @@ public class SecretBoss : AIActor
       {
         yield return Wait(framesToApproach);
         float degreesPerFrame = degreesToOrbit / framesToOrbit;
-        // ETGModConsole.Log($"orbiting {degreesPerFrame} degrees / frame");
         float curAngle = captureAngle;
         float oldSpeed = this.Speed;
         this.UpdatePosition();
         ChangeSpeed(new Speed(0f,SpeedType.Absolute));
         this.UpdateVelocity();
-        yield return Wait(10);
-        // ETGModConsole.Log($"expected angle {captureAngle}");
-        // ETGModConsole.Log($"  actual angle {(this.Position-center).ToAngle()}");
-        this.Position = center + radius * captureAngle.ToVector();
-        this.UpdatePosition();
         for (int i = 0; i < framesToOrbit; ++i)
         {
           yield return Wait(1);
           curAngle = (curAngle+degreesPerFrame).Clamp180();
           Vector2 newTarget = center + radius * curAngle.ToVector();
-          // ChangeDirection(new Direction((newTarget-this.Position).ToAngle(),DirectionType.Absolute));
-          // this.Position = newTarget;
+          ChangeDirection(new Direction((newTarget-this.Position).ToAngle(),DirectionType.Absolute));
+          this.Position = newTarget;
         }
         AkSoundEngine.PostEvent("Play_WPN_spacerifle_shot_01", GameManager.Instance.PrimaryPlayer.gameObject);
         ChangeSpeed(new Speed(oldSpeed,SpeedType.Absolute));
@@ -459,10 +448,11 @@ public class SecretBoss : AIActor
       }
     }
 
-    private const int COUNT = 16;
+    private const float ROTATIONS = 2.0f;
+    private const int COUNT = 43;
     private const float OUTER_RADIUS = 8f;
     private const float INNER_RADIUS = 3f;
-    private const int SPAWN_GAP = 5;
+    private const int SPAWN_GAP = 2;
 
     public override IEnumerator Top()
     {
@@ -472,13 +462,13 @@ public class SecretBoss : AIActor
       this.BulletBank.Bullets.Add(boneBullet);
 
       Vector2 playerpos = GameManager.Instance.PrimaryPlayer.CenterPosition;
-      float angleDelta = 360.0f / COUNT;
+      float angleDelta = ROTATIONS * 360.0f / COUNT;
       for (int j = 0; j < COUNT; j++)
       {
         AkSoundEngine.PostEvent("Play_OBJ_turret_set_01", GameManager.Instance.PrimaryPlayer.gameObject);
         yield return this.Wait(SPAWN_GAP);
         float realAngle = (j*angleDelta).Clamp180();
-        float targetRadius = INNER_RADIUS+(j*1.0f/COUNT);
+        float targetRadius = INNER_RADIUS+(j*ROTATIONS/COUNT);
         Bullet b = new OrbitBullet(playerpos, targetRadius, realAngle, 10f, 360f, 60f, SPAWN_GAP*(COUNT-j));
         Vector2 spawnPoint = playerpos + (targetRadius * realAngle.ToVector()) + (OUTER_RADIUS * (realAngle-90f).ToVector());
         this.Fire(Offset.OverridePosition(spawnPoint), b);
