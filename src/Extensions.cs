@@ -35,9 +35,9 @@ namespace CwaffingTheGungy
     // Insets the borders of a rectangle by a specified amount on each side
     public static Rect Inset(this Rect self, float topInset, float rightInset, float bottomInset, float leftInset)
     {
-      ETGModConsole.Log($"  old bounds are {self.xMin},{self.yMin} to {self.xMax},{self.yMax}");
+      // ETGModConsole.Log($"  old bounds are {self.xMin},{self.yMin} to {self.xMax},{self.yMax}");
       Rect r = new Rect(self.x + leftInset, self.y + bottomInset, self.width - leftInset - rightInset, self.height - bottomInset - topInset);
-      ETGModConsole.Log($"  new bounds are {r.xMin},{r.yMin} to {r.xMax},{r.yMax}");
+      // ETGModConsole.Log($"  new bounds are {r.xMin},{r.yMin} to {r.xMax},{r.yMax}");
       return r;
     }
 
@@ -56,7 +56,7 @@ namespace CwaffingTheGungy
     // Get a random point on the perimeter of a rectangle
     public static Vector2 RandomPointOnPerimeter(this Rect self)
     {
-      ETGModConsole.Log($"bounds are {self.xMin},{self.yMin} to {self.xMax},{self.yMax}");
+      // ETGModConsole.Log($"bounds are {self.xMin},{self.yMin} to {self.xMax},{self.yMax}");
       float half  = self.width + self.height;
       float point = UnityEngine.Random.Range(0.0f,2.0f*half);
       Vector2 retPoint;
@@ -68,8 +68,17 @@ namespace CwaffingTheGungy
         retPoint = new Vector2(self.xMin + point-half, self.yMin + self.height);
       else
         retPoint = new Vector2(self.xMin + self.width, self.yMin + point-half-self.width); // right edge
-      ETGModConsole.Log($"  chose point {retPoint.x},{retPoint.y}");
+      // ETGModConsole.Log($"  chose point {retPoint.x},{retPoint.y}");
       return retPoint;
+    }
+
+    // Given an angle and wall Rect, determine the intersection point from a ray cast from self to theWall
+    public static Vector2 RaycastToWall(this Vector2 self, float angle, Rect theWall)
+    {
+      Vector2 intersection = Vector2.positiveInfinity;
+      if(!BraveMathCollege.LineSegmentRectangleIntersection(self + 1000f * angle.ToVector(), self, theWall.position, theWall.position + theWall.size, ref intersection))
+        ETGModConsole.Log("no intersection found");
+      return intersection;
     }
 
     // Add a named bullet from a named enemy to a bullet bank

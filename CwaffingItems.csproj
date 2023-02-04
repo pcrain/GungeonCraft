@@ -251,7 +251,9 @@
     <EmbeddedResource Include="Resources\Companions\Wolf\wolf_pet_004.png"/>
     <EmbeddedResource Include="Resources\Companions\Wolf\wolf_pet_left_004.png"/>
     <EmbeddedResource Include="Resources\EmbeddedRooms\BoomhildrRoom.room"/>
+    <EmbeddedResource Include="Resources\bossyboi\bossyboi_teleport_002.png"/>
     <EmbeddedResource Include="Resources\bossyboi\bossyboi_idle_001.png"/>
+    <EmbeddedResource Include="Resources\bossyboi\bossyboi_teleport_001.png"/>
     <EmbeddedResource Include="Resources\Sounds\CwaffingTheGungy.bnk"/>
     <EmbeddedResource Include="Resources\StatusEffectVFX\plaguevfxframe_004.png"/>
     <EmbeddedResource Include="Resources\StatusEffectVFX\plaguevfxframe_002.png"/>

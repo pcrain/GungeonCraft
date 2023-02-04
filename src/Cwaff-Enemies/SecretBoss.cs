@@ -40,6 +40,7 @@ public class SecretBoss : AIActor
     // Set up our animations
     bb.InitSpritesFromResourcePath(spritePath);
       bb.AdjustAnimation("idle",   fps:   7f, loop: true);
+      bb.AdjustAnimation("teleport",   fps:   2f, loop: false);
       // bb.AdjustAnimation("swirl",  fps:   9f, loop: false);
       // bb.AdjustAnimation("scream", fps: 5.3f, loop: false);
       // bb.AdjustAnimation("tell",   fps:   8f, loop: false);
@@ -60,6 +61,7 @@ public class SecretBoss : AIActor
 
     // Add a random teleportation behavior
     // bb.CreateTeleportAttack<TeleportBehavior>(outAnim: "scream", inAnim: "swirl", attackCooldown: 3.5f);
+    // bb.CreateTeleportAttack<TeleportBehavior>(outAnim: "teleport", inAnim: "teleport", attackCooldown: 1.15f);
     // Add a basic bullet attack
     // bb.CreateBulletAttack<CeilingBulletsScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
     // bb.CreateBulletAttack<FancyBulletsScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
@@ -133,6 +135,7 @@ public class SecretBoss : AIActor
     {
       base.aiActor.healthHaver.OnPreDeath += (obj) =>
       {
+        AkSoundEngine.PostEvent("megalo_stop", base.aiActor.gameObject);
         AkSoundEngine.PostEvent("Play_ENM_beholster_death_01", base.aiActor.gameObject);
       };
       base.healthHaver.healthHaver.OnDeath += (obj) =>
@@ -154,6 +157,7 @@ public class SecretBoss : AIActor
 
     private IEnumerator PlaySound()
     {
+      AkSoundEngine.PostEvent("megalo", base.aiActor.gameObject);
       yield return StartCoroutine(BH.WaitForSecondsInvariant(1.8f));
       AkSoundEngine.PostEvent("Play_BOSS_doormimic_lick_01", base.aiActor.gameObject);
       yield break;
@@ -182,12 +186,13 @@ public class SecretBoss : AIActor
       }
     }
 
-    private const int STREAMS        = 3;
-    private const int STREAMDELAY    = 20;
-    private const int SHOTSPERSTREAM = 12;
-    private const int SHOTDELAY      = 5;
-    private const int SHOTSPEED      = 20;
-    private const float MINDIST      = 12f;
+    private const int PHASES          = 3;
+    private const int STREAMSPERPHASE = 5;
+    private const int STREAMDELAY     = 20;
+    private const int SHOTSPERSTREAM  = 12;
+    private const int SHOTDELAY       = 5;
+    private const int SHOTSPEED       = 20;
+    private const float MINDIST       = 12f;
     public override IEnumerator Top()
     {
 
@@ -196,25 +201,32 @@ public class SecretBoss : AIActor
 
       this.BulletBank.Bullets.Add(boneBullet);
 
-      Rect roomBounds = this.BulletBank.aiActor.GetAbsoluteParentRoom().GetBoundingRect().Inset(topInset: 2f, rightInset: 2f, bottomInset: 4f, leftInset: 2f);
-      for (int i = 0; i < STREAMS; ++i)
+      Rect roomFullBounds = this.BulletBank.aiActor.GetAbsoluteParentRoom().GetBoundingRect();
+      Rect roomBounds = roomFullBounds.Inset(topInset: 2f, rightInset: 2f, bottomInset: 4f, leftInset: 2f);
+      for (int i = 0; i < PHASES; ++i)
       {
         Vector2 ppos = GameManager.Instance.PrimaryPlayer.CenterPosition;
-        Vector2 spawnPoint = roomBounds.RandomPointOnPerimeter();
-        while((ppos-spawnPoint).magnitude < MINDIST)
-          spawnPoint = roomBounds.RandomPointOnPerimeter();
-        float shotAngle = (ppos-spawnPoint).ToAngle().Clamp180();
-        DoomZone(spawnPoint, ppos, 1f, 1f);
+        List<Vector2> spawnPoints = new List<Vector2>(STREAMSPERPHASE);
+        List<float> shotAngles = new List<float>(STREAMSPERPHASE);
+        for (int s = 0; s < STREAMSPERPHASE; ++s)
+        {
+          Vector2 spawnPoint = roomBounds.RandomPointOnPerimeter();
+          while((ppos-spawnPoint).magnitude < MINDIST)
+            spawnPoint = roomBounds.RandomPointOnPerimeter();
+          spawnPoints.Add(spawnPoint);
+          shotAngles.Add((ppos-spawnPoint).ToAngle().Clamp180());
+          DoomZone(spawnPoint, spawnPoints[s].RaycastToWall(shotAngles[s], roomFullBounds), 1f, 1f);
+        }
         yield return Wait(STREAMDELAY);
         for (int j = 0; j < SHOTSPERSTREAM; ++j)
         {
-          this.Fire(Offset.OverridePosition(spawnPoint), new Direction(shotAngle,DirectionType.Absolute), new Speed(SHOTSPEED,SpeedType.Absolute), new ChainBullet());
+          for (int s = 0; s < STREAMSPERPHASE; ++s)
+            this.Fire(Offset.OverridePosition(spawnPoints[s]), new Direction(shotAngles[s],DirectionType.Absolute), new Speed(SHOTSPEED,SpeedType.Absolute), new ChainBullet());
           yield return Wait(SHOTDELAY);
         }
       }
     }
   }
-
 
   internal class SquareBulletScript : Script
   {
@@ -385,9 +397,9 @@ public class SecretBoss : AIActor
 
       public override void Initialize()
       {
+        this.Projectile.ChangeTintColorShader(0f,new Color(1.0f,0.5f,0.5f,0.5f));
         this.Projectile.BulletScriptSettings.surviveTileCollisions = true;
         this.Projectile.specRigidbody.OnPreTileCollision += (_,_,_,_) => { PhysicsEngine.SkipCollision = true; };
-        this.Projectile.ChangeTintColorShader(0f,new Color(1.0f,0.5f,0.5f,0.5f));
 
         this.initialTarget = this.center + this.radius * this.captureAngle.ToVector();
         this.delta = this.initialTarget - this.Position;
@@ -444,11 +456,12 @@ public class SecretBoss : AIActor
       float angleDelta = 360.0f / COUNT;
       for (int j = 0; j < COUNT; j++)
       {
+        AkSoundEngine.PostEvent("Play_OBJ_turret_set_01", GameManager.Instance.PrimaryPlayer.gameObject);
+        yield return this.Wait(SPAWN_GAP);
         float realAngle = (j*angleDelta).Clamp180();
         Bullet b = new FancyBullet(playerpos, INNER_RADIUS, realAngle, 30f, 720f, 60f, SPAWN_GAP*(COUNT-j));
         Vector2 spawnPoint = playerpos + OUTER_RADIUS * realAngle.ToVector();
         this.Fire(Offset.OverridePosition(spawnPoint), b);
-        yield return this.Wait(SPAWN_GAP);
       }
       yield break;
     }
@@ -469,10 +482,16 @@ public class SecretBoss : AIActor
       float offset = roomBounds.width / (float)COUNT;
       for (int j = 0; j < COUNT; j++)
       {
-        AkSoundEngine.PostEvent("Play_OBJ_turret_set_01", GameManager.Instance.PrimaryPlayer.gameObject);
-        Vector2 spawnPoint = new Vector2(roomBounds.xMin + j*offset, roomBounds.yMax - 1f);
-        this.Fire(Offset.OverridePosition(spawnPoint), new Direction(-90f, DirectionType.Absolute), new Speed(9f), new Bullet("getboned"));
+        Vector2 spawnPoint = new Vector2(roomBounds.xMin + j*offset, roomBounds.yMax);
         DoomZone(spawnPoint, spawnPoint - new Vector2(0f,10f), 1f, 3f);
+        AkSoundEngine.PostEvent("Play_OBJ_turret_set_01", GameManager.Instance.PrimaryPlayer.gameObject);
+        yield return this.Wait(4);
+      }
+      for (int j = 0; j < COUNT; j++)
+      {
+        Vector2 spawnPoint = new Vector2(roomBounds.xMin + j*offset, roomBounds.yMax);
+        this.Fire(Offset.OverridePosition(spawnPoint), new Direction(-90f, DirectionType.Absolute), new Speed(20f), new Bullet("getboned"));
+        AkSoundEngine.PostEvent("Play_WPN_spacerifle_shot_01", GameManager.Instance.PrimaryPlayer.gameObject);
         yield return this.Wait(4);
       }
       yield break;
