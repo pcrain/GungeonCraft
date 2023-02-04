@@ -64,7 +64,8 @@ public class SecretBoss : AIActor
     // bb.CreateBulletAttack<CeilingBulletsScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
     // bb.CreateBulletAttack<FancyBulletsScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
     // bb.CreateBulletAttack<HesitantBulletWallScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
-    bb.CreateBulletAttack<SquareBulletScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
+    // bb.CreateBulletAttack<SquareBulletScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
+    bb.CreateBulletAttack<ChainBulletScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
     // Add a bunch of simultaenous bullet attacks
     // bb.CreateSimultaneousAttack(new(){
     //   bb.CreateBulletAttack<RichochetScript> (add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
@@ -159,6 +160,62 @@ public class SecretBoss : AIActor
     }
   }
 
+  internal class ChainBulletScript : Script
+  {
+
+    public class ChainBullet : Bullet
+    {
+      public ChainBullet() : base("getboned")
+      {
+      }
+
+      public override void Initialize()
+      {
+        this.Projectile.ChangeTintColorShader(0f,new Color(1.0f,0.5f,0.5f,0.5f));
+        base.Initialize();
+      }
+
+      public override IEnumerator Top()
+      {
+        AkSoundEngine.PostEvent("Play_WPN_spacerifle_shot_01", GameManager.Instance.PrimaryPlayer.gameObject);
+        yield break;
+      }
+    }
+
+    private const int STREAMS        = 3;
+    private const int STREAMDELAY    = 20;
+    private const int SHOTSPERSTREAM = 12;
+    private const int SHOTDELAY      = 5;
+    private const int SHOTSPEED      = 20;
+    private const float MINDIST      = 12f;
+    public override IEnumerator Top()
+    {
+
+      if (this.BulletBank?.aiActor?.TargetRigidbody == null)
+        yield break;
+
+      this.BulletBank.Bullets.Add(boneBullet);
+
+      Rect roomBounds = this.BulletBank.aiActor.GetAbsoluteParentRoom().GetBoundingRect().Inset(topInset: 2f, rightInset: 2f, bottomInset: 4f, leftInset: 2f);
+      for (int i = 0; i < STREAMS; ++i)
+      {
+        Vector2 ppos = GameManager.Instance.PrimaryPlayer.CenterPosition;
+        Vector2 spawnPoint = roomBounds.RandomPointOnPerimeter();
+        while((ppos-spawnPoint).magnitude < MINDIST)
+          spawnPoint = roomBounds.RandomPointOnPerimeter();
+        float shotAngle = (ppos-spawnPoint).ToAngle().Clamp180();
+        DoomZone(spawnPoint, ppos, 1f, 1f);
+        yield return Wait(STREAMDELAY);
+        for (int j = 0; j < SHOTSPERSTREAM; ++j)
+        {
+          this.Fire(Offset.OverridePosition(spawnPoint), new Direction(shotAngle,DirectionType.Absolute), new Speed(SHOTSPEED,SpeedType.Absolute), new ChainBullet());
+          yield return Wait(SHOTDELAY);
+        }
+      }
+    }
+  }
+
+
   internal class SquareBulletScript : Script
   {
     public class SquareBullet : Bullet
@@ -219,7 +276,7 @@ public class SecretBoss : AIActor
         float sideAngle = (initAngle + i * SIDESPAN).Clamp180();
         for (int j = 0; j < COUNTPERSIDE; ++j)
         {
-          float launchAngle = sideAngle + SPREADSPAN * ((float)(j + 1) / (float)(COUNTPERSIDE+1) - 0.5f);
+          float launchAngle = sideAngle + SPREADSPAN * ((1f+j) / (1f+COUNTPERSIDE) - 0.5f);
           this.Fire(new Direction(launchAngle.Clamp180(),DirectionType.Absolute), new Speed(SPEED,SpeedType.Absolute), new SquareBullet(GOFRAMES, FINALDELAY));
           yield return this.Wait(SHOTDELAY);
         }
@@ -278,7 +335,6 @@ public class SecretBoss : AIActor
       this.BulletBank.Bullets.Add(boneBullet);
 
       Vector2 playerpos = GameManager.Instance.PrimaryPlayer.CenterPosition;
-      RoomHandler room = GameManager.Instance.PrimaryPlayer.CurrentRoom;
 
       float incidentDirection;
       Vector2 centerPoint;

@@ -32,10 +32,44 @@ namespace CwaffingTheGungy
       self.GetOrAddComponent<Expiration>().ExpireIn(seconds);
     }
 
-    // Insets the borders of a rectangle by a specified amount
-    public static Rect Inset(this Rect self, float amount)
+    // Insets the borders of a rectangle by a specified amount on each side
+    public static Rect Inset(this Rect self, float topInset, float rightInset, float bottomInset, float leftInset)
     {
-      return new Rect(self.x + amount, self.y + amount, self.width - amount, self.height - amount);
+      ETGModConsole.Log($"  old bounds are {self.xMin},{self.yMin} to {self.xMax},{self.yMax}");
+      Rect r = new Rect(self.x + leftInset, self.y + bottomInset, self.width - leftInset - rightInset, self.height - bottomInset - topInset);
+      ETGModConsole.Log($"  new bounds are {r.xMin},{r.yMin} to {r.xMax},{r.yMax}");
+      return r;
+    }
+
+    // Insets the borders of a rectangle by a specified amount on each axis
+    public static Rect Inset(this Rect self, float xInset, float yInset)
+    {
+      return self.Inset(yInset,xInset,yInset,xInset);
+    }
+
+    // Insets the borders of a rectangle by a specified amount on all sides
+    public static Rect Inset(this Rect self, float inset)
+    {
+      return self.Inset(inset,inset,inset,inset);
+    }
+
+    // Get a random point on the perimeter of a rectangle
+    public static Vector2 RandomPointOnPerimeter(this Rect self)
+    {
+      ETGModConsole.Log($"bounds are {self.xMin},{self.yMin} to {self.xMax},{self.yMax}");
+      float half  = self.width + self.height;
+      float point = UnityEngine.Random.Range(0.0f,2.0f*half);
+      Vector2 retPoint;
+      if (point < self.width) // bottom edge
+        retPoint = new Vector2(self.xMin + point, self.yMin);
+      else if (point < half) // left edge
+        retPoint = new Vector2(self.xMin, self.yMin + point-self.width);
+      else if (point-half < self.width) // top edge
+        retPoint = new Vector2(self.xMin + point-half, self.yMin + self.height);
+      else
+        retPoint = new Vector2(self.xMin + self.width, self.yMin + point-half-self.width); // right edge
+      ETGModConsole.Log($"  chose point {retPoint.x},{retPoint.y}");
+      return retPoint;
     }
 
     // Add a named bullet from a named enemy to a bullet bank
