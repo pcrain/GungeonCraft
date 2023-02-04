@@ -64,10 +64,10 @@ public class SecretBoss : AIActor
     // bb.CreateTeleportAttack<TeleportBehavior>(outAnim: "teleport", inAnim: "teleport", attackCooldown: 1.15f);
     // Add a basic bullet attack
     // bb.CreateBulletAttack<CeilingBulletsScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
-    // bb.CreateBulletAttack<FancyBulletsScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
+    bb.CreateBulletAttack<OrbitBulletScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
     // bb.CreateBulletAttack<HesitantBulletWallScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
     // bb.CreateBulletAttack<SquareBulletScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
-    bb.CreateBulletAttack<ChainBulletScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
+    // bb.CreateBulletAttack<ChainBulletScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
     // Add a bunch of simultaenous bullet attacks
     // bb.CreateSimultaneousAttack(new(){
     //   bb.CreateBulletAttack<RichochetScript> (add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
@@ -215,7 +215,9 @@ public class SecretBoss : AIActor
             spawnPoint = roomBounds.RandomPointOnPerimeter();
           spawnPoints.Add(spawnPoint);
           shotAngles.Add((ppos-spawnPoint).ToAngle().Clamp180());
-          DoomZone(spawnPoint, spawnPoints[s].RaycastToWall(shotAngles[s], roomFullBounds), 1f, 1f);
+          DoomZone(spawnPoint, spawnPoints[s].RaycastToWall(shotAngles[s], roomFullBounds), 1f, STREAMDELAY / 60.0f);
+          AkSoundEngine.PostEvent("Play_OBJ_turret_set_01", GameManager.Instance.PrimaryPlayer.gameObject);
+          yield return Wait(SHOTDELAY);
         }
         yield return Wait(STREAMDELAY);
         for (int j = 0; j < SHOTSPERSTREAM; ++j)
@@ -367,10 +369,10 @@ public class SecretBoss : AIActor
     }
   }
 
-  internal class FancyBulletsScript : Script
+  internal class OrbitBulletScript : Script
   {
 
-    public class FancyBullet : Bullet
+    public class OrbitBullet : Bullet
     {
       private Vector2 center;
       private float radius;
@@ -383,7 +385,7 @@ public class SecretBoss : AIActor
       private Vector2 initialTarget;
       private Vector2 delta;
 
-      public FancyBullet(Vector2 center, float radius, float captureAngle, float framesToApproach, float degreesToOrbit, float framesToOrbit, int delay)
+      public OrbitBullet(Vector2 center, float radius, float captureAngle, float framesToApproach, float degreesToOrbit, float framesToOrbit, int delay)
         : base("getboned")
       {
         this.center           = center;
@@ -403,8 +405,10 @@ public class SecretBoss : AIActor
 
         this.initialTarget = this.center + this.radius * this.captureAngle.ToVector();
         this.delta = this.initialTarget - this.Position;
+        this.UpdatePosition();
         ChangeDirection(new Direction(delta.ToAngle(), DirectionType.Absolute));
         ChangeSpeed(new Speed(0, SpeedType.Absolute));
+        this.UpdateVelocity();
 
         base.Initialize();
       }
@@ -413,7 +417,10 @@ public class SecretBoss : AIActor
       {
         AkSoundEngine.PostEvent("Play_OBJ_turret_set_01", GameManager.Instance.PrimaryPlayer.gameObject);
         yield return Wait(this.delay);
-        ChangeSpeed(new Speed(C.PIXELS_PER_CELL * delta.magnitude / framesToApproach, SpeedType.Absolute));
+        // ChangeSpeed(new Speed(C.PIXELS_PER_CELL * delta.magnitude / framesToApproach, SpeedType.Absolute));
+        // fta 10 = 54.0
+        // ChangeSpeed(new Speed((60.0f - 60.0f/framesToApproach) * delta.magnitude / framesToApproach, SpeedType.Absolute));
+        ChangeSpeed(new Speed(60.0f * delta.magnitude / (framesToApproach+1), SpeedType.Absolute));
         // IEnumerator[] scripts = {OrbitAndScatter(),OrbitAndScatter()};
         IEnumerator[] scripts = {OrbitAndScatter()};
         foreach(IEnumerator e in scripts)
@@ -426,22 +433,34 @@ public class SecretBoss : AIActor
       {
         yield return Wait(framesToApproach);
         float degreesPerFrame = degreesToOrbit / framesToOrbit;
+        // ETGModConsole.Log($"orbiting {degreesPerFrame} degrees / frame");
         float curAngle = captureAngle;
+        float oldSpeed = this.Speed;
+        this.UpdatePosition();
+        ChangeSpeed(new Speed(0f,SpeedType.Absolute));
+        this.UpdateVelocity();
+        yield return Wait(10);
+        // ETGModConsole.Log($"expected angle {captureAngle}");
+        // ETGModConsole.Log($"  actual angle {(this.Position-center).ToAngle()}");
+        this.Position = center + radius * captureAngle.ToVector();
+        this.UpdatePosition();
         for (int i = 0; i < framesToOrbit; ++i)
         {
+          yield return Wait(1);
           curAngle = (curAngle+degreesPerFrame).Clamp180();
           Vector2 newTarget = center + radius * curAngle.ToVector();
-          this.Position = newTarget;
-          yield return Wait(1);
+          // ChangeDirection(new Direction((newTarget-this.Position).ToAngle(),DirectionType.Absolute));
+          // this.Position = newTarget;
         }
         AkSoundEngine.PostEvent("Play_WPN_spacerifle_shot_01", GameManager.Instance.PrimaryPlayer.gameObject);
-        ChangeDirection(new Direction(curAngle,DirectionType.Absolute));
+        ChangeSpeed(new Speed(oldSpeed,SpeedType.Absolute));
+        // ChangeDirection(new Direction(curAngle,DirectionType.Absolute));
         yield return Wait(60);
       }
     }
 
     private const int COUNT = 16;
-    private const float OUTER_RADIUS = 7f;
+    private const float OUTER_RADIUS = 8f;
     private const float INNER_RADIUS = 3f;
     private const int SPAWN_GAP = 5;
 
@@ -459,8 +478,9 @@ public class SecretBoss : AIActor
         AkSoundEngine.PostEvent("Play_OBJ_turret_set_01", GameManager.Instance.PrimaryPlayer.gameObject);
         yield return this.Wait(SPAWN_GAP);
         float realAngle = (j*angleDelta).Clamp180();
-        Bullet b = new FancyBullet(playerpos, INNER_RADIUS, realAngle, 30f, 720f, 60f, SPAWN_GAP*(COUNT-j));
-        Vector2 spawnPoint = playerpos + OUTER_RADIUS * realAngle.ToVector();
+        float targetRadius = INNER_RADIUS+(j*1.0f/COUNT);
+        Bullet b = new OrbitBullet(playerpos, targetRadius, realAngle, 10f, 360f, 60f, SPAWN_GAP*(COUNT-j));
+        Vector2 spawnPoint = playerpos + (targetRadius * realAngle.ToVector()) + (OUTER_RADIUS * (realAngle-90f).ToVector());
         this.Fire(Offset.OverridePosition(spawnPoint), b);
       }
       yield break;
@@ -478,19 +498,31 @@ public class SecretBoss : AIActor
         yield break;
 
       this.BulletBank.Bullets.Add(boneBullet);
-      Rect roomBounds = this.BulletBank.aiActor.GetAbsoluteParentRoom().GetBoundingRect().Inset(2f);
+      Rect roomFullBounds = this.BulletBank.aiActor.GetAbsoluteParentRoom().GetBoundingRect();
+      Rect roomBounds = roomFullBounds.Inset(topInset: 2f, rightInset: 2f, bottomInset: 4f, leftInset: 2f);
       float offset = roomBounds.width / (float)COUNT;
       for (int j = 0; j < COUNT; j++)
       {
-        Vector2 spawnPoint = new Vector2(roomBounds.xMin + j*offset, roomBounds.yMax);
-        DoomZone(spawnPoint, spawnPoint - new Vector2(0f,10f), 1f, 3f);
+        Vector2 topPoint = new Vector2(roomBounds.xMin + j*offset, roomBounds.yMax);
+        DoomZone(topPoint, topPoint.RaycastToWall(-90f, roomFullBounds), 1f, COUNT / 15.0f);
         AkSoundEngine.PostEvent("Play_OBJ_turret_set_01", GameManager.Instance.PrimaryPlayer.gameObject);
         yield return this.Wait(4);
       }
       for (int j = 0; j < COUNT; j++)
       {
-        Vector2 spawnPoint = new Vector2(roomBounds.xMin + j*offset, roomBounds.yMax);
-        this.Fire(Offset.OverridePosition(spawnPoint), new Direction(-90f, DirectionType.Absolute), new Speed(20f), new Bullet("getboned"));
+        Vector2 topPoint = new Vector2(roomBounds.xMin + j*offset, roomBounds.yMax);
+        this.Fire(Offset.OverridePosition(topPoint), new Direction(-90f, DirectionType.Absolute), new Speed(30f), new Bullet("getboned"));
+        AkSoundEngine.PostEvent("Play_WPN_spacerifle_shot_01", GameManager.Instance.PrimaryPlayer.gameObject);
+
+        Vector2 bottomPoint = new Vector2(roomBounds.xMin + (j+0.5f)*offset, roomBounds.yMin);
+        DoomZone(bottomPoint, bottomPoint.RaycastToWall(90f, roomFullBounds), 1f, COUNT / 15.0f);
+        AkSoundEngine.PostEvent("Play_OBJ_turret_set_01", GameManager.Instance.PrimaryPlayer.gameObject);
+        yield return this.Wait(4);
+      }
+      for (int j = 0; j < COUNT; j++)
+      {
+        Vector2 bottomPoint = new Vector2(roomBounds.xMin + (j+0.5f)*offset, roomBounds.yMin);
+        this.Fire(Offset.OverridePosition(bottomPoint), new Direction(90f, DirectionType.Absolute), new Speed(30f), new Bullet("getboned"));
         AkSoundEngine.PostEvent("Play_WPN_spacerifle_shot_01", GameManager.Instance.PrimaryPlayer.gameObject);
         yield return this.Wait(4);
       }
