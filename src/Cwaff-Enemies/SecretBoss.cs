@@ -60,7 +60,6 @@ public class SecretBoss : AIActor
     bb.AddNamedVFX(VFX.vfxpool["Tornado"], "mytornado");
 
     // Add a random teleportation behavior
-    // bb.CreateTeleportAttack<TeleportBehavior>(outAnim: "scream", inAnim: "swirl", attackCooldown: 3.5f);
     // bb.CreateTeleportAttack<TeleportBehavior>(outAnim: "teleport", inAnim: "teleport", attackCooldown: 1.15f);
     // Add a basic bullet attack
     // bb.CreateBulletAttack<CeilingBulletsScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
@@ -164,12 +163,9 @@ public class SecretBoss : AIActor
     }
   }
 
-  internal class ChainBulletScript : Script
+  internal class SecretBullet : Bullet
   {
-
-    public class ChainBullet : Bullet
-    {
-      public ChainBullet() : base("getboned")
+      public SecretBullet() : base("getboned")
       {
       }
 
@@ -178,7 +174,13 @@ public class SecretBoss : AIActor
         this.Projectile.ChangeTintColorShader(0f,new Color(1.0f,0.5f,0.5f,0.5f));
         base.Initialize();
       }
+  }
 
+  internal class ChainBulletScript : Script
+  {
+
+    public class ChainBullet : SecretBullet
+    {
       public override IEnumerator Top()
       {
         AkSoundEngine.PostEvent("Play_WPN_spacerifle_shot_01", GameManager.Instance.PrimaryPlayer.gameObject);
@@ -232,20 +234,14 @@ public class SecretBoss : AIActor
 
   internal class SquareBulletScript : Script
   {
-    public class SquareBullet : Bullet
+    public class SquareBullet : SecretBullet
     {
       private int goFrames;
       private int waitFrames;
-      public SquareBullet(int goFrames = 30, int waitFrames = 60) : base("getboned")
+      public SquareBullet(int goFrames = 30, int waitFrames = 60) : base()
       {
         this.waitFrames = waitFrames;
         this.goFrames = goFrames;
-      }
-
-      public override void Initialize()
-      {
-        this.Projectile.ChangeTintColorShader(0f,new Color(1.0f,0.5f,0.5f,0.5f));
-        base.Initialize();
       }
 
       public override IEnumerator Top()
@@ -304,19 +300,13 @@ public class SecretBoss : AIActor
 
   internal class HesitantBulletWallScript : Script
   {
-    public class HesitantBullet : Bullet
+    public class HesitantBullet : SecretBullet
     {
 
       private int waitFrames;
-      public HesitantBullet(int waitFrames = 60) : base("getboned")
+      public HesitantBullet(int waitFrames = 60) : base()
       {
         this.waitFrames = waitFrames;
-      }
-
-      public override void Initialize()
-      {
-        this.Projectile.ChangeTintColorShader(0f,new Color(1.0f,0.5f,0.5f,0.5f));
-        base.Initialize();
       }
 
       public override IEnumerator Top()
@@ -372,7 +362,7 @@ public class SecretBoss : AIActor
   internal class OrbitBulletScript : Script
   {
 
-    public class OrbitBullet : Bullet
+    public class OrbitBullet : SecretBullet
     {
       private Vector2 center;
       private float radius;
@@ -386,7 +376,7 @@ public class SecretBoss : AIActor
       private Vector2 delta;
 
       public OrbitBullet(Vector2 center, float radius, float captureAngle, float framesToApproach, float degreesToOrbit, float framesToOrbit, int delay)
-        : base("getboned")
+        : base()
       {
         this.center           = center;
         this.radius           = radius;
@@ -399,7 +389,8 @@ public class SecretBoss : AIActor
 
       public override void Initialize()
       {
-        this.Projectile.ChangeTintColorShader(0f,new Color(1.0f,0.5f,0.5f,0.5f));
+        base.Initialize();
+
         this.Projectile.BulletScriptSettings.surviveTileCollisions = true;
         this.Projectile.specRigidbody.OnPreTileCollision += (_,_,_,_) => { PhysicsEngine.SkipCollision = true; };
 
@@ -407,8 +398,6 @@ public class SecretBoss : AIActor
         this.delta = this.initialTarget - this.Position;
         ChangeDirection(new Direction(delta.ToAngle(), DirectionType.Absolute));
         ChangeSpeed(new Speed(0, SpeedType.Absolute));
-
-        base.Initialize();
       }
 
       public override IEnumerator Top()
@@ -448,11 +437,12 @@ public class SecretBoss : AIActor
       }
     }
 
-    private const float ROTATIONS = 2.0f;
-    private const int COUNT = 43;
+    private const float ROTATIONS = 5.0f;
+    private const int COUNT = 37;
     private const float OUTER_RADIUS = 8f;
-    private const float INNER_RADIUS = 3f;
+    private const float INNER_RADIUS = 1f;
     private const int SPAWN_GAP = 2;
+    private const float SPIRAL = 1.0f;  // higher spiral factor = bullets form a spiral instead of a circle
 
     public override IEnumerator Top()
     {
@@ -465,11 +455,12 @@ public class SecretBoss : AIActor
       float angleDelta = ROTATIONS * 360.0f / COUNT;
       for (int j = 0; j < COUNT; j++)
       {
-        AkSoundEngine.PostEvent("Play_OBJ_turret_set_01", GameManager.Instance.PrimaryPlayer.gameObject);
+        if (j % 2 == 0)
+          AkSoundEngine.PostEvent("Play_OBJ_turret_set_01", GameManager.Instance.PrimaryPlayer.gameObject);
         yield return this.Wait(SPAWN_GAP);
         float realAngle = (j*angleDelta).Clamp180();
-        float targetRadius = INNER_RADIUS+(j*ROTATIONS/COUNT);
-        Bullet b = new OrbitBullet(playerpos, targetRadius, realAngle, 10f, 360f, 60f, SPAWN_GAP*(COUNT-j));
+        float targetRadius = INNER_RADIUS+(j*SPIRAL/COUNT);
+        Bullet b = new OrbitBullet(playerpos, targetRadius, realAngle, 12f, 360f, 60f, SPAWN_GAP*(COUNT-j));
         Vector2 spawnPoint = playerpos + (targetRadius * realAngle.ToVector()) + (OUTER_RADIUS * (realAngle-90f).ToVector());
         this.Fire(Offset.OverridePosition(spawnPoint), b);
       }
@@ -501,7 +492,7 @@ public class SecretBoss : AIActor
       for (int j = 0; j < COUNT; j++)
       {
         Vector2 topPoint = new Vector2(roomBounds.xMin + j*offset, roomBounds.yMax);
-        this.Fire(Offset.OverridePosition(topPoint), new Direction(-90f, DirectionType.Absolute), new Speed(30f), new Bullet("getboned"));
+        this.Fire(Offset.OverridePosition(topPoint), new Direction(-90f, DirectionType.Absolute), new Speed(30f), new SecretBullet());
         AkSoundEngine.PostEvent("Play_WPN_spacerifle_shot_01", GameManager.Instance.PrimaryPlayer.gameObject);
 
         Vector2 bottomPoint = new Vector2(roomBounds.xMin + (j+0.5f)*offset, roomBounds.yMin);
@@ -512,7 +503,7 @@ public class SecretBoss : AIActor
       for (int j = 0; j < COUNT; j++)
       {
         Vector2 bottomPoint = new Vector2(roomBounds.xMin + (j+0.5f)*offset, roomBounds.yMin);
-        this.Fire(Offset.OverridePosition(bottomPoint), new Direction(90f, DirectionType.Absolute), new Speed(30f), new Bullet("getboned"));
+        this.Fire(Offset.OverridePosition(bottomPoint), new Direction(90f, DirectionType.Absolute), new Speed(30f), new SecretBullet());
         AkSoundEngine.PostEvent("Play_WPN_spacerifle_shot_01", GameManager.Instance.PrimaryPlayer.gameObject);
         yield return this.Wait(4);
       }
