@@ -62,11 +62,11 @@ public class SecretBoss : AIActor
     // Add a random teleportation behavior
     // bb.CreateTeleportAttack<TeleportBehavior>(outAnim: "teleport", inAnim: "teleport", attackCooldown: 1.15f);
     // Add a basic bullet attack
-    // bb.CreateBulletAttack<CeilingBulletsScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
+    bb.CreateBulletAttack<CeilingBulletsScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
     bb.CreateBulletAttack<OrbitBulletScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
-    // bb.CreateBulletAttack<HesitantBulletWallScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
-    // bb.CreateBulletAttack<SquareBulletScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
-    // bb.CreateBulletAttack<ChainBulletScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
+    bb.CreateBulletAttack<HesitantBulletWallScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
+    bb.CreateBulletAttack<SquareBulletScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
+    bb.CreateBulletAttack<ChainBulletScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
     // Add a bunch of simultaenous bullet attacks
     // bb.CreateSimultaneousAttack(new(){
     //   bb.CreateBulletAttack<RichochetScript> (add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
@@ -176,7 +176,7 @@ public class SecretBoss : AIActor
       }
   }
 
-  internal class ChainBulletScript : Script
+  internal class ChainBulletScript : FluidBulletScript
   {
 
     public class ChainBullet : SecretBullet
@@ -195,7 +195,14 @@ public class SecretBoss : AIActor
     private const int SHOTDELAY       = 5;
     private const int SHOTSPEED       = 20;
     private const float MINDIST       = 12f;
-    public override IEnumerator Top()
+
+    protected override List<FluidBulletInfo> BuildChain()
+    {
+      return Run(DoTheThing())
+      .Finish();
+    }
+
+    private IEnumerator DoTheThing()
     {
 
       if (this.BulletBank?.aiActor?.TargetRigidbody == null)
@@ -232,7 +239,7 @@ public class SecretBoss : AIActor
     }
   }
 
-  internal class SquareBulletScript : Script
+  internal class SquareBulletScript : FluidBulletScript
   {
     public class SquareBullet : SecretBullet
     {
@@ -272,7 +279,14 @@ public class SecretBoss : AIActor
     private const float SPREADSPAN = SPREAD * SIDESPAN;
     private const float OFFSET     = 0.5f * (COUNTPERSIDE - 1);
     private const int FINALDELAY   = ((SHOTDELAY * COUNTPERSIDE) + SIDEDELAY) * SIDES;
-    public override IEnumerator Top()
+
+    protected override List<FluidBulletInfo> BuildChain()
+    {
+      return Run(DoTheThing())
+      .Finish();
+    }
+
+    private IEnumerator DoTheThing()
     {
 
       if (this.BulletBank?.aiActor?.TargetRigidbody == null)
@@ -298,7 +312,7 @@ public class SecretBoss : AIActor
 
   }
 
-  internal class HesitantBulletWallScript : Script
+  internal class HesitantBulletWallScript : FluidBulletScript
   {
     public class HesitantBullet : SecretBullet
     {
@@ -330,7 +344,14 @@ public class SecretBoss : AIActor
     private const float DISTANCE  = 7f;
     private const float SPEED     = 10f;
     private const float SPACING   = WALLWIDTH / COUNT;
-    public override IEnumerator Top()
+
+    protected override List<FluidBulletInfo> BuildChain()
+    {
+      return Run(DoTheThing())
+      .Finish();
+    }
+
+    private IEnumerator DoTheThing()
     {
 
       if (this.BulletBank?.aiActor?.TargetRigidbody == null)
@@ -359,7 +380,7 @@ public class SecretBoss : AIActor
     }
   }
 
-  internal class OrbitBulletScript : Script
+  internal class OrbitBulletScript : FluidBulletScript
   {
 
     public class OrbitBullet : SecretBullet
@@ -444,7 +465,13 @@ public class SecretBoss : AIActor
     private const int SPAWN_GAP = 2;
     private const float SPIRAL = 1.0f;  // higher spiral factor = bullets form a spiral instead of a circle
 
-    public override IEnumerator Top()
+    protected override List<FluidBulletInfo> BuildChain()
+    {
+      return Run(DoTheThing())
+      .Finish();
+    }
+
+    private IEnumerator DoTheThing()
     {
       if (this.BulletBank?.aiActor?.TargetRigidbody == null)
         yield break;
@@ -469,11 +496,17 @@ public class SecretBoss : AIActor
   }
 
   // Shoots a bunch of bullets from the ceiling of the current room
-  internal class CeilingBulletsScript : Script
+  internal class CeilingBulletsScript : FluidBulletScript
   {
     private const int COUNT = 16;
 
-    public override IEnumerator Top()
+    protected override List<FluidBulletInfo> BuildChain()
+    {
+      return Run(DoTheThing())
+      .Finish();
+    }
+
+    private IEnumerator DoTheThing()
     {
       if (this.BulletBank?.aiActor?.TargetRigidbody == null)
         yield break;

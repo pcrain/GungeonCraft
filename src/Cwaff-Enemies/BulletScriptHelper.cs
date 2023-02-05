@@ -112,7 +112,13 @@ namespace CwaffingTheGungy
   public abstract class FluidBulletScript : Script
   {
     // Must be overridden by anyone wanting to make use of our script
-    public abstract List<FluidBulletInfo> BuildChain();
+    protected abstract List<FluidBulletInfo> BuildChain();
+
+    // Entry point for running our first script
+    public FluidBulletInfo Run(IEnumerator script)
+    {
+      return FluidBulletInfo.Run(this,script);
+    }
 
     // Where all of the actual magic happens
     public sealed override IEnumerator Top()
