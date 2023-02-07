@@ -63,10 +63,10 @@ public class SecretBoss : AIActor
     // bb.CreateTeleportAttack<TeleportBehavior>(outAnim: "teleport", inAnim: "teleport", attackCooldown: 1.15f);
     // Add a basic bullet attack
     bb.CreateBulletAttack<CeilingBulletsScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
-    bb.CreateBulletAttack<OrbitBulletScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
-    bb.CreateBulletAttack<HesitantBulletWallScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
-    bb.CreateBulletAttack<SquareBulletScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
-    bb.CreateBulletAttack<ChainBulletScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
+    // bb.CreateBulletAttack<OrbitBulletScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
+    // bb.CreateBulletAttack<HesitantBulletWallScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
+    // bb.CreateBulletAttack<SquareBulletScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
+    // bb.CreateBulletAttack<ChainBulletScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
     // Add a bunch of simultaenous bullet attacks
     // bb.CreateSimultaneousAttack(new(){
     //   bb.CreateBulletAttack<RichochetScript> (add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
@@ -502,16 +502,20 @@ public class SecretBoss : AIActor
 
     protected override List<FluidBulletInfo> BuildChain()
     {
-      return Run(DoTheThing())
-      .Finish();
+      if (this.BulletBank?.aiActor?.TargetRigidbody == null)
+        return new();
+      this.BulletBank.Bullets.Add(boneBullet);
+
+      return
+        Run(DoTheThing(15))
+          .And(DoTheThing(30), withDelay: 10)
+        .Then(DoTheThing(45), withDelay: 20)
+          .And(DoTheThing(15))
+        .Finish();
     }
 
-    private IEnumerator DoTheThing()
+    private IEnumerator DoTheThing(float speed)
     {
-      if (this.BulletBank?.aiActor?.TargetRigidbody == null)
-        yield break;
-
-      this.BulletBank.Bullets.Add(boneBullet);
       Rect roomFullBounds = this.BulletBank.aiActor.GetAbsoluteParentRoom().GetBoundingRect();
       Rect roomBounds = roomFullBounds.Inset(topInset: 2f, rightInset: 2f, bottomInset: 4f, leftInset: 2f);
       float offset = roomBounds.width / (float)COUNT;
@@ -525,7 +529,7 @@ public class SecretBoss : AIActor
       for (int j = 0; j < COUNT; j++)
       {
         Vector2 topPoint = new Vector2(roomBounds.xMin + j*offset, roomBounds.yMax);
-        this.Fire(Offset.OverridePosition(topPoint), new Direction(-90f, DirectionType.Absolute), new Speed(30f), new SecretBullet());
+        this.Fire(Offset.OverridePosition(topPoint), new Direction(-90f, DirectionType.Absolute), new Speed(speed), new SecretBullet());
         AkSoundEngine.PostEvent("Play_WPN_spacerifle_shot_01", GameManager.Instance.PrimaryPlayer.gameObject);
 
         Vector2 bottomPoint = new Vector2(roomBounds.xMin + (j+0.5f)*offset, roomBounds.yMin);
@@ -536,7 +540,7 @@ public class SecretBoss : AIActor
       for (int j = 0; j < COUNT; j++)
       {
         Vector2 bottomPoint = new Vector2(roomBounds.xMin + (j+0.5f)*offset, roomBounds.yMin);
-        this.Fire(Offset.OverridePosition(bottomPoint), new Direction(90f, DirectionType.Absolute), new Speed(30f), new SecretBullet());
+        this.Fire(Offset.OverridePosition(bottomPoint), new Direction(90f, DirectionType.Absolute), new Speed(speed), new SecretBullet());
         AkSoundEngine.PostEvent("Play_WPN_spacerifle_shot_01", GameManager.Instance.PrimaryPlayer.gameObject);
         yield return this.Wait(4);
       }

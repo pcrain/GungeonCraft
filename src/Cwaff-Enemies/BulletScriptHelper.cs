@@ -74,7 +74,7 @@ namespace CwaffingTheGungy
     }
 
     // Run another script simultaneously with other scripts in the current layer
-    public FluidBulletInfo And(IEnumerator script)
+    public FluidBulletInfo And(IEnumerator script, int withDelay = 0)
     {
       if (nextAutoId != this.id + 1)  // if we're not chaining these together, we're causing problems
       {
@@ -86,6 +86,7 @@ namespace CwaffingTheGungy
         node.Value.runsBefore.Add(next.id);
         next.runsAfter.Add(node.Value.id);
       }
+      next.waitFrames = 1 + withDelay;
 
       curLayer.AddLast(next);
       theChain.Add(next);
@@ -93,12 +94,12 @@ namespace CwaffingTheGungy
     }
 
     // Run another script sequentially after all scripts in the previous layer
-    public FluidBulletInfo Then(IEnumerator script)
+    public FluidBulletInfo Then(IEnumerator script, int withDelay = 0)
     {
       lastLayer = curLayer;
       curLayer = new LinkedList<FluidBulletInfo>();
 
-      return And(script);
+      return And(script, withDelay);
     }
 
     // Finish up the call chain and return it
