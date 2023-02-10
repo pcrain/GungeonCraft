@@ -37,7 +37,7 @@ includes+=('<Reference Include="System" />') #needed for LinkedList
 #Regenerate audio sources
 
 echo -e "[${GRN}>${BLN}] Checking for changes to audio files"
-updateaudio=1
+updateaudio=0
 if [ ! -e "./Resources/Sounds/${namespace}.bnk" ]; then
   echo -e "[${GRN}>${BLN}]   Audio bank does not exist, regenerating sound bank"
   updateaudio=1

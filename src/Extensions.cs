@@ -111,6 +111,12 @@ namespace CwaffingTheGungy
       return BraveMathCollege.ClampAngle180(self);
     }
 
+    // Clamp a floating point angle in degrees to [0,360]
+    public static float Clamp360(this float self)
+    {
+      return BraveMathCollege.ClampAngle360(self);
+    }
+
     // Get a bullet's direction to the primary player
     public static float DirToNearestPlayer(this Bullet self)
     {
