@@ -208,9 +208,9 @@ namespace CwaffingTheGungy
           NickName    = typeof(T).AssemblyQualifiedName,
           Behavior    = bangbang
         };
-        this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors.Add(theAttack);
+        // this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors.Add(theAttack);
+        this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviors.Add(bangbang); // TODO: could also just do this
       }
-      // this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviors.Add(); // TODO: could also just do this
       return bangbang;
     }
 
@@ -501,7 +501,7 @@ namespace CwaffingTheGungy
     private static PrototypeDungeonRoom genericBossRoomPrefab = null;
 
     // Regular expression for teasing apart animation names in a folder
-    public static Regex rx_anim = new Regex(@"^(?:(.*?)_)?([^_]*?)_([0-9]+)\.png$",
+    public static Regex rx_anim = new Regex(@"^(?:([^_]*?)_)?(.*)_([0-9]+)\.png$",
           RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
     public static List<int> Range(int start, int end)
@@ -708,6 +708,7 @@ namespace CwaffingTheGungy
       string realPath = resourcePath.Replace('/', '.') + ".";
 
       // Load all of our sprites into a dictionary of ordered lists of names
+      ETGModConsole.Log($"loading sprites from {resourcePath}");
       Dictionary<string,string[]> spriteMaps = new Dictionary<string,string[]>();
       foreach (string s in ResourceExtractor.GetResourceNames())
       {
@@ -721,7 +722,10 @@ namespace CwaffingTheGungy
           string animName   = match.Groups[2].Value;
           string animIndex  = match.Groups[3].Value;
           if (!spriteMaps.ContainsKey(animName))
+          {
+            ETGModConsole.Log($"  found animation {animName}");
             spriteMaps[animName] = new string[0];
+          }
           int index = Int32.Parse(animIndex);
           if (index >= spriteMaps[animName].Length)
           {

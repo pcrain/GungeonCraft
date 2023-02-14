@@ -21,8 +21,8 @@ public class SecretBoss : AIActor
   private const string bossname      = "Bossyboi";
   private const string subtitle      = "It's Literally Just a...";
   // private const string spritePath    = "CwaffingTheGungy/Resources/room_mimic";
-  private const string spritePath    = "CwaffingTheGungy/Resources/bossyboi";
-  private const string defaultSprite = "bossyboi_idle_001";
+  private const string spritePath    = "CwaffingTheGungy/Resources/sans";
+  private const string defaultSprite = "sans_idle_1";
   private const string bossCardPath  = "CwaffingTheGungy/Resources/bossyboi_bosscard.png";
 
   internal static GameObject napalmReticle      = null;
@@ -39,8 +39,10 @@ public class SecretBoss : AIActor
       hitReactChance: 0.05f, collisionKnockbackStrength: 5f);
     // Set up our animations
     bb.InitSpritesFromResourcePath(spritePath);
-      bb.AdjustAnimation("idle",   fps:   7f, loop: true);
-      bb.AdjustAnimation("teleport",   fps:   2f, loop: false);
+      bb.AdjustAnimation("idle",   fps:   12f, loop: true);
+      bb.AdjustAnimation("decloak",   fps:   6f, loop: false);
+      bb.AdjustAnimation("teleport_in",   fps:   16f, loop: false);
+      bb.AdjustAnimation("teleport_out",   fps:   16f, loop: false);
       // bb.AdjustAnimation("swirl",  fps:   9f, loop: false);
       // bb.AdjustAnimation("scream", fps: 5.3f, loop: false);
       // bb.AdjustAnimation("tell",   fps:   8f, loop: false);
@@ -52,7 +54,7 @@ public class SecretBoss : AIActor
     // Set our default pixel colliders
     // bb.SetDefaultColliders(101,27,0,10);
     // Add custom animation to the generic intro doer, and add a specific intro doer as well
-    bb.SetIntroAnimation("intro");
+    bb.SetIntroAnimation("decloak");
     bb.AddCustomIntro<BossIntro>();
     // Set up the boss's targeting and attacking scripts
     bb.TargetPlayer();
@@ -60,9 +62,10 @@ public class SecretBoss : AIActor
     bb.AddNamedVFX(VFX.vfxpool["Tornado"], "mytornado");
 
     // Add a random teleportation behavior
-    // bb.CreateTeleportAttack<TeleportBehavior>(outAnim: "teleport", inAnim: "teleport", attackCooldown: 1.15f);
+    bb.CreateTeleportAttack<TeleportBehavior>(outAnim: "teleport_out", inAnim: "teleport_in", cooldown: 3f);
     // Add a basic bullet attack
-    bb.CreateBulletAttack<CeilingBulletsScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
+    bb.CreateBulletAttack<CeilingBulletsScript>(fireAnim: "laugh", attackCooldown: 1f);
+    // bb.CreateBulletAttack<CeilingBulletsScript>(fireAnim: "laugh", attackCooldown: 1.15f, fireVfx: "mytornado");
     // bb.CreateBulletAttack<OrbitBulletScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
     // bb.CreateBulletAttack<HesitantBulletWallScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
     // bb.CreateBulletAttack<SquareBulletScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");

@@ -323,8 +323,26 @@ namespace CwaffingTheGungy
       bullet.UpdateVelocity();
       return bullet.AccelerateWithTrajectoryThroughPoint(pointB, framesB);
     }
-    public static IEnumerator MoveTangentToPlayer(this Bullet bullet)
-      { yield break; }
+    public static IEnumerator MoveTangentToPlayer(this Bullet bullet, PlayerController player = null)
+      {
+        player ??= GameManager.Instance.BestActivePlayer;
+        Vector2 ppos = player.CenterPosition;
+        float angle = bullet.Velocity.ToAngle();
+
+        Vector2 p1 = bullet.Position;
+        Vector2 p2 = p1 + 1000f*bullet.Velocity;
+        Vector2 q1 = ppos + 500f*((angle+90f).ToVector());
+        Vector2 q2 = ppos + 500f*((angle-90f).ToVector());
+
+        Vector2 isect;
+        if (!BraveUtility.LineIntersectsLine(p1,p2,q1,q2,out isect))
+          yield break;
+
+        float dist = (isect - p1).magnitude;
+        int time = Mathf.CeilToInt(dist / bullet.Velocity.magnitude);
+        yield return bullet.Wait(time);
+        yield break;
+      }
     public static IEnumerator OrbitPointAtCurrentRadiusAndVelocity(this Bullet bullet)
       { yield break; }
   }
