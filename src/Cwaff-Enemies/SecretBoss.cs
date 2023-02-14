@@ -53,8 +53,10 @@ public class SecretBoss : AIActor
       // bb.AdjustAnimation("die",    fps:   6f, loop: false);
     // Set our default pixel colliders
     // bb.SetDefaultColliders(101,27,0,10);
+    bb.SetDefaultColliders(15,30,24,2);
     // Add custom animation to the generic intro doer, and add a specific intro doer as well
     bb.SetIntroAnimation("decloak");
+    bb.prefab.GetComponent<GenericIntroDoer>().preIntroAnim = "idle_cloak";
     bb.AddCustomIntro<BossIntro>();
     // Set up the boss's targeting and attacking scripts
     bb.TargetPlayer();
@@ -64,12 +66,11 @@ public class SecretBoss : AIActor
     // Add a random teleportation behavior
     bb.CreateTeleportAttack<TeleportBehavior>(outAnim: "teleport_out", inAnim: "teleport_in", cooldown: 3f);
     // Add a basic bullet attack
-    bb.CreateBulletAttack<CeilingBulletsScript>(fireAnim: "laugh", attackCooldown: 1f);
-    // bb.CreateBulletAttack<CeilingBulletsScript>(fireAnim: "laugh", attackCooldown: 1.15f, fireVfx: "mytornado");
-    // bb.CreateBulletAttack<OrbitBulletScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
-    // bb.CreateBulletAttack<HesitantBulletWallScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
-    // bb.CreateBulletAttack<SquareBulletScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
-    // bb.CreateBulletAttack<ChainBulletScript>(fireAnim: "idle", attackCooldown: 1.15f, fireVfx: "mytornado");
+    bb.CreateBulletAttack<CeilingBulletsScript>(fireAnim: "laugh", attackCooldown: 1.15f);
+    bb.CreateBulletAttack<OrbitBulletScript>(fireAnim: "throw_up", attackCooldown: 1.15f);
+    bb.CreateBulletAttack<HesitantBulletWallScript>(fireAnim: "throw_down", attackCooldown: 1.15f);
+    bb.CreateBulletAttack<SquareBulletScript>(fireAnim: "throw_left", attackCooldown: 1.15f);
+    bb.CreateBulletAttack<ChainBulletScript>(fireAnim: "throw_right", attackCooldown: 1.15f);
     // Add a bunch of simultaenous bullet attacks
     // bb.CreateSimultaneousAttack(new(){
     //   bb.CreateBulletAttack<RichochetScript> (add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
@@ -146,6 +147,12 @@ public class SecretBoss : AIActor
         chest2.IsLocked = false;
       };
       // this.aiActor.knockbackDoer.SetImmobile(true, "laugh");
+    }
+
+    private void Update()
+    {
+      base.sprite.FlipX = (GameManager.Instance.BestActivePlayer.CenterPosition.x < base.transform.position.x);
+      base.sprite.PlaceAtPositionByAnchor(base.sprite.specRigidbody.UnitBottomCenter, tk2dBaseSprite.Anchor.LowerCenter);
     }
   }
 

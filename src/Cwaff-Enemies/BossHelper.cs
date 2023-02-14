@@ -208,8 +208,8 @@ namespace CwaffingTheGungy
           NickName    = typeof(T).AssemblyQualifiedName,
           Behavior    = bangbang
         };
-        // this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors.Add(theAttack);
-        this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviors.Add(bangbang); // TODO: could also just do this
+        this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors.Add(theAttack);
+        // this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviors.Add(bangbang); // TODO: could also just do this
       }
       return bangbang;
     }
@@ -309,8 +309,8 @@ namespace CwaffingTheGungy
           NickName = typeof(T).AssemblyQualifiedName,
           Behavior = blipblip
         };
-        // this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors.Add(theAttack);
-        this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviors.Add(blipblip); // TODO: could also just do this
+        this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors.Add(theAttack);
+        // this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviors.Add(blipblip); // TODO: could also just do this
       }
       return blipblip;
     }
@@ -371,8 +371,8 @@ namespace CwaffingTheGungy
           NickName = typeof(T).AssemblyQualifiedName,
           Behavior = basicAttack
         };
-        // this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors.Add(theAttack);
-        this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviors.Add(basicAttack); // TODO: could also just do this
+        this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors.Add(theAttack);
+        // this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviors.Add(basicAttack); // TODO: could also just do this
       }
       return basicAttack;
     }
@@ -388,8 +388,8 @@ namespace CwaffingTheGungy
           // NickName = typeof(T).AssemblyQualifiedName,
           Behavior = theGroup
         };
-        // this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors.Add(theAttack);
-        this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviors.Add(theGroup); // TODO: could also just do this
+        this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors.Add(theAttack);
+        // this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviors.Add(theGroup); // TODO: could also just do this
       }
       return theGroup;
     }
@@ -410,8 +410,8 @@ namespace CwaffingTheGungy
           // NickName = typeof(T).AssemblyQualifiedName,
           Behavior = theGroup
         };
-        // this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors.Add(theAttack);
-        this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviors.Add(theGroup); // TODO: could also just do this
+        this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors.Add(theAttack);
+        // this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviors.Add(theGroup); // TODO: could also just do this
       }
       return theGroup;
     }
@@ -652,7 +652,7 @@ namespace CwaffingTheGungy
         // miniBossIntroDoer.BossMusicEvent = "Play_MUS_Boss_Theme_Beholster";
         miniBossIntroDoer.BossMusicEvent = "Play_Nothing";
         miniBossIntroDoer.PreventBossMusic = false;
-        miniBossIntroDoer.InvisibleBeforeIntroAnim = true;
+        miniBossIntroDoer.InvisibleBeforeIntroAnim = false;
         miniBossIntroDoer.preIntroAnim = string.Empty;
         miniBossIntroDoer.preIntroDirectionalAnim = string.Empty;
         miniBossIntroDoer.cameraFocus = null;
