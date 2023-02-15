@@ -165,7 +165,7 @@ public class SecretBoss : AIActor
       // base.specRigidbody.transform.localScale = new Vector3(shouldFlip ? -1f : 1f, 1f, 1f);
       // if (base.sprite.FlipX == lastFlip)
       //   return;
-      base.sprite.transform.localPosition = base.specRigidbody.UnitBottomCenter;
+      base.sprite.transform.localPosition = base.specRigidbody.UnitCenter.RoundToInt();
       if (base.sprite.FlipX)
           base.sprite.transform.localPosition += new Vector3(base.sprite.GetUntrimmedBounds().size.x / 2, 0f, 0f);
       else
