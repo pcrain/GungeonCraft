@@ -42,8 +42,8 @@ public class SecretBoss : AIActor
       bb.AdjustAnimation("idle",   fps:   12f, loop: true);
       bb.AdjustAnimation("idle_cloak",   fps:   12f, loop: true);
       bb.AdjustAnimation("decloak",   fps:   6f, loop: false);
-      bb.AdjustAnimation("teleport_in",   fps:   16f, loop: false);
-      bb.AdjustAnimation("teleport_out",   fps:   16f, loop: false);
+      bb.AdjustAnimation("teleport_in",   fps:   60f, loop: false);
+      bb.AdjustAnimation("teleport_out",   fps:   60f, loop: false);
       // bb.AdjustAnimation("swirl",  fps:   9f, loop: false);
       // bb.AdjustAnimation("scream", fps: 5.3f, loop: false);
       // bb.AdjustAnimation("tell",   fps:   8f, loop: false);
@@ -65,13 +65,13 @@ public class SecretBoss : AIActor
     bb.AddNamedVFX(VFX.vfxpool["Tornado"], "mytornado");
 
     // Add a random teleportation behavior
-    // bb.CreateTeleportAttack<TeleportBehavior>(outAnim: "teleport_out", inAnim: "teleport_in", cooldown: 3f);
+    bb.CreateTeleportAttack<TeleportBehavior>(goneTime: 0.25f, outAnim: "teleport_out", inAnim: "teleport_in", cooldown: 1f, probability: 5, outScript: typeof(TeleportScript), inScript: typeof(TeleportScript));
     // Add a basic bullet attack
-    // bb.CreateBulletAttack<CeilingBulletsScript>(fireAnim: "laugh", cooldown: 5f, attackCooldown: 1.15f);
-    // bb.CreateBulletAttack<OrbitBulletScript>(fireAnim: "throw_up", cooldown: 5f, attackCooldown: 1.15f);
-    // bb.CreateBulletAttack<HesitantBulletWallScript>(fireAnim: "throw_down", cooldown: 5f, attackCooldown: 1.15f);
-    bb.CreateBulletAttack<SquareBulletScript>(fireAnim: "throw_left", cooldown: 5f, attackCooldown: 1.15f);
-    // bb.CreateBulletAttack<ChainBulletScript>(fireAnim: "throw_right", cooldown: 5f, attackCooldown: 1.15f);
+    bb.CreateBulletAttack<CeilingBulletsScript>(fireAnim: "laugh", cooldown: 1.5f, attackCooldown: 0.15f);
+    bb.CreateBulletAttack<OrbitBulletScript>(fireAnim: "throw_up", cooldown: 1.5f, attackCooldown: 0.15f);
+    bb.CreateBulletAttack<HesitantBulletWallScript>(fireAnim: "throw_down", cooldown: 1.5f, attackCooldown: 0.15f);
+    bb.CreateBulletAttack<SquareBulletScript>(fireAnim: "throw_left", cooldown: 1.5f, attackCooldown: 0.15f);
+    bb.CreateBulletAttack<ChainBulletScript>(fireAnim: "throw_right", cooldown: 1.5f, attackCooldown: 0.15f);
     // Add a bunch of simultaenous bullet attacks
     // bb.CreateSimultaneousAttack(new(){
     //   bb.CreateBulletAttack<RichochetScript> (add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
@@ -195,6 +195,15 @@ public class SecretBoss : AIActor
       AkSoundEngine.PostEvent("Play_BOSS_doormimic_lick_01", base.aiActor.gameObject);
       yield break;
     }
+  }
+
+  internal class TeleportScript : Script
+  {
+      public override IEnumerator Top()
+      {
+        AkSoundEngine.PostEvent("teledash", GameManager.Instance.PrimaryPlayer.gameObject);
+        yield break;
+      }
   }
 
   internal class SecretBullet : Bullet
