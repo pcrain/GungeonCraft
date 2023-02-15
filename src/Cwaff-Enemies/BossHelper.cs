@@ -71,8 +71,8 @@ namespace CwaffingTheGungy
 
       // Set up a default shoot point from the center of our sprite
       GameObject shootpoint = new GameObject("attach");
-        shootpoint.transform.parent = bb.enemyBehavior.transform;
-        shootpoint.transform.position = bb.enemyBehavior.sprite.WorldCenter;
+        shootpoint.transform.parent = bb.enemyBehavior.specRigidbody.transform;
+        shootpoint.transform.position = bb.enemyBehavior.specRigidbody.UnitCenter;
       bb.defaultGunAttachPoint = bb.enemyBehavior.transform.Find("attach").gameObject;
 
       // Set up a default shadow so teleportation doesn't throw exceptions
@@ -874,7 +874,7 @@ namespace CwaffingTheGungy
         PrototypeDungeonRoom p = GetGenericBossRoom();
           Vector2 roomCenter = new Vector2(0.5f*p.Width, 0.5f*p.Height);
           tk2dBaseSprite anySprite = self.GetComponent<tk2dSpriteAnimator>().GetAnySprite();
-        AddObjectToRoom(p, roomCenter - anySprite.WorldCenter, EnemyBehaviourGuid: guid);
+        AddObjectToRoom(p, roomCenter + anySprite.WorldCenter, EnemyBehaviourGuid: guid);
 
         // Create a new table and add our new boss room
         GenericRoomTable theRoomTable = ScriptableObject.CreateInstance<GenericRoomTable>();

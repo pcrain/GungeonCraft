@@ -40,6 +40,7 @@ public class SecretBoss : AIActor
     // Set up our animations
     bb.InitSpritesFromResourcePath(spritePath);
       bb.AdjustAnimation("idle",   fps:   12f, loop: true);
+      bb.AdjustAnimation("idle_cloak",   fps:   12f, loop: true);
       bb.AdjustAnimation("decloak",   fps:   6f, loop: false);
       bb.AdjustAnimation("teleport_in",   fps:   16f, loop: false);
       bb.AdjustAnimation("teleport_out",   fps:   16f, loop: false);
@@ -64,13 +65,13 @@ public class SecretBoss : AIActor
     bb.AddNamedVFX(VFX.vfxpool["Tornado"], "mytornado");
 
     // Add a random teleportation behavior
-    bb.CreateTeleportAttack<TeleportBehavior>(outAnim: "teleport_out", inAnim: "teleport_in", cooldown: 3f);
+    // bb.CreateTeleportAttack<TeleportBehavior>(outAnim: "teleport_out", inAnim: "teleport_in", cooldown: 3f);
     // Add a basic bullet attack
-    bb.CreateBulletAttack<CeilingBulletsScript>(fireAnim: "laugh", attackCooldown: 1.15f);
-    bb.CreateBulletAttack<OrbitBulletScript>(fireAnim: "throw_up", attackCooldown: 1.15f);
-    bb.CreateBulletAttack<HesitantBulletWallScript>(fireAnim: "throw_down", attackCooldown: 1.15f);
-    bb.CreateBulletAttack<SquareBulletScript>(fireAnim: "throw_left", attackCooldown: 1.15f);
-    bb.CreateBulletAttack<ChainBulletScript>(fireAnim: "throw_right", attackCooldown: 1.15f);
+    // bb.CreateBulletAttack<CeilingBulletsScript>(fireAnim: "laugh", cooldown: 5f, attackCooldown: 1.15f);
+    // bb.CreateBulletAttack<OrbitBulletScript>(fireAnim: "throw_up", cooldown: 5f, attackCooldown: 1.15f);
+    // bb.CreateBulletAttack<HesitantBulletWallScript>(fireAnim: "throw_down", cooldown: 5f, attackCooldown: 1.15f);
+    bb.CreateBulletAttack<SquareBulletScript>(fireAnim: "throw_left", cooldown: 5f, attackCooldown: 1.15f);
+    // bb.CreateBulletAttack<ChainBulletScript>(fireAnim: "throw_right", cooldown: 5f, attackCooldown: 1.15f);
     // Add a bunch of simultaenous bullet attacks
     // bb.CreateSimultaneousAttack(new(){
     //   bb.CreateBulletAttack<RichochetScript> (add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
@@ -149,10 +150,37 @@ public class SecretBoss : AIActor
       // this.aiActor.knockbackDoer.SetImmobile(true, "laugh");
     }
 
+    /* Need to make sure of five things
+        - shoot point is centered
+        - collision box is centered
+        - sprite is centered
+        - sprite is properly flipped
+        - sprite animation is not glitched out
+    */
     private void Update()
     {
-      base.sprite.FlipX = (GameManager.Instance.BestActivePlayer.CenterPosition.x < base.transform.position.x);
-      base.sprite.PlaceAtPositionByAnchor(base.sprite.specRigidbody.UnitBottomCenter, tk2dBaseSprite.Anchor.LowerCenter);
+      bool lastFlip = base.sprite.FlipX;
+      bool shouldFlip = (GameManager.Instance.BestActivePlayer.sprite.WorldBottomCenter.x < base.transform.position.x);
+      base.sprite.FlipX = shouldFlip;
+      // base.specRigidbody.transform.localScale = new Vector3(shouldFlip ? -1f : 1f, 1f, 1f);
+      // if (base.sprite.FlipX == lastFlip)
+      //   return;
+      base.sprite.transform.localPosition = base.specRigidbody.UnitBottomCenter;
+      if (base.sprite.FlipX)
+          base.sprite.transform.localPosition += new Vector3(base.sprite.GetUntrimmedBounds().size.x / 2, 0f, 0f);
+      else
+          base.sprite.transform.localPosition -= new Vector3(base.sprite.GetUntrimmedBounds().size.x / 2, 0f, 0f);
+      // base.specRigidbody.transform.position = base.sprite.transform.localPosition;
+      // else
+      //     base.sprite.transform.localPosition = Vector3.zero;
+      // base.sprite.PlaceAtPositionByAnchor(base.sprite.specRigidbody.UnitBottomCenter, tk2dBaseSprite.Anchor.LowerCenter);
+      // base.transform.position = base.sprite.specRigidbody.UnitBottomCenter;
+      // base.transform.position = base.transform.position - (base.specRigidbody.UnitBottomCenter - base.transform.position.XY()).ToVector3ZUp();
+
+    //       gameObject.GetComponent<tk2dSprite>().PlaceAtPositionByAnchor(base.specRigidbody.UnitBottomCenter, tk2dBaseSprite.Anchor.LowerCenter);
+    // Vector2 vector = base.specRigidbody.UnitBottomCenter - base.transform.position.XY();
+    // base.transform.position = targetPosition - vector.ToVector3ZUp();
+    // base.specRigidbody.Reinitialize();
     }
   }
 
