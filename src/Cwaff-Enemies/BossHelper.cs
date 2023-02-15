@@ -73,6 +73,8 @@ namespace CwaffingTheGungy
       GameObject shootpoint = new GameObject("attach");
         shootpoint.transform.parent = bb.enemyBehavior.specRigidbody.transform;
         shootpoint.transform.position = bb.enemyBehavior.specRigidbody.UnitCenter;
+        shootpoint.transform.localPosition = bb.enemyBehavior.specRigidbody.UnitCenter;
+        shootpoint.transform.localScale = new Vector3(-1f, 1f, 1f);
       bb.defaultGunAttachPoint = bb.enemyBehavior.transform.Find("attach").gameObject;
 
       // Set up a default shadow so teleportation doesn't throw exceptions

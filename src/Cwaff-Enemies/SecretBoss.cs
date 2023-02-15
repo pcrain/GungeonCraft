@@ -139,11 +139,13 @@ public class SecretBoss : AIActor
     {
       base.aiActor.healthHaver.OnPreDeath += (obj) =>
       {
+        FlipSpriteIfNecessary(forceUnflip: true);
         AkSoundEngine.PostEvent("megalo_stop", base.aiActor.gameObject);
         AkSoundEngine.PostEvent("Play_ENM_beholster_death_01", base.aiActor.gameObject);
       };
       base.healthHaver.healthHaver.OnDeath += (obj) =>
       {
+        FlipSpriteIfNecessary(forceUnflip: true);
         Chest chest2 = GameManager.Instance.RewardManager.SpawnTotallyRandomChest(GameManager.Instance.PrimaryPlayer.CurrentRoom.GetRandomVisibleClearSpot(1, 1));
         chest2.IsLocked = false;
       };
@@ -159,28 +161,22 @@ public class SecretBoss : AIActor
     */
     private void Update()
     {
+      FlipSpriteIfNecessary();
+    }
+
+    private void FlipSpriteIfNecessary(bool forceUnflip = false)
+    {
       bool lastFlip = base.sprite.FlipX;
-      bool shouldFlip = (GameManager.Instance.BestActivePlayer.sprite.WorldBottomCenter.x < base.transform.position.x);
-      base.sprite.FlipX = shouldFlip;
+      bool shouldFlip = (GameManager.Instance.BestActivePlayer.sprite.WorldBottomCenter.x < base.sprite.WorldBottomCenter.x);
+      base.sprite.FlipX = shouldFlip && (!forceUnflip);
       // base.specRigidbody.transform.localScale = new Vector3(shouldFlip ? -1f : 1f, 1f, 1f);
       // if (base.sprite.FlipX == lastFlip)
       //   return;
-      base.sprite.transform.localPosition = base.specRigidbody.UnitCenter.RoundToInt();
+      base.sprite.transform.localPosition = base.specRigidbody.UnitBottomCenter.RoundToInt();
       if (base.sprite.FlipX)
           base.sprite.transform.localPosition += new Vector3(base.sprite.GetUntrimmedBounds().size.x / 2, 0f, 0f);
       else
           base.sprite.transform.localPosition -= new Vector3(base.sprite.GetUntrimmedBounds().size.x / 2, 0f, 0f);
-      // base.specRigidbody.transform.position = base.sprite.transform.localPosition;
-      // else
-      //     base.sprite.transform.localPosition = Vector3.zero;
-      // base.sprite.PlaceAtPositionByAnchor(base.sprite.specRigidbody.UnitBottomCenter, tk2dBaseSprite.Anchor.LowerCenter);
-      // base.transform.position = base.sprite.specRigidbody.UnitBottomCenter;
-      // base.transform.position = base.transform.position - (base.specRigidbody.UnitBottomCenter - base.transform.position.XY()).ToVector3ZUp();
-
-    //       gameObject.GetComponent<tk2dSprite>().PlaceAtPositionByAnchor(base.specRigidbody.UnitBottomCenter, tk2dBaseSprite.Anchor.LowerCenter);
-    // Vector2 vector = base.specRigidbody.UnitBottomCenter - base.transform.position.XY();
-    // base.transform.position = targetPosition - vector.ToVector3ZUp();
-    // base.specRigidbody.Reinitialize();
     }
   }
 
@@ -339,7 +335,7 @@ public class SecretBoss : AIActor
         for (int j = 0; j < COUNTPERSIDE; ++j)
         {
           float launchAngle = sideAngle + SPREADSPAN * ((1f+j) / (1f+COUNTPERSIDE) - 0.5f);
-          this.Fire(new Direction(launchAngle.Clamp180(),DirectionType.Absolute), new Speed(SPEED,SpeedType.Absolute), new SquareBullet(GOFRAMES, FINALDELAY));
+          this.Fire(Offset.OverridePosition(this.BulletBank.aiActor.sprite.WorldCenter), new Direction(launchAngle.Clamp180(),DirectionType.Absolute), new Speed(SPEED,SpeedType.Absolute), new SquareBullet(GOFRAMES, FINALDELAY));
           yield return this.Wait(SHOTDELAY);
         }
         yield return this.Wait(SIDEDELAY);
