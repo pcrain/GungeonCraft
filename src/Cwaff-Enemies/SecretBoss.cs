@@ -288,31 +288,38 @@ public class SecretBoss : AIActor
 
     private IEnumerator DoTheThing()
     {
-      Vector2 GRAVITY = new Vector2(0,-2f);
-
       AkSoundEngine.PostEvent("sans_laugh", GameManager.Instance.PrimaryPlayer.gameObject);
       yield return Wait(30);
 
-      Rect roomFullBounds = this.BulletBank.aiActor.GetAbsoluteParentRoom().GetBoundingRect();
-      Rect roomBounds = roomFullBounds.Inset(topInset: 1f, rightInset: 1f, bottomInset: 2f, leftInset: 1f);
-      float bottom = roomBounds.yMin;
-
       PlayerController p = GameManager.Instance.PrimaryPlayer;
+      Rect roomFullBounds = this.BulletBank.aiActor.GetAbsoluteParentRoom().GetBoundingRect();
+      Rect slamBounds = roomFullBounds.Inset(topInset: 2f, rightInset: 2.5f, bottomInset: 2f, leftInset: 1.5f);
+      if (!slamBounds.Contains(p.specRigidbody.Position.GetPixelVector2()))
+        yield break;
+
+      // Vector2 gravity = RandomAngle().ToVector();
+      Vector2 gravity = 1.2f*(p.CenterPosition - this.BulletBank.aiActor.CenterPosition).normalized;
       p.SetInputOverride("comeonandslam");
       p.specRigidbody.Velocity = Vector2.zero;
-      Vector2 fakeVelocity = Vector2.zero;
 
-      for (int frames = 0; ((Vector2)p.specRigidbody.transform.position + fakeVelocity + GRAVITY).y > bottom; ++frames)
+      Vector2 finalPos = Vector2.zero;
+      for (int frames = 0; frames < 100; ++frames)
       {
-        fakeVelocity += GRAVITY;
-        p.specRigidbody.Position += fakeVelocity;
+        p.specRigidbody.Velocity += gravity;
+        Vector2 newPos = p.specRigidbody.Position.GetPixelVector2() + p.specRigidbody.Velocity;
+        if (BraveMathCollege.LineSegmentRectangleIntersection(p.specRigidbody.Position.GetPixelVector2(), newPos, slamBounds.position, slamBounds.position+slamBounds.size, ref finalPos))
+          break;
+        p.transform.position = newPos;
+        p.specRigidbody.Reinitialize();
         yield return Wait(1);
       }
-      p.specRigidbody.transform.position = p.specRigidbody.transform.position.WithY(bottom);
+      p.specRigidbody.Velocity = Vector2.zero;
+      p.transform.position = finalPos;
       p.specRigidbody.Reinitialize();
       yield return Wait(1);
+
       p.ClearInputOverride("comeonandslam");
-      GameManager.Instance.MainCameraController.DoScreenShake(new ScreenShakeSettings(0.5f,6f,2.0f,0f), null);
+      GameManager.Instance.MainCameraController.DoScreenShake(new ScreenShakeSettings(0.5f,6f,0.5f,0f), null);
       AkSoundEngine.PostEvent("undertale_damage", GameManager.Instance.PrimaryPlayer.gameObject);
     }
   }
