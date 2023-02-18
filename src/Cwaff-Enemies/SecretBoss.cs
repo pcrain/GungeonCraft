@@ -77,7 +77,7 @@ public class SecretBoss : AIActor
     bb.CreateBulletAttack<HesitantBulletWallScript>(fireAnim: "throw_down", cooldown: 1.5f, attackCooldown: 0.15f);
     bb.CreateBulletAttack<SquareBulletScript>(fireAnim: "throw_left", cooldown: 1.5f, attackCooldown: 0.15f);
     bb.CreateBulletAttack<ChainBulletScript>(fireAnim: "throw_right", cooldown: 1.5f, attackCooldown: 0.15f);
-    bb.CreateBulletAttack<WallSlamScript>(fireAnim: "laugh", cooldown: 2.5f, attackCooldown: 0.15f, probability: 3);
+    bb.CreateBulletAttack<WallSlamScript>(fireAnim: "laugh", cooldown: 2.5f, attackCooldown: 0.15f);
     // Add a bunch of simultaenous bullet attacks
     // bb.CreateSimultaneousAttack(new(){
     //   bb.CreateBulletAttack<RichochetScript> (add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
@@ -187,6 +187,7 @@ public class SecretBoss : AIActor
   internal class BossBehavior : BraveBehaviour
   {
     private bool hasFinishedIntro = false;
+    private float yoffset = 0;
 
     private void Start()
     {
@@ -212,14 +213,14 @@ public class SecretBoss : AIActor
 
     private void Update()
     {
-      if (!hasFinishedIntro)
-        return;
       const float JIGGLE = 4.0f;
       const float SPEED = 4.0f;
-      float yoffset = Mathf.CeilToInt(JIGGLE * Mathf.Sin(SPEED*BraveTime.ScaledTimeSinceStartup))/16.0f;
       FlipSpriteIfNecessary();
-      base.sprite.transform.localPosition += new Vector3(0,yoffset,0);
 
+      if (!hasFinishedIntro)
+        return;
+      yoffset = Mathf.CeilToInt(JIGGLE * Mathf.Sin(SPEED*BraveTime.ScaledTimeSinceStartup))/16.0f;
+      base.sprite.transform.localPosition += new Vector3(0,yoffset,0);
       if (UnityEngine.Random.Range(0.0f,1.0f) < 0.5f)
         SpawnDust(base.specRigidbody.UnitCenter);
     }
@@ -314,27 +315,99 @@ public class SecretBoss : AIActor
 
   internal class WallSlamScript : FluidBulletScript
   {
+
+    internal class GravityBullet : SecretBullet
+    {
+      private const int LIFETIME = 30;
+      private const int VANISHTIME = 120;
+      private Vector2 gravity = Vector2.zero;
+      private Vector2 startVelocity = Vector2.zero;
+      private bool skipCollisions = true;
+      public GravityBullet(Vector2 velocity, Vector2 gravity) : base()
+      {
+        this.startVelocity  = velocity;
+        this.gravity        = gravity;
+      }
+
+      public override void Initialize()
+      {
+        base.Initialize();
+        this.skipCollisions = true;
+        this.Projectile.BulletScriptSettings.surviveTileCollisions = true;
+        this.Projectile.specRigidbody.OnPreTileCollision += (_,_,_,_) => {
+          if (this.skipCollisions)
+            PhysicsEngine.SkipCollision = true;
+        };
+      }
+
+      public override IEnumerator Top()
+      {
+        Rect roomFullBounds = this.BulletBank.aiActor.GetAbsoluteParentRoom().GetBoundingRect();
+        AkSoundEngine.PostEvent(soundShoot, GameManager.Instance.PrimaryPlayer.gameObject);
+        Vector2 newVelocity = this.startVelocity;
+        for (int i = 0; i < VANISHTIME; ++i)
+        {
+          if (i >= LIFETIME && this.skipCollisions && roomFullBounds.Contains(this.Position))
+          {
+            this.skipCollisions = false;
+            this.Projectile.BulletScriptSettings.surviveTileCollisions = false;
+          }
+          newVelocity += gravity;
+          this.ChangeDirection(new Direction(newVelocity.ToAngle(),DirectionType.Absolute));
+          this.ChangeSpeed(new Speed(newVelocity.magnitude,SpeedType.Absolute));
+          yield return Wait(1);
+        }
+        Vanish();
+        yield break;
+      }
+    }
+
     protected override List<FluidBulletInfo> BuildChain()
     {
       return Run(DoTheThing())
       .Finish();
     }
 
+    private const int COUNT = 10;
     private IEnumerator DoTheThing()
     {
+      if (this.BulletBank?.aiActor?.TargetRigidbody == null)
+        yield break;
+
+      this.BulletBank.Bullets.Add(boneBullet);
+
       PlayerController p = GameManager.Instance.PrimaryPlayer;
       Rect roomFullBounds = this.BulletBank.aiActor.GetAbsoluteParentRoom().GetBoundingRect();
       Rect slamBounds = roomFullBounds.Inset(topInset: 2f, rightInset: 2.5f, bottomInset: 2f, leftInset: 1.5f);
       if (!slamBounds.Contains(p.specRigidbody.Position.GetPixelVector2()))
         yield break;
 
+      Vector2 gravity  = 1.2f*(p.CenterPosition - this.BulletBank.aiActor.CenterPosition).normalized;
+      Vector2 baseVel  = -20 * gravity;
+      float baseSpeed = baseVel.magnitude;
+      float baseDir   = baseVel.ToAngle();
+      Speed s = new Speed(baseSpeed,SpeedType.Absolute);
+      Offset o = Offset.OverridePosition(this.BulletBank.aiActor.sprite.WorldCenter);
       AkSoundEngine.PostEvent("sans_laugh", GameManager.Instance.PrimaryPlayer.gameObject);
-      yield return Wait(30);
+      for(int i = 0; i < COUNT; ++i)
+      {
+        Vector2 bulletvel = baseVel.Rotate(UnityEngine.Random.Range(-18f,18f));
+        Direction d = new Direction(bulletvel.ToAngle().Clamp180(),DirectionType.Absolute);
+        try
+        {
+          this.Fire(o, d, s, new GravityBullet(bulletvel,gravity));
+        }
+        catch (Exception ex)
+        {
+          ETGModConsole.Log($"{ex}");
+        }
+        yield return Wait(3);
+      }
+
       if (!slamBounds.Contains(p.specRigidbody.Position.GetPixelVector2()))
         yield break;
 
       p.SetInputOverride("comeonandslam");
-      Vector2 gravity          = 1.2f*(p.CenterPosition - this.BulletBank.aiActor.CenterPosition).normalized;
       Vector2 slamStart        = slamBounds.position;
       Vector2 slamEnd          = slamBounds.position + slamBounds.size;
       Vector2 finalPos         = Vector2.zero;
