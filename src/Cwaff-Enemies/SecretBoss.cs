@@ -18,12 +18,12 @@ namespace CwaffingTheGungy
 public class SecretBoss : AIActor
 {
   public  const string guid          = "Secret Boss";
-  private const string bossname      = "Bossyboi";
-  private const string subtitle      = "It's Literally Just a...";
+  private const string bossname      = "Sans Gundertale";
+  private const string subtitle      = "Introducing...";
   // private const string spritePath    = "CwaffingTheGungy/Resources/room_mimic";
   private const string spritePath    = "CwaffingTheGungy/Resources/sans";
   private const string defaultSprite = "sans_idle_1";
-  private const string bossCardPath  = "CwaffingTheGungy/Resources/bossyboi_bosscard.png";
+  private const string bossCardPath  = "CwaffingTheGungy/Resources/sans_bosscard.png";
 
   private const string soundSpawn      = "Play_OBJ_turret_set_01";
   private const string soundSpawnQuiet = "undertale_pullback";
@@ -124,14 +124,44 @@ public class SecretBoss : AIActor
       boneBullet.MuzzleFlashEffects = bonevfx;
   }
 
+  internal class DoomZoneGrowth : MonoBehaviour
+  {
+    public void Lengthen(float targetLength, int numFrames)
+    {
+      this.StartCoroutine(Lengthen_CR(targetLength,numFrames));
+    }
+
+    private IEnumerator Lengthen_CR(float targetLength, int numFrames)
+    {
+      tk2dSlicedSprite quad = this.GetComponent<tk2dSlicedSprite>();
+      float scaleFactor = C.PIXELS_PER_TILE * targetLength / numFrames;
+      for (int i = 1 ; i <= numFrames; ++i)
+      {
+        quad.dimensions = quad.dimensions.WithX(scaleFactor * i);
+        // quad.UpdateIndices();
+        quad.UpdateZDepth();
+        yield return null;
+      }
+      // restore reticle riser settings
+      this.gameObject.GetOrAddComponent<ReticleRiserEffect>().NumRisers = 3;
+    }
+  }
+
   // Creates a napalm-strike=esque danger zone
-  internal static GameObject DoomZone(Vector2 start, Vector2 target, float width, float lifetime = -1f)
+  internal static GameObject DoomZone(Vector2 start, Vector2 target, float width, float lifetime = -1f, int growthTime = 0)
   {
     Vector2 delta                               = target - start;
     float angle                                 = BraveMathCollege.Atan2Degrees(target-start);
     GameObject reticle                          = UnityEngine.Object.Instantiate(napalmReticle);
     tk2dSlicedSprite m_extantReticleQuad        = reticle.GetComponent<tk2dSlicedSprite>();
-      m_extantReticleQuad.dimensions              = C.PIXELS_PER_TILE * (new Vector2(delta.magnitude, width));
+      if (growthTime == 0)
+        m_extantReticleQuad.dimensions              = C.PIXELS_PER_TILE * (new Vector2(delta.magnitude, width));
+      else
+      {
+        UnityEngine.Object.Destroy(reticle.GetComponent<ReticleRiserEffect>());
+        m_extantReticleQuad.dimensions              = C.PIXELS_PER_TILE * (new Vector2(delta.magnitude / growthTime, width));
+        reticle.AddComponent<DoomZoneGrowth>().Lengthen(delta.magnitude,growthTime);
+      }
       m_extantReticleQuad.transform.localRotation = Quaternion.Euler(0f, 0f, angle);
       m_extantReticleQuad.transform.position      = start + (Quaternion.Euler(0f, 0f, -90f) * delta.normalized * (width / 2f)).XY();
     if (lifetime > 0)
@@ -156,6 +186,8 @@ public class SecretBoss : AIActor
 
   internal class BossBehavior : BraveBehaviour
   {
+    private bool hasFinishedIntro = false;
+
     private void Start()
     {
       base.aiActor.healthHaver.OnPreDeath += (obj) =>
@@ -173,15 +205,15 @@ public class SecretBoss : AIActor
       // this.aiActor.knockbackDoer.SetImmobile(true, "laugh");
     }
 
-    /* Need to make sure of five things
-        - shoot point is centered
-        - collision box is centered
-        - sprite is centered
-        - sprite is properly flipped
-        - sprite animation is not glitched out
-    */
+    public void FinishedIntro()
+    {
+      hasFinishedIntro = true;
+    }
+
     private void Update()
     {
+      if (!hasFinishedIntro)
+        return;
       const float JIGGLE = 4.0f;
       const float SPEED = 4.0f;
       float yoffset = Mathf.CeilToInt(JIGGLE * Mathf.Sin(SPEED*BraveTime.ScaledTimeSinceStartup))/16.0f;
@@ -197,9 +229,6 @@ public class SecretBoss : AIActor
       bool lastFlip = base.sprite.FlipX;
       bool shouldFlip = (GameManager.Instance.BestActivePlayer.sprite.WorldBottomCenter.x < base.sprite.WorldBottomCenter.x);
       base.sprite.FlipX = shouldFlip && (!forceUnflip);
-      // base.specRigidbody.transform.localScale = new Vector3(shouldFlip ? -1f : 1f, 1f, 1f);
-      // if (base.sprite.FlipX == lastFlip)
-      //   return;
       base.sprite.transform.localPosition = base.specRigidbody.UnitBottomCenter.RoundToInt();
       if (base.sprite.FlipX)
           base.sprite.transform.localPosition += new Vector3(base.sprite.GetUntrimmedBounds().size.x / 2, 0f, 0f);
@@ -222,6 +251,11 @@ public class SecretBoss : AIActor
       yield return StartCoroutine(BH.WaitForSecondsInvariant(1.8f));
       AkSoundEngine.PostEvent("Play_BOSS_doormimic_lick_01", base.aiActor.gameObject);
       yield break;
+    }
+
+    public override void EndIntro()
+    {
+      base.aiActor.gameObject.GetComponent<BossBehavior>().FinishedIntro();
     }
   }
 
@@ -376,7 +410,7 @@ public class SecretBoss : AIActor
             spawnPoint = roomBounds.RandomPointOnPerimeter();
           spawnPoints.Add(spawnPoint);
           shotAngles.Add((ppos-spawnPoint).ToAngle().Clamp180());
-          DoomZone(spawnPoint, spawnPoints[s].RaycastToWall(shotAngles[s], roomFullBounds), 1f, STREAMDELAY / 60.0f);
+          DoomZone(spawnPoint, spawnPoints[s].RaycastToWall(shotAngles[s], roomFullBounds), 1f, STREAMDELAY / 60.0f, 10);
           AkSoundEngine.PostEvent(soundSpawn, GameManager.Instance.PrimaryPlayer.gameObject);
           yield return Wait(SHOTDELAY);
         }
@@ -511,21 +545,17 @@ public class SecretBoss : AIActor
 
       this.BulletBank.Bullets.Add(boneBullet);
 
-      Vector2 playerpos = GameManager.Instance.PrimaryPlayer.CenterPosition;
-
-      float incidentDirection;
-      Vector2 centerPoint;
+      Vector2 incidentDirection, centerPoint, playerpos = GameManager.Instance.PrimaryPlayer.CenterPosition;
       do
       {
-        incidentDirection = UnityEngine.Random.Range(-180f,180f);
-        centerPoint = playerpos + DISTANCE * incidentDirection.ToVector();
+        incidentDirection = Lazy.RandomAngle().ToVector();
+        centerPoint = playerpos + DISTANCE * incidentDirection;
       } while(IsPointInTile(centerPoint));
-      for (int j = -COUNT/2; j <= COUNT/2; j++)
+      List<Vector2> points = centerPoint.TangentLine(playerpos,WALLWIDTH).SampleUniform(COUNT);
+      Direction towardsPlayerDirection = new Direction((-incidentDirection).ToAngle().Clamp180(),DirectionType.Absolute);
+      foreach (Vector2 spawnPoint in points)
       {
-        float offset = j*SPACING;
-        Vector2 spawnPoint = centerPoint + (offset * (incidentDirection - 90f).Clamp180().ToVector());
-        Bullet b = new HesitantBullet(60);
-        this.Fire(Offset.OverridePosition(spawnPoint), new Direction((incidentDirection+180f).Clamp180(),DirectionType.Absolute), new Speed(SPEED,SpeedType.Absolute), b);
+        this.Fire(Offset.OverridePosition(spawnPoint), towardsPlayerDirection, new Speed(SPEED,SpeedType.Absolute), new HesitantBullet(60));
         yield return this.Wait(5);
       }
       yield break;
@@ -609,12 +639,13 @@ public class SecretBoss : AIActor
       }
     }
 
-    private const float ROTATIONS = 5.0f;
-    private const int COUNT = 37;
+    private const float ROTATIONS    = 5.0f;
+    private const int   COUNT        = 37;
     private const float OUTER_RADIUS = 8f;
     private const float INNER_RADIUS = 1f;
-    private const int SPAWN_GAP = 2;
-    private const float SPIRAL = 1.0f;  // higher spiral factor = bullets form a spiral instead of a circle
+    private const int   SPAWN_GAP    = 2;
+    private const float SPIRAL       = 1.0f;  // higher spiral factor = bullets form a spiral instead of a circle
+    private const float ANGLE_DELTA  = ROTATIONS * 360.0f / COUNT;
 
     protected override List<FluidBulletInfo> BuildChain()
     {
@@ -630,13 +661,12 @@ public class SecretBoss : AIActor
       this.BulletBank.Bullets.Add(boneBullet);
 
       Vector2 playerpos = GameManager.Instance.PrimaryPlayer.CenterPosition;
-      float angleDelta = ROTATIONS * 360.0f / COUNT;
       for (int j = 0; j < COUNT; j++)
       {
         if (j % 2 == 0)
           AkSoundEngine.PostEvent(soundSpawn, GameManager.Instance.PrimaryPlayer.gameObject);
         yield return this.Wait(SPAWN_GAP);
-        float realAngle = (j*angleDelta).Clamp180();
+        float realAngle = (j*ANGLE_DELTA).Clamp180();
         float targetRadius = INNER_RADIUS+(j*SPIRAL/COUNT);
         Bullet b = new OrbitBullet(playerpos, targetRadius, realAngle, 12f, 360f, 60f, SPAWN_GAP*(COUNT-j));
         Vector2 spawnPoint = playerpos + (targetRadius * realAngle.ToVector()) + (OUTER_RADIUS * (realAngle-90f).ToVector());
@@ -650,6 +680,8 @@ public class SecretBoss : AIActor
   internal class CeilingBulletsScript : FluidBulletScript
   {
     private const int COUNT = 16;
+    private const int SPAWN_DELAY = 4;
+    private Rect roomBounds;
 
     protected override List<FluidBulletInfo> BuildChain()
     {
@@ -657,14 +689,20 @@ public class SecretBoss : AIActor
         return new();
       this.BulletBank.Bullets.Add(boneBullet);
 
+      Rect roomFullBounds = this.BulletBank.aiActor.GetAbsoluteParentRoom().GetBoundingRect();
+      this.roomBounds = roomFullBounds.Inset(topInset: 2f, rightInset: 2f, bottomInset: 4f, leftInset: 2f);
 
       return
         Run(Laugh(10))
-        .Then(DoTheThing(15))
-          .And(DoTheThing(30), withDelay: 10)
+          .And(DoTheThing(15, warn: true))
+          .And(DoTheThing(15, warn: true , reverse: true), withDelay: SPAWN_DELAY*COUNT)
+          .And(DoTheThing(30               ),              withDelay: 10)
+          .And(DoTheThing(30, reverse: true),              withDelay: 10 + SPAWN_DELAY*COUNT)
         .Then(Laugh(10))
-          .And(DoTheThing(15))
-          .And(DoTheThing(45), withDelay: 20)
+          .And(DoTheThing(15, warn: true))
+          .And(DoTheThing(15, warn: true, reverse: true),  withDelay: SPAWN_DELAY*COUNT)
+          .And(DoTheThing(45               ),              withDelay: 20)
+          .And(DoTheThing(45, reverse: true),              withDelay: 20 + SPAWN_DELAY*COUNT)
         .Finish();
     }
 
@@ -674,38 +712,25 @@ public class SecretBoss : AIActor
       yield return this.Wait(delay);
     }
 
-    private IEnumerator DoTheThing(float speed)
+    private IEnumerator DoTheThing(float speed, bool reverse = false, bool warn = false)
     {
-      Rect roomFullBounds = this.BulletBank.aiActor.GetAbsoluteParentRoom().GetBoundingRect();
-      Rect roomBounds = roomFullBounds.Inset(topInset: 2f, rightInset: 2f, bottomInset: 4f, leftInset: 2f);
       float offset = roomBounds.width / (float)COUNT;
-      for (int j = 0; j < COUNT; j++)
+      for (float j = (reverse ? 0.5f : 0); j < COUNT; j++)
       {
-        Vector2 topPoint = new Vector2(roomBounds.xMin + j*offset, roomBounds.yMax);
-        DoomZone(topPoint, topPoint.RaycastToWall(-90f, roomFullBounds), 1f, COUNT / 15.0f);
-        if (j % 3 == 0)
+        Vector2 topPoint = new Vector2(roomBounds.xMin + j*offset, reverse ? roomBounds.yMin : roomBounds.yMax);
+        if (warn)
+          DoomZone(topPoint, topPoint.RaycastToWall(reverse ? 90f : -90f, roomBounds), 1f, COUNT / 15.0f, 20);
+        if ((int)j % 2 == 0)
           AkSoundEngine.PostEvent(soundSpawnQuiet, GameManager.Instance.PrimaryPlayer.gameObject);
-        yield return this.Wait(4);
+        yield return this.Wait(SPAWN_DELAY);
       }
-      for (int j = 0; j < COUNT; j++)
+      for (float j = (reverse ? 0.5f : 0); j < COUNT; j++)
       {
-        Vector2 topPoint = new Vector2(roomBounds.xMin + j*offset, roomBounds.yMax);
-        this.Fire(Offset.OverridePosition(topPoint), new Direction(-90f, DirectionType.Absolute), new Speed(speed), new SecretBullet());
-
-        Vector2 bottomPoint = new Vector2(roomBounds.xMin + (j+0.5f)*offset, roomBounds.yMin);
-        DoomZone(bottomPoint, bottomPoint.RaycastToWall(90f, roomFullBounds), 1f, COUNT / 15.0f);
-        if (j % 3 == 0)
-          AkSoundEngine.PostEvent(soundSpawnQuiet, GameManager.Instance.PrimaryPlayer.gameObject);
-        else
+        Vector2 topPoint = new Vector2(roomBounds.xMin + j*offset, reverse ? roomBounds.yMin : roomBounds.yMax);
+        this.Fire(Offset.OverridePosition(topPoint), new Direction(reverse ? 90f : -90f, DirectionType.Absolute), new Speed(speed), new SecretBullet());
+        if ((int)j % 2 == 1)
           AkSoundEngine.PostEvent(soundShoot, GameManager.Instance.PrimaryPlayer.gameObject);
-        yield return this.Wait(4);
-      }
-      for (int j = 0; j < COUNT; j++)
-      {
-        Vector2 bottomPoint = new Vector2(roomBounds.xMin + (j+0.5f)*offset, roomBounds.yMin);
-        this.Fire(Offset.OverridePosition(bottomPoint), new Direction(90f, DirectionType.Absolute), new Speed(speed), new SecretBullet());
-        AkSoundEngine.PostEvent(soundShoot, GameManager.Instance.PrimaryPlayer.gameObject);
-        yield return this.Wait(4);
+        yield return this.Wait(SPAWN_DELAY);
       }
       yield break;
     }

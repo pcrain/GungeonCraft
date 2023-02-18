@@ -55,8 +55,8 @@
     <Compile Include="src\HatsStolenFromNN\Hat.cs"/>
     <Compile Include="src\HatsStolenFromNN\HatDefinitions.cs"/>
     <Compile Include="src\Cwaff-Enemies\BulletScriptHelper.cs"/>
+    <Compile Include="src\Cwaff-Enemies\BuildABoss.cs"/>
     <Compile Include="src\Cwaff-Enemies\TestBoss.cs"/>
-    <Compile Include="src\Cwaff-Enemies\BossHelper.cs"/>
     <Compile Include="src\Cwaff-Enemies\SecretBoss.cs"/>
     <Compile Include="src\Cwaff-Enemies\PathableBullet.cs"/>
     <Compile Include="src\Cwaff-Rooms\FlowHelpers.cs"/>
@@ -381,6 +381,7 @@
     <EmbeddedResource Include="Resources\sans\sans_decloak_1.png"/>
     <EmbeddedResource Include="Resources\sans\sans_throw_left_17.png"/>
     <EmbeddedResource Include="Resources\sans\sans_shrug_3.png"/>
+    <EmbeddedResource Include="Resources\sans_bosscard.png"/>
     <EmbeddedResource Include="Resources\Companions\Wolf\wolf_pet_002.png"/>
     <EmbeddedResource Include="Resources\Companions\Wolf\wolf_pet_001.png"/>
     <EmbeddedResource Include="Resources\Companions\Wolf\wolf_pet_003.png"/>

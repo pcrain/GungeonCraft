@@ -50,8 +50,8 @@ namespace CwaffingTheGungy
   {
     // Get a point on the path between 0 and 1
     public abstract Vector2 At(float t);
-    // Uniformly sample n points on a path
 
+    // Uniformly sample n points on a path
     public List<Vector2> SampleUniform(int numPoints)
     {
       List<Vector2> points = new List<Vector2>();
@@ -171,20 +171,16 @@ namespace CwaffingTheGungy
       { return this.center + this.radius * ((this.startAngle+t*this.angleDelta)*TWOPI).ToVector(); }
   }
 
-  public class PathCircle : PathShape
+  public class PathCircle : PathArc
   {
-    const float TWOPI = 2.0f*Mathf.PI;
-
-    public Vector2 center {get; private set; }
-    public float radius {get; private set; }
-
-    public PathCircle(Vector2 center, float radius)
+    public PathCircle(Vector2 center, float radius) : base(center, radius, 0f, 360f)
+      {}
+    public PathLine TangentLine(float angle, float length)
     {
-      this.center = center;
-      this.radius = radius;
+      Vector2 midpoint = this.center + this.radius * angle.ToVector();
+      Vector2 extension = (angle+90).ToVector();
+      return new PathLine(midpoint-extension,midpoint+extension);
     }
-    public override Vector2 At(float t)
-      { return this.center + this.radius * (t*TWOPI).ToVector(); }
   }
 
   // curve that passes through 4 arbitrary points
@@ -220,7 +216,7 @@ namespace CwaffingTheGungy
     }
   }
 
-  public class PathableBullet
+  public static class PathHelpers
   {
     // a = major axis, b = minor axis, https://www.johndcook.com/blog/2013/05/05/ramanujan-circumference-ellipse/
     // Credit to Ramanujan
@@ -236,6 +232,12 @@ namespace CwaffingTheGungy
       Rect bounds = GameManager.Instance.BestActivePlayer.GetAbsoluteParentRoom().GetBoundingRect();
       Rect roomBounds = bounds.Inset(topInset: 2f, rightInset: 2f, bottomInset: 4f, leftInset: 2f);
       return roomBounds;
+    }
+
+    public static PathLine TangentLine(this Vector2 self, Vector2 other, float length)
+    {
+      Vector2 extension = 0.5f * length * (self-other).normalized.Rotate(90f);
+      return new PathLine(self-extension,self+extension);
     }
   }
 

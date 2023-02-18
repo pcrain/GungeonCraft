@@ -286,6 +286,12 @@ namespace CwaffingTheGungy
         {
             return ((!(Mathf.Abs(vector.x) < 0.1f)) ? (((!(vector.y > 0.1f)) ? "dodge_left" : "dodge_left_bw") + ((!p.UseArmorlessAnim) ? string.Empty : "_armorless")) : (((!(vector.y > 0.1f)) ? "dodge" : "dodge_bw") + ((!p.UseArmorlessAnim) ? string.Empty : "_armorless")));
         }
+
+        // Get a random angle in range [-180,180]
+        public static float RandomAngle()
+        {
+          return UnityEngine.Random.Range(-180f,180f);
+        }
     }
 
     public static class Dissect // reflection helper methods for being a lazy dumdum

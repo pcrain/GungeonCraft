@@ -111,6 +111,12 @@ namespace CwaffingTheGungy
       return (Vector2)(Quaternion.Euler(0f, 0f, self) * Vector2.right);
     }
 
+    // Rotate a Vector2 by specified number of degrees
+    public static Vector2 Rotate(this Vector2 self, float rotation)
+    {
+      return (Vector2)(Quaternion.Euler(0f, 0f, rotation) * self);
+    }
+
     // Clamp a floating point angle in degrees to [-180,180]
     public static float Clamp180(this float self)
     {
