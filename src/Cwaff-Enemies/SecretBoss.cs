@@ -77,7 +77,7 @@ public class SecretBoss : AIActor
     bb.CreateBulletAttack<HesitantBulletWallScript>(fireAnim: "throw_down", cooldown: 1.5f, attackCooldown: 0.15f);
     bb.CreateBulletAttack<SquareBulletScript>(fireAnim: "throw_left", cooldown: 1.5f, attackCooldown: 0.15f);
     bb.CreateBulletAttack<ChainBulletScript>(fireAnim: "throw_right", cooldown: 1.5f, attackCooldown: 0.15f);
-    bb.CreateBulletAttack<WallSlamScript>(fireAnim: "laugh", cooldown: 2.5f, attackCooldown: 0.15f, probability: 50);
+    bb.CreateBulletAttack<WallSlamScript>(fireAnim: "laugh", cooldown: 2.5f, attackCooldown: 0.15f, probability: 3);
     // Add a bunch of simultaenous bullet attacks
     // bb.CreateSimultaneousAttack(new(){
     //   bb.CreateBulletAttack<RichochetScript> (add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
@@ -288,26 +288,29 @@ public class SecretBoss : AIActor
 
     private IEnumerator DoTheThing()
     {
-      AkSoundEngine.PostEvent("sans_laugh", GameManager.Instance.PrimaryPlayer.gameObject);
-      yield return Wait(30);
-
       PlayerController p = GameManager.Instance.PrimaryPlayer;
       Rect roomFullBounds = this.BulletBank.aiActor.GetAbsoluteParentRoom().GetBoundingRect();
       Rect slamBounds = roomFullBounds.Inset(topInset: 2f, rightInset: 2.5f, bottomInset: 2f, leftInset: 1.5f);
       if (!slamBounds.Contains(p.specRigidbody.Position.GetPixelVector2()))
         yield break;
 
-      // Vector2 gravity = RandomAngle().ToVector();
-      Vector2 gravity = 1.2f*(p.CenterPosition - this.BulletBank.aiActor.CenterPosition).normalized;
-      p.SetInputOverride("comeonandslam");
-      p.specRigidbody.Velocity = Vector2.zero;
+      AkSoundEngine.PostEvent("sans_laugh", GameManager.Instance.PrimaryPlayer.gameObject);
+      yield return Wait(30);
+      if (!slamBounds.Contains(p.specRigidbody.Position.GetPixelVector2()))
+        yield break;
 
-      Vector2 finalPos = Vector2.zero;
-      for (int frames = 0; frames < 100; ++frames)
+      p.SetInputOverride("comeonandslam");
+      Vector2 gravity          = 1.2f*(p.CenterPosition - this.BulletBank.aiActor.CenterPosition).normalized;
+      Vector2 slamStart        = slamBounds.position;
+      Vector2 slamEnd          = slamBounds.position + slamBounds.size;
+      Vector2 finalPos         = Vector2.zero;
+      p.specRigidbody.Velocity = Vector2.zero;
+      for (int frames = 0; frames < 120; ++frames) // give up after two seconds
       {
         p.specRigidbody.Velocity += gravity;
-        Vector2 newPos = p.specRigidbody.Position.GetPixelVector2() + p.specRigidbody.Velocity;
-        if (BraveMathCollege.LineSegmentRectangleIntersection(p.specRigidbody.Position.GetPixelVector2(), newPos, slamBounds.position, slamBounds.position+slamBounds.size, ref finalPos))
+        Vector2 oldPos = p.specRigidbody.Position.GetPixelVector2();
+        Vector2 newPos = oldPos + p.specRigidbody.Velocity;
+        if (BraveMathCollege.LineSegmentRectangleIntersection(oldPos, newPos, slamStart, slamEnd, ref finalPos))
           break;
         p.transform.position = newPos;
         p.specRigidbody.Reinitialize();
