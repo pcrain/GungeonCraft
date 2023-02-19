@@ -52,12 +52,12 @@ namespace CwaffingTheGungy
     public abstract Vector2 At(float t);
 
     // Uniformly sample n points on a path
-    public List<Vector2> SampleUniform(int numPoints)
+    public List<Vector2> SampleUniform(int numPoints, float start = 0f, float end = 1f)
     {
       List<Vector2> points = new List<Vector2>();
-      float delta = 1.0f/(numPoints+1);
+      float delta = (end-start)/(numPoints+1);
       for(int i = 1; i <= numPoints; ++i)
-        points.Add(At(i*delta));
+        points.Add(At(start+i*delta));
       return points;
     }
   }
@@ -134,7 +134,7 @@ namespace CwaffingTheGungy
 
     public PathRect(Rect r)
     {
-      this.rect = rect;
+      this.rect = r;
     }
 
     public PathLine Top()

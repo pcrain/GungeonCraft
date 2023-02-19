@@ -38,7 +38,6 @@ public class SecretBoss : AIActor
     // Create our build-a-boss
     BuildABoss bb = BuildABoss.LetsMakeABoss<BossBehavior>(
       bossname, guid, $"{spritePath}/{defaultSprite}", new IntVector2(8, 9), subtitle, bossCardPath);
-      // bossname, guid, $"{spritePath}/{defaultSprite}", new IntVector2(8, 9), subtitle, bossCardPath);
     // Set our stats
     bb.SetStats(health: 100f, weight: 200f, speed: 2f, collisionDamage: 1f,
       hitReactChance: 0.05f, collisionKnockbackStrength: 5f);
@@ -49,16 +48,7 @@ public class SecretBoss : AIActor
       bb.AdjustAnimation("decloak",   fps:   6f, loop: false);
       bb.AdjustAnimation("teleport_in",   fps:   60f, loop: false);
       bb.AdjustAnimation("teleport_out",   fps:   60f, loop: false);
-      // bb.AdjustAnimation("swirl",  fps:   9f, loop: false);
-      // bb.AdjustAnimation("scream", fps: 5.3f, loop: false);
-      // bb.AdjustAnimation("tell",   fps:   8f, loop: false);
-      // bb.AdjustAnimation("suck",   fps:   4f, loop: false);
-      // bb.AdjustAnimation("tell2",  fps:   6f, loop: false);
-      // bb.AdjustAnimation("puke",   fps:   7f, loop: false);
-      // bb.AdjustAnimation("intro",  fps:  11f, loop: false);
-      // bb.AdjustAnimation("die",    fps:   6f, loop: false);
     // Set our default pixel colliders
-    // bb.SetDefaultColliders(101,27,0,10);
     bb.SetDefaultColliders(15,30,24,2);
     // Add custom animation to the generic intro doer, and add a specific intro doer as well
     bb.SetIntroAnimation("decloak");
@@ -69,16 +59,17 @@ public class SecretBoss : AIActor
     // Add some named vfx pools to our bank of VFX
     bb.AddNamedVFX(VFX.vfxpool["Tornado"], "mytornado");
 
-    // Add a random teleportation behavior (moved to constructor)
+    // Add a random teleportation behavior
     bb.CreateTeleportAttack<CustomTeleportBehavior>(
-      goneTime: 0.25f, outAnim: "teleport_out", inAnim: "teleport_in", cooldown: 1f, probability: 200, inScript: typeof(TeleportScript));
-    // Add a basic bullet attack
+      goneTime: 0.25f, outAnim: "teleport_out", inAnim: "teleport_in", cooldown: 1f, inScript: typeof(TeleportScript));
+    // Add some basic bullet attacks
     bb.CreateBulletAttack<CeilingBulletsScript>(fireAnim: "laugh", cooldown: 1.5f, attackCooldown: 0.15f);
     bb.CreateBulletAttack<OrbitBulletScript>(fireAnim: "throw_up", cooldown: 1.5f, attackCooldown: 0.15f);
     bb.CreateBulletAttack<HesitantBulletWallScript>(fireAnim: "throw_down", cooldown: 1.5f, attackCooldown: 0.15f);
     bb.CreateBulletAttack<SquareBulletScript>(fireAnim: "throw_left", cooldown: 1.5f, attackCooldown: 0.15f);
     bb.CreateBulletAttack<ChainBulletScript>(fireAnim: "throw_right", cooldown: 1.5f, attackCooldown: 0.15f);
     bb.CreateBulletAttack<WallSlamScript>(fireAnim: "laugh", cooldown: 2.5f, attackCooldown: 0.15f);
+    bb.CreateBulletAttack<SineWaveScript>(fireAnim: "throw_right", cooldown: 2.5f, attackCooldown: 0.15f, probability: 200);
     // Add a bunch of simultaenous bullet attacks
     // bb.CreateSimultaneousAttack(new(){
     //   bb.CreateBulletAttack<RichochetScript> (add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
@@ -332,6 +323,72 @@ public class SecretBoss : AIActor
       }
   }
 
+  internal class SineWaveScript : FluidBulletScript
+  {
+    internal class SineBullet : SecretBullet
+    {
+      private float amplitude = 1f;
+      private float freq      = 1f;
+      private float phase     = 0f;
+
+      private float lifetime  = 0f;
+
+      public SineBullet(float amplitude, float freq, float phase = 0) : base()
+      {
+        this.amplitude = amplitude;
+        this.freq      = freq;
+        this.phase     = phase;
+      }
+
+      public override IEnumerator Top()
+      {
+        AkSoundEngine.PostEvent(soundShoot, GameManager.Instance.PrimaryPlayer.gameObject);
+
+        Vector2 startSpeed = (this.Speed / C.PIXELS_PER_CELL) * this.Direction.ToVector();
+        float basey = this.Position.y - amplitude * Mathf.Sin(phase);
+        float adjfreq = freq * 2f * Mathf.PI;
+        while (true)
+        {
+          this.lifetime += BraveTime.DeltaTime;
+          Vector2 oldPosition = this.Position;
+          this.Position = this.Position.WithY(basey + amplitude * Mathf.Sin(adjfreq*this.lifetime + phase));
+          this.Position += startSpeed;
+          this.ChangeDirection(new Direction((this.Position-oldPosition).ToAngle(),DirectionType.Absolute));
+          yield return Wait(1);
+        }
+      }
+    }
+
+    protected override List<FluidBulletInfo> BuildChain()
+    {
+      return Run(DoTheThing())
+      .Finish();
+    }
+
+    private const int COUNT = 50;
+    private IEnumerator DoTheThing()
+    {
+      if (this.BulletBank?.aiActor?.TargetRigidbody == null)
+        yield break;
+
+      this.BulletBank.Bullets.Add(boneBullet);
+
+      AkSoundEngine.PostEvent("sans_laugh", GameManager.Instance.PrimaryPlayer.gameObject);
+      Rect roomFullBounds = this.BulletBank.aiActor.GetAbsoluteParentRoom().GetBoundingRect();
+      Rect roomBounds     = roomFullBounds.Inset(topInset: 2f, rightInset: 2f, bottomInset: 4f, leftInset: 2f);
+      PathLine leftEdge   = new PathRect(roomBounds).Left();
+      int i = 0;
+      foreach(Vector2 p in leftEdge.SampleUniform(COUNT,0.1f,0.9f))
+      {
+          this.Fire(Offset.OverridePosition(p), new Direction(0f,DirectionType.Absolute),
+            new Speed(10f,SpeedType.Absolute), new SineBullet(3f,1f,i*0.1f));
+          yield return Wait(5);
+          ++i;
+      }
+    }
+
+  }
+
   internal class WallSlamScript : FluidBulletScript
   {
 
@@ -344,7 +401,6 @@ public class SecretBoss : AIActor
       private bool skipCollisions = true;
       public GravityBullet(Vector2 velocity, Vector2 gravity) : base()
       {
-        this.startVelocity  = velocity;
         this.gravity        = gravity;
       }
 
@@ -363,7 +419,7 @@ public class SecretBoss : AIActor
       {
         Rect roomFullBounds = this.BulletBank.aiActor.GetAbsoluteParentRoom().GetBoundingRect();
         AkSoundEngine.PostEvent(soundShoot, GameManager.Instance.PrimaryPlayer.gameObject);
-        Vector2 newVelocity = this.startVelocity;
+        Vector2 newVelocity = this.Speed * this.Direction.ToVector();
         for (int i = 0; i < VANISHTIME; ++i)
         {
           if (i >= LIFETIME && this.skipCollisions && roomFullBounds.Contains(this.Position))
