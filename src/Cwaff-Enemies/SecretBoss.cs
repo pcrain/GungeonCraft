@@ -69,8 +69,9 @@ public class SecretBoss : AIActor
     // Add some named vfx pools to our bank of VFX
     bb.AddNamedVFX(VFX.vfxpool["Tornado"], "mytornado");
 
-    // Add a random teleportation behavior
-    bb.CreateTeleportAttack<CustomTeleportBehavior>(goneTime: 0.25f, outAnim: "teleport_out", inAnim: "teleport_in", cooldown: 1f, probability: 2, inScript: typeof(TeleportScript));
+    // Add a random teleportation behavior (moved to constructor)
+    bb.CreateTeleportAttack<CustomTeleportBehavior>(
+      goneTime: 0.25f, outAnim: "teleport_out", inAnim: "teleport_in", cooldown: 1f, probability: 200, inScript: typeof(TeleportScript));
     // Add a basic bullet attack
     bb.CreateBulletAttack<CeilingBulletsScript>(fireAnim: "laugh", cooldown: 1.5f, attackCooldown: 0.15f);
     bb.CreateBulletAttack<OrbitBulletScript>(fireAnim: "throw_up", cooldown: 1.5f, attackCooldown: 0.15f);
@@ -243,7 +244,25 @@ public class SecretBoss : AIActor
   {
     public override void PlayerWalkedIn(PlayerController player, List<tk2dSpriteAnimator> animators)
     {
+      SetupRoomSpecificAttacks();
       GameManager.Instance.StartCoroutine(PlaySound());
+    }
+
+    private void SetupRoomSpecificAttacks()
+    {
+      Rect roomFullBounds = base.aiActor.GetAbsoluteParentRoom().GetBoundingRect();
+      Rect roomTrimmedBounds = roomFullBounds.Inset(4f);
+      foreach (AttackBehaviorGroup.AttackGroupItem attack in base.aiActor.gameObject.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors)
+      {
+        if (attack.Behavior is TeleportBehavior)
+        {
+          TeleportBehavior tb = attack.Behavior as TeleportBehavior;
+          tb.ManuallyDefineRoom = true;
+          tb.roomMin = roomTrimmedBounds.min;
+          tb.roomMax = roomTrimmedBounds.max;
+          // ETGModConsole.Log($"FIXED TELEPORTATION");
+        }
+      }
     }
 
     private IEnumerator PlaySound()
@@ -469,6 +488,7 @@ public class SecretBoss : AIActor
       this.BulletBank.Bullets.Add(boneBullet);
 
       Rect roomFullBounds = this.BulletBank.aiActor.GetAbsoluteParentRoom().GetBoundingRect();
+      ETGModConsole.Log($"room size:{roomFullBounds.position},{roomFullBounds.size}");
       Rect roomBounds = roomFullBounds.Inset(topInset: 2f, rightInset: 2f, bottomInset: 4f, leftInset: 2f);
       for (int i = 0; i < PHASES; ++i)
       {

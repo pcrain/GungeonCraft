@@ -247,6 +247,7 @@ namespace CwaffingTheGungy
     /// <param name="inAnim">Named animation to play when teleporting back in. (WARNING: cannot be looped)</param>
     /// <param name="outScript">Bullet scripts to run when initiating teleport. (WARNING: cannot be looped)</param>
     /// <param name="inScript">Bullet scripts to run when finishing teleport.</param>
+    /// <param name="roomBounds">Bounding rectangle for the room (if null, use the default bounding rectangle; can lead to glitches).</param>
     /// <returns>A TeleportBehavior with sane defaults initalized according to the parameters</returns>
     public TeleportBehavior CreateTeleportAttack<T>(
       bool add = true, float cooldown = 0f, float cooldownVariance = 0f, float attackCooldown = 0f, float globalCooldown = 0f,
@@ -256,7 +257,7 @@ namespace CwaffingTheGungy
       float minRange = 0f, float range = 0f, float minWallDist = 0f,
       bool vulnerable = false, bool avoidWalls = false, bool stayOnScreen = false, float minDist = 0f, float maxDist = 0f,
       float goneTime = 1f, bool onlyIfUnreachable = false,  string outAnim = null, string inAnim = null,
-      Type outScript = null, Type inScript = null
+      Type outScript = null, Type inScript = null, Rect? roomBounds = null, GameObject who = null
       )
       where T : TeleportBehavior, new()
     {
@@ -289,7 +290,9 @@ namespace CwaffingTheGungy
           targetAreaStyle                 = null,
 
           AllowCrossRoomTeleportation     = false,
-          ManuallyDefineRoom              = false,
+          ManuallyDefineRoom              = roomBounds.HasValue,
+          roomMin                         = roomBounds.HasValue ? roomBounds.Value.min : Vector2.zero,
+          roomMax                         = roomBounds.HasValue ? roomBounds.Value.max : Vector2.zero,
           MaxEnemiesInRoom                = 0,
           AttackableDuringAnimation       = vulnerable,
           AvoidWalls                      = avoidWalls,
@@ -311,7 +314,8 @@ namespace CwaffingTheGungy
           NickName = typeof(T).AssemblyQualifiedName,
           Behavior = blipblip
         };
-        this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors.Add(theAttack);
+        who ??= this.prefab;
+        who.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors.Add(theAttack);
         // this.prefab.GetComponent<BehaviorSpeculator>().AttackBehaviors.Add(blipblip); // TODO: could also just do this
       }
       return blipblip;
