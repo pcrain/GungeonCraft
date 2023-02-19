@@ -362,11 +362,14 @@ public class SecretBoss : AIActor
     protected override List<FluidBulletInfo> BuildChain()
     {
       return Run(DoTheThing())
+        .And(DoTheThing(reverse: true))
+        .And(DoTheThing(inverse: true))
+        .And(DoTheThing(reverse: true, inverse: true))
       .Finish();
     }
 
     private const int COUNT = 50;
-    private IEnumerator DoTheThing()
+    private IEnumerator DoTheThing(bool reverse = false, bool inverse = false)
     {
       if (this.BulletBank?.aiActor?.TargetRigidbody == null)
         yield break;
@@ -376,12 +379,12 @@ public class SecretBoss : AIActor
       AkSoundEngine.PostEvent("sans_laugh", GameManager.Instance.PrimaryPlayer.gameObject);
       Rect roomFullBounds = this.BulletBank.aiActor.GetAbsoluteParentRoom().GetBoundingRect();
       Rect roomBounds     = roomFullBounds.Inset(topInset: 2f, rightInset: 2f, bottomInset: 4f, leftInset: 2f);
-      PathLine leftEdge   = new PathRect(roomBounds).Left();
+      PathLine theEdge    = inverse ? (new PathRect(roomBounds).Right()) : (new PathRect(roomBounds).Left());
       int i = 0;
-      foreach(Vector2 p in leftEdge.SampleUniform(COUNT,0.1f,0.9f))
+      foreach(Vector2 p in theEdge.SampleUniform(COUNT,reverse ? 0.9f : 0.1f,reverse ? 0.1f : 0.9f))
       {
-          this.Fire(Offset.OverridePosition(p), new Direction(0f,DirectionType.Absolute),
-            new Speed(10f,SpeedType.Absolute), new SineBullet(3f,1f,i*0.1f));
+          this.Fire(Offset.OverridePosition(p), new Direction(inverse ? 180f : 0f,DirectionType.Absolute),
+            new Speed(10f,SpeedType.Absolute), new SineBullet(3f,reverse ? -1f : 1f, (reverse ? -i : i) * 0.1f));
           yield return Wait(5);
           ++i;
       }
