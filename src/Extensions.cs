@@ -63,21 +63,21 @@ namespace CwaffingTheGungy
     public static Vector2 RandomPointOnPerimeter(this Rect self)
       { return self.PointOnPerimeter(UnityEngine.Random.Range(0.0f,1.0f)); }
 
-    // Get a given point on the perimeter of a rectangle scales from 0 to 1
+    // Get a given point on the perimeter of a rectangle scales from 0 to 1 (counterclockwise from bottom-left)
     public static Vector2 PointOnPerimeter(this Rect self, float t)
     {
       // ETGModConsole.Log($"bounds are {self.xMin},{self.yMin} to {self.xMax},{self.yMax}");
       float half  = self.width + self.height;
-      float point = UnityEngine.Random.Range(0.0f,t*2.0f*half);
+      float point = t*2.0f*half;
       Vector2 retPoint;
       if (point < self.width) // bottom edge
         retPoint = new Vector2(self.xMin + point, self.yMin);
-      else if (point < half) // left edge
-        retPoint = new Vector2(self.xMin, self.yMin + point-self.width);
+      else if (point < half) // right edge
+        retPoint = new Vector2(self.xMax, self.yMin + point-self.width);
       else if (point-half < self.width) // top edge
-        retPoint = new Vector2(self.xMin + point-half, self.yMin + self.height);
+        retPoint = new Vector2(self.xMax - (point-half), self.yMax);
       else
-        retPoint = new Vector2(self.xMin + self.width, self.yMin + point-half-self.width); // right edge
+        retPoint = new Vector2(self.xMin, self.yMax - (point-half-self.width)); // left edge
       // ETGModConsole.Log($"  chose point {retPoint.x},{retPoint.y}");
       return retPoint;
     }

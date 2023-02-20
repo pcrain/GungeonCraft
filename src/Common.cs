@@ -292,6 +292,12 @@ namespace CwaffingTheGungy
         {
           return UnityEngine.Random.Range(-180f,180f);
         }
+
+        // Get a random boolean
+        public static bool CoinFlip()
+        {
+          return UnityEngine.Random.Range(0,2) == 1;
+        }
     }
 
     public static class Dissect // reflection helper methods for being a lazy dumdum

@@ -307,13 +307,15 @@ public class SecretBoss : AIActor
 
   internal class SecretBullet : Bullet
   {
-      public SecretBullet() : base("getboned")
+      private Color? tint = null;
+      public SecretBullet(Color? tint = null) : base("getboned")
       {
+        this.tint = tint;
       }
 
       public override void Initialize()
       {
-        this.Projectile.ChangeTintColorShader(0f,new Color(1.0f,0.5f,0.5f,0.5f));
+        this.Projectile.ChangeTintColorShader(0f,tint ?? new Color(1.0f,0.5f,0.5f,0.5f));
         base.Initialize();
         // EasyTrailBullet trail4 = this.Projectile.gameObject.AddComponent<EasyTrailBullet>();
         //   trail4.StartWidth = 0.2f;
@@ -328,12 +330,15 @@ public class SecretBoss : AIActor
   {
     private static readonly string orangeReticle = "reticle-orange";
     private static readonly string blueReticle = "reticle-blue";
+    // private static readonly Color orange = new Color(1.0f,0.5f,0.5f,0.5f)
+    private static readonly Color orangeColor = new Color(1.0f,0.75f,0f,0.5f);
+    private static readonly Color blueColor   = new Color(0.0f,0.0f,1.0f,0.5f);
 
     // orange = harmless if you're moving; blue = harmless if you're stationary
     internal class OrangeAndBlueBullet : SecretBullet
     {
       private bool orange;
-      public OrangeAndBlueBullet(bool orange) : base()
+      public OrangeAndBlueBullet(bool orange) : base(orange ? orangeColor : blueColor)
       {
         this.orange = orange;
       }
@@ -357,12 +362,18 @@ public class SecretBoss : AIActor
     protected override List<FluidBulletInfo> BuildChain()
     {
       return
-      Run(DoTheThing(false))
-        .Then(DoTheThing(true))
+      Run(DoTheThing(Lazy.CoinFlip()))
+        .Then(DoTheThing(Lazy.CoinFlip()))
+        .Then(DoTheThing(Lazy.CoinFlip()))
       .Finish();
     }
 
-    private const int COUNT = 20;
+    private const int COUNT      = 32;
+    private const int WAVES      = 5;
+    private const int BATCH      = 8;
+    private const float SPEED    = 30f;
+    private const float LENIENCE = 35f;
+    private const float COOLDOWN = 25f;
     private IEnumerator DoTheThing(bool orange)
     {
       if (this.BulletBank?.aiActor?.TargetRigidbody == null)
@@ -371,26 +382,33 @@ public class SecretBoss : AIActor
       this.BulletBank.Bullets.Add(boneBullet);
 
       Vector2 ppos = GameManager.Instance.PrimaryPlayer.CenterPosition;
-      DoomZone(ppos - 1*Vector2.right, ppos + 1*Vector2.right, 2f, 0.5f, 0, orange ? orangeReticle : blueReticle);
-      DoomZone(ppos - 2*Vector2.right, ppos + 2*Vector2.right, 4f, 0.5f, 0, orange ? orangeReticle : blueReticle);
+      DoomZone(ppos - 0.5f*Vector2.right, ppos + 0.5f*Vector2.right, 1f, 0.5f, 0, orange ? orangeReticle : blueReticle);
+      DoomZone(ppos - 1.0f*Vector2.right, ppos + 1.0f*Vector2.right, 2f, 0.5f, 0, orange ? orangeReticle : blueReticle);
+      DoomZone(ppos - 1.5f*Vector2.right, ppos + 1.5f*Vector2.right, 3f, 0.5f, 0, orange ? orangeReticle : blueReticle);
+      DoomZone(ppos - 2.0f*Vector2.right, ppos + 2.0f*Vector2.right, 4f, 0.5f, 0, orange ? orangeReticle : blueReticle);
       AkSoundEngine.PostEvent("undertale_eyeflash", GameManager.Instance.PrimaryPlayer.gameObject);
       Rect roomFullBounds = this.BulletBank.aiActor.GetAbsoluteParentRoom().GetBoundingRect();
       Rect roomBounds     = roomFullBounds.Inset(topInset: 2f, rightInset: 2f, bottomInset: 4f, leftInset: 2f);
-      PathLine theEdge    = new PathRect(roomBounds).Left();
-      List<Vector2> points = theEdge.SampleUniform(COUNT,0.1f,0.9f);
-      yield return Wait(30);
-      for(int phase = 0; phase < 12; ++phase)
+      PathRect roomPath   = new PathRect(roomBounds);
+      List<Vector2> points = roomPath.SampleUniform(COUNT,0.0f,1.0f);
+      yield return Wait(LENIENCE);
+      for(int wave = 0; wave < WAVES; ++wave)
       {
-        int i = 0;
+        ppos = GameManager.Instance.PrimaryPlayer.CenterPosition;
         AkSoundEngine.PostEvent(soundShoot, GameManager.Instance.PrimaryPlayer.gameObject);
+        int batch = 0;
         foreach(Vector2 p in points)
         {
-            this.Fire(Offset.OverridePosition(p), new Direction(0f,DirectionType.Absolute), new Speed(20f,SpeedType.Absolute), new OrangeAndBlueBullet(orange:orange));
-            ++i;
+          Vector2 wiggle = 3f * Lazy.RandomAngle().ToVector();
+          this.Fire(Offset.OverridePosition(p), new Direction(((ppos+wiggle)-p).ToAngle(),DirectionType.Absolute), new Speed(SPEED,SpeedType.Absolute), new OrangeAndBlueBullet(orange:orange));
+          if (++batch == BATCH)
+          {
+            batch = 0;
+            yield return Wait(1);
+          }
         }
-        yield return Wait(4);
       }
-      yield return Wait(30);
+      yield return Wait(COOLDOWN);
     }
   }
 
