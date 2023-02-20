@@ -182,6 +182,20 @@ public class SecretBoss : AIActor
   {
     private bool hasFinishedIntro = false;
     private float yoffset = 0;
+    private bool auraActive = false;
+    private HeatIndicatorController aura;
+
+    // from basegame AuroOnReloadModifier
+    private void ActivateAura()
+    {
+      if (auraActive)
+        return;
+      auraActive = true;
+      aura = ((GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global VFX/HeatIndicator"), base.aiActor.CenterPosition.ToVector3ZisY(), Quaternion.identity, base.aiActor.sprite.transform)).GetComponent<HeatIndicatorController>();
+        aura.CurrentColor = new Color(1f, 1f, 1f);
+        aura.IsFire = true;
+        aura.CurrentRadius = 2f;
+    }
 
     private void Start()
     {
@@ -203,6 +217,7 @@ public class SecretBoss : AIActor
     public void FinishedIntro()
     {
       hasFinishedIntro = true;
+      ActivateAura();
     }
 
     private void Update()
@@ -224,11 +239,15 @@ public class SecretBoss : AIActor
       bool lastFlip = base.sprite.FlipX;
       bool shouldFlip = (GameManager.Instance.BestActivePlayer.sprite.WorldBottomCenter.x < base.sprite.WorldBottomCenter.x);
       base.sprite.FlipX = shouldFlip && (!forceUnflip);
-      base.sprite.transform.localPosition = base.specRigidbody.UnitBottomCenter.RoundToInt();
-      if (base.sprite.FlipX)
-          base.sprite.transform.localPosition += new Vector3(base.sprite.GetUntrimmedBounds().size.x / 2, 0f, 0f);
-      else
-          base.sprite.transform.localPosition -= new Vector3(base.sprite.GetUntrimmedBounds().size.x / 2, 0f, 0f);
+      Vector3 spriteSize = base.sprite.GetUntrimmedBounds().size;
+      Vector3 offset = new Vector3(spriteSize.x / 2, 0f, 0f);
+      if (!base.sprite.FlipX)
+        offset *= -1;
+
+      Vector3 finalPosition = (Vector3)base.specRigidbody.UnitBottomCenter.RoundToInt() + offset;
+      base.sprite.transform.localPosition = finalPosition;
+      if (auraActive)
+        aura.transform.localPosition = new Vector3(0,spriteSize.y / 2,0) - offset;
     }
   }
 
