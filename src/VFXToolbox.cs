@@ -60,6 +60,8 @@ namespace CwaffingTheGungy
             RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/PumpChargeMeter5");
 
             RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/reticle-white");
+            RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/reticle-orange");
+            RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/reticle-blue");
 
             RegisterVFX<GameObject>("PumpChargeAnimated", new List<string>() {
                     "CwaffingTheGungy/Resources/MiscVFX/PumpChargeMeter1",

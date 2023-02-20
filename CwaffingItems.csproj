@@ -184,6 +184,7 @@
     <Compile Include="src\VFXToolbox.cs"/>
     <Compile Include="src\Main.cs"/>
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter3.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\reticle-blue.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter5.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\shine.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter4.png"/>
@@ -225,6 +226,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\Numbers\4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\Numbers\0.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\shine2.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\reticle-orange.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\friendlyoverhead_vfx_003.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\friendlyoverhead_vfx_001.png"/>

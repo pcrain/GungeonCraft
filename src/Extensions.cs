@@ -134,5 +134,11 @@ namespace CwaffingTheGungy
     {
       return (GameManager.Instance.GetPlayerClosestToPoint(self.Position).CenterPosition - self.Position).ToAngle();
     }
+
+    // Get a bullet's current velocity (because Velocity doesn't work)
+    public static Vector2 RealVelocity(this Bullet self)
+    {
+      return (self.Speed / C.PIXELS_PER_CELL) * self.Direction.ToVector();
+    }
   }
 }

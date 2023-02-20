@@ -24,6 +24,8 @@ using MonoMod.RuntimeDetour;
   - Ellipse Point Sampling: https://math.stackexchange.com/questions/172766/calculating-equidistant-points-around-an-ellipse-arc
   - Rose Curves: https://en.wikipedia.org/wiki/Rose_(mathematics)
   - Spline Interpolation in C#: https://swharden.com/blog/2022-01-22-spline-interpolation/
+  - Pendulum Physics: https://www.cfm.brown.edu/people/dobrush/am34/Mathematica/ch3/dpendulum.html
+  - Lissajous Curves: https://en.wikipedia.org/wiki/Lissajous_curve
 */
 /* Positioning Options
   - TangentToPlayerRelativeToCurrentVelocity()
