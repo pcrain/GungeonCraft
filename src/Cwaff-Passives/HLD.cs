@@ -123,7 +123,7 @@ namespace CwaffingTheGungy
 
             Vector2 vel = dashspeed * this.owner.m_lastNonzeroCommandedDirection.normalized;
 
-            AkSoundEngine.PostEvent("teledash", this.owner.gameObject);
+            AkSoundEngine.PostEvent("teledasher", this.owner.gameObject);
             this.owner.SetInputOverride("hld");
             this.owner.SetIsFlying(true, "hld");
 

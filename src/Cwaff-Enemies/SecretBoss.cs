@@ -70,7 +70,7 @@ public class SecretBoss : AIActor
     bb.CreateBulletAttack<ChainBulletScript>(fireAnim: "throw_right", cooldown: 1.5f, attackCooldown: 0.15f);
     bb.CreateBulletAttack<WallSlamScript>(fireAnim: "laugh", cooldown: 2.5f, attackCooldown: 0.15f);
     bb.CreateBulletAttack<SineWaveScript>(fireAnim: "throw_right", cooldown: 2.5f, attackCooldown: 0.15f);
-    bb.CreateBulletAttack<OrangeAndBlueScript>(fireAnim: "throw_right", cooldown: 2.5f, attackCooldown: 0.15f, probability: 200f);
+    bb.CreateBulletAttack<OrangeAndBlueScript>(fireAnim: "throw_right", cooldown: 2.5f, attackCooldown: 0.15f);
     // Add a bunch of simultaenous bullet attacks
     // bb.CreateSimultaneousAttack(new(){
     //   bb.CreateBulletAttack<RichochetScript> (add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
@@ -284,7 +284,7 @@ public class SecretBoss : AIActor
       {
         if (!playedOutSound)
         {
-          AkSoundEngine.PostEvent("teledash", GameManager.Instance.PrimaryPlayer.gameObject);
+          AkSoundEngine.PostEvent("teledasher", GameManager.Instance.PrimaryPlayer.gameObject);
           oldPos = base.m_aiActor.Position;
         }
         playedOutSound = true;
@@ -293,7 +293,7 @@ public class SecretBoss : AIActor
       {
         if (!playedInSound)
         {
-          AkSoundEngine.PostEvent("teledash", GameManager.Instance.PrimaryPlayer.gameObject);
+          AkSoundEngine.PostEvent("teledasher", GameManager.Instance.PrimaryPlayer.gameObject);
           newPos = base.m_aiActor.Position;
           Vector3 delta = (newPos-oldPos);
           for(int i = 0; i < 10; ++i)
@@ -450,6 +450,7 @@ public class SecretBoss : AIActor
 
     protected override List<FluidBulletInfo> BuildChain()
     {
+      AkSoundEngine.PostEvent("sans_laugh", GameManager.Instance.PrimaryPlayer.gameObject);
       return
       Run(DoTheThing())
         .And(DoTheThing(reverse: true))
@@ -466,7 +467,6 @@ public class SecretBoss : AIActor
 
       this.BulletBank.Bullets.Add(boneBullet);
 
-      AkSoundEngine.PostEvent("sans_laugh", GameManager.Instance.PrimaryPlayer.gameObject);
       Rect roomFullBounds = this.BulletBank.aiActor.GetAbsoluteParentRoom().GetBoundingRect();
       Rect roomBounds     = roomFullBounds.Inset(topInset: 2f, rightInset: 2f, bottomInset: 4f, leftInset: 2f);
       PathLine theEdge    = inverse ? (new PathRect(roomBounds).Right()) : (new PathRect(roomBounds).Left());
@@ -690,13 +690,13 @@ public class SecretBoss : AIActor
       }
     }
 
-    private const int SIDES        = 4;
+    private const int SIDES        = 5;
     private const int COUNTPERSIDE = 3;
     private const float SPREAD     = 0.5f; // percent of each side filled with bullets
     private const float SPEED      = 25f;
     private const int GOFRAMES     = 15;
-    private const int SHOTDELAY    = 5;
-    private const int SIDEDELAY    = 10;
+    private const int SHOTDELAY    = 4;
+    private const int SIDEDELAY    = 8;
 
     private const float SIDESPAN   = 360.0f / SIDES;
     private const float SPREADSPAN = SPREAD * SIDESPAN;
@@ -763,6 +763,8 @@ public class SecretBoss : AIActor
     }
 
     private const int COUNT       = 10;
+    private const int WAIT        = 60;
+    private const int SPAWN_DELAY = 5;
     private const float WALLWIDTH = 10f;
     private const float DISTANCE  = 7f;
     private const float SPEED     = 10f;
@@ -792,8 +794,8 @@ public class SecretBoss : AIActor
       Direction towardsPlayerDirection = new Direction((-incidentDirection).ToAngle().Clamp180(),DirectionType.Absolute);
       foreach (Vector2 spawnPoint in points)
       {
-        this.Fire(Offset.OverridePosition(spawnPoint), towardsPlayerDirection, new Speed(SPEED,SpeedType.Absolute), new HesitantBullet(60));
-        yield return this.Wait(5);
+        this.Fire(Offset.OverridePosition(spawnPoint), towardsPlayerDirection, new Speed(SPEED,SpeedType.Absolute), new HesitantBullet(WAIT));
+        yield return this.Wait(SPAWN_DELAY);
       }
       yield break;
     }
@@ -814,6 +816,9 @@ public class SecretBoss : AIActor
 
       private Vector2 initialTarget;
       private Vector2 delta;
+
+      private const float SPEED = 60f;
+      private const int DELAY = 60;
 
       public OrbitBullet(Vector2 center, float radius, float captureAngle, float framesToApproach, float degreesToOrbit, float framesToOrbit, int delay)
         : base()
@@ -843,7 +848,7 @@ public class SecretBoss : AIActor
       public override IEnumerator Top()
       {
         yield return Wait(this.delay);
-        ChangeSpeed(new Speed(60.0f * delta.magnitude / (framesToApproach+1), SpeedType.Absolute));
+        ChangeSpeed(new Speed(SPEED * delta.magnitude / (framesToApproach+1), SpeedType.Absolute));
         // IEnumerator[] scripts = {OrbitAndScatter(),OrbitAndScatter()};
         IEnumerator[] scripts = {OrbitAndScatter()};
         foreach(IEnumerator e in scripts)
@@ -872,17 +877,19 @@ public class SecretBoss : AIActor
         AkSoundEngine.PostEvent(soundShoot, GameManager.Instance.PrimaryPlayer.gameObject);
         ChangeSpeed(new Speed(oldSpeed,SpeedType.Absolute));
         // ChangeDirection(new Direction(curAngle,DirectionType.Absolute));
-        yield return Wait(60);
+        yield return Wait(DELAY);
       }
     }
 
-    private const float ROTATIONS    = 5.0f;
-    private const int   COUNT        = 37;
-    private const float OUTER_RADIUS = 8f;
-    private const float INNER_RADIUS = 1f;
-    private const int   SPAWN_GAP    = 2;
-    private const float SPIRAL       = 1.0f;  // higher spiral factor = bullets form a spiral instead of a circle
-    private const float ANGLE_DELTA  = ROTATIONS * 360.0f / COUNT;
+    private const float ROTATIONS       = 5.0f;
+    private const int   COUNT           = 37;
+    private const float OUTER_RADIUS    = 8f;
+    private const float INNER_RADIUS    = 1f;
+    private const int   SPAWN_GAP       = 2;
+    private const float SPIRAL          = 1.0f;  // higher spiral factor = bullets form a spiral instead of a circle
+    private const float ANGLE_DELTA     = ROTATIONS * 360.0f / COUNT;
+    private const float APPROACH_FRAMES = 12f;
+    private const float ORBIT_FRAMES    = 60f;
 
     protected override List<FluidBulletInfo> BuildChain()
     {
@@ -905,7 +912,7 @@ public class SecretBoss : AIActor
         yield return this.Wait(SPAWN_GAP);
         float realAngle = (j*ANGLE_DELTA).Clamp180();
         float targetRadius = INNER_RADIUS+(j*SPIRAL/COUNT);
-        Bullet b = new OrbitBullet(playerpos, targetRadius, realAngle, 12f, 360f, 60f, SPAWN_GAP*(COUNT-j));
+        Bullet b = new OrbitBullet(playerpos, targetRadius, realAngle, APPROACH_FRAMES, 360f, ORBIT_FRAMES, SPAWN_GAP*(COUNT-j));
         Vector2 spawnPoint = playerpos + (targetRadius * realAngle.ToVector()) + (OUTER_RADIUS * (realAngle-90f).ToVector());
         this.Fire(Offset.OverridePosition(spawnPoint), b);
       }
