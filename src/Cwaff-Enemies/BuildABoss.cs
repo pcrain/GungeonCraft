@@ -880,7 +880,7 @@ namespace CwaffingTheGungy
         PrototypeDungeonRoom p = GetGenericBossRoom();
           Vector2 roomCenter = new Vector2(0.5f*p.Width, 0.5f*p.Height);
           tk2dBaseSprite anySprite = self.GetComponent<tk2dSpriteAnimator>().GetAnySprite();
-        AddObjectToRoom(p, roomCenter + anySprite.WorldCenter, EnemyBehaviourGuid: guid);
+        AddObjectToRoom(p, roomCenter - anySprite.WorldTopLeft, EnemyBehaviourGuid: guid);
 
         // Create a new table and add our new boss room
         GenericRoomTable theRoomTable = ScriptableObject.CreateInstance<GenericRoomTable>();

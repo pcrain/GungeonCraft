@@ -59,7 +59,23 @@ namespace CwaffingTheGungy
       List<Vector2> points = new List<Vector2>();
       float delta = (end-start)/(numPoints+1);
       for(int i = 1; i <= numPoints; ++i)
-        points.Add(At(start+i*delta));
+      {
+        float offset = start+i*delta;
+        points.Add(At(offset % 1f));
+      }
+      return points;
+    }
+
+    // Uniformly sample n points on a path, including endpoints
+    public List<Vector2> SampleUniformInclusive(int numPoints, float start = 0f, float end = 1f)
+    {
+      List<Vector2> points = new List<Vector2>();
+      float delta = (end-start)/numPoints;
+      for(int i = 0; i < numPoints; ++i)
+      {
+        float offset = start+i*delta;
+        points.Add(At(offset % 1f));
+      }
       return points;
     }
   }
@@ -168,9 +184,11 @@ namespace CwaffingTheGungy
       this.startAngle = startAngle.Clamp360();
       this.endAngle   = endAngle.Clamp360();
       this.angleDelta = ((this.endAngle - this.startAngle) + 360f) % 360f;
+      if (this.angleDelta == 0)
+        this.angleDelta = 360f; // assume we just want a full rotation
     }
     public override Vector2 At(float t)
-      { return this.center + this.radius * ((this.startAngle+t*this.angleDelta)*TWOPI).ToVector(); }
+      { return this.center + this.radius * (this.startAngle+t*this.angleDelta).ToVector(); }
   }
 
   public class PathCircle : PathArc
@@ -182,6 +200,10 @@ namespace CwaffingTheGungy
       Vector2 midpoint = this.center + this.radius * angle.ToVector();
       Vector2 extension = (angle+90).ToVector();
       return new PathLine(midpoint-extension,midpoint+extension);
+    }
+    public float AngleTo(Vector2 p)
+    {
+      return (p-this.center).ToAngle();
     }
   }
 

@@ -59,6 +59,12 @@ namespace CwaffingTheGungy
       return self.Inset(inset,inset,inset,inset);
     }
 
+    // Gets the center of a rectangle
+    public static Vector2 Center(this Rect self)
+    {
+      return new Vector2(self.xMin + self.width / 2, self.yMin + self.height / 2);
+    }
+
     // Get a random point on the perimeter of a rectangle
     public static Vector2 RandomPointOnPerimeter(this Rect self)
       { return self.PointOnPerimeter(UnityEngine.Random.Range(0.0f,1.0f)); }

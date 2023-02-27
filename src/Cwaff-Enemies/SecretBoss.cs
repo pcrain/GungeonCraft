@@ -71,6 +71,8 @@ public class SecretBoss : AIActor
     bb.CreateBulletAttack<WallSlamScript>(fireAnim: "laugh", cooldown: 2.5f, attackCooldown: 0.15f);
     bb.CreateBulletAttack<SineWaveScript>(fireAnim: "throw_right", cooldown: 2.5f, attackCooldown: 0.15f);
     bb.CreateBulletAttack<OrangeAndBlueScript>(fireAnim: "throw_right", cooldown: 2.5f, attackCooldown: 0.15f);
+    // bb.CreateBulletAttack<WiggleWaveScript>(fireAnim: "throw_right", cooldown: 2.5f, attackCooldown: 0.15f);
+    bb.CreateBulletAttack<WiggleWaveScript>(fireAnim: "throw_right", cooldown: 2.5f, attackCooldown: 0.15f, probability: 999f);
     // Add a bunch of simultaenous bullet attacks
     // bb.CreateSimultaneousAttack(new(){
     //   bb.CreateBulletAttack<RichochetScript> (add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
@@ -281,7 +283,7 @@ public class SecretBoss : AIActor
     {
       AkSoundEngine.PostEvent("megalo", base.aiActor.gameObject);
       yield return StartCoroutine(BH.WaitForSecondsInvariant(1.8f));
-      AkSoundEngine.PostEvent("Play_BOSS_doormimic_lick_01", base.aiActor.gameObject);
+      // AkSoundEngine.PostEvent("Play_BOSS_doormimic_lick_01", base.aiActor.gameObject);
       yield break;
     }
 
@@ -431,41 +433,48 @@ public class SecretBoss : AIActor
     }
   }
 
-  internal class SineWaveScript : FluidBulletScript
+  internal class SineBullet : SecretBullet
   {
-    internal class SineBullet : SecretBullet
+    private float  amplitude        = 1f;
+    private float  freq             = 1f;
+    private float  phase            = 0f;
+    private float? rotationOverride = null;
+
+    private float lifetime  = 0f;
+
+    public SineBullet(float amplitude, float freq, float phase = 0, float? rotationOverride = null) : base()
     {
-      private float amplitude = 1f;
-      private float freq      = 1f;
-      private float phase     = 0f;
+      this.amplitude        = amplitude;
+      this.freq             = freq;
+      this.phase            = phase;
+      this.rotationOverride = rotationOverride;
+    }
 
-      private float lifetime  = 0f;
+    public override IEnumerator Top()
+    {
+      AkSoundEngine.PostEvent(soundShoot, GameManager.Instance.PrimaryPlayer.gameObject);
 
-      public SineBullet(float amplitude, float freq, float phase = 0) : base()
+      Vector2 startSpeed   = this.RealVelocity();
+      float rotationNormal = ((this.rotationOverride ?? startSpeed.ToAngle()) + 90f).Clamp180();
+      Vector2 amp          = amplitude * rotationNormal.ToVector();
+      Vector2 anchorPos    = this.Position - Mathf.Sin(phase) * amp;
+      float adjfreq        = freq * 2f * Mathf.PI;
+      this.ChangeSpeed(new Speed(0));
+      while (true)
       {
-        this.amplitude = amplitude;
-        this.freq      = freq;
-        this.phase     = phase;
-      }
-
-      public override IEnumerator Top()
-      {
-        AkSoundEngine.PostEvent(soundShoot, GameManager.Instance.PrimaryPlayer.gameObject);
-
-        Vector2 startSpeed = this.RealVelocity();
-        float basey = this.Position.y - amplitude * Mathf.Sin(phase);
-        float adjfreq = freq * 2f * Mathf.PI;
-        while (true)
-        {
-          this.lifetime += BraveTime.DeltaTime;
-          Vector2 oldPosition = this.Position;
-          this.Position = this.Position.WithY(basey + amplitude * Mathf.Sin(adjfreq*this.lifetime + phase));
-          this.Position += startSpeed;
-          this.ChangeDirection(new Direction((this.Position-oldPosition).ToAngle(),DirectionType.Absolute));
-          yield return Wait(1);
-        }
+        this.lifetime       += BraveTime.DeltaTime;
+        anchorPos           += startSpeed;
+        Vector2 oldPosition  = this.Position;
+        float curPhase       = Mathf.Sin(adjfreq*this.lifetime + phase);
+        this.Position        = anchorPos + curPhase * amp;
+        this.ChangeDirection(new Direction((this.Position-oldPosition).ToAngle(),DirectionType.Absolute));
+        yield return Wait(1);
       }
     }
+  }
+
+  internal class SineWaveScript : FluidBulletScript
+  {
 
     protected override List<FluidBulletInfo> BuildChain()
     {
@@ -493,9 +502,50 @@ public class SecretBoss : AIActor
       foreach(Vector2 p in theEdge.SampleUniform(COUNT,reverse ? 0.9f : 0.1f,reverse ? 0.1f : 0.9f))
       {
           this.Fire(Offset.OverridePosition(p), new Direction(inverse ? 180f : 0f,DirectionType.Absolute),
-            new Speed(10f,SpeedType.Absolute), new SineBullet(3f,reverse ? -1f : 1f, (reverse ? -i : i) * 0.1f));
+            new Speed(20f,SpeedType.Absolute), new SineBullet(3f,reverse ? -1f : 1f, (reverse ? -i : i) * 0.1f, 0f));
           yield return Wait(5);
           ++i;
+      }
+    }
+
+  }
+
+  internal class WiggleWaveScript : FluidBulletScript
+  {
+
+    protected override List<FluidBulletInfo> BuildChain()
+    {
+      AkSoundEngine.PostEvent("sans_laugh", GameManager.Instance.PrimaryPlayer.gameObject);
+      int version = Lazy.CoinFlip() ? 1 : 2;
+      return
+      Run(DoTheThing(0f, version))
+        .And(DoTheThing(0.25f, version))
+        .And(DoTheThing(0.50f, version))
+        .And(DoTheThing(0.75f, version))
+      .Finish();
+    }
+
+    private const int COUNT = 109;
+    private IEnumerator DoTheThing(float start, int version)
+    {
+      if (this.BulletBank?.aiActor?.TargetRigidbody == null)
+        yield break;
+
+      this.BulletBank.Bullets.Add(boneBullet);
+
+      Vector2 middleOfRoom = this.BulletBank.aiActor.GetAbsoluteParentRoom().GetBoundingRect().Center();
+      PathCircle theCircle = new PathCircle(middleOfRoom,2f);
+      int i = 0;
+      int waitTime = (version == 1 ? 5 : 4);
+      foreach(Vector2 p in theCircle.SampleUniform(COUNT,start: start, end:start + (version == 1 ? 2f : 4f))) // 2 rotations
+      {
+          this.Fire(Offset.OverridePosition(p), new Direction(theCircle.AngleTo(p),DirectionType.Absolute),
+            new Speed(12f,SpeedType.Absolute), new SineBullet(3f, 0.5f, 0f, null));
+          yield return Wait(waitTime);
+          if (version == 2 && ++i % 5 == 0)
+          {
+            yield return Wait(30);
+          }
       }
     }
 
