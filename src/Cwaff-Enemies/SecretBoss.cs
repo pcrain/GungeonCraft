@@ -183,85 +183,6 @@ public class SecretBoss : AIActor
     }
   }
 
-  // internal class WanderBehavior : MovementBehaviorBase
-  // {
-  //   public float PathInterval = 0.25f;
-
-  //   public float TargetInterval = 3f;
-
-  //   public float MillRadius = 5f;
-
-  //   private Vector2 m_currentTargetPosition;
-
-  //   private float m_repathTimer;
-
-  //   private float m_newPositionTimer;
-
-  //   public override void Start()
-  //   {
-  //     base.Start();
-  //   }
-
-  //   public override void Upkeep()
-  //   {
-  //     base.Upkeep();
-  //     DecrementTimer(ref m_repathTimer);
-  //     DecrementTimer(ref m_newPositionTimer);
-  //   }
-
-  //   public override BehaviorResult Update()
-  //   {
-  //     ETGModConsole.Log($"once");
-  //     PlayerController playerController = GameManager.Instance.PrimaryPlayer;
-  //     if (!playerController)
-  //       return BehaviorResult.Continue;
-  //     return BehaviorResult.RunContinuous;
-  //   }
-
-  //   public override ContinuousBehaviorResult ContinuousUpdate()
-  //   {
-  //     PlayerController playerController = GameManager.Instance.PrimaryPlayer;
-  //     if (!playerController)
-  //       return ContinuousBehaviorResult.Finished;
-  //     m_aiActor.MovementSpeed = m_aiActor.BaseMovementSpeed;
-  //     float num = Vector2.Distance(playerController.CenterPosition, m_currentTargetPosition);
-  //     float num2 = Vector2.Distance(m_aiActor.CenterPosition, m_currentTargetPosition);
-  //     if (m_newPositionTimer <= 0f || num > MillRadius * 1.75f || num2 <= 0.25f)
-  //     {
-  //       m_aiActor.ClearPath();
-  //       m_currentTargetPosition = playerController.specRigidbody.HitboxPixelCollider.UnitBottomCenter;
-  //       m_newPositionTimer = TargetInterval;
-  //     }
-  //     m_aiActor.MovementSpeed = Mathf.Lerp(m_aiActor.BaseMovementSpeed, m_aiActor.BaseMovementSpeed * 2f, Mathf.Clamp01(num2 / 30f));
-  //     if (m_repathTimer <= 0f && !playerController.IsOverPitAtAll && !playerController.IsInMinecart)
-  //     {
-  //       m_repathTimer = PathInterval;
-  //       m_aiActor.FallingProhibited = false;
-  //       m_aiActor.PathfindToPosition(m_currentTargetPosition);
-  //       if (m_aiActor.Path != null && m_aiActor.Path.InaccurateLength > 50f)
-  //       {
-  //         m_aiActor.ClearPath();
-  //         m_aiActor.CompanionWarp(m_aiActor.CompanionOwner.CenterPosition);
-  //       }
-  //       else if (m_aiActor.Path != null && !m_aiActor.Path.WillReachFinalGoal)
-  //       {
-  //         m_aiActor.CompanionWarp(m_aiActor.CompanionOwner.CenterPosition);
-  //       }
-  //     }
-  //     return base.ContinuousUpdate();
-  //   }
-
-  //   // public override void EndContinuousUpdate()
-  //   // {
-  //   //   m_updateEveryFrame = false;
-  //   //   m_triedToPathOverPit = false;
-  //   //   m_groundRolling = false;
-  //   //   m_aiActor.FallingProhibited = false;
-  //   //   m_aiActor.BehaviorOverridesVelocity = false;
-  //   //   base.EndContinuousUpdate();
-  //   // }
-  // }
-
   internal class BossBehavior : BraveBehaviour
   {
     private bool hasFinishedIntro = false;
@@ -354,15 +275,6 @@ public class SecretBoss : AIActor
 
     private void DriftAround()
     {
-      // // base.aiActor.specRigidbody.Velocity = Lazy.RandomVector();
-      // Vector2 rng = Lazy.RandomVector();
-      // // Vector3 movement = (1.0f/(float)C.PIXELS_PER_TILE)*rng.ToVector3ZisY();
-      // Vector3 movement = rng.ToVector3ZisY();
-      // // base.aiActor.specRigidbody.Reinitialize();
-      // base.aiActor.transform.position += movement;
-      // base.aiActor.specRigidbody.transform.position += movement;
-      // base.sprite.transform.localPosition += movement;
-
       base.aiActor.PathfindToPosition(GameManager.Instance.PrimaryPlayer.specRigidbody.UnitCenter);
     }
 
