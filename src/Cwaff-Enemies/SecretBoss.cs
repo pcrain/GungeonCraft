@@ -68,7 +68,7 @@ public class SecretBoss : AIActor
     bb.CreateBulletAttack<HesitantBulletWallScript>(fireAnim: "throw_down", cooldown: 0.25f, attackCooldown: 0.15f);
     bb.CreateBulletAttack<SquareBulletScript>(fireAnim: "throw_left", cooldown: 0.25f, attackCooldown: 0.15f);
     bb.CreateBulletAttack<ChainBulletScript>(fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
-    bb.CreateBulletAttack<WallSlamScript>(fireAnim: "laugh", cooldown: 0.25f, attackCooldown: 0.15f, probability: 999f);
+    bb.CreateBulletAttack<WallSlamScript>(fireAnim: "laugh", cooldown: 0.25f, attackCooldown: 0.15f);
     bb.CreateBulletAttack<SineWaveScript>(fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
     bb.CreateBulletAttack<OrangeAndBlueScript>(fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
     bb.CreateBulletAttack<WiggleWaveScript>(fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
@@ -78,11 +78,6 @@ public class SecretBoss : AIActor
     //   bb.CreateBulletAttack<RichochetScript> (add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
     //   bb.CreateBulletAttack<RichochetScript2>(add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
     //   bb.CreateBulletAttack<CeilingBulletsScript>(add: false, fireAnim: "swirl", attackCooldown: 3.5f, fireVfx: "mytornado"),
-    //   });
-    // // Add a sequential bullet attacks
-    // bb.CreateSequentialAttack(new(){
-    //   bb.CreateBulletAttack<RichochetScript> (add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
-    //   bb.CreateBulletAttack<RichochetScript2>(add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
     //   });
     // Add our boss to the enemy database and to the first floor's boss pool
     bb.AddBossToGameEnemies("cg:secretboss");
@@ -141,25 +136,24 @@ public class SecretBoss : AIActor
     }
   }
 
-  // Creates a napalm-strike=esque danger zone
+  // Creates a napalm-strike-esque danger zone
   internal static GameObject DoomZone(Vector2 start, Vector2 target, float width, float lifetime = -1f, int growthTime = 0, string sprite = null)
   {
-    Vector2 delta                               = target - start;
-    float angle                                 = BraveMathCollege.Atan2Degrees(target-start);
-    GameObject reticle                          = UnityEngine.Object.Instantiate(napalmReticle);
-    tk2dSlicedSprite m_extantReticleQuad        = reticle.GetComponent<tk2dSlicedSprite>();
+    Vector2 delta                        = target - start;
+    GameObject reticle                   = UnityEngine.Object.Instantiate(napalmReticle);
+    tk2dSlicedSprite m_extantReticleQuad = reticle.GetComponent<tk2dSlicedSprite>();
       if (sprite != null)
         m_extantReticleQuad.SetSprite(VFX.SpriteCollection, VFX.sprites[sprite]);
       if (growthTime == 0)
-        m_extantReticleQuad.dimensions              = C.PIXELS_PER_TILE * (new Vector2(delta.magnitude, width));
+        m_extantReticleQuad.dimensions = C.PIXELS_PER_TILE * (new Vector2(delta.magnitude, width));
       else
       {
         UnityEngine.Object.Destroy(reticle.GetComponent<ReticleRiserEffect>());
-        m_extantReticleQuad.dimensions              = C.PIXELS_PER_TILE * (new Vector2(delta.magnitude / growthTime, width));
+        m_extantReticleQuad.dimensions = C.PIXELS_PER_TILE * (new Vector2(delta.magnitude / growthTime, width));
         reticle.AddComponent<DoomZoneGrowth>().Lengthen(delta.magnitude,growthTime);
       }
-      m_extantReticleQuad.transform.localRotation = Quaternion.Euler(0f, 0f, angle);
-      m_extantReticleQuad.transform.position      = start + (Quaternion.Euler(0f, 0f, -90f) * delta.normalized * (width / 2f)).XY();
+      m_extantReticleQuad.transform.localRotation = Quaternion.Euler(0f, 0f, BraveMathCollege.Atan2Degrees(target-start));
+      m_extantReticleQuad.transform.position = start + (Quaternion.Euler(0f, 0f, -90f) * delta.normalized * (width / 2f)).XY();
     if (lifetime > 0)
       reticle.ExpireIn(lifetime);
     return reticle;
@@ -214,6 +208,7 @@ public class SecretBoss : AIActor
         chest2.IsLocked = false;
       };
       // this.aiActor.knockbackDoer.SetImmobile(true, "laugh");
+      this.aiActor.bulletBank.Bullets.Add(boneBullet);
     }
 
     public void FinishedIntro()
@@ -265,7 +260,7 @@ public class SecretBoss : AIActor
     private void SetupRoomSpecificAttacks()
     {
       Rect roomFullBounds = base.aiActor.GetAbsoluteParentRoom().GetBoundingRect();
-      Rect roomTrimmedBounds = roomFullBounds.Inset(4f);
+      Rect roomTrimmedBounds = roomFullBounds.Inset(8f);
       foreach (AttackBehaviorGroup.AttackGroupItem attack in base.aiActor.gameObject.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors)
       {
         if (attack.Behavior is TeleportBehavior)
@@ -349,13 +344,31 @@ public class SecretBoss : AIActor
       }
   }
 
-  internal class OrangeAndBlueScript : FluidBulletScript
+  internal abstract class SecretBulletScript : FluidBulletScript
+  {
+    protected AIActor boss {get; private set;}
+    protected Rect roomFullBounds {get; private set;}
+    protected Rect roomBulletBounds {get; private set;}
+    protected Rect roomSlamBounds {get; private set;}
+    protected Rect roomTeleportBounds {get; private set;}
+
+    public override void Initialize()
+    {
+      base.Initialize();
+      this.boss               = this.BulletBank.aiActor;
+      this.roomFullBounds     = this.boss.GetAbsoluteParentRoom().GetBoundingRect();
+      this.roomBulletBounds   = this.roomFullBounds.Inset(topInset: 2f, rightInset: 2f, bottomInset: 4f, leftInset: 2f);
+      this.roomSlamBounds     = this.roomFullBounds.Inset(topInset: 2f, rightInset: 2.5f, bottomInset: 2f, leftInset: 1.5f);
+      this.roomTeleportBounds = this.roomFullBounds.Inset(8f);
+    }
+  }
+
+  internal class OrangeAndBlueScript : SecretBulletScript
   {
     private static readonly string orangeReticle = "reticle-orange";
-    private static readonly string blueReticle = "reticle-blue";
-    // private static readonly Color orange = new Color(1.0f,0.5f,0.5f,0.5f)
-    private static readonly Color orangeColor = new Color(1.0f,0.75f,0f,0.5f);
-    private static readonly Color blueColor   = new Color(0.0f,0.0f,1.0f,0.5f);
+    private static readonly string blueReticle   = "reticle-blue";
+    private static readonly Color orangeColor    = new Color(1.0f,0.75f,0f,0.5f);
+    private static readonly Color blueColor      = new Color(0.65f,0.65f,1.0f,0.5f);
 
     // orange = harmless if you're moving; blue = harmless if you're stationary
     internal class OrangeAndBlueBullet : SecretBullet
@@ -399,20 +412,11 @@ public class SecretBoss : AIActor
     private const float COOLDOWN = 30f;
     private IEnumerator DoTheThing(bool orange)
     {
-      if (this.BulletBank?.aiActor?.TargetRigidbody == null)
-        yield break;
-
-      this.BulletBank.Bullets.Add(boneBullet);
-
       Vector2 ppos = GameManager.Instance.PrimaryPlayer.CenterPosition;
-      DoomZone(ppos - 0.5f*Vector2.right, ppos + 0.5f*Vector2.right, 1f, 0.5f, 0, orange ? orangeReticle : blueReticle);
-      DoomZone(ppos - 1.0f*Vector2.right, ppos + 1.0f*Vector2.right, 2f, 0.5f, 0, orange ? orangeReticle : blueReticle);
-      DoomZone(ppos - 1.5f*Vector2.right, ppos + 1.5f*Vector2.right, 3f, 0.5f, 0, orange ? orangeReticle : blueReticle);
-      DoomZone(ppos - 2.0f*Vector2.right, ppos + 2.0f*Vector2.right, 4f, 0.5f, 0, orange ? orangeReticle : blueReticle);
+      for (float i = 1f; i <= 4f; ++i)
+        DoomZone(ppos - i*0.5f*Vector2.right, ppos + i*0.5f*Vector2.right, i, 0.5f, 0, orange ? orangeReticle : blueReticle);
       AkSoundEngine.PostEvent("undertale_eyeflash", GameManager.Instance.PrimaryPlayer.gameObject);
-      Rect roomFullBounds = this.BulletBank.aiActor.GetAbsoluteParentRoom().GetBoundingRect();
-      Rect roomBounds     = roomFullBounds.Inset(topInset: 2f, rightInset: 2f, bottomInset: 4f, leftInset: 2f);
-      PathRect roomPath   = new PathRect(roomBounds);
+      PathRect roomPath   = new PathRect(base.roomBulletBounds);
       List<Vector2> points = roomPath.SampleUniform(COUNT,0.0f,1.0f);
       yield return Wait(LENIENCE);
       for(int wave = 0; wave < WAVES; ++wave)
@@ -475,7 +479,7 @@ public class SecretBoss : AIActor
     }
   }
 
-  internal class SineWaveScript : FluidBulletScript
+  internal class SineWaveScript : SecretBulletScript
   {
 
     protected override List<FluidBulletInfo> BuildChain()
@@ -492,14 +496,7 @@ public class SecretBoss : AIActor
     private const int COUNT = 50;
     private IEnumerator DoTheThing(bool reverse = false, bool inverse = false)
     {
-      if (this.BulletBank?.aiActor?.TargetRigidbody == null)
-        yield break;
-
-      this.BulletBank.Bullets.Add(boneBullet);
-
-      Rect roomFullBounds = this.BulletBank.aiActor.GetAbsoluteParentRoom().GetBoundingRect();
-      Rect roomBounds     = roomFullBounds.Inset(topInset: 2f, rightInset: 2f, bottomInset: 4f, leftInset: 2f);
-      PathLine theEdge    = inverse ? (new PathRect(roomBounds).Right()) : (new PathRect(roomBounds).Left());
+      PathLine theEdge    = inverse ? (new PathRect(base.roomBulletBounds).Right()) : (new PathRect(base.roomBulletBounds).Left());
       int i = 0;
       foreach(Vector2 p in theEdge.SampleUniform(COUNT,reverse ? 0.9f : 0.1f,reverse ? 0.1f : 0.9f))
       {
@@ -509,10 +506,9 @@ public class SecretBoss : AIActor
           ++i;
       }
     }
-
   }
 
-  internal class WiggleWaveScript : FluidBulletScript
+  internal class WiggleWaveScript : SecretBulletScript
   {
 
     protected override List<FluidBulletInfo> BuildChain()
@@ -530,11 +526,6 @@ public class SecretBoss : AIActor
     private const int COUNT = 57;
     private IEnumerator DoTheThing(float start, int version)
     {
-      if (this.BulletBank?.aiActor?.TargetRigidbody == null)
-        yield break;
-
-      this.BulletBank.Bullets.Add(boneBullet);
-
       // Vector2 middle = this.BulletBank.aiActor.GetAbsoluteParentRoom().GetBoundingRect().Center();
       Vector2 middle = this.BulletBank.aiActor.sprite.WorldCenter;
       PathCircle theCircle = new PathCircle(middle,2f);
@@ -551,10 +542,9 @@ public class SecretBoss : AIActor
           }
       }
     }
-
   }
 
-  internal class WallSlamScript : FluidBulletScript
+  internal class WallSlamScript : SecretBulletScript
   {
 
     internal class GravityBullet : SecretBullet
@@ -564,10 +554,12 @@ public class SecretBoss : AIActor
       private Vector2 gravity = Vector2.zero;
       private bool skipCollisions = true;
       private Vector2 startVelocity = Vector2.zero;
-      public GravityBullet(Vector2 velocity, Vector2 gravity) : base()
+      private Rect roomFullBounds;
+      public GravityBullet(Vector2 velocity, Vector2 gravity, Rect roomFullBounds) : base()
       {
         this.gravity        = gravity;
         this.startVelocity  = velocity;
+        this.roomFullBounds = roomFullBounds;
       }
 
       public override void Initialize()
@@ -583,13 +575,12 @@ public class SecretBoss : AIActor
 
       public override IEnumerator Top()
       {
-        Rect roomFullBounds = this.BulletBank.aiActor.GetAbsoluteParentRoom().GetBoundingRect();
         AkSoundEngine.PostEvent(soundShoot, GameManager.Instance.PrimaryPlayer.gameObject);
         // Vector2 newVelocity = this.RealVelocity();
         Vector2 newVelocity = this.startVelocity;
         for (int i = 0; i < VANISHTIME; ++i)
         {
-          if (i >= LIFETIME && this.skipCollisions && roomFullBounds.Contains(this.Position))
+          if (i >= LIFETIME && this.skipCollisions && this.roomFullBounds.Contains(this.Position))
           {
             this.skipCollisions = false;
             this.Projectile.BulletScriptSettings.surviveTileCollisions = false;
@@ -613,14 +604,11 @@ public class SecretBoss : AIActor
     private const int SLAMS = 5;
     private const int SLAMDELAY = 60;
 
-    private Rect slamBounds;
     private PathRect slamBoundsPath;
 
     protected override List<FluidBulletInfo> BuildChain()
     {
-      Rect roomFullBounds = this.BulletBank.aiActor.GetAbsoluteParentRoom().GetBoundingRect();
-      this.slamBounds = roomFullBounds.Inset(topInset: 2f, rightInset: 2.5f, bottomInset: 2f, leftInset: 1.5f);
-      this.slamBoundsPath = new PathRect(this.slamBounds);
+      this.slamBoundsPath = new PathRect(base.roomSlamBounds);
 
       bool vertical = Lazy.CoinFlip();
       FluidBulletInfo f = Run(DoTheThing(Lazy.CoinFlip() ? (vertical ? "up" : "left") : (vertical ? "down" : "right")));
@@ -635,30 +623,21 @@ public class SecretBoss : AIActor
 
     private IEnumerator DoTheThing(string direction)
     {
-      if (this.BulletBank?.aiActor?.TargetRigidbody == null)
-        yield break;
-
-      this.BulletBank.Bullets.Add(boneBullet);
-
       PlayerController p = GameManager.Instance.PrimaryPlayer;
-      // if (!slamBounds.Contains(p.specRigidbody.Position.GetPixelVector2()))
-      //   yield break;
 
       PathLine segment;
-      Vector2 target = Vector2.zero;
       if (direction.Equals("up"))
-        segment = slamBoundsPath.Top();
+        segment = this.slamBoundsPath.Top();
       else if (direction.Equals("down"))
-        segment = slamBoundsPath.Bottom();
+        segment = this.slamBoundsPath.Bottom();
       else if (direction.Equals("left"))
-        segment = slamBoundsPath.Left();
+        segment = this.slamBoundsPath.Left();
       else if (direction.Equals("right"))
-        segment = slamBoundsPath.Right();
+        segment = this.slamBoundsPath.Right();
       else // should never happen
-        segment = slamBoundsPath.Top();
-      target = segment.At(0.5f);
+        segment = this.slamBoundsPath.Top();
+      Vector2 target =  segment.At(0.5f);
 
-      // Vector2 gravity  = GRAVITY*(p.CenterPosition - this.BulletBank.aiActor.CenterPosition).normalized;
       Vector2 delta    = (target - p.CenterPosition);
       Vector2 gravity  = GRAVITY*delta.normalized;
       Vector2 gravityB = GRAVITY*(target - this.BulletBank.aiActor.sprite.WorldCenter).normalized;
@@ -670,29 +649,24 @@ public class SecretBoss : AIActor
       {
         Vector2 bulletvel = baseVel.Rotate(UnityEngine.Random.Range(-SPREAD,SPREAD));
         Direction d = new Direction(bulletvel.ToAngle().Clamp180(),DirectionType.Absolute);
-        this.Fire(o, d, s, new GravityBullet(bulletvel,gravityB));
+        this.Fire(o, d, s, new GravityBullet(bulletvel,gravityB,base.roomFullBounds));
         yield return Wait(SHOTDELAY);
       }
-
-      // if (!slamBounds.Contains(p.specRigidbody.Position.GetPixelVector2()))
-      //   yield break;
 
       p.SetInputOverride("comeonandslam");
       p.ForceStopDodgeRoll();
       int collisionmask = CollisionMask.LayerToMask(CollisionLayer.EnemyHitBox, CollisionLayer.EnemyCollider, CollisionLayer.Projectile);
       p.specRigidbody.AddCollisionLayerIgnoreOverride(collisionmask);
-      // p.override
-      Vector2 slamStart        = slamBounds.position;
-      Vector2 slamEnd          = slamBounds.position + slamBounds.size;
+      Vector2 slamStart        = base.roomSlamBounds.position;
+      Vector2 slamEnd          = base.roomSlamBounds.position + base.roomSlamBounds.size;
       Vector2 finalPos         = Vector2.zero;
       p.specRigidbody.Velocity = Vector2.zero;
-      int framesToReachTarget = Mathf.FloorToInt(Mathf.Sqrt(2*delta.magnitude/GRAVITY));
+      int framesToReachTarget = Mathf.FloorToInt(Mathf.Sqrt(2*delta.magnitude/GRAVITY)); // solve x = (0.5*a*t*t) for t
       for (int frames = 0; frames < framesToReachTarget; ++frames)
       {
         p.specRigidbody.Velocity += gravity;
         Vector2 oldPos = p.specRigidbody.Position.GetPixelVector2();
         Vector2 newPos = oldPos + p.specRigidbody.Velocity;
-        // if (BraveMathCollege.LineSegmentRectangleIntersection(oldPos, newPos, slamStart, slamEnd, ref finalPos))
         if (BraveMathCollege.LineSegmentRectangleIntersection(oldPos, newPos, segment.start, segment.end, ref finalPos))
           break;
         p.transform.position = newPos;
@@ -701,10 +675,7 @@ public class SecretBoss : AIActor
       }
       p.specRigidbody.RemoveCollisionLayerIgnoreOverride(collisionmask);
       p.specRigidbody.Velocity = Vector2.zero;
-      if (finalPos != Vector2.zero)
-        p.transform.position = finalPos;
-      else // failsafe
-        p.transform.position = target;
+      p.transform.position = (finalPos != Vector2.zero) ? finalPos : target;
       p.specRigidbody.Reinitialize();
       yield return Wait(1);
 
@@ -714,7 +685,7 @@ public class SecretBoss : AIActor
     }
   }
 
-  internal class ChainBulletScript : FluidBulletScript
+  internal class ChainBulletScript : SecretBulletScript
   {
 
     public class ChainBullet : SecretBullet
@@ -728,7 +699,7 @@ public class SecretBoss : AIActor
 
     private const int PHASES          = 3;
     private const int STREAMSPERPHASE = 5;
-    private const int STREAMDELAY     = 20;
+    private const int PHASEDELAY      = 20;
     private const int SHOTSPERSTREAM  = 12;
     private const int SHOTDELAY       = 5;
     private const int SHOTSPEED       = 20;
@@ -742,14 +713,6 @@ public class SecretBoss : AIActor
 
     private IEnumerator DoTheThing()
     {
-
-      if (this.BulletBank?.aiActor?.TargetRigidbody == null)
-        yield break;
-
-      this.BulletBank.Bullets.Add(boneBullet);
-
-      Rect roomFullBounds = this.BulletBank.aiActor.GetAbsoluteParentRoom().GetBoundingRect();
-      Rect roomBounds = roomFullBounds.Inset(topInset: 2f, rightInset: 2f, bottomInset: 4f, leftInset: 2f);
       for (int i = 0; i < PHASES; ++i)
       {
         AkSoundEngine.PostEvent("sans_laugh", GameManager.Instance.PrimaryPlayer.gameObject);
@@ -758,27 +721,27 @@ public class SecretBoss : AIActor
         List<float> shotAngles = new List<float>(STREAMSPERPHASE);
         for (int s = 0; s < STREAMSPERPHASE; ++s)
         {
-          Vector2 spawnPoint = roomBounds.RandomPointOnPerimeter();
+          Vector2 spawnPoint = base.roomBulletBounds.RandomPointOnPerimeter();
           while((ppos-spawnPoint).magnitude < MINDIST)
-            spawnPoint = roomBounds.RandomPointOnPerimeter();
+            spawnPoint = base.roomBulletBounds.RandomPointOnPerimeter();
           spawnPoints.Add(spawnPoint);
           shotAngles.Add((ppos-spawnPoint).ToAngle().Clamp180());
-          DoomZone(spawnPoint, spawnPoints[s].RaycastToWall(shotAngles[s], roomFullBounds), 1f, STREAMDELAY / 60.0f, 10);
+          DoomZone(spawnPoint, spawnPoints[s].RaycastToWall(shotAngles[s], base.roomFullBounds), 1f, PHASEDELAY / C.FPS, 10);
           AkSoundEngine.PostEvent(soundSpawn, GameManager.Instance.PrimaryPlayer.gameObject);
           yield return Wait(SHOTDELAY);
         }
-        yield return Wait(STREAMDELAY);
         for (int j = 0; j < SHOTSPERSTREAM; ++j)
         {
           for (int s = 0; s < STREAMSPERPHASE; ++s)
             this.Fire(Offset.OverridePosition(spawnPoints[s]), new Direction(shotAngles[s],DirectionType.Absolute), new Speed(SHOTSPEED,SpeedType.Absolute), new ChainBullet());
           yield return Wait(SHOTDELAY);
         }
+        yield return Wait(PHASEDELAY);
       }
     }
   }
 
-  internal class SquareBulletScript : FluidBulletScript
+  internal class SquareBulletScript : SecretBulletScript
   {
     public class SquareBullet : SecretBullet
     {
@@ -827,13 +790,7 @@ public class SecretBoss : AIActor
 
     private IEnumerator DoTheThing()
     {
-
-      if (this.BulletBank?.aiActor?.TargetRigidbody == null)
-        yield break;
-
-      this.BulletBank.Bullets.Add(boneBullet);
-
-      float initAngle = UnityEngine.Random.Range(-180f,180f);
+      float initAngle = Lazy.RandomAngle();
       for (int i = 0; i < SIDES; ++i)
       {
         float sideAngle = (initAngle + i * SIDESPAN).Clamp180();
@@ -848,10 +805,9 @@ public class SecretBoss : AIActor
       yield return this.Wait(60);
       yield break;
     }
-
   }
 
-  internal class HesitantBulletWallScript : FluidBulletScript
+  internal class HesitantBulletWallScript : SecretBulletScript
   {
     public class HesitantBullet : SecretBullet
     {
@@ -894,12 +850,6 @@ public class SecretBoss : AIActor
 
     private IEnumerator DoTheThing()
     {
-
-      if (this.BulletBank?.aiActor?.TargetRigidbody == null)
-        yield break;
-
-      this.BulletBank.Bullets.Add(boneBullet);
-
       Vector2 incidentDirection, centerPoint, playerpos = GameManager.Instance.PrimaryPlayer.CenterPosition;
       do
       {
@@ -917,7 +867,7 @@ public class SecretBoss : AIActor
     }
   }
 
-  internal class OrbitBulletScript : FluidBulletScript
+  internal class OrbitBulletScript : SecretBulletScript
   {
 
     public class OrbitBullet : SecretBullet
@@ -1015,11 +965,6 @@ public class SecretBoss : AIActor
 
     private IEnumerator DoTheThing()
     {
-      if (this.BulletBank?.aiActor?.TargetRigidbody == null)
-        yield break;
-
-      this.BulletBank.Bullets.Add(boneBullet);
-
       Vector2 playerpos = GameManager.Instance.PrimaryPlayer.CenterPosition;
       for (int j = 0; j < COUNT; j++)
       {
@@ -1037,21 +982,13 @@ public class SecretBoss : AIActor
   }
 
   // Shoots a bunch of bullets from the ceiling of the current room
-  internal class CeilingBulletsScript : FluidBulletScript
+  internal class CeilingBulletsScript : SecretBulletScript
   {
     private const int COUNT = 16;
     private const int SPAWN_DELAY = 4;
-    private Rect roomBounds;
 
     protected override List<FluidBulletInfo> BuildChain()
     {
-      if (this.BulletBank?.aiActor?.TargetRigidbody == null)
-        return new();
-      this.BulletBank.Bullets.Add(boneBullet);
-
-      Rect roomFullBounds = this.BulletBank.aiActor.GetAbsoluteParentRoom().GetBoundingRect();
-      this.roomBounds = roomFullBounds.Inset(topInset: 2f, rightInset: 2f, bottomInset: 4f, leftInset: 2f);
-
       bool flip = Lazy.CoinFlip();
 
       return
@@ -1076,48 +1013,30 @@ public class SecretBoss : AIActor
 
     private IEnumerator DoTheThing(float speed, bool reverse = false, bool warn = false)
     {
-      float offset = roomBounds.width / (float)COUNT;
+      float offset = base.roomBulletBounds.width / (float)COUNT;
+      float angle = reverse ? 90f : -90f;
+      List<Vector2> points = new List<Vector2>();
       for (float j = (reverse ? 0.5f : 0); j < COUNT; j++)
+        points.Add(new Vector2(base.roomBulletBounds.xMin + j*offset, reverse ? base.roomBulletBounds.yMin : base.roomBulletBounds.yMax));
+
+      for(int i = 0; i < points.Count; ++i)
       {
-        Vector2 topPoint = new Vector2(roomBounds.xMin + j*offset, reverse ? roomBounds.yMin : roomBounds.yMax);
         if (warn)
-          DoomZone(topPoint, topPoint.RaycastToWall(reverse ? 90f : -90f, roomBounds), 1f, COUNT / 15.0f, 20);
-        if ((int)j % 2 == 0)
-          AkSoundEngine.PostEvent(soundSpawnQuiet, GameManager.Instance.PrimaryPlayer.gameObject);
+        {
+          DoomZone(points[i], points[i].RaycastToWall(angle, base.roomBulletBounds), 1f, COUNT / 15.0f, 20);
+          if (i % 2 == 0)
+            AkSoundEngine.PostEvent(soundSpawnQuiet, GameManager.Instance.PrimaryPlayer.gameObject);
+        }
         yield return this.Wait(SPAWN_DELAY);
       }
-      for (float j = (reverse ? 0.5f : 0); j < COUNT; j++)
+      for(int i = 0; i < points.Count; ++i)
       {
-        Vector2 topPoint = new Vector2(roomBounds.xMin + j*offset, reverse ? roomBounds.yMin : roomBounds.yMax);
-        this.Fire(Offset.OverridePosition(topPoint), new Direction(reverse ? 90f : -90f, DirectionType.Absolute), new Speed(speed), new SecretBullet());
-        if ((int)j % 2 == 1)
+        this.Fire(Offset.OverridePosition(points[i]), new Direction(angle, DirectionType.Absolute), new Speed(speed), new SecretBullet());
+        if (i % 2 == 1)
           AkSoundEngine.PostEvent(soundShoot, GameManager.Instance.PrimaryPlayer.gameObject);
         yield return this.Wait(SPAWN_DELAY);
       }
       yield break;
-    }
-  }
-
-  internal class RichochetScript : Script  //Stolen and modified from base game DraGunGlockRicochet1
-  {
-    protected float start = -45f;
-    public override IEnumerator Top() {
-      if (this.BulletBank?.aiActor?.TargetRigidbody == null)
-        return null;
-      base.BulletBank.AddBulletFromEnemy("dragun","ricochet");
-      int count = 8;
-      float delta = 90f / (float)(count - 1);
-      for (int j = 0; j < count; j++)
-        Fire(new Direction(start + (float)j * delta, DirectionType.Aim), new Speed(9f), new Bullet("ricochet"));
-      return null;
-    }
-  }
-
-  internal class RichochetScript2 : RichochetScript
-  {
-    public override IEnumerator Top() {
-      start = 135f;
-      return base.Top();
     }
   }
 }

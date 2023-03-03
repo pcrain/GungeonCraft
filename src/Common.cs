@@ -21,6 +21,7 @@ namespace CwaffingTheGungy
     {
         public const float PIXELS_PER_TILE = 16f;
         public const float PIXELS_PER_CELL = 64f;
+        public const float FPS = 60f;
     }
 
     public class IDs // global IDs for this mod's guns and items
