@@ -294,6 +294,12 @@ namespace CwaffingTheGungy
           return UnityEngine.Random.Range(-180f,180f);
         }
 
+        // Get a random vector
+        public static Vector2 RandomVector(float magnitude = 1f)
+        {
+          return magnitude * RandomAngle().ToVector();
+        }
+
         // Get a random boolean
         public static bool CoinFlip()
         {

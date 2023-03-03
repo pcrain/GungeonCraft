@@ -33,6 +33,8 @@ public class SecretBoss : AIActor
   private const int MEGALO_LOOP_END    = 152512;
   private const int MEGALO_LOOP_LENGTH = 137141;
 
+  private const int NUM_HITS = 60;
+
   internal static GameObject napalmReticle      = null;
   internal static AIBulletBank.Entry boneBullet = null;
   internal static VFXPool bonevfx               = null;
@@ -43,8 +45,8 @@ public class SecretBoss : AIActor
     BuildABoss bb = BuildABoss.LetsMakeABoss<BossBehavior>(
       bossname, guid, $"{spritePath}/{defaultSprite}", new IntVector2(8, 9), subtitle, bossCardPath);
     // Set our stats
-    bb.SetStats(health: 100f, weight: 200f, speed: 2f, collisionDamage: 1f,
-      hitReactChance: 0.05f, collisionKnockbackStrength: 5f);
+    bb.SetStats(health: NUM_HITS, weight: 200f, speed: 2f, collisionDamage: 0f,
+      hitReactChance: 0.05f, collisionKnockbackStrength: 0f);
     // Set up our animations
     bb.InitSpritesFromResourcePath(spritePath);
       bb.AdjustAnimation("idle",   fps:   12f, loop: true);
@@ -65,7 +67,7 @@ public class SecretBoss : AIActor
 
     // Add a random teleportation behavior
     bb.CreateTeleportAttack<CustomTeleportBehavior>(
-      goneTime: 0.25f, outAnim: "teleport_out", inAnim: "teleport_in", cooldown: 1f);
+      goneTime: 0.25f, outAnim: "teleport_out", inAnim: "teleport_in", cooldown: 0.26f, attackCooldown: 0.15f, probability: 10f);
     // Add some basic bullet attacks
     bb.CreateBulletAttack<CeilingBulletsScript>(fireAnim: "laugh", cooldown: 0.25f, attackCooldown: 0.15f);
     bb.CreateBulletAttack<OrbitBulletScript>(fireAnim: "throw_up", cooldown: 0.25f, attackCooldown: 0.15f);
@@ -76,13 +78,16 @@ public class SecretBoss : AIActor
     bb.CreateBulletAttack<SineWaveScript>(fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
     bb.CreateBulletAttack<OrangeAndBlueScript>(fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
     bb.CreateBulletAttack<WiggleWaveScript>(fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
-    // bb.CreateBulletAttack<WiggleWaveScript>(fireAnim: "throw_right", cooldown: 2.5f, attackCooldown: 0.15f, probability: 999f);
     // Add a bunch of simultaenous bullet attacks
     // bb.CreateSimultaneousAttack(new(){
     //   bb.CreateBulletAttack<RichochetScript> (add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
     //   bb.CreateBulletAttack<RichochetScript2>(add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
     //   bb.CreateBulletAttack<CeilingBulletsScript>(add: false, fireAnim: "swirl", attackCooldown: 3.5f, fireVfx: "mytornado"),
     //   });
+
+    // Add a wandering behavior
+    // bb.prefab.GetComponent<BehaviorSpeculator>().MovementBehaviors.Add(new WanderBehavior());
+
     // Add our boss to the enemy database and to the first floor's boss pool
     bb.AddBossToGameEnemies("cg:secretboss");
     bb.AddBossToFloorPool(Floors.CASTLEGEON, weight: 9999f);
@@ -178,6 +183,85 @@ public class SecretBoss : AIActor
     }
   }
 
+  // internal class WanderBehavior : MovementBehaviorBase
+  // {
+  //   public float PathInterval = 0.25f;
+
+  //   public float TargetInterval = 3f;
+
+  //   public float MillRadius = 5f;
+
+  //   private Vector2 m_currentTargetPosition;
+
+  //   private float m_repathTimer;
+
+  //   private float m_newPositionTimer;
+
+  //   public override void Start()
+  //   {
+  //     base.Start();
+  //   }
+
+  //   public override void Upkeep()
+  //   {
+  //     base.Upkeep();
+  //     DecrementTimer(ref m_repathTimer);
+  //     DecrementTimer(ref m_newPositionTimer);
+  //   }
+
+  //   public override BehaviorResult Update()
+  //   {
+  //     ETGModConsole.Log($"once");
+  //     PlayerController playerController = GameManager.Instance.PrimaryPlayer;
+  //     if (!playerController)
+  //       return BehaviorResult.Continue;
+  //     return BehaviorResult.RunContinuous;
+  //   }
+
+  //   public override ContinuousBehaviorResult ContinuousUpdate()
+  //   {
+  //     PlayerController playerController = GameManager.Instance.PrimaryPlayer;
+  //     if (!playerController)
+  //       return ContinuousBehaviorResult.Finished;
+  //     m_aiActor.MovementSpeed = m_aiActor.BaseMovementSpeed;
+  //     float num = Vector2.Distance(playerController.CenterPosition, m_currentTargetPosition);
+  //     float num2 = Vector2.Distance(m_aiActor.CenterPosition, m_currentTargetPosition);
+  //     if (m_newPositionTimer <= 0f || num > MillRadius * 1.75f || num2 <= 0.25f)
+  //     {
+  //       m_aiActor.ClearPath();
+  //       m_currentTargetPosition = playerController.specRigidbody.HitboxPixelCollider.UnitBottomCenter;
+  //       m_newPositionTimer = TargetInterval;
+  //     }
+  //     m_aiActor.MovementSpeed = Mathf.Lerp(m_aiActor.BaseMovementSpeed, m_aiActor.BaseMovementSpeed * 2f, Mathf.Clamp01(num2 / 30f));
+  //     if (m_repathTimer <= 0f && !playerController.IsOverPitAtAll && !playerController.IsInMinecart)
+  //     {
+  //       m_repathTimer = PathInterval;
+  //       m_aiActor.FallingProhibited = false;
+  //       m_aiActor.PathfindToPosition(m_currentTargetPosition);
+  //       if (m_aiActor.Path != null && m_aiActor.Path.InaccurateLength > 50f)
+  //       {
+  //         m_aiActor.ClearPath();
+  //         m_aiActor.CompanionWarp(m_aiActor.CompanionOwner.CenterPosition);
+  //       }
+  //       else if (m_aiActor.Path != null && !m_aiActor.Path.WillReachFinalGoal)
+  //       {
+  //         m_aiActor.CompanionWarp(m_aiActor.CompanionOwner.CenterPosition);
+  //       }
+  //     }
+  //     return base.ContinuousUpdate();
+  //   }
+
+  //   // public override void EndContinuousUpdate()
+  //   // {
+  //   //   m_updateEveryFrame = false;
+  //   //   m_triedToPathOverPit = false;
+  //   //   m_groundRolling = false;
+  //   //   m_aiActor.FallingProhibited = false;
+  //   //   m_aiActor.BehaviorOverridesVelocity = false;
+  //   //   base.EndContinuousUpdate();
+  //   // }
+  // }
+
   internal class BossBehavior : BraveBehaviour
   {
     private bool hasFinishedIntro = false;
@@ -199,6 +283,9 @@ public class SecretBoss : AIActor
 
     private void Start()
     {
+      base.aiActor.healthHaver.healthIsNumberOfHits = true;
+      base.aiActor.healthHaver.usesInvulnerabilityPeriod = true;
+      base.aiActor.healthHaver.invulnerabilityPeriod = 1.0f;
       base.aiActor.healthHaver.OnPreDeath += (obj) =>
       {
         FlipSpriteIfNecessary(forceUnflip: true);
@@ -224,39 +311,72 @@ public class SecretBoss : AIActor
 
     private void Update()
     {
-      const float JIGGLE = 4.0f;
-      const float SPEED = 4.0f;
-      FlipSpriteIfNecessary();
 
       if (!hasFinishedIntro)
         return;
 
+      // loop music if necessary
       int pos = 0;
-      AKRESULT status = AkSoundEngine.GetSourcePlayPosition(megalo_event_id,out pos);
+      AKRESULT status = AkSoundEngine.GetSourcePlayPosition(megalo_event_id, out pos);
       if (status == AKRESULT.AK_Success)
       {
         // ETGModConsole.Log($"{megalo_event_id}: position {pos}");
         if (pos >= MEGALO_LOOP_END)
-          AkSoundEngine.SeekOnEvent("electromegalo",base.aiActor.gameObject,pos-MEGALO_LOOP_LENGTH);
+          AkSoundEngine.SeekOnEvent("electromegalo", base.aiActor.gameObject,pos - MEGALO_LOOP_LENGTH);
       }
+
+      // don't do anything if we're paused
+      if (BraveTime.DeltaTime == 0)
+        return;
+
+      DriftAround();
+    }
+
+    private void LateUpdate()
+    {
+      const float JIGGLE = 4.0f;
+      const float SPEED = 4.0f;
+
+      if (!hasFinishedIntro)
+        return;
+
+      // don't do anything if we're paused
+      if (BraveTime.DeltaTime == 0)
+        return;
+
+      FlipSpriteIfNecessary();
 
       yoffset = Mathf.CeilToInt(JIGGLE * Mathf.Sin(SPEED*BraveTime.ScaledTimeSinceStartup))/16.0f;
       base.sprite.transform.localPosition += new Vector3(0,yoffset,0);
-      if (UnityEngine.Random.Range(0.0f,1.0f) < 0.5f)
+      if (Lazy.CoinFlip())
         SpawnDust(base.specRigidbody.UnitCenter);
+    }
+
+    private void DriftAround()
+    {
+      // // base.aiActor.specRigidbody.Velocity = Lazy.RandomVector();
+      // Vector2 rng = Lazy.RandomVector();
+      // // Vector3 movement = (1.0f/(float)C.PIXELS_PER_TILE)*rng.ToVector3ZisY();
+      // Vector3 movement = rng.ToVector3ZisY();
+      // // base.aiActor.specRigidbody.Reinitialize();
+      // base.aiActor.transform.position += movement;
+      // base.aiActor.specRigidbody.transform.position += movement;
+      // base.sprite.transform.localPosition += movement;
+
+      base.aiActor.PathfindToPosition(GameManager.Instance.PrimaryPlayer.specRigidbody.UnitCenter);
     }
 
     private void FlipSpriteIfNecessary(bool forceUnflip = false)
     {
       bool lastFlip = base.sprite.FlipX;
-      bool shouldFlip = (GameManager.Instance.BestActivePlayer.sprite.WorldBottomCenter.x < base.sprite.WorldBottomCenter.x);
+      bool shouldFlip = (GameManager.Instance.BestActivePlayer.sprite.WorldBottomCenter.x < base.specRigidbody.UnitBottomCenter.x);
       base.sprite.FlipX = shouldFlip && (!forceUnflip);
       Vector3 spriteSize = base.sprite.GetUntrimmedBounds().size;
       Vector3 offset = new Vector3(spriteSize.x / 2, 0f, 0f);
       if (!base.sprite.FlipX)
         offset *= -1;
 
-      Vector3 finalPosition = (Vector3)base.specRigidbody.UnitBottomCenter.RoundToInt() + offset;
+      Vector3 finalPosition = (Vector3)base.specRigidbody.UnitBottomCenter/*.RoundToInt()*/ + offset;
       base.sprite.transform.localPosition = finalPosition;
       if (auraActive)
         aura.transform.localPosition = new Vector3(0,spriteSize.y / 2,0) - offset;

@@ -251,7 +251,7 @@ namespace CwaffingTheGungy
     /// <returns>A TeleportBehavior with sane defaults initalized according to the parameters</returns>
     public TeleportBehavior CreateTeleportAttack<T>(
       bool add = true, float cooldown = 0f, float cooldownVariance = 0f, float attackCooldown = 0f, float globalCooldown = 0f,
-      float initialCooldown = 0.5f, float initialCooldownVariance = 0f,
+      float initialCooldown = 0f, float initialCooldownVariance = 0f,
       float probability = 1f, int maxUsages = -1, bool requiresLineOfSight = false,
       float minHealth = 0f, float maxHealth = 1f, float[] healthThresholds = null, bool accumulateHealthThresholds = true,
       float minRange = 0f, float range = 0f, float minWallDist = 0f,
