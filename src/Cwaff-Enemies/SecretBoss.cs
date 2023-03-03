@@ -30,9 +30,13 @@ public class SecretBoss : AIActor
   private const string soundSpawnAlt   = "undertale_arrow";
   private const string soundShoot      = "Play_WPN_spacerifle_shot_01";
 
+  private const int MEGALO_LOOP_END    = 152512;
+  private const int MEGALO_LOOP_LENGTH = 137141;
+
   internal static GameObject napalmReticle      = null;
   internal static AIBulletBank.Entry boneBullet = null;
   internal static VFXPool bonevfx               = null;
+  internal static uint megalo_event_id          = 0;
   public static void Init()
   {
     // Create our build-a-boss
@@ -198,6 +202,7 @@ public class SecretBoss : AIActor
       base.aiActor.healthHaver.OnPreDeath += (obj) =>
       {
         FlipSpriteIfNecessary(forceUnflip: true);
+        megalo_event_id = 0;
         AkSoundEngine.PostEvent("electromegalo_stop", base.aiActor.gameObject);
         AkSoundEngine.PostEvent("Play_ENM_beholster_death_01", base.aiActor.gameObject);
       };
@@ -225,6 +230,16 @@ public class SecretBoss : AIActor
 
       if (!hasFinishedIntro)
         return;
+
+      int pos = 0;
+      AKRESULT status = AkSoundEngine.GetSourcePlayPosition(megalo_event_id,out pos);
+      if (status == AKRESULT.AK_Success)
+      {
+        // ETGModConsole.Log($"{megalo_event_id}: position {pos}");
+        if (pos >= MEGALO_LOOP_END)
+          AkSoundEngine.SeekOnEvent("electromegalo",base.aiActor.gameObject,pos-MEGALO_LOOP_LENGTH);
+      }
+
       yoffset = Mathf.CeilToInt(JIGGLE * Mathf.Sin(SPEED*BraveTime.ScaledTimeSinceStartup))/16.0f;
       base.sprite.transform.localPosition += new Vector3(0,yoffset,0);
       if (UnityEngine.Random.Range(0.0f,1.0f) < 0.5f)
@@ -276,7 +291,7 @@ public class SecretBoss : AIActor
 
     private IEnumerator PlaySound()
     {
-      AkSoundEngine.PostEvent("electromegalo", base.aiActor.gameObject);
+      megalo_event_id = AkSoundEngine.PostEvent("electromegalo", base.aiActor.gameObject, in_uFlags: (uint)AkCallbackType.AK_EnableGetSourcePlayPosition);
       yield return StartCoroutine(BH.WaitForSecondsInvariant(1.8f));
       // AkSoundEngine.PostEvent("Play_BOSS_doormimic_lick_01", base.aiActor.gameObject);
       yield break;
@@ -335,12 +350,6 @@ public class SecretBoss : AIActor
       {
         this.Projectile.ChangeTintColorShader(0f,tint ?? new Color(1.0f,0.5f,0.5f,0.5f));
         base.Initialize();
-        // EasyTrailBullet trail4 = this.Projectile.gameObject.AddComponent<EasyTrailBullet>();
-        //   trail4.StartWidth = 0.2f;
-        //   trail4.EndWidth = 0f;
-        //   trail4.LifeTime = 0.1f;
-        //   trail4.BaseColor = Color.blue;
-        //   trail4.EndColor = Color.blue;
       }
   }
 
@@ -915,16 +924,7 @@ public class SecretBoss : AIActor
       {
         yield return Wait(this.delay);
         ChangeSpeed(new Speed(SPEED * delta.magnitude / (framesToApproach+1), SpeedType.Absolute));
-        // IEnumerator[] scripts = {OrbitAndScatter(),OrbitAndScatter()};
-        IEnumerator[] scripts = {OrbitAndScatter()};
-        foreach(IEnumerator e in scripts)
-          while(e.MoveNext())
-            yield return e.Current;
-        Vanish();
-      }
 
-      public IEnumerator OrbitAndScatter()
-      {
         yield return Wait(framesToApproach);
         float degreesPerFrame = degreesToOrbit / framesToOrbit;
         float curAngle = captureAngle;
@@ -942,8 +942,9 @@ public class SecretBoss : AIActor
         }
         AkSoundEngine.PostEvent(soundShoot, GameManager.Instance.PrimaryPlayer.gameObject);
         ChangeSpeed(new Speed(oldSpeed,SpeedType.Absolute));
-        // ChangeDirection(new Direction(curAngle,DirectionType.Absolute));
         yield return Wait(DELAY);
+
+        Vanish();
       }
     }
 
@@ -993,14 +994,14 @@ public class SecretBoss : AIActor
 
       return
         Run(Laugh(10))
-          .And(DoTheThing(15, warn: true, reverse:  flip))
-          .And(DoTheThing(15, warn: true, reverse: !flip), withDelay: SPAWN_DELAY*COUNT)
-          .And(DoTheThing(30,             reverse:  flip), withDelay: 10)
+          .And(DoTheThing(15, warn: true, reverse:  flip)                                   )
+          .And(DoTheThing(15, warn: true, reverse: !flip), withDelay:      SPAWN_DELAY*COUNT)
+          .And(DoTheThing(30,             reverse:  flip), withDelay: 10                    )
           .And(DoTheThing(30,             reverse: !flip), withDelay: 10 + SPAWN_DELAY*COUNT)
         .Then(Laugh(10))
-          .And(DoTheThing(15, warn: true, reverse:  flip))
-          .And(DoTheThing(15, warn: true, reverse: !flip), withDelay: SPAWN_DELAY*COUNT)
-          .And(DoTheThing(45,             reverse:  flip), withDelay: 20)
+          .And(DoTheThing(15, warn: true, reverse:  flip)                                   )
+          .And(DoTheThing(15, warn: true, reverse: !flip), withDelay:      SPAWN_DELAY*COUNT)
+          .And(DoTheThing(45,             reverse:  flip), withDelay: 20                    )
           .And(DoTheThing(45,             reverse: !flip), withDelay: 20 + SPAWN_DELAY*COUNT)
         .Finish();
     }
