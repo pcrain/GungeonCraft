@@ -192,8 +192,7 @@ namespace CwaffingTheGungy
 
                 // Bosses yo
                 BossBuilder.Init();
-                // RoomMimic.Init();
-                SecretBoss.Init();
+                SansBoss.Init();
 
                 // Modified version of Anywhere mod, further stolen and modified from Apache's version
                 FlowCommands.Install();

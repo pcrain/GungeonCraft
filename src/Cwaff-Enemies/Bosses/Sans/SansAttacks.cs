@@ -8,356 +8,17 @@ using UnityEngine;
 using MonoMod.RuntimeDetour;
 using Brave.BulletScript;
 
-using Gungeon;
-using ItemAPI;
-using EnemyAPI;
-using Dungeonator;
-
 namespace CwaffingTheGungy
 {
-public class SecretBoss : AIActor
+
+public partial class SansBoss : AIActor
 {
-  public  const string guid          = "Secret Boss";
-  private const string bossname      = "Sans Gundertale";
-  private const string subtitle      = "Introducing...";
-  // private const string spritePath    = "CwaffingTheGungy/Resources/room_mimic";
-  private const string spritePath    = "CwaffingTheGungy/Resources/sans";
-  private const string defaultSprite = "sans_idle_1";
-  private const string bossCardPath  = "CwaffingTheGungy/Resources/sans_bosscard.png";
+  private const string SOUND_SPAWN       = "Play_OBJ_turret_set_01";
+  private const string SOUND_SPAWN_QUIET = "undertale_pullback";
+  private const string SOUND_SHOOT       = "Play_WPN_spacerifle_shot_01";
+  private const string SOUND_TELEPORT    = "teledasher";
 
-  private const string soundSpawn      = "Play_OBJ_turret_set_01";
-  private const string soundSpawnQuiet = "undertale_pullback";
-  private const string soundSpawnAlt   = "undertale_arrow";
-  private const string soundShoot      = "Play_WPN_spacerifle_shot_01";
-
-  private const int MEGALO_LOOP_END    = 152512;
-  private const int MEGALO_LOOP_LENGTH = 137141;
-
-  private const int NUM_HITS = 60;
-
-  internal static GameObject napalmReticle      = null;
-  internal static AIBulletBank.Entry boneBullet = null;
-  internal static VFXPool bonevfx               = null;
-  internal static uint megalo_event_id          = 0;
-  public static void Init()
-  {
-    // Create our build-a-boss
-    BuildABoss bb = BuildABoss.LetsMakeABoss<BossBehavior>(
-      bossname, guid, $"{spritePath}/{defaultSprite}", new IntVector2(8, 9), subtitle, bossCardPath);
-    // Set our stats
-    bb.SetStats(health: NUM_HITS, weight: 200f, speed: 0.4f, collisionDamage: 0f,
-      hitReactChance: 0.05f, collisionKnockbackStrength: 0f, healthIsNumberOfHits: true, invulnerabilityPeriod: 1.0f);
-    // Set up our animations
-    bb.InitSpritesFromResourcePath(spritePath);
-      bb.AdjustAnimation("idle",         fps:   12f, loop: true);
-      bb.AdjustAnimation("idle_cloak",   fps:   12f, loop: true);
-      bb.AdjustAnimation("decloak",      fps:    6f, loop: false);
-      bb.AdjustAnimation("teleport_in",  fps:   60f, loop: false);
-      bb.AdjustAnimation("teleport_out", fps:   60f, loop: false);
-    // Set our default pixel colliders
-    bb.SetDefaultColliders(15,30,24,2);
-    // Add custom animation to the generic intro doer, and add a specific intro doer as well
-    bb.SetIntroAnimation("decloak");
-    bb.prefab.GetComponent<GenericIntroDoer>().preIntroAnim = "idle_cloak";
-    bb.AddCustomIntro<BossIntro>();
-    // Set up the boss's targeting and attacking scripts
-    bb.TargetPlayer();
-    // Add some named vfx pools to our bank of VFX
-    bb.AddNamedVFX(VFX.vfxpool["Tornado"], "mytornado");
-
-    // Add a random teleportation behavior
-    bb.CreateTeleportAttack<CustomTeleportBehavior>(
-      goneTime: 0.25f, outAnim: "teleport_out", inAnim: "teleport_in", cooldown: 0.26f, attackCooldown: 0.15f, probability: 3f);
-    // Add some basic bullet attacks
-    bb.CreateBulletAttack<CeilingBulletsScript>    (fireAnim: "laugh",       cooldown: 0.25f, attackCooldown: 0.15f);
-    bb.CreateBulletAttack<OrbitBulletScript>       (fireAnim: "throw_up",    cooldown: 0.25f, attackCooldown: 0.15f);
-    bb.CreateBulletAttack<HesitantBulletWallScript>(fireAnim: "throw_down",  cooldown: 0.25f, attackCooldown: 0.15f);
-    bb.CreateBulletAttack<SquareBulletScript>      (fireAnim: "throw_left",  cooldown: 0.25f, attackCooldown: 0.15f);
-    bb.CreateBulletAttack<ChainBulletScript>       (fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
-    bb.CreateBulletAttack<WallSlamScript>          (fireAnim: "laugh",       cooldown: 0.25f, attackCooldown: 0.15f);
-    bb.CreateBulletAttack<SineWaveScript>          (fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
-    bb.CreateBulletAttack<OrangeAndBlueScript>     (fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
-    bb.CreateBulletAttack<WiggleWaveScript>        (fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
-    // Add a bunch of simultaenous bullet attacks
-    // bb.CreateSimultaneousAttack(new(){
-    //   bb.CreateBulletAttack<RichochetScript> (add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
-    //   bb.CreateBulletAttack<RichochetScript2>(add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
-    //   bb.CreateBulletAttack<CeilingBulletsScript>(add: false, fireAnim: "swirl", attackCooldown: 3.5f, fireVfx: "mytornado"),
-    //   });
-
-    // Add our boss to the enemy database and to the first floor's boss pool
-    bb.AddBossToGameEnemies("cg:secretboss");
-    bb.AddBossToFloorPool(Floors.CASTLEGEON, weight: 9999f);
-
-    InitPrefabs();  // Do miscellaneous prefab loading
-  }
-
-  internal static void InitPrefabs()
-  {
-    // Targeting reticle
-    AssetBundle sharedAssets2 = ResourceManager.LoadAssetBundle("shared_auto_002");
-    GameObject prefabReticle = sharedAssets2.LoadAsset<GameObject>("NapalmStrikeReticle");
-    napalmReticle = UnityEngine.Object.Instantiate(prefabReticle);
-    tk2dSlicedSprite m_extantReticleQuad = napalmReticle.GetComponent<tk2dSlicedSprite>();
-        m_extantReticleQuad.SetSprite(VFX.SpriteCollection, VFX.sprites["reticle-white"]);
-    napalmReticle.RegisterPrefab();
-
-    // Bone bullet Spawn VFX
-    bonevfx = VFX.CreatePoolFromVFXGameObject((PickupObjectDatabase.GetById(29) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
-
-    // Bone bullet
-    AIBulletBank.Entry reversible = EnemyDatabase.GetOrLoadByGuid("1bc2a07ef87741be90c37096910843ab").bulletBank.GetBullet("reversible");
-    boneBullet = new AIBulletBank.Entry(reversible);
-      boneBullet.Name        = "getboned";
-      GameObject fancyBullet = UnityEngine.Object.Instantiate((PickupObjectDatabase.GetById(59) as Gun).DefaultModule.projectiles[0].gameObject); // hegemony rifle
-        fancyBullet.RegisterPrefab();
-        boneBullet.BulletObject = fancyBullet;
-      boneBullet.PlayAudio               = true;
-      boneBullet.PlayAudio               = false;
-      boneBullet.AudioEvent              = "Play_WPN_golddoublebarrelshotgun_shot_01";
-      boneBullet.AudioLimitOncePerAttack = false;
-      boneBullet.AudioLimitOncePerFrame  = false;
-      boneBullet.MuzzleFlashEffects      = bonevfx;
-  }
-
-  internal class DoomZoneGrowth : MonoBehaviour
-  {
-    public void Lengthen(float targetLength, int numFrames)
-    {
-      this.StartCoroutine(Lengthen_CR(targetLength,numFrames));
-    }
-
-    private IEnumerator Lengthen_CR(float targetLength, int numFrames)
-    {
-      tk2dSlicedSprite quad = this.GetComponent<tk2dSlicedSprite>();
-      float scaleFactor = C.PIXELS_PER_TILE * targetLength / numFrames;
-      for (int i = 1 ; i <= numFrames; ++i)
-      {
-        quad.dimensions = quad.dimensions.WithX(scaleFactor * i);
-        quad.UpdateZDepth();
-        yield return null;
-      }
-      // restore reticle riser settings
-      this.gameObject.GetOrAddComponent<ReticleRiserEffect>().NumRisers = 3;
-    }
-  }
-
-  // Creates a napalm-strike-esque danger zone
-  internal static GameObject DoomZone(Vector2 start, Vector2 target, float width, float lifetime = -1f, int growthTime = 0, string sprite = null)
-  {
-    Vector2 delta                        = target - start;
-    GameObject reticle                   = UnityEngine.Object.Instantiate(napalmReticle);
-    tk2dSlicedSprite m_extantReticleQuad = reticle.GetComponent<tk2dSlicedSprite>();
-      if (sprite != null)
-        m_extantReticleQuad.SetSprite(VFX.SpriteCollection, VFX.sprites[sprite]);
-      if (growthTime == 0)
-        m_extantReticleQuad.dimensions = C.PIXELS_PER_TILE * (new Vector2(delta.magnitude, width));
-      else
-      {
-        UnityEngine.Object.Destroy(reticle.GetComponent<ReticleRiserEffect>());
-        m_extantReticleQuad.dimensions = C.PIXELS_PER_TILE * (new Vector2(delta.magnitude / growthTime, width));
-        reticle.AddComponent<DoomZoneGrowth>().Lengthen(delta.magnitude,growthTime);
-      }
-      m_extantReticleQuad.transform.localRotation = Quaternion.Euler(0f, 0f, BraveMathCollege.Atan2Degrees(target-start));
-      m_extantReticleQuad.transform.position = start + (Quaternion.Euler(0f, 0f, -90f) * delta.normalized * (width / 2f)).XY();
-    if (lifetime > 0)
-      reticle.ExpireIn(lifetime);
-    return reticle;
-  }
-
-  internal static void SpawnDust(Vector2 where, int howMany = 1)
-  {
-    for (int i = 0; i < howMany; ++i)
-    {
-      DustUpVFX dusts = GameManager.Instance.Dungeon.dungeonDustups;
-      float dir = UnityEngine.Random.Range(0.0f,360.0f);
-      float rot = UnityEngine.Random.Range(0.0f,360.0f);
-      float mag = UnityEngine.Random.Range(0.3f,1.25f);
-      SpawnManager.SpawnVFX(
-          dusts.rollLandDustup,
-          where + BraveMathCollege.DegreesToVector(dir, mag),
-          Quaternion.Euler(0f, 0f, rot));
-    }
-  }
-
-  internal class BossBehavior : BraveBehaviour
-  {
-    private bool                    hasFinishedIntro = false;
-    private float                   yoffset          = 0;
-    private bool                    auraActive       = false;
-    private HeatIndicatorController aura;
-
-    // from basegame AuroOnReloadModifier
-    private void ActivateAura()
-    {
-      if (auraActive)
-        return;
-      auraActive = true;
-      aura = ((GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global VFX/HeatIndicator"), base.aiActor.CenterPosition.ToVector3ZisY(), Quaternion.identity, base.aiActor.sprite.transform)).GetComponent<HeatIndicatorController>();
-        aura.CurrentColor  = new Color(1f, 1f, 1f);
-        aura.IsFire        = true;
-        aura.CurrentRadius = 2f;
-    }
-
-    private void Start()
-    {
-      base.aiActor.healthHaver.OnPreDeath += (obj) =>
-      {
-        FlipSpriteIfNecessary(forceUnflip: true);
-        megalo_event_id = 0;
-        AkSoundEngine.PostEvent("electromegalo_stop", GameManager.Instance.DungeonMusicController.gameObject);
-        AkSoundEngine.PostEvent("Play_ENM_beholster_death_01", base.aiActor.gameObject);
-      };
-      base.healthHaver.healthHaver.OnDeath += (obj) =>
-      {
-        FlipSpriteIfNecessary(forceUnflip: true);
-        Chest chest2 = GameManager.Instance.RewardManager.SpawnTotallyRandomChest(GameManager.Instance.PrimaryPlayer.CurrentRoom.GetRandomVisibleClearSpot(1, 1));
-        chest2.IsLocked = false;
-      };
-      this.aiActor.bulletBank.Bullets.Add(boneBullet);
-    }
-
-    public void FinishedIntro()
-    {
-      hasFinishedIntro = true;
-      ActivateAura();
-    }
-
-    private void Update()
-    {
-
-      if (!hasFinishedIntro)
-        return;
-
-      // loop music if necessary
-      int pos;
-      AKRESULT status = AkSoundEngine.GetSourcePlayPosition(megalo_event_id, out pos);
-      if (status == AKRESULT.AK_Success && pos >= MEGALO_LOOP_END)
-        AkSoundEngine.SeekOnEvent("electromegalo", GameManager.Instance.DungeonMusicController.gameObject,pos - MEGALO_LOOP_LENGTH);
-
-      // don't do anything if we're paused
-      if (BraveTime.DeltaTime == 0)
-        return;
-
-      DriftAround();
-    }
-
-    private void LateUpdate()
-    {
-      const float JIGGLE = 4.0f;
-      const float SPEED  = 4.0f;
-
-      if (!hasFinishedIntro)
-        return;
-
-      // don't do anything if we're paused
-      if (BraveTime.DeltaTime == 0)
-        return;
-
-      FlipSpriteIfNecessary();
-
-      yoffset = Mathf.CeilToInt(JIGGLE * Mathf.Sin(SPEED*BraveTime.ScaledTimeSinceStartup))/16.0f;
-      base.sprite.transform.localPosition += new Vector3(0,yoffset,0);
-      if (Lazy.CoinFlip())
-        SpawnDust(base.specRigidbody.UnitCenter);
-    }
-
-    private void DriftAround()
-    {
-      base.aiActor.PathfindToPosition(GameManager.Instance.PrimaryPlayer.specRigidbody.UnitCenter);
-    }
-
-    private void FlipSpriteIfNecessary(bool forceUnflip = false)
-    {
-      bool lastFlip      = base.sprite.FlipX;
-      bool shouldFlip    = (GameManager.Instance.BestActivePlayer.sprite.WorldBottomCenter.x < base.specRigidbody.UnitBottomCenter.x);
-      base.sprite.FlipX  = shouldFlip && (!forceUnflip);
-      Vector3 spriteSize = base.sprite.GetUntrimmedBounds().size;
-      Vector3 offset     = new Vector3(spriteSize.x / 2, 0f, 0f);
-      if (!base.sprite.FlipX)
-        offset *= -1;
-
-      Vector3 finalPosition = (Vector3)base.specRigidbody.UnitBottomCenter/*.RoundToInt()*/ + offset;
-      base.sprite.transform.localPosition = finalPosition;
-      if (auraActive)
-        aura.transform.localPosition = new Vector3(0,spriteSize.y / 2,0) - offset;
-    }
-  }
-
-  [RequireComponent(typeof(GenericIntroDoer))]
-  internal class BossIntro : SpecificIntroDoer
-  {
-    public override void PlayerWalkedIn(PlayerController player, List<tk2dSpriteAnimator> animators)
-    {
-      SetupRoomSpecificAttacks();
-      GameManager.Instance.StartCoroutine(PlayMusic());
-    }
-
-    private void SetupRoomSpecificAttacks()
-    {
-      Rect roomFullBounds = base.aiActor.GetAbsoluteParentRoom().GetBoundingRect();
-      Rect roomTeleportBounds = roomFullBounds.Inset(8f);
-      foreach (AttackBehaviorGroup.AttackGroupItem attack in base.aiActor.gameObject.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors)
-      {
-        if (attack.Behavior is TeleportBehavior)
-        {
-          TeleportBehavior tb = attack.Behavior as TeleportBehavior;
-          tb.ManuallyDefineRoom = true;
-          tb.roomMin = roomTeleportBounds.min;
-          tb.roomMax = roomTeleportBounds.max;
-        }
-      }
-    }
-
-    private IEnumerator PlayMusic()
-    {
-      megalo_event_id = AkSoundEngine.PostEvent("electromegalo", GameManager.Instance.DungeonMusicController.gameObject, in_uFlags: (uint)AkCallbackType.AK_EnableGetSourcePlayPosition);
-      yield return StartCoroutine(BH.WaitForSecondsInvariant(1.8f));
-      yield break;
-    }
-
-    public override void EndIntro()
-    {
-      base.aiActor.gameObject.GetComponent<BossBehavior>().FinishedIntro();
-    }
-  }
-
-  internal class CustomTeleportBehavior : TeleportBehavior
-  {
-    private bool    playedInSound  = false;
-    private bool    playedOutSound = false;
-    private Vector3 oldPos         = Vector3.zero;
-    private Vector3 newPos         = Vector3.zero;
-    public override ContinuousBehaviorResult ContinuousUpdate()
-    {
-      if (State == TeleportState.TeleportOut)
-      {
-        if (!playedOutSound)
-        {
-          AkSoundEngine.PostEvent("teledasher", GameManager.Instance.PrimaryPlayer.gameObject);
-          oldPos = base.m_aiActor.Position;
-        }
-        playedOutSound = true;
-        playedInSound = false;
-      }
-      else if (State == TeleportState.TeleportIn)
-      {
-        if (!playedInSound)
-        {
-          AkSoundEngine.PostEvent("teledasher", GameManager.Instance.PrimaryPlayer.gameObject);
-          newPos = base.m_aiActor.Position;
-          Vector3 delta = (newPos-oldPos);
-          for(int i = 0; i < 10; ++i)
-            SpawnDust(oldPos + (i/10.0f) * delta);
-        }
-        playedInSound = true;
-        playedOutSound = false;
-      }
-      return base.ContinuousUpdate();
-    }
-  }
-
-  internal class SecretBullet : Bullet
+  private class SecretBullet : Bullet
   {
       private Color? tint = null;
       public SecretBullet(Color? tint = null) : base("getboned")
@@ -372,12 +33,52 @@ public class SecretBoss : AIActor
       }
   }
 
-  internal abstract class SecretBulletScript : FluidBulletScript
+  private class SineBullet : SecretBullet
   {
-    protected AIActor boss {get; private set;}
-    protected Rect roomFullBounds {get; private set;}
-    protected Rect roomBulletBounds {get; private set;}
-    protected Rect roomSlamBounds {get; private set;}
+    private float  amplitude        = 1f;
+    private float  freq             = 1f;
+    private float  phase            = 0f;
+    private float? rotationOverride = null;
+
+    private float lifetime  = 0f;
+
+    public SineBullet(float amplitude, float freq, float phase = 0, float? rotationOverride = null) : base()
+    {
+      this.amplitude        = amplitude;
+      this.freq             = freq;
+      this.phase            = phase;
+      this.rotationOverride = rotationOverride;
+    }
+
+    public override IEnumerator Top()
+    {
+      AkSoundEngine.PostEvent(SOUND_SHOOT, GameManager.Instance.PrimaryPlayer.gameObject);
+
+      Vector2 startSpeed   = this.RealVelocity();
+      float rotationNormal = ((this.rotationOverride ?? startSpeed.ToAngle()) + 90f).Clamp180();
+      Vector2 amp          = amplitude * rotationNormal.ToVector();
+      Vector2 anchorPos    = this.Position - Mathf.Sin(phase) * amp;
+      float adjfreq        = freq * 2f * Mathf.PI;
+      this.ChangeSpeed(new Speed(0));
+      while (true)
+      {
+        this.lifetime       += BraveTime.DeltaTime;
+        anchorPos           += startSpeed;
+        Vector2 oldPosition  = this.Position;
+        float curPhase       = Mathf.Sin(adjfreq*this.lifetime + phase);
+        this.Position        = anchorPos + curPhase * amp;
+        this.ChangeDirection(new Direction((this.Position-oldPosition).ToAngle(),DirectionType.Absolute));
+        yield return Wait(1);
+      }
+    }
+  }
+
+  private abstract class SecretBulletScript : FluidBulletScript
+  {
+    protected AIActor boss             {get; private set;}
+    protected Rect    roomFullBounds   {get; private set;}
+    protected Rect    roomBulletBounds {get; private set;}
+    protected Rect    roomSlamBounds   {get; private set;}
 
     public override void Initialize()
     {
@@ -389,7 +90,8 @@ public class SecretBoss : AIActor
     }
   }
 
-  internal class OrangeAndBlueScript : SecretBulletScript
+  // Shoots undertale-esque blue / orange bullets from all directions
+  private class OrangeAndBlueScript : SecretBulletScript
   {
     private static readonly string orangeReticle = "reticle-orange";
     private static readonly string blueReticle   = "reticle-blue";
@@ -446,7 +148,7 @@ public class SecretBoss : AIActor
       yield return Wait(LENIENCE);
       for(int wave = 0; wave < WAVES; ++wave)
       {
-        AkSoundEngine.PostEvent(soundShoot, GameManager.Instance.PrimaryPlayer.gameObject);
+        AkSoundEngine.PostEvent(SOUND_SHOOT, GameManager.Instance.PrimaryPlayer.gameObject);
         ppos      = GameManager.Instance.PrimaryPlayer.CenterPosition;
         int count = 0;
         foreach(Vector2 p in points)
@@ -461,47 +163,8 @@ public class SecretBoss : AIActor
     }
   }
 
-  internal class SineBullet : SecretBullet
-  {
-    private float  amplitude        = 1f;
-    private float  freq             = 1f;
-    private float  phase            = 0f;
-    private float? rotationOverride = null;
-
-    private float lifetime  = 0f;
-
-    public SineBullet(float amplitude, float freq, float phase = 0, float? rotationOverride = null) : base()
-    {
-      this.amplitude        = amplitude;
-      this.freq             = freq;
-      this.phase            = phase;
-      this.rotationOverride = rotationOverride;
-    }
-
-    public override IEnumerator Top()
-    {
-      AkSoundEngine.PostEvent(soundShoot, GameManager.Instance.PrimaryPlayer.gameObject);
-
-      Vector2 startSpeed   = this.RealVelocity();
-      float rotationNormal = ((this.rotationOverride ?? startSpeed.ToAngle()) + 90f).Clamp180();
-      Vector2 amp          = amplitude * rotationNormal.ToVector();
-      Vector2 anchorPos    = this.Position - Mathf.Sin(phase) * amp;
-      float adjfreq        = freq * 2f * Mathf.PI;
-      this.ChangeSpeed(new Speed(0));
-      while (true)
-      {
-        this.lifetime       += BraveTime.DeltaTime;
-        anchorPos           += startSpeed;
-        Vector2 oldPosition  = this.Position;
-        float curPhase       = Mathf.Sin(adjfreq*this.lifetime + phase);
-        this.Position        = anchorPos + curPhase * amp;
-        this.ChangeDirection(new Direction((this.Position-oldPosition).ToAngle(),DirectionType.Absolute));
-        yield return Wait(1);
-      }
-    }
-  }
-
-  internal class SineWaveScript : SecretBulletScript
+  // Shoots an enclosing sinusoidal pattern of bullets from the walls of the room
+  private class SineWaveScript : SecretBulletScript
   {
 
     protected override List<FluidBulletInfo> BuildChain()
@@ -530,7 +193,8 @@ public class SecretBoss : AIActor
     }
   }
 
-  internal class WiggleWaveScript : SecretBulletScript
+  // Shoots a spiral of bullets outward from the boss
+  private class WiggleWaveScript : SecretBulletScript
   {
 
     protected override List<FluidBulletInfo> BuildChain()
@@ -565,7 +229,8 @@ public class SecretBoss : AIActor
     }
   }
 
-  internal class WallSlamScript : SecretBulletScript
+  // Slams the player against the wall in alternating horizontal / vertical directions and follows up with a bullet shower
+  private class WallSlamScript : SecretBulletScript
   {
 
     internal class GravityBullet : SecretBullet
@@ -596,7 +261,7 @@ public class SecretBoss : AIActor
 
       public override IEnumerator Top()
       {
-        AkSoundEngine.PostEvent(soundShoot, GameManager.Instance.PrimaryPlayer.gameObject);
+        AkSoundEngine.PostEvent(SOUND_SHOOT, GameManager.Instance.PrimaryPlayer.gameObject);
         // Vector2 newVelocity = this.RealVelocity();
         Vector2 newVelocity = this.startVelocity;
         for (int i = 0; i < VANISHTIME; ++i)
@@ -701,14 +366,15 @@ public class SecretBoss : AIActor
     }
   }
 
-  internal class ChainBulletScript : SecretBulletScript
+  // Shoots telegraphed bullets from random points on the room perimeter toward the player
+  private class ChainBulletScript : SecretBulletScript
   {
 
     public class ChainBullet : SecretBullet
     {
       public override IEnumerator Top()
       {
-        AkSoundEngine.PostEvent(soundShoot, GameManager.Instance.PrimaryPlayer.gameObject);
+        AkSoundEngine.PostEvent(SOUND_SHOOT, GameManager.Instance.PrimaryPlayer.gameObject);
         yield break;
       }
     }
@@ -743,7 +409,7 @@ public class SecretBoss : AIActor
           spawnPoints.Add(spawnPoint);
           shotAngles.Add((ppos-spawnPoint).ToAngle().Clamp180());
           DoomZone(spawnPoint, spawnPoints[s].RaycastToWall(shotAngles[s], base.roomFullBounds), 1f, PHASEDELAY / C.FPS, 10);
-          AkSoundEngine.PostEvent(soundSpawn, GameManager.Instance.PrimaryPlayer.gameObject);
+          AkSoundEngine.PostEvent(SOUND_SPAWN, GameManager.Instance.PrimaryPlayer.gameObject);
           yield return Wait(SHOTDELAY);
         }
         for (int j = 0; j < SHOTSPERSTREAM; ++j)
@@ -757,7 +423,8 @@ public class SecretBoss : AIActor
     }
   }
 
-  internal class SquareBulletScript : SecretBulletScript
+  // Shoots bullets in an interrupted circle around the boss that target the player after halting for a brief period
+  private class SquareBulletScript : SecretBulletScript
   {
     public class SquareBullet : SecretBullet
     {
@@ -771,14 +438,14 @@ public class SecretBoss : AIActor
 
       public override IEnumerator Top()
       {
-        AkSoundEngine.PostEvent(soundShoot, GameManager.Instance.PrimaryPlayer.gameObject);
+        AkSoundEngine.PostEvent(SOUND_SHOOT, GameManager.Instance.PrimaryPlayer.gameObject);
         yield return Wait(this.goFrames);
         float initSpeed = this.Speed;
         this.ChangeSpeed(new Speed(0,SpeedType.Absolute));
         yield return Wait(this.waitFrames);
         this.ChangeSpeed(new Speed(initSpeed,SpeedType.Absolute));
         this.ChangeDirection(new Direction(this.DirToNearestPlayer(),DirectionType.Absolute));
-        AkSoundEngine.PostEvent(soundShoot, GameManager.Instance.PrimaryPlayer.gameObject);
+        AkSoundEngine.PostEvent(SOUND_SHOOT, GameManager.Instance.PrimaryPlayer.gameObject);
         yield return Wait(120);
         Vanish();
         yield break;
@@ -822,7 +489,8 @@ public class SecretBoss : AIActor
     }
   }
 
-  internal class HesitantBulletWallScript : SecretBulletScript
+  // Shoots bullets that form a decelerating wall in front of the player then launch forward
+  private class HesitantBulletWallScript : SecretBulletScript
   {
     public class HesitantBullet : SecretBullet
     {
@@ -836,12 +504,12 @@ public class SecretBoss : AIActor
       public override IEnumerator Top()
       {
         // AkSoundEngine.PostEvent("megalo_pause", GameManager.Instance.DungeonMusicController.gameObject);
-        AkSoundEngine.PostEvent(soundSpawn, GameManager.Instance.PrimaryPlayer.gameObject);
+        AkSoundEngine.PostEvent(SOUND_SPAWN, GameManager.Instance.PrimaryPlayer.gameObject);
         float initSpeed = this.Speed;
         this.ChangeSpeed(new Speed(0,SpeedType.Absolute),waitFrames);
         yield return Wait(waitFrames);
         this.ChangeSpeed(new Speed(initSpeed*2,SpeedType.Absolute));
-        AkSoundEngine.PostEvent(soundShoot, GameManager.Instance.PrimaryPlayer.gameObject);
+        AkSoundEngine.PostEvent(SOUND_SHOOT, GameManager.Instance.PrimaryPlayer.gameObject);
         // AkSoundEngine.PostEvent("megalo_resume", GameManager.Instance.DungeonMusicController.gameObject);
         yield return Wait(120);
         Vanish();
@@ -882,7 +550,8 @@ public class SecretBoss : AIActor
     }
   }
 
-  internal class OrbitBulletScript : SecretBulletScript
+  // Shoots bullets that orbit the player closely then scatter
+  private class OrbitBulletScript : SecretBulletScript
   {
 
     public class OrbitBullet : SecretBullet
@@ -946,7 +615,7 @@ public class SecretBoss : AIActor
           ChangeDirection(new Direction((newTarget-this.Position).ToAngle(),DirectionType.Absolute));
           this.Position = newTarget;
         }
-        AkSoundEngine.PostEvent(soundShoot, GameManager.Instance.PrimaryPlayer.gameObject);
+        AkSoundEngine.PostEvent(SOUND_SHOOT, GameManager.Instance.PrimaryPlayer.gameObject);
         ChangeSpeed(new Speed(oldSpeed,SpeedType.Absolute));
         yield return Wait(DELAY);
 
@@ -976,7 +645,7 @@ public class SecretBoss : AIActor
       for (int j = 0; j < COUNT; j++)
       {
         if (j % 2 == 0)
-          AkSoundEngine.PostEvent(soundSpawn, GameManager.Instance.PrimaryPlayer.gameObject);
+          AkSoundEngine.PostEvent(SOUND_SPAWN, GameManager.Instance.PrimaryPlayer.gameObject);
         yield return this.Wait(SPAWN_GAP);
         float realAngle    = (j*ANGLE_DELTA).Clamp180();
         float targetRadius = INNER_RADIUS+(j*SPIRAL/COUNT);
@@ -988,8 +657,8 @@ public class SecretBoss : AIActor
     }
   }
 
-  // Shoots a bunch of bullets from the ceiling of the current room
-  internal class CeilingBulletsScript : SecretBulletScript
+  // Shoots bullets from the ceiling / floor of the current room
+  private class CeilingBulletsScript : SecretBulletScript
   {
     private const int COUNT       = 16;
     private const int SPAWN_DELAY = 4;
@@ -1032,7 +701,7 @@ public class SecretBoss : AIActor
         {
           DoomZone(points[i], points[i].RaycastToWall(angle, base.roomBulletBounds), 1f, COUNT / 15.0f, 20);
           if (i % 2 == 0)
-            AkSoundEngine.PostEvent(soundSpawnQuiet, GameManager.Instance.PrimaryPlayer.gameObject);
+            AkSoundEngine.PostEvent(SOUND_SPAWN_QUIET, GameManager.Instance.PrimaryPlayer.gameObject);
         }
         yield return this.Wait(SPAWN_DELAY);
       }
@@ -1040,10 +709,45 @@ public class SecretBoss : AIActor
       {
         this.Fire(Offset.OverridePosition(points[i]), new Direction(angle, DirectionType.Absolute), new Speed(speed), new SecretBullet());
         if (i % 2 == 1)
-          AkSoundEngine.PostEvent(soundShoot, GameManager.Instance.PrimaryPlayer.gameObject);
+          AkSoundEngine.PostEvent(SOUND_SHOOT, GameManager.Instance.PrimaryPlayer.gameObject);
         yield return this.Wait(SPAWN_DELAY);
       }
       yield break;
+    }
+  }
+
+  private class CustomTeleportBehavior : TeleportBehavior
+  {
+    private bool    playedInSound  = false;
+    private bool    playedOutSound = false;
+    private Vector3 oldPos         = Vector3.zero;
+    private Vector3 newPos         = Vector3.zero;
+    public override ContinuousBehaviorResult ContinuousUpdate()
+    {
+      if (State == TeleportState.TeleportOut)
+      {
+        if (!playedOutSound)
+        {
+          AkSoundEngine.PostEvent(SOUND_TELEPORT, GameManager.Instance.PrimaryPlayer.gameObject);
+          oldPos = base.m_aiActor.Position;
+        }
+        playedOutSound = true;
+        playedInSound = false;
+      }
+      else if (State == TeleportState.TeleportIn)
+      {
+        if (!playedInSound)
+        {
+          AkSoundEngine.PostEvent(SOUND_TELEPORT, GameManager.Instance.PrimaryPlayer.gameObject);
+          newPos = base.m_aiActor.Position;
+          Vector3 delta = (newPos-oldPos);
+          for(int i = 0; i < 10; ++i)
+            SpawnDust(oldPos + (i/10.0f) * delta);
+        }
+        playedInSound = true;
+        playedOutSound = false;
+      }
+      return base.ContinuousUpdate();
     }
   }
 }

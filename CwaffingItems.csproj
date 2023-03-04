@@ -55,9 +55,9 @@
     <Compile Include="src\HatsStolenFromNN\Hat.cs"/>
     <Compile Include="src\HatsStolenFromNN\HatDefinitions.cs"/>
     <Compile Include="src\Cwaff-Enemies\BulletScriptHelper.cs"/>
-    <Compile Include="src\Cwaff-Enemies\BuildABoss.cs"/>
-    <Compile Include="src\Cwaff-Enemies\TestBoss.cs"/>
-    <Compile Include="src\Cwaff-Enemies\SecretBoss.cs"/>
+    <Compile Include="src\Cwaff-Enemies\Bosses\BuildABoss.cs"/>
+    <Compile Include="src\Cwaff-Enemies\Bosses\Sans\Sans.cs"/>
+    <Compile Include="src\Cwaff-Enemies\Bosses\Sans\SansAttacks.cs"/>
     <Compile Include="src\Cwaff-Enemies\PathableBullet.cs"/>
     <Compile Include="src\Cwaff-Rooms\FlowHelpers.cs"/>
     <Compile Include="src\Cwaff-Rooms\FlowSimpleAsItGets.cs"/>

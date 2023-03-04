@@ -305,6 +305,11 @@ namespace CwaffingTheGungy
         {
           return UnityEngine.Random.Range(0,2) == 1;
         }
+
+        public static Projectile GunDefaultProjectile(int gunid)
+        {
+            return (PickupObjectDatabase.GetById(gunid) as Gun).DefaultModule.projectiles[0];
+        }
     }
 
     public static class Dissect // reflection helper methods for being a lazy dumdum

@@ -104,11 +104,12 @@ namespace CwaffingTheGungy
     }
 
     // Register a game object as a prefab
-    public static void RegisterPrefab(this GameObject self)
+    public static GameObject RegisterPrefab(this GameObject self)
     {
       self.gameObject.SetActive(false);
       FakePrefab.MarkAsFakePrefab(self.gameObject);
       UnityEngine.Object.DontDestroyOnLoad(self);
+      return self;
     }
 
     // Convert degrees to a Vector2 angle

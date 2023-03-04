@@ -483,9 +483,12 @@ namespace CwaffingTheGungy
       this.enemyBehavior.AdjustAnimation(name, fps, loop);
     }
 
-    public void SetIntroAnimation(string name)
+    public void SetIntroAnimations(string introAnim = null, string preIntroAnim = null)
     {
-      this.prefab.GetComponent<GenericIntroDoer>().introAnim = name;
+      if (introAnim != null)
+        this.prefab.GetComponent<GenericIntroDoer>().introAnim = introAnim;
+      if (preIntroAnim != null)
+        this.prefab.GetComponent<GenericIntroDoer>().preIntroAnim = preIntroAnim;
     }
 
     public void AddBossToGameEnemies(string name)
