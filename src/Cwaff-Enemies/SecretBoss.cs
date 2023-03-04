@@ -45,15 +45,15 @@ public class SecretBoss : AIActor
     BuildABoss bb = BuildABoss.LetsMakeABoss<BossBehavior>(
       bossname, guid, $"{spritePath}/{defaultSprite}", new IntVector2(8, 9), subtitle, bossCardPath);
     // Set our stats
-    bb.SetStats(health: NUM_HITS, weight: 200f, speed: 2f, collisionDamage: 0f,
-      hitReactChance: 0.05f, collisionKnockbackStrength: 0f);
+    bb.SetStats(health: NUM_HITS, weight: 200f, speed: 0.4f, collisionDamage: 0f,
+      hitReactChance: 0.05f, collisionKnockbackStrength: 0f, healthIsNumberOfHits: true, invulnerabilityPeriod: 1.0f);
     // Set up our animations
     bb.InitSpritesFromResourcePath(spritePath);
-      bb.AdjustAnimation("idle",   fps:   12f, loop: true);
+      bb.AdjustAnimation("idle",         fps:   12f, loop: true);
       bb.AdjustAnimation("idle_cloak",   fps:   12f, loop: true);
-      bb.AdjustAnimation("decloak",   fps:   6f, loop: false);
-      bb.AdjustAnimation("teleport_in",   fps:   60f, loop: false);
-      bb.AdjustAnimation("teleport_out",   fps:   60f, loop: false);
+      bb.AdjustAnimation("decloak",      fps:    6f, loop: false);
+      bb.AdjustAnimation("teleport_in",  fps:   60f, loop: false);
+      bb.AdjustAnimation("teleport_out", fps:   60f, loop: false);
     // Set our default pixel colliders
     bb.SetDefaultColliders(15,30,24,2);
     // Add custom animation to the generic intro doer, and add a specific intro doer as well
@@ -67,26 +67,23 @@ public class SecretBoss : AIActor
 
     // Add a random teleportation behavior
     bb.CreateTeleportAttack<CustomTeleportBehavior>(
-      goneTime: 0.25f, outAnim: "teleport_out", inAnim: "teleport_in", cooldown: 0.26f, attackCooldown: 0.15f, probability: 10f);
+      goneTime: 0.25f, outAnim: "teleport_out", inAnim: "teleport_in", cooldown: 0.26f, attackCooldown: 0.15f, probability: 3f);
     // Add some basic bullet attacks
-    bb.CreateBulletAttack<CeilingBulletsScript>(fireAnim: "laugh", cooldown: 0.25f, attackCooldown: 0.15f);
-    bb.CreateBulletAttack<OrbitBulletScript>(fireAnim: "throw_up", cooldown: 0.25f, attackCooldown: 0.15f);
-    bb.CreateBulletAttack<HesitantBulletWallScript>(fireAnim: "throw_down", cooldown: 0.25f, attackCooldown: 0.15f);
-    bb.CreateBulletAttack<SquareBulletScript>(fireAnim: "throw_left", cooldown: 0.25f, attackCooldown: 0.15f);
-    bb.CreateBulletAttack<ChainBulletScript>(fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
-    bb.CreateBulletAttack<WallSlamScript>(fireAnim: "laugh", cooldown: 0.25f, attackCooldown: 0.15f);
-    bb.CreateBulletAttack<SineWaveScript>(fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
-    bb.CreateBulletAttack<OrangeAndBlueScript>(fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
-    bb.CreateBulletAttack<WiggleWaveScript>(fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
+    bb.CreateBulletAttack<CeilingBulletsScript>    (fireAnim: "laugh",       cooldown: 0.25f, attackCooldown: 0.15f);
+    bb.CreateBulletAttack<OrbitBulletScript>       (fireAnim: "throw_up",    cooldown: 0.25f, attackCooldown: 0.15f);
+    bb.CreateBulletAttack<HesitantBulletWallScript>(fireAnim: "throw_down",  cooldown: 0.25f, attackCooldown: 0.15f);
+    bb.CreateBulletAttack<SquareBulletScript>      (fireAnim: "throw_left",  cooldown: 0.25f, attackCooldown: 0.15f);
+    bb.CreateBulletAttack<ChainBulletScript>       (fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
+    bb.CreateBulletAttack<WallSlamScript>          (fireAnim: "laugh",       cooldown: 0.25f, attackCooldown: 0.15f);
+    bb.CreateBulletAttack<SineWaveScript>          (fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
+    bb.CreateBulletAttack<OrangeAndBlueScript>     (fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
+    bb.CreateBulletAttack<WiggleWaveScript>        (fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
     // Add a bunch of simultaenous bullet attacks
     // bb.CreateSimultaneousAttack(new(){
     //   bb.CreateBulletAttack<RichochetScript> (add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
     //   bb.CreateBulletAttack<RichochetScript2>(add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
     //   bb.CreateBulletAttack<CeilingBulletsScript>(add: false, fireAnim: "swirl", attackCooldown: 3.5f, fireVfx: "mytornado"),
     //   });
-
-    // Add a wandering behavior
-    // bb.prefab.GetComponent<BehaviorSpeculator>().MovementBehaviors.Add(new WanderBehavior());
 
     // Add our boss to the enemy database and to the first floor's boss pool
     bb.AddBossToGameEnemies("cg:secretboss");
@@ -111,16 +108,16 @@ public class SecretBoss : AIActor
     // Bone bullet
     AIBulletBank.Entry reversible = EnemyDatabase.GetOrLoadByGuid("1bc2a07ef87741be90c37096910843ab").bulletBank.GetBullet("reversible");
     boneBullet = new AIBulletBank.Entry(reversible);
-      boneBullet.Name         = "getboned";
+      boneBullet.Name        = "getboned";
       GameObject fancyBullet = UnityEngine.Object.Instantiate((PickupObjectDatabase.GetById(59) as Gun).DefaultModule.projectiles[0].gameObject); // hegemony rifle
         fancyBullet.RegisterPrefab();
         boneBullet.BulletObject = fancyBullet;
-      boneBullet.PlayAudio    = true;
-      boneBullet.PlayAudio    = false;
-      boneBullet.AudioEvent   = "Play_WPN_golddoublebarrelshotgun_shot_01";
+      boneBullet.PlayAudio               = true;
+      boneBullet.PlayAudio               = false;
+      boneBullet.AudioEvent              = "Play_WPN_golddoublebarrelshotgun_shot_01";
       boneBullet.AudioLimitOncePerAttack = false;
-      boneBullet.AudioLimitOncePerFrame = false;
-      boneBullet.MuzzleFlashEffects = bonevfx;
+      boneBullet.AudioLimitOncePerFrame  = false;
+      boneBullet.MuzzleFlashEffects      = bonevfx;
   }
 
   internal class DoomZoneGrowth : MonoBehaviour
@@ -185,9 +182,9 @@ public class SecretBoss : AIActor
 
   internal class BossBehavior : BraveBehaviour
   {
-    private bool hasFinishedIntro = false;
-    private float yoffset = 0;
-    private bool auraActive = false;
+    private bool                    hasFinishedIntro = false;
+    private float                   yoffset          = 0;
+    private bool                    auraActive       = false;
     private HeatIndicatorController aura;
 
     // from basegame AuroOnReloadModifier
@@ -197,21 +194,18 @@ public class SecretBoss : AIActor
         return;
       auraActive = true;
       aura = ((GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global VFX/HeatIndicator"), base.aiActor.CenterPosition.ToVector3ZisY(), Quaternion.identity, base.aiActor.sprite.transform)).GetComponent<HeatIndicatorController>();
-        aura.CurrentColor = new Color(1f, 1f, 1f);
-        aura.IsFire = true;
+        aura.CurrentColor  = new Color(1f, 1f, 1f);
+        aura.IsFire        = true;
         aura.CurrentRadius = 2f;
     }
 
     private void Start()
     {
-      base.aiActor.healthHaver.healthIsNumberOfHits = true;
-      base.aiActor.healthHaver.usesInvulnerabilityPeriod = true;
-      base.aiActor.healthHaver.invulnerabilityPeriod = 1.0f;
       base.aiActor.healthHaver.OnPreDeath += (obj) =>
       {
         FlipSpriteIfNecessary(forceUnflip: true);
         megalo_event_id = 0;
-        AkSoundEngine.PostEvent("electromegalo_stop", base.aiActor.gameObject);
+        AkSoundEngine.PostEvent("electromegalo_stop", GameManager.Instance.DungeonMusicController.gameObject);
         AkSoundEngine.PostEvent("Play_ENM_beholster_death_01", base.aiActor.gameObject);
       };
       base.healthHaver.healthHaver.OnDeath += (obj) =>
@@ -220,7 +214,6 @@ public class SecretBoss : AIActor
         Chest chest2 = GameManager.Instance.RewardManager.SpawnTotallyRandomChest(GameManager.Instance.PrimaryPlayer.CurrentRoom.GetRandomVisibleClearSpot(1, 1));
         chest2.IsLocked = false;
       };
-      // this.aiActor.knockbackDoer.SetImmobile(true, "laugh");
       this.aiActor.bulletBank.Bullets.Add(boneBullet);
     }
 
@@ -237,14 +230,10 @@ public class SecretBoss : AIActor
         return;
 
       // loop music if necessary
-      int pos = 0;
+      int pos;
       AKRESULT status = AkSoundEngine.GetSourcePlayPosition(megalo_event_id, out pos);
-      if (status == AKRESULT.AK_Success)
-      {
-        // ETGModConsole.Log($"{megalo_event_id}: position {pos}");
-        if (pos >= MEGALO_LOOP_END)
-          AkSoundEngine.SeekOnEvent("electromegalo", base.aiActor.gameObject,pos - MEGALO_LOOP_LENGTH);
-      }
+      if (status == AKRESULT.AK_Success && pos >= MEGALO_LOOP_END)
+        AkSoundEngine.SeekOnEvent("electromegalo", GameManager.Instance.DungeonMusicController.gameObject,pos - MEGALO_LOOP_LENGTH);
 
       // don't do anything if we're paused
       if (BraveTime.DeltaTime == 0)
@@ -256,7 +245,7 @@ public class SecretBoss : AIActor
     private void LateUpdate()
     {
       const float JIGGLE = 4.0f;
-      const float SPEED = 4.0f;
+      const float SPEED  = 4.0f;
 
       if (!hasFinishedIntro)
         return;
@@ -280,11 +269,11 @@ public class SecretBoss : AIActor
 
     private void FlipSpriteIfNecessary(bool forceUnflip = false)
     {
-      bool lastFlip = base.sprite.FlipX;
-      bool shouldFlip = (GameManager.Instance.BestActivePlayer.sprite.WorldBottomCenter.x < base.specRigidbody.UnitBottomCenter.x);
-      base.sprite.FlipX = shouldFlip && (!forceUnflip);
+      bool lastFlip      = base.sprite.FlipX;
+      bool shouldFlip    = (GameManager.Instance.BestActivePlayer.sprite.WorldBottomCenter.x < base.specRigidbody.UnitBottomCenter.x);
+      base.sprite.FlipX  = shouldFlip && (!forceUnflip);
       Vector3 spriteSize = base.sprite.GetUntrimmedBounds().size;
-      Vector3 offset = new Vector3(spriteSize.x / 2, 0f, 0f);
+      Vector3 offset     = new Vector3(spriteSize.x / 2, 0f, 0f);
       if (!base.sprite.FlipX)
         offset *= -1;
 
@@ -301,31 +290,29 @@ public class SecretBoss : AIActor
     public override void PlayerWalkedIn(PlayerController player, List<tk2dSpriteAnimator> animators)
     {
       SetupRoomSpecificAttacks();
-      GameManager.Instance.StartCoroutine(PlaySound());
+      GameManager.Instance.StartCoroutine(PlayMusic());
     }
 
     private void SetupRoomSpecificAttacks()
     {
       Rect roomFullBounds = base.aiActor.GetAbsoluteParentRoom().GetBoundingRect();
-      Rect roomTrimmedBounds = roomFullBounds.Inset(8f);
+      Rect roomTeleportBounds = roomFullBounds.Inset(8f);
       foreach (AttackBehaviorGroup.AttackGroupItem attack in base.aiActor.gameObject.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors)
       {
         if (attack.Behavior is TeleportBehavior)
         {
           TeleportBehavior tb = attack.Behavior as TeleportBehavior;
           tb.ManuallyDefineRoom = true;
-          tb.roomMin = roomTrimmedBounds.min;
-          tb.roomMax = roomTrimmedBounds.max;
-          // ETGModConsole.Log($"FIXED TELEPORTATION");
+          tb.roomMin = roomTeleportBounds.min;
+          tb.roomMax = roomTeleportBounds.max;
         }
       }
     }
 
-    private IEnumerator PlaySound()
+    private IEnumerator PlayMusic()
     {
-      megalo_event_id = AkSoundEngine.PostEvent("electromegalo", base.aiActor.gameObject, in_uFlags: (uint)AkCallbackType.AK_EnableGetSourcePlayPosition);
+      megalo_event_id = AkSoundEngine.PostEvent("electromegalo", GameManager.Instance.DungeonMusicController.gameObject, in_uFlags: (uint)AkCallbackType.AK_EnableGetSourcePlayPosition);
       yield return StartCoroutine(BH.WaitForSecondsInvariant(1.8f));
-      // AkSoundEngine.PostEvent("Play_BOSS_doormimic_lick_01", base.aiActor.gameObject);
       yield break;
     }
 
@@ -337,10 +324,10 @@ public class SecretBoss : AIActor
 
   internal class CustomTeleportBehavior : TeleportBehavior
   {
-    private bool playedInSound = false;
-    private bool playedOutSound = false;
-    private Vector3 oldPos = Vector3.zero;
-    private Vector3 newPos = Vector3.zero;
+    private bool    playedInSound  = false;
+    private bool    playedOutSound = false;
+    private Vector3 oldPos         = Vector3.zero;
+    private Vector3 newPos         = Vector3.zero;
     public override ContinuousBehaviorResult ContinuousUpdate()
     {
       if (State == TeleportState.TeleportOut)
@@ -391,7 +378,6 @@ public class SecretBoss : AIActor
     protected Rect roomFullBounds {get; private set;}
     protected Rect roomBulletBounds {get; private set;}
     protected Rect roomSlamBounds {get; private set;}
-    protected Rect roomTeleportBounds {get; private set;}
 
     public override void Initialize()
     {
@@ -400,7 +386,6 @@ public class SecretBoss : AIActor
       this.roomFullBounds     = this.boss.GetAbsoluteParentRoom().GetBoundingRect();
       this.roomBulletBounds   = this.roomFullBounds.Inset(topInset: 2f, rightInset: 2f, bottomInset: 4f, leftInset: 2f);
       this.roomSlamBounds     = this.roomFullBounds.Inset(topInset: 2f, rightInset: 2.5f, bottomInset: 2f, leftInset: 1.5f);
-      this.roomTeleportBounds = this.roomFullBounds.Inset(8f);
     }
   }
 
@@ -408,8 +393,15 @@ public class SecretBoss : AIActor
   {
     private static readonly string orangeReticle = "reticle-orange";
     private static readonly string blueReticle   = "reticle-blue";
-    private static readonly Color orangeColor    = new Color(1.0f,0.75f,0f,0.5f);
-    private static readonly Color blueColor      = new Color(0.65f,0.65f,1.0f,0.5f);
+    private static readonly Color  orangeColor   = new Color(1.0f,0.75f,0f,0.5f);
+    private static readonly Color  blueColor     = new Color(0.65f,0.65f,1.0f,0.5f);
+
+    private const int   COUNT    = 32;
+    private const int   WAVES    = 5;
+    private const int   BATCH    = 8;
+    private const float SPEED    = 50f;
+    private const float LENIENCE = 30f;
+    private const float COOLDOWN = 30f;
 
     // orange = harmless if you're moving; blue = harmless if you're stationary
     internal class OrangeAndBlueBullet : SecretBullet
@@ -430,8 +422,7 @@ public class SecretBoss : AIActor
       {
         if (!(other.gameActor is PlayerController))
           return;
-        PlayerController p = other.gameActor as PlayerController;
-        bool playerIsIdle = p.spriteAnimator.CurrentClip.name.Contains("idle",true);
+        bool playerIsIdle           = other.gameActor.spriteAnimator.CurrentClip.name.Contains("idle",true);
         PhysicsEngine.SkipCollision = (this.orange != playerIsIdle);
       }
     }
@@ -440,40 +431,30 @@ public class SecretBoss : AIActor
     {
       return
       Run(DoTheThing(Lazy.CoinFlip()))
-        .Then(DoTheThing(Lazy.CoinFlip()))
-        .Then(DoTheThing(Lazy.CoinFlip()))
+      .Then(DoTheThing(Lazy.CoinFlip()))
+      .Then(DoTheThing(Lazy.CoinFlip()))
       .Finish();
     }
 
-    private const int COUNT      = 32;
-    private const int WAVES      = 5;
-    private const int BATCH      = 8;
-    private const float SPEED    = 50f;
-    private const float LENIENCE = 30f;
-    private const float COOLDOWN = 30f;
     private IEnumerator DoTheThing(bool orange)
     {
+      AkSoundEngine.PostEvent("undertale_eyeflash", GameManager.Instance.PrimaryPlayer.gameObject);
       Vector2 ppos = GameManager.Instance.PrimaryPlayer.CenterPosition;
       for (float i = 1f; i <= 4f; ++i)
         DoomZone(ppos - i*0.5f*Vector2.right, ppos + i*0.5f*Vector2.right, i, 0.5f, 0, orange ? orangeReticle : blueReticle);
-      AkSoundEngine.PostEvent("undertale_eyeflash", GameManager.Instance.PrimaryPlayer.gameObject);
-      PathRect roomPath   = new PathRect(base.roomBulletBounds);
-      List<Vector2> points = roomPath.SampleUniform(COUNT,0.0f,1.0f);
+      List<Vector2> points = new PathRect(base.roomBulletBounds).SampleUniform(COUNT);
       yield return Wait(LENIENCE);
       for(int wave = 0; wave < WAVES; ++wave)
       {
-        ppos = GameManager.Instance.PrimaryPlayer.CenterPosition;
         AkSoundEngine.PostEvent(soundShoot, GameManager.Instance.PrimaryPlayer.gameObject);
-        int batch = 0;
+        ppos      = GameManager.Instance.PrimaryPlayer.CenterPosition;
+        int count = 0;
         foreach(Vector2 p in points)
         {
-          Vector2 wiggle = 3f * Lazy.RandomAngle().ToVector();
-          this.Fire(Offset.OverridePosition(p), new Direction(((ppos+wiggle)-p).ToAngle(),DirectionType.Absolute), new Speed(SPEED,SpeedType.Absolute), new OrangeAndBlueBullet(orange:orange));
-          if (++batch == BATCH)
-          {
-            batch = 0;
+          this.Fire(Offset.OverridePosition(p), new Direction(((ppos+Lazy.RandomAngle().ToVector(magnitude: 3f))-p).ToAngle(),DirectionType.Absolute),
+            new Speed(SPEED,SpeedType.Absolute), new OrangeAndBlueBullet(orange:orange));
+          if (++count % BATCH == 0)
             yield return Wait(1);
-          }
         }
       }
       yield return Wait(COOLDOWN);
@@ -537,7 +518,7 @@ public class SecretBoss : AIActor
     private const int COUNT = 50;
     private IEnumerator DoTheThing(bool reverse = false, bool inverse = false)
     {
-      PathLine theEdge    = inverse ? (new PathRect(base.roomBulletBounds).Right()) : (new PathRect(base.roomBulletBounds).Left());
+      PathLine theEdge = inverse ? (new PathRect(base.roomBulletBounds).Right()) : (new PathRect(base.roomBulletBounds).Left());
       int i = 0;
       foreach(Vector2 p in theEdge.SampleUniform(COUNT,reverse ? 0.9f : 0.1f,reverse ? 0.1f : 0.9f))
       {
@@ -567,11 +548,10 @@ public class SecretBoss : AIActor
     private const int COUNT = 57;
     private IEnumerator DoTheThing(float start, int version)
     {
-      // Vector2 middle = this.BulletBank.aiActor.GetAbsoluteParentRoom().GetBoundingRect().Center();
-      Vector2 middle = this.BulletBank.aiActor.sprite.WorldCenter;
+      Vector2 middle       = this.BulletBank.aiActor.sprite.WorldCenter;
       PathCircle theCircle = new PathCircle(middle,2f);
-      int i = 0;
-      int waitTime = (version == 1 ? 5 : 4);
+      int i                = 0;
+      int waitTime         = (version == 1 ? 5 : 4);
       foreach(Vector2 p in theCircle.SampleUniform(COUNT,start: start, end:start + (version == 1 ? 1f : 2f))) // 2 rotations
       {
           this.Fire(Offset.OverridePosition(p), new Direction(theCircle.AngleTo(p),DirectionType.Absolute),
@@ -589,13 +569,13 @@ public class SecretBoss : AIActor
   {
 
     internal class GravityBullet : SecretBullet
-    {
-      private const int LIFETIME = 30;
-      private const int VANISHTIME = 120;
-      private Vector2 gravity = Vector2.zero;
-      private bool skipCollisions = true;
-      private Vector2 startVelocity = Vector2.zero;
-      private Rect roomFullBounds;
+      {
+      private const int     LIFETIME       = 30;
+      private const int     VANISHTIME     = 120;
+      private       Vector2 gravity        = Vector2.zero;
+      private       bool    skipCollisions = true;
+      private       Vector2 startVelocity  = Vector2.zero;
+      private       Rect    roomFullBounds;
       public GravityBullet(Vector2 velocity, Vector2 gravity, Rect roomFullBounds) : base()
       {
         this.gravity        = gravity;
@@ -636,14 +616,14 @@ public class SecretBoss : AIActor
       }
     }
 
-    private const int COUNT = 10;
-    private const float SPREAD = 9f;
-    private const float GRAVITY = 1.0f;
-    private const float VELOCITY = 20f;
+    private const int   COUNT     = 10;
+    private const float SPREAD    = 9f;
+    private const float GRAVITY   = 1.0f;
+    private const float VELOCITY  = 20f;
     private const float BASESPEED = VELOCITY*GRAVITY;
-    private const int SHOTDELAY = 3;
-    private const int SLAMS = 5;
-    private const int SLAMDELAY = 60;
+    private const int   SHOTDELAY = 3;
+    private const int   SLAMS     = 5;
+    private const int   SLAMDELAY = 60;
 
     private PathRect slamBoundsPath;
 
@@ -656,7 +636,7 @@ public class SecretBoss : AIActor
       for (int i = 1 ; i < SLAMS; ++i)
       {
         vertical = (!vertical);
-        f = f.And(DoTheThing(Lazy.CoinFlip() ? (vertical ? "up" : "left") : (vertical ? "down" : "right")),withDelay: i * SLAMDELAY);
+        f = f.And(DoTheThing(Lazy.CoinFlip() ? (vertical ? "up" : "left") : (vertical ? "down" : "right")), withDelay: i * SLAMDELAY);
       }
 
       return f.Finish();
@@ -667,16 +647,11 @@ public class SecretBoss : AIActor
       PlayerController p = GameManager.Instance.PrimaryPlayer;
 
       PathLine segment;
-      if (direction.Equals("up"))
-        segment = this.slamBoundsPath.Top();
-      else if (direction.Equals("down"))
-        segment = this.slamBoundsPath.Bottom();
-      else if (direction.Equals("left"))
-        segment = this.slamBoundsPath.Left();
-      else if (direction.Equals("right"))
-        segment = this.slamBoundsPath.Right();
-      else // should never happen
-        segment = this.slamBoundsPath.Top();
+        if (direction.Equals("up"))         segment = this.slamBoundsPath.Top();
+        else if (direction.Equals("down"))  segment = this.slamBoundsPath.Bottom();
+        else if (direction.Equals("left"))  segment = this.slamBoundsPath.Left();
+        else if (direction.Equals("right")) segment = this.slamBoundsPath.Right();
+        else /* should never happen */      segment = this.slamBoundsPath.Top();
       Vector2 target =  segment.At(0.5f);
 
       Vector2 delta    = (target - p.CenterPosition);
@@ -791,7 +766,7 @@ public class SecretBoss : AIActor
       public SquareBullet(int goFrames = 30, int waitFrames = 60) : base()
       {
         this.waitFrames = waitFrames;
-        this.goFrames = goFrames;
+        this.goFrames   = goFrames;
       }
 
       public override IEnumerator Top()
@@ -817,7 +792,6 @@ public class SecretBoss : AIActor
     private const int GOFRAMES     = 15;
     private const int SHOTDELAY    = 4;
     private const int SIDEDELAY    = 8;
-
     private const float SIDESPAN   = 360.0f / SIDES;
     private const float SPREADSPAN = SPREAD * SIDESPAN;
     private const float OFFSET     = 0.5f * (COUNTPERSIDE - 1);
@@ -925,7 +899,7 @@ public class SecretBoss : AIActor
       private Vector2 delta;
 
       private const float SPEED = 60f;
-      private const int DELAY = 60;
+      private const int   DELAY = 60;
 
       public OrbitBullet(Vector2 center, float radius, float captureAngle, float framesToApproach, float degreesToOrbit, float framesToOrbit, int delay)
         : base()
@@ -1004,10 +978,10 @@ public class SecretBoss : AIActor
         if (j % 2 == 0)
           AkSoundEngine.PostEvent(soundSpawn, GameManager.Instance.PrimaryPlayer.gameObject);
         yield return this.Wait(SPAWN_GAP);
-        float realAngle = (j*ANGLE_DELTA).Clamp180();
+        float realAngle    = (j*ANGLE_DELTA).Clamp180();
         float targetRadius = INNER_RADIUS+(j*SPIRAL/COUNT);
-        Bullet b = new OrbitBullet(playerpos, targetRadius, realAngle, APPROACH_FRAMES, 360f, ORBIT_FRAMES, SPAWN_GAP*(COUNT-j));
         Vector2 spawnPoint = playerpos + (targetRadius * realAngle.ToVector()) + (OUTER_RADIUS * (realAngle-90f).ToVector());
+        Bullet b           = new OrbitBullet(playerpos, targetRadius, realAngle, APPROACH_FRAMES, 360f, ORBIT_FRAMES, SPAWN_GAP*(COUNT-j));
         this.Fire(Offset.OverridePosition(spawnPoint), b);
       }
       yield break;
@@ -1017,7 +991,7 @@ public class SecretBoss : AIActor
   // Shoots a bunch of bullets from the ceiling of the current room
   internal class CeilingBulletsScript : SecretBulletScript
   {
-    private const int COUNT = 16;
+    private const int COUNT       = 16;
     private const int SPAWN_DELAY = 4;
 
     protected override List<FluidBulletInfo> BuildChain()
@@ -1046,8 +1020,8 @@ public class SecretBoss : AIActor
 
     private IEnumerator DoTheThing(float speed, bool reverse = false, bool warn = false)
     {
-      float offset = base.roomBulletBounds.width / (float)COUNT;
-      float angle = reverse ? 90f : -90f;
+      float offset         = base.roomBulletBounds.width / (float)COUNT;
+      float angle          = reverse ? 90f : -90f;
       List<Vector2> points = new List<Vector2>();
       for (float j = (reverse ? 0.5f : 0); j < COUNT; j++)
         points.Add(new Vector2(base.roomBulletBounds.xMin + j*offset, reverse ? base.roomBulletBounds.yMin : base.roomBulletBounds.yMax));

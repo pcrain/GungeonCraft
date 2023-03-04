@@ -112,7 +112,7 @@ namespace CwaffingTheGungy
     }
 
     // Convert degrees to a Vector2 angle
-    public static Vector2 ToVector(this float self)
+    public static Vector2 ToVector(this float self, float magnitude = 1f)
     {
       return (Vector2)(Quaternion.Euler(0f, 0f, self) * Vector2.right);
     }

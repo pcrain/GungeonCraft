@@ -90,7 +90,9 @@ namespace CwaffingTheGungy
       return bb;
     }
 
-    public void SetStats(float? health = null, float? weight = null, float? speed = null, float? collisionDamage = null, float? collisionKnockbackStrength = null, float? hitReactChance = null)
+    public void SetStats(float? health = null, float? weight = null, float? speed = null, float? collisionDamage = null,
+      float? collisionKnockbackStrength = null, float? hitReactChance = null, bool? healthIsNumberOfHits = null,
+      float? invulnerabilityPeriod = null)
     {
       if (health.HasValue)
       {
@@ -108,6 +110,13 @@ namespace CwaffingTheGungy
         this.enemyBehavior.aiActor.CollisionKnockbackStrength = collisionKnockbackStrength.Value;
       if (hitReactChance.HasValue)
         this.enemyBehavior.aiActor.aiAnimator.HitReactChance = hitReactChance.Value;
+      if (healthIsNumberOfHits.HasValue)
+        this.enemyBehavior.aiActor.healthHaver.healthIsNumberOfHits = healthIsNumberOfHits.Value;
+      if (invulnerabilityPeriod.HasValue)
+      {
+        this.enemyBehavior.aiActor.healthHaver.invulnerabilityPeriod = invulnerabilityPeriod.Value;
+        this.enemyBehavior.aiActor.healthHaver.usesInvulnerabilityPeriod = invulnerabilityPeriod.Value > 0.0f;
+      }
     }
 
     /// <summary>Adds a new ShootBehavior attack with a custom Brave.BraveBulletScript.Script to a custom boss.</summary>
