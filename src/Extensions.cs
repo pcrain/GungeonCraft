@@ -112,6 +112,12 @@ namespace CwaffingTheGungy
       return self;
     }
 
+    // Instantiate a prefab and clone it as a new prefab
+    public static GameObject ClonePrefab(this GameObject self)
+    {
+      return UnityEngine.Object.Instantiate(self).RegisterPrefab();
+    }
+
     // Convert degrees to a Vector2 angle
     public static Vector2 ToVector(this float self, float magnitude = 1f)
     {

@@ -4,8 +4,6 @@ using Gungeon;
 using ItemAPI;
 using EnemyAPI;
 using UnityEngine;
-//using DirectionType = DirectionalAnimation.DirectionType;
-// using AnimationType = ItemAPI.BossBuilder.AnimationType;
 using System.Collections;
 using Dungeonator;
 using System.Linq;
@@ -20,22 +18,22 @@ namespace CwaffingTheGungy
 {
   public enum Floors // Matches GlobalDungeonData.ValidTilesets
   {
-    GUNGEON = 1,
-    CASTLEGEON = 2,
-    SEWERGEON = 4,
-    CATHEDRALGEON = 8,
-    MINEGEON = 0x10,
-    CATACOMBGEON = 0x20,
-    FORGEGEON = 0x40,
-    HELLGEON = 0x80,
-    SPACEGEON = 0x100,
-    PHOBOSGEON = 0x200,
-    WESTGEON = 0x400,
-    OFFICEGEON = 0x800,
-    BELLYGEON = 0x1000,
-    JUNGLEGEON = 0x2000,
-    FINALGEON = 0x4000,
-    RATGEON = 0x8000
+    GUNGEON       = 0x0001,
+    CASTLEGEON    = 0x0002,
+    SEWERGEON     = 0x0004,
+    CATHEDRALGEON = 0x0008,
+    MINEGEON      = 0x0010,
+    CATACOMBGEON  = 0x0020,
+    FORGEGEON     = 0x0040,
+    HELLGEON      = 0x0080,
+    SPACEGEON     = 0x0100,
+    PHOBOSGEON    = 0x0200,
+    WESTGEON      = 0x0400,
+    OFFICEGEON    = 0x0800,
+    BELLYGEON     = 0x1000,
+    JUNGLEGEON    = 0x2000,
+    FINALGEON     = 0x4000,
+    RATGEON       = 0x8000,
   }
 
   public class BuildABoss
@@ -507,6 +505,7 @@ namespace CwaffingTheGungy
     }
   }
 
+  // BuildABoss helper extension methods
   public static class BH
   {
     // Used for loading a sane default behavior speculator
@@ -951,5 +950,33 @@ namespace CwaffingTheGungy
         ETGModConsole.Log($"    {i.TargetRoomTable.name} -> {i.BossWeight}");
       return orig(self);
     }
+
+    // SpecificIntroDoer extension method for playing boss music
+    public static uint PlayBossMusic(this SpecificIntroDoer introDoer, string musicName, int loopPoint = -1, int rewindAmount = -1)
+    {
+      uint musicEventId =  AkSoundEngine.PostEvent(musicName, GameManager.Instance.DungeonMusicController.gameObject, in_uFlags: (uint)AkCallbackType.AK_EnableGetSourcePlayPosition);
+      if (loopPoint > 0 && rewindAmount > 0)
+        GameManager.Instance.DungeonMusicController.StartCoroutine(LoopMusic(musicEventId, musicName, loopPoint, rewindAmount));
+      introDoer.aiActor.healthHaver.OnPreDeath += (_) =>
+        { AkSoundEngine.StopPlayingID(musicEventId, 0, AkCurveInterpolation.AkCurveInterpolation_Constant); };
+      return musicEventId;
+    }
+
+    private static IEnumerator LoopMusic(uint musicPlayingEventId, string musicName, int loopPoint, int rewindAmount)
+    {
+      yield return new WaitForSeconds(1f);  // GetSourcePlayPosition() will fail if we don't wait a bit
+      while (true)
+      {
+        int pos;
+        AKRESULT status = AkSoundEngine.GetSourcePlayPosition(musicPlayingEventId, out pos);
+        if (status != AKRESULT.AK_Success)
+          break;
+        if (pos >= loopPoint)
+          AkSoundEngine.SeekOnEvent(musicName, GameManager.Instance.DungeonMusicController.gameObject, pos - rewindAmount);
+        yield return null;
+      }
+      yield break;
+    }
+
   }
 }

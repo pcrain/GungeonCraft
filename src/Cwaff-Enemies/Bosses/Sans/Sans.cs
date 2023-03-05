@@ -21,12 +21,10 @@ public partial class SansBoss : AIActor
   private const string MUSIC_NAME        = "electromegalo";
   private const int    MUSIC_LOOP_END    = 152512;
   private const int    MUSIC_LOOP_LENGTH = 137141;
-  private const int    NUM_HITS          = 60;
+  private const int    NUM_HITS          = 1;//60;
 
   internal static GameObject napalmReticle      = null;
   internal static AIBulletBank.Entry boneBullet = null;
-  internal static VFXPool bonevfx               = null;
-  internal static uint megalo_event_id          = 0;
 
   public static void Init()
   {
@@ -48,11 +46,10 @@ public partial class SansBoss : AIActor
     bb.SetDefaultColliders(15,30,24,2);
     // Add custom animation to the generic intro doer
     bb.AddCustomIntro<BossIntro>();
-    // Set up the boss's targeting and attacking scripts
+    // Set up the boss's targeting scripts
     bb.TargetPlayer();
     // Add some named vfx pools to our bank of VFX
     bb.AddNamedVFX(VFX.vfxpool["Tornado"], "mytornado");
-
     // Add some attacks
     bb.CreateTeleportAttack<CustomTeleportBehavior>(
       goneTime: 0.25f, outAnim: "teleport_out", inAnim: "teleport_in", cooldown: 0.26f, attackCooldown: 0.15f, probability: 3f);
@@ -70,30 +67,24 @@ public partial class SansBoss : AIActor
     //   bb.CreateBulletAttack<RichochetScript2>(add: false, tellAnim: "swirl", fireAnim: "suck", attackCooldown: 3.5f, fireVfx: "mytornado"),
     //   bb.CreateBulletAttack<CeilingBulletsScript>(add: false, fireAnim: "swirl", attackCooldown: 3.5f, fireVfx: "mytornado"),
     //   });
-
     // Add our boss to the enemy database and to the first floor's boss pool
     bb.AddBossToGameEnemies("cg:sansboss");
     bb.AddBossToFloorPool(Floors.CASTLEGEON, weight: 9999f);
-
     InitPrefabs(); // Do miscellaneous prefab loading
   }
 
   private static void InitPrefabs()
   {
     // Targeting reticle
-    napalmReticle = Instantiate(ResourceManager.LoadAssetBundle("shared_auto_002").LoadAsset<GameObject>("NapalmStrikeReticle"));
+    napalmReticle = ResourceManager.LoadAssetBundle("shared_auto_002").LoadAsset<GameObject>("NapalmStrikeReticle").ClonePrefab();
       napalmReticle.GetComponent<tk2dSlicedSprite>().SetSprite(VFX.SpriteCollection, VFX.sprites["reticle-white"]);
-      napalmReticle.RegisterPrefab();
-
-    // Bone bullet Spawn VFX
-    bonevfx = VFX.CreatePoolFromVFXGameObject(Lazy.GunDefaultProjectile(29).hitEffects.overrideMidairDeathVFX);
-
+      UnityEngine.Object.Destroy(napalmReticle.GetComponent<ReticleRiserEffect>());
     // Bone bullet
     boneBullet = new AIBulletBank.Entry(EnemyDatabase.GetOrLoadByGuid("1bc2a07ef87741be90c37096910843ab").bulletBank.GetBullet("reversible")) {
       Name               = "getboned",
-      BulletObject       = Instantiate(Lazy.GunDefaultProjectile(59).gameObject).RegisterPrefab(),
+      BulletObject       = Lazy.GunDefaultProjectile(59).gameObject.ClonePrefab(),
       PlayAudio          = false,
-      MuzzleFlashEffects = bonevfx,
+      MuzzleFlashEffects = VFX.CreatePoolFromVFXGameObject(Lazy.GunDefaultProjectile(29).hitEffects.overrideMidairDeathVFX),
     };
   }
 
@@ -119,23 +110,17 @@ public partial class SansBoss : AIActor
   }
 
   // Creates a napalm-strike-esque danger zone
-  private static GameObject DoomZone(Vector2 start, Vector2 target, float width, float lifetime = -1f, int growthTime = 0, string sprite = null)
+  private static GameObject DoomZone(Vector2 start, Vector2 target, float width, float lifetime = -1f, int growthTime = 1, string sprite = null)
   {
-    Vector2 delta                        = target - start;
-    GameObject reticle                   = UnityEngine.Object.Instantiate(napalmReticle);
-    tk2dSlicedSprite m_extantReticleQuad = reticle.GetComponent<tk2dSlicedSprite>();
+    Vector2 delta                = target - start;
+    GameObject reticle           = UnityEngine.Object.Instantiate(napalmReticle);
+    tk2dSlicedSprite reticleQuad = reticle.GetComponent<tk2dSlicedSprite>();
       if (sprite != null)
-        m_extantReticleQuad.SetSprite(VFX.SpriteCollection, VFX.sprites[sprite]);
-      if (growthTime == 0)
-        m_extantReticleQuad.dimensions = C.PIXELS_PER_TILE * (new Vector2(delta.magnitude, width));
-      else
-      {
-        UnityEngine.Object.Destroy(reticle.GetComponent<ReticleRiserEffect>());
-        m_extantReticleQuad.dimensions = C.PIXELS_PER_TILE * (new Vector2(delta.magnitude / growthTime, width));
-        reticle.AddComponent<DoomZoneGrowth>().Lengthen(delta.magnitude,growthTime);
-      }
-      m_extantReticleQuad.transform.localRotation = Quaternion.Euler(0f, 0f, BraveMathCollege.Atan2Degrees(target-start));
-      m_extantReticleQuad.transform.position = start + (Quaternion.Euler(0f, 0f, -90f) * delta.normalized * (width / 2f)).XY();
+        reticleQuad.SetSprite(VFX.SpriteCollection, VFX.sprites[sprite]);
+      reticleQuad.dimensions = C.PIXELS_PER_TILE * (new Vector2(delta.magnitude / growthTime, width));
+      reticle.AddComponent<DoomZoneGrowth>().Lengthen(delta.magnitude,growthTime);
+      reticleQuad.transform.localRotation = Quaternion.Euler(0f, 0f, BraveMathCollege.Atan2Degrees(target-start));
+      reticleQuad.transform.position = start + (Quaternion.Euler(0f, 0f, -90f) * delta.normalized * (width / 2f)).XY();
     if (lifetime > 0)
       reticle.ExpireIn(lifetime);
     return reticle;
@@ -143,159 +128,93 @@ public partial class SansBoss : AIActor
 
   private static void SpawnDust(Vector2 where, int howMany = 1)
   {
+    DustUpVFX dusts = GameManager.Instance.Dungeon.dungeonDustups;
     for (int i = 0; i < howMany; ++i)
-    {
-      DustUpVFX dusts = GameManager.Instance.Dungeon.dungeonDustups;
-      float dir = UnityEngine.Random.Range(0.0f,360.0f);
-      float rot = UnityEngine.Random.Range(0.0f,360.0f);
-      float mag = UnityEngine.Random.Range(0.3f,1.25f);
       SpawnManager.SpawnVFX(
           dusts.rollLandDustup,
-          where + BraveMathCollege.DegreesToVector(dir, mag),
-          Quaternion.Euler(0f, 0f, rot));
-    }
+          where + Lazy.RandomVector(UnityEngine.Random.Range(0.3f,1.25f)),
+          Quaternion.Euler(0f, 0f, Lazy.RandomAngle()));
   }
 
   private class BossBehavior : BraveBehaviour
   {
     private bool                    hasFinishedIntro = false;
-    private float                   yoffset          = 0;
-    private bool                    auraActive       = false;
-    private HeatIndicatorController aura;
-
-    // from basegame AuroOnReloadModifier
-    private void ActivateAura()
-    {
-      if (auraActive)
-        return;
-      auraActive = true;
-      aura = ((GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global VFX/HeatIndicator"), base.aiActor.CenterPosition.ToVector3ZisY(), Quaternion.identity, base.aiActor.sprite.transform)).GetComponent<HeatIndicatorController>();
-        aura.CurrentColor  = new Color(1f, 1f, 1f);
-        aura.IsFire        = true;
-        aura.CurrentRadius = 2f;
-    }
+    private HeatIndicatorController aura             = null;
 
     private void Start()
     {
-      base.aiActor.healthHaver.OnPreDeath += (obj) =>
-      {
-        FlipSpriteIfNecessary(forceUnflip: true);
-        megalo_event_id = 0;
-        AkSoundEngine.PostEvent(MUSIC_NAME+"_stop", GameManager.Instance.DungeonMusicController.gameObject);
+      base.aiActor.healthHaver.OnPreDeath += (_) => {
+        FlipSpriteIfNecessary(overrideFlip: false);
         AkSoundEngine.PostEvent("Play_ENM_beholster_death_01", base.aiActor.gameObject);
       };
-      base.healthHaver.healthHaver.OnDeath += (obj) =>
-      {
-        FlipSpriteIfNecessary(forceUnflip: true);
-        Chest chest2 = GameManager.Instance.RewardManager.SpawnTotallyRandomChest(GameManager.Instance.PrimaryPlayer.CurrentRoom.GetRandomVisibleClearSpot(1, 1));
-        chest2.IsLocked = false;
+      base.healthHaver.healthHaver.OnDeath += (_) => {
+        FlipSpriteIfNecessary(overrideFlip: false);
+        GameManager.Instance.RewardManager.SpawnTotallyRandomChest(GameManager.Instance.PrimaryPlayer.CurrentRoom.GetRandomVisibleClearSpot(1, 1)).IsLocked = false;
       };
       this.aiActor.bulletBank.Bullets.Add(boneBullet);
+    }
+
+    private void Update()
+    {
+      if (!hasFinishedIntro || BraveTime.DeltaTime == 0)
+        return; // don't do anything if we're paused or pre-intro
+      base.aiActor.PathfindToPosition(GameManager.Instance.PrimaryPlayer.specRigidbody.UnitCenter); // drift around
+    }
+
+    private void LateUpdate()
+    {
+      const float JIGGLE = 4f;
+      const float SPEED  = 4f;
+      if (!hasFinishedIntro || BraveTime.DeltaTime == 0)
+        return; // don't do anything if we're paused or pre-intro
+
+      FlipSpriteIfNecessary();
+      base.sprite.transform.localPosition += Vector3.zero.WithY(Mathf.CeilToInt(JIGGLE*Mathf.Sin(SPEED*BraveTime.ScaledTimeSinceStartup))/C.PIXELS_PER_TILE);
+      if (Lazy.CoinFlip())
+        SpawnDust(base.specRigidbody.UnitCenter); // spawn dust particles
+    }
+
+    private void FlipSpriteIfNecessary(bool? overrideFlip = null)
+    {
+      base.sprite.FlipX  = overrideFlip ?? (GameManager.Instance.BestActivePlayer.sprite.WorldBottomCenter.x < base.specRigidbody.UnitBottomCenter.x);
+      Vector3 spriteSize = base.sprite.GetUntrimmedBounds().size;
+      Vector3 offset     = Vector3.zero.WithX(spriteSize.x / (base.sprite.FlipX ? 2f : -2f));
+      base.sprite.transform.localPosition = (Vector3)base.specRigidbody.UnitBottomCenter/*.RoundToInt()*/ + offset;
+      if (aura != null)
+        aura.transform.localPosition = new Vector3(0,spriteSize.y / 2,0) - offset;
     }
 
     public void FinishedIntro()
     {
       hasFinishedIntro = true;
-      ActivateAura();
-    }
-
-    private void Update()
-    {
-
-      if (!hasFinishedIntro)
-        return;
-
-      // loop music if necessary
-      int pos;
-      AKRESULT status = AkSoundEngine.GetSourcePlayPosition(megalo_event_id, out pos);
-      if (status == AKRESULT.AK_Success && pos >= MUSIC_LOOP_END)
-        AkSoundEngine.SeekOnEvent(MUSIC_NAME, GameManager.Instance.DungeonMusicController.gameObject,pos - MUSIC_LOOP_LENGTH);
-
-      // don't do anything if we're paused
-      if (BraveTime.DeltaTime == 0)
-        return;
-
-      DriftAround();
-    }
-
-    private void LateUpdate()
-    {
-      const float JIGGLE = 4.0f;
-      const float SPEED  = 4.0f;
-
-      if (!hasFinishedIntro)
-        return;
-
-      // don't do anything if we're paused
-      if (BraveTime.DeltaTime == 0)
-        return;
-
-      FlipSpriteIfNecessary();
-
-      yoffset = Mathf.CeilToInt(JIGGLE * Mathf.Sin(SPEED*BraveTime.ScaledTimeSinceStartup))/16.0f;
-      base.sprite.transform.localPosition += new Vector3(0,yoffset,0);
-      if (Lazy.CoinFlip())
-        SpawnDust(base.specRigidbody.UnitCenter);
-    }
-
-    private void DriftAround()
-    {
-      base.aiActor.PathfindToPosition(GameManager.Instance.PrimaryPlayer.specRigidbody.UnitCenter);
-    }
-
-    private void FlipSpriteIfNecessary(bool forceUnflip = false)
-    {
-      bool lastFlip      = base.sprite.FlipX;
-      bool shouldFlip    = (GameManager.Instance.BestActivePlayer.sprite.WorldBottomCenter.x < base.specRigidbody.UnitBottomCenter.x);
-      base.sprite.FlipX  = shouldFlip && (!forceUnflip);
-      Vector3 spriteSize = base.sprite.GetUntrimmedBounds().size;
-      Vector3 offset     = new Vector3(spriteSize.x / 2, 0f, 0f);
-      if (!base.sprite.FlipX)
-        offset *= -1;
-
-      Vector3 finalPosition = (Vector3)base.specRigidbody.UnitBottomCenter/*.RoundToInt()*/ + offset;
-      base.sprite.transform.localPosition = finalPosition;
-      if (auraActive)
-        aura.transform.localPosition = new Vector3(0,spriteSize.y / 2,0) - offset;
+      aura = ((GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global VFX/HeatIndicator"), base.aiActor.CenterPosition.ToVector3ZisY(), Quaternion.identity, base.aiActor.sprite.transform)).GetComponent<HeatIndicatorController>();
+        aura.CurrentColor  = Color.white;
+        aura.IsFire        = true;
+        aura.CurrentRadius = 2f; // activate aura (from basegame AuraOnReloadModifier)
     }
   }
 
-  [RequireComponent(typeof(GenericIntroDoer))]
   private class BossIntro : SpecificIntroDoer
   {
     public override void PlayerWalkedIn(PlayerController player, List<tk2dSpriteAnimator> animators)
     {
-      SetupRoomSpecificAttacks();
-      GameManager.Instance.StartCoroutine(PlayMusic());
-    }
-
-    private void SetupRoomSpecificAttacks()
-    {
-      Rect roomFullBounds = base.aiActor.GetAbsoluteParentRoom().GetBoundingRect();
-      Rect roomTeleportBounds = roomFullBounds.Inset(8f);
-      foreach (AttackBehaviorGroup.AttackGroupItem attack in base.aiActor.gameObject.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors)
+      // Play boss music
+      this.PlayBossMusic(MUSIC_NAME, MUSIC_LOOP_END, MUSIC_LOOP_LENGTH);
+      // Set up room specific attacks
+      Rect roomTeleportBounds = base.aiActor.GetAbsoluteParentRoom().GetBoundingRect().Inset(8f);
+      foreach (AttackBehaviorGroup.AttackGroupItem attack in base.aiActor.GetComponent<BehaviorSpeculator>().AttackBehaviorGroup.AttackBehaviors)
       {
-        if (attack.Behavior is TeleportBehavior)
-        {
-          TeleportBehavior tb = attack.Behavior as TeleportBehavior;
+        if (attack.Behavior is not TeleportBehavior)
+          continue;
+        TeleportBehavior tb = attack.Behavior as TeleportBehavior;
           tb.ManuallyDefineRoom = true;
-          tb.roomMin = roomTeleportBounds.min;
-          tb.roomMax = roomTeleportBounds.max;
-        }
+          tb.roomMin            = roomTeleportBounds.min;
+          tb.roomMax            = roomTeleportBounds.max;
       }
     }
 
-    private IEnumerator PlayMusic()
-    {
-      megalo_event_id = AkSoundEngine.PostEvent(MUSIC_NAME, GameManager.Instance.DungeonMusicController.gameObject, in_uFlags: (uint)AkCallbackType.AK_EnableGetSourcePlayPosition);
-      yield return StartCoroutine(BH.WaitForSecondsInvariant(1.8f));
-      yield break;
-    }
-
     public override void EndIntro()
-    {
-      base.aiActor.gameObject.GetComponent<BossBehavior>().FinishedIntro();
-    }
+      { base.aiActor.GetComponent<BossBehavior>().FinishedIntro(); }
   }
 }
 

@@ -75,7 +75,7 @@ public partial class SansBoss : AIActor
 
   private abstract class SecretBulletScript : FluidBulletScript
   {
-    protected AIActor boss             {get; private set;}
+    protected AIActor theBoss          {get; private set;}
     protected Rect    roomFullBounds   {get; private set;}
     protected Rect    roomBulletBounds {get; private set;}
     protected Rect    roomSlamBounds   {get; private set;}
@@ -83,8 +83,8 @@ public partial class SansBoss : AIActor
     public override void Initialize()
     {
       base.Initialize();
-      this.boss               = this.BulletBank.aiActor;
-      this.roomFullBounds     = this.boss.GetAbsoluteParentRoom().GetBoundingRect();
+      this.theBoss            = this.BulletBank.aiActor;
+      this.roomFullBounds     = this.theBoss.GetAbsoluteParentRoom().GetBoundingRect();
       this.roomBulletBounds   = this.roomFullBounds.Inset(topInset: 2f, rightInset: 2f, bottomInset: 4f, leftInset: 2f);
       this.roomSlamBounds     = this.roomFullBounds.Inset(topInset: 2f, rightInset: 2.5f, bottomInset: 2f, leftInset: 1.5f);
     }
@@ -143,7 +143,7 @@ public partial class SansBoss : AIActor
       AkSoundEngine.PostEvent("undertale_eyeflash", GameManager.Instance.PrimaryPlayer.gameObject);
       Vector2 ppos = GameManager.Instance.PrimaryPlayer.CenterPosition;
       for (float i = 1f; i <= 4f; ++i)
-        DoomZone(ppos - i*0.5f*Vector2.right, ppos + i*0.5f*Vector2.right, i, 0.5f, 0, orange ? orangeReticle : blueReticle);
+        DoomZone(ppos - i*0.5f*Vector2.right, ppos + i*0.5f*Vector2.right, i, 0.5f, 1, orange ? orangeReticle : blueReticle);
       List<Vector2> points = new PathRect(base.roomBulletBounds).SampleUniform(COUNT);
       yield return Wait(LENIENCE);
       for(int wave = 0; wave < WAVES; ++wave)
@@ -199,7 +199,7 @@ public partial class SansBoss : AIActor
 
     protected override List<FluidBulletInfo> BuildChain()
     {
-      AkSoundEngine.PostEvent("sans_laugh", GameManager.Instance.PrimaryPlayer.gameObject);
+      AkSoundEngine.PostEvent("sans_laugh", theBoss.gameObject);
       int version = Lazy.CoinFlip() ? 1 : 2;
       return
       Run(DoTheThing(0f, version))
@@ -212,7 +212,7 @@ public partial class SansBoss : AIActor
     private const int COUNT = 57;
     private IEnumerator DoTheThing(float start, int version)
     {
-      Vector2 middle       = this.BulletBank.aiActor.sprite.WorldCenter;
+      Vector2 middle       = theBoss.sprite.WorldCenter;
       PathCircle theCircle = new PathCircle(middle,2f);
       int i                = 0;
       int waitTime         = (version == 1 ? 5 : 4);
@@ -261,7 +261,7 @@ public partial class SansBoss : AIActor
 
       public override IEnumerator Top()
       {
-        AkSoundEngine.PostEvent(SOUND_SHOOT, GameManager.Instance.PrimaryPlayer.gameObject);
+        AkSoundEngine.PostEvent(SOUND_SHOOT, this.Projectile.gameObject);
         // Vector2 newVelocity = this.RealVelocity();
         Vector2 newVelocity = this.startVelocity;
         for (int i = 0; i < VANISHTIME; ++i)
@@ -321,11 +321,11 @@ public partial class SansBoss : AIActor
 
       Vector2 delta    = (target - p.CenterPosition);
       Vector2 gravity  = GRAVITY*delta.normalized;
-      Vector2 gravityB = GRAVITY*(target - this.BulletBank.aiActor.sprite.WorldCenter).normalized;
+      Vector2 gravityB = GRAVITY*(target - theBoss.sprite.WorldCenter).normalized;
       Vector2 baseVel  = -VELOCITY * gravityB;
       Speed s = new Speed(BASESPEED,SpeedType.Absolute);
-      Offset o = Offset.OverridePosition(this.BulletBank.aiActor.sprite.WorldCenter);
-      AkSoundEngine.PostEvent("sans_laugh", GameManager.Instance.PrimaryPlayer.gameObject);
+      Offset o = Offset.OverridePosition(theBoss.sprite.WorldCenter);
+      AkSoundEngine.PostEvent("sans_laugh", theBoss.gameObject);
       for(int i = 0; i < COUNT; ++i)
       {
         Vector2 bulletvel = baseVel.Rotate(UnityEngine.Random.Range(-SPREAD,SPREAD));
@@ -362,7 +362,7 @@ public partial class SansBoss : AIActor
 
       p.ClearInputOverride("comeonandslam");
       GameManager.Instance.MainCameraController.DoScreenShake(new ScreenShakeSettings(0.5f,6f,0.5f,0f), null);
-      AkSoundEngine.PostEvent("undertale_damage", GameManager.Instance.PrimaryPlayer.gameObject);
+      AkSoundEngine.PostEvent("undertale_damage", p.gameObject);
     }
   }
 
@@ -374,7 +374,7 @@ public partial class SansBoss : AIActor
     {
       public override IEnumerator Top()
       {
-        AkSoundEngine.PostEvent(SOUND_SHOOT, GameManager.Instance.PrimaryPlayer.gameObject);
+        AkSoundEngine.PostEvent(SOUND_SHOOT, this.Projectile.gameObject);
         yield break;
       }
     }
@@ -397,8 +397,9 @@ public partial class SansBoss : AIActor
     {
       for (int i = 0; i < PHASES; ++i)
       {
-        AkSoundEngine.PostEvent("sans_laugh", GameManager.Instance.PrimaryPlayer.gameObject);
-        Vector2 ppos = GameManager.Instance.PrimaryPlayer.CenterPosition;
+        PlayerController target = GameManager.Instance.PrimaryPlayer;
+        AkSoundEngine.PostEvent("sans_laugh", theBoss.gameObject);
+        Vector2 ppos = target.CenterPosition;
         List<Vector2> spawnPoints = new List<Vector2>(STREAMSPERPHASE);
         List<float> shotAngles = new List<float>(STREAMSPERPHASE);
         for (int s = 0; s < STREAMSPERPHASE; ++s)
@@ -409,7 +410,7 @@ public partial class SansBoss : AIActor
           spawnPoints.Add(spawnPoint);
           shotAngles.Add((ppos-spawnPoint).ToAngle().Clamp180());
           DoomZone(spawnPoint, spawnPoints[s].RaycastToWall(shotAngles[s], base.roomFullBounds), 1f, PHASEDELAY / C.FPS, 10);
-          AkSoundEngine.PostEvent(SOUND_SPAWN, GameManager.Instance.PrimaryPlayer.gameObject);
+          AkSoundEngine.PostEvent(SOUND_SPAWN, target.gameObject);
           yield return Wait(SHOTDELAY);
         }
         for (int j = 0; j < SHOTSPERSTREAM; ++j)
@@ -438,14 +439,14 @@ public partial class SansBoss : AIActor
 
       public override IEnumerator Top()
       {
-        AkSoundEngine.PostEvent(SOUND_SHOOT, GameManager.Instance.PrimaryPlayer.gameObject);
+        AkSoundEngine.PostEvent(SOUND_SHOOT, this.Projectile.gameObject);
         yield return Wait(this.goFrames);
         float initSpeed = this.Speed;
         this.ChangeSpeed(new Speed(0,SpeedType.Absolute));
         yield return Wait(this.waitFrames);
         this.ChangeSpeed(new Speed(initSpeed,SpeedType.Absolute));
         this.ChangeDirection(new Direction(this.DirToNearestPlayer(),DirectionType.Absolute));
-        AkSoundEngine.PostEvent(SOUND_SHOOT, GameManager.Instance.PrimaryPlayer.gameObject);
+        AkSoundEngine.PostEvent(SOUND_SHOOT, this.Projectile.gameObject);
         yield return Wait(120);
         Vanish();
         yield break;
@@ -479,7 +480,7 @@ public partial class SansBoss : AIActor
         for (int j = 0; j < COUNTPERSIDE; ++j)
         {
           float launchAngle = sideAngle + SPREADSPAN * ((1f+j) / (1f+COUNTPERSIDE) - 0.5f);
-          this.Fire(Offset.OverridePosition(this.BulletBank.aiActor.sprite.WorldCenter), new Direction(launchAngle.Clamp180(),DirectionType.Absolute), new Speed(SPEED,SpeedType.Absolute), new SquareBullet(GOFRAMES, FINALDELAY));
+          this.Fire(Offset.OverridePosition(theBoss.sprite.WorldCenter), new Direction(launchAngle.Clamp180(),DirectionType.Absolute), new Speed(SPEED,SpeedType.Absolute), new SquareBullet(GOFRAMES, FINALDELAY));
           yield return this.Wait(SHOTDELAY);
         }
         yield return this.Wait(SIDEDELAY);
@@ -504,12 +505,12 @@ public partial class SansBoss : AIActor
       public override IEnumerator Top()
       {
         // AkSoundEngine.PostEvent("megalo_pause", GameManager.Instance.DungeonMusicController.gameObject);
-        AkSoundEngine.PostEvent(SOUND_SPAWN, GameManager.Instance.PrimaryPlayer.gameObject);
+        AkSoundEngine.PostEvent(SOUND_SPAWN, this.Projectile.gameObject);
         float initSpeed = this.Speed;
         this.ChangeSpeed(new Speed(0,SpeedType.Absolute),waitFrames);
         yield return Wait(waitFrames);
         this.ChangeSpeed(new Speed(initSpeed*2,SpeedType.Absolute));
-        AkSoundEngine.PostEvent(SOUND_SHOOT, GameManager.Instance.PrimaryPlayer.gameObject);
+        AkSoundEngine.PostEvent(SOUND_SHOOT, this.Projectile.gameObject);
         // AkSoundEngine.PostEvent("megalo_resume", GameManager.Instance.DungeonMusicController.gameObject);
         yield return Wait(120);
         Vanish();
@@ -615,7 +616,7 @@ public partial class SansBoss : AIActor
           ChangeDirection(new Direction((newTarget-this.Position).ToAngle(),DirectionType.Absolute));
           this.Position = newTarget;
         }
-        AkSoundEngine.PostEvent(SOUND_SHOOT, GameManager.Instance.PrimaryPlayer.gameObject);
+        AkSoundEngine.PostEvent(SOUND_SHOOT, this.Projectile.gameObject);
         ChangeSpeed(new Speed(oldSpeed,SpeedType.Absolute));
         yield return Wait(DELAY);
 
@@ -645,7 +646,7 @@ public partial class SansBoss : AIActor
       for (int j = 0; j < COUNT; j++)
       {
         if (j % 2 == 0)
-          AkSoundEngine.PostEvent(SOUND_SPAWN, GameManager.Instance.PrimaryPlayer.gameObject);
+          AkSoundEngine.PostEvent(SOUND_SPAWN, theBoss.gameObject);
         yield return this.Wait(SPAWN_GAP);
         float realAngle    = (j*ANGLE_DELTA).Clamp180();
         float targetRadius = INNER_RADIUS+(j*SPIRAL/COUNT);
@@ -683,7 +684,7 @@ public partial class SansBoss : AIActor
 
     private IEnumerator Laugh(float delay)
     {
-      AkSoundEngine.PostEvent("sans_laugh", GameManager.Instance.PrimaryPlayer.gameObject);
+      AkSoundEngine.PostEvent("sans_laugh", theBoss.gameObject);
       yield return this.Wait(delay);
     }
 
@@ -718,34 +719,31 @@ public partial class SansBoss : AIActor
 
   private class CustomTeleportBehavior : TeleportBehavior
   {
-    private bool    playedInSound  = false;
-    private bool    playedOutSound = false;
-    private Vector3 oldPos         = Vector3.zero;
-    private Vector3 newPos         = Vector3.zero;
+    private bool    teleported = false;
+    private Vector3 oldPos     = Vector3.zero;
+    private Vector3 newPos     = Vector3.zero;
     public override ContinuousBehaviorResult ContinuousUpdate()
     {
       if (State == TeleportState.TeleportOut)
       {
-        if (!playedOutSound)
+        if (!teleported)
         {
-          AkSoundEngine.PostEvent(SOUND_TELEPORT, GameManager.Instance.PrimaryPlayer.gameObject);
+          AkSoundEngine.PostEvent(SOUND_TELEPORT, base.m_aiActor.gameObject);
           oldPos = base.m_aiActor.Position;
         }
-        playedOutSound = true;
-        playedInSound = false;
+        teleported = true;
       }
       else if (State == TeleportState.TeleportIn)
       {
-        if (!playedInSound)
+        if (teleported)
         {
-          AkSoundEngine.PostEvent(SOUND_TELEPORT, GameManager.Instance.PrimaryPlayer.gameObject);
+          AkSoundEngine.PostEvent(SOUND_TELEPORT, base.m_aiActor.gameObject);
           newPos = base.m_aiActor.Position;
           Vector3 delta = (newPos-oldPos);
           for(int i = 0; i < 10; ++i)
             SpawnDust(oldPos + (i/10.0f) * delta);
         }
-        playedInSound = true;
-        playedOutSound = false;
+        teleported = false;
       }
       return base.ContinuousUpdate();
     }
