@@ -1,36 +1,25 @@
-using System;
 using System.Collections.Generic;
 using System.Collections;
-using System.Linq;
-using System.Reflection;
 
 using UnityEngine;
-using MonoMod.RuntimeDetour;
 using Brave.BulletScript;
 
 namespace CwaffingTheGungy
 {
 public partial class SansBoss : AIActor
 {
-  public  const string BOSS_GUID         = "Sans Boss";
-  private const string BOSS_NAME         = "Sans Gundertale";
-  private const string SUBTITLE          = "Introducing...";
-  private const string SPRITE_PATH       = "CwaffingTheGungy/Resources/sans";
-  private const string DEFAULT_SPRITE    = "sans_idle_1";
-  private const string BOSS_CARD_PATH    = "CwaffingTheGungy/Resources/sans_bosscard.png";
-  private const string MUSIC_NAME        = "electromegalo";
-  private const int    MUSIC_LOOP_END    = 152512;
-  private const int    MUSIC_LOOP_LENGTH = 137141;
-  private const int    NUM_HITS          = 60;
-
-  internal static GameObject napalmReticle      = null;
-  internal static AIBulletBank.Entry boneBullet = null;
+  public  const  string BOSS_GUID              = "Sans Boss";
+  private const  string BOSS_NAME              = "Sans Gundertale";
+  private const  string SUBTITLE               = "Introducing...";
+  private const  string SPRITE_PATH            = "CwaffingTheGungy/Resources/sans";
+  private static GameObject napalmReticle      = null;
+  private static AIBulletBank.Entry boneBullet = null;
 
   public static void Init()
   {
-    BuildABoss bb = BuildABoss.LetsMakeABoss<BossBehavior>(bossname: BOSS_NAME, guid: BOSS_GUID, defaultSprite: $"{SPRITE_PATH}/{DEFAULT_SPRITE}",
-      hitboxSize: new IntVector2(8, 9), subtitle: SUBTITLE, bossCardPath: BOSS_CARD_PATH); // Create our build-a-boss
-    bb.SetStats(health: NUM_HITS, weight: 200f, speed: 0.4f, collisionDamage: 0f, hitReactChance: 0.05f, collisionKnockbackStrength: 0f,
+    BuildABoss bb = BuildABoss.LetsMakeABoss<BossBehavior>(bossname: BOSS_NAME, guid: BOSS_GUID, defaultSprite: $"{SPRITE_PATH}/sans_idle_1",
+      hitboxSize: new IntVector2(8, 9), subtitle: SUBTITLE, bossCardPath: $"{SPRITE_PATH}_bosscard.png"); // Create our build-a-boss
+    bb.SetStats(health: 60, weight: 200f, speed: 0.4f, collisionDamage: 0f, hitReactChance: 0.05f, collisionKnockbackStrength: 0f,
       healthIsNumberOfHits: true, invulnerabilityPeriod: 1.0f);                // Set our stats
     bb.InitSpritesFromResourcePath(SPRITE_PATH);                               // Set up our animations
       bb.AdjustAnimation(name: "idle",         fps:   12f, loop: true);        // Adjust some specific animations as needed
@@ -41,8 +30,8 @@ public partial class SansBoss : AIActor
       bb.SetIntroAnimations(introAnim: "decloak", preIntroAnim: "idle_cloak"); // Set up our intro animations (TODO: pre-intro not working???)
     bb.SetDefaultColliders(width: 15, height: 30, xoff: 24, yoff: 2);          // Set our default pixel colliders
     bb.AddCustomIntro<BossIntro>();                                            // Add custom animation to the generic intro doer
-    bb.AddCustomMusic(name: MUSIC_NAME, loopAt: 152512, rewind: 137141);       // Add custom music for our boss
     bb.TargetPlayer();                                                         // Set up the boss's targeting scripts
+    bb.AddCustomMusic(name: "electromegalo", loopAt: 152512, rewind: 137141);  // Add custom music for our boss
     bb.AddNamedVFX(pool: VFX.vfxpool["Tornado"], name: "mytornado");           // Add some named vfx pools to our bank of VFX
     bb.CreateTeleportAttack<CustomTeleportBehavior>(                           // Add some attacks
       goneTime: 0.25f, outAnim: "teleport_out", inAnim: "teleport_in", cooldown: 0.26f, attackCooldown: 0.15f, probability: 3f);
