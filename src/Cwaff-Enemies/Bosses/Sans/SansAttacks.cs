@@ -717,11 +717,12 @@ public partial class SansBoss : AIActor
     }
   }
 
+  // Teleport around the room with particle effects and sound effects for teleporting in and out
   private class CustomTeleportBehavior : TeleportBehavior
   {
     private bool    teleported = false;
-    private Vector3 oldPos     = Vector3.zero;
-    private Vector3 newPos     = Vector3.zero;
+    private Vector2 oldPos     = Vector2.zero;
+    private Vector2 newPos     = Vector2.zero;
     public override ContinuousBehaviorResult ContinuousUpdate()
     {
       if (State == TeleportState.TeleportOut)
@@ -729,7 +730,7 @@ public partial class SansBoss : AIActor
         if (!teleported)
         {
           AkSoundEngine.PostEvent(SOUND_TELEPORT, base.m_aiActor.gameObject);
-          oldPos = base.m_aiActor.Position;
+          oldPos = base.m_aiActor.Position.XY();
         }
         teleported = true;
       }
@@ -738,10 +739,10 @@ public partial class SansBoss : AIActor
         if (teleported)
         {
           AkSoundEngine.PostEvent(SOUND_TELEPORT, base.m_aiActor.gameObject);
-          newPos = base.m_aiActor.Position;
-          Vector3 delta = (newPos-oldPos);
+          newPos = base.m_aiActor.Position.XY();
+          Vector2 delta = (newPos-oldPos);
           for(int i = 0; i < 10; ++i)
-            SpawnDust(oldPos + (i/10.0f) * delta);
+            SpawnDust(oldPos + (i/10.0f) * delta + Lazy.RandomVector(UnityEngine.Random.Range(0.3f,1.25f)));
         }
         teleported = false;
       }

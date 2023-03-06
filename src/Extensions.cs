@@ -153,5 +153,17 @@ namespace CwaffingTheGungy
     {
       return (self.Speed / C.PIXELS_PER_CELL) * self.Direction.ToVector();
     }
+
+    // Get a Quaternion representing an angle rotated on the Z axis
+    public static Quaternion EulerZ(this float self)
+    {
+      return Quaternion.Euler(0f, 0f, self);
+    }
+
+    // Get a Quaternion representing a vector rotated on the Z axis
+    public static Quaternion EulerZ(this Vector2 self)
+    {
+      return Quaternion.Euler(0f, 0f, BraveMathCollege.Atan2Degrees(self));
+    }
   }
 }

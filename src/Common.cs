@@ -300,6 +300,12 @@ namespace CwaffingTheGungy
           return magnitude * RandomAngle().ToVector();
         }
 
+        // Get a random Quaternion rotated on the Z axis
+        public static Quaternion RandomEulerZ()
+        {
+          return RandomAngle().EulerZ();
+        }
+
         // Get a random boolean
         public static bool CoinFlip()
         {

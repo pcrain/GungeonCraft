@@ -36,16 +36,59 @@ namespace CwaffingTheGungy
     RATGEON       = 0x8000,
   }
 
+  // Helper class for storing runtime boss information
+  internal class BossData
+  {
+    public string musicId { get; private set; } = null;
+    public int loopPoint  { get; private set; } = -1;
+    public int loopRewind { get; private set; } = -1;
+
+    public static BossData ForGuid(string guid)
+    {
+      if (!staticBossData.ContainsKey(guid))
+        staticBossData[guid] = new BossData();
+      return staticBossData[guid];
+    }
+
+    public void SetMusic(string musicName, int loopPoint = -1, int rewindAmount = -1)
+    {
+      this.musicId    = musicName;
+      this.loopPoint  = loopPoint;
+      this.loopRewind = rewindAmount;
+    }
+
+    internal static Dictionary<string, BossData> staticBossData = new Dictionary<string, BossData>();
+  }
+
+  // Helper class for loading runtime boss information
+  internal class BossRoomController : DungeonPlaceableBehaviour, IPlaceConfigurable
+  {
+    public static BossRoomController GetPlaceable(BuildABoss bb)
+      { return new GameObject("BossRoomController").RegisterPrefab().AddComponent<BossRoomController>(); }
+
+    public void ConfigureOnPlacement(RoomHandler room)
+    {
+      room.Entered += (_) => {
+        foreach (AIActor enemy in room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All))
+          if (BossData.staticBossData.ContainsKey(enemy.EnemyGuid))
+            SetUpBossFight(BossData.staticBossData[enemy.EnemyGuid], enemy);
+      };
+    }
+
+    private void SetUpBossFight(BossData bd, AIActor enemy)
+    {
+      if (bd.musicId != null)
+        enemy.PlayBossMusic(bd.musicId, bd.loopPoint, bd.loopRewind);
+    }
+  }
+
+  // The big boi itself
   public class BuildABoss
   {
-    public GameObject prefab = null;
-    private GameObject defaultGunAttachPoint = null;
-
-    // Enemy behavior info
-    private BraveBehaviour enemyBehavior = null;
-
-    // Misc private variables
-    private string guid = "";
+    public  GameObject     prefab                { get; private set; } = null;
+    public  string         guid                  { get; private set; } = null;
+    private GameObject     defaultGunAttachPoint = null;
+    private BraveBehaviour enemyBehavior         = null;
 
     // Private constructor
     private BuildABoss() {}
@@ -77,13 +120,7 @@ namespace CwaffingTheGungy
 
       // Set up a default shadow so teleportation doesn't throw exceptions
       if (bb.enemyBehavior.aiActor.ShadowObject == null)
-      {
-        GameObject defaultShadow = (GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("DefaultShadowSprite"));
-        defaultShadow.SetActive(false);
-        FakePrefab.MarkAsFakePrefab(defaultShadow);
-        UnityEngine.Object.DontDestroyOnLoad(defaultShadow);
-        bb.enemyBehavior.aiActor.ShadowObject = defaultShadow;
-      }
+        bb.enemyBehavior.aiActor.ShadowObject = ((GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("DefaultShadowSprite"))).RegisterPrefab();
 
       return bb;
     }
@@ -116,6 +153,13 @@ namespace CwaffingTheGungy
         this.enemyBehavior.aiActor.healthHaver.usesInvulnerabilityPeriod = invulnerabilityPeriod.Value > 0.0f;
       }
     }
+
+    /// <summary>Adds custom music for a custom boss.</summary>
+    /// <param name="name">The name of the music track (WWise event name) to play.</param>
+    /// <param name="loopAt">Offset in milliseconds where a song should loop.</param>
+    /// <param name="rewind">How many milliseconds a song should rewind after reaching the loop point.</param>
+    public void AddCustomMusic(string name, int loopAt = -1, int rewind = -1)
+      { BossData.ForGuid(this.guid).SetMusic(name, loopAt, rewind); }
 
     /// <summary>Adds a new ShootBehavior attack with a custom Brave.BraveBulletScript.Script to a custom boss.</summary>
     /// <typeparam name="T">A Brave Bullet Script or derived class thereof.</typeparam>
@@ -501,7 +545,7 @@ namespace CwaffingTheGungy
 
     public void AddBossToFloorPool(Floors floors, float weight = 1f)
     {
-      this.prefab.AddBossToFloorPool(guid: this.guid, floors: floors, weight: weight);
+      this.prefab.AddBossToFloorPool(bb: this, guid: this.guid, floors: floors, weight: weight);
     }
   }
 
@@ -877,7 +921,7 @@ namespace CwaffingTheGungy
       Illegal tilesets:
         SPACEGEON, PHOBOSGEON, WESTGEON, OFFICEGEON, BELLYGEON, JUNGLEGEON, FINALGEON, RATGEON
     */
-    public static void AddBossToFloorPool(this GameObject self, string guid, Floors floors = Floors.CASTLEGEON, float weight = 1f)
+    public static void AddBossToFloorPool(this GameObject self, BuildABoss bb, string guid, Floors floors = Floors.CASTLEGEON, float weight = 1f)
     {
         // Load our boss manager if it's not loaded already
         if (theBossMan == null)
@@ -892,6 +936,7 @@ namespace CwaffingTheGungy
           Vector2 roomCenter = new Vector2(0.5f*p.Width, 0.5f*p.Height);
           tk2dBaseSprite anySprite = self.GetComponent<tk2dSpriteAnimator>().GetAnySprite();
         AddObjectToRoom(p, roomCenter - anySprite.WorldTopLeft, EnemyBehaviourGuid: guid);
+        AddObjectToRoom(p, roomCenter, NonEnemyBehaviour: BossRoomController.GetPlaceable(bb));
 
         // Create a new table and add our new boss room
         GenericRoomTable theRoomTable = ScriptableObject.CreateInstance<GenericRoomTable>();
@@ -952,12 +997,12 @@ namespace CwaffingTheGungy
     }
 
     // SpecificIntroDoer extension method for playing boss music
-    public static uint PlayBossMusic(this SpecificIntroDoer introDoer, string musicName, int loopPoint = -1, int rewindAmount = -1)
+    public static uint PlayBossMusic(this AIActor aiActor, string musicName, int loopPoint = -1, int rewindAmount = -1)
     {
       uint musicEventId =  AkSoundEngine.PostEvent(musicName, GameManager.Instance.DungeonMusicController.gameObject, in_uFlags: (uint)AkCallbackType.AK_EnableGetSourcePlayPosition);
       if (loopPoint > 0 && rewindAmount > 0)
         GameManager.Instance.DungeonMusicController.StartCoroutine(LoopMusic(musicEventId, musicName, loopPoint, rewindAmount));
-      introDoer.aiActor.healthHaver.OnPreDeath += (_) =>
+      aiActor.healthHaver.OnPreDeath += (_) =>
         { AkSoundEngine.StopPlayingID(musicEventId, 0, AkCurveInterpolation.AkCurveInterpolation_Constant); };
       return musicEventId;
     }
