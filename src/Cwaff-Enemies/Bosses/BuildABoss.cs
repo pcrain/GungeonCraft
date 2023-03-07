@@ -36,12 +36,26 @@ namespace CwaffingTheGungy
     RATGEON       = 0x8000,
   }
 
-  // Helper class for storing miscellaneous runtime information for BuildABoss
-  internal class BossController : MonoBehaviour
+  // Helper class for loading runtime boss information
+  internal class BossController : DungeonPlaceableBehaviour, IPlaceConfigurable
   {
     public string musicId = null;
     public int loopPoint  = -1;
     public int loopRewind = -1;
+
+    public static BossController GetPlaceable(BuildABoss bb)
+      { return new GameObject("BossController").RegisterPrefab().AddComponent<BossController>(); }
+
+    public void ConfigureOnPlacement(RoomHandler room)
+    {
+      room.Entered += (_) => {
+        foreach (AIActor enemy in room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All))
+        {
+          if (enemy.GetComponent<GenericIntroDoer>() != null)
+            SetUpBossFight(enemy);
+        }
+      };
+    }
 
     public void SetMusic(string musicName, int loopPoint = -1, int rewindAmount = -1)
     {
@@ -49,42 +63,23 @@ namespace CwaffingTheGungy
       this.loopPoint  = loopPoint;
       this.loopRewind = rewindAmount;
     }
-  }
 
-  // Helper class for loading runtime boss information
-  internal class BossRoomController : DungeonPlaceableBehaviour, IPlaceConfigurable
-  {
-    public static BossRoomController GetPlaceable(BuildABoss bb)
-      { return new GameObject("BossRoomController").RegisterPrefab().AddComponent<BossRoomController>(); }
-
-    public void ConfigureOnPlacement(RoomHandler room)
+    private void SetUpBossFight(AIActor enemy)
     {
-      room.Entered += (_) => {
-        foreach (AIActor enemy in room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All))
-        {
-          BossController bc = enemy.GetComponent<BossController>();
-          if (bc != null)
-            SetUpBossFight(bc, enemy);
-        }
-      };
-    }
-
-    private void SetUpBossFight(BossController bc, AIActor enemy)
-    {
-      // ETGModConsole.Log($"bc.musicid = {bc.musicId}");
-      if (bc.musicId != null)
-        enemy.PlayBossMusic(bc.musicId, bc.loopPoint, bc.loopRewind);
+      ETGModConsole.Log($"this.musicid = {this.musicId}");
+      if (this.musicId != null)
+        enemy.PlayBossMusic(this.musicId, this.loopPoint, this.loopRewind);
     }
   }
 
   // The big boi itself
   public class BuildABoss
   {
-    public  GameObject     prefab                { get; private set; } = null;
-    public  string         guid                  { get; private set; } = null;
-    private GameObject     defaultGunAttachPoint = null;
-    private BraveBehaviour enemyBehavior         = null;
-    private BossController bossController        = null;
+    public   GameObject     prefab         { get; private set; } = null;
+    public   string         guid           { get; private set; } = null;
+    internal BossController bossController { get; private set; } = null;
+    private  GameObject     defaultGunAttachPoint  = null;
+    private  BraveBehaviour enemyBehavior          = null;
 
     // Private constructor
     private BuildABoss() {}
@@ -102,7 +97,7 @@ namespace CwaffingTheGungy
       bb.enemyBehavior  = BH.AddSaneDefaultBossBehavior<T>(bb.prefab,bossname,subtitle,bossCardPath);
 
       // Add a BossController
-      bb.bossController = bb.prefab.AddComponent<BossController>();
+      bb.bossController = BossController.GetPlaceable(bb);
 
       // Set up default colliders from the default sprite
       var sprite = bb.prefab.GetComponent<HealthHaver>().GetAnySprite();
@@ -935,7 +930,7 @@ namespace CwaffingTheGungy
           Vector2 roomCenter = new Vector2(0.5f*p.Width, 0.5f*p.Height);
           tk2dBaseSprite anySprite = self.GetComponent<tk2dSpriteAnimator>().GetAnySprite();
         AddObjectToRoom(p, roomCenter - anySprite.WorldTopLeft, EnemyBehaviourGuid: guid);
-        AddObjectToRoom(p, roomCenter, NonEnemyBehaviour: BossRoomController.GetPlaceable(bb));
+        AddObjectToRoom(p, roomCenter, NonEnemyBehaviour: bb.bossController);
 
         // Create a new table and add our new boss room
         GenericRoomTable theRoomTable = ScriptableObject.CreateInstance<GenericRoomTable>();
