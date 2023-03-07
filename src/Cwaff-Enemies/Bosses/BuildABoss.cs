@@ -36,19 +36,12 @@ namespace CwaffingTheGungy
     RATGEON       = 0x8000,
   }
 
-  // Helper class for storing runtime boss information
-  internal class BossData
+  // Helper class for storing miscellaneous runtime information for BuildABoss
+  internal class BossController : MonoBehaviour
   {
-    public string musicId { get; private set; } = null;
-    public int loopPoint  { get; private set; } = -1;
-    public int loopRewind { get; private set; } = -1;
-
-    public static BossData ForGuid(string guid)
-    {
-      if (!staticBossData.ContainsKey(guid))
-        staticBossData[guid] = new BossData();
-      return staticBossData[guid];
-    }
+    public string musicId = null;
+    public int loopPoint  = -1;
+    public int loopRewind = -1;
 
     public void SetMusic(string musicName, int loopPoint = -1, int rewindAmount = -1)
     {
@@ -56,8 +49,6 @@ namespace CwaffingTheGungy
       this.loopPoint  = loopPoint;
       this.loopRewind = rewindAmount;
     }
-
-    internal static Dictionary<string, BossData> staticBossData = new Dictionary<string, BossData>();
   }
 
   // Helper class for loading runtime boss information
@@ -70,15 +61,19 @@ namespace CwaffingTheGungy
     {
       room.Entered += (_) => {
         foreach (AIActor enemy in room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All))
-          if (BossData.staticBossData.ContainsKey(enemy.EnemyGuid))
-            SetUpBossFight(BossData.staticBossData[enemy.EnemyGuid], enemy);
+        {
+          BossController bc = enemy.GetComponent<BossController>();
+          if (bc != null)
+            SetUpBossFight(bc, enemy);
+        }
       };
     }
 
-    private void SetUpBossFight(BossData bd, AIActor enemy)
+    private void SetUpBossFight(BossController bc, AIActor enemy)
     {
-      if (bd.musicId != null)
-        enemy.PlayBossMusic(bd.musicId, bd.loopPoint, bd.loopRewind);
+      // ETGModConsole.Log($"bc.musicid = {bc.musicId}");
+      if (bc.musicId != null)
+        enemy.PlayBossMusic(bc.musicId, bc.loopPoint, bc.loopRewind);
     }
   }
 
@@ -89,6 +84,7 @@ namespace CwaffingTheGungy
     public  string         guid                  { get; private set; } = null;
     private GameObject     defaultGunAttachPoint = null;
     private BraveBehaviour enemyBehavior         = null;
+    private BossController bossController        = null;
 
     // Private constructor
     private BuildABoss() {}
@@ -103,7 +99,10 @@ namespace CwaffingTheGungy
         IntVector2.Zero, hitboxSize, false, true);
 
       // Add sane default behavior
-      bb.enemyBehavior = BH.AddSaneDefaultBossBehavior<T>(bb.prefab,bossname,subtitle,bossCardPath);
+      bb.enemyBehavior  = BH.AddSaneDefaultBossBehavior<T>(bb.prefab,bossname,subtitle,bossCardPath);
+
+      // Add a BossController
+      bb.bossController = bb.prefab.AddComponent<BossController>();
 
       // Set up default colliders from the default sprite
       var sprite = bb.prefab.GetComponent<HealthHaver>().GetAnySprite();
@@ -159,7 +158,7 @@ namespace CwaffingTheGungy
     /// <param name="loopAt">Offset in milliseconds where a song should loop.</param>
     /// <param name="rewind">How many milliseconds a song should rewind after reaching the loop point.</param>
     public void AddCustomMusic(string name, int loopAt = -1, int rewind = -1)
-      { BossData.ForGuid(this.guid).SetMusic(name, loopAt, rewind); }
+      { this.bossController.SetMusic(name, loopAt, rewind); }
 
     /// <summary>Adds a new ShootBehavior attack with a custom Brave.BraveBulletScript.Script to a custom boss.</summary>
     /// <typeparam name="T">A Brave Bullet Script or derived class thereof.</typeparam>
