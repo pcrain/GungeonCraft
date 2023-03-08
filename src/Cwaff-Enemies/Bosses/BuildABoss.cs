@@ -39,21 +39,26 @@ namespace CwaffingTheGungy
   // Helper class for loading runtime boss information
   internal class BossController : DungeonPlaceableBehaviour, IPlaceConfigurable
   {
+    public string enemyGuid = null;
     public string musicId = null;
     public int loopPoint  = -1;
     public int loopRewind = -1;
 
-    public static BossController GetPlaceable(BuildABoss bb)
-      { return new GameObject("BossController").RegisterPrefab().AddComponent<BossController>(); }
+    public static BossController NewPrefab(string guid)
+      {
+        return new GameObject("BossController").RegisterPrefab().AddComponent<BossController>(
+          new BossController() {
+            enemyGuid = guid,
+          }
+        );
+      }
 
     public void ConfigureOnPlacement(RoomHandler room)
     {
       room.Entered += (_) => {
         foreach (AIActor enemy in room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All))
-        {
-          if (enemy.GetComponent<GenericIntroDoer>() != null)
+          if (enemy.EnemyGuid == this.enemyGuid)
             SetUpBossFight(enemy);
-        }
       };
     }
 
@@ -66,7 +71,6 @@ namespace CwaffingTheGungy
 
     private void SetUpBossFight(AIActor enemy)
     {
-      ETGModConsole.Log($"this.musicid = {this.musicId}");
       if (this.musicId != null)
         enemy.PlayBossMusic(this.musicId, this.loopPoint, this.loopRewind);
     }
@@ -97,7 +101,7 @@ namespace CwaffingTheGungy
       bb.enemyBehavior  = BH.AddSaneDefaultBossBehavior<T>(bb.prefab,bossname,subtitle,bossCardPath);
 
       // Add a BossController
-      bb.bossController = BossController.GetPlaceable(bb);
+      bb.bossController = BossController.NewPrefab(guid);
 
       // Set up default colliders from the default sprite
       var sprite = bb.prefab.GetComponent<HealthHaver>().GetAnySprite();

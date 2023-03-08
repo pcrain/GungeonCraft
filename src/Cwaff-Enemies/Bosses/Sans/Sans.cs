@@ -21,7 +21,7 @@ public partial class SansBoss : AIActor
       hitboxSize: new IntVector2(8, 9), subtitle: SUBTITLE, bossCardPath: $"{SPRITE_PATH}_bosscard.png"); // Create our build-a-boss
     bb.SetStats(health: 60, weight: 200f, speed: 0.4f, collisionDamage: 0f, hitReactChance: 0.05f, collisionKnockbackStrength: 0f,
       healthIsNumberOfHits: true, invulnerabilityPeriod: 1.0f);                // Set our stats
-    bb.InitSpritesFromResourcePath(SPRITE_PATH);                               // Set up our animations
+    bb.InitSpritesFromResourcePath(spritePath: SPRITE_PATH);                   // Set up our animations
       bb.AdjustAnimation(name: "idle",         fps:   12f, loop: true);        // Adjust some specific animations as needed
       bb.AdjustAnimation(name: "idle_cloak",   fps:   12f, loop: true);
       bb.AdjustAnimation(name: "decloak",      fps:    6f, loop: false);
@@ -67,37 +67,30 @@ public partial class SansBoss : AIActor
   private static void SpawnDust(Vector2 where)
     { SpawnManager.SpawnVFX(GameManager.Instance.Dungeon.dungeonDustups.rollLandDustup, where, Lazy.RandomEulerZ()); }
 
-  private class DoomZoneGrowth : MonoBehaviour
+  private static IEnumerator Lengthen(tk2dSlicedSprite quad, float targetLength, int numFrames)
   {
-    public void Lengthen(float targetLength, int numFrames)
-      { this.StartCoroutine(Lengthen_CR(targetLength,numFrames)); }
-
-    private IEnumerator Lengthen_CR(float targetLength, int numFrames)
+    float scaleFactor = C.PIXELS_PER_TILE * targetLength / numFrames;
+    for (int i = 1 ; i <= numFrames; ++i)
     {
-      tk2dSlicedSprite quad = this.GetComponent<tk2dSlicedSprite>();
-      float scaleFactor = C.PIXELS_PER_TILE * targetLength / numFrames;
-      for (int i = 1 ; i <= numFrames; ++i)
-      {
-        quad.dimensions = quad.dimensions.WithX(scaleFactor * i);
-        quad.UpdateZDepth();
-        yield return null;
-      }
-      this.gameObject.AddComponent<ReticleRiserEffect>().NumRisers = 3; // restore reticle riser settings
+      quad.dimensions = quad.dimensions.WithX(scaleFactor * i);
+      quad.UpdateZDepth();
+      yield return null;
     }
+    quad.gameObject.AddComponent<ReticleRiserEffect>().NumRisers = 3; // restore reticle riser settings
   }
 
   // Creates a napalm-strike-esque danger zone
   private static GameObject DoomZone(Vector2 start, Vector2 target, float width, float lifetime = -1f, int growthTime = 1, string sprite = null)
   {
-    Vector2 delta = target - start;
-    GameObject reticle = UnityEngine.Object.Instantiate(napalmReticle);
-      reticle.AddComponent<DoomZoneGrowth>().Lengthen(delta.magnitude,growthTime);
+    Vector2 delta         = target - start;
+    GameObject reticle    = UnityEngine.Object.Instantiate(napalmReticle);
     tk2dSlicedSprite quad = reticle.GetComponent<tk2dSlicedSprite>();
       if (sprite != null)
         quad.SetSprite(VFX.SpriteCollection, VFX.sprites[sprite]);
       quad.dimensions              = C.PIXELS_PER_TILE * (new Vector2(delta.magnitude / growthTime, width));
       quad.transform.localRotation = delta.EulerZ();
       quad.transform.position      = start + (0.5f * width * delta.normalized.Rotate(-90f));
+      quad.StartCoroutine(Lengthen(quad, delta.magnitude,growthTime));
     if (lifetime > 0)
       reticle.ExpireIn(lifetime);
     return reticle;
@@ -122,14 +115,12 @@ public partial class SansBoss : AIActor
 
     private void LateUpdate() // movement is buggy if we use the regular Update() method
     {
-      const float JIGGLE = 4f; // max distance at which we hover from base position
-      const float SPEED  = 4f; // speed at which we hover
       if (aura == null || BraveTime.DeltaTime == 0)
         return; // don't do anything if we're paused or pre-intro
 
       base.aiActor.PathfindToPosition(GameManager.Instance.PrimaryPlayer.specRigidbody.UnitCenter); // drift around
       FlipSpriteIfNecessary();
-      base.sprite.transform.localPosition += Vector3.zero.WithY(Mathf.CeilToInt(JIGGLE*Mathf.Sin(SPEED*BraveTime.ScaledTimeSinceStartup))/C.PIXELS_PER_TILE);
+      base.sprite.transform.localPosition += Vector3.zero.WithY(Mathf.CeilToInt(4f*Mathf.Sin(4f*BraveTime.ScaledTimeSinceStartup))/C.PIXELS_PER_TILE);
       if (Lazy.CoinFlip())
         SpawnDust(base.specRigidbody.UnitCenter + Lazy.RandomVector(UnityEngine.Random.Range(0.3f,1.25f))); // spawn dust particles
     }
