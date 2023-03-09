@@ -19,7 +19,7 @@ public partial class SansBoss : AIActor
   {
     BuildABoss bb = BuildABoss.LetsMakeABoss<BossBehavior>(bossname: BOSS_NAME, guid: BOSS_GUID, defaultSprite: $"{SPRITE_PATH}/sans_idle_1",
       hitboxSize: new IntVector2(8, 9), subtitle: SUBTITLE, bossCardPath: $"{SPRITE_PATH}_bosscard.png"); // Create our build-a-boss
-    bb.SetStats(health: 60, weight: 200f, speed: 0.4f, collisionDamage: 0f, hitReactChance: 0.05f, collisionKnockbackStrength: 0f,
+    bb.SetStats(health: 1/*60*/, weight: 200f, speed: 0.4f, collisionDamage: 0f, hitReactChance: 0.05f, collisionKnockbackStrength: 0f,
       healthIsNumberOfHits: true, invulnerabilityPeriod: 1.0f);                // Set our stats
     bb.InitSpritesFromResourcePath(spritePath: SPRITE_PATH);                   // Set up our animations
       bb.AdjustAnimation(name: "idle",         fps:   12f, loop: true);        // Adjust some specific animations as needed
@@ -48,54 +48,6 @@ public partial class SansBoss : AIActor
     bb.AddBossToGameEnemies(name: "cg:sansboss");                              // Add our boss to the enemy database
     bb.AddBossToFloorPool(floors: Floors.CASTLEGEON, weight: 9999f);           // Add our boss to the first floor's boss pool
     InitPrefabs();                                                             // Do miscellaneous prefab loading
-  }
-
-  // protected IEnumerator Prompt(string optionA, string optionB)
-  // {
-  //     int selectedResponse = -1;
-  //     GameUIRoot.Instance.DisplayPlayerConversationOptions(this.m_interactor, null, optionA, optionB);
-  //     while (!GameUIRoot.Instance.GetPlayerConversationResponse(out selectedResponse))
-  //         yield return null;
-  //     LastResponse = selectedResponse;
-  //     yield break;
-  // }
-
-  public static IEnumerator NPCTalkingScript(BossNPC theBoss)
-  {
-      ETGModConsole.Log($"in SANSNPC");
-      List<string> conversation = new List<string> {
-          "Hey buddy, what's good!",
-          "Listen, I've got a *real* nice item for you.",
-          };
-
-
-      IEnumerator script = theBoss.Converse(conversation,"idle_cloak","idle_cloak");
-      while(script.MoveNext())
-        yield return script.Current;
-      // yield return theBoss.StartCoroutine(theBoss.Converse(conversation,"idle_cloak","idle_cloak"));
-      yield break;
-      // List<string> conversation = new List<string> {
-      //     "Hey guys!",
-      //     "Got custom NPCs working o:",
-      //     "Neat huh?",
-      //     };
-
-      // IEnumerator script = Converse(conversation,"talker","idler");
-      // while(script.MoveNext())
-      //     yield return script.Current;
-
-      // var acceptanceTextToUse = "Very neat! :D";
-      // var declineTextToUse = "Not impressed. :/" + " (pay " + 99 + "[sprite \"hbux_text_icon\"] to disagree)";
-      // GameUIRoot.Instance.DisplayPlayerConversationOptions(this.m_interactor, null, acceptanceTextToUse, declineTextToUse);
-      // int selectedResponse = -1;
-      // while (!GameUIRoot.Instance.GetPlayerConversationResponse(out selectedResponse))
-      //     yield return null;
-
-      // IEnumerator prompt = Prompt("Very neat! :D","Not impressed. :/" + " (pay " + 99 + "[sprite \"hbux_text_icon\"] to disagree)");
-      // while(prompt.MoveNext())
-      //     yield return prompt.Current;
-
-      // this.ShowText((selectedResponse == 0) ? "Yay!" : "Aw ):",2f);
   }
 
   private static void InitPrefabs()
@@ -154,6 +106,9 @@ public partial class SansBoss : AIActor
       base.aiActor.healthHaver.OnPreDeath += (_) => {
         FlipSpriteIfNecessary(overrideFlip: false);
         AkSoundEngine.PostEvent("Play_ENM_beholster_death_01", base.aiActor.gameObject);
+        UnityEngine.Object.Destroy(aura);
+        aura = null;
+        ETGModConsole.Log($"deregistered aura");
       };
       base.healthHaver.healthHaver.OnDeath += (_) => {
         FlipSpriteIfNecessary(overrideFlip: false);
@@ -164,12 +119,15 @@ public partial class SansBoss : AIActor
 
     private void LateUpdate() // movement is buggy if we use the regular Update() method
     {
-      if (aura == null || BraveTime.DeltaTime == 0)
-        return; // don't do anything if we're paused or pre-intro
+      if (BraveTime.DeltaTime == 0)
+        return; // don't do anything if we're paused
 
-      base.aiActor.PathfindToPosition(GameManager.Instance.PrimaryPlayer.specRigidbody.UnitCenter); // drift around
       FlipSpriteIfNecessary();
+      if (aura == null)
+        return; // don't do anything else if we're pre-intro
+
       base.sprite.transform.localPosition += Vector3.zero.WithY(Mathf.CeilToInt(4f*Mathf.Sin(4f*BraveTime.ScaledTimeSinceStartup))/C.PIXELS_PER_TILE);
+      base.aiActor.PathfindToPosition(GameManager.Instance.PrimaryPlayer.specRigidbody.UnitCenter); // drift around
       if (Lazy.CoinFlip())
         SpawnDust(base.specRigidbody.UnitCenter + Lazy.RandomVector(UnityEngine.Random.Range(0.3f,1.25f))); // spawn dust particles
     }

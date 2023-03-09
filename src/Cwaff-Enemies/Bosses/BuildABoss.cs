@@ -84,18 +84,24 @@ namespace CwaffingTheGungy
       this.loopRewind = rewindAmount;
     }
 
-    private void SetUpBoss(AIActor enemy)
+    private void RegisterAnyInteractables(AIActor enemy)
     {
-      ETGModConsole.Log($"Setting up Boss");
       UnityEngine.Component[] componentsInChildren = enemy.GetComponentsInChildren(typeof(IPlayerInteractable));
       for (int i = 0; i < componentsInChildren.Length; i++)
       {
           if (componentsInChildren[i] is IPlayerInteractable)
             enemy.transform.position.GetAbsoluteRoom().RegisterInteractable(componentsInChildren[i] as IPlayerInteractable);
       }
+    }
+
+    private void SetUpBoss(AIActor enemy)
+    {
+      ETGModConsole.Log($"Setting up Boss");
+      RegisterAnyInteractables(enemy);
       GenericIntroDoer gid = enemy.GetComponent<GenericIntroDoer>();
       if (!string.IsNullOrEmpty(gid.preIntroAnim))
         enemy.aiAnimator.PlayUntilCancelled(gid.preIntroAnim); // hack to forcibly play the pre-intro animation before room entry
+      enemy.healthHaver.healthHaver.ManualDeathHandling = true; // make sure we manually handle our death as necessary
     }
 
     private void SetUpBossFight(AIActor enemy)
@@ -111,6 +117,10 @@ namespace CwaffingTheGungy
       if (npc != null)
       {
         npc.SetBossController(this);
+        enemy.healthHaver.OnPreDeath += (_) => {
+          enemy.StartCoroutine(npc.DefeatedScript());
+          RegisterAnyInteractables(enemy);
+        };
         return;
       }
       ETGModConsole.Log($"something went horribly wrong, boss should have an npc! o.o");
