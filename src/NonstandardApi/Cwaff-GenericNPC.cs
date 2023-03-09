@@ -30,13 +30,13 @@ namespace CwaffingTheGungy
     {
         public Transform talkPoint;
         public Vector3 talkPointAdjustment;
+        public bool autoFlipSprite = true;
 
         protected bool canInteract;
         protected bool m_canUse = true;
         protected PlayerController m_interactor;
 
         protected Vector3 talkPointOffset;
-        protected bool autoFlipSprite = true;
         protected int PromptResult()
         {
             return LastResponse;
@@ -229,7 +229,7 @@ namespace CwaffingTheGungy
             EndConversation();
         }
 
-        protected IEnumerator Converse(List<string> dialogue, string talkAnimation = null, string pauseAnimation = null)
+        public IEnumerator Converse(List<string> dialogue, string talkAnimation = null, string pauseAnimation = null)
         {
             for (int ci = 0; ci < dialogue.Count; ++ci)
             {
@@ -258,7 +258,7 @@ namespace CwaffingTheGungy
             yield break;
         }
 
-        protected IEnumerator Prompt(string optionA, string optionB)
+        public IEnumerator Prompt(string optionA, string optionB)
         {
             int selectedResponse = -1;
             GameUIRoot.Instance.DisplayPlayerConversationOptions(this.m_interactor, null, optionA, optionB);

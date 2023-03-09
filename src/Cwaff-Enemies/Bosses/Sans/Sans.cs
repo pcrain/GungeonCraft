@@ -30,6 +30,7 @@ public partial class SansBoss : AIActor
       bb.SetIntroAnimations(introAnim: "decloak", preIntroAnim: "idle_cloak"); // Set up our intro animations (TODO: pre-intro not working???)
     bb.SetDefaultColliders(width: 15, height: 30, xoff: 24, yoff: 2);          // Set our default pixel colliders
     bb.AddCustomIntro<BossIntro>();                                            // Add custom animation to the generic intro doer
+    bb.AddPreFightInteractible<SansNPC>();
     bb.TargetPlayer();                                                         // Set up the boss's targeting scripts
     bb.AddCustomMusic(name: "electromegalo", loopAt: 152512, rewind: 137141);  // Add custom music for our boss
     bb.AddNamedVFX(pool: VFX.vfxpool["Tornado"], name: "mytornado");           // Add some named vfx pools to our bank of VFX
@@ -47,6 +48,54 @@ public partial class SansBoss : AIActor
     bb.AddBossToGameEnemies(name: "cg:sansboss");                              // Add our boss to the enemy database
     bb.AddBossToFloorPool(floors: Floors.CASTLEGEON, weight: 9999f);           // Add our boss to the first floor's boss pool
     InitPrefabs();                                                             // Do miscellaneous prefab loading
+  }
+
+  // protected IEnumerator Prompt(string optionA, string optionB)
+  // {
+  //     int selectedResponse = -1;
+  //     GameUIRoot.Instance.DisplayPlayerConversationOptions(this.m_interactor, null, optionA, optionB);
+  //     while (!GameUIRoot.Instance.GetPlayerConversationResponse(out selectedResponse))
+  //         yield return null;
+  //     LastResponse = selectedResponse;
+  //     yield break;
+  // }
+
+  public static IEnumerator NPCTalkingScript(BossNPC theBoss)
+  {
+      ETGModConsole.Log($"in SANSNPC");
+      List<string> conversation = new List<string> {
+          "Hey buddy, what's good!",
+          "Listen, I've got a *real* nice item for you.",
+          };
+
+
+      IEnumerator script = theBoss.Converse(conversation,"idle_cloak","idle_cloak");
+      while(script.MoveNext())
+        yield return script.Current;
+      // yield return theBoss.StartCoroutine(theBoss.Converse(conversation,"idle_cloak","idle_cloak"));
+      yield break;
+      // List<string> conversation = new List<string> {
+      //     "Hey guys!",
+      //     "Got custom NPCs working o:",
+      //     "Neat huh?",
+      //     };
+
+      // IEnumerator script = Converse(conversation,"talker","idler");
+      // while(script.MoveNext())
+      //     yield return script.Current;
+
+      // var acceptanceTextToUse = "Very neat! :D";
+      // var declineTextToUse = "Not impressed. :/" + " (pay " + 99 + "[sprite \"hbux_text_icon\"] to disagree)";
+      // GameUIRoot.Instance.DisplayPlayerConversationOptions(this.m_interactor, null, acceptanceTextToUse, declineTextToUse);
+      // int selectedResponse = -1;
+      // while (!GameUIRoot.Instance.GetPlayerConversationResponse(out selectedResponse))
+      //     yield return null;
+
+      // IEnumerator prompt = Prompt("Very neat! :D","Not impressed. :/" + " (pay " + 99 + "[sprite \"hbux_text_icon\"] to disagree)");
+      // while(prompt.MoveNext())
+      //     yield return prompt.Current;
+
+      // this.ShowText((selectedResponse == 0) ? "Yay!" : "Aw ):",2f);
   }
 
   private static void InitPrefabs()

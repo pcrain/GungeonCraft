@@ -37,14 +37,18 @@ namespace CwaffingTheGungy
   }
 
   // Helper class for loading runtime boss information
-  internal class BossController : DungeonPlaceableBehaviour, IPlaceConfigurable
+  public class BossController : DungeonPlaceableBehaviour, IPlaceConfigurable
   {
     public string enemyGuid = null;
     public string musicId = null;
     public int loopPoint  = -1;
     public int loopRewind = -1;
 
-    public static BossController NewPrefab(string guid)
+    private bool bossFightStarted = false;
+
+    private BossController() {} // default constructor is private
+
+    internal static BossController NewPrefab(string guid) // should not be instantiated outside this class
       {
         return new GameObject("BossController").RegisterPrefab().AddComponent<BossController>(
           new BossController() {
@@ -55,10 +59,21 @@ namespace CwaffingTheGungy
 
     public void ConfigureOnPlacement(RoomHandler room)
     {
+      AIActor theBoss = null;
+      foreach (AIActor enemy in room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All))
+        if (enemy.EnemyGuid == this.enemyGuid)
+        {
+          theBoss = enemy;
+          break;
+        }
+      if (theBoss == null)
+      {
+        ETGModConsole.Log($"Something went horrendously wrong setting up the Boss o.o");
+        return;
+      }
+      SetUpBoss(theBoss);
       room.Entered += (_) => {
-        foreach (AIActor enemy in room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All))
-          if (enemy.EnemyGuid == this.enemyGuid)
-            SetUpBossFight(enemy);
+        SetUpBossFight(theBoss);
       };
     }
 
@@ -69,11 +84,49 @@ namespace CwaffingTheGungy
       this.loopRewind = rewindAmount;
     }
 
+    private void SetUpBoss(AIActor enemy)
+    {
+      ETGModConsole.Log($"Setting up Boss");
+      UnityEngine.Component[] componentsInChildren = enemy.GetComponentsInChildren(typeof(IPlayerInteractable));
+      for (int i = 0; i < componentsInChildren.Length; i++)
+      {
+          if (componentsInChildren[i] is IPlayerInteractable)
+            enemy.transform.position.GetAbsoluteRoom().RegisterInteractable(componentsInChildren[i] as IPlayerInteractable);
+      }
+      GenericIntroDoer gid = enemy.GetComponent<GenericIntroDoer>();
+      if (!string.IsNullOrEmpty(gid.preIntroAnim))
+        enemy.aiAnimator.PlayUntilCancelled(gid.preIntroAnim); // hack to forcibly play the pre-intro animation before room entry
+    }
+
     private void SetUpBossFight(AIActor enemy)
     {
+      ETGModConsole.Log($"Setting up Boss Fight");
+      if (enemy.GetComponent<GenericIntroDoer>().triggerType == GenericIntroDoer.TriggerType.PlayerEnteredRoom)
+      {
+        StartBossFight(enemy);
+        return;
+      }
+      // if we make it here, we have a custom trigger
+      BossNPC npc = enemy.GetComponent<BossNPC>();
+      if (npc != null)
+      {
+        npc.SetBossController(this);
+        return;
+      }
+      ETGModConsole.Log($"something went horribly wrong, boss should have an npc! o.o");
+    }
+
+    public void StartBossFight(AIActor enemy)
+    {
+      if (bossFightStarted)
+        return;
+      bossFightStarted = true;
+      ETGModConsole.Log($"Starting Boss Fight");
       if (this.musicId != null)
         enemy.PlayBossMusic(this.musicId, this.loopPoint, this.loopRewind);
+      enemy.transform.position.GetAbsoluteRoom().SealRoom();
     }
+
   }
 
   // The big boi itself
@@ -484,6 +537,13 @@ namespace CwaffingTheGungy
       };
       this.prefab.GetComponent<BehaviorSpeculator>().TargetBehaviors.Add(t);
       return t;
+    }
+
+    public void AddPreFightInteractible<T>() where T : BossNPC
+    {
+      this.prefab.GetComponent<GenericIntroDoer>().triggerType = GenericIntroDoer.TriggerType.BossTriggerZone;
+      T npc = this.prefab.AddComponent<T>();
+        npc.autoFlipSprite = false;
     }
 
     public void AddNamedVFX(VFXObject vfxobj, string name, Transform transformAnchor = null)
@@ -903,10 +963,15 @@ namespace CwaffingTheGungy
         p.prerequisites = new List<DungeonPrerequisite>();
         p.rectangularFeatures = new List<PrototypeRectangularFeature>();
 
-      // Make sure it still seals when we enter
-        p.roomEvents.Add(new RoomEventDefinition(RoomEventTriggerCondition.ON_ENTER_WITH_ENEMIES, RoomEventTriggerAction.SEAL_ROOM));
+      // Make sure we don't treat the room as a room with normal enemies upon entry (mostly useful for interaction-based bosses)
+        p.UseCustomMusicState = true;
+        p.OverrideMusicState = DungeonFloorMusicController.DungeonMusicState.CALM;
+
+
+      // Make sure it still seals when we enter and exit (entrance now handled in StartBossFight())
+        // p.roomEvents.Add(new RoomEventDefinition(RoomEventTriggerCondition.ON_ENTER_WITH_ENEMIES, RoomEventTriggerAction.SEAL_ROOM));
         p.roomEvents.Add(new RoomEventDefinition(RoomEventTriggerCondition.ON_ENEMIES_CLEARED, RoomEventTriggerAction.UNSEAL_ROOM));
-      // TODO: figure out how to create the smaller secondary boss door
+
       // TODO: add custom music
         // p.UseCustomMusic = true;
         // p.CustomMusicEvent = "";
