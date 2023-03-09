@@ -84,7 +84,7 @@ namespace CwaffingTheGungy
       this.loopRewind = rewindAmount;
     }
 
-    public void RegisterAnyInteractables(AIActor enemy)
+    private void RegisterAnyInteractables(AIActor enemy)
     {
       UnityEngine.Component[] componentsInChildren = enemy.GetComponentsInChildren(typeof(IPlayerInteractable));
       for (int i = 0; i < componentsInChildren.Length; i++)
@@ -107,12 +107,6 @@ namespace CwaffingTheGungy
     private void SetUpBossFight(AIActor enemy)
     {
       ETGModConsole.Log($"Setting up Boss Fight");
-      if (enemy.GetComponent<GenericIntroDoer>().triggerType == GenericIntroDoer.TriggerType.PlayerEnteredRoom)
-      {
-        StartBossFight(enemy);
-        return;
-      }
-      // if we make it here, we have a custom trigger
       BossNPC npc = enemy.GetComponent<BossNPC>();
       if (npc != null)
       {
@@ -120,9 +114,9 @@ namespace CwaffingTheGungy
         enemy.healthHaver.OnPreDeath += (_) => {
           npc.FinishBossFight();
         };
-        return;
       }
-      ETGModConsole.Log($"something went horribly wrong, boss should have an npc! o.o");
+      if (enemy.GetComponent<GenericIntroDoer>().triggerType == GenericIntroDoer.TriggerType.PlayerEnteredRoom)
+        StartBossFight(enemy);
     }
 
     public void StartBossFight(AIActor enemy)
@@ -131,12 +125,23 @@ namespace CwaffingTheGungy
         return;
       bossFightStarted = true;
       ETGModConsole.Log($"Starting Boss Fight");
+      enemy.aiAnimator.EndAnimation();  // make sure our base idle animation plays after our preIntro animation finishes
       BossNPC npc = enemy.GetComponent<BossNPC>();
       if (npc != null)
+      {
+        enemy.aiAnimator.StartCoroutine(RemoveOutlines(enemy)); // hack because trying to remove outlines instantaneously doesn't work for some reason
+        npc.startedFight = true;
         enemy.gameObject.transform.position.GetAbsoluteRoom().DeregisterInteractable(npc);
+      }
       if (this.musicId != null)
         enemy.PlayBossMusic(this.musicId, this.loopPoint, this.loopRewind);
       enemy.transform.position.GetAbsoluteRoom().SealRoom();
+    }
+
+    private IEnumerator RemoveOutlines(AIActor enemy)
+    {
+      yield return new WaitForSecondsRealtime(1.0f/60.0f);
+      SpriteOutlineManager.RemoveOutlineFromSprite(enemy.sprite);
     }
 
   }

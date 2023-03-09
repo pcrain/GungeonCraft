@@ -12,30 +12,22 @@ namespace CwaffingTheGungy
   {
     public bool hasPreFightDialogue = false;
     public bool hasPostFightDialogue = false;
+    public bool startedFight = false;
+    public bool finishedFight = false;
 
     private BossController bossController = null;
-    private bool startedFight = false;
-    private bool finishedFight = false;
 
     protected void StartBossFight()
     {
       AIActor enemy = this.gameObject.GetComponent<AIActor>();
 
-      enemy.aiAnimator.EndAnimation();  // make sure our base idle animation plays after our preIntro animation finishes
-      this.gameObject.GetComponent<GenericIntroDoer>().TriggerSequence(GameManager.Instance.BestActivePlayer);
       if (this.bossController != null)
         this.bossController.StartBossFight(enemy);
       else
         ETGModConsole.Log($"BOSS CONTROLLER SHOULD NEVER BE NULL");
-      enemy.aiAnimator.StartCoroutine(RemoveOutlines(enemy)); // hack because trying to remove outlines instantaneously doesn't work for some reason
+      this.gameObject.GetComponent<GenericIntroDoer>().TriggerSequence(GameManager.Instance.BestActivePlayer);
 
       this.startedFight = true;
-    }
-
-    private IEnumerator RemoveOutlines(AIActor enemy)
-    {
-      yield return new WaitForSecondsRealtime(1.0f/60.0f);
-      SpriteOutlineManager.RemoveOutlineFromSprite(enemy.sprite);
     }
 
     public void SetBossController(BossController bc)
@@ -50,12 +42,13 @@ namespace CwaffingTheGungy
 
     private IEnumerator Defeat_CR()
     {
+      AIActor enemy = this.gameObject.GetComponent<AIActor>();
+      enemy.transform.position.GetAbsoluteRoom().RegisterInteractable(this);
+
       IEnumerator script = DefeatedScript();
       while(script.MoveNext())
         yield return script.Current;
 
-      AIActor enemy = this.gameObject.GetComponent<AIActor>();
-      bossController.RegisterAnyInteractables(enemy);
       if (hasPreFightDialogue)
         enemy.transform.position.GetAbsoluteRoom().UnsealRoom();
       if (!hasPostFightDialogue)
