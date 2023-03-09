@@ -84,7 +84,7 @@ namespace CwaffingTheGungy
       this.loopRewind = rewindAmount;
     }
 
-    private void RegisterAnyInteractables(AIActor enemy)
+    public void RegisterAnyInteractables(AIActor enemy)
     {
       UnityEngine.Component[] componentsInChildren = enemy.GetComponentsInChildren(typeof(IPlayerInteractable));
       for (int i = 0; i < componentsInChildren.Length; i++)
@@ -118,8 +118,7 @@ namespace CwaffingTheGungy
       {
         npc.SetBossController(this);
         enemy.healthHaver.OnPreDeath += (_) => {
-          enemy.StartCoroutine(npc.DefeatedScript());
-          RegisterAnyInteractables(enemy);
+          npc.FinishBossFight();
         };
         return;
       }
@@ -132,6 +131,9 @@ namespace CwaffingTheGungy
         return;
       bossFightStarted = true;
       ETGModConsole.Log($"Starting Boss Fight");
+      BossNPC npc = enemy.GetComponent<BossNPC>();
+      if (npc != null)
+        enemy.gameObject.transform.position.GetAbsoluteRoom().DeregisterInteractable(npc);
       if (this.musicId != null)
         enemy.PlayBossMusic(this.musicId, this.loopPoint, this.loopRewind);
       enemy.transform.position.GetAbsoluteRoom().SealRoom();
@@ -549,11 +551,14 @@ namespace CwaffingTheGungy
       return t;
     }
 
-    public void AddPreFightInteractible<T>() where T : BossNPC
+    public void MakeInteractible<T>(bool preFight = true, bool postFight = false) where T : BossNPC
     {
-      this.prefab.GetComponent<GenericIntroDoer>().triggerType = GenericIntroDoer.TriggerType.BossTriggerZone;
-      T npc = this.prefab.AddComponent<T>();
-        npc.autoFlipSprite = false;
+      if (preFight)
+        this.prefab.GetComponent<GenericIntroDoer>().triggerType = GenericIntroDoer.TriggerType.BossTriggerZone;
+      T npc = this.prefab.GetOrAddComponent<T>();
+        npc.hasPreFightDialogue  = preFight;
+        npc.hasPostFightDialogue = postFight;
+        npc.autoFlipSprite       = false;
     }
 
     public void AddNamedVFX(VFXObject vfxobj, string name, Transform transformAnchor = null)

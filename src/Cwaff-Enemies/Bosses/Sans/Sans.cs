@@ -30,7 +30,7 @@ public partial class SansBoss : AIActor
       bb.SetIntroAnimations(introAnim: "decloak", preIntroAnim: "idle_cloak"); // Set up our intro animations (TODO: pre-intro not working???)
     bb.SetDefaultColliders(width: 15, height: 30, xoff: 24, yoff: 2);          // Set our default pixel colliders
     bb.AddCustomIntro<BossIntro>();                                            // Add custom animation to the generic intro doer
-    bb.AddPreFightInteractible<SansNPC>();
+    bb.MakeInteractible<SansNPC>(preFight: false, postFight: true);             // Add some pre-fight and post-fight dialogue
     bb.TargetPlayer();                                                         // Set up the boss's targeting scripts
     bb.AddCustomMusic(name: "electromegalo", loopAt: 152512, rewind: 137141);  // Add custom music for our boss
     bb.AddNamedVFX(pool: VFX.vfxpool["Tornado"], name: "mytornado");           // Add some named vfx pools to our bank of VFX
@@ -106,14 +106,14 @@ public partial class SansBoss : AIActor
       base.aiActor.healthHaver.OnPreDeath += (_) => {
         FlipSpriteIfNecessary(overrideFlip: false);
         AkSoundEngine.PostEvent("Play_ENM_beholster_death_01", base.aiActor.gameObject);
-        UnityEngine.Object.Destroy(aura);
+        UnityEngine.Object.Destroy(aura.gameObject);
         aura = null;
-        ETGModConsole.Log($"deregistered aura");
-      };
-      base.healthHaver.healthHaver.OnDeath += (_) => {
-        FlipSpriteIfNecessary(overrideFlip: false);
         GameManager.Instance.RewardManager.SpawnTotallyRandomChest(GameManager.Instance.PrimaryPlayer.CurrentRoom.GetRandomVisibleClearSpot(1, 1)).IsLocked = false;
       };
+      // base.healthHaver.healthHaver.OnDeath += (_) => { // doesn't work properly with interactible component if you keep it around
+      //   FlipSpriteIfNecessary(overrideFlip: false);
+      //   GameManager.Instance.RewardManager.SpawnTotallyRandomChest(GameManager.Instance.PrimaryPlayer.CurrentRoom.GetRandomVisibleClearSpot(1, 1)).IsLocked = false;
+      // };
       this.aiActor.bulletBank.Bullets.Add(boneBullet);
     }
 
