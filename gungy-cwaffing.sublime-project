@@ -1,7 +1,7 @@
 {
-	"folders":
-	[
-		{
+  "folders":
+  [
+    {
       "file_exclude_patterns":
       [
         "*.sublime-project",
@@ -15,8 +15,8 @@
           "obj/",
           "packages/",
       ],
-			"path": ".",
-		}
+      "path": ".",
+    }
   ],
   "build_systems":
   [
@@ -29,10 +29,28 @@
         "syntax": "Packages/ANSIescape/ANSI.sublime-syntax",
     },
     {
-			"file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
-			"name": "Anaconda Python Builder",
-			"selector": "source.python",
-			"shell_cmd": "\"/usr/bin/python\" -u \"$file\""
-		},
+        "name": "Regenerate Project Files and Run",
+        "shell_cmd": "$project_path/genproject -g",
+        "working_dir": "${project_path}",
+        "env": {"CLICOLOR_FORCE": "1",},
+        "target": "ansi_color_build",
+        "syntax": "Packages/ANSIescape/ANSI.sublime-syntax",
+    },
+    {
+      "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
+      "name": "Anaconda Python Builder",
+      "selector": "source.python",
+      "shell_cmd": "\"/usr/bin/python\" -u \"$file\""
+    },
   ],
+  "settings":
+  {
+    "LSP":
+    {
+      "OmniSharp":
+      {
+        "enabled": true
+      }
+    }
+  },
 }
