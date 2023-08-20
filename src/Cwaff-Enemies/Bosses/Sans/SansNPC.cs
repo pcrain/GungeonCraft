@@ -20,10 +20,10 @@ namespace CwaffingTheGungy
     }
     protected override IEnumerator DefeatedScript()
     {
-      this.ShowText("good stuff kid");
+      this.ShowText("good stuff kid", 1f);
       yield return new WaitForSeconds(1f);
-      this.ShowText("take this treasure chest", 1f);
-      yield return new WaitForSeconds(1f);
+      // this.ShowText("take this treasure chest", 1f);
+      // yield return new WaitForSeconds(1f);
       yield break;
     }
     protected override IEnumerator PostFightScript()

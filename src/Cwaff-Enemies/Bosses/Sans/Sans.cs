@@ -46,7 +46,8 @@ public partial class SansBoss : AIActor
     bb.CreateBulletAttack<OrangeAndBlueScript>     (fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
     bb.CreateBulletAttack<WiggleWaveScript>        (fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
     bb.AddBossToGameEnemies(name: "cg:sansboss");                              // Add our boss to the enemy database
-    bb.AddBossToFloorPool(floors: Floors.CASTLEGEON, weight: 9999f);           // Add our boss to the first floor's boss pool
+    // bb.AddBossToFloorPool(floors: Floors.CASTLEGEON, weight: 9999f);           // Add our boss to the first floor's boss pool
+    bb.AddBossToFloorPool(floors: Floors.MINEGEON, weight: 1f);                // Add our boss to the first floor's boss pool
     InitPrefabs();                                                             // Do miscellaneous prefab loading
   }
 
