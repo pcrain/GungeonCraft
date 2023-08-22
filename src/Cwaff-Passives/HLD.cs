@@ -29,7 +29,7 @@ namespace CwaffingTheGungy
 
         public static void Init()
         {
-            PickupObject item = Lazy.SetupPassive<HLD>(PassiveName, SpritePath, ShortDescription, LongDescription, C.MOD_PREFIX);
+            PickupObject item = Lazy.SetupPassive<HLD>(PassiveName, SpritePath, ShortDescription, LongDescription);
             item.quality      = PickupObject.ItemQuality.A;
 
             LinkVFXPrefab = FakePrefab.Clone(Game.Items["shock_rounds"].GetComponent<ComplexProjectileModifier>().ChainLightningVFX);

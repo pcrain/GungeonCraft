@@ -27,7 +27,7 @@ namespace CwaffingTheGungy
 
         public static void Init()
         {
-            PickupObject item  = Lazy.SetupPassive<RatPoison>(PassiveName, SpritePath, ShortDescription, LongDescription, C.MOD_PREFIX);
+            PickupObject item  = Lazy.SetupPassive<RatPoison>(PassiveName, SpritePath, ShortDescription, LongDescription);
             item.quality       = PickupObject.ItemQuality.C;
 
             ratPoisonId        = IDs.Passives["rat_poison"];

@@ -112,7 +112,7 @@ namespace CwaffingTheGungy
         /// <summary>
         /// Perform basic initialization for a new passive item definition. Stolen and modified from Noonum.
         /// </summary>
-        public static PickupObject SetupPassive<T>(string itemName, string spritePath, string shortDescription, string longDescription, string idPool = "ItemAPI")
+        public static PickupObject SetupPassive<T>(string itemName, string spritePath, string shortDescription, string longDescription)
             where T : PickupObject
         {
             GameObject obj = new GameObject(itemName);
@@ -134,7 +134,7 @@ namespace CwaffingTheGungy
 
             string newItemName  = itemName.Replace("'", "").Replace("-", "");  //get sane item for item rename
             string baseItemName = newItemName.Replace(" ", "_").ToLower();  //get saner item name for commands
-            Gungeon.Game.Items.Add(idPool + ":" + baseItemName, item);
+            Gungeon.Game.Items.Add(C.MOD_PREFIX + ":" + baseItemName, item);
             ETGMod.Databases.Items.Add(item);
             IDs.Passives[baseItemName] = item.PickupObjectId; //register item in passive ID database
             IDs.Pickups[baseItemName] = item.PickupObjectId; //register item in pickup ID database
@@ -146,7 +146,7 @@ namespace CwaffingTheGungy
         /// <summary>
         /// Perform basic initialization for a new active item definition.
         /// </summary>
-        public static PlayerItem SetupActive<T>(string itemName, string spritePath, string shortDescription, string longDescription, string idPool = "ItemAPI")
+        public static PlayerItem SetupActive<T>(string itemName, string spritePath, string shortDescription, string longDescription)
             where T : PlayerItem
         {
             GameObject obj = new GameObject(itemName);
@@ -168,7 +168,7 @@ namespace CwaffingTheGungy
 
             string newItemName  = itemName.Replace("'", "").Replace("-", "");  //get sane item for item rename
             string baseItemName = newItemName.Replace(" ", "_").ToLower();  //get saner item name for commands
-            Gungeon.Game.Items.Add(idPool + ":" + baseItemName, item);
+            Gungeon.Game.Items.Add(C.MOD_PREFIX + ":" + baseItemName, item);
             ETGMod.Databases.Items.Add(item);
             IDs.Actives[baseItemName] = item.PickupObjectId; //register item in active ID database
             IDs.Pickups[baseItemName] = item.PickupObjectId; //register item in pickup ID database

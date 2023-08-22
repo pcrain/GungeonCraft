@@ -30,7 +30,7 @@ namespace CwaffingTheGungy
 
         public static void Init()
         {
-            PlayerItem item = Lazy.SetupActive<BulletThatCanKillTheFuture>(ActiveName, SpritePath, ShortDescription, LongDescription, C.MOD_PREFIX);
+            PlayerItem item = Lazy.SetupActive<BulletThatCanKillTheFuture>(ActiveName, SpritePath, ShortDescription, LongDescription);
             item.quality    = PickupObject.ItemQuality.C;
 
             //Set the cooldown type and duration of the cooldown
