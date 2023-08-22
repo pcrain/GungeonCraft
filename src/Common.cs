@@ -19,9 +19,10 @@ namespace CwaffingTheGungy
 {
     public class C // constants
     {
-        public const float PIXELS_PER_TILE = 16f;
-        public const float PIXELS_PER_CELL = 64f;
-        public const float FPS = 60f;
+        public const string MOD_PREFIX      = "cg";
+        public const float  PIXELS_PER_TILE = 16f;
+        public const float  PIXELS_PER_CELL = 64f;
+        public const float  FPS             = 60f;
     }
 
     public class IDs // global IDs for this mod's guns and items
@@ -44,7 +45,7 @@ namespace CwaffingTheGungy
             string baseGunName = newGunName.Replace(" ", "_").ToLower();  //get saner gun name for commands
 
             Gun gun = ETGMod.Databases.Items.NewGun(newGunName, spriteName);  //create a new gun using specified sprite name
-            Game.Items.Rename("outdated_gun_mods:"+baseGunName, "cg:"+baseGunName);  //rename the gun for commands
+            Game.Items.Rename("outdated_gun_mods:"+baseGunName, C.MOD_PREFIX+":"+baseGunName);  //rename the gun for commands
             gun.encounterTrackable.EncounterGuid = baseGunName+"-"+spriteName; //create a unique guid for the gun
             gun.SetShortDescription(shortDescription); //set the gun's short description
             gun.SetLongDescription(longDescription); //set the gun's long description

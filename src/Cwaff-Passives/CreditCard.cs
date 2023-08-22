@@ -31,7 +31,7 @@ namespace CwaffingTheGungy
 
         public static void Init()
         {
-            PickupObject item  = Lazy.SetupItem<CreditCard>(PassiveName, SpritePath, ShortDescription, LongDescription, "cg");
+            PickupObject item  = Lazy.SetupItem<CreditCard>(PassiveName, SpritePath, ShortDescription, LongDescription, C.MOD_PREFIX);
             item.quality       = PickupObject.ItemQuality.A;
         }
 

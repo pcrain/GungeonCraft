@@ -27,7 +27,7 @@ namespace CwaffingTheGungy
 
         public static void Init()
         {
-            PlayerItem item = Lazy.SetupActive<BorrowedTime>(ActiveName, SpritePath, ShortDescription, LongDescription, "cg");
+            PlayerItem item = Lazy.SetupActive<BorrowedTime>(ActiveName, SpritePath, ShortDescription, LongDescription, C.MOD_PREFIX);
             item.quality      = PickupObject.ItemQuality.C;
 
             //Set the cooldown type and duration of the cooldown

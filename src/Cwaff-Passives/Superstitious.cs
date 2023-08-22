@@ -29,7 +29,7 @@ namespace CwaffingTheGungy
 
         public static void Init()
         {
-            PickupObject item = Lazy.SetupItem<Superstitious>(PassiveName, SpritePath, ShortDescription, LongDescription, "cg");
+            PickupObject item = Lazy.SetupItem<Superstitious>(PassiveName, SpritePath, ShortDescription, LongDescription, C.MOD_PREFIX);
             item.quality      = PickupObject.ItemQuality.C;
 
             els.Add(new HUDElement("Coolness","","CwaffingTheGungy/Resources/HUD/Coolness.png"));
