@@ -21,17 +21,17 @@ namespace CwaffingTheGungy
 {
     public class Commitment : AdvancedGunBehavior
     {
-        public static string gunName          = "Commitment";
-        public static string spriteName       = "g20";
-        public static string projectileName   = "86"; //marine sidearm
-        public static string shortDescription = "Going Until It's Gone";
-        public static string longDescription  = "(cannot switch weapons or stop firing until out of ammo)";
+        public static string GunName          = "Commitment";
+        public static string SpriteName       = "g20";
+        public static string ProjectileName   = "86"; //marine sidearm
+        public static string ShortDescription = "Going Until It's Gone";
+        public static string LongDescription  = "(cannot switch weapons or stop firing until out of ammo)";
 
         private bool committed = false;
 
         public static void Add()
         {
-            Gun gun = Lazy.InitGunFromStrings(gunName, spriteName, projectileName, shortDescription, longDescription);
+            Gun gun = Lazy.InitGunFromStrings(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             var comp = gun.gameObject.AddComponent<Commitment>();
             // comp.preventNormalFireAudio = true;
 

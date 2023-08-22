@@ -11,15 +11,15 @@ namespace CwaffingTheGungy
 {
     public class SoulKaliber : AdvancedGunBehavior
     {
-        public static string gunName          = "Soul Kaliber";
-        public static string spriteName       = "ringer";
-        public static string projectileName   = "ak-47";
-        public static string shortDescription = "Gundead or Alive";
-        public static string longDescription  = "(hitting an enemy gives them the soul link status effect, making all soul linked enemies take damage when any enemy is hit)";
+        public static string GunName          = "Soul Kaliber";
+        public static string SpriteName       = "ringer";
+        public static string ProjectileName   = "ak-47";
+        public static string ShortDescription = "Gundead or Alive";
+        public static string LongDescription  = "(hitting an enemy gives them the soul link status effect, making all soul linked enemies take damage when any enemy is hit)";
 
         public static void Add()
         {
-            Gun gun = Lazy.InitGunFromStrings(gunName, spriteName, projectileName, shortDescription, longDescription);
+            Gun gun = Lazy.InitGunFromStrings(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
 
             var comp = gun.gameObject.AddComponent<SoulKaliber>();
             comp.preventNormalFireAudio = true;

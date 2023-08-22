@@ -14,15 +14,15 @@ namespace CwaffingTheGungy
 {
     public class MasterSword : AdvancedGunBehavior
     {
-        public static string gunName          = "Master Sword";
-        public static string spriteName       = "carnwennan";
-        public static string projectileName   = "86"; //marine sidearm
-        public static string shortDescription = "Dangerous Alone";
-        public static string longDescription  = "(shoots beams until you get hit, stylish hat)";
+        public static string GunName          = "Master Sword";
+        public static string SpriteName       = "carnwennan";
+        public static string ProjectileName   = "86"; //marine sidearm
+        public static string ShortDescription = "Dangerous Alone";
+        public static string LongDescription  = "(shoots beams until you get hit, stylish hat)";
 
         public static void Add()
         {
-            Gun gun = Lazy.InitGunFromStrings(gunName, spriteName, projectileName, shortDescription, longDescription);
+            Gun gun = Lazy.InitGunFromStrings(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             var comp = gun.gameObject.AddComponent<MasterSword>();
 
             gun.DefaultModule.ammoCost               = 1;

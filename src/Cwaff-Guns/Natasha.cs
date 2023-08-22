@@ -14,18 +14,18 @@ namespace CwaffingTheGungy
 {
     public class Natasha : AdvancedGunBehavior
     {
-        public static string gunName          = "Natasha";
-        public static string spriteName       = "accelerator";
-        public static string projectileName   = "ak-47";
-        public static string shortDescription = "Fear no Man";
-        public static string longDescription  = "(Gets more powerful the longer you fire, but you slow down as well.)";
+        public static string GunName          = "Natasha";
+        public static string SpriteName       = "accelerator";
+        public static string ProjectileName   = "ak-47";
+        public static string ShortDescription = "Fear no Man";
+        public static string LongDescription  = "(Gets more powerful the longer you fire, but you slow down as well.)";
 
         private static float baseCooldownTime = 0.4f;
         private float speedmult               = 1.0f;
 
         public static void Add()
         {
-            Gun gun = Lazy.InitGunFromStrings(gunName, spriteName, projectileName, shortDescription, longDescription);
+            Gun gun = Lazy.InitGunFromStrings(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             var comp = gun.gameObject.AddComponent<Natasha>();
 
             gun.gunSwitchGroup                    = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup;

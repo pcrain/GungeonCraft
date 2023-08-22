@@ -14,17 +14,17 @@ namespace CwaffingTheGungy
 {
     public class PopcornGun : AdvancedGunBehavior
     {
-        public static string gunName          = "Popcorn Gun";
-        public static string spriteName       = "arcpistol";
-        public static string projectileName   = "ak-47";
-        public static string shortDescription = "The Weasel";
-        public static string longDescription  = "(split split split again)";
+        public static string GunName          = "Popcorn Gun";
+        public static string SpriteName       = "arcpistol";
+        public static string ProjectileName   = "ak-47";
+        public static string ShortDescription = "The Weasel";
+        public static string LongDescription  = "(split split split again)";
 
         public static Projectile gunprojectile;
 
         public static void Add()
         {
-            Gun gun = Lazy.InitGunFromStrings(gunName, spriteName, projectileName, shortDescription, longDescription);
+            Gun gun = Lazy.InitGunFromStrings(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             var comp = gun.gameObject.AddComponent<PopcornGun>();
 
             gun.gunSwitchGroup                    = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup;

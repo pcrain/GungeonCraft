@@ -14,15 +14,15 @@ namespace CwaffingTheGungy
 {
     public class PaintballGun : GunBehaviour
     {
-        public static string gunName          = "Paintball Gun";
-        public static string spriteName       = "paintballgun";
-        public static string projectileName   = "86"; //marine sidearm
-        public static string shortDescription = "Taste the Rainbow";
-        public static string longDescription  = "(shoots colored projectiles with colored goop that colors enemies...colors)";
+        public static string GunName          = "Paintball Gun";
+        public static string SpriteName       = "paintballgun";
+        public static string ProjectileName   = "86"; //marine sidearm
+        public static string ShortDescription = "Taste the Rainbow";
+        public static string LongDescription  = "(shoots colored projectiles with colored goop that colors enemies...colors)";
 
         public static void Add()
         {
-            Gun gun = Lazy.InitGunFromStrings(gunName, spriteName, projectileName, shortDescription, longDescription);
+            Gun gun = Lazy.InitGunFromStrings(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             var comp = gun.gameObject.AddComponent<PaintballGun>();
 
             gun.DefaultModule.ammoCost                  = 1;

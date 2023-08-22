@@ -14,15 +14,15 @@ namespace CwaffingTheGungy
 {
     public class Kinsurrection : AdvancedGunBehavior
     {
-        public static string gunName          = "Kinsurrection";
-        public static string spriteName       = "redblaster";
-        public static string projectileName   = "ak-47";
-        public static string shortDescription = "Friendliest Fire";
-        public static string longDescription  = "(shoots bullet kin as projectiles, surviving with 1hp)";
+        public static string GunName          = "Kinsurrection";
+        public static string SpriteName       = "redblaster";
+        public static string ProjectileName   = "ak-47";
+        public static string ShortDescription = "Friendliest Fire";
+        public static string LongDescription  = "(shoots bullet kin as projectiles, surviving with 1hp)";
 
         public static void Add()
         {
-            Gun gun = Lazy.InitGunFromStrings(gunName, spriteName, projectileName, shortDescription, longDescription);
+            Gun gun = Lazy.InitGunFromStrings(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             var comp = gun.gameObject.AddComponent<Kinsurrection>();
 
             gun.gunSwitchGroup                    = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup;

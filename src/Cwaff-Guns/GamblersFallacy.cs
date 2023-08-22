@@ -14,17 +14,17 @@ namespace CwaffingTheGungy
 {
     public class GamblersFallacy : AdvancedGunBehavior
     {
-        public static string gunName          = "Gambler's Fallacy";
-        public static string spriteName       = "grandfatherglock";
-        public static string projectileName   = "ak-47";
-        public static string shortDescription = "This Time for Sure!";
-        public static string longDescription  = "(1/30 chance of exploding and self-destructing, taking health in the process)";
+        public static string GunName          = "Gambler's Fallacy";
+        public static string SpriteName       = "grandfatherglock";
+        public static string ProjectileName   = "ak-47";
+        public static string ShortDescription = "This Time for Sure!";
+        public static string LongDescription  = "(1/30 chance of exploding and self-destructing, taking health in the process)";
 
         private static VFXPool vfx = null;
 
         public static void Add()
         {
-            Gun gun = Lazy.InitGunFromStrings(gunName, spriteName, projectileName, shortDescription, longDescription);
+            Gun gun = Lazy.InitGunFromStrings(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             var comp = gun.gameObject.AddComponent<GamblersFallacy>();
 
             gun.gunSwitchGroup                    = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup;

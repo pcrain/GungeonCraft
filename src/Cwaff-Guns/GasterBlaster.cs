@@ -13,11 +13,11 @@ namespace CwaffingTheGungy
 {
     public class GasterBlaster : AdvancedGunBehavior
     {
-        public static string gunName          = "Gaster Blaster";
-        public static string spriteName       = "converter";
-        public static string projectileName   = "86"; //marine sidearm
-        public static string shortDescription = "Not a Bad Time";
-        public static string longDescription  = "(O_O)";
+        public static string GunName          = "Gaster Blaster";
+        public static string SpriteName       = "converter";
+        public static string ProjectileName   = "86"; //marine sidearm
+        public static string ShortDescription = "Not a Bad Time";
+        public static string LongDescription  = "(O_O)";
 
         public static Projectile gasterBlast;
         public static Projectile gasterBlastLauncher;
@@ -26,7 +26,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.InitGunFromStrings(gunName, spriteName, projectileName, shortDescription, longDescription);
+            Gun gun = Lazy.InitGunFromStrings(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             var comp = gun.gameObject.AddComponent<DerailGun>();
             // comp.preventNormalFireAudio = true;
 

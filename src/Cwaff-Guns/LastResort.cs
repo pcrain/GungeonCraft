@@ -15,11 +15,11 @@ namespace CwaffingTheGungy
 {
     public class LastResort : AdvancedGunBehavior
     {
-        public static string gunName          = "Last Resort";
-        public static string spriteName       = "converter";
-        public static string projectileName   = "ak-47";
-        public static string shortDescription = "Way Past Plan B";
-        public static string longDescription  = "(Gains stats for every ammo-less gun you have in your inventory.)";
+        public static string GunName          = "Last Resort";
+        public static string SpriteName       = "converter";
+        public static string ProjectileName   = "ak-47";
+        public static string ShortDescription = "Way Past Plan B";
+        public static string LongDescription  = "(Gains stats for every ammo-less gun you have in your inventory.)";
 
         public static List<string> lastResortLevelSprites;
         public static List<Projectile> lastResortProjectiles;
@@ -27,7 +27,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.InitGunFromStrings(gunName, spriteName, projectileName, shortDescription, longDescription);
+            Gun gun = Lazy.InitGunFromStrings(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             var comp = gun.gameObject.AddComponent<LastResort>();
             comp.preventNormalFireAudio = true;
             comp.preventNormalReloadAudio = true;

@@ -14,15 +14,15 @@ namespace CwaffingTheGungy
 {
     public class RainCheck : AdvancedGunBehavior
     {
-        public static string gunName          = "Rain Check";
-        public static string spriteName       = "eldermagnum2";
-        public static string projectileName   = "ak-47";
-        public static string shortDescription = "For a Rainy Day";
-        public static string longDescription  = "(Upon firing, bullets are delayed from moving until reloading, then move towards player. Switching away from this gun keeps bullets in stasis until switching back to this gun.)";
+        public static string GunName          = "Rain Check";
+        public static string SpriteName       = "eldermagnum2";
+        public static string ProjectileName   = "ak-47";
+        public static string ShortDescription = "For a Rainy Day";
+        public static string LongDescription  = "(Upon firing, bullets are delayed from moving until reloading, then move towards player. Switching away from this gun keeps bullets in stasis until switching back to this gun.)";
 
         public static void Add()
         {
-            Gun gun = Lazy.InitGunFromStrings(gunName, spriteName, projectileName, shortDescription, longDescription);
+            Gun gun = Lazy.InitGunFromStrings(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             var comp = gun.gameObject.AddComponent<RainCheck>();
 
             gun.gunSwitchGroup                    = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup;

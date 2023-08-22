@@ -14,15 +14,15 @@ namespace CwaffingTheGungy
 {
     public class Tranquilizer : AdvancedGunBehavior
     {
-        public static string gunName          = "Tranquilizer";
-        public static string spriteName       = "biotranstater2100";
-        public static string projectileName   = "ak-47";
-        public static string shortDescription = "Zzzzzz";
-        public static string longDescription  = "(10 seconds after being hit, enemy is permastunned)";
+        public static string GunName          = "Tranquilizer";
+        public static string SpriteName       = "biotranstater2100";
+        public static string ProjectileName   = "ak-47";
+        public static string ShortDescription = "Zzzzzz";
+        public static string LongDescription  = "(10 seconds after being hit, enemy is permastunned)";
 
         public static void Add()
         {
-            Gun gun = Lazy.InitGunFromStrings(gunName, spriteName, projectileName, shortDescription, longDescription);
+            Gun gun = Lazy.InitGunFromStrings(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             var comp = gun.gameObject.AddComponent<Tranquilizer>();
 
             gun.gunSwitchGroup                    = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup;

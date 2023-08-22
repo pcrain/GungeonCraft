@@ -14,11 +14,11 @@ namespace CwaffingTheGungy
 {
     public class KiBlast : AdvancedGunBehavior
     {
-        public static string gunName          = "Ki Blast";
-        public static string spriteName       = "fingerguns";
-        public static string projectileName   = "38_special";
-        public static string shortDescription = "Dragunball Z";
-        public static string longDescription  = "(dakka)";
+        public static string GunName          = "Ki Blast";
+        public static string SpriteName       = "fingerguns";
+        public static string ProjectileName   = "38_special";
+        public static string ShortDescription = "Dragunball Z";
+        public static string LongDescription  = "(dakka)";
 
         public static tk2dSpriteAnimationClip kisprite;
         public static tk2dSpriteAnimationClip kispritered;
@@ -32,7 +32,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.InitGunFromStrings(gunName, spriteName, projectileName, shortDescription, longDescription);
+            Gun gun = Lazy.InitGunFromStrings(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             var comp = gun.gameObject.AddComponent<KiBlast>();
             comp.preventNormalReloadAudio = true;
             comp.preventNormalFireAudio = true;

@@ -15,11 +15,11 @@ namespace CwaffingTheGungy
 {
     public class TimingGun : AdvancedGunBehavior
     {
-        public static string gunName          = "Timing Gun";
-        public static string spriteName       = "agargun";
-        public static string projectileName   = "ak-47";
-        public static string shortDescription = "One You Can Count On";
-        public static string longDescription  = "(charge 1-10, different effects depending on charge)";
+        public static string GunName          = "Timing Gun";
+        public static string SpriteName       = "agargun";
+        public static string ProjectileName   = "ak-47";
+        public static string ShortDescription = "One You Can Count On";
+        public static string LongDescription  = "(charge 1-10, different effects depending on charge)";
 
         public static List<string> timingLevelSprites;
         public static List<Projectile> timingProjectiles;
@@ -33,7 +33,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.InitGunFromStrings(gunName, spriteName, projectileName, shortDescription, longDescription);
+            Gun gun = Lazy.InitGunFromStrings(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             var comp = gun.gameObject.AddComponent<TimingGun>();
 
             gun.gunSwitchGroup                    = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup;

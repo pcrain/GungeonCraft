@@ -20,11 +20,11 @@ namespace CwaffingTheGungy
 
     public class Deadline : AdvancedGunBehavior
     {
-        public static string gunName          = "Deadline";
-        public static string spriteName       = "bullatterer";
-        public static string projectileName   = "38_special";
-        public static string shortDescription = "Pythagoras Would be Proud";
-        public static string longDescription  = "(intersecting lines create explosions)";
+        public static string GunName          = "Deadline";
+        public static string SpriteName       = "bullatterer";
+        public static string ProjectileName   = "38_special";
+        public static string ShortDescription = "Pythagoras Would be Proud";
+        public static string LongDescription  = "(intersecting lines create explosions)";
 
         private static ExplosionData deadlineExplosion = null;
 
@@ -36,7 +36,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.InitGunFromStrings(gunName, spriteName, projectileName, shortDescription, longDescription);
+            Gun gun = Lazy.InitGunFromStrings(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
 
             var comp = gun.gameObject.AddComponent<Deadline>();
             comp.preventNormalReloadAudio = true;

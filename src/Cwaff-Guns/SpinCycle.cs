@@ -19,11 +19,11 @@ namespace CwaffingTheGungy
 {
     public class SpinCycle : AdvancedGunBehavior
     {
-        public static string gunName          = "Spin Cycle";
-        public static string spriteName       = "ranger";
-        public static string projectileName   = "86"; //marine sidearm
-        public static string shortDescription = "Bring it Around Town";
-        public static string longDescription  = "(ball and chain)";
+        public static string GunName          = "Spin Cycle";
+        public static string SpriteName       = "ranger";
+        public static string ProjectileName   = "86"; //marine sidearm
+        public static string ShortDescription = "Bring it Around Town";
+        public static string LongDescription  = "(ball and chain)";
 
         private static VFXPool vfx  = null;
         private static VFXPool vfx2 = null;
@@ -34,7 +34,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.InitGunFromStrings(gunName, spriteName, projectileName, shortDescription, longDescription);
+            Gun gun = Lazy.InitGunFromStrings(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             var comp = gun.gameObject.AddComponent<SpinCycle>();
             comp.preventNormalFireAudio = true;
 

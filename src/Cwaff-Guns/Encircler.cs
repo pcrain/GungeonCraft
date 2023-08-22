@@ -14,15 +14,15 @@ namespace CwaffingTheGungy
 {
     public class Encircler : AdvancedGunBehavior
     {
-        public static string gunName          = "Encircler";
-        public static string spriteName       = "doublegun";
-        public static string projectileName   = "ak-47";
-        public static string shortDescription = "Sir Cumference's Own";
-        public static string longDescription  = "(circles)";
+        public static string GunName          = "Encircler";
+        public static string SpriteName       = "doublegun";
+        public static string ProjectileName   = "ak-47";
+        public static string ShortDescription = "Sir Cumference's Own";
+        public static string LongDescription  = "(circles)";
 
         public static void Add()
         {
-            Gun gun = Lazy.InitGunFromStrings(gunName, spriteName, projectileName, shortDescription, longDescription);
+            Gun gun = Lazy.InitGunFromStrings(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             var comp = gun.gameObject.AddComponent<Encircler>();
 
             gun.gunSwitchGroup                    = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup;
