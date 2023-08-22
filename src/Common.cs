@@ -38,7 +38,7 @@ namespace CwaffingTheGungy
         /// <summary>
         /// Perform basic initialization for a new gun definition.
         /// </summary>
-        public static Gun InitGunFromStrings(
+        public static Gun SetupGun(
           string gunName, string spriteName, string projectileName, string shortDescription, string longDescription)
         {
             string newGunName  = gunName.Replace("'", "").Replace("-", "").Replace(".", "");  //get sane gun for item rename
