@@ -26,7 +26,7 @@ namespace CwaffingTheGungy
 
         public static void Init()
         {
-            PickupObject item = Lazy.SetupItem<Shine>(PassiveName, SpritePath, ShortDescription, LongDescription, C.MOD_PREFIX);
+            PickupObject item = Lazy.SetupPassive<Shine>(PassiveName, SpritePath, ShortDescription, LongDescription, C.MOD_PREFIX);
             item.quality      = PickupObject.ItemQuality.C;
 
             noSpeed = new StatModifier

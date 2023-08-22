@@ -20,7 +20,7 @@ namespace CwaffingTheGungy
 
         public static void Init()
         {
-            PickupObject item = Lazy.SetupItem<ZoolandersDiary>(PassiveName, SpritePath, ShortDescription, LongDescription, C.MOD_PREFIX);
+            PickupObject item = Lazy.SetupPassive<ZoolandersDiary>(PassiveName, SpritePath, ShortDescription, LongDescription, C.MOD_PREFIX);
             item.quality      = PickupObject.ItemQuality.C;
         }
 

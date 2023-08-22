@@ -112,7 +112,7 @@ namespace CwaffingTheGungy
         /// <summary>
         /// Perform basic initialization for a new passive item definition. Stolen and modified from Noonum.
         /// </summary>
-        public static PickupObject SetupItem<T>(string itemName, string spritePath, string shortDescription, string longDescription, string idPool = "ItemAPI")
+        public static PickupObject SetupPassive<T>(string itemName, string spritePath, string shortDescription, string longDescription, string idPool = "ItemAPI")
             where T : PickupObject
         {
             GameObject obj = new GameObject(itemName);
