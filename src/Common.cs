@@ -110,13 +110,14 @@ namespace CwaffingTheGungy
         }
 
         /// <summary>
-        /// Perform basic initialization for a new passive item definition. Stolen and modified from Noonum.
+        /// Perform basic initialization for a new passive or active item definition.
         /// </summary>
-        public static PickupObject SetupPassive<T>(string itemName, string spritePath, string shortDescription, string longDescription)
-            where T : PickupObject
+        public static TItemClass SetupItem<TItemClass, TItemSpecific>(string itemName, string spritePath, string shortDescription, string longDescription)
+            where TItemClass : PickupObject   // must be PickupObject for passive items or PlayerItem for active items
+            where TItemSpecific : TItemClass  // must be a subclass of TItemClass
         {
             GameObject obj = new GameObject(itemName);
-            PickupObject item = obj.AddComponent<T>();
+            TItemClass item = obj.AddComponent<TItemSpecific>();
             ItemBuilder.AddSpriteToObject(itemName, spritePath, obj);
 
             item.encounterTrackable = null;
@@ -129,18 +130,30 @@ namespace CwaffingTheGungy
             item.SetShortDescription(shortDescription);
             item.SetLongDescription(longDescription);
 
-            if (item is PlayerItem)
-                (item as PlayerItem).consumable = false;
+            if (item is PlayerItem activeItem)
+                activeItem.consumable = false;
 
             string newItemName  = itemName.Replace("'", "").Replace("-", "");  //get sane item for item rename
             string baseItemName = newItemName.Replace(" ", "_").ToLower();  //get saner item name for commands
             Gungeon.Game.Items.Add(C.MOD_PREFIX + ":" + baseItemName, item);
             ETGMod.Databases.Items.Add(item);
-            IDs.Passives[baseItemName] = item.PickupObjectId; //register item in passive ID database
+            if (item is PlayerItem)
+                IDs.Actives[baseItemName] = item.PickupObjectId; //register item in active ID database
+            else
+                IDs.Passives[baseItemName] = item.PickupObjectId; //register item in passive ID database
             IDs.Pickups[baseItemName] = item.PickupObjectId; //register item in pickup ID database
 
             ETGModConsole.Log("Lazy Initialized Passive: "+baseItemName);
             return item;
+        }
+
+        /// <summary>
+        /// Perform basic initialization for a new passive item definition.
+        /// </summary>
+        public static PickupObject SetupPassive<T>(string itemName, string spritePath, string shortDescription, string longDescription)
+            where T : PickupObject
+        {
+            return SetupItem<PickupObject, T>(itemName, spritePath, shortDescription, longDescription);
         }
 
         /// <summary>
@@ -149,32 +162,7 @@ namespace CwaffingTheGungy
         public static PlayerItem SetupActive<T>(string itemName, string spritePath, string shortDescription, string longDescription)
             where T : PlayerItem
         {
-            GameObject obj = new GameObject(itemName);
-            PlayerItem item = obj.AddComponent<T>();
-            ItemBuilder.AddSpriteToObject(itemName, spritePath, obj);
-
-            item.encounterTrackable = null;
-
-            ETGMod.Databases.Items.SetupItem(item, item.name);
-            SpriteBuilder.AddToAmmonomicon(item.sprite.GetCurrentSpriteDef());
-            item.encounterTrackable.journalData.AmmonomiconSprite = item.sprite.GetCurrentSpriteDef().name;
-
-            item.SetName(item.name);
-            item.SetShortDescription(shortDescription);
-            item.SetLongDescription(longDescription);
-
-            if (item is PlayerItem)
-                (item as PlayerItem).consumable = false;
-
-            string newItemName  = itemName.Replace("'", "").Replace("-", "");  //get sane item for item rename
-            string baseItemName = newItemName.Replace(" ", "_").ToLower();  //get saner item name for commands
-            Gungeon.Game.Items.Add(C.MOD_PREFIX + ":" + baseItemName, item);
-            ETGMod.Databases.Items.Add(item);
-            IDs.Actives[baseItemName] = item.PickupObjectId; //register item in active ID database
-            IDs.Pickups[baseItemName] = item.PickupObjectId; //register item in pickup ID database
-
-            ETGModConsole.Log("Lazy Initialized Active: "+baseItemName);
-            return item;
+            return SetupItem<PlayerItem, T>(itemName, spritePath, shortDescription, longDescription);
         }
 
         /// <summary>
