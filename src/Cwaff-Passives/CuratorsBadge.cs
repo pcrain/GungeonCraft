@@ -22,10 +22,10 @@ namespace CwaffingTheGungy
 {
     public class CuratorsBadge : PassiveItem
     {
-        public static string passiveName      = "Curator's Badge";
-        public static string spritePath       = "CwaffingTheGungy/Resources/ItemSprites/curators_badge_icon";
-        public static string shortDescription = "Neat and Tidy";
-        public static string longDescription  = "(Get shells for leaving minor breakables unscathed)";
+        public static string PassiveName      = "Curator's Badge";
+        public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/curators_badge_icon";
+        public static string ShortDescription = "Neat and Tidy";
+        public static string LongDescription  = "(Get shells for leaving minor breakables unscathed)";
 
         private int curRoomBreakables = 0;
         private int maxRoomBreakables = 0;
@@ -33,7 +33,7 @@ namespace CwaffingTheGungy
 
         public static void Init()
         {
-            PickupObject item  = Lazy.SetupItem<CuratorsBadge>(passiveName, spritePath, shortDescription, longDescription, "cg");
+            PickupObject item  = Lazy.SetupItem<CuratorsBadge>(PassiveName, SpritePath, ShortDescription, LongDescription, "cg");
             item.quality       = PickupObject.ItemQuality.C;
         }
 

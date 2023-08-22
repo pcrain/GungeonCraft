@@ -17,10 +17,10 @@ namespace CwaffingTheGungy
 {
     public class CreditCard : PassiveItem
     {
-        public static string passiveName      = "Credit Card";
-        public static string spritePath       = "CwaffingTheGungy/Resources/ItemSprites/credit_card_icon";
-        public static string shortDescription = "Shop 'til You Drop";
-        public static string longDescription  = "(Grants 500 shells. Grants 1 curse for every 50 shells below 500. Grants 1 coolness for every 50 shells above 500.)";
+        public static string PassiveName      = "Credit Card";
+        public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/credit_card_icon";
+        public static string ShortDescription = "Shop 'til You Drop";
+        public static string LongDescription  = "(Grants 500 shells. Grants 1 curse for every 50 shells below 500. Grants 1 coolness for every 50 shells above 500.)";
 
         private const int BASE_CREDIT = 500;
         private const int CREDIT_DELTA = 50;
@@ -31,7 +31,7 @@ namespace CwaffingTheGungy
 
         public static void Init()
         {
-            PickupObject item  = Lazy.SetupItem<CreditCard>(passiveName, spritePath, shortDescription, longDescription, "cg");
+            PickupObject item  = Lazy.SetupItem<CreditCard>(PassiveName, SpritePath, ShortDescription, LongDescription, "cg");
             item.quality       = PickupObject.ItemQuality.A;
         }
 

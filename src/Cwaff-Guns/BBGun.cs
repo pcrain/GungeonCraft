@@ -16,7 +16,6 @@ namespace CwaffingTheGungy
     {
         public static string GunName          = "B. B. Gun";
         public static string SpriteName       = "embercannon";
-        // public static string projectileName   = "83";
         public static string ProjectileName   = "ak-47";
         public static string ShortDescription = "Spare No One";
         public static string LongDescription  = "(Three Strikes)";

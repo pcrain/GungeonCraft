@@ -14,17 +14,17 @@ namespace CwaffingTheGungy
 {
     public class Gyroscope : PassiveItem
     {
-        public static string passiveName      = "Gyroscope";
-        public static string spritePath       = "CwaffingTheGungy/Resources/ItemSprites/gyroscope_icon";
-        public static string shortDescription = "Spin to Win";
-        public static string longDescription  = "(spinspinspinspinspinspinspinspinspinspin)";
+        public static string PassiveName      = "Gyroscope";
+        public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/gyroscope_icon";
+        public static string ShortDescription = "Spin to Win";
+        public static string LongDescription  = "(spinspinspinspinspinspinspinspinspinspin)";
 
         private PlayerController owner = null;
         private GyroscopeRoll dodgeRoller = null;
 
         public static void Init()
         {
-            PickupObject item = Lazy.SetupItem<Gyroscope>(passiveName, spritePath, shortDescription, longDescription, "cg");
+            PickupObject item = Lazy.SetupItem<Gyroscope>(PassiveName, SpritePath, ShortDescription, LongDescription, "cg");
             item.quality      = PickupObject.ItemQuality.A;
 
             var comp = item.gameObject.AddComponent<GyroscopeRoll>();

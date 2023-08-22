@@ -13,10 +13,10 @@ namespace CwaffingTheGungy
 {
     public class Siphon : PassiveItem
     {
-        public static string passiveName      = "Siphon";
-        public static string spritePath       = "CwaffingTheGungy/Resources/ItemSprites/88888888_icon";
-        public static string shortDescription = "Super Gooper";
-        public static string longDescription  = "Immunity to all negative goops; projectiles fired while standing in goops spread during flight";
+        public static string PassiveName      = "Siphon";
+        public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/88888888_icon";
+        public static string ShortDescription = "Super Gooper";
+        public static string LongDescription  = "Immunity to all negative goops; projectiles fired while standing in goops spread during flight";
 
         // private enum GoopStatus
         // {
@@ -33,7 +33,7 @@ namespace CwaffingTheGungy
 
         public static void Init()
         {
-            PickupObject item = Lazy.SetupItem<Siphon>(passiveName, spritePath, shortDescription, longDescription, "cg");
+            PickupObject item = Lazy.SetupItem<Siphon>(PassiveName, SpritePath, ShortDescription, LongDescription, "cg");
             item.quality      = PickupObject.ItemQuality.B;
         }
 

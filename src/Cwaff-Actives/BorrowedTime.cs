@@ -13,10 +13,10 @@ namespace CwaffingTheGungy
 {
     class BorrowedTime : PlayerItem
     {
-        public static string activeName       = "Borrowed Time";
-        public static string spritePath       = "CwaffingTheGungy/Resources/ItemSprites/88888888_icon";
-        public static string shortDescription = "Clock's Ticking";
-        public static string longDescription  = "(insta clear any room, but enemies will all respawn in boss room with increased jam chance. cannot pick up bosses or jammed enemies)";
+        public static string ActiveName       = "Borrowed Time";
+        public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/88888888_icon";
+        public static string ShortDescription = "Clock's Ticking";
+        public static string LongDescription  = "(insta clear any room, but enemies will all respawn in boss room with increased jam chance. cannot pick up bosses or jammed enemies)";
 
         private static List<string> borrowedEnemies = new List<string>{};
 
@@ -27,7 +27,7 @@ namespace CwaffingTheGungy
 
         public static void Init()
         {
-            PlayerItem item = Lazy.SetupActive<BorrowedTime>(activeName, spritePath, shortDescription, longDescription, "cg");
+            PlayerItem item = Lazy.SetupActive<BorrowedTime>(ActiveName, SpritePath, ShortDescription, LongDescription, "cg");
             item.quality      = PickupObject.ItemQuality.C;
 
             //Set the cooldown type and duration of the cooldown

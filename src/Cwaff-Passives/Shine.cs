@@ -13,10 +13,10 @@ namespace CwaffingTheGungy
 {
     public class Shine : PassiveItem
     {
-        public static string passiveName      = "Shine";
-        public static string spritePath       = "CwaffingTheGungy/Resources/ItemSprites/88888888_icon";
-        public static string shortDescription = "That Ain't Falco";
-        public static string longDescription  = "(Melee)";
+        public static string PassiveName      = "Shine";
+        public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/88888888_icon";
+        public static string ShortDescription = "That Ain't Falco";
+        public static string LongDescription  = "(Melee)";
 
         private static StatModifier noSpeed;
 
@@ -26,7 +26,7 @@ namespace CwaffingTheGungy
 
         public static void Init()
         {
-            PickupObject item = Lazy.SetupItem<Shine>(passiveName, spritePath, shortDescription, longDescription, "cg");
+            PickupObject item = Lazy.SetupItem<Shine>(PassiveName, SpritePath, ShortDescription, LongDescription, "cg");
             item.quality      = PickupObject.ItemQuality.C;
 
             noSpeed = new StatModifier

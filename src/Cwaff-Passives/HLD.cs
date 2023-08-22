@@ -14,10 +14,10 @@ namespace CwaffingTheGungy
 {
     public class HLD : PassiveItem
     {
-        public static string passiveName      = "HLD";
-        public static string spritePath       = "CwaffingTheGungy/Resources/ItemSprites/yellow_bandana_icon";
-        public static string shortDescription = "Hyper Light Dasher";
-        public static string longDescription  = "(Pyoooom)";
+        public static string PassiveName      = "HLD";
+        public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/yellow_bandana_icon";
+        public static string ShortDescription = "Hyper Light Dasher";
+        public static string LongDescription  = "(Pyoooom)";
 
         private HLDRoll dodgeRoller = null;
 
@@ -26,7 +26,7 @@ namespace CwaffingTheGungy
 
         public static void Init()
         {
-            PickupObject item = Lazy.SetupItem<HLD>(passiveName, spritePath, shortDescription, longDescription, "cg");
+            PickupObject item = Lazy.SetupItem<HLD>(PassiveName, SpritePath, ShortDescription, LongDescription, "cg");
             item.quality      = PickupObject.ItemQuality.A;
 
             LinkVFXPrefab = FakePrefab.Clone(Game.Items["shock_rounds"].GetComponent<ComplexProjectileModifier>().ChainLightningVFX);

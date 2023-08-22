@@ -13,14 +13,14 @@ namespace CwaffingTheGungy
 {
     public class ZoolandersDiary : PassiveItem
     {
-        public static string passiveName      = "Zoolander's Diary";
-        public static string spritePath       = "CwaffingTheGungy/Resources/ItemSprites/zoolander_icon";
-        public static string shortDescription = "Ambiturner No More";
-        public static string longDescription  = "(3x damage when shooting right; 1/3 damage when aiming left)";
+        public static string PassiveName      = "Zoolander's Diary";
+        public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/zoolander_icon";
+        public static string ShortDescription = "Ambiturner No More";
+        public static string LongDescription  = "(3x damage when shooting right; 1/3 damage when aiming left)";
 
         public static void Init()
         {
-            PickupObject item = Lazy.SetupItem<ZoolandersDiary>(passiveName, spritePath, shortDescription, longDescription, "cg");
+            PickupObject item = Lazy.SetupItem<ZoolandersDiary>(PassiveName, SpritePath, ShortDescription, LongDescription, "cg");
             item.quality      = PickupObject.ItemQuality.C;
         }
 

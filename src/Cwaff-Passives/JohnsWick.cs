@@ -13,10 +13,10 @@ namespace CwaffingTheGungy
 {
     public class JohnsWick : PassiveItem
     {
-        public static string passiveName      = "John's Wick";
-        public static string spritePath       = "CwaffingTheGungy/Resources/ItemSprites/johns_wick_icon";
-        public static string shortDescription = "No Dogs Harmed";
-        public static string longDescription  = "(Move faster and do triple damage while on fire; take damage from fire more slowly.)";
+        public static string PassiveName      = "John's Wick";
+        public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/johns_wick_icon";
+        public static string ShortDescription = "No Dogs Harmed";
+        public static string LongDescription  = "(Move faster and do triple damage while on fire; take damage from fire more slowly.)";
 
         private float lastFireMeterValue = 0f;
         private const float MAX_FIRE_INCREASE = 0.166f; // base game increases by 0.66f
@@ -27,7 +27,7 @@ namespace CwaffingTheGungy
 
         public static void Init()
         {
-            PickupObject item  = Lazy.SetupItem<JohnsWick>(passiveName, spritePath, shortDescription, longDescription, "cg");
+            PickupObject item  = Lazy.SetupItem<JohnsWick>(PassiveName, SpritePath, ShortDescription, LongDescription, "cg");
             item.quality       = PickupObject.ItemQuality.C;
         }
 
