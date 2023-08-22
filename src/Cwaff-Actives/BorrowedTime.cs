@@ -3,11 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Reflection;
 
 using UnityEngine;
+using MonoMod.RuntimeDetour;
 
+using Gungeon;
 using Dungeonator;
-using ItemAPI;
+using Alexandria.ItemAPI;
+using Alexandria.Misc;
 
 namespace CwaffingTheGungy
 {

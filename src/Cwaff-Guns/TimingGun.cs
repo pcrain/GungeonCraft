@@ -6,10 +6,12 @@ using System.Text;
 using System.Reflection;
 
 using UnityEngine;
+using MonoMod.RuntimeDetour;
 
 using Gungeon;
-using ItemAPI;
-// using Alexandria.Misc;
+using Dungeonator;
+using Alexandria.ItemAPI;
+using Alexandria.Misc;
 
 namespace CwaffingTheGungy
 {

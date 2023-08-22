@@ -1,13 +1,17 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Collections;
 using System.Reflection;
 
 using UnityEngine;
+using MonoMod.RuntimeDetour;
 
-using ItemAPI;
+using Gungeon;
+using Dungeonator;
+using Alexandria.ItemAPI;
+using Alexandria.Misc;
 
 using ETGGUI;
 using SGUI;

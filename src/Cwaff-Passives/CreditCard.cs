@@ -10,7 +10,7 @@ using MonoMod.RuntimeDetour;
 
 using Gungeon;
 using Dungeonator;
-using ItemAPI;
+using Alexandria.ItemAPI;
 using Alexandria.Misc;
 
 namespace CwaffingTheGungy
