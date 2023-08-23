@@ -29,97 +29,93 @@ namespace CwaffingTheGungy
         public static string ShortDescription = "Bring it Around Town";
         public static string LongDescription  = "(ball and chain)";
 
-        private static VFXPool vfx  = null;
-        private static VFXPool vfx2 = null;
-        private static Projectile theProtoBall;
-        private static Projectile theProtoChain;
-        private Projectile theCurBall = null;
-        private BasicBeamController theCurChain = null;
+        private static VFXPool _Vfx  = null;
+        private static VFXPool _Vfx2 = null;
+        private static Projectile _TheProtoBall;
+        private static Projectile _TheProtoChain;
+
+        private Projectile _theCurBall = null;
+        private BasicBeamController _theCurChain = null;
 
         public static void Add()
         {
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+                gun.gunSwitchGroup                    = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup;
+                gun.DefaultModule.ammoCost            = 1;
+                gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
+                gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+                gun.reloadTime                        = 5f;
+                gun.DefaultModule.angleVariance       = 0f;
+                gun.DefaultModule.numberOfShotsInClip = 1;
+                gun.quality                           = PickupObject.ItemQuality.A;
+                gun.InfiniteAmmo                      = true;
+                gun.SetAnimationFPS(gun.shootAnimation, 0);
+
             var comp = gun.gameObject.AddComponent<SpinCycle>();
-            comp.preventNormalFireAudio = true;
-
-            gun.gunSwitchGroup                    = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup;
-            gun.DefaultModule.ammoCost            = 1;
-            gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
-            gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
-            gun.reloadTime                        = 5f;
-            gun.DefaultModule.angleVariance       = 0f;
-            gun.DefaultModule.numberOfShotsInClip = 1;
-            gun.quality                           = PickupObject.ItemQuality.A;
-            gun.InfiniteAmmo                      = true;
-            gun.SetAnimationFPS(gun.shootAnimation, 0);
-
-            Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
+                comp.preventNormalFireAudio = true;
 
             Projectile ball = Lazy.PrefabProjectileFromGun(gun,false);
-            ball.BulletScriptSettings.surviveTileCollisions      = true;
-            ball.BulletScriptSettings.surviveRigidbodyCollisions = true;
-            ball.baseData.speed          = 0.0001f;
-            ball.baseData.force          = 100f;
-            ball.baseData.damage         = 100f;
-            ball.baseData.range          = 1000000f;
-            ball.PenetratesInternalWalls = true;
-            ball.pierceMinorBreakables   = true;
+                ball.BulletScriptSettings.surviveTileCollisions      = true;
+                ball.BulletScriptSettings.surviveRigidbodyCollisions = true;
+                ball.baseData.speed          = 0.0001f;
+                ball.baseData.force          = 100f;
+                ball.baseData.damage         = 100f;
+                ball.baseData.range          = 1000000f;
+                ball.PenetratesInternalWalls = true;
+                ball.pierceMinorBreakables   = true;
+            _TheProtoBall = ball;
 
             PierceProjModifier pierce    = ball.gameObject.GetOrAddComponent<PierceProjModifier>();
-            pierce.penetration           = 100000;
-            pierce.penetratesBreakables  = true;
-
-            theProtoBall = ball;
+                pierce.penetration           = 100000;
+                pierce.penetratesBreakables  = true;
 
             Projectile chain = Lazy.PrefabProjectileFromGun(gun,false);
-            chain.baseData.force                                  = 1f;
-            chain.baseData.damage                                 = 1f;
-            chain.baseData.speed                                  = 100f;
-            chain.BulletScriptSettings.surviveTileCollisions      = true;
-            chain.BulletScriptSettings.surviveRigidbodyCollisions = true;
-            chain.PenetratesInternalWalls                         = true;
-            chain.pierceMinorBreakables                           = true;
+                chain.baseData.force                                  = 1f;
+                chain.baseData.damage                                 = 1f;
+                chain.baseData.speed                                  = 100f;
+                chain.BulletScriptSettings.surviveTileCollisions      = true;
+                chain.BulletScriptSettings.surviveRigidbodyCollisions = true;
+                chain.PenetratesInternalWalls                         = true;
+                chain.pierceMinorBreakables                           = true;
+                _TheProtoChain = chain;
 
             PierceProjModifier pierce2    = chain.gameObject.GetOrAddComponent<PierceProjModifier>();
-            pierce2.penetration           = 100000;
-            pierce2.penetratesBreakables  = true;
+                pierce2.penetration           = 100000;
+                pierce2.penetratesBreakables  = true;
 
-            List<string> BeamAnimPaths = new List<string>()
-            {
-                "CwaffingTheGungy/Resources/BeamSprites/alphabeam_mid_001",
-                "CwaffingTheGungy/Resources/BeamSprites/alphabeam_mid_002",
-                "CwaffingTheGungy/Resources/BeamSprites/alphabeam_mid_003",
-                "CwaffingTheGungy/Resources/BeamSprites/alphabeam_mid_004",
-            };
             BasicBeamController chainBeam = chain.GenerateBeamPrefab(
                 "CwaffingTheGungy/Resources/BeamSprites/alphabeam_mid_001",
                 new Vector2(15, 7),
                 new Vector2(0, 4),
-                BeamAnimPaths,
-                13,glowAmount:100,emissivecolouramt:100);
-            chainBeam.boneType                         = BasicBeamController.BeamBoneType.Projectile;
-            chainBeam.interpolateStretchedBones        = true;
-            chainBeam.ContinueBeamArtToWall            = true;
+                new() {
+                    "CwaffingTheGungy/Resources/BeamSprites/alphabeam_mid_001",
+                    "CwaffingTheGungy/Resources/BeamSprites/alphabeam_mid_002",
+                    "CwaffingTheGungy/Resources/BeamSprites/alphabeam_mid_003",
+                    "CwaffingTheGungy/Resources/BeamSprites/alphabeam_mid_004",
+                },
+                13,glowAmount:100,emissivecolouramt:100
+            );
+                chainBeam.boneType                         = BasicBeamController.BeamBoneType.Projectile;
+                chainBeam.interpolateStretchedBones        = true;
+                chainBeam.ContinueBeamArtToWall            = true;
 
-            theProtoChain = chain;
-
-            vfx = VFX.CreatePoolFromVFXGameObject((PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
-            vfx2 = (PickupObjectDatabase.GetById(33) as Gun).muzzleFlashEffects;
+            _Vfx = VFX.CreatePoolFromVFXGameObject((PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
+            _Vfx2 = (PickupObjectDatabase.GetById(33) as Gun).muzzleFlashEffects;
         }
 
         private void SetupBallAndChain(PlayerController p)
         {
-            theCurBall = SpawnManager.SpawnProjectile(
-                theProtoBall.gameObject, p.sprite.WorldCenter, Quaternion.Euler(0f, 0f, 0f), true
-                ).GetComponent<Projectile>();
-            theCurBall.Owner = p;
-            theCurBall.Shooter = p.specRigidbody;
-            theCurBall.RuntimeUpdateScale(3.0f);
+            _theCurBall = SpawnManager.SpawnProjectile(
+              _TheProtoBall.gameObject, p.sprite.WorldCenter, Quaternion.Euler(0f, 0f, 0f), true
+              ).GetComponent<Projectile>();
+                _theCurBall.Owner = p;
+                _theCurBall.Shooter = p.specRigidbody;
+                _theCurBall.RuntimeUpdateScale(3.0f);
 
             if (tieProjectilePositionToBeam)
             {
-                theCurChain = BeamAPI.FreeFireBeamFromAnywhere(
-                    theProtoChain, p, p.gameObject,
+                _theCurChain = BeamAPI.FreeFireBeamFromAnywhere(
+                    _TheProtoChain, p, p.gameObject,
                     Vector2.zero, this.forcedDirection, 1000000.0f, true, true
                     ).GetComponent<BasicBeamController>();
             }
@@ -132,19 +128,12 @@ namespace CwaffingTheGungy
 
         private void DestroyBallAndChain()
         {
-            if (this.theCurBall != null)
-            {
-                this.theCurBall.DieInAir(true,false,false,true);
-                this.theCurBall = null;
-            }
-            if (tieProjectilePositionToBeam)
-            {
-                if (this.theCurChain != null)
-                {
-                    this.theCurChain.DestroyBeam();
-                    this.theCurChain = null;
-                }
-            }
+            this._theCurBall?.DieInAir(true,false,false,true);
+            this._theCurBall = null;
+            if (!tieProjectilePositionToBeam)
+                return;
+            this._theCurChain?.DestroyBeam();
+            this._theCurChain = null;
         }
 
         public override void OnSwitchedToThisGun()
@@ -183,20 +172,20 @@ namespace CwaffingTheGungy
             base.OnSwitchedAwayFromThisGun();
         }
 
-        private static float maxMomentum         = 18f;  //3.0 rotations per second @60FPS
-        private static float ballWeight          = 75f;  //full speed in 0.5 seconds @60FPS
-        private static float minChainLengh       = 1.0f;
-        private static float maxChainLength      = 6.0f;
-        private static float airFriction         = 0.995f;
-        private static bool relativeToLastFacing = true;
-        private static float maxAccel            = maxMomentum/ballWeight;
+        private const float _MAX_MOMENTUM           = 18f;  //3.0 rotations per second @60FPS
+        private const float _BALL_WEIGHT            = 75f;  //full speed in 0.5 seconds @60FPS
+        private const float _MIN_CHAIN_LENGTH       = 1.0f;
+        private const float _MAX_CHAIN_LENGTH       = 6.0f;
+        private const float _AIR_FRICTION           = 0.995f;
+        private const bool _RELATIVE_TO_LAST_FACING = true;
+        private const float _MAX_ACCEL              = _MAX_MOMENTUM/_BALL_WEIGHT;
 
-        private static bool influencePlayerMomentum     = true;
-        private static float minPlayerMomentum          = 0.5f;
-        private static float maxPlayerMomentum          = 1.5f;
-        private static float playerMomentumDelta        = maxPlayerMomentum - minPlayerMomentum;
-        private static int maxChainSegments             = 5;
-        private static float minGapBetweenChainSegments = 1.4f;
+        private const bool _INFLUENCE_PLAYER_MOMENTUM = true;
+        private const float _MIN_PLAYER_MOMENTUM      = 0.5f;
+        private const float _MAX_PLAYER_MOMENTUM      = 1.5f;
+        private const float _PLAYER_MOMENTUM_DELTA    = _MAX_PLAYER_MOMENTUM - _MIN_PLAYER_MOMENTUM;
+        private const int _MAX_CHAIN_SEGMENTS         = 5;
+        private const float _MIN_GAP_BETWEEN_SEGMENTS = 1.4f;
 
         // Very important variable, determines behavior dramatically
         private static bool tieProjectilePositionToBeam = true;  //makes projectile hug walls since beams collide with them
@@ -220,47 +209,30 @@ namespace CwaffingTheGungy
         protected override void Update()
         {
             base.Update();
-            if (!(this.gun.CurrentOwner && this.gun.CurrentOwner is PlayerController))
+            if (this.gun.CurrentOwner is not PlayerController p)
                 return;
 
-            // get the owner of the gun
-            PlayerController p = this.gun.CurrentOwner as PlayerController;
-
-            if (theCurBall == null)
-            {
+            if (_theCurBall == null)
                 SetupBallAndChain(p);
-            }
 
             // prevent the gun from normal firing entirely
             this.gun.RuntimeModuleData[this.gun.DefaultModule].onCooldown = true;
 
             // determine the angle delta between the reticle and our current forced direction
-            float deltaToTarget =
-                p.FacingDirection - (relativeToLastFacing ? this.facingLast : this.forcedDirection);
-            if (deltaToTarget > 180)
-                deltaToTarget -= 360f;
-            else if (deltaToTarget < -180)
-                deltaToTarget += 360f;
+            float theta = (p.FacingDirection - (_RELATIVE_TO_LAST_FACING ? this.facingLast : this.forcedDirection)).Clamp180();
             this.facingLast = p.FacingDirection;
 
             // determine the actual change in momentum, then update momentum and direction accordingly
-            float accel = Mathf.Sign(deltaToTarget)*Mathf.Min(Math.Abs(deltaToTarget)/ballWeight,maxAccel);
-            this.curMomentum += accel;
-            if (Mathf.Abs(this.curMomentum) > maxMomentum)
-                this.curMomentum = Mathf.Sign(this.curMomentum)*maxMomentum;
-            this.curMomentum *= airFriction;
-            this.forcedDirection += this.curMomentum;
-            if (this.forcedDirection > 360f)
-                this.forcedDirection -= 360f;
-            else if (this.forcedDirection < 0f)
-                this.forcedDirection += 360f;
+            float accel = Mathf.Sign(theta)*Mathf.Min(Math.Abs(theta)/_BALL_WEIGHT,_MAX_ACCEL);
+            this.curMomentum = (this.curMomentum + accel).ClampAbsolute(_MAX_MOMENTUM)*_AIR_FRICTION;
+            this.forcedDirection = (this.forcedDirection + this.curMomentum).Clamp360();
 
             // force player to face targeting reticle
             p.m_overrideGunAngle = this.forcedDirection;
 
             // update chain length
             float curChainLength
-                = Mathf.Max(minChainLengh,maxChainLength * (Mathf.Abs(this.curMomentum) / maxMomentum));
+                = Mathf.Max(_MIN_CHAIN_LENGTH,_MAX_CHAIN_LENGTH * (Mathf.Abs(this.curMomentum) / _MAX_MOMENTUM));
             BasicBeamController.BeamBone lastBone = null;
             if (tieProjectilePositionToBeam)
             {
@@ -269,7 +241,7 @@ namespace CwaffingTheGungy
                 float chainTargetDirection = this.forcedDirection +
                     this.curMomentum * curChainLength;  //TODO: 0.75 is magic, do real math later
                 // theCurChain.Direction = BraveMathCollege.DegreesToVector(chainTargetDirection);
-                foreach (BasicBeamController.BeamBone b in theCurChain.m_bones)
+                foreach (BasicBeamController.BeamBone b in _theCurChain.m_bones)
                 {
                     b.Velocity = BraveMathCollege.DegreesToVector(chainTargetDirection,curChainLength*C.PIXELS_PER_TILE);
                     lastBone   = b;
@@ -277,38 +249,37 @@ namespace CwaffingTheGungy
             }
 
             // update speed of owner as appropriate
-            if (influencePlayerMomentum)
-            {
-                RecomputePlayerSpeed(p,minPlayerMomentum+playerMomentumDelta*(curChainLength/maxChainLength));
-            }
+            if (_INFLUENCE_PLAYER_MOMENTUM)
+                RecomputePlayerSpeed(p,_MIN_PLAYER_MOMENTUM+_PLAYER_MOMENTUM_DELTA*(curChainLength/_MAX_CHAIN_LENGTH));
 
             // draw VFX showing the ball's current momentum
             if (!tieProjectilePositionToBeam)
                 DrawVFXWithRespectToPlayerAngle(p,this.forcedDirection,curChainLength);
 
             // update and draw the ball itself
-            theCurBall.collidesWithEnemies = true;
-            theCurBall.collidesWithPlayer = false;
-            Vector2 ppos = (p.sprite.WorldCenter+BraveMathCollege.DegreesToVector(this.forcedDirection,curChainLength+15f/C.PIXELS_PER_TILE) // 15 == beam sprite length
-                ).ToVector3ZisY(-1f);
+            _theCurBall.collidesWithEnemies = true;
+            _theCurBall.collidesWithPlayer = false;
+            Vector2 ppos =
+                (p.sprite.WorldCenter+BraveMathCollege.DegreesToVector(this.forcedDirection,curChainLength+15f/C.PIXELS_PER_TILE)) // 15 == beam sprite length
+                .ToVector3ZisY(-1f);
 
-            Vector2 oldPos = theCurBall.specRigidbody.Position.GetPixelVector2();
+            Vector2 oldPos = _theCurBall.specRigidbody.Position.GetPixelVector2();
             if (tieProjectilePositionToBeam && (lastBone != null))
                 ppos = lastBone.Position;
 
-            theCurBall.specRigidbody.Position = new Position(ppos);
-            theCurBall.SendInDirection(ppos-oldPos,true,true);
+            _theCurBall.specRigidbody.Position = new Position(ppos);
+            _theCurBall.SendInDirection(ppos-oldPos,true,true);
         }
 
         private void DrawVFXWithRespectToPlayerAngle(PlayerController p, float angle, float mag)
         {
             Vector2 ppos   = p.sprite.WorldCenter;
-            float segments = Mathf.Floor(Mathf.Min(maxChainSegments,mag/minGapBetweenChainSegments));
+            float segments = Mathf.Floor(Mathf.Min(_MAX_CHAIN_SEGMENTS,mag/_MIN_GAP_BETWEEN_SEGMENTS));
             float gap      = mag/segments;
             for(int i = 0 ; i < segments; ++i )
-                vfx2.SpawnAtPosition((ppos+BraveMathCollege.DegreesToVector(angle,i*gap)).ToVector3ZisY(-1f),
+                _Vfx2.SpawnAtPosition((ppos+BraveMathCollege.DegreesToVector(angle,i*gap)).ToVector3ZisY(-1f),
                     angle,null, null, null, -0.05f);
-            vfx.SpawnAtPosition((ppos+BraveMathCollege.DegreesToVector(angle,mag)).ToVector3ZisY(-1f),
+            _Vfx.SpawnAtPosition((ppos+BraveMathCollege.DegreesToVector(angle,mag)).ToVector3ZisY(-1f),
                 angle,null, null, null, -0.05f);
         }
     }
