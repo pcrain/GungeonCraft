@@ -23,37 +23,36 @@ namespace CwaffingTheGungy
         public static string ShortDescription = "Dragunball Z";
         public static string LongDescription  = "(dakka)";
 
-        public static tk2dSpriteAnimationClip kisprite;
-        public static tk2dSpriteAnimationClip kispritered;
+        public static tk2dSpriteAnimationClip KiSprite;
+        public static tk2dSpriteAnimationClip KiSpriteRed;
+
+        private static float _KiReflectRange = 3.0f;
+        private static VFXPool _Vfx  = null;
+
+        private PlayerController _owner = null;
+        private Vector2 _currentTarget = Vector2.zero;
 
         public float nextKiBlastSign = 1;  //1 to deviate right, -1 to deviate left
-
-        private static float kiReflectRange = 3.0f;
-        private static VFXPool vfx  = null;
-        private PlayerController owner = null;
-        private Vector2 currentTarget = Vector2.zero;
 
         public static void Add()
         {
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+                gun.gunSwitchGroup                    = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup;
+                gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
+                gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+                gun.DefaultModule.cooldownTime        = 0.1f;
+                gun.DefaultModule.numberOfShotsInClip = 99999;
+                gun.reloadTime                        = 0f;
+                gun.quality                           = PickupObject.ItemQuality.D;
+                gun.InfiniteAmmo                      = true;
+                gun.SetBaseMaxAmmo(99999);
+                gun.SetAnimationFPS(gun.shootAnimation, 24);
+                gun.SetFireAudio("Play_WPN_Vorpal_Shot_Critical_01");
+
             var comp = gun.gameObject.AddComponent<KiBlast>();
-            comp.preventNormalReloadAudio = true;
-            comp.preventNormalFireAudio = true;
-            comp.overrideNormalFireAudio = "Play_WPN_Vorpal_Shot_Critical_01";
+                comp.preventNormalReloadAudio = true;
 
-            gun.gunSwitchGroup                    = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup;
-            gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
-            gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
-            gun.DefaultModule.cooldownTime        = 0.1f;
-            gun.DefaultModule.numberOfShotsInClip = 99999;
-            gun.reloadTime                        = 0f;
-            gun.quality                           = PickupObject.ItemQuality.D;
-            gun.InfiniteAmmo                      = true;
-            gun.SetBaseMaxAmmo(99999);
-            gun.SetAnimationFPS(gun.shootAnimation, 24);
-
-            Projectile blast = Lazy.PrefabProjectileFromGun(gun);
-            kisprite = AnimateBullet.CreateProjectileAnimation(
+            KiSprite = AnimateBullet.CreateProjectileAnimation(
                 new List<string> {
                     "ki_blast_001",
                     "ki_blast_002",
@@ -61,8 +60,8 @@ namespace CwaffingTheGungy
                     "ki_blast_004",
                 }, 12, true, new IntVector2(8, 8),
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
-            blast.AddAnimation(kisprite);
-            kispritered = AnimateBullet.CreateProjectileAnimation(
+
+            KiSpriteRed = AnimateBullet.CreateProjectileAnimation(
                 new List<string> {
                     "ki_blast_red_001",
                     "ki_blast_red_002",
@@ -70,38 +69,37 @@ namespace CwaffingTheGungy
                     "ki_blast_red_004",
                 }, 12, true, new IntVector2(8, 8),
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
-            blast.AddAnimation(kispritered);
-            blast.SetAnimation(kisprite);
-            blast.baseData.damage = 4f;
-            blast.ignoreDamageCaps = true;
 
-            blast.gameObject.AddComponent<KiBlastBehavior>();
+            Projectile blast = Lazy.PrefabProjectileFromGun(gun);
+                blast.AddAnimation(KiSprite);
+                blast.AddAnimation(KiSpriteRed);
+                blast.SetAnimation(KiSprite);
+                blast.baseData.damage = 4f;
+                blast.ignoreDamageCaps = true;
+                blast.gameObject.AddComponent<KiBlastBehavior>();
 
             EasyTrailBullet trail = blast.gameObject.AddComponent<EasyTrailBullet>();
-            trail.TrailPos = trail.transform.position;
-            trail.StartWidth = 0.2f;
-            trail.EndWidth = 0f;
-            trail.LifeTime = 0.1f;
-            trail.BaseColor = Color.cyan;
-            trail.EndColor = Color.cyan;
+                trail.TrailPos = trail.transform.position;
+                trail.StartWidth = 0.2f;
+                trail.EndWidth = 0f;
+                trail.LifeTime = 0.1f;
+                trail.BaseColor = Color.cyan;
+                trail.EndColor = Color.cyan;
 
-            vfx = VFX.CreatePoolFromVFXGameObject((PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
+            _Vfx = VFX.CreatePoolFromVFXGameObject((PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
         }
 
         public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
         {
             base.OnReloadPressed(player, gun, manualReload);
-            float closestDistance = 999f;
+            float closestDistance = _KiReflectRange;
             KiBlastBehavior closestBlast = null;
-            for (int i = 0; i < StaticReferenceManager.AllProjectiles.Count; i++)
+            foreach (Projectile p in StaticReferenceManager.AllProjectiles)
             {
-                Projectile p = StaticReferenceManager.AllProjectiles[i];
                 KiBlastBehavior k = p.GetComponent<KiBlastBehavior>();
                 if (k == null || (!k.reflected))
                     continue;
                 float distanceToPlayer = Vector2.Distance(player.sprite.WorldCenter,p.sprite.WorldCenter);
-                if (distanceToPlayer > kiReflectRange)
-                    continue;
                 if (distanceToPlayer > closestDistance)
                     continue;
                 closestDistance = distanceToPlayer;
@@ -115,9 +113,9 @@ namespace CwaffingTheGungy
             base.Update();
             if (!this.Player)
                 return;
-            this.currentTarget = Raycast.ToNearestWallOrEnemyOrObject(
+            this._currentTarget = Raycast.ToNearestWallOrEnemyOrObject(
                 this.Player.sprite.WorldCenter,this.Player.CurrentGun.CurrentAngle);
-            vfx.SpawnAtPosition(this.currentTarget.ToVector3ZisY(-1f),
+            _Vfx.SpawnAtPosition(this._currentTarget.ToVector3ZisY(-1f),
                 this.Player.CurrentGun.CurrentAngle,null, null, null, -0.05f);
         }
 
@@ -130,121 +128,116 @@ namespace CwaffingTheGungy
 
     public class KiBlastBehavior : MonoBehaviour
     {
-        private static float defaultSecsToReachTarget = 0.5f;
-        private static float maxAngleVariance  = 60f;
-        private static float minSpeed = 15.0f;
-        private static float minReflectableLifetime = 0.4f;
-        private static SlashData basicSlashData = null;
+        private static float _DefaultSecsToReachTarget = 0.5f;
+        private static float _MaxAngleVariance  = 60f;
+        private static float _MinSpeed = 15.0f;
+        private static float _MinReflectableLifetime = 0.4f;
+        private static SlashData _BasicSlashData = null;
 
-        private Projectile m_projectile;
-        private PlayerController m_owner;
-        private Vector2 targetPos;
-        private float targetAngle;
-        private float angleVariance;
-        private float lifetime = 0;
-        private float timeSinceLastReflect = 0;
-        private float timeToReachTarget;
-        private float actualTimeToReachTarget;
-        private int numReflections = 0;
-        private float startingDamage;
-        private float scaling = 1.5f;
+        private Projectile _projectile;
+        private PlayerController _owner;
+        private Vector2 _targetPos;
+        private float _targetAngle;
+        private float _angleVariance;
+        private float _lifetime = 0;
+        private float _timeSinceLastReflect = 0;
+        private float _timeToReachTarget;
+        private float _actualTimeToReachTarget;
+        private int _numReflections = 0;
+        private float _startingDamage;
+        private float _scaling = 1.5f;
 
         public bool reflected = false;
 
         private void Start()
         {
-            basicSlashData ??= new SlashData();
-            this.m_projectile = base.GetComponent<Projectile>();
-            this.startingDamage = this.m_projectile.baseData.damage;
-            if (this.m_projectile.Owner && this.m_projectile.Owner is PlayerController)
+            _BasicSlashData ??= new SlashData();
+            this._projectile = base.GetComponent<Projectile>();
+            this._startingDamage = this._projectile.baseData.damage;
+            if (this._projectile.Owner is not PlayerController pc)
+                return;
+
+            this._owner      = pc;
+            this._targetAngle  = this._owner.CurrentGun.CurrentAngle;
+            this._targetPos    = Raycast.ToNearestWallOrEnemyOrObject(
+                this._owner.sprite.WorldCenter,
+                this._targetAngle);
+
+            this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
+
+            KiBlast k = this._owner.CurrentGun.GetComponent<KiBlast>();
+            if (k != null)
             {
-                this.m_owner      = this.m_projectile.Owner as PlayerController;
-                this.targetAngle  = this.m_owner.CurrentGun.CurrentAngle;
-                this.targetPos    = Raycast.ToNearestWallOrEnemyOrObject(
-                    this.m_owner.sprite.WorldCenter,
-                    this.targetAngle);
-
-                this.m_projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
-
-                KiBlast k = this.m_owner.CurrentGun.GetComponent<KiBlast>();
-                if (k != null)
-                {
-                    this.angleVariance = UnityEngine.Random.value*maxAngleVariance*k.nextKiBlastSign;
-                    k.nextKiBlastSign *= -1;
-                }
-                else
-                    ETGModConsole.Log("that should never happen o.o");
-
-                AkSoundEngine.PostEvent("ki_blast_return_sound_stop_all", this.m_projectile.gameObject);
-                AkSoundEngine.PostEvent("ki_blast_sound_stop_all", this.m_projectile.gameObject);
-                AkSoundEngine.PostEvent("ki_blast_sound", this.m_projectile.gameObject);
-                SetNewTarget(this.targetPos, defaultSecsToReachTarget);
+                this._angleVariance = UnityEngine.Random.value*_MaxAngleVariance*k.nextKiBlastSign;
+                k.nextKiBlastSign *= -1;
             }
+            else
+                ETGModConsole.Log("that should never happen o.o");
+
+            AkSoundEngine.PostEvent("ki_blast_return_sound_stop_all", this._projectile.gameObject);
+            AkSoundEngine.PostEvent("ki_blast_sound_stop_all", this._projectile.gameObject);
+            AkSoundEngine.PostEvent("ki_blast_sound", this._projectile.gameObject);
+            SetNewTarget(this._targetPos, _DefaultSecsToReachTarget);
         }
 
         public void SetNewTarget(Vector2 target, float secsToReachTarget)
         {
-            this.lifetime = 0;
-            this.targetPos = target;
-            this.timeToReachTarget = secsToReachTarget;
-            Vector2 curpos = this.m_projectile.specRigidbody.Position.GetPixelVector2();
-            Vector2 delta  = (this.targetPos-curpos);
-            this.targetAngle = delta.ToAngle();
-            float distanceToTarget = Vector2.Distance(curpos,this.targetPos);
-            this.m_projectile.baseData.speed = Mathf.Max(distanceToTarget / this.timeToReachTarget,minSpeed);
-            this.actualTimeToReachTarget = distanceToTarget / this.m_projectile.baseData.speed;
-            this.m_projectile.UpdateSpeed();
-            this.m_projectile.SendInDirection(BraveMathCollege.DegreesToVector(this.targetAngle-this.angleVariance), true);
+            this._lifetime = 0;
+            this._targetPos = target;
+            this._timeToReachTarget = secsToReachTarget;
+            Vector2 curpos = this._projectile.specRigidbody.Position.GetPixelVector2();
+            Vector2 delta  = (this._targetPos-curpos);
+            this._targetAngle = delta.ToAngle();
+            float distanceToTarget = Vector2.Distance(curpos,this._targetPos);
+            this._projectile.baseData.speed = Mathf.Max(distanceToTarget / this._timeToReachTarget,_MinSpeed);
+            this._actualTimeToReachTarget = distanceToTarget / this._projectile.baseData.speed;
+            this._projectile.UpdateSpeed();
+            this._projectile.SendInDirection(BraveMathCollege.DegreesToVector(this._targetAngle-this._angleVariance), true);
         }
 
         private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
         {
+            if (this.reflected)
+                return;
+
             AIActor enemy = otherRigidbody.GetComponent<AIActor>();
-            // Leaving this out for now because I think it's funny if enemies can team kill
-            // if (this.reflected && enemy != null)
-            // {
-            //     PhysicsEngine.SkipCollision = true;
-            //     return;
-            // }
-            if (!this.reflected)
-            {
-                if (enemy == null)
-                    return;
+            if (enemy == null)
+                return;
 
-                if (this.m_projectile.baseData.damage >= enemy.healthHaver.GetCurrentHealth())
-                    return;
+            if (this._projectile.baseData.damage >= enemy.healthHaver.GetCurrentHealth())
+                return;
 
-                if (this.timeSinceLastReflect < minReflectableLifetime)
-                    return; //don't want enemies to just be able to spam reflect
+            if (this._timeSinceLastReflect < _MinReflectableLifetime)
+                return; //don't want enemies to just be able to spam reflect
 
-                // Apply damage to the enemy
-                enemy.healthHaver.ApplyDamage(this.m_projectile.baseData.damage, this.m_projectile.Direction, "Ki Blast",
-                    CoreDamageTypes.None, DamageCategory.Collision,
-                    false, null, true);
-                enemy.healthHaver.knockbackDoer.ApplyKnockback(this.m_projectile.Direction, this.m_projectile.baseData.force);
+            // Apply damage to the enemy
+            enemy.healthHaver.ApplyDamage(this._projectile.baseData.damage, this._projectile.Direction, "Ki Blast",
+                CoreDamageTypes.None, DamageCategory.Collision,
+                false, null, true);
+            enemy.healthHaver.knockbackDoer.ApplyKnockback(this._projectile.Direction, this._projectile.baseData.force);
 
-                // Skip the normal collision
-                PhysicsEngine.SkipCollision = true;
+            // Skip the normal collision
+            PhysicsEngine.SkipCollision = true;
 
-                // Make the projectile belong to the enemy and return it towards the player
-                Projectile p = this.m_projectile;
-                p.Owner = enemy;
-                p.collidesWithPlayer = true;
-                p.collidesWithEnemies = false;
-                this.reflected = true;
+            // Make the projectile belong to the enemy and return it towards the player
+            Projectile p = this._projectile;
+            p.Owner = enemy;
+            p.collidesWithPlayer = true;
+            p.collidesWithEnemies = false;
+            this.reflected = true;
 
-                // Update sounds and animations
-                p.SetAnimation(KiBlast.kispritered);
-                EasyTrailBullet trail = p.gameObject.GetComponent<EasyTrailBullet>();
+            // Update sounds and animations
+            p.SetAnimation(KiBlast.KiSpriteRed);
+            EasyTrailBullet trail = p.gameObject.GetComponent<EasyTrailBullet>();
                 trail.BaseColor = Color.red;
                 trail.EndColor = Color.red;
                 trail.UpdateTrail();
-                // AkSoundEngine.PostEvent("Play_WPN_Vorpal_Shot_Critical_01", enemy.gameObject);
-                AkSoundEngine.PostEvent("ki_blast_return_sound_stop_all", this.m_projectile.gameObject);
-                AkSoundEngine.PostEvent("ki_blast_sound_stop_all", this.m_projectile.gameObject);
-                AkSoundEngine.PostEvent("ki_blast_return_sound", this.m_projectile.gameObject);
-                SetNewTarget(this.m_owner.sprite.WorldCenter, this.timeToReachTarget);
-            }
+
+            // AkSoundEngine.PostEvent("Play_WPN_Vorpal_Shot_Critical_01", enemy.gameObject);
+            AkSoundEngine.PostEvent("ki_blast_return_sound_stop_all", this._projectile.gameObject);
+            AkSoundEngine.PostEvent("ki_blast_sound_stop_all", this._projectile.gameObject);
+            AkSoundEngine.PostEvent("ki_blast_return_sound", this._projectile.gameObject);
+            SetNewTarget(this._owner.sprite.WorldCenter, this._timeToReachTarget);
         }
 
         // TODO: misnomer, we're returning *from* the player
@@ -252,50 +245,53 @@ namespace CwaffingTheGungy
         {
             if (!this.reflected)
                 return;
-            Projectile p = this.m_projectile;
-            AIActor enemy = p.Owner as AIActor;
-            if (enemy == null)
+
+            Projectile p = this._projectile;
+            if (p.Owner is not AIActor enemy)
                 return;
+
+            ++this._numReflections;
+            this.reflected = false;
+            this._timeSinceLastReflect = 0.0f;
+            this._projectile.baseData.damage = this._startingDamage*Mathf.Pow(this._scaling,this._numReflections);
+
             p.Owner = player;
             // p.AdjustPlayerProjectileTint(Color.green, 2, 0.1f);
             p.collidesWithPlayer = false;
             p.collidesWithEnemies = true;
-            this.reflected = false;
+            p.SetAnimation(KiBlast.KiSprite);
 
-            p.SetAnimation(KiBlast.kisprite);
             EasyTrailBullet trail = p.gameObject.GetComponent<EasyTrailBullet>();
-            trail.BaseColor = Color.cyan;
-            trail.EndColor = Color.cyan;
-            trail.UpdateTrail();
-            ++this.numReflections;
-            this.timeSinceLastReflect = 0.0f;
-            this.m_projectile.baseData.damage = this.startingDamage*Mathf.Pow(this.scaling,this.numReflections);
-            AkSoundEngine.PostEvent("ki_blast_return_sound_stop_all", this.m_projectile.gameObject);
-            AkSoundEngine.PostEvent("ki_blast_sound_stop_all", this.m_projectile.gameObject);
-            AkSoundEngine.PostEvent("ki_blast_return_sound", this.m_projectile.gameObject);
+                trail.BaseColor = Color.cyan;
+                trail.EndColor = Color.cyan;
+                trail.UpdateTrail();
+
+            AkSoundEngine.PostEvent("ki_blast_return_sound_stop_all", this._projectile.gameObject);
+            AkSoundEngine.PostEvent("ki_blast_sound_stop_all", this._projectile.gameObject);
+            AkSoundEngine.PostEvent("ki_blast_return_sound", this._projectile.gameObject);
             int enemiesToCheck = 10;
             while (enemy.healthHaver.currentHealth <= 0 && --enemiesToCheck >= 0)
                 enemy = enemy.GetAbsoluteParentRoom().GetRandomActiveEnemy(false);
-            SetNewTarget(enemy.sprite.WorldCenter, this.timeToReachTarget);
+            SetNewTarget(enemy.sprite.WorldCenter, this._timeToReachTarget);
             SlashDoer.DoSwordSlash(
                 player.sprite.WorldCenter,
                 (enemy.sprite.WorldCenter-player.sprite.WorldCenter).ToAngle(),
                 p.Owner,
-                basicSlashData);
+                _BasicSlashData);
         }
 
         private void Update()
         {
             float deltatime = BraveTime.DeltaTime;
-            this.lifetime += deltatime;
-            this.timeSinceLastReflect += deltatime;
-            float percentDoneTurning = this.lifetime / this.actualTimeToReachTarget;
-            if (percentDoneTurning <= 1.0f)
-            {
-                float inflection = (2.0f*percentDoneTurning) - 1.0f;
-                float newAngle = this.targetAngle + inflection * this.angleVariance;
-                this.m_projectile.SendInDirection(BraveMathCollege.DegreesToVector(newAngle), true);
-            }
+            this._lifetime += deltatime;
+            this._timeSinceLastReflect += deltatime;
+            float percentDoneTurning = this._lifetime / this._actualTimeToReachTarget;
+            if (percentDoneTurning > 1.0f)
+                return;
+
+            float inflection = (2.0f*percentDoneTurning) - 1.0f;
+            float newAngle = this._targetAngle + inflection * this._angleVariance;
+            this._projectile.SendInDirection(BraveMathCollege.DegreesToVector(newAngle), true);
         }
     }
 }
