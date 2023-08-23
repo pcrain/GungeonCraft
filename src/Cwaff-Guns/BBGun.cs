@@ -17,7 +17,7 @@ namespace CwaffingTheGungy
 {
     public class BBGun : AdvancedGunBehavior
     {
-        public static string GunName          = "B. B. Gun";
+        public static string ItemName         = "B. B. Gun";
         public static string SpriteName       = "embercannon";
         public static string ProjectileName   = "ak-47";
         public static string ShortDescription = "Spare No One";
@@ -31,7 +31,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.SetupGun(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+            Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             var comp = gun.gameObject.AddComponent<BBGun>();
 
             comp.preventNormalFireAudio = true;

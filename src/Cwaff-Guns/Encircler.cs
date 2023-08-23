@@ -17,7 +17,7 @@ namespace CwaffingTheGungy
 {
     public class Encircler : AdvancedGunBehavior
     {
-        public static string GunName          = "Encircler";
+        public static string ItemName         = "Encircler";
         public static string SpriteName       = "doublegun";
         public static string ProjectileName   = "ak-47";
         public static string ShortDescription = "Sir Cumference's Own";
@@ -25,7 +25,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.SetupGun(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+            Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             var comp = gun.gameObject.AddComponent<Encircler>();
 
             gun.gunSwitchGroup                    = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup;

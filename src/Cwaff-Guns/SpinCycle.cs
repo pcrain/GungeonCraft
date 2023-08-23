@@ -23,7 +23,7 @@ namespace CwaffingTheGungy
 {
     public class SpinCycle : AdvancedGunBehavior
     {
-        public static string GunName          = "Spin Cycle";
+        public static string ItemName         = "Spin Cycle";
         public static string SpriteName       = "ranger";
         public static string ProjectileName   = "86"; //marine sidearm
         public static string ShortDescription = "Bring it Around Town";
@@ -38,7 +38,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.SetupGun(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+            Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             var comp = gun.gameObject.AddComponent<SpinCycle>();
             comp.preventNormalFireAudio = true;
 

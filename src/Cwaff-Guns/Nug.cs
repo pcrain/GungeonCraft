@@ -17,7 +17,7 @@ namespace CwaffingTheGungy
 {
     public class Nug : AdvancedGunBehavior
     {
-        public static string GunName          = "Nug";
+        public static string ItemName         = "Nug";
         public static string SpriteName       = "flayedrevolver";
         public static string ProjectileName   = "magnum"; //38
         public static string ShortDescription = "Noegnug Eht Retne";
@@ -30,7 +30,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.SetupGun(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+            Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
 
             var comp = gun.gameObject.AddComponent<Nug>();
             comp.preventNormalFireAudio = true;

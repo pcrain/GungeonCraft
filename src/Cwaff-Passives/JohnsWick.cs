@@ -17,7 +17,7 @@ namespace CwaffingTheGungy
 {
     public class JohnsWick : PassiveItem
     {
-        public static string PassiveName      = "John's Wick";
+        public static string ItemName         = "John's Wick";
         public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/johns_wick_icon";
         public static string ShortDescription = "No Dogs Harmed";
         public static string LongDescription  = "(Move faster and do triple damage while on fire; take damage from fire more slowly.)";
@@ -31,7 +31,7 @@ namespace CwaffingTheGungy
 
         public static void Init()
         {
-            PickupObject item  = Lazy.SetupPassive<JohnsWick>(PassiveName, SpritePath, ShortDescription, LongDescription);
+            PickupObject item  = Lazy.SetupPassive<JohnsWick>(ItemName, SpritePath, ShortDescription, LongDescription);
             item.quality       = PickupObject.ItemQuality.C;
         }
 

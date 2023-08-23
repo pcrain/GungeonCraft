@@ -17,7 +17,7 @@ namespace CwaffingTheGungy
 {
     public class MasterSword : AdvancedGunBehavior
     {
-        public static string GunName          = "Master Sword";
+        public static string ItemName         = "Master Sword";
         public static string SpriteName       = "carnwennan";
         public static string ProjectileName   = "86"; //marine sidearm
         public static string ShortDescription = "Dangerous Alone";
@@ -25,7 +25,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.SetupGun(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+            Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             var comp = gun.gameObject.AddComponent<MasterSword>();
 
             gun.DefaultModule.ammoCost               = 1;

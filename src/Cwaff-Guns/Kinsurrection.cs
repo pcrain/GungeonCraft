@@ -17,7 +17,7 @@ namespace CwaffingTheGungy
 {
     public class Kinsurrection : AdvancedGunBehavior
     {
-        public static string GunName          = "Kinsurrection";
+        public static string ItemName         = "Kinsurrection";
         public static string SpriteName       = "redblaster";
         public static string ProjectileName   = "ak-47";
         public static string ShortDescription = "Friendliest Fire";
@@ -25,7 +25,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.SetupGun(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+            Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             var comp = gun.gameObject.AddComponent<Kinsurrection>();
 
             gun.gunSwitchGroup                    = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup;

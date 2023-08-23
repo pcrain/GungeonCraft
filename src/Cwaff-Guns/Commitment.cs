@@ -25,7 +25,7 @@ namespace CwaffingTheGungy
 {
     public class Commitment : AdvancedGunBehavior
     {
-        public static string GunName          = "Commitment";
+        public static string ItemName         = "Commitment";
         public static string SpriteName       = "g20";
         public static string ProjectileName   = "86"; //marine sidearm
         public static string ShortDescription = "Going Until It's Gone";
@@ -35,7 +35,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.SetupGun(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+            Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             var comp = gun.gameObject.AddComponent<Commitment>();
             // comp.preventNormalFireAudio = true;
 

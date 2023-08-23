@@ -17,7 +17,7 @@ namespace CwaffingTheGungy
 {
     public class CreditCard : PassiveItem
     {
-        public static string PassiveName      = "Credit Card";
+        public static string ItemName         = "Credit Card";
         public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/credit_card_icon";
         public static string ShortDescription = "Shop 'til You Drop";
         public static string LongDescription  = "(Grants 500 shells. Grants 1 curse for every 50 shells below 500. Grants 1 coolness for every 50 shells above 500.)";
@@ -31,7 +31,7 @@ namespace CwaffingTheGungy
 
         public static void Init()
         {
-            PickupObject item  = Lazy.SetupPassive<CreditCard>(PassiveName, SpritePath, ShortDescription, LongDescription);
+            PickupObject item  = Lazy.SetupPassive<CreditCard>(ItemName, SpritePath, ShortDescription, LongDescription);
             item.quality       = PickupObject.ItemQuality.A;
         }
 

@@ -17,7 +17,7 @@ namespace CwaffingTheGungy
 {
     public class Natasha : AdvancedGunBehavior
     {
-        public static string GunName          = "Natasha";
+        public static string ItemName         = "Natasha";
         public static string SpriteName       = "accelerator";
         public static string ProjectileName   = "ak-47";
         public static string ShortDescription = "Fear no Man";
@@ -28,7 +28,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.SetupGun(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+            Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             var comp = gun.gameObject.AddComponent<Natasha>();
 
             gun.gunSwitchGroup                    = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup;

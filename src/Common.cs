@@ -27,10 +27,11 @@ namespace CwaffingTheGungy
 
     public class IDs // global IDs for this mod's guns and items
     {
-        public static Dictionary<string, int> Pickups  { get; set; } = new Dictionary<string, int>();
-        public static Dictionary<string, int> Guns     { get; set; } = new Dictionary<string, int>();
-        public static Dictionary<string, int> Actives  { get; set; } = new Dictionary<string, int>();
-        public static Dictionary<string, int> Passives { get; set; } = new Dictionary<string, int>();
+        public static Dictionary<string, int>    Pickups       { get; set; } = new Dictionary<string, int>();
+        public static Dictionary<string, int>    Guns          { get; set; } = new Dictionary<string, int>();
+        public static Dictionary<string, int>    Actives       { get; set; } = new Dictionary<string, int>();
+        public static Dictionary<string, int>    Passives      { get; set; } = new Dictionary<string, int>();
+        public static Dictionary<string, string> InternalNames { get; set; } = new Dictionary<string, string>();
     }
 
     public static class Lazy // all-purpose helper methods for being a lazy dumdum
@@ -44,6 +45,7 @@ namespace CwaffingTheGungy
         {
             string newItemName  = itemName.Replace("'", "").Replace("-", "").Replace(".", "");  //get sane gun for item rename
             string baseItemName = newItemName.Replace(" ", "_").ToLower();  //get saner gun name for commands
+            IDs.InternalNames[itemName] = C.MOD_PREFIX+":"+baseItemName;
 
             TItemClass item;
 
@@ -51,7 +53,7 @@ namespace CwaffingTheGungy
             {
                 string spriteName = spritePath; // TODO: guns use names, regular items use full paths -- should be made uniform eventually
                 Gun gun = ETGMod.Databases.Items.NewGun(newItemName, spriteName);  //create a new gun using specified sprite name
-                Game.Items.Rename("outdated_gun_mods:"+baseItemName, C.MOD_PREFIX+":"+baseItemName);  //rename the gun for commands
+                Game.Items.Rename("outdated_gun_mods:"+baseItemName, IDs.InternalNames[itemName]);  //rename the gun for commands
                 gun.SetupSprite(null, spriteName+"_idle_001", 8); //set the gun's ammonomicon sprite
                 int projectileId = 0;
                 if (int.TryParse(projectileName, out projectileId))
@@ -69,10 +71,10 @@ namespace CwaffingTheGungy
                 ETGMod.Databases.Items.SetupItem(item, item.name);
                 SpriteBuilder.AddToAmmonomicon(item.sprite.GetCurrentSpriteDef());
 
-                Gungeon.Game.Items.Add(C.MOD_PREFIX + ":" + baseItemName, item);
+                Gungeon.Game.Items.Add(IDs.InternalNames[itemName], item);
             }
 
-            item.encounterTrackable.EncounterGuid = C.MOD_PREFIX+"-"+baseItemName; //create a unique guid for the gun
+            item.encounterTrackable.EncounterGuid = C.MOD_PREFIX+"-"+baseItemName; //create a unique guid for the item
             item.encounterTrackable.journalData.AmmonomiconSprite = item.sprite.GetCurrentSpriteDef().name;
             item.SetShortDescription(shortDescription);
             item.SetLongDescription(longDescription);

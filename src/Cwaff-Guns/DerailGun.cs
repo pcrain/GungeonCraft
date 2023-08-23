@@ -23,7 +23,7 @@ namespace CwaffingTheGungy
 {
     public class DerailGun : AdvancedGunBehavior
     {
-        public static string GunName          = "Derail Gun";
+        public static string ItemName         = "Derail Gun";
         public static string SpriteName       = "alphabeam";
         public static string ProjectileName   = "86"; //marine sidearm
         public static string ShortDescription = "I Choo Choose You";
@@ -38,7 +38,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.SetupGun(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+            Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             var comp = gun.gameObject.AddComponent<DerailGun>();
             // comp.preventNormalFireAudio = true;
 

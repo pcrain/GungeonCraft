@@ -17,7 +17,7 @@ namespace CwaffingTheGungy
 {
     public class PopcornGun : AdvancedGunBehavior
     {
-        public static string GunName          = "Popcorn Gun";
+        public static string ItemName         = "Popcorn Gun";
         public static string SpriteName       = "arcpistol";
         public static string ProjectileName   = "ak-47";
         public static string ShortDescription = "The Weasel";
@@ -27,7 +27,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.SetupGun(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+            Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             var comp = gun.gameObject.AddComponent<PopcornGun>();
 
             gun.gunSwitchGroup                    = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup;

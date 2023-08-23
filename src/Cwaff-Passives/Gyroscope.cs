@@ -17,7 +17,7 @@ namespace CwaffingTheGungy
 {
     public class Gyroscope : PassiveItem
     {
-        public static string PassiveName      = "Gyroscope";
+        public static string ItemName         = "Gyroscope";
         public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/gyroscope_icon";
         public static string ShortDescription = "Spin to Win";
         public static string LongDescription  = "(spinspinspinspinspinspinspinspinspinspin)";
@@ -27,7 +27,7 @@ namespace CwaffingTheGungy
 
         public static void Init()
         {
-            PickupObject item = Lazy.SetupPassive<Gyroscope>(PassiveName, SpritePath, ShortDescription, LongDescription);
+            PickupObject item = Lazy.SetupPassive<Gyroscope>(ItemName, SpritePath, ShortDescription, LongDescription);
             item.quality      = PickupObject.ItemQuality.A;
 
             var comp = item.gameObject.AddComponent<GyroscopeRoll>();

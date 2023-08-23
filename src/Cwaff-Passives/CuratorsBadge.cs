@@ -22,7 +22,7 @@ namespace CwaffingTheGungy
 {
     public class CuratorsBadge : PassiveItem
     {
-        public static string PassiveName      = "Curator's Badge";
+        public static string ItemName         = "Curator's Badge";
         public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/curators_badge_icon";
         public static string ShortDescription = "Neat and Tidy";
         public static string LongDescription  = "(Get shells for leaving minor breakables unscathed)";
@@ -33,7 +33,7 @@ namespace CwaffingTheGungy
 
         public static void Init()
         {
-            PickupObject item  = Lazy.SetupPassive<CuratorsBadge>(PassiveName, SpritePath, ShortDescription, LongDescription);
+            PickupObject item  = Lazy.SetupPassive<CuratorsBadge>(ItemName, SpritePath, ShortDescription, LongDescription);
             item.quality       = PickupObject.ItemQuality.C;
         }
 

@@ -17,7 +17,7 @@ namespace CwaffingTheGungy
 {
     public class Telefragger : AdvancedGunBehavior
     {
-        public static string GunName          = "Telefragger";
+        public static string ItemName         = "Telefragger";
         public static string SpriteName       = "multiplicator";
         public static string ProjectileName   = "ak-47";
         public static string ShortDescription = "Voip";
@@ -25,7 +25,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.SetupGun(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+            Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             var comp = gun.gameObject.AddComponent<Telefragger>();
 
             gun.gunSwitchGroup                    = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup;

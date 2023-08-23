@@ -17,7 +17,7 @@ namespace CwaffingTheGungy
 {
     class BulletThatCanKillTheFuture : PlayerItem
     {
-        public static string ActiveName       = "Bullet That Can Kill the Future";
+        public static string ItemName         = "Bullet That Can Kill the Future";
         public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/future_killing_bullet_icon";
         public static string ShortDescription = "Seriously, Don't Miss";
         public static string LongDescription  = "(enemy will not spawn for the rest of the run)";
@@ -30,7 +30,7 @@ namespace CwaffingTheGungy
 
         public static void Init()
         {
-            PlayerItem item = Lazy.SetupActive<BulletThatCanKillTheFuture>(ActiveName, SpritePath, ShortDescription, LongDescription);
+            PlayerItem item = Lazy.SetupActive<BulletThatCanKillTheFuture>(ItemName, SpritePath, ShortDescription, LongDescription);
             item.quality    = PickupObject.ItemQuality.C;
 
             //Set the cooldown type and duration of the cooldown

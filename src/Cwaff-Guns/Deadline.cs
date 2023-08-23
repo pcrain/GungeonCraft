@@ -23,7 +23,7 @@ namespace CwaffingTheGungy
 
     public class Deadline : AdvancedGunBehavior
     {
-        public static string GunName          = "Deadline";
+        public static string ItemName         = "Deadline";
         public static string SpriteName       = "bullatterer";
         public static string ProjectileName   = "38_special";
         public static string ShortDescription = "Pythagoras Would be Proud";
@@ -39,7 +39,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.SetupGun(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+            Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
 
             var comp = gun.gameObject.AddComponent<Deadline>();
             comp.preventNormalReloadAudio = true;

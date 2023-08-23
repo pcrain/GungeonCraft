@@ -17,7 +17,7 @@ namespace CwaffingTheGungy
 {
     class BorrowedTime : PlayerItem
     {
-        public static string ActiveName       = "Borrowed Time";
+        public static string ItemName         = "Borrowed Time";
         public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/88888888_icon";
         public static string ShortDescription = "Clock's Ticking";
         public static string LongDescription  = "(insta clear any room, but enemies will all respawn in boss room with increased jam chance. cannot pick up bosses or jammed enemies)";
@@ -31,7 +31,7 @@ namespace CwaffingTheGungy
 
         public static void Init()
         {
-            PlayerItem item = Lazy.SetupActive<BorrowedTime>(ActiveName, SpritePath, ShortDescription, LongDescription);
+            PlayerItem item = Lazy.SetupActive<BorrowedTime>(ItemName, SpritePath, ShortDescription, LongDescription);
             item.quality      = PickupObject.ItemQuality.C;
 
             //Set the cooldown type and duration of the cooldown

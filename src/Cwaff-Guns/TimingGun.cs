@@ -17,7 +17,7 @@ namespace CwaffingTheGungy
 {
     public class TimingGun : AdvancedGunBehavior
     {
-        public static string GunName          = "Timing Gun";
+        public static string ItemName         = "Timing Gun";
         public static string SpriteName       = "agargun";
         public static string ProjectileName   = "ak-47";
         public static string ShortDescription = "One You Can Count On";
@@ -35,7 +35,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.SetupGun(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+            Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             var comp = gun.gameObject.AddComponent<TimingGun>();
 
             gun.gunSwitchGroup                    = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup;

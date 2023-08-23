@@ -17,7 +17,7 @@ namespace CwaffingTheGungy
 {
     public class SoulKaliber : AdvancedGunBehavior
     {
-        public static string GunName          = "Soul Kaliber";
+        public static string ItemName         = "Soul Kaliber";
         public static string SpriteName       = "ringer";
         public static string ProjectileName   = "ak-47";
         public static string ShortDescription = "Gundead or Alive";
@@ -25,7 +25,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.SetupGun(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+            Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
 
             var comp = gun.gameObject.AddComponent<SoulKaliber>();
             comp.preventNormalFireAudio = true;

@@ -17,7 +17,7 @@ namespace CwaffingTheGungy
 {
     public class HLD : PassiveItem
     {
-        public static string PassiveName      = "HLD";
+        public static string ItemName         = "HLD";
         public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/yellow_bandana_icon";
         public static string ShortDescription = "Hyper Light Dasher";
         public static string LongDescription  = "(Pyoooom)";
@@ -29,7 +29,7 @@ namespace CwaffingTheGungy
 
         public static void Init()
         {
-            PickupObject item = Lazy.SetupPassive<HLD>(PassiveName, SpritePath, ShortDescription, LongDescription);
+            PickupObject item = Lazy.SetupPassive<HLD>(ItemName, SpritePath, ShortDescription, LongDescription);
             item.quality      = PickupObject.ItemQuality.A;
 
             LinkVFXPrefab = FakePrefab.Clone(Game.Items["shock_rounds"].GetComponent<ComplexProjectileModifier>().ChainLightningVFX);

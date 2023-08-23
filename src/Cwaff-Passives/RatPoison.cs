@@ -17,7 +17,7 @@ namespace CwaffingTheGungy
 {
     public class RatPoison : PassiveItem
     {
-        public static string PassiveName      = "Rat Poison";
+        public static string ItemName         = "Rat Poison";
         public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/rat_poison_icon";
         public static string ShortDescription = "Ratty no Ratting";
         public static string LongDescription  = "(Resourceful rat no longer steals items)";
@@ -27,7 +27,7 @@ namespace CwaffingTheGungy
 
         public static void Init()
         {
-            PickupObject item  = Lazy.SetupPassive<RatPoison>(PassiveName, SpritePath, ShortDescription, LongDescription);
+            PickupObject item  = Lazy.SetupPassive<RatPoison>(ItemName, SpritePath, ShortDescription, LongDescription);
             item.quality       = PickupObject.ItemQuality.C;
 
             ratPoisonId        = IDs.Passives["rat_poison"];

@@ -20,10 +20,15 @@ namespace CwaffingTheGungy
                 CustomSynergies.Add(name, mandatory.ToList());
         }
 
+        private static string Name(string itemName)
+        {
+            return IDs.InternalNames[itemName];
+        }
+
         public static void Init()
         {
             // Makes Hyper Light Dasher 20% longer and reflect bullets
-            NewSynergy("Hype Yourself Up", new[]{"cg:hld", "hyper_light_blaster"});
+            NewSynergy("Hype Yourself Up", new[]{Name(HLD.ItemName), "hyper_light_blaster"});
         }
     }
 }

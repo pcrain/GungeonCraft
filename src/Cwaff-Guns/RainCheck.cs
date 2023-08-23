@@ -17,7 +17,7 @@ namespace CwaffingTheGungy
 {
     public class RainCheck : AdvancedGunBehavior
     {
-        public static string GunName          = "Rain Check";
+        public static string ItemName         = "Rain Check";
         public static string SpriteName       = "eldermagnum2";
         public static string ProjectileName   = "ak-47";
         public static string ShortDescription = "For a Rainy Day";
@@ -25,7 +25,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.SetupGun(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+            Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             var comp = gun.gameObject.AddComponent<RainCheck>();
 
             gun.gunSwitchGroup                    = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup;

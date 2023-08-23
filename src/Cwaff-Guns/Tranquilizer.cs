@@ -17,7 +17,7 @@ namespace CwaffingTheGungy
 {
     public class Tranquilizer : AdvancedGunBehavior
     {
-        public static string GunName          = "Tranquilizer";
+        public static string ItemName         = "Tranquilizer";
         public static string SpriteName       = "biotranstater2100";
         public static string ProjectileName   = "ak-47";
         public static string ShortDescription = "Zzzzzz";
@@ -25,7 +25,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.SetupGun(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+            Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             var comp = gun.gameObject.AddComponent<Tranquilizer>();
 
             gun.gunSwitchGroup                    = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup;

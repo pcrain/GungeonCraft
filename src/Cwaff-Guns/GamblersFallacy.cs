@@ -17,7 +17,7 @@ namespace CwaffingTheGungy
 {
     public class GamblersFallacy : AdvancedGunBehavior
     {
-        public static string GunName          = "Gambler's Fallacy";
+        public static string ItemName         = "Gambler's Fallacy";
         public static string SpriteName       = "grandfatherglock";
         public static string ProjectileName   = "ak-47";
         public static string ShortDescription = "This Time for Sure!";
@@ -27,7 +27,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.SetupGun(GunName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+            Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             var comp = gun.gameObject.AddComponent<GamblersFallacy>();
 
             gun.gunSwitchGroup                    = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup;
