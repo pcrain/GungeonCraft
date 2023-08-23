@@ -49,11 +49,10 @@ namespace CwaffingTheGungy
 
             if (typeof(TItemClass) == typeof(Gun))
             {
-                string spriteName = spritePath; // TODO: should be made uniform with other items
+                string spriteName = spritePath; // TODO: guns use names, regular items use full paths -- should be made uniform eventually
                 Gun gun = ETGMod.Databases.Items.NewGun(newItemName, spriteName);  //create a new gun using specified sprite name
                 Game.Items.Rename("outdated_gun_mods:"+baseItemName, C.MOD_PREFIX+":"+baseItemName);  //rename the gun for commands
-                gun.encounterTrackable.EncounterGuid = baseItemName+"-"+spriteName; //create a unique guid for the gun
-                gun.SetupSprite(null, spriteName+"_idle_001", 8); //set the gun's ammonomicon sprit
+                gun.SetupSprite(null, spriteName+"_idle_001", 8); //set the gun's ammonomicon sprite
                 int projectileId = 0;
                 if (int.TryParse(projectileName, out projectileId))
                     gun.AddProjectileModuleFrom(PickupObjectDatabase.GetById(projectileId) as Gun, true, true); //set the gun's default projectile to inherit
@@ -67,27 +66,21 @@ namespace CwaffingTheGungy
                 item = obj.AddComponent<TItemSpecific>();
                 ItemBuilder.AddSpriteToObject(itemName, spritePath, obj);
 
-                item.encounterTrackable = null;
-
                 ETGMod.Databases.Items.SetupItem(item, item.name);
                 SpriteBuilder.AddToAmmonomicon(item.sprite.GetCurrentSpriteDef());
-                item.encounterTrackable.journalData.AmmonomiconSprite = item.sprite.GetCurrentSpriteDef().name;
-
-                item.SetName(item.name);
-
-                if (item is PlayerItem activeItem)
-                    activeItem.consumable = false;
 
                 Gungeon.Game.Items.Add(C.MOD_PREFIX + ":" + baseItemName, item);
             }
 
+            item.encounterTrackable.EncounterGuid = C.MOD_PREFIX+"-"+baseItemName; //create a unique guid for the gun
+            item.encounterTrackable.journalData.AmmonomiconSprite = item.sprite.GetCurrentSpriteDef().name;
             item.SetShortDescription(shortDescription);
             item.SetLongDescription(longDescription);
             ETGMod.Databases.Items.Add(item);
             IDs.Pickups[baseItemName] = item.PickupObjectId; //register item in pickup ID database
             if (item is Gun)
             {
-                IDs.Guns[baseItemName] = item.PickupObjectId; //register item in active ID database
+                IDs.Guns[baseItemName] = item.PickupObjectId; //register item in gun ID database
                 ETGModConsole.Log("Lazy Initialized Gun: "+baseItemName);
             }
             else if (item is PlayerItem)
