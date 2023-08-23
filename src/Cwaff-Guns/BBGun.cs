@@ -23,36 +23,30 @@ namespace CwaffingTheGungy
         public static string ShortDescription = "Spare No One";
         public static string LongDescription  = "(Three Strikes)";
 
-        private float lastCharge = 0.0f;
-
-        private static readonly float[] CHARGE_LEVELS = {0.25f,0.5f,1.0f,2.0f};
-
-        private static Projectile fakeProjectile;
+        private static readonly float[] _CHARGE_LEVELS  = {0.25f,0.5f,1.0f,2.0f};
+        private static Projectile       _FakeProjectile = null;
+        private float                   _lastCharge     = 0.0f;
 
         public static void Add()
         {
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+                gun.gunClass                             = GunClass.CHARGE;
+                gun.quality                              = PickupObject.ItemQuality.B;
+                gun.reloadTime                           = 0.01f;
+                gun.CanGainAmmo                          = false;
+                gun.muzzleFlashEffects                   = (PickupObjectDatabase.GetById(37) as Gun).muzzleFlashEffects;
+                gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.Charged;
+                gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Ordered;
+                gun.barrelOffset.transform.localPosition = new Vector3(1.93f, 0.87f, 0f);
+                gun.SetBaseMaxAmmo(1);
+                gun.SetFireAudio("Play_WPN_seriouscannon_shot_01");
+                gun.SetAnimationFPS(gun.shootAnimation, 10);
+                gun.SetAnimationFPS(gun.chargeAnimation, 8);
+                gun.LoopAnimation(gun.chargeAnimation, 2);
+
             var comp = gun.gameObject.AddComponent<BBGun>();
+                comp.SetReloadAudio("Play_ENM_flame_veil_01");
 
-            comp.preventNormalFireAudio = true;
-            comp.preventNormalReloadAudio = true;
-            comp.overrideNormalReloadAudio = "Play_ENM_flame_veil_01";
-
-            gun.GetComponent<tk2dSpriteAnimator>().GetClipByName(gun.shootAnimation).frames[0].eventAudio = "Play_WPN_seriouscannon_shot_01";
-            gun.GetComponent<tk2dSpriteAnimator>().GetClipByName(gun.shootAnimation).frames[0].triggerEvent = true;
-            gun.GetComponent<tk2dSpriteAnimator>().GetClipByName(gun.chargeAnimation).wrapMode = tk2dSpriteAnimationClip.WrapMode.LoopSection;
-            gun.GetComponent<tk2dSpriteAnimator>().GetClipByName(gun.chargeAnimation).loopStart = 2;
-
-            gun.muzzleFlashEffects = (PickupObjectDatabase.GetById(37) as Gun).muzzleFlashEffects;
-            gun.barrelOffset.transform.localPosition = new Vector3(1.93f, 0.87f, 0f);
-            gun.SetAnimationFPS(gun.shootAnimation, 10);
-            gun.SetAnimationFPS(gun.chargeAnimation, 8);
-            gun.gunClass = GunClass.CHARGE;
-
-            gun.DefaultModule.shootStyle = ProjectileModule.ShootStyle.Charged;
-            gun.DefaultModule.sequenceStyle = ProjectileModule.ProjectileSequenceStyle.Ordered;
-
-            //GUN STATS
             ProjectileModule mod = gun.DefaultModule;
                 mod.ammoCost            = 1;
                 mod.numberOfShotsInClip = 1;
@@ -61,19 +55,14 @@ namespace CwaffingTheGungy
                 mod.cooldownTime        = 0.70f;
                 mod.angleVariance       = 10f;
 
-            List<ProjectileModule.ChargeProjectile> tempChargeProjectiles =
-                new List<ProjectileModule.ChargeProjectile>();
-
-            for (int i = 0; i < CHARGE_LEVELS.Length; i++)
+            List<ProjectileModule.ChargeProjectile> tempChargeProjectiles = new();
+            for (int i = 0; i < _CHARGE_LEVELS.Length; i++)
             {
-                Projectile projectile = UnityEngine.Object.Instantiate<Projectile>(mod.projectiles[0]);
+                Projectile projectile = mod.projectiles[0].ClonePrefab();
                 if (i < mod.projectiles.Count)
                     mod.projectiles[i] = projectile;
                 else
                     mod.projectiles.Add(projectile);
-                projectile.gameObject.SetActive(false);
-                FakePrefab.MarkAsFakePrefab(projectile.gameObject);
-                UnityEngine.Object.DontDestroyOnLoad(projectile);
 
                 const int bbSpriteDiameter = 20;
                 projectile.baseData.range = 999999f;
@@ -88,38 +77,29 @@ namespace CwaffingTheGungy
                         "bball6",
                         "bball7",
                         "bball8",
-                        // "bb9",
-                        // "bb10",
                     },
                     20, true, new IntVector2(bbSpriteDiameter, bbSpriteDiameter),
                     false, tk2dBaseSprite.Anchor.MiddleCenter, true, false);
 
                 TheBB bb = projectile.gameObject.AddComponent<TheBB>();
-                bb.chargeLevel = i+1;
+                    bb.chargeLevel = i+1;
 
-                // if (mod != gun.DefaultModule) { mod.ammoCost = 0; }
                 ProjectileModule.ChargeProjectile chargeProj = new ProjectileModule.ChargeProjectile
                 {
                     Projectile = projectile,
-                    ChargeTime = CHARGE_LEVELS[i],
+                    ChargeTime = _CHARGE_LEVELS[i],
                 };
                 tempChargeProjectiles.Add(chargeProj);
             }
             mod.chargeProjectiles = tempChargeProjectiles;
-            gun.reloadTime = 0.01f;
-            gun.CanGainAmmo = false;
-            gun.SetBaseMaxAmmo(1);
 
-            gun.quality = PickupObject.ItemQuality.B;
-
-            fakeProjectile = Lazy.PrefabProjectileFromGun(gun);
-            fakeProjectile.gameObject.AddComponent<FakeProjectileComponent>();
+            _FakeProjectile = Lazy.PrefabProjectileFromGun(gun);
+            _FakeProjectile.gameObject.AddComponent<FakeProjectileComponent>();
         }
 
         public override void PostProcessProjectile(Projectile projectile)
         {
-            ETGModConsole.Log("for speed, last charge was "+lastCharge);
-            projectile.baseData.speed = 100*lastCharge;
+            projectile.baseData.speed = 100 * this._lastCharge;
             base.PostProcessProjectile(projectile);
         }
 
@@ -129,104 +109,103 @@ namespace CwaffingTheGungy
             if (!this.Player)
                 return;
             if (this.gun.IsCharging)
-                lastCharge = this.gun.GetChargeFraction();
-            // p.CurrentGun.charge
-            // ETGModConsole.Log("charge is "+this.gun.GetChargeFraction());
+                this._lastCharge = this.gun.GetChargeFraction();
         }
     }
 
     public class TheBB : MonoBehaviour
     {
-        private const float BB_DAMAGE_SCALE = 2.0f;
-        private const float BB_FORCE_SCALE = 2.0f;
-        private const float BB_SPEED_DECAY = 3.0f;
+        private const float _BB_DAMAGE_SCALE = 2.0f;
+        private const float _BB_FORCE_SCALE = 2.0f;
+        private const float _BB_SPEED_DECAY = 3.0f;
 
         public int chargeLevel = 0;
 
-        private Projectile m_projectile;
-        private PlayerController m_owner;
-        private float lifetime = 0f;
-        private float maxSpeed = 0f;
+        private Projectile _projectile;
+        private PlayerController _owner;
+        private float _lifetime = 0f;
+        private float _maxSpeed = 0f;
 
         private void Start()
         {
-            ETGModConsole.Log("created projectile with charge level "+chargeLevel);
-            this.m_projectile = base.GetComponent<Projectile>();
-            if (this.m_projectile.Owner && this.m_projectile.Owner is PlayerController)
-                this.m_owner = this.m_projectile.Owner as PlayerController;
+            this._projectile = base.GetComponent<Projectile>();
+            if (this._projectile.Owner is PlayerController pc)
+                this._owner = pc;
 
-            this.m_projectile.collidesWithPlayer = true;
-            this.maxSpeed = this.m_projectile.baseData.speed;
+            this._projectile.collidesWithPlayer = true;
+            this._maxSpeed = this._projectile.baseData.speed;
 
-            this.m_projectile.sprite.usesOverrideMaterial = true;
-            this.m_projectile.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-                this.m_projectile.sprite.renderer.material.SetFloat("_EmissivePower", 1000f);
-                this.m_projectile.sprite.renderer.material.SetFloat("_EmissiveColorPower", 1.55f);
-                this.m_projectile.sprite.renderer.material.SetColor("_EmissiveColor", Color.magenta);
+            this._projectile.sprite.usesOverrideMaterial = true;
+            Material m = this._projectile.sprite.renderer.material;
+                m.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+                m.SetFloat("_EmissivePower", 1000f);
+                m.SetFloat("_EmissiveColorPower", 1.55f);
+                m.SetColor("_EmissiveColor", Color.magenta);
 
-            BounceProjModifier bounce = this.m_projectile.gameObject.GetOrAddComponent<BounceProjModifier>();
+            BounceProjModifier bounce = this._projectile.gameObject.GetOrAddComponent<BounceProjModifier>();
                 bounce.numberOfBounces     = Mathf.Max(bounce.numberOfBounces, 999);
                 bounce.chanceToDieOnBounce = 0f;
                 bounce.onlyBounceOffTiles  = true;
                 bounce.OnBounce += OnBounce;
 
-            PierceProjModifier pierce = this.m_projectile.gameObject.GetOrAddComponent<PierceProjModifier>();
+            PierceProjModifier pierce = this._projectile.gameObject.GetOrAddComponent<PierceProjModifier>();
                 pierce.penetration = Mathf.Max(pierce.penetration,999);
                 pierce.penetratesBreakables = true;
         }
 
         private void OnBounce()
         {
-            this.m_projectile.baseData.speed *= 0.9f;
+            this._projectile.baseData.speed *= 0.9f;
         }
 
         private void Update()
         {
             float deltatime = BraveTime.DeltaTime;
-            lifetime += deltatime;
-            this.m_projectile.UpdateSpeed();
-            float newSpeed = Mathf.Max(
-                this.m_projectile.baseData.speed-BB_SPEED_DECAY*deltatime,0.0001f);
-            this.m_projectile.baseData.speed = newSpeed;
-            this.m_projectile.UpdateSpeed();
+            this._lifetime += deltatime;
+            this._projectile.UpdateSpeed();
+            float newSpeed = Mathf.Max(this._projectile.baseData.speed-_BB_SPEED_DECAY*deltatime,0.0001f);
+            this._projectile.baseData.speed = newSpeed;
+            this._projectile.UpdateSpeed();
 
-            this.m_projectile.sprite.renderer.material.SetFloat(
-                "_EmissivePower", 300.0f+1000.0f*(newSpeed/maxSpeed));
+            this._projectile.sprite.renderer.material.SetFloat(
+                "_EmissivePower", 300.0f+1000.0f*(newSpeed/_maxSpeed));
             // this.m_projectile.sprite.renderer.material.SetFloat(
             //     "_EmissiveColorPower", 1.55f*(newSpeed/maxSpeed));
-            this.m_projectile.sprite.renderer.material.SetFloat(
+            this._projectile.sprite.renderer.material.SetFloat(
                 "_Cutoff", 0.1f);
             // this.m_projectile.sprite.renderer.material.SetFloat(
             //     "_VertexColor", 1.0f*(newSpeed/maxSpeed));
 
-            if (this.m_projectile.baseData.speed < 1)
+            if (this._projectile.baseData.speed > 1)
             {
-                MiniInteractable mi = MiniInteractable.CreateInteractableAtPosition(
-                    this.m_projectile.sprite,
-                    this.m_projectile.sprite.WorldCenter,
-                    BBInteractScript);
-                    mi.sprite.usesOverrideMaterial = true;
-                    mi.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-                        mi.sprite.renderer.material.SetFloat("_EmissivePower", 300f);
-                        mi.sprite.renderer.material.SetFloat("_EmissiveColorPower", 1.55f);
-                        mi.sprite.renderer.material.SetColor("_EmissiveColor", Color.magenta);
-
-                this.m_projectile.DieInAir(true,false,false,true);
+                this._projectile.baseData.damage = _BB_DAMAGE_SCALE * this._projectile.baseData.speed;
+                this._projectile.baseData.force = _BB_FORCE_SCALE * this._projectile.baseData.speed;
                 return;
             }
 
-            this.m_projectile.baseData.damage = BB_DAMAGE_SCALE * this.m_projectile.baseData.speed;
-            this.m_projectile.baseData.force = BB_FORCE_SCALE * this.m_projectile.baseData.speed;
+            MiniInteractable mi = MiniInteractable.CreateInteractableAtPosition(
+                this._projectile.sprite,
+                this._projectile.sprite.WorldCenter,
+                BBInteractScript);
+                mi.sprite.usesOverrideMaterial = true;
+                Material mat = mi.sprite.renderer.material;
+                    mat.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+                    mat.SetFloat("_EmissivePower", 300f);
+                    mat.SetFloat("_EmissiveColorPower", 1.55f);
+                    mat.SetColor("_EmissiveColor", Color.magenta);
+
+            this._projectile.DieInAir(true,false,false,true);
+            return;
         }
 
         public IEnumerator BBInteractScript(MiniInteractable i, PlayerController p)
         {
-            if (p != this.m_owner)
+            if (p != this._owner)
             {
                 i.interacting = false;
                 yield break;
             }
-            foreach (Gun gun in this.m_owner.inventory.AllGuns)
+            foreach (Gun gun in this._owner.inventory.AllGuns)
             {
                 if (!gun.GetComponent<BBGun>())
                     continue;

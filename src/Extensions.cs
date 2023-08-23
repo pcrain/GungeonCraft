@@ -104,18 +104,36 @@ namespace CwaffingTheGungy
     }
 
     // Register a game object as a prefab
-    public static GameObject RegisterPrefab(this GameObject self)
+    public static GameObject RegisterPrefab(this GameObject self, bool deactivate = true, bool markFake = true, bool dontUnload = true)
     {
-      self.gameObject.SetActive(false);
-      FakePrefab.MarkAsFakePrefab(self.gameObject);
-      UnityEngine.Object.DontDestroyOnLoad(self);
+      if (deactivate)
+        self.gameObject.SetActive(false);
+      if (markFake)
+        FakePrefab.MarkAsFakePrefab(self.gameObject);
+      if (dontUnload)
+        UnityEngine.Object.DontDestroyOnLoad(self);
+      return self;
+    }
+
+    // Register a game object as a prefab, with generic support
+    public static T RegisterPrefab<T>(this T self, bool deactivate = true, bool markFake = true, bool dontUnload = true)
+      where T : Component
+    {
+      self.gameObject.RegisterPrefab(deactivate, markFake, dontUnload);
       return self;
     }
 
     // Instantiate a prefab and clone it as a new prefab
-    public static GameObject ClonePrefab(this GameObject self)
+    public static GameObject ClonePrefab(this GameObject self, bool deactivate = true, bool markFake = true, bool dontUnload = true)
     {
-      return UnityEngine.Object.Instantiate(self).RegisterPrefab();
+      return UnityEngine.Object.Instantiate(self).RegisterPrefab(deactivate, markFake, dontUnload).gameObject;
+    }
+
+    // Instantiate a prefab and clone it as a new prefab, with generic support
+    public static T ClonePrefab<T>(this T self, bool deactivate = true, bool markFake = true, bool dontUnload = true)
+      where T : Component
+    {
+      return UnityEngine.Object.Instantiate<T>(self).RegisterPrefab<T>(deactivate, markFake, dontUnload);
     }
 
     // Convert degrees to a Vector2 angle
@@ -164,6 +182,29 @@ namespace CwaffingTheGungy
     public static Quaternion EulerZ(this Vector2 self)
     {
       return Quaternion.Euler(0f, 0f, BraveMathCollege.Atan2Degrees(self));
+    }
+
+    // Add custom firing audio to a gun
+    public static void SetFireAudio(this Gun gun, string audioEventName)
+    {
+      gun.PreventNormalFireAudio = true;
+      gun.GetComponent<tk2dSpriteAnimator>().GetClipByName(gun.shootAnimation).frames[0].triggerEvent = true;
+      gun.GetComponent<tk2dSpriteAnimator>().GetClipByName(gun.shootAnimation).frames[0].eventAudio = audioEventName;
+    }
+
+    // Add custom reloading audio to a gun
+    public static void SetReloadAudio<T>(this T agun, string audioEventName)
+      where T : Alexandria.ItemAPI.AdvancedGunBehavior
+    {
+      agun.preventNormalReloadAudio  = true;
+      agun.overrideNormalReloadAudio = audioEventName;
+    }
+
+    // Loop a gun's animation
+    public static void LoopAnimation(this Gun gun, string animationName, int loopStart)
+    {
+      gun.GetComponent<tk2dSpriteAnimator>().GetClipByName(animationName).wrapMode = tk2dSpriteAnimationClip.WrapMode.LoopSection;
+      gun.GetComponent<tk2dSpriteAnimator>().GetClipByName(animationName).loopStart = loopStart;
     }
   }
 }
