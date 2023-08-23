@@ -14,6 +14,7 @@ using Alexandria.Misc; // GetFullListOfStatusEffects
 
 namespace CwaffingTheGungy
 {
+    // invisible, collisionless projectile used for calculating other objects as if they were projectiles
     public class FakeProjectileComponent : MonoBehaviour
     {
         // dummy component

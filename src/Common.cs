@@ -130,10 +130,7 @@ namespace CwaffingTheGungy
         public static Projectile PrefabProjectileFromGun(Gun gun, bool setGunDefaultProjectile = true)
         {
             //actually instantiate the projectile
-            Projectile projectile = UnityEngine.Object.Instantiate<Projectile>(gun.DefaultModule.projectiles[0]);
-            projectile.gameObject.SetActive(false); //make sure the projectile isn't an active game object
-            FakePrefab.MarkAsFakePrefab(projectile.gameObject);  //mark the projectile as a prefab
-            UnityEngine.Object.DontDestroyOnLoad(projectile); //make sure the projectile isn't destroyed when loaded as a prefab
+            Projectile projectile = gun.DefaultModule.projectiles[0].ClonePrefab<Projectile>();
             if (setGunDefaultProjectile)
                 gun.DefaultModule.projectiles[0] = projectile; //reset the gun's default projectile
             return projectile;
@@ -144,12 +141,7 @@ namespace CwaffingTheGungy
         /// </summary>
         public static Projectile PrefabProjectileFromExistingProjectile(Projectile baseProjectile)
         {
-            //actually instantiate the projectile
-            Projectile projectile = UnityEngine.Object.Instantiate<Projectile>(baseProjectile);
-            projectile.gameObject.SetActive(false); //make sure the projectile isn't an active game object
-            FakePrefab.MarkAsFakePrefab(projectile.gameObject);  //mark the projectile as a prefab
-            UnityEngine.Object.DontDestroyOnLoad(projectile); //make sure the projectile isn't destroyed when loaded as a prefab
-            return projectile;
+            return baseProjectile.ClonePrefab<Projectile>();
         }
 
         /// <summary>
@@ -315,9 +307,7 @@ namespace CwaffingTheGungy
         public static void DumpComponents(this GameObject g)
         {
             foreach (var c in g.GetComponents(typeof(object)))
-            {
                 ETGModConsole.Log("  "+c.GetType().Name);
-            }
 
         }
 
@@ -325,16 +315,10 @@ namespace CwaffingTheGungy
         {
             // Type type = o.GetType();
             Type type = typeof(T);
-            foreach (var f in type.GetFields()) {
-                Console.WriteLine(
-                    String.Format("field {0} = {1}", f.Name, f.GetValue(o)));
-            }
+            foreach (var f in type.GetFields())
+                Console.WriteLine(String.Format("field {0} = {1}", f.Name, f.GetValue(o)));
             foreach(PropertyDescriptor d in TypeDescriptor.GetProperties(o))
-            {
-                string name = d.Name;
-                object value = d.GetValue(o);
-                Console.WriteLine(" prop {0} = {1}", name, value);
-            }
+                Console.WriteLine(" prop {0} = {1}", d.Name, d.GetValue(o));
         }
 
         public static void CompareFieldsAndProperties<T>(T o1, T o2)
@@ -422,9 +406,7 @@ namespace CwaffingTheGungy
             PhysicsEngine.Instance.RegisterOverlappingGhostCollisionExceptions(ObjectSpecRigidBody, null, false);
 
             if (SpawnVFX != null)
-            {
                 UnityEngine.Object.Instantiate<GameObject>(SpawnVFX, ObjectSpecRigidBody.sprite.WorldCenter, Quaternion.identity);
-            }
             if (correctForWalls) CorrectForWalls(newObject);
 
             return newObject;
@@ -432,39 +414,26 @@ namespace CwaffingTheGungy
         private static void CorrectForWalls(GameObject portal)
         {
             SpeculativeRigidbody rigidbody = portal.GetComponent<SpeculativeRigidbody>();
-            if (rigidbody)
+            if (!rigidbody)
+                return;
+
+            bool flag = PhysicsEngine.Instance.OverlapCast(rigidbody, null, true, false, null, null, false, null, null, new SpeculativeRigidbody[0]);
+            if (!flag)
+                return;
+
+            Vector2 vector = portal.transform.position.XY();
+            IntVector2[] cardinalsAndOrdinals = IntVector2.CardinalsAndOrdinals;
+            for (int num2 = 1; num2 <= 200; ++num2)
             {
-                bool flag = PhysicsEngine.Instance.OverlapCast(rigidbody, null, true, false, null, null, false, null, null, new SpeculativeRigidbody[0]);
-                if (flag)
+                for (int i = 0; i < cardinalsAndOrdinals.Length; i++)
                 {
-                    Vector2 vector = portal.transform.position.XY();
-                    IntVector2[] cardinalsAndOrdinals = IntVector2.CardinalsAndOrdinals;
-                    int num = 0;
-                    int num2 = 1;
-                    for (; ; )
-                    {
-                        for (int i = 0; i < cardinalsAndOrdinals.Length; i++)
-                        {
-                            portal.transform.position = vector + PhysicsEngine.PixelToUnit(cardinalsAndOrdinals[i] * num2);
-                            rigidbody.Reinitialize();
-                            if (!PhysicsEngine.Instance.OverlapCast(rigidbody, null, true, false, null, null, false, null, null, new SpeculativeRigidbody[0]))
-                            {
-                                return;
-                            }
-                        }
-                        num2++;
-                        num++;
-                        if (num > 200)
-                        {
-                            goto Block_4;
-                        }
-                    }
-                //return;
-                Block_4:
-                    UnityEngine.Debug.LogError("FREEZE AVERTED!  TELL RUBEL!  (you're welcome) 147");
-                    return;
+                    portal.transform.position = vector + PhysicsEngine.PixelToUnit(cardinalsAndOrdinals[i] * num2);
+                    rigidbody.Reinitialize();
+                    if (!PhysicsEngine.Instance.OverlapCast(rigidbody, null, true, false, null, null, false, null, null, new SpeculativeRigidbody[0]))
+                        return;
                 }
             }
+            UnityEngine.Debug.LogError("FREEZE AVERTED!  TELL RUBEL!  (you're welcome) 147");
         }
     }
 
@@ -482,6 +451,7 @@ namespace CwaffingTheGungy
             prefix = prefix.Trim();
             bool flag3 = prefix == "";
             if (flag3) { throw new ArgumentException("Prefix name cannot be an empty (or whitespace only) string.", "prefix"); }
+
             List<string> list = new List<string>(assembly.GetManifestResourceNames());
             for (int i = 0; i < list.Count; i++)
             {
@@ -489,23 +459,21 @@ namespace CwaffingTheGungy
                 string text2 = text;
                 text2 = text2.Replace('/', Path.DirectorySeparatorChar);
                 text2 = text2.Replace('\\', Path.DirectorySeparatorChar);
-                bool flag4 = text2.IndexOf(prefix) != 0;
-                if (!flag4)
+                if (text2.IndexOf(prefix) != 0)
+                    continue;
+
+                text2 = text2.Substring(text2.IndexOf(prefix) + prefix.Length);
+                if (text2.LastIndexOf(".bnk") != text2.Length - ".bnk".Length)
+                    continue;
+
+                text2 = text2.Substring(0, text2.Length - ".bnk".Length);
+                bool flag6 = text2.IndexOf(Path.DirectorySeparatorChar) == 0;
+                if (flag6) { text2 = text2.Substring(1); }
+                text2 = prefix + ":" + text2;
+                // Console.WriteLine(string.Format("{0}: Soundbank found, attempting to autoload: name='{1}' resource='{2}'", "hi", text2, text));
+                using (Stream manifestResourceStream = assembly.GetManifestResourceStream(text))
                 {
-                    text2 = text2.Substring(text2.IndexOf(prefix) + prefix.Length);
-                    bool flag5 = text2.LastIndexOf(".bnk") != text2.Length - ".bnk".Length;
-                    if (!flag5)
-                    {
-                        text2 = text2.Substring(0, text2.Length - ".bnk".Length);
-                        bool flag6 = text2.IndexOf(Path.DirectorySeparatorChar) == 0;
-                        if (flag6) { text2 = text2.Substring(1); }
-                        text2 = prefix + ":" + text2;
-                        // Console.WriteLine(string.Format("{0}: Soundbank found, attempting to autoload: name='{1}' resource='{2}'", "hi", text2, text));
-                        using (Stream manifestResourceStream = assembly.GetManifestResourceStream(text))
-                        {
-                            LoadSoundbankFromStream(manifestResourceStream, text2);
-                        }
-                    }
+                    LoadSoundbankFromStream(manifestResourceStream, text2);
                 }
             }
         }

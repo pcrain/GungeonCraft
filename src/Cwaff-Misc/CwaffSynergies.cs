@@ -14,10 +14,7 @@ namespace CwaffingTheGungy
         // private const string[] noStrings = new string[0];
         private static void NewSynergy(string name, string[] mandatory, string[] optional = null)
         {
-            if (optional != null)
-                CustomSynergies.Add(name, mandatory.ToList(), optional.ToList());
-            else
-                CustomSynergies.Add(name, mandatory.ToList());
+            CustomSynergies.Add(name, mandatory.ToList(), optional?.ToList());
         }
 
         private static string Name(string itemName)

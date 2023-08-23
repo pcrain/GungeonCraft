@@ -107,11 +107,11 @@ namespace CwaffingTheGungy
     public static GameObject RegisterPrefab(this GameObject self, bool deactivate = true, bool markFake = true, bool dontUnload = true)
     {
       if (deactivate)
-        self.gameObject.SetActive(false);
+        self.gameObject.SetActive(false); //make sure we aren't an active game object
       if (markFake)
-        FakePrefab.MarkAsFakePrefab(self.gameObject);
+        FakePrefab.MarkAsFakePrefab(self.gameObject); //mark the object as a fake prefab
       if (dontUnload)
-        UnityEngine.Object.DontDestroyOnLoad(self);
+        UnityEngine.Object.DontDestroyOnLoad(self); //make sure the object isn't destroyed when loaded as a prefab
       return self;
     }
 
@@ -146,6 +146,12 @@ namespace CwaffingTheGungy
     public static Vector2 Rotate(this Vector2 self, float rotation)
     {
       return (Vector2)(Quaternion.Euler(0f, 0f, rotation) * self);
+    }
+
+    // Clamp a floating point number between -absoluteMax and absoluteMax
+    public static float ClampAbsolute(this float self, float absoluteMax)
+    {
+      return (Mathf.Abs(self) <= absoluteMax) ? self : Mathf.Sign(self)*absoluteMax;
     }
 
     // Clamp a floating point angle in degrees to [-180,180]
