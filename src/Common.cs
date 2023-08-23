@@ -36,33 +36,97 @@ namespace CwaffingTheGungy
     public static class Lazy // all-purpose helper methods for being a lazy dumdum
     {
         /// <summary>
-        /// Perform basic initialization for a new gun definition.
+        /// Perform basic initialization for a new passive, active, or gun item definition.
         /// </summary>
-        public static Gun SetupGun(
-          string gunName, string spriteName, string projectileName, string shortDescription, string longDescription)
+        public static TItemClass SetupItem<TItemClass, TItemSpecific>(string itemName, string spritePath, string projectileName, string shortDescription, string longDescription)
+            where TItemClass : PickupObject   // must be PickupObject for passive items, PlayerItem for active items, or Gun for guns
+            where TItemSpecific : TItemClass  // must be a subclass of TItemClass
         {
-            string newGunName  = gunName.Replace("'", "").Replace("-", "").Replace(".", "");  //get sane gun for item rename
-            string baseGunName = newGunName.Replace(" ", "_").ToLower();  //get saner gun name for commands
+            string newItemName  = itemName.Replace("'", "").Replace("-", "").Replace(".", "");  //get sane gun for item rename
+            string baseItemName = newItemName.Replace(" ", "_").ToLower();  //get saner gun name for commands
 
-            Gun gun = ETGMod.Databases.Items.NewGun(newGunName, spriteName);  //create a new gun using specified sprite name
-            Game.Items.Rename("outdated_gun_mods:"+baseGunName, C.MOD_PREFIX+":"+baseGunName);  //rename the gun for commands
-            gun.encounterTrackable.EncounterGuid = baseGunName+"-"+spriteName; //create a unique guid for the gun
-            gun.SetShortDescription(shortDescription); //set the gun's short description
-            gun.SetLongDescription(longDescription); //set the gun's long description
-            gun.SetupSprite(null, spriteName+"_idle_001", 8); //set the gun's ammonomicon sprit
-            int projectileId = 0;
-            if (int.TryParse(projectileName, out projectileId))
+            TItemClass item;
+
+            if (typeof(TItemClass) == typeof(Gun))
             {
-                gun.AddProjectileModuleFrom(PickupObjectDatabase.GetById(projectileId) as Gun, true, true); //set the gun's default projectile to inherit
+                string spriteName = spritePath; // TODO: should be made uniform with other items
+                Gun gun = ETGMod.Databases.Items.NewGun(newItemName, spriteName);  //create a new gun using specified sprite name
+                Game.Items.Rename("outdated_gun_mods:"+baseItemName, C.MOD_PREFIX+":"+baseItemName);  //rename the gun for commands
+                gun.encounterTrackable.EncounterGuid = baseItemName+"-"+spriteName; //create a unique guid for the gun
+                gun.SetupSprite(null, spriteName+"_idle_001", 8); //set the gun's ammonomicon sprit
+                int projectileId = 0;
+                if (int.TryParse(projectileName, out projectileId))
+                    gun.AddProjectileModuleFrom(PickupObjectDatabase.GetById(projectileId) as Gun, true, true); //set the gun's default projectile to inherit
+                else
+                    gun.AddProjectileModuleFrom(projectileName, true, false); //set the gun's default projectile to inherit
+                item = gun as TItemClass;
             }
             else
-                gun.AddProjectileModuleFrom(projectileName, true, false); //set the gun's default projectile to inherit
-            ETGMod.Databases.Items.Add(gun, false, "ANY");  //register the gun in the EtG database
-            IDs.Guns[baseGunName] = gun.PickupObjectId; //register gun in gun ID database
-            IDs.Pickups[baseGunName] = gun.PickupObjectId; //register gun in pickup ID database
+            {
+                GameObject obj = new GameObject(itemName);
+                item = obj.AddComponent<TItemSpecific>();
+                ItemBuilder.AddSpriteToObject(itemName, spritePath, obj);
 
-            ETGModConsole.Log("Lazy Initialized Gun: "+baseGunName);
-            return gun;
+                item.encounterTrackable = null;
+
+                ETGMod.Databases.Items.SetupItem(item, item.name);
+                SpriteBuilder.AddToAmmonomicon(item.sprite.GetCurrentSpriteDef());
+                item.encounterTrackable.journalData.AmmonomiconSprite = item.sprite.GetCurrentSpriteDef().name;
+
+                item.SetName(item.name);
+
+                if (item is PlayerItem activeItem)
+                    activeItem.consumable = false;
+
+                Gungeon.Game.Items.Add(C.MOD_PREFIX + ":" + baseItemName, item);
+            }
+
+            item.SetShortDescription(shortDescription);
+            item.SetLongDescription(longDescription);
+            ETGMod.Databases.Items.Add(item);
+            IDs.Pickups[baseItemName] = item.PickupObjectId; //register item in pickup ID database
+            if (item is Gun)
+            {
+                IDs.Guns[baseItemName] = item.PickupObjectId; //register item in active ID database
+                ETGModConsole.Log("Lazy Initialized Gun: "+baseItemName);
+            }
+            else if (item is PlayerItem)
+            {
+                IDs.Actives[baseItemName] = item.PickupObjectId; //register item in active ID database
+                ETGModConsole.Log("Lazy Initialized Active: "+baseItemName);
+            }
+            else
+            {
+                IDs.Passives[baseItemName] = item.PickupObjectId; //register item in passive ID database
+                ETGModConsole.Log("Lazy Initialized Passive: "+baseItemName);
+            }
+            return item;
+        }
+
+        /// <summary>
+        /// Perform basic initialization for a new passive item definition.
+        /// </summary>
+        public static PickupObject SetupPassive<T>(string itemName, string spritePath, string shortDescription, string longDescription)
+            where T : PickupObject
+        {
+            return SetupItem<PickupObject, T>(itemName, spritePath, "", shortDescription, longDescription);
+        }
+
+        /// <summary>
+        /// Perform basic initialization for a new active item definition.
+        /// </summary>
+        public static PlayerItem SetupActive<T>(string itemName, string spritePath, string shortDescription, string longDescription)
+            where T : PlayerItem
+        {
+            return SetupItem<PlayerItem, T>(itemName, spritePath, "", shortDescription, longDescription);
+        }
+
+        /// <summary>
+        /// Perform basic initialization for a new gun definition.
+        /// </summary>
+        public static Gun SetupGun(string gunName, string spritePath, string projectileName, string shortDescription, string longDescription)
+        {
+            return SetupItem<Gun, Gun>(gunName, spritePath, projectileName, shortDescription, longDescription);
         }
 
         /// <summary>
@@ -107,62 +171,6 @@ namespace CwaffingTheGungy
                 UINotificationController.NotificationColor.PURPLE,
                 false,
                 false);
-        }
-
-        /// <summary>
-        /// Perform basic initialization for a new passive or active item definition.
-        /// </summary>
-        public static TItemClass SetupItem<TItemClass, TItemSpecific>(string itemName, string spritePath, string shortDescription, string longDescription)
-            where TItemClass : PickupObject   // must be PickupObject for passive items or PlayerItem for active items
-            where TItemSpecific : TItemClass  // must be a subclass of TItemClass
-        {
-            GameObject obj = new GameObject(itemName);
-            TItemClass item = obj.AddComponent<TItemSpecific>();
-            ItemBuilder.AddSpriteToObject(itemName, spritePath, obj);
-
-            item.encounterTrackable = null;
-
-            ETGMod.Databases.Items.SetupItem(item, item.name);
-            SpriteBuilder.AddToAmmonomicon(item.sprite.GetCurrentSpriteDef());
-            item.encounterTrackable.journalData.AmmonomiconSprite = item.sprite.GetCurrentSpriteDef().name;
-
-            item.SetName(item.name);
-            item.SetShortDescription(shortDescription);
-            item.SetLongDescription(longDescription);
-
-            if (item is PlayerItem activeItem)
-                activeItem.consumable = false;
-
-            string newItemName  = itemName.Replace("'", "").Replace("-", "");  //get sane item for item rename
-            string baseItemName = newItemName.Replace(" ", "_").ToLower();  //get saner item name for commands
-            Gungeon.Game.Items.Add(C.MOD_PREFIX + ":" + baseItemName, item);
-            ETGMod.Databases.Items.Add(item);
-            if (item is PlayerItem)
-                IDs.Actives[baseItemName] = item.PickupObjectId; //register item in active ID database
-            else
-                IDs.Passives[baseItemName] = item.PickupObjectId; //register item in passive ID database
-            IDs.Pickups[baseItemName] = item.PickupObjectId; //register item in pickup ID database
-
-            ETGModConsole.Log("Lazy Initialized Passive: "+baseItemName);
-            return item;
-        }
-
-        /// <summary>
-        /// Perform basic initialization for a new passive item definition.
-        /// </summary>
-        public static PickupObject SetupPassive<T>(string itemName, string spritePath, string shortDescription, string longDescription)
-            where T : PickupObject
-        {
-            return SetupItem<PickupObject, T>(itemName, spritePath, shortDescription, longDescription);
-        }
-
-        /// <summary>
-        /// Perform basic initialization for a new active item definition.
-        /// </summary>
-        public static PlayerItem SetupActive<T>(string itemName, string spritePath, string shortDescription, string longDescription)
-            where T : PlayerItem
-        {
-            return SetupItem<PlayerItem, T>(itemName, spritePath, shortDescription, longDescription);
         }
 
         /// <summary>
