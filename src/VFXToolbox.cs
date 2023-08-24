@@ -135,7 +135,7 @@ namespace CwaffingTheGungy
         /// <summary>
         /// Generically register a VFX as a GameObject (animated sprite), VFXComplex, or VFXPool
         /// </summary>
-        public static void RegisterVFX<T>(string name, List<string> spritePaths, int fps, bool loops = true, tk2dBaseSprite.Anchor anchor = tk2dBaseSprite.Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null)
+        public static void RegisterVFX<T>(string name, List<string> spritePaths, int fps, bool loops = true, float scale = 1.0f, tk2dBaseSprite.Anchor anchor = tk2dBaseSprite.Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null)
         {
             // GameObject Obj     = new GameObject(name);
             GameObject Obj     = SpriteBuilder.SpriteFromResource(spritePaths[0], new GameObject(name));
@@ -143,9 +143,7 @@ namespace CwaffingTheGungy
             VFXObject vfObj    = new VFXObject();
             VFXPool pool       = new VFXPool();
             pool.type          = VFXPoolType.All;
-            Obj.SetActive(false);
-            FakePrefab.MarkAsFakePrefab(Obj);
-            UnityEngine.Object.DontDestroyOnLoad(Obj);
+            Obj.RegisterPrefab();
 
             tk2dBaseSprite baseSprite = Obj.GetComponent<tk2dBaseSprite>();
             tk2dSpriteDefinition baseDef = baseSprite.GetCurrentSpriteDef();
@@ -232,6 +230,9 @@ namespace CwaffingTheGungy
             vfObj.alignment            = alignment;
             vfObj.destructible         = false;
 
+            if (scale != 1.0f)
+                Obj.transform.localScale = new Vector3(scale, scale, scale);
+
             vfObj.effect               = Obj;
             complex.effects            = new VFXObject[] { vfObj };
             pool.effects               = new VFXComplex[] { complex };
@@ -244,6 +245,30 @@ namespace CwaffingTheGungy
             vfxcomplex[name] = complex;
             animations[name] = Obj;
         }
+
+        /// <summary>
+        /// Register and return a VFXPool
+        /// </summary>
+        public static VFXPool RegisterVFXPool(string name, List<string> spritePaths, int fps, bool loops = true, float scale = 1.0f, tk2dBaseSprite.Anchor anchor = tk2dBaseSprite.Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null)
+        {
+            RegisterVFX<VFXPool>(
+                name           : name,
+                spritePaths    : spritePaths,
+                fps            : fps,
+                loops          : loops,
+                scale          : scale,
+                anchor         : anchor,
+                dimensions     : dimensions,
+                usesZHeight    : usesZHeight,
+                zHeightOffset  : zHeightOffset,
+                persist        : persist,
+                alignment      : alignment,
+                emissivePower  : emissivePower,
+                emissiveColour : emissiveColour
+                );
+            return vfxpool[name];
+        }
+
 
         public static void ShowOverheadVFX(this GameActor gunOwner, string name, float timeout)
         {

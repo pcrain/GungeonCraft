@@ -47,7 +47,20 @@ namespace CwaffingTheGungy
                 gun.InfiniteAmmo                      = true;
                 gun.SetBaseMaxAmmo(99999);
                 gun.SetAnimationFPS(gun.shootAnimation, 24);
-                gun.SetFireAudio("Play_WPN_Vorpal_Shot_Critical_01");
+                // gun.SetFireAudio("Play_WPN_Vorpal_Shot_Critical_01");
+                gun.SetFireAudio("ki_blast_sound");
+
+                VFXPool impactFVX = VFX.RegisterVFXPool(ItemName+" Impact", new List<string> {
+                    "CwaffingTheGungy/ResourcesExternal/ProjectileCollection/ki_blast_red_001",
+                    "CwaffingTheGungy/ResourcesExternal/ProjectileCollection/ki_blast_red_002",
+                    "CwaffingTheGungy/ResourcesExternal/ProjectileCollection/ki_blast_red_003",
+                    "CwaffingTheGungy/ResourcesExternal/ProjectileCollection/ki_blast_red_004",
+                }, 12, false, scale: 0.2f);
+
+                gun.SetHorizontalImpactVFX(impactFVX);
+                gun.SetVerticalImpactVFX(impactFVX);
+                gun.SetEnemyImpactVFX(impactFVX);
+                gun.SetAirImpactVFX(impactFVX);
 
             var comp = gun.gameObject.AddComponent<KiBlast>();
                 comp.preventNormalReloadAudio = true;
@@ -75,6 +88,7 @@ namespace CwaffingTheGungy
                 blast.AddAnimation(KiSpriteRed);
                 blast.SetAnimation(KiSprite);
                 blast.baseData.damage = 4f;
+                blast.baseData.range = 1f; // TEMPORARY
                 blast.ignoreDamageCaps = true;
                 blast.gameObject.AddComponent<KiBlastBehavior>();
 

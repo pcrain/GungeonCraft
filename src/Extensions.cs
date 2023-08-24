@@ -212,5 +212,57 @@ namespace CwaffingTheGungy
       gun.GetComponent<tk2dSpriteAnimator>().GetClipByName(animationName).wrapMode = tk2dSpriteAnimationClip.WrapMode.LoopSection;
       gun.GetComponent<tk2dSpriteAnimator>().GetClipByName(animationName).loopStart = loopStart;
     }
+
+    // Set a projectile's horizontal impact VFX
+    public static void SetHorizontalImpactVFX(this Projectile p, VFXPool vfx)
+    {
+      p.hitEffects.tileMapHorizontal = vfx;  // necessary
+      p.hitEffects.deathTileMapHorizontal = vfx; // optional
+    }
+
+    // Set a gun's horizontal impact VFX
+    public static void SetHorizontalImpactVFX(this Gun gun, VFXPool vfx)
+    {
+      gun.DefaultModule.projectiles[0].SetHorizontalImpactVFX(vfx);
+    }
+
+    // Set a projectile's vertical impact VFX
+    public static void SetVerticalImpactVFX(this Projectile p, VFXPool vfx)
+    {
+      p.hitEffects.tileMapVertical = vfx;  // necessary
+      p.hitEffects.deathTileMapVertical = vfx; // optional
+    }
+
+    // Set a gun's vertical impact VFX
+    public static void SetVerticalImpactVFX(this Gun gun, VFXPool vfx)
+    {
+      gun.DefaultModule.projectiles[0].SetVerticalImpactVFX(vfx);
+    }
+
+    // Set a projectile's enemy impact VFX
+    public static void SetEnemyImpactVFX(this Projectile p, VFXPool vfx)
+    {
+      p.hitEffects.enemy = vfx;  // necessary
+      p.hitEffects.deathEnemy = vfx; // optional
+    }
+
+    // Set a gun's enemy impact VFX
+    public static void SetEnemyImpactVFX(this Gun gun, VFXPool vfx)
+    {
+      gun.DefaultModule.projectiles[0].SetEnemyImpactVFX(vfx);
+    }
+
+    // Set a projectile's midair impact / death VFX
+    public static void SetAirImpactVFX(this Projectile p, VFXPool vfx)
+    {
+      p.hitEffects.suppressMidairDeathVfx = false;
+      p.hitEffects.overrideMidairDeathVFX = vfx.effects[0].effects[0].effect;
+    }
+
+    // Set a gun's midair impact / death VFX
+    public static void SetAirImpactVFX(this Gun gun, VFXPool vfx)
+    {
+      gun.DefaultModule.projectiles[0].SetAirImpactVFX(vfx);
+    }
   }
 }

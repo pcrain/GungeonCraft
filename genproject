@@ -91,6 +91,12 @@ while read -r line; do
   includes+=("<EmbeddedResource Include=\"${line}\" />")
 done <<< $(find "Resources" -type f -not -path "*.wav" -not -path "*.csv" | sed -r 's@/@\\@g')
 
+#External Embedded resources (technically duplicates external resources internally; should deprecate later)
+echo -e "[${GRN}>${BLN}] Scanning for external resources"
+while read -r line; do
+  includes+=("<EmbeddedResource Include=\"${line}\" />")
+done <<< $(find "ResourcesExternal" -type f -not -path "*.wav" -not -path "*.csv" | sed -r 's@/@\\@g')
+
 #Unversioned EtG Unity Packages (skipping version numbers because there's no way to tell just by looking and it was causing problems)
 echo -e "[${GRN}>${BLN}] Scanning for EtG DLLs"
 while read -r line; do
