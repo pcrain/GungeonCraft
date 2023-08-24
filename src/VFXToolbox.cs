@@ -63,63 +63,25 @@ namespace CwaffingTheGungy
             RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/reticle-orange");
             RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/reticle-blue");
 
-            RegisterVFX<GameObject>("PumpChargeAnimated", new List<string>() {
-                    "CwaffingTheGungy/Resources/MiscVFX/PumpChargeMeter1",
-                    "CwaffingTheGungy/Resources/MiscVFX/PumpChargeMeter2",
-                    "CwaffingTheGungy/Resources/MiscVFX/PumpChargeMeter3",
-                    "CwaffingTheGungy/Resources/MiscVFX/PumpChargeMeter4",
-                }, 4, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter);
+            RegisterVFX<GameObject>("PumpChargeAnimated", ResMap.Get("PumpChargeMeter"), 4, loops: true,
+                anchor: tk2dBaseSprite.Anchor.LowerCenter);
 
-            RegisterVFX<GameObject>("FriendlyOverhead", new List<string>() {
-                    "CwaffingTheGungy/Resources/MiscVFX/friendlyoverhead_vfx_001",
-                    "CwaffingTheGungy/Resources/MiscVFX/friendlyoverhead_vfx_002",
-                    "CwaffingTheGungy/Resources/MiscVFX/friendlyoverhead_vfx_003",
-                    "CwaffingTheGungy/Resources/MiscVFX/friendlyoverhead_vfx_004",
-                    "CwaffingTheGungy/Resources/MiscVFX/friendlyoverhead_vfx_005",
-                }, 10, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter);
+            RegisterVFX<GameObject>("FriendlyOverhead", ResMap.Get("friendlyoverhead_vfx"), 10, loops: true,
+                anchor: tk2dBaseSprite.Anchor.LowerCenter);
 
-            RegisterVFX<GameObject>("PlagueOverhead", new List<string>() {
-                    "CwaffingTheGungy/Resources/StatusEffectVFX/plaguevfxframe_001",
-                    "CwaffingTheGungy/Resources/StatusEffectVFX/plaguevfxframe_002",
-                    "CwaffingTheGungy/Resources/StatusEffectVFX/plaguevfxframe_003",
-                    "CwaffingTheGungy/Resources/StatusEffectVFX/plaguevfxframe_004",
-                    "CwaffingTheGungy/Resources/StatusEffectVFX/plaguevfxframe_005",
-                }, 4, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter);
+            RegisterVFX<GameObject>("PlagueOverhead", ResMap.Get("plaguevfxframe"), 4, loops: true,
+                anchor: tk2dBaseSprite.Anchor.LowerCenter);
 
             RegisterVFX<GameObject>("Shine", new List<string>() {
                     "CwaffingTheGungy/Resources/MiscVFX/shine2",
                 }, 1, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 100);
 
-            RegisterVFX<GameObject>("Splode", new List<string>() {
-                    "CwaffingTheGungy/Resources/MiscVFX/Explosions/splode1",
-                    "CwaffingTheGungy/Resources/MiscVFX/Explosions/splode2",
-                    "CwaffingTheGungy/Resources/MiscVFX/Explosions/splode3",
-                    "CwaffingTheGungy/Resources/MiscVFX/Explosions/splode4",
-                    "CwaffingTheGungy/Resources/MiscVFX/Explosions/splode5",
-                    "CwaffingTheGungy/Resources/MiscVFX/Explosions/splode6",
-                }, 18, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 300, emissiveColour: Color.cyan);
+            RegisterVFX<GameObject>("Splode", ResMap.Get("splode"), 18, loops: true,
+                    anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 300, emissiveColour: Color.cyan);
 
-            RegisterVFX<VFXPool>("Rebar", new List<string>() {
-                    "CwaffingTheGungy/Resources/MiscVFX/GunVFX/RebarGunImpactVFX2_001",
-                    "CwaffingTheGungy/Resources/MiscVFX/GunVFX/RebarGunImpactVFX2_002",
-                    "CwaffingTheGungy/Resources/MiscVFX/GunVFX/RebarGunImpactVFX2_003",
-                    "CwaffingTheGungy/Resources/MiscVFX/GunVFX/RebarGunImpactVFX2_004",
-                    "CwaffingTheGungy/Resources/MiscVFX/GunVFX/RebarGunImpactVFX2_005",
-                    "CwaffingTheGungy/Resources/MiscVFX/GunVFX/RebarGunImpactVFX2_006",
-                }, 6, loops: false);
+            RegisterVFX<VFXPool>("Rebar", ResMap.Get("RebarGunImpactVFX2"), 6, loops: false);
 
-            RegisterVFX<GameObject>("Tornado", new List<string>() {
-                    "CwaffingTheGungy/Resources/MiscVFX/Tornado/tornado1",
-                    "CwaffingTheGungy/Resources/MiscVFX/Tornado/tornado2",
-                    "CwaffingTheGungy/Resources/MiscVFX/Tornado/tornado3",
-                    "CwaffingTheGungy/Resources/MiscVFX/Tornado/tornado4",
-                    "CwaffingTheGungy/Resources/MiscVFX/Tornado/tornado5",
-                    "CwaffingTheGungy/Resources/MiscVFX/Tornado/tornado6",
-                    "CwaffingTheGungy/Resources/MiscVFX/Tornado/tornado7",
-                    "CwaffingTheGungy/Resources/MiscVFX/Tornado/tornado8",
-                    "CwaffingTheGungy/Resources/MiscVFX/Tornado/tornado9",
-                    "CwaffingTheGungy/Resources/MiscVFX/Tornado/tornado10",
-                }, 20, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter);
+            RegisterVFX<GameObject>("Tornado", ResMap.Get("tornado"), 20, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter);
 
             laserSightPrefab = LoadHelper.LoadAssetFromAnywhere("assets/resourcesbundle/global vfx/vfx_lasersight.prefab") as GameObject;
         }
