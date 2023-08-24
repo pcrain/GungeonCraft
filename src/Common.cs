@@ -7,6 +7,7 @@ using System.Reflection;
 using System.ComponentModel;  //debug
 using System.IO;
 using System.Runtime.InteropServices; // audio loading
+using System.Text.RegularExpressions;
 
 using UnityEngine;
 using MonoMod.RuntimeDetour;
@@ -32,6 +33,74 @@ namespace CwaffingTheGungy
         public static Dictionary<string, int>    Actives       { get; set; } = new Dictionary<string, int>();
         public static Dictionary<string, int>    Passives      { get; set; } = new Dictionary<string, int>();
         public static Dictionary<string, string> InternalNames { get; set; } = new Dictionary<string, string>();
+    }
+
+    public static class ResMap
+    {
+        private static Regex _NumberAtEnd = new Regex(@"^(.*?)(_?)([0-9]+)$",
+          RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static Dictionary<string, List<string>> _ResMap = new ();
+
+        public static List<string> Get(string resource)
+        {
+            return _ResMap[resource];
+        }
+
+        public static void Build()
+        {
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            Dictionary<string, string[]> tempMap = new ();
+            // Get the name of each PNG resource and stuff it into a sorted array by its index number
+            foreach(string s in ResourceExtractor.GetResourceNames())
+            {
+                if (!s.EndsWithInvariant(".png"))
+                    continue;
+                string path = s.Replace('.','/').Substring(0, s.Length - 4);
+                string[] tokens = path.Split('/');
+                string baseName = tokens[tokens.Length - 1];
+                MatchCollection matches = _NumberAtEnd.Matches(baseName);
+                // If we aren't numbered at the end, we're just a singular sprite
+                if (matches.Count == 0)
+                {
+                    if (!tempMap.ContainsKey(baseName))
+                        tempMap[baseName] = new string[1];
+                    tempMap[baseName][0] = path;
+                    continue;
+                }
+                foreach (Match match in matches)
+                {
+                    string name = match.Groups[1].Value;
+                    if (name.Length == 0)
+                        continue; // don't allow 0-length keys
+                    int index = Int32.Parse(match.Groups[3].Value);
+                    if (index == 0)
+                        continue; // don't allow 0 for an index
+                    if (!tempMap.ContainsKey(name))
+                        tempMap[name] = new string[index];
+                    if (index > tempMap[name].Length)
+                    {
+                        string[] arr = tempMap[name];
+                        Array.Resize(ref arr, index);
+                        tempMap[name] = arr;
+                    }
+                    tempMap[name][index - 1] = path;
+                }
+            }
+
+            // Convert our arrays to lists
+            foreach(KeyValuePair<string, string[]> entry in tempMap)
+                _ResMap[entry.Key] = new List<string>(entry.Value);
+
+            // Debug sanity check
+            // foreach(KeyValuePair<string, List<string>> entry in _ResMap)
+            // {
+            //     ETGModConsole.Log($"{entry.Key} ->");
+            //     foreach (string s in entry.Value)
+            //         ETGModConsole.Log($"  {s}");
+            // }
+            watch.Stop();
+            ETGModConsole.Log($"Built resource map in {watch.ElapsedMilliseconds} milliseconds");
+        }
     }
 
     public static class Lazy // all-purpose helper methods for being a lazy dumdum

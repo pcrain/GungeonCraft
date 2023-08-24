@@ -46,7 +46,11 @@ namespace CwaffingTheGungy
 
                 instance = this;
 
+                // Setup sprites from Gungeon mod folder
                 ETGMod.Assets.SetupSpritesFromFolder(System.IO.Path.Combine(this.FolderPath(), "sprites"));
+
+                // Build resource map for ease of access
+                ResMap.Build();
 
                 //Tools and Toolboxes
                 StaticReferences.Init();
