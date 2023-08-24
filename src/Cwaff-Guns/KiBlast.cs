@@ -50,12 +50,8 @@ namespace CwaffingTheGungy
                 // gun.SetFireAudio("Play_WPN_Vorpal_Shot_Critical_01");
                 gun.SetFireAudio("ki_blast_sound");
 
-                VFXPool impactFVX = VFX.RegisterVFXPool(ItemName+" Impact", new List<string> {
-                    "CwaffingTheGungy/ResourcesExternal/ProjectileCollection/ki_blast_red_001",
-                    "CwaffingTheGungy/ResourcesExternal/ProjectileCollection/ki_blast_red_002",
-                    "CwaffingTheGungy/ResourcesExternal/ProjectileCollection/ki_blast_red_003",
-                    "CwaffingTheGungy/ResourcesExternal/ProjectileCollection/ki_blast_red_004",
-                }, 12, false, scale: 0.2f);
+                VFXPool impactFVX = VFX.RegisterVFXPool(
+                    ItemName+" Impact", ResMap.Get("ki_blast_red"), 12, false, scale: 0.2f);
 
                 gun.SetHorizontalImpactVFX(impactFVX);
                 gun.SetVerticalImpactVFX(impactFVX);
@@ -145,7 +141,7 @@ namespace CwaffingTheGungy
         private static float _DefaultSecsToReachTarget = 0.5f;
         private static float _MaxAngleVariance  = 60f;
         private static float _MinSpeed = 15.0f;
-        private static float _MinReflectableLifetime = 0.4f;
+        private static float _MinReflectableLifetime = 0.1f;
         private static SlashData _BasicSlashData = null;
 
         private Projectile _projectile;

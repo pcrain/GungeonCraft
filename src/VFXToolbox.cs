@@ -231,7 +231,7 @@ namespace CwaffingTheGungy
             vfObj.destructible         = false;
 
             if (scale != 1.0f)
-                Obj.transform.localScale = new Vector3(scale, scale, scale);
+                sprite.scale = new Vector3(scale, scale, scale);
 
             vfObj.effect               = Obj;
             complex.effects            = new VFXObject[] { vfObj };

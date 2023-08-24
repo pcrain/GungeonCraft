@@ -35,17 +35,20 @@ namespace CwaffingTheGungy
         public static Dictionary<string, string> InternalNames { get; set; } = new Dictionary<string, string>();
     }
 
-    public static class ResMap
+    public static class ResMap // Resource map from PNG stem names to lists of paths to all PNGs with those names (i.e., animation frames)
     {
         private static Regex _NumberAtEnd = new Regex(@"^(.*?)(_?)([0-9]+)$",
           RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private static Dictionary<string, List<string>> _ResMap = new ();
 
+        // Gets a list of resources with numbered sprites from the resource's base name
+        // Does not work with CreateProjectileAnimation(), which expects direct sprite names in the mod's "sprites" directory
         public static List<string> Get(string resource)
         {
             return _ResMap[resource];
         }
 
+        // Builds a resource map from every PNG embedded in the assembly
         public static void Build()
         {
             var watch = System.Diagnostics.Stopwatch.StartNew();
