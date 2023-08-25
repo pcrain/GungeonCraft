@@ -79,6 +79,74 @@ namespace CwaffingTheGungy
         private Projectile m_projectile;
     }
 
+    public class ArcTowardsTargetBehavior : MonoBehaviour
+    {
+        // Computed
+        private Projectile _projectile         = null;
+        private PlayerController _owner        = null;
+        private float _lifetime                = 0;
+        private Vector2 _targetPos             = Vector2.zero;
+        private float _targetAngle             = 0;
+        private float _actualTimeToReachTarget = 0;
+
+        // Manualy Set
+        private float _arcAngle                = 0;
+        private float _maxSecsToReachTarget    = 3.0f;
+        private float _minSpeed                = 5.0f;
+
+        private void Start()
+        {
+            this._projectile = base.GetComponent<Projectile>();
+            if (this._projectile.Owner is not PlayerController pc)
+                return;
+            this._owner = pc;
+
+            this._targetAngle  = this._owner.CurrentGun.CurrentAngle;
+            this._targetPos    = Raycast.ToNearestWallOrEnemyOrObject(
+                this._owner.sprite.WorldCenter,
+                this._targetAngle);
+
+            SetNewTarget(this._targetPos);
+        }
+
+        public void Setup(float? arcAngle = null, float? maxSecsToReachTarget = null, float? minSpeed = null)
+        {
+            if (arcAngle.HasValue)
+                this._arcAngle = arcAngle.Value;
+            if (maxSecsToReachTarget.HasValue)
+                this._maxSecsToReachTarget = maxSecsToReachTarget.Value;
+            if (minSpeed.HasValue)
+                this._minSpeed = minSpeed.Value;
+        }
+
+        public void SetNewTarget(Vector2 target)
+        {
+            this._lifetime = 0;
+            this._targetPos = target;
+            Vector2 curpos = this._projectile.specRigidbody.Position.GetPixelVector2();
+            Vector2 delta  = (this._targetPos-curpos);
+            this._targetAngle = delta.ToAngle();
+            float distanceToTarget = Vector2.Distance(curpos,this._targetPos);
+            this._projectile.baseData.speed = Mathf.Max(distanceToTarget / _maxSecsToReachTarget, _minSpeed);
+            this._actualTimeToReachTarget = distanceToTarget / this._projectile.baseData.speed;
+            this._projectile.UpdateSpeed();
+            this._projectile.SendInDirection(BraveMathCollege.DegreesToVector(this._targetAngle-this._arcAngle), true);
+        }
+
+        private void Update()
+        {
+            float deltatime = BraveTime.DeltaTime;
+            this._lifetime += deltatime;
+            float percentDoneTurning = this._lifetime / this._actualTimeToReachTarget;
+            if (percentDoneTurning > 1.0f)
+                return;
+
+            float inflection = (2.0f*percentDoneTurning) - 1.0f;
+            float newAngle = this._targetAngle + inflection * this._arcAngle;
+            this._projectile.SendInDirection(BraveMathCollege.DegreesToVector(newAngle), true);
+        }
+    }
+
     public class ProjectileSlashingBehaviour : MonoBehaviour  // stolen from NN
     {
         public ProjectileSlashingBehaviour()

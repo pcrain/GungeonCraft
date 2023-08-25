@@ -94,6 +94,9 @@ namespace CwaffingTheGungy
             foreach(KeyValuePair<string, string[]> entry in tempMap)
                 _ResMap[entry.Key] = new List<string>(entry.Value);
 
+            // Hint to the GC we want to unload the tempMap
+            tempMap = null;
+
             // Debug sanity check
             // foreach(KeyValuePair<string, List<string>> entry in _ResMap)
             // {

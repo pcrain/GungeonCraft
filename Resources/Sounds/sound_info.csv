@@ -1,7 +1,8 @@
 name,volume,loops,channel
 gaster_blaster_sound_effect,1.0,1,sound
-ki_blast_return_sound,1.0,1,sound
-ki_blast_sound,1.0,1,sound
+ki_blast_return_sound,-6.0,1,sound
+ki_blast_sound,-6.0,1,sound
+ki_blast_explode_sound,-6.0,1,sound
 reflector,1.0,1,sound
 undertale_arrow,1.0,1,sound
 undertale_damage,1.0,1,sound

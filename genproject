@@ -47,7 +47,10 @@ elif [ ! -e "${audiochecksums}" ]; then
 else
   #Checksum all files in the audio directory, then take a checksum of the checksum file
   #  and compare it to the existing checksum file
-  find "Resources" -type f -path "*.wav" -exec md5sum '{}' \; > "${audiochecksums}.new"
+  find "Resources" -type f \
+    -path "*.wav" -exec md5sum '{}' \; -o \
+    -path "*.csv" -exec md5sum '{}' \; >> "${audiochecksums}.new"
+
   c1="$(md5sum "${audiochecksums}" | cut -f 1 -d ' ')"
   c2="$(md5sum "${audiochecksums}.new" | cut -f 1 -d ' ')"
   /bin/rm "${audiochecksums}.new"
@@ -68,7 +71,7 @@ if [ $updateaudio -eq 1 ]; then
   /bin/rm -f "${audiochecksums}"
   while read -r afile; do
     echo "$(md5sum "${afile}")" >> "${audiochecksums}"
-  done <<< $(find "Resources" -type f -path "*.wav")
+  done <<< $(find "Resources" -type f -path "*.wav" -o -path "*.csv")
 fi
 
 #Source files
@@ -125,9 +128,8 @@ echo -e "[${GRN}>${BLN}] Copying over updated external resources"
 while read -r line; do
   localrelpath="$(echo "${line}" | cut -f 2- -d '/')"
   externpath="${pluginspritesdir}/${localrelpath}"
-  externmodtime="$(stat -c '%y' "${externpath}")"
   localmodtime="$(stat -c '%y' "${line}")"
-  if [[ "$localmodtime" > "$externmodtime" ]]; then
+  if [[ ! -e "${externpath}" ]] || [[ "$localmodtime" > "$(stat -c '%y' "${externpath}")" ]]; then
     echo -e "[${GRN}>${BLN}]   Copying ${localrelpath}"
     /bin/cp "${line}" "${externpath}"
   fi
