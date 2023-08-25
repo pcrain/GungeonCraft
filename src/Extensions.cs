@@ -194,6 +194,7 @@ namespace CwaffingTheGungy
     public static void SetFireAudio(this Gun gun, string audioEventName)
     {
       gun.PreventNormalFireAudio = true;
+      // gun.OverrideNormalFireAudioEvent = audioEventName;
       gun.GetComponent<tk2dSpriteAnimator>().GetClipByName(gun.shootAnimation).frames[0].triggerEvent = true;
       gun.GetComponent<tk2dSpriteAnimator>().GetClipByName(gun.shootAnimation).frames[0].eventAudio = audioEventName;
     }

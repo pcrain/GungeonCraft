@@ -65,7 +65,7 @@ fi
 if [ $updateaudio -eq 1 ]; then
   rebuild=1
   echo -e "[${GRN}>${BLN}] Regenerating audio bank"
-  ./gen-gungeon-audio-bank.py -Or -s "./Resources/Sounds/sound_info.csv" "./Resources/Sounds" "${namespace}"
+  ./gen-gungeon-audio-bank.py -Ovr -s "./Resources/Sounds/sound_info.csv" "./Resources/Sounds" "${namespace}"
 
   echo -e "[${GRN}>${BLN}]   Regenerating checksums for audio files"
   /bin/rm -f "${audiochecksums}"

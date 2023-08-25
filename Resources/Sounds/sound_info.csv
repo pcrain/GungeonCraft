@@ -12,3 +12,5 @@ sans,1.0,0,music
 megalo,1.0,0,music
 electromegalo,1.0,0,music
 teledasher,1.0,1,sound
+paintball_shoot_sound,1.0,1,sound
+paintball_reload_sound,1.0,1,sound

@@ -102,7 +102,7 @@ namespace CwaffingTheGungy
 
                     RainCheck.Add();
                     Natasha.Add();
-                    PaintballGun.Add();
+                    PaintballCannon.Add();
                     DerailGun.Add();
                     PopcornGun.Add();
                     Tranquilizer.Add();
