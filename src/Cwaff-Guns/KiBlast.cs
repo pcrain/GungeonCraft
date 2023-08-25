@@ -140,6 +140,14 @@ namespace CwaffingTheGungy
             }
             closestBlast?.ReturnFromPlayer(player);
         }
+
+        protected override void Update()
+        {
+            base.Update();
+            if (!this.Player)
+                return;
+            this.Player.ToggleGunRenderers(!this.gun.isActiveAndEnabled, "ki blast is an invisible gun");
+        }
     }
 
     public class KiBlastBehavior : MonoBehaviour
