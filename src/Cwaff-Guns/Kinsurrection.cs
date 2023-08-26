@@ -67,7 +67,7 @@ namespace CwaffingTheGungy
         private float m_angle;
 
         private static AIActor bulletkin =
-            EnemyDatabase.GetOrLoadByGuid(EnemyGuidDatabase.Entries["bullet_kin"]);
+            EnemyDatabase.GetOrLoadByGuid(Enemies.BulletKin);
 
         private void Start()
         {

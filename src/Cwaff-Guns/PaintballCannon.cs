@@ -46,7 +46,6 @@ namespace CwaffingTheGungy
                 comp.SetReloadAudio("paintball_reload_sound");
 
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
-                ETGModConsole.Log($"old damage {projectile.baseData.damage}");
                 projectile.baseData.damage = 7f;
 
             PaintballColorizer paintballController = projectile.gameObject.AddComponent<PaintballColorizer>();

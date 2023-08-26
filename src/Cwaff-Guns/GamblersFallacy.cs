@@ -81,7 +81,7 @@ namespace CwaffingTheGungy
             else if (percent < 10)
             {
                 ETGModConsole.Log("1 in 10 O:");
-                var enemyToSpawn = EnemyDatabase.GetOrLoadByGuid(EnemyGuidDatabase.Entries["gunreaper"]);
+                var enemyToSpawn = EnemyDatabase.GetOrLoadByGuid(Enemies.Gunreaper);
                 Vector2 position = player.sprite.WorldCenter;
                 AIActor TargetActor = AIActor.Spawn(
                     enemyToSpawn, position, GameManager.Instance.Dungeon.data.GetAbsoluteRoomFromPosition(

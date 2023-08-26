@@ -98,9 +98,9 @@ namespace CwaffingTheGungy
     }
 
     // Add a named bullet from a named enemy to a bullet bank
-    public static void AddBulletFromEnemy(this AIBulletBank self, string enemyName, string bulletName)
+    public static void AddBulletFromEnemy(this AIBulletBank self, string enemyGuid, string bulletName)
     {
-      self.Bullets.Add(EnemyDatabase.GetOrLoadByGuid(EnemyGuidDatabase.Entries[enemyName]).bulletBank.GetBullet(bulletName));
+      self.Bullets.Add(EnemyDatabase.GetOrLoadByGuid(enemyGuid).bulletBank.GetBullet(bulletName));
     }
 
     // Register a game object as a prefab
