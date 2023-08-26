@@ -28,7 +28,7 @@ namespace CwaffingTheGungy
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             var comp = gun.gameObject.AddComponent<Telefragger>();
 
-            gun.gunSwitchGroup                    = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup;
+            gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
             gun.DefaultModule.ammoCost            = 1;
             gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.Automatic;
             gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
@@ -59,7 +59,7 @@ namespace CwaffingTheGungy
 
         private void Start()
         {
-            vfx ??= VFX.CreatePoolFromVFXGameObject((PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
+            vfx ??= VFX.CreatePoolFromVFXGameObject((ItemHelper.Get(Items.MagicLamp) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
 
             this.m_projectile = base.GetComponent<Projectile>();
             if (this.m_projectile?.Owner is PlayerController)

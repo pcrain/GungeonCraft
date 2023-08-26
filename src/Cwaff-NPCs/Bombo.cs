@@ -91,7 +91,7 @@ namespace CwaffingTheGungy
                 );
 
             // Set up sweat particles
-            sweat = FakePrefab.Clone(PickupObjectDatabase.GetById(449).GetComponent<TeleporterPrototypeItem>().TelefragVFXPrefab.gameObject).GetComponent<ParticleSystem>();
+            sweat = FakePrefab.Clone(ItemHelper.Get(Items.TeleporterPrototype).GetComponent<TeleporterPrototypeItem>().TelefragVFXPrefab.gameObject).GetComponent<ParticleSystem>();
             #pragma warning disable 0618 //disable deprecation warnings for a bit
                 sweat.startLifetime = 0.3f;
                 sweat.startColor = Color.cyan;
@@ -379,9 +379,9 @@ namespace CwaffingTheGungy
                 case OhNoMy.STOMACH:
                     chump.GetExtComp().OnPickedUpHP -= Bombo.AppetiteLoss;
                     chump.GetExtComp().OnPickedUpHP += Bombo.AppetiteLoss;
-                    LootEngine.SpawnItem(PickupObjectDatabase.GetById(73).gameObject, chump.CurrentRoom.GetRandomVisibleClearSpot(1, 1).ToVector3(), Vector2.zero, 1f, false, true, false);
-                    LootEngine.SpawnItem(PickupObjectDatabase.GetById(85).gameObject, chump.CurrentRoom.GetRandomVisibleClearSpot(1, 1).ToVector3(), Vector2.zero, 1f, false, true, false);
-                    LootEngine.SpawnItem(PickupObjectDatabase.GetById(120).gameObject, chump.CurrentRoom.GetRandomVisibleClearSpot(1, 1).ToVector3(), Vector2.zero, 1f, false, true, false);
+                    LootEngine.SpawnItem(ItemHelper.Get(Items.HalfHeart).gameObject, chump.CurrentRoom.GetRandomVisibleClearSpot(1, 1).ToVector3(), Vector2.zero, 1f, false, true, false);
+                    LootEngine.SpawnItem(ItemHelper.Get(Items.Heart).gameObject, chump.CurrentRoom.GetRandomVisibleClearSpot(1, 1).ToVector3(), Vector2.zero, 1f, false, true, false);
+                    LootEngine.SpawnItem(ItemHelper.Get(Items.Armor).gameObject, chump.CurrentRoom.GetRandomVisibleClearSpot(1, 1).ToVector3(), Vector2.zero, 1f, false, true, false);
                     // ETGModConsole.Log("lost your stomach");
                     break;
             }
@@ -450,8 +450,8 @@ namespace CwaffingTheGungy
         private IEnumerator SacrificeCutsceneScript(PlayerController p)
         {
             // Make some fancy particle effects
-            VFXPool v  = VFX.CreatePoolFromVFXGameObject((PickupObjectDatabase.GetById(45) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
-            VFXPool v2 = (PickupObjectDatabase.GetById(519) as Gun).DefaultModule.projectiles[0].hitEffects.tileMapVertical;
+            VFXPool v  = VFX.CreatePoolFromVFXGameObject((ItemHelper.Get(Items.SkullSpitter) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
+            VFXPool v2 = (ItemHelper.Get(Items.CombinedRifle) as Gun).DefaultModule.projectiles[0].hitEffects.tileMapVertical;
             GameManager.Instance.MainCameraController.DoScreenShake(new ScreenShakeSettings(0.35f,6f,2.0f,0f), null);
             for (int i = 0; i < 30; ++i)
             {

@@ -31,7 +31,7 @@ namespace CwaffingTheGungy
             comp.preventNormalFireAudio = true;
 
             gun.muzzleFlashEffects.type           = VFXPoolType.None;
-            gun.gunSwitchGroup                    = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup;
+            gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
             gun.DefaultModule.ammoCost            = 1;
             gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
             gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;

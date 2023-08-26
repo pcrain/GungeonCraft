@@ -34,7 +34,7 @@ namespace CwaffingTheGungy
             comp.preventNormalFireAudio = true;
             comp.preventNormalReloadAudio = true;
 
-            gun.gunSwitchGroup                    = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup;
+            gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
             gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.Automatic;
             gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
             gun.quality                           = PickupObject.ItemQuality.C;
@@ -96,9 +96,9 @@ namespace CwaffingTheGungy
             base.OnSwitchedToThisGun();
             ComputeLastResortStats();
 
-            Gun g = (PickupObjectDatabase.GetById(0) as Gun);
+            Gun g = (ItemHelper.Get(Items.MagicLamp) as Gun);
             // overrideMidairDeathVFX will make implicit use of CreatePoolFromVFXGameObject
-            VFXPool v = VFX.CreatePoolFromVFXGameObject((PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
+            VFXPool v = VFX.CreatePoolFromVFXGameObject((ItemHelper.Get(Items.MagicLamp) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
 
             Vector2 ppos = this.Player.sprite.WorldCenter;
             float pangle = this.Player.CurrentGun.gunAngle;

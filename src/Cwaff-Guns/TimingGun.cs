@@ -38,7 +38,7 @@ namespace CwaffingTheGungy
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             var comp = gun.gameObject.AddComponent<TimingGun>();
 
-            gun.gunSwitchGroup                    = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup;
+            gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
             gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.Automatic;
             gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
             gun.quality                           = PickupObject.ItemQuality.C;

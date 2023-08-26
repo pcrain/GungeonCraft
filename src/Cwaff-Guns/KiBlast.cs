@@ -36,7 +36,7 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.gunSwitchGroup                       = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup;
+                gun.gunSwitchGroup                       = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
                 gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
                 gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
                 gun.DefaultModule.cooldownTime           = 0.1f;
@@ -95,7 +95,7 @@ namespace CwaffingTheGungy
                 trail.BaseColor  = Color.cyan;
                 trail.EndColor   = Color.cyan;
 
-            _Vfx = VFX.CreatePoolFromVFXGameObject((PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
+            _Vfx = VFX.CreatePoolFromVFXGameObject((ItemHelper.Get(Items.MagicLamp) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
         }
 
         public override void OnSwitchedToThisGun()

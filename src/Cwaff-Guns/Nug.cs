@@ -36,7 +36,7 @@ namespace CwaffingTheGungy
             comp.preventNormalFireAudio = true;
 
             gun.muzzleFlashEffects.type           = VFXPoolType.None;
-            gun.gunSwitchGroup                    = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup;
+            gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
             gun.DefaultModule.ammoCost            = 0;
             gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
             gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
@@ -51,7 +51,7 @@ namespace CwaffingTheGungy
             projectile.baseData.speed   = 200.0f;
             Projectile projectile2 = Lazy.PrefabProjectileFromGun(gun, false);
             projectile2.baseData.speed   = 20.0f;
-            Projectile projectile3 = Lazy.PrefabProjectileFromGun(PickupObjectDatabase.GetById(38) as Gun, false);
+            Projectile projectile3 = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items.Magnum) as Gun, false);
             projectile3.baseData.speed = 0.0f;
 
             // Ordering is important here, we don't want the secondary projectile to have the NugBehavior

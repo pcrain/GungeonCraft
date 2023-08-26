@@ -90,7 +90,7 @@ namespace CwaffingTheGungy
 
             var railcomp = projectile.gameObject.AddComponent<ReplaceBulletWithRail>();
 
-            Projectile projectile2         = Lazy.PrefabProjectileFromGun(PickupObjectDatabase.GetById(86) as Gun, false);
+            Projectile projectile2         = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items.MarineSidearm) as Gun, false);
             projectile2.baseData.damage    = 0;
             projectile2.baseData.force     = 0;
             projectile2.baseData.range    *= 200;
@@ -123,7 +123,7 @@ namespace CwaffingTheGungy
             // beamComp2.ContinueBeamArtToWall = true;
             railBeam = projectile2;
 
-            Projectile train = Lazy.PrefabProjectileFromGun(PickupObjectDatabase.GetById(56) as Gun, false); //id 56 == 38 special
+            Projectile train = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items._38Special) as Gun, false); //id 56 == 38 special
             // train.SetProjectileSpriteRight("train_projectile_001", trainSpriteDiameter, trainSpriteDiameter, true, tk2dBaseSprite.Anchor.MiddleCenter, 20, 20);
             train.AnimateProjectile(
                 new List<string> {

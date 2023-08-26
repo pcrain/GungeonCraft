@@ -38,7 +38,7 @@ namespace CwaffingTheGungy
 
             var comp = item.gameObject.AddComponent<HLDRoll>();
 
-            lightningProjectile = Lazy.PrefabProjectileFromGun((PickupObjectDatabase.GetById(198) as Gun));
+            lightningProjectile = Lazy.PrefabProjectileFromGun((ItemHelper.Get(Items.GunslingersAshes) as Gun));
                 lightningProjectile.baseData.damage = 5f;
                 lightningProjectile.baseData.speed  = 0.001f;
         }

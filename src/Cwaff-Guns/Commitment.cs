@@ -39,7 +39,7 @@ namespace CwaffingTheGungy
             var comp = gun.gameObject.AddComponent<Commitment>();
             // comp.preventNormalFireAudio = true;
 
-            gun.gunSwitchGroup                    = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup;
+            gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
             gun.DefaultModule.ammoCost            = 1;
             gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.Automatic;
             gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;

@@ -151,7 +151,7 @@ namespace CwaffingTheGungy {
             Dungeon CatacombsDungeonPrefab = DungeonDatabase.GetOrLoadByName("Base_Catacombs");
             Dungeon NakatomiDungeonPrefab = DungeonDatabase.GetOrLoadByName("base_nakatomi");
 
-            SpaceFog = PickupObjectDatabase.GetById(597).gameObject.GetComponent<GunParticleSystemController>().TargetSystem.gameObject.GetComponent<ParticleSystemRenderer>().materials[0];
+            SpaceFog = ItemHelper.Get(Items.MrAccretionJr).gameObject.GetComponent<GunParticleSystemController>().TargetSystem.gameObject.GetComponent<ParticleSystemRenderer>().materials[0];
             
             RatTrapdoor = MinesDungeonPrefab.RatTrapdoor;
 

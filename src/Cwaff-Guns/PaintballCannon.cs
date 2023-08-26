@@ -26,8 +26,8 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                // gun.gunSwitchGroup                       = (PickupObjectDatabase.GetById(150) as Gun).gunSwitchGroup; // set audio from tshirt cannon
-                gun.gunSwitchGroup                       = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup; // silent reload
+                // gun.gunSwitchGroup                       = (ItemHelper.Get(Items.TShirtCannon) as Gun).gunSwitchGroup;
+                gun.gunSwitchGroup                       = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup; // silent reload
                 gun.DefaultModule.ammoCost               = 1;
                 gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
                 gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;

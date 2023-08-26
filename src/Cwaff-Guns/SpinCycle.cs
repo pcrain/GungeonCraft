@@ -40,7 +40,7 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.gunSwitchGroup                    = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup;
+                gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
                 gun.DefaultModule.ammoCost            = 1;
                 gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
                 gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
@@ -99,8 +99,8 @@ namespace CwaffingTheGungy
                 chainBeam.interpolateStretchedBones        = true;
                 chainBeam.ContinueBeamArtToWall            = true;
 
-            _Vfx = VFX.CreatePoolFromVFXGameObject((PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
-            _Vfx2 = (PickupObjectDatabase.GetById(33) as Gun).muzzleFlashEffects;
+            _Vfx = VFX.CreatePoolFromVFXGameObject((ItemHelper.Get(Items.MagicLamp) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
+            _Vfx2 = (ItemHelper.Get(Items.TearJerker) as Gun).muzzleFlashEffects;
         }
 
         private void SetupBallAndChain(PlayerController p)

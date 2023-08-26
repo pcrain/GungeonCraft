@@ -39,7 +39,7 @@ namespace CwaffingTheGungy
             gun.quality                              = PickupObject.ItemQuality.D;
             gun.gunClass                             = GunClass.SILLY;
             gun.DefaultModule.ammoType               = GameUIAmmoType.AmmoType.BEAM;
-            gun.gunSwitchGroup                       = (PickupObjectDatabase.GetById(417) as Gun).gunSwitchGroup;
+            gun.gunSwitchGroup                       = (ItemHelper.Get(Items.Blasphemy) as Gun).gunSwitchGroup;
             gun.InfiniteAmmo                         = true;
             gun.SetAnimationFPS(gun.shootAnimation, 12);
 

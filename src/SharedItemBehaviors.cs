@@ -740,9 +740,9 @@ namespace CwaffingTheGungy
     public class SlashData : ScriptableObject // stolen from NN
     {
         public bool doVFX = true;
-        public VFXPool VFX = (PickupObjectDatabase.GetById(417) as Gun).muzzleFlashEffects;
+        public VFXPool VFX = (ItemHelper.Get(Items.Blasphemy) as Gun).muzzleFlashEffects;
         public bool doHitVFX = true;
-        public VFXPool hitVFX = (PickupObjectDatabase.GetById(417) as Gun).DefaultModule.projectiles[0].hitEffects.enemy;
+        public VFXPool hitVFX = (ItemHelper.Get(Items.Blasphemy) as Gun).DefaultModule.projectiles[0].hitEffects.enemy;
         public SlashDoer.ProjInteractMode projInteractMode = SlashDoer.ProjInteractMode.IGNORE;
         public float playerKnockbackForce = 5;
         public float enemyKnockbackForce = 10;

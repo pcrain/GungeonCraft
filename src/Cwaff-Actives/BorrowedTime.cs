@@ -84,7 +84,7 @@ namespace CwaffingTheGungy
             if (borrowedEnemies.Count > 0)
             {
                 int enemiesToSpawn = borrowedEnemies.Count;
-                var tpvfx = (PickupObjectDatabase.GetById(573) as ChestTeleporterItem).TeleportVFX;
+                var tpvfx = (ItemHelper.Get(Items.ChestTeleporter) as ChestTeleporterItem).TeleportVFX;
                 for (int i = 0; i < enemiesToSpawn; i++)
                 {
                     var Enemy = EnemyDatabase.GetOrLoadByGuid(borrowedEnemies[i]);
@@ -144,7 +144,7 @@ namespace CwaffingTheGungy
             }
 
             // Capture enemies for later
-            VFXPool vfx = VFX.CreatePoolFromVFXGameObject((PickupObjectDatabase.GetById(0) as Gun
+            VFXPool vfx = VFX.CreatePoolFromVFXGameObject((ItemHelper.Get(Items.MagicLamp) as Gun
                 ).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
             AkSoundEngine.PostEvent("Play_OBJ_chestwarp_use_01", gameObject);
             for (int i = 0; i < activeEnemies.Count; i++)

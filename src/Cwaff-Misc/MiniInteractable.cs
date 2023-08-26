@@ -33,7 +33,7 @@ namespace CwaffingTheGungy
 
     private void InitializeInternal(tk2dBaseSprite sprite)
     {
-      this.effect = (PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.tileMapVertical;
+      this.effect = (ItemHelper.Get(Items.MagicLamp) as Gun).DefaultModule.projectiles[0].hitEffects.tileMapVertical;
 
       base.gameObject.AddComponent<tk2dSprite>();
       base.sprite.SetSprite(sprite.Collection, sprite.spriteId);

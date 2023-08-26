@@ -84,7 +84,7 @@ namespace CwaffingTheGungy
 
     private void InitializeInternal(PickupObject i)
     {
-      this.effect = (PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.tileMapVertical;
+      this.effect = (ItemHelper.Get(Items.MagicLamp) as Gun).DefaultModule.projectiles[0].hitEffects.tileMapVertical;
       sacType = (OhNoMy)UnityEngine.Random.Range(0, (int)OhNoMy._last);
       // sacType = OhNoMy.STOMACH;
       sacName = Bombo.sacNames[(int)sacType];

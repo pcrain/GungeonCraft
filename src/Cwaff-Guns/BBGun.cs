@@ -34,7 +34,7 @@ namespace CwaffingTheGungy
                 gun.quality                              = PickupObject.ItemQuality.B;
                 gun.reloadTime                           = 0.01f;
                 gun.CanGainAmmo                          = false;
-                gun.muzzleFlashEffects                   = (PickupObjectDatabase.GetById(37) as Gun).muzzleFlashEffects;
+                gun.muzzleFlashEffects                   = (ItemHelper.Get(Items.SeriousCannon) as Gun).muzzleFlashEffects;
                 gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.Charged;
                 gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Ordered;
                 gun.barrelOffset.transform.localPosition = new Vector3(1.93f, 0.87f, 0f);

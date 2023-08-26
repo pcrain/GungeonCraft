@@ -30,7 +30,7 @@ namespace CwaffingTheGungy
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             var comp = gun.gameObject.AddComponent<GamblersFallacy>();
 
-            gun.gunSwitchGroup                    = (PickupObjectDatabase.GetById(198) as Gun).gunSwitchGroup;
+            gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
             gun.DefaultModule.ammoCost            = 1;
             gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.Automatic;
             gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
@@ -65,7 +65,7 @@ namespace CwaffingTheGungy
                 ETGModConsole.Log("1 in 33 O:");
                 // deal damage
                 vfx ??= VFX.CreatePoolFromVFXGameObject(
-                    (PickupObjectDatabase.GetById(0) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
+                    (ItemHelper.Get(Items.MagicLamp) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
 
                 Vector2 position = player.sprite.WorldCenter;
                 for (int i = 0; i < 4; ++i)

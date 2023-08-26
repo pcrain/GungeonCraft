@@ -989,6 +989,13 @@ namespace CwaffingTheGungy
         WoodBeamDupe1                      = 823, //
     }
 
+    public static class ItemHelper {
+        public static PickupObject Get(Items i)
+        {
+            return PickupObjectDatabase.GetById((int)i);
+        }
+    }
+
     public class ExtendedColours // stolen from NN
     {
         //New Colours
@@ -1046,7 +1053,7 @@ namespace CwaffingTheGungy
         public static GameObject ChestTruth = LoadHelper.LoadAssetFromAnywhere<GameObject>("TruthChest");
         public static GameObject ChestRat = LoadHelper.LoadAssetFromAnywhere<GameObject>("Chest_Rat");
         public static GameObject Mirror = LoadHelper.LoadAssetFromAnywhere<GameObject>("Shrine_Mirror");
-        public static GameObject FoldingTable = PickupObjectDatabase.GetById(644).GetComponent<FoldingTableItem>().TableToSpawn.gameObject;
+        public static GameObject FoldingTable = ItemHelper.Get(Items.PortableTableDevice).GetComponent<FoldingTableItem>().TableToSpawn.gameObject;
         public static GameObject BabyDragunNPC = LoadHelper.LoadAssetFromAnywhere<GameObject>("BabyDragunJail");
     }
 
@@ -1059,9 +1066,9 @@ namespace CwaffingTheGungy
         public static GoopDefinition BlobulonGoopDef;
         public static GoopDefinition WebGoop;
         public static GoopDefinition WaterGoop;
-        public static GoopDefinition CharmGoopDef = PickupObjectDatabase.GetById(310)?.GetComponent<WingsItem>()?.RollGoop;
-        public static GoopDefinition GreenFireDef = (PickupObjectDatabase.GetById(698) as Gun).DefaultModule.projectiles[0].GetComponent<GoopModifier>().goopDefinition;
-        public static GoopDefinition CheeseDef    = (PickupObjectDatabase.GetById(808) as Gun).DefaultModule.projectiles[0].GetComponent<GoopModifier>().goopDefinition;
+        public static GoopDefinition CharmGoopDef = ItemHelper.Get(Items.FairyWings)?.GetComponent<WingsItem>()?.RollGoop;
+        public static GoopDefinition GreenFireDef = (ItemHelper.Get(Items.FlameHandMaximizeSpell) as Gun).DefaultModule.projectiles[0].GetComponent<GoopModifier>().goopDefinition;
+        public static GoopDefinition CheeseDef    = (ItemHelper.Get(Items.TheExoticUnknownSynergy1) as Gun).DefaultModule.projectiles[0].GetComponent<GoopModifier>().goopDefinition;
 
         public static List<GoopDefinition> ColorGoops = new List<GoopDefinition>();
         public static List<Color> ColorGoopColors     = new List<Color>

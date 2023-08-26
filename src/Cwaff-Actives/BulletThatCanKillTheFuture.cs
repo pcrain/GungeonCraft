@@ -286,7 +286,7 @@ namespace CwaffingTheGungy
                 CwaffToolbox.enemyWithoutAFuture = victim.EnemyGuid;
                 Lazy.CustomNotification("Future Erased",victim.GetActorName());
                 ETGModConsole.Log("future erased for "+victim.EnemyGuid);
-                VFXPool vfx = VFX.CreatePoolFromVFXGameObject((PickupObjectDatabase.GetById(0) as Gun
+                VFXPool vfx = VFX.CreatePoolFromVFXGameObject((ItemHelper.Get(Items.MagicLamp) as Gun
                     ).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
                     vfx.SpawnAtPosition(
                         victim.sprite.WorldCenter.ToVector3ZisY(-1f), /* -1 = above player sprite */

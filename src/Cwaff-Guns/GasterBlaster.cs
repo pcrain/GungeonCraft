@@ -95,7 +95,7 @@ namespace CwaffingTheGungy
             };
 
             //BULLET STATS
-            Projectile projectile2 = Lazy.PrefabProjectileFromGun(PickupObjectDatabase.GetById(86) as Gun, false);
+            Projectile projectile2 = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items.MarineSidearm) as Gun, false);
 
             BasicBeamController beamComp = projectile2.GenerateBeamPrefab(
                 "CwaffingTheGungy/Resources/BeamSprites/alphabeam_mid_001",
@@ -133,7 +133,7 @@ namespace CwaffingTheGungy
 
             gasterBlast = projectile2;
 
-            Projectile blaster = Lazy.PrefabProjectileFromGun(PickupObjectDatabase.GetById(56) as Gun, false);
+            Projectile blaster = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items._38Special) as Gun, false);
             blaster.baseData.damage         = 0f;
             blaster.baseData.force          = 0f;
             blaster.baseData.speed          = 0.0f;
