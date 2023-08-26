@@ -95,6 +95,7 @@ namespace CwaffingTheGungy
                     Gyroscope.Init();
                     CuratorsBadge.Init();
                     CreditCard.Init();
+                    LibraryCardtridge.Init();
                 #endregion
 
                 #region Guns
