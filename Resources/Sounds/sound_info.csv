@@ -14,3 +14,6 @@ electromegalo,1.0,0,music
 teledasher,1.0,1,sound
 paintball_shoot_sound,1.0,1,sound
 paintball_reload_sound,1.0,1,sound
+MC_Link_Grow,2.0,1,sound
+MC_Link_Lift,3.0,1,sound
+MC_Mushroom_Bounce,3.0,1,sound

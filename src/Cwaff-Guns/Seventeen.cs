@@ -25,9 +25,10 @@ namespace CwaffingTheGungy
 
         internal static tk2dSpriteAnimationClip _ProjSpriteInactive = null;
         internal static tk2dSpriteAnimationClip _ProjSpriteActive   = null;
+        internal static ExplosionData           _MiniExplosion      = null;
         private static float _Damage_After_Bounce                   = 40f;
 
-        internal const float _ACCELERATION = 1.5f;
+        internal const float _ACCELERATION = 1.6f;
 
         public static void Add()
         {
@@ -55,12 +56,12 @@ namespace CwaffingTheGungy
             _ProjSpriteInactive = AnimateBullet.CreateProjectileAnimation(
                 new List<string> {
                     "bouncelet_gray_001",
-                }, 10, true, new IntVector2(7, 7), // half the size of the sprite
+                }, 10, true, new IntVector2(10, 10), // reduced sprite size
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true, null, colliderSize);
             _ProjSpriteActive = AnimateBullet.CreateProjectileAnimation(
                 new List<string> {
                     "bouncelet_001",
-                }, 10, true, new IntVector2(7, 7), // half the size of the sprite
+                }, 10, true, new IntVector2(10, 10), // reduced sprite size
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true, null, colliderSize);
 
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
@@ -68,7 +69,31 @@ namespace CwaffingTheGungy
                 projectile.AddAnimation(_ProjSpriteInactive);
                 projectile.baseData.damage = _ACCELERATION;
                 projectile.baseData.speed  = _ACCELERATION;
+                projectile.baseData.range  = 9999f;
                 projectile.gameObject.AddComponent<HarmlessUntilBounce>();
+
+            // Initialize our explosion data
+            ExplosionData defaultExplosion = GameManager.Instance.Dungeon.sharedSettingsPrefab.DefaultSmallExplosionData;
+            _MiniExplosion = new ExplosionData()
+            {
+                forceUseThisRadius     = true,
+                pushRadius             = 0.5f,
+                damageRadius           = 0.5f,
+                damageToPlayer         = 0f,
+                doDamage               = true,
+                damage                 = 10,
+                doDestroyProjectiles   = false,
+                doForce                = true,
+                debrisForce            = 10f,
+                preventPlayerForce     = true,
+                explosionDelay         = 0.01f,
+                usesComprehensiveDelay = false,
+                doScreenShake          = false,
+                playDefaultSFX         = true,
+                effect                 = defaultExplosion.effect,
+                ignoreList             = defaultExplosion.ignoreList,
+                ss                     = defaultExplosion.ss,
+            };
         }
     }
 
@@ -113,6 +138,8 @@ namespace CwaffingTheGungy
             // skip non-tile collisions if we haven't bounced yet
             if (!otherRigidbody.PrimaryPixelCollider.IsTileCollider)
                 PhysicsEngine.SkipCollision = true;
+            else if (otherRigidbody.GetComponent<DungeonPlaceable>() != null)
+                PhysicsEngine.SkipCollision = true;
             else if (otherRigidbody.GetComponent<MinorBreakable>() != null)
                 PhysicsEngine.SkipCollision = true;
             else if (otherRigidbody.GetComponent<MajorBreakable>() != null)
@@ -125,6 +152,7 @@ namespace CwaffingTheGungy
             this._projectile = base.GetComponent<Projectile>();
             this._projectile.SetAnimation(Seventeen._ProjSpriteActive);
             this._projectile.StartCoroutine(DoElasticBounce());
+            AkSoundEngine.PostEvent("MC_Link_Lift_stop_all", this._projectile.gameObject);
             AkSoundEngine.PostEvent("MC_Link_Lift", this._projectile.gameObject);
         }
 
@@ -134,16 +162,17 @@ namespace CwaffingTheGungy
             Vector3 oldScale = this._projectile.spriteAnimator.transform.localScale;
 
             this._projectile.baseData.damage = oldSpeed;  // base damage should scale with speed
+            this._projectile.baseData.force = oldSpeed;  // force should scale with speed
             this._projectile.baseData.speed = 0.001f;
             this._projectile.UpdateSpeed();
             this._projectile.specRigidbody.Reinitialize();
 
-            for (int i = 10; i > 3; --i)
+            for (int i = 10; i > 2; --i)
             {
                 this._projectile.spriteAnimator.transform.localScale = oldScale.WithX(0.1f*i);
                 yield return null;
             }
-            for (int i = 3; i < 10; ++i)
+            for (int i = 2; i < 10; ++i)
             {
                 this._projectile.spriteAnimator.transform.localScale = oldScale.WithX(0.1f*i);
                 yield return null;
@@ -153,9 +182,10 @@ namespace CwaffingTheGungy
             this._projectile.baseData.speed = oldSpeed;
             this._projectile.UpdateSpeed();
             this._projectile.specRigidbody.Reinitialize();
+            this._projectile.OnDestruction += (Projectile p) => Exploder.Explode(
+                this._projectile.sprite.WorldCenter, Seventeen._MiniExplosion, p.Direction);
 
             this._bounceFinished = true;
-
         }
     }
 }
