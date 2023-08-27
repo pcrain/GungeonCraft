@@ -39,12 +39,12 @@ namespace CwaffingTheGungy
                 gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Ordered;
                 gun.barrelOffset.transform.localPosition = new Vector3(1.93f, 0.87f, 0f);
                 gun.SetBaseMaxAmmo(1);
-                gun.SetFireAudio("Play_WPN_seriouscannon_shot_01");
                 gun.SetAnimationFPS(gun.shootAnimation, 10);
                 gun.SetAnimationFPS(gun.chargeAnimation, 8);
                 gun.LoopAnimation(gun.chargeAnimation, 2);
 
             var comp = gun.gameObject.AddComponent<BBGun>();
+                comp.SetFireAudio("Play_WPN_seriouscannon_shot_01");
                 comp.SetReloadAudio("Play_ENM_flame_veil_01");
 
             ProjectileModule mod = gun.DefaultModule;

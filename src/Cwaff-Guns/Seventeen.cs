@@ -27,44 +27,47 @@ namespace CwaffingTheGungy
         internal static tk2dSpriteAnimationClip _ProjSpriteActive   = null;
         private static float _Damage_After_Bounce                   = 40f;
 
+        internal const float _ACCELERATION = 1.5f;
+
         public static void Add()
         {
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.gunSwitchGroup                       = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup; // silent reload
+                gun.gunSwitchGroup                       = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup; // silent default sounds
                 gun.DefaultModule.ammoCost               = 1;
                 gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
                 gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
-                gun.reloadTime                           = 0.9f;
+                gun.reloadTime                           = 0.72f;
                 gun.DefaultModule.cooldownTime           = 0.18f;
-                gun.DefaultModule.numberOfShotsInClip    = 12;
+                gun.DefaultModule.numberOfShotsInClip    = 4;
                 gun.gunClass                             = GunClass.PISTOL;
                 gun.quality                              = PickupObject.ItemQuality.C;
                 gun.barrelOffset.transform.localPosition = new Vector3(1.6875f, 0.5f, 0f); // should match "Casing" in JSON file
-                // gun.SetFireAudio("paintball_shoot_sound");
                 gun.SetBaseMaxAmmo(300);
                 gun.SetAnimationFPS(gun.shootAnimation, 14);
                 gun.SetAnimationFPS(gun.reloadAnimation, 4);
 
             var comp = gun.gameObject.AddComponent<Seventeen>();
+                comp.SetFireAudio("MC_Mushroom_Bounce");
+                comp.SetReloadAudio("MC_Link_Grow");
 
             IntVector2 colliderSize = new IntVector2(1,1); // 1-pixel collider for accurate bounce animation
 
             _ProjSpriteInactive = AnimateBullet.CreateProjectileAnimation(
                 new List<string> {
                     "bouncelet_gray_001",
-                }, 10, true, new IntVector2(14, 14),
+                }, 10, true, new IntVector2(7, 7), // half the size of the sprite
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true, null, colliderSize);
             _ProjSpriteActive = AnimateBullet.CreateProjectileAnimation(
                 new List<string> {
                     "bouncelet_001",
-                }, 10, true, new IntVector2(14, 14),
+                }, 10, true, new IntVector2(7, 7), // half the size of the sprite
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true, null, colliderSize);
 
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
                 projectile.AddAnimation(_ProjSpriteActive);
                 projectile.AddAnimation(_ProjSpriteInactive);
-                projectile.baseData.damage = _Damage_After_Bounce;
-                projectile.baseData.speed  = 44;
+                projectile.baseData.damage = _ACCELERATION;
+                projectile.baseData.speed  = _ACCELERATION;
                 projectile.gameObject.AddComponent<HarmlessUntilBounce>();
         }
     }
@@ -73,6 +76,7 @@ namespace CwaffingTheGungy
     {
         private Projectile _projectile;
         private PlayerController _owner;
+        private bool _bounceStarted = false;
         private bool _bounceFinished = false;
 
         private void Start()
@@ -93,17 +97,35 @@ namespace CwaffingTheGungy
             this._projectile.SetAnimation(Seventeen._ProjSpriteInactive); // TODO: this doesn't seem to work properly; default sprite is always first sprite added
         }
 
+        private void Update()
+        {
+            if (_bounceStarted)
+                return;
+            this._projectile.baseData.speed += Seventeen._ACCELERATION;
+            this._projectile.UpdateSpeed();
+        }
+
         private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
         {
-            if (otherRigidbody.GetComponent<AIActor>() is AIActor && (!this._bounceFinished))
-                PhysicsEngine.SkipCollision = true; // skip collision if we haven't bounced yet
+            if (this._bounceFinished)
+                return;
+
+            // skip non-tile collisions if we haven't bounced yet
+            if (!otherRigidbody.PrimaryPixelCollider.IsTileCollider)
+                PhysicsEngine.SkipCollision = true;
+            else if (otherRigidbody.GetComponent<MinorBreakable>() != null)
+                PhysicsEngine.SkipCollision = true;
+            else if (otherRigidbody.GetComponent<MajorBreakable>() != null)
+                PhysicsEngine.SkipCollision = true;
         }
 
         private void OnBounce()
         {
+            this._bounceStarted = true;
             this._projectile = base.GetComponent<Projectile>();
             this._projectile.SetAnimation(Seventeen._ProjSpriteActive);
             this._projectile.StartCoroutine(DoElasticBounce());
+            AkSoundEngine.PostEvent("MC_Link_Lift", this._projectile.gameObject);
         }
 
         private IEnumerator DoElasticBounce()
@@ -111,18 +133,19 @@ namespace CwaffingTheGungy
             float oldSpeed = this._projectile.baseData.speed;
             Vector3 oldScale = this._projectile.spriteAnimator.transform.localScale;
 
+            this._projectile.baseData.damage = oldSpeed;  // base damage should scale with speed
             this._projectile.baseData.speed = 0.001f;
             this._projectile.UpdateSpeed();
             this._projectile.specRigidbody.Reinitialize();
 
             for (int i = 10; i > 3; --i)
             {
-                this._projectile.spriteAnimator.transform.localScale = oldScale.WithX(((float)i)/10f);
+                this._projectile.spriteAnimator.transform.localScale = oldScale.WithX(0.1f*i);
                 yield return null;
             }
             for (int i = 3; i < 10; ++i)
             {
-                this._projectile.spriteAnimator.transform.localScale = oldScale.WithX(((float)i)/10f);
+                this._projectile.spriteAnimator.transform.localScale = oldScale.WithX(0.1f*i);
                 yield return null;
             }
             this._projectile.spriteAnimator.transform.localScale = oldScale;
@@ -132,6 +155,7 @@ namespace CwaffingTheGungy
             this._projectile.specRigidbody.Reinitialize();
 
             this._bounceFinished = true;
+
         }
     }
 }

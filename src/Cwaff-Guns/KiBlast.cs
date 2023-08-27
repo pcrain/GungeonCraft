@@ -47,7 +47,6 @@ namespace CwaffingTheGungy
                 gun.barrelOffset.transform.localPosition = new Vector3(0f,0f, 0f); // emit directly from hand
                 gun.SetBaseMaxAmmo(99999);
                 gun.SetAnimationFPS(gun.shootAnimation, 24);
-                gun.SetFireAudio("ki_blast_sound");
 
                 VFXPool impactFVX = VFX.RegisterVFXPool(ItemName+" Impact", ResMap.Get("ki-explosion"), 20, false, scale: 0.5f);
 
@@ -57,6 +56,7 @@ namespace CwaffingTheGungy
                 gun.SetAirImpactVFX(impactFVX);
 
             var comp = gun.gameObject.AddComponent<KiBlast>();
+                comp.SetFireAudio("ki_blast_sound");
                 comp.preventNormalReloadAudio = true;
 
             _KiSprite = AnimateBullet.CreateProjectileAnimation(

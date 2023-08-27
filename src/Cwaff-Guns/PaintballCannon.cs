@@ -37,12 +37,12 @@ namespace CwaffingTheGungy
                 gun.gunClass                             = GunClass.PISTOL;
                 gun.quality                              = PickupObject.ItemQuality.C;
                 gun.barrelOffset.transform.localPosition = new Vector3(1.625f, 0.5f, 0f); // should match "Casing" in JSON file
-                gun.SetFireAudio("paintball_shoot_sound");
                 gun.SetBaseMaxAmmo(300);
                 gun.SetAnimationFPS(gun.shootAnimation, 14);
                 gun.SetAnimationFPS(gun.reloadAnimation, 4);
 
             var comp = gun.gameObject.AddComponent<PaintballCannon>();
+                comp.SetFireAudio("paintball_shoot_sound");
                 comp.SetReloadAudio("paintball_reload_sound");
 
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);

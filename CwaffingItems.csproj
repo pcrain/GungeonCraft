@@ -547,8 +547,10 @@
     <EmbeddedResource Include="Resources\BeamSprites\alphabeam_mid_002.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\ki_blast_gun_fire_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\paintball_cannon_idle_001.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\seventeen_fire_004.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\paintball_cannon_reload_003.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\ki_blast_gun_idle_001.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\seventeen_fire_002.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\paintball_cannon_fire_003.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\paintball_cannon_fire_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\paintball_cannon_fire_003.png"/>
@@ -567,9 +569,13 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\paintball_cannon_fire_002.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\seventeen_fire_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\paintball_cannon_reload_001.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\seventeen_fire_003.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\seventeen_fire_003.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\paintball_cannon_reload_003.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\paintball_cannon_fire_004.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\seventeen_fire_004.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\paintball_cannon_reload_001.png"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\seventeen_fire_002.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\ki_blast_gun_fire_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\ki_blast_002.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\bball6.png"/>

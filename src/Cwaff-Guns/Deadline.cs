@@ -38,10 +38,10 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.SetFireAudio("Play_WPN_stdissuelaser_shot_01");
 
             var comp = gun.gameObject.AddComponent<Deadline>();
                 comp.preventNormalReloadAudio = true;
+                comp.SetFireAudio("Play_WPN_stdissuelaser_shot_01");
 
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
                 projectile.collidesWithEnemies = false;
