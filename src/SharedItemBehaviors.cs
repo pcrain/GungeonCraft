@@ -300,11 +300,10 @@ namespace CwaffingTheGungy
                 Enumerable.Repeat<IntVector2?>(overrideColliderOffsets,n).ToList(),
                 Enumerable.Repeat<Projectile>(overrideProjectilesToCopyFrom,n).ToList());
         }
-        public static void SetAnimation(this Projectile proj, tk2dSpriteAnimationClip clip, int frame = -1)
+        public static void SetAnimation(this Projectile proj, tk2dSpriteAnimationClip clip, int frame = 0)
         {
             proj.sprite.spriteAnimator.currentClip = clip;
-            if (frame >= 0)
-                proj.sprite.spriteAnimator.SetFrame(frame);
+            proj.sprite.spriteAnimator.PlayFromFrame(frame);
         }
         public static void AddAnimation(this Projectile proj, tk2dSpriteAnimationClip clip)
         {
