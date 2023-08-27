@@ -19,32 +19,58 @@ namespace CwaffingTheGungy
     {
         public static string ItemName         = "Library Cardtridge";
         public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/credit_card_icon";
-        public static string ShortDescription = "...";
-        public static string LongDescription  = "(...)";
+        public static string ShortDescription = "Knowledge is Firepower";
+        public static string LongDescription  = "(informational items are free at shops; Bookllets are charmed upon entering a room)";
 
-        private static HashSet<int> _BookItemIDs = null;
-        private static bool         _DidLateInit = false;
+        private static HashSet<int>         _BookItemIDs    = null;
+        private static HashSet<string>      _BookEnemyGUIDs = null;
+        private static bool                 _DidLateInit    = false;
+        private static GameActorCharmEffect _CharmEffect    = null;
 
         public static void Init()
         {
             PickupObject item  = Lazy.SetupPassive<LibraryCardtridge>(ItemName, SpritePath, ShortDescription, LongDescription);
             item.quality       = PickupObject.ItemQuality.D;
 
-            // Add guids for book items to list
+            // Add guids for book items to set
             _BookItemIDs = new();
-                _BookItemIDs.Add(ItemHelper.Get(Items.BookOfChestAnatomy).PickupObjectId);
-                _BookItemIDs.Add(ItemHelper.Get(Items.MilitaryTraining).PickupObjectId);
-                _BookItemIDs.Add(ItemHelper.Get(Items.Map).PickupObjectId);
-                _BookItemIDs.Add(ItemHelper.Get(Items.GungeonBlueprint).PickupObjectId);
-                _BookItemIDs.Add(ItemHelper.Get(Items.MagazineRack).PickupObjectId);
-                _BookItemIDs.Add(ItemHelper.Get(Items.TableTechBlanks).PickupObjectId);
-                _BookItemIDs.Add(ItemHelper.Get(Items.TableTechHeat).PickupObjectId);
-                _BookItemIDs.Add(ItemHelper.Get(Items.TableTechMoney).PickupObjectId);
-                _BookItemIDs.Add(ItemHelper.Get(Items.TableTechRage).PickupObjectId);
-                _BookItemIDs.Add(ItemHelper.Get(Items.TableTechRocket).PickupObjectId);
-                _BookItemIDs.Add(ItemHelper.Get(Items.TableTechShotgun).PickupObjectId);
-                _BookItemIDs.Add(ItemHelper.Get(Items.TableTechSight).PickupObjectId);
-                _BookItemIDs.Add(ItemHelper.Get(Items.TableTechStun).PickupObjectId);
+                _BookItemIDs.Add((int)Items.BookOfChestAnatomy);
+                _BookItemIDs.Add((int)Items.MilitaryTraining);
+                _BookItemIDs.Add((int)Items.Map);
+                _BookItemIDs.Add((int)Items.GungeonBlueprint);
+                _BookItemIDs.Add((int)Items.MagazineRack);
+                _BookItemIDs.Add((int)Items.TableTechBlanks);
+                _BookItemIDs.Add((int)Items.TableTechHeat);
+                _BookItemIDs.Add((int)Items.TableTechMoney);
+                _BookItemIDs.Add((int)Items.TableTechRage);
+                _BookItemIDs.Add((int)Items.TableTechRocket);
+                _BookItemIDs.Add((int)Items.TableTechShotgun);
+                _BookItemIDs.Add((int)Items.TableTechSight);
+                _BookItemIDs.Add((int)Items.TableTechStun);
+
+            // Add guids for book enemies to set
+            _BookEnemyGUIDs = new();
+                _BookEnemyGUIDs.Add(Enemies.Bookllet);
+                _BookEnemyGUIDs.Add(Enemies.BlueBookllet);
+                _BookEnemyGUIDs.Add(Enemies.GreenBookllet);
+                _BookEnemyGUIDs.Add(Enemies.TabletBookllett);
+
+            // Initialize our charm effect
+            _CharmEffect = (ItemHelper.Get(Items.YellowChamber) as YellowChamberItem).CharmEffect;
+        }
+
+        private void OnEnteredCombat()
+        {
+            foreach(AIActor enemy in this.Owner.CurrentRoom.GetActiveEnemies(RoomHandler.ActiveEnemyType.All))
+            {
+                if (!enemy.IsNormalEnemy || !enemy.healthHaver || enemy.healthHaver.IsBoss || enemy.IsHarmlessEnemy)
+                    continue;
+                if (!_BookEnemyGUIDs.Contains(enemy.EnemyGuid))
+                    continue;
+                enemy.IgnoreForRoomClear = true;
+                enemy.ParentRoom.ResetEnemyHPPercentage();
+                enemy.ApplyEffect(_CharmEffect);
+            }
         }
 
         public override void Pickup(PlayerController player)
@@ -59,10 +85,12 @@ namespace CwaffingTheGungy
             base.Pickup(player);
             MakeBooksFree();
             GameManager.Instance.OnNewLevelFullyLoaded += this.OnNewFloor;
+            player.OnEnteredCombat += this.OnEnteredCombat;
         }
 
         public override DebrisObject Drop(PlayerController player)
         {
+            player.OnEnteredCombat -= this.OnEnteredCombat;
             GameManager.Instance.OnNewLevelFullyLoaded -= this.OnNewFloor;
             NoMoreFreeBooks();
             return base.Drop(player);
