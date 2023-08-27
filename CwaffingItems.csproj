@@ -243,6 +243,7 @@
     <EmbeddedResource Include="Resources\ItemSprites\rat_poison_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\curators_badge_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\future_killing_bullet_icon.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\library_cardtridge_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\88888888_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\zoolander_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\note_icon.png"/>

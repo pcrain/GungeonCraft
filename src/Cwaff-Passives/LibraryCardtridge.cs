@@ -18,14 +18,15 @@ namespace CwaffingTheGungy
     public class LibraryCardtridge : PassiveItem
     {
         public static string ItemName         = "Library Cardtridge";
-        public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/credit_card_icon";
+        public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/library_cardtridge_icon";
         public static string ShortDescription = "Knowledge is Firepower";
-        public static string LongDescription  = "(informational items are free at shops; Bookllets are charmed upon entering a room)";
+        public static string LongDescription  = "(informational items are free at shops; Bookllets are charmed upon entering a room; books explode on destruction)";
 
         private static HashSet<int>         _BookItemIDs    = null;
         private static HashSet<string>      _BookEnemyGUIDs = null;
         private static bool                 _DidLateInit    = false;
         private static GameActorCharmEffect _CharmEffect    = null;
+        private static ExplosionData        _BookExplosion  = null;
 
         public static void Init()
         {
@@ -57,19 +58,67 @@ namespace CwaffingTheGungy
 
             // Initialize our charm effect
             _CharmEffect = (ItemHelper.Get(Items.YellowChamber) as YellowChamberItem).CharmEffect;
+
+            // Initialize our explosion data
+            ExplosionData defaultExplosion = GameManager.Instance.Dungeon.sharedSettingsPrefab.DefaultExplosionData;
+            _BookExplosion = new ExplosionData()
+            {
+                forceUseThisRadius     = true,
+                pushRadius             = 3f,
+                damageRadius           = 3f,
+                damageToPlayer         = 0f,
+                doDamage               = true,
+                damage                 = 100,
+                doDestroyProjectiles   = false,
+                doForce                = true,
+                debrisForce            = 10f,
+                preventPlayerForce     = true,
+                explosionDelay         = 0.01f,
+                usesComprehensiveDelay = false,
+                doScreenShake          = false,
+                playDefaultSFX         = true,
+                effect                 = defaultExplosion.effect,
+                ignoreList             = defaultExplosion.ignoreList,
+                ss                     = defaultExplosion.ss,
+            };
+
+            // Get our book pile assets
+            AssetBundle sharedAssets = ResourceManager.LoadAssetBundle("shared_auto_001");
+            DungeonPlaceable pile = sharedAssets.LoadAsset<DungeonPlaceable>("PileOrStackOfBooks");
+            ETGModConsole.Log($"books: {pile.name}");
+            sharedAssets = null;
+        }
+
+        private void MakeBooksFriendlyAndExplodey(AIActor enemy)
+        {
+            if (!enemy.IsNormalEnemy || !enemy.healthHaver || enemy.healthHaver.IsBoss || enemy.IsHarmlessEnemy)
+                return;
+            if (!_BookEnemyGUIDs.Contains(enemy.EnemyGuid))
+                return;
+            enemy.IgnoreForRoomClear = true;
+            enemy.ParentRoom.ResetEnemyHPPercentage();
+            enemy.ApplyEffect(_CharmEffect);
+            enemy.healthHaver.OnDeath += (_) => Exploder.Explode(enemy.sprite.WorldCenter, _BookExplosion, Vector2.zero);
+        }
+
+        private void OnEnemySpawn(AIActor enemy)
+        {
+            MakeBooksFriendlyAndExplodey(enemy);
+        }
+
+        private void ExplodingBooks(MinorBreakable mb)
+        {
+            Exploder.Explode(mb.sprite.WorldCenter, _BookExplosion, Vector2.zero);
         }
 
         private void OnEnteredCombat()
         {
-            foreach(AIActor enemy in this.Owner.CurrentRoom.GetActiveEnemies(RoomHandler.ActiveEnemyType.All))
+            // Make piles of books explode on destruction
+            RoomHandler curRoom = this.Owner.GetAbsoluteParentRoom();
+            foreach (MinorBreakable mb in StaticReferenceManager.AllMinorBreakables)
             {
-                if (!enemy.IsNormalEnemy || !enemy.healthHaver || enemy.healthHaver.IsBoss || enemy.IsHarmlessEnemy)
-                    continue;
-                if (!_BookEnemyGUIDs.Contains(enemy.EnemyGuid))
-                    continue;
-                enemy.IgnoreForRoomClear = true;
-                enemy.ParentRoom.ResetEnemyHPPercentage();
-                enemy.ApplyEffect(_CharmEffect);
+                if (mb.name == "Pile Of Books" && mb.transform.position.GetAbsoluteRoom() == curRoom)
+                    mb.OnBreakContext += ExplodingBooks;
             }
         }
 
@@ -86,10 +135,12 @@ namespace CwaffingTheGungy
             MakeBooksFree();
             GameManager.Instance.OnNewLevelFullyLoaded += this.OnNewFloor;
             player.OnEnteredCombat += this.OnEnteredCombat;
+            ETGMod.AIActor.OnPreStart += this.OnEnemySpawn;
         }
 
         public override DebrisObject Drop(PlayerController player)
         {
+            ETGMod.AIActor.OnPreStart -= this.OnEnemySpawn;
             player.OnEnteredCombat -= this.OnEnteredCombat;
             GameManager.Instance.OnNewLevelFullyLoaded -= this.OnNewFloor;
             NoMoreFreeBooks();
