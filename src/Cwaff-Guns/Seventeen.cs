@@ -26,9 +26,10 @@ namespace CwaffingTheGungy
         internal static tk2dSpriteAnimationClip _ProjSpriteInactive = null;
         internal static tk2dSpriteAnimationClip _ProjSpriteActive   = null;
         internal static ExplosionData           _MiniExplosion      = null;
-        private static float _Damage_After_Bounce                   = 40f;
+        internal static float                   _Damage_Factor      = 0.5f; // % of speed converted to damage
+        internal static float                   _Force_Factor       = 0.5f; // % of speed converted to force
 
-        internal const float _ACCELERATION = 1.6f;
+        internal const float _ACCELERATION = 1.9f;
 
         public static void Add()
         {
@@ -37,30 +38,40 @@ namespace CwaffingTheGungy
                 gun.DefaultModule.ammoCost               = 1;
                 gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
                 gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
-                gun.reloadTime                           = 0.72f;
-                gun.DefaultModule.cooldownTime           = 0.18f;
-                gun.DefaultModule.numberOfShotsInClip    = 4;
+                gun.reloadTime                           = 0.80f;
+                gun.DefaultModule.cooldownTime           = 0.16f;
+                gun.DefaultModule.numberOfShotsInClip    = 6;
                 gun.gunClass                             = GunClass.PISTOL;
                 gun.quality                              = PickupObject.ItemQuality.C;
+                gun.gunHandedness                        = GunHandedness.OneHanded;
                 gun.barrelOffset.transform.localPosition = new Vector3(1.6875f, 0.5f, 0f); // should match "Casing" in JSON file
                 gun.SetBaseMaxAmmo(300);
                 gun.SetAnimationFPS(gun.shootAnimation, 14);
-                gun.SetAnimationFPS(gun.reloadAnimation, 4);
+                gun.SetAnimationFPS(gun.reloadAnimation, 20);
 
             var comp = gun.gameObject.AddComponent<Seventeen>();
-                comp.SetFireAudio("MC_Mushroom_Bounce");
+                // comp.SetFireAudio("MC_Mushroom_Bounce");
+                comp.SetFireAudio("MC_RocsCape");
                 comp.SetReloadAudio("MC_Link_Grow");
 
             IntVector2 colliderSize = new IntVector2(1,1); // 1-pixel collider for accurate bounce animation
 
             _ProjSpriteInactive = AnimateBullet.CreateProjectileAnimation(
                 new List<string> {
-                    "bouncelet_gray_001",
+                    // "bouncelet_gray_001",
+                    "energy_bounce1",
+                    "energy_bounce2",
+                    "energy_bounce3",
+                    "energy_bounce4",
                 }, 10, true, new IntVector2(10, 10), // reduced sprite size
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true, null, colliderSize);
             _ProjSpriteActive = AnimateBullet.CreateProjectileAnimation(
                 new List<string> {
-                    "bouncelet_001",
+                    // "bouncelet_001",
+                    "energy_bounce1",
+                    "energy_bounce2",
+                    "energy_bounce3",
+                    "energy_bounce4",
                 }, 10, true, new IntVector2(10, 10), // reduced sprite size
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true, null, colliderSize);
 
@@ -94,6 +105,19 @@ namespace CwaffingTheGungy
                 ignoreList             = defaultExplosion.ignoreList,
                 ss                     = defaultExplosion.ss,
             };
+        }
+
+        public override void OnReload(PlayerController player, Gun gun)
+        {
+            gun.gunHandedness = GunHandedness.TwoHanded;
+            base.OnReload(player, gun);
+        }
+
+        public override void OnReloadEnded(PlayerController player, Gun gun)
+        {
+            gun.gunHandedness = GunHandedness.TwoHanded;
+            // gun.gunHandedness = GunHandedness.OneHanded;
+            base.OnReloadEnded(player, gun);
         }
     }
 
@@ -146,35 +170,53 @@ namespace CwaffingTheGungy
                 PhysicsEngine.SkipCollision = true;
         }
 
+        private static float _LastBouncePlayed = 0;
+        private const  float _MIN_SOUND_GAP = 0.25f;
+        private void HandleBounceSounds()
+        {
+            float now = BraveTime.ScaledTimeSinceStartup;
+            if ((now - _LastBouncePlayed) < _MIN_SOUND_GAP)
+                return;
+            _LastBouncePlayed = now;
+            // AkSoundEngine.PostEvent("MC_Link_Grow_stop_all", this._projectile.gameObject);
+            AkSoundEngine.PostEvent("MC_RocsCape", this._projectile.gameObject);
+            // AkSoundEngine.PostEvent("MC_Mushroom_Bounce_stop_all", this._projectile.gameObject);
+            AkSoundEngine.PostEvent("MC_Mushroom_Bounce", this._projectile.gameObject);
+        }
+
         private void OnBounce()
         {
             this._bounceStarted = true;
             this._projectile = base.GetComponent<Projectile>();
             this._projectile.SetAnimation(Seventeen._ProjSpriteActive);
+
             this._projectile.StartCoroutine(DoElasticBounce());
-            AkSoundEngine.PostEvent("MC_Link_Lift_stop_all", this._projectile.gameObject);
-            AkSoundEngine.PostEvent("MC_Link_Lift", this._projectile.gameObject);
+            // AkSoundEngine.PostEvent("MC_Link_Lift_stop_all", this._projectile.gameObject);
+            // AkSoundEngine.PostEvent("MC_Link_Lift", this._projectile.gameObject);
         }
 
+        private const float BOUNCE_TIME = 15.0f; // frames for half a bounce
         private IEnumerator DoElasticBounce()
         {
             float oldSpeed = this._projectile.baseData.speed;
             Vector3 oldScale = this._projectile.spriteAnimator.transform.localScale;
 
-            this._projectile.baseData.damage = oldSpeed;  // base damage should scale with speed
-            this._projectile.baseData.force = oldSpeed;  // force should scale with speed
+            this._projectile.baseData.damage = oldSpeed * Seventeen._Damage_Factor;  // base damage should scale with speed
+            this._projectile.baseData.force = oldSpeed * Seventeen._Force_Factor;  // force should scale with speed
             this._projectile.baseData.speed = 0.001f;
             this._projectile.UpdateSpeed();
             this._projectile.specRigidbody.Reinitialize();
 
-            for (int i = 10; i > 2; --i)
+            float bounceScale = 1.0f / BOUNCE_TIME;
+            for (int i = (int)BOUNCE_TIME; i > 1; --i)
             {
-                this._projectile.spriteAnimator.transform.localScale = oldScale.WithX(0.1f*i);
+                this._projectile.spriteAnimator.transform.localScale = oldScale.WithX(bounceScale*i);
                 yield return null;
             }
-            for (int i = 2; i < 10; ++i)
+            HandleBounceSounds();
+            for (int i = 1; i < BOUNCE_TIME; ++i)
             {
-                this._projectile.spriteAnimator.transform.localScale = oldScale.WithX(0.1f*i);
+                this._projectile.spriteAnimator.transform.localScale = oldScale.WithX(bounceScale*i);
                 yield return null;
             }
             this._projectile.spriteAnimator.transform.localScale = oldScale;
@@ -186,6 +228,13 @@ namespace CwaffingTheGungy
                 this._projectile.sprite.WorldCenter, Seventeen._MiniExplosion, p.Direction);
 
             this._bounceFinished = true;
+            this._projectile.sprite.usesOverrideMaterial = true;
+            Material m = this._projectile.sprite.renderer.material;
+                m.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+                m.SetFloat("_EmissivePower", 100f);
+                m.SetFloat("_EmissiveColorPower", 1.55f);
+                m.SetColor("_EmissiveColor", Color.yellow);
+                m.SetColor("_OverrideColor", Color.yellow);
         }
     }
 }
