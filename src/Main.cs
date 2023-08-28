@@ -122,7 +122,7 @@ namespace CwaffingTheGungy
                     KiBlast.Add();
                     Deadline.Add();
                     BBGun.Add();
-                    Seventeen.Add();
+                    Bouncer.Add();
 
                     // MasterSword.Add();
                 #endregion

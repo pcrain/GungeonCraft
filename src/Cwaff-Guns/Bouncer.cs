@@ -15,12 +15,12 @@ using Alexandria.Misc;
 
 namespace CwaffingTheGungy
 {
-    public class Seventeen : AdvancedGunBehavior
+    public class Bouncer : AdvancedGunBehavior
     {
-        public static string ItemName         = "Seventeen";
-        public static string SpriteName       = "seventeen";
+        public static string ItemName         = "Bouncer";
+        public static string SpriteName       = "bouncer";
         public static string ProjectileName   = "38_special"; //for rotation niceness
-        public static string ShortDescription = "Not Again";
+        public static string ShortDescription = "Rebound to Go Wrong";
         public static string LongDescription  = "(fires strong projectiles that do no damage until bouncing at least once)";
 
         internal static tk2dSpriteAnimationClip _ProjSpriteInactive = null;
@@ -49,7 +49,7 @@ namespace CwaffingTheGungy
                 gun.SetAnimationFPS(gun.shootAnimation, 14);
                 gun.SetAnimationFPS(gun.reloadAnimation, 20);
 
-            var comp = gun.gameObject.AddComponent<Seventeen>();
+            var comp = gun.gameObject.AddComponent<Bouncer>();
                 // comp.SetFireAudio("MC_Mushroom_Bounce");
                 comp.SetFireAudio("MC_RocsCape");
                 comp.SetReloadAudio("MC_Link_Grow");
@@ -143,14 +143,14 @@ namespace CwaffingTheGungy
 
             this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
 
-            this._projectile.SetAnimation(Seventeen._ProjSpriteInactive); // TODO: this doesn't seem to work properly; default sprite is always first sprite added
+            this._projectile.SetAnimation(Bouncer._ProjSpriteInactive); // TODO: this doesn't seem to work properly; default sprite is always first sprite added
         }
 
         private void Update()
         {
             if (_bounceStarted)
                 return;
-            this._projectile.baseData.speed += Seventeen._ACCELERATION;
+            this._projectile.baseData.speed += Bouncer._ACCELERATION;
             this._projectile.UpdateSpeed();
         }
 
@@ -188,7 +188,7 @@ namespace CwaffingTheGungy
         {
             this._bounceStarted = true;
             this._projectile = base.GetComponent<Projectile>();
-            this._projectile.SetAnimation(Seventeen._ProjSpriteActive);
+            this._projectile.SetAnimation(Bouncer._ProjSpriteActive);
 
             this._projectile.StartCoroutine(DoElasticBounce());
             // AkSoundEngine.PostEvent("MC_Link_Lift_stop_all", this._projectile.gameObject);
@@ -201,8 +201,8 @@ namespace CwaffingTheGungy
             float oldSpeed = this._projectile.baseData.speed;
             Vector3 oldScale = this._projectile.spriteAnimator.transform.localScale;
 
-            this._projectile.baseData.damage = oldSpeed * Seventeen._Damage_Factor;  // base damage should scale with speed
-            this._projectile.baseData.force = oldSpeed * Seventeen._Force_Factor;  // force should scale with speed
+            this._projectile.baseData.damage = oldSpeed * Bouncer._Damage_Factor;  // base damage should scale with speed
+            this._projectile.baseData.force = oldSpeed * Bouncer._Force_Factor;  // force should scale with speed
             this._projectile.baseData.speed = 0.001f;
             this._projectile.UpdateSpeed();
             this._projectile.specRigidbody.Reinitialize();
@@ -244,7 +244,7 @@ namespace CwaffingTheGungy
             this._projectile.UpdateSpeed();
             this._projectile.specRigidbody.Reinitialize();
             this._projectile.OnDestruction += (Projectile p) => Exploder.Explode(
-                this._projectile.sprite.WorldCenter, Seventeen._MiniExplosion, p.Direction);
+                this._projectile.sprite.WorldCenter, Bouncer._MiniExplosion, p.Direction);
 
             this._bounceFinished = true;
         }
