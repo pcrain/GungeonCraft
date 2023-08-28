@@ -23,13 +23,11 @@ namespace CwaffingTheGungy
         public static string ShortDescription = "Rebound to Go Wrong";
         public static string LongDescription  = "(fires strong projectiles that do no damage until bouncing at least once)";
 
-        internal static tk2dSpriteAnimationClip _ProjSpriteInactive = null;
-        internal static tk2dSpriteAnimationClip _ProjSpriteActive   = null;
         internal static ExplosionData           _MiniExplosion      = null;
         internal static float                   _Damage_Factor      = 0.5f; // % of speed converted to damage
         internal static float                   _Force_Factor       = 0.5f; // % of speed converted to force
 
-        internal const float _ACCELERATION = 1.9f;
+        internal const float                    _ACCELERATION       = 1.9f;
 
         public static void Add()
         {
@@ -50,24 +48,13 @@ namespace CwaffingTheGungy
                 gun.SetAnimationFPS(gun.reloadAnimation, 20);
 
             var comp = gun.gameObject.AddComponent<Bouncer>();
-                // comp.SetFireAudio("MC_Mushroom_Bounce");
                 comp.SetFireAudio("MC_RocsCape");
                 comp.SetReloadAudio("MC_Link_Grow");
 
             IntVector2 colliderSize = new IntVector2(1,1); // 1-pixel collider for accurate bounce animation
 
-            _ProjSpriteInactive = AnimateBullet.CreateProjectileAnimation(
+            tk2dSpriteAnimationClip anim = AnimateBullet.CreateProjectileAnimation(
                 new List<string> {
-                    // "bouncelet_gray_001",
-                    "energy_bounce1",
-                    "energy_bounce2",
-                    "energy_bounce3",
-                    "energy_bounce4",
-                }, 10, true, new IntVector2(10, 10), // reduced sprite size
-                false, tk2dBaseSprite.Anchor.MiddleCenter, true, true, null, colliderSize);
-            _ProjSpriteActive = AnimateBullet.CreateProjectileAnimation(
-                new List<string> {
-                    // "bouncelet_001",
                     "energy_bounce1",
                     "energy_bounce2",
                     "energy_bounce3",
@@ -76,8 +63,7 @@ namespace CwaffingTheGungy
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true, null, colliderSize);
 
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
-                projectile.AddAnimation(_ProjSpriteActive);
-                projectile.AddAnimation(_ProjSpriteInactive);
+                projectile.AddAnimation(anim);
                 projectile.baseData.damage = _ACCELERATION;
                 projectile.baseData.speed  = _ACCELERATION;
                 projectile.baseData.range  = 9999f;
@@ -106,19 +92,6 @@ namespace CwaffingTheGungy
                 ss                     = defaultExplosion.ss,
             };
         }
-
-        public override void OnReload(PlayerController player, Gun gun)
-        {
-            gun.gunHandedness = GunHandedness.TwoHanded;
-            base.OnReload(player, gun);
-        }
-
-        public override void OnReloadEnded(PlayerController player, Gun gun)
-        {
-            gun.gunHandedness = GunHandedness.TwoHanded;
-            // gun.gunHandedness = GunHandedness.OneHanded;
-            base.OnReloadEnded(player, gun);
-        }
     }
 
     public class HarmlessUntilBounce : MonoBehaviour
@@ -142,8 +115,6 @@ namespace CwaffingTheGungy
                 bounce.onlyBounceOffTiles = true;
 
             this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
-
-            this._projectile.SetAnimation(Bouncer._ProjSpriteInactive); // TODO: this doesn't seem to work properly; default sprite is always first sprite added
         }
 
         private void Update()
@@ -166,8 +137,6 @@ namespace CwaffingTheGungy
                 PhysicsEngine.SkipCollision = true;
             else if (otherRigidbody.GetComponent<MinorBreakable>() != null)
                 PhysicsEngine.SkipCollision = true;
-            // else if (otherRigidbody.GetComponent<MajorBreakable>() != null)
-            //     PhysicsEngine.SkipCollision = true;
         }
 
         private static float _LastBouncePlayed = 0;
@@ -178,21 +147,14 @@ namespace CwaffingTheGungy
             if ((now - _LastBouncePlayed) < _MIN_SOUND_GAP)
                 return;
             _LastBouncePlayed = now;
-            // AkSoundEngine.PostEvent("MC_Link_Grow_stop_all", this._projectile.gameObject);
             AkSoundEngine.PostEvent("MC_RocsCape", this._projectile.gameObject);
-            // AkSoundEngine.PostEvent("MC_Mushroom_Bounce_stop_all", this._projectile.gameObject);
             AkSoundEngine.PostEvent("MC_Mushroom_Bounce", this._projectile.gameObject);
         }
 
         private void OnBounce()
         {
             this._bounceStarted = true;
-            this._projectile = base.GetComponent<Projectile>();
-            this._projectile.SetAnimation(Bouncer._ProjSpriteActive);
-
             this._projectile.StartCoroutine(DoElasticBounce());
-            // AkSoundEngine.PostEvent("MC_Link_Lift_stop_all", this._projectile.gameObject);
-            // AkSoundEngine.PostEvent("MC_Link_Lift", this._projectile.gameObject);
         }
 
         private const float BOUNCE_TIME = 15.0f; // frames for half a bounce
