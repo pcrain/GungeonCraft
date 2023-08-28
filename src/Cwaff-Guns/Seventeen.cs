@@ -166,8 +166,8 @@ namespace CwaffingTheGungy
                 PhysicsEngine.SkipCollision = true;
             else if (otherRigidbody.GetComponent<MinorBreakable>() != null)
                 PhysicsEngine.SkipCollision = true;
-            else if (otherRigidbody.GetComponent<MajorBreakable>() != null)
-                PhysicsEngine.SkipCollision = true;
+            // else if (otherRigidbody.GetComponent<MajorBreakable>() != null)
+            //     PhysicsEngine.SkipCollision = true;
         }
 
         private static float _LastBouncePlayed = 0;
@@ -207,16 +207,35 @@ namespace CwaffingTheGungy
             this._projectile.UpdateSpeed();
             this._projectile.specRigidbody.Reinitialize();
 
+            // Squeeze
             float bounceScale = 1.0f / BOUNCE_TIME;
             for (int i = (int)BOUNCE_TIME; i > 1; --i)
             {
                 this._projectile.spriteAnimator.transform.localScale = oldScale.WithX(bounceScale*i);
                 yield return null;
             }
+
             HandleBounceSounds();
+            this._projectile.sprite.usesOverrideMaterial = true;
+            Material m = this._projectile.sprite.renderer.material;
+                m.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+                m.SetFloat("_EmissivePower", 0f);
+                m.SetFloat("_EmissiveColorPower", 1.55f);
+                m.SetColor("_EmissiveColor", Color.yellow);
+                m.SetColor("_OverrideColor", Color.yellow);
+
+            // Stretch
             for (int i = 1; i < BOUNCE_TIME; ++i)
             {
-                this._projectile.spriteAnimator.transform.localScale = oldScale.WithX(bounceScale*i);
+                float percentDone = bounceScale*i;
+                Color newColor = new Color(
+                    r: Mathf.Lerp(Color.white.r, Color.yellow.r, percentDone),
+                    g: Mathf.Lerp(Color.white.g, Color.yellow.g, percentDone),
+                    b: Mathf.Lerp(Color.white.b, Color.yellow.b, percentDone));
+                m.SetFloat("_EmissivePower", 100f * percentDone);
+                m.SetColor("_EmissiveColor", newColor);
+                m.SetColor("_OverrideColor", newColor);
+                this._projectile.spriteAnimator.transform.localScale = oldScale.WithX(percentDone);
                 yield return null;
             }
             this._projectile.spriteAnimator.transform.localScale = oldScale;
@@ -228,13 +247,6 @@ namespace CwaffingTheGungy
                 this._projectile.sprite.WorldCenter, Seventeen._MiniExplosion, p.Direction);
 
             this._bounceFinished = true;
-            this._projectile.sprite.usesOverrideMaterial = true;
-            Material m = this._projectile.sprite.renderer.material;
-                m.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-                m.SetFloat("_EmissivePower", 100f);
-                m.SetFloat("_EmissiveColorPower", 1.55f);
-                m.SetColor("_EmissiveColor", Color.yellow);
-                m.SetColor("_OverrideColor", Color.yellow);
         }
     }
 }
