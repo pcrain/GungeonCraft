@@ -97,7 +97,6 @@ namespace CwaffingTheGungy
         protected Vector2? _target        = null;  // the target position we're actually aiming at
         protected Vector2  _targetVec     = Vector2.zero;  // the vector we are traveling to reach that target position
 
-        protected float _nextDir          = 0;     // the diretion we intend to move / scan for targets after our current move
         protected AIActor _targetEnemy    = null;  // which enemy, if any, we're currently targeting
         protected bool _twoPhaseMove      = false; // whether the piece moves in two phases; true only for knight
 
@@ -194,6 +193,7 @@ namespace CwaffingTheGungy
                 this._trail.EndColor   = GetTrailColor();
 
             this._projectile.SetAnimation(this._sprite);
+            this._targetVec = this._projectile.m_currentDirection;
             UpdateCreate();
         }
 
@@ -217,7 +217,6 @@ namespace CwaffingTheGungy
             if (this._target is Vector2 target)
             {
                 this._targetVec = target - this._projectile.sprite.WorldCenter;
-                this._projectile.SendInDirection(this._targetVec, true);
                 float adjSpeed = this._targetVec.magnitude / _BaseMoveTime;
                 this._projectile.baseData.speed = Mathf.Min(this._speed, adjSpeed);
             }
@@ -225,6 +224,7 @@ namespace CwaffingTheGungy
             {
                 this._projectile.baseData.speed = this._speed;
             }
+            this._projectile.SendInDirection(this._targetVec, true);
             this._projectile.UpdateSpeed();
         }
 
@@ -237,6 +237,9 @@ namespace CwaffingTheGungy
 
         protected float LockAngleToOneOf(float angle, List<float> angles)
         {
+            if (angles.Count == 0)
+                return angle; // all angles are valid
+
             float a = angle.Clamp360();
 
             float best      = 0.0f;
@@ -252,9 +255,14 @@ namespace CwaffingTheGungy
             return best;
         }
 
-        protected virtual float GetBestValidAngleForPiece(float angle)
+        protected float GetBestValidAngleForPiece(float angle)
         {
-            return angle;
+            return LockAngleToOneOf(angle, GetValidAnglesForPiece());
+        }
+
+        protected virtual List<float> GetValidAnglesForPiece()
+        {
+            return new();
         }
 
         protected Vector2? PointOrthognalTo(Vector2 start, Vector2 target, Vector2 dir, float projAmount = 1000f)
@@ -293,18 +301,12 @@ namespace CwaffingTheGungy
                 return null;
 
             // Get our position and direction
-            Vector2 abeg = this._projectile.sprite.WorldCenter;
-            Vector2 dir  = this._nextDir.ToVector();
-
-            // Project an imaginary line in our current direction
-            Vector2 aend = abeg + (1000f * dir);
-
-            // Get a line orthogonal to our current direction
-            Vector2 ortho = 1000f * dir.Rotate(degrees: 90);
+            Vector2 ppos = this._projectile.sprite.WorldCenter;
 
             // Find the closest viable enemy == one which we can move into the line of sight
             Vector2? closestViableEnemyPosition = null;
-            float closestDistance = 999999f;
+            float closestEnemyDistance = 999999f;
+            // float closestOrthoDistance = 999999f;
             foreach (AIActor enemy in activeEnemies)
             {
                 if (!enemy.IsNormalEnemy || !enemy.healthHaver || enemy.IsHarmlessEnemy)
@@ -312,25 +314,33 @@ namespace CwaffingTheGungy
 
                 // Get the enemy's position and distance
                 Vector2 epos = enemy.sprite.WorldCenter;
-                float edist  = (epos - abeg).magnitude;
-                if (edist >= closestDistance)
+                float edist  = (epos - ppos).magnitude;
+                if (edist >= closestEnemyDistance)
                     continue; // we only care about the closest enemy
 
-                // Check if we can move orthogonal to the enemy in our current direction
-                Vector2? ipoint = PointOrthognalTo(abeg, epos, dir);
+                // Check if we can move orthogonal to the enemy in any of our valid directions
+                Vector2? ipoint = null;
+                Vector2 dirVec = Vector2.zero;
+                foreach(float candidateAngle in GetValidAnglesForPiece())
+                {
+                    ipoint = PointOrthognalTo(ppos, epos, candidateAngle.ToVector());
+                    if (ipoint.HasValue)
+                    {
+                        dirVec = (ipoint.Value - ppos);
+                        break;
+                    }
+                }
                 if (!ipoint.HasValue)
-                    continue; // if we're not orthogonal to the enemy, we don't care
+                    continue; // if we're not orthogonal to the enemy in any direction, ignore it
 
                 // Check if there's an obstruction between us on the intersection point
-                float dist = (ipoint.Value - abeg).magnitude;
                 RaycastResult collision;
-                if (PhysicsEngine.Instance.Raycast(abeg, dir, dist, out collision, true, false))
+                if (PhysicsEngine.Instance.Raycast(ppos, dirVec, dirVec.magnitude, out collision, true, false))
                     continue; // if we collide with a wall, we don't care
 
                 // If there's no collision, it's a good position!
-                closestDistance            = edist;
+                closestEnemyDistance       = edist;
                 closestViableEnemyPosition = ipoint;
-                this._nextDir              = GetBestValidAngleForPiece((epos - abeg).ToAngle());
                 this._targetEnemy          = enemy;
             }
 
@@ -342,7 +352,7 @@ namespace CwaffingTheGungy
         protected override tk2dSpriteAnimationClip GetSprite() => Grandmaster._PawnSprite;
         protected override float GetMoveDistance()             => _BaseMoveDist;
         protected override float GetMoveTime()                 => _BaseMoveTime;
-        protected override Color GetTrailColor()               => Color.yellow;
+        protected override Color GetTrailColor()               => Color.white;
     }
 
     public class RookPiece : ChessPiece
@@ -354,16 +364,15 @@ namespace CwaffingTheGungy
 
         protected override void UpdateCreate()
         {
-            // Rook should snap to 90 degree angles
-            float angle = this._projectile.m_currentDirection.ToAngle();
-            this._nextDir = GetBestValidAngleForPiece(angle);
-            this._projectile.SendInDirection(this._nextDir.ToVector(), true);
+            // Rook should snap to 90 degree angles after initial shot
+            this._targetVec = GetBestValidAngleForPiece(this._projectile.m_currentDirection.ToAngle()).ToVector();
         }
 
         private static List<float> _AnglesOf90 = new(){0f, 90f, 180f, 270f};
-        protected override float GetBestValidAngleForPiece(float angle)
+
+        protected override List<float> GetValidAnglesForPiece()
         {
-            return LockAngleToOneOf(angle, _AnglesOf90);
+            return _AnglesOf90;
         }
 
         protected override Vector2? ChooseNewTarget()
@@ -381,16 +390,15 @@ namespace CwaffingTheGungy
 
         protected override void UpdateCreate()
         {
-            // Bishop should snap to 45 degree angles
-            float angle = this._projectile.m_currentDirection.ToAngle();
-            this._nextDir = GetBestValidAngleForPiece(angle);
-            this._projectile.SendInDirection(this._nextDir.ToVector(), true);
+            // Bishop should snap to 45 degree angles after initial shot
+            this._targetVec = GetBestValidAngleForPiece(this._projectile.m_currentDirection.ToAngle()).ToVector();
         }
 
         private static List<float> _AnglesOf45 = new(){45f, 135f, 225f, 315f};
-        protected override float GetBestValidAngleForPiece(float angle)
+
+        protected override List<float> GetValidAnglesForPiece()
         {
-            return LockAngleToOneOf(angle, _AnglesOf45);
+            return _AnglesOf45;
         }
 
         protected override Vector2? ChooseNewTarget()
@@ -408,11 +416,8 @@ namespace CwaffingTheGungy
 
         protected override void UpdateCreate()
         {
-            // Knight should snap to 30 degree angles
-            float angle = this._projectile.m_currentDirection.ToAngle();
-            this._nextDir = GetBestValidAngleForPiece(angle);
-            this._targetVec = this._nextDir.ToVector();
-            this._projectile.SendInDirection(this._nextDir.ToVector(), true);
+            // Knight should snap to 30 degree angles after initial shot
+            this._targetVec = GetBestValidAngleForPiece(this._projectile.m_currentDirection.ToAngle()).ToVector();
 
             // Knights also have a two step move
             this._twoPhaseMove = true;
@@ -420,9 +425,10 @@ namespace CwaffingTheGungy
         }
 
         private static List<float> _AnglesOf30 = new(){30f, 60f, 120f, 150f, 210f, 240f, 300f, 330f};
-        protected override float GetBestValidAngleForPiece(float angle)
+
+        protected override List<float> GetValidAnglesForPiece()
         {
-            return LockAngleToOneOf(angle, _AnglesOf30);
+            return _AnglesOf30;
         }
 
         protected override Vector2? ChooseNewTarget()
