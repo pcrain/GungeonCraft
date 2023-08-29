@@ -167,6 +167,7 @@
     <Compile Include="src\Cwaff-Guns\BBGun.cs"/>
     <Compile Include="src\Cwaff-Guns\GasterBlaster.cs"/>
     <Compile Include="src\Cwaff-Guns\DerailGun.cs"/>
+    <Compile Include="src\Cwaff-Guns\Grandmaster.cs"/>
     <Compile Include="src\Cwaff-Guns\Tranquilizer.cs"/>
     <Compile Include="src\Cwaff-Guns\TestLightning.cs"/>
     <Compile Include="src\Cwaff-Guns\PaintballCannon.cs"/>
@@ -572,6 +573,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_014.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_fire_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\paintball_cannon_reload_004.png"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_fire_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_015.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\paintball_cannon_reload_004.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_011.json"/>
@@ -582,9 +584,11 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_011.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\paintball_cannon_fire_002.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_007.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\paintball_cannon_reload_002.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\paintball_cannon_fire_004.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_010.png"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_idle_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\ki_blast_gun_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_fire_002.png"/>
@@ -604,6 +608,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_008.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\paintball_cannon_reload_001.png"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_fire_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\ki_blast_gun_fire_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_013.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_015.json"/>
@@ -611,6 +616,7 @@
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\ki_blast_002.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\energy_bounce1.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\bball6.png"/>
+    <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\pawn.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\train_projectile_002.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\bball5.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\bball2.png"/>
@@ -634,6 +640,7 @@
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\ki_blast_red_003.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\bouncelet_gray_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\paintball_cannon_idle_001.png"/>
+    <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\grandmaster_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\ki_blast_gun_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\bouncer_idle_001.png"/>
     <Reference Include="UnityEngine.ClothModule"/>

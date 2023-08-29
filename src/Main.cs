@@ -123,6 +123,7 @@ namespace CwaffingTheGungy
                     Deadline.Add();
                     BBGun.Add();
                     Bouncer.Add();
+                    Grandmaster.Add();
 
                     // MasterSword.Add();
                 #endregion

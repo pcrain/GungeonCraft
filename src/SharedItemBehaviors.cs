@@ -419,6 +419,9 @@ namespace CwaffingTheGungy
             tr.endWidth = EndWidth;
         }
 
+        public void Enable() => tr.enabled = true;
+        public void Disable() => tr.enabled = false;
+
         public Texture _gradTexture;
         private Projectile proj;
         private GameObject tro;
