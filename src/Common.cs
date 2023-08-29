@@ -280,6 +280,13 @@ namespace CwaffingTheGungy
             return source[UnityEngine.Random.Range(0,source.Count)];
         }
 
+        // Select a random element from an enum
+        public static T ChooseRandom<T>() where T : Enum
+        {
+            var v = Enum.GetValues(typeof (T));
+            return (T) v.GetValue(UnityEngine.Random.Range(0,v.Length));
+        }
+
         public static void MovePlayerTowardsPositionUntilHittingWall(PlayerController player, Vector2 position)
         {
             int num_steps = 100;
