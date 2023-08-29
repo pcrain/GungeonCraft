@@ -68,16 +68,7 @@ namespace CwaffingTheGungy
                 projectile.AddAnimation(_KingSprite);
                 projectile.SetAnimation(_PawnSprite);
                 projectile.baseData.speed = 30f;
-                EasyTrailBullet trail = projectile.gameObject.AddComponent<EasyTrailBullet>();
-                    trail.TrailPos   = trail.transform.position;
-                    trail.StartWidth = 0.2f;
-                    trail.EndWidth   = 0f;
-                    trail.LifeTime   = 0.1f;
-                    trail.BaseColor  = Color.yellow;
-                    trail.StartColor = Color.yellow;
-                    trail.EndColor   = Color.yellow;
-                PlayChessBehavior pop = projectile.gameObject.AddComponent<PlayChessBehavior>();
-
+            PlayChessBehavior pop = projectile.gameObject.AddComponent<PlayChessBehavior>();
         }
     }
 
@@ -90,7 +81,7 @@ namespace CwaffingTheGungy
         King   = 5,
     };
 
-    public class ChessPiece : MonoBehaviour
+    public abstract class ChessPiece : MonoBehaviour
     {
         protected static float _BaseMoveDist  = 180f; // number of max pixels to travel each move
         protected static float _BaseMoveTime  = 0.1f; // seconds for a piece to move from one position to another
@@ -186,22 +177,30 @@ namespace CwaffingTheGungy
             return dist / (time * C.FPS);
         }
 
-        public void Setup(Projectile projectile, PlayerController owner, EasyTrailBullet trail)
+        public virtual void Setup(Projectile projectile, PlayerController owner)
         {
             this._projectile = projectile;
             this._owner      = owner;
-            this._trail      = trail;
 
             this._sprite     = GetSprite();
             this._speed      = ComputeSpeed(GetMoveDistance(), GetMoveTime());
+
+            this._trail = this._projectile.gameObject.AddComponent<EasyTrailBullet>();
+                this._trail.StartWidth = 0.2f;
+                this._trail.EndWidth   = 0f;
+                this._trail.LifeTime   = 0.1f;
+                this._trail.BaseColor  = GetTrailColor();
+                this._trail.StartColor = GetTrailColor();
+                this._trail.EndColor   = GetTrailColor();
 
             this._projectile.SetAnimation(this._sprite);
             UpdateCreate();
         }
 
-        protected virtual tk2dSpriteAnimationClip GetSprite() => Grandmaster._PawnSprite;
-        protected virtual float GetMoveDistance()             => _BaseMoveDist;
-        protected virtual float GetMoveTime()                 => _BaseMoveTime;
+        protected abstract tk2dSpriteAnimationClip GetSprite();
+        protected abstract float GetMoveDistance();
+        protected abstract float GetMoveTime();
+        protected abstract Color GetTrailColor();
 
         protected virtual Vector2? ChooseNewTarget()
         {
@@ -339,13 +338,19 @@ namespace CwaffingTheGungy
         }
     }
 
-    public class PawnPiece   : ChessPiece { }
+    public class PawnPiece   : ChessPiece {
+        protected override tk2dSpriteAnimationClip GetSprite() => Grandmaster._PawnSprite;
+        protected override float GetMoveDistance()             => _BaseMoveDist;
+        protected override float GetMoveTime()                 => _BaseMoveTime;
+        protected override Color GetTrailColor()               => Color.yellow;
+    }
 
-    public class RookPiece   : ChessPiece
+    public class RookPiece : ChessPiece
     {
         protected override tk2dSpriteAnimationClip GetSprite() => Grandmaster._RookSprite;
         protected override float GetMoveDistance()             => 450f;
         protected override float GetMoveTime()                 => ChessPiece._BaseMoveTime;
+        protected override Color GetTrailColor()               => Color.magenta;
 
         protected override void UpdateCreate()
         {
@@ -353,10 +358,6 @@ namespace CwaffingTheGungy
             float angle = this._projectile.m_currentDirection.ToAngle();
             this._nextDir = GetBestValidAngleForPiece(angle);
             this._projectile.SendInDirection(this._nextDir.ToVector(), true);
-
-            this._trail.BaseColor  = Color.magenta;
-            this._trail.StartColor = Color.magenta;
-            this._trail.EndColor   = Color.magenta;
         }
 
         private static List<float> _AnglesOf90 = new(){0f, 90f, 180f, 270f};
@@ -371,10 +372,12 @@ namespace CwaffingTheGungy
         }
     }
 
-    public class BishopPiece : ChessPiece {
+    public class BishopPiece : ChessPiece
+    {
         protected override tk2dSpriteAnimationClip GetSprite() => Grandmaster._BishopSprite;
         protected override float GetMoveDistance()             => 350f;
         protected override float GetMoveTime()                 => ChessPiece._BaseMoveTime;
+        protected override Color GetTrailColor()               => Color.cyan;
 
         protected override void UpdateCreate()
         {
@@ -382,10 +385,6 @@ namespace CwaffingTheGungy
             float angle = this._projectile.m_currentDirection.ToAngle();
             this._nextDir = GetBestValidAngleForPiece(angle);
             this._projectile.SendInDirection(this._nextDir.ToVector(), true);
-
-            this._trail.BaseColor  = Color.cyan;
-            this._trail.StartColor = Color.cyan;
-            this._trail.EndColor   = Color.cyan;
         }
 
         private static List<float> _AnglesOf45 = new(){45f, 135f, 225f, 315f};
@@ -400,10 +399,12 @@ namespace CwaffingTheGungy
         }
     }
 
-    public class KnightPiece : ChessPiece {
+    public class KnightPiece : ChessPiece
+    {
         protected override tk2dSpriteAnimationClip GetSprite() => Grandmaster._KnightSprite;
-        protected override float GetMoveDistance()             => 250f;
+        protected override float GetMoveDistance()             => 200f;
         protected override float GetMoveTime()                 => ChessPiece._BaseMoveTime;
+        protected override Color GetTrailColor()               => Color.green;
 
         protected override void UpdateCreate()
         {
@@ -416,10 +417,6 @@ namespace CwaffingTheGungy
             // Knights also have a two step move
             this._twoPhaseMove = true;
             this._movePhase = 2;
-
-            this._trail.BaseColor  = Color.green;
-            this._trail.StartColor = Color.green;
-            this._trail.EndColor   = Color.green;
         }
 
         private static List<float> _AnglesOf30 = new(){30f, 60f, 120f, 150f, 210f, 240f, 300f, 330f};
@@ -434,8 +431,21 @@ namespace CwaffingTheGungy
         }
     }
 
-    public class QueenPiece  : ChessPiece { }
-    public class KingPiece   : ChessPiece { }
+    public class QueenPiece : ChessPiece
+    {
+        protected override tk2dSpriteAnimationClip GetSprite() => Grandmaster._PawnSprite;
+        protected override float GetMoveDistance()             => _BaseMoveDist;
+        protected override float GetMoveTime()                 => _BaseMoveTime;
+        protected override Color GetTrailColor()               => Color.yellow;
+    }
+
+    public class KingPiece : ChessPiece
+    {
+        protected override tk2dSpriteAnimationClip GetSprite() => Grandmaster._PawnSprite;
+        protected override float GetMoveDistance()             => _BaseMoveDist;
+        protected override float GetMoveTime()                 => _BaseMoveTime;
+        protected override Color GetTrailColor()               => Color.yellow;
+    }
 
     public class PlayChessBehavior : MonoBehaviour
     {
@@ -478,8 +488,7 @@ namespace CwaffingTheGungy
             // this._piece = this._projectile.gameObject.AddComponent<RookPiece>();
             // this._piece = this._projectile.gameObject.AddComponent<BishopPiece>();
 
-            EasyTrailBullet trail = this._projectile.gameObject.GetComponent<EasyTrailBullet>();
-            this._piece.Setup(this._projectile, pc, trail);
+            this._piece.Setup(this._projectile, pc);
         }
     }
 }
