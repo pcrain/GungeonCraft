@@ -73,8 +73,9 @@ namespace CwaffingTheGungy
                     trail.StartWidth = 0.2f;
                     trail.EndWidth   = 0f;
                     trail.LifeTime   = 0.1f;
-                    trail.BaseColor  = Color.red;
-                    trail.EndColor   = Color.red;
+                    trail.BaseColor  = Color.yellow;
+                    trail.StartColor = Color.yellow;
+                    trail.EndColor   = Color.yellow;
                 PlayChessBehavior pop = projectile.gameObject.AddComponent<PlayChessBehavior>();
 
         }
@@ -99,14 +100,15 @@ namespace CwaffingTheGungy
         protected Projectile _projectile  = null;
         protected PlayerController _owner = null;
         protected float _lifetime         = 0.0f;
-        protected bool _paused            = false;
+        protected int _movePhase          = 1;     // 1 == moving, 2 == knight's second move, 0 == paused
         protected float _speed            = 0.0f;
         protected EasyTrailBullet _trail  = null;
-        protected Vector2? _target        = null;
+        protected Vector2? _target        = null;  // the target position we're actually aiming at
+        protected Vector2  _targetVec     = Vector2.zero;  // the vector we are traveling to reach that target position
 
-        protected float _nextDir          = 0;    // the diretion we intend to move / scan for targets after our current move
-        protected AIActor _targetEnemy    = null; // which enemy, if any, we're currently targeting
-
+        protected float _nextDir          = 0;     // the diretion we intend to move / scan for targets after our current move
+        protected AIActor _targetEnemy    = null;  // which enemy, if any, we're currently targeting
+        protected bool _twoPhaseMove      = false; // whether the piece moves in two phases; true only for knight
 
         private void Start()
         {
@@ -116,27 +118,61 @@ namespace CwaffingTheGungy
         private void Update()
         {
             this._lifetime += BraveTime.DeltaTime;
-            if (this._paused)
+            if (this._movePhase == 0)
             {
                 if (this._lifetime >= _BaseMovePause)
                 {
                     StartMoving();
                     this._trail.Enable();
                     this._projectile.collidesWithEnemies = true;
-                    this._paused                         = false;
+                    this._movePhase                      = 1;
                     this._lifetime                       = 0.0f;
+                    if (this._twoPhaseMove)
+                    {
+                        // Get the magnitude of the both components of the vector
+                        float xmag = Mathf.Abs(this._targetVec.x);
+                        float ymag = Mathf.Abs(this._targetVec.y);
+                        // Return the larger component on phase 1
+                        Vector2 axisVec;
+                        if (xmag > ymag)
+                            axisVec = this._targetVec.WithY(0);
+                        else
+                            axisVec = this._targetVec.WithX(0);
+                        // ETGModConsole.Log($"sending in major direction {axisVec}");
+                        this._projectile.SendInDirection(axisVec, true);
+                    }
                 }
                 else
                     UpdatePaused();
             }
-            else
+            else if (this._twoPhaseMove && this._movePhase == 1)
             {
                 if (this._lifetime >= _BaseMoveTime)
+                {
+                    // Get the magnitude of the both components of the vector
+                    float xmag = Mathf.Abs(this._targetVec.x);
+                    float ymag = Mathf.Abs(this._targetVec.y);
+                    // Return the smaller component on phase 2
+                    Vector2 axisVec;
+                    if (xmag > ymag)
+                        axisVec = this._targetVec.WithX(0);
+                    else
+                        axisVec = this._targetVec.WithY(0);
+                    // ETGModConsole.Log($"sending in minor direction {axisVec}");
+                    this._projectile.SendInDirection(axisVec, true);
+                    this._movePhase = 2; // very intentionally not resetting lifetime here
+                }
+                else
+                    UpdateMoving();
+            }
+            else
+            {
+                if (this._lifetime >= (_BaseMoveTime * this._movePhase)) // double the wait time for knight moves
                 {
                     StopMoving();
                     this._trail.Disable();
                     this._projectile.collidesWithEnemies = false;
-                    this._paused                         = true;
+                    this._movePhase                      = 0;
                     this._lifetime                       = 0.0f;
                 }
                 else
@@ -181,13 +217,15 @@ namespace CwaffingTheGungy
             this._target = ChooseNewTarget();
             if (this._target is Vector2 target)
             {
-                Vector2 targetVec = target - this._projectile.sprite.WorldCenter;
-                this._projectile.SendInDirection(targetVec, true);
-                float adjSpeed = targetVec.magnitude / _BaseMoveTime;
+                this._targetVec = target - this._projectile.sprite.WorldCenter;
+                this._projectile.SendInDirection(this._targetVec, true);
+                float adjSpeed = this._targetVec.magnitude / _BaseMoveTime;
                 this._projectile.baseData.speed = Mathf.Min(this._speed, adjSpeed);
             }
             else
+            {
                 this._projectile.baseData.speed = this._speed;
+            }
             this._projectile.UpdateSpeed();
         }
 
@@ -315,6 +353,10 @@ namespace CwaffingTheGungy
             float angle = this._projectile.m_currentDirection.ToAngle();
             this._nextDir = GetBestValidAngleForPiece(angle);
             this._projectile.SendInDirection(this._nextDir.ToVector(), true);
+
+            this._trail.BaseColor  = Color.magenta;
+            this._trail.StartColor = Color.magenta;
+            this._trail.EndColor   = Color.magenta;
         }
 
         private static List<float> _AnglesOf90 = new(){0f, 90f, 180f, 270f};
@@ -340,6 +382,10 @@ namespace CwaffingTheGungy
             float angle = this._projectile.m_currentDirection.ToAngle();
             this._nextDir = GetBestValidAngleForPiece(angle);
             this._projectile.SendInDirection(this._nextDir.ToVector(), true);
+
+            this._trail.BaseColor  = Color.cyan;
+            this._trail.StartColor = Color.cyan;
+            this._trail.EndColor   = Color.cyan;
         }
 
         private static List<float> _AnglesOf45 = new(){45f, 135f, 225f, 315f};
@@ -364,7 +410,16 @@ namespace CwaffingTheGungy
             // Knight should snap to 30 degree angles
             float angle = this._projectile.m_currentDirection.ToAngle();
             this._nextDir = GetBestValidAngleForPiece(angle);
+            this._targetVec = this._nextDir.ToVector();
             this._projectile.SendInDirection(this._nextDir.ToVector(), true);
+
+            // Knights also have a two step move
+            this._twoPhaseMove = true;
+            this._movePhase = 2;
+
+            this._trail.BaseColor  = Color.green;
+            this._trail.StartColor = Color.green;
+            this._trail.EndColor   = Color.green;
         }
 
         private static List<float> _AnglesOf30 = new(){30f, 60f, 120f, 150f, 210f, 240f, 300f, 330f};
@@ -395,28 +450,33 @@ namespace CwaffingTheGungy
                 return;
             this._owner = pc;
 
-            // switch(Lazy.ChooseRandom<ChessPieces>())
-            // {
-            //     case ChessPieces.Pawn:
-            //         this._piece = this._projectile.gameObject.AddComponent<PawnPiece>();
-            //         break;
-            //     case ChessPieces.Rook:
-            //         this._piece = this._projectile.gameObject.AddComponent<RookPiece>();
-            //         break;
-            //     case ChessPieces.Bishop:
-            //         this._piece = this._projectile.gameObject.AddComponent<BishopPiece>();
-            //         break;
-            //     case ChessPieces.Knight:
-            //         this._piece = this._projectile.gameObject.AddComponent<KnightPiece>();
-            //         break;
-            //     case ChessPieces.Queen:
-            //         this._piece = this._projectile.gameObject.AddComponent<QueenPiece>();
-            //         break;
-            //     case ChessPieces.King:
-            //         this._piece = this._projectile.gameObject.AddComponent<KingPiece>();
-            //         break;
-            // }
-            this._piece = this._projectile.gameObject.AddComponent<KnightPiece>();
+            switch(Lazy.ChooseRandom<ChessPieces>())
+            {
+                case ChessPieces.Pawn:
+                    this._piece = this._projectile.gameObject.AddComponent<PawnPiece>();
+                    break;
+                case ChessPieces.Rook:
+                    this._piece = this._projectile.gameObject.AddComponent<RookPiece>();
+                    break;
+                case ChessPieces.Bishop:
+                    this._piece = this._projectile.gameObject.AddComponent<BishopPiece>();
+                    break;
+                case ChessPieces.Knight:
+                    this._piece = this._projectile.gameObject.AddComponent<KnightPiece>();
+                    break;
+                default:
+                    this._piece = this._projectile.gameObject.AddComponent<PawnPiece>();
+                    break;
+                // case ChessPieces.Queen:
+                //     this._piece = this._projectile.gameObject.AddComponent<QueenPiece>();
+                //     break;
+                // case ChessPieces.King:
+                //     this._piece = this._projectile.gameObject.AddComponent<KingPiece>();
+                //     break;
+            }
+            // this._piece = this._projectile.gameObject.AddComponent<KnightPiece>();
+            // this._piece = this._projectile.gameObject.AddComponent<RookPiece>();
+            // this._piece = this._projectile.gameObject.AddComponent<BishopPiece>();
 
             EasyTrailBullet trail = this._projectile.gameObject.GetComponent<EasyTrailBullet>();
             this._piece.Setup(this._projectile, pc, trail);
