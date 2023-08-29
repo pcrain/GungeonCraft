@@ -104,6 +104,10 @@ namespace CwaffingTheGungy
         protected EasyTrailBullet _trail  = null;
         protected Vector2? _target        = null;
 
+        protected float _nextDir          = 0;    // the diretion we intend to move / scan for targets after our current move
+        protected AIActor _targetEnemy    = null; // which enemy, if any, we're currently targeting
+
+
         private void Start()
         {
             // ETGModConsole.Log($"chose {this.GetType()}");
@@ -155,6 +159,7 @@ namespace CwaffingTheGungy
             this._sprite     = GetSprite();
             this._speed      = ComputeSpeed(GetMoveDistance(), GetMoveTime());
 
+            this._projectile.SetAnimation(this._sprite);
             UpdateCreate();
         }
 
@@ -192,64 +197,57 @@ namespace CwaffingTheGungy
             this._projectile.baseData.speed = 0.001f;
             this._projectile.UpdateSpeed();
         }
-    }
 
-    public class PawnPiece   : ChessPiece { }
-    public class RookPiece   : ChessPiece
-    {
-        private float _nextDir = 0;
-        private AIActor _targetEnemy = null;
-
-        protected override tk2dSpriteAnimationClip GetSprite() => Grandmaster._RookSprite;
-        protected override float GetMoveDistance()             => 450f;
-        protected override float GetMoveTime()                 => ChessPiece._BaseMoveTime;
-
-        private float LockAngleTo90Degrees(float angle)
+        protected float LockAngleToOneOf(float angle, List<float> angles)
         {
-            float mod90 = angle.Clamp360() % 90.0f;
-            if (mod90 > 45.0f)
-                angle += (90.0f - mod90);
-            else
-                angle -= mod90;
+            float a = angle.Clamp360();
+
+            float best      = 0.0f;
+            float bestDelta = 999f;
+            foreach(float c in angles)
+            {
+                float delta = Mathf.Abs(c - a);
+                if (delta > bestDelta)
+                    continue;
+                bestDelta = delta;
+                best = c;
+            }
+            return best;
+        }
+
+        protected virtual float GetBestValidAngleForPiece(float angle)
+        {
             return angle;
         }
 
-        protected override void UpdateCreate()
+        protected Vector2? PointOrthognalTo(Vector2 start, Vector2 target, Vector2 dir, float projAmount = 1000f)
         {
-            // Rook should snap to 90 degree angles
-            float angle = this._projectile.m_currentDirection.ToAngle();
-            this._nextDir = LockAngleTo90Degrees(angle);
-            this._projectile.SendInDirection(this._nextDir.ToVector(), true);
-        }
-
-        private Vector2? PointOrthognalTo(Vector2 start, Vector2 target, Vector2 dir, float projAmount = 1000f)
-        {
+            // Project a point outward from start in direction dir by amount projAmount
             Vector2 projection = start + (projAmount * dir);
-            Vector2 ortho      = projAmount * dir.Rotate(degrees: 90);
-            Vector2 delta      = (target - start);
-            float distance     = delta.magnitude;
 
             // Project a line orthogonal to dir through our target
-            Vector2 bbeg = target + ortho;
-            Vector2 bend = target - ortho;
+            Vector2 ortho = projAmount * dir.Rotate(degrees: 90);
+            Vector2 bbeg  = target + ortho;
+            Vector2 bend  = target - ortho;
 
+            // Find the orthogonal intersection point, or return null if no such point exists
             Vector2 ipoint;
             if (!BraveUtility.LineIntersectsLine(start, projection, bbeg, bend, out ipoint))
-                return null;  // if we're not orthogonal, return null
-
+                return null;
             return ipoint;
         }
 
-        protected override Vector2? ChooseNewTarget()
+        protected Vector2? ScanForTarget()
         {
             // If we've already found a target previously, we have nothing else to do
             if (this._targetEnemy)
             {
-                if (this._targetEnemy.healthHaver.IsDead)
-                    return null; // if our target is dead, march onward
-
-                float bestAngle = LockAngleTo90Degrees((this._targetEnemy.sprite.WorldCenter - this._projectile.sprite.WorldCenter).ToAngle());
-                return PointOrthognalTo(this._projectile.sprite.WorldCenter, this._targetEnemy.sprite.WorldCenter, bestAngle.ToVector());
+                if (!this._targetEnemy.healthHaver.IsDead)
+                {
+                    float bestAngle = GetBestValidAngleForPiece((this._targetEnemy.sprite.WorldCenter - this._projectile.sprite.WorldCenter).ToAngle());
+                    return PointOrthognalTo(this._projectile.sprite.WorldCenter, this._targetEnemy.sprite.WorldCenter, bestAngle.ToVector());
+                }
+                this._targetEnemy = null; // reset our target and march onward
             }
 
             // Rook should march forward until an enemy is in its line of sight on one axis
@@ -295,18 +293,92 @@ namespace CwaffingTheGungy
                 // If there's no collision, it's a good position!
                 closestDistance            = edist;
                 closestViableEnemyPosition = ipoint;
-                this._nextDir              = LockAngleTo90Degrees((epos - abeg).ToAngle());
+                this._nextDir              = GetBestValidAngleForPiece((epos - abeg).ToAngle());
                 this._targetEnemy          = enemy;
             }
 
-            // Return the closest viable position we've found
-            // if (closestViableEnemyPosition.HasValue)
-            //     this._projectile.SendInDirection(this._nextDir.ToVector(), true);
             return closestViableEnemyPosition;
         }
     }
-    public class BishopPiece : ChessPiece { }
-    public class KnightPiece : ChessPiece { }
+
+    public class PawnPiece   : ChessPiece { }
+
+    public class RookPiece   : ChessPiece
+    {
+        protected override tk2dSpriteAnimationClip GetSprite() => Grandmaster._RookSprite;
+        protected override float GetMoveDistance()             => 450f;
+        protected override float GetMoveTime()                 => ChessPiece._BaseMoveTime;
+
+        protected override void UpdateCreate()
+        {
+            // Rook should snap to 90 degree angles
+            float angle = this._projectile.m_currentDirection.ToAngle();
+            this._nextDir = GetBestValidAngleForPiece(angle);
+            this._projectile.SendInDirection(this._nextDir.ToVector(), true);
+        }
+
+        private static List<float> _AnglesOf90 = new(){0f, 90f, 180f, 270f};
+        protected override float GetBestValidAngleForPiece(float angle)
+        {
+            return LockAngleToOneOf(angle, _AnglesOf90);
+        }
+
+        protected override Vector2? ChooseNewTarget()
+        {
+            return ScanForTarget();
+        }
+    }
+
+    public class BishopPiece : ChessPiece {
+        protected override tk2dSpriteAnimationClip GetSprite() => Grandmaster._BishopSprite;
+        protected override float GetMoveDistance()             => 350f;
+        protected override float GetMoveTime()                 => ChessPiece._BaseMoveTime;
+
+        protected override void UpdateCreate()
+        {
+            // Bishop should snap to 45 degree angles
+            float angle = this._projectile.m_currentDirection.ToAngle();
+            this._nextDir = GetBestValidAngleForPiece(angle);
+            this._projectile.SendInDirection(this._nextDir.ToVector(), true);
+        }
+
+        private static List<float> _AnglesOf45 = new(){45f, 135f, 225f, 315f};
+        protected override float GetBestValidAngleForPiece(float angle)
+        {
+            return LockAngleToOneOf(angle, _AnglesOf45);
+        }
+
+        protected override Vector2? ChooseNewTarget()
+        {
+            return ScanForTarget();
+        }
+    }
+
+    public class KnightPiece : ChessPiece {
+        protected override tk2dSpriteAnimationClip GetSprite() => Grandmaster._KnightSprite;
+        protected override float GetMoveDistance()             => 250f;
+        protected override float GetMoveTime()                 => ChessPiece._BaseMoveTime;
+
+        protected override void UpdateCreate()
+        {
+            // Knight should snap to 30 degree angles
+            float angle = this._projectile.m_currentDirection.ToAngle();
+            this._nextDir = GetBestValidAngleForPiece(angle);
+            this._projectile.SendInDirection(this._nextDir.ToVector(), true);
+        }
+
+        private static List<float> _AnglesOf30 = new(){30f, 60f, 120f, 150f, 210f, 240f, 300f, 330f};
+        protected override float GetBestValidAngleForPiece(float angle)
+        {
+            return LockAngleToOneOf(angle, _AnglesOf30);
+        }
+
+        protected override Vector2? ChooseNewTarget()
+        {
+            return ScanForTarget();
+        }
+    }
+
     public class QueenPiece  : ChessPiece { }
     public class KingPiece   : ChessPiece { }
 
@@ -344,7 +416,7 @@ namespace CwaffingTheGungy
             //         this._piece = this._projectile.gameObject.AddComponent<KingPiece>();
             //         break;
             // }
-            this._piece = this._projectile.gameObject.AddComponent<RookPiece>();
+            this._piece = this._projectile.gameObject.AddComponent<KnightPiece>();
 
             EasyTrailBullet trail = this._projectile.gameObject.GetComponent<EasyTrailBullet>();
             this._piece.Setup(this._projectile, pc, trail);
