@@ -37,13 +37,15 @@ namespace CwaffingTheGungy
                 gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
                 gun.reloadTime                           = 1.1f;
                 gun.DefaultModule.cooldownTime           = 0.1f;
-                gun.DefaultModule.numberOfShotsInClip    = 20;
+                gun.DefaultModule.numberOfShotsInClip    = 25;
                 gun.quality                              = PickupObject.ItemQuality.D;
                 gun.barrelOffset.transform.localPosition = new Vector3(2.4375f, 0.4375f, 0f); // should match "Casing" in JSON file
                 gun.SetBaseMaxAmmo(250);
                 gun.SetAnimationFPS(gun.shootAnimation, 24);
 
             var comp = gun.gameObject.AddComponent<RainCheck>();
+                comp.SetFireAudio("knife_gun_fire");
+                comp.SetReloadAudio("knife_gun_reload");
 
             _KunaiSprite = AnimateBullet.CreateProjectileAnimation(
                 new List<string> {
@@ -51,7 +53,7 @@ namespace CwaffingTheGungy
                 }, 12, true, new IntVector2(16, 10),
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
 
-            Projectile projectile       = Lazy.PrefabProjectileFromGun(gun);
+            Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
                 projectile.baseData.damage  = 5f;
                 projectile.baseData.speed   = 20.0f;
                 projectile.transform.parent = gun.barrelOffset;
@@ -69,6 +71,12 @@ namespace CwaffingTheGungy
         public override void OnSwitchedToThisGun()
         {
             base.OnSwitchedToThisGun();
+            LaunchAllBullets();
+        }
+
+        public override void OnDropped()
+        {
+            base.OnDropped();
             LaunchAllBullets();
         }
 
@@ -114,27 +122,30 @@ namespace CwaffingTheGungy
     {
         private const float _TIME_BEFORE_STASIS     = 0.25f;
         private const float _GLOW_TIME              = 0.5f;
-        private const float _GLOW_MAX               = 40f;
-        private const float _RAINCHECK_LAUNCH_DELAY = 0.04f;
+        private const float _GLOW_MAX               = 10f;
+        private const float _LAUNCH_DELAY           = 0.04f;
+        private const float _LAUNCH_SPEED           = 50f;
 
         private PlayerController _owner;
-        private Projectile _projectile;
-        private RainCheck _raincheck;
-        private float _initialSpeed;
-        private float _moveTimer;
-        private bool _launchSequenceStarted;
-        private bool _wasEverInStasis;
-        private int _index;
+        private Projectile       _projectile;
+        private RainCheck        _raincheck;
+        private float            _moveTimer;
+        private bool             _launchSequenceStarted;
+        private bool             _wasEverInStasis;
+        private int              _index;
 
         private void Start()
         {
             this._projectile            = base.GetComponent<Projectile>();
             this._owner                 = _projectile.Owner as PlayerController;
             this._raincheck             = this._owner.CurrentGun.GetComponent<RainCheck>();
-            this._initialSpeed          = _projectile.baseData.speed;
             this._launchSequenceStarted = false;
             this._wasEverInStasis       = false;
             this._index                 = this._raincheck.GetNextIndex();
+
+            this._projectile.specRigidbody.OnCollision += (_) => {
+                AkSoundEngine.PostEvent("knife_gun_hit", this._projectile.gameObject);
+            };
 
             StartCoroutine(TakeARainCheck());
         }
@@ -171,6 +182,8 @@ namespace CwaffingTheGungy
                 m.SetFloat("_EmissivePower", 0f);
                 m.SetFloat("_EmissiveColorPower", 1.55f);
                 m.SetColor("_EmissiveColor", Color.cyan);
+            AkSoundEngine.PostEvent("knife_gun_glow_stop_all", this._projectile.gameObject);
+            AkSoundEngine.PostEvent("knife_gun_glow", this._projectile.gameObject);
             this._moveTimer = _GLOW_TIME;
             while (this._moveTimer > 0)
             {
@@ -181,7 +194,7 @@ namespace CwaffingTheGungy
             }
 
             // Phase 4 / 5 -- the launch queue
-            this._moveTimer = _RAINCHECK_LAUNCH_DELAY * this._index;
+            this._moveTimer = _LAUNCH_DELAY * this._index;
             while (this._moveTimer > 0)
             {
                 this._moveTimer -= BraveTime.DeltaTime;
@@ -189,9 +202,10 @@ namespace CwaffingTheGungy
             }
 
             // Phase 5 / 5 -- the launch
-            this._projectile.baseData.speed = this._initialSpeed;
+            this._projectile.baseData.speed = _LAUNCH_SPEED;
             _projectile.SendInDirection(targetDir, true);
             _projectile.UpdateSpeed();
+            AkSoundEngine.PostEvent("knife_gun_launch", this._projectile.gameObject);
 
             yield break;
         }
@@ -199,7 +213,7 @@ namespace CwaffingTheGungy
         public void StartLaunchSequenceForPlayer(PlayerController pc)
         {
             if (pc != this._owner)
-                return;
+                return; // don't launch projectiles that don't belong to us
 
             this._launchSequenceStarted = true;
         }
