@@ -547,6 +547,7 @@
     <EmbeddedResource Include="Resources\BeamSprites\alphabeam_start_002.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\alphabeam_mid_002.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_fire_005.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\knife_gun_fire_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_fire_004.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\ki_blast_gun_fire_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_reload_002.png"/>
@@ -631,11 +632,13 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\paintball_cannon_reload_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_009.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_reload_010.png"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\knife_gun_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\paintball_cannon_reload_003.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\paintball_cannon_fire_004.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_006.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_fire_003.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_008.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\knife_gun_idle_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\paintball_cannon_reload_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_fire_001.png"/>
@@ -649,6 +652,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_fire_004.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_reload_008.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_reload_002.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\knife_gun_fire_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\ki_blast_002.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\energy_bounce1.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\bball6.png"/>
@@ -656,6 +660,7 @@
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\chess_king.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\train_projectile_002.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\bball5.png"/>
+    <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\kunai.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\chess_rook.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\bball2.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\bouncelet_001.png"/>
@@ -683,6 +688,7 @@
     <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\paintball_cannon_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\grandmaster_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\ki_blast_gun_idle_001.png"/>
+    <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\knife_gun_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\bouncer_idle_001.png"/>
     <Reference Include="UnityEngine.ClothModule"/>
     <Reference Include="UnityEngine.UnityConnectModule"/>

@@ -18,33 +18,46 @@ namespace CwaffingTheGungy
     public class RainCheck : AdvancedGunBehavior
     {
         public static string ItemName         = "Rain Check";
-        public static string SpriteName       = "eldermagnum2";
-        public static string ProjectileName   = "ak-47";
+        public static string SpriteName       = "knife_gun";
+        public static string ProjectileName   = "38_special";
         public static string ShortDescription = "For a Rainy Day";
         public static string LongDescription  = "(Upon firing, bullets are delayed from moving until reloading, then move towards player. Switching away from this gun keeps bullets in stasis until switching back to this gun.)";
+
+        internal static tk2dSpriteAnimationClip _KunaiSprite;
+
+        private int _nextIndex = 0;
+        private Vector2 _whereIsThePlayerLooking;
 
         public static void Add()
         {
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+                gun.gunSwitchGroup                       = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
+                gun.DefaultModule.ammoCost               = 1;
+                gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
+                gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
+                gun.reloadTime                           = 1.1f;
+                gun.DefaultModule.cooldownTime           = 0.1f;
+                gun.DefaultModule.numberOfShotsInClip    = 20;
+                gun.quality                              = PickupObject.ItemQuality.D;
+                gun.barrelOffset.transform.localPosition = new Vector3(2.4375f, 0.4375f, 0f); // should match "Casing" in JSON file
+                gun.SetBaseMaxAmmo(250);
+                gun.SetAnimationFPS(gun.shootAnimation, 24);
+
             var comp = gun.gameObject.AddComponent<RainCheck>();
 
-            gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
-            gun.DefaultModule.ammoCost            = 1;
-            gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
-            gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
-            gun.reloadTime                        = 1.1f;
-            gun.DefaultModule.cooldownTime        = 0.1f;
-            gun.DefaultModule.numberOfShotsInClip = 20;
-            gun.quality                           = PickupObject.ItemQuality.D;
-            gun.SetBaseMaxAmmo(250);
-            gun.SetAnimationFPS(gun.shootAnimation, 24);
+            _KunaiSprite = AnimateBullet.CreateProjectileAnimation(
+                new List<string> {
+                    "kunai",
+                }, 12, true, new IntVector2(16, 10),
+                false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
 
             Projectile projectile       = Lazy.PrefabProjectileFromGun(gun);
-            projectile.baseData.damage  = 5f;
-            projectile.baseData.speed   = 20.0f;
-            projectile.transform.parent = gun.barrelOffset;
-
-            projectile.gameObject.AddComponent<RainCheckBullets>();
+                projectile.baseData.damage  = 5f;
+                projectile.baseData.speed   = 20.0f;
+                projectile.transform.parent = gun.barrelOffset;
+                projectile.AddAnimation(_KunaiSprite);
+                projectile.SetAnimation(_KunaiSprite);
+                projectile.gameObject.AddComponent<RainCheckBullets>();
         }
 
         public override void OnReload(PlayerController player, Gun gun)
@@ -62,114 +75,133 @@ namespace CwaffingTheGungy
         public override void OnSwitchedAwayFromThisGun()
         {
             base.OnSwitchedAwayFromThisGun();
-            PutAllBulletsInStasis();
+            LaunchAllBullets();
+        }
+
+        public int GetNextIndex()
+        {
+            return ++this._nextIndex;
         }
 
         private void LaunchAllBullets()
         {
-            int num_found = 0;
-            for (int i = 0; i < StaticReferenceManager.AllProjectiles.Count; i++)
+            foreach (Projectile projectile in StaticReferenceManager.AllProjectiles)
             {
-                Projectile projectile = StaticReferenceManager.AllProjectiles[i];
-                if (projectile && projectile.Owner == gun.CurrentOwner && projectile.GetComponent<RainCheckBullets>())
-                {
-                    projectile.GetComponent<RainCheckBullets>().ForceMove(++num_found);
-                }
+                if (projectile.GetComponent<RainCheckBullets>() is not RainCheckBullets rcb)
+                    continue;
+                rcb.StartLaunchSequenceForPlayer(this.Player);
             }
+            this._nextIndex = 0;
         }
 
-        private void PutAllBulletsInStasis()
+        protected override void Update()
         {
-            for (int i = 0; i < StaticReferenceManager.AllProjectiles.Count; i++)
-            {
-                Projectile projectile = StaticReferenceManager.AllProjectiles[i];
-                if (projectile && projectile.Owner == gun.CurrentOwner && projectile.GetComponent<RainCheckBullets>())
-                {
-                    projectile.GetComponent<RainCheckBullets>().PutInStasis();
-                }
-            }
+            base.Update();
+            if (this.Player is not PlayerController pc)
+                return;
+
+            this._whereIsThePlayerLooking =
+                Raycast.ToNearestWallOrEnemyOrObject(pc.sprite.WorldCenter, pc.CurrentGun.CurrentAngle);
+        }
+
+        public Vector2 PointWherePlayerIsLooking()
+        {
+            return this._whereIsThePlayerLooking;
         }
     }
 
     public class RainCheckBullets : MonoBehaviour
     {
-        private const float RAINCHECK_MAX_TIMEOUT  = 10f;
-        private const float RAINCHECK_LAUNCH_DELAY = 0.025f;
+        private const float _TIME_BEFORE_STASIS     = 0.25f;
+        private const float _GLOW_TIME              = 0.5f;
+        private const float _GLOW_MAX               = 40f;
+        private const float _RAINCHECK_LAUNCH_DELAY = 0.04f;
 
-        private Projectile self;
-        private PlayerController owner;
-        private float initialSpeed;
-        private float moveTimer;
-        private bool launchSequenceStarted;
-        private bool inStasis;
-        private bool wasEverInStasis;
+        private PlayerController _owner;
+        private Projectile _projectile;
+        private RainCheck _raincheck;
+        private float _initialSpeed;
+        private float _moveTimer;
+        private bool _launchSequenceStarted;
+        private bool _wasEverInStasis;
+        private int _index;
+
         private void Start()
         {
-            this.self                  = base.GetComponent<Projectile>();
-            this.owner                 = self.Owner as PlayerController;
-            this.initialSpeed          = self.baseData.speed;
-            this.moveTimer             = RAINCHECK_MAX_TIMEOUT;
-            this.launchSequenceStarted = false;
-            this.inStasis              = false;
-            this.wasEverInStasis       = false;
+            this._projectile            = base.GetComponent<Projectile>();
+            this._owner                 = _projectile.Owner as PlayerController;
+            this._raincheck             = this._owner.CurrentGun.GetComponent<RainCheck>();
+            this._initialSpeed          = _projectile.baseData.speed;
+            this._launchSequenceStarted = false;
+            this._wasEverInStasis       = false;
+            this._index                 = this._raincheck.GetNextIndex();
 
-            self.baseData.speed = 0.1f;
-            self.UpdateSpeed();
-
-            // Reset the timers of all of our other RainCheckBullets, with a small delay
-            int numRainProjectiles = 0;
-            for (int i = 0; i < StaticReferenceManager.AllProjectiles.Count; i++)
-            {
-                Projectile projectile = StaticReferenceManager.AllProjectiles[i];
-                if (projectile && projectile.Owner == self.Owner)
-                {
-                    var p = projectile.GetComponent<RainCheckBullets>();
-                    if (p && !p.launchSequenceStarted)
-                    {
-                        p.moveTimer =
-                            RAINCHECK_MAX_TIMEOUT - RAINCHECK_LAUNCH_DELAY * numRainProjectiles;
-                        ++numRainProjectiles;
-                    }
-                }
-            }
-
-            StartCoroutine(DoSpeedChange());
+            StartCoroutine(TakeARainCheck());
         }
 
-        private IEnumerator DoSpeedChange()
+        private IEnumerator TakeARainCheck()
         {
-            while (this.inStasis || this.moveTimer > 0)
+            // Phase 1 / 5 -- the initial fire
+            this._moveTimer = _TIME_BEFORE_STASIS;
+            while (this._moveTimer > 0 && !this._launchSequenceStarted)
             {
-                this.moveTimer -= BraveTime.DeltaTime;
-                if (!self) break;
+                this._moveTimer -= BraveTime.DeltaTime;
                 yield return null;
             }
-            this.launchSequenceStarted = true;
-            self.baseData.speed        = this.initialSpeed;
-            if (this.owner)
+
+            // Phase 2 / 5 -- the freeze
+            this._projectile.baseData.speed = 0.01f;
+            this._projectile.UpdateSpeed();
+            this._wasEverInStasis = true;
+            Vector2 pos = this._projectile.sprite.WorldCenter;
+            Vector2 targetDir = Vector2.zero;
+            while (true)
             {
-                Vector2 dirToPlayer = this.owner.sprite.WorldCenter - self.sprite.WorldCenter;
-                self.SendInDirection(dirToPlayer, true);
+                targetDir = this._raincheck.PointWherePlayerIsLooking() - pos;
+                _projectile.SendInDirection(targetDir, true); // rotate the projectile
+                if (this._launchSequenceStarted)
+                    break; // awkward loop construct to make sure we set our targetDir at least once
+                yield return null;
             }
-            self.UpdateSpeed();
+
+            // Phase 3 / 5 -- the glow
+            this._projectile.sprite.usesOverrideMaterial = true;
+            Material m = this._projectile.sprite.renderer.material;
+                m.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+                m.SetFloat("_EmissivePower", 0f);
+                m.SetFloat("_EmissiveColorPower", 1.55f);
+                m.SetColor("_EmissiveColor", Color.cyan);
+            this._moveTimer = _GLOW_TIME;
+            while (this._moveTimer > 0)
+            {
+                float glowAmount = (_GLOW_TIME - this._moveTimer) / _GLOW_TIME;
+                m.SetFloat("_EmissivePower", glowAmount * _GLOW_MAX);
+                this._moveTimer -= BraveTime.DeltaTime;
+                yield return null;
+            }
+
+            // Phase 4 / 5 -- the launch queue
+            this._moveTimer = _RAINCHECK_LAUNCH_DELAY * this._index;
+            while (this._moveTimer > 0)
+            {
+                this._moveTimer -= BraveTime.DeltaTime;
+                yield return null;
+            }
+
+            // Phase 5 / 5 -- the launch
+            this._projectile.baseData.speed = this._initialSpeed;
+            _projectile.SendInDirection(targetDir, true);
+            _projectile.UpdateSpeed();
+
+            yield break;
         }
 
-        public void ForceMove(int index)
+        public void StartLaunchSequenceForPlayer(PlayerController pc)
         {
-            if (this.launchSequenceStarted)
+            if (pc != this._owner)
                 return;
-            //no resetting our timers after this function has been called once
-            this.launchSequenceStarted = true;
-            this.moveTimer             = index * RAINCHECK_LAUNCH_DELAY;
-            this.inStasis              = false;
-        }
 
-        public void PutInStasis()
-        {
-            if (this.wasEverInStasis)
-                return;
-            this.inStasis        = true;
-            this.wasEverInStasis = true;
+            this._launchSequenceStarted = true;
         }
     }
 }
