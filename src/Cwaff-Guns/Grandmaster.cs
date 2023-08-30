@@ -81,7 +81,7 @@ namespace CwaffingTheGungy
         Bishop = 2,
         Knight = 3,
         Queen  = 4,
-        King   = 5,
+        // King   = 5, // the gun itself is a king, don't need this for now; maybe a synergy later?
     };
 
     public abstract class ChessPiece : MonoBehaviour
@@ -189,7 +189,7 @@ namespace CwaffingTheGungy
 
             this._trail = this._projectile.gameObject.AddComponent<EasyTrailBullet>();
                 this._trail.StartWidth = 0.2f;
-                this._trail.EndWidth   = 0f;
+                this._trail.EndWidth   = 0.1f;
                 this._trail.LifeTime   = 0.1f;
                 this._trail.BaseColor  = GetTrailColor();
                 this._trail.StartColor = GetTrailColor();
@@ -442,25 +442,61 @@ namespace CwaffingTheGungy
 
     public class QueenPiece : ChessPiece
     {
-        protected override tk2dSpriteAnimationClip GetSprite() => Grandmaster._PawnSprite;
-        protected override float GetMoveDistance()             => _BaseMoveDist;
-        protected override float GetMoveTime()                 => _BaseMoveTime;
+        protected override tk2dSpriteAnimationClip GetSprite() => Grandmaster._QueenSprite;
+        protected override float GetMoveDistance()             => 500f;
+        protected override float GetMoveTime()                 => ChessPiece._BaseMoveTime;
         protected override Color GetTrailColor()               => Color.yellow;
+
+        protected override void UpdateCreate()
+        {
+            // Queen should snap to 45 and 90 degree angles after initial shot
+            this._targetVec = GetBestValidAngleForPiece(this._projectile.m_currentDirection.ToAngle()).ToVector();
+        }
+
+        private static List<float> _AnglesOf45And90 = new(){0f, 45f, 90f, 135f, 180f, 225f, 270f, 315f};
+
+        protected override List<float> GetValidAnglesForPiece()
+        {
+            return _AnglesOf45And90;
+        }
+
+        protected override Vector2? ChooseNewTarget()
+        {
+            return ScanForTarget();
+        }
     }
 
-    public class KingPiece : ChessPiece
-    {
-        protected override tk2dSpriteAnimationClip GetSprite() => Grandmaster._PawnSprite;
-        protected override float GetMoveDistance()             => _BaseMoveDist;
-        protected override float GetMoveTime()                 => _BaseMoveTime;
-        protected override Color GetTrailColor()               => Color.yellow;
-    }
+    // public class KingPiece : ChessPiece
+    // {
+    //     protected override tk2dSpriteAnimationClip GetSprite() => Grandmaster._PawnSprite;
+    //     protected override float GetMoveDistance()             => _BaseMoveDist;
+    //     protected override float GetMoveTime()                 => _BaseMoveTime;
+    //     protected override Color GetTrailColor()               => Color.yellow;
+    // }
 
     public class PlayChessBehavior : MonoBehaviour
     {
         private Projectile _projectile  = null;
         private PlayerController _owner = null;
         private ChessPiece _piece       = null;
+
+        private static List<ChessPieces> _PiecePool = new() {
+            ChessPieces.Pawn,
+            ChessPieces.Pawn,
+            ChessPieces.Pawn,
+            ChessPieces.Pawn,
+            ChessPieces.Pawn,
+            ChessPieces.Pawn,
+            ChessPieces.Pawn,
+            ChessPieces.Pawn, // 8 pawns
+            ChessPieces.Rook,
+            ChessPieces.Rook, // 2 rooks
+            ChessPieces.Bishop,
+            ChessPieces.Bishop, // 2 bishops
+            ChessPieces.Knight,
+            ChessPieces.Knight, // 2 knights
+            ChessPieces.Queen, // 1 queen (and 0 kings for now)
+        };
 
         private void Start()
         {
@@ -469,7 +505,7 @@ namespace CwaffingTheGungy
                 return;
             this._owner = pc;
 
-            switch(Lazy.ChooseRandom<ChessPieces>())
+            switch(_PiecePool.ChooseRandom())
             {
                 case ChessPieces.Pawn:
                     this._piece = this._projectile.gameObject.AddComponent<PawnPiece>();
@@ -483,19 +519,16 @@ namespace CwaffingTheGungy
                 case ChessPieces.Knight:
                     this._piece = this._projectile.gameObject.AddComponent<KnightPiece>();
                     break;
-                default:
-                    this._piece = this._projectile.gameObject.AddComponent<PawnPiece>();
+                case ChessPieces.Queen:
+                    this._piece = this._projectile.gameObject.AddComponent<QueenPiece>();
                     break;
-                // case ChessPieces.Queen:
-                //     this._piece = this._projectile.gameObject.AddComponent<QueenPiece>();
-                //     break;
                 // case ChessPieces.King:
                 //     this._piece = this._projectile.gameObject.AddComponent<KingPiece>();
                 //     break;
+                default:
+                    this._piece = this._projectile.gameObject.AddComponent<PawnPiece>();
+                    break;
             }
-            // this._piece = this._projectile.gameObject.AddComponent<KnightPiece>();
-            // this._piece = this._projectile.gameObject.AddComponent<RookPiece>();
-            // this._piece = this._projectile.gameObject.AddComponent<BishopPiece>();
 
             this._piece.Setup(this._projectile, pc);
         }
