@@ -191,11 +191,12 @@ namespace CwaffingTheGungy
     }
 
     // Add custom firing audio to a gun
-    public static void SetFireAudio<T>(this T agun, string audioEventName)
+    public static void SetFireAudio<T>(this T agun, string audioEventName = null)
       where T : Alexandria.ItemAPI.AdvancedGunBehavior
     {
       agun.preventNormalFireAudio = true;
-      agun.overrideNormalFireAudio = audioEventName;
+      if (audioEventName is not null)
+        agun.overrideNormalFireAudio = audioEventName;
       // agun.OverrideNormalFireAudioEvent = audioEventName;
       // agun.GetComponent<tk2dSpriteAnimator>().GetClipByName(agun.shootAnimation).frames[0].triggerEvent = true;
       // agun.GetComponent<tk2dSpriteAnimator>().GetClipByName(agun.shootAnimation).frames[0].eventAudio = audioEventName;
@@ -206,7 +207,8 @@ namespace CwaffingTheGungy
       where T : Alexandria.ItemAPI.AdvancedGunBehavior
     {
       agun.preventNormalReloadAudio  = true;
-      agun.overrideNormalReloadAudio = audioEventName;
+      if (audioEventName is not null)
+        agun.overrideNormalReloadAudio = audioEventName;
     }
 
     // Loop a gun's animation

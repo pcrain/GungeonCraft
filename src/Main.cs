@@ -102,7 +102,7 @@ namespace CwaffingTheGungy
                     // TestLightning.Add();
 
                     IronMaid.Add();
-                    Natasha.Add();
+                    Natascha.Add();
                     PaintballCannon.Add();
                     DerailGun.Add();
                     PopcornGun.Add();
