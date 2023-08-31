@@ -15,10 +15,10 @@ using Alexandria.Misc;
 
 namespace CwaffingTheGungy
 {
-    public class RainCheck : AdvancedGunBehavior
+    public class IronMaid : AdvancedGunBehavior
     {
-        public static string ItemName         = "Rain Check";
-        public static string SpriteName       = "knife_gun";
+        public static string ItemName         = "Iron Maid";
+        public static string SpriteName       = "iron_maid";
         public static string ProjectileName   = "38_special";
         public static string ShortDescription = "For a Rainy Day";
         public static string LongDescription  = "(Upon firing, bullets are delayed from moving until reloading, then move towards player. Switching away from this gun keeps bullets in stasis until switching back to this gun.)";
@@ -35,16 +35,18 @@ namespace CwaffingTheGungy
                 gun.DefaultModule.ammoCost               = 1;
                 gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
                 gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
-                gun.reloadTime                           = 1.1f;
+                gun.reloadTime                           = 0.75f;
                 gun.DefaultModule.cooldownTime           = 0.1f;
-                gun.DefaultModule.numberOfShotsInClip    = 25;
+                gun.DefaultModule.numberOfShotsInClip    = 20;
                 gun.quality                              = PickupObject.ItemQuality.D;
-                gun.barrelOffset.transform.localPosition = new Vector3(2.4375f, 0.4375f, 0f); // should match "Casing" in JSON file
-                gun.SetBaseMaxAmmo(250);
+                gun.barrelOffset.transform.localPosition = new Vector3(1.875f, 0.375f, 0f); // should match "Casing" in JSON file
+                gun.SetBaseMaxAmmo(400);
                 gun.SetAnimationFPS(gun.shootAnimation, 24);
+                gun.SetAnimationFPS(gun.reloadAnimation, 24);
 
-            var comp = gun.gameObject.AddComponent<RainCheck>();
-                comp.SetFireAudio("knife_gun_fire");
+            var comp = gun.gameObject.AddComponent<IronMaid>();
+                // comp.SetFireAudio("knife_gun_fire");
+                comp.SetFireAudio("knife_gun_launch");
                 comp.SetReloadAudio("knife_gun_reload");
 
             _KunaiSprite = AnimateBullet.CreateProjectileAnimation(
@@ -55,7 +57,7 @@ namespace CwaffingTheGungy
 
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
                 projectile.baseData.damage  = 5f;
-                projectile.baseData.speed   = 20.0f;
+                projectile.baseData.speed   = 40.0f;
                 projectile.transform.parent = gun.barrelOffset;
                 projectile.AddAnimation(_KunaiSprite);
                 projectile.SetAnimation(_KunaiSprite);
@@ -65,25 +67,33 @@ namespace CwaffingTheGungy
         public override void OnReload(PlayerController player, Gun gun)
         {
             base.OnReload(player, gun);
-            LaunchAllBullets();
+            LaunchAllBullets(player);
         }
 
         public override void OnSwitchedToThisGun()
         {
             base.OnSwitchedToThisGun();
-            LaunchAllBullets();
+            LaunchAllBullets(this.Player);
+        }
+
+        protected override void OnPickup(GameActor owner)
+        {
+            base.OnPickup(owner);
+            if (owner is PlayerController player && player == this.Player)
+                this.Player.OnReceivedDamage += LaunchAllBullets;
         }
 
         public override void OnDropped()
         {
             base.OnDropped();
-            LaunchAllBullets();
+            LaunchAllBullets(this.Player);
+            this.Player.OnReceivedDamage -= LaunchAllBullets;
         }
 
         public override void OnSwitchedAwayFromThisGun()
         {
             base.OnSwitchedAwayFromThisGun();
-            LaunchAllBullets();
+            LaunchAllBullets(this.Player);
         }
 
         public int GetNextIndex()
@@ -91,13 +101,19 @@ namespace CwaffingTheGungy
             return ++this._nextIndex;
         }
 
-        private void LaunchAllBullets()
+        private void LaunchAllBullets(GameActor player)
+        {
+            if (player is PlayerController pc)
+                LaunchAllBullets(pc);
+        }
+
+        private void LaunchAllBullets(PlayerController pc)
         {
             foreach (Projectile projectile in StaticReferenceManager.AllProjectiles)
             {
                 if (projectile.GetComponent<RainCheckBullets>() is not RainCheckBullets rcb)
                     continue;
-                rcb.StartLaunchSequenceForPlayer(this.Player);
+                rcb.StartLaunchSequenceForPlayer(pc);
             }
             this._nextIndex = 0;
         }
@@ -120,7 +136,7 @@ namespace CwaffingTheGungy
 
     public class RainCheckBullets : MonoBehaviour
     {
-        private const float _TIME_BEFORE_STASIS     = 0.25f;
+        private const float _TIME_BEFORE_STASIS     = 0.2f;
         private const float _GLOW_TIME              = 0.5f;
         private const float _GLOW_MAX               = 10f;
         private const float _LAUNCH_DELAY           = 0.04f;
@@ -128,7 +144,7 @@ namespace CwaffingTheGungy
 
         private PlayerController _owner;
         private Projectile       _projectile;
-        private RainCheck        _raincheck;
+        private IronMaid        _raincheck;
         private float            _moveTimer;
         private bool             _launchSequenceStarted;
         private bool             _wasEverInStasis;
@@ -138,7 +154,7 @@ namespace CwaffingTheGungy
         {
             this._projectile            = base.GetComponent<Projectile>();
             this._owner                 = _projectile.Owner as PlayerController;
-            this._raincheck             = this._owner.CurrentGun.GetComponent<RainCheck>();
+            this._raincheck             = this._owner.CurrentGun.GetComponent<IronMaid>();
             this._launchSequenceStarted = false;
             this._wasEverInStasis       = false;
             this._index                 = this._raincheck.GetNextIndex();
@@ -154,10 +170,13 @@ namespace CwaffingTheGungy
         {
             // Phase 1 / 5 -- the initial fire
             this._moveTimer = _TIME_BEFORE_STASIS;
+            float decel = this._projectile.baseData.speed / (C.FPS * _TIME_BEFORE_STASIS);
             while (this._moveTimer > 0 && !this._launchSequenceStarted)
             {
                 this._moveTimer -= BraveTime.DeltaTime;
                 yield return null;
+                this._projectile.baseData.speed -= decel;
+                this._projectile.UpdateSpeed();
             }
 
             // Phase 2 / 5 -- the freeze

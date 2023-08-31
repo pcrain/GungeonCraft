@@ -101,7 +101,7 @@ namespace CwaffingTheGungy
                 #region Guns
                     // TestLightning.Add();
 
-                    RainCheck.Add();
+                    IronMaid.Add();
                     Natasha.Add();
                     PaintballCannon.Add();
                     DerailGun.Add();
