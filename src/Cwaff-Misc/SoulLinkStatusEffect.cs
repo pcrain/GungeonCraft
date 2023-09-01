@@ -10,75 +10,98 @@ using Dungeonator;
 
 namespace CwaffingTheGungy
 {
-    class SoulLinkStatusEffectSetup
+    public class SoulLinkStatus : MonoBehaviour
     {
-        public static GameActorSoulLinkEffect StandardSoulLinkEffect;
-        public static GameObject SoulLinkOverheadVFX;
+        public static GameActorHealthEffect StandardSoulLinkEffect;
+
+        private const int   _ORBIT_NUM       = 3;
+        private const float _ORBIT_RPS       = 0.5f;
+        private const float _ORBIT_RAD_X     = 1.0f;
+        private const float _ORBIT_RAD_Y     = 0.4f;
+        private const float _ORBIT_SPR       = 1.0f / _ORBIT_RPS; // seconds per rotation
+        private const float _ORBIT_GAP       = 360.0f / (float)_ORBIT_NUM;
+        private const float _EFFECT_COOLDOWN = 0.01f; // MUST be nonzero or game can freeze
+
+        internal static VFXPool _SoulLinkHitVFXPool      = null;
+        internal static GameObject _SoulLinkHitVFX       = null;
+        internal static GameObject _SoulLinkOverheadVFX  = null;
+
+        private AIActor _enemy;
+        private float _cooldown;
+        private float _orbitTimer;
+        private List<GameObject> _orbitals;
 
         public static void Init()
         {
-            SoulLinkOverheadVFX = VFX.animations["PlagueOverhead"];
-            GameActorSoulLinkEffect StandSoulLink = GenerateSoulLinkEffect(
-                100, 2, true, Color.green, true, Color.green);
-            StandardSoulLinkEffect = StandSoulLink;
-        }
-
-        public static GameActorSoulLinkEffect GenerateSoulLinkEffect(float duration, float dps, bool tintEnemy, Color bodyTint, bool tintCorpse, Color corpseTint)
-        {
-            GameActorSoulLinkEffect soulLink = new GameActorSoulLinkEffect
+            _SoulLinkHitVFXPool    = VFX.CreatePoolFromVFXGameObject((ItemHelper.Get(Items.MagicLamp) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
+            _SoulLinkHitVFX        = _SoulLinkHitVFXPool.effects[0].effects[0].effect.gameObject;
+            _SoulLinkOverheadVFX   = VFX.animations["SoulLinkParticle"];
+            StandardSoulLinkEffect = new GameActorHealthEffect
             {
                 duration                 = 60,
                 effectIdentifier         = "SoulLink",
                 resistanceType           = EffectResistanceType.None,
                 DamagePerSecondToEnemies = 0,
                 ignitesGoops             = false,
-                OverheadVFX              = SoulLinkOverheadVFX,
+                // OverheadVFX              = _SoulLinkOverheadVFX,
+                OverheadVFX              = null,
                 AffectsEnemies           = true,
                 AffectsPlayers           = false,
                 AppliesOutlineTint       = true,
                 PlaysVFXOnActor          = false,
-                AppliesTint              = tintEnemy,
-                AppliesDeathTint         = tintCorpse,
-                TintColor                = bodyTint,
-                DeathTintColor           = corpseTint,
+                AppliesTint              = true,
+                TintColor                = ExtendedColours.pink,
+                AppliesDeathTint         = false,
             };
-            return soulLink;
         }
-    }
-    public class GameActorSoulLinkEffect : GameActorHealthEffect
-    {
-        public GameActorSoulLinkEffect()
-        {
-            this.DamagePerSecondToEnemies = 1f;
-            this.TintColor                = Color.green;
-            this.DeathTintColor           = Color.green;
-            this.AppliesTint              = true;
-            this.AppliesDeathTint         = true;
-        }
-
-        public override void EffectTick(GameActor actor, RuntimeGameActorEffectData effectData)
-        {
-            base.EffectTick(actor, effectData);
-        }
-    }
-
-    public class SoulLinkProjectile : MonoBehaviour
-    {
-        private Projectile m_projectile;
 
         private void Start()
         {
-            this.m_projectile = base.GetComponent<Projectile>();
-            this.m_projectile.OnHitEnemy += this.OnHitEnemy;
+            this._enemy        = base.GetComponent<AIActor>();
+            this._cooldown     = 0;
+            this._orbitTimer   = 0;
+            this._orbitals     = new();
+
+            for (int i = 0; i < _ORBIT_NUM; ++i)
+            {
+                float angle = (_ORBIT_GAP * i).Clamp360();
+                Quaternion rot = angle.EulerZ();
+                Vector2 offset = _ORBIT_RAD_X * angle.ToVector();
+                this._orbitals.Add(SpawnManager.SpawnVFX(
+                    SoulLinkStatus._SoulLinkOverheadVFX, (this._enemy.sprite.WorldCenter + offset).ToVector3ZisY(-1), rot));
+            }
+
+            this._enemy.ApplyEffect(SoulLinkStatus.StandardSoulLinkEffect);
+            this._enemy.healthHaver.ModifyDamage += this.OnTakeDamage;
         }
 
-        private void OnHitEnemy(Projectile bullet, SpeculativeRigidbody enemy, bool what)
+        private void Update()
         {
-            if (enemy.aiActor.gameObject.GetComponent<UnderEffectsOfSoulLink>())
+            if (this._enemy.healthHaver.IsDead)
+            {
+                HandleEnemyDied();
                 return;
-            enemy.aiActor.ApplyEffect(SoulLinkStatusEffectSetup.StandardSoulLinkEffect);
-            var comp = enemy.aiActor.gameObject.AddComponent<UnderEffectsOfSoulLink>();
-            enemy.healthHaver.ModifyDamage += this.OnTakeDamage;
+            }
+
+            if (this._cooldown > 0f)
+                this._cooldown -= BraveTime.DeltaTime;
+
+            this._orbitTimer += BraveTime.DeltaTime;
+            if (this._orbitTimer > _ORBIT_SPR)
+                this._orbitTimer -= _ORBIT_SPR;
+            float orbitOffset = this._orbitTimer / _ORBIT_SPR;
+
+            int i = 0;
+            foreach (GameObject g in this._orbitals)
+            {
+                g.GetComponent<tk2dSprite>().renderer.enabled = this._enemy.renderer.enabled;
+                float angle = (_ORBIT_GAP * i + 360.0f * orbitOffset).Clamp360();
+                Vector2 avec   = angle.ToVector();
+                Vector2 offset = new Vector2(_ORBIT_RAD_X * avec.x, _ORBIT_RAD_Y * avec.y);
+                g.transform.position = this._enemy.sprite.WorldCenter + offset;
+                g.transform.rotation = angle.EulerZ();
+                ++i;
+            }
         }
 
         private void OnTakeDamage(HealthHaver enemy, HealthHaver.ModifyDamageEventArgs data)
@@ -86,57 +109,39 @@ namespace CwaffingTheGungy
             List<AIActor> activeEnemies = enemy.aiActor.GetAbsoluteParentRoom().GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
             if (activeEnemies == null)
                 return;
-            for (int i = 0; i < activeEnemies.Count; i++)
+            foreach (AIActor otherEnemy in activeEnemies)
             {
-                AIActor otherEnemy = activeEnemies[i];
                 if (!(otherEnemy && otherEnemy.specRigidbody && !otherEnemy.IsGone && otherEnemy.healthHaver))
                     continue;
-                var comp = otherEnemy.gameObject.GetComponent<UnderEffectsOfSoulLink>();
-                if (!comp)
-                    continue;
-                comp.TryApplyDamage(otherEnemy.healthHaver);
+                otherEnemy.gameObject.GetComponent<SoulLinkStatus>()?.TryApplyDamage(otherEnemy.healthHaver);
             }
         }
-    }
 
-    public class UnderEffectsOfSoulLink : MonoBehaviour
-    {
-        private AIActor m_enemy;
-        private float m_cooldown;
-        private static VFXPool vfx = null;
-
-        private void Start()
+        private void HandleEnemyDied()
         {
-            vfx ??= VFX.CreatePoolFromVFXGameObject((ItemHelper.Get(Items.MagicLamp) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
-            this.m_enemy = base.GetComponent<AIActor>();
-            this.m_cooldown = 0;
+            foreach (GameObject g in this._orbitals)
+                UnityEngine.Object.Destroy(g);
         }
 
         public void TryApplyDamage(HealthHaver enemyHH)
         {
-            if (this.m_cooldown > 0)
+            if (this._cooldown > 0)
                 return;
-            this.m_cooldown = 0.1f;
+
+            this._cooldown = _EFFECT_COOLDOWN;
             enemyHH.ApplyDamage(1f, new Vector2(10f,0f), "Soul Link",
-                CoreDamageTypes.Magic, DamageCategory.Collision,
-                false, null, false);
+                CoreDamageTypes.Magic, DamageCategory.Unstoppable,
+                true, null, false);
             enemyHH.knockbackDoer.ApplyKnockback(new Vector2(10f,0f), 2f);
 
-            Vector2 ppos = this.m_enemy.sprite.WorldCenter;
+            Vector2 ppos = this._enemy.sprite.WorldCenter;
             for (int i = 0; i < 3; ++i)
             {
                 Vector2 finalpos = ppos + BraveMathCollege.DegreesToVector(120*i,1);
-                vfx.SpawnAtPosition(
-                    finalpos.ToVector3ZisY(-1f), /* -1 = above player sprite */
-                    120*i,
-                    null, null, null, -0.05f);
+                GameObject v = SpawnManager.SpawnVFX(_SoulLinkHitVFX, finalpos, (120f*i).EulerZ());
+                // v.transform.parent = enemyHH.transform;
+                // _Vfx.SpawnAtPosition(finalpos.ToVector3ZisY(-1f /* -1 = above player sprite */), zRotation: 120*i, heightOffGround: -0.05f);
             }
-        }
-
-        private void Update()
-        {
-            if (this.m_cooldown > 0f)
-                this.m_cooldown -= BraveTime.DeltaTime;
         }
     }
 }

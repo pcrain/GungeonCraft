@@ -43,10 +43,18 @@ namespace CwaffingTheGungy
             gun.SetAnimationFPS(gun.shootAnimation, 24);
 
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
-            projectile.baseData.speed   = 30.0f;
-            projectile.baseData.damage  = 1f;
-            projectile.gameObject.AddComponent<SoulLinkProjectile>();
+                projectile.baseData.speed   = 30.0f;
+                projectile.baseData.damage  = 1f;
+                projectile.gameObject.AddComponent<SoulLinkProjectile>();
         }
+    }
 
+    public class SoulLinkProjectile : MonoBehaviour
+    {
+        private void Start()
+        {
+            base.GetComponent<Projectile>().OnHitEnemy += (Projectile _, SpeculativeRigidbody enemy, bool _) =>
+                enemy.aiActor.gameObject.GetOrAddComponent<SoulLinkStatus>();
+        }
     }
 }

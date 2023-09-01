@@ -68,7 +68,7 @@ namespace CwaffingTheGungy
                 VFX.Init();
 
                 //Status Effect Setup
-                SoulLinkStatusEffectSetup.Init();
+                SoulLinkStatus.Init();
                 //Goop Setup
                 EasyGoopDefinitions.DefineDefaultGoops();
 
