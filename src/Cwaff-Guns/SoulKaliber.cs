@@ -57,6 +57,71 @@ namespace CwaffingTheGungy
         }
     }
 
+    public class FancyVFX : MonoBehaviour
+    {
+        private GameObject _vfx;
+        private float _lifeTime;
+        private tk2dSprite _sprite;
+
+        private Vector3 _velocity;
+        private bool _fadeOut;
+        private float _fadeStartTime;
+        private float _fadeTotalTime;
+        private float _maxLifeTime;
+
+        private void Start()
+        {
+            this._vfx = base.gameObject;
+            this._lifeTime = 0.0f;
+            this._sprite = this._vfx.GetComponent<tk2dSprite>();
+
+        }
+
+        private void Update()
+        {
+            this._lifeTime += BraveTime.DeltaTime;
+            if (this._lifeTime > this._maxLifeTime)
+            {
+                UnityEngine.Object.Destroy(this);
+                return;
+            }
+
+            this._sprite.transform.position += this._velocity;
+
+            if (this._lifeTime > this._fadeStartTime)
+                this._sprite.renderer.SetAlpha(1.0f - (this._lifeTime - this._fadeStartTime) / this._fadeTotalTime);
+        }
+
+        public void Setup(Vector2 velocity, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0, Color? emissiveColor = null)
+        {
+            this._velocity = (1.0f / C.PIXELS_PER_CELL) * velocity.ToVector3ZisY(0);
+            this._maxLifeTime = lifetime;
+            this._fadeOut = fadeOutTime.HasValue;
+            if (this._fadeOut)
+            {
+                this._fadeTotalTime = fadeOutTime.Value;
+                this._fadeStartTime = lifetime - this._fadeTotalTime;
+            }
+            this.transform.parent = parent;
+
+            // if (emissivePower > 0)
+            // {
+            //     this._sprite.usesOverrideMaterial = true;
+            //     Material m = this._sprite.renderer.material;
+            //         m.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+            //         m.SetFloat("_EmissivePower", emissivePower);
+
+            //     if (emissiveColor.HasValue)
+            //     {
+            //         m.SetFloat("_EmissiveColorPower", 1.55f);
+            //         m.SetColor("_EmissiveColor", emissiveColor.Value);
+            //         m.SetColor("_OverrideColor", emissiveColor.Value);
+            //     }
+            // }
+        }
+    }
+
+
     public class SoulLinkStatus : MonoBehaviour
     {
         public static GameActorHealthEffect StandardSoulLinkEffect;
@@ -71,6 +136,7 @@ namespace CwaffingTheGungy
         internal static VFXPool _SoulLinkHitVFXPool      = null;
         internal static GameObject _SoulLinkHitVFX       = null;
         internal static GameObject _SoulLinkOverheadVFX  = null;
+        internal static GameObject _SoulLinkSoulVFX      = null;
 
         private static bool _SoulLinkEffectHappening = false;
 
@@ -83,6 +149,7 @@ namespace CwaffingTheGungy
             _SoulLinkHitVFXPool    = VFX.CreatePoolFromVFXGameObject((ItemHelper.Get(Items.MagicLamp) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
             _SoulLinkHitVFX        = _SoulLinkHitVFXPool.effects[0].effects[0].effect.gameObject;
             _SoulLinkOverheadVFX   = VFX.animations["SoulLinkParticle"];
+            _SoulLinkSoulVFX       = VFX.animations["SoulLinkSoul"];
             StandardSoulLinkEffect = new GameActorHealthEffect
             {
                 duration                 = 60,
@@ -189,12 +256,16 @@ namespace CwaffingTheGungy
             hh.knockbackDoer.ApplyKnockback(new Vector2(10f,0f), 2f);
 
             Vector2 ppos = this._enemy.sprite.WorldCenter;
-            for (int i = 0; i < 3; ++i)
+            for (int i = 0; i < 5; ++i)
             {
-                Vector2 finalpos = ppos + BraveMathCollege.DegreesToVector(120*i,1);
-                GameObject v = SpawnManager.SpawnVFX(_SoulLinkHitVFX, finalpos, (120f*i).EulerZ());
+                float angle = Lazy.RandomAngle();
+                Quaternion rot = Lazy.RandomAngle().EulerZ();
+                Vector2 finalpos = ppos + BraveMathCollege.DegreesToVector(angle);
+                GameObject v = SpawnManager.SpawnVFX(_SoulLinkSoulVFX, finalpos, rot);
+                // ETGModConsole.Log($"setup {i}");
+                FancyVFX f = v.AddComponent<FancyVFX>();
+                    f.Setup(Lazy.RandomVector(1f), 0.5f, fadeOutTime: 0.5f, emissivePower: 50f, emissiveColor: Color.white);
                 // v.transform.parent = enemyHH.transform;
-                // _Vfx.SpawnAtPosition(finalpos.ToVector3ZisY(-1f /* -1 = above player sprite */), zRotation: 120*i, heightOffGround: -0.05f);
             }
         }
     }
