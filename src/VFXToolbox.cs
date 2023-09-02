@@ -73,10 +73,10 @@ namespace CwaffingTheGungy
                 anchor: tk2dBaseSprite.Anchor.LowerCenter);
 
             RegisterVFX<GameObject>("SoulLinkParticle", ResMap.Get("soul-link-particle"), 16, loops: true,
-                anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.3f);
+                anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.3f, emissivePower: 100);
 
-            RegisterVFX<GameObject>("SoulLinkSoul", ResMap.Get("soul-link-soul"), 2, loops: true,
-                anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.3f);
+            RegisterVFX<GameObject>("SoulLinkSoul", ResMap.Get("soul-link-soul"), 5, loops: true,
+                anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.3f, emissivePower: 200);
 
             RegisterVFX<GameObject>("Shine", new List<string>() {
                     "CwaffingTheGungy/Resources/MiscVFX/shine2",
@@ -410,6 +410,77 @@ namespace CwaffingTheGungy
             if (renderer.material.shader.name != "Brave/Internal/SimpleAlphaFadeUnlit")
                 renderer.material.shader = Shader.Find("Brave/Internal/SimpleAlphaFadeUnlit");
             renderer.material.SetFloat("_Fade", newAlpha);
+        }
+    }
+
+    // Helper class for making movable / fadeable  VFX
+    public class FancyVFX : MonoBehaviour
+    {
+        private GameObject _vfx;
+        private float _lifeTime;
+        private tk2dSprite _sprite;
+
+        private Vector3 _velocity;
+        private bool _fadeOut;
+        private float _fadeStartTime;
+        private float _fadeTotalTime;
+        private float _maxLifeTime;
+
+        private void Start()
+        {
+            this._vfx = base.gameObject;
+            this._lifeTime = 0.0f;
+            this._sprite = this._vfx.GetComponent<tk2dSprite>();
+        }
+
+        private void Update()
+        {
+            if (!this._vfx)
+            {
+                UnityEngine.Object.Destroy(this);
+                return;
+            }
+            this._lifeTime += BraveTime.DeltaTime;
+            if (this._lifeTime > this._maxLifeTime)
+            {
+                if (this._vfx)
+                    UnityEngine.Object.Destroy(this._vfx);
+                UnityEngine.Object.Destroy(this);
+                return;
+            }
+
+            this._sprite.transform.position += this._velocity;
+
+            if (this._lifeTime > this._fadeStartTime)
+                this._sprite.renderer.SetAlpha(1.0f - (this._lifeTime - this._fadeStartTime) / this._fadeTotalTime);
+        }
+
+        public void Setup(Vector2 velocity, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0, Color? emissiveColor = null)
+        {
+            this._velocity = (1.0f / C.PIXELS_PER_CELL) * velocity.ToVector3ZisY(0);
+            this._maxLifeTime = lifetime;
+            this._fadeOut = fadeOutTime.HasValue;
+            if (this._fadeOut)
+            {
+                this._fadeTotalTime = fadeOutTime.Value;
+                this._fadeStartTime = lifetime - this._fadeTotalTime;
+            }
+            this.transform.parent = parent;
+
+            // if (emissivePower > 0)
+            // {
+            //     this._sprite.usesOverrideMaterial = true;
+            //     Material m = this._sprite.renderer.material;
+            //         m.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+            //         m.SetFloat("_EmissivePower", emissivePower);
+
+            //     if (emissiveColor.HasValue)
+            //     {
+            //         m.SetFloat("_EmissiveColorPower", 1.55f);
+            //         m.SetColor("_EmissiveColor", emissiveColor.Value);
+            //         m.SetColor("_OverrideColor", emissiveColor.Value);
+            //     }
+            // }
         }
     }
 }

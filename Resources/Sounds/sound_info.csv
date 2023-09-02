@@ -22,3 +22,7 @@ chess_move,1.0,1,sound
 chess_gun_fire,2.0,1,sound
 chess_gun_reload,2.0,1,sound
 tomislav_shoot,-4.0,1,sound
+soul_kaliber_drain,4.4,1,sound
+soul_kaliber_fire,-3.0,1,sound
+soul_kaliber_impact,-5.0,1,sound
+soul_kaliber_reload,-3.0,1,sound
