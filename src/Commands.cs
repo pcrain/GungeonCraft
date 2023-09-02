@@ -10,6 +10,52 @@ using UnityEngine;
 
 namespace CwaffingTheGungy
 {
+    public class Goldenboi : MonoBehaviour
+    {
+        private GameActor actor = null;
+        private Color gold;
+        private void Start()
+        {
+            actor = base.GetComponent<GameActor>();
+            gold = new Color(1f,1f,0f,0.35f);
+
+            Material material = actor.sprite?.renderer?.material;
+            if (!material)
+                return;
+            Shader shader = ShaderCache.Acquire("Brave/ItemSpecific/MetalSkinShader");
+            actor.sprite.usesOverrideMaterial = true;
+            if (actor is PlayerController pc)
+            {
+                pc.OverrideColorOverridden = true;
+                pc.SetOverrideShader(shader);
+                pc.RegisterOverrideColor(gold, "goldenboi");
+            }
+            else
+            {
+                material.shader = shader;
+                material.SetVector("_OverrideColor", gold);
+            }
+        }
+        private void Update()
+        {
+            // ETGModConsole.Log($"updating");
+            if (!actor)
+                return;
+            // ETGModConsole.Log($"  materializing");
+            Material material = actor.sprite?.renderer?.material;
+            if (!material)
+                return;
+            if (actor is PlayerController pc)
+            {
+                // ETGModConsole.Log($"  goldening: {pc.FlatColorOverridden}, {pc.HasSourcedOverrideColor("goldenboi")}");
+                // pc.DeregisterOverrideColor("goldenboi");
+                pc.RegisterOverrideColor(gold, "goldenboi");
+                pc.FlatColorOverridden = true;
+                pc.ChangeFlatColorOverride(gold);
+            }
+            material.SetVector("_OverrideColor", gold);
+        }
+    }
     public class Commands
     {
         public static void Init()
@@ -18,23 +64,7 @@ namespace CwaffingTheGungy
             ETGModConsole.Commands.AddGroup("gg", delegate (string[] args)
             {
                 LootEngine.SpawnItem(
-                    // PickupObjectDatabase.GetById(IDs.Actives["borrowed_time"]).gameObject,
-                    // PickupObjectDatabase.GetById(IDs.Passives["shine"]).gameObject,
-                    // PickupObjectDatabase.GetById(IDs.Guns["ki_blast"]).gameObject,
-                    // PickupObjectDatabase.GetById(IDs.Pickups["superstitious"]).gameObject,
-                    // PickupObjectDatabase.GetById(IDs.Pickups["deadline"]).gameObject,
-                    // PickupObjectDatabase.GetById(IDs.Passives["hld"]).gameObject,
-                    // PickupObjectDatabase.GetById(IDs.Passives["siphon"]).gameObject,
-                    // PickupObjectDatabase.GetById(IDs.Actives["bullet_that_can_kill_the_future"]).gameObject,
-                    // PickupObjectDatabase.GetById(IDs.Passives["zoolanders_diary"]).gameObject,
-                    // PickupObjectDatabase.GetById(IDs.Passives["rat_poison"]).gameObject,
-                    // PickupObjectDatabase.GetById(IDs.Passives["johns_wick"]).gameObject,
-                    // PickupObjectDatabase.GetById(IDs.Guns["testlightning"]).gameObject,
-                    // PickupObjectDatabase.GetById(IDs.Guns["b_b_gun"]).gameObject,
-                    // PickupObjectDatabase.GetById(IDs.Guns["test_gun"]).gameObject,
-                    // PickupObjectDatabase.GetById(IDs.Passives["gyroscope"]).gameObject,
-                    // PickupObjectDatabase.GetById(IDs.Passives["curators_badge"]).gameObject,
-                    PickupObjectDatabase.GetById(IDs.Pickups["soul_kaliber"]).gameObject,
+                    PickupObjectDatabase.GetById(IDs.Pickups["quarter_pounder"]).gameObject,
                     GameManager.Instance.PrimaryPlayer.CenterPosition,
                     Vector2.zero,
                     0);
@@ -48,6 +78,82 @@ namespace CwaffingTheGungy
             //   AIActor aiactor = AIActor.Spawn(orLoadByGuid, player.gameObject.transform.position, player.gameObject.transform.position.GetAbsoluteRoom(), true, AIActor.AwakenAnimationType.Default, true);
             //   aiactor.GetComponent<GenericIntroDoer>().TriggerSequence(player);
             // });
+            // Gold Shader test
+            ETGModConsole.Commands.AddGroup("gold", delegate (string[] args)
+            {
+                try
+                {
+                    Color gold = new Color(1f,1f,0f,0.35f);
+                    Texture2D testTexture = new Texture2D(2, 2);
+                        testTexture.SetPixel(0, 0, gold);
+                        testTexture.SetPixel(0, 1, gold);
+                        testTexture.SetPixel(1, 0, gold);
+                        testTexture.SetPixel(1, 1, gold);
+                        testTexture.Apply();
+
+                    PlayerController pc = GameManager.Instance.PrimaryPlayer;
+                    pc.gameObject.AddComponent<Goldenboi>();
+                    return;
+                    // tk2dBaseSprite s = pc.sprite;
+                    // s.usesOverrideMaterial = true;
+                    Shader shader = ShaderCache.Acquire("Brave/ItemSpecific/MetalSkinShader");
+                    // Material m = s.renderer.material;
+                    // m.shader = shader;
+                    // pc.SetOverrideShader(shader);
+                    // pc.RegisterOverrideColor(gold, "goldenboi");
+                    // m.SetTexture("_MainTex", testTexture);
+
+                    Material material = pc.sprite.GetComponent<MeshRenderer>().material;
+                    if (!material)
+                    {
+                        ETGModConsole.Log($"no material D:");
+                    }
+                    else
+                    {
+                        material.shader = shader;
+                        material.SetVector("_OverrideColor", gold);
+                        // material.SetTexture("_MainTex", testTexture);
+                    }
+                }
+                catch(Exception ex) {
+                    ETGModConsole.Log($"something went wrong D: {ex}");
+                }
+            });
+            // Shader test
+            ETGModConsole.Commands.AddGroup("shader", delegate (string[] args)
+            {
+                if (args == null || args.Length < 1)
+                {
+                    ETGModConsole.Log($"need a shader name and property and value");
+                    return;
+                }
+                try
+                {
+                    tk2dBaseSprite s = GameManager.Instance.PrimaryPlayer.sprite;
+                    s.usesOverrideMaterial = true;
+                    Material m = s.renderer.material;
+                    if (args.Length == 2 && args[0].StartsWithInvariant("_"))
+                    {
+                        if (args[0] == "_OverrideColor")
+                        {
+                            m.SetVector(args[0], new Vector4(1.0f,1.0f,0.0f,1.0f));
+                        }
+                        else
+                        {
+                            ETGModConsole.Log($"Setting property {args[0]} of current shader to {args[1]}");
+                            m.SetFloat(args[0], float.Parse(args[1]));
+                        }
+                    }
+                    else
+                    {
+                        ETGModConsole.Log($"Setting shader to {args[0]}");
+                        m.shader = ShaderCache.Acquire(args[0]);
+                    }
+                }
+                catch(Exception ex) {
+                    ETGModConsole.Log($"something went wrong D: {ex}");
+                }
+            });
             // Another base command for loading my latest debug flow
             ETGModConsole.Commands.AddGroup("ff", delegate (string[] args)
             {

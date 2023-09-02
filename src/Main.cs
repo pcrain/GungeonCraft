@@ -6,7 +6,6 @@ using System.Text;
 using System.Reflection;
 using System.Runtime;
 
-
 using BepInEx;
 using UnityEngine;
 using MonoMod.RuntimeDetour;
@@ -124,6 +123,7 @@ namespace CwaffingTheGungy
                     BBGun.Add();
                     Bouncer.Add();
                     Grandmaster.Add();
+                    QuarterPounder.Add();
 
                     // MasterSword.Add();
                 #endregion

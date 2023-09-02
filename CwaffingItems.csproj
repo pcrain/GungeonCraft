@@ -155,6 +155,7 @@
     <Compile Include="src\Cwaff-Guns\IronMaiden.cs"/>
     <Compile Include="src\Cwaff-Guns\LastResort.cs"/>
     <Compile Include="src\Cwaff-Guns\SoulKaliber.cs"/>
+    <Compile Include="src\Cwaff-Guns\QuarterPounder.cs"/>
     <Compile Include="src\Cwaff-Guns\Deadline.cs"/>
     <Compile Include="src\Cwaff-Guns\GamblersFallacy.cs"/>
     <Compile Include="src\Cwaff-Guns\Encircler.cs"/>
@@ -245,6 +246,8 @@
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\soul-link-particle1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\friendlyoverhead_vfx_001.png"/>
+    <EmbeddedResource Include="Resources\shaders\InvisibleShader.shader"/>
+    <EmbeddedResource Include="Resources\shaders\PretzelCustom.shader"/>
     <EmbeddedResource Include="Resources\bossyboi_bosscard_orig.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\johns_wick_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\rat_poison_icon.png"/>
@@ -570,6 +573,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\soul_kaliber_fire_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_reload_009.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\soul_kaliber_fire_004.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\quarter_pounder_fire_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_009.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_005.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\ki_blast_gun_idle_001.json"/>
@@ -657,6 +661,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_015.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_003.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_018.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\quarter_pounder_reload_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_011.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_015.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\natascha_fire_005.png"/>
@@ -711,9 +716,11 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\natascha_reload_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\soul_kaliber_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\soul_kaliber_reload_004.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\quarter_pounder_idle_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_fire_003.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_014.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\shade0.png"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\quarter_pounder_reload_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_reload_011.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_007.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_005.json"/>
@@ -751,9 +758,11 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_015.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_002.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_029.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\quarter_pounder_fire_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_reload_008.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_reload_007.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_031.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\quarter_pounder_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_reload_012.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_028.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_024.png"/>
@@ -778,6 +787,7 @@
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\bball6.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\chess_bishop.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\chess_king.png"/>
+    <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\soap-bubble-projectile-002.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\train_projectile_002.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\bball5.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\kunai.png"/>
@@ -785,6 +795,7 @@
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\bball2.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\bouncelet_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\chess_pawn.png"/>
+    <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\soap-bubble-projectile-001.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\bball1.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\bball3.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\ki_blast_red_002.png"/>
@@ -794,6 +805,7 @@
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\energy_bounce4.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\chess_knight.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\soul-kaliber-projectile.png"/>
+    <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\soap-bubble-projectile-003.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\natascha_bullet_003.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\bball7.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\train_projectile_001.png"/>
@@ -801,6 +813,7 @@
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\bball8.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\ki_blast_red_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\gaster_blaster.png"/>
+    <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\soap-bubble-projectile-004.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\natascha_bullet_002.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\chess_queen.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\ki_blast_red_004.png"/>
@@ -816,6 +829,7 @@
     <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\soul_kaliber_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\knife_gun_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\bouncer_idle_001.png"/>
+    <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\quarter_pounder_idle_001.png"/>
     <Reference Include="UnityEngine.ClothModule"/>
     <Reference Include="UnityEngine.UnityConnectModule"/>
     <Reference Include="UnityEngine.AIModule"/>
