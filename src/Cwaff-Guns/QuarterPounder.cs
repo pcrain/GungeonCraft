@@ -73,39 +73,51 @@ namespace CwaffingTheGungy
             {
                 Projectile p = base.GetComponent<Projectile>();
                 p.OnHitEnemy += this.OnHitEnemy;
+                p.OnWillKillEnemy += this.OnWillKillEnemy;
             }
 
-            private void OnHitEnemy(Projectile bullet, SpeculativeRigidbody enemy, bool what)
+            private void OnHitEnemy(Projectile bullet, SpeculativeRigidbody enemy, bool willKill)
             {
-                // ETGModConsole.Log($"making a gold texture");
-                Texture2D goldSprite = MakeSpriteGoldenTexture(enemy.sprite);
+                if (!willKill)
+                    OnWillKillEnemy(bullet, enemy);
+            }
 
-                // ETGModConsole.Log($"making a game object");
-                GameObject g = UnityEngine.Object.Instantiate(new GameObject(), enemy.sprite.WorldBottomCenter, Quaternion.identity);
-                    // ETGModConsole.Log($"making a gold collection");
-                    tk2dSpriteCollectionData collection = SpriteBuilder.ConstructCollection(g, "goldcollection");
-                    // ETGModConsole.Log($"making a gold sprite");
-                    int spriteId = SpriteBuilder.AddSpriteToCollection(goldSprite, collection, "goldsprite");
-                    // ETGModConsole.Log($"adding a gold sprite");
-                    tk2dBaseSprite sprite = g.AddComponent<tk2dSprite>();
-                        sprite.SetSprite(collection, spriteId);
-                        sprite.usesOverrideMaterial = true;
-                        // sprite.renderer.material.shader = ShaderCache.Acquire("Brave/ItemSpecific/MetalSkinShader");
+            private void OnWillKillEnemy(Projectile bullet, SpeculativeRigidbody enemy)
+            {
+                Texture2D goldSprite                = MakeSpriteGoldenTexture(enemy.aiActor);
+                GameObject g                        = UnityEngine.Object.Instantiate(new GameObject(), enemy.sprite.WorldBottomLeft, Quaternion.identity);
+                tk2dSpriteCollectionData collection = SpriteBuilder.ConstructCollection(g, "goldcollection");
+                int spriteId                        = SpriteBuilder.AddSpriteToCollection(goldSprite, collection, "goldsprite");
+                tk2dBaseSprite sprite               = g.AddComponent<tk2dSprite>();
+                sprite.usesOverrideMaterial         = true;
+                sprite.SetSprite(collection, spriteId);
             }
         }
 
-        public static Color _Gold = new Color(1f,1f,0f,1f);
-        public static Texture2D MakeSpriteGoldenTexture(tk2dBaseSprite sprite)
+        private const float _SHEEN_WIDTH = 20.0f;
+        public static Color _Gold  = new Color(1f,1f,0f,1f);
+        public static Color _White = new Color(1f,1f,1f,1f);
+        public static Texture2D MakeSpriteGoldenTexture(AIActor enemy)
         {
-            Texture2D spriteTexture = sprite.CurrentSprite.DesheetTexture();
-            Texture2D goldTexture = new Texture2D(spriteTexture.width, spriteTexture.height);
-            for (int x = 0; x < spriteTexture.width; x++)
+            tk2dSpriteDefinition bestIdleSprite = enemy.sprite.collection.spriteDefinitions[CwaffToolbox.GetIdForBestIdleAnimation(enemy)];
+            // If the x coordinate of the first two UVs match, we're using a rotated sprite
+            bool isRotated = (bestIdleSprite.uvs[0].x == bestIdleSprite.uvs[1].x);
+            Texture2D spriteTexture = bestIdleSprite.DesheetTexture();
+            Texture2D goldTexture = new Texture2D(
+                isRotated ? spriteTexture.height : spriteTexture.width,
+                isRotated ? spriteTexture.width : spriteTexture.height);
+            for (int x = 0; x < goldTexture.width; x++)
             {
-                for (int y = 0; y < spriteTexture.height; y++)
+                for (int y = 0; y < goldTexture.height; y++)
                 {
-                    Color pixelColor = spriteTexture.GetPixel(x, y);
+                    Color pixelColor = spriteTexture.GetPixel(isRotated ? y : x, isRotated ? x : y);
                     if (pixelColor.a > 0)
-                        pixelColor = Color.Lerp(pixelColor, _Gold, 0.5f); // Blend opaque pixels
+                    {
+                        // Blend opaque pixels with gold
+                        pixelColor = Color.Lerp(pixelColor, _Gold, 0.3f);
+                        // Add a white sheen
+                        pixelColor = Color.Lerp(pixelColor, _White, Mathf.Sin( 6.28f * ( ( (x+y) % _SHEEN_WIDTH) / _SHEEN_WIDTH )));
+                    }
                     goldTexture.SetPixel(x, y, pixelColor);
                 }
             }

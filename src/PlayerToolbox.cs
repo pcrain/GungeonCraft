@@ -75,15 +75,11 @@ namespace CwaffingTheGungy
             action(enemy);
         }
 
-        public static void Memorialize(AIActor enemy)
+        public static int GetIdForBestIdleAnimation(AIActor enemy)
         {
-            GameObject obj = new GameObject();
-            obj.SetActive(false);
-            FakePrefab.MarkAsFakePrefab(obj);
-            GameObject g = UnityEngine.Object.Instantiate(obj, enemy.sprite.WorldBottomCenter, Quaternion.identity);
-
             int bestMatchStrength = 0;
             int bestSpriteId = -1;
+
             tk2dSpriteDefinition[] defs = enemy.sprite.collection.spriteDefinitions;
             for (int i = 0; i < defs.Length; ++i)
             {
@@ -91,9 +87,9 @@ namespace CwaffingTheGungy
                 int matchStrength = 0;
                 if (sd.name.Contains("001"))
                 {
-                    if (sd.name.Contains("idle_right"))
+                    if (sd.name.Contains("idle_f"))
                         matchStrength = 4;
-                    else if (sd.name.Contains("idle_f") || sd.name.Contains("idle_l") || sd.name.Contains("idle_r"))
+                    else if (sd.name.Contains("idle_right") || sd.name.Contains("idle_l") || sd.name.Contains("idle_r"))
                         matchStrength = 3;
                     else if (sd.name.Contains("idle") || sd.name.Contains("fire") || sd.name.Contains("run_right") || sd.name.Contains("right_run"))
                         matchStrength = 2;
@@ -123,6 +119,18 @@ namespace CwaffingTheGungy
             {
                 // ETGModConsole.Log("  found "+defs[bestSpriteId].name);
             }
+
+            return bestSpriteId;
+        }
+
+        public static void Memorialize(AIActor enemy)
+        {
+            GameObject obj = new GameObject();
+            obj.SetActive(false);
+            FakePrefab.MarkAsFakePrefab(obj);
+            GameObject g = UnityEngine.Object.Instantiate(obj, enemy.sprite.WorldBottomCenter, Quaternion.identity);
+
+            int bestSpriteId = GetIdForBestIdleAnimation(enemy);
 
             tk2dBaseSprite sprite = g.AddComponent<tk2dSprite>();
                 sprite.SetSprite(enemy.sprite.collection, bestSpriteId);
