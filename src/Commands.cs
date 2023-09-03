@@ -17,7 +17,11 @@ namespace CwaffingTheGungy
         private void Start()
         {
             actor = base.GetComponent<GameActor>();
-            gold = new Color(1f,1f,0f,0.35f);
+            gold = new Color(1f,1f,0f,0.5f);
+            // gold = new Color(1f,1f,0f,0.65f);
+            // gold = new Color(0f,0f,0f,0.65f);
+            // gold = new Color(0.5f,0.5f,0f,0.65f);
+            // gold = new Color(0.25f,0.25f,0f,1.0f);
 
             Material material = actor.sprite?.renderer?.material;
             if (!material)
@@ -27,8 +31,10 @@ namespace CwaffingTheGungy
             if (actor is PlayerController pc)
             {
                 pc.OverrideColorOverridden = true;
-                pc.SetOverrideShader(shader);
-                pc.RegisterOverrideColor(gold, "goldenboi");
+                material.shader = shader;
+                // pc.SetOverrideShader(shader);
+                // pc.RegisterOverrideColor(gold, "goldenboi");
+                material.SetVector("_OverrideColor", gold);
             }
             else
             {
@@ -38,22 +44,18 @@ namespace CwaffingTheGungy
         }
         private void Update()
         {
-            // ETGModConsole.Log($"updating");
             if (!actor)
                 return;
-            // ETGModConsole.Log($"  materializing");
             Material material = actor.sprite?.renderer?.material;
             if (!material)
                 return;
             if (actor is PlayerController pc)
             {
-                // ETGModConsole.Log($"  goldening: {pc.FlatColorOverridden}, {pc.HasSourcedOverrideColor("goldenboi")}");
-                // pc.DeregisterOverrideColor("goldenboi");
-                pc.RegisterOverrideColor(gold, "goldenboi");
-                pc.FlatColorOverridden = true;
-                pc.ChangeFlatColorOverride(gold);
+                // pc.RegisterOverrideColor(gold, "goldenboi");
+                // pc.FlatColorOverridden = true;
+                // pc.ChangeFlatColorOverride(gold);
             }
-            material.SetVector("_OverrideColor", gold);
+            // material.SetVector("_OverrideColor", gold);
         }
     }
     public class Commands
@@ -94,26 +96,6 @@ namespace CwaffingTheGungy
                     PlayerController pc = GameManager.Instance.PrimaryPlayer;
                     pc.gameObject.AddComponent<Goldenboi>();
                     return;
-                    // tk2dBaseSprite s = pc.sprite;
-                    // s.usesOverrideMaterial = true;
-                    Shader shader = ShaderCache.Acquire("Brave/ItemSpecific/MetalSkinShader");
-                    // Material m = s.renderer.material;
-                    // m.shader = shader;
-                    // pc.SetOverrideShader(shader);
-                    // pc.RegisterOverrideColor(gold, "goldenboi");
-                    // m.SetTexture("_MainTex", testTexture);
-
-                    Material material = pc.sprite.GetComponent<MeshRenderer>().material;
-                    if (!material)
-                    {
-                        ETGModConsole.Log($"no material D:");
-                    }
-                    else
-                    {
-                        material.shader = shader;
-                        material.SetVector("_OverrideColor", gold);
-                        // material.SetTexture("_MainTex", testTexture);
-                    }
                 }
                 catch(Exception ex) {
                     ETGModConsole.Log($"something went wrong D: {ex}");

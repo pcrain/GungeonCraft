@@ -2,8 +2,8 @@
   "name": null,
   "x": 0,
   "y": 0,
-  "width": 36,
-  "height": 20,
+  "width": 26,
+  "height": 15,
   "flip": 1,
   "attachPoints": [
     {
@@ -14,8 +14,8 @@
     {
       "name": "PrimaryHand",
       "position": {
-        "x": 0.75,
-        "y": 0.25,
+        "x": 0.4375,
+        "y": 0.375,
         "z": 0.0
       },
       "angle": 0.0
@@ -23,8 +23,8 @@
     {
       "name": "Casing",
       "position": {
-        "x": 1.8125,
-        "y": 0.5,
+        "x": 1.5625,
+        "y": 0.625,
         "z": 0.0
       },
       "angle": 0.0
