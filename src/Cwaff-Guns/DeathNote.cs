@@ -43,43 +43,57 @@ namespace CwaffingTheGungy
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
         }
 
-        protected override void OnPickedUpByPlayer(PlayerController player)
-        {
-            base.OnPickedUpByPlayer(player);
-        }
-
         protected override void OnPostDroppedByPlayer(PlayerController player)
         {
             base.OnPostDroppedByPlayer(player);
+            WhoAreTheyAgain();
+        }
+
+        public override void OnSwitchedAwayFromThisGun()
+        {
+            WhoAreTheyAgain();
+            base.OnSwitchedAwayFromThisGun();
         }
 
         protected override void Update()
         {
+            base.Update();
             YouShallKnowTheirNames();
         }
 
-        private void YouShallKnowTheirNames()
+        private void WhoAreTheyAgain()
+        {
+            UpdateNametags(false);
+        }
+
+        private void UpdateNametags(bool enable)
         {
             List<int> deadEnemies = new();
             foreach(KeyValuePair<int, Nametag> entry in _Nametags)
             {
                 if (!entry.Value.UpdateWhileParentAlive())
                     deadEnemies.Add(entry.Key);
+                else
+                    entry.Value.SetEnabled(enable);
             }
             foreach (int key in deadEnemies)
                 _Nametags.Remove(key);
+        }
+
+        private void YouShallKnowTheirNames()
+        {
+            UpdateNametags(true);
 
             List<AIActor> activeEnemies = this.Owner.GetAbsoluteParentRoom().GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
-            if (activeEnemies != null)
+            if (activeEnemies == null)
+                return;
+
+            foreach (AIActor enemy in activeEnemies)
             {
-                foreach (AIActor enemy in activeEnemies)
-                {
-                    if (!enemy || !enemy.specRigidbody || enemy.IsGone || !enemy.healthHaver || enemy.healthHaver.IsDead)
-                        continue;
-                    if (enemy.gameObject.GetComponent<Nametag>())
-                        continue;
+                if (!enemy || !enemy.specRigidbody || enemy.IsGone || !enemy.healthHaver || enemy.healthHaver.IsDead)
+                    continue;
+                if (!enemy.gameObject.GetComponent<Nametag>())
                     _Nametags[enemy.GetHashCode()] = enemy.gameObject.AddComponent<Nametag>();
-                }
             }
         }
     }
@@ -147,6 +161,11 @@ namespace CwaffingTheGungy
             UnityEngine.Object.Destroy(this._canvasGo);
             UnityEngine.Object.Destroy(this._textGo);
             UnityEngine.Object.Destroy(this);
+        }
+
+        public void SetEnabled(bool v)
+        {
+            this._textGo.SetActive(v);
         }
     }
 }
