@@ -188,6 +188,7 @@
     <Compile Include="src\VFXToolbox.cs"/>
     <Compile Include="src\Main.cs"/>
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter3.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\midas-sparkle2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\reticle-blue.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter5.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\shine.png"/>
@@ -195,6 +196,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\soul-link-particle4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\friendlyoverhead_vfx_002.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\midas-sparkle1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\friendlyoverhead_vfx_004.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\soul-link-soul2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\friendlyoverhead_vfx_005.png"/>

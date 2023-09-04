@@ -75,6 +75,9 @@ namespace CwaffingTheGungy
             RegisterVFX<GameObject>("SoulLinkParticle", ResMap.Get("soul-link-particle"), 16, loops: true,
                 anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.3f, emissivePower: 100);
 
+            RegisterVFX<GameObject>("MidasParticle", ResMap.Get("midas-sparkle"), 8, loops: true,
+                anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 5);
+
             RegisterVFX<GameObject>("SoulLinkSoul", ResMap.Get("soul-link-soul"), 5, loops: true,
                 anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.3f, emissivePower: 200);
 

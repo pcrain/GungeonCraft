@@ -24,6 +24,9 @@ namespace CwaffingTheGungy
         public static string LongDescription  = "(shoots money O:)";
 
         internal static tk2dSpriteAnimationClip _ProjSprite;
+        internal static GameObject _MidasParticleVFX;
+
+        private int _lastMoney = -1;
 
         public static void Add()
         {
@@ -32,10 +35,13 @@ namespace CwaffingTheGungy
                 gun.DefaultModule.ammoCost            = 1;
                 gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
                 gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
-                gun.reloadTime                        = 1.1f;
+                gun.DefaultModule.numberOfShotsInClip = 10;
                 gun.DefaultModule.angleVariance       = 15.0f;
+                gun.reloadTime                        = 1.1f;
                 gun.quality                           = PickupObject.ItemQuality.D;
                 gun.barrelOffset.transform.localPosition = new Vector3(1.8125f, 0.5f, 0f); // should match "Casing" in JSON file
+                gun.CanGainAmmo                       = false;
+                gun.SetBaseMaxAmmo(9999);
                 gun.SetAnimationFPS(gun.shootAnimation, 24);
                 gun.SetAnimationFPS(gun.reloadAnimation, 16);
 
@@ -65,39 +71,76 @@ namespace CwaffingTheGungy
                 projectile.AddAnimation(_ProjSprite);
                 projectile.SetAnimation(_ProjSprite);
                 projectile.gameObject.AddComponent<MidasProjectile>();
+
+            _MidasParticleVFX = VFX.animations["MidasParticle"];
         }
 
-        public class MidasProjectile : MonoBehaviour
+        protected override void OnPickedUpByPlayer(PlayerController player)
         {
-            private void Start()
-            {
-                Projectile p = base.GetComponent<Projectile>();
-                p.OnHitEnemy += this.OnHitEnemy;
-                p.OnWillKillEnemy += this.OnWillKillEnemy;
-            }
+            base.OnPickedUpByPlayer(player);
+            AdjustAmmoToMoney();
+        }
 
-            private void OnHitEnemy(Projectile bullet, SpeculativeRigidbody enemy, bool willKill)
-            {
-                if (!willKill)
-                    OnWillKillEnemy(bullet, enemy);
-            }
+        public override void OnSwitchedToThisGun()
+        {
+            base.OnSwitchedToThisGun();
+            AdjustAmmoToMoney();
+        }
 
-            private void OnWillKillEnemy(Projectile bullet, SpeculativeRigidbody enemy)
-            {
-                Texture2D goldSprite                = MakeSpriteGoldenTexture(enemy.aiActor);
-                GameObject g                        = UnityEngine.Object.Instantiate(new GameObject(), enemy.sprite.WorldBottomLeft, Quaternion.identity);
-                tk2dSpriteCollectionData collection = SpriteBuilder.ConstructCollection(g, "goldcollection");
-                int spriteId                        = SpriteBuilder.AddSpriteToCollection(goldSprite, collection, "goldsprite");
-                tk2dBaseSprite sprite               = g.AddComponent<tk2dSprite>();
-                sprite.usesOverrideMaterial         = true;
-                sprite.SetSprite(collection, spriteId);
-            }
+        protected override void NonCurrentGunUpdate()
+        {
+            base.NonCurrentGunUpdate();
+            AdjustAmmoToMoney();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            AdjustAmmoToMoney();
+        }
+
+        public override void OnPostFired(PlayerController player, Gun gun)
+        {
+            base.OnPostFired(player, gun);
+            --GameManager.Instance.PrimaryPlayer.carriedConsumables.Currency;
+            AdjustAmmoToMoney();
+        }
+
+        private void AdjustAmmoToMoney()
+        {
+            int money = GameManager.Instance.PrimaryPlayer.carriedConsumables.Currency;
+            if (money == this._lastMoney)
+                return;
+            this.gun.CurrentAmmo = money;
+        }
+    }
+
+    public class MidasProjectile : MonoBehaviour
+    {
+        private void Start()
+        {
+            Projectile p = base.GetComponent<Projectile>();
+            p.OnWillKillEnemy += this.OnWillKillEnemy;
+        }
+
+        private void OnWillKillEnemy(Projectile bullet, SpeculativeRigidbody enemy)
+        {
+            Texture2D goldSprite                = GetGoldenTextureForEnemyIdleAnimation(enemy.aiActor);
+            GameObject g                        = UnityEngine.Object.Instantiate(new GameObject(), enemy.sprite.WorldBottomLeft.ToVector3ZisY(0f), Quaternion.identity);
+            tk2dSpriteCollectionData collection = SpriteBuilder.ConstructCollection(g, "goldcollection");
+            int spriteId                        = SpriteBuilder.AddSpriteToCollection(goldSprite, collection, "goldsprite");
+            tk2dBaseSprite sprite               = g.AddComponent<tk2dSprite>();
+            sprite.SetSprite(collection, spriteId);
+            g.AddComponent<GoldenDeath>();
+
+            enemy.aiActor.EraseFromExistenceWithRewards(true);
+
         }
 
         private const float _SHEEN_WIDTH = 20.0f;
         public static Color _Gold  = new Color(1f,1f,0f,1f);
         public static Color _White = new Color(1f,1f,1f,1f);
-        public static Texture2D MakeSpriteGoldenTexture(AIActor enemy)
+        public static Texture2D GetGoldenTextureForEnemyIdleAnimation(AIActor enemy)
         {
             tk2dSpriteDefinition bestIdleSprite = enemy.sprite.collection.spriteDefinitions[CwaffToolbox.GetIdForBestIdleAnimation(enemy)];
             // If the x coordinate of the first two UVs match, we're using a rotated sprite
@@ -115,7 +158,7 @@ namespace CwaffingTheGungy
                     {
                         // Blend opaque pixels with gold
                         pixelColor = Color.Lerp(pixelColor, _Gold, 0.3f);
-                        // Add a white sheen
+                        // Add a diagonal white sheen
                         pixelColor = Color.Lerp(pixelColor, _White, Mathf.Sin( 6.28f * ( ( (x+y) % _SHEEN_WIDTH) / _SHEEN_WIDTH )));
                     }
                     goldTexture.SetPixel(x, y, pixelColor);
@@ -123,16 +166,73 @@ namespace CwaffingTheGungy
             }
             return goldTexture;
         }
-
-
-        // protected override void OnPickedUpByPlayer(PlayerController player)
-        // {
-        //     base.OnPickedUpByPlayer(player);
-        // }
-
-        // protected override void OnPostDroppedByPlayer(PlayerController player)
-        // {
-        //     base.OnPostDroppedByPlayer(player);
-        // }
     }
+
+    public class GoldenDeath : MonoBehaviour
+    {
+        private const float _START_EMIT    = 30.0f;
+        private const float _MAX_EMIT      = 50.0f;
+        private const float _MIN_EMIT      = 0.5f;
+        private const float _GROW_TIME     = 0.25f;
+        private const float _DECAY_TIME    = 0.5f;
+        private const int   _NUM_PARTICLES = 10;
+        private const float _PART_SPEED    = 2f;
+        private const float _PART_SPREAD   = 0.5f;
+        private const float _PART_LIFE     = 0.5f;
+        private const float _PART_EMIT     = 20f;
+
+        private float _lifetime;
+        private bool _decaying;
+        private tk2dSprite _sprite;
+
+        private void Start()
+        {
+            this._lifetime = 0.0f;
+            this._decaying = false;
+
+            this._sprite = base.gameObject.GetComponent<tk2dSprite>();
+            this._sprite.usesOverrideMaterial = true;
+            this._sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
+            this._sprite.renderer.material.DisableKeyword("BRIGHTNESS_CLAMP_OFF");
+            this._sprite.renderer.material.EnableKeyword("BRIGHTNESS_CLAMP_ON");
+            this._sprite.renderer.material.SetFloat("_EmissivePower", _lifetime);
+            this._sprite.renderer.material.SetFloat("_EmissiveColorPower", 1.55f);
+            this._sprite.renderer.material.SetColor("_EmissiveColor", ExtendedColours.paleYellow);
+
+            Vector2 ppos = this._sprite.WorldCenter;
+            for (int i = 0; i < _NUM_PARTICLES; ++i)
+            {
+                float angle = Lazy.RandomAngle();
+                Vector2 finalpos = ppos + BraveMathCollege.DegreesToVector(angle, magnitude: _PART_SPREAD);
+                GameObject v = SpawnManager.SpawnVFX(QuarterPounder._MidasParticleVFX, finalpos, Lazy.RandomEulerZ());
+                FancyVFX f = v.AddComponent<FancyVFX>();
+                    f.Setup(Lazy.RandomVector(_PART_SPEED), lifetime: _PART_LIFE, fadeOutTime: _PART_LIFE, emissivePower: _PART_EMIT, emissiveColor: Color.white);
+            }
+
+            AkSoundEngine.PostEvent("turn_to_gold", base.gameObject);
+        }
+
+        private void Update()
+        {
+            float emit;
+            if (this._decaying)
+            {
+                if (this._lifetime >= _DECAY_TIME)
+                    return;
+                this._lifetime = Mathf.Min(this._lifetime + BraveTime.DeltaTime, _DECAY_TIME);
+                emit = _MAX_EMIT - (_MAX_EMIT - _MIN_EMIT) * (this._lifetime / _DECAY_TIME);
+                this._sprite.renderer.material.SetFloat("_EmissivePower", emit);
+                return;
+            }
+            this._lifetime = Mathf.Min(this._lifetime + BraveTime.DeltaTime, _GROW_TIME);
+            emit = _START_EMIT + (_MAX_EMIT - _START_EMIT) * (this._lifetime / _GROW_TIME);
+            this._sprite.renderer.material.SetFloat("_EmissivePower", emit);
+            if (this._lifetime >= _GROW_TIME)
+            {
+                this._decaying = true;
+                this._lifetime = 0.0f;
+            }
+        }
+    }
+
 }
