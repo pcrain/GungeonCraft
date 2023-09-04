@@ -24,6 +24,8 @@ namespace CwaffingTheGungy
         public static string ShortDescription = "Notably Dangerous";
         public static string LongDescription  = "(TBD)";
 
+        internal static Dictionary<int, Nametag> _Nametags = new();
+
         public static void Add()
         {
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
@@ -58,13 +60,26 @@ namespace CwaffingTheGungy
 
         private void YouShallKnowTheirNames()
         {
-            List<AIActor> activeEnemies = this.Owner.GetAbsoluteParentRoom().GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
-            foreach (AIActor enemy in activeEnemies)
+            List<int> deadEnemies = new();
+            foreach(KeyValuePair<int, Nametag> entry in _Nametags)
             {
-                if (!enemy || !enemy.specRigidbody || enemy.IsGone || !enemy.healthHaver || enemy.healthHaver.IsDead)
-                    continue;
-                if (!enemy.gameObject.GetComponent<Nametag>())
-                    enemy.gameObject.AddComponent<Nametag>();
+                if (!entry.Value.UpdateWhileParentAlive())
+                    deadEnemies.Add(entry.Key);
+            }
+            foreach (int key in deadEnemies)
+                _Nametags.Remove(key);
+
+            List<AIActor> activeEnemies = this.Owner.GetAbsoluteParentRoom().GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
+            if (activeEnemies != null)
+            {
+                foreach (AIActor enemy in activeEnemies)
+                {
+                    if (!enemy || !enemy.specRigidbody || enemy.IsGone || !enemy.healthHaver || enemy.healthHaver.IsDead)
+                        continue;
+                    if (enemy.gameObject.GetComponent<Nametag>())
+                        continue;
+                    _Nametags[enemy.GetHashCode()] = enemy.gameObject.AddComponent<Nametag>();
+                }
             }
         }
     }
@@ -105,36 +120,26 @@ namespace CwaffingTheGungy
             this._nametag.alignment = TextAnchor.UpperCenter;
             this._nametag.color     = Color.green;
 
-            // Make it emissive
-            Material m = this._nametag.material;
-                ETGModConsole.Log($"{m.shader.name}");
-                m.SetFloat("_EmissivePower", 100f);
-                m.SetFloat("_EmissiveColorPower", 1.55f);
-                m.SetColor("_EmissiveColor", Color.white);
-
             // Provide Text position and size using RectTransform.
             RectTransform rectTransform;
             rectTransform = this._nametag.GetComponent<RectTransform>();
             rectTransform.localPosition = new Vector3(0, 0, 0);
             rectTransform.sizeDelta = new Vector2(500, 100); // make this big enough to fit a pretty big name
 
-            StartCoroutine(UpdateWhileParentAlive());
+            this._actor.healthHaver.OnPreDeath += (_) => HandleEnemyDied();
         }
 
-        private IEnumerator UpdateWhileParentAlive()
+        internal bool UpdateWhileParentAlive()
         {
-            while (true)
+            if (this._actor?.healthHaver?.IsDead ?? true)
             {
-                if (this._actor?.healthHaver?.IsDead ?? true)
-                {
-                    HandleEnemyDied();
-                    yield break;
-                }
-
-                Vector3 screenPos = Camera.main.WorldToScreenPoint(this._actor.sprite.WorldTopCenter);
-                this._nametag.transform.position = screenPos;
-                yield return null;
+                HandleEnemyDied();
+                return false;
             }
+
+            Vector3 screenPos = Camera.main.WorldToScreenPoint(this._actor.sprite.WorldTopCenter);
+            this._nametag.transform.position = screenPos;
+            return true;
         }
 
         private void HandleEnemyDied()
