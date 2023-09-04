@@ -87,12 +87,6 @@ namespace CwaffingTheGungy
             AdjustAmmoToMoney();
         }
 
-        protected override void NonCurrentGunUpdate()
-        {
-            base.NonCurrentGunUpdate();
-            AdjustAmmoToMoney();
-        }
-
         protected override void Update()
         {
             base.Update();
@@ -112,6 +106,8 @@ namespace CwaffingTheGungy
             if (money == this._lastMoney)
                 return;
             this.gun.CurrentAmmo = money;
+            if (this.gun.ClipShotsRemaining > money)
+                this.gun.ClipShotsRemaining = money;
         }
     }
 
@@ -138,17 +134,26 @@ namespace CwaffingTheGungy
         }
 
         private const float _SHEEN_WIDTH = 20.0f;
-        public static Color _Gold  = new Color(1f,1f,0f,1f);
-        public static Color _White = new Color(1f,1f,1f,1f);
+        internal static Color _Gold      = new Color(1f,1f,0f,1f);
+        internal static Color _White     = new Color(1f,1f,1f,1f);
+        internal static Dictionary<string, Texture2D> _GoldenTextures = new();
         public static Texture2D GetGoldenTextureForEnemyIdleAnimation(AIActor enemy)
         {
+            // If we've already computed a texture for this enemy, don't do it again
+            if (_GoldenTextures.ContainsKey(enemy.EnemyGuid))
+                return _GoldenTextures[enemy.EnemyGuid];
+
+            // Get the best idle sprite for the enemy
             tk2dSpriteDefinition bestIdleSprite = enemy.sprite.collection.spriteDefinitions[CwaffToolbox.GetIdForBestIdleAnimation(enemy)];
             // If the x coordinate of the first two UVs match, we're using a rotated sprite
             bool isRotated = (bestIdleSprite.uvs[0].x == bestIdleSprite.uvs[1].x);
+            // Remove the texture from the sprite sheet
             Texture2D spriteTexture = bestIdleSprite.DesheetTexture();
+            // Create a new gold-blended texture for the sprite
             Texture2D goldTexture = new Texture2D(
                 isRotated ? spriteTexture.height : spriteTexture.width,
                 isRotated ? spriteTexture.width : spriteTexture.height);
+            // Blend the pixels piece by piece
             for (int x = 0; x < goldTexture.width; x++)
             {
                 for (int y = 0; y < goldTexture.height; y++)
@@ -164,6 +169,8 @@ namespace CwaffingTheGungy
                     goldTexture.SetPixel(x, y, pixelColor);
                 }
             }
+            // Cache the texture for this enemy for later
+            _GoldenTextures[enemy.EnemyGuid] = goldTexture;
             return goldTexture;
         }
     }
