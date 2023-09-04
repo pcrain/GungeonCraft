@@ -10,54 +10,6 @@ using UnityEngine;
 
 namespace CwaffingTheGungy
 {
-    public class Goldenboi : MonoBehaviour
-    {
-        private GameActor actor = null;
-        private Color gold;
-        private void Start()
-        {
-            actor = base.GetComponent<GameActor>();
-            gold = new Color(1f,1f,0f,0.5f);
-            // gold = new Color(1f,1f,0f,0.65f);
-            // gold = new Color(0f,0f,0f,0.65f);
-            // gold = new Color(0.5f,0.5f,0f,0.65f);
-            // gold = new Color(0.25f,0.25f,0f,1.0f);
-
-            Material material = actor.sprite?.renderer?.material;
-            if (!material)
-                return;
-            Shader shader = ShaderCache.Acquire("Brave/ItemSpecific/MetalSkinShader");
-            actor.sprite.usesOverrideMaterial = true;
-            if (actor is PlayerController pc)
-            {
-                pc.OverrideColorOverridden = true;
-                material.shader = shader;
-                // pc.SetOverrideShader(shader);
-                // pc.RegisterOverrideColor(gold, "goldenboi");
-                material.SetVector("_OverrideColor", gold);
-            }
-            else
-            {
-                material.shader = shader;
-                material.SetVector("_OverrideColor", gold);
-            }
-        }
-        private void Update()
-        {
-            if (!actor)
-                return;
-            Material material = actor.sprite?.renderer?.material;
-            if (!material)
-                return;
-            if (actor is PlayerController pc)
-            {
-                // pc.RegisterOverrideColor(gold, "goldenboi");
-                // pc.FlatColorOverridden = true;
-                // pc.ChangeFlatColorOverride(gold);
-            }
-            // material.SetVector("_OverrideColor", gold);
-        }
-    }
     public class Commands
     {
         public static void Init()
@@ -66,7 +18,7 @@ namespace CwaffingTheGungy
             ETGModConsole.Commands.AddGroup("gg", delegate (string[] args)
             {
                 LootEngine.SpawnItem(
-                    PickupObjectDatabase.GetById(IDs.Pickups["quarter_pounder"]).gameObject,
+                    PickupObjectDatabase.GetById(IDs.Pickups["blank_checks"]).gameObject,
                     GameManager.Instance.PrimaryPlayer.CenterPosition,
                     Vector2.zero,
                     0);
@@ -80,27 +32,6 @@ namespace CwaffingTheGungy
             //   AIActor aiactor = AIActor.Spawn(orLoadByGuid, player.gameObject.transform.position, player.gameObject.transform.position.GetAbsoluteRoom(), true, AIActor.AwakenAnimationType.Default, true);
             //   aiactor.GetComponent<GenericIntroDoer>().TriggerSequence(player);
             // });
-            // Gold Shader test
-            ETGModConsole.Commands.AddGroup("gold", delegate (string[] args)
-            {
-                try
-                {
-                    Color gold = new Color(1f,1f,0f,0.35f);
-                    Texture2D testTexture = new Texture2D(2, 2);
-                        testTexture.SetPixel(0, 0, gold);
-                        testTexture.SetPixel(0, 1, gold);
-                        testTexture.SetPixel(1, 0, gold);
-                        testTexture.SetPixel(1, 1, gold);
-                        testTexture.Apply();
-
-                    PlayerController pc = GameManager.Instance.PrimaryPlayer;
-                    pc.gameObject.AddComponent<Goldenboi>();
-                    return;
-                }
-                catch(Exception ex) {
-                    ETGModConsole.Log($"something went wrong D: {ex}");
-                }
-            });
             // Shader test
             ETGModConsole.Commands.AddGroup("shader", delegate (string[] args)
             {

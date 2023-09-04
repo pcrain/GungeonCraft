@@ -43,6 +43,7 @@
     <Compile Include="src\Cwaff-Passives\Siphon.cs"/>
     <Compile Include="src\Cwaff-Passives\Shine.cs"/>
     <Compile Include="src\Cwaff-Passives\RatPoison.cs"/>
+    <Compile Include="src\Cwaff-Passives\BlankChecks.cs"/>
     <Compile Include="src\Cwaff-Passives\LibraryCardtridge.cs"/>
     <Compile Include="src\Cwaff-Passives\ZoolandersDiary.cs"/>
     <Compile Include="src\Cwaff-Passives\HLD.cs"/>
@@ -253,6 +254,7 @@
     <EmbeddedResource Include="Resources\bossyboi_bosscard_orig.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\johns_wick_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\rat_poison_icon.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\blank_checks_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\curators_badge_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\future_killing_bullet_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\library_cardtridge_icon.png"/>

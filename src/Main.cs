@@ -95,6 +95,7 @@ namespace CwaffingTheGungy
                     CuratorsBadge.Init();
                     CreditCard.Init();
                     LibraryCardtridge.Init();
+                    BlankChecks.Init();
                 #endregion
 
                 #region Guns
