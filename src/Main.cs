@@ -125,6 +125,7 @@ namespace CwaffingTheGungy
                     Bouncer.Add();
                     Grandmaster.Add();
                     QuarterPounder.Add();
+                    DeathNote.Add();
 
                     // MasterSword.Add();
                 #endregion
