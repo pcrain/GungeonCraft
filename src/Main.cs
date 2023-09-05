@@ -96,6 +96,7 @@ namespace CwaffingTheGungy
                     CreditCard.Init();
                     LibraryCardtridge.Init();
                     BlankChecks.Init();
+                    DeadRinger.Init();
                 #endregion
 
                 #region Guns
@@ -125,7 +126,7 @@ namespace CwaffingTheGungy
                     Bouncer.Add();
                     Grandmaster.Add();
                     QuarterPounder.Add();
-                    DeathNote.Add();
+                    // DeathNote.Add();
 
                     // MasterSword.Add();
                 #endregion

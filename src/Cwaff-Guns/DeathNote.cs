@@ -25,6 +25,7 @@ namespace CwaffingTheGungy
         public static string LongDescription  = "(TBD)";
 
         internal static Dictionary<int, Nametag> _Nametags = new();
+        internal static string _Letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
         public static void Add()
         {
