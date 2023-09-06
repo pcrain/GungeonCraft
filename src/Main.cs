@@ -86,7 +86,7 @@ namespace CwaffingTheGungy
                 #region Passives
                     Shine.Init();
                     Superstitious.Init();
-                    HLD.Init();
+                    DriftersHeadgear.Init();
                     Siphon.Init();
                     ZoolandersDiary.Init();
                     RatPoison.Init();

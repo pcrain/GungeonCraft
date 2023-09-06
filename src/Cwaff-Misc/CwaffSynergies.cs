@@ -25,7 +25,7 @@ namespace CwaffingTheGungy
         public static void Init()
         {
             // Makes Hyper Light Dasher 20% longer and reflect bullets
-            NewSynergy("Hype Yourself Up", new[]{Name(HLD.ItemName), "hyper_light_blaster"});
+            NewSynergy("Hype Yourself Up", new[]{Name(DriftersHeadgear.ItemName), "hyper_light_blaster"});
         }
     }
 }

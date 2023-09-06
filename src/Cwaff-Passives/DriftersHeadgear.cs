@@ -15,32 +15,31 @@ using Alexandria.Misc;
 
 namespace CwaffingTheGungy
 {
-    public class HLD : PassiveItem
+    public class DriftersHeadgear : PassiveItem
     {
-        public static string ItemName         = "HLD";
-        public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/yellow_bandana_icon";
-        public static string ShortDescription = "Hyper Light Dasher";
-        public static string LongDescription  = "(Pyoooom)";
+        public static string ItemName         = "Drifter's Headgear";
+        public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/drifters_headgear_icon";
+        public static string ShortDescription = "Hyper Light Dodger";
+        public static string LongDescription  = "(Grants a very quick dodge roll, but loses the ability to dodge through bullets...just go faster o.o)";
 
-        private HLDRoll dodgeRoller = null;
+        internal static GameObject _LinkVFXPrefab;
+        internal static Projectile _LightningProjectile;
 
-        internal static GameObject LinkVFXPrefab;
-        internal static Projectile lightningProjectile;
+        private HLDRoll _dodgeRoller = null;
 
         public static void Init()
         {
-            PickupObject item = Lazy.SetupPassive<HLD>(ItemName, SpritePath, ShortDescription, LongDescription);
+            PickupObject item = Lazy.SetupPassive<DriftersHeadgear>(ItemName, SpritePath, ShortDescription, LongDescription);
             item.quality      = PickupObject.ItemQuality.A;
 
-            LinkVFXPrefab = FakePrefab.Clone(Game.Items["shock_rounds"].GetComponent<ComplexProjectileModifier>().ChainLightningVFX);
-            FakePrefab.MarkAsFakePrefab(LinkVFXPrefab);
-            UnityEngine.Object.DontDestroyOnLoad(LinkVFXPrefab);
+            _LinkVFXPrefab = FakePrefab.Clone(Game.Items["shock_rounds"].GetComponent<ComplexProjectileModifier>().ChainLightningVFX)
+                .RegisterPrefab(deactivate: false);
 
             var comp = item.gameObject.AddComponent<HLDRoll>();
 
-            lightningProjectile = Lazy.PrefabProjectileFromGun((ItemHelper.Get(Items.GunslingersAshes) as Gun));
-                lightningProjectile.baseData.damage = 5f;
-                lightningProjectile.baseData.speed  = 0.001f;
+            _LightningProjectile = Lazy.PrefabProjectileFromGun((ItemHelper.Get(Items.GunslingersAshes) as Gun));
+                _LightningProjectile.baseData.damage = 5f;
+                _LightningProjectile.baseData.speed  = 0.001f;
         }
 
         public override void Update()
@@ -50,13 +49,13 @@ namespace CwaffingTheGungy
             if (!this.Owner)
                 return;
 
-            dodgeRoller.isHyped =
+            this._dodgeRoller.isHyped =
                 this.Owner.PlayerHasActiveSynergy("Hype Yourself Up");
         }
 
         private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherCollider)
         {
-            if(!(dodgeRoller.isDodging && dodgeRoller.isHyped))  // reflect projectiles with hyped synergy
+            if(!(this._dodgeRoller.isDodging && this._dodgeRoller.isHyped))  // reflect projectiles with hyped synergy
                 return;
             Projectile component = otherRigidbody.GetComponent<Projectile>();
             if (component != null && !(component.Owner is PlayerController))
@@ -69,21 +68,21 @@ namespace CwaffingTheGungy
         public override void Pickup(PlayerController player)
         {
             base.Pickup(player);
-            dodgeRoller = this.gameObject.GetComponent<HLDRoll>();
-                dodgeRoller.owner = player;
+            this._dodgeRoller = this.gameObject.GetComponent<HLDRoll>();
+                this._dodgeRoller.owner = player;
             player.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
         }
 
         public override DebrisObject Drop(PlayerController player)
         {
             player.specRigidbody.OnPreRigidbodyCollision -= this.OnPreCollision;
-            dodgeRoller.AbortDodgeRoll();
+            this._dodgeRoller.AbortDodgeRoll();
             return base.Drop(player);
         }
 
         public override void OnDestroy()
         {
-            dodgeRoller.AbortDodgeRoll();
+            this._dodgeRoller.AbortDodgeRoll();
             base.OnDestroy();
         }
     }
@@ -102,7 +101,7 @@ namespace CwaffingTheGungy
             if (!(this.isHyped && this.owner))
                 return;
             Projectile p = SpawnManager.SpawnProjectile(
-              HLD.lightningProjectile.gameObject,
+              DriftersHeadgear._LightningProjectile.gameObject,
               this.owner.sprite.WorldCenter,
               Quaternion.Euler(0f, 0f, this.owner.m_currentGunAngle),
               true).GetComponent<Projectile>();
@@ -113,7 +112,7 @@ namespace CwaffingTheGungy
                 p.gameObject.AddComponent<Expiration>().expirationTimer = DISOWN_TIME+FADE_TIME;
 
                 OwnerConnectLightningModifier oclm = p.gameObject.AddComponent<OwnerConnectLightningModifier>();
-                    oclm.linkPrefab = HLD.LinkVFXPrefab;
+                    oclm.linkPrefab = DriftersHeadgear._LinkVFXPrefab;
                     oclm.disownTimer = DISOWN_TIME;
                     oclm.fadeTimer = FADE_TIME;
                     oclm.MakeGlowy();

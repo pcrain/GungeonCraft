@@ -42,11 +42,11 @@
     <Compile Include="src\Cwaff-Passives\Superstitious.cs"/>
     <Compile Include="src\Cwaff-Passives\Siphon.cs"/>
     <Compile Include="src\Cwaff-Passives\Shine.cs"/>
+    <Compile Include="src\Cwaff-Passives\DriftersHeadgear.cs"/>
     <Compile Include="src\Cwaff-Passives\RatPoison.cs"/>
     <Compile Include="src\Cwaff-Passives\BlankChecks.cs"/>
     <Compile Include="src\Cwaff-Passives\LibraryCardtridge.cs"/>
     <Compile Include="src\Cwaff-Passives\ZoolandersDiary.cs"/>
-    <Compile Include="src\Cwaff-Passives\HLD.cs"/>
     <Compile Include="src\Cwaff-Passives\VoodooDoll.cs"/>
     <Compile Include="src\Cwaff-Passives\CuratorsBadge.cs"/>
     <Compile Include="src\Cwaff-Passives\CampingSupplies.cs"/>
@@ -280,6 +280,7 @@
     <EmbeddedResource Include="Resources\ItemSprites\rat_poison_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\blank_checks_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\curators_badge_icon.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\drifters_headgear_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\future_killing_bullet_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\library_cardtridge_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\dead_ringer_icon.png"/>
