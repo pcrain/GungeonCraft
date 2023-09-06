@@ -14,16 +14,17 @@ namespace CwaffingTheGungy
     {
         private const int PIXELS_ABOVE_HEAD = 2;
 
-        private static GameObject VFXScapegoat;
+        private static GameObject VFXScapegoat = new();
         private static tk2dSpriteCollectionData OverheadVFXCollection;
-        private static Dictionary<GameActor,List<GameObject>> extantSprites;
+        private static Dictionary<GameActor,List<GameObject>> extantSprites = new();
 
-        public static Dictionary<string,int> sprites;
-        public static Dictionary<string,GameObject> animations;
-        public static Dictionary<string,VFXPool> vfxpool;
-        public static Dictionary<string,VFXComplex> vfxcomplex;
+        public static Dictionary<string,int> sprites = new();
+        public static Dictionary<string,GameObject> animations = new();
+        public static Dictionary<string,VFXPool> vfxpool = new();
+        public static Dictionary<string,VFXComplex> vfxcomplex = new();
+        private static Dictionary<GameObject,VFXPool> vfxObjectToPoolMap = new();
 
-        private static Dictionary<GameObject,VFXPool> vfxObjectToPoolMap;
+        public static GameObject laserSightPrefab;
 
         public static tk2dSpriteCollectionData SpriteCollection
         {
@@ -32,14 +33,6 @@ namespace CwaffingTheGungy
 
         public static void Init()
         {
-            sprites               = new Dictionary<string,int>();
-            extantSprites         = new Dictionary<GameActor,List<GameObject>>();
-            animations            = new Dictionary<string,GameObject>();
-            vfxpool               = new Dictionary<string,VFXPool>();
-            vfxcomplex            = new Dictionary<string,VFXComplex>();
-            vfxObjectToPoolMap    = new Dictionary<GameObject,VFXPool>();
-
-            VFXScapegoat          = new GameObject();
             OverheadVFXCollection = SpriteBuilder.ConstructCollection(VFXScapegoat, "OverheadVFX_Collection");
             UnityEngine.Object.DontDestroyOnLoad(VFXScapegoat);
             UnityEngine.Object.DontDestroyOnLoad(OverheadVFXCollection);
@@ -384,7 +377,6 @@ namespace CwaffingTheGungy
         }
 
         // Blatantly stolen from Noonum
-        public static GameObject laserSightPrefab;
         public static GameObject RenderLaserSight(Vector2 position, float length, float width, float angle, Color? colour = null, float power = 0)
         {
             GameObject gameObject = SpawnManager.SpawnVFX(laserSightPrefab, position, Quaternion.Euler(0, 0, angle));
