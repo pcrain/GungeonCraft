@@ -48,7 +48,7 @@ namespace CwaffingTheGungy
             {
                 string istring = i.ToString();
                 // RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/Numbers/"+i.ToString());
-                RegisterVFX<GameObject>(istring, new List<string>() {
+                RegisterVFX(istring, new List<string>() {
                         "CwaffingTheGungy/Resources/MiscVFX/Numbers/"+i.ToString(),
                     }, 1, loops: false, anchor: tk2dBaseSprite.Anchor.LowerCenter, persist: true);
             }
@@ -63,37 +63,37 @@ namespace CwaffingTheGungy
             RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/reticle-orange");
             RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/reticle-blue");
 
-            RegisterVFX<GameObject>("PumpChargeAnimated", ResMap.Get("PumpChargeMeter"), 4, loops: true,
+            RegisterVFX("PumpChargeAnimated", ResMap.Get("PumpChargeMeter"), 4, loops: true,
                 anchor: tk2dBaseSprite.Anchor.LowerCenter);
 
-            RegisterVFX<GameObject>("FriendlyOverhead", ResMap.Get("friendlyoverhead_vfx"), 10, loops: true,
+            RegisterVFX("FriendlyOverhead", ResMap.Get("friendlyoverhead_vfx"), 10, loops: true,
                 anchor: tk2dBaseSprite.Anchor.LowerCenter);
 
-            RegisterVFX<GameObject>("PlagueOverhead", ResMap.Get("plaguevfxframe"), 4, loops: true,
+            RegisterVFX("PlagueOverhead", ResMap.Get("plaguevfxframe"), 4, loops: true,
                 anchor: tk2dBaseSprite.Anchor.LowerCenter);
 
-            RegisterVFX<GameObject>("SoulLinkParticle", ResMap.Get("soul-link-particle"), 16, loops: true,
+            RegisterVFX("SoulLinkParticle", ResMap.Get("soul-link-particle"), 16, loops: true,
                 anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.3f, emissivePower: 100);
 
-            RegisterVFX<GameObject>("MidasParticle", ResMap.Get("midas-sparkle"), 8, loops: true,
+            RegisterVFX("MidasParticle", ResMap.Get("midas-sparkle"), 8, loops: true,
                 anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 5);
 
-            RegisterVFX<GameObject>("SoulLinkSoul", ResMap.Get("soul-link-soul"), 5, loops: true,
+            RegisterVFX("SoulLinkSoul", ResMap.Get("soul-link-soul"), 5, loops: true,
                 anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.3f, emissivePower: 200);
 
-            RegisterVFX<GameObject>("VoodooGhost", ResMap.Get("voodoo-ghost"), 2, loops: true,
+            RegisterVFX("VoodooGhost", ResMap.Get("voodoo-ghost"), 2, loops: true,
                 anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);
 
-            RegisterVFX<GameObject>("Shine", new List<string>() {
+            RegisterVFX("Shine", new List<string>() {
                     "CwaffingTheGungy/Resources/MiscVFX/shine2",
                 }, 1, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 100);
 
-            RegisterVFX<GameObject>("Splode", ResMap.Get("splode"), 18, loops: true,
+            RegisterVFX("Splode", ResMap.Get("splode"), 18, loops: true,
                     anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 300, emissiveColour: Color.cyan);
 
-            RegisterVFX<VFXPool>("Rebar", ResMap.Get("RebarGunImpactVFX2"), 6, loops: false);
+            RegisterVFX("Rebar", ResMap.Get("RebarGunImpactVFX2"), 6, loops: false);
 
-            RegisterVFX<GameObject>("Tornado", ResMap.Get("tornado"), 20, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter);
+            RegisterVFX("Tornado", ResMap.Get("tornado"), 20, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter);
 
             laserSightPrefab = LoadHelper.LoadAssetFromAnywhere("assets/resourcesbundle/global vfx/vfx_lasersight.prefab") as GameObject;
         }
@@ -109,7 +109,7 @@ namespace CwaffingTheGungy
         /// <summary>
         /// Generically register a VFX as a GameObject (animated sprite), VFXComplex, or VFXPool
         /// </summary>
-        public static void RegisterVFX<T>(string name, List<string> spritePaths, int fps, bool loops = true, float scale = 1.0f, tk2dBaseSprite.Anchor anchor = tk2dBaseSprite.Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null)
+        public static void RegisterVFX(string name, List<string> spritePaths, int fps, bool loops = true, float scale = 1.0f, tk2dBaseSprite.Anchor anchor = tk2dBaseSprite.Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null)
         {
             // GameObject Obj     = new GameObject(name);
             GameObject Obj     = SpriteBuilder.SpriteFromResource(spritePaths[0], new GameObject(name));
@@ -211,10 +211,6 @@ namespace CwaffingTheGungy
             complex.effects            = new VFXObject[] { vfObj };
             pool.effects               = new VFXComplex[] { complex };
 
-            // Type genericType = typeof(T);
-            // if(genericType == typeof(VFXPool))         vfxpool[name]    = pool;
-            // else if(genericType == typeof(VFXComplex)) vfxcomplex[name] = complex;
-            // else if(genericType == typeof(GameObject)) animations[name] = Obj;
             vfxpool[name]    = pool;
             vfxcomplex[name] = complex;
             animations[name] = Obj;
@@ -225,7 +221,7 @@ namespace CwaffingTheGungy
         /// </summary>
         public static VFXPool RegisterVFXPool(string name, List<string> spritePaths, int fps, bool loops = true, float scale = 1.0f, tk2dBaseSprite.Anchor anchor = tk2dBaseSprite.Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null)
         {
-            RegisterVFX<VFXPool>(
+            RegisterVFX(
                 name           : name,
                 spritePaths    : spritePaths,
                 fps            : fps,
