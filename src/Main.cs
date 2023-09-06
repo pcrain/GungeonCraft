@@ -98,6 +98,7 @@ namespace CwaffingTheGungy
                     BlankChecks.Init();
                     DeadRinger.Init();
                     VoodooDoll.Init();
+                    CampingSupplies.Init();
                 #endregion
 
                 #region Guns
@@ -145,25 +146,27 @@ namespace CwaffingTheGungy
                 #endregion
 
                 #region Flow stuff stolen from Apache
-                    AssetBundle sharedAssets = ResourceManager.LoadAssetBundle("shared_auto_001");
-                    AssetBundle sharedAssets2 = ResourceManager.LoadAssetBundle("shared_auto_002");
-                    AssetBundle sharedBase = ResourceManager.LoadAssetBundle("shared_base_001");
-                    AssetBundle braveResources = ResourceManager.LoadAssetBundle("brave_resources_001");
-                    AssetBundle enemiesBase = ResourceManager.LoadAssetBundle("enemies_base_001");
+                    // AssetBundle sharedAssets = ResourceManager.LoadAssetBundle("shared_auto_001");
+                    // AssetBundle sharedAssets2 = ResourceManager.LoadAssetBundle("shared_auto_002");
+                    // AssetBundle sharedBase = ResourceManager.LoadAssetBundle("shared_base_001");
+                    // AssetBundle braveResources = ResourceManager.LoadAssetBundle("brave_resources_001");
+                    // AssetBundle enemiesBase = ResourceManager.LoadAssetBundle("enemies_base_001");
+                    // AssetBundle encounterAssets = ResourceManager.LoadAssetBundle("encounters_base_001");
 
                     // ETGModConsole.Log("Trying to load some stuff");
                     // try
                     // {
-                    //     ETGModConsole.Log($"  we got {sharedAssets.LoadAsset<GameObject>("NapalmStrike")?.name ?? "null"}");
-                    //     ETGModConsole.Log($"  we got {sharedAssets2.LoadAsset<GameObject>("NapalmStrike")?.name ?? "null"}");
-                    //     ETGModConsole.Log($"  we got {braveResources.LoadAsset<GameObject>("NapalmStrike")?.name ?? "null"}");
-                    //     ETGModConsole.Log($"  we got {enemiesBase.LoadAsset<GameObject>("NapalmStrike")?.name ?? "null"}");
-                    //     ETGModConsole.Log($"  we got {sharedBase.LoadAsset<GameObject>("NapalmStrike")?.name ?? "null"}");
-                    //     ETGModConsole.Log($"  we got {sharedAssets.LoadAsset<GameObject>("NapalmStrikeReticle")?.name ?? "null"}");
-                    //     ETGModConsole.Log($"  we got {sharedAssets2.LoadAsset<GameObject>("NapalmStrikeReticle")?.name ?? "null"}");
-                    //     ETGModConsole.Log($"  we got {braveResources.LoadAsset<GameObject>("NapalmStrikeReticle")?.name ?? "null"}");
-                    //     ETGModConsole.Log($"  we got {enemiesBase.LoadAsset<GameObject>("NapalmStrikeReticle")?.name ?? "null"}");
-                    //     ETGModConsole.Log($"  we got {sharedBase.LoadAsset<GameObject>("NapalmStrikeReticle")?.name ?? "null"}");
+                    //     // ETGModConsole.Log($"  we got {sharedAssets.LoadAsset<GameObject>("Bonfire")?.name ?? "null"}");
+                    //     // ETGModConsole.Log($"  we got {sharedAssets2.LoadAsset<GameObject>("Bonfire")?.name ?? "null"}");
+                    //     // ETGModConsole.Log($"  we got {braveResources.LoadAsset<GameObject>("Bonfire")?.name ?? "null"}");
+                    //     // ETGModConsole.Log($"  we got {enemiesBase.LoadAsset<GameObject>("Bonfire")?.name ?? "null"}");
+                    //     // ETGModConsole.Log($"  we got {sharedBase.LoadAsset<GameObject>("Bonfire")?.name ?? "null"}");
+                    //     // ETGModConsole.Log($"  we got {encounterAssets.LoadAsset<GameObject>("Bonfire")?.name ?? "null"}");
+                    //     // ETGModConsole.Log($"  we got {sharedAssets.LoadAsset<GameObject>("NapalmStrikeReticle")?.name ?? "null"}");
+                    //     // ETGModConsole.Log($"  we got {sharedAssets2.LoadAsset<GameObject>("NapalmStrikeReticle")?.name ?? "null"}");
+                    //     // ETGModConsole.Log($"  we got {braveResources.LoadAsset<GameObject>("NapalmStrikeReticle")?.name ?? "null"}");
+                    //     // ETGModConsole.Log($"  we got {enemiesBase.LoadAsset<GameObject>("NapalmStrikeReticle")?.name ?? "null"}");
+                    //     // ETGModConsole.Log($"  we got {sharedBase.LoadAsset<GameObject>("NapalmStrikeReticle")?.name ?? "null"}");
 
                     //     // GameObject napalm = sharedAssets.LoadAsset<GameObject>("NapalmStrike");
                     //     // if (napalm != null)
@@ -175,30 +178,30 @@ namespace CwaffingTheGungy
                     // {
                     //     ETGModConsole.Log($"  you broke it: {ex}");
                     // }
-                    try {
-                        // Init Prefab Databases
-                        CwaffDungeonPrefabs.InitCustomPrefabs(sharedAssets, sharedAssets2, braveResources, enemiesBase);
-                        // Init Custom Enemy Prefabs
-                        // ExpandCustomEnemyDatabase.InitPrefabs(expandSharedAssets1);
-                        // Init Custom Room Prefabs
-                        // ExpandRoomPrefabs.InitCustomRooms(sharedAssets, sharedAssets2, braveResources, enemiesBase);
-                        // Init Custom DungeonFlow(s)
-                        CwaffDungeonFlow.InitDungeonFlowsAndHooks(sharedAssets2);
-                    } catch (Exception ex) {
-                        ETGModConsole.Log("[CtG] ERROR: Exception occured while building prefabs!", true);
-                        Debug.LogException(ex);
-                        sharedAssets = null;
-                        sharedAssets2 = null;
-                        braveResources = null;
-                        enemiesBase = null;
-                        return;
-                    }
+                    // try {
+                    //     // Init Prefab Databases
+                    //     CwaffDungeonPrefabs.InitCustomPrefabs(sharedAssets, sharedAssets2, braveResources, enemiesBase);
+                    //     // Init Custom Enemy Prefabs
+                    //     // ExpandCustomEnemyDatabase.InitPrefabs(expandSharedAssets1);
+                    //     // Init Custom Room Prefabs
+                    //     // ExpandRoomPrefabs.InitCustomRooms(sharedAssets, sharedAssets2, braveResources, enemiesBase);
+                    //     // Init Custom DungeonFlow(s)
+                    //     CwaffDungeonFlow.InitDungeonFlowsAndHooks(sharedAssets2);
+                    // } catch (Exception ex) {
+                    //     ETGModConsole.Log("[CtG] ERROR: Exception occured while building prefabs!", true);
+                    //     Debug.LogException(ex);
+                    //     sharedAssets = null;
+                    //     sharedAssets2 = null;
+                    //     braveResources = null;
+                    //     enemiesBase = null;
+                    //     return;
+                    // }
 
-                    // Null bundles when done with them to avoid game crash issues
-                    sharedAssets = null;
-                    sharedAssets2 = null;
-                    braveResources = null;
-                    enemiesBase = null;
+                    // // Null bundles when done with them to avoid game crash issues
+                    // sharedAssets = null;
+                    // sharedAssets2 = null;
+                    // braveResources = null;
+                    // enemiesBase = null;
                 #endregion
 
                 // Bosses yo

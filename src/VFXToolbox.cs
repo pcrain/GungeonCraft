@@ -65,6 +65,11 @@ namespace CwaffingTheGungy
             RegisterVFX("PlagueOverhead", ResMap.Get("plaguevfxframe"), 4, loops: true,
                 anchor: tk2dBaseSprite.Anchor.LowerCenter);
 
+            RegisterVFX("CampfireA", ResMap.Get("campfire-a"), 6, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.5f, emissivePower: 5f);
+            RegisterVFX("CampfireB", ResMap.Get("campfire-b"), 6, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.5f, emissivePower: 10f);
+            RegisterVFX("CampfireC", ResMap.Get("campfire-c"), 6, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.5f, emissivePower: 20f);
+            RegisterVFX("CampfireD", ResMap.Get("campfire-d"), 6, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.5f, emissivePower: 30f);
+
             RegisterVFX("SoulLinkParticle", ResMap.Get("soul-link-particle"), 16, loops: true,
                 anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.3f, emissivePower: 100);
 
@@ -76,6 +81,10 @@ namespace CwaffingTheGungy
 
             RegisterVFX("VoodooGhost", ResMap.Get("voodoo-ghost"), 2, loops: true,
                 anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);
+
+            RegisterVFX("CanOfPepsi", ResMap.Get("can-of-pepsi"), 2, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);
+            RegisterVFX("CanOfCoke", ResMap.Get("can-of-coke"), 2, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);
+            RegisterVFX("CanOfSprite", ResMap.Get("can-of-sprite"), 2, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);
 
             RegisterVFX("Shine", new List<string>() {
                     "CwaffingTheGungy/Resources/MiscVFX/shine2",
