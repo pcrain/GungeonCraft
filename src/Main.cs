@@ -97,6 +97,7 @@ namespace CwaffingTheGungy
                     LibraryCardtridge.Init();
                     BlankChecks.Init();
                     DeadRinger.Init();
+                    VoodooDoll.Init();
                 #endregion
 
                 #region Guns

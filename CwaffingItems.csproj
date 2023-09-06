@@ -47,6 +47,7 @@
     <Compile Include="src\Cwaff-Passives\LibraryCardtridge.cs"/>
     <Compile Include="src\Cwaff-Passives\ZoolandersDiary.cs"/>
     <Compile Include="src\Cwaff-Passives\HLD.cs"/>
+    <Compile Include="src\Cwaff-Passives\VoodooDoll.cs"/>
     <Compile Include="src\Cwaff-Passives\CuratorsBadge.cs"/>
     <Compile Include="src\Cwaff-Passives\DeadRinger.cs"/>
     <Compile Include="src\Cwaff-Passives\CreditCard.cs"/>
@@ -234,6 +235,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\Explosions\ki-explosion1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\Explosions\splode2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\soul-link-particle3.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\voodoo-ghost.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\Numbers\8.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\Numbers\3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\Numbers\2.png"/>
@@ -255,6 +257,7 @@
     <EmbeddedResource Include="Resources\shaders\PretzelCustom.shader"/>
     <EmbeddedResource Include="Resources\bossyboi_bosscard_orig.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\johns_wick_icon.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\voodoo_doll_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\rat_poison_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\blank_checks_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\curators_badge_icon.png"/>

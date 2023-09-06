@@ -81,6 +81,9 @@ namespace CwaffingTheGungy
             RegisterVFX<GameObject>("SoulLinkSoul", ResMap.Get("soul-link-soul"), 5, loops: true,
                 anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.3f, emissivePower: 200);
 
+            RegisterVFX<GameObject>("VoodooGhost", ResMap.Get("voodoo-ghost"), 2, loops: true,
+                anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);
+
             RegisterVFX<GameObject>("Shine", new List<string>() {
                     "CwaffingTheGungy/Resources/MiscVFX/shine2",
                 }, 1, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 100);
