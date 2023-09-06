@@ -45,40 +45,35 @@ namespace CwaffingTheGungy
 
         public static bool CustomDodgeRollHook(Func<PlayerController,Vector2,bool> orig, PlayerController player, Vector2 direction)
         {
+            // Figure out all of our passives that give us a custom dodge roll
             List<CustomDodgeRoll> overrides = new List<CustomDodgeRoll>();
             foreach (PassiveItem p in player.passiveItems)
-            {
-                CustomDodgeRoll overrideDodgeRoll = p.GetComponent<CustomDodgeRoll>();
-                if (overrideDodgeRoll)
+                if (p.GetComponent<CustomDodgeRoll>() is CustomDodgeRoll overrideDodgeRoll)
                     overrides.Add(overrideDodgeRoll);
-            }
             if (overrides.Count == 0)  // fall back to default behavior if we don't have overrides
                 return orig(player,direction);
 
+            // Turn off dodgeButtonHeld state for all custom rolls if we aren't pushing the dodge button
             BraveInput instanceForPlayer = BraveInput.GetInstanceForPlayer(player.PlayerIDX);
-            if (instanceForPlayer.ActiveActions.DodgeRollAction.IsPressed)
-            {
-                instanceForPlayer.ConsumeButtonDown(GungeonActions.GungeonActionType.DodgeRoll);
-                // if (!(this.owner.IsDodgeRolling || this.owner.IsFalling || this.owner.IsInputOverridden || this.dodgeButtonHeld || this.isDodging))
-                // if (player.AcceptingNonMotionInput && !(player.IsDodgeRolling || this.dodgeButtonHeld || this.isDodging))
-                if (player.AcceptingNonMotionInput && !player.IsDodgeRolling)
-                {
-                    foreach (CustomDodgeRoll customDodgeRoll in overrides)
-                    {
-                        if (customDodgeRoll.dodgeButtonHeld)
-                            continue;
-                        customDodgeRoll.dodgeButtonHeld = true;
-                        customDodgeRoll.TryDodgeRoll();
-                    }
-                    return true;
-                }
-            }
-            else
+            if (!instanceForPlayer.ActiveActions.DodgeRollAction.IsPressed)
             {
                 foreach (CustomDodgeRoll customDodgeRoll in overrides)
                     customDodgeRoll.dodgeButtonHeld = false;
+                return false;
             }
-            return false;
+            instanceForPlayer.ConsumeButtonDown(GungeonActions.GungeonActionType.DodgeRoll);
+            if (!player.AcceptingNonMotionInput || player.IsDodgeRolling)
+                return false;
+
+            // Begin the dodge roll for all of our custom dodge rolls available
+            foreach (CustomDodgeRoll customDodgeRoll in overrides)
+            {
+                if (customDodgeRoll.dodgeButtonHeld)
+                    continue;
+                customDodgeRoll.dodgeButtonHeld = true;
+                customDodgeRoll.TryDodgeRoll();
+            }
+            return true;
         }
 
         public virtual void BeginDodgeRoll()
