@@ -378,9 +378,21 @@ namespace CwaffingTheGungy
           return UnityEngine.Random.Range(0,2) == 1;
         }
 
+        // Get the defautl projectile for a gun by id
         public static Projectile GunDefaultProjectile(int gunid)
         {
             return (PickupObjectDatabase.GetById(gunid) as Gun).DefaultModule.projectiles[0];
+        }
+
+        // Blend two colors
+        public static Color Blend(Color a, Color b, float t = 0.5f, bool blendAlpha = true)
+        {
+            return new Color(
+                (1f - t) * a.r + t * b.r,
+                (1f - t) * a.g + t * b.g,
+                (1f - t) * a.b + t * b.b,
+                blendAlpha ? ((1f - t) * a.a + t * b.a) : a.a
+                );
         }
     }
 

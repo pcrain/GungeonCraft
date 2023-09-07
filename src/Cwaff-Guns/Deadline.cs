@@ -31,7 +31,8 @@ namespace CwaffingTheGungy
 
         private const float _SIGHT_WIDTH = 2.0f;
 
-        private static ExplosionData _DeadlineExplosion = null;
+        internal static ExplosionData _DeadlineExplosion = null;
+        internal static tk2dSpriteAnimationClip _BulletSprite;
 
         private List <DeadlineLaser> _myLasers = new();
         private float _myTimer = 0;
@@ -41,14 +42,43 @@ namespace CwaffingTheGungy
         {
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
                 gun.barrelOffset.transform.localPosition = new Vector3(1.6875f, 0.5625f, 0f); // should match "Casing" in JSON file
+                gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
+                gun.reloadTime                        = 0.9f;
+                gun.DefaultModule.angleVariance       = 0.0f;
+                gun.DefaultModule.cooldownTime        = 0.1f;
+                gun.DefaultModule.numberOfShotsInClip = 8;
+                gun.CurrentAmmo                       = 64;
+                gun.SetBaseMaxAmmo(64);
+                gun.SetAnimationFPS(gun.shootAnimation, 20);
+                gun.SetAnimationFPS(gun.reloadAnimation, 30);
+                gun.SetAnimationFPS(gun.idleAnimation, 10);
 
             var comp = gun.gameObject.AddComponent<Deadline>();
                 comp.preventNormalReloadAudio = true;
-                comp.SetFireAudio("Play_WPN_stdissuelaser_shot_01");
+                comp.SetFireAudio("deadline_fire_sound");
+                comp.SetReloadAudio("deadline_fire_sound");
+
+            _BulletSprite = AnimateBullet.CreateProjectileAnimation(
+                new List<string> {
+                    "deadline_projectile",
+                }, 2, true, new IntVector2(23, 4),
+                false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
 
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
+                projectile.AddAnimation(_BulletSprite);
+                projectile.SetAnimation(_BulletSprite);
                 projectile.collidesWithEnemies = false;
+                projectile.baseData.speed      = 60.0f;
+                projectile.baseData.range      = 30.0f;
                 projectile.gameObject.AddComponent<DeadlineProjectile>();
+
+            EasyTrailBullet trail = projectile.gameObject.AddComponent<EasyTrailBullet>();
+                trail.TrailPos   = trail.transform.position;
+                trail.StartWidth = 0.2f;
+                trail.EndWidth   = 0f;
+                trail.LifeTime   = 0.1f;
+                trail.BaseColor  = Color.green;
+                trail.EndColor   = Color.green;
 
             ExplosionData defaultExplosion = GameManager.Instance.Dungeon.sharedSettingsPrefab.DefaultExplosionData;
             _DeadlineExplosion = new ExplosionData()
@@ -71,14 +101,14 @@ namespace CwaffingTheGungy
                 ignoreList             = defaultExplosion.ignoreList,
                 ss                     = new ScreenShakeSettings
                 {
-                    magnitude               = 2.5f,
-                    speed                   = 2.5f,
+                    magnitude               = 0.5f,
+                    speed                   = 1.5f,
                     time                    = 1f,
                     falloff                 = 0,
                     direction               = Vector2.zero,
                     vibrationType           = ScreenShakeSettings.VibrationType.Auto,
                     simpleVibrationStrength = Vibration.Strength.Light,
-                    simpleVibrationTime     = Vibration.Time.Quick
+                    simpleVibrationTime     = Vibration.Time.Instant
                 },
             };
         }
@@ -111,7 +141,7 @@ namespace CwaffingTheGungy
         {
             if (this._myLaserSight)
                 return;
-            this._myLaserSight = VFX.CreateLaserSight(this.gun.barrelOffset.transform.position, 1f, _SIGHT_WIDTH, this.gun.CurrentAngle);
+            this._myLaserSight = VFX.CreateLaserSight(this.gun.barrelOffset.transform.position, 1f, _SIGHT_WIDTH, this.gun.CurrentAngle, colour: Color.cyan, power: 50f);
             this._myLaserSight.transform.parent = this.gun.barrelOffset.transform;
             UpdateLaserSight();
         }
@@ -134,7 +164,30 @@ namespace CwaffingTheGungy
             tk2dTiledSprite sprite = this._myLaserSight.GetComponent<tk2dTiledSprite>();
             sprite.dimensions = new Vector2(length, _SIGHT_WIDTH);
             this._myLaserSight.transform.rotation = this.gun.CurrentAngle.EulerZ();
+            this._myLaserSight.transform.position = this.gun.barrelOffset.transform.position; // TODO: maybe unnecessary?
+            MakeLaserMatchGunSpriteColor(sprite);
+        }
 
+        // Logic below is custom-tailored to current specific animation, change as necessary
+        internal static Color _Green = Color.green;
+        internal static Color _Red   = Color.red;
+        private void MakeLaserMatchGunSpriteColor(tk2dTiledSprite sprite)
+        {
+            int frame = this.gun.spriteAnimator.CurrentFrame;
+            string clip = this.gun.spriteAnimator.CurrentClip.name;
+
+            float t = 0.0f;
+            if (clip == "deadline_idle") // max green on 0 and 20, max red on 10
+                t = 1.0f - 0.1f*Mathf.Abs(10 - frame); // full red
+            else if (clip == "deadline_reload") // max green on 0 and 21, max red on 10 and 11
+                t = 0.1f * ((frame < 11) ? frame : (21 - frame));
+            else if (clip == "deadline_fire") // always green
+                t = 0.0f;
+            else
+                return; // unknown animation, nothing to do
+            Color c = Lazy.Blend(_Green, _Red, t);
+            sprite.renderer.material.SetColor("_OverrideColor", c);
+            sprite.renderer.material.SetColor("_EmissiveColor", c);
         }
 
         protected override void Update()
@@ -258,7 +311,6 @@ namespace CwaffingTheGungy
             public bool markedForDestruction = false;
             public bool dead = false;
 
-            // TODO: angle technically redundant here
             public DeadlineLaser(Vector2 p1, Vector2 p2, float angle)
             {
                 this.start        = p1;
