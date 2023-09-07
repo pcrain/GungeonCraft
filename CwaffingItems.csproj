@@ -597,6 +597,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_004.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_reload_004.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\soul_kaliber_fire_005.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_idle_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_reload_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\natascha_fire_006.json"/>
@@ -661,6 +662,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_003.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_026.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_reload_004.png"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_014.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\natascha_fire_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_025.json"/>
@@ -684,6 +686,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\death_note_fire_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_026.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_idle_001.png"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_fire_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\paintball_cannon_reload_004.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\quarter_pounder_reload_010.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_011.json"/>
@@ -716,6 +719,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\soul_kaliber_reload_002.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\paintball_cannon_fire_002.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_reload_001.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_007.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\quarter_pounder_reload_006.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_fire_006.png"/>
@@ -739,6 +743,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_idle_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\death_note_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\natascha_reload_001.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_fire_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\ki_blast_gun_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\quarter_pounder_reload_009.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_reload_006.json"/>
@@ -836,6 +841,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\quarter_pounder_reload_003.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_reload_008.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_010.png"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_019.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\quarter_pounder_reload_010.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_016.png"/>

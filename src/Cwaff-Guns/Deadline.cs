@@ -24,20 +24,23 @@ namespace CwaffingTheGungy
     public class Deadline : AdvancedGunBehavior
     {
         public static string ItemName         = "Deadline";
-        public static string SpriteName       = "bullatterer";
+        public static string SpriteName       = "deadline";
         public static string ProjectileName   = "38_special";
         public static string ShortDescription = "Pythagoras Would be Proud";
         public static string LongDescription  = "(intersecting lines create explosions)";
 
+        private const float _SIGHT_WIDTH = 2.0f;
+
         private static ExplosionData _DeadlineExplosion = null;
 
-        private List <DeadlineLaser> _myLasers;
+        private List <DeadlineLaser> _myLasers = new();
         private float _myTimer = 0;
         private GameObject _myLaserSight = null;
 
         public static void Add()
         {
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+                gun.barrelOffset.transform.localPosition = new Vector3(1.6875f, 0.5625f, 0f); // should match "Casing" in JSON file
 
             var comp = gun.gameObject.AddComponent<Deadline>();
                 comp.preventNormalReloadAudio = true;
@@ -80,29 +83,70 @@ namespace CwaffingTheGungy
             };
         }
 
-        public Deadline()
+        public override void OnSwitchedToThisGun()
         {
-            _myLasers = new List<DeadlineLaser>();
+            base.OnSwitchedToThisGun();
+            EnableLaserSight();
+        }
+
+        public override void OnSwitchedAwayFromThisGun()
+        {
+            DisableLaserSight();
+            base.OnSwitchedAwayFromThisGun();
+        }
+
+        protected override void OnPickedUpByPlayer(PlayerController player)
+        {
+            base.OnPickedUpByPlayer(player);
+            EnableLaserSight();
+        }
+
+        protected override void OnPostDroppedByPlayer(PlayerController player)
+        {
+            DisableLaserSight();
+            base.OnPostDroppedByPlayer(player);
+        }
+
+        private void EnableLaserSight()
+        {
+            if (this._myLaserSight)
+                return;
+            this._myLaserSight = VFX.CreateLaserSight(this.gun.barrelOffset.transform.position, 1f, _SIGHT_WIDTH, this.gun.CurrentAngle);
+            this._myLaserSight.transform.parent = this.gun.barrelOffset.transform;
+            UpdateLaserSight();
+        }
+
+        private void DisableLaserSight()
+        {
+            if (!this._myLaserSight)
+                return;
+            UnityEngine.Object.Destroy(this._myLaserSight);
+        }
+
+        private void UpdateLaserSight()
+        {
+            if (!this._myLaserSight)
+                return;
+
+            Vector2 target = Raycast.ToNearestWallOrObject(this.gun.barrelOffset.transform.position, this.gun.CurrentAngle, minDistance: 1);
+            float length = C.PIXELS_PER_TILE*Vector2.Distance(this.gun.barrelOffset.transform.position,target);
+
+            tk2dTiledSprite sprite = this._myLaserSight.GetComponent<tk2dTiledSprite>();
+            sprite.dimensions = new Vector2(length, _SIGHT_WIDTH);
+            this._myLaserSight.transform.rotation = this.gun.CurrentAngle.EulerZ();
+
         }
 
         protected override void Update()
         {
             base.Update();
-
             if (!this.Player)
                 return;
 
-            if (_myLaserSight != null)
-                UnityEngine.Object.Destroy(_myLaserSight);
+            UpdateLaserSight();
 
-            Vector2 target = Raycast.ToNearestWallOrObject(this.Player.sprite.WorldCenter, this.gun.CurrentAngle, minDistance: 1);
-            float length = C.PIXELS_PER_TILE*Vector2.Distance(this.Player.sprite.WorldCenter,target);
-            _myLaserSight = VFX.RenderLaserSight(this.Player.sprite.WorldCenter,length,2,this.gun.CurrentAngle);
-            _myLaserSight.transform.parent = this.gun.transform;
-
-            _myTimer += BraveTime.DeltaTime;
-            float power = 200.0f+400.0f*Mathf.Abs(Mathf.Sin(16*_myTimer));
-
+            this._myTimer += BraveTime.DeltaTime;
+            float power = 200.0f + 400.0f * Mathf.Abs(Mathf.Sin(16 * this._myTimer));
             foreach (DeadlineLaser laser in _myLasers)
                 laser.UpdateLaser(emissivePower : power);
         }
@@ -149,7 +193,6 @@ namespace CwaffingTheGungy
             {
                 newest.UpdateEndPoint(closestPosition);
                 newest.InitiateDeathSequenceAt(Vector2.zero,false);
-                // myLasers[closestIndex].UpdateEndPoint(closestPosition);
                 _myLasers[closestIndex].InitiateDeathSequenceAt(closestPosition.ToVector3ZisY(-1f),true);
                 AkSoundEngine.PostEvent("gaster_blaster_sound_effect", ETGModMainBehaviour.Instance.gameObject);
 
@@ -264,7 +307,7 @@ namespace CwaffingTheGungy
                 {
                     if (this._laserVfx != null)
                         UnityEngine.Object.Destroy(this._laserVfx);
-                    this._laserVfx = VFX.RenderLaserSight(this.start,curLength,1,this._angle,this._color,this._power);
+                    this._laserVfx = VFX.CreateLaserSight(this.start,curLength,1,this._angle,this._color,this._power);
                     this.laserComp = _laserVfx.GetComponent<tk2dTiledSprite>();
                     this.laserMat  = this.laserComp.sprite.renderer.material;
                 }

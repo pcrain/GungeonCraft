@@ -91,7 +91,7 @@ namespace CwaffingTheGungy
                 }, 1, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 100);
 
             RegisterVFX("Splode", ResMap.Get("splode"), 18, loops: true,
-                    anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 300, emissiveColour: Color.cyan);
+                    anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 100, emissiveColour: Color.cyan);
 
             RegisterVFX("Rebar", ResMap.Get("RebarGunImpactVFX2"), 6, loops: false);
 
@@ -386,7 +386,7 @@ namespace CwaffingTheGungy
         }
 
         // Blatantly stolen from Noonum
-        public static GameObject RenderLaserSight(Vector2 position, float length, float width, float angle, Color? colour = null, float power = 0)
+        public static GameObject CreateLaserSight(Vector2 position, float length, float width, float angle, Color? colour = null, float power = 0)
         {
             GameObject gameObject = SpawnManager.SpawnVFX(laserSightPrefab, position, Quaternion.Euler(0, 0, angle));
 
