@@ -178,6 +178,7 @@
     <Compile Include="src\Cwaff-Guns\TestLightning.cs"/>
     <Compile Include="src\Cwaff-Guns\PaintballCannon.cs"/>
     <Compile Include="src\Cwaff-Guns\Bouncer.cs"/>
+    <Compile Include="src\Cwaff-Guns\HolyWaterGun.cs"/>
     <Compile Include="src\Cwaff-Guns\SpinCycle.cs"/>
     <Compile Include="src\Cwaff-Guns\Telefragger.cs"/>
     <Compile Include="src\PlayerToolbox.cs"/>
@@ -597,6 +598,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_reload_002.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_idle_011.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_004.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\holy_water_gun_fire_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_reload_004.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_idle_010.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\soul_kaliber_fire_005.json"/>
@@ -705,6 +707,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_idle_011.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\quarter_pounder_reload_006.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_010.png"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\holy_water_gun_reload_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_002.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_014.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\natascha_idle_001.json"/>
@@ -736,6 +739,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_003.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_020.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_idle_018.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\holy_water_gun_idle_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\natascha_fire_007.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\soul_kaliber_fire_002.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\soul_kaliber_reload_001.json"/>
@@ -797,6 +801,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_007.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_010.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_idle_003.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\holy_water_gun_reload_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\natascha_reload_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_fire_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\ki_blast_gun_idle_001.png"/>
@@ -858,6 +863,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_022.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_031.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_reload_010.png"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\holy_water_gun_fire_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\natascha_fire_008.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\quarter_pounder_reload_007.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_018.json"/>
@@ -906,6 +912,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_031.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\quarter_pounder_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_idle_020.png"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\holy_water_gun_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_reload_012.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\quarter_pounder_fire_003.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_028.png"/>
@@ -1000,6 +1007,7 @@
     <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\knife_gun_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\bouncer_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\quarter_pounder_idle_001.png"/>
+    <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\holy_water_gun_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\deadline_idle_001.png"/>
     <Reference Include="UnityEngine.ClothModule"/>
     <Reference Include="UnityEngine.UnityConnectModule"/>

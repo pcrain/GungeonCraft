@@ -14,7 +14,7 @@ using MonoMod.RuntimeDetour;
 
 using Gungeon;
 using Dungeonator;
-using ItemAPI;
+using Alexandria.ItemAPI;
 
 namespace CwaffingTheGungy
 {
@@ -45,6 +45,8 @@ namespace CwaffingTheGungy
         // Does not work with CreateProjectileAnimation(), which expects direct sprite names in the mod's "sprites" directory
         public static List<string> Get(string resource)
         {
+            if (!_ResMap.ContainsKey(resource))
+                return null;
             return _ResMap[resource];
         }
 
@@ -197,6 +199,66 @@ namespace CwaffingTheGungy
         public static Gun SetupGun(string gunName, string spritePath, string projectileName, string shortDescription, string longDescription)
         {
             return SetupItem<Gun, Gun>(gunName, spritePath, projectileName, shortDescription, longDescription);
+        }
+
+        /// <summary>
+        /// Perform basic initialization of beam sprites for a projectile, override the beam controller's existing sprites if they exist
+        /// </summary>
+        public static BasicBeamController SetupBeamSprites(this Projectile projectile, string spriteName, int fps, Vector2 dims, Vector2? impactDims = null)
+        {
+            // Fix breakage with GenerateBeamPrefab() expecting a non-null specrigidbody
+            projectile.specRigidbody = projectile.gameObject.GetOrAddComponent<SpeculativeRigidbody>();
+            // Make sure we actually have a rotatable projectile so we don't have weird rendering glitches
+            projectile.specRigidbody.UpdateCollidersOnRotation = true;
+            projectile.shouldRotate = true;
+
+            // Compute beam offsets from middle-left of sprite
+            Vector2 offsets = new Vector2(0, Mathf.Ceil(dims.y / 2f));
+            // Compute impact offsets from true center of sprite
+            Vector2? impactOffsets = impactDims.HasValue ? new Vector2(Mathf.Ceil(impactDims.Value.x / 2f), Mathf.Ceil(impactDims.Value.y / 2f)) : null;
+
+            ETGModConsole.Log($"sprite: {ResMap.Get($"{spriteName}_mid")}");
+            ETGModConsole.Log($"_impact: {ResMap.Get($"{spriteName}_impact")}");
+            ETGModConsole.Log($"_end: {ResMap.Get($"{spriteName}_end")}");
+            ETGModConsole.Log($"_start: {ResMap.Get($"{spriteName}_start")}");
+
+            // Create the beam itself using our resource map lookup
+            BasicBeamController beamComp = projectile.GenerateBeamPrefab(
+                spritePath: ResMap.Get($"{spriteName}_start")[0],
+                colliderDimensions: dims,
+                colliderOffsets: offsets,
+                beamAnimationPaths: ResMap.Get($"{spriteName}_mid"),
+                beamFPS: fps,
+                //Impact
+                impactVFXAnimationPaths: ResMap.Get($"{spriteName}_impact"),
+                beamImpactFPS: fps,
+                impactVFXColliderDimensions: impactDims,
+                impactVFXColliderOffsets: impactOffsets,
+                //End
+                endVFXAnimationPaths: ResMap.Get($"{spriteName}_end"),
+                beamEndFPS: fps,
+                endVFXColliderDimensions: dims,
+                endVFXColliderOffsets: offsets,
+                //Beginning
+                muzzleVFXAnimationPaths: ResMap.Get($"{spriteName}_start"),
+                beamMuzzleFPS: fps,
+                muzzleVFXColliderDimensions: dims,
+                muzzleVFXColliderOffsets: offsets,
+                //Other Variables
+                glowAmount: 0f,
+                emissivecolouramt: 0f
+                );
+
+            beamComp.boneType = BasicBeamController.BeamBoneType.Projectile;
+            // projectile.sprite.transform.rot
+
+            return beamComp;
+
+            // Unnecessary to delete these
+            // UnityEngine.Object.Destroy(projectile.GetComponentInChildren<tk2dSprite>());
+            // UnityEngine.Object.Destroy(projectile.GetComponentInChildren<tk2dSpriteAnimation>());
+            // UnityEngine.Object.Destroy(projectile.GetComponentInChildren<tk2dSpriteAnimator>());
+            // UnityEngine.Object.Destroy(projectile.GetComponentInChildren<tk2dTiledSprite>());
         }
 
         /// <summary>
@@ -420,27 +482,39 @@ namespace CwaffingTheGungy
             // Type type = o.GetType();
             Type type = typeof(T);
             foreach (var f in type.GetFields()) {
-                if (f.GetValue(o1) == null)
+                try
                 {
-                    if (f.GetValue(o2) == null)
+                    if (f.GetValue(o1) == null)
+                    {
+                        if (f.GetValue(o2) == null)
+                            continue;
+                    }
+                    else if (f.GetValue(o2) != null && f.GetValue(o1).Equals(f.GetValue(o2)))
                         continue;
+                    Console.WriteLine(
+                        String.Format("field {0} = {1} -> {2}", f.Name, f.GetValue(o1), f.GetValue(o2)));
                 }
-                else if (f.GetValue(o2) != null && f.GetValue(o1).Equals(f.GetValue(o2)))
-                    continue;
-                Console.WriteLine(
-                    String.Format("field {0} = {1} -> {2}", f.Name, f.GetValue(o1), f.GetValue(o2)));
+                catch (Exception)
+                {
+                    Console.WriteLine(" prop {0} = {1} -> {2}", f.Name, "ERROR", "ERROR");
+                }
             }
             foreach(PropertyDescriptor f in TypeDescriptor.GetProperties(o1))
             {
-                if (f.GetValue(o1) == null)
-                {
-                    if (f.GetValue(o2) == null)
+                try {
+                    if (f.GetValue(o1) == null)
+                    {
+                        if (f.GetValue(o2) == null)
+                            continue;
+                    }
+                    else if (f.GetValue(o2) != null && f.GetValue(o1).Equals(f.GetValue(o2)))
                         continue;
+                    Console.WriteLine(" prop {0} = {1} -> {2}", f.Name, f.GetValue(o1), f.GetValue(o2));
                 }
-                else if (f.GetValue(o2) != null && f.GetValue(o1).Equals(f.GetValue(o2)))
-                    continue;
-                string name = f.Name;
-                Console.WriteLine(" prop {0} = {1} -> {2}", name, f.GetValue(o1), f.GetValue(o2));
+                catch (Exception)
+                {
+                    Console.WriteLine(" prop {0} = {1} -> {2}", f.Name, "ERROR", "ERROR");
+                }
             }
         }
 

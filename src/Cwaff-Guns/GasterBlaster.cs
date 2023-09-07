@@ -65,62 +65,11 @@ namespace CwaffingTheGungy
 
             var gastercomp = projectile.gameObject.AddComponent<ReplaceBulletWithGasterBlaster>();
 
-            List<string> BeamAnimPaths = new List<string>()
-            {
-                "CwaffingTheGungy/Resources/BeamSprites/alphabeam_mid_001",
-                "CwaffingTheGungy/Resources/BeamSprites/alphabeam_mid_002",
-                "CwaffingTheGungy/Resources/BeamSprites/alphabeam_mid_003",
-                "CwaffingTheGungy/Resources/BeamSprites/alphabeam_mid_004",
-            };
-            List<string> BeamStartPaths = new List<string>()
-            {
-                "CwaffingTheGungy/Resources/BeamSprites/alphabeam_start_001",
-                "CwaffingTheGungy/Resources/BeamSprites/alphabeam_start_002",
-                "CwaffingTheGungy/Resources/BeamSprites/alphabeam_start_003",
-                "CwaffingTheGungy/Resources/BeamSprites/alphabeam_start_004",
-            };
-            List<string> BeamEndPaths = new List<string>()
-            {
-                "CwaffingTheGungy/Resources/BeamSprites/alphabeam_end_001",
-                "CwaffingTheGungy/Resources/BeamSprites/alphabeam_end_002",
-                "CwaffingTheGungy/Resources/BeamSprites/alphabeam_end_003",
-                "CwaffingTheGungy/Resources/BeamSprites/alphabeam_end_004",
-            };
-            List<string> BeamImpactPaths = new List<string>()
-            {
-                "CwaffingTheGungy/Resources/BeamSprites/alphabeam_impact_001",
-                "CwaffingTheGungy/Resources/BeamSprites/alphabeam_impact_002",
-                "CwaffingTheGungy/Resources/BeamSprites/alphabeam_impact_003",
-                "CwaffingTheGungy/Resources/BeamSprites/alphabeam_impact_004",
-            };
-
             //BULLET STATS
             Projectile projectile2 = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items.MarineSidearm) as Gun, false);
 
-            BasicBeamController beamComp = projectile2.GenerateBeamPrefab(
-                "CwaffingTheGungy/Resources/BeamSprites/alphabeam_mid_001",
-                new Vector2(15, 7),
-                new Vector2(0, 4),
-                BeamAnimPaths,
-                13,
-                //Impact
-                BeamImpactPaths,
-                13,
-                new Vector2(7, 7),
-                new Vector2(4, 4),
-                //End
-                BeamEndPaths,
-                13,
-                new Vector2(15, 7),
-                new Vector2(0, 4),
-                //Beginning
-                BeamStartPaths,
-                13,
-                new Vector2(15, 7),
-                new Vector2(0, 4),
-                //Other Variables
-                0
-                );
+            BasicBeamController beamComp = projectile2.SetupBeamSprites(
+              spriteName: "alphabeam", fps: 13, dims: new Vector2(15, 7), impactDims: new Vector2(7, 7));
 
             beamComp.boneType = BasicBeamController.BeamBoneType.Projectile;
             // beamComp.interpolateStretchedBones = true;

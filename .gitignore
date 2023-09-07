@@ -10,3 +10,4 @@ src2/*
 *.aseprite
 Resources/Sounds/*.wav
 Resources/Sounds-unedited/*
+.todo
