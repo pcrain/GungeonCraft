@@ -278,6 +278,7 @@
     <EmbeddedResource Include="Resources\ItemSprites\johns_wick_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\voodoo_doll_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\rat_poison_icon.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\gyroscope_icon_old.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\blank_checks_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\curators_badge_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\drifters_headgear_icon.png"/>

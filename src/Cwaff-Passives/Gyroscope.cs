@@ -22,8 +22,8 @@ namespace CwaffingTheGungy
         public static string ShortDescription = "Spin to Win";
         public static string LongDescription  = "(spinspinspinspinspinspinspinspinspinspin)";
 
-        private PlayerController owner = null;
-        private GyroscopeRoll dodgeRoller = null;
+        private PlayerController _owner = null;
+        private GyroscopeRoll _dodgeRoller = null;
 
         public static void Init()
         {
@@ -35,13 +35,13 @@ namespace CwaffingTheGungy
 
         private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherCollider)
         {
-            if(!dodgeRoller.isDodging)
+            if(!_dodgeRoller.isDodging)
                 return;
             Projectile component = otherRigidbody.GetComponent<Projectile>();
 
             if (component == null || component.Owner is PlayerController)
                 return;
-            if (dodgeRoller.reflectingProjectiles)
+            if (_dodgeRoller.reflectingProjectiles)
                 PassiveReflectItem.ReflectBullet(component, true, Owner.specRigidbody.gameActor, 10f, 1f, 1f, 0f);
             if (!this.Owner.healthHaver.IsVulnerable)
                 PhysicsEngine.SkipCollision = true;
@@ -50,21 +50,21 @@ namespace CwaffingTheGungy
         public override void Pickup(PlayerController player)
         {
             base.Pickup(player);
-            dodgeRoller = this.gameObject.GetComponent<GyroscopeRoll>();
-                dodgeRoller.owner = player;
+            _dodgeRoller = this.gameObject.GetComponent<GyroscopeRoll>();
+                _dodgeRoller.owner = player;
             player.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
         }
 
         public override DebrisObject Drop(PlayerController player)
         {
             player.specRigidbody.OnPreRigidbodyCollision -= this.OnPreCollision;
-            dodgeRoller.AbortDodgeRoll();
+            _dodgeRoller.AbortDodgeRoll();
             return base.Drop(player);
         }
 
         public override void OnDestroy()
         {
-            dodgeRoller.AbortDodgeRoll();
+            _dodgeRoller.AbortDodgeRoll();
             base.OnDestroy();
         }
     }
