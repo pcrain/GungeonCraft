@@ -113,6 +113,11 @@ namespace CwaffingTheGungy
 
     public class MidasProjectile : MonoBehaviour
     {
+        private const float _SHEEN_WIDTH = 20.0f;
+        internal static Color _Gold      = new Color(1f,1f,0f,1f);
+        internal static Color _White     = new Color(1f,1f,1f,1f);
+        internal static Dictionary<string, Texture2D> _GoldenTextures = new();
+
         private void Start()
         {
             Projectile p = base.GetComponent<Projectile>();
@@ -121,7 +126,14 @@ namespace CwaffingTheGungy
 
         private void OnWillKillEnemy(Projectile bullet, SpeculativeRigidbody enemy)
         {
-            Texture2D goldSprite                = GetGoldenTextureForEnemyIdleAnimation(enemy.aiActor);
+            Texture2D goldSprite;
+            if (_GoldenTextures.ContainsKey(enemy.aiActor.EnemyGuid))
+                goldSprite = _GoldenTextures[enemy.aiActor.EnemyGuid]; // If we've already computed a texture for this enemy, don't do it again
+            else
+            {
+                goldSprite = Lazy.GetTexturedEnemyIdleAnimation(enemy.aiActor, _Gold, 0.3f, _White, _SHEEN_WIDTH);
+                _GoldenTextures[enemy.aiActor.EnemyGuid] = goldSprite; // Cache the texture for this enemy for later
+            }
             GameObject g                        = UnityEngine.Object.Instantiate(new GameObject(), enemy.sprite.WorldBottomLeft.ToVector3ZisY(0f), Quaternion.identity);
             tk2dSpriteCollectionData collection = SpriteBuilder.ConstructCollection(g, "goldcollection");
             int spriteId                        = SpriteBuilder.AddSpriteToCollection(goldSprite, collection, "goldsprite");
@@ -131,47 +143,6 @@ namespace CwaffingTheGungy
 
             enemy.aiActor.EraseFromExistenceWithRewards(true);
 
-        }
-
-        private const float _SHEEN_WIDTH = 20.0f;
-        internal static Color _Gold      = new Color(1f,1f,0f,1f);
-        internal static Color _White     = new Color(1f,1f,1f,1f);
-        internal static Dictionary<string, Texture2D> _GoldenTextures = new();
-        public static Texture2D GetGoldenTextureForEnemyIdleAnimation(AIActor enemy)
-        {
-            // If we've already computed a texture for this enemy, don't do it again
-            if (_GoldenTextures.ContainsKey(enemy.EnemyGuid))
-                return _GoldenTextures[enemy.EnemyGuid];
-
-            // Get the best idle sprite for the enemy
-            tk2dSpriteDefinition bestIdleSprite = enemy.sprite.collection.spriteDefinitions[CwaffToolbox.GetIdForBestIdleAnimation(enemy)];
-            // If the x coordinate of the first two UVs match, we're using a rotated sprite
-            bool isRotated = (bestIdleSprite.uvs[0].x == bestIdleSprite.uvs[1].x);
-            // Remove the texture from the sprite sheet
-            Texture2D spriteTexture = bestIdleSprite.DesheetTexture();
-            // Create a new gold-blended texture for the sprite
-            Texture2D goldTexture = new Texture2D(
-                isRotated ? spriteTexture.height : spriteTexture.width,
-                isRotated ? spriteTexture.width : spriteTexture.height);
-            // Blend the pixels piece by piece
-            for (int x = 0; x < goldTexture.width; x++)
-            {
-                for (int y = 0; y < goldTexture.height; y++)
-                {
-                    Color pixelColor = spriteTexture.GetPixel(isRotated ? y : x, isRotated ? x : y);
-                    if (pixelColor.a > 0)
-                    {
-                        // Blend opaque pixels with gold
-                        pixelColor = Color.Lerp(pixelColor, _Gold, 0.3f);
-                        // Add a diagonal white sheen
-                        pixelColor = Color.Lerp(pixelColor, _White, Mathf.Sin( 6.28f * ( ( (x+y) % _SHEEN_WIDTH) / _SHEEN_WIDTH )));
-                    }
-                    goldTexture.SetPixel(x, y, pixelColor);
-                }
-            }
-            // Cache the texture for this enemy for later
-            _GoldenTextures[enemy.EnemyGuid] = goldTexture;
-            return goldTexture;
         }
     }
 

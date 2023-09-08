@@ -455,6 +455,39 @@ namespace CwaffingTheGungy
                 blendAlpha ? ((1f - t) * a.a + t * b.a) : a.a
                 );
         }
+
+        // Get an enemy's idle animation blended with a color of choice, with optional sheen
+        public static Texture2D GetTexturedEnemyIdleAnimation(AIActor enemy, Color blendColor, float blendAmount, Color? sheenColor = null, float sheenWidth = 20.0f)
+        {
+            // Get the best idle sprite for the enemy
+            tk2dSpriteDefinition bestIdleSprite = enemy.sprite.collection.spriteDefinitions[CwaffToolbox.GetIdForBestIdleAnimation(enemy)];
+            // If the x coordinate of the first two UVs match, we're using a rotated sprite
+            bool isRotated = (bestIdleSprite.uvs[0].x == bestIdleSprite.uvs[1].x);
+            // Remove the texture from the sprite sheet
+            Texture2D spriteTexture = bestIdleSprite.DesheetTexture();
+            // Create a new gold-blended texture for the sprite
+            Texture2D goldTexture = new Texture2D(
+                isRotated ? spriteTexture.height : spriteTexture.width,
+                isRotated ? spriteTexture.width : spriteTexture.height);
+            // Blend the pixels piece by piece
+            for (int x = 0; x < goldTexture.width; x++)
+            {
+                for (int y = 0; y < goldTexture.height; y++)
+                {
+                    Color pixelColor = spriteTexture.GetPixel(isRotated ? y : x, isRotated ? x : y);
+                    if (pixelColor.a > 0)
+                    {
+                        // Blend opaque pixels with blendColor
+                        pixelColor = Color.Lerp(pixelColor, blendColor, blendAmount);
+                        // Add a diagonal white sheen
+                        if (sheenColor.HasValue)
+                            pixelColor = Color.Lerp(pixelColor, sheenColor.Value, Mathf.Sin( 6.28f * ( ( (x+y) % sheenWidth) / sheenWidth )));
+                    }
+                    goldTexture.SetPixel(x, y, pixelColor);
+                }
+            }
+            return goldTexture;
+        }
     }
 
     public static class Dissect // reflection helper methods for being a lazy dumdum
