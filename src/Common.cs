@@ -208,57 +208,56 @@ namespace CwaffingTheGungy
         {
             // Fix breakage with GenerateBeamPrefab() expecting a non-null specrigidbody
             projectile.specRigidbody = projectile.gameObject.GetOrAddComponent<SpeculativeRigidbody>();
-            // Make sure we actually have a rotatable projectile so we don't have weird rendering glitches
-            projectile.specRigidbody.UpdateCollidersOnRotation = true;
-            projectile.shouldRotate = true;
+
+            // Unnecessary to delete these
+            // UnityEngine.Object.Destroy(projectile.GetComponentInChildren<tk2dSpriteAnimation>());
+            // UnityEngine.Object.Destroy(projectile.GetComponentInChildren<tk2dTiledSprite>());
+            // UnityEngine.Object.Destroy(projectile.GetComponentInChildren<tk2dSpriteAnimator>());
+            // UnityEngine.Object.Destroy(projectile.GetComponentInChildren<BasicBeamController>());
 
             // Compute beam offsets from middle-left of sprite
             Vector2 offsets = new Vector2(0, Mathf.Ceil(dims.y / 2f));
             // Compute impact offsets from true center of sprite
             Vector2? impactOffsets = impactDims.HasValue ? new Vector2(Mathf.Ceil(impactDims.Value.x / 2f), Mathf.Ceil(impactDims.Value.y / 2f)) : null;
 
-            ETGModConsole.Log($"sprite: {ResMap.Get($"{spriteName}_mid")}");
-            ETGModConsole.Log($"_impact: {ResMap.Get($"{spriteName}_impact")}");
-            ETGModConsole.Log($"_end: {ResMap.Get($"{spriteName}_end")}");
-            ETGModConsole.Log($"_start: {ResMap.Get($"{spriteName}_start")}");
-
             // Create the beam itself using our resource map lookup
-            BasicBeamController beamComp = projectile.GenerateBeamPrefab(
-                spritePath: ResMap.Get($"{spriteName}_start")[0],
-                colliderDimensions: dims,
-                colliderOffsets: offsets,
-                beamAnimationPaths: ResMap.Get($"{spriteName}_mid"),
-                beamFPS: fps,
+            BasicBeamController beamComp = projectile.FixedGenerateBeamPrefab(
+                spritePath                  : ResMap.Get($"{spriteName}_start")[0],
+                colliderDimensions          : dims,
+                colliderOffsets             : offsets,
+                beamAnimationPaths          : ResMap.Get($"{spriteName}_mid"),
+                beamFPS                     : fps,
                 //Impact
-                impactVFXAnimationPaths: ResMap.Get($"{spriteName}_impact"),
-                beamImpactFPS: fps,
-                impactVFXColliderDimensions: impactDims,
-                impactVFXColliderOffsets: impactOffsets,
+                impactVFXAnimationPaths     : ResMap.Get($"{spriteName}_impact"),
+                beamImpactFPS               : fps,
+                impactVFXColliderDimensions : impactDims,
+                impactVFXColliderOffsets    : impactOffsets,
                 //End
-                endVFXAnimationPaths: ResMap.Get($"{spriteName}_end"),
-                beamEndFPS: fps,
-                endVFXColliderDimensions: dims,
-                endVFXColliderOffsets: offsets,
+                endVFXAnimationPaths        : ResMap.Get($"{spriteName}_end"),
+                beamEndFPS                  : fps,
+                endVFXColliderDimensions    : dims,
+                endVFXColliderOffsets       : offsets,
                 //Beginning
-                muzzleVFXAnimationPaths: ResMap.Get($"{spriteName}_start"),
-                beamMuzzleFPS: fps,
-                muzzleVFXColliderDimensions: dims,
-                muzzleVFXColliderOffsets: offsets,
+                muzzleVFXAnimationPaths     : ResMap.Get($"{spriteName}_start"),
+                beamMuzzleFPS               : fps,
+                muzzleVFXColliderDimensions : dims,
+                muzzleVFXColliderOffsets    : offsets //,
                 //Other Variables
-                glowAmount: 0f,
-                emissivecolouramt: 0f
+                // glowAmount                  : 0f,
+                // emissivecolouramt           : 0f
                 );
 
-            beamComp.boneType = BasicBeamController.BeamBoneType.Projectile;
-            // projectile.sprite.transform.rot
+
+            // fix some more animation glitches (don't consistently work, check and enable on a case by case basis)
+            // beamComp.usesChargeDelay = false;
+            // beamComp.muzzleAnimation = "beam_start;
+            // beamComp.beamStartAnimation = null;
+            // beamComp.chargeAnimation = null;
+            // beamComp.rotateChargeAnimation = true;
+            // projectile.shouldRotate = true;
+            // projectile.shouldFlipVertically = true;
 
             return beamComp;
-
-            // Unnecessary to delete these
-            // UnityEngine.Object.Destroy(projectile.GetComponentInChildren<tk2dSprite>());
-            // UnityEngine.Object.Destroy(projectile.GetComponentInChildren<tk2dSpriteAnimation>());
-            // UnityEngine.Object.Destroy(projectile.GetComponentInChildren<tk2dSpriteAnimator>());
-            // UnityEngine.Object.Destroy(projectile.GetComponentInChildren<tk2dTiledSprite>());
         }
 
         /// <summary>

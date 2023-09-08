@@ -89,9 +89,9 @@ namespace CwaffingTheGungy
                 new Vector2(0, 4),
                 new() {
                     "CwaffingTheGungy/Resources/BeamSprites/alphabeam_mid_001",
-                    "CwaffingTheGungy/Resources/BeamSprites/alphabeam_mid_002",
-                    "CwaffingTheGungy/Resources/BeamSprites/alphabeam_mid_003",
-                    "CwaffingTheGungy/Resources/BeamSprites/alphabeam_mid_004",
+                    // "CwaffingTheGungy/Resources/BeamSprites/alphabeam_mid_002",
+                    // "CwaffingTheGungy/Resources/BeamSprites/alphabeam_mid_003",
+                    // "CwaffingTheGungy/Resources/BeamSprites/alphabeam_mid_004",
                 },
                 13,glowAmount:100,emissivecolouramt:100
             );

@@ -19,6 +19,7 @@ namespace CwaffingTheGungy
     {
         public static string ItemName         = "Holy Water Gun";
         public static string SpriteName       = "holy_water_gun";
+        // public static string ProjectileName   = "331"; // science cannon
         public static string ProjectileName   = "10"; // water gun
         // public static string ProjectileName   = "86"; // marine sidearm
         public static string ShortDescription = "The Water, Gun, & Holy Soak";
@@ -44,33 +45,30 @@ namespace CwaffingTheGungy
             //     ((PickupObjectDatabase.GetById(86)) as Gun).DefaultModule.projectiles[0]);
 
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
-                // projectile.spriteAnimator.
-                // projectile.gameObject.AddComponent<TestComp>();
 
             BasicBeamController beamComp = projectile.SetupBeamSprites(
-              spriteName: "alphabeam", fps: 13, dims: new Vector2(15, 7), impactDims: new Vector2(7, 7));
+              spriteName: "holy_water_gun", fps: 13, dims: new Vector2(15, 15), impactDims: new Vector2(7, 7));
+              // spriteName: "alphabeam", fps: 13, dims: new Vector2(15, 15), impactDims: new Vector2(7, 7));
                 // beamComp.sprite.usesOverrideMaterial = true;
                 // beamComp.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
                 // beamComp.sprite.renderer.material.SetFloat("_EmissivePower", 100f);
                 // beamComp.sprite.renderer.material.SetFloat("_EmissiveColorPower", 1.55f);
                 // beamComp.sprite.renderer.material.SetColor("_EmissiveColor", ExtendedColours.paleYellow);
-        }
-    }
+                // // fix some animation glitches (don't blindly copy paste; need to be set on a case by case basis depending on your beam's needs)
+                beamComp.usesChargeDelay = false;
+                beamComp.muzzleAnimation = beamComp.beamStartAnimation;
+                beamComp.beamStartAnimation = null;
+                // beamComp.muzzleAnimation = "beam_idle";
+                // beamComp.muzzleAnimation = null;
+                beamComp.chargeAnimation = null;
+                beamComp.rotateChargeAnimation = true;
 
-    public class TestComp : MonoBehaviour
-    {
-        private PlayerController _owner;
-        private Projectile _proj;
+            // beamComp.TileType = BasicBeamController.BeamTileType.Flowing;
+            // beamComp.TileType = BasicBeamController.BeamTileType.GrowAtBeginning;
+            // beamComp.endType  = BasicBeamController.BeamEndType.Dissipate;
+            // beamComp.boneType = BasicBeamController.BeamBoneType.Projectile;
+            // beamComp.collisionSeparation = true;
 
-        private void Start()
-        {
-            this._proj = base.GetComponent<Projectile>();
-            this._owner = this._proj.Owner as PlayerController;
-        }
-
-        private void Update()
-        {
-            this._proj.specRigidbody.transform.rotation = (this._owner?.m_currentGunAngle ?? 0f).EulerZ();
         }
     }
 }
