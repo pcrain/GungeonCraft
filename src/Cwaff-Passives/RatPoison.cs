@@ -19,31 +19,31 @@ namespace CwaffingTheGungy
     {
         public static string ItemName         = "Rat Poison";
         public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/rat_poison_icon";
-        public static string ShortDescription = "Ratty no Ratting";
+        public static string ShortDescription = "Swiper no Swiping";
         public static string LongDescription  = "(Resourceful rat no longer steals items)";
 
         private static int ratPoisonId;
-        private static Hook ratPoisonSpawnHook;
+        private static Hook ratPoisonHook;
 
         public static void Init()
         {
-            PickupObject item  = Lazy.SetupPassive<RatPoison>(ItemName, SpritePath, ShortDescription, LongDescription);
-            item.quality       = PickupObject.ItemQuality.C;
+            PickupObject item                  = Lazy.SetupPassive<RatPoison>(ItemName, SpritePath, ShortDescription, LongDescription);
+            item.quality                       = PickupObject.ItemQuality.C;
+            item.IgnoredByRat                  = true;
+            item.ClearIgnoredByRatFlagOnPickup = false;
 
-            ratPoisonId        = IDs.Passives["rat_poison"];
-            ratPoisonSpawnHook = new Hook(
-                typeof(LootEngine).GetMethod("PostprocessItemSpawn", BindingFlags.Static | BindingFlags.NonPublic),
-                typeof(RatPoison).GetMethod("OnItemSpawn", BindingFlags.Static | BindingFlags.Public)
+            ratPoisonId   = IDs.Passives["rat_poison"];
+            ratPoisonHook = new Hook(
+                typeof(PickupObject).GetMethod("ShouldBeTakenByRat", BindingFlags.Instance | BindingFlags.NonPublic),
+                typeof(RatPoison).GetMethod("ShouldBeTakenByRat", BindingFlags.Static | BindingFlags.Public)
                 );
         }
 
-        public static void OnItemSpawn(Action<DebrisObject> orig, DebrisObject spawnedItem)
+        public static bool ShouldBeTakenByRat(Func<PickupObject, Vector2, bool> orig, PickupObject pickup, Vector2 point)
         {
-            orig(spawnedItem);
-            if (!GameManager.Instance.AnyPlayerHasPickupID(ratPoisonId))
-                return;
-            spawnedItem.GetComponent<PickupObject>().IgnoredByRat = true;
-            spawnedItem.GetComponent<PickupObject>().ClearIgnoredByRatFlagOnPickup = false;
+            if (GameManager.Instance.AnyPlayerHasPickupID(ratPoisonId))
+                return false;
+            return orig(pickup, point);
         }
     }
 }
