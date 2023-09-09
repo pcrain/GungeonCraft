@@ -33,13 +33,10 @@ namespace CwaffingTheGungy
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
                 gun.gunSwitchGroup                       = (ItemHelper.Get(Items.MegaDouser) as Gun).gunSwitchGroup;
                 gun.barrelOffset.transform.localPosition = new Vector3(1.9375f, 0.5f, 0f); // should match "Casing" in JSON file
-                // gun.muzzleFlashEffects.type              = VFXPoolType.None; // prevent visual glitch with non-rotating beam near gun muzzle
-                // gun.usesContinuousMuzzleFlash            = false;
-                // gun.finalMuzzleFlashEffects.type         = VFXPoolType.None;
                 gun.gunClass                             = GunClass.BEAM;
                 gun.DefaultModule.ammoType               = GameUIAmmoType.AmmoType.BEAM;
                 gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.Beam;
-                gun.DefaultModule.numberOfShotsInClip    = 500;
+                gun.DefaultModule.numberOfShotsInClip    = -1;
                 gun.SetBaseMaxAmmo(500);
 
             var comp = gun.gameObject.AddComponent<HolyWaterGun>();
@@ -114,7 +111,7 @@ namespace CwaffingTheGungy
             //     sprite.gameObject.GetOrAddComponent<Encircler>();
             // }
 
-            float epower = _EXORCISM_DPS * (this._enemy.IsBlackPhantom ? HolyWaterGun._JAMMED_DAMAGE_MULT : 1f);
+            float epower = _EXORCISM_POWER * (this._enemy.IsBlackPhantom ? HolyWaterGun._JAMMED_DAMAGE_MULT : 1f);
             if (this._enemy.IsBlackPhantom && epower >= this._enemy.healthHaver.currentHealth)
             {
                 PlayerController pc = beam.projectile.Owner as PlayerController;
