@@ -76,12 +76,6 @@ namespace CwaffingTheGungy
             LaunchAllBullets(this.Player);
         }
 
-        protected override void OnPickup(GameActor owner)
-        {
-            base.OnPickup(owner);
-            if (owner is PlayerController player && player == this.Player)
-                this.Player.OnReceivedDamage += LaunchAllBullets;
-        }
 
         public override void OnDropped()
         {

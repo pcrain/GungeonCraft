@@ -181,6 +181,7 @@
     <Compile Include="src\Cwaff-Guns\Bouncer.cs"/>
     <Compile Include="src\Cwaff-Guns\HolyWaterGun.cs"/>
     <Compile Include="src\Cwaff-Guns\SpinCycle.cs"/>
+    <Compile Include="src\Cwaff-Guns\Alyx.cs"/>
     <Compile Include="src\Cwaff-Guns\Telefragger.cs"/>
     <Compile Include="src\PlayerToolbox.cs"/>
     <Compile Include="src\NonstandardApi\FakeShopItem.cs"/>
@@ -682,6 +683,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_012.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_028.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_012.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\alyx_fire_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_fire_003.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_016.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_020.json"/>
@@ -691,6 +693,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_022.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_008.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_idle_021.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\alyx_reload_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\natascha_fire_007.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\natascha_fire_003.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_fire_006.json"/>
@@ -727,6 +730,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\natascha_idle_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_fire_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_015.png"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\alyx_fire_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\death_note_fire_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_idle_017.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_017.png"/>
@@ -745,6 +749,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_002.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_fire_005.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_013.png"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\alyx_idle_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_006.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_006.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_020.png"/>
@@ -787,6 +792,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\quarter_pounder_reload_006.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_012.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_fire_006.png"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\alyx_reload_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_017.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_idle_021.png"/>
@@ -890,6 +896,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_fire_003.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_004.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_idle_015.png"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\alyx_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_fire_002.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_021.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\quarter_pounder_reload_004.json"/>
@@ -976,6 +983,7 @@
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\chess_rook.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\coin-gun-projectile3.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\bball2.png"/>
+    <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\alyx-projectile4.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\bouncelet_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\chess_pawn.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\coin-gun-projectile9.png"/>
@@ -993,6 +1001,7 @@
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\soul-kaliber-projectile.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\soap-bubble-projectile-003.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\natascha_bullet_003.png"/>
+    <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\alyx-projectile2.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\bball7.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\train_projectile_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\bball4.png"/>
@@ -1009,8 +1018,10 @@
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\ki_blast_003.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\energy_bounce3.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\ki_blast_004.png"/>
+    <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\alyx-projectile3.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\ki_blast_red_003.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\bouncelet_gray_001.png"/>
+    <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\alyx-projectile1.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\coin-gun-projectile7.png"/>
     <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\paintball_cannon_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\iron_maid_idle_001.png"/>
@@ -1019,6 +1030,7 @@
     <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\ki_blast_gun_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\soul_kaliber_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\knife_gun_idle_001.png"/>
+    <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\alyx_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\bouncer_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\quarter_pounder_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\holy_water_gun_idle_001.png"/>

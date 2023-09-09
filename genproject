@@ -46,8 +46,8 @@ if [ ! -e "./Resources/Sounds/${namespace}.bnk" ]; then
 elif [ ! -e "${audiochecksums}" ]; then
   echo -e "[${GRN}>${BLN}]   Audio checksum file does not exist, regenerating sound bank"
   updateaudio=1
-elif [ "${lastmodifiedaudio}" == "$(cat "$audioupdate")" ]; then
-  updateaudio=0
+# elif [ "${lastmodifiedaudio}" == "$(cat "$audioupdate")" ]; then
+#   updateaudio=0 #todo: this doesn't work for newly-added files with old modification times
 else
   #Checksum all files in the audio directory, then take a checksum of the checksum file
   #  and compare it to the existing checksum file

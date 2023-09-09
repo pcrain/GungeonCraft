@@ -130,6 +130,7 @@ namespace CwaffingTheGungy
                     QuarterPounder.Add();
                     // DeathNote.Add();
                     HolyWaterGun.Add();
+                    Alyx.Add();
 
                     // MasterSword.Add();
                 #endregion
