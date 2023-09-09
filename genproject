@@ -7,6 +7,8 @@ projectname="CwaffingTheGungy"                   #name of the DLL to create
 projfile="./CwaffingItems.csproj"                #the name of the csproj file to generate
 sourcechecksums="./_${namespace}-checksums-src"  #file containing checksums of all source files to determing recompilation
 audiochecksums="./_${namespace}-checksums-audio" #file containing checksums of all source files to determing recompilation
+externalupdate="./_${namespace}-externalupdate"  #file containing the last time an external resource was added
+audioupdate="./_${namespace}-audioupdate"        #file containing the last time an audio resource / csv was added / updated
 dllname="./bin/Debug/${projectname}.dll"         #DLL name is directly based on the project name
 USEXTERNALASSEMBLY=0                             #Whether to use the external Assembly-Csharp.dll or the one bundled in the source directory
 #Could not get the external assembly working ):
@@ -34,9 +36,9 @@ includes+=('<Reference Include="System" />') #needed for LinkedList
 # includes+=('<Folder Include="Characters\Shade\newspritesetup\custom\" />')
 # includes+=('<Reference Include="Ionic.Zip, Version=1.9.1.8"/>')
 
-#Regenerate audio sources
-
+#Regenerate audio sources if necessary
 echo -e "[${GRN}>${BLN}] Checking for changes to audio files"
+lastmodifiedaudio="$(find "Resources" -type f -path "*.wav" -o -path "*.csv" -printf "%T+\n" | sort -nr | head -n 1)"
 updateaudio=0
 if [ ! -e "./Resources/Sounds/${namespace}.bnk" ]; then
   echo -e "[${GRN}>${BLN}]   Audio bank does not exist, regenerating sound bank"
@@ -44,22 +46,26 @@ if [ ! -e "./Resources/Sounds/${namespace}.bnk" ]; then
 elif [ ! -e "${audiochecksums}" ]; then
   echo -e "[${GRN}>${BLN}]   Audio checksum file does not exist, regenerating sound bank"
   updateaudio=1
+elif [ "${lastmodifiedaudio}" == "$(cat "$audioupdate")" ]; then
+  updateaudio=0
 else
   #Checksum all files in the audio directory, then take a checksum of the checksum file
   #  and compare it to the existing checksum file
-  find "Resources" -type f \
+  find "Resources/Sounds/" -type f \
     -path "*.wav" -exec md5sum '{}' \; -o \
     -path "*.csv" -exec md5sum '{}' \; >> "${audiochecksums}.new"
 
   c1="$(md5sum "${audiochecksums}" | cut -f 1 -d ' ')"
   c2="$(md5sum "${audiochecksums}.new" | cut -f 1 -d ' ')"
-  /bin/rm "${audiochecksums}.new"
   if [[ "${c1}" != "${c2}" ]]; then
     echo -e "[${GRN}>${BLN}]   At least one audio file was changed, rebuilding sound bank and project"
+    diff "${audiochecksums}" "${audiochecksums}.new"
     updateaudio=1
   else
     echo -e "[${GRN}>${BLN}]   No audio files changed, skipping sound bank generation"
   fi
+  /bin/rm "${audiochecksums}.new"
+  echo "${lastmodifiedaudio}" > "$audioupdate";
 fi
 
 if [ $updateaudio -eq 1 ]; then
@@ -71,7 +77,7 @@ if [ $updateaudio -eq 1 ]; then
   /bin/rm -f "${audiochecksums}"
   while read -r afile; do
     echo "$(md5sum "${afile}")" >> "${audiochecksums}"
-  done <<< $(find "Resources" -type f -path "*.wav" -o -path "*.csv")
+  done <<< $(find "Resources/Sounds" -type f -path "*.wav" -o -path "*.csv")
 fi
 
 #Source files
@@ -124,16 +130,21 @@ if [ $USEXTERNALASSEMBLY -eq 1 ]; then
 fi
 
 #Copy over external resources as necessary
-echo -e "[${GRN}>${BLN}] Copying over updated external resources"
-while read -r line; do
-  localrelpath="$(echo "${line}" | cut -f 2- -d '/')"
-  externpath="${pluginspritesdir}/${localrelpath}"
-  localmodtime="$(stat -c '%y' "${line}")"
-  if [[ ! -e "${externpath}" ]] || [[ "$localmodtime" > "$(stat -c '%y' "${externpath}")" ]]; then
-    echo -e "[${GRN}>${BLN}]   Copying ${localrelpath}"
-    /bin/cp "${line}" "${externpath}"
-  fi
-done <<< $(find "ResourcesExternal" -type f)
+echo -e "[${GRN}>${BLN}] Checking for updated external resources"
+  lastmodifiedextern="$(find ./ResourcesExternal -printf "%T+\n" | sort -nr | head -n 1)"
+if [ "${lastmodifiedextern}" != "$(cat "$externalupdate")" ]; then
+  echo -e "[${GRN}>${BLN}] Copying over updated external resources"
+  while read -r line; do
+    localrelpath="$(echo "${line}" | cut -f 2- -d '/')"
+    externpath="${pluginspritesdir}/${localrelpath}"
+    localmodtime="$(stat -c '%y' "${line}")"
+    if [[ ! -e "${externpath}" ]] || [[ "$localmodtime" > "$(stat -c '%y' "${externpath}")" ]]; then
+      echo -e "[${GRN}>${BLN}]   Copying ${localrelpath}"
+      /bin/cp "${line}" "${externpath}"
+    fi
+  done <<< $(find "ResourcesExternal" -type f)
+  echo "${lastmodifiedextern}" > "$externalupdate";
+fi
 
 #Generate the template .csproj file
 echo -e "[${GRN}>${BLN}] Generating .csproj template"

@@ -488,6 +488,28 @@ namespace CwaffingTheGungy
             }
             return goldTexture;
         }
+
+        internal static Dictionary<string, float> _SoundTimers = new();
+        public static void PlaySoundUntilDeathOrTimeout(string soundName, GameObject source, float timer)
+        {
+            if (_SoundTimers.ContainsKey(soundName))
+                _SoundTimers[soundName] = timer; // reset the timer
+            else
+                GameManager.Instance.StartCoroutine(PlaySoundUntilDeathOrTimeout_CR(soundName, source, timer)); // play the sound
+        }
+
+        public static IEnumerator PlaySoundUntilDeathOrTimeout_CR(string soundName, GameObject source, float timer)
+        {
+            _SoundTimers[soundName] = timer;
+            AkSoundEngine.PostEvent(soundName, source);
+            while (source != null && _SoundTimers[soundName] > 0)
+            {
+                _SoundTimers[soundName] -= BraveTime.DeltaTime;
+                yield return null;
+            }
+            AkSoundEngine.PostEvent($"{soundName}_stop_all", source);
+            _SoundTimers.Remove(soundName);
+        }
     }
 
     public static class Dissect // reflection helper methods for being a lazy dumdum

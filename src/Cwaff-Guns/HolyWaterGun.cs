@@ -20,10 +20,13 @@ namespace CwaffingTheGungy
         public static string ItemName         = "Holy Water Gun";
         public static string SpriteName       = "holy_water_gun";
         public static string ProjectileName   = "10"; // mega douser
-        public static string ShortDescription = "The Water, The Gun, & The Holy Soak";
-        public static string LongDescription  = "(Deals some damage to jammed; killing a jammed enemy reduces curse by 1)";
+        public static string ShortDescription = "Water, Gun, & Holy Soak";
+        public static string LongDescription  = "(Deals 4x damage to jammed; killing a jammed enemy reduces curse by 1)";
+
+        internal const float _JAMMED_DAMAGE_MULT = 4f;
 
         internal static Dictionary<string, Texture2D> _GhostTextures = new();
+        internal static GameObject _ExorcismParticleVFX = null;
 
         public static void Add()
         {
@@ -55,14 +58,14 @@ namespace CwaffingTheGungy
                 beamComp.muzzleAnimation = beamComp.beamStartAnimation;  //use start animation for muzzle animation, make start animatino null
                 beamComp.beamStartAnimation = null;
 
+            _ExorcismParticleVFX = VFX.animations["ExorcismParticle"];
+
             projectile.gameObject.AddComponent<ExorcismJuice>();
         }
 
         protected override void OnPickup(GameActor owner)
         {
             base.OnPickup(owner);
-            if (owner as PlayerController != this.Player)
-                return;
 
             foreach (AIActor enemy in StaticReferenceManager.AllEnemies)
                 OnEnemySpawn(enemy);
@@ -71,32 +74,48 @@ namespace CwaffingTheGungy
 
         private void OnEnemySpawn(AIActor enemy)
         {
-            enemy.gameObject.GetOrAddComponent<Exorcisable>();
+            enemy.gameObject.GetOrAddComponent<Exorcisable>();  // add a dummy component for exorcism checks below
         }
     }
 
+    public class ExorcismJuice : MonoBehaviour {} // dummy component
 
     public class Exorcisable : MonoBehaviour
     {
+        private const float _EXORCISM_DPS   = 15.0f; // damage per second
+        private const float _EXORCISM_POWER = _EXORCISM_DPS / C.FPS; // damage per frame
+
+        private static uint ExorcismSoundId = 0;
+        private static float ExorcismTimer = 0.0f;
+
         private AIActor _enemy;
         private void Start()
         {
+
             this._enemy = base.GetComponent<AIActor>();
             this._enemy.specRigidbody.OnBeamCollision += this.CheckForHolyWater;
         }
 
         private void CheckForHolyWater(BeamController beam)
         {
-            // if (!this._enemy.IsBlackPhantom) // TODO: put this back when done debugging
-            //     return;
             if (!this._enemy.healthHaver || this._enemy.healthHaver.IsBoss || this._enemy.healthHaver.IsDead  || !this._enemy.healthHaver.IsAlive)
                 return;
             if (beam.GetComponent<ExorcismJuice>() is not ExorcismJuice exorcism)
                 return;
 
-            // float epower = exorcism.GetPower(); // TODO: put this back when done debugging
-            float epower = 1000f;
-            if (epower >= this._enemy.healthHaver.currentHealth)
+            // Can't quite get this to work, just uses a black sprite :\
+            // foreach (tk2dBaseSprite sprite in this._enemy.healthHaver.bodySprites)
+            // {
+            //     if (!sprite)
+            //         continue;
+            //     sprite.usesOverrideMaterial = true;
+            //     sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitCutoutUber");
+            //     sprite.renderer.material.SetFloat("_CircleAmount", 1f);
+            //     sprite.gameObject.GetOrAddComponent<Encircler>();
+            // }
+
+            float epower = _EXORCISM_DPS * (this._enemy.IsBlackPhantom ? HolyWaterGun._JAMMED_DAMAGE_MULT : 1f);
+            if (this._enemy.IsBlackPhantom && epower >= this._enemy.healthHaver.currentHealth)
             {
                 PlayerController pc = beam.projectile.Owner as PlayerController;
                 pc.ownerlessStatModifiers.Add(new StatModifier() {
@@ -114,39 +133,56 @@ namespace CwaffingTheGungy
                     ghostSprite = Lazy.GetTexturedEnemyIdleAnimation(this._enemy, new Color(1f,1f,1f,1f), 0.3f);
                     HolyWaterGun._GhostTextures[this._enemy.EnemyGuid] = ghostSprite; // Cache the texture for this enemy for later
                 }
-                GameObject g                        = UnityEngine.Object.Instantiate(new GameObject(), this._enemy.sprite.WorldTopCenter.ToVector3ZisY(-10f), Quaternion.identity);
+                Vector3 pos                         = this._enemy.sprite.WorldCenter.ToVector3ZisY(-10f);
+                GameObject g                        = UnityEngine.Object.Instantiate(new GameObject(), pos, Quaternion.identity);
                 tk2dSpriteCollectionData collection = SpriteBuilder.ConstructCollection(g, "ghostcollection");
                 int spriteId                        = SpriteBuilder.AddSpriteToCollection(ghostSprite, collection, "ghostsprite");
                 tk2dBaseSprite sprite               = g.AddComponent<tk2dSprite>();
-                sprite.SetSprite(collection, spriteId);
-                g.AddComponent<GhostlyDeath>();
-
-                // this._enemy.aiActor.EraseFromExistenceWithRewards(true);
-                // this._enemy.ForceDeath(beam.projectile.Direction, true);
+                    sprite.SetSprite(collection, spriteId);
+                    sprite.PlaceAtPositionByAnchor(pos, tk2dBaseSprite.Anchor.MiddleCenter);
+                g.AddComponent<GhostlyDeath>().Setup(beam.Direction);
             }
             this._enemy.healthHaver.ApplyDamage(
-                epower, beam.projectile.Direction, "Exorcism", CoreDamageTypes.Water, DamageCategory.Unstoppable, true, null, true);
+                epower, beam.Direction, "Exorcism", CoreDamageTypes.Water, DamageCategory.Unstoppable, true, null, true);
+
+            // Create particles
+            if (UnityEngine.Random.Range(0f, 1f) < 0.25f)
+            {
+                Vector2 ppos = this._enemy.sprite.WorldCenter;
+                float angle = Lazy.RandomAngle();
+                Vector2 finalpos = ppos + BraveMathCollege.DegreesToVector(angle, magnitude: 1f);
+                GameObject v = SpawnManager.SpawnVFX(HolyWaterGun._ExorcismParticleVFX, finalpos.ToVector3ZisY(-1f), Lazy.RandomEulerZ());
+                FancyVFX f = v.AddComponent<FancyVFX>();
+                    f.Setup(Lazy.RandomVector(0.5f), lifetime: 0.34f, fadeOutTime: 0.34f, parent: this._enemy.sprite.transform);
+            }
+
+            // Play exorcism noises
+            Lazy.PlaySoundUntilDeathOrTimeout(soundName: "exorcism_noises_intensify", source: this._enemy.gameObject, timer: 0.2f);
         }
     }
 
-
     public class GhostlyDeath : MonoBehaviour
     {
-        private const float _FADE_TIME = 1.4f;
-        private const float _DRIFT_SPEED = 0.3f / C.PIXELS_PER_TILE;
+        private const float _FADE_TIME   = 2.5f;
+        private const float _DRIFT_SPEED = 0.15f / C.PIXELS_PER_TILE;
 
         private float _lifetime;
         private tk2dSprite _sprite;
         private Vector3 _velocity;
 
+        public void Setup(Vector2 direction)
+        {
+            Vector2 normdir = direction.normalized;
+            this._velocity = _DRIFT_SPEED * (new Vector3(normdir.x, normdir.y, 0f));
+            this._sprite = base.gameObject.GetComponent<tk2dSprite>();
+            if (this._velocity.x < 0)
+                this._sprite.transform.localScale = new Vector3(-1f, 1f, 1f);
+            this._lifetime = 0.0f;
+        }
+
         private void Start()
         {
-            this._lifetime = 0.0f;
-            this._sprite = base.gameObject.GetComponent<tk2dSprite>();
-
-            this._velocity = new Vector3(_DRIFT_SPEED, _DRIFT_SPEED, 0f);
-
-            AkSoundEngine.PostEvent("turn_to_gold", base.gameObject);
+            AkSoundEngine.PostEvent("ghost_soul_sound", base.gameObject);
         }
 
         private void Update()
@@ -160,52 +196,5 @@ namespace CwaffingTheGungy
             this._sprite.transform.position += this._velocity;
             this._sprite.renderer.SetAlpha(1f - (this._lifetime / _FADE_TIME));
         }
-    }
-
-    public class ExorcismJuice : MonoBehaviour
-    {
-        private const float _EXORCISM_DPS   = 15.0f; // damage per second
-        private const float _EXORCISM_POWER = _EXORCISM_DPS / C.FPS; // damage per frame
-
-        private Projectile _projectile;
-        private BasicBeamController _beam;
-        private PlayerController _owner;
-        private void Start()
-        {
-            this._projectile = base.GetComponent<Projectile>();
-            this._owner = this._projectile.Owner as PlayerController;
-            this._beam = this._projectile.GetComponent<BasicBeamController>();
-            // this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
-            // this._projectile.OnHitEnemy += this.OnHitEnemy;
-        }
-
-        public float GetPower()
-        {
-            return _EXORCISM_POWER;
-        }
-
-        private void OnHitEnemy(Projectile bullet, SpeculativeRigidbody spec, bool fatal)
-        {
-            if (spec.GetComponent<AIActor>() is not AIActor enemy)
-                return;
-            if (enemy.IsBlackPhantom)
-                bullet.baseData.damage = 1000f; // instantly kill black phantoms
-
-            // var t = enemy.aiActor.gameObject.AddComponent<EnemyTranquilizedBehavior>();
-            // t.stuntime = this.stuntime;
-            // t.stundelay = this.stundelay;
-        }
-
-        // private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
-        // {
-        //     if (otherRigidbody.GetComponent<AIActor>() is not AIActor enemy)
-        //         return; // nothing to do against non-enemies
-
-        //     if (enemy.IsBlackPhantom)
-        //     {
-        //         ETGModConsole.Log($"THOUSAND");
-        //         this._projectile.baseData.damage = 1000f; // instantly kill black phantoms
-        //     }
-        // }
     }
 }

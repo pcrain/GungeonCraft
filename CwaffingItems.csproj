@@ -201,9 +201,11 @@
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter5.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire-d6.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\shine.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\exorcism-particles2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire-b2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter1.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\exorcism-particles1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire-c3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\soul-link-particle4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire-d1.png"/>
@@ -259,12 +261,14 @@
     <EmbeddedResource Include="Resources\MiscVFX\Numbers\4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\Numbers\0.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\shine2.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\exorcism-particles4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire-d3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire-c1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire-d2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\reticle-orange.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\can-of-sprite.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\friendlyoverhead_vfx_003.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\exorcism-particles3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\soul-link-soul1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\soul-link-particle1.png"/>
