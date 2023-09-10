@@ -456,6 +456,15 @@ namespace CwaffingTheGungy
                 );
         }
 
+        // Given a floating point amount (e.g., 45.71), use the fractional component (e.g., .71) as the odds to return
+        //  the ceiling of amount + 1 (e.g., 48), returning the floor of amount (e.g., 47) otherwise
+        public static int RoundWeighted(this float amount)
+        {
+            return (UnityEngine.Random.value <= (amount - Math.Truncate(amount))
+                ? Mathf.CeilToInt(amount)
+                : Mathf.FloorToInt(amount)); // handle partial decay gracefully
+        }
+
         // Get an enemy's idle animation blended with a color of choice, with optional sheen
         public static Texture2D GetTexturedEnemyIdleAnimation(AIActor enemy, Color blendColor, float blendAmount, Color? sheenColor = null, float sheenWidth = 20.0f)
         {

@@ -112,10 +112,7 @@ namespace CwaffingTheGungy
 
         internal static int ComputeExponentialDecay(float startAmount, float lambda, float timeElapsed)
         {
-            float newAmount = startAmount * Mathf.Exp(-lambda * timeElapsed);
-            return (UnityEngine.Random.value <= (newAmount - Math.Truncate(newAmount))
-                ? Mathf.CeilToInt(newAmount)
-                : Mathf.FloorToInt(newAmount)); // handle partial decay gracefully
+            return Lazy.RoundWeighted(startAmount * Mathf.Exp(-lambda * timeElapsed));
         }
 
         private void RecalculateAmmo()
