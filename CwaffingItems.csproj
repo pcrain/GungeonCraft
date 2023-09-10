@@ -636,6 +636,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\natascha_fire_006.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_002.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\paintball_cannon_idle_001.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\vacuum_cleaner_charge_003.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_007.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\soul_kaliber_reload_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\paintball_cannon_reload_003.png"/>
@@ -696,6 +697,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\soul_kaliber_fire_003.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_012.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_028.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\vacuum_cleaner_charge_004.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_012.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\alyx_fire_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_fire_003.json"/>
@@ -759,6 +761,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_024.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_fire_002.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\quarter_pounder_reload_005.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\vacuum_cleaner_charge_003.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_002.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_002.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_fire_005.png"/>
@@ -777,6 +780,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\soul_kaliber_fire_002.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\soul_kaliber_reload_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_004.png"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\vacuum_cleaner_charge_004.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_022.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\natascha_fire_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_013.png"/>
@@ -800,6 +804,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\soul_kaliber_reload_002.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_idle_004.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\paintball_cannon_fire_002.png"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\vacuum_cleaner_charge_002.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_015.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_reload_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_001.png"/>
@@ -980,6 +985,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\knife_gun_fire_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_idle_007.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_011.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\vacuum_cleaner_charge_002.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_idle_020.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_fire_003.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\quarter_pounder_reload_004.png"/>

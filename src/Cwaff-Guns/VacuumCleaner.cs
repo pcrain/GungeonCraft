@@ -42,30 +42,26 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.gunClass                          = GunClass.CHARGE;
-                gun.gunSwitchGroup                    = (ItemHelper.Get(Items.MarineSidearm) as Gun).gunSwitchGroup;
-                gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.Charged;
-                gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
-                gun.DefaultModule.numberOfShotsInClip = 16;
-                gun.quality                           = PickupObject.ItemQuality.A;
-                gun.InfiniteAmmo                      = true;
+                gun.gunClass                             = GunClass.CHARGE;
+                gun.gunSwitchGroup                       = (ItemHelper.Get(Items.MarineSidearm) as Gun).gunSwitchGroup;
+                gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.Charged;
+                gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
+                gun.DefaultModule.numberOfShotsInClip    = -1;
+                gun.DefaultModule.ammoType               = GameUIAmmoType.AmmoType.BEAM;
+                gun.quality                              = PickupObject.ItemQuality.A;
+                gun.InfiniteAmmo                         = true;
                 gun.barrelOffset.transform.localPosition = new Vector3(1.8125f, 0.4375f, 0f); // should match "Casing" in JSON file
+                gun.SetAnimationFPS(gun.chargeAnimation, 16);
 
             var comp = gun.gameObject.AddComponent<VacuumCleaner>();
-                comp.SetFireAudio(); // prevent fire audio, as it's handled in OnPostFired()
+                comp.SetFireAudio(); // prevent fire audio, as it's handled in Update()
 
             gun.DefaultModule.chargeProjectiles = new(){ new(){
                 Projectile = Lazy.PrefabProjectileFromGun(gun),
-                ChargeTime = 999999f, // absurdly high value so we never actually shoot
+                ChargeTime = float.MaxValue, // absurdly high value so we never actually shoot
             }};
 
             _VacuumVFX = VFX.animations["VacuumParticle"];
-        }
-
-        public override void OnPostFired(PlayerController player, Gun gun)
-        {
-            base.OnPostFired(player, gun);
-            AkSoundEngine.PostEvent("alyx_shoot_sound", gun.gameObject);
         }
 
         private void MaybeRestoreAmmo()
