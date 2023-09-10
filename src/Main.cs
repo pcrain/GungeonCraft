@@ -131,6 +131,7 @@ namespace CwaffingTheGungy
                     // DeathNote.Add();
                     HolyWaterGun.Add();
                     Alyx.Add();
+                    VacuumCleaner.Add();
 
                     // MasterSword.Add();
                 #endregion

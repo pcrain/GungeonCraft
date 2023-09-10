@@ -23,11 +23,14 @@ namespace CwaffingTheGungy
         public static string ShortDescription = "Welcome to the New Age";
         public static string LongDescription  = "(Poisons and ignites enemies; current and max ammo both suffer from exponential decay)";
 
-        internal const float _AMMO_HALF_LIFE_SECS =  90.0f;
+        internal const float _AMMO_HALF_LIFE_SECS = 90.0f;
         internal const float _GUN_HALF_LIFE_SECS  = 300.0f;
         internal const float _MIN_CALC_RATE       = 0.1f; // we don't need to recalculate every single gosh darn frame
         internal const int   _BASE_MAX_AMMO       = 1000;
         internal const int   _MIN_AMMO_TO_PERSIST = 10;
+
+        internal static readonly float _AMMO_DECAY_LAMBDA   = Mathf.Log(2) / _AMMO_HALF_LIFE_SECS;
+        internal static readonly float _GUN_DECAY_LAMBDA    = Mathf.Log(2) / _GUN_HALF_LIFE_SECS;
 
         internal static tk2dSpriteAnimationClip _BulletSprite;
 
@@ -102,14 +105,17 @@ namespace CwaffingTheGungy
             RecalculateAmmo();
         }
 
-        internal static int ComputeExponentialDecay(float startAmount, float halfLifeInSeconds, float timeElapsed)
+        internal static int ComputeDecayFromHalfLife(float startAmount, float halfLifeInSeconds, float timeElapsed)
         {
-            float lambda = Mathf.Log(2) / halfLifeInSeconds;
-            float decay = Mathf.Exp(-lambda * timeElapsed);
-            float newAmount = startAmount * decay;
-            return (UnityEngine.Random.Range(0f, 1f) <= (newAmount - Math.Truncate(newAmount))
+            return ComputeExponentialDecay(startAmount, Mathf.Log(2) / halfLifeInSeconds, timeElapsed);
+        }
+
+        internal static int ComputeExponentialDecay(float startAmount, float lambda, float timeElapsed)
+        {
+            float newAmount = startAmount * Mathf.Exp(-lambda * timeElapsed);
+            return (UnityEngine.Random.value <= (newAmount - Math.Truncate(newAmount))
                 ? Mathf.CeilToInt(newAmount)
-                : Mathf.FloorToInt(newAmount)); // handle rounding gracefully
+                : Mathf.FloorToInt(newAmount)); // handle partial decay gracefully
         }
 
         private void RecalculateAmmo()
@@ -122,8 +128,8 @@ namespace CwaffingTheGungy
                 return;
             this._timeAtLastRecalc = BraveTime.ScaledTimeSinceStartup;
 
-            this.gun.CurrentAmmo    = ComputeExponentialDecay((float)this.gun.CurrentAmmo, _AMMO_HALF_LIFE_SECS, timeSinceLastRecalc);
-            this.gun.SetBaseMaxAmmo(ComputeExponentialDecay((float)this.gun.GetBaseMaxAmmo(), _GUN_HALF_LIFE_SECS, timeSinceLastRecalc));
+            this.gun.CurrentAmmo    = ComputeExponentialDecay((float)this.gun.CurrentAmmo, _AMMO_DECAY_LAMBDA, timeSinceLastRecalc);
+            this.gun.SetBaseMaxAmmo(ComputeExponentialDecay((float)this.gun.GetBaseMaxAmmo(), _GUN_DECAY_LAMBDA, timeSinceLastRecalc));
         }
     }
 }

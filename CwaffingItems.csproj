@@ -155,6 +155,7 @@
     <Compile Include="src\Cwaff-Actives\BulletThatCanKillTheFuture.cs"/>
     <Compile Include="src\Cwaff-Actives\BorrowedTime.cs"/>
     <Compile Include="src\Cwaff-Guns\DeathNote.cs"/>
+    <Compile Include="src\Cwaff-Guns\VacuumCleaner.cs"/>
     <Compile Include="src\Cwaff-Guns\PopcornGun.cs"/>
     <Compile Include="src\Cwaff-Guns\KiBlast.cs"/>
     <Compile Include="src\Cwaff-Guns\Nug.cs"/>
@@ -198,6 +199,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\midas-sparkle2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire-b1.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\reticle-blue.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter5.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire-d6.png"/>
@@ -211,11 +213,14 @@
     <EmbeddedResource Include="Resources\MiscVFX\soul-link-particle4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire-d1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\friendlyoverhead_vfx_002.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\midas-sparkle1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire-c2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\friendlyoverhead_vfx_004.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a10.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\soul-link-soul2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\friendlyoverhead_vfx_005.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\Tornado\tornado7.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\Tornado\tornado8.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\Tornado\tornado5.png"/>
@@ -227,6 +232,8 @@
     <EmbeddedResource Include="Resources\MiscVFX\Tornado\tornado3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\Tornado\tornado9.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\soul-link-particle2.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a8.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a6.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\reticle-white.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\GunVFX\RebarGunImpactVFX2_001.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\GunVFX\RebarGunImpactVFX2_004.png"/>
@@ -234,6 +241,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\GunVFX\RebarGunImpactVFX2_003.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\GunVFX\RebarGunImpactVFX2_002.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\GunVFX\RebarGunImpactVFX2_005.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a5.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\Explosions\ki-explosion6.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\Explosions\ki-explosion3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\Explosions\splode3.png"/>
@@ -271,12 +279,15 @@
     <EmbeddedResource Include="Resources\MiscVFX\friendlyoverhead_vfx_003.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\exorcism-particles3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\soul-link-soul1.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a9.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter2.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\soul-link-particle1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire-d5.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\friendlyoverhead_vfx_001.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire-a.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire-b4.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a7.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire-b3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\can-of-pepsi.png"/>
     <EmbeddedResource Include="Resources\shaders\InvisibleShader.shader"/>
@@ -617,6 +628,8 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_reload_004.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_idle_010.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\soul_kaliber_fire_005.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\vacuum_cleaner_idle_001.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\vacuum_cleaner_charge_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_idle_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_reload_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_001.json"/>
@@ -645,6 +658,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\death_note_idle_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_014.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_008.png"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\vacuum_cleaner_fire_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_010.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_idle_009.png"/>
@@ -779,6 +793,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_011.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_015.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\natascha_fire_005.png"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\vacuum_cleaner_reload_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\natascha_fire_006.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_011.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_015.json"/>
@@ -802,6 +817,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_fire_003.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_013.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_012.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\vacuum_cleaner_reload_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_idle_013.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\paintball_cannon_fire_004.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\natascha_fire_008.json"/>
@@ -845,12 +861,14 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_fire_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_003.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\soul_kaliber_idle_001.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\vacuum_cleaner_fire_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_016.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_007.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_idle_012.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\paintball_cannon_reload_002.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_019.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_018.png"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\vacuum_cleaner_charge_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_008.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_005.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\death_note_reload_001.png"/>
@@ -907,6 +925,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_idle_014.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_019.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_006.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\vacuum_cleaner_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_fire_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\paintball_cannon_reload_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\soul_kaliber_fire_005.png"/>

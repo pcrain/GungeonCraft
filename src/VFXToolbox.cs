@@ -100,6 +100,10 @@ namespace CwaffingTheGungy
 
             RegisterVFX("Tornado", ResMap.Get("tornado"), 20, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter);
 
+            // TODO: setting alpha on the first frame doesn't work, so we create an empty dummy sprite to start with
+            RegisterVFX("VacuumParticle", ResMap.Get("vacuum_wind_sprite_a"), 30, loops: true, loopStart: 6,
+                anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);
+
             laserSightPrefab = LoadHelper.LoadAssetFromAnywhere("assets/resourcesbundle/global vfx/vfx_lasersight.prefab") as GameObject;
         }
 
@@ -114,7 +118,7 @@ namespace CwaffingTheGungy
         /// <summary>
         /// Generically register a VFX as a GameObject (animated sprite), VFXComplex, or VFXPool
         /// </summary>
-        public static void RegisterVFX(string name, List<string> spritePaths, int fps, bool loops = true, float scale = 1.0f, tk2dBaseSprite.Anchor anchor = tk2dBaseSprite.Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null)
+        public static void RegisterVFX(string name, List<string> spritePaths, int fps, bool loops = true, int loopStart = -1, float scale = 1.0f, tk2dBaseSprite.Anchor anchor = tk2dBaseSprite.Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null)
         {
             // GameObject Obj     = new GameObject(name);
             GameObject Obj     = SpriteBuilder.SpriteFromResource(spritePaths[0], new GameObject(name));
@@ -168,11 +172,11 @@ namespace CwaffingTheGungy
                 tk2dSpriteDefinition frameDef       = collection.spriteDefinitions[frameSpriteId];
                 frameDef.ConstructOffsetsFromAnchor(anchor);
                 frameDef.colliderVertices = defaultDef.colliderVertices;
+                frameDef.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+                frameDef.materialInst.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
                 if (emissivePower > 0) {
-                    frameDef.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
                     frameDef.material.SetFloat("_EmissivePower", emissivePower);
                     frameDef.material.SetFloat("_EmissiveColorPower", 1.55f);
-                    frameDef.materialInst.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
                     frameDef.materialInst.SetFloat("_EmissivePower", emissivePower);
                     frameDef.materialInst.SetFloat("_EmissiveColorPower", 1.55f);
                 }
@@ -191,7 +195,13 @@ namespace CwaffingTheGungy
             if (emissiveColour != null)
                 sprite.renderer.material.SetColor("_EmissiveColor", (Color)emissiveColour);
             clip.frames     = frames.ToArray();
-            clip.wrapMode   = loops ? tk2dSpriteAnimationClip.WrapMode.Loop : tk2dSpriteAnimationClip.WrapMode.Once;
+            if (loopStart > 0)
+            {
+                clip.wrapMode  = tk2dSpriteAnimationClip.WrapMode.LoopSection;
+                clip.loopStart = loopStart;
+            }
+            else
+                clip.wrapMode   = loops ? tk2dSpriteAnimationClip.WrapMode.Loop : tk2dSpriteAnimationClip.WrapMode.Once;
             animation.clips = animation.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
             if (!persist)
             {
@@ -439,7 +449,7 @@ namespace CwaffingTheGungy
             this._sprite = this._vfx.GetComponent<tk2dSprite>();
         }
 
-        private void Update()
+        private void LateUpdate()
         {
             if (!this._vfx)
             {
