@@ -75,7 +75,7 @@ namespace CwaffingTheGungy
             List<Gun> candidates = new();
             foreach (Gun g in player.inventory.AllGuns)
             {
-                if (!(g.InfiniteAmmo || g.CurrentAmmo == g.AdjustedMaxAmmo))
+                if (!g.InfiniteAmmo && g.CanGainAmmo && g.CurrentAmmo < g.AdjustedMaxAmmo)
                     candidates.Add(g);
             }
             if (candidates.Count == 0)
@@ -83,12 +83,12 @@ namespace CwaffingTheGungy
 
             // Pick a gun
             Gun gunToGainAmmo = candidates.ChooseRandom();
-            int amountAmmoToRestore = Lazy.RoundWeighted(_AMMO_AMT * gunToGainAmmo.AdjustedMaxAmmo);
-            if (amountAmmoToRestore == 0)
+            int ammoToRestore = Lazy.RoundWeighted(_AMMO_AMT * gunToGainAmmo.AdjustedMaxAmmo);
+            if (ammoToRestore == 0)
                 return; // our fractional ammo gain did not restore anything
 
             // Actually restore the ammo
-            gunToGainAmmo.GainAmmo(amountAmmoToRestore);
+            gunToGainAmmo.GainAmmo(ammoToRestore);
         }
 
         protected override void Update()
