@@ -933,7 +933,7 @@ namespace CwaffingTheGungy
           string animIndex  = match.Groups[3].Value;
           if (!spriteMaps.ContainsKey(animName))
           {
-            ETGModConsole.Log($"  found animation {animName}");
+            // ETGModConsole.Log($"  found animation {animName}");
             spriteMaps[animName] = new string[0];
           }
           int index = Int32.Parse(animIndex);

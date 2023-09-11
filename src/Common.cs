@@ -519,6 +519,13 @@ namespace CwaffingTheGungy
             AkSoundEngine.PostEvent($"{soundName}_stop_all", source);
             _SoundTimers.Remove(soundName);
         }
+
+        public static void DoSmokeAt(Vector3 pos)
+        {
+            UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global VFX/VFX_Item_Spawn_Poof") as GameObject)
+                .GetComponent<tk2dBaseSprite>()
+                .PlaceAtPositionByAnchor(pos, tk2dBaseSprite.Anchor.MiddleCenter);
+        }
     }
 
     public static class Dissect // reflection helper methods for being a lazy dumdum
