@@ -120,7 +120,7 @@ namespace CwaffingTheGungy
             where TItemClass : PickupObject   // must be PickupObject for passive items, PlayerItem for active items, or Gun for guns
             where TItemSpecific : TItemClass  // must be a subclass of TItemClass
         {
-            string newItemName  = itemName.Replace("'", "").Replace("-", "").Replace(".", "");  //get sane gun for item rename
+            string newItemName  = itemName.Replace("-", "").Replace(".", "");  //get sane gun for item rename
             string baseItemName = newItemName.Replace(" ", "_").ToLower();  //get saner gun name for commands
             IDs.InternalNames[itemName] = C.MOD_PREFIX+":"+baseItemName;
 
@@ -129,7 +129,8 @@ namespace CwaffingTheGungy
             if (typeof(TItemClass) == typeof(Gun))
             {
                 string spriteName = spritePath; // TODO: guns use names, regular items use full paths -- should be made uniform eventually
-                Gun gun = ETGMod.Databases.Items.NewGun(newItemName, spriteName);  //create a new gun using specified sprite name
+                Gun gun = ETGMod.Databases.Items.NewGun(itemName, spriteName);  //create a new gun using specified sprite name
+                ETGModConsole.Log($"  {Game.Items.AllIDs[Game.Items.Count-1]}");
                 Game.Items.Rename("outdated_gun_mods:"+baseItemName, IDs.InternalNames[itemName]);  //rename the gun for commands
                 gun.SetupSprite(null, spriteName+"_idle_001", 8); //set the gun's ammonomicon sprite
                 int projectileId = 0;

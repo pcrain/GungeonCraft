@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,11 +36,12 @@ namespace CwaffingTheGungy
                 gun.muzzleFlashEffects                   = (ItemHelper.Get(Items.SeriousCannon) as Gun).muzzleFlashEffects;
                 gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.Charged;
                 gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Ordered;
+                gun.DefaultModule.cooldownTime           = 0f;
                 gun.barrelOffset.transform.localPosition = new Vector3(2.0625f, 0.4375f, 0f);
                 gun.SetBaseMaxAmmo(3);
                 gun.SetAnimationFPS(gun.shootAnimation, 10);
-                gun.SetAnimationFPS(gun.chargeAnimation, 8);
-                gun.LoopAnimation(gun.chargeAnimation, 2);
+                gun.SetAnimationFPS(gun.chargeAnimation, 16);
+                gun.LoopAnimation(gun.chargeAnimation, 32);
 
             var comp = gun.gameObject.AddComponent<BBGun>();
                 comp.SetFireAudio("Play_WPN_seriouscannon_shot_01");
