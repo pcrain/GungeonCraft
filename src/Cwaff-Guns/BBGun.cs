@@ -18,8 +18,8 @@ namespace CwaffingTheGungy
     public class BBGun : AdvancedGunBehavior
     {
         public static string ItemName         = "B. B. Gun";
-        public static string SpriteName       = "embercannon";
-        public static string ProjectileName   = "ak-47";
+        public static string SpriteName       = "b_b_gun";
+        public static string ProjectileName   = "38_special";
         public static string ShortDescription = "Spare No One";
         public static string LongDescription  = "(Three Strikes)";
 
@@ -32,13 +32,12 @@ namespace CwaffingTheGungy
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
                 gun.gunClass                             = GunClass.CHARGE;
                 gun.quality                              = PickupObject.ItemQuality.B;
-                gun.reloadTime                           = 0.01f;
                 gun.CanGainAmmo                          = false;
                 gun.muzzleFlashEffects                   = (ItemHelper.Get(Items.SeriousCannon) as Gun).muzzleFlashEffects;
                 gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.Charged;
                 gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Ordered;
-                gun.barrelOffset.transform.localPosition = new Vector3(1.93f, 0.87f, 0f);
-                gun.SetBaseMaxAmmo(1);
+                gun.barrelOffset.transform.localPosition = new Vector3(2.0625f, 0.4375f, 0f);
+                gun.SetBaseMaxAmmo(3);
                 gun.SetAnimationFPS(gun.shootAnimation, 10);
                 gun.SetAnimationFPS(gun.chargeAnimation, 8);
                 gun.LoopAnimation(gun.chargeAnimation, 2);
@@ -49,13 +48,13 @@ namespace CwaffingTheGungy
 
             ProjectileModule mod = gun.DefaultModule;
                 mod.ammoCost            = 1;
-                mod.numberOfShotsInClip = 1;
+                mod.numberOfShotsInClip = 3;
                 mod.shootStyle          = ProjectileModule.ShootStyle.Charged;
                 mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Ordered;
                 mod.cooldownTime        = 0.70f;
                 mod.angleVariance       = 10f;
 
-            List<ProjectileModule.ChargeProjectile> tempChargeProjectiles = new();
+            mod.chargeProjectiles = new();
             for (int i = 0; i < _CHARGE_LEVELS.Length; i++)
             {
                 Projectile projectile = mod.projectiles[0].ClonePrefab();
@@ -64,21 +63,32 @@ namespace CwaffingTheGungy
                 else
                     mod.projectiles.Add(projectile);
 
-                const int bbSpriteDiameter = 20;
                 projectile.baseData.range = 999999f;
                 projectile.baseData.speed = 20f;
                 projectile.AnimateProjectile(
                     new List<string> {
-                        "bball1",
-                        "bball2",
-                        "bball3",
-                        "bball4",
-                        "bball5",
-                        "bball6",
-                        "bball7",
-                        "bball8",
+                        "bball001",
+                        "bball002",
+                        "bball003",
+                        "bball004",
+                        "bball005",
+                        "bball006",
+                        "bball007",
+                        "bball008",
+                        "bball009",
+                        "bball010",
+                        "bball011",
+                        "bball012",
+                        "bball013",
+                        "bball014",
+                        "bball015",
+                        "bball016",
+                        "bball017",
+                        "bball018",
+                        "bball019",
+                        "bball020",
                     },
-                    20, true, new IntVector2(bbSpriteDiameter, bbSpriteDiameter),
+                    20, true, new IntVector2(24, 22),
                     false, tk2dBaseSprite.Anchor.MiddleCenter, true, false);
 
                 TheBB bb = projectile.gameObject.AddComponent<TheBB>();
@@ -89,12 +99,11 @@ namespace CwaffingTheGungy
                     Projectile = projectile,
                     ChargeTime = _CHARGE_LEVELS[i],
                 };
-                tempChargeProjectiles.Add(chargeProj);
+                mod.chargeProjectiles.Add(chargeProj);
             }
-            mod.chargeProjectiles = tempChargeProjectiles;
 
             _FakeProjectile = Lazy.PrefabProjectileFromGun(gun);
-            _FakeProjectile.gameObject.AddComponent<FakeProjectileComponent>();
+            _FakeProjectile.gameObject.AddComponent<FakeProjectileComponent>(); // disable VFX like robot's lightning (TODO: this doesn't work here; need to apply to each projectile)
         }
 
         public override void PostProcessProjectile(Projectile projectile)
@@ -116,8 +125,11 @@ namespace CwaffingTheGungy
     public class TheBB : MonoBehaviour
     {
         private const float _BB_DAMAGE_SCALE = 2.0f;
-        private const float _BB_FORCE_SCALE = 2.0f;
-        private const float _BB_SPEED_DECAY = 3.0f;
+        private const float _BB_FORCE_SCALE  = 2.0f;
+        private const float _BB_SPEED_DECAY  = 3.0f;
+        private const float _BASE_EMISSION   = 3.0f;
+        private const float _EXTRA_EMISSION  = 30.0f;
+        private const float _BASE_ANIM_SPEED = 2.0f;
 
         public int chargeLevel = 0;
 
@@ -149,7 +161,7 @@ namespace CwaffingTheGungy
                 bounce.OnBounce += OnBounce;
 
             PierceProjModifier pierce = this._projectile.gameObject.GetOrAddComponent<PierceProjModifier>();
-                pierce.penetration = Mathf.Max(pierce.penetration,999);
+                pierce.penetration = Mathf.Max(pierce.penetration, 999);
                 pierce.penetratesBreakables = true;
         }
 
@@ -168,29 +180,28 @@ namespace CwaffingTheGungy
             this._projectile.UpdateSpeed();
 
             this._projectile.sprite.renderer.material.SetFloat(
-                "_EmissivePower", 300.0f+1000.0f*(newSpeed/_maxSpeed));
-            // this.m_projectile.sprite.renderer.material.SetFloat(
-            //     "_EmissiveColorPower", 1.55f*(newSpeed/maxSpeed));
+                "_EmissivePower", _BASE_EMISSION+_EXTRA_EMISSION*(newSpeed/_maxSpeed));
             this._projectile.sprite.renderer.material.SetFloat(
                 "_Cutoff", 0.1f);
-            // this.m_projectile.sprite.renderer.material.SetFloat(
-            //     "_VertexColor", 1.0f*(newSpeed/maxSpeed));
 
-            if (this._projectile.baseData.speed > 1)
+            if (newSpeed > 1)
             {
-                this._projectile.baseData.damage = _BB_DAMAGE_SCALE * this._projectile.baseData.speed;
-                this._projectile.baseData.force = _BB_FORCE_SCALE * this._projectile.baseData.speed;
+                this._projectile.baseData.damage = _BB_DAMAGE_SCALE * newSpeed;
+                this._projectile.baseData.force = _BB_FORCE_SCALE * newSpeed;
+                this._projectile.spriteAnimator.ClipFps = Mathf.Min(_BASE_ANIM_SPEED*newSpeed, 60f);
+                Lazy.PlaySoundUntilDeathOrTimeout("bb_rolling", this._projectile.gameObject, 0.1f);
                 return;
             }
 
             MiniInteractable mi = MiniInteractable.CreateInteractableAtPosition(
-                this._projectile.sprite,
-                this._projectile.sprite.WorldCenter,
-                BBInteractScript);
+              this._projectile.sprite,
+              this._projectile.sprite.WorldCenter,
+              BBInteractScript);
+                mi.doHover = true;
                 mi.sprite.usesOverrideMaterial = true;
                 Material mat = mi.sprite.renderer.material;
                     mat.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-                    mat.SetFloat("_EmissivePower", 300f);
+                    mat.SetFloat("_EmissivePower", _BASE_EMISSION);
                     mat.SetFloat("_EmissiveColorPower", 1.55f);
                     mat.SetColor("_EmissiveColor", Color.magenta);
 
@@ -209,18 +220,13 @@ namespace CwaffingTheGungy
             {
                 if (!gun.GetComponent<BBGun>())
                     continue;
-                gun.CurrentAmmo = 1;
+                if (gun.CurrentAmmo >= gun.AdjustedMaxAmmo)
+                    break;
+                gun.CurrentAmmo += 1;
                 gun.ForceImmediateReload();
-                AkSoundEngine.PostEvent("Play_OBJ_item_pickup_01", p.gameObject);
-                GameObject original = (GameObject)ResourceCache.Acquire("Global VFX/VFX_Item_Pickup");
-                  GameObject gameObject = UnityEngine.Object.Instantiate(original);
-                    tk2dSprite sprite = gameObject.GetComponent<tk2dSprite>();
-                        sprite.PlaceAtPositionByAnchor(i.sprite.WorldCenter, tk2dBaseSprite.Anchor.MiddleCenter);
-                        sprite.HeightOffGround = 6f;
-                        sprite.UpdateZDepth();
-
+                Lazy.DoPickupAt(i.sprite.WorldCenter);
                 UnityEngine.Object.Destroy(i.gameObject);
-                yield break;
+                break;
             }
             i.interacting = false;
         }

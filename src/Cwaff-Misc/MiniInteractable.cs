@@ -16,12 +16,14 @@ namespace CwaffingTheGungy
     public InteractionScript interactionScript = DefaultInteractionScript;
 
     public bool interacting = false;
+    public bool doVFX = false;
+    public bool doHover = false;
 
     public DungeonData.Direction itemFacing = DungeonData.Direction.SOUTH;
 
     private VFXPool effect;
-
-    private float myTimer = 0;
+    private float _vfxTimer = 0;
+    private float _hoverTimer = 0;
 
     public void Initialize(tk2dBaseSprite i)
     {
@@ -44,7 +46,8 @@ namespace CwaffingTheGungy
       DepthLookupManager.ProcessRenderer(base.sprite.renderer);
       tk2dSprite componentInParent = base.transform.parent.gameObject.GetComponentInParent<tk2dSprite>();
       componentInParent?.AttachRenderer(base.sprite);
-      SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black, 0.1f, 0.05f);
+      // SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black, 0.1f, 0.05f);
+      SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black);
       base.sprite.UpdateZDepth();
 
       SpeculativeRigidbody orAddComponent = base.gameObject.GetOrAddComponent<SpeculativeRigidbody>();
@@ -66,29 +69,41 @@ namespace CwaffingTheGungy
     private void ItemOnPreRigidbodyCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
     {
       if (otherRigidbody?.PrimaryPixelCollider?.CollisionLayer != CollisionLayer.Projectile)
-      {
         PhysicsEngine.SkipCollision = true;
-      }
     }
 
     private void Update()
+    {
+      // PickupObject.HandlePickupCurseParticles(base.sprite, 1f);
+      if (doVFX)
+        UpdateVFX();
+      if (doHover)
+        UpdateHover();
+    }
+
+    private void UpdateVFX()
     {
       const float RADIUS      = 1.3f;
       const int NUM_VFX       = 10;
       const float ANGLE_DELTA = 360f / NUM_VFX;
       const float VFX_FREQ    = 0.4f;
 
-      // PickupObject.HandlePickupCurseParticles(base.sprite, 1f);
-      myTimer += BraveTime.DeltaTime;
-      if (myTimer < VFX_FREQ)
+      _vfxTimer += BraveTime.DeltaTime;
+      if (_vfxTimer < VFX_FREQ)
         return;
 
-      myTimer = 0;
+      _vfxTimer = 0;
       for (int i = 0; i < NUM_VFX; ++i)
       {
         Vector2 ppos = base.sprite.WorldCenter + BraveMathCollege.DegreesToVector(i*ANGLE_DELTA,RADIUS);
         effect.SpawnAtPosition(ppos.ToVector3ZisY(1f), 0, null, null, null, -0.05f);
       }
+    }
+
+    private void UpdateHover()
+    {
+      _hoverTimer += BraveTime.DeltaTime;
+      base.sprite.transform.localPosition = Vector3.zero.WithY(Mathf.CeilToInt(2f*Mathf.Sin(4f*_hoverTimer))/C.PIXELS_PER_TILE);
     }
 
     public override void OnDestroy()

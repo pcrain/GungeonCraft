@@ -526,6 +526,17 @@ namespace CwaffingTheGungy
                 .GetComponent<tk2dBaseSprite>()
                 .PlaceAtPositionByAnchor(pos, tk2dBaseSprite.Anchor.MiddleCenter);
         }
+
+        public static void DoPickupAt(Vector3 pos)
+        {
+            GameObject original = (GameObject)ResourceCache.Acquire("Global VFX/VFX_Item_Pickup");
+              GameObject gameObject = UnityEngine.Object.Instantiate(original);
+                tk2dSprite sprite = gameObject.GetComponent<tk2dSprite>();
+                    sprite.PlaceAtPositionByAnchor(pos, tk2dBaseSprite.Anchor.MiddleCenter);
+                    sprite.HeightOffGround = 6f;
+                    sprite.UpdateZDepth();
+            AkSoundEngine.PostEvent("Play_OBJ_item_pickup_01", gameObject);
+        }
     }
 
     public static class Dissect // reflection helper methods for being a lazy dumdum
