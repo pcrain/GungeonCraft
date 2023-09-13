@@ -76,7 +76,6 @@ namespace CwaffingTheGungy
             foreach (StatModifier stat in this.passiveStatModifiers)
                 stat.amount = this._commitmentMult;
             player.stats.RecalculateStats(player);
-            ETGModConsole.Log($"new mult {this._commitmentMult}");
         }
 
         private void OnKilledEnemy(PlayerController player)

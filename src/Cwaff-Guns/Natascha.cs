@@ -28,7 +28,7 @@ namespace CwaffingTheGungy
         internal static int                     _FireAnimationFrames = 8;
 
         private const float _NATASHA_PROJECTILE_SCALE = 0.5f;
-        private float _speedmult               = 1.0f;
+        private float _speedMult                      = 1.0f;
 
         public static void Add()
         {
@@ -40,7 +40,7 @@ namespace CwaffingTheGungy
                 gun.reloadTime                        = 1.1f;
                 gun.DefaultModule.angleVariance       = 15.0f;
                 gun.DefaultModule.cooldownTime        = _BaseCooldownTime;
-                gun.DefaultModule.numberOfShotsInClip = 2500;
+                gun.DefaultModule.numberOfShotsInClip = -1;
                 gun.quality                           = PickupObject.ItemQuality.D;
                 gun.barrelOffset.transform.localPosition = new Vector3(2.0625f, 0.5f, 0f); // should match "Casing" in JSON file
                 gun.SetBaseMaxAmmo(2500);
@@ -70,11 +70,11 @@ namespace CwaffingTheGungy
         {
             base.OnPostFired(player, gun);
             AkSoundEngine.PostEvent("tomislav_shoot", gun.gameObject);
-            if (this._speedmult <= 0.15f)
+            if (this._speedMult <= 0.15f)
                 return;
 
-            this._speedmult *= 0.85f;
-            float secondsBetweenShots = this._speedmult * _BaseCooldownTime;
+            this._speedMult *= 0.85f;
+            float secondsBetweenShots = this._speedMult * _BaseCooldownTime;
             gun.AdjustAnimation( // add 1 to FPS to make sure the animation doesn't skip a loop
                 gun.shootAnimation, fps: (int)((float)_FireAnimationFrames / secondsBetweenShots) + 1);
             this.RecalculateGunStats();
@@ -82,7 +82,7 @@ namespace CwaffingTheGungy
 
         public override void OnFinishAttack(PlayerController player, Gun gun)
         {
-            this._speedmult = 1.0f;
+            this._speedMult = 1.0f;
             gun.AdjustAnimation( // add 1 to FPS to make sure the animation doesn't skip a loop
                 gun.shootAnimation, fps: (int)((float)_FireAnimationFrames / _BaseCooldownTime) + 1);
             this.RecalculateGunStats();
@@ -102,7 +102,7 @@ namespace CwaffingTheGungy
 
         private void OnDodgeRoll(PlayerController player, Vector2 dirVec)
         {
-            this._speedmult = 1.0f;
+            this._speedMult = 1.0f;
             this.RecalculateGunStats();
         }
 
@@ -112,9 +112,10 @@ namespace CwaffingTheGungy
                 return;
 
             this.gun.RemoveStatFromGun(PlayerStats.StatType.MovementSpeed);
-            this.gun.AddStatToGun(PlayerStats.StatType.MovementSpeed, (float)Math.Sqrt(this._speedmult), StatModifier.ModifyMethod.MULTIPLICATIVE);
-            this.Player.stats.RecalculateStats(this.Player); // TODO: this resets the gun's cooldown time??? need it first for now
-            this.gun.DefaultModule.cooldownTime = this._speedmult * _BaseCooldownTime;
+            this.gun.AddStatToGun(PlayerStats.StatType.MovementSpeed, (float)Math.Sqrt(this._speedMult), StatModifier.ModifyMethod.MULTIPLICATIVE);
+            this.gun.RemoveStatFromGun(PlayerStats.StatType.RateOfFire);
+            this.gun.AddStatToGun(PlayerStats.StatType.RateOfFire, 1.0f / this._speedMult, StatModifier.ModifyMethod.MULTIPLICATIVE);
+            this.Player.stats.RecalculateStats(this.Player);
         }
     }
 }
