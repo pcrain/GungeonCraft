@@ -166,6 +166,18 @@ namespace CwaffingTheGungy
       return BraveMathCollege.ClampAngle360(self);
     }
 
+    // Determine whether a Vector is within a degree tolerance of a floating point angle
+    public static bool IsNearAngle(this Vector2 v, float angle, float tolerance)
+    {
+      float vangle = v.ToAngle().Clamp360();
+      float cangle = angle.Clamp360();
+      float minangle = (cangle - tolerance).Clamp360();
+      float maxangle = (cangle + tolerance).Clamp360();
+      if (minangle < maxangle)
+        return minangle < vangle && vangle < maxangle;
+      return minangle < vangle || vangle < maxangle; // note the || operator
+    }
+
     // Get a bullet's direction to the primary player
     public static float DirToNearestPlayer(this Bullet self)
     {
@@ -268,6 +280,13 @@ namespace CwaffingTheGungy
     public static void SetAirImpactVFX(this Gun gun, VFXPool vfx)
     {
       gun.DefaultModule.projectiles[0].SetAirImpactVFX(vfx);
+    }
+
+    // Check if an enemy is hostile and a non-boss
+    public static bool IsAliveAndNotABoss(this AIActor e)
+    {
+      HealthHaver h = e?.healthHaver;
+      return e && !e.IsGone && !e.IsHarmlessEnemy && h && !h.IsBoss && !h.IsSubboss && h.IsAlive && !h.IsDead && !h.isPlayerCharacter;
     }
   }
 }

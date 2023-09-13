@@ -91,7 +91,7 @@ namespace CwaffingTheGungy
 
         private void MakeBooksFriendlyAndExplodey(AIActor enemy)
         {
-            if (!enemy.IsNormalEnemy || !enemy.healthHaver || enemy.healthHaver.IsBoss || enemy.IsHarmlessEnemy)
+            if (!enemy.IsAliveAndNotABoss())
                 return;
             if (!_BookEnemyGUIDs.Contains(enemy.EnemyGuid))
                 return;

@@ -100,6 +100,7 @@ namespace CwaffingTheGungy
                     VoodooDoll.Init();
                     CampingSupplies.Init();
                     WeddingRing.Init();
+                    GorgunEye.Init();
                 #endregion
 
                 #region Guns
