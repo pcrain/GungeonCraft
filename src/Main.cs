@@ -99,6 +99,7 @@ namespace CwaffingTheGungy
                     DeadRinger.Init();
                     VoodooDoll.Init();
                     CampingSupplies.Init();
+                    WeddingRing.Init();
                 #endregion
 
                 #region Guns
