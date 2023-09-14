@@ -176,6 +176,7 @@
     <Compile Include="src\Cwaff-Guns\TimingGun.cs"/>
     <Compile Include="src\Cwaff-Guns\BBGun.cs"/>
     <Compile Include="src\Cwaff-Guns\GasterBlaster.cs"/>
+    <Compile Include="src\Cwaff-Guns\Gunbrella.cs"/>
     <Compile Include="src\Cwaff-Guns\DerailGun.cs"/>
     <Compile Include="src\Cwaff-Guns\Grandmaster.cs"/>
     <Compile Include="src\Cwaff-Guns\Tranquilizer.cs"/>
@@ -673,6 +674,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_010.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_idle_009.png"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\gunbrella_fire_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_idle_019.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\paintball_cannon_fire_003.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_004.png"/>
@@ -708,6 +710,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_reload_010.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_fire_002.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_fire_002.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\gunbrella_charge_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\soul_kaliber_fire_003.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_012.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_028.json"/>
@@ -769,6 +772,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_010.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\holy_water_gun_reload_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_002.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\gunbrella_fire_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_014.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\b_b_gun_charge_019.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\natascha_idle_001.json"/>
@@ -777,6 +781,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\grandmaster_fire_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_015.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\alyx_fire_001.png"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\gunbrella_idle_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\b_b_gun_charge_004.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\b_b_gun_charge_005.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\death_note_fire_001.json"/>
@@ -916,6 +921,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\alyx_reload_004.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\b_b_gun_charge_028.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\natascha_fire_005.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\gunbrella_reload_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_reload_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_021.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_014.json"/>
@@ -929,6 +935,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\soul_kaliber_reload_003.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_009.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_reload_017.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\gunbrella_reload_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_idle_016.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\bouncer_fire_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\b_b_gun_charge_024.json"/>
@@ -954,6 +961,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_fire_004.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\natascha_reload_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\soul_kaliber_idle_001.png"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\gunbrella_charge_001.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\soul_kaliber_reload_004.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\b_b_gun_charge_014.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\alyx_reload_005.png"/>
@@ -1096,6 +1104,7 @@
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_011.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\vacuum_cleaner_charge_002.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_idle_020.json"/>
+    <EmbeddedResource Include="ResourcesExternal\WeaponCollection\gunbrella_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\deadline_fire_003.json"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\quarter_pounder_reload_004.png"/>
     <EmbeddedResource Include="ResourcesExternal\WeaponCollection\iron_maid_reload_023.json"/>
@@ -1127,6 +1136,7 @@
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\chess_rook.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\coin-gun-projectile3.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\bball_old_2.png"/>
+    <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\gunbrella-projectile1.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\alyx-projectile4.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\bouncelet_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\chess_pawn.png"/>
@@ -1155,6 +1165,7 @@
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\bball003.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\bball_old_1.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\bball_old_4.png"/>
+    <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\gunbrella-projectile3.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\train_projectile_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\bball_old_8.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\bball018.png"/>
@@ -1180,6 +1191,7 @@
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\bouncelet_gray_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\alyx-projectile1.png"/>
     <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\coin-gun-projectile7.png"/>
+    <EmbeddedResource Include="ResourcesExternal\ProjectileCollection\gunbrella-projectile2.png"/>
     <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\paintball_cannon_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\b_b_gun_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\iron_maid_idle_001.png"/>
@@ -1193,6 +1205,7 @@
     <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\quarter_pounder_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\holy_water_gun_idle_001.png"/>
     <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\deadline_idle_001.png"/>
+    <EmbeddedResource Include="ResourcesExternal\Ammonomicon Encounter Icon Collection\gunbrella_idle_001.png"/>
     <Reference Include="UnityEngine.ClothModule"/>
     <Reference Include="UnityEngine.UnityConnectModule"/>
     <Reference Include="UnityEngine.AIModule"/>

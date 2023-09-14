@@ -288,5 +288,18 @@ namespace CwaffingTheGungy
       HealthHaver h = e?.healthHaver;
       return e && !e.IsGone && !e.IsHarmlessEnemy && h && !h.IsBoss && !h.IsSubboss && h.IsAlive && !h.IsDead && !h.isPlayerCharacter;
     }
+
+    // Set the Alpha of a GameObject's sprite
+    public static void SetAlpha(this GameObject g, float a)
+    {
+      g.GetComponent<Renderer>()?.SetAlpha(a);
+    }
+
+    // Set the Alpha of a GameObject's sprite immediately and avoid the 1-frame opacity delay upon creation
+    public static void SetAlphaImmediate(this GameObject g, float a)
+    {
+      g.GetComponent<Renderer>()?.SetAlpha(a);
+      g.GetComponent<tk2dSpriteAnimator>()?.LateUpdate();
+    }
   }
 }

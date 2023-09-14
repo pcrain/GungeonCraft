@@ -134,6 +134,7 @@ namespace CwaffingTheGungy
                     HolyWaterGun.Add();
                     Alyx.Add();
                     VacuumCleaner.Add();
+                    Gunbrella.Add();
 
                     // MasterSword.Add();
                 #endregion
