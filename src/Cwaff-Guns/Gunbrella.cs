@@ -23,10 +23,13 @@ namespace CwaffingTheGungy
         public static string ShortDescription = "Cloudy with a Chance of Pain";
         public static string LongDescription  = "(Charging and releasing fires projectiles that rain from the sky)";
 
-        private const float _RETICLE_SPEED    = 5.0f;
-        private const float _FADE_IN_SPEED    = 5.0f;
-        private const float _MIN_CHARGE_TIME  = 0.25f;
-        private const int   _BARRAGE_SIZE     = 1;
+        private const float _RETICLE_ACCEL     = 24.0f;
+        private const float _RETICLE_MAX_SPEED = 24.0f;
+        private const float _FADE_IN_SPEED     = 5.0f;
+        private const float _MIN_CHARGE_TIME   = 0.25f;
+        private const int   _BARRAGE_SIZE      = 16;
+        private const float _BARRAGE_DELAY     = 0.04f;
+        private const float _PROJ_DAMAGE       = 16f;
 
         internal static tk2dSpriteAnimationClip _BulletSprite;
 
@@ -42,11 +45,13 @@ namespace CwaffingTheGungy
                 gun.gunSwitchGroup                       = (ItemHelper.Get(Items.MarineSidearm) as Gun).gunSwitchGroup;
                 gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.Charged;
                 gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
-                gun.DefaultModule.numberOfShotsInClip    = -1;
+                gun.DefaultModule.numberOfShotsInClip    = 1;
                 gun.quality                              = PickupObject.ItemQuality.A;
-                gun.InfiniteAmmo                         = true;
+                gun.InfiniteAmmo                         = false;
                 gun.barrelOffset.transform.localPosition = new Vector3(1.6875f, 0.6875f, 0f); // should match "Casing" in JSON file
                 gun.SetAnimationFPS(gun.chargeAnimation, 16);
+                gun.SetBaseMaxAmmo(100);
+                gun.CurrentAmmo = 100;
 
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
                 new List<string> {
@@ -63,13 +68,17 @@ namespace CwaffingTheGungy
                 gun.AddProjectileModuleFrom(ItemHelper.Get(Items.Ak47) as Gun, true, false);
             }
 
-            Projectile projectile = Lazy.PrefabProjectileFromGun(gun, setGunDefaultProjectile: false);
-                projectile.AddAnimation(_BulletSprite);
-                projectile.SetAnimation(_BulletSprite);
-                projectile.gameObject.AddComponent<GunbrellaProjectile>();
 
+            int index = 0;
             foreach (ProjectileModule mod in gun.Volley.projectiles)
             {
+                Projectile projectile = Lazy.PrefabProjectileFromGun(gun, setGunDefaultProjectile: false);
+                    projectile.AddAnimation(_BulletSprite);
+                    projectile.SetAnimation(_BulletSprite);
+                    projectile.baseData.damage = _PROJ_DAMAGE;
+                GunbrellaProjectile gp = projectile.gameObject.AddComponent<GunbrellaProjectile>();
+                    gp.extraDelay = _BARRAGE_DELAY * (index++);
+
                 mod.angleVariance = 10f;
                 mod.ammoCost = (mod != gun.DefaultModule) ? 0 : 1;
                 mod.shootStyle = ProjectileModule.ShootStyle.Charged;
@@ -108,7 +117,6 @@ namespace CwaffingTheGungy
             this._targetingReticle?.SetAlpha(Mathf.Min(1.0f, _FADE_IN_SPEED * this._curChargeTime));
         }
 
-        // Adapated from MagazinRack.cs
         private void BeginCharge()
         {
             this._chargeStartPos   = this.gun.barrelOffset.PositionVector2();
@@ -125,7 +133,8 @@ namespace CwaffingTheGungy
             if (this._curChargeTime == 0.0f)
                 BeginCharge();
 
-            this._chargeStartPos += this._chargeStartAngle.ToVector(_RETICLE_SPEED * BraveTime.DeltaTime);
+            float velocity = Mathf.Min(_RETICLE_MAX_SPEED, _RETICLE_ACCEL * this._curChargeTime);
+            this._chargeStartPos += this._chargeStartAngle.ToVector(velocity * BraveTime.DeltaTime);
             this._targetingReticle.transform.position = this._chargeStartPos;
         }
 
@@ -134,7 +143,6 @@ namespace CwaffingTheGungy
             this._curChargeTime = 0.0f;
             if (!this._targetingReticle)
                 return;
-            // this._targetingReticle.EndEffect();
             UnityEngine.Object.Destroy(this._targetingReticle);
             this._targetingReticle = null;
         }
@@ -148,10 +156,11 @@ namespace CwaffingTheGungy
 
     public class GunbrellaProjectile : MonoBehaviour
     {
-        private const float _LAUNCH_TIME          = 0.5f;
-        private const float _HANG_TIME            = 0.5f;
-        private const float _FALL_TIME            = 0.2f;
-        private const float _MAX_HEIGHT           = 20.0f;
+        private const float _SPREAD               = 1.5f;   // max distance from the target an individual projectile can land
+        private const float _LAUNCH_SPEED         = 80.0f;  // speed at which projectiles rise / fall
+        private const float _LAUNCH_TIME          = 0.35f;  // time spent rising
+        private const float _HANG_TIME            = 0.15f;  // time spent between rising and falling
+        private const float _FALL_TIME            = 0.2f;   // time spent falling
         private const float _TIME_TO_REACH_TARGET = _LAUNCH_TIME + _HANG_TIME + _FALL_TIME;
 
         private Projectile _projectile   = null;
@@ -162,6 +171,8 @@ namespace CwaffingTheGungy
 
         private bool _launching          = false;
         private bool _falling            = false;
+
+        public float extraDelay          = 0.0f; // must be public so unity serializes it properly with the prefab
 
         private void Start()
         {
@@ -175,13 +186,9 @@ namespace CwaffingTheGungy
             }
 
             this._exactTarget = gun.GetReticleCenter();
-            // Vector2 targetDelta = this._exactTarget - this._projectile.sprite.WorldCenter;
-            // float targetSpeed = targetDelta.magnitude / _TIME_TO_REACH_TARGET;
-            // this._projectile.baseData.speed = targetSpeed;
-            // this._projectile.SendInDirection(targetDelta, true);
-            // this._projectile.UpdateSpeed();
 
             this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
+            this._projectile.specRigidbody.OnPreTileCollision += this.OnPreTileCollision;
             StartCoroutine(TakeToTheSkies());
         }
 
@@ -191,14 +198,20 @@ namespace CwaffingTheGungy
                 PhysicsEngine.SkipCollision = true;
         }
 
+        private void OnPreTileCollision(SpeculativeRigidbody me, PixelCollider myPixelCollider, PhysicsEngine.Tile other, PixelCollider otherPixelCollider)
+        {
+            if (this._intangible)
+                PhysicsEngine.SkipCollision = true;
+        }
+
         private IEnumerator TakeToTheSkies()
         {
             // Phase 1 / 4 -- become intangible and launch to the skies
-            this._projectile.IgnoreTileCollisionsFor(999f);
+            this._projectile.IgnoreTileCollisionsFor(_TIME_TO_REACH_TARGET);
             this._projectile.collidesWithEnemies = false;
-            this._projectile.baseData.speed = 100f;
+            this._projectile.baseData.speed = _LAUNCH_SPEED;
             this._projectile.baseData.range = float.MaxValue;
-            this._projectile.SendInDirection(Vector2.up, true);
+            this._projectile.SendInDirection((85f + 10f*UnityEngine.Random.value).ToVector(), true);
             this._projectile.UpdateSpeed();
             this._launching = true;
             while (this._lifetime < _LAUNCH_TIME)
@@ -209,33 +222,34 @@ namespace CwaffingTheGungy
             this._lifetime -= _LAUNCH_TIME;
 
             // Phase 2 / 4 -- slight delay
-            this._projectile.sprite.color = this._projectile.sprite.color.WithAlpha(0.1f);
             this._launching = false;
             this._projectile.baseData.speed = 0.01f;
-            while (this._lifetime < _HANG_TIME)
+            while (this._lifetime < (_HANG_TIME + this.extraDelay))
             {
                 yield return null;
                 this._lifetime += BraveTime.DeltaTime;
             }
-            this._lifetime -= _HANG_TIME;
+            this._lifetime -= (_HANG_TIME + this.extraDelay);
 
             // Phase 3 / 4 -- fall from the skies
-            this._projectile.sprite.color = this._projectile.sprite.color.WithAlpha(1.0f);
             this._falling = true;
-            this._projectile.baseData.speed = 100f;
+            this._projectile.baseData.speed = _LAUNCH_SPEED;
             this._projectile.SendInDirection(Vector2.down, true);
             this._projectile.UpdateSpeed();
-            this._projectile.specRigidbody.Position = new Position(this._exactTarget + (_FALL_TIME * this._projectile.baseData.speed) * Vector2.up);
+            this._projectile.specRigidbody.Position = new Position(this._exactTarget + (_FALL_TIME * _LAUNCH_SPEED) * Vector2.up + Lazy.RandomVector(_SPREAD * UnityEngine.Random.value));
             this._projectile.specRigidbody.UpdateColliderPositions();
-            while (this._lifetime < _FALL_TIME)
+            while (this._lifetime + BraveTime.DeltaTime < _FALL_TIME) // stop a frame early so we can collide with enemies on our last frame
             {
-                yield return null;
                 this._lifetime += BraveTime.DeltaTime;
+                yield return null;
             }
             this._lifetime -= _FALL_TIME;
 
-            // Phase 4 / 4 -- become tangible
+            // Phase 4 / 4 -- become tangible, wait a frame to collide with enemies, then die
+            this._projectile.collidesWithEnemies = true;
             this._intangible = false;
+            yield return null;
+
             this._projectile.DieInAir();
         }
     }
