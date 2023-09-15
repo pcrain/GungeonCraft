@@ -130,7 +130,7 @@ namespace CwaffingTheGungy
             {
                 string spriteName = spritePath; // TODO: guns use names, regular items use full paths -- should be made uniform eventually
                 Gun gun = ETGMod.Databases.Items.NewGun(itemName, spriteName);  //create a new gun using specified sprite name
-                ETGModConsole.Log($"  {Game.Items.AllIDs[Game.Items.Count-1]}");
+                // ETGModConsole.Log($"  {Game.Items.AllIDs[Game.Items.Count-1]}");
                 Game.Items.Rename("outdated_gun_mods:"+baseItemName, IDs.InternalNames[itemName]);  //rename the gun for commands
                 gun.SetupSprite(null, spriteName+"_idle_001", 8); //set the gun's ammonomicon sprite
                 int projectileId = 0;

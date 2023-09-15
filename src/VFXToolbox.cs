@@ -107,6 +107,8 @@ namespace CwaffingTheGungy
             RegisterVFX("VacuumParticle", ResMap.Get("vacuum_wind_sprite_a"), 30, loops: true, loopStart: 6,
                 anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);
 
+            RegisterVFX("HailParticle", ResMap.Get("hail-collision"), 30, loops: false, anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.75f);
+
             laserSightPrefab = LoadHelper.LoadAssetFromAnywhere("assets/resourcesbundle/global vfx/vfx_lasersight.prefab") as GameObject;
         }
 

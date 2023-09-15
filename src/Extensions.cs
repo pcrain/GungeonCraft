@@ -301,5 +301,11 @@ namespace CwaffingTheGungy
       g.GetComponent<Renderer>()?.SetAlpha(a);
       g.GetComponent<tk2dSpriteAnimator>()?.LateUpdate();
     }
+
+    // Randomly add or subtract an amount from an angle
+    public static float AddRandomSpread(this float angle, float spread)
+    {
+      return angle + (Lazy.CoinFlip() ? 1f : -1f) * spread * UnityEngine.Random.value;
+    }
   }
 }
