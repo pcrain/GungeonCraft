@@ -16,8 +16,8 @@ using Alexandria.Misc;
 namespace CwaffingTheGungy
 {
     /* TODO:
-        - figure out how to ignore invulnerability frames
-        - figure out how to reduce damage to bosses
+        - figure out nicely drawing while out of bounds
+        - maybe find a more thematically appropriate reticle?
     */
 
     public class Gunbrella : AdvancedGunBehavior
@@ -28,8 +28,6 @@ namespace CwaffingTheGungy
         public static string ShortDescription = "Cloudy with a Chance of Pain";
         public static string LongDescription  = "(Charging and releasing fires projectiles that rain from the sky)";
 
-        private const float _RETICLE_ACCEL     = 24.0f;
-        private const float _RETICLE_MAX_SPEED = 24.0f;
         private const float _MIN_CHARGE_TIME   = 0.75f;
         private const int   _BARRAGE_SIZE      = 16;
         private const float _BARRAGE_DELAY     = 0.04f;
@@ -38,11 +36,11 @@ namespace CwaffingTheGungy
 
         internal static tk2dSpriteAnimationClip _BulletSprite;
 
-        private GameObject _targetingReticle              = null;
-        private float _curChargeTime                      = 0.0f;
-        private Vector2 _chargeStartPos                   = Vector2.zero;
-        private float _chargeStartAngle                   = 0.0f;
-        private int _nextProjectileNumber                 = 0;
+        private GameObject _targetingReticle = null;
+        private float _curChargeTime         = 0.0f;
+        private Vector2 _chargeStartPos      = Vector2.zero;
+        private float _chargeStartAngle      = 0.0f;
+        private int _nextProjectileNumber    = 0;
 
         public static void Add()
         {
@@ -83,11 +81,12 @@ namespace CwaffingTheGungy
                     projectile.SetAnimation(_BulletSprite);
                     projectile.SetAirImpactVFX(VFX.vfxpool["HailParticle"]);
                     projectile.SetEnemyImpactVFX(VFX.vfxpool["HailParticle"]);
-                    projectile.onDestroyEventName = "icicle_crash";
-                    projectile.baseData.damage    = _PROJ_DAMAGE;
-                    projectile.AppliesFreeze      = true;
-                    projectile.FreezeApplyChance  = 0.33f;
-                    projectile.freezeEffect       = freeze;
+                    projectile.onDestroyEventName   = "icicle_crash";
+                    projectile.baseData.damage      = _PROJ_DAMAGE;
+                    projectile.AppliesFreeze        = true;
+                    projectile.FreezeApplyChance    = 0.33f;
+                    projectile.freezeEffect         = freeze;
+                    projectile.BossDamageMultiplier = 0.6f; // bosses are big and this does a lot of damage, so tone it down
                 GunbrellaProjectile gp = projectile.gameObject.AddComponent<GunbrellaProjectile>();
 
                 mod.angleVariance = 10f;
@@ -102,7 +101,6 @@ namespace CwaffingTheGungy
 
             var comp = gun.gameObject.AddComponent<Gunbrella>();
                 comp.SetFireAudio(); // prevent fire audio, as it's handled in Update()
-                // comp.SetFireAudio("gunbrella_fire_sound"); // prevent fire audio, as it's handled in Update()
         }
 
         protected override void Update()
@@ -277,14 +275,14 @@ namespace CwaffingTheGungy
             // Phase 1 / 4 -- become intangible and launch to the skies
             // this._projectile.sprite.HeightOffGround = 70f;
 
-            Vector2 targetVelocity = (85f + 10f*UnityEngine.Random.value).ToVector(1f);
+            Vector2 targetLaunchVelocity = (85f + 10f*UnityEngine.Random.value).ToVector(1f);
             this._projectile.IgnoreTileCollisionsFor(_TIME_TO_REACH_TARGET);
             this._projectile.baseData.speed = _LAUNCH_SPEED;
             this._projectile.baseData.range = float.MaxValue;
             this._launching = true;
             while (this._lifetime < _LAUNCH_TIME)
             {
-                this._startVelocity = ((1f - _HOME_STRENGTH) * this._startVelocity) + (_HOME_STRENGTH * targetVelocity);
+                this._startVelocity = ((1f - _HOME_STRENGTH) * this._startVelocity) + (_HOME_STRENGTH * targetLaunchVelocity);
                 this._projectile.SendInDirection(this._startVelocity, true);
                 this._projectile.UpdateSpeed();
                 yield return null;
@@ -304,11 +302,13 @@ namespace CwaffingTheGungy
 
             // Phase 3 / 4 -- fall from the skies
             this._falling = true;
+            Vector2 targetFallVelocity = (250f + 40f*UnityEngine.Random.value).ToVector(1f);
             this._projectile.baseData.speed = _LAUNCH_SPEED;
-            this._projectile.SendInDirection(Vector2.down, true);
-            this._projectile.UpdateSpeed();
-            this._projectile.specRigidbody.Position = new Position(this._exactTarget + (_FALL_TIME * _LAUNCH_SPEED) * Vector2.up + Lazy.RandomVector(_SPREAD * UnityEngine.Random.value));
+            Vector2 offsetTarget = this._exactTarget + Lazy.RandomVector(_SPREAD * UnityEngine.Random.value);
+            this._projectile.specRigidbody.Position = new Position(offsetTarget + (_FALL_TIME * _LAUNCH_SPEED) * (-targetFallVelocity));
             this._projectile.specRigidbody.UpdateColliderPositions();
+            this._projectile.SendInDirection(targetFallVelocity, true);
+            this._projectile.UpdateSpeed();
             while (this._lifetime + BraveTime.DeltaTime < _FALL_TIME) // stop a frame early so we can collide with enemies on our last frame
             {
                 this._lifetime += BraveTime.DeltaTime;
