@@ -97,7 +97,7 @@ namespace CwaffingTheGungy
                     anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 100, emissiveColour: Color.cyan);
 
             RegisterVFX("RainReticle", ResMap.Get("splode"), 12, loops: true,
-                    anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 10, emissiveColour: Color.cyan, scale: 0.5f);
+                    anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 10, emissiveColour: Color.cyan, scale: 0.75f);
 
             RegisterVFX("Rebar", ResMap.Get("RebarGunImpactVFX2"), 6, loops: false);
 
@@ -107,7 +107,7 @@ namespace CwaffingTheGungy
             RegisterVFX("VacuumParticle", ResMap.Get("vacuum_wind_sprite_a"), 30, loops: true, loopStart: 6,
                 anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);
 
-            RegisterVFX("HailParticle", ResMap.Get("hail-collision"), 30, loops: false, anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.75f);
+            RegisterVFX("HailParticle", ResMap.Get("icicle-crash-particles"), 30, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.35f);
 
             laserSightPrefab = LoadHelper.LoadAssetFromAnywhere("assets/resourcesbundle/global vfx/vfx_lasersight.prefab") as GameObject;
         }

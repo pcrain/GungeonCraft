@@ -204,6 +204,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\campfire-b1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\hail-collision2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\hail-collision1.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\icicle-crash-particles7.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\hail-collision4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\reticle-blue.png"/>
@@ -224,6 +225,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\hail-collision7.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\midas-sparkle1.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\icicle-crash-particles1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire-c2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\friendlyoverhead_vfx_004.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a10.png"/>
@@ -243,8 +245,12 @@
     <EmbeddedResource Include="Resources\MiscVFX\Tornado\tornado9.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\soul-link-particle2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\hail-collision10.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\icicle-crash-particles4.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\icicle-crash-particles6.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a8.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a6.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\icicle-crash-particles2.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\icicle-crash-particles3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\reticle-white.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\GunVFX\RebarGunImpactVFX2_001.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\GunVFX\RebarGunImpactVFX2_004.png"/>
@@ -292,6 +298,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\can-of-sprite.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\friendlyoverhead_vfx_003.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\exorcism-particles3.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\icicle-crash-particles8.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\soul-link-soul1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a9.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter2.png"/>
@@ -300,6 +307,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\campfire-d5.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\friendlyoverhead_vfx_001.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire-a.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\icicle-crash-particles5.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire-b4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a7.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire-b3.png"/>

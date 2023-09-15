@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +15,11 @@ using Alexandria.Misc;
 
 namespace CwaffingTheGungy
 {
+    /* TODO:
+        - figure out how to ignore invulnerability frames
+        - figure out how to reduce damage to bosses
+    */
+
     public class Gunbrella : AdvancedGunBehavior
     {
         public static string ItemName         = "Gunbrella";
@@ -25,11 +30,11 @@ namespace CwaffingTheGungy
 
         private const float _RETICLE_ACCEL     = 24.0f;
         private const float _RETICLE_MAX_SPEED = 24.0f;
-        private const float _FADE_IN_SPEED     = 5.0f;
-        private const float _MIN_CHARGE_TIME   = 0.25f;
+        private const float _MIN_CHARGE_TIME   = 0.75f;
         private const int   _BARRAGE_SIZE      = 16;
         private const float _BARRAGE_DELAY     = 0.04f;
         private const float _PROJ_DAMAGE       = 16f;
+        private const float _MAX_RETICLE_RANGE = 10f;
 
         internal static tk2dSpriteAnimationClip _BulletSprite;
 
@@ -70,15 +75,19 @@ namespace CwaffingTheGungy
                 gun.AddProjectileModuleFrom(ItemHelper.Get(Items.Ak47) as Gun, true, false);
             }
 
+            GameActorFreezeEffect freeze = ItemHelper.Get(Items.FrostBullets).GetComponent<BulletStatusEffectItem>().FreezeModifierEffect;
             foreach (ProjectileModule mod in gun.Volley.projectiles)
             {
                 Projectile projectile = Lazy.PrefabProjectileFromGun(gun, setGunDefaultProjectile: false);
                     projectile.AddAnimation(_BulletSprite);
                     projectile.SetAnimation(_BulletSprite);
-                    projectile.baseData.damage = _PROJ_DAMAGE;
                     projectile.SetAirImpactVFX(VFX.vfxpool["HailParticle"]);
                     projectile.SetEnemyImpactVFX(VFX.vfxpool["HailParticle"]);
                     projectile.onDestroyEventName = "icicle_crash";
+                    projectile.baseData.damage    = _PROJ_DAMAGE;
+                    projectile.AppliesFreeze      = true;
+                    projectile.FreezeApplyChance  = 0.33f;
+                    projectile.freezeEffect       = freeze;
                 GunbrellaProjectile gp = projectile.gameObject.AddComponent<GunbrellaProjectile>();
 
                 mod.angleVariance = 10f;
@@ -119,7 +128,7 @@ namespace CwaffingTheGungy
         // Using LateUpdate() here so alpha is updated correctly
         private void LateUpdate()
         {
-            this._targetingReticle?.SetAlpha(Mathf.Min(1.0f, _FADE_IN_SPEED * this._curChargeTime));
+            this._targetingReticle?.SetAlpha(Mathf.Min(1.0f, this._curChargeTime / _MIN_CHARGE_TIME));
         }
 
         private void BeginCharge()
@@ -136,17 +145,47 @@ namespace CwaffingTheGungy
 
         private void UpdateCharge()
         {
+            if (this.Owner is not PlayerController player)
+                return;
+
             if (this._curChargeTime == 0.0f)
                 BeginCharge();
 
-            float velocity = Mathf.Min(_RETICLE_MAX_SPEED, _RETICLE_ACCEL * this._curChargeTime);
-            this._chargeStartPos += this._chargeStartAngle.ToVector(velocity * BraveTime.DeltaTime);
+            // smoothly handle reticle postion, compensating extra distance for controller users
+            Vector2 gunPos       = this.gun.barrelOffset.PositionVector2();
+            Vector2 cursorPos    = player.unadjustedAimPoint.XY();
+            Vector2 newTargetPos = gunPos + (player.IsKeyboardAndMouse() ? 1f : 2f) * (cursorPos - gunPos);
+            Vector2 gunDelta     = (newTargetPos - gunPos);
+            if (gunDelta.magnitude > _MAX_RETICLE_RANGE)
+                newTargetPos = gunPos + _MAX_RETICLE_RANGE * gunDelta.normalized;
+
+            if (newTargetPos.GetAbsoluteRoom() != gunPos.GetAbsoluteRoom())
+                return; // aiming outside the room
+
+            this._chargeStartPos = newTargetPos;
             this._targetingReticle.transform.position = this._chargeStartPos;
         }
 
         private void EndCharge()
         {
             this._curChargeTime = 0.0f;
+            DestroyReticle();
+        }
+
+        public override void OnSwitchedAwayFromThisGun()
+        {
+            base.OnSwitchedAwayFromThisGun();
+            DestroyReticle();
+        }
+
+        public override void OnDropped()
+        {
+            base.OnDropped();
+            DestroyReticle();
+        }
+
+        private void DestroyReticle()
+        {
             if (!this._targetingReticle)
                 return;
             UnityEngine.Object.Destroy(this._targetingReticle);
@@ -215,6 +254,9 @@ namespace CwaffingTheGungy
                 AkSoundEngine.PostEvent("gunbrella_fire_sound", this._projectile.gameObject);
             }
 
+            this._projectile.collidesWithEnemies = false;
+            this._projectile.specRigidbody.CollideWithOthers = false;
+            this._projectile.specRigidbody.CollideWithTileMap = false;
             StartCoroutine(TakeToTheSkies());
         }
 
@@ -233,22 +275,12 @@ namespace CwaffingTheGungy
         private IEnumerator TakeToTheSkies()
         {
             // Phase 1 / 4 -- become intangible and launch to the skies
-            this._projectile.sprite.HeightOffGround = 70f;
-            // this._projectile.transform.position = this._projectile.transform.position.WithZ(-1000f);
-            // this._projectile.sprite.SortingOrder = -1;
+            // this._projectile.sprite.HeightOffGround = 70f;
 
             Vector2 targetVelocity = (85f + 10f*UnityEngine.Random.value).ToVector(1f);
-
-            // ETGModConsole.Log($"start: {this._projectile.LastVelocity.normalized:F5}");
-            // ETGModConsole.Log($"target: {targetVelocity:F5}");
-            // ETGModConsole.Log($"new: {(0.98f * this._projectile.LastVelocity.normalized) + (0.02f * targetVelocity):F5}");
-
             this._projectile.IgnoreTileCollisionsFor(_TIME_TO_REACH_TARGET);
-            this._projectile.collidesWithEnemies = false;
             this._projectile.baseData.speed = _LAUNCH_SPEED;
             this._projectile.baseData.range = float.MaxValue;
-            // this._projectile.SendInDirection((85f + 10f*UnityEngine.Random.value).ToVector(), true);
-            // this._projectile.UpdateSpeed();
             this._launching = true;
             while (this._lifetime < _LAUNCH_TIME)
             {
@@ -286,6 +318,8 @@ namespace CwaffingTheGungy
 
             // Phase 4 / 4 -- become tangible, wait a frame to collide with enemies, then die
             this._projectile.collidesWithEnemies = true;
+            this._projectile.specRigidbody.CollideWithOthers = true;
+            this._projectile.specRigidbody.CollideWithTileMap = true;
             this._intangible = false;
             yield return null;
 
