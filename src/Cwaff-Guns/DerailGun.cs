@@ -82,6 +82,7 @@ namespace CwaffingTheGungy
             };
 
             Projectile projectile              = Lazy.PrefabProjectileFromGun(gun);
+            ETGModConsole.Log($"got beam paths");
             projectile.baseData.damage         = 0f;
             projectile.baseData.force          = 0f;
             projectile.baseData.speed          = 0.1f;

@@ -51,7 +51,6 @@ namespace CwaffingTheGungy
         {
             PickupObject item = Lazy.SetupPassive<CampingSupplies>(ItemName, SpritePath, ShortDescription, LongDescription);
             item.quality      = PickupObject.ItemQuality.C;
-            ETGModConsole.Log($"max camp level is {_MaxCampLevel}");
 
             _BonfirePrefab = (ItemHelper.Get(Items.GunSoul) as ExtraLifeItem).BonfireSynergyBonfire;
             _CampfirePrefabs = new GameObject[]{

@@ -85,7 +85,6 @@ namespace CwaffingTheGungy
             // Get our book pile assets
             AssetBundle sharedAssets = ResourceManager.LoadAssetBundle("shared_auto_001");
             DungeonPlaceable pile = sharedAssets.LoadAsset<DungeonPlaceable>("PileOrStackOfBooks");
-            ETGModConsole.Log($"books: {pile.name}");
             sharedAssets = null;
         }
 

@@ -6,6 +6,9 @@ using System.Text;
 using System.Reflection;
 using System.Runtime;
 
+using System.Collections.ObjectModel;
+using System.IO;
+
 using BepInEx;
 using UnityEngine;
 using MonoMod.RuntimeDetour;
@@ -46,7 +49,16 @@ namespace CwaffingTheGungy
                 instance = this;
 
                 // Setup sprites from Gungeon mod folder
-                ETGMod.Assets.SetupSpritesFromFolder(System.IO.Path.Combine(this.FolderPath(), "sprites"));
+                // ETGMod.Assets.SetupSpritesFromFolder(System.IO.Path.Combine(this.FolderPath(), "sprites"));
+
+
+                // var resources = Assembly.GetExecutingAssembly().GetManifestResourceNames();
+                // foreach (var resource in resources)
+                // {
+                //     ETGModConsole.Log($"{resource}");
+                // }
+
+                ETGMod.Assets.SetupSpritesFromAssembly(Assembly.GetExecutingAssembly(), "CwaffingTheGungy.Resources");
 
                 // Build resource map for ease of access
                 ResMap.Build();
@@ -109,21 +121,21 @@ namespace CwaffingTheGungy
                     IronMaid.Add();
                     Natascha.Add();
                     PaintballCannon.Add();
-                    DerailGun.Add();
-                    PopcornGun.Add();
-                    Tranquilizer.Add();
-                    LastResort.Add();
-                    Encircler.Add();
-                    Nug.Add();
+                    // DerailGun.Add(); no sprite
+                    // PopcornGun.Add(); no sprite
+                    // Tranquilizer.Add(); no sprite
+                    // LastResort.Add(); no sprite
+                    // Encircler.Add(); no sprite
+                    // Nug.Add(); no sprite
                     SoulKaliber.Add();
-                    GamblersFallacy.Add();
-                    GasterBlaster.Add();
-                    Commitment.Add();
-                    // HeadCannon.Add();
-                    Telefragger.Add();
-                    Kinsurrection.Add();
-                    SpinCycle.Add();
-                    TimingGun.Add();
+                    // GamblersFallacy.Add(); no sprite
+                    // GasterBlaster.Add(); no sprite
+                    // Commitment.Add(); no sprite
+                    // HeadCannon.Add(); unfinished
+                    // Telefragger.Add(); no sprite
+                    // Kinsurrection.Add(); no sprite
+                    // SpinCycle.Add(); no sprite
+                    // TimingGun.Add(); no sprite
                     KiBlast.Add();
                     Deadline.Add();
                     BBGun.Add();
