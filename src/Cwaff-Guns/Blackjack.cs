@@ -21,7 +21,7 @@ namespace CwaffingTheGungy
         public static string SpriteName       = "blackjack";
         public static string ProjectileName   = "38_special";
         public static string ShortDescription = "Gambit's Queens";
-        public static string LongDescription  = "(Range and power both scale with accuracy. Hope you like 52 pickup.)";
+        public static string LongDescription  = "(Stability and power both scale with accuracy. Hope you like 52 pickup.)";
 
         private const int _DECK_SIZE = 54; // includes 2 jokers
         private const int _CLIP_SIZE = 13; // 1 suit
@@ -44,13 +44,16 @@ namespace CwaffingTheGungy
                 gun.DefaultModule.cooldownTime        = 0.15f;
                 gun.DefaultModule.numberOfShotsInClip = _CLIP_SIZE;
                 gun.quality                           = PickupObject.ItemQuality.C;
-                gun.barrelOffset.transform.localPosition = new Vector3(1.1875f, 0.75f, 0f); // should match "Casing" in JSON file
+                gun.barrelOffset.transform.localPosition = new Vector3(1.625f, 1.375f, 0f); // should match "Casing" in JSON file
                 gun.SetBaseMaxAmmo(_DECK_SIZE * _NUM_DECKS);
                 gun.CurrentAmmo = _DECK_SIZE * _NUM_DECKS;
-                gun.SetAnimationFPS(gun.shootAnimation, 10);
+                gun.SetAnimationFPS(gun.shootAnimation, 30);
+                // gun.SetAnimationFPS(gun.reloadAnimation, 24);
+                gun.SetAnimationFPS(gun.reloadAnimation, 30);
 
             var comp = gun.gameObject.AddComponent<Blackjack>();
                 comp.SetFireAudio(); // prevent fire audio, as it's handled in OnPostFired()
+                comp.SetReloadAudio("card_shuffle_sound");
 
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("playing_card").Base(),
@@ -67,17 +70,19 @@ namespace CwaffingTheGungy
                 projectile.SetAnimation(_BulletSprite);
 
                 projectile.gameObject.AddComponent<ThrownCard>();
-                // projectile.baseData.damage  = 3f;
-                // projectile.baseData.speed   = 20.0f;
-                // projectile.transform.parent = gun.barrelOffset;
+                projectile.transform.parent = gun.barrelOffset;
         }
 
         public override Projectile OnPreFireProjectileModifier(Gun gun, Projectile projectile, ProjectileModule mod)
         {
             if (projectile.GetComponent<ThrownCard>() is not ThrownCard tc)
                 return projectile;
+            if (gun.CurrentOwner is not PlayerController player)
+                return projectile;
 
-            tc.isAFreebie = (mod.ammoCost == 0);
+            tc.isAFreebie = (mod.ammoCost == 0 || gun.InfiniteAmmo || gun.LocalInfiniteAmmo || gun.CanGainAmmo || player.InfiniteAmmo.Value);
+            if (tc.isAFreebie)
+                projectile.gameObject.SetAlphaImmediate(0.5f);
             return projectile;
         }
     }
@@ -85,8 +90,8 @@ namespace CwaffingTheGungy
     public class ThrownCard : MonoBehaviour
     {
         private const float _SPIN_SPEED = 2.0f;
-        private const float _BASE_LIFE  = 0.21f;
-        private const float _AIR_DRAG   = 0.92f;
+        private const float _BASE_LIFE  = 0.25f;
+        private const float _AIR_DRAG   = 0.93f;
 
         private Projectile _projectile;
         private PlayerController _owner;
@@ -96,13 +101,12 @@ namespace CwaffingTheGungy
         private int _cardFront = 0;
         private int _cardBack  = 0;
 
-        private float _inverseAcc = 1.0f;
         private float _timeAtMaxPower = 0.0f;
         private bool _faltering = false;
         private float _curveAmount = 0.0f;
         private float _startScale = 1f;
 
-        public bool isAFreebie = true;
+        public bool isAFreebie = true; // false if we fired directly from the gun and it cost us ammo, true otherwise
 
         private void Start()
         {
@@ -112,8 +116,9 @@ namespace CwaffingTheGungy
             this._projectile.OnDestruction += CreatePlayingCardPickup;
 
             this._projectile.AdjustPlayerProjectileTint(Color.white, 0, 0f);
-            this._projectile.sprite.renderer.material.SetFloat("_EmissivePower", 0.1f);
-            this._projectile.sprite.renderer.material.SetFloat("_EmissiveColorPower", 0.1f);
+            this._projectile.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitBlendUber");
+            // this._projectile.sprite.renderer.material.SetFloat("_EmissivePower", 0.1f);
+            // this._projectile.sprite.renderer.material.SetFloat("_EmissiveColorPower", 0.1f);
 
             BounceProjModifier bounce = this._projectile.gameObject.GetOrAddComponent<BounceProjModifier>();
                 bounce.numberOfBounces     = 1;
@@ -137,18 +142,23 @@ namespace CwaffingTheGungy
         private void CalculateStatsFromPlayerStats()
         {
             float acc            = this._owner.stats.GetStatModifier(PlayerStats.StatType.Accuracy);
-            this._inverseAcc     = 1.0f / acc;
-            this._timeAtMaxPower = _BASE_LIFE * Mathf.Sqrt(this._inverseAcc);
+            float inverseRootAcc = Mathf.Sqrt(1.0f / acc);
+            this._timeAtMaxPower = _BASE_LIFE * inverseRootAcc * UnityEngine.Random.Range(0.8f, 1.2f);
+            this._projectile.baseData.damage *= inverseRootAcc;
         }
 
         private void Update()
         {
             if (this._projectile.baseData.speed < 1f)
             {
-                this._projectile.DieInAir();
+                this._projectile.DieInAir(suppressInAirEffects: true);
                 return;
             }
 
+            if (BraveTime.DeltaTime == 0)
+                return;
+
+            float timeScale = BraveTime.DeltaTime * C.FPS;
             this._lifetime += BraveTime.DeltaTime;
             if (this._faltering || this._lifetime >= this._timeAtMaxPower)
             {
@@ -157,9 +167,10 @@ namespace CwaffingTheGungy
                     this._faltering = true;
                     this._curveAmount = (Lazy.CoinFlip() ? -1f : 1f) * 5f * UnityEngine.Random.value;
                 }
-                this._projectile.baseData.speed *= _AIR_DRAG;
+                // this._projectile.baseData.speed *= _AIR_DRAG;
+                this._projectile.baseData.speed *= Mathf.Pow(_AIR_DRAG, timeScale); // todo: see if this slows things down too much
                 this._projectile.SendInDirection(
-                    (this._projectile.m_currentDirection.ToAngle() + this._curveAmount).ToVector(), true, true);
+                    (this._projectile.m_currentDirection.ToAngle() + this._curveAmount * timeScale).ToVector(), true, true);
                 this._projectile.UpdateSpeed();
             }
 
@@ -181,8 +192,14 @@ namespace CwaffingTheGungy
               PickUpPlayingCardScript);
             mi.autoInteract = true;
             mi.transform.rotation = p.transform.rotation;
-            mi.sprite.renderer.material.SetFloat("_EmissivePower", 0.1f);
-            mi.sprite.renderer.material.SetFloat("_EmissiveColorPower", 0.1f);
+            // mi.sprite.renderer.material.shader = p.sprite.renderer.material.shader;
+            mi.sprite.renderer.material = p.sprite.renderer.material;
+            // mi.sprite.renderer.material.SetFloat("_EmissivePower", 0.1f);
+            // mi.sprite.renderer.material.SetFloat("_EmissiveColorPower", 0.1f);
+            // mi.sprite.renderer.material.SetColor("_OverrideColor", Color.white);
+            // mi.sprite.renderer.sharedMaterial.SetColor("_OverrideColor", Color.white);
+            // mi.sprite.usesOverrideMaterial = true;
+            // mi.sprite.renderer.sharedMaterial.SetColor("_OverrideColor", color);
         }
 
         public IEnumerator PickUpPlayingCardScript(MiniInteractable i, PlayerController p)
