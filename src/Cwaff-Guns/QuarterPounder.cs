@@ -50,18 +50,8 @@ namespace CwaffingTheGungy
                 comp.SetReloadAudio("coin_gun_reload");
 
             _ProjSprite = AnimateBullet.CreateProjectileAnimation(
-                new List<string> {
-                    "coin-gun-projectile1",
-                    "coin-gun-projectile2",
-                    "coin-gun-projectile3",
-                    "coin-gun-projectile4",
-                    "coin-gun-projectile5",
-                    "coin-gun-projectile6",
-                    "coin-gun-projectile7",
-                    "coin-gun-projectile8",
-                    "coin-gun-projectile9",
-                    "coin-gun-projectile10",
-                }, 2, true, new IntVector2(9, 6),
+                ResMap.Get("coin-gun-projectile").Base(),
+                2, true, new IntVector2(9, 6),
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
 
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);

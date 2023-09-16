@@ -57,12 +57,8 @@ namespace CwaffingTheGungy
                 comp.SetReloadAudio("alyx_reload_sound");
 
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
-                new List<string> {
-                    "alyx-projectile1",
-                    "alyx-projectile2",
-                    "alyx-projectile3",
-                    "alyx-projectile4",
-                }, 16, true, new IntVector2(9, 9),
+                ResMap.Get("alyx-projectile").Base(),
+                16, true, new IntVector2(9, 9),
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
 
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);

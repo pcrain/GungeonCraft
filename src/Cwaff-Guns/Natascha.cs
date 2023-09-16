@@ -51,11 +51,8 @@ namespace CwaffingTheGungy
                 comp.SetFireAudio(); // prevent fire audio, as it's handled in OnPostFired()
 
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
-                new List<string> {
-                    "natascha_bullet_001",
-                    "natascha_bullet_002",
-                    "natascha_bullet_003",
-                }, 12, true, new IntVector2((int)(_NATASHA_PROJECTILE_SCALE * 15), (int)(_NATASHA_PROJECTILE_SCALE * 7)),
+                ResMap.Get("natascha_bullet").Base(),
+                12, true, new IntVector2((int)(_NATASHA_PROJECTILE_SCALE * 15), (int)(_NATASHA_PROJECTILE_SCALE * 7)),
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
 
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);

@@ -89,9 +89,8 @@ namespace CwaffingTheGungy
             blaster.baseData.range          = 200;
 
             blaster.AnimateProjectile(
-                new List<string> {
-                    "gaster_blaster",
-                }, 6, true, new IntVector2(48, 36),
+                ResMap.Get("gaster_blaster").Base(),
+                6, true, new IntVector2(48, 36),
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, false);
 
 

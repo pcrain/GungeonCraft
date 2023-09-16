@@ -47,9 +47,8 @@ namespace CwaffingTheGungy
                 comp.SetReloadAudio("soul_kaliber_reload");
 
             _ProjSprite = AnimateBullet.CreateProjectileAnimation(
-                new List<string> {
-                    "soul-kaliber-projectile",
-                }, 2, true, new IntVector2(10, 10),
+                ResMap.Get("soul-kaliber-projectile").Base(),
+                2, true, new IntVector2(10, 10),
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
 
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);

@@ -60,21 +60,13 @@ namespace CwaffingTheGungy
                 comp.preventNormalReloadAudio = true;
 
             _KiSprite = AnimateBullet.CreateProjectileAnimation(
-                new List<string> {
-                    "ki_blast_001",
-                    "ki_blast_002",
-                    "ki_blast_003",
-                    "ki_blast_004",
-                }, 12, true, new IntVector2(8, 8),
+                ResMap.Get("ki_blast").Base(),
+                12, true, new IntVector2(8, 8),
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
 
             _KiSpriteRed = AnimateBullet.CreateProjectileAnimation(
-                new List<string> {
-                    "ki_blast_red_001",
-                    "ki_blast_red_002",
-                    "ki_blast_red_003",
-                    "ki_blast_red_004",
-                }, 12, true, new IntVector2(8, 8),
+                ResMap.Get("ki_blast_red").Base(),
+                12, true, new IntVector2(8, 8),
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
 
             Projectile blast = Lazy.PrefabProjectileFromGun(gun);

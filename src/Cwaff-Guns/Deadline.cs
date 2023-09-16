@@ -59,9 +59,8 @@ namespace CwaffingTheGungy
                 comp.SetReloadAudio("deadline_fire_sound");
 
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
-                new List<string> {
-                    "deadline_projectile",
-                }, 2, true, new IntVector2(23, 4),
+                ResMap.Get("deadline_projectile").Base(),
+                2, true, new IntVector2(23, 4),
                 false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
 
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);

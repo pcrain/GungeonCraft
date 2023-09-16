@@ -41,7 +41,7 @@ namespace CwaffingTheGungy
           RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private static Dictionary<string, List<string>> _ResMap = new ();
 
-        // Gets a list of resources with numbered sprites from the resource's base name
+        // Gets a list of resource paths with numbered sprites from the resource's base name
         // Does not work with CreateProjectileAnimation(), which expects direct sprite names in the mod's "sprites" directory
         public static List<string> Get(string resource)
         {
@@ -49,6 +49,16 @@ namespace CwaffingTheGungy
                 return null;
             return _ResMap[resource];
         }
+
+        // Gets only the basenames for each item in a list of strings
+        public static List<string> Base(this List<string> paths)
+        {
+            List<string> bases = new();
+            foreach(string s in paths)
+                bases.Add(s.Substring(s.LastIndexOf("/") + 1));
+            return bases;
+        }
+
 
         // Builds a resource map from every PNG embedded in the assembly
         public static void Build()

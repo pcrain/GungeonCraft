@@ -50,9 +50,8 @@ namespace CwaffingTheGungy
                 comp.SetReloadAudio("knife_gun_reload");
 
             _KunaiSprite = AnimateBullet.CreateProjectileAnimation(
-                new List<string> {
-                    "kunai",
-                }, 12, true, new IntVector2(16, 10),
+                ResMap.Get("kunai").Base(),
+                12, true, new IntVector2(16, 10),
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
 
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);

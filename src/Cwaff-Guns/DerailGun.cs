@@ -127,10 +127,7 @@ namespace CwaffingTheGungy
             Projectile train = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items._38Special) as Gun, false); //id 56 == 38 special
             // train.SetProjectileSpriteRight("train_projectile_001", trainSpriteDiameter, trainSpriteDiameter, true, tk2dBaseSprite.Anchor.MiddleCenter, 20, 20);
             train.AnimateProjectile(
-                new List<string> {
-                    "train_projectile_001",
-                    "train_projectile_002",
-                },
+                ResMap.Get("train_projectile").Base(),
                 6, true, new IntVector2(trainSpriteDiameter, trainSpriteDiameter),
                 false, tk2dBaseSprite.Anchor.LowerCenter, true, false);
             train.PenetratesInternalWalls = true;

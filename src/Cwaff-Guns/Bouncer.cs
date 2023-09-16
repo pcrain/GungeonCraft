@@ -54,12 +54,8 @@ namespace CwaffingTheGungy
             IntVector2 colliderSize = new IntVector2(1,1); // 1-pixel collider for accurate bounce animation
 
             tk2dSpriteAnimationClip anim = AnimateBullet.CreateProjectileAnimation(
-                new List<string> {
-                    "energy_bounce1",
-                    "energy_bounce2",
-                    "energy_bounce3",
-                    "energy_bounce4",
-                }, 10, true, new IntVector2(10, 10), // reduced sprite size
+                ResMap.Get("energy_bounce").Base(),
+                10, true, new IntVector2(10, 10), // reduced sprite size
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true, null, colliderSize);
 
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);

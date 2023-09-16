@@ -67,28 +67,7 @@ namespace CwaffingTheGungy
                 projectile.baseData.range = 999999f;
                 projectile.baseData.speed = 20f;
                 projectile.AnimateProjectile(
-                    new List<string> {
-                        "bball001",
-                        "bball002",
-                        "bball003",
-                        "bball004",
-                        "bball005",
-                        "bball006",
-                        "bball007",
-                        "bball008",
-                        "bball009",
-                        "bball010",
-                        "bball011",
-                        "bball012",
-                        "bball013",
-                        "bball014",
-                        "bball015",
-                        "bball016",
-                        "bball017",
-                        "bball018",
-                        "bball019",
-                        "bball020",
-                    },
+                    ResMap.Get("bball").Base(),
                     20, true, new IntVector2(24, 22),
                     false, tk2dBaseSprite.Anchor.MiddleCenter, true, false);
 
