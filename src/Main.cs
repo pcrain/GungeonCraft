@@ -111,7 +111,7 @@ namespace CwaffingTheGungy
                     PaintballCannon.Add();
                     // DerailGun.Add(); unfinished
                     // PopcornGun.Add(); no sprite
-                    // Tranquilizer.Add(); no sprite
+                    Tranquilizer.Add();
                     // LastResort.Add(); no sprite
                     // Encircler.Add(); no sprite
                     // Nug.Add(); no sprite

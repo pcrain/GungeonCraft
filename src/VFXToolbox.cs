@@ -73,6 +73,9 @@ namespace CwaffingTheGungy
             RegisterVFX("SoulLinkParticle", ResMap.Get("soul-link-particle"), 16, loops: true,
                 anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.3f, emissivePower: 100);
 
+            RegisterVFX("DrowsyParticle", ResMap.Get("drowsy_cloud"), 6, loops: true,
+                anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);
+
             RegisterVFX("MidasParticle", ResMap.Get("midas-sparkle"), 8, loops: true,
                 anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 5);
 
@@ -504,6 +507,119 @@ namespace CwaffingTheGungy
             //         m.SetColor("_OverrideColor", emissiveColor.Value);
             //     }
             // }
+        }
+    }
+
+    // Helper class for doing orbital effects around an AIActor
+    public class OrbitalEffect : MonoBehaviour
+    {
+        private const float _ORBIT_RPS = 0.5f;
+        private const float _ORBIT_SPR = 1.0f / _ORBIT_RPS; // seconds per rotation
+
+        private AIActor          _enemy       = null;
+        private List<GameObject> _orbitals    = null;
+        private int              _numOrbitals = 0;
+        private float            _enemyGirth  = 0.0f;
+        private float            _enemyHeight = 0.0f;
+        private float            _orbitTimer  = 0.0f;
+        private float            _orbitalGap  = 0.0f;
+        private float            _rps         = 0.0f;
+        private float            _spr         = 0.0f;
+        private bool             _isEmissive  = false;
+        private bool             _overhead    = false;
+        private bool             _didSetup    = false;
+
+        public void SetupOrbitals(GameObject vfx, int numOrbitals = 3, float rps = 0.5f, bool isEmissive = false, bool isOverhead = false)
+        {
+            this._enemy        = base.GetComponent<AIActor>();
+            this._enemyGirth   = this._enemy.sprite.GetBounds().size.x / 2.0f; // get the x radius of the enemy's sprite
+            this._enemyHeight  = this._enemy.sprite.GetBounds().size.y / 2.0f; // get the y radius of the enemy's sprite
+            this._orbitTimer   = 0f;
+            this._orbitals     = new();
+            this._numOrbitals  = numOrbitals;
+            this._orbitalGap   = 360.0f / (float)this._numOrbitals;
+            this._isEmissive   = isEmissive;
+            this._overhead     = isOverhead;
+            this._rps          = rps;
+            this._spr          = 1.0f / this._rps;
+
+            // Spawn orbitals
+            for (int i = 0; i < this._numOrbitals; ++i)
+                this._orbitals.Add(SpawnManager.SpawnVFX(
+                    vfx, this._enemy.sprite.WorldCenter.ToVector3ZisY(-1), Quaternion.identity));
+            UpdateOrbitals();
+
+            this._didSetup = true;
+        }
+
+        public void AddOrbital(GameObject vfx)
+        {
+            this._orbitals.Add(SpawnManager.SpawnVFX(
+                vfx, this._enemy.sprite.WorldCenter.ToVector3ZisY(-1), Quaternion.identity));
+            this._numOrbitals += 1;
+            this._orbitalGap   = 360.0f / (float)this._numOrbitals;
+        }
+
+        private void Update()
+        {
+            if (!this._didSetup)
+                return;
+
+            if (this._enemy?.healthHaver?.IsDead ?? true)
+            {
+                HandleEnemyDied();
+                return;
+            }
+
+            this._orbitTimer += BraveTime.DeltaTime;
+            if (this._orbitTimer > this._spr)
+                this._orbitTimer -= this._spr;
+
+            UpdateOrbitals();
+        }
+
+        private void OnDestroy()
+        {
+            HandleEnemyDied();
+        }
+
+        public void HandleEnemyDied()
+        {
+            if (this._orbitals == null)
+                return;
+            foreach (GameObject g in this._orbitals)
+                UnityEngine.Object.Destroy(g);
+            this._orbitals = null;
+        }
+
+        private float OverheadOffset()
+        {
+            return this._overhead ? this._enemyHeight : 0f;
+        }
+
+        private void UpdateOrbitals()
+        {
+            int i = 0;
+            float orbitOffset = this._orbitTimer / this._spr;
+            float z = C.PIXELS_PER_TILE * this._enemyGirth;
+
+            float power = 2f * Mathf.Abs(Mathf.Sin(2.0f * Mathf.PI * orbitOffset));
+
+            foreach (GameObject g in this._orbitals)
+            {
+                tk2dSprite sprite = g.GetComponent<tk2dSprite>();
+                sprite.renderer.enabled = this._enemy.renderer.enabled;
+                float angle = (this._orbitalGap * i + 360.0f * orbitOffset).Clamp360();
+                Vector2 avec   = angle.ToVector();
+                Vector2 offset = new Vector2(1.5f * this._enemyGirth * avec.x, 0.75f * this._enemyGirth * avec.y + OverheadOffset());
+                g.transform.position = (this._enemy.sprite.WorldCenter + offset).ToVector3ZisY(angle < 180 ? z : -z);
+                g.transform.rotation = angle.EulerZ();
+
+                if (this._isEmissive)
+                    sprite.renderer.material.SetFloat("_EmissivePower", power);
+
+                ++i;
+            }
         }
     }
 }

@@ -83,10 +83,6 @@ namespace CwaffingTheGungy
     {
         public static GameActorHealthEffect StandardSoulLinkEffect;
 
-        private const int   _ORBIT_NUM         = 3;
-        private const float _ORBIT_RPS         = 0.5f;
-        private const float _ORBIT_SPR         = 1.0f / _ORBIT_RPS; // seconds per rotation
-        private const float _ORBIT_GAP         = 360.0f / (float)_ORBIT_NUM;
         private const int   _NUM_HIT_PARTICLES = 12;
         private const float _SOUL_PART_SPEED   = 3f;
 
@@ -98,9 +94,7 @@ namespace CwaffingTheGungy
         private static bool _SoulLinkEffectHappening = false;
 
         private AIActor _enemy;
-        private float _enemyGirth;
-        private float _orbitTimer;
-        private List<GameObject> _orbitals;
+        private OrbitalEffect _orbitalEffect = null;
 
         public static void Init()
         {
@@ -127,60 +121,14 @@ namespace CwaffingTheGungy
 
         private void Start()
         {
-            this._enemy        = base.GetComponent<AIActor>();
-            this._enemyGirth   = this._enemy.sprite.GetBounds().size.x / 2.0f; // get the radius of the enemy's sprite
-            this._orbitTimer   = 0;
-            this._orbitals     = new();
-
-            // Spawn orbitals
-            for (int i = 0; i < _ORBIT_NUM; ++i)
-                this._orbitals.Add(SpawnManager.SpawnVFX(
-                    SoulLinkStatus._SoulLinkOverheadVFX, this._enemy.sprite.WorldCenter.ToVector3ZisY(-1), Quaternion.identity));
-            UpdateOrbitals();
+            this._enemy         = base.GetComponent<AIActor>();
+            this._orbitalEffect = this._enemy.gameObject.AddComponent<OrbitalEffect>();
+                this._orbitalEffect.SetupOrbitals(vfx: _SoulLinkOverheadVFX, numOrbitals: 3, rps: 0.5f, isEmissive: true);
 
             this._enemy.ApplyEffect(SoulLinkStatus.StandardSoulLinkEffect);
             this._enemy.healthHaver.ModifyDamage += this.OnTakeDamage;
-            this._enemy.healthHaver.OnPreDeath += (_) => HandleEnemyDied();  // deal with some despawn gliches
-        }
-
-        private void Update()
-        {
-            if (this._enemy?.healthHaver?.IsDead ?? true)
-            {
-                HandleEnemyDied();
-                return;
-            }
-
-            this._orbitTimer += BraveTime.DeltaTime;
-            if (this._orbitTimer > _ORBIT_SPR)
-                this._orbitTimer -= _ORBIT_SPR;
-
-            UpdateOrbitals();
-        }
-
-        private void UpdateOrbitals()
-        {
-            int i = 0;
-            float orbitOffset = this._orbitTimer / _ORBIT_SPR;
-            float z = C.PIXELS_PER_TILE * this._enemyGirth;
-
-            float power = 2f * Mathf.Abs(Mathf.Sin(2.0f * Mathf.PI * orbitOffset));
-
-            foreach (GameObject g in this._orbitals)
-            {
-                tk2dSprite sprite = g.GetComponent<tk2dSprite>();
-                sprite.renderer.enabled = this._enemy.renderer.enabled;
-                float angle = (_ORBIT_GAP * i + 360.0f * orbitOffset).Clamp360();
-                Vector2 avec   = angle.ToVector();
-                Vector2 offset = new Vector2(1.5f * this._enemyGirth * avec.x, 0.75f * this._enemyGirth * avec.y);
-                g.transform.position = (this._enemy.sprite.WorldCenter + offset).ToVector3ZisY(angle < 180 ? z : -z);
-                g.transform.rotation = angle.EulerZ();
-
-                Material m = sprite.renderer.material;
-                    m.SetFloat("_EmissivePower", power);
-
-                ++i;
-            }
+            this._enemy.healthHaver.OnPreDeath +=
+                (_) => this._orbitalEffect.HandleEnemyDied();  // deal with some despawn gliches
         }
 
         private void OnTakeDamage(HealthHaver hh, HealthHaver.ModifyDamageEventArgs data)
@@ -188,34 +136,34 @@ namespace CwaffingTheGungy
             // prevent ourselves from taking damage in an infinite loop from other soul-linked enemies
             if (_SoulLinkEffectHappening)
                 return;
-            _SoulLinkEffectHappening = true;
-
-            AIActor enemy = hh.aiActor;
-            List<AIActor> activeEnemies = enemy.GetAbsoluteParentRoom().GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
-            if (activeEnemies == null)
-                return;
-
-            bool didAnything = false;
-            foreach (AIActor otherEnemy in activeEnemies)
+            try
             {
-                if (!(otherEnemy && otherEnemy.specRigidbody && !otherEnemy.IsGone && otherEnemy.healthHaver))
-                    continue; // we don't care about harmless enemies
-                if (enemy == otherEnemy)
-                    continue; // don't apply damage to ourselves
-                if (otherEnemy.gameObject.GetComponent<SoulLinkStatus>() is not SoulLinkStatus soulLink)
-                    continue;
-                soulLink.ShareThePain(data.ModifiedDamage);
-                didAnything = true;
-            }
-            if (didAnything)
-                AkSoundEngine.PostEvent("soul_kaliber_drain", hh.gameObject);
-            _SoulLinkEffectHappening = false;
-        }
+                _SoulLinkEffectHappening = true;
 
-        private void HandleEnemyDied()
-        {
-            foreach (GameObject g in this._orbitals)
-                UnityEngine.Object.Destroy(g);
+                AIActor enemy = hh.aiActor;
+                List<AIActor> activeEnemies = enemy.GetAbsoluteParentRoom().GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
+                if (activeEnemies == null)
+                    return;
+
+                bool didAnything = false;
+                foreach (AIActor otherEnemy in activeEnemies)
+                {
+                    if (!(otherEnemy.IsAliveAndNotABoss()))
+                        continue; // we don't care about harmless enemies
+                    if (enemy == otherEnemy)
+                        continue; // don't apply damage to ourselves
+                    if (otherEnemy.gameObject.GetComponent<SoulLinkStatus>() is not SoulLinkStatus soulLink)
+                        continue;
+                    soulLink.ShareThePain(data.ModifiedDamage);
+                    didAnything = true;
+                }
+                if (didAnything)
+                    AkSoundEngine.PostEvent("soul_kaliber_drain", hh.gameObject);
+            }
+            finally
+            {
+                _SoulLinkEffectHappening = false;
+            }
         }
 
         public void ShareThePain(float damage)

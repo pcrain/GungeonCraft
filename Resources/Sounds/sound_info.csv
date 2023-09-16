@@ -38,3 +38,6 @@ gunbrella_fire_sound,-3.0,1,sound
 card_pickup_sound,-1.0,1,sound
 card_throw_sound,-2.0,1,sound
 card_shuffle_sound,5.0,1,sound
+blowgun_fire_sound,2.0,1,sound
+blowgun_reload_sound,1.0,1,sound
+drowsy_sound,-3.0,1,sound
