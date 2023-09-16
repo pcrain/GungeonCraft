@@ -35,3 +35,5 @@ gorgun_eye_activate,-6.0,1,sound
 gunbrella_charge_sound,4.0,0,sound
 gunbrella_fire_sound,0.0,1,sound
 gunbrella_fire_sound,-3.0,1,sound
+card_pickup_sound,-1.0,1,sound
+card_throw_sound,-4.0,1,sound

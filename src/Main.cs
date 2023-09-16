@@ -135,6 +135,7 @@ namespace CwaffingTheGungy
                     Alyx.Add();
                     VacuumCleaner.Add();
                     Gunbrella.Add();
+                    Blackjack.Add();
                     // MasterSword.Add(); unfinished
                 #endregion
 

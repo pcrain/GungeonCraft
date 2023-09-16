@@ -18,6 +18,7 @@ namespace CwaffingTheGungy
     public bool interacting = false;
     public bool doVFX = false;
     public bool doHover = false;
+    public bool autoInteract = false;
 
     public DungeonData.Direction itemFacing = DungeonData.Direction.SOUTH;
 
@@ -51,6 +52,8 @@ namespace CwaffingTheGungy
       base.sprite.UpdateZDepth();
 
       SpeculativeRigidbody orAddComponent = base.gameObject.GetOrAddComponent<SpeculativeRigidbody>();
+      orAddComponent.CollideWithOthers = false;
+      orAddComponent.CollideWithTileMap = false;
       orAddComponent.PixelColliders = new List<PixelCollider>();
       PixelCollider pixelCollider = new PixelCollider();
       pixelCollider.ColliderGenerationMode = PixelCollider.PixelColliderGeneration.Circle;
@@ -61,14 +64,13 @@ namespace CwaffingTheGungy
       pixelCollider.ManualOffsetY = PhysicsEngine.UnitToPixel(vector.y) - 7;
       orAddComponent.PixelColliders.Add(pixelCollider);
       orAddComponent.Initialize();
-      orAddComponent.OnPreRigidbodyCollision = null;
       orAddComponent.OnPreRigidbodyCollision = (SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate)Delegate.Combine(orAddComponent.OnPreRigidbodyCollision, new SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate(ItemOnPreRigidbodyCollision));
       RegenerateCache();
     }
 
     private void ItemOnPreRigidbodyCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
     {
-      if (otherRigidbody?.PrimaryPixelCollider?.CollisionLayer != CollisionLayer.Projectile)
+      // if (otherRigidbody?.PrimaryPixelCollider?.CollisionLayer != CollisionLayer.Projectile)
         PhysicsEngine.SkipCollision = true;
     }
 
@@ -117,6 +119,8 @@ namespace CwaffingTheGungy
         return;
       SpriteOutlineManager.RemoveOutlineFromSprite(base.sprite);
       SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.white);
+      if (this.autoInteract)
+        Interact(interactor);
     }
 
     public void OnExitRange(PlayerController interactor)
