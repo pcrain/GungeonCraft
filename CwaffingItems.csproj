@@ -180,7 +180,6 @@
     <Compile Include="src\Cwaff-Guns\DerailGun.cs"/>
     <Compile Include="src\Cwaff-Guns\Grandmaster.cs"/>
     <Compile Include="src\Cwaff-Guns\Tranquilizer.cs"/>
-    <Compile Include="src\Cwaff-Guns\TestLightning.cs"/>
     <Compile Include="src\Cwaff-Guns\PaintballCannon.cs"/>
     <Compile Include="src\Cwaff-Guns\Bouncer.cs"/>
     <Compile Include="src\Cwaff-Guns\HolyWaterGun.cs"/>

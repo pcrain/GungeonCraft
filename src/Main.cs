@@ -28,7 +28,7 @@ namespace CwaffingTheGungy
     public class Initialisation : BaseUnityPlugin
     {
         public const string GUID = "pretzel.etg.cwaff";
-        public static Initialisation instance;
+        public static Initialisation Instance;
 
         public void Awake()
         {
@@ -46,17 +46,7 @@ namespace CwaffingTheGungy
 
                 // BraveMemory.EnsureHeapSize(1024*1024); ETGModConsole.Log("Ensured 1GB heap...");
 
-                instance = this;
-
-                // Setup sprites from Gungeon mod folder
-                // ETGMod.Assets.SetupSpritesFromFolder(System.IO.Path.Combine(this.FolderPath(), "sprites"));
-
-
-                // var resources = Assembly.GetExecutingAssembly().GetManifestResourceNames();
-                // foreach (var resource in resources)
-                // {
-                //     ETGModConsole.Log($"{resource}");
-                // }
+                Instance = this;
 
                 ETGMod.Assets.SetupSpritesFromAssembly(Assembly.GetExecutingAssembly(), "CwaffingTheGungy.Resources");
 
@@ -96,10 +86,10 @@ namespace CwaffingTheGungy
                 #endregion
 
                 #region Passives
-                    Shine.Init();
-                    Superstitious.Init();
+                    // Shine.Init(); unfinished
+                    // Superstitious.Init(); unfinished
                     DriftersHeadgear.Init();
-                    Siphon.Init();
+                    // Siphon.Init(); unfinished
                     ZoolandersDiary.Init();
                     RatPoison.Init();
                     JohnsWick.Init();
@@ -116,12 +106,10 @@ namespace CwaffingTheGungy
                 #endregion
 
                 #region Guns
-                    // TestLightning.Add();
-
                     IronMaid.Add();
                     Natascha.Add();
                     PaintballCannon.Add();
-                    // DerailGun.Add(); no sprite
+                    // DerailGun.Add(); unfinished
                     // PopcornGun.Add(); no sprite
                     // Tranquilizer.Add(); no sprite
                     // LastResort.Add(); no sprite
@@ -133,22 +121,21 @@ namespace CwaffingTheGungy
                     // Commitment.Add(); no sprite
                     // HeadCannon.Add(); unfinished
                     // Telefragger.Add(); no sprite
-                    // Kinsurrection.Add(); no sprite
+                    // Kinsurrection.Add(); unfinished
                     // SpinCycle.Add(); no sprite
-                    // TimingGun.Add(); no sprite
+                    // TimingGun.Add(); unfinished
                     KiBlast.Add();
                     Deadline.Add();
                     BBGun.Add();
                     Bouncer.Add();
                     Grandmaster.Add();
                     QuarterPounder.Add();
-                    // DeathNote.Add();
+                    // DeathNote.Add(); unfinished
                     HolyWaterGun.Add();
                     Alyx.Add();
                     VacuumCleaner.Add();
                     Gunbrella.Add();
-
-                    // MasterSword.Add();
+                    // MasterSword.Add(); unfinished
                 #endregion
 
                 #region Synergies
@@ -222,9 +209,10 @@ namespace CwaffingTheGungy
                     // enemiesBase = null;
                 #endregion
 
-                // Bosses yo
-                BossBuilder.Init();
-                SansBoss.Init();
+                #region Bosses yo
+                    BossBuilder.Init();
+                    SansBoss.Init();
+                #endregion
 
                 // Modified version of Anywhere mod, further stolen and modified from Apache's version
                 FlowCommands.Install();
