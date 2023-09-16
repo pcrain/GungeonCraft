@@ -22,7 +22,8 @@ namespace CwaffingTheGungy
         public static string ShortDescription = "Commitment";
         public static string LongDescription  = "(Every enemy killed without switching guns grants 1% boosts to damage, reload speed, and chance not to consume ammo, up to a maximum of 50% each; stats reset upon firing another gun)";
 
-        private const float _BONUS_PER_KILL = 0.01f;
+        private const float _BONUS_PER_KILL     = 0.01f;
+        private const float _MAX_BONUS          = 1.50f;
 
         private Gun            _committedGun    = null;
         private StatModifier[] _commitmentBuffs = null;
@@ -72,7 +73,7 @@ namespace CwaffingTheGungy
 
         private void UpdateCommitmentStats(PlayerController player, bool reset = false)
         {
-            this._commitmentMult = reset ? 1.00f : (this._commitmentMult + _BONUS_PER_KILL);
+            this._commitmentMult = reset ? 1.00f : Mathf.Min(this._commitmentMult + _BONUS_PER_KILL, _MAX_BONUS);
             foreach (StatModifier stat in this.passiveStatModifiers)
                 stat.amount = this._commitmentMult;
             player.stats.RecalculateStats(player);
