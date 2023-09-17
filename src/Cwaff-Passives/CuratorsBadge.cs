@@ -104,7 +104,7 @@ namespace CwaffingTheGungy
                 if (success)
                     CustomNoteDoer.CreateNote(clearSpot, angry);
                 if (chancesLeft == 0)
-                    this.Owner.RemoveItemFromInventory(this);
+                    UnityEngine.Object.Destroy(this.Owner.DropPassiveItem(this));
                 return;
             }
             if (percentIntact <= 0.7f)

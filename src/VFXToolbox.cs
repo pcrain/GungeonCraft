@@ -434,8 +434,21 @@ namespace CwaffingTheGungy
         {
             // NOTE: might need to also make sure sprite has override material
             if (renderer.material.shader.name != "Brave/Internal/SimpleAlphaFadeUnlit")
-                renderer.material.shader = Shader.Find("Brave/Internal/SimpleAlphaFadeUnlit");
+                renderer.material.shader = ShaderCache.Acquire("Brave/Internal/SimpleAlphaFadeUnlit");
             renderer.material.SetFloat("_Fade", newAlpha);
+
+            // todo: these don't seem to be necessary or to work particularly well
+
+            // if (renderer.sharedMaterial.shader.name != "Brave/Internal/SimpleAlphaFadeUnlit")
+            //     renderer.sharedMaterial.shader = ShaderCache.Acquire("Brave/Internal/SimpleAlphaFadeUnlit");
+            // renderer.sharedMaterial.SetFloat("_Fade", newAlpha);
+
+            // foreach(Material m in renderer.sharedMaterials)
+            // {
+            //     if (m.shader.name != "Brave/Internal/SimpleAlphaFadeUnlit")
+            //         m.shader = ShaderCache.Acquire("Brave/Internal/SimpleAlphaFadeUnlit");
+            //     m.SetFloat("_Fade", newAlpha);
+            // }
         }
     }
 

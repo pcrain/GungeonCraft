@@ -307,5 +307,20 @@ namespace CwaffingTheGungy
     {
       return angle + (Lazy.CoinFlip() ? 1f : -1f) * spread * UnityEngine.Random.value;
     }
+
+
+    // Get a list including all of a players' passives, actives, and guns
+    public static List<PickupObject> AllItems(this PlayerController player)
+    {
+        List<PickupObject> allItems = new();
+        foreach(PickupObject item in player.passiveItems)
+            allItems.Add(item);
+        foreach(PickupObject item in player.activeItems)
+            allItems.Add(item);
+        foreach(PickupObject item in player.inventory.AllGuns)
+            allItems.Add(item);
+        return allItems;
+    }
+
   }
 }

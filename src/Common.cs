@@ -548,6 +548,18 @@ namespace CwaffingTheGungy
                     sprite.UpdateZDepth();
             AkSoundEngine.PostEvent("Play_OBJ_item_pickup_01", gameObject);
         }
+
+        public static DebrisObject MakeDebrisFromSprite(tk2dBaseSprite sprite, Vector3 position, Vector2? initialVelocity = null, float? angularVelocity = null)
+        {
+            GameObject debrisObject = new GameObject("debrisboi");
+                debrisObject.transform.position = position;
+            debrisObject.AddComponent<tk2dSprite>().SetSprite(sprite.collection, sprite.spriteId);
+            // SpeculativeRigidbody rigidbody = fakeDebris.AddComponent<SpeculativeRigidbody>();
+            DebrisObject debris = debrisObject.AddComponent<DebrisObject>();
+            if (initialVelocity.HasValue)
+                debris.Trigger(initialVelocity.Value/*new Vector2(4f, 4f)*/, 1f, angularVelocity ?? 0f);
+            return debris;
+        }
     }
 
     public static class Dissect // reflection helper methods for being a lazy dumdum

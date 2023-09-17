@@ -103,6 +103,7 @@ namespace CwaffingTheGungy
                     CampingSupplies.Init();
                     WeddingRing.Init();
                     GorgunEye.Init();
+                    UtilityVest.Init();
                 #endregion
 
                 #region Guns
