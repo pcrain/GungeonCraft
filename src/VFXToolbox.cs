@@ -114,6 +114,11 @@ namespace CwaffingTheGungy
 
             RegisterVFX("MiniPickup", ResMap.Get("mini_pickup"), 12, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
 
+            RegisterVFX("ZenkaiAura", ResMap.Get("zenkai_aura"), 12, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.4f,
+                emissivePower: 5f, emissiveColour: Color.yellow);
+
+            RegisterVFX("SaiyanSpark", ResMap.Get("saiyan_spark"), 12, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);
+
             laserSightPrefab = LoadHelper.LoadAssetFromAnywhere("assets/resourcesbundle/global vfx/vfx_lasersight.prefab") as GameObject;
         }
 
@@ -434,7 +439,11 @@ namespace CwaffingTheGungy
         {
             // NOTE: might need to also make sure sprite has override material
             if (renderer.material.shader.name != "Brave/Internal/SimpleAlphaFadeUnlit")
+            {
+                if (renderer.gameObject.GetComponent<tk2dSprite>() is tk2dSprite sprite)
+                    sprite.usesOverrideMaterial = true;
                 renderer.material.shader = ShaderCache.Acquire("Brave/Internal/SimpleAlphaFadeUnlit");
+            }
             renderer.material.SetFloat("_Fade", newAlpha);
 
             // todo: these don't seem to be necessary or to work particularly well

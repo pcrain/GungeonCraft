@@ -156,6 +156,9 @@ namespace CwaffingTheGungy
             if (gunDelta.magnitude > _MAX_RETICLE_RANGE)
                 newTargetPos = gunPos + _MAX_RETICLE_RANGE * gunDelta.normalized;
 
+            // if (!GameManager.Instance.Dungeon.data.CheckInBoundsAndValid(newTargetPos.ToVector3ZUp().IntXY(VectorConversions.Floor)))
+            //     return;
+
             if (newTargetPos.GetAbsoluteRoom() != gunPos.GetAbsoluteRoom())
                 return; // aiming outside the room
 
@@ -254,6 +257,7 @@ namespace CwaffingTheGungy
             this._projectile.collidesWithEnemies = false;
             this._projectile.specRigidbody.CollideWithOthers = false;
             this._projectile.specRigidbody.CollideWithTileMap = false;
+            // this._projectile.renderer.sortingOrder = -10;
             StartCoroutine(TakeToTheSkies());
         }
 
@@ -272,7 +276,10 @@ namespace CwaffingTheGungy
         private IEnumerator TakeToTheSkies()
         {
             // Phase 1 / 4 -- become intangible and launch to the skies
-            // this._projectile.sprite.HeightOffGround = 70f;
+            this._projectile.sprite.HeightOffGround = 99f; // max, 100 doesn't render
+            this._projectile.sprite.UpdateZDepth();
+            DepthLookupManager.ProcessRenderer(
+                this._projectile.sprite.renderer, DepthLookupManager.GungeonSortingLayer.FOREGROUND);
 
             Vector2 targetLaunchVelocity = (85f + 10f*UnityEngine.Random.value).ToVector(1f);
             this._projectile.IgnoreTileCollisionsFor(_TIME_TO_REACH_TARGET);

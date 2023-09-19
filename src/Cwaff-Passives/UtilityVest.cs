@@ -32,7 +32,6 @@ namespace CwaffingTheGungy
         {
             base.Pickup(player);
             player.healthHaver.ModifyDamage += this.OnTakeDamage;
-            GetWorstItemWeCanScrapAsArmor();
         }
 
         public override DebrisObject Drop(PlayerController player)

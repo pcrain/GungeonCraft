@@ -18,7 +18,7 @@ namespace CwaffingTheGungy
             ETGModConsole.Commands.AddGroup("gg", delegate (string[] args)
             {
                 LootEngine.SpawnItem(
-                    PickupObjectDatabase.GetById(IDs.Pickups["utility_vest"]).gameObject,
+                    PickupObjectDatabase.GetById(IDs.Pickups["warrior's_gi"]).gameObject,
                     GameManager.Instance.PrimaryPlayer.CenterPosition,
                     Vector2.zero,
                     0);

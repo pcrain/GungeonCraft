@@ -302,6 +302,32 @@ namespace CwaffingTheGungy
       g.GetComponent<tk2dSpriteAnimator>()?.LateUpdate();
     }
 
+    // Add emissiveness to a game object
+    public static void SetGlowiness(this GameObject g, float a)
+    {
+      if (g.GetComponent<tk2dSprite>() is not tk2dSprite sprite)
+        return;
+      sprite.SetGlowiness(a);
+    }
+
+    public static void SetGlowiness(this tk2dSprite sprite, float a, Color? color = null, bool clampBrightness = true)
+    {
+      sprite.usesOverrideMaterial = true;
+      Material m = sprite.renderer.material;
+      m.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+      if (!clampBrightness)
+      {
+        m.DisableKeyword("BRIGHTNESS_CLAMP_ON");
+        m.EnableKeyword("BRIGHTNESS_CLAMP_OFF");
+      }
+      m.SetFloat("_EmissivePower", a);
+      if (color is Color c)
+      {
+        m.SetFloat("_EmissiveColorPower", 1.55f);
+        m.SetColor("_EmissiveColor", c);
+      }
+    }
+
     // Randomly add or subtract an amount from an angle
     public static float AddRandomSpread(this float angle, float spread)
     {
@@ -322,5 +348,18 @@ namespace CwaffingTheGungy
         return allItems;
     }
 
+    // Clamps a float between two numbers (default 0 and 1)
+    public static float Clamp(this float f, float min = 0f, float max = 1f)
+    {
+      return (f < min) ? min : ((f > max) ? max : f);
+    }
+
+    // Check if a player is one hit from death
+    public static bool IsOneHitFromDeath(this PlayerController player)
+    {
+      if (player.ForceZeroHealthState)
+        return player.healthHaver.Armor == 1;
+      return player.healthHaver.GetCurrentHealth() == 0.5f;
+    }
   }
 }

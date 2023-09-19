@@ -104,6 +104,7 @@ namespace CwaffingTheGungy
                     WeddingRing.Init();
                     GorgunEye.Init();
                     UtilityVest.Init();
+                    WarriorsGi.Init();
                 #endregion
 
                 #region Guns
