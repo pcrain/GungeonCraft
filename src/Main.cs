@@ -84,6 +84,7 @@ namespace CwaffingTheGungy
                     BorrowedTime.Init();
                     BulletThatCanKillTheFuture.Init();
                     GunPowderer.Init();
+                    AmazonPrimer.Init();
                 #endregion
 
                 #region Passives

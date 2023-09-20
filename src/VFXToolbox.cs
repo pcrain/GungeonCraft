@@ -119,6 +119,8 @@ namespace CwaffingTheGungy
 
             RegisterVFX("SaiyanSpark", ResMap.Get("saiyan_spark"), 12, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);
 
+            RegisterVFX("PrimeLogo", ResMap.Get("prime_logo_overhead"), 2, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter, emissivePower: 100f);
+
             laserSightPrefab = LoadHelper.LoadAssetFromAnywhere("assets/resourcesbundle/global vfx/vfx_lasersight.prefab") as GameObject;
         }
 
@@ -503,6 +505,7 @@ namespace CwaffingTheGungy
                 this._sprite.renderer.SetAlpha(1.0f - (this._lifeTime - this._fadeStartTime) / this._fadeTotalTime);
         }
 
+        // todo: fading and emission are not simultaneously compatible
         public void Setup(Vector2 velocity, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0, Color? emissiveColor = null)
         {
             this._velocity = (1.0f / C.PIXELS_PER_CELL) * velocity.ToVector3ZisY(0);
@@ -515,20 +518,21 @@ namespace CwaffingTheGungy
             }
             this.transform.parent = parent;
 
-            // if (emissivePower > 0)
-            // {
-            //     this._sprite.usesOverrideMaterial = true;
-            //     Material m = this._sprite.renderer.material;
-            //         m.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-            //         m.SetFloat("_EmissivePower", emissivePower);
+            if (emissivePower > 0)
+            {
+                // this._sprite.usesOverrideMaterial = true;
+                Material m = this._sprite.renderer.material;
+                    m.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+                    m.SetFloat("_EmissivePower", emissivePower);
 
-            //     if (emissiveColor.HasValue)
-            //     {
-            //         m.SetFloat("_EmissiveColorPower", 1.55f);
-            //         m.SetColor("_EmissiveColor", emissiveColor.Value);
-            //         m.SetColor("_OverrideColor", emissiveColor.Value);
-            //     }
-            // }
+                Color emitColor = emissiveColor ?? Color.white;
+                // if (emissiveColor.HasValue)
+                {
+                    m.SetFloat("_EmissiveColorPower", 1.55f);
+                    m.SetColor("_EmissiveColor", emitColor);
+                    m.SetColor("_OverrideColor", emitColor);
+                }
+            }
         }
     }
 

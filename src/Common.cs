@@ -294,9 +294,9 @@ namespace CwaffingTheGungy
         /// <summary>
         /// Post a custom item pickup notification to the bottom of the screen
         /// </summary>
-        public static void CustomNotification(string header, string text)
+        public static void CustomNotification(string header, string text, tk2dBaseSprite sprite = null)
         {
-            var sprite = GameUIRoot.Instance.notificationController.notificationObjectSprite;
+            sprite ??= GameUIRoot.Instance.notificationController.notificationObjectSprite;
             GameUIRoot.Instance.notificationController.DoCustomNotification(
                 header,
                 text,

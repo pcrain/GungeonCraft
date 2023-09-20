@@ -156,6 +156,7 @@
     <Compile Include="src\StandardAPI\GungeonAPI\Dungeon Code\ShrineTools.cs"/>
     <Compile Include="src\StandardAPI\GungeonAPI\Dungeon Code\DungeonHooks.cs"/>
     <Compile Include="src\Common.cs"/>
+    <Compile Include="src\Cwaff-Actives\AmazonPrimer.cs"/>
     <Compile Include="src\Cwaff-Actives\BulletThatCanKillTheFuture.cs"/>
     <Compile Include="src\Cwaff-Actives\GunPowderer.cs"/>
     <Compile Include="src\Cwaff-Actives\BorrowedTime.cs"/>
@@ -968,6 +969,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\drowsy_cloud1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\reticle-white.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\saiyan_spark2.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\prime_logo_overhead.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\GunVFX\RebarGunImpactVFX2_001.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\GunVFX\RebarGunImpactVFX2_004.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\GunVFX\RebarGunImpactVFX2_006.png"/>
@@ -1061,6 +1063,7 @@
     <EmbeddedResource Include="Resources\ItemSprites\zoolander_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\note_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\cozy_camper_icon.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\amazon_primer_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\gyroscope_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\yellow_bandana_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\credit_card_icon.png"/>
