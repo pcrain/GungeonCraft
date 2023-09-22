@@ -59,7 +59,7 @@ namespace CwaffingTheGungy
                 if (this.m_owner.CurrentRoom != lastCheckedRoom)
                 {
                     this.lastCheckedRoom = this.m_owner.CurrentRoom;
-                    this.inBossRoom = CheckIfBossIsPresent();
+                    this.inBossRoom = this.m_owner.InBossRoom();
                 }
                 this.isUsable = !(this.m_owner.InExitCell || this.inBossRoom);
                 if (this.isUsable)
@@ -74,20 +74,6 @@ namespace CwaffingTheGungy
         public override bool CanBeUsed(PlayerController user)
         {
             return this.isUsable && base.CanBeUsed(user);
-        }
-
-        private bool CheckIfBossIsPresent()
-        {
-            if (lastCheckedRoom == null)
-                return false;
-            List<AIActor> activeEnemies =
-                this.m_owner.GetAbsoluteParentRoom().GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
-            for (int i = 0; i < activeEnemies.Count; i++)
-            {
-                if (activeEnemies[i].healthHaver?.IsBoss ?? false)
-                    return true;
-            }
-            return false;
         }
 
         private static List<AIActor> CheckForValidEnemies(PlayerController player)

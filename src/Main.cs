@@ -85,6 +85,7 @@ namespace CwaffingTheGungy
                     BulletThatCanKillTheFuture.Init();
                     GunPowderer.Init();
                     AmazonPrimer.Init();
+                    EmergencySiren.Init();
                 #endregion
 
                 #region Passives

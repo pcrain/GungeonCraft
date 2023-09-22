@@ -361,5 +361,11 @@ namespace CwaffingTheGungy
         return player.healthHaver.Armor == 1;
       return player.healthHaver.GetCurrentHealth() == 0.5f;
     }
+
+    // Check if a player is in a boss room
+    public static bool InBossRoom(this PlayerController player)
+    {
+        return player.GetAbsoluteParentRoom().area.PrototypeRoomCategory == PrototypeDungeonRoom.RoomCategory.BOSS;
+    }
   }
 }

@@ -560,6 +560,11 @@ namespace CwaffingTheGungy
                 debris.Trigger(initialVelocity.Value/*new Vector2(4f, 4f)*/, 1f, angularVelocity ?? 0f);
             return debris;
         }
+
+        public static RoomHandler CurrentRoom()
+        {
+            return GameManager.Instance.PrimaryPlayer.CurrentRoom;
+        }
     }
 
     public static class Dissect // reflection helper methods for being a lazy dumdum

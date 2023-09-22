@@ -160,6 +160,7 @@
     <Compile Include="src\Cwaff-Actives\BulletThatCanKillTheFuture.cs"/>
     <Compile Include="src\Cwaff-Actives\GunPowderer.cs"/>
     <Compile Include="src\Cwaff-Actives\BorrowedTime.cs"/>
+    <Compile Include="src\Cwaff-Actives\EmergencySiren.cs"/>
     <Compile Include="src\Cwaff-Guns\DeathNote.cs"/>
     <Compile Include="src\Cwaff-Guns\VacuumCleaner.cs"/>
     <Compile Include="src\Cwaff-Guns\PopcornGun.cs"/>
