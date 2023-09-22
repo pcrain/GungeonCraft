@@ -47,7 +47,7 @@ namespace CwaffingTheGungy
 
         private void OnDealtDamage(PlayerController source, float damage, bool fatal, HealthHaver enemy)
         {
-            if (_VoodooDollEffectHappening)
+            if (_VoodooDollEffectHappening || !enemy)
                 return; // avoid recursive damage
 
             _VoodooDollEffectHappening = true;
@@ -71,7 +71,7 @@ namespace CwaffingTheGungy
                 other.healthHaver.ApplyDamage(damage, Vector2.zero, "Voodoo Doll", CoreDamageTypes.Magic, DamageCategory.Unstoppable,
                     ignoreInvulnerabilityFrames: true, ignoreDamageCaps: false);
 
-                bool flip =Lazy.CoinFlip();
+                bool flip = Lazy.CoinFlip();
                 Vector2 ppos = flip ? other.sprite.WorldTopRight : other.sprite.WorldTopLeft;
                 GameObject v = SpawnManager.SpawnVFX(_VoodooGhostVFX, ppos, 0f.EulerZ());
                     v.GetComponent<tk2dSprite>().FlipX = flip;
