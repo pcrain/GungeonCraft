@@ -19,9 +19,11 @@ namespace CwaffingTheGungy
     class EmergencySiren : PlayerItem
     {
         public static string ItemName         = "Emergency Siren";
-        public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/gyroscope_icon_old";
+        public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/emergency_siren_icon";
         public static string ShortDescription = "WEE WOO! WEE WOO!";
         public static string LongDescription  = "(Opens locked doors and renders enemies and traps in a room harmless until leaving and returning to it.)";
+
+        private static StatModifier[] _EmergencyMods = null;
 
         private RoomHandler _roomToReset = null;
         private bool _anyEnemyInRoomDied = false;
@@ -33,7 +35,15 @@ namespace CwaffingTheGungy
             item.quality      = PickupObject.ItemQuality.B;
             item.consumable   = false;
             item.CanBeDropped = true;
-            item.SetCooldownType(ItemBuilder.CooldownType.Timed, 3f);
+            item.SetCooldownType(ItemBuilder.CooldownType.Damage, 300f);
+
+            _EmergencyMods = new[] {
+                new StatModifier(){
+                    amount      = 2.00f,
+                    modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
+                    statToBoost = PlayerStats.StatType.MovementSpeed,
+                },
+            };
         }
 
         public override void Pickup(PlayerController player)
@@ -90,14 +100,21 @@ namespace CwaffingTheGungy
             List<AIActor> activeEnemies = room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
             foreach (AIActor enemy in activeEnemies)
             {
+                if (!enemy)
+                    continue; // stupid grenades D:
                 enemy.behaviorSpeculator?.InterruptAndDisable();
                 enemy.knockbackDoer?.SetImmobile(true, "emergency_siren");
-                enemy.specRigidbody.CollideWithOthers = false;
-                enemy.specRigidbody.CollideWithTileMap = false;
-                enemy.healthHaver.IsVulnerable = false;
-                enemy.healthHaver.TriggerInvulnerabilityPeriod(999999f);
+                if (enemy.healthHaver)
+                {
+                    enemy.healthHaver.IsVulnerable = false;
+                    enemy.healthHaver.TriggerInvulnerabilityPeriod(999999f);
+                }
                 if (enemy.specRigidbody)
+                {
+                    enemy.specRigidbody.CollideWithOthers = false;
+                    enemy.specRigidbody.CollideWithTileMap = false;
                     enemy.specRigidbody.OnPreMovement += (SpeculativeRigidbody b) => b.Velocity = Vector2.zero;
+                }
                 enemy.State = AIActor.ActorState.Inactive;
             }
 
@@ -106,20 +123,27 @@ namespace CwaffingTheGungy
                 allProjectiles[num]?.DieInAir();
 
             this._roomToReset = room;
+            this.passiveStatModifiers = _EmergencyMods;
+            user.stats.RecalculateStats(user);
             user.StartCoroutine(AwaitRoomChange(user));
         }
 
         private IEnumerator AwaitRoomChange(PlayerController user)
         {
+            GameObject v = SpawnManager.SpawnVFX(VFX.animations["EmergencySiren"], user.sprite.WorldTopCenter + new Vector2(0f, 0.75f), Quaternion.identity);
+                v.transform.parent = user.transform;
             while (user.CurrentRoom == this._roomToReset)
             {
-                if (this._roomToReset.IsSealed)
-                    this._roomToReset.UnsealRoom(); // failsafe e.g., for grenade enemies
+                Lazy.PlaySoundUntilDeathOrTimeout("siren_sound", v, 0.1f);
                 yield return null;
             }
+            UnityEngine.Object.Destroy(v);
 
             ResetPredefinedRoomForEmergency(this._roomToReset);
             FixDoorsInRoom(this._roomToReset);
+
+            this.passiveStatModifiers = null;
+            user.stats.RecalculateStats(user);
             this._roomToReset = null;
         }
 

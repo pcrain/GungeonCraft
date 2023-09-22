@@ -121,6 +121,8 @@ namespace CwaffingTheGungy
 
             RegisterVFX("PrimeLogo", ResMap.Get("prime_logo_overhead"), 2, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter, emissivePower: 100f);
 
+            RegisterVFX("EmergencySiren", ResMap.Get("siren"), 36, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.75f, emissivePower: 50f);
+
             laserSightPrefab = LoadHelper.LoadAssetFromAnywhere("assets/resourcesbundle/global vfx/vfx_lasersight.prefab") as GameObject;
         }
 
