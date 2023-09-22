@@ -367,5 +367,28 @@ namespace CwaffingTheGungy
     {
         return player.GetAbsoluteParentRoom().area.PrototypeRoomCategory == PrototypeDungeonRoom.RoomCategory.BOSS;
     }
+
+    // Shuffle the elements in a list (or any other enumerable)
+    public static void Shuffle<T>(this IList<T> list)
+    {
+        int n = list.Count;
+        while (n > 1) {
+            n--;
+            int k = UnityEngine.Random.Range(0, n);
+            T value = list[k];
+            list[k] = list[n];
+            list[n] = value;
+        }
+    }
+
+    // Copy and shuffle a list
+    public static List<T> CopyAndShuffle<T>(this List<T> list)
+    {
+      List<T> shuffled = new();
+      foreach (T item in list)
+        shuffled.Add(item);
+      shuffled.Shuffle();
+      return shuffled;
+    }
   }
 }

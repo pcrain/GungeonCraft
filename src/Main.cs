@@ -86,6 +86,7 @@ namespace CwaffingTheGungy
                     GunPowderer.Init();
                     AmazonPrimer.Init();
                     EmergencySiren.Init();
+                    Itemfinder.Init();
                 #endregion
 
                 #region Passives
