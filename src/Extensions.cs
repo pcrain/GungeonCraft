@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -389,6 +390,57 @@ namespace CwaffingTheGungy
         shuffled.Add(item);
       shuffled.Shuffle();
       return shuffled;
+    }
+
+    // Get a numerical quality for a PickupObject
+    public static int QualityGrade (this PickupObject pickup)
+    {
+      switch (pickup.quality)
+      {
+        case PickupObject.ItemQuality.S: return 5;
+        case PickupObject.ItemQuality.A: return 4;
+        case PickupObject.ItemQuality.B: return 3;
+        case PickupObject.ItemQuality.C: return 2;
+        case PickupObject.ItemQuality.D: return 1;
+        default:                         return 0;
+      }
+    }
+
+    // Get the highest quality item in a list
+    public static PickupObject HighestQualityItem<T>(this List<T> pickups) where T : PickupObject
+    {
+      if (pickups == null || pickups.Count == 0)
+        return null;
+      PickupObject best = pickups[0];
+      foreach (PickupObject p in pickups)
+      {
+        if (p.QualityGrade() > best.QualityGrade())
+          best = p;
+      }
+      return best;
+    }
+
+    // Select a random element from an array
+    public static T ChooseRandom<T>(this T[] source)
+    {
+        if (source.Length == 0)
+          return default(T);
+        return source[UnityEngine.Random.Range(0,source.Length)];
+    }
+
+    // Select a random element from a list
+    public static T ChooseRandom<T>(this List<T> source)
+    {
+        if (source == null || source.Count == 0)
+          return default(T);
+        return source[UnityEngine.Random.Range(0,source.Count)];
+    }
+
+    // Select a random element from an enum
+    public static T ChooseRandom<T>() where T : Enum
+    {
+        var v = Enum.GetValues(typeof (T));
+        return (T) v.GetValue(UnityEngine.Random.Range(0,v.Length));
     }
   }
 }
