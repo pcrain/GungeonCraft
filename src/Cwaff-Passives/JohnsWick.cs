@@ -20,14 +20,16 @@ namespace CwaffingTheGungy
         public static string ItemName         = "John's Wick";
         public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/johns_wick_icon";
         public static string ShortDescription = "No Dogs Harmed";
-        public static string LongDescription  = "(Move faster and do triple damage while on fire; take damage from fire more slowly.)";
+        public static string LongDescription  = "(Move faster and do double damage while on fire; take damage from fire more slowly.)";
 
-        private float lastFireMeterValue = 0f;
-        private const float MAX_FIRE_INCREASE = 0.166f; // base game increases by 0.66f
+        private const float _FIRE_TIMER_MULT = 0.25f;
+        private const float _MOVEMENT_BOOST  = 5f;
+        private const float _DAMAGE_BOOST    = 2f;
 
-        private bool flaming = false;
-        private StatModifier[] flameOn = null;
-        private StatModifier[] flameOff = null;
+        private bool                 _wasOnFire          = false;
+        private StatModifier[]       _flameOn            = null;
+        private StatModifier[]       _flameOff           = null;
+        private DamageTypeModifier   _fireResistance     = null;
 
         public static void Init()
         {
@@ -35,64 +37,73 @@ namespace CwaffingTheGungy
             item.quality       = PickupObject.ItemQuality.C;
         }
 
+        private void OnFirstPickup()
+        {
+            this._flameOff = new StatModifier[]{};
+            StatModifier s1 = new StatModifier {
+                amount      = _MOVEMENT_BOOST,
+                statToBoost = PlayerStats.StatType.MovementSpeed,
+                modifyType  = StatModifier.ModifyMethod.ADDITIVE };
+            StatModifier s2 = new StatModifier {
+                amount      = _DAMAGE_BOOST,
+                statToBoost = PlayerStats.StatType.Damage,
+                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE };
+            this._flameOn = (new StatModifier[] { s1, s2 }).ToArray();
+            this._wasOnFire = false;
+            this._fireResistance = new DamageTypeModifier {
+                damageType = CoreDamageTypes.Fire,
+                damageMultiplier = _FIRE_TIMER_MULT,
+            };
+        }
+
         public override void Pickup(PlayerController player)
         {
+            if (!this.m_pickedUpThisRun)
+                OnFirstPickup();
             base.Pickup(player);
-            flameOff ??= (new StatModifier[] {}).ToArray();
-            if (flameOn == null)
-            {
-                StatModifier s1 = new StatModifier {
-                    amount      = 5f,
-                    statToBoost = PlayerStats.StatType.MovementSpeed,
-                    modifyType  = StatModifier.ModifyMethod.ADDITIVE };
-                StatModifier s2 = new StatModifier {
-                    amount      = 3f,
-                    statToBoost = PlayerStats.StatType.Damage,
-                    modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE };
-                flameOn = (new StatModifier[] { s1, s2 }).ToArray();
-            }
-            this.flaming = false;
-            this.passiveStatModifiers = flameOff;
+
+            this.passiveStatModifiers = _flameOff;
             player.PostProcessProjectile += this.PostProcessProjectile;
-            lastFireMeterValue = player.CurrentFireMeterValue;
+            if (!player.healthHaver.damageTypeModifiers.Contains(this._fireResistance))
+                player.healthHaver.damageTypeModifiers.Add(this._fireResistance);
         }
 
         public override DebrisObject Drop(PlayerController player)
         {
             player.PostProcessProjectile -= this.PostProcessProjectile;
+            if (player.healthHaver.damageTypeModifiers.Contains(this._fireResistance))
+                player.healthHaver.damageTypeModifiers.Remove(this._fireResistance);
             return base.Drop(player);
         }
 
         private void PostProcessProjectile(Projectile proj, float effectChanceScalar)
         {
-            if (!(this.Owner && this.flaming))
+            if (!(this.Owner && this._wasOnFire))
                 return;
-            proj.StartCoroutine(GetWickedCR(proj.specRigidbody));
+            proj.StartCoroutine(GetWicked(proj.specRigidbody));
         }
 
-        private IEnumerator GetWickedCR(SpeculativeRigidbody s)
+        private IEnumerator GetWicked(SpeculativeRigidbody s, bool once = false)
         {
+            const int   NUM                = 1;
+            const float ANGLE_VARIANCE     = 15f;
+            const float BASE_MAGNITUDE     = 2.25f;
+            const float MAGNITUDE_VARIANCE = 1f;
+            Color? startColor              = Color.blue;
             while (s)
             {
-                GetWicked(s);
+                Vector3 minPosition = s.HitboxPixelCollider.UnitBottomLeft.ToVector3ZisY();
+                Vector3 maxPosition = s.HitboxPixelCollider.UnitTopRight.ToVector3ZisY();
+                GlobalSparksDoer.DoRadialParticleBurst(
+                  NUM, minPosition, maxPosition, ANGLE_VARIANCE, BASE_MAGNITUDE, MAGNITUDE_VARIANCE,
+                  startColor: startColor,
+                  startLifetime: 0.5f,
+                  systemType: GlobalSparksDoer.SparksType.STRAIGHT_UP_GREEN_FIRE/*EMBERS_SWIRLING*/
+                  );
+                if (once)
+                    yield break;
                 yield return null;
             }
-        }
-
-        private void GetWicked(SpeculativeRigidbody s)
-        {
-            int num = 1;
-            Vector3 minPosition = s.HitboxPixelCollider.UnitBottomLeft.ToVector3ZisY();
-            Vector3 maxPosition = s.HitboxPixelCollider.UnitTopRight.ToVector3ZisY();
-            float angleVariance = 15f;
-            float baseMagnitude = 2.25f;
-            float magnitudeVariance = 1f;
-            Color? startColor = Color.blue;
-            GlobalSparksDoer.DoRadialParticleBurst(
-              num, minPosition, maxPosition, angleVariance, baseMagnitude, magnitudeVariance,
-              startColor: startColor,
-              startLifetime: 0.5f,
-              systemType: GlobalSparksDoer.SparksType.STRAIGHT_UP_GREEN_FIRE/*EMBERS_SWIRLING*/);
         }
 
         public override void Update()
@@ -102,27 +113,14 @@ namespace CwaffingTheGungy
             if (!this.Owner)
                 return;
 
-            float maxCurrentFireMeterValue = lastFireMeterValue + (MAX_FIRE_INCREASE * BraveTime.DeltaTime);
-            this.Owner.CurrentFireMeterValue = Mathf.Min(this.Owner.CurrentFireMeterValue,maxCurrentFireMeterValue);
-            lastFireMeterValue = this.Owner.CurrentFireMeterValue;
-
-            if (!this.Owner.IsOnFire)
+            if (this._wasOnFire != this.Owner.IsOnFire)
             {
-                if (this.flaming)
-                {
-                    this.flaming = false;
-                    this.passiveStatModifiers = flameOff;
-                    this.Owner.stats.RecalculateStats(this.Owner, false, false);
-                }
-                return;
-            }
-            if (!this.flaming)
-            {
-                this.flaming = true;
-                this.passiveStatModifiers = flameOn;
+                this._wasOnFire           = this.Owner.IsOnFire;
+                this.passiveStatModifiers = this.Owner.IsOnFire ? _flameOn : _flameOff;
                 this.Owner.stats.RecalculateStats(this.Owner, false, false);
             }
-            GetWicked(this.Owner.specRigidbody);
+            if (this.Owner.IsOnFire)
+                this.Owner.StartCoroutine(GetWicked(this.Owner.specRigidbody, once: true));
         }
     }
 }

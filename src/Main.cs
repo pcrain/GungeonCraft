@@ -95,7 +95,7 @@ namespace CwaffingTheGungy
                     // Superstitious.Init(); unfinished
                     DriftersHeadgear.Init();
                     // Siphon.Init(); unfinished
-                    ZoolandersDiary.Init();
+                    // ZoolandersDiary.Init(); unfinished / mediocre
                     RatPoison.Init();
                     JohnsWick.Init();
                     Gyroscope.Init();

@@ -1102,6 +1102,7 @@
     <EmbeddedResource Include="Resources\ItemSprites\gyroscope_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\emergency_siren_icon (copy 1).png"/>
     <EmbeddedResource Include="Resources\ItemSprites\emergency_siren_icon.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\johns_wick_icon_old.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\yellow_bandana_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\credit_card_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\gun_powderer_icon.png"/>
