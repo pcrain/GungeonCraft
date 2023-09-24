@@ -111,6 +111,7 @@ namespace CwaffingTheGungy
                     UtilityVest.Init();
                     WarriorsGi.Init();
                     CatEarHeadband.Init();
+                    Blazer.Init();
                 #endregion
 
                 #region Guns
