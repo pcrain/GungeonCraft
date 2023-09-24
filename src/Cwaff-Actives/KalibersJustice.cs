@@ -244,6 +244,14 @@ namespace CwaffingTheGungy
                     break;
             }
 
+            GameObject vfx =
+                (ItemHelper.Get(Items.MagicLamp) as Gun).DefaultModule.projectiles[0].hitEffects.tileMapVertical.effects[0].effects[0].effect;
+            for (int i = 0; i < 8; ++i)
+            {
+                float angle = 45f * i;
+                SpawnManager.SpawnVFX(vfx, where + angle.ToVector(1.5f), Quaternion.identity);
+            }
+
             AkSoundEngine.PostEvent("Play_OBJ_dice_bless_01", user.gameObject);
             Lazy.CustomNotification(
                 "Kaliber's Justice",
