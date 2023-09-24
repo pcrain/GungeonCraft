@@ -56,10 +56,10 @@ namespace CwaffingTheGungy
             List<Need> enough    = new();
             List<Need> plenty    = new();
             List<Need> excessive = new();
-            ETGModConsole.Log($"checking needs");
+            // ETGModConsole.Log($"checking needs");
             foreach (Need need in needs)
             {
-                ETGModConsole.Log($"  user's need for {need.type} is {need.status}");
+                // ETGModConsole.Log($"  user's need for {need.type} is {need.status}");
                 switch(need.status)
                 {
                     case NeedStatus.Minimal:   minimal.Add(need);   break;
@@ -102,17 +102,17 @@ namespace CwaffingTheGungy
                 ETGModConsole.Log($"player has way too much stuff o.o"); // maybe just give them money or something
         }
 
-        private void DoTrade(PlayerController user, List<Need> giveList, List<Need> receiveList, bool big)
+        private void DoTrade(PlayerController user, List<Need> offerList, List<Need> receiveList, bool big)
         {
             if ((receiveList?.Count ?? 0) == 0)
                 return; // this should never happen, but bail out just in case
 
             // Figure out what item we're giving and give it
-            Need? whatToGive = null;
-            if ((giveList?.Count ?? 0) > 0)
+            Need? whatToOffer = null;
+            if ((offerList?.Count ?? 0) > 0)
             {
-                whatToGive = giveList.ChooseRandom<Need>();
-                switch(whatToGive.Value.type)
+                whatToOffer = offerList.ChooseRandom<Need>();
+                switch(whatToOffer.Value.type)
                 {
                     case NeedType.Health:
                         user.healthHaver.ApplyDamage(big ? 3.5f : 2.0f, Vector2.zero, "Balance", CoreDamageTypes.None, DamageCategory.Unstoppable);
@@ -196,58 +196,74 @@ namespace CwaffingTheGungy
             switch(whatToReceive.type)
             {
                 case NeedType.Health:
-                    LootEngine.SpawnItem(ItemHelper.Get(big ? Items.HeartSynthesizer : Items.HeartHolster).gameObject, where, Vector2.zero, 0f, true, true, false);
+                    LootEngine.SpawnItem(ItemHelper.Get(big ? Items.HeartSynthesizer : Items.HeartHolster).gameObject, SpotNear(where), Vector2.zero, 0f, true, true, false);
+                    for (int i = 0; i < 3; ++i)
+                        LootEngine.SpawnItem(ItemHelper.Get(Items.Heart).gameObject, SpotNear(where), Vector2.zero, 0f, true, true, false);
                     break;
                 case NeedType.Armor:
-                    LootEngine.SpawnItem(ItemHelper.Get(big ? Items.ArmorSynthesizer : Items.Nanomachines).gameObject, where, Vector2.zero, 0f, true, true, false);
+                    LootEngine.SpawnItem(ItemHelper.Get(big ? Items.ArmorSynthesizer : Items.Nanomachines).gameObject, SpotNear(where), Vector2.zero, 0f, true, true, false);
+                    for (int i = 0; i < 2; ++i)
+                        LootEngine.SpawnItem(ItemHelper.Get(Items.Armor).gameObject, SpotNear(where), Vector2.zero, 0f, true, true, false);
                     break;
                 case NeedType.Money:
                     if (big)
-                        LootEngine.SpawnItem(ItemHelper.Get(Items.BriefcaseOfCash).gameObject, where, Vector2.zero, 0f, true, true, false);
+                        LootEngine.SpawnItem(ItemHelper.Get(Items.BriefcaseOfCash).gameObject, SpotNear(where), Vector2.zero, 0f, true, true, false);
                     else
-                        LootEngine.SpawnCurrency(where, 70, false, null, null);
+                        LootEngine.SpawnCurrency(SpotNear(where), 70, false, null, null);
                     break;
                 case NeedType.Keys:
-                    LootEngine.SpawnItem(ItemHelper.Get(big ? Items.Akey47 : Items.ShelletonKey).gameObject, where, Vector2.zero, 0f, true, true, false);
+                    LootEngine.SpawnItem(ItemHelper.Get(big ? Items.Akey47 : Items.ShelletonKey).gameObject, SpotNear(where), Vector2.zero, 0f, true, true, false);
                     break;
                 case NeedType.Blanks:
-                    LootEngine.SpawnItem(ItemHelper.Get(big ? Items.ElderBlank : Items.BlankBullets).gameObject, where, Vector2.zero, 0f, true, true, false);
+                    LootEngine.SpawnItem(ItemHelper.Get(big ? Items.ElderBlank : Items.BlankBullets).gameObject, SpotNear(where), Vector2.zero, 0f, true, true, false);
+                    for (int i = 0; i < (big ? 4 : 2); ++i)
+                        LootEngine.SpawnItem(ItemHelper.Get(Items.Blank).gameObject, SpotNear(where), Vector2.zero, 0f, true, true, false);
                     break;
                 case NeedType.Ammo:
-                    LootEngine.SpawnItem(ItemHelper.Get(big ? Items.AmmoSynthesizer : Items.MagazineRack).gameObject, where, Vector2.zero, 0f, true, true, false);
+                    LootEngine.SpawnItem(ItemHelper.Get(big ? Items.AmmoSynthesizer : Items.MagazineRack).gameObject, SpotNear(where), Vector2.zero, 0f, true, true, false);
+                    for (int i = 0; i < (big ? 2 : 1); ++i)
+                        LootEngine.SpawnItem(ItemHelper.Get(Items.PartialAmmo).gameObject, SpotNear(where), Vector2.zero, 0f, true, true, false);
                     break;
                 case NeedType.Guns:
                     PickupObject.ItemQuality qg = Lazy.CoinFlip()
-                        ? (big ? PickupObject.ItemQuality.S : PickupObject.ItemQuality.A)
-                        : (big ? PickupObject.ItemQuality.B : PickupObject.ItemQuality.C);
-                    LootEngine.SpawnItem(GameManager.Instance.RewardManager.GetItemForPlayer(user, GameManager.Instance.RewardManager.GunsLootTable, qg, null).gameObject, where, Vector2.zero, 0f, true, true, false);
+                        ? (big ? PickupObject.ItemQuality.S : PickupObject.ItemQuality.B)
+                        : (big ? PickupObject.ItemQuality.A : PickupObject.ItemQuality.C);
+                    LootEngine.SpawnItem(GameManager.Instance.RewardManager.GetItemForPlayer(
+                        user, GameManager.Instance.RewardManager.GunsLootTable, qg, null).gameObject, SpotNear(where), Vector2.zero, 0f, true, true, false);
                     break;
                 case NeedType.Passives: // TODO: can spawn actives too since it just uses the ItemsLootTable
                     PickupObject.ItemQuality qp = Lazy.CoinFlip()
-                        ? (big ? PickupObject.ItemQuality.S : PickupObject.ItemQuality.A)
-                        : (big ? PickupObject.ItemQuality.B : PickupObject.ItemQuality.C);
-                    LootEngine.SpawnItem(GameManager.Instance.RewardManager.GetItemForPlayer(user, GameManager.Instance.RewardManager.ItemsLootTable, qp, null).gameObject, where, Vector2.zero, 0f, true, true, false);
+                        ? (big ? PickupObject.ItemQuality.S : PickupObject.ItemQuality.B)
+                        : (big ? PickupObject.ItemQuality.A : PickupObject.ItemQuality.C);
+                    LootEngine.SpawnItem(GameManager.Instance.RewardManager.GetItemForPlayer(
+                        user, GameManager.Instance.RewardManager.ItemsLootTable, qp, null).gameObject, SpotNear(where), Vector2.zero, 0f, true, true, false);
                     break;
                 case NeedType.Actives:
-                    LootEngine.SpawnItem(ItemHelper.Get(Items.Backpack).gameObject, where, Vector2.zero, 0f, true, true, false);
-                    LootEngine.SpawnItem(ItemHelper.Get(big ? Items.Relodestone : Items.PortableTurret).gameObject, where, Vector2.zero, 0f, true, true, false);
+                    LootEngine.SpawnItem(ItemHelper.Get(Items.Backpack).gameObject, SpotNear(where), Vector2.zero, 0f, true, true, false);
+                    LootEngine.SpawnItem(ItemHelper.Get(big ? Items.Relodestone : Items.PortableTurret).gameObject, SpotNear(where), Vector2.zero, 0f, true, true, false);
                     break;
             }
 
+            AkSoundEngine.PostEvent("Play_OBJ_dice_bless_01", user.gameObject);
             Lazy.CustomNotification(
                 "Kaliber's Justice",
-                $"Gave {whatToGive?.type ?? NeedType.Nothing}, Received {whatToReceive.type}",
+                $"Offered {whatToOffer?.type ?? NeedType.Nothing}, Received {whatToReceive.type}",
                 this.sprite);
         }
 
-        private void DoBigTrade(PlayerController user, List<Need> giveList, List<Need> receiveList)
+        private static Vector2 SpotNear(Vector2 where)
         {
-            DoTrade(user, giveList, receiveList, true);
+            return where + Lazy.RandomVector(0.75f);
         }
 
-        private void DoModerateTrade(PlayerController user, List<Need> giveList, List<Need> receiveList)
+        private void DoBigTrade(PlayerController user, List<Need> offerList, List<Need> receiveList)
         {
-            DoTrade(user, giveList, receiveList, false);
+            DoTrade(user, offerList, receiveList, true);
+        }
+
+        private void DoModerateTrade(PlayerController user, List<Need> offerList, List<Need> receiveList)
+        {
+            DoTrade(user, offerList, receiveList, false);
         }
 
         private List<Need> GetItemNeeds(PlayerController user)
