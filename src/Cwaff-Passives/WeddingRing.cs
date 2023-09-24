@@ -75,7 +75,7 @@ namespace CwaffingTheGungy
         {
             this._commitmentMult = reset ? 1.00f : Mathf.Min(this._commitmentMult + _BONUS_PER_KILL, _MAX_BONUS);
             foreach (StatModifier stat in this.passiveStatModifiers)
-                stat.amount = this._commitmentMult;
+                stat.amount = (stat.statToBoost == PlayerStats.StatType.ReloadSpeed) ? (1.0f / this._commitmentMult) : this._commitmentMult;
             player.stats.RecalculateStats(player);
         }
 
