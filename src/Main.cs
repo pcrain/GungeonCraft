@@ -112,6 +112,7 @@ namespace CwaffingTheGungy
                     WarriorsGi.Init();
                     CatEarHeadband.Init();
                     Blazer.Init();
+                    PlotArmor.Init();
                 #endregion
 
                 #region Guns

@@ -43,6 +43,7 @@
     <Compile Include="src\Cwaff-Passives\Siphon.cs"/>
     <Compile Include="src\Cwaff-Passives\Shine.cs"/>
     <Compile Include="src\Cwaff-Passives\DriftersHeadgear.cs"/>
+    <Compile Include="src\Cwaff-Passives\PlotArmor.cs"/>
     <Compile Include="src\Cwaff-Passives\RatPoison.cs"/>
     <Compile Include="src\Cwaff-Passives\BlankChecks.cs"/>
     <Compile Include="src\Cwaff-Passives\LibraryCardtridge.cs"/>
@@ -1088,6 +1089,7 @@
     <EmbeddedResource Include="Resources\ItemSprites\drifters_headgear_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\future_killing_bullet_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\library_cardtridge_icon.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\plot_armor_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\wedding_ring_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\dead_ringer_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\88888888_icon.png"/>
