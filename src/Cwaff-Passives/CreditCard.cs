@@ -22,12 +22,12 @@ namespace CwaffingTheGungy
         public static string ShortDescription = "Shop 'til You Drop";
         public static string LongDescription  = "(Grants 500 shells. Grants 1 curse for every 50 shells below 500. Grants 1 coolness for every 50 shells above 500.)";
 
-        private const int BASE_CREDIT = 500;
-        private const int CREDIT_DELTA = 50;
+        internal const int _BASE_CREDIT  = 500;
+        internal const int _CREDIT_DELTA = 50;
 
-        private int oldCurrency = 0;
+        private int oldCurrency       = 0;
         private StatModifier curseMod = null;
-        private StatModifier coolMod = null;
+        private StatModifier coolMod  = null;
 
         public static void Init()
         {
@@ -51,14 +51,14 @@ namespace CwaffingTheGungy
             }
 
             base.Pickup(player);
-            oldCurrency = BASE_CREDIT;
-            GameManager.Instance.PrimaryPlayer.carriedConsumables.Currency += BASE_CREDIT;
+            oldCurrency = _BASE_CREDIT;
+            GameManager.Instance.PrimaryPlayer.carriedConsumables.Currency += _BASE_CREDIT;
             UpdateCreditScore();
         }
 
         public override DebrisObject Drop(PlayerController player)
         {
-            GameManager.Instance.PrimaryPlayer.carriedConsumables.Currency -= BASE_CREDIT;
+            GameManager.Instance.PrimaryPlayer.carriedConsumables.Currency -= _BASE_CREDIT;
             return base.Drop(player);
         }
 
@@ -76,12 +76,10 @@ namespace CwaffingTheGungy
             if (oldCurrency == newCurrency)
                 return;
 
-            int newCurse = (newCurrency > BASE_CREDIT) ? 0 : ((BASE_CREDIT - newCurrency) / CREDIT_DELTA);
-            int newCool  = (newCurrency < BASE_CREDIT) ? 0 : ((newCurrency - BASE_CREDIT) / CREDIT_DELTA);
-            curseMod.amount = newCurse;
-            coolMod.amount = newCool;
+            this.CanBeDropped = (newCurrency >= _BASE_CREDIT);
+            curseMod.amount   = (newCurrency > _BASE_CREDIT) ? 0 : ((_BASE_CREDIT - newCurrency) / _CREDIT_DELTA);
+            coolMod.amount    = (newCurrency < _BASE_CREDIT) ? 0 : ((newCurrency - _BASE_CREDIT) / _CREDIT_DELTA);
             this.Owner.stats.RecalculateStats(this.Owner);
-            this.CanBeDropped = (newCurrency >= BASE_CREDIT);
         }
     }
 }
