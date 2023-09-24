@@ -85,9 +85,8 @@ namespace CwaffingTheGungy
                 || room.area.IsProceduralRoom || !user.IsInCombat || !room.IsSealed || !room.EverHadEnemies)
                 return false; // can only be used in sealed rooms with non-boss enemies before firing a gun or killing any enemy
 
-            foreach (AIActor enemy in room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All))
-                if (!enemy.isActiveAndEnabled || !enemy.IsValid || !enemy.HasBeenAwoken)
-                    return false; // cannot use while enemies are actively awakening
+            if (room.NewWaveOfEnemiesIsSpawning())
+                return false; // cannot use while enemies are actively awakening
 
             return base.CanBeUsed(user);
         }

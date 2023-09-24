@@ -20,76 +20,48 @@ namespace CwaffingTheGungy
         public static string ItemName         = "Bullet That Can Kill the Future";
         public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/future_killing_bullet_icon";
         public static string ShortDescription = "Seriously, Don't Miss";
-        public static string LongDescription  = "(enemy will not spawn for the rest of the run)";
+        public static string LongDescription  = "(Any enemy shot with "+ItemName+" will not spawn for the rest of the run)";
 
-        private PlayerController m_owner = null;
-        private RoomHandler lastCheckedRoom = null;
-        private bool inBossRoom = false;
-        private bool isUsable = false;
-        private List<AIActor> validEnemies = new List<AIActor>{};
+        internal static tk2dBaseSprite _Sprite = null;
+
+        private PlayerController _owner = null;
 
         public static void Init()
         {
-            PlayerItem item = Lazy.SetupActive<BulletThatCanKillTheFuture>(ItemName, SpritePath, ShortDescription, LongDescription);
-            item.quality    = PickupObject.ItemQuality.C;
-
-            //Set the cooldown type and duration of the cooldown
-            ItemBuilder.SetCooldownType(item, ItemBuilder.CooldownType.PerRoom, 1);
+            PlayerItem item   = Lazy.SetupActive<BulletThatCanKillTheFuture>(ItemName, SpritePath, ShortDescription, LongDescription);
+            item.quality      = PickupObject.ItemQuality.C;
             item.consumable   = true;
             item.quality      = ItemQuality.S;
             item.CanBeDropped = true;
+
+            _Sprite = item.sprite;
         }
 
         public override void Pickup(PlayerController player)
         {
-            this.m_owner = player;
             base.Pickup(player);
+            this._owner = player;
         }
 
         public override void OnPreDrop(PlayerController player)
         {
-            this.m_owner = null;
+            this._owner = null;
             base.OnPreDrop(player);
-        }
-
-        public override void Update()
-        {
-            if (this.m_owner)
-            {
-                if (this.m_owner.CurrentRoom != lastCheckedRoom)
-                {
-                    this.lastCheckedRoom = this.m_owner.CurrentRoom;
-                    this.inBossRoom = this.m_owner.InBossRoom();
-                }
-                this.isUsable = !(this.m_owner.InExitCell || this.inBossRoom);
-                if (this.isUsable)
-                {
-                    this.validEnemies = CheckForValidEnemies(this.m_owner);
-                    this.isUsable = this.validEnemies.Count > 0;
-                }
-            }
-            base.Update();
         }
 
         public override bool CanBeUsed(PlayerController user)
         {
-            return this.isUsable && base.CanBeUsed(user);
+            return user.IsInCombat && user.CurrentRoom.IsSealed && !user.InBossRoom()
+                && !user.CurrentRoom.NewWaveOfEnemiesIsSpawning() && base.CanBeUsed(user);
         }
 
         private static List<AIActor> CheckForValidEnemies(PlayerController player)
         {
-            List<AIActor> candidates = new List<AIActor>();
+            List<AIActor> candidates    = new List<AIActor>();
             List<AIActor> activeEnemies = player.GetAbsoluteParentRoom().GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
-            if (activeEnemies == null || activeEnemies.Count == 0)
-                return candidates;
-
-            for (int i = 0; i < activeEnemies.Count; i++)
-            {
-                AIActor otherEnemy = activeEnemies[i];
-                if (!(otherEnemy && otherEnemy.specRigidbody && otherEnemy.healthHaver) || otherEnemy.IsGone || otherEnemy.healthHaver.IsBoss)
-                    continue;
-                candidates.Add(otherEnemy);
-            }
+            foreach (AIActor otherEnemy in activeEnemies)
+                if (otherEnemy.IsAliveAndNotABoss())
+                    candidates.Add(otherEnemy);
             return candidates;
         }
 
@@ -127,7 +99,7 @@ namespace CwaffingTheGungy
             // Extra stuff to make this work properly outside the intended cutscene
             Pixelator.Instance.DoFinalNonFadedLayer = true;
             Pixelator.Instance.DoRenderGBuffer = true;
-            interactor.SetInputOverride("future");
+            interactor.SetInputOverride(ItemName);
             interactor.specRigidbody.CollideWithTileMap = false;
             interactor.specRigidbody.CollideWithOthers = false;
 
@@ -136,13 +108,12 @@ namespace CwaffingTheGungy
             List<AIActor> curEnemies = CheckForValidEnemies(interactor);
             foreach (AIActor a in curEnemies)
             {
-                if (a.healthHaver.IsDead)
+                if (a.healthHaver.IsDead || !a.specRigidbody)
                     continue;
                 frozenEnemies[a] = a.State;
                 a.State = AIActor.ActorState.Inactive;
-                a.specRigidbody.OnPreMovement = (Action<SpeculativeRigidbody>)Delegate.Combine(a.specRigidbody.OnPreMovement, new Action<SpeculativeRigidbody>(FreezeInPlace));
-                if ((bool)a.knockbackDoer)
-                    a.knockbackDoer.SetImmobile(true, "future");
+                a.specRigidbody.OnPreMovement += FreezeInPlace;
+                a.knockbackDoer?.SetImmobile(true, ItemName);
             }
 
             // Do normal crosshair logic minus some unneeded steps
@@ -163,26 +134,20 @@ namespace CwaffingTheGungy
             while (elapsed < duration)
             {
                 // UpdateCameraPositionDuringClockhair(interactor.CenterPosition);
-                if (GameManager.INVARIANT_DELTA_TIME == 0f)
-                {
-                    elapsed += 0.05f;
-                }
-                elapsed += GameManager.INVARIANT_DELTA_TIME;
+                elapsed += Mathf.Max(0.05f,GameManager.INVARIANT_DELTA_TIME);
                 float t = elapsed / duration;
                 float smoothT = Mathf.SmoothStep(0f, 1f, t);
                 clockhairTargetPosition = GetTargetClockhairPosition(currentInput, clockhairTargetPosition);
                 Vector3 currentPosition = Vector3.Slerp(clockhairStartPosition, clockhairTargetPosition, smoothT);
                 clockhairTransform.position = currentPosition.WithZ(0f);
                 if (t > 0.5f)
-                {
                     clockhair.renderer.enabled = true;
-                }
                 if (t > 0.75f)
                 {
                     clockhair.hourAnimator.GetComponent<Renderer>().enabled = true;
                     clockhair.minuteAnimator.GetComponent<Renderer>().enabled = true;
                     clockhair.secondAnimator.GetComponent<Renderer>().enabled = true;
-                    GameCursorController.CursorOverride.SetOverride("future", true);
+                    GameCursorController.CursorOverride.SetOverride(ItemName, true);
                 }
                 clockhair.sprite.UpdateZDepth();
                 PointGunAtClockhair(interactor, clockhairTransform);
@@ -252,15 +217,15 @@ namespace CwaffingTheGungy
 
             // Figure out closest enemy to the crosshair and wipe them off the face of the earth
             AIActor victim = null;
-            float victimDistance = 3f;  //start with a maximum distance
+            float victimDistance = 8f;  //start with a maximum distance
             foreach (AIActor a in frozenEnemies.Keys)
             {
+                if (!a || !a.healthHaver || a.healthHaver.IsDead || !a.specRigidbody)
+                    continue;
                 a.State = frozenEnemies[a];
-                a.specRigidbody.OnPreMovement = (Action<SpeculativeRigidbody>)Delegate.Remove(a.specRigidbody.OnPreMovement, new Action<SpeculativeRigidbody>(FreezeInPlace));
-                if ((bool)a.knockbackDoer)
-                    a.knockbackDoer.SetImmobile(false, "future");
+                a.specRigidbody.OnPreMovement -= FreezeInPlace;
+                a.knockbackDoer?.SetImmobile(false, ItemName);
                 float dist = Vector2.Distance(clockhair.transform.PositionVector2(),a.transform.PositionVector2());
-                ETGModConsole.Log("found distance of "+dist);
                 if (dist < victimDistance)
                 {
                     victim = a;
@@ -270,20 +235,30 @@ namespace CwaffingTheGungy
             if (victim != null)
             {
                 CwaffToolbox.enemyWithoutAFuture = victim.EnemyGuid;
-                Lazy.CustomNotification("Future Erased",victim.GetActorName());
-                ETGModConsole.Log("future erased for "+victim.EnemyGuid);
+                Lazy.CustomNotification("Future Erased", victim.GetActorName(), _Sprite);
+                // ETGModConsole.Log("future erased for "+victim.EnemyGuid);
                 VFXPool vfx = VFX.CreatePoolFromVFXGameObject((ItemHelper.Get(Items.MagicLamp) as Gun
                     ).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
                     vfx.SpawnAtPosition(
                         victim.sprite.WorldCenter.ToVector3ZisY(-1f), /* -1 = above player sprite */
                         0, null, null, null, -0.05f);
-                victim.healthHaver.ApplyDamage(10000f,Vector2.zero,"Future Bullet",ignoreDamageCaps: true);
+
+                foreach (AIActor a in StaticReferenceManager.AllEnemies)
+                {
+                    if (a.EnemyGuid != victim.EnemyGuid)
+                        continue;
+                    if (!a.IsAliveAndNotABoss())
+                        continue;
+
+                    CwaffToolbox.Memorialize(a);
+                    UnityEngine.Object.Destroy(a.gameObject);
+                }
+
+                victim.healthHaver.ApplyDamage(10000f,Vector2.zero,"Future Bullet",
+                    damageTypes: CoreDamageTypes.Void, damageCategory: DamageCategory.Unstoppable, ignoreDamageCaps: true);
             }
             else
-            {
-                // TODO: make fun of the player for wasting the bullet
-                // Lazy.CustomNotification("You Missed","");
-            }
+                Lazy.CustomNotification("You Missed","Better Luck Next Time", _Sprite);
 
             // finish up the base original script
             BraveInput.DoSustainedScreenShakeVibration(0f);
@@ -296,14 +271,13 @@ namespace CwaffingTheGungy
             clockhair.hourAnimator.GetComponent<Renderer>().enabled = false;
             clockhair.minuteAnimator.GetComponent<Renderer>().enabled = false;
             clockhair.secondAnimator.GetComponent<Renderer>().enabled = false;
-
             yield return null;
 
             // clean up our mess
-            interactor.ClearInputOverride("future");
+            interactor.ClearInputOverride(ItemName);
             interactor.specRigidbody.CollideWithTileMap = true;
             interactor.specRigidbody.CollideWithOthers = true;
-            GameCursorController.CursorOverride.RemoveOverride("future");
+            GameCursorController.CursorOverride.RemoveOverride(ItemName);
             Pixelator.Instance.DoFinalNonFadedLayer = false;
             yield return new WaitForSeconds(0.5f);
 

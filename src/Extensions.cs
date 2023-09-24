@@ -442,5 +442,14 @@ namespace CwaffingTheGungy
         var v = Enum.GetValues(typeof (T));
         return (T) v.GetValue(UnityEngine.Random.Range(0,v.Length));
     }
+
+    // Check if enemies are actively spawning in a room
+    public static bool NewWaveOfEnemiesIsSpawning(this RoomHandler room)
+    {
+      foreach (AIActor enemy in room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All))
+        if (!enemy.isActiveAndEnabled || !enemy.IsValid || !enemy.HasBeenAwoken)
+          return true;
+      return false;
+    }
   }
 }
