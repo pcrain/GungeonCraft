@@ -110,6 +110,7 @@ namespace CwaffingTheGungy
                     GorgunEye.Init();
                     UtilityVest.Init();
                     WarriorsGi.Init();
+                    CatEarHeadband.Init();
                 #endregion
 
                 #region Guns
