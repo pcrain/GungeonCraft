@@ -1079,6 +1079,7 @@
     <EmbeddedResource Include="Resources\ItemSprites\voodoo_doll_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\rat_poison_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\gorgun_eye_icon.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\borrowed_time_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\blazer_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\gyroscope_icon_old.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\utility_vest_icon.png"/>
@@ -1092,7 +1093,7 @@
     <EmbeddedResource Include="Resources\ItemSprites\plot_armor_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\wedding_ring_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\dead_ringer_icon.png"/>
-    <EmbeddedResource Include="Resources\ItemSprites\88888888_icon.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\borrowed_time_full_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\warriors_gi_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\cat_ear_headband_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\zoolander_icon.png"/>
@@ -1100,7 +1101,6 @@
     <EmbeddedResource Include="Resources\ItemSprites\cozy_camper_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\amazon_primer_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\gyroscope_icon.png"/>
-    <EmbeddedResource Include="Resources\ItemSprites\emergency_siren_icon (copy 1).png"/>
     <EmbeddedResource Include="Resources\ItemSprites\emergency_siren_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\johns_wick_icon_old.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\yellow_bandana_icon.png"/>

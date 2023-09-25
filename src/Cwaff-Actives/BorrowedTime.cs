@@ -18,150 +18,161 @@ namespace CwaffingTheGungy
     class BorrowedTime : PlayerItem
     {
         public static string ItemName         = "Borrowed Time";
-        public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/88888888_icon";
-        public static string ShortDescription = "Clock's Ticking";
-        public static string LongDescription  = "(insta clear any room, but enemies will all respawn in boss room with increased jam chance. cannot pick up bosses or jammed enemies)";
+        public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/borrowed_time_icon";
+        public static string ShortDescription = "Mafuba";
+        public static string LongDescription  = "(Captures all non-jammed, non-boss enemies in a room. Using in an empty room will release all captured enemies, with a chance for enemies to spawn jammed. All captured enemies will be forcibly released in boss rooms. Cannot be dropped while containing captured enemies.)";
 
-        private static List<string> borrowedEnemies = new List<string>{};
+        internal static List<string> _BorrowedEnemies  = new List<string>{};
+        internal static int _EmptyId;
+        internal static int _FullId;
 
-        private PlayerController m_owner = null;
-        private RoomHandler lastCheckedRoom = null;
-        private bool inBossRoom = false;
-        private bool isUsable = true;
+        internal const float _RESPAWN_AS_JAMMED_CHANCE = 0.1f;
+
+        private PlayerController _owner              = null;
+        private RoomHandler      _lastCheckedRoom    = null;
+        private bool             _isBossPresent      = false;
+        private bool             _roomCanHaveEnemies = true;
 
         public static void Init()
         {
             PlayerItem item = Lazy.SetupActive<BorrowedTime>(ItemName, SpritePath, ShortDescription, LongDescription);
-            item.quality      = PickupObject.ItemQuality.C;
+            item.quality    = PickupObject.ItemQuality.D;
 
-            //Set the cooldown type and duration of the cooldown
-            ItemBuilder.SetCooldownType(item, ItemBuilder.CooldownType.Timed, 1);
+            ItemBuilder.SetCooldownType(item, ItemBuilder.CooldownType.Timed, 2);
             item.consumable   = false;
-            item.quality      = ItemQuality.D;
             item.CanBeDropped = true;
-        }
 
+            _EmptyId = item.sprite.spriteId;
+            _FullId  = SpriteBuilder.AddSpriteToCollection(ResMap.Get("borrowed_time_full_icon")[0], item.sprite.Collection);
+            ETGModConsole.Log($"full id is {_FullId}");
+        }
 
         public override void Pickup(PlayerController player)
         {
-            this.m_owner = player;
+            this._owner = player;
             base.Pickup(player);
         }
 
         public override void OnPreDrop(PlayerController player)
         {
-            if (borrowedEnemies.Count > 0)
-                this.m_owner.StartCoroutine(ReapWhatYouSow());
-            this.m_owner = null;
+            if (_BorrowedEnemies.Count > 0)
+                this._owner.StartCoroutine(ReapWhatYouSow());
+            this._owner = null;
             base.OnPreDrop(player);
         }
 
         public override void Update()
         {
-            if (this.m_owner && this.m_owner.CurrentRoom != lastCheckedRoom)
-            {
-                lastCheckedRoom = this.m_owner.CurrentRoom;
-                bool wasInBossRoom = this.inBossRoom;
-                this.inBossRoom = CheckIfBossIsPresent();
-                if (this.inBossRoom && !wasInBossRoom)
-                    this.m_owner.StartCoroutine(ReapWhatYouSow());
-            }
-            this.isUsable = !this.m_owner.InExitCell;
             base.Update();
+            if (!this._owner || this._owner.CurrentRoom == this._lastCheckedRoom)
+                return;
+
+            RoomHandler room         = this._owner.CurrentRoom;
+            this._lastCheckedRoom    = room;
+            this._roomCanHaveEnemies = room.EverHadEnemies && !room.area.IsProceduralRoom && (
+                room.area.PrototypeRoomCategory == PrototypeDungeonRoom.RoomCategory.NORMAL
+                || room.area.PrototypeRoomCategory == PrototypeDungeonRoom.RoomCategory.HUB);
+            bool wasBossPresent      = this._isBossPresent;
+            this._isBossPresent      = CheckIfBossIsPresent();
+            if (this._isBossPresent && !wasBossPresent)
+                this._owner.StartCoroutine(ReapWhatYouSow());
         }
 
         public override bool CanBeUsed(PlayerController user)
         {
-            return this.isUsable && base.CanBeUsed(user);
+            return !user.InExitCell && this._roomCanHaveEnemies && base.CanBeUsed(user);
         }
 
-        private const float JAMMED_CHANCE = 0.1f;
         private IEnumerator ReapWhatYouSow()
         {
             while (GameManager.IsBossIntro)
                 yield return null;
 
-            if (borrowedEnemies.Count > 0)
+            if (_BorrowedEnemies.Count == 0)
+                yield break;
+
+            int enemiesToSpawn = _BorrowedEnemies.Count;
+            var tpvfx = (ItemHelper.Get(Items.ChestTeleporter) as ChestTeleporterItem).TeleportVFX;
+            for (int i = 0; i < enemiesToSpawn; i++)
             {
-                int enemiesToSpawn = borrowedEnemies.Count;
-                var tpvfx = (ItemHelper.Get(Items.ChestTeleporter) as ChestTeleporterItem).TeleportVFX;
-                for (int i = 0; i < enemiesToSpawn; i++)
-                {
-                    var Enemy = EnemyDatabase.GetOrLoadByGuid(borrowedEnemies[i]);
-                    IntVector2? bestRewardLocation = this.m_owner.CurrentRoom.GetRandomVisibleClearSpot(2, 2);
-                    AIActor TargetActor = AIActor.Spawn(Enemy.aiActor, bestRewardLocation.Value, GameManager.Instance.Dungeon.data.GetAbsoluteRoomFromPosition(bestRewardLocation.Value), true, AIActor.AwakenAnimationType.Default, true);
-                    if (UnityEngine.Random.value <= JAMMED_CHANCE)
-                        TargetActor.BecomeBlackPhantom();
-                    PhysicsEngine.Instance.RegisterOverlappingGhostCollisionExceptions(TargetActor.specRigidbody, null, false);
-                    // TargetActor.healthHaver.ForceSetCurrentHealth(enemy.HEALTH);
+                IntVector2 bestRewardLocation = this._owner.CurrentRoom.GetRandomVisibleClearSpot(2, 2);
+                AIActor TargetActor = AIActor.Spawn(EnemyDatabase.GetOrLoadByGuid(_BorrowedEnemies[i]).aiActor,
+                    bestRewardLocation, GameManager.Instance.Dungeon.data.GetAbsoluteRoomFromPosition(bestRewardLocation),
+                    true, AIActor.AwakenAnimationType.Default, true);
+                if (UnityEngine.Random.value <= _RESPAWN_AS_JAMMED_CHANCE)
+                    TargetActor.BecomeBlackPhantom();
+                PhysicsEngine.Instance.RegisterOverlappingGhostCollisionExceptions(TargetActor.specRigidbody, null, false);
 
-                    AkSoundEngine.PostEvent("Play_OBJ_chestwarp_use_01", gameObject);
-                    SpawnManager.SpawnVFX(tpvfx, TargetActor.sprite.WorldCenter, Quaternion.identity, true);
-                }
-                if (!this.m_owner.CurrentRoom.IsSealed)
-                {
-                    this.m_owner.CurrentRoom.SealRoom();
-                    GameManager.Instance.DungeonMusicController.SwitchToActiveMusic(null);
-                }
-                borrowedEnemies.Clear();
-                this.CanBeDropped = true;
+                AkSoundEngine.PostEvent("Play_OBJ_chestwarp_use_01", gameObject);
+                SpawnManager.SpawnVFX(tpvfx, TargetActor.sprite.WorldCenter, Quaternion.identity, true);
+                yield return new WaitForSeconds(0.05f);
             }
+            if (!this._owner.CurrentRoom.IsSealed)
+            {
+                this._owner.CurrentRoom.SealRoom();
+                GameManager.Instance.DungeonMusicController.SwitchToActiveMusic(null);
+            }
+            _BorrowedEnemies.Clear();
+            this.CanBeDropped = true;
 
-            yield break;
+            base.sprite.SetSprite(_EmptyId);
         }
 
         private bool CheckIfBossIsPresent()
         {
-            if (lastCheckedRoom == null)
+            if (_lastCheckedRoom == null)
                 return false;
             List<AIActor> activeEnemies =
-                this.m_owner.GetAbsoluteParentRoom().GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
-            for (int i = 0; i < activeEnemies.Count; i++)
-            {
-                if (activeEnemies[i].healthHaver.IsBoss)
+                this._owner.GetAbsoluteParentRoom().GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
+            foreach (AIActor enemy in activeEnemies)
+                if (enemy.healthHaver.IsBoss)
                     return true;
-            }
             return false;
         }
 
         public override void DoEffect(PlayerController user)
         {
             // Ineffective in boss rooms
-            if (this.inBossRoom)
+            if (this._isBossPresent)
                 return;
 
             // Ineffective if the room has no active enemies
             RoomHandler curRoom = user.GetAbsoluteParentRoom();
-            List<AIActor> activeEnemies = user.GetAbsoluteParentRoom().GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
+            if (curRoom != this._lastCheckedRoom)
+                return; // this should never happen in theory
+
+            List<AIActor> activeEnemies = curRoom.GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
             if (activeEnemies == null)
                 return;
 
             if (activeEnemies.Count == 0)
             {
-                if (borrowedEnemies.Count > 0 && user.GetAbsoluteParentRoom() != null)
-                    this.m_owner.StartCoroutine(ReapWhatYouSow());
+                if (_BorrowedEnemies.Count > 0 && user.GetAbsoluteParentRoom() != null)
+                    user.StartCoroutine(ReapWhatYouSow());
                 return;
             }
 
             // Capture enemies for later
+            base.sprite.SetSprite(_FullId);
             VFXPool vfx = VFX.CreatePoolFromVFXGameObject((ItemHelper.Get(Items.MagicLamp) as Gun
                 ).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
-            AkSoundEngine.PostEvent("Play_OBJ_chestwarp_use_01", gameObject);
-            for (int i = 0; i < activeEnemies.Count; i++)
+            AkSoundEngine.PostEvent("borrowed_time_capture_sound", gameObject);
+            foreach (AIActor otherEnemy in activeEnemies)
             {
-                AIActor otherEnemy = activeEnemies[i];
-                if (!(otherEnemy && otherEnemy.specRigidbody && otherEnemy.healthHaver)
-                 || otherEnemy.IsGone || otherEnemy.healthHaver.IsBoss || otherEnemy.IsBlackPhantom)
+                if (!otherEnemy.IsAliveAndNotABoss() || otherEnemy.IsBlackPhantom)
                     continue;
 
-                vfx.SpawnAtPosition(
-                    otherEnemy.sprite.WorldCenter.ToVector3ZisY(-1f), /* -1 = above player sprite */
-                    0, null, null, null, -0.05f);
+                Vector2 center = otherEnemy.sprite.WorldCenter;
+                const int NUM_VFX = 7;
+                for (int i = 0; i < NUM_VFX; ++i)
+                    vfx.SpawnAtPosition(
+                        (center + (i * 360f / NUM_VFX).ToVector(0.75f)).ToVector3ZisY(-1f), /* -1 = above player sprite */
+                        0, null, null, null, -0.05f);
 
                 otherEnemy.EraseFromExistence(true);
-                borrowedEnemies.Add(otherEnemy.EnemyGuid);
+                _BorrowedEnemies.Add(otherEnemy.EnemyGuid);
             }
-            if (borrowedEnemies.Count > 0)
+            if (_BorrowedEnemies.Count > 0)
                 this.CanBeDropped = false; //cannot be dropped if it contains enemies
         }
     }

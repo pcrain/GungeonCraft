@@ -134,7 +134,7 @@ namespace CwaffingTheGungy
         {
             if (room?.area == null)
                 return false;
-            if (room.area.PrototypeRoomCategory != PrototypeDungeonRoom.RoomCategory.NORMAL)
+            if (room.area.PrototypeRoomCategory != PrototypeDungeonRoom.RoomCategory.NORMAL && room.area.PrototypeRoomCategory != PrototypeDungeonRoom.RoomCategory.HUB)
                 return false;
             if (room.area.IsProceduralRoom || room.area.proceduralCells != null)
                 return false;

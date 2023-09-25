@@ -29,9 +29,8 @@ namespace CwaffingTheGungy
         public static void Init()
         {
             PlayerItem item   = Lazy.SetupActive<BulletThatCanKillTheFuture>(ItemName, SpritePath, ShortDescription, LongDescription);
-            item.quality      = PickupObject.ItemQuality.C;
+            item.quality      = PickupObject.ItemQuality.S;
             item.consumable   = true;
-            item.quality      = ItemQuality.S;
             item.CanBeDropped = true;
 
             _Sprite = item.sprite;

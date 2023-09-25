@@ -276,7 +276,7 @@ namespace CwaffingTheGungy
         private IEnumerator TakeToTheSkies()
         {
             // Phase 1 / 4 -- become intangible and launch to the skies
-            this._projectile.sprite.HeightOffGround = 99f; // max, 100 doesn't render
+            this._projectile.sprite.HeightOffGround = 10f; // max, 100 doesn't render
             this._projectile.sprite.UpdateZDepth();
             DepthLookupManager.ProcessRenderer(
                 this._projectile.sprite.renderer, DepthLookupManager.GungeonSortingLayer.FOREGROUND);
