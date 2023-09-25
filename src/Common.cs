@@ -215,7 +215,7 @@ namespace CwaffingTheGungy
         /// <summary>
         /// Perform basic initialization of beam sprites for a projectile, override the beam controller's existing sprites if they exist
         /// </summary>
-        public static BasicBeamController SetupBeamSprites(this Projectile projectile, string spriteName, int fps, Vector2 dims, Vector2? impactDims = null)
+        public static BasicBeamController SetupBeamSprites(this Projectile projectile, string spriteName, int fps, Vector2 dims, Vector2? impactDims = null, int impactFps = -1)
         {
             // Fix breakage with GenerateBeamPrefab() expecting a non-null specrigidbody
             projectile.specRigidbody = projectile.gameObject.GetOrAddComponent<SpeculativeRigidbody>();
@@ -233,14 +233,14 @@ namespace CwaffingTheGungy
 
             // Create the beam itself using our resource map lookup
             BasicBeamController beamComp = projectile.FixedGenerateBeamPrefab(
-                spritePath                  : ResMap.Get($"{spriteName}_start")[0],
+                spritePath                  : ResMap.Get($"{spriteName}_mid")[0],
                 colliderDimensions          : dims,
                 colliderOffsets             : offsets,
                 beamAnimationPaths          : ResMap.Get($"{spriteName}_mid"),
                 beamFPS                     : fps,
                 //Impact
                 impactVFXAnimationPaths     : ResMap.Get($"{spriteName}_impact"),
-                beamImpactFPS               : fps,
+                beamImpactFPS               : (impactFps > 0) ? impactFps : fps,
                 impactVFXColliderDimensions : impactDims,
                 impactVFXColliderOffsets    : impactOffsets,
                 //End

@@ -88,6 +88,7 @@ namespace CwaffingTheGungy
                     EmergencySiren.Init();
                     Itemfinder.Init();
                     KalibersJustice.Init();
+                    GasterBlaster.Init();
                 #endregion
 
                 #region Passives

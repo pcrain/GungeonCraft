@@ -1075,7 +1075,7 @@ namespace CwaffingTheGungy
             return true;
         }
 
-        public static Vector2 ToNearestWallOrEnemyOrObject(Vector2 pos, float angle, float minDistance = 1)
+        public static Vector2 ToNearestWallOrEnemyOrObject(this Vector2 pos, float angle, float minDistance = 1)
         {
             RaycastResult hit;
             if (PhysicsEngine.Instance.Raycast(
@@ -1085,7 +1085,7 @@ namespace CwaffingTheGungy
             return pos+BraveMathCollege.DegreesToVector(angle,minDistance);
         }
 
-        public static Vector2 ToNearestWallOrObject(Vector2 pos, float angle, float minDistance = 1)
+        public static Vector2 ToNearestWallOrObject(this Vector2 pos, float angle, float minDistance = 1)
         {
             RaycastResult hit;
             if (PhysicsEngine.Instance.Raycast(
