@@ -31,13 +31,13 @@ namespace CwaffingTheGungy
 
         public static void Init()
         {
-            PlayerItem item = Lazy.SetupActive<GasterBlaster>(ItemName, SpritePath, ShortDescription, LongDescription);
+            PlayerItem item   = Lazy.SetupActive<GasterBlaster>(ItemName, SpritePath, ShortDescription, LongDescription);
             item.quality      = PickupObject.ItemQuality.S;
             item.consumable   = false;
             item.CanBeDropped = true;
-            // item.SetCooldownType(ItemBuilder.CooldownType.Damage, 100f);
-            // item.SetCooldownType(ItemBuilder.CooldownType.PerRoom, 1f);
-            item.SetCooldownType(ItemBuilder.CooldownType.Timed, 1f);
+            item.SetCooldownType(ItemBuilder.CooldownType.Damage, 100f);
+
+            _GasterBlaster = VFX.animations["GasterBlaster"];
 
             _GasterBlast = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items.MarineSidearm) as Gun, false);
             _GasterBlast.baseData.damage         = 700f;
@@ -54,43 +54,28 @@ namespace CwaffingTheGungy
                 beamComp.ContinueBeamArtToWall = false;
                 beamComp.PenetratesCover       = true;
                 beamComp.penetration           = 1000;
+
             PierceProjModifier pierce = _GasterBlast.gameObject.GetOrAddComponent<PierceProjModifier>();
                 pierce.penetration          = 100;
                 pierce.penetratesBreakables = true;
-
-            _GasterBlaster = VFX.animations["GasterBlaster"];
         }
 
         public override void Pickup(PlayerController player)
         {
             base.Pickup(player);
             this._owner = player;
-            player.OnEnteredCombat += this.OnEnteredCombat;
-            player.PostProcessProjectile += this.OnFired;
         }
 
         public override void OnPreDrop(PlayerController player)
         {
-            player.PostProcessProjectile -= this.OnFired;
-            player.OnEnteredCombat -= this.OnEnteredCombat;
             this._owner = null;
             base.OnPreDrop(player);
         }
 
-        private void OnFired(Projectile p, float f)
+        public override bool CanBeUsed(PlayerController user)
         {
-            this._anyGunFiredInRoom = true;
+            return user.IsInCombat && base.CanBeUsed(user);
         }
-
-        private void OnEnteredCombat()
-        {
-            this._anyGunFiredInRoom = false;
-        }
-
-        // public override bool CanBeUsed(PlayerController user)
-        // {
-        //     return user.IsInCombat && base.CanBeUsed(user);
-        // }
 
         public override void DoEffect(PlayerController user)
         {
@@ -126,47 +111,6 @@ namespace CwaffingTheGungy
                 blaster.GetComponent<tk2dSprite>().WorldCenter + rotcomp.m_start_angle.ToVector(0.33f), rotcomp.m_start_angle, 0.75f, true, true);
             beam.sprite.gameObject.SetGlowiness(300f); // TODO: not sure why this doesn't actually seem to have any effect
             blaster.ExpireIn(1.25f, fadeFor: 0.25f);
-        }
-    }
-
-    public class RotateIntoPositionBehavior : MonoBehaviour
-    {
-        public Vector2 m_fulcrum;
-        public float m_radius;
-        public float m_start_angle;
-        public float m_end_angle;
-        public float m_rotate_time;
-
-        private float timer;
-        private float angle_delta;
-        private bool has_been_init = false;
-
-        public void Setup()
-        {
-            this.timer         = 0;
-            this.angle_delta   = this.m_end_angle - this.m_start_angle;
-            this.has_been_init = true;
-            this.Relocate();
-        }
-
-        private void Update()
-        {
-            if ((!this.has_been_init) || (this.timer > m_rotate_time))
-                return;
-            this.timer += BraveTime.DeltaTime;
-            if (this.timer > this.m_rotate_time)
-                this.timer = this.m_rotate_time;
-            this.Relocate();
-        }
-
-        private void Relocate()
-        {
-            float percentDone  = this.timer / this.m_rotate_time;
-            float curAngle     = this.m_start_angle + (float)Math.Tanh(percentDone*Mathf.PI) * this.angle_delta;
-            Vector2 curPos     = this.m_fulcrum + BraveMathCollege.DegreesToVector(curAngle, this.m_radius);
-            base.gameObject.transform.position = curPos.ToVector3ZUp(base.gameObject.transform.position.z);
-            base.gameObject.transform.rotation =
-                Quaternion.Euler(0f, 0f, curAngle + (curAngle > 180 ? 180 : (-180)));
         }
     }
 }

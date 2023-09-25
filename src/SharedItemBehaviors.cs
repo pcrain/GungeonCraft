@@ -1193,5 +1193,46 @@ namespace CwaffingTheGungy
             return noteDoer;
         }
     }
+
+    public class RotateIntoPositionBehavior : MonoBehaviour
+    {
+        public Vector2 m_fulcrum;
+        public float m_radius;
+        public float m_start_angle;
+        public float m_end_angle;
+        public float m_rotate_time;
+
+        private float timer;
+        private float angle_delta;
+        private bool has_been_init = false;
+
+        public void Setup()
+        {
+            this.timer         = 0;
+            this.angle_delta   = this.m_end_angle - this.m_start_angle;
+            this.has_been_init = true;
+            this.Relocate();
+        }
+
+        private void Update()
+        {
+            if ((!this.has_been_init) || (this.timer > m_rotate_time))
+                return;
+            this.timer += BraveTime.DeltaTime;
+            if (this.timer > this.m_rotate_time)
+                this.timer = this.m_rotate_time;
+            this.Relocate();
+        }
+
+        private void Relocate()
+        {
+            float percentDone  = this.timer / this.m_rotate_time;
+            float curAngle     = this.m_start_angle + (float)Math.Tanh(percentDone*Mathf.PI) * this.angle_delta;
+            Vector2 curPos     = this.m_fulcrum + BraveMathCollege.DegreesToVector(curAngle, this.m_radius);
+            base.gameObject.transform.position = curPos.ToVector3ZUp(base.gameObject.transform.position.z);
+            base.gameObject.transform.rotation =
+                Quaternion.Euler(0f, 0f, curAngle + (curAngle > 180 ? 180 : (-180)));
+        }
+    }
 }
 
