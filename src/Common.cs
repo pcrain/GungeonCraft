@@ -140,9 +140,9 @@ namespace CwaffingTheGungy
             {
                 string spriteName = spritePath; // TODO: guns use names, regular items use full paths -- should be made uniform eventually
                 Gun gun = ETGMod.Databases.Items.NewGun(itemName, spriteName);  //create a new gun using specified sprite name
-                // ETGModConsole.Log($"  {Game.Items.AllIDs[Game.Items.Count-1]}");
                 Game.Items.Rename("outdated_gun_mods:"+baseItemName, IDs.InternalNames[itemName]);  //rename the gun for commands
-                gun.SetupSprite(null, spriteName+"_idle_001", 8); //set the gun's ammonomicon sprite
+                gun.SetupSprite(null, spriteName+"_idle_001"); //set the gun's ammonomicon sprite
+
                 int projectileId = 0;
                 if (int.TryParse(projectileName, out projectileId))
                     gun.AddProjectileModuleFrom(PickupObjectDatabase.GetById(projectileId) as Gun, true, true); //set the gun's default projectile to inherit
@@ -157,16 +157,17 @@ namespace CwaffingTheGungy
                 ItemBuilder.AddSpriteToObject(itemName, spritePath, obj);
 
                 ETGMod.Databases.Items.SetupItem(item, item.name);
-                SpriteBuilder.AddToAmmonomicon(item.sprite.GetCurrentSpriteDef());
 
                 Gungeon.Game.Items.Add(IDs.InternalNames[itemName], item);
+                SpriteBuilder.AddToAmmonomicon(item.sprite.GetCurrentSpriteDef());
+                item.encounterTrackable.journalData.AmmonomiconSprite = item.sprite.GetCurrentSpriteDef().name;
             }
 
             item.encounterTrackable.EncounterGuid = C.MOD_PREFIX+"-"+baseItemName; //create a unique guid for the item
-            item.encounterTrackable.journalData.AmmonomiconSprite = item.sprite.GetCurrentSpriteDef().name;
             item.SetShortDescription(shortDescription);
             item.SetLongDescription(longDescription);
             ETGMod.Databases.Items.Add(item);
+
             IDs.Pickups[baseItemName] = item.PickupObjectId; //register item in pickup ID database
             if (item is Gun)
             {
