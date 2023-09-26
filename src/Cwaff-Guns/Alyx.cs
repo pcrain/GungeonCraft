@@ -34,7 +34,6 @@ namespace CwaffingTheGungy
 
         internal static tk2dSpriteAnimationClip _BulletSprite;
 
-        private float _timeAtSpawn        = 0.0f;
         private float _timeAtLastRecalc   = 0.0f;
         private Coroutine _decayCoroutine = null;
 
@@ -86,6 +85,8 @@ namespace CwaffingTheGungy
         public override void Start()
         {
             base.Start();
+            this.gun.SetBaseMaxAmmo(_BASE_MAX_AMMO);
+            this.gun.CurrentAmmo = _BASE_MAX_AMMO;
             this._timeAtLastRecalc = BraveTime.ScaledTimeSinceStartup;
             RecalculateAmmo();
         }

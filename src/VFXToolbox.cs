@@ -471,7 +471,7 @@ namespace CwaffingTheGungy
     public class FancyVFX : MonoBehaviour
     {
         private GameObject _vfx;
-        private float _lifeTime;
+        private float _curLifeTime;
         private tk2dSprite _sprite;
 
         private Vector3 _velocity;
@@ -480,13 +480,6 @@ namespace CwaffingTheGungy
         private float _fadeTotalTime;
         private float _maxLifeTime;
 
-        private void Start()
-        {
-            this._vfx = base.gameObject;
-            this._lifeTime = 0.0f;
-            this._sprite = this._vfx.GetComponent<tk2dSprite>();
-        }
-
         private void LateUpdate()
         {
             if (!this._vfx)
@@ -494,8 +487,8 @@ namespace CwaffingTheGungy
                 UnityEngine.Object.Destroy(this);
                 return;
             }
-            this._lifeTime += BraveTime.DeltaTime;
-            if (this._lifeTime > this._maxLifeTime)
+            this._curLifeTime += BraveTime.DeltaTime;
+            if (this._curLifeTime > this._maxLifeTime)
             {
                 if (this._vfx)
                     UnityEngine.Object.Destroy(this._vfx);
@@ -505,13 +498,17 @@ namespace CwaffingTheGungy
 
             this._sprite.transform.position += this._velocity;
 
-            if (this._lifeTime > this._fadeStartTime)
-                this._sprite.renderer.SetAlpha(1.0f - (this._lifeTime - this._fadeStartTime) / this._fadeTotalTime);
+            if (this._curLifeTime > this._fadeStartTime)
+                this._sprite.renderer.SetAlpha(1.0f - (this._curLifeTime - this._fadeStartTime) / this._fadeTotalTime);
         }
 
         // todo: fading and emission are not simultaneously compatible
         public void Setup(Vector2 velocity, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0, Color? emissiveColor = null)
         {
+            this._vfx = base.gameObject;
+            this._sprite = this._vfx.GetComponent<tk2dSprite>();
+            this._curLifeTime = 0.0f;
+
             this._velocity = (1.0f / C.PIXELS_PER_CELL) * velocity.ToVector3ZisY(0);
             this._maxLifeTime = lifetime;
             this._fadeOut = fadeOutTime.HasValue;
