@@ -21,7 +21,7 @@ namespace CwaffingTheGungy
         public static string SpriteName       = "alyx";
         public static string ProjectileName   = "38_special";
         public static string ShortDescription = "Welcome to the New Age";
-        public static string LongDescription  = "(Poisons and ignites enemies; current and max ammo decay exponentially leaving radiactive waste; gun decays completely at 10 max ammo)";
+        public static string LongDescription  = "Fires shots that poison and ignite enemies. Current and max ammo decay exponentially, leaving radiactive waste behind in the process. Gun decays completely at 10 max ammo.\n\nA little known fact of nuclear chemistry is that sufficiently large quantities of Uranium -- under specific circumstances not fully understood at present -- can decay directly into guns. These guns have extremely limited lifespans before decaying completely into radiactive goo, but their sheer utility in battle make them a prized treasure for experienced gungeoneers who are willing to absorb a few gamma rays in the name of DPS";
 
         internal const float _AMMO_HALF_LIFE_SECS = 90.0f;
         internal const float _GUN_HALF_LIFE_SECS  = 300.0f;

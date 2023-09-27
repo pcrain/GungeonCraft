@@ -21,7 +21,7 @@ namespace CwaffingTheGungy
         public static string SpriteName       = "b_b_gun";
         public static string ProjectileName   = "38_special";
         public static string ShortDescription = "Spare No One";
-        public static string LongDescription  = "(Three Strikes)";
+        public static string LongDescription  = "Fires a single large projectile that bounces off walls and knocks enemies around with extreme force. Ammo can only be regained by interacting with the projectiles once they have come to a halt.\n\nThis gun was originally used in the mid-18th century for hunting turkeys, as they were the only birds slow enough to actually hit with any degree of reliability. While hunters quickly decided that using a large, slow, rolling projectile wasn't ideal for hunting, the gun's legacy lives on today in shooting arenas known as \"alleys\", where sporting enthusiasts roll similar projectiles against red and white wooden objects in hopes of scoring a \"turkey\" themselves.";
 
         private static readonly float[] _CHARGE_LEVELS  = {0.25f,0.5f,1.0f,2.0f};
         private static Projectile       _FakeProjectile = null;

@@ -20,8 +20,8 @@ namespace CwaffingTheGungy
         public static string ItemName         = "Grandmaster";
         public static string SpriteName       = "grandmaster";
         public static string ProjectileName   = "ak-47"; // no rotation
-        public static string ShortDescription = "Magnum Carlsen";
-        public static string LongDescription  = "(TBD)";
+        public static string ShortDescription = "Mate in Gun";
+        public static string LongDescription  = "Fires assorted chess pieces that home towards enemies in discrete steps.\n\nThis gun was wielded by the legendary Magnum Carlsen in his bullet chess world championship match against the equally legendary Garry Makarov. While the match ended in a draw, it was notable for being Makarov's final match before retiring to a life of mentorship for the new generation of aspiring Gungeoneers.";
 
         internal static tk2dSpriteAnimationClip _PawnSprite;
         internal static tk2dSpriteAnimationClip _RookSprite;
