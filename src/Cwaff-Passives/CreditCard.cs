@@ -20,7 +20,7 @@ namespace CwaffingTheGungy
         public static string ItemName         = "Credit Card";
         public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/credit_card_icon";
         public static string ShortDescription = "Shop 'til You Drop";
-        public static string LongDescription  = "(Grants 500 shells. Grants 1 curse for every 50 shells below 500. Grants 1 coolness for every 50 shells above 500.)";
+        public static string LongDescription  = "Grants 500 shells while picked up. Grants 1 curse for every 50 shells below 500, and 1 coolness for every 50 shells above 500. Cannot be dropped when possessing fewer than 500 shells.\n\nPerhaps the greatest emblem of 20th century economics, this handly little piece of plastic gives unprecedented purchasing power for all of your Gungeon needs. Comes with the teensiest of interest rates, charged directly to your soul for your convenience.";
 
         internal const int _BASE_CREDIT  = 500;
         internal const int _CREDIT_DELTA = 50;

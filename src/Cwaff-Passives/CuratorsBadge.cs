@@ -25,7 +25,7 @@ namespace CwaffingTheGungy
         public static string ItemName         = "Curator's Badge";
         public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/curators_badge_icon";
         public static string ShortDescription = "Neat and Tidy";
-        public static string LongDescription  = "(Get shells for leaving minor breakables unscathed)";
+        public static string LongDescription  = "Rewards extra shells for leaving minor breakables unscathed after each combat encounter.\n\nThe role of Gungeon Curator has been unfilled since the hiring of the Gungeon Janitorial Crew, who rendered the position mostly obsolete. The pay is mediocre, the working conditions are rather dangerous, and the job itself is surprisingly difficult. However, for adventurers who happen to be passing through the Gungeon, earning a few extra shells before inevitably getting fired for breaking everything with a BSG just might help pay for that extra piece of armor -- which will promptly be lost by stumbling into a pit.";
 
         internal const int   _MAX_CHANCES      = 3;
         internal const float _FAIL_THRESHOLD   = 0.3f;

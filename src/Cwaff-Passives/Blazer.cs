@@ -20,7 +20,7 @@ namespace CwaffingTheGungy
         public static string ItemName         = "Blazer";
         public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/blazer_icon";
         public static string ShortDescription = "Get 'em While It's Hot";
-        public static string LongDescription  = "(Fire rate, charge time, and reload speed are doubled for 3 seconds upon entering combat.)";
+        public static string LongDescription  = "Fire rate, charge time, and reload speed are doubled for 3 seconds upon entering combat.\n\nA simple yet timeless garment, its light weight, loose fit, and hot pallette get office managers and Gungeoneers alike in the mood for taking care of business as soon as they walk into a room.";
 
         internal const  float          _BOOST_TIME = 3f;
         internal static StatModifier[] _Boosts     = null;

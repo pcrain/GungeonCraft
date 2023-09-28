@@ -20,7 +20,7 @@ namespace CwaffingTheGungy
         public static string ItemName         = "Camping Supplies";
         public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/cozy_camper_icon";
         public static string ShortDescription = "In for the Long Gun";
-        public static string LongDescription  = "(Damage increases the longer you go without moving)";
+        public static string LongDescription  = "Increases damage over time while standing still. Damage boost is reset after moving.\n\nCamping has proven time and again to be an effective strategy to any Gungeoneer that has the mental fortitude to endure insults to their skill, their mother, their face, and their mother's face.";
 
         private static float[] _CampTimes = { 0.00f, 2.00f, 5.00f, 10.0f }; // how long we stand still before each bonus kicks in
         private static float[] _CampMults = { 1.00f, 1.30f, 1.60f, 1.90f }; // bonus at each camp level
