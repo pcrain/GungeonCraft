@@ -234,7 +234,11 @@ namespace CwaffingTheGungy
                     victimDistance = dist;
                 }
             }
-            if (victim != null)
+
+            // Check if player is reasonably close to the crosshair, and make magic happen if so
+            float pdist = Vector2.Distance(clockhair.transform.PositionVector2(), interactor.sprite.WorldCenter);
+            bool killedOwnFuture = (pdist < Mathf.Min(2f, victimDistance));
+            if (!killedOwnFuture && victim != null)
             {
                 CwaffToolbox.enemyWithoutAFuture = victim.EnemyGuid;
                 Lazy.CustomNotification("Future Erased", victim.GetActorName(), _Sprite);
@@ -259,7 +263,7 @@ namespace CwaffingTheGungy
                 victim.healthHaver.ApplyDamage(10000f,Vector2.zero,"Future Bullet",
                     damageTypes: CoreDamageTypes.Void, damageCategory: DamageCategory.Unstoppable, ignoreDamageCaps: true);
             }
-            else
+            else if (!killedOwnFuture)
                 Lazy.CustomNotification("You Missed","Better Luck Next Time", _Sprite);
 
             // finish up the base original script
@@ -281,9 +285,18 @@ namespace CwaffingTheGungy
             interactor.specRigidbody.CollideWithOthers = true;
             GameCursorController.CursorOverride.RemoveOverride(ItemName);
             Pixelator.Instance.DoFinalNonFadedLayer = false;
-            yield return new WaitForSeconds(0.5f);
 
-            UnityEngine.Object.Destroy(clockhair.gameObject);
+            if (!killedOwnFuture)
+            {
+                yield return new WaitForSeconds(0.5f);
+                UnityEngine.Object.Destroy(clockhair.gameObject);
+            }
+            else
+            {
+                UnityEngine.Object.Destroy(clockhair.gameObject);
+                yield return new WaitForSeconds(0.25f);
+                GameManager.Instance.LoadCustomFlowForDebug("simplest"); //TODO: rename later
+            }
             yield break;
         }
     }

@@ -104,7 +104,7 @@ public partial class SansBoss : AIActor
     // orange = harmless if you're moving; blue = harmless if you're stationary
     internal class OrangeAndBlueBullet : SecretBullet
     {
-      private bool orange;
+      private bool orange = false;
       public OrangeAndBlueBullet(bool orange) : base(orange ? orangeColor : blueColor)
       {
         this.orange = orange;
@@ -113,13 +113,17 @@ public partial class SansBoss : AIActor
       public override IEnumerator Top()
       {
         this.Projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
-        yield break;
+        yield return Wait(180);
+        Vanish();
       }
 
       private void OnPreCollision(SpeculativeRigidbody me, PixelCollider myPixelCollider, SpeculativeRigidbody other, PixelCollider otherPixelCollider)
       {
         if (!(other.gameActor is PlayerController))
+        {
+          PhysicsEngine.SkipCollision = false;
           return;
+        }
         bool playerIsIdle           = other.gameActor.spriteAnimator.CurrentClip.name.Contains("idle",true);
         PhysicsEngine.SkipCollision = (this.orange != playerIsIdle);
       }
