@@ -19,8 +19,8 @@ namespace CwaffingTheGungy
     {
         public static string ItemName         = "Voodoo Doll";
         public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/voodoo_doll_icon";
-        public static string ShortDescription = "PewPew Unto Others";
-        public static string LongDescription  = "(When a player-owned projectile hits an enemy, all other enemies of the same type in that room take damage)";
+        public static string ShortDescription = "Pew Pew Unto Others";
+        public static string LongDescription  = "Whenever a player-owned projectile hits an enemy, all other enemies of the same type take damage.\n\nThere are actually two types of voodoo dolls. Traditional voodoo dolls are created in the likeness of a single, specific individual, and doing physical damage to the doll inflicts equivalent physical damage to the individual it depicts. By contrast, the dolls found in the Gungeon depict an unknown figure smiling in the face of life's hardships, motivating the Gundead to do their best. Upon seeing their peers struggle, this motivation is promptly shattered, inflicting (arguably more powerful) emotional damage instead.";
 
         private static bool _VoodooDollEffectHappening = false;
 
