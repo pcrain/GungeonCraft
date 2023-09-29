@@ -696,6 +696,11 @@ namespace CwaffingTheGungy
     {
       this.prefab.AddBossToFloorPool(bb: this, guid: this.guid, floors: floors, weight: weight);
     }
+
+    public PrototypeDungeonRoom CreateStandaloneBossRoom()
+    {
+      return this.prefab.CreateStandaloneBossRoom(bb: this);
+    }
   }
 
   // BuildABoss helper extension methods
@@ -1069,6 +1074,16 @@ namespace CwaffingTheGungy
       return p;
     }
 
+    public static PrototypeDungeonRoom CreateStandaloneBossRoom(this GameObject self, BuildABoss bb)
+    {
+        PrototypeDungeonRoom p = GetGenericBossRoom();
+          Vector2 roomCenter = new Vector2(0.5f*p.Width, 0.5f*p.Height);
+          tk2dBaseSprite anySprite = self.GetComponent<tk2dSpriteAnimator>().GetAnySprite();
+        AddObjectToRoom(p, roomCenter - anySprite.WorldTopLeft, EnemyBehaviourGuid: bb.guid);
+        AddObjectToRoom(p, roomCenter, NonEnemyBehaviour: bb.bossController);
+        return p;
+    }
+
     /*
       Legal tilesets:
         CASTLEGEON, SEWERGEON, GUNGEON, CATHEDRALGEON, MINEGEON, CATACOMBGEON, FORGEGEON, HELLGEON
@@ -1086,11 +1101,7 @@ namespace CwaffingTheGungy
           (GlobalDungeonData.ValidTilesets)Enum.Parse(typeof(GlobalDungeonData.ValidTilesets), floors.ToString());
 
         // Get a generic boss room and add it to the center of the room
-        PrototypeDungeonRoom p = GetGenericBossRoom();
-          Vector2 roomCenter = new Vector2(0.5f*p.Width, 0.5f*p.Height);
-          tk2dBaseSprite anySprite = self.GetComponent<tk2dSpriteAnimator>().GetAnySprite();
-        AddObjectToRoom(p, roomCenter - anySprite.WorldTopLeft, EnemyBehaviourGuid: guid);
-        AddObjectToRoom(p, roomCenter, NonEnemyBehaviour: bb.bossController);
+        PrototypeDungeonRoom p = self.CreateStandaloneBossRoom(bb);
 
         // Create a new table and add our new boss room
         GenericRoomTable theRoomTable = ScriptableObject.CreateInstance<GenericRoomTable>();

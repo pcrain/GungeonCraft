@@ -70,7 +70,7 @@ namespace CwaffingTheGungy
             // Another base command for loading my latest debug flow
             ETGModConsole.Commands.AddGroup("ff", delegate (string[] args)
             {
-                FlowCommands.LoadFlowFunction(new string[]{"simplest"});
+                FlowCommands.LoadFlowFunction(new string[]{"Simplest"});
             });
             // Another base command for testing npc shenanigans
             ETGModConsole.Commands.AddGroup("tt", delegate (string[] args)

@@ -162,14 +162,47 @@ namespace CwaffingTheGungy
                     // Bombo.Init();  //disabled for now until i can find a better way to turn him off within game
                 #endregion
 
-                #region Flow stuff stolen from Apache
-                    // AssetBundle sharedAssets = ResourceManager.LoadAssetBundle("shared_auto_001");
-                    // AssetBundle sharedAssets2 = ResourceManager.LoadAssetBundle("shared_auto_002");
-                    // AssetBundle sharedBase = ResourceManager.LoadAssetBundle("shared_base_001");
-                    // AssetBundle braveResources = ResourceManager.LoadAssetBundle("brave_resources_001");
-                    // AssetBundle enemiesBase = ResourceManager.LoadAssetBundle("enemies_base_001");
-                    // AssetBundle encounterAssets = ResourceManager.LoadAssetBundle("encounters_base_001");
+                #region Bosses yo
+                    BossBuilder.Init();
+                    SansBoss.Init();
+                #endregion
 
+                #region Flow stuff stolen from Apache
+                    AssetBundle sharedAssets;
+                    AssetBundle sharedAssets2;
+                    AssetBundle sharedBase;
+                    AssetBundle braveResources;
+                    AssetBundle enemiesBase;
+                    AssetBundle encounterAssets;
+                    try {
+                        // Init some asset bundles
+                        sharedAssets    = ResourceManager.LoadAssetBundle("shared_auto_001");
+                        sharedAssets2   = ResourceManager.LoadAssetBundle("shared_auto_002");
+                        sharedBase      = ResourceManager.LoadAssetBundle("shared_base_001");
+                        braveResources  = ResourceManager.LoadAssetBundle("brave_resources_001");
+                        enemiesBase     = ResourceManager.LoadAssetBundle("enemies_base_001");
+                        encounterAssets = ResourceManager.LoadAssetBundle("encounters_base_001");
+                        // Init Prefab Databases
+                        CwaffDungeonPrefabs.InitCustomPrefabs(sharedAssets, sharedAssets2, braveResources, enemiesBase);
+                        // Init Custom Enemy Prefabs
+                        // ExpandCustomEnemyDatabase.InitPrefabs(expandSharedAssets1);
+                        // Init Custom Room Prefabs
+                        // ExpandRoomPrefabs.InitCustomRooms(sharedAssets, sharedAssets2, braveResources, enemiesBase);
+                        // Init Custom DungeonFlow(s)
+                        CwaffDungeonFlow.InitDungeonFlowsAndHooks(sharedAssets2);
+                    } catch (Exception ex) {
+                        ETGModConsole.Log("[CtG] ERROR: Exception occured while building prefabs!", true);
+                        Debug.LogException(ex);
+                    } finally {
+                        // Null bundles when done with them to avoid game crash issues
+                        sharedAssets = null;
+                        sharedAssets2 = null;
+                        braveResources = null;
+                        enemiesBase = null;
+                    }
+                #endregion
+
+                #region Old Asset Stuff
                     // ETGModConsole.Log("Trying to load some stuff");
                     // try
                     // {
@@ -195,35 +228,6 @@ namespace CwaffingTheGungy
                     // {
                     //     ETGModConsole.Log($"  you broke it: {ex}");
                     // }
-                    // try {
-                    //     // Init Prefab Databases
-                    //     CwaffDungeonPrefabs.InitCustomPrefabs(sharedAssets, sharedAssets2, braveResources, enemiesBase);
-                    //     // Init Custom Enemy Prefabs
-                    //     // ExpandCustomEnemyDatabase.InitPrefabs(expandSharedAssets1);
-                    //     // Init Custom Room Prefabs
-                    //     // ExpandRoomPrefabs.InitCustomRooms(sharedAssets, sharedAssets2, braveResources, enemiesBase);
-                    //     // Init Custom DungeonFlow(s)
-                    //     CwaffDungeonFlow.InitDungeonFlowsAndHooks(sharedAssets2);
-                    // } catch (Exception ex) {
-                    //     ETGModConsole.Log("[CtG] ERROR: Exception occured while building prefabs!", true);
-                    //     Debug.LogException(ex);
-                    //     sharedAssets = null;
-                    //     sharedAssets2 = null;
-                    //     braveResources = null;
-                    //     enemiesBase = null;
-                    //     return;
-                    // }
-
-                    // // Null bundles when done with them to avoid game crash issues
-                    // sharedAssets = null;
-                    // sharedAssets2 = null;
-                    // braveResources = null;
-                    // enemiesBase = null;
-                #endregion
-
-                #region Bosses yo
-                    BossBuilder.Init();
-                    SansBoss.Init();
                 #endregion
 
                 // Modified version of Anywhere mod, further stolen and modified from Apache's version

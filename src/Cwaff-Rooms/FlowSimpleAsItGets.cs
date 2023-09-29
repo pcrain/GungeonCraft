@@ -50,7 +50,7 @@ namespace CwaffingTheGungy {
                 roomCategory = PrototypeDungeonRoom.RoomCategory.CONNECTOR,
                 percentChance = 1f,
                 priority = DungeonFlowNode.NodePriority.MANDATORY,
-                overrideExactRoom = Boomhildr.shopRoom,
+                overrideExactRoom = SansBoss.SansBossRoom,
                 overrideRoomTable = null,
                 capSubchain = false,
                 subchainIdentifier = string.Empty,
@@ -76,6 +76,7 @@ namespace CwaffingTheGungy {
                 loopTargetIsOneWay = false,
                 guidAsString = Guid.NewGuid().ToString(),
             };
+
             DungeonFlowNode Node_99 = new DungeonFlowNode(m_CachedFlow) {
                 isSubchainStandin = false,
                 nodeType = DungeonFlowNode.ControlNodeType.ROOM,
