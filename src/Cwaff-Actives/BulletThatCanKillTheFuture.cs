@@ -295,7 +295,8 @@ namespace CwaffingTheGungy
             {
                 UnityEngine.Object.Destroy(clockhair.gameObject);
                 yield return new WaitForSeconds(0.25f);
-                GameManager.Instance.LoadCustomFlowForDebug("simplest"); //TODO: rename later
+                // GameManager.Instance.LoadCustomFlowForDebug("simplest"); //TODO: rename later
+                GameManager.Instance.LoadCustomLevel("cg_sansfloor"); //TODO: rename later
             }
             yield break;
         }

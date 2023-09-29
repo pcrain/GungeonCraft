@@ -202,6 +202,10 @@ namespace CwaffingTheGungy
                     }
                 #endregion
 
+                #region Floor Initialization
+                    SansDungeon.InitCustomDungeon();
+                #endregion
+
                 #region Old Asset Stuff
                     // ETGModConsole.Log("Trying to load some stuff");
                     // try
