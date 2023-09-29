@@ -15,12 +15,15 @@ using Alexandria.Misc;
 
 namespace CwaffingTheGungy
 {
+    /* TODO:
+        - make sure killed enemies serialize properly on game saves and reloads
+    */
     class BulletThatCanKillTheFuture : PlayerItem
     {
         public static string ItemName         = "Bullet That Can Kill the Future";
         public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/future_killing_bullet_icon";
         public static string ShortDescription = "Seriously, Don't Miss";
-        public static string LongDescription  = "(Any enemy shot with "+ItemName+" will not spawn for the rest of the run)";
+        public static string LongDescription  = "Any enemy shot with "+ItemName+" will not spawn for the rest of the run.\n\nVery little is known about this bullet, as few know it exists at all. It was originally given to Bello by a mysterious blue-clad skeleton, who claims to have found it behind the Hero Shrine in the Keep of the Lead Lord. It's almost as if it's calling out to be fired.";
 
         internal static tk2dBaseSprite _Sprite = null;
 
