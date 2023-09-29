@@ -20,7 +20,7 @@ namespace CwaffingTheGungy
         public static string ItemName         = "Gyroscope";
         public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/gyroscope_icon";
         public static string ShortDescription = "Spin to Win";
-        public static string LongDescription  = "(spinspinspinspinspinspinspinspinspinspin)";
+        public static string LongDescription  = "Grants a chargeable dodge roll that transforms the user into a rampant tornado, reflecting projectiles but effectively randomizing shooting direction. Longer charges result in longer invulnerability periods, but may cause dizziness leaving the user briefly immobile and vulnerable.\n\nWatching this simple toy spin for even a few seconds is completely mesmerizing. Its trifold axes of rotation inspire truly revolutionary possibilities for avoiding projectiles.";
 
         private PlayerController _owner = null;
         private GyroscopeRoll _dodgeRoller = null;

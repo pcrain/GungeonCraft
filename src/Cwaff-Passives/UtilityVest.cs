@@ -20,7 +20,7 @@ namespace CwaffingTheGungy
         public static string ItemName         = "Utility Vest";
         public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/utility_vest_icon";
         public static string ShortDescription = "Pocket Protector";
-        public static string LongDescription  = "(When taking otherwise fatal damage, destroys the least valuable item in your inventory instead.)";
+        public static string LongDescription  = "When taking otherwise fatal damage, destroys the least valuable item in your inventory instead.\n\n";
 
         public static void Init()
         {

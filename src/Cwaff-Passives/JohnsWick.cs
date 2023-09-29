@@ -20,7 +20,7 @@ namespace CwaffingTheGungy
         public static string ItemName         = "John's Wick";
         public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/johns_wick_icon";
         public static string ShortDescription = "No Dogs Harmed";
-        public static string LongDescription  = "(Move faster and do double damage while on fire; take damage from fire more slowly.)";
+        public static string LongDescription  = "Move faster and deal double damage while on fire; take damage from fire more slowly.\n\nAccording to Bello, the wick inside this lantern was once possessed by a man who survived dozens of assassination attempts en route to grabbing breakfast at a hotel. This raises far more questions than it answers, and Bello refuses to elaborate further.";
 
         private const float _FIRE_TIMER_MULT = 0.25f;
         private const float _MOVEMENT_BOOST  = 5f;

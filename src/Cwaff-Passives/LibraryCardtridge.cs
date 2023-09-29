@@ -20,7 +20,7 @@ namespace CwaffingTheGungy
         public static string ItemName         = "Library Cardtridge";
         public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/library_cardtridge_icon";
         public static string ShortDescription = "Knowledge is Firepower";
-        public static string LongDescription  = "(informational items are free at shops; Bookllets are charmed upon entering a room; books explode on destruction)";
+        public static string LongDescription  = "Informational items are free at shops. Bookllets are charmed upon entering a room. Piles of books explode when destroyed.\n\nIt's pretty safe to assume that most who enter the Gungeon don't come there with the primary goal of reading books, but if you're one of the 4 who do, a library cardtridge is a must-have. Not only does it make reading that much more affordable, but when some unruly Bullet Kin inevitably swing by to destroy your preferred chair and knock over your favorite mug filled with ginger peach green tea, you'll be armed with the knowledge to transform the table you're sitting at into a true bastion of defense.";
 
         private static HashSet<int>         _BookItemIDs    = null;
         private static HashSet<string>      _BookEnemyGUIDs = null;
