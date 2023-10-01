@@ -15,8 +15,13 @@ namespace CwaffingTheGungy
       GameManager.Instance.MainCameraController.SetManualControl(true, true);
       yield return StartCoroutine(Converse(new(){"hey pal", "wanna fight?"},"idle_cloak","idle_cloak"));
       yield return StartCoroutine(Prompt("sure", "not really"));
-      if (PromptResult() == 0)  StartBossFight(); // accept
-      else                      this.ShowText("Alright, suit yourself!", 1f);
+      if (PromptResult() == 0)
+      {
+        AkSoundEngine.PostEvent("sans_stop_all", base.aiActor.gameObject);
+        StartBossFight(); // accept
+      }
+      else
+        this.ShowText("Alright, suit yourself!", 1f);
     }
     protected override IEnumerator DefeatedScript()
     {

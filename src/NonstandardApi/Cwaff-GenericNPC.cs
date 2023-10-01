@@ -35,8 +35,9 @@ namespace CwaffingTheGungy
         protected bool canInteract;
         protected bool m_canUse = true;
         protected PlayerController m_interactor;
-
         protected Vector3 talkPointOffset;
+        protected GameObject talkPointObject;
+
         protected int PromptResult()
         {
             return LastResponse;
@@ -112,7 +113,9 @@ namespace CwaffingTheGungy
         {
             this.canInteract = true;
             this.m_canUse = true;
-            this.talkPoint = base.transform;
+            this.talkPointObject = new GameObject();
+            this.talkPointObject.transform.position = base.transform.position;
+            this.talkPoint = this.talkPointObject.transform;
             // base.sprite.SetSprite(base.sprite.GetSpriteIdByName("talk"));
             Vector3 size = base.sprite.GetCurrentSpriteDef().position3;
             // base.sprite.SetSprite(base.sprite.GetSpriteIdByName("idle"));
@@ -191,8 +194,13 @@ namespace CwaffingTheGungy
             //     ETGModConsole.Log("trying to talk with null interactor!");
             //     return;
             // }
+
+            // Vector3 size = base.sprite.GetCurrentSpriteDef().position3;
+            // this.talkPointOffset = new Vector3(base.sprite.FlipX ? -size.x/2 : size.x/2, size.y, 0) + this.talkPointAdjustment;
+            this.talkPointObject.transform.position = base.sprite.WorldTopCenter;
+
             TextBoxManager.ShowTextBox(
-                this.talkPoint.position + this.talkPointOffset,
+                this.talkPoint.position,
                 this.talkPoint,
                 autoContinueTimer,
                 convoLine,
@@ -271,7 +279,9 @@ namespace CwaffingTheGungy
         protected virtual void Update()
         {
             if (autoFlipSprite)
-                base.sprite.FlipX = (GameManager.Instance.PrimaryPlayer.CenterPosition.x < base.transform.position.x);
+                base.transform.localScale = base.transform.localScale.WithX(
+                    (GameManager.Instance.PrimaryPlayer.CenterPosition.x < base.transform.position.x) ? -1 : 1);
+                // base.sprite.FlipX = (GameManager.Instance.PrimaryPlayer.CenterPosition.x < base.transform.position.x);
         }
 
         protected virtual IEnumerator NPCTalkingScript()

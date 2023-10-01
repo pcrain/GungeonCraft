@@ -171,9 +171,7 @@ namespace CwaffingTheGungy
 
     public void SetBossController(BossController bc)
     {
-      if (this.bossController != null)
-        return;
-      this.bossController = bc;
+      this.bossController ??= bc;
     }
 
     public void FinishBossFight()

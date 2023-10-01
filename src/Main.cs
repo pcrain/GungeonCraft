@@ -155,7 +155,7 @@ namespace CwaffingTheGungy
                 #endregion
 
                 #region Shop NPCs
-                    Boomhildr.Init();
+                    // Boomhildr.Init();
                 #endregion
 
                 #region Fancy NPCs

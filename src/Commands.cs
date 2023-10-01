@@ -67,6 +67,10 @@ namespace CwaffingTheGungy
                     ETGModConsole.Log($"something went wrong D: {ex}");
                 }
             });
+            ETGModConsole.Commands.AddGroup("ss", delegate (string[] args)
+            {
+                GameManager.Instance.LoadCustomLevel("cg_sansfloor"); //TODO: rename later
+            });
             // Another base command for loading my latest debug flow
             ETGModConsole.Commands.AddGroup("ff", delegate (string[] args)
             {

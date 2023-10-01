@@ -21,7 +21,8 @@ public partial class SansBoss : AIActor
   {
     BuildABoss bb = BuildABoss.LetsMakeABoss<BossBehavior>(bossname: BOSS_NAME, guid: BOSS_GUID, defaultSprite: $"{SPRITE_PATH}/sans_idle_1",
       hitboxSize: new IntVector2(8, 9), subtitle: SUBTITLE, bossCardPath: $"{SPRITE_PATH}_bosscard.png"); // Create our build-a-boss
-    bb.SetStats(health: /*1*/60, weight: 200f, speed: 0.4f, collisionDamage: 0f, hitReactChance: 0.05f, collisionKnockbackStrength: 0f,
+    bb.SetStats(health: 60, weight: 200f, speed: 0.4f, collisionDamage: 0f, hitReactChance: 0.05f, collisionKnockbackStrength: 0f,
+    // bb.SetStats(health: 1, weight: 200f, speed: 0.4f, collisionDamage: 0f, hitReactChance: 0.05f, collisionKnockbackStrength: 0f,
       healthIsNumberOfHits: true, invulnerabilityPeriod: 1.0f);                // Set our stats
     bb.InitSpritesFromResourcePath(spritePath: SPRITE_PATH);                   // Set up our animations
       bb.AdjustAnimation(name: "idle",         fps:   12f, loop: true);        // Adjust some specific animations as needed
@@ -107,18 +108,18 @@ public partial class SansBoss : AIActor
 
     private void Start()
     {
+      this.aiActor.bulletBank.Bullets.Add(boneBullet);
+      base.aiActor.healthHaver.forcePreventVictoryMusic = true; // prevent default floor theme from playing on death
       base.aiActor.healthHaver.OnPreDeath += (_) => {
         FlipSpriteIfNecessary(overrideFlip: false);
-        AkSoundEngine.PostEvent("Play_ENM_beholster_death_01", base.aiActor.gameObject);
+        // AkSoundEngine.PostEvent("Play_ENM_beholster_death_01", base.aiActor.gameObject);
+        AkSoundEngine.PostEvent("Stop_MUS_All", base.gameObject);
+        AkSoundEngine.PostEvent("electromegalo_stop_all", base.aiActor.gameObject);
+        AkSoundEngine.PostEvent("sans", base.aiActor.gameObject);
         UnityEngine.Object.Destroy(aura.gameObject);
         aura = null;
         GameManager.Instance.RewardManager.SpawnTotallyRandomChest(GameManager.Instance.PrimaryPlayer.CurrentRoom.GetRandomVisibleClearSpot(1, 1)).IsLocked = false;
       };
-      // base.healthHaver.healthHaver.OnDeath += (_) => { // doesn't work properly with interactible component if you keep it around
-      //   FlipSpriteIfNecessary(overrideFlip: false);
-      //   GameManager.Instance.RewardManager.SpawnTotallyRandomChest(GameManager.Instance.PrimaryPlayer.CurrentRoom.GetRandomVisibleClearSpot(1, 1)).IsLocked = false;
-      // };
-      this.aiActor.bulletBank.Bullets.Add(boneBullet);
     }
 
     private void LateUpdate() // movement is buggy if we use the regular Update() method
@@ -128,7 +129,7 @@ public partial class SansBoss : AIActor
 
       FlipSpriteIfNecessary();
       if (aura == null)
-        return; // don't do anything else if we're pre-intro
+        return; // don't do anything else if we're pre-intro or post-fight
 
       base.sprite.transform.localPosition += Vector3.zero.WithY(Mathf.CeilToInt(4f*Mathf.Sin(4f*BraveTime.ScaledTimeSinceStartup))/C.PIXELS_PER_TILE);
       base.aiActor.PathfindToPosition(GameManager.Instance.PrimaryPlayer.specRigidbody.UnitCenter); // drift around

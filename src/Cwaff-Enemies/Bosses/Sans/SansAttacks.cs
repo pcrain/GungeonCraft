@@ -119,13 +119,11 @@ public partial class SansBoss : AIActor
 
       private void OnPreCollision(SpeculativeRigidbody me, PixelCollider myPixelCollider, SpeculativeRigidbody other, PixelCollider otherPixelCollider)
       {
-        if (!(other.gameActor is PlayerController))
-        {
-          PhysicsEngine.SkipCollision = false;
-          return;
-        }
-        bool playerIsIdle           = other.gameActor.spriteAnimator.CurrentClip.name.Contains("idle",true);
-        PhysicsEngine.SkipCollision = (this.orange != playerIsIdle);
+        if (this.Destroyed || other.gameActor is not PlayerController pc)
+          return;  // need Destroyed check or we can keep skipping collisions post-death, causing player to become near invincible
+        bool playerIsIdle = pc.spriteAnimator.CurrentClip.name.Contains("idle",true);
+        if (this.orange != playerIsIdle)
+          PhysicsEngine.SkipCollision = true;
       }
     }
 
