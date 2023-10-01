@@ -20,7 +20,7 @@ namespace CwaffingTheGungy
         public static string ItemName         = "Kaliber's Justice";
         public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/kalibers_justice_icon";
         public static string ShortDescription = "Knows What You Need";
-        public static string LongDescription  = "(Gives you a Pickup that would best complement your current loadout, but removes an equally valuable item that you need the least.)";
+        public static string LongDescription  = "Gives one or more items based on what you currently need most, but may take away items that you have in excess. Reward quality scales with the quality and quantity of items you lose.\n\nPraying to Kaliber for assistance is something of a mixed bag, even among her followers. On the one hand, she tends to be highly responsive to prayers and considerate of one's present situation when choosing her mode of assistance. On the flipside, she is less than thrilled by the modern trend of praying to her only when in need something, and has been known to make the equally modern decision of treating her blessings as business transactions and taking as much as she gives. Still, she has been known to freely offer her aid to those who remain humble.";
 
         private float _lastUse = 0f;
 
@@ -146,6 +146,8 @@ namespace CwaffingTheGungy
                                 gunToDrop = user.inventory.AllGuns.ChooseRandom();
                                 if (!gunToDrop.CanActuallyBeDropped(user))
                                     continue;
+                                if (n < 50 && !big && (gunToDrop.quality == ItemQuality.S || gunToDrop.quality == ItemQuality.A))
+                                    continue; // try not to drop rare items if we're not doing a big trade
                             }
                             if (gunToDrop)
                                 UnityEngine.Object.Destroy(user.ForceDropGun(gunToDrop));
@@ -162,6 +164,8 @@ namespace CwaffingTheGungy
                                 passiveToDrop = user.passiveItems.ChooseRandom();
                                 if (!passiveToDrop.CanActuallyBeDropped(user))
                                     continue;
+                                if (n < 50 && !big && (passiveToDrop.quality == ItemQuality.S || passiveToDrop.quality == ItemQuality.A))
+                                    continue; // try not to drop rare items if we're not doing a big trade
                             }
                             if (passiveToDrop)
                                 UnityEngine.Object.Destroy(user.DropPassiveItem(passiveToDrop));
@@ -180,6 +184,8 @@ namespace CwaffingTheGungy
                                     continue;
                                 if (!activeToDrop.CanActuallyBeDropped(user))
                                     continue;
+                                if (n < 50 && !big && (activeToDrop.quality == ItemQuality.S || activeToDrop.quality == ItemQuality.A))
+                                    continue; // try not to drop rare items if we're not doing a big trade
                             }
                             if (activeToDrop)
                                 UnityEngine.Object.Destroy(user.DropActiveItem(activeToDrop));

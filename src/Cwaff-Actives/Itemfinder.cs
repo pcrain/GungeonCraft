@@ -20,7 +20,7 @@ namespace CwaffingTheGungy
         public static string ItemName         = "Itemfinder";
         public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/itemfinder_icon";
         public static string ShortDescription = "Scavenger Hunt";
-        public static string LongDescription  = "(Becomes usable over select hidden spots in random rooms; using near these spots can uncover items of varying rarities.)";
+        public static string LongDescription  = "Beeps when near hidden treasure. Using near hidden treasure uncovers an item or gun with varying rarity.\n\nOx and Cadence commissioned the development of this handy little gadget for helping them find wares to sell at their shop. Their inventory has expanded considerably since they switched over from using a traditional metal detector, which had the unfortunate habit of going off around just about everything in the Gungeon. As this included the Gundead themselves, Ox and Cadence's medical expenses have also gone down considerably since foregoing the metal detector.";
 
         // Chance for getting at least 0, 1, 2, 3, 4, or 5 treasures per floor
         internal readonly float[] _TREASURE_CHANCES = {1.00f, 1.00f, 1.00f, 0.50f, 0.20f, 0.05f};
