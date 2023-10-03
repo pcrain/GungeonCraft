@@ -166,6 +166,8 @@ namespace CwaffingTheGungy
         private bool _isDebris       = true; // false for the VFX particles created by the vacuum animation itself, true for actual debris
         private DebrisObject _debris = null;
         private float _startDistance = 0.0f;
+        private float _startScaleX   = 1.0f;
+        private float _startScaleY   = 1.0f;
 
         public void Setup(Gun g, float startDistance = 0.0f)
         {
@@ -174,6 +176,8 @@ namespace CwaffingTheGungy
             this._debris        = base.gameObject.GetComponent<DebrisObject>();
             this._isDebris      = this._debris != null;
             this._startDistance = startDistance;
+            this._startScaleX   = this._sprite.scale.x;
+            this._startScaleY   = this._sprite.scale.y;
         }
 
         // Using LateUpdate() here so alpha is updated correctly
@@ -205,7 +209,7 @@ namespace CwaffingTheGungy
 
             // Shrink on our way to the vacuum
             float scale = mag / this._startDistance;
-            this._sprite.scale = new Vector3(scale, scale, 1f);
+            this._sprite.scale = new Vector3(this._startScaleX * scale, this._startScaleY * scale, 1f);
             // Compute our natural velocity from accelerating towards the vacuum
             float accel = VacuumCleaner._ACCEL_SEC * BraveTime.DeltaTime;
             Vector2 naturalVelocity = this._velocity + (accel * towardsVacuum.normalized);
