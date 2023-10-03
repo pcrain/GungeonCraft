@@ -56,7 +56,7 @@ namespace CwaffingTheGungy
                 comp.SetReloadAudio("alyx_reload_sound");
 
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
-                ResMap.Get("alyx-projectile").Base(),
+                ResMap.Get("alyx_projectile").Base(),
                 16, true, new IntVector2(9, 9),
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
 

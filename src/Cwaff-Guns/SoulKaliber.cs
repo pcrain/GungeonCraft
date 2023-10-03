@@ -47,7 +47,7 @@ namespace CwaffingTheGungy
                 comp.SetReloadAudio("soul_kaliber_reload");
 
             _ProjSprite = AnimateBullet.CreateProjectileAnimation(
-                ResMap.Get("soul-kaliber-projectile").Base(),
+                ResMap.Get("soul_kaliber_projectile").Base(),
                 2, true, new IntVector2(10, 10),
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
 

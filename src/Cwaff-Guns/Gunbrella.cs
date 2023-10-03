@@ -61,7 +61,7 @@ namespace CwaffingTheGungy
                 gun.CurrentAmmo = 100;
 
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
-                ResMap.Get("gunbrella-projectile").Base(),
+                ResMap.Get("gunbrella_projectile").Base(),
                 16, true, new IntVector2(15, 8),
                 false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
 

@@ -50,7 +50,7 @@ namespace CwaffingTheGungy
                 comp.SetReloadAudio("coin_gun_reload");
 
             _ProjSprite = AnimateBullet.CreateProjectileAnimation(
-                ResMap.Get("coin-gun-projectile").Base(),
+                ResMap.Get("coin_gun_projectile").Base(),
                 2, true, new IntVector2(9, 6),
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
 

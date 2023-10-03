@@ -46,7 +46,10 @@ namespace CwaffingTheGungy
         public static List<string> Get(string resource)
         {
             if (!_ResMap.ContainsKey(resource))
+            {
+                ETGModConsole.Log($"failed to retrieve \"{resource}\" from resmap");
                 return null;
+            }
             return _ResMap[resource];
         }
 

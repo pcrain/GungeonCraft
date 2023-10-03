@@ -89,8 +89,8 @@ public partial class SansBoss : AIActor
   // Shoots undertale-esque blue / orange bullets from all directions
   private class OrangeAndBlueScript : SecretBulletScript
   {
-    private static readonly string orangeReticle = "reticle-orange";
-    private static readonly string blueReticle   = "reticle-blue";
+    private static readonly string orangeReticle = "reticle_orange";
+    private static readonly string blueReticle   = "reticle_blue";
     private static readonly Color  orangeColor   = new Color(1.0f,0.75f,0f,0.5f);
     private static readonly Color  blueColor     = new Color(0.65f,0.65f,1.0f,0.5f);
 

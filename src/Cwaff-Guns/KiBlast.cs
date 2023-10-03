@@ -48,7 +48,7 @@ namespace CwaffingTheGungy
                 gun.SetBaseMaxAmmo(99999);
                 gun.SetAnimationFPS(gun.shootAnimation, 24);
 
-                VFXPool impactFVX = VFX.RegisterVFXPool(ItemName+" Impact", ResMap.Get("ki-explosion"), 20, false, scale: 0.5f);
+                VFXPool impactFVX = VFX.RegisterVFXPool(ItemName+" Impact", ResMap.Get("ki_explosion"), 20, false, scale: 0.5f);
 
                 gun.SetHorizontalImpactVFX(impactFVX);
                 gun.SetVerticalImpactVFX(impactFVX);
