@@ -99,7 +99,10 @@ namespace CwaffingTheGungy
             RegisterVFX("Splode", ResMap.Get("splode"), 18, loops: true,
                     anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 100, emissiveColour: Color.cyan);
 
-            RegisterVFX("RainReticle", ResMap.Get("splode"), 12, loops: true,
+            // RegisterVFX("RainReticle", ResMap.Get("splode"), 12, loops: true,
+            //         anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 10, emissiveColour: Color.cyan, scale: 0.75f);
+
+            RegisterVFX("RainReticle", ResMap.Get("gunbrella_target_reticle"), 12, loops: true,
                     anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 10, emissiveColour: Color.cyan, scale: 0.75f);
 
             RegisterVFX("Rebar", ResMap.Get("RebarGunImpactVFX2"), 6, loops: false);

@@ -17,7 +17,6 @@ namespace CwaffingTheGungy
 {
     /* TODO:
         - figure out nicely drawing while out of bounds
-        - maybe find a more thematically appropriate reticle?
     */
 
     public class Gunbrella : AdvancedGunBehavior
@@ -33,6 +32,7 @@ namespace CwaffingTheGungy
         private const float _BARRAGE_DELAY     = 0.04f;
         private const float _PROJ_DAMAGE       = 16f;
         private const float _MAX_RETICLE_RANGE = 10f;
+        private const float _MAX_ALPHA         = 0.5f;
 
         internal static tk2dSpriteAnimationClip _BulletSprite;
 
@@ -125,7 +125,7 @@ namespace CwaffingTheGungy
         // Using LateUpdate() here so alpha is updated correctly
         private void LateUpdate()
         {
-            this._targetingReticle?.SetAlpha(Mathf.Min(1.0f, this._curChargeTime / _MIN_CHARGE_TIME));
+            this._targetingReticle?.SetAlpha(_MAX_ALPHA * Mathf.Min(1.0f, this._curChargeTime / _MIN_CHARGE_TIME));
         }
 
         private void BeginCharge()

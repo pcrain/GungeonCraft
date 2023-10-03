@@ -908,6 +908,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_026.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\natascha_fire_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alyx_fire_003.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\gunbrella_target_reticle4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren15.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\zenkai_aura2.png"/>
@@ -915,9 +916,11 @@
     <EmbeddedResource Include="Resources\MiscVFX\campfire-b1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren20.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\hail-collision2.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\gunbrella_target_reticle1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\hail-collision1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\mini_pickup2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\icicle-crash-particles7.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\gunbrella_target_reticle3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren14.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\saiyan_spark1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a2.png"/>
@@ -1038,7 +1041,9 @@
     <EmbeddedResource Include="Resources\MiscVFX\siren10.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren19.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\hail-collision9.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\gunbrella_target_reticle2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\shine2.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\gunbrella_target_reticle5.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\exorcism-particles4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire-d3.png"/>
@@ -1046,6 +1051,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\campfire-c1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire-d2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\hail-collision6.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\gunbrella_target_reticle6.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\reticle-orange.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\can-of-sprite.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\friendlyoverhead_vfx_003.png"/>
@@ -1070,6 +1076,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\campfire-b3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren13.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\zenkai_aura5.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\gunbrella_target_reticle7.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren8.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\can-of-pepsi.png"/>
     <EmbeddedResource Include="Resources\shaders\InvisibleShader.shader"/>
