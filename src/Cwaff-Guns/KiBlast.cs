@@ -44,7 +44,7 @@ namespace CwaffingTheGungy
                 gun.reloadTime                           = 0f;
                 gun.quality                              = PickupObject.ItemQuality.D;
                 gun.InfiniteAmmo                         = true;
-                gun.barrelOffset.transform.localPosition = new Vector3(0f,0f, 0f); // emit directly from hand
+                gun.barrelOffset.transform.localPosition = new Vector3(0.125f,0.6875f, 0f); // emit directly from hand
                 gun.SetBaseMaxAmmo(99999);
                 gun.SetAnimationFPS(gun.shootAnimation, 24);
 
