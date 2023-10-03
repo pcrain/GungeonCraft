@@ -44,6 +44,9 @@ namespace CwaffingTheGungy
             if (Time.timeScale <= 0f || this.Owner.m_blankCooldownTimer > 0f)
                 return; // Can't use blanks when paused or on cooldown
 
+            if (!this.Owner.AcceptingNonMotionInput)
+                return; // Can't use when we're not accepting input
+
             if (PlayerStats.GetTotalCurse() >= 10)
                 return; // Won't work past 10 curse
 
