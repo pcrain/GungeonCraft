@@ -147,6 +147,7 @@ namespace CwaffingTheGungy
                     VacuumCleaner.Add();
                     Gunbrella.Add();
                     Blackjack.Add();
+                    SchrodingersGat.Add();
                     // MasterSword.Add(); unfinished
                 #endregion
 
