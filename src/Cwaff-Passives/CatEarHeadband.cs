@@ -15,6 +15,9 @@ using Alexandria.Misc;
 
 namespace CwaffingTheGungy
 {
+    /* TODO:
+        - Look into logic in ConsumableStealthItem
+    */
     public class CatEarHeadband : PassiveItem
     {
         public static string ItemName         = "Cat Ear Headband";

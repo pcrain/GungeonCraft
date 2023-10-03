@@ -15,6 +15,9 @@ using Alexandria.Misc;
 
 namespace CwaffingTheGungy
 {
+    /* TODO:
+        - Look into logic in ConsumableStealthItem
+    */
     public class DeadRinger : PassiveItem
     {
         public static string ItemName         = "Dead Ringer";
