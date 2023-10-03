@@ -45,7 +45,7 @@ namespace CwaffingTheGungy
                 gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
                 gun.reloadTime                        = 0.9f;
                 gun.DefaultModule.angleVariance       = 0.0f;
-                gun.DefaultModule.cooldownTime        = 0.1f;
+                gun.DefaultModule.cooldownTime        = 0.4f;
                 gun.DefaultModule.numberOfShotsInClip = 8;
                 gun.CurrentAmmo                       = 64;
                 gun.SetBaseMaxAmmo(64);
@@ -195,7 +195,13 @@ namespace CwaffingTheGungy
             if (!this.Player)
                 return;
 
-            UpdateLaserSight();
+            if (this.Player.m_hideGunRenderers.Value)
+                DisableLaserSight();
+            else
+            {
+                EnableLaserSight();
+                UpdateLaserSight();
+            }
 
             this._myTimer += BraveTime.DeltaTime;
             float power = 200.0f + 400.0f * Mathf.Abs(Mathf.Sin(16 * this._myTimer));
