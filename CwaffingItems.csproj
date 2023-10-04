@@ -1410,6 +1410,7 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\bball_old_8.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball018.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\ki_blast_red_001.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\schrodinger_bullet.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\gaster_blaster.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball_old_7.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball005.png"/>
@@ -1481,6 +1482,7 @@
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\natascha_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\blackjack_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\paintball_cannon_idle_001.png"/>
+    <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\schrodingers_gat_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\b_b_gun_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\iron_maid_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\grandmaster_idle_001.png"/>

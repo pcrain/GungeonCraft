@@ -473,10 +473,10 @@ namespace CwaffingTheGungy
     // Helper class for making movable / fadeable  VFX
     public class FancyVFX : MonoBehaviour
     {
+        public tk2dSprite sprite;
+
         private GameObject _vfx;
         private float _curLifeTime;
-        private tk2dSprite _sprite;
-
         private Vector3 _velocity;
         private bool _fadeOut;
         private float _fadeStartTime;
@@ -499,17 +499,17 @@ namespace CwaffingTheGungy
                 return;
             }
 
-            this._sprite.transform.position += this._velocity;
+            this.sprite.transform.position += this._velocity;
 
             if (this._curLifeTime > this._fadeStartTime)
-                this._sprite.renderer.SetAlpha(1.0f - (this._curLifeTime - this._fadeStartTime) / this._fadeTotalTime);
+                this.sprite.renderer.SetAlpha(1.0f - (this._curLifeTime - this._fadeStartTime) / this._fadeTotalTime);
         }
 
         // todo: fading and emission are not simultaneously compatible
         public void Setup(Vector2 velocity, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0, Color? emissiveColor = null)
         {
             this._vfx = base.gameObject;
-            this._sprite = this._vfx.GetComponent<tk2dSprite>();
+            this.sprite = this._vfx.GetComponent<tk2dSprite>();
             this._curLifeTime = 0.0f;
 
             this._velocity = (1.0f / C.PIXELS_PER_CELL) * velocity.ToVector3ZisY(0);
@@ -525,7 +525,7 @@ namespace CwaffingTheGungy
             if (emissivePower > 0)
             {
                 // this._sprite.usesOverrideMaterial = true;
-                Material m = this._sprite.renderer.material;
+                Material m = this.sprite.renderer.material;
                     m.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
                     m.SetFloat("_EmissivePower", emissivePower);
 
@@ -537,6 +537,21 @@ namespace CwaffingTheGungy
                     m.SetColor("_OverrideColor", emitColor);
                 }
             }
+        }
+
+        // Make a new FancyVFX from a GameObject's current sprite, frame, position, etc.
+        public static FancyVFX FromCurrentFrame(tk2dBaseSprite osprite)
+        {
+            if (!osprite)
+                return null;
+
+            GameObject g = UnityEngine.Object.Instantiate(new GameObject(), osprite.WorldCenter, osprite.transform.rotation);
+            tk2dBaseSprite sprite = g.AddComponent<tk2dSprite>();
+                sprite.SetSprite(osprite.collection, osprite.spriteId);
+                sprite.PlaceAtPositionByAnchor(osprite.WorldCenter, tk2dBaseSprite.Anchor.MiddleCenter);
+
+            FancyVFX fv = g.AddComponent<FancyVFX>();
+            return fv;
         }
     }
 
