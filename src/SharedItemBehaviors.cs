@@ -36,7 +36,10 @@ namespace CwaffingTheGungy
         private void Start()
         {
             Projectile p = base.GetComponent<Projectile>();
-            Invoke("Expire", expirationTimer);
+            if (expirationTimer == 0f)
+                Expire();
+            else
+                Invoke("Expire", expirationTimer);
         }
 
         private void Expire()

@@ -550,6 +550,23 @@ namespace CwaffingTheGungy
         {
             return GameManager.Instance.PrimaryPlayer.CurrentRoom;
         }
+
+        private static Projectile _NullProjectilePrefab = null;
+        public static Projectile NoProjectile()
+        {
+            if (_NullProjectilePrefab == null)
+            {
+                _NullProjectilePrefab                     = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items.Ak47) as Gun, setGunDefaultProjectile: false);
+                _NullProjectilePrefab.damageTypes         = CoreDamageTypes.None;
+                _NullProjectilePrefab.collidesWithEnemies = false;
+                _NullProjectilePrefab.collidesWithPlayer  = false;
+                _NullProjectilePrefab.baseData.damage     = 0;
+                _NullProjectilePrefab.baseData.speed      = 0.0001f;
+                _NullProjectilePrefab.baseData.range      = 1f;
+                _NullProjectilePrefab.gameObject.AddComponent<Expiration>().expirationTimer = 0f;
+            }
+            return _NullProjectilePrefab;
+        }
     }
 
     public static class Dissect // reflection helper methods for being a lazy dumdum
