@@ -124,6 +124,7 @@ namespace CwaffingTheGungy
                     // PopcornGun.Add(); no sprite
                     Tranquilizer.Add();
                     // LastResort.Add(); no sprite
+                    // MasterSword.Add(); unfinished
                     // Encircler.Add(); no sprite
                     // Nug.Add(); no sprite
                     SoulKaliber.Add();
@@ -148,7 +149,8 @@ namespace CwaffingTheGungy
                     Gunbrella.Add();
                     Blackjack.Add();
                     SchrodingersGat.Add();
-                    // MasterSword.Add(); unfinished
+                    // Taomislav.Add(); unfinished
+                    TennisRocket.Add();
                 #endregion
 
                 #region Synergies
