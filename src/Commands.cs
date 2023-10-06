@@ -18,7 +18,7 @@ namespace CwaffingTheGungy
             ETGModConsole.Commands.AddGroup("gg", delegate (string[] args)
             {
                 LootEngine.SpawnItem(
-                    PickupObjectDatabase.GetById(IDs.Pickups["tennis_rocket"]).gameObject,
+                    PickupObjectDatabase.GetById(IDs.Pickups["racket_launcher"]).gameObject,
                     GameManager.Instance.PrimaryPlayer.CenterPosition,
                     Vector2.zero,
                     0);

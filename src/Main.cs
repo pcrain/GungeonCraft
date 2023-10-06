@@ -150,7 +150,7 @@ namespace CwaffingTheGungy
                     Blackjack.Add();
                     SchrodingersGat.Add();
                     // Taomislav.Add(); unfinished
-                    TennisRocket.Add();
+                    RacketLauncher.Add();
                 #endregion
 
                 #region Synergies

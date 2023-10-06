@@ -15,10 +15,10 @@ using Alexandria.Misc;
 
 namespace CwaffingTheGungy
 {
-    public class TennisRocket : AdvancedGunBehavior
+    public class RacketLauncher : AdvancedGunBehavior
     {
-        public static string ItemName         = "Tennis Rocket";
-        public static string SpriteName       = "paddle";
+        public static string ItemName         = "Racket Launcher";
+        public static string SpriteName       = "racket_launcher";
         public static string ProjectileName   = "86"; //marine sidearm
         public static string ShortDescription = "TBD";
         public static string LongDescription  = "TBD";
@@ -34,7 +34,7 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            var comp = gun.gameObject.AddComponent<TennisRocket>();
+            var comp = gun.gameObject.AddComponent<RacketLauncher>();
                 comp.SetFireAudio();
 
             gun.DefaultModule.ammoCost               = 1;
@@ -165,7 +165,7 @@ namespace CwaffingTheGungy
         private bool                _returning     = false;
         private bool                _missedPlayer  = false;
         private bool                _dead          = false;
-        private TennisRocket        _parentGun     = null;
+        private RacketLauncher        _parentGun     = null;
         private EasyTrailBullet     _trail         = null;
         private float               _baseSpeed     = 0f;
         private float               _baseDamage    = 0f;
@@ -182,11 +182,11 @@ namespace CwaffingTheGungy
             // this._projectile.DestroyMode = Projectile.ProjectileDestroyMode.BecomeDebris;
             this._projectile.DestroyMode = Projectile.ProjectileDestroyMode.DestroyComponent;
 
-            if (pc.CurrentGun.GetComponent<TennisRocket>() is TennisRocket tr)
+            if (pc.CurrentGun.GetComponent<RacketLauncher>() is RacketLauncher tr)
                 this._parentGun = tr;
             else foreach (Gun g in pc.inventory.AllGuns)
             {
-                if (g.GetComponent<TennisRocket>() is TennisRocket tr2)
+                if (g.GetComponent<RacketLauncher>() is RacketLauncher tr2)
                 {
                     this._parentGun = tr2;
                     break;
