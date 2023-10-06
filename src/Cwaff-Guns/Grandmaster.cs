@@ -328,17 +328,11 @@ namespace CwaffingTheGungy
                 {
                     ipoint = PointOrthognalTo(ppos, epos, candidateAngle.ToVector());
                     if (ipoint.HasValue)
-                    {
-                        dirVec = (ipoint.Value - ppos);
                         break;
-                    }
                 }
                 if (!ipoint.HasValue)
                     continue; // if we're not orthogonal to the enemy in any direction, ignore it
-
-                // Check if there's an obstruction between us on the intersection point
-                RaycastResult collision;
-                if (PhysicsEngine.Instance.Raycast(ppos, dirVec, dirVec.magnitude, out collision, true, false))
+                if (!ppos.HasLineOfSight(ipoint.Value))
                     continue; // if we collide with a wall, we don't care
 
                 // If there's no collision, it's a good position!

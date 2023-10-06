@@ -465,5 +465,16 @@ namespace CwaffingTheGungy
           return true;
       return false;
     }
+
+    // Check if we have line of sight to a target from start without walls interfering
+    public static bool HasLineOfSight(this Vector2 start, Vector2 target)
+    {
+      Vector2 dirVec = target - start;
+      RaycastResult collision;
+      bool collided = PhysicsEngine.Instance.Raycast(start, dirVec, dirVec.magnitude, out collision, true, false);
+      RaycastResult.Pool.Free(ref collision);
+      return !collided;
+    }
+
   }
 }

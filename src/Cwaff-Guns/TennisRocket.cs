@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +23,8 @@ namespace CwaffingTheGungy
         public static string ShortDescription = "TBD";
         public static string LongDescription  = "TBD";
 
-        internal const float _MAX_REFLECT_DISTANCE = 2f;
+        internal const float _MAX_REFLECT_DISTANCE = 5f;
+        internal const int   _IDLE_FPS             = 24;
 
         internal static tk2dSpriteAnimationClip _BulletSprite;
 
@@ -40,6 +41,7 @@ namespace CwaffingTheGungy
             gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
             gun.reloadTime                           = 0;
             gun.DefaultModule.cooldownTime           = 0.3f;
+            gun.DefaultModule.cooldownTime           = 0.1f;
             gun.muzzleFlashEffects.type              = VFXPoolType.None;
             gun.DefaultModule.numberOfShotsInClip    = 100;
             gun.barrelOffset.transform.localPosition = new Vector3(1.0f, 1.875f, 0);
@@ -50,7 +52,7 @@ namespace CwaffingTheGungy
             gun.CurrentAmmo                          = 100;
             gun.SetBaseMaxAmmo(100);
             gun.SetAnimationFPS(gun.shootAnimation, 60);
-            gun.SetAnimationFPS(gun.idleAnimation, 24);
+            gun.SetAnimationFPS(gun.idleAnimation, _IDLE_FPS);
             gun.LoopAnimation(gun.idleAnimation, 0);
 
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
@@ -72,6 +74,20 @@ namespace CwaffingTheGungy
                 mod.ammoCost = 0;
         }
 
+        protected override void OnPickedUpByPlayer(PlayerController player)
+        {
+            base.OnPickedUpByPlayer(player);
+            gun.SetAnimationFPS(gun.idleAnimation, _IDLE_FPS);
+            gun.spriteAnimator.Play();
+        }
+
+        protected override void OnPostDroppedByPlayer(PlayerController player)
+        {
+            base.OnPostDroppedByPlayer(player);
+            gun.SetAnimationFPS(gun.idleAnimation, 0);
+            gun.spriteAnimator.StopAndResetFrameToDefault();
+        }
+
         public override Projectile OnPreFireProjectileModifier(Gun gun, Projectile projectile, ProjectileModule mod)
         {
             if (this._extantTennisBalls.Count == 0 && gun.CurrentAmmo > 0)
@@ -79,15 +95,19 @@ namespace CwaffingTheGungy
                 gun.LoseAmmo(1);
                 return projectile;
             }
-            Vector2 racketpos = gun.barrelOffset.transform.position;
+            Vector2 racketpos = gun.GunPlayerOwner().sprite.WorldCenter;
             foreach (TennisBall ball in this._extantTennisBalls)
             {
                 if (!ball.Whackable())
                     continue;
-                float dist = (racketpos - ball.Position()).magnitude;
-                if (dist < _MAX_REFLECT_DISTANCE)
+                Vector2 delta = (ball.Position() - racketpos);
+                float dist = delta.magnitude;
+                float angle = delta.ToAngle();
+                // make sure it's within range and not behind us
+                if (dist < _MAX_REFLECT_DISTANCE && Mathf.Abs(angle - gun.CurrentAngle) < 90f)
                     ball.GotWhacked(gun.CurrentAngle.ToVector());
             }
+            gun.ClipShotsRemaining = gun.CurrentAmmo;
             return Lazy.NoProjectile();
         }
 
@@ -125,14 +145,21 @@ namespace CwaffingTheGungy
 
     public class TennisBall : MonoBehaviour
     {
-        const float _RETURN_HOMING_STRENGTH = 0.2f;
+        const float _RETURN_HOMING_STRENGTH = 0.1f;
         const float _SPREAD = 10f;
+        const float _MAX_DEVIATION = 30f; // max angle deviation we can be from player to home in
+        const int   _MAX_VOLLEYS = 10;
 
         private Projectile       _projectile;
         private PlayerController _owner;
         private int              _volleys = 0;
         private bool             _returning = false;
+        private bool             _missedPlayer = false;
         private TennisRocket     _parentGun = null;
+        private EasyTrailBullet  _trail = null;
+        private float            _baseSpeed  = 0f;
+        private float            _baseDamage = 0f;
+        private float            _baseForce  = 0f;
 
         private void Start()
         {
@@ -166,17 +193,24 @@ namespace CwaffingTheGungy
                 AkSoundEngine.PostEvent("racket_hit", this._projectile.gameObject);
             }
 
-
-            // don't use an emissive / tinted shader so we can turn off the glowing yellow tint effect
-            // this._projectile.sprite.usesOverrideMaterial = true; // keep this off so we still get nice lighting
-            // this._projectile.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitBlendUber");
-
             BounceProjModifier bounce = this._projectile.gameObject.GetOrAddComponent<BounceProjModifier>();
                 bounce.numberOfBounces     = 9999;
                 bounce.chanceToDieOnBounce = 0f;
                 bounce.onlyBounceOffTiles  = false;
                 bounce.ExplodeOnEnemyBounce = true;
                 bounce.OnBounce += this.ReturnToSender;
+
+            this._trail = this._projectile.gameObject.AddComponent<EasyTrailBullet>();
+                this._trail.StartWidth = 0.2f;
+                this._trail.EndWidth   = 0.1f;
+                this._trail.LifeTime   = 0.1f;
+                this._trail.BaseColor  = ExtendedColours.lime;
+                this._trail.StartColor = ExtendedColours.lime;
+                this._trail.EndColor   = Color.green;
+
+            this._baseSpeed  = this._projectile.baseData.speed;
+            this._baseDamage = this._projectile.baseData.damage;
+            this._baseForce  = this._projectile.baseData.force;
 
             // AkSoundEngine.PostEvent("racket_hit", this._projectile.gameObject);
         }
@@ -200,9 +234,23 @@ namespace CwaffingTheGungy
         {
             if (!this._returning)
                 return;
-            ++this._volleys;
+
+            this._volleys                    = Mathf.Min(this._volleys + 1, _MAX_VOLLEYS);
+            float percentPower               = (float)this._volleys / (float)_MAX_VOLLEYS;
+            this._projectile.baseData.speed  = this._baseSpeed  + 40f * percentPower;
+            this._projectile.baseData.damage = this._baseDamage + 20f * percentPower;
+            this._projectile.baseData.force  = this._baseForce  + 10f * percentPower;
+            this._trail.LifeTime             = 0.1f + (this._volleys * 0.02f);
+            Color newColor                   = Lazy.Blend(ExtendedColours.lime, Color.red, 0.1f * (float)this._volleys);
+            this._trail.BaseColor            = newColor;
+            this._trail.StartColor           = newColor;
+            this._trail.UpdateTrail();
+
             this._returning = false;
+            this._missedPlayer = false;
+            this._projectile.Speed = this._projectile.baseData.speed;
             this._projectile.SendInDirection(direction, true);
+            this._projectile.UpdateSpeed();
             AkSoundEngine.PostEvent("racket_hit", this._projectile.gameObject);
         }
 
@@ -220,15 +268,43 @@ namespace CwaffingTheGungy
             AkSoundEngine.PostEvent("racket_hit", this._projectile.gameObject);
         }
 
-        // private void Update()
-        // {
-        //     if (this._returning)
-        //     {
-        //         Vector2 curVelocity = this._projectile.LastVelocity.normalized;
-        //         Vector2 targetVelocity = (this._owner.sprite.WorldCenter - this._projectile.sprite.WorldCenter).normalized;
-        //         Vector2 newVelocty = (_RETURN_HOMING_STRENGTH * targetVelocity) + ((1 - _RETURN_HOMING_STRENGTH) * curVelocity);
-        //         this._projectile.SendInDirection(newVelocty, false);
-        //     }
-        // }
+        private void HomeTowardsTarget(Vector2 targetPos, Vector2 curVelocity)
+        {
+            Vector2 targetVelocity = (targetPos - this._projectile.sprite.WorldCenter).normalized;
+            if (this._returning && (Mathf.Abs(curVelocity.ToAngle().Clamp360() - targetVelocity.ToAngle().Clamp360()) > _MAX_DEVIATION))
+            {
+                this._missedPlayer = true;
+                return;
+            }
+            Vector2 newVelocty = (_RETURN_HOMING_STRENGTH * targetVelocity) + ((1 - _RETURN_HOMING_STRENGTH) * curVelocity);
+            this._projectile.SendInDirection(newVelocty, false);
+        }
+
+        private void Update()
+        {
+            if (this._missedPlayer)
+                return;
+
+            Vector2 ppos = this._projectile.sprite.WorldCenter;
+            Vector2 curVelocity = this._projectile.LastVelocity.normalized;
+
+            // Returning to the player
+            if (this._returning)
+            {
+                HomeTowardsTarget(this._owner.sprite.WorldCenter, curVelocity);
+                return;
+            }
+
+            // Homing in on nearest enemy
+            Vector2? maybeTarget = Lazy.NearestEnemyWithinConeOfVision(
+                start: this._projectile.transform.position,
+                coneAngle: curVelocity.ToAngle().Clamp360(),
+                maxDeviation: _MAX_DEVIATION,
+                useNearestAngleInsteadOfDistance: true,
+                ignoreWalls: false
+                );
+            if (maybeTarget is Vector2 target)
+                HomeTowardsTarget(target, curVelocity);
+        }
     }
 }

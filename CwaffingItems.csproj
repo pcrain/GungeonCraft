@@ -61,6 +61,7 @@
     <Compile Include="src\Cwaff-Passives\CreditCard.cs"/>
     <Compile Include="src\Cwaff-Passives\Gyroscope.cs"/>
     <Compile Include="src\Cwaff-Passives\JohnsWick.cs"/>
+    <Compile Include="src\Lazy.cs"/>
     <Compile Include="src\Commands.cs"/>
     <Compile Include="src\HatsStolenFromNN\HatController.cs"/>
     <Compile Include="src\HatsStolenFromNN\HatUtility.cs"/>
