@@ -128,6 +128,9 @@ namespace CwaffingTheGungy
 
             RegisterVFX("GasterBlaster", ResMap.Get("gaster_blaster"), 2, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
 
+            RegisterVFX("OutbreakSmoke", ResMap.Get("outbreak_smoke_small"), 2, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+            RegisterVFX("OutbreakSmokeLarge", ResMap.Get("outbreak_smoke_large"), 2, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+
             laserSightPrefab = LoadHelper.LoadAssetFromAnywhere("assets/resourcesbundle/global vfx/vfx_lasersight.prefab") as GameObject;
         }
 

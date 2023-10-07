@@ -151,6 +151,7 @@ namespace CwaffingTheGungy
                     SchrodingersGat.Add();
                     // Taomislav.Add(); unfinished
                     RacketLauncher.Add();
+                    Outbreak.Add();
                 #endregion
 
                 #region Synergies

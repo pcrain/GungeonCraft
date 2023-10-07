@@ -177,6 +177,7 @@
     <Compile Include="src\Cwaff-Guns\KiBlast.cs"/>
     <Compile Include="src\Cwaff-Guns\Nug.cs"/>
     <Compile Include="src\Cwaff-Guns\Blackjack.cs"/>
+    <Compile Include="src\Cwaff-Guns\Outbreak.cs"/>
     <Compile Include="src\Cwaff-Guns\LastResort.cs"/>
     <Compile Include="src\Cwaff-Guns\SoulKaliber.cs"/>
     <Compile Include="src\Cwaff-Guns\QuarterPounder.cs"/>
@@ -216,6 +217,7 @@
     <Compile Include="src\Main.cs"/>
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_fire_005.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\knife_gun_fire_001.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_019.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\bouncer_fire_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\quarter_pounder_reload_008.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_019.png"/>
@@ -233,17 +235,21 @@
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_011.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_fire_005.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\bouncer_reload_004.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_013.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\holy_water_gun_fire_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_reload_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_010.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\soul_kaliber_fire_005.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\vacuum_cleaner_idle_001.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_007.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\vacuum_cleaner_charge_001.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_fire_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tennis_rocket_gun_fire_006.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_010.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_007.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_fire_014.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_005.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_reload_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_001.json"/>
@@ -258,6 +264,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_012.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\soul_kaliber_reload_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_016.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\paintball_cannon_reload_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_fire_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\soul_kaliber_fire_001.json"/>
@@ -290,6 +297,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_fire_015.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_017.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_015.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_fire_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_008.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_025.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\death_note_idle_001.json"/>
@@ -310,14 +318,17 @@
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_019.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\paintball_cannon_fire_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\bouncer_reload_004.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_011.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_fire_012.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_006.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_011.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\natascha_fire_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_005.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_030.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alyx_reload_012.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_fire_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_007.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_009.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_fire_015.json"/>
@@ -354,6 +365,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\paintball_cannon_fire_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_fire_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\quarter_pounder_reload_005.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_fire_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\paintball_cannon_fire_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_017.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_009.png"/>
@@ -386,8 +398,11 @@
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_014.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_fire_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_reload_011.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_019.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_013.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_010.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_016.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_020.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_020.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_008.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alyx_reload_009.png"/>
@@ -425,6 +440,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\ki_blast_gun_reload_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_026.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_009.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_fire_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tennis_rocket_gun_fire_008.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_fire_007.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_001.png"/>
@@ -441,6 +457,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_013.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_016.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_025.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_idle_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_011.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\ki_blast_gun_idle_004.png"/>
@@ -459,6 +476,8 @@
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_022.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_006.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_idle_001.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_003.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_018.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\quarter_pounder_fire_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tennis_rocket_gun_fire_003.json"/>
@@ -503,6 +522,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_fire_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_fire_012.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\bouncer_reload_015.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alyx_fire_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_idle_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_004.json"/>
@@ -515,6 +535,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_017.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alyx_reload_009.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_fire_001.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_idle_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_014.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_fire_008.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_026.png"/>
@@ -531,11 +552,14 @@
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_fire_011.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\bouncer_reload_011.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_021.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_fire_015.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_024.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_fire_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_fire_008.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\quarter_pounder_reload_005.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_016.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_016.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_016.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_fire_004.json"/>
@@ -565,13 +589,16 @@
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_023.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\quarter_pounder_fire_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_036.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_015.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_012.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alyx_reload_010.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_041.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_fire_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_020.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_fire_008.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_reload_022.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_010.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_005.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_015.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_fire_014.png"/>
@@ -583,6 +610,8 @@
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_005.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alyx_reload_012.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_036.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_006.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_014.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\natascha_fire_007.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\soul_kaliber_fire_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\ki_blast_gun_reload_003.json"/>
@@ -593,6 +622,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_fire_006.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\vacuum_cleaner_charge_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_022.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_fire_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\natascha_fire_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_reload_011.png"/>
@@ -623,7 +653,9 @@
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_007.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_018.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\quarter_pounder_reload_001.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_018.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\bouncer_reload_011.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_013.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_013.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_015.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_018.json"/>
@@ -692,6 +724,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\alyx_reload_011.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_reload_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tennis_rocket_gun_fire_010.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_009.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\vacuum_cleaner_reload_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alyx_reload_008.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_013.png"/>
@@ -701,6 +734,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_010.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_reload_002.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_fire_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_008.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_008.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_010.json"/>
@@ -763,6 +797,8 @@
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_fire_005.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_028.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_012.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_020.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_fire_013.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\natascha_fire_005.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_reload_001.png"/>
@@ -780,6 +816,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_fire_013.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_011.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_009.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_007.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alyx_reload_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_025.json"/>
@@ -788,7 +825,9 @@
     <EmbeddedResource Include="Resources\WeaponCollection\bouncer_fire_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\soul_kaliber_reload_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tennis_rocket_gun_fire_010.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_017.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_009.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_017.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_reload_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\ki_blast_gun_fire_003.json"/>
@@ -833,6 +872,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_reload_015.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_reload_022.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_fire_002.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_006.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tennis_rocket_gun_fire_005.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\soul_kaliber_idle_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\ki_blast_gun_reload_002.png"/>
@@ -850,6 +890,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\tennis_rocket_gun_idle_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_014.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\death_note_fire_001.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_017.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_fire_010.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_013.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_fire_003.png"/>
@@ -875,6 +916,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_fire_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_022.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alyx_reload_007.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_009.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_018.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_005.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_fire_003.png"/>
@@ -918,11 +960,13 @@
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_018.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alyx_reload_006.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_012.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_012.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_009.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_reload_012.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_009.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_fire_013.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_008.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_014.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_012.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_004.png"/>
@@ -955,12 +999,14 @@
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_fire_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\ki_blast_gun_reload_003.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_021.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_idle_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_021.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\quarter_pounder_reload_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_042.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_038.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\bouncer_reload_008.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_014.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tennis_rocket_gun_fire_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_007.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_fire_004.png"/>
@@ -996,9 +1042,11 @@
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_018.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_005.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_031.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_021.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_027.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_fire_013.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_002.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_008.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_fire_010.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_005.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_009.png"/>
@@ -1015,6 +1063,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\bouncer_reload_013.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\bouncer_reload_015.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_007.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_005.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_029.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_011.png"/>
@@ -1058,6 +1107,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\tennis_rocket_gun_fire_007.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_034.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_004.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_005.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_031.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_fire_017.png"/>
@@ -1075,6 +1125,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_024.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_idle_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_fire_004.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_011.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_fire_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_fire_012.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\ki_blast_gun_idle_003.json"/>
@@ -1082,6 +1133,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\quarter_pounder_reload_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_fire_001.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_015.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_reload_008.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_010.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_020.json"/>
@@ -1127,6 +1179,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_020.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\quarter_pounder_reload_011.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\outbreak_fire_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_fire_007.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_016.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_010.json"/>
@@ -1166,6 +1219,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\siren6.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\voodoo_ghost.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\icicle_crash_particles3.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\outbreak_smoke_large.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren23.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\friendlyoverhead_vfx_002.png"/>
@@ -1209,6 +1263,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\siren16.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a8.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\drowsy_cloud7.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\outbreak_smoke_small.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a6.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\can_of_coke.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren21.png"/>
@@ -1484,6 +1539,7 @@
     <EmbeddedResource Include="Resources\sans_bosscard.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tennis_ball8.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\ki_blast_002.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\outbreak_projectile2.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball019.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\energy_bounce1.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball015.png"/>
@@ -1559,14 +1615,17 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\bball018.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\ki_blast_red_001.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\schrodinger_bullet.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\outbreak_projectile4.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\gaster_blaster.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball_old_7.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball005.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\gunbrella_projectile1.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\alyx_projectile4.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\natascha_bullet_002.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\outbreak_projectile3.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\chess_queen.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tennis_ball6.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\outbreak_projectile1.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile17.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\ki_blast_red_004.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\deadline_projectile.png"/>
@@ -1632,6 +1691,7 @@
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\blackjack_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\paintball_cannon_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\schrodingers_gat_idle_001.png"/>
+    <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\outbreak_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\b_b_gun_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\iron_maid_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\racket_launcher_idle_001.png"/>
