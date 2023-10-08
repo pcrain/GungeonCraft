@@ -47,8 +47,10 @@ namespace CwaffingTheGungy
 
         private void OnDealtDamage(PlayerController source, float damage, bool fatal, HealthHaver enemy)
         {
-            if (_VoodooDollEffectHappening || !enemy)
+            if (_VoodooDollEffectHappening)
                 return; // avoid recursive damage
+            if (!(enemy?.aiActor?.IsHostile(canBeDead: true) ?? false))
+                return; // avoid processing effect for non-hostile enemies
 
             _VoodooDollEffectHappening = true;
             DoVoodooDollEffect(damage, enemy);
@@ -61,14 +63,14 @@ namespace CwaffingTheGungy
             List<AIActor> activeEnemies = enemy.aiActor.GetAbsoluteParentRoom().GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
             foreach (AIActor other in activeEnemies)
             {
-                if (!other || !other.specRigidbody || other.IsGone || !other.healthHaver || other.healthHaver.IsDead)
+                if (!(other?.IsHostileAndNotABoss() ?? false))
                     continue; // don't care about inactive or dead enemies
-                if (other.aiActor.EnemyGuid != myGuid)
+                if (other.EnemyGuid != myGuid)
                     continue; // don't care about non-matching enemies
                 if (other == enemy.aiActor)
                     continue; // don't care about matching ourself
 
-                other.healthHaver.ApplyDamage(damage, Vector2.zero, "Voodoo Doll", CoreDamageTypes.Magic, DamageCategory.Unstoppable,
+                other.healthHaver?.ApplyDamage(damage, Vector2.zero, "Voodoo Doll", CoreDamageTypes.Magic, DamageCategory.Unstoppable,
                     ignoreInvulnerabilityFrames: true, ignoreDamageCaps: false);
 
                 bool flip = Lazy.CoinFlip();

@@ -298,17 +298,17 @@ namespace CwaffingTheGungy
     }
 
     // Check if an enemy is hostile
-    public static bool IsAlive(this AIActor e)
+    public static bool IsHostile(this AIActor e, bool canBeDead = false)
     {
       HealthHaver h = e?.healthHaver;
-      return e && !e.IsGone && !e.IsHarmlessEnemy && h && h.IsAlive && !h.IsDead && !h.isPlayerCharacter;
+      return e && !e.IsGone && !e.IsHarmlessEnemy && h && (canBeDead || (h.IsAlive && !h.IsDead)) && !h.isPlayerCharacter;
     }
 
     // Check if an enemy is hostile and a non-boss
-    public static bool IsAliveAndNotABoss(this AIActor e)
+    public static bool IsHostileAndNotABoss(this AIActor e, bool canBeDead = false)
     {
       HealthHaver h = e?.healthHaver;
-      return e && !e.IsGone && !e.IsHarmlessEnemy && h && !h.IsBoss && !h.IsSubboss && h.IsAlive && !h.IsDead && !h.isPlayerCharacter;
+      return e && !e.IsGone && !e.IsHarmlessEnemy && h && !h.IsBoss && !h.IsSubboss &&  (canBeDead || (h.IsAlive && !h.IsDead)) && !h.isPlayerCharacter;
     }
 
     // Set the Alpha of a GameObject's sprite

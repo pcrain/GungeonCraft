@@ -159,7 +159,7 @@ namespace CwaffingTheGungy
             AkSoundEngine.PostEvent("borrowed_time_capture_sound", gameObject);
             foreach (AIActor otherEnemy in activeEnemies)
             {
-                if (!otherEnemy.IsAliveAndNotABoss() || otherEnemy.IsBlackPhantom)
+                if (!otherEnemy.IsHostileAndNotABoss() || otherEnemy.IsBlackPhantom)
                     continue;
 
                 Vector2 center = otherEnemy.sprite.WorldCenter;

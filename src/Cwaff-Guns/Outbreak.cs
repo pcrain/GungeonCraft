@@ -112,7 +112,7 @@ namespace CwaffingTheGungy
         {
             this._projectile = base.GetComponent<Projectile>();
             this._projectile.OnHitEnemy += (Projectile _, SpeculativeRigidbody enemy, bool _) => {
-                if (enemy.aiActor?.IsAliveAndNotABoss() ?? false)
+                if (enemy.aiActor?.IsHostileAndNotABoss() ?? false)
                     enemy.aiActor.gameObject.GetOrAddComponent<InfectedBehavior>();
             };
         }

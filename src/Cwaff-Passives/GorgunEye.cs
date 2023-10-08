@@ -62,7 +62,7 @@ namespace CwaffingTheGungy
             float closestDist    = 999999f;
             foreach(AIActor enemy in this.Owner.GetAbsoluteParentRoom().GetActiveEnemies(RoomHandler.ActiveEnemyType.All))
             {
-                if (!enemy.IsAliveAndNotABoss())
+                if (!enemy.IsHostileAndNotABoss())
                     continue; // enemy is not one we should be targeting
 
                 Vector2 epos  = enemy.sprite.WorldCenter;

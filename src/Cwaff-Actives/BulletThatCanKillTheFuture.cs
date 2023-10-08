@@ -62,7 +62,7 @@ namespace CwaffingTheGungy
             List<AIActor> candidates    = new List<AIActor>();
             List<AIActor> activeEnemies = player.GetAbsoluteParentRoom().GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
             foreach (AIActor otherEnemy in activeEnemies)
-                if (otherEnemy.IsAliveAndNotABoss())
+                if (otherEnemy.IsHostileAndNotABoss())
                     candidates.Add(otherEnemy);
             return candidates;
         }
@@ -253,7 +253,7 @@ namespace CwaffingTheGungy
                 {
                     if (a.EnemyGuid != victim.EnemyGuid)
                         continue;
-                    if (!a.IsAliveAndNotABoss())
+                    if (!a.IsHostileAndNotABoss())
                         continue;
 
                     CwaffToolbox.Memorialize(a);

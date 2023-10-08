@@ -148,7 +148,7 @@ namespace CwaffingTheGungy
                 bool didAnything = false;
                 foreach (AIActor otherEnemy in activeEnemies)
                 {
-                    if (!(otherEnemy.IsAliveAndNotABoss()))
+                    if (!(otherEnemy.IsHostileAndNotABoss()))
                         continue; // we don't care about harmless enemies
                     if (enemy == otherEnemy)
                         continue; // don't apply damage to ourselves

@@ -90,7 +90,7 @@ namespace CwaffingTheGungy
 
         private void MakeBooksFriendlyAndExplodey(AIActor enemy)
         {
-            if (!enemy.IsAliveAndNotABoss())
+            if (!enemy.IsHostileAndNotABoss())
                 return;
             if (!_BookEnemyGUIDs.Contains(enemy.EnemyGuid))
                 return;

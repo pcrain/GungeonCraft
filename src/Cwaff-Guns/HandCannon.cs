@@ -125,7 +125,7 @@ namespace CwaffingTheGungy
             if (otherRigidbody?.healthHaver?.gameActor is not AIActor enemy)
                 return;
 
-            if (!enemy.IsAlive())
+            if (!enemy.IsHostile())
                 return;
 
             // Set up SLAPPP parameters

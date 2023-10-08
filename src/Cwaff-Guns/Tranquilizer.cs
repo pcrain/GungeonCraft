@@ -70,7 +70,7 @@ namespace CwaffingTheGungy
         private void Start()
         {
             base.GetComponent<Projectile>().OnHitEnemy += (Projectile _, SpeculativeRigidbody enemy, bool _) => {
-                if (enemy.aiActor?.IsAliveAndNotABoss() ?? false)
+                if (enemy.aiActor?.IsHostileAndNotABoss() ?? false)
                     enemy.aiActor.gameObject.GetOrAddComponent<EnemyTranquilizedBehavior>();
             };
         }

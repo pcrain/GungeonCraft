@@ -120,7 +120,7 @@ namespace CwaffingTheGungy
         {
             base.GetComponent<Projectile>().specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
             base.GetComponent<Projectile>().OnHitEnemy += (Projectile p, SpeculativeRigidbody enemy, bool _) => {
-                if (enemy.GetComponent<AIActor>()?.IsAliveAndNotABoss() ?? false)
+                if (enemy.GetComponent<AIActor>()?.IsHostileAndNotABoss() ?? false)
                     enemy.aiActor.gameObject.GetOrAddComponent<SchrodingersStat>();
             };
         }

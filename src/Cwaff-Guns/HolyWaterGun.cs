@@ -95,7 +95,7 @@ namespace CwaffingTheGungy
 
         private void CheckForHolyWater(BeamController beam)
         {
-            if (!this._enemy.IsAliveAndNotABoss())
+            if (!this._enemy.IsHostileAndNotABoss())
                 return;
             if (beam.GetComponent<ExorcismJuice>() is not ExorcismJuice exorcism)
                 return;
