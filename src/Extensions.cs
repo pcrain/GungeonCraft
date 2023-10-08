@@ -230,7 +230,7 @@ namespace CwaffingTheGungy
     }
 
     // Add custom reloading audio to a gun
-    public static void SetReloadAudio<T>(this T agun, string audioEventName)
+    public static void SetReloadAudio<T>(this T agun, string audioEventName = null)
       where T : Alexandria.ItemAPI.AdvancedGunBehavior
     {
       agun.preventNormalReloadAudio  = true;

@@ -20,8 +20,8 @@ namespace CwaffingTheGungy
         public static string ItemName         = "Hand Cannon";
         public static string SpriteName       = "hand_cannon";
         public static string ProjectileName   = "38_special";
-        public static string ShortDescription = "TBD";
-        public static string LongDescription  = "TBD";
+        public static string ShortDescription = "Fire Arms";
+        public static string LongDescription  = "Fires a high-powered glove that slaps enemies perpendicular to the glove's trajectory with extreme force.\n\nSecond only to guns, hands are widely considered to be one of the most effective weapons ever brought to the battlefield. In ancient times, combatants would often throw the severed hands of their fallen comrades at their enemies to simultaneously inflict physical and emotional damage, ergo the modern expression \"tossing hands\". The venerable Gun Tzu is thought to be the first to marry guns and hands with his legendary Finger Gun, known for inflicting panic and fear in all who opposed his army. The Hand Cannon is a direct descendant and natural evolution of Gun Tzu's original Finger Gun, packing enough force to make Vasilii Kamotskii blush.";
 
         internal static GameObject _SlapppAnimation;
         internal static tk2dSpriteAnimationClip _BulletSprite;
@@ -33,14 +33,14 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                // gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup; // silent gun audio
+                gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup; // silent gun audio
                 gun.DefaultModule.ammoCost            = 1;
                 gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.Charged;
                 gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
-                gun.reloadTime                        = 0.5f;
+                gun.reloadTime                        = 0.75f;
                 gun.DefaultModule.angleVariance       = 15.0f;
-                gun.DefaultModule.cooldownTime        = 0.5f;
-                gun.DefaultModule.numberOfShotsInClip = 1;
+                gun.DefaultModule.cooldownTime        = 0.1f;
+                gun.DefaultModule.numberOfShotsInClip = 2;
                 gun.quality                           = PickupObject.ItemQuality.D;
                 gun.barrelOffset.transform.localPosition = new Vector3(1.9375f, 0.6875f, 0f); // should match "Casing" in JSON file
                 gun.SetBaseMaxAmmo(100);
@@ -54,7 +54,7 @@ namespace CwaffingTheGungy
 
             var comp = gun.gameObject.AddComponent<HandCannon>();
                 // comp.SetFireAudio("hand_cannon_shoot_sound");
-                // comp.SetReloadAudio("hand_cannon_reload_sound");
+                comp.SetReloadAudio();
             gun.spriteAnimator.GetClipByName(gun.shootAnimation).frames[0].triggerEvent = true;
             gun.spriteAnimator.GetClipByName(gun.shootAnimation).frames[0].eventAudio = "hand_cannon_shoot_sound";
             gun.spriteAnimator.GetClipByName(gun.reloadAnimation).frames[0].triggerEvent = true;
@@ -77,8 +77,8 @@ namespace CwaffingTheGungy
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
                 projectile.AddAnimation(_BulletSprite);
                 projectile.SetAnimation(_BulletSprite);
-                projectile.baseData.damage  = 50f;
-                projectile.baseData.speed   = 40.0f;
+                projectile.baseData.damage  = 40f;
+                projectile.baseData.speed   = 40f;
                 projectile.transform.parent = gun.barrelOffset;
                 projectile.gameObject.AddComponent<SlappProjectile>();
 
