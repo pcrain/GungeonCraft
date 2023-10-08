@@ -44,7 +44,6 @@ namespace CwaffingTheGungy
                 gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
                 gun.DefaultModule.numberOfShotsInClip = 10;
                 gun.quality                           = PickupObject.ItemQuality.A;
-                gun.barrelOffset.transform.localPosition = new Vector3(1.0625f, 1.25f, 0f); // should match "Casing" in JSON file
                 gun.SetBaseMaxAmmo(_BASE_MAX_AMMO);
                 gun.CurrentAmmo = _BASE_MAX_AMMO;
                 gun.SetAnimationFPS(gun.reloadAnimation, 20);

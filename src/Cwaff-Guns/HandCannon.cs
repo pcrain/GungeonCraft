@@ -41,7 +41,6 @@ namespace CwaffingTheGungy
                 gun.DefaultModule.cooldownTime        = 0.1f;
                 gun.DefaultModule.numberOfShotsInClip = 2;
                 gun.quality                           = PickupObject.ItemQuality.D;
-                gun.barrelOffset.transform.localPosition = new Vector3(1.9375f, 0.6875f, 0f); // should match "Casing" in JSON file
                 gun.SetBaseMaxAmmo(100);
                 gun.CurrentAmmo = 100;
                 gun.SetAnimationFPS(gun.shootAnimation, 30);

@@ -32,7 +32,6 @@ namespace CwaffingTheGungy
         {
             Gun gun = Lazy.SetupGun<HolyWaterGun>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
                 gun.gunSwitchGroup                       = (ItemHelper.Get(Items.MegaDouser) as Gun).gunSwitchGroup;
-                gun.barrelOffset.transform.localPosition = new Vector3(1.9375f, 0.5f, 0f); // should match "Casing" in JSON file
                 gun.gunClass                             = GunClass.BEAM;
                 gun.DefaultModule.ammoType               = GameUIAmmoType.AmmoType.BEAM;
                 gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.Beam;

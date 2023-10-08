@@ -51,7 +51,6 @@ namespace CwaffingTheGungy
             gun.DefaultModule.numberOfShotsInClip    = -1;
             // gun.DefaultModule.ammoType               = GameUIAmmoType.AmmoType.BEAM;
             gun.DefaultModule.ammoType               = GameUIAmmoType.AmmoType.MEDIUM_BULLET;
-            gun.barrelOffset.transform.localPosition = new Vector3(2.75f, 0.43f, 0f);
             gun.ammo                                 = 600;
             gun.quality                              = PickupObject.ItemQuality.A;
             // gun.gunClass                             = GunClass.BEAM;

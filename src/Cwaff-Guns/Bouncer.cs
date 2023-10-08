@@ -41,7 +41,6 @@ namespace CwaffingTheGungy
                 gun.gunClass                             = GunClass.PISTOL;
                 gun.quality                              = PickupObject.ItemQuality.C;
                 gun.gunHandedness                        = GunHandedness.OneHanded;
-                gun.barrelOffset.transform.localPosition = new Vector3(1.6875f, 0.5f, 0f); // should match "Casing" in JSON file
                 gun.SetBaseMaxAmmo(300);
                 gun.SetAnimationFPS(gun.shootAnimation, 14);
                 gun.SetAnimationFPS(gun.reloadAnimation, 20);

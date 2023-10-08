@@ -20,6 +20,8 @@ namespace CwaffingTheGungy
 {
     public static class Lazy // all-purpose helper methods for being a lazy dumdum
     {
+        private static tk2dSpriteCollectionData _GunSpriteCollection = null;
+
         /// <summary>
         /// Perform basic initialization for a new passive, active, or gun item definition.
         /// </summary>
@@ -108,9 +110,19 @@ namespace CwaffingTheGungy
         public static Gun SetupGun<T>(string gunName, string spritePath, string projectileName, string shortDescription, string longDescription)
             where T : Alexandria.ItemAPI.AdvancedGunBehavior
         {
-            Gun g = SetupItem<Gun, Gun>(gunName, spritePath, projectileName, shortDescription, longDescription);
-            g.gameObject.AddComponent<T>();
-            return g;
+            Gun gun = SetupItem<Gun, Gun>(gunName, spritePath, projectileName, shortDescription, longDescription);
+            gun.gameObject.AddComponent<T>();
+
+            #region Auto-setup barrelOffset from Casing attach point
+                _GunSpriteCollection ??= gun.sprite.collection; // need to initialize at least once
+                int spriteid = gun.GetComponent<tk2dSpriteAnimator>().GetClipByName(gun.idleAnimation).frames[0].spriteId;
+                int attachIndex = _GunSpriteCollection.SpriteIDsWithAttachPoints.IndexOf(spriteid);
+                foreach (tk2dSpriteDefinition.AttachPoint a in _GunSpriteCollection.SpriteDefinedAttachPoints[attachIndex].attachPoints)
+                    if (a.name == "Casing")
+                        gun.barrelOffset.transform.localPosition = a.position;
+            #endregion
+
+            return gun;
         }
 
         /// <summary>

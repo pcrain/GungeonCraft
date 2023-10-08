@@ -49,7 +49,6 @@ namespace CwaffingTheGungy
                 gun.DefaultModule.ammoType               = GameUIAmmoType.AmmoType.BEAM;
                 gun.quality                              = PickupObject.ItemQuality.A;
                 gun.InfiniteAmmo                         = true;
-                gun.barrelOffset.transform.localPosition = new Vector3(1.8125f, 0.4375f, 0f); // should match "Casing" in JSON file
                 gun.SetAnimationFPS(gun.chargeAnimation, 16);
                 gun.ClearDefaultAudio(); // prevent fire audio, as it's handled in Update()
 

@@ -42,7 +42,6 @@ namespace CwaffingTheGungy
             gun.DefaultModule.ammoType               = GameUIAmmoType.AmmoType.SMALL_BULLET;
             gun.muzzleFlashEffects.type              = VFXPoolType.None;
             gun.DefaultModule.numberOfShotsInClip    = -1;
-            gun.barrelOffset.transform.localPosition = new Vector3(1.0f, 1.875f, 0);
             gun.quality                              = PickupObject.ItemQuality.D;
             gun.gunClass                             = GunClass.SILLY;
             gun.gunSwitchGroup                       = (ItemHelper.Get(Items.Blasphemy) as Gun).gunSwitchGroup;

@@ -38,7 +38,6 @@ namespace CwaffingTheGungy
                 gun.InfiniteAmmo                      = true;
                 gun.DefaultModule.angleVariance       = 15.0f;
                 gun.quality                           = PickupObject.ItemQuality.D;
-                gun.barrelOffset.transform.localPosition = new Vector3(2.0625f, 0.5f, 0f); // should match "Casing" in JSON file
 
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
         }

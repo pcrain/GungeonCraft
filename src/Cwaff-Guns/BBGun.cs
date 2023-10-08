@@ -37,7 +37,6 @@ namespace CwaffingTheGungy
                 gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.Charged;
                 gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Ordered;
                 gun.DefaultModule.cooldownTime           = 0f;
-                gun.barrelOffset.transform.localPosition = new Vector3(2.0625f, 0.4375f, 0f);
                 gun.SetBaseMaxAmmo(3);
                 gun.SetAnimationFPS(gun.shootAnimation, 10);
                 gun.SetAnimationFPS(gun.chargeAnimation, 16);

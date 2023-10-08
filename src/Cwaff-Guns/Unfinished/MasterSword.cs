@@ -34,7 +34,6 @@ namespace CwaffingTheGungy
             gun.DefaultModule.cooldownTime           = 0.3f;
             gun.muzzleFlashEffects.type              = VFXPoolType.None;
             gun.DefaultModule.numberOfShotsInClip    = 5;
-            gun.barrelOffset.transform.localPosition = new Vector3(9f / 16f, 4f / 16f, 0f);
             gun.quality                              = PickupObject.ItemQuality.D;
             gun.gunClass                             = GunClass.SILLY;
             gun.DefaultModule.ammoType               = GameUIAmmoType.AmmoType.BEAM;
