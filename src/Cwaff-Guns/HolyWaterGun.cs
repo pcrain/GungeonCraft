@@ -148,9 +148,8 @@ namespace CwaffingTheGungy
                 Vector2 ppos = this._enemy.sprite.WorldCenter;
                 float angle = Lazy.RandomAngle();
                 Vector2 finalpos = ppos + BraveMathCollege.DegreesToVector(angle, magnitude: 1f);
-                GameObject v = SpawnManager.SpawnVFX(HolyWaterGun._ExorcismParticleVFX, finalpos.ToVector3ZisY(-1f), Lazy.RandomEulerZ());
-                FancyVFX f = v.AddComponent<FancyVFX>();
-                    f.Setup(Lazy.RandomVector(0.5f), lifetime: 0.34f, fadeOutTime: 0.34f, parent: this._enemy.sprite.transform);
+                FancyVFX.Spawn(HolyWaterGun._ExorcismParticleVFX, finalpos.ToVector3ZisY(-1f), Lazy.RandomEulerZ(), ignoresPools: false,
+                    velocity: Lazy.RandomVector(0.5f), lifetime: 0.34f, fadeOutTime: 0.34f, parent: this._enemy.sprite.transform);
             }
 
             // Play exorcism noises

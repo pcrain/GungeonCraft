@@ -73,10 +73,9 @@ namespace CwaffingTheGungy
 
                 bool flip = Lazy.CoinFlip();
                 Vector2 ppos = flip ? other.sprite.WorldTopRight : other.sprite.WorldTopLeft;
-                GameObject v = SpawnManager.SpawnVFX(_VoodooGhostVFX, ppos, 0f.EulerZ());
-                    v.GetComponent<tk2dSprite>().FlipX = flip;
-                FancyVFX f = v.AddComponent<FancyVFX>();
-                    f.Setup(velocity: Vector2.zero, lifetime: 0.4f, fadeOutTime: 0.4f);
+                FancyVFX f = FancyVFX.Spawn(_VoodooGhostVFX, ppos, 0f.EulerZ(), ignoresPools: false,
+                    velocity: Vector2.zero, lifetime: 0.4f, fadeOutTime: 0.4f);
+                    f.GetComponent<tk2dSprite>().FlipX = flip;
             }
         }
 

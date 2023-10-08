@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -132,19 +132,23 @@ namespace CwaffingTheGungy
             this._slapVictim = enemy;
             this._slapAngle = (this._projectile.Direction.ToAngle() + (this._flipped ? -90f : 90f)).Clamp180();
 
-            //NOTE: absolutely ESSENTIAL this ignores pools so FancyVFX objects don't get attached to reused instances that already have the component
-            GameObject v = SpawnManager.SpawnVFX(
-                HandCannon._SlapppAnimation, this._projectile.sprite.transform.position, this._projectile.sprite.transform.rotation, ignoresPools: true);
-            this._vfx = v.AddComponent<FancyVFX>();
-                this._vfx.Setup(Vector2.zero, lifetime: 0.5f, fadeOutTime: 0.20f, parent: enemy.sprite.transform);
-                this._vfx.sprite.FlipY = this._flipped;  //smack in the opposite direction by flipping vertically, not horizontally
-                if (this._vfx.GetComponent<tk2dSpriteAnimator>() is tk2dSpriteAnimator animator)
-                {
-                    animator.AnimationEventTriggered += SlapppEvent;
-                    animator.DefaultClip.frames[_SLAPPP_FRAME].triggerEvent = true;
-                    animator.DefaultClip.frames[_SLAPPP_FRAME].eventAudio = "slappp_sound";
-                    animator.Play(animator.DefaultClip);
-                }
+            this._vfx = FancyVFX.Spawn(
+                prefab       : HandCannon._SlapppAnimation,
+                position     : this._projectile.sprite.transform.position,
+                rotation     : this._projectile.sprite.transform.rotation,
+                ignoresPools : true, //NOTE: absolutely MUST ignore pools or VFX objects with preexisting FancyVFX components might get reused
+                velocity     : Vector2.zero,
+                lifetime     : 0.5f,
+                fadeOutTime  : 0.20f,
+                parent       : enemy.sprite.transform);
+            this._vfx.sprite.FlipY = this._flipped;  //smack in the opposite direction by flipping vertically, not horizontally
+            if (this._vfx.GetComponent<tk2dSpriteAnimator>() is tk2dSpriteAnimator animator)
+            {
+                animator.AnimationEventTriggered += SlapppEvent;
+                animator.DefaultClip.frames[_SLAPPP_FRAME].triggerEvent = true;
+                animator.DefaultClip.frames[_SLAPPP_FRAME].eventAudio = "slappp_sound";
+                animator.Play(animator.DefaultClip);
+            }
             PhysicsEngine.SkipCollision = true;
             this._projectile.DieInAir(suppressInAirEffects: true, allowActorSpawns: false, allowProjectileSpawns: false, killedEarly: false);
         }

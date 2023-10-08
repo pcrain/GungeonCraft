@@ -181,9 +181,8 @@ namespace CwaffingTheGungy
             {
                 float angle = Lazy.RandomAngle();
                 Vector2 finalpos = ppos + BraveMathCollege.DegreesToVector(angle);
-                GameObject v = SpawnManager.SpawnVFX(_SoulLinkSoulVFX, finalpos, 0f.EulerZ());
-                FancyVFX f = v.AddComponent<FancyVFX>();
-                    f.Setup(_SOUL_PART_SPEED * Vector2.up, lifetime: 0.5f, fadeOutTime: 0.5f, emissivePower: 50f, emissiveColor: Color.white);
+                FancyVFX.Spawn(_SoulLinkSoulVFX, finalpos, 0f.EulerZ(), ignoresPools: false,
+                    velocity: _SOUL_PART_SPEED * Vector2.up, lifetime: 0.5f, fadeOutTime: 0.5f, emissivePower: 50f, emissiveColor: Color.white);
             }
         }
     }

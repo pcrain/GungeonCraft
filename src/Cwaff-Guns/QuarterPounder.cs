@@ -172,9 +172,8 @@ namespace CwaffingTheGungy
             {
                 float angle = Lazy.RandomAngle();
                 Vector2 finalpos = ppos + BraveMathCollege.DegreesToVector(angle, magnitude: _PART_SPREAD);
-                GameObject v = SpawnManager.SpawnVFX(QuarterPounder._MidasParticleVFX, finalpos, Lazy.RandomEulerZ());
-                FancyVFX f = v.AddComponent<FancyVFX>();
-                    f.Setup(Lazy.RandomVector(_PART_SPEED), lifetime: _PART_LIFE, fadeOutTime: _PART_LIFE, emissivePower: _PART_EMIT, emissiveColor: Color.white);
+                FancyVFX.Spawn(QuarterPounder._MidasParticleVFX, finalpos, Lazy.RandomEulerZ(), ignoresPools: false,
+                    velocity: Lazy.RandomVector(_PART_SPEED), lifetime: _PART_LIFE, fadeOutTime: _PART_LIFE, emissivePower: _PART_EMIT, emissiveColor: Color.white);
             }
 
             AkSoundEngine.PostEvent("turn_to_gold", base.gameObject);
