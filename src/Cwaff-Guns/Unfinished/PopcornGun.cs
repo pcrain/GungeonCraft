@@ -27,8 +27,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            var comp = gun.gameObject.AddComponent<PopcornGun>();
+            Gun gun = Lazy.SetupGun<PopcornGun>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
 
             gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
             gun.DefaultModule.ammoCost            = 1;

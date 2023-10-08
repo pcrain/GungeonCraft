@@ -35,23 +35,20 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            var comp = gun.gameObject.AddComponent<Commitment>();
-            // comp.preventNormalFireAudio = true;
-
-            gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
-            gun.DefaultModule.ammoCost            = 1;
-            gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.Automatic;
-            gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
-            gun.reloadTime                        = 1.1f;
-            gun.DefaultModule.angleVariance       = 15.0f;
-            gun.DefaultModule.cooldownTime        = 0.15f;
-            gun.DefaultModule.numberOfShotsInClip = 10000;
-            gun.CanBeDropped                      = false;
-            gun.CanGainAmmo                       = false;
-            gun.quality                           = PickupObject.ItemQuality.C;
-            gun.SetBaseMaxAmmo(500);
-            gun.SetAnimationFPS(gun.shootAnimation, 24);
+            Gun gun = Lazy.SetupGun<Commitment>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+                gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
+                gun.DefaultModule.ammoCost            = 1;
+                gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.Automatic;
+                gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+                gun.reloadTime                        = 1.1f;
+                gun.DefaultModule.angleVariance       = 15.0f;
+                gun.DefaultModule.cooldownTime        = 0.15f;
+                gun.DefaultModule.numberOfShotsInClip = 10000;
+                gun.CanBeDropped                      = false;
+                gun.CanGainAmmo                       = false;
+                gun.quality                           = PickupObject.ItemQuality.C;
+                gun.SetBaseMaxAmmo(500);
+                gun.SetAnimationFPS(gun.shootAnimation, 24);
 
             Projectile projectile       = Lazy.PrefabProjectileFromGun(gun);
             projectile.baseData.damage  = 16f;

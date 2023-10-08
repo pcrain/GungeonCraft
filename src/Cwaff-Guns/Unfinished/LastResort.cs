@@ -29,10 +29,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            var comp = gun.gameObject.AddComponent<LastResort>();
-            comp.preventNormalFireAudio = true;
-            comp.preventNormalReloadAudio = true;
+            Gun gun = Lazy.SetupGun<LastResort>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
 
             gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
             gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.Automatic;

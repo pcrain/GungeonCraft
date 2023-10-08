@@ -30,10 +30,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-
-            var comp = gun.gameObject.AddComponent<Nug>();
-            comp.preventNormalFireAudio = true;
+            Gun gun = Lazy.SetupGun<Nug>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
 
             gun.muzzleFlashEffects.type           = VFXPoolType.None;
             gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;

@@ -38,10 +38,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            var comp = gun.gameObject.AddComponent<DerailGun>();
-            // comp.preventNormalFireAudio = true;
-
+            Gun gun = Lazy.SetupGun<DerailGun>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             gun.isAudioLoop                          = true;
             gun.doesScreenShake                      = false;
             gun.DefaultModule.ammoCost               = 1;

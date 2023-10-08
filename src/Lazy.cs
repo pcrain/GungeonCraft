@@ -105,9 +105,12 @@ namespace CwaffingTheGungy
         /// <summary>
         /// Perform basic initialization for a new gun definition.
         /// </summary>
-        public static Gun SetupGun(string gunName, string spritePath, string projectileName, string shortDescription, string longDescription)
+        public static Gun SetupGun<T>(string gunName, string spritePath, string projectileName, string shortDescription, string longDescription)
+            where T : Alexandria.ItemAPI.AdvancedGunBehavior
         {
-            return SetupItem<Gun, Gun>(gunName, spritePath, projectileName, shortDescription, longDescription);
+            Gun g = SetupItem<Gun, Gun>(gunName, spritePath, projectileName, shortDescription, longDescription);
+            g.gameObject.AddComponent<T>();
+            return g;
         }
 
         /// <summary>

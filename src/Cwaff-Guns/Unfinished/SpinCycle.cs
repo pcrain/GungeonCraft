@@ -39,7 +39,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+            Gun gun = Lazy.SetupGun<SpinCycle>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
                 gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
                 gun.DefaultModule.ammoCost            = 1;
                 gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
@@ -50,9 +50,6 @@ namespace CwaffingTheGungy
                 gun.quality                           = PickupObject.ItemQuality.A;
                 gun.InfiniteAmmo                      = true;
                 gun.SetAnimationFPS(gun.shootAnimation, 0);
-
-            var comp = gun.gameObject.AddComponent<SpinCycle>();
-                comp.preventNormalFireAudio = true;
 
             Projectile ball = Lazy.PrefabProjectileFromGun(gun,false);
                 ball.BulletScriptSettings.surviveTileCollisions      = true;

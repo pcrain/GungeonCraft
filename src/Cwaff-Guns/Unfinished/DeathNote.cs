@@ -29,7 +29,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+            Gun gun = Lazy.SetupGun<DeathNote>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
                 gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
                 gun.DefaultModule.ammoCost            = 1;
                 gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.Automatic;
@@ -40,7 +40,6 @@ namespace CwaffingTheGungy
                 gun.quality                           = PickupObject.ItemQuality.D;
                 gun.barrelOffset.transform.localPosition = new Vector3(2.0625f, 0.5f, 0f); // should match "Casing" in JSON file
 
-            var comp = gun.gameObject.AddComponent<DeathNote>();
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
         }
 

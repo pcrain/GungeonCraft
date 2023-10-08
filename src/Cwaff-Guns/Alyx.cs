@@ -39,8 +39,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.gameObject.AddComponent<Alyx>();
+            Gun gun = Lazy.SetupGun<Alyx>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
                 gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.Automatic;
                 gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
                 gun.DefaultModule.numberOfShotsInClip = 10;

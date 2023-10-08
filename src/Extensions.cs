@@ -108,7 +108,9 @@ namespace CwaffingTheGungy
     {
       Vector2 intersection = Vector2.positiveInfinity;
       if(!BraveMathCollege.LineSegmentRectangleIntersection(self + 1000f * angle.ToVector(), self, theWall.position, theWall.position + theWall.size, ref intersection))
-        ETGModConsole.Log("no intersection found");
+      {
+        // ETGModConsole.Log("no intersection found");
+      }
       return intersection;
     }
 
@@ -488,7 +490,6 @@ namespace CwaffingTheGungy
     {
       if (gun.GetComponent<Alexandria.ItemAPI.AdvancedGunBehavior>() is Alexandria.ItemAPI.AdvancedGunBehavior agun)
       {
-        ETGModConsole.Log($"  FOUND THE BEHAVIOR");
         agun.SetFireAudio();
         agun.SetReloadAudio();
       }
@@ -543,7 +544,6 @@ namespace CwaffingTheGungy
 
       if (gun.GetComponent<Alexandria.ItemAPI.AdvancedGunBehavior>() is Alexandria.ItemAPI.AdvancedGunBehavior agun)
       {
-        ETGModConsole.Log($"  FOUND THE BEHAVIOR");
         agun.preventNormalFireAudio = true;
         agun.overrideNormalFireAudio = audio;
       }

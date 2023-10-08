@@ -35,8 +35,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.gameObject.AddComponent<KiBlast>();
+            Gun gun = Lazy.SetupGun<KiBlast>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
                 gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
                 gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
                 gun.DefaultModule.cooldownTime           = 0.1f;

@@ -40,8 +40,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.gameObject.AddComponent<Deadline>();
+            Gun gun = Lazy.SetupGun<Deadline>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
                 gun.barrelOffset.transform.localPosition = new Vector3(1.6875f, 0.5625f, 0f); // should match "Casing" in JSON file
                 gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
                 gun.reloadTime                        = 0.9f;

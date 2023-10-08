@@ -27,8 +27,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.gameObject.AddComponent<SoulKaliber>();
+            Gun gun = Lazy.SetupGun<SoulKaliber>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
                 gun.muzzleFlashEffects.type              = VFXPoolType.None;
                 gun.DefaultModule.ammoCost               = 1;
                 gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;

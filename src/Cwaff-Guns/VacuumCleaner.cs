@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,8 +41,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.gameObject.AddComponent<VacuumCleaner>();
+            Gun gun = Lazy.SetupGun<VacuumCleaner>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
                 gun.gunClass                             = GunClass.CHARGE;
                 gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.Charged;
                 gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;

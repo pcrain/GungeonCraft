@@ -44,8 +44,7 @@ namespace CwaffingTheGungy
 
         public static void Add()
         {
-            Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.gameObject.AddComponent<Gunbrella>();
+            Gun gun = Lazy.SetupGun<Gunbrella>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
                 gun.gunClass                             = GunClass.CHARGE;
                 gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.Charged;
                 gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
