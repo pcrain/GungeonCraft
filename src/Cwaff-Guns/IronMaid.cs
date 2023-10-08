@@ -55,8 +55,7 @@ namespace CwaffingTheGungy
                 projectile.baseData.damage  = 5f;
                 projectile.baseData.speed   = 40.0f;
                 projectile.transform.parent = gun.barrelOffset;
-                projectile.AddAnimation(_KunaiSprite);
-                projectile.SetAnimation(_KunaiSprite);
+                projectile.AddDefaultAnimation(_KunaiSprite);
                 projectile.gameObject.AddComponent<RainCheckBullets>();
         }
 

@@ -67,9 +67,8 @@ namespace CwaffingTheGungy
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
 
             Projectile blast = Lazy.PrefabProjectileFromGun(gun);
-                blast.AddAnimation(_KiSprite);
+                blast.AddDefaultAnimation(_KiSprite);
                 blast.AddAnimation(_KiSpriteRed);
-                blast.SetAnimation(_KiSprite);
                 blast.baseData.damage  = 4f;
                 blast.baseData.range   = 10f;
                 blast.ignoreDamageCaps = true;

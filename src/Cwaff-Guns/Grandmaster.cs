@@ -62,13 +62,12 @@ namespace CwaffingTheGungy
                 tk2dBaseSprite.Anchor.MiddleCenter, true, true);
 
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
-                projectile.AddAnimation(_PawnSprite);
+                projectile.AddDefaultAnimation(_PawnSprite);
                 projectile.AddAnimation(_RookSprite);
                 projectile.AddAnimation(_BishopSprite);
                 projectile.AddAnimation(_KnightSprite);
                 projectile.AddAnimation(_QueenSprite);
                 projectile.AddAnimation(_KingSprite);
-                projectile.SetAnimation(_PawnSprite);
                 projectile.baseData.speed = 30f;
             PlayChessBehavior pop = projectile.gameObject.AddComponent<PlayChessBehavior>();
         }

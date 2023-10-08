@@ -53,8 +53,7 @@ namespace CwaffingTheGungy
                 projectile.baseData.speed   = 30.0f;
                 projectile.baseData.damage  = 1f;
                 projectile.transform.parent = gun.barrelOffset;
-                projectile.AddAnimation(_ProjSprite);
-                projectile.SetAnimation(_ProjSprite);
+                projectile.AddDefaultAnimation(_ProjSprite);
                 projectile.gameObject.AddComponent<SoulLinkProjectile>();
         }
     }

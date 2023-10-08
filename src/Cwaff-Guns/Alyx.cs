@@ -58,8 +58,7 @@ namespace CwaffingTheGungy
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
 
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
-                projectile.AddAnimation(_BulletSprite);
-                projectile.SetAnimation(_BulletSprite);
+                projectile.AddDefaultAnimation(_BulletSprite);
                 projectile.baseData.damage   = 15f;
                 projectile.baseData.speed    = 20.0f;
                 projectile.transform.parent  = gun.barrelOffset;

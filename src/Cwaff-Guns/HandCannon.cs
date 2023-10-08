@@ -62,8 +62,7 @@ namespace CwaffingTheGungy
                 );
 
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
-                projectile.AddAnimation(_BulletSprite);
-                projectile.SetAnimation(_BulletSprite);
+                projectile.AddDefaultAnimation(_BulletSprite);
                 projectile.baseData.damage  = 40f;
                 projectile.baseData.speed   = 40f;
                 projectile.transform.parent = gun.barrelOffset;

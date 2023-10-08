@@ -75,8 +75,7 @@ namespace CwaffingTheGungy
             foreach (ProjectileModule mod in gun.Volley.projectiles)
             {
                 Projectile projectile = Lazy.PrefabProjectileFromGun(gun, setGunDefaultProjectile: false);
-                    projectile.AddAnimation(_BulletSprite);
-                    projectile.SetAnimation(_BulletSprite);
+                    projectile.AddDefaultAnimation(_BulletSprite);
                     projectile.SetAirImpactVFX(VFX.vfxpool["HailParticle"]);
                     projectile.SetEnemyImpactVFX(VFX.vfxpool["HailParticle"]);
                     projectile.onDestroyEventName   = "icicle_crash";

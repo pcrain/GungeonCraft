@@ -48,15 +48,13 @@ namespace CwaffingTheGungy
                 gun.ClearDefaultAudio();
                 gun.SetFireAudio(); // prevent fire audio, as it's handled in OnPostFired()
 
-
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("natascha_bullet").Base(),
                 12, true, new IntVector2((int)(_NATASHA_PROJECTILE_SCALE * 15), (int)(_NATASHA_PROJECTILE_SCALE * 7)),
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
 
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
-                projectile.AddAnimation(_BulletSprite);
-                projectile.SetAnimation(_BulletSprite);
+                projectile.AddDefaultAnimation(_BulletSprite);
                 projectile.baseData.damage  = 3f;
                 projectile.baseData.speed   = 20.0f;
                 projectile.transform.parent = gun.barrelOffset;

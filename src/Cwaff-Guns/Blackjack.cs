@@ -62,9 +62,7 @@ namespace CwaffingTheGungy
                 false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
 
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
-                projectile.AddAnimation(_BulletSprite);
-                projectile.SetAnimation(_BulletSprite);
-
+                projectile.AddDefaultAnimation(_BulletSprite);
                 projectile.baseData.damage = 7f;
                 projectile.baseData.range  = 999f; // we implement a custom range-like behavior
                 projectile.baseData.speed  = 18f;

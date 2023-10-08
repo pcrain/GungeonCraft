@@ -56,8 +56,7 @@ namespace CwaffingTheGungy
                 projectile.baseData.speed   = 44.0f;
                 projectile.baseData.damage  = 20f;
                 projectile.transform.parent = gun.barrelOffset;
-                projectile.AddAnimation(_ProjSprite);
-                projectile.SetAnimation(_ProjSprite);
+                projectile.AddDefaultAnimation(_ProjSprite);
                 projectile.gameObject.AddComponent<MidasProjectile>();
 
             _MidasParticleVFX = VFX.animations["MidasParticle"];

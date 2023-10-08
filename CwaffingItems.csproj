@@ -39,9 +39,9 @@
   <ItemGroup>
     <None Include="packages.config"/>
     <Reference Include="System"/>
-    <Compile Include="src\Cwaff-Passives\Superstitious.cs"/>
-    <Compile Include="src\Cwaff-Passives\Siphon.cs"/>
-    <Compile Include="src\Cwaff-Passives\Shine.cs"/>
+    <Compile Include="src\Cwaff-Passives\Unfinished\Superstitious.cs"/>
+    <Compile Include="src\Cwaff-Passives\Unfinished\Siphon.cs"/>
+    <Compile Include="src\Cwaff-Passives\Unfinished\Shine.cs"/>
     <Compile Include="src\Cwaff-Passives\DriftersHeadgear.cs"/>
     <Compile Include="src\Cwaff-Passives\PlotArmor.cs"/>
     <Compile Include="src\Cwaff-Passives\RatPoison.cs"/>
