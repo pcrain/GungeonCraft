@@ -538,7 +538,7 @@ namespace CwaffingTheGungy
     // needs to use Alexandria version because fireaudio overrides are not serialized
     public static void SetFireAudio(this Gun gun, string audio = "", int frame = 0)
     {
-      // gun.SetGunAudio(name: gun.shootAnimatgunion, audio: audio, frame: frame);
+      gun.SetGunAudio(name: gun.shootAnimation, audio: audio, frame: frame);
       // gun.PreventNormalFireAudio = true;
       // gun.OverrideNormalFireAudioEvent = audio;
 

@@ -173,8 +173,8 @@ namespace CwaffingTheGungy
             this._debris        = base.gameObject.GetComponent<DebrisObject>();
             this._isDebris      = this._debris != null;
             this._startDistance = startDistance;
-            this._startScaleX   = this._sprite.scale.x;
-            this._startScaleY   = this._sprite.scale.y;
+            this._startScaleX   = this._isDebris ? this._sprite.scale.x : 1.0f;
+            this._startScaleY   = this._isDebris ? this._sprite.scale.y : 1.0f;
         }
 
         // Using LateUpdate() here so alpha is updated correctly
