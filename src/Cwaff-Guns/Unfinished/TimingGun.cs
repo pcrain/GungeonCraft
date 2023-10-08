@@ -65,6 +65,15 @@ namespace CwaffingTheGungy
             p0.baseData.range  = 2f;
             timingProjectiles.Add(p0);
 
+            // TODO: antiquated sprite registration, figure out something better if I ever revamp this gun
+            for (int i = 0; i < 10; ++i)
+            {
+                string istring = i.ToString();
+                VFX.RegisterVFX(istring, new List<string>() {
+                        "CwaffingTheGungy/Resources/MiscVFX/Numbers/"+istring,
+                    }, 1, loops: false, anchor: tk2dBaseSprite.Anchor.LowerCenter, persist: true);
+            }
+
             // 1+ guns without ammo (scale stats from last projectile)
             for(int i = 1; i < maxCharge; ++i)
             {

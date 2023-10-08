@@ -53,7 +53,8 @@ namespace CwaffingTheGungy
                 beamComp.muzzleAnimation = beamComp.beamStartAnimation;  //use start animation for muzzle animation, make start animatino null
                 beamComp.beamStartAnimation = null;
 
-            _ExorcismParticleVFX = VFX.animations["ExorcismParticle"];
+            _ExorcismParticleVFX = VFX.RegisterVFXObject("ExorcismParticle", ResMap.Get("exorcism_particles"),
+                fps: 12, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 2);
 
             projectile.gameObject.AddComponent<ExorcismJuice>();
         }

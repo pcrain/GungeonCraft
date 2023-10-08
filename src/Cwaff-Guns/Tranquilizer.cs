@@ -54,7 +54,8 @@ namespace CwaffingTheGungy
                 projectile.transform.parent = gun.barrelOffset;
                 projectile.gameObject.AddComponent<TranquilizerBehavior>();
 
-            _DrowsyVFX = VFX.animations["DrowsyParticle"];
+            _DrowsyVFX = VFX.RegisterVFXObject("DrowsyParticle", ResMap.Get("drowsy_cloud"),
+                fps: 6, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);
         }
 
     }

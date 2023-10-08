@@ -24,6 +24,7 @@ namespace CwaffingTheGungy
         public static string LongDescription  = "Opens locked doors and renders enemies harmless until leaving a room. Any room unlocked in this way does not count as visited, and enemies will respawn if it is revisited later. Cannot be used in a room if you have fired a gun or if any enemy has otherwise taken damage.\n\nDespite their hostility towards adventurers, even the Gundead understand and abide by the Geneva conventions, and will immediately cease fire in the presence of emergency personnel. As impersonating a medical professional is already dangerously close to violating the Geneva conventions, it would be wise not to press your luck trying to take advantage of the cease-fire by sneaking in a few shots. Besides, only a real monster would attempt something like that anyway.";
 
         private static StatModifier[] _EmergencyMods = null;
+        internal static GameObject _SirenVFX;
 
         private RoomHandler _roomToReset = null;
         private bool _anyEnemyInRoomDied = false;
@@ -44,6 +45,9 @@ namespace CwaffingTheGungy
                     statToBoost = PlayerStats.StatType.MovementSpeed,
                 },
             };
+
+            _SirenVFX = VFX.RegisterVFXObject("EmergencySiren", ResMap.Get("siren"), 36,
+                loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.75f, emissivePower: 50f);
         }
 
         public override void Pickup(PlayerController player)
@@ -129,7 +133,7 @@ namespace CwaffingTheGungy
 
         private IEnumerator AwaitRoomChange(PlayerController user)
         {
-            GameObject v = SpawnManager.SpawnVFX(VFX.animations["EmergencySiren"], user.sprite.WorldTopCenter + new Vector2(0f, 0.75f), Quaternion.identity);
+            GameObject v = SpawnManager.SpawnVFX(_SirenVFX, user.sprite.WorldTopCenter + new Vector2(0f, 0.75f), Quaternion.identity);
                 v.transform.parent = user.transform;
             while (user.CurrentRoom == this._roomToReset)
             {

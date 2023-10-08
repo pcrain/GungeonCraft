@@ -37,7 +37,7 @@ namespace CwaffingTheGungy
             item.CanBeDropped = true;
             item.SetCooldownType(ItemBuilder.CooldownType.Damage, 100f);
 
-            _GasterBlaster = VFX.animations["GasterBlaster"];
+            _GasterBlaster = VFX.RegisterVFXObject("GasterBlaster", ResMap.Get("gaster_blaster"), 2, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
 
             _GasterBlast = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items.MarineSidearm) as Gun, false);
             _GasterBlast.baseData.damage         = 700f;

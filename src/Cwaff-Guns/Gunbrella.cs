@@ -35,6 +35,8 @@ namespace CwaffingTheGungy
         private const float _MAX_ALPHA         = 0.5f;
 
         internal static tk2dSpriteAnimationClip _BulletSprite;
+        internal static VFXPool _HailParticle;
+        internal static GameObject _RainReticle;
 
         private GameObject _targetingReticle = null;
         private float _curChargeTime         = 0.0f;
@@ -71,13 +73,16 @@ namespace CwaffingTheGungy
                 gun.AddProjectileModuleFrom(ItemHelper.Get(Items.Ak47) as Gun, true, false);
             }
 
+            _HailParticle = VFX.RegisterVFXPool("HailParticle", ResMap.Get("icicle_crash_particles"),
+                fps: 30, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.35f);
+
             GameActorFreezeEffect freeze = ItemHelper.Get(Items.FrostBullets).GetComponent<BulletStatusEffectItem>().FreezeModifierEffect;
             foreach (ProjectileModule mod in gun.Volley.projectiles)
             {
                 Projectile projectile = Lazy.PrefabProjectileFromGun(gun, setGunDefaultProjectile: false);
                     projectile.AddDefaultAnimation(_BulletSprite);
-                    projectile.SetAirImpactVFX(VFX.vfxpool["HailParticle"]);
-                    projectile.SetEnemyImpactVFX(VFX.vfxpool["HailParticle"]);
+                    projectile.SetAirImpactVFX(_HailParticle);
+                    projectile.SetEnemyImpactVFX(_HailParticle);
                     projectile.onDestroyEventName   = "icicle_crash";
                     projectile.baseData.damage      = _PROJ_DAMAGE;
                     projectile.AppliesFreeze        = true;
@@ -95,6 +100,9 @@ namespace CwaffingTheGungy
                     ChargeTime = _MIN_CHARGE_TIME,
                 }};
             }
+
+            _RainReticle = VFX.RegisterVFXObject("RainReticle", ResMap.Get("gunbrella_target_reticle"),
+                fps: 12, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 10, emissiveColour: Color.cyan, scale: 0.75f);
         }
 
         protected override void Update()
@@ -131,7 +139,7 @@ namespace CwaffingTheGungy
             if (this._targetingReticle)
                 return;
 
-            this._targetingReticle = Instantiate<GameObject>(VFX.animations["RainReticle"], base.transform.position, Quaternion.identity);
+            this._targetingReticle = Instantiate<GameObject>(_RainReticle, base.transform.position, Quaternion.identity);
             this._targetingReticle.SetAlphaImmediate(0.0f); // avoid bug where setting alpha on newly created object is delayed by one frame
         }
 

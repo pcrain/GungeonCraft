@@ -58,7 +58,8 @@ namespace CwaffingTheGungy
                 ChargeTime = float.MaxValue, // absurdly high value so we never actually shoot
             }};
 
-            _VacuumVFX = VFX.animations["VacuumParticle"];
+            _VacuumVFX = VFX.RegisterVFXObject("VacuumParticle", ResMap.Get("vacuum_wind_sprite_a"),
+                fps: 30, loops: true, loopStart: 6, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);
         }
 
         private void MaybeRestoreAmmo()

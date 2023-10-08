@@ -24,7 +24,7 @@ namespace CwaffingTheGungy
         public static Dictionary<string,VFXComplex> vfxcomplex = new();
         private static Dictionary<GameObject,VFXPool> vfxObjectToPoolMap = new();
 
-        public static GameObject laserSightPrefab;
+        public static GameObject LaserSightPrefab;
 
         public static tk2dSpriteCollectionData SpriteCollection
         {
@@ -33,113 +33,33 @@ namespace CwaffingTheGungy
 
         public static void Init()
         {
-            OverheadVFXCollection = SpriteBuilder.ConstructCollection(VFXScapegoat, "OverheadVFX_Collection");
-            UnityEngine.Object.DontDestroyOnLoad(VFXScapegoat);
-            UnityEngine.Object.DontDestroyOnLoad(OverheadVFXCollection);
+            // Initialize VFX collections
+            #region VFX Initialization
+                OverheadVFXCollection = SpriteBuilder.ConstructCollection(VFXScapegoat, "OverheadVFX_Collection");
+                UnityEngine.Object.DontDestroyOnLoad(VFXScapegoat);
+                UnityEngine.Object.DontDestroyOnLoad(OverheadVFXCollection);
+            #endregion
 
-            for (int i = 0; i < 10; ++i)
-            {
-                string istring = i.ToString();
-                // RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/Numbers/"+i.ToString());
-                RegisterVFX(istring, new List<string>() {
-                        "CwaffingTheGungy/Resources/MiscVFX/Numbers/"+i.ToString(),
-                    }, 1, loops: false, anchor: tk2dBaseSprite.Anchor.LowerCenter, persist: true);
-            }
+            #region Shared Assets
+                LaserSightPrefab = LoadHelper.LoadAssetFromAnywhere("assets/resourcesbundle/global vfx/vfx_lasersight.prefab") as GameObject;
+            #endregion
 
-            RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/PumpChargeMeter1");
-            RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/PumpChargeMeter2");
-            RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/PumpChargeMeter3");
-            RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/PumpChargeMeter4");
-            RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/PumpChargeMeter5");
-
-            RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/reticle_white");
-            RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/reticle_orange");
-            RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/reticle_blue");
-
-            RegisterVFX("PumpChargeAnimated", ResMap.Get("PumpChargeMeter"), 4, loops: true,
-                anchor: tk2dBaseSprite.Anchor.LowerCenter);
-
-            RegisterVFX("FriendlyOverhead", ResMap.Get("friendlyoverhead_vfx"), 10, loops: true,
-                anchor: tk2dBaseSprite.Anchor.LowerCenter);
-
-            RegisterVFX("PlagueOverhead", ResMap.Get("plaguevfxframe"), 4, loops: true,
-                anchor: tk2dBaseSprite.Anchor.LowerCenter);
-
-            RegisterVFX("CampfireA", ResMap.Get("campfire_a"), 6, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.5f, emissivePower: 5f);
-            RegisterVFX("CampfireB", ResMap.Get("campfire_b"), 6, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.5f, emissivePower: 10f);
-            RegisterVFX("CampfireC", ResMap.Get("campfire_c"), 6, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.5f, emissivePower: 20f);
-            RegisterVFX("CampfireD", ResMap.Get("campfire_d"), 6, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.5f, emissivePower: 30f);
-
-            RegisterVFX("SoulLinkParticle", ResMap.Get("soul_link_particle"), 16, loops: true,
-                anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.3f, emissivePower: 100);
-
-            RegisterVFX("DrowsyParticle", ResMap.Get("drowsy_cloud"), 6, loops: true,
-                anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);
-
-            RegisterVFX("MidasParticle", ResMap.Get("midas_sparkle"), 8, loops: true,
-                anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 5);
-
-            RegisterVFX("ExorcismParticle", ResMap.Get("exorcism_particles"), 12, loops: false,
-                anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 2);
-
-            RegisterVFX("SoulLinkSoul", ResMap.Get("soul_link_soul"), 5, loops: true,
-                anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.3f, emissivePower: 200);
-
-            RegisterVFX("VoodooGhost", ResMap.Get("voodoo_ghost"), 2, loops: true,
-                anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);
-
-            RegisterVFX("CanOfPepsi", ResMap.Get("can_of_pepsi"), 2, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);
-            RegisterVFX("CanOfCoke", ResMap.Get("can_of_coke"), 2, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);
-            RegisterVFX("CanOfSprite", ResMap.Get("can_of_sprite"), 2, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);
-
-            RegisterVFX("Shine", new List<string>() {
-                    "CwaffingTheGungy/Resources/MiscVFX/shine2",
-                }, 1, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 100);
-
-            RegisterVFX("Splode", ResMap.Get("splode"), 18, loops: true,
-                    anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 100, emissiveColour: Color.cyan);
-
-            // RegisterVFX("RainReticle", ResMap.Get("splode"), 12, loops: true,
-            //         anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 10, emissiveColour: Color.cyan, scale: 0.75f);
-
-            RegisterVFX("RainReticle", ResMap.Get("gunbrella_target_reticle"), 12, loops: true,
-                    anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 10, emissiveColour: Color.cyan, scale: 0.75f);
-
-            RegisterVFX("Rebar", ResMap.Get("RebarGunImpactVFX2"), 6, loops: false);
-
-            RegisterVFX("Tornado", ResMap.Get("tornado"), 20, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter);
-
-            // TODO: setting alpha on the first frame doesn't work, so we create an empty dummy sprite to start with
-            RegisterVFX("VacuumParticle", ResMap.Get("vacuum_wind_sprite_a"), 30, loops: true, loopStart: 6,
-                anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);
-
-            RegisterVFX("HailParticle", ResMap.Get("icicle_crash_particles"), 30, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.35f);
-
-            RegisterVFX("MiniPickup", ResMap.Get("mini_pickup"), 12, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
-
-            RegisterVFX("ZenkaiAura", ResMap.Get("zenkai_aura"), 12, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.4f,
-                emissivePower: 5f, emissiveColour: Color.yellow);
-
-            RegisterVFX("SaiyanSpark", ResMap.Get("saiyan_spark"), 12, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);
-
-            RegisterVFX("PrimeLogo", ResMap.Get("prime_logo_overhead"), 2, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter, emissivePower: 100f);
-
-            RegisterVFX("EmergencySiren", ResMap.Get("siren"), 36, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.75f, emissivePower: 50f);
-
-            RegisterVFX("GasterBlaster", ResMap.Get("gaster_blaster"), 2, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
-
-            RegisterVFX("OutbreakSmoke", ResMap.Get("outbreak_smoke_small"), 2, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
-            RegisterVFX("OutbreakSmokeLarge", ResMap.Get("outbreak_smoke_large"), 2, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
-
-            RegisterVFX("Slappp", ResMap.Get("slappp"), 30, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);
-
-            laserSightPrefab = LoadHelper.LoadAssetFromAnywhere("assets/resourcesbundle/global vfx/vfx_lasersight.prefab") as GameObject;
+            #region Shared VFX
+                // Shared by Sans and potentially future reticle users
+                RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/reticle_white");
+                RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/reticle_orange");
+                RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/reticle_blue");
+                // Shared by Gyroscope and Sans
+                VFX.RegisterVFXObject("Tornado", ResMap.Get("tornado"), 20, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter);
+                // Shared by Blackjack and possibly future auto-pickup items
+                VFX.RegisterVFXObject("MiniPickup", ResMap.Get("mini_pickup"), 12, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+            #endregion
         }
 
         /// <summary>
         /// Register a single-frame static sprite
         /// </summary>
-        private static void RegisterSprite(string path)
+        public static void RegisterSprite(string path)
         {
             sprites[path.Substring(path.LastIndexOf("/")+1)] = SpriteBuilder.AddSpriteToCollection(path, OverheadVFXCollection);
         }
@@ -261,15 +181,40 @@ namespace CwaffingTheGungy
         }
 
         /// <summary>
-        /// Register and return a VFXPool
+        /// Register and return a VFXObject
         /// </summary>
-        public static VFXPool RegisterVFXPool(string name, List<string> spritePaths, int fps, bool loops = true, float scale = 1.0f, tk2dBaseSprite.Anchor anchor = tk2dBaseSprite.Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null)
+        public static GameObject RegisterVFXObject(string name, List<string> spritePaths, int fps, bool loops = true, int loopStart = -1, float scale = 1.0f, tk2dBaseSprite.Anchor anchor = tk2dBaseSprite.Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null)
         {
             RegisterVFX(
                 name           : name,
                 spritePaths    : spritePaths,
                 fps            : fps,
                 loops          : loops,
+                loopStart      : loopStart,
+                scale          : scale,
+                anchor         : anchor,
+                dimensions     : dimensions,
+                usesZHeight    : usesZHeight,
+                zHeightOffset  : zHeightOffset,
+                persist        : persist,
+                alignment      : alignment,
+                emissivePower  : emissivePower,
+                emissiveColour : emissiveColour
+                );
+            return animations[name];
+        }
+
+        /// <summary>
+        /// Register and return a VFXPool
+        /// </summary>
+        public static VFXPool RegisterVFXPool(string name, List<string> spritePaths, int fps, bool loops = true, int loopStart = -1, float scale = 1.0f, tk2dBaseSprite.Anchor anchor = tk2dBaseSprite.Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null)
+        {
+            RegisterVFX(
+                name           : name,
+                spritePaths    : spritePaths,
+                fps            : fps,
+                loops          : loops,
+                loopStart      : loopStart,
                 scale          : scale,
                 anchor         : anchor,
                 dimensions     : dimensions,
@@ -283,6 +228,29 @@ namespace CwaffingTheGungy
             return vfxpool[name];
         }
 
+        /// <summary>
+        /// Register and return a VFXComplex
+        /// </summary>
+        public static VFXComplex RegisterVFXComplex(string name, List<string> spritePaths, int fps, bool loops = true, int loopStart = -1, float scale = 1.0f, tk2dBaseSprite.Anchor anchor = tk2dBaseSprite.Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null)
+        {
+            RegisterVFX(
+                name           : name,
+                spritePaths    : spritePaths,
+                fps            : fps,
+                loops          : loops,
+                loopStart      : loopStart,
+                scale          : scale,
+                anchor         : anchor,
+                dimensions     : dimensions,
+                usesZHeight    : usesZHeight,
+                zHeightOffset  : zHeightOffset,
+                persist        : persist,
+                alignment      : alignment,
+                emissivePower  : emissivePower,
+                emissiveColour : emissiveColour
+                );
+            return vfxcomplex[name];
+        }
 
         public static void ShowOverheadVFX(this GameActor gunOwner, string name, float timeout)
         {
@@ -430,7 +398,7 @@ namespace CwaffingTheGungy
         // Blatantly stolen from Noonum
         public static GameObject CreateLaserSight(Vector2 position, float length, float width, float angle, Color? colour = null, float power = 0)
         {
-            GameObject gameObject = SpawnManager.SpawnVFX(laserSightPrefab, position, Quaternion.Euler(0, 0, angle));
+            GameObject gameObject = SpawnManager.SpawnVFX(LaserSightPrefab, position, Quaternion.Euler(0, 0, angle));
 
             tk2dTiledSprite component2 = gameObject.GetComponent<tk2dTiledSprite>();
             float newWidth = 1f;

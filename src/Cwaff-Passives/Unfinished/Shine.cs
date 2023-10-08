@@ -22,6 +22,8 @@ namespace CwaffingTheGungy
         public static string ShortDescription = "That Ain't Falco";
         public static string LongDescription  = "(Melee)";
 
+        internal static GameObject _ShineVFX;
+
         private static StatModifier noSpeed;
 
         private bool dodgeButtonHeld = false;
@@ -39,6 +41,10 @@ namespace CwaffingTheGungy
                 statToBoost = PlayerStats.StatType.MovementSpeed,
                 modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE
             };
+
+            // Can't use resmap because sprite has number in it
+            _ShineVFX = VFX.RegisterVFXObject("Shine", new (){"CwaffingTheGungy/Resources/MiscVFX/shine2"},
+                fps: 1, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 100);
         }
         private void PostProcessProjectile(Projectile bullet, float thing)
         {
@@ -51,7 +57,7 @@ namespace CwaffingTheGungy
         {
             this.isShining = true;
             theShine = Instantiate<GameObject>(
-                VFX.animations["Shine"], player.specRigidbody.sprite.WorldCenter, Quaternion.identity, player.specRigidbody.transform);
+                _ShineVFX, player.specRigidbody.sprite.WorldCenter, Quaternion.identity, player.specRigidbody.transform);
             this.Update();
             // VFX.SpawnVFXPool("Shine",player.specRigidbody.sprite.WorldCenter, relativeTo: player.gameObject);
             // VFX.SpawnVFXPool("Shine", player.specRigidbody.sprite.WorldCenter);

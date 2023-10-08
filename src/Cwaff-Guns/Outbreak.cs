@@ -62,8 +62,8 @@ namespace CwaffingTheGungy
                 projectile.baseData.range  = 100f;
             _InfectionProjectile = projectile;
 
-            _OutbreakSmokeVFX = VFX.animations["OutbreakSmoke"];
-            _OutbreakSmokeLargeVFX = VFX.animations["OutbreakSmokeLarge"];
+            _OutbreakSmokeVFX = VFX.RegisterVFXObject("OutbreakSmoke", ResMap.Get("outbreak_smoke_small"), 2, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+            _OutbreakSmokeLargeVFX = VFX.RegisterVFXObject("OutbreakSmokeLarge", ResMap.Get("outbreak_smoke_large"), 2, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
         }
 
         public override void OnPostFired(PlayerController player, Gun gun)

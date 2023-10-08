@@ -30,7 +30,8 @@ namespace CwaffingTheGungy
         {
             PickupObject item = Lazy.SetupPassive<VoodooDoll>(ItemName, SpritePath, ShortDescription, LongDescription);
             item.quality      = PickupObject.ItemQuality.A;
-            _VoodooGhostVFX   = VFX.animations["VoodooGhost"];
+            _VoodooGhostVFX   = VFX.RegisterVFXObject("VoodooGhost", ResMap.Get("voodoo_ghost"),
+                fps: 2, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);
         }
 
         public override void Pickup(PlayerController player)

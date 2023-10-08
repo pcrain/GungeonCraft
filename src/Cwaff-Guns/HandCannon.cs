@@ -76,7 +76,8 @@ namespace CwaffingTheGungy
                 }
             };
 
-            _SlapppAnimation = VFX.animations["Slappp"];
+            _SlapppAnimation = VFX.RegisterVFXObject(
+                "Slappp", ResMap.Get("slappp"), fps: 30, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);
         }
     }
 

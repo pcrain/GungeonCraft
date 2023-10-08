@@ -27,6 +27,8 @@ namespace CwaffingTheGungy
         public static List<Projectile> lastResortProjectiles;
         public static Projectile lastResortBaseProjectile;
 
+        internal static string _PumpChargeAnimationName = "PumpChargeAnimated";
+
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<LastResort>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
@@ -56,6 +58,15 @@ namespace CwaffingTheGungy
             Projectile p0 = Lazy.PrefabProjectileFromExistingProjectile(projectile);
             p0.baseData.damage = 2f;
             lastResortProjectiles.Add(p0);
+
+            // TODO: antiquated VFX registering from my early days, clean this up if I ever come back to this
+            VFX.RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/PumpChargeMeter1");
+            VFX.RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/PumpChargeMeter2");
+            VFX.RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/PumpChargeMeter3");
+            VFX.RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/PumpChargeMeter4");
+            VFX.RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/PumpChargeMeter5");
+            VFX.RegisterVFX(_PumpChargeAnimationName, ResMap.Get("PumpChargeMeter"),
+                fps: 4, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter);
 
             // 1+ guns without ammo (scale stats from last projectile)
             for(int i = 1; i < 5; ++i)
@@ -134,7 +145,7 @@ namespace CwaffingTheGungy
                 AkSoundEngine.PostEvent("Play_OBJ_silenceblank_small_01", this.gameObject);
                 this.Player.ShowOverheadVFX(lastResortLevelSprites[ammoless-1], 1);
             }
-            this.Player.ShowOverheadAnimatedVFX("PumpChargeAnimated", 2);
+            this.Player.ShowOverheadAnimatedVFX(_PumpChargeAnimationName, 2);
         }
     }
 }

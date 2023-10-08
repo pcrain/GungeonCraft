@@ -29,6 +29,9 @@ namespace CwaffingTheGungy
         internal readonly float[] _DAMAGE_MULT      = {1.00f, 1.40f, 1.70f, 1.85f, 1.95f, 2.00f};
         internal readonly float[] _BOSS_DAMAGE_MULT = {1.00f, 1.40f, 1.70f, 1.85f, 1.95f, 2.00f};
 
+        internal static GameObject _SaiyanSpark;
+        internal static GameObject _ZenkaiAura;
+
         private bool _canActivate = false;
 
         private StatModifier _rateOfFireStat     = null;
@@ -41,6 +44,11 @@ namespace CwaffingTheGungy
         {
             PickupObject item = Lazy.SetupPassive<WarriorsGi>(ItemName, SpritePath, ShortDescription, LongDescription);
             item.quality      = PickupObject.ItemQuality.B;
+
+            _SaiyanSpark = VFX.RegisterVFXObject("SaiyanSpark", ResMap.Get("saiyan_spark"),
+                fps: 12, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);
+            _ZenkaiAura  = VFX.RegisterVFXObject("ZenkaiAura", ResMap.Get("zenkai_aura"),
+                fps: 12, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.4f, emissivePower: 5f, emissiveColour: Color.yellow);
         }
 
         public override void Pickup(PlayerController player)
@@ -178,7 +186,7 @@ namespace CwaffingTheGungy
                 return;
 
             AkSoundEngine.PostEvent("dbz_spark_sound", this._saiyan.gameObject);
-            GameObject v = SpawnManager.SpawnVFX(VFX.animations["SaiyanSpark"], (this._saiyan.sprite.WorldCenter + Lazy.RandomVector(0.3f)).ToVector3ZUp(10f), Lazy.RandomEulerZ());
+            GameObject v = SpawnManager.SpawnVFX(WarriorsGi._SaiyanSpark, (this._saiyan.sprite.WorldCenter + Lazy.RandomVector(0.3f)).ToVector3ZUp(10f), Lazy.RandomEulerZ());
                 tk2dSprite sprite = v.GetComponent<tk2dSprite>();
                 sprite.HeightOffGround = 10f;
                 // DepthLookupManager.AssignRendererToSortingLayer(sprite.renderer, DepthLookupManager.GungeonSortingLayer.FOREGROUND);
@@ -230,7 +238,7 @@ namespace CwaffingTheGungy
 
             if (this._extantAura != null)
                 UnityEngine.Object.Destroy(this._extantAura);
-            this._extantAura                  = SpawnManager.SpawnVFX(VFX.animations["ZenkaiAura"], this._saiyan.sprite.WorldBottomCenter, Quaternion.identity);
+            this._extantAura                  = SpawnManager.SpawnVFX(WarriorsGi._ZenkaiAura, this._saiyan.sprite.WorldBottomCenter, Quaternion.identity);
             this._extantAura.transform.parent = this._saiyan.transform;
             this._auraLife                    = _AURA_LIFE;
             this._nextSparkTime               =

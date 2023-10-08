@@ -33,6 +33,7 @@ namespace CwaffingTheGungy
 
         internal static ExplosionData _DeadlineExplosion = null;
         internal static tk2dSpriteAnimationClip _BulletSprite;
+        internal static GameObject _SplodeVFX;
 
         private List <DeadlineLaser> _myLasers = new();
         private float _myTimer = 0;
@@ -106,6 +107,9 @@ namespace CwaffingTheGungy
                     simpleVibrationTime     = Vibration.Time.Instant
                 },
             };
+
+            _SplodeVFX = VFX.RegisterVFXObject("Splode", ResMap.Get("splode"),
+                fps: 18, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 100, emissiveColour: Color.cyan);
         }
 
         public override void OnSwitchedToThisGun()
@@ -250,7 +254,7 @@ namespace CwaffingTheGungy
                 _myLasers[closestIndex].InitiateDeathSequenceAt(closestPosition.ToVector3ZisY(-1f),true);
                 AkSoundEngine.PostEvent("gaster_blaster_sound_effect", ETGModMainBehaviour.Instance.gameObject);
 
-                new FakeExplosion(Instantiate<GameObject>(VFX.animations["Splode"], closestPosition, Quaternion.identity));
+                new FakeExplosion(Instantiate<GameObject>(_SplodeVFX, closestPosition, Quaternion.identity));
             }
 
             for (int i = _myLasers.Count - 1; i >= 0; i--)

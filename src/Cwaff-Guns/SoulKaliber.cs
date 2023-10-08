@@ -97,8 +97,10 @@ namespace CwaffingTheGungy
         {
             _SoulLinkHitVFXPool    = VFX.CreatePoolFromVFXGameObject((ItemHelper.Get(Items.MagicLamp) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
             _SoulLinkHitVFX        = _SoulLinkHitVFXPool.effects[0].effects[0].effect.gameObject;
-            _SoulLinkOverheadVFX   = VFX.animations["SoulLinkParticle"];
-            _SoulLinkSoulVFX       = VFX.animations["SoulLinkSoul"];
+            _SoulLinkOverheadVFX   = VFX.RegisterVFXObject("SoulLinkParticle", ResMap.Get("soul_link_particle"),
+                fps: 16, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.3f, emissivePower: 100);
+            _SoulLinkSoulVFX       = VFX.RegisterVFXObject("SoulLinkSoul", ResMap.Get("soul_link_soul"),
+                fps: 5, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.3f, emissivePower: 200);
             StandardSoulLinkEffect = new GameActorHealthEffect
             {
                 duration                 = 60,

@@ -59,7 +59,8 @@ namespace CwaffingTheGungy
                 projectile.AddDefaultAnimation(_ProjSprite);
                 projectile.gameObject.AddComponent<MidasProjectile>();
 
-            _MidasParticleVFX = VFX.animations["MidasParticle"];
+            _MidasParticleVFX = VFX.RegisterVFXObject("MidasParticle", ResMap.Get("midas_sparkle"),
+                fps: 8, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 5);
         }
 
         protected override void OnPickedUpByPlayer(PlayerController player)

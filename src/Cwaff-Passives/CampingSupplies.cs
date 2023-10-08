@@ -52,21 +52,28 @@ namespace CwaffingTheGungy
             PickupObject item = Lazy.SetupPassive<CampingSupplies>(ItemName, SpritePath, ShortDescription, LongDescription);
             item.quality      = PickupObject.ItemQuality.C;
 
-            _BonfirePrefab = (ItemHelper.Get(Items.GunSoul) as ExtraLifeItem).BonfireSynergyBonfire;
+            _SmokePrefab     = ResourceCache.Acquire("Global VFX/VFX_Item_Spawn_Poof") as GameObject;
+            _BonfirePrefab   = (ItemHelper.Get(Items.GunSoul) as ExtraLifeItem).BonfireSynergyBonfire;
             _CampfirePrefabs = new GameObject[]{
-                VFX.animations["CampfireA"], // level 0 (unused)
-                // VFX.animations["CampfireA"], // level 1 (super unused)
-                VFX.animations["CampfireB"], // level 2
-                VFX.animations["CampfireC"], // level 3
-                VFX.animations["CampfireD"], // level 4
+                VFX.RegisterVFXObject("CampfireA", ResMap.Get("campfire_a"),
+                    fps: 6, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.5f, emissivePower: 5f), // level 0 (unused)
+                VFX.RegisterVFXObject("CampfireB", ResMap.Get("campfire_b"),
+                    fps: 6, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.5f, emissivePower: 10f), // level 1
+                VFX.RegisterVFXObject("CampfireC", ResMap.Get("campfire_c"),
+                    fps: 6, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.5f, emissivePower: 20f), // level 2
+                VFX.RegisterVFXObject("CampfireD", ResMap.Get("campfire_d"),
+                    fps: 6, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.5f, emissivePower: 30f), // level 3
             };
 
-            _SmokePrefab = ResourceCache.Acquire("Global VFX/VFX_Item_Spawn_Poof") as GameObject;
-            _SodaCanPrefabs = new GameObject[] {
-                VFX.animations["CanOfCoke"],
-                VFX.animations["CanOfPepsi"],
-                VFX.animations["CanOfSprite"],
+            _SodaCanPrefabs  = new GameObject[] {
+                VFX.RegisterVFXObject("CanOfCoke", ResMap.Get("can_of_coke"),
+                    fps: 2, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f),
+                VFX.RegisterVFXObject("CanOfPepsi", ResMap.Get("can_of_pepsi"),
+                    fps: 2, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f),
+                VFX.RegisterVFXObject("CanOfSprite", ResMap.Get("can_of_sprite"),
+                    fps: 2, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f),
             };
+
         }
 
         public override void Pickup(PlayerController player)
