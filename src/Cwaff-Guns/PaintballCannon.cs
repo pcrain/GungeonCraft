@@ -26,8 +26,8 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+                gun.gameObject.AddComponent<PaintballCannon>();
                 // gun.gunSwitchGroup                       = (ItemHelper.Get(Items.TShirtCannon) as Gun).gunSwitchGroup;
-                gun.gunSwitchGroup                       = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup; // silent reload
                 gun.DefaultModule.ammoCost               = 1;
                 gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
                 gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
@@ -40,10 +40,9 @@ namespace CwaffingTheGungy
                 gun.SetBaseMaxAmmo(300);
                 gun.SetAnimationFPS(gun.shootAnimation, 14);
                 gun.SetAnimationFPS(gun.reloadAnimation, 4);
-
-            var comp = gun.gameObject.AddComponent<PaintballCannon>();
-                comp.SetFireAudio("paintball_shoot_sound");
-                comp.SetReloadAudio("paintball_reload_sound");
+                gun.ClearDefaultAudio();
+                gun.SetFireAudio("paintball_shoot_sound");
+                gun.SetReloadAudio("paintball_reload_sound");
 
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
                 projectile.baseData.damage = 7f;

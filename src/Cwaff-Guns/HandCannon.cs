@@ -33,7 +33,7 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup; // silent gun audio
+                gun.gameObject.AddComponent<HandCannon>();
                 gun.DefaultModule.ammoCost            = 1;
                 gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.Charged;
                 gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
@@ -49,28 +49,16 @@ namespace CwaffingTheGungy
                 gun.SetAnimationFPS(gun.reloadAnimation, (int)(gun.spriteAnimator.GetClipByName(gun.reloadAnimation).frames.Length / gun.reloadTime));
                 gun.SetAnimationFPS(gun.chargeAnimation, (int)((1.0f / _CHARGE_TIME) * _CHARGE_LOOP_FRAME));
                 gun.LoopAnimation(gun.chargeAnimation, _CHARGE_LOOP_FRAME);
-                // gun.PreventNormalFireAudio = true;
-                // gun.OverrideNormalFireAudioEvent = "hand_cannon_shoot_sound";
+                gun.ClearDefaultAudio();
+                gun.SetFireAudio("hand_cannon_shoot_sound");
+                gun.SetReloadAudio("hand_cannon_reload_sound");
+                gun.SetChargeAudio("hand_cannon_charge_sound", frame: 0);
+                gun.SetChargeAudio("hand_cannon_charge_sound", frame: 10);
 
-            var comp = gun.gameObject.AddComponent<HandCannon>();
-                // comp.SetFireAudio("hand_cannon_shoot_sound");
-                comp.SetReloadAudio();
-            gun.spriteAnimator.GetClipByName(gun.shootAnimation).frames[0].triggerEvent = true;
-            gun.spriteAnimator.GetClipByName(gun.shootAnimation).frames[0].eventAudio = "hand_cannon_shoot_sound";
-            gun.spriteAnimator.GetClipByName(gun.reloadAnimation).frames[0].triggerEvent = true;
-            gun.spriteAnimator.GetClipByName(gun.reloadAnimation).frames[0].eventAudio = "hand_cannon_reload_sound";
-            gun.spriteAnimator.GetClipByName(gun.chargeAnimation).frames[0].triggerEvent = true;
-            gun.spriteAnimator.GetClipByName(gun.chargeAnimation).frames[0].eventAudio = "hand_cannon_charge_sound";
-            gun.spriteAnimator.GetClipByName(gun.chargeAnimation).frames[10].triggerEvent = true;
-            gun.spriteAnimator.GetClipByName(gun.chargeAnimation).frames[10].eventAudio = "hand_cannon_charge_sound";
-
-            // IntVector2 sizeOfFirstFrame = new IntVector2(31, 28); // pixel size of the first frame of the projectile
-            // IntVector2 centerOfFirstFrame = new IntVector2(57, 70); // offsets to the center of the first frame of the projectile
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("slappp").Base(),
                 30, true, new IntVector2(46, 70), // 0.5x scale
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true,
-                /*overrideColliderOffsets: centerOfFirstFrame - (colliderSize / 2),*/
                 overrideColliderPixelSize: new IntVector2(8,8) // small collider near the center of the sprite
                 );
 

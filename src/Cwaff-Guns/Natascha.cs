@@ -33,7 +33,7 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
+                gun.gameObject.AddComponent<Natascha>();
                 gun.DefaultModule.ammoCost            = 1;
                 gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.Automatic;
                 gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
@@ -46,9 +46,9 @@ namespace CwaffingTheGungy
                 gun.SetBaseMaxAmmo(2500);
                 gun.CurrentAmmo = 2500;
                 gun.SetAnimationFPS(gun.shootAnimation, (int)((float)_FireAnimationFrames / _BaseCooldownTime) + 1);
+                gun.ClearDefaultAudio();
+                gun.SetFireAudio(); // prevent fire audio, as it's handled in OnPostFired()
 
-            var comp = gun.gameObject.AddComponent<Natascha>();
-                comp.SetFireAudio(); // prevent fire audio, as it's handled in OnPostFired()
 
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("natascha_bullet").Base(),

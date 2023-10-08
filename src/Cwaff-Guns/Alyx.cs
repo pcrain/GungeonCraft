@@ -40,7 +40,7 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.gunSwitchGroup                    = (ItemHelper.Get(Items.MarineSidearm) as Gun).gunSwitchGroup;
+                gun.gameObject.AddComponent<Alyx>();
                 gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.Automatic;
                 gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
                 gun.DefaultModule.numberOfShotsInClip = 10;
@@ -50,10 +50,8 @@ namespace CwaffingTheGungy
                 gun.CurrentAmmo = _BASE_MAX_AMMO;
                 gun.SetAnimationFPS(gun.reloadAnimation, 20);
                 gun.SetAnimationFPS(gun.shootAnimation, 20);
-
-            var comp = gun.gameObject.AddComponent<Alyx>();
-                comp.SetFireAudio(); // prevent fire audio, as it's handled in OnPostFired()
-                comp.SetReloadAudio("alyx_reload_sound");
+                gun.ClearDefaultAudio();
+                gun.SetReloadAudio("alyx_reload_sound");
 
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("alyx_projectile").Base(),

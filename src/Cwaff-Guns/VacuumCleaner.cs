@@ -42,8 +42,8 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+                gun.gameObject.AddComponent<VacuumCleaner>();
                 gun.gunClass                             = GunClass.CHARGE;
-                gun.gunSwitchGroup                       = (ItemHelper.Get(Items.MarineSidearm) as Gun).gunSwitchGroup;
                 gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.Charged;
                 gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
                 gun.DefaultModule.numberOfShotsInClip    = -1;
@@ -52,9 +52,7 @@ namespace CwaffingTheGungy
                 gun.InfiniteAmmo                         = true;
                 gun.barrelOffset.transform.localPosition = new Vector3(1.8125f, 0.4375f, 0f); // should match "Casing" in JSON file
                 gun.SetAnimationFPS(gun.chargeAnimation, 16);
-
-            var comp = gun.gameObject.AddComponent<VacuumCleaner>();
-                comp.SetFireAudio(); // prevent fire audio, as it's handled in Update()
+                gun.ClearDefaultAudio(); // prevent fire audio, as it's handled in Update()
 
             gun.DefaultModule.chargeProjectiles = new(){ new(){
                 Projectile = Lazy.PrefabProjectileFromGun(gun),

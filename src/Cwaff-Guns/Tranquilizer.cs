@@ -29,7 +29,7 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
+                gun.gameObject.AddComponent<Tranquilizer>();
                 gun.DefaultModule.ammoCost            = 1;
                 gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
                 gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
@@ -41,10 +41,9 @@ namespace CwaffingTheGungy
                 gun.SetBaseMaxAmmo(60);
                 gun.SetAnimationFPS(gun.shootAnimation, 30);
                 gun.SetAnimationFPS(gun.reloadAnimation, 40);
-
-            var comp = gun.gameObject.AddComponent<Tranquilizer>();
-                comp.SetFireAudio("blowgun_fire_sound");
-                comp.SetReloadAudio("blowgun_reload_sound");
+                gun.ClearDefaultAudio();
+                gun.SetFireAudio("blowgun_fire_sound");
+                gun.SetReloadAudio("blowgun_reload_sound");
 
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("tranquilizer_projectile").Base(),

@@ -35,7 +35,7 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
+                gun.gameObject.AddComponent<SchrodingersGat>();
                 gun.DefaultModule.ammoCost            = 1;
                 gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.Automatic;
                 gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
@@ -49,9 +49,7 @@ namespace CwaffingTheGungy
                 gun.CurrentAmmo = 2500;
                 gun.SetAnimationFPS(gun.idleAnimation, 24);
                 gun.SetAnimationFPS(gun.shootAnimation, 24);
-
-            var comp = gun.gameObject.AddComponent<SchrodingersGat>();
-                comp.SetFireAudio(); // prevent fire audio, as it's handled in OnPostFired()
+                gun.ClearDefaultAudio(); // prevent fire audio, as it's handled in OnPostFired()
 
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("schrodinger_bullet").Base(),

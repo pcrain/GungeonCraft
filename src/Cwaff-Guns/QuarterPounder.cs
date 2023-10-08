@@ -31,7 +31,7 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
+                gun.gameObject.AddComponent<QuarterPounder>();
                 gun.DefaultModule.ammoCost            = 1;
                 gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
                 gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
@@ -44,10 +44,9 @@ namespace CwaffingTheGungy
                 gun.SetBaseMaxAmmo(9999);
                 gun.SetAnimationFPS(gun.shootAnimation, 24);
                 gun.SetAnimationFPS(gun.reloadAnimation, 16);
-
-            var comp = gun.gameObject.AddComponent<QuarterPounder>();
-                comp.SetFireAudio("fire_coin_sound");
-                comp.SetReloadAudio("coin_gun_reload");
+                gun.ClearDefaultAudio();
+                gun.SetFireAudio("fire_coin_sound");
+                gun.SetReloadAudio("coin_gun_reload");
 
             _ProjSprite = AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("coin_gun_projectile").Base(),

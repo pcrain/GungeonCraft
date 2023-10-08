@@ -41,6 +41,7 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+                gun.gameObject.AddComponent<Deadline>();
                 gun.barrelOffset.transform.localPosition = new Vector3(1.6875f, 0.5625f, 0f); // should match "Casing" in JSON file
                 gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
                 gun.reloadTime                        = 0.9f;
@@ -52,11 +53,8 @@ namespace CwaffingTheGungy
                 gun.SetAnimationFPS(gun.shootAnimation, 20);
                 gun.SetAnimationFPS(gun.reloadAnimation, 30);
                 gun.SetAnimationFPS(gun.idleAnimation, 10);
-
-            var comp = gun.gameObject.AddComponent<Deadline>();
-                comp.preventNormalReloadAudio = true;
-                comp.SetFireAudio("deadline_fire_sound");
-                comp.SetReloadAudio("deadline_fire_sound");
+                gun.SetFireAudio("deadline_fire_sound");
+                gun.SetReloadAudio("deadline_fire_sound");
 
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("deadline_projectile").Base(),

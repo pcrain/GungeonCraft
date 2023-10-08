@@ -483,5 +483,78 @@ namespace CwaffingTheGungy
       return !collided;
     }
 
+    // Clear a gun's default audio events
+    public static void ClearDefaultAudio(this Gun gun, bool useSilentGroup = true)
+    {
+      if (gun.GetComponent<Alexandria.ItemAPI.AdvancedGunBehavior>() is Alexandria.ItemAPI.AdvancedGunBehavior agun)
+      {
+        ETGModConsole.Log($"  FOUND THE BEHAVIOR");
+        agun.SetFireAudio();
+        agun.SetReloadAudio();
+      }
+
+      if (useSilentGroup)
+        gun.gunSwitchGroup = (ItemHelper.Get(Items.Blasphemy) as Gun).gunSwitchGroup; // quietest gun audio
+
+      gun.PreventNormalFireAudio = true;
+      gun.OverrideNormalFireAudioEvent = "";
+
+      if (gun.spriteAnimator.GetClipByName(gun.shootAnimation) is tk2dSpriteAnimationClip shootAnimation)
+        foreach (tk2dSpriteAnimationFrame f in shootAnimation.frames)
+        {
+          f.triggerEvent = false;
+          f.eventAudio   = "";
+        }
+      if (gun.spriteAnimator.GetClipByName(gun.chargeAnimation) is tk2dSpriteAnimationClip chargeAnimation)
+        foreach (tk2dSpriteAnimationFrame f in chargeAnimation.frames)
+        {
+          f.triggerEvent = false;
+          f.eventAudio   = "";
+        }
+      if (gun.spriteAnimator.GetClipByName(gun.reloadAnimation) is tk2dSpriteAnimationClip reloadAnimation)
+        foreach (tk2dSpriteAnimationFrame f in reloadAnimation.frames)
+        {
+          f.triggerEvent = false;
+          f.eventAudio   = "";
+        }
+    }
+
+    // Set an audio event for a specific frame of a gun's animation
+    public static void SetGunAudio(this Gun gun, string name = null, string audio = "", int frame = 0)
+    {
+      tk2dSpriteAnimationFrame aframe = gun.spriteAnimator.GetClipByName(name).frames[frame];
+      aframe.triggerEvent = !string.IsNullOrEmpty(audio);
+      aframe.eventAudio = audio;
+    }
+    //  doesn't work
+    // public static void SetProjectileAudio(this Gun gun, string audio = "")
+    // {
+    //     gun.OnPostFired += (_, _) => {
+    //       ETGModConsole.Log($"making a projectile!");
+    //       AkSoundEngine.PostEvent(audio, gun.gameObject);
+    //     };
+    // }
+    // needs to use Alexandria version because fireaudio overrides are not serialized
+    public static void SetFireAudio(this Gun gun, string audio = "", int frame = 0)
+    {
+      // gun.SetGunAudio(name: gun.shootAnimatgunion, audio: audio, frame: frame);
+      // gun.PreventNormalFireAudio = true;
+      // gun.OverrideNormalFireAudioEvent = audio;
+
+      if (gun.GetComponent<Alexandria.ItemAPI.AdvancedGunBehavior>() is Alexandria.ItemAPI.AdvancedGunBehavior agun)
+      {
+        ETGModConsole.Log($"  FOUND THE BEHAVIOR");
+        agun.preventNormalFireAudio = true;
+        agun.overrideNormalFireAudio = audio;
+      }
+    }
+    public static void SetReloadAudio(this Gun gun, string audio = "", int frame = 0)
+    {
+      gun.SetGunAudio(name: gun.reloadAnimation, audio: audio, frame: frame);
+    }
+    public static void SetChargeAudio(this Gun gun, string audio = "", int frame = 0)
+    {
+      gun.SetGunAudio(name: gun.chargeAnimation, audio: audio, frame: frame);
+    }
   }
 }

@@ -45,8 +45,8 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+                gun.gameObject.AddComponent<Gunbrella>();
                 gun.gunClass                             = GunClass.CHARGE;
-                gun.gunSwitchGroup                       = (ItemHelper.Get(Items.MarineSidearm) as Gun).gunSwitchGroup;
                 gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.Charged;
                 gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
                 gun.DefaultModule.numberOfShotsInClip    = 1;
@@ -55,10 +55,10 @@ namespace CwaffingTheGungy
                 gun.barrelOffset.transform.localPosition = new Vector3(1.6875f, 0.6875f, 0f); // should match "Casing" in JSON file
                 gun.SetAnimationFPS(gun.shootAnimation, 60);
                 gun.SetAnimationFPS(gun.chargeAnimation, 16);
-                // gun.LoopAnimation(gun.chargeAnimation, 16);
                 gun.LoopAnimation(gun.chargeAnimation, 17);
                 gun.SetBaseMaxAmmo(100);
                 gun.CurrentAmmo = 100;
+                gun.ClearDefaultAudio();
 
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("gunbrella_projectile").Base(),
@@ -97,9 +97,6 @@ namespace CwaffingTheGungy
                     ChargeTime = _MIN_CHARGE_TIME,
                 }};
             }
-
-            var comp = gun.gameObject.AddComponent<Gunbrella>();
-                comp.SetFireAudio(); // prevent fire audio, as it's handled in Update()
         }
 
         protected override void Update()

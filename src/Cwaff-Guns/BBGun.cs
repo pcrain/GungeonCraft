@@ -30,6 +30,7 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+                gun.gameObject.AddComponent<BBGun>();
                 gun.gunClass                             = GunClass.CHARGE;
                 gun.quality                              = PickupObject.ItemQuality.B;
                 gun.CanGainAmmo                          = false;
@@ -42,10 +43,8 @@ namespace CwaffingTheGungy
                 gun.SetAnimationFPS(gun.shootAnimation, 10);
                 gun.SetAnimationFPS(gun.chargeAnimation, 16);
                 gun.LoopAnimation(gun.chargeAnimation, 32);
-
-            var comp = gun.gameObject.AddComponent<BBGun>();
-                comp.SetFireAudio("Play_WPN_seriouscannon_shot_01");
-                comp.SetReloadAudio("Play_ENM_flame_veil_01");
+                gun.SetFireAudio("Play_WPN_seriouscannon_shot_01");
+                gun.SetReloadAudio("Play_ENM_flame_veil_01");
 
             ProjectileModule mod = gun.DefaultModule;
                 mod.ammoCost            = 1;

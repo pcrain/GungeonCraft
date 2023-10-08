@@ -31,6 +31,7 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+                gun.gameObject.AddComponent<HolyWaterGun>();
                 gun.gunSwitchGroup                       = (ItemHelper.Get(Items.MegaDouser) as Gun).gunSwitchGroup;
                 gun.barrelOffset.transform.localPosition = new Vector3(1.9375f, 0.5f, 0f); // should match "Casing" in JSON file
                 gun.gunClass                             = GunClass.BEAM;
@@ -38,8 +39,6 @@ namespace CwaffingTheGungy
                 gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.Beam;
                 gun.DefaultModule.numberOfShotsInClip    = -1;
                 gun.SetBaseMaxAmmo(500);
-
-            var comp = gun.gameObject.AddComponent<HolyWaterGun>();
 
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
                 projectile.baseData.speed  = 50f;

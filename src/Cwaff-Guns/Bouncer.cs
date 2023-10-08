@@ -32,7 +32,7 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.gunSwitchGroup                       = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup; // silent default sounds
+                gun.gameObject.AddComponent<Bouncer>();
                 gun.DefaultModule.ammoCost               = 1;
                 gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
                 gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
@@ -46,11 +46,9 @@ namespace CwaffingTheGungy
                 gun.SetBaseMaxAmmo(300);
                 gun.SetAnimationFPS(gun.shootAnimation, 14);
                 gun.SetAnimationFPS(gun.reloadAnimation, 20);
-
-            var comp = gun.gameObject.AddComponent<Bouncer>();
-                comp.SetFireAudio("hand_cannon_shoot_sound");
-                // comp.SetFireAudio("MC_RocsCape");
-                comp.SetReloadAudio("MC_Link_Grow");
+                gun.ClearDefaultAudio();
+                gun.SetFireAudio("MC_RocsCape");
+                gun.SetReloadAudio("MC_Link_Grow");
 
             IntVector2 colliderSize = new IntVector2(1,1); // 1-pixel collider for accurate bounce animation
 

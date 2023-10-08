@@ -31,7 +31,7 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.gunSwitchGroup                       = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
+                gun.gameObject.AddComponent<IronMaid>();
                 gun.DefaultModule.ammoCost               = 1;
                 gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
                 gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
@@ -43,11 +43,9 @@ namespace CwaffingTheGungy
                 gun.SetBaseMaxAmmo(400);
                 gun.SetAnimationFPS(gun.shootAnimation, 24);
                 gun.SetAnimationFPS(gun.reloadAnimation, 24);
-
-            var comp = gun.gameObject.AddComponent<IronMaid>();
-                // comp.SetFireAudio("knife_gun_fire");
-                comp.SetFireAudio("knife_gun_launch");
-                comp.SetReloadAudio("knife_gun_reload");
+                gun.ClearDefaultAudio();
+                gun.SetFireAudio("knife_gun_launch");
+                gun.SetReloadAudio("knife_gun_reload");
 
             _KunaiSprite = AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("kunai").Base(),

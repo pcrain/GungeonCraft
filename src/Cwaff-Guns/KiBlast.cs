@@ -36,7 +36,7 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.gunSwitchGroup                       = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
+                gun.gameObject.AddComponent<KiBlast>();
                 gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
                 gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
                 gun.DefaultModule.cooldownTime           = 0.1f;
@@ -47,17 +47,15 @@ namespace CwaffingTheGungy
                 gun.barrelOffset.transform.localPosition = new Vector3(0.125f,0.6875f, 0f); // emit directly from hand
                 gun.SetBaseMaxAmmo(99999);
                 gun.SetAnimationFPS(gun.shootAnimation, 24);
+                gun.ClearDefaultAudio();
+                gun.SetFireAudio("ki_blast_sound");
+                gun.SetReloadAudio();
 
-                VFXPool impactFVX = VFX.RegisterVFXPool(ItemName+" Impact", ResMap.Get("ki_explosion"), 20, false, scale: 0.5f);
-
+            VFXPool impactFVX = VFX.RegisterVFXPool(ItemName+" Impact", ResMap.Get("ki_explosion"), 20, false, scale: 0.5f);
                 gun.SetHorizontalImpactVFX(impactFVX);
                 gun.SetVerticalImpactVFX(impactFVX);
                 gun.SetEnemyImpactVFX(impactFVX);
                 gun.SetAirImpactVFX(impactFVX);
-
-            var comp = gun.gameObject.AddComponent<KiBlast>();
-                comp.SetFireAudio("ki_blast_sound");
-                comp.preventNormalReloadAudio = true;
 
             _KiSprite = AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("ki_blast").Base(),

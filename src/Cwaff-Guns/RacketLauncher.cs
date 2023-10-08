@@ -34,9 +34,7 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            var comp = gun.gameObject.AddComponent<RacketLauncher>();
-                comp.SetFireAudio();
-
+            gun.gameObject.AddComponent<RacketLauncher>();
             gun.DefaultModule.ammoCost               = 1;
             gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
             gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
@@ -55,6 +53,7 @@ namespace CwaffingTheGungy
             gun.SetAnimationFPS(gun.shootAnimation, 60);
             gun.SetAnimationFPS(gun.idleAnimation, _IDLE_FPS);
             gun.LoopAnimation(gun.idleAnimation, 0);
+            gun.ClearDefaultAudio();
 
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("tennis_ball").Base(),

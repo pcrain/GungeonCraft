@@ -33,7 +33,7 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
+                gun.gameObject.AddComponent<Blackjack>();
                 gun.DefaultModule.ammoCost            = 1;
                 gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.Automatic;
                 gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
@@ -48,10 +48,9 @@ namespace CwaffingTheGungy
                 gun.CurrentAmmo = _DECK_SIZE * _NUM_DECKS;
                 gun.SetAnimationFPS(gun.shootAnimation, 30);
                 gun.SetAnimationFPS(gun.reloadAnimation, 30);
-
-            var comp = gun.gameObject.AddComponent<Blackjack>();
-                comp.SetFireAudio(); // prevent fire audio, as it's handled in OnPostFired()
-                comp.SetReloadAudio("card_shuffle_sound"); // todo: this is still playing the default reload sound as well, for some reason
+                gun.ClearDefaultAudio();
+                gun.SetFireAudio(); // prevent fire audio, as it's handled in OnPostFired()
+                gun.SetReloadAudio("card_shuffle_sound"); // todo: this is still playing the default reload sound as well, for some reason
 
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("playing_card").Base(),
