@@ -48,7 +48,8 @@ namespace CwaffingTheGungy
                 gun.SetAnimationFPS(gun.reloadAnimation, 20);
 
             var comp = gun.gameObject.AddComponent<Bouncer>();
-                comp.SetFireAudio("MC_RocsCape");
+                comp.SetFireAudio("hand_cannon_shoot_sound");
+                // comp.SetFireAudio("MC_RocsCape");
                 comp.SetReloadAudio("MC_Link_Grow");
 
             IntVector2 colliderSize = new IntVector2(1,1); // 1-pixel collider for accurate bounce animation

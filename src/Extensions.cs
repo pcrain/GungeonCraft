@@ -297,6 +297,13 @@ namespace CwaffingTheGungy
       gun.DefaultModule.projectiles[0].SetAirImpactVFX(vfx);
     }
 
+    // Check if an enemy is hostile
+    public static bool IsAlive(this AIActor e)
+    {
+      HealthHaver h = e?.healthHaver;
+      return e && !e.IsGone && !e.IsHarmlessEnemy && h && h.IsAlive && !h.IsDead && !h.isPlayerCharacter;
+    }
+
     // Check if an enemy is hostile and a non-boss
     public static bool IsAliveAndNotABoss(this AIActor e)
     {

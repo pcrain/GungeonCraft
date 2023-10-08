@@ -1,0 +1,173 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Reflection;
+
+using UnityEngine;
+using MonoMod.RuntimeDetour;
+
+using Gungeon;
+using Dungeonator;
+using Alexandria.ItemAPI;
+using Alexandria.Misc;
+
+namespace CwaffingTheGungy
+{
+    public class HandCannon : AdvancedGunBehavior
+    {
+        public static string ItemName         = "Hand Cannon";
+        public static string SpriteName       = "hand_cannon";
+        public static string ProjectileName   = "38_special";
+        public static string ShortDescription = "TBD";
+        public static string LongDescription  = "TBD";
+
+        internal static GameObject _SlapppAnimation;
+        internal static tk2dSpriteAnimationClip _BulletSprite;
+        internal static int                     _FireAnimationFrames = 8;
+
+        private const float _CHARGE_TIME       = 0.5f;
+        private const int   _CHARGE_LOOP_FRAME = 11;
+
+        public static void Add()
+        {
+            Gun gun = Lazy.SetupGun(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+                // gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup; // silent gun audio
+                gun.DefaultModule.ammoCost            = 1;
+                gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.Charged;
+                gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+                gun.reloadTime                        = 0.5f;
+                gun.DefaultModule.angleVariance       = 15.0f;
+                gun.DefaultModule.cooldownTime        = 0.5f;
+                gun.DefaultModule.numberOfShotsInClip = 1;
+                gun.quality                           = PickupObject.ItemQuality.D;
+                gun.barrelOffset.transform.localPosition = new Vector3(1.9375f, 0.6875f, 0f); // should match "Casing" in JSON file
+                gun.SetBaseMaxAmmo(100);
+                gun.CurrentAmmo = 100;
+                gun.SetAnimationFPS(gun.shootAnimation, 30);
+                gun.SetAnimationFPS(gun.reloadAnimation, (int)(gun.spriteAnimator.GetClipByName(gun.reloadAnimation).frames.Length / gun.reloadTime));
+                gun.SetAnimationFPS(gun.chargeAnimation, (int)((1.0f / _CHARGE_TIME) * _CHARGE_LOOP_FRAME));
+                gun.LoopAnimation(gun.chargeAnimation, _CHARGE_LOOP_FRAME);
+                // gun.PreventNormalFireAudio = true;
+                // gun.OverrideNormalFireAudioEvent = "hand_cannon_shoot_sound";
+
+            var comp = gun.gameObject.AddComponent<HandCannon>();
+                // comp.SetFireAudio("hand_cannon_shoot_sound");
+                // comp.SetReloadAudio("hand_cannon_reload_sound");
+            gun.spriteAnimator.GetClipByName(gun.shootAnimation).frames[0].triggerEvent = true;
+            gun.spriteAnimator.GetClipByName(gun.shootAnimation).frames[0].eventAudio = "hand_cannon_shoot_sound";
+            gun.spriteAnimator.GetClipByName(gun.reloadAnimation).frames[0].triggerEvent = true;
+            gun.spriteAnimator.GetClipByName(gun.reloadAnimation).frames[0].eventAudio = "hand_cannon_reload_sound";
+            gun.spriteAnimator.GetClipByName(gun.chargeAnimation).frames[0].triggerEvent = true;
+            gun.spriteAnimator.GetClipByName(gun.chargeAnimation).frames[0].eventAudio = "hand_cannon_charge_sound";
+            gun.spriteAnimator.GetClipByName(gun.chargeAnimation).frames[10].triggerEvent = true;
+            gun.spriteAnimator.GetClipByName(gun.chargeAnimation).frames[10].eventAudio = "hand_cannon_charge_sound";
+
+            // IntVector2 sizeOfFirstFrame = new IntVector2(31, 28); // pixel size of the first frame of the projectile
+            // IntVector2 centerOfFirstFrame = new IntVector2(57, 70); // offsets to the center of the first frame of the projectile
+            _BulletSprite = AnimateBullet.CreateProjectileAnimation(
+                ResMap.Get("slappp").Base(),
+                30, true, new IntVector2(46, 70), // 0.5x scale
+                false, tk2dBaseSprite.Anchor.MiddleCenter, true, true,
+                /*overrideColliderOffsets: centerOfFirstFrame - (colliderSize / 2),*/
+                overrideColliderPixelSize: new IntVector2(8,8) // small collider near the center of the sprite
+                );
+
+            Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
+                projectile.AddAnimation(_BulletSprite);
+                projectile.SetAnimation(_BulletSprite);
+                projectile.baseData.damage  = 50f;
+                projectile.baseData.speed   = 40.0f;
+                projectile.transform.parent = gun.barrelOffset;
+                projectile.gameObject.AddComponent<SlappProjectile>();
+
+            gun.DefaultModule.chargeProjectiles = new(){
+                new ProjectileModule.ChargeProjectile
+                {
+                    Projectile = projectile,
+                    ChargeTime = _CHARGE_TIME,
+                }
+            };
+
+            _SlapppAnimation = VFX.animations["Slappp"];
+        }
+    }
+
+    public class SlappProjectile : MonoBehaviour
+    {
+        private const int   _SLAPPP_FRAME         = 8;   // frame 8 is the meat of the slappp animation
+        private const float _SLAPPP_FORCE         = 300f;
+        private const float _SLAPPP_STUN          = 2f;
+        private const float _SLAPP_RADIUS_SQUARED = 3f;
+
+        private Projectile _projectile;
+        private PlayerController _owner;
+        private AIActor _slapVictim = null;
+        private float _slapAngle = 0f;
+        private bool _flipped = false;
+        private float _slapDamage = 0f;
+        private FancyVFX _vfx = null;
+        private void Start()
+        {
+            this._projectile = base.GetComponent<Projectile>();
+            this._owner = this._projectile.Owner as PlayerController;
+
+            this._projectile.spriteAnimator.Stop(); // 0 FPS for now since we only care about the first frame
+            this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
+
+            this._flipped = this._owner.sprite.FlipX;
+            this._slapDamage = this._projectile.baseData.damage;
+        }
+
+        private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
+        {
+            if (otherRigidbody?.healthHaver?.gameActor is not AIActor enemy)
+                return;
+
+            if (!enemy.IsAlive())
+                return;
+
+            // Set up SLAPPP parameters
+            this._slapVictim = enemy;
+            this._slapAngle = (this._projectile.Direction.ToAngle() + (this._flipped ? -90f : 90f)).Clamp180();
+
+            //NOTE: absolutely ESSENTIAL this ignores pools so FancyVFX objects don't get attached to reused instances that already have the component
+            GameObject v = SpawnManager.SpawnVFX(
+                HandCannon._SlapppAnimation, this._projectile.sprite.transform.position, this._projectile.sprite.transform.rotation, ignoresPools: true);
+            this._vfx = v.AddComponent<FancyVFX>();
+                this._vfx.Setup(Vector2.zero, lifetime: 0.5f, fadeOutTime: 0.20f, parent: enemy.sprite.transform);
+                this._vfx.sprite.FlipY = this._flipped;  //smack in the opposite direction by flipping vertically, not horizontally
+                if (this._vfx.GetComponent<tk2dSpriteAnimator>() is tk2dSpriteAnimator animator)
+                {
+                    animator.AnimationEventTriggered += SlapppEvent;
+                    animator.DefaultClip.frames[_SLAPPP_FRAME].triggerEvent = true;
+                    animator.DefaultClip.frames[_SLAPPP_FRAME].eventAudio = "slappp_sound";
+                    animator.Play(animator.DefaultClip);
+                }
+            PhysicsEngine.SkipCollision = true;
+            this._projectile.DieInAir(suppressInAirEffects: true, allowActorSpawns: false, allowProjectileSpawns: false, killedEarly: false);
+        }
+
+        private /*static*/ void SlapppEvent(tk2dSpriteAnimator animator, tk2dSpriteAnimationClip clip, int frame)
+        {
+            this._vfx.transform.parent = null;  // don't follow the enemy after we've followed through on the slap
+            if (!this._slapVictim?.sprite)
+                return;
+
+            Vector2 victimPos = this._slapVictim.sprite.WorldCenter;
+            foreach (AIActor enemy in StaticReferenceManager.AllEnemies)
+            {
+                if (enemy?.healthHaver is not HealthHaver hh)
+                    continue;
+                if ((enemy.sprite.WorldCenter - victimPos).magnitude > _SLAPP_RADIUS_SQUARED)
+                    continue;
+                enemy.behaviorSpeculator?.Stun(_SLAPPP_STUN);
+                hh.ApplyDamage(this._slapDamage, Vector2.zero, "SLAPPP", CoreDamageTypes.None, DamageCategory.Collision, true);
+                if (!hh.IsBoss && !hh.IsSubboss)
+                    hh.knockbackDoer?.ApplyKnockback(this._slapAngle.ToVector(), _SLAPPP_FORCE);
+            }
+            UnityEngine.Object.Destroy(this);
+        }
+    }
+}

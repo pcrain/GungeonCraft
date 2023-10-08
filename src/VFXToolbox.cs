@@ -131,6 +131,8 @@ namespace CwaffingTheGungy
             RegisterVFX("OutbreakSmoke", ResMap.Get("outbreak_smoke_small"), 2, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
             RegisterVFX("OutbreakSmokeLarge", ResMap.Get("outbreak_smoke_large"), 2, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
 
+            RegisterVFX("Slappp", ResMap.Get("slappp"), 30, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);
+
             laserSightPrefab = LoadHelper.LoadAssetFromAnywhere("assets/resourcesbundle/global vfx/vfx_lasersight.prefab") as GameObject;
         }
 
@@ -478,13 +480,18 @@ namespace CwaffingTheGungy
     {
         public tk2dSprite sprite;
 
-        private GameObject _vfx;
-        private float _curLifeTime;
-        private Vector3 _velocity;
-        private bool _fadeOut;
-        private float _fadeStartTime;
-        private float _fadeTotalTime;
-        private float _maxLifeTime;
+        private GameObject _vfx           = null;
+        private Vector3    _velocity      = Vector3.zero;
+        private float      _curLifeTime   = 0.0f;
+        private bool       _fadeOut       = false;
+        private float      _fadeStartTime = 0.0f;
+        private float      _fadeTotalTime = 0.0f;
+        private float      _maxLifeTime   = 0.0f;
+
+        private void Start()
+        {
+            // ETGModConsole.Log($"created new fancy vfx {this.GetHashCode()}");
+        }
 
         private void LateUpdate()
         {

@@ -288,7 +288,7 @@ namespace CwaffingTheGungy
             return clip;
         }
         public static tk2dSpriteAnimationClip CreateProjectileAnimation(List<string> names, int fps, bool loops, IntVector2 pixelSizes, bool lighteneds, tk2dBaseSprite.Anchor anchors, bool anchorsChangeColliders,
-            bool fixesScales, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null, IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null)
+            bool fixesScales, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSize = null, IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null)
         {
             int n = names.Count;
             return CreateProjectileAnimation(
@@ -299,7 +299,7 @@ namespace CwaffingTheGungy
                 Enumerable.Repeat(anchorsChangeColliders,n).ToList(),
                 Enumerable.Repeat(fixesScales,n).ToList(),
                 Enumerable.Repeat<Vector3?>(manualOffsets,n).ToList(),
-                Enumerable.Repeat<IntVector2?>(overrideColliderPixelSizes,n).ToList(),
+                Enumerable.Repeat<IntVector2?>(overrideColliderPixelSize,n).ToList(),
                 Enumerable.Repeat<IntVector2?>(overrideColliderOffsets,n).ToList(),
                 Enumerable.Repeat<Projectile>(overrideProjectilesToCopyFrom,n).ToList());
         }

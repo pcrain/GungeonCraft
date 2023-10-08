@@ -152,6 +152,7 @@ namespace CwaffingTheGungy
                     // Taomislav.Add(); unfinished
                     RacketLauncher.Add();
                     Outbreak.Add();
+                    HandCannon.Add();
                 #endregion
 
                 #region Synergies
