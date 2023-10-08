@@ -33,14 +33,8 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<Blackjack>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.DefaultModule.ammoCost            = 1;
-                gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.Automatic;
-                gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
                 gun.reloadTime                        = 0.8f;
                 gun.CanGainAmmo                       = false;
-                gun.DefaultModule.angleVariance       = 30.0f;
-                gun.DefaultModule.cooldownTime        = 0.15f;
-                gun.DefaultModule.numberOfShotsInClip = _CLIP_SIZE;
                 gun.quality                           = PickupObject.ItemQuality.C;
                 gun.SetBaseMaxAmmo(_DECK_SIZE * _NUM_DECKS);
                 gun.CurrentAmmo = _DECK_SIZE * _NUM_DECKS;
@@ -49,6 +43,14 @@ namespace CwaffingTheGungy
                 gun.ClearDefaultAudio();
                 gun.SetFireAudio(); // prevent fire audio, as it's handled in OnPostFired()
                 gun.SetReloadAudio("card_shuffle_sound"); // todo: this is still playing the default reload sound as well, for some reason
+
+            ProjectileModule mod = gun.DefaultModule;
+                mod.ammoCost            = 1;
+                mod.shootStyle          = ProjectileModule.ShootStyle.Automatic;
+                mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+                mod.angleVariance       = 30.0f;
+                mod.cooldownTime        = 0.15f;
+                mod.numberOfShotsInClip = _CLIP_SIZE;
 
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("playing_card").Base(),

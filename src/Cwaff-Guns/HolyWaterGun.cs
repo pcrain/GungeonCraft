@@ -33,10 +33,12 @@ namespace CwaffingTheGungy
             Gun gun = Lazy.SetupGun<HolyWaterGun>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
                 gun.gunSwitchGroup                       = (ItemHelper.Get(Items.MegaDouser) as Gun).gunSwitchGroup;
                 gun.gunClass                             = GunClass.BEAM;
-                gun.DefaultModule.ammoType               = GameUIAmmoType.AmmoType.BEAM;
-                gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.Beam;
-                gun.DefaultModule.numberOfShotsInClip    = -1;
                 gun.SetBaseMaxAmmo(500);
+
+            ProjectileModule mod = gun.DefaultModule;
+                mod.ammoType               = GameUIAmmoType.AmmoType.BEAM;
+                mod.shootStyle             = ProjectileModule.ShootStyle.Beam;
+                mod.numberOfShotsInClip    = -1;
 
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
                 projectile.baseData.speed  = 50f;

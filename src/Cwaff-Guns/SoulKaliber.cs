@@ -29,12 +29,7 @@ namespace CwaffingTheGungy
         {
             Gun gun = Lazy.SetupGun<SoulKaliber>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
                 gun.muzzleFlashEffects.type              = VFXPoolType.None;
-                gun.DefaultModule.ammoCost               = 1;
-                gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
-                gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
                 gun.reloadTime                           = 1.1f;
-                gun.DefaultModule.cooldownTime           = 0.1f;
-                gun.DefaultModule.numberOfShotsInClip    = 10;
                 gun.quality                              = PickupObject.ItemQuality.D;
                 gun.SetBaseMaxAmmo(250);
                 gun.SetAnimationFPS(gun.shootAnimation, 24);
@@ -42,6 +37,13 @@ namespace CwaffingTheGungy
                 gun.ClearDefaultAudio();
                 gun.SetFireAudio("soul_kaliber_fire");
                 gun.SetReloadAudio("soul_kaliber_reload");
+
+            ProjectileModule mod = gun.DefaultModule;
+                mod.ammoCost               = 1;
+                mod.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
+                mod.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
+                mod.cooldownTime           = 0.1f;
+                mod.numberOfShotsInClip    = 10;
 
             _ProjSprite = AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("soul_kaliber_projectile").Base(),

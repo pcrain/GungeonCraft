@@ -34,24 +34,26 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<RacketLauncher>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.DefaultModule.ammoCost               = 1;
-            gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
-            gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
-            gun.reloadTime                           = 0;
-            gun.DefaultModule.cooldownTime           = 0.1f;
-            gun.DefaultModule.ammoType               = GameUIAmmoType.AmmoType.SMALL_BULLET;
-            gun.muzzleFlashEffects.type              = VFXPoolType.None;
-            gun.DefaultModule.numberOfShotsInClip    = -1;
-            gun.quality                              = PickupObject.ItemQuality.D;
-            gun.gunClass                             = GunClass.SILLY;
-            gun.gunSwitchGroup                       = (ItemHelper.Get(Items.Blasphemy) as Gun).gunSwitchGroup;
-            gun.CanReloadNoMatterAmmo                = true;
-            gun.CurrentAmmo                          = _AMMO;
-            gun.SetBaseMaxAmmo(_AMMO);
-            gun.SetAnimationFPS(gun.shootAnimation, 60);
-            gun.SetAnimationFPS(gun.idleAnimation, _IDLE_FPS);
-            gun.LoopAnimation(gun.idleAnimation, 0);
-            gun.ClearDefaultAudio();
+                gun.reloadTime                           = 0;
+                gun.muzzleFlashEffects.type              = VFXPoolType.None;
+                gun.quality                              = PickupObject.ItemQuality.D;
+                gun.gunClass                             = GunClass.SILLY;
+                gun.gunSwitchGroup                       = (ItemHelper.Get(Items.Blasphemy) as Gun).gunSwitchGroup;
+                gun.CanReloadNoMatterAmmo                = true;
+                gun.CurrentAmmo                          = _AMMO;
+                gun.SetBaseMaxAmmo(_AMMO);
+                gun.SetAnimationFPS(gun.shootAnimation, 60);
+                gun.SetAnimationFPS(gun.idleAnimation, _IDLE_FPS);
+                gun.LoopAnimation(gun.idleAnimation, 0);
+                gun.ClearDefaultAudio();
+
+            ProjectileModule mod = gun.DefaultModule;
+                mod.ammoCost               = 1;
+                mod.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
+                mod.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
+                mod.cooldownTime           = 0.1f;
+                mod.ammoType               = GameUIAmmoType.AmmoType.SMALL_BULLET;
+                mod.numberOfShotsInClip    = -1;
 
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("tennis_ball").Base(),
@@ -68,8 +70,8 @@ namespace CwaffingTheGungy
 
             projectile.gameObject.AddComponent<TennisBall>();
 
-            foreach (ProjectileModule mod in gun.Volley.projectiles)
-                mod.ammoCost = 0;
+            foreach (ProjectileModule pmod in gun.Volley.projectiles)
+                pmod.ammoCost = 0;
         }
 
         protected override void OnPickedUpByPlayer(PlayerController player)

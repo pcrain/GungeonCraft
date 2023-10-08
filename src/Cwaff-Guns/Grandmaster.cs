@@ -34,12 +34,7 @@ namespace CwaffingTheGungy
         {
             Gun gun = Lazy.SetupGun<Grandmaster>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
                 gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
-                gun.DefaultModule.ammoCost            = 1;
-                gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
-                gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
                 gun.reloadTime                        = 1.0f;
-                gun.DefaultModule.cooldownTime        = 0.1f;
-                gun.DefaultModule.numberOfShotsInClip = 20;
                 gun.quality                           = PickupObject.ItemQuality.A;
                 gun.SetBaseMaxAmmo(250);
                 gun.SetAnimationFPS(gun.shootAnimation, 24);
@@ -47,6 +42,13 @@ namespace CwaffingTheGungy
                 gun.ClearDefaultAudio();
                 gun.SetFireAudio("chess_gun_fire");
                 gun.SetReloadAudio("chess_gun_reload");
+
+            ProjectileModule mod = gun.DefaultModule;
+                mod.ammoCost            = 1;
+                mod.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
+                mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+                mod.cooldownTime        = 0.1f;
+                mod.numberOfShotsInClip = 20;
 
             _PawnSprite   = AnimateBullet.CreateProjectileAnimation(ResMap.Get("chess_pawn").Base(), 12, true, new IntVector2(8, 12), false,
                 tk2dBaseSprite.Anchor.MiddleCenter, true, true);

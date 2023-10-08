@@ -48,9 +48,6 @@ namespace CwaffingTheGungy
         {
             Gun gun = Lazy.SetupGun<Gunbrella>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
                 gun.gunClass                             = GunClass.CHARGE;
-                gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.Charged;
-                gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
-                gun.DefaultModule.numberOfShotsInClip    = 1;
                 gun.quality                              = PickupObject.ItemQuality.A;
                 gun.InfiniteAmmo                         = false;
                 gun.SetAnimationFPS(gun.shootAnimation, 60);
@@ -60,11 +57,15 @@ namespace CwaffingTheGungy
                 gun.CurrentAmmo = 100;
                 gun.ClearDefaultAudio();
 
+            ProjectileModule mod = gun.DefaultModule;
+                mod.shootStyle             = ProjectileModule.ShootStyle.Charged;
+                mod.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
+                mod.numberOfShotsInClip    = 1;
+
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("gunbrella_projectile").Base(),
                 16, true, new IntVector2(15, 8),
                 false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
-
 
             for (int i = 0; i < _BARRAGE_SIZE; i++)
             {
@@ -76,7 +77,7 @@ namespace CwaffingTheGungy
                 fps: 30, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.35f);
 
             GameActorFreezeEffect freeze = ItemHelper.Get(Items.FrostBullets).GetComponent<BulletStatusEffectItem>().FreezeModifierEffect;
-            foreach (ProjectileModule mod in gun.Volley.projectiles)
+            foreach (ProjectileModule pmod in gun.Volley.projectiles)
             {
                 Projectile projectile = Lazy.PrefabProjectileFromGun(gun, setGunDefaultProjectile: false);
                     projectile.AddDefaultAnimation(_BulletSprite);
@@ -90,11 +91,11 @@ namespace CwaffingTheGungy
                     projectile.BossDamageMultiplier = 0.6f; // bosses are big and this does a lot of damage, so tone it down
                 GunbrellaProjectile gp = projectile.gameObject.AddComponent<GunbrellaProjectile>();
 
-                mod.angleVariance = 10f;
-                mod.ammoCost = (mod != gun.DefaultModule) ? 0 : 1;
-                mod.shootStyle = ProjectileModule.ShootStyle.Charged;
-                mod.sequenceStyle = ProjectileModule.ProjectileSequenceStyle.Random;
-                mod.chargeProjectiles = new(){ new(){
+                pmod.angleVariance = 10f;
+                pmod.ammoCost = (mod != gun.DefaultModule) ? 0 : 1;
+                pmod.shootStyle = ProjectileModule.ShootStyle.Charged;
+                pmod.sequenceStyle = ProjectileModule.ProjectileSequenceStyle.Random;
+                pmod.chargeProjectiles = new(){ new(){
                     Projectile = projectile,
                     ChargeTime = _MIN_CHARGE_TIME,
                 }};

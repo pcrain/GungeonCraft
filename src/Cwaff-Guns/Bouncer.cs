@@ -32,12 +32,7 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<Bouncer>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.DefaultModule.ammoCost               = 1;
-                gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
-                gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
                 gun.reloadTime                           = 0.80f;
-                gun.DefaultModule.cooldownTime           = 0.16f;
-                gun.DefaultModule.numberOfShotsInClip    = 6;
                 gun.gunClass                             = GunClass.PISTOL;
                 gun.quality                              = PickupObject.ItemQuality.C;
                 gun.gunHandedness                        = GunHandedness.OneHanded;
@@ -47,6 +42,13 @@ namespace CwaffingTheGungy
                 gun.ClearDefaultAudio();
                 gun.SetFireAudio("MC_RocsCape");
                 gun.SetReloadAudio("MC_Link_Grow");
+
+            ProjectileModule mod = gun.DefaultModule;
+                mod.ammoCost               = 1;
+                mod.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
+                mod.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
+                mod.cooldownTime           = 0.16f;
+                mod.numberOfShotsInClip    = 6;
 
             IntVector2 colliderSize = new IntVector2(1,1); // 1-pixel collider for accurate bounce animation
 

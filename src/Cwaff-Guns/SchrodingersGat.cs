@@ -35,19 +35,21 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<SchrodingersGat>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.DefaultModule.ammoCost            = 1;
-                gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.Automatic;
-                gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
                 gun.reloadTime                        = 0f;
-                gun.DefaultModule.angleVariance       = 15.0f;
-                gun.DefaultModule.cooldownTime        = 0.125f;
-                gun.DefaultModule.numberOfShotsInClip = -1;
                 gun.quality                           = PickupObject.ItemQuality.B;
                 gun.SetBaseMaxAmmo(2500);
                 gun.CurrentAmmo = 2500;
                 gun.SetAnimationFPS(gun.idleAnimation, 24);
                 gun.SetAnimationFPS(gun.shootAnimation, 24);
                 gun.ClearDefaultAudio(); // prevent fire audio, as it's handled in OnPostFired()
+
+            ProjectileModule mod = gun.DefaultModule;
+                mod.ammoCost            = 1;
+                mod.shootStyle          = ProjectileModule.ShootStyle.Automatic;
+                mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+                mod.angleVariance       = 15.0f;
+                mod.cooldownTime        = 0.125f;
+                mod.numberOfShotsInClip = -1;
 
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("schrodinger_bullet").Base(),

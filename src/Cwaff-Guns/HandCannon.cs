@@ -33,13 +33,7 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<HandCannon>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.DefaultModule.ammoCost            = 1;
-                gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.Charged;
-                gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
                 gun.reloadTime                        = 0.75f;
-                gun.DefaultModule.angleVariance       = 15.0f;
-                gun.DefaultModule.cooldownTime        = 0.1f;
-                gun.DefaultModule.numberOfShotsInClip = 2;
                 gun.quality                           = PickupObject.ItemQuality.D;
                 gun.SetBaseMaxAmmo(100);
                 gun.CurrentAmmo = 100;
@@ -52,6 +46,14 @@ namespace CwaffingTheGungy
                 gun.SetReloadAudio("hand_cannon_reload_sound");
                 gun.SetChargeAudio("hand_cannon_charge_sound", frame: 0);
                 gun.SetChargeAudio("hand_cannon_charge_sound", frame: 10);
+
+            ProjectileModule mod = gun.DefaultModule;
+                mod.ammoCost            = 1;
+                mod.shootStyle          = ProjectileModule.ShootStyle.Charged;
+                mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+                mod.angleVariance       = 15.0f;
+                mod.cooldownTime        = 0.1f;
+                mod.numberOfShotsInClip = 2;
 
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("slappp").Base(),

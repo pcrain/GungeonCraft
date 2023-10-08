@@ -31,11 +31,6 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<QuarterPounder>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.DefaultModule.ammoCost            = 1;
-                gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
-                gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
-                gun.DefaultModule.numberOfShotsInClip = 10;
-                gun.DefaultModule.angleVariance       = 15.0f;
                 gun.reloadTime                        = 1.1f;
                 gun.quality                           = PickupObject.ItemQuality.D;
                 gun.CanGainAmmo                       = false;
@@ -45,6 +40,13 @@ namespace CwaffingTheGungy
                 gun.ClearDefaultAudio();
                 gun.SetFireAudio("fire_coin_sound");
                 gun.SetReloadAudio("coin_gun_reload");
+
+            ProjectileModule mod = gun.DefaultModule;
+                mod.ammoCost            = 1;
+                mod.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
+                mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+                mod.numberOfShotsInClip = 10;
+                mod.angleVariance       = 15.0f;
 
             _ProjSprite = AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("coin_gun_projectile").Base(),

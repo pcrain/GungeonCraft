@@ -27,12 +27,7 @@ namespace CwaffingTheGungy
         {
             Gun gun = Lazy.SetupGun<PaintballCannon>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
                 // gun.gunSwitchGroup                       = (ItemHelper.Get(Items.TShirtCannon) as Gun).gunSwitchGroup;
-                gun.DefaultModule.ammoCost               = 1;
-                gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
-                gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
                 gun.reloadTime                           = 0.9f;
-                gun.DefaultModule.cooldownTime           = 0.18f;
-                gun.DefaultModule.numberOfShotsInClip    = 12;
                 gun.gunClass                             = GunClass.PISTOL;
                 gun.quality                              = PickupObject.ItemQuality.C;
                 gun.SetBaseMaxAmmo(300);
@@ -41,6 +36,13 @@ namespace CwaffingTheGungy
                 gun.ClearDefaultAudio();
                 gun.SetFireAudio("paintball_shoot_sound");
                 gun.SetReloadAudio("paintball_reload_sound");
+
+            ProjectileModule mod = gun.DefaultModule;
+                mod.ammoCost               = 1;
+                mod.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
+                mod.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
+                mod.cooldownTime           = 0.18f;
+                mod.numberOfShotsInClip    = 12;
 
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
                 projectile.baseData.damage = 7f;

@@ -42,11 +42,7 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<Deadline>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
                 gun.reloadTime                        = 0.9f;
-                gun.DefaultModule.angleVariance       = 0.0f;
-                gun.DefaultModule.cooldownTime        = 0.4f;
-                gun.DefaultModule.numberOfShotsInClip = 8;
                 gun.CurrentAmmo                       = 64;
                 gun.SetBaseMaxAmmo(64);
                 gun.SetAnimationFPS(gun.shootAnimation, 20);
@@ -54,6 +50,12 @@ namespace CwaffingTheGungy
                 gun.SetAnimationFPS(gun.idleAnimation, 10);
                 gun.SetFireAudio("deadline_fire_sound");
                 gun.SetReloadAudio("deadline_fire_sound");
+
+            ProjectileModule mod = gun.DefaultModule;
+                mod.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
+                mod.angleVariance       = 0.0f;
+                mod.cooldownTime        = 0.4f;
+                mod.numberOfShotsInClip = 8;
 
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("deadline_projectile").Base(),

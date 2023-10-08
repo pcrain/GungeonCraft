@@ -31,12 +31,7 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<IronMaid>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.DefaultModule.ammoCost               = 1;
-                gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
-                gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
                 gun.reloadTime                           = 0.75f;
-                gun.DefaultModule.cooldownTime           = 0.1f;
-                gun.DefaultModule.numberOfShotsInClip    = 20;
                 gun.quality                              = PickupObject.ItemQuality.D;
                 gun.SetBaseMaxAmmo(400);
                 gun.SetAnimationFPS(gun.shootAnimation, 24);
@@ -44,6 +39,13 @@ namespace CwaffingTheGungy
                 gun.ClearDefaultAudio();
                 gun.SetFireAudio("knife_gun_launch");
                 gun.SetReloadAudio("knife_gun_reload");
+
+            ProjectileModule mod = gun.DefaultModule;
+                mod.ammoCost               = 1;
+                mod.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
+                mod.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
+                mod.cooldownTime           = 0.1f;
+                mod.numberOfShotsInClip    = 20;
 
             _KunaiSprite = AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("kunai").Base(),

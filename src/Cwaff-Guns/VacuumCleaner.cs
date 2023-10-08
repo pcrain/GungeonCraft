@@ -43,19 +43,20 @@ namespace CwaffingTheGungy
         {
             Gun gun = Lazy.SetupGun<VacuumCleaner>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
                 gun.gunClass                             = GunClass.CHARGE;
-                gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.Charged;
-                gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
-                gun.DefaultModule.numberOfShotsInClip    = -1;
-                gun.DefaultModule.ammoType               = GameUIAmmoType.AmmoType.BEAM;
                 gun.quality                              = PickupObject.ItemQuality.A;
                 gun.InfiniteAmmo                         = true;
                 gun.SetAnimationFPS(gun.chargeAnimation, 16);
                 gun.ClearDefaultAudio(); // prevent fire audio, as it's handled in Update()
 
-            gun.DefaultModule.chargeProjectiles = new(){ new(){
-                Projectile = Lazy.PrefabProjectileFromGun(gun),
-                ChargeTime = float.MaxValue, // absurdly high value so we never actually shoot
-            }};
+            ProjectileModule mod = gun.DefaultModule;
+                mod.shootStyle             = ProjectileModule.ShootStyle.Charged;
+                mod.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
+                mod.numberOfShotsInClip    = -1;
+                mod.ammoType               = GameUIAmmoType.AmmoType.BEAM;
+                mod.chargeProjectiles      = new(){ new(){
+                    Projectile = Lazy.PrefabProjectileFromGun(gun),
+                    ChargeTime = float.MaxValue, // absurdly high value so we never actually shoot
+                }};
 
             _VacuumVFX = VFX.RegisterVFXObject("VacuumParticle", ResMap.Get("vacuum_wind_sprite_a"),
                 fps: 30, loops: true, loopStart: 6, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);

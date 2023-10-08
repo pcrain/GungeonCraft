@@ -34,9 +34,6 @@ namespace CwaffingTheGungy
                 gun.quality                              = PickupObject.ItemQuality.B;
                 gun.CanGainAmmo                          = false;
                 gun.muzzleFlashEffects                   = (ItemHelper.Get(Items.SeriousCannon) as Gun).muzzleFlashEffects;
-                gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.Charged;
-                gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Ordered;
-                gun.DefaultModule.cooldownTime           = 0f;
                 gun.SetBaseMaxAmmo(3);
                 gun.SetAnimationFPS(gun.shootAnimation, 10);
                 gun.SetAnimationFPS(gun.chargeAnimation, 16);

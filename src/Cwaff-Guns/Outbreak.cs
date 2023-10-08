@@ -33,12 +33,7 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<Outbreak>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.DefaultModule.ammoCost            = 1;
-                gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
-                gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
                 gun.reloadTime                        = 1.2f;
-                gun.DefaultModule.cooldownTime        = 0.2f;
-                gun.DefaultModule.numberOfShotsInClip = 10;
                 gun.quality                           = PickupObject.ItemQuality.C;
                 gun.SetBaseMaxAmmo(300);
                 gun.SetAnimationFPS(gun.shootAnimation, 24);
@@ -46,6 +41,13 @@ namespace CwaffingTheGungy
                 gun.ClearDefaultAudio();
                 gun.SetFireAudio("outbreak_shoot_sound");
                 gun.SetReloadAudio("outbreak_reload_sound");
+
+            ProjectileModule mod = gun.DefaultModule;
+                mod.ammoCost            = 1;
+                mod.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
+                mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+                mod.cooldownTime        = 0.2f;
+                mod.numberOfShotsInClip = 10;
 
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("outbreak_projectile").Base(),

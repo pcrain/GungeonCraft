@@ -33,19 +33,21 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<Natascha>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.DefaultModule.ammoCost            = 1;
-                gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.Automatic;
-                gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
                 gun.reloadTime                        = 1.1f;
-                gun.DefaultModule.angleVariance       = 15.0f;
-                gun.DefaultModule.cooldownTime        = _BaseCooldownTime;
-                gun.DefaultModule.numberOfShotsInClip = -1;
                 gun.quality                           = PickupObject.ItemQuality.D;
                 gun.SetBaseMaxAmmo(2500);
                 gun.CurrentAmmo = 2500;
                 gun.SetAnimationFPS(gun.shootAnimation, (int)((float)_FireAnimationFrames / _BaseCooldownTime) + 1);
                 gun.ClearDefaultAudio();
                 gun.SetFireAudio(); // prevent fire audio, as it's handled in OnPostFired()
+
+            ProjectileModule mod = gun.DefaultModule;
+                mod.ammoCost            = 1;
+                mod.shootStyle          = ProjectileModule.ShootStyle.Automatic;
+                mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+                mod.angleVariance       = 15.0f;
+                mod.cooldownTime        = _BaseCooldownTime;
+                mod.numberOfShotsInClip = -1;
 
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("natascha_bullet").Base(),
