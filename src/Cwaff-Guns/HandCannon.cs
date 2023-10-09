@@ -36,7 +36,6 @@ namespace CwaffingTheGungy
                 gun.reloadTime                        = 0.75f;
                 gun.quality                           = PickupObject.ItemQuality.D;
                 gun.SetBaseMaxAmmo(100);
-                gun.CurrentAmmo = 100;
                 gun.SetAnimationFPS(gun.shootAnimation, 30);
                 gun.SetAnimationFPS(gun.reloadAnimation, (int)(gun.spriteAnimator.GetClipByName(gun.reloadAnimation).frames.Length / gun.reloadTime));
                 gun.SetAnimationFPS(gun.chargeAnimation, (int)((1.0f / _CHARGE_TIME) * _CHARGE_LOOP_FRAME));
@@ -120,11 +119,10 @@ namespace CwaffingTheGungy
             this._slapVictim = enemy;
             this._slapAngle = (this._projectile.Direction.ToAngle() + (this._flipped ? -90f : 90f)).Clamp180();
 
-            this._vfx = FancyVFX.Spawn(
+            this._vfx = FancyVFX.SpawnUnpooled( //NOTE: absolutely MUST ignore pools or VFX objects with preexisting FancyVFX components might get reused
                 prefab       : HandCannon._SlapppAnimation,
                 position     : this._projectile.sprite.transform.position,
                 rotation     : this._projectile.sprite.transform.rotation,
-                ignoresPools : true, //NOTE: absolutely MUST ignore pools or VFX objects with preexisting FancyVFX components might get reused
                 velocity     : Vector2.zero,
                 lifetime     : 0.5f,
                 fadeOutTime  : 0.20f,

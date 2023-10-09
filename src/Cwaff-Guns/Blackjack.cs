@@ -37,7 +37,6 @@ namespace CwaffingTheGungy
                 gun.CanGainAmmo                       = false;
                 gun.quality                           = PickupObject.ItemQuality.C;
                 gun.SetBaseMaxAmmo(_DECK_SIZE * _NUM_DECKS);
-                gun.CurrentAmmo = _DECK_SIZE * _NUM_DECKS;
                 gun.SetAnimationFPS(gun.shootAnimation, 30);
                 gun.SetAnimationFPS(gun.reloadAnimation, 30);
                 gun.ClearDefaultAudio();

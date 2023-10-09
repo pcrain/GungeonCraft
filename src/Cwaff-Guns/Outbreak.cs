@@ -120,7 +120,7 @@ namespace CwaffingTheGungy
             if (UnityEngine.Random.value > 0.3f)
                 return;
 
-            FancyVFX.Spawn(Outbreak._OutbreakSmokeVFX, this._projectile.sprite.WorldCenter.ToVector3ZisY(-1f), Lazy.RandomEulerZ(), ignoresPools: false,
+            FancyVFX.Spawn(Outbreak._OutbreakSmokeVFX, this._projectile.sprite.WorldCenter.ToVector3ZisY(-1f), Lazy.RandomEulerZ(),
                 velocity: Lazy.RandomVector(0.1f), lifetime: 0.3f, fadeOutTime: 0.6f);
         }
     }
@@ -143,7 +143,7 @@ namespace CwaffingTheGungy
             if (UnityEngine.Random.value > 0.02f)
                 return;
 
-            FancyVFX.Spawn(Outbreak._OutbreakSmokeVFX, this._enemy.sprite.WorldTopCenter.ToVector3ZisY(-1f), Lazy.RandomEulerZ(), ignoresPools: false,
+            FancyVFX.Spawn(Outbreak._OutbreakSmokeVFX, this._enemy.sprite.WorldTopCenter.ToVector3ZisY(-1f), Lazy.RandomEulerZ(),
                 velocity: Lazy.RandomVector(0.5f), lifetime: 0.3f, fadeOutTime: 0.6f);
         }
     }

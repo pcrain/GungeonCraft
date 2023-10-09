@@ -518,10 +518,20 @@ namespace CwaffingTheGungy
         }
 
         // Make a new FancyVFX from a normal SpawnManager.SpawnVFX
-        public static FancyVFX Spawn(GameObject prefab, Vector3 position, Quaternion rotation, bool ignoresPools,
+        public static FancyVFX Spawn(GameObject prefab, Vector3 position, Quaternion rotation,
             Vector2 velocity, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0, Color? emissiveColor = null)
         {
-            GameObject v = SpawnManager.SpawnVFX(prefab, position, rotation, ignoresPools);
+            GameObject v = SpawnManager.SpawnVFX(prefab, position, rotation, ignoresPools: false);
+            FancyVFX fv = v.AddComponent<FancyVFX>();
+            fv.Setup(velocity, lifetime, fadeOutTime, parent, emissivePower, emissiveColor);
+            return fv;
+        }
+
+        // Make a new FancyVFX from a normal SpawnManager.SpawnVFX, ignoring pools (necessary for adding custom components)
+        public static FancyVFX SpawnUnpooled(GameObject prefab, Vector3 position, Quaternion rotation,
+            Vector2 velocity, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0, Color? emissiveColor = null)
+        {
+            GameObject v = SpawnManager.SpawnVFX(prefab, position, rotation, ignoresPools: true);
             FancyVFX fv = v.AddComponent<FancyVFX>();
             fv.Setup(velocity, lifetime, fadeOutTime, parent, emissivePower, emissiveColor);
             return fv;

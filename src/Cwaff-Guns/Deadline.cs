@@ -43,7 +43,6 @@ namespace CwaffingTheGungy
         {
             Gun gun = Lazy.SetupGun<Deadline>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
                 gun.reloadTime                        = 0.9f;
-                gun.CurrentAmmo                       = 64;
                 gun.SetBaseMaxAmmo(64);
                 gun.SetAnimationFPS(gun.shootAnimation, 20);
                 gun.SetAnimationFPS(gun.reloadAnimation, 30);

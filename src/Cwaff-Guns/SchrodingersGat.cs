@@ -38,7 +38,7 @@ namespace CwaffingTheGungy
                 gun.reloadTime                        = 0f;
                 gun.quality                           = PickupObject.ItemQuality.B;
                 gun.SetBaseMaxAmmo(2500);
-                gun.CurrentAmmo = 2500;
+                gun.CurrentAmmo = gun.GetBaseMaxAmmo(); // necessary iff gun basemaxammo > 1000
                 gun.SetAnimationFPS(gun.idleAnimation, 24);
                 gun.SetAnimationFPS(gun.shootAnimation, 24);
                 gun.ClearDefaultAudio(); // prevent fire audio, as it's handled in OnPostFired()

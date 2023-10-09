@@ -54,7 +54,6 @@ namespace CwaffingTheGungy
                 gun.SetAnimationFPS(gun.chargeAnimation, 16);
                 gun.LoopAnimation(gun.chargeAnimation, 17);
                 gun.SetBaseMaxAmmo(100);
-                gun.CurrentAmmo = 100;
                 gun.ClearDefaultAudio();
 
             ProjectileModule mod = gun.DefaultModule;

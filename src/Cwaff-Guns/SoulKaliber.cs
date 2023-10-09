@@ -181,7 +181,7 @@ namespace CwaffingTheGungy
             {
                 float angle = Lazy.RandomAngle();
                 Vector2 finalpos = ppos + BraveMathCollege.DegreesToVector(angle);
-                FancyVFX.Spawn(_SoulLinkSoulVFX, finalpos, 0f.EulerZ(), ignoresPools: false,
+                FancyVFX.Spawn(_SoulLinkSoulVFX, finalpos, 0f.EulerZ(),
                     velocity: _SOUL_PART_SPEED * Vector2.up, lifetime: 0.5f, fadeOutTime: 0.5f, emissivePower: 50f, emissiveColor: Color.white);
             }
         }

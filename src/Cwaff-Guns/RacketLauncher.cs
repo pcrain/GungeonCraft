@@ -40,7 +40,6 @@ namespace CwaffingTheGungy
                 gun.gunClass                             = GunClass.SILLY;
                 gun.gunSwitchGroup                       = (ItemHelper.Get(Items.Blasphemy) as Gun).gunSwitchGroup;
                 gun.CanReloadNoMatterAmmo                = true;
-                gun.CurrentAmmo                          = _AMMO;
                 gun.SetBaseMaxAmmo(_AMMO);
                 gun.SetAnimationFPS(gun.shootAnimation, 60);
                 gun.SetAnimationFPS(gun.idleAnimation, _IDLE_FPS);

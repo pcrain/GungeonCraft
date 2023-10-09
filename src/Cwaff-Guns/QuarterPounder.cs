@@ -171,7 +171,7 @@ namespace CwaffingTheGungy
             {
                 float angle = Lazy.RandomAngle();
                 Vector2 finalpos = ppos + BraveMathCollege.DegreesToVector(angle, magnitude: _PART_SPREAD);
-                FancyVFX.Spawn(QuarterPounder._MidasParticleVFX, finalpos, Lazy.RandomEulerZ(), ignoresPools: false,
+                FancyVFX.Spawn(QuarterPounder._MidasParticleVFX, finalpos, Lazy.RandomEulerZ(),
                     velocity: Lazy.RandomVector(_PART_SPEED), lifetime: _PART_LIFE, fadeOutTime: _PART_LIFE, emissivePower: _PART_EMIT, emissiveColor: Color.white);
             }
 
