@@ -537,7 +537,7 @@ namespace CwaffingTheGungy
             return fv;
         }
 
-        // Make a new FancyVFX from a GameObject's current sprite, frame, position, etc.
+        // Make a new FancyVFX from a GameObject's current sprite, frame, position, etc. (does not have a spriteanimator, use with caution)
         public static FancyVFX FromCurrentFrame(tk2dBaseSprite osprite)
         {
             if (!osprite)

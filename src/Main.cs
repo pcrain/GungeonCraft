@@ -153,6 +153,7 @@ namespace CwaffingTheGungy
                     RacketLauncher.Add();
                     Outbreak.Add();
                     HandCannon.Add();
+                    HatchlingGun.Add();
                 #endregion
 
                 #region Synergies
