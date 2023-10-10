@@ -1359,6 +1359,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\saiyan_spark1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter5.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\egg_break4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire_b4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\midas_sparkle1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\hail_collision2.png"/>
@@ -1376,6 +1377,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\icicle_crash_particles3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\outbreak_smoke_large.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter1.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\egg_break1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren23.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\friendlyoverhead_vfx_002.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\drowsy_cloud8.png"/>
@@ -1383,6 +1385,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\zenkai_aura1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\saiyan_spark4.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\egg_break2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\soul_link_particle1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\zenkai_aura7.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren9.png"/>
@@ -1511,6 +1514,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\campfire_c3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a7.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\hail_collision9.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\egg_break3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\icicle_crash_particles1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren13.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\midas_sparkle2.png"/>

@@ -21,7 +21,7 @@ namespace CwaffingTheGungy
         public static string SpriteName       = "hatchling_gun";
         public static string ProjectileName   = "38_special";
         public static string ShortDescription = "Yolked In";
-        public static string LongDescription  = "TBD";
+        public static string LongDescription  = $"Fires eggs which spawn chicks on impact. Chicks randomly wander the room, blocking enemies and their projectiles until taking damage.\n\nThe age-old question \"which came first, the chicken or the egg?\" is mostly of academic interest. Questions of more practical interest to gunsmiths include \"what is the fastest an egg can be fired out of a gun without it breaking in transit?\" and \"how much damage can a singular egg inflict on the Gundead?\" The answers to these questions turn out to be \"not very fast\" and \"not very much,\" respectively. As such, most gunsmiths have no interest in forging guns that fire eggs as projectiles, and the {ItemName}'s existence can be largely attributed to an excessive supply of eggs moreso than an excessive demans of egg-shooting firearms.";
 
         internal static tk2dSpriteAnimationClip _BulletSprite;
 
@@ -31,7 +31,7 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<HatchlingGun>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.reloadTime                        = 25f / 20f;
+                gun.reloadTime                        = 25f / 20f;  // animation frames / animation fps
                 gun.quality                           = PickupObject.ItemQuality.D;
                 gun.SetBaseMaxAmmo(500);
                 gun.SetAnimationFPS(gun.shootAnimation, 40);
@@ -48,17 +48,23 @@ namespace CwaffingTheGungy
                 mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
                 mod.angleVariance       = 15.0f;
                 mod.cooldownTime        = 0.2f;
-                mod.numberOfShotsInClip = -1;
+                mod.numberOfShotsInClip = 12;
+
+            VFXPool impactFVX = VFX.RegisterVFXPool("EggBreak", ResMap.Get("egg_break"), fps: 16, loops: false, scale: 0.75f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+                gun.SetHorizontalImpactVFX(impactFVX);
+                gun.SetVerticalImpactVFX(impactFVX);
+                gun.SetEnemyImpactVFX(impactFVX);
+                gun.SetAirImpactVFX(impactFVX);
 
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("egg").Base(),
-                12, true, new IntVector2(8, 8),
+                12, true, new IntVector2(12, 12), // sprite is 8x8 -> 1.5x scale
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
 
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
                 projectile.AddDefaultAnimation(_BulletSprite);
                 projectile.baseData.damage  = 3f;
-                projectile.baseData.speed   = 20.0f;
+                projectile.baseData.speed   = 24.0f;
                 projectile.transform.parent = gun.barrelOffset;
                 projectile.gameObject.AddComponent<HatchlingProjectile>();
         }
@@ -73,6 +79,7 @@ namespace CwaffingTheGungy
     public class HatchlingProjectile : MonoBehaviour
     {
         private const float _HATCH_CHANCE = 1.0f;
+        private const float _PATH_INTERVAL = 10.0f;
 
         private Projectile _projectile;
         private PlayerController _owner;
@@ -93,8 +100,7 @@ namespace CwaffingTheGungy
                 return;
 
             // Create a baby chicken
-            AIActor chickenActor = EnemyDatabase.GetOrLoadByGuid(Enemies.Cucco);
-            GameObject chickum = AIActor.Spawn(chickenActor, (Vector2)p.LastPosition, p.transform.position.GetAbsoluteRoom(), true).gameObject;
+            GameObject chickum = AIActor.Spawn(EnemyDatabase.GetOrLoadByGuid(Enemies.Cucco), (Vector2)p.LastPosition, p.transform.position.GetAbsoluteRoom(), true).gameObject;
             CompanionController cc = chickum.GetOrAddComponent<CompanionController>();
 
             // From CompanionItem.Initialize()
@@ -106,7 +112,6 @@ namespace CwaffingTheGungy
             cc.aiActor.State                  = AIActor.ActorState.Normal;
             cc.healthHaver.OnDamaged += (float resultValue, float maxValue, CoreDamageTypes damageTypes, DamageCategory damageCategory, Vector2 damageDirection) => {
                 AkSoundEngine.PostEvent("bird_chirp", cc.gameObject);
-                // AkSoundEngine.PostEvent("Play_PET_chicken_cluck_01", cc.gameObject);
                 UnityEngine.Object.Destroy(cc.gameObject);
             };
             cc.aiActor.ParentRoom = p.transform.position.GetAbsoluteRoom(); // needed to avoid null deref for MoveErraticallyBehavior
@@ -126,8 +131,10 @@ namespace CwaffingTheGungy
                 bs.TargetBehaviors.Clear();
                 bs.MovementBehaviors.Clear();
 
-                bs.MovementBehaviors.Add(new MoveErraticallyBehavior/*Clone*/ {
-                    PathInterval = 5.0f,
+                bs.MovementBehaviors.Add(new MoveErraticallyBehavior {
+                    PathInterval = _PATH_INTERVAL,
+                    StayOnScreen = false,
+                    UseTargetsRoom = false,
                     AvoidTarget = false,
                 });
                 bs.RegisterBehaviors(bs.TargetBehaviors);
@@ -147,8 +154,7 @@ namespace CwaffingTheGungy
             cc.aiActor.RegisterOverrideColor(new Color(1.0f, 1.0f, 0.0f, 0.5f) , "little chicky");
 
             // Add HatchlingBehavior
-            HatchlingBehavior hb = cc.gameObject.AddComponent<HatchlingBehavior>();
-            hb.Setup(this._owner);
+            cc.gameObject.AddComponent<HatchlingBehavior>().Setup(this._owner);
         }
     }
 
@@ -170,7 +176,6 @@ namespace CwaffingTheGungy
         {
             this._startRoom = this.gameObject.transform.position.GetAbsoluteRoom();
             this._actor = base.gameObject.GetComponent<AIActor>();
-            // AkSoundEngine.PostEvent("Play_PET_chicken_cluck_01", base.gameObject);
             AkSoundEngine.PostEvent("bird_chirp", base.gameObject);
         }
 
