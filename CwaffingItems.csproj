@@ -50,6 +50,7 @@
     <Compile Include="src\Cwaff-Passives\GorgunEye.cs"/>
     <Compile Include="src\Cwaff-Passives\ZoolandersDiary.cs"/>
     <Compile Include="src\Cwaff-Passives\CatEarHeadband.cs"/>
+    <Compile Include="src\Cwaff-Passives\FourDBullets.cs"/>
     <Compile Include="src\Cwaff-Passives\WeddingRing.cs"/>
     <Compile Include="src\Cwaff-Passives\VoodooDoll.cs"/>
     <Compile Include="src\Cwaff-Passives\UtilityVest.cs"/>
@@ -1545,6 +1546,7 @@
     <EmbeddedResource Include="Resources\ItemSprites\cat_ear_headband_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\zoolander_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\note_icon.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\4d_bullets_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\cozy_camper_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\amazon_primer_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\gaster_blaster_icon.png"/>

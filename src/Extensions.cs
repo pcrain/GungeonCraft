@@ -50,7 +50,7 @@ namespace CwaffingTheGungy
     // Check if a rectangle contains a point
     public static bool Contains(this Rect self, Vector2 point)
     {
-      return (point.x > self.xMin && point.x < self.xMax && point.y > self.yMin && point.y < self.yMax);
+      return (point.x >= self.xMin && point.x <= self.xMax && point.y >= self.yMin && point.y <= self.yMax);
     }
 
     // Insets the borders of a rectangle by a specified amount on each side

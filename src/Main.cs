@@ -114,6 +114,7 @@ namespace CwaffingTheGungy
                     CatEarHeadband.Init();
                     Blazer.Init();
                     PlotArmor.Init();
+                    FourDBullets.Init();
                 #endregion
 
                 #region Guns
