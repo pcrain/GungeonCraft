@@ -31,24 +31,28 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<HatchlingGun>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.reloadTime                        = 1.1f;
+                gun.reloadTime                        = 25f / 20f;
                 gun.quality                           = PickupObject.ItemQuality.D;
-                gun.SetBaseMaxAmmo(2500);
-                gun.CurrentAmmo = gun.GetBaseMaxAmmo(); // necessary iff gun basemaxammo > 1000
-                gun.SetAnimationFPS(gun.shootAnimation, 30);
+                gun.SetBaseMaxAmmo(500);
+                gun.SetAnimationFPS(gun.shootAnimation, 40);
+                gun.SetAnimationFPS(gun.reloadAnimation, 20);
                 gun.ClearDefaultAudio();
+                // gun.SetFireAudio("hatchling_gun_shoot_sound");
+                gun.SetReloadAudio("hatchling_gun_bounce_sound", frame: 0);
+                gun.SetReloadAudio("hatchling_gun_bounce_sound", frame: 6);
+                gun.SetReloadAudio("hatchling_gun_bounce_sound", frame: 14);
 
             ProjectileModule mod = gun.DefaultModule;
                 mod.ammoCost            = 1;
-                mod.shootStyle          = ProjectileModule.ShootStyle.Automatic;
+                mod.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
                 mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
                 mod.angleVariance       = 15.0f;
                 mod.cooldownTime        = 0.2f;
                 mod.numberOfShotsInClip = -1;
 
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
-                ResMap.Get("natascha_bullet").Base(),
-                12, true, new IntVector2((int)(_NATASHA_PROJECTILE_SCALE * 15), (int)(_NATASHA_PROJECTILE_SCALE * 7)),
+                ResMap.Get("egg").Base(),
+                12, true, new IntVector2(8, 8),
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
 
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
@@ -59,11 +63,10 @@ namespace CwaffingTheGungy
                 projectile.gameObject.AddComponent<HatchlingProjectile>();
         }
 
-        protected override void OnPickedUpByPlayer(PlayerController player)
+        public override void OnPostFired(PlayerController player, Gun gun)
         {
-            // if (!this.everPickedUpByPlayer)
-            //     ETGModConsole.Log($"first");
-            base.OnPickedUpByPlayer(player);
+            base.OnPostFired(player, gun);
+            AkSoundEngine.PostEvent("hatchling_gun_shoot_sound", gun.gameObject);
         }
     }
 
@@ -102,7 +105,8 @@ namespace CwaffingTheGungy
             cc.aiActor.CanTargetEnemies       = true;  // original was true
             cc.aiActor.State                  = AIActor.ActorState.Normal;
             cc.healthHaver.OnDamaged += (float resultValue, float maxValue, CoreDamageTypes damageTypes, DamageCategory damageCategory, Vector2 damageDirection) => {
-                AkSoundEngine.PostEvent("Play_PET_chicken_cluck_01", cc.gameObject);
+                AkSoundEngine.PostEvent("bird_chirp", cc.gameObject);
+                // AkSoundEngine.PostEvent("Play_PET_chicken_cluck_01", cc.gameObject);
                 UnityEngine.Object.Destroy(cc.gameObject);
             };
             cc.aiActor.ParentRoom = p.transform.position.GetAbsoluteRoom(); // needed to avoid null deref for MoveErraticallyBehavior
@@ -166,7 +170,8 @@ namespace CwaffingTheGungy
         {
             this._startRoom = this.gameObject.transform.position.GetAbsoluteRoom();
             this._actor = base.gameObject.GetComponent<AIActor>();
-            AkSoundEngine.PostEvent("Play_PET_chicken_cluck_01", base.gameObject);
+            // AkSoundEngine.PostEvent("Play_PET_chicken_cluck_01", base.gameObject);
+            AkSoundEngine.PostEvent("bird_chirp", base.gameObject);
         }
 
         public void Setup(PlayerController pc)
