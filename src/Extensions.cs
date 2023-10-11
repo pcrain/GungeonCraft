@@ -556,5 +556,93 @@ namespace CwaffingTheGungy
     {
       gun.SetGunAudio(name: gun.chargeAnimation, audio: audio, frame: frame);
     }
+
+    public static bool Contains(this List<PassiveItem> items, int itemId)
+    {
+      foreach(PassiveItem item in items)
+        if (item.PickupObjectId == itemId)
+          return true;
+
+      return false;
+    }
+
+    // Gets the actual rectangle corresponding to the the outermost walls of a room
+    //   - Useful for boss fights
+    //   - Useful for phasing checks
+    // private const int _ROOM_PIXEL_FUDGE_FACTOR = 16;
+    private const int _ROOM_PIXEL_FUDGE_FACTOR = 8;
+    public static Rect GetRoomPixelBorder(this RoomHandler room)
+    {
+      Rect roomRect = room.GetBoundingRect();
+      Rect roomPixelRect = new Rect(16 * roomRect.xMin, 16 * roomRect.yMin, 16 * roomRect.width, 16 * roomRect.height);
+      return roomPixelRect.Inset(1, 1, _ROOM_PIXEL_FUDGE_FACTOR, 1);
+    }
+
+    public static bool FullyWithinRoom(this PlayerController pc, out bool xwithin, out bool ywithin, RoomHandler room = null)
+    {
+      return pc.specRigidbody.PixelColliders[0].FullyWithin((room ?? pc.CurrentRoom).GetRoomPixelBorder(), out xwithin, out ywithin);
+    }
+
+    public static bool ForceConstrainToRoom(this PlayerController pc, RoomHandler room)
+    {
+      // ETGModConsole.Log($"position is {pc.specRigidbody.Position.PixelPosition}");
+
+      Position oldPosition = pc.specRigidbody.Position;
+      PixelCollider collider = pc.specRigidbody.PixelColliders[0];
+      // ETGModConsole.Log($"bounds are {collider.Min} to {collider.Max}");
+      Rect roomRect = room.GetRoomPixelBorder();
+
+      bool adjusted = false;
+      Vector2 vector = pc.transform.position.XY();
+
+      if (collider.MinX < roomRect.xMin)
+      {
+        IntVector2 force = new IntVector2(1, 0) * (int)(roomRect.xMin - collider.MinX);
+        ETGModConsole.Log($"pushing right with force {force}");
+        vector += PhysicsEngine.PixelToUnit(force);
+        adjusted = true;
+      }
+      else if (collider.MaxX > roomRect.xMax)
+      {
+        IntVector2 force = new IntVector2(1, 0) * (int)(roomRect.xMax - collider.MaxX);
+        ETGModConsole.Log($"pushing left with force {force}");
+        vector += PhysicsEngine.PixelToUnit(force);
+        adjusted = true;
+      }
+
+      if (collider.MinY < roomRect.yMin)
+      {
+        IntVector2 force = new IntVector2(0, 1) * (int)(roomRect.yMin - collider.MinY);
+        ETGModConsole.Log($"pushing up with force {force}");
+        vector += PhysicsEngine.PixelToUnit(force);
+        adjusted = true;
+      }
+      else if (collider.MaxY > roomRect.yMax)
+      {
+        IntVector2 force = new IntVector2(0, 1) * (int)(roomRect.yMax - collider.MaxY);
+        ETGModConsole.Log($"pushing down with force {force}");
+        vector += PhysicsEngine.PixelToUnit(force);
+        adjusted = true;
+      }
+
+      if (adjusted)
+      {
+        pc.transform.position = vector;
+        pc.specRigidbody.Reinitialize();
+      }
+      return adjusted;
+    }
+
+    public static bool FullyWithin(this PixelCollider self, Rect other, out bool xwithin, out bool ywithin)
+    {
+      return new Rect(self.MinX, self.MinY, self.Dimensions.X, self.Dimensions.Y).FullyWithin(other, out xwithin, out ywithin);
+    }
+
+    public static bool FullyWithin(this Rect self, Rect other, out bool xwithin, out bool ywithin)
+    {
+      xwithin = self.xMin > other.xMin && self.xMax < other.xMax;
+      ywithin = self.yMin > other.yMin && self.yMax < other.yMax;
+      return xwithin && ywithin;
+    }
   }
 }

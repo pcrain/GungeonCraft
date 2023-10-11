@@ -53,9 +53,9 @@ namespace CwaffingTheGungy
 
     public class PhaseThroughInnerWallsBehavior : MonoBehaviour
     {
-        private const float _ROOM_BORDER_WITH = 1f; // number of cell lengths that make up each room's border
+        private const float _ROOM_BORDER_WIDTH = 1f; // number of cell lengths that make up each room's border
         private const float _LENIENCE = 0.5f; // prevents certain projectiles that leave debris from getting stuck in the wall
-        private const float _INSET = _ROOM_BORDER_WITH + _LENIENCE;
+        private const float _INSET = _ROOM_BORDER_WIDTH + _LENIENCE;
         private const float _UNPHASE_TIMER = 0.05f; // 3 frames
 
         private Projectile _projectile;

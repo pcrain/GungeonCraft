@@ -44,6 +44,7 @@
     <Compile Include="src\Cwaff-Passives\Unfinished\Shine.cs"/>
     <Compile Include="src\Cwaff-Passives\DriftersHeadgear.cs"/>
     <Compile Include="src\Cwaff-Passives\PlotArmor.cs"/>
+    <Compile Include="src\Cwaff-Passives\AstralProjector.cs"/>
     <Compile Include="src\Cwaff-Passives\RatPoison.cs"/>
     <Compile Include="src\Cwaff-Passives\BlankChecks.cs"/>
     <Compile Include="src\Cwaff-Passives\LibraryCardtridge.cs"/>
@@ -1537,6 +1538,7 @@
     <EmbeddedResource Include="Resources\ItemSprites\curators_badge_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\drifters_headgear_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\future_killing_bullet_icon.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\astral_projector_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\library_cardtridge_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\plot_armor_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\wedding_ring_icon.png"/>
