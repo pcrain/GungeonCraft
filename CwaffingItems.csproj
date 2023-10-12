@@ -42,6 +42,7 @@
     <Compile Include="src\Cwaff-Passives\Unfinished\Superstitious.cs"/>
     <Compile Include="src\Cwaff-Passives\Unfinished\Siphon.cs"/>
     <Compile Include="src\Cwaff-Passives\Unfinished\Shine.cs"/>
+    <Compile Include="src\Cwaff-Passives\Unfinished\ZoolandersDiary.cs"/>
     <Compile Include="src\Cwaff-Passives\DriftersHeadgear.cs"/>
     <Compile Include="src\Cwaff-Passives\PlotArmor.cs"/>
     <Compile Include="src\Cwaff-Passives\AstralProjector.cs"/>
@@ -49,7 +50,6 @@
     <Compile Include="src\Cwaff-Passives\BlankChecks.cs"/>
     <Compile Include="src\Cwaff-Passives\LibraryCardtridge.cs"/>
     <Compile Include="src\Cwaff-Passives\GorgunEye.cs"/>
-    <Compile Include="src\Cwaff-Passives\ZoolandersDiary.cs"/>
     <Compile Include="src\Cwaff-Passives\CatEarHeadband.cs"/>
     <Compile Include="src\Cwaff-Passives\FourDBullets.cs"/>
     <Compile Include="src\Cwaff-Passives\WeddingRing.cs"/>
@@ -1992,6 +1992,10 @@
     <Reference Include="0Harmony"/>
     <Reference Include="ModTheGungeonAPI"/>
     <Reference Include="BepInEx"/>
+    <Reference Include="Mono.Cecil.Rocks"/>
+    <Reference Include="Mono.Cecil"/>
+    <Reference Include="Mono.Cecil.Pdb"/>
+    <Reference Include="Mono.Cecil.Mdb"/>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
   <Import Project=".\packages\BepInEx.Core.5.4.21\build\BepInEx.Core.targets" Condition="Exists('.\packages\BepInEx.Core.5.4.21\build\BepInEx.Core.targets')"/>

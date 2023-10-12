@@ -598,14 +598,14 @@ namespace CwaffingTheGungy
       if (collider.MinX < roomRect.xMin)
       {
         IntVector2 force = new IntVector2(1, 0) * (int)(roomRect.xMin - collider.MinX);
-        ETGModConsole.Log($"pushing right with force {force}");
+        // ETGModConsole.Log($"pushing right with force {force}");
         vector += PhysicsEngine.PixelToUnit(force);
         adjusted = true;
       }
       else if (collider.MaxX > roomRect.xMax)
       {
         IntVector2 force = new IntVector2(1, 0) * (int)(roomRect.xMax - collider.MaxX);
-        ETGModConsole.Log($"pushing left with force {force}");
+        // ETGModConsole.Log($"pushing left with force {force}");
         vector += PhysicsEngine.PixelToUnit(force);
         adjusted = true;
       }
@@ -613,14 +613,14 @@ namespace CwaffingTheGungy
       if (collider.MinY < roomRect.yMin)
       {
         IntVector2 force = new IntVector2(0, 1) * (int)(roomRect.yMin - collider.MinY);
-        ETGModConsole.Log($"pushing up with force {force}");
+        // ETGModConsole.Log($"pushing up with force {force}");
         vector += PhysicsEngine.PixelToUnit(force);
         adjusted = true;
       }
       else if (collider.MaxY > roomRect.yMax)
       {
         IntVector2 force = new IntVector2(0, 1) * (int)(roomRect.yMax - collider.MaxY);
-        ETGModConsole.Log($"pushing down with force {force}");
+        // ETGModConsole.Log($"pushing down with force {force}");
         vector += PhysicsEngine.PixelToUnit(force);
         adjusted = true;
       }
