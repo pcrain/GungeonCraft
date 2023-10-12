@@ -11,6 +11,8 @@ using System.Text.RegularExpressions;
 
 using UnityEngine;
 using MonoMod.RuntimeDetour;
+using MonoMod.Cil;
+using Mono.Cecil.Cil; //Instruction
 
 using Gungeon;
 using Dungeonator;
@@ -188,6 +190,33 @@ namespace CwaffingTheGungy
         {
             for (int i = 0; i < theCollection.spriteDefinitions.Length; ++i)
                 ETGModConsole.Log(theCollection.spriteDefinitions[i].name);
+        }
+
+        // Dump IL instructions for an IL Hook
+        private static HashSet<string> _DumpedKeys = new();
+        public static void DumpILOnce(this ILCursor cursor, string key)
+        {
+            if (_DumpedKeys.Contains(key))
+                return;
+            _DumpedKeys.Add(key);
+            foreach (Instruction c in cursor.Instrs)
+            {
+                try
+                {
+                    ETGModConsole.Log($"  {c.ToStringSafe()}");
+                }
+                catch (Exception)
+                {
+                    try
+                    {
+                        ETGModConsole.Log($"  {c.Offset} ... {c.OpCode.Name} ... {c.Operand.ToStringSafe()}");
+                    }
+                    catch (Exception)
+                    {
+                        ETGModConsole.Log($"  <error>");
+                    }
+                }
+            }
         }
     }
 

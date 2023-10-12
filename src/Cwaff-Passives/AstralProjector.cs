@@ -39,7 +39,7 @@ namespace CwaffingTheGungy
         private RoomHandler _phasedRoom;
 
         private static int astralProjectorId;
-        private static Hook astralProjectorHook;
+        // private static Hook astralProjectorHook;
         private static ILHook astralProjectorILHook;
 
         public static void Init()
@@ -167,85 +167,72 @@ namespace CwaffingTheGungy
             AkSoundEngine.PostEvent("phase_through_wall_sound", this.Owner.gameObject);
         }
 
-        static bool didOnce = false;
-        /* References:
+        /* References for using ILHooks:
             https://en.wikipedia.org/wiki/List_of_CIL_instructions
             https://github.com/StrawberryJam2021/StrawberryJam2021/blob/21079f1c2521aa704fc5ddc91f67ff3ebc95c317/Triggers/SkateboardTrigger.cs#L18
             https://github.com/lostinnowhere314/CelesteCollabUtils2/blob/b6b7fde825a6bdc218d201bf1a4feaa709487f3b/Entities/MiniHeartDoor.cs#L17
         */
+        public static float PreventRigidbodyCastDuringHandlePlayerInput(PlayerController pc, float inValue)
+        {
+            if (pc.passiveItems.Contains(astralProjectorId))
+                return inValue > 0 ? 999f : -999f; // replace the value we're checking against with something absurdly high so we avoid doing RigidBodyCasts
+            return inValue; // return the original value
+        }
+
+
+        // This IL Hook replaces some checks in HandlePlayerInput that do RigidBodyCasts on each axis if the absolutely velocity is greater than 0.01
+        // This hook simply replaces the checks for an absolute velocity greater than 999 while we have this item,
+        //   ensuring they will never run under any sane circumstance
         private static void HandlePlayerPhasingInputIL(ILContext il)
         {
-            if (didOnce)
-                return;
-            didOnce = true;
             ILCursor cursor = new ILCursor(il);
+            // cursor.DumpILOnce("HandlePlayerPhasingInputIL");
+
+            //Replace positive movement checks
             while (cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdcR4(0.01f)))
             {
-                // ETGModConsole.Log($"FOUND");
-                cursor.Emit(OpCodes.Pop);
-                cursor.Emit(OpCodes.Ldc_R4, 999f);
+                cursor.Emit(OpCodes.Pop); // remove the check for 0.01f...
+                cursor.Emit(OpCodes.Ldarg_0); // load the player instance
+                cursor.Emit(OpCodes.Ldc_R4, 0.01f); // replace the check for 0.01f...
+                cursor.Emit(OpCodes.Call, typeof(AstralProjector).GetMethod("PreventRigidbodyCastDuringHandlePlayerInput")); // call our method
+                // return value from our hook is now on the stack, replacing 0.01f with 999f if we have the item
             }
             cursor.Index = 0;
             while (cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdcR4(-0.01f)))
             {
-                // ETGModConsole.Log($"FOUND");
-                cursor.Emit(OpCodes.Pop);
-                cursor.Emit(OpCodes.Ldc_R4, -999f);
+                cursor.Emit(OpCodes.Pop); // remove the check for 0.01f...
+                cursor.Emit(OpCodes.Ldarg_0); // load the player instance
+                cursor.Emit(OpCodes.Ldc_R4, -0.01f); // replace the check for -0.01f...
+                cursor.Emit(OpCodes.Call, typeof(AstralProjector).GetMethod("PreventRigidbodyCastDuringHandlePlayerInput")); // call our method
+                // return value from our hook is now on the stack, replacing -0.01f with -999f if we have the item
             }
-
-            // {
-            //     ETGModConsole.Log($"found cursor:");
-            //     foreach (Instruction c in cursor.Instrs)
-            //     {
-            //         try
-            //         {
-            //             ETGModConsole.Log($"  {c.ToStringSafe()}");
-            //             if (c.MatchLdcR4(0.01f)) // checking if speed vector.x/y is greater than 0.01f
-            //             {
-            //                 cursor.Emit(OpCodes.Pop);
-            //                 cursor.Emit(OpCodes.Ldc_R4, 999f);
-            //                 // ETGModConsole.Log($"    FOUND");
-            //             }
-            //             else if (c.MatchLdcR4(0.01f)) // checking if speed vector.x/y is greater than 0.01f
-            //             {
-            //                 cursor.Emit(OpCodes.Pop);
-            //                 cursor.Emit(OpCodes.Ldc_R4, -999f);
-            //                 // ETGModConsole.Log($"    FOUND");
-            //             }
-            //         }
-            //         catch (Exception e)
-            //         {
-            //             ETGModConsole.Log($"  <error>");
-            //         }
-            //     }
-            //     break;
-            // }
-            return;// Vector2.zero;
+            return;
         }
 
 
+        // OBSOLETE: better ILHook method above that effectively disables the checks on the spot and saves some RigidBodyCasts
         // we have to do this nonsense because even when we're ignoring tile collisions, HandlePlayerInput insists on zeroing our movement unless we're rolling
-        private static Vector2 HandlePlayerPhasingInput(Func<PlayerController, Vector2> orig, PlayerController player)
-        {
-            // Run the original movement function and return its output if we don't have this item
-            Vector2 ovec = orig(player);
-            if (!player.passiveItems.Contains(astralProjectorId))
-                return ovec;
+        // private static Vector2 HandlePlayerPhasingInput(Func<PlayerController, Vector2> orig, PlayerController player)
+        // {
+        //     // Run the original movement function and return its output if we don't have this item
+        //     Vector2 ovec = orig(player);
+        //     if (!player.passiveItems.Contains(astralProjectorId))
+        //         return ovec;
 
-            #region Perform all of the original checks to make sure we're not doing illegal movements
-                if (player.m_activeActions == null)
-                    return ovec; // If we have no active actions, we're not doing anything, so return
-                if (player.CurrentInputState == PlayerInputState.NoMovement)
-                    return ovec; // AdjustInputVector never gets called if we are in the NoMovement input state, so return
-                if (player.IsGhost)
-                    return ovec; // Original function checks if we're a ghost and returns immediately if so. Ironically, we need to respect walls if we're a ghost
-            #endregion
+        //     #region Perform all of the original checks to make sure we're not doing illegal movements
+        //         if (player.m_activeActions == null)
+        //             return ovec; // If we have no active actions, we're not doing anything, so return
+        //         if (player.CurrentInputState == PlayerInputState.NoMovement)
+        //             return ovec; // AdjustInputVector never gets called if we are in the NoMovement input state, so return
+        //         if (player.IsGhost)
+        //             return ovec; // Original function checks if we're a ghost and returns immediately if so. Ironically, we need to respect walls if we're a ghost
+        //     #endregion
 
-            // If we've made it here, then only the RigidbodyCast() functions could have reset our movement vector to zero, so recalculate AdjustInputVector()
-            Vector2 moveVector = player.AdjustInputVector(player.m_activeActions.Move.Vector, BraveInput.MagnetAngles.movementCardinal, BraveInput.MagnetAngles.movementOrdinal);
-            if (moveVector.magnitude > 1f)
-                moveVector.Normalize();
-            return moveVector;
-        }
+        //     // If we've made it here, then only the RigidbodyCast() functions could have reset our movement vector to zero, so recalculate AdjustInputVector()
+        //     Vector2 moveVector = player.AdjustInputVector(player.m_activeActions.Move.Vector, BraveInput.MagnetAngles.movementCardinal, BraveInput.MagnetAngles.movementOrdinal);
+        //     if (moveVector.magnitude > 1f)
+        //         moveVector.Normalize();
+        //     return moveVector;
+        // }
     }
 }
