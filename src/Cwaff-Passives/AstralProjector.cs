@@ -17,11 +17,6 @@ using Alexandria.Misc;
 
 namespace CwaffingTheGungy
 {
-
-    /* TODO:
-        -
-    */
-
     public class AstralProjector : PassiveItem
     {
         public static string ItemName         = "Astral Projector";
@@ -32,10 +27,10 @@ namespace CwaffingTheGungy
         private const float _UNPHASE_TIMER = 0.5f; // delay before being unphasing and being able to perform non-movement actions
 
         private bool _phased = false;
+        private bool _intangible = false;
         private int _insideWalls = 0;
-        private float _unphaseTimer = 0.0f;
+        private float _intangibleTimer = 0.0f;
         private Shader _originalShader;
-        private Position _lastGoodPosition;
         private RoomHandler _phasedRoom;
 
         private static int astralProjectorId;
@@ -61,7 +56,6 @@ namespace CwaffingTheGungy
         public override void Pickup(PlayerController player)
         {
             base.Pickup(player);
-            this._lastGoodPosition = this.Owner.specRigidbody.Position;
             player.specRigidbody.OnPreTileCollision += this.OnPreTileCollision;
         }
 
@@ -82,8 +76,8 @@ namespace CwaffingTheGungy
         {
             if (!this.Owner)
                 return false; // can't phase if we're not owner
-            if (this.Owner.CurrentInputState != PlayerInputState.AllInput)
-                return false; // can't phase if we're not fully mobile
+            if (this.Owner.CurrentInputState != PlayerInputState.AllInput && !this._intangible)
+                return false; // can't phase if we're not fully mobile, unless we're in our intangible phase
             if (_BannedRoomTypes.Contains(this.Owner.CurrentRoom.area.PrototypeRoomCategory))
                 return false; // can only phase in normal rooms
             if (this.Owner.CurrentRoom.area.IsProceduralRoom || (this.Owner.CurrentRoom.area.proceduralCells?.Count ?? 0) > 0)
@@ -94,58 +88,49 @@ namespace CwaffingTheGungy
         public override void Update()
         {
             base.Update();
-            this.CanBeDropped = !this._phased;
+            this.CanBeDropped = !(this._intangible || this._phased);
+
+            if (this._intangibleTimer > 0)
+            {
+                this._intangibleTimer -= BraveTime.DeltaTime;
+                if (this._intangibleTimer <= 0f)
+                    BecomeTangible();
+            }
+
             if (!this._phased)
                 return;
 
             if (this.Owner.ForceConstrainToRoom(this._phasedRoom))
                 return;
 
-            this._lastGoodPosition = this.Owner.specRigidbody.Position;
-            this._insideWalls -= 1;
-            this._unphaseTimer -= BraveTime.DeltaTime;
-            if (this._unphaseTimer <= 0f)
-                DoUnphase();
+            if (--this._insideWalls == 0)
+                this._phased = false;
         }
 
         private void OnPreTileCollision(SpeculativeRigidbody me, PixelCollider myPixelCollider, PhysicsEngine.Tile other, PixelCollider otherPixelCollider)
         {
-            bool xwithin;
-            bool ywithin;
             RoomHandler targetRoom = this._phased ? this._phasedRoom : this.Owner.CurrentRoom;
             if (this._phased)
                 this.Owner.ForceConstrainToRoom(targetRoom);
             else if (!CanStartPhase())
                 return; // can't phase here
-            else if (!this.Owner.FullyWithinRoom(out xwithin, out ywithin, targetRoom))
+            else if (!this.Owner.FullyWithinRoom(targetRoom))
                 return; // outside the room
 
             this._phasedRoom = this.Owner.CurrentRoom;
             this._insideWalls = 2;  // 2 frames of leniency for checking if we're inside walls
-            this._unphaseTimer = _UNPHASE_TIMER;
+            this._intangibleTimer = _UNPHASE_TIMER;
             PhysicsEngine.SkipCollision = true;
 
-            if (!this._phased)
-                DoPhase();
-        }
-
-        private void PushOutOfWalls(bool xwithin, bool ywithin)
-        {
-            Position curPosition = this.Owner.specRigidbody.Position;
-            if (xwithin)
-                curPosition.Y = this._lastGoodPosition.Y;
-            else if (ywithin)
-                curPosition.X = this._lastGoodPosition.X;
-            else
-                curPosition = new Position(this._lastGoodPosition);
-            this.Owner.specRigidbody.Position = curPosition;
-        }
-
-        private void DoPhase()
-        {
             this._phased = true;
+            if (!this._intangible)
+                BecomeIntangible();
+        }
 
-            // this.Owner.SetInputOverride()
+       private void BecomeIntangible()
+        {
+            this._intangible = true;
+
             this.Owner.CurrentInputState = PlayerInputState.FoyerInputOnly;
             tk2dBaseSprite sprite = this.Owner.sprite;
             sprite.usesOverrideMaterial = true;
@@ -155,9 +140,9 @@ namespace CwaffingTheGungy
             AkSoundEngine.PostEvent("phase_through_wall_sound", this.Owner.gameObject);
         }
 
-        private void DoUnphase()
+        private void BecomeTangible()
         {
-            this._phased = false;
+            this._intangible = false;
 
             this.Owner.CurrentInputState = PlayerInputState.AllInput;
             tk2dBaseSprite sprite = this.Owner.sprite;
@@ -179,10 +164,9 @@ namespace CwaffingTheGungy
             return inValue; // return the original value
         }
 
-
         // This IL Hook replaces some checks in HandlePlayerInput that do RigidBodyCasts on each axis if the absolutely velocity is greater than 0.01
-        // This hook simply replaces the checks for an absolute velocity greater than 999 while we have this item,
-        //   ensuring they will never run under any sane circumstance
+        // If we have this item, this hook instead checks if each axis has an absolute velocity greater than 999,
+        //   ensuring the RigidBodyCasts will never run under any sane circumstance
         private static void HandlePlayerPhasingInputIL(ILContext il)
         {
             ILCursor cursor = new ILCursor(il);
@@ -191,24 +175,31 @@ namespace CwaffingTheGungy
             //Replace positive movement checks
             while (cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdcR4(0.01f)))
             {
-                cursor.Emit(OpCodes.Pop); // remove the check for 0.01f...
-                cursor.Emit(OpCodes.Ldarg_0); // load the player instance
-                cursor.Emit(OpCodes.Ldc_R4, 0.01f); // replace the check for 0.01f...
-                cursor.Emit(OpCodes.Call, typeof(AstralProjector).GetMethod("PreventRigidbodyCastDuringHandlePlayerInput")); // call our method
-                // return value from our hook is now on the stack, replacing 0.01f with 999f if we have the item
+                cursor.Emit(OpCodes.Pop); // pop the check for 0.01f itself
+                cursor.Emit(OpCodes.Ldarg_0); // load the player instance as arg0
+                cursor.Emit(OpCodes.Ldc_R4, 0.01f); // replace the check for 0.01f as arg1
+
+                // call our method with player instance and original threshold value as args
+                cursor.Emit(OpCodes.Call, typeof(AstralProjector).GetMethod("PreventRigidbodyCastDuringHandlePlayerInput"));
+                // the return value from our hook is now on the stack, replacing 0.01f with 999f if we have the item
+                // this ensures the RigidBodyCast() will never happen
             }
+
+            // Replcae negative movement checks
             cursor.Index = 0;
             while (cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdcR4(-0.01f)))
             {
-                cursor.Emit(OpCodes.Pop); // remove the check for 0.01f...
-                cursor.Emit(OpCodes.Ldarg_0); // load the player instance
-                cursor.Emit(OpCodes.Ldc_R4, -0.01f); // replace the check for -0.01f...
-                cursor.Emit(OpCodes.Call, typeof(AstralProjector).GetMethod("PreventRigidbodyCastDuringHandlePlayerInput")); // call our method
-                // return value from our hook is now on the stack, replacing -0.01f with -999f if we have the item
+                cursor.Emit(OpCodes.Pop); // pop the check for -0.01f itself
+                cursor.Emit(OpCodes.Ldarg_0); // load the player instance as arg0
+                cursor.Emit(OpCodes.Ldc_R4, -0.01f); // replace the check for -0.01f as arg1
+
+                // call our method with player instance and original threshold value as args
+                cursor.Emit(OpCodes.Call, typeof(AstralProjector).GetMethod("PreventRigidbodyCastDuringHandlePlayerInput"));
+                // the return value from our hook is now on the stack, replacing -0.01f with -999f if we have the item
+                // this ensures the RigidBodyCast() will never happen
             }
             return;
         }
-
 
         // OBSOLETE: better ILHook method above that effectively disables the checks on the spot and saves some RigidBodyCasts
         // we have to do this nonsense because even when we're ignoring tile collisions, HandlePlayerInput insists on zeroing our movement unless we're rolling

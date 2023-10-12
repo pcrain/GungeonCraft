@@ -578,9 +578,9 @@ namespace CwaffingTheGungy
       return roomPixelRect.Inset(1, 1, _ROOM_PIXEL_FUDGE_FACTOR, 1);
     }
 
-    public static bool FullyWithinRoom(this PlayerController pc, out bool xwithin, out bool ywithin, RoomHandler room = null)
+    public static bool FullyWithinRoom(this PlayerController pc, RoomHandler room = null)
     {
-      return pc.specRigidbody.PixelColliders[0].FullyWithin((room ?? pc.CurrentRoom).GetRoomPixelBorder(), out xwithin, out ywithin);
+      return pc.specRigidbody.PixelColliders[0].FullyWithin((room ?? pc.CurrentRoom).GetRoomPixelBorder());
     }
 
     public static bool ForceConstrainToRoom(this PlayerController pc, RoomHandler room)
@@ -633,15 +633,15 @@ namespace CwaffingTheGungy
       return adjusted;
     }
 
-    public static bool FullyWithin(this PixelCollider self, Rect other, out bool xwithin, out bool ywithin)
+    public static bool FullyWithin(this PixelCollider self, Rect other)
     {
-      return new Rect(self.MinX, self.MinY, self.Dimensions.X, self.Dimensions.Y).FullyWithin(other, out xwithin, out ywithin);
+      return new Rect(self.MinX, self.MinY, self.Dimensions.X, self.Dimensions.Y).FullyWithin(other);
     }
 
-    public static bool FullyWithin(this Rect self, Rect other, out bool xwithin, out bool ywithin)
+    public static bool FullyWithin(this Rect self, Rect other)
     {
-      xwithin = self.xMin > other.xMin && self.xMax < other.xMax;
-      ywithin = self.yMin > other.yMin && self.yMax < other.yMax;
+      bool xwithin = self.xMin > other.xMin && self.xMax < other.xMax;
+      bool ywithin = self.yMin > other.yMin && self.yMax < other.yMax;
       return xwithin && ywithin;
     }
   }
