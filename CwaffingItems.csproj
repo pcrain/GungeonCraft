@@ -45,6 +45,7 @@
     <Compile Include="src\Cwaff-Passives\Unfinished\ZoolandersDiary.cs"/>
     <Compile Include="src\Cwaff-Passives\DriftersHeadgear.cs"/>
     <Compile Include="src\Cwaff-Passives\PlotArmor.cs"/>
+    <Compile Include="src\Cwaff-Passives\EchoChamber.cs"/>
     <Compile Include="src\Cwaff-Passives\AstralProjector.cs"/>
     <Compile Include="src\Cwaff-Passives\RatPoison.cs"/>
     <Compile Include="src\Cwaff-Passives\BlankChecks.cs"/>
@@ -1531,6 +1532,7 @@
     <EmbeddedResource Include="Resources\ItemSprites\borrowed_time_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\blazer_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\gyroscope_icon_old.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\echo_chamber_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\utility_vest_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\blank_checks_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\itemfinder_icon.png"/>

@@ -116,6 +116,7 @@ namespace CwaffingTheGungy
                     PlotArmor.Init();
                     FourDBullets.Init();
                     AstralProjector.Init();
+                    EchoChamber.Init();
                 #endregion
 
                 #region Guns

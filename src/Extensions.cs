@@ -15,12 +15,12 @@ namespace CwaffingTheGungy
   {
     public class Expiration : MonoBehaviour  // destroy a game object after a fixed amount of time, with optional fadeout
     {
-      public void ExpireIn(float seconds, float fadeFor = 0f)
+      public void ExpireIn(float seconds, float fadeFor = 0f, float startAlpha = 1f)
       {
-        this.StartCoroutine(Expire(seconds, fadeFor));
+        this.StartCoroutine(Expire(seconds, fadeFor, startAlpha));
       }
 
-      private IEnumerator Expire(float seconds, float fadeFor = 0f)
+      private IEnumerator Expire(float seconds, float fadeFor = 0f, float startAlpha = 1f)
       {
         if (fadeFor == 0f)
         {
@@ -33,7 +33,7 @@ namespace CwaffingTheGungy
         while (lifeLeft > 0)
         {
           lifeLeft -= BraveTime.DeltaTime;
-          this.gameObject.SetAlpha(Mathf.Min(1f,lifeLeft / fadeFor));
+          this.gameObject.SetAlpha(startAlpha * Mathf.Min(1f,lifeLeft / fadeFor));
           yield return null;
         }
         UnityEngine.Object.Destroy(this.gameObject);
@@ -42,9 +42,9 @@ namespace CwaffingTheGungy
     }
 
     // Add an expiration timer to a GameObject
-    public static void ExpireIn(this GameObject self, float seconds, float fadeFor = 0f)
+    public static void ExpireIn(this GameObject self, float seconds, float fadeFor = 0f, float startAlpha = 1f)
     {
-      self.GetOrAddComponent<Expiration>().ExpireIn(seconds, fadeFor);
+      self.GetOrAddComponent<Expiration>().ExpireIn(seconds, fadeFor, startAlpha);
     }
 
     // Check if a rectangle contains a point
