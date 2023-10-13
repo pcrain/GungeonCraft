@@ -49,7 +49,6 @@ namespace CwaffingTheGungy
             Gun gun = Lazy.SetupGun<Gunbrella>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
                 gun.gunClass                             = GunClass.CHARGE;
                 gun.quality                              = PickupObject.ItemQuality.A;
-                gun.InfiniteAmmo                         = false;
                 gun.SetAnimationFPS(gun.shootAnimation, 60);
                 gun.SetAnimationFPS(gun.chargeAnimation, 16);
                 gun.LoopAnimation(gun.chargeAnimation, 17);
@@ -66,18 +65,20 @@ namespace CwaffingTheGungy
                 16, true, new IntVector2(15, 8),
                 false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
 
-            for (int i = 0; i < _BARRAGE_SIZE; i++)
+            for (int i = 1; i < _BARRAGE_SIZE; i++) // start from 1 since we already have a default module
             {
                 // use ak47 so our sprite doesn't rotate and mess up our transform calculations when launching / falling
                 gun.AddProjectileModuleFrom(ItemHelper.Get(Items.Ak47) as Gun, true, false);
+                gun.DefaultModule.ammoCost = 1;
             }
 
             _HailParticle = VFX.RegisterVFXPool("HailParticle", ResMap.Get("icicle_crash_particles"),
                 fps: 30, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.35f);
 
             GameActorFreezeEffect freeze = ItemHelper.Get(Items.FrostBullets).GetComponent<BulletStatusEffectItem>().FreezeModifierEffect;
-            foreach (ProjectileModule pmod in gun.Volley.projectiles)
+            for (int i = 0; i < _BARRAGE_SIZE; i++)
             {
+                ProjectileModule pmod = gun.Volley.projectiles[i];
                 Projectile projectile = Lazy.PrefabProjectileFromGun(gun, setGunDefaultProjectile: false);
                     projectile.AddDefaultAnimation(_BulletSprite);
                     projectile.SetAirImpactVFX(_HailParticle);
@@ -91,7 +92,8 @@ namespace CwaffingTheGungy
                 GunbrellaProjectile gp = projectile.gameObject.AddComponent<GunbrellaProjectile>();
 
                 pmod.angleVariance = 10f;
-                pmod.ammoCost = (mod != gun.DefaultModule) ? 0 : 1;
+                if (i >= 1)
+                    pmod.ammoCost = 0;
                 pmod.shootStyle = ProjectileModule.ShootStyle.Charged;
                 pmod.sequenceStyle = ProjectileModule.ProjectileSequenceStyle.Random;
                 pmod.chargeProjectiles = new(){ new(){
