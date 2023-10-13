@@ -15,13 +15,17 @@ namespace CwaffingTheGungy
   {
     public class Expiration : MonoBehaviour  // destroy a game object after a fixed amount of time, with optional fadeout
     {
-      public void ExpireIn(float seconds, float fadeFor = 0f, float startAlpha = 1f)
+      public void ExpireIn(float seconds, float fadeFor = 0f, float startAlpha = 1f, bool shrink = false)
       {
-        this.StartCoroutine(Expire(seconds, fadeFor, startAlpha));
+        this.StartCoroutine(Expire(seconds, fadeFor, startAlpha, shrink));
       }
 
-      private IEnumerator Expire(float seconds, float fadeFor = 0f, float startAlpha = 1f)
+      private IEnumerator Expire(float seconds, float fadeFor = 0f, float startAlpha = 1f, bool shrink = false)
       {
+        if (startAlpha < 1f)
+          this.gameObject.SetAlphaImmediate(startAlpha);
+        float startXScale = this.gameObject.transform.localScale.x;
+        float startYScale = this.gameObject.transform.localScale.y;
         if (fadeFor == 0f)
         {
           yield return new WaitForSeconds(seconds);
@@ -33,7 +37,12 @@ namespace CwaffingTheGungy
         while (lifeLeft > 0)
         {
           lifeLeft -= BraveTime.DeltaTime;
-          this.gameObject.SetAlpha(startAlpha * Mathf.Min(1f,lifeLeft / fadeFor));
+          float percentAlive = Mathf.Min(1f,lifeLeft / fadeFor);
+          this.gameObject.SetAlpha(startAlpha * percentAlive);
+          if (shrink)
+          {
+            this.gameObject.transform.localScale = new Vector3(percentAlive * startXScale, percentAlive * startYScale, 1.0f);
+          }
           yield return null;
         }
         UnityEngine.Object.Destroy(this.gameObject);
@@ -42,9 +51,9 @@ namespace CwaffingTheGungy
     }
 
     // Add an expiration timer to a GameObject
-    public static void ExpireIn(this GameObject self, float seconds, float fadeFor = 0f, float startAlpha = 1f)
+    public static void ExpireIn(this GameObject self, float seconds, float fadeFor = 0f, float startAlpha = 1f, bool shrink = false)
     {
-      self.GetOrAddComponent<Expiration>().ExpireIn(seconds, fadeFor, startAlpha);
+      self.GetOrAddComponent<Expiration>().ExpireIn(seconds, fadeFor, startAlpha, shrink);
     }
 
     // Check if a rectangle contains a point

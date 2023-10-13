@@ -23,6 +23,7 @@ namespace CwaffingTheGungy
         public static string LongDescription  = "TBD";
 
         internal static Projectile _FlakProjectile;
+        internal static GameObject _EchoPrefab;
 
         public static void Init()
         {
@@ -30,6 +31,8 @@ namespace CwaffingTheGungy
             item.quality       = PickupObject.ItemQuality.C;
 
             _FlakProjectile = (ItemHelper.Get(Items.FlakBullets) as ComplexProjectileModifier).CollisionSpawnProjectile;
+            _EchoPrefab = VFX.RegisterVFXObject("Echo", ResMap.Get("echo_effect"), 16, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+
         }
 
         public override void Pickup(PlayerController player)
@@ -54,6 +57,8 @@ namespace CwaffingTheGungy
     {
         private const float _DAMAGE_SCALE = 0.5f;
         private const int _NUM_ECHOS = 3;
+        private const float _INITIAL_DELAY = 1f / 6f;
+        private const float _DELAY_SCALE = 2f;
 
         private Projectile _projectile;
         private PlayerController _owner;
@@ -90,14 +95,18 @@ namespace CwaffingTheGungy
 
         public IEnumerator DelayedTrigger_CR()
         {
-            float baseDamageScale = 1.0f;
+            GameObject v = SpawnManager.SpawnVFX(EchoChamber._EchoPrefab, this._echoPosition, Quaternion.identity);
+                v.ExpireIn(seconds: 1.5f, fadeFor: 1.5f, startAlpha: 0.25f, shrink: true);
+
+            float baseDamageScale = 0.5f;
             float baseSpeedScale = 1.0f;
             float baseSpriteScale = 1.0f;
+            float delay = _INITIAL_DELAY;
             for (int i = 0; i < _NUM_ECHOS; ++i)
             {
-                yield return new WaitForSeconds(0.05f);
+                yield return new WaitForSeconds(delay);
+                delay *= _DELAY_SCALE;
                 baseDamageScale *= _DAMAGE_SCALE;
-                baseSpeedScale -= 0.1f;
                 baseSpriteScale -= 0.1f;
                 SpawnProjectile(baseDamageScale, baseSpeedScale, baseSpriteScale);
             }
@@ -138,7 +147,7 @@ namespace CwaffingTheGungy
             echo.UpdateSpeed();
 
             echo.sprite.gameObject.AddComponent<EchoedProjectile>();
-            echo.sprite.gameObject.ExpireIn(seconds: 0.5f, fadeFor: 0.5f, startAlpha: damageScale);
+            echo.sprite.gameObject.ExpireIn(seconds: 0.5f, fadeFor: 0.5f, startAlpha: Mathf.Sqrt(damageScale));
             // AkSoundEngine.PostEvent("deadline_fire_sound_stop_all", this._owner.gameObject);
             // AkSoundEngine.PostEvent("deadline_fire_sound", this._owner.gameObject);
         }

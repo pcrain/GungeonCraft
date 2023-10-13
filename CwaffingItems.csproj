@@ -1365,6 +1365,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\egg_break4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire_b4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\midas_sparkle1.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\echo_effect1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\hail_collision2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\shine.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\hail_collision1.png"/>
@@ -1381,9 +1382,11 @@
     <EmbeddedResource Include="Resources\MiscVFX\outbreak_smoke_large.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\egg_break1.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\echo_effect6.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren23.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\friendlyoverhead_vfx_002.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\drowsy_cloud8.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\echo_effect3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\icicle_crash_particles8.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\zenkai_aura1.png"/>
@@ -1429,6 +1432,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\can_of_coke.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren21.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\drowsy_cloud1.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\echo_effect5.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\icicle_crash_particles7.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\saiyan_spark2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire_d5.png"/>
@@ -1442,6 +1446,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\GunVFX\RebarGunImpactVFX2_005.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire_c2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire_d6.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\echo_effect4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\drowsy_cloud2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\icicle_crash_particles4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a5.png"/>
@@ -1463,6 +1468,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\Explosions\splode2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren22.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren7.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\echo_effect2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\drowsy_cloud4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire_c4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\zenkai_aura8.png"/>
