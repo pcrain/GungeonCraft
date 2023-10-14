@@ -96,7 +96,7 @@ namespace CwaffingTheGungy
 
     private void SetUpBossRoom(AIActor enemy)
     {
-      ETGModConsole.Log($"Setting up Boss Room");
+      // ETGModConsole.Log($"Setting up Boss Room");
       RegisterAnyInteractables(enemy);
       GenericIntroDoer gid = enemy.GetComponent<GenericIntroDoer>();
       if (!string.IsNullOrEmpty(gid.preIntroAnim))
@@ -106,7 +106,7 @@ namespace CwaffingTheGungy
 
     private void SetUpBossFight(AIActor enemy)
     {
-      ETGModConsole.Log($"Setting up Boss Fight");
+      // ETGModConsole.Log($"Setting up Boss Fight");
       BossNPC npc = enemy.GetComponent<BossNPC>();
       if (npc != null)
       {
@@ -124,7 +124,7 @@ namespace CwaffingTheGungy
       if (bossFightStarted)
         return;
       bossFightStarted = true;
-      ETGModConsole.Log($"Starting Boss Fight");
+      // ETGModConsole.Log($"Starting Boss Fight");
       enemy.aiAnimator.EndAnimation();  // make sure our base idle animation plays after our preIntro animation finishes
       BossNPC npc = enemy.GetComponent<BossNPC>();
       if (npc != null)

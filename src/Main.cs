@@ -56,6 +56,7 @@ namespace CwaffingTheGungy
                 //Tools and Toolboxes
                 StaticReferences.Init();
                 Tools.Init();
+                CwaffEvents.Init();
 
                 FakePrefabHooks.Init();
                 HUDController.Init(); //Need to load early

@@ -33,11 +33,30 @@ namespace CwaffingTheGungy
         public static void Init()
         {
             PlayerItem item   = Lazy.SetupActive<BulletThatCanKillTheFuture>(ItemName, SpritePath, ShortDescription, LongDescription);
-            item.quality      = PickupObject.ItemQuality.S;
+            item.quality      = PickupObject.ItemQuality.EXCLUDED;
             item.consumable   = true;
             item.CanBeDropped = true;
 
             _Sprite = item.sprite;
+            CwaffEvents.OnNewFloorFullyLoaded += SpawnFutureBullet;
+        }
+
+        private static void SpawnFutureBullet()
+        {
+            // ETGModConsole.Log($"FULLY LOADED {GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName}");
+            foreach (AdvancedShrineController a in StaticReferenceManager.AllAdvancedShrineControllers)
+            {
+                if (!a.IsLegendaryHeroShrine)
+                    continue;
+
+                Vector3 pos = a.transform.position + (new Vector2(a.sprite.GetCurrentSpriteDef().position3.x/2, 6f)).ToVector3ZisY(0);
+                DebrisObject futureBullet = LootEngine.SpawnItem(
+                    item: PickupObjectDatabase.GetById(IDs.Pickups["bullet_that_can_kill_the_future"]).gameObject,
+                    spawnPosition: pos,
+                    spawnDirection: Vector2.zero,
+                    force: 0);
+
+            }
         }
 
         public override void Pickup(PlayerController player)
@@ -296,19 +315,7 @@ namespace CwaffingTheGungy
             {
                 UnityEngine.Object.Destroy(clockhair.gameObject);
                 yield return new WaitForSeconds(0.25f);
-                // GameManager.Instance.LoadCustomFlowForDebug("simplest"); //TODO: rename later
-                string currentFloor = GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName;
-                // switch (currentFloor)
-                // {
-                //     default:
-                //     {
-                //         ETGModConsole.Log($"on floor {currentFloor}");
-                //         break;
-                //     }
-                // }
-
-
-                SansDungeon.NameOfPreviousFloor = currentFloor;
+                SansDungeon.NameOfPreviousFloor = GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName;
                 GameManager.Instance.OnNewLevelFullyLoaded += ForceElevatorToReturnToPreviousFloor;
                 GameManager.Instance.LoadCustomLevel("cg_sansfloor"); //TODO: rename later
             }

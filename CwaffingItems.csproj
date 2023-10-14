@@ -164,6 +164,7 @@
     <Compile Include="src\StandardAPI\GungeonAPI\Dungeon Code\ShrineTools.cs"/>
     <Compile Include="src\StandardAPI\GungeonAPI\Dungeon Code\DungeonHooks.cs"/>
     <Compile Include="src\Common.cs"/>
+    <Compile Include="src\CwaffEvents.cs"/>
     <Compile Include="src\Cwaff-Actives\AmazonPrimer.cs"/>
     <Compile Include="src\Cwaff-Actives\BulletThatCanKillTheFuture.cs"/>
     <Compile Include="src\Cwaff-Actives\GunPowderer.cs"/>
