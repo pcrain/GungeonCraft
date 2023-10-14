@@ -46,14 +46,13 @@ namespace CwaffingTheGungy
 
         // Gets a list of resource paths with numbered sprites from the resource's base name
         // Does not work with CreateProjectileAnimation(), which expects direct sprite names in the mod's "sprites" directory
-        public static List<string> Get(string resource)
+        public static List<string> Get(string resource, bool expectFailure = false)
         {
-            if (!_ResMap.ContainsKey(resource))
-            {
+            if (_ResMap.ContainsKey(resource))
+                return _ResMap[resource];
+            if (!expectFailure)
                 ETGModConsole.Log($"failed to retrieve \"{resource}\" from resmap");
-                return null;
-            }
-            return _ResMap[resource];
+            return null;
         }
 
         // Gets only the basenames for each item in a list of strings
@@ -123,7 +122,8 @@ namespace CwaffingTheGungy
             //         ETGModConsole.Log($"  {s}");
             // }
             watch.Stop();
-            ETGModConsole.Log($"Built resource map in {watch.ElapsedMilliseconds} milliseconds");
+            if (C.DEBUG_BUILD)
+                ETGModConsole.Log($"Built resource map in {watch.ElapsedMilliseconds} milliseconds");
         }
     }
 

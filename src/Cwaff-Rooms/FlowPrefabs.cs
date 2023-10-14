@@ -346,7 +346,7 @@ namespace CwaffingTheGungy {
             CatacombsDungeonPrefab = null;
             NakatomiDungeonPrefab = null;
 
-            ETGModConsole.Log("InitCustomPrefabs finished");
+            // ETGModConsole.Log("InitCustomPrefabs finished");
         }
     }
 }

@@ -155,17 +155,17 @@ namespace CwaffingTheGungy
                 beamAnimationPaths          : ResMap.Get($"{spriteName}_mid"),
                 beamFPS                     : fps,
                 //Impact
-                impactVFXAnimationPaths     : ResMap.Get($"{spriteName}_impact"),
+                impactVFXAnimationPaths     : ResMap.Get($"{spriteName}_impact", expectFailure: true),
                 beamImpactFPS               : (impactFps > 0) ? impactFps : fps,
                 impactVFXColliderDimensions : impactDims,
                 impactVFXColliderOffsets    : impactOffsets,
                 //End
-                endVFXAnimationPaths        : ResMap.Get($"{spriteName}_end"),
+                endVFXAnimationPaths        : ResMap.Get($"{spriteName}_end", expectFailure: true),
                 beamEndFPS                  : fps,
                 endVFXColliderDimensions    : dims,
                 endVFXColliderOffsets       : offsets,
                 //Beginning
-                muzzleVFXAnimationPaths     : ResMap.Get($"{spriteName}_start"),
+                muzzleVFXAnimationPaths     : ResMap.Get($"{spriteName}_start", expectFailure: true),
                 beamMuzzleFPS               : fps,
                 muzzleVFXColliderDimensions : dims,
                 muzzleVFXColliderOffsets    : offsets //,

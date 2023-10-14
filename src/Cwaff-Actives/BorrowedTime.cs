@@ -44,7 +44,6 @@ namespace CwaffingTheGungy
 
             _EmptyId = item.sprite.spriteId;
             _FullId  = SpriteBuilder.AddSpriteToCollection(ResMap.Get("borrowed_time_full_icon")[0], item.sprite.Collection);
-            ETGModConsole.Log($"full id is {_FullId}");
         }
 
         public override void Pickup(PlayerController player)

@@ -921,7 +921,8 @@ namespace CwaffingTheGungy
       string realPath = resourcePath.Replace('/', '.') + ".";
 
       // Load all of our sprites into a dictionary of ordered lists of names
-      ETGModConsole.Log($"loading sprites from {resourcePath}");
+      if (C.DEBUG_BUILD)
+        ETGModConsole.Log($"loading sprites from {resourcePath}");
       Dictionary<string,string[]> spriteMaps = new Dictionary<string,string[]>();
       foreach (string s in ResourceExtractor.GetResourceNames())
       {
