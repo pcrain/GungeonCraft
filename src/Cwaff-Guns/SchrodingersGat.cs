@@ -80,7 +80,7 @@ namespace CwaffingTheGungy
 
         internal static void CheckFromQuantumEnemyOwner(Projectile p)
         {
-            if (p.Owner is not AIActor enemy)
+            if (!p || p.Owner is not AIActor enemy)
                 return;
             if (!(enemy.gameObject.GetComponent<SchrodingersStat>()?.IsActuallyDead() ?? false))
                 return;
