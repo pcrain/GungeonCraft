@@ -148,6 +148,8 @@ namespace CwaffingTheGungy
             Vector2 victimPos = this._slapVictim.sprite.WorldCenter;
             foreach (AIActor enemy in StaticReferenceManager.AllEnemies)
             {
+                if (!enemy.IsHostileAndNotABoss(canBeNeutral: true))
+                    continue;
                 if (enemy?.healthHaver is not HealthHaver hh)
                     continue;
                 if ((enemy.sprite.WorldCenter - victimPos).magnitude > _SLAPP_RADIUS_SQUARED)
