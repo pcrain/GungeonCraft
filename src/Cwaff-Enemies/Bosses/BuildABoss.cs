@@ -205,7 +205,7 @@ namespace CwaffingTheGungy
     {
       GameManager.Instance.MainCameraController.OverridePosition = this.sprite.transform.localPosition;
       GameManager.Instance.MainCameraController.SetManualControl(true, true);
-      yield return StartCoroutine(Prompt("fight this guy", "don't fight this guy"));
+      yield return Prompt("fight this guy", "don't fight this guy");
       if (PromptResult() == 0) // accept
         StartBossFight();
     }

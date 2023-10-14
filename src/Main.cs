@@ -255,7 +255,8 @@ namespace CwaffingTheGungy
                 // ETGMod.StartGlobalCoroutine(this.delayedstarthandler());
 
                 watch.Stop();
-                AkSoundEngine.PostEvent("vc_kirby_appeal01", ETGModMainBehaviour.Instance.gameObject);
+                if (C.DEBUG_BUILD)
+                    AkSoundEngine.PostEvent("vc_kirby_appeal01", ETGModMainBehaviour.Instance.gameObject);
                 ETGModConsole.Log("  Yay! :D CtG initialized in "+(watch.ElapsedMilliseconds/1000.0f)+" seconds");
 
                 // foreach (tk2dSpriteDefinition def in AmmonomiconController.ForceInstance.EncounterIconCollection.spriteDefinitions)

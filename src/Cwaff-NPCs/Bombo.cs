@@ -219,7 +219,7 @@ namespace CwaffingTheGungy
                 "Listen, I've got a *real* nice item for you.",
                 };
 
-            yield return StartCoroutine(Converse(conversation,"talker","idler"));
+            yield return StartCoroutine(Dialogue(conversation,"talker","idler"));
 
             GameObject bombyPos = new GameObject("ItemPoint3");
                 bombyPos.transform.parent = this.transform;
@@ -253,7 +253,7 @@ namespace CwaffingTheGungy
                 "No no, all I ask in return for this beautiful treasure...",
                 };
 
-            yield return StartCoroutine(Converse(conversation2,"point"));
+            yield return StartCoroutine(Dialogue(conversation2,"point"));
             base.aiAnimator.PlayUntilCancelled("sad");
             yield return new WaitForSeconds(0.4f);
 
@@ -261,17 +261,17 @@ namespace CwaffingTheGungy
                 "...is a little bit of self-sacrifice! Specifically your *" + sacNames[(int)item.sacType] + "*!",
                 "Of course I mean that figuratively, not literally.",
                 };
-            yield return StartCoroutine(Converse(conversation3,"point"));
+            yield return StartCoroutine(Dialogue(conversation3,"point"));
 
             List<string> conversation3b = new List<string> {
                 "(...kinda..............)",
                 };
-            yield return StartCoroutine(Converse(conversation3b,"sad"));
+            yield return StartCoroutine(Dialogue(conversation3b,"sad"));
 
             List<string> conversation3c = new List<string> {
                 "So whaddaya say?",
                 };
-            yield return StartCoroutine(Converse(conversation3c,"point"));
+            yield return StartCoroutine(Dialogue(conversation3c,"point"));
 
             GameManager.Instance.MainCameraController.SetManualControl(false, true);
             yield break;
@@ -490,12 +490,12 @@ namespace CwaffingTheGungy
             List<string> conversation = new List<string> {
                 "You like it, huh? So we got a deal?",
                 };
-            yield return StartCoroutine(Converse(conversation,"point"));
+            yield return StartCoroutine(Dialogue(conversation,"point"));
 
-            yield return StartCoroutine(Prompt(
+            yield return Prompt(
                 "sacrifice your [color #ff8888]"+sacNames[(int)f.sacType]+"[/color] ("+sacDescriptions[(int)f.sacType]+")",
                 "actually I rather like having my "+sacNames[(int)f.sacType]
-                ));
+                );
 
             if (PromptResult() == 1) //decline
             {
@@ -511,7 +511,7 @@ namespace CwaffingTheGungy
                 "It shouldn't hurt a bit! (...at least nobody's ever complained about it, anyhow.)",
                 "Here we go!!!",
                 };
-            yield return StartCoroutine(Converse(conversation2,"point"));
+            yield return StartCoroutine(Dialogue(conversation2,"point"));
 
             yield return StartCoroutine(SacrificeCutsceneScript(p));
             RandomSacrifice(p,f.sacType);

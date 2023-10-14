@@ -44,7 +44,8 @@ namespace CwaffingTheGungy
             };
             foreach(string c in defaultCompanions)
             {
-                ETGModConsole.Log("Making "+c+" pettable");
+                if (C.DEBUG_BUILD)
+                    ETGModConsole.Log("Making "+c+" pettable");
                 Gungeon.Game.Items[c].GetComponent<CompanionItem>().MakePettable(testPet,testPet2);
             }
         }

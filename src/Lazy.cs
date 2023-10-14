@@ -71,17 +71,20 @@ namespace CwaffingTheGungy
             if (item is Gun)
             {
                 IDs.Guns[baseItemName] = item.PickupObjectId; //register item in gun ID database
-                ETGModConsole.Log("Lazy Initialized Gun: "+baseItemName);
+                if (C.DEBUG_BUILD)
+                    ETGModConsole.Log("Lazy Initialized Gun: "+baseItemName);
             }
             else if (item is PlayerItem)
             {
                 IDs.Actives[baseItemName] = item.PickupObjectId; //register item in active ID database
-                ETGModConsole.Log("Lazy Initialized Active: "+baseItemName);
+                if (C.DEBUG_BUILD)
+                    ETGModConsole.Log("Lazy Initialized Active: "+baseItemName);
             }
             else
             {
                 IDs.Passives[baseItemName] = item.PickupObjectId; //register item in passive ID database
-                ETGModConsole.Log("Lazy Initialized Passive: "+baseItemName);
+                if (C.DEBUG_BUILD)
+                    ETGModConsole.Log("Lazy Initialized Passive: "+baseItemName);
             }
             return item;
         }

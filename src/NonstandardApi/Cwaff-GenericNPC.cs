@@ -237,7 +237,17 @@ namespace CwaffingTheGungy
             EndConversation();
         }
 
-        public IEnumerator Converse(List<string> dialogue, string talkAnimation = null, string pauseAnimation = null)
+        public void SetAnimation(string animation)
+        {
+            base.aiAnimator.PlayUntilCancelled(animation);
+        }
+
+        public Coroutine Converse(string dialogueLine, string talkAnimation = null, string pauseAnimation = null, string audioEvent =  null)
+        {
+            return StartCoroutine(Dialogue(new(){dialogueLine}, talkAnimation, pauseAnimation, audioEvent));
+        }
+
+        public IEnumerator Dialogue(List<string> dialogue, string talkAnimation = null, string pauseAnimation = null, string audioEvent =  null)
         {
             for (int ci = 0; ci < dialogue.Count; ++ci)
             {
@@ -247,6 +257,11 @@ namespace CwaffingTheGungy
                 this.ShowText(dialogue[ci]);
                 float timer = 0;
                 bool playingTalkingAnimation = true;
+                if (!string.IsNullOrEmpty(audioEvent))
+                {
+                    AkSoundEngine.PostEvent(audioEvent+"_stop_all", base.gameObject);
+                    AkSoundEngine.PostEvent(audioEvent, base.gameObject);
+                }
                 while (!BraveInput.GetInstanceForPlayer(this.m_interactor.PlayerIDX).ActiveActions.GetActionFromType(GungeonActions.GungeonActionType.Interact).WasPressed || timer < MIN_TEXTBOX_TIME)
                 {
                     timer += BraveTime.DeltaTime;
@@ -266,7 +281,12 @@ namespace CwaffingTheGungy
             yield break;
         }
 
-        public IEnumerator Prompt(string optionA, string optionB)
+        public Coroutine Prompt(string optionA, string optionB)
+        {
+            return StartCoroutine(Prompt_CR(optionA, optionB));
+        }
+
+        private IEnumerator Prompt_CR(string optionA, string optionB)
         {
             int selectedResponse = -1;
             GameUIRoot.Instance.DisplayPlayerConversationOptions(this.m_interactor, null, optionA, optionB);
@@ -294,7 +314,7 @@ namespace CwaffingTheGungy
                 "Neat huh?",
                 };
 
-            IEnumerator script = Converse(conversation,"talker","idler");
+            IEnumerator script = Dialogue(conversation,"talker","idler");
             while(script.MoveNext())
                 yield return script.Current;
 
@@ -307,9 +327,10 @@ namespace CwaffingTheGungy
             while (!GameUIRoot.Instance.GetPlayerConversationResponse(out selectedResponse))
                 yield return null;
 
-            IEnumerator prompt = Prompt("Very neat! :D","Not impressed. :/" + " (pay " + 99 + "[sprite \"hbux_text_icon\"] to disagree)");
-            while(prompt.MoveNext())
-                yield return prompt.Current;
+            // IEnumerator prompt = Prompt("Very neat! :D","Not impressed. :/" + " (pay " + 99 + "[sprite \"hbux_text_icon\"] to disagree)");
+            // while(prompt.MoveNext())
+            //     yield return prompt.Current;
+            yield return Prompt("Very neat! :D","Not impressed. :/" + " (pay " + 99 + "[sprite \"hbux_text_icon\"] to disagree)");
 
             this.ShowText((selectedResponse == 0) ? "Yay!" : "Aw ):",2f);
         }

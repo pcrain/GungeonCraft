@@ -12,8 +12,11 @@ public partial class SansBoss : AIActor
   private const  string BOSS_NAME              = "Sans Gundertale";
   private const  string SUBTITLE               = "Introducing...";
   private const  string SPRITE_PATH            = "CwaffingTheGungy/Resources/sans";
-  private static GameObject napalmReticle      = null;
-  private static AIBulletBank.Entry boneBullet = null;
+
+  private static GameObject _NapalmReticle      = null;
+  private static AIBulletBank.Entry _BoneBullet = null;
+
+  private const  int _SANS_HP = 60;
 
   public static PrototypeDungeonRoom SansBossRoom = null;
 
@@ -21,8 +24,8 @@ public partial class SansBoss : AIActor
   {
     BuildABoss bb = BuildABoss.LetsMakeABoss<BossBehavior>(bossname: BOSS_NAME, guid: BOSS_GUID, defaultSprite: $"{SPRITE_PATH}/sans_idle_1",
       hitboxSize: new IntVector2(8, 9), subtitle: SUBTITLE, bossCardPath: $"{SPRITE_PATH}_bosscard.png"); // Create our build-a-boss
-    bb.SetStats(health: 60, weight: 200f, speed: 0.4f, collisionDamage: 0f, hitReactChance: 0.05f, collisionKnockbackStrength: 0f,
-    // bb.SetStats(health: 1, weight: 200f, speed: 0.4f, collisionDamage: 0f, hitReactChance: 0.05f, collisionKnockbackStrength: 0f,
+    // bb.SetStats(health: _SANS_HP, weight: 200f, speed: 0.4f, collisionDamage: 0f, hitReactChance: 0.05f, collisionKnockbackStrength: 0f,
+    bb.SetStats(health: C.DEBUG_BUILD ? 1 : _SANS_HP, weight: 200f, speed: 0.4f, collisionDamage: 0f, hitReactChance: 0.05f, collisionKnockbackStrength: 0f,
       healthIsNumberOfHits: true, invulnerabilityPeriod: 1.0f);                // Set our stats
     bb.InitSpritesFromResourcePath(spritePath: SPRITE_PATH);                   // Set up our animations
       bb.AdjustAnimation(name: "idle",         fps:   12f, loop: true);        // Adjust some specific animations as needed
@@ -30,9 +33,10 @@ public partial class SansBoss : AIActor
       bb.AdjustAnimation(name: "decloak",      fps:    6f, loop: false);
       bb.AdjustAnimation(name: "teleport_in",  fps:   60f, loop: false);
       bb.AdjustAnimation(name: "teleport_out", fps:   60f, loop: false);
-      bb.SetIntroAnimations(introAnim: "decloak", preIntroAnim: "idle_cloak"); // Set up our intro animations (TODO: pre-intro not working???)
+      bb.SetIntroAnimations(introAnim: "idle", preIntroAnim: "idle"); // Set up our intro animations (TODO: pre-intro not working???)
+      // bb.SetIntroAnimations(introAnim: "decloak", preIntroAnim: "idle_cloak"); // Set up our intro animations (TODO: pre-intro not working???)
     bb.SetDefaultColliders(width: 15, height: 30, xoff: 24, yoff: 2);          // Set our default pixel colliders
-    bb.AddCustomIntro<BossIntro>();                                            // Add custom animation to the generic intro doer
+    bb.AddCustomIntro<SansIntro>();                                            // Add custom animation to the generic intro doer
     bb.MakeInteractible<SansNPC>(preFight: true, postFight: true) ;            // Add some pre-fight and post-fight dialogue
     bb.TargetPlayer();                                                         // Set up the boss's targeting scripts
     bb.AddCustomMusic(name: "electromegalo", loopAt: 152512, rewind: 137141);  // Add custom music for our boss
@@ -58,13 +62,13 @@ public partial class SansBoss : AIActor
   private static void InitPrefabs()
   {
     // Targeting reticle
-    napalmReticle = ResourceManager.LoadAssetBundle("shared_auto_002").LoadAsset<GameObject>("NapalmStrikeReticle").ClonePrefab();
-      napalmReticle.GetComponent<tk2dSlicedSprite>().SetSprite(VFX.SpriteCollection, VFX.sprites["reticle_white"]);
-      UnityEngine.Object.Destroy(napalmReticle.GetComponent<ReticleRiserEffect>());  // delete risers for use with DoomZoneGrowth component later
+    _NapalmReticle = ResourceManager.LoadAssetBundle("shared_auto_002").LoadAsset<GameObject>("NapalmStrikeReticle").ClonePrefab();
+      _NapalmReticle.GetComponent<tk2dSlicedSprite>().SetSprite(VFX.SpriteCollection, VFX.sprites["reticle_white"]);
+      UnityEngine.Object.Destroy(_NapalmReticle.GetComponent<ReticleRiserEffect>());  // delete risers for use with DoomZoneGrowth component later
     // Bone bullet
     Projectile boneBulletProjectile = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items.HegemonyRifle) as Gun, false);
       // boneBulletProjectile.BulletScriptSettings.preventPooling = true; // prevents shenanigans with OrangeAndBlue Bullet script causing permanent collision skips
-    boneBullet = new AIBulletBank.Entry(EnemyDatabase.GetOrLoadByGuid("1bc2a07ef87741be90c37096910843ab").bulletBank.GetBullet("reversible")) {
+    _BoneBullet = new AIBulletBank.Entry(EnemyDatabase.GetOrLoadByGuid("1bc2a07ef87741be90c37096910843ab").bulletBank.GetBullet("reversible")) {
       Name               = "getboned",
       PlayAudio          = false,
       BulletObject       = boneBulletProjectile.gameObject.ClonePrefab(),
@@ -91,7 +95,7 @@ public partial class SansBoss : AIActor
   private static GameObject DoomZone(Vector2 start, Vector2 target, float width, float lifetime = -1f, int growthTime = 1, string sprite = null)
   {
     Vector2 delta         = target - start;
-    GameObject reticle    = UnityEngine.Object.Instantiate(napalmReticle);
+    GameObject reticle    = UnityEngine.Object.Instantiate(_NapalmReticle);
     tk2dSlicedSprite quad = reticle.GetComponent<tk2dSlicedSprite>();
       if (sprite != null)
         quad.SetSprite(VFX.SpriteCollection, VFX.sprites[sprite]);
@@ -110,7 +114,7 @@ public partial class SansBoss : AIActor
 
     private void Start()
     {
-      this.aiActor.bulletBank.Bullets.Add(boneBullet);
+      this.aiActor.bulletBank.Bullets.Add(_BoneBullet);
       base.aiActor.healthHaver.forcePreventVictoryMusic = true; // prevent default floor theme from playing on death
       base.aiActor.healthHaver.OnPreDeath += (_) => {
         FlipSpriteIfNecessary(overrideFlip: false);
@@ -121,9 +125,10 @@ public partial class SansBoss : AIActor
         UnityEngine.Object.Destroy(aura.gameObject);
         aura = null;
 
+        bool success;
         Lazy.SpawnChestWithSpecificItem(
           pickup: ItemHelper.Get((Items)GasterBlaster.ID),
-          position: GameManager.Instance.PrimaryPlayer.CurrentRoom.GetRandomVisibleClearSpot(1, 1),
+          position: GameManager.Instance.PrimaryPlayer.CurrentRoom.GetCenteredVisibleClearSpot(2, 2, out success),
           overrideChestQuality: PickupObject.ItemQuality.S);
         // GameManager.Instance.RewardManager.SpawnTotallyRandomChest(GameManager.Instance.PrimaryPlayer.CurrentRoom.GetRandomVisibleClearSpot(1, 1)).IsLocked = false;
       };
@@ -165,7 +170,7 @@ public partial class SansBoss : AIActor
     }
   }
 
-  private class BossIntro : SpecificIntroDoer
+  private class SansIntro : SpecificIntroDoer
   {
     public override void PlayerWalkedIn(PlayerController player, List<tk2dSpriteAnimator> animators)
     {
