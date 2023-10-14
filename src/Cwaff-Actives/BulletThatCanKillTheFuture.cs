@@ -26,6 +26,7 @@ namespace CwaffingTheGungy
         public static string LongDescription  = "Any enemy shot with "+ItemName+" will not spawn for the rest of the run.\n\nVery little is known about this bullet, as few know it exists at all. It was originally given to Bello by a mysterious blue-clad skeleton, who claims to have found it behind the Hero Shrine in the Keep of the Lead Lord. It's almost as if it's calling out to be fired.";
 
         internal static tk2dBaseSprite _Sprite = null;
+        private static Hook _RevertLevelHook = null;
 
         private PlayerController _owner = null;
 
@@ -296,9 +297,44 @@ namespace CwaffingTheGungy
                 UnityEngine.Object.Destroy(clockhair.gameObject);
                 yield return new WaitForSeconds(0.25f);
                 // GameManager.Instance.LoadCustomFlowForDebug("simplest"); //TODO: rename later
+                string currentFloor = GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName;
+                // switch (currentFloor)
+                // {
+                //     default:
+                //     {
+                //         ETGModConsole.Log($"on floor {currentFloor}");
+                //         break;
+                //     }
+                // }
+
+
+                SansDungeon.NameOfPreviousFloor = currentFloor;
+                GameManager.Instance.OnNewLevelFullyLoaded += ForceElevatorToReturnToPreviousFloor;
                 GameManager.Instance.LoadCustomLevel("cg_sansfloor"); //TODO: rename later
             }
             yield break;
+        }
+
+        private static void ForceElevatorToReturnToPreviousFloor()
+        {
+            GameManager.Instance.OnNewLevelFullyLoaded -= ForceElevatorToReturnToPreviousFloor;
+            if (_RevertLevelHook != null)
+                _RevertLevelHook.Dispose();
+            _RevertLevelHook = new Hook(
+                typeof(ElevatorDepartureController).GetMethod("TransitionToDepart", BindingFlags.Instance | BindingFlags.NonPublic),
+                typeof(BulletThatCanKillTheFuture).GetMethod("TransitionToDepartHook", BindingFlags.Static | BindingFlags.NonPublic)
+                );
+        }
+
+        private static void TransitionToDepartHook(Action<ElevatorDepartureController, tk2dSpriteAnimator, tk2dSpriteAnimationClip> orig, ElevatorDepartureController self, tk2dSpriteAnimator animator, tk2dSpriteAnimationClip clip)
+        {
+            self.UsesOverrideTargetFloor = false;
+            if (GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName == "cg_sansfloor")
+                GameManager.Instance.InjectedLevelName = SansDungeon.NameOfPreviousFloor;
+
+            _RevertLevelHook.Dispose();
+            _RevertLevelHook = null;
+            orig(self, animator, clip);
         }
     }
 }

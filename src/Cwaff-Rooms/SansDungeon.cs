@@ -14,8 +14,17 @@ using MonoMod.RuntimeDetour;
 
 namespace CwaffingTheGungy
 {
+
+    /*
+        Valid level names:
+            tt_castle    // Keep of the Lead Lord
+            tt_catacombs
+        GameManager.Instance.InjectedLevelName =
+    */
+
     public class SansDungeon
     {
+        public static string NameOfPreviousFloor = ""; // used by Bullet That Can Kill the Future to set the floor elevator should take us to
         public static GameLevelDefinition FloorNameDefinition;
         public static GameObject GameManagerObject;
         public static tk2dSpriteCollectionData goheckyourself;
@@ -130,10 +139,7 @@ namespace CwaffingTheGungy
             };
             dungeon.ForceRegenerationOfCharacters = false;
             dungeon.ActuallyGenerateTilemap = true;
-            if (goheckyourself == null)
-            {
-                goheckyourself = RatDungeonPrefab.tileIndices.dungeonCollection;
-            }
+            goheckyourself ??= RatDungeonPrefab.tileIndices.dungeonCollection;
             dungeon.tileIndices = new TileIndices()
             {
                 // tilesetId = (GlobalDungeonData.ValidTilesets)CustomValidTilesets.FLOORNAMEGEON, //sets it to our floors CustomValidTileset
@@ -253,7 +259,7 @@ namespace CwaffingTheGungy
             dungeon.PrefabsToAutoSpawn = new GameObject[0];
 
             //include this for custom floor audio
-            dungeon.musicEventName = "sans"; // TODO: fix overlapping music
+            dungeon.musicEventName = "sans";
 
             CatacombsPrefab = null;
             RatDungeonPrefab = null;

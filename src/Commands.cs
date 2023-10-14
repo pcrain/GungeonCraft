@@ -18,7 +18,7 @@ namespace CwaffingTheGungy
             ETGModConsole.Commands.AddGroup("gg", delegate (string[] args)
             {
                 LootEngine.SpawnItem(
-                    PickupObjectDatabase.GetById(IDs.Pickups["echo_chamber"]).gameObject,
+                    PickupObjectDatabase.GetById(IDs.Pickups["bullet_that_can_kill_the_future"]).gameObject,
                     GameManager.Instance.PrimaryPlayer.CenterPosition,
                     Vector2.zero,
                     0);
@@ -72,10 +72,10 @@ namespace CwaffingTheGungy
                 GameManager.Instance.LoadCustomLevel("cg_sansfloor"); //TODO: rename later
             });
             // Another base command for loading my latest debug flow
-            ETGModConsole.Commands.AddGroup("ff", delegate (string[] args)
-            {
-                FlowCommands.LoadFlowFunction(new string[]{"Simplest"});
-            });
+            // ETGModConsole.Commands.AddGroup("ff", delegate (string[] args)
+            // {
+            //     FlowCommands.LoadFlowFunction(new string[]{"Simplest"});
+            // });
             // Another base command for testing npc shenanigans
             ETGModConsole.Commands.AddGroup("tt", delegate (string[] args)
             {
