@@ -8,7 +8,7 @@ using UnityEngine;
 namespace CwaffingTheGungy
 {
 
-  /* Animations:
+  /* Available Talking Animations:
     idle
     idle_calm     [eyes closed]
     idle_empty    [eyes angry]
@@ -18,17 +18,6 @@ namespace CwaffingTheGungy
     shrug         [eyes winking]
     shrug_calm    [eyes closed]
     shrug_glance  [eyes smug]
-
-    hey kid, how'd you manage to find me?
-    this place ain't exactly easy to get to.
-    that bello guy tip you off, or you just get here by luck?
-    ...eh, doesn't matter.
-    seems like you have some cool toys on you.
-    since you're here, wanna try my little test?
-    if you can manage to land a few hits on me, i'll give you something cool.
-    i don't have any guns on me, but i'll try to make it interesting.
-    and don't worry about holding back, i can handle myself.
-    whaddaya say, kid?
   */
 
   public class SansNPC : BossNPC

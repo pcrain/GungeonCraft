@@ -12,6 +12,7 @@ using Gungeon;
 using Dungeonator;
 using Alexandria.ItemAPI;
 using Alexandria.Misc;
+using NpcApi; // ETGMod.Databases.Strings.Core.AddComplex
 
 namespace CwaffingTheGungy
 {
@@ -25,6 +26,7 @@ namespace CwaffingTheGungy
         public static string ShortDescription = "Seriously, Don't Miss";
         public static string LongDescription  = "Any enemy shot with "+ItemName+" will not spawn for the rest of the run.\n\nVery little is known about this bullet, as few know it exists at all. It was originally given to Bello by a mysterious blue-clad skeleton, who claims to have found it behind the Hero Shrine in the Keep of the Lead Lord. It's almost as if it's calling out to be fired.";
 
+        internal static string _BelloItemHint = "A blue-clad skeleton stopped by earlier for some armor. I saw him walk behind the Hero Shrine and haven't seen him since.";
         internal static tk2dBaseSprite _Sprite = null;
         internal static bool _BulletSpawnedThisRun = false;
 
@@ -43,6 +45,9 @@ namespace CwaffingTheGungy
             _Sprite = item.sprite;
             CwaffEvents.OnRunStart += (_, _, _) => _BulletSpawnedThisRun = false;
             CwaffEvents.OnNewFloorFullyLoaded += SpawnFutureBullet;
+
+            // ETGMod.Databases.Strings.Core.AddComplex("#SHOP_RUNBASEDMULTILINE_GENERIC", "more words");
+            ETGMod.Databases.Strings.Core.AddComplex("#SHOP_RUNBASEDMULTILINE_STOPPER", _BelloItemHint);
         }
 
         private static void SpawnFutureBullet()

@@ -24,11 +24,16 @@ public partial class SansBoss : AIActor
   {
     BuildABoss bb = BuildABoss.LetsMakeABoss<BossBehavior>(bossname: BOSS_NAME, guid: BOSS_GUID, defaultSprite: $"{SPRITE_PATH}/sans_idle_1",
       hitboxSize: new IntVector2(8, 9), subtitle: SUBTITLE, bossCardPath: $"{SPRITE_PATH}_bosscard.png"); // Create our build-a-boss
-    // bb.SetStats(health: _SANS_HP, weight: 200f, speed: 0.4f, collisionDamage: 0f, hitReactChance: 0.05f, collisionKnockbackStrength: 0f,
-    bb.SetStats(health: C.DEBUG_BUILD ? 1 : _SANS_HP, weight: 200f, speed: 0.4f, collisionDamage: 0f, hitReactChance: 0.05f, collisionKnockbackStrength: 0f,
+    // bb.SetStats(health: C.DEBUG_BUILD ? 1 : _SANS_HP, weight: 200f, speed: 0.4f, collisionDamage: 0f, hitReactChance: 0.05f, collisionKnockbackStrength: 0f,
+    bb.SetStats(health: _SANS_HP, weight: 200f, speed: 0.4f, collisionDamage: 0f, hitReactChance: 0.05f, collisionKnockbackStrength: 0f,
       healthIsNumberOfHits: true, invulnerabilityPeriod: 1.0f);                // Set our stats
     bb.InitSpritesFromResourcePath(spritePath: SPRITE_PATH);                   // Set up our animations
-      bb.AdjustAnimation(name: "idle",         fps:   12f, loop: true);        // Adjust some specific animations as needed
+      bb.AdjustAnimation(name: "idle",         fps:    8f, loop: true);        // Adjust some specific animations as needed
+      bb.AdjustAnimation(name: "idle_glance",  fps:    8f, loop: true);
+      bb.AdjustAnimation(name: "idle_empty",   fps:    8f, loop: true);
+      bb.AdjustAnimation(name: "shrug",        fps:    8f, loop: true);
+      bb.AdjustAnimation(name: "shrug_calm",   fps:    8f, loop: true);
+      bb.AdjustAnimation(name: "shrug_glance", fps:    8f, loop: true);
       bb.AdjustAnimation(name: "idle_cloak",   fps:   12f, loop: true);
       bb.AdjustAnimation(name: "decloak",      fps:    6f, loop: false);
       bb.AdjustAnimation(name: "teleport_in",  fps:   60f, loop: false);
