@@ -87,6 +87,7 @@ public partial class SansBoss : AIActor
   }
 
   // Shoots undertale-esque blue / orange bullets from all directions
+  // NOTE: if you run into problems with all collisions being skipped, uncomment the boneBulletProjectile.BulletScriptSettings.preventPooling line in Sans.InitPrefabs()
   private class OrangeAndBlueScript : SecretBulletScript
   {
     private static readonly string orangeReticle = "reticle_orange";
