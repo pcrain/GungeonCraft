@@ -49,31 +49,27 @@ namespace CwaffingTheGungy
                 mod.cooldownTime        = 0.70f;
                 mod.angleVariance       = 10f;
 
+            Projectile projectile = mod.projectiles[0].ClonePrefab();
+                projectile.baseData.range = 999999f;
+                projectile.baseData.speed = 20f;
+                projectile.AddDefaultAnimation(AnimateBullet.CreateProjectileAnimation(
+                    ResMap.Get("bball").Base(),
+                    20, true, new IntVector2(24, 22),
+                    false, tk2dBaseSprite.Anchor.MiddleCenter,
+                    anchorsChangeColliders: false,
+                    fixesScales: true,
+                    overrideColliderPixelSize: new IntVector2(2, 2))); // prevent uneven colliders from glitching into walls
+                projectile.gameObject.AddComponent<TheBB>();
+
             mod.chargeProjectiles = new();
             for (int i = 0; i < _CHARGE_LEVELS.Length; i++)
             {
-                Projectile projectile = mod.projectiles[0].ClonePrefab();
-                if (i < mod.projectiles.Count)
-                    mod.projectiles[i] = projectile;
-                else
-                    mod.projectiles.Add(projectile);
-
-                projectile.baseData.range = 999999f;
-                projectile.baseData.speed = 20f;
-                projectile.AnimateProjectile(
-                    ResMap.Get("bball").Base(),
-                    20, true, new IntVector2(24, 22),
-                    false, tk2dBaseSprite.Anchor.MiddleCenter, true, false);
-
-                TheBB bb = projectile.gameObject.AddComponent<TheBB>();
-                    bb.chargeLevel = i+1;
-
-                ProjectileModule.ChargeProjectile chargeProj = new ProjectileModule.ChargeProjectile
-                {
-                    Projectile = projectile,
+                Projectile p = projectile.ClonePrefab();
+                p.gameObject.GetComponent<TheBB>().chargeLevel = i+1;
+                mod.chargeProjectiles.Add(new ProjectileModule.ChargeProjectile {
+                    Projectile = p,
                     ChargeTime = _CHARGE_LEVELS[i],
-                };
-                mod.chargeProjectiles.Add(chargeProj);
+                });
             }
 
             _FakeProjectile = Lazy.PrefabProjectileFromGun(gun);
@@ -98,12 +94,13 @@ namespace CwaffingTheGungy
 
     public class TheBB : MonoBehaviour
     {
-        private const float _BB_DAMAGE_SCALE = 2.0f;
-        private const float _BB_FORCE_SCALE  = 2.0f;
-        private const float _BB_SPEED_DECAY  = 3.0f;
-        private const float _BASE_EMISSION   = 3.0f;
-        private const float _EXTRA_EMISSION  = 30.0f;
-        private const float _BASE_ANIM_SPEED = 2.0f;
+        private const float _BB_DAMAGE_SCALE    = 2.0f;
+        private const float _BB_FORCE_SCALE     = 2.0f;
+        private const float _BB_SPEED_DECAY     = 3.0f;
+        private const float _BASE_EMISSION      = 3.0f;
+        private const float _EXTRA_EMISSION     = 30.0f;
+        private const float _BASE_ANIM_SPEED    = 2.0f;
+        private const float _BOUNCE_SPEED_DECAY = 0.9f;
 
         public int chargeLevel = 0;
 
@@ -111,6 +108,7 @@ namespace CwaffingTheGungy
         private PlayerController _owner;
         private float _lifetime = 0f;
         private float _maxSpeed = 0f;
+        private float _lastBounceTime = 0f;
 
         private void Start()
         {
@@ -119,6 +117,8 @@ namespace CwaffingTheGungy
                 this._owner = pc;
 
             this._projectile.collidesWithPlayer = true;
+            // this._projectile.DestroyMode = Projectile.ProjectileDestroyMode.DestroyComponent;
+            this._projectile.OnDestruction += CreateInteractible;
             this._maxSpeed = this._projectile.baseData.speed;
 
             this._projectile.sprite.usesOverrideMaterial = true;
@@ -141,7 +141,23 @@ namespace CwaffingTheGungy
 
         private void OnBounce()
         {
-            this._projectile.baseData.speed *= 0.9f;
+            this._projectile.baseData.speed *= _BOUNCE_SPEED_DECAY;
+        }
+
+        private void CreateInteractible(Projectile p)
+        {
+            MiniInteractable mi = MiniInteractable.CreateInteractableAtPosition(
+              this._projectile.sprite,
+              this._projectile.sprite.WorldCenter,
+              BBInteractScript);
+                mi.doHover = true;
+                mi.sprite.usesOverrideMaterial = true;
+                Material mat = mi.sprite.renderer.material;
+                    mat.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+                    mat.SetFloat("_EmissivePower", _BASE_EMISSION);
+                    mat.SetFloat("_EmissiveColorPower", 1.55f);
+                    mat.SetColor("_EmissiveColor", Color.magenta);
+            // UnityEngine.Object.Destroy(p.gameObject);
         }
 
         private void Update()
@@ -167,30 +183,14 @@ namespace CwaffingTheGungy
                 return;
             }
 
-            MiniInteractable mi = MiniInteractable.CreateInteractableAtPosition(
-              this._projectile.sprite,
-              this._projectile.sprite.WorldCenter,
-              BBInteractScript);
-                mi.doHover = true;
-                mi.sprite.usesOverrideMaterial = true;
-                Material mat = mi.sprite.renderer.material;
-                    mat.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-                    mat.SetFloat("_EmissivePower", _BASE_EMISSION);
-                    mat.SetFloat("_EmissiveColorPower", 1.55f);
-                    mat.SetColor("_EmissiveColor", Color.magenta);
-
-            this._projectile.DieInAir(true,false,false,true);
+            // CreateInteractible(this);
+            this._projectile.DieInAir(suppressInAirEffects: true);
             return;
         }
 
-        public IEnumerator BBInteractScript(MiniInteractable i, PlayerController p)
+        public static IEnumerator BBInteractScript(MiniInteractable i, PlayerController p)
         {
-            if (p != this._owner)
-            {
-                i.interacting = false;
-                yield break;
-            }
-            foreach (Gun gun in this._owner.inventory.AllGuns)
+            foreach (Gun gun in p.inventory.AllGuns)
             {
                 if (!gun.GetComponent<BBGun>())
                     continue;
@@ -203,6 +203,7 @@ namespace CwaffingTheGungy
                 break;
             }
             i.interacting = false;
+            yield break;
         }
     }
 }

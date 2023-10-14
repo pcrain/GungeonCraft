@@ -190,12 +190,7 @@ namespace CwaffingTheGungy
 
         public IEnumerator PickUpPlayingCardScript(MiniInteractable i, PlayerController p)
         {
-            if (p != this._owner)
-            {
-                i.interacting = false;
-                yield break;
-            }
-            foreach (Gun gun in this._owner.inventory.AllGuns)
+            foreach (Gun gun in p.inventory.AllGuns)
             {
                 if (!gun.GetComponent<Blackjack>())
                     continue;
@@ -209,6 +204,7 @@ namespace CwaffingTheGungy
                 break;
             }
             i.interacting = false;
+            yield break;
         }
     }
 }

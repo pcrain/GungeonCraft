@@ -110,6 +110,8 @@ namespace CwaffingTheGungy
 
     public override void OnDestroy()
     {
+      if (RoomHandler.unassignedInteractableObjects.Contains(this))
+          RoomHandler.unassignedInteractableObjects.Remove(this);
       base.OnDestroy();
     }
 
@@ -179,7 +181,8 @@ namespace CwaffingTheGungy
             iMini.transform.position      = Vector3.zero;
         MiniInteractable mini = iMini.AddComponent<MiniInteractable>();
             // NOTE: the below transform position absolutely has to be linked to a game object
-            iPos.transform.position.GetAbsoluteRoom().RegisterInteractable(mini);
+            if (!RoomHandler.unassignedInteractableObjects.Contains(mini))
+                RoomHandler.unassignedInteractableObjects.Add(mini);
             mini.interactionScript = iscript ?? DefaultInteractionScript;
             mini.Initialize(sprite);
         return mini;
