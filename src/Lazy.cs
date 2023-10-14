@@ -513,5 +513,14 @@ namespace CwaffingTheGungy
         {
             return NearestEnemyWithinConeOfVision(start, coneAngle, 360f, useNearestAngleInsteadOfDistance, ignoreWalls);
         }
+
+        public static Chest SpawnChestWithSpecificItem(PickupObject pickup, IntVector2 position, PickupObject.ItemQuality? overrideChestQuality = null)
+        {
+          Chest chestPrefab =
+            GameManager.Instance.RewardManager.GetTargetChestPrefab(overrideChestQuality ?? pickup.quality)
+            ?? GameManager.Instance.RewardManager.GetTargetChestPrefab(PickupObject.ItemQuality.B);
+          chestPrefab.forceContentIds = new(){pickup.PickupObjectId};
+          return Chest.Spawn(chestPrefab, position);
+        }
     }
 }

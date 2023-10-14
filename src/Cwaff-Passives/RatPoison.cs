@@ -32,7 +32,7 @@ namespace CwaffingTheGungy
             item.IgnoredByRat                  = true;
             item.ClearIgnoredByRatFlagOnPickup = false;
 
-            ratPoisonId   = IDs.Passives["rat_poison"];
+            ratPoisonId   = item.PickupObjectId;
             ratPoisonHook = new Hook(
                 typeof(PickupObject).GetMethod("ShouldBeTakenByRat", BindingFlags.Instance | BindingFlags.NonPublic),
                 typeof(RatPoison).GetMethod("ShouldBeTakenByRat", BindingFlags.Static | BindingFlags.Public)

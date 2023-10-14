@@ -26,13 +26,15 @@ namespace CwaffingTheGungy
         internal static Projectile _GasterBlast;
         internal static GameObject _GasterBlaster;
 
+        public static int ID;
+
         private bool _anyGunFiredInRoom = false;
         private PlayerController _owner = null;
 
         public static void Init()
         {
             PlayerItem item   = Lazy.SetupActive<GasterBlaster>(ItemName, SpritePath, ShortDescription, LongDescription);
-            item.quality      = PickupObject.ItemQuality.S;
+            item.quality      = PickupObject.ItemQuality.EXCLUDED;
             item.consumable   = false;
             item.CanBeDropped = true;
             item.SetCooldownType(ItemBuilder.CooldownType.Damage, 100f);
@@ -58,6 +60,8 @@ namespace CwaffingTheGungy
             PierceProjModifier pierce = _GasterBlast.gameObject.GetOrAddComponent<PierceProjModifier>();
                 pierce.penetration          = 100;
                 pierce.penetratesBreakables = true;
+
+            ID = item.PickupObjectId;
         }
 
         public override void Pickup(PlayerController player)

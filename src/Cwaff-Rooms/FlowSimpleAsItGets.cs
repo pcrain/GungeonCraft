@@ -126,7 +126,7 @@ namespace CwaffingTheGungy {
 
             m_CachedFlow.FirstNode = Node_00;
 
-            ETGModConsole.Log("loaded flow "+m_CachedFlow.name);
+            // ETGModConsole.Log("loaded flow "+m_CachedFlow.name);
 
             // FlowHelpers.PrintFlow(m_CachedFlow);
 

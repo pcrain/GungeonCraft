@@ -120,7 +120,12 @@ public partial class SansBoss : AIActor
         AkSoundEngine.PostEvent("sans", base.aiActor.gameObject);
         UnityEngine.Object.Destroy(aura.gameObject);
         aura = null;
-        GameManager.Instance.RewardManager.SpawnTotallyRandomChest(GameManager.Instance.PrimaryPlayer.CurrentRoom.GetRandomVisibleClearSpot(1, 1)).IsLocked = false;
+
+        Lazy.SpawnChestWithSpecificItem(
+          pickup: ItemHelper.Get((Items)GasterBlaster.ID),
+          position: GameManager.Instance.PrimaryPlayer.CurrentRoom.GetRandomVisibleClearSpot(1, 1),
+          overrideChestQuality: PickupObject.ItemQuality.S);
+        // GameManager.Instance.RewardManager.SpawnTotallyRandomChest(GameManager.Instance.PrimaryPlayer.CurrentRoom.GetRandomVisibleClearSpot(1, 1)).IsLocked = false;
       };
     }
 

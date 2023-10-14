@@ -26,6 +26,7 @@ namespace CwaffingTheGungy
         public static string LongDescription  = "Any enemy shot with "+ItemName+" will not spawn for the rest of the run.\n\nVery little is known about this bullet, as few know it exists at all. It was originally given to Bello by a mysterious blue-clad skeleton, who claims to have found it behind the Hero Shrine in the Keep of the Lead Lord. It's almost as if it's calling out to be fired.";
 
         internal static tk2dBaseSprite _Sprite = null;
+        internal static bool _BulletSpawnedThisRun = false;
         private static Hook _RevertLevelHook = null;
 
         private PlayerController _owner = null;
@@ -38,11 +39,15 @@ namespace CwaffingTheGungy
             item.CanBeDropped = true;
 
             _Sprite = item.sprite;
+            CwaffEvents.OnRunStart += (_, _, _) => _BulletSpawnedThisRun = false;
             CwaffEvents.OnNewFloorFullyLoaded += SpawnFutureBullet;
         }
 
         private static void SpawnFutureBullet()
         {
+            if (_BulletSpawnedThisRun)
+                return;
+
             // ETGModConsole.Log($"FULLY LOADED {GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName}");
             foreach (AdvancedShrineController a in StaticReferenceManager.AllAdvancedShrineControllers)
             {
@@ -57,6 +62,7 @@ namespace CwaffingTheGungy
                   force: 0).GetComponent<PickupObject>();
                     futureBullet.IgnoredByRat = true;
                     futureBullet.ClearIgnoredByRatFlagOnPickup = false;
+                _BulletSpawnedThisRun = true;
             }
         }
 
