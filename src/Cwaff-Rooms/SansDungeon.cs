@@ -24,7 +24,6 @@ namespace CwaffingTheGungy
 
     public class SansDungeon
     {
-        public static string NameOfPreviousFloor = ""; // used by Bullet That Can Kill the Future to set the floor elevator should take us to
         public static GameLevelDefinition FloorNameDefinition;
         public static GameObject GameManagerObject;
         public static tk2dSpriteCollectionData goheckyourself;

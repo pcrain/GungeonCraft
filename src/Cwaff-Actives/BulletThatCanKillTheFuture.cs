@@ -27,7 +27,9 @@ namespace CwaffingTheGungy
 
         internal static tk2dBaseSprite _Sprite = null;
         internal static bool _BulletSpawnedThisRun = false;
+
         private static Hook _RevertLevelHook = null;
+        private static string NameOfPreviousFloor = ""; // used to set the floor elevator should take us to
 
         private PlayerController _owner = null;
 
@@ -55,15 +57,23 @@ namespace CwaffingTheGungy
                     continue;
 
                 Vector3 pos = a.transform.position + (new Vector2(a.sprite.GetCurrentSpriteDef().position3.x/2, 6f)).ToVector3ZisY(0);
-                PickupObject futureBullet = LootEngine.SpawnItem(
+                GameObject futureBulletObject = LootEngine.SpawnItem(
                   item: PickupObjectDatabase.GetById(IDs.Pickups["bullet_that_can_kill_the_future"]).gameObject,
                   spawnPosition: pos,
                   spawnDirection: Vector2.zero,
-                  force: 0).GetComponent<PickupObject>();
+                  force: 0).gameObject;
+                PickupObject futureBullet = futureBulletObject.GetComponent<PickupObject>();
                     futureBullet.IgnoredByRat = true;
                     futureBullet.ClearIgnoredByRatFlagOnPickup = false;
+                    futureBullet.StartCoroutine(DelayedRemoveBulletFromMinimap(futureBulletObject));
                 _BulletSpawnedThisRun = true;
             }
+        }
+
+        private static IEnumerator DelayedRemoveBulletFromMinimap(GameObject futureBulletObject)
+        {
+            yield return null; // need to delay for a single frame for this to work properly
+            futureBulletObject.GetComponent<PlayerItem>().GetRidOfMinimapIcon();
         }
 
         public override void Pickup(PlayerController player)
@@ -322,7 +332,7 @@ namespace CwaffingTheGungy
             {
                 UnityEngine.Object.Destroy(clockhair.gameObject);
                 yield return new WaitForSeconds(0.25f);
-                SansDungeon.NameOfPreviousFloor = GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName;
+                NameOfPreviousFloor = GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName;
                 GameManager.Instance.OnNewLevelFullyLoaded += ForceElevatorToReturnToPreviousFloor;
                 GameManager.Instance.LoadCustomLevel("cg_sansfloor"); //TODO: rename later
             }
@@ -344,7 +354,7 @@ namespace CwaffingTheGungy
         {
             self.UsesOverrideTargetFloor = false;
             if (GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName == "cg_sansfloor")
-                GameManager.Instance.InjectedLevelName = SansDungeon.NameOfPreviousFloor;
+                GameManager.Instance.InjectedLevelName = NameOfPreviousFloor;
 
             _RevertLevelHook.Dispose();
             _RevertLevelHook = null;
