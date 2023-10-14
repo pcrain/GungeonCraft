@@ -50,12 +50,13 @@ namespace CwaffingTheGungy
                     continue;
 
                 Vector3 pos = a.transform.position + (new Vector2(a.sprite.GetCurrentSpriteDef().position3.x/2, 6f)).ToVector3ZisY(0);
-                DebrisObject futureBullet = LootEngine.SpawnItem(
-                    item: PickupObjectDatabase.GetById(IDs.Pickups["bullet_that_can_kill_the_future"]).gameObject,
-                    spawnPosition: pos,
-                    spawnDirection: Vector2.zero,
-                    force: 0);
-
+                PickupObject futureBullet = LootEngine.SpawnItem(
+                  item: PickupObjectDatabase.GetById(IDs.Pickups["bullet_that_can_kill_the_future"]).gameObject,
+                  spawnPosition: pos,
+                  spawnDirection: Vector2.zero,
+                  force: 0).GetComponent<PickupObject>();
+                    futureBullet.IgnoredByRat = true;
+                    futureBullet.ClearIgnoredByRatFlagOnPickup = false;
             }
         }
 
