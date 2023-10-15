@@ -56,13 +56,13 @@ namespace CwaffingTheGungy
             _BonfirePrefab   = (ItemHelper.Get(Items.GunSoul) as ExtraLifeItem).BonfireSynergyBonfire;
             _CampfirePrefabs = new GameObject[]{
                 VFX.RegisterVFXObject("CampfireA", ResMap.Get("campfire_a"),
-                    fps: 6, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.5f, emissivePower: 5f), // level 0 (unused)
+                    fps: 6, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.5f, emissivePower: 1f), // level 0 (unused)
                 VFX.RegisterVFXObject("CampfireB", ResMap.Get("campfire_b"),
-                    fps: 6, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.5f, emissivePower: 10f), // level 1
+                    fps: 6, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.5f, emissivePower: 2f), // level 1
                 VFX.RegisterVFXObject("CampfireC", ResMap.Get("campfire_c"),
-                    fps: 6, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.5f, emissivePower: 20f), // level 2
+                    fps: 6, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.5f, emissivePower: 3f), // level 2
                 VFX.RegisterVFXObject("CampfireD", ResMap.Get("campfire_d"),
-                    fps: 6, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.5f, emissivePower: 30f), // level 3
+                    fps: 6, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.5f, emissivePower: 4f), // level 3
             };
 
             _SodaCanPrefabs  = new GameObject[] {
@@ -157,6 +157,8 @@ namespace CwaffingTheGungy
 
         private void TossASodaCan()
         {
+            if (BraveTime.DeltaTime == 0.0f)
+                return; // don't toss cans while game is paused
             if (BraveTime.ScaledTimeSinceStartup - this._lastCanToss < _MAX_CAN_THROW_RATE)
                 return; // don't toss cans too frequently
             this._lastCanToss = BraveTime.ScaledTimeSinceStartup;
