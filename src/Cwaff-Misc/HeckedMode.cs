@@ -20,8 +20,82 @@ namespace CwaffingTheGungy
         public static bool HeckedModeEnabled = true;
 
         public readonly static List<int> HeckedModeGunWhiteList = new(){
-            (int)Items.HegemonyRifle,
+            // Unfair Hitscan D:
+            (int)Items.LightGun,
+            (int)Items.SniperRifle,
+
+            // Terrifying O.O
+            (int)Items.Com4nd0,
+            (int)Items.RubeAdyneMk2,
+            (int)Items.VulcanCannon,
+            (int)Items.RobotsLeftHand,
+            (int)Items.GrenadeLauncher,
+            (int)Items.YariLauncher,
+            (int)Items.VoidMarshal,
+            (int)Items.SunlightJavelin,
+
+            // Ouchie
+            (int)Items.Siren,
+            (int)Items.FrostGiant,
+            (int)Items.Hexagun,
+            (int)Items.PlaguePistol,
+            (int)Items.Trashcannon,
+            (int)Items.H4mmer,
+            (int)Items.NailGun,
+            (int)Items.Blooper,
+            (int)Items.BeeHive,
+            (int)Items.Thompson,
+            (int)Items.Slinger,
             (int)Items.Ak47,
+            (int)Items.ElephantGun,
+            (int)Items.FlameHand,
+            (int)Items.Cactus,
+            (int)Items.WindUpGun,
+            (int)Items.Origuni,
+            (int)Items.Snowballer,
+
+            // Balanced Enough
+            (int)Items.BalloonGun,
+            (int)Items.Tetrominator,
+            (int)Items.PulseCannon,
+            (int)Items.Rpg,
+            (int)Items.HegemonyRifle,
+            (int)Items.Polaris,
+            (int)Items.Winchester,
+            (int)Items.StickyCrossbow,
+            (int)Items.Patriot,  // doesn't increase in speed like the player's
+            (int)Items.Stinger,
+            (int)Items.Shotbow,
+            (int)Items.Mahoguny,
+
+            // Goofy
+            (int)Items.MolotovLauncher,
+            (int)Items.BubbleBlaster,
+
+            // Semi-broken
+            (int)Items.Mailbox, // final package projectile doesn't seem to work quite right
+            (int)Items.VoidCoreAssaultRifle, // slow shoot speed, burst not respected
+            (int)Items.AlienSidearm, // only fires the large scary projectiles
+            (int)Items.Blunderbuss, // only puts out one projectile
+            (int)Items.Jk47, // very noisy on floor entrance, but seems fine otherwise
+
+            // Beeg broken
+            (int)Items.SkullSpitter, // invariably homes in on other enemies
+            (int)Items.AlienEngine, // AI doesn't fire until getting really close, and behaviorspeculators mess up from there
+            (int)Items.LowerCaseR, // bursts don't seem to work quite right, no sound effects
+            (int)Items.DirectionalPad, // same as lowercaser
+            (int)Items.Railgun, // completely non-functional, doesn't even appear on enemy sprites
+            (int)Items.PrototypeRailgun,  // same as railgun
+            (int)Items.CobaltHammer, // enemies literally just self-destruct. would put it in goofy, but this has no function
+            (int)Items.CrownOfGuns, // doesn't appear on heads, behaviorspeculators mess up eventually
+
+            // Beam broken
+            (int)Items.Disintegrator, // beams stay in place on screen after firing and loop their firing sound nonstop o.o
+            (int)Items.ProtonBackpack,  // beams weapons are very evidently a mistake
+            (int)Items.ScienceCannon, // yup, still bad
+
+            // Testing
+            // (int)Items.
         };
 
         private static Hook _EnemyAwakeHook;
@@ -94,7 +168,7 @@ namespace CwaffingTheGungy
             Gun replacementGun = ItemHelper.Get(replacementGunId) as Gun;
             // replacementGun.enemyPreFireAnimation = null;
 
-            if ((enemy.EnemyGuid != Enemies.BulletKin || (enemy.aiShooter is not AIShooter shooter)))
+            if (/*(enemy.EnemyGuid != Enemies.BulletKin) ||*/ (enemy.aiShooter is not AIShooter shooter))
             {
                 action(enemy);
                 return;
