@@ -33,21 +33,21 @@ namespace CwaffingTheGungy
         private Shader _originalShader;
         private RoomHandler _phasedRoom;
 
-        private static int astralProjectorId;
+        private static int _AstralProjectorId;
         // private static Hook astralProjectorHook;
-        private static ILHook astralProjectorILHook;
+        private static ILHook _AstralProjectorILHook;
 
         public static void Init()
         {
             PickupObject item  = Lazy.SetupPassive<AstralProjector>(ItemName, SpritePath, ShortDescription, LongDescription);
             item.quality       = PickupObject.ItemQuality.A;
 
-            astralProjectorId   = item.PickupObjectId;
+            _AstralProjectorId   = item.PickupObjectId;
             // astralProjectorHook = new Hook(
             //     typeof(PlayerController).GetMethod("HandlePlayerInput", BindingFlags.Instance | BindingFlags.NonPublic),
             //     typeof(AstralProjector).GetMethod("HandlePlayerPhasingInput", BindingFlags.Static | BindingFlags.NonPublic)
             //     );
-            astralProjectorILHook = new ILHook(
+            _AstralProjectorILHook = new ILHook(
                 typeof(PlayerController).GetMethod("HandlePlayerInput", BindingFlags.Instance | BindingFlags.NonPublic),
                 HandlePlayerPhasingInputIL
                 );
@@ -159,7 +159,7 @@ namespace CwaffingTheGungy
         */
         public static float PreventRigidbodyCastDuringHandlePlayerInput(PlayerController pc, float inValue)
         {
-            if (pc.passiveItems.Contains(astralProjectorId))
+            if (pc.passiveItems.Contains(_AstralProjectorId))
                 return inValue > 0 ? 999f : -999f; // replace the value we're checking against with something absurdly high so we avoid doing RigidBodyCasts
             return inValue; // return the original value
         }

@@ -118,6 +118,7 @@ namespace CwaffingTheGungy
                     FourDBullets.Init();
                     AstralProjector.Init();
                     EchoChamber.Init();
+                    BionicFinger.Init();
                 #endregion
 
                 #region Guns

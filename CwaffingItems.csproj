@@ -55,6 +55,7 @@
     <Compile Include="src\Cwaff-Passives\FourDBullets.cs"/>
     <Compile Include="src\Cwaff-Passives\WeddingRing.cs"/>
     <Compile Include="src\Cwaff-Passives\VoodooDoll.cs"/>
+    <Compile Include="src\Cwaff-Passives\BionicFinger.cs"/>
     <Compile Include="src\Cwaff-Passives\UtilityVest.cs"/>
     <Compile Include="src\Cwaff-Passives\CuratorsBadge.cs"/>
     <Compile Include="src\Cwaff-Passives\Blazer.cs"/>
@@ -1535,6 +1536,7 @@
     <EmbeddedResource Include="Resources\ItemSprites\cool_ball_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\voodoo_doll_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\rat_poison_icon.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\bionic_finger_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\gorgun_eye_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\borrowed_time_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\blazer_icon.png"/>
