@@ -97,7 +97,7 @@ namespace CwaffingTheGungy
         public IEnumerator DelayedTrigger_CR()
         {
             GameObject v = SpawnManager.SpawnVFX(EchoChamber._EchoPrefab, this._echoPosition, Quaternion.identity);
-                v.ExpireIn(seconds: 1.5f, fadeFor: 1.5f, startAlpha: 0.25f, shrink: true);
+                v.ExpireIn(seconds: 2.0f, fadeFor: 2.0f, startAlpha: 0.25f, shrink: true);
 
             float baseDamageScale = 0.5f;
             float baseSpeedScale = 1.0f;
@@ -147,6 +147,7 @@ namespace CwaffingTheGungy
             echo.SendInDirection(this._echoVelocity, true);
             echo.UpdateSpeed();
 
+            echo.gameObject.ExpireIn(seconds: 0.5f, fadeFor: 0.5f, startAlpha: Mathf.Sqrt(damageScale));
             echo.sprite.gameObject.ExpireIn(seconds: 0.5f, fadeFor: 0.5f, startAlpha: Mathf.Sqrt(damageScale));
         }
     }

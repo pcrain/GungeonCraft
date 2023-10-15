@@ -48,6 +48,7 @@ namespace CwaffingTheGungy
             ProjectileModule mod = gun.DefaultModule;
                 mod.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
                 mod.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
+                mod.ammoType               = GameUIAmmoType.AmmoType.BEAM;
                 mod.cooldownTime           = 0.1f;
                 mod.numberOfShotsInClip    = 99999;
 
