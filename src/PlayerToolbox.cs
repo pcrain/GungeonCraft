@@ -24,6 +24,7 @@ namespace CwaffingTheGungy
             playerStartHook = new Hook(
                 typeof(PlayerController).GetMethod("Start", BindingFlags.Public | BindingFlags.Instance),
                 typeof(PlayerToolsSetup).GetMethod("DoSetup"));
+
             enemySpawnHook = new Hook(
                 typeof(AIActor).GetMethod("Start", BindingFlags.Public | BindingFlags.Instance),
                 typeof(CwaffToolbox).GetMethod("OnEnemyPreSpawn"));
@@ -55,10 +56,6 @@ namespace CwaffingTheGungy
             eeveeTexture = ResourceManager.LoadAssetBundle("shared_auto_001").LoadAsset<Texture2D>("nebula_reducednoise");
 
             enemyWithoutAFuture = ""; //reset so enemies don't stay dead between runs
-        }
-
-        private void Update()
-        {
         }
 
         public static void OnEnemyPreSpawn(Action<AIActor> action, AIActor enemy)

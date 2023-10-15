@@ -214,13 +214,14 @@
     <Compile Include="src\PlayerToolbox.cs"/>
     <Compile Include="src\NonstandardApi\FakeShopItem.cs"/>
     <Compile Include="src\NonstandardApi\CustomDodgeRoll.cs"/>
+    <Compile Include="src\NonstandardApi\MiniInteractable.cs"/>
     <Compile Include="src\NonstandardApi\Cwaff-GenericNPC.cs"/>
     <Compile Include="src\Databases.cs"/>
     <Compile Include="src\SharedItemBehaviors.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffTweaks.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffSynergies.cs"/>
+    <Compile Include="src\Cwaff-Misc\HeckedMode.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffHUD.cs"/>
-    <Compile Include="src\Cwaff-Misc\MiniInteractable.cs"/>
     <Compile Include="src\VFXToolbox.cs"/>
     <Compile Include="src\Main.cs"/>
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_fire_005.json"/>

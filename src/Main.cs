@@ -252,6 +252,7 @@ namespace CwaffingTheGungy
                 CustomNoteDoer.Init();
                 CustomDodgeRoll.InitCustomDodgeRollHooks();
                 CwaffTweaks.Init();
+                HeckedMode.Init();
 
                 // ETGMod.StartGlobalCoroutine(this.delayedstarthandler());
 
