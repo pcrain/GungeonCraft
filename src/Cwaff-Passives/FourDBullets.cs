@@ -19,8 +19,8 @@ namespace CwaffingTheGungy
     {
         public static string ItemName         = "4D Bullets";
         public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/4d_bullets_icon";
-        public static string ShortDescription = "Thinking Outside the Tesseract";
-        public static string LongDescription  = "Bullets can phase through the inner walls of a room, but lose half their power for every wall they phase through.\n\n";
+        public static string ShortDescription = "No-Clipping Clips"; //"Thinking Outside the Tesseract";
+        public static string LongDescription  = "Bullets can phase through the inner walls of a room, but lose half their power for every wall they phase through.\n\nWall hacks are almost universally despised for the completely one-sided advantage they give to those who possess them. Although most Gungeoneers aren't concerned for the Gundead's feelings, wall hacks also unfortuntaely don't exist in the real world. Historical attempts to create guns and gadgets that emulate wall hacks have generally ended in the loss of lives and, in some extreme cases, the loss of some pretty nice guns. The latest generation of technology has at least partially succeeded in emulating wall hacks by augmenting guns to shoot bullets into the 4th dimension. However, due to most Gungeoneers' inability to see said 4th dimension, their bullets tend to ricochet off walls in 4D space, losing a lot of their oomph in the process.";
 
         internal const float _PHASE_DAMAGE_SCALING = 0.5f;
 
@@ -61,7 +61,6 @@ namespace CwaffingTheGungy
         private Projectile _projectile;
         private PlayerController _owner;
         private RoomHandler _startingRoom;
-        private Shader _originalShader;
 
         private bool _leftStartingRoom = false;
         private bool _collidedWithWall = false;
@@ -73,19 +72,15 @@ namespace CwaffingTheGungy
             this._projectile = base.GetComponent<Projectile>();
             this._owner = this._projectile.Owner as PlayerController;
 
-            // this._projectile.BulletScriptSettings.surviveTileCollisions = true;
             this._startingRoom = this._projectile.transform.position.GetAbsoluteRoom();
             this._projectile.specRigidbody.OnPreTileCollision += this.OnPreTileCollision;
-            this._originalShader = this._projectile.sprite.renderer.material.shader;
-
-            // DoPhaseFX();
         }
 
         private void OnPreTileCollision(SpeculativeRigidbody me, PixelCollider myPixelCollider, PhysicsEngine.Tile other, PixelCollider otherPixelCollider)
         {
             RoomHandler currentRoom = this._projectile.transform.position.GetAbsoluteRoom();
             if (currentRoom != this._startingRoom)
-                return;
+                return; // left our original room
 
             if (!currentRoom.GetBoundingRect().Inset(_INSET).Contains(this._projectile.transform.position))
                 return; // outside the room

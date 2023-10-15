@@ -13,14 +13,16 @@ using Dungeonator;
 using Alexandria.ItemAPI;
 using Alexandria.Misc;
 
+//
+
 namespace CwaffingTheGungy
 {
     public class EchoChamber : PassiveItem
     {
         public static string ItemName         = "Echo Chamber";
         public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/echo_chamber_icon";
-        public static string ShortDescription = "TBD";
-        public static string LongDescription  = "TBD";
+        public static string ShortDescription = "Primed and Corrupted";
+        public static string LongDescription  = "Fired projectiles leave echoes that shoot weakened duplicates of the original projectile for a few seconds.\n\nMuch like their owners, guns have memories, albeit limited and imperfect ones. The Hollowpoint that possesses this chamber is able to tap into these memories to manifest spectres of recently-fired projectiles. While the quality of these spectral projectiles may not be up to par with the originals in every conceivable way, one ought to count their blessings that the Hollowpoint is inadvertently helping at all.";
 
         internal static Projectile _FlakProjectile;
         internal static GameObject _EchoPrefab;
@@ -32,7 +34,6 @@ namespace CwaffingTheGungy
 
             _FlakProjectile = (ItemHelper.Get(Items.FlakBullets) as ComplexProjectileModifier).CollisionSpawnProjectile;
             _EchoPrefab = VFX.RegisterVFXObject("Echo", ResMap.Get("echo_effect"), 16, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
-
         }
 
         public override void Pickup(PlayerController player)
@@ -57,7 +58,7 @@ namespace CwaffingTheGungy
     {
         private const float _DAMAGE_SCALE = 0.5f;
         private const int _NUM_ECHOS = 3;
-        private const float _INITIAL_DELAY = 1f / 6f;
+        private const float _INITIAL_DELAY = 1f / 4f;
         private const float _DELAY_SCALE = 2f;
 
         private Projectile _projectile;
@@ -146,10 +147,7 @@ namespace CwaffingTheGungy
             echo.SendInDirection(this._echoVelocity, true);
             echo.UpdateSpeed();
 
-            echo.sprite.gameObject.AddComponent<EchoedProjectile>();
             echo.sprite.gameObject.ExpireIn(seconds: 0.5f, fadeFor: 0.5f, startAlpha: Mathf.Sqrt(damageScale));
-            // AkSoundEngine.PostEvent("deadline_fire_sound_stop_all", this._owner.gameObject);
-            // AkSoundEngine.PostEvent("deadline_fire_sound", this._owner.gameObject);
         }
     }
 
@@ -169,30 +167,6 @@ namespace CwaffingTheGungy
             this._spawner
                 .Setup(this._projectile, this._owner)
                 .DelayedTrigger();
-            // this._projectile.specRigidbody.OnCollision += this.OnCollision;
-        }
-
-        private void OnCollision(CollisionData tileCollision)
-        {
-            this._spawner.Trigger();
-        }
-    }
-
-    public class EchoedProjectile : MonoBehaviour
-    {
-        private Projectile _projectile;
-        private PlayerController _owner;
-        private void Start()
-        {
-            this._projectile = base.GetComponent<Projectile>();
-            this._owner = this._projectile.Owner as PlayerController;
-
-            // AkSoundEngine.PostEvent("deadline_fire_sound", base.gameObject);
-        }
-
-        private void Update()
-        {
-          // enter update code here
         }
     }
 }

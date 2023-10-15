@@ -22,7 +22,8 @@ namespace CwaffingTheGungy
 {
     public class C // constants
     {
-        public const bool   DEBUG_BUILD     = true; // set to false for release builds
+        public static readonly bool DEBUG_BUILD = true; // set to false for release builds (must be readonly instead of const to avoid build warnings)
+
         public const string MOD_PREFIX      = "cg";
         public const float  PIXELS_PER_TILE = 16f;
         public const float  PIXELS_PER_CELL = 64f;
