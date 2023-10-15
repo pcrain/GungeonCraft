@@ -211,7 +211,25 @@ namespace CwaffingTheGungy
                 {
                     try
                     {
-                        ETGModConsole.Log($"  {c.Offset} ... {c.OpCode.Name} ... {c.Operand.ToStringSafe()}");
+                        ILLabel label = null;
+                        if (label == null) c.MatchBr(out label);
+                        if (label == null) c.MatchBeq(out label);
+                        if (label == null) c.MatchBge(out label);
+                        if (label == null) c.MatchBgeUn(out label);
+                        if (label == null) c.MatchBgt(out label);
+                        if (label == null) c.MatchBgtUn(out label);
+                        if (label == null) c.MatchBle(out label);
+                        if (label == null) c.MatchBleUn(out label);
+                        if (label == null) c.MatchBlt(out label);
+                        if (label == null) c.MatchBltUn(out label);
+                        if (label == null) c.MatchBrfalse(out label);
+                        if (label == null) c.MatchBrtrue(out label);
+                        if (label == null) c.MatchBneUn(out label);
+                        if (label != null)
+                            ETGModConsole.Log($"  IL_{c.Offset.ToString("x4")}: {c.OpCode.Name} IL_{label.Target.Offset.ToString("x4")}");
+                        else
+                            ETGModConsole.Log($"[UNKNOWN INSTRUCTION]");
+                            // ETGModConsole.Log($"  IL_{c.Offset.ToString("x4")}: {c.OpCode.Name} {c.Operand.ToStringSafe()}");
                     }
                     catch (Exception)
                     {
