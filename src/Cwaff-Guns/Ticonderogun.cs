@@ -20,15 +20,14 @@ namespace CwaffingTheGungy
         public static string ItemName         = "Ticonderogun";
         public static string SpriteName       = "ticonderogun";
         public static string ProjectileName   = "38_special";
-        public static string ShortDescription = "Creative Juices Flowing";
-        public static string LongDescription  = "TBD\n\n+1 Curse";
-
-        // internal static tk2dSpriteAnimationClip _BulletSprite;
+        public static string ShortDescription = "Cursed Canvas";
+        public static string LongDescription  = "TBD\n\n+2 Curse";
 
         private const float _MIN_SEGMENT_DIST    = 0.5f;
         private const float _DRAW_RATE           = 0.2f;
         private const int   _POINT_CAP           = 40;
         private const float _BASE_DAMAGE         = 10f;
+        private const float _AMMO_DRAIN_TIME     = 1f; // how frequently we lose ammo
 
         private static GameObject _VFXPrefab     = null;
 
@@ -38,6 +37,7 @@ namespace CwaffingTheGungy
         private bool _isCharging                 = false;
         private float _lastDrawTime              = 0f;
         private float _maxDistanceFromFirstPoint = 0f;
+        private float _timeCharging              = 0f;
 
         private Vector2 _cameraPositionAtChargeStart;
         private Vector2 _playerPositionAtChargeStart;
@@ -47,31 +47,28 @@ namespace CwaffingTheGungy
             Gun gun = Lazy.SetupGun<Ticonderogun>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
                 gun.reloadTime                        = 1.2f;
                 gun.quality                           = PickupObject.ItemQuality.A;
-                gun.SetBaseMaxAmmo(60);
+                gun.SetBaseMaxAmmo(150);
                 gun.SetAnimationFPS(gun.shootAnimation, 30);
                 gun.SetAnimationFPS(gun.reloadAnimation, 40);
                 gun.ClearDefaultAudio();
                 gun.SetFireAudio("blowgun_fire_sound");
                 gun.SetReloadAudio("blowgun_reload_sound");
-                gun.AddStatToGun(PlayerStats.StatType.Curse, 1f, StatModifier.ModifyMethod.ADDITIVE);
+                gun.AddStatToGun(PlayerStats.StatType.Curse, 2f, StatModifier.ModifyMethod.ADDITIVE);
 
             ProjectileModule mod = gun.DefaultModule;
-                mod.ammoCost            = 1;
+                mod.ammoCost            = 0;
                 mod.ammoType            = GameUIAmmoType.AmmoType.BEAM;
                 mod.shootStyle          = ProjectileModule.ShootStyle.Charged;
                 mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
                 mod.cooldownTime        = 0.1f;
-                mod.numberOfShotsInClip = 1;
-
-            // _BulletSprite = AnimateBullet.CreateProjectileAnimation(
-            //     ResMap.Get("tranquilizer_projectile").Base(),
-            //     12, true, new IntVector2(13, 9),
-            //     false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
+                mod.numberOfShotsInClip = -1;
 
             // Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
             //     projectile.AddDefaultAnimation(_BulletSprite);
             //     projectile.transform.parent = gun.barrelOffset;
             //     projectile.gameObject.AddComponent<TranquilizerBehavior>();
+
+            _VFXPrefab = VFX.RegisterVFXObject("PencilSparkles", ResMap.Get("pencil_sparkles"), 12, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
         }
 
         protected override void Update()
@@ -90,6 +87,10 @@ namespace CwaffingTheGungy
                     EndCharge();
                 return;
             }
+
+            if (this.gun.CurrentAmmo == 0)
+                return;
+
             if (!this._isCharging)
                 BeginCharge();
             ContinueCharge();
@@ -97,7 +98,6 @@ namespace CwaffingTheGungy
 
         private void DrawVFXAtExtantPoints()
         {
-            _VFXPrefab ??= VFX.animations["MiniPickup"];
             float time = BraveTime.ScaledTimeSinceStartup;
             if (this._lastDrawTime + _DRAW_RATE > time)
                 return;
@@ -123,7 +123,7 @@ namespace CwaffingTheGungy
 
         private void CheckIfEnemiesAreEncircled(Vector2 hullCenter)
         {
-            AkSoundEngine.PostEvent("soul_kaliber_drain", base.gameObject);
+            AkSoundEngine.PostEvent("pencil_circle_sound", base.gameObject);
             if (this.Owner is not PlayerController pc)
                 return;
             List<AIActor> activeEnemies = pc?.CurrentRoom?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
@@ -145,10 +145,11 @@ namespace CwaffingTheGungy
 
         private float ComputeCircleDamage(Vector2 hullCenter)
         {
+            PlayerController pc = this.Owner as PlayerController;
             float maxSquareDistToCenter = 0f;
             foreach (Vector2 point in this._extantPoints)
                 maxSquareDistToCenter = Mathf.Max(maxSquareDistToCenter, (hullCenter - point).sqrMagnitude);
-            return Mathf.Ceil(_BASE_DAMAGE * Mathf.Min(1f, 10f / maxSquareDistToCenter));
+            return Mathf.Ceil(_BASE_DAMAGE * pc.stats.GetStatValue(PlayerStats.StatType.Damage) * Mathf.Min(1f, 10f / maxSquareDistToCenter));
         }
 
         private void DoEncirclingMagic(AIActor enemy, float damage)
@@ -181,7 +182,7 @@ namespace CwaffingTheGungy
             this._isCharging = false;
         }
 
-        // Creates a napalm-strike-esque danger zone
+        // Draw a nice tiled sprite from start to target
         public static GameObject FancyLine(Vector2 start, Vector2 target, float width)
         {
             Vector2 delta         = target - start;
@@ -197,6 +198,19 @@ namespace CwaffingTheGungy
 
         private void ContinueCharge()
         {
+            // Decrement ammo and stop charging if necessary
+            this._timeCharging += BraveTime.DeltaTime;
+            if (this._timeCharging > _AMMO_DRAIN_TIME)
+            {
+                this._timeCharging -= _AMMO_DRAIN_TIME;
+                this.gun.LoseAmmo(1);
+                if (this.gun.CurrentAmmo == 0)
+                {
+                    EndCharge();
+                    return;
+                }
+            }
+
             // Stabilize the camera while we're using this weapon
             GameManager.Instance.MainCameraController.SetManualControl(true, true);
             GameManager.Instance.MainCameraController.OverridePosition =
@@ -213,8 +227,15 @@ namespace CwaffingTheGungy
             }
 
             // Add the point and register the last cursor position
+            AkSoundEngine.PostEvent("pencil_write_stop", base.gameObject);
+            AkSoundEngine.PostEvent("pencil_write", base.gameObject);
             this._extantPoints.Add(cursorPos);
             this._lastCursorPos = cursorPos;
+            if (this._extantPoints.Count >= _POINT_CAP) // too many points, don't want lag
+            {
+                RestartCharge(cursorPos);
+                return;
+            }
 
             // Play some nice VFX
             SpawnManager.SpawnVFX(_VFXPrefab, cursorPos, Quaternion.identity, ignoresPools: false);
@@ -224,23 +245,18 @@ namespace CwaffingTheGungy
             if (distanceFromStart > this._maxDistanceFromFirstPoint)
                 this._maxDistanceFromFirstPoint = distanceFromStart;
 
-            if (this._extantPoints.Count > _POINT_CAP) // too many points, don't want lag
-            {
-                RestartCharge(cursorPos);
+            // We're done if we don't have enough points to make a remotely circular shape
+            if (this._extantPoints.Count < 5)
                 return;
-            }
-            if (this._extantPoints.Count < 5) // 5 points is enough for a circle
-                return;
-
             // Get the convex hull of the current point list
             List<Vector2> hull = this._extantPoints.GetConvexHull();
             // Get the centroid of that hull
             Vector2 hullCentroid = hull.GetCentroid(); // hull.HullCenter();
             // Get the angle from the center of the hull to our starting point
-            float startAngle = (hull[0] - hullCentroid).ToAngle().Clamp360();
+            float startAngle = (this._extantPoints[0] - hullCentroid).ToAngle();
             // Get the angle from the center of the hull to our latest point
-            float endAngle = (cursorPos - hullCentroid).ToAngle().Clamp360();
-            // Determine if we've made a full lap
+            float endAngle = (cursorPos - hullCentroid).ToAngle();
+            // Determine if we've made a full circle-y shape
             if (endAngle.IsNearAngle(startAngle, 30f))
             {
                 CheckIfEnemiesAreEncircled(hullCentroid);
@@ -252,11 +268,12 @@ namespace CwaffingTheGungy
     /* References:
         https://stackoverflow.com/a/46371357 // convex hull
         https://stackoverflow.com/a/57624683 // point in polygon
+        https://stackoverflow.com/a/19750258 // centroid calculation
     */
     public static class HullHelper
     {
 
-        public static double cross(Vector2 O, Vector2 A, Vector2 B)
+        public static double Cross(Vector2 O, Vector2 A, Vector2 B)
         {
             return (A.x - O.x) * (B.y - O.y) - (A.y - O.y) * (B.x - O.x);
         }
@@ -265,6 +282,8 @@ namespace CwaffingTheGungy
         {
             if ((points?.Count() ?? 0) <= 1)
                 return points;
+
+            points = new List<Vector2>(points);  // make a copy so we don't modify in place
 
             int n = points.Count(), k = 0;
             List<Vector2> H = new List<Vector2>(new Vector2[2 * n]);
@@ -275,7 +294,7 @@ namespace CwaffingTheGungy
             // Build lower hull
             for (int i = 0; i < n; ++i)
             {
-                while (k >= 2 && cross(H[k - 2], H[k - 1], points[i]) <= 0)
+                while (k >= 2 && Cross(H[k - 2], H[k - 1], points[i]) <= 0)
                     k--;
                 H[k++] = points[i];
             }
@@ -283,7 +302,7 @@ namespace CwaffingTheGungy
             // Build upper hull
             for (int i = n - 2, t = k + 1; i >= 0; i--)
             {
-                while (k >= t && cross(H[k - 2], H[k - 1], points[i]) <= 0)
+                while (k >= t && Cross(H[k - 2], H[k - 1], points[i]) <= 0)
                     k--;
                 H[k++] = points[i];
             }
@@ -326,21 +345,6 @@ namespace CwaffingTheGungy
         {
             return point.IsPointInPolygon(polygonHull.GetConvexHull());
         }
-
-        // public static Vector2 HullCenter(this List<Vector2> hull)
-        // {
-        //     if (hull?.Count == 0)
-        //         return Vector2.zero;
-
-        //     float averageX = 0f;
-        //     float averageY = 0f;
-        //     foreach (Vector2 point in hull)
-        //     {
-        //         averageX += point.x;
-        //         averageY += point.y;
-        //     }
-        //     return new Vector2(averageX / hull.Count, averageY / hull.Count);
-        // }
 
         public static Vector2 GetCentroid(this List<Vector2> poly)
         {

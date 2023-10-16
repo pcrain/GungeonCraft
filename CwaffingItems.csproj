@@ -1365,6 +1365,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren15.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\zenkai_aura2.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\pencil_sparkles4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire_b1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren20.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\gunbrella_target_reticle1.png"/>
@@ -1403,11 +1404,13 @@
     <EmbeddedResource Include="Resources\MiscVFX\icicle_crash_particles8.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\zenkai_aura1.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\pencil_sparkles3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\saiyan_spark4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\egg_break2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\soul_link_particle1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\zenkai_aura7.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren9.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\fancy_line (copy 1).png"/>
     <EmbeddedResource Include="Resources\MiscVFX\soul_link_soul2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\friendlyoverhead_vfx_004.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\hail_collision10.png"/>
@@ -1505,6 +1508,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\gunbrella_target_reticle2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire_d1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\shine2.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\pencil_sparkles1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\gunbrella_target_reticle5.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\soul_link_particle2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\hail_collision11.png"/>
@@ -1535,6 +1539,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\hail_collision6.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire_c3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a7.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\pencil_sparkles2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\hail_collision9.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\egg_break3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\icicle_crash_particles1.png"/>

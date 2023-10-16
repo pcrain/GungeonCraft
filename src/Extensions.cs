@@ -196,9 +196,8 @@ namespace CwaffingTheGungy
     public static bool IsNearAngle(this float angle, float other, float tolerance)
     {
       float vangle = angle.Clamp360();
-      float cangle = other.Clamp360();
-      float minangle = (cangle - tolerance).Clamp360();
-      float maxangle = (cangle + tolerance).Clamp360();
+      float minangle = (other - tolerance).Clamp360();
+      float maxangle = (other + tolerance).Clamp360();
       if (minangle < maxangle)
         return minangle < vangle && vangle < maxangle;
       return minangle < vangle || vangle < maxangle; // note the || operator
