@@ -201,6 +201,7 @@
     <Compile Include="src\Cwaff-Guns\Deadline.cs"/>
     <Compile Include="src\Cwaff-Guns\RacketLauncher.cs"/>
     <Compile Include="src\Cwaff-Guns\Natascha.cs"/>
+    <Compile Include="src\Cwaff-Guns\Ticonderogun.cs"/>
     <Compile Include="src\Cwaff-Guns\SchrodingersGat.cs"/>
     <Compile Include="src\Cwaff-Guns\BBGun.cs"/>
     <Compile Include="src\Cwaff-Guns\Gunbrella.cs"/>
@@ -424,6 +425,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\bouncer_fire_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_024.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_014.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\ticonderogun_reload_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_fire_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_reload_011.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_reload_024.png"/>
@@ -440,6 +442,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_fire_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_reload_011.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\soul_kaliber_reload_004.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\ticonderogun_charge_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_reload_009.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_022.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\bouncer_reload_008.png"/>
@@ -537,6 +540,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_019.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_fire_011.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_032.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\ticonderogun_reload_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_008.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_charge_006.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\quarter_pounder_reload_002.json"/>
@@ -708,6 +712,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_015.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_015.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_001.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\ticonderogun_fire_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_fire_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_fire_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_004.png"/>
@@ -767,6 +772,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_idle_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_reload_020.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_017.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\ticonderogun_charge_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_021.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_reload_007.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_reload_006.png"/>
@@ -846,6 +852,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_010.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\holy_water_gun_reload_001.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\ticonderogun_idle_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_fire_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_011.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_016.json"/>
@@ -1097,6 +1104,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_015.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_021.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_charge_007.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\ticonderogun_fire_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tennis_rocket_gun_fire_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\ki_blast_gun_fire_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_021.png"/>
@@ -1182,6 +1190,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_027.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_fire_013.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_reload_016.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\ticonderogun_idle_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_008.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_fire_010.png"/>
@@ -1376,6 +1385,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\reticle_white.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\mini_pickup1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\icicle_crash_particles6.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\fancy_line.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren17.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire_c1.png"/>
@@ -1895,6 +1905,7 @@
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\bouncer_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\vacuum_cleaner_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\tennis_rocket_gun_idle_001.png"/>
+    <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\ticonderogun_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\quarter_pounder_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\holy_water_gun_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\deadline_idle_001.png"/>

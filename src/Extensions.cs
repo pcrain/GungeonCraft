@@ -192,16 +192,22 @@ namespace CwaffingTheGungy
       return BraveMathCollege.ClampAngle360(self);
     }
 
-    // Determine whether a Vector is within a degree tolerance of a floating point angle
-    public static bool IsNearAngle(this Vector2 v, float angle, float tolerance)
+    // Determine whether an angle is within a degree tolerance of a floating point angle
+    public static bool IsNearAngle(this float angle, float other, float tolerance)
     {
-      float vangle = v.ToAngle().Clamp360();
-      float cangle = angle.Clamp360();
+      float vangle = angle.Clamp360();
+      float cangle = other.Clamp360();
       float minangle = (cangle - tolerance).Clamp360();
       float maxangle = (cangle + tolerance).Clamp360();
       if (minangle < maxangle)
         return minangle < vangle && vangle < maxangle;
       return minangle < vangle || vangle < maxangle; // note the || operator
+    }
+
+    // Determine whether a Vector is within a degree tolerance of a floating point angle
+    public static bool IsNearAngle(this Vector2 v, float angle, float tolerance)
+    {
+      return v.ToAngle().IsNearAngle(angle, tolerance);
     }
 
     // Get a bullet's direction to the primary player

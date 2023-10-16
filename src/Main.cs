@@ -159,6 +159,7 @@ namespace CwaffingTheGungy
                     Outbreak.Add();
                     HandCannon.Add();
                     HatchlingGun.Add();
+                    Ticonderogun.Add();
                 #endregion
 
                 #region Synergies

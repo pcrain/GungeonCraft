@@ -17,7 +17,7 @@ namespace CwaffingTheGungy
 {
     public static class HeckedMode
     {
-        public static bool HeckedModeEnabled = true;
+        public static bool HeckedModeEnabled = false; // the world isn't ready yet o.o
 
         public readonly static List<int> HeckedModeGunWhiteList = new(){
             // Unfair Hitscan D:
@@ -95,6 +95,7 @@ namespace CwaffingTheGungy
             (int)Items.ScienceCannon, // yup, still bad
 
             // Testing
+            (int)Items.RobotsLeftHand,
             // (int)Items.
         };
 
@@ -164,6 +165,12 @@ namespace CwaffingTheGungy
 
         public static void OnEnemyPreAwake(Action<AIActor> action, AIActor enemy)
         {
+            if (!HeckedModeEnabled)
+            {
+                action(enemy);
+                return;
+            }
+
             Items replacementGunId = (Items)HeckedModeGunWhiteList[HeckedModeGunWhiteList.Count-1];
             Gun replacementGun = ItemHelper.Get(replacementGunId) as Gun;
             // replacementGun.enemyPreFireAnimation = null;
@@ -192,11 +199,16 @@ namespace CwaffingTheGungy
                 pewpew.EmptiesClip           = true;
                 pewpew.LeadAmount            = 0f; // don't let them shoot ahead of us...that's too mean for now
                 pewpew.LeadChance            = 0f; // don't let them shoot ahead of us...that's too mean for now
-                pewpew.TimeBetweenShots      = -1f; //0f; //replacementGun.DefaultModule.cooldownTime;
                 pewpew.TimeBetweenShots      = replacementGun.DefaultModule.cooldownTime;
                 pewpew.MagazineCapacity      = replacementGun.ClipCapacity;
                 pewpew.ReloadSpeed           = replacementGun.reloadTime;
                 pewpew.Range                 = replacementGun.DefaultModule.projectiles[0].baseData.range;
+
+                pewpew.EmptiesClip           = false;
+                pewpew.RequiresLineOfSight = true;
+                pewpew.AimAtFacingDirectionWhenSafe = true;
+                pewpew.StopDuringAttack = true;  // enemies shouldn't move while attacking
+
                 /* Default bulletkin behavior
 
                 "GroupCooldownVariance"        : 0.200000002980232,
