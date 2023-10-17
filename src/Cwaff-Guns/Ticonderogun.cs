@@ -23,28 +23,35 @@ namespace CwaffingTheGungy
         public static string ShortDescription = "Cursed Canvas";
         public static string LongDescription  = "TBD\n\n+2 Curse";
 
-        private const float _MIN_SEGMENT_DIST    = 0.5f;
-        private const float _DRAW_RATE           = 0.2f;
-        private const int   _POINT_CAP           = 100;//40;
-        private const float _BASE_DAMAGE         = 10f;
-        private const float _AMMO_DRAIN_TIME     = 1f; // how frequently we lose ammo
+        private const float _BASE_DAMAGE             = 10f;   // base damage of being encircled
+        private const float _AMMO_DRAIN_TIME         = 1f;    // how frequently we lose ammo
 
-        private static GameObject _VFXPrefab     = null;
-        private static GameObject _RunePrefab    = null;
-        private static float _LastWriteSound     = 0f;
+        private const float _DRAW_FX_RATE            = 0.2f;  // how frequently particles are spawned for extant drawing lines
+        private const int   _POINT_CAP               = 40;    // max segment sthat can be on the screen before calling it a bust and starting over
+        private const int   _NUM_RUNES               = 3;     // number of runs to spawn when damaging enemies
+        private const float _MIN_SEGMENT_DIST        = 0.5f;  // [mouse] minimum distance cursor must travel before drawing a new segment
+        private const float _TRACKING_SPEED          = 40f;   // [controller] how quickly the cursor moves
+        private const float _MAX_CONTROLLER_DIST     = 12f;   // [controller] how far away we can draw with the control stick at max distance
+        private const float _AUTOTARGET_MAX_DELTA    = 20f;   // [controller] the cone of vision we have before we can lock on with controller
+        private const float _ENEMY_TRACK_RADIUS      = 4f;    // [controller] the radius around a tracked enemy where we can draw
 
-        private Vector2? _lastCursorPos          = null;
-        private List<Vector2> _extantPoints      = new();
-        private List<GameObject> _extantSprites  = new();
-        private bool _isCharging                 = false;
-        private float _lastDrawTime              = 0f;
-        private float _maxDistanceFromFirstPoint = 0f;
-        private float _timeCharging              = 0f;
+        private static GameObject _SparklePrefab     = null;  // prefab for the sparklies
+        private static GameObject _RunePrefab        = null;  // prefab for the runes
+        private static float _LastWriteSound         = 0f;    // how long its been since we played the scribbling sound
 
-        private Vector2 _cameraPositionAtChargeStart;
-        private Vector2 _playerPositionAtChargeStart;
-
-        public static float TrackingSpeed = 5f;
+        private PlayerController _owner              = null;  // player owner of the weapon
+        private Vector2? _lastCursorPos              = null;  // position of the pencil cursor last time we updated
+        private AIActor _trackedEnemy                = null;  // [controller] the enemy we are currently tracking
+        private bool _isCharging                     = false; // whether we are currently charging our weapon
+        private float _lastDrawTime                  = 0f;    // the last time that VFX were drawn
+        private float _timeCharging                  = 0f;
+        private float _lifeElapsed                   = 0f;
+        private Vector2 _adjustedAimPoint            = Vector2.zero;
+        private Vector2 _targetEnemyPos              = Vector2.zero;
+        private Vector2 _cameraPositionAtChargeStart = Vector2.zero;
+        private Vector2 _playerPositionAtChargeStart = Vector2.zero;
+        private List<Vector2> _extantPoints          = new();
+        private List<GameObject> _extantSprites      = new();
 
         public static void Add()
         {
@@ -71,17 +78,27 @@ namespace CwaffingTheGungy
             //     projectile.transform.parent = gun.barrelOffset;
             //     projectile.gameObject.AddComponent<TranquilizerBehavior>();
 
-            _VFXPrefab = VFX.RegisterVFXObject("PencilSparkles", ResMap.Get("pencil_sparkles"), 12, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+            _SparklePrefab = VFX.RegisterVFXObject("PencilSparkles", ResMap.Get("pencil_sparkles"), 12, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
             // FPS must be nonzero or sprites don't update properly
             _RunePrefab = VFX.RegisterVFXObject("PencilRunes", ResMap.Get("pencil_runes"), 0.01f, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+        }
+
+        protected override void OnPickedUpByPlayer(PlayerController player)
+        {
+            base.OnPickedUpByPlayer(player);
+            this._owner = player;
+        }
+
+        protected override void OnPostDroppedByPlayer(PlayerController player)
+        {
+            this._owner = null;
+            base.OnPostDroppedByPlayer(player);
         }
 
         protected override void Update()
         {
             base.Update();
-            if (BraveTime.DeltaTime == 0.0f)
-                return;
-            if (this.Owner is not PlayerController pc)
+            if (!this._owner || BraveTime.DeltaTime == 0.0f)
                 return;
 
             DrawVFXAtExtantPoints();
@@ -104,36 +121,19 @@ namespace CwaffingTheGungy
         private void DrawVFXAtExtantPoints()
         {
             float time = BraveTime.ScaledTimeSinceStartup;
-            if (this._lastDrawTime + _DRAW_RATE > time)
+            if (this._lastDrawTime + _DRAW_FX_RATE > time)
                 return;
             foreach (Vector2 p in this._extantPoints)
-                SpawnManager.SpawnVFX(_VFXPrefab, p, Quaternion.identity, ignoresPools: false);
+                SpawnManager.SpawnVFX(_SparklePrefab, p, Quaternion.identity, ignoresPools: false);
             this._lastDrawTime = time;
-        }
-
-        private void BeginCharge()
-        {
-            this._targetEnemy = null;
-            this._maxDistanceFromFirstPoint = 0f;
-            this._lastCursorPos = null;
-            this._extantPoints.Clear();
-            foreach(GameObject g in this._extantSprites)
-                UnityEngine.GameObject.Destroy(g);
-            this._extantSprites.Clear();
-
-            this._cameraPositionAtChargeStart = GameManager.Instance.MainCameraController.previousBasePosition;
-            this._playerPositionAtChargeStart = this.Owner.sprite.WorldCenter;
-            this.adjustedAimPoint = this._playerPositionAtChargeStart + (this.Owner as PlayerController).m_currentGunAngle.ToVector(1f);
-
-            this._isCharging = true;
         }
 
         private void CheckIfEnemiesAreEncircled(Vector2 hullCenter)
         {
             AkSoundEngine.PostEvent("pencil_circle_sound", base.gameObject);
-            if (this.Owner is not PlayerController pc)
+            if (!this._owner)
                 return;
-            List<AIActor> activeEnemies = pc?.CurrentRoom?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
+            List<AIActor> activeEnemies = this._owner.CurrentRoom?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
             if (activeEnemies == null)
                 return; // TODO: not sure why we don't need to do this check elsewhere
 
@@ -152,17 +152,16 @@ namespace CwaffingTheGungy
 
         private float ComputeCircleDamage(Vector2 hullCenter)
         {
-            PlayerController pc = this.Owner as PlayerController;
             float maxSquareDistToCenter = 0f;
             foreach (Vector2 point in this._extantPoints)
                 maxSquareDistToCenter = Mathf.Max(maxSquareDistToCenter, (hullCenter - point).sqrMagnitude);
-            return Mathf.Ceil(_BASE_DAMAGE * pc.stats.GetStatValue(PlayerStats.StatType.Damage) * Mathf.Min(1f, 10f / maxSquareDistToCenter));
+            return Mathf.Ceil(_BASE_DAMAGE * this._owner.stats.GetStatValue(PlayerStats.StatType.Damage) * Mathf.Min(1f, 10f / maxSquareDistToCenter));
         }
 
         private void DoEncirclingMagic(AIActor enemy, float damage)
         {
             enemy.healthHaver.ApplyDamage(damage, Vector2.zero, ItemName, CoreDamageTypes.Magic, DamageCategory.Normal);
-            for (int i = 0; i < 3; ++i)
+            for (int i = 0; i < _NUM_RUNES; ++i)
             {
                 Vector2 offset = Lazy.RandomVector(0.3f);
                 Vector2 velocity = 2f * offset.normalized;
@@ -174,30 +173,46 @@ namespace CwaffingTheGungy
             }
         }
 
-        private void RestartCharge(Vector2 cursorPos)
+        private void ResetCharge()
         {
-            this._maxDistanceFromFirstPoint = 0f;
-            // this._lastCursorPos = null;
-            this._extantPoints.Clear();
-            this._extantPoints.Add(cursorPos);
             foreach(GameObject g in this._extantSprites)
                 UnityEngine.GameObject.Destroy(g);
             this._extantSprites.Clear();
+            this._extantPoints.Clear();
+        }
+
+        private void ResetCharge(Vector2 cursorPos)
+        {
+            ResetCharge();
+            this._extantPoints.Add(cursorPos);
         }
 
         private void EndCharge()
         {
-            this._targetEnemy = null;
-            this._maxDistanceFromFirstPoint = 0f;
+            ResetCharge();
+            this._trackedEnemy = null;
             this._lastCursorPos = null;
-            this._extantPoints.Clear();
-            foreach(GameObject g in this._extantSprites)
-                UnityEngine.GameObject.Destroy(g);
-            this._extantSprites.Clear();
 
             GameManager.Instance.MainCameraController.SetManualControl(false, true);
 
             this._isCharging = false;
+        }
+
+        private void BeginCharge()
+        {
+            ResetCharge();
+            this._trackedEnemy = null;
+            this._lastCursorPos = null;
+
+            // Override camera position
+            this._cameraPositionAtChargeStart = GameManager.Instance.MainCameraController.previousBasePosition;
+            GameManager.Instance.MainCameraController.SetManualControl(true, true);
+            GameManager.Instance.MainCameraController.OverridePosition = this._cameraPositionAtChargeStart;
+
+            this._playerPositionAtChargeStart = this.Owner.sprite.WorldCenter;
+            this._adjustedAimPoint = this._playerPositionAtChargeStart + (this.Owner as PlayerController).m_currentGunAngle.ToVector(1f);
+
+            this._isCharging = true;
         }
 
         // Draw a nice tiled sprite from start to target
@@ -214,33 +229,21 @@ namespace CwaffingTheGungy
             return reticle;
         }
 
-        private Vector2 adjustedAimPoint = Vector2.zero;
-        private float m_currentTrackingSpeed = 0f;
-        private float m_lifeElapsed = 0f;
-        private int skipCount = 0;
-        private const float _MAX_CONTROLLER_DIST = 12f;
-        private const float _AUTOTARGET_MAX_DELTA = 20f;
-
-        private AIActor _targetEnemy = null;
-        private Vector2 _targetEnemyPos = Vector2.zero;
-
+        // Choose the enemy with the smallest angle from our aim point that is also within _MAX_CONTROLLER_DIST
         private AIActor ChooseNewTarget()
         {
-            if (this.Owner is not PlayerController pc)
-                return null;
-
-            List<AIActor> activeEnemies = pc?.CurrentRoom?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
+            List<AIActor> activeEnemies = this._owner.CurrentRoom?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
             if (activeEnemies == null)
                 return null;
 
-            float aimAngle = pc.m_currentGunAngle;
+            float aimAngle = this._owner.m_currentGunAngle;
             float minDelta = _AUTOTARGET_MAX_DELTA;
             AIActor bestEnemy = null;
             foreach (AIActor enemy in activeEnemies)
             {
                 if (enemy?.sprite == null || !enemy.IsHostile(canBeNeutral: true))
                     continue;
-                Vector2 enemyDelta = (enemy.sprite.WorldCenter - pc.sprite.WorldCenter);
+                Vector2 enemyDelta = (enemy.sprite.WorldCenter - this._owner.sprite.WorldCenter);
                 if (enemyDelta.magnitude > _MAX_CONTROLLER_DIST)
                     continue;
                 float enemyAngle = enemyDelta.ToAngle();
@@ -255,46 +258,37 @@ namespace CwaffingTheGungy
             return bestEnemy;
         }
 
-
         private Vector2 GetControllerTrackingVector()
         {
-            if (this.Owner is not PlayerController pc)
-                return Vector2.zero;
-            if (pc.IsKeyboardAndMouse())
-                return pc.unadjustedAimPoint.XY();
+            // If we're using a mouse, just use the cursor position, easy
+            if (this._owner.IsKeyboardAndMouse())
+                return this._owner.unadjustedAimPoint.XY();
 
-            // Autocircle input
+            // If we're using a controller, determine if we should be tracking a specific enemy
             bool restartCharge = false;
-            if (!(this._targetEnemy?.IsHostile(canBeNeutral: true) ?? false))
-                this._targetEnemy = null;
-            if (this._targetEnemy == null)
+            if (!(this._trackedEnemy?.IsHostile(canBeNeutral: true) ?? false))
             {
-                this._targetEnemy = ChooseNewTarget();
-                if (this._targetEnemy)
-                {
-                    // this._targetEnemyPos = this._targetEnemy.sprite.WorldCenter;
-                    restartCharge = true;
-                }
+                this._trackedEnemy = ChooseNewTarget();
+                if (this._trackedEnemy)
+                    restartCharge = true; // if we just chose a new target, we need to restart our charge
             }
-            if (this._targetEnemy?.sprite != null)
+
+            // If we're tracking an enemy, set our target based on the enemy's position and our cursor direction
+            if (this._trackedEnemy?.sprite != null)
             {
-                Vector2 target = this._targetEnemy.sprite.WorldCenter + 4f * pc.m_activeActions.Aim.Vector;
-                // Vector2 target = this._targetEnemyPos + 4f * pc.m_activeActions.Aim.Vector;
+                Vector2 target = this._trackedEnemy.sprite.WorldCenter + _ENEMY_TRACK_RADIUS * this._owner.m_activeActions.Aim.Vector;
                 if (restartCharge)
-                    RestartCharge(target);
+                    ResetCharge(target);
+                this._adjustedAimPoint = target; // set our adjusted aim point for when we stop tracking the enemy
                 return target; // Autotracked input
             }
 
-            // return pc.sprite.WorldCenter + 10f * pc.m_activeActions.Aim.Vector; // Raw input
-
-            // Tracked input
-            // this.m_currentTrackingSpeed = 20f * Mathf.Lerp(0f, TrackingSpeed, Mathf.Clamp01(this._timeCharging / 3f));
-            this.m_currentTrackingSpeed = 40f;
-            this.adjustedAimPoint += pc.m_activeActions.Aim.Vector/*.normalized*/ * m_currentTrackingSpeed * BraveTime.DeltaTime;
-            Vector2 delta = this.adjustedAimPoint - pc.sprite.WorldCenter;
+            // If we're not tracking an enemy, we're just freehanding input
+            this._adjustedAimPoint += this._owner.m_activeActions.Aim.Vector * _TRACKING_SPEED * BraveTime.DeltaTime;
+            Vector2 delta = this._adjustedAimPoint - this._owner.sprite.WorldCenter;
             if (delta.magnitude > _MAX_CONTROLLER_DIST)
-                this.adjustedAimPoint = pc.sprite.WorldCenter + (_MAX_CONTROLLER_DIST * delta.normalized);
-            return this.adjustedAimPoint;
+                this._adjustedAimPoint = this._owner.sprite.WorldCenter + (_MAX_CONTROLLER_DIST * delta.normalized);
+            return this._adjustedAimPoint;
         }
 
         private void ContinueCharge()
@@ -312,65 +306,51 @@ namespace CwaffingTheGungy
                 }
             }
 
-            // Figure out if we should add a new point to our list
-            PlayerController player = this.Owner as PlayerController;
-            Vector2 playerPos = player.sprite.WorldCenter;
-            Vector2 pencilPos = GetControllerTrackingVector();
-
-            // Stabilize the camera while we're using this weapon
-            GameManager.Instance.MainCameraController.SetManualControl(true, true);
-            GameManager.Instance.MainCameraController.OverridePosition = /*player.IsKeyboardAndMouse() ?*/
-                this._cameraPositionAtChargeStart + (this.Owner.sprite.WorldCenter - this._playerPositionAtChargeStart)
-                /*: 0.5f * (this.Owner.sprite.WorldCenter + pencilPos)*/;
-
-            bool shouldDraw = false;
-
-            if (player.IsKeyboardAndMouse())
+            // If our input has been taken from us (e.g., during a boss cutscene), we need to stop charging
+            if (this._owner.CurrentInputState != PlayerInputState.AllInput)
             {
-                if (this._lastCursorPos.HasValue && (pencilPos - this._lastCursorPos.Value).magnitude < _MIN_SEGMENT_DIST)
-                    return;
-                shouldDraw = true;
-            }
-            else
-            {
-                if (!this._lastCursorPos.HasValue)
-                    this._lastCursorPos = playerPos; // controller should always set the cursor position
-                shouldDraw = true;
-                this.skipCount = 0;
-            }
-
-            if (!shouldDraw)
-            {
-                ETGModConsole.Log($"skipping drawing");
+                EndCharge();
                 return;
             }
 
-            if (this._lastCursorPos.HasValue)
-                this._extantSprites.Add(FancyLine(this._lastCursorPos.Value, pencilPos, 0.3f));
+            // Figure out if we should add a new point to our list
+            Vector2 playerPos = this._owner.sprite.WorldCenter;
+            Vector2 pencilPos = GetControllerTrackingVector();
 
-            // Add the point and register the last cursor position
-            if (_LastWriteSound + 0.1f < BraveTime.ScaledTimeSinceStartup) // play sounds at most once every 0.1 seconds
+            // Stabilize the camera while we're using this weapon on keyboard and mouse
+            bool usingMouse = this._owner.IsKeyboardAndMouse();
+            GameManager.Instance.MainCameraController.SetManualControl(usingMouse, true);
+            if (usingMouse)
+                GameManager.Instance.MainCameraController.OverridePosition =
+                    this._cameraPositionAtChargeStart + (this.Owner.sprite.WorldCenter - this._playerPositionAtChargeStart);
+
+            // Don't draw or update anything if we've barely moved the cursor
+            if (this._lastCursorPos.HasValue && (pencilPos - this._lastCursorPos.Value).magnitude < _MIN_SEGMENT_DIST)
+                return;
+
+            // Play a scribbling sound if enough time has elapsed
+            if (_LastWriteSound + 0.1f < BraveTime.ScaledTimeSinceStartup)
             {
                 _LastWriteSound = BraveTime.ScaledTimeSinceStartup;
                 AkSoundEngine.PostEvent("pencil_write_stop", base.gameObject);
                 AkSoundEngine.PostEvent("pencil_write", base.gameObject);
             }
 
+            // Add the point and register the last cursor position
+            if (this._lastCursorPos.HasValue)
+                this._extantSprites.Add(FancyLine(this._lastCursorPos.Value, pencilPos, 0.3f));
             this._lastCursorPos = pencilPos;
             this._extantPoints.Add(pencilPos);
-            if (this._extantPoints.Count >= _POINT_CAP) // too many points, don't want lag
-            {
-                RestartCharge(pencilPos);
-                return;
-            }
 
             // Play some nice VFX
-            SpawnManager.SpawnVFX(_VFXPrefab, pencilPos, Quaternion.identity, ignoresPools: false);
+            SpawnManager.SpawnVFX(_SparklePrefab, pencilPos, Quaternion.identity, ignoresPools: false);
 
-            // Update the max distance we've reached from our start point
-            float distanceFromStart = (pencilPos - this._extantPoints[0]).magnitude;
-            if (distanceFromStart > this._maxDistanceFromFirstPoint)
-                this._maxDistanceFromFirstPoint = distanceFromStart;
+            // If we have too many points, remove everything and start over
+            if (this._extantPoints.Count >= _POINT_CAP)
+            {
+                ResetCharge(pencilPos);
+                return;
+            }
 
             // We're done if we don't have enough points to make a remotely circular shape
             if (this._extantPoints.Count < 5)
@@ -387,7 +367,7 @@ namespace CwaffingTheGungy
             if (endAngle.IsNearAngle(startAngle, 30f))
             {
                 CheckIfEnemiesAreEncircled(hullCentroid);
-                RestartCharge(pencilPos);
+                ResetCharge(pencilPos);
             }
         }
     }
