@@ -192,15 +192,20 @@ namespace CwaffingTheGungy
       return BraveMathCollege.ClampAngle360(self);
     }
 
+    // Determine the absolute angle (in degrees) between two angles
+    public static float AbsAngleTo(this float angle, float other)
+    {
+      float absangle = (angle - other).Clamp360();
+      if (absangle > 180f)
+        return 360f - absangle;
+      return absangle;
+    }
+
+
     // Determine whether an angle is within a degree tolerance of a floating point angle
     public static bool IsNearAngle(this float angle, float other, float tolerance)
     {
-      float vangle = angle.Clamp360();
-      float minangle = (other - tolerance).Clamp360();
-      float maxangle = (other + tolerance).Clamp360();
-      if (minangle < maxangle)
-        return minangle < vangle && vangle < maxangle;
-      return minangle < vangle || vangle < maxangle; // note the || operator
+      return angle.AbsAngleTo(other) <= tolerance;
     }
 
     // Determine whether a Vector is within a degree tolerance of a floating point angle

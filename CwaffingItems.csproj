@@ -343,6 +343,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_011.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_fire_012.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_006.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\ticonderogun_charge_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_011.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\natascha_fire_004.png"/>
@@ -838,6 +839,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\natascha_fire_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_023.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_reload_008.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\ticonderogun_charge_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_idle_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_fire_005.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_003.png"/>
@@ -868,6 +870,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_reload_006.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_006.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\ticonderogun_charge_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_reload_009.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_reload_019.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_fire_006.png"/>
@@ -1082,6 +1085,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_007.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_022.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_fire_005.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\ticonderogun_charge_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_018.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alyx_reload_006.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_012.png"/>
@@ -1159,6 +1163,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_014.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\ki_blast_gun_reload_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_019.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\ticonderogun_charge_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_006.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\vacuum_cleaner_idle_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_014.png"/>
@@ -1349,6 +1354,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\quarter_pounder_reload_011.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\outbreak_fire_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_fire_007.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\ticonderogun_charge_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_016.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_010.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_idle_001.json"/>
@@ -1382,6 +1388,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\hail_collision2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\shine.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\hail_collision1.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\pencil_runes5.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren12.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\reticle_white.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\mini_pickup1.png"/>
@@ -1394,6 +1401,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\voodoo_ghost.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\icicle_crash_particles3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\outbreak_smoke_large.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\pencil_runes1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\egg_break1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\echo_effect6.png"/>
@@ -1464,12 +1472,14 @@
     <EmbeddedResource Include="Resources\MiscVFX\campfire_d6.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\echo_effect4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\drowsy_cloud2.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\pencil_runes6.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\icicle_crash_particles4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a5.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\can_of_pepsi.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\hail_collision4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\soul_link_soul1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\hail_collision7.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\pencil_runes3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\Explosions\ki_explosion1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\Explosions\ki_explosion4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\Explosions\ki_explosion3.png"/>
@@ -1515,6 +1525,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\siren1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\exorcism_particles2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\saiyan_spark3.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\pencil_runes4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\gunbrella_target_reticle6.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\exorcism_particles1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\hail_collision5.png"/>
@@ -1543,6 +1554,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\hail_collision9.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\egg_break3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\icicle_crash_particles1.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\pencil_runes2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren13.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\midas_sparkle2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\zenkai_aura5.png"/>

@@ -25,11 +25,13 @@ namespace CwaffingTheGungy
 
         private const float _MIN_SEGMENT_DIST    = 0.5f;
         private const float _DRAW_RATE           = 0.2f;
-        private const int   _POINT_CAP           = 40;
+        private const int   _POINT_CAP           = 100;//40;
         private const float _BASE_DAMAGE         = 10f;
         private const float _AMMO_DRAIN_TIME     = 1f; // how frequently we lose ammo
 
         private static GameObject _VFXPrefab     = null;
+        private static GameObject _RunePrefab    = null;
+        private static float _LastWriteSound     = 0f;
 
         private Vector2? _lastCursorPos          = null;
         private List<Vector2> _extantPoints      = new();
@@ -42,17 +44,18 @@ namespace CwaffingTheGungy
         private Vector2 _cameraPositionAtChargeStart;
         private Vector2 _playerPositionAtChargeStart;
 
+        public static float TrackingSpeed = 5f;
+
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<Ticonderogun>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
                 gun.reloadTime                        = 1.2f;
                 gun.quality                           = PickupObject.ItemQuality.A;
                 gun.SetBaseMaxAmmo(150);
-                gun.SetAnimationFPS(gun.shootAnimation, 30);
-                gun.SetAnimationFPS(gun.reloadAnimation, 40);
+                gun.SetAnimationFPS(gun.shootAnimation, 1);
+                gun.SetAnimationFPS(gun.reloadAnimation, 1);
+                gun.SetAnimationFPS(gun.chargeAnimation, 24);
                 gun.ClearDefaultAudio();
-                gun.SetFireAudio("blowgun_fire_sound");
-                gun.SetReloadAudio("blowgun_reload_sound");
                 gun.AddStatToGun(PlayerStats.StatType.Curse, 2f, StatModifier.ModifyMethod.ADDITIVE);
 
             ProjectileModule mod = gun.DefaultModule;
@@ -69,6 +72,8 @@ namespace CwaffingTheGungy
             //     projectile.gameObject.AddComponent<TranquilizerBehavior>();
 
             _VFXPrefab = VFX.RegisterVFXObject("PencilSparkles", ResMap.Get("pencil_sparkles"), 12, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+            // FPS must be nonzero or sprites don't update properly
+            _RunePrefab = VFX.RegisterVFXObject("PencilRunes", ResMap.Get("pencil_runes"), 0.01f, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
         }
 
         protected override void Update()
@@ -108,6 +113,7 @@ namespace CwaffingTheGungy
 
         private void BeginCharge()
         {
+            this._targetEnemy = null;
             this._maxDistanceFromFirstPoint = 0f;
             this._lastCursorPos = null;
             this._extantPoints.Clear();
@@ -117,6 +123,7 @@ namespace CwaffingTheGungy
 
             this._cameraPositionAtChargeStart = GameManager.Instance.MainCameraController.previousBasePosition;
             this._playerPositionAtChargeStart = this.Owner.sprite.WorldCenter;
+            this.adjustedAimPoint = this._playerPositionAtChargeStart + (this.Owner as PlayerController).m_currentGunAngle.ToVector(1f);
 
             this._isCharging = true;
         }
@@ -155,6 +162,16 @@ namespace CwaffingTheGungy
         private void DoEncirclingMagic(AIActor enemy, float damage)
         {
             enemy.healthHaver.ApplyDamage(damage, Vector2.zero, ItemName, CoreDamageTypes.Magic, DamageCategory.Normal);
+            for (int i = 0; i < 3; ++i)
+            {
+                Vector2 offset = Lazy.RandomVector(0.3f);
+                Vector2 velocity = 2f * offset.normalized;
+                FancyVFX fv = FancyVFX.Spawn(_RunePrefab, position: enemy.sprite.WorldCenter + offset, rotation: Quaternion.identity, velocity: velocity,
+                    lifetime: 1f, fadeOutTime: 1f, parent: enemy.sprite.transform);
+                tk2dSpriteAnimator anim = fv.GetComponent<tk2dSpriteAnimator>();
+                int newSpriteId = anim.currentClip.frames[UnityEngine.Random.Range(0, anim.currentClip.frames.Count())].spriteId;
+                fv.sprite.SetSprite(newSpriteId);
+            }
         }
 
         private void RestartCharge(Vector2 cursorPos)
@@ -170,6 +187,7 @@ namespace CwaffingTheGungy
 
         private void EndCharge()
         {
+            this._targetEnemy = null;
             this._maxDistanceFromFirstPoint = 0f;
             this._lastCursorPos = null;
             this._extantPoints.Clear();
@@ -196,6 +214,89 @@ namespace CwaffingTheGungy
             return reticle;
         }
 
+        private Vector2 adjustedAimPoint = Vector2.zero;
+        private float m_currentTrackingSpeed = 0f;
+        private float m_lifeElapsed = 0f;
+        private int skipCount = 0;
+        private const float _MAX_CONTROLLER_DIST = 12f;
+        private const float _AUTOTARGET_MAX_DELTA = 20f;
+
+        private AIActor _targetEnemy = null;
+        private Vector2 _targetEnemyPos = Vector2.zero;
+
+        private AIActor ChooseNewTarget()
+        {
+            if (this.Owner is not PlayerController pc)
+                return null;
+
+            List<AIActor> activeEnemies = pc?.CurrentRoom?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
+            if (activeEnemies == null)
+                return null;
+
+            float aimAngle = pc.m_currentGunAngle;
+            float minDelta = _AUTOTARGET_MAX_DELTA;
+            AIActor bestEnemy = null;
+            foreach (AIActor enemy in activeEnemies)
+            {
+                if (enemy?.sprite == null || !enemy.IsHostile(canBeNeutral: true))
+                    continue;
+                Vector2 enemyDelta = (enemy.sprite.WorldCenter - pc.sprite.WorldCenter);
+                if (enemyDelta.magnitude > _MAX_CONTROLLER_DIST)
+                    continue;
+                float enemyAngle = enemyDelta.ToAngle();
+                float deltaAngle = aimAngle.AbsAngleTo(enemyAngle);
+                if (deltaAngle < minDelta)
+                {
+                    minDelta = deltaAngle;
+                    bestEnemy = enemy;
+                }
+            }
+
+            return bestEnemy;
+        }
+
+
+        private Vector2 GetControllerTrackingVector()
+        {
+            if (this.Owner is not PlayerController pc)
+                return Vector2.zero;
+            if (pc.IsKeyboardAndMouse())
+                return pc.unadjustedAimPoint.XY();
+
+            // Autocircle input
+            bool restartCharge = false;
+            if (!(this._targetEnemy?.IsHostile(canBeNeutral: true) ?? false))
+                this._targetEnemy = null;
+            if (this._targetEnemy == null)
+            {
+                this._targetEnemy = ChooseNewTarget();
+                if (this._targetEnemy)
+                {
+                    // this._targetEnemyPos = this._targetEnemy.sprite.WorldCenter;
+                    restartCharge = true;
+                }
+            }
+            if (this._targetEnemy?.sprite != null)
+            {
+                Vector2 target = this._targetEnemy.sprite.WorldCenter + 4f * pc.m_activeActions.Aim.Vector;
+                // Vector2 target = this._targetEnemyPos + 4f * pc.m_activeActions.Aim.Vector;
+                if (restartCharge)
+                    RestartCharge(target);
+                return target; // Autotracked input
+            }
+
+            // return pc.sprite.WorldCenter + 10f * pc.m_activeActions.Aim.Vector; // Raw input
+
+            // Tracked input
+            // this.m_currentTrackingSpeed = 20f * Mathf.Lerp(0f, TrackingSpeed, Mathf.Clamp01(this._timeCharging / 3f));
+            this.m_currentTrackingSpeed = 40f;
+            this.adjustedAimPoint += pc.m_activeActions.Aim.Vector/*.normalized*/ * m_currentTrackingSpeed * BraveTime.DeltaTime;
+            Vector2 delta = this.adjustedAimPoint - pc.sprite.WorldCenter;
+            if (delta.magnitude > _MAX_CONTROLLER_DIST)
+                this.adjustedAimPoint = pc.sprite.WorldCenter + (_MAX_CONTROLLER_DIST * delta.normalized);
+            return this.adjustedAimPoint;
+        }
+
         private void ContinueCharge()
         {
             // Decrement ammo and stop charging if necessary
@@ -211,37 +312,63 @@ namespace CwaffingTheGungy
                 }
             }
 
+            // Figure out if we should add a new point to our list
+            PlayerController player = this.Owner as PlayerController;
+            Vector2 playerPos = player.sprite.WorldCenter;
+            Vector2 pencilPos = GetControllerTrackingVector();
+
             // Stabilize the camera while we're using this weapon
             GameManager.Instance.MainCameraController.SetManualControl(true, true);
-            GameManager.Instance.MainCameraController.OverridePosition =
-                this._cameraPositionAtChargeStart + (this.Owner.sprite.WorldCenter - this._playerPositionAtChargeStart);
+            GameManager.Instance.MainCameraController.OverridePosition = /*player.IsKeyboardAndMouse() ?*/
+                this._cameraPositionAtChargeStart + (this.Owner.sprite.WorldCenter - this._playerPositionAtChargeStart)
+                /*: 0.5f * (this.Owner.sprite.WorldCenter + pencilPos)*/;
 
-            // Figure out if we should add a new point to our list
-            Vector2 cursorPos = (this.Owner as PlayerController).unadjustedAimPoint.XY();
-            if (this._lastCursorPos.HasValue)
+            bool shouldDraw = false;
+
+            if (player.IsKeyboardAndMouse())
             {
-                Vector2 delta = (cursorPos - this._lastCursorPos.Value);
-                if (delta.magnitude < _MIN_SEGMENT_DIST)
+                if (this._lastCursorPos.HasValue && (pencilPos - this._lastCursorPos.Value).magnitude < _MIN_SEGMENT_DIST)
                     return;
-                this._extantSprites.Add(FancyLine(this._lastCursorPos.Value, cursorPos, 0.3f));
+                shouldDraw = true;
+            }
+            else
+            {
+                if (!this._lastCursorPos.HasValue)
+                    this._lastCursorPos = playerPos; // controller should always set the cursor position
+                shouldDraw = true;
+                this.skipCount = 0;
             }
 
+            if (!shouldDraw)
+            {
+                ETGModConsole.Log($"skipping drawing");
+                return;
+            }
+
+            if (this._lastCursorPos.HasValue)
+                this._extantSprites.Add(FancyLine(this._lastCursorPos.Value, pencilPos, 0.3f));
+
             // Add the point and register the last cursor position
-            AkSoundEngine.PostEvent("pencil_write_stop", base.gameObject);
-            AkSoundEngine.PostEvent("pencil_write", base.gameObject);
-            this._extantPoints.Add(cursorPos);
-            this._lastCursorPos = cursorPos;
+            if (_LastWriteSound + 0.1f < BraveTime.ScaledTimeSinceStartup) // play sounds at most once every 0.1 seconds
+            {
+                _LastWriteSound = BraveTime.ScaledTimeSinceStartup;
+                AkSoundEngine.PostEvent("pencil_write_stop", base.gameObject);
+                AkSoundEngine.PostEvent("pencil_write", base.gameObject);
+            }
+
+            this._lastCursorPos = pencilPos;
+            this._extantPoints.Add(pencilPos);
             if (this._extantPoints.Count >= _POINT_CAP) // too many points, don't want lag
             {
-                RestartCharge(cursorPos);
+                RestartCharge(pencilPos);
                 return;
             }
 
             // Play some nice VFX
-            SpawnManager.SpawnVFX(_VFXPrefab, cursorPos, Quaternion.identity, ignoresPools: false);
+            SpawnManager.SpawnVFX(_VFXPrefab, pencilPos, Quaternion.identity, ignoresPools: false);
 
             // Update the max distance we've reached from our start point
-            float distanceFromStart = (cursorPos - this._extantPoints[0]).magnitude;
+            float distanceFromStart = (pencilPos - this._extantPoints[0]).magnitude;
             if (distanceFromStart > this._maxDistanceFromFirstPoint)
                 this._maxDistanceFromFirstPoint = distanceFromStart;
 
@@ -255,12 +382,12 @@ namespace CwaffingTheGungy
             // Get the angle from the center of the hull to our starting point
             float startAngle = (this._extantPoints[0] - hullCentroid).ToAngle();
             // Get the angle from the center of the hull to our latest point
-            float endAngle = (cursorPos - hullCentroid).ToAngle();
+            float endAngle = (pencilPos - hullCentroid).ToAngle();
             // Determine if we've made a full circle-y shape
             if (endAngle.IsNearAngle(startAngle, 30f))
             {
                 CheckIfEnemiesAreEncircled(hullCentroid);
-                RestartCharge(cursorPos);
+                RestartCharge(pencilPos);
             }
         }
     }
