@@ -154,8 +154,8 @@ namespace CwaffingTheGungy
 
             // smoothly handle reticle postion, compensating extra distance for controller users
             Vector2 gunPos       = this.gun.barrelOffset.PositionVector2();
-            Vector2 cursorPos    = player.unadjustedAimPoint.XY();
-            Vector2 newTargetPos = gunPos + (player.IsKeyboardAndMouse() ? 1f : 2f) * (cursorPos - gunPos);
+            Vector2 newTargetPos =
+                player.IsKeyboardAndMouse() ? player.unadjustedAimPoint.XY() : player.sprite.WorldCenter + (1f + _MAX_RETICLE_RANGE) * player.m_activeActions.Aim.Vector;
             Vector2 gunDelta     = (newTargetPos - gunPos);
             if (gunDelta.magnitude > _MAX_RETICLE_RANGE)
                 newTargetPos = gunPos + _MAX_RETICLE_RANGE * gunDelta.normalized;
