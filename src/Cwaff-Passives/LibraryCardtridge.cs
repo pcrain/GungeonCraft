@@ -126,7 +126,7 @@ namespace CwaffingTheGungy
             if (!_DidLateInit)
             {
                 // Add modded items to the book items list
-                _BookItemIDs.Add(IDs.Pickups["zoolanders_diary"]);
+                // _BookItemIDs.Add(IDs.Pickups["zoolanders_diary"]);
                 _DidLateInit = true;
             }
 
