@@ -20,8 +20,8 @@ namespace CwaffingTheGungy
         public static string ItemName         = "Ticonderogun";
         public static string SpriteName       = "ticonderogun";
         public static string ProjectileName   = "38_special";
-        public static string ShortDescription = "Cursed Canvas";
-        public static string LongDescription  = "TBD\n\n+2 Curse";
+        public static string ShortDescription = "A Picture is Worth 1000 Swords";
+        public static string LongDescription  = "Creates magic brushstrokes at the cursor while continuously fired. Encircling enemies with brushstrokes damages them, with smaller circles dealing more damage. (On controller, brushstrokes auto-lock onto nearby enemies and always deal max damage.) Increases curse by 2 while in inventory.\n\nA truly bizarre relic from another dimension where the pen is mightier than the gun. It radiates with an aura that gives one the sense that the arcane sketches it's capable of producing are lying dormant inside the relic itself, just waiting for the right user to draw out their power.";
 
         private const float _BASE_DAMAGE             = 10f;   // base damage of being encircled
         private const float _AMMO_DRAIN_TIME         = 1f;    // how frequently we lose ammo
@@ -152,6 +152,9 @@ namespace CwaffingTheGungy
 
         private float ComputeCircleDamage(Vector2 hullCenter)
         {
+            if (!this._owner.IsKeyboardAndMouse()) // controller users always get max damage because this weapon is already hard enough to use with controllers
+                return Mathf.Ceil(_BASE_DAMAGE * this._owner.stats.GetStatValue(PlayerStats.StatType.Damage));
+
             float maxSquareDistToCenter = 0f;
             foreach (Vector2 point in this._extantPoints)
                 maxSquareDistToCenter = Mathf.Max(maxSquareDistToCenter, (hullCenter - point).sqrMagnitude);
