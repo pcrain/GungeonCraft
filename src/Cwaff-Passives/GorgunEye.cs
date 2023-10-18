@@ -18,7 +18,7 @@ namespace CwaffingTheGungy
     public class GorgunEye : PassiveItem
     {
         public static string ItemName         = "Gorgun Eye";
-        public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/gorgun_eye_icon";
+        public static string SpritePath       = "gorgun_eye_icon";
         public static string ShortDescription = "Staredown";
         public static string LongDescription  = "Stuns enemies while looking directly at them.\n\nContrary to popular belief, Gorgun eyes have no intrinsic petrification properties. Gungeon archaeologists have discovered that Gorgun shamans traditionally imbue the eyes of their peers with petrification magic during infancy. More recently, it appears that Gorguns have begun to prefer enchanting synthetic eyes and disposable contact lenses, presumably after collectively realizing that petrifying everyone you meet was mildly inconvenient during social gatherings.";
 

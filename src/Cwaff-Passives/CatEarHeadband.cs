@@ -21,7 +21,7 @@ namespace CwaffingTheGungy
     public class CatEarHeadband : PassiveItem
     {
         public static string ItemName         = "Cat Ear Headband";
-        public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/cat_ear_headband_icon";
+        public static string SpritePath       = "cat_ear_headband_icon";
         public static string ShortDescription = "Stealthy Entrances";
         public static string LongDescription  = "Gain 3 seconds of light stealth upon entering combat. Cannot steal or sneak attack while lightly stealthed.\n\nWearing these headbands for extended periods has been shown to cause increasingly severe side effects over time. These typically start with a propensity for curling your hands and uttering the occasional meow, but eventually culminate in forgetting to put on clothes in the morning and spending 6-12 hours a day in front of a webcam periodically checking that your undergarments are still intact.";
 

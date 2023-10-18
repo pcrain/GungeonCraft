@@ -18,7 +18,7 @@ namespace CwaffingTheGungy
     public class Siphon : PassiveItem
     {
         public static string ItemName         = "Siphon";
-        public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/88888888_icon";
+        public static string SpritePath       = "88888888_icon";
         public static string ShortDescription = "Super Gooper";
         public static string LongDescription  = "Immunity to all negative goops; projectiles fired while standing in goops spread during flight";
 

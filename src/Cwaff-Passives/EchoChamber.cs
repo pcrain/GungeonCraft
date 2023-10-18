@@ -20,7 +20,7 @@ namespace CwaffingTheGungy
     public class EchoChamber : PassiveItem
     {
         public static string ItemName         = "Echo Chamber";
-        public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/echo_chamber_icon";
+        public static string SpritePath       = "echo_chamber_icon";
         public static string ShortDescription = "Primed and Corrupted";
         public static string LongDescription  = "Fired projectiles leave echoes that shoot weakened duplicates of the original projectile for a few seconds.\n\nMuch like their owners, guns have memories, albeit limited and imperfect ones. The Hollowpoint that possesses this chamber is able to tap into these memories to manifest spectres of recently-fired projectiles. While the quality of these spectral projectiles may not be up to par with the originals in every conceivable way, one ought to count their blessings that the Hollowpoint is inadvertently helping at all.";
 

@@ -18,7 +18,7 @@ namespace CwaffingTheGungy
     public class WarriorsGi : PassiveItem
     {
         public static string ItemName         = "Warrior's Gi";
-        public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/warriors_gi_icon";
+        public static string SpritePath       = "warriors_gi_icon";
         public static string ShortDescription = "Going Further Beyond";
         public static string LongDescription  = "After taking damage that leaves you one hit from death, gives a permanent buff to several stats. Can be activated up to 5 times, with diminsihing returns.\n\nAn exceedingly heavy training garment worn by the great Gunsoku, an almost-mythical being widely considered to be the greatest master of finger guns in history. Known best for saving the planet from galactic terrors such as Shell, Majin Boom, and Beebeerus, his unflinching drive for self-improvement and fighting stronger opponents has inspired many generations of Gungeoneers.";
 

@@ -21,7 +21,7 @@ namespace CwaffingTheGungy
     public class DeadRinger : PassiveItem
     {
         public static string ItemName         = "Dead Ringer";
-        public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/dead_ringer_icon";
+        public static string SpritePath       = "dead_ringer_icon";
         public static string ShortDescription = "Tactical Defeat";
         public static string LongDescription  = "Feigh death and become stealthed upon taking damage. Shooting while stealthed deals 10x damage and removes stealth.\n\nDeveloped by the French government for use by their elite secret agents in case of their inevitable failure, this marvelous gadget takes making lemonade out of lemons to the next level.";
 

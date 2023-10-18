@@ -18,7 +18,7 @@ namespace CwaffingTheGungy
     public class CampingSupplies : PassiveItem
     {
         public static string ItemName         = "Camping Supplies";
-        public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/cozy_camper_icon";
+        public static string SpritePath       = "cozy_camper_icon";
         public static string ShortDescription = "In for the Long Gun";
         public static string LongDescription  = "Increases damage over time while standing still. Damage boost is reset after moving.\n\nCamping has proven time and again to be an effective strategy to any Gungeoneer that has the mental fortitude to endure insults to their skill, their mother, their face, and their mother's face.";
 

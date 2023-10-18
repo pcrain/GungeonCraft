@@ -1187,7 +1187,7 @@ namespace CwaffingTheGungy
 
         public static void Init()
         {
-            GameObject noteSpriteObject = SpriteBuilder.SpriteFromResource("CwaffingTheGungy/Resources/ItemSprites/note_icon", null);
+            GameObject noteSpriteObject = SpriteBuilder.SpriteFromResource(ResMap.Get("note_icon")[0], null);
                 FakePrefab.MarkAsFakePrefab(noteSpriteObject);
                 tk2dSprite noteSprite = noteSpriteObject.GetComponent<tk2dSprite>();
 

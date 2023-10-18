@@ -18,7 +18,7 @@ namespace CwaffingTheGungy
     public class BlankChecks : PassiveItem
     {
         public static string ItemName         = "Blank Checks";
-        public static string SpritePath       = "CwaffingTheGungy/Resources/ItemSprites/blank_checks_icon";
+        public static string SpritePath       = "blank_checks_icon";
         public static string ShortDescription = "Write-off";
         public static string LongDescription  = "Trying to use a blank without one in your inventory gives you 3 blanks and +1 curse. Will not work if you already have 10 or more curse.\n\nRumor has it that blank checks were originally conceived of outside the domain of weaponry entirely, and were developed primarily for use in large-scale business transactions. As firearms are only very rarely involved in such transactions, why so many business people have any use for extra blanks remains a mystery to this day.";
 
