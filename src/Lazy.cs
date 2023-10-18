@@ -51,9 +51,11 @@ namespace CwaffingTheGungy
             }
             else
             {
+                // Interpret paths with slashes as fully-qualified resource paths, and use our ResMap otherwise
+                string spriteName = spritePath.Contains("/") ? spritePath : ResMap.Get(spritePath)[0];
                 GameObject obj = new GameObject(itemName);
                 item = obj.AddComponent<TItemSpecific>();
-                ItemBuilder.AddSpriteToObject(itemName, spritePath, obj);
+                ItemBuilder.AddSpriteToObject(itemName, spriteName, obj);
 
                 ETGMod.Databases.Items.SetupItem(item, item.name);
 

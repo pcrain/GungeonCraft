@@ -170,6 +170,7 @@
     <Compile Include="src\Cwaff-Actives\BulletThatCanKillTheFuture.cs"/>
     <Compile Include="src\Cwaff-Actives\GunPowderer.cs"/>
     <Compile Include="src\Cwaff-Actives\BorrowedTime.cs"/>
+    <Compile Include="src\Cwaff-Actives\StackOfTorches.cs"/>
     <Compile Include="src\Cwaff-Actives\EmergencySiren.cs"/>
     <Compile Include="src\Cwaff-Actives\KalibersJustice.cs"/>
     <Compile Include="src\Cwaff-Actives\GasterBlaster.cs"/>
@@ -1586,6 +1587,7 @@
     <EmbeddedResource Include="Resources\ItemSprites\warriors_gi_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\cat_ear_headband_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\zoolander_icon.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\stack_of_torches_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\note_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\4d_bullets_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\cozy_camper_icon.png"/>

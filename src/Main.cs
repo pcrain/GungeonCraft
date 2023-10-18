@@ -90,6 +90,7 @@ namespace CwaffingTheGungy
                     Itemfinder.Init();
                     KalibersJustice.Init();
                     GasterBlaster.Init();
+                    StackOfTorches.Init();
                 #endregion
 
                 #region Passives
@@ -219,6 +220,7 @@ namespace CwaffingTheGungy
                 #endregion
 
                 #region Old Asset Stuff
+                    Dissect.FindDefaultResource("DefaultTorch");
                     // ETGModConsole.Log("Trying to load some stuff");
                     // try
                     // {
@@ -260,7 +262,7 @@ namespace CwaffingTheGungy
                 watch.Stop();
                 if (C.DEBUG_BUILD)
                     AkSoundEngine.PostEvent("vc_kirby_appeal01", ETGModMainBehaviour.Instance.gameObject);
-                ETGModConsole.Log($"\nYay! :D Initialized <color=#aaffaaff>{C.MOD_NAME}</color> in "+(watch.ElapsedMilliseconds/1000.0f)+" seconds");
+                ETGModConsole.Log($"Yay! :D Initialized <color=#aaffaaff>{C.MOD_NAME}</color> in "+(watch.ElapsedMilliseconds/1000.0f)+" seconds");
 
                 // Debug.LogError("Gungy o.o!");
                 // Debug.LogAssertion("Gungy o.o!");

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -242,6 +242,68 @@ namespace CwaffingTheGungy
             _DumpedKeys.Add(key);
             foreach (Instruction c in cursor.Instrs)
                 DumpILInstruction(c);
+        }
+
+        private static List<string> _Bundles = new(){
+            "shared_auto_001",
+            "shared_auto_002",
+            "shared_base_001",
+            "brave_resources_001",
+            "enemies_base_001",
+            "encounters_base_001",
+            // "dungeon_scene_001", // seems to work in base game code???
+
+            "dungeons/base_castle",
+            "dungeons/base_sewer",
+            "dungeons/base_gungeon",
+            "dungeons/base_cathedral",
+            "dungeons/base_mines",
+            "dungeons/base_resourcefulrat",
+            "dungeons/base_catacombs",
+            "dungeons/base_forge",
+            "dungeons/base_bullethell",
+
+            // "dungeons/base_office", // not real asset bundles???
+            // "dungeons/base_space",
+            // "dungeons/base_jungle",
+            // "dungeons/base_belly",
+            // "dungeons/base_west",
+            // "dungeons/base_phobos",
+            };
+
+        // Attempt to load a prefab from various default resource packs (SLOW, DEBUG ONLY)
+        public static GameObject FindDefaultResource(string name)
+        {
+            foreach (string bundle in _Bundles)
+            {
+                try
+                {
+                    GameObject res = ResourceManager.LoadAssetBundle(bundle).LoadAsset<GameObject>(name);
+                    if (res == null)
+                        continue;
+                    ETGModConsole.Log($"found asset {name} in bundle {bundle}");
+                    return res;
+                }
+                catch (Exception)
+                {
+                    ETGModConsole.Log($"failed to load bundle {bundle}");
+                    continue;
+                }
+            }
+            ETGModConsole.Log($"  could not find asset {name} in any bundle!");
+            return null;
+        }
+
+        public static void FindDefaultResource<T>(string name)
+            where T : MonoBehaviour
+        {
+            foreach (string bundle in _Bundles)
+            {
+                if (ResourceManager.LoadAssetBundle(bundle).LoadAsset<T>(name) == null)
+                    continue;
+                ETGModConsole.Log($"found asset {name} in bundle {bundle}");
+                break;
+            }
         }
     }
 
