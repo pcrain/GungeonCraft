@@ -22,9 +22,8 @@ namespace CwaffingTheGungy
     {
         // Runs whenever a new run is started (floor may not be fully loaded)
         public static Action<PlayerController, PlayerController, GameManager.GameMode> OnRunStart;
+        // Runs whenever a floor is started and fully loaded
         public static Action OnNewFloorFullyLoaded;
-
-        // Runs whenever a floor is started (floor may not be fully loaded)
 
         public static void Init()
         {
