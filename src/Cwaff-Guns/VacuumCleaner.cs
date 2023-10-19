@@ -42,11 +42,8 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<VacuumCleaner>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.gunClass                             = GunClass.CHARGE;
-                gun.quality                              = PickupObject.ItemQuality.A;
-                gun.InfiniteAmmo                         = true;
+                gun.SetAttributes(quality: PickupObject.ItemQuality.D, gunClass: GunClass.CHARGE, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true);
                 gun.SetAnimationFPS(gun.chargeAnimation, 16);
-                gun.ClearDefaultAudio(); // prevent fire audio, as it's handled in Update()
 
             ProjectileModule mod = gun.DefaultModule;
                 mod.shootStyle             = ProjectileModule.ShootStyle.Charged;

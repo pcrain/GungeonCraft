@@ -34,17 +34,11 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<RacketLauncher>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.reloadTime                           = 0;
+                gun.SetAttributes(quality: PickupObject.ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: _AMMO, canReloadNoMatterAmmo: true);
                 gun.muzzleFlashEffects.type              = VFXPoolType.None;
-                gun.quality                              = PickupObject.ItemQuality.D;
-                gun.gunClass                             = GunClass.SILLY;
-                gun.gunSwitchGroup                       = (ItemHelper.Get(Items.Blasphemy) as Gun).gunSwitchGroup;
-                gun.CanReloadNoMatterAmmo                = true;
-                gun.SetBaseMaxAmmo(_AMMO);
                 gun.SetAnimationFPS(gun.shootAnimation, 60);
                 gun.SetAnimationFPS(gun.idleAnimation, _IDLE_FPS);
                 gun.LoopAnimation(gun.idleAnimation, 0);
-                gun.ClearDefaultAudio();
 
             ProjectileModule mod = gun.DefaultModule;
                 mod.ammoCost               = 1;

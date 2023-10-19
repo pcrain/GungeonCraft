@@ -31,9 +31,7 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<HolyWaterGun>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.gunSwitchGroup                       = (ItemHelper.Get(Items.MegaDouser) as Gun).gunSwitchGroup;
-                gun.gunClass                             = GunClass.BEAM;
-                gun.SetBaseMaxAmmo(500);
+                gun.SetAttributes(quality: PickupObject.ItemQuality.C, gunClass: GunClass.BEAM, reloadTime: 1.0f, ammo: 500, audioFrom: Items.MegaDouser, defaultAudio: true);
 
             ProjectileModule mod = gun.DefaultModule;
                 mod.ammoType               = GameUIAmmoType.AmmoType.BEAM;

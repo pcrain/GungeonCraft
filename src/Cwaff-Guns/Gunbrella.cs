@@ -47,13 +47,10 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<Gunbrella>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.gunClass                             = GunClass.CHARGE;
-                gun.quality                              = PickupObject.ItemQuality.A;
+                gun.SetAttributes(quality: PickupObject.ItemQuality.A, gunClass: GunClass.CHARGE, reloadTime: 1.0f, ammo: 100);
                 gun.SetAnimationFPS(gun.shootAnimation, 60);
                 gun.SetAnimationFPS(gun.chargeAnimation, 16);
                 gun.LoopAnimation(gun.chargeAnimation, 17);
-                gun.SetBaseMaxAmmo(100);
-                gun.ClearDefaultAudio();
 
             ProjectileModule mod = gun.DefaultModule;
                 mod.shootStyle             = ProjectileModule.ShootStyle.Charged;

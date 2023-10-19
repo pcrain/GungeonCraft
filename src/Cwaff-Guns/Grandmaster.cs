@@ -33,13 +33,9 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<Grandmaster>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
-                gun.reloadTime                        = 1.0f;
-                gun.quality                           = PickupObject.ItemQuality.A;
-                gun.SetBaseMaxAmmo(250);
+                gun.SetAttributes(quality: PickupObject.ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.0f, ammo: 350);
                 gun.SetAnimationFPS(gun.shootAnimation, 24);
                 gun.SetAnimationFPS(gun.reloadAnimation, 16);
-                gun.ClearDefaultAudio();
                 gun.SetFireAudio("chess_gun_fire");
                 gun.SetReloadAudio("chess_gun_reload");
 

@@ -28,13 +28,10 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<SoulKaliber>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+                gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.1f, ammo: 250);
                 gun.muzzleFlashEffects.type              = VFXPoolType.None;
-                gun.reloadTime                           = 1.1f;
-                gun.quality                              = PickupObject.ItemQuality.D;
-                gun.SetBaseMaxAmmo(250);
                 gun.SetAnimationFPS(gun.shootAnimation, 24);
                 gun.SetAnimationFPS(gun.reloadAnimation, 12);
-                gun.ClearDefaultAudio();
                 gun.SetFireAudio("soul_kaliber_fire");
                 gun.SetReloadAudio("soul_kaliber_reload");
 

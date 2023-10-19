@@ -33,14 +33,11 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<HandCannon>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.reloadTime                        = 0.75f;
-                gun.quality                           = PickupObject.ItemQuality.D;
-                gun.SetBaseMaxAmmo(100);
+                gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 0.75f, ammo: 100);
                 gun.SetAnimationFPS(gun.shootAnimation, 30);
                 gun.SetAnimationFPS(gun.reloadAnimation, (int)(gun.spriteAnimator.GetClipByName(gun.reloadAnimation).frames.Length / gun.reloadTime));
                 gun.SetAnimationFPS(gun.chargeAnimation, (int)((1.0f / _CHARGE_TIME) * _CHARGE_LOOP_FRAME));
                 gun.LoopAnimation(gun.chargeAnimation, _CHARGE_LOOP_FRAME);
-                gun.ClearDefaultAudio();
                 gun.SetFireAudio("hand_cannon_shoot_sound");
                 gun.SetReloadAudio("hand_cannon_reload_sound");
                 gun.SetChargeAudio("hand_cannon_charge_sound", frame: 0);

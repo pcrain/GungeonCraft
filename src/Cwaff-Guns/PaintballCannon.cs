@@ -26,16 +26,12 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<PaintballCannon>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                // gun.gunSwitchGroup                       = (ItemHelper.Get(Items.TShirtCannon) as Gun).gunSwitchGroup;
-                gun.reloadTime                           = 0.9f;
-                gun.gunClass                             = GunClass.PISTOL;
-                gun.quality                              = PickupObject.ItemQuality.C;
-                gun.SetBaseMaxAmmo(300);
+                gun.SetAttributes(quality: PickupObject.ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 0.9f, ammo: 300);
                 gun.SetAnimationFPS(gun.shootAnimation, 14);
                 gun.SetAnimationFPS(gun.reloadAnimation, 4);
-                gun.ClearDefaultAudio();
                 gun.SetFireAudio("paintball_shoot_sound");
                 gun.SetReloadAudio("paintball_reload_sound");
+                // gun.gunSwitchGroup                       = (ItemHelper.Get(Items.TShirtCannon) as Gun).gunSwitchGroup;
 
             ProjectileModule mod = gun.DefaultModule;
                 mod.ammoCost               = 1;

@@ -31,13 +31,9 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<QuarterPounder>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.reloadTime                        = 1.1f;
-                gun.quality                           = PickupObject.ItemQuality.D;
-                gun.CanGainAmmo                       = false;
-                gun.SetBaseMaxAmmo(9999);
+                gun.SetAttributes(quality: PickupObject.ItemQuality.C, gunClass: GunClass.RIFLE, reloadTime: 1.1f, ammo: 9999, canGainAmmo: false);
                 gun.SetAnimationFPS(gun.shootAnimation, 24);
                 gun.SetAnimationFPS(gun.reloadAnimation, 16);
-                gun.ClearDefaultAudio();
                 gun.SetFireAudio("fire_coin_sound");
                 gun.SetReloadAudio("coin_gun_reload");
 

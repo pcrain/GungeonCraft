@@ -652,16 +652,37 @@ namespace CwaffingTheGungy
       return adjusted;
     }
 
+    // Check if a PixelColider is fully within a rectangle
     public static bool FullyWithin(this PixelCollider self, Rect other)
     {
       return new Rect(self.MinX, self.MinY, self.Dimensions.X, self.Dimensions.Y).FullyWithin(other);
     }
 
+    // Check if a rectangle is fully within another rectangle
     public static bool FullyWithin(this Rect self, Rect other)
     {
       bool xwithin = self.xMin > other.xMin && self.xMax < other.xMax;
       bool ywithin = self.yMin > other.yMin && self.yMax < other.yMax;
       return xwithin && ywithin;
+    }
+
+    // Set some basic attributes for each gun
+    public static void SetAttributes(this Gun gun, PickupObject.ItemQuality quality, GunClass gunClass, float reloadTime, int ammo,
+      Items audioFrom = Items.Blasphemy, bool defaultAudio = false, bool infiniteAmmo = false, bool canGainAmmo = true, bool canReloadNoMatterAmmo = false)
+    {
+      gun.quality = quality;
+      gun.reloadTime = reloadTime;
+      gun.gunClass = gunClass;
+      gun.SetBaseMaxAmmo(ammo);
+      gun.CurrentAmmo = gun.GetBaseMaxAmmo(); // necessary iff gun basemaxammo > 1000
+
+      gun.gunSwitchGroup = (ItemHelper.Get(audioFrom) as Gun).gunSwitchGroup;
+      gun.InfiniteAmmo = infiniteAmmo;
+      gun.CanGainAmmo = canGainAmmo;
+      gun.CanReloadNoMatterAmmo = canReloadNoMatterAmmo;
+
+      if (!defaultAudio)
+        gun.ClearDefaultAudio();
     }
   }
 }

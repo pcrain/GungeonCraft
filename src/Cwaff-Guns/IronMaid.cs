@@ -31,12 +31,9 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<IronMaid>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.reloadTime                           = 0.75f;
-                gun.quality                              = PickupObject.ItemQuality.D;
-                gun.SetBaseMaxAmmo(400);
+                gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 0.75f, ammo: 400);
                 gun.SetAnimationFPS(gun.shootAnimation, 24);
                 gun.SetAnimationFPS(gun.reloadAnimation, 24);
-                gun.ClearDefaultAudio();
                 gun.SetFireAudio("knife_gun_launch");
                 gun.SetReloadAudio("knife_gun_reload");
 

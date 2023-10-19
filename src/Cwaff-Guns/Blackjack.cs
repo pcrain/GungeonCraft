@@ -33,13 +33,9 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<Blackjack>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.reloadTime                        = 0.8f;
-                gun.CanGainAmmo                       = false;
-                gun.quality                           = PickupObject.ItemQuality.C;
-                gun.SetBaseMaxAmmo(_DECK_SIZE * _NUM_DECKS);
+                gun.SetAttributes(quality: PickupObject.ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.8f, ammo: _DECK_SIZE * _NUM_DECKS, canGainAmmo: false);
                 gun.SetAnimationFPS(gun.shootAnimation, 30);
                 gun.SetAnimationFPS(gun.reloadAnimation, 30);
-                gun.ClearDefaultAudio();
                 gun.SetFireAudio(); // prevent fire audio, as it's handled in OnPostFired()
                 gun.SetReloadAudio("card_shuffle_sound"); // todo: this is still playing the default reload sound as well, for some reason
 

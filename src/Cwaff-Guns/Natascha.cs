@@ -33,12 +33,8 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<Natascha>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.reloadTime                        = 1.1f;
-                gun.quality                           = PickupObject.ItemQuality.D;
-                gun.SetBaseMaxAmmo(2500);
-                gun.CurrentAmmo = gun.GetBaseMaxAmmo(); // necessary iff gun basemaxammo > 1000
+                gun.SetAttributes(quality: PickupObject.ItemQuality.D, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 2500);
                 gun.SetAnimationFPS(gun.shootAnimation, (int)((float)_FireAnimationFrames / _BaseCooldownTime) + 1);
-                gun.ClearDefaultAudio();
 
             ProjectileModule mod = gun.DefaultModule;
                 mod.ammoCost            = 1;

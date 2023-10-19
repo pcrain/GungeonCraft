@@ -56,13 +56,10 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<Ticonderogun>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.reloadTime                        = 1.2f;
-                gun.quality                           = PickupObject.ItemQuality.A;
-                gun.SetBaseMaxAmmo(150);
+                gun.SetAttributes(quality: PickupObject.ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.0f, ammo: 150);
                 gun.SetAnimationFPS(gun.shootAnimation, 1);
                 gun.SetAnimationFPS(gun.reloadAnimation, 1);
                 gun.SetAnimationFPS(gun.chargeAnimation, 24);
-                gun.ClearDefaultAudio();
                 gun.AddStatToGun(PlayerStats.StatType.Curse, 2f, StatModifier.ModifyMethod.ADDITIVE);
 
             ProjectileModule mod = gun.DefaultModule;

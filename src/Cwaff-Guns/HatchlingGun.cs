@@ -31,13 +31,9 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<HatchlingGun>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.reloadTime                        = 25f / 20f;  // animation frames / animation fps
-                gun.quality                           = PickupObject.ItemQuality.D;
-                gun.SetBaseMaxAmmo(500);
+                gun.SetAttributes(quality: PickupObject.ItemQuality.D, gunClass: GunClass.RIFLE, reloadTime: 25f / 20f /* frames / fps*/, ammo: 500);
                 gun.SetAnimationFPS(gun.shootAnimation, 40);
                 gun.SetAnimationFPS(gun.reloadAnimation, 20);
-                gun.ClearDefaultAudio();
-                // gun.SetFireAudio("hatchling_gun_shoot_sound");
                 gun.SetReloadAudio("hatchling_gun_bounce_sound", frame: 0);
                 gun.SetReloadAudio("hatchling_gun_bounce_sound", frame: 6);
                 gun.SetReloadAudio("hatchling_gun_bounce_sound", frame: 14);

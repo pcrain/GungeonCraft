@@ -36,14 +36,9 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<KiBlast>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.reloadTime                           = 0f;
-                gun.quality                              = PickupObject.ItemQuality.D;
-                gun.InfiniteAmmo                         = true;
-                gun.SetBaseMaxAmmo(99999);
+                gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 999, infiniteAmmo: true);
                 gun.SetAnimationFPS(gun.shootAnimation, 24);
-                gun.ClearDefaultAudio();
                 gun.SetFireAudio("ki_blast_sound");
-                gun.SetReloadAudio();
 
             ProjectileModule mod = gun.DefaultModule;
                 mod.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;

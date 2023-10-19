@@ -40,12 +40,9 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<Alyx>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.quality                           = PickupObject.ItemQuality.A;
-                gun.CurrentAmmo = _BASE_MAX_AMMO;
-                gun.SetBaseMaxAmmo(_BASE_MAX_AMMO);
+                gun.SetAttributes(quality: PickupObject.ItemQuality.A, gunClass: GunClass.FULLAUTO, reloadTime: 0.5f, ammo: _BASE_MAX_AMMO);
                 gun.SetAnimationFPS(gun.reloadAnimation, 20);
                 gun.SetAnimationFPS(gun.shootAnimation, 20);
-                gun.ClearDefaultAudio();
                 gun.SetReloadAudio("alyx_reload_sound");
 
             ProjectileModule mod = gun.DefaultModule;

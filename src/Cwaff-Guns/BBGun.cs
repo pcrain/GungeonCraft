@@ -30,11 +30,9 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<BBGun>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.gunClass                             = GunClass.CHARGE;
-                gun.quality                              = PickupObject.ItemQuality.B;
+                gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 0.5f, ammo: 3, canGainAmmo: false);
                 gun.CanGainAmmo                          = false;
                 gun.muzzleFlashEffects                   = (ItemHelper.Get(Items.SeriousCannon) as Gun).muzzleFlashEffects;
-                gun.SetBaseMaxAmmo(3);
                 gun.SetAnimationFPS(gun.shootAnimation, 10);
                 gun.SetAnimationFPS(gun.chargeAnimation, 16);
                 gun.LoopAnimation(gun.chargeAnimation, 32);
