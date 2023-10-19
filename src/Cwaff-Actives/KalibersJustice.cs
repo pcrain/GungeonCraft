@@ -27,7 +27,7 @@ namespace CwaffingTheGungy
         public static void Init()
         {
             PlayerItem item = Lazy.SetupActive<KalibersJustice>(ItemName, SpritePath, ShortDescription, LongDescription);
-            item.quality      = PickupObject.ItemQuality.A;
+            item.quality      = PickupObject.ItemQuality.B;
             item.consumable   = false;
             item.CanBeDropped = true;
             item.SetCooldownType(ItemBuilder.CooldownType.Damage, 1000f);

@@ -29,7 +29,7 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<Tranquilizer>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.SetAttributes(quality: PickupObject.ItemQuality.C, gunClass: GunClass.POISON, reloadTime: 1.2f, ammo: 80);
+                gun.SetAttributes(quality: PickupObject.ItemQuality.D, gunClass: GunClass.POISON, reloadTime: 1.2f, ammo: 80);
                 gun.SetAnimationFPS(gun.shootAnimation, 30);
                 gun.SetAnimationFPS(gun.reloadAnimation, 40);
                 gun.SetFireAudio("blowgun_fire_sound");

@@ -32,7 +32,7 @@ namespace CwaffingTheGungy
         public static void Init()
         {
             PickupObject item  = Lazy.SetupPassive<CreditCard>(ItemName, SpritePath, ShortDescription, LongDescription);
-            item.quality       = PickupObject.ItemQuality.A;
+            item.quality       = PickupObject.ItemQuality.B;
         }
 
         public override void Pickup(PlayerController player)

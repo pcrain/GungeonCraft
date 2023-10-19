@@ -27,7 +27,7 @@ namespace CwaffingTheGungy
         public static void Init()
         {
             PlayerItem item = Lazy.SetupActive<AmazonPrimer>(ItemName, SpritePath, ShortDescription, LongDescription);
-            item.quality      = PickupObject.ItemQuality.B;
+            item.quality      = PickupObject.ItemQuality.A;
             item.consumable   = true;
             item.CanBeDropped = true;
 

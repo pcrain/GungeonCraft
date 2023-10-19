@@ -36,7 +36,7 @@ namespace CwaffingTheGungy
         public static void Init()
         {
             PlayerItem item = Lazy.SetupActive<BorrowedTime>(ItemName, SpritePath, ShortDescription, LongDescription);
-            item.quality    = PickupObject.ItemQuality.D;
+            item.quality    = PickupObject.ItemQuality.C;
 
             ItemBuilder.SetCooldownType(item, ItemBuilder.CooldownType.Timed, 2);
             item.consumable   = false;

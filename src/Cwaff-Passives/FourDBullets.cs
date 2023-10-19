@@ -27,7 +27,7 @@ namespace CwaffingTheGungy
         public static void Init()
         {
             PickupObject item  = Lazy.SetupPassive<FourDBullets>(ItemName, SpritePath, ShortDescription, LongDescription);
-            item.quality       = PickupObject.ItemQuality.B;
+            item.quality       = PickupObject.ItemQuality.A;
         }
 
         public override void Pickup(PlayerController player)

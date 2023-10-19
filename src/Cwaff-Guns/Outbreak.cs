@@ -33,7 +33,7 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<Outbreak>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.SetAttributes(quality: PickupObject.ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 1.2f, ammo: 300);
+                gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 1.2f, ammo: 300);
                 gun.SetAnimationFPS(gun.shootAnimation, 24);
                 gun.SetAnimationFPS(gun.reloadAnimation, 20);
                 gun.SetFireAudio("outbreak_shoot_sound");

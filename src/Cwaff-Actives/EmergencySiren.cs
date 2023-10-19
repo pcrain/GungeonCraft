@@ -33,7 +33,7 @@ namespace CwaffingTheGungy
         public static void Init()
         {
             PlayerItem item = Lazy.SetupActive<EmergencySiren>(ItemName, SpritePath, ShortDescription, LongDescription);
-            item.quality      = PickupObject.ItemQuality.B;
+            item.quality      = PickupObject.ItemQuality.C;
             item.consumable   = false;
             item.CanBeDropped = true;
             item.SetCooldownType(ItemBuilder.CooldownType.Damage, 300f);
