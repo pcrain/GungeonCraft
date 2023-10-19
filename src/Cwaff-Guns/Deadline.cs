@@ -38,6 +38,7 @@ namespace CwaffingTheGungy
         private List <DeadlineLaser> _myLasers = new();
         private float _myTimer = 0;
         private GameObject _myLaserSight = null;
+        private GameObject _debugLaserSight = null;
 
         public static void Add()
         {
@@ -156,7 +157,7 @@ namespace CwaffingTheGungy
             if (!this._myLaserSight)
                 return;
 
-            Vector2 target = Raycast.ToNearestWallOrObject(this.gun.barrelOffset.transform.position, this.gun.CurrentAngle, minDistance: 1);
+            Vector2 target = Raycast.ToNearestWall(this.gun.barrelOffset.transform.position, this.gun.CurrentAngle, minDistance: 0.01f);
             float length = C.PIXELS_PER_TILE*Vector2.Distance(this.gun.barrelOffset.transform.position,target);
 
             tk2dTiledSprite sprite = this._myLaserSight.GetComponent<tk2dTiledSprite>();
@@ -200,6 +201,7 @@ namespace CwaffingTheGungy
             {
                 EnableLaserSight();
                 UpdateLaserSight();
+                // DrawSpeculativeLaser();
             }
 
             this._myTimer += BraveTime.DeltaTime;
@@ -208,12 +210,66 @@ namespace CwaffingTheGungy
                 laser.UpdateLaser(emissivePower : power);
         }
 
-        public void CreateALaser(Vector2 position, float angle)
+        public void GetSpeculativeLaserEndpoints(out Vector2? start, out Vector2? end)
         {
-            Vector2 target = Raycast.ToNearestWallOrObject(position, angle, minDistance: C.PIXELS_PER_TILE);
-            // raycast backwards to snap to wall
-            Vector2 invtarget = Raycast.ToNearestWallOrObject(position, angle + (angle < 180 ? 180 : -180), minDistance: 0);
-            this._myLasers.Add(new DeadlineLaser(invtarget,target,angle));
+            Vector2 normal, normalb;
+            start = Raycast.ToNearestWall(this.gun.barrelOffset.transform.position, out normal, this.gun.CurrentAngle, minDistance: 0.01f);
+            if (normal == Vector2.zero)
+            {
+                start = null;
+                end   = null;
+                return; // no normal, nothing to do
+            }
+
+            start -= this.gun.CurrentAngle.ToVector(C.PIXEL_SIZE); // move ever so slightly out of the wall
+            float normangle = normal.ToAngle().Clamp360();
+            end = (start.Value + normal).ToNearestWall(out normalb, normangle, minDistance: 0.01f);
+            if (normalb != -normal)
+            {
+                start = null;
+                end   = null;
+                return; // other wall's normal isn't the complete inverse of our original wall's normal, so not a good wall for putting out a laser
+            }
+
+            end -= normangle.ToVector(C.PIXEL_SIZE); // move ever so slightly out of the wall
+            return;
+        }
+
+        private void DrawSpeculativeLaser()
+        {
+            if (this._debugLaserSight)
+                UnityEngine.Object.Destroy(this._debugLaserSight);
+
+            Vector2? start, end;
+            GetSpeculativeLaserEndpoints(out start, out end);
+            if (!start.HasValue)
+                return; // no normal, nothing to do
+
+            Vector2 delta = (end.Value - start.Value);
+            this._debugLaserSight = VFX.CreateLaserSight(start.Value, C.PIXELS_PER_TILE * delta.magnitude, _SIGHT_WIDTH, delta.ToAngle(), colour: Color.magenta, power: 50f);
+        }
+
+        // public void CreateALaser(Vector2 position, float angle)
+        // {
+        //     Vector2 target = Raycast.ToNearestWall(position, angle, minDistance: C.PIXELS_PER_TILE);
+        //     // raycast backwards to snap to wall
+        //     Vector2 invtarget = Raycast.ToNearestWall(position, (angle + 180f).Clamp360(), minDistance: 0);
+        //     if ((invtarget - position).magnitude > 1f)
+        //         invtarget = position; // hack: if raycast moves us really far away from our point of impact, we're too far, so just use our original position
+        //     this._myLasers.Add(new DeadlineLaser(invtarget, target, angle));
+        //     if (this.Player)
+        //         AkSoundEngine.PostEvent("Play_WPN_moonscraperLaser_shot_01", this.Player.gameObject);
+        //     this.CheckForLaserIntersections();
+        // }
+
+        public void CreateALaser(Vector2 start, Vector2 end)
+        {
+            // Vector2 target = Raycast.ToNearestWall(position, angle, minDistance: C.PIXELS_PER_TILE);
+            // // raycast backwards to snap to wall
+            // Vector2 invtarget = Raycast.ToNearestWall(position, (angle + 180f).Clamp360(), minDistance: 0);
+            // if ((invtarget - position).magnitude > 1f)
+            //     invtarget = position; // hack: if raycast moves us really far away from our point of impact, we're too far, so just use our original position
+            this._myLasers.Add(new DeadlineLaser(start, end, (end - start).ToAngle()));
             if (this.Player)
                 AkSoundEngine.PostEvent("Play_WPN_moonscraperLaser_shot_01", this.Player.gameObject);
             this.CheckForLaserIntersections();
@@ -408,14 +464,20 @@ namespace CwaffingTheGungy
         private PlayerController _owner = null;
         private Deadline _gun           = null;
 
+        private Vector2? _start;
+        private Vector2? _end;
+
         private void Start()
         {
             this._projectile = base.GetComponent<Projectile>();
-            if (this._projectile.Owner is PlayerController pc)
-            {
-                this._owner = pc;
-                this._gun = pc.CurrentGun.GetComponent<Deadline>();
-            }
+            if (this._projectile.Owner is not PlayerController pc)
+                return;
+
+            this._owner = pc;
+            this._gun = pc.CurrentGun.GetComponent<Deadline>();
+            this._gun.GetSpeculativeLaserEndpoints(out this._start, out this._end);
+            if (!this._start.HasValue)
+                return;
 
             SpeculativeRigidbody specRigidBody = this._projectile.specRigidbody;
             this._projectile.BulletScriptSettings.surviveTileCollisions = true;
@@ -423,23 +485,35 @@ namespace CwaffingTheGungy
             specRigidBody.OnCollision += this.OnCollision;
         }
 
+        // private static PrototypeDungeonRoom.RoomCategory[] _BannedRoomTypes = {
+        //     PrototypeDungeonRoom.RoomCategory.BOSS,
+        //     PrototypeDungeonRoom.RoomCategory.CONNECTOR,
+        //     PrototypeDungeonRoom.RoomCategory.ENTRANCE,
+        //     PrototypeDungeonRoom.RoomCategory.EXIT,
+        // };
+
         // Only collide with tiles
         private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
         {
             if (!(otherRigidbody?.PrimaryPixelCollider?.IsTileCollider ?? false))
                 PhysicsEngine.SkipCollision = true;
+
+            // RoomHandler room = myPixelCollider.UnitCenter.GetAbsoluteRoom();
+            // if (_BannedRoomTypes.Contains(room.area.PrototypeRoomCategory) || !myPixelCollider.FullyWithin(room.GetBoundingRect()))
+            //     PhysicsEngine.SkipCollision = true;
         }
 
         private void OnCollision(CollisionData tileCollision)
         {
-            this._projectile.baseData.speed *= 0f;
-            this._projectile.UpdateSpeed();
-            float m_hitNormal = tileCollision.Normal.ToAngle();
-            PhysicsEngine.PostSliceVelocity = new Vector2?(default(Vector2));
-            SpeculativeRigidbody specRigidbody = this._projectile.specRigidbody;
-            specRigidbody.OnCollision -= this.OnCollision;
-            Vector2 spawnPoint = tileCollision.PostCollisionUnitCenter;
-            _gun?.CreateALaser(spawnPoint,m_hitNormal);
+            // this._projectile.baseData.speed = 0.01f;
+            // this._projectile.UpdateSpeed();
+            // float m_hitNormal = tileCollision.Normal.ToAngle();
+            // PhysicsEngine.PostSliceVelocity = new Vector2?(default(Vector2));
+            // SpeculativeRigidbody specRigidbody = this._projectile.specRigidbody;
+            // specRigidbody.OnCollision -= this.OnCollision;
+            // Vector2 spawnPoint = tileCollision.PostCollisionUnitCenter;
+            // _gun?.CreateALaser(spawnPoint,m_hitNormal);
+            _gun?.CreateALaser(this._start.Value, this._end.Value);
             this._projectile.DieInAir();
         }
     }

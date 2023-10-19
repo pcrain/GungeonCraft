@@ -1111,18 +1111,30 @@ namespace CwaffingTheGungy
             return contact;
         }
 
-        public static Vector2 ToNearestWall(this Vector2 pos, float angle, float minDistance = 1)
+        public static Vector2 ToNearestWall(this Vector2 pos, out Vector2 normal, float angle, float minDistance = 1)
         {
             RaycastResult hit;
             Vector2 contact;
             if (PhysicsEngine.Instance.Raycast(
               pos+BraveMathCollege.DegreesToVector(angle,minDistance), BraveMathCollege.DegreesToVector(angle), 200, out hit,
               collideWithRigidbodies: false))
+            {
                 contact = hit.Contact;
+                normal = hit.Normal;
+            }
             else
+            {
                 contact = pos+BraveMathCollege.DegreesToVector(angle,minDistance);
+                normal = Vector2.zero;
+            }
             RaycastResult.Pool.Free(ref hit);
             return contact;
+        }
+
+        public static Vector2 ToNearestWall(this Vector2 pos, float angle, float minDistance = 1)
+        {
+            Vector2 dummy;
+            return pos.ToNearestWall(out dummy, angle, minDistance);
         }
     }
 
