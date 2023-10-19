@@ -84,7 +84,6 @@
     <Compile Include="src\Cwaff-Rooms\FlowPrefabs.cs"/>
     <Compile Include="src\Extensions.cs"/>
     <Compile Include="src\Cwaff-NPCs\Bombo.cs"/>
-    <Compile Include="src\Cwaff-NPCs\Boomhildr.cs"/>
     <Compile Include="src\StandardAPI\NPCAPI\LootTableTools.cs"/>
     <Compile Include="src\StandardAPI\NPCAPI\Examples.cs"/>
     <Compile Include="src\StandardAPI\NPCAPI\Hooks.cs"/>
@@ -2027,10 +2026,10 @@
     <Reference Include="UnityEngine.TilemapModule"/>
     <Reference Include="UnityEngine.ImageConversionModule"/>
     <Reference Include="MonoMod.Utils"/>
+    <Reference Include="Alexandria"/>
     <Reference Include="MonoMod.RuntimeDetour"/>
     <Reference Include="Assembly-CSharp"/>
     <Reference Include="PlayMaker"/>
-    <Reference Include="Alexandria"/>
     <Reference Include="0Harmony"/>
     <Reference Include="ModTheGungeonAPI"/>
     <Reference Include="BepInEx"/>
