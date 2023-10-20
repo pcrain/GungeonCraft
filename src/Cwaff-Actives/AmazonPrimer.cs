@@ -20,7 +20,7 @@ namespace CwaffingTheGungy
         public static string ItemName         = "Amazon Primer";
         public static string SpritePath       = "amazon_primer_icon";
         public static string ShortDescription = "Cancel Any* Time!";
-        public static string LongDescription  = "Begins a Primer subscription when consumed. Subscription drains 5 casings per combat encounter, but doubles fire rate and projectile speed and slightly boosts damage. Per-room subscription cost increases by 5 casings each floor.\n\nOnce upon a time, money couldn't buy firearm proficiency, and gun-toting peasants needed to practice things often described using buzzwords such as \"aiming,\" \"timing,\" and \"strategy\". Fortunately, the stone ages are behind us, and for a low** fee, you too can join the dozens of happy*** Primers and shoot with the best of them!\n\n*(any time you run out of money, your subscription will be automatically cancelled for your convenience)\n\n**(low fee increases as you descend lower into the Gungeon)\n\n***(happiness is subjective and relative)";
+        public static string LongDescription  = "Begins a Primer subscription when consumed. Subscription drains 5 casings per combat encounter, but doubles fire rate and projectile speed and slightly boosts damage. Per-room subscription cost increases by 5 casings each floor. Cannot be activated with less than 25\n\nOnce upon a time, money couldn't buy firearm proficiency, and gun-toting peasants needed to practice things often described using buzzwords such as \"aiming,\" \"timing,\" and \"strategy\". Fortunately, the stone ages are behind us, and for a low** fee, you too can join the dozens of happy*** Primers and shoot with the best of them!\n\n*(any time you run out of money, your subscription will be automatically cancelled for your convenience)\n\n**(low fee increases as you descend lower into the Gungeon)\n\n***(happiness is subjective and relative)";
 
         internal static GameObject _PrimeLogo;
 
@@ -32,6 +32,11 @@ namespace CwaffingTheGungy
             item.CanBeDropped = true;
 
             _PrimeLogo = VFX.RegisterVFXObject("PrimeLogo", ResMap.Get("prime_logo_overhead"), 2, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter, emissivePower: 100f);
+        }
+
+        public override bool CanBeUsed(PlayerController user)
+        {
+            return GameManager.Instance.PrimaryPlayer.carriedConsumables.Currency >= 25;
         }
 
         public override void DoEffect(PlayerController user)

@@ -3,7 +3,7 @@
 
 #Important top level variables
 namespace="CwaffingTheGungy"                     #namespace used throughout source code; need to change for my own mod eventually
-projectname="CwaffingTheGungy"                   #name of the DLL to create
+projectname="GungeonCraft"                       #name of the DLL to create
 projfile="./CwaffingItems.csproj"                #the name of the csproj file to generate
 sourcechecksums="./_${namespace}-checksums-src"  #file containing checksums of all source files to determing recompilation
 audiochecksums="./_${namespace}-checksums-audio" #file containing checksums of all source files to determing recompilation

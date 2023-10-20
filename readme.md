@@ -1,4 +1,4 @@
-## Gungeon-Craft: A Mod for Enter the Gungeon
+## GungeonCraft: A Mod for Enter the Gungeon
 
 |                                 |                                       |                                      |
 | -------------                   | :-------------:                       | :-------------:                      |

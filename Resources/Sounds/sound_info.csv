@@ -1,7 +1,7 @@
 name,volume,loops,channel
 gaster_blaster_sound_effect,1.0,1,sound
 ki_blast_return_sound,-6.0,1,sound
-ki_blast_sound,-6.0,1,sound
+ki_blast_sound,-7.5,1,sound
 ki_blast_explode_sound,-6.0,1,sound
 reflector,1.0,1,sound
 undertale_arrow,1.0,1,sound
@@ -11,8 +11,8 @@ vc_kirby_appeal01,1.0,2,sound
 sans,1.0,0,music
 megalo,1.0,0,music
 electromegalo,1.0,0,music
-teledasher,-2.0,1,sound
-paintball_shoot_sound,1.0,1,sound
+teledasher,-3.5,1,sound
+paintball_shoot_sound,-4.0,1,sound
 paintball_reload_sound,1.0,1,sound
 MC_Link_Grow,-1.0,1,sound
 MC_Link_Lift,2.0,1,sound
@@ -38,7 +38,7 @@ gunbrella_fire_sound,-3.0,1,sound
 card_pickup_sound,-1.0,1,sound
 card_throw_sound,-2.0,1,sound
 card_shuffle_sound,5.0,1,sound
-blowgun_fire_sound,2.0,1,sound
+blowgun_fire_sound,-4.0,1,sound
 blowgun_reload_sound,1.0,1,sound
 drowsy_sound,-3.0,1,sound
 dbz_spark_sound,-10.0,1,sound
@@ -56,3 +56,8 @@ pencil_write,4.0,1,sound
 mc_torch_place,5.0,1,sound
 mc_lantern_place,5.0,1,sound
 deadline_fire_sound,-5.0,1,sound
+outbreak_shoot_sound,-5.0,1,sound
+knife_gun_launch,-3.0,1,sound
+schrodingers_gat_fire_sound,-2.0,1,sound
+fire_coin_sound,-5.0,1,sound
+coin_gun_reload,2.0,1,sound

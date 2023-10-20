@@ -20,7 +20,7 @@ namespace CwaffingTheGungy
         public static string ItemName         = "Drifter's Headgear";
         public static string SpritePath       = "drifters_headgear_icon";
         public static string ShortDescription = "Hyper Light Dodger";
-        public static string LongDescription  = "Grants the user an extremely quick dash in place of their dodge roll, but leaves them vulnerable to bullets while dashing.\n\nA memento left behind by a former adventurer said to possess the ability to outrun everything except his inner demons. While he never elaborated on what exactly those demons were, it almost certainly wasn't the likes of the Gundead.";
+        public static string LongDescription  = "Grants the user an extremely quick dash in place of their dodge roll, but leaves them vulnerable to bullets and enemies while dashing.\n\nA memento left behind by a former adventurer said to possess the ability to outrun everything except his inner demons. While he never elaborated on what exactly those demons were, it almost certainly wasn't the likes of the Gundead.";
 
         internal static GameObject _LinkVFXPrefab;
         internal static Projectile _LightningProjectile;
@@ -89,8 +89,8 @@ namespace CwaffingTheGungy
 
     public class HLDRoll : CustomDodgeRoll
     {
-        const float DASH_SPEED  = 50.0f; // Speed of our dash
-        const float DASH_TIME   = 0.1f; // Time we spend dashing
+        const float DASH_SPEED  = 55.0f; // Speed of our dash
+        const float DASH_TIME   = 0.125f; // Time we spend dashing
         const float DISOWN_TIME = DASH_TIME+0.05f; // Amount of time after our dash starts before lightning is no longer connected
         const float FADE_TIME   = 0.5f; // Amount of time lightning persists after being disowned
 

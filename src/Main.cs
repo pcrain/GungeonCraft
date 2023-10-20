@@ -20,7 +20,7 @@ using EnemyAPI;
 
 namespace CwaffingTheGungy
 {
-    [BepInPlugin(GUID, "Cwaffing the Gungy", "0.0.2")]
+    [BepInPlugin(GUID, "Cwaffing the Gungy", C.MOD_VERSION)]
     [BepInDependency(ETGModMainBehaviour.GUID)]
     [BepInDependency("etgmodding.etg.mtgapi")]
     [BepInDependency("kyle.etg.gapi")]
@@ -42,7 +42,8 @@ namespace CwaffingTheGungy
             try
             {
                 var watch = System.Diagnostics.Stopwatch.StartNew();
-                ETGModConsole.Log("Cwaffing the Gungy initialising...");
+                if (C.DEBUG_BUILD)
+                    ETGModConsole.Log("Cwaffing the Gungy initialising...");
 
                 // BraveMemory.EnsureHeapSize(1024*1024); ETGModConsole.Log("Ensured 1GB heap...");
 
@@ -260,9 +261,9 @@ namespace CwaffingTheGungy
                 // ETGMod.StartGlobalCoroutine(this.delayedstarthandler());
 
                 watch.Stop();
+                ETGModConsole.Log($"Yay! :D Initialized <color=#aaffaaff>{C.MOD_NAME} v{C.MOD_VERSION}</color> in "+(watch.ElapsedMilliseconds/1000.0f)+" seconds");
                 if (C.DEBUG_BUILD)
                     AkSoundEngine.PostEvent("vc_kirby_appeal01", ETGModMainBehaviour.Instance.gameObject);
-                ETGModConsole.Log($"Yay! :D Initialized <color=#aaffaaff>{C.MOD_NAME}</color> in "+(watch.ElapsedMilliseconds/1000.0f)+" seconds");
 
                 // Debug.LogError("Gungy o.o!");
                 // Debug.LogAssertion("Gungy o.o!");

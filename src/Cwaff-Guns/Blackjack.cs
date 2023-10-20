@@ -23,9 +23,9 @@ namespace CwaffingTheGungy
         public static string ShortDescription = "Gambit's Queens";
         public static string LongDescription  = "Fires cards whose range increase with accuracy. Ammo can only be regained by picking up cards from the floor.\n\nMany would argue that cards do not make the best projectiles for a gun...and many would largely be correct, as their lack of raw power and aerodynamics make them rather weak and unreliable in the hands of a novice. The most proficient and well-prepared duelists, however, have demonstrated that a single deck of cards is more than capable of dealing with the Gungeon's greatest threats.";
 
-        private const int _DECK_SIZE = 52; // does not include 2 jokers yet...need to finish up individual playing cards later
-        private const int _CLIP_SIZE = 13; // 1 suit
-        private const int _NUM_DECKS = 1;
+        private const int _DECK_SIZE = 54; // need to finish up individual playing cards later
+        private const int _CLIP_SIZE = 54; // 1 suit
+        private const int _NUM_DECKS = 2;
 
         internal static tk2dSpriteAnimationClip _BulletSprite;
         internal static tk2dSpriteAnimationClip _BackSprite;
@@ -43,8 +43,8 @@ namespace CwaffingTheGungy
                 mod.ammoCost            = 1;
                 mod.shootStyle          = ProjectileModule.ShootStyle.Automatic;
                 mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
-                mod.angleVariance       = 30.0f;
-                mod.cooldownTime        = 0.15f;
+                mod.angleVariance       = 24.0f;
+                mod.cooldownTime        = 0.16f;
                 mod.numberOfShotsInClip = _CLIP_SIZE;
 
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
@@ -59,7 +59,7 @@ namespace CwaffingTheGungy
 
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
                 projectile.AddDefaultAnimation(_BulletSprite);
-                projectile.baseData.damage = 7f;
+                projectile.baseData.damage = 8f;
                 projectile.baseData.range  = 999f; // we implement a custom range-like behavior
                 projectile.baseData.speed  = 18f;
                 projectile.gameObject.AddComponent<ThrownCard>();
@@ -81,8 +81,8 @@ namespace CwaffingTheGungy
     public class ThrownCard : MonoBehaviour
     {
         private const float _SPIN_SPEED = 2.0f;
-        private const float _BASE_LIFE  = 0.25f;
-        private const float _AIR_DRAG   = 0.93f;
+        private const float _BASE_LIFE  = 0.33f;
+        private const float _AIR_DRAG   = 0.94f;
 
         private Projectile       _projectile;
         private PlayerController _owner;

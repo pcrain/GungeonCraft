@@ -20,6 +20,9 @@ namespace CwaffingTheGungy
 
         public static void Init()
         {
+            if (!C.DEBUG_BUILD)
+                return; // do nothing in non-debug builds
+
             // Handle debug keyboard input
             InitDebugKeys();
             // Base command for doing whatever I'm testing at the moment

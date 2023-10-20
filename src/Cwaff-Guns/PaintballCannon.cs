@@ -26,7 +26,7 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<PaintballCannon>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.SetAttributes(quality: PickupObject.ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 0.9f, ammo: 300);
+                gun.SetAttributes(quality: PickupObject.ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 0.9f, ammo: 600);
                 gun.SetAnimationFPS(gun.shootAnimation, 14);
                 gun.SetAnimationFPS(gun.reloadAnimation, 4);
                 gun.SetFireAudio("paintball_shoot_sound");
@@ -41,7 +41,7 @@ namespace CwaffingTheGungy
                 mod.numberOfShotsInClip    = 12;
 
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
-                projectile.baseData.damage = 7f;
+                projectile.baseData.damage = 9f;
 
             PaintballColorizer paintballController = projectile.gameObject.AddComponent<PaintballColorizer>();
                 paintballController.ApplyColourToHitEnemies = true;
