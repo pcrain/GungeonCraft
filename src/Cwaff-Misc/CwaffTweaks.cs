@@ -39,8 +39,9 @@ namespace CwaffingTheGungy
 
             //Make Wolf pettable
             string[] defaultCompanions = new string[] {
-                "wolf","junkan","turkey","baby_good_mimic","baby_good_shelleton","super_space_turtle",
-                "r2g2","blank_companions_ring","badge","pig","chicken_flute",
+                "wolf",
+                // "junkan","turkey","baby_good_mimic","baby_good_shelleton","super_space_turtle",
+                // "r2g2","blank_companions_ring","badge","pig","chicken_flute",
             };
             foreach(string c in defaultCompanions)
             {

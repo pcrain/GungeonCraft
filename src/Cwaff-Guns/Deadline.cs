@@ -27,7 +27,7 @@ namespace CwaffingTheGungy
         public static string SpriteName       = "deadline";
         public static string ProjectileName   = "38_special";
         public static string ShortDescription = "Pythagoras Would be Proud";
-        public static string LongDescription  = "Upon colliding with walls, projectiles create laser beams perpendicular to the wall at their point of collision. If two such lasers intersect, a large explosion that damages enemies and players alike is created at the point of intersection.\n\nNot intended to be a weapon at all, this gun was used primarily as a tool for setting up dodge roll training rooms for newbie Gungeoneers. After an accidental crossing of the beams (an act generally known not to be a great idea) left seven injured, the engineer responsible for desigining the tool publicly apologized for the incident. Immediately afterwards, he returned to a private meeting room with his colleagues, who unanimously agreed the explosion was freakin' awesome. High fives and fist bumps were promptly exchanged all around.";
+        public static string LongDescription  = "Upon colliding with walls, projectiles create laser beams perpendicular to the wall at their point of collision. If two such lasers intersect, a large explosion is created at the point of intersection.\n\nNot intended to be a weapon at all, this gun was used primarily as a tool for setting up dodge roll training rooms for newbie Gungeoneers. After an accidental crossing of the beams (an act generally known not to be a great idea) left seven injured, the engineer responsible for desigining the tool publicly apologized for the incident. Immediately afterwards, he returned to a private meeting room with his colleagues, who unanimously agreed the explosion was freakin' awesome. High fives and fist bumps were promptly exchanged all around.";
 
         private const float _SIGHT_WIDTH = 2.0f;
 
@@ -82,7 +82,7 @@ namespace CwaffingTheGungy
                 forceUseThisRadius     = true,
                 pushRadius             = 3f,
                 damageRadius           = 3f,
-                damageToPlayer         = 1f,
+                damageToPlayer         = 0f,
                 doDamage               = true,
                 damage                 = 100,
                 doDestroyProjectiles   = false,
@@ -249,29 +249,9 @@ namespace CwaffingTheGungy
             this._debugLaserSight = VFX.CreateLaserSight(start.Value, C.PIXELS_PER_TILE * delta.magnitude, _SIGHT_WIDTH, delta.ToAngle(), colour: Color.magenta, power: 50f);
         }
 
-        // public void CreateALaser(Vector2 position, float angle)
-        // {
-        //     Vector2 target = Raycast.ToNearestWall(position, angle, minDistance: C.PIXELS_PER_TILE);
-        //     // raycast backwards to snap to wall
-        //     Vector2 invtarget = Raycast.ToNearestWall(position, (angle + 180f).Clamp360(), minDistance: 0);
-        //     if ((invtarget - position).magnitude > 1f)
-        //         invtarget = position; // hack: if raycast moves us really far away from our point of impact, we're too far, so just use our original position
-        //     this._myLasers.Add(new DeadlineLaser(invtarget, target, angle));
-        //     if (this.Player)
-        //         AkSoundEngine.PostEvent("Play_WPN_moonscraperLaser_shot_01", this.Player.gameObject);
-        //     this.CheckForLaserIntersections();
-        // }
-
         public void CreateALaser(Vector2 start, Vector2 end)
         {
-            // Vector2 target = Raycast.ToNearestWall(position, angle, minDistance: C.PIXELS_PER_TILE);
-            // // raycast backwards to snap to wall
-            // Vector2 invtarget = Raycast.ToNearestWall(position, (angle + 180f).Clamp360(), minDistance: 0);
-            // if ((invtarget - position).magnitude > 1f)
-            //     invtarget = position; // hack: if raycast moves us really far away from our point of impact, we're too far, so just use our original position
             this._myLasers.Add(new DeadlineLaser(start, end, (end - start).ToAngle()));
-            if (this.Player)
-                AkSoundEngine.PostEvent("Play_WPN_moonscraperLaser_shot_01", this.Player.gameObject);
             this.CheckForLaserIntersections();
         }
 

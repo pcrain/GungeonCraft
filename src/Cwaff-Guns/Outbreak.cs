@@ -55,7 +55,7 @@ namespace CwaffingTheGungy
                 projectile.AddDefaultAnimation(_BulletSprite);
                 projectile.transform.parent = gun.barrelOffset;
                 projectile.gameObject.AddComponent<InfectionBehavior>();
-                projectile.baseData.speed  = 15f;
+                projectile.baseData.speed  = 17f;
                 projectile.baseData.damage = 8f;
                 projectile.baseData.range  = 100f;
             _InfectionProjectile = projectile;
