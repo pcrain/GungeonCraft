@@ -282,7 +282,8 @@ namespace CwaffingTheGungy
                     GameObject res = ResourceManager.LoadAssetBundle(bundle).LoadAsset<GameObject>(name);
                     if (res == null)
                         continue;
-                    ETGModConsole.Log($"found asset {name} in bundle {bundle}");
+                    if (C.DEBUG_BUILD)
+                        ETGModConsole.Log($"found asset {name} in bundle {bundle}");
                     return res;
                 }
                 catch (Exception)
@@ -302,7 +303,8 @@ namespace CwaffingTheGungy
             {
                 if (ResourceManager.LoadAssetBundle(bundle).LoadAsset<T>(name) == null)
                     continue;
-                ETGModConsole.Log($"found asset {name} in bundle {bundle}");
+                if (C.DEBUG_BUILD)
+                    ETGModConsole.Log($"found asset {name} in bundle {bundle}");
                 break;
             }
         }

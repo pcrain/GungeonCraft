@@ -491,7 +491,7 @@ namespace CwaffingTheGungy
             Vector2 bestTarget          = Vector2.zero;
             foreach (AIActor enemy in activeEnemies)
             {
-                if (!enemy.IsHostileAndNotABoss())
+                if (!enemy.IsHostile(canBeNeutral: true))
                     continue;
                 Vector2 tentativeTarget = enemy.sprite.WorldCenter;
                 if (!ignoreWalls && !start.HasLineOfSight(tentativeTarget))
