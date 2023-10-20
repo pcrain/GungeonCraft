@@ -1,5 +1,11 @@
 ## Gungeon-Craft: A Mod for Enter the Gungeon
 
+|                                 |                                       |                                      |
+| -------------                   | :-------------:                       | :-------------:                      |
+| ![](previews/clip5-volley.webp) |                                       | ![](previews/clip1-the-slap.webp)    |
+| ![](previews/clip4-zoom.webp)   | ![](previews/clip3-janitor-time.webp) | ![](previews/clip2-pet-da-wolf.webp) |
+|                                 |                                       |                                      |
+
 ### Features
 
 - 22 new guns 
@@ -9,14 +15,6 @@
 - A new boss!
 - You can pet Junior \o/
 - You can become the greatest janitor the Gungeon has ever seen O:
-
-### Gallery
-
-![](https://imgur.com/JZBIcjX)
-![](https://imgur.com/j27tdcp)
-![](https://imgur.com/KSZt0sj)
-![](https://imgur.com/CRW4DhV)
-![](https://imgur.com/GTtu7DE)
 
 ### Goals
 
