@@ -62,7 +62,7 @@ namespace CwaffingTheGungy
         {
             // ETGModConsole.Log("spawning "+enemy.GetActorName() + " ("+enemy.EnemyGuid+")");
             // if (true || enemy.EnemyGuid == enemyWithoutAFuture)
-            if (enemy.EnemyGuid != enemyWithoutAFuture)
+            if (string.IsNullOrEmpty(enemyWithoutAFuture) || enemy.EnemyGuid != enemyWithoutAFuture)
             {
                 action(enemy);
                 return;
