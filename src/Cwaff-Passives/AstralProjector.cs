@@ -88,6 +88,9 @@ namespace CwaffingTheGungy
         public override void Update()
         {
             base.Update();
+            if (!this.Owner)
+                return;
+
             this.CanBeDropped = !(this._intangible || this._phased);
 
             if (this._intangibleTimer > 0)

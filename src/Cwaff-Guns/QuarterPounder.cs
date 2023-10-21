@@ -75,6 +75,8 @@ namespace CwaffingTheGungy
         protected override void Update()
         {
             base.Update();
+            if (!this.Player)
+                return;
             AdjustAmmoToMoney();
         }
 

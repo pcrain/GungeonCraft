@@ -35,8 +35,11 @@ namespace CwaffingTheGungy
         public override void Update()
         {
             base.Update();
+            if (!this.Owner)
+                return;
+
             RoomHandler room = this.Owner.CurrentRoom;
-            if (!this.Owner || room == this._lastVisitedRoom)
+            if (room == this._lastVisitedRoom)
                 return;
 
             this._lastVisitedRoom = room;

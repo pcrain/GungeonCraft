@@ -45,7 +45,6 @@ namespace CwaffingTheGungy
         public override void Update()
         {
             base.Update();
-
             if (!this.Owner)
                 return;
 

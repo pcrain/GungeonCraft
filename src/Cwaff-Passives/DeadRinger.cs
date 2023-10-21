@@ -55,13 +55,6 @@ namespace CwaffingTheGungy
             BecomeInvisible();
         }
 
-        public override void Update()
-        {
-            base.Update();
-            if (!this.Owner.IsStealthed)
-                return;
-        }
-
         private void FeignDeath()
         {
             AkSoundEngine.PostEvent("spy_uncloak_feigndeath", this.Owner.gameObject);

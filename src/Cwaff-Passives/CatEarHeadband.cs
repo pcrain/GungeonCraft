@@ -55,13 +55,6 @@ namespace CwaffingTheGungy
             BecomeInvisible();
         }
 
-        public override void Update()
-        {
-            base.Update();
-            if (!this.Owner.IsStealthed)
-                return;
-        }
-
         // copied and simplified from DoEffect() of CardboardBoxItem.cs
         private void BecomeInvisible()
         {

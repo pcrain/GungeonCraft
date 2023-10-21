@@ -100,11 +100,6 @@ namespace CwaffingTheGungy
             UnityEngine.GameObject.Destroy(nearestTreasure.gameObject);
         }
 
-        public override void Update()
-        {
-            base.Update();
-        }
-
         private void InitializeTreasureForFloor()
         {
             if (_Treasure != null)
