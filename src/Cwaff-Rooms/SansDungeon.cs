@@ -29,6 +29,8 @@ namespace CwaffingTheGungy
         public static tk2dSpriteCollectionData goheckyourself;
         public static Dungeon GetOrLoadByNameHook(Func<string, Dungeon> orig, string name)
         {
+            if (!GameManager.Instance.customFloors.Contains(FloorNameDefinition))
+                GameManager.Instance.customFloors.Add(FloorNameDefinition); // fixes a bug where returning to the breach deletes the floor, thanks Bunny!
             Dungeon dungeon = null;
             string dungeonPrefabTemplate = "Base_ResourcefulRat";
             if (name.ToLower() == "cg_sansfloor")

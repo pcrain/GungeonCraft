@@ -26,7 +26,7 @@ namespace CwaffingTheGungy
 
         public const string MOD_NAME        = "GungeonCraft";
         public const string MOD_INT_NAME    = "CwaffingTheGungy";
-        public const string MOD_VERSION     = "1.0.2";
+        public const string MOD_VERSION     = "1.0.3";
 
         public const string MOD_PREFIX      = "cg";
         public const float  PIXELS_PER_TILE = 16f;
