@@ -111,6 +111,7 @@ namespace CwaffingTheGungy
             p.OnWillKillEnemy += this.OnWillKillEnemy;
         }
 
+        private static tk2dSpriteCollectionData _GoldSpriteCollection = null;
         private void OnWillKillEnemy(Projectile bullet, SpeculativeRigidbody enemy)
         {
             Texture2D goldSprite;
@@ -121,13 +122,40 @@ namespace CwaffingTheGungy
                 goldSprite = Lazy.GetTexturedEnemyIdleAnimation(enemy.aiActor, _Gold, 0.3f, _White, _SHEEN_WIDTH);
                 _GoldenTextures[enemy.aiActor.EnemyGuid] = goldSprite; // Cache the texture for this enemy for later
             }
-            GameObject g                        = UnityEngine.Object.Instantiate(new GameObject(), enemy.sprite.WorldBottomLeft.ToVector3ZisY(0f), Quaternion.identity);
-            tk2dSpriteCollectionData collection = SpriteBuilder.ConstructCollection(g, "goldcollection");
-            int spriteId                        = SpriteBuilder.AddSpriteToCollection(goldSprite, collection, "goldsprite");
+            GameObject g                        = UnityEngine.Object.Instantiate(new GameObject(), enemy.sprite.WorldBottomLeft.ToVector3ZUp(), Quaternion.identity);
+            _GoldSpriteCollection             ??= SpriteBuilder.ConstructCollection(g, "goldcollection");
+            int spriteId                        = SpriteBuilder.AddSpriteToCollection(goldSprite, _GoldSpriteCollection, "goldsprite");
             tk2dBaseSprite sprite               = g.AddComponent<tk2dSprite>();
-            sprite.SetSprite(collection, spriteId);
+                sprite.SetSprite(_GoldSpriteCollection, spriteId);
+                sprite.PlaceAtPositionByAnchor(enemy.sprite.WorldCenter.ToVector3ZisY(), tk2dBaseSprite.Anchor.MiddleCenter);
+                sprite.HeightOffGround        = enemy.sprite.HeightOffGround;
+                sprite.depthUsesTrimmedBounds = enemy.sprite.depthUsesTrimmedBounds;
+                sprite.SortingOrder           = enemy.sprite.SortingOrder;
+                sprite.renderLayer            = enemy.sprite.renderLayer;
+                sprite.UpdateZDepth();
+            PixelCollider pixelCollider = new PixelCollider();
+                pixelCollider.Enabled                = false;
+                pixelCollider.CollisionLayer         = CollisionLayer.PlayerBlocker;
+                pixelCollider.Enabled                = true;
+                pixelCollider.IsTrigger              = false; //true;
+                pixelCollider.ColliderGenerationMode = PixelCollider.PixelColliderGeneration.Manual;
+                pixelCollider.ManualOffsetX          = 0;
+                pixelCollider.ManualOffsetY          = 0;
+                pixelCollider.ManualWidth            = Mathf.CeilToInt(C.PIXELS_PER_TILE * sprite.GetBounds().size.x);
+                pixelCollider.ManualHeight           = Mathf.CeilToInt(C.PIXELS_PER_TILE * sprite.GetBounds().size.y);
+            SpeculativeRigidbody s = g.AddComponent<SpeculativeRigidbody>();
+                s.CanBePushed        = true;
+                s.CanBeCarried       = true;
+                s.CollideWithOthers  = true;
+                s.CollideWithTileMap = false;
+                s.TK2DSprite         = sprite;
+                s.PixelColliders     = new List<PixelCollider>(1);
+                s.PixelColliders.Add(pixelCollider);
+                s.Initialize();
             g.AddComponent<GoldenDeath>();
 
+            if (enemy.aiActor.IsABoss()) // Unsure why this doesn't trigger normally, but this seems to fix it
+                enemy.aiActor.ParentRoom.HandleRoomClearReward(); //TODO: it's possible non-boss room rewards also don't spawn if final enemy is midas'd...look into later
             enemy.aiActor.EraseFromExistenceWithRewards(true);
 
         }
@@ -179,6 +207,7 @@ namespace CwaffingTheGungy
         private void Update()
         {
             float emit;
+            this._sprite.UpdateZDepth();
             if (this._decaying)
             {
                 if (this._lifetime >= _DECAY_TIME)

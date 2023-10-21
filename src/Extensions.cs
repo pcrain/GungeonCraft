@@ -332,6 +332,13 @@ namespace CwaffingTheGungy
       return e && !e.IsGone && (canBeNeutral || !e.IsHarmlessEnemy) && h && !h.IsBoss && !h.IsSubboss &&  (canBeDead || (h.IsAlive && !h.IsDead)) && !h.isPlayerCharacter;
     }
 
+    // Check if an enemy is a boss
+    public static bool IsABoss(this AIActor e, bool canBeDead = false)
+    {
+      HealthHaver h = e?.healthHaver;
+      return e && !e.IsGone && h && (h.IsBoss || h.IsSubboss) && (canBeDead || (h.IsAlive && !h.IsDead));
+    }
+
     // Set the Alpha of a GameObject's sprite
     public static void SetAlpha(this GameObject g, float a)
     {

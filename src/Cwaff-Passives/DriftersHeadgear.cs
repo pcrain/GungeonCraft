@@ -97,6 +97,7 @@ namespace CwaffingTheGungy
 
         public override void BeginDodgeRoll()
         {
+            base.BeginDodgeRoll();
             if (!(this.isHyped && this.owner))
                 return;
             Projectile p = SpawnManager.SpawnProjectile(

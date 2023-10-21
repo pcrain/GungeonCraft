@@ -18,6 +18,7 @@ namespace CwaffingTheGungy
 
         public bool canDodge      { get; }  // if false, disables a CustomDodgeRoll from activating
         public bool canMultidodge { get; }  // if true, enables dodging while already mid-dodge
+        public bool putsOutFire   { get; }  // if true, puts out fires when the dodge roll starts up
 
         public void BeginDodgeRoll();  // called once before a dodge roll begins
         public IEnumerator ContinueDodgeRoll();  // called every frame until dodge roll ends
@@ -33,6 +34,7 @@ namespace CwaffingTheGungy
 
         public virtual bool canDodge      => true;
         public virtual bool canMultidodge => false;
+        public virtual bool putsOutFire   => true;
 
         private static Hook customDodgeRollHook = null;
 
@@ -79,6 +81,16 @@ namespace CwaffingTheGungy
         public virtual void BeginDodgeRoll()
         {
             // any dodge setup code should be here
+            if (!this.owner)
+                return;
+
+            // by default, we want to make sure we can put out fires at the beginning of our dodge roll
+            if (this.putsOutFire && this.owner.CurrentFireMeterValue > 0f)
+            {
+                this.owner.CurrentFireMeterValue = Mathf.Max(0f, this.owner.CurrentFireMeterValue -= 0.5f);
+                if (this.owner.CurrentFireMeterValue == 0f)
+                    this.owner.IsOnFire = false;
+            }
         }
 
         public virtual void FinishDodgeRoll()

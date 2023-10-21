@@ -85,6 +85,8 @@ namespace CwaffingTheGungy
         const float TORNADO_ALPHA  = 0.5f;     // Max alpha of tornado VFX
         const float SPIN_DELTA     = MAX_SPIN - MIN_SPIN;
 
+        public override bool putsOutFire => false; // We have custom fire extinguishing behavior
+
         public bool reflectingProjectiles { get; private set; }
 
         private bool useDriftMechanics          = true;
@@ -170,6 +172,16 @@ namespace CwaffingTheGungy
             AkSoundEngine.PostEvent("undertale_damage", this.owner.gameObject);
         }
 
+        private void ExtinguishFire()
+        {
+            if (this.owner.CurrentFireMeterValue <= 0f)
+                return;
+
+            this.owner.CurrentFireMeterValue = Mathf.Max(0f, this.owner.CurrentFireMeterValue - 1.0f * BraveTime.DeltaTime);
+            if (this.owner.CurrentFireMeterValue == 0f)
+                this.owner.IsOnFire = false;
+        }
+
         public override IEnumerator ContinueDodgeRoll()
         {
             float minDashSpeed = GetDodgeRollSpeed(); // Min speed of our dash
@@ -244,6 +256,7 @@ namespace CwaffingTheGungy
                         tornadoAnimator.renderer.SetAlpha(tornadoCurAlpha);
                     }
 
+                    ExtinguishFire();
                     yield return null;
                 }
                 this.owner.ownerlessStatModifiers.Remove(this.speedModifier);
@@ -301,6 +314,7 @@ namespace CwaffingTheGungy
                     }
 
                     tornadoAnimator.sprite.transform.position = this.owner.sprite.WorldBottomCenter;
+                    ExtinguishFire();
                     yield return null;
                 }
                 this.owner.specRigidbody.OnPreRigidbodyCollision -= BounceAwayEnemies;

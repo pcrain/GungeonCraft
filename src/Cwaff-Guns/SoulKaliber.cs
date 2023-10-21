@@ -80,6 +80,7 @@ namespace CwaffingTheGungy
 
         private const int   _NUM_HIT_PARTICLES = 12;
         private const float _SOUL_PART_SPEED   = 3f;
+        private const float _MAX_VFX_RATE      = 0.10f;
 
         internal static VFXPool _SoulLinkHitVFXPool      = null;
         internal static GameObject _SoulLinkHitVFX       = null;
@@ -90,6 +91,7 @@ namespace CwaffingTheGungy
 
         private AIActor _enemy;
         private OrbitalEffect _orbitalEffect = null;
+        private float _lastVfxTime = 0f;
 
         public static void Init()
         {
@@ -142,7 +144,7 @@ namespace CwaffingTheGungy
                 if (activeEnemies == null)
                     return;
 
-                bool didAnything = false;
+                bool shouldPlaySound = false;
                 foreach (AIActor otherEnemy in activeEnemies)
                 {
                     if (!(otherEnemy.IsHostileAndNotABoss()))
@@ -151,10 +153,9 @@ namespace CwaffingTheGungy
                         continue; // don't apply damage to ourselves
                     if (otherEnemy.gameObject.GetComponent<SoulLinkStatus>() is not SoulLinkStatus soulLink)
                         continue;
-                    soulLink.ShareThePain(data.ModifiedDamage);
-                    didAnything = true;
+                    shouldPlaySound = soulLink.ShareThePain(data.ModifiedDamage);
                 }
-                if (didAnything)
+                if (shouldPlaySound)
                     AkSoundEngine.PostEvent("soul_kaliber_drain", hh.gameObject);
             }
             finally
@@ -163,7 +164,7 @@ namespace CwaffingTheGungy
             }
         }
 
-        public void ShareThePain(float damage)
+        public bool ShareThePain(float damage)
         {
             HealthHaver hh = this._enemy.healthHaver;
             float curHealth = hh.currentHealth;
@@ -171,8 +172,12 @@ namespace CwaffingTheGungy
             hh.ApplyDamage(damage, new Vector2(0f,0f), "Soul Link",
                 CoreDamageTypes.Magic, DamageCategory.Unstoppable,
                 true, null, false);
-            hh.knockbackDoer.ApplyKnockback(new Vector2(10f,0f), 2f);
+            hh.knockbackDoer.ApplyKnockback(new Vector2(0f,0f), 2f);
 
+            if (this._lastVfxTime + _MAX_VFX_RATE > BraveTime.ScaledTimeSinceStartup)
+                return false; // don't play any sounds
+
+            this._lastVfxTime = BraveTime.ScaledTimeSinceStartup;
             Vector2 ppos = this._enemy.sprite.WorldCenter;
             for (int i = 0; i < _NUM_HIT_PARTICLES; ++i)
             {
@@ -181,6 +186,7 @@ namespace CwaffingTheGungy
                 FancyVFX.Spawn(_SoulLinkSoulVFX, finalpos, 0f.EulerZ(),
                     velocity: _SOUL_PART_SPEED * Vector2.up, lifetime: 0.5f, fadeOutTime: 0.5f, emissivePower: 50f, emissiveColor: Color.white);
             }
+            return true; // now we can play sounds
         }
     }
 }
