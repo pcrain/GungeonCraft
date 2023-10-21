@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2 (2023-10-20)
+
+- Remove unnecessary dependency on Kyle's Custom Rooms
+
 ## 1.0.1 (2023-10-20)
 
 - Fix Thunderstore build manifest

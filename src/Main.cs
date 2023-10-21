@@ -23,7 +23,6 @@ namespace CwaffingTheGungy
     [BepInPlugin(GUID, "Cwaffing the Gungy", C.MOD_VERSION)]
     [BepInDependency(ETGModMainBehaviour.GUID)]
     [BepInDependency("etgmodding.etg.mtgapi")]
-    [BepInDependency("kyle.etg.gapi")]
     [BepInDependency("alexandria.etgmod.alexandria")]
     public class Initialisation : BaseUnityPlugin
     {
