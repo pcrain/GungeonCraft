@@ -29,6 +29,14 @@
         "syntax": "Packages/ANSIescape/ANSI.sublime-syntax",
     },
     {
+        "name": "Regenerate Project Files and Thunderstore Package",
+        "shell_cmd": "$project_path/genproject -t",
+        "working_dir": "${project_path}",
+        "env": {"CLICOLOR_FORCE": "1",},
+        "target": "ansi_color_build",
+        "syntax": "Packages/ANSIescape/ANSI.sublime-syntax",
+    },
+    {
         "name": "Regenerate Project Files and Run",
         "shell_cmd": "$project_path/genproject -g",
         "working_dir": "${project_path}",

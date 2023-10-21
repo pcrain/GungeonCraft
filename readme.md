@@ -1,4 +1,4 @@
-## GungeonCraft: A Mod for Enter the Gungeon
+## GungeonCraft: A mechanics-focused mod for Enter the Gungeon
 
 |                                 |                                       |                                      |
 | -------------                   | :-------------:                       | :-------------:                      |
@@ -29,9 +29,9 @@
 ### FAQ
 
 * Found a Bug?
-	- Open an issue on GitHub! Please bear in mind that I work on this in my free time for fun, so I might not fix every bug, but I'll do my best to get to all of the important ones. C:
+	- [Open an Issue on GitHub](https://github.com/pcrain/GungeonCraft/issues)! Please bear in mind that I work on this in my free time for fun, so I might not fix every bug, but I'll do my best to get to all of the important ones. C:
 * Balance or Feature Suggestion?
-	- I'm always open to more ideas! But I do have a spreadsheet with 160 or so item ideas in it already, so I probably won't be implementing anything unless it's really intriguing. O:
+	- [Submit it here!](https://github.com/pcrain/GungeonCraft/issues/1) I'm always open to more ideas, but I also have a spreadsheet with 160 or so ideas in it already, so no guarantees I get around to everything. O:
 * Where do I find the new boss?
 	- Try talking to Bello a few dozen times! He'll give you a hint eventually (dialogue is RNG and I can't find a way around it D: ).
 
@@ -39,6 +39,10 @@
 
 May or may not be coming soon, but all of the information and lore you'll ever need can be found in-game in the Ammonomicon. O:
 
+### Changelog
+
+See the [changelog page](https://github.com/pcrain/GungeonCraft/blob/master/changelog.md)!
+
 ### Credits
 
-See the [credits page](credits.md)!
+See the [credits page](https://github.com/pcrain/GungeonCraft/blob/master/credits.md)!
