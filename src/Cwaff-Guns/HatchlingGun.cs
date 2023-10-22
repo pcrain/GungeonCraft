@@ -46,12 +46,6 @@ namespace CwaffingTheGungy
                 mod.cooldownTime        = 0.2f;
                 mod.numberOfShotsInClip = 12;
 
-            VFXPool impactFVX = VFX.RegisterVFXPool("EggBreak", ResMap.Get("egg_break"), fps: 16, loops: false, scale: 0.75f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
-                gun.SetHorizontalImpactVFX(impactFVX);
-                gun.SetVerticalImpactVFX(impactFVX);
-                gun.SetEnemyImpactVFX(impactFVX);
-                gun.SetAirImpactVFX(impactFVX);
-
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("egg").Base(),
                 12, true, new IntVector2(12, 12), // sprite is 8x8 -> 1.5x scale
@@ -63,6 +57,13 @@ namespace CwaffingTheGungy
                 projectile.baseData.speed   = 24.0f;
                 projectile.transform.parent = gun.barrelOffset;
                 projectile.gameObject.AddComponent<HatchlingProjectile>();
+
+            // Must be done AFTER gun / projectile setup so impact effects don't bleed onto other guns
+            VFXPool impactFVX = VFX.RegisterVFXPool("EggBreak", ResMap.Get("egg_break"), fps: 16, loops: false, scale: 0.75f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+                gun.SetHorizontalImpactVFX(impactFVX);
+                gun.SetVerticalImpactVFX(impactFVX);
+                gun.SetEnemyImpactVFX(impactFVX);
+                gun.SetAirImpactVFX(impactFVX);
         }
 
         public override void OnPostFired(PlayerController player, Gun gun)

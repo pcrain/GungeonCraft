@@ -24,7 +24,7 @@
 
 - Fix Thunderstore build manifest
 - Fix Dead Ringer crash
-- Fix null derference in Update() of several items
+- Fix null dereference in Update() of several items
 
 ## 1.0.0 (2023-10-20)
 	

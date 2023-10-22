@@ -1028,7 +1028,7 @@ namespace CwaffingTheGungy
 
     }
 
-    public class EasyPlaceableObjects // stolen from NN
+    public static class EasyPlaceableObjects // stolen from NN
     {
         public static GameObject CoffinVert = LoadHelper.LoadAssetFromAnywhere<GameObject>("Coffin_Vertical");
         public static GameObject CoffinHoriz = LoadHelper.LoadAssetFromAnywhere<GameObject>("Coffin_Horizontal");

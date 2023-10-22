@@ -165,8 +165,9 @@ namespace CwaffingTheGungy
                 ETGModConsole.Log(e.ToString());
                 return null;
             }
+
         }
-        private static void SetupBeamPart(tk2dSpriteAnimation beamAnimation, List<string> animSpritePaths, string animationName, int fps, Vector2? colliderDimensions = null, Vector2? colliderOffsets = null, Vector3[] overrideVertices = null, tk2dSpriteAnimationClip.WrapMode wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop, tk2dBaseSprite.Anchor? anchorOverride = null)
+        internal static void SetupBeamPart(tk2dSpriteAnimation beamAnimation, List<string> animSpritePaths, string animationName, int fps, Vector2? colliderDimensions = null, Vector2? colliderOffsets = null, Vector3[] overrideVertices = null, tk2dSpriteAnimationClip.WrapMode wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop, tk2dBaseSprite.Anchor? anchorOverride = null)
         {
             tk2dSpriteAnimationClip clip = new tk2dSpriteAnimationClip() { name = animationName, frames = new tk2dSpriteAnimationFrame[0], fps = fps };
             List<string> spritePaths = animSpritePaths;
@@ -174,6 +175,7 @@ namespace CwaffingTheGungy
             clip.wrapMode = wrapMode;
             foreach (string path in spritePaths)
             {
+                ETGModConsole.Log($"adding path {path} at fps {fps}");
                 tk2dSpriteCollectionData collection = ETGMod.Databases.Items.ProjectileCollection;
                 int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
                 tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
@@ -202,6 +204,7 @@ namespace CwaffingTheGungy
             }
             clip.frames = frames.ToArray();
             beamAnimation.clips = beamAnimation.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
+            ETGModConsole.Log($"  beanAnimation has {beamAnimation.clips.Count()} clips");
         }
     }
 }

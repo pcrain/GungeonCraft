@@ -13,6 +13,7 @@ dllname="./bin/Debug/${projectname}.dll"         #DLL name is directly based on 
 USEXTERNALASSEMBLY=0                             #Whether to use the external Assembly-Csharp.dll or the one bundled in the source directory
 #Could not get the external assembly working ):
 projectversion="$(cat 'src/Common.cs' | grep 'MOD_VERSION' | cut -f 2 -d '"')"
+debugbuild="$( [ "false" == "$(cat 'src/Common.cs' | grep -m1 'DEBUG_BUILD' | cut -f 2 -d '=' | cut -f 1 -d ';' | tr -d ' ')" ]; echo "$?" )"
 manifesttemplate=`cat <<HERE
 {
   "name": "$projectname",
@@ -302,21 +303,25 @@ fi
 #Generate new Thunderstore Package
 if [ $# -gt 0 ] && [ "$1" == "-t" ]; then
   echo -e "[${GRN}>${BLN}] Assembling Thunderstore package"
-  tdir="./_thunderstore_package"
-  /bin/mkdir -p "${tdir}"
-  cat "./readme.md" | grep -vE "^\|" > "${tdir}/README.md" # remove gallery since Thunderstore can't display inline images
-  /bin/cp -f "./changelog.md" "${tdir}/CHANGELOG.md"
-  /bin/cp -f "./previews/icon.png" "${tdir}/icon.png"
-  echo "${manifesttemplate}" > "${tdir}/manifest.json"
-  /bin/cp "${dllname}" "${tdir}"
+  if [ $debugbuild -gt 0 ]; then
+    echo -e "[${RED}@${BLN}] Trying to build Thunderstore package from debug build, refusing"
+  else
+    tdir="./_thunderstore_package"
+    /bin/mkdir -p "${tdir}"
+    cat "./readme.md" | grep -vE "^\|" > "${tdir}/README.md" # remove gallery since Thunderstore can't display inline images
+    /bin/cp -f "./changelog.md" "${tdir}/CHANGELOG.md"
+    /bin/cp -f "./previews/icon.png" "${tdir}/icon.png"
+    echo "${manifesttemplate}" > "${tdir}/manifest.json"
+    /bin/cp "${dllname}" "${tdir}"
 
-  cd "${tdir}"
-  /bin/rm -f "${projectname}.zip"
-  zip -q "${projectname}.zip" ./*
-  cd ..
-  /bin/rm -f "./bin/${projectname}.zip"
-  /bin/mv "${tdir}/${projectname}.zip" "./bin/${projectname}.zip"
-  echo -e "[${GRN}>${BLN}]   Created package ./bin/${projectname}.zip"
+    cd "${tdir}"
+    /bin/rm -f "${projectname}.zip"
+    zip -q "${projectname}.zip" ./*
+    cd ..
+    /bin/rm -f "./bin/${projectname}.zip"
+    /bin/mv "${tdir}/${projectname}.zip" "./bin/${projectname}.zip"
+    echo -e "[${GRN}>${BLN}]   Created package ./bin/${projectname}.zip"
+  fi
 fi
 
 #Launch the game if "-g" flag was passed

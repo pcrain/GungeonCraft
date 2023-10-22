@@ -22,7 +22,7 @@ namespace CwaffingTheGungy
 {
     public class C // constants
     {
-        public static readonly bool DEBUG_BUILD = false; // set to false for release builds (must be readonly instead of const to avoid build warnings)
+        public static readonly bool DEBUG_BUILD = true; // set to false for release builds (must be readonly instead of const to avoid build warnings)
 
         public const string MOD_NAME        = "GungeonCraft";
         public const string MOD_INT_NAME    = "CwaffingTheGungy";
@@ -32,6 +32,7 @@ namespace CwaffingTheGungy
         public const float  PIXELS_PER_TILE = 16f;
         public const float  PIXELS_PER_CELL = 64f;
         public const float  FPS             = 60f;
+        public const float  FRAME           = 1f / FPS;
         public const float  PIXEL_SIZE      = 1f / PIXELS_PER_TILE;
     }
 

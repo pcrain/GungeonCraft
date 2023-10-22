@@ -161,6 +161,7 @@ namespace CwaffingTheGungy
                     HandCannon.Add();
                     HatchlingGun.Add();
                     Ticonderogun.Add();
+                    AimuHakurei.Add();
                 #endregion
 
                 #region Synergies
