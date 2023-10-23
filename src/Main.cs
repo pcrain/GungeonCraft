@@ -59,7 +59,8 @@ namespace CwaffingTheGungy
                 CwaffEvents.Init();
 
                 FakePrefabHooks.Init();
-                HUDController.Init(); //Need to load early
+                HUDController.Init(); // Need to load early
+                CustomAmmoDisplay.Init(); // Also need to load early
 
                 ItemBuilder.Init();
                 // SaveAPIManager.Setup("cg");

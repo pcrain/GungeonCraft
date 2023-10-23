@@ -214,6 +214,7 @@
     <Compile Include="src\Cwaff-Guns\HolyWaterGun.cs"/>
     <Compile Include="src\Cwaff-Guns\Alyx.cs"/>
     <Compile Include="src\PlayerToolbox.cs"/>
+    <Compile Include="src\NonstandardApi\CustomAmmoDisplay.cs"/>
     <Compile Include="src\NonstandardApi\FakeShopItem.cs"/>
     <Compile Include="src\NonstandardApi\CustomDodgeRoll.cs"/>
     <Compile Include="src\NonstandardApi\MiniInteractable.cs"/>
