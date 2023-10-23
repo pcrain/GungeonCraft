@@ -61,3 +61,6 @@ knife_gun_launch,-3.0,1,sound
 schrodingers_gat_fire_sound,-2.0,1,sound
 fire_coin_sound,-5.0,1,sound
 coin_gun_reload,2.0,1,sound
+aimu_shoot_sound,-1.0,1,sound
+aimu_shoot_sound_alt,-4.0,1,sound
+aimu_beam_sound_2,-9.0,1,sound

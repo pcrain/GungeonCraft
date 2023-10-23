@@ -1760,6 +1760,7 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\bball015.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tennis_ball2.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile7.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\aimu_projectile.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\alyx_projectile1.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile13.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\slappp8.png"/>
