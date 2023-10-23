@@ -25,8 +25,19 @@ namespace CwaffingTheGungy
         public static string ShortDescription = "TBD";
         public static string LongDescription  = "TBD";
 
+        internal const float _GRAZE_THRES             = 1.6f;
+        internal const float _GRAZE_THRES_SQUARED     = _GRAZE_THRES * _GRAZE_THRES;
+        internal const float _GRAZE_DECAY_RATE        = 0.75f;
+        internal const int   _GRAZE_MAX               = 120;
+
+        internal static readonly int[] _GRAZE_TIER_THRESHOLDS  = {10, 30, 60, 100};
+
         internal static tk2dSpriteAnimationClip _BulletSprite = null;
         internal static Projectile _ProjBase;
+
+        public int graze = 0;
+
+        private float _lastDecayTime = 0f;
 
         public static void Add()
         {
@@ -64,8 +75,30 @@ namespace CwaffingTheGungy
                 beamProj.SetEnemyImpactVFX(impactFVX);
                 beamProj.SetAirImpactVFX(impactFVX);
 
+            // set up tiered projectiles
             gun.Volley.projectiles = new(){
+                // Tier 0
+                AimuMod(fireRate: 20, projectiles: new(){
+                    AimuProj(invert: false, amplitude: 0.0f),
+                    }),
                 // Tier 1
+                AimuMod(fireRate: 15, projectiles: new(){
+                    AimuProj(invert: false, amplitude: 0.75f),
+                    AimuProj(invert: true,  amplitude: 0.75f),
+                    }),
+                // Tier 2
+                AimuMod(fireRate: 10, projectiles: new(){
+                    AimuProj(invert: false, amplitude: 0.75f),
+                    AimuProj(invert: true,  amplitude: 0.75f),
+                    }),
+                // Tier 3
+                AimuMod(fireRate: 5, projectiles: new(){
+                    AimuProj(invert: false, amplitude: 0.75f),
+                    AimuProj(invert: true,  amplitude: 0.75f),
+                    AimuProj(invert: false, amplitude: 2.25f),
+                    AimuProj(invert: true,  amplitude: 2.25f),
+                    }),
+                // Tier 4
                 AimuMod(fireRate: 3, projectiles: new(){
                     AimuProj(invert: false, amplitude: 0.75f),
                     AimuProj(invert: true,  amplitude: 0.75f),
@@ -78,14 +111,11 @@ namespace CwaffingTheGungy
             gun.gameObject.AddComponent<AimuHakureiAmmoDisplay>();
         }
 
-        public class AimuHakureiAmmoDisplay : CustomAmmoDisplay
+        protected override void OnPickup(GameActor owner)
         {
-            public override bool DoCustomAmmoDisplay(GameUIAmmoController uic)
-            {
-                uic.SetAmmoCountLabelColor(Color.magenta);
-                uic.GunAmmoCountLabel.Text = "O: neat";
-                return true;
-            }
+            base.OnPickup(owner);
+            this.graze                   = 0; // reset graze when dropped
+            this.gun.CurrentStrengthTier = 0;
         }
 
         private static ProjectileModule AimuMod(List<Projectile> projectiles, float fireRate)
@@ -118,15 +148,115 @@ namespace CwaffingTheGungy
         private static void AddTrail(Projectile p)
         {
             EasyTrailBullet trail = p.gameObject.AddComponent<EasyTrailBullet>();
-                trail.TrailPos   = trail.transform.position;
+                trail.TrailPos   = p.transform.position.XY() + new Vector2(5f / C.PIXELS_PER_TILE, 5f / C.PIXELS_PER_TILE); // offset by middle of the sprite
                 trail.StartWidth = 0.5f;
                 trail.EndWidth   = 0.05f;
                 trail.LifeTime   = 0.1f;
                 trail.BaseColor  = Color.magenta;
                 trail.EndColor   = Color.magenta;
         }
+
+        protected override void Update()
+        {
+            base.Update();
+            CheckForGraze();
+        }
+
+        private void PowerUp()
+        {
+            ++this.gun.CurrentStrengthTier;
+            GameObject aura = SpawnManager.SpawnVFX(WarriorsGi._ZenkaiAura, this.Owner.sprite.WorldBottomCenter, Quaternion.identity);
+                aura.transform.parent = this.Owner.transform;
+                aura.ExpireIn(0.5f, 0.5f);
+            AkSoundEngine.PostEvent("zenkai_aura_sound", this.Owner.gameObject);
+        }
+
+        private void PowerDown()
+        {
+            --this.gun.CurrentStrengthTier;
+        }
+
+        // private static List<Projectile> shortList; // cache projectiles that are nearby so we can look them up every other frame
+        private static Dictionary<Projectile, int> _GrazeDict = new();
+        private void CheckForGraze()
+        {
+            if (this.Owner is not PlayerController pc)
+                return; // if our owner isn't a player, we have nothing to do
+
+            if (this.graze > 0 && (this._lastDecayTime + _GRAZE_DECAY_RATE <= BraveTime.ScaledTimeSinceStartup))
+            {
+                --this.graze;
+                if (this.gun.CurrentStrengthTier > 0 && graze < _GRAZE_TIER_THRESHOLDS[this.gun.CurrentStrengthTier-1])
+                    PowerDown();
+                this._lastDecayTime = BraveTime.ScaledTimeSinceStartup;
+            }
+
+            if (!pc.healthHaver.IsVulnerable)
+                return; // can't graze if we're invincible, that's cheating!!!
+
+            Vector2 ppos = pc.sprite.WorldCenter;
+            foreach (Projectile p in StaticReferenceManager.AllProjectiles)
+            {
+                if (!p.collidesWithPlayer || p.Owner == this.Owner)
+                    continue; // if the projectile can't collide with us, we're not impressed
+
+                if (p.sprite?.WorldCenter is not Vector2 epos)
+                    continue; // don't care about projectiles without sprites
+
+                if ((epos-ppos).sqrMagnitude < _GRAZE_THRES_SQUARED)
+                {
+                    if (!_GrazeDict.ContainsKey(p))
+                    {
+                        _GrazeDict[p] = 1;
+                        ++this.graze;
+                    }
+                    else if (_GrazeDict[p] < 5)
+                    {
+                        ++_GrazeDict[p];
+                        ++this.graze;
+                    }
+                    if (this.graze > _GRAZE_MAX)
+                        this.graze = _GRAZE_MAX;
+
+                    Vector2 finalpos = ppos + BraveMathCollege.DegreesToVector(Lazy.RandomAngle());
+                    FancyVFX.Spawn(SoulLinkStatus._SoulLinkSoulVFX, finalpos, Quaternion.identity, parent: p.transform,
+                        velocity: 3f * Vector2.up, lifetime: 0.5f, fadeOutTime: 0.5f, emissivePower: 50f, emissiveColor: Color.white);
+
+                    if (this.gun.CurrentStrengthTier < _GRAZE_TIER_THRESHOLDS.Count() && graze >= _GRAZE_TIER_THRESHOLDS[this.gun.CurrentStrengthTier])
+                        PowerUp();
+                }
+            }
+        }
     }
 
+    public class AimuHakureiAmmoDisplay : CustomAmmoDisplay
+    {
+        private Gun _gun;
+        private AimuHakurei _aimu;
+        private PlayerController _owner;
+        private void Start()
+        {
+            this._gun = base.GetComponent<Gun>();
+            this._aimu = this._gun.GetComponent<AimuHakurei>();
+            this._owner = this._gun.CurrentOwner as PlayerController;
+        }
+
+        private void Update()
+        {
+          // enter update code here
+        }
+
+        public override bool DoCustomAmmoDisplay(GameUIAmmoController uic)
+        {
+            if (!this._owner)
+                return false;
+
+            float phase = Mathf.Sin(4f * BraveTime.ScaledTimeSinceStartup);
+            uic.SetAmmoCountLabelColor(Color.Lerp(Color.magenta, Color.white, Mathf.Abs(phase)));
+            uic.GunAmmoCountLabel.Text = $"{this._aimu.graze}";
+            return true;
+        }
+    }
 
     public class AimuHakureiProjectileBehavior : MonoBehaviour
     {
@@ -155,6 +285,7 @@ namespace CwaffingTheGungy
         }
     }
 
+    // modified from HelixProjectileMotionModule
     public class AimuHakureiProjectileMotionModule : ProjectileMotionModule
     {
         public float wavelength = 8f;
@@ -189,11 +320,11 @@ namespace CwaffingTheGungy
         private void Initialize(Vector2 lastPosition, Transform projectileTransform, float m_timeElapsed, Vector2 m_currentDirection, bool shouldRotate)
         {
             _privateLastPosition = lastPosition;
-            _initialRightVector = ((!shouldRotate) ? m_currentDirection : projectileTransform.right.XY());
-            _initialUpVector    = ((!shouldRotate) ? (Quaternion.Euler(0f, 0f, 90f) * m_currentDirection) : projectileTransform.up);
-            _initialized   = true;
+            _initialRightVector  = ((!shouldRotate) ? m_currentDirection : projectileTransform.right.XY());
+            _initialUpVector     = ((!shouldRotate) ? (Quaternion.Euler(0f, 0f, 90f) * m_currentDirection) : projectileTransform.up);
+            _initialized         = true;
             _xDisplacement       = 0f;
-            _yDisplacement      = 0f;
+            _yDisplacement       = 0f;
             m_timeElapsed        = 0f;
         }
 
