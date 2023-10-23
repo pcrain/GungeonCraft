@@ -25,48 +25,53 @@ namespace CwaffingTheGungy
         public static string ShortDescription = "TBD";
         public static string LongDescription  = "TBD";
 
-        internal const float _GRAZE_THRES              = 1.6f;
-        internal const float _GRAZE_THRES_SQUARED      = _GRAZE_THRES * _GRAZE_THRES;
-        internal const float _GRAZE_DECAY_RATE         = 0.75f;
-        internal const int   _GRAZE_MAX                = 120;
-        internal const int   _MAX_GRAZE_PER_PROJECTILE = 5;
+        internal const float _GRAZE_THRES              = 1.5f;  // max distance from player a projectile can be to count as grazed
+        internal const float _GRAZE_THRES_SQUARED      = _GRAZE_THRES * _GRAZE_THRES; // speed up distance calculations a bit
+        internal const float _GRAZE_DECAY_RATE         = 0.75f; // seconds between our graze counter decreasing
+        internal const float _GRAZE_COOLDOWN           = 1.0f;  // cooldown to prevent projectiles from being infinitely grazed
+        internal const int   _MAX_GRAZE_PER_PROJECTILE = 5;     // max amount of graze we can accumulate per projectile
+        internal const int   _GRAZE_MAX                = 120;   // max amount of graze we can accumulate overall
 
         internal static readonly int[] _GRAZE_TIER_THRESHOLDS  = {10, 30, 60, 100};
 
         internal static tk2dSpriteAnimationClip _BulletSprite = null;
         internal static Projectile _ProjBase;
+        internal static GameObject _GrazeVFX      = null;
 
         public int graze = 0;
 
         private float _lastDecayTime = 0f;
+        private Coroutine _decayCoroutine = null;
+        private bool _focused = false;
 
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<AimuHakurei>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.FULLAUTO, reloadTime: 1.2f, ammo: 100, infiniteAmmo: true, canGainAmmo: false);
+                gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f,
+                    ammo: 200, /*infiniteAmmo: true,*/ canGainAmmo: false, canReloadNoMatterAmmo: true);
                 gun.Volley.ModulesAreTiers = true;
-                // gun.SetAnimationFPS(gun.shootAnimation, 30);
-                // gun.SetAnimationFPS(gun.reloadAnimation, 40);
-                // gun.SetFireAudio("aimu_shoot_sound");
-                // gun.SetReloadAudio("blowgun_reload_sound");
+                gun.SetAnimationFPS(gun.shootAnimation, 60);
 
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("aimu_projectile").Base(),
                 2, true, new IntVector2(10, 10),
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
 
+            _GrazeVFX = VFX.RegisterVFXObject("GrazeVFX", ResMap.Get("graze_vfx"),
+                fps: 5, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 1.0f, emissivePower: 5f);
+
             _ProjBase = Lazy.PrefabProjectileFromGun(gun, setGunDefaultProjectile: false);
                 _ProjBase.baseData.speed  = 44f;
-                _ProjBase.baseData.damage = 7f;
+                _ProjBase.baseData.damage = 8f;
                 _ProjBase.baseData.range  = 100f;
                 _ProjBase.baseData.force  = 3f;
                 _ProjBase.transform.parent = gun.barrelOffset;
 
             Projectile beamProj = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items._38Special) as Gun, setGunDefaultProjectile: false);
                 beamProj.baseData.speed = 300f;
-                beamProj.baseData.damage = 20f;
+                beamProj.baseData.damage = 16f;
                 TrailController tc = beamProj.AddTrailToProjectile(ResMap.Get("aimu_beam_mid")[0], new Vector2(25, 39), new Vector2(0, 0),
-                    ResMap.Get("aimu_beam_mid"), 60, ResMap.Get("aimu_beam_start"), 60, /*timeTillAnimStart: 0.01f,*/ cascadeTimer: C.FRAME, destroyOnEmpty: true);
+                    ResMap.Get("aimu_beam_mid"), 60, ResMap.Get("aimu_beam_start"), 60, cascadeTimer: C.FRAME, destroyOnEmpty: true);
                     tc.UsesDispersalParticles = true;
                     tc.DispersalParticleSystemPrefab = (ItemHelper.Get(Items.FlashRay) as Gun).DefaultModule.projectiles[0].GetComponentInChildren<TrailController>().DispersalParticleSystemPrefab;
 
@@ -78,33 +83,33 @@ namespace CwaffingTheGungy
 
             // set up tiered projectiles
             gun.Volley.projectiles = new(){
-                // Tier 0
-                AimuMod(fireRate: 20, projectiles: new(){
-                    AimuProj(invert: false, amplitude: 0.0f, sound: "aimu_shoot_sound"),
+                // Tier 0 / Level 1
+                AimuMod(level: 1, fireRate: 16, projectiles: new(){
+                    AimuProj(invert: false, amplitude: 0.0f, sound: "aimu_shoot_sound",      trailWidth: 0.2f),
                     }),
-                // Tier 1
-                AimuMod(fireRate: 15, projectiles: new(){
-                    AimuProj(invert: false, amplitude: 0.75f, sound: "aimu_shoot_sound"),
-                    AimuProj(invert: true,  amplitude: 0.75f, sound: "aimu_shoot_sound"),
+                // Tier 1 / Level 2
+                AimuMod(level: 2, fireRate: 12, projectiles: new(){
+                    AimuProj(invert: false, amplitude: 0.75f, sound: "aimu_shoot_sound",     trailWidth: 0.3f),
+                    AimuProj(invert: true,  amplitude: 0.75f, sound: "aimu_shoot_sound",     trailWidth: 0.3f),
                     }),
-                // Tier 2
-                AimuMod(fireRate: 10, projectiles: new(){
-                    AimuProj(invert: false, amplitude: 0.75f, sound: "aimu_shoot_sound"),
-                    AimuProj(invert: true,  amplitude: 0.75f, sound: "aimu_shoot_sound"),
+                // Tier 2 / Level 3
+                AimuMod(level: 3, fireRate: 8, projectiles: new(){
+                    AimuProj(invert: false, amplitude: 0.75f, sound: "aimu_shoot_sound",     trailWidth: 0.4f),
+                    AimuProj(invert: true,  amplitude: 0.75f, sound: "aimu_shoot_sound",     trailWidth: 0.4f),
                     }),
-                // Tier 3
-                AimuMod(fireRate: 5, projectiles: new(){
-                    AimuProj(invert: false, amplitude: 0.75f, sound: "aimu_shoot_sound"),
-                    AimuProj(invert: true,  amplitude: 0.75f, sound: "aimu_shoot_sound"),
-                    AimuProj(invert: false, amplitude: 2.25f, sound: "aimu_shoot_sound_alt", trailColor: Color.white),
-                    AimuProj(invert: true,  amplitude: 2.25f, sound: "aimu_shoot_sound_alt", trailColor: Color.white),
+                // Tier 3 / Level 4
+                AimuMod(level: 4, fireRate: 4, projectiles: new(){
+                    AimuProj(invert: false, amplitude: 0.75f, sound: "aimu_shoot_sound",     trailWidth: 0.5f),
+                    AimuProj(invert: true,  amplitude: 0.75f, sound: "aimu_shoot_sound",     trailWidth: 0.5f),
+                    AimuProj(invert: false, amplitude: 2.25f, sound: "aimu_shoot_sound_alt", trailWidth: 0.5f, trailColor: Color.white),
+                    AimuProj(invert: true,  amplitude: 2.25f, sound: "aimu_shoot_sound_alt", trailWidth: 0.5f, trailColor: Color.white),
                     }),
-                // Tier 4
-                AimuMod(fireRate: 3, projectiles: new(){
-                    AimuProj(invert: false, amplitude: 0.75f, sound: "aimu_shoot_sound"),
-                    AimuProj(invert: true,  amplitude: 0.75f, sound: "aimu_shoot_sound"),
-                    AimuProj(invert: false, amplitude: 2.25f, sound: "aimu_shoot_sound_alt", trailColor: Color.white),
-                    AimuProj(invert: true,  amplitude: 2.25f, sound: "aimu_shoot_sound_alt", trailColor: Color.white),
+                // Tier 4 / Level 5
+                AimuMod(level: 5, fireRate: 2, projectiles: new(){
+                    AimuProj(invert: false, amplitude: 0.75f, sound: "aimu_shoot_sound",     trailWidth: 0.5f),
+                    AimuProj(invert: true,  amplitude: 0.75f, sound: "aimu_shoot_sound",     trailWidth: 0.5f),
+                    AimuProj(invert: false, amplitude: 2.25f, sound: "aimu_shoot_sound_alt", trailWidth: 0.5f, trailColor: Color.white),
+                    AimuProj(invert: true,  amplitude: 2.25f, sound: "aimu_shoot_sound_alt", trailWidth: 0.5f, trailColor: Color.white),
                     beamProj,
                     }),
             };
@@ -115,6 +120,7 @@ namespace CwaffingTheGungy
         public override void PostProcessProjectile(Projectile projectile)
         {
             base.PostProcessProjectile(projectile);
+            SetFocus(false);
             if (projectile.GetComponentInChildren<TrailController>())
             {
                 AkSoundEngine.PostEvent("aimu_beam_sound_2_stop_all", this.Owner.gameObject);
@@ -122,14 +128,79 @@ namespace CwaffingTheGungy
             }
         }
 
-        protected override void OnPickup(GameActor owner)
+        protected override void OnPickedUpByPlayer(PlayerController player)
         {
-            base.OnPickup(owner);
+            base.OnPickedUpByPlayer(player);
             this.graze                   = 0; // reset graze when dropped
             this.gun.CurrentStrengthTier = 0;
+            SetFocus(false);
+            player.OnRollStarted += this.OnDodgeRoll;
         }
 
-        private static ProjectileModule AimuMod(List<Projectile> projectiles, float fireRate)
+        protected override void OnPostDroppedByPlayer(PlayerController player)
+        {
+            base.OnPostDroppedByPlayer(player);
+            player.OnRollStarted -= this.OnDodgeRoll;
+        }
+
+        private void OnDodgeRoll(PlayerController player, Vector2 dirVec)
+        {
+            SetFocus(false);
+        }
+
+        public override void OnSwitchedToThisGun()
+        {
+            base.OnSwitchedToThisGun();
+            if (this._decayCoroutine != null)
+            {
+                StopCoroutine(this._decayCoroutine);
+                this._decayCoroutine = null;
+            }
+            SetFocus(false);
+        }
+
+        public override void OnSwitchedAwayFromThisGun()
+        {
+            base.OnSwitchedAwayFromThisGun();
+            if (this._decayCoroutine == null)
+                this._decayCoroutine = this.Owner.StartCoroutine(DecayWhileInactive());
+            SetFocus(false);
+        }
+
+        public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
+        {
+            base.OnReloadPressed(player, gun, manualReload);
+            if (!player.IsDodgeRolling && player.AcceptingNonMotionInput)
+                SetFocus(!this._focused);
+        }
+
+        private void SetFocus(bool focus)
+        {
+            if (focus == this._focused)
+                return;
+            this._focused = focus;
+            this.gun.CanBeDropped = !focus;
+            BraveTime.SetTimeScaleMultiplier(focus ? 0.65f : 1.0f, base.gameObject);
+            if (this._focused)
+                AkSoundEngine.PostEvent("aimu_focus_sound", this.Owner.gameObject);
+            // else
+            //     AkSoundEngine.PostEvent("aimu_unfocus_sound", this.Owner.gameObject);
+
+            this.gun.RemoveStatFromGun(PlayerStats.StatType.MovementSpeed);
+            this.gun.AddStatToGun(PlayerStats.StatType.MovementSpeed, focus ? 0.65f : 1.0f, StatModifier.ModifyMethod.MULTIPLICATIVE);
+            this.Player.stats.RecalculateStats(this.Player);
+        }
+
+        private IEnumerator DecayWhileInactive()
+        {
+            while (this.gameObject != null)
+            {
+                if (!GameManager.Instance.IsPaused && !GameManager.Instance.IsLoadingLevel)
+                    UpdateGraze();
+                yield return null;
+            }
+        }
+        private static ProjectileModule AimuMod(List<Projectile> projectiles, float fireRate, int level)
         {
             ProjectileModule mod = new ProjectileModule();
                 mod.ammoType            = GameUIAmmoType.AmmoType.BEAM;
@@ -138,7 +209,7 @@ namespace CwaffingTheGungy
                 mod.numberOfShotsInClip = -1;
                 mod.shootStyle          = ProjectileModule.ShootStyle.Burst;
                 mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Ordered;
-                mod.angleVariance       = 5f;
+                mod.angleVariance       = 15f - (2 * level);
                 mod.angleFromAim        = 0f;
                 mod.burstShotCount      = mod.projectiles.Count();
                 mod.burstCooldownTime   = C.FRAME * fireRate;
@@ -146,21 +217,21 @@ namespace CwaffingTheGungy
             return mod;
         }
 
-        private static Projectile AimuProj(bool invert, float amplitude, string sound, Color? trailColor = null)
+        private static Projectile AimuProj(bool invert, float amplitude, string sound, float trailWidth, Color? trailColor = null)
         {
             Projectile proj = _ProjBase.ClonePrefab<Projectile>();
                 proj.AddDefaultAnimation(_BulletSprite);
                 proj.gameObject.AddComponent<AimuHakureiProjectileBehavior>()
                     .Setup(invert: invert, amplitude: amplitude, sound: sound);
-                AddTrail(proj, trailColor);
+                AddTrail(proj, trailWidth, trailColor);
             return proj;
         }
 
-        private static void AddTrail(Projectile p, Color? trailColor = null)
+        private static void AddTrail(Projectile p, float trailWidth, Color? trailColor = null)
         {
             EasyTrailBullet trail = p.gameObject.AddComponent<EasyTrailBullet>();
                 trail.TrailPos   = p.transform.position.XY() + new Vector2(5f / C.PIXELS_PER_TILE, 5f / C.PIXELS_PER_TILE); // offset by middle of the sprite
-                trail.StartWidth = 0.5f;
+                trail.StartWidth = trailWidth;
                 trail.EndWidth   = 0.05f;
                 trail.LifeTime   = 0.1f;
                 trail.BaseColor  = trailColor ?? Color.Lerp(Color.magenta, Color.red, 0.5f);
@@ -170,7 +241,9 @@ namespace CwaffingTheGungy
         protected override void Update()
         {
             base.Update();
-            CheckForGraze();
+            if (this.Owner is PlayerController pc && pc.CurrentInputState != PlayerInputState.AllInput)
+                SetFocus(false);
+            UpdateGraze();
         }
 
         private void PowerUp()
@@ -180,17 +253,19 @@ namespace CwaffingTheGungy
             //     aura.transform.parent = this.Owner.transform;
             //     aura.ExpireIn(0.5f, 0.5f);
             AkSoundEngine.PostEvent("aimu_power_up_sound", this.Owner.gameObject);
+            this.gun.gameObject.SetGlowiness(this.gun.CurrentStrengthTier * this.gun.CurrentStrengthTier);
         }
 
         private void PowerDown()
         {
             --this.gun.CurrentStrengthTier;
+            this.gun.gameObject.SetGlowiness(this.gun.CurrentStrengthTier * this.gun.CurrentStrengthTier);
         }
 
         // private static List<Projectile> shortList; // cache projectiles that are nearby so we can look them up every other frame
         private static Dictionary<Projectile, int> _GrazeDict = new();
         private static Dictionary<Projectile, float> _GrazeTimeDict = new();
-        private void CheckForGraze()
+        private void UpdateGraze()
         {
             if (this.Owner is not PlayerController pc)
                 return; // if our owner isn't a player, we have nothing to do
@@ -206,7 +281,11 @@ namespace CwaffingTheGungy
             if (!pc.healthHaver.IsVulnerable)
                 return; // can't graze if we're invincible, that's cheating!!!
 
+            if (pc.CurrentGun != this.gun)
+                return;// if this isn't our active gun, we can't benefit from grazing
+
             Vector2 ppos = pc.sprite.WorldCenter;
+            Vector2 bottom = pc.sprite.WorldBottomCenter;
             foreach (Projectile p in StaticReferenceManager.AllProjectiles)
             {
                 if (!p.collidesWithPlayer || p.Owner == this.Owner)
@@ -215,29 +294,28 @@ namespace CwaffingTheGungy
                 if (p.sprite?.WorldCenter is not Vector2 epos)
                     continue; // don't care about projectiles without sprites
 
-                if ((epos-ppos).sqrMagnitude < _GRAZE_THRES_SQUARED)
-                {
-                    // Shenanigans to make sure pooled projectiles don't count as already-grazed when they respawn
-                    if (!_GrazeTimeDict.ContainsKey(p))
-                        _GrazeTimeDict[p] = 0;
-                    if (_GrazeTimeDict[p] + 1f < BraveTime.ScaledTimeSinceStartup)
-                        _GrazeDict[p] = 0; // reset our grazedict timer if we haven't been near it for at least one second
-                    _GrazeTimeDict[p] = BraveTime.ScaledTimeSinceStartup;
+                if ((epos-ppos).sqrMagnitude >= _GRAZE_THRES_SQUARED)
+                    continue; // bullet's too far away, so doesn't need to be considered
 
-                    if (_GrazeDict[p] < _MAX_GRAZE_PER_PROJECTILE)
-                    {
-                        ++_GrazeDict[p];
-                        if (++this.graze > _GRAZE_MAX)
-                            this.graze = _GRAZE_MAX;
-                    }
+                // Shenanigans to make sure pooled projectiles don't count as already-grazed when they respawn from the pool
+                if (!_GrazeTimeDict.ContainsKey(p))
+                    _GrazeTimeDict[p] = 0;
+                if (_GrazeTimeDict[p] + _GRAZE_COOLDOWN < BraveTime.ScaledTimeSinceStartup)
+                    _GrazeDict[p] = 0; // reset our grazedict timer if we haven't been near it for at least one second
+                _GrazeTimeDict[p] = BraveTime.ScaledTimeSinceStartup;
+                if (_GrazeDict[p] >= _MAX_GRAZE_PER_PROJECTILE)
+                    continue; // we've already grazed the bullet a bunch, so put it on cooldown
 
-                    Vector2 finalpos = ppos + BraveMathCollege.DegreesToVector(Lazy.RandomAngle());
-                    FancyVFX.Spawn(SoulLinkStatus._SoulLinkSoulVFX, finalpos, Quaternion.identity, parent: p.transform,
-                        velocity: 3f * Vector2.up, lifetime: 0.5f, fadeOutTime: 0.5f, emissivePower: 50f, emissiveColor: Color.white);
+                ++_GrazeDict[p];
+                if (++this.graze > _GRAZE_MAX)
+                    this.graze = _GRAZE_MAX;
 
-                    if (this.gun.CurrentStrengthTier < _GRAZE_TIER_THRESHOLDS.Count() && graze >= _GRAZE_TIER_THRESHOLDS[this.gun.CurrentStrengthTier])
-                        PowerUp();
-                }
+                // Vector2 finalpos = ppos + BraveMathCollege.DegreesToVector(Lazy.RandomAngle());
+                FancyVFX.Spawn(AimuHakurei._GrazeVFX, bottom, Quaternion.identity, parent: pc.sprite?.transform,
+                    velocity: 5f * Vector2.up, lifetime: 0.2f, fadeOutTime: 0.4f, /*emissivePower: 50f,*/ emissiveColor: Color.white);
+
+                if (this.gun.CurrentStrengthTier < _GRAZE_TIER_THRESHOLDS.Count() && graze >= _GRAZE_TIER_THRESHOLDS[this.gun.CurrentStrengthTier])
+                    PowerUp();
             }
         }
     }
@@ -264,9 +342,18 @@ namespace CwaffingTheGungy
             if (!this._owner)
                 return false;
 
-            float phase = Mathf.Sin(4f * BraveTime.ScaledTimeSinceStartup);
-            uic.SetAmmoCountLabelColor(Color.Lerp(Color.magenta, Color.white, Mathf.Abs(phase)));
-            uic.GunAmmoCountLabel.Text = $"{this._aimu.graze}";
+            if (this._gun.CurrentStrengthTier < 4)
+            {
+                uic.SetAmmoCountLabelColor(Color.magenta);
+                uic.GunAmmoCountLabel.Text = $"{this._aimu.graze} - L{1 + this._gun.CurrentStrengthTier}";
+            }
+            else
+            {
+                float phase = Mathf.Sin(4f * BraveTime.ScaledTimeSinceStartup);
+                uic.SetAmmoCountLabelColor(Color.Lerp(Color.magenta, Color.cyan, Mathf.Abs(phase)));
+                uic.GunAmmoCountLabel.Text = $"{this._aimu.graze} - MAX";
+            }
+            // uic.GunAmmoCountLabel.Text = $"{this._aimu.graze}";
             return true;
         }
     }

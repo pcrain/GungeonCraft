@@ -273,6 +273,25 @@ namespace CwaffingTheGungy
                 // Debug.LogException("Gungy o.o!");
                 // foreach (tk2dSpriteDefinition def in AmmonomiconController.ForceInstance.EncounterIconCollection.spriteDefinitions)
                 //     ETGModConsole.Log($"  def: {def.name}");
+
+                // var watch2 = System.Diagnostics.Stopwatch.StartNew();
+                // for (float i = 0f; i < 100000f; i += 1f)
+                // {
+                //     Vector2 v = new Vector2(i, i);
+                //     float a = v.magnitude;
+                // }
+                // watch2.Stop();
+                // ETGModConsole.Log($"sqrt = {watch2.ElapsedTicks} ticks");
+
+                // var watch3 = System.Diagnostics.Stopwatch.StartNew();
+                // for (float i = 0f; i < 100000f; i += 1f)
+                // {
+                //     Vector2 v = new Vector2(i, i);
+                //     float a = v.sqrMagnitude; // 3X FASTER
+                // }
+                // watch3.Stop();
+                // ETGModConsole.Log($"no sqrt = {watch3.ElapsedTicks} ticks");
+
             }
             catch (Exception e)
             {
