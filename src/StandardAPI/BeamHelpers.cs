@@ -175,7 +175,6 @@ namespace CwaffingTheGungy
             clip.wrapMode = wrapMode;
             foreach (string path in spritePaths)
             {
-                ETGModConsole.Log($"adding path {path} at fps {fps}");
                 tk2dSpriteCollectionData collection = ETGMod.Databases.Items.ProjectileCollection;
                 int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
                 tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
@@ -204,7 +203,6 @@ namespace CwaffingTheGungy
             }
             clip.frames = frames.ToArray();
             beamAnimation.clips = beamAnimation.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
-            ETGModConsole.Log($"  beanAnimation has {beamAnimation.clips.Count()} clips");
         }
     }
 }

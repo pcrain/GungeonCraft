@@ -38,112 +38,72 @@ namespace CwaffingTheGungy
                 2, true, new IntVector2(10, 10),
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
 
-            Projectile proj1a = Lazy.PrefabProjectileFromGun(gun, setGunDefaultProjectile: false);
+            Projectile projBase = Lazy.PrefabProjectileFromGun(gun, setGunDefaultProjectile: false);
+
+            Projectile proj1a = projBase.ClonePrefab<Projectile>();
                 proj1a.AddDefaultAnimation(proj1Sprite);
                 proj1a.transform.parent = gun.barrelOffset;
                 proj1a.gameObject.AddComponent<AimuHakureiProjectileBehavior>()
                     .Setup(invert: false, amplitude: 0.75f);
+                AddTrail(proj1a);
 
-            Projectile proj1b = Lazy.PrefabProjectileFromGun(gun, setGunDefaultProjectile: false);
+            Projectile proj1b = projBase.ClonePrefab<Projectile>();
                 proj1b.AddDefaultAnimation(proj1Sprite);
                 proj1b.transform.parent = gun.barrelOffset;
                 proj1b.gameObject.AddComponent<AimuHakureiProjectileBehavior>()
                     .Setup(invert: true, amplitude: 0.75f);
+                AddTrail(proj1b);
 
-            Projectile proj1c = Lazy.PrefabProjectileFromGun(gun, setGunDefaultProjectile: false);
+            Projectile proj1c = projBase.ClonePrefab<Projectile>();
                 proj1c.AddDefaultAnimation(proj1Sprite);
                 proj1c.transform.parent = gun.barrelOffset;
                 proj1c.gameObject.AddComponent<AimuHakureiProjectileBehavior>()
-                    .Setup(invert: false, amplitude: 1.25f);
+                    .Setup(invert: false, amplitude: 2.25f);
+                AddTrail(proj1c);
 
-            Projectile proj1d = Lazy.PrefabProjectileFromGun(gun, setGunDefaultProjectile: false);
+            Projectile proj1d = projBase.ClonePrefab<Projectile>();
                 proj1d.AddDefaultAnimation(proj1Sprite);
                 proj1d.transform.parent = gun.barrelOffset;
                 proj1d.gameObject.AddComponent<AimuHakureiProjectileBehavior>()
-                    .Setup(invert: true, amplitude: 1.25f);
+                    .Setup(invert: true, amplitude: 2.25f);
+                AddTrail(proj1d);
 
-            tk2dBaseSprite basesprite = GasterBlaster._GasterBlaster.GetComponent<tk2dBaseSprite>();
-
-            // Projectile proj1e = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items.FlashRay) as Gun, setGunDefaultProjectile: false);
-            // Projectile proj1e = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items._38Special) as Gun, setGunDefaultProjectile: false);
             Projectile proj1e = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items._38Special) as Gun, setGunDefaultProjectile: false);
                 proj1e.baseData.speed = 300f;
-                if (proj1e.gameObject.transform.Find("Trail 1")?.gameObject is GameObject trail)
-                {
-                    // Dissect.DumpComponents(trail.gameObject);
-
-                    // UnityEngine.Object.Destroy(trail.GetComponent<tk2dTiledSprite>());
-                    // tk2dTiledSprite tsprite = trail.gameObject.GetOrAddComponent<tk2dTiledSprite>();
-                        // tsprite.SetSprite(basesprite.collection, basesprite.spriteId);
-                        // tsprite.Build();
-
-                    // ETGModConsole.Log($"tiledsprite***");
-                    // Dissect.DumpFieldsAndProperties<tk2dTiledSprite>(trail.GetComponent<tk2dTiledSprite>());
-                    // ETGModConsole.Log($"trail***");
-                    // Dissect.DumpFieldsAndProperties<TrailController>(trail.GetComponent<TrailController>());
-                    // ETGModConsole.Log($"tk2dSpriteAnimator***");
-                    // Dissect.DumpFieldsAndProperties<tk2dSpriteAnimator>(trail.GetComponent<tk2dSpriteAnimator>());
-
-                    UnityEngine.Object.Destroy(trail.GetComponent<TrailController>());
-                    UnityEngine.Object.Destroy(trail.GetComponent<tk2dTiledSprite>());
-                    UnityEngine.Object.Destroy(trail.GetComponent<tk2dSpriteAnimator>());
-                    UnityEngine.Object.Destroy(trail);
-                }
-                TrailController tc = proj1e.AddTrailToProjectile(ResMap.Get("gaster_beam_mid")[0], new Vector2(25, 39), new Vector2(0, 0),
-                // TrailController tc = proj1e.AddTrailToProjectile(ResMap.Get("gaster_beam_mid")[0], new Vector2(2, 2), new Vector2(1, 1),
-                // TrailController tc = trail.AddTrailToObject(ResMap.Get("gaster_beam_mid")[0], new Vector2(2, 2), new Vector2(1, 1),
-                // TrailController tc = trail.AddTrailToObject(ResMap.Get("gaster_beam_mid")[0], new Vector2(25, 39), new Vector2(12, 19),
-                    ResMap.Get("gaster_beam_mid"), 30, ResMap.Get("gaster_beam_start"), 30, 0.01f, destroyOnEmpty: true);
-                    // tc.cascadeTimer = 0.1f;
-                    // tc.usesGlobalTimer = false;
-                    // tc.UsesDispersalParticles = false;
-
-
-                // TrailController tc = proj1e.AddTrailToProjectile(ResMap.Get("gaster_beam_mid")[0], new Vector2(35, 39), new Vector2(1, 1),
-                //     ResMap.Get("gaster_beam_mid"), 30, ResMap.Get("gaster_beam_mid"), 30);
-
-                // tc.usesAnimation = true;
-                // tc.usesStartAnimation = true;
-                // tc.animation = "gaster_beam_mid";
-                // tc.startAnimation = "gaster_beam_mid";
-                // TrailController tc = trail.gameObject.GetComponent<TrailController>();
-                //     tc.sprite.SetSprite(basesprite.collection, basesprite.spriteId);
-
-                // UnityEngine.Object.Destroy(trail.GetComponent<tk2dSpriteAnimator>());
-                // tk2dSpriteAnimator anim = trail.gameObject.GetComponent<tk2dSpriteAnimator>();
-                //     anim.currentClip = proj1Sprite;
-                //     anim.library = basesprite.collection.anima;
-                    // anim.defaultClipId = basesprite.spriteId;
-                    // anim.SetSprite(basesprite.collection, basesprite.spriteId);
-
-                // tk2dSpriteAnimation anim = trail.gameObject.GetOrAddComponent<tk2dSpriteAnimation>();
-                //     anim.clips = new[]{proj1Sprite};
-
-            // // Projectile proj1f = Lazy.PrefabProjectileFromGun(gun, setGunDefaultProjectile: false);
-            // // Projectile proj1f = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items.MarineSidearm) as Gun, false);
-            // Projectile proj1f = Lazy.PrefabProjectileFromGun(gun);
-
-            //     BasicBeamController beamComp = proj1f.SetupBeamSprites(
-            //         spriteName: "gaster_beam", fps: 60, dims: new Vector2(35, 39), impactDims: new Vector2(36, 36), impactFps: 16);
-            //         beamComp.boneType = BasicBeamController.BeamBoneType.Projectile;
-            //         beamComp.ContinueBeamArtToWall = false;
-            //         beamComp.PenetratesCover       = true;
-            //         beamComp.penetration           = 1000;
-
-            // gun.DefaultModule.projectiles[0] = proj1f;
+                TrailController tc = proj1e.AddTrailToProjectile(ResMap.Get("aimu_beam_mid")[0], new Vector2(25, 39), new Vector2(0, 0),
+                    ResMap.Get("aimu_beam_mid"), 60, ResMap.Get("aimu_beam_start"), 60, /*timeTillAnimStart: 0.01f,*/ cascadeTimer: C.FRAME, destroyOnEmpty: true);
+                    tc.UsesDispersalParticles = true;
+                    tc.DispersalParticleSystemPrefab = (ItemHelper.Get(Items.FlashRay) as Gun).DefaultModule.projectiles[0].GetComponentInChildren<TrailController>().DispersalParticleSystemPrefab;
 
             ProjectileModule mod1 = gun.DefaultModule;
                 mod1.ammoCost            = 1;
                 mod1.shootStyle          = ProjectileModule.ShootStyle.Burst;
                 mod1.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Ordered;
                 mod1.burstShotCount      = 5;
-                mod1.burstCooldownTime   = C.FRAME;
-                mod1.cooldownTime        = 0.20f;
+                mod1.burstCooldownTime   = C.FRAME * 3;
+                mod1.cooldownTime        = C.FRAME * 3;
                 mod1.numberOfShotsInClip = 10 * mod1.burstShotCount;
-                mod1.angleVariance       = 0f;
+                mod1.angleVariance       = 5f;
                 mod1.angleFromAim        = 0f;
-                mod1.alternateAngle      = true;
+                // mod1.alternateAngle      = true;
                 mod1.projectiles         = new(){ proj1a, proj1b, proj1c, proj1d, proj1e, };
+
+            VFXPool impactFVX = VFX.RegisterVFXPool(ItemName+" Impact", ResMap.Get("gaster_beam_impact"), fps: 20, loops: false, scale: 1.0f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+                proj1e.SetHorizontalImpactVFX(impactFVX);
+                proj1e.SetVerticalImpactVFX(impactFVX);
+                proj1e.SetEnemyImpactVFX(impactFVX);
+                proj1e.SetAirImpactVFX(impactFVX);
+        }
+
+        private static void AddTrail(Projectile p)
+        {
+            EasyTrailBullet trail = p.gameObject.AddComponent<EasyTrailBullet>();
+                trail.TrailPos   = trail.transform.position;
+                trail.StartWidth = 0.2f;
+                trail.EndWidth   = 0.05f;
+                trail.LifeTime   = 0.1f;
+                trail.BaseColor  = Color.magenta;
+                trail.EndColor   = Color.magenta;
         }
 
         public override void PostProcessProjectile(Projectile projectile)
@@ -152,14 +112,14 @@ namespace CwaffingTheGungy
             // TrailController tc = projectile.GetComponentInChildren<TrailController>();
             // if (tc)
             // {
-            //     ETGModConsole.Log($"found TrailController");
+            //     ETGModConsole.Log($"found TrailController with dispersal {tc.UsesDispersalParticles}");
             //     Dissect.DumpFieldsAndProperties<TrailController>(tc);
             // }
-            tk2dSpriteAnimator animator = projectile.GetComponentInChildren<tk2dSpriteAnimator>();
-            if (animator)
-            {
-                ETGModConsole.Log($"found animator with fps {animator.ClipFps}");
-            }
+
+            // tk2dSpriteAnimator animator = projectile.GetComponentInChildren<tk2dSpriteAnimator>();
+            // if (animator)
+            //     ETGModConsole.Log($"found animator with fps {animator.ClipFps}");
+
             // if (projectile.GetComponentInChildren<TrailController>())
             //     Dissect.CompareFieldsAndProperties<TrailController>(
             //         projectile.GetComponentInChildren<TrailController>(),
