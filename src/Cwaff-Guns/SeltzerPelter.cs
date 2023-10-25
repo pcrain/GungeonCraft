@@ -29,7 +29,14 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<SeltzerPelter>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.2f, ammo: 800);
+                gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.0f, ammo: 800);
+                gun.SetAnimationFPS(gun.reloadAnimation, 45);
+                gun.SetReloadAudio("seltzer_shake_sound", frame: 0);
+                gun.SetReloadAudio("seltzer_shake_sound", frame: 10);
+                gun.SetReloadAudio("seltzer_shake_sound", frame: 22);
+                gun.SetReloadAudio("seltzer_shake_sound", frame: 29);
+                gun.SetReloadAudio("seltzer_shake_sound", frame: 35);
+                gun.SetReloadAudio("seltzer_shake_sound", frame: 42);
 
             ProjectileModule mod = gun.DefaultModule;
                 mod.ammoCost            = 1;
@@ -57,9 +64,9 @@ namespace CwaffingTheGungy
                 beamProjectile.baseData.range  = 3f;   // the perfect seltzer stats, do not tweak without testing!
                 beamProjectile.baseData.speed  = 20f;  // the perfect seltzer stats, do not tweak without testing!
                 beamProjectile.baseData.force  = 100f;
-                beamProjectile.baseData.damage = 4f;
+                beamProjectile.baseData.damage = 20f;
 
-            _BubbleBeam = beamProjectile.SetupBeamSprites(spriteName: "bubble_beam", fps: 10, dims: new Vector2(16, 8));
+            _BubbleBeam = beamProjectile.SetupBeamSprites(spriteName: "bubble_beam", fps: 8, dims: new Vector2(16, 8));
                 _BubbleBeam.sprite.usesOverrideMaterial = true;
                 _BubbleBeam.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
                 _BubbleBeam.sprite.renderer.material.SetFloat("_EmissivePower", 5f);
@@ -74,10 +81,6 @@ namespace CwaffingTheGungy
                 _BubbleBeam.TileType            = BasicBeamController.BeamTileType.Flowing;
                 _BubbleBeam.endType             = BasicBeamController.BeamEndType.Persist;
                 _BubbleBeam.interpolateStretchedBones = false; // causes weird graphical glitches whether it's enabled or not, but enabled is worse
-
-                // _BubbleBeam.collisionRadius = 1.5f;
-                // _BubbleBeam.collisionLength = 320;
-                // _BubbleBeam.collisionWidth  = 64;
 
             GoopModifier gmod = _BubbleBeam.gameObject.AddComponent<GoopModifier>();
                 gmod.SpawnAtBeamEnd         = true;
@@ -114,6 +117,8 @@ namespace CwaffingTheGungy
                 this._bounce.bouncesTrackEnemies  = true;
                 this._bounce.bounceTrackRadius    = 3f;
                 this._bounce.OnBounce += this.StartSprayingSoda;
+
+            AkSoundEngine.PostEvent("seltzer_shoot_sound_alt", base.gameObject);
         }
 
         private void OnRigidbodyCollision(CollisionData rigidbodyCollision)
@@ -141,6 +146,8 @@ namespace CwaffingTheGungy
             this._canProjectile.UpdateSpeed();
             this._canProjectile.OnDestruction += this.DestroyBeam;
             this._canProjectile.StartCoroutine(SpraySoda_CR(this, this._canProjectile));
+
+            AkSoundEngine.PostEvent("seltzer_shoot_sound", base.gameObject);
         }
 
         private void CreateBeam()
@@ -154,7 +161,6 @@ namespace CwaffingTheGungy
                 this._beam.HitsPlayers = false;
                 this._beam.HitsEnemies = true;
                 this._beam.Origin      = this._canProjectile.sprite.WorldCenter;
-                // this._beam.Direction   = -this._canProjectile.LastVelocity;
                 this._beam.Direction   = -this._canProjectile.sprite.transform.rotation.z.ToVector();
         }
 
@@ -180,12 +186,17 @@ namespace CwaffingTheGungy
         private const float SPIN_TIME  = 4f;
         private const float ACCEL      = 40f;
         private const float _AIR_DRAG  = 0.20f;
+        private const float _SOUND_RATE = 0.2f;
+
         private static IEnumerator SpraySoda_CR(SeltzerProjectile seltzer, Projectile p)
         {
             yield return null;
             float startAngle = p.LastVelocity.ToAngle();
             float curAngle = startAngle;
             seltzer.UpdateRotationRate();
+
+            AkSoundEngine.PostEvent("seltzer_spray_sound", p.gameObject);
+            float lastSoundTime = BraveTime.ScaledTimeSinceStartup;
 
             #region The Ballistics
                 for (float elapsed = 0f; elapsed < SPRAY_TIME; elapsed += BraveTime.DeltaTime)
@@ -196,6 +207,13 @@ namespace CwaffingTheGungy
                         break;
                     if (!seltzer._beam)
                         seltzer.CreateBeam();
+
+                    if (lastSoundTime + _SOUND_RATE < BraveTime.ScaledTimeSinceStartup)
+                    {
+                        lastSoundTime = BraveTime.ScaledTimeSinceStartup;
+                        AkSoundEngine.PostEvent("seltzer_spray_sound", p.gameObject);
+                    }
+
                     Vector2 oldSpeed = p.LastVelocity;
                     curAngle += seltzer._rotationRate;
                     Vector2 newSpeed = oldSpeed + curAngle.ToVector(ACCEL * BraveTime.DeltaTime);
@@ -221,6 +239,13 @@ namespace CwaffingTheGungy
                         break;
                     if (!seltzer._beam)
                         seltzer.CreateBeam();
+
+                    if (lastSoundTime + _SOUND_RATE < BraveTime.ScaledTimeSinceStartup)
+                    {
+                        lastSoundTime = BraveTime.ScaledTimeSinceStartup;
+                        AkSoundEngine.PostEvent("seltzer_spray_sound", p.gameObject);
+                    }
+
                     if (p.baseData.speed > 0.1f)
                     {
                         p.baseData.speed *= Mathf.Pow(_AIR_DRAG, BraveTime.DeltaTime);
