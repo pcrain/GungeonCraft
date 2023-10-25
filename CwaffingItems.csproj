@@ -197,6 +197,7 @@
     <Compile Include="src\Cwaff-Guns\KiBlast.cs"/>
     <Compile Include="src\Cwaff-Guns\Blackjack.cs"/>
     <Compile Include="src\Cwaff-Guns\Outbreak.cs"/>
+    <Compile Include="src\Cwaff-Guns\SeltzerPelter.cs"/>
     <Compile Include="src\Cwaff-Guns\SoulKaliber.cs"/>
     <Compile Include="src\Cwaff-Guns\QuarterPounder.cs"/>
     <Compile Include="src\Cwaff-Guns\Deadline.cs"/>
@@ -243,6 +244,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\quarter_pounder_reload_007.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\ki_blast_gun_fire_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_fire_007.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_023.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_reload_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_fire_002.json"/>
@@ -497,6 +499,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_reload_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_reload_023.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_reload_006.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_fire_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_001.json"/>
@@ -515,6 +518,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\outbreak_idle_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_011.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_004.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_fire_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\ki_blast_gun_idle_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_018.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tennis_rocket_gun_reload_001.png"/>
@@ -946,6 +950,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\ki_blast_gun_fire_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\aimu_hakurei_fire_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_016.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\bouncer_fire_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_024.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_fire_007.png"/>
@@ -1119,6 +1124,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_019.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\knife_gun_idle_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_charge_011.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_idle_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_015.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_021.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_charge_007.png"/>
@@ -1340,6 +1346,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_reload_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_007.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_037.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_idle_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_fire_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_fire_012.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_reload_014.png"/>
@@ -1759,6 +1766,7 @@
     <EmbeddedResource Include="Resources\sans_bosscard.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tennis_ball8.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\ki_blast_002.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\can_projectile_a.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\outbreak_projectile2.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball019.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\egg.png"/>
@@ -1926,6 +1934,7 @@
     <EmbeddedResource Include="Resources\HUD\Curse.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\natascha_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\hand_cannon_idle_001.png"/>
+    <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\soda_cannon_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\blackjack_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\aimu_hakurei_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\paintball_cannon_idle_001.png"/>

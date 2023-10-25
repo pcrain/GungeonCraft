@@ -757,85 +757,9 @@ namespace CwaffingTheGungy
         }
     }
 
-    public static GameObject InstantiateAndFakeprefab(this GameObject target)
+    public static void SetRotation(this Projectile p, float angle)
     {
-
-        GameObject instantiatedTarget = UnityEngine.Object.Instantiate<GameObject>(target);
-        instantiatedTarget.SetActive(false);
-        FakePrefab.MarkAsFakePrefab(instantiatedTarget);
-        UnityEngine.Object.DontDestroyOnLoad(instantiatedTarget);
-        return instantiatedTarget;
-    }
-
-    // yoinked from SomeBunny
-    public static TrailController AddTrailToObject(this GameObject target, string spritePath, Vector2 colliderDimensions, Vector2 colliderOffsets, List<string> animPaths = null, int animFPS = -1, List<string> startAnimPaths = null, int startAnimFPS = -1, float timeTillAnimStart = -1, float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false)
-    {
-        try
-        {
-            ETGModConsole.Log($"adding trail with  path {spritePath} and anims...");
-            foreach (string apath in animPaths)
-              ETGModConsole.Log($"  {apath}");
-            GameObject newTrailObject = new GameObject();
-            newTrailObject.InstantiateAndFakeprefab();
-            // newTrailObject.RegisterPrefab();
-            newTrailObject.transform.parent = target.transform;
-            newTrailObject.name = "trailObject";
-
-            float convertedColliderX = colliderDimensions.x / 16f;
-            float convertedColliderY = colliderDimensions.y / 16f;
-            float convertedOffsetX = colliderOffsets.x / 16f;
-            float convertedOffsetY = colliderOffsets.y / 16f;
-
-            int spriteID = SpriteBuilder.AddSpriteToCollection(spritePath, ETGMod.Databases.Items.ProjectileCollection);
-            tk2dTiledSprite tiledSprite = newTrailObject.GetOrAddComponent<tk2dTiledSprite>();
-
-            tiledSprite.SetSprite(ETGMod.Databases.Items.ProjectileCollection, spriteID);
-            tk2dSpriteDefinition def = tiledSprite.GetCurrentSpriteDef();
-            def.colliderVertices = new Vector3[]{
-                new Vector3(convertedOffsetX, convertedOffsetY, 0f),
-                new Vector3(convertedColliderX, convertedColliderY, 0f)
-            };
-
-            def.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.MiddleLeft);
-
-            tk2dSpriteAnimator animator = newTrailObject.GetOrAddComponent<tk2dSpriteAnimator>();
-            tk2dSpriteAnimation animation = newTrailObject.GetOrAddComponent<tk2dSpriteAnimation>();
-            animation.clips = new tk2dSpriteAnimationClip[0];
-            animator.Library = animation;
-
-            TrailController trail = newTrailObject.AddComponent<TrailController>();
-
-            // ---------------- Sets up the animation for the main part of the trail
-            if (animPaths != null)
-            {
-                BeamHelpers.SetupBeamPart(animation, animPaths, "trail_mid", animFPS, null, null, def.colliderVertices);
-                trail.animation = "trail_mid";
-                trail.usesAnimation = true;
-            }
-            else
-                trail.usesAnimation = false;
-
-            if (startAnimPaths != null)
-            {
-                BeamHelpers.SetupBeamPart(animation, startAnimPaths, "trail_start", startAnimFPS, null, null, def.colliderVertices);
-                trail.startAnimation = "trail_start";
-                trail.usesStartAnimation = true;
-            }
-            else
-                trail.usesStartAnimation = false;
-
-            //Trail Variables
-            if (softMaxLength > 0) { trail.usesSoftMaxLength = true; trail.softMaxLength = softMaxLength; }
-            if (cascadeTimer > 0) { trail.usesCascadeTimer = true; trail.cascadeTimer = cascadeTimer; }
-            if (timeTillAnimStart > 0) { trail.usesGlobalTimer = true; trail.globalTimer = timeTillAnimStart; }
-            trail.destroyOnEmpty = destroyOnEmpty;
-            return trail;
-        }
-        catch (Exception e)
-        {
-            ETGModConsole.Log(e.ToString());
-            return null;
-        }
+      p.m_transform.eulerAngles = new Vector3(0f, 0f, angle);
     }
   }
 }

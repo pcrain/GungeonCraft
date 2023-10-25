@@ -163,6 +163,7 @@ namespace CwaffingTheGungy
                     HatchlingGun.Add();
                     Ticonderogun.Add();
                     AimuHakurei.Add();
+                    SeltzerPelter.Add();
                 #endregion
 
                 #region Synergies
