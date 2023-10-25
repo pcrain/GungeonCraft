@@ -49,7 +49,7 @@ namespace CwaffingTheGungy
                 beamComp.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
                 beamComp.sprite.renderer.material.SetFloat("_EmissivePower", 15f);
                 // fix some animation glitches (don't blindly copy paste; need to be set on a case by case basis depending on your beam's needs)
-                beamComp.muzzleAnimation = beamComp.beamStartAnimation;  //use start animation for muzzle animation, make start animatino null
+                beamComp.muzzleAnimation = beamComp.beamStartAnimation;  //use start animation for muzzle animation, make start animation null
                 beamComp.beamStartAnimation = null;
 
             _ExorcismParticleVFX = VFX.RegisterVFXObject("ExorcismParticle", ResMap.Get("exorcism_particles"),

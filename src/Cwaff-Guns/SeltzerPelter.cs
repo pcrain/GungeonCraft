@@ -24,6 +24,7 @@ namespace CwaffingTheGungy
         public static string LongDescription  = "TBD";
 
         internal static tk2dSpriteAnimationClip _BulletSprite;
+        internal static BasicBeamController _BubbleBeam;
 
         public static void Add()
         {
@@ -52,6 +53,34 @@ namespace CwaffingTheGungy
                 projectile.baseData.range = 999f;
                 // projectile.shouldRotate = true;
                 projectile.gameObject.AddComponent<SeltzerProjectile>();
+
+            Projectile beamProjectile = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items.MarineSidearm) as Gun, false);
+                beamProjectile.baseData.range = 3f;   // the perfect seltzer stats, do not tweak without testing!
+                beamProjectile.baseData.speed = 20f;  // the perfect seltzer stats, do not tweak without testing!
+
+            _BubbleBeam = beamProjectile.SetupBeamSprites(
+              spriteName: "bubble_beam", fps: 20, dims: new Vector2(16, 8));
+                _BubbleBeam.sprite.usesOverrideMaterial = true;
+                _BubbleBeam.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
+                _BubbleBeam.sprite.renderer.material.SetFloat("_EmissivePower", 5f);
+                // fix some animation glitches (don't blindly copy paste; need to be set on a case by case basis depending on your beam's needs)
+                // _BubbleBeam.muzzleAnimation = _BubbleBeam.beamStartAnimation;  //use start animation for muzzle animation, make start animation null
+                // _BubbleBeam.beamStartAnimation = null;
+
+            // GoopModifier gmod = _BubbleBeam.gameObject.AddComponent<GoopModifier>();
+            //     gmod.InFlightSpawnRadius = 0.5f;
+            //     gmod.InFlightSpawnFrequency = 0.05f;
+            //     gmod.goopDefinition = EasyGoopDefinitions.WaterGoop;
+            //     // gmod.goopDefinition = EasyGoopDefinitions.SeltzerGoop;
+
+            GoopModifier gmod = _BubbleBeam.gameObject.AddComponent<GoopModifier>();
+                gmod.SpawnAtBeamEnd = true;
+                gmod.BeamEndRadius = 0.5f;
+                gmod.SpawnGoopInFlight = true;
+                gmod.InFlightSpawnRadius = 0.5f;
+                gmod.InFlightSpawnFrequency = 0.01f;
+                gmod.goopDefinition = EasyGoopDefinitions.SeltzerGoop;
+
         }
     }
 
@@ -62,14 +91,16 @@ namespace CwaffingTheGungy
         private BounceProjModifier  _bounce        = null;
         private BasicBeamController _beam = null;
         private float _rotationRate = 0f;
+        private bool _startedSpraying = false;
 
         private void Start()
         {
             this._projectile = base.GetComponent<Projectile>();
             this._owner = this._projectile.Owner as PlayerController;
+            this._projectile.BulletScriptSettings.surviveRigidbodyCollisions = true;
             this._projectile.DestroyMode = Projectile.ProjectileDestroyMode.BecomeDebris;
             this._projectile.shouldRotate = false; // prevent automatic rotation after creation
-
+            this._projectile.specRigidbody.OnRigidbodyCollision += OnRigidbodyCollision;
             this._bounce = this._projectile.gameObject.GetOrAddComponent<BounceProjModifier>();
                 this._bounce.numberOfBounces     = 9999;
                 this._bounce.chanceToDieOnBounce = 0f;
@@ -80,21 +111,37 @@ namespace CwaffingTheGungy
                 this._bounce.OnBounce += this.StartSprayingSoda;
         }
 
+        private void OnRigidbodyCollision(CollisionData rigidbodyCollision)
+        {
+            if (!this?._projectile)
+                return;
+            this._projectile.SendInDirection(rigidbodyCollision.Normal, false);
+
+            if (!this._startedSpraying)
+            {
+                StartSprayingSoda();
+                return;
+            }
+
+            this._projectile.baseData.speed *= 0.5f;
+            this._projectile.UpdateSpeed();
+        }
+
         private void StartSprayingSoda()
         {
+            this._startedSpraying = true;
             this._bounce.OnBounce -= this.StartSprayingSoda;
             this._bounce.OnBounce += this.DisconnectBeamOnBounce;
             this._projectile.baseData.speed *= 0.5f;
             this._projectile.UpdateSpeed();
 
             // From FreeFireBeam()
-            GameObject theBeamPrefab = (ItemHelper.Get(Items.MegaDouser) as Gun).DefaultModule.projectiles[0].gameObject;
-            GameObject theBeamObject = SpawnManager.SpawnProjectile(theBeamPrefab, this._projectile.sprite.WorldCenter, Quaternion.identity);
+            // GameObject theBeamPrefab = (ItemHelper.Get(Items.MegaDouser) as Gun).DefaultModule.projectiles[0].gameObject;
+            GameObject theBeamObject = SpawnManager.SpawnProjectile(SeltzerPelter._BubbleBeam.gameObject, this._projectile.sprite.WorldCenter, Quaternion.identity);
 
             Projectile proj = theBeamObject.GetComponent<Projectile>();
                 proj.Owner = this._owner;
-                proj.baseData.range = 3f;
-                proj.baseData.speed = 20f;
+                // proj.baseData.range = 3f;
                 // proj.baseData.speed = 20f;
 
             this._beam = theBeamObject.GetComponent<BasicBeamController>();
@@ -120,6 +167,10 @@ namespace CwaffingTheGungy
 
         private void DisconnectBeamOnBounce()
         {
+            if (this?._projectile)
+                this._projectile.baseData.speed *= 0.5f;
+            if (this?._beam?.m_bones?.First?.Value == null)
+                return;
             this._beam.SeparateBeam(this._beam.m_bones.First, this._beam.Origin, this._beam.m_bones.First.Value.PosX);
             UpdateRotationRate();
         }
@@ -134,9 +185,9 @@ namespace CwaffingTheGungy
             this._beam?.CeaseAttack();
         }
 
-        private const float SPRAY_TIME = 3f;
-        private const float SPIN_TIME  = 5f;
-        private const float ACCEL      = 50f;
+        private const float SPRAY_TIME = 2f;
+        private const float SPIN_TIME  = 4f;
+        private const float ACCEL      = 40f;
         private const float _AIR_DRAG  = 0.20f;
         private static IEnumerator SpraySoda_CR(SeltzerProjectile seltzer, BasicBeamController beam, Projectile p)
         {
@@ -156,16 +207,16 @@ namespace CwaffingTheGungy
                     p.baseData.speed = newSpeed.magnitude;
                     p.SendInDirection(newSpeed, false, false);
                     p.UpdateSpeed();
-                    p.SetRotation(curAngle);
+                    p.SetRotation(newSpeed.ToAngle());
                     beam.Origin = p.sprite.WorldCenter;
-                    // beam.Direction = -this._projectile.sprite.transform.rotation.z.ToVector();
-                    beam.Direction = -curAngle.ToVector();
+                    beam.Direction = -p.LastVelocity;
                     beam.LateUpdatePosition(beam.Origin);
                     yield return null;
                 }
             #endregion
 
             #region The Rapid Spin
+                curAngle = p.LastVelocity.ToAngle(); // reset this to match the actual sprite
                 float rotIncrease = 5f * Mathf.Sign(seltzer._rotationRate);
                 for (float elapsed = 0f; elapsed < SPIN_TIME; elapsed += BraveTime.DeltaTime)
                 {

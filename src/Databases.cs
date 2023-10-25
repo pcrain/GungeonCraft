@@ -1066,6 +1066,7 @@ namespace CwaffingTheGungy
         public static GoopDefinition BlobulonGoopDef;
         public static GoopDefinition WebGoop;
         public static GoopDefinition WaterGoop;
+        public static GoopDefinition SeltzerGoop;
         public static GoopDefinition CharmGoopDef = ItemHelper.Get(Items.FairyWings)?.GetComponent<WingsItem>()?.RollGoop;
         public static GoopDefinition GreenFireDef = (ItemHelper.Get(Items.FlameHandMaximizeSpell) as Gun).DefaultModule.projectiles[0].GetComponent<GoopModifier>().goopDefinition;
         public static GoopDefinition CheeseDef    = (ItemHelper.Get(Items.TheExoticUnknownSynergy1) as Gun).DefaultModule.projectiles[0].GetComponent<GoopModifier>().goopDefinition;
@@ -1128,7 +1129,16 @@ namespace CwaffingTheGungy
                 g.CanBeElectrified = false;
                 g.baseColor32      = ColorGoopColors[i];
                 ColorGoops.Add(g);
+
             }
+
+            SeltzerGoop = UnityEngine.Object.Instantiate<GoopDefinition>(WaterGoop);
+                SeltzerGoop.CanBeElectrified = false;
+                SeltzerGoop.usesAmbientGoopFX = true;
+                SeltzerGoop.ambientGoopFXChance = 0.001f;
+                SeltzerGoop.ambientGoopFX = VFX.RegisterVFXPool("SeltzerSparkles", ResMap.Get("seltzer_sparkles"), fps: 10,
+                    loops: false, scale: 0.5f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+
         }
     }
 }

@@ -1417,9 +1417,11 @@
     <EmbeddedResource Include="Resources\MiscVFX\fancy_line.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren17.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\seltzer_sparkles4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire_c1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren6.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\voodoo_ghost.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\seltzer_sparkles1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\icicle_crash_particles3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\outbreak_smoke_large.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\pencil_runes1.png"/>
@@ -1429,6 +1431,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\siren23.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\friendlyoverhead_vfx_002.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\drowsy_cloud8.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\seltzer_sparkles3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\echo_effect3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\icicle_crash_particles8.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a3.png"/>
@@ -1579,6 +1582,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\egg_break3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\icicle_crash_particles1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\pencil_runes2.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\seltzer_sparkles2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren13.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\midas_sparkle2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\zenkai_aura5.png"/>
@@ -1963,6 +1967,7 @@
     <EmbeddedResource Include="Resources\BeamSprites\holy_water_gun_start_002.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\aimu_beam_mid_004.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\gaster_beam_start_001.png"/>
+    <EmbeddedResource Include="Resources\BeamSprites\bubble_beam_mid_004.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\gaster_beam_impact_002.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\alphabeam_impact_001.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\holy_water_gun_impact_005.png"/>
@@ -1973,12 +1978,15 @@
     <EmbeddedResource Include="Resources\BeamSprites\alphabeam_end_001.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\alphabeam_mid_001.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\holy_water_gun_middle_break_005.png"/>
+    <EmbeddedResource Include="Resources\BeamSprites\bubble_beam_mid_001.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\holy_water_gun_mid_003.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\aimu_beam_start_007.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\aimu_beam_start_002.png"/>
+    <EmbeddedResource Include="Resources\BeamSprites\bubble_beam_mid_002.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\holy_water_gun_mid_005.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\gaster_beam_impact_001.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\gaster_beam_mid_004.png"/>
+    <EmbeddedResource Include="Resources\BeamSprites\bubble_beam_mid_003.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\holy_water_gun_mid_002.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\holy_water_gun_impact_003.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\aimu_beam_start_005.png"/>
