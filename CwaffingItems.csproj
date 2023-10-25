@@ -1971,6 +1971,7 @@
     <EmbeddedResource Include="Resources\BeamSprites\gaster_beam_impact_002.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\alphabeam_impact_001.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\holy_water_gun_impact_005.png"/>
+    <EmbeddedResource Include="Resources\BeamSprites\bubble_beam_impact_003.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\holy_water_gun_start_001.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\gaster_beam_start_002.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\holy_water_gun_mid_004.png"/>
@@ -1997,6 +1998,7 @@
     <EmbeddedResource Include="Resources\BeamSprites\holy_water_gun_start_005.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\gaster_beam_mid_002.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\gaster_beam_start_006.png"/>
+    <EmbeddedResource Include="Resources\BeamSprites\bubble_beam_impact_002.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\aimu_beam_start_003.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\gaster_beam_mid_006.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\holy_water_gun_impact_002.png"/>
@@ -2007,15 +2009,18 @@
     <EmbeddedResource Include="Resources\BeamSprites\holy_water_gun_middle_break_002.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\holy_water_gun_middle_break_001.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\aimu_beam_start_004.png"/>
+    <EmbeddedResource Include="Resources\BeamSprites\bubble_beam_impact_005.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\gaster_beam_start_005.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\aimu_beam_mid_005.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\aimu_beam_start_006.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\gaster_beam_start_007.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\aimu_beam_mid_003.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\alphabeam_start_001.png"/>
+    <EmbeddedResource Include="Resources\BeamSprites\bubble_beam_impact_004.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\gaster_beam_start_004.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\gaster_beam_mid_003.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\aimu_beam_start_001.png"/>
+    <EmbeddedResource Include="Resources\BeamSprites\bubble_beam_impact_001.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\holy_water_gun_impact_004.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\aimu_beam_mid_006.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\holy_water_gun_middle_break_003.png"/>

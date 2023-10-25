@@ -51,42 +51,47 @@ namespace CwaffingTheGungy
                 projectile.AddDefaultAnimation(_BulletSprite);
                 projectile.transform.parent = gun.barrelOffset;
                 projectile.baseData.range = 999f;
-                // projectile.shouldRotate = true;
                 projectile.gameObject.AddComponent<SeltzerProjectile>();
 
             Projectile beamProjectile = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items.MarineSidearm) as Gun, false);
-                beamProjectile.baseData.range = 3f;   // the perfect seltzer stats, do not tweak without testing!
-                beamProjectile.baseData.speed = 20f;  // the perfect seltzer stats, do not tweak without testing!
+                beamProjectile.baseData.range  = 3f;   // the perfect seltzer stats, do not tweak without testing!
+                beamProjectile.baseData.speed  = 20f;  // the perfect seltzer stats, do not tweak without testing!
+                beamProjectile.baseData.force  = 100f;
+                beamProjectile.baseData.damage = 4f;
 
-            _BubbleBeam = beamProjectile.SetupBeamSprites(
-              spriteName: "bubble_beam", fps: 20, dims: new Vector2(16, 8));
+            _BubbleBeam = beamProjectile.SetupBeamSprites(spriteName: "bubble_beam", fps: 10, dims: new Vector2(16, 8));
                 _BubbleBeam.sprite.usesOverrideMaterial = true;
                 _BubbleBeam.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
                 _BubbleBeam.sprite.renderer.material.SetFloat("_EmissivePower", 5f);
-                // fix some animation glitches (don't blindly copy paste; need to be set on a case by case basis depending on your beam's needs)
-                // _BubbleBeam.muzzleAnimation = _BubbleBeam.beamStartAnimation;  //use start animation for muzzle animation, make start animation null
-                // _BubbleBeam.beamStartAnimation = null;
 
-            // GoopModifier gmod = _BubbleBeam.gameObject.AddComponent<GoopModifier>();
-            //     gmod.InFlightSpawnRadius = 0.5f;
-            //     gmod.InFlightSpawnFrequency = 0.05f;
-            //     gmod.goopDefinition = EasyGoopDefinitions.WaterGoop;
-            //     // gmod.goopDefinition = EasyGoopDefinitions.SeltzerGoop;
+                _BubbleBeam.chargeDelay         = 0f;
+                _BubbleBeam.usesChargeDelay     = false;
+                _BubbleBeam.HitsPlayers         = false;
+                _BubbleBeam.HitsEnemies         = true;
+                _BubbleBeam.collisionSeparation = true;
+                _BubbleBeam.knockbackStrength   = 100f;
+                _BubbleBeam.boneType            = BasicBeamController.BeamBoneType.Projectile;
+                _BubbleBeam.TileType            = BasicBeamController.BeamTileType.Flowing;
+                _BubbleBeam.endType             = BasicBeamController.BeamEndType.Persist;
+                _BubbleBeam.interpolateStretchedBones = false; // causes weird graphical glitches whether it's enabled or not, but enabled is worse
+
+                // _BubbleBeam.collisionRadius = 1.5f;
+                // _BubbleBeam.collisionLength = 320;
+                // _BubbleBeam.collisionWidth  = 64;
 
             GoopModifier gmod = _BubbleBeam.gameObject.AddComponent<GoopModifier>();
-                gmod.SpawnAtBeamEnd = true;
-                gmod.BeamEndRadius = 0.5f;
-                gmod.SpawnGoopInFlight = true;
-                gmod.InFlightSpawnRadius = 0.5f;
+                gmod.SpawnAtBeamEnd         = true;
+                gmod.BeamEndRadius          = 0.5f;
+                gmod.SpawnGoopInFlight      = true;
+                gmod.InFlightSpawnRadius    = 0.5f;
                 gmod.InFlightSpawnFrequency = 0.01f;
-                gmod.goopDefinition = EasyGoopDefinitions.SeltzerGoop;
-
+                gmod.goopDefinition         = EasyGoopDefinitions.SeltzerGoop;
         }
     }
 
     public class SeltzerProjectile : MonoBehaviour
     {
-        private Projectile _projectile;
+        private Projectile _canProjectile;
         private PlayerController _owner;
         private BounceProjModifier  _bounce        = null;
         private BasicBeamController _beam = null;
@@ -95,27 +100,27 @@ namespace CwaffingTheGungy
 
         private void Start()
         {
-            this._projectile = base.GetComponent<Projectile>();
-            this._owner = this._projectile.Owner as PlayerController;
-            this._projectile.BulletScriptSettings.surviveRigidbodyCollisions = true;
-            this._projectile.DestroyMode = Projectile.ProjectileDestroyMode.BecomeDebris;
-            this._projectile.shouldRotate = false; // prevent automatic rotation after creation
-            this._projectile.specRigidbody.OnRigidbodyCollision += OnRigidbodyCollision;
-            this._bounce = this._projectile.gameObject.GetOrAddComponent<BounceProjModifier>();
-                this._bounce.numberOfBounces     = 9999;
-                this._bounce.chanceToDieOnBounce = 0f;
-                this._bounce.onlyBounceOffTiles  = false;
+            this._canProjectile = base.GetComponent<Projectile>();
+            this._owner = this._canProjectile.Owner as PlayerController;
+            this._canProjectile.BulletScriptSettings.surviveRigidbodyCollisions = true;
+            this._canProjectile.DestroyMode = Projectile.ProjectileDestroyMode.BecomeDebris;
+            this._canProjectile.shouldRotate = false; // prevent automatic rotation after creation
+            this._canProjectile.specRigidbody.OnRigidbodyCollision += OnRigidbodyCollision;
+            this._bounce = this._canProjectile.gameObject.GetOrAddComponent<BounceProjModifier>();
+                this._bounce.numberOfBounces      = 9999;
+                this._bounce.chanceToDieOnBounce  = 0f;
+                this._bounce.onlyBounceOffTiles   = false;
                 this._bounce.ExplodeOnEnemyBounce = false;
-                this._bounce.bouncesTrackEnemies = true;
-                this._bounce.bounceTrackRadius = 3f;
+                this._bounce.bouncesTrackEnemies  = true;
+                this._bounce.bounceTrackRadius    = 3f;
                 this._bounce.OnBounce += this.StartSprayingSoda;
         }
 
         private void OnRigidbodyCollision(CollisionData rigidbodyCollision)
         {
-            if (!this?._projectile)
+            if (!this?._canProjectile)
                 return;
-            this._projectile.SendInDirection(rigidbodyCollision.Normal, false);
+            this._canProjectile.SendInDirection(rigidbodyCollision.Normal, false);
 
             if (!this._startedSpraying)
             {
@@ -123,56 +128,42 @@ namespace CwaffingTheGungy
                 return;
             }
 
-            this._projectile.baseData.speed *= 0.5f;
-            this._projectile.UpdateSpeed();
+            this._canProjectile.baseData.speed *= 0.5f;
+            this._canProjectile.UpdateSpeed();
         }
 
         private void StartSprayingSoda()
         {
             this._startedSpraying = true;
             this._bounce.OnBounce -= this.StartSprayingSoda;
-            this._bounce.OnBounce += this.DisconnectBeamOnBounce;
-            this._projectile.baseData.speed *= 0.5f;
-            this._projectile.UpdateSpeed();
-
-            // From FreeFireBeam()
-            // GameObject theBeamPrefab = (ItemHelper.Get(Items.MegaDouser) as Gun).DefaultModule.projectiles[0].gameObject;
-            GameObject theBeamObject = SpawnManager.SpawnProjectile(SeltzerPelter._BubbleBeam.gameObject, this._projectile.sprite.WorldCenter, Quaternion.identity);
-
-            Projectile proj = theBeamObject.GetComponent<Projectile>();
-                proj.Owner = this._owner;
-                // proj.baseData.range = 3f;
-                // proj.baseData.speed = 20f;
-
-            this._beam = theBeamObject.GetComponent<BasicBeamController>();
-                this._beam.chargeDelay     = 0f;
-                this._beam.usesChargeDelay = false;
-                this._beam.HitsPlayers     = false;
-                this._beam.HitsEnemies     = true;
-                this._beam.Owner           = this._owner;
-                this._beam.Origin          = this._projectile.sprite.WorldCenter;
-                this._beam.Direction       = -this._projectile.sprite.transform.rotation.z.ToVector();
-                this._beam.boneType        = BasicBeamController.BeamBoneType.Projectile;
-                // this._beam.boneType        = BasicBeamController.BeamBoneType.Straight;
-                // this._beam.TileType        = BasicBeamController.BeamTileType.GrowAtBeginning;
-                this._beam.TileType        = BasicBeamController.BeamTileType.Flowing;
-                this._beam.endType         = BasicBeamController.BeamEndType.Persist;
-                // this._beam.endType         = BasicBeamController.BeamEndType.Vanish;
-                // this._beam.endType         = BasicBeamController.BeamEndType.Dissipate; // doesn't work great without dissipate animation
-                // this._beam.dissipateTime   = 0.5f;
-
-            this._projectile.OnDestruction += this.DestroyBeam;
-            this._beam.StartCoroutine(SpraySoda_CR(this, this._beam, this._projectile));
+            this._bounce.OnBounce += this.RestartBeamOnBounce;
+            this._canProjectile.baseData.speed *= 0.5f;
+            this._canProjectile.UpdateSpeed();
+            this._canProjectile.OnDestruction += this.DestroyBeam;
+            this._canProjectile.StartCoroutine(SpraySoda_CR(this, this._canProjectile));
         }
 
-        private void DisconnectBeamOnBounce()
+        private void CreateBeam()
         {
-            if (this?._projectile)
-                this._projectile.baseData.speed *= 0.5f;
-            if (this?._beam?.m_bones?.First?.Value == null)
-                return;
-            this._beam.SeparateBeam(this._beam.m_bones.First, this._beam.Origin, this._beam.m_bones.First.Value.PosX);
-            UpdateRotationRate();
+            GameObject theBeamObject = SpawnManager.SpawnProjectile(SeltzerPelter._BubbleBeam.gameObject, this._canProjectile.sprite.WorldCenter, Quaternion.identity);
+            Projectile beamProjectile = theBeamObject.GetComponent<Projectile>();
+                beamProjectile.Owner = this._owner;
+
+            this._beam = theBeamObject.GetComponent<BasicBeamController>();
+                this._beam.Owner       = this._owner;
+                this._beam.HitsPlayers = false;
+                this._beam.HitsEnemies = true;
+                this._beam.Origin      = this._canProjectile.sprite.WorldCenter;
+                // this._beam.Direction   = -this._canProjectile.LastVelocity;
+                this._beam.Direction   = -this._canProjectile.sprite.transform.rotation.z.ToVector();
+        }
+
+        private void RestartBeamOnBounce()
+        {
+            if (this?._canProjectile)
+                this._canProjectile.baseData.speed *= 0.5f;
+            this._beam?.CeaseAttack();
+            this._beam = null;
         }
 
         private void UpdateRotationRate()
@@ -189,7 +180,7 @@ namespace CwaffingTheGungy
         private const float SPIN_TIME  = 4f;
         private const float ACCEL      = 40f;
         private const float _AIR_DRAG  = 0.20f;
-        private static IEnumerator SpraySoda_CR(SeltzerProjectile seltzer, BasicBeamController beam, Projectile p)
+        private static IEnumerator SpraySoda_CR(SeltzerProjectile seltzer, Projectile p)
         {
             yield return null;
             float startAngle = p.LastVelocity.ToAngle();
@@ -199,8 +190,12 @@ namespace CwaffingTheGungy
             #region The Ballistics
                 for (float elapsed = 0f; elapsed < SPRAY_TIME; elapsed += BraveTime.DeltaTime)
                 {
+                    while (BraveTime.DeltaTime == 0)
+                        yield return null;
                     if (!p.isActiveAndEnabled || p.HasDiedInAir)
                         break;
+                    if (!seltzer._beam)
+                        seltzer.CreateBeam();
                     Vector2 oldSpeed = p.LastVelocity;
                     curAngle += seltzer._rotationRate;
                     Vector2 newSpeed = oldSpeed + curAngle.ToVector(ACCEL * BraveTime.DeltaTime);
@@ -208,9 +203,9 @@ namespace CwaffingTheGungy
                     p.SendInDirection(newSpeed, false, false);
                     p.UpdateSpeed();
                     p.SetRotation(newSpeed.ToAngle());
-                    beam.Origin = p.sprite.WorldCenter;
-                    beam.Direction = -p.LastVelocity;
-                    beam.LateUpdatePosition(beam.Origin);
+                    seltzer._beam.Origin = p.sprite.WorldCenter;
+                    seltzer._beam.Direction = -p.LastVelocity;
+                    seltzer._beam.LateUpdatePosition(seltzer._beam.Origin);
                     yield return null;
                 }
             #endregion
@@ -220,25 +215,29 @@ namespace CwaffingTheGungy
                 float rotIncrease = 5f * Mathf.Sign(seltzer._rotationRate);
                 for (float elapsed = 0f; elapsed < SPIN_TIME; elapsed += BraveTime.DeltaTime)
                 {
+                    while (BraveTime.DeltaTime == 0)
+                        yield return null;
                     if (!p.isActiveAndEnabled || p.HasDiedInAir)
                         break;
+                    if (!seltzer._beam)
+                        seltzer.CreateBeam();
                     if (p.baseData.speed > 0.1f)
                     {
                         p.baseData.speed *= Mathf.Pow(_AIR_DRAG, BraveTime.DeltaTime);
                         p.UpdateSpeed();
                     }
                     seltzer._rotationRate += rotIncrease * BraveTime.DeltaTime;
-                    curAngle += seltzer._rotationRate;
+                    curAngle += seltzer._rotationRate * C.FPS * BraveTime.DeltaTime;
                     p.SetRotation(curAngle);
-                    beam.Origin = p.sprite.WorldCenter;
-                    beam.Direction = -curAngle.ToVector();
-                    beam.LateUpdatePosition(beam.Origin);
+                    seltzer._beam.Origin = p.sprite.WorldCenter;
+                    seltzer._beam.Direction = -curAngle.ToVector();
+                    seltzer._beam.LateUpdatePosition(seltzer._beam.Origin);
                     yield return null;
                 }
             #endregion
 
             #region Die Down
-                beam.CeaseAttack();
+                seltzer._beam.CeaseAttack();
                 p?.DieInAir();
             #endregion
 

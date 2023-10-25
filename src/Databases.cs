@@ -1135,7 +1135,7 @@ namespace CwaffingTheGungy
             SeltzerGoop = UnityEngine.Object.Instantiate<GoopDefinition>(WaterGoop);
                 SeltzerGoop.CanBeElectrified = false;
                 SeltzerGoop.usesAmbientGoopFX = true;
-                SeltzerGoop.ambientGoopFXChance = 0.001f;
+                SeltzerGoop.ambientGoopFXChance = 0.004f;
                 SeltzerGoop.ambientGoopFX = VFX.RegisterVFXPool("SeltzerSparkles", ResMap.Get("seltzer_sparkles"), fps: 10,
                     loops: false, scale: 0.5f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
 
