@@ -65,5 +65,6 @@ aimu_shoot_sound,-1.0,1,sound
 aimu_shoot_sound_alt,-4.0,1,sound
 aimu_beam_sound_2,-9.0,1,sound
 seltzer_open_sound,10.0,1,sound
-seltzer_spray_sound,-3.0,1,sound
-seltzer_shake_sound,5.0,1,sound
+seltzer_spray_sound,-6.0,1,sound
+seltzer_shake_sound,4.0,1,sound
+seltzer_insert_sound,-1.0,1,sound

@@ -29,21 +29,22 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<SeltzerPelter>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.0f, ammo: 800);
-                gun.SetAnimationFPS(gun.reloadAnimation, 45);
-                gun.SetReloadAudio("seltzer_shake_sound", frame: 0);
-                gun.SetReloadAudio("seltzer_shake_sound", frame: 10);
-                gun.SetReloadAudio("seltzer_shake_sound", frame: 22);
-                gun.SetReloadAudio("seltzer_shake_sound", frame: 29);
-                gun.SetReloadAudio("seltzer_shake_sound", frame: 35);
-                gun.SetReloadAudio("seltzer_shake_sound", frame: 42);
+                gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.1f, ammo: 150);
+                gun.SetAnimationFPS(gun.reloadAnimation, 48);
+                gun.SetReloadAudio("seltzer_shake_sound",  frame: 0);
+                gun.SetReloadAudio("seltzer_shake_sound",  frame: 10);
+                gun.SetReloadAudio("seltzer_shake_sound",  frame: 22);
+                gun.SetReloadAudio("seltzer_shake_sound",  frame: 29);
+                gun.SetReloadAudio("seltzer_shake_sound",  frame: 35);
+                gun.SetReloadAudio("seltzer_shake_sound",  frame: 42);
+                gun.SetReloadAudio("seltzer_insert_sound", frame: 42);
 
             ProjectileModule mod = gun.DefaultModule;
                 mod.ammoCost            = 1;
                 mod.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
                 mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
-                mod.cooldownTime        = 0.75f;
-                mod.numberOfShotsInClip = 4;
+                mod.cooldownTime        = 0.5f;
+                mod.numberOfShotsInClip = 1;
 
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("can_projectile_a").Base(),
@@ -57,14 +58,16 @@ namespace CwaffingTheGungy
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
                 projectile.AddDefaultAnimation(_BulletSprite);
                 projectile.transform.parent = gun.barrelOffset;
-                projectile.baseData.range = 999f;
+                projectile.baseData.range   = 999f;
+                projectile.baseData.damage  = 16f;
+                projectile.baseData.speed   = 30f;
                 projectile.gameObject.AddComponent<SeltzerProjectile>();
 
             Projectile beamProjectile = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items.MarineSidearm) as Gun, false);
                 beamProjectile.baseData.range  = 3f;   // the perfect seltzer stats, do not tweak without testing!
                 beamProjectile.baseData.speed  = 20f;  // the perfect seltzer stats, do not tweak without testing!
                 beamProjectile.baseData.force  = 100f;
-                beamProjectile.baseData.damage = 20f;
+                beamProjectile.baseData.damage = 40f;  // DPS for beams
 
             _BubbleBeam = beamProjectile.SetupBeamSprites(spriteName: "bubble_beam", fps: 8, dims: new Vector2(16, 8));
                 _BubbleBeam.sprite.usesOverrideMaterial = true;
@@ -118,7 +121,7 @@ namespace CwaffingTheGungy
                 this._bounce.bounceTrackRadius    = 3f;
                 this._bounce.OnBounce += this.StartSprayingSoda;
 
-            AkSoundEngine.PostEvent("seltzer_shoot_sound_alt", base.gameObject);
+            AkSoundEngine.PostEvent("seltzer_shoot_sound_alt_2", base.gameObject);
         }
 
         private void OnRigidbodyCollision(CollisionData rigidbodyCollision)
