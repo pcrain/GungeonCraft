@@ -25,19 +25,31 @@ namespace CwaffingTheGungy
 
         internal static tk2dSpriteAnimationClip _BulletSprite;
         internal static BasicBeamController _BubbleBeam;
+        internal static List<string> _ReloadAnimations;
+
+        private int _loadedCanIndex = 0;
 
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<SeltzerPelter>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
                 gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.1f, ammo: 150);
-                gun.SetAnimationFPS(gun.reloadAnimation, 48);
-                gun.SetReloadAudio("seltzer_shake_sound",  frame: 0);
-                gun.SetReloadAudio("seltzer_shake_sound",  frame: 10);
-                gun.SetReloadAudio("seltzer_shake_sound",  frame: 22);
-                gun.SetReloadAudio("seltzer_shake_sound",  frame: 29);
-                gun.SetReloadAudio("seltzer_shake_sound",  frame: 35);
-                gun.SetReloadAudio("seltzer_shake_sound",  frame: 42);
-                gun.SetReloadAudio("seltzer_insert_sound", frame: 42);
+
+                _ReloadAnimations = new(){
+                    gun.UpdateAnimation("reload",   returnToIdle: true), // coke can
+                    gun.UpdateAnimation("reload_b", returnToIdle: true), // pepsi can
+                    gun.UpdateAnimation("reload_c", returnToIdle: true), // sprite can
+                };
+                foreach(string animation in _ReloadAnimations)
+                {
+                    gun.SetAnimationFPS(animation, 48);
+                    gun.SetGunAudio(name: animation, audio: "seltzer_shake_sound", frame: 0);
+                    gun.SetGunAudio(name: animation, audio: "seltzer_shake_sound", frame: 10);
+                    gun.SetGunAudio(name: animation, audio: "seltzer_shake_sound", frame: 22);
+                    gun.SetGunAudio(name: animation, audio: "seltzer_shake_sound", frame: 29);
+                    gun.SetGunAudio(name: animation, audio: "seltzer_shake_sound", frame: 35);
+                    gun.SetGunAudio(name: animation, audio: "seltzer_shake_sound", frame: 42);
+                    gun.SetGunAudio(name: animation, audio: "seltzer_insert_sound", frame: 42);
+                }
 
             ProjectileModule mod = gun.DefaultModule;
                 mod.ammoCost            = 1;
@@ -47,8 +59,8 @@ namespace CwaffingTheGungy
                 mod.numberOfShotsInClip = 1;
 
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
-                ResMap.Get("can_projectile_a").Base(),
-                12, true, new IntVector2(16, 12),
+                ResMap.Get("can_projectile").Base(),
+                1, true, new IntVector2(16, 12), // 1 FPS minimum, stop animator manually later
                 false, tk2dBaseSprite.Anchor.MiddleCenter,
                 anchorsChangeColliders: false/*true*/,
                 fixesScales: true,
@@ -61,10 +73,11 @@ namespace CwaffingTheGungy
                 projectile.baseData.range   = 999f;
                 projectile.baseData.damage  = 16f;
                 projectile.baseData.speed   = 30f;
+                projectile.baseData.force   = 75f;
                 projectile.gameObject.AddComponent<SeltzerProjectile>();
 
             Projectile beamProjectile = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items.MarineSidearm) as Gun, false);
-                beamProjectile.baseData.range  = 3f;   // the perfect seltzer stats, do not tweak without testing!
+                beamProjectile.baseData.range  = 4f;   // the perfect seltzer stats, do not tweak without testing!
                 beamProjectile.baseData.speed  = 20f;  // the perfect seltzer stats, do not tweak without testing!
                 beamProjectile.baseData.force  = 100f;
                 beamProjectile.baseData.damage = 40f;  // DPS for beams
@@ -92,6 +105,21 @@ namespace CwaffingTheGungy
                 gmod.InFlightSpawnRadius    = 0.5f;
                 gmod.InFlightSpawnFrequency = 0.01f;
                 gmod.goopDefinition         = EasyGoopDefinitions.SeltzerGoop;
+        }
+
+        public override void OnReload(PlayerController player, Gun gun)
+        {
+            base.OnReload(player, gun);
+
+            this._loadedCanIndex = UnityEngine.Random.Range(0, _ReloadAnimations.Count());
+            gun.spriteAnimator.Stop();
+            gun.spriteAnimator.Play(_ReloadAnimations[this._loadedCanIndex]);
+        }
+
+        public override void PostProcessProjectile(Projectile projectile)
+        {
+            base.PostProcessProjectile(projectile);
+            projectile.spriteAnimator.PlayFromFrame(this._loadedCanIndex);
         }
     }
 
@@ -121,6 +149,8 @@ namespace CwaffingTheGungy
                 this._bounce.bounceTrackRadius    = 3f;
                 this._bounce.OnBounce += this.StartSprayingSoda;
 
+            this._canProjectile.spriteAnimator.Stop(); // stop animating immediately after creation so we can stick with our initial sprite
+
             AkSoundEngine.PostEvent("seltzer_shoot_sound_alt_2", base.gameObject);
         }
 
@@ -136,6 +166,7 @@ namespace CwaffingTheGungy
                 return;
             }
 
+            AkSoundEngine.PostEvent("seltzer_pelter_collide_sound", base.gameObject);
             this._canProjectile.baseData.speed *= 0.5f;
             this._canProjectile.UpdateSpeed();
         }
@@ -151,6 +182,7 @@ namespace CwaffingTheGungy
             this._canProjectile.StartCoroutine(SpraySoda_CR(this, this._canProjectile));
 
             AkSoundEngine.PostEvent("seltzer_shoot_sound", base.gameObject);
+            AkSoundEngine.PostEvent("seltzer_pelter_collide_sound", base.gameObject);
         }
 
         private void CreateBeam()
@@ -173,6 +205,7 @@ namespace CwaffingTheGungy
                 this._canProjectile.baseData.speed *= 0.5f;
             this._beam?.CeaseAttack();
             this._beam = null;
+            AkSoundEngine.PostEvent("seltzer_pelter_collide_sound", base.gameObject);
         }
 
         private void UpdateRotationRate()
@@ -188,7 +221,7 @@ namespace CwaffingTheGungy
         private const float SPRAY_TIME = 2f;
         private const float SPIN_TIME  = 4f;
         private const float ACCEL      = 40f;
-        private const float _AIR_DRAG  = 0.20f;
+        private const float _AIR_DRAG  = 0.25f;
         private const float _SOUND_RATE = 0.2f;
 
         private static IEnumerator SpraySoda_CR(SeltzerProjectile seltzer, Projectile p)

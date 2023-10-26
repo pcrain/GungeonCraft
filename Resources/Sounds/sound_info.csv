@@ -68,3 +68,4 @@ seltzer_open_sound,10.0,1,sound
 seltzer_spray_sound,-6.0,1,sound
 seltzer_shake_sound,4.0,1,sound
 seltzer_insert_sound,-1.0,1,sound
+seltzer_pelter_collide_sound,-6.0,1,sound
