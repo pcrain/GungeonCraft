@@ -32,8 +32,8 @@ namespace CwaffingTheGungy
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<SeltzerPelter>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.1f, ammo: 150);
-
+                gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.0f, ammo: 150);
+                gun.SetAnimationFPS(gun.shootAnimation, 36);
                 _ReloadAnimations = new(){
                     gun.UpdateAnimation("reload",   returnToIdle: true), // coke can
                     gun.UpdateAnimation("reload_b", returnToIdle: true), // pepsi can
@@ -41,7 +41,7 @@ namespace CwaffingTheGungy
                 };
                 foreach(string animation in _ReloadAnimations)
                 {
-                    gun.SetAnimationFPS(animation, 48);
+                    gun.SetAnimationFPS(animation, 52);
                     gun.SetGunAudio(name: animation, audio: "seltzer_shake_sound", frame: 0);
                     gun.SetGunAudio(name: animation, audio: "seltzer_shake_sound", frame: 10);
                     gun.SetGunAudio(name: animation, audio: "seltzer_shake_sound", frame: 22);
@@ -75,6 +75,8 @@ namespace CwaffingTheGungy
                 projectile.baseData.speed   = 30f;
                 projectile.baseData.force   = 75f;
                 projectile.gameObject.AddComponent<SeltzerProjectile>();
+                // projectile.AddTrailToProjectile(ResMap.Get("bubble_stream_mid")[0], new Vector2(8, 8), new Vector2(4, 4),
+                //     ResMap.Get("bubble_stream_mid"), 32, ResMap.Get("bubble_stream_start"), 32, cascadeTimer: C.FRAME, destroyOnEmpty: true);
 
             Projectile beamProjectile = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items.MarineSidearm) as Gun, false);
                 beamProjectile.baseData.range  = 4f;   // the perfect seltzer stats, do not tweak without testing!
@@ -82,7 +84,8 @@ namespace CwaffingTheGungy
                 beamProjectile.baseData.force  = 100f;
                 beamProjectile.baseData.damage = 40f;  // DPS for beams
 
-            _BubbleBeam = beamProjectile.SetupBeamSprites(spriteName: "bubble_beam", fps: 8, dims: new Vector2(16, 8));
+            // _BubbleBeam = beamProjectile.SetupBeamSprites(spriteName: "bubble_beam", fps: 8, dims: new Vector2(16, 8));
+            _BubbleBeam = beamProjectile.SetupBeamSprites(spriteName: "bubble_stream", fps: 8, dims: new Vector2(8, 8));
                 _BubbleBeam.sprite.usesOverrideMaterial = true;
                 _BubbleBeam.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
                 _BubbleBeam.sprite.renderer.material.SetFloat("_EmissivePower", 5f);
