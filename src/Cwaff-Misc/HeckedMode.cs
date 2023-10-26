@@ -165,23 +165,20 @@ namespace CwaffingTheGungy
 
         public static void OnEnemyPreAwake(Action<AIActor> action, AIActor enemy)
         {
-            if (!HeckedModeEnabled)
+            if (HeckedModeEnabled)
             {
-                action(enemy);
-                return;
+                Items replacementGunId = (Items)HeckedModeGunWhiteList[HeckedModeGunWhiteList.Count-1];
+                enemy.HeckedShootGunBehavior(ItemHelper.Get(replacementGunId) as Gun);
             }
+            action(enemy);
+        }
 
-            Items replacementGunId = (Items)HeckedModeGunWhiteList[HeckedModeGunWhiteList.Count-1];
-            Gun replacementGun = ItemHelper.Get(replacementGunId) as Gun;
-            // replacementGun.enemyPreFireAnimation = null;
-
-            if (/*(enemy.EnemyGuid != Enemies.BulletKin) ||*/ (enemy.aiShooter is not AIShooter shooter))
-            {
-                action(enemy);
+        public static void HeckedShootGunBehavior(this AIActor enemy, Gun replacementGun)
+        {
+            if (enemy.aiShooter is not AIShooter shooter)
                 return;
-            }
 
-            shooter.equippedGunId = (int)replacementGunId;
+            shooter.equippedGunId = replacementGun.PickupObjectId;
             shooter.customShootCooldownPeriod = 0f;
             shooter.bulletName = null;
             foreach (AttackBehaviorBase attack in shooter.behaviorSpeculator.AttackBehaviors)
@@ -259,10 +256,96 @@ namespace CwaffingTheGungy
 
                 */
             }
-            action(enemy);
+        }
+
+        public static void AttachStats(this AIShooter shooter)
+        {
+            ETGModConsole.Log($"  equipped gun is {shooter.EquippedGun.name}");
+            ETGModConsole.Log($"  current gun is {shooter.CurrentGun.name}");
+            ETGModConsole.Log($"  handObject is {shooter.handObject != null}");
+            for (int i = shooter.sprite.attachedRenderers.Count() - 1; i >= 0; --i)
+                ETGModConsole.Log($"    sprite attached: {shooter.sprite.attachedRenderers[i].name}");
+            for (int i = shooter.CurrentGun.GetSprite().attachedRenderers.Count() - 1; i >= 0; --i)
+                ETGModConsole.Log($"    gun attached: {shooter.CurrentGun.GetSprite().attachedRenderers[i].name}");
+            for (int i = shooter.m_attachedHands.Count() - 1; i >= 0; --i)
+                ETGModConsole.Log($"    hands attached: {shooter.m_attachedHands[i].name}");
+
+            for (int i = shooter.transform.childCount - 1; i >= 0; --i)
+            {
+                Transform t = shooter.transform.GetChild(i);
+                ETGModConsole.Log($"    transform attached: {t.name}");
+                for (int ti = t.gameObject.transform.childCount - 1; ti >= 0; --ti)
+                {
+                    Transform ts = t.gameObject.transform.GetChild(ti);
+                    ETGModConsole.Log($"      transform subattached: {ts.name}");
+                }
+            }
+        }
+
+        // If an enemy has already been initialized, replacing their guns gets a lot more complicated
+        // All of this code is basically the inverse of AIShooter.Initialize() in reverse order
+        public static void ReplaceGun(this AIActor enemy, Items replacementGunId)
+        {
+            if (enemy.aiShooter is not AIShooter shooter)
+                return;
+
+            // ETGModConsole.Log($"  BUBBLETIME");
+            // ETGModConsole.Log($"before init: ");
+            // shooter.AttachStats();
+
+            for (int i = shooter.transform.childCount - 1; i >= 0; --i)
+            {
+                Transform t = shooter.transform.GetChild(i);
+                if (t.gameObject.GetComponent<PlayerHandController>() is PlayerHandController hc)
+                {
+                    if (shooter.healthHaver)
+                    {
+                        tk2dSprite hcsprite = hc.GetComponent<tk2dSprite>();
+                        if (shooter.healthHaver.bodySprites.Contains(hcsprite))
+                            shooter.healthHaver.bodySprites.Remove(hcsprite);
+                    }
+                    if (shooter.m_attachedHands.Contains(hc))
+                        shooter.m_attachedHands.Remove(hc);
+                    // hc.attachPoint = null;
+                    shooter.CurrentGun.GetSprite().DetachRenderer(hc.sprite);
+                    // UnityEngine.Object.Destroy(hc);
+                    t.parent = null;
+                    UnityEngine.Object.Destroy(t.gameObject);
+                }
+                else if (t.name == "GunAttachPoint")
+                {
+                    for (int ti = t.gameObject.transform.childCount - 1; ti >= 0; --ti)
+                    {
+                        Transform ts = t.gameObject.transform.GetChild(ti);
+                        ts.parent = null;
+                        UnityEngine.Object.Destroy(ts.gameObject);
+                    }
+                }
+            }
+            shooter.sprite.DetachRenderer(shooter.CurrentGun.GetSprite());
+            SpriteOutlineManager.RemoveOutlineFromSprite(shooter.CurrentGun.GetSprite());
+
+            shooter.equippedGunId = (int)replacementGunId;
+            // shooter.customShootCooldownPeriod = 0f;
+            shooter.m_hasCachedGun = false;
+            shooter.bulletName = null;
+            foreach (AttackBehaviorBase attack in shooter.behaviorSpeculator.AttackBehaviors)
+            {
+                if (attack is not ShootGunBehavior pewpew)
+                    continue;
+                pewpew.WeaponType         = WeaponType.AIShooterProjectile;
+                pewpew.OverrideBulletName = null;
+            }
+
+            // enemy.HeckedShootGunBehavior(ItemHelper.Get(replacementGunId) as Gun);
+
+            shooter.Initialize();
+            // ETGModConsole.Log($"after init: ");
+            // shooter.AttachStats();
         }
 
     }
 }
+
 
 

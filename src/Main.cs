@@ -121,6 +121,7 @@ namespace CwaffingTheGungy
                     AstralProjector.Init();
                     EchoChamber.Init();
                     BionicFinger.Init();
+                    BubbleWand.Init();
                 #endregion
 
                 #region Guns
