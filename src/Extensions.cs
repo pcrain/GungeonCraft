@@ -757,9 +757,21 @@ namespace CwaffingTheGungy
         }
     }
 
+    // Set the rotation of a projectile manually
     public static void SetRotation(this Projectile p, float angle)
     {
       p.m_transform.eulerAngles = new Vector3(0f, 0f, angle);
+    }
+
+    public static string SetUpAnimation(this tk2dBaseSprite sprite, string animationName, float fps, tk2dSpriteAnimationClip.WrapMode wrapMode = tk2dSpriteAnimationClip.WrapMode.Once)
+    {
+      tk2dSpriteCollectionData collection = sprite.collection;
+      tk2dSpriteAnimator anim = sprite.spriteAnimator;
+      List<int> spriteIds = new();
+      foreach (string spritePath in ResMap.Get(animationName))
+          spriteIds.Add(SpriteBuilder.AddSpriteToCollection(spritePath, collection));
+      tk2dSpriteAnimationClip clip = SpriteBuilder.AddAnimation(anim, collection, spriteIds, animationName, tk2dSpriteAnimationClip.WrapMode.Once, fps);
+      return animationName;
     }
   }
 }

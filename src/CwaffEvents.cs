@@ -24,6 +24,10 @@ namespace CwaffingTheGungy
         public static Action<PlayerController, PlayerController, GameManager.GameMode> OnRunStart;
         // Runs whenever a floor is started and fully loaded
         public static Action OnNewFloorFullyLoaded;
+        // Runs whenever the first floor is started and fully loaded
+        public static Action OnFirstFloorFullyLoaded;
+
+        internal static bool _OnFirstFloor = false;
 
         public static void Init()
         {
@@ -46,7 +50,8 @@ namespace CwaffingTheGungy
             if (gm == null || !(gsm?.IsInSession ?? false))
                 return;
 
-            if (gsm.GetSessionStatValue(TrackedStats.TIME_PLAYED) < 0.1f && OnRunStart != null)
+            _OnFirstFloor = gsm.GetSessionStatValue(TrackedStats.TIME_PLAYED) < 0.1f;
+            if (_OnFirstFloor && OnRunStart != null)
                 OnRunStart(gm.PrimaryPlayer, gm.SecondaryPlayer, gm.CurrentGameMode);
 
             gm.OnNewLevelFullyLoaded += OnNewFloorFullyLoadedTempHook;
@@ -57,6 +62,8 @@ namespace CwaffingTheGungy
             GameManager.Instance.OnNewLevelFullyLoaded -= OnNewFloorFullyLoadedTempHook;
             if (OnNewFloorFullyLoaded != null)
                 OnNewFloorFullyLoaded();
+            if (_OnFirstFloor && OnFirstFloorFullyLoaded != null)
+                OnFirstFloorFullyLoaded();
         }
     }
 }

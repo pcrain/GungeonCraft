@@ -174,6 +174,7 @@
     <Compile Include="src\Cwaff-Actives\EmergencySiren.cs"/>
     <Compile Include="src\Cwaff-Actives\KalibersJustice.cs"/>
     <Compile Include="src\Cwaff-Actives\GasterBlaster.cs"/>
+    <Compile Include="src\Cwaff-Actives\InsurancePolicy.cs"/>
     <Compile Include="src\Cwaff-Actives\Itemfinder.cs"/>
     <Compile Include="src\SharedEnemyBehaviors.cs"/>
     <Compile Include="src\Cwaff-Guns\VacuumCleaner.cs"/>
@@ -1945,6 +1946,7 @@
     <EmbeddedResource Include="Resources\ItemSprites\bubble_wand_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\note_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\4d_bullets_icon.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\insurance_policy_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\cozy_camper_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\amazon_primer_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\gaster_blaster_icon.png"/>
@@ -2095,6 +2097,20 @@
     <EmbeddedResource Include="Resources\sans\sans_decloak_1.png"/>
     <EmbeddedResource Include="Resources\sans\sans_throw_left_17.png"/>
     <EmbeddedResource Include="Resources\sans\sans_shrug_3.png"/>
+    <EmbeddedResource Include="Resources\ObjectSprites\insurance_chest_appear_004.png"/>
+    <EmbeddedResource Include="Resources\ObjectSprites\insurance_chest_open_005.png"/>
+    <EmbeddedResource Include="Resources\ObjectSprites\insurance_chest_appear_002.png"/>
+    <EmbeddedResource Include="Resources\ObjectSprites\insurance_chest_open_001.png"/>
+    <EmbeddedResource Include="Resources\ObjectSprites\insurance_chest_appear_003.png"/>
+    <EmbeddedResource Include="Resources\ObjectSprites\insurance_chest_appear_006.png"/>
+    <EmbeddedResource Include="Resources\ObjectSprites\insurance_chest_appear_001.png"/>
+    <EmbeddedResource Include="Resources\ObjectSprites\insurance_chest_appear_old.png"/>
+    <EmbeddedResource Include="Resources\ObjectSprites\insurance_chest_idle_001.png"/>
+    <EmbeddedResource Include="Resources\ObjectSprites\insurance_chest_open_004.png"/>
+    <EmbeddedResource Include="Resources\ObjectSprites\insurance_chest_open_003.png"/>
+    <EmbeddedResource Include="Resources\ObjectSprites\insurance_chest_break_001.png"/>
+    <EmbeddedResource Include="Resources\ObjectSprites\insurance_chest_open_002.png"/>
+    <EmbeddedResource Include="Resources\ObjectSprites\insurance_chest_appear_005.png"/>
     <EmbeddedResource Include="Resources\sans_bosscard.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\can_projectile_1.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tennis_ball8.png"/>

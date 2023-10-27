@@ -17,6 +17,7 @@ using MonoMod.Utils;
 using GungeonAPI;
 using ItemAPI;
 using EnemyAPI;
+using SaveAPI;
 
 namespace CwaffingTheGungy
 {
@@ -63,7 +64,7 @@ namespace CwaffingTheGungy
                 CustomAmmoDisplay.Init(); // Also need to load early
 
                 ItemBuilder.Init();
-                // SaveAPIManager.Setup("cg");
+                SaveAPIManager.Setup("cg");
                 AudioResourceLoader.InitAudio();
                 ETGModMainBehaviour.Instance.gameObject.AddComponent<AudioSource>();
 
@@ -92,6 +93,7 @@ namespace CwaffingTheGungy
                     KalibersJustice.Init();
                     GasterBlaster.Init();
                     StackOfTorches.Init();
+                    InsurancePolicy.Init();
                 #endregion
 
                 #region Passives

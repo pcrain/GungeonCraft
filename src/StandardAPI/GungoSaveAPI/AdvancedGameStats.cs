@@ -52,7 +52,10 @@ namespace SaveAPI
         {
             if (this.stats.ContainsKey(stat))
             {
+                ETGModConsole.Log($"  stat was {this.stats[stat]}");
+                ETGModConsole.Log($"setting stat to {val}");
                 this.stats[stat] = val;
+                ETGModConsole.Log($"  stat is now {this.stats[stat]}");
             }
             else
             {

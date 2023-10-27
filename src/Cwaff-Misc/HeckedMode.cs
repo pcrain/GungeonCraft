@@ -282,8 +282,8 @@ namespace CwaffingTheGungy
             }
         }
 
-        // If an enemy has already been initialized, replacing their guns gets a lot more complicated
-        // All of this code is basically the inverse of AIShooter.Initialize() in reverse order
+        // If an enemy has already run their Awake() method, replacing their guns gets a lot more complicated
+        // All of this code is basically undoing AIShooter.Initialize() in reverse order
         public static void ReplaceGun(this AIActor enemy, Items replacementGunId)
         {
             if (enemy.aiShooter is not AIShooter shooter)
@@ -336,8 +336,6 @@ namespace CwaffingTheGungy
                 pewpew.WeaponType         = WeaponType.AIShooterProjectile;
                 pewpew.OverrideBulletName = null;
             }
-
-            // enemy.HeckedShootGunBehavior(ItemHelper.Get(replacementGunId) as Gun);
 
             shooter.Initialize();
             // ETGModConsole.Log($"after init: ");

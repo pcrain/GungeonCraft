@@ -336,17 +336,20 @@ namespace SaveAPI
             if (this.m_numCharacters <= 0)
             {
                 this.m_numCharacters = Enum.GetValues(typeof(PlayableCharacters)).Length;
+                ETGModConsole.Log($"  there are {this.m_numCharacters} characters");
             }
             float num = 0f;
             if (this.m_sessionStats != null)
             {
                 num += this.m_sessionStats.GetStatValue(stat);
+                ETGModConsole.Log($"  session value is {num}");
             }
             for (int i = 0; i < this.m_numCharacters; i++)
             {
                 AdvancedGameStats gameStats;
                 if (this.m_characterStats.TryGetValue((PlayableCharacters)i, out gameStats))
                 {
+                    ETGModConsole.Log($"    value for character {i} is {gameStats.GetStatValue(stat)}");
                     num += gameStats.GetStatValue(stat);
                 }
             }
