@@ -47,6 +47,9 @@ namespace CwaffingTheGungy
         internal static GameObject _InsuranceVFXMarine;
         internal static GameObject _InsuranceVFXBullet;
 
+        internal static GameObject _InsuranceParticleVFX;
+        internal static int _InsurancePickupId;
+
         private static List<int> _InsuredItems = new();
         private static string _InsuranceFile;
 
@@ -89,6 +92,10 @@ namespace CwaffingTheGungy
                 _InsuranceChestPrefab.GetComponent<MajorBreakable>().HitPoints = float.MaxValue; // insurance chest should be unbreakable
 
             _InsuranceFile     = Path.Combine(SaveManager.SavePath,"insurance.csv");
+            _InsurancePickupId = item.PickupObjectId;
+
+            _InsuranceParticleVFX = VFX.RegisterVFXObject("InsuranceParticle", ResMap.Get("midas_sparkle"),
+                fps: 8, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 5);
 
             CwaffEvents.OnFirstFloorFullyLoaded += InsuranceCheck;
         }
@@ -164,8 +171,10 @@ namespace CwaffingTheGungy
                     continue;
                 if (debris.GetComponentInChildren<PickupObject>() is not PickupObject pickup)
                     continue;
-                if (pickup.GetComponent<Insured>())
-                    continue;
+                if (pickup.GetComponent<Insured>() || _InsuredItems.Contains(pickup.PickupObjectId))
+                    continue;  // 2nd check needed to prevent duplicate insured items
+                if (pickup.PickupObjectId == _InsurancePickupId)
+                    continue;  // can't insure insurance!!! (leads to weird graphical glitches)
 
                 float pickupDist = (debris.sprite.WorldCenter - user.sprite.WorldCenter).magnitude;
                 if (pickupDist >= nearestDist)
@@ -177,13 +186,14 @@ namespace CwaffingTheGungy
             if (!nearestPickup)
                 return;
 
-            nearestPickup.gameObject.AddComponent<Insured>();
-            Lazy.CustomNotification(nearestPickup.DisplayName,"Item Insured", nearestPickup.sprite,
-                color: UINotificationController.NotificationColor.PURPLE);
-            AkSoundEngine.PostEvent("the_sound_of_buying_insurance", base.gameObject);
-            user.RemoveItemFromInventory(this);
+            nearestPickup.gameObject.AddComponent<Insured>().DoSparkles();
             _InsuredItems.Add(nearestPickup.PickupObjectId);
             SaveInsuredItems();
+
+            // Lazy.CustomNotification(nearestPickup.DisplayName,"Item Insured", nearestPickup.sprite,
+            //     color: UINotificationController.NotificationColor.PURPLE);
+            AkSoundEngine.PostEvent("the_sound_of_buying_insurance", base.gameObject);
+            user.RemoveItemFromInventory(this);
         }
 
         internal static void SaveInsuredItems()
@@ -227,6 +237,7 @@ namespace CwaffingTheGungy
     {
         private PickupObject _pickup;
         private int _pickupId;
+        private bool _doSparkles = false;
 
         // these need to be public because Guns create copies of themselves when picked up
         // since private fields don't serialize, they get reset, and the Start() method gets repeatedly called
@@ -239,6 +250,8 @@ namespace CwaffingTheGungy
             this._pickupId = this._pickup.PickupObjectId;
             this.dropped = true;
             OnDrop();
+            if (this._doSparkles)
+                this._pickup.StartCoroutine(DoSparkles_CR());
         }
 
         private void LateUpdate()
@@ -271,7 +284,26 @@ namespace CwaffingTheGungy
                 UnityEngine.Object.Destroy(this.vfx);
             this.vfx = SpawnManager.SpawnVFX(InsurancePolicy.GetVFXForCharacter(), this._pickup.sprite.WorldTopCenter + new Vector2(0f, 0.5f), Quaternion.identity);
             this.vfx.transform.parent = this._pickup.gameObject.transform;
-            this.vfx.SetAlphaImmediate(0.5f);
+            this._pickup.StartCoroutine(SpinIntoExistence(this.vfx));
+        }
+
+        const float SPIN_TIME    = 3f;
+        const float SPIN_AMOUNT  = 4.25f; // since we're using Sin, we need the extra 1/4 rotation to have a scale of 1.0f
+        const float SPIN_RADIANS = 2f * Mathf.PI * SPIN_AMOUNT;
+        public static IEnumerator SpinIntoExistence(GameObject vfx)
+        {
+            vfx.SetAlphaImmediate(0.5f);
+            vfx.transform.localScale = vfx.transform.localScale.WithX(0f);
+            for (float elapsed = 0f; elapsed < SPIN_TIME; elapsed += BraveTime.DeltaTime)
+            {
+                if (!vfx)
+                    yield break;
+                float percentLeft = (1.0f - elapsed / SPIN_TIME);
+                float easeAmount = (1.0f - percentLeft * percentLeft * percentLeft);
+                vfx.transform.localScale = vfx.transform.localScale.WithX(Mathf.Sin(easeAmount * SPIN_RADIANS));
+                yield return null;
+            }
+            yield break;
         }
 
         private void OnPickup()
@@ -281,6 +313,24 @@ namespace CwaffingTheGungy
 
             UnityEngine.Object.Destroy(this.vfx);
             this.vfx = null;
+        }
+
+        public void DoSparkles()
+        {
+            this._doSparkles = true;
+        }
+
+        public IEnumerator DoSparkles_CR()
+        {
+            const int NUM_SPARKLES = 20;
+            Vector3 basePos = this._pickup.sprite.WorldCenter.ToVector3ZisY(-10f);
+            for (int i = 0; i < NUM_SPARKLES; ++i)
+            {
+                SpawnManager.SpawnVFX(
+                    InsurancePolicy._InsuranceParticleVFX, basePos + Lazy.RandomVector(0.5f).ToVector3ZUp(0), Quaternion.identity);
+                yield return null;
+            }
+            yield break;
         }
     }
 }
