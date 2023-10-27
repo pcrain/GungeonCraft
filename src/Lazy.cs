@@ -212,7 +212,7 @@ namespace CwaffingTheGungy
         /// <summary>
         /// Post a custom item pickup notification to the bottom of the screen
         /// </summary>
-        public static void CustomNotification(string header, string text, tk2dBaseSprite sprite = null)
+        public static void CustomNotification(string header, string text, tk2dBaseSprite sprite = null, UINotificationController.NotificationColor? color = null)
         {
             sprite ??= GameUIRoot.Instance.notificationController.notificationObjectSprite;
             GameUIRoot.Instance.notificationController.DoCustomNotification(
@@ -220,7 +220,7 @@ namespace CwaffingTheGungy
                 text,
                 sprite.Collection,
                 sprite.spriteId,
-                UINotificationController.NotificationColor.PURPLE,
+                color ?? UINotificationController.NotificationColor.PURPLE,
                 false,
                 false);
         }

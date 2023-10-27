@@ -20,7 +20,7 @@ namespace CwaffingTheGungy
     class InsurancePolicy : PlayerItem
     {
         public static string ItemName         = "Insurance Policy";
-        public static string SpritePath       = "insurance_policy_icon";
+        public static string SpritePath       = "insurance_policy_robot_icon";
         public static string ShortDescription = "TBD";
         public static string LongDescription  = "TBD";
 
@@ -29,7 +29,24 @@ namespace CwaffingTheGungy
         internal static Chest _InsuranceChestPrefab = null;
         internal static GameObject _InsuranceSparklePrefab = null;
 
-        private static int _InsurancePolicyId;
+        internal static int _InsuranceSpriteRobot;
+        internal static int _InsuranceSpriteConvict;
+        internal static int _InsuranceSpritePilot;
+        internal static int _InsuranceSpriteParadox;
+        internal static int _InsuranceSpriteGunslinger;
+        internal static int _InsuranceSpriteHunter;
+        internal static int _InsuranceSpriteMarine;
+        internal static int _InsuranceSpriteBullet;
+
+        internal static GameObject _InsuranceVFXRobot;
+        internal static GameObject _InsuranceVFXConvict;
+        internal static GameObject _InsuranceVFXPilot;
+        internal static GameObject _InsuranceVFXParadox;
+        internal static GameObject _InsuranceVFXGunslinger;
+        internal static GameObject _InsuranceVFXHunter;
+        internal static GameObject _InsuranceVFXMarine;
+        internal static GameObject _InsuranceVFXBullet;
+
         private static List<int> _InsuredItems = new();
         private static string _InsuranceFile;
 
@@ -39,7 +56,25 @@ namespace CwaffingTheGungy
             item.quality      = PickupObject.ItemQuality.A;
             item.consumable   = false;
             item.CanBeDropped = true;
-            item.SetCooldownType(ItemBuilder.CooldownType.Timed, 2f);
+            item.SetCooldownType(ItemBuilder.CooldownType.Timed, 0.5f);
+
+            _InsuranceSpriteRobot      = SpriteBuilder.AddSpriteToCollection(ResMap.Get("insurance_policy_robot_icon")[0],      item.sprite.Collection);
+            _InsuranceSpriteConvict    = SpriteBuilder.AddSpriteToCollection(ResMap.Get("insurance_policy_convict_icon")[0],    item.sprite.Collection);
+            _InsuranceSpritePilot      = SpriteBuilder.AddSpriteToCollection(ResMap.Get("insurance_policy_pilot_icon")[0],      item.sprite.Collection);
+            _InsuranceSpriteParadox    = SpriteBuilder.AddSpriteToCollection(ResMap.Get("insurance_policy_paradox_icon")[0],    item.sprite.Collection);
+            _InsuranceSpriteGunslinger = SpriteBuilder.AddSpriteToCollection(ResMap.Get("insurance_policy_gunslinger_icon")[0], item.sprite.Collection);
+            _InsuranceSpriteHunter     = SpriteBuilder.AddSpriteToCollection(ResMap.Get("insurance_policy_hunter_icon")[0],     item.sprite.Collection);
+            _InsuranceSpriteMarine     = SpriteBuilder.AddSpriteToCollection(ResMap.Get("insurance_policy_marine_icon")[0],     item.sprite.Collection);
+            _InsuranceSpriteBullet     = SpriteBuilder.AddSpriteToCollection(ResMap.Get("insurance_policy_bullet_icon")[0],     item.sprite.Collection);
+
+            _InsuranceVFXRobot      = VFX.RegisterVFXObject("InsuranceVFXRobot",      ResMap.Get("insurance_policy_robot_icon"),      fps: 1, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+            _InsuranceVFXConvict    = VFX.RegisterVFXObject("InsuranceVFXConvict",    ResMap.Get("insurance_policy_convict_icon"),    fps: 1, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+            _InsuranceVFXPilot      = VFX.RegisterVFXObject("InsuranceVFXPilot",      ResMap.Get("insurance_policy_pilot_icon"),      fps: 1, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+            _InsuranceVFXParadox    = VFX.RegisterVFXObject("InsuranceVFXParadox",    ResMap.Get("insurance_policy_paradox_icon"),    fps: 1, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+            _InsuranceVFXGunslinger = VFX.RegisterVFXObject("InsuranceVFXGunslinger", ResMap.Get("insurance_policy_gunslinger_icon"), fps: 1, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+            _InsuranceVFXHunter     = VFX.RegisterVFXObject("InsuranceVFXHunter",     ResMap.Get("insurance_policy_hunter_icon"),     fps: 1, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+            _InsuranceVFXMarine     = VFX.RegisterVFXObject("InsuranceVFXMarine",     ResMap.Get("insurance_policy_marine_icon"),     fps: 1, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+            _InsuranceVFXBullet     = VFX.RegisterVFXObject("InsuranceVFXBullet",     ResMap.Get("insurance_policy_bullet_icon"),     fps: 1, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
 
             _InsuranceChestPrefab = GameManager.Instance.RewardManager.GetTargetChestPrefab(PickupObject.ItemQuality.B).gameObject.ClonePrefab().GetComponent<Chest>();
                 _InsuranceChestPrefab.groundHitDelay = 0.10f;
@@ -53,13 +88,47 @@ namespace CwaffingTheGungy
                 _InsuranceChestPrefab.IsLocked = false; // can't get lock renderer to attach properly after adjusting appearance animation
                 _InsuranceChestPrefab.GetComponent<MajorBreakable>().HitPoints = float.MaxValue; // insurance chest should be unbreakable
 
-            _InsuranceSparklePrefab = VFX.RegisterVFXObject("InsuranceSparkle", ResMap.Get("insurance_policy_icon"),
-                fps: 1, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 1f);
-
-            _InsurancePolicyId = item.PickupObjectId;
             _InsuranceFile     = Path.Combine(SaveManager.SavePath,"insurance.csv");
 
             CwaffEvents.OnFirstFloorFullyLoaded += InsuranceCheck;
+        }
+
+        internal static int GetSpriteIdForCharacter()
+        {
+            switch(GameManager.Instance.PrimaryPlayer.characterIdentity)
+            {
+                case PlayableCharacters.Robot:      return _InsuranceSpriteRobot;
+                case PlayableCharacters.Convict:    return _InsuranceSpriteConvict;
+                case PlayableCharacters.Pilot:      return _InsuranceSpritePilot;
+                case PlayableCharacters.Eevee:      return _InsuranceSpriteParadox;
+                case PlayableCharacters.Gunslinger: return _InsuranceSpriteGunslinger;
+                case PlayableCharacters.Guide:      return _InsuranceSpriteHunter;
+                case PlayableCharacters.Soldier:    return _InsuranceSpriteMarine;
+                case PlayableCharacters.Bullet:     return _InsuranceSpriteBullet;
+            }
+            return _InsuranceSpritePilot;
+        }
+
+        internal static GameObject GetVFXForCharacter()
+        {
+            switch(GameManager.Instance.PrimaryPlayer.characterIdentity)
+            {
+                case PlayableCharacters.Robot:      return _InsuranceVFXRobot;
+                case PlayableCharacters.Convict:    return _InsuranceVFXConvict;
+                case PlayableCharacters.Pilot:      return _InsuranceVFXPilot;
+                case PlayableCharacters.Eevee:      return _InsuranceVFXParadox;
+                case PlayableCharacters.Gunslinger: return _InsuranceVFXGunslinger;
+                case PlayableCharacters.Guide:      return _InsuranceVFXHunter;
+                case PlayableCharacters.Soldier:    return _InsuranceVFXMarine;
+                case PlayableCharacters.Bullet:     return _InsuranceVFXBullet;
+            }
+            return _InsuranceVFXPilot;
+        }
+
+        public override void Start()
+        {
+            base.Start();
+            base.sprite.SetSprite(GetSpriteIdForCharacter());
         }
 
         public static void InsuranceCheck()
@@ -71,7 +140,7 @@ namespace CwaffingTheGungy
         {
             PlayerController p1 = GameManager.Instance.PrimaryPlayer;
             while (!p1.AcceptingAnyInput)
-                yield return null;
+                yield return null; // wait for player to finish falling to the ground
 
             LoadInsuredItems();
             ClearInsuredItemsFile();
@@ -85,7 +154,7 @@ namespace CwaffingTheGungy
             _InsuredItems.Clear();
         }
 
-        public override void DoEffect(PlayerController user) ///
+        public override void DoEffect(PlayerController user)
         {
             PickupObject nearestPickup = null;
             float nearestDist = _MAX_DIST;
@@ -108,15 +177,18 @@ namespace CwaffingTheGungy
             if (!nearestPickup)
                 return;
 
-            nearestPickup.gameObject.GetOrAddComponent<Insured>();
-            ETGModConsole.Log($"insuring {nearestPickup.DisplayName}");
+            nearestPickup.gameObject.AddComponent<Insured>();
+            Lazy.CustomNotification(nearestPickup.DisplayName,"Item Insured", nearestPickup.sprite,
+                color: UINotificationController.NotificationColor.PURPLE);
+            AkSoundEngine.PostEvent("the_sound_of_buying_insurance", base.gameObject);
+            user.RemoveItemFromInventory(this);
             _InsuredItems.Add(nearestPickup.PickupObjectId);
             SaveInsuredItems();
         }
 
         internal static void SaveInsuredItems()
         {
-            using (var file = File.CreateText(_InsuranceFile))
+            using (StreamWriter file = File.CreateText(_InsuranceFile))
             {
                 bool first = true;
                 foreach(int itemId in _InsuredItems)
@@ -151,14 +223,13 @@ namespace CwaffingTheGungy
         }
     }
 
-    // NOTE: this is apparently recreated every time the item is picked up...why?
     public class Insured : MonoBehaviour
     {
         private PickupObject _pickup;
         private int _pickupId;
 
-        // these need to be public because Guns create copies of themselves when picked up, and
-        //   private fields don't serialize and get reset
+        // these need to be public because Guns create copies of themselves when picked up
+        // since private fields don't serialize, they get reset, and the Start() method gets repeatedly called
         public bool dropped = false;
         public GameObject vfx = null;
 
@@ -172,8 +243,8 @@ namespace CwaffingTheGungy
 
         private void LateUpdate()
         {
-            // if (this._dropped)
-            //     DoInsuranceParticles();
+            if (this.dropped)
+                UpdateVFX();
 
             bool dropped = !GameManager.Instance.AnyPlayerHasPickupID(this._pickupId);
             if (this.dropped == dropped)
@@ -186,32 +257,30 @@ namespace CwaffingTheGungy
             this.dropped = dropped;
         }
 
-        private void DoInsuranceParticles()
+        private void UpdateVFX()
         {
-            if (UnityEngine.Random.value > 0.1f)
+            if (this.vfx == null)
                 return;
-            SpawnManager.SpawnVFX(InsurancePolicy._InsuranceSparklePrefab,
-                this._pickup.sprite.WorldCenter + Lazy.RandomVector(0.5f), Lazy.RandomEulerZ());
+
+            this.vfx.transform.position = this._pickup.sprite.WorldTopCenter + new Vector2(0f, 0.75f + 0.25f * Mathf.Sin(4f * BraveTime.ScaledTimeSinceStartup));
         }
 
         private void OnDrop()
         {
             if (this.vfx != null)
                 UnityEngine.Object.Destroy(this.vfx);
-            ETGModConsole.Log($"spawning vfx");
-            this.vfx = SpawnManager.SpawnVFX(InsurancePolicy._InsuranceSparklePrefab, this._pickup.sprite.WorldTopCenter + new Vector2(0f, 0.5f), Quaternion.identity);
+            this.vfx = SpawnManager.SpawnVFX(InsurancePolicy.GetVFXForCharacter(), this._pickup.sprite.WorldTopCenter + new Vector2(0f, 0.5f), Quaternion.identity);
             this.vfx.transform.parent = this._pickup.gameObject.transform;
             this.vfx.SetAlphaImmediate(0.5f);
-            // AkSoundEngine.PostEvent("zenkai_aura_sound", this._pickup.gameObject);
         }
 
         private void OnPickup()
         {
-            if (this.vfx != null)
-            {
-                UnityEngine.Object.Destroy(this.vfx);
-                this.vfx = null;
-            }
+            if (this.vfx == null)
+                return;
+
+            UnityEngine.Object.Destroy(this.vfx);
+            this.vfx = null;
         }
     }
 }
