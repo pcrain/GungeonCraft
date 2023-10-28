@@ -23,18 +23,35 @@ namespace CwaffingTheGungy
         public static string ShortDescription = "TBD";
         public static string LongDescription  = "TBD";
 
-        internal static tk2dSpriteAnimationClip _BulletSprite;
-        internal static GameObject _WrapVFX;
-        internal static GameObject _UnwrapVFX;
+        internal static GameObject _WrapVFXS;
+        internal static GameObject _WrapVFXA;
+        internal static GameObject _WrapVFXB;
+        internal static GameObject _WrapVFXC;
+        internal static GameObject _WrapVFXD;
+
+        internal static GameObject _UnwrapVFXS;
+        internal static GameObject _UnwrapVFXA;
+        internal static GameObject _UnwrapVFXB;
+        internal static GameObject _UnwrapVFXC;
+        internal static GameObject _UnwrapVFXD;
+
         internal static List<PickupObject> _WrappedGifts = new();
+        internal static List<PickupObject.ItemQuality> _WrappedQualities = new();
+        internal static List<PickupObject.ItemQuality> _ShuffledQualities = new();
         internal static float _WrapAnimLength;
 
-        private const int _WRAP_FPS = 10;
+        internal static Projectile _GiftProjectileS;
+        internal static Projectile _GiftProjectileA;
+        internal static Projectile _GiftProjectileB;
+        internal static Projectile _GiftProjectileC;
+        internal static Projectile _GiftProjectileD;
+
+        private const int _WRAP_FPS = 16;
 
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<Missiletoe>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.CHARM, reloadTime: 1.2f, ammo: 80, canReloadNoMatterAmmo: true);
+                gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.CHARM, reloadTime: 1f, ammo: 80, canReloadNoMatterAmmo: true);
                 gun.SetAnimationFPS(gun.shootAnimation, 30);
                 gun.SetAnimationFPS(gun.reloadAnimation, 40);
                 gun.SetFireAudio("blowgun_fire_sound");
@@ -44,33 +61,95 @@ namespace CwaffingTheGungy
                 mod.ammoCost            = 1;
                 mod.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
                 mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
-                mod.cooldownTime        = 0.1f;
-                mod.numberOfShotsInClip = 10;
+                mod.cooldownTime        = 0.33f;
+                mod.numberOfShotsInClip = 1;
 
-            _WrapVFX = VFX.RegisterVFXObject("Wrap", ResMap.Get("blue_gift_wrap"), _WRAP_FPS,
+            _WrapVFXS   = SetupVFX("black_gift_wrap");
+            _WrapVFXA   = SetupVFX("red_gift_wrap");
+            _WrapVFXB   = SetupVFX("green_gift_wrap");
+            _WrapVFXC   = SetupVFX("blue_gift_wrap");
+            _WrapVFXD   = SetupVFX("brown_gift_wrap");
+
+            _UnwrapVFXS = SetupVFX("black_gift_unwrap");
+            _UnwrapVFXA = SetupVFX("red_gift_unwrap");
+            _UnwrapVFXB = SetupVFX("green_gift_unwrap");
+            _UnwrapVFXC = SetupVFX("blue_gift_unwrap");
+            _UnwrapVFXD = SetupVFX("brown_gift_unwrap");
+
+            _WrapAnimLength = _WrapVFXB.GetComponent<tk2dSpriteAnimator>().DefaultClip.BaseClipLength;
+
+            _GiftProjectileS = SetupProjectile(gun: gun, name: "gift_projectile_black");
+            _GiftProjectileA = SetupProjectile(gun: gun, name: "gift_projectile_red");
+            _GiftProjectileB = SetupProjectile(gun: gun, name: "gift_projectile_green");
+            _GiftProjectileC = SetupProjectile(gun: gun, name: "gift_projectile_blue");
+            _GiftProjectileD = SetupProjectile(gun: gun, name: "gift_projectile_brown");
+        }
+
+        private static GameObject SetupVFX(string name)
+        {
+            return VFX.RegisterVFXObject($"VFX_{name}", ResMap.Get(name), _WRAP_FPS,
                 loops: false, anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.75f, persist: true);
+        }
 
-            _UnwrapVFX = VFX.RegisterVFXObject("Unwrap", ResMap.Get("blue_gift_unwrap"), _WRAP_FPS,
-                loops: false, anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.75f, persist: true);
-
-            _WrapAnimLength = _WrapVFX.GetComponent<tk2dSpriteAnimator>().DefaultClip.BaseClipLength;
-
-            _BulletSprite = AnimateBullet.CreateProjectileAnimation(
-                ResMap.Get("blue_gift_projectile").Base(),
+        private static Projectile SetupProjectile(Gun gun, string name)
+        {
+            tk2dSpriteAnimationClip clip = AnimateBullet.CreateProjectileAnimation(
+                ResMap.Get(name).Base(),
                 1, true, new IntVector2(14, 12),
                 false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
 
-            Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
-                projectile.AddDefaultAnimation(_BulletSprite);
+            Projectile projectile = Lazy.PrefabProjectileFromGun(gun, setGunDefaultProjectile: false);
+                projectile.AddDefaultAnimation(clip);
                 projectile.transform.parent = gun.barrelOffset;
-                projectile.gameObject.AddComponent<TranquilizerBehavior>();
+
+            return projectile;
+        }
+
+        public override Projectile OnPreFireProjectileModifier(Gun gun, Projectile projectile, ProjectileModule mod)
+        {
+            switch (_ShuffledQualities[mod.numberOfShotsInClip - gun.ClipShotsRemaining])
+            {
+                case PickupObject.ItemQuality.S: return _GiftProjectileS;
+                case PickupObject.ItemQuality.A: return _GiftProjectileA;
+                case PickupObject.ItemQuality.B: return _GiftProjectileB;
+                case PickupObject.ItemQuality.C: return _GiftProjectileC;
+                case PickupObject.ItemQuality.D: return _GiftProjectileD;
+                default                        : return _GiftProjectileD;
+            }
+        }
+
+        public static GameObject GetGiftVFX(PickupObject.ItemQuality quality, bool wrap)
+        {
+            switch (quality)
+            {
+                case PickupObject.ItemQuality.S: return wrap ? _WrapVFXS : _UnwrapVFXS;
+                case PickupObject.ItemQuality.A: return wrap ? _WrapVFXA : _UnwrapVFXA;
+                case PickupObject.ItemQuality.B: return wrap ? _WrapVFXB : _UnwrapVFXB;
+                case PickupObject.ItemQuality.C: return wrap ? _WrapVFXC : _UnwrapVFXC;
+                case PickupObject.ItemQuality.D: return wrap ? _WrapVFXD : _UnwrapVFXD;
+                default                        : return wrap ? _WrapVFXD : _UnwrapVFXD;
+            }
+        }
+
+        protected override void OnPickup(GameActor owner)
+        {
+            if (!this.everPickedUpByPlayer)
+            {
+                _WrappedGifts.Clear();
+                _WrappedQualities.Clear();
+                _ShuffledQualities.Clear();
+            }
+            RecalculateClip();
+            base.OnPickup(owner);
         }
 
         public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
         {
-            base.OnReloadPressed(player, gun, manualReload);
             if (manualReload && gun.DefaultModule.numberOfShotsInClip == gun.ClipShotsRemaining)
                 WrapPresent();
+            else
+                RecalculateClip();
+            base.OnReloadPressed(player, gun, manualReload);
         }
 
         private const float _MAX_DIST = 5f;
@@ -100,7 +179,15 @@ namespace CwaffingTheGungy
                 return;
             }
 
-            WrappableGift.Spawn(this.gun.barrelOffset.position, nearestPickup, unwrapping: false);
+            WrappableGift.Spawn(this, this.gun.barrelOffset.position, nearestPickup, unwrapping: false);
+        }
+
+        internal void RecalculateClip()
+        {
+            _WrappedQualities.Add(PickupObject.ItemQuality.D);  // make sure our list has at least one item
+            _ShuffledQualities = _WrappedQualities.CopyAndShuffle();
+            _WrappedQualities.Pop();
+            this.gun.DefaultModule.numberOfShotsInClip = _ShuffledQualities.Count();
         }
 
         private void UnwrapPresent()
@@ -108,7 +195,9 @@ namespace CwaffingTheGungy
             if (_WrappedGifts.Count() == 0)
                 return;
             PickupObject gift = _WrappedGifts.Pop();
-            WrappableGift.Spawn(this.gun.barrelOffset.position, gift, unwrapping: true);
+            _WrappedQualities.Pop();
+            RecalculateClip();
+            WrappableGift.Spawn(this, this.gun.barrelOffset.position, gift, unwrapping: true);
         }
     }
 
@@ -125,29 +214,29 @@ namespace CwaffingTheGungy
         private tk2dSpriteAnimator _animator;
         private Vector3 _position;
         private PickupObject _pickup;
+        private Missiletoe _gun;
 
-        public static WrappableGift Spawn(Vector3 position, PickupObject pickup, bool unwrapping)
+        public static WrappableGift Spawn(Missiletoe gun, Vector3 position, PickupObject pickup, bool unwrapping)
         {
             GameObject go = UnityEngine.Object.Instantiate(new GameObject(), position, Quaternion.identity);
             WrappableGift gift = go.AddComponent<WrappableGift>();
-            gift.Setup(position, pickup, unwrapping);
+            gift.Setup(gun, position, pickup, unwrapping);
             return gift;
         }
 
-        public void Setup(Vector3 position, PickupObject pickup, bool unwrapping)
+        public void Setup(Missiletoe gun, Vector3 position, PickupObject pickup, bool unwrapping)
         {
+            this._gun      = gun;
             this._position = position;
-            this._pickup = pickup;
-            this._vfx = FancyVFX.Spawn(unwrapping ? Missiletoe._UnwrapVFX : Missiletoe._WrapVFX, this._position, Quaternion.identity,
-                velocity: Vector2.zero, lifetime: Missiletoe._WrapAnimLength + 0.25f, fadeOutTime: 0.25f);
-            this._sprite = this._vfx.sprite;
+            this._pickup   = pickup;
+            this._vfx      = FancyVFX.Spawn(Missiletoe.GetGiftVFX(pickup.quality, !unwrapping), this._position, Quaternion.identity,
+                velocity: Vector2.zero, lifetime: Missiletoe._WrapAnimLength + 0.5f, fadeOutTime: 0.25f);
+            this._sprite   = this._vfx.sprite;
             this._animator = this._sprite.spriteAnimator;
-            // this._sprite.transform.position = this._sprite.transform.position.WithZ(this._sprite.transform.position.y + 1f);
-
-            // ETGModConsole.Log($"{(unwrapping ? "unwrapping" : "wrapping")} {pickup.itemName}");
 
             StartCoroutine(WrapItUp(unwrapping));
         }
+
         private IEnumerator WrapItUp(bool unwrapping)
         {
             // Set up some useful variables
@@ -164,11 +253,12 @@ namespace CwaffingTheGungy
             // Clone and destroy the pickup itself
             if (wrapping)
             {
+                Missiletoe._WrappedQualities.Add(this._pickup.quality);
                 if (isGun)
                 {
                     Missiletoe._WrappedGifts.Add(UnityEngine.Object.Instantiate(this._pickup));
                     if (this._pickup.transform.parent != null)
-                        UnityEngine.Object.Destroy(this._pickup.transform.parent.gameObject);
+                        UnityEngine.Object.Destroy(this._pickup.transform.parent?.gameObject);
                     else
                         UnityEngine.Object.Destroy(this._pickup);
                 }
@@ -186,6 +276,7 @@ namespace CwaffingTheGungy
                     this._pickup.renderer.enabled = false;
                     UnityEngine.Object.Destroy(this._pickup.gameObject.GetComponent<DebrisObject>());
                 }
+                this._gun.RecalculateClip();
             }
 
             // Pause the gift's default animation and let it grow into existence first
@@ -199,7 +290,6 @@ namespace CwaffingTheGungy
                 this._sprite.transform.localScale = new Vector3(percentDone, percentDone, 1.0f);
                 yield return null;
             }
-            this._animator.StopAndResetFrame();
             this._animator.Play();
 
             // Make it magically hover over to the present
@@ -223,9 +313,9 @@ namespace CwaffingTheGungy
             {
                 if (!pickupvfx)
                     break;
+
                 float percentDone = Mathf.Clamp01(elapsed / loopLength);
                 float cubicLerp = Ease.OutCubic(percentDone);
-
                 Vector2 extraOffset = new Vector2(0f, 2f * Mathf.Sin(Mathf.PI * cubicLerp));
                 Vector2 curPosition = extraOffset + Vector2.Lerp(startPosition, targetPosition, cubicLerp);
                 float scale = ((1f - _MIN_SCALE) * cubicLerp);
@@ -233,7 +323,6 @@ namespace CwaffingTheGungy
                     scale = 1f - scale;
                 pickupvfx.sprite.transform.localScale = new Vector3(scale, scale, 1f);
                 pickupvfx.sprite.PlaceAtScaledPositionByAnchor(curPosition, tk2dBaseSprite.Anchor.MiddleCenter);
-                // pickupvfx.sprite.UpdateZDepth();
                 yield return null;
             }
         }

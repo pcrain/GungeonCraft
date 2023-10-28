@@ -2320,6 +2320,8 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\chess_pawn.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball006.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\slappp10.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\gift_projectile_red.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\gift_projectile_green.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball020.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile2.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\coin_gun_projectile2.png"/>
@@ -2361,7 +2363,9 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\soap_bubble_projectile_004.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball003.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball_old_1.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\gift_projectile_blue.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball_old_4.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\gift_projectile_black.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tennis_ball5.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\train_projectile_001.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\slappp13.png"/>
@@ -2374,6 +2378,7 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\slappp15.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\slappp14.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\gaster_blaster.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\gift_projectile_brown.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball_old_7.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball005.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\slappp6.png"/>
@@ -2391,7 +2396,6 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\bball004.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\coin_gun_projectile3.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\ki_blast_003.png"/>
-    <EmbeddedResource Include="Resources\ProjectileCollection\blue_gift_projectile.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\energy_bounce3.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\playing_card.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\slappp1.png"/>

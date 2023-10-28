@@ -418,16 +418,15 @@ namespace CwaffingTheGungy
         return player.GetAbsoluteParentRoom().area.PrototypeRoomCategory == PrototypeDungeonRoom.RoomCategory.BOSS;
     }
 
-    // Shuffle the elements in a list (or any other enumerable)
-    public static void Shuffle<T>(this IList<T> list)
-    {
-        int n = list.Count;
-        while (n > 1) {
-            n--;
-            int k = UnityEngine.Random.Range(0, n);
-            T value = list[k];
-            list[k] = list[n];
-            list[n] = value;
+    // https://forum.unity.com/threads/clever-way-to-shuffle-a-list-t-in-one-line-of-c-code.241052/
+    public static void Shuffle<T>(this IList<T> ts) {
+        var count = ts.Count;
+        var last = count - 1;
+        for (var i = 0; i < last; ++i) {
+            var r = UnityEngine.Random.Range(i, count);
+            var tmp = ts[i];
+            ts[i] = ts[r];
+            ts[r] = tmp;
         }
     }
 
