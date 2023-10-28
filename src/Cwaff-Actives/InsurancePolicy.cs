@@ -171,6 +171,8 @@ namespace CwaffingTheGungy
                     continue;
                 if (debris.GetComponentInChildren<PickupObject>() is not PickupObject pickup)
                     continue;
+                if (pickup.IsBeingSold)
+                    continue;  // no stealing ):<
                 if (pickup.GetComponent<Insured>() || _InsuredItems.Contains(pickup.PickupObjectId))
                     continue;  // 2nd check needed to prevent duplicate insured items
                 if (pickup.PickupObjectId == _InsurancePickupId)

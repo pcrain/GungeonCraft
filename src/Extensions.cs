@@ -773,5 +773,15 @@ namespace CwaffingTheGungy
       tk2dSpriteAnimationClip clip = SpriteBuilder.AddAnimation(anim, collection, spriteIds, animationName, tk2dSpriteAnimationClip.WrapMode.Once, fps);
       return animationName;
     }
+
+    // Same as PlaceAtPositionByAnchor(), but adjusted for sprite's current scale
+    public static void PlaceAtScaledPositionByAnchor(this tk2dBaseSprite sprite, Vector3 position, tk2dBaseSprite.Anchor anchor)
+    {
+        Vector2 scale = sprite.transform.localScale.XY();
+        Vector2 anchorPos = sprite.GetRelativePositionFromAnchor(anchor);
+        Vector2 relativePositionFromAnchor = new Vector2(scale.x * anchorPos.x, scale.y * anchorPos.y);
+        // Vector2 relativePositionFromAnchor = Vector2.Cross(sprite.transform.localScale.XY(), sprite.GetRelativePositionFromAnchor(anchor));
+        sprite.transform.position = position - relativePositionFromAnchor.ToVector3ZUp();
+    }
   }
 }

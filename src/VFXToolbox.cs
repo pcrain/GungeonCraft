@@ -481,7 +481,11 @@ namespace CwaffingTheGungy
             this.sprite.transform.position += this._velocity;
 
             if (this._curLifeTime > this._fadeStartTime)
-                this.sprite.renderer.SetAlpha(1.0f - (this._curLifeTime - this._fadeStartTime) / this._fadeTotalTime);
+            {
+                float alpha = 1.0f - (this._curLifeTime - this._fadeStartTime) / this._fadeTotalTime;
+                // ETGModConsole.Log($"  setting alpha to {}");
+                this.sprite.renderer.SetAlpha(alpha);
+            }
         }
 
         // todo: fading and emission are not simultaneously compatible
@@ -497,7 +501,7 @@ namespace CwaffingTheGungy
             if (this._fadeOut)
             {
                 this._fadeTotalTime = fadeOutTime.Value;
-                this._fadeStartTime = lifetime - this._fadeTotalTime;
+                this._fadeStartTime = this._maxLifeTime - this._fadeTotalTime;
             }
             this.transform.parent = parent;
 

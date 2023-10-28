@@ -26,20 +26,20 @@ namespace CwaffingTheGungy
     private float _vfxTimer = 0;
     private float _hoverTimer = 0;
 
-    public void Initialize(tk2dBaseSprite i)
+    public void Initialize(tk2dSpriteCollectionData collection, int spriteId)
     {
-      InitializeInternal(i);
+      InitializeInternal(collection, spriteId);
       base.sprite.depthUsesTrimmedBounds = true;
       base.sprite.HeightOffGround = -1.25f;
       base.sprite.UpdateZDepth();
     }
 
-    private void InitializeInternal(tk2dBaseSprite sprite)
+    private void InitializeInternal(tk2dSpriteCollectionData collection, int spriteId)
     {
       this.effect = (ItemHelper.Get(Items.MagicLamp) as Gun).DefaultModule.projectiles[0].hitEffects.tileMapVertical;
 
       base.gameObject.AddComponent<tk2dSprite>();
-      base.sprite.SetSprite(sprite.Collection, sprite.spriteId);
+      base.sprite.SetSprite(collection, spriteId);
       base.sprite.IsPerpendicular = true;
       base.sprite.HeightOffGround = 1f;
       base.sprite.PlaceAtPositionByAnchor(base.transform.parent.position, tk2dBaseSprite.Anchor.MiddleCenter);
@@ -173,6 +173,11 @@ namespace CwaffingTheGungy
 
     public static MiniInteractable CreateInteractableAtPosition(tk2dBaseSprite sprite, Vector2 position, InteractionScript iscript = null)
     {
+      return CreateInteractableAtPosition(sprite.collection, sprite.spriteId, position, iscript);
+    }
+
+    public static MiniInteractable CreateInteractableAtPosition(tk2dSpriteCollectionData collection, int spriteId, Vector2 position, InteractionScript iscript = null)
+    {
         GameObject iPos = new GameObject("Mini interactible position test");
             iPos.transform.position = position.ToVector3ZisY();
         GameObject iMini = new GameObject("Mini interactible test");
@@ -184,7 +189,7 @@ namespace CwaffingTheGungy
             if (!RoomHandler.unassignedInteractableObjects.Contains(mini))
                 RoomHandler.unassignedInteractableObjects.Add(mini);
             mini.interactionScript = iscript ?? DefaultInteractionScript;
-            mini.Initialize(sprite);
+            mini.Initialize(collection, spriteId);
         return mini;
     }
   }

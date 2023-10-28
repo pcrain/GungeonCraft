@@ -64,7 +64,7 @@ namespace CwaffingTheGungy
                 CustomAmmoDisplay.Init(); // Also need to load early
 
                 ItemBuilder.Init();
-                SaveAPIManager.Setup("cg");
+                // SaveAPIManager.Setup("cg");
                 AudioResourceLoader.InitAudio();
                 ETGModMainBehaviour.Instance.gameObject.AddComponent<AudioSource>();
 
@@ -167,6 +167,7 @@ namespace CwaffingTheGungy
                     Ticonderogun.Add();
                     AimuHakurei.Add();
                     SeltzerPelter.Add();
+                    Missiletoe.Add();
                 #endregion
 
                 #region Synergies
