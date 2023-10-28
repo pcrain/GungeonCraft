@@ -48,7 +48,11 @@ namespace CwaffingTheGungy
       tk2dSprite componentInParent = base.transform.parent.gameObject.GetComponentInParent<tk2dSprite>();
       componentInParent?.AttachRenderer(base.sprite);
       // SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black, 0.1f, 0.05f);
-      SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black);
+      base.sprite.ignoresTiltworldDepth = true;
+      // if (scaledOutline)
+      //   SpriteOutlineManager.AddScaledOutlineToSprite<tk2dSprite>(base.sprite, Color.black, 0.1f, 0.05f);
+      // else
+        SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black);
       base.sprite.UpdateZDepth();
 
       SpeculativeRigidbody orAddComponent = base.gameObject.GetOrAddComponent<SpeculativeRigidbody>();
@@ -120,7 +124,10 @@ namespace CwaffingTheGungy
       if (!this)
         return;
       SpriteOutlineManager.RemoveOutlineFromSprite(base.sprite);
-      SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.white);
+      // if (scaledOutline)
+      //   SpriteOutlineManager.AddScaledOutlineToSprite<tk2dSprite>(base.sprite, Color.white, 0.1f, 0.05f);
+      // else
+        SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.white, 0.01f, 0.005f);
       if (this.autoInteract)
         Interact(interactor);
     }
@@ -130,7 +137,10 @@ namespace CwaffingTheGungy
       if (!this)
         return;
       SpriteOutlineManager.RemoveOutlineFromSprite(base.sprite);
-      SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black, 0.1f, 0.05f);
+      // if (scaledOutline)
+      //   SpriteOutlineManager.AddScaledOutlineToSprite<tk2dSprite>(base.sprite, Color.black, 0.1f, 0.05f);
+      // else
+        SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black, 0.01f, 0.005f);
     }
 
     public float GetDistanceToPoint(Vector2 point)

@@ -783,5 +783,13 @@ namespace CwaffingTheGungy
         // Vector2 relativePositionFromAnchor = Vector2.Cross(sprite.transform.localScale.XY(), sprite.GetRelativePositionFromAnchor(anchor));
         sprite.transform.position = position - relativePositionFromAnchor.ToVector3ZUp();
     }
+
+    // Remove and return last element from list
+    public static T Pop<T>(this List<T> items)
+    {
+      T item = items[items.Count - 1];
+      items.RemoveAt(items.Count - 1);
+      return item;
+    }
   }
 }

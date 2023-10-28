@@ -456,6 +456,8 @@ namespace CwaffingTheGungy
         private float      _fadeStartTime = 0.0f;
         private float      _fadeTotalTime = 0.0f;
         private float      _maxLifeTime   = 0.0f;
+        private bool       _setup         = false;
+        private bool       _fadeIn        = false;
 
         private void Start()
         {
@@ -464,6 +466,9 @@ namespace CwaffingTheGungy
 
         private void LateUpdate()
         {
+            if (!this._setup)
+                return;
+
             if (!this._vfx)
             {
                 UnityEngine.Object.Destroy(this);
@@ -482,18 +487,21 @@ namespace CwaffingTheGungy
 
             if (this._curLifeTime > this._fadeStartTime)
             {
-                float alpha = 1.0f - (this._curLifeTime - this._fadeStartTime) / this._fadeTotalTime;
+                float alpha = (this._curLifeTime - this._fadeStartTime) / this._fadeTotalTime;
+                if (!this._fadeIn)
+                    alpha = 1.0f - alpha;
                 // ETGModConsole.Log($"  setting alpha to {}");
                 this.sprite.renderer.SetAlpha(alpha);
             }
         }
 
         // todo: fading and emission are not simultaneously compatible
-        public void Setup(Vector2 velocity, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0, Color? emissiveColor = null)
+        public void Setup(Vector2 velocity, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false)
         {
             this._vfx = base.gameObject;
             this.sprite = this._vfx.GetComponent<tk2dSprite>();
             this._curLifeTime = 0.0f;
+            this._fadeIn = fadeIn;
 
             this._velocity = (1.0f / C.PIXELS_PER_CELL) * velocity.ToVector3ZisY(0);
             this._maxLifeTime = lifetime;
@@ -520,25 +528,27 @@ namespace CwaffingTheGungy
                     m.SetColor("_OverrideColor", emitColor);
                 }
             }
+
+            this._setup = true;
         }
 
         // Make a new FancyVFX from a normal SpawnManager.SpawnVFX
         public static FancyVFX Spawn(GameObject prefab, Vector3 position, Quaternion rotation,
-            Vector2 velocity, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0, Color? emissiveColor = null)
+            Vector2 velocity, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false)
         {
             GameObject v = SpawnManager.SpawnVFX(prefab, position, rotation, ignoresPools: false);
             FancyVFX fv = v.AddComponent<FancyVFX>();
-            fv.Setup(velocity, lifetime, fadeOutTime, parent, emissivePower, emissiveColor);
+            fv.Setup(velocity, lifetime, fadeOutTime, parent, emissivePower, emissiveColor, fadeIn);
             return fv;
         }
 
         // Make a new FancyVFX from a normal SpawnManager.SpawnVFX, ignoring pools (necessary for adding custom components)
         public static FancyVFX SpawnUnpooled(GameObject prefab, Vector3 position, Quaternion rotation,
-            Vector2 velocity, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0, Color? emissiveColor = null)
+            Vector2 velocity, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false)
         {
             GameObject v = SpawnManager.SpawnVFX(prefab, position, rotation, ignoresPools: true);
             FancyVFX fv = v.AddComponent<FancyVFX>();
-            fv.Setup(velocity, lifetime, fadeOutTime, parent, emissivePower, emissiveColor);
+            fv.Setup(velocity, lifetime, fadeOutTime, parent, emissivePower, emissiveColor, fadeIn);
             return fv;
         }
 
@@ -549,11 +559,12 @@ namespace CwaffingTheGungy
                 return null;
 
             GameObject g = UnityEngine.Object.Instantiate(new GameObject(), osprite.WorldCenter, osprite.transform.rotation);
-            tk2dBaseSprite sprite = g.AddComponent<tk2dSprite>();
+            tk2dSprite sprite = g.AddComponent<tk2dSprite>();
                 sprite.SetSprite(osprite.collection, osprite.spriteId);
                 sprite.PlaceAtPositionByAnchor(osprite.WorldCenter, tk2dBaseSprite.Anchor.MiddleCenter);
 
             FancyVFX fv = g.AddComponent<FancyVFX>();
+                fv.sprite = sprite;
             return fv;
         }
     }
