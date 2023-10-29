@@ -58,8 +58,8 @@ namespace CwaffingTheGungy
         {
             Gun gun = Lazy.SetupGun<Missiletoe>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
                 gun.SetAttributes(quality: PickupObject.ItemQuality.A, gunClass: GunClass.CHARM, reloadTime: 1.0f, ammo: 300, canReloadNoMatterAmmo: true);
-                gun.SetAnimationFPS(gun.shootAnimation, 30);
-                gun.SetAnimationFPS(gun.reloadAnimation, 40);
+                gun.SetAnimationFPS(gun.shootAnimation, 45);
+                gun.SetAnimationFPS(gun.reloadAnimation, 20);
                 gun.SetFireAudio("missiletoe_shoot_sound_1");
                 gun.SetReloadAudio("missiletoe_reload_sound");
 
@@ -295,7 +295,6 @@ namespace CwaffingTheGungy
         }
     }
 
-
     public class GlowyChristmasProjectileBehavior : MonoBehaviour
     {
         private Projectile _projectile;
@@ -308,14 +307,9 @@ namespace CwaffingTheGungy
             this._projectile.sprite.usesOverrideMaterial = true;
             Material m = this._projectile.sprite.renderer.material;
                 m.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-                m.SetFloat("_EmissivePower", 10f);
+                m.SetFloat("_EmissivePower", 40f);
                 m.SetFloat("_EmissiveColorPower", 1.55f);
                 m.SetColor("_EmissiveColor", Color.white);
-        }
-
-        private void Update()
-        {
-          // enter update code here
         }
     }
 
@@ -345,8 +339,6 @@ namespace CwaffingTheGungy
             this._lifetime -= _SPARKLE_TIME;
             SpawnManager.SpawnVFX(Missiletoe._SparklePrefab, this._projectile.sprite.WorldCenter, Lazy.RandomEulerZ())
                 .ExpireIn(_SPARKLE_LIFE, _SPARKLE_FADE, shrink: false);
-            // FancyVFX.SpawnUnpooled(Missiletoe._SparklePrefab, this._projectile.sprite.WorldCenter, Lazy.RandomEulerZ(),
-            //     velocity: Vector2.zero, lifetime: _SPARKLE_LIFE, fadeOutTime: _SPARKLE_FADE, emissivePower: _PART_EMIT, emissiveColor: Color.white);
         }
     }
 
@@ -399,7 +391,7 @@ namespace CwaffingTheGungy
             if (wrapping)
                 pickupvfx = FancyVFX.FromCurrentFrame(this._pickup.sprite);
 
-            // Clone and destroy the pickup itself
+            // Clone and destroy the pickup itself (logic is largely from Pickup() methods without actually picking items up)
             if (wrapping)
             {
                 Missiletoe._WrappedQualities.Add(this._pickup.quality);
@@ -416,18 +408,15 @@ namespace CwaffingTheGungy
                 {
                     if (this._pickup.GetComponent<PlayerItem>() is PlayerItem active)
                     {
-                        // FakeActivePickup(active);
-                        SpriteOutlineManager.RemoveOutlineFromSprite(active.sprite, true);
                         active.GetRidOfMinimapIcon();
                         active.m_pickedUp = true;
                     }
                     else if (this._pickup.GetComponent<PassiveItem>() is PassiveItem passive)
                     {
-                        // FakePassivePickup(passive);
-                        SpriteOutlineManager.RemoveOutlineFromSprite(passive.sprite, true);
                         passive.GetRidOfMinimapIcon();
                         passive.m_pickedUp = true;
                     }
+                    SpriteOutlineManager.RemoveOutlineFromSprite(this._pickup.sprite, true);
                     this._pickup.renderer.enabled = false;
                     this._pickup.m_isBeingEyedByRat = false;
                     if (this._pickup.gameObject.GetComponent<DebrisObject>() is DebrisObject debris)
