@@ -2358,6 +2358,7 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\coin_gun_projectile5.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile10.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tennis_ball1.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\ornament_projectile.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\natascha_bullet_003.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile14.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\soap_bubble_projectile_004.png"/>
@@ -2389,6 +2390,7 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\chess_queen.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tennis_ball6.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\outbreak_projectile1.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\exploding_ornament_projectile.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile17.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\ki_blast_red_004.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\deadline_projectile.png"/>

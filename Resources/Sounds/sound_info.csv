@@ -70,3 +70,5 @@ seltzer_shake_sound,2.0,1,sound
 seltzer_insert_sound,-3.0,1,sound
 seltzer_pelter_collide_sound,-10.0,1,sound
 seltzer_shoot_sound,-5.0,1,sound
+missiletoe_shoot_sound_1,-4.0,1,sound
+missiletoe_reload_sound,-1.0,1,sound

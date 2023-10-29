@@ -59,11 +59,13 @@ namespace CwaffingTheGungy
 
                 ETGMod.Databases.Items.SetupItem(item, item.name);
 
+
                 Gungeon.Game.Items.Add(IDs.InternalNames[itemName], item);
                 SpriteBuilder.AddToAmmonomicon(item.sprite.GetCurrentSpriteDef());
                 item.encounterTrackable.journalData.AmmonomiconSprite = item.sprite.GetCurrentSpriteDef().name;
             }
 
+            item.itemName = itemName;
             item.encounterTrackable.EncounterGuid = C.MOD_PREFIX+"-"+baseItemName; //create a unique guid for the item
             item.SetShortDescription(shortDescription);
             item.SetLongDescription(longDescription);

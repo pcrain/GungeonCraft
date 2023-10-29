@@ -35,8 +35,9 @@ namespace CwaffingTheGungy
         private const float _AUTOTARGET_MAX_DELTA    = 20f;   // [controller] the cone of vision we have before we can lock on with controller
         private const float _ENEMY_TRACK_RADIUS      = 4f;    // [controller] the radius around a tracked enemy where we can draw
 
-        private static GameObject _SparklePrefab     = null;  // prefab for the sparklies
-        private static GameObject _RunePrefab        = null;  // prefab for the runes
+        internal static GameObject _SparklePrefab    = null;  // prefab for the sparklies
+        internal static GameObject _RunePrefab       = null;  // prefab for the runes
+
         private static float _LastWriteSound         = 0f;    // how long its been since we played the scribbling sound
 
         private PlayerController _owner              = null;  // player owner of the weapon
