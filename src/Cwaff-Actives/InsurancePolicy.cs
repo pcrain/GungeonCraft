@@ -57,7 +57,7 @@ namespace CwaffingTheGungy
         {
             PlayerItem item = Lazy.SetupActive<InsurancePolicy>(ItemName, SpritePath, ShortDescription, LongDescription);
             item.quality      = PickupObject.ItemQuality.A;
-            item.consumable   = false;
+            item.consumable   = true;
             item.CanBeDropped = true;
             item.SetCooldownType(ItemBuilder.CooldownType.Timed, 0.5f);
 
@@ -163,6 +163,7 @@ namespace CwaffingTheGungy
 
         public override void DoEffect(PlayerController user)
         {
+            this.numberOfUses += 1; // adjust in case we fail our usage
             PickupObject nearestPickup = null;
             float nearestDist = _MAX_DIST;
             foreach (DebrisObject debris in StaticReferenceManager.AllDebris)
@@ -187,6 +188,7 @@ namespace CwaffingTheGungy
             }
             if (!nearestPickup)
                 return;
+            this.numberOfUses -= 1; // we didn't fail, so actually use it now
 
             nearestPickup.gameObject.AddComponent<Insured>().DoSparkles();
             _InsuredItems.Add(nearestPickup.PickupObjectId);
@@ -195,7 +197,6 @@ namespace CwaffingTheGungy
             // Lazy.CustomNotification(nearestPickup.DisplayName,"Item Insured", nearestPickup.sprite,
             //     color: UINotificationController.NotificationColor.PURPLE);
             AkSoundEngine.PostEvent("the_sound_of_buying_insurance", base.gameObject);
-            user.RemoveItemFromInventory(this);
         }
 
         internal static void SaveInsuredItems()
