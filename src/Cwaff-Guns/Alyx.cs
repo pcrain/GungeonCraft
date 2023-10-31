@@ -34,8 +34,9 @@ namespace CwaffingTheGungy
 
         internal static tk2dSpriteAnimationClip _BulletSprite;
 
-        private float _timeAtLastRecalc   = 0.0f;
         private Coroutine _decayCoroutine = null;
+
+        public float timeAtLastRecalc   = 0.0f; // must be public so it serializes properly when dropped / picked up
 
         public static void Add()
         {
@@ -79,9 +80,6 @@ namespace CwaffingTheGungy
         public override void Start()
         {
             base.Start();
-            this.gun.SetBaseMaxAmmo(_BASE_MAX_AMMO);
-            this.gun.CurrentAmmo = _BASE_MAX_AMMO;
-            this._timeAtLastRecalc = BraveTime.ScaledTimeSinceStartup;
             RecalculateAmmo();
         }
 
@@ -99,6 +97,13 @@ namespace CwaffingTheGungy
 
         protected override void OnPickup(GameActor owner)
         {
+            if (!this.everPickedUpByPlayer)
+            {
+                this.gun.SetBaseMaxAmmo(_BASE_MAX_AMMO);
+                this.gun.CurrentAmmo = _BASE_MAX_AMMO;
+                this.timeAtLastRecalc = BraveTime.ScaledTimeSinceStartup;
+                ETGModConsole.Log($"first pickup");
+            }
             base.OnPickup(owner);
             RecalculateAmmo();
             if (this._decayCoroutine != null)
@@ -158,10 +163,10 @@ namespace CwaffingTheGungy
 
         private void RecalculateAmmo()
         {
-            float timeSinceLastRecalc = BraveTime.ScaledTimeSinceStartup - this._timeAtLastRecalc;
+            float timeSinceLastRecalc = BraveTime.ScaledTimeSinceStartup - this.timeAtLastRecalc;
             if (timeSinceLastRecalc <= _MIN_CALC_RATE)
                 return;
-            this._timeAtLastRecalc = BraveTime.ScaledTimeSinceStartup;
+            this.timeAtLastRecalc = BraveTime.ScaledTimeSinceStartup;
 
             int newAmmo = ComputeExponentialDecay((float)this.gun.CurrentAmmo, _AMMO_DECAY_LAMBDA, timeSinceLastRecalc);
             int newMaxAmmo = ComputeExponentialDecay((float)this.gun.GetBaseMaxAmmo(), _GUN_DECAY_LAMBDA, timeSinceLastRecalc);
