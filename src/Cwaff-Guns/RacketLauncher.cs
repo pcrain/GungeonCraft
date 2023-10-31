@@ -39,6 +39,7 @@ namespace CwaffingTheGungy
                 gun.SetAnimationFPS(gun.shootAnimation, 60);
                 gun.SetAnimationFPS(gun.idleAnimation, _IDLE_FPS);
                 gun.LoopAnimation(gun.idleAnimation, 0);
+                gun.spriteAnimator.playAutomatically = false; // don't autoplay idle animation when dropped
 
             ProjectileModule mod = gun.DefaultModule;
                 mod.ammoCost               = 1;

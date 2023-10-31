@@ -37,6 +37,7 @@ namespace CwaffingTheGungy
         {
             Gun gun = Lazy.SetupGun<KiBlast>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
                 gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 999, infiniteAmmo: true);
+                gun.SetAnimationFPS(gun.idleAnimation, 10);
                 gun.SetAnimationFPS(gun.shootAnimation, 24);
                 gun.SetFireAudio("ki_blast_sound");
 
@@ -77,6 +78,13 @@ namespace CwaffingTheGungy
                 trail.EndColor   = Color.cyan;
 
             _Vfx = VFX.CreatePoolFromVFXGameObject((ItemHelper.Get(Items.MagicLamp) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
+        }
+
+        public override void Start()
+        {
+            base.Start();
+            // this.gun.spriteAnimator.Play(SpriteName+"_idle");
+            // gun.spriteAnimator.StopAndResetFrameToDefault();
         }
 
         public override void OnSwitchedToThisGun()

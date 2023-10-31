@@ -129,6 +129,11 @@ namespace CwaffingTheGungy
                         gun.barrelOffset.transform.localPosition = a.position;
             #endregion
 
+            #region Auto-play idle animation
+                gun.spriteAnimator.DefaultClipId = gun.spriteAnimator.GetClipIdByName(gun.idleAnimation);
+                gun.spriteAnimator.playAutomatically = true;
+            #endregion
+
             return gun;
         }
 
