@@ -209,7 +209,7 @@ namespace CwaffingTheGungy
                 clockhair.transform.position = GetTargetClockhairPosition(currentInput, clockhair.transform.position.XY());
                 clockhair.sprite.UpdateZDepth();
                 clockhair.SetMotionType(-10f);
-                if (currentInput.ActiveActions.UseItemAction.IsPressed)
+                if (currentInput.ActiveActions.UseItemAction.IsPressed || currentInput.ActiveActions.ShootAction.IsPressed)
                 {
                     if (!m_isPlayingChargeAudio)
                     {
@@ -227,7 +227,8 @@ namespace CwaffingTheGungy
                         AkSoundEngine.PostEvent("Stop_OBJ_pastkiller_charge_01", interactor.gameObject);
                     }
                 }
-                if (currentInput.ActiveActions.UseItemAction.WasReleased && shotTargetTime > holdDuration && !GameManager.Instance.IsPaused)
+                if ((currentInput.ActiveActions.UseItemAction.WasReleased || currentInput.ActiveActions.ShootAction.WasReleased)
+                    && shotTargetTime > holdDuration && !GameManager.Instance.IsPaused)
                 {
                     break;
                 }
