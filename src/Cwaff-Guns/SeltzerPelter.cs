@@ -224,7 +224,8 @@ namespace CwaffingTheGungy
         private const float SPRAY_TIME = 2f;
         private const float SPIN_TIME  = 4f;
         private const float ACCEL      = 40f;
-        private const float _AIR_DRAG  = 0.25f;
+        // private const float _AIR_DRAG  = 0.25f;
+        private const double _AIR_DRAG  = 0.25;
         private const float _SOUND_RATE = 0.2f;
 
         private static IEnumerator SpraySoda_CR(SeltzerProjectile seltzer, Projectile p)
@@ -287,7 +288,8 @@ namespace CwaffingTheGungy
 
                     if (p.baseData.speed > 0.1f)
                     {
-                        p.baseData.speed *= Mathf.Pow(_AIR_DRAG, BraveTime.DeltaTime);
+                        // p.baseData.speed *= Mathf.Pow(_AIR_DRAG, BraveTime.DeltaTime); // TODO: this is probably very expensive
+                        p.baseData.speed = (float)(p.baseData.speed * Lazy.FastPow(_AIR_DRAG, BraveTime.DeltaTime));
                         p.UpdateSpeed();
                     }
                     seltzer._rotationRate += rotIncrease * BraveTime.DeltaTime;
