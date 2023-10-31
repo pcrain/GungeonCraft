@@ -57,13 +57,8 @@ namespace CwaffingTheGungy
                 projectile.baseData.speed   = 24.0f;
                 projectile.transform.parent = gun.barrelOffset;
                 projectile.gameObject.AddComponent<HatchlingProjectile>();
-
-            // Must be done AFTER gun / projectile setup so impact effects don't bleed onto other guns
-            VFXPool impactFVX = VFX.RegisterVFXPool("EggBreak", ResMap.Get("egg_break"), fps: 16, loops: false, scale: 0.75f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
-                gun.SetHorizontalImpactVFX(impactFVX);
-                gun.SetVerticalImpactVFX(impactFVX);
-                gun.SetEnemyImpactVFX(impactFVX);
-                gun.SetAirImpactVFX(impactFVX);
+                projectile.SetAllImpactVFX(VFX.RegisterVFXPool(
+                    "EggBreak", ResMap.Get("egg_break"), fps: 16, loops: false, scale: 0.75f, anchor: tk2dBaseSprite.Anchor.MiddleCenter));
         }
 
         public override void OnPostFired(PlayerController player, Gun gun)

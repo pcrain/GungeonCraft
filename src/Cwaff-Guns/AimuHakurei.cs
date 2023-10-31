@@ -74,12 +74,8 @@ namespace CwaffingTheGungy
                     ResMap.Get("aimu_beam_mid"), 60, ResMap.Get("aimu_beam_start"), 60, cascadeTimer: C.FRAME, destroyOnEmpty: true);
                     tc.UsesDispersalParticles = true;
                     tc.DispersalParticleSystemPrefab = (ItemHelper.Get(Items.FlashRay) as Gun).DefaultModule.projectiles[0].GetComponentInChildren<TrailController>().DispersalParticleSystemPrefab;
-
-            VFXPool impactFVX = VFX.RegisterVFXPool(ItemName+" Impact", ResMap.Get("gaster_beam_impact"), fps: 20, loops: false, scale: 1.0f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
-                beamProj.SetHorizontalImpactVFX(impactFVX);
-                beamProj.SetVerticalImpactVFX(impactFVX);
-                beamProj.SetEnemyImpactVFX(impactFVX);
-                beamProj.SetAirImpactVFX(impactFVX);
+                beamProj.SetAllImpactVFX(VFX.RegisterVFXPool(
+                    ItemName+" Impact", ResMap.Get("gaster_beam_impact"), fps: 20, loops: false, scale: 1.0f, anchor: tk2dBaseSprite.Anchor.MiddleCenter));
 
             // set up tiered projectiles
             gun.Volley.projectiles = new(){

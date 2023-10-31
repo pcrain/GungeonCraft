@@ -276,7 +276,9 @@ namespace CwaffingTheGungy
     // Set a gun's horizontal impact VFX
     public static void SetHorizontalImpactVFX(this Gun gun, VFXPool vfx)
     {
-      gun.DefaultModule.projectiles[0].SetHorizontalImpactVFX(vfx);
+      foreach (ProjectileModule mod in gun.Volley.projectiles)
+        foreach (Projectile p in mod.projectiles)
+          p.SetHorizontalImpactVFX(vfx);
     }
 
     // Set a projectile's vertical impact VFX
@@ -289,7 +291,9 @@ namespace CwaffingTheGungy
     // Set a gun's vertical impact VFX
     public static void SetVerticalImpactVFX(this Gun gun, VFXPool vfx)
     {
-      gun.DefaultModule.projectiles[0].SetVerticalImpactVFX(vfx);
+      foreach (ProjectileModule mod in gun.Volley.projectiles)
+        foreach (Projectile p in mod.projectiles)
+          p.SetVerticalImpactVFX(vfx);
     }
 
     // Set a projectile's enemy impact VFX
@@ -302,7 +306,9 @@ namespace CwaffingTheGungy
     // Set a gun's enemy impact VFX
     public static void SetEnemyImpactVFX(this Gun gun, VFXPool vfx)
     {
-      gun.DefaultModule.projectiles[0].SetEnemyImpactVFX(vfx);
+      foreach (ProjectileModule mod in gun.Volley.projectiles)
+        foreach (Projectile p in mod.projectiles)
+          p.SetEnemyImpactVFX(vfx);
     }
 
     // Set a projectile's midair impact / death VFX
@@ -315,7 +321,24 @@ namespace CwaffingTheGungy
     // Set a gun's midair impact / death VFX
     public static void SetAirImpactVFX(this Gun gun, VFXPool vfx)
     {
-      gun.DefaultModule.projectiles[0].SetAirImpactVFX(vfx);
+      foreach (ProjectileModule mod in gun.Volley.projectiles)
+        foreach (Projectile p in mod.projectiles)
+          p.SetAirImpactVFX(vfx);
+    }
+
+    // Set a projectile's impact VFX across the board
+    public static void SetAllImpactVFX(this Projectile p, VFXPool vfx)
+    {
+      p.SetHorizontalImpactVFX(vfx);
+      p.SetVerticalImpactVFX(vfx);
+      p.SetEnemyImpactVFX(vfx);
+      p.SetAirImpactVFX(vfx);
+    }
+
+    // Set a gun's impact VFX across the board
+    public static void SetAllImpactVFX(this Gun gun, VFXPool vfx)
+    {
+      gun.DefaultModule.projectiles[0].SetAllImpactVFX(vfx);
     }
 
     // Check if an enemy is hostile

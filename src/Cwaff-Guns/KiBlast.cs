@@ -47,12 +47,6 @@ namespace CwaffingTheGungy
                 mod.cooldownTime           = 0.1f;
                 mod.numberOfShotsInClip    = 99999;
 
-            VFXPool impactFVX = VFX.RegisterVFXPool(ItemName+" Impact", ResMap.Get("ki_explosion"), fps: 20, loops: false, scale: 0.5f);
-                gun.SetHorizontalImpactVFX(impactFVX);
-                gun.SetVerticalImpactVFX(impactFVX);
-                gun.SetEnemyImpactVFX(impactFVX);
-                gun.SetAirImpactVFX(impactFVX);
-
             _KiSprite = AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("ki_blast").Base(),
                 12, true, new IntVector2(8, 8),
@@ -71,6 +65,8 @@ namespace CwaffingTheGungy
                 blast.ignoreDamageCaps = true;
                 blast.gameObject.AddComponent<KiBlastBehavior>();
                 blast.gameObject.AddComponent<ArcTowardsTargetBehavior>();
+                blast.SetAllImpactVFX(VFX.RegisterVFXPool(
+                    ItemName+" Impact", ResMap.Get("ki_explosion"), fps: 20, loops: false, scale: 0.5f));
 
             EasyTrailBullet trail = blast.gameObject.AddComponent<EasyTrailBullet>();
                 trail.TrailPos   = trail.transform.position;
