@@ -26,7 +26,11 @@ namespace CwaffingTheGungy
         public static string LongDescription  = "Feigh death and become stealthed upon taking damage. Shooting while stealthed deals 10x damage and removes stealth.\n\nDeveloped by the French government for use by their elite secret agents in case of their inevitable failure, this marvelous gadget takes making lemonade out of lemons to the next level.";
 
         internal const float _DEAD_RINGER_DAMAGE_MULT = 10.0f;
+        internal const float _LENIENCE = 0.75f; // minimum time after getting hit we can decloak (to prevent instantly losing cloak in panic)
+
         internal static GameObject _CorpsePrefab;
+
+        private float _lastActivationTime = 0.0f;
 
         public static void Init()
         {
@@ -44,6 +48,7 @@ namespace CwaffingTheGungy
         public override DebrisObject Drop(PlayerController player)
         {
             player.OnReceivedDamage -= this.OnReceivedDamage;
+            BreakStealth(player);
             return base.Drop(player);
         }
 
@@ -94,6 +99,7 @@ namespace CwaffingTheGungy
             // if (!CanAnyBossOrNPCSee(this.Owner)) // don't need this check, we can feign death in front of them
             this.Owner.SetIsStealthed(true, "DeadRinger");
             this.Owner.SetCapableOfStealing(true, "DeadRinger");
+            this._lastActivationTime = BraveTime.ScaledTimeSinceStartup;
 
             // Apply a shadowy shader
             foreach (Material m in this.Owner.SetOverrideShader(ShaderCache.Acquire("Brave/Internal/HighPriestAfterImage")))
@@ -110,6 +116,9 @@ namespace CwaffingTheGungy
         {
             if (this.Owner != pc)
                 return;
+            if (JustBecameStealthy())
+                return; // don't lose stealth immediately if we shoot right when we get shot
+
             this.Owner.ClearOverrideShader();
             this.Owner.OnDidUnstealthyAction -= BreakStealth;
             this.Owner.PostProcessProjectile -= SneakAttackProcessor;
@@ -119,8 +128,15 @@ namespace CwaffingTheGungy
             DoSmokeAroundPlayer(8);
         }
 
+        private bool JustBecameStealthy()
+        {
+            return BraveTime.ScaledTimeSinceStartup < this._lastActivationTime + _LENIENCE;
+        }
+
         private void SneakAttackProcessor(Projectile proj, float _)
         {
+            if (JustBecameStealthy())
+                return; // don't get sneak attack bonus immediately unless we become unstealthed
             if (this.Owner?.IsStealthed ?? false)
                 proj.baseData.damage *= _DEAD_RINGER_DAMAGE_MULT;
         }
