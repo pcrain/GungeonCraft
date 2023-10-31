@@ -29,13 +29,12 @@ namespace CwaffingTheGungy
 
         internal static tk2dSpriteAnimationClip _BulletSprite;
 
-        private const float _NATASHA_PROJECTILE_SCALE = 0.5f;
         private float _speedMult                      = 1.0f;
 
         public static void Add()
         {
             Gun gun = Lazy.SetupGun<SchrodingersGat>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.SetAttributes(quality: PickupObject.ItemQuality.C, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f, ammo: 500);
+                gun.SetAttributes(quality: PickupObject.ItemQuality.A, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f, ammo: 250);
                 gun.SetAnimationFPS(gun.idleAnimation, 24);
                 gun.SetAnimationFPS(gun.shootAnimation, 24);
 
@@ -55,7 +54,7 @@ namespace CwaffingTheGungy
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
                 projectile.AddDefaultAnimation(_BulletSprite);
                 projectile.baseData.damage  = 0f;
-                projectile.baseData.speed   = 30.0f;
+                projectile.baseData.speed   = 32.0f;
                 projectile.transform.parent = gun.barrelOffset;
 
             projectile.gameObject.AddComponent<SchrodingersGatProjectile>();
@@ -159,8 +158,6 @@ namespace CwaffingTheGungy
                     SchrodingersGat.CheckFromQuantumEnemyOwner(p);
             }
 
-            // string dies = this._diesNextHit ? "die" : "not die";
-            // ETGModConsole.Log($"Enemy {this._enemy.name} will {dies} next hit");
             AkSoundEngine.PostEvent("schrodinger_bullet_hit", base.gameObject);
         }
 
