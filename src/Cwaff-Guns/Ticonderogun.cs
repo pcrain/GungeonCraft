@@ -21,7 +21,7 @@ namespace CwaffingTheGungy
         public static string SpriteName       = "ticonderogun";
         public static string ProjectileName   = "38_special";
         public static string ShortDescription = "A Picture is Worth 1000 Swords";
-        public static string LongDescription  = "Creates magic brushstrokes at the cursor while continuously fired. Encircling enemies with brushstrokes damages them, with smaller circles dealing more damage. (On controller, brushstrokes auto-lock onto nearby enemies and always deal max damage.) Increases curse by 2 while in inventory.\n\nA truly bizarre relic from another dimension where the pen is mightier than the gun. It radiates with an aura that gives one the sense that the arcane sketches it's capable of producing are lying dormant inside the relic itself, just waiting for the right user to draw out their power.";
+        public static string LongDescription  = "Creates magic brushstrokes at the cursor while continuously fired. Encircling enemies with brushstrokes damages them, and multiple enemies can be encircled at once for slightly reduced per-enemy damage. (On controller, brushstrokes auto-lock onto nearby enemies and always deal max damage.) Increases curse by 2 while in inventory.\n\nA truly bizarre relic from another dimension where the pen is mightier than the gun. It radiates with an aura that gives one the sense that the arcane sketches it's capable of producing are lying dormant inside the relic itself, just waiting for the right user to draw out their power.";
 
         private const float _BASE_DAMAGE             = 10f;   // base damage of being encircled
         private const float _AMMO_DRAIN_TIME         = 1f;    // how frequently we lose ammo
@@ -143,12 +143,25 @@ namespace CwaffingTheGungy
                 return;  // return early if we haven't actually done anything
 
             // Compute the damage we need to do base
-            float damage = ComputeCircleDamage(hullCenter);
+            float damage = ComputeCircleDamage(hullCenter, theEncircled.Count());
             foreach (AIActor enemy in theEncircled)
                 DoEncirclingMagic(enemy, damage);
         }
 
-        private float ComputeCircleDamage(Vector2 hullCenter)
+        private float ComputeCircleDamage(Vector2 hullCenter, int numEncircled)
+        {
+            float baseDamage = _BASE_DAMAGE * this._owner.stats.GetStatValue(PlayerStats.StatType.Damage);
+            switch(numEncircled)
+            {
+                case 1:  return baseDamage;        // 10 * 1 = 10
+                case 2:  return baseDamage * 0.8f; //  8 * 2 = 16
+                case 3:  return baseDamage * 0.7f; //  7 * 3 = 21
+                case 4:  return baseDamage * 0.6f; //  6 * 4 = 24
+                default: return baseDamage * 0.5f; //  5 * n = 5n = 25+
+            }
+        }
+
+        private float ComputeCircleDamageOld(Vector2 hullCenter)
         {
             if (!this._owner.IsKeyboardAndMouse()) // controller users always get max damage because this weapon is already hard enough to use with controllers
                 return Mathf.Ceil(_BASE_DAMAGE * this._owner.stats.GetStatValue(PlayerStats.StatType.Damage));
