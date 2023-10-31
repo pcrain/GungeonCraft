@@ -526,8 +526,9 @@ namespace CwaffingTheGungy
           Chest chestPrefab =
             GameManager.Instance.RewardManager.GetTargetChestPrefab(overrideChestQuality ?? pickup.quality)
             ?? GameManager.Instance.RewardManager.GetTargetChestPrefab(PickupObject.ItemQuality.B);
-          chestPrefab.forceContentIds = new(){pickup.PickupObjectId};
-          return Chest.Spawn(chestPrefab, position);
+          Chest chest = Chest.Spawn(chestPrefab, position);
+          chest.forceContentIds = new(){pickup.PickupObjectId};
+          return chest;
         }
     }
 }
