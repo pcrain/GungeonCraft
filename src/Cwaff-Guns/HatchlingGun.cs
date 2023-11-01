@@ -129,9 +129,9 @@ namespace CwaffingTheGungy
                     UseTargetsRoom = false,
                     AvoidTarget = false,
                 });
-                bs.RegisterBehaviors(bs.TargetBehaviors);
-                bs.RegisterBehaviors(bs.MovementBehaviors);
-                bs.RefreshBehaviors();
+                // bs.RegisterBehaviors(bs.TargetBehaviors);
+                // bs.RegisterBehaviors(bs.MovementBehaviors);
+                bs.FullyRefreshBehaviors();
             }
 
             // Make it smol

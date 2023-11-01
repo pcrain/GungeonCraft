@@ -168,6 +168,7 @@ namespace CwaffingTheGungy
                     AimuHakurei.Add();
                     SeltzerPelter.Add();
                     Missiletoe.Add();
+                    IceCream.Add();
                 #endregion
 
                 #region Synergies

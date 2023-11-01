@@ -203,6 +203,7 @@
     <Compile Include="src\Cwaff-Guns\SoulKaliber.cs"/>
     <Compile Include="src\Cwaff-Guns\Missiletoe.cs"/>
     <Compile Include="src\Cwaff-Guns\QuarterPounder.cs"/>
+    <Compile Include="src\Cwaff-Guns\IceCream.cs"/>
     <Compile Include="src\Cwaff-Guns\Deadline.cs"/>
     <Compile Include="src\Cwaff-Guns\RacketLauncher.cs"/>
     <Compile Include="src\Cwaff-Guns\Natascha.cs"/>
@@ -254,6 +255,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_fire_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_011.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_fire_005.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\ice_cream_charge_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\bouncer_reload_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_013.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\holy_water_gun_fire_001.json"/>
@@ -374,6 +376,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_032.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_fire_013.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tennis_rocket_gun_reload_001.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\ice_cream_fire_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_fire_014.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_038.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_017.png"/>
@@ -452,6 +455,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_038.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_035.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alyx_fire_002.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\ice_cream_charge_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_042.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_fire_016.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_reload_004.json"/>
@@ -677,6 +681,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_reload_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_reload_005.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\holy_water_gun_reload_001.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\ice_cream_idle_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_reload_005.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\missiletoe_idle_001.png"/>
@@ -987,6 +992,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_028.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_reload_007.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_002.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\ice_cream_idle_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_006.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_009.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_004.json"/>
@@ -995,6 +1001,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_reload_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\ki_blast_gun_fire_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_fire_003.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\ice_cream_reload_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_013.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_050.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_013.json"/>
@@ -1040,6 +1047,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\missiletoe_reload_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_026.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_012.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\ice_cream_reload_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_013.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alyx_reload_011.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_fire_009.json"/>
@@ -1602,6 +1610,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_020.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\holy_water_gun_idle_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_017.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\ice_cream_fire_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_015.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_reload_012.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_018.json"/>
@@ -2515,6 +2524,7 @@
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\schrodingers_gat_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\outbreak_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\b_b_gun_idle_001.png"/>
+    <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\ice_cream_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\missiletoe_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\hatchling_gun_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\iron_maid_idle_001.png"/>

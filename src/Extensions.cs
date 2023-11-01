@@ -813,5 +813,12 @@ namespace CwaffingTheGungy
       items.RemoveAt(items.Count - 1);
       return item;
     }
+
+    // Clear out all old behaviors for a BehaviorSpeculator and restart everything
+    public static void FullyRefreshBehaviors(this BehaviorSpeculator self)
+    {
+      self.m_behaviors.Clear();
+      self.RefreshBehaviors();
+    }
   }
 }
