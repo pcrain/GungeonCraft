@@ -86,8 +86,10 @@ namespace CwaffingTheGungy
                 if (sd.name.Contains("001"))
                 {
                     if (sd.name.Contains("idle_f"))
+                        matchStrength = 5;
+                    else if (sd.name.Contains("idle_right") || sd.name.Contains("idle_r"))
                         matchStrength = 4;
-                    else if (sd.name.Contains("idle_right") || sd.name.Contains("idle_l") || sd.name.Contains("idle_r"))
+                    else if (sd.name.Contains("idle_left") || sd.name.Contains("idle_l"))
                         matchStrength = 3;
                     else if (sd.name.Contains("idle") || sd.name.Contains("fire") || sd.name.Contains("run_right") || sd.name.Contains("right_run"))
                         matchStrength = 2;
@@ -97,7 +99,7 @@ namespace CwaffingTheGungy
                     {
                       bestMatchStrength = matchStrength;
                       bestSpriteId = i;
-                      if (bestMatchStrength == 4)
+                      if (bestMatchStrength == 5)
                         break;
                     }
                 }

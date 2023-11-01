@@ -42,9 +42,37 @@ namespace CwaffingTheGungy
                 mod.cooldownTime           = 0.0f;
                 mod.projectiles            = new(){ Lazy.NoProjectile() };
 
+            // NOTE: sprites might need lots of padding for hands to render in right positions w.r.t. vanilla sprites, see bullet kin for example
             AIActor bulletKin = EnemyDatabase.GetOrLoadByGuid(Enemies.BulletKin);
                 bulletKin.sprite.SetUpAnimation("bullet_smile_left", 2, tk2dSpriteAnimationClip.WrapMode.Loop);
                 bulletKin.sprite.SetUpAnimation("bullet_smile_right", 2, tk2dSpriteAnimationClip.WrapMode.Loop);
+                AIAnimator.NamedDirectionalAnimation newOtheranim = new AIAnimator.NamedDirectionalAnimation
+                {
+                    name = "smile",
+                    anim = new DirectionalAnimation
+                    {
+                        Prefix    = "smile",
+                        AnimNames = new string[2]{"bullet_smile_right","bullet_smile_left"},
+                        Type      = DirectionalAnimation.DirectionType.TwoWayHorizontal,
+                        Flipped   = new DirectionalAnimation.FlipType[]{
+                            DirectionalAnimation.FlipType.None,
+                            // DirectionalAnimation.FlipType.Mirror,
+                            // DirectionalAnimation.FlipType.Mirror,
+                            DirectionalAnimation.FlipType.None,
+                        },
+                    }
+                };
+                bulletKin.sprite.aiAnimator.OtherAnimations ??= new List<AIAnimator.NamedDirectionalAnimation>();
+                bulletKin.sprite.aiAnimator.OtherAnimations.Add(newOtheranim);
+                // Copy attach points from idle sprites
+                // tk2dSpriteCollectionData collection = bulletKin.sprite.collection;
+                // int bestIdleId = CwaffToolbox.GetIdForBestIdleAnimation(bulletKin);
+                // ETGModConsole.Log($"  best idle animation is {bestIdleId} -> {collection.spriteDefinitions[bestIdleId].name}");
+                // tk2dSpriteDefinition.AttachPoint[] idleAttachPoints = collection.GetAttachPoints(bestIdleId);
+                // if (idleAttachPoints != null)
+                // {
+                //     ETGModConsole.Log($"  found {idleAttachPoints.Length} attach points");
+                // }
 
             _IceCreamId = gun.PickupObjectId;
         }
@@ -85,7 +113,14 @@ namespace CwaffingTheGungy
             Vector2 ppos = this.gun.barrelOffset.transform.position.XY();
             foreach (AIActor enemy in roomEnemies)
                 if (NeedsIceCream(enemy) && ((enemy.sprite.WorldCenter - ppos).sqrMagnitude <= _SHARE_RANGE_SQUARED))
+                {
+                    if (enemy.aiShooter is AIShooter shooter)
+                    {
+                        ETGModConsole.Log($" before shooter.attachPointCachedPosition = {shooter.attachPointCachedPosition}");
+                        ETGModConsole.Log($" before shooter.attachPointCachedFlippedPosition = {shooter.attachPointCachedFlippedPosition}");
+                    }
                     GiveIceCream(enemy);
+                }
         }
     }
 
@@ -109,8 +144,12 @@ namespace CwaffingTheGungy
                 body.CanBeCarried       = true;
                 body.CollideWithTileMap = true;
                 body.CollideWithOthers  = true;
-                foreach(PixelCollider pc in body.PixelColliders)
-                    pc.CollisionLayer = CollisionLayer.PlayerBlocker; // necessary to avoid getting stuck inside enemies
+                // body.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.Projectile | CollisionLayer.PlayerBlocker));
+                // foreach(PixelCollider pc in body.PixelColliders)
+                // {
+                //     // CollisionMask.LayerToMask(CollisionLayer.Projectile | CollisionLayer.PlayerBlocker)
+                //     pc.CollisionLayer = CollisionLayer.PlayerBlocker; // necessary to avoid getting stuck inside enemies
+                // }
             }
 
             if (this._enemy.healthHaver is HealthHaver hh)
@@ -121,9 +160,14 @@ namespace CwaffingTheGungy
 
             if (this._enemy.EnemyGuid == Enemies.BulletKin)
             {
-                ETGModConsole.Log($"  TRYING!");
-                this._enemy.aiAnimator.PlayUntilCancelled("bullet_smile_right");
-                // this._enemy.aiAnimator.OverrideIdleAnimation = "bullet_smile";
+                // ETGModConsole.Log($"  TRYING!");
+                this._enemy.aiAnimator.OverrideIdleAnimation = "smile";
+            }
+
+            if (this._enemy.aiShooter is AIShooter shooter)
+            {
+                ETGModConsole.Log($" after shooter.attachPointCachedPosition = {shooter.attachPointCachedPosition}");
+                ETGModConsole.Log($" after shooter.attachPointCachedFlippedPosition = {shooter.attachPointCachedFlippedPosition}");
             }
         }
 
@@ -162,16 +206,29 @@ namespace CwaffingTheGungy
 
         private void Update()
         {
-            this._enemy.CurrentGun.preventRotation      = true;
-            this._enemy.CanTargetEnemies                = true;
-            this._enemy.CanTargetPlayers                = false;
-            this._enemy.behaviorSpeculator.PlayerTarget = NearestEnemyThatReallyNeedsIceCream();
-            if (this._enemy.aiShooter)
+            this._enemy.CurrentGun.preventRotation        = true;   // make sure the ice cream is always standing up straight
+            this._enemy.CurrentGun.sprite.HeightOffGround = 0.2f;   // render in front of the enemy
+            this._enemy.CanTargetEnemies                  = true;
+            this._enemy.CanTargetPlayers                  = false;
+            this._enemy.behaviorSpeculator.PlayerTarget   = NearestEnemyThatReallyNeedsIceCream();
+            if (this._enemy.aiShooter is AIShooter shooter)
             {
-                if (this._enemy.behaviorSpeculator.PlayerTarget)
-                    this._enemy.aiShooter.OverrideAimPoint = this._enemy.behaviorSpeculator.PlayerTarget.transform.position.XY();
+                shooter.ForceGunOnTop = true;
+
+                // ETGModConsole.Log($"gunangle {shooter.GunAngle}, manual {shooter.ManualGunAngle}");
+                // Bounds untrimmedBounds = shooter.sprite.GetUntrimmedBounds();
+                // shooter.attachPointCachedPosition = shooter.gunAttachPoint.localPosition + (Vector3)PhysicsEngine.PixelToUnit(shooter.overallGunAttachOffset);
+                // shooter.attachPointCachedFlippedPosition = shooter.gunAttachPoint.localPosition.WithX(untrimmedBounds.center.x + (untrimmedBounds.center.x - shooter.gunAttachPoint.localPosition.x)) + (Vector3)PhysicsEngine.PixelToUnit(shooter.flippedGunAttachOffset) + (Vector3)PhysicsEngine.PixelToUnit(shooter.overallGunAttachOffset);
+
+                if (shooter.gunAttachPoint.localPosition == shooter.attachPointCachedPosition)
+                    shooter.attachPointCachedFlippedPosition = shooter.attachPointCachedPosition;
                 else
-                    this._enemy.aiShooter.OverrideAimPoint = GameManager.Instance.BestActivePlayer.sprite.WorldCenter;
+                    shooter.attachPointCachedPosition = shooter.attachPointCachedFlippedPosition;
+
+                if (this._enemy.behaviorSpeculator.PlayerTarget)
+                    shooter.OverrideAimPoint = this._enemy.behaviorSpeculator.PlayerTarget.transform.position.XY();
+                else
+                    shooter.OverrideAimPoint = GameManager.Instance.BestActivePlayer.sprite.WorldCenter;
             }
         }
 
