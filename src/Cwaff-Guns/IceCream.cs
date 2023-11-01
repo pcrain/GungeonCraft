@@ -25,7 +25,7 @@ namespace CwaffingTheGungy
 
         internal const float _SHARE_RANGE_SQUARED = 4f;
 
-        private static int _IceCreamId;
+        internal static int _IceCreamId;
 
         public static void Add()
         {
@@ -220,10 +220,11 @@ namespace CwaffingTheGungy
                 // shooter.attachPointCachedPosition = shooter.gunAttachPoint.localPosition + (Vector3)PhysicsEngine.PixelToUnit(shooter.overallGunAttachOffset);
                 // shooter.attachPointCachedFlippedPosition = shooter.gunAttachPoint.localPosition.WithX(untrimmedBounds.center.x + (untrimmedBounds.center.x - shooter.gunAttachPoint.localPosition.x)) + (Vector3)PhysicsEngine.PixelToUnit(shooter.flippedGunAttachOffset) + (Vector3)PhysicsEngine.PixelToUnit(shooter.overallGunAttachOffset);
 
-                if (shooter.gunAttachPoint.localPosition == shooter.attachPointCachedPosition)
-                    shooter.attachPointCachedFlippedPosition = shooter.attachPointCachedPosition;
-                else
-                    shooter.attachPointCachedPosition = shooter.attachPointCachedFlippedPosition;
+                // Fix hands appearing in weird positions (BAD, need something better)
+                // if (shooter.gunAttachPoint.localPosition == shooter.attachPointCachedPosition)
+                //     shooter.attachPointCachedFlippedPosition = shooter.attachPointCachedPosition;
+                // else
+                //     shooter.attachPointCachedPosition = shooter.attachPointCachedFlippedPosition;
 
                 if (this._enemy.behaviorSpeculator.PlayerTarget)
                     shooter.OverrideAimPoint = this._enemy.behaviorSpeculator.PlayerTarget.transform.position.XY();
