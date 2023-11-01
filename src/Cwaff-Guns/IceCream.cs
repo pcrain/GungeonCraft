@@ -24,6 +24,7 @@ namespace CwaffingTheGungy
         public static string LongDescription  = "TBD";
 
         internal const float _SHARE_RANGE_SQUARED = 4f;
+        internal const float _SHARE_PLAYER_RANGE_SQUARED = 16f;
 
         internal static int _IceCreamId;
 
@@ -66,15 +67,6 @@ namespace CwaffingTheGungy
                 };
                 bulletKin.sprite.aiAnimator.OtherAnimations ??= new List<AIAnimator.NamedDirectionalAnimation>();
                 bulletKin.sprite.aiAnimator.OtherAnimations.Add(newOtheranim);
-                // Copy attach points from idle sprites
-                // tk2dSpriteCollectionData collection = bulletKin.sprite.collection;
-                // int bestIdleId = CwaffToolbox.GetIdForBestIdleAnimation(bulletKin);
-                // ETGModConsole.Log($"  best idle animation is {bestIdleId} -> {collection.spriteDefinitions[bestIdleId].name}");
-                // tk2dSpriteDefinition.AttachPoint[] idleAttachPoints = collection.GetAttachPoints(bestIdleId);
-                // if (idleAttachPoints != null)
-                // {
-                //     ETGModConsole.Log($"  found {idleAttachPoints.Length} attach points");
-                // }
 
             _IceCreamId = gun.PickupObjectId;
         }
@@ -115,20 +107,13 @@ namespace CwaffingTheGungy
             Vector2 ppos = this.gun.barrelOffset.transform.position.XY();
             foreach (AIActor enemy in roomEnemies)
                 if (NeedsIceCream(enemy) && ((enemy.sprite.WorldCenter - ppos).sqrMagnitude <= _SHARE_RANGE_SQUARED))
-                {
-                    // if (enemy.aiShooter is AIShooter shooter)
-                    // {
-                    //     ETGModConsole.Log($" before shooter.attachPointCachedPosition = {shooter.attachPointCachedPosition}");
-                    //     ETGModConsole.Log($" before shooter.attachPointCachedFlippedPosition = {shooter.attachPointCachedFlippedPosition}");
-                    // }
                     GiveIceCream(enemy);
-                }
         }
     }
 
     public class HappyIceCreamHaver : MonoBehaviour
     {
-        private const float _TARGET_SWITCH_RATE = 0.05f;
+        private const float _TARGET_SWITCH_RATE = 1.00f;
 
         private AIActor _enemy;
         private float _lastTargetSwitch = 0f;
@@ -166,16 +151,7 @@ namespace CwaffingTheGungy
             }
 
             if (this._enemy.EnemyGuid == Enemies.BulletKin)
-            {
-                // ETGModConsole.Log($"  TRYING!");//
                 this._enemy.aiAnimator.OverrideIdleAnimation = "smile";
-            }
-
-            // if (this._enemy.aiShooter is AIShooter shooter)
-            // {
-            //     ETGModConsole.Log($" after shooter.attachPointCachedPosition = {shooter.attachPointCachedPosition}");
-            //     ETGModConsole.Log($" after shooter.attachPointCachedFlippedPosition = {shooter.attachPointCachedFlippedPosition}");
-            // }
         }
 
         private void AdjustBehaviors()
@@ -191,8 +167,7 @@ namespace CwaffingTheGungy
                 targeter.Radius              = 100.0f;
                 targeter.LineOfSight         = false;
                 targeter.ObjectPermanence    = true;
-                // targeter.SearchInterval      = 0.01f;
-                targeter.SearchInterval      = 1.25f;
+                targeter.SearchInterval      = _TARGET_SWITCH_RATE;
                 targeter.PauseOnTargetSwitch = false;
                 targeter.PauseTime           = 0.0f;
                 targeter.Init(this._enemy.gameObject, this._enemy.aiActor, this._enemy.aiShooter);
@@ -205,7 +180,7 @@ namespace CwaffingTheGungy
                 seeker.CustomRange            = 2.0f;
                 seeker.LineOfSight            = false;
                 seeker.ReturnToSpawn          = false;
-                seeker.PathInterval           = 0.25f;
+                seeker.PathInterval           = 0.5f;
                 seeker.Init(this._enemy.gameObject, this._enemy.aiActor, this._enemy.aiShooter);
             bs.MovementBehaviors = new(){seeker};
 
@@ -222,70 +197,21 @@ namespace CwaffingTheGungy
             if (!this._enemy.CanTargetPlayers)
                 this._enemy.CanTargetPlayers = true; // WARNING: calling these nullifies the PlayerTarget every time, so do it as little as possible
 
-            // if (this._lastTargetSwitch + _TARGET_SWITCH_RATE < BraveTime.ScaledTimeSinceStartup)
-            // {
-            //     this._lastTargetSwitch                      = BraveTime.ScaledTimeSinceStartup;
-            //     GameActor target                            = NearestEnemyThatReallyNeedsIceCream(this._enemy);
-            //     this._enemy.behaviorSpeculator.PlayerTarget = target;
-            //     this._enemy.PlayerTarget                    = target;
-            // }
+            if (this._enemy.aiShooter is not AIShooter shooter)
+                return;
 
-            if (this._enemy.aiShooter is AIShooter shooter)
+            shooter.ForceGunOnTop = true;
+
+            if (this._enemy.behaviorSpeculator.PlayerTarget is not AIActor iceCreamNeeder)
             {
-                shooter.ForceGunOnTop = true;
-
-                // ETGModConsole.Log($"gunangle {shooter.GunAngle}, manual {shooter.ManualGunAngle}");
-                // Bounds untrimmedBounds = shooter.sprite.GetUntrimmedBounds();
-                // shooter.attachPointCachedPosition = shooter.gunAttachPoint.localPosition + (Vector3)PhysicsEngine.PixelToUnit(shooter.overallGunAttachOffset);
-                // shooter.attachPointCachedFlippedPosition = shooter.gunAttachPoint.localPosition.WithX(untrimmedBounds.center.x + (untrimmedBounds.center.x - shooter.gunAttachPoint.localPosition.x)) + (Vector3)PhysicsEngine.PixelToUnit(shooter.flippedGunAttachOffset) + (Vector3)PhysicsEngine.PixelToUnit(shooter.overallGunAttachOffset);
-
-                // Fix hands appearing in weird positions (BAD, need something better)
-                // if (shooter.gunAttachPoint.localPosition == shooter.attachPointCachedPosition)
-                //     shooter.attachPointCachedFlippedPosition = shooter.attachPointCachedPosition;
-                // else
-                //     shooter.attachPointCachedPosition = shooter.attachPointCachedFlippedPosition;
-
-                if (this._enemy.behaviorSpeculator.PlayerTarget is GameActor target)
-                {
-                    shooter.OverrideAimPoint = target.transform.position.XY();
-                    if (target is AIActor iceCreamNeeder)
-                    {
-                        if ((this._enemy.sprite.WorldCenter - iceCreamNeeder.sprite.WorldCenter).sqrMagnitude < IceCream._SHARE_RANGE_SQUARED)
-                        {
-                            if (IceCream.NeedsIceCream(iceCreamNeeder))
-                                IceCream.GiveIceCream(iceCreamNeeder);
-                        }
-                    }
-                }
-                else
-                    shooter.OverrideAimPoint = GameManager.Instance.BestActivePlayer.sprite.WorldCenter;
+                shooter.OverrideAimPoint = GameManager.Instance.BestActivePlayer.sprite.WorldCenter;
+                return;
             }
-        }
 
-        internal static GameActor NearestEnemyThatReallyNeedsIceCream(AIActor iceCreamHaver)
-        {
-            GameActor target = null;
-            float bestDist = 9999f;
-            Vector2 pos = iceCreamHaver.sprite.WorldCenter;
-            foreach (AIActor other in pos.GetAbsoluteRoom().GetActiveEnemies(RoomHandler.ActiveEnemyType.All))
-            {
-                if (other == iceCreamHaver)
-                    continue;
-                if (!IceCream.NeedsIceCream(other))
-                    continue;
-                float dist = (pos - other.sprite.WorldCenter).sqrMagnitude;
-                if (dist > bestDist)
-                    continue;
-                if (dist < IceCream._SHARE_RANGE_SQUARED)
-                {
-                    IceCream.GiveIceCream(other);
-                    continue;
-                }
-                bestDist = dist;
-                target = other;
-            }
-            return target ?? GameManager.Instance.BestActivePlayer; // target the player if we have no better target
-            // return target ?? this._enemy; // target ourself if we have no better target
+            shooter.OverrideAimPoint = iceCreamNeeder.transform.position.XY();
+            if ((this._enemy.sprite.WorldCenter - iceCreamNeeder.sprite.WorldCenter).sqrMagnitude < IceCream._SHARE_RANGE_SQUARED)
+                if (IceCream.NeedsIceCream(iceCreamNeeder))
+                    IceCream.GiveIceCream(iceCreamNeeder);
         }
     }
 
@@ -328,22 +254,44 @@ namespace CwaffingTheGungy
                 return BehaviorResult.Continue;
 
             m_losTimer = SearchInterval;
+            m_behaviorSpeculator.PlayerTarget = NearestEnemyThatReallyNeedsIceCream(m_aiActor);
             if (m_behaviorSpeculator.PlayerTarget)
-                return BehaviorResult.Continue;
+                m_aiShooter?.AimAtPoint(m_behaviorSpeculator.PlayerTarget.CenterPosition);
 
-            m_behaviorSpeculator.PlayerTarget = HappyIceCreamHaver.NearestEnemyThatReallyNeedsIceCream(m_aiActor);
-            // m_aiActor.PlayerTarget            = m_behaviorSpeculator.PlayerTarget;
-            // m_aiActor.OverrideTarget          = m_behaviorSpeculator.PlayerTarget?.specRigidbody; // TODO: why is this necessary to get everything functioning properly?
-
-            if (m_aiShooter != null && m_behaviorSpeculator.PlayerTarget != null)
-                m_aiShooter.AimAtPoint(m_behaviorSpeculator.PlayerTarget.CenterPosition);
-
-            if ((bool)m_aiActor && !m_aiActor.HasBeenEngaged)
-            {
-                m_aiActor.HasBeenEngaged = true;
-                return BehaviorResult.SkipAllRemainingBehaviors;
-            }
             return BehaviorResult.SkipRemainingClassBehaviors;
+        }
+
+        internal static GameActor NearestEnemyThatReallyNeedsIceCream(AIActor iceCreamHaver)
+        {
+            GameActor target = null;
+            float bestDist = 9999f;
+            Vector2 pos = iceCreamHaver.sprite.WorldCenter;
+            foreach (AIActor other in pos.GetAbsoluteRoom().GetActiveEnemies(RoomHandler.ActiveEnemyType.All))
+            {
+                if (other == iceCreamHaver)
+                    continue;
+                if (!IceCream.NeedsIceCream(other))
+                    continue;
+                float dist = (pos - other.sprite.WorldCenter).sqrMagnitude;
+                if (dist > bestDist)
+                    continue;
+                if (dist < IceCream._SHARE_RANGE_SQUARED)
+                {
+                    IceCream.GiveIceCream(other);
+                    continue;
+                }
+                bestDist = dist;
+                target = other;
+            }
+            if (target)
+                return target;
+
+            PlayerController bestPlayer = GameManager.Instance.BestActivePlayer;
+            Vector2 bestPlayerPos       = bestPlayer.sprite.WorldCenter;
+            if ((pos-bestPlayerPos).sqrMagnitude < IceCream._SHARE_PLAYER_RANGE_SQUARED)
+                return bestPlayer; // target the player if we have no good enemy target and they're in range
+
+            return iceCreamHaver; // target ourself if we have no better target
         }
     }
 
