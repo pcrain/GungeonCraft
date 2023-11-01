@@ -786,13 +786,23 @@ namespace CwaffingTheGungy
     }
 
     // Add a new animation to the same collection as a reference sprite
-    public static string SetUpAnimation(this tk2dBaseSprite sprite, string animationName, float fps, tk2dSpriteAnimationClip.WrapMode wrapMode = tk2dSpriteAnimationClip.WrapMode.Once)
+    public static string SetUpAnimation(this tk2dBaseSprite sprite, string animationName, float fps, tk2dSpriteAnimationClip.WrapMode wrapMode = tk2dSpriteAnimationClip.WrapMode.Once, bool copyShaders = false)
     {
       tk2dSpriteCollectionData collection = sprite.collection;
+      tk2dSpriteDefinition referenceFrameDef = collection.spriteDefinitions[sprite.spriteId];
       tk2dSpriteAnimator anim = sprite.spriteAnimator;
       List<int> spriteIds = new();
       foreach (string spritePath in ResMap.Get(animationName))
-          spriteIds.Add(SpriteBuilder.AddSpriteToCollection(spritePath, collection));
+      {
+          int frameSpriteId = SpriteBuilder.AddSpriteToCollection(spritePath, collection);
+          spriteIds.Add(frameSpriteId);
+          if (copyShaders)
+          {
+            tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
+            frameDef.material.shader = referenceFrameDef.material.shader;
+            // frameDef.materialInst.shader = referenceFrameDef.materialInst.shader;
+          }
+      }
       tk2dSpriteAnimationClip clip = SpriteBuilder.AddAnimation(anim, collection, spriteIds, animationName, wrapMode, fps);
       return animationName;
     }

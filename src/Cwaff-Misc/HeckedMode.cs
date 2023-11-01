@@ -333,10 +333,10 @@ namespace CwaffingTheGungy
             // Reset the gunattachpoint by inverting the Initialize() calculations for attachPointCachedPosition (unnecessary?)
             if (shooter.attachPointCachedPosition != default(Vector3))
             {
-                ETGModConsole.Log($"cur attach point is {shooter.attachPointCachedPosition}");
+                // ETGModConsole.Log($"cur attach point is {shooter.attachPointCachedPosition}");
                 Vector3 originalGunAttachPoint = shooter.attachPointCachedPosition - (Vector3)PhysicsEngine.PixelToUnit(shooter.overallGunAttachOffset);
                 shooter.gunAttachPoint.localPosition = originalGunAttachPoint;
-                ETGModConsole.Log($"new attach point is {originalGunAttachPoint}");
+                // ETGModConsole.Log($"new attach point is {originalGunAttachPoint}");
             }
 
             // Override the attack behaviors
