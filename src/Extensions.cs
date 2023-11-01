@@ -785,6 +785,7 @@ namespace CwaffingTheGungy
       p.m_transform.eulerAngles = new Vector3(0f, 0f, angle);
     }
 
+    // Add a new animation to the same collection as a reference sprite
     public static string SetUpAnimation(this tk2dBaseSprite sprite, string animationName, float fps, tk2dSpriteAnimationClip.WrapMode wrapMode = tk2dSpriteAnimationClip.WrapMode.Once)
     {
       tk2dSpriteCollectionData collection = sprite.collection;
@@ -792,7 +793,7 @@ namespace CwaffingTheGungy
       List<int> spriteIds = new();
       foreach (string spritePath in ResMap.Get(animationName))
           spriteIds.Add(SpriteBuilder.AddSpriteToCollection(spritePath, collection));
-      tk2dSpriteAnimationClip clip = SpriteBuilder.AddAnimation(anim, collection, spriteIds, animationName, tk2dSpriteAnimationClip.WrapMode.Once, fps);
+      tk2dSpriteAnimationClip clip = SpriteBuilder.AddAnimation(anim, collection, spriteIds, animationName, wrapMode, fps);
       return animationName;
     }
 

@@ -2491,6 +2491,10 @@
     <EmbeddedResource Include="Resources\Companions\Wolf\wolf_pet_left_004.png"/>
     <EmbeddedResource Include="Resources\EmbeddedRooms\BoomhildrRoom.room"/>
     <EmbeddedResource Include="Resources\Sounds\CwaffingTheGungy.bnk"/>
+    <EmbeddedResource Include="Resources\EnemySprites\bullet_smile_right_002.png"/>
+    <EmbeddedResource Include="Resources\EnemySprites\bullet_smile_left_002.png"/>
+    <EmbeddedResource Include="Resources\EnemySprites\bullet_smile_left_001.png"/>
+    <EmbeddedResource Include="Resources\EnemySprites\bullet_smile_right_001.png"/>
     <EmbeddedResource Include="Resources\StatusEffectVFX\plaguevfxframe_004.png"/>
     <EmbeddedResource Include="Resources\StatusEffectVFX\plaguevfxframe_002.png"/>
     <EmbeddedResource Include="Resources\StatusEffectVFX\plaguevfxframe_005.png"/>

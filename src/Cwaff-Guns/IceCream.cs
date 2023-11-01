@@ -42,6 +42,10 @@ namespace CwaffingTheGungy
                 mod.cooldownTime           = 0.0f;
                 mod.projectiles            = new(){ Lazy.NoProjectile() };
 
+            AIActor bulletKin = EnemyDatabase.GetOrLoadByGuid(Enemies.BulletKin);
+                bulletKin.sprite.SetUpAnimation("bullet_smile_left", 2, tk2dSpriteAnimationClip.WrapMode.Loop);
+                bulletKin.sprite.SetUpAnimation("bullet_smile_right", 2, tk2dSpriteAnimationClip.WrapMode.Loop);
+
             _IceCreamId = gun.PickupObjectId;
         }
 
@@ -92,23 +96,34 @@ namespace CwaffingTheGungy
         {
             this._enemy = base.GetComponent<AIActor>();
             this._enemy.CollisionDamage            = 0f;
-            this._enemy.CollisionKnockbackStrength = 0f;
+            this._enemy.CollisionKnockbackStrength = 10f;
             this._enemy.IgnoreForRoomClear         = true;
 
             AdjustBehaviors();
 
             if (this._enemy.specRigidbody is SpeculativeRigidbody body)
             {
+                body.CanPush            = true;
                 body.CanBePushed        = true;
+                body.CanCarry           = true;
                 body.CanBeCarried       = true;
                 body.CollideWithTileMap = true;
                 body.CollideWithOthers  = true;
+                foreach(PixelCollider pc in body.PixelColliders)
+                    pc.CollisionLayer = CollisionLayer.PlayerBlocker; // necessary to avoid getting stuck inside enemies
             }
 
             if (this._enemy.healthHaver is HealthHaver hh)
             {
                 hh.IsVulnerable = false;
                 hh.TriggerInvulnerabilityPeriod(999999f);
+            }
+
+            if (this._enemy.EnemyGuid == Enemies.BulletKin)
+            {
+                ETGModConsole.Log($"  TRYING!");
+                this._enemy.aiAnimator.PlayUntilCancelled("bullet_smile_right");
+                // this._enemy.aiAnimator.OverrideIdleAnimation = "bullet_smile";
             }
         }
 
@@ -122,23 +137,23 @@ namespace CwaffingTheGungy
             bs.OtherBehaviors    = new();
 
             TargetPlayerBehavior targeter = new TargetPlayerBehavior();
-                targeter.Radius              = 1000.0f;
+                targeter.Radius              = 100.0f;
                 targeter.LineOfSight         = false;
                 targeter.ObjectPermanence    = true;
-                targeter.SearchInterval      = 1.0f;
+                targeter.SearchInterval      = 0.25f;
                 targeter.PauseOnTargetSwitch = false;
-                targeter.PauseTime           = 0.1f;
+                targeter.PauseTime           = 0.0f;
                 targeter.Init(this._enemy.gameObject, this._enemy.aiActor, this._enemy.aiShooter);
             bs.TargetBehaviors = new(){targeter};
 
             SeekTargetBehavior seeker = new SeekTargetBehavior();
                 seeker.ExternalCooldownSource = false;
                 seeker.SpecifyRange    = false;
-                seeker.StopWhenInRange = false;
-                seeker.CustomRange     = 1.0f;
+                seeker.StopWhenInRange = true;
+                seeker.CustomRange     = 2.0f;
                 seeker.LineOfSight     = false;
                 seeker.ReturnToSpawn   = false;
-                seeker.PathInterval    = 1.0f;
+                seeker.PathInterval    = 0.25f;
                 seeker.Init(this._enemy.gameObject, this._enemy.aiActor, this._enemy.aiShooter);
             bs.MovementBehaviors = new(){seeker};
 
@@ -147,22 +162,17 @@ namespace CwaffingTheGungy
 
         private void Update()
         {
-          // enter update code here
-            this._enemy.CanTargetEnemies = true;
-            this._enemy.CanTargetPlayers = false;
+            this._enemy.CurrentGun.preventRotation      = true;
+            this._enemy.CanTargetEnemies                = true;
+            this._enemy.CanTargetPlayers                = false;
             this._enemy.behaviorSpeculator.PlayerTarget = NearestEnemyThatReallyNeedsIceCream();
             if (this._enemy.aiShooter)
             {
                 if (this._enemy.behaviorSpeculator.PlayerTarget)
-                {
                     this._enemy.aiShooter.OverrideAimPoint = this._enemy.behaviorSpeculator.PlayerTarget.transform.position.XY();
-                    // ETGModConsole.Log($"  ice cream!!!");
-                }
                 else
-                    this._enemy.aiShooter.OverrideAimPoint = this._enemy.sprite.WorldCenter + Vector2.right;
+                    this._enemy.aiShooter.OverrideAimPoint = GameManager.Instance.BestActivePlayer.sprite.WorldCenter;
             }
-            // this._enemy.PlayerTarget = this._enemy.behaviorSpeculator.PlayerTarget;
-            // this._enemy.OverrideTarget = this._enemy.behaviorSpeculator.PlayerTarget?.specRigidbody;
         }
 
         private AIActor NearestEnemyThatReallyNeedsIceCream()
