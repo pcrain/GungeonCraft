@@ -15,24 +15,68 @@ using Alexandria.Misc;
 
 namespace CwaffingTheGungy
 {
-    public class IceCream : AdvancedGunBehavior
+    public class IceCream : PlayerItem
     {
         public static string ItemName         = "Ice Cream";
-        public static string SpriteName       = "ice_cream";
+        public static string SpritePath       = "ice_cream_icon";
+        public static string ShortDescription = ":>";
+        public static string LongDescription  = "TBD";
+
+        internal static GameObject _HeartVFX;
+
+        public static void Init()
+        {
+            IceCreamGun.Add(); // add the gun here because it's a pseudo-gun
+
+            PlayerItem item = Lazy.SetupActive<IceCream>(ItemName, SpritePath, ShortDescription, LongDescription);
+            item.quality      = PickupObject.ItemQuality.C;
+            item.consumable   = false;
+            item.CanBeDropped = true;
+            item.SetCooldownType(ItemBuilder.CooldownType.Timed, 15f);
+
+            _HeartVFX = VFX.RegisterVFXObject("Heart", ResMap.Get("heart_vfx"),
+                fps: 18, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 1, emissiveColour: Color.magenta);
+        }
+
+        public override bool CanBeUsed(PlayerController user)
+        {
+            if (user.CurrentRoom?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> roomEnemies)
+                return false;
+
+            Vector2 ppos = user.sprite.WorldCenter;
+            foreach (AIActor enemy in roomEnemies)
+                if (HappyIceCreamHaver.NeedsIceCream(enemy) && ((enemy.sprite.WorldCenter - ppos).sqrMagnitude <= HappyIceCreamHaver._SHARE_RANGE_SQUARED))
+                    return base.CanBeUsed(user);
+
+            return false;
+        }
+
+        public override void DoEffect(PlayerController user)
+        {
+            if (user.CurrentRoom?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> roomEnemies)
+                return;
+
+            Vector2 ppos = user.sprite.WorldCenter;
+            foreach (AIActor enemy in roomEnemies)
+                if (HappyIceCreamHaver.NeedsIceCream(enemy) && ((enemy.sprite.WorldCenter - ppos).sqrMagnitude <= HappyIceCreamHaver._SHARE_RANGE_SQUARED))
+                    HappyIceCreamHaver.ShareIceCream(enemy);
+        }
+    }
+
+    public class IceCreamGun : AdvancedGunBehavior
+    {
+        public static string ItemName         = "Ice Cream Gun";
+        public static string SpriteName       = "ice_cream_gun";
         public static string ProjectileName   = "38_special";
         public static string ShortDescription = ":>";
         public static string LongDescription  = "TBD";
 
-        internal const float _SHARE_RANGE_SQUARED = 4f;
-        internal const float _SHARE_PLAYER_RANGE_SQUARED = 16f;
-        internal static GameObject _HeartVFX;
-
-        internal static int _IceCreamId;
+        internal static int _IceCreamGunId;
 
         public static void Add()
         {
-            Gun gun = Lazy.SetupGun<IceCream>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-                gun.SetAttributes(quality: PickupObject.ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true);
+            Gun gun = Lazy.SetupGun<IceCreamGun>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, hideFromAmmonomicon: true);
+                gun.SetAttributes(quality: PickupObject.ItemQuality.SPECIAL, gunClass: GunClass.SILLY, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true);
                 gun.SetAnimationFPS(gun.chargeAnimation, 16);
                 gun.muzzleFlashEffects = null;
                 gun.preventRotation        = true; // make sure the ice cream is always standing up straight
@@ -60,8 +104,6 @@ namespace CwaffingTheGungy
                         Type      = DirectionalAnimation.DirectionType.TwoWayHorizontal,
                         Flipped   = new DirectionalAnimation.FlipType[]{
                             DirectionalAnimation.FlipType.None,
-                            // DirectionalAnimation.FlipType.Mirror,
-                            // DirectionalAnimation.FlipType.Mirror,
                             DirectionalAnimation.FlipType.None,
                         },
                     }
@@ -69,60 +111,15 @@ namespace CwaffingTheGungy
                 bulletKin.sprite.aiAnimator.OtherAnimations ??= new List<AIAnimator.NamedDirectionalAnimation>();
                 bulletKin.sprite.aiAnimator.OtherAnimations.Add(newOtheranim);
 
-            _HeartVFX = VFX.RegisterVFXObject("Heart", ResMap.Get("heart_vfx"),
-                fps: 18, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 1, emissiveColour: Color.magenta);
-
-            _IceCreamId = gun.PickupObjectId;
-        }
-
-        internal static bool NeedsIceCream(AIActor enemy)
-        {
-            if (enemy?.aiShooter?.behaviorSpeculator?.AttackBehaviors == null)
-                return false;
-            if (enemy.GetComponent<HappyIceCreamHaver>())
-                return false;
-            if (!enemy.IsHostileAndNotABoss())
-                return false;
-            foreach (AttackBehaviorBase attack in enemy.aiShooter.behaviorSpeculator.AttackBehaviors)
-                if (attack is ShootGunBehavior)
-                    return true;
-            return false;
-        }
-
-        internal static void ShareIceCream(AIActor enemy)
-        {
-            enemy.ReplaceGun((Items)_IceCreamId);
-            enemy.gameObject.AddComponent<HappyIceCreamHaver>();
-            GameObject vfx = SpawnManager.SpawnVFX(_HeartVFX, enemy.sprite.WorldTopCenter + new Vector2(0f, 1f), Quaternion.identity, ignoresPools: true);
-                tk2dSprite sprite = vfx.GetComponent<tk2dSprite>();
-                    sprite.HeightOffGround = 1f;
-                vfx.transform.parent = enemy.sprite.transform;
-                vfx.AddComponent<GlowAndFadeOut>().Setup(
-                    fadeInTime: 0.25f, glowInTime: 0.50f, glowOutTime: 0.50f, fadeOutTime: 0.25f, maxEmit: 200f, destroy: true);
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-            if (this.Owner is not PlayerController player)
-                return;
-            if (player.CurrentRoom == null)
-                return;
-            if (BraveTime.DeltaTime == 0.0f)
-                return;
-            List<AIActor> roomEnemies = player.CurrentRoom.GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
-            if (roomEnemies == null)
-                return;
-
-            Vector2 ppos = this.gun.barrelOffset.transform.position.XY();
-            foreach (AIActor enemy in roomEnemies)
-                if (NeedsIceCream(enemy) && ((enemy.sprite.WorldCenter - ppos).sqrMagnitude <= _SHARE_RANGE_SQUARED))
-                    ShareIceCream(enemy);
+            _IceCreamGunId = gun.PickupObjectId;
         }
     }
 
     public class HappyIceCreamHaver : MonoBehaviour
     {
+        internal const float _SHARE_RANGE_SQUARED = 6f;
+        internal const float _SEEK_PLAYER_RANGE_SQUARED = 16f;
+
         private const float _TARGET_SWITCH_RATE = 1.00f;
 
         private AIActor _enemy;
@@ -221,9 +218,35 @@ namespace CwaffingTheGungy
             }
 
             shooter.OverrideAimPoint = iceCreamNeeder.transform.position.XY();
-            if ((this._enemy.sprite.WorldCenter - iceCreamNeeder.sprite.WorldCenter).sqrMagnitude < IceCream._SHARE_RANGE_SQUARED)
-                if (IceCream.NeedsIceCream(iceCreamNeeder))
-                    IceCream.ShareIceCream(iceCreamNeeder);
+            if ((this._enemy.sprite.WorldCenter - iceCreamNeeder.sprite.WorldCenter).sqrMagnitude < _SHARE_RANGE_SQUARED)
+                if (NeedsIceCream(iceCreamNeeder))
+                    ShareIceCream(iceCreamNeeder);
+        }
+
+        internal static bool NeedsIceCream(AIActor enemy)
+        {
+            if (enemy?.aiShooter?.behaviorSpeculator?.AttackBehaviors == null)
+                return false;
+            if (enemy.GetComponent<HappyIceCreamHaver>())
+                return false;
+            if (!enemy.IsHostileAndNotABoss())
+                return false;
+            foreach (AttackBehaviorBase attack in enemy.aiShooter.behaviorSpeculator.AttackBehaviors)
+                if (attack is ShootGunBehavior)
+                    return true;
+            return false;
+        }
+
+        internal static void ShareIceCream(AIActor enemy)
+        {
+            enemy.ReplaceGun((Items)IceCreamGun._IceCreamGunId);
+            enemy.gameObject.AddComponent<HappyIceCreamHaver>();
+            GameObject vfx = SpawnManager.SpawnVFX(IceCream._HeartVFX, enemy.sprite.WorldTopCenter + new Vector2(0f, 1f), Quaternion.identity, ignoresPools: true);
+                tk2dSprite sprite = vfx.GetComponent<tk2dSprite>();
+                    sprite.HeightOffGround = 1f;
+                vfx.transform.parent = enemy.sprite.transform;
+                vfx.AddComponent<GlowAndFadeOut>().Setup(
+                    fadeInTime: 0.25f, glowInTime: 0.50f, glowOutTime: 0.50f, fadeOutTime: 0.25f, maxEmit: 200f, destroy: true);
         }
     }
 
@@ -282,14 +305,14 @@ namespace CwaffingTheGungy
             {
                 if (other == iceCreamHaver)
                     continue;
-                if (!IceCream.NeedsIceCream(other))
+                if (!HappyIceCreamHaver.NeedsIceCream(other))
                     continue;
                 float dist = (pos - other.sprite.WorldCenter).sqrMagnitude;
                 if (dist > bestDist)
                     continue;
-                if (dist < IceCream._SHARE_RANGE_SQUARED)
+                if (dist < HappyIceCreamHaver._SHARE_RANGE_SQUARED)
                 {
-                    IceCream.ShareIceCream(other);
+                    HappyIceCreamHaver.ShareIceCream(other);
                     continue;
                 }
                 bestDist = dist;
@@ -300,7 +323,7 @@ namespace CwaffingTheGungy
 
             PlayerController bestPlayer = GameManager.Instance.BestActivePlayer;
             Vector2 bestPlayerPos       = bestPlayer.sprite.WorldCenter;
-            if ((pos-bestPlayerPos).sqrMagnitude < IceCream._SHARE_PLAYER_RANGE_SQUARED)
+            if ((pos-bestPlayerPos).sqrMagnitude < HappyIceCreamHaver._SEEK_PLAYER_RANGE_SQUARED)
                 return bestPlayer; // target the player if we have no good enemy target and they're in range
 
             return iceCreamHaver; // target ourself if we have no better target

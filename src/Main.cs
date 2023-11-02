@@ -94,6 +94,7 @@ namespace CwaffingTheGungy
                     GasterBlaster.Init();
                     StackOfTorches.Init();
                     InsurancePolicy.Init();
+                    IceCream.Init();
                 #endregion
 
                 #region Passives
@@ -168,7 +169,6 @@ namespace CwaffingTheGungy
                     AimuHakurei.Add();
                     SeltzerPelter.Add();
                     Missiletoe.Add();
-                    IceCream.Add();
                 #endregion
 
                 #region Synergies
