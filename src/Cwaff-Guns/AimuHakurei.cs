@@ -22,8 +22,8 @@ namespace CwaffingTheGungy
         public static string ItemName         = "Aimu Hakurei";
         public static string SpriteName       = "aimu_hakurei";
         public static string ProjectileName   = "38_special";
-        public static string ShortDescription = "TBD";
-        public static string LongDescription  = "TBD";
+        public static string ShortDescription = "Highly Responsive";
+        public static string LongDescription  = "Fires a variety of projectiles based on its current level. Grazing nearby enemy projectiles while the gun is active increases the graze counter, with the gun's level increasing at 10, 30, 60, and 100 graze. Reloading toggles focus mode, which slows down time to enable precision grazing. Focus mode is cancelled by reloading, firing, dodge rolling, or switching guns.\n\nOne of the finest weapons ever crafted in Gunsokyo, a land whose denizens are renowned for their otherworldly bullet-dodging abilities that would put most Gungeoneers to shame. The potential dakka output of this gun is enough to keep up even with these impressive abilities. However, the Gunsokyo warriors being the showboats that they are, reaching this gun's full potential requires placing oneself in some rather precarious situations, making it a weapon of truly ludicrous risk and reward.";
 
         internal const float _GRAZE_THRES              = 1.5f;  // max distance from player a projectile can be to count as grazed
         internal const float _GRAZE_THRES_SQUARED      = _GRAZE_THRES * _GRAZE_THRES; // speed up distance calculations a bit
@@ -183,6 +183,7 @@ namespace CwaffingTheGungy
             //     AkSoundEngine.PostEvent("aimu_unfocus_sound", this.Owner.gameObject);
 
             this.gun.RemoveStatFromGun(PlayerStats.StatType.MovementSpeed);
+            // NOTE: since time is slowed down, the player's effective speed is 0.65 * 0.65. This is intentional
             this.gun.AddStatToGun(PlayerStats.StatType.MovementSpeed, focus ? 0.65f : 1.0f, StatModifier.ModifyMethod.MULTIPLICATIVE);
             this.Player.stats.RecalculateStats(this.Player);
         }
