@@ -1979,6 +1979,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\icicle_crash_particles1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\pencil_runes2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\seltzer_sparkles2.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\heart_vfx.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren13.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\midas_sparkle2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\zenkai_aura5.png"/>

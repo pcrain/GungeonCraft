@@ -25,6 +25,7 @@ namespace CwaffingTheGungy
 
         internal const float _SHARE_RANGE_SQUARED = 4f;
         internal const float _SHARE_PLAYER_RANGE_SQUARED = 16f;
+        internal static GameObject _HeartVFX;
 
         internal static int _IceCreamId;
 
@@ -68,6 +69,9 @@ namespace CwaffingTheGungy
                 bulletKin.sprite.aiAnimator.OtherAnimations ??= new List<AIAnimator.NamedDirectionalAnimation>();
                 bulletKin.sprite.aiAnimator.OtherAnimations.Add(newOtheranim);
 
+            _HeartVFX = VFX.RegisterVFXObject("Heart", ResMap.Get("heart_vfx"),
+                fps: 18, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 1, emissiveColour: Color.magenta);
+
             _IceCreamId = gun.PickupObjectId;
         }
 
@@ -85,10 +89,16 @@ namespace CwaffingTheGungy
             return false;
         }
 
-        internal static void GiveIceCream(AIActor enemy)
+        internal static void ShareIceCream(AIActor enemy)
         {
             enemy.ReplaceGun((Items)_IceCreamId);
             enemy.gameObject.AddComponent<HappyIceCreamHaver>();
+            GameObject vfx = SpawnManager.SpawnVFX(_HeartVFX, enemy.sprite.WorldTopCenter + new Vector2(0f, 1f), Quaternion.identity, ignoresPools: true);
+                tk2dSprite sprite = vfx.GetComponent<tk2dSprite>();
+                    sprite.HeightOffGround = 1f;
+                vfx.transform.parent = enemy.sprite.transform;
+                vfx.AddComponent<GlowAndFadeOut>().Setup(
+                    fadeInTime: 0.25f, glowInTime: 0.50f, glowOutTime: 0.50f, fadeOutTime: 0.25f, maxEmit: 200f, destroy: true);
         }
 
         protected override void Update()
@@ -107,7 +117,7 @@ namespace CwaffingTheGungy
             Vector2 ppos = this.gun.barrelOffset.transform.position.XY();
             foreach (AIActor enemy in roomEnemies)
                 if (NeedsIceCream(enemy) && ((enemy.sprite.WorldCenter - ppos).sqrMagnitude <= _SHARE_RANGE_SQUARED))
-                    GiveIceCream(enemy);
+                    ShareIceCream(enemy);
         }
     }
 
@@ -152,6 +162,8 @@ namespace CwaffingTheGungy
 
             if (this._enemy.EnemyGuid == Enemies.BulletKin)
                 this._enemy.aiAnimator.OverrideIdleAnimation = "smile";
+
+            AkSoundEngine.PostEvent("ice_cream_shared", base.gameObject);
         }
 
         private void AdjustBehaviors()
@@ -211,7 +223,7 @@ namespace CwaffingTheGungy
             shooter.OverrideAimPoint = iceCreamNeeder.transform.position.XY();
             if ((this._enemy.sprite.WorldCenter - iceCreamNeeder.sprite.WorldCenter).sqrMagnitude < IceCream._SHARE_RANGE_SQUARED)
                 if (IceCream.NeedsIceCream(iceCreamNeeder))
-                    IceCream.GiveIceCream(iceCreamNeeder);
+                    IceCream.ShareIceCream(iceCreamNeeder);
         }
     }
 
@@ -277,7 +289,7 @@ namespace CwaffingTheGungy
                     continue;
                 if (dist < IceCream._SHARE_RANGE_SQUARED)
                 {
-                    IceCream.GiveIceCream(other);
+                    IceCream.ShareIceCream(other);
                     continue;
                 }
                 bestDist = dist;

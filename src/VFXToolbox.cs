@@ -485,7 +485,7 @@ namespace CwaffingTheGungy
 
             this.sprite.transform.position += this._velocity;
 
-            if (this._curLifeTime > this._fadeStartTime)
+            if (this._fadeOut && this._curLifeTime > this._fadeStartTime)
             {
                 float alpha = (this._curLifeTime - this._fadeStartTime) / this._fadeTotalTime;
                 if (!this._fadeIn)
@@ -679,6 +679,61 @@ namespace CwaffingTheGungy
 
                 ++i;
             }
+        }
+    }
+
+    // Fade in from complete transparency, emit light for a bit, then fade back out
+    public class GlowAndFadeOut : MonoBehaviour
+    {
+        private const float _MAX_EMIT = 200f;
+
+        public void Setup(float fadeInTime, float glowInTime, float glowOutTime, float fadeOutTime, float maxEmit = _MAX_EMIT, bool destroy = true)
+        {
+            StartCoroutine(Top(fadeInTime, glowInTime, glowOutTime, fadeOutTime, maxEmit, destroy));
+        }
+
+        private IEnumerator Top(float fadeInTime, float glowInTime, float glowOutTime, float fadeOutTime, float maxEmit = _MAX_EMIT, bool destroy = true)
+        {
+            tk2dSprite sprite = base.GetComponent<tk2dSprite>();
+            sprite.usesOverrideMaterial = true;
+
+            for (float elapsed = 0f; elapsed < fadeInTime; elapsed += BraveTime.DeltaTime)
+            {
+                float percentDone = elapsed / fadeInTime;
+                base.gameObject.SetAlpha(percentDone);
+                yield return null;
+            }
+
+            sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+
+            for (float elapsed = 0f; elapsed < glowInTime; elapsed += BraveTime.DeltaTime)
+            {
+                float percentLeft = 1f - elapsed / glowInTime;
+                float quadraticEase = 1f - percentLeft * percentLeft;
+                sprite.renderer.material.SetFloat("_EmissivePower", maxEmit * quadraticEase);
+                yield return null;
+            }
+
+            for (float elapsed = 0f; elapsed < glowOutTime; elapsed += BraveTime.DeltaTime)
+            {
+                float percentDone = elapsed / glowOutTime;
+                float quadraticEase = 1f - percentDone * percentDone;
+                sprite.renderer.material.SetFloat("_EmissivePower", maxEmit * quadraticEase);
+                yield return null;
+            }
+
+            for (float elapsed = 0f; elapsed < fadeOutTime; elapsed += BraveTime.DeltaTime)
+            {
+                float percentDone = elapsed / fadeOutTime;
+                base.gameObject.SetAlpha(1f - percentDone);
+                yield return null;
+            }
+
+            if (destroy)
+                UnityEngine.Object.Destroy(base.gameObject);
+            else
+                base.gameObject.SetAlpha(1f);
+            yield break;
         }
     }
 }
