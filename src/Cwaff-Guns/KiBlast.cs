@@ -81,13 +81,6 @@ namespace CwaffingTheGungy
             _Vfx = VFX.CreatePoolFromVFXGameObject((ItemHelper.Get(Items.MagicLamp) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
         }
 
-        public override void Start()
-        {
-            base.Start();
-            // this.gun.spriteAnimator.Play(SpriteName+"_idle");
-            // gun.spriteAnimator.StopAndResetFrameToDefault();
-        }
-
         public override void OnSwitchedToThisGun()
         {
             base.OnSwitchedToThisGun();

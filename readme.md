@@ -8,9 +8,9 @@
 
 ### Features
 
-- 22 new guns 
-- 22 new passive items
-- 9 new active items
+- 25 new guns 
+- 23 new passive items
+- 11 new active items
 - Lore for all new guns and items
 - A new boss!
 - You can pet Junior \o/

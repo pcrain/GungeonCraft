@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.1.0 (2023-11-03)
+
+#### Features and Polish:
+- Added Aimu Hakurei, Seltzer Pelter, Missiletoe, Bubble Wand, Insurance Policy, and Ice Cream
+- Items can now be found in specialty shops (subshops), including support for modded shops (Planetside of Gunymede & Once More Into the Breach)
+- Added a few new sprites for Bullet Kin (they love ice cream :>)
+- All of the mod's guns now spawn with their idle animations playing by default (before, they would be stuck on the first frame)
+- Use a new, faster exponent approximation in a few places to reduce lag
+
+#### Balance Changes:
+- Ticonderogun's damage now scales inversely with the number of enemies encircled rather than inversely with circle size, resulting in higher damage on average
+- Dead ringer now has a short grace period after activating to make it less likely you will immediately lose your cloak
+- Halved max ammo of Schrodinger's Gat
+- [REDACTED]'s active item effect can now be triggered by either the active item button or the fire button
+
+#### Bugfixes:
+- Fixed Alyx magically replenishing all of its ammo when dropped and picked up again
+- Fixed an oversight where the contents of all chests could be replaced with a singular specific item rather than drawing from their normal loot table
+- Fixed incorrect impact effects playing on some projectiles
+- Updated to Alexandria 0.3.24 to fix co-op blank issue (thanks SomeBunny!)
+
 ## 1.0.4 (2023-10-21)
 
 - Fix custom dodge rolls not properly putting out fires
@@ -14,7 +35,7 @@
 
 ## 1.0.3 (2023-10-21)
 
-- Fix custom floor failing to load after returning to the Breach
+- Fix custom floor failing to load after returning to the Breach (thanks SomeBunny!)
 
 ## 1.0.2 (2023-10-20)
 

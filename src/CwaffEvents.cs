@@ -29,7 +29,6 @@ namespace CwaffingTheGungy
         public static Action OnFirstFloorFullyLoaded;
 
         internal static bool _OnFirstFloor = false;
-        // internal static Dict<
 
         public static void Init()
         {
