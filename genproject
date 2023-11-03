@@ -10,6 +10,7 @@ audiochecksums="./_${namespace}-checksums-audio" #file containing checksums of a
 externalupdate="./_${namespace}-externalupdate"  #file containing the last time an external resource was added
 audioupdate="./_${namespace}-audioupdate"        #file containing the last time an audio resource / csv was added / updated
 dllname="./bin/Debug/${projectname}.dll"         #DLL name is directly based on the project name
+dotnet35path="$(pwd)/_dotNETFramework/v3.5"      # Path to .NET 3.5 developer assemblies (from NUGet)
 USEXTERNALASSEMBLY=0                             #Whether to use the external Assembly-Csharp.dll or the one bundled in the source directory
 #Could not get the external assembly working ):
 projectversion="$(cat 'src/Common.cs' | grep 'MOD_VERSION' | cut -f 2 -d '"')"
@@ -37,7 +38,7 @@ pluginspritesdir="${plugindir}/sprites" #plugin sprite directory
   BLU="\e[1;34m"; MGN="\e[1;35m"; CYN="\e[1;36m"; WHT="\e[1;37m";
 
 #Variable tracking if anything actually needs to be rebuilt
-rebuild=0
+rebuild=1
 
 sources=()  #Array of source files
 includes=() #Array of items to include in the base project file
@@ -127,6 +128,12 @@ done <<< $(find "Resources" -type f -not -path "*.wav" -not -path "*.ogg" -not -
 #Unversioned EtG Unity Packages (skipping version numbers because there's no way to tell just by looking and it was causing problems)
 echo -e "[${GRN}>${BLN}] Scanning for EtG DLLs"
 while read -r line; do
+  basename="$(echo "${line}" | rev | cut -f1 -d $'\\' | rev)"
+  separated="$(echo "${line}" | sed -re 's@\\@/@g')"
+  newpath="./bin/Debug/${basename}"
+  if [ ! -e "$newpath" ]; then
+    /bin/cp "${separated}" "${newpath}"
+  fi
   includes+=("<Reference Include=\"$(echo "$line" | rev | cut -f 1 -d '\' | cut -f 2- -d '.' | rev)\"/>")
 done <<< $(find "packages/EtG.UnityEngine.1.0.0" -path "*.dll" | sed -r 's@/@\\@g')
 
@@ -135,6 +142,12 @@ echo -e "[${GRN}>${BLN}] Scanning for net35 DLLs"
 while read -r line; do
   if [ $USEXTERNALASSEMBLY -eq 1 ] && [[ "$line" =~ Assembly-CSharp ]]; then
     continue
+  fi
+  basename="$(echo "${line}" | rev | cut -f1 -d $'\\' | rev)"
+  separated="$(echo "${line}" | sed -re 's@\\@/@g')"
+  newpath="./bin/Debug/${basename}"
+  if [ ! -e "$newpath" ]; then
+    /bin/cp "${separated}" "${newpath}"
   fi
   includes+=("<Reference Include=\"$(echo "$line" | rev | cut -f 1 -d '\' | cut -f 2- -d '.' | rev)\"/>")
 done <<< $(find "packages" -path "*net35*.dll" | sed -r 's@/@\\@g')
@@ -164,7 +177,7 @@ fi
 #   echo "${lastmodifiedextern}" > "$externalupdate";
 # fi
 
-#Generate the template .csproj file
+#Generate the template .csproj file (FrameworkPathOverride points to the .NET 3.5 development packages)
 echo -e "[${GRN}>${BLN}] Generating .csproj template"
 template=`cat <<'HERE'
 <?xml version="1.0" encoding="utf-8"?>
@@ -184,6 +197,7 @@ template=`cat <<'HERE'
     <Deterministic>true</Deterministic>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <FrameworkPathOverride>%s</FrameworkPathOverride>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <LangVersion>latest</LangVersion>
@@ -228,7 +242,7 @@ echo -e "[${GRN}>${BLN}] Substituting .csproj template"
 #Get old checksum of generated csproj file
 oldchecksum="$(md5sum "$projfile" | cut -f 1 -d ' ')"
 #Invoke the substitution and create our projects file
-printf "$template" "$namespace" "$projectname" "$replace" | xmllint --format - > "${projfile}.new"
+printf "$template" "$namespace" "$projectname" "$dotnet35path" "$replace" | xmllint --format - > "${projfile}.new"
 #Get new checksum of generated csproj file
 newchecksum="$(md5sum "${projfile}.new" | cut -f 1 -d ' ')"
 
@@ -286,7 +300,9 @@ if [ $rebuild -eq 1 ]; then
 
   #Actually rebuild the project
   echo -e "[${GRN}>${BLN}] Building project"
-  msbuild -noLogo -warnAsMessage:"${nowarn}" -v:minimal -clp:"Summary;Verbosity=minimal"
+  dotnet build --no-restore -m -noLogo -warnAsMessage:"${nowarn}" -v:minimal -clp:"Summary"
+  # dotnet build -m -noLogo -warnAsMessage:"${nowarn}" -v:minimal -clp:"Summary;Verbosity=minimal"
+  # msbuild -m -noLogo -warnAsMessage:"${nowarn}" -v:minimal -clp:"Summary;Verbosity=minimal"
   if [ $? -gt 0 ]; then
     echo -e "[${RED}@${BLN}] Build failed! D: Check errors above"
     exit
