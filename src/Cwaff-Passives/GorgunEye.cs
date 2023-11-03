@@ -35,6 +35,7 @@ namespace CwaffingTheGungy
         {
             PickupObject item = Lazy.SetupPassive<GorgunEye>(ItemName, SpritePath, ShortDescription, LongDescription);
             item.quality      = PickupObject.ItemQuality.B;
+            item.AddToSubShop(ItemBuilder.ShopType.Cursula);
 
             _GorgunTint = new GameActorHealthEffect()
             {

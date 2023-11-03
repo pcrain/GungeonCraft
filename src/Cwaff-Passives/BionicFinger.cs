@@ -31,6 +31,7 @@ namespace CwaffingTheGungy
         {
             PickupObject item  = Lazy.SetupPassive<BionicFinger>(ItemName, SpritePath, ShortDescription, LongDescription);
             item.quality       = PickupObject.ItemQuality.C;
+            item.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
             _BionicFingerId   = item.PickupObjectId;
             _RemoveSemiautoCooldownILHook = new ILHook(

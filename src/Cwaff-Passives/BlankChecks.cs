@@ -26,6 +26,8 @@ namespace CwaffingTheGungy
         {
             PickupObject item  = Lazy.SetupPassive<BlankChecks>(ItemName, SpritePath, ShortDescription, LongDescription);
             item.quality       = PickupObject.ItemQuality.B;
+            item.AddToSubShop(ItemBuilder.ShopType.Cursula);
+            item.AddToSubShop(ItemBuilder.ShopType.OldRed);
         }
 
         public override void Pickup(PlayerController player)

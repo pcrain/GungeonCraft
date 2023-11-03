@@ -45,6 +45,7 @@ namespace CwaffingTheGungy
                 gun.SetAnimationFPS(gun.reloadAnimation, 20);
                 gun.SetAnimationFPS(gun.shootAnimation, 20);
                 gun.SetReloadAudio("alyx_reload_sound");
+                gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
             ProjectileModule mod = gun.DefaultModule;
                 mod.shootStyle          = ProjectileModule.ShootStyle.Automatic;

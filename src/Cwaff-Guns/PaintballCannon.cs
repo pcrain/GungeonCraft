@@ -31,7 +31,7 @@ namespace CwaffingTheGungy
                 gun.SetAnimationFPS(gun.reloadAnimation, 4);
                 gun.SetFireAudio("paintball_shoot_sound");
                 gun.SetReloadAudio("paintball_reload_sound");
-                // gun.gunSwitchGroup                       = (ItemHelper.Get(Items.TShirtCannon) as Gun).gunSwitchGroup;
+                gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
             ProjectileModule mod = gun.DefaultModule;
                 mod.ammoCost               = 1;

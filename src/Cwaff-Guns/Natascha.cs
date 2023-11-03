@@ -35,6 +35,7 @@ namespace CwaffingTheGungy
             Gun gun = Lazy.SetupGun<Natascha>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
                 gun.SetAttributes(quality: PickupObject.ItemQuality.D, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 2500);
                 gun.SetAnimationFPS(gun.shootAnimation, (int)((float)_FireAnimationFrames / _BaseCooldownTime) + 1);
+                gun.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
             ProjectileModule mod = gun.DefaultModule;
                 mod.ammoCost            = 1;

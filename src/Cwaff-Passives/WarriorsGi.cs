@@ -44,6 +44,7 @@ namespace CwaffingTheGungy
         {
             PickupObject item = Lazy.SetupPassive<WarriorsGi>(ItemName, SpritePath, ShortDescription, LongDescription);
             item.quality      = PickupObject.ItemQuality.B;
+            item.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
             _SaiyanSpark = VFX.RegisterVFXObject("SaiyanSpark", ResMap.Get("saiyan_spark"),
                 fps: 12, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);

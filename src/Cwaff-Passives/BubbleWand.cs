@@ -29,6 +29,7 @@ namespace CwaffingTheGungy
         {
             PickupObject item = Lazy.SetupPassive<BubbleWand>(ItemName, SpritePath, ShortDescription, LongDescription);
             item.quality      = PickupObject.ItemQuality.B;
+            item.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
             _BubbleWandId   = item.PickupObjectId;
             _BubbleWandHook = new Hook(

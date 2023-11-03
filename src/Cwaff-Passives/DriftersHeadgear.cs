@@ -31,6 +31,7 @@ namespace CwaffingTheGungy
         {
             PickupObject item = Lazy.SetupPassive<DriftersHeadgear>(ItemName, SpritePath, ShortDescription, LongDescription);
             item.quality      = PickupObject.ItemQuality.C;
+            item.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
             _LinkVFXPrefab = FakePrefab.Clone(Game.Items["shock_rounds"].GetComponent<ComplexProjectileModifier>().ChainLightningVFX)
                 .RegisterPrefab(deactivate: false);

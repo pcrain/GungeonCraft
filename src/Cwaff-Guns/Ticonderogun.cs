@@ -62,6 +62,7 @@ namespace CwaffingTheGungy
                 gun.SetAnimationFPS(gun.reloadAnimation, 1);
                 gun.SetAnimationFPS(gun.chargeAnimation, 24);
                 gun.AddStatToGun(PlayerStats.StatType.Curse, 2f, StatModifier.ModifyMethod.ADDITIVE);
+                gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
 
             ProjectileModule mod = gun.DefaultModule;
                 mod.ammoCost            = 0;

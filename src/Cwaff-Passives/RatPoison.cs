@@ -31,6 +31,7 @@ namespace CwaffingTheGungy
             item.quality                       = PickupObject.ItemQuality.C;
             item.IgnoredByRat                  = true;
             item.ClearIgnoredByRatFlagOnPickup = false;
+            item.AddToSubShop(ItemBuilder.ShopType.Cursula);
 
             ratPoisonId   = item.PickupObjectId;
             ratPoisonHook = new Hook(

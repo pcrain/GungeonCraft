@@ -32,6 +32,7 @@ namespace CwaffingTheGungy
         {
             PickupObject item = Lazy.SetupPassive<Blazer>(ItemName, SpritePath, ShortDescription, LongDescription);
             item.quality      = PickupObject.ItemQuality.A;
+            item.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
             _Boosts = new[] {
                 new StatModifier(){

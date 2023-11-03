@@ -38,6 +38,7 @@ namespace CwaffingTheGungy
                 gun.SetAnimationFPS(gun.reloadAnimation, 20);
                 gun.SetFireAudio("outbreak_shoot_sound");
                 gun.SetReloadAudio("outbreak_reload_sound");
+                gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
 
             ProjectileModule mod = gun.DefaultModule;
                 mod.ammoCost            = 1;

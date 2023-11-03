@@ -36,6 +36,7 @@ namespace CwaffingTheGungy
                 gun.SetAnimationFPS(gun.reloadAnimation, 24);
                 gun.SetFireAudio("knife_gun_launch");
                 gun.SetReloadAudio("knife_gun_reload");
+                gun.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
             ProjectileModule mod = gun.DefaultModule;
                 mod.ammoCost               = 1;

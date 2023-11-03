@@ -50,6 +50,7 @@ namespace CwaffingTheGungy
                     gun.SetGunAudio(name: animation, audio: "seltzer_shake_sound", frame: 42);
                     gun.SetGunAudio(name: animation, audio: "seltzer_insert_sound", frame: 42);
                 }
+                gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
             ProjectileModule mod = gun.DefaultModule;
                 mod.ammoCost            = 1;
