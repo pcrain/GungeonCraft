@@ -45,6 +45,7 @@ namespace CwaffingTheGungy
                 gun.SetAttributes(quality: PickupObject.ItemQuality.D, gunClass: GunClass.CHARGE, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true);
                 gun.SetAnimationFPS(gun.chargeAnimation, 16);
                 gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
+                gun.AddToSubShop(ModdedShopType.Rusty);
 
             ProjectileModule mod = gun.DefaultModule;
                 mod.shootStyle             = ProjectileModule.ShootStyle.Charged;

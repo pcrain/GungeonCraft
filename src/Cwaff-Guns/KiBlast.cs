@@ -40,6 +40,7 @@ namespace CwaffingTheGungy
                 gun.SetAnimationFPS(gun.idleAnimation, 10);
                 gun.SetAnimationFPS(gun.shootAnimation, 24);
                 gun.SetFireAudio("ki_blast_sound");
+                gun.AddToSubShop(ModdedShopType.Boomhildr);
 
             ProjectileModule mod = gun.DefaultModule;
                 mod.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;

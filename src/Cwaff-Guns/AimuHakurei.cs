@@ -51,6 +51,7 @@ namespace CwaffingTheGungy
                     ammo: 200, /*infiniteAmmo: true,*/ canGainAmmo: false, canReloadNoMatterAmmo: true);
                 gun.Volley.ModulesAreTiers = true;
                 gun.SetAnimationFPS(gun.shootAnimation, 60);
+                gun.AddToSubShop(ModdedShopType.TimeTrader);
 
             _BulletSprite = AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("aimu_projectile").Base(),

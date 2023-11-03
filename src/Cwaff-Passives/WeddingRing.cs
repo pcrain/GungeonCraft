@@ -35,6 +35,7 @@ namespace CwaffingTheGungy
         {
             PickupObject item  = Lazy.SetupPassive<WeddingRing>(ItemName, SpritePath, ShortDescription, LongDescription);
             item.quality       = PickupObject.ItemQuality.C;
+            item.AddToSubShop(ModdedShopType.Rusty);
         }
 
         public override void Pickup(PlayerController player)

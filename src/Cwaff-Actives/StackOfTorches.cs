@@ -41,6 +41,7 @@ namespace CwaffingTheGungy
         {
             PlayerItem item = Lazy.SetupActive<StackOfTorches>(ItemName, SpritePath, ShortDescription, LongDescription);
             item.quality    = PickupObject.ItemQuality.D;
+            item.AddToSubShop(ModdedShopType.Rusty);
 
             ItemBuilder.SetCooldownType(item, ItemBuilder.CooldownType.None, 0.1f);
             item.consumable   = true;

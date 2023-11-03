@@ -18,6 +18,7 @@ using GungeonAPI;
 using ItemAPI;
 using EnemyAPI;
 using SaveAPI;
+using NpcApi;
 
 namespace CwaffingTheGungy
 {
@@ -62,6 +63,7 @@ namespace CwaffingTheGungy
                 FakePrefabHooks.Init();
                 HUDController.Init(); // Need to load early
                 CustomAmmoDisplay.Init(); // Also need to load early
+                ModdedShopItemAdder.Init(); // Need to load after CwaffEvents.Init()
 
                 ItemBuilder.Init();
                 // SaveAPIManager.Setup("cg");
@@ -297,7 +299,6 @@ namespace CwaffingTheGungy
                 // }
                 // watch3.Stop();
                 // ETGModConsole.Log($"no sqrt = {watch3.ElapsedTicks} ticks");
-
             }
             catch (Exception e)
             {

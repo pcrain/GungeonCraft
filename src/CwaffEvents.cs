@@ -15,6 +15,7 @@ using MonoMod.RuntimeDetour;
 using Gungeon;
 using Dungeonator;
 using Alexandria.ItemAPI;
+using NpcApi;
 
 namespace CwaffingTheGungy
 {
@@ -28,6 +29,7 @@ namespace CwaffingTheGungy
         public static Action OnFirstFloorFullyLoaded;
 
         internal static bool _OnFirstFloor = false;
+        // internal static Dict<
 
         public static void Init()
         {

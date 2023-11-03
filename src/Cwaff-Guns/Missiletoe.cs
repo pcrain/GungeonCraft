@@ -62,6 +62,7 @@ namespace CwaffingTheGungy
                 gun.SetAnimationFPS(gun.reloadAnimation, 20);
                 gun.SetFireAudio("missiletoe_shoot_sound_1");
                 gun.SetReloadAudio("missiletoe_reload_sound");
+                gun.AddToSubShop(ModdedShopType.Boomhildr);
 
             ProjectileModule mod = gun.DefaultModule;
                 mod.ammoCost            = 1;

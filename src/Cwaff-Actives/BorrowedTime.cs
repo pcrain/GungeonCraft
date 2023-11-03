@@ -37,6 +37,7 @@ namespace CwaffingTheGungy
         {
             PlayerItem item = Lazy.SetupActive<BorrowedTime>(ItemName, SpritePath, ShortDescription, LongDescription);
             item.quality    = PickupObject.ItemQuality.C;
+            item.AddToSubShop(ModdedShopType.TimeTrader);
 
             ItemBuilder.SetCooldownType(item, ItemBuilder.CooldownType.Timed, 2);
             item.consumable   = false;

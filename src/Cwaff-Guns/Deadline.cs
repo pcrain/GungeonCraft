@@ -49,6 +49,8 @@ namespace CwaffingTheGungy
                 gun.SetAnimationFPS(gun.idleAnimation, 10);
                 gun.SetFireAudio("deadline_fire_sound");
                 gun.SetReloadAudio("deadline_fire_sound");
+                gun.AddToSubShop(ModdedShopType.TimeTrader);
+                gun.AddToSubShop(ModdedShopType.Boomhildr);
 
             ProjectileModule mod = gun.DefaultModule;
                 mod.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;

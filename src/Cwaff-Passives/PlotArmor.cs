@@ -31,6 +31,7 @@ namespace CwaffingTheGungy
             PickupObject item = Lazy.SetupPassive<PlotArmor>(ItemName, SpritePath, ShortDescription, LongDescription);
             item.quality      = PickupObject.ItemQuality.S;
             item.AddToSubShop(ItemBuilder.ShopType.Trorc);
+            item.AddToSubShop(ModdedShopType.Ironside);
         }
 
         public override void Update()

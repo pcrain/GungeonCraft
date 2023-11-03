@@ -41,6 +41,7 @@ namespace CwaffingTheGungy
         {
             PickupObject item  = Lazy.SetupPassive<AstralProjector>(ItemName, SpritePath, ShortDescription, LongDescription);
             item.quality       = PickupObject.ItemQuality.A;
+            item.AddToSubShop(ModdedShopType.TimeTrader);
 
             _AstralProjectorId   = item.PickupObjectId;
             // astralProjectorHook = new Hook(

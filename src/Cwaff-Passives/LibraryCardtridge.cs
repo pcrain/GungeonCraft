@@ -33,6 +33,7 @@ namespace CwaffingTheGungy
             PickupObject item  = Lazy.SetupPassive<LibraryCardtridge>(ItemName, SpritePath, ShortDescription, LongDescription);
             item.quality       = PickupObject.ItemQuality.D;
             item.AddToSubShop(ItemBuilder.ShopType.Flynt);
+            item.AddToSubShop(ModdedShopType.Talbert);
 
             // Add guids for book items to set
             _BookItemIDs = new();

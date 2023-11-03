@@ -37,6 +37,8 @@ namespace CwaffingTheGungy
                 gun.SetAnimationFPS(gun.reloadAnimation, 20);
                 gun.SetFireAudio("MC_RocsCape");
                 gun.SetReloadAudio("MC_Link_Grow");
+                gun.AddToSubShop(ModdedShopType.Boomhildr);
+                gun.AddToSubShop(ModdedShopType.Rusty);
 
             ProjectileModule mod = gun.DefaultModule;
                 mod.ammoCost               = 1;

@@ -36,6 +36,7 @@ namespace CwaffingTheGungy
                 gun.SetAttributes(quality: PickupObject.ItemQuality.D, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 2500);
                 gun.SetAnimationFPS(gun.shootAnimation, (int)((float)_FireAnimationFrames / _BaseCooldownTime) + 1);
                 gun.AddToSubShop(ItemBuilder.ShopType.Trorc);
+                gun.AddToSubShop(ModdedShopType.Rusty);
 
             ProjectileModule mod = gun.DefaultModule;
                 mod.ammoCost            = 1;
