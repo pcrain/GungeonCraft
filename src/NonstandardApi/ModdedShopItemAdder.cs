@@ -136,11 +136,11 @@ namespace CwaffingTheGungy
                     if (!_ModdedShopNameMap.ContainsKey(entry.Key))
                         continue;
 
-                    if (C.DEBUG_BUILD)
-                    {
-                        foreach(WeightedGameObject item in shopItems.GetCompiledRawItems())
-                            ETGModConsole.Log($"      contains {item.pickupId} == {PickupObjectDatabase.GetById(item.pickupId).EncounterNameOrDisplayName} with weight {item.weight}");
-                    }
+                    // if (C.DEBUG_BUILD)
+                    // {
+                    //     foreach(WeightedGameObject item in shopItems.GetCompiledRawItems())
+                    //         ETGModConsole.Log($"      contains {item.pickupId} == {PickupObjectDatabase.GetById(item.pickupId).EncounterNameOrDisplayName} with weight {item.weight}");
+                    // }
 
                     foreach(int itemToAdd in _ModdedShopItems[_ModdedShopNameMap[entry.Key]])
                     {

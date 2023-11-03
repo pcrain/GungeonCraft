@@ -37,10 +37,14 @@ namespace CwaffingTheGungy
 
             if (typeof(TItemClass) == typeof(Gun))
             {
+                // System.Diagnostics.Stopwatch tempWatch = System.Diagnostics.Stopwatch.StartNew();
                 string spriteName = spritePath; // TODO: guns use names, regular items use full paths -- should be made uniform eventually
                 Gun gun = ETGMod.Databases.Items.NewGun(itemName, spriteName);  //create a new gun using specified sprite name
                 Game.Items.Rename("outdated_gun_mods:"+baseItemName, IDs.InternalNames[itemName]);  //rename the gun for commands
+                // tempWatch.Stop(); ETGModConsole.Log($" setup 3 finished in "+(tempWatch.ElapsedMilliseconds/1000.0f)+" seconds"); tempWatch = System.Diagnostics.Stopwatch.StartNew();
+                // TODO: this is extremely slow the more sprites that get added, but I don't think there's anything I can do about it...probably...
                 gun.SetupSprite(null, spriteName+"_idle_001"); //set the gun's ammonomicon sprite
+                // tempWatch.Stop(); ETGModConsole.Log($" setup 4 finished in "+(tempWatch.ElapsedMilliseconds/1000.0f)+" seconds"); tempWatch = System.Diagnostics.Stopwatch.StartNew();
 
                 int projectileId = 0;
                 if (int.TryParse(projectileName, out projectileId))

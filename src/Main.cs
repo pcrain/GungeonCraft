@@ -129,6 +129,8 @@ namespace CwaffingTheGungy
                     BubbleWand.Init();
                 #endregion
 
+                // System.Diagnostics.Stopwatch tempWatch = System.Diagnostics.Stopwatch.StartNew();
+                // tempWatch.Stop(); ETGModConsole.Log($"part 1 finished in "+(tempWatch.ElapsedMilliseconds/1000.0f)+" seconds"); tempWatch = System.Diagnostics.Stopwatch.StartNew();
                 #region Guns
                     IronMaid.Add();
                     Natascha.Add();
@@ -172,6 +174,7 @@ namespace CwaffingTheGungy
                     SeltzerPelter.Add();
                     Missiletoe.Add();
                 #endregion
+                // tempWatch.Stop(); ETGModConsole.Log($"part 1 finished in "+(tempWatch.ElapsedMilliseconds/1000.0f)+" seconds"); tempWatch = System.Diagnostics.Stopwatch.StartNew();
 
                 #region Synergies
                     CwaffSynergies.Init();
