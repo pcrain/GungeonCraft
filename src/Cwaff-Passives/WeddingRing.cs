@@ -1,101 +1,100 @@
-namespace CwaffingTheGungy
+namespace CwaffingTheGungy;
+
+public class WeddingRing : PassiveItem
 {
-    public class WeddingRing : PassiveItem
+    public static string ItemName         = "Wedding Ring";
+    public static string SpritePath       = "wedding_ring_icon";
+    public static string ShortDescription = "Commitment";
+    public static string LongDescription  = "Every enemy killed without switching guns grants 1% boosts to damage, reload speed, and chance not to consume ammo, up to a maximum of 50% each. Boosts are reset upon firing another gun.\n\nWhether it is legal and/or ethical to marry a gun has been the topic of a surprising number of conversations in the Breach and the Gungeon, with the general consensus seeming to be: \"well...um...probably, yes, but it's weird as heck!\" Regardless of its legality, ethicality, or sanity, more than one Gungeoneer has slapped a wedding ring on their favorite gun. And whether attributable to the placebo effect, madness, or empirical results, these gunnymooners have reported that their loyalty brings out the best in both them and their guns.";
+
+    private const float _BONUS_PER_KILL     = 0.01f;
+    private const float _MAX_BONUS          = 1.50f;
+
+    private Gun            _committedGun    = null;
+    private StatModifier[] _commitmentBuffs = null;
+    private float          _commitmentMult  = 1.00f;
+    private int            _lastKnownAmmo   = 0;
+    private bool           _refundAmmo      = false;
+
+    public static void Init()
     {
-        public static string ItemName         = "Wedding Ring";
-        public static string SpritePath       = "wedding_ring_icon";
-        public static string ShortDescription = "Commitment";
-        public static string LongDescription  = "Every enemy killed without switching guns grants 1% boosts to damage, reload speed, and chance not to consume ammo, up to a maximum of 50% each. Boosts are reset upon firing another gun.\n\nWhether it is legal and/or ethical to marry a gun has been the topic of a surprising number of conversations in the Breach and the Gungeon, with the general consensus seeming to be: \"well...um...probably, yes, but it's weird as heck!\" Regardless of its legality, ethicality, or sanity, more than one Gungeoneer has slapped a wedding ring on their favorite gun. And whether attributable to the placebo effect, madness, or empirical results, these gunnymooners have reported that their loyalty brings out the best in both them and their guns.";
+        PickupObject item  = Lazy.SetupPassive<WeddingRing>(ItemName, SpritePath, ShortDescription, LongDescription);
+        item.quality       = PickupObject.ItemQuality.C;
+        item.AddToSubShop(ModdedShopType.Rusty);
+    }
 
-        private const float _BONUS_PER_KILL     = 0.01f;
-        private const float _MAX_BONUS          = 1.50f;
+    public override void Pickup(PlayerController player)
+    {
+        base.Pickup(player);
+        player.OnPreFireProjectileModifier += this.ChanceToRefundAmmo;
+        player.PostProcessProjectile += this.PostProcessProjectile;
+        player.OnKilledEnemy += this.OnKilledEnemy;
+        if (m_pickedUpThisRun)
+            return;
 
-        private Gun            _committedGun    = null;
-        private StatModifier[] _commitmentBuffs = null;
-        private float          _commitmentMult  = 1.00f;
-        private int            _lastKnownAmmo   = 0;
-        private bool           _refundAmmo      = false;
+        this.passiveStatModifiers = new StatModifier[] {
+            new StatModifier {
+                amount      = 1.00f,
+                statToBoost = PlayerStats.StatType.ReloadSpeed,
+                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE},
+            new StatModifier {
+                amount      = 1.00f,
+                statToBoost = PlayerStats.StatType.Damage,
+                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE},
+            new StatModifier {
+                amount      = 1.00f,
+                statToBoost = PlayerStats.StatType.DamageToBosses,
+                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE},
+        };
+    }
 
-        public static void Init()
-        {
-            PickupObject item  = Lazy.SetupPassive<WeddingRing>(ItemName, SpritePath, ShortDescription, LongDescription);
-            item.quality       = PickupObject.ItemQuality.C;
-            item.AddToSubShop(ModdedShopType.Rusty);
-        }
+    public override DebrisObject Drop(PlayerController player)
+    {
+        player.OnKilledEnemy -= this.OnKilledEnemy;
+        player.PostProcessProjectile -= this.PostProcessProjectile;
+        player.OnPreFireProjectileModifier -= this.ChanceToRefundAmmo;
+        UpdateCommitmentStats(player, reset: true);
+        return base.Drop(player);
+    }
 
-        public override void Pickup(PlayerController player)
-        {
-            base.Pickup(player);
-            player.OnPreFireProjectileModifier += this.ChanceToRefundAmmo;
-            player.PostProcessProjectile += this.PostProcessProjectile;
-            player.OnKilledEnemy += this.OnKilledEnemy;
-            if (m_pickedUpThisRun)
-                return;
+    private void UpdateCommitmentStats(PlayerController player, bool reset = false)
+    {
+        this._commitmentMult = reset ? 1.00f : Mathf.Min(this._commitmentMult + _BONUS_PER_KILL, _MAX_BONUS);
+        foreach (StatModifier stat in this.passiveStatModifiers)
+            stat.amount = (stat.statToBoost == PlayerStats.StatType.ReloadSpeed) ? (1.0f / this._commitmentMult) : this._commitmentMult;
+        player.stats.RecalculateStats(player);
+    }
 
-            this.passiveStatModifiers = new StatModifier[] {
-                new StatModifier {
-                    amount      = 1.00f,
-                    statToBoost = PlayerStats.StatType.ReloadSpeed,
-                    modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE},
-                new StatModifier {
-                    amount      = 1.00f,
-                    statToBoost = PlayerStats.StatType.Damage,
-                    modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE},
-                new StatModifier {
-                    amount      = 1.00f,
-                    statToBoost = PlayerStats.StatType.DamageToBosses,
-                    modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE},
-            };
-        }
+    private void OnKilledEnemy(PlayerController player)
+    {
+        UpdateCommitmentStats(player);
+    }
 
-        public override DebrisObject Drop(PlayerController player)
-        {
-            player.OnKilledEnemy -= this.OnKilledEnemy;
-            player.PostProcessProjectile -= this.PostProcessProjectile;
-            player.OnPreFireProjectileModifier -= this.ChanceToRefundAmmo;
-            UpdateCommitmentStats(player, reset: true);
-            return base.Drop(player);
-        }
+    private Projectile ChanceToRefundAmmo(Gun gun, Projectile projectile)
+    {
+        this._refundAmmo    = UnityEngine.Random.value < (this._commitmentMult - 1.00f);
+        this._lastKnownAmmo = (this.Owner as PlayerController).CurrentGun.CurrentAmmo;
+        return projectile;
+    }
 
-        private void UpdateCommitmentStats(PlayerController player, bool reset = false)
-        {
-            this._commitmentMult = reset ? 1.00f : Mathf.Min(this._commitmentMult + _BONUS_PER_KILL, _MAX_BONUS);
-            foreach (StatModifier stat in this.passiveStatModifiers)
-                stat.amount = (stat.statToBoost == PlayerStats.StatType.ReloadSpeed) ? (1.0f / this._commitmentMult) : this._commitmentMult;
-            player.stats.RecalculateStats(player);
-        }
+    private void PostProcessProjectile(Projectile proj, float effectChanceScalar)
+    {
+        if (this.Owner is not PlayerController player)
+            return;
+        if (player.CurrentGun == this._committedGun)
+            return;
 
-        private void OnKilledEnemy(PlayerController player)
-        {
-            UpdateCommitmentStats(player);
-        }
+        UpdateCommitmentStats(player, reset: true);
+        this._committedGun = player.CurrentGun;
+        this._refundAmmo = false;
+    }
 
-        private Projectile ChanceToRefundAmmo(Gun gun, Projectile projectile)
-        {
-            this._refundAmmo    = UnityEngine.Random.value < (this._commitmentMult - 1.00f);
-            this._lastKnownAmmo = (this.Owner as PlayerController).CurrentGun.CurrentAmmo;
-            return projectile;
-        }
+    private void LateUpdate()
+    {
+        if (!this._refundAmmo)
+            return;
 
-        private void PostProcessProjectile(Projectile proj, float effectChanceScalar)
-        {
-            if (this.Owner is not PlayerController player)
-                return;
-            if (player.CurrentGun == this._committedGun)
-                return;
-
-            UpdateCommitmentStats(player, reset: true);
-            this._committedGun = player.CurrentGun;
-            this._refundAmmo = false;
-        }
-
-        private void LateUpdate()
-        {
-            if (!this._refundAmmo)
-                return;
-
-            this._refundAmmo = false;
-            this._committedGun.CurrentAmmo = this._lastKnownAmmo;
-        }
+        this._refundAmmo = false;
+        this._committedGun.CurrentAmmo = this._lastKnownAmmo;
     }
 }

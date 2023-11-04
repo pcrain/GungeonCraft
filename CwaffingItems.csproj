@@ -99,7 +99,6 @@
     <Compile Include="src\Cwaff-Actives\GasterBlaster.cs"/>
     <Compile Include="src\Cwaff-Actives\InsurancePolicy.cs"/>
     <Compile Include="src\Cwaff-Actives\Itemfinder.cs"/>
-    <Compile Include="src\SharedEnemyBehaviors.cs"/>
     <Compile Include="src\Cwaff-Guns\VacuumCleaner.cs"/>
     <Compile Include="src\Cwaff-Guns\IronMaid.cs"/>
     <Compile Include="src\Cwaff-Guns\AimuHakurei.cs"/>

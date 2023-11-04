@@ -1,5 +1,5 @@
-﻿// namespace CwaffingTheGungy
-// {
+﻿// namespace CwaffingTheGungy;
+//
 //     public class HeadCannon : AdvancedGunBehavior
 //     {
 //         public static string gunName          = "Head Cannon";
@@ -135,4 +135,3 @@
 //             yield break;
 //         }
 //     }
-// }

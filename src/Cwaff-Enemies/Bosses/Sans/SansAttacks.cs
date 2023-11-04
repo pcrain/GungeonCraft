@@ -1,5 +1,4 @@
-namespace CwaffingTheGungy
-{
+namespace CwaffingTheGungy;
 
 public partial class SansBoss : AIActor
 {
@@ -742,6 +741,4 @@ public partial class SansBoss : AIActor
       return base.ContinuousUpdate();
     }
   }
-}
-
 }

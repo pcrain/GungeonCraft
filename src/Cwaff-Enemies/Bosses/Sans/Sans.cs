@@ -1,5 +1,5 @@
-namespace CwaffingTheGungy
-{
+namespace CwaffingTheGungy;
+
 public partial class SansBoss : AIActor
 {
   public  const  string BOSS_GUID              = "Sans Boss";
@@ -189,6 +189,4 @@ public partial class SansBoss : AIActor
     public override void EndIntro()
       { base.aiActor.GetComponent<BossBehavior>().FinishedIntro(); }
   }
-}
-
 }
