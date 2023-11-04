@@ -5,7 +5,7 @@ public class PlotArmor : PassiveItem
     public static string ItemName         = "Plot Armor";
     public static string SpritePath       = "plot_armor_icon";
     public static string ShortDescription = "Can't Die Yet";
-    public static string LongDescription  = $"Gain enough armor before every boss fight to have {_MIN_ARMOR} total armor ({_MIN_ARMOR+1} for zero-health characters). Always grants at least 1 armor.\n\nThe single most effective piece of armor ever created, under the right circumstances. The amount of protection it actually offers seems to vary from person to person over time, and the Gungeon's best blacksmiths are still trying to figure out how to fully harness the properties of \"plot\" to their advantage.";
+    public static string LongDescription  = $"Gain enough armor before every boss fight to have 3 total armor (4 for zero-health characters). Always grants at least 1 armor.\n\nThe single most effective piece of armor ever created, under the right circumstances. The amount of protection it actually offers seems to vary from person to person over time, and the Gungeon's best blacksmiths are still trying to figure out how to fully harness the properties of \"plot\" to their advantage.";
 
     internal const int _MIN_ARMOR = 3;
 
