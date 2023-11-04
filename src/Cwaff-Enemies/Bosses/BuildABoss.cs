@@ -1,19 +1,3 @@
-using System;
-using System.Collections.Generic;
-using Gungeon;
-using ItemAPI;
-using EnemyAPI;
-using UnityEngine;
-using System.Collections;
-using Dungeonator;
-using System.Linq;
-using Brave.BulletScript;
-using System.Text.RegularExpressions;
-using ResourceExtractor = ItemAPI.ResourceExtractor;
-using GungeonAPI;
-using System.Reflection;
-using MonoMod.RuntimeDetour;
-
 namespace CwaffingTheGungy
 {
   public enum Floors // Matches GlobalDungeonData.ValidTilesets

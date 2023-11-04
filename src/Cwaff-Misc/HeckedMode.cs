@@ -1,18 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-
-using UnityEngine;
-using MonoMod.RuntimeDetour;
-using MonoMod.Cil;
-using Mono.Cecil.Cil; //Instruction
-
-using ItemAPI;
-using Dungeonator;
-
 namespace CwaffingTheGungy
 {
     public static class HeckedMode

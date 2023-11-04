@@ -1,14 +1,3 @@
-using ItemAPI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Reflection;  //debug
-using System.ComponentModel;  //debug
-
-using UnityEngine;
-
-
 namespace CwaffingTheGungy
 {
     public static class CwaffTweaks

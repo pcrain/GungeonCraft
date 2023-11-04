@@ -1,20 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Reflection;
-
-using UnityEngine;
-using MonoMod.RuntimeDetour;
-using MonoMod.Cil;
-using Mono.Cecil.Cil; //Instruction
-
-using Gungeon;
-using Dungeonator;
-using Alexandria.ItemAPI;
-using Alexandria.Misc;
-
 namespace CwaffingTheGungy
 {
     public abstract class CustomAmmoDisplay : MonoBehaviour

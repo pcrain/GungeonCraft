@@ -1,17 +1,3 @@
-using System;
-using System.Collections;
-using System.Reflection;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
-using ItemAPI;
-using Dungeonator;
-using Pathfinding;
-using UnityEngine.SceneManagement;
-using GungeonAPI;
-using MonoMod.RuntimeDetour;
-
 namespace CwaffingTheGungy
 {
 

@@ -1,14 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-
-using UnityEngine;
-using MonoMod.RuntimeDetour;
-using Brave.BulletScript;
-
-using Dungeonator;
-using ItemAPI;
-
 namespace CwaffingTheGungy
 {
   public static class Extensions

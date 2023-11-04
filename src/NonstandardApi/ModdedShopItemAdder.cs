@@ -1,22 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Reflection;
-using System.ComponentModel;  //debug
-using System.IO;
-using System.Runtime.InteropServices; // audio loading
-using System.Text.RegularExpressions;
-
-using UnityEngine;
-using MonoMod.RuntimeDetour;
-
-using Gungeon;
-using Dungeonator;
-using Alexandria.ItemAPI;
-using NpcApi;
-
 namespace CwaffingTheGungy
 {
     /*
@@ -103,7 +84,7 @@ namespace CwaffingTheGungy
             foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 // See if the assembly contains a reference to the shop api
-                Type perModShopApi        = assembly.GetType("NpcApi.ItsDaFuckinShopApi");
+                Type perModShopApi        = assembly.GetType("NpcApi.ShopAPI");
                 Type perModShopController = assembly.GetType("NpcApi.CustomShopController");
                 if (perModShopApi == null || perModShopController == null)
                     continue;

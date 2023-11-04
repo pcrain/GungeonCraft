@@ -1,9 +1,3 @@
-using System.Collections.Generic;
-using System.Collections;
-
-using UnityEngine;
-using Brave.BulletScript;
-
 namespace CwaffingTheGungy
 {
 public partial class SansBoss : AIActor

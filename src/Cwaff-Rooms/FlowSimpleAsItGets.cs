@@ -1,8 +1,3 @@
-using Dungeonator;
-using System;
-using System.Collections.Generic;
-using UnityEngine;
-
 namespace CwaffingTheGungy {
 
     public class FlowSimpleAsItGets {

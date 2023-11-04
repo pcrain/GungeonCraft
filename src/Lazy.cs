@@ -1,21 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Reflection;
-using System.ComponentModel;  //debug
-using System.IO;
-using System.Runtime.InteropServices; // audio loading
-using System.Text.RegularExpressions;
-
-using UnityEngine;
-using MonoMod.RuntimeDetour;
-
-using Gungeon;
-using Dungeonator;
-using Alexandria.ItemAPI;
-
 namespace CwaffingTheGungy
 {
     public static class Lazy // all-purpose helper methods for being a lazy dumdum
@@ -41,10 +23,10 @@ namespace CwaffingTheGungy
                 string spriteName = spritePath; // TODO: guns use names, regular items use full paths -- should be made uniform eventually
                 Gun gun = ETGMod.Databases.Items.NewGun(itemName, spriteName);  //create a new gun using specified sprite name
                 Game.Items.Rename("outdated_gun_mods:"+baseItemName, IDs.InternalNames[itemName]);  //rename the gun for commands
-                // tempWatch.Stop(); ETGModConsole.Log($" setup 3 finished in "+(tempWatch.ElapsedMilliseconds/1000.0f)+" seconds"); tempWatch = System.Diagnostics.Stopwatch.StartNew();
                 // TODO: this is extremely slow the more sprites that get added, but I don't think there's anything I can do about it...probably...
+                // System.Diagnostics.Stopwatch tempWatch = System.Diagnostics.Stopwatch.StartNew();
                 gun.SetupSprite(null, spriteName+"_idle_001"); //set the gun's ammonomicon sprite
-                // tempWatch.Stop(); ETGModConsole.Log($" setup 4 finished in "+(tempWatch.ElapsedMilliseconds/1000.0f)+" seconds"); tempWatch = System.Diagnostics.Stopwatch.StartNew();
+                // tempWatch.Stop(); Console.Write($"  setup gun sprites in "+tempWatch.ElapsedTicks+" ticks");
 
                 int projectileId = 0;
                 if (int.TryParse(projectileName, out projectileId))

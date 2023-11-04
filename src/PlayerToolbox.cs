@@ -1,17 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-
-using UnityEngine;
-using MonoMod.RuntimeDetour;
-
-using ItemAPI;
-// using SaveAPI;
-using Dungeonator;
-
 namespace CwaffingTheGungy
 {
     public static class PlayerToolsSetup  // hooks and stuff for PlayerControllers on game start

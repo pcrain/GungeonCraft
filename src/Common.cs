@@ -1,23 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Reflection;
-using System.ComponentModel;  //debug
-using System.IO;
-using System.Runtime.InteropServices; // audio loading
-using System.Text.RegularExpressions;
-
-using UnityEngine;
-using MonoMod.RuntimeDetour;
-using MonoMod.Cil;
-using Mono.Cecil.Cil; //Instruction
-
-using Gungeon;
-using Dungeonator;
-using Alexandria.ItemAPI;
-
 namespace CwaffingTheGungy
 {
     public class C // constants

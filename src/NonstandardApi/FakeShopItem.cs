@@ -1,17 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Reflection;
-
-using UnityEngine;
-
-using Gungeon;
-using Dungeonator;
-using ItemAPI;
-// using SaveAPI;
-
 namespace CwaffingTheGungy
 {
   public class FakeShopItem : BraveBehaviour, IPlayerInteractable

@@ -1,16 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Reflection;
-
-using UnityEngine;
-
-using NpcApi;
-using ItemAPI;
-// using SaveAPI;
-
 namespace CwaffingTheGungy
 {
     public struct SimpleAnimationData
@@ -81,11 +68,11 @@ namespace CwaffingTheGungy
                         animNames.Add(ad.animName);
                     }
 
-                AIAnimator aIAnimator = ItsDaFuckinShopApi.GenerateBlankAIAnimator(npcObj);
+                AIAnimator aIAnimator = ShopAPI.GenerateBlankAIAnimator(npcObj);
                     aIAnimator.spriteAnimator  = spriteAnimator;
                     aIAnimator.OtherAnimations = Lazy.EasyNamedDirectionalAnimations(animNames.ToArray());
 
-                SpeculativeRigidbody rigidbody = ItsDaFuckinShopApi.GenerateOrAddToRigidBody(npcObj, CollisionLayer.BulletBlocker, PixelCollider.PixelColliderGeneration.Manual, true, true, true, false, false, false, false, true, new IntVector2(20, 18), new IntVector2(5, 0));
+                SpeculativeRigidbody rigidbody = ShopAPI.GenerateOrAddToRigidBody(npcObj, CollisionLayer.BulletBlocker, PixelCollider.PixelColliderGeneration.Manual, true, true, true, false, false, false, false, true, new IntVector2(20, 18), new IntVector2(5, 0));
 
                 FancyNPC ci = npcObj.AddComponent<T>() as FancyNPC;
                     ci.talkPointAdjustment = talkPointAdjust.HasValue ? talkPointAdjust.Value : Vector3.zero;

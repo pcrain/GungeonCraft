@@ -1,16 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
-using Gungeon;
-using Dungeonator;
-using System.Reflection;
-using ItemAPI;
-using System.Collections;
-using System.Globalization;
-
-namespace CwaffingTheGungy
+﻿namespace CwaffingTheGungy
 {
     class HatDefinitions
     {

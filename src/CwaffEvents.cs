@@ -1,22 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Reflection;
-using System.ComponentModel;  //debug
-using System.IO;
-using System.Runtime.InteropServices; // audio loading
-using System.Text.RegularExpressions;
-
-using UnityEngine;
-using MonoMod.RuntimeDetour;
-
-using Gungeon;
-using Dungeonator;
-using Alexandria.ItemAPI;
-using NpcApi;
-
 namespace CwaffingTheGungy
 {
     public static class CwaffEvents // global custom events we can listen for

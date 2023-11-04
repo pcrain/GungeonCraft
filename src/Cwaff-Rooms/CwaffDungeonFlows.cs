@@ -1,12 +1,3 @@
-// using ExpandUtilities;
-// using ExpandPrefab;
-using Dungeonator;
-using System;
-using System.Collections.Generic;
-using UnityEngine;
-using System.Reflection;
-using MonoMod.RuntimeDetour;
-
 // Stealing from ApacheThunder this time .o.
 namespace CwaffingTheGungy {
     

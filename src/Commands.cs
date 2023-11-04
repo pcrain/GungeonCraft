@@ -1,18 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections;
-using System.Reflection;
-
-using UnityEngine;
-using MonoMod.RuntimeDetour;
-using MonoMod.Cil;
-using Mono.Cecil.Cil; //Instruction
-
-// using SaveAPI;
-
-namespace CwaffingTheGungy
+﻿namespace CwaffingTheGungy
 {
     public class Commands
     {
@@ -99,7 +85,7 @@ namespace CwaffingTheGungy
                 PlayerController p1 = GameManager.Instance.PrimaryPlayer;
                 // TalkDoer td = new TalkDoer();
                 // td.BeginConversation(p1);
-                // GameObject go = ItsDaFuckinShopApi.SetUpGenericNpc(
+                // GameObject go = ShopAPI.SetUpGenericNpc(
                 //     "Boomhildr",
                 //      "cg",
                 //      new List<string>() {

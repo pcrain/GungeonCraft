@@ -1,10 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-
-using UnityEngine;
-
-using Dungeonator;
-
 namespace CwaffingTheGungy
 {
     // GUIDs for various enemies (notes by NN)

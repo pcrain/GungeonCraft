@@ -1,24 +1,44 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Reflection;
-using System.Runtime;
+﻿#region Global Usings
+    global using System;
+    global using System.Collections;
+    global using System.Collections.Generic;
+    global using System.Linq;
+    global using System.Text;
+    global using System.Text.RegularExpressions;
+    global using System.Reflection;
+    global using System.Runtime;
+    global using System.Collections.ObjectModel;
+    global using System.IO;
+    global using System.Globalization; // CultureInfo
+    global using System.ComponentModel;  // Debug stuff
+    global using System.Runtime.InteropServices; // Audio loading
 
-using System.Collections.ObjectModel;
-using System.IO;
+    global using BepInEx;
+    global using UnityEngine;
+    global using UnityEngine.UI;
+    global using UnityEngine.Events; // UnityEventBase
+    global using MonoMod.RuntimeDetour;
+    global using MonoMod.Utils;
+    global using MonoMod.Cil;
+    global using Mono.Cecil.Cil; //Instruction
+    global using SGUI;
+    global using FullSerializer;
+    // global using ETGGUI; // unneeded???
 
-using BepInEx;
-using UnityEngine;
-using MonoMod.RuntimeDetour;
-using MonoMod.Utils;
+    global using Gungeon;
+    global using Dungeonator;
+    global using Alexandria.ItemAPI;
+    global using Alexandria.EnemyAPI;
+    global using Alexandria.Misc;
+    global using Alexandria.NPCAPI;
+    global using Brave.BulletScript;
 
-using GungeonAPI;
-using ItemAPI;
-using EnemyAPI;
-using SaveAPI;
-using NpcApi;
+    // global using SaveAPI; // only nonstandard api copied in from elsewhere, hopefully Alexandria standardizes this eventually
+#endregion
+
+global using ResourceExtractor = Alexandria.ItemAPI.ResourceExtractor;
+global using Component         = UnityEngine.Component;
+global using ShopAPI           = Alexandria.NPCAPI.ShopAPI;
 
 namespace CwaffingTheGungy
 {
@@ -56,8 +76,8 @@ namespace CwaffingTheGungy
                 ResMap.Build();
 
                 //Tools and Toolboxes
-                StaticReferences.Init();
-                Tools.Init();
+                // StaticReferences.Init();
+                // Tools.Init();
                 CwaffEvents.Init();
 
                 FakePrefabHooks.Init();

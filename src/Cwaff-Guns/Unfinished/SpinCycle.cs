@@ -1,19 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Reflection;
-
-using UnityEngine;
-using MonoMod.RuntimeDetour;
-
-using Gungeon;
-using Dungeonator;
-using Alexandria.ItemAPI;
-using Alexandria.Misc;
-
-/*
+﻿/*
     - figure out projectile interpolation so it doesn't whiff when moving too fast
         (hack for now, just make projectile bigger)
     - add visuals for the chains

@@ -1,20 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Reflection;
-
-using UnityEngine;
-using UnityEngine.UI;
-using MonoMod.RuntimeDetour;
-
-using Gungeon;
-using Dungeonator;
-using Alexandria.ItemAPI;
-using Alexandria.Misc;
-
-namespace CwaffingTheGungy
+﻿namespace CwaffingTheGungy
 {
     public class DeathNote : AdvancedGunBehavior
     {

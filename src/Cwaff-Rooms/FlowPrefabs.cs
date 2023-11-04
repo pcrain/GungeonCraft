@@ -1,10 +1,3 @@
-using Dungeonator;
-using System;
-using System.Collections.Generic;
-using UnityEngine;
-using System.Reflection;
-using FullInspector;
-
 namespace CwaffingTheGungy {
 
     // yay stolen code (thanks apache)

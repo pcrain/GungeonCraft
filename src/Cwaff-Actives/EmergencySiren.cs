@@ -1,19 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel; // ReadOnlyCollection
-using System.Linq;
-using System.Text;
-using System.Reflection;
-
-using UnityEngine;
-using MonoMod.RuntimeDetour;
-
-using Gungeon;
-using Dungeonator;
-using Alexandria.ItemAPI;
-using Alexandria.Misc;
-
 namespace CwaffingTheGungy
 {
     class EmergencySiren : PlayerItem
