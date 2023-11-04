@@ -35,6 +35,7 @@ public class HandCannon : AdvancedGunBehavior
             mod.angleVariance       = 15.0f;
             mod.cooldownTime        = 0.1f;
             mod.numberOfShotsInClip = 2;
+            mod.SetupCustomAmmoClip(SpriteName);
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("slappp").Base(),

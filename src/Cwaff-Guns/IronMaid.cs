@@ -29,6 +29,7 @@ public class IronMaid : AdvancedGunBehavior
             mod.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
             mod.cooldownTime           = 0.1f;
             mod.numberOfShotsInClip    = 20;
+            mod.SetupCustomAmmoClip(SpriteName);
 
         _KunaiSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("kunai").Base(),

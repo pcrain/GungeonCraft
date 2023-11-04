@@ -820,4 +820,11 @@ public static class Extensions
     self.m_behaviors.Clear();
     self.RefreshBehaviors();
   }
+
+  // Set up custom ammo types from default resource paths
+  public static void SetupCustomAmmoClip(this ProjectileModule mod, string clipname)
+  {
+      mod.ammoType       = GameUIAmmoType.AmmoType.CUSTOM;
+      mod.customAmmoType = CustomClipAmmoTypeToolbox.AddCustomAmmoType($"{clipname}_clip", ResMap.Get($"{clipname}_clipfull")[0], ResMap.Get($"{clipname}_clipempty")[0]);
+  }
 }

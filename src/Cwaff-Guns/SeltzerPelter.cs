@@ -43,6 +43,7 @@ public class SeltzerPelter : AdvancedGunBehavior
             mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
             mod.cooldownTime        = 0.5f;
             mod.numberOfShotsInClip = 1;
+            mod.SetupCustomAmmoClip(SpriteName);
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("can_projectile").Base(),

@@ -31,10 +31,11 @@ public class SchrodingersGat : AdvancedGunBehavior
             mod.angleVariance       = 15.0f;
             mod.cooldownTime        = 0.125f;
             mod.numberOfShotsInClip = -1;
+            mod.SetupCustomAmmoClip(SpriteName);
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
-            ResMap.Get("schrodinger_bullet").Base(),
-            12, true, new IntVector2(7, 5),
+            ResMap.Get("schrodingers_gat_projectile").Base(),
+            12, true, new IntVector2(8, 7),
             false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);

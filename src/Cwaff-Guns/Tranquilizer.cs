@@ -26,10 +26,11 @@ public class Tranquilizer : AdvancedGunBehavior
             mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
             mod.cooldownTime        = 0.1f;
             mod.numberOfShotsInClip = 1;
+            mod.SetupCustomAmmoClip(SpriteName);
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("tranquilizer_projectile").Base(),
-            12, true, new IntVector2(13, 9),
+            12, true, new IntVector2(10, 3),
             false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);

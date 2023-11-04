@@ -30,6 +30,7 @@ public class Grandmaster : AdvancedGunBehavior
             mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
             mod.cooldownTime        = 0.1f;
             mod.numberOfShotsInClip = 20;
+            mod.SetupCustomAmmoClip(SpriteName);
 
         _PawnSprite   = AnimateBullet.CreateProjectileAnimation(ResMap.Get("chess_pawn").Base(), 12, true, new IntVector2(8, 12), false,
             tk2dBaseSprite.Anchor.MiddleCenter, true, true);

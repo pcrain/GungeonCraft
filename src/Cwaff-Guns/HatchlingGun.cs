@@ -30,6 +30,7 @@ public class HatchlingGun : AdvancedGunBehavior
             mod.angleVariance       = 15.0f;
             mod.cooldownTime        = 0.2f;
             mod.numberOfShotsInClip = 12;
+            mod.SetupCustomAmmoClip(SpriteName);
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("egg").Base(),

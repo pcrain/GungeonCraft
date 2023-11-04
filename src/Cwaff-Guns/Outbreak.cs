@@ -31,10 +31,11 @@ public class Outbreak : AdvancedGunBehavior
             mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
             mod.cooldownTime        = 0.2f;
             mod.numberOfShotsInClip = 10;
+            mod.SetupCustomAmmoClip(SpriteName);
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("outbreak_projectile").Base(),
-            12, true, new IntVector2(12, 12),
+            12, true, new IntVector2(8, 7),
             false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);

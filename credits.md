@@ -15,6 +15,7 @@ I have no artistic talent beyond making minor sprite and sound edits, so all bas
 	- mrgranade's game, [Raining Blood](https://store.steampowered.com/app/2147530/Raining_Blood_Hellfire/)
 	- [Terraria](https://terraria.wiki.gg/wiki/Guns) and many of its various mods including (but probably not limited to) [Tremor](https://tremormod.fandom.com/wiki/Weapons#Guns), [Exodus](https://exodusmod.fandom.com/wiki/Weapons#Guns), [The Spirit Mod](https://spiritmod.wiki.gg/wiki/Weapons#Guns), [Calamity](https://calamitymod.fandom.com/wiki/Guns), [Thorium](https://thoriummod.fandom.com/wiki/Guns), [Shadows of Abaddon](https://shadowsofabaddon.wiki.gg/wiki/Weapons#Guns), and [Mod of Redemption](https://modofredemption.wiki.gg/wiki/Weapons#Guns)
 	- Most animation edits are my own, but probably aren't as good as the animations of the guns in their respective games / mods, so please check the original sources out!
+* Several custom clip and projectiles sprites by [Lynceus](https://enter-the-gungeon.thunderstore.io/package/Lynceus/The_Captain_Custom_Character/) from the Mod the Gungeon Discord
 * Item sprites by [Dallan](https://enter-the-gungeon.thunderstore.io/package/Dallan/Breach_Renovations/) from the Mod the Gungeon Discord, and from various games including Knights in the Nightmare, Blaze Union, Pokemon, Dragonball Z: Buu's Fury, and Minecraft
 * [SPOILERS] boss sprites [by askywalker from Spriter's Resource](https://www.spriters-resource.com/custom_edited/undertalecustoms/sheet/126792/)
 * [SPOILERS] boss card art [by synistersyrup from DeviantArt](https://www.deviantart.com/synistersyrup/art/Sans-Uses-Flirt-665517108)
@@ -29,5 +30,6 @@ I have no artistic talent beyond making minor sprite and sound edits, so all bas
 ## Special Thanks
 
 - NeverNamed, for making [Once More Into the Breach](https://enter-the-gungeon.thunderstore.io/package/Nevernamed/Once_More_Into_The_Breach/) and providing a very useful code base to reference as I was learning to mod Enter the Gungeon
-- [ApacheThunder](https://enter-the-gungeon.thunderstore.io/package/ApacheThunder/ExpandTheGungeon/) and [SpecialAPI](https://enter-the-gungeon.thunderstore.io/package/SpecialAPI/SpecialAPIs_Stuff/), for answering a lot of questions and troubleshooting a lot of issues related to Gungeon modding and Unity in general
-- Dallan, Dulsam, June, Lynceus, Neighborino, QAday, Skilotar, Some Bunny, and the rest of the Mod the Gungeon Discord, for general help, friendly chat, and moral support. You are all beautiful people and I love you all <3 :D
+- [ApacheThunder](https://enter-the-gungeon.thunderstore.io/package/ApacheThunder/ExpandTheGungeon/), [SpecialAPI](https://enter-the-gungeon.thunderstore.io/package/SpecialAPI/SpecialAPIs_Stuff/), and [Some Bunny](https://enter-the-gungeon.thunderstore.io/package/TeamPlanetside/Planetside_Of_Gunymede_PreRelease/) for answering a lot of questions and troubleshooting a lot of issues related to Gungeon modding and Unity in general
+- Lynceus, for generously donating time and effort to making a bunch of beautiful custom clip and projectile sprites, in addition to helping beta test the mod and find a few bugs
+- Dallan, Dulsam, June, Lichton, Neighborino, QAday, Skilotar, and the rest of the Mod the Gungeon Discord, for general help, friendly chat, and moral support. You are all beautiful people and I love you all <3 :D
