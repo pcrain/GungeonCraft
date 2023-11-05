@@ -4,50 +4,50 @@ public class HatUtility
 {
     public static void NecessarySetup()
     {
-        ETGModConsole.Commands.AddGroup("nn", delegate (string[] args)
-        {
-            ETGModConsole.Log("<size=100><color=#ff0000ff>Please specify a command. Type 'nn help' for a list of commands.</color></size>", false);
-        });
-        ETGModConsole.Commands.GetGroup("nn").AddUnit("sethat", delegate (string[] args)
-        {
-            if (args == null)
-                ETGModConsole.Log("<size=100><color=#ff0000ff>Please Specify a Hat</color></size>", false);
-            else
-            {
-                if (args[0] == "none")
-                {
-                    PlayerController playa = GameManager.Instance.PrimaryPlayer;
-                    HatController HatCont = playa.GetComponent<HatController>();
-                    if (HatCont)
-                    {
-                        if (HatCont.CurrentHat != null)
-                        {
-                            HatCont.RemoveCurrentHat();
-                            ETGModConsole.Log("Hat Removed", false);
-                        }
-                        else ETGModConsole.Log("No Hat to remove!", false);
-                    }
-                }
-                else
-                {
-                    string processedHatName = args[0].Replace("_", " ");
-                    processedHatName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(processedHatName.ToLower());
+        // ETGModConsole.Commands.AddGroup("hats", delegate (string[] args)
+        // {
+        //     ETGModConsole.Log("<size=100><color=#ff0000ff>Please specify a command. Type 'hats help' for a list of commands.</color></size>", false);
+        // });
+        // ETGModConsole.Commands.GetGroup("hats").AddUnit("sethat", delegate (string[] args)
+        // {
+        //     if (args == null)
+        //         ETGModConsole.Log("<size=100><color=#ff0000ff>Please Specify a Hat</color></size>", false);
+        //     else
+        //     {
+        //         if (args[0] == "none")
+        //         {
+        //             PlayerController playa = GameManager.Instance.PrimaryPlayer;
+        //             HatController HatCont = playa.GetComponent<HatController>();
+        //             if (HatCont)
+        //             {
+        //                 if (HatCont.CurrentHat != null)
+        //                 {
+        //                     HatCont.RemoveCurrentHat();
+        //                     ETGModConsole.Log("Hat Removed", false);
+        //                 }
+        //                 else ETGModConsole.Log("No Hat to remove!", false);
+        //             }
+        //         }
+        //         else
+        //         {
+        //             string processedHatName = args[0].Replace("_", " ");
+        //             processedHatName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(processedHatName.ToLower());
 
-                    if (HatLibrary.Hats.ContainsKey(processedHatName))
-                    {
-                        PlayerController playa = GameManager.Instance.PrimaryPlayer;
-                        HatController HatCont = playa.GetComponent<HatController>();
-                        if (HatCont)
-                        {
-                            HatCont.SetHat(HatLibrary.Hats[processedHatName]);
-                            ETGModConsole.Log("Hat set to: " + processedHatName, false);
-                        }
-                        else ETGModConsole.Log("<size=100><color=#ff0000ff>Error: No HatController found.</color></size>", false);
-                    }
-                    else ETGModConsole.Log("<size=100><color=#ff0000ff>Error: Hat '</color></size>" + processedHatName + "<size=100><color=#ff0000ff>' not found in Hatabase</color></size>", false);
-                }
-            }
-        });
+        //             if (HatLibrary.Hats.ContainsKey(processedHatName))
+        //             {
+        //                 PlayerController playa = GameManager.Instance.PrimaryPlayer;
+        //                 HatController HatCont = playa.GetComponent<HatController>();
+        //                 if (HatCont)
+        //                 {
+        //                     HatCont.SetHat(HatLibrary.Hats[processedHatName]);
+        //                     ETGModConsole.Log("Hat set to: " + processedHatName, false);
+        //                 }
+        //                 else ETGModConsole.Log("<size=100><color=#ff0000ff>Error: No HatController found.</color></size>", false);
+        //             }
+        //             else ETGModConsole.Log("<size=100><color=#ff0000ff>Error: Hat '</color></size>" + processedHatName + "<size=100><color=#ff0000ff>' not found in Hatabase</color></size>", false);
+        //         }
+        //     }
+        // });
     }
     public static void SetupHatSprites(List<string> spritePaths, GameObject hatObj, int fps, Vector2 hatSize)
     {

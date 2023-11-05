@@ -1,4 +1,4 @@
-﻿#region Global Usings
+#region Global Usings
     global using System;
     global using System.Collections;
     global using System.Collections.Generic;
@@ -99,8 +99,8 @@ public class Initialisation : BaseUnityPlugin
             EasyGoopDefinitions.DefineDefaultGoops();
 
             //Hats
-            HatUtility.NecessarySetup();
-            HatDefinitions.Init();
+            // HatUtility.NecessarySetup();
+            // HatDefinitions.Init();
 
             //Commands and Other Console Utilities
             Commands.Init();
