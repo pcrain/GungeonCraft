@@ -57,6 +57,7 @@ echo -e "[${GRN}>${BLN}] Checking for changes to audio files"
 lastmodifiedaudio="$(find "Resources" -type f -path "*.wav" -o -path "*.csv" -printf "%T+\n" | sort -nr | head -n 1)"
 # lastmodifiedaudio="$(find "Resources" -type f -path "*.wav" -o -type f -path "*.ogg" -o -path "*.csv" -printf "%T+\n" | sort -nr | head -n 1)"
 updateaudio=0
+audiodata=""
 if [ ! -e "./Resources/Sounds/${namespace}.bnk" ]; then
   echo -e "[${GRN}>${BLN}]   Audio bank does not exist, regenerating sound bank"
   updateaudio=1
@@ -66,25 +67,18 @@ elif [ ! -e "${audiochecksums}" ]; then
 # elif [ "${lastmodifiedaudio}" == "$(cat "$audioupdate")" ]; then
 #   updateaudio=0 #todo: this doesn't work for newly-added files with old modification times
 else
-  #Checksum all files in the audio directory, then take a checksum of the checksum file
-  #  and compare it to the existing checksum file
-  find "Resources/Sounds/" -type f \
-    -path "*.wav" -exec md5sum '{}' \; -o \
-    -path "*.csv" -exec md5sum '{}' \; >> "${audiochecksums}.new"
-    # -path "*.ogg" -exec md5sum '{}' \; -o \
-
-  c1="$(md5sum "${audiochecksums}" | cut -f 1 -d ' ')"
-  c2="$(md5sum "${audiochecksums}.new" | cut -f 1 -d ' ')"
-  if [[ "${c1}" != "${c2}" ]]; then
+  audiodata="$(/bin/ls -Al "Resources/Sounds/" | grep -vE "(^total|.bnk$)")"
+  oldaudiodata="$(cat "${audiochecksums}")"
+  if [[ "${audiodata}" != "${oldaudiodata}" ]]; then
     echo -e "[${GRN}>${BLN}]   At least one audio file was changed, rebuilding sound bank and project"
-    diff "${audiochecksums}" "${audiochecksums}.new"
     updateaudio=1
   else
     echo -e "[${GRN}>${BLN}]   No audio files changed, skipping sound bank generation"
   fi
-  /bin/rm "${audiochecksums}.new"
   echo "${lastmodifiedaudio}" > "$audioupdate";
 fi
+
+[ -z "$audiodata" ] && audiodata="$(/bin/ls -Al "Resources/Sounds/" | grep -vE "(^total|.bnk$)")"
 
 if [ $updateaudio -eq 1 ]; then
   rebuild=1
@@ -92,11 +86,7 @@ if [ $updateaudio -eq 1 ]; then
   ./gen-gungeon-audio-bank.py -Ovr -s "./Resources/Sounds/sound_info.csv" "./Resources/Sounds" "${namespace}"
 
   echo -e "[${GRN}>${BLN}]   Regenerating checksums for audio files"
-  /bin/rm -f "${audiochecksums}"
-  while read -r afile; do
-    echo "$(md5sum "${afile}")" >> "${audiochecksums}"
-  done <<< $(find "Resources/Sounds" -type f -path "*.wav" -o -path "*.csv")
-  # done <<< $(find "Resources/Sounds" -type f -path "*.wav" -o -type f -path "*.ogg" -o -path "*.csv")
+  echo "$audiodata" > "${audiochecksums}"
 fi
 
 #Source files
@@ -119,13 +109,6 @@ while read -r line; do
   includes+=("<EmbeddedResource Include=\"${line}\" />")
 done <<< $(find "Resources" -type f -not -path "*.wav" -not -path "*.ogg" -not -path "*.csv" | sed -r 's@/@\\@g')
 
-#External Embedded resources (technically duplicates external resources internally; should deprecate later)
-# echo -e "[${GRN}>${BLN}] Scanning for external resources"
-# while read -r line; do
-#   [ -z "$line" ] && continue;
-#   includes+=("<EmbeddedResource Include=\"${line}\" />")
-# done <<< $(find "ResourcesExternal" -type f -not -path "*.wav" -not -path "*.csv" | sed -r 's@/@\\@g')
-
 #Unversioned EtG Unity Packages (skipping version numbers because there's no way to tell just by looking and it was causing problems)
 echo -e "[${GRN}>${BLN}] Scanning for EtG DLLs"
 while read -r line; do
@@ -137,8 +120,8 @@ while read -r line; do
       /bin/cp "${separated}" "${newpath}"
     fi
   fi
-  includes+=("<Reference Include=\"$(echo "$line" | rev | cut -f 1 -d '\' | cut -f 2- -d '.' | rev)\"/>")
-done <<< $(find "packages/EtG.UnityEngine.1.0.0" -path "*.dll" | sed -r 's@/@\\@g')
+  includes+=("<Reference Include=\"${line}\"/>")
+done <<< $(find "packages/EtG.UnityEngine.1.0.0" -path "*.dll" | sed -r 's@^.*(UnityEngine(\..+)?).dll@\1@g')
 
 #Versioned packages, net35
 echo -e "[${GRN}>${BLN}] Scanning for net35 DLLs"
@@ -164,23 +147,6 @@ if [ $USEXTERNALASSEMBLY -eq 1 ]; then
   maindll=$(echo -e "<Reference Include=\"Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL\">\n  <SpecificVersion>False</SpecificVersion>\n  <HintPath>/xmedia/pretzel/Steam/steamapps/common/Enter the Gungeon/EtG_Data/Managed/Assembly-CSharp.dll</HintPath>\n</Reference>")
   includes+=("${maindll}")
 fi
-
-#Copy over external resources as necessary
-# echo -e "[${GRN}>${BLN}] Checking for updated external resources"
-#   lastmodifiedextern="$(find ./ResourcesExternal -printf "%T+\n" | sort -nr | head -n 1)"
-# if [ "${lastmodifiedextern}" != "$(cat "$externalupdate")" ]; then
-#   echo -e "[${GRN}>${BLN}] Copying over updated external resources"
-#   while read -r line; do
-#     localrelpath="$(echo "${line}" | cut -f 2- -d '/')"
-#     externpath="${pluginspritesdir}/${localrelpath}"
-#     localmodtime="$(stat -c '%y' "${line}")"
-#     if [[ ! -e "${externpath}" ]] || [[ "$localmodtime" > "$(stat -c '%y' "${externpath}")" ]]; then
-#       echo -e "[${GRN}>${BLN}]   Copying ${localrelpath}"
-#       /bin/cp "${line}" "${externpath}"
-#     fi
-#   done <<< $(find "ResourcesExternal" -type f)
-#   echo "${lastmodifiedextern}" > "$externalupdate";
-# fi
 
 #Generate the template .csproj file (FrameworkPathOverride points to the .NET 3.5 development packages)
 echo -e "[${GRN}>${BLN}] Generating .csproj template"
@@ -279,6 +245,7 @@ if [ $rebuild -eq 0 ]; then
   fi
 fi
 
+#Check if our dll has actually been built
 if [ ! -e "${dllname}" ]; then
   echo -e "[${GRN}>${BLN}] ${dllname} does not exist, forcing rebuild"
   rebuild=1
