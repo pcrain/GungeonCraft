@@ -52,7 +52,7 @@ public class TranquilizerBehavior : MonoBehaviour
     private void Start()
     {
         base.GetComponent<Projectile>().OnHitEnemy += (Projectile _, SpeculativeRigidbody enemy, bool _) => {
-            if (enemy.aiActor?.IsHostileAndNotABoss() ?? false)
+            if ((enemy.aiActor?.IsHostileAndNotABoss() ?? false) && !(enemy.behaviorSpeculator?.ImmuneToStun ?? true))
                 enemy.aiActor.gameObject.GetOrAddComponent<EnemyTranquilizedBehavior>();
         };
     }
