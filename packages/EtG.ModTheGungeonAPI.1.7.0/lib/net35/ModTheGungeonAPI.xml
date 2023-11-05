@@ -1,0 +1,1586 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ModTheGungeonAPI</name>
+    </assembly>
+    <members>
+        <member name="T:ETGMod">
+            <summary>
+            Core class of the MTG API.
+            </summary>
+        </member>
+        <member name="M:ETGMod.FolderPath(BepInEx.BaseUnityPlugin)">
+            <summary>
+            Returns the path to a plugin's folder.
+            </summary>
+            <param name="plug">The plugin to get the folder path of.</param>
+            <returns>The path to a plugin's folder.</returns>
+        </member>
+        <member name="T:ETGMod.Assets">
+            <summary>
+            ETGMod asset management.
+            </summary>
+        </member>
+        <member name="F:ETGMod.Assets.DEFINITION_METADATA_EXTENSION">
+            <summary>
+            The extension for tk2dSpriteDefinition metadata files, without the . at the start.
+            </summary>
+        </member>
+        <member name="F:ETGMod.Assets.FULL_DEFINITION_METADATA_EXTENSION">
+            <summary>
+            The extension for tk2dSpriteDefinition metadata files, with the . at the start.
+            </summary>
+        </member>
+        <member name="P:ETGMod.Assets.Collections">
+            <summary>
+            All loaded sprite collections.
+            </summary>
+        </member>
+        <member name="F:ETGMod.Assets.TextureMap">
+            <summary>
+            A dictionary where the keys are the paths to textures loaded through SetupSprites methods and the values are the textures themselves.
+            </summary>
+        </member>
+        <member name="F:ETGMod.Assets.Packer">
+            <summary>
+            The instance RuntimeAtlasPacker that is used for creating new spritesheets.
+            </summary>
+        </member>
+        <member name="M:ETGMod.Assets.GenerateUVs(UnityEngine.Texture2D,System.Int32,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Creates UVs for a sprite definition.
+            </summary>
+            <param name="texture">The spritesheet texture.</param>
+            <param name="x">The x coordinate of your target texture's bottom left corner.</param>
+            <param name="y">The y coordinate of your target texture's bottom left corner.</param>
+            <param name="width">The width of your target texture.</param>
+            <param name="height">The height of your target texture.</param>
+            <returns>The created UVs.</returns>
+        </member>
+        <member name="M:ETGMod.Assets.SetupSpritesFromFolder(System.String)">
+            <summary>
+            Sets up sprites from a folder, adding sprites to collections or replacing existing sprites.
+            </summary>
+            <param name="folder">The root folder for the sprite setup.</param>
+        </member>
+        <member name="M:ETGMod.Assets.SetupSpritesFromAssembly(System.Reflection.Assembly,System.String)">
+            <summary>
+            Sets up sprites from an assembly's embedded resources, adding sprites to collections or replacing existing sprites.
+            </summary>
+            <param name="asmb">The assembly to search.</param>
+            <param name="path">The root path to the folder in the assembly's embedded resources.</param>
+        </member>
+        <member name="M:ETGMod.Assets.ReplaceTexture(tk2dSpriteDefinition,UnityEngine.Texture2D,System.Boolean)">
+            <summary>
+            Replaces a sprite definition's texture with the given one.
+            </summary>
+            <param name="frame">The sprite definition to replace.</param>
+            <param name="replacement">The replacement texture.</param>
+            <param name="pack">Does nothing, only exists for backwards compatibility.</param>
+        </member>
+        <member name="M:ETGMod.ReplaceTexture(tk2dSpriteDefinition,UnityEngine.Texture2D,System.Boolean)">
+            <summary>
+            Replaces a sprite definition's texture with the given one.
+            </summary>
+            <param name="frame">The sprite definition to replace.</param>
+            <param name="replacement">The replacement texture.</param>
+            <param name="pack">Does nothing, only exists for backwards compatibility.</param>
+        </member>
+        <member name="P:ETGMod.ResourcesDirectory">
+            <summary>
+            Returns the path to the Resources directory (Path/To/Game/Resources)
+            </summary>
+        </member>
+        <member name="P:ETGMod.SpriteReplacementDirectory">
+            <summary>
+            Returns the path to the old Sprite Replacement directory (Path/To/Resources/SpriteReplacement)
+            </summary>
+        </member>
+        <member name="T:ETGMod.Databases">
+            <summary>
+            Contains the instance Item Database and the instance String Database;
+            </summary>
+        </member>
+        <member name="F:ETGMod.Databases.Items">
+            <summary>
+            The instance Item Database used for adding, getting and creating new items.
+            </summary>
+        </member>
+        <member name="F:ETGMod.Databases.Strings">
+            <summary>
+            The instance String Database for editing, adding and getting strings.
+            </summary>
+        </member>
+        <member name="T:ETGMod.AIActor">
+            <summary>
+            Contains all of the AIActor hooks.
+            </summary>
+        </member>
+        <member name="F:ETGMod.AIActor.OnPreStart">
+            <summary>
+            Runs before an AIActor fully starts.
+            </summary>
+        </member>
+        <member name="F:ETGMod.AIActor.OnPostStart">
+            <summary>
+            Runs after an AIActor fully starts.
+            </summary>
+        </member>
+        <member name="F:ETGMod.AIActor.OnBlackPhantomnessCheck">
+            <summary>
+            Runs before an AIActor is checked to become jammed.
+            </summary>
+        </member>
+        <member name="T:ETGMod.Chest">
+            <summary>
+            Contains all of the Chest hooks.
+            </summary>
+        </member>
+        <member name="F:ETGMod.Chest.OnPostSpawn">
+            <summary>
+            Runs after a chest spawns.
+            </summary>
+        </member>
+        <member name="F:ETGMod.Chest.OnPreOpen">
+            <summary>
+            Runs before a chest is opened. If the final result of the hook is false, the chest will not open.
+            </summary>
+        </member>
+        <member name="F:ETGMod.Chest.OnPostOpen">
+            <summary>
+            Runs after a chest is opened.
+            </summary>
+        </member>
+        <member name="T:ETGMod.Chest.DOnPreOpen">
+            <summary>
+            Hook delegate for the OnPreOpen hook. If the final result is false, the chest will not open.
+            </summary>
+            <param name="shouldOpen">Current result. Starts as true, gets set to the returned result of this delegate after running.</param>
+            <param name="chest">The target chest.</param>
+            <param name="player">The player trying to open the chest.</param>
+            <returns></returns>
+        </member>
+        <member name="M:ETGMod.ToStringSafe(System.Object)">
+            <summary>
+            Just like object.ToString(), but returns string.Empty if the object is null.
+            </summary>
+            <param name="o">The object to convert into string.</param>
+            <returns>The result string.</returns>
+        </member>
+        <member name="M:ETGMod.RemoveUnacceptableCharactersForEnum(System.String)">
+            <summary>
+            Removes the characters ", \, -, and \n from the string.
+            </summary>
+            <param name="str">The string to modify.</param>
+            <returns>The string with then unacceptable characters removed.</returns>
+        </member>
+        <member name="M:ETGMod.RemoveUnacceptableCharactersForGUID(System.String)">
+            <summary>
+            Removes the characters ", \, and \n from the string.
+            </summary>
+            <param name="str">The string to modify.</param>
+            <returns>The string with then unacceptable characters removed.</returns>
+        </member>
+        <member name="M:ETGMod.ToID(System.String)">
+            <summary>
+            Makes the string all lowercase, removes the characters \n, \, \", . and - and replaces spaces with underscores.
+            </summary>
+            <param name="str"></param>
+            <returns></returns>
+        </member>
+        <member name="T:RuntimeAtlasPacker">
+            <summary>
+            Used for creating new spritesheets at runtime.
+            </summary>
+        </member>
+        <member name="M:RuntimeAtlasPacker.Pack(UnityEngine.Texture2D,System.Boolean)">
+            <summary>
+            Adds the texture to a new spritesheet and returns a RuntimeAtlasSegment that represents that texture.
+            </summary>
+            <param name="tex">Texture to add to a spritesheet.</param>
+            <param name="apply">If true, the changes will be automatically applied to the texture. Not recommended, as applying every change is not effective and creates lag. All of the changes will be automatically applied at the end of the frame</param>
+            <returns></returns>
+        </member>
+        <member name="T:RuntimeAtlasPage">
+            <summary>
+            Represents a spritesheet created by RuntimeAtlasPacker
+            </summary>
+        </member>
+        <member name="T:RuntimeAtlasSegment">
+            <summary>
+            Represents a texture within a RuntimeAtlasPage spritesheet.
+            </summary>
+        </member>
+        <member name="T:ETGModCompatibility">
+            <summary>
+            Class used for cross-mod interactions and enum extensions.
+            </summary>
+        </member>
+        <member name="M:ETGModCompatibility.ExtendEnum``1(System.String,System.String)">
+            <summary>
+            Extends a given enum and returns the result.
+            </summary>
+            <typeparam name="T">The enum to extend.</typeparam>
+            <param name="guid">The guid of the mod that extends the enum.</param>
+            <param name="name">The name of the new enum value.</param>
+            <returns>The extended enum value.</returns>
+        </member>
+        <member name="M:ETGModCompatibility.ExtendEnum(System.String,System.String,System.Type)">
+            <summary>
+            Extends a given enum and returns the result.
+            </summary>
+            <param name="guid">The guid of the mod that extends the enum.</param>
+            <param name="name">The name of the new enum value.</param>
+            <param name="t">The type of the enum to extend.</param>
+            <returns>The extended enum value.</returns>
+        </member>
+        <member name="M:ETGModCompatibility.SetSharedData(System.String,System.String,System.Object)">
+            <summary>
+            Sets a mod's shared data with the given name to the given value.
+            </summary>
+            <param name="guid">The guid of the mod that owns the shared data.</param>
+            <param name="name">The name of the shared data to set.</param>
+            <param name="value">The new value for the shared data.</param>
+        </member>
+        <member name="M:ETGModCompatibility.TryGetSharedData``1(System.String,System.String,``0@)">
+            <summary>
+            Tries to get a mod's shared data and reports if the result was successful.
+            </summary>
+            <typeparam name="T">The type of generic data to get.</typeparam>
+            <param name="guid">The guid of the mod that owns the shared data.</param>
+            <param name="name">The name of the shared data to get.</param>
+            <param name="value">The value of the shared data to output.</param>
+            <returns>True if the shared data exists and is of the type T, false otherwise.</returns>
+        </member>
+        <member name="M:ETGModCompatibility.TryGetSharedData(System.String,System.String,System.Object@)">
+            <summary>
+            Tries to get a mod's shared data and reports if the result was successful.
+            </summary>
+            <param name="guid">The guid of the mod that owns the shared data.</param>
+            <param name="name">The name of the shared data to get.</param>
+            <param name="value">The value of the shared data to output.</param>
+            <returns>True if the shared data exists, false otherwise.</returns>
+        </member>
+        <member name="M:ETGModCompatibility.GetSharedData``1(System.String,System.String)">
+            <summary>
+            Gets a mod's shared data with the given name.
+            </summary>
+            <typeparam name="T">The type of generic data to get.</typeparam>
+            <param name="guid">The guid of the mod that owns the shared data.</param>
+            <param name="name">The name of the shared data to get.</param>
+            <returns>The shared data's value if it exists and is of type T, default value otherwise.</returns>
+        </member>
+        <member name="M:ETGModCompatibility.GetSharedData(System.String,System.String)">
+            <summary>
+            Gets a mod's shared data with the given name.
+            </summary>
+            <param name="guid">The guid of the mod that owns the shared data.</param>
+            <param name="name">The name of the shared data to get.</param>
+            <returns>The shared data's value if it exists, null otherwise.</returns>
+        </member>
+        <member name="T:GuidInfo">
+            <summary>
+            Represents a pair consisting of a guid and info.
+            </summary>
+        </member>
+        <member name="P:ItemDB.Item(System.Int32)">
+            <summary>
+            Finds an item that has the given id.
+            </summary>
+            <param name="id">The item id to search for.</param>
+            <returns>The found item or null if nothing is found.</returns>
+        </member>
+        <member name="P:ItemDB.Item(System.String)">
+            <summary>
+            Finds an item that has the given internal name.
+            </summary>
+            <param name="name">The internal name to search for.</param>
+            <returns>The found item or null if nothing is found.</returns>
+        </member>
+        <member name="P:ItemDB.Count">
+            <summary>
+            Returns the number of items in the game.
+            </summary>
+        </member>
+        <member name="F:ItemDB.ModItems">
+            <summary>
+            The list of all modded items created.
+            </summary>
+        </member>
+        <member name="F:ItemDB.ModItemMap">
+            <summary>
+            The dictionary where the keys are the internal names for the modded items and the values are the modded items with those names.
+            </summary>
+        </member>
+        <member name="F:ItemDB.ModLootPerFloor">
+            <summary>
+            The dictionary where the keys are the names of a floor and the values are the items that will be added to the fallback item table for those floors.
+            </summary>
+        </member>
+        <member name="F:ItemDB.WeaponCollection">
+            <summary>
+            Sprite collection used by guns.
+            </summary>
+        </member>
+        <member name="F:ItemDB.WeaponCollection02">
+            <summary>
+            Sprite collection used by some other guns.
+            </summary>
+        </member>
+        <member name="F:ItemDB.ProjectileCollection">
+            <summary>
+            Sprite collection used by projectiles.
+            </summary>
+        </member>
+        <member name="F:ItemDB.ItemCollection">
+            <summary>
+            Sprite collection used by items.
+            </summary>
+        </member>
+        <member name="M:ItemDB.AddSpecific(System.Boolean,PickupObject,System.Boolean,System.String)">
+            <summary>
+            Adds an item to the list of items in the game.
+            </summary>
+            <param name="proxy">Whether the EncounterDatabaseEntry assigned to the item should be proxy or not. If an encounter database entry is proxy, the item's EncounterTrackable will get all of its values from the proxy 
+            EncounterDatabaseEntry.</param>
+            <param name="value">The item to add.</param>
+            <param name="dontDestroyOnLoad">If true, the item won't be destroyed when a scene is loaded. Only use for fake prefab items.</param>
+            <param name="floor">The floor to the fallback loot table of which the gun will be added.</param>
+            <returns>The id of the added item.</returns>
+        </member>
+        <member name="M:ItemDB.AddSpecific(PickupObject,System.Boolean,System.String)">
+            <summary>
+            Adds an item to the list of items in the game.
+            </summary>
+            <param name="value">The item to add.</param>
+            <param name="dontDestroyOnLoad">If true, the item won't be destroyed when a scene is loaded. Only use for fake prefab items.</param>
+            <param name="floor">The floor to the fallback loot table of which the gun will be added.</param>
+            <returns>The id of the added item.</returns>
+        </member>
+        <member name="M:ItemDB.Add(PickupObject,System.Boolean,System.String)">
+            <summary>
+            Adds an item to the list of items in the game.
+            </summary>
+            <param name="value">The item to add.</param>
+            <param name="updateSpriteCollections">Does nothing, only exists for backwards compatibility.</param>
+            <param name="floor">The floor to the fallback loot table of which the gun will be added.</param>
+            <returns>The id of the added item.</returns>
+        </member>
+        <member name="M:ItemDB.Add(Gun,tk2dSpriteCollectionData,System.String)">
+            <summary>
+            Adds a gun to the list of items in the game.
+            </summary>
+            <param name="value">The gun to add.</param>
+            <param name="collection">Does nothing, only exists for backwards compatibility.</param>
+            <param name="floor">The floor to the fallback loot table of which the gun will be added.</param>
+            <returns>The id of the added gun.</returns>
+        </member>
+        <member name="M:ItemDB.NewGun(System.String,System.String)">
+            <summary>
+            Creates a new gun with a peashooter base.
+            </summary>
+            <param name="gunName">The ingame name for the new gun.</param>
+            <param name="gunNameShort">The internal name for the new gun.</param>
+            <returns>The created gun.</returns>
+        </member>
+        <member name="M:ItemDB.NewGun(System.String,Gun,System.String)">
+            <summary>
+            Creates a new gun with the given base.
+            </summary>
+            <param name="gunName">The ingame name for the new gun.</param>
+            <param name="baseGun">The base gun to build the new gun from.</param>
+            <param name="gunNameShort">The internal name for the new gun.</param>
+            <returns>The created gun.</returns>
+        </member>
+        <member name="M:ItemDB.SetupItem(PickupObject,System.String)">
+            <summary>
+            Sets up an item, adding an encounter trackable to it and setting its name to the given one.
+            </summary>
+            <param name="item">The item to setup.</param>
+            <param name="name">The name for the item.</param>
+        </member>
+        <member name="M:ItemDB.GetModItemByName(System.String)">
+            <summary>
+            Finds a modded item that has the given internal name.
+            </summary>
+            <param name="name">The internal name to search for.</param>
+            <returns>The found item or null if nothing is found.</returns>
+        </member>
+        <member name="P:StringDB.CurrentLanguage">
+            <summary>
+            Current game language.
+            </summary>
+        </member>
+        <member name="F:StringDB.Core">
+            <summary>
+            The string table that has miscellaneous strings that don't fit into other tables.
+            </summary>
+        </member>
+        <member name="F:StringDB.Items">
+            <summary>
+            The string table that has all of the item-related strings: item names, short descriptions, long descrpitions, etc.
+            </summary>
+        </member>
+        <member name="F:StringDB.Enemies">
+            <summary>
+            The string table that has all of the enemy-related strings: enemy names, short descriptions, long descriptions, etc.
+            </summary>
+        </member>
+        <member name="F:StringDB.Intro">
+            <summary>
+            The string table that has all of the text in the intro.
+            </summary>
+        </member>
+        <member name="F:StringDB.Synergy">
+            <summary>
+            The string table that has all of the synergy names.
+            </summary>
+        </member>
+        <member name="F:StringDB.UI">
+            <summary>
+            The string table that has all of the UI text.
+            </summary>
+        </member>
+        <member name="F:StringDB.OnLanguageChanged">
+            <summary>
+            Runs when the game's language is changed.
+            </summary>
+        </member>
+        <member name="F:StringDB.OnUILanguageChanged">
+            <summary>
+            Runs for each UI language manager when the game's language is changed or when a UI language manager is created.
+            </summary>
+        </member>
+        <member name="T:StringDBTable">
+            <summary>
+            Represents a string table in StringTableManager.
+            </summary>
+        </member>
+        <member name="M:StringDBTable.#ctor(System.Func{System.Collections.Generic.Dictionary{System.String,StringTableManager.StringCollection}})">
+            <summary>
+            Creates a new StringTableManager from a table getter Func.
+            </summary>
+            <param name="getTable">The Func that gets the current table.</param>
+        </member>
+        <member name="P:StringDBTable.Table">
+            <summary>
+            The current table dictionary.
+            </summary>
+        </member>
+        <member name="P:StringDBTable.Item(System.String)">
+            <summary>
+            Sets or gets a string collection from this table.
+            </summary>
+            <param name="key">The key to the string collection.</param>
+            <returns>The string table found.</returns>
+        </member>
+        <member name="M:StringDBTable.ContainsKey(System.String)">
+            <summary>
+            Returns true if the table contains a collection with the given key, false otherwise.
+            </summary>
+            <param name="key">The key to search for.</param>
+            <returns>True if the table contains a collection with the given key, false otherwise.</returns>
+        </member>
+        <member name="M:StringDBTable.Set(System.String,System.String)">
+            <summary>
+            Sets a string with the given key to the given value.
+            </summary>
+            <param name="key">The key to the string.</param>
+            <param name="value">The new value for the string.</param>
+        </member>
+        <member name="M:StringDBTable.SetComplex(System.String,System.String[])">
+            <summary>
+            Sets a string with the given key to the given values that all have the weight 1.
+            </summary>
+            <param name="key">The key to the string.</param>
+            <param name="values">The new values for the string that all have the weight 1.</param>
+        </member>
+        <member name="M:StringDBTable.SetComplex(System.String,Tuple{System.String,System.Single}[])">
+            <summary>
+            Sets a string with the given key to the given values.
+            </summary>
+            <param name="key">The key to the string.</param>
+            <param name="values">The new values and weights for the string where the strings are values and floats are weights.</param>
+        </member>
+        <member name="M:StringDBTable.LanguageChanged">
+            <summary>
+            Reloads the table and reapplies all of the changes made.
+            </summary>
+        </member>
+        <member name="M:UIStringDBTable.LanguageChanged(dfLanguageManager)">
+            <summary>
+            Reapplies all of the changes made to the given manager.
+            </summary>
+            <param name="man">The manager to reapply the changes to.</param>
+        </member>
+        <member name="M:UIStringDBTable.Set(System.String,System.String)">
+            <summary>
+            Sets a string with the given key to the given value.
+            </summary>
+            <param name="key">The key to the string.</param>
+            <param name="value">The new value for the string.</param>
+        </member>
+        <member name="F:ETGModConsole.ModdedChests">
+            <summary>
+            A dictionary where the keys are the ingame names for modded chests and the values are modded chest objects. Add to this dictionary when adding new chests for them to be supported by chest autocompletion.
+            </summary>
+        </member>
+        <member name="F:ETGModConsole.ModdedShrines">
+            <summary>
+            A dictionary where the keys are the ingame names for modded shrines and the values are modded shrine objects. Add to this dictionary when adding new shrines for them to be supported by shrine autocompletion.
+            </summary>
+        </member>
+        <member name="F:ETGModConsole.ModdedNPCs">
+            <summary>
+            A dictionary where the keys are the ingame names for modded NPCs and the values are the modded NPC objects. Add to this dictionary when adding new NPCs for them to be supported by NPC autocompletion.
+            </summary>
+        </member>
+        <member name="F:ETGModConsole.BaseGameChests">
+            <summary>
+            An array with all of the names for basegame chests.
+            </summary>
+        </member>
+        <member name="F:ETGModConsole.BaseGameShrines">
+            <summary>
+            An array with all of the internal names for basegame shrines.
+            </summary>
+        </member>
+        <member name="F:ETGModConsole.BaseGameNPCs">
+            <summary>
+            The dictionary where the keys are the ingame names for NPCs and the values are the internal names for NPC objects. It is not recommended to add to this dictionary, use the ModdedNPCs dictionary instead.
+            </summary>
+        </member>
+        <member name="F:ETGModConsole.DungeonDictionary">
+            <summary>
+            The dictionary where the keys are the ingame names for floors and the values are the internal names for dungeon asset paths. Add to this dictionary when adding new floors for them to be supported by level autocompletion.
+            </summary>
+        </member>
+        <member name="F:ETGModConsole.PlayerStatDictionary">
+            <summary>
+            The dictionary where the keys are the ingame names for stats and the values are PlayerStats.StatType enum values. Add to this dictionary when adding new stats for them to be supported by stat autocompletion.
+            </summary>
+        </member>
+        <member name="F:ETGModConsole.Characters">
+            <summary>
+            The dictionary where the strings are the ingame names for characters and the values are the internal names for character objects. Add to this dictionary when adding new characters for them to be supported by character autocompletion.
+            </summary>
+        </member>
+        <member name="P:ETGModConsole.Instance">
+            <summary>
+            The current instance of the console.
+            </summary>
+        </member>
+        <member name="F:ETGModConsole.Logger">
+            <summary>
+            The current instance of the console's BepInEx console logger. Can be used to write to BepInEx's console under the console's name.
+            </summary>
+        </member>
+        <member name="F:ETGModConsole.Commands">
+            <summary>
+            All commands supported by the ETGModConsole. Add your own commands here!
+            </summary>
+        </member>
+        <member name="F:ETGModConsole.CommandDescriptions">
+            <summary>
+            The dictionary where the keys are commands and the values are command descriptions. Add to this dictionary if you want your commands to have descriptions in the help command.
+            </summary>
+        </member>
+        <member name="F:ETGModConsole.AllItems">
+            <summary>
+            All items in the game, name sorted. Used for the give command.
+            </summary>
+        </member>
+        <member name="F:ETGModConsole.GiveAutocompletionSettings">
+            <summary>
+            The basic autocompletion settings for items.
+            </summary>
+        </member>
+        <member name="F:ETGModConsole.SpawnAutocompletionSettings">
+            <summary>
+            The basic autocompletion settings for enemies.
+            </summary>
+        </member>
+        <member name="F:ETGModConsole.TrackedStatAutocompletionSettings">
+            <summary>
+            The basic autocompletion for tracked stats.
+            </summary>
+        </member>
+        <member name="F:ETGModConsole.TrueFalseAutocompletionSettings">
+            <summary>
+            The basic true/false autocompletion settings.
+            </summary>
+        </member>
+        <member name="F:ETGModConsole.ChestAutocompletionSettings">
+            <summary>
+            The basic autocompletion settings for chests, including modded chests.
+            </summary>
+        </member>
+        <member name="F:ETGModConsole.ShrineAutocompletionSettings">
+            <summary>
+            The basic autocompletion settings for shrines, including modded shrines.
+            </summary>
+        </member>
+        <member name="F:ETGModConsole.NPCAutocompletionSettings">
+            <summary>
+            The basic autocompletion settings for NPCs, including modded NPCs.
+            </summary>
+        </member>
+        <member name="F:ETGModConsole.LevelAutocompletionSettings">
+            <summary>
+            The basic autocompletion settings for floors.
+            </summary>
+        </member>
+        <member name="F:ETGModConsole.PlayerStatAutocompletionSettings">
+            <summary>
+            The basic autocompletion settings for player stats.
+            </summary>
+        </member>
+        <member name="F:ETGModConsole.CharacterAutocompletionSettings">
+            <summary>
+            The basic autocompletion settings for characters.
+            </summary>
+        </member>
+        <member name="M:ETGModConsole.AutocompletionFromCollection(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Builds autocompletion settings from a collection.
+            </summary>
+            <param name="collection">The collection to build the settings from.</param>
+            <returns>The built autocompletion settings.</returns>
+        </member>
+        <member name="M:ETGModConsole.AutocompletionFromCollection(System.Collections.Generic.IEnumerable{System.Collections.Generic.IEnumerable{System.String}})">
+            <summary>
+            Builds autocompletion settings from a collection of collection, each representing a level of autocompletion.
+            </summary>
+            <param name="collection">The collection of collections to build the settings from.</param>
+            <returns>The built autocompletion settings.</returns>
+        </member>
+        <member name="M:ETGModConsole.AutocompletionFromCollectionGetter(System.Func{System.Collections.Generic.IEnumerable{System.String}})">
+            <summary>
+            Builds autocompletion settings from a Func that gets a collection.
+            </summary>
+            <param name="collectionGet">The Func that gets the collection for the autocompletion.</param>
+            <returns>The built autocompletion settings.</returns>
+        </member>
+        <member name="M:ETGModConsole.AutocompletionFromCollectionGetterMultilevel(System.Func{System.Int32,System.Collections.Generic.IEnumerable{System.String}})">
+            <summary>
+            Builds autocompletion settings from a Func that gets a collection from an autocompletion level.
+            </summary>
+            <param name="collectionGet">The Func that gets the collection for the autocompletion from an autocompletion level.</param>
+            <returns>The built autocompletion settings.</returns>
+        </member>
+        <member name="M:ETGModConsole.AutocompletionFromIDPool``1(IDPool{``0})">
+            <summary>
+            Builds autocompletion settings from an IDPool.
+            </summary>
+            <param name="pool">The IDPool to build the autocompletion from.</param>
+            <returns>The built autocompletion settings.</returns>
+        </member>
+        <member name="M:ETGModConsole.RunCommand(System.String[],System.String[])">
+            <summary>
+            Runs the provided command with the provided args.
+            </summary>
+        </member>
+        <member name="F:ETGModDebugLogMenu._AllLoggedText">
+            <summary>
+            All debug logged text lines. Feel free to add your lines here!
+            </summary>
+        </member>
+        <member name="M:ETGModGUI.Create">
+            <summary>
+            Creates a new object with this script on it.
+            </summary>
+        </member>
+        <member name="M:GunExt.SetName(PickupObject,System.String)">
+            <summary>
+            Sets the given item's name to the given string.
+            </summary>
+            <param name="item">The item to rename.</param>
+            <param name="text">The new name for the item.</param>
+        </member>
+        <member name="M:GunExt.SetShortDescription(PickupObject,System.String)">
+            <summary>
+            Sets the given item's short description to the given string.
+            </summary>
+            <param name="item">The item to rename.</param>
+            <param name="text">The new short description for the item.</param>
+        </member>
+        <member name="M:GunExt.SetLongDescription(PickupObject,System.String)">
+            <summary>
+            Sets the given item's long description to the given string.
+            </summary>
+            <param name="item">The item to rename.</param>
+            <param name="text">The new long description for the item.</param>
+        </member>
+        <member name="M:GunExt.UpdateAnimations(Gun,tk2dSpriteCollectionData)">
+            <summary>
+            Updates a gun's animation sprites if the animations have been setup, or sets them up otherwise.
+            </summary>
+            <param name="gun">The gun to process.</param>
+            <param name="collection">The collection to get the sprites from. Defaults to WeaponCollection.</param>
+        </member>
+        <member name="M:GunExt.UpdateAnimation(Gun,System.String,tk2dSpriteCollectionData,System.Boolean)">
+            <summary>
+            Updates a specific gun animation's sprites or sets it up if it doesn't exist.
+            </summary>
+            <param name="gun">The gun to update the animaiton for.</param>
+            <param name="name">The name for the animation.</param>
+            <param name="collection">The collection to get the sprites from. Defaults to WeaponCollection</param>
+            <param name="returnToIdle">True if the animation should return to the idle animation after playing, false otherwise.</param>
+            <returns>The full name for the created or updated animation.</returns>
+        </member>
+        <member name="M:GunExt.SetAnimationFPS(Gun,System.Int32)">
+            <summary>
+            Sets the fps of all animations for the given gun to the given number.
+            </summary>
+            <param name="gun">The gun to process.</param>
+            <param name="fps">The new fps for all of the animations.</param>
+        </member>
+        <member name="M:GunExt.SetAnimationFPS(Gun,System.String,System.Int32)">
+            <summary>
+            Sets the fps of an animation with a given name for a given gun to the given number/
+            </summary>
+            <param name="gun">The gun to process.</param>
+            <param name="name">The name of the animation to change.</param>
+            <param name="fps">The new fps for the given animation.</param>
+        </member>
+        <member name="M:GunExt.AddProjectileFrom(Gun,System.String,System.Boolean)">
+            <summary>
+            Adds a projectile from a gun with the given internal name to the given gun's list of possible projectiles.
+            </summary>
+            <param name="gun">The gun to add the projectile to.</param>
+            <param name="other">The internal name of the gun to get the projectile from.</param>
+            <param name="cloned">Does nothing, only exists for backwards compatibility.</param>
+            <returns>The added projectile.</returns>
+        </member>
+        <member name="M:GunExt.AddProjectileFrom(Gun,Gun,System.Boolean)">
+            <summary>
+            Adds a projectile to the given gun's list of possible projectiles from another given gun.
+            </summary>
+            <param name="gun">The gun to add the projectile to.</param>
+            <param name="other">The gun to get the projectile from.</param>
+            <param name="cloned">Does nothing, only exists for backwards compatibility.</param>
+            <returns>The added projectile.</returns>
+        </member>
+        <member name="M:GunExt.AddProjectile(Gun,Projectile)">
+            <summary>
+            Adds the given projectile to the given gun's list of possible projectiles.
+            </summary>
+            <param name="gun">The gun to add the projectile to.</param>
+            <param name="projectile">The projectile to add.</param>
+            <returns>The added projectile.</returns>
+        </member>
+        <member name="M:GunExt.AddProjectileModuleFrom(Gun,System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Adds a projectile module from a gun with the given internal name to the given gun's list of projectile modules.
+            </summary>
+            <param name="gun">The gun to add the projectile module to.</param>
+            <param name="other">The internal name of the gun to get the projectile module from.</param>
+            <param name="cloned">Does nothing, only exists for backwards compatibility.</param>
+            <param name="clonedProjectiles">Does nothing, only exists for backwards compatibility.</param>
+            <returns>The added projectile module.</returns>
+        </member>
+        <member name="M:GunExt.AddProjectileModuleFrom(Gun,Gun,System.Boolean,System.Boolean)">
+            <summary>
+            Adds a projectile module to the given gun's list of projectile modules from another given gun.
+            </summary>
+            <param name="gun">The gun to add the projectile module to.</param>
+            <param name="other">The gun to get the projectile module from.</param>
+            <param name="cloned">Does nothing, only exists for backwards compatibility.</param>
+            <param name="clonedProjectiles">Does nothing, only exists for backwards compatibility.</param>
+            <returns>The added projectile module.</returns>
+        </member>
+        <member name="M:GunExt.AddProjectileModule(Gun,ProjectileModule)">
+            <summary>
+            Adds the given projectile module to the given gun's list of projectile modules.
+            </summary>
+            <param name="gun">The gun to add the projectile module to.</param>
+            <param name="projectile">The projectile module to add.</param>
+            <returns>The added projectile module.</returns>
+        </member>
+        <member name="M:GunExt.SetupSprite(Gun,tk2dSpriteCollectionData,System.String,System.Int32)">
+            <summary>
+            Sets the gun's default sprite to the gun's ammonomicon sprite, and if defaultSprite isn't null, sets the ammonomicon sprite to defaultSprite. If fps isn't 0, also sets the fps for all of the gun's animaiton to the given number.
+            </summary>
+            <param name="gun">The gun to do the setup for.</param>
+            <param name="collection">The collection to get the default sprite from. Defaults to WeaponCollection.</param>
+            <param name="defaultSprite">The name of the sprite to set the gun's ammonomicon sprite to. Defaults to null, which makes it not set the sprite to anything.</param>
+            <param name="fps">The new fps for all of the gun's animations. Defaults to 0, which doesn't change the fps.</param>
+        </member>
+        <member name="T:GunAnimationSpriteCache">
+            <summary>
+            Used to cache animation frames so that we do not need to recan sprite collections on every update to gun animations.
+            </summary>
+        </member>
+        <member name="F:GunAnimationSpriteCache._gameSpriteCollections">
+            <summary>
+            Organized by sprite collection name, eg WeaponCollection, WeaponCollection02, etc.
+            </summary>
+        </member>
+        <member name="P:GunAnimationSpriteCache.GunAnimationSpriteGroup.IdentityObject">
+            <summary>
+            If this associated object changes we will rescan and update.
+            </summary>
+        </member>
+        <member name="T:GunBehaviour">
+            <summary>
+            Base class for gun modifier behaviours.
+            </summary>
+        </member>
+        <member name="M:GunBehaviour.OnDroppedByPlayer(PlayerController)">
+            <summary>
+            Runs when a player drops the gun this behaviour is applied to.
+            </summary>
+            <param name="player">The player that dropped the gun.</param>
+        </member>
+        <member name="M:GunBehaviour.OnEnemyPickup(AIActor)">
+            <summary>
+            Runs when an AIActor picks up the gun this behaviour is applied to.
+            </summary>
+            <param name="enemyOwner">The enemy that picked up the gun.</param>
+        </member>
+        <member name="M:GunBehaviour.OnPlayerPickup(PlayerController)">
+            <summary>
+            Runs when a player picks up the gun this behaviour is applied to.
+            </summary>
+            <param name="playerOwner">The player that picked up the gun.</param>
+        </member>
+        <member name="M:GunBehaviour.OnCreation(Gun)">
+            <summary>
+            Runs when the gun this behaviour is applied to is created as an object.
+            </summary>
+            <param name="gun">The gun this behaviour is applied to.</param>
+        </member>
+        <member name="M:GunBehaviour.Update">
+            <summary>
+            Runs every frame when the gun is active, even if the gun is not picked up.
+            </summary>
+        </member>
+        <member name="M:GunBehaviour.OnReflectedBulletDamageModifier(System.Single)">
+            <summary>
+            Modifies the damage of bullets reflected through reload.
+            </summary>
+            <param name="originalDamage">The original damage of the bullet.</param>
+            <returns>The modified damage of the bullet</returns>
+        </member>
+        <member name="M:GunBehaviour.OnReflectedBulletScaleModifier(System.Single)">
+            <summary>
+            Modifies the scale of bullets reflected through reload.
+            </summary>
+            <param name="originalScale">The original scale of the bullet.</param>
+            <returns>The modified scale of the bullet</returns>
+        </member>
+        <member name="M:GunBehaviour.ModifyActiveCooldownDamage(System.Single)">
+            <summary>
+            Modifies the amount of damage dealt for cooldown purposes. The higher the number, the faster the recharge.
+            </summary>
+            <param name="originalDamage">The original amount of damage dealt.</param>
+            <returns>The modified amount of damage dealt.</returns>
+        </member>
+        <member name="M:GunBehaviour.OnInitializedWithOwner(GameActor)">
+            <summary>
+            Runs when the gun this behaviour is applied to gets picked up, be it by enemy or by player.
+            </summary>
+            <param name="actor">The enemy or player that picked up this gun.</param>
+        </member>
+        <member name="M:GunBehaviour.OnBurstContinued(PlayerController,Gun)">
+            <summary>
+            Runs when the gun this behaviour is applied to ends a burst shot.
+            </summary>
+            <param name="player">The player owner of the gun.</param>
+            <param name="gun">The gun this behaviour is applied to.</param>
+        </member>
+        <member name="M:GunBehaviour.PostProcessProjectile(Projectile)">
+            <summary>
+            Runs when the gun this behaviour is applied to shoots a projectile. Can be used to modify the projectile that was created.
+            </summary>
+            <param name="projectile">The projectile shot.</param>
+        </member>
+        <member name="M:GunBehaviour.PostProcessVolley(ProjectileVolleyData)">
+            <summary>
+            Runs when the volley of the gun this behaviour is applied to gets updated. Can be used to modify the volley based on synergies and etc.
+            </summary>
+            <param name="volley">The volley that is being updated. Modify this argument to modify the updated volley.</param>
+        </member>
+        <member name="M:GunBehaviour.OnDropped">
+            <summary>
+            Runs when the gun this behaviour is applied to is dropped, be it by enemy or by player.
+            </summary>
+        </member>
+        <member name="M:GunBehaviour.OnAutoReload(PlayerController,Gun)">
+            <summary>
+            Runs when the gun this behaviour is applied to is reloaded with an empty clip, be it manually or automatically.
+            </summary>
+            <param name="player">The player that reloaded the gun.</param>
+            <param name="gun">The gun this behaviour is applied to.</param>
+        </member>
+        <member name="M:GunBehaviour.OnReloadPressed(PlayerController,Gun,System.Boolean)">
+            <summary>
+            Runs when a player tries to reload the gun this behaviour is applied to, even if it's full. To check for actual reloads, use Gun.IsReloading.
+            </summary>
+            <param name="player">The player that reloaded the gun.</param>
+            <param name="gun">The gun this behaviour is applied to.</param>
+            <param name="manual">True if the player reloaded the gun by pressing the reload key, false otherwise.</param>
+        </member>
+        <member name="M:GunBehaviour.OnFinishAttack(PlayerController,Gun)">
+            <summary>
+            Runs when the player stops shooting with the gun this behaviour is applied to.
+            </summary>
+            <param name="player">The player that stopped shooting.</param>
+            <param name="gun">The gun this behaviour is applied to.</param>
+        </member>
+        <member name="M:GunBehaviour.OnPostFired(PlayerController,Gun)">
+            <summary>
+            Runs after the gun this behaviour is applied to is shot, after all of the projectiles were created. On charge guns, runs once per charge when the player starts charging the gun.
+            </summary>
+            <param name="player">The player that shot the gun.</param>
+            <param name="gun">The gun this behaviour is applied to.</param>
+        </member>
+        <member name="M:GunBehaviour.OnAmmoChanged(PlayerController,Gun)">
+            <summary>
+            Runs after the gun this behaviour is applied to either loses or gains any amount of ammo.
+            </summary>
+            <param name="player">The player that owns the gun.</param>
+            <param name="gun">The gun this behaviour is applied to.</param>
+        </member>
+        <member name="M:GunBehaviour.OnPreFireProjectileModifier(Gun,Projectile,ProjectileModule)">
+            <summary>
+            Runs before the gun this behaviour is applied to is fired. Can be used to change what projectile gets fired.
+            </summary>
+            <param name="gun">The gun this behaviour is applied to.</param>
+            <param name="projectile">The original projectile that was about to get fired.</param>
+            <param name="module">The projectile module that is being fired.</param>
+            <returns>The modified projectile that will be fired. Return the original projectile for no change.</returns>
+        </member>
+        <member name="M:GunBehaviour.OnLevelLoadPreGeneration">
+            <summary>
+            Runs when a new floor is loaded, but before it's actually generated.
+            </summary>
+        </member>
+        <member name="M:GunBehaviour.OnPlayerLevelLoadPreGeneration(PlayerController)">
+            <summary>
+            Runs when a new floor is loaded with a player owner, but before the floor is actually generated.
+            </summary>
+            <param name="player">The player owner of the gun this behaviour is applied to.</param>
+        </member>
+        <member name="M:GunBehaviour.OnLevelLoadPostGeneration">
+            <summary>
+            Runs when a floor is loaded and fully generated.
+            </summary>
+        </member>
+        <member name="M:GunBehaviour.OnPlayerLevelLoadPostGeneration(PlayerController)">
+            <summary>
+            Runs when a floor is loaded and fully generated with a player owner.
+            </summary>
+            <param name="player">The player owner of the gun this behaviour is applied to.</param>
+        </member>
+        <member name="M:GunBehaviour.InheritData(Gun)">
+            <summary>
+            Transfer the data that wouldn't normally be saved from a gun pre-pickup to a gun post-pickup.
+            </summary>
+            <param name="sourceGun">The gun pre-pickup.</param>
+        </member>
+        <member name="M:GunBehaviour.MidGameSerialize(System.Collections.Generic.List{System.Object},System.Int32)">
+            <summary>
+            Save data from this gun to a mid-game save.
+            </summary>
+            <param name="data">The list of data to save. Add data to this list to save it.</param>
+            <param name="dataIndex">Not used.</param>
+        </member>
+        <member name="M:GunBehaviour.OnGunThrown(Gun,GameActor,Projectile)">
+            <summary>
+            Runs when the gun this behaviour is applied to is thrown.
+            </summary>
+            <param name="gun">The gun that was thrown.</param>
+            <param name="owner">The owner of the gun that was thrown.</param>
+            <param name="thrownGunProjectile">The projectile that the gun is attached to.</param>
+        </member>
+        <member name="M:GunBehaviour.OnGunThrownPlayer(Gun,PlayerController,Projectile)">
+            <summary>
+            Runs when the gun this behaviour is applied to is thrown by a player.
+            </summary>
+            <param name="gun">The gun that was thrown.</param>
+            <param name="owner">The owner of the gun that was thrown.</param>
+            <param name="thrownGunProjectile">The projectile that the gun is attached to.</param>
+        </member>
+        <member name="M:GunBehaviour.OnGunThrownEnemy(Gun,AIActor,Projectile)">
+            <summary>
+            Runs when the gun this behaviour is applied to is thrown by an enemy.
+            </summary>
+            <param name="gun">The gun that was thrown.</param>
+            <param name="owner">The owner of the gun that was thrown.</param>
+            <param name="thrownGunProjectile">The projectile that the gun is attached to.</param>
+        </member>
+        <member name="M:GunBehaviour.PostProcessBeam(BeamController)">
+            <summary>
+            Runs when the gun this behaviour is applied to starts firing a beam.
+            </summary>
+            <param name="beam">The beam that the gun this behaviour is applied to started firing.</param>
+        </member>
+        <member name="M:GunBehaviour.PostProcessBeamChanceTick(BeamController)">
+            <summary>
+            Runs every second when a beam fired by the gun this behaviour is applied to is active.
+            </summary>
+            <param name="beam">The beam fired by the gun this behaviour is applied to.</param>
+        </member>
+        <member name="M:GunBehaviour.ModifyClipCount(Gun,ProjectileModule,PlayerController,System.Int32@,System.Int32@)">
+            <summary>
+            Modifies the amount of current shots left in the clip and the max clip capacity that's visually displayed in the clip UI.
+            </summary>
+            <param name="gun">The gun that the clip belongs to.</param>
+            <param name="mod">The module on which the clip is based.</param>
+            <param name="player">The owner of the gun.</param>
+            <param name="currentModuleAmmo">The current value of the current shots left in the clip.</param>
+            <param name="maxModuleAmmo">The current value of the max clip capacity.</param>
+        </member>
+        <member name="M:GunBehaviour.DeserializeObject``1(System.Collections.Generic.List{System.Object},System.Int32@)">
+            <summary>
+            Get data from the given list of data, cast it to the type T and increment the data index.
+            </summary>
+            <typeparam name="T">The type to cast the data to.</typeparam>
+            <param name="data">The list of data to get the data from.</param>
+            <param name="dataIndex">The index to increment.</param>
+            <returns>The data found from the list.</returns>
+        </member>
+        <member name="M:GunBehaviour.MidGameDeserialize(System.Collections.Generic.List{System.Object},System.Int32@)">
+            <summary>
+            Get data from the saved list of a mid-game save. Data must be gotten in the exact same order as it was saved in MidGameSerialize.
+            </summary>
+            <param name="data">The list of data from the mid-game save.</param>
+            <param name="dataIndex">The current data index. Needs to be increased by the amount of data gotten from the list,</param>
+        </member>
+        <member name="F:GunBehaviour.gun">
+            <summary>
+            The gun this behaviour is applied to.
+            </summary>
+        </member>
+        <member name="P:GunBehaviour.GenericOwner">
+            <summary>
+            Generic GameActor owner of this gun.
+            </summary>
+        </member>
+        <member name="P:GunBehaviour.PlayerOwner">
+            <summary>
+            PlayerController owner of the gun this behaviour is applied to if the owner is a player, null otherwise.
+            </summary>
+        </member>
+        <member name="P:GunBehaviour.EnemyOwner">
+            <summary>
+            AIActor owner of the gun this behaviour is applied to if the owner is an enemy, null otherwise.
+            </summary>
+        </member>
+        <member name="P:GunBehaviour.EverPickedUp">
+            <summary>
+            True if the gun was ever picked up, false otherwise.
+            </summary>
+        </member>
+        <member name="T:Gungeon.Game">
+            <summary>
+            Contains the IDPools for Items and Enemies.
+            </summary>
+        </member>
+        <member name="P:Gungeon.Game.Items">
+            <summary>
+            The IDPool for items, containing both modded and basegame items.
+            </summary>
+        </member>
+        <member name="P:Gungeon.Game.Enemies">
+            <summary>
+            The IDPool for enemies, containing both modded and basegame enemies.
+            </summary>
+        </member>
+        <member name="T:IDPool`1">
+            <summary>
+            A list of values that can be found by their given ids.
+            </summary>
+            <typeparam name="T">The type of values in this IDPool.</typeparam>
+        </member>
+        <member name="P:IDPool`1.Item(System.String)">
+            <summary>
+            Gets or sets the object at the given id.
+            </summary>
+            <param name="id">The string id to get or set the object at.</param>
+            <returns></returns>
+        </member>
+        <member name="P:IDPool`1.Count">
+            <summary>
+            Number of objects in this IDPool.
+            </summary>
+        </member>
+        <member name="M:IDPool`1.Add(System.String,`0)">
+            <summary>
+            Adds a new item to this IDPool.
+            </summary>
+            <param name="id">The id of the item that will get added.</param>
+            <param name="obj">The new item that will be added.</param>
+            <exception cref="T:IDPool`1.ItemIDExistsException">Thrown if an item with the given id already exists in this IDPool.</exception>
+        </member>
+        <member name="M:IDPool`1.Get(System.String)">
+            <summary>
+            Gets the item with the given id.
+            </summary>
+            <param name="id">The id to search for.</param>
+            <returns>The found item.</returns>
+            <exception cref="T:IDPool`1.NonExistantIDException"></exception>
+        </member>
+        <member name="M:IDPool`1.GetSafe(System.String)">
+            <summary>
+            Gets the item with the given id. Unlike Get(string), this will not throw an exception when the item is not found and will instead return the default value.
+            </summary>
+            <param name="id">The id to search for.</param>
+            <returns>The found item or default value if nothing was found.</returns>
+        </member>
+        <member name="M:IDPool`1.Remove(System.String,System.Boolean)">
+            <summary>
+            Removes an item with the given id from this IDPool.
+            </summary>
+            <param name="id">The id to search for.</param>
+            <param name="destroy">If true, the removed item will also be destroyed if it's a unity object.</param>
+            <exception cref="T:IDPool`1.NonExistantIDException"></exception>
+        </member>
+        <member name="M:IDPool`1.Rename(System.String,System.String)">
+            <summary>
+            Changes the id of an item to the given id.
+            </summary>
+            <param name="source">The original id for the item.</param>
+            <param name="target">The new id for the item.</param>
+            <exception cref="T:IDPool`1.NonExistantIDException"></exception>
+        </member>
+        <member name="M:IDPool`1.VerifyID(System.String)">
+            <summary>
+            Throws an exception if the given id contains more than 1 ":" character.
+            </summary>
+            <param name="id">The id to verify.</param>
+            <exception cref="T:IDPool`1.BadlyFormattedIDException"></exception>
+        </member>
+        <member name="M:IDPool`1.Resolve(System.String)">
+            <summary>
+            If the given id contains a ":" character, verifies the id. Otherwise, returns gungeon:id
+            </summary>
+            <param name="id">The id to resolve.</param>
+            <returns>The modified id.</returns>
+        </member>
+        <member name="T:IDPool`1.Entry">
+            <summary>
+            Represents a pair of name and namespace.
+            </summary>
+        </member>
+        <member name="M:IDPool`1.Entry.#ctor(System.String,System.String)">
+            <summary>
+            Creates a new Entry from the given name and namespace.
+            </summary>
+            <param name="namesp">The namespace for this Entry.</param>
+            <param name="name">The name for this entry.</param>
+        </member>
+        <member name="M:IDPool`1.Split(System.String)">
+            <summary>
+            Splits an id into a name and a namespace and turns it into an Entry.
+            </summary>
+            <param name="id">The id to split.</param>
+            <returns>The created Entry.</returns>
+            <exception cref="T:IDPool`1.BadlyFormattedIDException"></exception>
+        </member>
+        <member name="M:IDPool`1.ContainsID(System.String)">
+            <summary>
+            Returns true if this IDPool contains the given id, false otherwise.
+            </summary>
+            <param name="id"></param>
+            <returns>True if this IDPool contains the given id, false otherwise.</returns>
+        </member>
+        <member name="P:IDPool`1.AllIDs">
+            <summary>
+            Returns an array of all ids in this IDPool.
+            </summary>
+        </member>
+        <member name="P:IDPool`1.Entries">
+            <summary>
+            Returns an IEnumerable containing all of the items in this IDPool.
+            </summary>
+        </member>
+        <member name="P:IDPool`1.IDs">
+            <summary>
+            Returns an IEnumerable containing all of the ids in this IDPool.
+            </summary>
+        </member>
+        <member name="P:IDPool`1.Pairs">
+            <summary>
+            Returns an IEnumerable containing all of the pairs of ids and items in this IDPool.
+            </summary>
+        </member>
+        <member name="F:JSONHelper.META.MARKER">
+            <summary>
+            The metadata object marker. Use it inside metadata objects to specify which type of metadata it is.
+            </summary>
+        </member>
+        <member name="F:JSONHelper.META.PROP">
+            <summary>
+            The property "marker". Use it in normal objects as property name and the metadata object as value.
+            </summary>
+        </member>
+        <member name="F:JSONHelper.META.VALUETYPE">
+            <summary>
+            The ValueType / struct "marker". Use it as value to PROP in value types.
+            </summary>
+        </member>
+        <member name="T:ReflectionHelper">
+            <summary>
+            Stolen from http://theinstructionlimit.com/fast-net-reflection and FEZ. Thanks, Renaud!
+            </summary>
+        </member>
+        <member name="T:LoadHelper">
+            <summary>
+            Used for easy loading of assets.
+            </summary>
+        </member>
+        <member name="M:LoadHelper.LoadAssetFromAnywhere(System.String)">
+            <summary>
+            Loads an asset with the given name from all asset bundles and returns the first one found.
+            </summary>
+            <param name="path">The path or the name of the asset.</param>
+            <returns>The found asset or null if nothing was found</returns>
+        </member>
+        <member name="M:LoadHelper.LoadAssetFromAnywhere``1(System.String)">
+            <summary>
+            Loads an asset with the given name and the given type from all asset bundles and returns the first one found.
+            </summary>
+            <typeparam name="T">The required type of the asset.</typeparam>
+            <param name="path">The path or the name of the asset.</param>
+            <returns>The found asset or null if nothing was found</returns>
+        </member>
+        <member name="M:LoadHelper.Find``1(System.String)">
+            <summary>
+            Finds all assets that match the path and type in all asset bundles.
+            </summary>
+            <typeparam name="T">The type of assets to load.</typeparam>
+            <param name="toFind">The path or the name for the assets.</param>
+            <returns>A list of all found assets.</returns>
+        </member>
+        <member name="M:LoadHelper.Find(System.String)">
+            <summary>
+            Finds all assets that match the path in all asset bundles.
+            </summary>
+            <param name="toFind">The path or the name for the assets.</param>
+            <returns>A list of all found assets.</returns>
+        </member>
+        <member name="T:ETGModMainBehaviour">
+            <summary>
+            The main behaviour of MTG API.
+            </summary>
+        </member>
+        <member name="F:ETGModMainBehaviour.GUID">
+            <summary>
+            MTG API's guid. Can be set as your mod's dependency if your mod depends on the MTG API.
+            </summary>
+        </member>
+        <member name="F:ETGModMainBehaviour.VERSION">
+            <summary>
+            The current version of the MTG API.
+            </summary>
+        </member>
+        <member name="F:ETGModMainBehaviour.Instance">
+            <summary>
+            Current instance of the MTG API behaviour.
+            </summary>
+        </member>
+        <member name="M:ETGModMainBehaviour.WaitForGameManagerStart(System.Action{GameManager})">
+            <summary>
+            Delays the given action until both GameManager and GameUIRoot exist and one of them is running Start().
+            </summary>
+            <param name="onStart">The action to delay.</param>
+        </member>
+        <member name="M:ETGModMainBehaviour.WaitForGameManagerAwake(System.Action{GameManager})">
+            <summary>
+            Delays the given action until both GameManager and GameUIRoot exist and one of them is running Awake().
+            </summary>
+            <param name="onAwake">The action to delay.</param>
+        </member>
+        <member name="T:System.ComponentModel.ICancelAddNew">
+             <summary>
+                 Interface implemented by a list that allows the addition of a new item
+                 to be either cancelled or committed.
+            
+                 Note: In some scenarios, specifically Windows Forms complex data binding,
+                 the list may recieve CancelNew or EndNew calls for items other than the
+                 new item. These calls should be ignored, ie. the new item should only be
+                 cancelled or committed when that item's index is specified.
+             </summary>
+        </member>
+        <member name="M:System.ComponentModel.ICancelAddNew.CancelNew(System.Int32)">
+            <summary>
+                If a new item has been added to the list, and <paramref name="itemIndex"/> is the position of that item,
+                then this method should remove it from the list and cancel the add operation.
+            </summary>
+        </member>
+        <member name="M:System.ComponentModel.ICancelAddNew.EndNew(System.Int32)">
+            <summary>
+                If a new item has been added to the list, and <paramref name="itemIndex"/> is the position of that item,
+                then this method should leave it in the list and complete the add operation.
+            </summary>
+        </member>
+        <member name="T:System.ComponentModel.AddingNewEventHandler">
+            <summary>
+                Represents the method that will handle the AddingNew event on a list,
+                and provide the new object to be added to the list.
+            </summary>
+        </member>
+        <member name="P:System.ComponentModel.IRaiseItemChangedEvents.RaisesItemChangedEvents">
+            <summary>
+            </summary>
+        </member>
+        <member name="T:SGUI.ISGUIBackend">
+            <summary>
+            A SGUI backend. Only use it in a valid context (when rendering)!
+            </summary>
+        </member>
+        <member name="P:SGUI.ISGUIBackend.CurrentRoot">
+            <summary>
+            The root that currently uses the backend to render.
+            </summary>
+            <value>The current root using the backend. Null when not rendering.</value>
+        </member>
+        <member name="P:SGUI.ISGUIBackend.RenderOnGUI">
+            <summary>
+            Whether to use OnGUI (IMGUI) or not (GameObject-based / shadow hierarchy).
+            </summary>
+            <value><c>true</c> if the children of CurrentRoot should be rendered on and Start-/EndRender should get called in OnGUI.</value>
+        </member>
+        <member name="P:SGUI.ISGUIBackend.RenderOnGUILayout">
+            <summary>
+            Whether GUILayout is used in OnGUI or not. Returning false here cuts half the OnGUI calls, but disables GUILayout / GUI.Window.
+            </summary>
+            <value><c>true</c> if the backend uses GUILayout.</value>
+        </member>
+        <member name="M:SGUI.ISGUIBackend.Text(SGUI.SElement,UnityEngine.Vector2,UnityEngine.Vector2,System.String,UnityEngine.TextAnchor,UnityEngine.Texture)">
+            <summary>
+            Render the specified text on screen.
+            </summary>
+            <param name="elem">Element instance. Null for root.</param>
+            <param name="position">Relative position to render the text at.</param>
+            <param name="size">Size in which the text should fit in.</param>
+            <param name="text">Text to render.</param>
+            <param name="alignment">How to align the text in the label.</param>
+            <param name="icon">An optional icon for the label.</param>
+        </member>
+        <member name="M:SGUI.ISGUIBackend.TextField(SGUI.SElement,UnityEngine.Vector2,UnityEngine.Vector2,System.String@)">
+            <summary>
+            Render a text field on screen.
+            </summary>
+            <param name="elem">Element instance. Null for root.</param>
+            <param name="position">Position.</param>
+            <param name="size">Size.</param>
+            <param name="text">Text.</param>
+        </member>
+        <member name="M:SGUI.ISGUIBackend.TextField(UnityEngine.Rect,System.String@)">
+            <summary>
+            Render a text field on screen.
+            </summary>
+            <param name="bounds">Bounds.</param>
+            <param name="text">Text.</param>
+        </member>
+        <member name="M:SGUI.ISGUIBackend.MeasureText(System.String,System.Nullable{UnityEngine.Vector2},System.Object)">
+            <summary>
+            Gets the size of the text.
+            </summary>
+            <returns>The size of the given text.</returns>
+            <param name="text">The text to measure.</param>
+            <param name="size">The bounds in which the text should fit in.</param>
+            <param name="font">The font in which the text gets rendered.</param>
+        </member>
+        <member name="M:SGUI.ISGUIBackend.MeasureText(System.String@,System.Nullable{UnityEngine.Vector2},System.Object)">
+            <summary>
+            Gets the size of the text.
+            </summary>
+            <returns>The size of the given text.</returns>
+            <param name="text">The text to measure. Will be adapted to fit in the given bounds.</param>
+            <param name="size">The bounds in which the text should fit in.</param>
+            <param name="font">The font in which the text gets rendered.</param>
+        </member>
+        <member name="M:SGUI.ISGUIBackend.Dispose">
+            <summary>
+            Releases all resource used by the <see cref="T:SGUI.ISGUIBackend"/> object.
+            </summary>
+            <remarks>Call <see cref="M:SGUI.ISGUIBackend.Dispose"/> when you are finished using the <see cref="T:SGUI.ISGUIBackend"/>. The
+            <see cref="M:SGUI.ISGUIBackend.Dispose"/> method leaves the <see cref="T:SGUI.ISGUIBackend"/> in an unusable state. After
+            calling <see cref="M:SGUI.ISGUIBackend.Dispose"/>, you must release all references to the <see cref="T:SGUI.ISGUIBackend"/> so
+            the garbage collector can reclaim the memory that the <see cref="T:SGUI.ISGUIBackend"/> was occupying.</remarks>
+        </member>
+        <member name="M:SGUI.ISGUIBackend.Dispose(SGUI.SElement)">
+            <summary>
+            Dispose the specified elem.
+            </summary>
+            <param name="elem">Element.</param>
+        </member>
+        <member name="P:SGUI.SElement.IsInteractive">
+            <summary>
+            Gets a value indicating whether this <see cref="T:SGUI.SElement"/> is interactive.
+            </summary>
+            <value><c>true</c> if is interactive; otherwise, <c>false</c>.</value>
+        </member>
+        <member name="T:SGUI.SEasings">
+            <summary>
+            Taken from https://github.com/warrenm/AHEasing/blob/master/AHEasing/easing.c,
+            which is licensed under the "Do What The Fuck You Want To Public License, Version 2".
+            </summary>
+        </member>
+        <member name="M:SGUI.SEasings.Linear(System.Single)">
+            <summary>
+            Modeled after the line y = x
+            </summary>
+        </member>
+        <member name="M:SGUI.SEasings.QuadraticEaseIn(System.Single)">
+            <summary>
+            Modeled after the parabola y = x^2
+            </summary>
+        </member>
+        <member name="M:SGUI.SEasings.QuadraticEaseOut(System.Single)">
+            <summary>
+            Modeled after the parabola y = -x^2 + 2x
+            </summary>
+        </member>
+        <member name="M:SGUI.SEasings.QuadraticEaseInOut(System.Single)">
+            <summary>
+            Modeled after the piecewise quadratic
+            y = (1/2)((2x)^2)             ; [0, 0.5)
+            y = -(1/2)((2x-1)*(2x-3) - 1) ; [0.5, 1]
+            </summary>
+        </member>
+        <member name="M:SGUI.SEasings.CubicEaseIn(System.Single)">
+            <summary>
+            Modeled after the cubic y = x^3
+            </summary>
+        </member>
+        <member name="M:SGUI.SEasings.CubicEaseOut(System.Single)">
+            <summary>
+            Modeled after the cubic y = (x - 1)^3 + 1
+            </summary>
+        </member>
+        <member name="M:SGUI.SEasings.CubicEaseInOut(System.Single)">
+            <summary>
+            Modeled after the piecewise cubic
+            y = (1/2)((2x)^3)       ; [0, 0.5)
+            y = (1/2)((2x-2)^3 + 2) ; [0.5, 1]
+            </summary>
+        </member>
+        <member name="M:SGUI.SEasings.QuarticEaseIn(System.Single)">
+            <summary>
+            Modeled after the quartic x^4
+            </summary>
+        </member>
+        <member name="M:SGUI.SEasings.QuarticEaseOut(System.Single)">
+            <summary>
+            Modeled after the quartic y = 1 - (x - 1)^4
+            </summary>
+        </member>
+        <member name="M:SGUI.SEasings.QuarticEaseInOut(System.Single)">
+            <summary>
+            Modeled after the piecewise quartic
+            y = (1/2)((2x)^4)        ; [0, 0.5)
+            y = -(1/2)((2x-2)^4 - 2) ; [0.5, 1]
+            </summary>
+        </member>
+        <member name="M:SGUI.SEasings.QuinticEaseIn(System.Single)">
+            <summary>
+            Modeled after the quintic y = x^5
+            </summary>
+        </member>
+        <member name="M:SGUI.SEasings.QuinticEaseOut(System.Single)">
+            <summary>
+            Modeled after the quintic y = (x - 1)^5 + 1
+            </summary>
+        </member>
+        <member name="M:SGUI.SEasings.QuinticEaseInOut(System.Single)">
+            <summary>
+            Modeled after the piecewise quintic
+            y = (1/2)((2x)^5)       ; [0, 0.5)
+            y = (1/2)((2x-2)^5 + 2) ; [0.5, 1]
+            </summary>
+        </member>
+        <member name="M:SGUI.SEasings.SineEaseIn(System.Single)">
+            <summary>
+            Modeled after quarter-cycle of sine wave
+            </summary>
+        </member>
+        <member name="M:SGUI.SEasings.SineEaseOut(System.Single)">
+            <summary>
+            Modeled after quarter-cycle of sine wave (different phase)
+            </summary>
+        </member>
+        <member name="M:SGUI.SEasings.SineEaseInOut(System.Single)">
+            <summary>
+            Modeled after half sine wave
+            </summary>
+        </member>
+        <member name="M:SGUI.SEasings.CircularEaseIn(System.Single)">
+            <summary>
+            Modeled after shifted quadrant IV of unit circle
+            </summary>
+        </member>
+        <member name="M:SGUI.SEasings.CircularEaseOut(System.Single)">
+            <summary>
+            Modeled after shifted quadrant II of unit circle
+            </summary>
+        </member>
+        <member name="M:SGUI.SEasings.CircularEaseInOut(System.Single)">
+            <summary>
+            Modeled after the piecewise circular function
+            y = (1/2)(1 - sqrt(1 - 4x^2))           ; [0, 0.5)
+            y = (1/2)(sqrt(-(2x - 3)*(2x - 1)) + 1) ; [0.5, 1]
+            </summary>
+        </member>
+        <member name="M:SGUI.SEasings.ExponentialEaseIn(System.Single)">
+            <summary>
+            Modeled after the exponential function y = 2^(10(x - 1))
+            </summary>
+        </member>
+        <member name="M:SGUI.SEasings.ExponentialEaseOut(System.Single)">
+            <summary>
+            Modeled after the exponential function y = -2^(-10x) + 1
+            </summary>
+        </member>
+        <member name="M:SGUI.SEasings.ExponentialEaseInOut(System.Single)">
+            <summary>
+            Modeled after the piecewise exponential
+            y = (1/2)2^(10(2x - 1))         ; [0,0.5)
+            y = -(1/2)*2^(-10(2x - 1))) + 1 ; [0.5,1]
+            </summary>
+        </member>
+        <member name="M:SGUI.SEasings.ElasticEaseIn(System.Single)">
+            <summary>
+            Modeled after the damped sine wave y = sin(13pi/2*x)*pow(2, 10 * (x - 1))
+            </summary>
+        </member>
+        <member name="M:SGUI.SEasings.ElasticEaseOut(System.Single)">
+            <summary>
+            Modeled after the damped sine wave y = sin(-13pi/2*(x + 1))*pow(2, -10x) + 1
+            </summary>
+        </member>
+        <member name="M:SGUI.SEasings.ElasticEaseInOut(System.Single)">
+            <summary>
+            Modeled after the piecewise exponentially-damped sine wave:
+            y = (1/2)*sin(13pi/2*(2*x))*pow(2, 10 * ((2*x) - 1))      ; [0,0.5)
+            y = (1/2)*(sin(-13pi/2*((2x-1)+1))*pow(2,-10(2*x-1)) + 2) ; [0.5, 1]
+            </summary>
+        </member>
+        <member name="M:SGUI.SEasings.BackEaseIn(System.Single)">
+            <summary>
+            Modeled after the overshooting cubic y = x^3-x*sin(x*pi)
+            </summary>
+        </member>
+        <member name="M:SGUI.SEasings.BackEaseOut(System.Single)">
+            <summary>
+            Modeled after overshooting cubic y = 1-((1-x)^3-(1-x)*sin((1-x)*pi))
+            </summary>
+        </member>
+        <member name="M:SGUI.SEasings.BackEaseInOut(System.Single)">
+            <summary>
+            Modeled after the piecewise overshooting cubic function:
+            y = (1/2)*((2x)^3-(2x)*sin(2*x*pi))           ; [0, 0.5)
+            y = (1/2)*(1-((1-x)^3-(1-x)*sin((1-x)*pi))+1) ; [0.5, 1]
+            </summary>
+        </member>
+        <member name="F:SGUI.SGUIRoot.TextFieldBackground">
+            <summary>
+            Order of textures depending on backend. For SGUI-IM: Normal, active, hover, focused.
+            </summary>
+        </member>
+    </members>
+</doc>

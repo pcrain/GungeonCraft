@@ -21,7 +21,7 @@ I have no artistic talent beyond making minor sprite and sound edits, so all bas
 * [SPOILERS] boss card art [by synistersyrup from DeviantArt](https://www.deviantart.com/synistersyrup/art/Sans-Uses-Flirt-665517108)
 * [SPOILERS] boss music [by tomori](https://www.youtube.com/watch?v=pC_7lrh6mGs)
 * Other item and effect sprites from various games on the [Spriter's Resource](https://www.spriters-resource.com/) and from [OpenGameArt.org](https://opengameart.org)
-* Thunderstore preview icon AI-generated with [Bing Image Creator](https://www.bing.com/images/create/robot-player-character-from-enter-the-gungeon-in-m/650a0f82d4f9484da318b476dce1c00e?id=DJ8HZlG4p%2fssR6hTLvs4lw%3d%3d&view=detailv2&idpp=genimg&FORM=GCRIDP&ajaxhist=0&ajaxserp=0)
+* Thunderstore preview icon AI-generated with [Bing Image Creator](https://www.bing.com/images/create/robot-player-character-from-enter-the-gungeon-in-m/65330333515049d6b25f20395ca48f48?id=WgRNve%2f3ujnjiElePfoRnQ%3d%3d&view=detailv2&idpp=genimg&FORM=GCRIDP&mode=overlay)
 	
 ### Sounds
 

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.1 (2023-11-05)
+- New custom projectile and ammo clip sprites for several guns thanks to Lynceus :D
+- Added full support for the [ItemTips](https://enter-the-gungeon.thunderstore.io/package/Glorfindel/ItemTips/?utm_source=discord) mod for all GungeonCraft items
+- Updated to ModTheGungeon API 1.7.0 for faster load times (thanks SpecialAPI!)
+- Fixed an issue where a few console commands from other mods would be disabled when GungeonCraft is loaded
+- Fixed Tranquilizer being able to stun enemies immune to stun
+- Fixed Thunderstore preview icon image link in Credits.md
+
 ## 1.1.0 (2023-11-03)
 
 #### Features and Polish:

@@ -23,7 +23,7 @@ manifesttemplate=`cat <<HERE
   "website_url": "https://github.com/pcrain/GungeonCraft",
   "description": "A mechanics-focused mod for Enter the Gungeon O:",
   "dependencies": [
-    "MtG_API-Mod_the_Gungeon_API-1.5.5",
+    "MtG_API-Mod_the_Gungeon_API-1.7.0",
     "Alexandria-Alexandria-0.3.24"
   ]
 }
@@ -111,17 +111,16 @@ done <<< $(find "Resources" -type f -not -path "*.wav" -not -path "*.ogg" -not -
 
 #Unversioned EtG Unity Packages (skipping version numbers because there's no way to tell just by looking and it was causing problems)
 echo -e "[${GRN}>${BLN}] Scanning for EtG DLLs"
+unitydllpath="packages/EtG.UnityEngine.1.0.0/lib"
 while read -r line; do
   if [ $UPDATEDLLS -eq 1 ]; then
-    basename="$(echo "${line}" | rev | cut -f1 -d $'\\' | rev)"
-    separated="$(echo "${line}" | sed -re 's@\\@/@g')"
-    newpath="./bin/Debug/${basename}"
+    newpath="./bin/Debug/${line}.dll"
     if [ ! -e "$newpath" ]; then
-      /bin/cp "${separated}" "${newpath}"
+      /bin/cp "${unitydllpath}/${line}.dll" "${newpath}"
     fi
   fi
   includes+=("<Reference Include=\"${line}\"/>")
-done <<< $(find "packages/EtG.UnityEngine.1.0.0" -path "*.dll" | sed -r 's@^.*(UnityEngine(\..+)?).dll@\1@g')
+done <<< $(find "${unitydllpath}" -path "*.dll" | sed -r 's@^.*(UnityEngine(\..+)?).dll@\1@g')
 
 #Versioned packages, net35
 echo -e "[${GRN}>${BLN}] Scanning for net35 DLLs"

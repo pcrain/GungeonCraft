@@ -2647,8 +2647,8 @@
     <Reference Include="Assembly-CSharp"/>
     <Reference Include="PlayMaker"/>
     <Reference Include="0Harmony"/>
-    <Reference Include="ModTheGungeonAPI"/>
     <Reference Include="BepInEx"/>
+    <Reference Include="ModTheGungeonAPI"/>
     <Reference Include="Mono.Cecil.Rocks"/>
     <Reference Include="Mono.Cecil"/>
     <Reference Include="Mono.Cecil.Pdb"/>

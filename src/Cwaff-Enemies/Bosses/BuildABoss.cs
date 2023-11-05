@@ -611,6 +611,8 @@ public class BuildABoss
 
   public void MakeInteractible<T>(bool preFight = true, bool postFight = false) where T : BossNPC
   {
+    // TODO WARNING: if this were ever actually attached to a proper BossTriggerZone, this could cause null dereferences
+    // in the vanilla BossTriggerZone.cs -> OnTriggerCollision() method. See discussion on Gungeon Modding Discord 2023-11-05
     if (preFight)
       this.prefab.GetComponent<GenericIntroDoer>().triggerType = GenericIntroDoer.TriggerType.BossTriggerZone;
     T npc = this.prefab.GetOrAddComponent<T>();

@@ -6,7 +6,7 @@ public class C // constants
 
     public const string MOD_NAME        = "GungeonCraft";
     public const string MOD_INT_NAME    = "CwaffingTheGungy";
-    public const string MOD_VERSION     = "1.1.0";
+    public const string MOD_VERSION     = "1.1.1";
 
     public const string MOD_PREFIX      = "cg";
     public const float  PIXELS_PER_TILE = 16f;
