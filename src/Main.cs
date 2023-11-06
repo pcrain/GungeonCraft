@@ -292,6 +292,9 @@ public class Initialisation : BaseUnityPlugin
 
             // ETGMod.StartGlobalCoroutine(this.delayedstarthandler());
 
+            // Hotfixes for bugs and issues mostly out of my control
+            DragunFightHotfix.Init();
+
             watch.Stop();
             ETGModConsole.Log($"Yay! :D Initialized <color=#aaffaaff>{C.MOD_NAME} v{C.MOD_VERSION}</color> in "+(watch.ElapsedMilliseconds/1000.0f)+" seconds");
             if (C.DEBUG_BUILD)

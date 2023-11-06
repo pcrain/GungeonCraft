@@ -21,6 +21,16 @@ public class Commands
                 0);
             // ETGModConsole.Log("<size=100><color=#ff0000ff>Please specify a command. Type 'nn help' for a list of commands.</color></size>", false);
         });
+        ETGModConsole.Commands.AddGroup("shaderfix", delegate (string[] args)
+        {
+            foreach (DebrisObject debris in StaticReferenceManager.AllDebris)
+            {
+                if (debris.GetComponentInChildren<PickupObject>() is not PickupObject pickup)
+                    continue;
+                pickup.sprite.usesOverrideMaterial = true;
+                pickup.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
+            }
+        });
         // Boss time o.o
         // ETGModConsole.Commands.AddGroup("bb", delegate (string[] args)
         // {
