@@ -1,12 +1,17 @@
 # Changelog
 
+## 1.1.2 (2023-11-06)
+- Fixed (kinda) null dereference randomly preventing the Dragun fight cutscene from triggers, and added some debug output in case anyone is ever able to reproduce it again
+- Fixed Aimu Hakurei being able to graze bullets that have already despawned
+- Fixed a few edge cases for Astral Projector that could get you stuck in walls when pausing, opening the Ammonomicon, or opening a debug console
+
 ## 1.1.1 (2023-11-05)
 - New custom projectile and ammo clip sprites for several guns thanks to Lynceus :D
 - Added full support for the [ItemTips](https://enter-the-gungeon.thunderstore.io/package/Glorfindel/ItemTips/?utm_source=discord) mod for all GungeonCraft items
 - Updated to ModTheGungeon API 1.7.0 for faster load times (thanks SpecialAPI!)
 - Fixed an issue where a few console commands from other mods would be disabled when GungeonCraft is loaded
 - Fixed Tranquilizer being able to stun enemies immune to stun
-- Fixed Thunderstore preview icon image link in Credits.md
+- Fixed Thunderstore preview icon image link in Credits page
 
 ## 1.1.0 (2023-11-03)
 
@@ -19,7 +24,7 @@
 
 #### Balance Changes:
 - Ticonderogun's damage now scales inversely with the number of enemies encircled rather than inversely with circle size, resulting in higher damage on average
-- Dead ringer now has a short grace period after activating to make it less likely you will immediately lose your cloak
+- Dead Ringer now has a short grace period after activating to make it less likely you will immediately lose your cloak
 - Halved max ammo of Schrodinger's Gat
 - [REDACTED]'s active item effect can now be triggered by either the active item button or the fire button
 
