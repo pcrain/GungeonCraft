@@ -269,7 +269,7 @@ public class AimuHakurei : AdvancedGunBehavior
         Vector2 bottom = pc.sprite.WorldBottomCenter;
         foreach (Projectile p in StaticReferenceManager.AllProjectiles)
         {
-            if (!p.collidesWithPlayer || p.Owner == this.Owner)
+            if (!p.isActiveAndEnabled || !p.sprite.renderer.enabled || !p.collidesWithPlayer || p.Owner == this.Owner)
                 continue; // if the projectile can't collide with us, we're not impressed
 
             if (p.sprite?.WorldCenter is not Vector2 epos)
