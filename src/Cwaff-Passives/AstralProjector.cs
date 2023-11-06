@@ -17,8 +17,9 @@ public class AstralProjector : PassiveItem
     private RoomHandler _phasedRoom;
 
     private static int _AstralProjectorId;
-    // private static Hook astralProjectorHook;
     private static ILHook _AstralProjectorILHook;
+
+    private static Vector2 _LastSanePosition = Vector2.zero;
 
     public static void Init()
     {
@@ -27,10 +28,6 @@ public class AstralProjector : PassiveItem
         item.AddToSubShop(ModdedShopType.TimeTrader);
 
         _AstralProjectorId   = item.PickupObjectId;
-        // astralProjectorHook = new Hook(
-        //     typeof(PlayerController).GetMethod("HandlePlayerInput", BindingFlags.Instance | BindingFlags.NonPublic),
-        //     typeof(AstralProjector).GetMethod("HandlePlayerPhasingInput", BindingFlags.Static | BindingFlags.NonPublic)
-        //     );
         _AstralProjectorILHook = new ILHook(
             typeof(PlayerController).GetMethod("HandlePlayerInput", BindingFlags.Instance | BindingFlags.NonPublic),
             HandlePlayerPhasingInputIL
@@ -40,6 +37,7 @@ public class AstralProjector : PassiveItem
     public override void Pickup(PlayerController player)
     {
         base.Pickup(player);
+        _LastSanePosition = player.specRigidbody.PrimaryPixelCollider.UnitBottomCenter;
         player.specRigidbody.OnPreTileCollision += this.OnPreTileCollision;
     }
 
@@ -72,7 +70,7 @@ public class AstralProjector : PassiveItem
     public override void Update()
     {
         base.Update();
-        if (!this.Owner)
+        if (!this.Owner || BraveTime.DeltaTime == 0f)
             return;
 
         this.CanBeDropped = !(this._intangible || this._phased);
@@ -89,6 +87,16 @@ public class AstralProjector : PassiveItem
 
         if (this.Owner.ForceConstrainToRoom(this._phasedRoom))
             return;
+
+        Vector2 ppos = this.Owner.transform.PositionVector2();
+        Vector2 unitBottomCenter = this.Owner.specRigidbody.PrimaryPixelCollider.UnitBottomCenter;
+        if (!GameManager.Instance.Dungeon.data.CheckInBoundsAndValid(unitBottomCenter.ToIntVector2(VectorConversions.Floor)))
+        {
+            this._intangibleTimer = _UNPHASE_TIMER;
+            ppos = _LastSanePosition;
+            return;
+        }
+        _LastSanePosition = ppos;
 
         if (--this._insideWalls == 0)
             this._phased = false;
@@ -118,6 +126,7 @@ public class AstralProjector : PassiveItem
     {
         this._intangible = true;
 
+        GameManager.Instance.PreventPausing = true; // if we allow pausing, then our _insideWalls might skip a frame and unphase us in a wall, getting us stuck
         this.Owner.CurrentInputState = PlayerInputState.FoyerInputOnly;
         tk2dBaseSprite sprite = this.Owner.sprite;
         sprite.usesOverrideMaterial = true;
@@ -131,6 +140,7 @@ public class AstralProjector : PassiveItem
     {
         this._intangible = false;
 
+        GameManager.Instance.PreventPausing = false;
         this.Owner.CurrentInputState = PlayerInputState.AllInput;
         tk2dBaseSprite sprite = this.Owner.sprite;
         sprite.usesOverrideMaterial = true;
