@@ -31,6 +31,7 @@ public class Blackjack : AdvancedGunBehavior
             mod.angleVariance       = 24.0f;
             mod.cooldownTime        = 0.16f;
             mod.numberOfShotsInClip = _CLIP_SIZE;
+            mod.SetupCustomAmmoClip(SpriteName);
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("playing_card").Base(),

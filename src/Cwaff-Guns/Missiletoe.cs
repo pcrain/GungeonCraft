@@ -55,6 +55,7 @@ public class Missiletoe : AdvancedGunBehavior
             mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
             mod.cooldownTime        = 0.2f;
             mod.numberOfShotsInClip = 1;
+            mod.SetupCustomAmmoClip(SpriteName);
 
         _WrapVFXS   = SetupVFX("black_gift_wrap");
         _WrapVFXA   = SetupVFX("red_gift_wrap");
@@ -78,18 +79,50 @@ public class Missiletoe : AdvancedGunBehavior
             // giftExplosion.freezeRadius      = 0.5f;
             // giftExplosion.freezeEffect      = ItemHelper.Get(Items.FrostBullets).GetComponent<BulletStatusEffectItem>().FreezeModifierEffect;
 
+        tk2dSpriteAnimationClip oldOrnamentProjectile = AnimateBullet.CreateProjectileAnimation(
+            ResMap.Get("ornament_projectile").Base(),
+            1, true, new IntVector2(8, 7), false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
+        tk2dSpriteAnimationClip oldExplodingOrnamentProjectile = AnimateBullet.CreateProjectileAnimation(
+            ResMap.Get("exploding_ornament_projectile").Base(),
+            1, true, new IntVector2(8, 7), false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
+
+        tk2dSpriteAnimationClip ballProjectile =
+            AnimateBullet.CreateProjectileAnimation(ResMap.Get("missiletoe_projectile_ball").Base(), 2, true,
+                new IntVector2(6, 6), false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
+        tk2dSpriteAnimationClip gingerbreadProjectile =
+            AnimateBullet.CreateProjectileAnimation(ResMap.Get("missiletoe_projectile_gingerbread").Base(), 2, true,
+                new IntVector2(9, 11), false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
+        tk2dSpriteAnimationClip mistletoeProjectile =
+            AnimateBullet.CreateProjectileAnimation(ResMap.Get("missiletoe_projectile_mistletoe").Base(), 2, true,
+                new IntVector2(9, 7), false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
+        tk2dSpriteAnimationClip sockProjectile =
+            AnimateBullet.CreateProjectileAnimation(ResMap.Get("missiletoe_projectile_sock").Base(), 2, true,
+                new IntVector2(7, 9), false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
+        tk2dSpriteAnimationClip starProjectile =
+            AnimateBullet.CreateProjectileAnimation(ResMap.Get("missiletoe_projectile_star").Base(), 2, true,
+                new IntVector2(7, 7), false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
+        tk2dSpriteAnimationClip wreathProjectile =
+            AnimateBullet.CreateProjectileAnimation(ResMap.Get("missiletoe_projectile_wreath").Base(), 2, true,
+                new IntVector2(7, 9), false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
+
         _OrnamentProjectile = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items._38Special) as Gun, false);
-            _OrnamentProjectile.AddDefaultAnimation(AnimateBullet.CreateProjectileAnimation(
-                ResMap.Get("ornament_projectile").Base(),
-                1, true, new IntVector2(8, 7), false, tk2dBaseSprite.Anchor.MiddleLeft, true, true));
+            _OrnamentProjectile.AddAnimation(gingerbreadProjectile);
+            _OrnamentProjectile.AddAnimation(mistletoeProjectile);
+            _OrnamentProjectile.AddAnimation(sockProjectile);
+            _OrnamentProjectile.AddAnimation(starProjectile);
+            _OrnamentProjectile.AddAnimation(wreathProjectile);
+            _OrnamentProjectile.AddDefaultAnimation(ballProjectile);
             _OrnamentProjectile.gameObject.AddComponent<GlowyChristmasProjectileBehavior>();
 
         _ExplodingOrnamentProjectile = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items._38Special) as Gun, false);
-            _ExplodingOrnamentProjectile.AddDefaultAnimation(AnimateBullet.CreateProjectileAnimation(
-                    ResMap.Get("exploding_ornament_projectile").Base(),
-                    1, true, new IntVector2(8, 7), false, tk2dBaseSprite.Anchor.MiddleLeft, true, true));
+            _ExplodingOrnamentProjectile.AddAnimation(gingerbreadProjectile);
+            _ExplodingOrnamentProjectile.AddAnimation(mistletoeProjectile);
+            _ExplodingOrnamentProjectile.AddAnimation(sockProjectile);
+            _ExplodingOrnamentProjectile.AddAnimation(starProjectile);
+            _ExplodingOrnamentProjectile.AddAnimation(wreathProjectile);
+            _ExplodingOrnamentProjectile.AddDefaultAnimation(ballProjectile);
             _ExplodingOrnamentProjectile.gameObject.AddComponent<ExplosiveModifier>().explosionData = giftExplosion;
-            _ExplodingOrnamentProjectile.gameObject.AddComponent<GlowyChristmasProjectileBehavior>();
+            _ExplodingOrnamentProjectile.gameObject.AddComponent<GlowyChristmasProjectileBehavior>().Glow(40);
 
         _GiftProjectileS = SetupProjectile(gun: gun, name: "gift_projectile_black", damage: 30f, speed: 30f, force: 30f);
             ExplosiveModifier explodeS = _GiftProjectileS.gameObject.AddComponent<ExplosiveModifier>();
@@ -283,19 +316,28 @@ public class Missiletoe : AdvancedGunBehavior
 
 public class GlowyChristmasProjectileBehavior : MonoBehaviour
 {
-    private Projectile _projectile;
-    private PlayerController _owner;
+    public float glow = 0f;
+
     private void Start()
     {
-        this._projectile = base.GetComponent<Projectile>();
-        this._owner = this._projectile.Owner as PlayerController;
+        Projectile _projectile = base.GetComponent<Projectile>();
 
-        this._projectile.sprite.usesOverrideMaterial = true;
-        Material m = this._projectile.sprite.renderer.material;
+        _projectile.sprite.spriteAnimator.Play(_projectile.sprite.spriteAnimator.Library.clips.ChooseRandom());
+
+        if (this.glow == 0f)
+            return;
+
+        _projectile.sprite.usesOverrideMaterial = true;
+        Material m = _projectile.sprite.renderer.material;
             m.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
             m.SetFloat("_EmissivePower", 40f);
             m.SetFloat("_EmissiveColorPower", 1.55f);
             m.SetColor("_EmissiveColor", Color.white);
+    }
+
+    public void Glow(float amount)
+    {
+        this.glow = amount;
     }
 }
 

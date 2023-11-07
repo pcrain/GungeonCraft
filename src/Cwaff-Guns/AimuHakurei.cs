@@ -195,6 +195,7 @@ public class AimuHakurei : AdvancedGunBehavior
             mod.burstShotCount      = mod.projectiles.Count();
             mod.burstCooldownTime   = C.FRAME * fireRate;
             mod.cooldownTime        = C.FRAME * fireRate;
+            mod.SetupCustomAmmoClip(SpriteName);
         return mod;
     }
 

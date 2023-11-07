@@ -31,6 +31,7 @@ public class BBGun : AdvancedGunBehavior
             mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Ordered;
             mod.cooldownTime        = 0.70f;
             mod.angleVariance       = 10f;
+            mod.SetupCustomAmmoClip(SpriteName);
 
         Projectile projectile = mod.projectiles[0].ClonePrefab();
             projectile.baseData.range = 999999f;

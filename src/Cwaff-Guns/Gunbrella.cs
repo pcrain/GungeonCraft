@@ -32,7 +32,7 @@ public class Gunbrella : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Gunbrella>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.A, gunClass: GunClass.CHARGE, reloadTime: 1.0f, ammo: 100);
+            gun.SetAttributes(quality: PickupObject.ItemQuality.A, gunClass: GunClass.CHARGE, reloadTime: 1.0f, ammo: 60);
             gun.SetAnimationFPS(gun.shootAnimation, 60);
             gun.SetAnimationFPS(gun.chargeAnimation, 16);
             gun.LoopAnimation(gun.chargeAnimation, 17);
@@ -41,6 +41,7 @@ public class Gunbrella : AdvancedGunBehavior
             mod.shootStyle             = ProjectileModule.ShootStyle.Charged;
             mod.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
             mod.numberOfShotsInClip    = 1;
+            mod.SetupCustomAmmoClip(SpriteName);
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("gunbrella_projectile").Base(),

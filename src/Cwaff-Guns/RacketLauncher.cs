@@ -33,6 +33,7 @@ public class RacketLauncher : AdvancedGunBehavior
             mod.cooldownTime           = 0.1f;
             mod.ammoType               = GameUIAmmoType.AmmoType.SMALL_BULLET;
             mod.numberOfShotsInClip    = -1;
+            mod.SetupCustomAmmoClip(SpriteName);
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("tennis_ball").Base(),

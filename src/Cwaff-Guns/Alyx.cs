@@ -36,6 +36,7 @@ public class Alyx : AdvancedGunBehavior
             mod.shootStyle          = ProjectileModule.ShootStyle.Automatic;
             mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
             mod.numberOfShotsInClip = 10;
+            mod.SetupCustomAmmoClip(SpriteName);
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("alyx_projectile").Base(),

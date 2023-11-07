@@ -28,6 +28,7 @@ public class QuarterPounder : AdvancedGunBehavior
             mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
             mod.numberOfShotsInClip = 10;
             mod.angleVariance       = 15.0f;
+            mod.SetupCustomAmmoClip(SpriteName);
 
         _ProjSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("coin_gun_projectile").Base(),
