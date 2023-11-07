@@ -342,6 +342,7 @@ public class WrappableGift : MonoBehaviour
     private Vector3 _position;
     private PickupObject _pickup;
     private Missiletoe _gun;
+    private bool _wasEyedByRat = false;
 
     public static WrappableGift Spawn(Missiletoe gun, Vector3 position, PickupObject pickup, bool unwrapping)
     {
@@ -404,6 +405,7 @@ public class WrappableGift : MonoBehaviour
                 }
                 SpriteOutlineManager.RemoveOutlineFromSprite(this._pickup.sprite, true);
                 this._pickup.renderer.enabled = false;
+                this._wasEyedByRat = this._pickup.m_isBeingEyedByRat;
                 this._pickup.m_isBeingEyedByRat = false;
                 if (this._pickup.gameObject.GetComponent<DebrisObject>() is DebrisObject debris)
                     UnityEngine.Object.Destroy(debris);
@@ -438,6 +440,18 @@ public class WrappableGift : MonoBehaviour
             if (isGun)
                 trueTarget += _EXTRA_OFFSET; // guns are weirdly offset for some reason
             LootEngine.DropItemWithoutInstantiating(this._pickup.gameObject, trueTarget, Vector2.zero, 0f, true, false, true);
+            if (this._pickup.GetComponent<PlayerItem>() is PlayerItem active)
+            {
+                active.RegisterMinimapIcon();
+                active.m_pickedUp = false;
+            }
+            else if (this._pickup.GetComponent<PassiveItem>() is PassiveItem passive)
+            {
+                passive.RegisterMinimapIcon();
+                passive.m_pickedUp = false;
+            }
+            this._pickup.m_isBeingEyedByRat = this._wasEyedByRat;
+            // else if (this._pickup.GetComponent<PassiveItem>() is PassiveItem passive)
             yield break;
         }
 
