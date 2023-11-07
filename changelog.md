@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.3 (2023-11-06)
+- Fixed chicks spawned from Hatchling Gun causing errors every frame of their existence D:
+- Fixed items unwrapped from Missiletoe not being pickup-able
+- Added more custom ammo clip sprites and Missiletoe projectile variants thanks to Lynceus!
+- Nerfed Gunbrella ammo and Blackjack clip size slightly 
+
 ## 1.1.2 (2023-11-06)
 - Fixed (kinda) null dereference randomly preventing the Dragun fight cutscene from triggers, and added some debug output in case anyone is ever able to reproduce it again
 - Fixed Aimu Hakurei being able to graze bullets that have already despawned
