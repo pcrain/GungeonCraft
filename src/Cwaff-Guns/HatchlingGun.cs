@@ -82,9 +82,9 @@ public class HatchlingProjectile : MonoBehaviour
         CompanionController cc = chickum.GetOrAddComponent<CompanionController>();
 
         // From CompanionItem.Initialize()
-        cc.m_owner                        = null; // original was player
+        cc.m_owner                        = this._owner; // original was player
         cc.aiActor.IsNormalEnemy          = false;
-        cc.aiActor.CompanionOwner         = null; // original was player
+        cc.aiActor.CompanionOwner         = this._owner; // original was player
         cc.aiActor.CanTargetPlayers       = false;
         cc.aiActor.CanTargetEnemies       = true;  // original was true
         cc.aiActor.State                  = AIActor.ActorState.Normal;
