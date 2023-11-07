@@ -8,8 +8,8 @@ public class Blackjack : AdvancedGunBehavior
     public static string ShortDescription = "Gambit's Queens";
     public static string LongDescription  = "Fires cards whose range increase with accuracy. Ammo can only be regained by picking up cards from the floor.\n\nMany would argue that cards do not make the best projectiles for a gun...and many would largely be correct, as their lack of raw power and aerodynamics make them rather weak and unreliable in the hands of a novice. The most proficient and well-prepared duelists, however, have demonstrated that a single deck of cards is more than capable of dealing with the Gungeon's greatest threats.";
 
-    private const int _DECK_SIZE = 54; // need to finish up individual playing cards later
-    private const int _CLIP_SIZE = 54; // 1 suit
+    private const int _DECK_SIZE = 52; // need to finish up individual playing cards later
+    private const int _CLIP_SIZE = 13; // 1 suit
     private const int _NUM_DECKS = 2;
 
     internal static tk2dSpriteAnimationClip _BulletSprite;
