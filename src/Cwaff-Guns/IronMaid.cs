@@ -46,6 +46,7 @@ public class IronMaid : AdvancedGunBehavior
 
     public override void OnReload(PlayerController player, Gun gun)
     {
+        ETGModConsole.Log($"reloading!");
         base.OnReload(player, gun);
         LaunchAllBullets(player);
     }
@@ -55,7 +56,6 @@ public class IronMaid : AdvancedGunBehavior
         base.OnSwitchedToThisGun();
         LaunchAllBullets(this.Player);
     }
-
 
     public override void OnDropped()
     {

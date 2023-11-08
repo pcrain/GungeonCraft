@@ -193,6 +193,7 @@ public class Initialisation : BaseUnityPlugin
                 AimuHakurei.Add();
                 SeltzerPelter.Add();
                 Missiletoe.Add();
+                Platinum.Add();
             #endregion
             // tempWatch.Stop(); ETGModConsole.Log($"part 1 finished in "+(tempWatch.ElapsedMilliseconds/1000.0f)+" seconds"); tempWatch = System.Diagnostics.Stopwatch.StartNew();
 

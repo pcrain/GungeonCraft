@@ -119,6 +119,7 @@
     <Compile Include="src\Cwaff-Guns\Unfinished\SpinCycle.cs"/>
     <Compile Include="src\Cwaff-Guns\Unfinished\Telefragger.cs"/>
     <Compile Include="src\Cwaff-Guns\HandCannon.cs"/>
+    <Compile Include="src\Cwaff-Guns\Platinum.cs"/>
     <Compile Include="src\Cwaff-Guns\KiBlast.cs"/>
     <Compile Include="src\Cwaff-Guns\Blackjack.cs"/>
     <Compile Include="src\Cwaff-Guns\Outbreak.cs"/>
@@ -198,6 +199,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_fire_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_011.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_fire_005.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\platinum_reload_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\bouncer_reload_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_013.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\holy_water_gun_fire_001.json"/>
@@ -480,6 +482,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_012.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_021.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alyx_reload_001.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\platinum_idle_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\natascha_fire_007.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\aimu_hakurei_fire_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_reload_010.png"/>
@@ -875,6 +878,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_charge_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_015.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\platinum_fire_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_017.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_reload_016.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_fire_009.json"/>
@@ -1118,6 +1122,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_005.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_044.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\bouncer_fire_002.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\platinum_idle_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\soul_kaliber_reload_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tennis_rocket_gun_fire_010.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_017.png"/>
@@ -1250,6 +1255,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_reload_011.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tennis_rocket_gun_fire_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_040.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\platinum_reload_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_010.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_fire_009.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\bouncer_reload_007.png"/>
@@ -1495,6 +1501,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_fire_013.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_reload_016.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\ticonderogun_idle_001.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\platinum_fire_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\missiletoe_fire_015.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_008.json"/>
@@ -2370,6 +2377,7 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\slappp10.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\gift_projectile_red.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\gift_projectile_green.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\ora_fist_fast.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball020.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\outbreak_projectile_alt_002.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\coin_gun_projectile2.png"/>
@@ -2392,6 +2400,7 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\energy_bounce2.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\coin_gun_projectile4.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\can_projectile_3.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\ora_fist.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\slappp12.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball016.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball_old_5.png"/>
@@ -2527,6 +2536,7 @@
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\racket_launcher_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\grandmaster_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\ki_blast_gun_idle_001.png"/>
+    <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\platinum_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\soul_kaliber_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\seltzer_pelter_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\alyx_idle_001.png"/>
