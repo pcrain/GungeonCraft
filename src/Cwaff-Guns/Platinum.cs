@@ -16,6 +16,9 @@ public class Platinum : AdvancedGunBehavior
         Gun gun = Lazy.SetupGun<Platinum>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             gun.SetAttributes(quality: PickupObject.ItemQuality.A, gunClass: GunClass.PISTOL, reloadTime: 1f, ammo: 480);
             gun.SetAnimationFPS(gun.shootAnimation, 20);
+            gun.SetAnimationFPS(gun.reloadAnimation, 40);
+            gun.SetFireAudio("platinum_fire_sound");
+            gun.SetReloadAudio("platinum_reload_sound", frame: 5);
 
         ProjectileModule mod = gun.DefaultModule;
             mod.ammoCost            = 1;
@@ -26,9 +29,9 @@ public class Platinum : AdvancedGunBehavior
             mod.numberOfShotsInClip = 32;
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
-            ResMap.Get("natascha_bullet").Base(),
-            12, true, new IntVector2(15, 7),
-            false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
+            ResMap.Get("platinum_projectile").Base(),
+            12, true, new IntVector2(16, 8),
+            false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
             projectile.AddDefaultAnimation(_BulletSprite);
@@ -40,21 +43,16 @@ public class Platinum : AdvancedGunBehavior
             projectile.gameObject.AddComponent<PlatinumProjectile>();
 
         _OraBullet = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items.Polaris) as Gun);
-            _OraBullet.AddAnimation(AnimateBullet.CreateProjectileAnimation(
+            _OraBullet.AddDefaultAnimation(AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("ora_fist_fast").Base(),
                 12, true, new IntVector2(63 / 3, 27 / 3),
                 false, tk2dBaseSprite.Anchor.MiddleRight, true, true));
-            // _OraBullet.AddDefaultAnimation(AnimateBullet.CreateProjectileAnimation(
-            //     ResMap.Get("ora_fist").Base(),
-            //     12, true, new IntVector2(63 / 3, 27 / 3),
-            //     false, tk2dBaseSprite.Anchor.MiddleRight, true, true));
             _OraBullet.shouldRotate    = true;
             _OraBullet.baseData.damage = 1f;
             _OraBullet.baseData.force  = 0.1f;
             _OraBullet.baseData.range  = 3f;
             _OraBullet.baseData.speed  = 75f;
-            PierceProjModifier pierce = _OraBullet.gameObject.GetOrAddComponent<PierceProjModifier>();
-                pierce.penetration = Mathf.Max(pierce.penetration, 999);
+            _OraBullet.gameObject.GetOrAddComponent<PierceProjModifier>().penetration = 999;
     }
 
     public override void OnPostFired(PlayerController player, Gun gun)
@@ -92,6 +90,12 @@ public class Platinum : AdvancedGunBehavior
         foreach (AIActor enemy in StaticReferenceManager.AllEnemies)
             if (enemy?.GetComponent<OraOra>() is OraOra oraora) oraora.OraOraOra(pc);
     }
+
+    protected override void Update()
+    {
+        base.Update();
+        this.gun.preventRotation = (this.gun.spriteAnimator.currentClip.name == this.gun.reloadAnimation);
+    }
 }
 
 public class PlatinumProjectile : MonoBehaviour
@@ -103,12 +107,11 @@ public class PlatinumProjectile : MonoBehaviour
 
     private void Start()
     {
-        this._projectile = base.GetComponent<Projectile>();
-        this._owner = this._projectile.Owner as PlayerController;
-        this._bankedDamage = this._projectile.baseData.damage;
+        this._projectile                 = base.GetComponent<Projectile>();
+        this._owner                      = this._projectile.Owner as PlayerController;
+        this._angle                      = this._projectile.Direction.ToAngle();
+        this._bankedDamage               = this._projectile.baseData.damage;
         this._projectile.baseData.damage = 0f;
-
-        this._angle = this._projectile.Direction.ToAngle();
 
         this._projectile.OnHitEnemy += (Projectile p, SpeculativeRigidbody enemy, bool _) => {
             AkSoundEngine.PostEvent("soul_kaliber_impact", p.gameObject);
@@ -123,6 +126,7 @@ public class OraOra : MonoBehaviour
     private const float _HIT_DELAY      = 0.1f;
     private const float _DELAY_DECAY    = 0.01f;
     private const float _ANGLE_VARIANCE = 45f;
+    private const float _MOVE_TIME      = 0.1f;
     private const int   _BURST_SIZE     = 4;
 
     private AIActor _enemy;
@@ -192,15 +196,28 @@ public class OraOra : MonoBehaviour
 
         this._stand = new GameObject();
         tk2dSprite standSprite = this._stand.AddComponent<tk2dSprite>();
-            standSprite.SetSprite(pc.spriteAnimator.CurrentClip.frames[0].spriteCollection, pc.spriteAnimator.CurrentClip.frames[pc.spriteAnimator.CurrentFrame].spriteId);
+            standSprite.SetSprite(
+                newCollection: pc.spriteAnimator.CurrentClip.frames[0].spriteCollection,
+                newSpriteId: pc.spriteAnimator.GetClipByName(Lazy.GetBaseIdleAnimationName(pc, bankedAngles[0])).frames[0].spriteId);
             standSprite.usesOverrideMaterial = true;
             standSprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/HologramShader");
         this._stand.GetComponent<BraveBehaviour>().sprite = standSprite;
+
+        for (float elapsed = BraveTime.DeltaTime; elapsed < _MOVE_TIME; elapsed += BraveTime.DeltaTime)
+        {
+            float percentDone = elapsed / _MOVE_TIME;
+            standSprite.PlaceAtPositionByAnchor(
+                Vector2.Lerp(pc.sprite.WorldCenter, this._enemy.sprite.WorldCenter - bankedAngles[0].ToVector(offset + 0.5f), percentDone),
+                tk2dBaseSprite.Anchor.MiddleCenter);
+            yield return null;
+        }
 
         float baseDelay = _HIT_DELAY;
         int numBursts = bankedDamage.Count();
         for (int i = 0; i < numBursts; ++i)
         {
+            if (!(this._enemy?.healthHaver?.IsAlive ?? false))
+                break;
             float damage = bankedDamage[i];
             bool lastBurst = (i == (numBursts - 1));
             standSprite.SetSprite(pc.spriteAnimator.GetClipByName(Lazy.GetBaseIdleAnimationName(pc, bankedAngles[i])).frames[0].spriteId);
@@ -242,6 +259,14 @@ public class OraOra : MonoBehaviour
                 yield return new WaitForSeconds(baseDelay);
             }
             baseDelay = Mathf.Max(baseDelay - _DELAY_DECAY, 0.02f);
+        }
+
+        Vector2 finalPos = standSprite.WorldCenter;
+        for (float elapsed = BraveTime.DeltaTime; elapsed < _MOVE_TIME; elapsed += BraveTime.DeltaTime)
+        {
+            float percentDone = elapsed / _MOVE_TIME;
+            standSprite.PlaceAtPositionByAnchor(Vector2.Lerp(finalPos, pc.sprite.WorldCenter, percentDone), tk2dBaseSprite.Anchor.MiddleCenter);
+            yield return null;
         }
 
         UnityEngine.Object.Destroy(this._stand);

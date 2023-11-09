@@ -73,3 +73,7 @@ seltzer_shoot_sound,-5.0,1,sound
 missiletoe_shoot_sound_1,-4.0,1,sound
 missiletoe_reload_sound,-1.0,1,sound
 ice_cream_shared,-5.0,1,sound
+platinum_fire_sound,-11.0,1,sound
+platinum_reload_sound,-4.0,1,sound
+ora_hit_sound,-2.0,1,sound
+ora_final_hit_sound,-2.0,1,sound
