@@ -40,6 +40,8 @@ public static class VFX
             RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/reticle_orange");
             RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/reticle_blue");
             RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/fancy_line");
+            RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/whip_segment");
+            RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/whip_segment_base");
             // Shared by Gyroscope and Sans
             VFX.RegisterVFXObject("Tornado", ResMap.Get("tornado"), 20, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter);
             // Shared by Blackjack and possibly future auto-pickup items

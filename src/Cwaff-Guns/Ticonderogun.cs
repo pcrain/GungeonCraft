@@ -216,13 +216,13 @@ public class Ticonderogun : AdvancedGunBehavior
     }
 
     // Draw a nice tiled sprite from start to target
-    public static GameObject FancyLine(Vector2 start, Vector2 target, float width)
+    public static GameObject FancyLine(Vector2 start, Vector2 target, float width, int? spriteId = null)
     {
         Vector2 delta         = target - start;
         Quaternion rot        = delta.EulerZ();
         GameObject reticle    = UnityEngine.Object.Instantiate(new GameObject(), start, rot);
         tk2dSlicedSprite quad = reticle.AddComponent<tk2dSlicedSprite>();
-        quad.SetSprite(VFX.SpriteCollection, VFX.sprites["fancy_line"]);
+        quad.SetSprite(VFX.SpriteCollection, spriteId ?? VFX.sprites["fancy_line"]);
         quad.dimensions              = C.PIXELS_PER_TILE * (new Vector2(delta.magnitude, width));
         quad.transform.localRotation = rot;
         quad.transform.position      = start + (0.5f * width * delta.normalized.Rotate(-90f));

@@ -1848,6 +1848,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\zenkai_aura1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\pencil_sparkles3.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\whip_segment_base.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\saiyan_spark4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\egg_break2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\soul_link_particle1.png"/>
@@ -1958,6 +1959,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\pencil_sparkles1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\gunbrella_target_reticle5.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\soul_link_particle2.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\whip_segment.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\hail_collision11.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\exorcism_particles2.png"/>
@@ -2515,7 +2517,6 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile_old17.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\slappp6.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\gunbrella_projectile1.png"/>
-    <EmbeddedResource Include="Resources\ProjectileCollection\whip_segment.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\alyx_projectile4.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\natascha_bullet_002.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile_old8.png"/>
