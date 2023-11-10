@@ -127,6 +127,7 @@
     <Compile Include="src\Cwaff-Guns\SoulKaliber.cs"/>
     <Compile Include="src\Cwaff-Guns\Missiletoe.cs"/>
     <Compile Include="src\Cwaff-Guns\QuarterPounder.cs"/>
+    <Compile Include="src\Cwaff-Guns\PistolWhip.cs"/>
     <Compile Include="src\Cwaff-Guns\Deadline.cs"/>
     <Compile Include="src\Cwaff-Guns\RacketLauncher.cs"/>
     <Compile Include="src\Cwaff-Guns\Natascha.cs"/>
@@ -469,6 +470,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_014.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\ticonderogun_reload_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_015.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\pistol_whip_idle_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_fire_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_reload_011.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_reload_024.png"/>
@@ -498,6 +500,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\platinum_fire_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_012.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_021.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\pistol_whip_fire_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alyx_reload_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\platinum_idle_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\natascha_fire_007.json"/>
@@ -728,6 +731,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_fire_007.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_016.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\pistol_whip_reload_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_fire_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_fire_015.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\vacuum_cleaner_charge_003.png"/>
@@ -846,6 +850,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_reload_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_fire_008.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_020.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\pistol_whip_idle_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\platinum_reload_006.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_fire_010.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_fire_003.json"/>
@@ -976,6 +981,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_020.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_reload_001.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\pistol_whip_fire_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\ki_blast_gun_fire_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_fire_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_013.json"/>
@@ -1153,6 +1159,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_charge_013.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_025.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_fire_002.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\pistol_whip_reload_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_005.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_044.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\bouncer_fire_002.png"/>
@@ -2508,6 +2515,7 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile_old17.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\slappp6.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\gunbrella_projectile1.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\whip_segment.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\alyx_projectile4.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\natascha_bullet_002.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile_old8.png"/>
@@ -2594,6 +2602,7 @@
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\hatchling_gun_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\iron_maid_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\racket_launcher_idle_001.png"/>
+    <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\pistol_whip_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\grandmaster_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\ki_blast_gun_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\platinum_idle_001.png"/>
