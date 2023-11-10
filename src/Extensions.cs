@@ -806,6 +806,16 @@ public static class Extensions
       sprite.transform.position = position - relativePositionFromAnchor.ToVector3ZUp();
   }
 
+  // Same as PlaceAtPositionByAnchor(), but adjusted for sprite's current scale and rotation
+  public static void PlaceAtRotatedPositionByAnchor(this tk2dBaseSprite sprite, Vector3 position, tk2dBaseSprite.Anchor anchor)
+  {
+      Vector2 scale = sprite.transform.localScale.XY();
+      Vector2 anchorPos = sprite.GetRelativePositionFromAnchor(anchor);
+      Vector2 relativePositionFromAnchor = sprite.transform.rotation * new Vector2(scale.x * anchorPos.x, scale.y * anchorPos.y);
+      // Vector2 relativePositionFromAnchor = Vector2.Cross(sprite.transform.localScale.XY(), sprite.GetRelativePositionFromAnchor(anchor));
+      sprite.transform.position = position - relativePositionFromAnchor.ToVector3ZUp();
+  }
+
   // Remove and return last element from list
   public static T Pop<T>(this List<T> items)
   {

@@ -78,3 +78,4 @@ platinum_reload_sound,-4.0,1,sound
 ora_hit_sound,-2.0,1,sound
 ora_final_hit_sound,-2.0,1,sound
 whip_sound,10.0,1,sound
+whip_crack_sound,10.0,1,sound

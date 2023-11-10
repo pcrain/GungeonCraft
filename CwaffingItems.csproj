@@ -1846,6 +1846,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\echo_effect3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\icicle_crash_particles8.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a3.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\whip_particles2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\zenkai_aura1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\pencil_sparkles3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\whip_segment_base.png"/>
@@ -1853,6 +1854,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\egg_break2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\soul_link_particle1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\zenkai_aura7.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\whip_particles4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren9.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\graze_vfx1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\fancy_line (copy 1).png"/>
@@ -1885,6 +1887,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\reticle_blue.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\mini_pickup4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren18.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\whip_particles1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren16.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a8.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\drowsy_cloud7.png"/>
@@ -1895,6 +1898,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\drowsy_cloud1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\echo_effect5.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\icicle_crash_particles7.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\whip_particles3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\saiyan_spark2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire_d5.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\prime_logo_overhead.png"/>
