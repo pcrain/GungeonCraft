@@ -593,6 +593,10 @@ public static class Extensions
   {
     gun.SetGunAudio(name: gun.chargeAnimation, audio: audio, frame: frame);
   }
+  public static void SetIdleAudio(this Gun gun, string audio = "", int frame = 0)
+  {
+    gun.SetGunAudio(name: gun.idleAnimation, audio: audio, frame: frame);
+  }
 
   public static bool Contains(this List<PassiveItem> items, int itemId)
   {
