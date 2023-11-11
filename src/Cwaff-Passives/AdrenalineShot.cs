@@ -11,6 +11,7 @@ public class AdrenalineShot : PassiveItem
     internal const float _MAX_ADRENALINE_LOSS = 4f; // loss from taking damage while under effects of adrenaline
     internal static int _AdrenalineShotId;
     internal static dfSprite _AdrenalineHeart;
+    internal static float _LastHeartbeatTime = 0f;
 
     private bool  _adrenalineActive = false;
     private float _adrenalineTimer  = _MAX_ADRENALINE_TIME;
@@ -28,47 +29,7 @@ public class AdrenalineShot : PassiveItem
         new Hook(
             typeof(GameUIHeartController).GetMethod("UpdateHealth", BindingFlags.Public | BindingFlags.Instance),
             typeof(AdrenalineShot).GetMethod("UpdateHealth", BindingFlags.NonPublic | BindingFlags.Static));
-
-        // new Hook(
-        //     typeof(GameUIHeartController).GetMethod("ProcessHeartSpriteModifications", BindingFlags.NonPublic | BindingFlags.Instance),
-        //     typeof(AdrenalineShot).GetMethod("ProcessHeartSpriteModifications", BindingFlags.NonPublic | BindingFlags.Static));
     }
-
-    public static string SetupDfSpriteFromTextureForAtlas(Texture2D texture, dfAtlas atlas, string spriteName)
-    {
-        // T sprite = obj.GetOrAddComponent<T>();
-        atlas.AddItem(new dfAtlas.ItemInfo
-        {
-            border       = new RectOffset(),
-            deleted      = false,
-            name         = spriteName,
-            region       = new Rect(Vector2.zero, new Vector2(texture.width, texture.height)),
-            rotated      = false,
-            sizeInPixels = new Vector2(texture.width, texture.height),
-            texture      = texture,
-            textureGUID  = spriteName
-        });
-        // sprite.Atlas = atlas;
-        // sprite.SpriteName = spriteName;
-        return spriteName;
-    }
-
-    // internal static string _AdrenalineHeartName = null;
-    // private static void ProcessHeartSpriteModifications(Action<GameUIHeartController, PlayerController> orig, GameUIHeartController guihc, PlayerController associatedPlayer)
-    // {
-    //     orig(guihc, associatedPlayer);
-    //     if (associatedPlayer.HasPickupID(_AdrenalineShotId) && guihc.extantHearts.Count() > 0)
-    //     {
-    //         _AdrenalineHeartName ??= SetupDfSpriteFromTextureForAtlas(
-    //             texture: ResourceExtractor.GetTextureFromResource(ResMap.Get("adrenaline_heart")[0] + ".png"),
-    //             atlas: guihc.extantHearts[0].Atlas,
-    //             spriteName: "adrenaline_heart");
-    //         guihc.m_currentFullHeartName = _AdrenalineHeartName;
-    //         guihc.m_currentHalfHeartName = _AdrenalineHeartName;
-    //         // guihc.m_currentFullHeartName = "heart_full_yellow_001";
-    //         // guihc.m_currentHalfHeartName = "heart_half_yellow_001";
-    //     }
-    // }
 
     internal static bool didEffect = false;
     private static void UpdateHealth(Action<GameUIHeartController, HealthHaver> orig, GameUIHeartController guihc, HealthHaver hh)
@@ -134,6 +95,7 @@ public class AdrenalineShot : PassiveItem
     {
         base.Pickup(player);
         player.healthHaver.ModifyDamage += this.OnTakeDamage;
+
     }
 
     public override DebrisObject Drop(PlayerController player)
@@ -149,7 +111,6 @@ public class AdrenalineShot : PassiveItem
         base.OnDestroy();
     }
 
-    internal static float lastHeartbeatTime = 0f;
     public override void Update()
     {
         base.Update();
@@ -159,10 +120,13 @@ public class AdrenalineShot : PassiveItem
             return; // nothing to do if we're not in control of our character
 
         this._adrenalineTimer -= BraveTime.DeltaTime;
-        float heartRate = (this._adrenalineTimer > 30) ? 2f : (this._adrenalineTimer > 10) ? 1f : 0.5f;
-        if (BraveTime.ScaledTimeSinceStartup - lastHeartbeatTime > heartRate)
+        float heartRate =
+            (this._adrenalineTimer > 30) ? 2f   :
+            (this._adrenalineTimer > 10) ? 1f   :
+            (this._adrenalineTimer > 3)  ? 0.5f : 0.25f;
+        if (BraveTime.ScaledTimeSinceStartup - _LastHeartbeatTime > heartRate)
         {
-            lastHeartbeatTime = BraveTime.ScaledTimeSinceStartup;
+            _LastHeartbeatTime = BraveTime.ScaledTimeSinceStartup;
             AkSoundEngine.PostEvent("heartbeat", this.Owner.gameObject);
         }
 
@@ -231,7 +195,11 @@ public class AdrenalineShot : PassiveItem
         this.Owner.gameObject.AddComponent<UnderAdrenalineEffects>();
         this.Owner.healthHaver.ForceSetCurrentHealth(0.5f);
         this.Owner.healthHaver.OnHealthChanged += this.OnHealthChanged;
-        AkSoundEngine.PostEvent("adrenaline_activate_sound", this.Owner.gameObject);
+        Color faded = Color.Lerp(Color.gray, Color.clear, 0.25f);
+        this.Owner.FlatColorOverridden = true;
+        this.Owner.baseFlatColorOverride = faded;
+        this.Owner.ChangeFlatColorOverride(faded);
+        this.Owner.DoGenericItemActivation(this);
 
         this._adrenalineTimer  = _MAX_ADRENALINE_TIME;
     }
@@ -249,7 +217,9 @@ public class AdrenalineShot : PassiveItem
         this.CanBeSold         = true;
         this.Owner.healthHaver.OnHealthChanged -= this.OnHealthChanged;
         this.Owner.healthHaver.ForceSetCurrentHealth(Mathf.Max(this.Owner.healthHaver.currentHealth - 0.5f, 0.5f));
-        AkSoundEngine.PostEvent("adrenaline_recover_sound", this.Owner.gameObject);
+        this.Owner.baseFlatColorOverride = Color.clear;
+        this.Owner.ChangeFlatColorOverride(Color.clear);
+        AkSoundEngine.PostEvent("adrenaline_deactivate_sound", this.Owner.gameObject);
 
         UnityEngine.Object.Destroy(this.Owner.gameObject.GetComponent<UnderAdrenalineEffects>());
     }

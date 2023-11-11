@@ -79,3 +79,6 @@ ora_hit_sound,-2.0,1,sound
 ora_final_hit_sound,-2.0,1,sound
 whip_sound,10.0,1,sound
 whip_crack_sound,10.0,1,sound
+heartbeat,2.0,1,sound
+adrenaline_activate_sound,-2.0,1,sound
+minecraft_totem_pop_sound,0.0,1,sound

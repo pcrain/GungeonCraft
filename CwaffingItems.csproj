@@ -2037,6 +2037,7 @@
     <EmbeddedResource Include="Resources\ItemSprites\dead_ringer_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\borrowed_time_full_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\warriors_gi_icon.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\adrenaline_shot_icon_old.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\insurance_policy_hunter_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\insurance_policy_gunslinger_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\cat_ear_headband_icon.png"/>

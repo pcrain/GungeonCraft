@@ -434,6 +434,43 @@ public static class VFX
         //     m.SetFloat("_Fade", newAlpha);
         // }
     }
+
+    // Do a generic passive item activation effect above the player's head
+    public static void DoGenericItemActivation(this PlayerController player, PickupObject item, bool playSound = true)
+    {
+        player.StartCoroutine(DoGenericItemActivation_CR(player, item, playSound));
+    }
+
+    public static IEnumerator DoGenericItemActivation_CR(PlayerController player, PickupObject item, bool playSound = true)
+    {
+        const float FADE_TIME  = 1.0f;
+        const float BOB_RATE   = 1.0f * 2f * Mathf.PI;
+        const float BOB_OFFSET = -0.5f;
+        const float BOB_AMOUNT = 0.33f;
+        const float SPIN_RATE  = 1.5f * 2f * Mathf.PI;
+
+        if (playSound)
+            AkSoundEngine.PostEvent("minecraft_totem_pop_sound", player.gameObject);
+
+        GameObject g = UnityEngine.Object.Instantiate(new GameObject(), player.sprite.WorldCenter, Quaternion.identity);
+        tk2dSprite sprite = g.AddComponent<tk2dSprite>();
+            sprite.SetSprite(item.sprite.collection, item.sprite.spriteId);
+            sprite.PlaceAtPositionByAnchor(player.sprite.WorldTopCenter - new Vector2(0, BOB_OFFSET), tk2dBaseSprite.Anchor.LowerCenter);
+            sprite.transform.parent = player.transform;
+
+        for (float elapsed = 0f; elapsed < FADE_TIME; elapsed += BraveTime.DeltaTime)
+        {
+            float percentDone = elapsed / FADE_TIME;
+            sprite.transform.localScale = new Vector2(Mathf.Cos(elapsed * SPIN_RATE), 1f);
+            sprite.PlaceAtScaledPositionByAnchor(player.sprite.WorldTopCenter - new Vector2(0, BOB_OFFSET + BOB_AMOUNT * Mathf.Sin(elapsed * BOB_RATE)), tk2dBaseSprite.Anchor.LowerCenter);
+            sprite.gameObject.SetAlpha(1f - percentDone);
+            yield return null;
+        }
+
+        UnityEngine.Object.Destroy(sprite);
+        UnityEngine.Object.Destroy(g);
+        yield break;
+    }
 }
 
 // Helper class for making movable / fadeable  VFX
