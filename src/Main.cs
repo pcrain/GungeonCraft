@@ -147,6 +147,7 @@ public class Initialisation : BaseUnityPlugin
                 EchoChamber.Init();
                 BionicFinger.Init();
                 BubbleWand.Init();
+                AdrenalineShot.Init();
             #endregion
 
             // System.Diagnostics.Stopwatch tempWatch = System.Diagnostics.Stopwatch.StartNew();

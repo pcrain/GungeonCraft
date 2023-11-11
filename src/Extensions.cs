@@ -837,4 +837,19 @@ public static class Extensions
       mod.ammoType       = GameUIAmmoType.AmmoType.CUSTOM;
       mod.customAmmoType = CustomClipAmmoTypeToolbox.AddCustomAmmoType($"{clipname}_clip", ResMap.Get($"{clipname}_clipfull")[0], ResMap.Get($"{clipname}_clipempty")[0]);
   }
+
+  // Check if a player will die from next hit
+  public static bool PlayerWillDieFromHit(this HealthHaver hh, HealthHaver.ModifyDamageEventArgs data)
+  {
+    if (data == EventArgs.Empty || data.ModifiedDamage <= 0f || !hh.IsVulnerable)
+      return false; // if we weren't going to take damage anyway, nothing to do
+
+    if (hh.Armor > 1 || hh.GetCurrentHealth() > data.ModifiedDamage)
+      return false; // no character is one hit from death in this situation
+
+    if (hh.Armor == 1 && hh.GetCurrentHealth() > 0)
+      return false; // we have both armor and health, so we are not the robot, and we are fine
+
+    return true;
+  }
 }

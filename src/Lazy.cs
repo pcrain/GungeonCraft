@@ -526,4 +526,13 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
         int tmp2 = (int)(b * (tmp - 1072632447) + 1072632447);
         return BitConverter.Int64BitsToDouble(((long)tmp2) << 32);
     }
+
+    public static dfSprite SetupUISprite(List<string> resourcePaths)
+    {
+        dfSprite uiSprite = CustomClipAmmoTypeToolbox.SetupDfSpriteFromTexture<dfSprite>(
+            new GameObject().RegisterPrefab(),
+            ResourceExtractor.GetTextureFromResource(resourcePaths[0] + ".png"),
+            ShaderCache.Acquire("Daikon Forge/Default UI Shader"));
+        return uiSprite;
+    }
 }

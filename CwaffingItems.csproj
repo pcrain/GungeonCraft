@@ -60,6 +60,7 @@
     <Compile Include="src\Cwaff-Passives\UtilityVest.cs"/>
     <Compile Include="src\Cwaff-Passives\CuratorsBadge.cs"/>
     <Compile Include="src\Cwaff-Passives\Blazer.cs"/>
+    <Compile Include="src\Cwaff-Passives\AdrenalineShot.cs"/>
     <Compile Include="src\Cwaff-Passives\CampingSupplies.cs"/>
     <Compile Include="src\Cwaff-Passives\BubbleWand.cs"/>
     <Compile Include="src\Cwaff-Passives\WarriorsGi.cs"/>
@@ -2007,6 +2008,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\gunbrella_target_reticle7.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren8.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\johns_wick_icon.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\adrenaline_shot_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\cool_ball_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\voodoo_doll_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\rat_poison_icon.png"/>
@@ -2564,6 +2566,7 @@
     <EmbeddedResource Include="Resources\Companions\Wolf\wolf_pet_004.png"/>
     <EmbeddedResource Include="Resources\Companions\Wolf\wolf_pet_left_004.png"/>
     <EmbeddedResource Include="Resources\EmbeddedRooms\BoomhildrRoom.room"/>
+    <EmbeddedResource Include="Resources\UISpritesa\adrenaline_heart.png"/>
     <EmbeddedResource Include="Resources\Sounds\CwaffingTheGungy.bnk"/>
     <EmbeddedResource Include="Resources\EnemySprites\bullet_smile_right_002.png"/>
     <EmbeddedResource Include="Resources\EnemySprites\bullet_smile_left_002.png"/>

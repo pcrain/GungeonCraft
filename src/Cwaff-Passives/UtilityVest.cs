@@ -36,14 +36,8 @@ public class UtilityVest : PassiveItem
 
     private void OnTakeDamage(HealthHaver hh, HealthHaver.ModifyDamageEventArgs data)
     {
-        if (data == EventArgs.Empty || data.ModifiedDamage <= 0f || !hh.IsVulnerable)
-            return; // if we weren't going to take damage anyway, nothing to do
-
-        if (hh.Armor > 1 || hh.GetCurrentHealth() > data.ModifiedDamage)
-            return; // no character is one hit from death in this situation
-
-        if (hh.Armor == 1 && hh.GetCurrentHealth() > 0)
-            return; // we have both armor and health, so we are not the robot, and we are fine
+        if (!hh.PlayerWillDieFromHit(data))
+            return; // if we're not going to die, we don't need to activate
 
         if (GetWorstItemWeCanScrapAsArmor() is not PickupObject worst)
             return; // we have no items to scrap (theoretically can't happen since this item is itself scrappable)
