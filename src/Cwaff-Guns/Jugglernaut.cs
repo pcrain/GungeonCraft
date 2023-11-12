@@ -20,6 +20,7 @@ public class Jugglernaut : AdvancedGunBehavior
     internal static List<float> _MinEmission = new(){0f, 10f, 50f, 100f, 200f, 400f};
     internal static string _TrueIdleAnimation;
     internal static Hook _AdjustAnimationHook;
+    internal static Hook _AdjustWeaponPanelHook;
     internal static IntVector2 _CarryOffset        = new IntVector2(21, -8);
     internal static IntVector2 _FlippedCarryOffset = new IntVector2(-14, -8);
 
@@ -30,7 +31,7 @@ public class Jugglernaut : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Jugglernaut>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 150, defaultAudio: true);
+            gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 150, defaultAudio: true);
             gun.SetAnimationFPS(gun.shootAnimation, 30);
             gun.SetAnimationFPS(gun.reloadAnimation, 40);
             _JuggleAnimations = new(){
@@ -49,6 +50,10 @@ public class Jugglernaut : AdvancedGunBehavior
             _AdjustAnimationHook                = new Hook(
                 typeof(Gun).GetMethod("HandleSpriteFlip", BindingFlags.Instance | BindingFlags.Public),
                 typeof(Jugglernaut).GetMethod("FixAttachPointsImmediately", BindingFlags.Static | BindingFlags.NonPublic)
+                );
+            _AdjustWeaponPanelHook              = new Hook(
+                typeof(GameUIAmmoController).GetMethod("GetOffsetVectorForGun", BindingFlags.Instance | BindingFlags.Public),
+                typeof(Jugglernaut).GetMethod("FixWeaponBoxSprite", BindingFlags.Static | BindingFlags.NonPublic)
                 );
 
             string tossSound = "juggle_toss_sound";
@@ -120,6 +125,15 @@ public class Jugglernaut : AdvancedGunBehavior
             gun.carryPixelOffset = _FlippedCarryOffset;
         jugglernaut._cachedFlipped = flipped;
         jugglernaut._firstCheck = false;
+    }
+
+    private static Vector3 _WeaponBoxCorrection = new Vector3(-0.125f, -0.125f, 0f);
+    private static Vector3 FixWeaponBoxSprite(Func<GameUIAmmoController, Gun, bool, Vector3> orig, GameUIAmmoController guiac, Gun gun, bool flipped)
+    {
+        Vector3 vec = orig(guiac, gun, flipped);
+        if (gun.GetComponent<Jugglernaut>() is not Jugglernaut jugglernaut)
+            return vec;
+        return vec + _WeaponBoxCorrection;
     }
 
     protected override void OnPickedUpByPlayer(PlayerController player)
@@ -231,7 +245,8 @@ public class Jugglernaut : AdvancedGunBehavior
 
         Material m = gun.sprite.renderer.material;
         m.SetFloat("_EmissivePower", 0f);
-        AkSoundEngine.PostEvent("gunbrella_fire_sound", gun.gameObject);
+        AkSoundEngine.PostEvent("juggle_add_sound", gun.gameObject);
+        // AkSoundEngine.PostEvent("gunbrella_fire_sound", gun.gameObject);
 
         for (float elapsed = 0f; elapsed < GLOW_TIME; elapsed += BraveTime.DeltaTime)
         {
