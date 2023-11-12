@@ -428,6 +428,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_reload_012.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\natascha_fire_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_031.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_idle_old_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_019.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_fire_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_2_gun_019.json"/>
@@ -951,6 +952,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\soul_kaliber_reload_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_3_gun_005.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_idle_old_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_fire_006.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_1_gun_024.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\missiletoe_fire_008.png"/>
@@ -2771,6 +2773,7 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\coin_gun_projectile4.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\can_projectile_3.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\ora_fist.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\jugglernaut_projectile.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\slappp12.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball016.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball_old_5.png"/>

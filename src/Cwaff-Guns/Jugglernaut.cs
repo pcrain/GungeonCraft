@@ -1,6 +1,10 @@
 ﻿namespace CwaffingTheGungy;
 
-// red, blue, yellow, green, purple, orange
+/* TODO:
+    - due to barreloffset technically being in the bottom left corner of the sprite, sometimes we can't shoot when our left side is against the wall
+   NOTES:
+    - juggling order:   red, blue, yellow, green, purple, orange
+*/
 
 public class Jugglernaut : AdvancedGunBehavior
 {
@@ -13,7 +17,7 @@ public class Jugglernaut : AdvancedGunBehavior
     internal const int _IDLE_FPS = 16;
 
     internal static List<string> _JuggleAnimations;
-    internal static List<AIActor> _JuggledEnemies = new();
+    internal static List<float> _MinEmission = new(){0f, 10f, 50f, 100f, 200f, 400f};
     internal static string _TrueIdleAnimation;
     internal static Hook _AdjustAnimationHook;
     internal static IntVector2 _CarryOffset        = new IntVector2(21, -8);
@@ -21,11 +25,12 @@ public class Jugglernaut : AdvancedGunBehavior
 
     private int _juggleLevel = 0;
     private Coroutine _glowRoutine = null;
+    private List<AIActor> _juggledEnemies = new();
 
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Jugglernaut>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 1.2f, ammo: 300, defaultAudio: true);
+            gun.SetAttributes(quality: PickupObject.ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 150, defaultAudio: true);
             gun.SetAnimationFPS(gun.shootAnimation, 30);
             gun.SetAnimationFPS(gun.reloadAnimation, 40);
             _JuggleAnimations = new(){
@@ -86,26 +91,27 @@ public class Jugglernaut : AdvancedGunBehavior
             mod.ammoCost            = 1;
             mod.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
             mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
-            mod.cooldownTime        = 0.5f;
+            mod.cooldownTime        = 1.0f;
             mod.numberOfShotsInClip = -1;
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
-            // projectile.AddDefaultAnimation(AnimateBullet.CreateProjectileAnimation(
-            //     ResMap.Get("jugglernaut_projectile").Base(),
-            //     12, true, new IntVector2(10, 3),
-            //     false, tk2dBaseSprite.Anchor.MiddleLeft, true, true));
+            projectile.AddDefaultAnimation(AnimateBullet.CreateProjectileAnimation(
+                ResMap.Get("jugglernaut_projectile").Base(),
+                12, true, new IntVector2(8, 8),
+                false, tk2dBaseSprite.Anchor.MiddleLeft, true, true));
             projectile.transform.parent = gun.barrelOffset;
             projectile.baseData.speed   = 70f;
             projectile.baseData.damage  = 10f;
     }
 
     private bool _cachedFlipped = false;
+    private bool _firstCheck = true;
     private static void FixAttachPointsImmediately(Action<Gun, bool> orig, Gun gun, bool flipped)
     {
         orig(gun, flipped);
         if (gun.GetComponent<Jugglernaut>() is not Jugglernaut jugglernaut)
             return;
-        if (flipped == jugglernaut._cachedFlipped)
+        if (flipped == jugglernaut._cachedFlipped && !jugglernaut._firstCheck)
             return;
 
         if (flipped)
@@ -113,11 +119,14 @@ public class Jugglernaut : AdvancedGunBehavior
         else
             gun.carryPixelOffset = _FlippedCarryOffset;
         jugglernaut._cachedFlipped = flipped;
+        jugglernaut._firstCheck = false;
     }
 
     protected override void OnPickedUpByPlayer(PlayerController player)
     {
         base.OnPickedUpByPlayer(player);
+
+        player.healthHaver.OnDamaged += DroppingTheBall;
 
         ResetJuggle();
         gun.spriteAnimator.currentClip = gun.spriteAnimator.GetClipByName(_JuggleAnimations[0]);
@@ -129,9 +138,20 @@ public class Jugglernaut : AdvancedGunBehavior
     {
         base.OnPostDroppedByPlayer(player);
 
+        player.healthHaver.OnDamaged -= DroppingTheBall;
+
         ResetJuggle();
         gun.spriteAnimator.currentClip = gun.spriteAnimator.GetClipByName(_TrueIdleAnimation);
         gun.spriteAnimator.StopAndResetFrameToDefault();
+    }
+
+    private void DroppingTheBall(float resultValue, float maxValue, CoreDamageTypes damageTypes, DamageCategory damageCategory, Vector2 damageDirection)
+    {
+        if (this._juggledEnemies.Count() == 0)
+            return;
+
+        AkSoundEngine.PostEvent("juggle_drop_sound", this.Player.gameObject);
+        ResetJuggle();
     }
 
     public override void OnSwitchedToThisGun()
@@ -160,29 +180,29 @@ public class Jugglernaut : AdvancedGunBehavior
     public void RegisterEnemyHit(AIActor enemy)
     {
         // scan backwards until we find the enemy in our list, then remove it an all previous enemies
-        for (int i = _JuggledEnemies.Count() - 1; i >= 0; --i)
+        for (int i = this._juggledEnemies.Count() - 1; i >= 0; --i)
         {
-            if (_JuggledEnemies[i] != enemy)
+            if (this._juggledEnemies[i] != enemy)
                 continue;
             for (int j = i; j >= 0; --j)
-                _JuggledEnemies.RemoveAt(j);
+                this._juggledEnemies.RemoveAt(j);
             break;
         }
         // add our enemy and return
-        _JuggledEnemies.Add(enemy);
+        this._juggledEnemies.Add(enemy);
         UpdateLevel(returnIfUnchanged: true);
     }
 
     private void ResetJuggle()
     {
-        _JuggledEnemies.Clear();
+        this._juggledEnemies.Clear();
         UpdateLevel();
     }
 
     private void UpdateLevel(bool returnIfUnchanged = false)
     {
         int oldLevel = this._juggleLevel;
-        this._juggleLevel = Mathf.Clamp(_JuggledEnemies.Count() - 1, 0, _JuggleAnimations.Count() - 1);
+        this._juggleLevel = Mathf.Clamp(this._juggledEnemies.Count() - 1, 0, _JuggleAnimations.Count() - 1);
         if (returnIfUnchanged && this._juggleLevel == oldLevel)
             return;
 
@@ -192,6 +212,8 @@ public class Jugglernaut : AdvancedGunBehavior
                 gun.StopCoroutine(this._glowRoutine);
             this._glowRoutine = gun.StartCoroutine(GlowUp());
         }
+        else
+            gun.sprite.renderer.material.SetFloat("_EmissivePower", _MinEmission[this._juggleLevel]);
 
         gun.idleAnimation = _JuggleAnimations[this._juggleLevel];
         gun.spriteAnimator.currentClip = gun.spriteAnimator.GetClipByName(gun.idleAnimation);
@@ -204,7 +226,8 @@ public class Jugglernaut : AdvancedGunBehavior
     {
         const float GLOW_TIME      = 0.25f;
         const float GLOW_FADE_TIME = 1.00f;
-        const float MAX_EMIT       = 800f;
+        const float MAX_EMISSION   = 800f;
+        float minEmit = _MinEmission[this._juggleLevel];
 
         Material m = gun.sprite.renderer.material;
         m.SetFloat("_EmissivePower", 0f);
@@ -213,13 +236,13 @@ public class Jugglernaut : AdvancedGunBehavior
         for (float elapsed = 0f; elapsed < GLOW_TIME; elapsed += BraveTime.DeltaTime)
         {
             float percentDone = elapsed / GLOW_TIME;
-            m.SetFloat("_EmissivePower", MAX_EMIT * percentDone * percentDone);
+            m.SetFloat("_EmissivePower", MAX_EMISSION * percentDone * percentDone);
             yield return null;
         }
         for (float elapsed = 0f; elapsed < GLOW_FADE_TIME; elapsed += BraveTime.DeltaTime)
         {
             float percentLeft = 1f - elapsed / GLOW_FADE_TIME;
-            m.SetFloat("_EmissivePower", MAX_EMIT * percentLeft * percentLeft);
+            m.SetFloat("_EmissivePower", minEmit + (MAX_EMISSION - minEmit) * percentLeft * percentLeft);
             yield return null;
         }
         yield break;
