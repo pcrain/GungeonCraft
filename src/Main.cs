@@ -194,7 +194,7 @@ public class Initialisation : BaseUnityPlugin
                 AimuHakurei.Add();
                 SeltzerPelter.Add();
                 Missiletoe.Add();
-                Platinum.Add();
+                PlatinumStar.Add();
                 PistolWhip.Add();
                 Jugglernaut.Add();
             #endregion
