@@ -856,4 +856,43 @@ public static class Extensions
 
     return true;
   }
+
+  // Remove a shader from a gameObject
+  public static void RemoveShader(this GameObject g, Shader shader)
+  {
+    if (g?.GetComponent<MeshRenderer>() is not MeshRenderer component)
+      return;
+    Material[] sharedMaterials = component.sharedMaterials;
+    List<Material> list = new List<Material>();
+    for (int i = 0; i < sharedMaterials.Length; i++)
+    {
+      if (sharedMaterials[i].shader != shader)
+        list.Add(sharedMaterials[i]);
+    }
+    component.sharedMaterials = list.ToArray();
+  }
+
+  // Add a shader to a gameObject, and return the material for that shader
+  public static Material GetOrAddShader(this GameObject g, Shader shader, bool atBeginning = true)
+  {
+    if (g?.GetComponent<MeshRenderer>() is not MeshRenderer component)
+      return null;
+    Material[] array = component.sharedMaterials;
+    for (int i = 0; i < array.Length; i++)
+      if (array[i].shader == shader)
+        return array[i];
+    Array.Resize(ref array, array.Length + 1);
+    Material material = new Material(shader);
+    material.SetTexture("_MainTex", array[0].GetTexture("_MainTex"));
+    if (atBeginning)
+    {
+      for (int i = array.Length - 1; i > 1; --i)
+        array[i] = array[i - 1];
+      array[1] = material;
+    }
+    else
+      array[array.Length - 1] = material;
+    component.sharedMaterials = array;
+    return material;
+  }
 }

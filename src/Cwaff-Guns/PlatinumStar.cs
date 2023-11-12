@@ -58,6 +58,10 @@ public class PlatinumStar : AdvancedGunBehavior
     public override void OnPostFired(PlayerController player, Gun gun)
     {
         base.OnPostFired(player, gun);
+        // Material m = this.gun.gameObject.GetOrAddShader(Shader.Find("Brave/ItemSpecific/LootGlintAdditivePass"));
+        // m.SetColor("_OverrideColor", Color.yellow);
+        // Material m3 = this.Owner.sprite.gameObject.GetOrAddShader(Shader.Find("Brave/ItemSpecific/LootGlintAdditivePass"));
+        // m3?.SetColor("_OverrideColor", Color.white);
         AkSoundEngine.PostEvent("tomislav_shoot", gun.gameObject);
     }
 
