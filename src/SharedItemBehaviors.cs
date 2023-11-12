@@ -1126,6 +1126,8 @@ public static class Raycast
 
 public static class AfterImageHelpers
 {
+    private const float _LIFETIME = 0.5f;
+
     public static Color afterImageGray   = new Color( 32f / 255f,  32f / 255f,  32f / 255f);
     public static Color afterImageWhite  = new Color(255f / 255f, 255f / 255f, 255f / 255f);
     public static Color afterImageBlue   = new Color(160f / 255f, 160f / 255f, 255f / 255f);
@@ -1133,25 +1135,19 @@ public static class AfterImageHelpers
 
     public static void PlayerAfterImage(this PlayerController player)
     {
-        GameObject obj = new GameObject();
+        GameObject obj = UnityEngine.Object.Instantiate(new GameObject(), player.sprite.WorldBottomCenter, Quaternion.identity);
         tk2dSprite sprite = obj.AddComponent<tk2dSprite>();
 
-        // sprite.SetSprite(player.sprite.collection, player.sprite.spriteId);
-        sprite.SetSprite(player.spriteAnimator.CurrentClip.frames[0].spriteCollection, player.spriteAnimator.CurrentClip.frames[player.spriteAnimator.CurrentFrame].spriteId);
+        tk2dSpriteAnimationFrame frame = player.spriteAnimator.CurrentClip.frames[player.spriteAnimator.CurrentFrame];
+        sprite.SetSprite(frame.spriteCollection, frame.spriteId);
         sprite.FlipX = player.sprite.FlipX;
         obj.GetComponent<BraveBehaviour>().sprite = sprite;
 
-        obj.SetActive(false);
-        FakePrefab.MarkAsFakePrefab(obj);
+        sprite.PlaceAtPositionByAnchor(
+            player.sprite.transform.position,
+            sprite.FlipX ? tk2dBaseSprite.Anchor.LowerRight : tk2dBaseSprite.Anchor.LowerLeft);
 
-        GameObject g = UnityEngine.Object.Instantiate(obj, player.sprite.WorldBottomCenter, Quaternion.identity);
-        tk2dSprite gsprite = g.GetComponent<tk2dSprite>();
-            gsprite.PlaceAtPositionByAnchor(
-                player.sprite.transform.position,
-                sprite.FlipX ? tk2dBaseSprite.Anchor.LowerRight : tk2dBaseSprite.Anchor.LowerLeft);
-
-        const float LIFETIME = 0.5f;
-        g.GetComponent<BraveBehaviour>().StartCoroutine(Fade(g,LIFETIME));
+        obj.GetComponent<BraveBehaviour>().StartCoroutine(Fade(obj,_LIFETIME));
     }
 
     private static IEnumerator Fade(GameObject obj, float fadeTime, float flickerRate = 0.05f)

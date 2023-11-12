@@ -32,7 +32,6 @@ public class AdrenalineShot : PassiveItem
             typeof(AdrenalineShot).GetMethod("UpdateHealth", BindingFlags.NonPublic | BindingFlags.Static));
     }
 
-    internal static bool didEffect = false;
     private static void UpdateHealth(Action<GameUIHeartController, HealthHaver> orig, GameUIHeartController guihc, HealthHaver hh)
     {
         orig(guihc, hh);
