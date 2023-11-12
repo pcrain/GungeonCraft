@@ -1,7 +1,10 @@
 ﻿namespace CwaffingTheGungy;
 
-/* TODO:
+/*
+   TODO:
     - due to barreloffset technically being in the bottom left corner of the sprite, sometimes we can't shoot when our left side is against the wall
+    - figure out how to render gun sprite behind player when player is facing backwards
+
    NOTES:
     - juggling order:   red, blue, yellow, green, purple, orange
 */

@@ -9,6 +9,7 @@ public class AdrenalineShot : PassiveItem
 
     internal const float _MAX_ADRENALINE_TIME = 60f;
     internal const float _MAX_ADRENALINE_LOSS = 4f; // loss from taking damage while under effects of adrenaline
+    internal const int   _CASINGS_FOR_ROBOT   = 20;
     internal static int _AdrenalineShotId;
     internal static dfSprite _AdrenalineHeart;
     internal static float _LastHeartbeatTime = 0f;
@@ -93,20 +94,23 @@ public class AdrenalineShot : PassiveItem
 
     public override void Pickup(PlayerController player)
     {
+        if (!this.m_pickedUpThisRun && player.ForceZeroHealthState) // Robot + 0-health characters can't use this item, so just give them some money
+            LootEngine.SpawnCurrency(player.CenterPosition, _CASINGS_FOR_ROBOT);
         base.Pickup(player);
-        player.healthHaver.ModifyDamage += this.OnTakeDamage;
-
+        if (!player.ForceZeroHealthState)
+            player.healthHaver.ModifyDamage += this.OnTakeDamage;
     }
 
     public override DebrisObject Drop(PlayerController player)
     {
-        player.healthHaver.OnHealthChanged -= this.OnHealthChanged;
+        if (this._adrenalineActive)
+            DeactivateAdrenaline(); // shouldn't ever be able to happen, but just in case
         return base.Drop(player);
     }
 
     public override void OnDestroy()
     {
-        if (this.Owner)
+        if (this.Owner && !this.Owner.ForceZeroHealthState)
             this.Owner.healthHaver.ModifyDamage -= this.OnTakeDamage;
         base.OnDestroy();
     }
