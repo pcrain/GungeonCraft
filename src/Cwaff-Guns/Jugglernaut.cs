@@ -15,6 +15,9 @@ public class Jugglernaut : AdvancedGunBehavior
     internal static List<string> _JuggleAnimations;
     internal static List<AIActor> _JuggledEnemies = new();
     internal static string _TrueIdleAnimation;
+    internal static Hook _AdjustAnimationHook;
+    internal static IntVector2 _CarryOffset        = new IntVector2(21, -8);
+    internal static IntVector2 _FlippedCarryOffset = new IntVector2(-14, -8);
 
     private int _juggleLevel = 0;
     private Coroutine _glowRoutine = null;
@@ -22,7 +25,7 @@ public class Jugglernaut : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Jugglernaut>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 1.2f, ammo: 300);
+            gun.SetAttributes(quality: PickupObject.ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 1.2f, ammo: 300, defaultAudio: true);
             gun.SetAnimationFPS(gun.shootAnimation, 30);
             gun.SetAnimationFPS(gun.reloadAnimation, 40);
             _JuggleAnimations = new(){
@@ -33,13 +36,15 @@ public class Jugglernaut : AdvancedGunBehavior
                 gun.UpdateAnimation("5_gun", returnToIdle: false),
                 gun.UpdateAnimation("6_gun", returnToIdle: false),
             };
-            // gun.carryPixelOffset      = new IntVector2(-14, -8);
-            gun.preventRotation  = true;
-            // gun.forceFlat        = true;
-            // gun.barrelOffset.transform.position = new Vector3(1f, 1f, 0f);
-            // gun.m_originalBarrelOffsetPosition  = gun.barrelOffset.transform.position;
-            // gun.muzzleOffset                    = gun.barrelOffset;
-            // gun.m_originalMuzzleOffsetPosition = gun.barrelOffset.localPosition;
+            gun.muzzleFlashEffects              = null;
+            // Manual adjustments to prevent wonky firing animations
+            gun.preventRotation                 = true;
+            gun.barrelOffset.transform.position = new Vector3(0.75f, 0.75f, 0f);
+            gun.carryPixelOffset                = _CarryOffset;
+            _AdjustAnimationHook                = new Hook(
+                typeof(Gun).GetMethod("HandleSpriteFlip", BindingFlags.Instance | BindingFlags.Public),
+                typeof(Jugglernaut).GetMethod("FixAttachPointsImmediately", BindingFlags.Static | BindingFlags.NonPublic)
+                );
 
             string tossSound = "juggle_toss_sound";
             for (int i = 0; i < _JuggleAnimations.Count(); ++i)
@@ -81,61 +86,33 @@ public class Jugglernaut : AdvancedGunBehavior
             mod.ammoCost            = 1;
             mod.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
             mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
-            mod.cooldownTime        = 0.1f;
+            mod.cooldownTime        = 0.5f;
             mod.numberOfShotsInClip = -1;
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
-            projectile.AddDefaultAnimation(AnimateBullet.CreateProjectileAnimation(
-                ResMap.Get("tranquilizer_projectile").Base(),
-                12, true, new IntVector2(10, 3),
-                false, tk2dBaseSprite.Anchor.MiddleLeft, true, true));
+            // projectile.AddDefaultAnimation(AnimateBullet.CreateProjectileAnimation(
+            //     ResMap.Get("jugglernaut_projectile").Base(),
+            //     12, true, new IntVector2(10, 3),
+            //     false, tk2dBaseSprite.Anchor.MiddleLeft, true, true));
             projectile.transform.parent = gun.barrelOffset;
-
-        new Hook(
-            typeof(Gun).GetMethod("HandleSpriteFlip", BindingFlags.Instance | BindingFlags.Public),
-            typeof(Jugglernaut).GetMethod("FixAttachPointsImmediately", BindingFlags.Static | BindingFlags.NonPublic)
-            );
+            projectile.baseData.speed   = 70f;
+            projectile.baseData.damage  = 10f;
     }
 
-    // private void LateUpdate()
-    // {
-    //     // bool flipped = Mathf.Abs(gun.CurrentAngle.Clamp180()) > 90f;
-    // }
-
-    // internal bool cachedFlipped = false;
-    // protected override void Update()
-    // {
-    //     base.Update();
-    //     bool flipped = this.Player.SpriteFlipped;
-    //     // float absAngle = Mathf.Abs(gun.CurrentAngle.Clamp180());
-    //     // if (!cachedFlipped && absAngle > 105f)
-    //     // {
-    //     //     cachedFlipped = true;
-    //     //     gun.carryPixelOffset = new IntVector2(21, -8);
-    //     // }
-    //     // else if (cachedFlipped && absAngle < 75f)
-    //     // {
-    //     //     cachedFlipped = false;
-    //     //     gun.carryPixelOffset = new IntVector2(-14, -8);
-    //     // }
-
-    //     // bool flipped = Mathf.Abs(gun.CurrentAngle.Clamp180()) >= 90f;
-    //     if (flipped)
-    //         gun.carryPixelOffset = new IntVector2(21, -8);
-    //     else
-    //         gun.carryPixelOffset = new IntVector2(-14, -8);
-    // }
-
+    private bool _cachedFlipped = false;
     private static void FixAttachPointsImmediately(Action<Gun, bool> orig, Gun gun, bool flipped)
     {
         orig(gun, flipped);
-        if (!gun.GetComponent<Jugglernaut>())
+        if (gun.GetComponent<Jugglernaut>() is not Jugglernaut jugglernaut)
+            return;
+        if (flipped == jugglernaut._cachedFlipped)
             return;
 
         if (flipped)
-            gun.carryPixelOffset = new IntVector2(21, -8);
+            gun.carryPixelOffset = _CarryOffset;
         else
-            gun.carryPixelOffset = new IntVector2(-14, -8);
+            gun.carryPixelOffset = _FlippedCarryOffset;
+        jugglernaut._cachedFlipped = flipped;
     }
 
     protected override void OnPickedUpByPlayer(PlayerController player)
@@ -173,6 +150,11 @@ public class Jugglernaut : AdvancedGunBehavior
     {
         base.PostProcessProjectile(projectile);
         projectile.gameObject.AddComponent<JugglernautProjectile>().Setup(this);
+            projectile.baseData.damage *= (1f + this._juggleLevel);
+
+        // Animation wonkiness due to manually adjusting carry offsets messes with aim position, so redirect towards the cursor
+        projectile.SendInDirection((this.Player.unadjustedAimPoint.XY() - projectile.sprite.WorldCenter), resetDistance: true);
+        projectile.UpdateSpeed();
     }
 
     public void RegisterEnemyHit(AIActor enemy)
