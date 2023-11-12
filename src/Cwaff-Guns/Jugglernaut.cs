@@ -1,5 +1,7 @@
 ﻿namespace CwaffingTheGungy;
 
+// red, blue, yellow, green, purple, orange
+
 public class Jugglernaut : AdvancedGunBehavior
 {
     public static string ItemName         = "Jugglernaut";
@@ -31,6 +33,14 @@ public class Jugglernaut : AdvancedGunBehavior
                 gun.UpdateAnimation("5_gun", returnToIdle: false),
                 gun.UpdateAnimation("6_gun", returnToIdle: false),
             };
+            // gun.carryPixelOffset      = new IntVector2(-14, -8);
+            gun.preventRotation  = true;
+            // gun.forceFlat        = true;
+            // gun.barrelOffset.transform.position = new Vector3(1f, 1f, 0f);
+            // gun.m_originalBarrelOffsetPosition  = gun.barrelOffset.transform.position;
+            // gun.muzzleOffset                    = gun.barrelOffset;
+            // gun.m_originalMuzzleOffsetPosition = gun.barrelOffset.localPosition;
+
             string tossSound = "juggle_toss_sound";
             for (int i = 0; i < _JuggleAnimations.Count(); ++i)
             {
@@ -80,6 +90,52 @@ public class Jugglernaut : AdvancedGunBehavior
                 12, true, new IntVector2(10, 3),
                 false, tk2dBaseSprite.Anchor.MiddleLeft, true, true));
             projectile.transform.parent = gun.barrelOffset;
+
+        new Hook(
+            typeof(Gun).GetMethod("HandleSpriteFlip", BindingFlags.Instance | BindingFlags.Public),
+            typeof(Jugglernaut).GetMethod("FixAttachPointsImmediately", BindingFlags.Static | BindingFlags.NonPublic)
+            );
+    }
+
+    // private void LateUpdate()
+    // {
+    //     // bool flipped = Mathf.Abs(gun.CurrentAngle.Clamp180()) > 90f;
+    // }
+
+    // internal bool cachedFlipped = false;
+    // protected override void Update()
+    // {
+    //     base.Update();
+    //     bool flipped = this.Player.SpriteFlipped;
+    //     // float absAngle = Mathf.Abs(gun.CurrentAngle.Clamp180());
+    //     // if (!cachedFlipped && absAngle > 105f)
+    //     // {
+    //     //     cachedFlipped = true;
+    //     //     gun.carryPixelOffset = new IntVector2(21, -8);
+    //     // }
+    //     // else if (cachedFlipped && absAngle < 75f)
+    //     // {
+    //     //     cachedFlipped = false;
+    //     //     gun.carryPixelOffset = new IntVector2(-14, -8);
+    //     // }
+
+    //     // bool flipped = Mathf.Abs(gun.CurrentAngle.Clamp180()) >= 90f;
+    //     if (flipped)
+    //         gun.carryPixelOffset = new IntVector2(21, -8);
+    //     else
+    //         gun.carryPixelOffset = new IntVector2(-14, -8);
+    // }
+
+    private static void FixAttachPointsImmediately(Action<Gun, bool> orig, Gun gun, bool flipped)
+    {
+        orig(gun, flipped);
+        if (!gun.GetComponent<Jugglernaut>())
+            return;
+
+        if (flipped)
+            gun.carryPixelOffset = new IntVector2(21, -8);
+        else
+            gun.carryPixelOffset = new IntVector2(-14, -8);
     }
 
     protected override void OnPickedUpByPlayer(PlayerController player)
