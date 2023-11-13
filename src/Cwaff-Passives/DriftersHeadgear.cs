@@ -35,7 +35,7 @@ public class DriftersHeadgear : PassiveItem
             return;
 
         this._dodgeRoller.isHyped =
-            this.Owner.PlayerHasActiveSynergy("Hype Yourself Up");
+            this.Owner.PlayerHasActiveSynergy(Synergy.HYPE_YOURSELF_UP);
     }
 
     private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherCollider)
