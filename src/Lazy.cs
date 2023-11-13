@@ -60,19 +60,19 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
         {
             IDs.Guns[baseItemName] = item.PickupObjectId; //register item in gun ID database
             if (C.DEBUG_BUILD && !hideFromAmmonomicon)
-                ETGModConsole.Log("Lazy Initialized Gun: "+baseItemName);
+                ETGModConsole.Log($"Lazy Initialized Gun: {baseItemName} ({item.DisplayName})");
         }
         else if (item is PlayerItem)
         {
             IDs.Actives[baseItemName] = item.PickupObjectId; //register item in active ID database
             if (C.DEBUG_BUILD && !hideFromAmmonomicon)
-                ETGModConsole.Log("Lazy Initialized Active: "+baseItemName);
+                ETGModConsole.Log($"Lazy Initialized Active: {baseItemName} ({item.DisplayName})");
         }
         else
         {
             IDs.Passives[baseItemName] = item.PickupObjectId; //register item in passive ID database
             if (C.DEBUG_BUILD && !hideFromAmmonomicon)
-                ETGModConsole.Log("Lazy Initialized Passive: "+baseItemName);
+                ETGModConsole.Log($"Lazy Initialized Passive: {baseItemName} ({item.DisplayName})");
         }
         return item;
     }
@@ -239,15 +239,15 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
     }
 
     // Stolen from NN
-    public static bool PlayerHasActiveSynergy(this PlayerController player, string synergyNameToCheck)
-    {
-        foreach (int index in player.ActiveExtraSynergies)
-        {
-            if (GameManager.Instance.SynergyManager.synergies[index].NameKey == synergyNameToCheck)
-                return true;
-        }
-        return false;
-    }
+    // public static bool PlayerHasActiveSynergy(this PlayerController player, string synergyNameToCheck)
+    // {
+    //     foreach (int index in player.ActiveExtraSynergies)
+    //     {
+    //         if (GameManager.Instance.SynergyManager.synergies[index].NameKey == synergyNameToCheck)
+    //             return true;
+    //     }
+    //     return false;
+    // }
 
     public static void MovePlayerTowardsPositionUntilHittingWall(PlayerController player, Vector2 position)
     {

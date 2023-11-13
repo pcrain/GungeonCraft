@@ -11,23 +11,36 @@ public static class CwaffSynergies
 
     public static void Init()
     {
-        // Makes Hyper Light Dasher 20% longer and reflect bullets
+        /* NOTE:
+            - Each synergy entry below must have a comment before the line and the name of the synergy as the first quoted string in the following line
+              This is to ensure that our automatic item tips generation script parses it correctly.
+        */
+
+        // Makes Drifter's Headgear 20% longer and reflect bullets
         NewSynergy(HYPE_YOURSELF_UP, "Hype Yourself Up", new[]{IName(DriftersHeadgear.ItemName), "hyper_light_blaster"});
+
+        SanityCheckAllSynergiesHaveBeenInitialized();
+    }
+
+    private static void SanityCheckAllSynergiesHaveBeenInitialized()
+    {
+        for (int i = 0; i < _SynergyNames.Count(); ++i)
+            if (_SynergyNames[i] == null)
+                ETGModConsole.Log($"<color=#ffff88ff>WARNING: haven't initialized custom synergy {_SynergyEnums[i]}</color>");
     }
 
     private static void NewSynergy(Synergy synergy, string name, string[] mandatory, string[] optional = null)
     {
-        // ETGModConsole.Log($"number of total synergies was {GameManager.Instance.SynergyManager.synergies.Length}");
-        int index = (int)synergy;
-        // ETGModConsole.Log($"adding synergy {index}");
-        _Synergies[index]    = ETGModCompatibility.ExtendEnum<CustomSynergyType>(C.MOD_PREFIX.ToUpper(), _SynergyEnums[index]);
-        // ETGModConsole.Log($"got synergy with id {(int)_Synergies[index]} == {_Synergies[index]}");
-        _SynergyNames[index] = name;
+        // Register the AdvancedSynergyEntry so that the game knows about it
         CustomSynergies.Add(name, mandatory.ToList(), optional?.ToList());
-        _SynergyIds[index] = GameManager.Instance.SynergyManager.synergies.Length - 1;
-        // ETGModConsole.Log($"number of total synergies is now {GameManager.Instance.SynergyManager.synergies.Length}");
-        // for (int i = 0; i < GameManager.Instance.SynergyManager.synergies.Length; ++i)
-        //     ETGModConsole.Log($"{i} -> {GameManager.Instance.SynergyManager.synergies[i].NameKey}");
+        // Get the enum index of our synergy
+        int index            = (int)synergy;
+        // Extend the base game's CustomSynergyType enum to make room for our new synergy
+        _Synergies[index]    = ETGModCompatibility.ExtendEnum<CustomSynergyType>(C.MOD_PREFIX.ToUpper(), _SynergyEnums[index]);
+        // Index the friendly name of our synergy
+        _SynergyNames[index] = name;
+        // Get the actual ID of our synergy entry in the AdvancedSynergyDatabase, which doesn't necessarily match the CustomSynergyType enum
+        _SynergyIds[index]   = GameManager.Instance.SynergyManager.synergies.Length - 1;
     }
 
     private static string IName(string itemName)
@@ -40,31 +53,9 @@ public static class CwaffSynergies
         return _SynergyNames[(int)synergy];
     }
 
-    private static bool first = true;
     public static bool PlayerHasActiveSynergy(this PlayerController player, Synergy synergy)
     {
-        // if (first)
-        // {
-        //     // first = false;
-        //     // foreach (string s in Enum.GetNames(typeof(CustomSynergyType)))
-        //     //     ETGModConsole.Log($"{s}");
-        //     ETGModConsole.Log($"printing all active synergies");
-        //     foreach (CustomSynergyType s in player.ActiveExtraSynergies)
-        //         ETGModConsole.Log($" {s}");
-        //     foreach (CustomSynergyType s in player.stats.ActiveCustomSynergies)
-        //         ETGModConsole.Log($" {s}");
-        //     foreach (CustomSynergyType s in player.CustomEventSynergies)
-        //         ETGModConsole.Log($" {s}");
-        // }
-        // ETGModConsole.Log($"checking if we have {(int)_Synergies[(int)synergy]}");
-
         return player.ActiveExtraSynergies.Contains((int)_SynergyIds[(int)synergy]);
-
-        // ETGModConsole.Log($"checking for synergy with id {_Synergies[(int)synergy]}");
-        // ETGModConsole.Log($"  found {player.CountActiveBonusSynergies(_Synergies[(int)synergy])}");
-        // return player.HasActiveBonusSynergy(_Synergies[(int)synergy]);
-
-        // return player.PlayerHasActiveSynergy(synergy.SynergyName());
     }
 }
 

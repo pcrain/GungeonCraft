@@ -5,6 +5,7 @@ import os, json
 
 MODURL="https://enter-the-gungeon.thunderstore.io/package/CaptainPretzel/GungeonCraft/"
 MODDATAFILE=os.path.join("src","Common.cs")
+MODSYNERGYFILE=os.path.join("src","Cwaff-Misc","CwaffSynergies.cs")
 TIPDATAFILE=os.path.join("_thunderstore_package","itemtips-cg.tip")
 ITEMDIRS  = [
   "Cwaff-Passives",
@@ -25,13 +26,15 @@ def main():
       if None not in [modprefix, modname, modversion]:
         break # we have all the metadata we need
 
+  # Process metadata
   metadata = {
     "name"    : modname,
     "version" : modversion,
     "url"     : MODURL,
   }
-  items = {}
 
+  # Process items
+  items = {}
   for itemdir in ITEMDIRS:
     for root, subFolders, files in os.walk(os.path.join("src",itemdir)):
       if root.endswith("/Unfinished"):
@@ -59,9 +62,24 @@ def main():
           "notes" : desc,
         }
 
+  # Process synergies
+  synergies = {}
+  with open(MODSYNERGYFILE, 'r') as fin:
+    try:
+      while line := next(fin):
+        sline = line.strip()
+        if sline.startswith("NewSynergy"):
+          comment = lastline.replace("// ","").replace("//","")
+          name = sline.split('"')[1]
+          synergies[name] = {"notes" : comment }
+        lastline = sline
+    except StopIteration:
+      pass
+
   tipdata = {
-    "metadata" : metadata,
-    "items"    : items,
+    "metadata"  : metadata,
+    "items"     : items,
+    "synergies" : synergies,
   }
   with open(TIPDATAFILE,'w') as fout:
     fout.write(json.dumps(tipdata, indent=2))
