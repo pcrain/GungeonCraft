@@ -8,8 +8,8 @@
 
 ### Features
 
-- 25 new guns 
-- 23 new passive items
+- 28 new guns 
+- 24 new passive items
 - 11 new active items
 - Lore for all new guns and items
 - A new boss!

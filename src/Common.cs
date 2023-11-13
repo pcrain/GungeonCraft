@@ -2,11 +2,11 @@ namespace CwaffingTheGungy;
 
 public class C // constants
 {
-    public static readonly bool DEBUG_BUILD = true; // set to false for release builds (must be readonly instead of const to avoid build warnings)
+    public static readonly bool DEBUG_BUILD = false; // set to false for release builds (must be readonly instead of const to avoid build warnings)
 
     public const string MOD_NAME        = "GungeonCraft";
     public const string MOD_INT_NAME    = "CwaffingTheGungy";
-    public const string MOD_VERSION     = "1.1.3";
+    public const string MOD_VERSION     = "1.2.0";
 
     public const string MOD_PREFIX      = "cg";
     public const float  PIXELS_PER_TILE = 16f;

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.0 (2023-11-13)
+- Added Platinum Star, Pistol Whip, Jugglernaut, and Adrenaline Shot
+- Added synergy support for ItemTips in preparation for future synergies
+
 ## 1.1.3 (2023-11-06)
 - Fixed chicks spawned from Hatchling Gun causing errors every frame of their existence D:
 - Fixed items unwrapped from Missiletoe not being pickup-able
