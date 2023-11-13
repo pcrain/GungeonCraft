@@ -6,7 +6,7 @@ public class PlatinumStar : AdvancedGunBehavior
     public static string SpriteName       = "platinum_star";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Unbreakable";
-    public static string LongDescription  = "TBD";
+    public static string LongDescription  = "Fires projectiles that deal no damage on initial impact. When reloaded, summons manifestations of the user's soul to attack all previously-shot enemies with a flurry of rapid punches.\n\nThis gun had a large golden arrow pierced through its barrel and grip when it was originally discovered by Ox and Cadence lying in a patch of flowers behind the Gungeon. The arrow had mysteriously vanished by the time they had gotten back to the Breach to test out the gun's capabilities, which by all accounts seemed to be nothing more than rapid-firing some harmless phantom projectiles. Having deemed the gun worthless in combat, Cadence tossed it back outside where she found it, only for it to vanish before hitting the ground. Somehow, it has found its way into the Gungeon on its own.";
 
     internal static tk2dSpriteAnimationClip _BulletSprite;
     internal static Projectile _OraBullet;
@@ -19,6 +19,7 @@ public class PlatinumStar : AdvancedGunBehavior
             gun.SetAnimationFPS(gun.reloadAnimation, 40);
             gun.SetFireAudio("platinum_fire_sound");
             gun.SetReloadAudio("platinum_reload_sound", frame: 5);
+            gun.AddToSubShop(ModdedShopType.TimeTrader);
 
         ProjectileModule mod = gun.DefaultModule;
             mod.ammoCost            = 1;

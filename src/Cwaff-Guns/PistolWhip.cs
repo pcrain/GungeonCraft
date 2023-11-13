@@ -5,8 +5,8 @@ public class PistolWhip : AdvancedGunBehavior
     public static string ItemName         = "Pistol Whip";
     public static string SpriteName       = "pistol_whip";
     public static string ProjectileName   = "38_special";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
+    public static string ShortDescription = "What a Horrible Night";
+    public static string LongDescription  = "A long range weapon that deals high melee damage at its tip and fires a fast projectile when fully extended. Can only melee hit enemies when fully extended. Increases curse by 3 while in inventory.\n\nOnce wielded by elite foot soldiers in the army of the great Pharaoh Tutancannon, this weapon is contraband in modern gunfare. On top of flouting the Guneva Conventions with its absurd muzzle range and ability to reach around rather tall walls, it is also reported to have been cursed by Tutancannon himself on his deathbed, bound to unleash the foulest creatures upon those who would dare wield it within the Gungeon's chambers.";
 
     internal static tk2dSpriteAnimationClip _BulletSprite;
     internal static Projectile _WhipStartProjectile;
@@ -19,7 +19,7 @@ public class PistolWhip : AdvancedGunBehavior
             gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 0.01f, ammo: 100);
             gun.SetAnimationFPS(gun.shootAnimation, 30);
             gun.SetAnimationFPS(gun.reloadAnimation, 40);
-            gun.AddStatToGun(PlayerStats.StatType.Curse, 1f, StatModifier.ModifyMethod.ADDITIVE);
+            gun.AddStatToGun(PlayerStats.StatType.Curse, 3f, StatModifier.ModifyMethod.ADDITIVE);
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
             gun.muzzleFlashEffects = null;
 
