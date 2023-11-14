@@ -1,6 +1,57 @@
 namespace CwaffingTheGungy;
 
-public static class DragunFightHotfix // global custom events we can listen for
+// Fix player two not getting Turbo Mode speed buffs in Coop
+public static class CoopTurboModeHotfix
+{
+    private static ILHook _CoopTurboModeFixHook;
+
+    public static void Init()
+    {
+        _CoopTurboModeFixHook = new ILHook(
+            typeof(PlayerController).GetMethod("UpdateTurboModeStats", BindingFlags.Instance | BindingFlags.NonPublic),
+            CoopTurboModeFixHookIL
+            );
+    }
+
+    private static void CoopTurboModeFixHookIL(ILContext il)
+    {
+        ILCursor cursor = new ILCursor(il);
+        // cursor.DumpILOnce("CoopTurboModeFixHookIL");
+
+        if (!cursor.TryGotoNext(MoveType.After,
+          instr => instr.MatchLdfld<PlayerController>("m_turboSpeedModifier"),
+          instr => instr.OpCode == OpCodes.Callvirt  // can't match List<StatModified>::Add() for some reason
+          ))
+            return; // failed to find what we need
+
+        // Recalculate stats after adjusting turbo speed modifier (mirrors IL code for other calls to stats.RecalculateStats())
+        cursor.Emit(OpCodes.Ldarg_0);
+        cursor.Emit(OpCodes.Ldfld, typeof(PlayerController).GetField("stats", BindingFlags.Instance | BindingFlags.Public));
+        cursor.Emit(OpCodes.Ldarg_0);
+        cursor.Emit(OpCodes.Ldc_I4_0);
+        cursor.Emit(OpCodes.Ldc_I4_0);
+        cursor.Emit(OpCodes.Callvirt, typeof(PlayerStats).GetMethod("RecalculateStats", BindingFlags.Instance | BindingFlags.Public));
+
+        if (!cursor.TryGotoNext(MoveType.After,
+          instr => instr.MatchLdfld<PlayerController>("m_turboRollSpeedModifier"),
+          instr => instr.OpCode == OpCodes.Callvirt  // can't match List<StatModified>::Add() for some reason
+          ))
+            return; // failed to find what we need
+
+        // Recalculate stats after adjusting turbo roll speed modifier (mirrors IL code for other calls to stats.RecalculateStats())
+        cursor.Emit(OpCodes.Ldarg_0);
+        cursor.Emit(OpCodes.Ldfld, typeof(PlayerController).GetField("stats", BindingFlags.Instance | BindingFlags.Public));
+        cursor.Emit(OpCodes.Ldarg_0);
+        cursor.Emit(OpCodes.Ldc_I4_0);
+        cursor.Emit(OpCodes.Ldc_I4_0);
+        cursor.Emit(OpCodes.Callvirt, typeof(PlayerStats).GetMethod("RecalculateStats", BindingFlags.Instance | BindingFlags.Public));
+
+        return;
+    }
+}
+
+// Temporary hotfix until I can figure out why the Dragun fight crashes with PSOG
+public static class DragunFightHotfix
 {
     private static ILHook _BossTriggerZoneNullDereferenceFixHook;
 
