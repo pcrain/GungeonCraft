@@ -18,8 +18,8 @@ public partial class SansBoss : AIActor
   {
     BuildABoss bb = BuildABoss.LetsMakeABoss<BossBehavior>(bossname: BOSS_NAME, guid: BOSS_GUID, defaultSprite: $"{SPRITE_PATH}/sans_idle_1",
       hitboxSize: new IntVector2(8, 9), subtitle: SUBTITLE, bossCardPath: $"{SPRITE_PATH}_bosscard.png"); // Create our build-a-boss
-    // bb.SetStats(health: C.DEBUG_BUILD ? 1 : _SANS_HP, weight: 200f, speed: 0.4f, collisionDamage: 0f, hitReactChance: 0.05f, collisionKnockbackStrength: 0f,
-    bb.SetStats(health: _SANS_HP, weight: 200f, speed: 0.4f, collisionDamage: 0f, hitReactChance: 0.05f, collisionKnockbackStrength: 0f,
+    bb.SetStats(health: C.DEBUG_BUILD ? 1 : _SANS_HP, weight: 200f, speed: 0.4f, collisionDamage: 0f, hitReactChance: 0.05f, collisionKnockbackStrength: 0f,
+    // bb.SetStats(health: _SANS_HP, weight: 200f, speed: 0.4f, collisionDamage: 0f, hitReactChance: 0.05f, collisionKnockbackStrength: 0f,
       healthIsNumberOfHits: true, invulnerabilityPeriod: 1.0f);                // Set our stats
     bb.InitSpritesFromResourcePath(spritePath: SPRITE_PATH);                   // Set up our animations
       bb.AdjustAnimation(name: "idle",         fps:    8f, loop: true);        // Adjust some specific animations as needed
@@ -117,10 +117,7 @@ public partial class SansBoss : AIActor
       base.aiActor.healthHaver.forcePreventVictoryMusic = true; // prevent default floor theme from playing on death
       base.aiActor.healthHaver.OnPreDeath += (_) => {
         FlipSpriteIfNecessary(overrideFlip: false);
-        // AkSoundEngine.PostEvent("Play_ENM_beholster_death_01", base.aiActor.gameObject);
-        AkSoundEngine.PostEvent("Stop_MUS_All", base.gameObject);
-        AkSoundEngine.PostEvent("electromegalo_stop_all", base.aiActor.gameObject);
-        AkSoundEngine.PostEvent("sans", base.aiActor.gameObject);
+        GameManager.Instance.DungeonMusicController.LoopMusic(musicName: "sans", loopPoint: 48800, rewindAmount: 48800);
         UnityEngine.Object.Destroy(aura.gameObject);
         aura = null;
 

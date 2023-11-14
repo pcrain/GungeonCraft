@@ -9,16 +9,23 @@ namespace CwaffingTheGungy;
 
 public class SansDungeon
 {
+    public const string INTERNAL_NAME = "cg_sansfloor";
+    public const string FLOOR_NAME    = "Odd Corridor";
+
     public static GameLevelDefinition FloorNameDefinition;
     public static GameObject GameManagerObject;
     public static tk2dSpriteCollectionData goheckyourself;
+
+    public static Hook getOrLoadByName_Hook;
+    public static Hook forceCustomMusicHook;
+
     public static Dungeon GetOrLoadByNameHook(Func<string, Dungeon> orig, string name)
     {
         if (!GameManager.Instance.customFloors.Contains(FloorNameDefinition))
             GameManager.Instance.customFloors.Add(FloorNameDefinition); // fixes a bug where returning to the breach deletes the floor, thanks Bunny!
         Dungeon dungeon = null;
         string dungeonPrefabTemplate = "Base_ResourcefulRat";
-        if (name.ToLower() == "cg_sansfloor")
+        if (name.ToLower() == INTERNAL_NAME)
         {
             try
             {
@@ -41,12 +48,22 @@ public class SansDungeon
         }
     }
 
-    public static Hook getOrLoadByName_Hook;
+    internal static void PlayFloorMusicHook(Action<DungeonFloorMusicController, Dungeon> orig, DungeonFloorMusicController musicController, Dungeon d)
+    {
+        orig(musicController, d);
+        if (d.DungeonFloorName == FLOOR_NAME)
+            GameManager.Instance.DungeonMusicController.LoopMusic(musicName: "sans", loopPoint: 48800, rewindAmount: 48800);
+    }
+
     public static void InitCustomDungeon()
     {
         getOrLoadByName_Hook = new Hook(
             typeof(DungeonDatabase).GetMethod("GetOrLoadByName", BindingFlags.Static | BindingFlags.Public),
             typeof(SansDungeon).GetMethod("GetOrLoadByNameHook", BindingFlags.Static | BindingFlags.Public)
+        );
+        forceCustomMusicHook = new Hook(
+            typeof(DungeonFloorMusicController).GetMethod("ResetForNewFloor", BindingFlags.Instance | BindingFlags.Public),
+            typeof(SansDungeon).GetMethod("PlayFloorMusicHook", BindingFlags.Static | BindingFlags.NonPublic)
         );
 
         AssetBundle braveResources = ResourceManager.LoadAssetBundle("brave_resources_001");
@@ -54,8 +71,8 @@ public class SansDungeon
 
         FloorNameDefinition = new GameLevelDefinition()
         {
-            dungeonSceneName = "cg_sansfloor", //this is the name we will use whenever we want to load our dungeons scene
-            dungeonPrefabPath = "cg_sansfloor", //this is what we will use when we want to acess our dungeon prefab
+            dungeonSceneName = INTERNAL_NAME, //this is the name we will use whenever we want to load our dungeons scene
+            dungeonPrefabPath = INTERNAL_NAME, //this is what we will use when we want to acess our dungeon prefab
             priceMultiplier = 1.5f, //multiplies how much things cost in the shop
             secretDoorHealthMultiplier = 1, //multiplies how much health secret room doors have, aka how many shots you will need to expose them
             enemyHealthMultiplier = 2, //multiplies how much health enemies have
@@ -68,7 +85,7 @@ public class SansDungeon
         // sets the level definition of the GameLevelDefinition in GameManager.Instance.customFloors if it exists
         foreach (GameLevelDefinition levelDefinition in GameManager.Instance.customFloors)
         {
-            if (levelDefinition.dungeonSceneName == "cg_sansfloor") { FloorNameDefinition = levelDefinition; }
+            if (levelDefinition.dungeonSceneName == INTERNAL_NAME) { FloorNameDefinition = levelDefinition; }
         }
 
         GameManager.Instance.customFloors.Add(FloorNameDefinition);
@@ -102,11 +119,11 @@ public class SansDungeon
         m_FloorNameStampData.SymmetricFrameChance = 0.25f;
         m_FloorNameStampData.SymmetricCompleteChance = 0.6f;
 
-        dungeon.gameObject.name = "cg_sansfloor";
+        dungeon.gameObject.name = INTERNAL_NAME;
         dungeon.contentSource = ContentSource.CONTENT_UPDATE_03;
         dungeon.DungeonSeed = 0;
-        dungeon.DungeonFloorName = "Odd Corridor"; // what shows up At the top when floor is loaded
-        dungeon.DungeonShortName = "Odd Corridor"; // no clue lol, just make it the same
+        dungeon.DungeonFloorName = FLOOR_NAME; // what shows up At the top when floor is loaded
+        dungeon.DungeonShortName = FLOOR_NAME; // no clue lol, just make it the same
         dungeon.DungeonFloorLevelTextOverride = "Unknown Location"; // what shows up below the floorname
         dungeon.LevelOverrideType = GameManager.LevelOverrideState.NONE;
         dungeon.debugSettings = new DebugDungeonSettings()
@@ -244,8 +261,8 @@ public class SansDungeon
         dungeon.PlayerLightRadius = 4;
         dungeon.PrefabsToAutoSpawn = new GameObject[0];
 
-        //include this for custom floor audio
-        dungeon.musicEventName = "sans";
+        //include this for custom floor audio (we need to prevent music from playing manually se our hook can properly loop it)
+        dungeon.musicEventName = "fakedummymusiceventthatdoesntexist";
 
         CatacombsPrefab = null;
         RatDungeonPrefab = null;

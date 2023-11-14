@@ -1141,23 +1141,38 @@ public static class BH
 
   public static IndividualBossFloorEntry SelectBossHook(Func<BossFloorEntry, IndividualBossFloorEntry> orig, BossFloorEntry self)
   {
-    foreach (IndividualBossFloorEntry i in self.Bosses)
-      ETGModConsole.Log($"    {i.TargetRoomTable.name} -> {i.BossWeight}");
+    if (C.DEBUG_BUILD)
+      foreach (IndividualBossFloorEntry i in self.Bosses)
+        ETGModConsole.Log($"    {i.TargetRoomTable.name} -> {i.BossWeight}");
     return orig(self);
   }
 
   // SpecificIntroDoer extension method for playing boss music
   public static uint PlayBossMusic(this AIActor aiActor, string musicName, int loopPoint = -1, int rewindAmount = -1)
   {
-    uint musicEventId =  AkSoundEngine.PostEvent(musicName, GameManager.Instance.DungeonMusicController.gameObject, in_uFlags: (uint)AkCallbackType.AK_EnableGetSourcePlayPosition);
-    if (loopPoint > 0 && rewindAmount > 0)
-      GameManager.Instance.DungeonMusicController.StartCoroutine(LoopMusic(musicEventId, musicName, loopPoint, rewindAmount));
+    uint musicEventId = GameManager.Instance.DungeonMusicController.LoopMusic(musicName, loopPoint, rewindAmount);
     aiActor.healthHaver.OnPreDeath += (_) =>
       { AkSoundEngine.StopPlayingID(musicEventId, 0, AkCurveInterpolation.AkCurveInterpolation_Constant); };
     return musicEventId;
   }
 
-  private static IEnumerator LoopMusic(uint musicPlayingEventId, string musicName, int loopPoint, int rewindAmount)
+  public static uint LoopMusic(this DungeonFloorMusicController musicController, string musicName, int loopPoint, int rewindAmount)
+  {
+    if (musicController.m_coreMusicEventID > 0)
+      AkSoundEngine.StopPlayingID(musicController.m_coreMusicEventID, 0, AkCurveInterpolation.AkCurveInterpolation_Constant);
+    uint musicEventId =  AkSoundEngine.PostEvent(musicName, musicController.gameObject, in_uFlags: (uint)AkCallbackType.AK_EnableGetSourcePlayPosition);
+    musicController.m_coreMusicEventID = musicEventId;
+    if (loopPoint > 0 && rewindAmount > 0)
+      musicController.LoopMusic(musicEventId, musicName, loopPoint, rewindAmount);
+    return musicEventId;
+  }
+
+  public static void LoopMusic(this DungeonFloorMusicController musicController, uint musicPlayingEventId, string musicName, int loopPoint, int rewindAmount)
+  {
+    musicController.StartCoroutine(LoopMusic_CR(musicPlayingEventId, musicName, loopPoint, rewindAmount));
+  }
+
+  private static IEnumerator LoopMusic_CR(uint musicPlayingEventId, string musicName, int loopPoint, int rewindAmount)
   {
     yield return new WaitForSeconds(1f);  // GetSourcePlayPosition() will fail if we don't wait a bit
     while (true)
@@ -1172,5 +1187,4 @@ public static class BH
     }
     yield break;
   }
-
 }
