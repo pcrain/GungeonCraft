@@ -119,6 +119,8 @@ public class Jugglernaut : AdvancedGunBehavior
         orig(gun, flipped);
         if (gun.GetComponent<Jugglernaut>() is not Jugglernaut jugglernaut)
             return;
+        if (gun.CurrentOwner is not PlayerController player)
+            return;
         if (flipped == jugglernaut._cachedFlipped && !jugglernaut._firstCheck)
             return;
 
