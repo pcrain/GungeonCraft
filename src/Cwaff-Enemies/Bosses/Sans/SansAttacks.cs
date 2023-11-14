@@ -86,7 +86,7 @@ public partial class SansBoss : AIActor
     private static readonly string orangeReticle = "reticle_orange";
     private static readonly string blueReticle   = "reticle_blue";
     private static readonly Color  orangeColor   = new Color(1.0f,0.75f,0f,0.5f);
-    private static readonly Color  blueColor     = new Color(0.65f,0.65f,1.0f,0.5f);
+    private static readonly Color  blueColor     = new Color(0.15f,0.65f,1.0f,0.5f);
 
     private const int   COUNT    = 32;
     private const int   WAVES    = 5;
