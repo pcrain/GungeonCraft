@@ -139,25 +139,25 @@ public class VacuumParticle : MonoBehaviour
     private const float _MAX_ALPHA          = 0.5f;
     private const float _DLT_ALPHA          = 0.01f;
 
-    private Gun _gun             = null;
-    private tk2dSprite _sprite   = null;
-    private float _accel         = 0.0f;
-    private Vector2 _velocity    = Vector2.zero;
-    private float _lifetime      = 0.0f;
-    private float _alpha         = _MIN_ALPHA;
-    private bool _isDebris       = true; // false for the VFX particles created by the vacuum animation itself, true for actual debris
-    private DebrisObject _debris = null;
-    private float _startDistance = 0.0f;
-    private float _startScaleX   = 1.0f;
-    private float _startScaleY   = 1.0f;
+    private Gun _gun               = null;
+    private tk2dBaseSprite _sprite = null;
+    private float _accel           = 0.0f;
+    private Vector2 _velocity      = Vector2.zero;
+    private float _lifetime        = 0.0f;
+    private float _alpha           = _MIN_ALPHA;
+    private bool _isDebris         = true; // false for the VFX particles created by the vacuum animation itself, true for actual debris
+    private DebrisObject _debris   = null;
+    private float _startDistance   = 0.0f;
+    private float _startScaleX     = 1.0f;
+    private float _startScaleY     = 1.0f;
 
     public void Setup(Gun g, float startDistance = 0.0f)
     {
         this._gun           = g;
-        this._sprite        = base.gameObject.GetComponent<tk2dSprite>();
+        this._startDistance = startDistance;
         this._debris        = base.gameObject.GetComponent<DebrisObject>();
         this._isDebris      = this._debris != null;
-        this._startDistance = startDistance;
+        this._sprite        = this._isDebris ? this._debris.sprite : base.gameObject.GetComponent<tk2dSprite>();
         this._startScaleX   = this._isDebris ? this._sprite.scale.x : 1.0f;
         this._startScaleY   = this._isDebris ? this._sprite.scale.y : 1.0f;
     }
