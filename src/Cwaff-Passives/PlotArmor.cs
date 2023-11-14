@@ -5,16 +5,17 @@ public class PlotArmor : PassiveItem
     public static string ItemName         = "Plot Armor";
     public static string SpritePath       = "plot_armor_icon";
     public static string ShortDescription = "Can't Die Yet";
-    public static string LongDescription  = $"Gain enough armor before every boss fight to have 3 total armor (4 for zero-health characters). Always grants at least 1 armor.\n\nThe single most effective piece of armor ever created, under the right circumstances. The amount of protection it actually offers seems to vary from person to person over time, and the Gungeon's best blacksmiths are still trying to figure out how to fully harness the properties of \"plot\" to their advantage.";
+    public static string LongDescription  = $"Gain enough armor before every boss fight to have 4 total armor (5 for zero-health characters). Always grants at least 2 armor.\n\nThe single most effective piece of armor ever created, under the right circumstances. The amount of protection it actually offers seems to vary from person to person over time, and the Gungeon's best blacksmiths are still trying to figure out how to fully harness the properties of \"plot\" to their advantage.";
 
-    internal const int _MIN_ARMOR = 3;
+    internal const int _MIN_PLAYER_ARMOR  = 4;
+    internal const int _MIN_ARMOR_TO_GIVE = 2;
 
-    private RoomHandler _lastVisitedRoom = null;
+    private RoomHandler _lastVisitedRoom  = null;
 
     public static void Init()
     {
         PickupObject item = Lazy.SetupPassive<PlotArmor>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality      = PickupObject.ItemQuality.S;
+        item.quality      = PickupObject.ItemQuality.A;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
         item.AddToSubShop(ModdedShopType.Ironside);
     }
@@ -33,10 +34,9 @@ public class PlotArmor : PassiveItem
         if (room.hasEverBeenVisited || room != ChestTeleporterItem.FindBossFoyer())
             return;
 
+        int minArmor = _MIN_PLAYER_ARMOR + (this.Owner.ForceZeroHealthState ? 1 : 0);
         int currentArmor = (int)this.Owner.healthHaver.Armor;
-        if (this.Owner.ForceZeroHealthState)
-            currentArmor -= 1; // Robot gets set to 4 armor
-        int armorToGain = Mathf.Max(1, _MIN_ARMOR - currentArmor);
+        int armorToGain = Mathf.Max(_MIN_ARMOR_TO_GIVE, minArmor - currentArmor);
         this.Owner.StartCoroutine(SpawnSomeArmor(room, armorToGain));
     }
 
