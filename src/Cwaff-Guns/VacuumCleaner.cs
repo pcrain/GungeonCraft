@@ -71,6 +71,7 @@ public class VacuumCleaner : AdvancedGunBehavior
 
         // Actually restore the ammo
         gunToGainAmmo.GainAmmo(ammoToRestore);
+        AkSoundEngine.PostEvent("vacuum_process_ammo_sound", this.gun.gameObject);
     }
 
     protected override void Update()
