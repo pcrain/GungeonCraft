@@ -2350,6 +2350,7 @@
     <EmbeddedResource Include="Resources\ItemSprites\gaster_blaster_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\gyroscope_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\emergency_siren_icon.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\itemfinder_blink_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\insurance_policy_paradox_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\johns_wick_icon_old.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\yellow_bandana_icon.png"/>

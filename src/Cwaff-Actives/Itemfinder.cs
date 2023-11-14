@@ -13,11 +13,14 @@ public class Itemfinder : PlayerItem
     internal readonly float[] _QUALITY_CHANCES  = {1.00f, 0.60f, 0.27f, 0.09f, 0.03f};
 
     internal const float _CLOSE_DISTANCE = 3f; // Distance in tiles from an item location to be considered "close"
+    internal const float _CLOSE_DISTANCE_SQR = _CLOSE_DISTANCE * _CLOSE_DISTANCE;
     internal const int   _MAX_CELL_DIST = 5;   // Max number of cells to look when looking for a good hiding location
 
     internal static List<RoomHandler> _RoomsOnFloor = null;
     internal static List<TreasureLocation> _Treasure = null;
     internal static float _LastSoundPlayTime = 0f;
+    internal static int _NormalId;
+    internal static int _BlinkId;
 
     public static void Init()
     {
@@ -26,6 +29,9 @@ public class Itemfinder : PlayerItem
         item.consumable   = false;
         item.CanBeDropped = true;
         item.SetCooldownType(ItemBuilder.CooldownType.Timed, 1f);
+
+        _NormalId = item.sprite.spriteId;
+        _BlinkId  = SpriteBuilder.AddSpriteToCollection(ResMap.Get("itemfinder_blink_icon")[0], item.sprite.Collection);
     }
 
     public override void Pickup(PlayerController player)
@@ -47,8 +53,8 @@ public class Itemfinder : PlayerItem
         bool nearAnyTreasure = false;
         foreach (TreasureLocation t in _Treasure)
         {
-            float dist = (t.location - user.sprite.WorldCenter).magnitude;
-            if (dist < _CLOSE_DISTANCE)
+            float sqrdist = (t.location - user.sprite.WorldCenter).sqrMagnitude;
+            if (sqrdist < _CLOSE_DISTANCE_SQR)
             {
                 nearAnyTreasure = true;
                 break;
@@ -56,22 +62,25 @@ public class Itemfinder : PlayerItem
         }
         if (nearAnyTreasure && (BraveTime.ScaledTimeSinceStartup - _LastSoundPlayTime) > 1f)
         {
+            base.sprite.SetSprite(_BlinkId);
             AkSoundEngine.PostEvent("itemfinder_sound", user.gameObject);
             _LastSoundPlayTime = BraveTime.ScaledTimeSinceStartup;
         }
+        if ((BraveTime.ScaledTimeSinceStartup - _LastSoundPlayTime) > 0.5f)
+            base.sprite.SetSprite(_NormalId);
         return nearAnyTreasure && base.CanBeUsed(user);
     }
 
     public override void DoEffect(PlayerController user)
     {
         TreasureLocation nearestTreasure = null;
-        float nearestDist = _CLOSE_DISTANCE;
+        float nearestSqrDist = _CLOSE_DISTANCE_SQR;
         foreach (TreasureLocation t in _Treasure)
         {
-            float dist = (t.location - user.sprite.WorldCenter).magnitude;
-            if (dist < nearestDist)
+            float sqrdist = (t.location - user.sprite.WorldCenter).sqrMagnitude;
+            if (sqrdist < nearestSqrDist)
             {
-                nearestDist = dist;
+                nearestSqrDist = sqrdist;
                 nearestTreasure = t;
             }
         }
