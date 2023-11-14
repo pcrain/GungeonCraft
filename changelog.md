@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.2.1 (2023-11-13)
+- Buffed Plot Armor: changed from S to A quality, now always gives at least 2 armor and brings the player up to a minimum of 4 armor
+- Added a sound cue to Vacuum Cleaner for when ammo is successfully restored
+- Made blue bullets for boss' blue attack more...blue (they were purple-ish previously)
+- Polished sprites for Itemfinder and gave it a small animation while active
+- Fixed vanilla bug preventing second player in co-op turbo mode from receiving increased speed until their stats were changed at least once
+- Fixed Vacuum Cleaner not being able to vacuum up some projectiles that were converted to debris
+- Fixed occasional animation error when picking up Jugglernaut
+- Fixed occasional null dereference error when Alyx tries to spawn poison goop
+- Fixed boss floor music not looping cleanly
+
 ## 1.2.0 (2023-11-13)
 - Added Platinum Star, Pistol Whip, Jugglernaut, and Adrenaline Shot
 - Added synergy support for ItemTips in preparation for future synergies

@@ -13,6 +13,7 @@
 - 11 new active items
 - Lore for all new guns and items
 - A new boss!
+- Fixed co-op Turbo Mode
 - You can pet Junior \o/
 - You can become the greatest janitor the Gungeon has ever seen O:
 
