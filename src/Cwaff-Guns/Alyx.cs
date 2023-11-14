@@ -161,11 +161,11 @@ public class Alyx : AdvancedGunBehavior
         // If we've decayed at all, create poison goop under our feet
         if (newAmmo < this.gun.CurrentAmmo || newMaxAmmo < this.gun.GetBaseMaxAmmo())
         {
-            DeadlyDeadlyGoopManager poisonGooper = DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.PoisonDef);
+            DeadlyDeadlyGoopManager poisonGooper = DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.PoisonDef); // can be null sometimes???
             if (this.Owner is PlayerController player)
-                poisonGooper.AddGoopCircle(player.sprite.WorldBottomCenter - player.m_currentGunAngle.ToVector(1f), 0.75f);
+                poisonGooper?.AddGoopCircle(player.sprite.WorldBottomCenter - player.m_currentGunAngle.ToVector(1f), 0.75f);
             else
-                poisonGooper.AddGoopCircle(this.gun.sprite.WorldCenter, 1f);
+                poisonGooper?.AddGoopCircle(this.gun.sprite.WorldCenter, 1f);
         }
 
         this.gun.CurrentAmmo = newAmmo;
