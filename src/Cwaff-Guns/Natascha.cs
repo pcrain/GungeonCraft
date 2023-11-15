@@ -20,6 +20,7 @@ public class Natascha : AdvancedGunBehavior
         Gun gun = Lazy.SetupGun<Natascha>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             gun.SetAttributes(quality: PickupObject.ItemQuality.D, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 2500);
             gun.SetAnimationFPS(gun.shootAnimation, (int)((float)_FireAnimationFrames / _BaseCooldownTime) + 1);
+            gun.SetMuzzleVFX("muzzle_natascha", fps: 60, scale: 0.3f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
             gun.AddToSubShop(ItemBuilder.ShopType.Trorc);
             gun.AddToSubShop(ModdedShopType.Rusty);
 

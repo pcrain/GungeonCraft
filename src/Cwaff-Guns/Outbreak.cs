@@ -21,6 +21,7 @@ public class Outbreak : AdvancedGunBehavior
             gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 1.2f, ammo: 300);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
             gun.SetAnimationFPS(gun.reloadAnimation, 20);
+            gun.SetMuzzleVFX("muzzle_outbreak", fps: 40, scale: 0.3f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
             gun.SetFireAudio("outbreak_shoot_sound");
             gun.SetReloadAudio("outbreak_reload_sound");
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);

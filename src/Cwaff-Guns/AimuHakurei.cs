@@ -34,6 +34,7 @@ public class AimuHakurei : AdvancedGunBehavior
                 ammo: 200, /*infiniteAmmo: true,*/ canGainAmmo: false, canReloadNoMatterAmmo: true);
             gun.Volley.ModulesAreTiers = true;
             gun.SetAnimationFPS(gun.shootAnimation, 60);
+            gun.SetMuzzleVFX("muzzle_aimu", fps: 30, scale: 0.3f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
             gun.AddToSubShop(ModdedShopType.TimeTrader);
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(

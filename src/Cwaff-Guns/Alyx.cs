@@ -29,6 +29,7 @@ public class Alyx : AdvancedGunBehavior
             gun.SetAttributes(quality: PickupObject.ItemQuality.A, gunClass: GunClass.FULLAUTO, reloadTime: 0.5f, ammo: _BASE_MAX_AMMO);
             gun.SetAnimationFPS(gun.reloadAnimation, 20);
             gun.SetAnimationFPS(gun.shootAnimation, 20);
+            gun.SetMuzzleVFX("muzzle_alyx", fps: 30, scale: 0.5f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
             gun.SetReloadAudio("alyx_reload_sound");
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
@@ -67,6 +68,7 @@ public class Alyx : AdvancedGunBehavior
     public override void Start()
     {
         base.Start();
+        gun.sprite.gameObject.SetGlowiness(50f);
         RecalculateAmmo();
     }
 
@@ -79,6 +81,8 @@ public class Alyx : AdvancedGunBehavior
     protected override void Update()
     {
         base.Update();
+        Material m = gun.sprite.renderer.material;
+        m.SetFloat("_EmissivePower", 50f + 100f * Mathf.Abs(Mathf.Sin(BraveTime.ScaledTimeSinceStartup)));
         RecalculateAmmo();
     }
 

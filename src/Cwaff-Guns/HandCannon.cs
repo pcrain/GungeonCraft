@@ -23,6 +23,7 @@ public class HandCannon : AdvancedGunBehavior
             gun.SetAnimationFPS(gun.reloadAnimation, (int)(gun.spriteAnimator.GetClipByName(gun.reloadAnimation).frames.Length / gun.reloadTime));
             gun.SetAnimationFPS(gun.chargeAnimation, (int)((1.0f / _CHARGE_TIME) * _CHARGE_LOOP_FRAME));
             gun.LoopAnimation(gun.chargeAnimation, _CHARGE_LOOP_FRAME);
+            gun.SetMuzzleVFX("muzzle_hand_cannon", fps: 30, scale: 0.5f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
             gun.SetFireAudio("hand_cannon_shoot_sound");
             gun.SetReloadAudio("hand_cannon_reload_sound");
             gun.SetChargeAudio("hand_cannon_charge_sound", frame: 0);

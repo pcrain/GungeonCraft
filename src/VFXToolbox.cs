@@ -60,7 +60,7 @@ public static class VFX
     /// <summary>
     /// Generically register a VFX as a GameObject (animated sprite), VFXComplex, or VFXPool
     /// </summary>
-    public static void RegisterVFX(string name, List<string> spritePaths, float fps, bool loops = true, int loopStart = -1, float scale = 1.0f, tk2dBaseSprite.Anchor anchor = tk2dBaseSprite.Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null)
+    public static void RegisterVFX(string name, List<string> spritePaths, float fps, bool loops = true, int loopStart = -1, float scale = 1.0f, tk2dBaseSprite.Anchor anchor = tk2dBaseSprite.Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true)
     {
         // GameObject Obj     = new GameObject(name);
         GameObject Obj     = SpriteBuilder.SpriteFromResource(spritePaths[0], new GameObject(name));
@@ -154,7 +154,8 @@ public static class VFX
         }
         animator.playAutomatically = true;
         animator.DefaultClipId     = animator.GetClipIdByName("start");
-        vfObj.attached             = true;
+        vfObj.attached             = attached;
+        vfObj.orphaned             = orphaned;
         vfObj.persistsOnDeath      = persist;
         vfObj.usesZHeight          = usesZHeight;
         vfObj.zHeight              = zHeightOffset;
@@ -176,7 +177,7 @@ public static class VFX
     /// <summary>
     /// Register and return a VFXObject
     /// </summary>
-    public static GameObject RegisterVFXObject(string name, List<string> spritePaths, float fps, bool loops = true, int loopStart = -1, float scale = 1.0f, tk2dBaseSprite.Anchor anchor = tk2dBaseSprite.Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null)
+    public static GameObject RegisterVFXObject(string name, List<string> spritePaths, float fps, bool loops = true, int loopStart = -1, float scale = 1.0f, tk2dBaseSprite.Anchor anchor = tk2dBaseSprite.Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true)
     {
         RegisterVFX(
             name           : name,
@@ -192,7 +193,9 @@ public static class VFX
             persist        : persist,
             alignment      : alignment,
             emissivePower  : emissivePower,
-            emissiveColour : emissiveColour
+            emissiveColour : emissiveColour,
+            orphaned       : orphaned,
+            attached       : attached
             );
         return animations[name];
     }
@@ -200,7 +203,7 @@ public static class VFX
     /// <summary>
     /// Register and return a VFXPool
     /// </summary>
-    public static VFXPool RegisterVFXPool(string name, List<string> spritePaths, float fps, bool loops = true, int loopStart = -1, float scale = 1.0f, tk2dBaseSprite.Anchor anchor = tk2dBaseSprite.Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null)
+    public static VFXPool RegisterVFXPool(string name, List<string> spritePaths, float fps, bool loops = true, int loopStart = -1, float scale = 1.0f, tk2dBaseSprite.Anchor anchor = tk2dBaseSprite.Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true)
     {
         RegisterVFX(
             name           : name,
@@ -216,7 +219,9 @@ public static class VFX
             persist        : persist,
             alignment      : alignment,
             emissivePower  : emissivePower,
-            emissiveColour : emissiveColour
+            emissiveColour : emissiveColour,
+            orphaned       : orphaned,
+            attached       : attached
             );
         return vfxpool[name];
     }
@@ -224,7 +229,7 @@ public static class VFX
     /// <summary>
     /// Register and return a VFXComplex
     /// </summary>
-    public static VFXComplex RegisterVFXComplex(string name, List<string> spritePaths, float fps, bool loops = true, int loopStart = -1, float scale = 1.0f, tk2dBaseSprite.Anchor anchor = tk2dBaseSprite.Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null)
+    public static VFXComplex RegisterVFXComplex(string name, List<string> spritePaths, float fps, bool loops = true, int loopStart = -1, float scale = 1.0f, tk2dBaseSprite.Anchor anchor = tk2dBaseSprite.Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true)
     {
         RegisterVFX(
             name           : name,
@@ -240,7 +245,9 @@ public static class VFX
             persist        : persist,
             alignment      : alignment,
             emissivePower  : emissivePower,
-            emissiveColour : emissiveColour
+            emissiveColour : emissiveColour,
+            orphaned       : orphaned,
+            attached       : attached
             );
         return vfxcomplex[name];
     }

@@ -36,6 +36,7 @@ public class Gunbrella : AdvancedGunBehavior
             gun.SetAnimationFPS(gun.shootAnimation, 60);
             gun.SetAnimationFPS(gun.chargeAnimation, 16);
             gun.LoopAnimation(gun.chargeAnimation, 17);
+            gun.SetMuzzleVFX("muzzle_gunbrella", fps: 30, scale: 0.5f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
 
         ProjectileModule mod = gun.DefaultModule;
             mod.shootStyle             = ProjectileModule.ShootStyle.Charged;

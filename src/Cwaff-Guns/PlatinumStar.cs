@@ -17,6 +17,7 @@ public class PlatinumStar : AdvancedGunBehavior
             gun.SetAttributes(quality: PickupObject.ItemQuality.A, gunClass: GunClass.PISTOL, reloadTime: 1f, ammo: 480);
             gun.SetAnimationFPS(gun.shootAnimation, 20);
             gun.SetAnimationFPS(gun.reloadAnimation, 40);
+            gun.SetMuzzleVFX("muzzle_platinum_star", fps: 60, scale: 0.25f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
             gun.SetFireAudio("platinum_fire_sound");
             gun.SetReloadAudio("platinum_reload_sound", frame: 5);
             gun.AddToSubShop(ModdedShopType.TimeTrader);
@@ -73,6 +74,7 @@ public class PlatinumStar : AdvancedGunBehavior
     public override void OnReload(PlayerController player, Gun gun)
     {
         base.OnReload(player, gun);
+        gun.muzzleFlashEffects.DestroyAll(); // since we're preventing gun rotation on reload, the muzzle vfx look weird, so just disable them
         LaunchAllBullets(this.Player);
     }
 

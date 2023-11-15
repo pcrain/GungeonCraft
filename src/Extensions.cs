@@ -598,6 +598,12 @@ public static class Extensions
     gun.SetGunAudio(name: gun.idleAnimation, audio: audio, frame: frame);
   }
 
+  public static void SetMuzzleVFX(this Gun gun, string resPath, float fps = 60, bool loops = false, float scale = 1.0f, tk2dBaseSprite.Anchor anchor = tk2dBaseSprite.Anchor.MiddleLeft, bool orphaned = false)
+  {
+    gun.muzzleFlashEffects = VFX.RegisterVFXPool($"{gun.itemName}_MuzzleVFX", ResMap.Get(resPath), fps: fps,
+      loops: loops, scale: scale, anchor: anchor, alignment: VFXAlignment.Fixed, orphaned: orphaned, attached: true);
+  }
+
   public static bool Contains(this List<PassiveItem> items, int itemId)
   {
     foreach(PassiveItem item in items)

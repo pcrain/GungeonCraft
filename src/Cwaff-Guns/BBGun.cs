@@ -21,6 +21,7 @@ public class BBGun : AdvancedGunBehavior
             gun.SetAnimationFPS(gun.shootAnimation, 10);
             gun.SetAnimationFPS(gun.chargeAnimation, 16);
             gun.LoopAnimation(gun.chargeAnimation, 32);
+            gun.SetMuzzleVFX("muzzle_b_b_gun", fps: 30, scale: 0.5f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
             gun.SetFireAudio("Play_WPN_seriouscannon_shot_01");
             gun.SetReloadAudio("Play_ENM_flame_veil_01");
 
