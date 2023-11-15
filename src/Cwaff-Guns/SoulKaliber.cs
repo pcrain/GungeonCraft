@@ -48,9 +48,9 @@ public class SoulLinkProjectile : MonoBehaviour
         Projectile proj = base.GetComponent<Projectile>();
         Material m = proj.sprite.renderer.material;
             m.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-            m.SetFloat("_EmissivePower", 0f);
+            m.SetFloat("_EmissivePower", 100f);
             m.SetFloat("_EmissiveColorPower", 1.55f);
-            m.SetColor("_EmissiveColor", Color.red);
+            m.SetColor("_EmissiveColor", Color.magenta);
 
         proj.OnHitEnemy += (Projectile p, SpeculativeRigidbody enemy, bool _) => {
             AkSoundEngine.PostEvent("soul_kaliber_impact", p.gameObject);
