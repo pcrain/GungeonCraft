@@ -604,6 +604,21 @@ public static class Extensions
       loops: loops, scale: scale, anchor: anchor, alignment: VFXAlignment.Fixed, orphaned: orphaned, attached: true);
   }
 
+  public static void SetMuzzleVFX(this Gun gun, Items gunToCopyFrom, bool onlyCopyBasicEffects = true)
+  {
+    Gun otherGun = ItemHelper.Get(gunToCopyFrom) as Gun;
+    if (!otherGun)
+      return;
+
+    gun.muzzleFlashEffects = otherGun.muzzleFlashEffects;
+    if (onlyCopyBasicEffects)
+      return;
+
+    gun.usesContinuousMuzzleFlash  = otherGun.usesContinuousMuzzleFlash;
+    gun.finalMuzzleFlashEffects    = otherGun.finalMuzzleFlashEffects;
+    gun.CriticalMuzzleFlashEffects = otherGun.CriticalMuzzleFlashEffects;
+  }
+
   public static bool Contains(this List<PassiveItem> items, int itemId)
   {
     foreach(PassiveItem item in items)

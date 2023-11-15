@@ -17,6 +17,7 @@ public class SoulKaliber : AdvancedGunBehavior
             gun.muzzleFlashEffects.type              = VFXPoolType.None;
             gun.SetAnimationFPS(gun.shootAnimation, 24);
             gun.SetAnimationFPS(gun.reloadAnimation, 12);
+            gun.SetMuzzleVFX(Items.BundleOfWands);
             gun.SetFireAudio("soul_kaliber_fire");
             gun.SetReloadAudio("soul_kaliber_reload");
 

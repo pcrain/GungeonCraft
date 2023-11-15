@@ -17,6 +17,7 @@ public class Tranquilizer : AdvancedGunBehavior
             gun.SetAttributes(quality: PickupObject.ItemQuality.D, gunClass: GunClass.POISON, reloadTime: 1.2f, ammo: 80);
             gun.SetAnimationFPS(gun.shootAnimation, 30);
             gun.SetAnimationFPS(gun.reloadAnimation, 40);
+            gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
             gun.SetFireAudio("blowgun_fire_sound");
             gun.SetReloadAudio("blowgun_reload_sound");
 

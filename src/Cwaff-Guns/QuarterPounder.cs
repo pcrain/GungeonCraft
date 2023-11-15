@@ -19,6 +19,7 @@ public class QuarterPounder : AdvancedGunBehavior
             gun.SetAttributes(quality: PickupObject.ItemQuality.C, gunClass: GunClass.RIFLE, reloadTime: 1.1f, ammo: 9999, canGainAmmo: false);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
             gun.SetAnimationFPS(gun.reloadAnimation, 16);
+            gun.SetMuzzleVFX("muzzle_quarter_pounder", fps: 30, scale: 0.4f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
             gun.SetFireAudio("fire_coin_sound");
             gun.SetReloadAudio("coin_gun_reload");
 

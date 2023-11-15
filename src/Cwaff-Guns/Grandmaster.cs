@@ -21,6 +21,7 @@ public class Grandmaster : AdvancedGunBehavior
             gun.SetAttributes(quality: PickupObject.ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.0f, ammo: 350);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
             gun.SetAnimationFPS(gun.reloadAnimation, 16);
+            gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
             gun.SetFireAudio("chess_gun_fire");
             gun.SetReloadAudio("chess_gun_reload");
 

@@ -31,6 +31,7 @@ public class Deadline : AdvancedGunBehavior
             gun.SetAnimationFPS(gun.shootAnimation, 20);
             gun.SetAnimationFPS(gun.reloadAnimation, 30);
             gun.SetAnimationFPS(gun.idleAnimation, 10);
+            gun.SetMuzzleVFX("muzzle_deadline", fps: 20, scale: 0.4f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
             gun.SetFireAudio("deadline_fire_sound");
             gun.SetReloadAudio("deadline_fire_sound");
             gun.AddToSubShop(ModdedShopType.TimeTrader);

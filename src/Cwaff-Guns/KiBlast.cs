@@ -24,6 +24,7 @@ public class KiBlast : AdvancedGunBehavior
             gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 999, infiniteAmmo: true);
             gun.SetAnimationFPS(gun.idleAnimation, 10);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
+            gun.SetMuzzleVFX("muzzle_iron_maid", fps: 30, scale: 0.5f, anchor: tk2dBaseSprite.Anchor.MiddleLeft);
             gun.SetFireAudio("ki_blast_sound");
             gun.AddToSubShop(ModdedShopType.Boomhildr);
 

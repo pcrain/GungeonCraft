@@ -20,6 +20,7 @@ public class Bouncer : AdvancedGunBehavior
             gun.SetAttributes(quality: PickupObject.ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 0.8f, ammo: 300);
             gun.SetAnimationFPS(gun.shootAnimation, 14);
             gun.SetAnimationFPS(gun.reloadAnimation, 20);
+            gun.SetMuzzleVFX(Items.Magnum);
             gun.SetFireAudio("MC_RocsCape");
             gun.SetReloadAudio("MC_Link_Grow");
             gun.AddToSubShop(ModdedShopType.Boomhildr);

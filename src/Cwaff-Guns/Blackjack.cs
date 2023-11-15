@@ -21,6 +21,7 @@ public class Blackjack : AdvancedGunBehavior
             gun.SetAttributes(quality: PickupObject.ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.8f, ammo: _DECK_SIZE * _NUM_DECKS, canGainAmmo: false);
             gun.SetAnimationFPS(gun.shootAnimation, 30);
             gun.SetAnimationFPS(gun.reloadAnimation, 30);
+            gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
             gun.SetFireAudio(); // prevent fire audio, as it's handled in OnPostFired()
             gun.SetReloadAudio("card_shuffle_sound"); // todo: this is still playing the default reload sound as well, for some reason
 

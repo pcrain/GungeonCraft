@@ -19,6 +19,7 @@ public class SeltzerPelter : AdvancedGunBehavior
         Gun gun = Lazy.SetupGun<SeltzerPelter>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.0f, ammo: 150);
             gun.SetAnimationFPS(gun.shootAnimation, 36);
+            gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
             _ReloadAnimations = new(){
                 gun.UpdateAnimation("reload",   returnToIdle: true), // coke can
                 gun.UpdateAnimation("reload_b", returnToIdle: true), // pepsi can

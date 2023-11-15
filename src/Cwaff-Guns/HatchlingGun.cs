@@ -19,6 +19,7 @@ public class HatchlingGun : AdvancedGunBehavior
             gun.SetAttributes(quality: PickupObject.ItemQuality.D, gunClass: GunClass.RIFLE, reloadTime: 25f / 20f /* frames / fps*/, ammo: 500);
             gun.SetAnimationFPS(gun.shootAnimation, 40);
             gun.SetAnimationFPS(gun.reloadAnimation, 20);
+            gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
             gun.SetReloadAudio("hatchling_gun_bounce_sound", frame: 0);
             gun.SetReloadAudio("hatchling_gun_bounce_sound", frame: 6);
             gun.SetReloadAudio("hatchling_gun_bounce_sound", frame: 14);

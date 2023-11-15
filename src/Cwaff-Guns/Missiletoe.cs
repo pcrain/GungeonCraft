@@ -45,6 +45,7 @@ public class Missiletoe : AdvancedGunBehavior
             gun.SetAttributes(quality: PickupObject.ItemQuality.A, gunClass: GunClass.CHARM, reloadTime: 1.0f, ammo: 300, canReloadNoMatterAmmo: true);
             gun.SetAnimationFPS(gun.shootAnimation, 45);
             gun.SetAnimationFPS(gun.reloadAnimation, 20);
+            gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
             gun.SetFireAudio("missiletoe_shoot_sound_1");
             gun.SetReloadAudio("missiletoe_reload_sound");
             gun.AddToSubShop(ModdedShopType.Boomhildr);

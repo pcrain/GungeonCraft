@@ -14,6 +14,7 @@ public class PaintballCannon : AdvancedGunBehavior
             gun.SetAttributes(quality: PickupObject.ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 0.9f, ammo: 600);
             gun.SetAnimationFPS(gun.shootAnimation, 14);
             gun.SetAnimationFPS(gun.reloadAnimation, 4);
+            gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
             gun.SetFireAudio("paintball_shoot_sound");
             gun.SetReloadAudio("paintball_reload_sound");
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
