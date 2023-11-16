@@ -2131,6 +2131,7 @@
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_hand_cannon1.png"/>
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_deadline2.png"/>
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_quarter_pounder4.png"/>
+    <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_jugglernaut1.png"/>
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_natascha4.png"/>
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_b_b_gun2.png"/>
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_b_b_gun1.png"/>
@@ -2139,6 +2140,7 @@
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_b_b_gun3.png"/>
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_iron_maid2.png"/>
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_alyx2.png"/>
+    <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_jugglernaut2.png"/>
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_natascha2.png"/>
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_gunbrella2.png"/>
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_b_b_gun6.png"/>
@@ -2848,6 +2850,7 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\natascha_bullet_003.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\outbreak_projectile_old2.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\outbreak_projectile_001.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\jugglernaut_ball1.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile_old9.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\soap_bubble_projectile_004.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball003.png"/>
@@ -2859,6 +2862,7 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\tennis_ball5.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\train_projectile_001.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\missiletoe_projectile_mistletoe_001.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\jugglernaut_ball3.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\slappp13.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile_old3.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball_old_8.png"/>
@@ -2907,7 +2911,9 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\gunbrella_projectile_old1.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\coin_gun_projectile8.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bouncelet_gray_001.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\jugglernaut_ball2.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\slappp11.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\jugglernaut_ball4.png"/>
     <EmbeddedResource Include="Resources\Companions\Wolf\wolf_pet_002.png"/>
     <EmbeddedResource Include="Resources\Companions\Wolf\wolf_pet_001.png"/>
     <EmbeddedResource Include="Resources\Companions\Wolf\wolf_pet_003.png"/>

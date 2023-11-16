@@ -34,7 +34,7 @@ public class Jugglernaut : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Jugglernaut>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 150, defaultAudio: true);
+            gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 150/*, defaultAudio: true*/);
             gun.SetAnimationFPS(gun.shootAnimation, 30);
             gun.SetAnimationFPS(gun.reloadAnimation, 40);
             _JuggleAnimations = new(){
@@ -46,6 +46,7 @@ public class Jugglernaut : AdvancedGunBehavior
                 gun.UpdateAnimation("6_gun", returnToIdle: false),
             };
             gun.muzzleFlashEffects              = null;
+            // gun.SetMuzzleVFX("muzzle_jugglernaut", fps: 10, scale: 0.2f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
             // Manual adjustments to prevent wonky firing animations
             gun.preventRotation                 = true;
             gun.barrelOffset.transform.position = new Vector3(0.75f, 0.75f, 0f);
@@ -92,8 +93,8 @@ public class Jugglernaut : AdvancedGunBehavior
                 }
             }
             _TrueIdleAnimation          = gun.idleAnimation;
-            gun.reloadAnimation         = null;
-            gun.shootAnimation          = null;
+            gun.reloadAnimation         = null; // animation shouldn't change when reloading
+            gun.shootAnimation          = null; // animation shouldn't change when firing
 
         ProjectileModule mod = gun.DefaultModule;
             mod.ammoCost            = 1;
@@ -104,7 +105,8 @@ public class Jugglernaut : AdvancedGunBehavior
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
             projectile.AddDefaultAnimation(AnimateBullet.CreateProjectileAnimation(
-                ResMap.Get("jugglernaut_projectile").Base(),
+                ResMap.Get("jugglernaut_ball").Base(),
+                // ResMap.Get("jugglernaut_projectile").Base(),
                 12, true, new IntVector2(8, 8),
                 false, tk2dBaseSprite.Anchor.MiddleLeft, true, true));
             projectile.transform.parent = gun.barrelOffset;
@@ -194,6 +196,8 @@ public class Jugglernaut : AdvancedGunBehavior
         // Animation wonkiness due to manually adjusting carry offsets messes with aim position, so redirect towards the cursor
         projectile.SendInDirection((this.Player.unadjustedAimPoint.XY() - projectile.sprite.WorldCenter), resetDistance: true);
         projectile.UpdateSpeed();
+
+        AkSoundEngine.PostEvent("alyx_shoot_sound", gun.gameObject);
     }
 
     public void RegisterEnemyHit(AIActor enemy)
