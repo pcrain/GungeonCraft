@@ -9,13 +9,22 @@
     {
       ".": "arraytype",
       "name": "array",
-      "size": 2
+      "size": 3
     },
     {
       "name": "PrimaryHand",
       "position": {
+        "x": 0.625,
+        "y": 0.75,
+        "z": 0.0
+      },
+      "angle": 0.0
+    },
+    {
+      "name": "SecondaryHand",
+      "position": {
         "x": 0.125,
-        "y": 0.6875,
+        "y": 0.5,
         "z": 0.0
       },
       "angle": 0.0

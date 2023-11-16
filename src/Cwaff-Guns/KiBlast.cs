@@ -10,6 +10,8 @@ public class KiBlast : AdvancedGunBehavior
 
     internal static tk2dSpriteAnimationClip _KiSprite;
     internal static tk2dSpriteAnimationClip _KiSpriteRed;
+    internal static string _FireLeftAnim;
+    internal static string _FireRightAnim;
 
     private static float _KiReflectRange = 3.0f;
     private static VFXPool _Vfx  = null;
@@ -23,7 +25,10 @@ public class KiBlast : AdvancedGunBehavior
         Gun gun = Lazy.SetupGun<KiBlast>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 999, infiniteAmmo: true);
             gun.SetAnimationFPS(gun.idleAnimation, 10);
-            gun.SetAnimationFPS(gun.shootAnimation, 24);
+            _FireLeftAnim  = gun.shootAnimation;
+            _FireRightAnim = gun.UpdateAnimation("fire_alt", returnToIdle: true);
+            gun.SetAnimationFPS(_FireLeftAnim, 24);
+            gun.SetAnimationFPS(_FireRightAnim, 24);
             gun.SetMuzzleVFX("muzzle_iron_maid", fps: 30, scale: 0.5f, anchor: tk2dBaseSprite.Anchor.MiddleLeft);
             gun.SetFireAudio("ki_blast_sound");
             gun.AddToSubShop(ModdedShopType.Boomhildr);
@@ -65,6 +70,12 @@ public class KiBlast : AdvancedGunBehavior
             trail.EndColor   = Color.cyan;
 
         _Vfx = VFX.CreatePoolFromVFXGameObject((ItemHelper.Get(Items.MagicLamp) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
+    }
+
+    public override void OnPostFired(PlayerController player, Gun gun)
+    {
+        base.OnPostFired(player, gun);
+        gun.shootAnimation = (this.nextKiBlastSign > 0 ? _FireRightAnim : _FireLeftAnim);
     }
 
     public override void OnSwitchedToThisGun()
