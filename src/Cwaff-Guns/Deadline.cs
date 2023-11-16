@@ -33,7 +33,7 @@ public class Deadline : AdvancedGunBehavior
             gun.SetAnimationFPS(gun.idleAnimation, 10);
             gun.SetMuzzleVFX("muzzle_deadline", fps: 20, scale: 0.4f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
             gun.SetFireAudio("deadline_fire_sound");
-            gun.SetReloadAudio("deadline_fire_sound");
+            gun.SetReloadAudio("deadline_reload_sound");
             gun.AddToSubShop(ModdedShopType.TimeTrader);
             gun.AddToSubShop(ModdedShopType.Boomhildr);
 
@@ -107,7 +107,7 @@ public class Deadline : AdvancedGunBehavior
 
     public override void OnSwitchedAwayFromThisGun()
     {
-        DisableLaserSight();
+        DisableLaserSights();
         base.OnSwitchedAwayFromThisGun();
     }
 
@@ -119,7 +119,7 @@ public class Deadline : AdvancedGunBehavior
 
     protected override void OnPostDroppedByPlayer(PlayerController player)
     {
-        DisableLaserSight();
+        DisableLaserSights();
         base.OnPostDroppedByPlayer(player);
     }
 
@@ -132,11 +132,18 @@ public class Deadline : AdvancedGunBehavior
         UpdateLaserSight();
     }
 
-    private void DisableLaserSight()
+    private void DisableLaserSights()
     {
-        if (!this._myLaserSight)
-            return;
-        UnityEngine.Object.Destroy(this._myLaserSight);
+        if (this._myLaserSight)
+        {
+            UnityEngine.Object.Destroy(this._myLaserSight);
+            this._myLaserSight = null;
+        }
+        if (this._debugLaserSight)
+        {
+            UnityEngine.Object.Destroy(this._debugLaserSight);
+            this._debugLaserSight = null;
+        }
     }
 
     private void UpdateLaserSight()
@@ -144,13 +151,30 @@ public class Deadline : AdvancedGunBehavior
         if (!this._myLaserSight)
             return;
 
-        Vector2 target = Raycast.ToNearestWall(this.gun.barrelOffset.transform.position, this.gun.CurrentAngle, minDistance: 0.01f);
-        float length = C.PIXELS_PER_TILE*Vector2.Distance(this.gun.barrelOffset.transform.position,target);
+        // Vector2 target = Raycast.ToNearestWall(this.gun.barrelOffset.transform.position, this.gun.CurrentAngle, minDistance: 0.01f);
+        // float length = C.PIXELS_PER_TILE*Vector2.Distance(this.gun.barrelOffset.transform.position,target);
+        int rayMask = CollisionMask.LayerToMask(CollisionLayer.HighObstacle/*, CollisionLayer.BulletBlocker, CollisionLayer.BulletBreakable*/);
+        RaycastResult result;
+        if (!PhysicsEngine.Instance.Raycast(this.gun.barrelOffset.transform.position.XY(), this.gun.CurrentAngle.ToVector(), 999f, out result, true, false, rayMask, null, false))
+        {
+            RaycastResult.Pool.Free(ref result);
+            return;
+        }
+        float length = C.PIXELS_PER_TILE * result.Distance;
+        Vector2 target = result.Contact;
+        RaycastResult.Pool.Free(ref result);
 
+        gun.sprite.ForceRotationRebuild();
         tk2dTiledSprite sprite = this._myLaserSight.GetComponent<tk2dTiledSprite>();
+        sprite.renderer.enabled = true;
+        // sprite.IsPerpendicular = false;
+        // sprite.HeightOffGround = 7f;
         sprite.dimensions = new Vector2(length, _SIGHT_WIDTH);
         this._myLaserSight.transform.rotation = this.gun.CurrentAngle.EulerZ();
-        this._myLaserSight.transform.position = this.gun.barrelOffset.transform.position; // TODO: maybe unnecessary?
+        this._myLaserSight.transform.parent = this.gun.barrelOffset;
+        this._myLaserSight.transform.localPosition = Vector2.zero;
+        sprite.ForceRotationRebuild();
+        sprite.UpdateZDepth();
         MakeLaserMatchGunSpriteColor(sprite);
     }
 
@@ -176,14 +200,21 @@ public class Deadline : AdvancedGunBehavior
         sprite.renderer.material.SetColor("_EmissiveColor", c);
     }
 
-    protected override void Update()
+    // protected override void Update()
+    // Using LateUpdate() here so laser sight is updated correctly without jittering
+    private void LateUpdate()
     {
-        base.Update();
+        // base.Update();
         if (!this.Player)
             return;
 
         if (this.Player.m_hideGunRenderers.Value)
-            DisableLaserSight();
+        {
+            if (this._debugLaserSight)
+                this._debugLaserSight.GetComponent<tk2dTiledSprite>().renderer.enabled = false;
+            if (this._myLaserSight)
+                this._myLaserSight.GetComponent<tk2dTiledSprite>().renderer.enabled = false;
+        }
         else
         {
             EnableLaserSight();
@@ -197,21 +228,40 @@ public class Deadline : AdvancedGunBehavior
             laser.UpdateLaser(emissivePower : power);
     }
 
+    private const int _RAYCAST_SPREAD = 1;
     public void GetSpeculativeLaserEndpoints(out Vector2? start, out Vector2? end)
     {
-        Vector2 normal, normalb;
-        start = Raycast.ToNearestWall(this.gun.barrelOffset.transform.position, out normal, this.gun.CurrentAngle, minDistance: 0.01f);
-        if (normal == Vector2.zero)
+        Vector2 normal1, normal2, normal3, trueNormal, normalb;
+
+        // our speculative laser can hit the corner / seam of two tiles and produce the wrong normal, so do multiple raycasts to try to find the true normal
+        int rayMask = CollisionMask.LayerToMask(CollisionLayer.HighObstacle/*, CollisionLayer.BulletBlocker, CollisionLayer.BulletBreakable*/);
+        RaycastResult result;
+        bool success = PhysicsEngine.Instance.Raycast(this.gun.barrelOffset.transform.position.XY(), this.gun.CurrentAngle.ToVector(), 999f, out result, true, false, rayMask, null, false);
+        if (!success)
         {
             start = null;
-            end   = null;
-            return; // no normal, nothing to do
+            end = null;
+            RaycastResult.Pool.Free(ref result);
+            return;
         }
+        start   = result.Contact;
+        normal1 = result.Normal;
+        success = PhysicsEngine.Instance.Raycast(this.gun.barrelOffset.transform.position.XY(), (this.gun.CurrentAngle + _RAYCAST_SPREAD).ToVector(), 999f, out result, true, false, rayMask, null, false);
+        normal2 = success ? result.Normal : Vector2.zero;
+        success = PhysicsEngine.Instance.Raycast(this.gun.barrelOffset.transform.position.XY(), (this.gun.CurrentAngle - _RAYCAST_SPREAD).ToVector(), 999f, out result, true, false, rayMask, null, false);
+        normal3 = success ? result.Normal : Vector2.zero;
+        RaycastResult.Pool.Free(ref result);
+
+        // If our first raycast agrees with either of the others, if all 3 disagree, or if either of the next 2 are a zero vector, use the first raycast normal
+        if (normal1 == normal2 || normal1 == normal3 || normal2 != normal3 || normal2 == Vector2.zero)
+            trueNormal = normal1;
+        else // otherwise, use the second raycast normal
+            trueNormal = normal2;
 
         start -= this.gun.CurrentAngle.ToVector(C.PIXEL_SIZE); // move ever so slightly out of the wall
-        float normangle = normal.ToAngle().Clamp360();
-        end = (start.Value + normal).ToNearestWall(out normalb, normangle, minDistance: 0.01f);
-        if (normalb != -normal)
+        float normangle = trueNormal.ToAngle().Clamp360();
+        end = (start.Value + trueNormal).ToNearestWall(out normalb, normangle, minDistance: 0.01f);
+        if (normalb != -trueNormal)
         {
             start = null;
             end   = null;
@@ -224,16 +274,32 @@ public class Deadline : AdvancedGunBehavior
 
     private void DrawSpeculativeLaser()
     {
-        if (this._debugLaserSight)
-            UnityEngine.Object.Destroy(this._debugLaserSight);
-
         Vector2? start, end;
         GetSpeculativeLaserEndpoints(out start, out end);
         if (!start.HasValue)
+        {
+            if (this._debugLaserSight)
+                this._debugLaserSight.GetComponent<tk2dTiledSprite>().renderer.enabled = false;
             return; // no normal, nothing to do
+        }
 
         Vector2 delta = (end.Value - start.Value);
-        this._debugLaserSight = VFX.CreateLaserSight(start.Value, C.PIXELS_PER_TILE * delta.magnitude, _SIGHT_WIDTH, delta.ToAngle(), colour: Color.magenta, power: 50f);
+        if (this._debugLaserSight)
+        {
+            tk2dTiledSprite sprite = this._debugLaserSight.GetComponent<tk2dTiledSprite>();
+            sprite.renderer.enabled = true;
+            sprite.dimensions = new Vector2(C.PIXELS_PER_TILE * delta.magnitude, _SIGHT_WIDTH);
+            this._debugLaserSight.transform.rotation = delta.EulerZ();
+            this._debugLaserSight.transform.position = start.Value;
+            sprite.ForceRotationRebuild();
+            sprite.UpdateZDepth();
+        }
+        else
+        {
+            this._debugLaserSight = VFX.CreateLaserSight(start.Value, C.PIXELS_PER_TILE * delta.magnitude, _SIGHT_WIDTH, delta.ToAngle(), colour: Color.magenta/*, power: 50f*/);
+            this._debugLaserSight.SetAlpha(0.3f);
+        }
+
     }
 
     public void CreateALaser(Vector2 start, Vector2 end)
@@ -382,7 +448,7 @@ public class Deadline : AdvancedGunBehavior
             if (emissivePower.HasValue)
                 this._power = emissivePower.Value;
 
-            if(needToRecreate || this._laserVfx == null)
+            if (needToRecreate || this._laserVfx == null)
             {
                 if (this._laserVfx != null)
                     UnityEngine.Object.Destroy(this._laserVfx);
