@@ -28,11 +28,12 @@ public class PlatinumStar : AdvancedGunBehavior
             mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
             mod.angleVariance       = 15.0f;
             mod.cooldownTime        = 0.125f;
-            mod.numberOfShotsInClip = 32;
+            mod.numberOfShotsInClip = 28;
+            mod.SetupCustomAmmoClip(SpriteName);
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
-            ResMap.Get("platinum_projectile").Base(),
-            12, true, new IntVector2(16, 8),
+            ResMap.Get("platinum_star_projectile").Base(),
+            12, true, new IntVector2(29, 9),
             false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);

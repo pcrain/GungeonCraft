@@ -2729,6 +2729,7 @@
     <EmbeddedResource Include="Resources\CustomClips\blackjack_clipfull_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\outbreak_clipfull_alt_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\b_b_gun_clipfull_001.png"/>
+    <EmbeddedResource Include="Resources\CustomClips\platinum_star_clipempty_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\aimu_hakurei_clipfull_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\grandmaster_clipempty_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\hand_cannon_clipfull_001.png"/>
@@ -2754,6 +2755,7 @@
     <EmbeddedResource Include="Resources\CustomClips\racket_launcher_clipfull_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\schrodingers_gat_clipempty_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\missiletoe_clipfull_001.png"/>
+    <EmbeddedResource Include="Resources\CustomClips\platinum_star_clipfull_001.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\can_projectile_1.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tennis_ball8.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\platinum_projectile2.png"/>
@@ -2790,6 +2792,10 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\tennis_ball4.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\schrodingers_gat_projectile_001.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\kunai.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\unused_so_far\projectile_a3.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\unused_so_far\projectile_a2.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\unused_so_far\projectile_a1.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\unused_so_far\projectile_a4.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\soap_bubble_projectile_002.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball012.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball011.png"/>
@@ -2885,6 +2891,7 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\alyx_projectile4.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\natascha_bullet_002.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile_old8.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\platinum_star_projectile.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\chess_queen.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile_old7.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tennis_ball6.png"/>
