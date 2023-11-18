@@ -96,6 +96,7 @@
     <Compile Include="src\Cwaff-Actives\StackOfTorches.cs"/>
     <Compile Include="src\Cwaff-Actives\IceCream.cs"/>
     <Compile Include="src\Cwaff-Actives\EmergencySiren.cs"/>
+    <Compile Include="src\Cwaff-Actives\GungeonitePickaxe.cs"/>
     <Compile Include="src\Cwaff-Actives\KalibersJustice.cs"/>
     <Compile Include="src\Cwaff-Actives\GasterBlaster.cs"/>
     <Compile Include="src\Cwaff-Actives\InsurancePolicy.cs"/>
@@ -2507,6 +2508,7 @@
     <EmbeddedResource Include="Resources\ItemSprites\stack_of_torches_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\bubble_wand_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\insurance_policy_bullet_icon.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\gungeonite_pickaxe_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\note_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\4d_bullets_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\insurance_policy_icon.png"/>

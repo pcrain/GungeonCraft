@@ -3,7 +3,7 @@ namespace CwaffingTheGungy;
 // Fix softlock when one player dies in a payday drill room (can't get the bug to trigger consistently enough to test this, so disabling this for now)
 public static class CoopDrillSoftlockHotfix
 {
-    private static ILHook _CoopDrillSoftlockHotfixHook;
+    // private static ILHook _CoopDrillSoftlockHotfixHook;
 
     public static void Init()
     {

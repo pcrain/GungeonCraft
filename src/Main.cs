@@ -117,6 +117,7 @@ public class Initialisation : BaseUnityPlugin
                 StackOfTorches.Init();
                 InsurancePolicy.Init();
                 IceCream.Init();
+                GungeonitePickaxe.Init();
             #endregion
 
             #region Passives
