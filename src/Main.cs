@@ -300,6 +300,7 @@ public class Initialisation : BaseUnityPlugin
             // Hotfixes for bugs and issues mostly out of my control
             DragunFightHotfix.Init();
             CoopTurboModeHotfix.Init();
+            // CoopDrillSoftlockHotfix.Init(); // incomplete
 
             watch.Stop();
             ETGModConsole.Log($"Yay! :D Initialized <color=#aaffaaff>{C.MOD_NAME} v{C.MOD_VERSION}</color> in "+(watch.ElapsedMilliseconds/1000.0f)+" seconds");

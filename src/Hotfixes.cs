@@ -1,5 +1,52 @@
 namespace CwaffingTheGungy;
 
+// Fix softlock when one player dies in a payday drill room (can't get the bug to trigger consistently enough to test this, so disabling this for now)
+public static class CoopDrillSoftlockHotfix
+{
+    private static ILHook _CoopDrillSoftlockHotfixHook;
+
+    public static void Init()
+    {
+        // _CoopDrillSoftlockHotfixHook = new ILHook(
+        //     typeof(PaydayDrillItem).GetNestedType("<HandleTransitionToFallbackCombatRoom>c__Iterator1", BindingFlags.NonPublic | BindingFlags.Instance).GetMethod("MoveNext"),
+        //     CoopDrillSoftlockHotfixHookIL
+        //     );
+    }
+
+    private static void CoopDrillSoftlockHotfixHookIL(ILContext il)
+    {
+        ILCursor cursor = new ILCursor(il);
+        // cursor.DumpILOnce("CoopDrillSoftlockHotfixHook");
+
+        if (!cursor.TryGotoNext(MoveType.After,
+          instr => instr.MatchCallvirt<Chest>("ForceUnlock"),
+          instr => instr.MatchLdarg(0)
+          ))
+            return; // failed to find what we need
+
+        ETGModConsole.Log($"found!");
+
+        // partial fix
+        cursor.Remove(); // remove loading false into our bool
+        cursor.Emit(OpCodes.Ldc_I4_1); // load true into the bool instead so we can immediately skip the loop
+
+        // debugging
+        // cursor.Emit(OpCodes.Call, typeof(CoopDrillSoftlockHotfix).GetMethod("SanityCheck"));
+
+        return;
+    }
+
+    public static void SanityCheck()
+    {
+        ETGModConsole.Log($"sanity checking");
+        for (int j = 0; j < GameManager.Instance.AllPlayers.Length; j++)
+        {
+            ETGModConsole.Log($"position for player {j+1}");
+            ETGModConsole.Log($"{GameManager.Instance.AllPlayers[j].CenterPosition}");
+        }
+    }
+}
+
 // Fix player two not getting Turbo Mode speed buffs in Coop
 public static class CoopTurboModeHotfix
 {
