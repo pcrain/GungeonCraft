@@ -367,12 +367,12 @@ public static class Extensions
   // Add emissiveness to a game object
   public static void SetGlowiness(this GameObject g, float a)
   {
-    if (g.GetComponent<tk2dSprite>() is not tk2dSprite sprite)
+    if (g.GetComponent<tk2dBaseSprite>() is not tk2dBaseSprite sprite)
       return;
     sprite.SetGlowiness(a);
   }
 
-  public static void SetGlowiness(this tk2dSprite sprite, float a, Color? color = null, bool clampBrightness = true)
+  public static void SetGlowiness(this tk2dBaseSprite sprite, float a, Color? color = null, bool clampBrightness = true)
   {
     sprite.usesOverrideMaterial = true;
     Material m = sprite.renderer.material;
@@ -728,69 +728,25 @@ public static class Extensions
       gun.ClearDefaultAudio();
   }
 
-  // yoinked from SomeBunny
   public static TrailController AddTrailToProjectile(this Projectile target, string spritePath, Vector2 colliderDimensions, Vector2 colliderOffsets, List<string> animPaths = null, int animFPS = -1, List<string> startAnimPaths = null, int startAnimFPS = -1, float timeTillAnimStart = -1, float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false)
   {
-      try
-      {
-          GameObject newTrailObject = UnityEngine.Object.Instantiate(new GameObject().RegisterPrefab());
-          newTrailObject.transform.parent = target.transform;
-          newTrailObject.name = "trailObject";
-          float convertedColliderX = colliderDimensions.x / 16f;
-          float convertedColliderY = colliderDimensions.y / 16f;
-          float convertedOffsetX = colliderOffsets.x / 16f;
-          float convertedOffsetY = colliderOffsets.y / 16f;
+      TrailController trail = VFX.CreateTrailObject(
+        spritePath, colliderDimensions, colliderOffsets, animPaths, animFPS, startAnimPaths, startAnimFPS, timeTillAnimStart, cascadeTimer, softMaxLength, destroyOnEmpty);
+      trail.gameObject.transform.parent = target.transform;
+      return trail;
+  }
 
-          int spriteID = SpriteBuilder.AddSpriteToCollection(spritePath, ETGMod.Databases.Items.ProjectileCollection);
-          tk2dTiledSprite tiledSprite = newTrailObject.GetOrAddComponent<tk2dTiledSprite>();
+  public static TrailController AddTrailToProjectile(this Projectile target, TrailController trail)
+  {
+      trail.gameObject.transform.parent = target.transform;
+      return trail;
+  }
 
-          tiledSprite.SetSprite(ETGMod.Databases.Items.ProjectileCollection, spriteID);
-          tk2dSpriteDefinition def = tiledSprite.GetCurrentSpriteDef();
-          def.colliderVertices = new Vector3[]{
-              new Vector3(convertedOffsetX, convertedOffsetY, 0f),
-              new Vector3(convertedColliderX, convertedColliderY, 0f)
-          };
-
-          def.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.MiddleLeft);
-
-          tk2dSpriteAnimator animator = newTrailObject.GetOrAddComponent<tk2dSpriteAnimator>();
-          tk2dSpriteAnimation animation = newTrailObject.GetOrAddComponent<tk2dSpriteAnimation>();
-          animation.clips = new tk2dSpriteAnimationClip[0];
-          animator.Library = animation;
-
-          TrailController trail = newTrailObject.AddComponent<TrailController>();
-
-          // ---------------- Sets up the animation for the main part of the trail
-          if (animPaths != null)
-          {
-              BeamHelpers.SetupBeamPart(animation, animPaths, "trail_mid", animFPS, null, null, def.colliderVertices);
-              trail.animation = "trail_mid";
-              trail.usesAnimation = true;
-          }
-          else
-              trail.usesAnimation = false;
-
-          if (startAnimPaths != null)
-          {
-              BeamHelpers.SetupBeamPart(animation, startAnimPaths, "trail_start", startAnimFPS, null, null, def.colliderVertices);
-              trail.startAnimation = "trail_start";
-              trail.usesStartAnimation = true;
-          }
-          else
-              trail.usesStartAnimation = false;
-
-          //Trail Variables
-          if (softMaxLength > 0) { trail.usesSoftMaxLength = true; trail.softMaxLength = softMaxLength; }
-          if (cascadeTimer > 0) { trail.usesCascadeTimer = true; trail.cascadeTimer = cascadeTimer; }
-          if (timeTillAnimStart > 0) { trail.usesGlobalTimer = true; trail.globalTimer = timeTillAnimStart; }
-          trail.destroyOnEmpty = destroyOnEmpty;
-          return trail;
-      }
-      catch (Exception e)
-      {
-          ETGModConsole.Log(e.ToString());
-          return null;
-      }
+  public static TrailController AddTrailToProjectileInstance(this Projectile target, TrailController trail)
+  {
+      GameObject instantiatedTrail = UnityEngine.Object.Instantiate(trail.gameObject);
+      instantiatedTrail.transform.parent = target.transform;
+      return instantiatedTrail.GetComponent<TrailController>();
   }
 
   // Set the rotation of a projectile manually

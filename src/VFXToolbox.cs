@@ -478,6 +478,71 @@ public static class VFX
         UnityEngine.Object.Destroy(g);
         yield break;
     }
+
+    // yoinked from SomeBunny
+    public static TrailController CreateTrailObject(string spritePath, Vector2 colliderDimensions, Vector2 colliderOffsets, List<string> animPaths = null, int animFPS = -1, List<string> startAnimPaths = null, int startAnimFPS = -1, float timeTillAnimStart = -1, float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false)
+    {
+      try
+      {
+          GameObject newTrailObject = UnityEngine.Object.Instantiate(new GameObject()).RegisterPrefab();
+          newTrailObject.name = "trailObject";
+          float convertedColliderX = colliderDimensions.x / 16f;
+          float convertedColliderY = colliderDimensions.y / 16f;
+          float convertedOffsetX = colliderOffsets.x / 16f;
+          float convertedOffsetY = colliderOffsets.y / 16f;
+
+          int spriteID = SpriteBuilder.AddSpriteToCollection(spritePath, ETGMod.Databases.Items.ProjectileCollection);
+          tk2dTiledSprite tiledSprite = newTrailObject.GetOrAddComponent<tk2dTiledSprite>();
+
+          tiledSprite.SetSprite(ETGMod.Databases.Items.ProjectileCollection, spriteID);
+          tk2dSpriteDefinition def = tiledSprite.GetCurrentSpriteDef();
+          def.colliderVertices = new Vector3[]{
+              new Vector3(convertedOffsetX, convertedOffsetY, 0f),
+              new Vector3(convertedColliderX, convertedColliderY, 0f)
+          };
+
+          def.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.MiddleLeft);
+
+          tk2dSpriteAnimator animator = newTrailObject.GetOrAddComponent<tk2dSpriteAnimator>();
+          tk2dSpriteAnimation animation = newTrailObject.GetOrAddComponent<tk2dSpriteAnimation>();
+          animation.clips = new tk2dSpriteAnimationClip[0];
+          animator.Library = animation;
+
+          TrailController trail = newTrailObject.AddComponent<TrailController>();
+
+          // ---------------- Sets up the animation for the main part of the trail
+          if (animPaths != null)
+          {
+              BeamHelpers.SetupBeamPart(animation, animPaths, "trail_mid", animFPS, null, null, def.colliderVertices);
+              trail.animation = "trail_mid";
+              trail.usesAnimation = true;
+          }
+          else
+              trail.usesAnimation = false;
+
+          if (startAnimPaths != null)
+          {
+              BeamHelpers.SetupBeamPart(animation, startAnimPaths, "trail_start", startAnimFPS, null, null, def.colliderVertices);
+              trail.startAnimation = "trail_start";
+              trail.usesStartAnimation = true;
+          }
+          else
+              trail.usesStartAnimation = false;
+
+          //Trail Variables
+          if (softMaxLength > 0) { trail.usesSoftMaxLength = true; trail.softMaxLength = softMaxLength; }
+          if (cascadeTimer > 0) { trail.usesCascadeTimer = true; trail.cascadeTimer = cascadeTimer; }
+          if (timeTillAnimStart > 0) { trail.usesGlobalTimer = true; trail.globalTimer = timeTillAnimStart; }
+          trail.destroyOnEmpty = destroyOnEmpty;
+          return trail;
+      }
+      catch (Exception e)
+      {
+          ETGModConsole.Log(e.ToString());
+          return null;
+      }
+    }
+
 }
 
 // Helper class for making movable / fadeable  VFX

@@ -85,3 +85,6 @@ minecraft_totem_pop_sound,0.0,1,sound
 juggle_toss_sound,-8.0,1,sound
 juggle_drop_sound,-5.0,1,sound
 juggle_add_sound,3.0,1,sound
+subtractor_beam_fire_sound,-6.5,1,sound
+subtractor_beam_impact_sound,-0.5,1,sound
+subtractor_beam_reload_sound,-5.0,1,sound
