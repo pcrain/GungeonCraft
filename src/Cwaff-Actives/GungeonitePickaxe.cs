@@ -7,8 +7,12 @@ public class GungeonitePickaxe : PlayerItem
     public static string ShortDescription = "So We Back in the Mines";
     public static string LongDescription  = "TBD";
 
+    private const int _ADD_WALL_DEPTH = 4; // number of layers of extra walls to add when digging (to prevent tilemap rebuilder from panicking)
+
     internal static VFXPool _VFXDustPoof;
     private static int _PickaxeId;
+    private static readonly List<IntVector2> _NeighborDirs = new(){
+        IntVector2.Right,IntVector2.UpRight,IntVector2.Up,IntVector2.UpLeft,IntVector2.Left,IntVector2.DownLeft,IntVector2.Down,IntVector2.DownRight};
 
     private const float _MAX_DIST = 5f;
 
@@ -35,14 +39,6 @@ public class GungeonitePickaxe : PlayerItem
 
     private static void BuildFloorEdgeBorderTilesSanityCheck(FloorEdgeBorderDelegate orig, TK2DDungeonAssembler assembler, CellData current, Dungeon d, tk2dTileMap map, int ix, int iy)
     {
-        // if (assembler == null)
-        //     ETGModConsole.Log($"NULL ASSEMBLER");
-        // if (current == null)
-        //     ETGModConsole.Log($"NULL CELLDATA");
-        // if (map == null)
-        //     ETGModConsole.Log($"NULL TILEMAP");
-        // // if (d.roomMaterialDefinitions[current.cellVisualData.roomVisualTypeIndex].roomFloorBorderGrid == null)
-        // //     ETGModConsole.Log($"NULL BORDER GRID");
         if (GameManager.Instance.AnyPlayerHasPickupID(_PickaxeId))
             MyBuildFloorEdgeBorderTiles(assembler, current, d, map, ix, iy);
         else
@@ -51,6 +47,7 @@ public class GungeonitePickaxe : PlayerItem
 
     private static void MyBuildFloorEdgeBorderTiles(TK2DDungeonAssembler assembler, CellData current, Dungeon d, tk2dTileMap map, int ix, int iy)
     {
+        ETGModConsole.Log($"called BuildFloorEdgeBorderTiles() from starting position {current.position}");
         if (current.type != CellType.FLOOR && !d.data.isFaceWallLower(ix, iy))
         {
             return;
@@ -94,63 +91,40 @@ public class GungeonitePickaxe : PlayerItem
                 map.Layers[GlobalDungeonData.decalLayerIndex].SetTile(current.positionInTilemap.x, current.positionInTilemap.y, indexByWeight);
             }
         }
-        // ETGModConsole.Log($"    DONE");
     }
 
-    private static void AddNeighboringWalls(Dungeon d, RoomHandler r, IntVector2 pos, int timesToRecurse = 1)
+    private static void AddNeighboringWalls(Dungeon d, RoomHandler r, IntVector2 pos, int timesToRecurse, bool firstLayer = true)
     {
-        List<IntVector2> neighborDirs = new();
-            neighborDirs.Add(IntVector2.Right);
-            neighborDirs.Add(IntVector2.UpRight);
-            neighborDirs.Add(IntVector2.Up);
-            neighborDirs.Add(IntVector2.UpLeft);
-            neighborDirs.Add(IntVector2.Left);
-            neighborDirs.Add(IntVector2.DownLeft);
-            neighborDirs.Add(IntVector2.Down);
-            neighborDirs.Add(IntVector2.DownRight);
-
-        // tk2dTileMap tilemap = null;
         CellData baseCell = d.data[pos];
         if (baseCell == null)
-        {
-            ETGModConsole.Log($"SHOULD NEVER HAPPEN");
-            return;
-        }
-        bool cachedDataCleared = false;
-        foreach (IntVector2 neighborDir in neighborDirs)
+            return; // should never happen
+        foreach (IntVector2 neighborDir in _NeighborDirs)
         {
             IntVector2 neighbor = pos + neighborDir;
             CellData neighborData = d.data[neighbor];
-            if (neighborData != null)
-                continue;
-
-            ETGModConsole.Log($"  placing new wall at {neighbor}");
-
-            if (!cachedDataCleared)
+            if (neighborData == null)
             {
-                cachedDataCleared = true;
-                d.data.ClearCachedCellData();
+                // ETGModConsole.Log($"  placing new wall at {neighbor}");
+                CellData newCell                        = new CellData(neighbor);
+                d.data.cellData[neighbor.x][neighbor.y] = newCell;
+                d.data[neighbor]                        = newCell;
+                r.Cells.Add(neighbor);
+                r.CellsWithoutExits.Add(neighbor);
+                r.RawCells.Add(neighbor);
+
+                newCell.cellVisualData.CopyFrom(baseCell.cellVisualData);
+                newCell.positionInTilemap               = baseCell.positionInTilemap + neighborDir;
+                newCell.parentArea                      = baseCell.parentArea;
+                newCell.parentRoom                      = r;
+                newCell.nearestRoom                     = r;
+                newCell.occlusionData.overrideOcclusion = true;
+
+                r.RuntimeStampCellComplex(neighbor.x, neighbor.y, CellType.WALL, DiagonalWallType.NONE);
+                d.ConstructWallAtPosition(neighbor.x, neighbor.y, deferRebuild: true);
             }
 
-            CellData newCell = new CellData(neighbor);
-            d.data.cellData[neighbor.x][neighbor.y] = newCell;
-            d.data[neighbor] = newCell;
-            r.Cells.Add(neighbor);
-            r.CellsWithoutExits.Add(neighbor);
-            r.RawCells.Add(neighbor);
-
-            newCell.cellVisualData.CopyFrom(baseCell.cellVisualData);
-            newCell.positionInTilemap = baseCell.positionInTilemap + neighborDir;
-            newCell.parentArea = baseCell.parentArea;
-            newCell.parentRoom = r;
-            newCell.nearestRoom = r;
-            newCell.occlusionData.overrideOcclusion = true;
-
-            r.RuntimeStampCellComplex(neighbor.x, neighbor.y, CellType.WALL, DiagonalWallType.NONE);
-            d.ConstructWallAtPosition(neighbor.x, neighbor.y, deferRebuild: true);
             if (timesToRecurse > 0)
-                AddNeighboringWalls(d, r, neighbor, timesToRecurse - 1);
-            // tilemap = d.ConstructWallAtPosition(neighbor.x, neighbor.y, deferRebuild: true);
+                AddNeighboringWalls(d, r, neighbor, timesToRecurse - 1, firstLayer: false);
         }
     }
 
@@ -190,8 +164,6 @@ public class GungeonitePickaxe : PlayerItem
         else
             facingPos += gunAngle > 0 ? IntVector2.Up : IntVector2.Down;
         ETGModConsole.Log($"we are in a cell at {cellData.position} of type {cellData.type}");
-        // foreach (CellData cellNeighbor in d.data.GetCellNeighbors(cellData))
-        //     ETGModConsole.Log($"  neighbor at {cellNeighbor.position} is type {cellNeighbor.type} {(cellNeighbor.position == facingPos ? " (facing)" : "")}");
 
         if (!GameManager.Instance.Dungeon.data.CheckInBoundsAndValid(facingPos))
         {
@@ -213,7 +185,8 @@ public class GungeonitePickaxe : PlayerItem
 
         ETGModConsole.Log($"  facing cell at {facingCellData.position} is type {facingCellData.type}");
 
-        AddNeighboringWalls(d, r, facingPos, timesToRecurse: 3);
+        d.data.ClearCachedCellData(); // clear our cell cache, as its about to be very out of date
+        AddNeighboringWalls(d, r, facingPos, timesToRecurse: _ADD_WALL_DEPTH, firstLayer: true);
         foreach (CellData cellNeighbor in d.data.GetCellNeighbors(facingCellData, getDiagonals: true))
             ETGModConsole.Log($"  NEW neighbor at {cellNeighbor.position} is type {cellNeighbor.type}");
 
@@ -231,6 +204,5 @@ public class GungeonitePickaxe : PlayerItem
 
         AkSoundEngine.PostEvent("Play_OBJ_rock_break_01", GameManager.Instance.gameObject);
         AkSoundEngine.PostEvent("Play_OBJ_stone_crumble_01", GameManager.Instance.gameObject);
-
     }
 }
