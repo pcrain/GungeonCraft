@@ -22,6 +22,7 @@ public class GungeonitePickaxe : PlayerItem
 
     // my compiler REALLY doesn't like Actions with 6 parameter types, so declaring this separately;
     public delegate void FloorEdgeBorderDelegate(TK2DDungeonAssembler assembler, CellData cellData, Dungeon dungeon, tk2dTileMap map, int x, int y);
+    public delegate void BuildForChunkDelegate(tk2dTileMap tileMap, SpriteChunk chunk, bool useColor, bool skipPrefabs, int baseX, int baseY, LayerInfo layerData);
 
     public static void Init()
     {
@@ -39,7 +40,27 @@ public class GungeonitePickaxe : PlayerItem
         //     typeof(TK2DDungeonAssembler).GetMethod("BuildFloorEdgeBorderTiles", BindingFlags.Instance | BindingFlags.NonPublic),
         //     typeof(GungeonitePickaxe).GetMethod("BuildFloorEdgeBorderTilesSanityCheck", BindingFlags.Static | BindingFlags.NonPublic)
         //     );
+
+        // new Hook(
+        //     typeof(tk2dRuntime.TileMap.RenderMeshBuilder).GetMethod("BuildForChunk", BindingFlags.Static | BindingFlags.Public),
+        //     typeof(GungeonitePickaxe).GetMethod("BuildForChunkSanityCheck", BindingFlags.Static | BindingFlags.NonPublic)
+        //     );
     }
+
+    private static int   _ChunksBuilt = 0;
+    private static float _ChunkBuildMsTotal = 0;
+    private static float _ChunkBuildMsMin = 0;
+    private static float _ChunkBuildMsMax = 0;
+    private static void BuildForChunkSanityCheck(BuildForChunkDelegate orig, tk2dTileMap tileMap, SpriteChunk chunk, bool useColor, bool skipPrefabs, int baseX, int baseY, LayerInfo layerData)
+    {
+        System.Diagnostics.Stopwatch tempWatch = System.Diagnostics.Stopwatch.StartNew();
+        orig(tileMap, chunk, useColor, skipPrefabs, baseX, baseY, layerData);
+        tempWatch.Stop();
+        ++_ChunksBuilt;
+        _ChunkBuildMsTotal += tempWatch.ElapsedMilliseconds;
+        // ETGModConsole.Log($"part 1 finished in "+(tempWatch.ElapsedMilliseconds/1000.0f)+" seconds"); tempWatch = System.Diagnostics.Stopwatch.StartNew();
+    }
+
 
     private static void BuildFloorEdgeBorderTilesSanityCheck(FloorEdgeBorderDelegate orig, TK2DDungeonAssembler assembler, CellData current, Dungeon d, tk2dTileMap map, int ix, int iy)
     {
@@ -204,6 +225,10 @@ public class GungeonitePickaxe : PlayerItem
 
     public override void DoEffect(PlayerController user)
     {
+        ETGModConsole.Log($"built {_ChunksBuilt} in {_ChunkBuildMsTotal} ms == {_ChunkBuildMsTotal/_ChunksBuilt} ms / chunk");
+        _ChunksBuilt = 0;
+        _ChunkBuildMsTotal = 0;
+
         Dungeon d = GameManager.Instance.Dungeon;
         Vector2 ppos = user.transform.PositionVector2();
         Vector2 unitBottomCenter = user.specRigidbody.PrimaryPixelCollider.UnitBottomCenter;
@@ -276,12 +301,12 @@ public class GungeonitePickaxe : PlayerItem
         Pixelator.Instance.ProcessOcclusionChange(truepos /*r.Epicenter*/, 1f, r, false);
         if (tilemap)
         {
-            _RebuiltChunks.Clear();
-            ETGModConsole.Log($"is main tilemap? {tilemap == GameManager.Instance.Dungeon.MainTilemap}");
-            int chunkX = Mathf.FloorToInt(facingPos.x / 32f);
-            int chunkY = Mathf.FloorToInt(facingPos.y / 32f);
-
-            RebuildAdjacentChunks(tilemap, chunkX, chunkY);
+            tilemap.Build(tk2dTileMap.BuildFlags.ForceBuild);
+            // _RebuiltChunks.Clear();
+            // ETGModConsole.Log($"is main tilemap? {tilemap == GameManager.Instance.Dungeon.MainTilemap}");
+            // int chunkX = Mathf.FloorToInt(facingPos.x / 32f);
+            // int chunkY = Mathf.FloorToInt(facingPos.y / 32f);
+            // RebuildAdjacentChunks(tilemap, chunkX, chunkY);
         }
         // Pixelator.Instance.MarkOcclusionDirty();
         // Pixelator.Instance.ProcessOcclusionChange(r.Epicenter, 1f, r, false);
