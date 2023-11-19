@@ -90,13 +90,14 @@
     <Compile Include="src\Common.cs"/>
     <Compile Include="src\CwaffEvents.cs"/>
     <Compile Include="src\Cwaff-Actives\AmazonPrimer.cs"/>
+    <Compile Include="src\Cwaff-Actives\Unfinished\GungeonitePickaxe.cs"/>
+    <Compile Include="src\Cwaff-Actives\ChamberEater.cs"/>
     <Compile Include="src\Cwaff-Actives\BulletThatCanKillTheFuture.cs"/>
     <Compile Include="src\Cwaff-Actives\GunPowderer.cs"/>
     <Compile Include="src\Cwaff-Actives\BorrowedTime.cs"/>
     <Compile Include="src\Cwaff-Actives\StackOfTorches.cs"/>
     <Compile Include="src\Cwaff-Actives\IceCream.cs"/>
     <Compile Include="src\Cwaff-Actives\EmergencySiren.cs"/>
-    <Compile Include="src\Cwaff-Actives\GungeonitePickaxe.cs"/>
     <Compile Include="src\Cwaff-Actives\KalibersJustice.cs"/>
     <Compile Include="src\Cwaff-Actives\GasterBlaster.cs"/>
     <Compile Include="src\Cwaff-Actives\InsurancePolicy.cs"/>
@@ -2476,6 +2477,7 @@
     <EmbeddedResource Include="Resources\ItemSprites\voodoo_doll_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\rat_poison_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\bionic_finger_icon.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\chamber_jammer_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\gorgun_eye_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\borrowed_time_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\insurance_policy_pilot_icon.png"/>
