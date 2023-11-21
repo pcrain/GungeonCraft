@@ -598,10 +598,10 @@ public static class Extensions
     gun.SetGunAudio(name: gun.idleAnimation, audio: audio, frame: frame);
   }
 
-  public static void SetMuzzleVFX(this Gun gun, string resPath, float fps = 60, bool loops = false, float scale = 1.0f, tk2dBaseSprite.Anchor anchor = tk2dBaseSprite.Anchor.MiddleLeft, bool orphaned = false)
+  public static void SetMuzzleVFX(this Gun gun, string resPath, float fps = 60, bool loops = false, float scale = 1.0f, tk2dBaseSprite.Anchor anchor = tk2dBaseSprite.Anchor.MiddleLeft, bool orphaned = false, float emissivePower = -1)
   {
     gun.muzzleFlashEffects = VFX.RegisterVFXPool($"{gun.itemName}_MuzzleVFX", ResMap.Get(resPath), fps: fps,
-      loops: loops, scale: scale, anchor: anchor, alignment: VFXAlignment.Fixed, orphaned: orphaned, attached: true);
+      loops: loops, scale: scale, anchor: anchor, alignment: VFXAlignment.Fixed, orphaned: orphaned, attached: true, emissivePower: emissivePower);
   }
 
   public static void SetMuzzleVFX(this Gun gun, Items gunToCopyFrom, bool onlyCopyBasicEffects = true)
@@ -871,5 +871,23 @@ public static class Extensions
       array[array.Length - 1] = material;
     component.sharedMaterials = array;
     return material;
+  }
+
+  // Check if a goop position is electrificed
+  public static bool IsPositionElectrified(this DeadlyDeadlyGoopManager goopManager, Vector2 position)
+  {
+    IntVector2 key = (position / DeadlyDeadlyGoopManager.GOOP_GRID_SIZE).ToIntVector2(VectorConversions.Floor);
+    DeadlyDeadlyGoopManager.GoopPositionData value;
+    if (goopManager.m_goopedCells.TryGetValue(key, out value) && value.remainingLifespan > goopManager.goopDefinition.fadePeriod)
+    {
+      return value.IsElectrified;
+    }
+    return false;
+  }
+
+  // Returns a singleton of an empty IEnumerable when the collection being extended is empty
+  public static IEnumerable<T> EmptyIfNull<T>(this IEnumerable<T> enumerable)
+  {
+    return enumerable ?? Enumerable.Empty<T>();
   }
 }

@@ -1,0 +1,333 @@
+﻿namespace CwaffingTheGungy;
+
+public class Alligator : AdvancedGunBehavior
+{
+    public static string ItemName         = "Alligator";
+    public static string SpriteName       = "alligator";
+    public static string ProjectileName   = "38_special";
+    public static string ShortDescription = "TBD";
+    public static string LongDescription  = "TBD";
+
+    internal static GameObject _SparkVFX;
+    internal static GameObject _ClipVFX;
+    internal static readonly Color _RedClipColor   = Color.Lerp(Color.red, Color.magenta, 0.25f);
+    internal static readonly Color _BlackClipColor = Color.Lerp(Color.black, Color.blue, 0.25f);
+
+    private DamageTypeModifier _electricImmunity = null;
+
+    public static void Add()
+    {
+        Gun gun = Lazy.SetupGun<Alligator>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+            gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 2.0f, ammo: 200);
+            gun.SetAnimationFPS(gun.shootAnimation, 16);
+            gun.SetAnimationFPS(gun.reloadAnimation, 16);
+            gun.SetMuzzleVFX("muzzle_alligator", fps: 60, scale: 0.5f, anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 50f);
+            gun.SetFireAudio("alligator_shoot_sound");
+            gun.SetReloadAudio("alligator_reload_sound");
+
+        ProjectileModule mod = gun.DefaultModule;
+            mod.ammoCost            = 1;
+            mod.shootStyle          = ProjectileModule.ShootStyle.Automatic;
+            mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+            mod.angleVariance       = 15.0f;
+            mod.cooldownTime        = 0.3f;
+            mod.numberOfShotsInClip = 8;
+
+        Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
+            projectile.AddDefaultAnimation(AnimateBullet.CreateProjectileAnimation(
+                ResMap.Get("alligator_projectile").Base(),
+                2, true, new IntVector2(6, 8),
+                false, tk2dBaseSprite.Anchor.MiddleCenter, true, true));
+            projectile.baseData.damage  = 1f;
+            projectile.baseData.speed   = 35.0f;
+            projectile.transform.parent = gun.barrelOffset;
+            projectile.gameObject.AddComponent<AlligatorProjectile>();
+
+        _SparkVFX = VFX.RegisterVFXObject(
+            "SparkVFX", ResMap.Get("spark_vfx"), fps: 16, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.35f, emissivePower: 50f /*5f*/);
+        _ClipVFX = VFX.RegisterVFXObject(
+            "AlligatorClipVFX", ResMap.Get("alligator_projectile_clamped"), fps: 2, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+    }
+
+    protected override void OnPickedUpByPlayer(PlayerController player)
+    {
+        if (!everPickedUpByPlayer)
+            this._electricImmunity = new DamageTypeModifier {
+                damageType = CoreDamageTypes.Electric,
+                damageMultiplier = 0f,
+            };
+        base.OnPickedUpByPlayer(player);
+
+        if (!player.healthHaver.damageTypeModifiers.Contains(this._electricImmunity))
+            player.healthHaver.damageTypeModifiers.Add(this._electricImmunity);
+    }
+
+    protected override void OnPostDroppedByPlayer(PlayerController player)
+    {
+        base.OnPostDroppedByPlayer(player);
+
+        if (player.healthHaver.damageTypeModifiers.Contains(this._electricImmunity))
+            player.healthHaver.damageTypeModifiers.Remove(this._electricImmunity);
+    }
+}
+
+public class AlligatorProjectile : MonoBehaviour
+{
+    const int _MAX_CLIPS_PER_ENEMY = 8;
+
+    private void Start()
+    {
+        Projectile p           = GetComponent<Projectile>();
+        PlayerController owner = p.Owner as PlayerController;
+
+        p.OnHitEnemy += HandleHitEnemy;
+
+        AlligatorCableHandler cable = base.gameObject.AddComponent<AlligatorCableHandler>();
+            cable.Attach1Offset = owner.CenterPosition - owner.transform.position.XY();
+            cable.Attach2Offset = p.specRigidbody.HitboxPixelCollider.UnitCenter - p.transform.position.XY();
+            cable.Initialize(owner, owner.transform, null, p.transform, hasEnemyTarget: false);
+
+        Material m = cable._stringFilter.GetComponent<MeshRenderer>().material;
+            m.SetColor("_OverrideColor", Alligator._RedClipColor);
+    }
+
+    private void HandleHitEnemy(Projectile projectile, SpeculativeRigidbody body, bool _)
+    {
+        if (body.aiActor is not AIActor aiActor)
+            return;
+        if (!aiActor.IsHostile(canBeNeutral: true) || aiActor.gameObject.GetComponents<AlligatorAttachedEffect>().Count() >= _MAX_CLIPS_PER_ENEMY)
+            return;
+
+        AlligatorAttachedEffect orAddComponent = aiActor.gameObject./*GetOr*/AddComponent<AlligatorAttachedEffect>();
+        orAddComponent.owner = projectile.Owner as PlayerController;
+    }
+}
+
+public class AlligatorAttachedEffect : MonoBehaviour
+{
+    public PlayerController owner;
+
+    private AIActor m_aiActor;
+    private AlligatorCableHandler m_cable;
+
+    private void Start()
+    {
+        m_aiActor = GetComponent<AIActor>();
+
+        m_cable = m_aiActor.gameObject.AddComponent<AlligatorCableHandler>();
+        m_cable.Attach1Offset = owner.CenterPosition - owner.transform.position.XY();
+        m_cable.Attach2Offset = m_aiActor.CenterPosition - m_aiActor.transform.position.XY();
+        m_cable.Initialize(owner, owner.transform, m_aiActor, m_aiActor.transform, hasEnemyTarget: true);
+
+        Material m = m_cable._stringFilter.GetComponent<MeshRenderer>().material;
+            m.SetColor("_OverrideColor", Alligator._RedClipColor);
+    }
+}
+
+// modified from basegame ArbitraryCableDrawer
+public class AlligatorCableHandler : MonoBehaviour
+{
+    const int _SEGMENTS                   = 10;
+    const float _SPARK_TRAVEL_TIME        = 0.3f;
+    const float _ELECTRIFIED_ENERGY_BONUS = 4.0f;
+    const float _ROLLING_ENERGY_BONUS     = 3.0f;
+
+    private static bool[] _PlayerElectrified                            = {false, false};
+    private static float[] _LastElectrifiedCheck                        = {0f, 0f};
+    private static float[] _PlayerEnergyProductionRate                  = {1f, 1f};
+    private static float[] _LastEnergyCheck                             = {0f, 0f};
+    private static HashSet<AlligatorCableHandler>[] _PlayerExtantCables = {new(), new()};
+
+    public Transform _startTransform;
+    public Vector2 Attach1Offset;
+    public Transform _endTransform;
+    public Vector2 Attach2Offset;
+
+    public Mesh _mesh;
+    public Vector3[] _vertices;
+    public MeshFilter _stringFilter;
+
+    private PlayerController _owner      = null;
+    private AIActor _enemy               = null;
+    private int _ownerId                 = -1;
+    private float _energyProduced        = 0f;
+    private bool _targetingEnemy         = false;
+    private GameObject _clippyboi        = null;
+
+    internal List<GameObject> _extantSparks = new();
+    internal List<float> _extantSpawnTimes  = new();
+
+    public void Initialize(PlayerController owner, Transform startTransform, AIActor target, Transform endTransform, bool hasEnemyTarget)
+    {
+        this._owner          = owner;
+        this._ownerId        = owner.PlayerIDX;
+        this._enemy          = target;
+        this._targetingEnemy = hasEnemyTarget;
+        this._startTransform = startTransform;
+        this._endTransform   = endTransform;
+        this._mesh           = new Mesh();
+        this._vertices       = new Vector3[2 * _SEGMENTS];
+        this._mesh.vertices  = this._vertices;
+        int[] array          = new int[6 * (_SEGMENTS - 1)];
+        Vector2[] uv         = new Vector2[2 * _SEGMENTS];
+        int num              = 0;
+        for (int i = 0; i < (_SEGMENTS - 1); i++)
+        {
+            array[i * 6]     = num;
+            array[i * 6 + 1] = num + 2;
+            array[i * 6 + 2] = num + 1;
+            array[i * 6 + 3] = num + 2;
+            array[i * 6 + 4] = num + 3;
+            array[i * 6 + 5] = num + 1;
+            num += 2;
+        }
+        this._mesh.triangles          = array;
+        this._mesh.uv                 = uv;
+        GameObject gameObject         = new GameObject("cableguy");
+        this._stringFilter            = gameObject.AddComponent<MeshFilter>();
+        this._stringFilter.mesh       = _mesh;
+        MeshRenderer meshRenderer     = gameObject.AddComponent<MeshRenderer>();
+            meshRenderer.material     = BraveResources.Load("Global VFX/WhiteMaterial", ".mat") as Material;
+            // meshRenderer.material.SetColor("_OverrideColor", Color.black);
+
+        if (this._owner && this._targetingEnemy)
+        {
+            float now = BraveTime.ScaledTimeSinceStartup;
+            this._extantSparks.Add(SpawnManager.SpawnVFX(Alligator._SparkVFX, startTransform.position, Quaternion.identity));
+            this._extantSpawnTimes.Add(now);
+            this._energyProduced = 0;
+
+            Vector3 spriteSize = this._enemy.sprite.GetBounds().size;
+                float randomXOffset = 0.25f * spriteSize.x * UnityEngine.Random.value * BraveUtility.RandomSign();
+                float randomYOffset = 0.25f * spriteSize.y * UnityEngine.Random.value * BraveUtility.RandomSign();
+            this.Attach2Offset += new Vector2(randomXOffset, randomYOffset);
+
+            this._clippyboi = SpawnManager.SpawnVFX(Alligator._ClipVFX, endTransform.position, Quaternion.identity);
+                this._clippyboi.transform.parent = endTransform;
+                this._clippyboi.transform.localPosition = Attach2Offset;
+                tk2dSprite clippySprite = this._clippyboi.GetComponent<tk2dSprite>();
+                    clippySprite.HeightOffGround = 10f;
+
+            _PlayerExtantCables[this._ownerId].Add(this);
+        }
+    }
+
+    private void CheckIfOwnerIsElectrified()
+    {
+        float now = BraveTime.ScaledTimeSinceStartup;
+        if (now - _LastElectrifiedCheck[this._ownerId] < 0.1f)
+            return;
+
+        _LastElectrifiedCheck[this._ownerId] = now;
+        _PlayerElectrified[this._ownerId]    = false;
+        RoomHandler absoluteRoomFromPosition = GameManager.Instance.Dungeon.data.GetAbsoluteRoomFromPosition(this._owner.specRigidbody.UnitCenter.ToIntVector2());
+        foreach (DeadlyDeadlyGoopManager goopManager in absoluteRoomFromPosition?.RoomGoops.EmptyIfNull())
+            if (goopManager.IsPositionElectrified(this._owner.specRigidbody.UnitCenter))
+            {
+                _PlayerElectrified[this._ownerId] = true;
+                break;
+            }
+    }
+
+    private void CalculateEnergyProduction()
+    {
+        float now = BraveTime.ScaledTimeSinceStartup;
+        if ((now - _LastEnergyCheck[this._ownerId]) < 0.01f)
+            return;
+        _LastEnergyCheck[this._ownerId] = now;
+
+        float energyOutput = this._owner.stats.GetStatValue(PlayerStats.StatType.Damage);
+        if (this._owner.IsDodgeRolling)
+            energyOutput *= _ROLLING_ENERGY_BONUS;
+        if (_PlayerElectrified[this._ownerId])
+            energyOutput *= _ELECTRIFIED_ENERGY_BONUS;
+
+        _PlayerEnergyProductionRate[this._ownerId] = energyOutput;
+    }
+
+    private void LateUpdate()
+    {
+        if (!this._owner || (this._targetingEnemy && !(this._enemy?.healthHaver?.IsAlive ?? false)))
+            UnityEngine.Object.Destroy(this);
+
+        if (!this._startTransform || !this._endTransform)
+            return;
+
+        CheckIfOwnerIsElectrified();
+        CalculateEnergyProduction();
+
+        Vector3 vector  = this._startTransform.position.XY().ToVector3ZisY(-3f) + this.Attach1Offset.ToVector3ZisY();
+        Vector3 vector2 = this._endTransform.position.XY().ToVector3ZisY(-3f) + this.Attach2Offset.ToVector3ZisY();
+        BuildMeshAlongCurveAndUpdateSparks(vector, vector, vector2 + new Vector3(0f, -2f, -2f), vector2);
+        this._mesh.vertices = this._vertices;
+        this._mesh.RecalculateBounds();
+        this._mesh.RecalculateNormals();
+    }
+
+    private void OnDestroy()
+    {
+        _PlayerExtantCables[this._ownerId].Remove(this);
+        if (this._clippyboi)
+            UnityEngine.Object.Destroy(this._clippyboi);
+        if (this._stringFilter)
+            UnityEngine.Object.Destroy(this._stringFilter.gameObject);
+        for (int i = 0; i < _extantSparks.Count(); ++i)
+            UnityEngine.Object.Destroy(this._extantSparks[i]);
+    }
+
+    private void BuildMeshAlongCurveAndUpdateSparks(Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3, float meshWidth = 1f / 32f)
+    {
+        Vector3[] vertices = this._vertices;
+        Vector2? vector    = null;
+        Quaternion euler90 = Quaternion.Euler(0f, 0f, 90f);
+
+        for (int i = 0; i < _SEGMENTS; i++)
+        {
+            Vector2 vector2 = BraveMathCollege.CalculateBezierPoint((float)i / 9f, p0, p1, p2, p3);
+            Vector2? vector3 = ((i != (_SEGMENTS - 1)) ? new Vector2?(BraveMathCollege.CalculateBezierPoint((float)i / (float)(_SEGMENTS - 1), p0, p1, p2, p3)) : null);
+            Vector2 offset = Vector2.zero;
+            if (vector.HasValue)
+                offset += (euler90 * (vector2 - vector.Value)).XY().normalized;
+            if (vector3.HasValue)
+                offset += (euler90 * (vector3.Value - vector2)).XY().normalized;
+            offset = offset.normalized;
+            vertices[i * 2] = (vector2 + offset * meshWidth).ToVector3ZisY(-10f);
+            vertices[i * 2 + 1] = (vector2 + -offset * meshWidth).ToVector3ZisY(-10f);
+            vector = vector2;
+        }
+
+        if (!this._targetingEnemy)
+            return;
+
+        float curTime = BraveTime.ScaledTimeSinceStartup;
+        this._energyProduced += _PlayerEnergyProductionRate[this._ownerId] * BraveTime.DeltaTime;
+        if (this._energyProduced >= 1f)
+        {
+            this._energyProduced -= 1f;
+            this._extantSparks.Add(SpawnManager.SpawnVFX(Alligator._SparkVFX, _startTransform.position, Quaternion.identity));
+            this._extantSpawnTimes.Add(curTime);
+        }
+
+        for (int i = _extantSparks.Count() - 1; i >= 0; --i)
+        {
+            float percentDone = (curTime - _extantSpawnTimes[i]) / _SPARK_TRAVEL_TIME;
+            if (percentDone > 1f)
+            {
+                this._enemy.healthHaver.ApplyDamage(1f, Vector2.zero, Alligator.ItemName, CoreDamageTypes.Electric, DamageCategory.Normal);
+                AkSoundEngine.PostEvent("electrocution_sound_stop_all", base.gameObject);
+                AkSoundEngine.PostEvent("electrocution_sound", base.gameObject);
+                UnityEngine.Object.Destroy(_extantSparks[i]);
+                this._extantSparks.RemoveAt(i);
+                this._extantSpawnTimes.RemoveAt(i);
+                continue;
+            }
+            Vector2 sparkPos = BraveMathCollege.CalculateBezierPoint(percentDone, p0, p1, p2, p3);
+            this._extantSparks[i].transform.position = sparkPos;
+            if (UnityEngine.Random.value < 0.2f)
+                GlobalSparksDoer.DoRandomParticleBurst(5, sparkPos, sparkPos, Lazy.RandomVector(4f), 360f, 0f,
+                    startLifetime: 0.2f,
+                    startColor: Color.cyan,
+                    systemType: GlobalSparksDoer.SparksType.SPARKS_ADDITIVE_DEFAULT);
+        }
+    }
+}

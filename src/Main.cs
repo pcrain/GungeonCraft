@@ -200,6 +200,7 @@ public class Initialisation : BaseUnityPlugin
                 PistolWhip.Add();
                 Jugglernaut.Add();
                 SubtractorBeam.Add();
+                Alligator.Add();
             #endregion
             // tempWatch.Stop(); ETGModConsole.Log($"part 1 finished in "+(tempWatch.ElapsedMilliseconds/1000.0f)+" seconds"); tempWatch = System.Diagnostics.Stopwatch.StartNew();
 
