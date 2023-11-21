@@ -150,6 +150,7 @@ public class Initialisation : BaseUnityPlugin
                 BionicFinger.Init();
                 BubbleWand.Init();
                 AdrenalineShot.Init();
+                StuntHelmet.Init();
             #endregion
 
             // System.Diagnostics.Stopwatch tempWatch = System.Diagnostics.Stopwatch.StartNew();

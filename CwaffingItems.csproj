@@ -40,6 +40,7 @@
   <ItemGroup>
     <None Include="packages.config"/>
     <Reference Include="System"/>
+    <Compile Include="src\Cwaff-Passives\StuntHelmet.cs"/>
     <Compile Include="src\Cwaff-Passives\Unfinished\Superstitious.cs"/>
     <Compile Include="src\Cwaff-Passives\Unfinished\Siphon.cs"/>
     <Compile Include="src\Cwaff-Passives\Unfinished\Shine.cs"/>
@@ -2578,6 +2579,7 @@
     <EmbeddedResource Include="Resources\ItemSprites\blazer_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\gyroscope_icon_old.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\echo_chamber_icon.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\stunt_helmet_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\insurance_policy_marine_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\utility_vest_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\blank_checks_icon.png"/>

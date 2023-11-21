@@ -20,7 +20,7 @@ public class Alligator : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Alligator>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 2.0f, ammo: 300);
+            gun.SetAttributes(quality: PickupObject.ItemQuality.C, gunClass: GunClass.CHARGE, reloadTime: 2.0f, ammo: 300);
             gun.SetAnimationFPS(gun.shootAnimation, 16);
             gun.SetAnimationFPS(gun.reloadAnimation, 16);
             gun.SetMuzzleVFX("muzzle_alligator", fps: 60, scale: 0.5f, anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 50f);
