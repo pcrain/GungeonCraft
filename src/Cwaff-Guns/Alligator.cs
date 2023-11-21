@@ -8,29 +8,34 @@ public class Alligator : AdvancedGunBehavior
     public static string ShortDescription = "TBD";
     public static string LongDescription  = "TBD";
 
-    internal static GameObject _SparkVFX;
-    internal static GameObject _ClipVFX;
-    internal static readonly Color _RedClipColor   = Color.Lerp(Color.red, Color.magenta, 0.25f);
-    internal static readonly Color _BlackClipColor = Color.Lerp(Color.black, Color.blue, 0.25f);
+    internal static GameObject _SparkVFX               = null;
+    internal static GameObject _ClipVFX                = null;
+    internal static readonly Color _RedClipColor       = Color.Lerp(Color.red, Color.magenta, 0.25f);
+    internal static readonly Color _BlackClipColor     = Color.Lerp(Color.black, Color.blue, 0.25f);
+    internal static List<Vector3> _ShootBarrelOffsets  = new();
+    internal static List<Vector3> _ReloadBarrelOffsets = new();
 
     private DamageTypeModifier _electricImmunity = null;
 
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Alligator>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 2.0f, ammo: 200);
+            gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 2.0f, ammo: 300);
             gun.SetAnimationFPS(gun.shootAnimation, 16);
             gun.SetAnimationFPS(gun.reloadAnimation, 16);
             gun.SetMuzzleVFX("muzzle_alligator", fps: 60, scale: 0.5f, anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 50f);
             gun.SetFireAudio("alligator_shoot_sound");
             gun.SetReloadAudio("alligator_reload_sound");
 
+        _ShootBarrelOffsets  = gun.GetBarrelOffsetsForAnimation(gun.shootAnimation);
+        _ReloadBarrelOffsets = gun.GetBarrelOffsetsForAnimation(gun.reloadAnimation);
+
         ProjectileModule mod = gun.DefaultModule;
             mod.ammoCost            = 1;
             mod.shootStyle          = ProjectileModule.ShootStyle.Automatic;
             mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
             mod.angleVariance       = 15.0f;
-            mod.cooldownTime        = 0.3f;
+            mod.cooldownTime        = 0.4f;
             mod.numberOfShotsInClip = 8;
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
@@ -39,12 +44,12 @@ public class Alligator : AdvancedGunBehavior
                 2, true, new IntVector2(6, 8),
                 false, tk2dBaseSprite.Anchor.MiddleCenter, true, true));
             projectile.baseData.damage  = 1f;
-            projectile.baseData.speed   = 35.0f;
+            projectile.baseData.speed   = 36.0f;
             projectile.transform.parent = gun.barrelOffset;
             projectile.gameObject.AddComponent<AlligatorProjectile>();
 
         _SparkVFX = VFX.RegisterVFXObject(
-            "SparkVFX", ResMap.Get("spark_vfx"), fps: 16, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.35f, emissivePower: 50f /*5f*/);
+            "SparkVFX", ResMap.Get("spark_vfx"), fps: 16, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.35f, emissivePower: 50f);
         _ClipVFX = VFX.RegisterVFXObject(
             "AlligatorClipVFX", ResMap.Get("alligator_projectile_clamped"), fps: 2, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
     }
@@ -69,6 +74,22 @@ public class Alligator : AdvancedGunBehavior
         if (player.healthHaver.damageTypeModifiers.Contains(this._electricImmunity))
             player.healthHaver.damageTypeModifiers.Remove(this._electricImmunity);
     }
+
+    protected override void Update()
+    {
+        base.Update();
+
+        tk2dSpriteAnimator anim = gun.spriteAnimator;
+        if (anim.IsPlaying(gun.shootAnimation))
+            gun.barrelOffset.localPosition = _ShootBarrelOffsets[anim.CurrentFrame];
+        else if (anim.IsPlaying(gun.reloadAnimation))
+            gun.barrelOffset.localPosition = _ReloadBarrelOffsets[anim.CurrentFrame];
+        else
+            gun.barrelOffset.localPosition = _ShootBarrelOffsets[0];
+
+        if (gun.sprite.FlipY)
+            gun.barrelOffset.localPosition = gun.barrelOffset.localPosition.WithY(-gun.barrelOffset.localPosition.y);
+    }
 }
 
 public class AlligatorProjectile : MonoBehaviour
@@ -77,50 +98,22 @@ public class AlligatorProjectile : MonoBehaviour
 
     private void Start()
     {
-        Projectile p           = GetComponent<Projectile>();
-        PlayerController owner = p.Owner as PlayerController;
-
-        p.OnHitEnemy += HandleHitEnemy;
-
+        Projectile p = GetComponent<Projectile>();
+            p.OnHitEnemy += HandleHitEnemy;
         AlligatorCableHandler cable = base.gameObject.AddComponent<AlligatorCableHandler>();
-            cable.Attach1Offset = owner.CenterPosition - owner.transform.position.XY();
-            cable.Attach2Offset = p.specRigidbody.HitboxPixelCollider.UnitCenter - p.transform.position.XY();
-            cable.Initialize(owner, owner.transform, null, p.transform, hasEnemyTarget: false);
-
-        Material m = cable._stringFilter.GetComponent<MeshRenderer>().material;
-            m.SetColor("_OverrideColor", Alligator._RedClipColor);
+            cable.Initialize(p.Owner as PlayerController, null, p.transform, p.specRigidbody.HitboxPixelCollider.UnitCenter - p.transform.position.XY());
+            cable._stringFilter.GetComponent<MeshRenderer>().material.SetColor("_OverrideColor", Alligator._RedClipColor);
     }
 
     private void HandleHitEnemy(Projectile projectile, SpeculativeRigidbody body, bool _)
     {
         if (body.aiActor is not AIActor aiActor)
             return;
-        if (!aiActor.IsHostile(canBeNeutral: true) || aiActor.gameObject.GetComponents<AlligatorAttachedEffect>().Count() >= _MAX_CLIPS_PER_ENEMY)
+        if (!aiActor.IsHostile(canBeNeutral: true) || aiActor.gameObject.GetComponents<AlligatorCableHandler>().Count() >= _MAX_CLIPS_PER_ENEMY)
             return;
-
-        AlligatorAttachedEffect orAddComponent = aiActor.gameObject./*GetOr*/AddComponent<AlligatorAttachedEffect>();
-        orAddComponent.owner = projectile.Owner as PlayerController;
-    }
-}
-
-public class AlligatorAttachedEffect : MonoBehaviour
-{
-    public PlayerController owner;
-
-    private AIActor m_aiActor;
-    private AlligatorCableHandler m_cable;
-
-    private void Start()
-    {
-        m_aiActor = GetComponent<AIActor>();
-
-        m_cable = m_aiActor.gameObject.AddComponent<AlligatorCableHandler>();
-        m_cable.Attach1Offset = owner.CenterPosition - owner.transform.position.XY();
-        m_cable.Attach2Offset = m_aiActor.CenterPosition - m_aiActor.transform.position.XY();
-        m_cable.Initialize(owner, owner.transform, m_aiActor, m_aiActor.transform, hasEnemyTarget: true);
-
-        Material m = m_cable._stringFilter.GetComponent<MeshRenderer>().material;
-            m.SetColor("_OverrideColor", Alligator._RedClipColor);
+        AlligatorCableHandler cable = aiActor.gameObject.AddComponent<AlligatorCableHandler>();
+            cable.Initialize(projectile.Owner as PlayerController, aiActor, aiActor.transform, aiActor.CenterPosition - aiActor.transform.position.XY());
+            cable._stringFilter.GetComponent<MeshRenderer>().material.SetColor("_OverrideColor", Alligator._RedClipColor);
     }
 }
 
@@ -139,38 +132,40 @@ public class AlligatorCableHandler : MonoBehaviour
     private static HashSet<AlligatorCableHandler>[] _PlayerExtantCables = {new(), new()};
 
     public Transform _startTransform;
-    public Vector2 Attach1Offset;
     public Transform _endTransform;
-    public Vector2 Attach2Offset;
 
     public Mesh _mesh;
     public Vector3[] _vertices;
     public MeshFilter _stringFilter;
 
-    private PlayerController _owner      = null;
-    private AIActor _enemy               = null;
-    private int _ownerId                 = -1;
-    private float _energyProduced        = 0f;
-    private bool _targetingEnemy         = false;
-    private GameObject _clippyboi        = null;
+    private PlayerController _owner     = null;
+    private AIActor _enemy              = null;
+    private int _ownerId                = -1;
+    private float _energyProduced       = 0f;
+    private bool _targetingEnemy        = false;
+    private GameObject _clippyboi       = null;
+    private Vector2 _ownerOffset        = Vector2.zero;
+    private Vector2 _endTransformOffset = Vector2.zero;
 
     internal List<GameObject> _extantSparks = new();
     internal List<float> _extantSpawnTimes  = new();
 
-    public void Initialize(PlayerController owner, Transform startTransform, AIActor target, Transform endTransform, bool hasEnemyTarget)
+    public void Initialize(PlayerController owner, AIActor target, Transform clipTransform, Vector2 clipTransformOffset)
     {
-        this._owner          = owner;
-        this._ownerId        = owner.PlayerIDX;
-        this._enemy          = target;
-        this._targetingEnemy = hasEnemyTarget;
-        this._startTransform = startTransform;
-        this._endTransform   = endTransform;
-        this._mesh           = new Mesh();
-        this._vertices       = new Vector3[2 * _SEGMENTS];
-        this._mesh.vertices  = this._vertices;
-        int[] array          = new int[6 * (_SEGMENTS - 1)];
-        Vector2[] uv         = new Vector2[2 * _SEGMENTS];
-        int num              = 0;
+        this._owner              = owner;
+        this._ownerOffset        = owner.CenterPosition - owner.transform.position.XY();
+        this._ownerId            = owner.PlayerIDX;
+        this._enemy              = target;
+        this._targetingEnemy     = target != null;
+        this._startTransform     = owner.CurrentGun.barrelOffset;
+        this._endTransform       = clipTransform;
+        this._endTransformOffset = clipTransformOffset;
+        this._mesh               = new Mesh();
+        this._vertices           = new Vector3[2 * _SEGMENTS];
+        this._mesh.vertices      = this._vertices;
+        int[] array              = new int[6 * (_SEGMENTS - 1)];
+        Vector2[] uv             = new Vector2[2 * _SEGMENTS];
+        int num                  = 0;
         for (int i = 0; i < (_SEGMENTS - 1); i++)
         {
             array[i * 6]     = num;
@@ -193,18 +188,18 @@ public class AlligatorCableHandler : MonoBehaviour
         if (this._owner && this._targetingEnemy)
         {
             float now = BraveTime.ScaledTimeSinceStartup;
-            this._extantSparks.Add(SpawnManager.SpawnVFX(Alligator._SparkVFX, startTransform.position, Quaternion.identity));
+            this._extantSparks.Add(SpawnManager.SpawnVFX(Alligator._SparkVFX, this._startTransform.position, Quaternion.identity));
             this._extantSpawnTimes.Add(now);
             this._energyProduced = 0;
 
             Vector3 spriteSize = this._enemy.sprite.GetBounds().size;
                 float randomXOffset = 0.25f * spriteSize.x * UnityEngine.Random.value * BraveUtility.RandomSign();
                 float randomYOffset = 0.25f * spriteSize.y * UnityEngine.Random.value * BraveUtility.RandomSign();
-            this.Attach2Offset += new Vector2(randomXOffset, randomYOffset);
+            this._endTransformOffset += new Vector2(randomXOffset, randomYOffset);
 
-            this._clippyboi = SpawnManager.SpawnVFX(Alligator._ClipVFX, endTransform.position, Quaternion.identity);
-                this._clippyboi.transform.parent = endTransform;
-                this._clippyboi.transform.localPosition = Attach2Offset;
+            this._clippyboi = SpawnManager.SpawnVFX(Alligator._ClipVFX, clipTransform.position, Quaternion.identity);
+                this._clippyboi.transform.parent = clipTransform;
+                this._clippyboi.transform.localPosition = _endTransformOffset;
                 tk2dSprite clippySprite = this._clippyboi.GetComponent<tk2dSprite>();
                     clippySprite.HeightOffGround = 10f;
 
@@ -256,8 +251,14 @@ public class AlligatorCableHandler : MonoBehaviour
         CheckIfOwnerIsElectrified();
         CalculateEnergyProduction();
 
-        Vector3 vector  = this._startTransform.position.XY().ToVector3ZisY(-3f) + this.Attach1Offset.ToVector3ZisY();
-        Vector3 vector2 = this._endTransform.position.XY().ToVector3ZisY(-3f) + this.Attach2Offset.ToVector3ZisY();
+        Vector3 vector;
+        Gun gun = this._owner.CurrentGun;
+        if (!gun.GetComponent<Alligator>() || !gun.renderer.enabled)
+            vector = this._owner.CenterPosition.ToVector3ZisY();
+        else
+            vector = this._startTransform.position.XY().ToVector3ZisY(-3f);
+
+        Vector3 vector2 = this._endTransform.position.XY().ToVector3ZisY(-3f) + this._endTransformOffset.ToVector3ZisY();
         BuildMeshAlongCurveAndUpdateSparks(vector, vector, vector2 + new Vector3(0f, -2f, -2f), vector2);
         this._mesh.vertices = this._vertices;
         this._mesh.RecalculateBounds();
