@@ -53,6 +53,7 @@
     <Compile Include="src\Cwaff-Passives\BlankChecks.cs"/>
     <Compile Include="src\Cwaff-Passives\LibraryCardtridge.cs"/>
     <Compile Include="src\Cwaff-Passives\GorgunEye.cs"/>
+    <Compile Include="src\Cwaff-Passives\ComfySlippers.cs"/>
     <Compile Include="src\Cwaff-Passives\CatEarHeadband.cs"/>
     <Compile Include="src\Cwaff-Passives\FourDBullets.cs"/>
     <Compile Include="src\Cwaff-Passives\WeddingRing.cs"/>
@@ -132,6 +133,7 @@
     <Compile Include="src\Cwaff-Guns\SoulKaliber.cs"/>
     <Compile Include="src\Cwaff-Guns\Missiletoe.cs"/>
     <Compile Include="src\Cwaff-Guns\QuarterPounder.cs"/>
+    <Compile Include="src\Cwaff-Guns\Darkwing.cs"/>
     <Compile Include="src\Cwaff-Guns\PistolWhip.cs"/>
     <Compile Include="src\Cwaff-Guns\Deadline.cs"/>
     <Compile Include="src\Cwaff-Guns\RacketLauncher.cs"/>
@@ -459,6 +461,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_reload_016.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_charge_008.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_idle_001.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\darkwing_reload_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_048.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_026.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_003.png"/>
@@ -1363,6 +1366,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\holy_water_gun_reload_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\ticonderogun_idle_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_fire_004.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\darkwing_fire_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\missiletoe_fire_011.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_011.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_5_gun_008.json"/>
@@ -1447,6 +1451,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_047.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_2_gun_020.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_021.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\darkwing_reload_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\ki_blast_gun_fire_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\platinum_star_reload_020.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_010.json"/>
@@ -1459,6 +1464,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_029.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\platinum_star_fire_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\soul_kaliber_reload_005.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\darkwing_idle_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_014.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_fire_013.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_5_gun_023.json"/>
@@ -1584,6 +1590,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\soul_kaliber_reload_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_014.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_003.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\darkwing_idle_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_reload_019.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_5_gun_007.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alyx_reload_005.png"/>
@@ -2274,6 +2281,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_4_gun_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_5_gun_023.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_fire_001.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\darkwing_fire_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_6_gun_006.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\platinum_star_reload_009.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alligator_reload_018.png"/>
@@ -2578,6 +2586,7 @@
     <EmbeddedResource Include="Resources\ItemSprites\insurance_policy_robot_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\blazer_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\gyroscope_icon_old.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\comfy_slippers_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\echo_chamber_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\stunt_helmet_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\insurance_policy_marine_icon.png"/>
@@ -2990,6 +2999,7 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\bball009.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\outbreak_projectile_old4.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\gunbrella_projectile_old2.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\darkwing_projectile_hunt1.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\slappp7.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile_old12.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\alyx_projectile2.png"/>
@@ -3005,7 +3015,9 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\unused_so_far\projectile_a1.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\unused_so_far\projectile_a4.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\soap_bubble_projectile_002.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\darkwing_projectile_retrieve2.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball012.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\darkwing_projectile_return4.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball011.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tennis_ball3.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\chess_rook.png"/>
@@ -3049,6 +3061,8 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\slappp12.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball016.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball_old_5.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\darkwing_projectile2.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\darkwing_projectile_return1.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\energy_bounce4.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball008.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\coin_gun_projectile1.png"/>
@@ -3062,15 +3076,18 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\tennis_ball1.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\ornament_projectile.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile_old15.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\darkwing_projectile_hunt4.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\natascha_bullet_003.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\outbreak_projectile_old2.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\outbreak_projectile_001.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\darkwing_projectile_return3.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\jugglernaut_ball1.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile_old9.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\soap_bubble_projectile_004.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball003.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball_old_1.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\missiletoe_projectile_ball_001.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\darkwing_projectile4.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\gift_projectile_blue.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball_old_4.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\gift_projectile_black.png"/>
@@ -3084,6 +3101,7 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\bball018.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\slappp9.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\ki_blast_red_001.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\darkwing_projectile_return2.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\platinum_projectile1.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile_old11.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\schrodinger_bullet.png"/>
@@ -3094,11 +3112,14 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\gift_projectile_brown.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball_old_7.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball005.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\darkwing_projectile1.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile_old17.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\slappp6.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\gunbrella_projectile1.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\darkwing_projectile_hunt2.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\alyx_projectile4.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\natascha_bullet_002.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\darkwing_projectile_hunt3.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile_old8.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\platinum_star_projectile.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\chess_queen.png"/>
@@ -3112,6 +3133,8 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\coin_gun_projectile3.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\ki_blast_003.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\energy_bounce3.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\darkwing_projectile_retrieve1.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\darkwing_projectile_retrieve4.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile_old2.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\missiletoe_projectile_sock_001.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\playing_card.png"/>
@@ -3120,6 +3143,8 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\ki_blast_004.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\coin_gun_projectile9.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\outbreak_projectile_alt_001.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\darkwing_projectile3.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\darkwing_projectile_retrieve3.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\ki_blast_red_003.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball002.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\slappp5.png"/>
@@ -3193,6 +3218,7 @@
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\grandmaster_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\platinum_star_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\ki_blast_gun_idle_001.png"/>
+    <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\darkwing_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\soul_kaliber_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\seltzer_pelter_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\alyx_idle_001.png"/>
