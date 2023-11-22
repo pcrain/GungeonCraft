@@ -8,43 +8,43 @@ public class Darkwing : AdvancedGunBehavior
     public static string ShortDescription = "TBD";
     public static string LongDescription  = "TBD";
 
-    internal static tk2dSpriteAnimationClip _NeutralSprite;
-    internal static tk2dSpriteAnimationClip _HuntingSprite;
-    internal static tk2dSpriteAnimationClip _RetrievingSprite;
-    internal static tk2dSpriteAnimationClip _ReturningSprite;
+    internal static tk2dSpriteAnimationClip _NeutralSprite    = null;
+    internal static tk2dSpriteAnimationClip _HuntingSprite    = null;
+    internal static tk2dSpriteAnimationClip _RetrievingSprite = null;
+    internal static tk2dSpriteAnimationClip _ReturningSprite  = null;
 
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Darkwing>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.0f, ammo: 80);
-            gun.SetAnimationFPS(gun.shootAnimation, 30);
-            gun.SetAnimationFPS(gun.reloadAnimation, 40);
-            gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
-            gun.SetFireAudio("soul_kaliber_fire");
-            gun.SetReloadAudio("soul_kaliber_reload");
+            gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.0f, ammo: 120);
+            gun.SetAnimationFPS(gun.shootAnimation, 32);
+            gun.SetAnimationFPS(gun.reloadAnimation, 20);
+            gun.SetMuzzleVFX("muzzle_darkwing", fps: 30, scale: 0.5f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+            gun.SetFireAudio("darkwing_fire_sound");
+            gun.SetReloadAudio("darkwing_reload_sound");
 
         ProjectileModule mod = gun.DefaultModule;
             mod.ammoCost            = 1;
             mod.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
             mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
-            mod.cooldownTime        = 0.25f;
+            mod.cooldownTime        = 0.33f;
             mod.numberOfShotsInClip = 20;
 
         _NeutralSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("darkwing_projectile").Base(),
-            12, true, new IntVector2(23 / 2, 32 / 2),
+            12, true, new IntVector2(23, 32),
             false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
         _HuntingSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("darkwing_projectile_hunt").Base(),
-            12, true, new IntVector2(23 / 2, 32 / 2),
+            12, true, new IntVector2(23, 32),
             false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
         _RetrievingSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("darkwing_projectile_retrieve").Base(),
-            12, true, new IntVector2(23 / 2, 32 / 2),
+            12, true, new IntVector2(23, 32),
             false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
         _ReturningSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("darkwing_projectile_return").Base(),
-            12, true, new IntVector2(23 / 2, 32 / 2),
+            12, true, new IntVector2(23, 32),
             false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
@@ -59,7 +59,6 @@ public class Darkwing : AdvancedGunBehavior
 
             projectile.gameObject.AddComponent<DarkwingProjectile>();
     }
-
 }
 
 public class DarkwingProjectile : MonoBehaviour
@@ -71,12 +70,21 @@ public class DarkwingProjectile : MonoBehaviour
         RETURNING,  // we're returning to the player after retrieving a projectile (or failing to find one)
     }
 
+    internal const float _START_SPEED       = 10f;
+    internal const float _MAX_TURN_RATE     = 16f;
+    internal const float _TURN_FRICTION     = 0.98f;
+    internal const float _BASE_ACCEL        = 1.0f;
+    internal const float _HUNT_ACCEL        = 2.0f;
+    internal const float _HUNT_SPEED_SCALE  = 2.0f;
+    internal const float _HUNT_DAMAGE_SCALE = 2.0f;
+
     private Projectile _projectile       = null;
     private PlayerController _owner      = null;
     private Gun _gun                     = null;
     private GameActor _target            = null;
     private Projectile _targetProjectile = null;
     private EasyTrailBullet _trail       = null;
+    private float _topSpeed              = 0f;
     private bool _retrievedAmmo          = false;
     private State _state_internal        = State.NEUTRAL;
     private State _state
@@ -117,7 +125,7 @@ public class DarkwingProjectile : MonoBehaviour
 
             this._trail.BaseColor  = newTrailColor;
             this._trail.StartColor = newTrailColor;
-            this._trail.EndColor   = Color.Lerp(newTrailColor, Color.white, 0.5f);
+            this._trail.EndColor   = Color.Lerp(newTrailColor, Color.white, 0.75f);
             this._trail.UpdateTrail();
         }
     }
@@ -129,6 +137,8 @@ public class DarkwingProjectile : MonoBehaviour
         if (this._owner.CurrentGun.GetComponent<Darkwing>() is Darkwing darkwing)
             this._gun = this._owner.CurrentGun;
 
+        this._topSpeed = this._projectile.baseData.speed;
+        this._projectile.baseData.speed = _START_SPEED;
         this._projectile.BulletScriptSettings.surviveRigidbodyCollisions = true;
         this._projectile.specRigidbody.OnCollision += this.OnCollision;
         this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
@@ -144,18 +154,31 @@ public class DarkwingProjectile : MonoBehaviour
 
     private void Update()
     {
-        // const float _TRACKING_SPEED = 5f;
         Vector2 targetPos = Vector2.zero;
 
+        bool haveTarget = true;
         switch(this._state)
         {
             case State.NEUTRAL:
-                return;  // nothing to do
+                haveTarget = false;
+                break;  // nothing to do
             case State.HUNTING:
+                if (this._target)
+                    targetPos = this._target.CenterPosition;
+                else if (this._owner)
+                {
+                    this._target = this._owner;
+                    targetPos = this._target.CenterPosition;
+                    this._state  = State.RETURNING;
+                }
+                else
+                    haveTarget = false;
+                break;
             case State.RETURNING:
-                if (this._target == null)
-                    return; // nothing to do
-                targetPos = this._target.CenterPosition;
+                if (this._target)
+                    targetPos = this._target.CenterPosition;
+                else
+                    haveTarget = false;
                 break;
             case State.RETRIEVING:
                 if (!this._targetProjectile || !this._targetProjectile.isActiveAndEnabled || !(this._targetProjectile.sprite?.renderer.enabled ?? false))
@@ -187,18 +210,30 @@ public class DarkwingProjectile : MonoBehaviour
                 break;
         }
 
-        Vector2 targetDir  = targetPos - this._projectile.sprite?.WorldCenter ?? this._projectile.transform.position.XY();
-        if (this._state == State.RETURNING && targetDir.sqrMagnitude < 1f)
+        float relTime = C.FPS * BraveTime.DeltaTime;
+        if (haveTarget)
         {
-            DissipateNearPlayer();
-            return;
-        }
-        Vector2 currentDir = this._projectile.m_currentDirection;
-        this._projectile.SendInDirection(0.5f * targetDir.normalized + 0.5f * currentDir.normalized, true);
-        this._projectile.UpdateSpeed();
+            Vector2 targetDir  = targetPos - this._projectile.sprite?.WorldCenter ?? this._projectile.transform.position.XY();
+            if (this._state == State.RETURNING && targetDir.sqrMagnitude < 1f)
+            {
+                DissipateNearPlayer();
+                return;
+            }
+            Vector2 currentDir = this._projectile.m_currentDirection;
 
-        // this._projectile.specRigidbody.Velocity = this._projectile.transform.right * this._projectile.baseData.speed;
-        // this._projectile.LastVelocity = this._projectile.specRigidbody.Velocity;
+            float turnRate      = _MAX_TURN_RATE * relTime;
+            float curAngle      = currentDir.ToAngle();
+            float angleDelta    = (curAngle.RelAngleTo(targetDir.ToAngle()));
+            if (Mathf.Abs(angleDelta) < turnRate)
+                this._projectile.SendInDirection(targetDir, true);
+            else
+            {
+                this._projectile.baseData.speed *= (_TURN_FRICTION * relTime);
+                this._projectile.SendInDirection((curAngle + turnRate * Mathf.Sign(angleDelta)).ToVector(), true);
+            }
+        }
+        this._projectile.baseData.speed += ((this._state == State.NEUTRAL ? _BASE_ACCEL : _HUNT_ACCEL) * relTime);
+        this._projectile.UpdateSpeed();
     }
 
     private void OnCollision(CollisionData collision)
@@ -243,12 +278,13 @@ public class DarkwingProjectile : MonoBehaviour
             return; // we collided with a projectile that wasn't owned by the enemy we were originally targeting
 
         projectile.DieInAir(allowActorSpawns: false, allowProjectileSpawns: false, killedEarly: true);
-        this._projectile.baseData.speed          *= 2f;
-        this._projectile.baseData.damage         *= 2f;
+        this._topSpeed                           *= _HUNT_SPEED_SCALE;
+        this._projectile.baseData.damage         *= _HUNT_DAMAGE_SCALE;
         this._projectile.collidesWithProjectiles  = false;
 
         if (this._state == State.NEUTRAL)
         {
+            AkSoundEngine.PostEvent("darkwing_hunt_sound", base.gameObject);
             this._target = enemy;
             this._state  = State.HUNTING;
         }
@@ -266,15 +302,11 @@ public class DarkwingProjectile : MonoBehaviour
         {
             case State.NEUTRAL:
             case State.HUNTING:
+                AkSoundEngine.PostEvent("darkwing_impact_sound", base.gameObject);
                 this._target                         = enemy;
                 this._projectile.collidesWithEnemies = false;
                 this._state                          = State.RETRIEVING;
                 return;
-            // case State.HUNTING:
-            //     this._target                         = this._owner;
-            //     this._projectile.collidesWithEnemies = false;
-            //     this._state                          = State.RETURNING;
-            //     return;
             case State.RETRIEVING:
             case State.RETURNING:
                 return; // theoretically can't happen

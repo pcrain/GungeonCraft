@@ -402,6 +402,8 @@ public class EasyTrailBullet : BraveBehaviour // stolen from NN
     }
     public void UpdateTrail()
     {
+        if (!tro)
+            return;
         tro.transform.localPosition = TrailPos;
         mat.SetColor("_Color", BaseColor);
         tr.startColor = StartColor;

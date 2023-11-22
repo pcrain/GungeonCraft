@@ -181,15 +181,17 @@ public static class Extensions
     return BraveMathCollege.ClampAngle360(self);
   }
 
+  // Determine the relative angle (in degrees) between two angles
+  public static float RelAngleTo(this float angle, float other)
+  {
+    return (other - angle).Clamp180();
+  }
+
   // Determine the absolute angle (in degrees) between two angles
   public static float AbsAngleTo(this float angle, float other)
   {
-    float absangle = (angle - other).Clamp360();
-    if (absangle > 180f)
-      return 360f - absangle;
-    return absangle;
+    return Mathf.Abs((other - angle).Clamp180());
   }
-
 
   // Determine whether an angle is within a degree tolerance of a floating point angle
   public static bool IsNearAngle(this float angle, float other, float tolerance)
