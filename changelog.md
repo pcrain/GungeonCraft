@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.3.0 (2023-11-22)
+- Added Subtractor Beam, Alligator, Darkwing, Stunt Helmet, Comfy Slippers, and Chamber Jammer (current item count: 69)
+- Added muzzle effects for all guns!
+- Added custom projectile and ammo clip to Platinum Star, thanks to Lynceus!
+- Added hand animations for Ki Blast
+- Added proper reload sound for Deadline
+- Improved gun sprite for Alyx
+- Improved projectile sprites for Soul Kaliber and Platinum Star
+- Improved collision detection substantially for Deadline lasers
+
 ## 1.2.1 (2023-11-13)
 - Buffed Plot Armor: changed from S to A quality, now always gives at least 2 armor and brings the player up to a minimum of 4 armor
 - Added a sound cue to Vacuum Cleaner for when ammo is successfully restored
