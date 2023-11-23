@@ -1,7 +1,7 @@
 # Changelog
 
 ## 1.3.0 (2023-11-22)
-- Added Subtractor Beam, Alligator, Darkwing, Stunt Helmet, Comfy Slippers, and Chamber Jammer (current item count: 69)
+- Added Subtractor Beam, Alligator, Lightwing, Stunt Helmet, Comfy Slippers, and Chamber Jammer (current item count: 69)
 - Added muzzle effects for all guns!
 - Added custom projectile and ammo clip to Platinum Star, thanks to Lynceus!
 - Added hand animations for Ki Blast
