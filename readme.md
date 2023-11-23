@@ -8,9 +8,10 @@
 
 ### Features
 
-- 31 new guns 
-- 26 new passive items
-- 12 new active items
+- 69 nice new items including
+	+ 31 new guns 
+	+ 26 new passive items
+	+ 12 new active items
 - Lore for all new guns and items
 - A new boss!
 - Fixed co-op Turbo Mode
