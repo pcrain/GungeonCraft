@@ -4,8 +4,8 @@ public class ChamberJammer : PlayerItem
 {
     public static string ItemName         = "Chamber Jammer";
     public static string SpritePath       = "chamber_jammer_icon";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
+    public static string ShortDescription = "Jam it All";
+    public static string LongDescription  = "Reduces the current gun's max ammo to its current ammo (max 90% reduction), and multiplies the gun's damage by (1 / [% ammo left]).\n\nA demonic bullet that once resided inside the chamber of a Jammed's gun. These bullets grow to fill the empty space in whatever chamber they find themselves inside, and infuse their dark energies into any ammunition within their host gun's chamber. Two notable effects of this infusion are 1) an increased potency of all fired bullets and 2) an ominous aura radiating from the host gun. Fortunately, you can hear whispers coming from inside the chamber assuring you that the ominous aura is nothing you need to worry about.";
 
     public static void Init()
     {
