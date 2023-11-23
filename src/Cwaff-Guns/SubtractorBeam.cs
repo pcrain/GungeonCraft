@@ -74,7 +74,10 @@ public class SubtractorBeam : AdvancedGunBehavior
     protected override void Update()
     {
         base.Update();
-        YouShallKnowTheirNames();
+        if ((this.Owner as PlayerController)?.healthHaver?.IsDead ?? true)
+            WhoAreTheyAgain();
+        else
+            YouShallKnowTheirNames();
     }
 
     private void WhoAreTheyAgain()
