@@ -27,7 +27,7 @@ public class Darkwing : AdvancedGunBehavior
             mod.ammoCost            = 1;
             mod.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
             mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
-            mod.cooldownTime        = 0.33f;
+            mod.cooldownTime        = 0.28f;
             mod.numberOfShotsInClip = 20;
 
         _NeutralSprite = AnimateBullet.CreateProjectileAnimation(
