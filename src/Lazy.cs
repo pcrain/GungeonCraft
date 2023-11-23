@@ -475,12 +475,11 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
 
     public static Vector2? NearestEnemyWithinConeOfVision(Vector2 start, float coneAngle, float maxDeviation, bool useNearestAngleInsteadOfDistance, bool ignoreWalls = false)
     {
-        List<AIActor> activeEnemies = start.GetAbsoluteRoom().GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
-        bool foundTarget            = false;
-        float bestAngle             = maxDeviation;
-        float bestDist              = 9999f;
-        Vector2 bestTarget          = Vector2.zero;
-        foreach (AIActor enemy in activeEnemies)
+        bool foundTarget   = false;
+        float bestAngle    = maxDeviation;
+        float bestDist     = 9999f;
+        Vector2 bestTarget = Vector2.zero;
+        foreach (AIActor enemy in start.GetAbsoluteRoom()?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All).EmptyIfNull())
         {
             if (!enemy.IsHostile(canBeNeutral: true))
                 continue;

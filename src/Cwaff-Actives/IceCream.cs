@@ -286,7 +286,7 @@ public class TargetPourSoulsWithoutIceCreamBehavior : TargetBehaviorBase
         GameActor target = null;
         float bestDist = 9999f;
         Vector2 pos = iceCreamHaver.sprite.WorldCenter;
-        foreach (AIActor other in pos.GetAbsoluteRoom().GetActiveEnemies(RoomHandler.ActiveEnemyType.All))
+        foreach (AIActor other in pos.GetAbsoluteRoom()?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All).EmptyIfNull())
         {
             if (other == iceCreamHaver)
                 continue;

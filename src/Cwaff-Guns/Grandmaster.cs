@@ -281,11 +281,6 @@ public abstract class ChessPiece : MonoBehaviour
             this._targetEnemy = null; // reset our target and march onward
         }
 
-        // Rook should march forward until an enemy is in its line of sight on one axis
-        List<AIActor> activeEnemies = this._projectile.transform.position.GetAbsoluteRoom().GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
-        if (activeEnemies == null || activeEnemies.Count == 0)
-            return null;
-
         // Get our position and direction
         Vector2 ppos = this._projectile.sprite.WorldCenter;
 
@@ -293,7 +288,7 @@ public abstract class ChessPiece : MonoBehaviour
         Vector2? closestViableEnemyPosition = null;
         float closestEnemyDistance = 999999f;
         // float closestOrthoDistance = 999999f;
-        foreach (AIActor enemy in activeEnemies)
+        foreach (AIActor enemy in this._projectile.transform.position.GetAbsoluteRoom()?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All).EmptyIfNull())
         {
             if (!enemy.IsNormalEnemy || !enemy.healthHaver || enemy.IsHarmlessEnemy)
                 continue; // we only care about normal, alive, hostile enemies
