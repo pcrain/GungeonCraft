@@ -11,7 +11,7 @@ public class PaintballCannon : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<PaintballCannon>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 0.9f, ammo: 600);
+            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 0.9f, ammo: 600);
             gun.SetAnimationFPS(gun.shootAnimation, 14);
             gun.SetAnimationFPS(gun.reloadAnimation, 4);
             gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
@@ -21,8 +21,8 @@ public class PaintballCannon : AdvancedGunBehavior
 
         ProjectileModule mod = gun.DefaultModule;
             mod.ammoCost               = 1;
-            mod.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
-            mod.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
+            mod.shootStyle             = ShootStyle.SemiAutomatic;
+            mod.sequenceStyle          = ProjectileSequenceStyle.Random;
             mod.cooldownTime           = 0.18f;
             mod.numberOfShotsInClip    = 12;
 

@@ -126,7 +126,7 @@ class CwaffToolbox : MonoBehaviour
             sprite.depthUsesTrimmedBounds = true;
             sprite.PlaceAtPositionByAnchor(
                 enemy.sprite.transform.position,
-                sprite.FlipX ? tk2dBaseSprite.Anchor.LowerRight : tk2dBaseSprite.Anchor.LowerLeft);
+                sprite.FlipX ? Anchor.LowerRight : Anchor.LowerLeft);
             // sprite.allowDefaultLayer
         g.GetComponent<BraveBehaviour>().sprite = sprite;
 

@@ -17,7 +17,7 @@ public class ComfySlippers : PassiveItem
     public static void Init()
     {
         PickupObject item = Lazy.SetupPassive<ComfySlippers>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality      = PickupObject.ItemQuality.D;
+        item.quality      = ItemQuality.D;
         _ComfyBuffs       = new[]{
             new StatModifier {
                 amount      = _MOVEMENT_BOOST,

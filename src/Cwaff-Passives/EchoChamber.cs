@@ -13,10 +13,10 @@ public class EchoChamber : PassiveItem
     public static void Init()
     {
         PickupObject item  = Lazy.SetupPassive<EchoChamber>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality       = PickupObject.ItemQuality.C;
+        item.quality       = ItemQuality.C;
 
         _FlakProjectile = (ItemHelper.Get(Items.FlakBullets) as ComplexProjectileModifier).CollisionSpawnProjectile;
-        _EchoPrefab = VFX.RegisterVFXObject("Echo", ResMap.Get("echo_effect"), 16, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+        _EchoPrefab = VFX.RegisterVFXObject("Echo", ResMap.Get("echo_effect"), 16, loops: true, anchor: Anchor.MiddleCenter);
     }
 
     public override void Pickup(PlayerController player)

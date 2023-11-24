@@ -27,7 +27,7 @@ public class GungeonitePickaxe : PlayerItem
     public static void Init()
     {
         PlayerItem item = Lazy.SetupActive<GungeonitePickaxe>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality      = PickupObject.ItemQuality.D;
+        item.quality      = ItemQuality.D;
         item.consumable   = false;
         item.CanBeDropped = true;
         item.SetCooldownType(ItemBuilder.CooldownType.Timed, 0.5f);

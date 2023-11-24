@@ -21,7 +21,7 @@ public class StuntHelmet : PassiveItem
     public static void Init()
     {
         PickupObject item  = Lazy.SetupPassive<StuntHelmet>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality       = PickupObject.ItemQuality.C;
+        item.quality       = ItemQuality.C;
 
         _StuntStats = new StatModifier {
             amount      = _DAMAGE_ADD,

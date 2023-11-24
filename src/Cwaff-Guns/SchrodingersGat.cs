@@ -20,14 +20,14 @@ public class SchrodingersGat : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<SchrodingersGat>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.A, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f, ammo: 250);
+            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f, ammo: 250);
             gun.SetAnimationFPS(gun.idleAnimation, 24);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
 
         ProjectileModule mod = gun.DefaultModule;
             mod.ammoCost            = 1;
-            mod.shootStyle          = ProjectileModule.ShootStyle.Automatic;
-            mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+            mod.shootStyle          = ShootStyle.Automatic;
+            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
             mod.angleVariance       = 15.0f;
             mod.cooldownTime        = 0.125f;
             mod.numberOfShotsInClip = -1;
@@ -36,7 +36,7 @@ public class SchrodingersGat : AdvancedGunBehavior
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("schrodingers_gat_projectile").Base(),
             12, true, new IntVector2(8, 7),
-            false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
+            false, Anchor.MiddleCenter, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
             projectile.AddDefaultAnimation(_BulletSprite);

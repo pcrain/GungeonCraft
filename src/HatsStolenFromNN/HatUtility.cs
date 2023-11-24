@@ -67,7 +67,7 @@ public class HatUtility
                 new Vector3(0f, 0f, 0f),
                 new Vector3((hatSize.x / 16), (hatSize.y / 16), 0f)
             };
-            hatBaseSprite.PlaceAtPositionByAnchor(hatObj.transform.position, tk2dBaseSprite.Anchor.LowerCenter);
+            hatBaseSprite.PlaceAtPositionByAnchor(hatObj.transform.position, Anchor.LowerCenter);
             hatBaseSprite.depthUsesTrimmedBounds = true;
             hatBaseSprite.IsPerpendicular = true;
             hatBaseSprite.UpdateZDepth();
@@ -154,7 +154,7 @@ public class HatUtility
                     int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
                     tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
                     frameDef.colliderVertices = def.colliderVertices;
-                    frameDef.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.LowerCenter);
+                    frameDef.ConstructOffsetsFromAnchor(Anchor.LowerCenter);
                     frames.Add(new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = collection });
                 }
                 clip.frames = frames.ToArray();
@@ -172,7 +172,7 @@ public class HatUtility
                     int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
                     tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
                     frameDef.colliderVertices = def.colliderVertices;
-                    frameDef.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.LowerCenter);
+                    frameDef.ConstructOffsetsFromAnchor(Anchor.LowerCenter);
                     frames.Add(new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = collection });
                 }
                 clip.frames = frames.ToArray();
@@ -190,7 +190,7 @@ public class HatUtility
                     int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
                     tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
                     frameDef.colliderVertices = def.colliderVertices;
-                    frameDef.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.LowerCenter);
+                    frameDef.ConstructOffsetsFromAnchor(Anchor.LowerCenter);
                     frames.Add(new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = collection });
                 }
                 clip.frames = frames.ToArray();
@@ -208,7 +208,7 @@ public class HatUtility
                     int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
                     tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
                     frameDef.colliderVertices = def.colliderVertices;
-                    frameDef.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.LowerCenter);
+                    frameDef.ConstructOffsetsFromAnchor(Anchor.LowerCenter);
                     frames.Add(new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = collection });
                 }
                 clip.frames = frames.ToArray();
@@ -226,7 +226,7 @@ public class HatUtility
                     int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
                     tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
                     frameDef.colliderVertices = def.colliderVertices;
-                    frameDef.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.LowerCenter);
+                    frameDef.ConstructOffsetsFromAnchor(Anchor.LowerCenter);
                     frames.Add(new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = collection });
                 }
                 clip.frames = frames.ToArray();
@@ -244,7 +244,7 @@ public class HatUtility
                     int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
                     tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
                     frameDef.colliderVertices = def.colliderVertices;
-                    frameDef.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.LowerCenter);
+                    frameDef.ConstructOffsetsFromAnchor(Anchor.LowerCenter);
                     frames.Add(new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = collection });
                 }
                 clip.frames = frames.ToArray();
@@ -262,7 +262,7 @@ public class HatUtility
                     int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
                     tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
                     frameDef.colliderVertices = def.colliderVertices;
-                    frameDef.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.LowerCenter);
+                    frameDef.ConstructOffsetsFromAnchor(Anchor.LowerCenter);
                     frames.Add(new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = collection });
                 }
                 clip.frames = frames.ToArray();
@@ -280,7 +280,7 @@ public class HatUtility
                     int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
                     tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
                     frameDef.colliderVertices = def.colliderVertices;
-                    frameDef.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.LowerCenter);
+                    frameDef.ConstructOffsetsFromAnchor(Anchor.LowerCenter);
                     frames.Add(new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = collection });
                 }
                 clip.frames = frames.ToArray();

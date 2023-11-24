@@ -18,7 +18,7 @@ public class Blackjack : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Blackjack>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.8f, ammo: _DECK_SIZE * _NUM_DECKS, canGainAmmo: false);
+            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.8f, ammo: _DECK_SIZE * _NUM_DECKS, canGainAmmo: false);
             gun.SetAnimationFPS(gun.shootAnimation, 30);
             gun.SetAnimationFPS(gun.reloadAnimation, 30);
             gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
@@ -27,8 +27,8 @@ public class Blackjack : AdvancedGunBehavior
 
         ProjectileModule mod = gun.DefaultModule;
             mod.ammoCost            = 1;
-            mod.shootStyle          = ProjectileModule.ShootStyle.Automatic;
-            mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+            mod.shootStyle          = ShootStyle.Automatic;
+            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
             mod.angleVariance       = 24.0f;
             mod.cooldownTime        = 0.16f;
             mod.numberOfShotsInClip = _CLIP_SIZE;
@@ -37,12 +37,12 @@ public class Blackjack : AdvancedGunBehavior
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("playing_card").Base(),
             0, true, new IntVector2(12, 8),
-            false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
+            false, Anchor.MiddleLeft, true, true);
 
         _BackSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("playing_card_back").Base(),
             0, true, new IntVector2(12, 8),
-            false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
+            false, Anchor.MiddleLeft, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
             projectile.AddDefaultAnimation(_BulletSprite);

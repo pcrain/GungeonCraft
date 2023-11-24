@@ -459,11 +459,11 @@ public static class Extensions
   {
     switch (pickup.quality)
     {
-      case PickupObject.ItemQuality.S: return 5;
-      case PickupObject.ItemQuality.A: return 4;
-      case PickupObject.ItemQuality.B: return 3;
-      case PickupObject.ItemQuality.C: return 2;
-      case PickupObject.ItemQuality.D: return 1;
+      case ItemQuality.S: return 5;
+      case ItemQuality.A: return 4;
+      case ItemQuality.B: return 3;
+      case ItemQuality.C: return 2;
+      case ItemQuality.D: return 1;
       default:                         return 0;
     }
   }
@@ -600,7 +600,7 @@ public static class Extensions
     gun.SetGunAudio(name: gun.idleAnimation, audio: audio, frame: frame);
   }
 
-  public static void SetMuzzleVFX(this Gun gun, string resPath, float fps = 60, bool loops = false, float scale = 1.0f, tk2dBaseSprite.Anchor anchor = tk2dBaseSprite.Anchor.MiddleLeft, bool orphaned = false, float emissivePower = -1)
+  public static void SetMuzzleVFX(this Gun gun, string resPath, float fps = 60, bool loops = false, float scale = 1.0f, Anchor anchor = Anchor.MiddleLeft, bool orphaned = false, float emissivePower = -1)
   {
     gun.muzzleFlashEffects = VFX.RegisterVFXPool($"{gun.itemName}_MuzzleVFX", ResMap.Get(resPath), fps: fps,
       loops: loops, scale: scale, anchor: anchor, alignment: VFXAlignment.Fixed, orphaned: orphaned, attached: true, emissivePower: emissivePower);
@@ -712,7 +712,7 @@ public static class Extensions
   }
 
   // Set some basic attributes for each gun
-  public static void SetAttributes(this Gun gun, PickupObject.ItemQuality quality, GunClass gunClass, float reloadTime, int ammo,
+  public static void SetAttributes(this Gun gun, ItemQuality quality, GunClass gunClass, float reloadTime, int ammo,
     Items audioFrom = Items.Blasphemy, bool defaultAudio = false, bool infiniteAmmo = false, bool canGainAmmo = true, bool canReloadNoMatterAmmo = false)
   {
     gun.quality = quality;
@@ -780,7 +780,7 @@ public static class Extensions
   }
 
   // Same as PlaceAtPositionByAnchor(), but adjusted for sprite's current scale
-  public static void PlaceAtScaledPositionByAnchor(this tk2dBaseSprite sprite, Vector3 position, tk2dBaseSprite.Anchor anchor)
+  public static void PlaceAtScaledPositionByAnchor(this tk2dBaseSprite sprite, Vector3 position, Anchor anchor)
   {
       Vector2 scale = sprite.transform.localScale.XY();
       Vector2 anchorPos = sprite.GetRelativePositionFromAnchor(anchor);
@@ -790,7 +790,7 @@ public static class Extensions
   }
 
   // Same as PlaceAtPositionByAnchor(), but adjusted for sprite's current scale and rotation
-  public static void PlaceAtRotatedPositionByAnchor(this tk2dBaseSprite sprite, Vector3 position, tk2dBaseSprite.Anchor anchor)
+  public static void PlaceAtRotatedPositionByAnchor(this tk2dBaseSprite sprite, Vector3 position, Anchor anchor)
   {
       Vector2 scale = sprite.transform.localScale.XY();
       Vector2 anchorPos = sprite.GetRelativePositionFromAnchor(anchor);

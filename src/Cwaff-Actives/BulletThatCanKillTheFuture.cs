@@ -23,7 +23,7 @@ public class BulletThatCanKillTheFuture : PlayerItem
     public static void Init()
     {
         PlayerItem item   = Lazy.SetupActive<BulletThatCanKillTheFuture>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality      = PickupObject.ItemQuality.SPECIAL;
+        item.quality      = ItemQuality.SPECIAL;
         item.consumable   = true;
         item.CanBeDropped = true;
 

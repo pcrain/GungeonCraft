@@ -17,7 +17,7 @@ public class SeltzerPelter : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<SeltzerPelter>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.0f, ammo: 150);
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.0f, ammo: 150);
             gun.SetAnimationFPS(gun.shootAnimation, 36);
             gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
             _ReloadAnimations = new(){
@@ -40,8 +40,8 @@ public class SeltzerPelter : AdvancedGunBehavior
 
         ProjectileModule mod = gun.DefaultModule;
             mod.ammoCost            = 1;
-            mod.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
-            mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+            mod.shootStyle          = ShootStyle.SemiAutomatic;
+            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
             mod.cooldownTime        = 0.5f;
             mod.numberOfShotsInClip = 1;
             mod.SetupCustomAmmoClip(SpriteName);
@@ -49,7 +49,7 @@ public class SeltzerPelter : AdvancedGunBehavior
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("can_projectile").Base(),
             1, true, new IntVector2(16, 12), // 1 FPS minimum, stop animator manually later
-            false, tk2dBaseSprite.Anchor.MiddleCenter,
+            false, Anchor.MiddleCenter,
             anchorsChangeColliders: false/*true*/,
             fixesScales: true,
             overrideColliderPixelSize: new IntVector2(2, 2) // prevent uneven colliders from glitching into walls

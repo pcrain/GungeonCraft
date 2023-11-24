@@ -19,9 +19,9 @@ public class LastResort : AdvancedGunBehavior
         Gun gun = Lazy.SetupGun<LastResort>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
 
         gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
-        gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.Automatic;
-        gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
-        gun.quality                           = PickupObject.ItemQuality.C;
+        gun.DefaultModule.shootStyle          = ShootStyle.Automatic;
+        gun.DefaultModule.sequenceStyle       = ProjectileSequenceStyle.Random;
+        gun.quality                           = ItemQuality.C;
         gun.DefaultModule.ammoCost            = 1;
         gun.SetBaseMaxAmmo(300);
         gun.SetAnimationFPS(gun.shootAnimation, 24);
@@ -51,7 +51,7 @@ public class LastResort : AdvancedGunBehavior
         VFX.RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/PumpChargeMeter4");
         VFX.RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/PumpChargeMeter5");
         VFX.RegisterVFX(_PumpChargeAnimationName, ResMap.Get("PumpChargeMeter"),
-            fps: 4, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter);
+            fps: 4, loops: true, anchor: Anchor.LowerCenter);
 
         // 1+ guns without ammo (scale stats from last projectile)
         for(int i = 1; i < 5; ++i)

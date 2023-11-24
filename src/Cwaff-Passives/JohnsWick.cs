@@ -19,7 +19,7 @@ public class JohnsWick : PassiveItem
     public static void Init()
     {
         PickupObject item  = Lazy.SetupPassive<JohnsWick>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality       = PickupObject.ItemQuality.C;
+        item.quality       = ItemQuality.C;
     }
 
     private void OnFirstPickup()

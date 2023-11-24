@@ -18,16 +18,16 @@ public class Natascha : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Natascha>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.D, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 2500);
+            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 2500);
             gun.SetAnimationFPS(gun.shootAnimation, (int)((float)_FireAnimationFrames / _BaseCooldownTime) + 1);
-            gun.SetMuzzleVFX("muzzle_natascha", fps: 60, scale: 0.3f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+            gun.SetMuzzleVFX("muzzle_natascha", fps: 60, scale: 0.3f, anchor: Anchor.MiddleCenter);
             gun.AddToSubShop(ItemBuilder.ShopType.Trorc);
             gun.AddToSubShop(ModdedShopType.Rusty);
 
         ProjectileModule mod = gun.DefaultModule;
             mod.ammoCost            = 1;
-            mod.shootStyle          = ProjectileModule.ShootStyle.Automatic;
-            mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+            mod.shootStyle          = ShootStyle.Automatic;
+            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
             mod.angleVariance       = 15.0f;
             mod.cooldownTime        = _BaseCooldownTime;
             mod.numberOfShotsInClip = -1;
@@ -35,7 +35,7 @@ public class Natascha : AdvancedGunBehavior
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("natascha_bullet").Base(),
             12, true, new IntVector2((int)(_NATASHA_PROJECTILE_SCALE * 15), (int)(_NATASHA_PROJECTILE_SCALE * 7)),
-            false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
+            false, Anchor.MiddleCenter, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
             projectile.AddDefaultAnimation(_BulletSprite);

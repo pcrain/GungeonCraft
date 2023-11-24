@@ -15,7 +15,7 @@ public class PlotArmor : PassiveItem
     public static void Init()
     {
         PickupObject item = Lazy.SetupPassive<PlotArmor>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality      = PickupObject.ItemQuality.A;
+        item.quality      = ItemQuality.A;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
         item.AddToSubShop(ModdedShopType.Ironside);
     }

@@ -14,7 +14,7 @@ public class Tranquilizer : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Tranquilizer>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.D, gunClass: GunClass.POISON, reloadTime: 1.2f, ammo: 80);
+            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.POISON, reloadTime: 1.2f, ammo: 80);
             gun.SetAnimationFPS(gun.shootAnimation, 30);
             gun.SetAnimationFPS(gun.reloadAnimation, 40);
             gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
@@ -23,8 +23,8 @@ public class Tranquilizer : AdvancedGunBehavior
 
         ProjectileModule mod = gun.DefaultModule;
             mod.ammoCost            = 1;
-            mod.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
-            mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+            mod.shootStyle          = ShootStyle.SemiAutomatic;
+            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
             mod.cooldownTime        = 0.1f;
             mod.numberOfShotsInClip = 1;
             mod.SetupCustomAmmoClip(SpriteName);
@@ -32,7 +32,7 @@ public class Tranquilizer : AdvancedGunBehavior
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("tranquilizer_projectile").Base(),
             12, true, new IntVector2(10, 3),
-            false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
+            false, Anchor.MiddleLeft, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
             projectile.AddDefaultAnimation(_BulletSprite);
@@ -40,7 +40,7 @@ public class Tranquilizer : AdvancedGunBehavior
             projectile.gameObject.AddComponent<TranquilizerBehavior>();
 
         _DrowsyVFX = VFX.RegisterVFXObject("DrowsyParticle", ResMap.Get("drowsy_cloud"),
-            fps: 6, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);
+            fps: 6, loops: true, anchor: Anchor.MiddleCenter, scale: 0.5f);
     }
 
 }

@@ -125,7 +125,7 @@ public partial class SansBoss : AIActor
         Lazy.SpawnChestWithSpecificItem(
           pickup: ItemHelper.Get((Items)GasterBlaster.ID),
           position: GameManager.Instance.PrimaryPlayer.CurrentRoom.GetCenteredVisibleClearSpot(2, 2, out success),
-          overrideChestQuality: PickupObject.ItemQuality.S);
+          overrideChestQuality: ItemQuality.S);
         // GameManager.Instance.RewardManager.SpawnTotallyRandomChest(GameManager.Instance.PrimaryPlayer.CurrentRoom.GetRandomVisibleClearSpot(1, 1)).IsLocked = false;
       };
     }

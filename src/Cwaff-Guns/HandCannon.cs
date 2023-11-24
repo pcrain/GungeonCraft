@@ -18,12 +18,12 @@ public class HandCannon : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<HandCannon>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 0.75f, ammo: 100);
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 0.75f, ammo: 100);
             gun.SetAnimationFPS(gun.shootAnimation, 30);
             gun.SetAnimationFPS(gun.reloadAnimation, (int)(gun.spriteAnimator.GetClipByName(gun.reloadAnimation).frames.Length / gun.reloadTime));
             gun.SetAnimationFPS(gun.chargeAnimation, (int)((1.0f / _CHARGE_TIME) * _CHARGE_LOOP_FRAME));
             gun.LoopAnimation(gun.chargeAnimation, _CHARGE_LOOP_FRAME);
-            gun.SetMuzzleVFX("muzzle_hand_cannon", fps: 30, scale: 0.5f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+            gun.SetMuzzleVFX("muzzle_hand_cannon", fps: 30, scale: 0.5f, anchor: Anchor.MiddleCenter);
             gun.SetFireAudio("hand_cannon_shoot_sound");
             gun.SetReloadAudio("hand_cannon_reload_sound");
             gun.SetChargeAudio("hand_cannon_charge_sound", frame: 0);
@@ -31,8 +31,8 @@ public class HandCannon : AdvancedGunBehavior
 
         ProjectileModule mod = gun.DefaultModule;
             mod.ammoCost            = 1;
-            mod.shootStyle          = ProjectileModule.ShootStyle.Charged;
-            mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+            mod.shootStyle          = ShootStyle.Charged;
+            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
             mod.angleVariance       = 15.0f;
             mod.cooldownTime        = 0.1f;
             mod.numberOfShotsInClip = 2;
@@ -41,7 +41,7 @@ public class HandCannon : AdvancedGunBehavior
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("slappp").Base(),
             30, true, new IntVector2(46, 70), // 0.5x scale
-            false, tk2dBaseSprite.Anchor.MiddleCenter, true, true,
+            false, Anchor.MiddleCenter, true, true,
             overrideColliderPixelSize: new IntVector2(8,8) // small collider near the center of the sprite
             );
 
@@ -61,7 +61,7 @@ public class HandCannon : AdvancedGunBehavior
         };
 
         _SlapppAnimation = VFX.RegisterVFXObject(
-            "Slappp", ResMap.Get("slappp"), fps: 30, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);
+            "Slappp", ResMap.Get("slappp"), fps: 30, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f);
     }
 }
 

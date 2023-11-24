@@ -15,7 +15,7 @@ public class DriftersHeadgear : PassiveItem
     public static void Init()
     {
         PickupObject item = Lazy.SetupPassive<DriftersHeadgear>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality      = PickupObject.ItemQuality.C;
+        item.quality      = ItemQuality.C;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
         _LinkVFXPrefab = FakePrefab.Clone(Game.Items["shock_rounds"].GetComponent<ComplexProjectileModifier>().ChainLightningVFX)

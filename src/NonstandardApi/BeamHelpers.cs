@@ -29,9 +29,9 @@ public static class BeamHelpers
                 new Vector3(convertedColliderX, convertedColliderY, 0f)
             };
 
-            def.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.MiddleLeft);
+            def.ConstructOffsetsFromAnchor(Anchor.MiddleLeft);
 
-            //tiledSprite.anchor = tk2dBaseSprite.Anchor.MiddleCenter;
+            //tiledSprite.anchor = Anchor.MiddleCenter;
             tk2dSpriteAnimator animator = projectile.gameObject.GetOrAddComponent<tk2dSpriteAnimator>();
             tk2dSpriteAnimation animation = projectile.gameObject.GetOrAddComponent<tk2dSpriteAnimation>();
             animation.clips = new tk2dSpriteAnimationClip[0];
@@ -53,7 +53,7 @@ public static class BeamHelpers
                     tk2dSpriteCollectionData collection = ETGMod.Databases.Items.ProjectileCollection;
                     int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
                     tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
-                    frameDef.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.MiddleLeft);
+                    frameDef.ConstructOffsetsFromAnchor(Anchor.MiddleLeft);
                     frameDef.colliderVertices = def.colliderVertices;
                     frames.Add(new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = collection });
                 }
@@ -77,14 +77,14 @@ public static class BeamHelpers
             //---------------Sets up the animaton for the VFX that plays over top of the end of the beam where it hits stuff
             if (impactVFXAnimationPaths != null && impactVFXColliderDimensions != null && impactVFXColliderOffsets != null)
             {
-                SetupBeamPart(animation, impactVFXAnimationPaths, "beam_impact", beamImpactFPS, (Vector2)impactVFXColliderDimensions, (Vector2)impactVFXColliderOffsets, anchorOverride: tk2dBaseSprite.Anchor.MiddleCenter);
+                SetupBeamPart(animation, impactVFXAnimationPaths, "beam_impact", beamImpactFPS, (Vector2)impactVFXColliderDimensions, (Vector2)impactVFXColliderOffsets, anchorOverride: Anchor.MiddleCenter);
                 beamController.impactAnimation = "beam_impact";
             }
 
             //--------------Sets up the animation for the very start of the beam
             if (muzzleVFXAnimationPaths != null && muzzleVFXColliderDimensions != null && muzzleVFXColliderOffsets != null)
             {
-                SetupBeamPart(animation, muzzleVFXAnimationPaths, "beam_start", beamMuzzleFPS, (Vector2)muzzleVFXColliderDimensions, (Vector2)muzzleVFXColliderOffsets, anchorOverride: tk2dBaseSprite.Anchor.MiddleCenter);
+                SetupBeamPart(animation, muzzleVFXAnimationPaths, "beam_start", beamMuzzleFPS, (Vector2)muzzleVFXColliderDimensions, (Vector2)muzzleVFXColliderOffsets, anchorOverride: Anchor.MiddleCenter);
                 beamController.beamStartAnimation = "beam_start";
             }
             else
@@ -154,7 +154,7 @@ public static class BeamHelpers
         }
 
     }
-    internal static void SetupBeamPart(tk2dSpriteAnimation beamAnimation, List<string> animSpritePaths, string animationName, int fps, Vector2? colliderDimensions = null, Vector2? colliderOffsets = null, Vector3[] overrideVertices = null, tk2dSpriteAnimationClip.WrapMode wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop, tk2dBaseSprite.Anchor? anchorOverride = null)
+    internal static void SetupBeamPart(tk2dSpriteAnimation beamAnimation, List<string> animSpritePaths, string animationName, int fps, Vector2? colliderDimensions = null, Vector2? colliderOffsets = null, Vector3[] overrideVertices = null, tk2dSpriteAnimationClip.WrapMode wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop, Anchor? anchorOverride = null)
     {
         tk2dSpriteAnimationClip clip = new tk2dSpriteAnimationClip() { name = animationName, frames = new tk2dSpriteAnimationFrame[0], fps = fps };
         List<string> spritePaths = animSpritePaths;
@@ -165,7 +165,7 @@ public static class BeamHelpers
             tk2dSpriteCollectionData collection = ETGMod.Databases.Items.ProjectileCollection;
             int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
             tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
-            frameDef.ConstructOffsetsFromAnchor(anchorOverride ?? tk2dBaseSprite.Anchor.MiddleLeft);
+            frameDef.ConstructOffsetsFromAnchor(anchorOverride ?? Anchor.MiddleLeft);
             if (overrideVertices != null)
             {
                 frameDef.colliderVertices = overrideVertices;

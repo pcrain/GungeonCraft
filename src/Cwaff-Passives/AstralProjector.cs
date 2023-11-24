@@ -24,7 +24,7 @@ public class AstralProjector : PassiveItem
     public static void Init()
     {
         PickupObject item  = Lazy.SetupPassive<AstralProjector>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality       = PickupObject.ItemQuality.A;
+        item.quality       = ItemQuality.A;
         item.AddToSubShop(ModdedShopType.TimeTrader);
 
         _AstralProjectorId   = item.PickupObjectId;

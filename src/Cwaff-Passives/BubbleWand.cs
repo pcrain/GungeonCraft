@@ -13,7 +13,7 @@ public class BubbleWand : PassiveItem
     public static void Init()
     {
         PickupObject item = Lazy.SetupPassive<BubbleWand>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality      = PickupObject.ItemQuality.B;
+        item.quality      = ItemQuality.B;
         item.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
         _BubbleWandId   = item.PickupObjectId;

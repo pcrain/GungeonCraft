@@ -13,7 +13,7 @@ public class RatPoison : PassiveItem
     public static void Init()
     {
         PickupObject item                  = Lazy.SetupPassive<RatPoison>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality                       = PickupObject.ItemQuality.C;
+        item.quality                       = ItemQuality.C;
         item.IgnoredByRat                  = true;
         item.ClearIgnoredByRatFlagOnPickup = false;
         item.AddToSubShop(ItemBuilder.ShopType.Cursula);

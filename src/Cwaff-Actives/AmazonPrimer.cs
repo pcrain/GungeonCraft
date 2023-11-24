@@ -12,11 +12,11 @@ public class AmazonPrimer : PlayerItem
     public static void Init()
     {
         PlayerItem item = Lazy.SetupActive<AmazonPrimer>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality      = PickupObject.ItemQuality.A;
+        item.quality      = ItemQuality.A;
         item.consumable   = true;
         item.CanBeDropped = true;
 
-        _PrimeLogo = VFX.RegisterVFXObject("PrimeLogo", ResMap.Get("prime_logo_overhead"), 2, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter, emissivePower: 100f);
+        _PrimeLogo = VFX.RegisterVFXObject("PrimeLogo", ResMap.Get("prime_logo_overhead"), 2, loops: true, anchor: Anchor.LowerCenter, emissivePower: 100f);
     }
 
     public override bool CanBeUsed(PlayerController user)

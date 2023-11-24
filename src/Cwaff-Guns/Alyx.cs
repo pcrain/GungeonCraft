@@ -26,23 +26,23 @@ public class Alyx : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Alyx>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.A, gunClass: GunClass.FULLAUTO, reloadTime: 0.5f, ammo: _BASE_MAX_AMMO);
+            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.FULLAUTO, reloadTime: 0.5f, ammo: _BASE_MAX_AMMO);
             gun.SetAnimationFPS(gun.reloadAnimation, 20);
             gun.SetAnimationFPS(gun.shootAnimation, 20);
-            gun.SetMuzzleVFX("muzzle_alyx", fps: 30, scale: 0.5f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+            gun.SetMuzzleVFX("muzzle_alyx", fps: 30, scale: 0.5f, anchor: Anchor.MiddleCenter);
             gun.SetReloadAudio("alyx_reload_sound");
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
         ProjectileModule mod = gun.DefaultModule;
-            mod.shootStyle          = ProjectileModule.ShootStyle.Automatic;
-            mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+            mod.shootStyle          = ShootStyle.Automatic;
+            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
             mod.numberOfShotsInClip = 10;
             mod.SetupCustomAmmoClip(SpriteName);
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("alyx_projectile").Base(),
             16, true, new IntVector2(9, 9),
-            false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
+            false, Anchor.MiddleCenter, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
             projectile.AddDefaultAnimation(_BulletSprite);

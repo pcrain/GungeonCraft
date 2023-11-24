@@ -16,13 +16,13 @@ public class GamblersFallacy : AdvancedGunBehavior
 
         gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
         gun.DefaultModule.ammoCost            = 1;
-        gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.Automatic;
-        gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+        gun.DefaultModule.shootStyle          = ShootStyle.Automatic;
+        gun.DefaultModule.sequenceStyle       = ProjectileSequenceStyle.Random;
         gun.reloadTime                        = 1.1f;
         gun.DefaultModule.angleVariance       = 15.0f;
         gun.DefaultModule.cooldownTime        = 0.4f;
         gun.DefaultModule.numberOfShotsInClip = 8;
-        gun.quality                           = PickupObject.ItemQuality.D;
+        gun.quality                           = ItemQuality.D;
         gun.InfiniteAmmo                      = true;
         gun.SetBaseMaxAmmo(800);
         gun.SetAnimationFPS(gun.shootAnimation, 24);

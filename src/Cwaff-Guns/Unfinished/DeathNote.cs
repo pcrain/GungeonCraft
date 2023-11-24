@@ -16,12 +16,12 @@ public class DeathNote : AdvancedGunBehavior
         Gun gun = Lazy.SetupGun<DeathNote>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
             gun.DefaultModule.ammoCost            = 1;
-            gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.Automatic;
-            gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+            gun.DefaultModule.shootStyle          = ShootStyle.Automatic;
+            gun.DefaultModule.sequenceStyle       = ProjectileSequenceStyle.Random;
             gun.reloadTime                        = 1.1f;
             gun.InfiniteAmmo                      = true;
             gun.DefaultModule.angleVariance       = 15.0f;
-            gun.quality                           = PickupObject.ItemQuality.D;
+            gun.quality                           = ItemQuality.D;
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
     }

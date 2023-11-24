@@ -16,18 +16,18 @@ public class IronMaid : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<IronMaid>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 0.75f, ammo: 400);
+            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 0.75f, ammo: 400);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
             gun.SetAnimationFPS(gun.reloadAnimation, 24);
-            gun.SetMuzzleVFX("muzzle_iron_maid", fps: 30, scale: 0.5f, anchor: tk2dBaseSprite.Anchor.MiddleLeft);
+            gun.SetMuzzleVFX("muzzle_iron_maid", fps: 30, scale: 0.5f, anchor: Anchor.MiddleLeft);
             gun.SetFireAudio("knife_gun_launch");
             gun.SetReloadAudio("knife_gun_reload");
             gun.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
         ProjectileModule mod = gun.DefaultModule;
             mod.ammoCost               = 1;
-            mod.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
-            mod.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
+            mod.shootStyle             = ShootStyle.SemiAutomatic;
+            mod.sequenceStyle          = ProjectileSequenceStyle.Random;
             mod.cooldownTime           = 0.1f;
             mod.numberOfShotsInClip    = 20;
             mod.SetupCustomAmmoClip(SpriteName);
@@ -35,7 +35,7 @@ public class IronMaid : AdvancedGunBehavior
         _KunaiSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("kunai").Base(),
             12, true, new IntVector2(16, 10),
-            false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
+            false, Anchor.MiddleCenter, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
             projectile.baseData.damage  = 5f;

@@ -20,13 +20,13 @@ public class Taomislav : AdvancedGunBehavior
         Gun gun = Lazy.SetupGun<Taomislav>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
             gun.DefaultModule.ammoCost            = 1;
-            gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.Automatic;
-            gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Ordered;
+            gun.DefaultModule.shootStyle          = ShootStyle.Automatic;
+            gun.DefaultModule.sequenceStyle       = ProjectileSequenceStyle.Ordered;
             gun.reloadTime                        = 1.1f;
             gun.DefaultModule.angleVariance       = 15.0f;
             gun.DefaultModule.cooldownTime        = _BaseCooldownTime;
             gun.DefaultModule.numberOfShotsInClip = -1;
-            gun.quality                           = PickupObject.ItemQuality.D;
+            gun.quality                           = ItemQuality.D;
             gun.SetBaseMaxAmmo(2500);
             gun.CurrentAmmo = 2500;
             gun.SetAnimationFPS(gun.shootAnimation, (int)((float)_FireAnimationFrames / _BaseCooldownTime) + 1);
@@ -34,7 +34,7 @@ public class Taomislav : AdvancedGunBehavior
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("natascha_bullet").Base(),
             12, true, new IntVector2((int)(_NATASHA_PROJECTILE_SCALE * 15), (int)(_NATASHA_PROJECTILE_SCALE * 7)),
-            false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
+            false, Anchor.MiddleCenter, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
             projectile.AddAnimation(_BulletSprite);

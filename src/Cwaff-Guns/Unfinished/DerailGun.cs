@@ -27,9 +27,9 @@ public class DerailGun : AdvancedGunBehavior
         gun.isAudioLoop                          = true;
         gun.doesScreenShake                      = false;
         gun.DefaultModule.ammoCost               = 1;
-        // gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.Beam;
-        gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
-        gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
+        // gun.DefaultModule.shootStyle             = ShootStyle.Beam;
+        gun.DefaultModule.shootStyle             = ShootStyle.SemiAutomatic;
+        gun.DefaultModule.sequenceStyle          = ProjectileSequenceStyle.Random;
         gun.reloadTime                           = 1f;
         gun.muzzleFlashEffects.type              = VFXPoolType.None;
         gun.DefaultModule.cooldownTime           = 0.5f;
@@ -37,7 +37,7 @@ public class DerailGun : AdvancedGunBehavior
         // gun.DefaultModule.ammoType               = GameUIAmmoType.AmmoType.BEAM;
         gun.DefaultModule.ammoType               = GameUIAmmoType.AmmoType.MEDIUM_BULLET;
         gun.ammo                                 = 600;
-        gun.quality                              = PickupObject.ItemQuality.A;
+        gun.quality                              = ItemQuality.A;
         // gun.gunClass                             = GunClass.BEAM;
         gun.gunClass                             = GunClass.SILLY;
         gun.SetBaseMaxAmmo(600);
@@ -106,11 +106,11 @@ public class DerailGun : AdvancedGunBehavior
         railBeam = projectile2;
 
         Projectile train = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items._38Special) as Gun, false); //id 56 == 38 special
-        // train.SetProjectileSpriteRight("train_projectile_001", trainSpriteDiameter, trainSpriteDiameter, true, tk2dBaseSprite.Anchor.MiddleCenter, 20, 20);
+        // train.SetProjectileSpriteRight("train_projectile_001", trainSpriteDiameter, trainSpriteDiameter, true, Anchor.MiddleCenter, 20, 20);
         train.AnimateProjectile(
             ResMap.Get("train_projectile").Base(),
             6, true, new IntVector2(trainSpriteDiameter, trainSpriteDiameter),
-            false, tk2dBaseSprite.Anchor.LowerCenter, true, false);
+            false, Anchor.LowerCenter, true, false);
         train.PenetratesInternalWalls = true;
         train.pierceMinorBreakables   = true;
         trainProjectile               = train;

@@ -12,7 +12,7 @@ public class GunPowderer : PlayerItem
     public static void Init()
     {
         PlayerItem item = Lazy.SetupActive<GunPowderer>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality      = PickupObject.ItemQuality.A;
+        item.quality      = ItemQuality.A;
         item.consumable   = false;
         item.CanBeDropped = true;
         item.SetCooldownType(ItemBuilder.CooldownType.Timed, 2f);

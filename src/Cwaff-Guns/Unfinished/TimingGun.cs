@@ -23,9 +23,9 @@ public class TimingGun : AdvancedGunBehavior
         Gun gun = Lazy.SetupGun<TimingGun>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
 
         gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
-        gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.Automatic;
-        gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
-        gun.quality                           = PickupObject.ItemQuality.C;
+        gun.DefaultModule.shootStyle          = ShootStyle.Automatic;
+        gun.DefaultModule.sequenceStyle       = ProjectileSequenceStyle.Random;
+        gun.quality                           = ItemQuality.C;
         gun.DefaultModule.ammoCost            = 1;
         gun.SetBaseMaxAmmo(300);
         gun.SetAnimationFPS(gun.shootAnimation, 24);
@@ -56,7 +56,7 @@ public class TimingGun : AdvancedGunBehavior
             string istring = i.ToString();
             VFX.RegisterVFX(istring, new List<string>() {
                     "CwaffingTheGungy/Resources/MiscVFX/Numbers/"+istring,
-                }, 1, loops: false, anchor: tk2dBaseSprite.Anchor.LowerCenter, persist: true);
+                }, 1, loops: false, anchor: Anchor.LowerCenter, persist: true);
         }
 
         // 1+ guns without ammo (scale stats from last projectile)

@@ -40,6 +40,10 @@ global using ResourceExtractor = Alexandria.ItemAPI.ResourceExtractor;
 global using Component         = UnityEngine.Component;
 global using ShopAPI           = Alexandria.NPCAPI.ShopAPI;
 
+global using static ProjectileModule; //ShootStyle, ProjectileSequenceStyle
+global using static tk2dBaseSprite;   //Anchor
+global using static PickupObject;     //ItemQuality
+
 namespace CwaffingTheGungy;
 
 [BepInPlugin(GUID, "Cwaffing the Gungy", C.MOD_VERSION)]

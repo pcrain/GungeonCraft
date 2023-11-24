@@ -13,13 +13,13 @@ public class MasterSword : AdvancedGunBehavior
         Gun gun = Lazy.SetupGun<MasterSword>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
 
         gun.DefaultModule.ammoCost               = 1;
-        gun.DefaultModule.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
-        gun.DefaultModule.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
+        gun.DefaultModule.shootStyle             = ShootStyle.SemiAutomatic;
+        gun.DefaultModule.sequenceStyle          = ProjectileSequenceStyle.Random;
         gun.reloadTime                           = 1.05f;
         gun.DefaultModule.cooldownTime           = 0.3f;
         gun.muzzleFlashEffects.type              = VFXPoolType.None;
         gun.DefaultModule.numberOfShotsInClip    = 5;
-        gun.quality                              = PickupObject.ItemQuality.D;
+        gun.quality                              = ItemQuality.D;
         gun.gunClass                             = GunClass.SILLY;
         gun.DefaultModule.ammoType               = GameUIAmmoType.AmmoType.BEAM;
         gun.gunSwitchGroup                       = (ItemHelper.Get(Items.Blasphemy) as Gun).gunSwitchGroup;

@@ -27,12 +27,12 @@ public class SpinCycle : AdvancedGunBehavior
         Gun gun = Lazy.SetupGun<SpinCycle>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
             gun.DefaultModule.ammoCost            = 1;
-            gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
-            gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+            gun.DefaultModule.shootStyle          = ShootStyle.SemiAutomatic;
+            gun.DefaultModule.sequenceStyle       = ProjectileSequenceStyle.Random;
             gun.reloadTime                        = 5f;
             gun.DefaultModule.angleVariance       = 0f;
             gun.DefaultModule.numberOfShotsInClip = 1;
-            gun.quality                           = PickupObject.ItemQuality.A;
+            gun.quality                           = ItemQuality.A;
             gun.InfiniteAmmo                      = true;
             gun.SetAnimationFPS(gun.shootAnimation, 0);
 

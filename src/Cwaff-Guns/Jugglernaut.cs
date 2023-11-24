@@ -34,7 +34,7 @@ public class Jugglernaut : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Jugglernaut>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 150/*, defaultAudio: true*/);
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 150/*, defaultAudio: true*/);
             gun.SetAnimationFPS(gun.shootAnimation, 30);
             gun.SetAnimationFPS(gun.reloadAnimation, 40);
             _JuggleAnimations = new(){
@@ -46,7 +46,7 @@ public class Jugglernaut : AdvancedGunBehavior
                 gun.UpdateAnimation("6_gun", returnToIdle: false),
             };
             gun.muzzleFlashEffects              = null;
-            // gun.SetMuzzleVFX("muzzle_jugglernaut", fps: 10, scale: 0.2f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+            // gun.SetMuzzleVFX("muzzle_jugglernaut", fps: 10, scale: 0.2f, anchor: Anchor.MiddleCenter);
             // Manual adjustments to prevent wonky firing animations
             gun.preventRotation                 = true;
             gun.barrelOffset.transform.position = new Vector3(0.75f, 0.75f, 0f);
@@ -98,8 +98,8 @@ public class Jugglernaut : AdvancedGunBehavior
 
         ProjectileModule mod = gun.DefaultModule;
             mod.ammoCost            = 1;
-            mod.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
-            mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+            mod.shootStyle          = ShootStyle.SemiAutomatic;
+            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
             mod.cooldownTime        = 1.0f;
             mod.numberOfShotsInClip = -1;
 
@@ -108,7 +108,7 @@ public class Jugglernaut : AdvancedGunBehavior
                 ResMap.Get("jugglernaut_ball").Base(),
                 // ResMap.Get("jugglernaut_projectile").Base(),
                 12, true, new IntVector2(8, 8),
-                false, tk2dBaseSprite.Anchor.MiddleLeft, true, true));
+                false, Anchor.MiddleLeft, true, true));
             projectile.transform.parent = gun.barrelOffset;
             projectile.baseData.speed   = 70f;
             projectile.baseData.damage  = 10f;

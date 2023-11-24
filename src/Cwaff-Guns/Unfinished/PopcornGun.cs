@@ -16,12 +16,12 @@ public class PopcornGun : AdvancedGunBehavior
 
         gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
         gun.DefaultModule.ammoCost            = 1;
-        gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
-        gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+        gun.DefaultModule.shootStyle          = ShootStyle.SemiAutomatic;
+        gun.DefaultModule.sequenceStyle       = ProjectileSequenceStyle.Random;
         gun.reloadTime                        = 1.1f;
         gun.DefaultModule.cooldownTime        = 0.1f;
         gun.DefaultModule.numberOfShotsInClip = 20;
-        gun.quality                           = PickupObject.ItemQuality.D;
+        gun.quality                           = ItemQuality.D;
         gun.SetBaseMaxAmmo(250);
         gun.SetAnimationFPS(gun.shootAnimation, 24);
 

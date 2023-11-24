@@ -28,13 +28,13 @@ public class WarriorsGi : PassiveItem
     public static void Init()
     {
         PickupObject item = Lazy.SetupPassive<WarriorsGi>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality      = PickupObject.ItemQuality.B;
+        item.quality      = ItemQuality.B;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
         _SaiyanSpark = VFX.RegisterVFXObject("SaiyanSpark", ResMap.Get("saiyan_spark"),
-            fps: 12, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);
+            fps: 12, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f);
         _ZenkaiAura  = VFX.RegisterVFXObject("ZenkaiAura", ResMap.Get("zenkai_aura"),
-            fps: 12, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.4f, emissivePower: 5f, emissiveColour: Color.yellow);
+            fps: 12, loops: true, anchor: Anchor.LowerCenter, scale: 0.4f, emissivePower: 5f, emissiveColour: Color.yellow);
     }
 
     public override void Pickup(PlayerController player)

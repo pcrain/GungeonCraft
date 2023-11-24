@@ -16,17 +16,17 @@ public class QuarterPounder : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<QuarterPounder>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.C, gunClass: GunClass.RIFLE, reloadTime: 1.1f, ammo: 9999, canGainAmmo: false);
+            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.RIFLE, reloadTime: 1.1f, ammo: 9999, canGainAmmo: false);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
             gun.SetAnimationFPS(gun.reloadAnimation, 16);
-            gun.SetMuzzleVFX("muzzle_quarter_pounder", fps: 30, scale: 0.4f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+            gun.SetMuzzleVFX("muzzle_quarter_pounder", fps: 30, scale: 0.4f, anchor: Anchor.MiddleCenter);
             gun.SetFireAudio("fire_coin_sound");
             gun.SetReloadAudio("coin_gun_reload");
 
         ProjectileModule mod = gun.DefaultModule;
             mod.ammoCost            = 1;
-            mod.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
-            mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+            mod.shootStyle          = ShootStyle.SemiAutomatic;
+            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
             mod.numberOfShotsInClip = 10;
             mod.angleVariance       = 15.0f;
             mod.SetupCustomAmmoClip(SpriteName);
@@ -34,7 +34,7 @@ public class QuarterPounder : AdvancedGunBehavior
         _ProjSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("coin_gun_projectile").Base(),
             2, true, new IntVector2(9, 6),
-            false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
+            false, Anchor.MiddleCenter, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
             projectile.baseData.speed   = 44.0f;
@@ -44,7 +44,7 @@ public class QuarterPounder : AdvancedGunBehavior
             projectile.gameObject.AddComponent<MidasProjectile>();
 
         _MidasParticleVFX = VFX.RegisterVFXObject("MidasParticle", ResMap.Get("midas_sparkle"),
-            fps: 8, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 5);
+            fps: 8, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 5);
     }
 
     protected override void OnPickedUpByPlayer(PlayerController player)
@@ -114,7 +114,7 @@ public class MidasProjectile : MonoBehaviour
         int spriteId                        = SpriteBuilder.AddSpriteToCollection(goldSprite, _GoldSpriteCollection, "goldsprite");
         tk2dBaseSprite sprite               = g.AddComponent<tk2dSprite>();
             sprite.SetSprite(_GoldSpriteCollection, spriteId);
-            sprite.PlaceAtPositionByAnchor(enemy.sprite.WorldCenter.ToVector3ZisY(), tk2dBaseSprite.Anchor.MiddleCenter);
+            sprite.PlaceAtPositionByAnchor(enemy.sprite.WorldCenter.ToVector3ZisY(), Anchor.MiddleCenter);
             sprite.HeightOffGround        = enemy.sprite.HeightOffGround;
             sprite.depthUsesTrimmedBounds = enemy.sprite.depthUsesTrimmedBounds;
             sprite.SortingOrder           = enemy.sprite.SortingOrder;

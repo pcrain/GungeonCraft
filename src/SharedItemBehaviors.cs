@@ -220,7 +220,7 @@ public class ProjectileSlashingBehaviour : MonoBehaviour  // stolen from NN
 
 public static class AnimateBullet // stolen from NN
 {
-    public static tk2dSpriteAnimationClip CreateProjectileAnimation(List<string> names, int fps, bool loops, List<IntVector2> pixelSizes, List<bool> lighteneds, List<tk2dBaseSprite.Anchor> anchors, List<bool> anchorsChangeColliders,
+    public static tk2dSpriteAnimationClip CreateProjectileAnimation(List<string> names, int fps, bool loops, List<IntVector2> pixelSizes, List<bool> lighteneds, List<Anchor> anchors, List<bool> anchorsChangeColliders,
         List<bool> fixesScales, List<Vector3?> manualOffsets, List<IntVector2?> overrideColliderPixelSizes, List<IntVector2?> overrideColliderOffsets, List<Projectile> overrideProjectilesToCopyFrom)
     {
         tk2dSpriteAnimationClip clip = new tk2dSpriteAnimationClip();
@@ -240,7 +240,7 @@ public static class AnimateBullet // stolen from NN
             {
                 manualOffset = new Vector2?(Vector2.zero);
             }
-            tk2dBaseSprite.Anchor anchor = anchors[i];
+            Anchor anchor = anchors[i];
             bool lightened = lighteneds[i];
             Projectile overrideProjectileToCopyFrom = overrideProjectilesToCopyFrom[i];
             tk2dSpriteAnimationFrame frame = new tk2dSpriteAnimationFrame();
@@ -273,7 +273,7 @@ public static class AnimateBullet // stolen from NN
         clip.frames = frames.ToArray();
         return clip;
     }
-    public static tk2dSpriteAnimationClip CreateProjectileAnimation(List<string> names, int fps, bool loops, IntVector2 pixelSizes, bool lighteneds, tk2dBaseSprite.Anchor anchors, bool anchorsChangeColliders,
+    public static tk2dSpriteAnimationClip CreateProjectileAnimation(List<string> names, int fps, bool loops, IntVector2 pixelSizes, bool lighteneds, Anchor anchors, bool anchorsChangeColliders,
         bool fixesScales, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSize = null, IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null)
     {
         int n = names.Count;
@@ -316,7 +316,7 @@ public static class AnimateBullet // stolen from NN
         proj.AddAnimation(clip);
         proj.SetAnimation(clip, frame);
     }
-    public static void AnimateProjectile(this Projectile proj, List<string> names, int fps, bool loops, List<IntVector2> pixelSizes, List<bool> lighteneds, List<tk2dBaseSprite.Anchor> anchors, List<bool> anchorsChangeColliders,
+    public static void AnimateProjectile(this Projectile proj, List<string> names, int fps, bool loops, List<IntVector2> pixelSizes, List<bool> lighteneds, List<Anchor> anchors, List<bool> anchorsChangeColliders,
         List<bool> fixesScales, List<Vector3?> manualOffsets, List<IntVector2?> overrideColliderPixelSizes, List<IntVector2?> overrideColliderOffsets, List<Projectile> overrideProjectilesToCopyFrom)
     {
         tk2dSpriteAnimationClip clip = CreateProjectileAnimation(
@@ -327,7 +327,7 @@ public static class AnimateBullet // stolen from NN
         proj.SetAnimation(clip);
     }
     // Simpler version of the above method assuming most elements are repeated
-    public static void AnimateProjectile(this Projectile proj, List<string> names, int fps, bool loops, IntVector2 pixelSizes, bool lighteneds, tk2dBaseSprite.Anchor anchors, bool anchorsChangeColliders,
+    public static void AnimateProjectile(this Projectile proj, List<string> names, int fps, bool loops, IntVector2 pixelSizes, bool lighteneds, Anchor anchors, bool anchorsChangeColliders,
         bool fixesScales, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null, IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null)
     {
         int n = names.Count;
@@ -1147,7 +1147,7 @@ public static class AfterImageHelpers
 
         sprite.PlaceAtPositionByAnchor(
             player.sprite.transform.position,
-            sprite.FlipX ? tk2dBaseSprite.Anchor.LowerRight : tk2dBaseSprite.Anchor.LowerLeft);
+            sprite.FlipX ? Anchor.LowerRight : Anchor.LowerLeft);
 
         obj.GetComponent<BraveBehaviour>().StartCoroutine(Fade(obj,_LIFETIME));
     }
@@ -1190,7 +1190,7 @@ public static class CustomNoteDoer
         GameObject noteItem = new GameObject("Custom Note Item");
         tk2dSprite noteSpriteComp = noteItem.GetOrAddComponent<tk2dSprite>();
             noteSpriteComp.SetSprite(noteSprite.Collection, noteSprite.spriteId);
-            noteSpriteComp.PlaceAtPositionByAnchor(noteItem.transform.position, tk2dBaseSprite.Anchor.LowerCenter);
+            noteSpriteComp.PlaceAtPositionByAnchor(noteItem.transform.position, Anchor.LowerCenter);
         prefab = noteItem.AddComponent<NoteDoer>();
         prefab.gameObject.SetActive(false);
         FakePrefab.MarkAsFakePrefab(prefab.gameObject);

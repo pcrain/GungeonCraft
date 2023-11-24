@@ -16,7 +16,7 @@ public class LibraryCardtridge : PassiveItem
     public static void Init()
     {
         PickupObject item  = Lazy.SetupPassive<LibraryCardtridge>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality       = PickupObject.ItemQuality.D;
+        item.quality       = ItemQuality.D;
         item.AddToSubShop(ItemBuilder.ShopType.Flynt);
         item.AddToSubShop(ModdedShopType.Talbert);
 

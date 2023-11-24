@@ -39,7 +39,7 @@ public class InsurancePolicy : PlayerItem
     public static void Init()
     {
         PlayerItem item = Lazy.SetupActive<InsurancePolicy>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality      = PickupObject.ItemQuality.A;
+        item.quality      = ItemQuality.A;
         item.consumable   = true;
         item.CanBeDropped = true;
         item.SetCooldownType(ItemBuilder.CooldownType.Timed, 0.5f);
@@ -53,16 +53,16 @@ public class InsurancePolicy : PlayerItem
         _InsuranceSpriteMarine     = SpriteBuilder.AddSpriteToCollection(ResMap.Get("insurance_policy_marine_icon")[0],     item.sprite.Collection);
         _InsuranceSpriteBullet     = SpriteBuilder.AddSpriteToCollection(ResMap.Get("insurance_policy_bullet_icon")[0],     item.sprite.Collection);
 
-        _InsuranceVFXRobot      = VFX.RegisterVFXObject("InsuranceVFXRobot",      ResMap.Get("insurance_policy_robot_icon"),      fps: 1, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
-        _InsuranceVFXConvict    = VFX.RegisterVFXObject("InsuranceVFXConvict",    ResMap.Get("insurance_policy_convict_icon"),    fps: 1, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
-        _InsuranceVFXPilot      = VFX.RegisterVFXObject("InsuranceVFXPilot",      ResMap.Get("insurance_policy_pilot_icon"),      fps: 1, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
-        _InsuranceVFXParadox    = VFX.RegisterVFXObject("InsuranceVFXParadox",    ResMap.Get("insurance_policy_paradox_icon"),    fps: 1, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
-        _InsuranceVFXGunslinger = VFX.RegisterVFXObject("InsuranceVFXGunslinger", ResMap.Get("insurance_policy_gunslinger_icon"), fps: 1, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
-        _InsuranceVFXHunter     = VFX.RegisterVFXObject("InsuranceVFXHunter",     ResMap.Get("insurance_policy_hunter_icon"),     fps: 1, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
-        _InsuranceVFXMarine     = VFX.RegisterVFXObject("InsuranceVFXMarine",     ResMap.Get("insurance_policy_marine_icon"),     fps: 1, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
-        _InsuranceVFXBullet     = VFX.RegisterVFXObject("InsuranceVFXBullet",     ResMap.Get("insurance_policy_bullet_icon"),     fps: 1, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+        _InsuranceVFXRobot      = VFX.RegisterVFXObject("InsuranceVFXRobot",      ResMap.Get("insurance_policy_robot_icon"),      fps: 1, loops: true, anchor: Anchor.MiddleCenter);
+        _InsuranceVFXConvict    = VFX.RegisterVFXObject("InsuranceVFXConvict",    ResMap.Get("insurance_policy_convict_icon"),    fps: 1, loops: true, anchor: Anchor.MiddleCenter);
+        _InsuranceVFXPilot      = VFX.RegisterVFXObject("InsuranceVFXPilot",      ResMap.Get("insurance_policy_pilot_icon"),      fps: 1, loops: true, anchor: Anchor.MiddleCenter);
+        _InsuranceVFXParadox    = VFX.RegisterVFXObject("InsuranceVFXParadox",    ResMap.Get("insurance_policy_paradox_icon"),    fps: 1, loops: true, anchor: Anchor.MiddleCenter);
+        _InsuranceVFXGunslinger = VFX.RegisterVFXObject("InsuranceVFXGunslinger", ResMap.Get("insurance_policy_gunslinger_icon"), fps: 1, loops: true, anchor: Anchor.MiddleCenter);
+        _InsuranceVFXHunter     = VFX.RegisterVFXObject("InsuranceVFXHunter",     ResMap.Get("insurance_policy_hunter_icon"),     fps: 1, loops: true, anchor: Anchor.MiddleCenter);
+        _InsuranceVFXMarine     = VFX.RegisterVFXObject("InsuranceVFXMarine",     ResMap.Get("insurance_policy_marine_icon"),     fps: 1, loops: true, anchor: Anchor.MiddleCenter);
+        _InsuranceVFXBullet     = VFX.RegisterVFXObject("InsuranceVFXBullet",     ResMap.Get("insurance_policy_bullet_icon"),     fps: 1, loops: true, anchor: Anchor.MiddleCenter);
 
-        _InsuranceChestPrefab = GameManager.Instance.RewardManager.GetTargetChestPrefab(PickupObject.ItemQuality.B).gameObject.ClonePrefab().GetComponent<Chest>();
+        _InsuranceChestPrefab = GameManager.Instance.RewardManager.GetTargetChestPrefab(ItemQuality.B).gameObject.ClonePrefab().GetComponent<Chest>();
             _InsuranceChestPrefab.groundHitDelay = 0.10f;
             _InsuranceChestPrefab.groundHitDelay = 0.40f;
             _InsuranceChestPrefab.spawnAnimName = _InsuranceChestPrefab.sprite.SetUpAnimation("insurance_chest_appear", 11);
@@ -78,7 +78,7 @@ public class InsurancePolicy : PlayerItem
         _InsurancePickupId = item.PickupObjectId;
 
         _InsuranceParticleVFX = VFX.RegisterVFXObject("InsuranceParticle", ResMap.Get("midas_sparkle"),
-            fps: 8, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 5);
+            fps: 8, loops: false, anchor: Anchor.MiddleCenter, emissivePower: 5);
 
         CwaffEvents.OnFirstFloorFullyLoaded += InsuranceCheck;
     }

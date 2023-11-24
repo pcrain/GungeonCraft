@@ -17,11 +17,11 @@ public class SubtractorBeam : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<SubtractorBeam>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.D, gunClass: GunClass.FULLAUTO, reloadTime: 1.25f, ammo: 300);
+            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.FULLAUTO, reloadTime: 1.25f, ammo: 300);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
             gun.SetAnimationFPS(gun.idleAnimation, 10);
             gun.SetAnimationFPS(gun.reloadAnimation, 30);
-            gun.SetMuzzleVFX("muzzle_subtractor_beam", fps: 30, scale: 0.3f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+            gun.SetMuzzleVFX("muzzle_subtractor_beam", fps: 30, scale: 0.3f, anchor: Anchor.MiddleCenter);
             gun.SetReloadAudio("subtractor_beam_reload_sound");
 
         _GreenTrailPrefab = VFX.CreateTrailObject(ResMap.Get("subtractor_beam_mid")[0], new Vector2(20, 4), new Vector2(0, 0),
@@ -29,12 +29,12 @@ public class SubtractorBeam : AdvancedGunBehavior
         _RedTrailPrefab = VFX.CreateTrailObject(ResMap.Get("subtractor_beam_red_mid")[0], new Vector2(20, 4), new Vector2(0, 0),
             ResMap.Get("subtractor_beam_red_mid"), 60, ResMap.Get("subtractor_beam_red_start"), 60, cascadeTimer: C.FRAME, destroyOnEmpty: true);
         _HitEffects = VFX.RegisterVFXObject("SubtractorHitEffects", ResMap.Get("subtractor_beam_hit_effect"), 12, loops: true,
-            scale: 0.5f, anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 10f);
+            scale: 0.5f, anchor: Anchor.MiddleCenter, emissivePower: 10f);
 
         ProjectileModule mod = gun.DefaultModule;
             mod.ammoCost            = 1;
-            mod.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
-            mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+            mod.shootStyle          = ShootStyle.SemiAutomatic;
+            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
             mod.angleVariance       = 5.0f;
             mod.cooldownTime        = 0.25f;
             mod.numberOfShotsInClip = 4;

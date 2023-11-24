@@ -15,21 +15,21 @@ public class BBGun : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<BBGun>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 0.5f, ammo: 3, canGainAmmo: false);
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 0.5f, ammo: 3, canGainAmmo: false);
             gun.CanGainAmmo                          = false;
             gun.muzzleFlashEffects                   = (ItemHelper.Get(Items.SeriousCannon) as Gun).muzzleFlashEffects;
             gun.SetAnimationFPS(gun.shootAnimation, 10);
             gun.SetAnimationFPS(gun.chargeAnimation, 16);
             gun.LoopAnimation(gun.chargeAnimation, 32);
-            gun.SetMuzzleVFX("muzzle_b_b_gun", fps: 30, scale: 0.5f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+            gun.SetMuzzleVFX("muzzle_b_b_gun", fps: 30, scale: 0.5f, anchor: Anchor.MiddleCenter);
             gun.SetFireAudio("Play_WPN_seriouscannon_shot_01");
             gun.SetReloadAudio("Play_ENM_flame_veil_01");
 
         ProjectileModule mod = gun.DefaultModule;
             mod.ammoCost            = 1;
             mod.numberOfShotsInClip = 3;
-            mod.shootStyle          = ProjectileModule.ShootStyle.Charged;
-            mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Ordered;
+            mod.shootStyle          = ShootStyle.Charged;
+            mod.sequenceStyle       = ProjectileSequenceStyle.Ordered;
             mod.cooldownTime        = 0.70f;
             mod.angleVariance       = 10f;
             mod.SetupCustomAmmoClip(SpriteName);
@@ -40,7 +40,7 @@ public class BBGun : AdvancedGunBehavior
             projectile.AddDefaultAnimation(AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("bball").Base(),
                 20, true, new IntVector2(24, 22),
-                false, tk2dBaseSprite.Anchor.MiddleCenter,
+                false, Anchor.MiddleCenter,
                 anchorsChangeColliders: false,
                 fixesScales: true,
                 overrideColliderPixelSize: new IntVector2(2, 2))); // prevent uneven colliders from glitching into walls

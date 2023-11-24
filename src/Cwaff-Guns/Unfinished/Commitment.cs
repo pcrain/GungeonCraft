@@ -23,15 +23,15 @@ public class Commitment : AdvancedGunBehavior
         Gun gun = Lazy.SetupGun<Commitment>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
             gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
             gun.DefaultModule.ammoCost            = 1;
-            gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.Automatic;
-            gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+            gun.DefaultModule.shootStyle          = ShootStyle.Automatic;
+            gun.DefaultModule.sequenceStyle       = ProjectileSequenceStyle.Random;
             gun.reloadTime                        = 1.1f;
             gun.DefaultModule.angleVariance       = 15.0f;
             gun.DefaultModule.cooldownTime        = 0.15f;
             gun.DefaultModule.numberOfShotsInClip = 10000;
             gun.CanBeDropped                      = false;
             gun.CanGainAmmo                       = false;
-            gun.quality                           = PickupObject.ItemQuality.C;
+            gun.quality                           = ItemQuality.C;
             gun.SetBaseMaxAmmo(500);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
 

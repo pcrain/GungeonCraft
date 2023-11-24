@@ -18,7 +18,7 @@ public class Shine : PassiveItem
     public static void Init()
     {
         PickupObject item = Lazy.SetupPassive<Shine>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality      = PickupObject.ItemQuality.C;
+        item.quality      = ItemQuality.C;
 
         noSpeed = new StatModifier
         {
@@ -29,7 +29,7 @@ public class Shine : PassiveItem
 
         // Can't use resmap because sprite has number in it
         _ShineVFX = VFX.RegisterVFXObject("Shine", new (){"CwaffingTheGungy/Resources/MiscVFX/shine2"},
-            fps: 1, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 100);
+            fps: 1, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 100);
     }
     private void PostProcessProjectile(Projectile bullet, float thing)
     {

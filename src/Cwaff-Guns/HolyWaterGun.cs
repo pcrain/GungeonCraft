@@ -16,13 +16,13 @@ public class HolyWaterGun : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<HolyWaterGun>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.C, gunClass: GunClass.BEAM, reloadTime: 1.0f, ammo: 500, audioFrom: Items.MegaDouser, defaultAudio: true);
+            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.BEAM, reloadTime: 1.0f, ammo: 500, audioFrom: Items.MegaDouser, defaultAudio: true);
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
         ProjectileModule mod = gun.DefaultModule;
             mod.ammoType               = GameUIAmmoType.AmmoType.BEAM;
-            mod.shootStyle             = ProjectileModule.ShootStyle.Beam;
+            mod.shootStyle             = ShootStyle.Beam;
             mod.numberOfShotsInClip    = -1;
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
@@ -40,7 +40,7 @@ public class HolyWaterGun : AdvancedGunBehavior
             beamComp.beamStartAnimation = null;
 
         _ExorcismParticleVFX = VFX.RegisterVFXObject("ExorcismParticle", ResMap.Get("exorcism_particles"),
-            fps: 12, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 2);
+            fps: 12, loops: false, anchor: Anchor.MiddleCenter, emissivePower: 2);
 
         projectile.gameObject.AddComponent<ExorcismJuice>();
     }
@@ -121,7 +121,7 @@ public class Exorcisable : MonoBehaviour
             int spriteId                        = SpriteBuilder.AddSpriteToCollection(ghostSprite, collection, "ghostsprite");
             tk2dBaseSprite sprite               = g.AddComponent<tk2dSprite>();
                 sprite.SetSprite(collection, spriteId);
-                sprite.PlaceAtPositionByAnchor(pos, tk2dBaseSprite.Anchor.MiddleCenter);
+                sprite.PlaceAtPositionByAnchor(pos, Anchor.MiddleCenter);
             g.AddComponent<GhostlyDeath>().Setup(beam.Direction);
         }
         this._enemy.healthHaver.ApplyDamage(

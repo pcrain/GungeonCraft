@@ -84,7 +84,7 @@ public class FakeShopItem : BraveBehaviour, IPlayerInteractable
     base.sprite.SetSprite(tk2dSprite2.Collection, tk2dSprite2.spriteId);
     base.sprite.IsPerpendicular = !UseOmnidirectionalItemFacing;
     base.sprite.HeightOffGround = 1f;
-    base.sprite.PlaceAtPositionByAnchor(base.transform.parent.position, tk2dBaseSprite.Anchor.MiddleCenter);
+    base.sprite.PlaceAtPositionByAnchor(base.transform.parent.position, Anchor.MiddleCenter);
     // ETGModConsole.Log("place at "+base.transform.parent.position);
     base.sprite.transform.position = base.sprite.transform.position.Quantize(0.0625f);
     DepthLookupManager.ProcessRenderer(base.sprite.renderer);
@@ -295,7 +295,7 @@ public class FakeShopItem : BraveBehaviour, IPlayerInteractable
 
     GameObject gameObject2 = (GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global VFX/VFX_Item_Spawn_Poof"));
     tk2dBaseSprite component2 = gameObject2.GetComponent<tk2dBaseSprite>();
-    component2.PlaceAtPositionByAnchor(base.sprite.WorldCenter.ToVector3ZUp(0f), tk2dBaseSprite.Anchor.MiddleCenter);
+    component2.PlaceAtPositionByAnchor(base.sprite.WorldCenter.ToVector3ZUp(0f), Anchor.MiddleCenter);
     component2.transform.position = component2.transform.position.Quantize(0.0625f);
     component2.HeightOffGround = 5f;
     component2.UpdateZDepth();

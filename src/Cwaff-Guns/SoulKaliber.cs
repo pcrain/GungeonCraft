@@ -13,7 +13,7 @@ public class SoulKaliber : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<SoulKaliber>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.1f, ammo: 250);
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.1f, ammo: 250);
             gun.muzzleFlashEffects.type              = VFXPoolType.None;
             gun.SetAnimationFPS(gun.shootAnimation, 24);
             gun.SetAnimationFPS(gun.reloadAnimation, 12);
@@ -23,15 +23,15 @@ public class SoulKaliber : AdvancedGunBehavior
 
         ProjectileModule mod = gun.DefaultModule;
             mod.ammoCost               = 1;
-            mod.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
-            mod.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
+            mod.shootStyle             = ShootStyle.SemiAutomatic;
+            mod.sequenceStyle          = ProjectileSequenceStyle.Random;
             mod.cooldownTime           = 0.1f;
             mod.numberOfShotsInClip    = 10;
 
         _ProjSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("soul_kaliber_projectile").Base(),
             2, true, new IntVector2(10, 10),
-            false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
+            false, Anchor.MiddleCenter, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
             projectile.baseData.speed   = 30.0f;
@@ -84,9 +84,9 @@ public class SoulLinkStatus : MonoBehaviour
         _SoulLinkHitVFXPool    = VFX.CreatePoolFromVFXGameObject((ItemHelper.Get(Items.MagicLamp) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
         _SoulLinkHitVFX        = _SoulLinkHitVFXPool.effects[0].effects[0].effect.gameObject;
         _SoulLinkOverheadVFX   = VFX.RegisterVFXObject("SoulLinkParticle", ResMap.Get("soul_link_particle"),
-            fps: 16, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.3f, emissivePower: 100);
+            fps: 16, loops: true, anchor: Anchor.LowerCenter, scale: 0.3f, emissivePower: 100);
         _SoulLinkSoulVFX       = VFX.RegisterVFXObject("SoulLinkSoul", ResMap.Get("soul_link_soul"),
-            fps: 5, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.3f, emissivePower: 200);
+            fps: 5, loops: true, anchor: Anchor.MiddleCenter, scale: 0.3f, emissivePower: 200);
         StandardSoulLinkEffect = new GameActorHealthEffect
         {
             duration                 = 60,

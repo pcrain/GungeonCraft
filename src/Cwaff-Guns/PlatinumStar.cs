@@ -14,18 +14,18 @@ public class PlatinumStar : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<PlatinumStar>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.A, gunClass: GunClass.PISTOL, reloadTime: 1f, ammo: 480);
+            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.PISTOL, reloadTime: 1f, ammo: 480);
             gun.SetAnimationFPS(gun.shootAnimation, 20);
             gun.SetAnimationFPS(gun.reloadAnimation, 40);
-            gun.SetMuzzleVFX("muzzle_platinum_star", fps: 60, scale: 0.25f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+            gun.SetMuzzleVFX("muzzle_platinum_star", fps: 60, scale: 0.25f, anchor: Anchor.MiddleCenter);
             gun.SetFireAudio("platinum_fire_sound");
             gun.SetReloadAudio("platinum_reload_sound", frame: 5);
             gun.AddToSubShop(ModdedShopType.TimeTrader);
 
         ProjectileModule mod = gun.DefaultModule;
             mod.ammoCost            = 1;
-            mod.shootStyle          = ProjectileModule.ShootStyle.Automatic;
-            mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+            mod.shootStyle          = ShootStyle.Automatic;
+            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
             mod.angleVariance       = 15.0f;
             mod.cooldownTime        = 0.125f;
             mod.numberOfShotsInClip = 28;
@@ -34,7 +34,7 @@ public class PlatinumStar : AdvancedGunBehavior
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("platinum_star_projectile").Base(),
             12, true, new IntVector2(29, 9),
-            false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
+            false, Anchor.MiddleLeft, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
             projectile.AddDefaultAnimation(_BulletSprite);
@@ -49,7 +49,7 @@ public class PlatinumStar : AdvancedGunBehavior
             _OraBullet.AddDefaultAnimation(AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("ora_fist_fast").Base(),
                 12, true, new IntVector2(63 / 3, 27 / 3),
-                false, tk2dBaseSprite.Anchor.MiddleRight, true, true));
+                false, Anchor.MiddleRight, true, true));
             _OraBullet.shouldRotate    = true;
             _OraBullet.baseData.damage = 1f;
             _OraBullet.baseData.force  = 0.1f;
@@ -220,7 +220,7 @@ public class OraOra : MonoBehaviour
             float percentDone = elapsed / _MOVE_TIME;
             standSprite.PlaceAtPositionByAnchor(
                 Vector2.Lerp(pc.sprite.WorldCenter, this._enemy.sprite.WorldCenter - bankedAngles[0].ToVector(offset + 0.5f), percentDone),
-                tk2dBaseSprite.Anchor.MiddleCenter);
+                Anchor.MiddleCenter);
             yield return null;
         }
 
@@ -233,7 +233,7 @@ public class OraOra : MonoBehaviour
             float damage = bankedDamage[i];
             bool lastBurst = (i == (numBursts - 1));
             standSprite.SetSprite(pc.spriteAnimator.GetClipByName(Lazy.GetBaseIdleAnimationName(pc, bankedAngles[i])).frames[0].spriteId);
-            standSprite.PlaceAtPositionByAnchor(this._enemy.sprite.WorldCenter - bankedAngles[i].ToVector(offset + 0.5f), tk2dBaseSprite.Anchor.MiddleCenter);
+            standSprite.PlaceAtPositionByAnchor(this._enemy.sprite.WorldCenter - bankedAngles[i].ToVector(offset + 0.5f), Anchor.MiddleCenter);
             standSprite.FlipX = (Mathf.Abs(bankedAngles[i].Clamp180()) > 90f);
             for (int j = 0; j < _BURST_SIZE; ++j)
             {
@@ -277,7 +277,7 @@ public class OraOra : MonoBehaviour
         for (float elapsed = BraveTime.DeltaTime; elapsed < _MOVE_TIME; elapsed += BraveTime.DeltaTime)
         {
             float percentDone = elapsed / _MOVE_TIME;
-            standSprite.PlaceAtPositionByAnchor(Vector2.Lerp(finalPos, pc.sprite.WorldCenter, percentDone), tk2dBaseSprite.Anchor.MiddleCenter);
+            standSprite.PlaceAtPositionByAnchor(Vector2.Lerp(finalPos, pc.sprite.WorldCenter, percentDone), Anchor.MiddleCenter);
             yield return null;
         }
 

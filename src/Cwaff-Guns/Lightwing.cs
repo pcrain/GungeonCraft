@@ -16,36 +16,36 @@ public class Lightwing : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Lightwing>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.0f, ammo: 120);
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.0f, ammo: 120);
             gun.SetAnimationFPS(gun.shootAnimation, 32);
             gun.SetAnimationFPS(gun.reloadAnimation, 30);
-            gun.SetMuzzleVFX("muzzle_lightwing", fps: 30, scale: 0.5f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+            gun.SetMuzzleVFX("muzzle_lightwing", fps: 30, scale: 0.5f, anchor: Anchor.MiddleCenter);
             gun.SetFireAudio("lightwing_fire_sound");
             gun.SetReloadAudio("lightwing_reload_sound");
 
         ProjectileModule mod = gun.DefaultModule;
             mod.ammoCost            = 1;
-            mod.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
-            mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+            mod.shootStyle          = ShootStyle.SemiAutomatic;
+            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
             mod.cooldownTime        = 0.28f;
             mod.numberOfShotsInClip = 20;
 
         _NeutralSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("lightwing_projectile").Base(),
             12, true, new IntVector2(23, 32),
-            false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
+            false, Anchor.MiddleLeft, true, true);
         _HuntingSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("lightwing_projectile_hunt").Base(),
             12, true, new IntVector2(23, 32),
-            false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
+            false, Anchor.MiddleLeft, true, true);
         _RetrievingSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("lightwing_projectile_retrieve").Base(),
             12, true, new IntVector2(23, 32),
-            false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
+            false, Anchor.MiddleLeft, true, true);
         _ReturningSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("lightwing_projectile_return").Base(),
             12, true, new IntVector2(23, 32),
-            false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
+            false, Anchor.MiddleLeft, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
             projectile.AddDefaultAnimation(_NeutralSprite);

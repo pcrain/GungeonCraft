@@ -14,12 +14,12 @@ public class Encircler : AdvancedGunBehavior
 
         gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
         gun.DefaultModule.ammoCost            = 1;
-        gun.DefaultModule.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
-        gun.DefaultModule.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+        gun.DefaultModule.shootStyle          = ShootStyle.SemiAutomatic;
+        gun.DefaultModule.sequenceStyle       = ProjectileSequenceStyle.Random;
         gun.reloadTime                        = 1.1f;
         gun.DefaultModule.cooldownTime        = 0.1f;
         gun.DefaultModule.numberOfShotsInClip = 20;
-        gun.quality                           = PickupObject.ItemQuality.D;
+        gun.quality                           = ItemQuality.D;
         gun.SetBaseMaxAmmo(250);
         gun.SetAnimationFPS(gun.shootAnimation, 24);
 
@@ -45,8 +45,8 @@ public class Encircler : AdvancedGunBehavior
             pop.angle = iterator*360/numProjectiles;
 
             mod.ammoCost                          = 1;
-            mod.shootStyle                        = ProjectileModule.ShootStyle.SemiAutomatic;
-            mod.sequenceStyle                     = ProjectileModule.ProjectileSequenceStyle.Random;
+            mod.shootStyle                        = ShootStyle.SemiAutomatic;
+            mod.sequenceStyle                     = ProjectileSequenceStyle.Random;
             mod.cooldownTime                      = 0.5f;
             mod.angleVariance                     = 11.25f;
             mod.numberOfShotsInClip               = 4;

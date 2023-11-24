@@ -17,7 +17,7 @@ public class EmergencySiren : PlayerItem
     public static void Init()
     {
         PlayerItem item = Lazy.SetupActive<EmergencySiren>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality      = PickupObject.ItemQuality.C;
+        item.quality      = ItemQuality.C;
         item.consumable   = false;
         item.CanBeDropped = true;
         item.SetCooldownType(ItemBuilder.CooldownType.Damage, 300f);
@@ -31,7 +31,7 @@ public class EmergencySiren : PlayerItem
         };
 
         _SirenVFX = VFX.RegisterVFXObject("EmergencySiren", ResMap.Get("siren"), 36,
-            loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.75f, emissivePower: 50f);
+            loops: true, anchor: Anchor.MiddleCenter, scale: 0.75f, emissivePower: 50f);
     }
 
     public override void Pickup(PlayerController player)

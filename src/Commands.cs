@@ -154,10 +154,10 @@ public class Commands
             GameObject bombyPickup;
                 if (UnityEngine.Random.Range(0,2) == 0)
                     bombyPickup = LootEngine.GetItemOfTypeAndQuality<PickupObject>(
-                                    PickupObject.ItemQuality.S, GameManager.Instance.RewardManager.GunsLootTable, false).gameObject;
+                                    ItemQuality.S, GameManager.Instance.RewardManager.GunsLootTable, false).gameObject;
                 else
                     bombyPickup = LootEngine.GetItemOfTypeAndQuality<PickupObject>(
-                                    PickupObject.ItemQuality.S, GameManager.Instance.RewardManager.ItemsLootTable, false).gameObject;
+                                    ItemQuality.S, GameManager.Instance.RewardManager.ItemsLootTable, false).gameObject;
                 PickupObject po = bombyPickup.GetComponent<PickupObject>();
             FakeShopItem fsi = bombyItem.AddComponent<FakeShopItem>();
                 if (!p1.CurrentRoom.IsRegistered(fsi))

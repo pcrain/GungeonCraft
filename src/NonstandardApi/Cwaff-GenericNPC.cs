@@ -62,7 +62,7 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
                     {
                         int fid = SpriteBuilder.AddSpriteToCollection(sprite, collection);
                         idList.Add(fid);
-                        collection.spriteDefinitions[fid].ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.LowerCenter);
+                        collection.spriteDefinitions[fid].ConstructOffsetsFromAnchor(Anchor.LowerCenter);
                     }
                     SpriteBuilder.AddAnimation(spriteAnimator, collection, idList, ad.animName, tk2dSpriteAnimationClip.WrapMode.Loop, ad.animFPS);
                     animNames.Add(ad.animName);
@@ -147,7 +147,7 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
     {
       GameObject gameObject2 = (GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global VFX/VFX_Item_Spawn_Poof"));
       tk2dBaseSprite sprite = gameObject2.GetComponent<tk2dBaseSprite>();
-      sprite.PlaceAtPositionByAnchor(base.sprite.WorldCenter.ToVector3ZUp(0f), tk2dBaseSprite.Anchor.MiddleCenter);
+      sprite.PlaceAtPositionByAnchor(base.sprite.WorldCenter.ToVector3ZUp(0f), Anchor.MiddleCenter);
       sprite.transform.position = sprite.transform.position.Quantize(0.0625f);
       sprite.HeightOffGround = 5f;
       sprite.UpdateZDepth();
@@ -157,7 +157,7 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
     {
       GameObject gameObject2 = (GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global VFX/VFX_Item_Spawn_Poof"));
       tk2dBaseSprite sprite = gameObject2.GetComponent<tk2dBaseSprite>();
-      sprite.PlaceAtPositionByAnchor(base.sprite.WorldCenter.ToVector3ZUp(0f), tk2dBaseSprite.Anchor.MiddleCenter);
+      sprite.PlaceAtPositionByAnchor(base.sprite.WorldCenter.ToVector3ZUp(0f), Anchor.MiddleCenter);
       sprite.transform.position = sprite.transform.position.Quantize(0.0625f);
       sprite.HeightOffGround = 5f;
       sprite.UpdateZDepth();

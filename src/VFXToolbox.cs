@@ -43,9 +43,9 @@ public static class VFX
             RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/whip_segment");
             RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/whip_segment_base");
             // Shared by Gyroscope and Sans
-            VFX.RegisterVFXObject("Tornado", ResMap.Get("tornado"), 20, loops: true, anchor: tk2dBaseSprite.Anchor.LowerCenter);
+            VFX.RegisterVFXObject("Tornado", ResMap.Get("tornado"), 20, loops: true, anchor: Anchor.LowerCenter);
             // Shared by Blackjack and possibly future auto-pickup items
-            VFX.RegisterVFXObject("MiniPickup", ResMap.Get("mini_pickup"), 12, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+            VFX.RegisterVFXObject("MiniPickup", ResMap.Get("mini_pickup"), 12, loops: false, anchor: Anchor.MiddleCenter);
         #endregion
     }
 
@@ -60,7 +60,7 @@ public static class VFX
     /// <summary>
     /// Generically register a VFX as a GameObject (animated sprite), VFXComplex, or VFXPool
     /// </summary>
-    public static void RegisterVFX(string name, List<string> spritePaths, float fps, bool loops = true, int loopStart = -1, float scale = 1.0f, tk2dBaseSprite.Anchor anchor = tk2dBaseSprite.Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true)
+    public static void RegisterVFX(string name, List<string> spritePaths, float fps, bool loops = true, int loopStart = -1, float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true)
     {
         // GameObject Obj     = new GameObject(name);
         GameObject Obj     = SpriteBuilder.SpriteFromResource(spritePaths[0], new GameObject(name));
@@ -73,7 +73,7 @@ public static class VFX
         tk2dBaseSprite baseSprite = Obj.GetComponent<tk2dBaseSprite>();
         tk2dSpriteDefinition baseDef = baseSprite.GetCurrentSpriteDef();
         baseDef.ConstructOffsetsFromAnchor(
-            tk2dBaseSprite.Anchor.LowerCenter,
+            Anchor.LowerCenter,
             baseDef.position3);
 
         tk2dSpriteCollectionData VFXSpriteCollection = SpriteBuilder.ConstructCollection(Obj, (name + "_Pool"));
@@ -177,7 +177,7 @@ public static class VFX
     /// <summary>
     /// Register and return a VFXObject
     /// </summary>
-    public static GameObject RegisterVFXObject(string name, List<string> spritePaths, float fps, bool loops = true, int loopStart = -1, float scale = 1.0f, tk2dBaseSprite.Anchor anchor = tk2dBaseSprite.Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true)
+    public static GameObject RegisterVFXObject(string name, List<string> spritePaths, float fps, bool loops = true, int loopStart = -1, float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true)
     {
         RegisterVFX(
             name           : name,
@@ -203,7 +203,7 @@ public static class VFX
     /// <summary>
     /// Register and return a VFXPool
     /// </summary>
-    public static VFXPool RegisterVFXPool(string name, List<string> spritePaths, float fps, bool loops = true, int loopStart = -1, float scale = 1.0f, tk2dBaseSprite.Anchor anchor = tk2dBaseSprite.Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true)
+    public static VFXPool RegisterVFXPool(string name, List<string> spritePaths, float fps, bool loops = true, int loopStart = -1, float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true)
     {
         RegisterVFX(
             name           : name,
@@ -229,7 +229,7 @@ public static class VFX
     /// <summary>
     /// Register and return a VFXComplex
     /// </summary>
-    public static VFXComplex RegisterVFXComplex(string name, List<string> spritePaths, float fps, bool loops = true, int loopStart = -1, float scale = 1.0f, tk2dBaseSprite.Anchor anchor = tk2dBaseSprite.Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true)
+    public static VFXComplex RegisterVFXComplex(string name, List<string> spritePaths, float fps, bool loops = true, int loopStart = -1, float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true)
     {
         RegisterVFX(
             name           : name,
@@ -322,7 +322,7 @@ public static class VFX
         tk2dSprite overheadSprite = newSprite.AddComponent<tk2dSprite>();
         extantSprites[gunOwner].Add(newSprite);
         overheadSprite.SetSprite(OverheadVFXCollection, sprites[name]);
-        overheadSprite.PlaceAtPositionByAnchor(newSprite.transform.position, tk2dBaseSprite.Anchor.LowerCenter);
+        overheadSprite.PlaceAtPositionByAnchor(newSprite.transform.position, Anchor.LowerCenter);
         overheadSprite.transform.localPosition = overheadSprite.transform.localPosition.Quantize(0.0625f);
         newSprite.transform.parent = gunOwner.transform;
         if (overheadSprite)
@@ -462,14 +462,14 @@ public static class VFX
         GameObject g = UnityEngine.Object.Instantiate(new GameObject(), player.sprite.WorldCenter, Quaternion.identity);
         tk2dSprite sprite = g.AddComponent<tk2dSprite>();
             sprite.SetSprite(item.sprite.collection, item.sprite.spriteId);
-            sprite.PlaceAtPositionByAnchor(player.sprite.WorldTopCenter - new Vector2(0, BOB_OFFSET), tk2dBaseSprite.Anchor.LowerCenter);
+            sprite.PlaceAtPositionByAnchor(player.sprite.WorldTopCenter - new Vector2(0, BOB_OFFSET), Anchor.LowerCenter);
             sprite.transform.parent = player.transform;
 
         for (float elapsed = 0f; elapsed < FADE_TIME; elapsed += BraveTime.DeltaTime)
         {
             float percentDone = elapsed / FADE_TIME;
             sprite.transform.localScale = new Vector2(Mathf.Cos(elapsed * SPIN_RATE), 1f);
-            sprite.PlaceAtScaledPositionByAnchor(player.sprite.WorldTopCenter - new Vector2(0, BOB_OFFSET + BOB_AMOUNT * Mathf.Sin(elapsed * BOB_RATE)), tk2dBaseSprite.Anchor.LowerCenter);
+            sprite.PlaceAtScaledPositionByAnchor(player.sprite.WorldTopCenter - new Vector2(0, BOB_OFFSET + BOB_AMOUNT * Mathf.Sin(elapsed * BOB_RATE)), Anchor.LowerCenter);
             sprite.gameObject.SetAlpha(1f - percentDone);
             yield return null;
         }
@@ -501,7 +501,7 @@ public static class VFX
               new Vector3(convertedColliderX, convertedColliderY, 0f)
           };
 
-          def.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.MiddleLeft);
+          def.ConstructOffsetsFromAnchor(Anchor.MiddleLeft);
 
           tk2dSpriteAnimator animator = newTrailObject.GetOrAddComponent<tk2dSpriteAnimator>();
           tk2dSpriteAnimation animation = newTrailObject.GetOrAddComponent<tk2dSpriteAnimation>();
@@ -662,7 +662,7 @@ public class FancyVFX : MonoBehaviour
         GameObject g = UnityEngine.Object.Instantiate(new GameObject(), osprite.WorldCenter, osprite.transform.rotation);
         tk2dSprite sprite = g.AddComponent<tk2dSprite>();
             sprite.SetSprite(osprite.collection, osprite.spriteId);
-            sprite.PlaceAtPositionByAnchor(osprite.WorldCenter, tk2dBaseSprite.Anchor.MiddleCenter);
+            sprite.PlaceAtPositionByAnchor(osprite.WorldCenter, Anchor.MiddleCenter);
 
         FancyVFX fv = g.AddComponent<FancyVFX>();
             fv.sprite = sprite;

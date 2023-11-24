@@ -20,7 +20,7 @@ public class AdrenalineShot : PassiveItem
     public static void Init()
     {
         PickupObject item = Lazy.SetupPassive<AdrenalineShot>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality      = PickupObject.ItemQuality.C;
+        item.quality      = ItemQuality.C;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
         _AdrenalineHeart = Lazy.SetupUISprite(ResMap.Get("adrenaline_heart"));

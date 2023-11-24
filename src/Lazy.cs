@@ -425,7 +425,7 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
     {
         UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global VFX/VFX_Item_Spawn_Poof") as GameObject)
             .GetComponent<tk2dBaseSprite>()
-            .PlaceAtPositionByAnchor(pos, tk2dBaseSprite.Anchor.MiddleCenter);
+            .PlaceAtPositionByAnchor(pos, Anchor.MiddleCenter);
     }
 
     public static void DoPickupAt(Vector3 pos)
@@ -433,7 +433,7 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
         GameObject original = (GameObject)ResourceCache.Acquire("Global VFX/VFX_Item_Pickup");
           GameObject gameObject = UnityEngine.Object.Instantiate(original);
             tk2dSprite sprite = gameObject.GetComponent<tk2dSprite>();
-                sprite.PlaceAtPositionByAnchor(pos, tk2dBaseSprite.Anchor.MiddleCenter);
+                sprite.PlaceAtPositionByAnchor(pos, Anchor.MiddleCenter);
                 sprite.HeightOffGround = 6f;
                 sprite.UpdateZDepth();
         AkSoundEngine.PostEvent("Play_OBJ_item_pickup_01", gameObject);
@@ -509,11 +509,11 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
         return NearestEnemyWithinConeOfVision(start, coneAngle, 360f, useNearestAngleInsteadOfDistance, ignoreWalls);
     }
 
-    public static Chest SpawnChestWithSpecificItem(PickupObject pickup, IntVector2 position, PickupObject.ItemQuality? overrideChestQuality = null)
+    public static Chest SpawnChestWithSpecificItem(PickupObject pickup, IntVector2 position, ItemQuality? overrideChestQuality = null)
     {
       Chest chestPrefab =
         GameManager.Instance.RewardManager.GetTargetChestPrefab(overrideChestQuality ?? pickup.quality)
-        ?? GameManager.Instance.RewardManager.GetTargetChestPrefab(PickupObject.ItemQuality.B);
+        ?? GameManager.Instance.RewardManager.GetTargetChestPrefab(ItemQuality.B);
       Chest chest = Chest.Spawn(chestPrefab, position);
       chest.forceContentIds = new(){pickup.PickupObjectId};
       return chest;

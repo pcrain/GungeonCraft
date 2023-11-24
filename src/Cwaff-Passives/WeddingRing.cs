@@ -19,7 +19,7 @@ public class WeddingRing : PassiveItem
     public static void Init()
     {
         PickupObject item  = Lazy.SetupPassive<WeddingRing>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality       = PickupObject.ItemQuality.C;
+        item.quality       = ItemQuality.C;
         item.AddToSubShop(ModdedShopType.Rusty);
     }
 

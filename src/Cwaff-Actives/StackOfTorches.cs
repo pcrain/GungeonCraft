@@ -25,7 +25,7 @@ public class StackOfTorches : PlayerItem
     public static void Init()
     {
         PlayerItem item = Lazy.SetupActive<StackOfTorches>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality    = PickupObject.ItemQuality.D;
+        item.quality    = ItemQuality.D;
         item.AddToSubShop(ModdedShopType.Rusty);
 
         ItemBuilder.SetCooldownType(item, ItemBuilder.CooldownType.None, 0.1f);
@@ -77,13 +77,13 @@ public class StackOfTorches : PlayerItem
         if (placeOnFloor)
         {
             torch = UnityEngine.Object.Instantiate(_Torches.ChooseRandom(), user.sprite.WorldCenter, Quaternion.identity) as GameObject;
-            torch.GetComponent<tk2dSprite>().PlaceAtPositionByAnchor(user.sprite.WorldCenter + _MAX_WALL_DIST * delta.normalized, tk2dBaseSprite.Anchor.MiddleCenter);
+            torch.GetComponent<tk2dSprite>().PlaceAtPositionByAnchor(user.sprite.WorldCenter + _MAX_WALL_DIST * delta.normalized, Anchor.MiddleCenter);
             AkSoundEngine.PostEvent("mc_torch_place", base.gameObject);
         }
         else
         {
             torch = UnityEngine.Object.Instantiate(_SconcePrefab, user.sprite.WorldCenter, Quaternion.identity) as GameObject;
-            torch.GetComponent<tk2dSprite>().PlaceAtPositionByAnchor(target, tk2dBaseSprite.Anchor.LowerCenter);
+            torch.GetComponent<tk2dSprite>().PlaceAtPositionByAnchor(target, Anchor.LowerCenter);
             AkSoundEngine.PostEvent("mc_lantern_place", base.gameObject);
         }
 

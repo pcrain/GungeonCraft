@@ -23,19 +23,19 @@ public class KiBlast : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<KiBlast>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 999, infiniteAmmo: true);
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 999, infiniteAmmo: true);
             gun.SetAnimationFPS(gun.idleAnimation, 10);
             _FireLeftAnim  = gun.shootAnimation;
             _FireRightAnim = gun.UpdateAnimation("fire_alt", returnToIdle: true);
             gun.SetAnimationFPS(_FireLeftAnim, 24);
             gun.SetAnimationFPS(_FireRightAnim, 24);
-            gun.SetMuzzleVFX("muzzle_iron_maid", fps: 30, scale: 0.5f, anchor: tk2dBaseSprite.Anchor.MiddleLeft);
+            gun.SetMuzzleVFX("muzzle_iron_maid", fps: 30, scale: 0.5f, anchor: Anchor.MiddleLeft);
             gun.SetFireAudio("ki_blast_sound");
             gun.AddToSubShop(ModdedShopType.Boomhildr);
 
         ProjectileModule mod = gun.DefaultModule;
-            mod.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
-            mod.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
+            mod.shootStyle             = ShootStyle.SemiAutomatic;
+            mod.sequenceStyle          = ProjectileSequenceStyle.Random;
             mod.ammoType               = GameUIAmmoType.AmmoType.BEAM;
             mod.cooldownTime           = 0.1f;
             mod.numberOfShotsInClip    = 99999;
@@ -43,12 +43,12 @@ public class KiBlast : AdvancedGunBehavior
         _KiSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("ki_blast").Base(),
             12, true, new IntVector2(8, 8),
-            false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
+            false, Anchor.MiddleCenter, true, true);
 
         _KiSpriteRed = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("ki_blast_red").Base(),
             12, true, new IntVector2(8, 8),
-            false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
+            false, Anchor.MiddleCenter, true, true);
 
         Projectile blast = Lazy.PrefabProjectileFromGun(gun);
             blast.AddDefaultAnimation(_KiSprite);

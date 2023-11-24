@@ -14,11 +14,11 @@ public class VoodooDoll : PassiveItem
     public static void Init()
     {
         PickupObject item = Lazy.SetupPassive<VoodooDoll>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality      = PickupObject.ItemQuality.A;
+        item.quality      = ItemQuality.A;
         item.AddToSubShop(ItemBuilder.ShopType.Cursula);
 
         _VoodooGhostVFX   = VFX.RegisterVFXObject("VoodooGhost", ResMap.Get("voodoo_ghost"),
-            fps: 2, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);
+            fps: 2, loops: true, anchor: Anchor.MiddleCenter, scale: 0.5f);
     }
 
     public override void Pickup(PlayerController player)

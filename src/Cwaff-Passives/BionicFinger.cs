@@ -13,7 +13,7 @@ public class BionicFinger : PassiveItem
     public static void Init()
     {
         PickupObject item  = Lazy.SetupPassive<BionicFinger>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality       = PickupObject.ItemQuality.C;
+        item.quality       = ItemQuality.C;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
         item.AddToSubShop(ModdedShopType.Rusty);
 

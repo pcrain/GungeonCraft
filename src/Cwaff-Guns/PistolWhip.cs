@@ -16,7 +16,7 @@ public class PistolWhip : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<PistolWhip>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 0.01f, ammo: 100);
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 0.01f, ammo: 100);
             gun.SetAnimationFPS(gun.shootAnimation, 30);
             gun.SetAnimationFPS(gun.reloadAnimation, 40);
             gun.AddStatToGun(PlayerStats.StatType.Curse, 3f, StatModifier.ModifyMethod.ADDITIVE);
@@ -25,8 +25,8 @@ public class PistolWhip : AdvancedGunBehavior
 
         ProjectileModule mod = gun.DefaultModule;
             mod.ammoCost            = 0;
-            mod.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
-            mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+            mod.shootStyle          = ShootStyle.SemiAutomatic;
+            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
             mod.cooldownTime        = WhipChainStart.TOTAL_TIME + C.FRAME;
             mod.numberOfShotsInClip = -1;
 
@@ -54,7 +54,7 @@ public class PistolWhip : AdvancedGunBehavior
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("whip_segment").Base(),
             12, true, new IntVector2(16, 16),
-            false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
+            false, Anchor.MiddleCenter, true, true);
 
         _PistolButtProjectile = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items.Ak47) as Gun, setGunDefaultProjectile: false);
             _PistolButtProjectile.AddDefaultAnimation(_BulletSprite);
@@ -63,7 +63,7 @@ public class PistolWhip : AdvancedGunBehavior
             _PistolButtProjectile.baseData.damage = 30f;
             _PistolButtProjectile.baseData.force  = 40f;
             _PistolButtProjectile.SetAllImpactVFX(VFX.RegisterVFXPool("WhipParticles", ResMap.Get("whip_particles"),
-                fps: 20, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f));
+                fps: 20, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f));
             _PistolButtProjectile.gameObject.AddComponent<PistolButtProjectile>();
     }
 }
@@ -245,7 +245,7 @@ public class WhipChainStart : MonoBehaviour
                 segBegin = segEnd;
             }
 
-            pistolSprite.PlaceAtRotatedPositionByAnchor(segEnd, tk2dBaseSprite.Anchor.MiddleLeft);
+            pistolSprite.PlaceAtRotatedPositionByAnchor(segEnd, Anchor.MiddleLeft);
 
             yield return null;
         }

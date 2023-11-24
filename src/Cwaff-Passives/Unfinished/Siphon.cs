@@ -23,7 +23,7 @@ public class Siphon : PassiveItem
     public static void Init()
     {
         PickupObject item = Lazy.SetupPassive<Siphon>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality      = PickupObject.ItemQuality.B;
+        item.quality      = ItemQuality.B;
     }
 
     public override void Pickup(PlayerController player)

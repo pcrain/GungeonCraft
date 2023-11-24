@@ -21,7 +21,7 @@ public class DeadRinger : PassiveItem
     public static void Init()
     {
         PickupObject item = Lazy.SetupPassive<DeadRinger>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality      = PickupObject.ItemQuality.A;
+        item.quality      = ItemQuality.A;
         _CorpsePrefab     = BraveResources.Load("Global Prefabs/PlayerCorpse") as GameObject;
     }
 
@@ -136,7 +136,7 @@ public class DeadRinger : PassiveItem
             GameObject smoke = UnityEngine.Object.Instantiate(smokePrefab);
             tk2dBaseSprite sprite = smoke.GetComponent<tk2dBaseSprite>();
             sprite.PlaceAtPositionByAnchor((ppos + Lazy.RandomVector(
-                UnityEngine.Random.Range(0f,0.5f))).ToVector3ZisY(), tk2dBaseSprite.Anchor.MiddleCenter);
+                UnityEngine.Random.Range(0f,0.5f))).ToVector3ZisY(), Anchor.MiddleCenter);
             sprite.transform.position = sprite.transform.position.Quantize(0.0625f);
         }
     }

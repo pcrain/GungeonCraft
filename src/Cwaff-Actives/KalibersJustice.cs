@@ -12,7 +12,7 @@ public class KalibersJustice : PlayerItem
     public static void Init()
     {
         PlayerItem item = Lazy.SetupActive<KalibersJustice>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality      = PickupObject.ItemQuality.B;
+        item.quality      = ItemQuality.B;
         item.consumable   = false;
         item.CanBeDropped = true;
         item.SetCooldownType(ItemBuilder.CooldownType.Damage, 1000f);
@@ -216,16 +216,16 @@ public class KalibersJustice : PlayerItem
                     LootEngine.SpawnItem(ItemHelper.Get(Items.PartialAmmo).gameObject, SpotNear(where), Vector2.zero, 0f, true, true, false);
                 break;
             case NeedType.Guns:
-                PickupObject.ItemQuality qg = Lazy.CoinFlip()
-                    ? (big ? PickupObject.ItemQuality.S : PickupObject.ItemQuality.B)
-                    : (big ? PickupObject.ItemQuality.A : PickupObject.ItemQuality.C);
+                ItemQuality qg = Lazy.CoinFlip()
+                    ? (big ? ItemQuality.S : ItemQuality.B)
+                    : (big ? ItemQuality.A : ItemQuality.C);
                 LootEngine.SpawnItem(GameManager.Instance.RewardManager.GetItemForPlayer(
                     user, GameManager.Instance.RewardManager.GunsLootTable, qg, null).gameObject, SpotNear(where), Vector2.zero, 0f, true, true, false);
                 break;
             case NeedType.Passives: // TODO: can spawn actives too since it just uses the ItemsLootTable
-                PickupObject.ItemQuality qp = Lazy.CoinFlip()
-                    ? (big ? PickupObject.ItemQuality.S : PickupObject.ItemQuality.B)
-                    : (big ? PickupObject.ItemQuality.A : PickupObject.ItemQuality.C);
+                ItemQuality qp = Lazy.CoinFlip()
+                    ? (big ? ItemQuality.S : ItemQuality.B)
+                    : (big ? ItemQuality.A : ItemQuality.C);
                 LootEngine.SpawnItem(GameManager.Instance.RewardManager.GetItemForPlayer(
                     user, GameManager.Instance.RewardManager.ItemsLootTable, qp, null).gameObject, SpotNear(where), Vector2.zero, 0f, true, true, false);
                 break;
@@ -358,12 +358,12 @@ public class KalibersJustice : PlayerItem
         #region Guns
             Need gunsNeed = new Need(NeedType.Guns);
             int numGuns = user.inventory.AllGuns.Count;
-            PickupObject.ItemQuality bestGunQuality =
-                user.inventory.AllGuns.HighestQualityItem()?.quality ?? PickupObject.ItemQuality.D;
-            if      (numGuns <= 2 || bestGunQuality == PickupObject.ItemQuality.D) gunsNeed.status = NeedStatus.Minimal;
-            else if (numGuns <= 4 || bestGunQuality == PickupObject.ItemQuality.C) gunsNeed.status = NeedStatus.Lacking;
-            else if (numGuns <= 6 || bestGunQuality == PickupObject.ItemQuality.B) gunsNeed.status = NeedStatus.Enough;
-            else if (numGuns <= 8 || bestGunQuality == PickupObject.ItemQuality.A) gunsNeed.status = NeedStatus.Plenty;
+            ItemQuality bestGunQuality =
+                user.inventory.AllGuns.HighestQualityItem()?.quality ?? ItemQuality.D;
+            if      (numGuns <= 2 || bestGunQuality == ItemQuality.D) gunsNeed.status = NeedStatus.Minimal;
+            else if (numGuns <= 4 || bestGunQuality == ItemQuality.C) gunsNeed.status = NeedStatus.Lacking;
+            else if (numGuns <= 6 || bestGunQuality == ItemQuality.B) gunsNeed.status = NeedStatus.Enough;
+            else if (numGuns <= 8 || bestGunQuality == ItemQuality.A) gunsNeed.status = NeedStatus.Plenty;
             else                                                                   gunsNeed.status = NeedStatus.Excessive;
             needs.Add(gunsNeed);
         #endregion
@@ -371,12 +371,12 @@ public class KalibersJustice : PlayerItem
         #region Passives
             Need passivesNeed = new Need(NeedType.Passives);
             int numPassives = user.passiveItems.Count;
-            PickupObject.ItemQuality bestPassiveQuality =
-                user.passiveItems.HighestQualityItem()?.quality ?? PickupObject.ItemQuality.D;
-            if      (numPassives < 2 || bestPassiveQuality == PickupObject.ItemQuality.D) passivesNeed.status = NeedStatus.Minimal;
-            else if (numPassives < 4 || bestPassiveQuality == PickupObject.ItemQuality.C) passivesNeed.status = NeedStatus.Lacking;
-            else if (numPassives < 6 || bestPassiveQuality == PickupObject.ItemQuality.B) passivesNeed.status = NeedStatus.Enough;
-            else if (numPassives < 8 || bestPassiveQuality == PickupObject.ItemQuality.A) passivesNeed.status = NeedStatus.Plenty;
+            ItemQuality bestPassiveQuality =
+                user.passiveItems.HighestQualityItem()?.quality ?? ItemQuality.D;
+            if      (numPassives < 2 || bestPassiveQuality == ItemQuality.D) passivesNeed.status = NeedStatus.Minimal;
+            else if (numPassives < 4 || bestPassiveQuality == ItemQuality.C) passivesNeed.status = NeedStatus.Lacking;
+            else if (numPassives < 6 || bestPassiveQuality == ItemQuality.B) passivesNeed.status = NeedStatus.Enough;
+            else if (numPassives < 8 || bestPassiveQuality == ItemQuality.A) passivesNeed.status = NeedStatus.Plenty;
             else                                                                          passivesNeed.status = NeedStatus.Excessive;
             needs.Add(passivesNeed);
         #endregion
@@ -384,13 +384,13 @@ public class KalibersJustice : PlayerItem
         #region Actives
             Need activesNeed = new Need(NeedType.Actives);
             int numActives = user.activeItems.Count;
-            PickupObject.ItemQuality bestActiveQuality =
-                user.activeItems.HighestQualityItem()?.quality ?? PickupObject.ItemQuality.D;
+            ItemQuality bestActiveQuality =
+                user.activeItems.HighestQualityItem()?.quality ?? ItemQuality.D;
             if (user.activeItems.Count == 1 && user.activeItems[0] == this)
                 activesNeed.status = NeedStatus.Enough;
-            else if (numActives  < 2 || bestActiveQuality == PickupObject.ItemQuality.D) activesNeed.status = NeedStatus.Lacking;
-            else if (numActives  < 3 || bestActiveQuality == PickupObject.ItemQuality.C) activesNeed.status = NeedStatus.Enough;
-            else if (numActives  < 4 || bestActiveQuality == PickupObject.ItemQuality.A) activesNeed.status = NeedStatus.Plenty;
+            else if (numActives  < 2 || bestActiveQuality == ItemQuality.D) activesNeed.status = NeedStatus.Lacking;
+            else if (numActives  < 3 || bestActiveQuality == ItemQuality.C) activesNeed.status = NeedStatus.Enough;
+            else if (numActives  < 4 || bestActiveQuality == ItemQuality.A) activesNeed.status = NeedStatus.Plenty;
             else                                                                         activesNeed.status = NeedStatus.Excessive;
             needs.Add(activesNeed);
         #endregion

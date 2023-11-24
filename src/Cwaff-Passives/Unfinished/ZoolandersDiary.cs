@@ -10,7 +10,7 @@ public class ZoolandersDiary : PassiveItem
     public static void Init()
     {
         PickupObject item = Lazy.SetupPassive<ZoolandersDiary>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality      = PickupObject.ItemQuality.C;
+        item.quality      = ItemQuality.C;
     }
 
     public override void Pickup(PlayerController player)

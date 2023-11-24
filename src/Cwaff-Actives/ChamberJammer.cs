@@ -10,7 +10,7 @@ public class ChamberJammer : PlayerItem
     public static void Init()
     {
         PlayerItem item = Lazy.SetupActive<ChamberJammer>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality      = PickupObject.ItemQuality.C;
+        item.quality      = ItemQuality.C;
         item.consumable   = true;
         item.CanBeDropped = true;
     }

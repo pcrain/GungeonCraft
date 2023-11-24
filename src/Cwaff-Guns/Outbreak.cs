@@ -18,18 +18,18 @@ public class Outbreak : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Outbreak>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 1.2f, ammo: 300);
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 1.2f, ammo: 300);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
             gun.SetAnimationFPS(gun.reloadAnimation, 20);
-            gun.SetMuzzleVFX("muzzle_outbreak", fps: 40, scale: 0.3f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+            gun.SetMuzzleVFX("muzzle_outbreak", fps: 40, scale: 0.3f, anchor: Anchor.MiddleCenter);
             gun.SetFireAudio("outbreak_shoot_sound");
             gun.SetReloadAudio("outbreak_reload_sound");
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
 
         ProjectileModule mod = gun.DefaultModule;
             mod.ammoCost            = 1;
-            mod.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
-            mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+            mod.shootStyle          = ShootStyle.SemiAutomatic;
+            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
             mod.cooldownTime        = 0.2f;
             mod.numberOfShotsInClip = 10;
             mod.SetupCustomAmmoClip(SpriteName);
@@ -37,7 +37,7 @@ public class Outbreak : AdvancedGunBehavior
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("outbreak_projectile").Base(),
             12, true, new IntVector2(8, 7),
-            false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
+            false, Anchor.MiddleLeft, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
             projectile.AddDefaultAnimation(_BulletSprite);
@@ -48,8 +48,8 @@ public class Outbreak : AdvancedGunBehavior
             projectile.baseData.range  = 100f;
         _InfectionProjectile = projectile;
 
-        _OutbreakSmokeVFX = VFX.RegisterVFXObject("OutbreakSmoke", ResMap.Get("outbreak_smoke_small"), 2, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
-        _OutbreakSmokeLargeVFX = VFX.RegisterVFXObject("OutbreakSmokeLarge", ResMap.Get("outbreak_smoke_large"), 2, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+        _OutbreakSmokeVFX = VFX.RegisterVFXObject("OutbreakSmoke", ResMap.Get("outbreak_smoke_small"), 2, loops: true, anchor: Anchor.MiddleCenter);
+        _OutbreakSmokeLargeVFX = VFX.RegisterVFXObject("OutbreakSmokeLarge", ResMap.Get("outbreak_smoke_large"), 2, loops: true, anchor: Anchor.MiddleCenter);
     }
 
     public override void OnPostFired(PlayerController player, Gun gun)

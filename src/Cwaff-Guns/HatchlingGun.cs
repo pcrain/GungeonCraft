@@ -16,7 +16,7 @@ public class HatchlingGun : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<HatchlingGun>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.D, gunClass: GunClass.RIFLE, reloadTime: 25f / 20f /* frames / fps*/, ammo: 500);
+            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.RIFLE, reloadTime: 25f / 20f /* frames / fps*/, ammo: 500);
             gun.SetAnimationFPS(gun.shootAnimation, 40);
             gun.SetAnimationFPS(gun.reloadAnimation, 20);
             gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
@@ -26,8 +26,8 @@ public class HatchlingGun : AdvancedGunBehavior
 
         ProjectileModule mod = gun.DefaultModule;
             mod.ammoCost            = 1;
-            mod.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
-            mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+            mod.shootStyle          = ShootStyle.SemiAutomatic;
+            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
             mod.angleVariance       = 15.0f;
             mod.cooldownTime        = 0.2f;
             mod.numberOfShotsInClip = 12;
@@ -36,7 +36,7 @@ public class HatchlingGun : AdvancedGunBehavior
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("egg").Base(),
             12, true, new IntVector2(12, 12), // sprite is 8x8 -> 1.5x scale
-            false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
+            false, Anchor.MiddleCenter, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
             projectile.AddDefaultAnimation(_BulletSprite);
@@ -45,7 +45,7 @@ public class HatchlingGun : AdvancedGunBehavior
             projectile.transform.parent = gun.barrelOffset;
             projectile.gameObject.AddComponent<HatchlingProjectile>();
             projectile.SetAllImpactVFX(VFX.RegisterVFXPool(
-                "EggBreak", ResMap.Get("egg_break"), fps: 16, loops: false, scale: 0.75f, anchor: tk2dBaseSprite.Anchor.MiddleCenter));
+                "EggBreak", ResMap.Get("egg_break"), fps: 16, loops: false, scale: 0.75f, anchor: Anchor.MiddleCenter));
     }
 
     public override void OnPostFired(PlayerController player, Gun gun)

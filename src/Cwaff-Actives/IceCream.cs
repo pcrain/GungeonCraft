@@ -14,13 +14,13 @@ public class IceCream : PlayerItem
         IceCreamGun.Add(); // add the gun here because it's a pseudo-gun
 
         PlayerItem item = Lazy.SetupActive<IceCream>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality      = PickupObject.ItemQuality.C;
+        item.quality      = ItemQuality.C;
         item.consumable   = false;
         item.CanBeDropped = true;
         item.SetCooldownType(ItemBuilder.CooldownType.Timed, 15f);
 
         _HeartVFX = VFX.RegisterVFXObject("Heart", ResMap.Get("heart_vfx"),
-            fps: 18, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 1, emissiveColour: Color.magenta);
+            fps: 18, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 1, emissiveColour: Color.magenta);
     }
 
     public override bool CanBeUsed(PlayerController user)
@@ -61,15 +61,15 @@ public class IceCreamGun : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<IceCreamGun>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, hideFromAmmonomicon: true);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.SPECIAL, gunClass: GunClass.SILLY, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true);
+            gun.SetAttributes(quality: ItemQuality.SPECIAL, gunClass: GunClass.SILLY, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true);
             gun.SetAnimationFPS(gun.chargeAnimation, 16);
             gun.muzzleFlashEffects = null;
             gun.preventRotation        = true; // make sure the ice cream is always standing up straight
             gun.sprite.HeightOffGround = 0.2f; // render in front of the player
 
         ProjectileModule mod = gun.DefaultModule;
-            mod.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
-            mod.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
+            mod.shootStyle             = ShootStyle.SemiAutomatic;
+            mod.sequenceStyle          = ProjectileSequenceStyle.Random;
             mod.numberOfShotsInClip    = -1;
             mod.ammoType               = GameUIAmmoType.AmmoType.BEAM;
             mod.cooldownTime           = 0.0f;

@@ -42,7 +42,7 @@ public class Ticonderogun : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Ticonderogun>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.0f, ammo: 150);
+            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.0f, ammo: 150);
             gun.SetAnimationFPS(gun.shootAnimation, 1);
             gun.SetAnimationFPS(gun.reloadAnimation, 1);
             gun.SetAnimationFPS(gun.chargeAnimation, 24);
@@ -52,8 +52,8 @@ public class Ticonderogun : AdvancedGunBehavior
         ProjectileModule mod = gun.DefaultModule;
             mod.ammoCost            = 0;
             mod.ammoType            = GameUIAmmoType.AmmoType.BEAM;
-            mod.shootStyle          = ProjectileModule.ShootStyle.Charged;
-            mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+            mod.shootStyle          = ShootStyle.Charged;
+            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
             mod.cooldownTime        = 0.1f;
             mod.numberOfShotsInClip = -1;
 
@@ -62,9 +62,9 @@ public class Ticonderogun : AdvancedGunBehavior
         //     projectile.transform.parent = gun.barrelOffset;
         //     projectile.gameObject.AddComponent<TranquilizerBehavior>();
 
-        _SparklePrefab = VFX.RegisterVFXObject("PencilSparkles", ResMap.Get("pencil_sparkles"), 12, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+        _SparklePrefab = VFX.RegisterVFXObject("PencilSparkles", ResMap.Get("pencil_sparkles"), 12, loops: false, anchor: Anchor.MiddleCenter);
         // FPS must be nonzero or sprites don't update properly
-        _RunePrefab = VFX.RegisterVFXObject("PencilRunes", ResMap.Get("pencil_runes"), 0.01f, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+        _RunePrefab = VFX.RegisterVFXObject("PencilRunes", ResMap.Get("pencil_runes"), 0.01f, loops: false, anchor: Anchor.MiddleCenter);
     }
 
     protected override void OnPickedUpByPlayer(PlayerController player)

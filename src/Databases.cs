@@ -1130,7 +1130,7 @@ public static class EasyGoopDefinitions  // mostly stolen from NN
             SeltzerGoop.usesAmbientGoopFX = true;
             SeltzerGoop.ambientGoopFXChance = 0.004f;
             SeltzerGoop.ambientGoopFX = VFX.RegisterVFXPool("SeltzerSparkles", ResMap.Get("seltzer_sparkles"), fps: 10,
-                loops: false, scale: 0.5f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+                loops: false, scale: 0.5f, anchor: Anchor.MiddleCenter);
 
     }
 }

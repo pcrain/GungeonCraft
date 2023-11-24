@@ -19,7 +19,7 @@ public class RacketLauncher : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<RacketLauncher>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: _AMMO, canReloadNoMatterAmmo: true);
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: _AMMO, canReloadNoMatterAmmo: true);
             gun.muzzleFlashEffects.type              = VFXPoolType.None;
             gun.SetAnimationFPS(gun.shootAnimation, 60);
             gun.SetAnimationFPS(gun.idleAnimation, _IDLE_FPS);
@@ -28,8 +28,8 @@ public class RacketLauncher : AdvancedGunBehavior
 
         ProjectileModule mod = gun.DefaultModule;
             mod.ammoCost               = 1;
-            mod.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
-            mod.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
+            mod.shootStyle             = ShootStyle.SemiAutomatic;
+            mod.sequenceStyle          = ProjectileSequenceStyle.Random;
             mod.cooldownTime           = 0.1f;
             mod.ammoType               = GameUIAmmoType.AmmoType.SMALL_BULLET;
             mod.numberOfShotsInClip    = -1;
@@ -38,7 +38,7 @@ public class RacketLauncher : AdvancedGunBehavior
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("tennis_ball").Base(),
             12, true, new IntVector2(9, 9),
-            false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
+            false, Anchor.MiddleCenter, true, true);
 
         Projectile projectile              = Lazy.PrefabProjectileFromGun(gun);
             projectile.AddDefaultAnimation(_BulletSprite);

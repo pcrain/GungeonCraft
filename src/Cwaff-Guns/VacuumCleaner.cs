@@ -27,14 +27,14 @@ public class VacuumCleaner : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<VacuumCleaner>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.D, gunClass: GunClass.CHARGE, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true);
+            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.CHARGE, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true);
             gun.SetAnimationFPS(gun.chargeAnimation, 16);
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
             gun.AddToSubShop(ModdedShopType.Rusty);
 
         ProjectileModule mod = gun.DefaultModule;
-            mod.shootStyle             = ProjectileModule.ShootStyle.Charged;
-            mod.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
+            mod.shootStyle             = ShootStyle.Charged;
+            mod.sequenceStyle          = ProjectileSequenceStyle.Random;
             mod.numberOfShotsInClip    = -1;
             mod.ammoType               = GameUIAmmoType.AmmoType.BEAM;
             mod.chargeProjectiles      = new(){ new(){
@@ -43,7 +43,7 @@ public class VacuumCleaner : AdvancedGunBehavior
             }};
 
         _VacuumVFX = VFX.RegisterVFXObject("VacuumParticle", ResMap.Get("vacuum_wind_sprite_a"),
-            fps: 30, loops: true, loopStart: 6, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.5f);
+            fps: 30, loops: true, loopStart: 6, anchor: Anchor.MiddleCenter, scale: 0.5f);
     }
 
     private void MaybeRestoreAmmo()

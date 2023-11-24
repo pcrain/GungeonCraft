@@ -25,7 +25,7 @@ public class Itemfinder : PlayerItem
     public static void Init()
     {
         PlayerItem item = Lazy.SetupActive<Itemfinder>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality      = PickupObject.ItemQuality.A;
+        item.quality      = ItemQuality.A;
         item.consumable   = false;
         item.CanBeDropped = true;
         item.SetCooldownType(ItemBuilder.CooldownType.Timed, 1f);
@@ -107,13 +107,13 @@ public class Itemfinder : PlayerItem
         {
             if (treasureVal > _TREASURE_CHANCES[i])
                 break;
-            PickupObject.ItemQuality q;
+            ItemQuality q;
             float treasureQual = UnityEngine.Random.value;
-            if      (treasureQual < _QUALITY_CHANCES[4]) q = PickupObject.ItemQuality.S;
-            else if (treasureQual < _QUALITY_CHANCES[3]) q = PickupObject.ItemQuality.A;
-            else if (treasureQual < _QUALITY_CHANCES[2]) q = PickupObject.ItemQuality.B;
-            else if (treasureQual < _QUALITY_CHANCES[1]) q = PickupObject.ItemQuality.C;
-            else                                         q = PickupObject.ItemQuality.D;
+            if      (treasureQual < _QUALITY_CHANCES[4]) q = ItemQuality.S;
+            else if (treasureQual < _QUALITY_CHANCES[3]) q = ItemQuality.A;
+            else if (treasureQual < _QUALITY_CHANCES[2]) q = ItemQuality.B;
+            else if (treasureQual < _QUALITY_CHANCES[1]) q = ItemQuality.C;
+            else                                         q = ItemQuality.D;
             // ETGModConsole.Log($"Seeding treasure {i+1} with quality {q}");
             InitializeSingleTreasureOfQuality(q);
         }
@@ -144,7 +144,7 @@ public class Itemfinder : PlayerItem
         return null;
     }
 
-    private void InitializeSingleTreasureOfQuality(PickupObject.ItemQuality quality)
+    private void InitializeSingleTreasureOfQuality(ItemQuality quality)
     {
         RoomHandler room = GetNextTreasureRoom();
         if (room == null)
@@ -170,7 +170,7 @@ public class TreasureLocation : MonoBehaviour
     public PickupObject pickup = null;
     public Vector2 location = Vector2.zero;
 
-    public static TreasureLocation Create(PickupObject.ItemQuality quality, Vector2 location)
+    public static TreasureLocation Create(ItemQuality quality, Vector2 location)
     {
         GameObject g = new GameObject();
             g.transform.position = location;

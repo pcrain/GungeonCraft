@@ -23,8 +23,8 @@ public class Missiletoe : AdvancedGunBehavior
     internal static GameObject _UnwrapVFXD;
 
     internal static List<PickupObject> _WrappedGifts = new();
-    internal static List<PickupObject.ItemQuality> _WrappedQualities = new();
-    internal static List<PickupObject.ItemQuality> _ShuffledQualities = new();
+    internal static List<ItemQuality> _WrappedQualities = new();
+    internal static List<ItemQuality> _ShuffledQualities = new();
     internal static float _WrapAnimLength;
 
     internal static Projectile _OrnamentProjectile;
@@ -37,12 +37,12 @@ public class Missiletoe : AdvancedGunBehavior
 
     private const int _WRAP_FPS = 16;
 
-    private PickupObject.ItemQuality _lastQualityFired;
+    private ItemQuality _lastQualityFired;
 
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Missiletoe>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.A, gunClass: GunClass.CHARM, reloadTime: 1.0f, ammo: 300, canReloadNoMatterAmmo: true);
+            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARM, reloadTime: 1.0f, ammo: 300, canReloadNoMatterAmmo: true);
             gun.SetAnimationFPS(gun.shootAnimation, 45);
             gun.SetAnimationFPS(gun.reloadAnimation, 20);
             gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
@@ -52,8 +52,8 @@ public class Missiletoe : AdvancedGunBehavior
 
         ProjectileModule mod = gun.DefaultModule;
             mod.ammoCost            = 1;
-            mod.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
-            mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+            mod.shootStyle          = ShootStyle.SemiAutomatic;
+            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
             mod.cooldownTime        = 0.2f;
             mod.numberOfShotsInClip = 1;
             mod.SetupCustomAmmoClip(SpriteName);
@@ -82,29 +82,29 @@ public class Missiletoe : AdvancedGunBehavior
 
         tk2dSpriteAnimationClip oldOrnamentProjectile = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("ornament_projectile").Base(),
-            1, true, new IntVector2(8, 7), false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
+            1, true, new IntVector2(8, 7), false, Anchor.MiddleLeft, true, true);
         tk2dSpriteAnimationClip oldExplodingOrnamentProjectile = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("exploding_ornament_projectile").Base(),
-            1, true, new IntVector2(8, 7), false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
+            1, true, new IntVector2(8, 7), false, Anchor.MiddleLeft, true, true);
 
         tk2dSpriteAnimationClip ballProjectile =
             AnimateBullet.CreateProjectileAnimation(ResMap.Get("missiletoe_projectile_ball").Base(), 2, true,
-                new IntVector2(6, 6), false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
+                new IntVector2(6, 6), false, Anchor.MiddleLeft, true, true);
         tk2dSpriteAnimationClip gingerbreadProjectile =
             AnimateBullet.CreateProjectileAnimation(ResMap.Get("missiletoe_projectile_gingerbread").Base(), 2, true,
-                new IntVector2(9, 11), false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
+                new IntVector2(9, 11), false, Anchor.MiddleLeft, true, true);
         tk2dSpriteAnimationClip mistletoeProjectile =
             AnimateBullet.CreateProjectileAnimation(ResMap.Get("missiletoe_projectile_mistletoe").Base(), 2, true,
-                new IntVector2(9, 7), false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
+                new IntVector2(9, 7), false, Anchor.MiddleLeft, true, true);
         tk2dSpriteAnimationClip sockProjectile =
             AnimateBullet.CreateProjectileAnimation(ResMap.Get("missiletoe_projectile_sock").Base(), 2, true,
-                new IntVector2(7, 9), false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
+                new IntVector2(7, 9), false, Anchor.MiddleLeft, true, true);
         tk2dSpriteAnimationClip starProjectile =
             AnimateBullet.CreateProjectileAnimation(ResMap.Get("missiletoe_projectile_star").Base(), 2, true,
-                new IntVector2(7, 7), false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
+                new IntVector2(7, 7), false, Anchor.MiddleLeft, true, true);
         tk2dSpriteAnimationClip wreathProjectile =
             AnimateBullet.CreateProjectileAnimation(ResMap.Get("missiletoe_projectile_wreath").Base(), 2, true,
-                new IntVector2(7, 9), false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
+                new IntVector2(7, 9), false, Anchor.MiddleLeft, true, true);
 
         _OrnamentProjectile = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items._38Special) as Gun, false);
             _OrnamentProjectile.AddAnimation(gingerbreadProjectile);
@@ -160,13 +160,13 @@ public class Missiletoe : AdvancedGunBehavior
         _GiftProjectileD = SetupProjectile(gun: gun, name: "gift_projectile_brown", damage: 10f, speed: 25f, force: 10f);
 
         _SparklePrefab = VFX.RegisterVFXObject("MissiletoeSparkles", ResMap.Get("pencil_sparkles"),
-            fps: 8, scale: 0.75f, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+            fps: 8, scale: 0.75f, loops: false, anchor: Anchor.MiddleCenter);
     }
 
     private static GameObject SetupVFX(string name)
     {
         return VFX.RegisterVFXObject($"VFX_{name}", ResMap.Get(name), _WRAP_FPS,
-            loops: false, anchor: tk2dBaseSprite.Anchor.LowerCenter, scale: 0.75f, persist: true);
+            loops: false, anchor: Anchor.LowerCenter, scale: 0.75f, persist: true);
     }
 
     private static Projectile SetupProjectile(Gun gun, string name, float damage, float speed, float force)
@@ -174,7 +174,7 @@ public class Missiletoe : AdvancedGunBehavior
         tk2dSpriteAnimationClip clip = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get(name).Base(),
             1, true, new IntVector2(14, 12),
-            false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
+            false, Anchor.MiddleLeft, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun, setGunDefaultProjectile: false);
             projectile.AddDefaultAnimation(clip);
@@ -197,31 +197,31 @@ public class Missiletoe : AdvancedGunBehavior
 
     public override Projectile OnPreFireProjectileModifier(Gun gun, Projectile projectile, ProjectileModule mod)
     {
-        PickupObject.ItemQuality quality;
+        ItemQuality quality;
         if (mod.ammoCost == 0)
             quality = this._lastQualityFired;
         else
             quality = this._lastQualityFired = _ShuffledQualities[mod.numberOfShotsInClip - gun.ClipShotsRemaining];
         switch (quality)
         {
-            case PickupObject.ItemQuality.S: return _GiftProjectileS;
-            case PickupObject.ItemQuality.A: return _GiftProjectileA;
-            case PickupObject.ItemQuality.B: return _GiftProjectileB;
-            case PickupObject.ItemQuality.C: return _GiftProjectileC;
-            case PickupObject.ItemQuality.D: return _GiftProjectileD;
+            case ItemQuality.S: return _GiftProjectileS;
+            case ItemQuality.A: return _GiftProjectileA;
+            case ItemQuality.B: return _GiftProjectileB;
+            case ItemQuality.C: return _GiftProjectileC;
+            case ItemQuality.D: return _GiftProjectileD;
             default                        : return _GiftProjectileD;
         }
     }
 
-    public static GameObject GetGiftVFX(PickupObject.ItemQuality quality, bool wrap)
+    public static GameObject GetGiftVFX(ItemQuality quality, bool wrap)
     {
         switch (quality)
         {
-            case PickupObject.ItemQuality.S: return wrap ? _WrapVFXS : _UnwrapVFXS;
-            case PickupObject.ItemQuality.A: return wrap ? _WrapVFXA : _UnwrapVFXA;
-            case PickupObject.ItemQuality.B: return wrap ? _WrapVFXB : _UnwrapVFXB;
-            case PickupObject.ItemQuality.C: return wrap ? _WrapVFXC : _UnwrapVFXC;
-            case PickupObject.ItemQuality.D: return wrap ? _WrapVFXD : _UnwrapVFXD;
+            case ItemQuality.S: return wrap ? _WrapVFXS : _UnwrapVFXS;
+            case ItemQuality.A: return wrap ? _WrapVFXA : _UnwrapVFXA;
+            case ItemQuality.B: return wrap ? _WrapVFXB : _UnwrapVFXB;
+            case ItemQuality.C: return wrap ? _WrapVFXC : _UnwrapVFXC;
+            case ItemQuality.D: return wrap ? _WrapVFXD : _UnwrapVFXD;
             default                        : return wrap ? _WrapVFXD : _UnwrapVFXD;
         }
     }
@@ -260,10 +260,10 @@ public class Missiletoe : AdvancedGunBehavior
     }
 
     private const float _MAX_DIST = 5f;
-    private static readonly List<PickupObject.ItemQuality> _BannedQualities = new(){
-        PickupObject.ItemQuality.COMMON,
-        PickupObject.ItemQuality.EXCLUDED,
-        PickupObject.ItemQuality.SPECIAL,
+    private static readonly List<ItemQuality> _BannedQualities = new(){
+        ItemQuality.COMMON,
+        ItemQuality.EXCLUDED,
+        ItemQuality.SPECIAL,
     };
     private void WrapPresent()
     {
@@ -298,7 +298,7 @@ public class Missiletoe : AdvancedGunBehavior
 
     internal void RecalculateClip()
     {
-        _WrappedQualities.Add(PickupObject.ItemQuality.D);  // make sure our list has at least one item
+        _WrappedQualities.Add(ItemQuality.D);  // make sure our list has at least one item
         _ShuffledQualities = _WrappedQualities.CopyAndShuffle();
         _WrappedQualities.Pop();
         this.gun.DefaultModule.numberOfShotsInClip = _ShuffledQualities.Count();
@@ -479,7 +479,7 @@ public class WrappableGift : MonoBehaviour
         if (unwrapping)// Wait for the appropriate point in the animation, then drop the original pickup
         {
             yield return new WaitForSeconds(animLength * (1f - _VANISH_PERCENT));
-            Vector2 trueTarget = targetPosition - this._pickup.sprite.GetRelativePositionFromAnchor(tk2dBaseSprite.Anchor.LowerCenter);
+            Vector2 trueTarget = targetPosition - this._pickup.sprite.GetRelativePositionFromAnchor(Anchor.LowerCenter);
             if (isGun)
                 trueTarget += _EXTRA_OFFSET; // guns are weirdly offset for some reason
             LootEngine.DropItemWithoutInstantiating(this._pickup.gameObject, trueTarget, Vector2.zero, 0f, true, false, true);
@@ -517,7 +517,7 @@ public class WrappableGift : MonoBehaviour
             if (wrapping)
                 scale = 1f - scale;
             pickupvfx.sprite.transform.localScale = new Vector3(scale, scale, 1f);
-            pickupvfx.sprite.PlaceAtScaledPositionByAnchor(curPosition, tk2dBaseSprite.Anchor.MiddleCenter);
+            pickupvfx.sprite.PlaceAtScaledPositionByAnchor(curPosition, Anchor.MiddleCenter);
             yield return null;
         }
     }

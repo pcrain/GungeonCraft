@@ -17,7 +17,7 @@ public class Bouncer : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Bouncer>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 0.8f, ammo: 300);
+            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 0.8f, ammo: 300);
             gun.SetAnimationFPS(gun.shootAnimation, 14);
             gun.SetAnimationFPS(gun.reloadAnimation, 20);
             gun.SetMuzzleVFX(Items.Magnum);
@@ -28,8 +28,8 @@ public class Bouncer : AdvancedGunBehavior
 
         ProjectileModule mod = gun.DefaultModule;
             mod.ammoCost               = 1;
-            mod.shootStyle             = ProjectileModule.ShootStyle.SemiAutomatic;
-            mod.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
+            mod.shootStyle             = ShootStyle.SemiAutomatic;
+            mod.sequenceStyle          = ProjectileSequenceStyle.Random;
             mod.cooldownTime           = 0.16f;
             mod.numberOfShotsInClip    = 6;
 
@@ -38,7 +38,7 @@ public class Bouncer : AdvancedGunBehavior
         tk2dSpriteAnimationClip anim = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("energy_bounce").Base(),
             10, true, new IntVector2(10, 10), // reduced sprite size
-            false, tk2dBaseSprite.Anchor.MiddleCenter, true, true, null, colliderSize);
+            false, Anchor.MiddleCenter, true, true, null, colliderSize);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
             projectile.AddDefaultAnimation(anim);

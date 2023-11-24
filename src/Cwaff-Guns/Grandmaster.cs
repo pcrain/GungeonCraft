@@ -18,7 +18,7 @@ public class Grandmaster : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Grandmaster>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.0f, ammo: 350);
+            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.0f, ammo: 350);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
             gun.SetAnimationFPS(gun.reloadAnimation, 16);
             gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
@@ -27,24 +27,24 @@ public class Grandmaster : AdvancedGunBehavior
 
         ProjectileModule mod = gun.DefaultModule;
             mod.ammoCost            = 1;
-            mod.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
-            mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+            mod.shootStyle          = ShootStyle.SemiAutomatic;
+            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
             mod.cooldownTime        = 0.1f;
             mod.numberOfShotsInClip = 20;
             mod.SetupCustomAmmoClip(SpriteName);
 
         _PawnSprite   = AnimateBullet.CreateProjectileAnimation(ResMap.Get("chess_pawn").Base(), 12, true, new IntVector2(8, 12), false,
-            tk2dBaseSprite.Anchor.MiddleCenter, true, true);
+            Anchor.MiddleCenter, true, true);
         _RookSprite   = AnimateBullet.CreateProjectileAnimation(ResMap.Get("chess_rook").Base(), 12, true, new IntVector2(8, 12), false,
-            tk2dBaseSprite.Anchor.MiddleCenter, true, true);
+            Anchor.MiddleCenter, true, true);
         _BishopSprite = AnimateBullet.CreateProjectileAnimation(ResMap.Get("chess_bishop").Base(), 12, true, new IntVector2(8, 12), false,
-            tk2dBaseSprite.Anchor.MiddleCenter, true, true);
+            Anchor.MiddleCenter, true, true);
         _KnightSprite = AnimateBullet.CreateProjectileAnimation(ResMap.Get("chess_knight").Base(), 12, true, new IntVector2(8, 12), false,
-            tk2dBaseSprite.Anchor.MiddleCenter, true, true);
+            Anchor.MiddleCenter, true, true);
         _QueenSprite  = AnimateBullet.CreateProjectileAnimation(ResMap.Get("chess_queen").Base(), 12, true, new IntVector2(8, 12), false,
-            tk2dBaseSprite.Anchor.MiddleCenter, true, true);
+            Anchor.MiddleCenter, true, true);
         _KingSprite   = AnimateBullet.CreateProjectileAnimation(ResMap.Get("chess_king").Base(), 12, true, new IntVector2(8, 12), false,
-            tk2dBaseSprite.Anchor.MiddleCenter, true, true);
+            Anchor.MiddleCenter, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
             projectile.AddDefaultAnimation(_PawnSprite);

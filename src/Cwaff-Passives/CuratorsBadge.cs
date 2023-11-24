@@ -39,7 +39,7 @@ public class CuratorsBadge : PassiveItem
     public static void Init()
     {
         PickupObject item  = Lazy.SetupPassive<CuratorsBadge>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality       = PickupObject.ItemQuality.D;
+        item.quality       = ItemQuality.D;
     }
 
     public override void Pickup(PlayerController player)

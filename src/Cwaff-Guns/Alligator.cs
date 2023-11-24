@@ -20,10 +20,10 @@ public class Alligator : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Alligator>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.C, gunClass: GunClass.CHARGE, reloadTime: 2.0f, ammo: 300);
+            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.CHARGE, reloadTime: 2.0f, ammo: 300);
             gun.SetAnimationFPS(gun.shootAnimation, 16);
             gun.SetAnimationFPS(gun.reloadAnimation, 16);
-            gun.SetMuzzleVFX("muzzle_alligator", fps: 60, scale: 0.5f, anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 50f);
+            gun.SetMuzzleVFX("muzzle_alligator", fps: 60, scale: 0.5f, anchor: Anchor.MiddleCenter, emissivePower: 50f);
             gun.SetFireAudio("alligator_shoot_sound");
             gun.SetReloadAudio("alligator_reload_sound");
 
@@ -32,8 +32,8 @@ public class Alligator : AdvancedGunBehavior
 
         ProjectileModule mod = gun.DefaultModule;
             mod.ammoCost            = 1;
-            mod.shootStyle          = ProjectileModule.ShootStyle.Automatic;
-            mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Random;
+            mod.shootStyle          = ShootStyle.Automatic;
+            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
             mod.angleVariance       = 15.0f;
             mod.cooldownTime        = 0.4f;
             mod.numberOfShotsInClip = 8;
@@ -42,16 +42,16 @@ public class Alligator : AdvancedGunBehavior
             projectile.AddDefaultAnimation(AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("alligator_projectile").Base(),
                 2, true, new IntVector2(6, 8),
-                false, tk2dBaseSprite.Anchor.MiddleCenter, true, true));
+                false, Anchor.MiddleCenter, true, true));
             projectile.baseData.damage  = 1f;
             projectile.baseData.speed   = 36.0f;
             projectile.transform.parent = gun.barrelOffset;
             projectile.gameObject.AddComponent<AlligatorProjectile>();
 
         _SparkVFX = VFX.RegisterVFXObject(
-            "SparkVFX", ResMap.Get("spark_vfx"), fps: 16, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.35f, emissivePower: 50f);
+            "SparkVFX", ResMap.Get("spark_vfx"), fps: 16, loops: true, anchor: Anchor.MiddleCenter, scale: 0.35f, emissivePower: 50f);
         _ClipVFX = VFX.RegisterVFXObject(
-            "AlligatorClipVFX", ResMap.Get("alligator_projectile_clamped"), fps: 2, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+            "AlligatorClipVFX", ResMap.Get("alligator_projectile_clamped"), fps: 2, loops: true, anchor: Anchor.MiddleCenter);
     }
 
     protected override void OnPickedUpByPlayer(PlayerController player)

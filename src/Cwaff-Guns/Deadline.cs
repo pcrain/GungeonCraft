@@ -27,18 +27,18 @@ public class Deadline : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Deadline>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 0.9f, ammo: 64);
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 0.9f, ammo: 64);
             gun.SetAnimationFPS(gun.shootAnimation, 20);
             gun.SetAnimationFPS(gun.reloadAnimation, 30);
             gun.SetAnimationFPS(gun.idleAnimation, 10);
-            gun.SetMuzzleVFX("muzzle_deadline", fps: 20, scale: 0.4f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+            gun.SetMuzzleVFX("muzzle_deadline", fps: 20, scale: 0.4f, anchor: Anchor.MiddleCenter);
             gun.SetFireAudio("deadline_fire_sound");
             gun.SetReloadAudio("deadline_reload_sound");
             gun.AddToSubShop(ModdedShopType.TimeTrader);
             gun.AddToSubShop(ModdedShopType.Boomhildr);
 
         ProjectileModule mod = gun.DefaultModule;
-            mod.shootStyle          = ProjectileModule.ShootStyle.SemiAutomatic;
+            mod.shootStyle          = ShootStyle.SemiAutomatic;
             mod.angleVariance       = 0.0f;
             mod.cooldownTime        = 0.4f;
             mod.numberOfShotsInClip = 8;
@@ -46,7 +46,7 @@ public class Deadline : AdvancedGunBehavior
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("deadline_projectile").Base(),
             2, true, new IntVector2(23, 4),
-            false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
+            false, Anchor.MiddleLeft, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
             projectile.AddDefaultAnimation(_BulletSprite);
@@ -96,7 +96,7 @@ public class Deadline : AdvancedGunBehavior
         };
 
         _SplodeVFX = VFX.RegisterVFXObject("Splode", ResMap.Get("splode"),
-            fps: 18, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 100, emissiveColour: Color.cyan);
+            fps: 18, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 100, emissiveColour: Color.cyan);
     }
 
     public override void OnSwitchedToThisGun()

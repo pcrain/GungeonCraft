@@ -30,20 +30,20 @@ public class AimuHakurei : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<AimuHakurei>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.B, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f,
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f,
                 ammo: 200, /*infiniteAmmo: true,*/ canGainAmmo: false, canReloadNoMatterAmmo: true);
             gun.Volley.ModulesAreTiers = true;
             gun.SetAnimationFPS(gun.shootAnimation, 60);
-            gun.SetMuzzleVFX("muzzle_aimu", fps: 30, scale: 0.3f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+            gun.SetMuzzleVFX("muzzle_aimu", fps: 30, scale: 0.3f, anchor: Anchor.MiddleCenter);
             gun.AddToSubShop(ModdedShopType.TimeTrader);
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("aimu_projectile").Base(),
             2, true, new IntVector2(10, 10),
-            false, tk2dBaseSprite.Anchor.MiddleCenter, true, true);
+            false, Anchor.MiddleCenter, true, true);
 
         _GrazeVFX = VFX.RegisterVFXObject("GrazeVFX", ResMap.Get("graze_vfx"),
-            fps: 5, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 1.0f, emissivePower: 5f);
+            fps: 5, loops: true, anchor: Anchor.MiddleCenter, scale: 1.0f, emissivePower: 5f);
 
         _ProjBase = Lazy.PrefabProjectileFromGun(gun, setGunDefaultProjectile: false);
             _ProjBase.baseData.speed  = 44f;
@@ -60,7 +60,7 @@ public class AimuHakurei : AdvancedGunBehavior
                 tc.UsesDispersalParticles = true;
                 tc.DispersalParticleSystemPrefab = (ItemHelper.Get(Items.FlashRay) as Gun).DefaultModule.projectiles[0].GetComponentInChildren<TrailController>().DispersalParticleSystemPrefab;
             beamProj.SetAllImpactVFX(VFX.RegisterVFXPool(
-                ItemName+" Impact", ResMap.Get("gaster_beam_impact"), fps: 20, loops: false, scale: 1.0f, anchor: tk2dBaseSprite.Anchor.MiddleCenter));
+                ItemName+" Impact", ResMap.Get("gaster_beam_impact"), fps: 20, loops: false, scale: 1.0f, anchor: Anchor.MiddleCenter));
 
         // set up tiered projectiles
         gun.Volley.projectiles = new(){
@@ -189,8 +189,8 @@ public class AimuHakurei : AdvancedGunBehavior
             mod.projectiles         = projectiles;
             mod.ammoCost            = 0;
             mod.numberOfShotsInClip = -1;
-            mod.shootStyle          = ProjectileModule.ShootStyle.Burst;
-            mod.sequenceStyle       = ProjectileModule.ProjectileSequenceStyle.Ordered;
+            mod.shootStyle          = ShootStyle.Burst;
+            mod.sequenceStyle       = ProjectileSequenceStyle.Ordered;
             mod.angleVariance       = 15f - (2 * level);
             mod.angleFromAim        = 0f;
             mod.burstShotCount      = mod.projectiles.Count();

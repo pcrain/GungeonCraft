@@ -32,7 +32,7 @@ public class MiniInteractable : BraveBehaviour, IPlayerInteractable
     base.sprite.SetSprite(collection, spriteId);
     base.sprite.IsPerpendicular = true;
     base.sprite.HeightOffGround = 1f;
-    base.sprite.PlaceAtPositionByAnchor(base.transform.parent.position, tk2dBaseSprite.Anchor.MiddleCenter);
+    base.sprite.PlaceAtPositionByAnchor(base.transform.parent.position, Anchor.MiddleCenter);
     base.sprite.transform.position = base.sprite.transform.position.Quantize(0.0625f);
     DepthLookupManager.ProcessRenderer(base.sprite.renderer);
     tk2dSprite componentInParent = base.transform.parent.gameObject.GetComponentInParent<tk2dSprite>();

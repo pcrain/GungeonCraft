@@ -13,7 +13,7 @@ public class Gyroscope : PassiveItem
     public static void Init()
     {
         PickupObject item = Lazy.SetupPassive<Gyroscope>(ItemName, SpritePath, ShortDescription, LongDescription);
-        item.quality      = PickupObject.ItemQuality.A;
+        item.quality      = ItemQuality.A;
 
         var comp = item.gameObject.AddComponent<GyroscopeRoll>();
     }

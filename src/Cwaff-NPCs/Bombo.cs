@@ -193,10 +193,10 @@ public class Bombo : FancyNPC
         GameObject bombyPickup;
             if (UnityEngine.Random.Range(0,2) == 0)
                 bombyPickup = LootEngine.GetItemOfTypeAndQuality<PickupObject>(
-                                PickupObject.ItemQuality.S, GameManager.Instance.RewardManager.GunsLootTable, false).gameObject;
+                                ItemQuality.S, GameManager.Instance.RewardManager.GunsLootTable, false).gameObject;
             else
                 bombyPickup = LootEngine.GetItemOfTypeAndQuality<PickupObject>(
-                                PickupObject.ItemQuality.S, GameManager.Instance.RewardManager.ItemsLootTable, false).gameObject;
+                                ItemQuality.S, GameManager.Instance.RewardManager.ItemsLootTable, false).gameObject;
         PickupObject po = bombyPickup.GetComponent<PickupObject>();
 
         List<string> conversation = new List<string> {
@@ -222,7 +222,7 @@ public class Bombo : FancyNPC
 
         GameObject smoke = (GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global VFX/VFX_Item_Spawn_Poof"));
         tk2dBaseSprite smokesprite = smoke.GetComponent<tk2dBaseSprite>();
-        smokesprite.PlaceAtPositionByAnchor(po.sprite.WorldCenter.ToVector3ZUp(0f), tk2dBaseSprite.Anchor.MiddleCenter);
+        smokesprite.PlaceAtPositionByAnchor(po.sprite.WorldCenter.ToVector3ZUp(0f), Anchor.MiddleCenter);
         smokesprite.transform.position = bombyItem.transform.parent.position.Quantize(0.0625f);
         smokesprite.HeightOffGround = 5f;
         smokesprite.UpdateZDepth();

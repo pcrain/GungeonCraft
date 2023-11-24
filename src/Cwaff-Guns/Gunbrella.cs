@@ -32,22 +32,22 @@ public class Gunbrella : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Gunbrella>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
-            gun.SetAttributes(quality: PickupObject.ItemQuality.A, gunClass: GunClass.CHARGE, reloadTime: 1.0f, ammo: 60);
+            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARGE, reloadTime: 1.0f, ammo: 60);
             gun.SetAnimationFPS(gun.shootAnimation, 60);
             gun.SetAnimationFPS(gun.chargeAnimation, 16);
             gun.LoopAnimation(gun.chargeAnimation, 17);
-            gun.SetMuzzleVFX("muzzle_gunbrella", fps: 30, scale: 0.5f, anchor: tk2dBaseSprite.Anchor.MiddleCenter);
+            gun.SetMuzzleVFX("muzzle_gunbrella", fps: 30, scale: 0.5f, anchor: Anchor.MiddleCenter);
 
         ProjectileModule mod = gun.DefaultModule;
-            mod.shootStyle             = ProjectileModule.ShootStyle.Charged;
-            mod.sequenceStyle          = ProjectileModule.ProjectileSequenceStyle.Random;
+            mod.shootStyle             = ShootStyle.Charged;
+            mod.sequenceStyle          = ProjectileSequenceStyle.Random;
             mod.numberOfShotsInClip    = 1;
             mod.SetupCustomAmmoClip(SpriteName);
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("gunbrella_projectile").Base(),
             16, true, new IntVector2(15, 8),
-            false, tk2dBaseSprite.Anchor.MiddleLeft, true, true);
+            false, Anchor.MiddleLeft, true, true);
 
         for (int i = 1; i < _BARRAGE_SIZE; i++) // start from 1 since we already have a default module
         {
@@ -57,7 +57,7 @@ public class Gunbrella : AdvancedGunBehavior
         }
 
         _HailParticle = VFX.RegisterVFXPool("HailParticle", ResMap.Get("icicle_crash_particles"),
-            fps: 30, loops: false, anchor: tk2dBaseSprite.Anchor.MiddleCenter, scale: 0.35f);
+            fps: 30, loops: false, anchor: Anchor.MiddleCenter, scale: 0.35f);
 
         GameActorFreezeEffect freeze = ItemHelper.Get(Items.FrostBullets).GetComponent<BulletStatusEffectItem>().FreezeModifierEffect;
         for (int i = 0; i < _BARRAGE_SIZE; i++)
@@ -77,8 +77,8 @@ public class Gunbrella : AdvancedGunBehavior
             pmod.angleVariance = 10f;
             if (i >= 1)
                 pmod.ammoCost = 0;
-            pmod.shootStyle = ProjectileModule.ShootStyle.Charged;
-            pmod.sequenceStyle = ProjectileModule.ProjectileSequenceStyle.Random;
+            pmod.shootStyle = ShootStyle.Charged;
+            pmod.sequenceStyle = ProjectileSequenceStyle.Random;
             pmod.chargeProjectiles = new(){ new(){
                 Projectile = projectile,
                 ChargeTime = _MIN_CHARGE_TIME,
@@ -86,7 +86,7 @@ public class Gunbrella : AdvancedGunBehavior
         }
 
         _RainReticle = VFX.RegisterVFXObject("RainReticle", ResMap.Get("gunbrella_target_reticle"),
-            fps: 12, loops: true, anchor: tk2dBaseSprite.Anchor.MiddleCenter, emissivePower: 10, emissiveColour: Color.cyan, scale: 0.75f);
+            fps: 12, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 10, emissiveColour: Color.cyan, scale: 0.75f);
     }
 
     protected override void Update()
