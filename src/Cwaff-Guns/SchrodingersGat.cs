@@ -29,7 +29,7 @@ public class SchrodingersGat : AdvancedGunBehavior
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("schrodingers_gat_projectile").Base(),
-            12, true, new IntVector2(8, 7),
+            12, true, 1.0f,
             false, Anchor.MiddleCenter, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);

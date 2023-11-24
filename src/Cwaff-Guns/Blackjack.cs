@@ -30,12 +30,12 @@ public class Blackjack : AdvancedGunBehavior
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("playing_card").Base(),
-            0, true, new IntVector2(12, 8),
+            0, true, 0.25f,
             false, Anchor.MiddleLeft, true, true);
 
         _BackSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("playing_card_back").Base(),
-            0, true, new IntVector2(12, 8),
+            0, true, 0.25f,
             false, Anchor.MiddleLeft, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);

@@ -33,7 +33,7 @@ public class Bouncer : AdvancedGunBehavior
 
         tk2dSpriteAnimationClip anim = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("energy_bounce").Base(),
-            10, true, new IntVector2(10, 10), // reduced sprite size
+            10, true, 0.2f, // reduced sprite size (DOUBLE CHECK SCALE IS CORRECT)
             false, Anchor.MiddleCenter, true, true, null, colliderSize);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);

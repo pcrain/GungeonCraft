@@ -29,7 +29,7 @@ public class Natascha : AdvancedGunBehavior
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("natascha_bullet").Base(),
-            12, true, new IntVector2((int)(_NATASHA_PROJECTILE_SCALE * 15), (int)(_NATASHA_PROJECTILE_SCALE * 7)),
+            12, true, _NATASHA_PROJECTILE_SCALE,
             false, Anchor.MiddleCenter, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);

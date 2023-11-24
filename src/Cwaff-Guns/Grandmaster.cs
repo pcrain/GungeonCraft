@@ -28,17 +28,17 @@ public class Grandmaster : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
 
-        _PawnSprite   = AnimateBullet.CreateProjectileAnimation(ResMap.Get("chess_pawn").Base(), 12, true, new IntVector2(8, 12), false,
+        _PawnSprite   = AnimateBullet.CreateProjectileAnimation(ResMap.Get("chess_pawn").Base(), 12, true, 0.8f, false,
             Anchor.MiddleCenter, true, true);
-        _RookSprite   = AnimateBullet.CreateProjectileAnimation(ResMap.Get("chess_rook").Base(), 12, true, new IntVector2(8, 12), false,
+        _RookSprite   = AnimateBullet.CreateProjectileAnimation(ResMap.Get("chess_rook").Base(), 12, true, 0.8f, false,
             Anchor.MiddleCenter, true, true);
-        _BishopSprite = AnimateBullet.CreateProjectileAnimation(ResMap.Get("chess_bishop").Base(), 12, true, new IntVector2(8, 12), false,
+        _BishopSprite = AnimateBullet.CreateProjectileAnimation(ResMap.Get("chess_bishop").Base(), 12, true, 0.8f, false,
             Anchor.MiddleCenter, true, true);
-        _KnightSprite = AnimateBullet.CreateProjectileAnimation(ResMap.Get("chess_knight").Base(), 12, true, new IntVector2(8, 12), false,
+        _KnightSprite = AnimateBullet.CreateProjectileAnimation(ResMap.Get("chess_knight").Base(), 12, true, 0.8f, false,
             Anchor.MiddleCenter, true, true);
-        _QueenSprite  = AnimateBullet.CreateProjectileAnimation(ResMap.Get("chess_queen").Base(), 12, true, new IntVector2(8, 12), false,
+        _QueenSprite  = AnimateBullet.CreateProjectileAnimation(ResMap.Get("chess_queen").Base(), 12, true, 0.8f, false,
             Anchor.MiddleCenter, true, true);
-        _KingSprite   = AnimateBullet.CreateProjectileAnimation(ResMap.Get("chess_king").Base(), 12, true, new IntVector2(8, 12), false,
+        _KingSprite   = AnimateBullet.CreateProjectileAnimation(ResMap.Get("chess_king").Base(), 12, true, 0.8f, false,
             Anchor.MiddleCenter, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);

@@ -29,7 +29,7 @@ public class IronMaid : AdvancedGunBehavior
 
         _KunaiSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("kunai").Base(),
-            12, true, new IntVector2(16, 10),
+            12, true, 1.0f,
             false, Anchor.MiddleCenter, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);

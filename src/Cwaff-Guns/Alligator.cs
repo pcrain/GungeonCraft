@@ -36,7 +36,7 @@ public class Alligator : AdvancedGunBehavior
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
             projectile.AddDefaultAnimation(AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("alligator_projectile").Base(),
-                2, true, new IntVector2(6, 8),
+                2, true, 1.0f,
                 false, Anchor.MiddleCenter, true, true));
             projectile.baseData.damage  = 1f;
             projectile.baseData.speed   = 36.0f;

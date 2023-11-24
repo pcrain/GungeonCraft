@@ -34,7 +34,7 @@ public class BBGun : AdvancedGunBehavior
             projectile.baseData.speed = 20f;
             projectile.AddDefaultAnimation(AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("bball").Base(),
-                20, true, new IntVector2(24, 22),
+                20, true, 1.0f,
                 false, Anchor.MiddleCenter,
                 anchorsChangeColliders: false,
                 fixesScales: true,

@@ -42,7 +42,7 @@ public class Deadline : AdvancedGunBehavior
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("deadline_projectile").Base(),
-            2, true, new IntVector2(23, 4),
+            2, true, 1.0F,
             false, Anchor.MiddleLeft, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);

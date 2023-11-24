@@ -38,12 +38,12 @@ public class KiBlast : AdvancedGunBehavior
 
         _KiSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("ki_blast").Base(),
-            12, true, new IntVector2(8, 8),
+            12, true, 0.0625f,
             false, Anchor.MiddleCenter, true, true);
 
         _KiSpriteRed = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("ki_blast_red").Base(),
-            12, true, new IntVector2(8, 8),
+            12, true, 0.0625f,
             false, Anchor.MiddleCenter, true, true);
 
         Projectile blast = Lazy.PrefabProjectileFromGun(gun);

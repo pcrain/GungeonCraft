@@ -29,7 +29,7 @@ public class HatchlingGun : AdvancedGunBehavior
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("egg").Base(),
-            12, true, new IntVector2(12, 12), // sprite is 8x8 -> 1.5x scale
+            12, true, 1.5f,
             false, Anchor.MiddleCenter, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);

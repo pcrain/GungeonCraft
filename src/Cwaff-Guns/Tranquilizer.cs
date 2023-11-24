@@ -26,7 +26,7 @@ public class Tranquilizer : AdvancedGunBehavior
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("tranquilizer_projectile").Base(),
-            12, true, new IntVector2(10, 3),
+            12, true, 1.0f,
             false, Anchor.MiddleLeft, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);

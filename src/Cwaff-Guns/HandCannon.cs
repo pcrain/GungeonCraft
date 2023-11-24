@@ -34,7 +34,7 @@ public class HandCannon : AdvancedGunBehavior
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("slappp").Base(),
-            30, true, new IntVector2(46, 70), // 0.5x scale
+            30, true, 0.5f,
             false, Anchor.MiddleCenter, true, true,
             overrideColliderPixelSize: new IntVector2(8,8) // small collider near the center of the sprite
             );

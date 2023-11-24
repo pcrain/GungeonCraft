@@ -48,8 +48,8 @@ public class PistolWhip : AdvancedGunBehavior
 
         // Not really visible, just used for pixel collider size
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
-            ResMap.Get("whip_segment").Base(),
-            12, true, new IntVector2(16, 16),
+            ResMap.Get("natascha_bullet").Base(),
+            12, true, 1.0f,
             false, Anchor.MiddleCenter, true, true);
 
         _PistolButtProjectile = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items.Ak47) as Gun, setGunDefaultProjectile: false);

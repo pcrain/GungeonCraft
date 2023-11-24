@@ -27,7 +27,7 @@ public class PlatinumStar : AdvancedGunBehavior
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("platinum_star_projectile").Base(),
-            12, true, new IntVector2(29, 9),
+            12, true, 1.0f,
             false, Anchor.MiddleLeft, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
@@ -42,7 +42,7 @@ public class PlatinumStar : AdvancedGunBehavior
         _OraBullet = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items.Polaris) as Gun);
             _OraBullet.AddDefaultAnimation(AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("ora_fist_fast").Base(),
-                12, true, new IntVector2(63 / 3, 27 / 3),
+                12, true, 0.33f,
                 false, Anchor.MiddleRight, true, true));
             _OraBullet.shouldRotate    = true;
             _OraBullet.baseData.damage = 1f;

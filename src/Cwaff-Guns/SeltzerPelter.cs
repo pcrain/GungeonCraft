@@ -43,7 +43,7 @@ public class SeltzerPelter : AdvancedGunBehavior
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("can_projectile").Base(),
-            1, true, new IntVector2(16, 12), // 1 FPS minimum, stop animator manually later
+            1, true, 1.0f, // 1 FPS minimum, stop animator manually later
             false, Anchor.MiddleCenter,
             anchorsChangeColliders: false/*true*/,
             fixesScales: true,

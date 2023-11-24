@@ -31,7 +31,7 @@ public class RacketLauncher : AdvancedGunBehavior
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("tennis_ball").Base(),
-            12, true, new IntVector2(9, 9),
+            12, true, 0.6f,
             false, Anchor.MiddleCenter, true, true);
 
         Projectile projectile              = Lazy.PrefabProjectileFromGun(gun);

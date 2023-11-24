@@ -28,7 +28,7 @@ public class QuarterPounder : AdvancedGunBehavior
 
         _ProjSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("coin_gun_projectile").Base(),
-            2, true, new IntVector2(9, 6),
+            2, true, 1.0f,
             false, Anchor.MiddleCenter, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);

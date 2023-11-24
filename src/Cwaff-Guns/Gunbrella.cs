@@ -43,7 +43,7 @@ public class Gunbrella : AdvancedGunBehavior
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("gunbrella_projectile").Base(),
-            16, true, new IntVector2(15, 8),
+            16, true, 1.0f,
             false, Anchor.MiddleLeft, true, true);
 
         for (int i = 1; i < _BARRAGE_SIZE; i++) // start from 1 since we already have a default module

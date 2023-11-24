@@ -38,7 +38,7 @@ public class Alyx : AdvancedGunBehavior
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("alyx_projectile").Base(),
-            16, true, new IntVector2(9, 9),
+            16, true, 0.5625f,
             false, Anchor.MiddleCenter, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);

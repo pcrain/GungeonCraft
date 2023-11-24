@@ -108,10 +108,10 @@ public class DerailGun : AdvancedGunBehavior
 
         Projectile train = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items._38Special) as Gun, false); //id 56 == 38 special
         // train.SetProjectileSpriteRight("train_projectile_001", trainSpriteDiameter, trainSpriteDiameter, true, Anchor.MiddleCenter, 20, 20);
-        train.AnimateProjectile(
-            ResMap.Get("train_projectile").Base(),
-            6, true, new IntVector2(trainSpriteDiameter, trainSpriteDiameter),
-            false, Anchor.LowerCenter, true, false);
+        // train.AnimateProjectile( // DEPRECATED METHOD, need to replace later if I ever come back to this
+        //     ResMap.Get("train_projectile").Base(),
+        //     6, true, new IntVector2(trainSpriteDiameter, trainSpriteDiameter),
+        //     false, Anchor.LowerCenter, true, false);
         train.PenetratesInternalWalls = true;
         train.pierceMinorBreakables   = true;
         trainProjectile               = train;

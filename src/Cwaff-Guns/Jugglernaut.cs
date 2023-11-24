@@ -103,7 +103,7 @@ public class Jugglernaut : AdvancedGunBehavior
             projectile.AddDefaultAnimation(AnimateBullet.CreateProjectileAnimation(
                 ResMap.Get("jugglernaut_ball").Base(),
                 // ResMap.Get("jugglernaut_projectile").Base(),
-                12, true, new IntVector2(8, 8),
+                12, true, 0.5f,
                 false, Anchor.MiddleLeft, true, true));
             projectile.transform.parent = gun.barrelOffset;
             projectile.baseData.speed   = 70f;

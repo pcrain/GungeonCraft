@@ -31,7 +31,7 @@ public class Outbreak : AdvancedGunBehavior
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("outbreak_projectile").Base(),
-            12, true, new IntVector2(8, 7),
+            12, true, 1.0f,
             false, Anchor.MiddleLeft, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);

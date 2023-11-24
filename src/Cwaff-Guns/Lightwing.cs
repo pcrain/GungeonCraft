@@ -28,19 +28,19 @@ public class Lightwing : AdvancedGunBehavior
 
         _NeutralSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("lightwing_projectile").Base(),
-            12, true, new IntVector2(23, 32),
+            12, true, 1.0f,
             false, Anchor.MiddleLeft, true, true);
         _HuntingSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("lightwing_projectile_hunt").Base(),
-            12, true, new IntVector2(23, 32),
+            12, true, 1.0f,
             false, Anchor.MiddleLeft, true, true);
         _RetrievingSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("lightwing_projectile_retrieve").Base(),
-            12, true, new IntVector2(23, 32),
+            12, true, 1.0f,
             false, Anchor.MiddleLeft, true, true);
         _ReturningSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("lightwing_projectile_return").Base(),
-            12, true, new IntVector2(23, 32),
+            12, true, 1.0f,
             false, Anchor.MiddleLeft, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);

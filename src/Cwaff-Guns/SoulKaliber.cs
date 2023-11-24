@@ -26,7 +26,7 @@ public class SoulKaliber : AdvancedGunBehavior
 
         _ProjSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("soul_kaliber_projectile").Base(),
-            2, true, new IntVector2(10, 10),
+            2, true, 0.33f,
             false, Anchor.MiddleCenter, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);

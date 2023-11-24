@@ -77,29 +77,29 @@ public class Missiletoe : AdvancedGunBehavior
 
         tk2dSpriteAnimationClip oldOrnamentProjectile = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("ornament_projectile").Base(),
-            1, true, new IntVector2(8, 7), false, Anchor.MiddleLeft, true, true);
+            1, true, 1.0f, false, Anchor.MiddleLeft, true, true);
         tk2dSpriteAnimationClip oldExplodingOrnamentProjectile = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("exploding_ornament_projectile").Base(),
-            1, true, new IntVector2(8, 7), false, Anchor.MiddleLeft, true, true);
+            1, true, 1.0f, false, Anchor.MiddleLeft, true, true);
 
         tk2dSpriteAnimationClip ballProjectile =
             AnimateBullet.CreateProjectileAnimation(ResMap.Get("missiletoe_projectile_ball").Base(), 2, true,
-                new IntVector2(6, 6), false, Anchor.MiddleLeft, true, true);
+                1.0f, false, Anchor.MiddleLeft, true, true);
         tk2dSpriteAnimationClip gingerbreadProjectile =
             AnimateBullet.CreateProjectileAnimation(ResMap.Get("missiletoe_projectile_gingerbread").Base(), 2, true,
-                new IntVector2(9, 11), false, Anchor.MiddleLeft, true, true);
+                1.0f, false, Anchor.MiddleLeft, true, true);
         tk2dSpriteAnimationClip mistletoeProjectile =
             AnimateBullet.CreateProjectileAnimation(ResMap.Get("missiletoe_projectile_mistletoe").Base(), 2, true,
-                new IntVector2(9, 7), false, Anchor.MiddleLeft, true, true);
+                1.0f, false, Anchor.MiddleLeft, true, true);
         tk2dSpriteAnimationClip sockProjectile =
             AnimateBullet.CreateProjectileAnimation(ResMap.Get("missiletoe_projectile_sock").Base(), 2, true,
-                new IntVector2(7, 9), false, Anchor.MiddleLeft, true, true);
+                1.0f, false, Anchor.MiddleLeft, true, true);
         tk2dSpriteAnimationClip starProjectile =
             AnimateBullet.CreateProjectileAnimation(ResMap.Get("missiletoe_projectile_star").Base(), 2, true,
-                new IntVector2(7, 7), false, Anchor.MiddleLeft, true, true);
+                1.0f, false, Anchor.MiddleLeft, true, true);
         tk2dSpriteAnimationClip wreathProjectile =
             AnimateBullet.CreateProjectileAnimation(ResMap.Get("missiletoe_projectile_wreath").Base(), 2, true,
-                new IntVector2(7, 9), false, Anchor.MiddleLeft, true, true);
+                1.0f, false, Anchor.MiddleLeft, true, true);
 
         _OrnamentProjectile = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items._38Special) as Gun, false);
             _OrnamentProjectile.AddAnimation(gingerbreadProjectile);
@@ -168,7 +168,7 @@ public class Missiletoe : AdvancedGunBehavior
     {
         tk2dSpriteAnimationClip clip = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get(name).Base(),
-            1, true, new IntVector2(14, 12),
+            1, true, 0.5f,
             false, Anchor.MiddleLeft, true, true);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun, setGunDefaultProjectile: false);

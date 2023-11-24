@@ -40,7 +40,7 @@ public class AimuHakurei : AdvancedGunBehavior
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("aimu_projectile").Base(),
-            2, true, new IntVector2(10, 10),
+            2, true, 0.625f,
             false, Anchor.MiddleCenter, true, true);
 
         _GrazeVFX = VFX.RegisterVFXObject("GrazeVFX", ResMap.Get("graze_vfx"),
