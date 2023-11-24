@@ -18,8 +18,6 @@ public class Alyx : AdvancedGunBehavior
     internal static readonly float _AMMO_DECAY_LAMBDA = Mathf.Log(2) / _AMMO_HALF_LIFE_SECS;
     internal static readonly float _GUN_DECAY_LAMBDA  = Mathf.Log(2) / _GUN_HALF_LIFE_SECS;
 
-    internal static tk2dSpriteAnimationClip _BulletSprite;
-
     private Coroutine _decayCoroutine = null;
 
     public float timeAtLastRecalc   = 0.0f; // must be public so it serializes properly when dropped / picked up
@@ -36,13 +34,8 @@ public class Alyx : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 10, shootStyle: ShootStyle.Automatic, customClip: SpriteName);
 
-        _BulletSprite = AnimateBullet.CreateProjectileAnimation(
-            ResMap.Get("alyx_projectile").Base(),
-            16, true, 0.5625f,
-            false, Anchor.MiddleCenter, true, true);
-
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
-            projectile.AddDefaultAnimation(_BulletSprite);
+            projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "alyx_projectile", fps: 16, scale: 0.5625f, anchor: Anchor.MiddleCenter));
             projectile.baseData.damage   = 15f;
             projectile.baseData.speed    = 20.0f;
             projectile.transform.parent  = gun.barrelOffset;

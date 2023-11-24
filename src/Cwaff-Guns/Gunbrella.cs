@@ -20,7 +20,6 @@ public class Gunbrella : AdvancedGunBehavior
     private const float _MAX_RETICLE_RANGE = 10f;
     private const float _MAX_ALPHA         = 0.5f;
 
-    internal static tk2dSpriteAnimationClip _BulletSprite;
     internal static VFXPool _HailParticle;
     internal static GameObject _RainReticle;
 
@@ -41,11 +40,6 @@ public class Gunbrella : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 1, shootStyle: ShootStyle.Charged, customClip: SpriteName);
 
-        _BulletSprite = AnimateBullet.CreateProjectileAnimation(
-            ResMap.Get("gunbrella_projectile").Base(),
-            16, true, 1.0f,
-            false, Anchor.MiddleLeft, true, true);
-
         for (int i = 1; i < _BARRAGE_SIZE; i++) // start from 1 since we already have a default module
         {
             // use ak47 so our sprite doesn't rotate and mess up our transform calculations when launching / falling
@@ -61,7 +55,7 @@ public class Gunbrella : AdvancedGunBehavior
         {
             ProjectileModule pmod = gun.Volley.projectiles[i];
             Projectile projectile = Lazy.PrefabProjectileFromGun(gun, setGunDefaultProjectile: false);
-                projectile.AddDefaultAnimation(_BulletSprite);
+                projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "gunbrella_projectile", fps: 16, anchor: Anchor.MiddleLeft));
                 projectile.SetAllImpactVFX(_HailParticle);
                 projectile.onDestroyEventName   = "icicle_crash";
                 projectile.baseData.damage      = _PROJ_DAMAGE;

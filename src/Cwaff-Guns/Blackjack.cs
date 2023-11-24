@@ -28,15 +28,8 @@ public class Blackjack : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: _CLIP_SIZE, cooldown: 0.16f, angleVariance: 24.0f, shootStyle: ShootStyle.Automatic, customClip: SpriteName);
 
-        _BulletSprite = AnimateBullet.CreateProjectileAnimation(
-            ResMap.Get("playing_card").Base(),
-            0, true, 0.25f,
-            false, Anchor.MiddleLeft, true, true);
-
-        _BackSprite = AnimateBullet.CreateProjectileAnimation(
-            ResMap.Get("playing_card_back").Base(),
-            0, true, 0.25f,
-            false, Anchor.MiddleLeft, true, true);
+        _BulletSprite = AnimatedBullet.Create(name: "playing_card", fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft);
+        _BackSprite = AnimatedBullet.Create(name: "playing_card_back", fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
             projectile.AddDefaultAnimation(_BulletSprite);

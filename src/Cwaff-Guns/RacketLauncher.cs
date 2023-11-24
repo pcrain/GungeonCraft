@@ -13,8 +13,6 @@ public class RacketLauncher : AdvancedGunBehavior
     internal const int   _IDLE_FPS             = 24;
     internal const int   _AMMO                 = 100; //100;
 
-    internal static tk2dSpriteAnimationClip _BulletSprite;
-
     private List<TennisBall> _extantTennisBalls = new();
 
     public static void Add()
@@ -29,13 +27,8 @@ public class RacketLauncher : AdvancedGunBehavior
 
         ProjectileModule mod = gun.DefaultModule.SetAttributes(ammoCost: 0, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
 
-        _BulletSprite = AnimateBullet.CreateProjectileAnimation(
-            ResMap.Get("tennis_ball").Base(),
-            12, true, 0.6f,
-            false, Anchor.MiddleCenter, true, true);
-
-        Projectile projectile              = Lazy.PrefabProjectileFromGun(gun);
-            projectile.AddDefaultAnimation(_BulletSprite);
+        Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
+            projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "tennis_ball", fps: 12, scale: 0.6f, anchor: Anchor.MiddleCenter));
             projectile.baseData.damage         = 10f;
             projectile.baseData.speed          = 20f;
             projectile.baseData.range          = 300f;

@@ -17,7 +17,6 @@ public class Deadline : AdvancedGunBehavior
     private const float _SIGHT_WIDTH = 2.0f;
 
     internal static ExplosionData _DeadlineExplosion = null;
-    internal static tk2dSpriteAnimationClip _BulletSprite;
     internal static GameObject _SplodeVFX;
 
     private List <DeadlineLaser> _myLasers = new();
@@ -40,13 +39,8 @@ public class Deadline : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 8, cooldown: 0.4f, angleVariance: 0.0f, shootStyle: ShootStyle.SemiAutomatic);
 
-        _BulletSprite = AnimateBullet.CreateProjectileAnimation(
-            ResMap.Get("deadline_projectile").Base(),
-            2, true, 1.0F,
-            false, Anchor.MiddleLeft, true, true);
-
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
-            projectile.AddDefaultAnimation(_BulletSprite);
+            projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "deadline_projectile", fps: 2, anchor: Anchor.MiddleLeft));
             projectile.collidesWithEnemies = false;
             projectile.baseData.speed      = 60.0f;
             projectile.baseData.range      = 30.0f;

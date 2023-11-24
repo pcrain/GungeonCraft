@@ -9,11 +9,9 @@ public class Taomislav : AdvancedGunBehavior
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
 
-    internal static tk2dSpriteAnimationClip _BulletSprite;
     internal static float                   _BaseCooldownTime = 0.4f;
     internal static int                     _FireAnimationFrames = 8;
 
-    private const float _NATASHA_PROJECTILE_SCALE = 0.5f;
     private float _speedMult                      = 1.0f;
 
     public static void Add()
@@ -32,14 +30,8 @@ public class Taomislav : AdvancedGunBehavior
             gun.CurrentAmmo = 2500;
             gun.SetAnimationFPS(gun.shootAnimation, (int)((float)_FireAnimationFrames / _BaseCooldownTime) + 1);
 
-        _BulletSprite = AnimateBullet.CreateProjectileAnimation(
-            ResMap.Get("natascha_bullet").Base(),
-            12, true, _NATASHA_PROJECTILE_SCALE,
-            false, Anchor.MiddleCenter, true, true);
-
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
-            projectile.AddAnimation(_BulletSprite);
-            projectile.SetAnimation(_BulletSprite);
+            projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "natascha_bullet", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter));
             projectile.baseData.damage  = 3f;
             projectile.baseData.speed   = 20.0f;
             projectile.transform.parent = gun.barrelOffset;

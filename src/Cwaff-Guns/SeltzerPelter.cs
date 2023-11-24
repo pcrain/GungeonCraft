@@ -9,7 +9,6 @@ public class SeltzerPelter : AdvancedGunBehavior
     public static string LongDescription  = "Launches soda cans that fly around wildly after initial impact, pushing enemies away with highly pressurized streams of seltzer water. Seltzer water cannot be electrified, but otherwise behaves like normal water.";
     public static string Lore             = "The best designs are inspired by nature, but those inspired by fraternities come in at a close second. This weapon was first conceptualized when a frat bro stuffed a beer can in a spud launcher and fired it at the ceiling. Although the can burst immediately and ruined the launcher, another frat bro desperate for a cool term project to bring his engineering class grade up to a D- ran with the idea. After investing in sturdier titanium-alloy cans and substituting the beer for soda, the remodeled launcher created as big a mess as ever, but by virtue of externalizing that mess, was considered a resounding success. The frat bro got a D+ in his class, and an actually competent engineer bought the rights to the design and tweaked it to be a bit more marketable and combat-viable, resulting in win-wins all around.";
 
-    internal static tk2dSpriteAnimationClip _BulletSprite;
     internal static BasicBeamController _BubbleBeam;
     internal static List<string> _ReloadAnimations;
 
@@ -41,17 +40,9 @@ public class SeltzerPelter : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 1, cooldown: 0.5f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
 
-        _BulletSprite = AnimateBullet.CreateProjectileAnimation(
-            ResMap.Get("can_projectile").Base(),
-            1, true, 1.0f, // 1 FPS minimum, stop animator manually later
-            false, Anchor.MiddleCenter,
-            anchorsChangeColliders: false/*true*/,
-            fixesScales: true,
-            overrideColliderPixelSize: new IntVector2(2, 2) // prevent uneven colliders from glitching into walls
-            );
-
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
-            projectile.AddDefaultAnimation(_BulletSprite);
+            projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "can_projectile", fps: 1,  anchor: Anchor.MiddleCenter, // 1 FPS minimum, stop animator manually later
+                anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(2, 2))); // prevent uneven colliders from glitching into walls
             projectile.transform.parent = gun.barrelOffset;
             projectile.baseData.range   = 999f;
             projectile.baseData.damage  = 16f;

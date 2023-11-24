@@ -9,7 +9,6 @@ public class QuarterPounder : AdvancedGunBehavior
     public static string LongDescription  = "Uses casings as ammo. Fires high-powered projectiles that transmute enemies to gold upon death.\n\nLegend says that Dionysus granted King Midas' wish that everything he touched would turn to gold. Midas was overjoyed at first, but upon turning his food and daughter to gold, realized his wish was ill thought out, and eventually died of starvation.";
     public static string Lore             = "The average person might interpret King Midas as a cautionary tale to be mindful of what you wish for. One gunsmith, however, heard the tale and thought, \"wow, turning my enemies to gold sure would be useful!\". Despite completely missing the moral of King Midas, the gunsmith did succeed in forging a rather powerful weapon, proving that the meaning of art is indeed up to the beholder.";
 
-    internal static tk2dSpriteAnimationClip _ProjSprite;
     internal static GameObject _MidasParticleVFX;
 
     private int _lastMoney = -1;
@@ -26,16 +25,11 @@ public class QuarterPounder : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 10, angleVariance: 15.0f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
 
-        _ProjSprite = AnimateBullet.CreateProjectileAnimation(
-            ResMap.Get("coin_gun_projectile").Base(),
-            2, true, 1.0f,
-            false, Anchor.MiddleCenter, true, true);
-
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
             projectile.baseData.speed   = 44.0f;
             projectile.baseData.damage  = 20f;
             projectile.transform.parent = gun.barrelOffset;
-            projectile.AddDefaultAnimation(_ProjSprite);
+            projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "coin_gun_projectile", fps: 2, anchor: Anchor.MiddleCenter));
             projectile.gameObject.AddComponent<MidasProjectile>();
 
         _MidasParticleVFX = VFX.RegisterVFXObject("MidasParticle", ResMap.Get("midas_sparkle"),

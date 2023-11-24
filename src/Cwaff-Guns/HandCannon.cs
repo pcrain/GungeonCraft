@@ -10,7 +10,6 @@ public class HandCannon : AdvancedGunBehavior
     public static string Lore             = "Second only to guns, hands are widely considered to be one of the most effective weapons ever brought to the battlefield. In ancient times, combatants would often throw the severed hands of their fallen comrades at their enemies to simultaneously inflict physical and emotional damage, ergo the modern expression \"tossing hands\". The venerable Gun Tzu is thought to be the first to marry guns and hands with his legendary Finger Gun, known for inflicting panic and fear in all who opposed his army. The Hand Cannon is a direct descendant and natural evolution of Gun Tzu's original Finger Gun, packing enough force to make Vasilii Kamotskii blush.";
 
     internal static GameObject _SlapppAnimation;
-    internal static tk2dSpriteAnimationClip _BulletSprite;
     internal static int                     _FireAnimationFrames = 8;
 
     private const float _CHARGE_TIME       = 0.5f;
@@ -32,15 +31,9 @@ public class HandCannon : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 2, cooldown: 0.1f, angleVariance: 15.0f, shootStyle: ShootStyle.Charged, customClip: SpriteName);
 
-        _BulletSprite = AnimateBullet.CreateProjectileAnimation(
-            ResMap.Get("slappp").Base(),
-            30, true, 0.5f,
-            false, Anchor.MiddleCenter, true, true,
-            overrideColliderPixelSize: new IntVector2(8,8) // small collider near the center of the sprite
-            );
-
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
-            projectile.AddDefaultAnimation(_BulletSprite);
+            projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "slappp", fps: 30, scale: 0.5f, anchor: Anchor.MiddleCenter,
+                overrideColliderPixelSizes: new IntVector2(8,8)));// small collider near the center of the sprite
             projectile.baseData.damage  = 40f;
             projectile.baseData.speed   = 40f;
             projectile.transform.parent = gun.barrelOffset;

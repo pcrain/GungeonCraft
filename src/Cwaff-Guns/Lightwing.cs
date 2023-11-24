@@ -26,22 +26,10 @@ public class Lightwing : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 20, cooldown: 0.28f, shootStyle: ShootStyle.SemiAutomatic);
 
-        _NeutralSprite = AnimateBullet.CreateProjectileAnimation(
-            ResMap.Get("lightwing_projectile").Base(),
-            12, true, 1.0f,
-            false, Anchor.MiddleLeft, true, true);
-        _HuntingSprite = AnimateBullet.CreateProjectileAnimation(
-            ResMap.Get("lightwing_projectile_hunt").Base(),
-            12, true, 1.0f,
-            false, Anchor.MiddleLeft, true, true);
-        _RetrievingSprite = AnimateBullet.CreateProjectileAnimation(
-            ResMap.Get("lightwing_projectile_retrieve").Base(),
-            12, true, 1.0f,
-            false, Anchor.MiddleLeft, true, true);
-        _ReturningSprite = AnimateBullet.CreateProjectileAnimation(
-            ResMap.Get("lightwing_projectile_return").Base(),
-            12, true, 1.0f,
-            false, Anchor.MiddleLeft, true, true);
+        _NeutralSprite    = AnimatedBullet.Create(name: "lightwing_projectile",          fps: 12, anchor: Anchor.MiddleLeft);
+        _HuntingSprite    = AnimatedBullet.Create(name: "lightwing_projectile_hunt",     fps: 12, anchor: Anchor.MiddleLeft);
+        _RetrievingSprite = AnimatedBullet.Create(name: "lightwing_projectile_retrieve", fps: 12, anchor: Anchor.MiddleLeft);
+        _ReturningSprite  = AnimatedBullet.Create(name: "lightwing_projectile_return",   fps: 12, anchor: Anchor.MiddleLeft);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
             projectile.AddDefaultAnimation(_NeutralSprite);
@@ -52,7 +40,6 @@ public class Lightwing : AdvancedGunBehavior
             projectile.collidesWithProjectiles = true;  // needs to be set up front, can't be set later because caching silliness or something idk
             projectile.baseData.damage         = 4f;
             projectile.baseData.speed          = 20f;
-
             projectile.gameObject.AddComponent<LightwingProjectile>();
     }
 }

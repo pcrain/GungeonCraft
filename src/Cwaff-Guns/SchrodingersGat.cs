@@ -14,8 +14,6 @@ public class SchrodingersGat : AdvancedGunBehavior
     public static string LongDescription  = "Fires bullets that leave enemies in a quantum state until they are observed by either dealing or receiving damage. Once observed, enemies have a 50% chance of already being dead, revealing themselves and their projectiles as illusions. Bullets from this gun cannot affect the same enemy twice.";
     public static string Lore             = "Famously used by a mad scientist who would often fire dozens of rounds into a locked box with an animal inside, claiming it was both alive and dead until the box was opened. That scientist eventually landed in prison on charges for kidnapping and murdering dozens of pet cats, insisting \"we don't know if I kidnapped and murdered dozens of cats until we observe it!\" throughout the entire court procedings.";
 
-    internal static tk2dSpriteAnimationClip _BulletSprite;
-
     private float _speedMult                      = 1.0f;
 
     public static void Add()
@@ -27,13 +25,8 @@ public class SchrodingersGat : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: -1, cooldown: 0.125f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, customClip: SpriteName);
 
-        _BulletSprite = AnimateBullet.CreateProjectileAnimation(
-            ResMap.Get("schrodingers_gat_projectile").Base(),
-            12, true, 1.0f,
-            false, Anchor.MiddleCenter, true, true);
-
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
-            projectile.AddDefaultAnimation(_BulletSprite);
+            projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "schrodingers_gat_projectile", fps: 12, anchor: Anchor.MiddleCenter));
             projectile.baseData.damage  = 0f;
             projectile.baseData.speed   = 32.0f;
             projectile.transform.parent = gun.barrelOffset;

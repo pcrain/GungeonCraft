@@ -9,8 +9,6 @@ public class KiBlast : AdvancedGunBehavior
     public static string LongDescription  = "Fires alternating ki blasts that may be reflected by sufficiently strong enemies. Reloading reflects the nearest ki blast back at the enemy, amplifying the damage after every successive reflect.";
     public static string Lore             = "Harnessing one's ki is an art form that has been taught for millennia, yet mastered by exceptionally few. Among the already small number of those able to effectively harness ki, even fewer have succesfully weaponized it, and among them, only one has brought that power to the Gungeon. That Gungeoneer unfortunately got absolutely incinerated by a flamethrower they didn't see jutting out of the wall, but to this very day, the ki they released upon their untimely demise occasionally manifests itself as a weapon for others passing through the Gungeon.";
 
-    internal static tk2dSpriteAnimationClip _KiSprite;
-    internal static tk2dSpriteAnimationClip _KiSpriteRed;
     internal static string _FireLeftAnim;
     internal static string _FireRightAnim;
 
@@ -36,19 +34,8 @@ public class KiBlast : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, ammoType: GameUIAmmoType.AmmoType.BEAM);
 
-        _KiSprite = AnimateBullet.CreateProjectileAnimation(
-            ResMap.Get("ki_blast").Base(),
-            12, true, 0.0625f,
-            false, Anchor.MiddleCenter, true, true);
-
-        _KiSpriteRed = AnimateBullet.CreateProjectileAnimation(
-            ResMap.Get("ki_blast_red").Base(),
-            12, true, 0.0625f,
-            false, Anchor.MiddleCenter, true, true);
-
         Projectile blast = Lazy.PrefabProjectileFromGun(gun);
-            blast.AddDefaultAnimation(_KiSprite);
-            blast.AddAnimation(_KiSpriteRed);
+            blast.AddDefaultAnimation(AnimatedBullet.Create(name: "ki_blast", fps: 12, scale: 0.0625f, anchor: Anchor.MiddleCenter));
             blast.baseData.damage  = 4f;
             blast.baseData.range   = 10f;
             blast.ignoreDamageCaps = true;
@@ -201,7 +188,6 @@ public class KiBlastBehavior : MonoBehaviour
         this._arc.SetNewTarget(this._owner.sprite.WorldCenter);
 
         // Update sounds and animations
-        // p.SetAnimation(KiBlast._KiSpriteRed);  // keep it blue for now
         EasyTrailBullet trail = p.gameObject.GetComponent<EasyTrailBullet>();
             trail.BaseColor = Color.red;
             trail.EndColor = Color.red;
@@ -230,7 +216,7 @@ public class KiBlastBehavior : MonoBehaviour
         this._projectile.collidesWithEnemies = true;
         this._arc.SetNewTarget(enemy.sprite.WorldCenter);
 
-        this._projectile.SetAnimation(KiBlast._KiSprite);
+        // this._projectile.SetAnimation(KiBlast._KiSprite);
         EasyTrailBullet trail = this._projectile.gameObject.GetComponent<EasyTrailBullet>();
             trail.BaseColor = Color.cyan;
             trail.EndColor = Color.cyan;

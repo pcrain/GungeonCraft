@@ -9,7 +9,6 @@ public class PistolWhip : AdvancedGunBehavior
     public static string LongDescription  = "A long range weapon that deals high melee damage at its tip and fires a fast projectile when fully extended. Can only melee hit enemies when fully extended. Increases curse by 3 while in inventory.";
     public static string Lore             = "Once wielded by elite foot soldiers in the army of the great Pharaoh Tutancannon, this weapon is contraband in modern gunfare. On top of flouting the Guneva Conventions with its absurd muzzle range and ability to reach around rather tall walls, it is also reported to have been cursed by Tutancannon himself on his deathbed, bound to unleash the foulest creatures upon those who would dare wield it within the Gungeon's chambers.";
 
-    internal static tk2dSpriteAnimationClip _BulletSprite;
     internal static Projectile _WhipStartProjectile;
     internal static Projectile _PistolWhipProjectile;
     internal static Projectile _PistolButtProjectile;
@@ -46,14 +45,8 @@ public class PistolWhip : AdvancedGunBehavior
                 trail.BaseColor  = Color.yellow;
                 trail.EndColor   = Color.yellow;
 
-        // Not really visible, just used for pixel collider size
-        _BulletSprite = AnimateBullet.CreateProjectileAnimation(
-            ResMap.Get("natascha_bullet").Base(),
-            12, true, 1.0f,
-            false, Anchor.MiddleCenter, true, true);
-
         _PistolButtProjectile = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items.Ak47) as Gun, setGunDefaultProjectile: false);
-            _PistolButtProjectile.AddDefaultAnimation(_BulletSprite);
+            _PistolButtProjectile.AddDefaultAnimation(AnimatedBullet.Create(name: "natascha_bullet", fps: 12, anchor: Anchor.MiddleCenter)); // Not really visible, just used for pixel collider size
             _PistolButtProjectile.baseData.range  = 0.01f;
             _PistolButtProjectile.baseData.speed  = 1f;
             _PistolButtProjectile.baseData.damage = 30f;

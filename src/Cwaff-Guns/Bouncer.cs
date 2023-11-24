@@ -31,10 +31,9 @@ public class Bouncer : AdvancedGunBehavior
 
         IntVector2 colliderSize = new IntVector2(1,1); // 1-pixel collider for accurate bounce animation
 
-        tk2dSpriteAnimationClip anim = AnimateBullet.CreateProjectileAnimation(
-            ResMap.Get("energy_bounce").Base(),
-            10, true, 0.2f, // reduced sprite size (DOUBLE CHECK SCALE IS CORRECT)
-            false, Anchor.MiddleCenter, true, true, null, colliderSize);
+        tk2dSpriteAnimationClip anim = AnimatedBullet.Create(
+            name: "energy_bounce", fps: 10, scale: 0.2f, anchor: Anchor.MiddleCenter,
+            overrideColliderPixelSizes: colliderSize);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
             projectile.AddDefaultAnimation(anim);

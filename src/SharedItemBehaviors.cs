@@ -218,7 +218,7 @@ public class ProjectileSlashingBehaviour : MonoBehaviour  // stolen from NN
     private PlayerController owner;
 }
 
-public static class AnimateBullet // stolen and modified from NN
+public static class AnimatedBullet // stolen and modified from NN
 {
     public static tk2dSpriteAnimationClip CreateProjectileAnimation(List<string> names, int fps, bool loops, List<float> pixelScales, List<bool> lighteneds, List<Anchor> anchors, List<bool> anchorsChangeColliders,
         List<bool> fixesScales, List<Vector3?> manualOffsets, List<IntVector2?> overrideColliderPixelSizes, List<IntVector2?> overrideColliderOffsets, List<Projectile> overrideProjectilesToCopyFrom)
@@ -276,21 +276,24 @@ public static class AnimateBullet // stolen and modified from NN
         clip.frames = frames.ToArray();
         return clip;
     }
-    public static tk2dSpriteAnimationClip CreateProjectileAnimation(List<string> names, int fps, bool loops, float pixelScales, bool lighteneds, Anchor anchors, bool anchorsChangeColliders,
-        bool fixesScales, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSize = null, IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null)
+    public static tk2dSpriteAnimationClip Create(string name, int fps, Anchor anchor, float scale = 1.0f, bool anchorsChangeColliders = true,
+        bool fixesScales = true, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null, IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null)
     {
+        List<string> names = ResMap.Get(name).Base();
         int n = names.Count;
         return CreateProjectileAnimation(
-            names,fps,loops,
-            Enumerable.Repeat(pixelScales,n).ToList(),
-            Enumerable.Repeat(lighteneds,n).ToList(),
-            Enumerable.Repeat(anchors,n).ToList(),
-            Enumerable.Repeat(anchorsChangeColliders,n).ToList(),
-            Enumerable.Repeat(fixesScales,n).ToList(),
-            Enumerable.Repeat<Vector3?>(manualOffsets,n).ToList(),
-            Enumerable.Repeat<IntVector2?>(overrideColliderPixelSize,n).ToList(),
-            Enumerable.Repeat<IntVector2?>(overrideColliderOffsets,n).ToList(),
-            Enumerable.Repeat<Projectile>(overrideProjectilesToCopyFrom,n).ToList());
+            names                         : names,
+            fps                           : fps,
+            loops                         : true,
+            pixelScales                   : Enumerable.Repeat(scale,n).ToList(),
+            lighteneds                    : Enumerable.Repeat(false/*lighteneds*/,n).ToList(),
+            anchors                       : Enumerable.Repeat(anchor,n).ToList(),
+            anchorsChangeColliders        : Enumerable.Repeat(anchorsChangeColliders,n).ToList(),
+            fixesScales                   : Enumerable.Repeat(fixesScales,n).ToList(),
+            manualOffsets                 : Enumerable.Repeat<Vector3?>(manualOffsets,n).ToList(),
+            overrideColliderPixelSizes    : Enumerable.Repeat<IntVector2?>(overrideColliderPixelSizes,n).ToList(),
+            overrideColliderOffsets       : Enumerable.Repeat<IntVector2?>(overrideColliderOffsets,n).ToList(),
+            overrideProjectilesToCopyFrom : Enumerable.Repeat<Projectile>(overrideProjectilesToCopyFrom,n).ToList());
     }
     public static void SetAnimation(this Projectile proj, tk2dSpriteAnimationClip clip, int frame = 0)
     {

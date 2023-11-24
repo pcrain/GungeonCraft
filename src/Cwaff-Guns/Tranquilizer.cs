@@ -10,7 +10,6 @@ public class Tranquilizer : AdvancedGunBehavior
     public static string Lore             = "Most commonly used for sedating loudly-opinionated supermarket shoppers and other similarly aggressive wild animals, the tranquilizer gun is the pinnacle of non-lethal firearm technology. What it lacks in visual spectacle or firepower it more than makes up for with raw practicality, able to completely pacify all but the mightiest of the Gungeon's denizens with a single shot and a few seconds of your time. As long as you have a plan in place for not getting shot for those few precious seconds, it's hard to beat in terms of ammo-efficiency for dispatching the Gundead.";
 
     internal static GameObject _DrowsyVFX = null;
-    internal static tk2dSpriteAnimationClip _BulletSprite;
 
     public static void Add()
     {
@@ -24,13 +23,8 @@ public class Tranquilizer : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
 
-        _BulletSprite = AnimateBullet.CreateProjectileAnimation(
-            ResMap.Get("tranquilizer_projectile").Base(),
-            12, true, 1.0f,
-            false, Anchor.MiddleLeft, true, true);
-
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
-            projectile.AddDefaultAnimation(_BulletSprite);
+            projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "tranquilizer_projectile", fps: 12, anchor: Anchor.MiddleLeft));
             projectile.transform.parent = gun.barrelOffset;
             projectile.gameObject.AddComponent<TranquilizerBehavior>();
 

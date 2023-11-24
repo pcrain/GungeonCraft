@@ -38,10 +38,7 @@ public class AimuHakurei : AdvancedGunBehavior
             gun.SetMuzzleVFX("muzzle_aimu", fps: 30, scale: 0.3f, anchor: Anchor.MiddleCenter);
             gun.AddToSubShop(ModdedShopType.TimeTrader);
 
-        _BulletSprite = AnimateBullet.CreateProjectileAnimation(
-            ResMap.Get("aimu_projectile").Base(),
-            2, true, 0.625f,
-            false, Anchor.MiddleCenter, true, true);
+        _BulletSprite = AnimatedBullet.Create(name: "aimu_projectile", fps: 2, scale: 0.625f, anchor: Anchor.MiddleCenter);
 
         _GrazeVFX = VFX.RegisterVFXObject("GrazeVFX", ResMap.Get("graze_vfx"),
             fps: 5, loops: true, anchor: Anchor.MiddleCenter, scale: 1.0f, emissivePower: 5f);

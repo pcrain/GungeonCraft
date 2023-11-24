@@ -12,7 +12,6 @@ public class Outbreak : AdvancedGunBehavior
     internal static GameObject _OutbreakSmokeVFX = null;
     internal static GameObject _OutbreakSmokeLargeVFX = null;
     internal static Projectile _InfectionProjectile = null;
-    internal static tk2dSpriteAnimationClip _BulletSprite;
 
     internal readonly bool _INFECT_TOWARDS_CURSOR = true;
 
@@ -29,13 +28,8 @@ public class Outbreak : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 10, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
 
-        _BulletSprite = AnimateBullet.CreateProjectileAnimation(
-            ResMap.Get("outbreak_projectile").Base(),
-            12, true, 1.0f,
-            false, Anchor.MiddleLeft, true, true);
-
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
-            projectile.AddDefaultAnimation(_BulletSprite);
+            projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "outbreak_projectile", fps: 12, anchor: Anchor.MiddleLeft));
             projectile.transform.parent = gun.barrelOffset;
             projectile.gameObject.AddComponent<InfectionBehavior>();
             projectile.baseData.speed  = 17f;

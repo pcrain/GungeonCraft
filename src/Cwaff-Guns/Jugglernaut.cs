@@ -100,11 +100,7 @@ public class Jugglernaut : AdvancedGunBehavior
         gun.DefaultModule.SetAttributes(clipSize: -1, cooldown: 1.0f, shootStyle: ShootStyle.SemiAutomatic);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
-            projectile.AddDefaultAnimation(AnimateBullet.CreateProjectileAnimation(
-                ResMap.Get("jugglernaut_ball").Base(),
-                // ResMap.Get("jugglernaut_projectile").Base(),
-                12, true, 0.5f,
-                false, Anchor.MiddleLeft, true, true));
+            projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "jugglernaut_ball", fps: 12, scale: 0.5f, anchor: Anchor.MiddleLeft));
             projectile.transform.parent = gun.barrelOffset;
             projectile.baseData.speed   = 70f;
             projectile.baseData.damage  = 10f;

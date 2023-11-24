@@ -27,10 +27,7 @@ public class HatchlingGun : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 12, cooldown: 0.2f, angleVariance: 15.0f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
 
-        _BulletSprite = AnimateBullet.CreateProjectileAnimation(
-            ResMap.Get("egg").Base(),
-            12, true, 1.5f,
-            false, Anchor.MiddleCenter, true, true);
+        _BulletSprite = AnimatedBullet.Create(name: "egg", fps: 12, scale: 1.5f, anchor: Anchor.MiddleCenter);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
             projectile.AddDefaultAnimation(_BulletSprite);

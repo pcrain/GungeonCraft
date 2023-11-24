@@ -9,11 +9,9 @@ public class Natascha : AdvancedGunBehavior
     public static string LongDescription  = "Rate of fire increases and movement speed decreases as this gun is continuously fired.";
     public static string Lore             = "The beloved gun of an amicable literature Ph.D., who refused to let anyone else so much as touch his precious Natascha. That is, until convinced by a hulking Australian man to grant ownership rights in exchange for unlimited lifetime access to the \"best sandwiches south of the equator.\"";
 
-    internal static tk2dSpriteAnimationClip _BulletSprite;
     internal static float                   _BaseCooldownTime = 0.4f;
     internal static int                     _FireAnimationFrames = 8;
 
-    private const float _NATASHA_PROJECTILE_SCALE = 0.5f;
     private float _speedMult                      = 1.0f;
 
     public static void Add()
@@ -27,13 +25,8 @@ public class Natascha : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: -1, cooldown: _BaseCooldownTime, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic);
 
-        _BulletSprite = AnimateBullet.CreateProjectileAnimation(
-            ResMap.Get("natascha_bullet").Base(),
-            12, true, _NATASHA_PROJECTILE_SCALE,
-            false, Anchor.MiddleCenter, true, true);
-
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
-            projectile.AddDefaultAnimation(_BulletSprite);
+            projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "natascha_bullet", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter));
             projectile.baseData.damage  = 3f;
             projectile.baseData.speed   = 20.0f;
             projectile.transform.parent = gun.barrelOffset;

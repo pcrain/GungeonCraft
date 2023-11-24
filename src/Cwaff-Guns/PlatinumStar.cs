@@ -9,7 +9,6 @@ public class PlatinumStar : AdvancedGunBehavior
     public static string LongDescription  = "Fires projectiles that deal no damage on initial impact. When reloaded, summons manifestations of the user's soul to attack all previously-shot enemies with a flurry of rapid punches.";
     public static string Lore             = "This gun had a large golden arrow pierced through its barrel and grip when it was originally discovered by Ox and Cadence lying in a patch of flowers behind the Gungeon. The arrow had mysteriously vanished by the time they had gotten back to the Breach to test out the gun's capabilities, which by all accounts seemed to be nothing more than rapid-firing some harmless phantom projectiles. Having deemed the gun worthless in combat, Cadence tossed it back outside where she found it, only for it to vanish before hitting the ground. Somehow, it has found its way into the Gungeon on its own.";
 
-    internal static tk2dSpriteAnimationClip _BulletSprite;
     internal static Projectile _OraBullet;
 
     public static void Add()
@@ -25,13 +24,8 @@ public class PlatinumStar : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 28, cooldown: 0.125f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, customClip: SpriteName);
 
-        _BulletSprite = AnimateBullet.CreateProjectileAnimation(
-            ResMap.Get("platinum_star_projectile").Base(),
-            12, true, 1.0f,
-            false, Anchor.MiddleLeft, true, true);
-
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
-            projectile.AddDefaultAnimation(_BulletSprite);
+            projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "platinum_star_projectile", fps: 12, anchor: Anchor.MiddleLeft));
             projectile.baseData.damage  = 3f;
             projectile.baseData.force   = 1f;
             projectile.baseData.speed   = 50.0f;
@@ -40,10 +34,7 @@ public class PlatinumStar : AdvancedGunBehavior
             projectile.gameObject.AddComponent<PlatinumProjectile>();
 
         _OraBullet = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items.Polaris) as Gun);
-            _OraBullet.AddDefaultAnimation(AnimateBullet.CreateProjectileAnimation(
-                ResMap.Get("ora_fist_fast").Base(),
-                12, true, 0.33f,
-                false, Anchor.MiddleRight, true, true));
+            _OraBullet.AddDefaultAnimation(AnimatedBullet.Create(name: "ora_fist_fast", fps: 12, scale: 0.33f, anchor: Anchor.MiddleRight));
             _OraBullet.shouldRotate    = true;
             _OraBullet.baseData.damage = 1f;
             _OraBullet.baseData.force  = 0.1f;
