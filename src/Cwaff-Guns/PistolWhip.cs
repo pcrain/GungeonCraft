@@ -24,12 +24,7 @@ public class PistolWhip : AdvancedGunBehavior
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
             gun.muzzleFlashEffects = null;
 
-        ProjectileModule mod = gun.DefaultModule;
-            mod.ammoCost            = 0;
-            mod.shootStyle          = ShootStyle.SemiAutomatic;
-            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
-            mod.cooldownTime        = WhipChainStart.TOTAL_TIME + C.FRAME;
-            mod.numberOfShotsInClip = -1;
+        gun.DefaultModule.SetAttributes(ammoCost: 0, clipSize: -1, cooldown: WhipChainStart.TOTAL_TIME + C.FRAME, shootStyle: ShootStyle.SemiAutomatic);
 
         _WhipStartProjectile = Lazy.PrefabProjectileFromGun(gun);
             _WhipStartProjectile.transform.parent = gun.barrelOffset;

@@ -22,12 +22,7 @@ public class SoulKaliber : AdvancedGunBehavior
             gun.SetFireAudio("soul_kaliber_fire");
             gun.SetReloadAudio("soul_kaliber_reload");
 
-        ProjectileModule mod = gun.DefaultModule;
-            mod.ammoCost               = 1;
-            mod.shootStyle             = ShootStyle.SemiAutomatic;
-            mod.sequenceStyle          = ProjectileSequenceStyle.Random;
-            mod.cooldownTime           = 0.1f;
-            mod.numberOfShotsInClip    = 10;
+        gun.DefaultModule.SetAttributes(clipSize: 10, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic);
 
         _ProjSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("soul_kaliber_projectile").Base(),

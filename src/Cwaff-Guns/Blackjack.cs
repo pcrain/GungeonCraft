@@ -26,14 +26,7 @@ public class Blackjack : AdvancedGunBehavior
             gun.SetFireAudio(); // prevent fire audio, as it's handled in OnPostFired()
             gun.SetReloadAudio("card_shuffle_sound"); // todo: this is still playing the default reload sound as well, for some reason
 
-        ProjectileModule mod = gun.DefaultModule;
-            mod.ammoCost            = 1;
-            mod.shootStyle          = ShootStyle.Automatic;
-            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
-            mod.angleVariance       = 24.0f;
-            mod.cooldownTime        = 0.16f;
-            mod.numberOfShotsInClip = _CLIP_SIZE;
-            mod.SetupCustomAmmoClip(SpriteName);
+        gun.DefaultModule.SetAttributes(clipSize: _CLIP_SIZE, cooldown: 0.16f, angleVariance: 24.0f, shootStyle: ShootStyle.Automatic, customClip: SpriteName);
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("playing_card").Base(),

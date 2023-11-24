@@ -32,13 +32,7 @@ public class SubtractorBeam : AdvancedGunBehavior
         _HitEffects = VFX.RegisterVFXObject("SubtractorHitEffects", ResMap.Get("subtractor_beam_hit_effect"), 12, loops: true,
             scale: 0.5f, anchor: Anchor.MiddleCenter, emissivePower: 10f);
 
-        ProjectileModule mod = gun.DefaultModule;
-            mod.ammoCost            = 1;
-            mod.shootStyle          = ShootStyle.SemiAutomatic;
-            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
-            mod.angleVariance       = 5.0f;
-            mod.cooldownTime        = 0.25f;
-            mod.numberOfShotsInClip = 4;
+        gun.DefaultModule.SetAttributes(clipSize: 4, cooldown: 0.25f, angleVariance: 5.0f, shootStyle: ShootStyle.SemiAutomatic);
 
         Projectile beamProj = Lazy.PrefabProjectileFromGun(gun);
             beamProj.baseData.speed  = 300f;

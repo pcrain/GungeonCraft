@@ -39,11 +39,7 @@ public class Gunbrella : AdvancedGunBehavior
             gun.LoopAnimation(gun.chargeAnimation, 17);
             gun.SetMuzzleVFX("muzzle_gunbrella", fps: 30, scale: 0.5f, anchor: Anchor.MiddleCenter);
 
-        ProjectileModule mod = gun.DefaultModule;
-            mod.shootStyle             = ShootStyle.Charged;
-            mod.sequenceStyle          = ProjectileSequenceStyle.Random;
-            mod.numberOfShotsInClip    = 1;
-            mod.SetupCustomAmmoClip(SpriteName);
+        gun.DefaultModule.SetAttributes(clipSize: 1, shootStyle: ShootStyle.Charged, customClip: SpriteName);
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("gunbrella_projectile").Base(),

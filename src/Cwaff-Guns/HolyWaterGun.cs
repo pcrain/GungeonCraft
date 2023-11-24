@@ -21,10 +21,7 @@ public class HolyWaterGun : AdvancedGunBehavior
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
-        ProjectileModule mod = gun.DefaultModule;
-            mod.ammoType               = GameUIAmmoType.AmmoType.BEAM;
-            mod.shootStyle             = ShootStyle.Beam;
-            mod.numberOfShotsInClip    = -1;
+        gun.DefaultModule.SetAttributes(clipSize: -1, shootStyle: ShootStyle.Beam, ammoType: GameUIAmmoType.AmmoType.BEAM);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
             projectile.baseData.speed  = 50f;

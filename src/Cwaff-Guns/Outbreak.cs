@@ -27,13 +27,7 @@ public class Outbreak : AdvancedGunBehavior
             gun.SetReloadAudio("outbreak_reload_sound");
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
 
-        ProjectileModule mod = gun.DefaultModule;
-            mod.ammoCost            = 1;
-            mod.shootStyle          = ShootStyle.SemiAutomatic;
-            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
-            mod.cooldownTime        = 0.2f;
-            mod.numberOfShotsInClip = 10;
-            mod.SetupCustomAmmoClip(SpriteName);
+        gun.DefaultModule.SetAttributes(clipSize: 10, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("outbreak_projectile").Base(),

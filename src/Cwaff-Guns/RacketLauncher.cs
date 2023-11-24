@@ -27,14 +27,7 @@ public class RacketLauncher : AdvancedGunBehavior
             gun.LoopAnimation(gun.idleAnimation, 0);
             gun.spriteAnimator.playAutomatically = false; // don't autoplay idle animation when dropped
 
-        ProjectileModule mod = gun.DefaultModule;
-            mod.ammoCost               = 1;
-            mod.shootStyle             = ShootStyle.SemiAutomatic;
-            mod.sequenceStyle          = ProjectileSequenceStyle.Random;
-            mod.cooldownTime           = 0.1f;
-            mod.ammoType               = GameUIAmmoType.AmmoType.SMALL_BULLET;
-            mod.numberOfShotsInClip    = -1;
-            mod.SetupCustomAmmoClip(SpriteName);
+        ProjectileModule mod = gun.DefaultModule.SetAttributes(ammoCost: 0, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("tennis_ball").Base(),
@@ -47,12 +40,12 @@ public class RacketLauncher : AdvancedGunBehavior
             projectile.baseData.speed          = 20f;
             projectile.baseData.range          = 300f;
             projectile.BulletScriptSettings.surviveRigidbodyCollisions = true;
-            // projectile.DestroyMode = Projectile.ProjectileDestroyMode.DestroyComponent;  // must be set at creatoin time
+            // projectile.DestroyMode = Projectile.ProjectileDestroyMode.DestroyComponent;  // must be set at creation time
 
         projectile.gameObject.AddComponent<TennisBall>();
 
-        foreach (ProjectileModule pmod in gun.Volley.projectiles)
-            pmod.ammoCost = 0;
+        // foreach (ProjectileModule pmod in gun.Volley.projectiles)
+        //     pmod.ammoCost = 0;
     }
 
     protected override void OnPickedUpByPlayer(PlayerController player)

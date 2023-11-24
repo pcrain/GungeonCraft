@@ -38,11 +38,7 @@ public class Deadline : AdvancedGunBehavior
             gun.AddToSubShop(ModdedShopType.TimeTrader);
             gun.AddToSubShop(ModdedShopType.Boomhildr);
 
-        ProjectileModule mod = gun.DefaultModule;
-            mod.shootStyle          = ShootStyle.SemiAutomatic;
-            mod.angleVariance       = 0.0f;
-            mod.cooldownTime        = 0.4f;
-            mod.numberOfShotsInClip = 8;
+        gun.DefaultModule.SetAttributes(clipSize: 8, cooldown: 0.4f, angleVariance: 0.0f, shootStyle: ShootStyle.SemiAutomatic);
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("deadline_projectile").Base(),

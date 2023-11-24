@@ -50,22 +50,10 @@ public class Ticonderogun : AdvancedGunBehavior
             gun.AddStatToGun(PlayerStats.StatType.Curse, 2f, StatModifier.ModifyMethod.ADDITIVE);
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
 
-        ProjectileModule mod = gun.DefaultModule;
-            mod.ammoCost            = 0;
-            mod.ammoType            = GameUIAmmoType.AmmoType.BEAM;
-            mod.shootStyle          = ShootStyle.Charged;
-            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
-            mod.cooldownTime        = 0.1f;
-            mod.numberOfShotsInClip = -1;
-
-        // Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
-        //     projectile.AddDefaultAnimation(_BulletSprite);
-        //     projectile.transform.parent = gun.barrelOffset;
-        //     projectile.gameObject.AddComponent<TranquilizerBehavior>();
+        gun.DefaultModule.SetAttributes(ammoCost: 0, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.Charged, ammoType: GameUIAmmoType.AmmoType.BEAM);
 
         _SparklePrefab = VFX.RegisterVFXObject("PencilSparkles", ResMap.Get("pencil_sparkles"), 12, loops: false, anchor: Anchor.MiddleCenter);
-        // FPS must be nonzero or sprites don't update properly
-        _RunePrefab = VFX.RegisterVFXObject("PencilRunes", ResMap.Get("pencil_runes"), 0.01f, loops: false, anchor: Anchor.MiddleCenter);
+        _RunePrefab = VFX.RegisterVFXObject("PencilRunes", ResMap.Get("pencil_runes"), 0.01f, loops: false, anchor: Anchor.MiddleCenter); // FPS must be nonzero or sprites don't update properly
     }
 
     protected override void OnPickedUpByPlayer(PlayerController player)

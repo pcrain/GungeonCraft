@@ -39,13 +39,7 @@ public class SeltzerPelter : AdvancedGunBehavior
             }
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
-        ProjectileModule mod = gun.DefaultModule;
-            mod.ammoCost            = 1;
-            mod.shootStyle          = ShootStyle.SemiAutomatic;
-            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
-            mod.cooldownTime        = 0.5f;
-            mod.numberOfShotsInClip = 1;
-            mod.SetupCustomAmmoClip(SpriteName);
+        gun.DefaultModule.SetAttributes(clipSize: 1, cooldown: 0.5f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("can_projectile").Base(),

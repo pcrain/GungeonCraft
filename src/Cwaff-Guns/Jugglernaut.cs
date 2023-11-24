@@ -97,12 +97,7 @@ public class Jugglernaut : AdvancedGunBehavior
             gun.reloadAnimation         = null; // animation shouldn't change when reloading
             gun.shootAnimation          = null; // animation shouldn't change when firing
 
-        ProjectileModule mod = gun.DefaultModule;
-            mod.ammoCost            = 1;
-            mod.shootStyle          = ShootStyle.SemiAutomatic;
-            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
-            mod.cooldownTime        = 1.0f;
-            mod.numberOfShotsInClip = -1;
+        gun.DefaultModule.SetAttributes(clipSize: -1, cooldown: 1.0f, shootStyle: ShootStyle.SemiAutomatic);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
             projectile.AddDefaultAnimation(AnimateBullet.CreateProjectileAnimation(

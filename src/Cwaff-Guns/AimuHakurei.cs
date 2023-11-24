@@ -185,19 +185,12 @@ public class AimuHakurei : AdvancedGunBehavior
     }
     private static ProjectileModule AimuMod(List<Projectile> projectiles, float fireRate, int level)
     {
-        ProjectileModule mod = new ProjectileModule();
-            mod.ammoType            = GameUIAmmoType.AmmoType.BEAM;
-            mod.projectiles         = projectiles;
-            mod.ammoCost            = 0;
-            mod.numberOfShotsInClip = -1;
-            mod.shootStyle          = ShootStyle.Burst;
-            mod.sequenceStyle       = ProjectileSequenceStyle.Ordered;
-            mod.angleVariance       = 15f - (2 * level);
-            mod.angleFromAim        = 0f;
-            mod.burstShotCount      = mod.projectiles.Count();
-            mod.burstCooldownTime   = C.FRAME * fireRate;
-            mod.cooldownTime        = C.FRAME * fireRate;
-            mod.SetupCustomAmmoClip(SpriteName);
+        ProjectileModule mod = new ProjectileModule().SetAttributes(
+            ammoCost: 0, clipSize: -1, cooldown: C.FRAME * fireRate, angleVariance: 15f - (2 * level),
+            shootStyle: ShootStyle.Burst, sequenceStyle: ProjectileSequenceStyle.Ordered, customClip: SpriteName);
+        mod.projectiles         = projectiles;
+        mod.burstShotCount      = mod.projectiles.Count();
+        mod.burstCooldownTime   = C.FRAME * fireRate;
         return mod;
     }
 

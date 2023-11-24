@@ -20,12 +20,7 @@ public class PaintballCannon : AdvancedGunBehavior
             gun.SetReloadAudio("paintball_reload_sound");
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
-        ProjectileModule mod = gun.DefaultModule;
-            mod.ammoCost               = 1;
-            mod.shootStyle             = ShootStyle.SemiAutomatic;
-            mod.sequenceStyle          = ProjectileSequenceStyle.Random;
-            mod.cooldownTime           = 0.18f;
-            mod.numberOfShotsInClip    = 12;
+        gun.DefaultModule.SetAttributes(clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic);
 
         Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
             projectile.baseData.damage = 9f;

@@ -24,13 +24,7 @@ public class QuarterPounder : AdvancedGunBehavior
             gun.SetFireAudio("fire_coin_sound");
             gun.SetReloadAudio("coin_gun_reload");
 
-        ProjectileModule mod = gun.DefaultModule;
-            mod.ammoCost            = 1;
-            mod.shootStyle          = ShootStyle.SemiAutomatic;
-            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
-            mod.numberOfShotsInClip = 10;
-            mod.angleVariance       = 15.0f;
-            mod.SetupCustomAmmoClip(SpriteName);
+        gun.DefaultModule.SetAttributes(clipSize: 10, angleVariance: 15.0f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
 
         _ProjSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("coin_gun_projectile").Base(),

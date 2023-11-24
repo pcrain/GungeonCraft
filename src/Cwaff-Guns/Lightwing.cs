@@ -24,12 +24,7 @@ public class Lightwing : AdvancedGunBehavior
             gun.SetFireAudio("lightwing_fire_sound");
             gun.SetReloadAudio("lightwing_reload_sound");
 
-        ProjectileModule mod = gun.DefaultModule;
-            mod.ammoCost            = 1;
-            mod.shootStyle          = ShootStyle.SemiAutomatic;
-            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
-            mod.cooldownTime        = 0.28f;
-            mod.numberOfShotsInClip = 20;
+        gun.DefaultModule.SetAttributes(clipSize: 20, cooldown: 0.28f, shootStyle: ShootStyle.SemiAutomatic);
 
         _NeutralSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("lightwing_projectile").Base(),

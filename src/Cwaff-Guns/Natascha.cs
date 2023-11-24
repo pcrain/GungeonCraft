@@ -25,13 +25,7 @@ public class Natascha : AdvancedGunBehavior
             gun.AddToSubShop(ItemBuilder.ShopType.Trorc);
             gun.AddToSubShop(ModdedShopType.Rusty);
 
-        ProjectileModule mod = gun.DefaultModule;
-            mod.ammoCost            = 1;
-            mod.shootStyle          = ShootStyle.Automatic;
-            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
-            mod.angleVariance       = 15.0f;
-            mod.cooldownTime        = _BaseCooldownTime;
-            mod.numberOfShotsInClip = -1;
+        gun.DefaultModule.SetAttributes(clipSize: -1, cooldown: _BaseCooldownTime, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic);
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("natascha_bullet").Base(),

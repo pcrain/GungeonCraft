@@ -894,6 +894,7 @@ public static class Extensions
   }
 
   internal static  tk2dSpriteCollectionData _GunCollection = null;
+
   // Get a list of barrel offsets for a gun's animation
   public static List<Vector3> GetBarrelOffsetsForAnimation(this Gun gun, string animationName)
   {
@@ -910,5 +911,25 @@ public static class Extensions
     }
 
     return offsets;
+  }
+
+  // Set basic attributes for a projectile module and return it
+  public static ProjectileModule SetAttributes(this ProjectileModule mod, int? clipSize = null, float? cooldown = null, float? angleVariance = null, int ammoCost = 1, string customClip = null, ShootStyle shootStyle = ShootStyle.SemiAutomatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, GameUIAmmoType.AmmoType? ammoType = null)
+  {
+    if (clipSize.HasValue)
+      mod.numberOfShotsInClip = clipSize.Value;
+    if (cooldown.HasValue)
+      mod.cooldownTime        = cooldown.Value;
+    mod.ammoCost            = ammoCost;
+    mod.shootStyle          = shootStyle;
+    mod.sequenceStyle       = sequenceStyle;
+    if (angleVariance.HasValue)
+      mod.angleVariance = angleVariance.Value;
+    if (!string.IsNullOrEmpty(customClip))
+      mod.SetupCustomAmmoClip(customClip);
+    else if (ammoType.HasValue)
+      mod.ammoType = ammoType.Value;
+
+    return mod;
   }
 }

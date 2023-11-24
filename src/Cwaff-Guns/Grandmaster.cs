@@ -26,13 +26,7 @@ public class Grandmaster : AdvancedGunBehavior
             gun.SetFireAudio("chess_gun_fire");
             gun.SetReloadAudio("chess_gun_reload");
 
-        ProjectileModule mod = gun.DefaultModule;
-            mod.ammoCost            = 1;
-            mod.shootStyle          = ShootStyle.SemiAutomatic;
-            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
-            mod.cooldownTime        = 0.1f;
-            mod.numberOfShotsInClip = 20;
-            mod.SetupCustomAmmoClip(SpriteName);
+        gun.DefaultModule.SetAttributes(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
 
         _PawnSprite   = AnimateBullet.CreateProjectileAnimation(ResMap.Get("chess_pawn").Base(), 12, true, new IntVector2(8, 12), false,
             Anchor.MiddleCenter, true, true);

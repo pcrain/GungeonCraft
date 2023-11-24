@@ -33,12 +33,8 @@ public class VacuumCleaner : AdvancedGunBehavior
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
             gun.AddToSubShop(ModdedShopType.Rusty);
 
-        ProjectileModule mod = gun.DefaultModule;
-            mod.shootStyle             = ShootStyle.Charged;
-            mod.sequenceStyle          = ProjectileSequenceStyle.Random;
-            mod.numberOfShotsInClip    = -1;
-            mod.ammoType               = GameUIAmmoType.AmmoType.BEAM;
-            mod.chargeProjectiles      = new(){ new(){
+        ProjectileModule mod = gun.DefaultModule.SetAttributes(clipSize: -1, shootStyle: ShootStyle.Charged, ammoType: GameUIAmmoType.AmmoType.BEAM);
+            mod.chargeProjectiles = new(){ new(){
                 Projectile = Lazy.PrefabProjectileFromGun(gun),
                 ChargeTime = float.MaxValue, // absurdly high value so we never actually shoot
             }};

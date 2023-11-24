@@ -25,14 +25,7 @@ public class SchrodingersGat : AdvancedGunBehavior
             gun.SetAnimationFPS(gun.idleAnimation, 24);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
 
-        ProjectileModule mod = gun.DefaultModule;
-            mod.ammoCost            = 1;
-            mod.shootStyle          = ShootStyle.Automatic;
-            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
-            mod.angleVariance       = 15.0f;
-            mod.cooldownTime        = 0.125f;
-            mod.numberOfShotsInClip = -1;
-            mod.SetupCustomAmmoClip(SpriteName);
+        gun.DefaultModule.SetAttributes(clipSize: -1, cooldown: 0.125f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, customClip: SpriteName);
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("schrodingers_gat_projectile").Base(),

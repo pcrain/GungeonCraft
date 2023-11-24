@@ -26,14 +26,8 @@ public class BBGun : AdvancedGunBehavior
             gun.SetFireAudio("Play_WPN_seriouscannon_shot_01");
             gun.SetReloadAudio("Play_ENM_flame_veil_01");
 
-        ProjectileModule mod = gun.DefaultModule;
-            mod.ammoCost            = 1;
-            mod.numberOfShotsInClip = 3;
-            mod.shootStyle          = ShootStyle.Charged;
-            mod.sequenceStyle       = ProjectileSequenceStyle.Ordered;
-            mod.cooldownTime        = 0.70f;
-            mod.angleVariance       = 10f;
-            mod.SetupCustomAmmoClip(SpriteName);
+        ProjectileModule mod = gun.DefaultModule.SetAttributes(
+            clipSize: 3, cooldown: 0.7f, angleVariance: 10.0f, shootStyle: ShootStyle.Charged, sequenceStyle: ProjectileSequenceStyle.Ordered, customClip: SpriteName);
 
         Projectile projectile = mod.projectiles[0].ClonePrefab();
             projectile.baseData.range = 999999f;

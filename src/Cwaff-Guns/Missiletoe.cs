@@ -51,13 +51,7 @@ public class Missiletoe : AdvancedGunBehavior
             gun.SetReloadAudio("missiletoe_reload_sound");
             gun.AddToSubShop(ModdedShopType.Boomhildr);
 
-        ProjectileModule mod = gun.DefaultModule;
-            mod.ammoCost            = 1;
-            mod.shootStyle          = ShootStyle.SemiAutomatic;
-            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
-            mod.cooldownTime        = 0.2f;
-            mod.numberOfShotsInClip = 1;
-            mod.SetupCustomAmmoClip(SpriteName);
+        gun.DefaultModule.SetAttributes(clipSize: 1, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
 
         _WrapVFXS   = SetupVFX("black_gift_wrap");
         _WrapVFXA   = SetupVFX("red_gift_wrap");

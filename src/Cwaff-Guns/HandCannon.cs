@@ -30,14 +30,7 @@ public class HandCannon : AdvancedGunBehavior
             gun.SetChargeAudio("hand_cannon_charge_sound", frame: 0);
             gun.SetChargeAudio("hand_cannon_charge_sound", frame: 10);
 
-        ProjectileModule mod = gun.DefaultModule;
-            mod.ammoCost            = 1;
-            mod.shootStyle          = ShootStyle.Charged;
-            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
-            mod.angleVariance       = 15.0f;
-            mod.cooldownTime        = 0.1f;
-            mod.numberOfShotsInClip = 2;
-            mod.SetupCustomAmmoClip(SpriteName);
+        gun.DefaultModule.SetAttributes(clipSize: 2, cooldown: 0.1f, angleVariance: 15.0f, shootStyle: ShootStyle.Charged, customClip: SpriteName);
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("slappp").Base(),

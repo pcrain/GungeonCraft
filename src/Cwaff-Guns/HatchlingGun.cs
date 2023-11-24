@@ -25,14 +25,7 @@ public class HatchlingGun : AdvancedGunBehavior
             gun.SetReloadAudio("hatchling_gun_bounce_sound", frame: 6);
             gun.SetReloadAudio("hatchling_gun_bounce_sound", frame: 14);
 
-        ProjectileModule mod = gun.DefaultModule;
-            mod.ammoCost            = 1;
-            mod.shootStyle          = ShootStyle.SemiAutomatic;
-            mod.sequenceStyle       = ProjectileSequenceStyle.Random;
-            mod.angleVariance       = 15.0f;
-            mod.cooldownTime        = 0.2f;
-            mod.numberOfShotsInClip = 12;
-            mod.SetupCustomAmmoClip(SpriteName);
+        gun.DefaultModule.SetAttributes(clipSize: 12, cooldown: 0.2f, angleVariance: 15.0f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
 
         _BulletSprite = AnimateBullet.CreateProjectileAnimation(
             ResMap.Get("egg").Base(),
