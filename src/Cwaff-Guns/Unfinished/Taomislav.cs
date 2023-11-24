@@ -7,6 +7,7 @@ public class Taomislav : AdvancedGunBehavior
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "TBD";
     public static string LongDescription  = "TBD";
+    public static string Lore             = "TBD";
 
     internal static tk2dSpriteAnimationClip _BulletSprite;
     internal static float                   _BaseCooldownTime = 0.4f;
@@ -17,7 +18,7 @@ public class Taomislav : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Taomislav>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+        Gun gun = Lazy.SetupGun<Taomislav>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
             gun.DefaultModule.ammoCost            = 1;
             gun.DefaultModule.shootStyle          = ShootStyle.Automatic;

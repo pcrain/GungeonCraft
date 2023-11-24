@@ -5,11 +5,12 @@ public class UtilityVest : PassiveItem
     public static string ItemName         = "Utility Vest";
     public static string SpritePath       = "utility_vest_icon";
     public static string ShortDescription = "Pocket Protector";
-    public static string LongDescription  = "When taking otherwise fatal damage, destroys the least valuable item in your inventory instead.\n\nMost Gungeoneers opt to bring the R&G department's classic Bag-O'-Holding model for stashing the ludicrous amount of guns and gear they accrue across the Gungeon's many floors. Although being able to carry an unlimited amount of items is already a pretty sweet deal, this latest evolution in hammerspace techno-magic automatically deploys your loot in the precise location that would block mortally-wounding projectiles. Reception to this model has been mixed, with Gungeoneers who prefer preserving their loot over their lives or vice versa being split 50-50.";
+    public static string LongDescription  = "When taking otherwise fatal damage, destroys the least valuable item in your inventory instead.";
+    public static string Lore             = "Most Gungeoneers opt to bring the R&G department's classic Bag-O'-Holding model for stashing the ludicrous amount of guns and gear they accrue across the Gungeon's many floors. Although being able to carry an unlimited amount of items is already a pretty sweet deal, this latest evolution in hammerspace techno-magic automatically deploys your loot in the precise location that would block mortally-wounding projectiles. Reception to this model has been mixed, with Gungeoneers who prefer preserving their loot over their lives or vice versa being split 50-50.";
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<UtilityVest>(ItemName, SpritePath, ShortDescription, LongDescription);
+        PickupObject item = Lazy.SetupPassive<UtilityVest>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
         item.AddToSubShop(ModdedShopType.Ironside);

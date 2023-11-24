@@ -6,7 +6,8 @@ public class SeltzerPelter : AdvancedGunBehavior
     public static string SpriteName       = "seltzer_pelter";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Shaken, not Stirred";
-    public static string LongDescription  = "Launches soda cans that fly around wildly after initial impact, pushing enemies away with highly pressurized streams of seltzer water. Seltzer water cannot be electrified, but otherwise behaves like normal water.\n\nThe best designs are inspired by nature, but those inspired by fraternities come in at a close second. This weapon was first conceptualized when a frat bro stuffed a beer can in a spud launcher and fired it at the ceiling. Although the can burst immediately and ruined the launcher, another frat bro desperate for a cool term project to bring his engineering class grade up to a D- ran with the idea. After investing in sturdier titanium-alloy cans and substituting the beer for soda, the remodeled launcher created as big a mess as ever, but by virtue of externalizing that mess, was considered a resounding success. The frat bro got a D+ in his class, and an actually competent engineer bought the rights to the design and tweaked it to be a bit more marketable and combat-viable, resulting in win-wins all around.";
+    public static string LongDescription  = "Launches soda cans that fly around wildly after initial impact, pushing enemies away with highly pressurized streams of seltzer water. Seltzer water cannot be electrified, but otherwise behaves like normal water.";
+    public static string Lore             = "The best designs are inspired by nature, but those inspired by fraternities come in at a close second. This weapon was first conceptualized when a frat bro stuffed a beer can in a spud launcher and fired it at the ceiling. Although the can burst immediately and ruined the launcher, another frat bro desperate for a cool term project to bring his engineering class grade up to a D- ran with the idea. After investing in sturdier titanium-alloy cans and substituting the beer for soda, the remodeled launcher created as big a mess as ever, but by virtue of externalizing that mess, was considered a resounding success. The frat bro got a D+ in his class, and an actually competent engineer bought the rights to the design and tweaked it to be a bit more marketable and combat-viable, resulting in win-wins all around.";
 
     internal static tk2dSpriteAnimationClip _BulletSprite;
     internal static BasicBeamController _BubbleBeam;
@@ -16,7 +17,7 @@ public class SeltzerPelter : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<SeltzerPelter>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+        Gun gun = Lazy.SetupGun<SeltzerPelter>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.0f, ammo: 150);
             gun.SetAnimationFPS(gun.shootAnimation, 36);
             gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects

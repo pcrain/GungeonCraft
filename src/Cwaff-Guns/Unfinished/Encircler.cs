@@ -7,10 +7,11 @@ public class Encircler : AdvancedGunBehavior
     public static string ProjectileName   = "ak-47";
     public static string ShortDescription = "Sir Cumference's Own";
     public static string LongDescription  = "(circles)";
+    public static string Lore             = "TBD";
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Encircler>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+        Gun gun = Lazy.SetupGun<Encircler>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
 
         gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
         gun.DefaultModule.ammoCost            = 1;

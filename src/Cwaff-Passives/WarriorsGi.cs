@@ -5,7 +5,8 @@ public class WarriorsGi : PassiveItem
     public static string ItemName         = "Warrior's Gi";
     public static string SpritePath       = "warriors_gi_icon";
     public static string ShortDescription = "Going Further Beyond";
-    public static string LongDescription  = "After taking damage that leaves you one hit from death, gives a permanent buff to several stats. Can be activated up to 5 times, with diminsihing returns.\n\nAn exceedingly heavy training garment worn by the great Gunsoku, an almost-mythical being widely considered to be the greatest master of finger guns in history. Known best for saving the planet from galactic terrors such as Shell, Majin Boom, and Beebeerus, his unflinching drive for self-improvement and fighting stronger opponents has inspired many generations of Gungeoneers.";
+    public static string LongDescription  = "After taking damage that leaves you one hit from death, gives a permanent buff to several stats. Can be activated up to 5 times, with diminsihing returns.";
+    public static string Lore             = "An exceedingly heavy training garment worn by the great Gunsoku, an almost-mythical being widely considered to be the greatest master of finger guns in history. Known best for saving the planet from galactic terrors such as Shell, Majin Boom, and Beebeerus, his unflinching drive for self-improvement and fighting stronger opponents has inspired many generations of Gungeoneers.";
 
     internal const    float   _MAX_POWER        = 5;
     internal readonly float[] _FIRE_RATE_MULT   = {1.00f, 1.20f, 1.30f, 1.35f, 1.38f, 1.40f};
@@ -27,7 +28,7 @@ public class WarriorsGi : PassiveItem
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<WarriorsGi>(ItemName, SpritePath, ShortDescription, LongDescription);
+        PickupObject item = Lazy.SetupPassive<WarriorsGi>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.B;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
 

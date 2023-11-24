@@ -7,6 +7,7 @@ public class LastResort : AdvancedGunBehavior
     public static string ProjectileName   = "ak-47";
     public static string ShortDescription = "Way Past Plan B";
     public static string LongDescription  = "(Gains stats for every ammo-less gun you have in your inventory.)";
+    public static string Lore             = "TBD";
 
     public static List<string> lastResortLevelSprites;
     public static List<Projectile> lastResortProjectiles;
@@ -16,7 +17,7 @@ public class LastResort : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<LastResort>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+        Gun gun = Lazy.SetupGun<LastResort>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
 
         gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
         gun.DefaultModule.shootStyle          = ShootStyle.Automatic;

@@ -13,6 +13,7 @@ public class SpinCycle : AdvancedGunBehavior
     public static string ProjectileName   = "86"; //marine sidearm
     public static string ShortDescription = "Bring it Around Town";
     public static string LongDescription  = "(ball and chain)";
+    public static string Lore             = "TBD";
 
     private static VFXPool _Vfx  = null;
     private static VFXPool _Vfx2 = null;
@@ -24,7 +25,7 @@ public class SpinCycle : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<SpinCycle>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+        Gun gun = Lazy.SetupGun<SpinCycle>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
             gun.DefaultModule.ammoCost            = 1;
             gun.DefaultModule.shootStyle          = ShootStyle.SemiAutomatic;

@@ -9,7 +9,8 @@ public class DeadRinger : PassiveItem
     public static string ItemName         = "Dead Ringer";
     public static string SpritePath       = "dead_ringer_icon";
     public static string ShortDescription = "Tactical Defeat";
-    public static string LongDescription  = "Feigh death and become stealthed upon taking damage. Shooting while stealthed deals 10x damage and removes stealth.\n\nDeveloped by the French government for use by their elite secret agents in case of their inevitable failure, this marvelous gadget takes making lemonade out of lemons to the next level.";
+    public static string LongDescription  = "Feigh death and become stealthed upon taking damage. Shooting while stealthed deals 10x damage and removes stealth.";
+    public static string Lore             = "Developed by the French government for use by their elite secret agents in case of their inevitable failure, this marvelous gadget takes making lemonade out of lemons to the next level.";
 
     internal const float _DEAD_RINGER_DAMAGE_MULT = 10.0f;
     internal const float _LENIENCE = 0.75f; // minimum time after getting hit we can decloak (to prevent instantly losing cloak in panic)
@@ -20,7 +21,7 @@ public class DeadRinger : PassiveItem
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<DeadRinger>(ItemName, SpritePath, ShortDescription, LongDescription);
+        PickupObject item = Lazy.SetupPassive<DeadRinger>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.A;
         _CorpsePrefab     = BraveResources.Load("Global Prefabs/PlayerCorpse") as GameObject;
     }

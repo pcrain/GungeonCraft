@@ -5,7 +5,8 @@ public class StackOfTorches : PlayerItem
     public static string ItemName         = "Stack of Torches";
     public static string SpritePath       = "stack_of_torches_icon";
     public static string ShortDescription = "Back in the Mines";
-    public static string LongDescription  = "Places a torch in front of the player, which has several effects: 1) Placing a torch guarantees at most one additional wave of enemies will spawn in the current room. 2) The first four torches placed in a room have a 25%, 50%, 75%, and 100% chance of preventing ALL additional waves of enemies from spawning. 3) Each placed torch has a 60% chance of brightening up a room under the darkness effect. 4) Each placed torch increases the chance of finding treasure on room clear by 5%, with 20 torches guaranteeing a chest.\n\nAn absolute staple in any adventurer's inventory. These state-of-the-art torches come pre-bundled, pre-lit, pre-mounted, and pre-used, having been yanked straight off the Gungeon's walls. Their lack of reslience towards bullets is matched only by their embarrassingly high susceptibility to singular drops of water. Even so, their warm, radiant glow provides a reassuring sense of safety.";
+    public static string LongDescription  = "Places a torch in front of the player, which has several effects: 1) Placing a torch guarantees at most one additional wave of enemies will spawn in the current room. 2) The first four torches placed in a room have a 25%, 50%, 75%, and 100% chance of preventing ALL additional waves of enemies from spawning. 3) Each placed torch has a 60% chance of brightening up a room under the darkness effect. 4) Each placed torch increases the chance of finding treasure on room clear by 5%, with 20 torches guaranteeing a chest.";
+    public static string Lore             = "An absolute staple in any adventurer's inventory. These state-of-the-art torches come pre-bundled, pre-lit, pre-mounted, and pre-used, having been yanked straight off the Gungeon's walls. Their lack of reslience towards bullets is matched only by their embarrassingly high susceptibility to singular drops of water. Even so, their warm, radiant glow provides a reassuring sense of safety.";
 
     private const float _MAX_WALL_DIST           = 1.6f;
     private const float _CHANCE_TO_END_DARK_ROOM = 0.60f;
@@ -24,7 +25,7 @@ public class StackOfTorches : PlayerItem
 
     public static void Init()
     {
-        PlayerItem item = Lazy.SetupActive<StackOfTorches>(ItemName, SpritePath, ShortDescription, LongDescription);
+        PlayerItem item = Lazy.SetupActive<StackOfTorches>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
         item.quality    = ItemQuality.D;
         item.AddToSubShop(ModdedShopType.Rusty);
 

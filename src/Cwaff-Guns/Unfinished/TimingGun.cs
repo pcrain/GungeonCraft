@@ -7,6 +7,7 @@ public class TimingGun : AdvancedGunBehavior
     public static string ProjectileName   = "ak-47";
     public static string ShortDescription = "One You Can Count On";
     public static string LongDescription  = "(charge 1-10, different effects depending on charge)";
+    public static string Lore             = "TBD";
 
     public static List<string> timingLevelSprites;
     public static List<Projectile> timingProjectiles;
@@ -20,7 +21,7 @@ public class TimingGun : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<TimingGun>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+        Gun gun = Lazy.SetupGun<TimingGun>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
 
         gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
         gun.DefaultModule.shootStyle          = ShootStyle.Automatic;

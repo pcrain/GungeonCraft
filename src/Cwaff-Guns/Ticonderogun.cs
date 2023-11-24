@@ -6,7 +6,8 @@ public class Ticonderogun : AdvancedGunBehavior
     public static string SpriteName       = "ticonderogun";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "A Picture is Worth 1000 Swords";
-    public static string LongDescription  = "Creates magic brushstrokes at the cursor while continuously fired. Encircling enemies with brushstrokes damages them, and multiple enemies can be encircled at once for slightly reduced per-enemy damage. (On controller, brushstrokes auto-lock onto nearby enemies.) Increases curse by 2 while in inventory.\n\nA truly bizarre relic from another dimension where the pen is mightier than the gun. It radiates with an aura that gives one the sense that the arcane sketches it's capable of producing are lying dormant inside the relic itself, just waiting for the right user to draw out their power.";
+    public static string LongDescription  = "Creates magic brushstrokes at the cursor while continuously fired. Encircling enemies with brushstrokes damages them, and multiple enemies can be encircled at once for slightly reduced per-enemy damage. (On controller, brushstrokes auto-lock onto nearby enemies.) Increases curse by 2 while in inventory.";
+    public static string Lore             = "A truly bizarre relic from another dimension where the pen is mightier than the gun. It radiates with an aura that gives one the sense that the arcane sketches it's capable of producing are lying dormant inside the relic itself, just waiting for the right user to draw out their power.";
 
     private const float _BASE_DAMAGE             = 10f;   // base damage of being encircled
     private const float _AMMO_DRAIN_TIME         = 1f;    // how frequently we lose ammo
@@ -41,7 +42,7 @@ public class Ticonderogun : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Ticonderogun>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+        Gun gun = Lazy.SetupGun<Ticonderogun>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.0f, ammo: 150);
             gun.SetAnimationFPS(gun.shootAnimation, 1);
             gun.SetAnimationFPS(gun.reloadAnimation, 1);

@@ -6,7 +6,8 @@ public class Grandmaster : AdvancedGunBehavior
     public static string SpriteName       = "grandmaster";
     public static string ProjectileName   = "ak-47"; // no rotation
     public static string ShortDescription = "Mate in Gun";
-    public static string LongDescription  = "Fires assorted chess pieces that home towards enemies in discrete steps.\n\nThis gun was wielded by the legendary Magnum Carlsen in his bullet chess world championship match against the equally legendary Garry Makarov. While the match ended in a draw, it was notable for being Makarov's final match before retiring to a life of mentorship for the new generation of aspiring Gungeoneers.";
+    public static string LongDescription  = "Fires assorted chess pieces that home towards enemies in discrete steps.";
+    public static string Lore             = "This gun was wielded by the legendary Magnum Carlsen in his bullet chess world championship match against the equally legendary Garry Makarov. While the match ended in a draw, it was notable for being Makarov's final match before retiring to a life of mentorship for the new generation of aspiring Gungeoneers.";
 
     internal static tk2dSpriteAnimationClip _PawnSprite;
     internal static tk2dSpriteAnimationClip _RookSprite;
@@ -17,7 +18,7 @@ public class Grandmaster : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Grandmaster>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+        Gun gun = Lazy.SetupGun<Grandmaster>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.0f, ammo: 350);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
             gun.SetAnimationFPS(gun.reloadAnimation, 16);

@@ -7,10 +7,11 @@ public class Kinsurrection : AdvancedGunBehavior
     public static string ProjectileName   = "ak-47";
     public static string ShortDescription = "Friendliest Fire";
     public static string LongDescription  = "(shoots bullet kin as projectiles, surviving with 1hp)";
+    public static string Lore             = "TBD";
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Kinsurrection>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+        Gun gun = Lazy.SetupGun<Kinsurrection>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
 
         gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
         gun.DefaultModule.ammoCost            = 1;

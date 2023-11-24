@@ -7,7 +7,7 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
     /// <summary>
     /// Perform basic initialization for a new passive, active, or gun item definition.
     /// </summary>
-    public static TItemClass SetupItem<TItemClass, TItemSpecific>(string itemName, string spritePath, string projectileName, string shortDescription, string longDescription, bool hideFromAmmonomicon = false)
+    public static TItemClass SetupItem<TItemClass, TItemSpecific>(string itemName, string spritePath, string projectileName, string shortDescription, string longDescription, string lore, bool hideFromAmmonomicon = false)
         where TItemClass : PickupObject   // must be PickupObject for passive items, PlayerItem for active items, or Gun for guns
         where TItemSpecific : TItemClass  // must be a subclass of TItemClass
     {
@@ -49,7 +49,7 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
         item.itemName = itemName;
         item.encounterTrackable.EncounterGuid = C.MOD_PREFIX+"-"+baseItemName; //create a unique guid for the item
         item.SetShortDescription(shortDescription);
-        item.SetLongDescription(longDescription);
+        item.SetLongDescription($"{longDescription}\n\n{lore}");
         ETGMod.Databases.Items.Add(item);
 
         if (hideFromAmmonomicon)
@@ -80,28 +80,28 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
     /// <summary>
     /// Perform basic initialization for a new passive item definition.
     /// </summary>
-    public static PickupObject SetupPassive<T>(string itemName, string spritePath, string shortDescription, string longDescription, bool hideFromAmmonomicon = false)
+    public static PickupObject SetupPassive<T>(string itemName, string spritePath, string shortDescription, string longDescription, string lore, bool hideFromAmmonomicon = false)
         where T : PickupObject
     {
-        return SetupItem<PickupObject, T>(itemName, spritePath, "", shortDescription, longDescription, hideFromAmmonomicon: hideFromAmmonomicon);
+        return SetupItem<PickupObject, T>(itemName, spritePath, "", shortDescription, longDescription, lore, hideFromAmmonomicon: hideFromAmmonomicon);
     }
 
     /// <summary>
     /// Perform basic initialization for a new active item definition.
     /// </summary>
-    public static PlayerItem SetupActive<T>(string itemName, string spritePath, string shortDescription, string longDescription, bool hideFromAmmonomicon = false)
+    public static PlayerItem SetupActive<T>(string itemName, string spritePath, string shortDescription, string longDescription, string lore, bool hideFromAmmonomicon = false)
         where T : PlayerItem
     {
-        return SetupItem<PlayerItem, T>(itemName, spritePath, "", shortDescription, longDescription, hideFromAmmonomicon: hideFromAmmonomicon);
+        return SetupItem<PlayerItem, T>(itemName, spritePath, "", shortDescription, longDescription, lore, hideFromAmmonomicon: hideFromAmmonomicon);
     }
 
     /// <summary>
     /// Perform basic initialization for a new gun definition.
     /// </summary>
-    public static Gun SetupGun<T>(string gunName, string spritePath, string projectileName, string shortDescription, string longDescription, bool hideFromAmmonomicon = false)
+    public static Gun SetupGun<T>(string gunName, string spritePath, string projectileName, string shortDescription, string longDescription, string lore, bool hideFromAmmonomicon = false)
         where T : Alexandria.ItemAPI.AdvancedGunBehavior
     {
-        Gun gun = SetupItem<Gun, Gun>(gunName, spritePath, projectileName, shortDescription, longDescription, hideFromAmmonomicon: hideFromAmmonomicon);
+        Gun gun = SetupItem<Gun, Gun>(gunName, spritePath, projectileName, shortDescription, longDescription, lore, hideFromAmmonomicon: hideFromAmmonomicon);
         gun.gameObject.AddComponent<T>();
 
         #region Auto-setup barrelOffset from Casing attach point

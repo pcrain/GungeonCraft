@@ -8,6 +8,7 @@ public class GungeonitePickaxe : PlayerItem
     public static string SpritePath       = "gungeonite_pickaxe_icon";
     public static string ShortDescription = "So We Back in the Mines";
     public static string LongDescription  = "TBD";
+    public static string Lore             = "TBD";
 
     private const int _ADD_WALL_DEPTH = 4; // number of layers of extra walls to add when digging (to prevent tilemap rebuilder from panicking)
 
@@ -26,7 +27,7 @@ public class GungeonitePickaxe : PlayerItem
 
     public static void Init()
     {
-        PlayerItem item = Lazy.SetupActive<GungeonitePickaxe>(ItemName, SpritePath, ShortDescription, LongDescription);
+        PlayerItem item = Lazy.SetupActive<GungeonitePickaxe>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.D;
         item.consumable   = false;
         item.CanBeDropped = true;

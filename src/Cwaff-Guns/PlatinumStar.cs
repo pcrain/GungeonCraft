@@ -6,14 +6,15 @@ public class PlatinumStar : AdvancedGunBehavior
     public static string SpriteName       = "platinum_star";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Unbreakable";
-    public static string LongDescription  = "Fires projectiles that deal no damage on initial impact. When reloaded, summons manifestations of the user's soul to attack all previously-shot enemies with a flurry of rapid punches.\n\nThis gun had a large golden arrow pierced through its barrel and grip when it was originally discovered by Ox and Cadence lying in a patch of flowers behind the Gungeon. The arrow had mysteriously vanished by the time they had gotten back to the Breach to test out the gun's capabilities, which by all accounts seemed to be nothing more than rapid-firing some harmless phantom projectiles. Having deemed the gun worthless in combat, Cadence tossed it back outside where she found it, only for it to vanish before hitting the ground. Somehow, it has found its way into the Gungeon on its own.";
+    public static string LongDescription  = "Fires projectiles that deal no damage on initial impact. When reloaded, summons manifestations of the user's soul to attack all previously-shot enemies with a flurry of rapid punches.";
+    public static string Lore             = "This gun had a large golden arrow pierced through its barrel and grip when it was originally discovered by Ox and Cadence lying in a patch of flowers behind the Gungeon. The arrow had mysteriously vanished by the time they had gotten back to the Breach to test out the gun's capabilities, which by all accounts seemed to be nothing more than rapid-firing some harmless phantom projectiles. Having deemed the gun worthless in combat, Cadence tossed it back outside where she found it, only for it to vanish before hitting the ground. Somehow, it has found its way into the Gungeon on its own.";
 
     internal static tk2dSpriteAnimationClip _BulletSprite;
     internal static Projectile _OraBullet;
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<PlatinumStar>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+        Gun gun = Lazy.SetupGun<PlatinumStar>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.PISTOL, reloadTime: 1f, ammo: 480);
             gun.SetAnimationFPS(gun.shootAnimation, 20);
             gun.SetAnimationFPS(gun.reloadAnimation, 40);

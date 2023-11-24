@@ -6,7 +6,8 @@ public class Natascha : AdvancedGunBehavior
     public static string SpriteName       = "natascha";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Fear no Man";
-    public static string LongDescription  = "Rate of fire increases and movement speed decreases as this gun is continuously fired.\n\nThe beloved gun of an amicable literature Ph.D., who refused to let anyone else so much as touch his precious Natascha. That is, until convinced by a hulking Australian man to grant ownership rights in exchange for unlimited lifetime access to the \"best sandwiches south of the equator.\"";
+    public static string LongDescription  = "Rate of fire increases and movement speed decreases as this gun is continuously fired.";
+    public static string Lore             = "The beloved gun of an amicable literature Ph.D., who refused to let anyone else so much as touch his precious Natascha. That is, until convinced by a hulking Australian man to grant ownership rights in exchange for unlimited lifetime access to the \"best sandwiches south of the equator.\"";
 
     internal static tk2dSpriteAnimationClip _BulletSprite;
     internal static float                   _BaseCooldownTime = 0.4f;
@@ -17,7 +18,7 @@ public class Natascha : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Natascha>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+        Gun gun = Lazy.SetupGun<Natascha>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 2500);
             gun.SetAnimationFPS(gun.shootAnimation, (int)((float)_FireAnimationFrames / _BaseCooldownTime) + 1);
             gun.SetMuzzleVFX("muzzle_natascha", fps: 60, scale: 0.3f, anchor: Anchor.MiddleCenter);

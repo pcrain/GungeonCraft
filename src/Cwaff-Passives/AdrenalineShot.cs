@@ -5,7 +5,8 @@ public class AdrenalineShot : PassiveItem
     public static string ItemName         = "Adrenaline Shot";
     public static string SpritePath       = "adrenaline_shot_icon";
     public static string ShortDescription = "Just a Little Longer";
-    public static string LongDescription  = "Upon taking fatal damage, the player is put in a critical 0-health state and has 60 seconds to restore at least half a heart. Taking any damage in this state decreases the countdown by 4 seconds. This item cannot be used by the Robot or other 0-health characters, and gives 20 casings instead.\n\nThis otherwise normal-looking epinephrine injector has approximately 5 times the doctor-approved amount of adrenaline deemed necessary for your everyday anaphylaxis. While there's no telling what kinds of long-term effects that much adrenaline might have on your health, it's reasonable to assume it probably won't be worse than the short-term effects of having your vital organs punctured by bullets...probably.";
+    public static string LongDescription  = "Upon taking fatal damage, the player is put in a critical 0-health state and has 60 seconds to restore at least half a heart. Taking any damage in this state decreases the countdown by 4 seconds. This item cannot be used by the Robot or other 0-health characters, and gives 20 casings instead.";
+    public static string Lore             = "This otherwise normal-looking epinephrine injector has approximately 5 times the doctor-approved amount of adrenaline deemed necessary for your everyday anaphylaxis. While there's no telling what kinds of long-term effects that much adrenaline might have on your health, it's reasonable to assume it probably won't be worse than the short-term effects of having your vital organs punctured by bullets...probably.";
 
     internal const float _MAX_ADRENALINE_TIME = 60f;
     internal const float _MAX_ADRENALINE_LOSS = 4f; // loss from taking damage while under effects of adrenaline
@@ -19,7 +20,7 @@ public class AdrenalineShot : PassiveItem
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<AdrenalineShot>(ItemName, SpritePath, ShortDescription, LongDescription);
+        PickupObject item = Lazy.SetupPassive<AdrenalineShot>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
 

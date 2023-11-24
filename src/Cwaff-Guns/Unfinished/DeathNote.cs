@@ -7,13 +7,14 @@ public class DeathNote : AdvancedGunBehavior
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Notably Dangerous";
     public static string LongDescription  = "(TBD)";
+    public static string Lore             = "TBD";
 
     internal static Dictionary<int, Nametag> _Nametags = new();
     internal static string _Letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<DeathNote>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+        Gun gun = Lazy.SetupGun<DeathNote>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
             gun.DefaultModule.ammoCost            = 1;
             gun.DefaultModule.shootStyle          = ShootStyle.Automatic;

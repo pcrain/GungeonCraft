@@ -6,14 +6,15 @@ public class Tranquilizer : AdvancedGunBehavior
     public static string SpriteName       = "tranquilizer";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Zzzzzz";
-    public static string LongDescription  = "Fires projectiles that permastun enemies after a few seconds, scaling logarithmically with their current health.\n\nMost commonly used for sedating loudly-opinionated supermarket shoppers and other similarly aggressive wild animals, the tranquilizer gun is the pinnacle of non-lethal firearm technology. What it lacks in visual spectacle or firepower it more than makes up for with raw practicality, able to completely pacify all but the mightiest of the Gungeon's denizens with a single shot and a few seconds of your time. As long as you have a plan in place for not getting shot for those few precious seconds, it's hard to beat in terms of ammo-efficiency for dispatching the Gundead.";
+    public static string LongDescription  = "Fires projectiles that permastun enemies after a few seconds, scaling logarithmically with their current health.";
+    public static string Lore             = "Most commonly used for sedating loudly-opinionated supermarket shoppers and other similarly aggressive wild animals, the tranquilizer gun is the pinnacle of non-lethal firearm technology. What it lacks in visual spectacle or firepower it more than makes up for with raw practicality, able to completely pacify all but the mightiest of the Gungeon's denizens with a single shot and a few seconds of your time. As long as you have a plan in place for not getting shot for those few precious seconds, it's hard to beat in terms of ammo-efficiency for dispatching the Gundead.";
 
     internal static GameObject _DrowsyVFX = null;
     internal static tk2dSpriteAnimationClip _BulletSprite;
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Tranquilizer>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+        Gun gun = Lazy.SetupGun<Tranquilizer>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.POISON, reloadTime: 1.2f, ammo: 80);
             gun.SetAnimationFPS(gun.shootAnimation, 30);
             gun.SetAnimationFPS(gun.reloadAnimation, 40);

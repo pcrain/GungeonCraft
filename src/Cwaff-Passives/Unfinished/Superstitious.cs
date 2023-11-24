@@ -6,6 +6,7 @@ public class Superstitious : PassiveItem
     public static string SpritePath       = "88888888_icon";
     public static string ShortDescription = "Writings on the HUD";
     public static string LongDescription  = "(6s and 7s)";
+    public static string Lore             = "TBD";
 
     private static HUDController hud => HUDController.Instance;
     private static List<HUDElement> els = new List<HUDElement>();
@@ -15,7 +16,7 @@ public class Superstitious : PassiveItem
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<Superstitious>(ItemName, SpritePath, ShortDescription, LongDescription);
+        PickupObject item = Lazy.SetupPassive<Superstitious>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
 
         els.Add(new HUDElement("Coolness","","CwaffingTheGungy/Resources/HUD/Coolness.png"));

@@ -6,7 +6,8 @@ public class RacketLauncher : AdvancedGunBehavior
     public static string SpriteName       = "racket_launcher";
     public static string ProjectileName   = "86"; //marine sidearm
     public static string ShortDescription = "Paddle to the Metal";
-    public static string LongDescription  = "Launches a tennis ball that bounces off of walls, enemies, projectiles, and other obstructions. The ball can be volleyed repeatedly and increases in power, speed, and knockback with each successive volley.\n\nThe amount of speed, dexterity, and awareness required to play table tennis at the highest level is staggering to some when they first learn about it. The Racket takes patience and practice to wield to its full potential, but those willing to invest time honing their skills with it will be able to fearlessly return the most lethal of volleys with a Smile on their face.";
+    public static string LongDescription  = "Launches a tennis ball that bounces off of walls, enemies, projectiles, and other obstructions. The ball can be volleyed repeatedly and increases in power, speed, and knockback with each successive volley.";
+    public static string Lore             = "The amount of speed, dexterity, and awareness required to play table tennis at the highest level is staggering to some when they first learn about it. The Racket takes patience and practice to wield to its full potential, but those willing to invest time honing their skills with it will be able to fearlessly return the most lethal of volleys with a Smile on their face.";
 
     internal const float _MAX_REFLECT_DISTANCE = 5f;
     internal const int   _IDLE_FPS             = 24;
@@ -18,7 +19,7 @@ public class RacketLauncher : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<RacketLauncher>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+        Gun gun = Lazy.SetupGun<RacketLauncher>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: _AMMO, canReloadNoMatterAmmo: true);
             gun.muzzleFlashEffects.type              = VFXPoolType.None;
             gun.SetAnimationFPS(gun.shootAnimation, 60);

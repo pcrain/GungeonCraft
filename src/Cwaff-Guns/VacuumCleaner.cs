@@ -6,7 +6,8 @@ public class VacuumCleaner : AdvancedGunBehavior
     public static string SpriteName       = "vacuum_cleaner";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Lean Mean Cleaning Machine";
-    public static string LongDescription  = "Cleans up debris lying around the Gungeon. Each piece of debris vacuumed has a 1% chance to restore 1% of a random gun's ammo.\n\nOver time, the Gungeon naturally accrues a substantial amount of shrapnel, corpses, and other garbage as Gungeoneers fight their way through hordes of Gundead. The Gungeon's relatively pristine state as each new adventurer begins their descent is thanks largely to the Gungeon Janitorial Crew, whose work largely goes unnoticed and unthanked. Observing how adventurers had a penchant for using guns with flashy particle effects, one cunning janitor modified a few vacuum cleaners to electrify the latent argon in the Gungeon, creating some fancy green eddies in the air as the vacuums are running. The janitor stuffed a few of these modified vacuums in chests, hoping adventurers would be distracted enough by the particles to not notice the complete lack of damage as they unwittingly cleaned the dungeon and made the GJC's lives a little easier.";
+    public static string LongDescription  = "Cleans up debris lying around the Gungeon. Each piece of debris vacuumed has a 1% chance to restore 1% of a random gun's ammo.";
+    public static string Lore             = "Over time, the Gungeon naturally accrues a substantial amount of shrapnel, corpses, and other garbage as Gungeoneers fight their way through hordes of Gundead. The Gungeon's relatively pristine state as each new adventurer begins their descent is thanks largely to the Gungeon Janitorial Crew, whose work largely goes unnoticed and unthanked. Observing how adventurers had a penchant for using guns with flashy particle effects, one cunning janitor modified a few vacuum cleaners to electrify the latent argon in the Gungeon, creating some fancy green eddies in the air as the vacuums are running. The janitor stuffed a few of these modified vacuums in chests, hoping adventurers would be distracted enough by the particles to not notice the complete lack of damage as they unwittingly cleaned the dungeon and made the GJC's lives a little easier.";
 
     internal static GameObject _VacuumVFX = null;
 
@@ -26,7 +27,7 @@ public class VacuumCleaner : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<VacuumCleaner>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+        Gun gun = Lazy.SetupGun<VacuumCleaner>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.CHARGE, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true);
             gun.SetAnimationFPS(gun.chargeAnimation, 16);
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);

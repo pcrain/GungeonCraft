@@ -10,7 +10,8 @@ public class Gunbrella : AdvancedGunBehavior
     public static string SpriteName       = "gunbrella";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Cloudy with a Chance of Pain";
-    public static string LongDescription  = "Charging and releasing fires projectiles that hail from the sky at the cursor's position.\n\nA normal umbrella that was genetically modified to fire bullets, older models fired projectiles from the front much like a traditional firearm. Gungeoneers quickly grew frustrated at being unable to actually see where they were shooting at due to the Gunbrella's large frame. With modern advances in technology and magic, newer models include a touchscreen and GPS that allows the user to target enemies directly with projectiles summoned from the sky itself.";
+    public static string LongDescription  = "Charging and releasing fires projectiles that hail from the sky at the cursor's position.";
+    public static string Lore             = "A normal umbrella that was genetically modified to fire bullets, older models fired projectiles from the front much like a traditional firearm. Gungeoneers quickly grew frustrated at being unable to actually see where they were shooting at due to the Gunbrella's large frame. With modern advances in technology and magic, newer models include a touchscreen and GPS that allows the user to target enemies directly with projectiles summoned from the sky itself.";
 
     private const float _MIN_CHARGE_TIME   = 0.75f;
     private const int   _BARRAGE_SIZE      = 16;
@@ -31,7 +32,7 @@ public class Gunbrella : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Gunbrella>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+        Gun gun = Lazy.SetupGun<Gunbrella>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARGE, reloadTime: 1.0f, ammo: 60);
             gun.SetAnimationFPS(gun.shootAnimation, 60);
             gun.SetAnimationFPS(gun.chargeAnimation, 16);

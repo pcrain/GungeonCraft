@@ -47,7 +47,7 @@ def main():
         with open(path, 'r') as fin:
           while line := next(fin):
             if "LongDescription" in line:
-              desc = line.split("\\n\\n")[0].split('"')[1]
+              desc = '"'.join(line.split('"')[1:-1])
               # print(f"DESC: {desc}")
               # print()
               break

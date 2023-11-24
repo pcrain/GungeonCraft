@@ -6,6 +6,7 @@ public class Siphon : PassiveItem
     public static string SpritePath       = "88888888_icon";
     public static string ShortDescription = "Super Gooper";
     public static string LongDescription  = "Immunity to all negative goops; projectiles fired while standing in goops spread during flight";
+    public static string Lore             = "TBD";
 
     // private enum GoopStatus
     // {
@@ -22,7 +23,7 @@ public class Siphon : PassiveItem
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<Siphon>(ItemName, SpritePath, ShortDescription, LongDescription);
+        PickupObject item = Lazy.SetupPassive<Siphon>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.B;
     }
 

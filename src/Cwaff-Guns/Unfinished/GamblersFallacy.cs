@@ -7,12 +7,13 @@ public class GamblersFallacy : AdvancedGunBehavior
     public static string ProjectileName   = "ak-47";
     public static string ShortDescription = "This Time for Sure!";
     public static string LongDescription  = "(1/30 chance of exploding and self-destructing, taking health in the process)";
+    public static string Lore             = "TBD";
 
     private static VFXPool vfx = null;
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<GamblersFallacy>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+        Gun gun = Lazy.SetupGun<GamblersFallacy>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
 
         gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
         gun.DefaultModule.ammoCost            = 1;

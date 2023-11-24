@@ -6,7 +6,8 @@ public class PistolWhip : AdvancedGunBehavior
     public static string SpriteName       = "pistol_whip";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "What a Horrible Night";
-    public static string LongDescription  = "A long range weapon that deals high melee damage at its tip and fires a fast projectile when fully extended. Can only melee hit enemies when fully extended. Increases curse by 3 while in inventory.\n\nOnce wielded by elite foot soldiers in the army of the great Pharaoh Tutancannon, this weapon is contraband in modern gunfare. On top of flouting the Guneva Conventions with its absurd muzzle range and ability to reach around rather tall walls, it is also reported to have been cursed by Tutancannon himself on his deathbed, bound to unleash the foulest creatures upon those who would dare wield it within the Gungeon's chambers.";
+    public static string LongDescription  = "A long range weapon that deals high melee damage at its tip and fires a fast projectile when fully extended. Can only melee hit enemies when fully extended. Increases curse by 3 while in inventory.";
+    public static string Lore             = "Once wielded by elite foot soldiers in the army of the great Pharaoh Tutancannon, this weapon is contraband in modern gunfare. On top of flouting the Guneva Conventions with its absurd muzzle range and ability to reach around rather tall walls, it is also reported to have been cursed by Tutancannon himself on his deathbed, bound to unleash the foulest creatures upon those who would dare wield it within the Gungeon's chambers.";
 
     internal static tk2dSpriteAnimationClip _BulletSprite;
     internal static Projectile _WhipStartProjectile;
@@ -15,7 +16,7 @@ public class PistolWhip : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<PistolWhip>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+        Gun gun = Lazy.SetupGun<PistolWhip>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 0.01f, ammo: 100);
             gun.SetAnimationFPS(gun.shootAnimation, 30);
             gun.SetAnimationFPS(gun.reloadAnimation, 40);

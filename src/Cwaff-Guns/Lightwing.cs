@@ -6,7 +6,8 @@ public class Lightwing : AdvancedGunBehavior
     public static string SpriteName       = "lightwing";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Falcon Captain";
-    public static string LongDescription  = "Fires birds that return to the user after hitting an enemy. Shooting an enemy's projectile will destroy it and cause the bird to home in on that enemy with increased speed and damage. When returning to the user, birds will attempt to retrieve an additional projectile belonging to the enemy they hit, restoring additional ammo if successful.\n\nFalconry is an art that is on the verge of being lost to time, with this weapon being one gunsmith's attempt to revive the art with a modern coat of paint. Boasting state-of-the-art military artificial intelligence in every projectile, the Lightwing allows its user to experience everything traditional falconry has to offer, except perhaps the bond between falcon and falconer. An improved model with projectiles that exhibit more realistic perching and pooping behaviors is currently under development.";
+    public static string LongDescription  = "Fires birds that return to the user after hitting an enemy. Shooting an enemy's projectile will destroy it and cause the bird to home in on that enemy with increased speed and damage. When returning to the user, birds will attempt to retrieve an additional projectile belonging to the enemy they hit, restoring additional ammo if successful.";
+    public static string Lore             = "Falconry is an art that is on the verge of being lost to time, with this weapon being one gunsmith's attempt to revive the art with a modern coat of paint. Boasting state-of-the-art military artificial intelligence in every projectile, the Lightwing allows its user to experience everything traditional falconry has to offer, except perhaps the bond between falcon and falconer. An improved model with projectiles that exhibit more realistic perching and pooping behaviors is currently under development.";
 
     internal static tk2dSpriteAnimationClip _NeutralSprite    = null;
     internal static tk2dSpriteAnimationClip _HuntingSprite    = null;
@@ -15,7 +16,7 @@ public class Lightwing : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Lightwing>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+        Gun gun = Lazy.SetupGun<Lightwing>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.0f, ammo: 120);
             gun.SetAnimationFPS(gun.shootAnimation, 32);
             gun.SetAnimationFPS(gun.reloadAnimation, 30);

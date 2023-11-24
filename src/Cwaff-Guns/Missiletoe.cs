@@ -6,7 +6,8 @@ public class Missiletoe : AdvancedGunBehavior
     public static string SpriteName       = "missiletoe";
     public static string ProjectileName   = "38_special"; // has rotation, but overridden later
     public static string ShortDescription = "O Tannenbomb";
-    public static string LongDescription  = $"Fires wrapped gifts with special attributes depending on the quality of item they contain. Reloading with a full clip while a dropped item or gun is nearby wraps it and adds it to the gun's clip. Reloading with a full clip while no items are nearby unwraps the most recently wrapped item and removes it from the gun's clip. Items and guns do not count as part of the player's normal inventory while they are wrapped.\n\nLeaving all of the gift-giving to Santa Claus during the Christmas season seems silly when modern firearm technology allows for the expedient delivery of high-velocity presents all year round. The sheer inertia with which the {ItemName} can launch presents is sure to leave a lasting impression on its lucky recipients, and while concussive force may render those recipients unable to actually enjoy those gifts, it's the thought that counts, right?";
+    public static string LongDescription  = "Fires wrapped gifts with special attributes depending on the quality of item they contain. Reloading with a full clip while a dropped item or gun is nearby wraps it and adds it to the gun's clip. Reloading with a full clip while no items are nearby unwraps the most recently wrapped item and removes it from the gun's clip. Items and guns do not count as part of the player's normal inventory while they are wrapped.";
+    public static string Lore             = "Leaving all of the gift-giving to Santa Claus during the Christmas season seems silly when modern firearm technology allows for the expedient delivery of high-velocity presents all year round. The sheer inertia with which the {ItemName} can launch presents is sure to leave a lasting impression on its lucky recipients, and while concussive force may render those recipients unable to actually enjoy those gifts, it's the thought that counts, right?";
 
     internal static GameObject _SparklePrefab;
 
@@ -41,7 +42,7 @@ public class Missiletoe : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Missiletoe>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+        Gun gun = Lazy.SetupGun<Missiletoe>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARM, reloadTime: 1.0f, ammo: 300, canReloadNoMatterAmmo: true);
             gun.SetAnimationFPS(gun.shootAnimation, 45);
             gun.SetAnimationFPS(gun.reloadAnimation, 20);

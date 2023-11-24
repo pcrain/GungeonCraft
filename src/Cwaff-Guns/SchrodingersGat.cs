@@ -11,7 +11,8 @@ public class SchrodingersGat : AdvancedGunBehavior
     public static string SpriteName       = "schrodingers_gat";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Proba-ballistic";
-    public static string LongDescription  = "Fires bullets that leave enemies in a quantum state until they are observed by either dealing or receiving damage. Once observed, enemies have a 50% chance of already being dead, revealing themselves and their projectiles as illusions. Bullets from this gun cannot affect the same enemy twice.\n\nFamously used by a mad scientist who would often fire dozens of rounds into a locked box with an animal inside, claiming it was both alive and dead until the box was opened. That scientist eventually landed in prison on charges for kidnapping and murdering dozens of pet cats, insisting \"we don't know if I kidnapped and murdered dozens of cats until we observe it!\" throughout the entire court procedings.";
+    public static string LongDescription  = "Fires bullets that leave enemies in a quantum state until they are observed by either dealing or receiving damage. Once observed, enemies have a 50% chance of already being dead, revealing themselves and their projectiles as illusions. Bullets from this gun cannot affect the same enemy twice.";
+    public static string Lore             = "Famously used by a mad scientist who would often fire dozens of rounds into a locked box with an animal inside, claiming it was both alive and dead until the box was opened. That scientist eventually landed in prison on charges for kidnapping and murdering dozens of pet cats, insisting \"we don't know if I kidnapped and murdered dozens of cats until we observe it!\" throughout the entire court procedings.";
 
     internal static tk2dSpriteAnimationClip _BulletSprite;
 
@@ -19,7 +20,7 @@ public class SchrodingersGat : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<SchrodingersGat>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+        Gun gun = Lazy.SetupGun<SchrodingersGat>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f, ammo: 250);
             gun.SetAnimationFPS(gun.idleAnimation, 24);
             gun.SetAnimationFPS(gun.shootAnimation, 24);

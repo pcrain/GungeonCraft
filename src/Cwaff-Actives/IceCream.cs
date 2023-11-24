@@ -5,7 +5,8 @@ public class IceCream : PlayerItem
     public static string ItemName         = "Ice Cream";
     public static string SpritePath       = "ice_cream_icon";
     public static string ShortDescription = "Frozen Treat to Warm the Heart";
-    public static string LongDescription  = "When used near an enemy with a gun, replaces their gun with ice cream. Enemies with ice cream are non-hostile, and will seek out other enemies with guns and try to share their ice cream.\n\nThe ice cream sundae is happiness in dairy format -- an irresistible, timeless classic that needs no introduction or explanation. Getting it into the hands of a frenzied Gundead may prove difficult, but that difficulty is more than made up for by the friendships you'll make by going through the effort of doing it anyway. :>";
+    public static string LongDescription  = "When used near an enemy with a gun, replaces their gun with ice cream. Enemies with ice cream are non-hostile, and will seek out other enemies with guns and try to share their ice cream.";
+    public static string Lore             = "The ice cream sundae is happiness in dairy format -- an irresistible, timeless classic that needs no introduction or explanation. Getting it into the hands of a frenzied Gundead may prove difficult, but that difficulty is more than made up for by the friendships you'll make by going through the effort of doing it anyway. :>";
 
     internal static GameObject _HeartVFX;
 
@@ -13,7 +14,7 @@ public class IceCream : PlayerItem
     {
         IceCreamGun.Add(); // add the gun here because it's a pseudo-gun
 
-        PlayerItem item = Lazy.SetupActive<IceCream>(ItemName, SpritePath, ShortDescription, LongDescription);
+        PlayerItem item = Lazy.SetupActive<IceCream>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
         item.consumable   = false;
         item.CanBeDropped = true;
@@ -55,12 +56,13 @@ public class IceCreamGun : AdvancedGunBehavior
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = ":>";
     public static string LongDescription  = "EYE KEEM! 'v'";
+    public static string Lore             = "EYYYYYEEEE KEEEEEMM";
 
     internal static int _IceCreamGunId;
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<IceCreamGun>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, hideFromAmmonomicon: true);
+        Gun gun = Lazy.SetupGun<IceCreamGun>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore, hideFromAmmonomicon: true);
             gun.SetAttributes(quality: ItemQuality.SPECIAL, gunClass: GunClass.SILLY, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true);
             gun.SetAnimationFPS(gun.chargeAnimation, 16);
             gun.muzzleFlashEffects = null;

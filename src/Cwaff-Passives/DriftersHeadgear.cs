@@ -5,7 +5,8 @@ public class DriftersHeadgear : PassiveItem
     public static string ItemName         = "Drifter's Headgear";
     public static string SpritePath       = "drifters_headgear_icon";
     public static string ShortDescription = "Hyper Light Dodger";
-    public static string LongDescription  = "Grants the user an extremely quick dash in place of their dodge roll, but leaves them vulnerable to bullets and enemies while dashing.\n\nA memento left behind by a former adventurer said to possess the ability to outrun everything except his inner demons. While he never elaborated on what exactly those demons were, it almost certainly wasn't the likes of the Gundead.";
+    public static string LongDescription  = "Grants the user an extremely quick dash in place of their dodge roll, but leaves them vulnerable to bullets and enemies while dashing.";
+    public static string Lore             = "A memento left behind by a former adventurer said to possess the ability to outrun everything except his inner demons. While he never elaborated on what exactly those demons were, it almost certainly wasn't the likes of the Gundead.";
 
     internal static GameObject _LinkVFXPrefab;
     internal static Projectile _LightningProjectile;
@@ -14,7 +15,7 @@ public class DriftersHeadgear : PassiveItem
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<DriftersHeadgear>(ItemName, SpritePath, ShortDescription, LongDescription);
+        PickupObject item = Lazy.SetupPassive<DriftersHeadgear>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
 

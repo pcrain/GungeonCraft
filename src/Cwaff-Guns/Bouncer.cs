@@ -6,7 +6,8 @@ public class Bouncer : AdvancedGunBehavior
     public static string SpriteName       = "bouncer";
     public static string ProjectileName   = "38_special"; //for rotation niceness
     public static string ShortDescription = "Rebound to Go Wrong";
-    public static string LongDescription  = "Fires strong projectiles that phase through enemies and objects until bouncing at least once, creating a small explosion on the final impact.\n\nOriginally developed as a proof-of-concept back in a time before true bouncing bullets existed, many Gungeoneers today still prefer this older design for flexing their \"mad trickshotting skillz yo\" and its ability to hit enemies behind cover.";
+    public static string LongDescription  = "Fires strong projectiles that phase through enemies and objects until bouncing at least once, creating a small explosion on the final impact.";
+    public static string Lore             = "Originally developed as a proof-of-concept back in a time before true bouncing bullets existed, many Gungeoneers today still prefer this older design for flexing their \"mad trickshotting skillz yo\" and its ability to hit enemies behind cover.";
 
     internal static ExplosionData           _MiniExplosion      = null;
     internal static float                   _Damage_Factor      = 0.5f; // % of speed converted to damage
@@ -16,7 +17,7 @@ public class Bouncer : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Bouncer>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription);
+        Gun gun = Lazy.SetupGun<Bouncer>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 0.8f, ammo: 300);
             gun.SetAnimationFPS(gun.shootAnimation, 14);
             gun.SetAnimationFPS(gun.reloadAnimation, 20);
