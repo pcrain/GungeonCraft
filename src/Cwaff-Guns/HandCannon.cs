@@ -31,7 +31,7 @@ public class HandCannon : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 2, cooldown: 0.1f, angleVariance: 15.0f, shootStyle: ShootStyle.Charged, customClip: SpriteName);
 
-        Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
+        Projectile projectile = gun.InitFirstProjectile();
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "slappp", fps: 30, scale: 0.5f, anchor: Anchor.MiddleCenter,
                 overrideColliderPixelSizes: new IntVector2(8,8)));// small collider near the center of the sprite
             projectile.baseData.damage  = 40f;

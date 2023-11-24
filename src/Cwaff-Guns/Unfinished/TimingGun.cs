@@ -38,14 +38,14 @@ public class TimingGun : AdvancedGunBehavior
         timingProjectiles = new List<Projectile>();
         timingLevelSprites = new List<string>();
 
-        Projectile projectile       = Lazy.PrefabProjectileFromGun(gun);
+        Projectile projectile       = gun.InitFirstProjectile();
         projectile.baseData.damage  = 0f;  //dummy value to check when stats need to be recalculated
         projectile.baseData.speed   = 5.0f;
         projectile.baseData.range   = 5.0f;
         projectile.transform.parent = gun.barrelOffset;
 
         // No guns without ammo (base stats)
-        Projectile p0 = Lazy.PrefabProjectileFromExistingProjectile(projectile);
+        Projectile p0 = projectile.Clone();
         p0.baseData.damage = 1f;
         p0.baseData.speed  = 2f;
         p0.baseData.range  = 2f;
@@ -64,7 +64,7 @@ public class TimingGun : AdvancedGunBehavior
         for(int i = 1; i < maxCharge; ++i)
         {
             Projectile po      = timingProjectiles[i-1];
-            Projectile pi      = Lazy.PrefabProjectileFromExistingProjectile(po);
+            Projectile pi      = po.Clone();
             pi.baseData.damage = po.baseData.damage * 1.4f;
             pi.baseData.speed  = po.baseData.speed * 1.4f;
             pi.baseData.range  = po.baseData.range * 1.4f;

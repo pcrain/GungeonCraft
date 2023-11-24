@@ -34,14 +34,14 @@ public class LastResort : AdvancedGunBehavior
         lastResortProjectiles = new List<Projectile>();
         lastResortLevelSprites = new List<string>();
 
-        Projectile projectile       = Lazy.PrefabProjectileFromGun(gun);
+        Projectile projectile       = gun.InitFirstProjectile();
         projectile.baseData.damage  = 0f;  //dummy value to check when stats need to be recalculated
         projectile.baseData.speed   = 5.0f;
         projectile.baseData.range   = 5.0f;
         projectile.transform.parent = gun.barrelOffset;
 
         // No guns without ammo (base stats)
-        Projectile p0 = Lazy.PrefabProjectileFromExistingProjectile(projectile);
+        Projectile p0 = projectile.Clone();
         p0.baseData.damage = 2f;
         lastResortProjectiles.Add(p0);
 
@@ -58,7 +58,7 @@ public class LastResort : AdvancedGunBehavior
         for(int i = 1; i < 5; ++i)
         {
             Projectile po      = lastResortProjectiles[i-1];
-            Projectile pi      = Lazy.PrefabProjectileFromExistingProjectile(po);
+            Projectile pi      = po.Clone();
             pi.baseData.damage = po.baseData.damage * 2;
             pi.baseData.speed  = po.baseData.speed * 2;
             pi.baseData.range  = po.baseData.range * 2;

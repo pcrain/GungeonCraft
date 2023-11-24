@@ -11,7 +11,7 @@ public class RacketLauncher : AdvancedGunBehavior
 
     internal const float _MAX_REFLECT_DISTANCE = 5f;
     internal const int   _IDLE_FPS             = 24;
-    internal const int   _AMMO                 = 100; //100;
+    internal const int   _AMMO                 = 100;
 
     private List<TennisBall> _extantTennisBalls = new();
 
@@ -27,7 +27,7 @@ public class RacketLauncher : AdvancedGunBehavior
 
         ProjectileModule mod = gun.DefaultModule.SetAttributes(ammoCost: 0, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
 
-        Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
+        Projectile projectile = gun.InitFirstProjectile();
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "tennis_ball", fps: 12, scale: 0.6f, anchor: Anchor.MiddleCenter));
             projectile.baseData.damage         = 10f;
             projectile.baseData.speed          = 20f;
@@ -36,9 +36,6 @@ public class RacketLauncher : AdvancedGunBehavior
             // projectile.DestroyMode = Projectile.ProjectileDestroyMode.DestroyComponent;  // must be set at creation time
 
         projectile.gameObject.AddComponent<TennisBall>();
-
-        // foreach (ProjectileModule pmod in gun.Volley.projectiles)
-        //     pmod.ammoCost = 0;
     }
 
     protected override void OnPickedUpByPlayer(PlayerController player)

@@ -47,7 +47,7 @@ public class BBGun : AdvancedGunBehavior
             });
         }
 
-        _FakeProjectile = Lazy.PrefabProjectileFromGun(gun);
+        _FakeProjectile = gun.InitFirstProjectile();
         _FakeProjectile.gameObject.AddComponent<FakeProjectileComponent>(); // disable VFX like robot's lightning (TODO: this doesn't work here; need to apply to each projectile)
     }
 

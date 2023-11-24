@@ -31,7 +31,7 @@ public class Lightwing : AdvancedGunBehavior
         _RetrievingSprite = AnimatedBullet.Create(name: "lightwing_projectile_retrieve", fps: 12, anchor: Anchor.MiddleLeft);
         _ReturningSprite  = AnimatedBullet.Create(name: "lightwing_projectile_return",   fps: 12, anchor: Anchor.MiddleLeft);
 
-        Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
+        Projectile projectile = gun.InitFirstProjectile();
             projectile.AddDefaultAnimation(_NeutralSprite);
             projectile.AddAnimation(_HuntingSprite);
             projectile.AddAnimation(_RetrievingSprite);

@@ -35,7 +35,7 @@ public class VacuumCleaner : AdvancedGunBehavior
 
         ProjectileModule mod = gun.DefaultModule.SetAttributes(clipSize: -1, shootStyle: ShootStyle.Charged, ammoType: GameUIAmmoType.AmmoType.BEAM);
             mod.chargeProjectiles = new(){ new(){
-                Projectile = Lazy.PrefabProjectileFromGun(gun),
+                Projectile = gun.InitFirstProjectile(),
                 ChargeTime = float.MaxValue, // absurdly high value so we never actually shoot
             }};
 

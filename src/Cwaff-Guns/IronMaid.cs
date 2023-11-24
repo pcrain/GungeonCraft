@@ -25,7 +25,7 @@ public class IronMaid : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
 
-        Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
+        Projectile projectile = gun.InitFirstProjectile();
             projectile.baseData.damage  = 5f;
             projectile.baseData.speed   = 40.0f;
             projectile.transform.parent = gun.barrelOffset;

@@ -82,7 +82,7 @@ public class Missiletoe : AdvancedGunBehavior
         tk2dSpriteAnimationClip starProjectile        = AnimatedBullet.Create(name: "missiletoe_projectile_star",        fps: 2, anchor: Anchor.MiddleLeft);
         tk2dSpriteAnimationClip wreathProjectile      = AnimatedBullet.Create(name: "missiletoe_projectile_wreath",      fps: 2, anchor: Anchor.MiddleLeft);
 
-        _OrnamentProjectile = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items._38Special) as Gun, false);
+        _OrnamentProjectile = Items._38Special.CloneProjectile();
             _OrnamentProjectile.AddAnimation(gingerbreadProjectile);
             _OrnamentProjectile.AddAnimation(mistletoeProjectile);
             _OrnamentProjectile.AddAnimation(sockProjectile);
@@ -91,7 +91,7 @@ public class Missiletoe : AdvancedGunBehavior
             _OrnamentProjectile.AddDefaultAnimation(ballProjectile);
             _OrnamentProjectile.gameObject.AddComponent<GlowyChristmasProjectileBehavior>();
 
-        _ExplodingOrnamentProjectile = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items._38Special) as Gun, false);
+        _ExplodingOrnamentProjectile = Items._38Special.CloneProjectile();
             _ExplodingOrnamentProjectile.AddAnimation(gingerbreadProjectile);
             _ExplodingOrnamentProjectile.AddAnimation(mistletoeProjectile);
             _ExplodingOrnamentProjectile.AddAnimation(sockProjectile);
@@ -147,7 +147,7 @@ public class Missiletoe : AdvancedGunBehavior
 
     private static Projectile SetupProjectile(Gun gun, string name, float damage, float speed, float force)
     {
-        Projectile projectile = Lazy.PrefabProjectileFromGun(gun, setGunDefaultProjectile: false);
+        Projectile projectile = gun.CloneProjectile();
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: name, fps: 1, scale: 0.5f, anchor: Anchor.MiddleLeft));
             projectile.transform.parent       = gun.barrelOffset;
             projectile.shouldFlipHorizontally = true;

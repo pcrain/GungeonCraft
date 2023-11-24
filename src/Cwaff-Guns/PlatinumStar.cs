@@ -24,7 +24,7 @@ public class PlatinumStar : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 28, cooldown: 0.125f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, customClip: SpriteName);
 
-        Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
+        Projectile projectile = gun.InitFirstProjectile();
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "platinum_star_projectile", fps: 12, anchor: Anchor.MiddleLeft));
             projectile.baseData.damage  = 3f;
             projectile.baseData.force   = 1f;
@@ -33,7 +33,7 @@ public class PlatinumStar : AdvancedGunBehavior
             projectile.transform.parent = gun.barrelOffset;
             projectile.gameObject.AddComponent<PlatinumProjectile>();
 
-        _OraBullet = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items.Polaris) as Gun);
+        _OraBullet = Items.Polaris.CloneProjectile();
             _OraBullet.AddDefaultAnimation(AnimatedBullet.Create(name: "ora_fist_fast", fps: 12, scale: 0.33f, anchor: Anchor.MiddleRight));
             _OraBullet.shouldRotate    = true;
             _OraBullet.baseData.damage = 1f;

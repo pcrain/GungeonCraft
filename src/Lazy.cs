@@ -181,26 +181,6 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
     }
 
     /// <summary>
-    /// Perform basic initialization for a new projectile definition.
-    /// </summary>
-    public static Projectile PrefabProjectileFromGun(Gun gun, bool setGunDefaultProjectile = true)
-    {
-        //actually instantiate the projectile
-        Projectile projectile = gun.DefaultModule.projectiles[0].ClonePrefab<Projectile>();
-        if (setGunDefaultProjectile)
-            gun.DefaultModule.projectiles[0] = projectile; //reset the gun's default projectile
-        return projectile;
-    }
-
-    /// <summary>
-    /// Perform basic initialization for a copied projectile definition.
-    /// </summary>
-    public static Projectile PrefabProjectileFromExistingProjectile(Projectile baseProjectile)
-    {
-        return baseProjectile.ClonePrefab<Projectile>();
-    }
-
-    /// <summary>
     /// Post a custom item pickup notification to the bottom of the screen
     /// </summary>
     public static void CustomNotification(string header, string text, tk2dBaseSprite sprite = null, UINotificationController.NotificationColor? color = null)
@@ -461,7 +441,7 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
     {
         if (_NullProjectilePrefab == null)
         {
-            _NullProjectilePrefab                     = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items.Ak47) as Gun, setGunDefaultProjectile: false);
+            _NullProjectilePrefab                     = Items.Ak47.CloneProjectile();
             _NullProjectilePrefab.damageTypes         = CoreDamageTypes.None;
             _NullProjectilePrefab.collidesWithEnemies = false;
             _NullProjectilePrefab.collidesWithPlayer  = false;

@@ -26,7 +26,7 @@ public class GasterBlaster : PlayerItem
 
         _GasterBlaster = VFX.RegisterVFXObject("GasterBlaster", ResMap.Get("gaster_blaster"), 2, loops: true, anchor: Anchor.MiddleCenter);
 
-        _GasterBlast = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items.MarineSidearm) as Gun, false);
+        _GasterBlast = Items.MarineSidearm.CloneProjectile();
         _GasterBlast.baseData.damage         = 700f;
         _GasterBlast.baseData.force          = 70f;
         _GasterBlast.baseData.range          = 200f;

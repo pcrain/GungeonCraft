@@ -25,7 +25,7 @@
 //             gun.SetBaseMaxAmmo(1000);
 //             gun.SetAnimationFPS(gun.shootAnimation, 24);
 
-//             Projectile projectile       = Lazy.PrefabProjectileFromGun(gun);
+//             Projectile projectile       = gun.InitFirstProjectile();
 //             projectile.baseData.damage  = 20f;
 //             projectile.baseData.speed   = 30.0f;
 //             projectile.transform.parent = gun.barrelOffset;

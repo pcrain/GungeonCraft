@@ -43,14 +43,14 @@ public class AimuHakurei : AdvancedGunBehavior
         _GrazeVFX = VFX.RegisterVFXObject("GrazeVFX", ResMap.Get("graze_vfx"),
             fps: 5, loops: true, anchor: Anchor.MiddleCenter, scale: 1.0f, emissivePower: 5f);
 
-        _ProjBase = Lazy.PrefabProjectileFromGun(gun, setGunDefaultProjectile: false);
+        _ProjBase = gun.InitFirstProjectile();
             _ProjBase.baseData.speed  = 44f;
             _ProjBase.baseData.damage = 8f;
             _ProjBase.baseData.range  = 100f;
             _ProjBase.baseData.force  = 3f;
             _ProjBase.transform.parent = gun.barrelOffset;
 
-        Projectile beamProj = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items._38Special) as Gun, setGunDefaultProjectile: false);
+        Projectile beamProj = Items._38Special.CloneProjectile();
             beamProj.baseData.speed = 300f;
             beamProj.baseData.damage = 16f;
             TrailController tc = beamProj.AddTrailToProjectile(ResMap.Get("aimu_beam_mid")[0], new Vector2(25, 39), new Vector2(0, 0),
@@ -162,8 +162,6 @@ public class AimuHakurei : AdvancedGunBehavior
         BraveTime.SetTimeScaleMultiplier(focus ? 0.65f : 1.0f, base.gameObject);
         if (this._focused)
             AkSoundEngine.PostEvent("aimu_focus_sound", this.Owner.gameObject);
-        // else
-        //     AkSoundEngine.PostEvent("aimu_unfocus_sound", this.Owner.gameObject);
 
         this.gun.RemoveStatFromGun(PlayerStats.StatType.MovementSpeed);
         // NOTE: since time is slowed down, the player's effective speed is 0.65 * 0.65. This is intentional
@@ -180,6 +178,7 @@ public class AimuHakurei : AdvancedGunBehavior
             yield return null;
         }
     }
+
     private static ProjectileModule AimuMod(List<Projectile> projectiles, float fireRate, int level)
     {
         ProjectileModule mod = new ProjectileModule().SetAttributes(
@@ -223,9 +222,6 @@ public class AimuHakurei : AdvancedGunBehavior
     private void PowerUp()
     {
         ++this.gun.CurrentStrengthTier;
-        // GameObject aura = SpawnManager.SpawnVFX(WarriorsGi._ZenkaiAura, this.Owner.sprite.WorldBottomCenter, Quaternion.identity);
-        //     aura.transform.parent = this.Owner.transform;
-        //     aura.ExpireIn(0.5f, 0.5f);
         AkSoundEngine.PostEvent("aimu_power_up_sound", this.Owner.gameObject);
         this.gun.gameObject.SetGlowiness(this.gun.CurrentStrengthTier * this.gun.CurrentStrengthTier);
     }
@@ -236,7 +232,6 @@ public class AimuHakurei : AdvancedGunBehavior
         this.gun.gameObject.SetGlowiness(this.gun.CurrentStrengthTier * this.gun.CurrentStrengthTier);
     }
 
-    // private static List<Projectile> shortList; // cache projectiles that are nearby so we can look them up every other frame
     private static Dictionary<Projectile, int> _GrazeDict = new();
     private static Dictionary<Projectile, float> _GrazeTimeDict = new();
     private void UpdateGraze()
@@ -306,11 +301,6 @@ public class AimuHakureiAmmoDisplay : CustomAmmoDisplay
         this._owner = this._gun.CurrentOwner as PlayerController;
     }
 
-    private void Update()
-    {
-      // enter update code here
-    }
-
     public override bool DoCustomAmmoDisplay(GameUIAmmoController uic)
     {
         if (!this._owner)
@@ -327,7 +317,6 @@ public class AimuHakureiAmmoDisplay : CustomAmmoDisplay
             uic.SetAmmoCountLabelColor(Color.Lerp(Color.magenta, Color.cyan, Mathf.Abs(phase)));
             uic.GunAmmoCountLabel.Text = $"{this._aimu.graze} - MAX";
         }
-        // uic.GunAmmoCountLabel.Text = $"{this._aimu.graze}";
         return true;
     }
 }
@@ -379,20 +368,20 @@ public class AimuHakureiProjectileMotionModule : ProjectileMotionModule
 
     public override void UpdateDataOnBounce(float angleDiff)
     {
-        if (!float.IsNaN(angleDiff))
-        {
-            _initialUpVector = Quaternion.Euler(0f, 0f, angleDiff) * _initialUpVector;
-            _initialRightVector = Quaternion.Euler(0f, 0f, angleDiff) * _initialRightVector;
-        }
+        if (float.IsNaN(angleDiff))
+            return;
+
+        _initialUpVector = Quaternion.Euler(0f, 0f, angleDiff) * _initialUpVector;
+        _initialRightVector = Quaternion.Euler(0f, 0f, angleDiff) * _initialRightVector;
     }
 
     public override void AdjustRightVector(float angleDiff)
     {
-        if (!float.IsNaN(angleDiff))
-        {
-            _initialUpVector = Quaternion.Euler(0f, 0f, angleDiff) * _initialUpVector;
-            _initialRightVector = Quaternion.Euler(0f, 0f, angleDiff) * _initialRightVector;
-        }
+        if (float.IsNaN(angleDiff))
+            return;
+
+        _initialUpVector = Quaternion.Euler(0f, 0f, angleDiff) * _initialUpVector;
+        _initialRightVector = Quaternion.Euler(0f, 0f, angleDiff) * _initialRightVector;
     }
 
     private void Initialize(Vector2 lastPosition, Transform projectileTransform, float m_timeElapsed, Vector2 m_currentDirection, bool shouldRotate)

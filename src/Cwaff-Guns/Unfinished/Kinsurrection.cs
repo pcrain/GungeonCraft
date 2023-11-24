@@ -25,7 +25,7 @@ public class Kinsurrection : AdvancedGunBehavior
         gun.SetBaseMaxAmmo(1000);
         gun.SetAnimationFPS(gun.shootAnimation, 24);
 
-        Projectile projectile       = Lazy.PrefabProjectileFromGun(gun);
+        Projectile projectile       = gun.InitFirstProjectile();
         projectile.baseData.damage  = 30f;
         projectile.baseData.force   = 50f;
         projectile.baseData.speed   = 0.01f;

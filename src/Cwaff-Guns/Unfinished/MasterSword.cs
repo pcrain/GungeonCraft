@@ -27,7 +27,7 @@ public class MasterSword : AdvancedGunBehavior
         gun.InfiniteAmmo                         = true;
         gun.SetAnimationFPS(gun.shootAnimation, 12);
 
-        Projectile projectile              = Lazy.PrefabProjectileFromGun(gun);
+        Projectile projectile              = gun.InitFirstProjectile();
         projectile.baseData.damage         = 4f;
         projectile.baseData.speed          *= 1.2f;
         projectile.sprite.renderer.enabled = false;

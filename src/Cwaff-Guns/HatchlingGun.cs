@@ -29,7 +29,7 @@ public class HatchlingGun : AdvancedGunBehavior
 
         _BulletSprite = AnimatedBullet.Create(name: "egg", fps: 12, scale: 1.5f, anchor: Anchor.MiddleCenter);
 
-        Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
+        Projectile projectile = gun.InitFirstProjectile();
             projectile.AddDefaultAnimation(_BulletSprite);
             projectile.baseData.damage  = 3f;
             projectile.baseData.speed   = 24.0f;

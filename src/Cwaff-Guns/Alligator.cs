@@ -33,7 +33,7 @@ public class Alligator : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 8, cooldown: 0.4f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic);
 
-        Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
+        Projectile projectile = gun.InitFirstProjectile();
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "alligator_projectile", fps: 2, anchor: Anchor.MiddleCenter));
             projectile.baseData.damage  = 1f;
             projectile.baseData.speed   = 36.0f;

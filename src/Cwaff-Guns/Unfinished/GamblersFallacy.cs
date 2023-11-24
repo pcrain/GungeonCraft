@@ -28,7 +28,7 @@ public class GamblersFallacy : AdvancedGunBehavior
         gun.SetBaseMaxAmmo(800);
         gun.SetAnimationFPS(gun.shootAnimation, 24);
 
-        Projectile projectile       = Lazy.PrefabProjectileFromGun(gun);
+        Projectile projectile       = gun.InitFirstProjectile();
         projectile.baseData.damage  = 3f;
         projectile.baseData.speed   = 20.0f;
         projectile.transform.parent = gun.barrelOffset;

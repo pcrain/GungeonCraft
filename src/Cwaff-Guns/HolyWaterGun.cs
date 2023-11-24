@@ -23,7 +23,7 @@ public class HolyWaterGun : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: -1, shootStyle: ShootStyle.Beam, ammoType: GameUIAmmoType.AmmoType.BEAM);
 
-        Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
+        Projectile projectile = gun.InitFirstProjectile();
             projectile.baseData.speed  = 50f;
             projectile.baseData.damage = 0f;
             projectile.baseData.force  = 50f;

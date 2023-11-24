@@ -65,7 +65,7 @@ public partial class SansBoss : AIActor
       _NapalmReticle.GetComponent<tk2dSlicedSprite>().SetSprite(VFX.SpriteCollection, VFX.sprites["reticle_white"]);
       UnityEngine.Object.Destroy(_NapalmReticle.GetComponent<ReticleRiserEffect>());  // delete risers for use with DoomZoneGrowth component later
     // Bone bullet
-    Projectile boneBulletProjectile = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items.HegemonyRifle) as Gun, false);
+    Projectile boneBulletProjectile = Items.HegemonyRifle.CloneProjectile();
       // boneBulletProjectile.BulletScriptSettings.preventPooling = true; // prevents shenanigans with OrangeAndBlue Bullet script causing permanent collision skips
     _BoneBullet = new AIBulletBank.Entry(EnemyDatabase.GetOrLoadByGuid("1bc2a07ef87741be90c37096910843ab").bulletBank.GetBullet("reversible")) {
       Name               = "getboned",

@@ -26,7 +26,7 @@ public class PopcornGun : AdvancedGunBehavior
         gun.SetBaseMaxAmmo(250);
         gun.SetAnimationFPS(gun.shootAnimation, 24);
 
-        Projectile projectile       = Lazy.PrefabProjectileFromGun(gun);
+        Projectile projectile       = gun.InitFirstProjectile();
         projectile.baseData.damage  = 5f;
         projectile.baseData.speed   = 20.0f;
         projectile.transform.parent = gun.barrelOffset;

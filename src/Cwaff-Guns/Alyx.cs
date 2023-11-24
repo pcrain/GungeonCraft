@@ -34,7 +34,7 @@ public class Alyx : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 10, shootStyle: ShootStyle.Automatic, customClip: SpriteName);
 
-        Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
+        Projectile projectile = gun.InitFirstProjectile();
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "alyx_projectile", fps: 16, scale: 0.5625f, anchor: Anchor.MiddleCenter));
             projectile.baseData.damage   = 15f;
             projectile.baseData.speed    = 20.0f;

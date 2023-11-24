@@ -22,7 +22,7 @@ public class PaintballCannon : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic);
 
-        Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
+        Projectile projectile = gun.InitFirstProjectile();
             projectile.baseData.damage = 9f;
 
         PaintballColorizer paintballController = projectile.gameObject.AddComponent<PaintballColorizer>();

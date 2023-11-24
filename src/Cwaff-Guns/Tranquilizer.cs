@@ -23,7 +23,7 @@ public class Tranquilizer : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
 
-        Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
+        Projectile projectile = gun.InitFirstProjectile();
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "tranquilizer_projectile", fps: 12, anchor: Anchor.MiddleLeft));
             projectile.transform.parent = gun.barrelOffset;
             projectile.gameObject.AddComponent<TranquilizerBehavior>();

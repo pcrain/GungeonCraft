@@ -51,11 +51,12 @@ public class Gunbrella : AdvancedGunBehavior
             fps: 30, loops: false, anchor: Anchor.MiddleCenter, scale: 0.35f);
 
         GameActorFreezeEffect freeze = ItemHelper.Get(Items.FrostBullets).GetComponent<BulletStatusEffectItem>().FreezeModifierEffect;
+        tk2dSpriteAnimationClip projAnimation = AnimatedBullet.Create(name: "gunbrella_projectile", fps: 16, anchor: Anchor.MiddleLeft);
         for (int i = 0; i < _BARRAGE_SIZE; i++)
         {
             ProjectileModule pmod = gun.Volley.projectiles[i];
-            Projectile projectile = Lazy.PrefabProjectileFromGun(gun, setGunDefaultProjectile: false);
-                projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "gunbrella_projectile", fps: 16, anchor: Anchor.MiddleLeft));
+            Projectile projectile = (i == 0) ? gun.InitFirstProjectile() : gun.CloneProjectile();
+                projectile.AddDefaultAnimation(projAnimation);
                 projectile.SetAllImpactVFX(_HailParticle);
                 projectile.onDestroyEventName   = "icicle_crash";
                 projectile.baseData.damage      = _PROJ_DAMAGE;

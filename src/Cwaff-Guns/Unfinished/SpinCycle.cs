@@ -37,7 +37,7 @@ public class SpinCycle : AdvancedGunBehavior
             gun.InfiniteAmmo                      = true;
             gun.SetAnimationFPS(gun.shootAnimation, 0);
 
-        Projectile ball = Lazy.PrefabProjectileFromGun(gun,false);
+        Projectile ball = gun.InitFirstProjectile();
             ball.BulletScriptSettings.surviveTileCollisions      = true;
             ball.BulletScriptSettings.surviveRigidbodyCollisions = true;
             ball.baseData.speed          = 0.0001f;
@@ -52,7 +52,7 @@ public class SpinCycle : AdvancedGunBehavior
             pierce.penetration           = 100000;
             pierce.penetratesBreakables  = true;
 
-        Projectile chain = Lazy.PrefabProjectileFromGun(gun,false);
+        Projectile chain = ball.Clone();
             chain.baseData.force                                  = 1f;
             chain.baseData.damage                                 = 1f;
             chain.baseData.speed                                  = 100f;

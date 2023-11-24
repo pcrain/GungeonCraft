@@ -31,7 +31,7 @@ public class Blackjack : AdvancedGunBehavior
         _BulletSprite = AnimatedBullet.Create(name: "playing_card", fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft);
         _BackSprite = AnimatedBullet.Create(name: "playing_card_back", fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft);
 
-        Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
+        Projectile projectile = gun.InitFirstProjectile();
             projectile.AddDefaultAnimation(_BulletSprite);
             projectile.baseData.damage = 8f;
             projectile.baseData.range  = 999f; // we implement a custom range-like behavior
@@ -47,7 +47,7 @@ public class Blackjack : AdvancedGunBehavior
         if (gun.CurrentOwner is not PlayerController player)
             return projectile;
 
-        tc.isAFreebie = (mod.ammoCost == 0 || gun.InfiniteAmmo || gun.LocalInfiniteAmmo || gun.CanGainAmmo || player.InfiniteAmmo.Value);
+        tc.isAFreebie = projectile.FiredForFree(gun, mod);
         return projectile;
     }
 }

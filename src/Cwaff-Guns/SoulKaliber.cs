@@ -22,7 +22,7 @@ public class SoulKaliber : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 10, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic);
 
-        Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
+        Projectile projectile = gun.InitFirstProjectile();
             projectile.baseData.speed   = 30.0f;
             projectile.baseData.damage  = 1f;
             projectile.transform.parent = gun.barrelOffset;

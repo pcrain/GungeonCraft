@@ -25,14 +25,14 @@ public class PistolWhip : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(ammoCost: 0, clipSize: -1, cooldown: WhipChainStart.TOTAL_TIME + C.FRAME, shootStyle: ShootStyle.SemiAutomatic);
 
-        _WhipStartProjectile = Lazy.PrefabProjectileFromGun(gun);
+        _WhipStartProjectile = gun.InitFirstProjectile();
             _WhipStartProjectile.transform.parent = gun.barrelOffset;
             _WhipStartProjectile.baseData.speed   = 0.01f;
             _WhipStartProjectile.baseData.damage  = 0f;
             _WhipStartProjectile.baseData.range   = 999f;
             _WhipStartProjectile.gameObject.AddComponent<WhipChainStartProjectile>();
 
-        _PistolWhipProjectile = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items.Ak47) as Gun, setGunDefaultProjectile: false);
+        _PistolWhipProjectile = Items.Ak47.CloneProjectile();
             _PistolWhipProjectile.baseData.speed  = 80f;
             _PistolWhipProjectile.baseData.damage = 15f;
             _PistolWhipProjectile.baseData.range  = 80f;
@@ -45,7 +45,7 @@ public class PistolWhip : AdvancedGunBehavior
                 trail.BaseColor  = Color.yellow;
                 trail.EndColor   = Color.yellow;
 
-        _PistolButtProjectile = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items.Ak47) as Gun, setGunDefaultProjectile: false);
+        _PistolButtProjectile = Items.Ak47.CloneProjectile();
             _PistolButtProjectile.AddDefaultAnimation(AnimatedBullet.Create(name: "natascha_bullet", fps: 12, anchor: Anchor.MiddleCenter)); // Not really visible, just used for pixel collider size
             _PistolButtProjectile.baseData.range  = 0.01f;
             _PistolButtProjectile.baseData.speed  = 1f;

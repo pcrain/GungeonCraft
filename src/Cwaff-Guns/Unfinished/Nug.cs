@@ -30,11 +30,11 @@ public class Nug : AdvancedGunBehavior
         gun.SetBaseMaxAmmo(250);
         gun.SetAnimationFPS(gun.shootAnimation, 24);
 
-        Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
+        Projectile projectile = gun.InitFirstProjectile();
         projectile.baseData.speed   = 200.0f;
-        Projectile projectile2 = Lazy.PrefabProjectileFromGun(gun, false);
+        Projectile projectile2 = projectile.Clone();
         projectile2.baseData.speed   = 20.0f;
-        Projectile projectile3 = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items.Magnum) as Gun, false);
+        Projectile projectile3 = Items.Magnum.CloneProjectile();
         projectile3.baseData.speed = 0.0f;
 
         // Ordering is important here, we don't want the secondary projectile to have the NugBehavior

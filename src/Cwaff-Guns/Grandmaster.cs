@@ -35,7 +35,7 @@ public class Grandmaster : AdvancedGunBehavior
         _QueenSprite  = AnimatedBullet.Create(name: "chess_queen",  fps: 12, scale: 0.8f, anchor: Anchor.MiddleCenter);
         _KingSprite   = AnimatedBullet.Create(name: "chess_king",   fps: 12, scale: 0.8f, anchor: Anchor.MiddleCenter);
 
-        Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
+        Projectile projectile = gun.InitFirstProjectile();
             projectile.AddDefaultAnimation(_PawnSprite);
             projectile.AddAnimation(_RookSprite);
             projectile.AddAnimation(_BishopSprite);

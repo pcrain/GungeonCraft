@@ -932,4 +932,34 @@ public static class Extensions
 
     return mod;
   }
+
+  // Returns true if a projectile was fired from a gun without depleting ammo
+  public static bool FiredForFree(this Projectile proj, Gun gun, ProjectileModule mod)
+  {
+    return (mod.ammoCost == 0 || gun.InfiniteAmmo || gun.LocalInfiniteAmmo /*|| gun.CanGainAmmo*/ || ((proj.Owner as PlayerController)?.InfiniteAmmo?.Value ?? false));
+  }
+
+  // Initializes and returns the first projectile from the default module of a gun
+  public static Projectile InitFirstProjectile(this Gun gun)
+  {
+    return gun.DefaultModule.projectiles[0] = gun.DefaultModule.projectiles[0].ClonePrefab();
+  }
+
+  // Clone and return a projectile from a specific gun (Items version)
+  public static Projectile CloneProjectile(this Items gunItem)
+  {
+      return (ItemHelper.Get(gunItem) as Gun).DefaultModule.projectiles[0].ClonePrefab<Projectile>();
+  }
+
+  // Clone and return a projectile from a specific gun (Gun version)
+  public static Projectile CloneProjectile(this Gun gun)
+  {
+      return gun.DefaultModule.projectiles[0].ClonePrefab<Projectile>();
+  }
+
+  // Clone and return a specific projectile
+  public static Projectile Clone(this Projectile projectile)
+  {
+      return projectile.ClonePrefab();
+  }
 }

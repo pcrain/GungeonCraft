@@ -28,7 +28,7 @@ public class Outbreak : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 10, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
 
-        Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
+        Projectile projectile = gun.InitFirstProjectile();
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "outbreak_projectile", fps: 12, anchor: Anchor.MiddleLeft));
             projectile.transform.parent = gun.barrelOffset;
             projectile.gameObject.AddComponent<InfectionBehavior>();

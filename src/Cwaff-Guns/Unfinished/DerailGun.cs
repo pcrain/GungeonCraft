@@ -63,7 +63,7 @@ public class DerailGun : AdvancedGunBehavior
             "CwaffingTheGungy/Resources/BeamSprites/railbeam_mid_001",
         };
 
-        Projectile projectile              = Lazy.PrefabProjectileFromGun(gun);
+        Projectile projectile              = gun.InitFirstProjectile();
         ETGModConsole.Log($"got beam paths");
         projectile.baseData.damage         = 0f;
         projectile.baseData.force          = 0f;
@@ -73,7 +73,7 @@ public class DerailGun : AdvancedGunBehavior
 
         var railcomp = projectile.gameObject.AddComponent<ReplaceBulletWithRail>();
 
-        Projectile projectile2         = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items.MarineSidearm) as Gun, false);
+        Projectile projectile2         = Items.MarineSidearm.CloneProjectile();
         projectile2.baseData.damage    = 0;
         projectile2.baseData.force     = 0;
         projectile2.baseData.range    *= 200;
@@ -106,7 +106,7 @@ public class DerailGun : AdvancedGunBehavior
         // beamComp2.ContinueBeamArtToWall = true;
         railBeam = projectile2;
 
-        Projectile train = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items._38Special) as Gun, false); //id 56 == 38 special
+        Projectile train = Items._38Special.CloneProjectile(); //id 56 == 38 special
         // train.SetProjectileSpriteRight("train_projectile_001", trainSpriteDiameter, trainSpriteDiameter, true, Anchor.MiddleCenter, 20, 20);
         // train.AnimateProjectile( // DEPRECATED METHOD, need to replace later if I ever come back to this
         //     ResMap.Get("train_projectile").Base(),

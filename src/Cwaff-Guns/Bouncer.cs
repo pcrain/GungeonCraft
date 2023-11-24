@@ -35,7 +35,7 @@ public class Bouncer : AdvancedGunBehavior
             name: "energy_bounce", fps: 10, scale: 0.2f, anchor: Anchor.MiddleCenter,
             overrideColliderPixelSizes: colliderSize);
 
-        Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
+        Projectile projectile = gun.InitFirstProjectile();
             projectile.AddDefaultAnimation(anim);
             projectile.baseData.damage = _ACCELERATION;
             projectile.baseData.speed  = _ACCELERATION;

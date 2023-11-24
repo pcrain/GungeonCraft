@@ -40,7 +40,7 @@ public class SeltzerPelter : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 1, cooldown: 0.5f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
 
-        Projectile projectile = Lazy.PrefabProjectileFromGun(gun);
+        Projectile projectile = gun.InitFirstProjectile();
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "can_projectile", fps: 1,  anchor: Anchor.MiddleCenter, // 1 FPS minimum, stop animator manually later
                 anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(2, 2))); // prevent uneven colliders from glitching into walls
             projectile.transform.parent = gun.barrelOffset;
@@ -52,7 +52,7 @@ public class SeltzerPelter : AdvancedGunBehavior
             // projectile.AddTrailToProjectile(ResMap.Get("bubble_stream_mid")[0], new Vector2(8, 8), new Vector2(4, 4),
             //     ResMap.Get("bubble_stream_mid"), 32, ResMap.Get("bubble_stream_start"), 32, cascadeTimer: C.FRAME, destroyOnEmpty: true);
 
-        Projectile beamProjectile = Lazy.PrefabProjectileFromGun(ItemHelper.Get(Items.MarineSidearm) as Gun, false);
+        Projectile beamProjectile = Items.MarineSidearm.CloneProjectile();
             beamProjectile.baseData.range  = 4f;   // the perfect seltzer stats, do not tweak without testing!
             beamProjectile.baseData.speed  = 20f;  // the perfect seltzer stats, do not tweak without testing!
             beamProjectile.baseData.force  = 100f;

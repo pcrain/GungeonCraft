@@ -34,7 +34,7 @@ public class SubtractorBeam : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 4, cooldown: 0.25f, angleVariance: 5.0f, shootStyle: ShootStyle.SemiAutomatic);
 
-        Projectile beamProj = Lazy.PrefabProjectileFromGun(gun);
+        Projectile beamProj = gun.InitFirstProjectile();
             beamProj.baseData.speed  = 300f;
             beamProj.baseData.range  = 300f;
             beamProj.baseData.damage = 0f;

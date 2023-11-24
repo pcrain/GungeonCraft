@@ -34,15 +34,14 @@ public class KiBlast : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, ammoType: GameUIAmmoType.AmmoType.BEAM);
 
-        Projectile blast = Lazy.PrefabProjectileFromGun(gun);
+        Projectile blast = gun.InitFirstProjectile();
             blast.AddDefaultAnimation(AnimatedBullet.Create(name: "ki_blast", fps: 12, scale: 0.0625f, anchor: Anchor.MiddleCenter));
             blast.baseData.damage  = 4f;
             blast.baseData.range   = 10f;
             blast.ignoreDamageCaps = true;
             blast.gameObject.AddComponent<KiBlastBehavior>();
             blast.gameObject.AddComponent<ArcTowardsTargetBehavior>();
-            blast.SetAllImpactVFX(VFX.RegisterVFXPool(
-                ItemName+" Impact", ResMap.Get("ki_explosion"), fps: 20, loops: false, scale: 0.5f));
+            blast.SetAllImpactVFX(VFX.RegisterVFXPool(ItemName+" Impact", ResMap.Get("ki_explosion"), fps: 20, loops: false, scale: 0.5f));
 
         EasyTrailBullet trail = blast.gameObject.AddComponent<EasyTrailBullet>();
             trail.TrailPos   = trail.transform.position;
@@ -66,7 +65,7 @@ public class KiBlast : AdvancedGunBehavior
         base.OnSwitchedToThisGun();
         if (this.Owner is not PlayerController owner)
             return;
-        owner.ToggleGunRenderers(false, "ki blast is an invisible gun");
+        owner.ToggleGunRenderers(false, ItemName);
     }
 
     public override void OnSwitchedAwayFromThisGun()
@@ -74,7 +73,7 @@ public class KiBlast : AdvancedGunBehavior
         base.OnSwitchedAwayFromThisGun();
         if (this.Owner is not PlayerController owner)
             return;
-        owner.ToggleGunRenderers(true, "ki blast is an invisible gun");
+        owner.ToggleGunRenderers(true, ItemName);
     }
 
     public override void OnInitializedWithOwner(GameActor actor)
@@ -82,7 +81,7 @@ public class KiBlast : AdvancedGunBehavior
         base.OnInitializedWithOwner(actor);
         if (actor is not PlayerController owner)
             return;
-        owner.ToggleGunRenderers(false, "ki blast is an invisible gun");
+        owner.ToggleGunRenderers(false, ItemName);
     }
 
     public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
@@ -109,7 +108,7 @@ public class KiBlast : AdvancedGunBehavior
         base.Update();
         if (!this.Player)
             return;
-        this.Player.ToggleGunRenderers(!this.gun.isActiveAndEnabled, "ki blast is an invisible gun");
+        this.Player.ToggleGunRenderers(!this.gun.isActiveAndEnabled, ItemName);
     }
 }
 

@@ -36,7 +36,7 @@ public class Commitment : AdvancedGunBehavior
             gun.SetBaseMaxAmmo(500);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
 
-        Projectile projectile       = Lazy.PrefabProjectileFromGun(gun);
+        Projectile projectile       = gun.InitFirstProjectile();
         projectile.baseData.damage  = 16f;
         projectile.baseData.speed   = 24.0f;
         projectile.transform.parent = gun.barrelOffset;
