@@ -50,7 +50,7 @@ public class Ticonderogun : AdvancedGunBehavior
             gun.AddStatToGun(PlayerStats.StatType.Curse, 2f, StatModifier.ModifyMethod.ADDITIVE);
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
 
-        gun.DefaultModule.SetAttributes(ammoCost: 0, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.Charged, ammoType: GameUIAmmoType.AmmoType.BEAM);
+        gun.SetupDefaultModule(ammoCost: 0, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.Charged, ammoType: GameUIAmmoType.AmmoType.BEAM);
 
         _SparklePrefab = VFX.RegisterVFXObject("pencil_sparkles", 12, loops: false, anchor: Anchor.MiddleCenter);
         _RunePrefab = VFX.RegisterVFXObject("pencil_runes", 0.01f, loops: false, anchor: Anchor.MiddleCenter); // FPS must be nonzero or sprites don't update properly

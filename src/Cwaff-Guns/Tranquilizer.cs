@@ -21,7 +21,7 @@ public class Tranquilizer : AdvancedGunBehavior
             gun.SetFireAudio("blowgun_fire_sound");
             gun.SetReloadAudio("blowgun_reload_sound");
 
-        gun.DefaultModule.SetAttributes(clipSize: 1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
+        gun.SetupDefaultModule(clipSize: 1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
 
         Projectile projectile = gun.InitFirstProjectile();
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "tranquilizer_projectile", fps: 12, anchor: Anchor.MiddleLeft));

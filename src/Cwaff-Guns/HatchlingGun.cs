@@ -23,7 +23,7 @@ public class HatchlingGun : AdvancedGunBehavior
             gun.SetReloadAudio("hatchling_gun_bounce_sound", frame: 6);
             gun.SetReloadAudio("hatchling_gun_bounce_sound", frame: 14);
 
-        gun.DefaultModule.SetAttributes(clipSize: 12, cooldown: 0.2f, angleVariance: 15.0f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
+        gun.SetupDefaultModule(clipSize: 12, cooldown: 0.2f, angleVariance: 15.0f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
 
         Projectile projectile = gun.InitFirstProjectile(damage: 3.0f, speed: 24.0f);
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "egg", fps: 12, scale: 1.5f, anchor: Anchor.MiddleCenter));

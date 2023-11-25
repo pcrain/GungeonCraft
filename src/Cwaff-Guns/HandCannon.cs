@@ -29,7 +29,7 @@ public class HandCannon : AdvancedGunBehavior
             gun.SetChargeAudio("hand_cannon_charge_sound", frame: 0);
             gun.SetChargeAudio("hand_cannon_charge_sound", frame: 10);
 
-        gun.DefaultModule.SetAttributes(clipSize: 2, cooldown: 0.1f, angleVariance: 15.0f, shootStyle: ShootStyle.Charged, customClip: SpriteName);
+        gun.SetupDefaultModule(clipSize: 2, cooldown: 0.1f, angleVariance: 15.0f, shootStyle: ShootStyle.Charged, customClip: SpriteName);
 
         Projectile projectile = gun.InitFirstProjectile(damage: 40.0f, speed: 40.0f);
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "slappp", fps: 30, scale: 0.5f, anchor: Anchor.MiddleCenter,

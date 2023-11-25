@@ -25,7 +25,7 @@ public class RacketLauncher : AdvancedGunBehavior
             gun.LoopAnimation(gun.idleAnimation, 0);
             gun.spriteAnimator.playAutomatically = false; // don't autoplay idle animation when dropped
 
-        ProjectileModule mod = gun.DefaultModule.SetAttributes(ammoCost: 0, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
+        ProjectileModule mod = gun.SetupDefaultModule(ammoCost: 0, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
 
         Projectile projectile = gun.InitFirstProjectile(damage: 10.0f, speed: 20.0f, range: 300.0f);
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "tennis_ball", fps: 12, scale: 0.6f, anchor: Anchor.MiddleCenter));

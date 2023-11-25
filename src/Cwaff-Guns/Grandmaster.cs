@@ -26,7 +26,7 @@ public class Grandmaster : AdvancedGunBehavior
             gun.SetFireAudio("chess_gun_fire");
             gun.SetReloadAudio("chess_gun_reload");
 
-        gun.DefaultModule.SetAttributes(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
+        gun.SetupDefaultModule(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
 
         _PawnSprite   = AnimatedBullet.Create(name: "chess_pawn",   fps: 12, scale: 0.8f, anchor: Anchor.MiddleCenter);
         _RookSprite   = AnimatedBullet.Create(name: "chess_rook",   fps: 12, scale: 0.8f, anchor: Anchor.MiddleCenter);

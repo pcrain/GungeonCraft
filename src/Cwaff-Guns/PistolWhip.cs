@@ -23,7 +23,7 @@ public class PistolWhip : AdvancedGunBehavior
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
             gun.muzzleFlashEffects = null;
 
-        gun.DefaultModule.SetAttributes(ammoCost: 0, clipSize: -1, cooldown: WhipChainStart.TOTAL_TIME + C.FRAME, shootStyle: ShootStyle.SemiAutomatic);
+        gun.SetupDefaultModule(ammoCost: 0, clipSize: -1, cooldown: WhipChainStart.TOTAL_TIME + C.FRAME, shootStyle: ShootStyle.SemiAutomatic);
 
         _WhipStartProjectile = gun.InitFirstProjectile(damage: 0.0f, speed: 0.01f, range: 999.0f);
             _WhipStartProjectile.gameObject.AddComponent<WhipChainStartProjectile>();

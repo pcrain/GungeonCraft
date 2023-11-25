@@ -933,6 +933,13 @@ public static class Extensions
     return mod;
   }
 
+  // Set basic attributes for a gun's default projectile module and return it
+  public static ProjectileModule SetupDefaultModule(this Gun gun, int? clipSize = null, float? cooldown = null, float? angleVariance = null, int ammoCost = 1, string customClip = null, ShootStyle shootStyle = ShootStyle.SemiAutomatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, GameUIAmmoType.AmmoType? ammoType = null)
+  {
+    return gun.DefaultModule.SetAttributes(clipSize: clipSize, cooldown: cooldown, angleVariance: angleVariance, ammoCost: ammoCost,
+      customClip: customClip, shootStyle: shootStyle, sequenceStyle: sequenceStyle, ammoType: ammoType);
+  }
+
   // Returns true if a projectile was fired from a gun without depleting ammo
   public static bool FiredForFree(this Projectile proj, Gun gun, ProjectileModule mod)
   {

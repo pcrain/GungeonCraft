@@ -31,7 +31,7 @@ public class Alligator : AdvancedGunBehavior
         _ShootBarrelOffsets  = gun.GetBarrelOffsetsForAnimation(gun.shootAnimation);
         _ReloadBarrelOffsets = gun.GetBarrelOffsetsForAnimation(gun.reloadAnimation);
 
-        gun.DefaultModule.SetAttributes(clipSize: 8, cooldown: 0.4f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic);
+        gun.SetupDefaultModule(clipSize: 8, cooldown: 0.4f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic);
 
         Projectile projectile = gun.InitFirstProjectile(damage: 1.0f, speed: 36.0f);
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "alligator_projectile", fps: 2, anchor: Anchor.MiddleCenter));

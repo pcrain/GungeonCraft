@@ -22,7 +22,7 @@ public class PlatinumStar : AdvancedGunBehavior
             gun.SetReloadAudio("platinum_reload_sound", frame: 5);
             gun.AddToSubShop(ModdedShopType.TimeTrader);
 
-        gun.DefaultModule.SetAttributes(clipSize: 28, cooldown: 0.125f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, customClip: SpriteName);
+        gun.SetupDefaultModule(clipSize: 28, cooldown: 0.125f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, customClip: SpriteName);
 
         Projectile projectile = gun.InitFirstProjectile(damage: 3.0f, speed: 50.0f, force: 1.0f, range: 50.0f);
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "platinum_star_projectile", fps: 12, anchor: Anchor.MiddleLeft));

@@ -32,7 +32,7 @@ public class KiBlast : AdvancedGunBehavior
             gun.SetFireAudio("ki_blast_sound");
             gun.AddToSubShop(ModdedShopType.Boomhildr);
 
-        gun.DefaultModule.SetAttributes(clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, ammoType: GameUIAmmoType.AmmoType.BEAM);
+        gun.SetupDefaultModule(clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, ammoType: GameUIAmmoType.AmmoType.BEAM);
 
         Projectile blast = gun.InitFirstProjectile(damage: 4.0f, range: 10.0f);
             blast.AddDefaultAnimation(AnimatedBullet.Create(name: "ki_blast", fps: 12, scale: 0.0625f, anchor: Anchor.MiddleCenter));

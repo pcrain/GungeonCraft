@@ -21,7 +21,7 @@ public class HolyWaterGun : AdvancedGunBehavior
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
-        gun.DefaultModule.SetAttributes(clipSize: -1, shootStyle: ShootStyle.Beam, ammoType: GameUIAmmoType.AmmoType.BEAM);
+        gun.SetupDefaultModule(clipSize: -1, shootStyle: ShootStyle.Beam, ammoType: GameUIAmmoType.AmmoType.BEAM);
 
         Projectile projectile = gun.InitFirstProjectile(damage: 0.0f, speed: 50.0f, force: 50.0f);
 

@@ -27,7 +27,7 @@ public class Bouncer : AdvancedGunBehavior
             gun.AddToSubShop(ModdedShopType.Boomhildr);
             gun.AddToSubShop(ModdedShopType.Rusty);
 
-        gun.DefaultModule.SetAttributes(clipSize: 6, cooldown: 0.16f, shootStyle: ShootStyle.SemiAutomatic);
+        gun.SetupDefaultModule(clipSize: 6, cooldown: 0.16f, shootStyle: ShootStyle.SemiAutomatic);
 
         IntVector2 colliderSize = new IntVector2(1,1); // 1-pixel collider for accurate bounce animation
 

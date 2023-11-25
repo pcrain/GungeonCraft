@@ -32,7 +32,7 @@ public class SubtractorBeam : AdvancedGunBehavior
         _HitEffects = VFX.RegisterVFXObject("subtractor_beam_hit_effect", 12, loops: true,
             scale: 0.5f, anchor: Anchor.MiddleCenter, emissivePower: 10f);
 
-        gun.DefaultModule.SetAttributes(clipSize: 4, cooldown: 0.25f, angleVariance: 5.0f, shootStyle: ShootStyle.SemiAutomatic);
+        gun.SetupDefaultModule(clipSize: 4, cooldown: 0.25f, angleVariance: 5.0f, shootStyle: ShootStyle.SemiAutomatic);
 
         Projectile beamProj = gun.InitFirstProjectile(damage: 0.0f, speed: 300.0f, force: 0.0f, range: 300.0f);
 

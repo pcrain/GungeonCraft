@@ -38,7 +38,7 @@ public class Gunbrella : AdvancedGunBehavior
             gun.LoopAnimation(gun.chargeAnimation, 17);
             gun.SetMuzzleVFX("muzzle_gunbrella", fps: 30, scale: 0.5f, anchor: Anchor.MiddleCenter);
 
-        gun.DefaultModule.SetAttributes(clipSize: 1, shootStyle: ShootStyle.Charged, customClip: SpriteName);
+        gun.SetupDefaultModule(clipSize: 1, shootStyle: ShootStyle.Charged, customClip: SpriteName);
 
         for (int i = 1; i < _BARRAGE_SIZE; i++) // start from 1 since we already have a default module
         {
