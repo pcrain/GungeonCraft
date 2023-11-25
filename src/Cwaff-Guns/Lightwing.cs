@@ -24,18 +24,15 @@ public class Lightwing : AdvancedGunBehavior
             gun.SetFireAudio("lightwing_fire_sound");
             gun.SetReloadAudio("lightwing_reload_sound");
 
-        _NeutralSprite    = AnimatedBullet.Create(name: "lightwing_projectile",          fps: 12, anchor: Anchor.MiddleLeft);
-        _HuntingSprite    = AnimatedBullet.Create(name: "lightwing_projectile_hunt",     fps: 12, anchor: Anchor.MiddleLeft);
-        _RetrievingSprite = AnimatedBullet.Create(name: "lightwing_projectile_retrieve", fps: 12, anchor: Anchor.MiddleLeft);
-        _ReturningSprite  = AnimatedBullet.Create(name: "lightwing_projectile_return",   fps: 12, anchor: Anchor.MiddleLeft);
-
-        Projectile projectile = gun.SetupSingularProjectile(clipSize: 20, cooldown: 0.28f, shootStyle: ShootStyle.SemiAutomatic, damage: 4.0f, speed: 20.0f
-          ).AttachComponent<LightwingProjectile>();
-            projectile.AddDefaultAnimation(_NeutralSprite);
-            projectile.AddAnimation(_HuntingSprite);
-            projectile.AddAnimation(_RetrievingSprite);
-            projectile.AddAnimation(_ReturningSprite);
-            projectile.collidesWithProjectiles = true;  // needs to be set up front, can't be set later because caching silliness or something idk
+        gun.SetupSingularProjectile(clipSize: 20, cooldown: 0.28f, shootStyle: ShootStyle.SemiAutomatic, damage: 4.0f,
+          speed: 20.0f, collidesWithProjectiles: true // collidesWithProjectiles needs to be set up front because...Unity
+          ).AttachComponent<LightwingProjectile>(
+          ).AddAnimations(
+            AnimatedBullet.Create(refClip: ref _NeutralSprite,    name: "lightwing_projectile",          fps: 12, anchor: Anchor.MiddleLeft),
+            AnimatedBullet.Create(refClip: ref _HuntingSprite,    name: "lightwing_projectile_hunt",     fps: 12, anchor: Anchor.MiddleLeft),
+            AnimatedBullet.Create(refClip: ref _RetrievingSprite, name: "lightwing_projectile_retrieve", fps: 12, anchor: Anchor.MiddleLeft),
+            AnimatedBullet.Create(refClip: ref _ReturningSprite,  name: "lightwing_projectile_return",   fps: 12, anchor: Anchor.MiddleLeft)
+          );
     }
 }
 

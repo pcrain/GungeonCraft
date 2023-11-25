@@ -26,23 +26,16 @@ public class Grandmaster : AdvancedGunBehavior
             gun.SetFireAudio("chess_gun_fire");
             gun.SetReloadAudio("chess_gun_reload");
 
-        gun.SetupDefaultModule(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
-
-        _PawnSprite   = AnimatedBullet.Create(name: "chess_pawn",   fps: 12, scale: 0.8f, anchor: Anchor.MiddleCenter);
-        _RookSprite   = AnimatedBullet.Create(name: "chess_rook",   fps: 12, scale: 0.8f, anchor: Anchor.MiddleCenter);
-        _BishopSprite = AnimatedBullet.Create(name: "chess_bishop", fps: 12, scale: 0.8f, anchor: Anchor.MiddleCenter);
-        _KnightSprite = AnimatedBullet.Create(name: "chess_knight", fps: 12, scale: 0.8f, anchor: Anchor.MiddleCenter);
-        _QueenSprite  = AnimatedBullet.Create(name: "chess_queen",  fps: 12, scale: 0.8f, anchor: Anchor.MiddleCenter);
-        _KingSprite   = AnimatedBullet.Create(name: "chess_king",   fps: 12, scale: 0.8f, anchor: Anchor.MiddleCenter);
-
-        Projectile projectile = gun.InitFirstProjectile(speed: 30f);
-            projectile.AddDefaultAnimation(_PawnSprite);
-            projectile.AddAnimation(_RookSprite);
-            projectile.AddAnimation(_BishopSprite);
-            projectile.AddAnimation(_KnightSprite);
-            projectile.AddAnimation(_QueenSprite);
-            projectile.AddAnimation(_KingSprite);
-        PlayChessBehavior pop = projectile.gameObject.AddComponent<PlayChessBehavior>();
+        gun.SetupSingularProjectile(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName, speed: 30f
+          ).AttachComponent<PlayChessBehavior>(
+          ).AddAnimations(
+            AnimatedBullet.Create(refClip: ref _PawnSprite,   name: "chess_pawn",   scale: 0.8f, anchor: Anchor.MiddleCenter),
+            AnimatedBullet.Create(refClip: ref _RookSprite,   name: "chess_rook",   scale: 0.8f, anchor: Anchor.MiddleCenter),
+            AnimatedBullet.Create(refClip: ref _BishopSprite, name: "chess_bishop", scale: 0.8f, anchor: Anchor.MiddleCenter),
+            AnimatedBullet.Create(refClip: ref _KnightSprite, name: "chess_knight", scale: 0.8f, anchor: Anchor.MiddleCenter),
+            AnimatedBullet.Create(refClip: ref _QueenSprite,  name: "chess_queen",  scale: 0.8f, anchor: Anchor.MiddleCenter),
+            AnimatedBullet.Create(refClip: ref _KingSprite,   name: "chess_king",   scale: 0.8f, anchor: Anchor.MiddleCenter)
+          );
     }
 }
 

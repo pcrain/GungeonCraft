@@ -234,7 +234,6 @@ public class GunbrellaProjectile : MonoBehaviour
         this._projectile.collidesWithEnemies = false;
         this._projectile.specRigidbody.CollideWithOthers = false;
         this._projectile.specRigidbody.CollideWithTileMap = false;
-        // this._projectile.renderer.sortingOrder = -10;
         StartCoroutine(TakeToTheSkies());
     }
 

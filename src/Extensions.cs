@@ -258,10 +258,11 @@ public static class Extensions
   }
 
   // Set a projectile's horizontal impact VFX
-  public static void SetHorizontalImpactVFX(this Projectile p, VFXPool vfx)
+  public static Projectile SetHorizontalImpactVFX(this Projectile p, VFXPool vfx)
   {
     p.hitEffects.tileMapHorizontal = vfx;  // necessary
     p.hitEffects.deathTileMapHorizontal = vfx; // optional
+    return p;
   }
 
   // Set a gun's horizontal impact VFX
@@ -273,10 +274,11 @@ public static class Extensions
   }
 
   // Set a projectile's vertical impact VFX
-  public static void SetVerticalImpactVFX(this Projectile p, VFXPool vfx)
+  public static Projectile SetVerticalImpactVFX(this Projectile p, VFXPool vfx)
   {
     p.hitEffects.tileMapVertical = vfx;  // necessary
     p.hitEffects.deathTileMapVertical = vfx; // optional
+    return p;
   }
 
   // Set a gun's vertical impact VFX
@@ -288,10 +290,11 @@ public static class Extensions
   }
 
   // Set a projectile's enemy impact VFX
-  public static void SetEnemyImpactVFX(this Projectile p, VFXPool vfx)
+  public static Projectile SetEnemyImpactVFX(this Projectile p, VFXPool vfx)
   {
     p.hitEffects.enemy = vfx;  // necessary
     p.hitEffects.deathEnemy = vfx; // optional
+    return p;
   }
 
   // Set a gun's enemy impact VFX
@@ -303,10 +306,11 @@ public static class Extensions
   }
 
   // Set a projectile's midair impact / death VFX
-  public static void SetAirImpactVFX(this Projectile p, VFXPool vfx)
+  public static Projectile SetAirImpactVFX(this Projectile p, VFXPool vfx)
   {
     p.hitEffects.suppressMidairDeathVfx = false;
     p.hitEffects.overrideMidairDeathVFX = vfx.effects[0].effects[0].effect;
+    return p;
   }
 
   // Set a gun's midair impact / death VFX
@@ -318,12 +322,13 @@ public static class Extensions
   }
 
   // Set a projectile's impact VFX across the board
-  public static void SetAllImpactVFX(this Projectile p, VFXPool vfx)
+  public static Projectile SetAllImpactVFX(this Projectile p, VFXPool vfx)
   {
     p.SetHorizontalImpactVFX(vfx);
     p.SetVerticalImpactVFX(vfx);
     p.SetEnemyImpactVFX(vfx);
     p.SetAirImpactVFX(vfx);
+    return p;
   }
 
   // Set a gun's impact VFX across the board
@@ -947,35 +952,44 @@ public static class Extensions
   }
 
   // Clone, modify, and return a specific projectile
-  public static Projectile Clone(this Projectile projectile, float? damage = null, float? speed = null, float? force = null, float? range = null)
+  public static Projectile Clone(this Projectile projectile, float? damage = null, float? speed = null, float? force = null, float? range = null, bool? shouldRotate = null,
+    bool collidesWithEnemies = true, bool ignoreDamageCaps = false, bool collidesWithProjectiles= false, bool surviveRigidbodyCollisions = true)
   {
       Projectile p = projectile.ClonePrefab();
-        p.baseData.damage = damage ?? p.baseData.damage;
-        p.baseData.speed  = speed  ?? p.baseData.speed;
-        p.baseData.force  = force  ?? p.baseData.force;
-        p.baseData.range  = range  ?? p.baseData.range;
+        p.baseData.damage                                 = damage       ?? p.baseData.damage;
+        p.baseData.speed                                  = speed        ?? p.baseData.speed;
+        p.baseData.force                                  = force        ?? p.baseData.force;
+        p.baseData.range                                  = range        ?? p.baseData.range;
+        p.shouldRotate                                    = shouldRotate ?? p.shouldRotate;
+        p.collidesWithEnemies                             = collidesWithEnemies;
+        p.ignoreDamageCaps                                = ignoreDamageCaps;
+        p.collidesWithProjectiles                         = collidesWithProjectiles;
+        p.BulletScriptSettings.surviveRigidbodyCollisions = surviveRigidbodyCollisions;
       return p;
   }
 
   // Initializes and returns the first projectile from the default module of a gun
-  public static Projectile InitFirstProjectile(this Gun gun, float? damage = null, float? speed = null, float? force = null, float? range = null)
+  public static Projectile InitFirstProjectile(this Gun gun, float? damage = null, float? speed = null, float? force = null, float? range = null, bool? shouldRotate = null,
+    bool collidesWithEnemies = true, bool ignoreDamageCaps = false, bool collidesWithProjectiles= false, bool surviveRigidbodyCollisions = true)
   {
-    Projectile p = gun.DefaultModule.projectiles[0].Clone(damage, speed, force, range);
+    Projectile p = gun.DefaultModule.projectiles[0].Clone(damage, speed, force, range, shouldRotate, collidesWithEnemies, ignoreDamageCaps, collidesWithProjectiles, surviveRigidbodyCollisions);
     gun.DefaultModule.projectiles[0] = p;
     p.transform.parent = gun.barrelOffset;
     return p;
   }
 
   // Clone and return a projectile from a specific gun (Gun version)
-  public static Projectile CloneProjectile(this Gun gun, float? damage = null, float? speed = null, float? force = null, float? range = null)
+  public static Projectile CloneProjectile(this Gun gun, float? damage = null, float? speed = null, float? force = null, float? range = null, bool? shouldRotate = null,
+    bool collidesWithEnemies = true, bool ignoreDamageCaps = false, bool collidesWithProjectiles= false, bool surviveRigidbodyCollisions = true)
   {
-      return gun.DefaultModule.projectiles[0].Clone(damage, speed, force, range);
+      return gun.DefaultModule.projectiles[0].Clone(damage, speed, force, range, shouldRotate, collidesWithEnemies, ignoreDamageCaps, collidesWithProjectiles, surviveRigidbodyCollisions);
   }
 
   // Clone and return a projectile from a specific gun (Items version)
-  public static Projectile CloneProjectile(this Items gunItem, float? damage = null, float? speed = null, float? force = null, float? range = null)
+  public static Projectile CloneProjectile(this Items gunItem, float? damage = null, float? speed = null, float? force = null, float? range = null, bool? shouldRotate = null,
+    bool collidesWithEnemies = true, bool ignoreDamageCaps = false, bool collidesWithProjectiles= false, bool surviveRigidbodyCollisions = true)
   {
-      return (ItemHelper.Get(gunItem) as Gun).DefaultModule.projectiles[0].Clone(damage, speed, force, range);
+      return (ItemHelper.Get(gunItem) as Gun).DefaultModule.projectiles[0].Clone(damage, speed, force, range, shouldRotate, collidesWithEnemies, ignoreDamageCaps, collidesWithProjectiles, surviveRigidbodyCollisions);
   }
 
   // Add a component to a projectile's GameObject and return the component
@@ -984,10 +998,18 @@ public static class Extensions
     return projectile.gameObject.AddComponent<T>();
   }
 
-  // Add a component to a projectile's GameObject and return the projectile
-  public static Projectile AttachComponent<T>(this Projectile projectile) where T : MonoBehaviour
+  // Returns or adds a component to a projectile's GameObject and return the component
+  public static T GetOrAddComponent<T>(this Projectile projectile) where T : MonoBehaviour
   {
-    projectile.gameObject.AddComponent<T>();
+    return projectile.gameObject.GetOrAddComponent<T>();
+  }
+
+  // Add a component to a projectile's GameObject, perform setup if necessary, and return the projectile
+  public static Projectile AttachComponent<T>(this Projectile projectile, Action<T> predicate = null, bool allowDuplicates = false) where T : MonoBehaviour
+  {
+    T component = allowDuplicates ? projectile.AddComponent<T>() : projectile.GetOrAddComponent<T>();
+    if (predicate != null)
+      predicate(component);
     return projectile;
   }
 
@@ -998,6 +1020,7 @@ public static class Extensions
   /// <param name="angleVariance">Maximum deviation from shooting angle (in degrees) a bullet may actually be fired.</param>
   /// <param name="shootStyle">How bullets are actually fired from the gun.</param>
   /// <param name="sequenceStyle">In what order bullets are actually fired from the gun.</param>
+  /// <param name="chargeTime">If shootStyle is Charged, how long the projectile must charge for.</param>
   /// <param name="ammoCost">How much ammo is depleted per shot fired from a module.</param>
   /// <param name="ammoType">If using base game ammo clips, the type of ammo clip to use.</param>
   /// <param name="customClip">If using custom ammo clips, the base name of the sprite of the clip to use.</param>
@@ -1009,6 +1032,10 @@ public static class Extensions
   /// <param name="poison">The chance for the projectile to apply poison.</param>
   /// <param name="fire">The chance for the projectile to apply fire.</param>
   /// <param name="freeze">The chance for the projectile to apply freeze.</param>
+  /// <param name="collidesWithEnemies">If false, projectile won't collide with enemies.</param>
+  /// <param name="ignoreDamageCaps">If true, ignores DPS caps on bosses.</param>
+  /// <param name="collidesWithProjectiles">If true, projectile will collide with other projectiles.</param>
+  /// <param name="surviveRigidbodyCollisions">If true, projectile will not die upon colliding with an enemy or other rigid body.</param>
 
   /// <param name="sprite">The base name of the sprite to use for the projectile.</param>
   /// <param name="fps">The number of frames per second for the projectile's default animation.</param>
@@ -1023,8 +1050,9 @@ public static class Extensions
 
   /// <returns>The fully setup projectile</returns>
   public static Projectile SetupSingularProjectile(this Gun gun, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
-    ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, int ammoCost = 1, GameUIAmmoType.AmmoType? ammoType = null,
+    ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1, GameUIAmmoType.AmmoType? ammoType = null,
     string customClip = null, float? damage = null, float? speed = null, float? force = null, float? range = null, float poison = 0.0f, float fire = 0.0f, float freeze = 0.0f,
+    bool collidesWithEnemies = true, bool ignoreDamageCaps = false, bool collidesWithProjectiles= false, bool surviveRigidbodyCollisions = true,
     string sprite = null, int fps = 2, Anchor anchor = Anchor.MiddleCenter,
     float scale = 1.0f, bool anchorsChangeColliders = true, bool fixesScales = true, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null,
     IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null)
@@ -1032,12 +1060,26 @@ public static class Extensions
     ProjectileModule mod = gun.SetupDefaultModule(
       clipSize: clipSize, cooldown: cooldown, angleVariance: angleVariance, ammoCost: ammoCost, customClip: customClip,
       shootStyle: shootStyle, sequenceStyle: sequenceStyle, ammoType: ammoType);
-    Projectile proj = gun.InitFirstProjectile(damage: damage, speed: speed, force: force, range: range);
+
+    Projectile proj = gun.InitFirstProjectile(damage: damage, speed: speed, force: force, range: range, collidesWithEnemies: collidesWithEnemies,
+      ignoreDamageCaps: ignoreDamageCaps, collidesWithProjectiles: collidesWithProjectiles, surviveRigidbodyCollisions: surviveRigidbodyCollisions);
     if (!string.IsNullOrEmpty(sprite))
       proj.AddDefaultAnimation(AnimatedBullet.Create(
         name: sprite, fps: fps, anchor: anchor, scale: scale, anchorsChangeColliders: anchorsChangeColliders, fixesScales: fixesScales,
         manualOffsets: manualOffsets, overrideColliderPixelSizes: overrideColliderPixelSizes, overrideColliderOffsets: overrideColliderOffsets,
         overrideProjectilesToCopyFrom: overrideProjectilesToCopyFrom));
+
+    if (shootStyle == ShootStyle.Charged)
+    {
+      mod.chargeProjectiles = new();
+      if (chargeTime > 0)
+      {
+        mod.chargeProjectiles.Add(new ProjectileModule.ChargeProjectile {
+          Projectile = proj,
+          ChargeTime = chargeTime,
+        });
+      }
+    }
 
     proj.PoisonApplyChance = poison;
     proj.AppliesPoison     = poison > 0.0f;
@@ -1054,6 +1096,14 @@ public static class Extensions
     if (proj.AppliesFreeze)
       proj.freezeEffect = ItemHelper.Get(Items.FrostBullets).GetComponent<BulletStatusEffectItem>().FreezeModifierEffect;
 
+    return proj;
+  }
+
+  // Add each animation from a list in turn to a projectile and return that projectile
+  public static Projectile AddAnimations(this Projectile proj, params tk2dSpriteAnimationClip[] animations)
+  {
+    foreach(tk2dSpriteAnimationClip clip in animations)
+      proj.AddAnimation(clip);
     return proj;
   }
 }

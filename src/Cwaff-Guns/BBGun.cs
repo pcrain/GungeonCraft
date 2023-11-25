@@ -10,7 +10,6 @@ public class BBGun : AdvancedGunBehavior
     public static string Lore             = "This gun was originally used in the mid-18th century for hunting turkeys, as they were the only birds slow enough to actually hit with any degree of reliability. While hunters quickly decided that using a large, slow, rolling projectile wasn't ideal for hunting, the gun's legacy lives on today in shooting arenas known as \"alleys\", where sporting enthusiasts roll similar projectiles against red and white wooden objects in hopes of scoring a \"turkey\" themselves.";
 
     private static readonly float[] _CHARGE_LEVELS  = {0.25f,0.5f,1.0f,2.0f};
-    private static Projectile       _FakeProjectile = null;
     private float                   _lastCharge     = 0.0f;
 
     public static void Add()
@@ -26,27 +25,16 @@ public class BBGun : AdvancedGunBehavior
             gun.SetFireAudio("Play_WPN_seriouscannon_shot_01");
             gun.SetReloadAudio("Play_ENM_flame_veil_01");
 
-        ProjectileModule mod = gun.SetupDefaultModule(
-            clipSize: 3, cooldown: 0.7f, angleVariance: 10.0f, shootStyle: ShootStyle.Charged, sequenceStyle: ProjectileSequenceStyle.Ordered, customClip: SpriteName);
+        Projectile p = gun.SetupSingularProjectile(
+          clipSize: 3, cooldown: 0.7f, angleVariance: 10.0f, shootStyle: ShootStyle.Charged, sequenceStyle: ProjectileSequenceStyle.Ordered,
+          customClip: SpriteName, speed: 20f, range: 999999f, sprite: "bball", fps: 20, anchor: Anchor.MiddleCenter,
+          anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(2, 2)); // prevent uneven colliders from glitching into walls
 
-        Projectile projectile = gun.InitFirstProjectile(speed: 20f, range: 999999f);
-            projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "bball", fps: 20, anchor: Anchor.MiddleCenter,
-                anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(2, 2))); // prevent uneven colliders from glitching into walls
-            projectile.gameObject.AddComponent<TheBB>();
-
-        mod.chargeProjectiles = new();
         for (int i = 0; i < _CHARGE_LEVELS.Length; i++)
-        {
-            Projectile p = projectile.ClonePrefab();
-            p.gameObject.GetComponent<TheBB>().chargeLevel = i+1;
-            mod.chargeProjectiles.Add(new ProjectileModule.ChargeProjectile {
-                Projectile = p,
+            gun.DefaultModule.chargeProjectiles.Add(new ProjectileModule.ChargeProjectile {
+                Projectile = p.Clone().AttachComponent<TheBB>(bb => bb.chargeLevel = i+1),
                 ChargeTime = _CHARGE_LEVELS[i],
             });
-        }
-
-        _FakeProjectile = gun.InitFirstProjectile();
-        _FakeProjectile.gameObject.AddComponent<FakeProjectileComponent>(); // disable VFX like robot's lightning (TODO: this doesn't work here; need to apply to each projectile)
     }
 
     public override void PostProcessProjectile(Projectile projectile)

@@ -26,10 +26,9 @@ public class PlatinumStar : AdvancedGunBehavior
           damage: 3.0f, speed: 50.0f, force: 1.0f, range: 50.0f, sprite: "platinum_star_projectile", fps: 12, anchor: Anchor.MiddleLeft
           ).AttachComponent<PlatinumProjectile>();
 
-        _OraBullet = Items.Polaris.CloneProjectile(damage: 1.0f, speed: 75.0f, force: 0.1f, range: 3.0f);
-            _OraBullet.AddDefaultAnimation(AnimatedBullet.Create(name: "ora_fist_fast", fps: 12, scale: 0.33f, anchor: Anchor.MiddleRight));
-            _OraBullet.shouldRotate    = true;
-            _OraBullet.gameObject.GetOrAddComponent<PierceProjModifier>().penetration = 999;
+        _OraBullet = Items.Polaris.CloneProjectile(damage: 1.0f, speed: 75.0f, force: 0.1f, range: 3.0f, shouldRotate: true
+          ).AddAnimations(AnimatedBullet.Create(name: "ora_fist_fast", fps: 12, scale: 0.33f, anchor: Anchor.MiddleRight)
+          ).AttachComponent<PierceProjModifier>(pierce => pierce.penetration = 999);
     }
 
     public override void OnPostFired(PlayerController player, Gun gun)

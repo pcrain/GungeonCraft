@@ -25,19 +25,20 @@ public class PistolWhip : AdvancedGunBehavior
         gun.SetupSingularProjectile(ammoCost: 0, clipSize: -1, cooldown: WhipChainStart.TOTAL_TIME + C.FRAME, shootStyle: ShootStyle.SemiAutomatic,
           damage: 0.0f, speed: 0.01f, range: 999.0f).AttachComponent<WhipChainStartProjectile>();
 
-        _PistolWhipProjectile = Items.Ak47.CloneProjectile(damage: 15.0f, speed: 80.0f, force: 10.0f, range: 80.0f);
-            EasyTrailBullet trail = _PistolWhipProjectile.gameObject.AddComponent<EasyTrailBullet>();
-                trail.TrailPos   = trail.transform.position;
-                trail.StartWidth = 0.3f;
-                trail.EndWidth   = 0f;
-                trail.LifeTime   = 0.05f;
-                trail.BaseColor  = Color.yellow;
-                trail.EndColor   = Color.yellow;
+        _PistolWhipProjectile = Items.Ak47.CloneProjectile(damage: 15.0f, speed: 80.0f, force: 10.0f, range: 80.0f
+          ).AttachComponent<EasyTrailBullet>(trail => {
+            trail.TrailPos   = trail.transform.position;
+            trail.StartWidth = 0.3f;
+            trail.EndWidth   = 0f;
+            trail.LifeTime   = 0.05f;
+            trail.BaseColor  = Color.yellow;
+            trail.EndColor   = Color.yellow;
+          });
 
-        _PistolButtProjectile = Items.Ak47.CloneProjectile(damage: 30.0f, speed: 1.0f, force: 40.0f, range: 0.01f);
-            _PistolButtProjectile.AddDefaultAnimation(AnimatedBullet.Create(name: "natascha_bullet", fps: 12, anchor: Anchor.MiddleCenter)); // Not really visible, just used for pixel collider size
-            _PistolButtProjectile.SetAllImpactVFX(VFX.RegisterVFXPool("whip_particles", fps: 20, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f));
-            _PistolButtProjectile.gameObject.AddComponent<PistolButtProjectile>();
+        _PistolButtProjectile = Items.Ak47.CloneProjectile(damage: 30.0f, speed: 1.0f, force: 40.0f, range: 0.01f
+          ).AddAnimations(AnimatedBullet.Create(name: "natascha_bullet", fps: 12, anchor: Anchor.MiddleCenter) // Not really visible, just used for pixel collider size
+          ).SetAllImpactVFX(VFX.RegisterVFXPool("whip_particles", fps: 20, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f)
+          ).AttachComponent<PistolButtProjectile>();
     }
 }
 

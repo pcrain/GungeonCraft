@@ -26,14 +26,13 @@ public class Blackjack : AdvancedGunBehavior
             gun.SetFireAudio(); // prevent fire audio, as it's handled in OnPostFired()
             gun.SetReloadAudio("card_shuffle_sound"); // todo: this is still playing the default reload sound as well, for some reason
 
-        gun.SetupDefaultModule(clipSize: _CLIP_SIZE, cooldown: 0.16f, angleVariance: 24.0f, shootStyle: ShootStyle.Automatic, customClip: SpriteName);
-
-        _BulletSprite = AnimatedBullet.Create(name: "playing_card", fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft);
-        _BackSprite = AnimatedBullet.Create(name: "playing_card_back", fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft);
-
-        Projectile projectile = gun.InitFirstProjectile(damage: 8f, speed: 18f, range: 999f);
-            projectile.AddDefaultAnimation(_BulletSprite);
-            projectile.gameObject.AddComponent<ThrownCard>();
+        gun.SetupSingularProjectile(clipSize: _CLIP_SIZE, cooldown: 0.16f, angleVariance: 24.0f, shootStyle: ShootStyle.Automatic,
+          customClip: SpriteName, damage: 8f, speed: 18f, range: 999f
+          ).AttachComponent<ThrownCard>(
+          ).AddAnimations(
+            AnimatedBullet.Create(refClip: ref _BulletSprite, name: "playing_card", fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft),
+            AnimatedBullet.Create(refClip: ref _BackSprite,   name: "playing_card_back", fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft)
+          );
     }
 
     public override Projectile OnPreFireProjectileModifier(Gun gun, Projectile projectile, ProjectileModule mod)

@@ -23,10 +23,10 @@ public class HatchlingGun : AdvancedGunBehavior
             gun.SetReloadAudio("hatchling_gun_bounce_sound", frame: 6);
             gun.SetReloadAudio("hatchling_gun_bounce_sound", frame: 14);
 
-        Projectile p = gun.SetupSingularProjectile(clipSize: 12, cooldown: 0.2f, angleVariance: 15.0f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName,
+        gun.SetupSingularProjectile(clipSize: 12, cooldown: 0.2f, angleVariance: 15.0f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName,
           damage: 3.0f, speed: 24.0f, sprite: "egg", fps: 12, scale: 1.5f, anchor: Anchor.MiddleCenter
+          ).SetAllImpactVFX(VFX.RegisterVFXPool("egg_break", fps: 16, loops: false, scale: 0.75f, anchor: Anchor.MiddleCenter)
           ).AttachComponent<HatchlingProjectile>();
-            p.SetAllImpactVFX(VFX.RegisterVFXPool("egg_break", fps: 16, loops: false, scale: 0.75f, anchor: Anchor.MiddleCenter));
     }
 
     public override void OnPostFired(PlayerController player, Gun gun)

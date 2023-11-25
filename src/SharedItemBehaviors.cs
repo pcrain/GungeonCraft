@@ -276,7 +276,7 @@ public static class AnimatedBullet // stolen and modified from NN
         clip.frames = frames.ToArray();
         return clip;
     }
-    public static tk2dSpriteAnimationClip Create(string name, int fps, Anchor anchor, float scale = 1.0f, bool anchorsChangeColliders = true,
+    public static tk2dSpriteAnimationClip Create(string name, int fps = 2, Anchor anchor = Anchor.MiddleCenter, float scale = 1.0f, bool anchorsChangeColliders = true,
         bool fixesScales = true, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null, IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null)
     {
         List<string> names = ResMap.Get(name).Base();
@@ -294,6 +294,13 @@ public static class AnimatedBullet // stolen and modified from NN
             overrideColliderPixelSizes    : Enumerable.Repeat<IntVector2?>(overrideColliderPixelSizes,n).ToList(),
             overrideColliderOffsets       : Enumerable.Repeat<IntVector2?>(overrideColliderOffsets,n).ToList(),
             overrideProjectilesToCopyFrom : Enumerable.Repeat<Projectile>(overrideProjectilesToCopyFrom,n).ToList());
+    }
+    public static tk2dSpriteAnimationClip Create(ref tk2dSpriteAnimationClip refClip, string name, int fps = 2, Anchor anchor = Anchor.MiddleCenter, float scale = 1.0f, bool anchorsChangeColliders = true,
+        bool fixesScales = true, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null, IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null)
+    {
+        return refClip = AnimatedBullet.Create(name: name, fps: fps, anchor: anchor, scale: scale, anchorsChangeColliders: anchorsChangeColliders,
+            fixesScales: fixesScales, manualOffsets: manualOffsets, overrideColliderPixelSizes: overrideColliderPixelSizes,
+            overrideColliderOffsets: overrideColliderOffsets, overrideProjectilesToCopyFrom: overrideProjectilesToCopyFrom);
     }
     public static void SetAnimation(this Projectile proj, tk2dSpriteAnimationClip clip, int frame = 0)
     {
@@ -322,34 +329,6 @@ public static class AnimatedBullet // stolen and modified from NN
         proj.AddAnimation(clip);
         proj.SetAnimation(clip, frame);
     }
-    // public static void AnimateProjectile(this Projectile proj, List<string> names, int fps, bool loops, List<IntVector2> pixelSizes, List<bool> lighteneds, List<Anchor> anchors, List<bool> anchorsChangeColliders,
-    //     List<bool> fixesScales, List<Vector3?> manualOffsets, List<IntVector2?> overrideColliderPixelSizes, List<IntVector2?> overrideColliderOffsets, List<Projectile> overrideProjectilesToCopyFrom)
-    // {
-    //     tk2dSpriteAnimationClip clip = CreateProjectileAnimation(
-    //         names, fps, loops, pixelSizes, lighteneds, anchors, anchorsChangeColliders,
-    //         fixesScales, manualOffsets, overrideColliderPixelSizes, overrideColliderOffsets,
-    //         overrideProjectilesToCopyFrom);
-    //     proj.AddAnimation(clip);
-    //     proj.SetAnimation(clip);
-    // }
-    // // Simpler version of the above method assuming most elements are repeated
-    // public static void AnimateProjectile(this Projectile proj, List<string> names, int fps, bool loops, IntVector2 pixelSizes, bool lighteneds, Anchor anchors, bool anchorsChangeColliders,
-    //     bool fixesScales, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null, IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null)
-    // {
-    //     int n = names.Count;
-    //     proj.AnimateProjectile(
-    //         names,fps,loops,
-    //         Enumerable.Repeat(pixelSizes,n).ToList(),
-    //         Enumerable.Repeat(lighteneds,n).ToList(),
-    //         Enumerable.Repeat(anchors,n).ToList(),
-    //         Enumerable.Repeat(anchorsChangeColliders,n).ToList(),
-    //         Enumerable.Repeat(fixesScales,n).ToList(),
-    //         Enumerable.Repeat<Vector3?>(manualOffsets,n).ToList(),
-    //         Enumerable.Repeat<IntVector2?>(overrideColliderPixelSizes,n).ToList(),
-    //         Enumerable.Repeat<IntVector2?>(overrideColliderOffsets,n).ToList(),
-    //         Enumerable.Repeat<Projectile>(overrideProjectilesToCopyFrom,n).ToList()
-    //         );
-    // }
 }
 
 public class EasyTrailBullet : BraveBehaviour // stolen from NN

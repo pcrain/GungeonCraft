@@ -25,11 +25,9 @@ public class RacketLauncher : AdvancedGunBehavior
             gun.LoopAnimation(gun.idleAnimation, 0);
             gun.spriteAnimator.playAutomatically = false; // don't autoplay idle animation when dropped
 
-        Projectile p = gun.SetupSingularProjectile(ammoCost: 0, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName,
-          damage: 10.0f, speed: 20.0f, range: 300.0f, sprite: "tennis_ball", fps: 12, scale: 0.6f, anchor: Anchor.MiddleCenter
-          ).AttachComponent<TennisBall>();
-            p.BulletScriptSettings.surviveRigidbodyCollisions = true;
-            // projectile.DestroyMode = Projectile.ProjectileDestroyMode.DestroyComponent;  // must be set at creation time
+        gun.SetupSingularProjectile(ammoCost: 0, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName,
+          damage: 10.0f, speed: 20.0f, range: 300.0f, sprite: "tennis_ball", fps: 12, scale: 0.6f, anchor: Anchor.MiddleCenter, surviveRigidbodyCollisions: true
+          ).AttachComponent<TennisBall>(); // DestroyMode must be set at creation time
     }
 
     protected override void OnPickedUpByPlayer(PlayerController player)

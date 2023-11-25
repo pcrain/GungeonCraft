@@ -24,8 +24,7 @@ public class Tranquilizer : AdvancedGunBehavior
         gun.SetupSingularProjectile(clipSize: 1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName,
           sprite: "tranquilizer_projectile", fps: 12, anchor: Anchor.MiddleLeft).AttachComponent<TranquilizerBehavior>();
 
-        _DrowsyVFX = VFX.RegisterVFXObject("drowsy_cloud",
-            fps: 6, loops: true, anchor: Anchor.MiddleCenter, scale: 0.5f);
+        _DrowsyVFX = VFX.RegisterVFXObject("drowsy_cloud", fps: 6, loops: true, anchor: Anchor.MiddleCenter, scale: 0.5f);
     }
 }
 

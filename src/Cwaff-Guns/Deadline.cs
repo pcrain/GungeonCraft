@@ -37,18 +37,17 @@ public class Deadline : AdvancedGunBehavior
             gun.AddToSubShop(ModdedShopType.TimeTrader);
             gun.AddToSubShop(ModdedShopType.Boomhildr);
 
-        Projectile projectile = gun.SetupSingularProjectile(clipSize: 8, cooldown: 0.4f, angleVariance: 0.0f, shootStyle: ShootStyle.SemiAutomatic,
-          speed: 60.0f, range: 30.0f, sprite: "deadline_projectile", fps: 2, anchor: Anchor.MiddleLeft
-          ).AttachComponent<DeadlineProjectile>();
-            projectile.collidesWithEnemies = false;
-
-        EasyTrailBullet trail = projectile.gameObject.AddComponent<EasyTrailBullet>();
+        gun.SetupSingularProjectile(clipSize: 8, cooldown: 0.4f, angleVariance: 0.0f, shootStyle: ShootStyle.SemiAutomatic,
+          speed: 60.0f, range: 30.0f, sprite: "deadline_projectile", fps: 2, anchor: Anchor.MiddleLeft, collidesWithEnemies: false
+          ).AttachComponent<DeadlineProjectile>(
+          ).AttachComponent<EasyTrailBullet>(trail => {
             trail.TrailPos   = trail.transform.position;
             trail.StartWidth = 0.2f;
             trail.EndWidth   = 0f;
             trail.LifeTime   = 0.1f;
             trail.BaseColor  = Color.green;
             trail.EndColor   = Color.green;
+          });
 
         ExplosionData defaultExplosion = GameManager.Instance.Dungeon.sharedSettingsPrefab.DefaultExplosionData;
         _DeadlineExplosion = new ExplosionData()

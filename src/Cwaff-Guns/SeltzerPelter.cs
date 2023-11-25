@@ -46,7 +46,6 @@ public class SeltzerPelter : AdvancedGunBehavior
         // the perfect seltzer stats, do not tweak without testing! (beam damage == DPS)
         Projectile beamProjectile = Items.MarineSidearm.CloneProjectile(damage: 40.0f, speed: 20.0f, force: 100.0f, range: 4.0f);
 
-        // _BubbleBeam = beamProjectile.SetupBeamSprites(spriteName: "bubble_beam", fps: 8, dims: new Vector2(16, 8));
         _BubbleBeam = beamProjectile.SetupBeamSprites(spriteName: "bubble_stream", fps: 8, dims: new Vector2(8, 8));
             _BubbleBeam.sprite.usesOverrideMaterial = true;
             _BubbleBeam.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");

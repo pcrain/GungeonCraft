@@ -31,6 +31,7 @@ public class Alyx : AdvancedGunBehavior
             gun.SetMuzzleVFX("muzzle_alyx", fps: 30, scale: 0.5f, anchor: Anchor.MiddleCenter);
             gun.SetReloadAudio("alyx_reload_sound");
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
+
         gun.SetupSingularProjectile(clipSize: 10, shootStyle: ShootStyle.Automatic, customClip: SpriteName, damage: 15.0f, speed: 20.0f,
           poison: 1.0f, fire: 1.0f, sprite: "alyx_projectile", fps: 16, scale: 0.5625f, anchor: Anchor.MiddleCenter);
     }
@@ -118,11 +119,6 @@ public class Alyx : AdvancedGunBehavior
         }
     }
 
-    internal static int ComputeDecayFromHalfLife(float startAmount, float halfLifeInSeconds, float timeElapsed)
-    {
-        return ComputeExponentialDecay(startAmount, Mathf.Log(2) / halfLifeInSeconds, timeElapsed);
-    }
-
     internal static int ComputeExponentialDecay(float startAmount, float lambda, float timeElapsed)
     {
         return Lazy.RoundWeighted(startAmount * Mathf.Exp(-lambda * timeElapsed));
@@ -138,11 +134,12 @@ public class Alyx : AdvancedGunBehavior
         int newAmmo = ComputeExponentialDecay((float)this.gun.CurrentAmmo, _AMMO_DECAY_LAMBDA, timeSinceLastRecalc);
         int newMaxAmmo = ComputeExponentialDecay((float)this.gun.GetBaseMaxAmmo(), _GUN_DECAY_LAMBDA, timeSinceLastRecalc);
 
+        PlayerController player = this.Owner as PlayerController;
         // If we've decayed at all, create poison goop under our feet
         if (newAmmo < this.gun.CurrentAmmo || newMaxAmmo < this.gun.GetBaseMaxAmmo())
         {
             DeadlyDeadlyGoopManager poisonGooper = DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.PoisonDef); // can be null sometimes???
-            if (this.Owner is PlayerController player)
+            if (player)
                 poisonGooper?.AddGoopCircle(player.sprite.WorldBottomCenter - player.m_currentGunAngle.ToVector(1f), 0.75f);
             else
                 poisonGooper?.AddGoopCircle(this.gun.sprite.WorldCenter, 1f);
@@ -151,15 +148,15 @@ public class Alyx : AdvancedGunBehavior
         this.gun.CurrentAmmo = newAmmo;
         this.gun.SetBaseMaxAmmo(newMaxAmmo);
 
-        if (newMaxAmmo <= _MIN_AMMO_TO_PERSIST)
+        if (newMaxAmmo > _MIN_AMMO_TO_PERSIST)
+            return;
+
+        if (player)
+            player.inventory.DestroyGun(this.gun);
+        else // vanish in a puff of smoke on the ground
         {
-            if (this.Owner is PlayerController player)
-                player.inventory.DestroyGun(this.gun);
-            else // vanish in a puff of smoke on the ground
-            {
-                Lazy.DoSmokeAt(this.gun.sprite.WorldCenter);
-                UnityEngine.Object.Destroy(this.gun.gameObject);
-            }
+            Lazy.DoSmokeAt(this.gun.sprite.WorldCenter);
+            UnityEngine.Object.Destroy(this.gun.gameObject);
         }
     }
 }
