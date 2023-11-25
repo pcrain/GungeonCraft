@@ -26,12 +26,9 @@ public class Outbreak : AdvancedGunBehavior
             gun.SetReloadAudio("outbreak_reload_sound");
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
 
-        gun.SetupDefaultModule(clipSize: 10, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
-
-        Projectile projectile = gun.InitFirstProjectile(damage: 8.0f, speed: 17.0f, range: 100.0f);
-            projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "outbreak_projectile", fps: 12, anchor: Anchor.MiddleLeft));
-            projectile.gameObject.AddComponent<InfectionBehavior>();
-        _InfectionProjectile = projectile;
+        _InfectionProjectile = gun.SetupSingularProjectile(clipSize: 10, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName,
+          damage: 8.0f, speed: 17.0f, range: 100.0f, sprite: "outbreak_projectile", fps: 12, anchor: Anchor.MiddleLeft
+          ).AttachComponent<InfectionBehavior>();
 
         _OutbreakSmokeVFX = VFX.RegisterVFXObject("outbreak_smoke_small", 2, loops: true, anchor: Anchor.MiddleCenter);
         _OutbreakSmokeLargeVFX = VFX.RegisterVFXObject("outbreak_smoke_large", 2, loops: true, anchor: Anchor.MiddleCenter);

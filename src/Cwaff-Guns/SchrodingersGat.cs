@@ -23,12 +23,9 @@ public class SchrodingersGat : AdvancedGunBehavior
             gun.SetAnimationFPS(gun.idleAnimation, 24);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
 
-        gun.SetupDefaultModule(clipSize: -1, cooldown: 0.125f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, customClip: SpriteName);
-
-        Projectile projectile = gun.InitFirstProjectile(damage: 0.0f, speed: 32.0f);
-            projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "schrodingers_gat_projectile", fps: 12, anchor: Anchor.MiddleCenter));
-
-        projectile.gameObject.AddComponent<SchrodingersGatProjectile>();
+        gun.SetupSingularProjectile(clipSize: -1, cooldown: 0.125f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, customClip: SpriteName,
+          damage: 0.0f, speed: 32.0f, sprite: "schrodingers_gat_projectile", fps: 12, anchor: Anchor.MiddleCenter
+          ).AttachComponent<SchrodingersGatProjectile>();
     }
 
     public override void OnPostFired(PlayerController player, Gun gun)

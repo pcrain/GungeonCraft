@@ -9,7 +9,6 @@ public class PistolWhip : AdvancedGunBehavior
     public static string LongDescription  = "A long range weapon that deals high melee damage at its tip and fires a fast projectile when fully extended. Can only melee hit enemies when fully extended. Increases curse by 3 while in inventory.";
     public static string Lore             = "Once wielded by elite foot soldiers in the army of the great Pharaoh Tutancannon, this weapon is contraband in modern gunfare. On top of flouting the Guneva Conventions with its absurd muzzle range and ability to reach around rather tall walls, it is also reported to have been cursed by Tutancannon himself on his deathbed, bound to unleash the foulest creatures upon those who would dare wield it within the Gungeon's chambers.";
 
-    internal static Projectile _WhipStartProjectile;
     internal static Projectile _PistolWhipProjectile;
     internal static Projectile _PistolButtProjectile;
 
@@ -23,10 +22,8 @@ public class PistolWhip : AdvancedGunBehavior
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
             gun.muzzleFlashEffects = null;
 
-        gun.SetupDefaultModule(ammoCost: 0, clipSize: -1, cooldown: WhipChainStart.TOTAL_TIME + C.FRAME, shootStyle: ShootStyle.SemiAutomatic);
-
-        _WhipStartProjectile = gun.InitFirstProjectile(damage: 0.0f, speed: 0.01f, range: 999.0f);
-            _WhipStartProjectile.gameObject.AddComponent<WhipChainStartProjectile>();
+        gun.SetupSingularProjectile(ammoCost: 0, clipSize: -1, cooldown: WhipChainStart.TOTAL_TIME + C.FRAME, shootStyle: ShootStyle.SemiAutomatic,
+          damage: 0.0f, speed: 0.01f, range: 999.0f).AttachComponent<WhipChainStartProjectile>();
 
         _PistolWhipProjectile = Items.Ak47.CloneProjectile(damage: 15.0f, speed: 80.0f, force: 10.0f, range: 80.0f);
             EasyTrailBullet trail = _PistolWhipProjectile.gameObject.AddComponent<EasyTrailBullet>();

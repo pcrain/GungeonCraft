@@ -38,14 +38,10 @@ public class SeltzerPelter : AdvancedGunBehavior
             }
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
-        gun.SetupDefaultModule(clipSize: 1, cooldown: 0.5f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
-
-        Projectile projectile = gun.InitFirstProjectile(damage: 16.0f, speed: 30.0f, force: 75.0f, range: 999.0f);
-            projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "can_projectile", fps: 1,  anchor: Anchor.MiddleCenter, // 1 FPS minimum, stop animator manually later
-                anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(2, 2))); // prevent uneven colliders from glitching into walls
-            projectile.gameObject.AddComponent<SeltzerProjectile>();
-            // projectile.AddTrailToProjectile(ResMap.Get("bubble_stream_mid")[0], new Vector2(8, 8), new Vector2(4, 4),
-            //     ResMap.Get("bubble_stream_mid"), 32, ResMap.Get("bubble_stream_start"), 32, cascadeTimer: C.FRAME, destroyOnEmpty: true);
+        gun.SetupSingularProjectile(clipSize: 1, cooldown: 0.5f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName,
+          damage: 16.0f, speed: 30.0f, force: 75.0f, range: 999.0f, sprite: "can_projectile", fps: 1,  anchor: Anchor.MiddleCenter, // 1 FPS minimum, stop animator manually later
+          anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(2, 2) // prevent uneven colliders from glitching into walls
+          ).AttachComponent<SeltzerProjectile>();
 
         // the perfect seltzer stats, do not tweak without testing! (beam damage == DPS)
         Projectile beamProjectile = Items.MarineSidearm.CloneProjectile(damage: 40.0f, speed: 20.0f, force: 100.0f, range: 4.0f);

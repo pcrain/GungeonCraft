@@ -29,12 +29,9 @@ public class HandCannon : AdvancedGunBehavior
             gun.SetChargeAudio("hand_cannon_charge_sound", frame: 0);
             gun.SetChargeAudio("hand_cannon_charge_sound", frame: 10);
 
-        gun.SetupDefaultModule(clipSize: 2, cooldown: 0.1f, angleVariance: 15.0f, shootStyle: ShootStyle.Charged, customClip: SpriteName);
-
-        Projectile projectile = gun.InitFirstProjectile(damage: 40.0f, speed: 40.0f);
-            projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "slappp", fps: 30, scale: 0.5f, anchor: Anchor.MiddleCenter,
-                overrideColliderPixelSizes: new IntVector2(8,8)));// small collider near the center of the sprite
-            projectile.gameObject.AddComponent<SlappProjectile>();
+        Projectile projectile = gun.SetupSingularProjectile(clipSize: 2, cooldown: 0.1f, angleVariance: 15.0f, shootStyle: ShootStyle.Charged,
+          customClip: SpriteName, damage: 40.0f, speed: 40.0f, sprite: "slappp", fps: 30, scale: 0.5f, anchor: Anchor.MiddleCenter,
+          overrideColliderPixelSizes: new IntVector2(8,8)).AttachComponent<SlappProjectile>();
 
         gun.DefaultModule.chargeProjectiles = new(){
             new ProjectileModule.ChargeProjectile

@@ -27,17 +27,10 @@ public class Bouncer : AdvancedGunBehavior
             gun.AddToSubShop(ModdedShopType.Boomhildr);
             gun.AddToSubShop(ModdedShopType.Rusty);
 
-        gun.SetupDefaultModule(clipSize: 6, cooldown: 0.16f, shootStyle: ShootStyle.SemiAutomatic);
-
-        IntVector2 colliderSize = new IntVector2(1,1); // 1-pixel collider for accurate bounce animation
-
-        tk2dSpriteAnimationClip anim = AnimatedBullet.Create(
-            name: "energy_bounce", fps: 10, scale: 0.2f, anchor: Anchor.MiddleCenter,
-            overrideColliderPixelSizes: colliderSize);
-
-        Projectile projectile = gun.InitFirstProjectile(damage: _ACCELERATION, speed: _ACCELERATION, range: 9999f);
-            projectile.AddDefaultAnimation(anim);
-            projectile.gameObject.AddComponent<HarmlessUntilBounce>();
+        gun.SetupSingularProjectile(clipSize: 6, cooldown: 0.16f, shootStyle: ShootStyle.SemiAutomatic, damage: _ACCELERATION, speed: _ACCELERATION,
+          range: 9999f, sprite: "energy_bounce", fps: 10, scale: 0.2f, anchor: Anchor.MiddleCenter,
+          overrideColliderPixelSizes: new IntVector2(1,1) // 1-pixel collider for accurate bounce animation
+          ).AttachComponent<HarmlessUntilBounce>();
 
         // Initialize our explosion data
         ExplosionData defaultExplosion = GameManager.Instance.Dungeon.sharedSettingsPrefab.DefaultSmallExplosionData;

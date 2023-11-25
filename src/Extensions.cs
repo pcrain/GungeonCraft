@@ -977,4 +977,83 @@ public static class Extensions
   {
       return (ItemHelper.Get(gunItem) as Gun).DefaultModule.projectiles[0].Clone(damage, speed, force, range);
   }
+
+  // Add a component to a projectile's GameObject and return the component
+  public static T AddComponent<T>(this Projectile projectile) where T : MonoBehaviour
+  {
+    return projectile.gameObject.AddComponent<T>();
+  }
+
+  // Add a component to a projectile's GameObject and return the projectile
+  public static Projectile AttachComponent<T>(this Projectile projectile) where T : MonoBehaviour
+  {
+    projectile.gameObject.AddComponent<T>();
+    return projectile;
+  }
+
+  /// <summary>Perform basic setup for a single module, single projectile gun.</summary>
+  /// <param name="gun">The gun for which we're setting up the module and projectile.</param>
+  /// <param name="clipSize">The number of shots the gun can fired before reloading.</param>
+  /// <param name="cooldown">The minimum number of seconds between shots</param>
+  /// <param name="angleVariance">Maximum deviation from shooting angle (in degrees) a bullet may actually be fired.</param>
+  /// <param name="shootStyle">How bullets are actually fired from the gun.</param>
+  /// <param name="sequenceStyle">In what order bullets are actually fired from the gun.</param>
+  /// <param name="ammoCost">How much ammo is depleted per shot fired from a module.</param>
+  /// <param name="ammoType">If using base game ammo clips, the type of ammo clip to use.</param>
+  /// <param name="customClip">If using custom ammo clips, the base name of the sprite of the clip to use.</param>
+
+  /// <param name="damage">The damage of the projectile.</param>
+  /// <param name="speed">The speed of the projectile.</param>
+  /// <param name="force">The force of the projectile.</param>
+  /// <param name="range">The range of the projectile.</param>
+  /// <param name="poison">The chance for the projectile to apply poison.</param>
+  /// <param name="fire">The chance for the projectile to apply fire.</param>
+  /// <param name="freeze">The chance for the projectile to apply freeze.</param>
+
+  /// <param name="sprite">The base name of the sprite to use for the projectile.</param>
+  /// <param name="fps">The number of frames per second for the projectile's default animation.</param>
+  /// <param name="anchor">Where the projectile's effective center of mass is for rotation and muzzle offset purposes.</param>
+  /// <param name="scale">The scale of the sprite in-game relative to its pixel size on disk.</param>
+  /// <param name="anchorsChangeColliders">If true, colliders are adjusted to account for the sprite's anchor.</param>
+  /// <param name="fixesScales">If true, colliders are adjusted to account for scaling.</param>
+  /// <param name="manualOffsets">[Unknown]</param>
+  /// <param name="overrideColliderPixelSizes">If set, manually adjusts the size of the projectile's hitbox.</param>
+  /// <param name="overrideColliderOffsets">If set, manually adjusts the offset of the projectile's hitbox.</param>
+  /// <param name="overrideProjectilesToCopyFrom">[Unknwon]</param>
+
+  /// <returns>The fully setup projectile</returns>
+  public static Projectile SetupSingularProjectile(this Gun gun, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
+    ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, int ammoCost = 1, GameUIAmmoType.AmmoType? ammoType = null,
+    string customClip = null, float? damage = null, float? speed = null, float? force = null, float? range = null, float poison = 0.0f, float fire = 0.0f, float freeze = 0.0f,
+    string sprite = null, int fps = 2, Anchor anchor = Anchor.MiddleCenter,
+    float scale = 1.0f, bool anchorsChangeColliders = true, bool fixesScales = true, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null,
+    IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null)
+  {
+    ProjectileModule mod = gun.SetupDefaultModule(
+      clipSize: clipSize, cooldown: cooldown, angleVariance: angleVariance, ammoCost: ammoCost, customClip: customClip,
+      shootStyle: shootStyle, sequenceStyle: sequenceStyle, ammoType: ammoType);
+    Projectile proj = gun.InitFirstProjectile(damage: damage, speed: speed, force: force, range: range);
+    if (!string.IsNullOrEmpty(sprite))
+      proj.AddDefaultAnimation(AnimatedBullet.Create(
+        name: sprite, fps: fps, anchor: anchor, scale: scale, anchorsChangeColliders: anchorsChangeColliders, fixesScales: fixesScales,
+        manualOffsets: manualOffsets, overrideColliderPixelSizes: overrideColliderPixelSizes, overrideColliderOffsets: overrideColliderOffsets,
+        overrideProjectilesToCopyFrom: overrideProjectilesToCopyFrom));
+
+    proj.PoisonApplyChance = poison;
+    proj.AppliesPoison     = poison > 0.0f;
+    if (proj.AppliesPoison)
+      proj.healthEffect = ItemHelper.Get(Items.IrradiatedLead).GetComponent<BulletStatusEffectItem>().HealthModifierEffect;
+
+    proj.FireApplyChance = fire;
+    proj.AppliesFire   = fire > 0.0f;
+    if (proj.AppliesFire)
+      proj.fireEffect = ItemHelper.Get(Items.HotLead).GetComponent<BulletStatusEffectItem>().FireModifierEffect;
+
+    proj.FreezeApplyChance = freeze;
+    proj.AppliesFreeze   = freeze > 0.0f;
+    if (proj.AppliesFreeze)
+      proj.freezeEffect = ItemHelper.Get(Items.FrostBullets).GetComponent<BulletStatusEffectItem>().FreezeModifierEffect;
+
+    return proj;
+  }
 }

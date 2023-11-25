@@ -37,12 +37,10 @@ public class Deadline : AdvancedGunBehavior
             gun.AddToSubShop(ModdedShopType.TimeTrader);
             gun.AddToSubShop(ModdedShopType.Boomhildr);
 
-        gun.SetupDefaultModule(clipSize: 8, cooldown: 0.4f, angleVariance: 0.0f, shootStyle: ShootStyle.SemiAutomatic);
-
-        Projectile projectile = gun.InitFirstProjectile(speed: 60.0f, range: 30.0f);
-            projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "deadline_projectile", fps: 2, anchor: Anchor.MiddleLeft));
+        Projectile projectile = gun.SetupSingularProjectile(clipSize: 8, cooldown: 0.4f, angleVariance: 0.0f, shootStyle: ShootStyle.SemiAutomatic,
+          speed: 60.0f, range: 30.0f, sprite: "deadline_projectile", fps: 2, anchor: Anchor.MiddleLeft
+          ).AttachComponent<DeadlineProjectile>();
             projectile.collidesWithEnemies = false;
-            projectile.gameObject.AddComponent<DeadlineProjectile>();
 
         EasyTrailBullet trail = projectile.gameObject.AddComponent<EasyTrailBullet>();
             trail.TrailPos   = trail.transform.position;

@@ -32,16 +32,14 @@ public class KiBlast : AdvancedGunBehavior
             gun.SetFireAudio("ki_blast_sound");
             gun.AddToSubShop(ModdedShopType.Boomhildr);
 
-        gun.SetupDefaultModule(clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, ammoType: GameUIAmmoType.AmmoType.BEAM);
+        Projectile p = gun.SetupSingularProjectile(clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
+          ammoType: GameUIAmmoType.AmmoType.BEAM, damage: 4.0f, range: 10.0f, sprite: "ki_blast", fps: 12, scale: 0.0625f,
+          anchor: Anchor.MiddleCenter
+          ).AttachComponent<KiBlastBehavior>().AttachComponent<ArcTowardsTargetBehavior>();
+        p.ignoreDamageCaps = true;
+        p.SetAllImpactVFX(VFX.RegisterVFXPool("ki_explosion", fps: 20, loops: false, scale: 0.5f));
 
-        Projectile blast = gun.InitFirstProjectile(damage: 4.0f, range: 10.0f);
-            blast.AddDefaultAnimation(AnimatedBullet.Create(name: "ki_blast", fps: 12, scale: 0.0625f, anchor: Anchor.MiddleCenter));
-            blast.ignoreDamageCaps = true;
-            blast.gameObject.AddComponent<KiBlastBehavior>();
-            blast.gameObject.AddComponent<ArcTowardsTargetBehavior>();
-            blast.SetAllImpactVFX(VFX.RegisterVFXPool("ki_explosion", fps: 20, loops: false, scale: 0.5f));
-
-        EasyTrailBullet trail = blast.gameObject.AddComponent<EasyTrailBullet>();
+        EasyTrailBullet trail = p.gameObject.AddComponent<EasyTrailBullet>();
             trail.TrailPos   = trail.transform.position;
             trail.StartWidth = 0.2f;
             trail.EndWidth   = 0f;

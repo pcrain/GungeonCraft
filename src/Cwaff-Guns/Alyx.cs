@@ -31,19 +31,8 @@ public class Alyx : AdvancedGunBehavior
             gun.SetMuzzleVFX("muzzle_alyx", fps: 30, scale: 0.5f, anchor: Anchor.MiddleCenter);
             gun.SetReloadAudio("alyx_reload_sound");
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
-
-        gun.SetupDefaultModule(clipSize: 10, shootStyle: ShootStyle.Automatic, customClip: SpriteName);
-
-        Projectile projectile = gun.InitFirstProjectile(damage: 15.0f, speed: 20.0f);
-            projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "alyx_projectile", fps: 16, scale: 0.5625f, anchor: Anchor.MiddleCenter));
-
-            projectile.healthEffect      = ItemHelper.Get(Items.IrradiatedLead).GetComponent<BulletStatusEffectItem>().HealthModifierEffect;
-            projectile.AppliesPoison     = true;
-            projectile.PoisonApplyChance = 1.0f;
-
-            projectile.fireEffect        = ItemHelper.Get(Items.HotLead).GetComponent<BulletStatusEffectItem>().FireModifierEffect;
-            projectile.AppliesFire       = true;
-            projectile.FireApplyChance   = 1.0f;
+        gun.SetupSingularProjectile(clipSize: 10, shootStyle: ShootStyle.Automatic, customClip: SpriteName, damage: 15.0f, speed: 20.0f,
+          poison: 1.0f, fire: 1.0f, sprite: "alyx_projectile", fps: 16, scale: 0.5625f, anchor: Anchor.MiddleCenter);
     }
 
     public override void OnPostFired(PlayerController player, Gun gun)

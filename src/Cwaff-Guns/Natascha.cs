@@ -9,10 +9,10 @@ public class Natascha : AdvancedGunBehavior
     public static string LongDescription  = "Rate of fire increases and movement speed decreases as this gun is continuously fired.";
     public static string Lore             = "The beloved gun of an amicable literature Ph.D., who refused to let anyone else so much as touch his precious Natascha. That is, until convinced by a hulking Australian man to grant ownership rights in exchange for unlimited lifetime access to the \"best sandwiches south of the equator.\"";
 
-    internal static float                   _BaseCooldownTime = 0.4f;
-    internal static int                     _FireAnimationFrames = 8;
+    internal static float _BaseCooldownTime    = 0.4f;
+    internal static int   _FireAnimationFrames = 8;
 
-    private float _speedMult                      = 1.0f;
+    private float _speedMult = 1.0f;
 
     public static void Add()
     {
@@ -23,10 +23,8 @@ public class Natascha : AdvancedGunBehavior
             gun.AddToSubShop(ItemBuilder.ShopType.Trorc);
             gun.AddToSubShop(ModdedShopType.Rusty);
 
-        gun.SetupDefaultModule(clipSize: -1, cooldown: _BaseCooldownTime, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic);
-
-        Projectile projectile = gun.InitFirstProjectile(damage: 3.0f, speed: 20.0f);
-            projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "natascha_bullet", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter));
+        gun.SetupSingularProjectile(clipSize: -1, cooldown: _BaseCooldownTime, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, damage: 3.0f, speed: 20.0f,
+          sprite: "natascha_bullet", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter);
     }
 
     public override void OnPostFired(PlayerController player, Gun gun)

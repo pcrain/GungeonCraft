@@ -20,12 +20,8 @@ public class PaintballCannon : AdvancedGunBehavior
             gun.SetReloadAudio("paintball_reload_sound");
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
-        gun.SetupDefaultModule(clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic);
-
-        Projectile projectile = gun.InitFirstProjectile(damage: 9.0f);
-
-        PaintballColorizer paintballController = projectile.gameObject.AddComponent<PaintballColorizer>();
-            paintballController.ApplyColourToHitEnemies = true;
+        gun.SetupSingularProjectile(clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic, damage: 9.0f
+            ).AttachComponent<PaintballColorizer>();
     }
 
     public override void PostProcessProjectile(Projectile projectile)
@@ -47,27 +43,25 @@ public class PaintballCannon : AdvancedGunBehavior
 
 public class PaintballColorizer : MonoBehaviour
 {
-    public  bool       ApplyColourToHitEnemies;
-    public  int        tintPriority;
+    public  bool       applyColourToHitEnemies = true;
+    public  int        tintPriority = 1;
     public  Color      selectedColour;
-    private Projectile m_projectile;
-    public PaintballColorizer()
-    {
-        ApplyColourToHitEnemies = false;
-        tintPriority            = 1;
-    }
+    private Projectile _projectile;
+
     public GoopDefinition setColorAndGetGoop() {
         int selectedIndex = UnityEngine.Random.Range(0, EasyGoopDefinitions.ColorGoopColors.Count);
         selectedColour = EasyGoopDefinitions.ColorGoopColors[selectedIndex];
         return EasyGoopDefinitions.ColorGoops[selectedIndex];
     }
+
     private void Start()
     {
-        this.m_projectile = base.GetComponent<Projectile>();
-        this.m_projectile.AdjustPlayerProjectileTint(selectedColour, tintPriority);
-        if (ApplyColourToHitEnemies)
-            this.m_projectile.OnHitEnemy += this.OnHitEnemy;
+        this._projectile = base.GetComponent<Projectile>();
+        this._projectile.AdjustPlayerProjectileTint(selectedColour, tintPriority);
+        if (applyColourToHitEnemies)
+            this._projectile.OnHitEnemy += this.OnHitEnemy;
     }
+
     private void OnHitEnemy(Projectile bullet, SpeculativeRigidbody enemy, bool what)
     {
         GameActorHealthEffect tint = new GameActorHealthEffect()

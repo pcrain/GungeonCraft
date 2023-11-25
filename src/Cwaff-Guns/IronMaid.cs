@@ -23,11 +23,9 @@ public class IronMaid : AdvancedGunBehavior
             gun.SetReloadAudio("knife_gun_reload");
             gun.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
-        gun.SetupDefaultModule(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
-
-        Projectile projectile = gun.InitFirstProjectile(damage: 5.0f, speed: 40.0f);
-            projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "kunai", fps: 12, anchor: Anchor.MiddleCenter));
-            projectile.gameObject.AddComponent<RainCheckBullets>();
+        gun.SetupSingularProjectile(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName,
+          damage: 5.0f, speed: 40.0f, sprite: "kunai", fps: 12, anchor: Anchor.MiddleCenter
+          ).AttachComponent<RainCheckBullets>();
     }
 
     public override void OnReload(PlayerController player, Gun gun)

@@ -24,20 +24,18 @@ public class Lightwing : AdvancedGunBehavior
             gun.SetFireAudio("lightwing_fire_sound");
             gun.SetReloadAudio("lightwing_reload_sound");
 
-        gun.SetupDefaultModule(clipSize: 20, cooldown: 0.28f, shootStyle: ShootStyle.SemiAutomatic);
-
         _NeutralSprite    = AnimatedBullet.Create(name: "lightwing_projectile",          fps: 12, anchor: Anchor.MiddleLeft);
         _HuntingSprite    = AnimatedBullet.Create(name: "lightwing_projectile_hunt",     fps: 12, anchor: Anchor.MiddleLeft);
         _RetrievingSprite = AnimatedBullet.Create(name: "lightwing_projectile_retrieve", fps: 12, anchor: Anchor.MiddleLeft);
         _ReturningSprite  = AnimatedBullet.Create(name: "lightwing_projectile_return",   fps: 12, anchor: Anchor.MiddleLeft);
 
-        Projectile projectile = gun.InitFirstProjectile(damage: 4.0f, speed: 20.0f);
+        Projectile projectile = gun.SetupSingularProjectile(clipSize: 20, cooldown: 0.28f, shootStyle: ShootStyle.SemiAutomatic, damage: 4.0f, speed: 20.0f
+          ).AttachComponent<LightwingProjectile>();
             projectile.AddDefaultAnimation(_NeutralSprite);
             projectile.AddAnimation(_HuntingSprite);
             projectile.AddAnimation(_RetrievingSprite);
             projectile.AddAnimation(_ReturningSprite);
             projectile.collidesWithProjectiles = true;  // needs to be set up front, can't be set later because caching silliness or something idk
-            projectile.gameObject.AddComponent<LightwingProjectile>();
     }
 }
 
