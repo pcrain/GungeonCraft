@@ -47,8 +47,7 @@ public class Gunbrella : AdvancedGunBehavior
             gun.DefaultModule.ammoCost = 1;
         }
 
-        _HailParticle = VFX.RegisterVFXPool("HailParticle", ResMap.Get("icicle_crash_particles"),
-            fps: 30, loops: false, anchor: Anchor.MiddleCenter, scale: 0.35f);
+        _HailParticle = VFX.RegisterVFXPool("icicle_crash_particles", fps: 30, loops: false, anchor: Anchor.MiddleCenter, scale: 0.35f);
 
         GameActorFreezeEffect freeze = ItemHelper.Get(Items.FrostBullets).GetComponent<BulletStatusEffectItem>().FreezeModifierEffect;
         tk2dSpriteAnimationClip projAnimation = AnimatedBullet.Create(name: "gunbrella_projectile", fps: 16, anchor: Anchor.MiddleLeft);
@@ -76,7 +75,7 @@ public class Gunbrella : AdvancedGunBehavior
             }};
         }
 
-        _RainReticle = VFX.RegisterVFXObject("RainReticle", ResMap.Get("gunbrella_target_reticle"),
+        _RainReticle = VFX.RegisterVFXObject("gunbrella_target_reticle",
             fps: 12, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 10, emissiveColour: Color.cyan, scale: 0.75f);
     }
 

@@ -84,7 +84,7 @@ public class Deadline : AdvancedGunBehavior
             },
         };
 
-        _SplodeVFX = VFX.RegisterVFXObject("Splode", ResMap.Get("splode"),
+        _SplodeVFX = VFX.RegisterVFXObject("splode",
             fps: 18, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 100, emissiveColour: Color.cyan);
     }
 

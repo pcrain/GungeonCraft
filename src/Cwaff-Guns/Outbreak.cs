@@ -33,8 +33,8 @@ public class Outbreak : AdvancedGunBehavior
             projectile.gameObject.AddComponent<InfectionBehavior>();
         _InfectionProjectile = projectile;
 
-        _OutbreakSmokeVFX = VFX.RegisterVFXObject("OutbreakSmoke", ResMap.Get("outbreak_smoke_small"), 2, loops: true, anchor: Anchor.MiddleCenter);
-        _OutbreakSmokeLargeVFX = VFX.RegisterVFXObject("OutbreakSmokeLarge", ResMap.Get("outbreak_smoke_large"), 2, loops: true, anchor: Anchor.MiddleCenter);
+        _OutbreakSmokeVFX = VFX.RegisterVFXObject("outbreak_smoke_small", 2, loops: true, anchor: Anchor.MiddleCenter);
+        _OutbreakSmokeLargeVFX = VFX.RegisterVFXObject("outbreak_smoke_large", 2, loops: true, anchor: Anchor.MiddleCenter);
     }
 
     public override void OnPostFired(PlayerController player, Gun gun)

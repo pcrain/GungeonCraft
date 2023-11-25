@@ -17,7 +17,7 @@ public class AmazonPrimer : PlayerItem
         item.consumable   = true;
         item.CanBeDropped = true;
 
-        _PrimeLogo = VFX.RegisterVFXObject("PrimeLogo", ResMap.Get("prime_logo_overhead"), 2, loops: true, anchor: Anchor.LowerCenter, emissivePower: 100f);
+        _PrimeLogo = VFX.RegisterVFXObject("prime_logo_overhead", 2, loops: true, anchor: Anchor.LowerCenter, emissivePower: 100f);
     }
 
     public override bool CanBeUsed(PlayerController user)

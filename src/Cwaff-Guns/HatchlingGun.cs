@@ -9,8 +9,6 @@ public class HatchlingGun : AdvancedGunBehavior
     public static string LongDescription  = $"Fires eggs which spawn chicks on impact. Chicks randomly wander the room, blocking enemies and their projectiles until taking damage.";
     public static string Lore             = "The age-old question \"which came first, the chicken or the egg?\" is mostly of academic interest. Questions of more practical interest to gunsmiths include \"what is the fastest an egg can be fired out of a gun without it breaking in transit?\" and \"how much damage can a singular egg inflict on the Gundead?\" The answers to these questions turn out to be \"not very fast\" and \"not very much,\" respectively. As such, most gunsmiths have no interest in forging guns that fire eggs as projectiles, and the {ItemName}'s existence can be largely attributed to an excessive supply of eggs moreso than an excessive demans of egg-shooting firearms.";
 
-    internal static tk2dSpriteAnimationClip _BulletSprite;
-
     private const float _NATASHA_PROJECTILE_SCALE = 0.5f;
     private float _speedMult                      = 1.0f;
 
@@ -27,13 +25,10 @@ public class HatchlingGun : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 12, cooldown: 0.2f, angleVariance: 15.0f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
 
-        _BulletSprite = AnimatedBullet.Create(name: "egg", fps: 12, scale: 1.5f, anchor: Anchor.MiddleCenter);
-
         Projectile projectile = gun.InitFirstProjectile(damage: 3.0f, speed: 24.0f);
-            projectile.AddDefaultAnimation(_BulletSprite);
+            projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "egg", fps: 12, scale: 1.5f, anchor: Anchor.MiddleCenter));
             projectile.gameObject.AddComponent<HatchlingProjectile>();
-            projectile.SetAllImpactVFX(VFX.RegisterVFXPool(
-                "EggBreak", ResMap.Get("egg_break"), fps: 16, loops: false, scale: 0.75f, anchor: Anchor.MiddleCenter));
+            projectile.SetAllImpactVFX(VFX.RegisterVFXPool("egg_break", fps: 16, loops: false, scale: 0.75f, anchor: Anchor.MiddleCenter));
     }
 
     public override void OnPostFired(PlayerController player, Gun gun)

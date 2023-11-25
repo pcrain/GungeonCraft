@@ -165,7 +165,7 @@ public class ThrownCard : MonoBehaviour
             gun.CurrentAmmo += 1;
             AkSoundEngine.PostEvent("card_pickup_sound_stop_all", p.gameObject);
             AkSoundEngine.PostEvent("card_pickup_sound", p.gameObject);
-            SpawnManager.SpawnVFX(VFX.animations["MiniPickup"], i.sprite.WorldCenter, Lazy.RandomEulerZ());
+            SpawnManager.SpawnVFX(VFX.MiniPickup, i.sprite.WorldCenter, Lazy.RandomEulerZ());
             UnityEngine.Object.Destroy(i.gameObject);
             break;
         }

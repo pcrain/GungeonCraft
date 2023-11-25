@@ -24,7 +24,7 @@ public class GasterBlaster : PlayerItem
         item.CanBeDropped = true;
         item.SetCooldownType(ItemBuilder.CooldownType.Damage, 100f);
 
-        _GasterBlaster = VFX.RegisterVFXObject("GasterBlaster", ResMap.Get("gaster_blaster"), 2, loops: true, anchor: Anchor.MiddleCenter);
+        _GasterBlaster = VFX.RegisterVFXObject("gaster_blaster", 2, loops: true, anchor: Anchor.MiddleCenter);
 
         _GasterBlast = Items.MarineSidearm.CloneProjectile(damage: 700.0f, speed: 150.0f, force: 70.0f, range: 200.0f);
         _GasterBlast.ignoreDamageCaps        = false;

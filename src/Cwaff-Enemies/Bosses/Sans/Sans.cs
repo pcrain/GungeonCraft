@@ -39,7 +39,7 @@ public partial class SansBoss : AIActor
     bb.MakeInteractible<SansNPC>(preFight: true, postFight: true) ;            // Add some pre-fight and post-fight dialogue
     bb.TargetPlayer();                                                         // Set up the boss's targeting scripts
     bb.AddCustomMusic(name: "electromegalo", loopAt: 152512, rewind: 137141);  // Add custom music for our boss
-    bb.AddNamedVFX(pool: VFX.vfxpool["Tornado"], name: "mytornado");           // Add some named vfx pools to our bank of VFX
+    // bb.AddNamedVFX(pool: VFX.vfxpool["Tornado"], name: "mytornado");           // Add some named vfx pools to our bank of VFX
     bb.CreateTeleportAttack<CustomTeleportBehavior>(                           // Add some attacks
       goneTime: 0.25f, outAnim: "teleport_out", inAnim: "teleport_in", cooldown: 0.26f, attackCooldown: 0.15f, probability: 3f);
     bb.CreateBulletAttack<CeilingBulletsScript>    (fireAnim: "laugh",       cooldown: 0.25f, attackCooldown: 0.15f);

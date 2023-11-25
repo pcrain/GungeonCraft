@@ -18,7 +18,7 @@ public class VoodooDoll : PassiveItem
         item.quality      = ItemQuality.A;
         item.AddToSubShop(ItemBuilder.ShopType.Cursula);
 
-        _VoodooGhostVFX   = VFX.RegisterVFXObject("VoodooGhost", ResMap.Get("voodoo_ghost"),
+        _VoodooGhostVFX   = VFX.RegisterVFXObject("voodoo_ghost",
             fps: 2, loops: true, anchor: Anchor.MiddleCenter, scale: 0.5f);
     }
 

@@ -27,10 +27,9 @@ public class Tranquilizer : AdvancedGunBehavior
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "tranquilizer_projectile", fps: 12, anchor: Anchor.MiddleLeft));
             projectile.gameObject.AddComponent<TranquilizerBehavior>();
 
-        _DrowsyVFX = VFX.RegisterVFXObject("DrowsyParticle", ResMap.Get("drowsy_cloud"),
+        _DrowsyVFX = VFX.RegisterVFXObject("drowsy_cloud",
             fps: 6, loops: true, anchor: Anchor.MiddleCenter, scale: 0.5f);
     }
-
 }
 
 public class TranquilizerBehavior : MonoBehaviour

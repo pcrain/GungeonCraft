@@ -81,11 +81,11 @@ public class TimingGun : AdvancedGunBehavior
         this.curCharge = (this.curCharge+1) % maxCharge;
         if (theCounter != null)
             UnityEngine.Object.Destroy(theCounter);
-        theCounter = Instantiate<GameObject>(
-                        VFX.animations[curCharge.ToString()],
-                        this.Player.specRigidbody.sprite.WorldTopCenter + new Vector2(0f,0.5f),
-                        Quaternion.identity,
-                        this.Player.specRigidbody.transform);
+        // theCounter = Instantiate<GameObject>(
+        //                 VFX.animations[curCharge.ToString()],
+        //                 this.Player.specRigidbody.sprite.WorldTopCenter + new Vector2(0f,0.5f),
+        //                 Quaternion.identity,
+        //                 this.Player.specRigidbody.transform);
         theCounter.transform.localScale = new Vector3(0.2f,0.2f,0.2f);
     }
 }

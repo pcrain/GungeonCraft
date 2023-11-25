@@ -32,9 +32,9 @@ public class WarriorsGi : PassiveItem
         item.quality      = ItemQuality.B;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
-        _SaiyanSpark = VFX.RegisterVFXObject("SaiyanSpark", ResMap.Get("saiyan_spark"),
+        _SaiyanSpark = VFX.RegisterVFXObject("saiyan_spark",
             fps: 12, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f);
-        _ZenkaiAura  = VFX.RegisterVFXObject("ZenkaiAura", ResMap.Get("zenkai_aura"),
+        _ZenkaiAura  = VFX.RegisterVFXObject("zenkai_aura",
             fps: 12, loops: true, anchor: Anchor.LowerCenter, scale: 0.4f, emissivePower: 5f, emissiveColour: Color.yellow);
     }
 

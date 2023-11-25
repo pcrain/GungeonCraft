@@ -29,7 +29,7 @@ public class QuarterPounder : AdvancedGunBehavior
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "coin_gun_projectile", fps: 2, anchor: Anchor.MiddleCenter));
             projectile.gameObject.AddComponent<MidasProjectile>();
 
-        _MidasParticleVFX = VFX.RegisterVFXObject("MidasParticle", ResMap.Get("midas_sparkle"),
+        _MidasParticleVFX = VFX.RegisterVFXObject("midas_sparkle",
             fps: 8, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 5);
     }
 

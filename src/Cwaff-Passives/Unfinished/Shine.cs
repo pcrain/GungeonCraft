@@ -8,7 +8,7 @@ public class Shine : PassiveItem
     public static string LongDescription  = "(Melee)";
     public static string Lore             = "TBD";
 
-    internal static GameObject _ShineVFX;
+    internal static GameObject _ShineVFX = null;
 
     private static StatModifier noSpeed;
 
@@ -29,8 +29,8 @@ public class Shine : PassiveItem
         };
 
         // Can't use resmap because sprite has number in it
-        _ShineVFX = VFX.RegisterVFXObject("Shine", new (){"CwaffingTheGungy/Resources/MiscVFX/shine2"},
-            fps: 1, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 100);
+        // _ShineVFX = VFX.RegisterVFXObject("Shine", new (){"CwaffingTheGungy/Resources/MiscVFX/shine2"},
+        //     fps: 1, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 100);
     }
     private void PostProcessProjectile(Projectile bullet, float thing)
     {

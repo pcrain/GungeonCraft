@@ -39,7 +39,7 @@ public class VacuumCleaner : AdvancedGunBehavior
                 ChargeTime = float.MaxValue, // absurdly high value so we never actually shoot
             }};
 
-        _VacuumVFX = VFX.RegisterVFXObject("VacuumParticle", ResMap.Get("vacuum_wind_sprite_a"),
+        _VacuumVFX = VFX.RegisterVFXObject("vacuum_wind_sprite_a",
             fps: 30, loops: true, loopStart: 6, anchor: Anchor.MiddleCenter, scale: 0.5f);
     }
 

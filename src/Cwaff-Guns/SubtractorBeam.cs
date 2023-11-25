@@ -29,7 +29,7 @@ public class SubtractorBeam : AdvancedGunBehavior
             ResMap.Get("subtractor_beam_mid"), 60, ResMap.Get("subtractor_beam_start"), 60, cascadeTimer: C.FRAME, destroyOnEmpty: true);
         _RedTrailPrefab = VFX.CreateTrailObject(ResMap.Get("subtractor_beam_red_mid")[0], new Vector2(20, 4), new Vector2(0, 0),
             ResMap.Get("subtractor_beam_red_mid"), 60, ResMap.Get("subtractor_beam_red_start"), 60, cascadeTimer: C.FRAME, destroyOnEmpty: true);
-        _HitEffects = VFX.RegisterVFXObject("SubtractorHitEffects", ResMap.Get("subtractor_beam_hit_effect"), 12, loops: true,
+        _HitEffects = VFX.RegisterVFXObject("subtractor_beam_hit_effect", 12, loops: true,
             scale: 0.5f, anchor: Anchor.MiddleCenter, emissivePower: 10f);
 
         gun.DefaultModule.SetAttributes(clipSize: 4, cooldown: 0.25f, angleVariance: 5.0f, shootStyle: ShootStyle.SemiAutomatic);

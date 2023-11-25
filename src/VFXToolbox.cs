@@ -15,6 +15,7 @@ public static class VFX
     private static Dictionary<GameObject,VFXPool> vfxObjectToPoolMap = new();
 
     public static GameObject LaserSightPrefab;
+    public static GameObject MiniPickup;
 
     public static tk2dSpriteCollectionData SpriteCollection
     {
@@ -42,10 +43,8 @@ public static class VFX
             RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/fancy_line");
             RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/whip_segment");
             RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/whip_segment_base");
-            // Shared by Gyroscope and Sans
-            VFX.RegisterVFXObject("Tornado", ResMap.Get("tornado"), 20, loops: true, anchor: Anchor.LowerCenter);
             // Shared by Blackjack and possibly future auto-pickup items
-            VFX.RegisterVFXObject("MiniPickup", ResMap.Get("mini_pickup"), 12, loops: false, anchor: Anchor.MiddleCenter);
+            MiniPickup = VFX.RegisterVFXObject("mini_pickup", 12, loops: false, anchor: Anchor.MiddleCenter);
         #endregion
     }
 
@@ -177,11 +176,11 @@ public static class VFX
     /// <summary>
     /// Register and return a VFXObject
     /// </summary>
-    public static GameObject RegisterVFXObject(string name, List<string> spritePaths, float fps, bool loops = true, int loopStart = -1, float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true)
+    public static GameObject RegisterVFXObject(string name, float fps, bool loops = true, int loopStart = -1, float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true)
     {
         RegisterVFX(
             name           : name,
-            spritePaths    : spritePaths,
+            spritePaths    : ResMap.Get(name),
             fps            : fps,
             loops          : loops,
             loopStart      : loopStart,
@@ -203,11 +202,11 @@ public static class VFX
     /// <summary>
     /// Register and return a VFXPool
     /// </summary>
-    public static VFXPool RegisterVFXPool(string name, List<string> spritePaths, float fps, bool loops = true, int loopStart = -1, float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true)
+    public static VFXPool RegisterVFXPool(string name, float fps, bool loops = true, int loopStart = -1, float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true)
     {
         RegisterVFX(
             name           : name,
-            spritePaths    : spritePaths,
+            spritePaths    : ResMap.Get(name),
             fps            : fps,
             loops          : loops,
             loopStart      : loopStart,
@@ -229,11 +228,11 @@ public static class VFX
     /// <summary>
     /// Register and return a VFXComplex
     /// </summary>
-    public static VFXComplex RegisterVFXComplex(string name, List<string> spritePaths, float fps, bool loops = true, int loopStart = -1, float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true)
+    public static VFXComplex RegisterVFXComplex(string name, float fps, bool loops = true, int loopStart = -1, float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true)
     {
         RegisterVFX(
             name           : name,
-            spritePaths    : spritePaths,
+            spritePaths    : ResMap.Get(name),
             fps            : fps,
             loops          : loops,
             loopStart      : loopStart,

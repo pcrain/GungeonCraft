@@ -17,7 +17,7 @@ public class EchoChamber : PassiveItem
         item.quality       = ItemQuality.C;
 
         _FlakProjectile = (ItemHelper.Get(Items.FlakBullets) as ComplexProjectileModifier).CollisionSpawnProjectile;
-        _EchoPrefab = VFX.RegisterVFXObject("Echo", ResMap.Get("echo_effect"), 16, loops: true, anchor: Anchor.MiddleCenter);
+        _EchoPrefab = VFX.RegisterVFXObject("echo_effect", 16, loops: true, anchor: Anchor.MiddleCenter);
     }
 
     public override void Pickup(PlayerController player)

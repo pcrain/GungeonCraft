@@ -8,6 +8,8 @@ public class Gyroscope : PassiveItem
     public static string LongDescription  = "Grants a chargeable dodge roll that transforms the user into a rampant tornado, reflecting projectiles but effectively randomizing shooting direction. Longer charges result in longer invulnerability periods, but may cause dizziness leaving the user briefly immobile and vulnerable.";
     public static string Lore             = "Watching this simple toy spin for even a few seconds is completely mesmerizing. Its trifold axes of rotation inspire truly revolutionary possibilities for avoiding projectiles.";
 
+    internal static GameObject _TornadoVFX;
+
     private PlayerController _owner = null;
     private GyroscopeRoll _dodgeRoller = null;
 
@@ -17,6 +19,8 @@ public class Gyroscope : PassiveItem
         item.quality      = ItemQuality.A;
 
         var comp = item.gameObject.AddComponent<GyroscopeRoll>();
+
+        _TornadoVFX = VFX.RegisterVFXObject("tornado", 20, loops: true, anchor: Anchor.LowerCenter);
     }
 
     private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherCollider)
@@ -182,7 +186,7 @@ public class GyroscopeRoll : CustomDodgeRoll
             this.stumbleClip = null;
 
             this.tornadoVFX = Instantiate<GameObject>(
-                VFX.animations["Tornado"], this.owner.specRigidbody.UnitBottomCenter, Quaternion.identity);
+                Gyroscope._TornadoVFX, this.owner.specRigidbody.UnitBottomCenter, Quaternion.identity);
             tk2dSpriteAnimator tornadoAnimator = this.tornadoVFX.GetComponent<tk2dSpriteAnimator>();
                 tornadoAnimator.sprite.transform.parent = this.owner.transform;
                 tornadoAnimator.sprite.transform.position = this.owner.sprite.WorldBottomCenter;

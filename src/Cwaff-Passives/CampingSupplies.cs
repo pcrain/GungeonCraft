@@ -41,22 +41,22 @@ public class CampingSupplies : PassiveItem
         _SmokePrefab     = ResourceCache.Acquire("Global VFX/VFX_Item_Spawn_Poof") as GameObject;
         _BonfirePrefab   = (ItemHelper.Get(Items.GunSoul) as ExtraLifeItem).BonfireSynergyBonfire;
         _CampfirePrefabs = new GameObject[]{
-            VFX.RegisterVFXObject("CampfireA", ResMap.Get("campfire_a"),
+            VFX.RegisterVFXObject("campfire_a",
                 fps: 6, loops: true, anchor: Anchor.LowerCenter, scale: 0.5f, emissivePower: 1f), // level 0 (unused)
-            VFX.RegisterVFXObject("CampfireB", ResMap.Get("campfire_b"),
+            VFX.RegisterVFXObject("campfire_b",
                 fps: 6, loops: true, anchor: Anchor.LowerCenter, scale: 0.5f, emissivePower: 2f), // level 1
-            VFX.RegisterVFXObject("CampfireC", ResMap.Get("campfire_c"),
+            VFX.RegisterVFXObject("campfire_c",
                 fps: 6, loops: true, anchor: Anchor.LowerCenter, scale: 0.5f, emissivePower: 3f), // level 2
-            VFX.RegisterVFXObject("CampfireD", ResMap.Get("campfire_d"),
+            VFX.RegisterVFXObject("campfire_d",
                 fps: 6, loops: true, anchor: Anchor.LowerCenter, scale: 0.5f, emissivePower: 4f), // level 3
         };
 
         _SodaCanPrefabs  = new GameObject[] {
-            VFX.RegisterVFXObject("CanOfCoke", ResMap.Get("can_of_coke"),
+            VFX.RegisterVFXObject("can_of_coke",
                 fps: 2, loops: true, anchor: Anchor.MiddleCenter, scale: 0.5f),
-            VFX.RegisterVFXObject("CanOfPepsi", ResMap.Get("can_of_pepsi"),
+            VFX.RegisterVFXObject("can_of_pepsi",
                 fps: 2, loops: true, anchor: Anchor.MiddleCenter, scale: 0.5f),
-            VFX.RegisterVFXObject("CanOfSprite", ResMap.Get("can_of_sprite"),
+            VFX.RegisterVFXObject("can_of_sprite",
                 fps: 2, loops: true, anchor: Anchor.MiddleCenter, scale: 0.5f),
         };
 

@@ -44,8 +44,7 @@ public class HandCannon : AdvancedGunBehavior
             }
         };
 
-        _SlapppAnimation = VFX.RegisterVFXObject(
-            "Slappp", ResMap.Get("slappp"), fps: 30, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f);
+        _SlapppAnimation = VFX.RegisterVFXObject("slappp", fps: 30, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f);
     }
 }
 

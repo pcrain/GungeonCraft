@@ -37,10 +37,8 @@ public class Alligator : AdvancedGunBehavior
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "alligator_projectile", fps: 2, anchor: Anchor.MiddleCenter));
             projectile.gameObject.AddComponent<AlligatorProjectile>();
 
-        _SparkVFX = VFX.RegisterVFXObject(
-            "SparkVFX", ResMap.Get("spark_vfx"), fps: 16, loops: true, anchor: Anchor.MiddleCenter, scale: 0.35f, emissivePower: 50f);
-        _ClipVFX = VFX.RegisterVFXObject(
-            "AlligatorClipVFX", ResMap.Get("alligator_projectile_clamped"), fps: 2, loops: true, anchor: Anchor.MiddleCenter);
+        _SparkVFX = VFX.RegisterVFXObject("spark_vfx", fps: 16, loops: true, anchor: Anchor.MiddleCenter, scale: 0.35f, emissivePower: 50f);
+        _ClipVFX = VFX.RegisterVFXObject("alligator_projectile_clamped", fps: 2, loops: true, anchor: Anchor.MiddleCenter);
     }
 
     protected override void OnPickedUpByPlayer(PlayerController player)

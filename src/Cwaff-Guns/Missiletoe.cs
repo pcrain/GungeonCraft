@@ -135,14 +135,12 @@ public class Missiletoe : AdvancedGunBehavior
                 spawnC.collisionSpawnStyle          = SpawnProjModifier.CollisionSpawnStyle.FLAK_BURST;
         _GiftProjectileD = SetupProjectile(gun: gun, name: "gift_projectile_brown", damage: 10f, speed: 25f, force: 10f);
 
-        _SparklePrefab = VFX.RegisterVFXObject("MissiletoeSparkles", ResMap.Get("pencil_sparkles"),
-            fps: 8, scale: 0.75f, loops: false, anchor: Anchor.MiddleCenter);
+        _SparklePrefab = VFX.RegisterVFXObject("pencil_sparkles", fps: 8, scale: 0.75f, loops: false, anchor: Anchor.MiddleCenter);
     }
 
     private static GameObject SetupVFX(string name)
     {
-        return VFX.RegisterVFXObject($"VFX_{name}", ResMap.Get(name), _WRAP_FPS,
-            loops: false, anchor: Anchor.LowerCenter, scale: 0.75f, persist: true);
+        return VFX.RegisterVFXObject(name, fps: _WRAP_FPS, loops: false, anchor: Anchor.LowerCenter, scale: 0.75f, persist: true);
     }
 
     private static Projectile SetupProjectile(Gun gun, string name, float damage, float speed, float force)

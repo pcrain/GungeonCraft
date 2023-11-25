@@ -39,7 +39,7 @@ public class KiBlast : AdvancedGunBehavior
             blast.ignoreDamageCaps = true;
             blast.gameObject.AddComponent<KiBlastBehavior>();
             blast.gameObject.AddComponent<ArcTowardsTargetBehavior>();
-            blast.SetAllImpactVFX(VFX.RegisterVFXPool(ItemName+" Impact", ResMap.Get("ki_explosion"), fps: 20, loops: false, scale: 0.5f));
+            blast.SetAllImpactVFX(VFX.RegisterVFXPool("ki_explosion", fps: 20, loops: false, scale: 0.5f));
 
         EasyTrailBullet trail = blast.gameObject.AddComponent<EasyTrailBullet>();
             trail.TrailPos   = trail.transform.position;

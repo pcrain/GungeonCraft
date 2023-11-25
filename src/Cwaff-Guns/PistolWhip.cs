@@ -39,8 +39,7 @@ public class PistolWhip : AdvancedGunBehavior
 
         _PistolButtProjectile = Items.Ak47.CloneProjectile(damage: 30.0f, speed: 1.0f, force: 40.0f, range: 0.01f);
             _PistolButtProjectile.AddDefaultAnimation(AnimatedBullet.Create(name: "natascha_bullet", fps: 12, anchor: Anchor.MiddleCenter)); // Not really visible, just used for pixel collider size
-            _PistolButtProjectile.SetAllImpactVFX(VFX.RegisterVFXPool("WhipParticles", ResMap.Get("whip_particles"),
-                fps: 20, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f));
+            _PistolButtProjectile.SetAllImpactVFX(VFX.RegisterVFXPool("whip_particles", fps: 20, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f));
             _PistolButtProjectile.gameObject.AddComponent<PistolButtProjectile>();
     }
 }

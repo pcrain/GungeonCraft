@@ -54,14 +54,14 @@ public class InsurancePolicy : PlayerItem
         _InsuranceSpriteMarine     = SpriteBuilder.AddSpriteToCollection(ResMap.Get("insurance_policy_marine_icon")[0],     item.sprite.Collection);
         _InsuranceSpriteBullet     = SpriteBuilder.AddSpriteToCollection(ResMap.Get("insurance_policy_bullet_icon")[0],     item.sprite.Collection);
 
-        _InsuranceVFXRobot      = VFX.RegisterVFXObject("InsuranceVFXRobot",      ResMap.Get("insurance_policy_robot_icon"),      fps: 1, loops: true, anchor: Anchor.MiddleCenter);
-        _InsuranceVFXConvict    = VFX.RegisterVFXObject("InsuranceVFXConvict",    ResMap.Get("insurance_policy_convict_icon"),    fps: 1, loops: true, anchor: Anchor.MiddleCenter);
-        _InsuranceVFXPilot      = VFX.RegisterVFXObject("InsuranceVFXPilot",      ResMap.Get("insurance_policy_pilot_icon"),      fps: 1, loops: true, anchor: Anchor.MiddleCenter);
-        _InsuranceVFXParadox    = VFX.RegisterVFXObject("InsuranceVFXParadox",    ResMap.Get("insurance_policy_paradox_icon"),    fps: 1, loops: true, anchor: Anchor.MiddleCenter);
-        _InsuranceVFXGunslinger = VFX.RegisterVFXObject("InsuranceVFXGunslinger", ResMap.Get("insurance_policy_gunslinger_icon"), fps: 1, loops: true, anchor: Anchor.MiddleCenter);
-        _InsuranceVFXHunter     = VFX.RegisterVFXObject("InsuranceVFXHunter",     ResMap.Get("insurance_policy_hunter_icon"),     fps: 1, loops: true, anchor: Anchor.MiddleCenter);
-        _InsuranceVFXMarine     = VFX.RegisterVFXObject("InsuranceVFXMarine",     ResMap.Get("insurance_policy_marine_icon"),     fps: 1, loops: true, anchor: Anchor.MiddleCenter);
-        _InsuranceVFXBullet     = VFX.RegisterVFXObject("InsuranceVFXBullet",     ResMap.Get("insurance_policy_bullet_icon"),     fps: 1, loops: true, anchor: Anchor.MiddleCenter);
+        _InsuranceVFXRobot      = VFX.RegisterVFXObject("insurance_policy_robot_icon",      fps: 1, loops: true, anchor: Anchor.MiddleCenter);
+        _InsuranceVFXConvict    = VFX.RegisterVFXObject("insurance_policy_convict_icon",    fps: 1, loops: true, anchor: Anchor.MiddleCenter);
+        _InsuranceVFXPilot      = VFX.RegisterVFXObject("insurance_policy_pilot_icon",      fps: 1, loops: true, anchor: Anchor.MiddleCenter);
+        _InsuranceVFXParadox    = VFX.RegisterVFXObject("insurance_policy_paradox_icon",    fps: 1, loops: true, anchor: Anchor.MiddleCenter);
+        _InsuranceVFXGunslinger = VFX.RegisterVFXObject("insurance_policy_gunslinger_icon", fps: 1, loops: true, anchor: Anchor.MiddleCenter);
+        _InsuranceVFXHunter     = VFX.RegisterVFXObject("insurance_policy_hunter_icon",     fps: 1, loops: true, anchor: Anchor.MiddleCenter);
+        _InsuranceVFXMarine     = VFX.RegisterVFXObject("insurance_policy_marine_icon",     fps: 1, loops: true, anchor: Anchor.MiddleCenter);
+        _InsuranceVFXBullet     = VFX.RegisterVFXObject("insurance_policy_bullet_icon",     fps: 1, loops: true, anchor: Anchor.MiddleCenter);
 
         _InsuranceChestPrefab = GameManager.Instance.RewardManager.GetTargetChestPrefab(ItemQuality.B).gameObject.ClonePrefab().GetComponent<Chest>();
             _InsuranceChestPrefab.groundHitDelay = 0.10f;
@@ -78,7 +78,7 @@ public class InsurancePolicy : PlayerItem
         _InsuranceFile     = Path.Combine(SaveManager.SavePath,"insurance.csv");
         _InsurancePickupId = item.PickupObjectId;
 
-        _InsuranceParticleVFX = VFX.RegisterVFXObject("InsuranceParticle", ResMap.Get("midas_sparkle"),
+        _InsuranceParticleVFX = VFX.RegisterVFXObject("midas_sparkle",
             fps: 8, loops: false, anchor: Anchor.MiddleCenter, emissivePower: 5);
 
         CwaffEvents.OnFirstFloorFullyLoaded += InsuranceCheck;

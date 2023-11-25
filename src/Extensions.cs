@@ -602,7 +602,7 @@ public static class Extensions
 
   public static void SetMuzzleVFX(this Gun gun, string resPath, float fps = 60, bool loops = false, float scale = 1.0f, Anchor anchor = Anchor.MiddleLeft, bool orphaned = false, float emissivePower = -1)
   {
-    gun.muzzleFlashEffects = VFX.RegisterVFXPool($"{gun.itemName}_MuzzleVFX", ResMap.Get(resPath), fps: fps,
+    gun.muzzleFlashEffects = VFX.RegisterVFXPool(resPath, fps: fps,
       loops: loops, scale: scale, anchor: anchor, alignment: VFXAlignment.Fixed, orphaned: orphaned, attached: true, emissivePower: emissivePower);
   }
 
