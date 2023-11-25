@@ -34,15 +34,10 @@ public class LastResort : AdvancedGunBehavior
         lastResortProjectiles = new List<Projectile>();
         lastResortLevelSprites = new List<string>();
 
-        Projectile projectile       = gun.InitFirstProjectile();
-        projectile.baseData.damage  = 0f;  //dummy value to check when stats need to be recalculated
-        projectile.baseData.speed   = 5.0f;
-        projectile.baseData.range   = 5.0f;
-        projectile.transform.parent = gun.barrelOffset;
+        Projectile projectile       = gun.InitFirstProjectile(damage: 0.0f, speed: 5.0f, range: 5.0f);
 
         // No guns without ammo (base stats)
-        Projectile p0 = projectile.Clone();
-        p0.baseData.damage = 2f;
+        Projectile p0 = projectile.Clone(damage: 2.0f);
         lastResortProjectiles.Add(p0);
 
         // TODO: antiquated VFX registering from my early days, clean this up if I ever come back to this
@@ -58,10 +53,7 @@ public class LastResort : AdvancedGunBehavior
         for(int i = 1; i < 5; ++i)
         {
             Projectile po      = lastResortProjectiles[i-1];
-            Projectile pi      = po.Clone();
-            pi.baseData.damage = po.baseData.damage * 2;
-            pi.baseData.speed  = po.baseData.speed * 2;
-            pi.baseData.range  = po.baseData.range * 2;
+            Projectile pi      = po.Clone(damage: po.baseData.damage * 2, speed: po.baseData.speed * 2, range: po.baseData.range * 2);
             lastResortProjectiles.Add(pi);
             lastResortLevelSprites.Add("PumpChargeMeter"+i);
         }

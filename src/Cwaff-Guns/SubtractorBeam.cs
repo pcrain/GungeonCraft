@@ -34,11 +34,7 @@ public class SubtractorBeam : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 4, cooldown: 0.25f, angleVariance: 5.0f, shootStyle: ShootStyle.SemiAutomatic);
 
-        Projectile beamProj = gun.InitFirstProjectile();
-            beamProj.baseData.speed  = 300f;
-            beamProj.baseData.range  = 300f;
-            beamProj.baseData.damage = 0f;
-            beamProj.baseData.force  = 0f;
+        Projectile beamProj = gun.InitFirstProjectile(damage: 0.0f, speed: 300.0f, force: 0.0f, range: 300.0f);
 
         PierceProjModifier pierce = beamProj.gameObject.GetOrAddComponent<PierceProjModifier>();
             pierce.penetration            = 999;

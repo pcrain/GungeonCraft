@@ -29,11 +29,8 @@ public class HatchlingGun : AdvancedGunBehavior
 
         _BulletSprite = AnimatedBullet.Create(name: "egg", fps: 12, scale: 1.5f, anchor: Anchor.MiddleCenter);
 
-        Projectile projectile = gun.InitFirstProjectile();
+        Projectile projectile = gun.InitFirstProjectile(damage: 3.0f, speed: 24.0f);
             projectile.AddDefaultAnimation(_BulletSprite);
-            projectile.baseData.damage  = 3f;
-            projectile.baseData.speed   = 24.0f;
-            projectile.transform.parent = gun.barrelOffset;
             projectile.gameObject.AddComponent<HatchlingProjectile>();
             projectile.SetAllImpactVFX(VFX.RegisterVFXPool(
                 "EggBreak", ResMap.Get("egg_break"), fps: 16, loops: false, scale: 0.75f, anchor: Anchor.MiddleCenter));

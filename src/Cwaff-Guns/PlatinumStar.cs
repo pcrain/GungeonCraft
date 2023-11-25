@@ -24,22 +24,13 @@ public class PlatinumStar : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 28, cooldown: 0.125f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, customClip: SpriteName);
 
-        Projectile projectile = gun.InitFirstProjectile();
+        Projectile projectile = gun.InitFirstProjectile(damage: 3.0f, speed: 50.0f, force: 1.0f, range: 50.0f);
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "platinum_star_projectile", fps: 12, anchor: Anchor.MiddleLeft));
-            projectile.baseData.damage  = 3f;
-            projectile.baseData.force   = 1f;
-            projectile.baseData.speed   = 50.0f;
-            projectile.baseData.range   = 50.0f;
-            projectile.transform.parent = gun.barrelOffset;
             projectile.gameObject.AddComponent<PlatinumProjectile>();
 
-        _OraBullet = Items.Polaris.CloneProjectile();
+        _OraBullet = Items.Polaris.CloneProjectile(damage: 1.0f, speed: 75.0f, force: 0.1f, range: 3.0f);
             _OraBullet.AddDefaultAnimation(AnimatedBullet.Create(name: "ora_fist_fast", fps: 12, scale: 0.33f, anchor: Anchor.MiddleRight));
             _OraBullet.shouldRotate    = true;
-            _OraBullet.baseData.damage = 1f;
-            _OraBullet.baseData.force  = 0.1f;
-            _OraBullet.baseData.range  = 3f;
-            _OraBullet.baseData.speed  = 75f;
             _OraBullet.gameObject.GetOrAddComponent<PierceProjModifier>().penetration = 999;
     }
 

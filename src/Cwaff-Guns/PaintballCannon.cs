@@ -22,8 +22,7 @@ public class PaintballCannon : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic);
 
-        Projectile projectile = gun.InitFirstProjectile();
-            projectile.baseData.damage = 9f;
+        Projectile projectile = gun.InitFirstProjectile(damage: 9.0f);
 
         PaintballColorizer paintballController = projectile.gameObject.AddComponent<PaintballColorizer>();
             paintballController.ApplyColourToHitEnemies = true;

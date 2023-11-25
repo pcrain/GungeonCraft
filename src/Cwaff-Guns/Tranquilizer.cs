@@ -25,7 +25,6 @@ public class Tranquilizer : AdvancedGunBehavior
 
         Projectile projectile = gun.InitFirstProjectile();
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "tranquilizer_projectile", fps: 12, anchor: Anchor.MiddleLeft));
-            projectile.transform.parent = gun.barrelOffset;
             projectile.gameObject.AddComponent<TranquilizerBehavior>();
 
         _DrowsyVFX = VFX.RegisterVFXObject("DrowsyParticle", ResMap.Get("drowsy_cloud"),

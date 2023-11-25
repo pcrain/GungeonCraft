@@ -35,14 +35,13 @@ public class Grandmaster : AdvancedGunBehavior
         _QueenSprite  = AnimatedBullet.Create(name: "chess_queen",  fps: 12, scale: 0.8f, anchor: Anchor.MiddleCenter);
         _KingSprite   = AnimatedBullet.Create(name: "chess_king",   fps: 12, scale: 0.8f, anchor: Anchor.MiddleCenter);
 
-        Projectile projectile = gun.InitFirstProjectile();
+        Projectile projectile = gun.InitFirstProjectile(speed: 30f);
             projectile.AddDefaultAnimation(_PawnSprite);
             projectile.AddAnimation(_RookSprite);
             projectile.AddAnimation(_BishopSprite);
             projectile.AddAnimation(_KnightSprite);
             projectile.AddAnimation(_QueenSprite);
             projectile.AddAnimation(_KingSprite);
-            projectile.baseData.speed = 30f;
         PlayChessBehavior pop = projectile.gameObject.AddComponent<PlayChessBehavior>();
     }
 }

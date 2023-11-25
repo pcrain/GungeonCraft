@@ -31,13 +31,9 @@ public class Blackjack : AdvancedGunBehavior
         _BulletSprite = AnimatedBullet.Create(name: "playing_card", fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft);
         _BackSprite = AnimatedBullet.Create(name: "playing_card_back", fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft);
 
-        Projectile projectile = gun.InitFirstProjectile();
+        Projectile projectile = gun.InitFirstProjectile(damage: 8f, speed: 18f, range: 999f);
             projectile.AddDefaultAnimation(_BulletSprite);
-            projectile.baseData.damage = 8f;
-            projectile.baseData.range  = 999f; // we implement a custom range-like behavior
-            projectile.baseData.speed  = 18f;
             projectile.gameObject.AddComponent<ThrownCard>();
-            projectile.transform.parent = gun.barrelOffset;
     }
 
     public override Projectile OnPreFireProjectileModifier(Gun gun, Projectile projectile, ProjectileModule mod)

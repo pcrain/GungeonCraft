@@ -35,11 +35,8 @@ public class Bouncer : AdvancedGunBehavior
             name: "energy_bounce", fps: 10, scale: 0.2f, anchor: Anchor.MiddleCenter,
             overrideColliderPixelSizes: colliderSize);
 
-        Projectile projectile = gun.InitFirstProjectile();
+        Projectile projectile = gun.InitFirstProjectile(damage: _ACCELERATION, speed: _ACCELERATION, range: 9999f);
             projectile.AddDefaultAnimation(anim);
-            projectile.baseData.damage = _ACCELERATION;
-            projectile.baseData.speed  = _ACCELERATION;
-            projectile.baseData.range  = 9999f;
             projectile.gameObject.AddComponent<HarmlessUntilBounce>();
 
         // Initialize our explosion data

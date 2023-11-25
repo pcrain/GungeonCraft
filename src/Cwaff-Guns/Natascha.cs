@@ -25,11 +25,8 @@ public class Natascha : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: -1, cooldown: _BaseCooldownTime, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic);
 
-        Projectile projectile = gun.InitFirstProjectile();
+        Projectile projectile = gun.InitFirstProjectile(damage: 3.0f, speed: 20.0f);
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "natascha_bullet", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter));
-            projectile.baseData.damage  = 3f;
-            projectile.baseData.speed   = 20.0f;
-            projectile.transform.parent = gun.barrelOffset;
     }
 
     public override void OnPostFired(PlayerController player, Gun gun)

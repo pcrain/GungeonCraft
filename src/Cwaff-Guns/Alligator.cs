@@ -33,11 +33,8 @@ public class Alligator : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 8, cooldown: 0.4f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic);
 
-        Projectile projectile = gun.InitFirstProjectile();
+        Projectile projectile = gun.InitFirstProjectile(damage: 1.0f, speed: 36.0f);
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "alligator_projectile", fps: 2, anchor: Anchor.MiddleCenter));
-            projectile.baseData.damage  = 1f;
-            projectile.baseData.speed   = 36.0f;
-            projectile.transform.parent = gun.barrelOffset;
             projectile.gameObject.AddComponent<AlligatorProjectile>();
 
         _SparkVFX = VFX.RegisterVFXObject(

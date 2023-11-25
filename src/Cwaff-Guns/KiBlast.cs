@@ -34,10 +34,8 @@ public class KiBlast : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, ammoType: GameUIAmmoType.AmmoType.BEAM);
 
-        Projectile blast = gun.InitFirstProjectile();
+        Projectile blast = gun.InitFirstProjectile(damage: 4.0f, range: 10.0f);
             blast.AddDefaultAnimation(AnimatedBullet.Create(name: "ki_blast", fps: 12, scale: 0.0625f, anchor: Anchor.MiddleCenter));
-            blast.baseData.damage  = 4f;
-            blast.baseData.range   = 10f;
             blast.ignoreDamageCaps = true;
             blast.gameObject.AddComponent<KiBlastBehavior>();
             blast.gameObject.AddComponent<ArcTowardsTargetBehavior>();

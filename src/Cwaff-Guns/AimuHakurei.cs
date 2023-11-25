@@ -43,16 +43,9 @@ public class AimuHakurei : AdvancedGunBehavior
         _GrazeVFX = VFX.RegisterVFXObject("GrazeVFX", ResMap.Get("graze_vfx"),
             fps: 5, loops: true, anchor: Anchor.MiddleCenter, scale: 1.0f, emissivePower: 5f);
 
-        _ProjBase = gun.InitFirstProjectile();
-            _ProjBase.baseData.speed  = 44f;
-            _ProjBase.baseData.damage = 8f;
-            _ProjBase.baseData.range  = 100f;
-            _ProjBase.baseData.force  = 3f;
-            _ProjBase.transform.parent = gun.barrelOffset;
+        _ProjBase = gun.InitFirstProjectile(damage: 8f, speed: 44f, range: 100f, force: 3f);
 
-        Projectile beamProj = Items._38Special.CloneProjectile();
-            beamProj.baseData.speed = 300f;
-            beamProj.baseData.damage = 16f;
+        Projectile beamProj = Items._38Special.CloneProjectile(damage: 16.0f, speed: 300.0f);
             TrailController tc = beamProj.AddTrailToProjectile(ResMap.Get("aimu_beam_mid")[0], new Vector2(25, 39), new Vector2(0, 0),
                 ResMap.Get("aimu_beam_mid"), 60, ResMap.Get("aimu_beam_start"), 60, cascadeTimer: C.FRAME, destroyOnEmpty: true);
                 tc.UsesDispersalParticles = true;

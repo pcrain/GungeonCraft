@@ -29,9 +29,7 @@ public class BBGun : AdvancedGunBehavior
         ProjectileModule mod = gun.DefaultModule.SetAttributes(
             clipSize: 3, cooldown: 0.7f, angleVariance: 10.0f, shootStyle: ShootStyle.Charged, sequenceStyle: ProjectileSequenceStyle.Ordered, customClip: SpriteName);
 
-        Projectile projectile = mod.projectiles[0].ClonePrefab();
-            projectile.baseData.range = 999999f;
-            projectile.baseData.speed = 20f;
+        Projectile projectile = gun.InitFirstProjectile(speed: 20f, range: 999999f);
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "bball", fps: 20, anchor: Anchor.MiddleCenter,
                 anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(2, 2))); // prevent uneven colliders from glitching into walls
             projectile.gameObject.AddComponent<TheBB>();

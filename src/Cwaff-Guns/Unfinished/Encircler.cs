@@ -34,14 +34,8 @@ public class Encircler : AdvancedGunBehavior
         //GUN STATS
         foreach (ProjectileModule mod in gun.Volley.projectiles)
         {
-            Projectile projectile = UnityEngine.Object.Instantiate<Projectile>(mod.projectiles[0]);
-            projectile.gameObject.SetActive(false);
-            FakePrefab.MarkAsFakePrefab(projectile.gameObject);
-            UnityEngine.Object.DontDestroyOnLoad(projectile);
-            projectile.baseData.range             = 15;
-            projectile.baseData.damage            = 12f;
+            Projectile projectile = mod.projectiles[0].Clone(damage: 12.0f, range: 15.0f);
             projectile.hitEffects.alwaysUseMidair = true;
-            projectile.transform.parent           = gun.barrelOffset;
             EncirclerBehavior pop = projectile.gameObject.AddComponent<EncirclerBehavior>();
             pop.angle = iterator*360/numProjectiles;
 

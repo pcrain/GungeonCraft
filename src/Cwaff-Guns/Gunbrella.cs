@@ -55,11 +55,10 @@ public class Gunbrella : AdvancedGunBehavior
         for (int i = 0; i < _BARRAGE_SIZE; i++)
         {
             ProjectileModule pmod = gun.Volley.projectiles[i];
-            Projectile projectile = (i == 0) ? gun.InitFirstProjectile() : gun.CloneProjectile();
+            Projectile projectile = (i == 0) ? gun.InitFirstProjectile(damage: _PROJ_DAMAGE) : gun.CloneProjectile(damage: _PROJ_DAMAGE);
                 projectile.AddDefaultAnimation(projAnimation);
                 projectile.SetAllImpactVFX(_HailParticle);
                 projectile.onDestroyEventName   = "icicle_crash";
-                projectile.baseData.damage      = _PROJ_DAMAGE;
                 projectile.AppliesFreeze        = true;
                 projectile.FreezeApplyChance    = 0.33f;
                 projectile.freezeEffect         = freeze;

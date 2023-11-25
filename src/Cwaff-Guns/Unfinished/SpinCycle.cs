@@ -37,13 +37,9 @@ public class SpinCycle : AdvancedGunBehavior
             gun.InfiniteAmmo                      = true;
             gun.SetAnimationFPS(gun.shootAnimation, 0);
 
-        Projectile ball = gun.InitFirstProjectile();
+        Projectile ball = gun.InitFirstProjectile(damage: 100.0f, speed: 0.0001f, force: 100.0f, range: 9999f);
             ball.BulletScriptSettings.surviveTileCollisions      = true;
             ball.BulletScriptSettings.surviveRigidbodyCollisions = true;
-            ball.baseData.speed          = 0.0001f;
-            ball.baseData.force          = 100f;
-            ball.baseData.damage         = 100f;
-            ball.baseData.range          = 1000000f;
             ball.PenetratesInternalWalls = true;
             ball.pierceMinorBreakables   = true;
         _TheProtoBall = ball;
@@ -52,10 +48,7 @@ public class SpinCycle : AdvancedGunBehavior
             pierce.penetration           = 100000;
             pierce.penetratesBreakables  = true;
 
-        Projectile chain = ball.Clone();
-            chain.baseData.force                                  = 1f;
-            chain.baseData.damage                                 = 1f;
-            chain.baseData.speed                                  = 100f;
+        Projectile chain = ball.Clone(damage: 1.0f, speed: 100.0f, force: 1.0f);
             chain.BulletScriptSettings.surviveTileCollisions      = true;
             chain.BulletScriptSettings.surviveRigidbodyCollisions = true;
             chain.PenetratesInternalWalls                         = true;

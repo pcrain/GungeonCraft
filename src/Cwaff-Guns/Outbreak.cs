@@ -28,13 +28,9 @@ public class Outbreak : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 10, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
 
-        Projectile projectile = gun.InitFirstProjectile();
+        Projectile projectile = gun.InitFirstProjectile(damage: 8.0f, speed: 17.0f, range: 100.0f);
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "outbreak_projectile", fps: 12, anchor: Anchor.MiddleLeft));
-            projectile.transform.parent = gun.barrelOffset;
             projectile.gameObject.AddComponent<InfectionBehavior>();
-            projectile.baseData.speed  = 17f;
-            projectile.baseData.damage = 8f;
-            projectile.baseData.range  = 100f;
         _InfectionProjectile = projectile;
 
         _OutbreakSmokeVFX = VFX.RegisterVFXObject("OutbreakSmoke", ResMap.Get("outbreak_smoke_small"), 2, loops: true, anchor: Anchor.MiddleCenter);

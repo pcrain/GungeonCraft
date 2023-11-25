@@ -39,11 +39,9 @@ public class Deadline : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 8, cooldown: 0.4f, angleVariance: 0.0f, shootStyle: ShootStyle.SemiAutomatic);
 
-        Projectile projectile = gun.InitFirstProjectile();
+        Projectile projectile = gun.InitFirstProjectile(speed: 60.0f, range: 30.0f);
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "deadline_projectile", fps: 2, anchor: Anchor.MiddleLeft));
             projectile.collidesWithEnemies = false;
-            projectile.baseData.speed      = 60.0f;
-            projectile.baseData.range      = 30.0f;
             projectile.gameObject.AddComponent<DeadlineProjectile>();
 
         EasyTrailBullet trail = projectile.gameObject.AddComponent<EasyTrailBullet>();

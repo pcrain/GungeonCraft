@@ -25,10 +25,7 @@ public class QuarterPounder : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 10, angleVariance: 15.0f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
 
-        Projectile projectile = gun.InitFirstProjectile();
-            projectile.baseData.speed   = 44.0f;
-            projectile.baseData.damage  = 20f;
-            projectile.transform.parent = gun.barrelOffset;
+        Projectile projectile = gun.InitFirstProjectile(damage: 20.0f, speed: 44.0f);
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "coin_gun_projectile", fps: 2, anchor: Anchor.MiddleCenter));
             projectile.gameObject.AddComponent<MidasProjectile>();
 

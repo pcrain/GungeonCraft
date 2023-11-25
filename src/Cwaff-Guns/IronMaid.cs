@@ -25,10 +25,7 @@ public class IronMaid : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
 
-        Projectile projectile = gun.InitFirstProjectile();
-            projectile.baseData.damage  = 5f;
-            projectile.baseData.speed   = 40.0f;
-            projectile.transform.parent = gun.barrelOffset;
+        Projectile projectile = gun.InitFirstProjectile(damage: 5.0f, speed: 40.0f);
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "kunai", fps: 12, anchor: Anchor.MiddleCenter));
             projectile.gameObject.AddComponent<RainCheckBullets>();
     }

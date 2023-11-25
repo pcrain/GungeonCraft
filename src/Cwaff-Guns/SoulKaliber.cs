@@ -22,10 +22,7 @@ public class SoulKaliber : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 10, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic);
 
-        Projectile projectile = gun.InitFirstProjectile();
-            projectile.baseData.speed   = 30.0f;
-            projectile.baseData.damage  = 1f;
-            projectile.transform.parent = gun.barrelOffset;
+        Projectile projectile = gun.InitFirstProjectile(damage: 1.0f, speed: 30.0f);
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "soul_kaliber_projectile", fps: 2, scale: 0.33f, anchor: Anchor.MiddleCenter));
             projectile.gameObject.AddComponent<SoulLinkProjectile>();
     }

@@ -40,23 +40,15 @@ public class SeltzerPelter : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 1, cooldown: 0.5f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
 
-        Projectile projectile = gun.InitFirstProjectile();
+        Projectile projectile = gun.InitFirstProjectile(damage: 16.0f, speed: 30.0f, force: 75.0f, range: 999.0f);
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "can_projectile", fps: 1,  anchor: Anchor.MiddleCenter, // 1 FPS minimum, stop animator manually later
                 anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(2, 2))); // prevent uneven colliders from glitching into walls
-            projectile.transform.parent = gun.barrelOffset;
-            projectile.baseData.range   = 999f;
-            projectile.baseData.damage  = 16f;
-            projectile.baseData.speed   = 30f;
-            projectile.baseData.force   = 75f;
             projectile.gameObject.AddComponent<SeltzerProjectile>();
             // projectile.AddTrailToProjectile(ResMap.Get("bubble_stream_mid")[0], new Vector2(8, 8), new Vector2(4, 4),
             //     ResMap.Get("bubble_stream_mid"), 32, ResMap.Get("bubble_stream_start"), 32, cascadeTimer: C.FRAME, destroyOnEmpty: true);
 
-        Projectile beamProjectile = Items.MarineSidearm.CloneProjectile();
-            beamProjectile.baseData.range  = 4f;   // the perfect seltzer stats, do not tweak without testing!
-            beamProjectile.baseData.speed  = 20f;  // the perfect seltzer stats, do not tweak without testing!
-            beamProjectile.baseData.force  = 100f;
-            beamProjectile.baseData.damage = 40f;  // DPS for beams
+        // the perfect seltzer stats, do not tweak without testing! (beam damage == DPS)
+        Projectile beamProjectile = Items.MarineSidearm.CloneProjectile(damage: 40.0f, speed: 20.0f, force: 100.0f, range: 4.0f);
 
         // _BubbleBeam = beamProjectile.SetupBeamSprites(spriteName: "bubble_beam", fps: 8, dims: new Vector2(16, 8));
         _BubbleBeam = beamProjectile.SetupBeamSprites(spriteName: "bubble_stream", fps: 8, dims: new Vector2(8, 8));

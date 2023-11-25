@@ -27,11 +27,8 @@ public class RacketLauncher : AdvancedGunBehavior
 
         ProjectileModule mod = gun.DefaultModule.SetAttributes(ammoCost: 0, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
 
-        Projectile projectile = gun.InitFirstProjectile();
+        Projectile projectile = gun.InitFirstProjectile(damage: 10.0f, speed: 20.0f, range: 300.0f);
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "tennis_ball", fps: 12, scale: 0.6f, anchor: Anchor.MiddleCenter));
-            projectile.baseData.damage         = 10f;
-            projectile.baseData.speed          = 20f;
-            projectile.baseData.range          = 300f;
             projectile.BulletScriptSettings.surviveRigidbodyCollisions = true;
             // projectile.DestroyMode = Projectile.ProjectileDestroyMode.DestroyComponent;  // must be set at creation time
 

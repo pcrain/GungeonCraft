@@ -147,22 +147,14 @@ public class Missiletoe : AdvancedGunBehavior
 
     private static Projectile SetupProjectile(Gun gun, string name, float damage, float speed, float force)
     {
-        Projectile projectile = gun.CloneProjectile();
+        Projectile projectile = gun.CloneProjectile(damage: damage, speed: speed, range: 50.0f, force: force);
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: name, fps: 1, scale: 0.5f, anchor: Anchor.MiddleLeft));
             projectile.transform.parent       = gun.barrelOffset;
             projectile.shouldFlipHorizontally = true;
             projectile.shouldFlipVertically   = false;
             projectile.shouldRotate           = false;
-
-        projectile.baseData.range  = 50f;
-        projectile.baseData.damage = damage;
-        projectile.baseData.speed  = speed;
-        projectile.baseData.force  = force;
-
-        projectile.onDestroyEventName = "gift_impact_sound";
-
-        projectile.gameObject.AddComponent<ChristmasSparkleDoer>();
-
+            projectile.onDestroyEventName = "gift_impact_sound";
+            projectile.gameObject.AddComponent<ChristmasSparkleDoer>();
         return projectile;
     }
 

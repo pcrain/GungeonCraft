@@ -28,7 +28,6 @@
 //             Projectile projectile       = gun.InitFirstProjectile();
 //             projectile.baseData.damage  = 20f;
 //             projectile.baseData.speed   = 30.0f;
-//             projectile.transform.parent = gun.barrelOffset;
 
 //             projectile.gameObject.AddComponent<HeadCannonBullets>();
 //         }

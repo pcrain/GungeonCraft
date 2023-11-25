@@ -23,10 +23,7 @@ public class HolyWaterGun : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: -1, shootStyle: ShootStyle.Beam, ammoType: GameUIAmmoType.AmmoType.BEAM);
 
-        Projectile projectile = gun.InitFirstProjectile();
-            projectile.baseData.speed  = 50f;
-            projectile.baseData.damage = 0f;
-            projectile.baseData.force  = 50f;
+        Projectile projectile = gun.InitFirstProjectile(damage: 0.0f, speed: 50.0f, force: 50.0f);
 
         BasicBeamController beamComp = projectile.SetupBeamSprites(
           spriteName: "holy_water_gun", fps: 20, dims: new Vector2(15, 15), impactDims: new Vector2(7, 7));

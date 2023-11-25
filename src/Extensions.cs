@@ -939,27 +939,35 @@ public static class Extensions
     return (mod.ammoCost == 0 || gun.InfiniteAmmo || gun.LocalInfiniteAmmo /*|| gun.CanGainAmmo*/ || ((proj.Owner as PlayerController)?.InfiniteAmmo?.Value ?? false));
   }
 
-  // Initializes and returns the first projectile from the default module of a gun
-  public static Projectile InitFirstProjectile(this Gun gun)
+  // Clone, modify, and return a specific projectile
+  public static Projectile Clone(this Projectile projectile, float? damage = null, float? speed = null, float? force = null, float? range = null)
   {
-    return gun.DefaultModule.projectiles[0] = gun.DefaultModule.projectiles[0].ClonePrefab();
+      Projectile p = projectile.ClonePrefab();
+        p.baseData.damage = damage ?? p.baseData.damage;
+        p.baseData.speed  = speed  ?? p.baseData.speed;
+        p.baseData.force  = force  ?? p.baseData.force;
+        p.baseData.range  = range  ?? p.baseData.range;
+      return p;
   }
 
-  // Clone and return a projectile from a specific gun (Items version)
-  public static Projectile CloneProjectile(this Items gunItem)
+  // Initializes and returns the first projectile from the default module of a gun
+  public static Projectile InitFirstProjectile(this Gun gun, float? damage = null, float? speed = null, float? force = null, float? range = null)
   {
-      return (ItemHelper.Get(gunItem) as Gun).DefaultModule.projectiles[0].ClonePrefab<Projectile>();
+    Projectile p = gun.DefaultModule.projectiles[0].Clone(damage, speed, force, range);
+    gun.DefaultModule.projectiles[0] = p;
+    p.transform.parent = gun.barrelOffset;
+    return p;
   }
 
   // Clone and return a projectile from a specific gun (Gun version)
-  public static Projectile CloneProjectile(this Gun gun)
+  public static Projectile CloneProjectile(this Gun gun, float? damage = null, float? speed = null, float? force = null, float? range = null)
   {
-      return gun.DefaultModule.projectiles[0].ClonePrefab<Projectile>();
+      return gun.DefaultModule.projectiles[0].Clone(damage, speed, force, range);
   }
 
-  // Clone and return a specific projectile
-  public static Projectile Clone(this Projectile projectile)
+  // Clone and return a projectile from a specific gun (Items version)
+  public static Projectile CloneProjectile(this Items gunItem, float? damage = null, float? speed = null, float? force = null, float? range = null)
   {
-      return projectile.ClonePrefab();
+      return (ItemHelper.Get(gunItem) as Gun).DefaultModule.projectiles[0].Clone(damage, speed, force, range);
   }
 }

@@ -34,11 +34,8 @@ public class Alyx : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 10, shootStyle: ShootStyle.Automatic, customClip: SpriteName);
 
-        Projectile projectile = gun.InitFirstProjectile();
+        Projectile projectile = gun.InitFirstProjectile(damage: 15.0f, speed: 20.0f);
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "alyx_projectile", fps: 16, scale: 0.5625f, anchor: Anchor.MiddleCenter));
-            projectile.baseData.damage   = 15f;
-            projectile.baseData.speed    = 20.0f;
-            projectile.transform.parent  = gun.barrelOffset;
 
             projectile.healthEffect      = ItemHelper.Get(Items.IrradiatedLead).GetComponent<BulletStatusEffectItem>().HealthModifierEffect;
             projectile.AppliesPoison     = true;
