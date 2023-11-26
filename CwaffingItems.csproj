@@ -140,6 +140,7 @@
     <Compile Include="src\Cwaff-Guns\Natascha.cs"/>
     <Compile Include="src\Cwaff-Guns\Ticonderogun.cs"/>
     <Compile Include="src\Cwaff-Guns\SchrodingersGat.cs"/>
+    <Compile Include="src\Cwaff-Guns\KingsLaw.cs"/>
     <Compile Include="src\Cwaff-Guns\BBGun.cs"/>
     <Compile Include="src\Cwaff-Guns\Gunbrella.cs"/>
     <Compile Include="src\Cwaff-Guns\Jugglernaut.cs"/>
@@ -515,6 +516,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_006.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alligator_reload_020.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_4_gun_024.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\kings_law_idle_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\platinum_star_reload_015.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\quarter_pounder_fire_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_2_gun_006.png"/>
@@ -540,10 +542,12 @@
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_2_gun_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\soul_kaliber_fire_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_031.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\kings_law_reload_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\bouncer_reload_012.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_028.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_020.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_023.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\kings_law_reload_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_031.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\lightwing_reload_012.json"/>
@@ -1223,6 +1227,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_036.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_reload_012.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_004.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\kings_law_fire_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\missiletoe_fire_013.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_fire_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alligator_reload_014.png"/>
@@ -1321,6 +1326,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_reload_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_1_gun_011.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\outbreak_fire_003.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\kings_law_idle_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_008.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_017.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_reload_007.json"/>
@@ -1706,6 +1712,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_030.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_016.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\lightwing_fire_001.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\kings_law_fire_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_reload_011.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tennis_rocket_gun_fire_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_fire_002.png"/>
@@ -2437,6 +2444,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\spark_vfx1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren20.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\gunbrella_target_reticle1.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\law_rune_small.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\mini_pickup2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\gunbrella_target_reticle3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren14.png"/>
@@ -2496,6 +2504,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\hail_collision10.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a10.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren2.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\law_rune_large.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\drowsy_cloud6.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\zenkai_aura6.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren11.png"/>
@@ -2579,6 +2588,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\campfire_b2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\spark_vfx6.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\saiyan_spark6.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\law_rune_mini.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\Numbers\8.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\Numbers\3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\Numbers\2.png"/>
@@ -3177,6 +3187,7 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\bball_old_8.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball018.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\slappp9.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\kings_law_projectile.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\ki_blast_red_001.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\platinum_projectile1.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile_old11.png"/>
@@ -3277,6 +3288,7 @@
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\alligator_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\jugglernaut_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\blackjack_idle_001.png"/>
+    <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\kings_law_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\aimu_hakurei_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\paintball_cannon_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\ice_cream_gun_idle_001.png"/>
