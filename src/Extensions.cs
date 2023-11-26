@@ -953,7 +953,7 @@ public static class Extensions
 
   // Clone, modify, and return a specific projectile
   public static Projectile Clone(this Projectile projectile, float? damage = null, float? speed = null, float? force = null, float? range = null, bool? shouldRotate = null,
-    bool collidesWithEnemies = true, bool ignoreDamageCaps = false, bool collidesWithProjectiles= false, bool surviveRigidbodyCollisions = true)
+    bool collidesWithEnemies = true, bool ignoreDamageCaps = false, bool collidesWithProjectiles= false, bool surviveRigidbodyCollisions = true, float bossDamageMult = 1.0f, string destroySound = null)
   {
       Projectile p = projectile.ClonePrefab();
         p.baseData.damage                                 = damage       ?? p.baseData.damage;
@@ -965,14 +965,16 @@ public static class Extensions
         p.ignoreDamageCaps                                = ignoreDamageCaps;
         p.collidesWithProjectiles                         = collidesWithProjectiles;
         p.BulletScriptSettings.surviveRigidbodyCollisions = surviveRigidbodyCollisions;
+        p.BossDamageMultiplier                            = bossDamageMult;
+        p.onDestroyEventName                              = destroySound;
       return p;
   }
 
   // Initializes and returns the first projectile from the default module of a gun
   public static Projectile InitFirstProjectile(this Gun gun, float? damage = null, float? speed = null, float? force = null, float? range = null, bool? shouldRotate = null,
-    bool collidesWithEnemies = true, bool ignoreDamageCaps = false, bool collidesWithProjectiles= false, bool surviveRigidbodyCollisions = true)
+    bool collidesWithEnemies = true, bool ignoreDamageCaps = false, bool collidesWithProjectiles= false, bool surviveRigidbodyCollisions = true, float bossDamageMult = 1.0f, string destroySound = null)
   {
-    Projectile p = gun.DefaultModule.projectiles[0].Clone(damage, speed, force, range, shouldRotate, collidesWithEnemies, ignoreDamageCaps, collidesWithProjectiles, surviveRigidbodyCollisions);
+    Projectile p = gun.DefaultModule.projectiles[0].Clone(damage, speed, force, range, shouldRotate, collidesWithEnemies, ignoreDamageCaps, collidesWithProjectiles, surviveRigidbodyCollisions, bossDamageMult, destroySound);
     gun.DefaultModule.projectiles[0] = p;
     p.transform.parent = gun.barrelOffset;
     return p;
@@ -980,16 +982,16 @@ public static class Extensions
 
   // Clone and return a projectile from a specific gun (Gun version)
   public static Projectile CloneProjectile(this Gun gun, float? damage = null, float? speed = null, float? force = null, float? range = null, bool? shouldRotate = null,
-    bool collidesWithEnemies = true, bool ignoreDamageCaps = false, bool collidesWithProjectiles= false, bool surviveRigidbodyCollisions = true)
+    bool collidesWithEnemies = true, bool ignoreDamageCaps = false, bool collidesWithProjectiles= false, bool surviveRigidbodyCollisions = true, float bossDamageMult = 1.0f, string destroySound = null)
   {
-      return gun.DefaultModule.projectiles[0].Clone(damage, speed, force, range, shouldRotate, collidesWithEnemies, ignoreDamageCaps, collidesWithProjectiles, surviveRigidbodyCollisions);
+      return gun.DefaultModule.projectiles[0].Clone(damage, speed, force, range, shouldRotate, collidesWithEnemies, ignoreDamageCaps, collidesWithProjectiles, surviveRigidbodyCollisions, bossDamageMult, destroySound);
   }
 
   // Clone and return a projectile from a specific gun (Items version)
   public static Projectile CloneProjectile(this Items gunItem, float? damage = null, float? speed = null, float? force = null, float? range = null, bool? shouldRotate = null,
-    bool collidesWithEnemies = true, bool ignoreDamageCaps = false, bool collidesWithProjectiles= false, bool surviveRigidbodyCollisions = true)
+    bool collidesWithEnemies = true, bool ignoreDamageCaps = false, bool collidesWithProjectiles= false, bool surviveRigidbodyCollisions = true, float bossDamageMult = 1.0f, string destroySound = null)
   {
-      return (ItemHelper.Get(gunItem) as Gun).DefaultModule.projectiles[0].Clone(damage, speed, force, range, shouldRotate, collidesWithEnemies, ignoreDamageCaps, collidesWithProjectiles, surviveRigidbodyCollisions);
+      return (ItemHelper.Get(gunItem) as Gun).DefaultModule.projectiles[0].Clone(damage, speed, force, range, shouldRotate, collidesWithEnemies, ignoreDamageCaps, collidesWithProjectiles, surviveRigidbodyCollisions, bossDamageMult, destroySound);
   }
 
   // Add a component to a projectile's GameObject and return the component
@@ -1005,7 +1007,7 @@ public static class Extensions
   }
 
   // Add a component to a projectile's GameObject, perform setup if necessary, and return the projectile
-  public static Projectile AttachComponent<T>(this Projectile projectile, Action<T> predicate = null, bool allowDuplicates = false) where T : MonoBehaviour
+  public static Projectile Attach<T>(this Projectile projectile, Action<T> predicate = null, bool allowDuplicates = false) where T : MonoBehaviour
   {
     T component = allowDuplicates ? projectile.AddComponent<T>() : projectile.GetOrAddComponent<T>();
     if (predicate != null)
@@ -1055,14 +1057,15 @@ public static class Extensions
     bool collidesWithEnemies = true, bool ignoreDamageCaps = false, bool collidesWithProjectiles= false, bool surviveRigidbodyCollisions = true,
     string sprite = null, int fps = 2, Anchor anchor = Anchor.MiddleCenter,
     float scale = 1.0f, bool anchorsChangeColliders = true, bool fixesScales = true, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null,
-    IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null)
+    IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null, float bossDamageMult = 1.0f, string destroySound = null)
   {
     ProjectileModule mod = gun.SetupDefaultModule(
       clipSize: clipSize, cooldown: cooldown, angleVariance: angleVariance, ammoCost: ammoCost, customClip: customClip,
       shootStyle: shootStyle, sequenceStyle: sequenceStyle, ammoType: ammoType);
 
     Projectile proj = gun.InitFirstProjectile(damage: damage, speed: speed, force: force, range: range, collidesWithEnemies: collidesWithEnemies,
-      ignoreDamageCaps: ignoreDamageCaps, collidesWithProjectiles: collidesWithProjectiles, surviveRigidbodyCollisions: surviveRigidbodyCollisions);
+      ignoreDamageCaps: ignoreDamageCaps, collidesWithProjectiles: collidesWithProjectiles, surviveRigidbodyCollisions: surviveRigidbodyCollisions,
+      bossDamageMult: bossDamageMult, destroySound: destroySound);
     if (!string.IsNullOrEmpty(sprite))
       proj.AddDefaultAnimation(AnimatedBullet.Create(
         name: sprite, fps: fps, anchor: anchor, scale: scale, anchorsChangeColliders: anchorsChangeColliders, fixesScales: fixesScales,

@@ -21,7 +21,7 @@ public class PaintballCannon : AdvancedGunBehavior
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
         gun.SetupSingularProjectile(clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic, damage: 9.0f
-          ).AttachComponent<PaintballColorizer>();
+          ).Attach<PaintballColorizer>();
     }
 
     public override void PostProcessProjectile(Projectile projectile)

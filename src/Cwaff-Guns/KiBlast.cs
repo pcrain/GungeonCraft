@@ -36,9 +36,9 @@ public class KiBlast : AdvancedGunBehavior
           ammoType: GameUIAmmoType.AmmoType.BEAM, damage: 4.0f, range: 10.0f, sprite: "ki_blast", fps: 12, scale: 0.0625f,
           anchor: Anchor.MiddleCenter, ignoreDamageCaps: true
           ).SetAllImpactVFX(VFX.RegisterVFXPool("ki_explosion", fps: 20, loops: false, scale: 0.5f)
-          ).AttachComponent<KiBlastBehavior>(
-          ).AttachComponent<ArcTowardsTargetBehavior>(
-          ).AttachComponent<EasyTrailBullet>(trail => {
+          ).Attach<KiBlastBehavior>(
+          ).Attach<ArcTowardsTargetBehavior>(
+          ).Attach<EasyTrailBullet>(trail => {
             trail.TrailPos   = trail.transform.position;
             trail.StartWidth = 0.2f;
             trail.EndWidth   = 0f;

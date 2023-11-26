@@ -22,7 +22,7 @@ public class HolyWaterGun : AdvancedGunBehavior
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
         Projectile projectile = gun.SetupSingularProjectile(clipSize: -1, shootStyle: ShootStyle.Beam, ammoType: GameUIAmmoType.AmmoType.BEAM, damage: 0.0f,
-          speed: 50.0f, force: 50.0f).AttachComponent<ExorcismJuice>();
+          speed: 50.0f, force: 50.0f).Attach<ExorcismJuice>();
 
         BasicBeamController beamComp = projectile.SetupBeamSprites(
           spriteName: "holy_water_gun", fps: 20, dims: new Vector2(15, 15), impactDims: new Vector2(7, 7));

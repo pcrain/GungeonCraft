@@ -31,7 +31,7 @@ public class HandCannon : AdvancedGunBehavior
 
         gun.SetupSingularProjectile(clipSize: 2, cooldown: 0.1f, angleVariance: 15.0f, shootStyle: ShootStyle.Charged,
           customClip: SpriteName, damage: 40.0f, speed: 40.0f, sprite: "slappp", fps: 30, scale: 0.5f, anchor: Anchor.MiddleCenter,
-          overrideColliderPixelSizes: new IntVector2(8,8), chargeTime: _CHARGE_TIME).AttachComponent<SlappProjectile>();
+          overrideColliderPixelSizes: new IntVector2(8,8), chargeTime: _CHARGE_TIME).Attach<SlappProjectile>();
 
         _SlapppAnimation = VFX.RegisterVFXObject("slappp", fps: 30, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f);
     }

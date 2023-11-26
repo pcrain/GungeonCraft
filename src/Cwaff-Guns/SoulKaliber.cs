@@ -21,7 +21,7 @@ public class SoulKaliber : AdvancedGunBehavior
             gun.SetReloadAudio("soul_kaliber_reload");
 
         gun.SetupSingularProjectile(clipSize: 10, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, damage: 1.0f, speed: 30.0f,
-          sprite: "soul_kaliber_projectile", fps: 2, scale: 0.33f, anchor: Anchor.MiddleCenter).AttachComponent<SoulLinkProjectile>();
+          sprite: "soul_kaliber_projectile", fps: 2, scale: 0.33f, anchor: Anchor.MiddleCenter).Attach<SoulLinkProjectile>();
     }
 }
 

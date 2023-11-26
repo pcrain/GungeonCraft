@@ -66,14 +66,14 @@ public class Missiletoe : AdvancedGunBehavior
 
         _OrnamentProjectile = Items._38Special.CloneProjectile(
           ).AddAnimations(ball, gingerbread, mistletoe, sock, star, wreath
-          ).AttachComponent<GlowyChristmasProjectileBehavior>();
+          ).Attach<GlowyChristmasProjectileBehavior>();
         _ExplodingOrnamentProjectile = Items._38Special.CloneProjectile(
           ).AddAnimations(ball, gingerbread, mistletoe, sock, star, wreath
-          ).AttachComponent<GlowyChristmasProjectileBehavior>(glow => glow.Glow(40)
-          ).AttachComponent<ExplosiveModifier>(e => e.explosionData = giftExplosion);
+          ).Attach<GlowyChristmasProjectileBehavior>(glow => glow.Glow(40)
+          ).Attach<ExplosiveModifier>(e => e.explosionData = giftExplosion);
         _GiftProjectileS = SetupProjectile(gun: gun, name: "gift_projectile_black", damage: 30f, speed: 30f, force: 30f
-            ).AttachComponent<ExplosiveModifier>(e => e.explosionData = giftExplosion
-            ).AttachComponent<SpawnProjModifier>(s => {
+            ).Attach<ExplosiveModifier>(e => e.explosionData = giftExplosion
+            ).Attach<SpawnProjModifier>(s => {
               s.spawnProjectilesOnCollision  = true;
               s.numberToSpawnOnCollison      = 9;
               s.startAngle                   = 180;
@@ -81,8 +81,8 @@ public class Missiletoe : AdvancedGunBehavior
               s.collisionSpawnStyle          = SpawnProjModifier.CollisionSpawnStyle.RADIAL;
             });
         _GiftProjectileA = SetupProjectile(gun: gun, name: "gift_projectile_red",   damage: 25f, speed: 30f, force: 25f
-            ).AttachComponent<ExplosiveModifier>(e => e.explosionData = Bouncer._MiniExplosion
-            ).AttachComponent<SpawnProjModifier>(s => {
+            ).Attach<ExplosiveModifier>(e => e.explosionData = Bouncer._MiniExplosion
+            ).Attach<SpawnProjModifier>(s => {
               s.spawnProjectilesOnCollision  = true;
               s.numberToSpawnOnCollison      = 7;
               s.startAngle                   = 180;
@@ -90,7 +90,7 @@ public class Missiletoe : AdvancedGunBehavior
               s.collisionSpawnStyle          = SpawnProjModifier.CollisionSpawnStyle.RADIAL;
             });
         _GiftProjectileB = SetupProjectile(gun: gun, name: "gift_projectile_green", damage: 20f, speed: 25f, force: 20f
-            ).AttachComponent<SpawnProjModifier>(s => {
+            ).Attach<SpawnProjModifier>(s => {
               s.spawnProjectilesOnCollision  = true;
               s.numberToSpawnOnCollison      = 5;
               s.startAngle                   = 180;
@@ -98,7 +98,7 @@ public class Missiletoe : AdvancedGunBehavior
               s.collisionSpawnStyle          = SpawnProjModifier.CollisionSpawnStyle.RADIAL;
             });
         _GiftProjectileC = SetupProjectile(gun: gun, name: "gift_projectile_blue",  damage: 15f, speed: 25f, force: 15f
-            ).AttachComponent<SpawnProjModifier>(s => {
+            ).Attach<SpawnProjModifier>(s => {
               s.spawnProjectilesOnCollision  = true;
               s.numberToSpawnOnCollison      = 2;
               s.startAngle                   = 180;

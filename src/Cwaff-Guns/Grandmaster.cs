@@ -27,7 +27,7 @@ public class Grandmaster : AdvancedGunBehavior
             gun.SetReloadAudio("chess_gun_reload");
 
         gun.SetupSingularProjectile(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName, speed: 30f
-          ).AttachComponent<PlayChessBehavior>(
+          ).Attach<PlayChessBehavior>(
           ).AddAnimations(
             AnimatedBullet.Create(refClip: ref _PawnSprite,   name: "chess_pawn",   scale: 0.8f, anchor: Anchor.MiddleCenter),
             AnimatedBullet.Create(refClip: ref _RookSprite,   name: "chess_rook",   scale: 0.8f, anchor: Anchor.MiddleCenter),

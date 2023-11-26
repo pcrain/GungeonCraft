@@ -34,8 +34,8 @@ public class SubtractorBeam : AdvancedGunBehavior
 
         gun.SetupSingularProjectile(clipSize: 4, cooldown: 0.25f, angleVariance: 5.0f, shootStyle: ShootStyle.SemiAutomatic,
           damage: 0.0f, speed: 300.0f, force: 0.0f, range: 300.0f
-          ).AttachComponent<SubtractorProjectile>(
-          ).AttachComponent<PierceProjModifier>(pierce => {
+          ).Attach<SubtractorProjectile>(
+          ).Attach<PierceProjModifier>(pierce => {
             pierce.penetration            = 999;
             pierce.penetratesBreakables   = true;
           });

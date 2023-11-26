@@ -20,7 +20,6 @@ public class Gunbrella : AdvancedGunBehavior
     private const float _MAX_RETICLE_RANGE = 10f;
     private const float _MAX_ALPHA         = 0.5f;
 
-    internal static VFXPool _HailParticle;
     internal static GameObject _RainReticle;
 
     private GameObject _targetingReticle = null;
@@ -38,42 +37,15 @@ public class Gunbrella : AdvancedGunBehavior
             gun.LoopAnimation(gun.chargeAnimation, 17);
             gun.SetMuzzleVFX("muzzle_gunbrella", fps: 30, scale: 0.5f, anchor: Anchor.MiddleCenter);
 
-        gun.SetupDefaultModule(clipSize: 1, shootStyle: ShootStyle.Charged, customClip: SpriteName);
+        gun.SetupSingularProjectile(clipSize: 1, shootStyle: ShootStyle.Charged, customClip: SpriteName, ammoCost: 0,
+          damage: _PROJ_DAMAGE, sprite: "gunbrella_projectile", fps: 16, anchor: Anchor.MiddleLeft, freeze: 0.33f, chargeTime: _MIN_CHARGE_TIME,
+          destroySound: "icicle_crash", bossDamageMult: 0.6f // bosses are big and this does a lot of damage, so tone it down
+          ).SetAllImpactVFX(VFX.RegisterVFXPool("icicle_crash_particles", fps: 30, loops: false, anchor: Anchor.MiddleCenter, scale: 0.35f)
+          ).Attach<GunbrellaProjectile>();
 
-        for (int i = 1; i < _BARRAGE_SIZE; i++) // start from 1 since we already have a default module
-        {
-            // use ak47 so our sprite doesn't rotate and mess up our transform calculations when launching / falling
-            gun.AddProjectileModuleFrom(ItemHelper.Get(Items.Ak47) as Gun, true, false);
-            gun.DefaultModule.ammoCost = 1;
-        }
-
-        _HailParticle = VFX.RegisterVFXPool("icicle_crash_particles", fps: 30, loops: false, anchor: Anchor.MiddleCenter, scale: 0.35f);
-
-        GameActorFreezeEffect freeze = ItemHelper.Get(Items.FrostBullets).GetComponent<BulletStatusEffectItem>().FreezeModifierEffect;
-        tk2dSpriteAnimationClip projAnimation = AnimatedBullet.Create(name: "gunbrella_projectile", fps: 16, anchor: Anchor.MiddleLeft);
-        for (int i = 0; i < _BARRAGE_SIZE; i++)
-        {
-            ProjectileModule pmod = gun.Volley.projectiles[i];
-            Projectile projectile = (i == 0) ? gun.InitFirstProjectile(damage: _PROJ_DAMAGE) : gun.CloneProjectile(damage: _PROJ_DAMAGE);
-                projectile.AddDefaultAnimation(projAnimation);
-                projectile.SetAllImpactVFX(_HailParticle);
-                projectile.onDestroyEventName   = "icicle_crash";
-                projectile.AppliesFreeze        = true;
-                projectile.FreezeApplyChance    = 0.33f;
-                projectile.freezeEffect         = freeze;
-                projectile.BossDamageMultiplier = 0.6f; // bosses are big and this does a lot of damage, so tone it down
-            GunbrellaProjectile gp = projectile.gameObject.AddComponent<GunbrellaProjectile>();
-
-            pmod.angleVariance = 10f;
-            if (i >= 1)
-                pmod.ammoCost = 0;
-            pmod.shootStyle = ShootStyle.Charged;
-            pmod.sequenceStyle = ProjectileSequenceStyle.Random;
-            pmod.chargeProjectiles = new(){ new(){
-                Projectile = projectile,
-                ChargeTime = _MIN_CHARGE_TIME,
-            }};
-        }
+        for (int i = 1; i < _BARRAGE_SIZE; i++)
+            gun.AddProjectileModuleFrom(gun);
+        gun.DefaultModule.ammoCost = 1; // everything defaults to 0, so make sure the default module costs 1 ammo
 
         _RainReticle = VFX.RegisterVFXObject("gunbrella_target_reticle",
             fps: 12, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 10, emissiveColour: Color.cyan, scale: 0.75f);

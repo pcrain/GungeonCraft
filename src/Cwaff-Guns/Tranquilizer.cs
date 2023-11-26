@@ -22,7 +22,7 @@ public class Tranquilizer : AdvancedGunBehavior
             gun.SetReloadAudio("blowgun_reload_sound");
 
         gun.SetupSingularProjectile(clipSize: 1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName,
-          sprite: "tranquilizer_projectile", fps: 12, anchor: Anchor.MiddleLeft).AttachComponent<TranquilizerBehavior>();
+          sprite: "tranquilizer_projectile", fps: 12, anchor: Anchor.MiddleLeft).Attach<TranquilizerBehavior>();
 
         _DrowsyVFX = VFX.RegisterVFXObject("drowsy_cloud", fps: 6, loops: true, anchor: Anchor.MiddleCenter, scale: 0.5f);
     }
@@ -30,8 +30,7 @@ public class Tranquilizer : AdvancedGunBehavior
 
 public class TranquilizerBehavior : MonoBehaviour
 {
-    private const int _STUN_DELAY = 10;
-    private const int _STUN_TIME  = 3600; // one hour
+    private const int _STUN_TIME = 3600; // one hour
 
     private void Start()
     {

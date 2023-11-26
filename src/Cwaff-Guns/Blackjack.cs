@@ -28,7 +28,7 @@ public class Blackjack : AdvancedGunBehavior
 
         gun.SetupSingularProjectile(clipSize: _CLIP_SIZE, cooldown: 0.16f, angleVariance: 24.0f, shootStyle: ShootStyle.Automatic,
           customClip: SpriteName, damage: 8f, speed: 18f, range: 999f
-          ).AttachComponent<ThrownCard>(
+          ).Attach<ThrownCard>(
           ).AddAnimations(
             AnimatedBullet.Create(refClip: ref _BulletSprite, name: "playing_card", fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft),
             AnimatedBullet.Create(refClip: ref _BackSprite,   name: "playing_card_back", fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft)

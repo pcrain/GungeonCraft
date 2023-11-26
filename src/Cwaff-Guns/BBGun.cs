@@ -32,7 +32,7 @@ public class BBGun : AdvancedGunBehavior
 
         for (int i = 0; i < _CHARGE_LEVELS.Length; i++)
             gun.DefaultModule.chargeProjectiles.Add(new ProjectileModule.ChargeProjectile {
-                Projectile = p.Clone().AttachComponent<TheBB>(bb => bb.chargeLevel = i+1),
+                Projectile = p.Clone().Attach<TheBB>(bb => bb.chargeLevel = i+1),
                 ChargeTime = _CHARGE_LEVELS[i],
             });
     }

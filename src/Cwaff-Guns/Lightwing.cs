@@ -26,7 +26,7 @@ public class Lightwing : AdvancedGunBehavior
 
         gun.SetupSingularProjectile(clipSize: 20, cooldown: 0.28f, shootStyle: ShootStyle.SemiAutomatic, damage: 4.0f,
           speed: 20.0f, collidesWithProjectiles: true // collidesWithProjectiles needs to be set up front because...Unity
-          ).AttachComponent<LightwingProjectile>(
+          ).Attach<LightwingProjectile>(
           ).AddAnimations(
             AnimatedBullet.Create(refClip: ref _NeutralSprite,    name: "lightwing_projectile",          fps: 12, anchor: Anchor.MiddleLeft),
             AnimatedBullet.Create(refClip: ref _HuntingSprite,    name: "lightwing_projectile_hunt",     fps: 12, anchor: Anchor.MiddleLeft),
