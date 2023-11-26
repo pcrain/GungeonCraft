@@ -22,7 +22,7 @@ public class PistolWhip : AdvancedGunBehavior
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
             gun.muzzleFlashEffects = null;
 
-        gun.SetupSingularProjectile(ammoCost: 0, clipSize: -1, cooldown: WhipChainStart.TOTAL_TIME + C.FRAME, shootStyle: ShootStyle.SemiAutomatic,
+        gun.InitProjectile(ammoCost: 0, clipSize: -1, cooldown: WhipChainStart.TOTAL_TIME + C.FRAME, shootStyle: ShootStyle.SemiAutomatic,
           damage: 0.0f, speed: 0.01f, range: 999.0f).Attach<WhipChainStartProjectile>();
 
         _PistolWhipProjectile = Items.Ak47.CloneProjectile(damage: 15.0f, speed: 80.0f, force: 10.0f, range: 80.0f
@@ -37,7 +37,7 @@ public class PistolWhip : AdvancedGunBehavior
 
         _PistolButtProjectile = Items.Ak47.CloneProjectile(damage: 30.0f, speed: 1.0f, force: 40.0f, range: 0.01f
           ).AddAnimations(AnimatedBullet.Create(name: "natascha_bullet", fps: 12, anchor: Anchor.MiddleCenter) // Not really visible, just used for pixel collider size
-          ).SetAllImpactVFX(VFX.RegisterVFXPool("whip_particles", fps: 20, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f)
+          ).SetAllImpactVFX(VFX.CreatePool("whip_particles", fps: 20, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f)
           ).Attach<PistolButtProjectile>();
     }
 }

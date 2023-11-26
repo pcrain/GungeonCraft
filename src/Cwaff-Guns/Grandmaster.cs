@@ -26,8 +26,7 @@ public class Grandmaster : AdvancedGunBehavior
             gun.SetFireAudio("chess_gun_fire");
             gun.SetReloadAudio("chess_gun_reload");
 
-        gun.SetupSingularProjectile(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName, speed: 30f
-          ).Attach<PlayChessBehavior>(
+        gun.InitProjectile(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName, speed: 30f
           ).AddAnimations(
             AnimatedBullet.Create(refClip: ref _PawnSprite,   name: "chess_pawn",   scale: 0.8f, anchor: Anchor.MiddleCenter),
             AnimatedBullet.Create(refClip: ref _RookSprite,   name: "chess_rook",   scale: 0.8f, anchor: Anchor.MiddleCenter),
@@ -35,7 +34,7 @@ public class Grandmaster : AdvancedGunBehavior
             AnimatedBullet.Create(refClip: ref _KnightSprite, name: "chess_knight", scale: 0.8f, anchor: Anchor.MiddleCenter),
             AnimatedBullet.Create(refClip: ref _QueenSprite,  name: "chess_queen",  scale: 0.8f, anchor: Anchor.MiddleCenter),
             AnimatedBullet.Create(refClip: ref _KingSprite,   name: "chess_king",   scale: 0.8f, anchor: Anchor.MiddleCenter)
-          );
+          ).Attach<PlayChessBehavior>();
     }
 }
 

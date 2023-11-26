@@ -118,12 +118,12 @@ public class Missiletoe : AdvancedGunBehavior
         _UnwrapVFXC     = SetupVFX("blue_gift_unwrap");
         _UnwrapVFXD     = SetupVFX("brown_gift_unwrap");
         _WrapAnimLength = _WrapVFXB.GetComponent<tk2dSpriteAnimator>().DefaultClip.BaseClipLength;
-        _SparklePrefab  = VFX.RegisterVFXObject("pencil_sparkles", fps: 8, scale: 0.75f, loops: false, anchor: Anchor.MiddleCenter);
+        _SparklePrefab  = VFX.Create("pencil_sparkles", fps: 8, scale: 0.75f, loops: false, anchor: Anchor.MiddleCenter);
     }
 
     private static GameObject SetupVFX(string name)
     {
-        return VFX.RegisterVFXObject(name, fps: _WRAP_FPS, loops: false, anchor: Anchor.LowerCenter, scale: 0.75f, persist: true);
+        return VFX.Create(name, fps: _WRAP_FPS, loops: false, anchor: Anchor.LowerCenter, scale: 0.75f, persist: true);
     }
 
     private static Projectile SetupProjectile(Gun gun, string name, float damage, float speed, float force)

@@ -31,7 +31,7 @@ public class EmergencySiren : PlayerItem
             },
         };
 
-        _SirenVFX = VFX.RegisterVFXObject("siren", 36,
+        _SirenVFX = VFX.Create("siren", 36,
             loops: true, anchor: Anchor.MiddleCenter, scale: 0.75f, emissivePower: 50f);
     }
 

@@ -38,7 +38,7 @@ public class SeltzerPelter : AdvancedGunBehavior
             }
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
-        gun.SetupSingularProjectile(clipSize: 1, cooldown: 0.5f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName,
+        gun.InitProjectile(clipSize: 1, cooldown: 0.5f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName,
           damage: 16.0f, speed: 30.0f, force: 75.0f, range: 999.0f, sprite: "can_projectile", fps: 1,  anchor: Anchor.MiddleCenter, // 1 FPS minimum, stop animator manually later
           anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(2, 2) // prevent uneven colliders from glitching into walls
           ).Attach<SeltzerProjectile>();

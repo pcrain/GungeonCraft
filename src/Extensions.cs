@@ -607,7 +607,7 @@ public static class Extensions
 
   public static void SetMuzzleVFX(this Gun gun, string resPath, float fps = 60, bool loops = false, float scale = 1.0f, Anchor anchor = Anchor.MiddleLeft, bool orphaned = false, float emissivePower = -1)
   {
-    gun.muzzleFlashEffects = VFX.RegisterVFXPool(resPath, fps: fps,
+    gun.muzzleFlashEffects = VFX.CreatePool(resPath, fps: fps,
       loops: loops, scale: scale, anchor: anchor, alignment: VFXAlignment.Fixed, orphaned: orphaned, attached: true, emissivePower: emissivePower);
   }
 
@@ -1051,7 +1051,7 @@ public static class Extensions
   /// <param name="overrideProjectilesToCopyFrom">[Unknwon]</param>
 
   /// <returns>The fully setup projectile</returns>
-  public static Projectile SetupSingularProjectile(this Gun gun, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
+  public static Projectile InitProjectile(this Gun gun, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
     ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1, GameUIAmmoType.AmmoType? ammoType = null,
     string customClip = null, float? damage = null, float? speed = null, float? force = null, float? range = null, float poison = 0.0f, float fire = 0.0f, float freeze = 0.0f,
     bool collidesWithEnemies = true, bool ignoreDamageCaps = false, bool collidesWithProjectiles= false, bool surviveRigidbodyCollisions = true,

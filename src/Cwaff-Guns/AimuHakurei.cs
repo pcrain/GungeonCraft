@@ -40,7 +40,7 @@ public class AimuHakurei : AdvancedGunBehavior
 
         _BulletSprite = AnimatedBullet.Create(name: "aimu_projectile", fps: 2, scale: 0.625f, anchor: Anchor.MiddleCenter);
 
-        _GrazeVFX = VFX.RegisterVFXObject("graze_vfx", fps: 5, loops: true, anchor: Anchor.MiddleCenter, scale: 1.0f, emissivePower: 5f);
+        _GrazeVFX = VFX.Create("graze_vfx", fps: 5, loops: true, anchor: Anchor.MiddleCenter, scale: 1.0f, emissivePower: 5f);
 
         _ProjBase = gun.InitFirstProjectile(damage: 8f, speed: 44f, range: 100f, force: 3f);
 
@@ -49,7 +49,7 @@ public class AimuHakurei : AdvancedGunBehavior
                 ResMap.Get("aimu_beam_mid"), 60, ResMap.Get("aimu_beam_start"), 60, cascadeTimer: C.FRAME, destroyOnEmpty: true);
                 tc.UsesDispersalParticles = true;
                 tc.DispersalParticleSystemPrefab = (ItemHelper.Get(Items.FlashRay) as Gun).DefaultModule.projectiles[0].GetComponentInChildren<TrailController>().DispersalParticleSystemPrefab;
-            beamProj.SetAllImpactVFX(VFX.RegisterVFXPool("gaster_beam_impact", fps: 20, loops: false, scale: 1.0f, anchor: Anchor.MiddleCenter));
+            beamProj.SetAllImpactVFX(VFX.CreatePool("gaster_beam_impact", fps: 20, loops: false, scale: 1.0f, anchor: Anchor.MiddleCenter));
 
         // set up tiered projectiles
         gun.Volley.projectiles = new(){

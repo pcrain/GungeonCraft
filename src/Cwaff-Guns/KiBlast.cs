@@ -13,7 +13,6 @@ public class KiBlast : AdvancedGunBehavior
     internal static string _FireRightAnim;
 
     private static float _KiReflectRange = 3.0f;
-    private static VFXPool _Vfx  = null;
 
     private Vector2 _currentTarget = Vector2.zero;
 
@@ -32,12 +31,10 @@ public class KiBlast : AdvancedGunBehavior
             gun.SetFireAudio("ki_blast_sound");
             gun.AddToSubShop(ModdedShopType.Boomhildr);
 
-        gun.SetupSingularProjectile(clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
+        gun.InitProjectile(clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
           ammoType: GameUIAmmoType.AmmoType.BEAM, damage: 4.0f, range: 10.0f, sprite: "ki_blast", fps: 12, scale: 0.0625f,
           anchor: Anchor.MiddleCenter, ignoreDamageCaps: true
-          ).SetAllImpactVFX(VFX.RegisterVFXPool("ki_explosion", fps: 20, loops: false, scale: 0.5f)
-          ).Attach<KiBlastBehavior>(
-          ).Attach<ArcTowardsTargetBehavior>(
+          ).SetAllImpactVFX(VFX.CreatePool("ki_explosion", fps: 20, loops: false, scale: 0.5f)
           ).Attach<EasyTrailBullet>(trail => {
             trail.TrailPos   = trail.transform.position;
             trail.StartWidth = 0.2f;
@@ -45,9 +42,9 @@ public class KiBlast : AdvancedGunBehavior
             trail.LifeTime   = 0.1f;
             trail.BaseColor  = Color.cyan;
             trail.EndColor   = Color.cyan;
-          });
-
-        _Vfx = VFX.CreatePoolFromVFXGameObject((ItemHelper.Get(Items.MagicLamp) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
+          }).Attach<ArcTowardsTargetBehavior>(
+          ).Attach<KiBlastBehavior>(
+          );
     }
 
     public override void OnPostFired(PlayerController player, Gun gun)

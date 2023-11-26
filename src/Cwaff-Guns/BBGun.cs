@@ -25,7 +25,7 @@ public class BBGun : AdvancedGunBehavior
             gun.SetFireAudio("Play_WPN_seriouscannon_shot_01");
             gun.SetReloadAudio("Play_ENM_flame_veil_01");
 
-        Projectile p = gun.SetupSingularProjectile(
+        Projectile p = gun.InitProjectile(
           clipSize: 3, cooldown: 0.7f, angleVariance: 10.0f, shootStyle: ShootStyle.Charged, sequenceStyle: ProjectileSequenceStyle.Ordered,
           customClip: SpriteName, speed: 20f, range: 999999f, sprite: "bball", fps: 20, anchor: Anchor.MiddleCenter,
           anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(2, 2)); // prevent uneven colliders from glitching into walls

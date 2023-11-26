@@ -41,22 +41,22 @@ public class CampingSupplies : PassiveItem
         _SmokePrefab     = ResourceCache.Acquire("Global VFX/VFX_Item_Spawn_Poof") as GameObject;
         _BonfirePrefab   = (ItemHelper.Get(Items.GunSoul) as ExtraLifeItem).BonfireSynergyBonfire;
         _CampfirePrefabs = new GameObject[]{
-            VFX.RegisterVFXObject("campfire_a",
+            VFX.Create("campfire_a",
                 fps: 6, loops: true, anchor: Anchor.LowerCenter, scale: 0.5f, emissivePower: 1f), // level 0 (unused)
-            VFX.RegisterVFXObject("campfire_b",
+            VFX.Create("campfire_b",
                 fps: 6, loops: true, anchor: Anchor.LowerCenter, scale: 0.5f, emissivePower: 2f), // level 1
-            VFX.RegisterVFXObject("campfire_c",
+            VFX.Create("campfire_c",
                 fps: 6, loops: true, anchor: Anchor.LowerCenter, scale: 0.5f, emissivePower: 3f), // level 2
-            VFX.RegisterVFXObject("campfire_d",
+            VFX.Create("campfire_d",
                 fps: 6, loops: true, anchor: Anchor.LowerCenter, scale: 0.5f, emissivePower: 4f), // level 3
         };
 
         _SodaCanPrefabs  = new GameObject[] {
-            VFX.RegisterVFXObject("can_of_coke",
+            VFX.Create("can_of_coke",
                 fps: 2, loops: true, anchor: Anchor.MiddleCenter, scale: 0.5f),
-            VFX.RegisterVFXObject("can_of_pepsi",
+            VFX.Create("can_of_pepsi",
                 fps: 2, loops: true, anchor: Anchor.MiddleCenter, scale: 0.5f),
-            VFX.RegisterVFXObject("can_of_sprite",
+            VFX.Create("can_of_sprite",
                 fps: 2, loops: true, anchor: Anchor.MiddleCenter, scale: 0.5f),
         };
 

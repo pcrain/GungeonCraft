@@ -21,7 +21,7 @@ public class HolyWaterGun : AdvancedGunBehavior
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
-        Projectile projectile = gun.SetupSingularProjectile(clipSize: -1, shootStyle: ShootStyle.Beam, ammoType: GameUIAmmoType.AmmoType.BEAM, damage: 0.0f,
+        Projectile projectile = gun.InitProjectile(clipSize: -1, shootStyle: ShootStyle.Beam, ammoType: GameUIAmmoType.AmmoType.BEAM, damage: 0.0f,
           speed: 50.0f, force: 50.0f).Attach<ExorcismJuice>();
 
         BasicBeamController beamComp = projectile.SetupBeamSprites(
@@ -33,7 +33,7 @@ public class HolyWaterGun : AdvancedGunBehavior
             beamComp.muzzleAnimation = beamComp.beamStartAnimation;  //use start animation for muzzle animation, make start animation null
             beamComp.beamStartAnimation = null;
 
-        _ExorcismParticleVFX = VFX.RegisterVFXObject("exorcism_particles", fps: 12, loops: false, anchor: Anchor.MiddleCenter, emissivePower: 2);
+        _ExorcismParticleVFX = VFX.Create("exorcism_particles", fps: 12, loops: false, anchor: Anchor.MiddleCenter, emissivePower: 2);
     }
 
     protected override void OnPickup(GameActor owner)

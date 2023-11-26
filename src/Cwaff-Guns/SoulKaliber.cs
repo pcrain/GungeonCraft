@@ -20,7 +20,7 @@ public class SoulKaliber : AdvancedGunBehavior
             gun.SetFireAudio("soul_kaliber_fire");
             gun.SetReloadAudio("soul_kaliber_reload");
 
-        gun.SetupSingularProjectile(clipSize: 10, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, damage: 1.0f, speed: 30.0f,
+        gun.InitProjectile(clipSize: 10, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, damage: 1.0f, speed: 30.0f,
           sprite: "soul_kaliber_projectile", fps: 2, scale: 0.33f, anchor: Anchor.MiddleCenter).Attach<SoulLinkProjectile>();
     }
 }
@@ -66,9 +66,9 @@ public class SoulLinkStatus : MonoBehaviour
     {
         _SoulLinkHitVFXPool    = VFX.CreatePoolFromVFXGameObject((ItemHelper.Get(Items.MagicLamp) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
         _SoulLinkHitVFX        = _SoulLinkHitVFXPool.effects[0].effects[0].effect.gameObject;
-        _SoulLinkOverheadVFX   = VFX.RegisterVFXObject("soul_link_particle",
+        _SoulLinkOverheadVFX   = VFX.Create("soul_link_particle",
             fps: 16, loops: true, anchor: Anchor.LowerCenter, scale: 0.3f, emissivePower: 100);
-        _SoulLinkSoulVFX       = VFX.RegisterVFXObject("soul_link_soul",
+        _SoulLinkSoulVFX       = VFX.Create("soul_link_soul",
             fps: 5, loops: true, anchor: Anchor.MiddleCenter, scale: 0.3f, emissivePower: 200);
         StandardSoulLinkEffect = new GameActorHealthEffect
         {

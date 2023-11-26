@@ -44,7 +44,7 @@ public static class VFX
             RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/whip_segment");
             RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/whip_segment_base");
             // Shared by Blackjack and possibly future auto-pickup items
-            MiniPickup = VFX.RegisterVFXObject("mini_pickup", 12, loops: false, anchor: Anchor.MiddleCenter);
+            MiniPickup = VFX.Create("mini_pickup", 12, loops: false, anchor: Anchor.MiddleCenter);
         #endregion
     }
 
@@ -176,7 +176,7 @@ public static class VFX
     /// <summary>
     /// Register and return a VFXObject
     /// </summary>
-    public static GameObject RegisterVFXObject(string name, float fps, bool loops = true, int loopStart = -1, float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true)
+    public static GameObject Create(string name, float fps, bool loops = true, int loopStart = -1, float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true)
     {
         RegisterVFX(
             name           : name,
@@ -202,7 +202,7 @@ public static class VFX
     /// <summary>
     /// Register and return a VFXPool
     /// </summary>
-    public static VFXPool RegisterVFXPool(string name, float fps, bool loops = true, int loopStart = -1, float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true)
+    public static VFXPool CreatePool(string name, float fps, bool loops = true, int loopStart = -1, float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true)
     {
         RegisterVFX(
             name           : name,
@@ -228,7 +228,7 @@ public static class VFX
     /// <summary>
     /// Register and return a VFXComplex
     /// </summary>
-    public static VFXComplex RegisterVFXComplex(string name, float fps, bool loops = true, int loopStart = -1, float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true)
+    public static VFXComplex CreateComplex(string name, float fps, bool loops = true, int loopStart = -1, float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true)
     {
         RegisterVFX(
             name           : name,

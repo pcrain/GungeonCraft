@@ -26,12 +26,12 @@ public class Outbreak : AdvancedGunBehavior
             gun.SetReloadAudio("outbreak_reload_sound");
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
 
-        _InfectionProjectile = gun.SetupSingularProjectile(clipSize: 10, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName,
+        _InfectionProjectile = gun.InitProjectile(clipSize: 10, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName,
           damage: 8.0f, speed: 17.0f, range: 100.0f, sprite: "outbreak_projectile", fps: 12, anchor: Anchor.MiddleLeft
           ).Attach<InfectionBehavior>();
 
-        _OutbreakSmokeVFX = VFX.RegisterVFXObject("outbreak_smoke_small", 2, loops: true, anchor: Anchor.MiddleCenter);
-        _OutbreakSmokeLargeVFX = VFX.RegisterVFXObject("outbreak_smoke_large", 2, loops: true, anchor: Anchor.MiddleCenter);
+        _OutbreakSmokeVFX = VFX.Create("outbreak_smoke_small", 2, loops: true, anchor: Anchor.MiddleCenter);
+        _OutbreakSmokeLargeVFX = VFX.Create("outbreak_smoke_large", 2, loops: true, anchor: Anchor.MiddleCenter);
     }
 
     public override void OnPostFired(PlayerController player, Gun gun)

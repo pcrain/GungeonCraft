@@ -20,7 +20,7 @@ public class Gyroscope : PassiveItem
 
         var comp = item.gameObject.AddComponent<GyroscopeRoll>();
 
-        _TornadoVFX = VFX.RegisterVFXObject("tornado", 20, loops: true, anchor: Anchor.LowerCenter);
+        _TornadoVFX = VFX.Create("tornado", 20, loops: true, anchor: Anchor.LowerCenter);
     }
 
     private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherCollider)
