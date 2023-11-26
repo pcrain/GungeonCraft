@@ -53,89 +53,72 @@ public class Missiletoe : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(clipSize: 1, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
 
-        _WrapVFXS   = SetupVFX("black_gift_wrap");
-        _WrapVFXA   = SetupVFX("red_gift_wrap");
-        _WrapVFXB   = SetupVFX("green_gift_wrap");
-        _WrapVFXC   = SetupVFX("blue_gift_wrap");
-        _WrapVFXD   = SetupVFX("brown_gift_wrap");
-
-        _UnwrapVFXS = SetupVFX("black_gift_unwrap");
-        _UnwrapVFXA = SetupVFX("red_gift_unwrap");
-        _UnwrapVFXB = SetupVFX("green_gift_unwrap");
-        _UnwrapVFXC = SetupVFX("blue_gift_unwrap");
-        _UnwrapVFXD = SetupVFX("brown_gift_unwrap");
-
-        _WrapAnimLength = _WrapVFXB.GetComponent<tk2dSpriteAnimator>().DefaultClip.BaseClipLength;
-
         ExplosionData giftExplosion = new ExplosionData();
             giftExplosion.CopyFrom(Bouncer._MiniExplosion);
             giftExplosion.damageRadius      = 0.5f;
-            // Freezing doesn't work???
-            // giftExplosion.isFreezeExplosion = true;
-            // giftExplosion.freezeRadius      = 0.5f;
-            // giftExplosion.freezeEffect      = ItemHelper.Get(Items.FrostBullets).GetComponent<BulletStatusEffectItem>().FreezeModifierEffect;
 
-        tk2dSpriteAnimationClip ballProjectile        = AnimatedBullet.Create(name: "missiletoe_projectile_ball",        fps: 2, anchor: Anchor.MiddleLeft);
-        tk2dSpriteAnimationClip gingerbreadProjectile = AnimatedBullet.Create(name: "missiletoe_projectile_gingerbread", fps: 2, anchor: Anchor.MiddleLeft);
-        tk2dSpriteAnimationClip mistletoeProjectile   = AnimatedBullet.Create(name: "missiletoe_projectile_mistletoe",   fps: 2, anchor: Anchor.MiddleLeft);
-        tk2dSpriteAnimationClip sockProjectile        = AnimatedBullet.Create(name: "missiletoe_projectile_sock",        fps: 2, anchor: Anchor.MiddleLeft);
-        tk2dSpriteAnimationClip starProjectile        = AnimatedBullet.Create(name: "missiletoe_projectile_star",        fps: 2, anchor: Anchor.MiddleLeft);
-        tk2dSpriteAnimationClip wreathProjectile      = AnimatedBullet.Create(name: "missiletoe_projectile_wreath",      fps: 2, anchor: Anchor.MiddleLeft);
+        tk2dSpriteAnimationClip ball        = AnimatedBullet.Create(name: "missiletoe_projectile_ball",        anchor: Anchor.MiddleLeft);
+        tk2dSpriteAnimationClip gingerbread = AnimatedBullet.Create(name: "missiletoe_projectile_gingerbread", anchor: Anchor.MiddleLeft);
+        tk2dSpriteAnimationClip mistletoe   = AnimatedBullet.Create(name: "missiletoe_projectile_mistletoe",   anchor: Anchor.MiddleLeft);
+        tk2dSpriteAnimationClip sock        = AnimatedBullet.Create(name: "missiletoe_projectile_sock",        anchor: Anchor.MiddleLeft);
+        tk2dSpriteAnimationClip star        = AnimatedBullet.Create(name: "missiletoe_projectile_star",        anchor: Anchor.MiddleLeft);
+        tk2dSpriteAnimationClip wreath      = AnimatedBullet.Create(name: "missiletoe_projectile_wreath",      anchor: Anchor.MiddleLeft);
 
-        _OrnamentProjectile = Items._38Special.CloneProjectile();
-            _OrnamentProjectile.AddAnimation(gingerbreadProjectile);
-            _OrnamentProjectile.AddAnimation(mistletoeProjectile);
-            _OrnamentProjectile.AddAnimation(sockProjectile);
-            _OrnamentProjectile.AddAnimation(starProjectile);
-            _OrnamentProjectile.AddAnimation(wreathProjectile);
-            _OrnamentProjectile.AddDefaultAnimation(ballProjectile);
-            _OrnamentProjectile.gameObject.AddComponent<GlowyChristmasProjectileBehavior>();
-
-        _ExplodingOrnamentProjectile = Items._38Special.CloneProjectile();
-            _ExplodingOrnamentProjectile.AddAnimation(gingerbreadProjectile);
-            _ExplodingOrnamentProjectile.AddAnimation(mistletoeProjectile);
-            _ExplodingOrnamentProjectile.AddAnimation(sockProjectile);
-            _ExplodingOrnamentProjectile.AddAnimation(starProjectile);
-            _ExplodingOrnamentProjectile.AddAnimation(wreathProjectile);
-            _ExplodingOrnamentProjectile.AddDefaultAnimation(ballProjectile);
-            _ExplodingOrnamentProjectile.gameObject.AddComponent<ExplosiveModifier>().explosionData = giftExplosion;
-            _ExplodingOrnamentProjectile.gameObject.AddComponent<GlowyChristmasProjectileBehavior>().Glow(40);
-
-        _GiftProjectileS = SetupProjectile(gun: gun, name: "gift_projectile_black", damage: 30f, speed: 30f, force: 30f);
-            ExplosiveModifier explodeS = _GiftProjectileS.gameObject.AddComponent<ExplosiveModifier>();
-                explodeS.explosionData = giftExplosion;
-            SpawnProjModifier spawnS = _GiftProjectileS.gameObject.AddComponent<SpawnProjModifier>();
-                spawnS.spawnProjectilesOnCollision  = true;
-                spawnS.numberToSpawnOnCollison      = 9;
-                spawnS.startAngle                   = 180;
-                spawnS.projectileToSpawnOnCollision = _ExplodingOrnamentProjectile;
-                spawnS.collisionSpawnStyle          = SpawnProjModifier.CollisionSpawnStyle.RADIAL;
-        _GiftProjectileA = SetupProjectile(gun: gun, name: "gift_projectile_red",   damage: 25f, speed: 30f, force: 25f);
-            ExplosiveModifier explodeA = _GiftProjectileA.gameObject.AddComponent<ExplosiveModifier>();
-                explodeA.explosionData = Bouncer._MiniExplosion;
-            SpawnProjModifier spawnA = _GiftProjectileA.gameObject.AddComponent<SpawnProjModifier>();
-                spawnA.spawnProjectilesOnCollision  = true;
-                spawnA.numberToSpawnOnCollison      = 7;
-                spawnA.startAngle                   = 180;
-                spawnA.projectileToSpawnOnCollision = _OrnamentProjectile;
-                spawnA.collisionSpawnStyle          = SpawnProjModifier.CollisionSpawnStyle.RADIAL;
-        _GiftProjectileB = SetupProjectile(gun: gun, name: "gift_projectile_green", damage: 20f, speed: 25f, force: 20f);
-            SpawnProjModifier spawnB = _GiftProjectileB.gameObject.AddComponent<SpawnProjModifier>();
-                spawnB.spawnProjectilesOnCollision  = true;
-                spawnB.numberToSpawnOnCollison      = 5;
-                spawnB.startAngle                   = 180;
-                spawnB.projectileToSpawnOnCollision = _OrnamentProjectile;
-                spawnB.collisionSpawnStyle          = SpawnProjModifier.CollisionSpawnStyle.RADIAL;
-        _GiftProjectileC = SetupProjectile(gun: gun, name: "gift_projectile_blue",  damage: 15f, speed: 25f, force: 15f);
-            SpawnProjModifier spawnC = _GiftProjectileC.gameObject.AddComponent<SpawnProjModifier>();
-                spawnC.spawnProjectilesOnCollision  = true;
-                spawnC.numberToSpawnOnCollison      = 2;
-                spawnC.startAngle                   = 180;
-                spawnC.projectileToSpawnOnCollision = _OrnamentProjectile;
-                spawnC.collisionSpawnStyle          = SpawnProjModifier.CollisionSpawnStyle.FLAK_BURST;
+        _OrnamentProjectile = Items._38Special.CloneProjectile(
+          ).AddAnimations(ball, gingerbread, mistletoe, sock, star, wreath
+          ).AttachComponent<GlowyChristmasProjectileBehavior>();
+        _ExplodingOrnamentProjectile = Items._38Special.CloneProjectile(
+          ).AddAnimations(ball, gingerbread, mistletoe, sock, star, wreath
+          ).AttachComponent<GlowyChristmasProjectileBehavior>(glow => glow.Glow(40)
+          ).AttachComponent<ExplosiveModifier>(e => e.explosionData = giftExplosion);
+        _GiftProjectileS = SetupProjectile(gun: gun, name: "gift_projectile_black", damage: 30f, speed: 30f, force: 30f
+            ).AttachComponent<ExplosiveModifier>(e => e.explosionData = giftExplosion
+            ).AttachComponent<SpawnProjModifier>(s => {
+              s.spawnProjectilesOnCollision  = true;
+              s.numberToSpawnOnCollison      = 9;
+              s.startAngle                   = 180;
+              s.projectileToSpawnOnCollision = _ExplodingOrnamentProjectile;
+              s.collisionSpawnStyle          = SpawnProjModifier.CollisionSpawnStyle.RADIAL;
+            });
+        _GiftProjectileA = SetupProjectile(gun: gun, name: "gift_projectile_red",   damage: 25f, speed: 30f, force: 25f
+            ).AttachComponent<ExplosiveModifier>(e => e.explosionData = Bouncer._MiniExplosion
+            ).AttachComponent<SpawnProjModifier>(s => {
+              s.spawnProjectilesOnCollision  = true;
+              s.numberToSpawnOnCollison      = 7;
+              s.startAngle                   = 180;
+              s.projectileToSpawnOnCollision = _OrnamentProjectile;
+              s.collisionSpawnStyle          = SpawnProjModifier.CollisionSpawnStyle.RADIAL;
+            });
+        _GiftProjectileB = SetupProjectile(gun: gun, name: "gift_projectile_green", damage: 20f, speed: 25f, force: 20f
+            ).AttachComponent<SpawnProjModifier>(s => {
+              s.spawnProjectilesOnCollision  = true;
+              s.numberToSpawnOnCollison      = 5;
+              s.startAngle                   = 180;
+              s.projectileToSpawnOnCollision = _OrnamentProjectile;
+              s.collisionSpawnStyle          = SpawnProjModifier.CollisionSpawnStyle.RADIAL;
+            });
+        _GiftProjectileC = SetupProjectile(gun: gun, name: "gift_projectile_blue",  damage: 15f, speed: 25f, force: 15f
+            ).AttachComponent<SpawnProjModifier>(s => {
+              s.spawnProjectilesOnCollision  = true;
+              s.numberToSpawnOnCollison      = 2;
+              s.startAngle                   = 180;
+              s.projectileToSpawnOnCollision = _OrnamentProjectile;
+              s.collisionSpawnStyle          = SpawnProjModifier.CollisionSpawnStyle.FLAK_BURST;
+            });
         _GiftProjectileD = SetupProjectile(gun: gun, name: "gift_projectile_brown", damage: 10f, speed: 25f, force: 10f);
 
-        _SparklePrefab = VFX.RegisterVFXObject("pencil_sparkles", fps: 8, scale: 0.75f, loops: false, anchor: Anchor.MiddleCenter);
+        _WrapVFXS       = SetupVFX("black_gift_wrap");
+        _WrapVFXA       = SetupVFX("red_gift_wrap");
+        _WrapVFXB       = SetupVFX("green_gift_wrap");
+        _WrapVFXC       = SetupVFX("blue_gift_wrap");
+        _WrapVFXD       = SetupVFX("brown_gift_wrap");
+        _UnwrapVFXS     = SetupVFX("black_gift_unwrap");
+        _UnwrapVFXA     = SetupVFX("red_gift_unwrap");
+        _UnwrapVFXB     = SetupVFX("green_gift_unwrap");
+        _UnwrapVFXC     = SetupVFX("blue_gift_unwrap");
+        _UnwrapVFXD     = SetupVFX("brown_gift_unwrap");
+        _WrapAnimLength = _WrapVFXB.GetComponent<tk2dSpriteAnimator>().DefaultClip.BaseClipLength;
+        _SparklePrefab  = VFX.RegisterVFXObject("pencil_sparkles", fps: 8, scale: 0.75f, loops: false, anchor: Anchor.MiddleCenter);
     }
 
     private static GameObject SetupVFX(string name)
