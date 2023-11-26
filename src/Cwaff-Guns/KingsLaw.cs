@@ -5,7 +5,7 @@ public class KingsLaw : AdvancedGunBehavior
     public static string ItemName         = "King's Law";
     public static string SpriteName       = "kings_law";
     public static string ProjectileName   = "38_special";
-    public static string ShortDescription = "TBD";
+    public static string ShortDescription = "Accept Your Fate";
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
 
@@ -24,7 +24,6 @@ public class KingsLaw : AdvancedGunBehavior
     internal static List<Vector2> _OffsetAnglesAndMags = new(_NUM_BULLETS);
     internal static GameObject _RuneLarge;
     internal static GameObject _RuneSmall;
-    internal static GameObject _RuneMini;
 
     private int _nextIndex = 0;
     private float _chargeTime = 0.0f;
@@ -32,7 +31,7 @@ public class KingsLaw : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<KingsLaw>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.CHARGE, reloadTime: 0.75f, ammo: 400);
+            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARGE, reloadTime: 0.75f, ammo: 700);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
             gun.SetAnimationFPS(gun.reloadAnimation, 24);
             gun.SetMuzzleVFX("muzzle_iron_maid", fps: 30, scale: 0.5f, anchor: Anchor.MiddleLeft);
@@ -44,9 +43,10 @@ public class KingsLaw : AdvancedGunBehavior
           shouldRotate: true/*, collidesWithTilemap: false*/);  // collidesWithTilemap doesn't actually work
 
         _KingsLawBullet = Items.Ak47.CloneProjectile(damage: 5.0f, speed: 40.0f, range: 30.0f
-          ).AddAnimations(AnimatedBullet.Create(name: "kunai"/*"kings_law_projectile"*/, fps: 12, anchor: Anchor.MiddleCenter)
+          ).AddAnimations(AnimatedBullet.Create(name: "kings_law_projectile", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter)
           ).Attach<KingsLawBullets>();
 
+        // Stagger projectile spawns alternating left and right from the starting angle
         int i = 0;
         for (float mag = _MIN_MAG; i++ < _LINE_SIZE; mag += _DLT_MAG)
         {
@@ -61,7 +61,6 @@ public class KingsLaw : AdvancedGunBehavior
 
         _RuneLarge = VFX.Create("law_rune_large", fps: 2);
         _RuneSmall = VFX.Create("law_rune_small", fps: 2);
-        _RuneMini  = VFX.Create("law_rune_mini",  fps: 2);
     }
 
     public override void OnReload(PlayerController player, Gun gun)
@@ -126,8 +125,11 @@ public class KingsLaw : AdvancedGunBehavior
     private void SpawnNextProjectile()
     {
         int index = GetNextIndex();
-        if (index >= _NUM_BULLETS)
+        if (index >= _NUM_BULLETS || (this.gun.CurrentAmmo < 1 && !this.gun.InfiniteAmmo))
             return;
+
+        if (!this.gun.InfiniteAmmo)
+            this.gun.LoseAmmo(1);
 
         PlayerController player = this.Owner as PlayerController;
         VolleyUtility.ShootSingleProjectile(_KingsLawBullet, player.sprite.WorldCenter, player.m_currentGunAngle, false, player
@@ -175,7 +177,6 @@ public class KingsLawBullets : MonoBehaviour
             AkSoundEngine.PostEvent("knife_gun_hit", this._projectile.gameObject);
         };
 
-        // AkSoundEngine.PostEvent("kings_law_create_sound", base.gameObject);
         AkSoundEngine.PostEvent("snd_undynedis", base.gameObject);
 
         StartCoroutine(TheLaw());
@@ -230,7 +231,6 @@ public class KingsLawBullets : MonoBehaviour
             this._runeSmall.transform.localRotation = (-_RUNE_ROT_SLOW * BraveTime.ScaledTimeSinceStartup).EulerZ();
             yield return null;
         }
-        // float ownerPositionAtLaunch = this._owner.CenterPosition;
 
         // Phase 3 / 5 -- the glow
         float targetAngle                = this._owner.m_currentGunAngle;
