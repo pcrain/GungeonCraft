@@ -596,6 +596,11 @@ public static class Extensions
   {
     gun.SetGunAudio(name: gun.reloadAnimation, audio: audio, frame: frame);
   }
+  public static void SetReloadAudio(this Gun gun, string audio = "", params int[] frames)
+  {
+    foreach (int frame in frames)
+      gun.SetGunAudio(name: gun.reloadAnimation, audio: audio, frame: frame);
+  }
   public static void SetChargeAudio(this Gun gun, string audio = "", int frame = 0)
   {
     gun.SetGunAudio(name: gun.chargeAnimation, audio: audio, frame: frame);
@@ -607,8 +612,11 @@ public static class Extensions
 
   public static void SetMuzzleVFX(this Gun gun, string resPath, float fps = 60, bool loops = false, float scale = 1.0f, Anchor anchor = Anchor.MiddleLeft, bool orphaned = false, float emissivePower = -1)
   {
-    gun.muzzleFlashEffects = VFX.CreatePool(resPath, fps: fps,
-      loops: loops, scale: scale, anchor: anchor, alignment: VFXAlignment.Fixed, orphaned: orphaned, attached: true, emissivePower: emissivePower);
+    if (string.IsNullOrEmpty(resPath))
+      gun.muzzleFlashEffects = null; //.type = VFXPoolType.None;
+    else
+      gun.muzzleFlashEffects = VFX.CreatePool(resPath, fps: fps,
+        loops: loops, scale: scale, anchor: anchor, alignment: VFXAlignment.Fixed, orphaned: orphaned, attached: true, emissivePower: emissivePower);
   }
 
   public static void SetMuzzleVFX(this Gun gun, Items gunToCopyFrom, bool onlyCopyBasicEffects = true)
@@ -718,7 +726,7 @@ public static class Extensions
 
   // Set some basic attributes for each gun
   public static void SetAttributes(this Gun gun, ItemQuality quality, GunClass gunClass, float reloadTime, int ammo,
-    Items audioFrom = Items.Blasphemy, bool defaultAudio = false, bool infiniteAmmo = false, bool canGainAmmo = true, bool canReloadNoMatterAmmo = false)
+    Items audioFrom = Items.Blasphemy, bool defaultAudio = false, bool infiniteAmmo = false, bool canGainAmmo = true, bool canReloadNoMatterAmmo = false, bool? doesScreenShake = null)
   {
     gun.quality = quality;
     gun.reloadTime = reloadTime;
@@ -730,6 +738,8 @@ public static class Extensions
     gun.InfiniteAmmo = infiniteAmmo;
     gun.CanGainAmmo = canGainAmmo;
     gun.CanReloadNoMatterAmmo = canReloadNoMatterAmmo;
+
+    gun.doesScreenShake = doesScreenShake ?? gun.doesScreenShake;
 
     if (!defaultAudio)
       gun.ClearDefaultAudio();
@@ -1056,6 +1066,7 @@ public static class Extensions
   /// <param name="bossDamageMult"></param>
   /// <param name="destroySound"></param>
   /// <param name="shouldRotate"></param>
+  /// <param name="barrageSize"></param>
 
   /// <returns>The fully setup projectile</returns>
   public static Projectile InitProjectile(this Gun gun, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
@@ -1064,7 +1075,7 @@ public static class Extensions
     bool collidesWithEnemies = true, bool ignoreDamageCaps = false, bool collidesWithProjectiles= false, bool surviveRigidbodyCollisions = false, bool collidesWithTilemap = true,
     string sprite = null, int fps = 2, Anchor anchor = Anchor.MiddleCenter,
     float scale = 1.0f, bool anchorsChangeColliders = true, bool fixesScales = true, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null,
-    IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null, float bossDamageMult = 1.0f, string destroySound = null, bool? shouldRotate = null)
+    IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null, float bossDamageMult = 1.0f, string destroySound = null, bool? shouldRotate = null, int barrageSize = 1)
   {
     ProjectileModule mod = gun.SetupDefaultModule(
       clipSize: clipSize, cooldown: cooldown, angleVariance: angleVariance, ammoCost: ammoCost, customClip: customClip,
@@ -1105,6 +1116,9 @@ public static class Extensions
     proj.AppliesFreeze   = freeze > 0.0f;
     if (proj.AppliesFreeze)
       proj.freezeEffect = ItemHelper.Get(Items.FrostBullets).GetComponent<BulletStatusEffectItem>().FreezeModifierEffect;
+
+    for (int i = 1; i < barrageSize; ++i)
+      gun.RawSourceVolley.projectiles.Add(ProjectileModule.CreateClone(mod, inheritGuid: false, sourceIndex: i));
 
     return proj;
   }

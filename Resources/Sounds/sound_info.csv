@@ -96,3 +96,5 @@ lightwing_hunt_sound,5.0,1,sound
 lightwing_reload_sound,1.0,1,sound
 lightwing_impact_sound,-1.5,1,sound
 lightwing_fire_sound,-2.5,1,sound
+pincushion_reload_sound,-7.0,1,sound
+pincushion_reload_start_sound,-4.0,1,sound

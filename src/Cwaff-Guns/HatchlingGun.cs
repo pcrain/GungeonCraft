@@ -19,9 +19,7 @@ public class HatchlingGun : AdvancedGunBehavior
             gun.SetAnimationFPS(gun.shootAnimation, 40);
             gun.SetAnimationFPS(gun.reloadAnimation, 20);
             gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
-            gun.SetReloadAudio("hatchling_gun_bounce_sound", frame: 0);
-            gun.SetReloadAudio("hatchling_gun_bounce_sound", frame: 6);
-            gun.SetReloadAudio("hatchling_gun_bounce_sound", frame: 14);
+            gun.SetReloadAudio("hatchling_gun_bounce_sound", 0, 6, 14);
 
         gun.InitProjectile(clipSize: 12, cooldown: 0.2f, angleVariance: 15.0f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName,
           damage: 3.0f, speed: 24.0f, sprite: "egg", fps: 12, scale: 1.5f, anchor: Anchor.MiddleCenter
