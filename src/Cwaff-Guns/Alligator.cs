@@ -32,6 +32,16 @@ public class Alligator : AdvancedGunBehavior
           damage: 1.0f, speed: 36.0f, sprite: "alligator_projectile", fps: 2, anchor: Anchor.MiddleCenter
           ).Attach<AlligatorProjectile>();
 
+        // gun.spriteAnimator.defaultClipId = gun.spriteAnimator.GetClipIdByName(gun.UpdateAnimation("idle_trimmed", returnToIdle: true));
+
+        gun.idleAnimation = gun.UpdateAnimation("idle_trimmed", returnToIdle: true);
+        gun.spriteAnimator.defaultClipId = gun.spriteAnimator.GetClipIdByName(gun.idleAnimation);
+
+        // PickupObjectDatabase.Instance.InternalGetById(gun.PickupObjectId).sprite.spriteId
+        //     = gun.spriteAnimator.GetClipByName(gun.idleAnimation).frames[0].spriteId;
+
+        // foreach (tk2dSpriteDefinition.AttachPoint a in gun.AttachPointsForClip(trimmedIdleAnimName).EmptyIfNull())
+
         _ShootBarrelOffsets  = gun.GetBarrelOffsetsForAnimation(gun.shootAnimation);
         _ReloadBarrelOffsets = gun.GetBarrelOffsetsForAnimation(gun.reloadAnimation);
         _SparkVFX            = VFX.Create("spark_vfx", fps: 16, loops: true, anchor: Anchor.MiddleCenter, scale: 0.35f, emissivePower: 50f);

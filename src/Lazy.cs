@@ -96,6 +96,20 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
     }
 
     /// <summary>
+    /// Get attach points for an animation clip
+    /// </summary>
+    public static tk2dSpriteDefinition.AttachPoint[] AttachPointsForClip(this Gun gun, string clipName)
+    {
+        _GunSpriteCollection ??= gun.sprite.collection; // need to initialize at least once
+        tk2dSpriteAnimationClip clip = gun.GetComponent<tk2dSpriteAnimator>().GetClipByName(clipName);
+        if (clip == null)
+            return null;
+        int spriteid = clip.frames[0].spriteId;
+        int attachIndex = _GunSpriteCollection.SpriteIDsWithAttachPoints.IndexOf(spriteid);
+        return _GunSpriteCollection.SpriteDefinedAttachPoints[attachIndex].attachPoints;
+    }
+
+    /// <summary>
     /// Perform basic initialization for a new gun definition.
     /// </summary>
     public static Gun SetupGun<T>(string gunName, string spritePath, string projectileName, string shortDescription, string longDescription, string lore, bool hideFromAmmonomicon = false)
@@ -103,15 +117,49 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
     {
         Gun gun = SetupItem<Gun, Gun>(gunName, spritePath, projectileName, shortDescription, longDescription, lore, hideFromAmmonomicon: hideFromAmmonomicon);
         gun.gameObject.AddComponent<T>();
+        _GunSpriteCollection ??= gun.sprite.collection; // need to initialize at least once
 
+        // tk2dSpriteDefinition.AttachPoint idleAttachPoint = null;
         #region Auto-setup barrelOffset from Casing attach point
-            _GunSpriteCollection ??= gun.sprite.collection; // need to initialize at least once
-            int spriteid = gun.GetComponent<tk2dSpriteAnimator>().GetClipByName(gun.idleAnimation).frames[0].spriteId;
-            int attachIndex = _GunSpriteCollection.SpriteIDsWithAttachPoints.IndexOf(spriteid);
-            foreach (tk2dSpriteDefinition.AttachPoint a in _GunSpriteCollection.SpriteDefinedAttachPoints[attachIndex].attachPoints)
+            foreach (tk2dSpriteDefinition.AttachPoint a in gun.AttachPointsForClip(gun.idleAnimation).EmptyIfNull())
+            {
                 if (a.name == "Casing")
                     gun.barrelOffset.transform.localPosition = a.position;
+                // else if (a.name == "PrimaryHand")
+                //     idleAttachPoint = a;
+            }
         #endregion
+
+        // #region Auto-adjust idle animations
+        //     string trimmedIdleAnimName = gun.UpdateAnimation("idle_trimmed", returnToIdle: true);
+        //     tk2dSpriteAnimationClip trimmedIdleAnim = gun.GetComponent<tk2dSpriteAnimator>().GetClipByName(trimmedIdleAnimName);
+        //     if (idleAttachPoint != null && trimmedIdleAnim != null)
+        //     {
+        //         Vector3 attachAdjustment = Vector3.zero;
+        //         foreach (tk2dSpriteDefinition.AttachPoint a in gun.AttachPointsForClip(trimmedIdleAnimName).EmptyIfNull())
+        //             if (a.name == "PrimaryHand")
+        //             {
+        //                 ETGModConsole.Log($"  found offset {a.position} vs {idleAttachPoint.position}");
+        //                 // a.position = idleOffest;
+        //                 // a.position = new Vector3(0.0f, 0.0f, 0.0f);
+        //                 attachAdjustment = a.position - idleAttachPoint.position;
+        //                 // idleAttachPoint.position += attachAdjustment;
+        //                 break;
+        //             }
+        //         if (attachAdjustment != Vector3.zero)
+        //         {
+        //             foreach (string anim in new List<String>{gun.idleAnimation, gun.reloadAnimation, gun.shootAnimation})
+        //             {
+        //                 foreach (tk2dSpriteDefinition.AttachPoint a in gun.AttachPointsForClip(anim).EmptyIfNull())
+        //                 {
+        //                     ETGModConsole.Log($"adjusting {a.position} by {attachAdjustment}");
+        //                     a.position += attachAdjustment;
+        //                 }
+        //                 gun.UpdateAnimation(anim);
+        //             }
+        //         }
+        //     }
+        // #endregion
 
         #region Auto-play idle animation
             gun.spriteAnimator.DefaultClipId = gun.spriteAnimator.GetClipIdByName(gun.idleAnimation);

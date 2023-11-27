@@ -1099,6 +1099,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_idle_old_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_fire_006.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_1_gun_024.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\alligator_idle_trimmed_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\missiletoe_fire_008.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\vacuum_cleaner_charge_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_022.json"/>
@@ -1571,6 +1572,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_029.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\platinum_star_fire_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\soul_kaliber_reload_005.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\alligator_idle_trimmed_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_014.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_fire_013.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_5_gun_023.json"/>
