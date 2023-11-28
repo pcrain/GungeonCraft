@@ -16,13 +16,16 @@ public class Alligator : AdvancedGunBehavior
     internal static List<Vector3> _ShootBarrelOffsets  = new();
     internal static List<Vector3> _ReloadBarrelOffsets = new();
 
+    private static string _OriginalIdleAnimation;
+    private static string _TrimmedIdleAnimation;
+
     private DamageTypeModifier _electricImmunity = null;
 
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Alligator>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.CHARGE, reloadTime: 2.0f, ammo: 300);
-            gun.SetAnimationFPS(gun.shootAnimation, 16);
+            gun.SetAnimationFPS(gun.shootAnimation, 20);
             gun.SetAnimationFPS(gun.reloadAnimation, 16);
             gun.SetMuzzleVFX("muzzle_alligator", fps: 60, scale: 0.5f, anchor: Anchor.MiddleCenter, emissivePower: 50f);
             gun.SetFireAudio("alligator_shoot_sound");
@@ -32,20 +35,96 @@ public class Alligator : AdvancedGunBehavior
           damage: 1.0f, speed: 36.0f, sprite: "alligator_projectile", fps: 2, anchor: Anchor.MiddleCenter
           ).Attach<AlligatorProjectile>();
 
-        // gun.spriteAnimator.defaultClipId = gun.spriteAnimator.GetClipIdByName(gun.UpdateAnimation("idle_trimmed", returnToIdle: true));
-
-        gun.idleAnimation = gun.UpdateAnimation("idle_trimmed", returnToIdle: true);
+        _OriginalIdleAnimation           = gun.idleAnimation;
+        _TrimmedIdleAnimation            = gun.UpdateAnimation("idle_trimmed", returnToIdle: true);
+        gun.idleAnimation                = _TrimmedIdleAnimation;
         gun.spriteAnimator.defaultClipId = gun.spriteAnimator.GetClipIdByName(gun.idleAnimation);
-
-        // PickupObjectDatabase.Instance.InternalGetById(gun.PickupObjectId).sprite.spriteId
-        //     = gun.spriteAnimator.GetClipByName(gun.idleAnimation).frames[0].spriteId;
-
-        // foreach (tk2dSpriteDefinition.AttachPoint a in gun.AttachPointsForClip(trimmedIdleAnimName).EmptyIfNull())
 
         _ShootBarrelOffsets  = gun.GetBarrelOffsetsForAnimation(gun.shootAnimation);
         _ReloadBarrelOffsets = gun.GetBarrelOffsetsForAnimation(gun.reloadAnimation);
         _SparkVFX            = VFX.Create("spark_vfx", fps: 16, loops: true, anchor: Anchor.MiddleCenter, scale: 0.35f, emissivePower: 50f);
         _ClipVFX             = VFX.Create("alligator_projectile_clamped", fps: 2, loops: true, anchor: Anchor.MiddleCenter);
+
+        new Hook(
+            typeof(GunInventory).GetMethod("CreateGunForAdd", BindingFlags.Instance | BindingFlags.Public),
+            typeof(Alligator).GetMethod("OnCreateGunForAdd", BindingFlags.Static | BindingFlags.NonPublic)
+            );
+
+        new Hook(
+            typeof(PlayerController).GetMethod("HandleGunEquipInternal", BindingFlags.Instance | BindingFlags.NonPublic),
+            typeof(Alligator).GetMethod("OnHandleGunEquipInternal", BindingFlags.Static | BindingFlags.NonPublic)
+            );
+
+         new Hook(
+            typeof(Gun).GetMethod("Pickup", BindingFlags.Instance | BindingFlags.Public),
+            typeof(Alligator).GetMethod("OnPickupHookRoutine", BindingFlags.Static | BindingFlags.NonPublic)
+            );
+
+        // private void HandleGunEquipInternal(Gun current, PlayerHandController hand)
+    }
+
+    internal static void OnPickupHookRoutine(Action<Gun, PlayerController> orig, Gun gun, PlayerController player)
+    {
+        ETGModConsole.Log($"  current sprite id {gun.sprite.spriteId} = OnPickupHookRoutine before");
+        gun.sprite.renderer.enabled = false;
+        gun.sprite.enabled = false;
+        gun.spriteAnimator.enabled = false;
+        gun.idleAnimation = _OriginalIdleAnimation;
+        gun.sprite.SetSprite(gun.spriteAnimator.GetClipByName(gun.idleAnimation).frames[0].spriteId);
+        gun.spriteAnimator.sprite.SetSprite(gun.spriteAnimator.GetClipByName(gun.idleAnimation).frames[0].spriteId);
+        gun.sprite.ForceUpdateMaterial();
+        gun.spriteAnimator.deferNextStartClip = false;
+        gun.spriteAnimator.Play(_OriginalIdleAnimation);
+        orig(gun, player);
+        ETGModConsole.Log($"  current sprite id {gun.sprite.spriteId} = OnPickupHookRoutine after");
+
+        // gun.sprite.SetSprite(gun.spriteAnimator.GetClipByName(gun.idleAnimation).frames[0].spriteId);
+        // gun.spriteAnimator.sprite.SetSprite(gun.spriteAnimator.GetClipByName(gun.idleAnimation).frames[0].spriteId);
+        // gun.sprite.ForceUpdateMaterial();
+        // gun.spriteAnimator.deferNextStartClip = false;
+        // gun.spriteAnimator.Play(_OriginalIdleAnimation);
+    }
+
+    internal static void OnHandleGunEquipInternal(Action<PlayerController, Gun, PlayerHandController> orig, PlayerController player, Gun gun, PlayerHandController handController)
+    {
+        // ETGModConsole.Log($" equiperooski");
+        orig(player, gun, handController);
+        if (!gun?.GetComponent<Alligator>())
+            return;
+        ETGModConsole.Log($"  current sprite id {gun.sprite.spriteId} = OnHandleGunEquipInternal before");
+        gun.Update();
+        gun.idleAnimation = _OriginalIdleAnimation;
+        gun.sprite.SetSprite(gun.spriteAnimator.GetClipByName(gun.idleAnimation).frames[0].spriteId);
+        gun.spriteAnimator.sprite.SetSprite(gun.spriteAnimator.GetClipByName(gun.idleAnimation).frames[0].spriteId);
+        gun.sprite.ForceUpdateMaterial();
+        gun.spriteAnimator.deferNextStartClip = false;
+        gun.spriteAnimator.Play(_OriginalIdleAnimation);
+        gun.Update();
+        ETGModConsole.Log($"  current sprite id {gun.sprite.spriteId} = OnHandleGunEquipInternal after");
+    }
+
+    internal static Gun OnCreateGunForAdd(Func<GunInventory, Gun, Gun> orig, GunInventory inventory, Gun gunPrototype)
+    {
+        // Debug.Log("Here");
+        Gun gun = orig(inventory, gunPrototype);
+        if (!gun.GetComponent<Alligator>())
+            return gun;
+
+        ETGModConsole.Log($"  current sprite id {gun.sprite.spriteId} = OnCreateGunForAdd before");
+        gun.idleAnimation = _OriginalIdleAnimation;
+        // gun.sprite.SetSprite(gun.spriteAnimator.GetClipByName(gun.idleAnimation).frames[0].spriteId);
+        // gun.spriteAnimator.sprite.SetSprite(gun.spriteAnimator.GetClipByName(gun.idleAnimation).frames[0].spriteId);
+        // gun.sprite.ForceUpdateMaterial();
+        // gun.spriteAnimator.deferNextStartClip = false;
+        // gun.spriteAnimator.Play(_OriginalIdleAnimation);
+        ETGModConsole.Log($"  current sprite id {gun.sprite.spriteId} = OnCreateGunForAdd after");
+        return gun;
+
+        // gun.sprite.SetSprite(gun.spriteAnimator.GetClipByName(gun.idleAnimation).frames[0].spriteId);
+        // gun.spriteAnimator.sprite.SetSprite(gun.spriteAnimator.GetClipByName(gun.idleAnimation).frames[0].spriteId);
+        // gun.sprite.ForceUpdateMaterial();
+        // gun.spriteAnimator.deferNextStartClip = false;
+        // gun.spriteAnimator.Play(_OriginalIdleAnimation);
     }
 
     protected override void OnPickedUpByPlayer(PlayerController player)
@@ -65,6 +144,11 @@ public class Alligator : AdvancedGunBehavior
     {
         base.OnPostDroppedByPlayer(player);
 
+        Vector2 center = gun.sprite.WorldCenter;
+        gun.spriteAnimator.Play(_TrimmedIdleAnimation);
+        gun.spriteAnimator.StopAndResetFrame();
+        gun.sprite.PlaceAtPositionByAnchor(center, Anchor.MiddleCenter);
+
         if (player.healthHaver.damageTypeModifiers.Contains(this._electricImmunity))
             player.healthHaver.damageTypeModifiers.Remove(this._electricImmunity);
     }
@@ -72,6 +156,8 @@ public class Alligator : AdvancedGunBehavior
     protected override void Update()
     {
         base.Update();
+
+        // ETGModConsole.Log($"    CURRENT ID {gun.sprite.spriteId}");
 
         tk2dSpriteAnimator anim = gun.spriteAnimator;
         if (anim.IsPlaying(gun.shootAnimation))
