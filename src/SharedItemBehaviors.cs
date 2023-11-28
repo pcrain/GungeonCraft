@@ -82,8 +82,9 @@ public class ArcTowardsTargetBehavior : MonoBehaviour
     private float _arcAngle                = 0;
     private float _maxSecsToReachTarget    = 3.0f;
     private float _minSpeed                = 5.0f;
+    private bool  _hasBeenSetup            = false;
 
-    private void Start()
+    public void Setup(float? arcAngle = null, float? maxSecsToReachTarget = null, float? minSpeed = null)
     {
         this._projectile = base.GetComponent<Projectile>();
         if (this._projectile.Owner is not PlayerController pc)
@@ -95,17 +96,15 @@ public class ArcTowardsTargetBehavior : MonoBehaviour
             this._owner.sprite.WorldCenter,
             this._targetAngle);
 
-        SetNewTarget(this._targetPos);
-    }
-
-    public void Setup(float? arcAngle = null, float? maxSecsToReachTarget = null, float? minSpeed = null)
-    {
         if (arcAngle.HasValue)
             this._arcAngle = arcAngle.Value;
         if (maxSecsToReachTarget.HasValue)
             this._maxSecsToReachTarget = maxSecsToReachTarget.Value;
         if (minSpeed.HasValue)
             this._minSpeed = minSpeed.Value;
+
+        SetNewTarget(this._targetPos);
+        this._hasBeenSetup = true;
     }
 
     public void SetNewTarget(Vector2 target)
@@ -124,6 +123,9 @@ public class ArcTowardsTargetBehavior : MonoBehaviour
 
     private void Update()
     {
+        if (!_hasBeenSetup)
+            return;
+
         float deltatime = BraveTime.DeltaTime;
         this._lifetime += deltatime;
         float percentDoneTurning = this._lifetime / this._actualTimeToReachTarget;
