@@ -44,8 +44,9 @@ public static class LargeGunAnimationHotfix
         if (gun.spriteAnimator.GetClipIdByName(fixedIdleAnimation) != -1)
         {
             Vector2 center = gun.sprite.WorldCenter;
-            gun.spriteAnimator.Play($"{gun.InternalSpriteName()}_{_TRIM_ANIMATION}");
-            gun.spriteAnimator.StopAndResetFrame();
+            gun.spriteAnimator.defaultClipId = gun.spriteAnimator.GetClipIdByName(fixedIdleAnimation);
+            // gun.spriteAnimator.PlayForDurationForceLoop(gun.spriteAnimator.GetClipByName(fixedIdleAnimation), 9999f);
+            gun.spriteAnimator.Play(fixedIdleAnimation);
             gun.sprite.PlaceAtPositionByAnchor(center, Anchor.MiddleCenter);
         }
         return debris;

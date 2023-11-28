@@ -128,6 +128,9 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
         #region Set up trimmed idle sprites so we don't have wonky hitboxes for very large animations
             gun.UpdateAnimation(LargeGunAnimationHotfix._TRIM_ANIMATION, returnToIdle: true);
             string fixedIdleAnimation = $"{gun.InternalSpriteName()}_{LargeGunAnimationHotfix._TRIM_ANIMATION}";
+            tk2dSpriteAnimationClip originalIdleClip = gun.spriteAnimator.GetClipByName(gun.idleAnimation);
+            gun.SetAnimationFPS(fixedIdleAnimation, (int)originalIdleClip.fps);
+            gun.LoopAnimation(fixedIdleAnimation, originalIdleClip.loopStart);
             int fixedIdleAnimationClipId = gun.spriteAnimator.GetClipIdByName(fixedIdleAnimation);
             if (fixedIdleAnimationClipId != -1)
             {
