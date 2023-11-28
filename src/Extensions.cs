@@ -1130,4 +1130,10 @@ public static class Extensions
       proj.AddAnimation(clip);
     return proj;
   }
+
+  // Get the internal sprite name for each gun (keep in parity with SetupItem())
+  public static string InternalSpriteName(this Gun gun)
+  {
+    return gun.gunName.Replace("-", "").Replace(".", "").Replace(" ", "_").Replace("'","").ToLower(); // keep in parity with SetupItem()
+  }
 }

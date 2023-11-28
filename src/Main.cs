@@ -312,6 +312,7 @@ public class Initialisation : BaseUnityPlugin
             // Hotfixes for bugs and issues mostly out of my control
             DragunFightHotfix.Init();
             CoopTurboModeHotfix.Init();
+            LargeGunAnimationHotfix.Init();
             // CoopDrillSoftlockHotfix.Init(); // incomplete
 
             watch.Stop();

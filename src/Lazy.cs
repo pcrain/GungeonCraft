@@ -119,47 +119,24 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
         gun.gameObject.AddComponent<T>();
         _GunSpriteCollection ??= gun.sprite.collection; // need to initialize at least once
 
-        // tk2dSpriteDefinition.AttachPoint idleAttachPoint = null;
         #region Auto-setup barrelOffset from Casing attach point
             foreach (tk2dSpriteDefinition.AttachPoint a in gun.AttachPointsForClip(gun.idleAnimation).EmptyIfNull())
-            {
                 if (a.name == "Casing")
                     gun.barrelOffset.transform.localPosition = a.position;
-                // else if (a.name == "PrimaryHand")
-                //     idleAttachPoint = a;
-            }
         #endregion
 
-        // #region Auto-adjust idle animations
-        //     string trimmedIdleAnimName = gun.UpdateAnimation("idle_trimmed", returnToIdle: true);
-        //     tk2dSpriteAnimationClip trimmedIdleAnim = gun.GetComponent<tk2dSpriteAnimator>().GetClipByName(trimmedIdleAnimName);
-        //     if (idleAttachPoint != null && trimmedIdleAnim != null)
-        //     {
-        //         Vector3 attachAdjustment = Vector3.zero;
-        //         foreach (tk2dSpriteDefinition.AttachPoint a in gun.AttachPointsForClip(trimmedIdleAnimName).EmptyIfNull())
-        //             if (a.name == "PrimaryHand")
-        //             {
-        //                 ETGModConsole.Log($"  found offset {a.position} vs {idleAttachPoint.position}");
-        //                 // a.position = idleOffest;
-        //                 // a.position = new Vector3(0.0f, 0.0f, 0.0f);
-        //                 attachAdjustment = a.position - idleAttachPoint.position;
-        //                 // idleAttachPoint.position += attachAdjustment;
-        //                 break;
-        //             }
-        //         if (attachAdjustment != Vector3.zero)
-        //         {
-        //             foreach (string anim in new List<String>{gun.idleAnimation, gun.reloadAnimation, gun.shootAnimation})
-        //             {
-        //                 foreach (tk2dSpriteDefinition.AttachPoint a in gun.AttachPointsForClip(anim).EmptyIfNull())
-        //                 {
-        //                     ETGModConsole.Log($"adjusting {a.position} by {attachAdjustment}");
-        //                     a.position += attachAdjustment;
-        //                 }
-        //                 gun.UpdateAnimation(anim);
-        //             }
-        //         }
-        //     }
-        // #endregion
+        #region Set up trimmed idle sprites so we don't have wonky hitboxes for very large animations
+            gun.UpdateAnimation(LargeGunAnimationHotfix._TRIM_ANIMATION, returnToIdle: true);
+            string fixedIdleAnimation = $"{gun.InternalSpriteName()}_{LargeGunAnimationHotfix._TRIM_ANIMATION}";
+            int fixedIdleAnimationClipId = gun.spriteAnimator.GetClipIdByName(fixedIdleAnimation);
+            if (fixedIdleAnimationClipId != -1)
+            {
+                gun.idleAnimation                = fixedIdleAnimation;
+                gun.spriteAnimator.defaultClipId = fixedIdleAnimationClipId;
+            }
+            else if (C.DEBUG_BUILD)
+                ETGModConsole.Log($"  no fixed idle animation for {gunName}");
+        #endregion
 
         #region Auto-play idle animation
             gun.spriteAnimator.DefaultClipId = gun.spriteAnimator.GetClipIdByName(gun.idleAnimation);

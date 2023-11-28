@@ -1,5 +1,57 @@
 namespace CwaffingTheGungy;
 
+// Fix guns with extremely large animations having enormous pickup ranges and appearing very weirdly on pedestals
+public static class LargeGunAnimationHotfix
+{
+    internal const string _TRIM_ANIMATION = "idle_trimmed";
+
+    public static void Init()
+    {
+        new Hook(
+            typeof(Gun).GetMethod("Pickup", BindingFlags.Instance | BindingFlags.Public),
+            typeof(LargeGunAnimationHotfix).GetMethod("OnPickupGun", BindingFlags.Static | BindingFlags.NonPublic)
+            );
+
+        new Hook(
+            typeof(Gun).GetMethod("DropGun", BindingFlags.Instance | BindingFlags.Public),
+            typeof(LargeGunAnimationHotfix).GetMethod("OnDropGun", BindingFlags.Static | BindingFlags.NonPublic)
+            );
+    }
+
+    private static void OnPickupGun(Action<Gun, PlayerController> orig, Gun gun, PlayerController player)
+    {
+        if (!gun)
+        {
+            orig(gun, player);
+            return;
+        }
+
+        string fixedIdleAnimation = $"{gun.InternalSpriteName()}_{_TRIM_ANIMATION}";
+        if (gun.spriteAnimator.GetClipIdByName(fixedIdleAnimation) != -1)
+        {
+            gun.idleAnimation = $"{gun.name}_idle";
+            gun.spriteAnimator.defaultClipId = gun.spriteAnimator.GetClipIdByName(gun.idleAnimation);
+        }
+
+        orig(gun, player);
+    }
+
+    private static DebrisObject OnDropGun(Func<Gun, float, DebrisObject> orig, Gun gun, float dropHeight)
+    {
+        DebrisObject debris = orig(gun, dropHeight);
+
+        string fixedIdleAnimation = $"{gun.InternalSpriteName()}_{_TRIM_ANIMATION}";
+        if (gun.spriteAnimator.GetClipIdByName(fixedIdleAnimation) != -1)
+        {
+            Vector2 center = gun.sprite.WorldCenter;
+            gun.spriteAnimator.Play($"{gun.InternalSpriteName()}_{_TRIM_ANIMATION}");
+            gun.spriteAnimator.StopAndResetFrame();
+            gun.sprite.PlaceAtPositionByAnchor(center, Anchor.MiddleCenter);
+        }
+        return debris;
+    }
+}
+
 // Fix softlock when one player dies in a payday drill room (can't get the bug to trigger consistently enough to test this, so disabling this for now)
 public static class CoopDrillSoftlockHotfix
 {

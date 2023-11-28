@@ -291,6 +291,8 @@ fi
 if [ $# -gt 0 ] && [ "$1" == "-t" ]; then
   echo -e "[${GRN}>${BLN}] Regenerating item tips"
   ./gen-itemtips.py
+  echo -e "[${GRN}>${BLN}] Trimming gun idle animations"
+  ./trim-idle-animations >/dev/null
   echo -e "[${GRN}>${BLN}] Assembling Thunderstore package"
   if [ $debugbuild -gt 0 ]; then
     echo -e "[${RED}@${BLN}] Trying to build Thunderstore package from debug build, refusing"
