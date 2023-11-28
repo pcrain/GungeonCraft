@@ -3,7 +3,7 @@
 public class KiBlast : AdvancedGunBehavior
 {
     public static string ItemName         = "Ki Blast";
-    public static string SpriteName       = "ki_blast_gun";
+    public static string SpriteName       = "ki_blast";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Dragunball Z";
     public static string LongDescription  = "Fires alternating ki blasts that may be reflected by sufficiently strong enemies. Reloading reflects the nearest ki blast back at the enemy, amplifying the damage after every successive reflect.";
