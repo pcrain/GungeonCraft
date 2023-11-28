@@ -1132,8 +1132,14 @@ public static class Extensions
   }
 
   // Get the internal sprite name for each gun (keep in parity with SetupItem())
+  public static string InternalName(this Gun gun)
+  {
+    return gun.gunName.Replace("-", "").Replace(".", "").Replace(" ", "_").ToLower(); // keep in parity with SetupItem()
+  }
+
+  // Get the internal sprite name for each gun (keep in parity with SetupItem())
   public static string InternalSpriteName(this Gun gun)
   {
-    return gun.gunName.Replace("-", "").Replace(".", "").Replace(" ", "_").Replace("'","").ToLower(); // keep in parity with SetupItem()
+    return gun.InternalName().Replace("'",""); // keep in parity with SetupItem()
   }
 }

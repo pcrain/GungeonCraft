@@ -29,7 +29,7 @@ public static class LargeGunAnimationHotfix
         string fixedIdleAnimation = $"{gun.InternalSpriteName()}_{_TRIM_ANIMATION}";
         if (gun.spriteAnimator.GetClipIdByName(fixedIdleAnimation) != -1)
         {
-            gun.idleAnimation = $"{gun.name}_idle";
+            gun.idleAnimation = $"{gun.InternalSpriteName()}_idle";
             gun.spriteAnimator.defaultClipId = gun.spriteAnimator.GetClipIdByName(gun.idleAnimation);
         }
 
