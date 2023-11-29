@@ -70,7 +70,6 @@ public class Alyx : AdvancedGunBehavior
             this.gun.SetBaseMaxAmmo(_BASE_MAX_AMMO);
             this.gun.CurrentAmmo = _BASE_MAX_AMMO;
             this.timeAtLastRecalc = BraveTime.ScaledTimeSinceStartup;
-            ETGModConsole.Log($"first pickup");
         }
         base.OnPickup(owner);
         RecalculateAmmo();

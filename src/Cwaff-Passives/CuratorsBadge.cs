@@ -136,4 +136,16 @@ public class CuratorsBadge : PassiveItem
     {
         --this.curRoomBreakables;
     }
+
+    public override void MidGameSerialize(List<object> data)
+    {
+        base.MidGameSerialize(data);
+        data.Add(chancesLeft);
+    }
+
+    public override void MidGameDeserialize(List<object> data)
+    {
+        base.MidGameDeserialize(data);
+        chancesLeft = (int)data[0];
+    }
 }
