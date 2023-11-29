@@ -45,7 +45,6 @@ public static class LargeGunAnimationHotfix
         {
             Vector2 center = gun.sprite.WorldCenter;
             gun.spriteAnimator.defaultClipId = gun.spriteAnimator.GetClipIdByName(fixedIdleAnimation);
-            // gun.spriteAnimator.PlayForDurationForceLoop(gun.spriteAnimator.GetClipByName(fixedIdleAnimation), 9999f);
             gun.spriteAnimator.Play(fixedIdleAnimation);
             gun.sprite.PlaceAtPositionByAnchor(center, Anchor.MiddleCenter);
         }

@@ -23,9 +23,6 @@ public class Missiletoe : AdvancedGunBehavior
     internal static GameObject _UnwrapVFXC;
     internal static GameObject _UnwrapVFXD;
 
-    internal static List<PickupObject> _WrappedGifts = new();
-    internal static List<ItemQuality> _WrappedQualities = new();
-    internal static List<ItemQuality> _ShuffledQualities = new();
     internal static float _WrapAnimLength;
 
     internal static Projectile _OrnamentProjectile;
@@ -37,8 +34,20 @@ public class Missiletoe : AdvancedGunBehavior
     internal static Projectile _GiftProjectileD;
 
     private const int _WRAP_FPS = 16;
+    private const float _MAX_DIST = 5f;
+
+    private static readonly List<ItemQuality> _BannedQualities = new(){
+        ItemQuality.COMMON,
+        ItemQuality.EXCLUDED,
+        ItemQuality.SPECIAL,
+    };
 
     private ItemQuality _lastQualityFired;
+
+    internal List<ItemQuality> _shuffledQualities = new();
+
+    public List<PickupObject> wrappedGifts = new();
+    public List<ItemQuality> wrappedQualities = new();
 
     public static void Add()
     {
@@ -145,7 +154,7 @@ public class Missiletoe : AdvancedGunBehavior
         if (mod.ammoCost == 0)
             quality = this._lastQualityFired;
         else
-            quality = this._lastQualityFired = _ShuffledQualities[mod.numberOfShotsInClip - gun.ClipShotsRemaining];
+            quality = this._lastQualityFired = _shuffledQualities[mod.numberOfShotsInClip - gun.ClipShotsRemaining];
         switch (quality)
         {
             case ItemQuality.S: return _GiftProjectileS;
@@ -172,12 +181,6 @@ public class Missiletoe : AdvancedGunBehavior
 
     protected override void OnPickup(GameActor owner)
     {
-        if (!this.everPickedUpByPlayer)
-        {
-            _WrappedGifts.Clear();
-            _WrappedQualities.Clear();
-            _ShuffledQualities.Clear();
-        }
         RecalculateClip();
         base.OnPickup(owner);
     }
@@ -203,12 +206,6 @@ public class Missiletoe : AdvancedGunBehavior
         RecalculateClip();
     }
 
-    private const float _MAX_DIST = 5f;
-    private static readonly List<ItemQuality> _BannedQualities = new(){
-        ItemQuality.COMMON,
-        ItemQuality.EXCLUDED,
-        ItemQuality.SPECIAL,
-    };
     private void WrapPresent()
     {
         PickupObject nearestPickup = null;
@@ -242,20 +239,88 @@ public class Missiletoe : AdvancedGunBehavior
 
     internal void RecalculateClip()
     {
-        _WrappedQualities.Add(ItemQuality.D);  // make sure our list has at least one item
-        _ShuffledQualities = _WrappedQualities.CopyAndShuffle();
-        _WrappedQualities.Pop();
-        this.gun.DefaultModule.numberOfShotsInClip = _ShuffledQualities.Count();
+        wrappedQualities.Add(ItemQuality.D);  // make sure our list has at least one item
+        ETGModConsole.Log($"  shuffling {wrappedQualities.Count} presents");
+        _shuffledQualities = wrappedQualities.CopyAndShuffle();
+        wrappedQualities.Pop();
+        this.gun.DefaultModule.numberOfShotsInClip = _shuffledQualities.Count();
     }
 
     private void UnwrapPresent()
     {
-        if (_WrappedGifts.Count() == 0)
+        if (wrappedGifts.Count() == 0)
             return;
-        PickupObject gift = _WrappedGifts.Pop();
-        _WrappedQualities.Pop();
+        PickupObject gift = wrappedGifts.Pop();
+        wrappedQualities.Pop();
         RecalculateClip();
         WrappableGift.Spawn(this, this.gun.barrelOffset.position, gift, unwrapping: true);
+    }
+
+    public override void MidGameSerialize(List<object> data, int i)
+    {
+        ETGModConsole.Log($"  serializing!!");
+        base.MidGameSerialize(data, i);
+        data.Add(wrappedGifts.Count);
+        ETGModConsole.Log($"    serializing {wrappedGifts.Count} gifts");
+        foreach(PickupObject pickup in wrappedGifts)
+        {
+            data.Add(pickup.PickupObjectId);
+
+            // List<object> innerData = new();
+
+            if (pickup.GetComponent<PlayerItem>() is PlayerItem active)
+                data.Add(new MidGameActiveItemData(active));
+            else if (pickup.GetComponent<PassiveItem>() is PassiveItem passive)
+                data.Add(new MidGamePassiveItemData(passive));
+            else if (pickup.GetComponent<Gun>() is Gun gun)
+                data.Add(new MidGameGunData(gun));
+            else
+                ETGModConsole.Log($"  SERIALIZING SOMETHING THAT ISN'T A GUN, ACTIVE, OR PASSIVE, TELL PRETZEL");
+
+            // pickup.MidGameSerialize(innerData);
+            // data.Add(innerData.Count);
+            // ETGModConsole.Log($"      serializing id {pickup.PickupObjectId} with {innerData.Count} subentries");
+            // foreach(object o in innerData)
+            //     data.Add(o);
+        }
+    }
+
+    public override void MidGameDeserialize(List<object> data, ref int i)
+    {
+        ETGModConsole.Log($"  deserializing!!");
+        base.MidGameDeserialize(data, ref i);
+        wrappedGifts.Clear();
+        int numGifts = (int)data[i++];
+        ETGModConsole.Log($"    deserializing {numGifts} gifts");
+        for (int n = 0; n < numGifts; ++n)
+        {
+            int pickupId = (int)data[i++];
+            int innerDataCount = (int)data[i++];
+            ETGModConsole.Log($"      deserializing id {pickupId} with {innerDataCount} subentries");
+            PickupObject pickup = UnityEngine.Object.Instantiate(
+                PickupObjectDatabase.GetById(pickupId).gameObject, Vector3.zero, Quaternion.identity).GetComponent<PickupObject>();
+            List<object> innerData = new();
+            for (int j = 0; j < innerDataCount; j++)
+                innerData.Add(data[i++]);
+            pickup.MidGameDeserialize(innerData);
+
+            if (pickup.GetComponent<PlayerItem>() is PlayerItem active)
+            {
+                active.GetRidOfMinimapIcon();
+                active.m_pickedUp = true;
+            }
+            else if (pickup.GetComponent<PassiveItem>() is PassiveItem passive)
+            {
+                passive.GetRidOfMinimapIcon();
+                passive.m_pickedUp = true;
+            }
+            pickup.renderer.enabled = false;
+            pickup.m_isBeingEyedByRat = false;
+
+            wrappedGifts.Add(pickup);
+            wrappedQualities.Add(pickup.quality);
+        }
+        RecalculateClip();
     }
 }
 
@@ -368,7 +433,7 @@ public class WrappableGift : MonoBehaviour
         // Clone and destroy the pickup itself (logic is largely from Pickup() methods without actually picking items up)
         if (wrapping)
         {
-            Missiletoe._WrappedQualities.Add(this._pickup.quality);
+            this._gun.wrappedQualities.Add(this._pickup.quality);
             if (isGun)
             {
                 PickupObject oldPickup = this._pickup;
@@ -400,7 +465,7 @@ public class WrappableGift : MonoBehaviour
                     UnityEngine.Object.Destroy(squish);
             }
             DontDestroyOnLoad(this._pickup.gameObject); // needed for persisting between floors
-            Missiletoe._WrappedGifts.Add(this._pickup);
+            this._gun.wrappedGifts.Add(this._pickup);
             this._gun.RecalculateClip();
         }
 
