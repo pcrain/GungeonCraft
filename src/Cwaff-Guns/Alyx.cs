@@ -159,4 +159,16 @@ public class Alyx : AdvancedGunBehavior
             UnityEngine.Object.Destroy(this.gun.gameObject);
         }
     }
+
+    public override void MidGameSerialize(List<object> data, int i)
+    {
+        base.MidGameSerialize(data, i);
+        data.Add(gun.GetBaseMaxAmmo());
+    }
+
+    public override void MidGameDeserialize(List<object> data, ref int i)
+    {
+        base.MidGameDeserialize(data, ref i);
+        gun.SetBaseMaxAmmo((int)data[i++]);
+    }
 }
