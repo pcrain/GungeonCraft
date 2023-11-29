@@ -11,8 +11,7 @@ public class WeddingRing : PassiveItem
     private const float _BONUS_PER_KILL     = 0.01f;
     private const float _MAX_BONUS          = 1.50f;
 
-    private Gun            _committedGun    = null;
-    private StatModifier[] _commitmentBuffs = null;
+    private int            _committedGunId  = -1;
     private float          _commitmentMult  = 1.00f;
     private int            _lastKnownAmmo   = 0;
     private bool           _refundAmmo      = false;
@@ -74,7 +73,7 @@ public class WeddingRing : PassiveItem
     private Projectile ChanceToRefundAmmo(Gun gun, Projectile projectile)
     {
         this._refundAmmo    = UnityEngine.Random.value < (this._commitmentMult - 1.00f);
-        this._lastKnownAmmo = (this.Owner as PlayerController).CurrentGun.CurrentAmmo;
+        this._lastKnownAmmo = this.Owner.CurrentGun.CurrentAmmo;
         return projectile;
     }
 
@@ -82,20 +81,36 @@ public class WeddingRing : PassiveItem
     {
         if (this.Owner is not PlayerController player)
             return;
-        if (player.CurrentGun == this._committedGun)
+        if (player.CurrentGun.PickupObjectId == this._committedGunId)
             return;
 
         UpdateCommitmentStats(player, reset: true);
-        this._committedGun = player.CurrentGun;
+        this._committedGunId = player.CurrentGun.PickupObjectId;
         this._refundAmmo = false;
     }
 
     private void LateUpdate()
     {
-        if (!this._refundAmmo)
+        if (!this._refundAmmo || (this.Owner?.CurrentGun == null))
             return;
 
         this._refundAmmo = false;
-        this._committedGun.CurrentAmmo = this._lastKnownAmmo;
+        this.Owner.CurrentGun.CurrentAmmo = this._lastKnownAmmo;
+    }
+
+    public override void MidGameSerialize(List<object> data)
+    {
+        base.MidGameSerialize(data);
+        data.Add(this._committedGunId);
+        data.Add(this._commitmentMult);
+        data.Add(this._lastKnownAmmo);
+    }
+
+    public override void MidGameDeserialize(List<object> data)
+    {
+        base.MidGameDeserialize(data);
+        this._committedGunId = (int)data[0];
+        this._commitmentMult = (float)data[1];
+        this._lastKnownAmmo  = (int)data[2];
     }
 }
