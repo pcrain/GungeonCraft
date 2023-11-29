@@ -8,12 +8,12 @@ public class BorrowedTime : PlayerItem
     public static string LongDescription  = "Captures all non-jammed, non-boss enemies in a room. Using in an empty combat room will release all captured enemies, with a chance for enemies to spawn Jammed. All captured enemies will be forcibly released in boss rooms. Cannot be dropped while enemies are captured.";
     public static string Lore             = "The first Gungeoneer to discover this hourglass believed they had stumbled upon an incomprehensibly powerful artifact, when in fact it was quite the opposite: a dangerous failure of a prototype thrown out and forgotten about by the Sorceress. The poor Gungeoneer couldn't believe their luck as they breezed through room after room, only to reach the Trigger Twins and find themselves fighting far more than the 2 oversized Bullet Kin they signed up for....";
 
-    internal static List<string> _BorrowedEnemies  = new List<string>{};
     internal static int _EmptyId;
     internal static int _FullId;
 
     internal const float _RESPAWN_AS_JAMMED_CHANCE = 0.1f;
 
+    private List<string>     _borrowedEnemies    = new List<string>{};
     private PlayerController _owner              = null;
     private RoomHandler      _lastCheckedRoom    = null;
     private bool             _isBossPresent      = false;
@@ -41,7 +41,7 @@ public class BorrowedTime : PlayerItem
 
     public override void OnPreDrop(PlayerController player)
     {
-        if (_BorrowedEnemies.Count > 0)
+        if (this._borrowedEnemies.Count > 0)
             this._owner.StartCoroutine(ReapWhatYouSow());
         this._owner = null;
         base.OnPreDrop(player);
@@ -74,15 +74,15 @@ public class BorrowedTime : PlayerItem
         while (GameManager.IsBossIntro)
             yield return null;
 
-        if (_BorrowedEnemies.Count == 0)
+        if (this._borrowedEnemies.Count == 0)
             yield break;
 
-        int enemiesToSpawn = _BorrowedEnemies.Count;
+        int enemiesToSpawn = this._borrowedEnemies.Count;
         var tpvfx = (ItemHelper.Get(Items.ChestTeleporter) as ChestTeleporterItem).TeleportVFX;
         for (int i = 0; i < enemiesToSpawn; i++)
         {
             IntVector2 bestRewardLocation = this._owner.CurrentRoom.GetRandomVisibleClearSpot(2, 2);
-            AIActor TargetActor = AIActor.Spawn(EnemyDatabase.GetOrLoadByGuid(_BorrowedEnemies[i]).aiActor,
+            AIActor TargetActor = AIActor.Spawn(EnemyDatabase.GetOrLoadByGuid(this._borrowedEnemies[i]).aiActor,
                 bestRewardLocation, GameManager.Instance.Dungeon.data.GetAbsoluteRoomFromPosition(bestRewardLocation),
                 true, AIActor.AwakenAnimationType.Default, true);
             if (UnityEngine.Random.value <= _RESPAWN_AS_JAMMED_CHANCE)
@@ -98,7 +98,7 @@ public class BorrowedTime : PlayerItem
             this._owner.CurrentRoom.SealRoom();
             GameManager.Instance.DungeonMusicController.SwitchToActiveMusic(null);
         }
-        _BorrowedEnemies.Clear();
+        this._borrowedEnemies.Clear();
         this.CanBeDropped = true;
 
         base.sprite.SetSprite(_EmptyId);
@@ -133,7 +133,7 @@ public class BorrowedTime : PlayerItem
 
         if (activeEnemies.Count == 0)
         {
-            if (_BorrowedEnemies.Count > 0 && user.GetAbsoluteParentRoom() != null)
+            if (this._borrowedEnemies.Count > 0 && user.GetAbsoluteParentRoom() != null)
                 user.StartCoroutine(ReapWhatYouSow());
             return;
         }
@@ -156,9 +156,27 @@ public class BorrowedTime : PlayerItem
                     0, null, null, null, -0.05f);
 
             otherEnemy.EraseFromExistence(true);
-            _BorrowedEnemies.Add(otherEnemy.EnemyGuid);
+            this._borrowedEnemies.Add(otherEnemy.EnemyGuid);
         }
-        if (_BorrowedEnemies.Count > 0)
+        if (this._borrowedEnemies.Count > 0)
             this.CanBeDropped = false; //cannot be dropped if it contains enemies
+    }
+
+    public override void MidGameSerialize(List<object> data)
+    {
+        base.MidGameSerialize(data);
+        data.Add(this._borrowedEnemies.Count);
+        foreach (string enemy in this._borrowedEnemies)
+            data.Add(enemy);
+    }
+
+    public override void MidGameDeserialize(List<object> data)
+    {
+        base.MidGameDeserialize(data);
+        int i = 0;
+        int count = (int)data[i++];
+        for (int n = 0; n < count; ++n)
+            this._borrowedEnemies.Add((string)data[i++]);
+        base.sprite.SetSprite((count > 0) ? _FullId : _EmptyId);
     }
 }
