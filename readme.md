@@ -25,7 +25,7 @@
 - **Playstyle Variety**: defensive and strategic play should feel as rewarding as aggressive and proactive play
 
 ### Known Bugs
-* Mid-run saving might not correctly save the internal state of Amazon Primer and Warrior's Gi
+* Mid-run saving might not correctly save the internal state of Amazon Primer
 * If you find any more, please let me know!
 
 ### FAQ

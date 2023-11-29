@@ -26,8 +26,8 @@ public static class LargeGunAnimationHotfix
     public static void Init()
     {
         new Hook(
-            typeof(Gun).GetMethod("Pickup", BindingFlags.Instance | BindingFlags.Public),
-            typeof(LargeGunAnimationHotfix).GetMethod("OnPickupGun", BindingFlags.Static | BindingFlags.NonPublic)
+            typeof(GunInventory).GetMethod("AddGunToInventory", BindingFlags.Instance | BindingFlags.Public),
+            typeof(LargeGunAnimationHotfix).GetMethod("OnAddGunToInventory", BindingFlags.Static | BindingFlags.NonPublic)
             );
 
         new Hook(
@@ -36,13 +36,10 @@ public static class LargeGunAnimationHotfix
             );
     }
 
-    private static void OnPickupGun(Action<Gun, PlayerController> orig, Gun gun, PlayerController player)
+    private static Gun OnAddGunToInventory(Func<GunInventory, Gun, bool, Gun> orig, GunInventory inventory, Gun gun, bool makeActive)
     {
-        if (!gun)
-        {
-            orig(gun, player);
-            return;
-        }
+         if (!gun)
+            return orig(inventory, gun, makeActive);
 
         string fixedIdleAnimation = $"{gun.InternalSpriteName()}_{_TRIM_ANIMATION}";
         if (gun.spriteAnimator.GetClipIdByName(fixedIdleAnimation) != -1)
@@ -51,7 +48,7 @@ public static class LargeGunAnimationHotfix
             gun.spriteAnimator.defaultClipId = gun.spriteAnimator.GetClipIdByName(gun.idleAnimation);
         }
 
-        orig(gun, player);
+        return orig(inventory, gun, makeActive);
     }
 
     private static DebrisObject OnDropGun(Func<Gun, float, DebrisObject> orig, Gun gun, float dropHeight)
