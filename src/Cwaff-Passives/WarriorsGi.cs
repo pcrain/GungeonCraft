@@ -18,6 +18,7 @@ public class WarriorsGi : PassiveItem
     internal static GameObject _SaiyanSpark;
     internal static GameObject _ZenkaiAura;
 
+    private bool _initialized = false;
     private bool _canActivate = false;
 
     private StatModifier _rateOfFireStat     = null;
@@ -40,8 +41,8 @@ public class WarriorsGi : PassiveItem
 
     public override void Pickup(PlayerController player)
     {
-        if (!m_pickedUpThisRun)
-            InitialPickup(player);
+        if (!this._initialized)
+            InitializeStats(player);
 
         base.Pickup(player);
         player.healthHaver.OnDamaged += this.OnDamaged;
@@ -50,7 +51,7 @@ public class WarriorsGi : PassiveItem
         RecalculatePower(player);
     }
 
-    private void InitialPickup(PlayerController player)
+    private void InitializeStats(PlayerController player)
     {
         this._rateOfFireStat = new StatModifier {
             amount      = 1.00f,
@@ -79,6 +80,7 @@ public class WarriorsGi : PassiveItem
             this._damageStat,
             this._bossDamageStat,
         };
+        this._initialized = true;
     }
 
     public override DebrisObject Drop(PlayerController player)
@@ -129,6 +131,46 @@ public class WarriorsGi : PassiveItem
         this._bossDamageStat.amount     = _BOSS_DAMAGE_MULT[newPower];
         player.stats.RecalculateStats(player);
     }
+
+    public override void MidGameSerialize(List<object> data)
+    {
+        base.MidGameSerialize(data);
+        int p1Zenkai = GameManager.Instance.PrimaryPlayer?.gameObject?.GetOrAddComponent<ZenkaiAura>()?._zenkaiLevel ?? 0;
+        ETGModConsole.Log($"  saving zenkai {p1Zenkai}");
+        data.Add(p1Zenkai);
+        if (GameManager.Instance.CurrentGameType == GameManager.GameType.COOP_2_PLAYER)
+        {
+            int p2Zenkai = GameManager.Instance.SecondaryPlayer?.gameObject?.GetOrAddComponent<ZenkaiAura>()?._zenkaiLevel ?? 0;
+            data.Add(p2Zenkai);
+        }
+    }
+
+    public override void MidGameDeserialize(List<object> data)
+    {
+        base.MidGameDeserialize(data);
+
+        int p1ZenkaiLevel = (int)data[0];
+        if (p1ZenkaiLevel > 0)
+        {
+            ZenkaiAura z = GameManager.Instance.PrimaryPlayer?.gameObject?.GetOrAddComponent<ZenkaiAura>();
+            if (z)
+                z._zenkaiLevel = p1ZenkaiLevel;
+            if (GameManager.Instance.PrimaryPlayer.passiveItems.Contains(this))
+                RecalculatePower(GameManager.Instance.PrimaryPlayer);
+        }
+        if (GameManager.Instance.CurrentGameType != GameManager.GameType.COOP_2_PLAYER)
+            return;
+
+        int p2ZenkaiLevel = (int)data[1];
+        if (p2ZenkaiLevel > 0)
+        {
+            ZenkaiAura z = GameManager.Instance.SecondaryPlayer?.gameObject?.GetOrAddComponent<ZenkaiAura>();
+            if (z)
+                z._zenkaiLevel = p2ZenkaiLevel;
+            if (GameManager.Instance.SecondaryPlayer.passiveItems.Contains(this))
+                RecalculatePower(GameManager.Instance.SecondaryPlayer);
+        }
+    }
 }
 
 public class ZenkaiAura : MonoBehaviour
@@ -140,7 +182,8 @@ public class ZenkaiAura : MonoBehaviour
     private readonly float[] _MAX_SPARK_GAPS = {999f, 15.0f, 9.00f, 6.00f, 3.00f, 2.00f};
     private readonly float[] _SPARK_ALPHAS   = {0.0f, 0.35f, 0.65f, 5.00f, 25.0f,  225f};
 
-    private int _zenkaiLevel            = 0;
+    internal int _zenkaiLevel           = 0;
+
     private PlayerController _saiyan    = null;
     private GameObject _extantAura      = null;
     private float _auraLife             = 0;
