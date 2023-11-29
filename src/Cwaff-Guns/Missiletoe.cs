@@ -264,24 +264,27 @@ public class Missiletoe : AdvancedGunBehavior
         ETGModConsole.Log($"    serializing {wrappedGifts.Count} gifts");
         foreach(PickupObject pickup in wrappedGifts)
         {
+            ETGModConsole.Log($"      serializing id {pickup.PickupObjectId}");
             data.Add(pickup.PickupObjectId);
-
-            // List<object> innerData = new();
-
             if (pickup.GetComponent<PlayerItem>() is PlayerItem active)
+            {
+                ETGModConsole.Log($"        serializing active");
                 data.Add(new MidGameActiveItemData(active));
+            }
             else if (pickup.GetComponent<PassiveItem>() is PassiveItem passive)
+            {
+                ETGModConsole.Log($"        serializing passive");
                 data.Add(new MidGamePassiveItemData(passive));
+            }
             else if (pickup.GetComponent<Gun>() is Gun gun)
-                data.Add(new MidGameGunData(gun));
+            {
+                ETGModConsole.Log($"        serializing gun with {gun.DuctTapeMergedGunIDs.Count} duct taped guns");
+                MidGameGunData gunData = new MidGameGunData(gun);
+                ETGModConsole.Log($"          ...saved with {gunData.DuctTapedGunIDs.Count} duct taped guns");
+                data.Add(gunData);
+            }
             else
                 ETGModConsole.Log($"  SERIALIZING SOMETHING THAT ISN'T A GUN, ACTIVE, OR PASSIVE, TELL PRETZEL");
-
-            // pickup.MidGameSerialize(innerData);
-            // data.Add(innerData.Count);
-            // ETGModConsole.Log($"      serializing id {pickup.PickupObjectId} with {innerData.Count} subentries");
-            // foreach(object o in innerData)
-            //     data.Add(o);
         }
     }
 
@@ -295,25 +298,41 @@ public class Missiletoe : AdvancedGunBehavior
         for (int n = 0; n < numGifts; ++n)
         {
             int pickupId = (int)data[i++];
-            int innerDataCount = (int)data[i++];
-            ETGModConsole.Log($"      deserializing id {pickupId} with {innerDataCount} subentries");
+            ETGModConsole.Log($"      deserializing id {pickupId}");
             PickupObject pickup = UnityEngine.Object.Instantiate(
                 PickupObjectDatabase.GetById(pickupId).gameObject, Vector3.zero, Quaternion.identity).GetComponent<PickupObject>();
-            List<object> innerData = new();
-            for (int j = 0; j < innerDataCount; j++)
-                innerData.Add(data[i++]);
-            pickup.MidGameDeserialize(innerData);
 
             if (pickup.GetComponent<PlayerItem>() is PlayerItem active)
             {
+                MidGameActiveItemData itemData = (MidGameActiveItemData)data[i++];
+                active.CurrentDamageCooldown = itemData.DamageCooldown;
+                active.CurrentRoomCooldown = itemData.RoomCooldown;
+                active.CurrentTimeCooldown = itemData.TimeCooldown;
+                active.numberOfUses = itemData.NumberOfUses;
+                active.MidGameDeserialize(itemData.SerializedData);
                 active.GetRidOfMinimapIcon();
                 active.m_pickedUp = true;
             }
             else if (pickup.GetComponent<PassiveItem>() is PassiveItem passive)
             {
+                MidGamePassiveItemData itemData = (MidGamePassiveItemData)data[i++];
+                passive.MidGameDeserialize(itemData.SerializedData);
                 passive.GetRidOfMinimapIcon();
                 passive.m_pickedUp = true;
             }
+            else if (pickup.GetComponent<Gun>() is Gun gun)
+            {
+                MidGameGunData itemData = (MidGameGunData)data[i++];
+                gun.CurrentAmmo = itemData.CurrentAmmo;
+                gun.MidGameDeserialize(itemData.SerializedData);
+                ETGModConsole.Log($"  gun has {itemData.DuctTapedGunIDs.Count} duct-taped guns!");
+                for (int k = 0; k < itemData.DuctTapedGunIDs.Count; k++)
+                {
+                    if (PickupObjectDatabase.GetById(itemData.DuctTapedGunIDs[k]) is Gun ductTapeGun)
+                        DuctTapeItem.DuctTapeGuns(ductTapeGun, gun);
+                }
+            }
+
             pickup.renderer.enabled = false;
             pickup.m_isBeingEyedByRat = false;
 
