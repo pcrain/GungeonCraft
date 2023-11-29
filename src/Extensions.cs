@@ -963,7 +963,7 @@ public static class Extensions
 
   // Clone, modify, and return a specific projectile
   public static Projectile Clone(this Projectile projectile, float? damage = null, float? speed = null, float? force = null, float? range = null, bool? shouldRotate = null,
-    bool collidesWithEnemies = true, bool ignoreDamageCaps = false, bool collidesWithProjectiles= false, bool surviveRigidbodyCollisions = true, float bossDamageMult = 1.0f, string destroySound = null, bool collidesWithTilemap = true)
+    bool collidesWithEnemies = true, bool ignoreDamageCaps = false, bool collidesWithProjectiles= false, bool surviveRigidbodyCollisions = false, float bossDamageMult = 1.0f, string destroySound = null, bool collidesWithTilemap = true)
   {
       Projectile p = projectile.ClonePrefab();
         p.baseData.damage                                 = damage       ?? p.baseData.damage;
@@ -984,7 +984,7 @@ public static class Extensions
 
   // Initializes and returns the first projectile from the default module of a gun
   public static Projectile InitFirstProjectile(this Gun gun, float? damage = null, float? speed = null, float? force = null, float? range = null, bool? shouldRotate = null,
-    bool collidesWithEnemies = true, bool ignoreDamageCaps = false, bool collidesWithProjectiles= false, bool surviveRigidbodyCollisions = true, float bossDamageMult = 1.0f, string destroySound = null, bool collidesWithTilemap = true)
+    bool collidesWithEnemies = true, bool ignoreDamageCaps = false, bool collidesWithProjectiles= false, bool surviveRigidbodyCollisions = false, float bossDamageMult = 1.0f, string destroySound = null, bool collidesWithTilemap = true)
   {
     Projectile p = gun.DefaultModule.projectiles[0].Clone(damage, speed, force, range, shouldRotate, collidesWithEnemies, ignoreDamageCaps, collidesWithProjectiles, surviveRigidbodyCollisions, bossDamageMult, destroySound);
     gun.DefaultModule.projectiles[0] = p;
@@ -994,14 +994,14 @@ public static class Extensions
 
   // Clone and return a projectile from a specific gun (Gun version)
   public static Projectile CloneProjectile(this Gun gun, float? damage = null, float? speed = null, float? force = null, float? range = null, bool? shouldRotate = null,
-    bool collidesWithEnemies = true, bool ignoreDamageCaps = false, bool collidesWithProjectiles= false, bool surviveRigidbodyCollisions = true, float bossDamageMult = 1.0f, string destroySound = null, bool collidesWithTilemap = true)
+    bool collidesWithEnemies = true, bool ignoreDamageCaps = false, bool collidesWithProjectiles= false, bool surviveRigidbodyCollisions = false, float bossDamageMult = 1.0f, string destroySound = null, bool collidesWithTilemap = true)
   {
       return gun.DefaultModule.projectiles[0].Clone(damage, speed, force, range, shouldRotate, collidesWithEnemies, ignoreDamageCaps, collidesWithProjectiles, surviveRigidbodyCollisions, bossDamageMult, destroySound);
   }
 
   // Clone and return a projectile from a specific gun (Items version)
   public static Projectile CloneProjectile(this Items gunItem, float? damage = null, float? speed = null, float? force = null, float? range = null, bool? shouldRotate = null,
-    bool collidesWithEnemies = true, bool ignoreDamageCaps = false, bool collidesWithProjectiles= false, bool surviveRigidbodyCollisions = true, float bossDamageMult = 1.0f, string destroySound = null, bool collidesWithTilemap = true)
+    bool collidesWithEnemies = true, bool ignoreDamageCaps = false, bool collidesWithProjectiles= false, bool surviveRigidbodyCollisions = false, float bossDamageMult = 1.0f, string destroySound = null, bool collidesWithTilemap = true)
   {
       return (ItemHelper.Get(gunItem) as Gun).DefaultModule.projectiles[0].Clone(damage, speed, force, range, shouldRotate, collidesWithEnemies, ignoreDamageCaps, collidesWithProjectiles, surviveRigidbodyCollisions, bossDamageMult, destroySound);
   }
