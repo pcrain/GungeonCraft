@@ -258,31 +258,17 @@ public class Missiletoe : AdvancedGunBehavior
 
     public override void MidGameSerialize(List<object> data, int i)
     {
-        ETGModConsole.Log($"  serializing!!");
         base.MidGameSerialize(data, i);
         data.Add(wrappedGifts.Count);
-        ETGModConsole.Log($"    serializing {wrappedGifts.Count} gifts");
         foreach(PickupObject pickup in wrappedGifts)
         {
-            ETGModConsole.Log($"      serializing id {pickup.PickupObjectId}");
             data.Add(pickup.PickupObjectId);
             if (pickup.GetComponent<PlayerItem>() is PlayerItem active)
-            {
-                ETGModConsole.Log($"        serializing active");
                 data.Add(new MidGameActiveItemData(active));
-            }
             else if (pickup.GetComponent<PassiveItem>() is PassiveItem passive)
-            {
-                ETGModConsole.Log($"        serializing passive");
                 data.Add(new MidGamePassiveItemData(passive));
-            }
             else if (pickup.GetComponent<Gun>() is Gun gun)
-            {
-                ETGModConsole.Log($"        serializing gun with {gun.DuctTapeMergedGunIDs.Count} duct taped guns");
-                MidGameGunData gunData = new MidGameGunData(gun);
-                ETGModConsole.Log($"          ...saved with {gunData.DuctTapedGunIDs.Count} duct taped guns");
-                data.Add(gunData);
-            }
+                data.Add(new MidGameGunData(gun));
             else
                 ETGModConsole.Log($"  SERIALIZING SOMETHING THAT ISN'T A GUN, ACTIVE, OR PASSIVE, TELL PRETZEL");
         }
@@ -290,15 +276,12 @@ public class Missiletoe : AdvancedGunBehavior
 
     public override void MidGameDeserialize(List<object> data, ref int i)
     {
-        ETGModConsole.Log($"  deserializing!!");
         base.MidGameDeserialize(data, ref i);
         wrappedGifts.Clear();
         int numGifts = (int)data[i++];
-        ETGModConsole.Log($"    deserializing {numGifts} gifts");
         for (int n = 0; n < numGifts; ++n)
         {
             int pickupId = (int)data[i++];
-            ETGModConsole.Log($"      deserializing id {pickupId}");
             PickupObject pickup = UnityEngine.Object.Instantiate(
                 PickupObjectDatabase.GetById(pickupId).gameObject, Vector3.zero, Quaternion.identity).GetComponent<PickupObject>();
 
@@ -323,14 +306,13 @@ public class Missiletoe : AdvancedGunBehavior
             else if (pickup.GetComponent<Gun>() is Gun gun)
             {
                 MidGameGunData itemData = (MidGameGunData)data[i++];
-                gun.CurrentAmmo = itemData.CurrentAmmo;
                 gun.MidGameDeserialize(itemData.SerializedData);
-                ETGModConsole.Log($"  gun has {itemData.DuctTapedGunIDs.Count} duct-taped guns!");
                 for (int k = 0; k < itemData.DuctTapedGunIDs.Count; k++)
                 {
                     if (PickupObjectDatabase.GetById(itemData.DuctTapedGunIDs[k]) is Gun ductTapeGun)
                         DuctTapeItem.DuctTapeGuns(ductTapeGun, gun);
                 }
+                gun.CurrentAmmo = itemData.CurrentAmmo;
             }
 
             pickup.renderer.enabled = false;
@@ -457,6 +439,8 @@ public class WrappableGift : MonoBehaviour
             {
                 PickupObject oldPickup = this._pickup;
                 this._pickup = UnityEngine.Object.Instantiate(oldPickup);
+                // Duct-taped guns aren't actually serialized, so we need to do this manually
+                this._pickup.GetComponent<Gun>().DuctTapeMergedGunIDs = oldPickup.GetComponent<Gun>().DuctTapeMergedGunIDs;
                 if (oldPickup.transform.parent != null)
                     UnityEngine.Object.Destroy(oldPickup.transform.parent?.gameObject);
                 else

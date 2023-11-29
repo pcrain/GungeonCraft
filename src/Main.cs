@@ -313,6 +313,7 @@ public class Initialisation : BaseUnityPlugin
             DragunFightHotfix.Init();
             CoopTurboModeHotfix.Init();
             LargeGunAnimationHotfix.Init();
+            DuctTapeSaveLoadHotfix.Init();
             // CoopDrillSoftlockHotfix.Init(); // incomplete
 
             watch.Stop();

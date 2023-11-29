@@ -1,5 +1,55 @@
 namespace CwaffingTheGungy;
 
+public static class DuctTapeSaveLoadHotfix
+{
+    public static void Init()
+    {
+
+        // foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+        // {
+        //     if (assembly.GetName().Name != "Assembly-CSharp")
+        //         continue;
+
+        //     // foreach (Type t in assembly.GetTypes())
+        //     // {
+        //     //     if (t.Name != "Gun")
+        //     //         continue;
+        //     //     ETGModConsole.Log($"    candidate type {t.Name} is gun {assembly.GetType("Gun") == t}");
+        //     // }
+
+        //     // continue;
+        //     Type gunType = assembly.GetType("Gun");
+        //     if (gunType == null)
+        //         continue;
+        //     ETGModConsole.Log($"  found gun type");
+
+        //     FieldInfo field = gunType.GetField("DuctTapeMergedGunIDs");
+        //     if (field == null)
+        //         continue;
+
+        //     ETGModConsole.Log($"  found DuctTapeMergedGunIDs field");
+        //     field
+
+        //     object[] myAttributes = field.GetCustomAttributes(true);
+        //     for(int j = 0; j < myAttributes.Length; j++)
+        //         Console.WriteLine("    The type of the attribute is {0}.", myAttributes[j]);
+        // }
+
+        new Hook(
+            typeof(Gun).GetMethod("CopyStateFrom", BindingFlags.Instance | BindingFlags.Public),
+            typeof(DuctTapeSaveLoadHotfix).GetMethod("CopyStateFromHook", BindingFlags.Static | BindingFlags.NonPublic)
+            );
+    }
+
+    private static void CopyStateFromHook(Action<Gun, Gun> orig, Gun gun, Gun other)
+    {
+        orig(gun, other);
+        gun.DuctTapeMergedGunIDs = other.DuctTapeMergedGunIDs;
+        // ETGModConsole.Log($"original duct tape count = {other.DuctTapeMergedGunIDs?.Count ?? -1}");
+        // ETGModConsole.Log($"new duct tape count = {gun.DuctTapeMergedGunIDs?.Count ?? -1}");
+    }
+}
+
 // Fix guns with extremely large animations having enormous pickup ranges and appearing very weirdly on pedestals
 public static class LargeGunAnimationHotfix
 {
