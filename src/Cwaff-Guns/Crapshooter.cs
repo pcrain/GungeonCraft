@@ -23,7 +23,7 @@ public class Crapshooter : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Crapshooter>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.POISON, reloadTime: 1.5f, ammo: 300);
+            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.PISTOL, reloadTime: 1.5f, ammo: 300);
             gun.SetIdleAnimationFPS(6);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
             gun.SetAnimationFPS(gun.reloadAnimation, 24);
@@ -33,9 +33,9 @@ public class Crapshooter : AdvancedGunBehavior
             gun.SetReloadAudio(_DiceSounds[1], 3, 7, 12, 15, 21, 27);
             gun.SetReloadAudio(_DiceSounds[2], 2, 18, 23, 25, 31);
 
-        _BaseCrapshooterProjectile = gun.InitSpecialProjectile<GrenadeProjectile>(clipSize: 12, cooldown: 0.16f, shootStyle: ShootStyle.Automatic, scale: 2.0f,
-          damage: 3f, speed: 24f, force: 10f, range: 30f, sprite: "crapshooter_projectile", fps: 12, anchor: Anchor.MiddleCenter,
-          shouldRotate: false
+        _BaseCrapshooterProjectile = gun.InitSpecialProjectile<GrenadeProjectile>(clipSize: 12, cooldown: 0.16f,
+            shootStyle: ShootStyle.Automatic, scale: 2.0f, damage: 3f, speed: 24f, force: 10f, range: 30f,
+            sprite: "crapshooter_projectile", fps: 12, anchor: Anchor.MiddleCenter, shouldRotate: false
           ).Attach<GrenadeProjectile>(g => {
             g.startingHeight = 0.5f;
           }).Attach<BounceProjModifier>(bounce => {

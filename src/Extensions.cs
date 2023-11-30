@@ -1296,7 +1296,6 @@ public static class Extensions
   // Set the FPS for a gun's idle animation (including the fixed idle animation, if available)
   public static void SetIdleAnimationFPS(this Gun gun, int fps)
   {
-    // gun.SetAnimationFPS(gun.idleAnimation, fps);
     gun.SetAnimationFPS($"{gun.InternalSpriteName()}_idle", fps);
     gun.SetAnimationFPS($"{gun.InternalSpriteName()}_{LargeGunAnimationHotfix._TRIM_ANIMATION}", fps);
   }

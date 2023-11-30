@@ -19,8 +19,8 @@ public class SubtractorBeam : AdvancedGunBehavior
     {
         Gun gun = Lazy.SetupGun<SubtractorBeam>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.FULLAUTO, reloadTime: 1.25f, ammo: 300);
+            gun.SetIdleAnimationFPS(10);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
-            gun.SetAnimationFPS(gun.idleAnimation, 10);
             gun.SetAnimationFPS(gun.reloadAnimation, 30);
             gun.SetMuzzleVFX("muzzle_subtractor_beam", fps: 30, scale: 0.3f, anchor: Anchor.MiddleCenter);
             gun.SetReloadAudio("subtractor_beam_reload_sound");

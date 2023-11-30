@@ -22,7 +22,7 @@ public class KiBlast : AdvancedGunBehavior
     {
         Gun gun = Lazy.SetupGun<KiBlast>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 999, infiniteAmmo: true);
-            gun.SetAnimationFPS(gun.idleAnimation, 10);
+            gun.SetIdleAnimationFPS(10);
             _FireLeftAnim  = gun.shootAnimation;
             _FireRightAnim = gun.UpdateAnimation("fire_alt", returnToIdle: true);
             gun.SetAnimationFPS(_FireLeftAnim, 24);

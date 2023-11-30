@@ -20,7 +20,7 @@ public class SchrodingersGat : AdvancedGunBehavior
     {
         Gun gun = Lazy.SetupGun<SchrodingersGat>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f, ammo: 250);
-            gun.SetAnimationFPS(gun.idleAnimation, 24);
+            gun.SetIdleAnimationFPS(24);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
 
         gun.InitProjectile(clipSize: -1, cooldown: 0.125f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, customClip: SpriteName,

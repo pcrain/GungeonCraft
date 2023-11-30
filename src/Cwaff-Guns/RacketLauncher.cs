@@ -20,8 +20,8 @@ public class RacketLauncher : AdvancedGunBehavior
         Gun gun = Lazy.SetupGun<RacketLauncher>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: _AMMO, canReloadNoMatterAmmo: true);
             gun.muzzleFlashEffects.type              = VFXPoolType.None;
+            gun.SetIdleAnimationFPS(_IDLE_FPS);
             gun.SetAnimationFPS(gun.shootAnimation, 60);
-            gun.SetAnimationFPS(gun.idleAnimation, _IDLE_FPS);
             gun.LoopAnimation(gun.idleAnimation, 0);
             gun.spriteAnimator.playAutomatically = false; // don't autoplay idle animation when dropped
 
@@ -33,14 +33,14 @@ public class RacketLauncher : AdvancedGunBehavior
     protected override void OnPickedUpByPlayer(PlayerController player)
     {
         base.OnPickedUpByPlayer(player);
-        gun.SetAnimationFPS(gun.idleAnimation, _IDLE_FPS);
+        gun.SetAnimationFPS(gun.idleAnimation, _IDLE_FPS); // don't need to use SetIdleAnimationFPS() outside of Initializer
         gun.spriteAnimator.Play();
     }
 
     protected override void OnPostDroppedByPlayer(PlayerController player)
     {
         base.OnPostDroppedByPlayer(player);
-        gun.SetAnimationFPS(gun.idleAnimation, 0);
+        gun.SetAnimationFPS(gun.idleAnimation, 0); // don't need to use SetIdleAnimationFPS() outside of Initializer
         gun.spriteAnimator.StopAndResetFrameToDefault();
     }
 
