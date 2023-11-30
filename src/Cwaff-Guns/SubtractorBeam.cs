@@ -32,9 +32,9 @@ public class SubtractorBeam : AdvancedGunBehavior
         _HitEffects = VFX.Create("subtractor_beam_hit_effect", 12, loops: true,
             scale: 0.5f, anchor: Anchor.MiddleCenter, emissivePower: 10f);
 
-        gun.InitProjectile(clipSize: 4, cooldown: 0.25f, angleVariance: 5.0f, shootStyle: ShootStyle.SemiAutomatic,
+        gun.InitProjectile(new(clipSize: 4, cooldown: 0.25f, angleVariance: 5.0f, shootStyle: ShootStyle.SemiAutomatic,
           damage: 0.0f, speed: 300.0f, force: 0.0f, range: 300.0f
-          ).Attach<PierceProjModifier>(pierce => {
+          )).Attach<PierceProjModifier>(pierce => {
             pierce.penetration            = 999;
             pierce.penetratesBreakables   = true;
           }).Attach<SubtractorProjectile>();

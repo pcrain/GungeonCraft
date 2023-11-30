@@ -39,11 +39,11 @@ public class KingsLaw : AdvancedGunBehavior
             gun.SetReloadAudio("knife_gun_reload");
             gun.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
-        gun.InitProjectile(clipSize: _NUM_BULLETS, shootStyle: ShootStyle.Charged, chargeTime: float.MaxValue, // absurdly high charge value so we never actually shoot
-          shouldRotate: true/*, collidesWithTilemap: false*/);  // collidesWithTilemap doesn't actually work
+        gun.InitProjectile(new(clipSize: _NUM_BULLETS, shootStyle: ShootStyle.Charged, chargeTime: float.MaxValue, // absurdly high charge value so we never actually shoot
+          shouldRotate: true/*, collidesWithTilemap: false*/));  // collidesWithTilemap doesn't actually work
 
-        _KingsLawBullet = Items.Ak47.CloneProjectile(damage: 5.0f, speed: 40.0f, range: 30.0f
-          ).AddAnimations(AnimatedBullet.Create(name: "kings_law_projectile", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter)
+        _KingsLawBullet = Items.Ak47.CloneProjectile(new(damage: 5.0f, speed: 40.0f, range: 30.0f
+          )).AddAnimations(AnimatedBullet.Create(name: "kings_law_projectile", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter)
           ).Attach<KingsLawBullets>();
 
         // Stagger projectile spawns alternating left and right from the starting angle

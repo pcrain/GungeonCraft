@@ -278,6 +278,7 @@ public static class AnimatedBullet // stolen and modified from NN
         clip.frames = frames.ToArray();
         return clip;
     }
+
     public static tk2dSpriteAnimationClip Create(string name, int fps = 2, Anchor anchor = Anchor.MiddleCenter, float scale = 1.0f, bool anchorsChangeColliders = true,
         bool fixesScales = true, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null, IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null)
     {
@@ -297,6 +298,7 @@ public static class AnimatedBullet // stolen and modified from NN
             overrideColliderOffsets       : Enumerable.Repeat<IntVector2?>(overrideColliderOffsets,n).ToList(),
             overrideProjectilesToCopyFrom : Enumerable.Repeat<Projectile>(overrideProjectilesToCopyFrom,n).ToList());
     }
+
     public static tk2dSpriteAnimationClip Create(ref tk2dSpriteAnimationClip refClip, string name, int fps = 2, Anchor anchor = Anchor.MiddleCenter, float scale = 1.0f, bool anchorsChangeColliders = true,
         bool fixesScales = true, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null, IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null)
     {
@@ -304,11 +306,13 @@ public static class AnimatedBullet // stolen and modified from NN
             fixesScales: fixesScales, manualOffsets: manualOffsets, overrideColliderPixelSizes: overrideColliderPixelSizes,
             overrideColliderOffsets: overrideColliderOffsets, overrideProjectilesToCopyFrom: overrideProjectilesToCopyFrom);
     }
+
     public static void SetAnimation(this Projectile proj, tk2dSpriteAnimationClip clip, int frame = 0)
     {
         proj.sprite.spriteAnimator.currentClip = clip;
         proj.sprite.spriteAnimator.PlayFromFrame(frame);
     }
+
     public static void AddAnimation(this Projectile proj, tk2dSpriteAnimationClip clip)
     {
         if (proj.sprite.spriteAnimator == null)
@@ -326,10 +330,21 @@ public static class AnimatedBullet // stolen and modified from NN
         proj.sprite.spriteAnimator.Library.clips = proj.sprite.spriteAnimator.Library.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
         proj.sprite.spriteAnimator.deferNextStartClip = false;
     }
+
     public static void AddDefaultAnimation(this Projectile proj, tk2dSpriteAnimationClip clip, int frame = 0)
     {
         proj.AddAnimation(clip);
         proj.SetAnimation(clip, frame);
+    }
+
+    public static void AddDefaultAnimation(this Projectile proj, GunBuildData b, int frame = 0)
+    {
+        if (string.IsNullOrEmpty(b.sprite))
+            return; // if we haven't specified a sprite, make this a no-op
+        proj.AddDefaultAnimation(AnimatedBullet.Create(
+            name: b.sprite, fps: b.fps, anchor: b.anchor, scale: b.scale, anchorsChangeColliders: b.anchorsChangeColliders, fixesScales: b.fixesScales,
+            manualOffsets: b.manualOffsets, overrideColliderPixelSizes: b.overrideColliderPixelSizes, overrideColliderOffsets: b.overrideColliderOffsets,
+            overrideProjectilesToCopyFrom: b.overrideProjectilesToCopyFrom), frame: frame);
     }
 }
 

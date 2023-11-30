@@ -28,9 +28,9 @@ public class Alligator : AdvancedGunBehavior
             gun.SetFireAudio("alligator_shoot_sound");
             gun.SetReloadAudio("alligator_reload_sound");
 
-        gun.InitProjectile(clipSize: 8, cooldown: 0.4f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic,
+        gun.InitProjectile(new(clipSize: 8, cooldown: 0.4f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic,
           damage: 1.0f, speed: 36.0f, sprite: "alligator_projectile", fps: 2, anchor: Anchor.MiddleCenter
-          ).Attach<AlligatorProjectile>();
+          )).Attach<AlligatorProjectile>();
 
         _ShootBarrelOffsets  = gun.GetBarrelOffsetsForAnimation(gun.shootAnimation);
         _ReloadBarrelOffsets = gun.GetBarrelOffsetsForAnimation(gun.reloadAnimation);

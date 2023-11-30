@@ -22,12 +22,12 @@ public class PlatinumStar : AdvancedGunBehavior
             gun.SetReloadAudio("platinum_reload_sound", frame: 5);
             gun.AddToSubShop(ModdedShopType.TimeTrader);
 
-        gun.InitProjectile(clipSize: 28, cooldown: 0.125f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, customClip: SpriteName,
+        gun.InitProjectile(new(clipSize: 28, cooldown: 0.125f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, customClip: SpriteName,
           damage: 3.0f, speed: 50.0f, force: 1.0f, range: 50.0f, sprite: "platinum_star_projectile", fps: 12, anchor: Anchor.MiddleLeft
-          ).Attach<PlatinumProjectile>();
+          )).Attach<PlatinumProjectile>();
 
-        _OraBullet = Items.Polaris.CloneProjectile(damage: 1.0f, speed: 75.0f, force: 0.1f, range: 3.0f, shouldRotate: true
-          ).AddAnimations(AnimatedBullet.Create(name: "ora_fist_fast", fps: 12, scale: 0.33f, anchor: Anchor.MiddleRight)
+        _OraBullet = Items.Polaris.CloneProjectile(new(damage: 1.0f, speed: 75.0f, force: 0.1f, range: 3.0f, shouldRotate: true
+          )).AddAnimations(AnimatedBullet.Create(name: "ora_fist_fast", fps: 12, scale: 0.33f, anchor: Anchor.MiddleRight)
           ).Attach<PierceProjModifier>(pierce => pierce.penetration = 999);
     }
 

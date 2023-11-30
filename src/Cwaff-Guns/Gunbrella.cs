@@ -37,10 +37,10 @@ public class Gunbrella : AdvancedGunBehavior
             gun.LoopAnimation(gun.chargeAnimation, 17);
             gun.SetMuzzleVFX("muzzle_gunbrella", fps: 30, scale: 0.5f, anchor: Anchor.MiddleCenter);
 
-        gun.InitProjectile(clipSize: 1, shootStyle: ShootStyle.Charged, customClip: SpriteName, ammoCost: 0,
+        gun.InitProjectile(new(clipSize: 1, shootStyle: ShootStyle.Charged, customClip: SpriteName, ammoCost: 0,
           damage: _PROJ_DAMAGE, sprite: "gunbrella_projectile", fps: 16, anchor: Anchor.MiddleLeft, freeze: 0.33f, chargeTime: _MIN_CHARGE_TIME,
           destroySound: "icicle_crash", bossDamageMult: 0.6f // bosses are big and this does a lot of damage, so tone it down
-          ).SetAllImpactVFX(VFX.CreatePool("icicle_crash_particles", fps: 30, loops: false, anchor: Anchor.MiddleCenter, scale: 0.35f)
+          )).SetAllImpactVFX(VFX.CreatePool("icicle_crash_particles", fps: 30, loops: false, anchor: Anchor.MiddleCenter, scale: 0.35f)
           ).Attach<GunbrellaProjectile>();
 
         for (int i = 1; i < _BARRAGE_SIZE; i++)

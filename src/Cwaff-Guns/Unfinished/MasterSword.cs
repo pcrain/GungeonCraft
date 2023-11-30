@@ -27,7 +27,7 @@ public class MasterSword : AdvancedGunBehavior
         gun.InfiniteAmmo                         = true;
         gun.SetAnimationFPS(gun.shootAnimation, 12);
 
-        Projectile projectile              = gun.InitFirstProjectile(damage: 4.0f, speed: 30.0f);
+        Projectile projectile              = gun.InitFirstProjectile(new(damage: 4.0f, speed: 30.0f));
         projectile.sprite.renderer.enabled = false;
 
         ProjectileSlashingBehaviour slash          = projectile.gameObject.AddComponent<ProjectileSlashingBehaviour>();

@@ -25,10 +25,10 @@ public class BBGun : AdvancedGunBehavior
             gun.SetFireAudio("Play_WPN_seriouscannon_shot_01");
             gun.SetReloadAudio("Play_ENM_flame_veil_01");
 
-        Projectile p = gun.InitProjectile(
+        Projectile p = gun.InitProjectile(new(
           clipSize: 3, cooldown: 0.7f, angleVariance: 10.0f, shootStyle: ShootStyle.Charged, sequenceStyle: ProjectileSequenceStyle.Ordered,
           customClip: SpriteName, speed: 20f, range: 999999f, sprite: "bball", fps: 20, anchor: Anchor.MiddleCenter,
-          anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(2, 2)); // prevent uneven colliders from glitching into walls
+          anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(2, 2))); // prevent uneven colliders from glitching into walls
 
         for (int i = 0; i < _CHARGE_LEVELS.Length; i++)
             gun.DefaultModule.chargeProjectiles.Add(new ProjectileModule.ChargeProjectile {

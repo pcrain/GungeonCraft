@@ -22,11 +22,11 @@ public class PistolWhip : AdvancedGunBehavior
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
             gun.muzzleFlashEffects = null;
 
-        gun.InitProjectile(ammoCost: 0, clipSize: -1, cooldown: WhipChainStart.TOTAL_TIME + C.FRAME, shootStyle: ShootStyle.SemiAutomatic,
-          damage: 0.0f, speed: 0.01f, range: 999.0f).Attach<WhipChainStartProjectile>();
+        gun.InitProjectile(new(ammoCost: 0, clipSize: -1, cooldown: WhipChainStart.TOTAL_TIME + C.FRAME, shootStyle: ShootStyle.SemiAutomatic,
+          damage: 0.0f, speed: 0.01f, range: 999.0f)).Attach<WhipChainStartProjectile>();
 
-        _PistolWhipProjectile = Items.Ak47.CloneProjectile(damage: 15.0f, speed: 80.0f, force: 10.0f, range: 80.0f
-          ).Attach<EasyTrailBullet>(trail => {
+        _PistolWhipProjectile = Items.Ak47.CloneProjectile(new(damage: 15.0f, speed: 80.0f, force: 10.0f, range: 80.0f
+          )).Attach<EasyTrailBullet>(trail => {
             trail.TrailPos   = trail.transform.position;
             trail.StartWidth = 0.3f;
             trail.EndWidth   = 0f;
@@ -35,8 +35,8 @@ public class PistolWhip : AdvancedGunBehavior
             trail.EndColor   = Color.yellow;
           });
 
-        _PistolButtProjectile = Items.Ak47.CloneProjectile(damage: 30.0f, speed: 1.0f, force: 40.0f, range: 0.01f
-          ).AddAnimations(AnimatedBullet.Create(name: "natascha_bullet", fps: 12, anchor: Anchor.MiddleCenter) // Not really visible, just used for pixel collider size
+        _PistolButtProjectile = Items.Ak47.CloneProjectile(new(damage: 30.0f, speed: 1.0f, force: 40.0f, range: 0.01f
+          )).AddAnimations(AnimatedBullet.Create(name: "natascha_bullet", fps: 12, anchor: Anchor.MiddleCenter) // Not really visible, just used for pixel collider size
           ).SetAllImpactVFX(VFX.CreatePool("whip_particles", fps: 20, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f)
           ).Attach<PistolButtProjectile>();
     }

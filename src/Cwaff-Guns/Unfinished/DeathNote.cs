@@ -24,7 +24,7 @@ public class DeathNote : AdvancedGunBehavior
             gun.DefaultModule.angleVariance       = 15.0f;
             gun.quality                           = ItemQuality.D;
 
-        Projectile projectile = gun.InitFirstProjectile();
+        Projectile projectile = gun.InitFirstProjectile(new());
     }
 
     protected override void OnPostDroppedByPlayer(PlayerController player)

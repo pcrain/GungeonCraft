@@ -20,8 +20,8 @@ public class PaintballCannon : AdvancedGunBehavior
             gun.SetReloadAudio("paintball_reload_sound");
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
-        gun.InitProjectile(clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic, damage: 9.0f
-          ).Attach<PaintballColorizer>();
+        gun.InitProjectile(new(clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic, damage: 9.0f
+          )).Attach<PaintballColorizer>();
     }
 
     public override void PostProcessProjectile(Projectile projectile)

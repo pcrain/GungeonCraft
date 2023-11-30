@@ -27,10 +27,10 @@ public class Pincushion : AdvancedGunBehavior
             gun.SetReloadAudio("pincushion_reload_sound", 8, 13, 18, 23, 28, 35);
             gun.SetMuzzleVFX(null); // too many projectiles to benefit from muzzle VFX
 
-        gun.InitProjectile(clipSize: 1000 / _SIMULTANEOUS_BULLETS, cooldown: C.FRAME, angleVariance: 35.0f, shootStyle: ShootStyle.Automatic,
+        gun.InitProjectile(new(clipSize: 1000 / _SIMULTANEOUS_BULLETS, cooldown: C.FRAME, angleVariance: 35.0f, shootStyle: ShootStyle.Automatic,
           damage: 0.0f, speed: 200.0f, force: 0.0f, range: 999f, bossDamageMult: 0.65f, sprite: "needle", fps: 12,
           anchor: Anchor.MiddleLeft, barrageSize: 4
-          ).SetAllImpactVFX(VFX.CreatePool("microdust", fps: 30, loops: false)
+          )).SetAllImpactVFX(VFX.CreatePool("microdust", fps: 30, loops: false)
           ).Attach<VeryFragileProjectile>(
           ).Attach<EasyTrailBullet>(trail => {
             trail.TrailPos   = trail.transform.position;

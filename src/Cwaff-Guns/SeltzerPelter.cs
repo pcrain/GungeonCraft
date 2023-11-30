@@ -38,14 +38,14 @@ public class SeltzerPelter : AdvancedGunBehavior
             }
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
-        gun.InitProjectile(clipSize: 1, cooldown: 0.5f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName,
+        gun.InitProjectile(new(clipSize: 1, cooldown: 0.5f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName,
           damage: 16.0f, speed: 30.0f, force: 75.0f, range: 999.0f, sprite: "can_projectile", fps: 1,  anchor: Anchor.MiddleCenter, // 1 FPS minimum, stop animator manually later
           anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(2, 2) // prevent uneven colliders from glitching into walls
-          ).Attach<SeltzerProjectile>();
+          )).Attach<SeltzerProjectile>();
 
         // the perfect seltzer stats, do not tweak without testing! (beam damage == DPS)
-        _BubbleBeam = Items.MarineSidearm.CloneProjectile(damage: 40.0f, speed: 20.0f, force: 100.0f, range: 4.0f
-          ).SetupBeamSprites(spriteName: "bubble_stream", fps: 8, dims: new Vector2(8, 8));
+        _BubbleBeam = Items.MarineSidearm.CloneProjectile(new(damage: 40.0f, speed: 20.0f, force: 100.0f, range: 4.0f
+          )).SetupBeamSprites(spriteName: "bubble_stream", fps: 8, dims: new Vector2(8, 8));
             _BubbleBeam.sprite.usesOverrideMaterial = true;
             _BubbleBeam.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
             _BubbleBeam.sprite.renderer.material.SetFloat("_EmissivePower", 5f);

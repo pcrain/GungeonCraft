@@ -24,7 +24,7 @@ public class DriftersHeadgear : PassiveItem
 
         var comp = item.gameObject.AddComponent<HLDRoll>();
 
-        _LightningProjectile = Items.GunslingersAshes.CloneProjectile(damage: 5.0f, speed: 0.001f);
+        _LightningProjectile = Items.GunslingersAshes.CloneProjectile(new(damage: 5.0f, speed: 0.001f));
     }
 
     public override void Update()

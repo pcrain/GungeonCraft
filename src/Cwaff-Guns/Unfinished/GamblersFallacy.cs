@@ -28,7 +28,7 @@ public class GamblersFallacy : AdvancedGunBehavior
         gun.SetBaseMaxAmmo(800);
         gun.SetAnimationFPS(gun.shootAnimation, 24);
 
-        Projectile projectile       = gun.InitFirstProjectile(damage: 3.0f, speed: 20.0f);
+        Projectile projectile       = gun.InitFirstProjectile(new(damage: 3.0f, speed: 20.0f));
     }
 
     public override void OnPostFired(PlayerController player, Gun gun)

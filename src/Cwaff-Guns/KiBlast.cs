@@ -31,10 +31,10 @@ public class KiBlast : AdvancedGunBehavior
             gun.SetFireAudio("ki_blast_sound");
             gun.AddToSubShop(ModdedShopType.Boomhildr);
 
-        gun.InitProjectile(clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
+        gun.InitProjectile(new(clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
           ammoType: GameUIAmmoType.AmmoType.BEAM, damage: 4.0f, range: 10.0f, speed: 50.0f, sprite: "ki_blast", fps: 12, scale: 0.0625f,
           anchor: Anchor.MiddleCenter, ignoreDamageCaps: true
-          ).SetAllImpactVFX(VFX.CreatePool("ki_explosion", fps: 20, loops: false, scale: 0.5f)
+          )).SetAllImpactVFX(VFX.CreatePool("ki_explosion", fps: 20, loops: false, scale: 0.5f)
           ).Attach<EasyTrailBullet>(trail => {
             trail.TrailPos   = trail.transform.position;
             trail.StartWidth = 0.2f;

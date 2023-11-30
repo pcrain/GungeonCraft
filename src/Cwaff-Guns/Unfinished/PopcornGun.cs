@@ -26,7 +26,7 @@ public class PopcornGun : AdvancedGunBehavior
         gun.SetBaseMaxAmmo(250);
         gun.SetAnimationFPS(gun.shootAnimation, 24);
 
-        Projectile projectile       = gun.InitFirstProjectile(damage: 5.0f, speed: 20.0f);
+        Projectile projectile       = gun.InitFirstProjectile(new(damage: 5.0f, speed: 20.0f));
 
         PopcornBehavior pop = projectile.gameObject.AddComponent<PopcornBehavior>();
 

@@ -30,7 +30,7 @@ public class Taomislav : AdvancedGunBehavior
             gun.CurrentAmmo = 2500;
             gun.SetAnimationFPS(gun.shootAnimation, (int)((float)_FireAnimationFrames / _BaseCooldownTime) + 1);
 
-        Projectile projectile = gun.InitFirstProjectile(damage: 3.0f, speed: 20.0f);
+        Projectile projectile = gun.InitFirstProjectile(new(damage: 3.0f, speed: 20.0f));
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: "natascha_bullet", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter));
     }
 

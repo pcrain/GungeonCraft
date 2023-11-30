@@ -60,7 +60,7 @@ public class Missiletoe : AdvancedGunBehavior
             gun.SetReloadAudio("missiletoe_reload_sound");
             gun.AddToSubShop(ModdedShopType.Boomhildr);
 
-        gun.DefaultModule.SetAttributes(clipSize: 1, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName);
+        gun.DefaultModule.SetAttributes(new(clipSize: 1, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName));
 
         ExplosionData giftExplosion = new ExplosionData();
             giftExplosion.CopyFrom(Bouncer._MiniExplosion);
@@ -137,7 +137,7 @@ public class Missiletoe : AdvancedGunBehavior
 
     private static Projectile SetupProjectile(Gun gun, string name, float damage, float speed, float force)
     {
-        Projectile projectile = gun.CloneProjectile(damage: damage, speed: speed, range: 50.0f, force: force);
+        Projectile projectile = gun.CloneProjectile(new(damage: damage, speed: speed, range: 50.0f, force: force));
             projectile.AddDefaultAnimation(AnimatedBullet.Create(name: name, fps: 1, scale: 0.5f, anchor: Anchor.MiddleLeft));
             projectile.transform.parent       = gun.barrelOffset;
             projectile.shouldFlipHorizontally = true;

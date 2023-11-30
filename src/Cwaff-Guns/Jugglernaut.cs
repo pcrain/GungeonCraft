@@ -97,8 +97,8 @@ public class Jugglernaut : AdvancedGunBehavior
             gun.reloadAnimation         = null; // animation shouldn't change when reloading
             gun.shootAnimation          = null; // animation shouldn't change when firing
 
-        gun.InitProjectile(clipSize: -1, cooldown: 1.0f, shootStyle: ShootStyle.SemiAutomatic, damage: 10.0f, speed: 70.0f,
-          sprite: "jugglernaut_ball", fps: 12, scale: 0.5f, anchor: Anchor.MiddleLeft);
+        gun.InitProjectile(new(clipSize: -1, cooldown: 1.0f, shootStyle: ShootStyle.SemiAutomatic, damage: 10.0f, speed: 70.0f,
+          sprite: "jugglernaut_ball", fps: 12, scale: 0.5f, anchor: Anchor.MiddleLeft));
     }
 
     private bool _cachedFlipped = false;

@@ -178,6 +178,7 @@
     <Compile Include="src\NonstandardApi\GungoSaveAPI\CustomDungeonPrerequisite.cs"/>
     <Compile Include="src\NonstandardApi\GungoSaveAPI\CustomHuntQuest.cs"/>
     <Compile Include="src\NonstandardApi\CustomDodgeRoll.cs"/>
+    <Compile Include="src\NonstandardApi\GunBuilder.cs"/>
     <Compile Include="src\NonstandardApi\MiniInteractable.cs"/>
     <Compile Include="src\NonstandardApi\BeamHelpers.cs"/>
     <Compile Include="src\NonstandardApi\Cwaff-GenericNPC.cs"/>

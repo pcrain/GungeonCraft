@@ -469,7 +469,7 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
     {
         if (_NullProjectilePrefab == null)
         {
-            _NullProjectilePrefab                     = Items.Ak47.CloneProjectile(damage: 0.0f, speed: 0.00001f, range: 1.0f);
+            _NullProjectilePrefab                     = Items.Ak47.CloneProjectile(new(damage: 0.0f, speed: 0.00001f, range: 1.0f));
             _NullProjectilePrefab.damageTypes         = CoreDamageTypes.None;
             _NullProjectilePrefab.collidesWithEnemies = false;
             _NullProjectilePrefab.collidesWithPlayer  = false;

@@ -63,13 +63,13 @@ public class DerailGun : AdvancedGunBehavior
             "CwaffingTheGungy/Resources/BeamSprites/railbeam_mid_001",
         };
 
-        Projectile projectile              = gun.InitFirstProjectile(damage: 0.0f, speed: 0.1f, force: 0.0f, range: 200.0f);
+        Projectile projectile              = gun.InitFirstProjectile(new(damage: 0.0f, speed: 0.1f, force: 0.0f, range: 200.0f));
         ETGModConsole.Log($"got beam paths");
         projectile.sprite.renderer.enabled = false;
 
         var railcomp = projectile.gameObject.AddComponent<ReplaceBulletWithRail>();
 
-        Projectile projectile2         = Items.MarineSidearm.CloneProjectile(damage: 0.0f, force: 0.0f, range: 999f);
+        Projectile projectile2         = Items.MarineSidearm.CloneProjectile(new(damage: 0.0f, force: 0.0f, range: 999f));
         BasicBeamController beamComp2  = projectile2.GenerateBeamPrefab(
             /*sprite path*/                    "CwaffingTheGungy/Resources/BeamSprites/railbeam_mid_001",
             /*collider dimensions*/            new Vector2(15, 7),

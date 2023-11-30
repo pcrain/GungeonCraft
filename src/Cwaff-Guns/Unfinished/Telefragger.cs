@@ -25,7 +25,7 @@ public class Telefragger : AdvancedGunBehavior
         gun.SetBaseMaxAmmo(1000);
         gun.SetAnimationFPS(gun.shootAnimation, 24);
 
-        Projectile projectile       = gun.InitFirstProjectile(damage: 20.0f, speed: 30.0f);
+        Projectile projectile       = gun.InitFirstProjectile(new(damage: 20.0f, speed: 30.0f));
 
         projectile.gameObject.AddComponent<HeadCannonBullets>();
     }
