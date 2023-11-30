@@ -982,14 +982,117 @@ public static class Extensions
       return p;
   }
 
-  // Initializes and returns the first projectile from the default module of a gun
-  public static Projectile InitFirstProjectile(this Gun gun, float? damage = null, float? speed = null, float? force = null, float? range = null, bool? shouldRotate = null,
-    bool collidesWithEnemies = true, bool ignoreDamageCaps = false, bool collidesWithProjectiles= false, bool surviveRigidbodyCollisions = false, float bossDamageMult = 1.0f, string destroySound = null, bool collidesWithTilemap = true)
+  // Copy fields from a Projectile to a subclass of that Projectile, then attach it to the base projectile's gameObject and destroy the base projectile
+  public static ProjectileType ConvertToSpecialtyType<ProjectileType>(this Projectile baseProj) where ProjectileType : Projectile
   {
-    Projectile p = gun.DefaultModule.projectiles[0].Clone(damage, speed, force, range, shouldRotate, collidesWithEnemies, ignoreDamageCaps, collidesWithProjectiles, surviveRigidbodyCollisions, bossDamageMult, destroySound);
+    ProjectileType p = baseProj.gameObject.AddComponent<ProjectileType>();
+    p.BulletScriptSettings                        = baseProj.BulletScriptSettings;
+    p.damageTypes                                 = baseProj.damageTypes;
+    p.allowSelfShooting                           = baseProj.allowSelfShooting;
+    p.collidesWithPlayer                          = baseProj.collidesWithPlayer;
+    p.collidesWithProjectiles                     = baseProj.collidesWithProjectiles;
+    p.collidesOnlyWithPlayerProjectiles           = baseProj.collidesOnlyWithPlayerProjectiles;
+    p.projectileHitHealth                         = baseProj.projectileHitHealth;
+    p.collidesWithEnemies                         = baseProj.collidesWithEnemies;
+    p.shouldRotate                                = baseProj.shouldRotate;
+    p.shouldFlipVertically                        = baseProj.shouldFlipVertically;
+    p.shouldFlipHorizontally                      = baseProj.shouldFlipHorizontally;
+    p.ignoreDamageCaps                            = baseProj.ignoreDamageCaps;
+    p.baseData                                    = baseProj.baseData;
+    p.AppliesPoison                               = baseProj.AppliesPoison;
+    p.PoisonApplyChance                           = baseProj.PoisonApplyChance;
+    p.healthEffect                                = baseProj.healthEffect;
+    p.AppliesSpeedModifier                        = baseProj.AppliesSpeedModifier;
+    p.SpeedApplyChance                            = baseProj.SpeedApplyChance;
+    p.speedEffect                                 = baseProj.speedEffect;
+    p.AppliesCharm                                = baseProj.AppliesCharm;
+    p.CharmApplyChance                            = baseProj.CharmApplyChance;
+    p.charmEffect                                 = baseProj.charmEffect;
+    p.AppliesFreeze                               = baseProj.AppliesFreeze;
+    p.FreezeApplyChance                           = baseProj.FreezeApplyChance;
+    p.freezeEffect                                = baseProj.freezeEffect;
+    p.AppliesFire                                 = baseProj.AppliesFire;
+    p.FireApplyChance                             = baseProj.FireApplyChance;
+    p.fireEffect                                  = baseProj.fireEffect;
+    p.AppliesStun                                 = baseProj.AppliesStun;
+    p.StunApplyChance                             = baseProj.StunApplyChance;
+    p.AppliedStunDuration                         = baseProj.AppliedStunDuration;
+    p.AppliesBleed                                = baseProj.AppliesBleed;
+    p.bleedEffect                                 = baseProj.bleedEffect;
+    p.AppliesCheese                               = baseProj.AppliesCheese;
+    p.CheeseApplyChance                           = baseProj.CheeseApplyChance;
+    p.cheeseEffect                                = baseProj.cheeseEffect;
+    p.BleedApplyChance                            = baseProj.BleedApplyChance;
+    p.CanTransmogrify                             = baseProj.CanTransmogrify;
+    p.ChanceToTransmogrify                        = baseProj.ChanceToTransmogrify;
+    p.TransmogrifyTargetGuids                     = baseProj.TransmogrifyTargetGuids;
+    p.hitEffects                                  = baseProj.hitEffects;
+    p.CenterTilemapHitEffectsByProjectileVelocity = baseProj.CenterTilemapHitEffectsByProjectileVelocity;
+    p.wallDecals                                  = baseProj.wallDecals;
+    p.damagesWalls                                = baseProj.damagesWalls;
+    p.persistTime                                 = baseProj.persistTime;
+    p.angularVelocity                             = baseProj.angularVelocity;
+    p.angularVelocityVariance                     = baseProj.angularVelocityVariance;
+    p.spawnEnemyGuidOnDeath                       = baseProj.spawnEnemyGuidOnDeath;
+    p.HasFixedKnockbackDirection                  = baseProj.HasFixedKnockbackDirection;
+    p.FixedKnockbackDirection                     = baseProj.FixedKnockbackDirection;
+    p.pierceMinorBreakables                       = baseProj.pierceMinorBreakables;
+    p.objectImpactEventName                       = baseProj.objectImpactEventName;
+    p.enemyImpactEventName                        = baseProj.enemyImpactEventName;
+    p.onDestroyEventName                          = baseProj.onDestroyEventName;
+    p.additionalStartEventName                    = baseProj.additionalStartEventName;
+    p.IsRadialBurstLimited                        = baseProj.IsRadialBurstLimited;
+    p.MaxRadialBurstLimit                         = baseProj.MaxRadialBurstLimit;
+    p.AdditionalBurstLimits                       = baseProj.AdditionalBurstLimits;
+    p.AppliesKnockbackToPlayer                    = baseProj.AppliesKnockbackToPlayer;
+    p.PlayerKnockbackForce                        = baseProj.PlayerKnockbackForce;
+    p.HasDefaultTint                              = baseProj.HasDefaultTint;
+    p.DefaultTintColor                            = baseProj.DefaultTintColor;
+    p.PenetratesInternalWalls                     = baseProj.PenetratesInternalWalls;
+    p.neverMaskThis                               = baseProj.neverMaskThis;
+    p.isFakeBullet                                = baseProj.isFakeBullet;
+    p.CanBecomeBlackBullet                        = baseProj.CanBecomeBlackBullet;
+    p.TrailRenderer                               = baseProj.TrailRenderer;
+    p.CustomTrailRenderer                         = baseProj.CustomTrailRenderer;
+    p.ParticleTrail                               = baseProj.ParticleTrail;
+    p.DelayedDamageToExploders                    = baseProj.DelayedDamageToExploders;
+    p.AdditionalScaleMultiplier                   = baseProj.AdditionalScaleMultiplier;
+    UnityEngine.Object.Destroy(baseProj);  // we don't want two projectiles attached to the same gameObject
+    return p;
+  }
+
+  // Initializes and returns the first projectile from the default module of a gun
+  public static ProjectileType InitFirstProjectileOfType<ProjectileType>(this Gun gun, float? damage = null, float? speed = null, float? force = null, float? range = null, bool? shouldRotate = null,
+    bool collidesWithEnemies = true, bool ignoreDamageCaps = false, bool collidesWithProjectiles= false, bool surviveRigidbodyCollisions = false, float bossDamageMult = 1.0f, string destroySound = null, bool collidesWithTilemap = true)
+    where ProjectileType : Projectile
+  {
+    Projectile clone = gun.DefaultModule.projectiles[0].Clone(damage, speed, force, range, shouldRotate, collidesWithEnemies, ignoreDamageCaps, collidesWithProjectiles, surviveRigidbodyCollisions, bossDamageMult, destroySound);
+    ProjectileType p = clone as ProjectileType;
+    if (p == null)
+      p = clone.ConvertToSpecialtyType<ProjectileType>();
     gun.DefaultModule.projectiles[0] = p;
     p.transform.parent = gun.barrelOffset;
     return p;
+  }
+
+  // Generic version of the above, assuming we just want a normal projectile
+  public static Projectile InitFirstProjectile(this Gun gun, float? damage = null, float? speed = null, float? force = null, float? range = null, bool? shouldRotate = null,
+    bool collidesWithEnemies = true, bool ignoreDamageCaps = false, bool collidesWithProjectiles= false, bool surviveRigidbodyCollisions = false, float bossDamageMult = 1.0f, string destroySound = null, bool collidesWithTilemap = true)
+  {
+    return gun.InitFirstProjectileOfType<Projectile>(
+      damage                     : damage,
+      speed                      : speed,
+      force                      : force,
+      range                      : range,
+      shouldRotate               : shouldRotate,
+      collidesWithEnemies        : collidesWithEnemies,
+      ignoreDamageCaps           : ignoreDamageCaps,
+      collidesWithProjectiles    : collidesWithProjectiles,
+      surviveRigidbodyCollisions : surviveRigidbodyCollisions,
+      bossDamageMult             : bossDamageMult,
+      destroySound               : destroySound,
+      collidesWithTilemap        : collidesWithTilemap
+      );
   }
 
   // Clone and return a projectile from a specific gun (Gun version)
@@ -1069,19 +1172,19 @@ public static class Extensions
   /// <param name="barrageSize"></param>
 
   /// <returns>The fully setup projectile</returns>
-  public static Projectile InitProjectile(this Gun gun, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
+  public static ProjectileType InitSpecialProjectile<ProjectileType>(this Gun gun, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
     ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1, GameUIAmmoType.AmmoType? ammoType = null,
     string customClip = null, float? damage = null, float? speed = null, float? force = null, float? range = null, float poison = 0.0f, float fire = 0.0f, float freeze = 0.0f,
     bool collidesWithEnemies = true, bool ignoreDamageCaps = false, bool collidesWithProjectiles= false, bool surviveRigidbodyCollisions = false, bool collidesWithTilemap = true,
-    string sprite = null, int fps = 2, Anchor anchor = Anchor.MiddleCenter,
-    float scale = 1.0f, bool anchorsChangeColliders = true, bool fixesScales = true, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null,
+    string sprite = null, int fps = 2, Anchor anchor = Anchor.MiddleCenter, float scale = 1.0f, bool anchorsChangeColliders = true, bool fixesScales = true, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null,
     IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null, float bossDamageMult = 1.0f, string destroySound = null, bool? shouldRotate = null, int barrageSize = 1)
+    where ProjectileType : Projectile
   {
     ProjectileModule mod = gun.SetupDefaultModule(
       clipSize: clipSize, cooldown: cooldown, angleVariance: angleVariance, ammoCost: ammoCost, customClip: customClip,
       shootStyle: shootStyle, sequenceStyle: sequenceStyle, ammoType: ammoType);
 
-    Projectile proj = gun.InitFirstProjectile(damage: damage, speed: speed, force: force, range: range, collidesWithEnemies: collidesWithEnemies,
+    ProjectileType proj = gun.InitFirstProjectileOfType<ProjectileType>(damage: damage, speed: speed, force: force, range: range, collidesWithEnemies: collidesWithEnemies,
       ignoreDamageCaps: ignoreDamageCaps, collidesWithProjectiles: collidesWithProjectiles, surviveRigidbodyCollisions: surviveRigidbodyCollisions,
       bossDamageMult: bossDamageMult, destroySound: destroySound, shouldRotate: shouldRotate, collidesWithTilemap: collidesWithTilemap);
     if (!string.IsNullOrEmpty(sprite))
@@ -1123,6 +1226,53 @@ public static class Extensions
     return proj;
   }
 
+  // Generic version of the above, assuming we just want a normal projectile
+  public static Projectile InitProjectile(this Gun gun, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
+  ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1, GameUIAmmoType.AmmoType? ammoType = null,
+  string customClip = null, float? damage = null, float? speed = null, float? force = null, float? range = null, float poison = 0.0f, float fire = 0.0f, float freeze = 0.0f,
+  bool collidesWithEnemies = true, bool ignoreDamageCaps = false, bool collidesWithProjectiles= false, bool surviveRigidbodyCollisions = false, bool collidesWithTilemap = true,
+  string sprite = null, int fps = 2, Anchor anchor = Anchor.MiddleCenter, float scale = 1.0f, bool anchorsChangeColliders = true, bool fixesScales = true, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null,
+  IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null, float bossDamageMult = 1.0f, string destroySound = null, bool? shouldRotate = null, int barrageSize = 1)
+  {
+    return gun.InitSpecialProjectile<Projectile>(
+      clipSize                      : clipSize,
+      cooldown                      : cooldown,
+      angleVariance                 : angleVariance,
+      shootStyle                    : shootStyle,
+      sequenceStyle                 : sequenceStyle,
+      chargeTime                    : chargeTime,
+      ammoCost                      : ammoCost,
+      ammoType                      : ammoType,
+      customClip                    : customClip,
+      damage                        : damage,
+      speed                         : speed,
+      force                         : force,
+      range                         : range,
+      poison                        : poison,
+      fire                          : fire,
+      freeze                        : freeze,
+      collidesWithEnemies           : collidesWithEnemies,
+      ignoreDamageCaps              : ignoreDamageCaps,
+      collidesWithProjectiles       : collidesWithProjectiles,
+      surviveRigidbodyCollisions    : surviveRigidbodyCollisions,
+      collidesWithTilemap           : collidesWithTilemap,
+      sprite                        : sprite,
+      fps                           : fps,
+      anchor                        : anchor,
+      scale                         : scale,
+      anchorsChangeColliders        : anchorsChangeColliders,
+      fixesScales                   : fixesScales,
+      manualOffsets                 : manualOffsets,
+      overrideColliderPixelSizes    : overrideColliderPixelSizes,
+      overrideColliderOffsets       : overrideColliderOffsets,
+      overrideProjectilesToCopyFrom : overrideProjectilesToCopyFrom,
+      bossDamageMult                : bossDamageMult,
+      destroySound                  : destroySound,
+      shouldRotate                  : shouldRotate,
+      barrageSize                   : barrageSize
+      );
+  }
+
   // Add each animation from a list in turn to a projectile and return that projectile
   public static Projectile AddAnimations(this Projectile proj, params tk2dSpriteAnimationClip[] animations)
   {
@@ -1141,5 +1291,33 @@ public static class Extensions
   public static string InternalSpriteName(this Gun gun)
   {
     return gun.InternalName().Replace("'",""); // keep in parity with SetupItem()
+  }
+
+  // Set the FPS for a gun's idle animation (including the fixed idle animation, if available)
+  public static void SetIdleAnimationFPS(this Gun gun, int fps)
+  {
+    // gun.SetAnimationFPS(gun.idleAnimation, fps);
+    gun.SetAnimationFPS($"{gun.InternalSpriteName()}_idle", fps);
+    gun.SetAnimationFPS($"{gun.InternalSpriteName()}_{LargeGunAnimationHotfix._TRIM_ANIMATION}", fps);
+  }
+
+  // Force a gun to render on top of the player (call this in LateUpdate())
+  public static void RenderInFrontOfPlayer(this Gun gun)
+  {
+    if (gun.CurrentOwner is not PlayerController pc)
+      return;
+    if (pc.m_currentGunAngle >= 25f && pc.m_currentGunAngle <= 155f)
+      return;
+
+    gun.GetSprite().HeightOffGround = 0.075f;
+    gun.GetSprite().UpdateZDepth();
+  }
+
+  // Set an animated projectile to play a singular frame
+  public static void SetFrame(this Projectile projectile, int frame)
+  {
+      projectile.spriteAnimator.deferNextStartClip = true;
+      projectile.spriteAnimator.SetFrame(frame);
+      projectile.spriteAnimator.Stop();
   }
 }

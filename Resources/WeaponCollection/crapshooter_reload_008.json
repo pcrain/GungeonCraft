@@ -1,0 +1,33 @@
+{
+  "name": null,
+  "x": 0,
+  "y": 0,
+  "width": 21,
+  "height": 29,
+  "flip": 1,
+  "attachPoints": [
+    {
+      ".": "arraytype",
+      "name": "array",
+      "size": 2
+    },
+    {
+      "name": "PrimaryHand",
+      "position": {
+        "x": 0.4375,
+        "y": 1.0625,
+        "z": 0.0
+      },
+      "angle": 0.0
+    },
+    {
+      "name": "Casing",
+      "position": {
+        "x": 0.4375,
+        "y": 1.625,
+        "z": 0.0
+      },
+      "angle": 0.0
+    }
+  ]
+}
