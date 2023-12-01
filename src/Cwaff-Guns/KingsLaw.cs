@@ -34,21 +34,8 @@ public class KingsLaw : AdvancedGunBehavior
             gun.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
         gun.InitProjectile(new(clipSize: 20, shootStyle: ShootStyle.Automatic, damage: 5.0f, speed: 40.0f, range: 999999f,
-          cooldown: _SPAWN_RATE, sprite: "kings_law_projectile", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter)
-          ).Attach<KingsLawBullets>();
-
-        ProjectileModule dummyChargeModule = ProjectileModule.CreateClone(gun.DefaultModule, inheritGuid: false, sourceIndex: 1);
-          dummyChargeModule.shootStyle = ShootStyle.Charged;
-          dummyChargeModule.ammoCost   = 0;  // hides from the UI when duct-taped
-          dummyChargeModule.chargeProjectiles = new();
-          dummyChargeModule.chargeProjectiles.Add(new ProjectileModule.ChargeProjectile {
-            Projectile = Lazy.NoProjectile(),
-            ChargeTime = float.MaxValue,
-          });
-          dummyChargeModule.numberOfShotsInClip = 1;
-          dummyChargeModule.ammoType            = GameUIAmmoType.AmmoType.CUSTOM;
-          dummyChargeModule.customAmmoType      = "white";
-        gun.RawSourceVolley.projectiles.Add(dummyChargeModule);
+          cooldown: _SPAWN_RATE, sprite: "kings_law_projectile", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter,
+          useDummyChargeModule: true)).Attach<KingsLawBullets>();
 
         // Projectiles should spawn in semi-circles around some offset point behind the player, filling in each
         //   semi-ring from the outside in

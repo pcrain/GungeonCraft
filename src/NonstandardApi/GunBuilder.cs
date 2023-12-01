@@ -39,6 +39,7 @@ public class GunBuildData
   public int barrageSize;
   public bool? shouldFlipHorizontally;
   public bool? shouldFlipVertically;
+  public bool  useDummyChargeModule;
 
   /// <summary>Helper class containing setup information for a single module, single projectile gun.</summary>
   /// <param name="clipSize">The number of shots the gun can fired before reloading.</param>
@@ -81,13 +82,14 @@ public class GunBuildData
   /// <param name="barrageSize"></param>
   /// <param name="shouldFlipHorizontally"></param>
   /// <param name="shouldFlipVertically"></param>
+  /// <param name="useDummyChargeModule"></param>
   public GunBuildData(int? clipSize = null, float? cooldown = null, float? angleVariance = null,
     ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1, GameUIAmmoType.AmmoType? ammoType = null,
     string customClip = null, float? damage = null, float? speed = null, float? force = null, float? range = null, float poison = 0.0f, float fire = 0.0f, float freeze = 0.0f,
     bool? collidesWithEnemies = null, bool? ignoreDamageCaps = null, bool? collidesWithProjectiles = null, bool? surviveRigidbodyCollisions = null, bool? collidesWithTilemap = null,
     string sprite = null, int fps = 2, Anchor anchor = Anchor.MiddleCenter, float scale = 1.0f, bool anchorsChangeColliders = true, bool fixesScales = true, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null,
     IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null, float bossDamageMult = 1.0f, string destroySound = null, bool? shouldRotate = null, int barrageSize = 1,
-    bool? shouldFlipHorizontally = null, bool? shouldFlipVertically = null)
+    bool? shouldFlipHorizontally = null, bool? shouldFlipVertically = null, bool useDummyChargeModule = false)
   {
       this.clipSize                      = clipSize;
       this.cooldown                      = cooldown;
@@ -126,6 +128,7 @@ public class GunBuildData
       this.barrageSize                   = barrageSize;
       this.shouldFlipHorizontally        = shouldFlipHorizontally;
       this.shouldFlipVertically          = shouldFlipVertically;
+      this.useDummyChargeModule          = useDummyChargeModule;
   }
 
   public static GunBuildData Default = new GunBuildData();
@@ -161,6 +164,10 @@ public static class GunBuilder
     // Need to duplicate volley projectile after all other setup is done, including charge projectiles
     for (int i = 1; i < b.barrageSize; ++i)
       gun.RawSourceVolley.projectiles.Add(ProjectileModule.CreateClone(mod, inheritGuid: false, sourceIndex: i));
+
+    // Add a dummy charge module if we request it (probably mutually exclusive with a ShootStyle.Charged default module)
+    if (b.useDummyChargeModule)
+        gun.AddDummyChargeModule();
 
     return proj;
   }
@@ -373,5 +380,26 @@ public static class GunBuilder
     foreach(tk2dSpriteAnimationClip clip in animations)
       proj.AddAnimation(clip);
     return proj;
+  }
+
+  // Get a dummy charge module and add it to a gun (useful for weapons that need to check if they're being charged)
+  private static ProjectileModule _DummyChargeModule = null;
+  public static void AddDummyChargeModule(this Gun gun)
+  {
+    if (_DummyChargeModule == null)
+    {
+        _DummyChargeModule = new();
+          _DummyChargeModule.shootStyle = ShootStyle.Charged;
+          _DummyChargeModule.ammoCost   = 0;  // hides from the UI when duct-taped
+          _DummyChargeModule.chargeProjectiles = new();
+          _DummyChargeModule.chargeProjectiles.Add(new ProjectileModule.ChargeProjectile {
+            Projectile = Lazy.NoProjectile(),
+            ChargeTime = float.MaxValue,
+          });
+          _DummyChargeModule.numberOfShotsInClip = 1;
+          _DummyChargeModule.ammoType            = GameUIAmmoType.AmmoType.CUSTOM;
+          _DummyChargeModule.customAmmoType      = "white";
+    }
+    gun.Volley.projectiles.Add(ProjectileModule.CreateClone(_DummyChargeModule, false, gun.Volley.projectiles.Count));
   }
 }
