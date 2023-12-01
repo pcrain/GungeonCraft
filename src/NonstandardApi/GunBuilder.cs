@@ -165,10 +165,11 @@ public static class GunBuilder
   }
 
   // Clone, modify, and return a specific projectile
-  public static Projectile Clone(this Projectile projectile, GunBuildData b = null)
+  public static ProjectileType CloneSpecial<ProjectileType>(this ProjectileType projectile, GunBuildData b = null)
+    where ProjectileType : Projectile
   {
     b ??= GunBuildData.Default;
-    Projectile p = projectile.ClonePrefab();
+    ProjectileType p = projectile.ClonePrefab();
 
     // Defaulted
     p.baseData.damage                                 = b.damage                     ?? p.baseData.damage;
@@ -205,10 +206,17 @@ public static class GunBuilder
     return p;
   }
 
+  // Generic version of the above, assuming we just want a normal projectile
+  public static Projectile Clone(this Projectile projectile, GunBuildData b = null)
+  {
+    return projectile.CloneSpecial<Projectile>(b);
+  }
+
   // Copy fields from a Projectile to a subclass of that Projectile, then attach it to the base projectile's gameObject and destroy the base projectile
   public static ProjectileType ConvertToSpecialtyType<ProjectileType>(this Projectile baseProj) where ProjectileType : Projectile
   {
     ProjectileType p = baseProj.gameObject.AddComponent<ProjectileType>();
+    ETGModConsole.Log($"creating specialty type {p.GetType().Name}");
     p.BulletScriptSettings                        = baseProj.BulletScriptSettings;
     p.damageTypes                                 = baseProj.damageTypes;
     p.allowSelfShooting                           = baseProj.allowSelfShooting;
@@ -280,7 +288,9 @@ public static class GunBuilder
     p.ParticleTrail                               = baseProj.ParticleTrail;
     p.DelayedDamageToExploders                    = baseProj.DelayedDamageToExploders;
     p.AdditionalScaleMultiplier                   = baseProj.AdditionalScaleMultiplier;
-    UnityEngine.Object.Destroy(baseProj);  // we don't want two projectiles attached to the same gameObject
+    UnityEngine.Object.DestroyImmediate(baseProj);  // we don't want two projectiles attached to the same gameObject
+    // foreach (Projectile pt in p.gameObject.GetComponents<Projectile>())
+    //   ETGModConsole.Log($"  found one");
     return p;
   }
 

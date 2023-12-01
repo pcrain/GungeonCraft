@@ -1358,11 +1358,6 @@ public class FancyGrenadeProjectile : Projectile
         m_current3DVelocity = (m_currentDirection * m_currentSpeed).ToVector3ZUp(startingVelocity);
     }
 
-    public override void OnDestroy()
-    {
-        base.OnDestroy();
-    }
-
     public override void Move()
     {
         m_current3DVelocity.x  = m_currentDirection.x;

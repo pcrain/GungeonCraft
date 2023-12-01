@@ -15,6 +15,7 @@ public class CarpetBomber : AdvancedGunBehavior
     private const float _MAX_SPEED             = 20f;
     private const float _MIN_SPEED             = 10f;
     private const float _DLT_SPEED             = _MAX_SPEED - _MIN_SPEED;
+    private const float _SPEED_PER_CHARGE      = 2f;
     private const float _RANGE_DELTA           = 12f;
 
     public static void Add()
@@ -30,10 +31,10 @@ public class CarpetBomber : AdvancedGunBehavior
             gun.SetReloadAudio("Play_ENM_flame_veil_01");
 
         Projectile p = gun.InitSpecialProjectile<FancyGrenadeProjectile>(new(
-          clipSize: _MAX_PROJECTILES, cooldown: 0.15f, angleVariance: /*2*/0.0f, shootStyle: ShootStyle.Charged, sequenceStyle: ProjectileSequenceStyle.Ordered,
-          sprite: "carpet_projectile", fps: 20, anchor: Anchor.MiddleCenter, scale: 0.5f, barrageSize: _MAX_PROJECTILES,
-          shouldRotate: true/*false*/, surviveRigidbodyCollisions: true, anchorsChangeColliders: false,
-          overrideColliderPixelSizes: new IntVector2(8, 8)
+          clipSize: _MAX_PROJECTILES, cooldown: 0.15f, angleVariance: 10.0f, shootStyle: ShootStyle.Charged, range: 9999f,
+          sequenceStyle: ProjectileSequenceStyle.Ordered, sprite: "carpet_projectile", fps: 20, anchor: Anchor.MiddleCenter,
+          scale: 0.5f, barrageSize: _MAX_PROJECTILES, shouldRotate: true, surviveRigidbodyCollisions: true,
+          anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(8, 8)
         )).Attach<BounceProjModifier>(bounce => {
           bounce.numberOfBounces = _MAX_WALL_BOUNCES;
           bounce.onlyBounceOffTiles = false;
@@ -49,17 +50,19 @@ public class CarpetBomber : AdvancedGunBehavior
             for (int j = 0; j <= i; ++j)
                 gun.RawSourceVolley.projectiles[j].chargeProjectiles.Add(new ProjectileModule.ChargeProjectile {
                     Projectile = p.Clone(new(
-                      speed: _MIN_SPEED + _DLT_SPEED * (i == 0 ? 0.5f : ((float)j / (float)i)),
-                      range: 9999f)
+                      // speed increases both with the charge and with the projectile's index in the array
+                      speed: _MIN_SPEED + (_DLT_SPEED + _SPEED_PER_CHARGE * i) * (i == 0 ? 0.5f : ((float)j / (float)i)))
                       ).Attach<FancyGrenadeProjectile>(g => {
                         g.startingHeight   = 0.5f;
-                        g.minBounceAngle   = 15f;
-                        g.maxBounceAngle   = 45f;
-                        g.startingVelocity = 1f * j;
+                        g.minBounceAngle   = 5f;
+                        g.maxBounceAngle   = 15f;
+                        g.startingVelocity = 0.5f * j;
                       }),
                     ChargeTime = _CHARGE_PER_PROJECTILE * (i + 1),
                 });
         }
+
+        UnityEngine.Object.Destroy(p);
     }
 
     protected override void Update()
@@ -98,7 +101,7 @@ public class CarpetProjectile : MonoBehaviour
             p.transform.position, Bouncer._MiniExplosion, p.Direction, ignoreQueues: true);
         if (this._projectile.specRigidbody)
             this._projectile.specRigidbody.OnRigidbodyCollision += (CollisionData rigidbodyCollision) => {
-                this._grenade.Redirect(rigidbodyCollision.Normal/*, false*/);
+                this._grenade?.Redirect(rigidbodyCollision.Normal);
                 this._projectile.UpdateSpeed();
                 OnGroundBounce();
             };
@@ -106,7 +109,7 @@ public class CarpetProjectile : MonoBehaviour
 
     private void Update()
     {
-        if (!this._projectile || !this._grenade)
+        if (!this._projectile)
             return;
 
         if (this._bounces >= _MAX_BOUNCES)
