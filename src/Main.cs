@@ -211,6 +211,7 @@ public class Initialisation : BaseUnityPlugin
                 KingsLaw.Add();
                 Pincushion.Add();
                 Crapshooter.Add();
+                CarpetBomber.Add();
             #endregion
             // tempWatch.Stop(); ETGModConsole.Log($"part 1 finished in "+(tempWatch.ElapsedMilliseconds/1000.0f)+" seconds"); tempWatch = System.Diagnostics.Stopwatch.StartNew();
 

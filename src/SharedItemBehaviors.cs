@@ -1337,3 +1337,73 @@ public class Nametag : MonoBehaviour
         this._textGo.SetActive(v);
     }
 }
+
+// Modified from GrenadeProjectile()
+public class FancyGrenadeProjectile : Projectile
+{
+    public float startingHeight   = 1f;
+    public float startingVelocity = 0f;
+    public float gravity          = 10f;
+    public float minBounceAngle   = 0f;
+    public float maxBounceAngle   = 0f;
+    public Action OnBounce;
+
+    private float m_currentHeight;
+    private Vector3 m_current3DVelocity;
+
+    public override void Start()
+    {
+        base.Start();
+        m_currentHeight = startingHeight;
+        m_current3DVelocity = (m_currentDirection * m_currentSpeed).ToVector3ZUp(startingVelocity);
+    }
+
+    public override void OnDestroy()
+    {
+        base.OnDestroy();
+    }
+
+    public override void Move()
+    {
+        m_current3DVelocity.x  = m_currentDirection.x;
+        m_current3DVelocity.y  = m_currentDirection.y;
+        m_current3DVelocity.z += base.LocalDeltaTime * -gravity;
+        float num              = m_currentHeight + m_current3DVelocity.z * base.LocalDeltaTime;
+        bool bounced = num < 0f;
+        if (bounced)
+        {
+            if (maxBounceAngle > 0)
+            {
+                m_current3DVelocity = (m_currentDirection.ToAngle() + BraveUtility.RandomSign() * UnityEngine.Random.Range(minBounceAngle,maxBounceAngle)
+                    ).ToVector().ToVector3ZUp(-m_current3DVelocity.z);
+            }
+            else
+                m_current3DVelocity.z = -m_current3DVelocity.z;
+            num *= -1f;
+        }
+        m_currentHeight             = num;
+        m_currentDirection          = m_current3DVelocity.XY();
+        Vector2 vector              = m_current3DVelocity.XY().normalized * m_currentSpeed;
+        base.specRigidbody.Velocity = new Vector2(vector.x, vector.y + m_current3DVelocity.z);
+        base.LastVelocity           = m_current3DVelocity.XY();
+        if (bounced)
+            OnBounce();
+    }
+
+    public override void DoModifyVelocity()
+    {
+        if (ModifyVelocity == null)
+            return;
+
+        Vector2 arg = m_current3DVelocity.XY().normalized * m_currentSpeed;
+        arg = ModifyVelocity(arg);
+        base.specRigidbody.Velocity = new Vector2(arg.x, arg.y + m_current3DVelocity.z);
+        if (arg.sqrMagnitude > 0f)
+            m_currentDirection = arg.normalized;
+    }
+
+    public void Redirect(Vector2 direction)
+    {
+        m_currentDirection = direction;
+    }
+}

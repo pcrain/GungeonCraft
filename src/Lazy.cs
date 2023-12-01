@@ -129,11 +129,11 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
             gun.UpdateAnimation(LargeGunAnimationHotfix._TRIM_ANIMATION, returnToIdle: true);
             string fixedIdleAnimation = $"{gun.InternalSpriteName()}_{LargeGunAnimationHotfix._TRIM_ANIMATION}";
             tk2dSpriteAnimationClip originalIdleClip = gun.spriteAnimator.GetClipByName(gun.idleAnimation);
-            gun.SetAnimationFPS(fixedIdleAnimation, (int)originalIdleClip.fps);
-            gun.LoopAnimation(fixedIdleAnimation, originalIdleClip.loopStart);
             int fixedIdleAnimationClipId = gun.spriteAnimator.GetClipIdByName(fixedIdleAnimation);
             if (fixedIdleAnimationClipId != -1)
             {
+                gun.SetAnimationFPS(fixedIdleAnimation, (int)originalIdleClip.fps);
+                gun.LoopAnimation(fixedIdleAnimation, originalIdleClip.loopStart);
                 gun.idleAnimation                = fixedIdleAnimation;
                 gun.spriteAnimator.defaultClipId = fixedIdleAnimationClipId;
             }

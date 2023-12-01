@@ -18,11 +18,11 @@ public class GunBuildData
   public float poison;
   public float fire;
   public float freeze;
-  public bool collidesWithEnemies;
-  public bool ignoreDamageCaps;
-  public bool collidesWithProjectiles;
-  public bool surviveRigidbodyCollisions;
-  public bool collidesWithTilemap;
+  public bool? collidesWithEnemies;
+  public bool? ignoreDamageCaps;
+  public bool? collidesWithProjectiles;
+  public bool? surviveRigidbodyCollisions;
+  public bool? collidesWithTilemap;
   public string sprite;
   public int fps;
   public Anchor anchor;
@@ -80,7 +80,7 @@ public class GunBuildData
   public GunBuildData(int? clipSize = null, float? cooldown = null, float? angleVariance = null,
     ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1, GameUIAmmoType.AmmoType? ammoType = null,
     string customClip = null, float? damage = null, float? speed = null, float? force = null, float? range = null, float poison = 0.0f, float fire = 0.0f, float freeze = 0.0f,
-    bool collidesWithEnemies = true, bool ignoreDamageCaps = false, bool collidesWithProjectiles= false, bool surviveRigidbodyCollisions = false, bool collidesWithTilemap = true,
+    bool? collidesWithEnemies = null, bool? ignoreDamageCaps = null, bool? collidesWithProjectiles = null, bool? surviveRigidbodyCollisions = null, bool? collidesWithTilemap = null,
     string sprite = null, int fps = 2, Anchor anchor = Anchor.MiddleCenter, float scale = 1.0f, bool anchorsChangeColliders = true, bool fixesScales = true, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null,
     IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null, float bossDamageMult = 1.0f, string destroySound = null, bool? shouldRotate = null, int barrageSize = 1)
   {
@@ -169,35 +169,38 @@ public static class GunBuilder
   {
     b ??= GunBuildData.Default;
     Projectile p = projectile.ClonePrefab();
-      p.baseData.damage                                 = b.damage       ?? p.baseData.damage;
-      p.baseData.speed                                  = b.speed        ?? p.baseData.speed;
-      p.baseData.force                                  = b.force        ?? p.baseData.force;
-      p.baseData.range                                  = b.range        ?? p.baseData.range;
-      p.shouldRotate                                    = b.shouldRotate ?? p.shouldRotate;
-      p.collidesWithEnemies                             = b.collidesWithEnemies;
-      p.ignoreDamageCaps                                = b.ignoreDamageCaps;
-      p.collidesWithProjectiles                         = b.collidesWithProjectiles;
-      p.BulletScriptSettings.surviveRigidbodyCollisions = b.surviveRigidbodyCollisions;
-      p.BossDamageMultiplier                            = b.bossDamageMult;
-      p.onDestroyEventName                              = b.destroySound;
 
-      if (p.specRigidbody)
-        p.specRigidbody.CollideWithTileMap              = b.collidesWithTilemap;  // doesn't work!
+    // Defaulted
+    p.baseData.damage                                 = b.damage                     ?? p.baseData.damage;
+    p.baseData.speed                                  = b.speed                      ?? p.baseData.speed;
+    p.baseData.force                                  = b.force                      ?? p.baseData.force;
+    p.baseData.range                                  = b.range                      ?? p.baseData.range;
+    p.shouldRotate                                    = b.shouldRotate               ?? p.shouldRotate;
+    p.collidesWithEnemies                             = b.collidesWithEnemies        ?? p.collidesWithEnemies;
+    p.ignoreDamageCaps                                = b.ignoreDamageCaps           ?? p.ignoreDamageCaps;
+    p.collidesWithProjectiles                         = b.collidesWithProjectiles    ?? p.collidesWithProjectiles;
+    p.BulletScriptSettings.surviveRigidbodyCollisions = b.surviveRigidbodyCollisions ?? p.BulletScriptSettings.surviveRigidbodyCollisions;
+    if (p.specRigidbody)
+      p.specRigidbody.CollideWithTileMap              = b.collidesWithTilemap ?? p.specRigidbody.CollideWithTileMap;  // doesn't work!
 
-      p.PoisonApplyChance = b.poison;
-      p.AppliesPoison     = b.poison > 0.0f;
-      if (p.AppliesPoison)
-        p.healthEffect = ItemHelper.Get(Items.IrradiatedLead).GetComponent<BulletStatusEffectItem>().HealthModifierEffect;
+    // Non-defaulted
+    p.BossDamageMultiplier                            = b.bossDamageMult;
+    p.onDestroyEventName                              = b.destroySound;
 
-      p.FireApplyChance = b.fire;
-      p.AppliesFire   = b.fire > 0.0f;
-      if (p.AppliesFire)
-        p.fireEffect = ItemHelper.Get(Items.HotLead).GetComponent<BulletStatusEffectItem>().FireModifierEffect;
+    p.PoisonApplyChance = b.poison;
+    p.AppliesPoison     = b.poison > 0.0f;
+    if (p.AppliesPoison)
+      p.healthEffect = ItemHelper.Get(Items.IrradiatedLead).GetComponent<BulletStatusEffectItem>().HealthModifierEffect;
 
-      p.FreezeApplyChance = b.freeze;
-      p.AppliesFreeze   = b.freeze > 0.0f;
-      if (p.AppliesFreeze)
-        p.freezeEffect = ItemHelper.Get(Items.FrostBullets).GetComponent<BulletStatusEffectItem>().FreezeModifierEffect;
+    p.FireApplyChance = b.fire;
+    p.AppliesFire   = b.fire > 0.0f;
+    if (p.AppliesFire)
+      p.fireEffect = ItemHelper.Get(Items.HotLead).GetComponent<BulletStatusEffectItem>().FireModifierEffect;
+
+    p.FreezeApplyChance = b.freeze;
+    p.AppliesFreeze   = b.freeze > 0.0f;
+    if (p.AppliesFreeze)
+      p.freezeEffect = ItemHelper.Get(Items.FrostBullets).GetComponent<BulletStatusEffectItem>().FreezeModifierEffect;
 
     return p;
   }
