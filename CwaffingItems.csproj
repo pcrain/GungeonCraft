@@ -197,6 +197,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\ki_blast_idle_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_reload_025.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\knife_gun_fire_001.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_charge_008.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_019.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_5_gun_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_reload_004.json"/>
@@ -210,6 +211,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_028.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_reload_007.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_035.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_charge_006.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\natascha_idle_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_reload_009.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_reload_016.json"/>
@@ -229,8 +231,10 @@
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_reload_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_2_gun_017.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_trimmed_018.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_006.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_fire_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_011.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_018.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_fire_005.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_reload_010.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_1_gun_002.png"/>
@@ -266,6 +270,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_010.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_007.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\lightwing_reload_007.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_charge_009.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_013.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_reload_031.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_036.png"/>
@@ -288,6 +293,8 @@
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_reload_011.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\crapshooter_reload_022.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_046.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_fire_005.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_017.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_014.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_2_gun_014.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_fire_003.json"/>
@@ -299,6 +306,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\natascha_fire_006.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_reload_001.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_fire_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\crapshooter_reload_007.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_reload_011.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_charge_007.json"/>
@@ -345,6 +353,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\quarter_pounder_fire_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_reload_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_reload_013.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_010.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_029.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_019.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_5_gun_011.png"/>
@@ -362,6 +371,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_052.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_reload_028.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\crapshooter_fire_002.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_020.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_reload_019.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_052.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alligator_fire_003.json"/>
@@ -374,9 +384,11 @@
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_005.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_030.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_008.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_016.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\missiletoe_fire_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\quarter_pounder_reload_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_fire_003.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_charge_007.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\death_note_reload_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_027.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\ice_cream_gun_reload_001.png"/>
@@ -397,6 +409,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_trimmed_012.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_015.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_1_gun_019.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_022.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_reload_030.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_reload_039.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_reload_008.png"/>
@@ -484,6 +497,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_4_gun_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_030.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_013.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_016.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_045.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_reload_026.json"/>
@@ -540,15 +554,19 @@
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_035.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alyx_fire_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\crapshooter_reload_023.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_fire_005.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_1_gun_013.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alligator_reload_010.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_reload_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_042.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_fire_016.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_015.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_reload_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\paintball_cannon_fire_003.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_charge_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_fire_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_6_gun_015.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\aimu_hakurei_fire_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\quarter_pounder_reload_005.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\outbreak_fire_002.png"/>
@@ -568,6 +586,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_reload_042.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alligator_reload_031.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_idle_trimmed_002.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_013.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\missiletoe_fire_012.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_reload_014.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_fire_002.json"/>
@@ -657,6 +676,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_010.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_016.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_5_gun_002.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_022.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_reload_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alligator_fire_008.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_020.json"/>
@@ -716,12 +736,14 @@
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_019.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_021.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\aimu_hakurei_idle_001.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_024.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_charge_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_charge_014.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\paintball_cannon_idle_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_idle_trimmed_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_fire_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_031.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_fire_007.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_1_gun_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_reload_002.png"/>
@@ -768,6 +790,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\missiletoe_reload_006.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_017.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\lightwing_fire_004.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_010.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_017.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_reload_012.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\platinum_star_reload_009.json"/>
@@ -781,6 +804,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_6_gun_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_001.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_012.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_reload_021.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_reload_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\platinum_star_reload_014.json"/>
@@ -816,6 +840,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\platinum_star_fire_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_reload_006.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_2_gun_011.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_011.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alligator_idle_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_033.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_fire_006.json"/>
@@ -916,6 +941,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\missiletoe_idle_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_4_gun_005.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_002.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_025.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_reload_014.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_fire_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_047.png"/>
@@ -930,6 +956,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_fire_016.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\ice_cream_gun_charge_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_019.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_024.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_6_gun_007.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_010.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_trimmed_003.png"/>
@@ -957,6 +984,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_033.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\ki_blast_fire_alt_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_4_gun_008.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_fire_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_005.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_017.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_3_gun_003.json"/>
@@ -1048,6 +1076,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_charge_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_fire_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_reload_012.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_021.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\missiletoe_fire_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_048.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_021.json"/>
@@ -1082,10 +1111,12 @@
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_3_gun_013.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\aimu_hakurei_reload_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_3_gun_002.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_024.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_036.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_015.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_012.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_charge_011.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_038.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alyx_reload_010.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_041.png"/>
@@ -1096,6 +1127,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_036.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\missiletoe_reload_011.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_033.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_015.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_1_gun_023.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_reload_029.png"/>
@@ -1142,6 +1174,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_036.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_006.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_idle_004.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_005.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_reload_008.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_reload_005.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_trimmed_021.png"/>
@@ -1196,6 +1229,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\missiletoe_fire_006.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_6_gun_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_reload_026.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_034.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_trimmed_015.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_reload_018.json"/>
@@ -1241,6 +1275,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_015.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\crapshooter_reload_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_001.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_fire_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\ticonderogun_fire_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\holy_water_gun_idle_trimmed_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\platinum_star_reload_025.json"/>
@@ -1254,6 +1289,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_051.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\missiletoe_idle_trimmed_001.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_023.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_fire_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\platinum_star_reload_025.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alligator_reload_001.json"/>
@@ -1283,6 +1319,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_2_gun_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_015.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_050.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_009.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_038.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_charge_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_5_gun_013.json"/>
@@ -1299,6 +1336,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_reload_016.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_trimmed_012.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\natascha_fire_006.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_charge_008.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_042.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_fire_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_027.png"/>
@@ -1314,6 +1352,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_017.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_reload_016.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_trimmed_002.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_fire_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_fire_009.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_3_gun_010.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_022.json"/>
@@ -1333,6 +1372,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\vacuum_cleaner_charge_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_042.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_2_gun_009.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_005.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\missiletoe_reload_006.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_4_gun_021.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_reload_005.png"/>
@@ -1383,6 +1423,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\aimu_hakurei_fire_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\ticonderogun_charge_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_021.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_charge_009.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_6_gun_010.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_trimmed_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_5_gun_001.png"/>
@@ -1391,6 +1432,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_reload_008.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_008.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_017.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_charge_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_007.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_4_gun_010.png"/>
@@ -1400,6 +1442,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\aimu_hakurei_fire_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_015.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_028.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_012.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_reload_007.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_6_gun_012.json"/>
@@ -1419,6 +1462,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_fire_006.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_fire_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alligator_reload_001.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_013.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_050.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\ki_blast_reload_003.png"/>
@@ -1494,6 +1538,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_009.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_016.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_021.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_018.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_charge_006.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_fire_008.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_1_gun_009.json"/>
@@ -1665,6 +1710,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_trimmed_009.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_3_gun_022.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_fire_013.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_charge_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\natascha_fire_005.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_041.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_reload_001.png"/>
@@ -1692,6 +1738,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_fire_014.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_029.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\platinum_star_fire_001.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_016.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\soul_kaliber_reload_005.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_014.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_fire_013.png"/>
@@ -1722,6 +1769,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\lightwing_reload_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alligator_fire_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\lightwing_reload_011.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_009.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alligator_reload_031.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_trimmed_038.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tennis_rocket_gun_fire_010.png"/>
@@ -1758,6 +1806,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\missiletoe_reload_009.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\bouncer_fire_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_reload_025.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_charge_005.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_reload_023.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_024.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\ice_cream_gun_fire_001.json"/>
@@ -1768,9 +1817,11 @@
     <EmbeddedResource Include="Resources\WeaponCollection\alyx_reload_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\bouncer_reload_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_003.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_008.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\soul_kaliber_idle_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_reload_029.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_reload_037.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_011.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_010.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\vacuum_cleaner_fire_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_reload_002.png"/>
@@ -1778,6 +1829,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_reload_024.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_fire_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_trimmed_041.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_014.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_007.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_012.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_reload_008.json"/>
@@ -1786,6 +1838,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\paintball_cannon_reload_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\crapshooter_reload_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_019.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_019.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_reload_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\crapshooter_reload_006.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_018.png"/>
@@ -1906,6 +1959,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_013.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_reload_029.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_fire_003.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_charge_007.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_reload_008.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\bouncer_fire_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_3_gun_014.json"/>
@@ -1946,6 +2000,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_reload_011.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tennis_rocket_gun_fire_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_fire_002.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_025.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_040.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_2_gun_021.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_6_gun_004.json"/>
@@ -1994,6 +2049,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_fire_006.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\crapshooter_reload_021.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_fire_015.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_023.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\crapshooter_reload_011.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_005.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_003.png"/>
@@ -2098,6 +2154,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_018.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_010.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_6_gun_014.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_017.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\platinum_star_reload_024.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alyx_reload_006.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_trimmed_021.png"/>
@@ -2121,6 +2178,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_029.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_fire_013.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\missiletoe_reload_003.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_charge_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_fire_006.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_008.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\crapshooter_reload_026.png"/>
@@ -2134,6 +2192,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_idle_trimmed_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alligator_fire_005.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_charge_013.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_charge_011.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_024.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_019.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\knife_gun_idle_001.png"/>
@@ -2154,11 +2213,13 @@
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_021.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_049.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_6_gun_005.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_charge_006.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_fire_009.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\paintball_cannon_reload_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\lightwing_fire_005.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_037.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\paintball_cannon_fire_004.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_007.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_idle_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_006.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_fire_003.json"/>
@@ -2178,6 +2239,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\alyx_reload_013.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_fire_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_fire_005.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_charge_010.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_trimmed_019.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_reload_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_004.png"/>
@@ -2200,6 +2262,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_trimmed_025.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_014.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_fire_002.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_charge_010.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_025.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_021.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_idle_001.json"/>
@@ -2243,6 +2306,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_reload_016.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\lightwing_reload_017.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_4_gun_011.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_006.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_4_gun_010.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_032.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_052.json"/>
@@ -2250,6 +2314,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_029.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_4_gun_023.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_014.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_charge_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alligator_reload_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_021.png"/>
@@ -2274,6 +2339,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\tennis_rocket_gun_idle_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_1_gun_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_fire_007.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_019.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_trimmed_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_1_gun_024.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\paintball_cannon_reload_001.png"/>
@@ -2328,6 +2394,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_fire_010.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_040.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_fire_005.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_021.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_idle_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_005.json"/>
@@ -2362,6 +2429,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_005.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alligator_reload_017.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_trimmed_011.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_fire_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_023.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\ice_cream_gun_idle_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_fire_004.png"/>
@@ -2448,6 +2516,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\missiletoe_fire_005.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\crapshooter_reload_026.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_3_gun_004.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_008.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_fire_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_008.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_reload_010.json"/>
@@ -2463,6 +2532,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_fire_011.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_trimmed_012.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_014.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_charge_005.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_005.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\bouncer_reload.aseprite"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_4_gun_019.json"/>
@@ -2472,6 +2542,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\lightwing_reload_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\platinum_star_reload_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tennis_rocket_gun_fire_007.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_fire_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\missiletoe_reload_008.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_6_gun_007.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_trimmed_002.png"/>
@@ -2490,6 +2561,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_005.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_031.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_reload_019.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_014.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_045.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_reload_021.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\missiletoe_reload_005.png"/>
@@ -2514,6 +2586,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_fire_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\quarter_pounder_reload_009.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_005.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_007.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_011.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_039.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_029.png"/>
@@ -2565,6 +2638,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_020.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_reload_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_reload_001.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_028.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_013.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_reload_005.json"/>
@@ -2587,6 +2661,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_reload_010.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_1_gun_022.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_reload_013.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_020.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_1_gun_022.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_008.json"/>
@@ -2671,6 +2746,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_016.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_010.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_idle_001.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_charge_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_4_gun_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_5_gun_023.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_fire_001.json"/>
@@ -2683,6 +2759,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_2_gun_023.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_026.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_023.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_idle_trimmed_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_reload_017.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_1_gun_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\natascha_fire_002.png"/>

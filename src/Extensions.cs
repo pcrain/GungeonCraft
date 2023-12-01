@@ -605,6 +605,11 @@ public static class Extensions
   {
     gun.SetGunAudio(name: gun.chargeAnimation, audio: audio, frame: frame);
   }
+  public static void SetChargeAudio(this Gun gun, string audio = "", params int[] frames)
+  {
+    foreach (int frame in frames)
+      gun.SetGunAudio(name: gun.chargeAnimation, audio: audio, frame: frame);
+  }
   public static void SetIdleAudio(this Gun gun, string audio = "", int frame = 0)
   {
     gun.SetGunAudio(name: gun.idleAnimation, audio: audio, frame: frame);

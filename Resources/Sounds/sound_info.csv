@@ -105,3 +105,6 @@ dice_sound_3,6.0,1,sound
 dice_sound_4,6.0,1,sound
 dice_sound_5,6.0,1,sound
 crapshooter_shoot_sound,-8.0,1,sound
+carpet_bomber_shoot_sound,-2.0,1,sound
+carpet_bomber_reload_sound,-4.0,1,sound
+carpet_bomber_charge_stage,-8.0,1,sound

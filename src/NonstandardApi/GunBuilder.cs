@@ -37,6 +37,8 @@ public class GunBuildData
   public string destroySound;
   public bool? shouldRotate;
   public int barrageSize;
+  public bool? shouldFlipHorizontally;
+  public bool? shouldFlipVertically;
 
   /// <summary>Helper class containing setup information for a single module, single projectile gun.</summary>
   /// <param name="clipSize">The number of shots the gun can fired before reloading.</param>
@@ -77,12 +79,15 @@ public class GunBuildData
   /// <param name="destroySound"></param>
   /// <param name="shouldRotate"></param>
   /// <param name="barrageSize"></param>
+  /// <param name="shouldFlipHorizontally"></param>
+  /// <param name="shouldFlipVertically"></param>
   public GunBuildData(int? clipSize = null, float? cooldown = null, float? angleVariance = null,
     ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1, GameUIAmmoType.AmmoType? ammoType = null,
     string customClip = null, float? damage = null, float? speed = null, float? force = null, float? range = null, float poison = 0.0f, float fire = 0.0f, float freeze = 0.0f,
     bool? collidesWithEnemies = null, bool? ignoreDamageCaps = null, bool? collidesWithProjectiles = null, bool? surviveRigidbodyCollisions = null, bool? collidesWithTilemap = null,
     string sprite = null, int fps = 2, Anchor anchor = Anchor.MiddleCenter, float scale = 1.0f, bool anchorsChangeColliders = true, bool fixesScales = true, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null,
-    IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null, float bossDamageMult = 1.0f, string destroySound = null, bool? shouldRotate = null, int barrageSize = 1)
+    IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null, float bossDamageMult = 1.0f, string destroySound = null, bool? shouldRotate = null, int barrageSize = 1,
+    bool? shouldFlipHorizontally = null, bool? shouldFlipVertically = null)
   {
       this.clipSize                      = clipSize;
       this.cooldown                      = cooldown;
@@ -119,6 +124,8 @@ public class GunBuildData
       this.destroySound                  = destroySound;
       this.shouldRotate                  = shouldRotate;
       this.barrageSize                   = barrageSize;
+      this.shouldFlipHorizontally        = shouldFlipHorizontally;
+      this.shouldFlipVertically          = shouldFlipVertically;
   }
 
   public static GunBuildData Default = new GunBuildData();
@@ -177,6 +184,8 @@ public static class GunBuilder
     p.baseData.force                                  = b.force                      ?? p.baseData.force;
     p.baseData.range                                  = b.range                      ?? p.baseData.range;
     p.shouldRotate                                    = b.shouldRotate               ?? p.shouldRotate;
+    p.shouldFlipHorizontally                          = b.shouldFlipHorizontally     ?? p.shouldFlipHorizontally;
+    p.shouldFlipVertically                            = b.shouldFlipVertically       ?? p.shouldFlipVertically;
     p.collidesWithEnemies                             = b.collidesWithEnemies        ?? p.collidesWithEnemies;
     p.ignoreDamageCaps                                = b.ignoreDamageCaps           ?? p.ignoreDamageCaps;
     p.collidesWithProjectiles                         = b.collidesWithProjectiles    ?? p.collidesWithProjectiles;

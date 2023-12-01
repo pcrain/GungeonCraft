@@ -10,12 +10,12 @@ public class CarpetBomber : AdvancedGunBehavior
     public static string Lore             = "TBD";
 
     private const int   _MAX_WALL_BOUNCES      = 3;
-    private const int   _MAX_PROJECTILES       = 12;
+    private const int   _MAX_PROJECTILES       = 10;
     private const float _CHARGE_PER_PROJECTILE = 0.33f;
     private const float _MAX_SPEED             = 20f;
     private const float _MIN_SPEED             = 10f;
     private const float _DLT_SPEED             = _MAX_SPEED - _MIN_SPEED;
-    private const float _SPEED_PER_CHARGE      = 2f;
+    private const float _SPEED_PER_CHARGE      = 2.4f;
     private const float _RANGE_DELTA           = 12f;
 
     internal static ExplosionData _CarpetExplosion = null;
@@ -23,19 +23,21 @@ public class CarpetBomber : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<CarpetBomber>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.5f, ammo: 9999);
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.5f, ammo: 360);
             gun.muzzleFlashEffects = (ItemHelper.Get(Items.SeriousCannon) as Gun).muzzleFlashEffects;
-            gun.SetAnimationFPS(gun.shootAnimation, 10);
-            gun.SetAnimationFPS(gun.chargeAnimation, 16);
-            // gun.LoopAnimation(gun.chargeAnimation, 32);
+            gun.SetAnimationFPS(gun.shootAnimation, 30);
+            gun.SetAnimationFPS(gun.reloadAnimation, 20);
+            gun.SetAnimationFPS(gun.chargeAnimation, (int)(1f / _CHARGE_PER_PROJECTILE));
+            gun.LoopAnimation(gun.chargeAnimation, 10);
             gun.SetMuzzleVFX("muzzle_b_b_gun", fps: 30, scale: 0.5f, anchor: Anchor.MiddleCenter);
-            gun.SetFireAudio("Play_WPN_seriouscannon_shot_01");
-            gun.SetReloadAudio("Play_ENM_flame_veil_01");
+            gun.SetFireAudio("carpet_bomber_shoot_sound");
+            gun.SetReloadAudio("carpet_bomber_reload_sound", 2, 10, 18);
+            gun.SetChargeAudio("carpet_bomber_charge_stage", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
         Projectile p = gun.InitSpecialProjectile<FancyGrenadeProjectile>(new(
-          clipSize: _MAX_PROJECTILES, cooldown: 0.15f, angleVariance: 10.0f, shootStyle: ShootStyle.Charged, range: 9999f,
+          clipSize: 3, cooldown: 0.15f, angleVariance: 10.0f, shootStyle: ShootStyle.Charged, range: 9999f,
           sequenceStyle: ProjectileSequenceStyle.Ordered, sprite: "carpet_projectile", fps: 20, anchor: Anchor.MiddleCenter,
-          scale: 0.5f, barrageSize: _MAX_PROJECTILES, shouldRotate: true, surviveRigidbodyCollisions: true,
+          scale: 0.5f, barrageSize: _MAX_PROJECTILES, shouldRotate: true, shouldFlipHorizontally: true, surviveRigidbodyCollisions: true,
           anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(8, 8)
         )).Attach<BounceProjModifier>(bounce => {
           bounce.numberOfBounces = _MAX_WALL_BOUNCES;
@@ -61,6 +63,8 @@ public class CarpetBomber : AdvancedGunBehavior
                         g.startingVelocity = 0.5f * j;
                       }),
                     ChargeTime = _CHARGE_PER_PROJECTILE * (i + 1),
+                    // AdditionalWwiseEvent = "carpet_bomber_charge_stage",
+                    // UsedProperties = ChargeProjectileProperties.additionalWwiseEvent,
                 });
         }
 
