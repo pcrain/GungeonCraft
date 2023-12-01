@@ -4,7 +4,7 @@ public class KingsLaw : AdvancedGunBehavior
 {
     public static string ItemName         = "King's Law";
     public static string SpriteName       = "kings_law";
-    public static string ProjectileName   = "38_special";
+    public static string ProjectileName   = "AK-47";
     public static string ShortDescription = "Accept Your Fate";
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
@@ -16,13 +16,11 @@ public class KingsLaw : AdvancedGunBehavior
     internal const int   _MAX_BULLETS = 400;
     internal const float _SPAWN_RATE  = 0.1f;
 
-    internal static Projectile _KingsLawBullet;
     internal static List<Vector3> _OffsetAnglesMagsAndRings = new(_MAX_BULLETS);
     internal static GameObject _RuneLarge;
     internal static GameObject _RuneSmall;
 
     private int _nextIndex = 0;
-    private float _chargeTime = 0.0f;
 
     public static void Add()
     {
@@ -35,14 +33,25 @@ public class KingsLaw : AdvancedGunBehavior
             gun.SetReloadAudio("knife_gun_reload");
             gun.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
-        gun.InitProjectile(new(clipSize: 20, shootStyle: ShootStyle.Charged, chargeTime: float.MaxValue, // absurdly high charge value so we never actually shoot
-          shouldRotate: true/*, collidesWithTilemap: false*/));  // collidesWithTilemap doesn't actually work
-
-        _KingsLawBullet = Items.Ak47.CloneProjectile(new(damage: 5.0f, speed: 40.0f, range: 30.0f
-          )).AddAnimations(AnimatedBullet.Create(name: "kings_law_projectile", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter)
+        gun.InitProjectile(new(clipSize: 20, shootStyle: ShootStyle.Automatic, damage: 5.0f, speed: 40.0f, range: 999999f,
+          cooldown: _SPAWN_RATE, sprite: "kings_law_projectile", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter)
           ).Attach<KingsLawBullets>();
 
-        // Stagger projectile spawns alternating left and right from the starting angle
+        ProjectileModule dummyChargeModule = ProjectileModule.CreateClone(gun.DefaultModule, inheritGuid: false, sourceIndex: 1);
+          dummyChargeModule.shootStyle = ShootStyle.Charged;
+          dummyChargeModule.ammoCost   = 0;  // hides from the UI when duct-taped
+          dummyChargeModule.chargeProjectiles = new();
+          dummyChargeModule.chargeProjectiles.Add(new ProjectileModule.ChargeProjectile {
+            Projectile = Lazy.NoProjectile(),
+            ChargeTime = float.MaxValue,
+          });
+          dummyChargeModule.numberOfShotsInClip = 1;
+          dummyChargeModule.ammoType            = GameUIAmmoType.AmmoType.CUSTOM;
+          dummyChargeModule.customAmmoType      = "white";
+        gun.RawSourceVolley.projectiles.Add(dummyChargeModule);
+
+        // Projectiles should spawn in semi-circles around some offset point behind the player, filling in each
+        //   semi-ring from the outside in
         int   ring            = 0;
         int   ringIndex       = 0;
         float angle           = 0f;
@@ -70,9 +79,8 @@ public class KingsLaw : AdvancedGunBehavior
             }
             else
             {
-                ring += 1;
-                // ringIndex = ring * 2;
-                ringIndex = ring;
+                ring            = ring + 1;
+                ringIndex       = ring;
                 maxAngleForRing = _MAX_SPREAD * ((float)ring / (float)(ring + 1));
                 gapAngleForRing = maxAngleForRing / ring;
             }
@@ -108,7 +116,6 @@ public class KingsLaw : AdvancedGunBehavior
 
     private void Reset()
     {
-        this._chargeTime = 0.0f;
         this._nextIndex = 0;
     }
 
@@ -122,37 +129,17 @@ public class KingsLaw : AdvancedGunBehavior
         base.Update();
         if (BraveTime.DeltaTime == 0.0f)
             return;
-        if (!this.gun.IsCharging)
-        {
-            Reset();
-            return;
-        }
         if (this.Owner is not PlayerController)
             return;
-
-        if (this._nextIndex >= _MAX_BULLETS)
+        if (this.gun.IsCharging)
             return;
 
-        this._chargeTime += BraveTime.DeltaTime;
-        if (this._chargeTime > _SPAWN_RATE)
-        {
-            this._chargeTime -= _SPAWN_RATE;
-            SpawnNextProjectile();
-        }
-    }
-
-    private void SpawnNextProjectile()
-    {
-        int index = GetNextIndex();
-        if (index >= _MAX_BULLETS || (this.gun.CurrentAmmo < 1 && !this.gun.InfiniteAmmo))
-            return;
-
-        if (!this.gun.InfiniteAmmo)
-            this.gun.LoseAmmo(1);
-
-        PlayerController player = this.Owner as PlayerController;
-        VolleyUtility.ShootSingleProjectile(_KingsLawBullet, player.sprite.WorldCenter, player.m_currentGunAngle, false, player
-          ).GetComponent<KingsLawBullets>().Setup(index);
+        Reset();
+        // Synchronize ammo clips between projectile modules as necessary
+        // (don't do while charging or bullets will all be forcibly released)
+        bool needsReload = this.gun.m_moduleData[this.gun.DefaultModule].needsReload;
+        foreach (ProjectileModule mod in this.gun.Volley.projectiles)
+            this.gun.m_moduleData[mod].needsReload |= needsReload;
     }
 }
 
@@ -167,29 +154,30 @@ public class KingsLawBullets : MonoBehaviour
     private const float _RUNE_ROT_FAST          = 69.0f;
     private const float _RUNE_ROT_SLOW          = 47.0f;
 
-    private PlayerController _owner;
-    private Projectile       _projectile;
-    private float            _moveTimer;
-    private bool             _launchSequenceStarted;
-    private bool             _wasEverInStasis;
-    private int              _index;
+    private PlayerController _owner                 = null;
+    private Projectile       _projectile            = null;
+    private bool             _launchSequenceStarted = false;
+    private bool             _wasEverInStasis       = false;
+    private GameObject       _runeLarge             = null;
+    private GameObject       _runeSmall             = null;
+    private float            _offsetAngle           = 0.0f;
+    private float            _offsetMag             = 0.0f;
+    private float            _offsetRing            = 0.0f;
+    private int              _index                 = 0;
+    private bool             _naturalSpawn          = false;
 
-    private GameObject       _runeLarge = null;
-    private GameObject       _runeSmall = null;
-
-    private float _offsetAngle = 0.0f;
-    private float _offsetMag   = 0.0f;
-    private float _offsetRing  = 0.0f;
-
-    public void Setup(int index)
+    private void Start()
     {
-        this._projectile            = base.GetComponent<Projectile>();
-        this._owner                 = _projectile.Owner as PlayerController;
-        this._launchSequenceStarted = false;
-        this._wasEverInStasis       = false;
-        this._index                 = index;
+        this._projectile = base.GetComponent<Projectile>();
+        this._owner      = _projectile.Owner as PlayerController;
 
-        Vector3 baseOffset = KingsLaw._OffsetAnglesMagsAndRings[index];
+        if (this._owner?.CurrentGun.GetComponent<KingsLaw>() is KingsLaw king)
+        {
+            this._index = king.GetNextIndex();
+            this._naturalSpawn = true;
+        }
+
+        Vector3 baseOffset = KingsLaw._OffsetAnglesMagsAndRings[this._index];
         this._offsetAngle  = baseOffset.x;
         this._offsetMag    = baseOffset.y;
         this._offsetRing   = baseOffset.z;
@@ -199,14 +187,15 @@ public class KingsLawBullets : MonoBehaviour
         };
 
         AkSoundEngine.PostEvent("snd_undynedis", base.gameObject);
-
         StartCoroutine(TheLaw());
     }
 
     private void OnDestroy()
     {
-        if (_runeLarge)
-            UnityEngine.Object.Destroy(_runeLarge);
+        if (this._runeLarge)
+            UnityEngine.Object.Destroy(this._runeLarge);
+        if (this._runeSmall)
+            UnityEngine.Object.Destroy(this._runeSmall);
     }
 
     private IEnumerator TheLaw()
@@ -227,10 +216,11 @@ public class KingsLawBullets : MonoBehaviour
         {
             float percentLeft        = 1f - elapsed / _TIME_BEFORE_STASIS;
             float cubicEase          = 1f - (percentLeft * percentLeft * percentLeft);
-            float mag                = this._offsetMag * cubicEase;
             float behindPlayerAngle  = this._owner.m_currentGunAngle + 180f;
-            Vector2 offset           = (behindPlayerAngle + this._offsetAngle).Clamp360().ToVector(mag);
-            this._projectile.specRigidbody.Position = new Position(this._owner.CenterPosition + offset);
+            Vector2 offset           = (behindPlayerAngle + this._offsetAngle).Clamp360().ToVector(this._offsetMag);
+            Vector2 targetPosition   = Vector2.Lerp(
+                this._owner.CurrentGun.barrelOffset.PositionVector2(), this._owner.CenterPosition + offset, cubicEase);
+            this._projectile.specRigidbody.Position = new Position(targetPosition);
             this._projectile.SendInDirection(this._owner.m_currentGunAngle.ToVector(), resetDistance: true);
             this._projectile.transform.localRotation = this._owner.m_currentGunAngle.EulerZ();
             this._projectile.specRigidbody.UpdateColliderPositions();
@@ -239,8 +229,8 @@ public class KingsLawBullets : MonoBehaviour
             yield return null;
         }
 
-        // Phase 2 / 5 -- the freeze
-        while (this._owner && this._owner.CurrentGun?.GetComponent<KingsLaw>() && (this._owner.CurrentGun?.IsCharging ?? false))
+        // Phase 2 / 5 -- the freeze (skipped if the projectile didn't spawn with King's Law)
+        while (this._naturalSpawn && this._owner && this._owner.CurrentGun?.GetComponent<KingsLaw>() && (this._owner.CurrentGun?.IsCharging ?? false))
         {
             float behindPlayerAngle = this._owner.m_currentGunAngle + 180f;
             Vector2 offset          = (behindPlayerAngle + this._offsetAngle).Clamp360().ToVector(this._offsetMag);
@@ -266,25 +256,25 @@ public class KingsLawBullets : MonoBehaviour
             m.SetColor("_EmissiveColor", Color.cyan);
         AkSoundEngine.PostEvent("knife_gun_glow_stop_all", this._projectile.gameObject);
         AkSoundEngine.PostEvent("knife_gun_glow", this._projectile.gameObject);
-        this._moveTimer = _GLOW_TIME;
-        while (this._moveTimer > 0)
+        float moveTimer = _GLOW_TIME;
+        while (moveTimer > 0)
         {
-            float runeAlpha = _RUNE_ALPHA * this._moveTimer / _GLOW_TIME;
+            float runeAlpha = _RUNE_ALPHA * moveTimer / _GLOW_TIME;
             this._runeLarge.SetAlpha(runeAlpha);
             this._runeSmall.SetAlpha(runeAlpha);
-            float glowAmount = (_GLOW_TIME - this._moveTimer) / _GLOW_TIME;
+            float glowAmount = (_GLOW_TIME - moveTimer) / _GLOW_TIME;
             m.SetFloat("_EmissivePower", glowAmount * _GLOW_MAX);
-            this._moveTimer -= BraveTime.DeltaTime;
+            moveTimer -= BraveTime.DeltaTime;
             yield return null;
         }
         this._runeLarge.SetAlpha(0f);
         this._runeSmall.SetAlpha(0f);
 
         // Phase 4 / 5 -- the launch queue
-        this._moveTimer = _LAUNCH_DELAY * this._offsetRing + C.FRAME * (this._index - this._offsetRing * this._offsetRing);
-        while (this._moveTimer > 0)
+        moveTimer = _LAUNCH_DELAY * this._offsetRing + C.FRAME * (this._index - this._offsetRing * this._offsetRing);
+        while (moveTimer > 0)
         {
-            this._moveTimer -= BraveTime.DeltaTime;
+            moveTimer -= BraveTime.DeltaTime;
             yield return null;
         }
 
