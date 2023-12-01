@@ -9,36 +9,36 @@ public class KingsLaw : AdvancedGunBehavior
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
 
-    internal const float _ANGLE_GAP   = 20.0f;
-    internal const float _MAG_GAP     = 0.75f;
-    internal const float _MIN_MAG     = 3.0f;
-    internal const float _MAX_SPREAD  = 45.0f;
-    internal const int   _MAX_BULLETS = 400;
-    internal const float _SPAWN_RATE  = 0.1f;
+    internal const float _ANGLE_GAP    = 20.0f;
+    internal const float _MAG_GAP      = 0.75f;
+    internal const float _MIN_MAG      = 3.0f;
+    internal const float _MAX_SPREAD   = 45.0f;
+    internal const int   _MAX_BULLETS  = 400;
+    internal const float _SPAWN_RATE   = 0.1f;
+    internal const float _RUNE_ROT_MID = 59.0f;
 
     internal static List<Vector3> _OffsetAnglesMagsAndRings = new(_MAX_BULLETS);
     internal static GameObject _RuneLarge;
     internal static GameObject _RuneSmall;
+    internal static GameObject _RuneMuzzle;
 
-    private int _nextIndex = 0;
+    private int        _nextIndex        = 0;
+    private GameObject _extantMuzzleRune = null;
+    private float      _muzzleRuneAlpha  = 0.0f;
 
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<KingsLaw>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARGE, reloadTime: 0.75f, ammo: 700);
-            gun.SetAnimationFPS(gun.shootAnimation, 24);
-            gun.SetAnimationFPS(gun.reloadAnimation, 24);
-            gun.SetMuzzleVFX("muzzle_iron_maid", fps: 30, scale: 0.5f, anchor: Anchor.MiddleLeft);
-            gun.SetFireAudio("knife_gun_launch");
+            gun.SetMuzzleVFX();
             gun.SetReloadAudio("knife_gun_reload");
-            gun.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
-        gun.InitProjectile(new(clipSize: 20, shootStyle: ShootStyle.Automatic, damage: 5.0f, speed: 40.0f, range: 999999f,
+        gun.InitProjectile(new(clipSize: 20, shootStyle: ShootStyle.Automatic, damage: 7.5f, speed: 40.0f, range: 999999f,
           cooldown: _SPAWN_RATE, sprite: "kings_law_projectile", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter,
           useDummyChargeModule: true)).Attach<KingsLawBullets>();
 
         // Projectiles should spawn in semi-circles around some offset point behind the player, filling in each
-        //   semi-ring from the outside in
+        //   semi-ring from the outside inward (the math checks out I promise)
         int   ring            = 0;
         int   ringIndex       = 0;
         float angle           = 0f;
@@ -73,8 +73,9 @@ public class KingsLaw : AdvancedGunBehavior
             }
         }
 
-        _RuneLarge = VFX.Create("law_rune_large", fps: 2);
-        _RuneSmall = VFX.Create("law_rune_small", fps: 2);
+        _RuneLarge  = VFX.Create("law_rune_large", fps: 2);
+        _RuneSmall  = VFX.Create("law_rune_small", fps: 2);
+        _RuneMuzzle = VFX.Create("muzzle_kings_law", fps: 10);
     }
 
     public override void OnReload(PlayerController player, Gun gun)
@@ -87,6 +88,8 @@ public class KingsLaw : AdvancedGunBehavior
     {
         base.OnSwitchedToThisGun();
         Reset();
+        this._muzzleRuneAlpha = 0f;
+        this._extantMuzzleRune?.SetAlphaImmediate(0f);
     }
 
     public override void OnDropped()
@@ -118,8 +121,22 @@ public class KingsLaw : AdvancedGunBehavior
             return;
         if (this.Owner is not PlayerController)
             return;
+
+        if (this._extantMuzzleRune == null)
+        {
+            this._extantMuzzleRune = SpawnManager.SpawnVFX(KingsLaw._RuneMuzzle, this.gun.barrelOffset.transform.position, Quaternion.identity);
+            this._extantMuzzleRune.SetAlphaImmediate(0.0f);
+            this._extantMuzzleRune.transform.parent = this.gun.barrelOffset;
+        }
         if (this.gun.IsCharging)
+        {
+            this._muzzleRuneAlpha = Mathf.Min(1f, this._muzzleRuneAlpha + 2f * BraveTime.DeltaTime);
+            this._extantMuzzleRune.SetAlpha(Mathf.Clamp01(this._muzzleRuneAlpha));
+            this._extantMuzzleRune.transform.localRotation = (-_RUNE_ROT_MID * BraveTime.ScaledTimeSinceStartup).EulerZ();
             return;
+        }
+        this._muzzleRuneAlpha = Mathf.Max(0f, this._muzzleRuneAlpha - 4f * BraveTime.DeltaTime);
+        this._extantMuzzleRune.SetAlpha(Mathf.Clamp01(this._muzzleRuneAlpha));
 
         Reset();
         // Synchronize ammo clips between projectile modules as necessary
@@ -158,20 +175,25 @@ public class KingsLawBullets : MonoBehaviour
         this._projectile = base.GetComponent<Projectile>();
         this._owner      = _projectile.Owner as PlayerController;
 
-        if (this._owner?.CurrentGun.GetComponent<KingsLaw>() is KingsLaw king)
+        if (!this._owner)
+            return; // shouldn't happen, but just be safe
+
+        if (this._owner.CurrentGun.GetComponent<KingsLaw>() is KingsLaw king)
         {
             this._index = king.GetNextIndex();
             this._naturalSpawn = true;
         }
 
         Vector3 baseOffset = KingsLaw._OffsetAnglesMagsAndRings[this._index];
-        this._offsetAngle  = baseOffset.x;
+        // offset angle can be reduced by at most half of the max depending on the player's accuracy
+        this._offsetAngle  = baseOffset.x * Mathf.Min(1.5f, 0.5f + 0.5f * this._owner.stats.GetStatValue(PlayerStats.StatType.Accuracy));
         this._offsetMag    = baseOffset.y;
         this._offsetRing   = baseOffset.z;
 
         this._projectile.specRigidbody.OnCollision += (_) => {
             AkSoundEngine.PostEvent("knife_gun_hit", this._projectile.gameObject);
         };
+        this._projectile.specRigidbody.OnPreRigidbodyCollision += SkipCorpseCollisions;
 
         AkSoundEngine.PostEvent("snd_undynedis", base.gameObject);
         StartCoroutine(TheLaw());
@@ -183,6 +205,14 @@ public class KingsLawBullets : MonoBehaviour
             UnityEngine.Object.Destroy(this._runeLarge);
         if (this._runeSmall)
             UnityEngine.Object.Destroy(this._runeSmall);
+    }
+
+    private void SkipCorpseCollisions(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
+    {
+        if (otherRigidbody.GetComponent<AIActor>() is not AIActor actor)
+            return;
+        if (!actor.healthHaver || actor.healthHaver.IsDead)
+            PhysicsEngine.SkipCollision = true;
     }
 
     private IEnumerator TheLaw()
@@ -233,6 +263,7 @@ public class KingsLawBullets : MonoBehaviour
         // Phase 3 / 5 -- the glow
         float targetAngle                = this._owner.m_currentGunAngle;
         Vector2 targetDir                = targetAngle.ToVector();
+        Vector2 originalPlayerPosition   = this._owner.CurrentGun.barrelOffset.PositionVector2();
         this._runeLarge.transform.parent = null;
         this._runeSmall.transform.parent = null;
         this._projectile.sprite.usesOverrideMaterial = true;
@@ -276,8 +307,8 @@ public class KingsLawBullets : MonoBehaviour
         // Post-launch: wait for the projectiles to pass the player's original point at their launch, then re-enable tile collision
         while (this._owner && (this._projectile?.isActiveAndEnabled ?? false))
         {
-            float angleToPlayer = (this._projectile.transform.position.XY() - this._owner.transform.position.XY()).ToAngle();
-            if (angleToPlayer.IsNearAngle(targetAngle, 90f))
+            float angleToPlayerOriginalPosition = (this._projectile.transform.position.XY() - originalPlayerPosition).ToAngle();
+            if (angleToPlayerOriginalPosition.IsNearAngle(targetAngle, 90f))
                 break;
             yield return null;
         }
