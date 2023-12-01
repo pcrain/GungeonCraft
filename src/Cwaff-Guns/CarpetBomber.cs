@@ -18,6 +18,8 @@ public class CarpetBomber : AdvancedGunBehavior
     private const float _SPEED_PER_CHARGE      = 2f;
     private const float _RANGE_DELTA           = 12f;
 
+    internal static ExplosionData _CarpetExplosion = null;
+
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<CarpetBomber>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
@@ -54,15 +56,35 @@ public class CarpetBomber : AdvancedGunBehavior
                       speed: _MIN_SPEED + (_DLT_SPEED + _SPEED_PER_CHARGE * i) * (i == 0 ? 0.5f : ((float)j / (float)i)))
                       ).Attach<FancyGrenadeProjectile>(g => {
                         g.startingHeight   = 0.5f;
-                        g.minBounceAngle   = 5f;
-                        g.maxBounceAngle   = 15f;
+                        g.minBounceAngle   = 10f;
+                        g.maxBounceAngle   = 30f;
                         g.startingVelocity = 0.5f * j;
                       }),
                     ChargeTime = _CHARGE_PER_PROJECTILE * (i + 1),
                 });
         }
 
-        UnityEngine.Object.Destroy(p);
+        // Initialize our explosion data
+        _CarpetExplosion = new ExplosionData()
+        {
+            forceUseThisRadius     = true,
+            pushRadius             = 0.5f,
+            damageRadius           = 0.5f,
+            damageToPlayer         = 0f,
+            doDamage               = true,
+            damage                 = 10,
+            doDestroyProjectiles   = false,
+            doForce                = true,
+            debrisForce            = 10f,
+            preventPlayerForce     = true,
+            explosionDelay         = 0.01f,
+            usesComprehensiveDelay = false,
+            doScreenShake          = false,
+            playDefaultSFX         = true,
+            effect                 = Explosions.ExplosiveRounds.effect,
+            ignoreList             = Explosions.DefaultSmall.ignoreList,
+            ss                     = Explosions.DefaultSmall.ss,
+        };
     }
 
     protected override void Update()
@@ -80,9 +102,9 @@ public class CarpetBomber : AdvancedGunBehavior
 
 public class CarpetProjectile : MonoBehaviour
 {
-    private const int _MAX_BOUNCES          = 4;
-    private const double _AIR_FRICTION      = 0.5d;
-    private const float _BOUNCE_FRICTION    = 0.7f;
+    private const int _MAX_BOUNCES          = 3;
+    private const double _AIR_FRICTION      = 0.8d;
+    private const float _BOUNCE_FRICTION    = 0.75f;
 
     private Projectile _projectile          = null;
     private PlayerController _owner         = null;
@@ -98,7 +120,7 @@ public class CarpetProjectile : MonoBehaviour
         this.GetComponent<BounceProjModifier>().OnBounce += OnGroundBounce;
 
         this._projectile.OnDestruction += (Projectile p) => Exploder.Explode(
-            p.transform.position, Bouncer._MiniExplosion, p.Direction, ignoreQueues: true);
+            p.transform.position, CarpetBomber._CarpetExplosion, p.Direction, ignoreQueues: true);
         if (this._projectile.specRigidbody)
             this._projectile.specRigidbody.OnRigidbodyCollision += (CollisionData rigidbodyCollision) => {
                 this._grenade?.Redirect(rigidbodyCollision.Normal);
@@ -112,11 +134,15 @@ public class CarpetProjectile : MonoBehaviour
         if (!this._projectile)
             return;
 
+
         if (this._bounces >= _MAX_BOUNCES)
         {
             this._projectile.DieInAir(suppressInAirEffects: true);
             return;
         }
+
+        if (this._bounces == 0)
+            return;
 
         this._projectile.baseData.speed *= (float)Lazy.FastPow(_AIR_FRICTION, this._projectile.LocalDeltaTime);
         this._projectile.UpdateSpeed();
@@ -125,7 +151,7 @@ public class CarpetProjectile : MonoBehaviour
     public void OnGroundBounce()
     {
         this._projectile.baseData.speed *= _BOUNCE_FRICTION;
-        Exploder.Explode(this._projectile.transform.position, Bouncer._MiniExplosion, this._projectile.Direction, ignoreQueues: true);
+        Exploder.Explode(this._projectile.transform.position, CarpetBomber._CarpetExplosion, this._projectile.Direction, ignoreQueues: true);
         ++this._bounces;
     }
 }

@@ -1050,6 +1050,29 @@ public static class EasyPlaceableObjects // stolen from NN
     public static GameObject BabyDragunNPC = LoadHelper.LoadAssetFromAnywhere<GameObject>("BabyDragunJail");
 }
 
+public static class Explosions
+{
+    public static ExplosionData DefaultSmall    =
+        GameManager.Instance.Dungeon.sharedSettingsPrefab.DefaultSmallExplosionData;
+    public static ExplosionData DefaultLarge    =
+        GameManager.Instance.Dungeon.sharedSettingsPrefab.DefaultExplosionData;
+    public static ExplosionData AirStrike       =
+        ItemHelper.Get(Items.AirStrike).GetComponent<DirectionalAttackActiveItem>().barrageExplosionData;
+    public static ExplosionData ExplosiveRounds =
+        ItemHelper.Get(Items.ExplosiveRounds).GetComponent<ComplexProjectileModifier>().ExplosionData;
+    public static ExplosionData FlareGun =
+        ItemHelper.Get(Items.FlareGun).GetComponent<BarrageSynergyProcessor>().Barrage.barrageExplosionData;
+    public static ExplosionData MeltedRock =
+        ItemHelper.Get(Items.MeltedRock).GetComponent<CorpseExplodeActiveItem>().CorpseExplosionData;
+    public static ExplosionData EmergencyCrate =
+        ResourceManager.LoadAssetBundle("brave_resources_001").LoadAsset<GameObject>("EmergencyCrate")
+          .GetComponent<EmergencyCrateController>().ExplosionData;
+
+    // public static ExplosionData Decoy =
+    //     ItemHelper.Get(Items.Decoy).GetComponent<SpawnObjectPlayerItem>().objectToSpawn.GetComponent<Decoy>().DeathExplosion;
+}
+
+
 public static class EasyGoopDefinitions  // mostly stolen from NN
 {
     //Basegame Goops

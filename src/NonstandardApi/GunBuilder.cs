@@ -216,7 +216,6 @@ public static class GunBuilder
   public static ProjectileType ConvertToSpecialtyType<ProjectileType>(this Projectile baseProj) where ProjectileType : Projectile
   {
     ProjectileType p = baseProj.gameObject.AddComponent<ProjectileType>();
-    ETGModConsole.Log($"creating specialty type {p.GetType().Name}");
     p.BulletScriptSettings                        = baseProj.BulletScriptSettings;
     p.damageTypes                                 = baseProj.damageTypes;
     p.allowSelfShooting                           = baseProj.allowSelfShooting;
@@ -289,8 +288,6 @@ public static class GunBuilder
     p.DelayedDamageToExploders                    = baseProj.DelayedDamageToExploders;
     p.AdditionalScaleMultiplier                   = baseProj.AdditionalScaleMultiplier;
     UnityEngine.Object.DestroyImmediate(baseProj);  // we don't want two projectiles attached to the same gameObject
-    // foreach (Projectile pt in p.gameObject.GetComponents<Projectile>())
-    //   ETGModConsole.Log($"  found one");
     return p;
   }
 
