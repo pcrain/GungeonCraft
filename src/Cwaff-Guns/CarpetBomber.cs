@@ -63,8 +63,6 @@ public class CarpetBomber : AdvancedGunBehavior
                         g.startingVelocity = 0.5f * j;
                       }),
                     ChargeTime = _CHARGE_PER_PROJECTILE * (i + 1),
-                    // AdditionalWwiseEvent = "carpet_bomber_charge_stage",
-                    // UsedProperties = ChargeProjectileProperties.additionalWwiseEvent,
                 });
         }
 

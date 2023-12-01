@@ -9,19 +9,15 @@ public class KingsLaw : AdvancedGunBehavior
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
 
-    internal const float _SPREAD      = 45.0f;
+    internal const float _ANGLE_GAP   = 20.0f;
+    internal const float _MAG_GAP     = 0.75f;
     internal const float _MIN_MAG     = 3.0f;
-    internal const float _MAX_MAG     = 6.0f;
-    internal const int   _LINES       = 5;
-    internal const int   _LINE_SIZE   = 4;
-    internal const int   _LINES_SIDE  = (int)((float)_LINES / 2.0f);
-    internal const float _DLT_MAG     = (_MAX_MAG - _MIN_MAG) / (_LINES - 1);
-    internal const int   _NUM_BULLETS = _LINES * _LINE_SIZE;
-    internal const float _GAP         = (2f * _SPREAD / (_LINES - 1));
+    internal const float _MAX_SPREAD  = 45.0f;
+    internal const int   _MAX_BULLETS = 400;
     internal const float _SPAWN_RATE  = 0.1f;
 
     internal static Projectile _KingsLawBullet;
-    internal static List<Vector2> _OffsetAnglesAndMags = new(_NUM_BULLETS);
+    internal static List<Vector3> _OffsetAnglesMagsAndRings = new(_MAX_BULLETS);
     internal static GameObject _RuneLarge;
     internal static GameObject _RuneSmall;
 
@@ -39,7 +35,7 @@ public class KingsLaw : AdvancedGunBehavior
             gun.SetReloadAudio("knife_gun_reload");
             gun.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
-        gun.InitProjectile(new(clipSize: _NUM_BULLETS, shootStyle: ShootStyle.Charged, chargeTime: float.MaxValue, // absurdly high charge value so we never actually shoot
+        gun.InitProjectile(new(clipSize: 20, shootStyle: ShootStyle.Charged, chargeTime: float.MaxValue, // absurdly high charge value so we never actually shoot
           shouldRotate: true/*, collidesWithTilemap: false*/));  // collidesWithTilemap doesn't actually work
 
         _KingsLawBullet = Items.Ak47.CloneProjectile(new(damage: 5.0f, speed: 40.0f, range: 30.0f
@@ -47,16 +43,39 @@ public class KingsLaw : AdvancedGunBehavior
           ).Attach<KingsLawBullets>();
 
         // Stagger projectile spawns alternating left and right from the starting angle
-        int i = 0;
-        for (float mag = _MIN_MAG; i++ < _LINE_SIZE; mag += _DLT_MAG)
+        int   ring            = 0;
+        int   ringIndex       = 0;
+        float angle           = 0f;
+        float mag             = 0f;
+        float maxAngleForRing = 0f;
+        float gapAngleForRing = 0f;
+        for (int i = 0; i < _MAX_BULLETS; ++i)
         {
-          int j = 0;
-          for (float angle = 0f; j++ <= _LINES_SIDE; angle += _GAP)
-          {
-              _OffsetAnglesAndMags.Add(new Vector2(angle, mag));
-              if (j > 1)
-                _OffsetAnglesAndMags.Add(new Vector2(-angle, mag));
-          }
+            if (ringIndex > ring) // build up the sides
+            {
+                angle = maxAngleForRing;
+                mag   = _MIN_MAG + _MAG_GAP * (ring * 2 - ringIndex);
+            }
+            else // build up the back
+            {
+                angle = gapAngleForRing * ringIndex;
+                mag   = _MIN_MAG + _MAG_GAP * ring;
+            }
+            _OffsetAnglesMagsAndRings.Add(new Vector3(angle, mag, ringIndex));
+            if (ringIndex > 0)
+            {
+                _OffsetAnglesMagsAndRings.Add(new Vector3(-angle, mag, ringIndex));
+                ++i;
+                --ringIndex;
+            }
+            else
+            {
+                ring += 1;
+                // ringIndex = ring * 2;
+                ringIndex = ring;
+                maxAngleForRing = _MAX_SPREAD * ((float)ring / (float)(ring + 1));
+                gapAngleForRing = maxAngleForRing / ring;
+            }
         }
 
         _RuneLarge = VFX.Create("law_rune_large", fps: 2);
@@ -111,7 +130,7 @@ public class KingsLaw : AdvancedGunBehavior
         if (this.Owner is not PlayerController)
             return;
 
-        if (this._nextIndex >= _NUM_BULLETS)
+        if (this._nextIndex >= _MAX_BULLETS)
             return;
 
         this._chargeTime += BraveTime.DeltaTime;
@@ -125,7 +144,7 @@ public class KingsLaw : AdvancedGunBehavior
     private void SpawnNextProjectile()
     {
         int index = GetNextIndex();
-        if (index >= _NUM_BULLETS || (this.gun.CurrentAmmo < 1 && !this.gun.InfiniteAmmo))
+        if (index >= _MAX_BULLETS || (this.gun.CurrentAmmo < 1 && !this.gun.InfiniteAmmo))
             return;
 
         if (!this.gun.InfiniteAmmo)
@@ -160,6 +179,7 @@ public class KingsLawBullets : MonoBehaviour
 
     private float _offsetAngle = 0.0f;
     private float _offsetMag   = 0.0f;
+    private float _offsetRing  = 0.0f;
 
     public void Setup(int index)
     {
@@ -169,9 +189,10 @@ public class KingsLawBullets : MonoBehaviour
         this._wasEverInStasis       = false;
         this._index                 = index;
 
-        Vector2 baseOffset = KingsLaw._OffsetAnglesAndMags[index];
+        Vector3 baseOffset = KingsLaw._OffsetAnglesMagsAndRings[index];
         this._offsetAngle  = baseOffset.x;
         this._offsetMag    = baseOffset.y;
+        this._offsetRing   = baseOffset.z;
 
         this._projectile.specRigidbody.OnCollision += (_) => {
             AkSoundEngine.PostEvent("knife_gun_hit", this._projectile.gameObject);
@@ -260,7 +281,7 @@ public class KingsLawBullets : MonoBehaviour
         this._runeSmall.SetAlpha(0f);
 
         // Phase 4 / 5 -- the launch queue
-        this._moveTimer = _LAUNCH_DELAY * this._index;
+        this._moveTimer = _LAUNCH_DELAY * this._offsetRing + C.FRAME * (this._index - this._offsetRing * this._offsetRing);
         while (this._moveTimer > 0)
         {
             this._moveTimer -= BraveTime.DeltaTime;
