@@ -29,7 +29,7 @@ public class KingsLaw : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<KingsLaw>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARGE, reloadTime: 0.75f, ammo: 700);
+            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARGE, reloadTime: 0.75f, ammo: 700, doesScreenShake: false);
             gun.SetMuzzleVFX();
             gun.SetReloadAudio("knife_gun_reload");
 
@@ -128,6 +128,7 @@ public class KingsLaw : AdvancedGunBehavior
             this._extantMuzzleRune.SetAlphaImmediate(0.0f);
             this._extantMuzzleRune.transform.parent = this.gun.barrelOffset;
         }
+
         if (this.gun.IsCharging)
         {
             this._muzzleRuneAlpha = Mathf.Min(1f, this._muzzleRuneAlpha + 2f * BraveTime.DeltaTime);
@@ -135,6 +136,10 @@ public class KingsLaw : AdvancedGunBehavior
             this._extantMuzzleRune.transform.localRotation = (-_RUNE_ROT_MID * BraveTime.ScaledTimeSinceStartup).EulerZ();
             return;
         }
+
+        if (!this.gun.IsReloading && this.gun.ClipShotsRemaining < Mathf.Min(this.gun.ClipCapacity, this.gun.CurrentAmmo))
+            this.gun.Reload(); // force reload while we're not at max clip capacity
+
         this._muzzleRuneAlpha = Mathf.Max(0f, this._muzzleRuneAlpha - 4f * BraveTime.DeltaTime);
         this._extantMuzzleRune.SetAlpha(Mathf.Clamp01(this._muzzleRuneAlpha));
 
