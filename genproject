@@ -309,9 +309,10 @@ if [ $# -gt 0 ] && [ "$1" == "-t" ]; then
     /bin/rm -f "${projectname}.zip"
     zip -q "${projectname}.zip" ./*
     cd ..
-    /bin/rm -f "./bin/${projectname}.zip"
-    /bin/mv "${tdir}/${projectname}.zip" "./bin/${projectname}.zip"
-    echo -e "[${GRN}>${BLN}]   Created package ./bin/${projectname}.zip"
+    /bin/rm -f ./bin/*.zip
+    zippath="./bin/${projectname}_${projectversion}_$(date +%F_%H-%M-%S).zip"
+    /bin/mv "${tdir}/${projectname}.zip" "${zippath}"
+    echo -e "[${GRN}>${BLN}]   Created package ${CYN}${zippath}${BLN}"
   fi
 fi
 
