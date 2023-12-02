@@ -6,8 +6,8 @@ public class KingsLaw : AdvancedGunBehavior
     public static string SpriteName       = "kings_law";
     public static string ProjectileName   = "AK-47";
     public static string ShortDescription = "Accept Your Fate";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string LongDescription  = "Conjures projectiles that hover behind the player as long as the fire button is held. Projectiles are launched with a short delay when fire is released, when reloading, or when changing weapons.";
+    public static string Lore             = "The trusty weapon of an ancient sorcerer-king who ruled Gunymede with an iron fist. Imbued with only a small fraction of his power and weakened further by the passage of time, this gun still resonates with enough destructive magic to wipe out hordes of lesser Gundead in the blink of an eye.";
 
     internal const float _ANGLE_GAP    = 20.0f;
     internal const float _MAG_GAP      = 0.75f;

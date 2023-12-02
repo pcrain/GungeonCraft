@@ -5,9 +5,9 @@ public class Pincushion : AdvancedGunBehavior
     public static string ItemName         = "Pincushion";
     public static string SpriteName       = "pincushion";
     public static string ProjectileName   = "38_special";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string ShortDescription = "Needless Violence";
+    public static string LongDescription  = "Fires an extraordinarily fast barrage of extremely weak pins that lose accuracy as the clip is depleted. Pins cannot damage anything other than enemies, and are completely blocked by barrels, crates, etc.";
+    public static string Lore             = "Even when shot out of a gun, a pin won't be particularly harmful to most of the Gungeon's inhabitants. Two pins won't fare much better, nor three, nor ten. But, by firing thousands of pins per second, one of them will in all likelihood eventually lodge itself in a weak point or some other location extremely compromising to its target. Needless to say, the probabilistic nature of this gun threads the line of practicality, but its high drum capacity doesn't leave it without merits in the right situation.";
 
     internal const int   _SIMULTANEOUS_BULLETS = 4;
     internal const float _MAX_SPREAD           = 45f;

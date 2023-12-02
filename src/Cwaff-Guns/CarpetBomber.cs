@@ -5,9 +5,9 @@ public class CarpetBomber : AdvancedGunBehavior
     public static string ItemName         = "Carpet Bomber";
     public static string SpriteName       = "carpet_bomber";
     public static string ProjectileName   = "38_special";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string ShortDescription = "Rugged Terrain";
+    public static string LongDescription  = "Fires a barrage of explosive bouncing carpets. Launches more carpets with more force the longer it is charged.";
+    public static string Lore             = "Developed by Mike (of 'Mike' fame), this ornate launcher fires carpets that have been tightly rolled using hydraulics, laced with glued-on patches of C4, and vacuum-sealed to preserve freshness.";
 
     private const int   _MAX_WALL_BOUNCES      = 3;
     private const int   _MAX_PROJECTILES       = 10;
