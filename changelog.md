@@ -1,7 +1,21 @@
 # Changelog
 
+## 1.4.0 (2023-12-01)
+
+#### Features and Polish:
+- Added King's Law, Pincushion, Crapshooter, and Carpet Bomber
+- Implemented proper mid-game saving behavior for Missiletoe, Alyx, Curator's Badge, Wedding Ring, Borrowed Time, and Warrior's Gi
+
+#### Balance Changes:
+- Reaching the floor's exit while Adrenaline Shot is active now automatically cancels the effect and brings you to half a heart
+
+#### Bugfixes:
+- Fixed vanilla bug preventing duct-taped guns from serializing properly
+- Fixed issue with guns having extremely large pickup ranges
+- Fixed issue with guns hovering far above / below reward pedestals if spawned
+
 ## 1.3.0 (2023-11-22)
-- Added Subtractor Beam, Alligator, Lightwing, Stunt Helmet, Comfy Slippers, and Chamber Jammer (current item count: 69)
+- Added Subtractor Beam, Alligator, Lightwing, Stunt Helmet, Comfy Slippers, and Chamber Jammer
 - Added muzzle effects for all guns!
 - Added custom projectile and ammo clip to Platinum Star, thanks to Lynceus!
 - Added hand animations for Ki Blast

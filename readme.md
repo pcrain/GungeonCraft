@@ -8,13 +8,13 @@
 
 ### Features
 
-- 69 nice new items including
-	+ 31 new guns 
+- 73 new items including
+	+ 35 new guns 
 	+ 26 new passive items
 	+ 12 new active items
 - Lore for all new guns and items
 - A new boss!
-- Fixed co-op Turbo Mode
+- Vanilla bugfixes
 - You can pet Junior \o/
 - You can become the greatest janitor the Gungeon has ever seen O:
 
@@ -27,6 +27,10 @@
 ### Known Bugs
 * Mid-run saving might not correctly save the internal state of Amazon Primer
 * If you find any more, please let me know!
+
+### Vanilla Bugs Fixed
+* In co-op Turbo Mode, the 2nd player now has the same speed as the first player without having to die first
+* When saving and reloading a run, guns no longer lose any other guns duct-taped to them
 
 ### FAQ
 
