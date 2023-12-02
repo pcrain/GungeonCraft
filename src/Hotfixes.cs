@@ -25,6 +25,11 @@ public static class LargeGunAnimationHotfix
 
     public static void Init()
     {
+        new ILHook(
+            typeof(RewardPedestal).GetMethod("DetermineContents", BindingFlags.Instance | BindingFlags.NonPublic),
+            OnDetermineContentsIL
+            );
+
         new Hook(
             typeof(GunInventory).GetMethod("AddGunToInventory", BindingFlags.Instance | BindingFlags.Public),
             typeof(LargeGunAnimationHotfix).GetMethod("OnAddGunToInventory", BindingFlags.Static | BindingFlags.NonPublic)
@@ -34,6 +39,50 @@ public static class LargeGunAnimationHotfix
             typeof(Gun).GetMethod("DropGun", BindingFlags.Instance | BindingFlags.Public),
             typeof(LargeGunAnimationHotfix).GetMethod("OnDropGun", BindingFlags.Static | BindingFlags.NonPublic)
             );
+    }
+
+    // private static void DebugSetRewardPedestal(RewardPedestal reward)
+    // {
+    //     if (!C.DEBUG_BUILD)
+    //         return;
+    //     ETGModConsole.Log($"  SETTING REWARD PEDESTAL TO KNOWN BROKEN ITEM");
+    //     reward.contents = PickupObjectDatabase.GetById(IDs.Pickups["racket_launcher"]);
+    //     // reward.contents = PickupObjectDatabase.GetById(IDs.Pickups["outbreak"]);
+    //     // reward.contents = PickupObjectDatabase.GetById(IDs.Pickups["jugglernaut"]);
+    // }
+
+    // Use the first frame of the gun's (potentially trimmed) idle animation as its reward pedestal sprite
+    private static void FixGunSpriteIfNecessary(RewardPedestal reward)
+    {
+        if (reward.contents.GetComponent<Gun>() is not Gun gun)
+            return;  // we don't have a gun, so there's nothing to do
+        if (!gun.idleAnimation.Contains(_TRIM_ANIMATION))
+            return;  // the gun doesn't have a trimmed idle animation, so there's nothing to do
+
+        tk2dSpriteAnimationClip idleClip = gun.spriteAnimator?.GetClipByName(gun.idleAnimation);
+        if (idleClip == null || idleClip.frames == null || idleClip.frames.Count() == 0)
+            return;  // the idle animation clip is missing frames, so there's nothing to do
+
+        // actually adjust the sprite to display properly on the reward pedestal
+        reward.m_itemDisplaySprite.SetSprite(idleClip.frames[0].spriteCollection, idleClip.frames[0].spriteId);
+    }
+
+    private static void OnDetermineContentsIL(ILContext il)
+    {
+        ILCursor cursor = new ILCursor(il);
+
+        // if (C.DEBUG_BUILD)
+        //     if (cursor.TryGotoNext(MoveType.Before, instr => instr.MatchLdstr("Display Sprite")))
+        //     {
+        //         cursor.Emit(OpCodes.Ldarg_0);
+        //         cursor.Emit(OpCodes.Call, typeof(LargeGunAnimationHotfix).GetMethod("DebugSetRewardPedestal", BindingFlags.Static | BindingFlags.NonPublic));
+        //     }
+
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchStfld<RewardPedestal>("m_itemDisplaySprite")))
+            return;
+
+        cursor.Emit(OpCodes.Ldarg_0);
+        cursor.Emit(OpCodes.Call, typeof(LargeGunAnimationHotfix).GetMethod("FixGunSpriteIfNecessary", BindingFlags.Static | BindingFlags.NonPublic));
     }
 
     private static Gun OnAddGunToInventory(Func<GunInventory, Gun, bool, Gun> orig, GunInventory inventory, Gun gun, bool makeActive)

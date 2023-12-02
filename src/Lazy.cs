@@ -132,10 +132,20 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
             int fixedIdleAnimationClipId = gun.spriteAnimator.GetClipIdByName(fixedIdleAnimation);
             if (fixedIdleAnimationClipId != -1)
             {
+                string originalIdleAnimation = gun.idleAnimation;
+                int fixedIdleAnimationSpriteId = gun.spriteAnimator.GetClipByName(fixedIdleAnimation).frames[0].spriteId;
+
+                // Fix sprite animator
                 gun.SetAnimationFPS(fixedIdleAnimation, (int)originalIdleClip.fps);
                 gun.LoopAnimation(fixedIdleAnimation, originalIdleClip.loopStart);
                 gun.idleAnimation                = fixedIdleAnimation;
                 gun.spriteAnimator.defaultClipId = fixedIdleAnimationClipId;
+
+                // Fix pickup object sprite
+                // gun.m_defaultSpriteID = fixedIdleAnimationSpriteId;
+                // gun.GetComponent<PickupObject>().sprite.spriteId = fixedIdleAnimationSpriteId;
+                // _GunSpriteCollection.SpriteIDsWithAttachPoints.Add(fixedIdleAnimationSpriteId);
+                // _GunSpriteCollection.SpriteDefinedAttachPoints.Add(new AttachPointData(gun.AttachPointsForClip(originalIdleAnimation)));
             }
             else if (C.DEBUG_BUILD)
                 ETGModConsole.Log($"  no fixed idle animation for {gunName}");
