@@ -309,8 +309,6 @@ public class Initialisation : BaseUnityPlugin
             CwaffTweaks.Init();
             HeckedMode.Init();
 
-            // ETGMod.StartGlobalCoroutine(this.delayedstarthandler());
-
             // Hotfixes for bugs and issues mostly out of my control
             DragunFightHotfix.Init();
             CoopTurboModeHotfix.Init();
@@ -330,24 +328,6 @@ public class Initialisation : BaseUnityPlugin
             // Debug.LogException("Gungy o.o!");
             // foreach (tk2dSpriteDefinition def in AmmonomiconController.ForceInstance.EncounterIconCollection.spriteDefinitions)
             //     ETGModConsole.Log($"  def: {def.name}");
-
-            // var watch2 = System.Diagnostics.Stopwatch.StartNew();
-            // for (float i = 0f; i < 100000f; i += 1f)
-            // {
-            //     Vector2 v = new Vector2(i, i);
-            //     float a = v.magnitude;
-            // }
-            // watch2.Stop();
-            // ETGModConsole.Log($"sqrt = {watch2.ElapsedTicks} ticks");
-
-            // var watch3 = System.Diagnostics.Stopwatch.StartNew();
-            // for (float i = 0f; i < 100000f; i += 1f)
-            // {
-            //     Vector2 v = new Vector2(i, i);
-            //     float a = v.sqrMagnitude; // 3X FASTER
-            // }
-            // watch3.Stop();
-            // ETGModConsole.Log($"no sqrt = {watch3.ElapsedTicks} ticks");
         }
         catch (Exception e)
         {
@@ -355,27 +335,4 @@ public class Initialisation : BaseUnityPlugin
             ETGModConsole.Log(e.StackTrace);
         }
     }
-
-    // public IEnumerator delayedstarthandler()
-    // {
-    //     yield return null;
-    //     this.DelayedInitialisation();
-    //     yield break;
-    // }
-    // public void DelayedInitialisation()
-    // {
-    //     try
-    //     {
-    //         // CrossmodNPCLootPoolSetup.CheckItems();
-
-    //         // OMITBChars.Shade = ETGModCompatibility.ExtendEnum<PlayableCharacters>(Initialisation.GUID, "Shade");
-
-    //         ETGModConsole.Log("(Also finished DelayedInitialization)");
-    //     }
-    //     catch (Exception e)
-    //     {
-    //         ETGModConsole.Log(e.Message);
-    //         ETGModConsole.Log(e.StackTrace);
-    //     }
-    // }
 }

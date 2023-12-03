@@ -82,11 +82,7 @@
     <Compile Include="src\Cwaff-Enemies\Bosses\Sans\Sans.cs"/>
     <Compile Include="src\Cwaff-Enemies\Bosses\Sans\SansAttacks.cs"/>
     <Compile Include="src\Cwaff-Enemies\PathableBullet.cs"/>
-    <Compile Include="src\Cwaff-Rooms\FlowHelpers.cs"/>
-    <Compile Include="src\Cwaff-Rooms\SansDungeon.cs"/>
-    <Compile Include="src\Cwaff-Rooms\FlowSimpleAsItGets.cs"/>
-    <Compile Include="src\Cwaff-Rooms\CwaffDungeonFlows.cs"/>
-    <Compile Include="src\Cwaff-Rooms\FlowPrefabs.cs"/>
+    <Compile Include="src\Cwaff-Rooms\FancyRoomBuilder.cs"/>
     <Compile Include="src\Extensions.cs"/>
     <Compile Include="src\Cwaff-NPCs\Bombo.cs"/>
     <Compile Include="src\Common.cs"/>
@@ -156,6 +152,10 @@
     <Compile Include="src\Cwaff-Guns\HolyWaterGun.cs"/>
     <Compile Include="src\Cwaff-Guns\Alyx.cs"/>
     <Compile Include="src\PlayerToolbox.cs"/>
+    <Compile Include="src\Cwaff-Flows\FlowHelpers.cs"/>
+    <Compile Include="src\Cwaff-Flows\SansDungeon.cs"/>
+    <Compile Include="src\Cwaff-Flows\CwaffDungeonFlows.cs"/>
+    <Compile Include="src\Cwaff-Flows\FlowPrefabs.cs"/>
     <Compile Include="src\NonstandardApi\ModdedShopItemAdder.cs"/>
     <Compile Include="src\NonstandardApi\CustomAmmoDisplay.cs"/>
     <Compile Include="src\NonstandardApi\FakeShopItem.cs"/>

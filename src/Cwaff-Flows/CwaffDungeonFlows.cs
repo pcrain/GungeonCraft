@@ -130,7 +130,7 @@ public class CwaffDungeonFlow {
 
         KnownFlows = new List<DungeonFlow>();
 
-        KnownFlows.Add(FlowSimpleAsItGets.Init());
+        KnownFlows.Add(SansDungeonFlow.Init());
 
         KnownFlows.Add(FlowHelpers.DuplicateDungeonFlow(LoadOfficialFlow("npcparadise")));
 
