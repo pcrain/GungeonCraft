@@ -271,7 +271,8 @@ public class Initialisation : BaseUnityPlugin
             #endregion
 
             #region Floor Initialization
-                SansDungeon.InitCustomDungeon();
+                CwaffDungeons.Init(); // must be done before creating any custom floors / flows
+                SansDungeon.Init();
             #endregion
 
             #region Old Asset Stuff

@@ -7,60 +7,85 @@ namespace CwaffingTheGungy;
     GameManager.Instance.InjectedLevelName =
 */
 
-public class SansDungeon
+public class CwaffDungeons
 {
-    public const string INTERNAL_NAME = "cg_sansfloor";
-    public const string FLOOR_NAME    = "Odd Corridor";
+    public string internalName                     = null;
+    public string dungeonPrefabTemplate            = null;
+    public GameLevelDefinition gameLevelDefinition = null;
+    public Func<Dungeon, Dungeon> dungeonGenerator = null;
 
-    public static GameLevelDefinition FloorNameDefinition;
-    public static GameObject GameManagerObject;
-    public static tk2dSpriteCollectionData goheckyourself;
+    public static Dictionary<string, CwaffDungeons> Flows = new();
 
-    public static Hook getOrLoadByName_Hook;
-    public static Hook forceCustomMusicHook;
+    private static Hook _GetOrLoadByNameHook = null;
+
+    public static void Init()
+    {
+        _GetOrLoadByNameHook = new Hook(
+            typeof(DungeonDatabase).GetMethod("GetOrLoadByName", BindingFlags.Static | BindingFlags.Public),
+            typeof(CwaffDungeons).GetMethod("GetOrLoadByNameHook", BindingFlags.Static | BindingFlags.Public)
+        );
+    }
+
+    public static CwaffDungeons Register(string internalName, string dungeonPrefabTemplate, GameLevelDefinition gameLevelDefinition,
+      Func<Dungeon, Dungeon> dungeonGenerator)
+    {
+        Flows[internalName] = new CwaffDungeons() {
+            internalName          = internalName,
+            dungeonPrefabTemplate = dungeonPrefabTemplate,
+            gameLevelDefinition   = gameLevelDefinition,
+            dungeonGenerator      = dungeonGenerator,
+        };
+        return Flows[internalName];
+    }
 
     public static Dungeon GetOrLoadByNameHook(Func<string, Dungeon> orig, string name)
     {
-        if (!GameManager.Instance.customFloors.Contains(FloorNameDefinition))
-            GameManager.Instance.customFloors.Add(FloorNameDefinition); // fixes a bug where returning to the breach deletes the floor, thanks Bunny!
+        CwaffDungeons dungeonData;
+        if (!Flows.TryGetValue(name, out dungeonData))
+            return orig(name);
+
+        if (!GameManager.Instance.customFloors.Contains(dungeonData.gameLevelDefinition))
+            GameManager.Instance.customFloors.Add(dungeonData.gameLevelDefinition); // fixes a bug where returning to the breach deletes the floor, thanks Bunny!
+
         Dungeon dungeon = null;
-        string dungeonPrefabTemplate = "Base_ResourcefulRat";
-        if (name.ToLower() == INTERNAL_NAME)
+        if (name.ToLower() == dungeonData.internalName)
         {
             try
             {
-                dungeon = SansGeon(GetOrLoadByName_Orig(dungeonPrefabTemplate));
+                dungeon = dungeonData.dungeonGenerator(GetOrLoadByName_Orig(dungeonData.dungeonPrefabTemplate));
             }
             catch (Exception e)
             {
                 ETGModConsole.Log($"exception: {e}");
             }
         }
-        if (dungeon)
-        {
-            DebugTime.RecordStartTime();
-            DebugTime.Log("AssetBundle.LoadAsset<Dungeon>({0})", new object[] { name });
-            return dungeon;
-        }
-        else
-        {
-            return orig(name);
-        }
+        return dungeon ?? orig(name);
     }
 
-    internal static void PlayFloorMusicHook(Action<DungeonFloorMusicController, Dungeon> orig, DungeonFloorMusicController musicController, Dungeon d)
+    public static Dungeon GetOrLoadByName_Orig(string name)
     {
-        orig(musicController, d);
-        if (d.DungeonFloorName == FLOOR_NAME)
-            GameManager.Instance.DungeonMusicController.LoopMusic(musicName: "sans", loopPoint: 48800, rewindAmount: 48800);
+        AssetBundle assetBundle = ResourceManager.LoadAssetBundle("dungeons/" + name.ToLower());
+        DebugTime.RecordStartTime();
+        Dungeon component = assetBundle.LoadAsset<GameObject>(name).GetComponent<Dungeon>();
+        DebugTime.Log("AssetBundle.LoadAsset<Dungeon>({0})", new object[] { name });
+        return component;
     }
+}
 
-    public static void InitCustomDungeon()
+public class SansDungeon
+{
+    public const string INTERNAL_NAME    = "cg_sansfloor";
+    public const string FLOOR_NAME       = "Odd Corridor";
+    public const string PREFAB_TEMPLATE  = "Base_ResourcefulRat";
+
+    public static GameLevelDefinition FloorNameDefinition;
+    public static GameObject GameManagerObject;
+    public static tk2dSpriteCollectionData goheckyourself;
+
+    public static Hook forceCustomMusicHook;
+
+    public static void Init()
     {
-        getOrLoadByName_Hook = new Hook(
-            typeof(DungeonDatabase).GetMethod("GetOrLoadByName", BindingFlags.Static | BindingFlags.Public),
-            typeof(SansDungeon).GetMethod("GetOrLoadByNameHook", BindingFlags.Static | BindingFlags.Public)
-        );
         forceCustomMusicHook = new Hook(
             typeof(DungeonFloorMusicController).GetMethod("ResetForNewFloor", BindingFlags.Instance | BindingFlags.Public),
             typeof(SansDungeon).GetMethod("PlayFloorMusicHook", BindingFlags.Static | BindingFlags.NonPublic)
@@ -90,13 +115,22 @@ public class SansDungeon
 
         GameManager.Instance.customFloors.Add(FloorNameDefinition);
         GameManagerObject.GetComponent<GameManager>().customFloors.Add(FloorNameDefinition);
+
+        CwaffDungeons.Register(INTERNAL_NAME, PREFAB_TEMPLATE, FloorNameDefinition, SansGeon);
+    }
+
+    internal static void PlayFloorMusicHook(Action<DungeonFloorMusicController, Dungeon> orig, DungeonFloorMusicController musicController, Dungeon d)
+    {
+        orig(musicController, d);
+        if (d.DungeonFloorName == FLOOR_NAME)
+            GameManager.Instance.DungeonMusicController.LoopMusic(musicName: "sans", loopPoint: 48800, rewindAmount: 48800);
     }
 
     public static Dungeon SansGeon(Dungeon dungeon)
     {
-        Dungeon MinesDungeonPrefab = GetOrLoadByName_Orig("Base_Mines");
-        Dungeon CatacombsPrefab = GetOrLoadByName_Orig("Base_Catacombs");
-        Dungeon RatDungeonPrefab = GetOrLoadByName_Orig("Base_ResourcefulRat");
+        Dungeon MinesDungeonPrefab = CwaffDungeons.GetOrLoadByName_Orig("Base_Mines");
+        Dungeon CatacombsPrefab = CwaffDungeons.GetOrLoadByName_Orig("Base_Catacombs");
+        Dungeon RatDungeonPrefab = CwaffDungeons.GetOrLoadByName_Orig("Base_ResourcefulRat");
         DungeonMaterial FinalScenario_MainMaterial = UnityEngine.Object.Instantiate(RatDungeonPrefab.roomMaterialDefinitions[0]);
         FinalScenario_MainMaterial.supportsPits = true;
         FinalScenario_MainMaterial.doPitAO = false;
@@ -269,14 +303,6 @@ public class SansDungeon
         MinesDungeonPrefab = null;
 
         return dungeon;
-    }
-    public static Dungeon GetOrLoadByName_Orig(string name)
-    {
-        AssetBundle assetBundle = ResourceManager.LoadAssetBundle("dungeons/" + name.ToLower());
-        DebugTime.RecordStartTime();
-        Dungeon component = assetBundle.LoadAsset<GameObject>(name).GetComponent<Dungeon>();
-        DebugTime.Log("AssetBundle.LoadAsset<Dungeon>({0})", new object[] { name });
-        return component;
     }
 }
 
