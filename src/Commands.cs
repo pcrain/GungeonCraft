@@ -21,6 +21,11 @@ public class Commands
                 0);
             // ETGModConsole.Log("<size=100><color=#ff0000ff>Please specify a command. Type 'nn help' for a list of commands.</color></size>", false);
         });
+        ETGModConsole.Commands.AddGroup("ff", delegate (string[] args)
+        {
+            OneOffDebugDungeonFlow.CreateAndWarp("boomhildr");
+            // ETGModConsole.Log("<size=100><color=#ff0000ff>Please specify a command. Type 'nn help' for a list of commands.</color></size>", false);
+        });
         ETGModConsole.Commands.AddGroup("shaderfix", delegate (string[] args)
         {
             foreach (DebrisObject debris in StaticReferenceManager.AllDebris)

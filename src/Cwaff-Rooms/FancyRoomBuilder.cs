@@ -1,6 +1,443 @@
+using SaveAPI;
+using Alexandria.DungeonAPI;
+
 namespace CwaffingTheGungy;
 
 public static class FancyRoomBuilder
 {
+  public delegate bool FancyNPCSpawnCondition();
 
+  public static Dictionary<string, PrototypeDungeonRoom> FancyShopRooms = new();
+
+  public static PrototypeDungeonRoom MakeFancyShop(string npcName, GenericLootTable shopLootTable, float spawnChance, Floors spawnFloors,
+    CwaffPrerequisite spawnPrerequisite = CwaffPrerequisite.NONE, FancyNPCSpawnCondition spawnPrequisiteChecker = null)
+  {
+    if (C.DEBUG_BUILD)
+      ETGModConsole.Log($"Setting up shop for {npcName}");
+
+    string npcNameUpper = npcName.ToUpper();
+
+    ETGMod.Databases.Strings.Core.AddComplex($"#{npcNameUpper}_GENERIC_TALK",  "GENERIC_TALK");
+    ETGMod.Databases.Strings.Core.AddComplex($"#{npcNameUpper}_STOPPER_TALK",  "STOPPER_TALK");
+    ETGMod.Databases.Strings.Core.AddComplex($"#{npcNameUpper}_PURCHASE_TALK", "PURCHASE_TALK");
+    ETGMod.Databases.Strings.Core.AddComplex($"#{npcNameUpper}_NOSALE_TALK",   "NOSALE_TALK");
+    ETGMod.Databases.Strings.Core.AddComplex($"#{npcNameUpper}_INTRO_TALK",    "INTRO_TALK");
+    ETGMod.Databases.Strings.Core.AddComplex($"#{npcNameUpper}_ATTACKED_TALK", "ATTACKED_TALK");
+
+    List<int> LootTable = new List<int>()
+    {
+        108, //Bomb
+        109, //Ice Bomb
+        460, //Chaff Grenade
+        66, //Proximity Mine
+        308, //Cluster Mine
+        136, //C4
+        252, //Air Strike
+        443, //Big Boy
+        567, //Roll Bomb
+        234, //iBomb Companion App
+        438, //Explosive Decoy
+        403, //Melted Rock
+        304, //Explosive Rounds
+        312, //Blast Helmet
+        398, //Table Tech Rocket
+        440, //Ruby Bracelet
+        601, //Big Shotgun
+        4, //Sticky Crossbow
+        542, //Strafe Gun
+        96, //M16
+        6, //Zorgun
+        81, //Deck4rd
+        274, //Dark Marker
+        39, //RPG
+        19, //Grenade Launcher
+        92, //Stinger
+        563, //The Exotic
+        129, //Com4nd0
+        372, //RC Rocket
+        16, //Yari Launcher
+        332, //Lil Bomber
+        180, //Grasschopper
+        593, //Void Core Cannon
+        362, //Bullet Bore
+        186, //Machine Fist
+        28, //Mailbox
+        339, //Mahoguny
+        478, //Banana
+    };
+
+    GenericLootTable loot = CreateLootTable();
+    foreach (int i in LootTable)
+        loot.AddItemToPool(i);
+
+    GameObject shop = ShopAPI.SetUpShop(
+      name                              : npcName,
+      prefix                            : C.MOD_PREFIX,
+      idleSpritePaths                   : ResMap.Get($"{npcName}_idle"),
+      idleFps                           : 2,
+      talkSpritePaths                   : ResMap.Get($"{npcName}_talk"),
+      talkFps                           : 2,
+      lootTable                         : loot/*shopLootTable*/,
+      currency                          : CustomShopItemController.ShopCurrencyType.COINS,
+      runBasedMultilineGenericStringKey : $"#{npcNameUpper}_GENERIC_TALK",
+      runBasedMultilineStopperStringKey : $"#{npcNameUpper}_STOPPER_TALK",
+      purchaseItemStringKey             : $"#{npcNameUpper}_PURCHASE_TALK",
+      purchaseItemFailedStringKey       : $"#{npcNameUpper}_NOSALE_TALK",
+      introStringKey                    : $"#{npcNameUpper}_INTRO_TALK",
+      attackedStringKey                 : $"#{npcNameUpper}_ATTACKED_TALK",
+      stolenFromStringKey               : $"#{npcNameUpper}_STOLEN_TALK",
+      talkPointOffset                   : Vector3.zero,
+      npcPosition                       : Vector3.zero,
+      voiceBox                          : ShopAPI.VoiceBoxes.OLD_MAN,
+      itemPositions                     : ShopAPI.defaultItemPositions,
+      costModifier                      : 1f,
+      giveStatsOnPurchase               : false,
+      statsToGiveOnPurchase             : null,
+      CustomCanBuy                      : null,
+      CustomRemoveCurrency              : null,
+      CustomPrice                       : null,
+      OnPurchase                        : null,
+      OnSteal                           : null,
+      currencyIconPath                  : "",
+      currencyName                      : "",
+      canBeRobbed                       : true,
+      hasCarpet                         : false,
+      carpetSpritePath                  : "",
+      CarpetOffset                      : null,
+      hasMinimapIcon                    : false,
+      minimapIconSpritePath             : ResMap.Get($"{npcName}_icon")?[0],
+      addToMainNpcPool                  : false,
+      percentChanceForMainPool          : 0.1f,
+      prerequisites                     : null,
+      fortunesFavorRadius               : 2,
+      poolType                          : CustomShopController.ShopItemPoolType.DEFAULT,
+      RainbowModeImmunity               : false,
+      hitboxSize                        : null,
+      hitboxOffset                      : null
+      );
+
+    PrototypeDungeonRoom shopRoom = GetBasicShopRoom();
+
+    ShopAPI.RegisterShopRoom(shop: shop, protoroom: shopRoom, vector: new Vector2((float)(shopRoom.Width / 2), (float)(shopRoom.Height / 2)));
+
+    List<ProceduralFlowModifierData.FlowModifierPlacementType> flowModifierPlacementTypes = new() {
+      ProceduralFlowModifierData.FlowModifierPlacementType.END_OF_CHAIN
+    };
+
+    List<DungeonPrerequisite> dungeonPrerequisites = new();
+    if (spawnPrerequisite != CwaffPrerequisite.NONE)
+      dungeonPrerequisites.Add(new CwaffDungeonPrerequisite { prerequisite = spawnPrerequisite.SetupCheck(spawnPrequisiteChecker) });
+
+    RoomFactory.AddInjection(
+      protoroom            : shopRoom/*RoomFactory.BuildFromResource(roomPath: "Planetside/Resources/ShrineRooms/ShopRooms/TimeTraderShop.room").room*/,
+      injectionAnnotation  : $"{npcName}'s Shop' Room",
+      placementRules       : flowModifierPlacementTypes,
+      chanceToLock         : 0,
+      prerequisites        : dungeonPrerequisites,
+      injectorName         : $"{npcName}'s Shop' Room",
+      selectionWeight      : 1,
+      chanceToSpawn        : 1,
+      addSingularPlaceable : null,
+      XFromCenter          : 0,
+      YFromCenter          : 0
+      );
+
+    foreach (Floors floor in Enum.GetValues(typeof(Floors)))
+    {
+      if ((floor & spawnFloors) == 0)
+        continue;
+      // TODO: add shop room to specific floor
+    }
+
+    FancyShopRooms[npcName] = shopRoom;
+    return shopRoom;
+  }
+
+  private static PrototypeDungeonRoom _BasicShopRoom = null;
+  public static PrototypeDungeonRoom GetBasicShopRoom()
+  {
+    return RoomFactory.BuildFromResource(roomPath: "CwaffingTheGungy/Resources/Rooms/BasicShopRoom.room").room; // rebuild every time for now
+    // if (_BasicShopRoom == null)
+    //   _BasicShopRoom = RoomFactory.BuildFromResource(roomPath: "CwaffingTheGungy/Resources/Rooms/BasicShopRoom.room").room;
+    // return _BasicShopRoom;
+  }
+
+  // Extension for checking shop activation conditions using CwaffPrerequisite and returning CwaffPrerequisite for inline setup
+  public static CwaffPrerequisite SetupCheck(this CwaffPrerequisite prereq, FancyRoomBuilder.FancyNPCSpawnCondition check)
+  {
+    CwaffDungeonPrerequisite.AddPrequisiteCheck(prereq, check);
+    return prereq;
+  }
+
+  // Stolen from NN for now
+  public static GenericLootTable CreateLootTable(List<GenericLootTable> includedLootTables = null, DungeonPrerequisite[] prerequisites = null)
+  {
+      GenericLootTable lootTable = ScriptableObject.CreateInstance<GenericLootTable>();
+      lootTable.defaultItemDrops = new WeightedGameObjectCollection()
+      {
+          elements = new List<WeightedGameObject>()
+      };
+      lootTable.tablePrerequisites = prerequisites ?? new DungeonPrerequisite[0];
+      lootTable.includedLootTables = includedLootTables ?? new List<GenericLootTable>();
+      return lootTable;
+  }
+
+  public static void ForceSpawnOnFirstFloorForDebugPurposes(this PrototypeDungeonRoom room)
+  {
+      SharedInjectionData injector                   = ScriptableObject.CreateInstance<SharedInjectionData>();
+      injector.UseInvalidWeightAsNoInjection         = true;
+      injector.PreventInjectionOfFailedPrerequisites = false;
+      injector.IsNPCCell                             = false;
+      injector.IgnoreUnmetPrerequisiteEntries        = false;
+      injector.OnlyOne                               = false;
+      injector.ChanceToSpawnOne                      = 1f;
+      injector.AttachedInjectionData                 = new List<SharedInjectionData>();
+      injector.InjectionData                         = new List<ProceduralFlowModifierData>
+      {
+        GenerateNewProcDataForTimeTrader(room, GlobalDungeonData.ValidTilesets.CASTLEGEON),
+      };
+      injector.name = "Debug Force Spawn Room";
+      SharedInjectionData BaseInjection = LoadHelper.LoadAssetFromAnywhere<SharedInjectionData>("Base Shared Injection Data");
+      BaseInjection.AttachedInjectionData ??= new List<SharedInjectionData>();
+      BaseInjection.AttachedInjectionData.Add(injector);
+  }
+
+  public static ProceduralFlowModifierData GenerateNewProcDataForTimeTrader(PrototypeDungeonRoom RequiredRoom, GlobalDungeonData.ValidTilesets Tileset)
+  {
+    string name = RequiredRoom.name.ToString()+Tileset.ToString();
+    if (RequiredRoom.name.ToString() == null)
+      name = "EmergencyAnnotationName";
+
+    Vector2 offset = new Vector2(-2.25f, -1.25f);
+    Vector2 vector = new Vector2((float)(RequiredRoom.Width / 2) + offset.x, (float)(RequiredRoom.Height / 2) + offset.y);
+
+    RequiredRoom.placedObjectPositions.Add(vector);
+
+    ProceduralFlowModifierData SpecProcData = new ProceduralFlowModifierData()
+    {
+      annotation = name,
+      DEBUG_FORCE_SPAWN = true,
+      OncePerRun = false,
+      placementRules = new List<ProceduralFlowModifierData.FlowModifierPlacementType>()
+      {
+        ProceduralFlowModifierData.FlowModifierPlacementType.END_OF_CHAIN
+      },
+      roomTable = null,
+      exactRoom = RequiredRoom,
+      IsWarpWing = false,
+      RequiresMasteryToken = false,
+      chanceToLock = 0,
+      selectionWeight = 2,
+      chanceToSpawn = 1,
+      RequiredValidPlaceable = null,
+      prerequisites = new DungeonPrerequisite[]
+      {
+        // new DungeonGenToolbox.AdvancedDungeonPrerequisite
+        // {
+        //    advancedAdvancedPrerequisiteType = DungeonGenToolbox.AdvancedDungeonPrerequisite.AdvancedAdvancedPrerequisiteType.SPEEDRUN_TIMER_BEFORE,
+        //    BeforeTimeInSeconds = BeforeTimeInSeconds,
+        //    requiredTileset = Tileset,
+        //    requireTileset = true
+        // }
+      },
+      CanBeForcedSecret = false,
+      RandomNodeChildMinDistanceFromEntrance = 0,
+      exactSecondaryRoom = null,
+      framedCombatNodes = 0,
+    };
+    return SpecProcData;
+  }
+}
+
+public enum CwaffPrerequisite
+{
+  NONE                   = 0,
+  INSURANCE_PREREQUISITE = 1,
+}
+
+public class CwaffDungeonPrerequisite : CustomDungeonPrerequisite
+{
+  private static Dictionary<CwaffPrerequisite, FancyRoomBuilder.FancyNPCSpawnCondition> SpawnConditionMap = new();
+
+  public static void AddPrequisiteCheck(CwaffPrerequisite prereq, FancyRoomBuilder.FancyNPCSpawnCondition check)
+  {
+    if (SpawnConditionMap.ContainsKey(prereq))
+    {
+      ETGModConsole.Log($"  Tried to reuse a shop spawn prerequisite!");
+      return;
+    }
+    SpawnConditionMap[prereq] = check;
+  }
+
+  public override bool CheckConditionsFulfilled()
+  {
+    ETGModConsole.Log($"  ATTEMPTING TO INJECT CUSTOM SHOP");
+    if (prerequisite == CwaffPrerequisite.NONE)
+      return true;
+    return SpawnConditionMap[CwaffPrerequisite.INSURANCE_PREREQUISITE]();
+  }
+
+  public bool UnlockRequirement;
+  public CustomDungeonFlags UnlockFlag;
+  public CwaffPrerequisite prerequisite;
+  // public List<GlobalDungeonData.ValidTilesets> validTilesets = new List<GlobalDungeonData.ValidTilesets>();
+}
+
+
+public static class OneOffDebugDungeonFlow {
+
+    public static DungeonFlow CreateAndWarp(string shopName) {
+        PrototypeDungeonRoom theRoom = FancyRoomBuilder.FancyShopRooms[shopName];
+
+        DungeonFlow m_CachedFlow = ScriptableObject.CreateInstance<DungeonFlow>();
+
+        DungeonFlowNode Node_00 = new DungeonFlowNode(m_CachedFlow) {
+            isSubchainStandin = false,
+            nodeType = DungeonFlowNode.ControlNodeType.ROOM,
+            roomCategory = PrototypeDungeonRoom.RoomCategory.CONNECTOR,
+            percentChance = 1f,
+            priority = DungeonFlowNode.NodePriority.MANDATORY,
+            overrideExactRoom = CwaffDungeonPrefabs.elevator_entrance,
+            overrideRoomTable = null,
+            capSubchain = false,
+            subchainIdentifier = string.Empty,
+            limitedCopiesOfSubchain = false,
+            maxCopiesOfSubchain = 1,
+            subchainIdentifiers = new List<string>(0),
+            receivesCaps = false,
+            isWarpWingEntrance = false,
+            handlesOwnWarping = false,
+            forcedDoorType = DungeonFlowNode.ForcedDoorType.NONE,
+            loopForcedDoorType = DungeonFlowNode.ForcedDoorType.NONE,
+            nodeExpands = false,
+            initialChainPrototype = "n",
+            chainRules = new List<ChainRule>(0),
+            minChainLength = 3,
+            maxChainLength = 8,
+            minChildrenToBuild = 1,
+            maxChildrenToBuild = 1,
+            canBuildDuplicateChildren = false,
+            parentNodeGuid = string.Empty,
+            childNodeGuids = new List<string>(0),
+            loopTargetNodeGuid = string.Empty,
+            loopTargetIsOneWay = false,
+            guidAsString = Guid.NewGuid().ToString(),
+            flow = m_CachedFlow,
+        };
+
+        DungeonFlowNode CustomShopNode = new DungeonFlowNode(m_CachedFlow) {
+            isSubchainStandin = false,
+            nodeType = DungeonFlowNode.ControlNodeType.ROOM,
+            roomCategory = PrototypeDungeonRoom.RoomCategory.CONNECTOR,
+            percentChance = 1f,
+            priority = DungeonFlowNode.NodePriority.MANDATORY,
+            overrideExactRoom = theRoom,
+            overrideRoomTable = null,
+            capSubchain = false,
+            subchainIdentifier = string.Empty,
+            limitedCopiesOfSubchain = false,
+            maxCopiesOfSubchain = 1,
+            subchainIdentifiers = new List<string>(0),
+            receivesCaps = false,
+            isWarpWingEntrance = false,
+            handlesOwnWarping = false,
+            forcedDoorType = DungeonFlowNode.ForcedDoorType.NONE,
+            loopForcedDoorType = DungeonFlowNode.ForcedDoorType.NONE,
+            nodeExpands = false,
+            initialChainPrototype = "n",
+            chainRules = new List<ChainRule>(0),
+            minChainLength = 3,
+            maxChainLength = 8,
+            minChildrenToBuild = 1,
+            maxChildrenToBuild = 1,
+            canBuildDuplicateChildren = false,
+            parentNodeGuid = string.Empty,
+            childNodeGuids = new List<string>(0),
+            loopTargetNodeGuid = string.Empty,
+            loopTargetIsOneWay = false,
+            guidAsString = Guid.NewGuid().ToString(),
+        };
+
+        DungeonFlowNode Node_99 = new DungeonFlowNode(m_CachedFlow) {
+            isSubchainStandin = false,
+            nodeType = DungeonFlowNode.ControlNodeType.ROOM,
+            roomCategory = PrototypeDungeonRoom.RoomCategory.EXIT,
+            percentChance = 1f,
+            priority = DungeonFlowNode.NodePriority.MANDATORY,
+            overrideExactRoom = CwaffDungeonPrefabs.exit_room_basic,
+            overrideRoomTable = null,
+            capSubchain = false,
+            subchainIdentifier = string.Empty,
+            limitedCopiesOfSubchain = false,
+            maxCopiesOfSubchain = 1,
+            subchainIdentifiers = new List<string>(0),
+            receivesCaps = false,
+            isWarpWingEntrance = false,
+            handlesOwnWarping = false,
+            forcedDoorType = DungeonFlowNode.ForcedDoorType.NONE,
+            loopForcedDoorType = DungeonFlowNode.ForcedDoorType.NONE,
+            nodeExpands = false,
+            initialChainPrototype = "n",
+            chainRules = new List<ChainRule>(0),
+            minChainLength = 3,
+            maxChainLength = 8,
+            minChildrenToBuild = 1,
+            maxChildrenToBuild = 1,
+            canBuildDuplicateChildren = false,
+            parentNodeGuid = string.Empty,
+            childNodeGuids = new List<string>(0),
+            loopTargetNodeGuid = string.Empty,
+            loopTargetIsOneWay = false,
+            guidAsString = Guid.NewGuid().ToString(),
+            flow = m_CachedFlow,
+        };
+
+        m_CachedFlow.name = shopName;
+        // m_CachedFlow.fallbackRoomTable = BossrushFlows.Bossrush_01_Castle.fallbackRoomTable;
+        m_CachedFlow.fallbackRoomTable = CwaffDungeonPrefabs.SewersRoomTable;
+        m_CachedFlow.subtypeRestrictions = new List<DungeonFlowSubtypeRestriction>(0);
+        m_CachedFlow.flowInjectionData = new List<ProceduralFlowModifierData>(0);
+        m_CachedFlow.sharedInjectionData = new List<SharedInjectionData>(0);
+
+        m_CachedFlow.Initialize();
+
+        m_CachedFlow.AddNodeToFlow(Node_00, null);
+        m_CachedFlow.AddNodeToFlow(CustomShopNode, Node_00);
+        m_CachedFlow.AddNodeToFlow(Node_99, CustomShopNode);
+
+        m_CachedFlow.FirstNode = Node_00;
+
+        // ETGModConsole.Log("loaded flow "+m_CachedFlow.name);
+
+        // FlowHelpers.PrintFlow(m_CachedFlow);
+
+        ETGModConsole.Log($"Attempting to warp to flow with {shopName} room");
+        GameManager.Instance.LoadCustomFlowForDebug(m_CachedFlow);
+
+        return m_CachedFlow;
+    }
+
+    public static void LoadCustomFlowForDebug(this GameManager gm, DungeonFlow flow)
+    {
+      gm.m_loadingLevel = true;
+      gm.FlushAudio();
+      gm.ClearPerLevelData();
+
+      GameLevelDefinition gameLevelDefinition = new GameLevelDefinition();
+      gameLevelDefinition.dungeonPrefabPath = "Base_Gungeon";
+      gameLevelDefinition.dungeonSceneName = "BB_Beholster";
+      gameLevelDefinition.priceMultiplier = 1f;
+      gameLevelDefinition.enemyHealthMultiplier = 1f;
+      gameLevelDefinition.predefinedSeeds = new List<int>();
+      gameLevelDefinition.flowEntries = new List<DungeonFlowLevelEntry>();
+
+      DungeonFlowLevelEntry dungeonFlowLevelEntry = new DungeonFlowLevelEntry();
+      // dungeonFlowLevelEntry.flowPath = flowpath;
+      // dungeonFlowLevelEntry.forceUseIfAvailable = true;
+      // dungeonFlowLevelEntry.prerequisites = new DungeonPrerequisite[0];
+      // dungeonFlowLevelEntry.weight = 1f;
+      // gameLevelDefinition.flowEntries.Add(dungeonFlowLevelEntry);
+
+      gm.StartCoroutine(gm.LoadNextLevelAsync_CR(gameLevelDefinition));
+    }
 }
