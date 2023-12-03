@@ -8,67 +8,30 @@ public static class FancyRoomBuilder
   public delegate bool SpawnCondition();
 
   public static Dictionary<string, PrototypeDungeonRoom> FancyShopRooms = new();
+  // public static Vector3[] defaultItemPositions = new Vector3[] {
+  //   new Vector3(1.125f, 2.125f, 1),
+  //   new Vector3(2.625f, 1f, 1),
+  //   new Vector3(4.125f, 2.125f, 1) };
 
-  public static PrototypeDungeonRoom MakeFancyShop(string npcName, GenericLootTable shopLootTable, float spawnChance = 1f, Floors? spawnFloors = null,
-    CwaffPrerequisite spawnPrerequisite = CwaffPrerequisite.NONE, SpawnCondition spawnPrequisiteChecker = null)
+  private static List<string> _DefaultLine = new(){"Buy somethin', will ya!"};
+
+  public static PrototypeDungeonRoom MakeFancyShop(string npcName, List<int> shopItems, float spawnChance = 1f, Floors? spawnFloors = null,
+    CwaffPrerequisite spawnPrerequisite = CwaffPrerequisite.NONE, SpawnCondition spawnPrequisiteChecker = null, string voice = null,
+    List<String> genericDialog = null, List<String> stopperDialog = null, List<String> purchaseDialog = null,
+    List<String> noSaleDialog = null, List<String> introDialog = null, List<String> attackedDialog = null, bool allowDupes = false,
+    float mainPoolChance = 0.0f, Vector3? talkPointOffset = null, Vector3? npcPosition = null, List<Vector3> itemPositions = null)
   {
     if (C.DEBUG_BUILD)
       ETGModConsole.Log($"Setting up shop for {npcName}");
 
     string npcNameUpper = npcName.ToUpper();
 
-    ETGMod.Databases.Strings.Core.AddComplex($"#{npcNameUpper}_GENERIC_TALK",  "GENERIC_TALK");
-    ETGMod.Databases.Strings.Core.AddComplex($"#{npcNameUpper}_STOPPER_TALK",  "STOPPER_TALK");
-    ETGMod.Databases.Strings.Core.AddComplex($"#{npcNameUpper}_PURCHASE_TALK", "PURCHASE_TALK");
-    ETGMod.Databases.Strings.Core.AddComplex($"#{npcNameUpper}_NOSALE_TALK",   "NOSALE_TALK");
-    ETGMod.Databases.Strings.Core.AddComplex($"#{npcNameUpper}_INTRO_TALK",    "INTRO_TALK");
-    ETGMod.Databases.Strings.Core.AddComplex($"#{npcNameUpper}_ATTACKED_TALK", "ATTACKED_TALK");
-
-    List<int> LootTable = new List<int>()
-    {
-        108, //Bomb
-        109, //Ice Bomb
-        460, //Chaff Grenade
-        66, //Proximity Mine
-        308, //Cluster Mine
-        136, //C4
-        252, //Air Strike
-        443, //Big Boy
-        567, //Roll Bomb
-        234, //iBomb Companion App
-        438, //Explosive Decoy
-        403, //Melted Rock
-        304, //Explosive Rounds
-        312, //Blast Helmet
-        398, //Table Tech Rocket
-        440, //Ruby Bracelet
-        601, //Big Shotgun
-        4, //Sticky Crossbow
-        542, //Strafe Gun
-        96, //M16
-        6, //Zorgun
-        81, //Deck4rd
-        274, //Dark Marker
-        39, //RPG
-        19, //Grenade Launcher
-        92, //Stinger
-        563, //The Exotic
-        129, //Com4nd0
-        372, //RC Rocket
-        16, //Yari Launcher
-        332, //Lil Bomber
-        180, //Grasschopper
-        593, //Void Core Cannon
-        362, //Bullet Bore
-        186, //Machine Fist
-        28, //Mailbox
-        339, //Mahoguny
-        478, //Banana
-    };
-
-    GenericLootTable loot = CreateLootTable();
-    foreach (int i in LootTable)
-        loot.AddItemToPool(i);
+    $"#{npcNameUpper}_GENERIC_TALK".SetupDBStrings(genericDialog ?? _DefaultLine);
+    $"#{npcNameUpper}_STOPPER_TALK".SetupDBStrings(stopperDialog ?? _DefaultLine);
+    $"#{npcNameUpper}_PURCHASE_TALK".SetupDBStrings(purchaseDialog ?? _DefaultLine);
+    $"#{npcNameUpper}_NOSALE_TALK".SetupDBStrings(noSaleDialog ?? _DefaultLine);
+    $"#{npcNameUpper}_INTRO_TALK".SetupDBStrings(introDialog ?? _DefaultLine);
+    $"#{npcNameUpper}_ATTACKED_TALK".SetupDBStrings(attackedDialog ?? _DefaultLine);
 
     List<DungeonPrerequisite> dungeonPrerequisites = new(){
       new CwaffDungeonPrerequisite { prerequisite = spawnPrerequisite.SetupCheck(spawnPrequisiteChecker)
@@ -81,7 +44,7 @@ public static class FancyRoomBuilder
       idleFps                           : 2,
       talkSpritePaths                   : ResMap.Get($"{npcName}_talk"),
       talkFps                           : 2,
-      lootTable                         : loot/*shopLootTable*/,
+      lootTable                         : shopItems.ToLootTable(),
       currency                          : CustomShopItemController.ShopCurrencyType.COINS,
       runBasedMultilineGenericStringKey : $"#{npcNameUpper}_GENERIC_TALK",
       runBasedMultilineStopperStringKey : $"#{npcNameUpper}_STOPPER_TALK",
@@ -90,10 +53,10 @@ public static class FancyRoomBuilder
       introStringKey                    : $"#{npcNameUpper}_INTRO_TALK",
       attackedStringKey                 : $"#{npcNameUpper}_ATTACKED_TALK",
       stolenFromStringKey               : $"#{npcNameUpper}_STOLEN_TALK",
-      talkPointOffset                   : Vector3.zero,
-      npcPosition                       : Vector3.zero,
+      talkPointOffset                   : talkPointOffset ?? ShopAPI.defaultTalkPointOffset,
+      npcPosition                       : npcPosition ?? ShopAPI.defaultNpcPosition,
       voiceBox                          : ShopAPI.VoiceBoxes.OLD_MAN,
-      itemPositions                     : ShopAPI.defaultItemPositions,
+      itemPositions                     : itemPositions?.ToArray() ?? ShopAPI.defaultItemPositions,
       costModifier                      : 1f,
       giveStatsOnPurchase               : false,
       statsToGiveOnPurchase             : null,
@@ -105,21 +68,23 @@ public static class FancyRoomBuilder
       currencyIconPath                  : "",
       currencyName                      : "",
       canBeRobbed                       : true,
-      hasCarpet                         : false,
-      carpetSpritePath                  : "",
+      hasCarpet                         : ResMap.Get($"{npcName}_carpet", quietFailure: true)?[0] != null,
+      carpetSpritePath                  : ResMap.Get($"{npcName}_carpet", quietFailure: true)?[0],
       CarpetOffset                      : null,
-      hasMinimapIcon                    : ResMap.Get($"{npcName}_icon")?[0] != null,
-      minimapIconSpritePath             : ResMap.Get($"{npcName}_icon")?[0],
-      addToMainNpcPool                  : false,
-      percentChanceForMainPool          : 0.1f,
-      prerequisites                     : null,  // DOESN'T DO ANYTHING AS FAR AS I CAN TELL BASED ON THE SOURCE CODE
-      // prerequisites                     : dungeonPrerequisites.ToArray(),
+      hasMinimapIcon                    : ResMap.Get($"{npcName}_icon", quietFailure: true)?[0] != null,
+      minimapIconSpritePath             : ResMap.Get($"{npcName}_icon", quietFailure: true)?[0],
+      addToMainNpcPool                  : mainPoolChance > 0,
+      percentChanceForMainPool          : mainPoolChance,
+      prerequisites                     : dungeonPrerequisites.ToArray(), // used by RegisterShopRoom(), but we're manually calling AddInjection() for now
       fortunesFavorRadius               : 2,
-      poolType                          : CustomShopController.ShopItemPoolType.DEFAULT,
+      poolType                          : allowDupes ? CustomShopController.ShopItemPoolType.DUPES : CustomShopController.ShopItemPoolType.DEFAULT,
       RainbowModeImmunity               : false,
       hitboxSize                        : null,
       hitboxOffset                      : null
       );
+
+    if (!string.IsNullOrEmpty(voice))
+      shop.GetComponentInChildren<TalkDoerLite>().audioCharacterSpeechTag = voice;
 
     PrototypeDungeonRoom shopRoom = GetBasicShopRoom();
 

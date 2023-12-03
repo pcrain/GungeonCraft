@@ -186,17 +186,17 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
             beamAnimationPaths          : ResMap.Get($"{spriteName}_mid"),
             beamFPS                     : fps,
             //Impact
-            impactVFXAnimationPaths     : ResMap.Get($"{spriteName}_impact", expectFailure: true),
+            impactVFXAnimationPaths     : ResMap.Get($"{spriteName}_impact", quietFailure: true),
             beamImpactFPS               : (impactFps > 0) ? impactFps : fps,
             impactVFXColliderDimensions : impactDims,
             impactVFXColliderOffsets    : impactOffsets,
             //End
-            endVFXAnimationPaths        : ResMap.Get($"{spriteName}_end", expectFailure: true),
+            endVFXAnimationPaths        : ResMap.Get($"{spriteName}_end", quietFailure: true),
             beamEndFPS                  : fps,
             endVFXColliderDimensions    : dims,
             endVFXColliderOffsets       : offsets,
             //Beginning
-            muzzleVFXAnimationPaths     : ResMap.Get($"{spriteName}_start", expectFailure: true),
+            muzzleVFXAnimationPaths     : ResMap.Get($"{spriteName}_start", quietFailure: true),
             beamMuzzleFPS               : fps,
             muzzleVFXColliderDimensions : dims,
             muzzleVFXColliderOffsets    : offsets //,

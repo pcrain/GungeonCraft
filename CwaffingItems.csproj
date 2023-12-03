@@ -85,6 +85,7 @@
     <Compile Include="src\Cwaff-Rooms\FancyRoomBuilder.cs"/>
     <Compile Include="src\Extensions.cs"/>
     <Compile Include="src\Cwaff-NPCs\Bombo.cs"/>
+    <Compile Include="src\Cwaff-NPCs\InsuranceBoi.cs"/>
     <Compile Include="src\Common.cs"/>
     <Compile Include="src\CwaffEvents.cs"/>
     <Compile Include="src\Cwaff-Actives\AmazonPrimer.cs"/>
@@ -3706,6 +3707,9 @@
     <EmbeddedResource Include="Resources\NPCSprites\Boomhildr\boomhildr_idle_003.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\Boomhildr\boomhildr_idle_004.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\Boomhildr\boomhildr_idle_002.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\insurance_boi\insurance_boi_talk.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\insurance_boi\insurance_boi_idle.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\insurance_boi\insurance_boi_icon.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\GrinReaper\grin_allsprites2.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\GrinReaper\grin_allsprites10.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\GrinReaper\grin_allsprites6.png"/>

@@ -990,4 +990,30 @@ public static class Extensions
       projectile.spriteAnimator.SetFrame(frame);
       projectile.spriteAnimator.Stop();
   }
+
+  // Add strings to the global string database
+  public static void SetupDBStrings(this string key, List<string> values)
+  {
+    StringDBTable table = ETGMod.Databases.Strings.Core;
+    foreach (string v in values)
+      table.AddComplex(key, v);
+  }
+
+  // Convert a list of pickup ids to an evenly-weighted loot table
+  public static GenericLootTable ToLootTable(this List<int> ids)
+  {
+    GenericLootTable loot = FancyRoomBuilder.CreateLootTable();
+    foreach (int id in ids)
+        loot.AddItemToPool(id);
+    return loot;
+  }
+
+  // Shift all vectors in a list by a different vector
+  public static List<Vector3> ShiftAll(this IEnumerable<Vector3> vecList, Vector3 shift)
+  {
+    List<Vector3> vecs = new();
+    foreach (Vector3 v in vecList)
+      vecs.Add(v + shift);
+    return vecs;
+  }
 }

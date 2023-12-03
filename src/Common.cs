@@ -33,11 +33,11 @@ public static class ResMap // Resource map from PNG stem names to lists of paths
 
     // Gets a list of resource paths with numbered sprites from the resource's base name
     // Does not work with CreateProjectileAnimation(), which expects direct sprite names in the mod's "sprites" directory
-    public static List<string> Get(string resource, bool expectFailure = false)
+    public static List<string> Get(string resource, bool quietFailure = false)
     {
         if (_ResMap.ContainsKey(resource))
             return _ResMap[resource];
-        if (!expectFailure)
+        if (!quietFailure)
             ETGModConsole.Log($"failed to retrieve \"{resource}\" from resmap");
         return null;
     }
