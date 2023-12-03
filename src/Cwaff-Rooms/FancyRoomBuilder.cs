@@ -19,7 +19,8 @@ public static class FancyRoomBuilder
     CwaffPrerequisite spawnPrerequisite = CwaffPrerequisite.NONE, SpawnCondition spawnPrequisiteChecker = null, string voice = null,
     List<String> genericDialog = null, List<String> stopperDialog = null, List<String> purchaseDialog = null,
     List<String> noSaleDialog = null, List<String> introDialog = null, List<String> attackedDialog = null, bool allowDupes = false,
-    float mainPoolChance = 0.0f, Vector3? talkPointOffset = null, Vector3? npcPosition = null, List<Vector3> itemPositions = null)
+    float mainPoolChance = 0.0f, Vector3? talkPointOffset = null, Vector3? npcPosition = null, List<Vector3> itemPositions = null,
+    bool oncePerRun = true)
   {
     if (C.DEBUG_BUILD)
       ETGModConsole.Log($"Setting up shop for {npcName}");
@@ -37,6 +38,10 @@ public static class FancyRoomBuilder
       new CwaffDungeonPrerequisite { prerequisite = spawnPrerequisite.SetupCheck(spawnPrequisiteChecker)
       }};
 
+    string currencyIcon = ResMap.Get($"{npcName}_icon", quietFailure: true)?[0];
+    if (!string.IsNullOrEmpty(currencyIcon))
+      currencyIcon += ".png";
+
     GameObject shop = ShopAPI.SetUpShop(
       name                              : npcName,
       prefix                            : C.MOD_PREFIX,
@@ -45,6 +50,7 @@ public static class FancyRoomBuilder
       talkSpritePaths                   : ResMap.Get($"{npcName}_talk"),
       talkFps                           : 2,
       lootTable                         : shopItems.ToLootTable(),
+      // currency                          : CustomShopItemController.ShopCurrencyType.CUSTOM,
       currency                          : CustomShopItemController.ShopCurrencyType.COINS,
       runBasedMultilineGenericStringKey : $"#{npcNameUpper}_GENERIC_TALK",
       runBasedMultilineStopperStringKey : $"#{npcNameUpper}_STOPPER_TALK",
@@ -63,10 +69,13 @@ public static class FancyRoomBuilder
       CustomCanBuy                      : null,
       CustomRemoveCurrency              : null,
       CustomPrice                       : null,
+      // CustomPrice                       : HealthTraderCustomPrice,
       OnPurchase                        : null,
       OnSteal                           : null,
-      currencyIconPath                  : "",
-      currencyName                      : "",
+      currencyIconPath                  : currencyIcon/*""*/,
+      // currencyIconPath                  : "",
+      // currencyName                      : "test",
+      currencyName                      : "ui_coin",
       canBeRobbed                       : true,
       hasCarpet                         : ResMap.Get($"{npcName}_carpet", quietFailure: true)?[0] != null,
       carpetSpritePath                  : ResMap.Get($"{npcName}_carpet", quietFailure: true)?[0],
@@ -79,17 +88,21 @@ public static class FancyRoomBuilder
       fortunesFavorRadius               : 2,
       poolType                          : allowDupes ? CustomShopController.ShopItemPoolType.DUPES : CustomShopController.ShopItemPoolType.DEFAULT,
       RainbowModeImmunity               : false,
-      hitboxSize                        : null,
-      hitboxOffset                      : null
+      hitboxSize                        : null, // must be null, doesn't work properly
+      // hitboxSize                        : new IntVector2(0/*13*/, 0/*19*/), // must be null, doesn't work properly
+      hitboxOffset                      : null // must be null, doesn't work properly
       );
 
+    TalkDoerLite npc = shop.GetComponentInChildren<TalkDoerLite>();
+    npc.gameObject.AddComponent<FlipsToFacePlayer>();
+    // npc.GetComponent<AIAnimator>().IdleAnimation.Type = DirectionalAnimation.DirectionType.TwoWayHorizontal;
+    // npc.GetComponent<AIAnimator>().IdleAnimation.Flipped[0] = DirectionalAnimation.FlipType.Mirror;
     if (!string.IsNullOrEmpty(voice))
-      shop.GetComponentInChildren<TalkDoerLite>().audioCharacterSpeechTag = voice;
+      npc.audioCharacterSpeechTag = voice;
 
     PrototypeDungeonRoom shopRoom = GetBasicShopRoom();
 
     // ShopAPI.RegisterShopRoom(shop: shop, protoroom: shopRoom, vector: new Vector2((float)(shopRoom.Width / 2), (float)(shopRoom.Height / 2)));
-
     RoomFactory.AddInjection(
       protoroom            : shopRoom/*RoomFactory.BuildFromResource(roomPath: "Planetside/Resources/ShrineRooms/ShopRooms/TimeTraderShop.room").room*/,
       injectionAnnotation  : $"{npcName}'s Shop Room",
@@ -104,6 +117,17 @@ public static class FancyRoomBuilder
       YFromCenter          : 0
       );
 
+    // below doesn't seem to work, figure out later
+    if (false && oncePerRun) // small hack for now since Alexandria doesn't let us modify this directly as of right now
+    {
+      SharedInjectionData baseInjection    = LoadHelper.LoadAssetFromAnywhere<SharedInjectionData>("Base Shared Injection Data");
+      SharedInjectionData injector         = baseInjection.AttachedInjectionData[baseInjection.AttachedInjectionData.Count - 1];
+      injector.OnlyOne                     = true;
+      injector.ChanceToSpawnOne            = 1.0f;
+      injector.InjectionData[0].OncePerRun = true;
+      // baseInjection                        = null;
+    }
+
     // foreach (Floors floor in Enum.GetValues(typeof(Floors)))
     // {
     //   if ((floor & spawnFloors) == 0)
@@ -115,10 +139,16 @@ public static class FancyRoomBuilder
     return shopRoom;
   }
 
+  public static int HealthTraderCustomPrice(CustomShopController shop, CustomShopItemController itemCont, PickupObject item)
+  {
+    return 5;
+  }
+
   private static PrototypeDungeonRoom _BasicShopRoom = null;
   public static PrototypeDungeonRoom GetBasicShopRoom()
   {
-    return RoomFactory.BuildFromResource(roomPath: "CwaffingTheGungy/Resources/Rooms/BasicShopRoom.room").room; // rebuild every time for now
+    PrototypeDungeonRoom room = RoomFactory.BuildNewRoomFromResource(roomPath: "CwaffingTheGungy/Resources/Rooms/BasicShopRoom2.newroom").room; // rebuild every time for now
+    return room;
     // if (_BasicShopRoom == null)
     //   _BasicShopRoom = RoomFactory.BuildFromResource(roomPath: "CwaffingTheGungy/Resources/Rooms/BasicShopRoom.room").room;
     // return _BasicShopRoom;
@@ -409,4 +439,59 @@ public static class OneOffDebugDungeonFlow {
     {
       return _CurrentCustomDebugFlow;
     }
+}
+
+public class FlipsToFacePlayer : MonoBehaviour
+{
+  private AIAnimator _animator;
+  private Transform _speechPoint;
+  private float _flipOffset;
+  private float _centerX;
+  private float _baseX;
+  private Vector3 _baseSpeechPos;
+  private bool _cachedFlipped;
+
+  private void Start()
+  {
+    this._animator      = base.GetComponent<AIAnimator>();
+    this._flipOffset    = this._animator.sprite.GetUntrimmedBounds().size.x /** 0.5f*/;
+    this._centerX       = this._animator.sprite.WorldBottomCenter.x;
+    this._baseX         = this._animator.sprite.transform.localPosition.x;
+
+    this._speechPoint   = base.transform.Find("SpeechPoint");
+    this._baseSpeechPos = this._speechPoint.position;
+
+    this._cachedFlipped = false;
+  }
+
+  private void Update()
+  {
+    // this._animator.sprite.FlipX = GameManager.Instance.BestActivePlayer.CenterPosition.x < this._animator.transform.position.x;
+    // this._animator.sprite.transform.localScale = this._animator.sprite.transform.localScale.WithX(
+    //   (GameManager.Instance.BestActivePlayer.CenterPosition.x < this._animator.transform.position.x) ? -1f : 1f);
+    FlipSpriteIfNecessary();
+  }
+
+  private void FlipSpriteIfNecessary()
+  {
+    this._animator.sprite.FlipX = GameManager.Instance.BestActivePlayer.sprite.WorldBottomCenter.x < this._centerX;
+    if (this._animator.sprite.FlipX == this._cachedFlipped)
+      return;
+
+    this._cachedFlipped = this._animator.sprite.FlipX;
+    base.transform.localPosition = base.transform.localPosition.WithX(
+      this._baseX + (this._cachedFlipped ? _flipOffset : 0f));
+    this._speechPoint.position = this._baseSpeechPos;
+  }
+
+  // private void FlipSpriteIfNecessaryClose()
+  // {
+  //   this._animator.sprite.FlipX = GameManager.Instance.BestActivePlayer.sprite.WorldBottomCenter.x < this._centerX;
+  //   if (this._animator.sprite.FlipX == this._cachedFlipped)
+  //     return;
+
+  //   this._cachedFlipped = this._animator.sprite.FlipX;
+  //   this._animator.sprite.transform.localPosition = this._animator.sprite.transform.localPosition.WithX(
+  //     this._baseX + (this._cachedFlipped ? _flipOffset : 0f));
+  // }
 }

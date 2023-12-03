@@ -16,7 +16,7 @@ public class InsuranceBoi
             spawnFloors            : Floors.CASTLEGEON,
             spawnPrerequisite      : CwaffPrerequisite.TEST_PREREQUISITE,
             spawnPrequisiteChecker : null,
-            talkPointOffset        : C.PIXEL_SIZE * new Vector2(6, 22),
+            talkPointOffset        : C.PIXEL_SIZE * new Vector2(7, 22),
             npcPosition            : C.PIXEL_SIZE * new Vector2(10, 60),
             itemPositions          : ShopAPI.defaultItemPositions.ShiftAll(C.PIXEL_SIZE * new Vector2(-25, 0)),
             // voice                  : "sans", // will play audio "Play_CHR_<voice>_voice_01"
