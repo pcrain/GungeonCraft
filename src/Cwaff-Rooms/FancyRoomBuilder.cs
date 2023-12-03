@@ -5,12 +5,12 @@ namespace CwaffingTheGungy;
 
 public static class FancyRoomBuilder
 {
-  public delegate bool FancyNPCSpawnCondition();
+  public delegate bool SpawnCondition();
 
   public static Dictionary<string, PrototypeDungeonRoom> FancyShopRooms = new();
 
-  public static PrototypeDungeonRoom MakeFancyShop(string npcName, GenericLootTable shopLootTable, float spawnChance, Floors spawnFloors,
-    CwaffPrerequisite spawnPrerequisite = CwaffPrerequisite.NONE, FancyNPCSpawnCondition spawnPrequisiteChecker = null)
+  public static PrototypeDungeonRoom MakeFancyShop(string npcName, GenericLootTable shopLootTable, float spawnChance = 1f, Floors? spawnFloors = null,
+    CwaffPrerequisite spawnPrerequisite = CwaffPrerequisite.NONE, SpawnCondition spawnPrequisiteChecker = null)
   {
     if (C.DEBUG_BUILD)
       ETGModConsole.Log($"Setting up shop for {npcName}");
@@ -70,9 +70,9 @@ public static class FancyRoomBuilder
     foreach (int i in LootTable)
         loot.AddItemToPool(i);
 
-    List<DungeonPrerequisite> dungeonPrerequisites = new();
-    // if (spawnPrerequisite != CwaffPrerequisite.NONE)
-      dungeonPrerequisites.Add(new CwaffDungeonPrerequisite { prerequisite = spawnPrerequisite.SetupCheck(spawnPrequisiteChecker) });
+    List<DungeonPrerequisite> dungeonPrerequisites = new(){
+      new CwaffDungeonPrerequisite { prerequisite = spawnPrerequisite.SetupCheck(spawnPrequisiteChecker)
+      }};
 
     GameObject shop = ShopAPI.SetUpShop(
       name                              : npcName,
@@ -112,7 +112,8 @@ public static class FancyRoomBuilder
       minimapIconSpritePath             : ResMap.Get($"{npcName}_icon")?[0],
       addToMainNpcPool                  : false,
       percentChanceForMainPool          : 0.1f,
-      prerequisites                     : dungeonPrerequisites.ToArray() /*null*/,
+      prerequisites                     : null,  // DOESN'T DO ANYTHING AS FAR AS I CAN TELL BASED ON THE SOURCE CODE
+      // prerequisites                     : dungeonPrerequisites.ToArray(),
       fortunesFavorRadius               : 2,
       poolType                          : CustomShopController.ShopItemPoolType.DEFAULT,
       RainbowModeImmunity               : false,
@@ -122,21 +123,21 @@ public static class FancyRoomBuilder
 
     PrototypeDungeonRoom shopRoom = GetBasicShopRoom();
 
-    ShopAPI.RegisterShopRoom(shop: shop, protoroom: shopRoom, vector: new Vector2((float)(shopRoom.Width / 2), (float)(shopRoom.Height / 2)));
+    // ShopAPI.RegisterShopRoom(shop: shop, protoroom: shopRoom, vector: new Vector2((float)(shopRoom.Width / 2), (float)(shopRoom.Height / 2)));
 
-    // RoomFactory.AddInjection(
-    //   protoroom            : shopRoom/*RoomFactory.BuildFromResource(roomPath: "Planetside/Resources/ShrineRooms/ShopRooms/TimeTraderShop.room").room*/,
-    //   injectionAnnotation  : $"{npcName}'s Shop' Room",
-    //   placementRules       : new() { ProceduralFlowModifierData.FlowModifierPlacementType.END_OF_CHAIN },
-    //   chanceToLock         : 0,
-    //   prerequisites        : dungeonPrerequisites,
-    //   injectorName         : $"{npcName}'s Shop' Room",
-    //   selectionWeight      : 1,
-    //   chanceToSpawn        : 1,
-    //   addSingularPlaceable : null,
-    //   XFromCenter          : 0,
-    //   YFromCenter          : 0
-    //   );
+    RoomFactory.AddInjection(
+      protoroom            : shopRoom/*RoomFactory.BuildFromResource(roomPath: "Planetside/Resources/ShrineRooms/ShopRooms/TimeTraderShop.room").room*/,
+      injectionAnnotation  : $"{npcName}'s Shop Room",
+      placementRules       : new() { ProceduralFlowModifierData.FlowModifierPlacementType.END_OF_CHAIN },
+      chanceToLock         : 0,
+      prerequisites        : dungeonPrerequisites,
+      injectorName         : $"{npcName}'s Shop Room",
+      selectionWeight      : 1,
+      chanceToSpawn        : spawnChance,
+      addSingularPlaceable : shop,
+      XFromCenter          : 0,
+      YFromCenter          : 0
+      );
 
     // foreach (Floors floor in Enum.GetValues(typeof(Floors)))
     // {
@@ -159,7 +160,7 @@ public static class FancyRoomBuilder
   }
 
   // Extension for checking shop activation conditions using CwaffPrerequisite and returning CwaffPrerequisite for inline setup
-  public static CwaffPrerequisite SetupCheck(this CwaffPrerequisite prereq, FancyRoomBuilder.FancyNPCSpawnCondition check)
+  public static CwaffPrerequisite SetupCheck(this CwaffPrerequisite prereq, FancyRoomBuilder.SpawnCondition check)
   {
     CwaffDungeonPrerequisite.AddPrequisiteCheck(prereq, check);
     return prereq;
@@ -178,7 +179,7 @@ public static class FancyRoomBuilder
       return lootTable;
   }
 
-  public static void ForceSpawnOnFirstFloorForDebugPurposes(this PrototypeDungeonRoom room)
+  public static void ForceSpawnForDebugPurposes(this PrototypeDungeonRoom room)
   {
       SharedInjectionData injector                   = ScriptableObject.CreateInstance<SharedInjectionData>();
       injector.UseInvalidWeightAsNoInjection         = true;
@@ -229,13 +230,6 @@ public static class FancyRoomBuilder
       prerequisites = new DungeonPrerequisite[]
       {
         new CwaffDungeonPrerequisite { prerequisite = CwaffPrerequisite.TEST_PREREQUISITE.SetupCheck(null) }
-        // new DungeonGenToolbox.AdvancedDungeonPrerequisite
-        // {
-        //    advancedAdvancedPrerequisiteType = DungeonGenToolbox.AdvancedDungeonPrerequisite.AdvancedAdvancedPrerequisiteType.SPEEDRUN_TIMER_BEFORE,
-        //    BeforeTimeInSeconds = BeforeTimeInSeconds,
-        //    requiredTileset = Tileset,
-        //    requireTileset = true
-        // }
       },
       CanBeForcedSecret = false,
       RandomNodeChildMinDistanceFromEntrance = 0,
@@ -248,47 +242,35 @@ public static class FancyRoomBuilder
 
 public enum CwaffPrerequisite
 {
-  NONE                   = 0,
-  INSURANCE_PREREQUISITE = 1,
-  TEST_PREREQUISITE      = 2,
+  NONE,
+  INSURANCE_PREREQUISITE,
+  TEST_PREREQUISITE,
 }
 
 public class CwaffDungeonPrerequisite : CustomDungeonPrerequisite
 {
-  private static Dictionary<CwaffPrerequisite, FancyRoomBuilder.FancyNPCSpawnCondition> SpawnConditionMap = new();
+  private static List<FancyRoomBuilder.SpawnCondition> SpawnConditions =
+    new(Enumerable.Repeat<FancyRoomBuilder.SpawnCondition>(null, Enum.GetNames(typeof(CwaffPrerequisite)).Length).ToList());
 
-  public static void AddPrequisiteCheck(CwaffPrerequisite prereq, FancyRoomBuilder.FancyNPCSpawnCondition check)
+  public CwaffPrerequisite prerequisite = CwaffPrerequisite.NONE;
+
+  public static void AddPrequisiteCheck(CwaffPrerequisite prereq, FancyRoomBuilder.SpawnCondition check)
   {
-    if (SpawnConditionMap.ContainsKey(prereq))
+    if (SpawnConditions[(int)prereq] != null)
     {
-      ETGModConsole.Log($"  Tried to reuse a shop spawn prerequisite!");
+      ETGModConsole.Log($"  Tried to reinitialize a shop spawn prerequisite!");
       return;
     }
-    if (check == null)
-      ETGModConsole.Log($"adding NULL prerequisite check for {prereq}");
-    else
-      ETGModConsole.Log($"adding prerequisite check for {prereq}");
-    SpawnConditionMap[prereq] = check;
-      ETGModConsole.Log($"  added!");
+    SpawnConditions[(int)prereq] = check;
   }
 
   public override bool CheckConditionsFulfilled()
   {
-    ETGModConsole.Log($"  CHECKING PREREQUISITES");
-    if (prerequisite == CwaffPrerequisite.NONE || SpawnConditionMap[prerequisite] == null)
-    {
-      ETGModConsole.Log($"    auto passed");
+    if (prerequisite == CwaffPrerequisite.NONE || SpawnConditions[(int)prerequisite] == null)
       return true;
-    }
-    return SpawnConditionMap[prerequisite]();
+    return SpawnConditions[(int)prerequisite]();
   }
-
-  // public bool UnlockRequirement;
-  // public CustomDungeonFlags UnlockFlag;
-  public CwaffPrerequisite prerequisite = CwaffPrerequisite.NONE;
-  // public List<GlobalDungeonData.ValidTilesets> validTilesets = new List<GlobalDungeonData.ValidTilesets>();
 }
-
 
 public static class OneOffDebugDungeonFlow {
 

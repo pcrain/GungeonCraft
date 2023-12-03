@@ -90,7 +90,7 @@ public class Initialisation : BaseUnityPlugin
             ModdedShopItemAdder.Init(); // Need to load after CwaffEvents.Init()
 
             ItemBuilder.Init();
-            // SaveAPIManager.Setup("cg");
+            SaveAPI.SaveAPIManager.Setup("cg");
             AudioResourceLoader.InitAudio();
             ETGModMainBehaviour.Instance.gameObject.AddComponent<AudioSource>();
 
@@ -222,7 +222,7 @@ public class Initialisation : BaseUnityPlugin
             #region Shop NPCs
                 PrototypeDungeonRoom shopRoom =
                     FancyRoomBuilder.MakeFancyShop("boomhildr", null, 1f, Floors.CASTLEGEON, CwaffPrerequisite.TEST_PREREQUISITE, null);
-                shopRoom.ForceSpawnOnFirstFloorForDebugPurposes();
+                // shopRoom.ForceSpawnForDebugPurposes();
             #endregion
 
             #region Fancy NPCs
