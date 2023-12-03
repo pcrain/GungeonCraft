@@ -288,7 +288,37 @@ public static class OneOffDebugDungeonFlow {
 
     public static DungeonFlow CreateAndWarp(string shopName) {
         PrototypeDungeonRoom theRoom = FancyRoomBuilder.FancyShopRooms[shopName];
+        DungeonFlow m_CachedFlow = CreateFlowWithSingleTestRoom(theRoom);
+        m_CachedFlow.name = shopName;
 
+        ETGModConsole.Log($"Attempting to warp to flow with {shopName} room");
+        GameLevelDefinition floorDef = new GameLevelDefinition()
+        {
+            dungeonSceneName           = shopName, //this is the name we will use whenever we want to load our dungeons scene
+            dungeonPrefabPath          = shopName, //this is what we will use when we want to acess our dungeon prefab
+            priceMultiplier            = 1f, //multiplies how much things cost in the shop
+            secretDoorHealthMultiplier = 1, //multiplies how much health secret room doors have, aka how many shots you will need to expose them
+            enemyHealthMultiplier      = 2, //multiplies how much health enemies have
+            damageCap                  = 300, // damage cap for regular enemies
+            bossDpsCap                 = 78, // damage cap for bosses
+            flowEntries                = new List<DungeonFlowLevelEntry>(0),
+            predefinedSeeds            = new List<int>(0)
+        };
+
+        CwaffDungeons.Register(internalName: shopName, floorName: shopName,
+            dungeonGenerator: CwaffDungeons.GenericGenerator, gameLevelDefinition: floorDef);
+
+        // CwaffDungeons.Register(internalName: shopName, floorName: shopName, dungeonGenerator: CwaffDungeons.GenericGenerator);
+
+        _CurrentCustomDebugFlow = m_CachedFlow;
+        GameManager.Instance.LoadCustomLevel(shopName);
+        // GameManager.Instance.LoadCustomFlowForDebug(shopName);
+
+        return m_CachedFlow;
+    }
+
+    public static DungeonFlow CreateFlowWithSingleTestRoom(PrototypeDungeonRoom theRoom)
+    {
         DungeonFlow m_CachedFlow = ScriptableObject.CreateInstance<DungeonFlow>();
 
         DungeonFlowNode Node_00 = new DungeonFlowNode(m_CachedFlow) {
@@ -392,7 +422,6 @@ public static class OneOffDebugDungeonFlow {
             flow = m_CachedFlow,
         };
 
-        m_CachedFlow.name = shopName;
         // m_CachedFlow.fallbackRoomTable = BossrushFlows.Bossrush_01_Castle.fallbackRoomTable;
         m_CachedFlow.fallbackRoomTable = CwaffDungeonPrefabs.SewersRoomTable;
         m_CachedFlow.subtypeRestrictions = new List<DungeonFlowSubtypeRestriction>(0);
@@ -407,16 +436,6 @@ public static class OneOffDebugDungeonFlow {
 
         m_CachedFlow.FirstNode = Node_00;
 
-        // ETGModConsole.Log("loaded flow "+m_CachedFlow.name);
-
-        // FlowHelpers.PrintFlow(m_CachedFlow);
-
-        ETGModConsole.Log($"Attempting to warp to flow with {shopName} room");
-        CwaffDungeons.Register(internalName: shopName, floorName: shopName, dungeonGenerator: CwaffDungeons.GenericGenerator);
-        _CurrentCustomDebugFlow = m_CachedFlow;
-        GameManager.Instance.LoadCustomLevel(shopName);
-        // GameManager.Instance.LoadCustomFlowForDebug(shopName);
-
         return m_CachedFlow;
     }
 
@@ -425,28 +444,4 @@ public static class OneOffDebugDungeonFlow {
     {
       return _CurrentCustomDebugFlow;
     }
-
-    // public static void LoadCustomFlowForDebug(this GameManager gm, DungeonFlow flow)
-    // {
-    //   gm.m_loadingLevel = true;
-    //   gm.FlushAudio();
-    //   gm.ClearPerLevelData();
-
-    //   GameLevelDefinition gameLevelDefinition = new GameLevelDefinition();
-    //   gameLevelDefinition.dungeonPrefabPath = "Base_Gungeon";
-    //   gameLevelDefinition.dungeonSceneName = "BB_Beholster";
-    //   gameLevelDefinition.priceMultiplier = 1f;
-    //   gameLevelDefinition.enemyHealthMultiplier = 1f;
-    //   gameLevelDefinition.predefinedSeeds = new List<int>();
-    //   gameLevelDefinition.flowEntries = new List<DungeonFlowLevelEntry>();
-
-    //   DungeonFlowLevelEntry dungeonFlowLevelEntry = new DungeonFlowLevelEntry();
-    //   // dungeonFlowLevelEntry.flowPath = flowpath;
-    //   // dungeonFlowLevelEntry.forceUseIfAvailable = true;
-    //   // dungeonFlowLevelEntry.prerequisites = new DungeonPrerequisite[0];
-    //   // dungeonFlowLevelEntry.weight = 1f;
-    //   // gameLevelDefinition.flowEntries.Add(dungeonFlowLevelEntry);
-
-    //   gm.StartCoroutine(gm.LoadNextLevelAsync_CR(gameLevelDefinition));
-    // }
 }

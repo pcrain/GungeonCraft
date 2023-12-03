@@ -19,7 +19,6 @@ public class SansDungeon
 
     public static void Init()
     {
-
         FloorNameDefinition = new GameLevelDefinition()
         {
             dungeonSceneName           = INTERNAL_NAME, //this is the name we will use whenever we want to load our dungeons scene
