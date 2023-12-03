@@ -220,9 +220,8 @@ public class Initialisation : BaseUnityPlugin
             #endregion
 
             #region Shop NPCs
-                // Boomhildr.Init();
                 PrototypeDungeonRoom shopRoom =
-                    FancyRoomBuilder.MakeFancyShop("boomhildr", null, 1f, Floors.CASTLEGEON, CwaffPrerequisite.NONE, null);
+                    FancyRoomBuilder.MakeFancyShop("boomhildr", null, 1f, Floors.CASTLEGEON, CwaffPrerequisite.TEST_PREREQUISITE, null);
                 shopRoom.ForceSpawnOnFirstFloorForDebugPurposes();
             #endregion
 
