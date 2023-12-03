@@ -7,71 +7,6 @@ namespace CwaffingTheGungy;
     GameManager.Instance.InjectedLevelName =
 */
 
-public class CwaffDungeons
-{
-    public string internalName                     = null;
-    public string dungeonPrefabTemplate            = null;
-    public GameLevelDefinition gameLevelDefinition = null;
-    public Func<Dungeon, Dungeon> dungeonGenerator = null;
-
-    public static Dictionary<string, CwaffDungeons> Flows = new();
-
-    private static Hook _GetOrLoadByNameHook = null;
-
-    public static void Init()
-    {
-        _GetOrLoadByNameHook = new Hook(
-            typeof(DungeonDatabase).GetMethod("GetOrLoadByName", BindingFlags.Static | BindingFlags.Public),
-            typeof(CwaffDungeons).GetMethod("GetOrLoadByNameHook", BindingFlags.Static | BindingFlags.Public)
-        );
-    }
-
-    public static CwaffDungeons Register(string internalName, string dungeonPrefabTemplate, GameLevelDefinition gameLevelDefinition,
-      Func<Dungeon, Dungeon> dungeonGenerator)
-    {
-        Flows[internalName] = new CwaffDungeons() {
-            internalName          = internalName,
-            dungeonPrefabTemplate = dungeonPrefabTemplate,
-            gameLevelDefinition   = gameLevelDefinition,
-            dungeonGenerator      = dungeonGenerator,
-        };
-        return Flows[internalName];
-    }
-
-    public static Dungeon GetOrLoadByNameHook(Func<string, Dungeon> orig, string name)
-    {
-        CwaffDungeons dungeonData;
-        if (!Flows.TryGetValue(name, out dungeonData))
-            return orig(name);
-
-        if (!GameManager.Instance.customFloors.Contains(dungeonData.gameLevelDefinition))
-            GameManager.Instance.customFloors.Add(dungeonData.gameLevelDefinition); // fixes a bug where returning to the breach deletes the floor, thanks Bunny!
-
-        Dungeon dungeon = null;
-        if (name.ToLower() == dungeonData.internalName)
-        {
-            try
-            {
-                dungeon = dungeonData.dungeonGenerator(GetOrLoadByName_Orig(dungeonData.dungeonPrefabTemplate));
-            }
-            catch (Exception e)
-            {
-                ETGModConsole.Log($"exception: {e}");
-            }
-        }
-        return dungeon ?? orig(name);
-    }
-
-    public static Dungeon GetOrLoadByName_Orig(string name)
-    {
-        AssetBundle assetBundle = ResourceManager.LoadAssetBundle("dungeons/" + name.ToLower());
-        DebugTime.RecordStartTime();
-        Dungeon component = assetBundle.LoadAsset<GameObject>(name).GetComponent<Dungeon>();
-        DebugTime.Log("AssetBundle.LoadAsset<Dungeon>({0})", new object[] { name });
-        return component;
-    }
-}
-
 public class SansDungeon
 {
     public const string INTERNAL_NAME    = "cg_sansfloor";
@@ -82,48 +17,25 @@ public class SansDungeon
     public static GameObject GameManagerObject;
     public static tk2dSpriteCollectionData goheckyourself;
 
-    public static Hook forceCustomMusicHook;
-
     public static void Init()
     {
-        forceCustomMusicHook = new Hook(
-            typeof(DungeonFloorMusicController).GetMethod("ResetForNewFloor", BindingFlags.Instance | BindingFlags.Public),
-            typeof(SansDungeon).GetMethod("PlayFloorMusicHook", BindingFlags.Static | BindingFlags.NonPublic)
-        );
-
-        AssetBundle braveResources = ResourceManager.LoadAssetBundle("brave_resources_001");
-        GameManagerObject = braveResources.LoadAsset<GameObject>("_GameManager");
 
         FloorNameDefinition = new GameLevelDefinition()
         {
-            dungeonSceneName = INTERNAL_NAME, //this is the name we will use whenever we want to load our dungeons scene
-            dungeonPrefabPath = INTERNAL_NAME, //this is what we will use when we want to acess our dungeon prefab
-            priceMultiplier = 1.5f, //multiplies how much things cost in the shop
+            dungeonSceneName           = INTERNAL_NAME, //this is the name we will use whenever we want to load our dungeons scene
+            dungeonPrefabPath          = INTERNAL_NAME, //this is what we will use when we want to acess our dungeon prefab
+            priceMultiplier            = 1.5f, //multiplies how much things cost in the shop
             secretDoorHealthMultiplier = 1, //multiplies how much health secret room doors have, aka how many shots you will need to expose them
-            enemyHealthMultiplier = 2, //multiplies how much health enemies have
-            damageCap = 300, // damage cap for regular enemies
-            bossDpsCap = 78, // damage cap for bosses
-            flowEntries = new List<DungeonFlowLevelEntry>(0),
-            predefinedSeeds = new List<int>(0)
+            enemyHealthMultiplier      = 2, //multiplies how much health enemies have
+            damageCap                  = 300, // damage cap for regular enemies
+            bossDpsCap                 = 78, // damage cap for bosses
+            flowEntries                = new List<DungeonFlowLevelEntry>(0),
+            predefinedSeeds            = new List<int>(0)
         };
 
-        // sets the level definition of the GameLevelDefinition in GameManager.Instance.customFloors if it exists
-        foreach (GameLevelDefinition levelDefinition in GameManager.Instance.customFloors)
-        {
-            if (levelDefinition.dungeonSceneName == INTERNAL_NAME) { FloorNameDefinition = levelDefinition; }
-        }
-
-        GameManager.Instance.customFloors.Add(FloorNameDefinition);
-        GameManagerObject.GetComponent<GameManager>().customFloors.Add(FloorNameDefinition);
-
-        CwaffDungeons.Register(INTERNAL_NAME, PREFAB_TEMPLATE, FloorNameDefinition, SansGeon);
-    }
-
-    internal static void PlayFloorMusicHook(Action<DungeonFloorMusicController, Dungeon> orig, DungeonFloorMusicController musicController, Dungeon d)
-    {
-        orig(musicController, d);
-        if (d.DungeonFloorName == FLOOR_NAME)
-            GameManager.Instance.DungeonMusicController.LoopMusic(musicName: "sans", loopPoint: 48800, rewindAmount: 48800);
+        CwaffDungeons.Register(
+            internalName: INTERNAL_NAME, floorName: FLOOR_NAME, floorMusic: "sans", loopPoint: 48800, rewindAmount: 48800,
+            dungeonGenerator: SansGeon, dungeonPrefabTemplate: PREFAB_TEMPLATE, gameLevelDefinition: FloorNameDefinition);
     }
 
     public static Dungeon SansGeon(Dungeon dungeon)

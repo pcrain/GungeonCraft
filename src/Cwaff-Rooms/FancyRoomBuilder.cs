@@ -412,32 +412,41 @@ public static class OneOffDebugDungeonFlow {
         // FlowHelpers.PrintFlow(m_CachedFlow);
 
         ETGModConsole.Log($"Attempting to warp to flow with {shopName} room");
-        GameManager.Instance.LoadCustomFlowForDebug(m_CachedFlow);
+        CwaffDungeons.Register(internalName: shopName, floorName: shopName, dungeonGenerator: CwaffDungeons.GenericGenerator);
+        _CurrentCustomDebugFlow = m_CachedFlow;
+        GameManager.Instance.LoadCustomLevel(shopName);
+        // GameManager.Instance.LoadCustomFlowForDebug(shopName);
 
         return m_CachedFlow;
     }
 
-    public static void LoadCustomFlowForDebug(this GameManager gm, DungeonFlow flow)
+    internal static DungeonFlow _CurrentCustomDebugFlow = null;
+    public static DungeonFlow GetCurrentCustomDebugFlow()
     {
-      gm.m_loadingLevel = true;
-      gm.FlushAudio();
-      gm.ClearPerLevelData();
-
-      GameLevelDefinition gameLevelDefinition = new GameLevelDefinition();
-      gameLevelDefinition.dungeonPrefabPath = "Base_Gungeon";
-      gameLevelDefinition.dungeonSceneName = "BB_Beholster";
-      gameLevelDefinition.priceMultiplier = 1f;
-      gameLevelDefinition.enemyHealthMultiplier = 1f;
-      gameLevelDefinition.predefinedSeeds = new List<int>();
-      gameLevelDefinition.flowEntries = new List<DungeonFlowLevelEntry>();
-
-      DungeonFlowLevelEntry dungeonFlowLevelEntry = new DungeonFlowLevelEntry();
-      // dungeonFlowLevelEntry.flowPath = flowpath;
-      // dungeonFlowLevelEntry.forceUseIfAvailable = true;
-      // dungeonFlowLevelEntry.prerequisites = new DungeonPrerequisite[0];
-      // dungeonFlowLevelEntry.weight = 1f;
-      // gameLevelDefinition.flowEntries.Add(dungeonFlowLevelEntry);
-
-      gm.StartCoroutine(gm.LoadNextLevelAsync_CR(gameLevelDefinition));
+      return _CurrentCustomDebugFlow;
     }
+
+    // public static void LoadCustomFlowForDebug(this GameManager gm, DungeonFlow flow)
+    // {
+    //   gm.m_loadingLevel = true;
+    //   gm.FlushAudio();
+    //   gm.ClearPerLevelData();
+
+    //   GameLevelDefinition gameLevelDefinition = new GameLevelDefinition();
+    //   gameLevelDefinition.dungeonPrefabPath = "Base_Gungeon";
+    //   gameLevelDefinition.dungeonSceneName = "BB_Beholster";
+    //   gameLevelDefinition.priceMultiplier = 1f;
+    //   gameLevelDefinition.enemyHealthMultiplier = 1f;
+    //   gameLevelDefinition.predefinedSeeds = new List<int>();
+    //   gameLevelDefinition.flowEntries = new List<DungeonFlowLevelEntry>();
+
+    //   DungeonFlowLevelEntry dungeonFlowLevelEntry = new DungeonFlowLevelEntry();
+    //   // dungeonFlowLevelEntry.flowPath = flowpath;
+    //   // dungeonFlowLevelEntry.forceUseIfAvailable = true;
+    //   // dungeonFlowLevelEntry.prerequisites = new DungeonPrerequisite[0];
+    //   // dungeonFlowLevelEntry.weight = 1f;
+    //   // gameLevelDefinition.flowEntries.Add(dungeonFlowLevelEntry);
+
+    //   gm.StartCoroutine(gm.LoadNextLevelAsync_CR(gameLevelDefinition));
+    // }
 }

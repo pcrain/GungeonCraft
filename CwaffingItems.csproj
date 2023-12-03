@@ -153,6 +153,7 @@
     <Compile Include="src\Cwaff-Guns\Alyx.cs"/>
     <Compile Include="src\PlayerToolbox.cs"/>
     <Compile Include="src\Cwaff-Flows\FlowHelpers.cs"/>
+    <Compile Include="src\Cwaff-Flows\CwaffDungeons.cs"/>
     <Compile Include="src\Cwaff-Flows\SansDungeon.cs"/>
     <Compile Include="src\Cwaff-Flows\CwaffDungeonFlows.cs"/>
     <Compile Include="src\Cwaff-Flows\FlowPrefabs.cs"/>
