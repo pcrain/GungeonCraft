@@ -9,7 +9,7 @@ public enum CwaffPrerequisites
 
 public class SpawnConditions
 {
-  public FancyRoomBuilder.SpawnCondition check         = null;
+  public FancyRoomBuilder.SpawnCondition validator     = null;
   public bool                            oncePerRun    = false;
   public int                             spawnsThisRun = 0;
 }
@@ -35,7 +35,7 @@ public class CwaffPrerequisite : CustomDungeonPrerequisite
     }
   }
 
-  public static void AddPrequisiteCheck(CwaffPrerequisites prereq, FancyRoomBuilder.SpawnCondition check, bool oncePerRun)
+  public static void AddPrequisiteValidator(CwaffPrerequisites prereq, FancyRoomBuilder.SpawnCondition validator, bool oncePerRun)
   {
     if (SpawnConditions[(int)prereq] != null)
     {
@@ -43,7 +43,7 @@ public class CwaffPrerequisite : CustomDungeonPrerequisite
       return;
     }
     SpawnConditions[(int)prereq] = new SpawnConditions(){
-      check      = check,
+      validator  = validator,
       oncePerRun = oncePerRun,
     };
   }
@@ -63,12 +63,12 @@ public class CwaffPrerequisite : CustomDungeonPrerequisite
       // ETGModConsole.Log($"  failed: already spawned this run");
       return false; // cannot spawn this run
     }
-    if (conditions.check == null)
+    if (conditions.validator == null)
     {
       // ETGModConsole.Log($"  auto-pass");
       return true;
     }
-    bool passed = conditions.check();
+    bool passed = conditions.validator();
     // ETGModConsole.Log($"  passed? {passed}");
     return passed;
   }
@@ -98,7 +98,7 @@ public class CwaffPrerequisite : CustomDungeonPrerequisite
 
     private void Start()
     {
-      ETGModConsole.Log($"shop created with prereq {Enum.GetName(typeof(CwaffPrerequisites), this.prereq)}!");
+      // ETGModConsole.Log($"shop created with prereq {Enum.GetName(typeof(CwaffPrerequisites), this.prereq)}!");
       CwaffPrerequisite.SpawnConditions[(int)this.prereq].spawnsThisRun += 1;
     }
   }

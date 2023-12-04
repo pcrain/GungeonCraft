@@ -8,16 +8,24 @@ public class InsuranceBoi
             IDs.Pickups["insurance_policy"],
         };
 
+        List<string> moddedItems = new(){
+            "nn:grandfather_glock",
+            "nn:arc_tactical",
+        };
+
         PrototypeDungeonRoom shopRoom = FancyRoomBuilder.MakeFancyShop(
             npcName                : "insurance_boi",
             shopItems              : shopItems,
+            moddedItems            : moddedItems,
             roomPath               : "CwaffingTheGungy/Resources/Rooms/BasicShopRoom2.newroom",
-            allowDupes             : true,
-            spawnChance            : 0.5f,
+            allowDupes             : false,
+            // allowDupes             : true,
+            costModifier           : 2f / 9f, // insurance should cost 2/9 of 90 == 20 casings
+            spawnChance            : 1.0f,
             spawnFloors            : Floors.CASTLEGEON,
-            spawnPrerequisite      : CwaffPrerequisites.TEST_PREREQUISITE,
-            // spawnPrequisiteChecker : CwaffDungeonPrerequisite.OnFirstFloor,
-            spawnPrequisiteChecker : null,
+            spawnPrerequisite      : CwaffPrerequisites.INSURANCE_PREREQUISITE,
+            prequisiteValidator    : CwaffPrerequisite.OnFirstFloor,
+            // spawnPrequisiteChecker : null,
             talkPointOffset        : C.PIXEL_SIZE * new Vector2(7, 22),
             npcPosition            : C.PIXEL_SIZE * new Vector2(10, 60),
             itemPositions          : ShopAPI.defaultItemPositions.ShiftAll(C.PIXEL_SIZE * new Vector2(-25, 0)),

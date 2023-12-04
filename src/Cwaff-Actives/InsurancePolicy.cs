@@ -43,6 +43,7 @@ public class InsurancePolicy : PlayerItem
         item.quality      = ItemQuality.A;
         item.consumable   = true;
         item.CanBeDropped = true;
+        item.CanBeSold    = false;  // no reselling insurance!
         item.SetCooldownType(ItemBuilder.CooldownType.Timed, 0.5f);
 
         _InsuranceSpriteRobot      = SpriteBuilder.AddSpriteToCollection(ResMap.Get("insurance_policy_robot_icon")[0],      item.sprite.Collection);

@@ -20,18 +20,21 @@ public enum ModdedShopType {
     Ironside,   //OMITB
 };
 
-public static class ModdedShopItemAdder // global custom events we can listen for
+public static class ModdedShopItemAdder
 {
 
     internal static Dictionary<string, ModdedShopType> _ModdedShopNameMap = new();
     internal static Dictionary<ModdedShopType,List<int>> _ModdedShopItems = new();
 
-    private static bool _Initialized = false;
+    private static bool _ModdedShopsInitialized = false;
+    private static bool _OurShopsInitialized = false;
 
     public static void Init()
     {
-        // Create a delayed initalizer to add items to modded shops once all mods are actually loaded
-        CwaffEvents.OnRunStart += AddItemsToModdedShops;
+        // Create a delayed initalizer to add our items to modded shops once all mods are actually loaded
+        CwaffEvents.OnAllModsLoaded += AddOurItemsToModdedShops;
+        // Create a delayed initalizer to add modded items to our shops once all mods are actually loaded
+        CwaffEvents.OnAllModsLoaded += AddModdedItemsToOurShops;
 
         // Create lists for items to add to each modded shop's loot table
         foreach (ModdedShopType moddedShopType in (ModdedShopType[]) Enum.GetValues(typeof(ModdedShopType)))
@@ -45,7 +48,7 @@ public static class ModdedShopItemAdder // global custom events we can listen fo
         _ModdedShopNameMap["omitb:Ironside"]     = ModdedShopType.Ironside;
     }
 
-    // Extension method for adding items to modded subshops (delayed until first level is loaded, then used by AddItemsToModdedShops())
+    // Extension method for adding items to modded subshops (delayed until first level is loaded, then used by AddOurItemsToModdedShops())
     public static void AddToSubShop(this PickupObject po, ModdedShopType type/*, float weight = 1*/)
     {
         _ModdedShopItems[type].Add(po.PickupObjectId);
@@ -72,11 +75,36 @@ public static class ModdedShopItemAdder // global custom events we can listen fo
         });
     }
 
-    private static void AddItemsToModdedShops(PlayerController p1, PlayerController p2, GameManager.GameMode gameMode)
+    private static void AddModdedItemsToOurShops()
     {
-        if (_Initialized)
+        if (_OurShopsInitialized)
             return;
-        _Initialized = true;
+        _OurShopsInitialized = true;
+
+        if (C.DEBUG_BUILD)
+            ETGModConsole.Log($"scanning custom items: ");
+        foreach (GameObject shop in FancyRoomBuilder.DelayedModdedLootAdditions.Keys)
+        {
+            if (C.DEBUG_BUILD)
+                ETGModConsole.Log($"  looking in shop {shop.name}");
+            GenericLootTable lootTable = shop.GetComponent<BaseShopController>().shopItems;
+            foreach (string moddedItem in FancyRoomBuilder.DelayedModdedLootAdditions[shop])
+            {
+                PickupObject moddedPickup = Lazy.GetModdedItem(moddedItem);
+                if (!moddedPickup)
+                    continue; // mod not loaded or item not found
+                if (C.DEBUG_BUILD)
+                    ETGModConsole.Log($"    adding modded item {moddedPickup.EncounterNameOrDisplayName} to shop");
+                lootTable.AddItemToPool(moddedPickup.PickupObjectId);
+            }
+        }
+    }
+
+    private static void AddOurItemsToModdedShops()
+    {
+        if (_ModdedShopsInitialized)
+            return;
+        _ModdedShopsInitialized = true;
 
         if (C.DEBUG_BUILD)
             ETGModConsole.Log($"scanning custom shops: ");

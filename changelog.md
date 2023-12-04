@@ -1,5 +1,10 @@
 # Changelog
 
+## Current
+
+- Insurance Broker guaranteed to spawn if you have a sellable S or A tier item in your inventory
+- Insurance Policy can no longer be sold
+
 ## 1.4.0 (2023-12-01)
 
 #### Features and Polish:

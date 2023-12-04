@@ -3701,6 +3701,11 @@
     <EmbeddedResource Include="Resources\StatusEffectVFX\plaguevfxframe_005.png"/>
     <EmbeddedResource Include="Resources\StatusEffectVFX\plaguevfxframe_003.png"/>
     <EmbeddedResource Include="Resources\StatusEffectVFX\plaguevfxframe_001.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\white_mage\white_mage_idle_001.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\white_mage\white_mage_talk_001.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\white_mage\white_mage_talk_002.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\white_mage\white_mage_idle_002.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\white_mage\white_mage_icon.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\insurance_boi\insurance_boi_talk.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\insurance_boi\insurance_boi_idle.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\insurance_boi\insurance_boi_icon.png"/>

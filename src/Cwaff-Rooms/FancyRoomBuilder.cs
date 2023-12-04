@@ -1,10 +1,17 @@
 namespace CwaffingTheGungy;
 
+
+/* NOTES:
+    - the OncePerFloor and OnlyOne variables for injection data don't seem to work properly / as expected, so we don't use them
+    -
+*/
+
 public static class FancyRoomBuilder
 {
   public delegate bool SpawnCondition();
 
   public static Dictionary<string, PrototypeDungeonRoom> FancyShopRooms = new();
+  public static Dictionary<GameObject, List<string>> DelayedModdedLootAdditions = new();
   // public static Vector3[] defaultItemPositions = new Vector3[] {
   //   new Vector3(1.125f, 2.125f, 1),
   //   new Vector3(2.625f, 1f, 1),
@@ -12,16 +19,18 @@ public static class FancyRoomBuilder
 
   private static List<string> _DefaultLine = new(){"Buy somethin', will ya!"};
 
-  public static PrototypeDungeonRoom MakeFancyShop(string npcName, List<int> shopItems, string roomPath, float spawnChance = 1f, Floors? spawnFloors = null,
-    CwaffPrerequisites spawnPrerequisite = CwaffPrerequisites.NONE, SpawnCondition spawnPrequisiteChecker = null, string voice = null,
+  public static PrototypeDungeonRoom MakeFancyShop(string npcName, List<int> shopItems, string roomPath, List<string> moddedItems = null,
+    float spawnChance = 1f, Floors? spawnFloors = null,
+    CwaffPrerequisites spawnPrerequisite = CwaffPrerequisites.NONE, SpawnCondition prequisiteValidator = null, string voice = null,
     List<String> genericDialog = null, List<String> stopperDialog = null, List<String> purchaseDialog = null,
     List<String> noSaleDialog = null, List<String> introDialog = null, List<String> attackedDialog = null, bool allowDupes = false,
     float mainPoolChance = 0.0f, Vector3? talkPointOffset = null, Vector3? npcPosition = null, List<Vector3> itemPositions = null,
-    bool oncePerRun = true)
+    bool oncePerRun = true, float costModifier = 1f)
   {
     if (C.DEBUG_BUILD)
       ETGModConsole.Log($"Setting up shop for {npcName}");
 
+    moddedItems ??= new();
     string npcNameUpper = npcName.ToUpper();
 
     $"#{npcNameUpper}_GENERIC_TALK".SetupDBStrings(genericDialog ?? _DefaultLine);
@@ -32,10 +41,10 @@ public static class FancyRoomBuilder
     $"#{npcNameUpper}_ATTACKED_TALK".SetupDBStrings(attackedDialog ?? _DefaultLine);
 
     List<DungeonPrerequisite> dungeonPrerequisites = new(){
-      new CwaffPrerequisite { prerequisite = spawnPrerequisite.SetupCheck(spawnPrequisiteChecker, oncePerRun) }
+      new CwaffPrerequisite { prerequisite = spawnPrerequisite.SetupPrerequisite(prequisiteValidator, oncePerRun) }
     };
 
-    string currencyIcon = ResMap.Get($"{npcName}_icon", quietFailure: true)?[0];
+    string currencyIcon = ResMap.Get($"{npcName}_currency", quietFailure: true)?[0];
     if (!string.IsNullOrEmpty(currencyIcon))
       currencyIcon += ".png";
 
@@ -60,7 +69,7 @@ public static class FancyRoomBuilder
       npcPosition                       : npcPosition ?? ShopAPI.defaultNpcPosition,
       voiceBox                          : ShopAPI.VoiceBoxes.OLD_MAN,
       itemPositions                     : itemPositions?.ToArray() ?? ShopAPI.defaultItemPositions,
-      costModifier                      : 1f,
+      costModifier                      : costModifier,
       giveStatsOnPurchase               : false,
       statsToGiveOnPurchase             : null,
       CustomCanBuy                      : null,
@@ -71,8 +80,8 @@ public static class FancyRoomBuilder
       OnSteal                           : null,
       currencyIconPath                  : currencyIcon/*""*/,
       // currencyIconPath                  : "",
-      // currencyName                      : "test",
-      currencyName                      : "ui_coin",
+      currencyName                      : "",
+      // currencyName                      : "ui_coin",
       canBeRobbed                       : true,
       hasCarpet                         : ResMap.Get($"{npcName}_carpet", quietFailure: true)?[0] != null,
       carpetSpritePath                  : ResMap.Get($"{npcName}_carpet", quietFailure: true)?[0],
@@ -85,9 +94,9 @@ public static class FancyRoomBuilder
       fortunesFavorRadius               : 2,
       poolType                          : allowDupes ? CustomShopController.ShopItemPoolType.DUPES : CustomShopController.ShopItemPoolType.DEFAULT,
       RainbowModeImmunity               : false,
-      hitboxSize                        : null, // must be null, doesn't work properly
-      // hitboxSize                        : new IntVector2(0/*13*/, 0/*19*/), // must be null, doesn't work properly
-      hitboxOffset                      : null // must be null, doesn't work properly
+      // hitboxSize                        : null, // must be null, doesn't work properly
+      hitboxSize                        : new IntVector2(13, 19),            // must be null, doesn't work properly
+      hitboxOffset                      : new IntVector2(1, -3)            // must be null, doesn't work properly
       );
 
     // Track how many times this shop room has been spawned in a run for prerequisite tracking purposes
@@ -95,8 +104,6 @@ public static class FancyRoomBuilder
 
     TalkDoerLite npc = shop.GetComponentInChildren<TalkDoerLite>();
     npc.gameObject.AddComponent<FlipsToFacePlayer>();
-    // npc.GetComponent<AIAnimator>().IdleAnimation.Type = DirectionalAnimation.DirectionType.TwoWayHorizontal;
-    // npc.GetComponent<AIAnimator>().IdleAnimation.Flipped[0] = DirectionalAnimation.FlipType.Mirror;
     if (!string.IsNullOrEmpty(voice))
       npc.audioCharacterSpeechTag = voice;
 
@@ -117,97 +124,25 @@ public static class FancyRoomBuilder
       YFromCenter          : 0
       );
 
-    // THIS DOESN'T REALLY WORK TOO WELL. manually handling it the hacky way for now
-    // if (oncePerRun) // small hack for now since Alexandria doesn't let us modify this directly as of right now
-    // {
-    //   SharedInjectionData baseInjection    = LoadHelper.LoadAssetFromAnywhere<SharedInjectionData>("Base Shared Injection Data");
-
-    //   SharedInjectionData injector         = baseInjection.AttachedInjectionData[baseInjection.AttachedInjectionData.Count - 1];
-    //   injector.OnlyOne                     = true;
-    //   injector.ChanceToSpawnOne            = spawnChance;
-    //   // injector.InjectionData[0].OncePerRun = true;  // this doesn't seem to work
-    //   baseInjection                        = null;
-    // }
-
-    // foreach (Floors floor in Enum.GetValues(typeof(Floors)))
-    // {
-    //   if ((floor & spawnFloors) == 0)
-    //     continue;
-    //   // TODO: add shop room to specific floor
-    // }
-
-    // _HandleNodeInjectionILHook ??= new ILHook(
-    //   typeof(LoopFlowBuilder).GetMethod("HandleNodeInjection", BindingFlags.Instance | BindingFlags.NonPublic, null,
-    //     new [] {typeof(BuilderFlowNode), typeof(RuntimeInjectionMetadata), typeof(RuntimeInjectionFlags), typeof(FlowCompositeMetastructure)}, null),
-    //   HandleNodeInjectionIL
-    //   );
-
-    // _DebugProcessSingleNodeInjectionILHook ??= new ILHook(
-    //   typeof(LoopFlowBuilder).GetMethod("ProcessSingleNodeInjection", BindingFlags.Instance | BindingFlags.NonPublic),
-    //   DebugProcessSingleNodeInjectionIL
-    //   );
+    // Defer initialization of modded items
+    DelayedModdedLootAdditions[shop] = moddedItems;
 
     FancyShopRooms[npcName] = shopRoom;
     return shopRoom;
   }
-
-  // private static ILHook _HandleNodeInjectionILHook = null;
-  // private static void HandleNodeInjectionIL(ILContext il)
-  // {
-  //   ILCursor cursor = new ILCursor(il);
-  //   // cursor.DumpILOnce("HandleNodeInjectionIL" );
-
-  //   // MetaInjectionData.InjectionSetsUsedThisRun faultily adds nodes to its list before actually confirming they were successfully added
-  //   //   so we need to undo that if we failed to actually add anything
-  //   if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCall<LoopFlowBuilder>("ProcessSingleNodeInjection")))
-  //         return; // failed to find what we need
-  //   if (!cursor.TryGotoNext(MoveType.Before, instr => instr.MatchLdnull()))
-  //         return; // failed to find what we need
-
-  //   cursor.Emit(OpCodes.Ldloc_2); // Get our old proceduralFlowModifierData
-  //   cursor.Emit(OpCodes.Ldarg_2); // Get sourceMetadata
-  //   cursor.Emit(OpCodes.Call, typeof(FancyRoomBuilder).GetMethod("RemoveProceduralFlowModifierDataFromSetsUsedThisRun", BindingFlags.Static | BindingFlags.NonPublic));
-  // }
-
-  // private static void RemoveProceduralFlowModifierDataFromSetsUsedThisRun(ProceduralFlowModifierData data, RuntimeInjectionMetadata source)
-  // {
-  //   // ETGModConsole.Log($"  RETRY {data.exactRoom?.name ?? "null"}");
-  //   if (MetaInjectionData.InjectionSetsUsedThisRun.Contains(data))
-  //   {
-  //     MetaInjectionData.InjectionSetsUsedThisRun.Remove(data);
-  //     source.HasAssignedModDataExactRoom = false;
-  //   }
-  // }
-
-  // private static ILHook _DebugProcessSingleNodeInjectionILHook = null;
-  // private static void DebugProcessSingleNodeInjectionIL(ILContext il)
-  // {
-  //   ILCursor cursor = new ILCursor(il);
-  //   // cursor.DumpILOnce("DebugProcessSingleNodeInjectionIL" );
-
-  //   // swap the debug print statements from false to true
-  //   cursor.Remove();
-  //   cursor.Emit(OpCodes.Ldc_I4_1);
-  // }
 
   // public static int HealthTraderCustomPrice(CustomShopController shop, CustomShopItemController itemCont, PickupObject item)
   // {
   //   return 5;
   // }
 
-  private static PrototypeDungeonRoom _BasicShopRoom = null;
-  public static PrototypeDungeonRoom GetBasicShopRoom()
-  {
-    return RoomFactory.BuildNewRoomFromResource(roomPath: "CwaffingTheGungy/Resources/Rooms/BasicShopRoom2.newroom").room; // rebuild every time for now
-    // if (_BasicShopRoom == null)
-    //   _BasicShopRoom = RoomFactory.BuildFromResource(roomPath: "CwaffingTheGungy/Resources/Rooms/BasicShopRoom.room").room;
-    // return _BasicShopRoom;
-  }
-
   // Extension for checking shop activation conditions using CwaffPrerequisite and returning CwaffPrerequisite for inline setup
-  public static CwaffPrerequisites SetupCheck(this CwaffPrerequisites prereq, FancyRoomBuilder.SpawnCondition check, bool oncePerRun)
+  public static CwaffPrerequisites SetupPrerequisite(this CwaffPrerequisites prereq, FancyRoomBuilder.SpawnCondition validator, bool oncePerRun)
   {
-    CwaffPrerequisite.AddPrequisiteCheck(prereq, check, oncePerRun);
+    if (prereq != CwaffPrerequisites.NONE)
+      CwaffPrerequisite.AddPrequisiteValidator(prereq, validator, oncePerRun);
+    else if (validator != null)
+      ETGModConsole.Log($"ATTEMPTED TO SET UP VALIDATOR FOR PREREQUISITE == NONE");
     return prereq;
   }
 
@@ -274,7 +209,7 @@ public static class FancyRoomBuilder
       RequiredValidPlaceable = null,
       prerequisites = new DungeonPrerequisite[]
       {
-        new CwaffPrerequisite { prerequisite = CwaffPrerequisites.TEST_PREREQUISITE.SetupCheck(check: null, oncePerRun: false) }
+        new CwaffPrerequisite { prerequisite = CwaffPrerequisites.TEST_PREREQUISITE.SetupPrerequisite(validator: null, oncePerRun: false) }
       },
       CanBeForcedSecret = false,
       RandomNodeChildMinDistanceFromEntrance = 0,

@@ -549,4 +549,9 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
             ShaderCache.Acquire("Daikon Forge/Default UI Shader"));
         return uiSprite;
     }
+
+    public static PickupObject GetModdedItem(string itemName)
+    {
+        return Gungeon.Game.Items.GetSafe(itemName);
+    }
 }

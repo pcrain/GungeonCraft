@@ -2,6 +2,8 @@ namespace CwaffingTheGungy;
 
 public static class CwaffEvents // global custom events we can listen for
 {
+    // Runs before first floor is loaded for the first run
+    public static Action OnAllModsLoaded;
     // Runs before a new run is started (before level generation)
     public static Action OnCleanStart;
     // Runs whenever a new run is started (floor may not be fully loaded)
@@ -12,6 +14,7 @@ public static class CwaffEvents // global custom events we can listen for
     public static Action OnFirstFloorFullyLoaded;
 
     internal static bool _OnFirstFloor = false;
+    internal static bool _AllModsLoaded = false;
 
     public static void Init()
     {
@@ -23,11 +26,29 @@ public static class CwaffEvents // global custom events we can listen for
             new Hook(
                 typeof(GameManager).GetMethod("ClearActiveGameData", BindingFlags.Instance | BindingFlags.Public),
                 typeof(CwaffEvents).GetMethod("ClearActiveGameDataHook"));
+
+            new Hook(
+                typeof(GameManager).GetMethod("SetNextLevelIndex", BindingFlags.Instance | BindingFlags.Public),
+                typeof(CwaffEvents).GetMethod("SetNextLevelIndexHook"));
+
+
         #endregion
 
         #region Set Up Events
             // OnRunStart += (_,_,_) => ETGModConsole.Log($"run started \\o/");
         #endregion
+    }
+
+
+    public static void SetNextLevelIndexHook(Action<GameManager, int> orig, GameManager self, int index)
+    {
+        orig(self, index);
+        if (_AllModsLoaded)
+            return;
+
+        _AllModsLoaded = true;
+        if (OnAllModsLoaded != null)
+            OnAllModsLoaded();
     }
 
     public static void ClearActiveGameDataHook(Action<GameManager, bool, bool> orig, GameManager self, bool destroyGameManager, bool endSession)
