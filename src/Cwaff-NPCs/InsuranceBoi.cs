@@ -12,13 +12,15 @@ public class InsuranceBoi
             npcName                : "insurance_boi",
             shopItems              : shopItems,
             allowDupes             : true,
-            spawnChance            : 1f,
+            spawnChance            : 0.5f,
             spawnFloors            : Floors.CASTLEGEON,
             spawnPrerequisite      : CwaffPrerequisite.TEST_PREREQUISITE,
+            // spawnPrequisiteChecker : CwaffDungeonPrerequisite.OnFirstFloor,
             spawnPrequisiteChecker : null,
             talkPointOffset        : C.PIXEL_SIZE * new Vector2(7, 22),
             npcPosition            : C.PIXEL_SIZE * new Vector2(10, 60),
             itemPositions          : ShopAPI.defaultItemPositions.ShiftAll(C.PIXEL_SIZE * new Vector2(-25, 0)),
+            oncePerRun             : true,
             // voice                  : "sans", // will play audio "Play_CHR_<voice>_voice_01"
             genericDialog          : new(){
                 "BUY SOMETHING PLEASE",
@@ -40,11 +42,5 @@ public class InsuranceBoi
                 }
             );
         // shopRoom.ForceSpawnForDebugPurposes();
-
-        // Add custom audio
-        // if (!string.IsNullOrEmpty(audioTag))
-        // {
-        //     AkSoundEngine.PostEvent("Play_CHR_" + audioTag + "_voice_01", base.gameObject);
-        // }
     }
 }

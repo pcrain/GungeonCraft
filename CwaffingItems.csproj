@@ -86,6 +86,7 @@
     <Compile Include="src\Extensions.cs"/>
     <Compile Include="src\Cwaff-NPCs\Bombo.cs"/>
     <Compile Include="src\Cwaff-NPCs\InsuranceBoi.cs"/>
+    <Compile Include="src\Cwaff-Debug\OneOffDebugDungeonFlow.cs"/>
     <Compile Include="src\Common.cs"/>
     <Compile Include="src\CwaffEvents.cs"/>
     <Compile Include="src\Cwaff-Actives\AmazonPrimer.cs"/>
@@ -3699,14 +3700,6 @@
     <EmbeddedResource Include="Resources\StatusEffectVFX\plaguevfxframe_005.png"/>
     <EmbeddedResource Include="Resources\StatusEffectVFX\plaguevfxframe_003.png"/>
     <EmbeddedResource Include="Resources\StatusEffectVFX\plaguevfxframe_001.png"/>
-    <EmbeddedResource Include="Resources\NPCSprites\Boomhildr\boomhildr_talk_001.png"/>
-    <EmbeddedResource Include="Resources\NPCSprites\Boomhildr\boomhildr_idle_001.png"/>
-    <EmbeddedResource Include="Resources\NPCSprites\Boomhildr\boomhildr_icon.png"/>
-    <EmbeddedResource Include="Resources\NPCSprites\Boomhildr\boomhildr_talk_002.png"/>
-    <EmbeddedResource Include="Resources\NPCSprites\Boomhildr\boomhildr_idle_005.png"/>
-    <EmbeddedResource Include="Resources\NPCSprites\Boomhildr\boomhildr_idle_003.png"/>
-    <EmbeddedResource Include="Resources\NPCSprites\Boomhildr\boomhildr_idle_004.png"/>
-    <EmbeddedResource Include="Resources\NPCSprites\Boomhildr\boomhildr_idle_002.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\insurance_boi\insurance_boi_talk.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\insurance_boi\insurance_boi_idle.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\insurance_boi\insurance_boi_icon.png"/>
