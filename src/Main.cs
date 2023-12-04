@@ -29,11 +29,12 @@
     global using Dungeonator;
     global using Alexandria.ItemAPI;
     global using Alexandria.EnemyAPI;
+    global using Alexandria.DungeonAPI;
     global using Alexandria.Misc;
     global using Alexandria.NPCAPI;
     global using Brave.BulletScript;
 
-    // global using SaveAPI; // only nonstandard api copied in from elsewhere, hopefully Alexandria standardizes this eventually
+    global using SaveAPI; // only nonstandard api copied in from elsewhere, hopefully Alexandria standardizes this eventually
 #endregion
 
 global using ResourceExtractor = Alexandria.ItemAPI.ResourceExtractor;
@@ -303,6 +304,9 @@ public class Initialisation : BaseUnityPlugin
 
             // Modified version of Anywhere mod, further stolen and modified from Apache's version
             FlowCommands.Install();
+
+            //Misc. Initialization
+            CwaffPrerequisite.Init();
 
             //Misc. Tweaks
             CustomNoteDoer.Init();

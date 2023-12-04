@@ -88,7 +88,6 @@
     <Compile Include="src\Cwaff-NPCs\InsuranceBoi.cs"/>
     <Compile Include="src\Cwaff-Debug\OneOffDebugDungeonFlow.cs"/>
     <Compile Include="src\Common.cs"/>
-    <Compile Include="src\CwaffEvents.cs"/>
     <Compile Include="src\Cwaff-Actives\AmazonPrimer.cs"/>
     <Compile Include="src\Cwaff-Actives\Unfinished\GungeonitePickaxe.cs"/>
     <Compile Include="src\Cwaff-Actives\ChamberJammer.cs"/>
@@ -188,8 +187,10 @@
     <Compile Include="src\NonstandardApi\Cwaff-GenericNPC.cs"/>
     <Compile Include="src\Databases.cs"/>
     <Compile Include="src\SharedItemBehaviors.cs"/>
+    <Compile Include="src\Cwaff-Misc\CwaffPrerequisite.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffTweaks.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffSynergies.cs"/>
+    <Compile Include="src\Cwaff-Misc\CwaffEvents.cs"/>
     <Compile Include="src\Cwaff-Misc\HeckedMode.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffHUD.cs"/>
     <Compile Include="src\VFXToolbox.cs"/>

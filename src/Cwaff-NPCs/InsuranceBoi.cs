@@ -11,10 +11,11 @@ public class InsuranceBoi
         PrototypeDungeonRoom shopRoom = FancyRoomBuilder.MakeFancyShop(
             npcName                : "insurance_boi",
             shopItems              : shopItems,
+            roomPath               : "CwaffingTheGungy/Resources/Rooms/BasicShopRoom2.newroom",
             allowDupes             : true,
             spawnChance            : 0.5f,
             spawnFloors            : Floors.CASTLEGEON,
-            spawnPrerequisite      : CwaffPrerequisite.TEST_PREREQUISITE,
+            spawnPrerequisite      : CwaffPrerequisites.TEST_PREREQUISITE,
             // spawnPrequisiteChecker : CwaffDungeonPrerequisite.OnFirstFloor,
             spawnPrequisiteChecker : null,
             talkPointOffset        : C.PIXEL_SIZE * new Vector2(7, 22),

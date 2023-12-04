@@ -2,6 +2,8 @@ namespace CwaffingTheGungy;
 
 public static class CwaffEvents // global custom events we can listen for
 {
+    // Runs before a new run is started (before level generation)
+    public static Action OnCleanStart;
     // Runs whenever a new run is started (floor may not be fully loaded)
     public static Action<PlayerController, PlayerController, GameManager.GameMode> OnRunStart;
     // Runs whenever a floor is started and fully loaded
@@ -17,11 +19,22 @@ public static class CwaffEvents // global custom events we can listen for
             new Hook(
                 typeof(Dungeon).GetMethod("FloorReached", BindingFlags.Instance | BindingFlags.Public),
                 typeof(CwaffEvents).GetMethod("FloorReachedHook"));
+
+            new Hook(
+                typeof(GameManager).GetMethod("ClearActiveGameData", BindingFlags.Instance | BindingFlags.Public),
+                typeof(CwaffEvents).GetMethod("ClearActiveGameDataHook"));
         #endregion
 
         #region Set Up Events
             // OnRunStart += (_,_,_) => ETGModConsole.Log($"run started \\o/");
         #endregion
+    }
+
+    public static void ClearActiveGameDataHook(Action<GameManager, bool, bool> orig, GameManager self, bool destroyGameManager, bool endSession)
+    {
+        orig(self, destroyGameManager, endSession);
+        if (OnCleanStart != null)
+            OnCleanStart();
     }
 
     public static void FloorReachedHook(Action<Dungeon> orig, Dungeon self)

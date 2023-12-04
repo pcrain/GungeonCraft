@@ -1,6 +1,3 @@
-using SaveAPI;
-using Alexandria.DungeonAPI;
-
 namespace CwaffingTheGungy;
 
 public static class FancyRoomBuilder
@@ -15,8 +12,8 @@ public static class FancyRoomBuilder
 
   private static List<string> _DefaultLine = new(){"Buy somethin', will ya!"};
 
-  public static PrototypeDungeonRoom MakeFancyShop(string npcName, List<int> shopItems, float spawnChance = 1f, Floors? spawnFloors = null,
-    CwaffPrerequisite spawnPrerequisite = CwaffPrerequisite.NONE, SpawnCondition spawnPrequisiteChecker = null, string voice = null,
+  public static PrototypeDungeonRoom MakeFancyShop(string npcName, List<int> shopItems, string roomPath, float spawnChance = 1f, Floors? spawnFloors = null,
+    CwaffPrerequisites spawnPrerequisite = CwaffPrerequisites.NONE, SpawnCondition spawnPrequisiteChecker = null, string voice = null,
     List<String> genericDialog = null, List<String> stopperDialog = null, List<String> purchaseDialog = null,
     List<String> noSaleDialog = null, List<String> introDialog = null, List<String> attackedDialog = null, bool allowDupes = false,
     float mainPoolChance = 0.0f, Vector3? talkPointOffset = null, Vector3? npcPosition = null, List<Vector3> itemPositions = null,
@@ -35,7 +32,7 @@ public static class FancyRoomBuilder
     $"#{npcNameUpper}_ATTACKED_TALK".SetupDBStrings(attackedDialog ?? _DefaultLine);
 
     List<DungeonPrerequisite> dungeonPrerequisites = new(){
-      new CwaffDungeonPrerequisite { prerequisite = spawnPrerequisite.SetupCheck(spawnPrequisiteChecker, oncePerRun) }
+      new CwaffPrerequisite { prerequisite = spawnPrerequisite.SetupCheck(spawnPrequisiteChecker, oncePerRun) }
     };
 
     string currencyIcon = ResMap.Get($"{npcName}_icon", quietFailure: true)?[0];
@@ -93,7 +90,8 @@ public static class FancyRoomBuilder
       hitboxOffset                      : null // must be null, doesn't work properly
       );
 
-    shop.AddComponent<PrerequisiteTracker>().Setup(spawnPrerequisite);
+    // Track how many times this shop room has been spawned in a run for prerequisite tracking purposes
+    shop.AddComponent<CwaffPrerequisite.Tracker>().Setup(spawnPrerequisite);
 
     TalkDoerLite npc = shop.GetComponentInChildren<TalkDoerLite>();
     npc.gameObject.AddComponent<FlipsToFacePlayer>();
@@ -102,11 +100,11 @@ public static class FancyRoomBuilder
     if (!string.IsNullOrEmpty(voice))
       npc.audioCharacterSpeechTag = voice;
 
-    PrototypeDungeonRoom shopRoom = GetBasicShopRoom();
+    PrototypeDungeonRoom shopRoom = RoomFactory.BuildNewRoomFromResource(roomPath: roomPath).room;
 
     // ShopAPI.RegisterShopRoom(shop: shop, protoroom: shopRoom, vector: new Vector2((float)(shopRoom.Width / 2), (float)(shopRoom.Height / 2)));
     RoomFactory.AddInjection(
-      protoroom            : shopRoom/*RoomFactory.BuildFromResource(roomPath: "Planetside/Resources/ShrineRooms/ShopRooms/TimeTraderShop.room").room*/,
+      protoroom            : shopRoom,
       injectionAnnotation  : $"{npcName}'s Shop Room",
       placementRules       : new() { ProceduralFlowModifierData.FlowModifierPlacementType.END_OF_CHAIN },
       chanceToLock         : 0,
@@ -207,9 +205,9 @@ public static class FancyRoomBuilder
   }
 
   // Extension for checking shop activation conditions using CwaffPrerequisite and returning CwaffPrerequisite for inline setup
-  public static CwaffPrerequisite SetupCheck(this CwaffPrerequisite prereq, FancyRoomBuilder.SpawnCondition check, bool oncePerRun)
+  public static CwaffPrerequisites SetupCheck(this CwaffPrerequisites prereq, FancyRoomBuilder.SpawnCondition check, bool oncePerRun)
   {
-    CwaffDungeonPrerequisite.AddPrequisiteCheck(prereq, check, oncePerRun);
+    CwaffPrerequisite.AddPrequisiteCheck(prereq, check, oncePerRun);
     return prereq;
   }
 
@@ -276,7 +274,7 @@ public static class FancyRoomBuilder
       RequiredValidPlaceable = null,
       prerequisites = new DungeonPrerequisite[]
       {
-        new CwaffDungeonPrerequisite { prerequisite = CwaffPrerequisite.TEST_PREREQUISITE.SetupCheck(check: null, oncePerRun: false) }
+        new CwaffPrerequisite { prerequisite = CwaffPrerequisites.TEST_PREREQUISITE.SetupCheck(check: null, oncePerRun: false) }
       },
       CanBeForcedSecret = false,
       RandomNodeChildMinDistanceFromEntrance = 0,
@@ -284,154 +282,5 @@ public static class FancyRoomBuilder
       framedCombatNodes = 0,
     };
     return SpecProcData;
-  }
-}
-
-public enum CwaffPrerequisite
-{
-  NONE,
-  INSURANCE_PREREQUISITE,
-  TEST_PREREQUISITE,
-}
-
-public class SpawnConditions
-{
-  public FancyRoomBuilder.SpawnCondition check         = null;
-  public bool                            oncePerRun    = false;
-  public int                             spawnsThisRun = 0;
-}
-
-public class CwaffDungeonPrerequisite : CustomDungeonPrerequisite
-{
-  internal static List<SpawnConditions> SpawnConditions =
-    new(Enumerable.Repeat<SpawnConditions>(null, Enum.GetNames(typeof(CwaffPrerequisite)).Length).ToList());
-
-  public CwaffPrerequisite prerequisite = CwaffPrerequisite.NONE;
-
-  public static void AddPrequisiteCheck(CwaffPrerequisite prereq, FancyRoomBuilder.SpawnCondition check, bool oncePerRun)
-  {
-    if (SpawnConditions[(int)prereq] != null)
-    {
-      ETGModConsole.Log($"  Tried to re-initialize a prerequisite!");
-      return;
-    }
-    SpawnConditions[(int)prereq] = new SpawnConditions(){
-      check      = check,
-      oncePerRun = oncePerRun,
-    };
-  }
-
-  public override bool CheckConditionsFulfilled()
-  {
-    // Debug.Log("CHECKING PREREQS NOW");
-    SpawnConditions conditions = SpawnConditions[(int)prerequisite];
-    ETGModConsole.Log($"checking prereqs for {Enum.GetName(typeof(CwaffPrerequisite), prerequisite)}");
-    if (prerequisite == CwaffPrerequisite.NONE || conditions == null)
-    {
-      // ETGModConsole.Log($"  auto-pass");
-      return true;
-    }
-    if (conditions.oncePerRun)
-    {
-      if (OnFirstFloor())
-        conditions.spawnsThisRun = 0;  // reset the counter for the first floor
-      else if (conditions.spawnsThisRun > 0)
-      {
-        ETGModConsole.Log($"  failed: already spawned this run");
-        return false; // cannot spawn this run
-      }
-    }
-    if (conditions.check == null)
-    {
-      ETGModConsole.Log($"  auto-pass");
-      return true;
-    }
-    bool passed = conditions.check();
-    ETGModConsole.Log($"  passed? {passed}");
-    return passed;
-  }
-
-  // Predicate checker functions
-  public static bool OnFirstFloor()
-  {
-      string levelBeingLoaded = GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName;
-      return levelBeingLoaded == "tt_castle";
-  }
-
-  public static bool OnSecondFloor()
-  {
-      string levelBeingLoaded = GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName;
-      return levelBeingLoaded == "tt5";
-  }
-}
-
-public class FlipsToFacePlayer : MonoBehaviour
-{
-  private AIAnimator _animator;
-  private Transform _speechPoint;
-  private float _flipOffset;
-  private float _centerX;
-  private float _baseX;
-  private Vector3 _baseSpeechPos;
-  private bool _cachedFlipped;
-
-  private void Start()
-  {
-    this._animator      = base.GetComponent<AIAnimator>();
-    this._flipOffset    = this._animator.sprite.GetUntrimmedBounds().size.x /** 0.5f*/;
-    this._centerX       = this._animator.sprite.WorldBottomCenter.x;
-    this._baseX         = this._animator.sprite.transform.localPosition.x;
-
-    this._speechPoint   = base.transform.Find("SpeechPoint");
-    this._baseSpeechPos = this._speechPoint.position;
-
-    this._cachedFlipped = false;
-  }
-
-  private void Update()
-  {
-    // this._animator.sprite.FlipX = GameManager.Instance.BestActivePlayer.CenterPosition.x < this._animator.transform.position.x;
-    // this._animator.sprite.transform.localScale = this._animator.sprite.transform.localScale.WithX(
-    //   (GameManager.Instance.BestActivePlayer.CenterPosition.x < this._animator.transform.position.x) ? -1f : 1f);
-    FlipSpriteIfNecessary();
-  }
-
-  private void FlipSpriteIfNecessary()
-  {
-    this._animator.sprite.FlipX = GameManager.Instance.BestActivePlayer.sprite.WorldBottomCenter.x < this._centerX;
-    if (this._animator.sprite.FlipX == this._cachedFlipped)
-      return;
-
-    this._cachedFlipped = this._animator.sprite.FlipX;
-    base.transform.localPosition = base.transform.localPosition.WithX(
-      this._baseX + (this._cachedFlipped ? _flipOffset : 0f));
-    this._speechPoint.position = this._baseSpeechPos;
-  }
-
-  // private void FlipSpriteIfNecessaryClose()
-  // {
-  //   this._animator.sprite.FlipX = GameManager.Instance.BestActivePlayer.sprite.WorldBottomCenter.x < this._centerX;
-  //   if (this._animator.sprite.FlipX == this._cachedFlipped)
-  //     return;
-
-  //   this._cachedFlipped = this._animator.sprite.FlipX;
-  //   this._animator.sprite.transform.localPosition = this._animator.sprite.transform.localPosition.WithX(
-  //     this._baseX + (this._cachedFlipped ? _flipOffset : 0f));
-  // }
-}
-
-public class PrerequisiteTracker : MonoBehaviour
-{
-  public CwaffPrerequisite prereq = CwaffPrerequisite.NONE; // must be public for serializatioin
-
-  public void Setup(CwaffPrerequisite prereq)
-  {
-    this.prereq = prereq;
-  }
-
-  private void Start()
-  {
-    ETGModConsole.Log($"shop created with prereq {Enum.GetName(typeof(CwaffPrerequisite), this.prereq)}!");
-    CwaffDungeonPrerequisite.SpawnConditions[(int)this.prereq].spawnsThisRun += 1;
   }
 }

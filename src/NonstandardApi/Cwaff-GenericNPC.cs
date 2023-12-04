@@ -352,3 +352,58 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
         return -1f;
     }
 }
+
+public class FlipsToFacePlayer : MonoBehaviour
+{
+  private AIAnimator _animator;
+  private Transform _speechPoint;
+  private float _flipOffset;
+  private float _centerX;
+  private float _baseX;
+  private Vector3 _baseSpeechPos;
+  private bool _cachedFlipped;
+
+  private void Start()
+  {
+    this._animator      = base.GetComponent<AIAnimator>();
+    this._flipOffset    = this._animator.sprite.GetUntrimmedBounds().size.x /** 0.5f*/;
+    this._centerX       = this._animator.sprite.WorldBottomCenter.x;
+    this._baseX         = this._animator.sprite.transform.localPosition.x;
+
+    this._speechPoint   = base.transform.Find("SpeechPoint");
+    this._baseSpeechPos = this._speechPoint.position;
+
+    this._cachedFlipped = false;
+  }
+
+  private void Update()
+  {
+    // this._animator.sprite.FlipX = GameManager.Instance.BestActivePlayer.CenterPosition.x < this._animator.transform.position.x;
+    // this._animator.sprite.transform.localScale = this._animator.sprite.transform.localScale.WithX(
+    //   (GameManager.Instance.BestActivePlayer.CenterPosition.x < this._animator.transform.position.x) ? -1f : 1f);
+    FlipSpriteIfNecessary();
+  }
+
+  private void FlipSpriteIfNecessary()
+  {
+    this._animator.sprite.FlipX = GameManager.Instance.BestActivePlayer.sprite.WorldBottomCenter.x < this._centerX;
+    if (this._animator.sprite.FlipX == this._cachedFlipped)
+      return;
+
+    this._cachedFlipped = this._animator.sprite.FlipX;
+    base.transform.localPosition = base.transform.localPosition.WithX(
+      this._baseX + (this._cachedFlipped ? _flipOffset : 0f));
+    this._speechPoint.position = this._baseSpeechPos;
+  }
+
+  // private void FlipSpriteIfNecessaryClose()
+  // {
+  //   this._animator.sprite.FlipX = GameManager.Instance.BestActivePlayer.sprite.WorldBottomCenter.x < this._centerX;
+  //   if (this._animator.sprite.FlipX == this._cachedFlipped)
+  //     return;
+
+  //   this._cachedFlipped = this._animator.sprite.FlipX;
+  //   this._animator.sprite.transform.localPosition = this._animator.sprite.transform.localPosition.WithX(
+  //     this._baseX + (this._cachedFlipped ? _flipOffset : 0f));
+  // }
+}
