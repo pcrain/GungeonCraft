@@ -122,7 +122,8 @@ public static class FancyRoomBuilder
     if (!string.IsNullOrEmpty(voice))
       npc.audioCharacterSpeechTag = voice;
 
-    PrototypeDungeonRoom shopRoom = RoomFactory.BuildNewRoomFromResource(roomPath: roomPath).room;
+    // PrototypeDungeonRoom shopRoom = RoomFactory.BuildNewRoomFromResource(roomPath: roomPath).room;
+    PrototypeDungeonRoom shopRoom = BuildNewRoomFromResourceWithoutRegistering(roomPath).room;  // prevents the game from spawning the rooms and disregarding prerequisites
 
     // ShopAPI.RegisterShopRoom(shop: shop, protoroom: shopRoom, vector: new Vector2((float)(shopRoom.Width / 2), (float)(shopRoom.Height / 2)));
     // RoomFactory.AddInjection(
@@ -153,6 +154,21 @@ public static class FancyRoomBuilder
       owner = npc,
       loot  = lootTable
     };
+  }
+
+  public static RoomFactory.RoomData BuildNewRoomFromResourceWithoutRegistering(string roomPath)
+  {
+      RoomFactory.RoomData roomData = RoomFactory.ExtractRoomDataFromResource(roomPath, Assembly.GetCallingAssembly());
+      roomData.name = Path.GetFileName(roomPath);
+      roomData.room = RoomFactory.Build(roomData);
+      RoomFactory.PostProcessCells(roomData);
+
+      // if (!rooms.ContainsKey(roomData.room.name))
+      // {
+      //     rooms.Add(roomData.room.name, roomData);
+      // }
+      // DungeonHandler.Register(roomData);
+      return roomData;
   }
 
   // Extension for checking shop activation conditions using CwaffPrerequisite and returning CwaffPrerequisite for inline setup
@@ -302,7 +318,7 @@ public static class FancyRoomBuilder
       {
         if (((int)tileset & allowedTilesets) == (int)tileset)
         {
-          // Lazy.DebugLog($"  have tileset {Enum.GetName(typeof(GlobalDungeonData.ValidTilesets), tileset)}");
+          Lazy.DebugLog($"  have tileset {Enum.GetName(typeof(GlobalDungeonData.ValidTilesets), tileset)}");
           ++numValidTilesets;
         }
       }
@@ -324,8 +340,8 @@ public static class FancyRoomBuilder
 
       GameManager.Instance.GlobalInjectionData.entries.Add(new MetaInjectionDataEntry{
         injectionData                    = injector,
-        MinToAppearPerRun                = oncePerRun ? 1 : numValidTilesets,
-        MaxToAppearPerRun                = oncePerRun ? 1 : numValidTilesets,  // if this number is lower than the number of enabled tilesets in validTilesets, everything will break
+        MinToAppearPerRun                = oncePerRun ? 1 : numValidTilesets, // corresponds to how many floors this room will try to spawn on, not how many instances of the room will spawn on the floor
+        MaxToAppearPerRun                = oncePerRun ? 1 : numValidTilesets, // if this number is lower than the number of enabled tilesets in validTilesets, everything will break
         OverallChanceToTrigger           = 1f, // chance this particular MetaInjectionDataEntry is present in the current run at all
         UsesUnlockedChanceToTrigger      = false,
         UnlockedChancesToTrigger         = new MetaInjectionUnlockedChanceEntry[0]{},

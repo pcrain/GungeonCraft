@@ -60,16 +60,16 @@ public class CwaffPrerequisite : CustomDungeonPrerequisite
     // Lazy.DebugLog($"checking prereqs for {Enum.GetName(typeof(CwaffPrerequisites), prerequisite)}");
     if (prerequisite == CwaffPrerequisites.NONE || conditions == null)
     {
-      // ETGModConsole.Log($"  auto-pass");
+      // Lazy.DebugLog($"  auto-pass");
       return true;
     }
     if (conditions.validator == null)
     {
-      // ETGModConsole.Log($"  auto-pass");
+      // Lazy.DebugLog($"  auto-pass");
       return true;
     }
     bool passed = conditions.validator(conditions);
-    // ETGModConsole.Log($"  passed? {passed}");
+    // Lazy.DebugLog($"  passed? {passed}");
     return passed;
   }
 

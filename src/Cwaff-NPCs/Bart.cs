@@ -39,7 +39,8 @@ public class Bart
             spawnPrerequisite      : CwaffPrerequisites.BARTER_SHOP_PREREQUISITE,
             // Guaranteed spawn on 2nd or 3rd floor
             allowedTilesets        : (int)( GlobalDungeonData.ValidTilesets.GUNGEON | GlobalDungeonData.ValidTilesets.MINEGEON ),
-            prequisiteValidator    : null,
+            prequisiteValidator    : OnSecondOrThirdFloor, // can glitchily spawn on other floors, so add extra insurance
+            // prequisiteValidator    : null,
             talkPointOffset        : C.PIXEL_SIZE * new Vector2(7, 22 + 16),
             npcPosition            : C.PIXEL_SIZE * new Vector2(10, 60 + 16),
             itemPositions          : ShopAPI.defaultItemPositions.ShiftAll(C.PIXEL_SIZE * new Vector2(-25, 0 + 16)),
@@ -91,9 +92,9 @@ public class Bart
     {
       string levelBeingLoaded = GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName;
       if (levelBeingLoaded == "tt5")
-        return conds.randomNumberForThisRun < 0.5f;
+        return true; // conds.randomNumberForThisRun < 0.5f;
       if (levelBeingLoaded == "tt_mines")
-        return conds.randomNumberForThisRun >= 0.5f;
+        return true; // conds.randomNumberForThisRun >= 0.5f;
       return false;
     }
 

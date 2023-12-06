@@ -40,6 +40,7 @@
 global using ResourceExtractor = Alexandria.ItemAPI.ResourceExtractor;
 global using Component         = UnityEngine.Component;
 global using ShopAPI           = Alexandria.NPCAPI.ShopAPI;
+global using RoomFactory       = Alexandria.DungeonAPI.RoomFactory;
 
 global using static ProjectileModule; //ShootStyle, ProjectileSequenceStyle
 global using static tk2dBaseSprite;   //Anchor
