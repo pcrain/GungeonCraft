@@ -14,49 +14,65 @@ public class Bart
     {
         // We need to find all loaded items, so defer initialization for now
         CwaffEvents.OnAllModsLoaded += SetupBarterTable;
-
-        _BarterSpriteS = AtlasFixer.BetterAddCustomCurrencyType(ResMap.Get("barter_s_icon")[0]+".png", $"{C.MOD_PREFIX}:S_TIER_ITEM", Assembly.GetCallingAssembly());
-        _BarterSpriteA = AtlasFixer.BetterAddCustomCurrencyType(ResMap.Get("barter_a_icon")[0]+".png", $"{C.MOD_PREFIX}:A_TIER_ITEM", Assembly.GetCallingAssembly());
-        _BarterSpriteB = AtlasFixer.BetterAddCustomCurrencyType(ResMap.Get("barter_b_icon")[0]+".png", $"{C.MOD_PREFIX}:B_TIER_ITEM", Assembly.GetCallingAssembly());
-        _BarterSpriteC = AtlasFixer.BetterAddCustomCurrencyType(ResMap.Get("barter_c_icon")[0]+".png", $"{C.MOD_PREFIX}:C_TIER_ITEM", Assembly.GetCallingAssembly());
-
         List<int> shopItems      = new();
         List<string> moddedItems = new();
 
+        // NOTE: resizing the Atlas when first adding a sprite takes 4 seconds (old method) and 1 second (current method, still slow)
+        //       not sure this can be sped up any further in the future, but something to be aware of and possibly disable when
+        //       doing heavy testing
+        if (!C.FAST_LOAD)
+        {
+            _BarterSpriteS = AtlasFixer.BetterAddCustomCurrencyType(ResMap.Get("barter_s_icon")[0]+".png", $"{C.MOD_PREFIX}:S_TIER_ITEM", Assembly.GetCallingAssembly());
+            _BarterSpriteA = AtlasFixer.BetterAddCustomCurrencyType(ResMap.Get("barter_a_icon")[0]+".png", $"{C.MOD_PREFIX}:A_TIER_ITEM", Assembly.GetCallingAssembly());
+            _BarterSpriteB = AtlasFixer.BetterAddCustomCurrencyType(ResMap.Get("barter_b_icon")[0]+".png", $"{C.MOD_PREFIX}:B_TIER_ITEM", Assembly.GetCallingAssembly());
+            _BarterSpriteC = AtlasFixer.BetterAddCustomCurrencyType(ResMap.Get("barter_c_icon")[0]+".png", $"{C.MOD_PREFIX}:C_TIER_ITEM", Assembly.GetCallingAssembly());
+        }
+
         FancyShopData shop = FancyRoomBuilder.MakeFancyShop(
-            npcName                : "insurance_boi",
+            npcName                : "bart",
             shopItems              : shopItems,
             moddedItems            : moddedItems,
-            roomPath               : "CwaffingTheGungy/Resources/Rooms/BasicShopRoom2.newroom",
-            allowDupes             : true,
+            roomPath               : "CwaffingTheGungy/Resources/Rooms/barter.newroom",
+            allowDupes             : false,
             costModifier           : 1f,
             spawnChance            : 1.0f,
             spawnFloors            : Floors.CASTLEGEON,
             spawnPrerequisite      : CwaffPrerequisites.INSURANCE_PREREQUISITE,
             prequisiteValidator    : CwaffPrerequisite.OnFirstFloor,
-            // spawnPrequisiteChecker : null,
-            talkPointOffset        : C.PIXEL_SIZE * new Vector2(7, 22),
-            npcPosition            : C.PIXEL_SIZE * new Vector2(10, 60),
-            itemPositions          : ShopAPI.defaultItemPositions.ShiftAll(C.PIXEL_SIZE * new Vector2(-25, 0)),
+            talkPointOffset        : C.PIXEL_SIZE * new Vector2(7, 22 + 16),
+            npcPosition            : C.PIXEL_SIZE * new Vector2(10, 60 + 16),
+            itemPositions          : ShopAPI.defaultItemPositions.ShiftAll(C.PIXEL_SIZE * new Vector2(-25, 0 + 16)),
             oncePerRun             : true,
             // voice                  : "sans", // will play audio "Play_CHR_<voice>_voice_01"
             genericDialog          : new(){
-                "BUY SOMETHING PLEASE",
+                "My trash is your treasure.",
+                "Finders keepers.",
+                "Not one for small talk.",
                 },
             stopperDialog          : new(){
-                "BUY SOMETHING PLEASE",
+                "My trash is your treasure.",
+                "Finders keepers.",
+                "Not one for small talk.",
                 },
             purchaseDialog         : new(){
-                "BUY SOMETHING PLEASE",
+                "Been a pleasure.",
+                "Have a good one.",
+                "Done deal.",
                 },
             noSaleDialog           : new(){
-                "BUY SOMETHING PLEASE",
+                "Give me something better.",
+                "Not interested.",
+                "For that?",
                 },
             introDialog            : new(){
-                "BUY SOMETHING PLEASE",
+                "I'll take that off your hands.",
+                "Let's make a deal.",
+                "What do you have for me?",
                 },
             attackedDialog         : new(){
-                "BUY SOMETHING PLEASE",
+                "Rude.",
+                "Please stop.",
+                "Enough.",
                 },
             customCanBuy           : CanBarterWithItemOnGround,
             removeCurrency         : DestroyBarteredItem,

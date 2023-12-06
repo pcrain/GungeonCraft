@@ -3717,10 +3717,15 @@
     <EmbeddedResource Include="Resources\NPCSprites\insurance_boi\insurance_boi_idle.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\insurance_boi\insurance_boi_icon.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\bart\barter_c_icon.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\bart\bart_icon1.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\bart\bart_talk_001.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\bart\barter_s_icon.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\bart\barter_b_icon.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\bart\bart_talk_002.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\bart\barter_a_icon.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\bart\bart_idle_002.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\bart\barter_d_icon.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\bart\bart_idle_001.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\GrinReaper\grin_allsprites2.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\GrinReaper\grin_allsprites10.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\GrinReaper\grin_allsprites6.png"/>
@@ -3864,6 +3869,7 @@
     <EmbeddedResource Include="Resources\BeamSprites\holy_water_gun_mid_001.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\subtractor_beam_red_mid_004.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\subtractor_beam_red_start_001.png"/>
+    <EmbeddedResource Include="Resources\Rooms\barter.newroom"/>
     <EmbeddedResource Include="Resources\Rooms\BasicShopRoom.room"/>
     <EmbeddedResource Include="Resources\Rooms\petshop.newroom"/>
     <EmbeddedResource Include="Resources\Rooms\BasicShopRoom.newroom"/>
