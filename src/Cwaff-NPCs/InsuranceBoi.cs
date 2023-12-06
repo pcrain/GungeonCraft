@@ -13,7 +13,7 @@ public class InsuranceBoi
             // "nn:arc_tactical",
         };
 
-        PrototypeDungeonRoom shopRoom = FancyRoomBuilder.MakeFancyShop(
+        FancyShopData shop = FancyRoomBuilder.MakeFancyShop(
             npcName                : "insurance_boi",
             shopItems              : shopItems,
             moddedItems            : moddedItems,

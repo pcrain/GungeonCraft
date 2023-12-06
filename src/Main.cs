@@ -223,6 +223,7 @@ public class Initialisation : BaseUnityPlugin
             #region Shop NPCs
                 // InsuranceBoi.Init();
                 WhiteMage.Init();
+                Bart.Init();
             #endregion
 
             #region Fancy NPCs

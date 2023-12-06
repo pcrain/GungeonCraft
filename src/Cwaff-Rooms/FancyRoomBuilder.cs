@@ -6,6 +6,14 @@ namespace CwaffingTheGungy;
     -
 */
 
+public class FancyShopData
+{
+  public GameObject shop;
+  public TalkDoerLite owner;
+  public PrototypeDungeonRoom room;
+  public GenericLootTable loot;
+}
+
 public static class FancyRoomBuilder
 {
   public delegate bool SpawnCondition();
@@ -19,13 +27,19 @@ public static class FancyRoomBuilder
 
   private static List<string> _DefaultLine = new(){"Buy somethin', will ya!"};
 
-  public static PrototypeDungeonRoom MakeFancyShop(string npcName, List<int> shopItems, string roomPath, List<string> moddedItems = null,
+  public static FancyShopData MakeFancyShop(string npcName, List<int> shopItems, string roomPath, List<string> moddedItems = null,
     float spawnChance = 1f, Floors? spawnFloors = null, Vector2? carpetOffset = null,
     CwaffPrerequisites spawnPrerequisite = CwaffPrerequisites.NONE, SpawnCondition prequisiteValidator = null, string voice = null,
     List<String> genericDialog = null, List<String> stopperDialog = null, List<String> purchaseDialog = null,
     List<String> noSaleDialog = null, List<String> introDialog = null, List<String> attackedDialog = null, bool allowDupes = false,
     float mainPoolChance = 0.0f, Vector3? talkPointOffset = null, Vector3? npcPosition = null, List<Vector3> itemPositions = null,
-    bool oncePerRun = true, float costModifier = 1f)
+    bool oncePerRun = true, float costModifier = 1f,
+    Func<CustomShopController, PlayerController, int, bool> customCanBuy = null,
+    Func<CustomShopController, PlayerController, int, int> removeCurrency = null,
+    Func<CustomShopController, CustomShopItemController, PickupObject, int> customPrice = null,
+    Func<PlayerController, PickupObject, int, bool> onPurchase = null,
+    Func<PlayerController, PickupObject, int, bool> onSteal = null
+    )
   {
     if (C.DEBUG_BUILD)
       ETGModConsole.Log($"Setting up shop for {npcName}");
@@ -48,6 +62,7 @@ public static class FancyRoomBuilder
     if (!string.IsNullOrEmpty(currencyIcon))
       currencyIcon += ".png";
 
+    GenericLootTable lootTable = shopItems.ToLootTable();
     GameObject shop = ShopAPI.SetUpShop(
       name                              : npcName,
       prefix                            : C.MOD_PREFIX,
@@ -55,9 +70,8 @@ public static class FancyRoomBuilder
       idleFps                           : 2,
       talkSpritePaths                   : ResMap.Get($"{npcName}_talk"),
       talkFps                           : 2,
-      lootTable                         : shopItems.ToLootTable(),
-      // currency                          : CustomShopItemController.ShopCurrencyType.CUSTOM,
-      currency                          : CustomShopItemController.ShopCurrencyType.COINS,
+      lootTable                         : lootTable,
+      currency                          : (removeCurrency == null) ? CustomShopItemController.ShopCurrencyType.COINS : CustomShopItemController.ShopCurrencyType.CUSTOM,
       runBasedMultilineGenericStringKey : $"#{npcNameUpper}_GENERIC_TALK",
       runBasedMultilineStopperStringKey : $"#{npcNameUpper}_STOPPER_TALK",
       purchaseItemStringKey             : $"#{npcNameUpper}_PURCHASE_TALK",
@@ -72,12 +86,12 @@ public static class FancyRoomBuilder
       costModifier                      : costModifier,
       giveStatsOnPurchase               : false,
       statsToGiveOnPurchase             : null,
-      CustomCanBuy                      : null,
-      CustomRemoveCurrency              : null,
-      CustomPrice                       : null,
+      CustomCanBuy                      : customCanBuy,
+      CustomRemoveCurrency              : removeCurrency,
+      CustomPrice                       : customPrice,
       // CustomPrice                       : HealthTraderCustomPrice,
-      OnPurchase                        : null,
-      OnSteal                           : null,
+      OnPurchase                        : onPurchase,
+      OnSteal                           : onSteal,
       currencyIconPath                  : currencyIcon/*""*/,
       // currencyIconPath                  : "",
       currencyName                      : "",
@@ -128,7 +142,12 @@ public static class FancyRoomBuilder
     DelayedModdedLootAdditions[shop] = moddedItems;
 
     FancyShopRooms[npcName] = shopRoom;
-    return shopRoom;
+    return new FancyShopData(){
+      shop = shop,
+      room = shopRoom,
+      owner = npc,
+      loot = lootTable
+    };
   }
 
   // public static int HealthTraderCustomPrice(CustomShopController shop, CustomShopItemController itemCont, PickupObject item)

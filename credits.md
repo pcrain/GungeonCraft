@@ -16,7 +16,8 @@ I have no artistic talent beyond making minor sprite and sound edits, so all bas
 	- [Terraria](https://terraria.wiki.gg/wiki/Guns) and many of its various mods including (but probably not limited to) [Tremor](https://tremormod.fandom.com/wiki/Weapons#Guns), [Exodus](https://exodusmod.fandom.com/wiki/Weapons#Guns), [The Spirit Mod](https://spiritmod.wiki.gg/wiki/Weapons#Guns), [Calamity](https://calamitymod.fandom.com/wiki/Guns), [Thorium](https://thoriummod.fandom.com/wiki/Guns), [Shadows of Abaddon](https://shadowsofabaddon.wiki.gg/wiki/Weapons#Guns), and [Mod of Redemption](https://modofredemption.wiki.gg/wiki/Weapons#Guns)
 	- Most animation edits are my own, but probably aren't as good as the animations of the guns in their respective games / mods, so please check the original sources out!
 * Several custom clip and projectiles sprites by [Lynceus](https://enter-the-gungeon.thunderstore.io/package/Lynceus/The_Captain_Custom_Character/) from the Mod the Gungeon Discord
-* Item sprites by [Dallan](https://enter-the-gungeon.thunderstore.io/package/Dallan/Breach_Renovations/) from the Mod the Gungeon Discord, and from various games including Knights in the Nightmare, Blaze Union, Pokemon, Dragonball Z: Buu's Fury, and Minecraft
+* Shopkeeper sprites and various item sprites by [Dallan](https://enter-the-gungeon.thunderstore.io/package/Dallan/Breach_Renovations/) from the Mod the Gungeon Discord
+* More item sprites from various games including Knights in the Nightmare, Blaze Union, Pokemon, Dragonball Z: Buu's Fury, and Minecraft
 * [SPOILERS] boss sprites [by askywalker from Spriter's Resource](https://www.spriters-resource.com/custom_edited/undertalecustoms/sheet/126792/)
 * [SPOILERS] boss card art [by synistersyrup from DeviantArt](https://www.deviantart.com/synistersyrup/art/Sans-Uses-Flirt-665517108)
 * [SPOILERS] boss music [by tomori](https://www.youtube.com/watch?v=pC_7lrh6mGs)

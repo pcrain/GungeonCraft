@@ -65,7 +65,7 @@ public class WhiteMage
             "ski:baby_good_dodogama",
         };
 
-        PrototypeDungeonRoom shopRoom = FancyRoomBuilder.MakeFancyShop(
+        FancyShopData shop = FancyRoomBuilder.MakeFancyShop(
             npcName                : "white_mage",
             shopItems              : shopItems,
             moddedItems            : moddedItems,
@@ -79,8 +79,8 @@ public class WhiteMage
             // spawnPrequisiteChecker : null,
             talkPointOffset        : C.PIXEL_SIZE * new Vector2(7, 22),
             npcPosition            : C.PIXEL_SIZE * new Vector2(10, 60),
-            carpetOffset           : C.PIXEL_SIZE * new Vector2(-128, -64),  // half sprite width minus npc offset
-            // carpetOffset           : C.PIXEL_SIZE * new Vector2(-46, 0),  // half sprite width minus npc offset
+            carpetOffset           : C.PIXEL_SIZE * new Vector2(-23, 0),  // half sprite width minus npc offset
+            // carpetOffset           : C.PIXEL_SIZE * new Vector2(-128, -64),  // half sprite width minus npc offset
             itemPositions          : ShopAPI.defaultItemPositions.ShiftAll(C.PIXEL_SIZE * new Vector2(-25, 0)),
             oncePerRun             : true,
             // voice                  : "sans", // will play audio "Play_CHR_<voice>_voice_01"

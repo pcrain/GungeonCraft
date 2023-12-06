@@ -4,6 +4,13 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
 {
     private static tk2dSpriteCollectionData _GunSpriteCollection = null;
 
+    // Log with the console only in debug mode
+    public static void DebugLog(object text)
+    {
+    if (C.DEBUG_BUILD)
+      ETGModConsole.Log(text);
+    }
+
     /// <summary>
     /// Perform basic initialization for a new passive, active, or gun item definition.
     /// </summary>

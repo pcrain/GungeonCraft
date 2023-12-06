@@ -1016,4 +1016,22 @@ public static class Extensions
       vecs.Add(v + shift);
     return vecs;
   }
+
+  // Find a custom shop item currently under consideration by player
+  public static CustomShopItemController GetTargetedItemByPlayer(this CustomShopController shop, PlayerController player)
+  {
+      if (!shop?.transform)
+        return null;
+      foreach (Transform child in shop.transform)
+      {
+          CustomShopItemController[] shopItems =child?.gameObject?.GetComponentsInChildren<CustomShopItemController>();
+          if ((shopItems?.Length ?? 0) == 0)
+              continue;
+          if (shopItems[0] is not CustomShopItemController shopItem)
+              continue;
+          if (player?.m_lastInteractionTarget?.Equals(shopItem) ?? false)
+              return shopItem;
+      }
+      return null;
+  }
 }
