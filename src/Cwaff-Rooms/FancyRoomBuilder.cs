@@ -20,7 +20,7 @@ public static class FancyRoomBuilder
   private static List<string> _DefaultLine = new(){"Buy somethin', will ya!"};
 
   public static PrototypeDungeonRoom MakeFancyShop(string npcName, List<int> shopItems, string roomPath, List<string> moddedItems = null,
-    float spawnChance = 1f, Floors? spawnFloors = null,
+    float spawnChance = 1f, Floors? spawnFloors = null, Vector2? carpetOffset = null,
     CwaffPrerequisites spawnPrerequisite = CwaffPrerequisites.NONE, SpawnCondition prequisiteValidator = null, string voice = null,
     List<String> genericDialog = null, List<String> stopperDialog = null, List<String> purchaseDialog = null,
     List<String> noSaleDialog = null, List<String> introDialog = null, List<String> attackedDialog = null, bool allowDupes = false,
@@ -85,7 +85,7 @@ public static class FancyRoomBuilder
       canBeRobbed                       : true,
       hasCarpet                         : ResMap.Get($"{npcName}_carpet", quietFailure: true)?[0] != null,
       carpetSpritePath                  : ResMap.Get($"{npcName}_carpet", quietFailure: true)?[0],
-      CarpetOffset                      : null,
+      CarpetOffset                      : carpetOffset,
       hasMinimapIcon                    : ResMap.Get($"{npcName}_icon", quietFailure: true)?[0] != null,
       minimapIconSpritePath             : ResMap.Get($"{npcName}_icon", quietFailure: true)?[0],
       addToMainNpcPool                  : mainPoolChance > 0,

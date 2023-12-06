@@ -9,8 +9,8 @@ public class InsuranceBoi
         };
 
         List<string> moddedItems = new(){
-            "nn:grandfather_glock",
-            "nn:arc_tactical",
+            // "nn:grandfather_glock",
+            // "nn:arc_tactical",
         };
 
         PrototypeDungeonRoom shopRoom = FancyRoomBuilder.MakeFancyShop(
@@ -18,8 +18,7 @@ public class InsuranceBoi
             shopItems              : shopItems,
             moddedItems            : moddedItems,
             roomPath               : "CwaffingTheGungy/Resources/Rooms/BasicShopRoom2.newroom",
-            allowDupes             : false,
-            // allowDupes             : true,
+            allowDupes             : true,
             costModifier           : 2f / 9f, // insurance should cost 2/9 of 90 == 20 casings
             spawnChance            : 1.0f,
             spawnFloors            : Floors.CASTLEGEON,

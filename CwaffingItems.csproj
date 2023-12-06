@@ -84,7 +84,9 @@
     <Compile Include="src\Cwaff-Enemies\PathableBullet.cs"/>
     <Compile Include="src\Cwaff-Rooms\FancyRoomBuilder.cs"/>
     <Compile Include="src\Extensions.cs"/>
+    <Compile Include="src\Cwaff-NPCs\WhiteMage.cs"/>
     <Compile Include="src\Cwaff-NPCs\Bombo.cs"/>
+    <Compile Include="src\Cwaff-NPCs\WhiteMageScrapped.cs"/>
     <Compile Include="src\Cwaff-NPCs\InsuranceBoi.cs"/>
     <Compile Include="src\Cwaff-Debug\OneOffDebugDungeonFlow.cs"/>
     <Compile Include="src\Common.cs"/>
@@ -3705,7 +3707,9 @@
     <EmbeddedResource Include="Resources\NPCSprites\white_mage\white_mage_talk_001.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\white_mage\white_mage_talk_002.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\white_mage\white_mage_idle_002.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\white_mage\white_mage_carpet.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\white_mage\white_mage_icon.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\white_mage\white_mage_carpet-2023-12-05_19-35-13.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\insurance_boi\insurance_boi_talk.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\insurance_boi\insurance_boi_idle.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\insurance_boi\insurance_boi_icon.png"/>
@@ -3853,6 +3857,7 @@
     <EmbeddedResource Include="Resources\BeamSprites\subtractor_beam_red_mid_004.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\subtractor_beam_red_start_001.png"/>
     <EmbeddedResource Include="Resources\Rooms\BasicShopRoom.room"/>
+    <EmbeddedResource Include="Resources\Rooms\petshop.newroom"/>
     <EmbeddedResource Include="Resources\Rooms\BasicShopRoom.newroom"/>
     <EmbeddedResource Include="Resources\Rooms\BasicShopRoom2.newroom"/>
     <Reference Include="UnityEngine.ClothModule"/>

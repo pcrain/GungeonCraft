@@ -18,27 +18,18 @@ public static class CwaffEvents // global custom events we can listen for
 
     public static void Init()
     {
-        #region Set Up Hooks
-            new Hook(
-                typeof(Dungeon).GetMethod("FloorReached", BindingFlags.Instance | BindingFlags.Public),
-                typeof(CwaffEvents).GetMethod("FloorReachedHook"));
+        new Hook(
+            typeof(Dungeon).GetMethod("FloorReached", BindingFlags.Instance | BindingFlags.Public),
+            typeof(CwaffEvents).GetMethod("FloorReachedHook"));
 
-            new Hook(
-                typeof(GameManager).GetMethod("ClearActiveGameData", BindingFlags.Instance | BindingFlags.Public),
-                typeof(CwaffEvents).GetMethod("ClearActiveGameDataHook"));
+        new Hook(
+            typeof(GameManager).GetMethod("ClearActiveGameData", BindingFlags.Instance | BindingFlags.Public),
+            typeof(CwaffEvents).GetMethod("ClearActiveGameDataHook"));
 
-            new Hook(
-                typeof(GameManager).GetMethod("SetNextLevelIndex", BindingFlags.Instance | BindingFlags.Public),
-                typeof(CwaffEvents).GetMethod("SetNextLevelIndexHook"));
-
-
-        #endregion
-
-        #region Set Up Events
-            // OnRunStart += (_,_,_) => ETGModConsole.Log($"run started \\o/");
-        #endregion
+        new Hook(
+            typeof(GameManager).GetMethod("SetNextLevelIndex", BindingFlags.Instance | BindingFlags.Public),
+            typeof(CwaffEvents).GetMethod("SetNextLevelIndexHook"));
     }
-
 
     public static void SetNextLevelIndexHook(Action<GameManager, int> orig, GameManager self, int index)
     {

@@ -4,6 +4,7 @@ public enum CwaffPrerequisites
 {
   NONE,
   INSURANCE_PREREQUISITE,
+  WHITE_MAGE_PREREQUISITE,
   TEST_PREREQUISITE,
 }
 
