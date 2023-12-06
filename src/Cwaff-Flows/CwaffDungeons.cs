@@ -60,10 +60,10 @@ public class CwaffDungeons
     public static Dungeon GetOrLoadByNameHook(Func<string, Dungeon> orig, string name)
     {
         CwaffDungeons dungeonData;
-        ETGModConsole.Log($"attempting to find custom flow with name {name}");
+        // Lazy.DebugLog($"attempting to find custom flow with name {name}");
         if (!Flows.TryGetValue(name, out dungeonData))
             return orig(name);
-        ETGModConsole.Log($"  found {name}!!");
+        Lazy.DebugLog($"  found {name}!!");
 
         if (dungeonData.gameLevelDefinition != null && !GameManager.Instance.customFloors.Contains(dungeonData.gameLevelDefinition))
             GameManager.Instance.customFloors.Add(dungeonData.gameLevelDefinition); // fixes a bug where returning to the breach deletes the floor, thanks Bunny!
@@ -77,7 +77,7 @@ public class CwaffDungeons
             }
             catch (Exception e)
             {
-                ETGModConsole.Log($"exception: {e}");
+                Lazy.DebugLog($"  exception: {e}");
             }
         }
         return dungeon ?? orig(name);

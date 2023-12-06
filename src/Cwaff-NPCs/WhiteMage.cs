@@ -74,6 +74,8 @@ public class WhiteMage
             costModifier           : 0.5f,
             spawnChance            : 1.0f,
             spawnPrerequisite      : CwaffPrerequisites.WHITE_MAGE_PREREQUISITE,
+            // Guaranteed spawn on 1st floor
+            allowedTilesets        : (int)( GlobalDungeonData.ValidTilesets.CASTLEGEON ),
             // prequisiteValidator    : CwaffPrerequisite.OnFirstFloor,
             prequisiteValidator    : null,
             talkPointOffset        : C.PIXEL_SIZE * new Vector2(7, 22),
@@ -81,7 +83,7 @@ public class WhiteMage
             carpetOffset           : C.PIXEL_SIZE * new Vector2(-23, 0),  // half sprite width minus npc offset
             // carpetOffset           : C.PIXEL_SIZE * new Vector2(-128, -64),  // half sprite width minus npc offset
             itemPositions          : ShopAPI.defaultItemPositions.ShiftAll(C.PIXEL_SIZE * new Vector2(-25, 0)),
-            oncePerRun             : false,
+            exactlyOncePerRun      : true,
             // oncePerRun             : true,
             // voice                  : "sans", // will play audio "Play_CHR_<voice>_voice_01"
             genericDialog          : new(){

@@ -18,16 +18,21 @@ public static class QuickRestartRoomCacheHotfix
 
         if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdstr("Quick Restarting...")))
             return;
-
         cursor.Index++; // skip over Debug.Log() call
-        // cursor.Emit(OpCodes.Ldarg_0); // load the game manager
+
+        // if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCall<GameManager>("FlushAudio")))
+        //     return;
+
+        cursor.Emit(OpCodes.Ldarg_0); // load the game manager
         cursor.Emit(OpCodes.Call, typeof(QuickRestartRoomCacheHotfix).GetMethod("ForcePreprocessRunForQuickStart", BindingFlags.Static | BindingFlags.NonPublic));
     }
 
-    private static void ForcePreprocessRunForQuickStart()
+    private static void ForcePreprocessRunForQuickStart(GameManager gm)
     {
         // ETGModConsole.Log($"  forcibly preprocessing run");
-        GameManager.Instance.GlobalInjectionData.PreprocessRun();
+        if (!gm)
+            return;
+        gm.GlobalInjectionData.PreprocessRun();
     }
 }
 

@@ -35,14 +35,17 @@ public class Bart
             roomPath               : "CwaffingTheGungy/Resources/Rooms/barter.newroom",
             allowDupes             : false,
             costModifier           : 1f,
-            spawnChance            : 0.5f,
+            spawnChance            : 1.0f,
             spawnPrerequisite      : CwaffPrerequisites.BARTER_SHOP_PREREQUISITE,
+            // Guaranteed spawn on 2nd or 3rd floor
+            allowedTilesets        : (int)( GlobalDungeonData.ValidTilesets.GUNGEON | GlobalDungeonData.ValidTilesets.MINEGEON ),
+            prequisiteValidator    : CwaffPrerequisite.OnThirdFloor,
             // prequisiteValidator    : CwaffPrerequisite.NotOnFirstFloor,
-            prequisiteValidator    : null,
+            // prequisiteValidator    : null,
             talkPointOffset        : C.PIXEL_SIZE * new Vector2(7, 22 + 16),
             npcPosition            : C.PIXEL_SIZE * new Vector2(10, 60 + 16),
             itemPositions          : ShopAPI.defaultItemPositions.ShiftAll(C.PIXEL_SIZE * new Vector2(-25, 0 + 16)),
-            oncePerRun             : true,
+            exactlyOncePerRun      : false,
             // voice                  : "sans", // will play audio "Play_CHR_<voice>_voice_01"
             genericDialog          : new(){
                 "My trash is your treasure.",

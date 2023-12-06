@@ -27,7 +27,7 @@ public class InsuranceBoi
             talkPointOffset        : C.PIXEL_SIZE * new Vector2(7, 22),
             npcPosition            : C.PIXEL_SIZE * new Vector2(10, 60),
             itemPositions          : ShopAPI.defaultItemPositions.ShiftAll(C.PIXEL_SIZE * new Vector2(-25, 0)),
-            oncePerRun             : true,
+            exactlyOncePerRun      : true,
             // voice                  : "sans", // will play audio "Play_CHR_<voice>_voice_01"
             genericDialog          : new(){
                 "BUY SOMETHING PLEASE",

@@ -8,6 +8,8 @@ namespace CwaffingTheGungy;
 
 public class FancyShopData
 {
+  public const int DEFAULT_SHOP_FLOORS = 127;
+
   public GameObject shop;
   public TalkDoerLite owner;
   public PrototypeDungeonRoom room;
@@ -20,6 +22,7 @@ public static class FancyRoomBuilder
 
   public static Dictionary<string, PrototypeDungeonRoom> FancyShopRooms = new();
   public static Dictionary<GameObject, List<string>> DelayedModdedLootAdditions = new();
+
   // public static Vector3[] defaultItemPositions = new Vector3[] {
   //   new Vector3(1.125f, 2.125f, 1),
   //   new Vector3(2.625f, 1f, 1),
@@ -33,7 +36,7 @@ public static class FancyRoomBuilder
     List<String> genericDialog = null, List<String> stopperDialog = null, List<String> purchaseDialog = null,
     List<String> noSaleDialog = null, List<String> introDialog = null, List<String> attackedDialog = null, bool allowDupes = false,
     float mainPoolChance = 0.0f, Vector3? talkPointOffset = null, Vector3? npcPosition = null, List<Vector3> itemPositions = null,
-    bool oncePerRun = true, float costModifier = 1f,
+    bool exactlyOncePerRun = true, int allowedTilesets = 127, float costModifier = 1f,
     Func<CustomShopController, PlayerController, int, bool> customCanBuy = null,
     Func<CustomShopController, PlayerController, int, int> removeCurrency = null,
     Func<CustomShopController, CustomShopItemController, PickupObject, int> customPrice = null,
@@ -135,7 +138,8 @@ public static class FancyRoomBuilder
       addSingularPlaceable : shop,
       XFromCenter          : 0,
       YFromCenter          : 0,
-      oncePerRun           : oncePerRun
+      oncePerRun           : exactlyOncePerRun,
+      allowedTilesets      : allowedTilesets
       );
 
     // Defer initialization of modded items
@@ -235,7 +239,7 @@ public static class FancyRoomBuilder
   }
 
   public static void InjectRoomIntoUniquePool(PrototypeDungeonRoom protoroom, string injectionAnnotation, List<ProceduralFlowModifierData.FlowModifierPlacementType> placementRules, float chanceToLock, List<DungeonPrerequisite> prerequisites,
-     string injectorName, float selectionWeight = 1, float chanceToSpawn = 1, GameObject addSingularPlaceable = null, float XFromCenter = 0, float YFromCenter = 0, bool oncePerRun = false)
+     string injectorName, float selectionWeight = 1, float chanceToSpawn = 1, GameObject addSingularPlaceable = null, float XFromCenter = 0, float YFromCenter = 0, bool oncePerRun = false, int allowedTilesets = 127)
   {
       if (addSingularPlaceable != null)
       {
@@ -243,7 +247,7 @@ public static class FancyRoomBuilder
           Vector2 vector = new Vector2((float)(protoroom.Width / 2) + offset.x, (float)(protoroom.Height / 2) + offset.y);
 
           protoroom.placedObjectPositions.Add(vector);
-          DungeonPrerequisite[] array = new DungeonPrerequisite[0];
+          DungeonPrerequisite[] prereqArray = new DungeonPrerequisite[0];
 
           GameObject original = addSingularPlaceable;
           DungeonPlaceable placeableContents = ScriptableObject.CreateInstance<DungeonPlaceable>();
@@ -255,7 +259,7 @@ public static class FancyRoomBuilder
               {
                   percentChance = 1f,
                   nonDatabasePlaceable = original,
-                  prerequisites = array,
+                  prerequisites = prereqArray,
                   materialRequirements = new DungeonPlaceableRoomMaterialRequirement[0]
               }
           };
@@ -264,7 +268,7 @@ public static class FancyRoomBuilder
           {
               contentsBasePosition  = vector,
               fieldData             = new List<PrototypePlacedObjectFieldData>(),
-              instancePrerequisites = array,
+              instancePrerequisites = prereqArray,
               linkedTriggerAreaIDs  = new List<int>(),
               placeableContents     = placeableContents
 
@@ -283,7 +287,7 @@ public static class FancyRoomBuilder
           RequiresMasteryToken                   = false,
           chanceToLock                           = chanceToLock,
           selectionWeight                        = selectionWeight,
-          chanceToSpawn                          = chanceToSpawn,
+          chanceToSpawn                          = chanceToSpawn,  // chance this paricular room will spawn from the current SharedInjectionData room pool
           RequiredValidPlaceable                 = null,
           prerequisites                          = prerequisites.ToArray(),
           CanBeForcedSecret                      = true,
@@ -292,6 +296,14 @@ public static class FancyRoomBuilder
           framedCombatNodes                      = 0,
       };
 
+      int numValidTilesets = 0;
+      GlobalDungeonData.ValidTilesets[] array = Enum.GetValues(typeof(GlobalDungeonData.ValidTilesets)) as GlobalDungeonData.ValidTilesets[];
+      foreach (GlobalDungeonData.ValidTilesets tileset in array)
+      {
+        if (((int)tileset & allowedTilesets) == (int)tileset)
+          ++numValidTilesets;
+      }
+
       SharedInjectionData injector = new SharedInjectionData(){
         name                                  = injectorName,
         UseInvalidWeightAsNoInjection         = true,
@@ -299,25 +311,26 @@ public static class FancyRoomBuilder
         IsNPCCell                             = false,
         IgnoreUnmetPrerequisiteEntries        = false,
         OnlyOne                               = oncePerRun,
-        ChanceToSpawnOne                      = 1.0f,
+        ChanceToSpawnOne                      = 1.0f /* / numValidTilesets*/,  // chance the MetaInjection will spawn this sharedInjection data on the current floor
         AttachedInjectionData                 = new List<SharedInjectionData>(),
         InjectionData                         = new List<ProceduralFlowModifierData> {
             injection
         }
       };
+      Lazy.DebugLog($"  there are {numValidTilesets} valid tilesets for this shop");
 
       GameManager.Instance.GlobalInjectionData.entries.Add(new MetaInjectionDataEntry{
         injectionData                    = injector,
-        MinToAppearPerRun                = 1,
-        MaxToAppearPerRun                = oncePerRun ? 1 : 2,  // if this number is lower than the number of enabled tilesets in validTilesets, everything will break
-        OverallChanceToTrigger           = 1f,
+        MinToAppearPerRun                = oncePerRun ? 1 : numValidTilesets,
+        MaxToAppearPerRun                = oncePerRun ? 1 : numValidTilesets,  // if this number is lower than the number of enabled tilesets in validTilesets, everything will break
+        OverallChanceToTrigger           = 1f, // chance this particular MetaInjectionDataEntry is present in the current run at all
         UsesUnlockedChanceToTrigger      = false,
         UnlockedChancesToTrigger         = new MetaInjectionUnlockedChanceEntry[0]{},
         UsesWeightedNumberToAppearPerRun = false,
         WeightedNumberToAppear           = new(),
         AllowBonusSecret                 = false,
         IsPartOfExcludedCastleSet        = false,
-        validTilesets                    = GlobalDungeonData.ValidTilesets.CASTLEGEON // only the first floor
+        validTilesets                    = (GlobalDungeonData.ValidTilesets)allowedTilesets // only the first floor
         // validTilesets                    = (GlobalDungeonData.ValidTilesets)127 // everything before Bullet Hell
       });
   }

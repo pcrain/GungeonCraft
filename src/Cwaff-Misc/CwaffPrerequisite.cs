@@ -29,7 +29,7 @@ public class CwaffPrerequisite : CustomDungeonPrerequisite
 
   public static void ResetPerRunPrerequisites()
   {
-    Lazy.DebugLog($"  clearing spawn conditions");
+    // Lazy.DebugLog($"  clearing spawn conditions");
     foreach (SpawnConditions spawn in SpawnConditions)
     {
       if (spawn != null)
@@ -53,7 +53,7 @@ public class CwaffPrerequisite : CustomDungeonPrerequisite
   {
     // Debug.Log("CHECKING PREREQS NOW");
     SpawnConditions conditions = SpawnConditions[(int)prerequisite];
-    // Lazy.DebugLog($"checking prereqs for {Enum.GetName(typeof(CwaffPrerequisites), prerequisite)}");
+    Lazy.DebugLog($"checking prereqs for {Enum.GetName(typeof(CwaffPrerequisites), prerequisite)}");
     if (prerequisite == CwaffPrerequisites.NONE || conditions == null)
     {
       // ETGModConsole.Log($"  auto-pass");
@@ -65,7 +65,7 @@ public class CwaffPrerequisite : CustomDungeonPrerequisite
       return true;
     }
     bool passed = conditions.validator();
-    // ETGModConsole.Log($"  passed? {passed}");
+    ETGModConsole.Log($"  passed? {passed}");
     return passed;
   }
 
@@ -87,6 +87,12 @@ public class CwaffPrerequisite : CustomDungeonPrerequisite
   {
       string levelBeingLoaded = GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName;
       return levelBeingLoaded == "tt5";
+  }
+
+  public static bool OnThirdFloor()
+  {
+      string levelBeingLoaded = GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName;
+      return levelBeingLoaded == "tt_mines";
   }
 
   // Prerequisite tracker to be attached to game objects to count how many times they've spawned in a run, etc.
