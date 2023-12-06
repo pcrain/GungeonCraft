@@ -28,7 +28,7 @@ public static class FancyRoomBuilder
   private static List<string> _DefaultLine = new(){"Buy somethin', will ya!"};
 
   public static FancyShopData MakeFancyShop(string npcName, List<int> shopItems, string roomPath, List<string> moddedItems = null,
-    float spawnChance = 1f, Floors? spawnFloors = null, Vector2? carpetOffset = null,
+    float spawnChance = 1f, Vector2? carpetOffset = null,
     CwaffPrerequisites spawnPrerequisite = CwaffPrerequisites.NONE, SpawnCondition prequisiteValidator = null, string voice = null,
     List<String> genericDialog = null, List<String> stopperDialog = null, List<String> purchaseDialog = null,
     List<String> noSaleDialog = null, List<String> introDialog = null, List<String> attackedDialog = null, bool allowDupes = false,
@@ -55,7 +55,7 @@ public static class FancyRoomBuilder
     $"#{npcNameUpper}_ATTACKED_TALK".SetupDBStrings(attackedDialog ?? _DefaultLine);
 
     List<DungeonPrerequisite> dungeonPrerequisites = new(){
-      new CwaffPrerequisite { prerequisite = spawnPrerequisite.SetupPrerequisite(prequisiteValidator, oncePerRun) }
+      new CwaffPrerequisite { prerequisite = spawnPrerequisite.SetupPrerequisite(prequisiteValidator) }
     };
 
     string currencyIcon = ResMap.Get($"{npcName}_currency", quietFailure: true)?[0];
@@ -89,11 +89,9 @@ public static class FancyRoomBuilder
       CustomCanBuy                      : customCanBuy,
       CustomRemoveCurrency              : removeCurrency,
       CustomPrice                       : customPrice,
-      // CustomPrice                       : HealthTraderCustomPrice,
       OnPurchase                        : onPurchase,
       OnSteal                           : onSteal,
-      currencyIconPath                  : currencyIcon/*""*/,
-      // currencyIconPath                  : "",
+      currencyIconPath                  : currencyIcon,
       currencyName                      : "",
       // currencyName                      : "ui_coin",
       canBeRobbed                       : true,
@@ -124,7 +122,8 @@ public static class FancyRoomBuilder
     PrototypeDungeonRoom shopRoom = RoomFactory.BuildNewRoomFromResource(roomPath: roomPath).room;
 
     // ShopAPI.RegisterShopRoom(shop: shop, protoroom: shopRoom, vector: new Vector2((float)(shopRoom.Width / 2), (float)(shopRoom.Height / 2)));
-    RoomFactory.AddInjection(
+    // RoomFactory.AddInjection(
+    InjectRoomIntoUniquePool(
       protoroom            : shopRoom,
       injectionAnnotation  : $"{npcName}'s Shop Room",
       placementRules       : new() { ProceduralFlowModifierData.FlowModifierPlacementType.END_OF_CHAIN },
@@ -135,31 +134,28 @@ public static class FancyRoomBuilder
       chanceToSpawn        : spawnChance,
       addSingularPlaceable : shop,
       XFromCenter          : 0,
-      YFromCenter          : 0
+      YFromCenter          : 0,
+      oncePerRun           : oncePerRun
       );
 
     // Defer initialization of modded items
     DelayedModdedLootAdditions[shop] = moddedItems;
 
+    // Return some useful FancyShopData
     FancyShopRooms[npcName] = shopRoom;
     return new FancyShopData(){
-      shop = shop,
-      room = shopRoom,
+      shop  = shop,
+      room  = shopRoom,
       owner = npc,
-      loot = lootTable
+      loot  = lootTable
     };
   }
 
-  // public static int HealthTraderCustomPrice(CustomShopController shop, CustomShopItemController itemCont, PickupObject item)
-  // {
-  //   return 5;
-  // }
-
   // Extension for checking shop activation conditions using CwaffPrerequisite and returning CwaffPrerequisite for inline setup
-  public static CwaffPrerequisites SetupPrerequisite(this CwaffPrerequisites prereq, FancyRoomBuilder.SpawnCondition validator, bool oncePerRun)
+  public static CwaffPrerequisites SetupPrerequisite(this CwaffPrerequisites prereq, FancyRoomBuilder.SpawnCondition validator)
   {
     if (prereq != CwaffPrerequisites.NONE)
-      CwaffPrerequisite.AddPrequisiteValidator(prereq, validator, oncePerRun);
+      CwaffPrerequisite.AddPrequisiteValidator(prereq, validator);
     else if (validator != null)
       ETGModConsole.Log($"ATTEMPTED TO SET UP VALIDATOR FOR PREREQUISITE == NONE");
     return prereq;
@@ -228,7 +224,7 @@ public static class FancyRoomBuilder
       RequiredValidPlaceable = null,
       prerequisites = new DungeonPrerequisite[]
       {
-        new CwaffPrerequisite { prerequisite = CwaffPrerequisites.TEST_PREREQUISITE.SetupPrerequisite(validator: null, oncePerRun: false) }
+        new CwaffPrerequisite { prerequisite = CwaffPrerequisites.TEST_PREREQUISITE.SetupPrerequisite(validator: null) }
       },
       CanBeForcedSecret = false,
       RandomNodeChildMinDistanceFromEntrance = 0,
@@ -236,5 +232,93 @@ public static class FancyRoomBuilder
       framedCombatNodes = 0,
     };
     return SpecProcData;
+  }
+
+  public static void InjectRoomIntoUniquePool(PrototypeDungeonRoom protoroom, string injectionAnnotation, List<ProceduralFlowModifierData.FlowModifierPlacementType> placementRules, float chanceToLock, List<DungeonPrerequisite> prerequisites,
+     string injectorName, float selectionWeight = 1, float chanceToSpawn = 1, GameObject addSingularPlaceable = null, float XFromCenter = 0, float YFromCenter = 0, bool oncePerRun = false)
+  {
+      if (addSingularPlaceable != null)
+      {
+          Vector2 offset = new Vector2(-0.75f, -0.75f);
+          Vector2 vector = new Vector2((float)(protoroom.Width / 2) + offset.x, (float)(protoroom.Height / 2) + offset.y);
+
+          protoroom.placedObjectPositions.Add(vector);
+          DungeonPrerequisite[] array = new DungeonPrerequisite[0];
+
+          GameObject original = addSingularPlaceable;
+          DungeonPlaceable placeableContents = ScriptableObject.CreateInstance<DungeonPlaceable>();
+          placeableContents.width = 2;
+          placeableContents.height = 2;
+          placeableContents.respectsEncounterableDifferentiator = true;
+          placeableContents.variantTiers = new List<DungeonPlaceableVariant> {
+              new DungeonPlaceableVariant
+              {
+                  percentChance = 1f,
+                  nonDatabasePlaceable = original,
+                  prerequisites = array,
+                  materialRequirements = new DungeonPlaceableRoomMaterialRequirement[0]
+              }
+          };
+
+          protoroom.placedObjects.Add(new PrototypePlacedObjectData
+          {
+              contentsBasePosition  = vector,
+              fieldData             = new List<PrototypePlacedObjectFieldData>(),
+              instancePrerequisites = array,
+              linkedTriggerAreaIDs  = new List<int>(),
+              placeableContents     = placeableContents
+
+          });
+      }
+
+      ProceduralFlowModifierData injection = new ProceduralFlowModifierData()
+      {
+          annotation                             = injectionAnnotation,
+          DEBUG_FORCE_SPAWN                      = false,
+          OncePerRun                             = oncePerRun,
+          placementRules                         = new List<ProceduralFlowModifierData.FlowModifierPlacementType>(placementRules),
+          roomTable                              = null,
+          exactRoom                              = protoroom,
+          IsWarpWing                             = false,
+          RequiresMasteryToken                   = false,
+          chanceToLock                           = chanceToLock,
+          selectionWeight                        = selectionWeight,
+          chanceToSpawn                          = chanceToSpawn,
+          RequiredValidPlaceable                 = null,
+          prerequisites                          = prerequisites.ToArray(),
+          CanBeForcedSecret                      = true,
+          RandomNodeChildMinDistanceFromEntrance = 0,
+          exactSecondaryRoom                     = null,
+          framedCombatNodes                      = 0,
+      };
+
+      SharedInjectionData injector = new SharedInjectionData(){
+        name                                  = injectorName,
+        UseInvalidWeightAsNoInjection         = true,
+        PreventInjectionOfFailedPrerequisites = false,
+        IsNPCCell                             = false,
+        IgnoreUnmetPrerequisiteEntries        = false,
+        OnlyOne                               = oncePerRun,
+        ChanceToSpawnOne                      = 1.0f,
+        AttachedInjectionData                 = new List<SharedInjectionData>(),
+        InjectionData                         = new List<ProceduralFlowModifierData> {
+            injection
+        }
+      };
+
+      GameManager.Instance.GlobalInjectionData.entries.Add(new MetaInjectionDataEntry{
+        injectionData                    = injector,
+        MinToAppearPerRun                = 1,
+        MaxToAppearPerRun                = oncePerRun ? 1 : 2,  // if this number is lower than the number of enabled tilesets in validTilesets, everything will break
+        OverallChanceToTrigger           = 1f,
+        UsesUnlockedChanceToTrigger      = false,
+        UnlockedChancesToTrigger         = new MetaInjectionUnlockedChanceEntry[0]{},
+        UsesWeightedNumberToAppearPerRun = false,
+        WeightedNumberToAppear           = new(),
+        AllowBonusSecret                 = false,
+        IsPartOfExcludedCastleSet        = false,
+        validTilesets                    = GlobalDungeonData.ValidTilesets.CASTLEGEON // only the first floor
+        // validTilesets                    = (GlobalDungeonData.ValidTilesets)127 // everything before Bullet Hell
+      });
   }
 }

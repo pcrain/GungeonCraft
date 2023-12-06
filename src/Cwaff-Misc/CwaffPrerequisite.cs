@@ -12,7 +12,6 @@ public enum CwaffPrerequisites
 public class SpawnConditions
 {
   public FancyRoomBuilder.SpawnCondition validator     = null;
-  public bool                            oncePerRun    = false;
   public int                             spawnsThisRun = 0;
 }
 
@@ -30,6 +29,7 @@ public class CwaffPrerequisite : CustomDungeonPrerequisite
 
   public static void ResetPerRunPrerequisites()
   {
+    Lazy.DebugLog($"  clearing spawn conditions");
     foreach (SpawnConditions spawn in SpawnConditions)
     {
       if (spawn != null)
@@ -37,7 +37,7 @@ public class CwaffPrerequisite : CustomDungeonPrerequisite
     }
   }
 
-  public static void AddPrequisiteValidator(CwaffPrerequisites prereq, FancyRoomBuilder.SpawnCondition validator, bool oncePerRun)
+  public static void AddPrequisiteValidator(CwaffPrerequisites prereq, FancyRoomBuilder.SpawnCondition validator)
   {
     if (SpawnConditions[(int)prereq] != null)
     {
@@ -46,7 +46,6 @@ public class CwaffPrerequisite : CustomDungeonPrerequisite
     }
     SpawnConditions[(int)prereq] = new SpawnConditions(){
       validator  = validator,
-      oncePerRun = oncePerRun,
     };
   }
 
@@ -54,16 +53,11 @@ public class CwaffPrerequisite : CustomDungeonPrerequisite
   {
     // Debug.Log("CHECKING PREREQS NOW");
     SpawnConditions conditions = SpawnConditions[(int)prerequisite];
-    // ETGModConsole.Log($"checking prereqs for {Enum.GetName(typeof(CwaffPrerequisites), prerequisite)}");
+    // Lazy.DebugLog($"checking prereqs for {Enum.GetName(typeof(CwaffPrerequisites), prerequisite)}");
     if (prerequisite == CwaffPrerequisites.NONE || conditions == null)
     {
       // ETGModConsole.Log($"  auto-pass");
       return true;
-    }
-    if (conditions.oncePerRun && conditions.spawnsThisRun > 0)
-    {
-      // ETGModConsole.Log($"  failed: already spawned this run");
-      return false; // cannot spawn this run
     }
     if (conditions.validator == null)
     {
@@ -80,6 +74,13 @@ public class CwaffPrerequisite : CustomDungeonPrerequisite
   {
       string levelBeingLoaded = GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName;
       return levelBeingLoaded == "tt_castle";
+  }
+
+  // Predicate checker functions
+  public static bool NotOnFirstFloor()
+  {
+      string levelBeingLoaded = GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName;
+      return levelBeingLoaded != "tt_castle";
   }
 
   public static bool OnSecondFloor()

@@ -35,10 +35,10 @@ public class Bart
             roomPath               : "CwaffingTheGungy/Resources/Rooms/barter.newroom",
             allowDupes             : false,
             costModifier           : 1f,
-            spawnChance            : 1.0f,
-            spawnFloors            : Floors.CASTLEGEON,
-            spawnPrerequisite      : CwaffPrerequisites.INSURANCE_PREREQUISITE,
-            prequisiteValidator    : CwaffPrerequisite.OnFirstFloor,
+            spawnChance            : 0.5f,
+            spawnPrerequisite      : CwaffPrerequisites.BARTER_SHOP_PREREQUISITE,
+            // prequisiteValidator    : CwaffPrerequisite.NotOnFirstFloor,
+            prequisiteValidator    : null,
             talkPointOffset        : C.PIXEL_SIZE * new Vector2(7, 22 + 16),
             npcPosition            : C.PIXEL_SIZE * new Vector2(10, 60 + 16),
             itemPositions          : ShopAPI.defaultItemPositions.ShiftAll(C.PIXEL_SIZE * new Vector2(-25, 0 + 16)),
@@ -163,10 +163,10 @@ public class BarteringPriceFixer : MonoBehaviour
 {
     private void Start()
     {
-        if (!base.gameObject?.transform?.parent)
+        if (base.gameObject?.transform?.parent is not Transform shopTransdorm)
             return;
-        ETGModConsole.Log($"Fixing barter prices!");
-        foreach (Transform child in base.gameObject.transform.parent)
+        Lazy.DebugLog($"Fixing barter prices!");
+        foreach (Transform child in shopTransdorm)
         {
             CustomShopItemController[] shopItems =child?.gameObject?.GetComponentsInChildren<CustomShopItemController>();
             if ((shopItems?.Length ?? 0) == 0)

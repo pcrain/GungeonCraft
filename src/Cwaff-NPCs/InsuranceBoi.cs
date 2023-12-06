@@ -21,7 +21,6 @@ public class InsuranceBoi
             allowDupes             : true,
             costModifier           : 2f / 9f, // insurance should cost 2/9 of 90 == 20 casings
             spawnChance            : 1.0f,
-            spawnFloors            : Floors.CASTLEGEON,
             spawnPrerequisite      : CwaffPrerequisites.INSURANCE_PREREQUISITE,
             prequisiteValidator    : CwaffPrerequisite.OnFirstFloor,
             // spawnPrequisiteChecker : null,

@@ -1,5 +1,36 @@
 namespace CwaffingTheGungy;
 
+// Quick restart doesn't call PreprcoessRun(), so once-per-run rooms will never respawn until you return to the Breach
+// GameManager.Instance.GlobalInjectionData.PreprocessRun();
+public static class QuickRestartRoomCacheHotfix
+{
+    public static void Init()
+    {
+        new ILHook(
+            typeof(GameManager).GetMethod("QuickRestart", BindingFlags.Instance | BindingFlags.Public),
+            OnQuickRestartIL
+            );
+    }
+
+    private static void OnQuickRestartIL(ILContext il)
+    {
+        ILCursor cursor = new ILCursor(il);
+
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdstr("Quick Restarting...")))
+            return;
+
+        cursor.Index++; // skip over Debug.Log() call
+        // cursor.Emit(OpCodes.Ldarg_0); // load the game manager
+        cursor.Emit(OpCodes.Call, typeof(QuickRestartRoomCacheHotfix).GetMethod("ForcePreprocessRunForQuickStart", BindingFlags.Static | BindingFlags.NonPublic));
+    }
+
+    private static void ForcePreprocessRunForQuickStart()
+    {
+        // ETGModConsole.Log($"  forcibly preprocessing run");
+        GameManager.Instance.GlobalInjectionData.PreprocessRun();
+    }
+}
+
 // Duct tape gun ids aren't serialized, so dropping them clears out the duct tape gun list and breaks save serialization
 public static class DuctTapeSaveLoadHotfix
 {

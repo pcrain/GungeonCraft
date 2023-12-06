@@ -224,6 +224,17 @@ public class Initialisation : BaseUnityPlugin
                 // InsuranceBoi.Init();
                 WhiteMage.Init();
                 Bart.Init();
+                // CwaffEvents.OnCleanStart += () => {
+                //     ETGModConsole.Log($"  we have {GameManager.Instance.GlobalInjectionData.entries.Count} entries");
+                //     foreach (MetaInjectionDataEntry m in GameManager.Instance.GlobalInjectionData.entries)
+                //     {
+                //         ETGModConsole.Log($"  is null? {m == null}");
+                //         ETGModConsole.Log($"    has injectionData? {m?.injectionData == null}");
+                //         ETGModConsole.Log($"    has flow data? {m?.injectionData?.InjectionData == null}");
+                //         ETGModConsole.Log($"    how much? {m?.injectionData?.InjectionData?.Count ?? -1}");
+                //         ETGModConsole.Log($"    annotation? {m?.injectionData?.InjectionData?[0]?.annotation ?? null}");
+                //     }
+                // };
             #endregion
 
             #region Fancy NPCs
@@ -322,6 +333,7 @@ public class Initialisation : BaseUnityPlugin
             LargeGunAnimationHotfix.Init();
             DuctTapeSaveLoadHotfix.Init();
             // CoopDrillSoftlockHotfix.Init(); // incomplete
+            QuickRestartRoomCacheHotfix.Init();
 
             watch.Stop();
             ETGModConsole.Log($"Yay! :D Initialized <color=#aaffaaff>{C.MOD_NAME} v{C.MOD_VERSION}</color> in "+(watch.ElapsedMilliseconds/1000.0f)+" seconds");
