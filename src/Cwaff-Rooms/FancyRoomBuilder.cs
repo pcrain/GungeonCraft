@@ -18,7 +18,7 @@ public class FancyShopData
 
 public static class FancyRoomBuilder
 {
-  public delegate bool SpawnCondition();
+  public delegate bool SpawnCondition(SpawnConditions conds);
 
   public static Dictionary<string, PrototypeDungeonRoom> FancyShopRooms = new();
   public static Dictionary<GameObject, List<string>> DelayedModdedLootAdditions = new();
@@ -301,7 +301,10 @@ public static class FancyRoomBuilder
       foreach (GlobalDungeonData.ValidTilesets tileset in array)
       {
         if (((int)tileset & allowedTilesets) == (int)tileset)
+        {
+          // Lazy.DebugLog($"  have tileset {Enum.GetName(typeof(GlobalDungeonData.ValidTilesets), tileset)}");
           ++numValidTilesets;
+        }
       }
 
       SharedInjectionData injector = new SharedInjectionData(){
@@ -317,7 +320,7 @@ public static class FancyRoomBuilder
             injection
         }
       };
-      Lazy.DebugLog($"  there are {numValidTilesets} valid tilesets for this shop");
+      // Lazy.DebugLog($"  there are {numValidTilesets} valid tilesets for this shop");
 
       GameManager.Instance.GlobalInjectionData.entries.Add(new MetaInjectionDataEntry{
         injectionData                    = injector,
@@ -330,7 +333,7 @@ public static class FancyRoomBuilder
         WeightedNumberToAppear           = new(),
         AllowBonusSecret                 = false,
         IsPartOfExcludedCastleSet        = false,
-        validTilesets                    = (GlobalDungeonData.ValidTilesets)allowedTilesets // only the first floor
+        validTilesets                    = (GlobalDungeonData.ValidTilesets)allowedTilesets // this is virtually useless since Gungeon uses GenerationShuffle(), which will never shuffle 2-element lists
         // validTilesets                    = (GlobalDungeonData.ValidTilesets)127 // everything before Bullet Hell
       });
   }

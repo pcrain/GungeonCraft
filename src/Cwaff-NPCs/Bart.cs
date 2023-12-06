@@ -39,13 +39,12 @@ public class Bart
             spawnPrerequisite      : CwaffPrerequisites.BARTER_SHOP_PREREQUISITE,
             // Guaranteed spawn on 2nd or 3rd floor
             allowedTilesets        : (int)( GlobalDungeonData.ValidTilesets.GUNGEON | GlobalDungeonData.ValidTilesets.MINEGEON ),
-            prequisiteValidator    : CwaffPrerequisite.OnThirdFloor,
-            // prequisiteValidator    : CwaffPrerequisite.NotOnFirstFloor,
-            // prequisiteValidator    : null,
+            prequisiteValidator    : null,
             talkPointOffset        : C.PIXEL_SIZE * new Vector2(7, 22 + 16),
             npcPosition            : C.PIXEL_SIZE * new Vector2(10, 60 + 16),
             itemPositions          : ShopAPI.defaultItemPositions.ShiftAll(C.PIXEL_SIZE * new Vector2(-25, 0 + 16)),
-            exactlyOncePerRun      : false,
+            // exactlyOncePerRun      : false,  // completely busted past the first floor for some reason, do not set to true
+            exactlyOncePerRun      : true,
             // voice                  : "sans", // will play audio "Play_CHR_<voice>_voice_01"
             genericDialog          : new(){
                 "My trash is your treasure.",
@@ -86,6 +85,16 @@ public class Bart
 
         _BarterTable = shop.loot;
         shop.owner.gameObject.AddComponent<BarteringPriceFixer>();
+    }
+
+    public static bool OnSecondOrThirdFloor(SpawnConditions conds)
+    {
+      string levelBeingLoaded = GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName;
+      if (levelBeingLoaded == "tt5")
+        return conds.randomNumberForThisRun < 0.5f;
+      if (levelBeingLoaded == "tt_mines")
+        return conds.randomNumberForThisRun >= 0.5f;
+      return false;
     }
 
     internal static void SetupBarterTable()
@@ -168,7 +177,7 @@ public class BarteringPriceFixer : MonoBehaviour
     {
         if (base.gameObject?.transform?.parent is not Transform shopTransdorm)
             return;
-        Lazy.DebugLog($"Fixing barter prices!");
+        // Lazy.DebugLog($"Fixing barter prices!");
         foreach (Transform child in shopTransdorm)
         {
             CustomShopItemController[] shopItems =child?.gameObject?.GetComponentsInChildren<CustomShopItemController>();

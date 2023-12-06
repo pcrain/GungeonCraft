@@ -1,5 +1,37 @@
 namespace CwaffingTheGungy;
 
+// All 3 of Gungeon's list-shuffling implementations are flawed due to off by one errors, so we need to fix them
+//   We can't hook generic methods directly, so focus on GenerationShuffle<int>(), which is the main issue for floor room generation
+public static class RoomShuffleOffByOneHotfix
+{
+    public static void Init()
+    {
+        new ILHook(
+            typeof(BraveUtility).GetMethod("GenerationShuffle", BindingFlags.Static | BindingFlags.Public).MakeGenericMethod(typeof(int)),
+            GenerationShuffleFixIL
+            );
+    }
+
+    private static void GenerationShuffleFixIL(ILContext il)
+    {
+        ILCursor cursor = new ILCursor(il);
+        // cursor.DumpILOnce("GenerationShuffleFixIL");
+
+        // GenerationRandomRange(0, num) should be GenerationRandomRange(0, num + 1)
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdloc(0)))
+            return;
+        cursor.Emit(OpCodes.Ldc_I4_1);
+        cursor.Emit(OpCodes.Add);
+
+        // num > 1 should be num >= 1
+        ILLabel forLabel = null;
+        if (!cursor.TryGotoNext(MoveType.Before, instr => instr.MatchBgt(out forLabel)))
+            return;
+        cursor.Remove();
+        cursor.Emit(OpCodes.Bge, forLabel);
+    }
+}
+
 // Quick restart doesn't call PreprcoessRun(), so once-per-run rooms will never respawn until you return to the Breach
 // GameManager.Instance.GlobalInjectionData.PreprocessRun();
 public static class QuickRestartRoomCacheHotfix

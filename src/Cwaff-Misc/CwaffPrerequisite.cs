@@ -11,8 +11,9 @@ public enum CwaffPrerequisites
 
 public class SpawnConditions
 {
-  public FancyRoomBuilder.SpawnCondition validator     = null;
-  public int                             spawnsThisRun = 0;
+  public FancyRoomBuilder.SpawnCondition validator              = null;
+  public int                             spawnsThisRun          = 0;
+  public float                           randomNumberForThisRun = 0.0f;
 }
 
 public class CwaffPrerequisite : CustomDungeonPrerequisite
@@ -32,8 +33,10 @@ public class CwaffPrerequisite : CustomDungeonPrerequisite
     // Lazy.DebugLog($"  clearing spawn conditions");
     foreach (SpawnConditions spawn in SpawnConditions)
     {
-      if (spawn != null)
-        spawn.spawnsThisRun = 0;
+      if (spawn == null)
+        continue;
+      spawn.spawnsThisRun          = 0;
+      spawn.randomNumberForThisRun = UnityEngine.Random.value;
     }
   }
 
@@ -45,15 +48,16 @@ public class CwaffPrerequisite : CustomDungeonPrerequisite
       return;
     }
     SpawnConditions[(int)prereq] = new SpawnConditions(){
-      validator  = validator,
+      validator              = validator,
+      spawnsThisRun          = 0,
+      randomNumberForThisRun = UnityEngine.Random.value,
     };
   }
 
   public override bool CheckConditionsFulfilled()
   {
-    // Debug.Log("CHECKING PREREQS NOW");
     SpawnConditions conditions = SpawnConditions[(int)prerequisite];
-    Lazy.DebugLog($"checking prereqs for {Enum.GetName(typeof(CwaffPrerequisites), prerequisite)}");
+    // Lazy.DebugLog($"checking prereqs for {Enum.GetName(typeof(CwaffPrerequisites), prerequisite)}");
     if (prerequisite == CwaffPrerequisites.NONE || conditions == null)
     {
       // ETGModConsole.Log($"  auto-pass");
@@ -64,32 +68,32 @@ public class CwaffPrerequisite : CustomDungeonPrerequisite
       // ETGModConsole.Log($"  auto-pass");
       return true;
     }
-    bool passed = conditions.validator();
-    ETGModConsole.Log($"  passed? {passed}");
+    bool passed = conditions.validator(conditions);
+    // ETGModConsole.Log($"  passed? {passed}");
     return passed;
   }
 
   // Predicate checker functions
-  public static bool OnFirstFloor()
+  public static bool OnFirstFloor(SpawnConditions conds)
   {
       string levelBeingLoaded = GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName;
       return levelBeingLoaded == "tt_castle";
   }
 
   // Predicate checker functions
-  public static bool NotOnFirstFloor()
+  public static bool NotOnFirstFloor(SpawnConditions conds)
   {
       string levelBeingLoaded = GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName;
       return levelBeingLoaded != "tt_castle";
   }
 
-  public static bool OnSecondFloor()
+  public static bool OnSecondFloor(SpawnConditions conds)
   {
       string levelBeingLoaded = GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName;
       return levelBeingLoaded == "tt5";
   }
 
-  public static bool OnThirdFloor()
+  public static bool OnThirdFloor(SpawnConditions conds)
   {
       string levelBeingLoaded = GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName;
       return levelBeingLoaded == "tt_mines";

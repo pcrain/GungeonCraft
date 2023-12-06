@@ -334,6 +334,7 @@ public class Initialisation : BaseUnityPlugin
             DuctTapeSaveLoadHotfix.Init();
             // CoopDrillSoftlockHotfix.Init(); // incomplete
             QuickRestartRoomCacheHotfix.Init();
+            RoomShuffleOffByOneHotfix.Init();
 
             watch.Stop();
             ETGModConsole.Log($"Yay! :D Initialized <color=#aaffaaff>{C.MOD_NAME} v{C.MOD_VERSION}</color> in "+(watch.ElapsedMilliseconds/1000.0f)+" seconds");

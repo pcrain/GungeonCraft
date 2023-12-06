@@ -76,7 +76,6 @@ public class WhiteMage
             spawnPrerequisite      : CwaffPrerequisites.WHITE_MAGE_PREREQUISITE,
             // Guaranteed spawn on 1st floor
             allowedTilesets        : (int)( GlobalDungeonData.ValidTilesets.CASTLEGEON ),
-            // prequisiteValidator    : CwaffPrerequisite.OnFirstFloor,
             prequisiteValidator    : null,
             talkPointOffset        : C.PIXEL_SIZE * new Vector2(7, 22),
             npcPosition            : C.PIXEL_SIZE * new Vector2(10, 60),
