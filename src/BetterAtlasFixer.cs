@@ -1,5 +1,6 @@
 namespace CwaffingTheGungy;
 
+// Temporary class for speeding up adding sprites to the Atlas until it's merged into Alexandria
 public static class AtlasFixer
 {
     public static string BetterAddCustomCurrencyType(string ammoTypeSpritePath, string name, Assembly assembly = null)
@@ -147,34 +148,27 @@ public static class AtlasFixer
     /// <param name="atlas">The <see cref="dfAtlas"/> to resize/</param>
     /// <param name="newDimensions"><paramref name="atlas"/>'s new size.</param>
     public static void FastResizeAtlas(this dfAtlas atlas, IntVector2 newDimensions)
+    {
+        Texture2D tex = atlas.Texture;
+        if (!tex.IsReadable())
+            return;
+        if (tex.width == newDimensions.x && tex.height == newDimensions.y)
+            return;
+        foreach (dfAtlas.ItemInfo item in atlas.Items)
         {
-            Texture2D tex = atlas.Texture;
-            if (!tex.IsReadable())
+            if (item.region != null)
             {
-                return;
+                item.region.x = (item.region.x * tex.width) / newDimensions.x;
+                item.region.y = (item.region.y * tex.height) / newDimensions.y;
+                item.region.width = (item.region.width * tex.width) / newDimensions.x;
+                item.region.height = (item.region.height * tex.height) / newDimensions.y;
             }
-            if (tex.width == newDimensions.x && tex.height == newDimensions.y)
-            {
-                return;
-            }
-            foreach (dfAtlas.ItemInfo item in atlas.Items)
-            {
-                if (item.region != null)
-                {
-                    item.region.x = (item.region.x * tex.width) / newDimensions.x;
-                    item.region.y = (item.region.y * tex.height) / newDimensions.y;
-                    item.region.width = (item.region.width * tex.width) / newDimensions.x;
-                    item.region.height = (item.region.height * tex.height) / newDimensions.y;
-                }
-            }
-            tex.FastResizeBetter(newDimensions.x, newDimensions.y);
-            atlas.Material.SetTexture("_MainTex", tex);
         }
+        tex.FastResizeBetter(newDimensions.x, newDimensions.y);
+        atlas.Material.SetTexture("_MainTex", tex);
+    }
 
-
-
-
-        /// <summary>
+    /// <summary>
     /// Resizes <paramref name="tex"/> without it losing it's pixel information.
     /// </summary>
     /// <param name="tex">The <see cref="Texture2D"/> to resize.</param>
@@ -183,54 +177,15 @@ public static class AtlasFixer
     /// <returns></returns>
     public static bool FastResizeBetter(this Texture2D tex, int width, int height, bool center = false)
     {
-        if (tex.IsReadable())
-        {
-            Color[][] pixels = new Color[Math.Min(tex.width, width)][];
+        if (!tex.IsReadable())
+          return tex.Resize(width, height);
 
-            Texture2D newTex = new(width, height);
-
-            int value = center ? 1 : 0;
-            newTex.SetPixels(value, value, tex.width - 2 * value, tex.height - 2 * value, tex.GetPixels());
-
-            bool result = tex.Resize(width, height);
-            tex.SetPixels(newTex.GetPixels());
-
-            // for (int x = value; x < tex.width - value; x++)
-            // {
-            //     for (int y = value; y < tex.height - value; y++)
-            //     {
-            //         bool isInOrigTex = false;
-            //         if (x - value < pixels.Length)
-            //         {
-            //             if (y - value < pixels[x - value].Length)
-            //             {
-            //                 isInOrigTex = true;
-            //                 tex.SetPixel(x, y, pixels[x - value][y - value]);
-            //             }
-            //         }
-            //         if (!isInOrigTex)
-            //         {
-            //             tex.SetPixel(x, y, Color.clear);
-            //         }
-            //     }
-            // }
-
-            // for (int x = 0; x < tex.width; x++)
-            // {
-            //     for (int y = 0; y < tex.height; y++)
-            //     {
-
-            //         if (tex.GetPixel(x, y) == new Color32(205, 205, 205, 205))
-            //         {
-            //             tex.SetPixel(x, y, Color.clear);
-            //         }
-
-            //     }
-            // }
-
-            tex.Apply();
-            return result;
-        }
-        return tex.Resize(width, height);
+        int value = center ? 1 : 0;
+        Texture2D tempTex = new Texture2D(width, height);
+        tempTex.SetPixels(value, value, tex.width - 2 * value, tex.height - 2 * value, tex.GetPixels());
+        bool result = tex.Resize(width, height);
+        tex.SetPixels(tempTex.GetPixels());
+        tex.Apply();
+        return result;
     }
 }

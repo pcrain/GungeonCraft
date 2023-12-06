@@ -15,21 +15,10 @@ public class Bart
         // We need to find all loaded items, so defer initialization for now
         CwaffEvents.OnAllModsLoaded += SetupBarterTable;
 
-        System.Diagnostics.Stopwatch tempWatch = System.Diagnostics.Stopwatch.StartNew();
-        // ETGModConsole.Log($"Timing old atlas adjusment code");
-        // _BarterSpriteS = ShopAPI.AddCustomCurrencyType(ResMap.Get("barter_s_icon")[0]+".png", $"{C.MOD_PREFIX}:S_TIER_ITEM", Assembly.GetCallingAssembly());
-        // _BarterSpriteA = ShopAPI.AddCustomCurrencyType(ResMap.Get("barter_a_icon")[0]+".png", $"{C.MOD_PREFIX}:A_TIER_ITEM", Assembly.GetCallingAssembly());
-        // _BarterSpriteB = ShopAPI.AddCustomCurrencyType(ResMap.Get("barter_b_icon")[0]+".png", $"{C.MOD_PREFIX}:B_TIER_ITEM", Assembly.GetCallingAssembly());
-        // _BarterSpriteC = ShopAPI.AddCustomCurrencyType(ResMap.Get("barter_c_icon")[0]+".png", $"{C.MOD_PREFIX}:C_TIER_ITEM", Assembly.GetCallingAssembly());
-        // tempWatch.Stop(); ETGModConsole.Log($"  finished in "+(tempWatch.ElapsedMilliseconds/1000.0f)+" seconds");
-
-        // tempWatch = System.Diagnostics.Stopwatch.StartNew();
-        ETGModConsole.Log($"Timing new atlas adjusment code");
         _BarterSpriteS = AtlasFixer.BetterAddCustomCurrencyType(ResMap.Get("barter_s_icon")[0]+".png", $"{C.MOD_PREFIX}:S_TIER_ITEM", Assembly.GetCallingAssembly());
         _BarterSpriteA = AtlasFixer.BetterAddCustomCurrencyType(ResMap.Get("barter_a_icon")[0]+".png", $"{C.MOD_PREFIX}:A_TIER_ITEM", Assembly.GetCallingAssembly());
         _BarterSpriteB = AtlasFixer.BetterAddCustomCurrencyType(ResMap.Get("barter_b_icon")[0]+".png", $"{C.MOD_PREFIX}:B_TIER_ITEM", Assembly.GetCallingAssembly());
         _BarterSpriteC = AtlasFixer.BetterAddCustomCurrencyType(ResMap.Get("barter_c_icon")[0]+".png", $"{C.MOD_PREFIX}:C_TIER_ITEM", Assembly.GetCallingAssembly());
-        tempWatch.Stop(); ETGModConsole.Log($"  finished in "+(tempWatch.ElapsedMilliseconds/1000.0f)+" seconds");
 
         List<int> shopItems      = new();
         List<string> moddedItems = new();
