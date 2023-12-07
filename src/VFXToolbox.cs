@@ -483,7 +483,8 @@ public static class VFX
     {
       try
       {
-          GameObject newTrailObject = UnityEngine.Object.Instantiate(new GameObject()).RegisterPrefab();
+          // we don't want to deactivate the trail, as its deactivated parent will not automatically reactivate it (this very issue caused Aimu Hakurei's Trail to not render)
+          GameObject newTrailObject = UnityEngine.Object.Instantiate(new GameObject()).RegisterPrefab(deactivate: false);
           newTrailObject.name = "trailObject";
           float convertedColliderX = colliderDimensions.x / 16f;
           float convertedColliderY = colliderDimensions.y / 16f;
