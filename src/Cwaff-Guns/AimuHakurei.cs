@@ -53,6 +53,15 @@ public class AimuHakurei : AdvancedGunBehavior
 
         // set up tiered projectiles
         gun.Volley.projectiles = new(){
+
+            // Tier 4 / Level 5
+            AimuMod(level: 5, fireRate: 2, projectiles: new(){
+                AimuProj(invert: false, amplitude: 0.75f, sound: "aimu_shoot_sound",     trailWidth: 0.5f),
+                AimuProj(invert: true,  amplitude: 0.75f, sound: "aimu_shoot_sound",     trailWidth: 0.5f),
+                AimuProj(invert: false, amplitude: 2.25f, sound: "aimu_shoot_sound_alt", trailWidth: 0.5f, trailColor: Color.white),
+                AimuProj(invert: true,  amplitude: 2.25f, sound: "aimu_shoot_sound_alt", trailWidth: 0.5f, trailColor: Color.white),
+                beamProj,
+                }),
             // Tier 0 / Level 1
             AimuMod(level: 1, fireRate: 16, projectiles: new(){
                 AimuProj(invert: false, amplitude: 0.0f, sound: "aimu_shoot_sound",      trailWidth: 0.2f),
@@ -73,7 +82,7 @@ public class AimuHakurei : AdvancedGunBehavior
                 AimuProj(invert: true,  amplitude: 0.75f, sound: "aimu_shoot_sound",     trailWidth: 0.5f),
                 AimuProj(invert: false, amplitude: 2.25f, sound: "aimu_shoot_sound_alt", trailWidth: 0.5f, trailColor: Color.white),
                 AimuProj(invert: true,  amplitude: 2.25f, sound: "aimu_shoot_sound_alt", trailWidth: 0.5f, trailColor: Color.white),
-                }),
+                }),/*
             // Tier 4 / Level 5
             AimuMod(level: 5, fireRate: 2, projectiles: new(){
                 AimuProj(invert: false, amplitude: 0.75f, sound: "aimu_shoot_sound",     trailWidth: 0.5f),
@@ -81,7 +90,7 @@ public class AimuHakurei : AdvancedGunBehavior
                 AimuProj(invert: false, amplitude: 2.25f, sound: "aimu_shoot_sound_alt", trailWidth: 0.5f, trailColor: Color.white),
                 AimuProj(invert: true,  amplitude: 2.25f, sound: "aimu_shoot_sound_alt", trailWidth: 0.5f, trailColor: Color.white),
                 beamProj,
-                }),
+                }),*/
         };
 
         gun.gameObject.AddComponent<AimuHakureiAmmoDisplay>();
