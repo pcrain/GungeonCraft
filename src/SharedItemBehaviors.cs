@@ -222,9 +222,16 @@ public class ProjectileSlashingBehaviour : MonoBehaviour  // stolen from NN
 
 public static class AnimatedBullet // stolen and modified from NN
 {
+    private static int _ClipCounter = 0;
+    private static HashSet<string> _KnownClips = new();
     public static tk2dSpriteAnimationClip CreateProjectileAnimation(List<string> names, int fps, bool loops, List<float> pixelScales, List<bool> lighteneds, List<Anchor> anchors, List<bool> anchorsChangeColliders,
         List<bool> fixesScales, List<Vector3?> manualOffsets, List<IntVector2?> overrideColliderPixelSizes, List<IntVector2?> overrideColliderOffsets, List<Projectile> overrideProjectilesToCopyFrom)
     {
+        if (_KnownClips.Contains(names[0]))
+        {
+            Lazy.DebugWarn($"  HEY! re-creating projectile sprite {names[0]}. If this is intentional, please reuse the original clip, don't create it twice.");
+            return null;
+        }
         tk2dSpriteAnimationClip clip = new tk2dSpriteAnimationClip();
         clip.name = names[0]+"_clip";
         clip.fps = fps;
@@ -276,6 +283,8 @@ public static class AnimatedBullet // stolen and modified from NN
         }
         clip.wrapMode = loops ? tk2dSpriteAnimationClip.WrapMode.Loop : tk2dSpriteAnimationClip.WrapMode.Once;
         clip.frames = frames.ToArray();
+        // Lazy.DebugLog($"  created clip {clip.name} with id {clip.frames[0].spriteId}");
+        _KnownClips.Add(names[0]);
         return clip;
     }
 

@@ -3503,6 +3503,7 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\lightwing_projectile_hunt3.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\carpet_projectile6.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball015.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\uppskeruvel_projectile.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tennis_ball2.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\aimu_projectile.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile_old16.png"/>
@@ -3562,6 +3563,7 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\carpet_projectile9.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\carpet_projectile8.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\outbreak_projectile_alt_002.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\pistol_whip_dummy_bullet.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\coin_gun_projectile2.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\missiletoe_projectile_gingerbread_001.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\soap_bubble_projectile_001.png"/>

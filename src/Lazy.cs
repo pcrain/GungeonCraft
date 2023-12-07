@@ -11,6 +11,13 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
       ETGModConsole.Log(text);
     }
 
+    // Warn with the console only in debug mode
+    public static void DebugWarn(string text)
+    {
+    if (C.DEBUG_BUILD)
+      ETGModConsole.Log($"<color=#ffffaaff>{text}</color>");
+    }
+
     /// <summary>
     /// Perform basic initialization for a new passive, active, or gun item definition.
     /// </summary>

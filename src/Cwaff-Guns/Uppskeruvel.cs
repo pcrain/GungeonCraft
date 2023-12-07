@@ -18,7 +18,7 @@ public class Uppskeruvel : AdvancedGunBehavior
             gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
 
         gun.InitProjectile(new(clipSize: 1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
-          sprite: "soul_kaliber_projectile", fps: 12, scale: 0.5f, anchor: Anchor.MiddleLeft)
+          sprite: "uppskeruvel_projectile", fps: 12, scale: 0.5f, anchor: Anchor.MiddleLeft)
         // ).Attach<TranquilizerBehavior>(
         );
     }
