@@ -17,8 +17,35 @@ public abstract class CustomAmmoDisplay : MonoBehaviour
     // must be public
     public static bool DoAmmoOverride(GameUIAmmoController uic, GunInventory guns)
     {
-        // returns true if we override vanilla behavior, or false if not
-        return guns?.CurrentGun?.GetComponent<CustomAmmoDisplay>()?.DoCustomAmmoDisplay(uic) ?? false;
+        if (guns?.CurrentGun?.GetComponent<CustomAmmoDisplay>() is not CustomAmmoDisplay ammoDisplay)
+          return false; // no custom ammo override, so use the vanilla behavior
+        if (!ammoDisplay.DoCustomAmmoDisplay(uic))
+          return false; // custom ammo override does not want to change vanilla behavior
+
+        // Need to do some vanilla postprocessing to make sure label alignment doesn't get all screwed up
+        Gun currentGun = guns.CurrentGun;
+        if (currentGun.IsUndertaleGun)
+        {
+          if (!uic.IsLeftAligned && uic.m_cachedMaxAmmo == int.MaxValue)
+            uic.GunAmmoCountLabel.RelativePosition += new Vector3(3f, 0f, 0f);
+        }
+        else if (currentGun.InfiniteAmmo)
+        {
+          if (!uic.IsLeftAligned && (!uic.m_cachedGun || !uic.m_cachedGun.InfiniteAmmo))
+            uic.GunAmmoCountLabel.RelativePosition += new Vector3(-3f, 0f, 0f);
+        }
+        else if (currentGun.AdjustedMaxAmmo > 0)
+        {
+          if (!uic.IsLeftAligned && uic.m_cachedMaxAmmo == int.MaxValue)
+            uic.GunAmmoCountLabel.RelativePosition += new Vector3(3f, 0f, 0f);
+        }
+        else
+        {
+          if (!uic.IsLeftAligned && uic.m_cachedMaxAmmo == int.MaxValue)
+            uic.GunAmmoCountLabel.RelativePosition += new Vector3(3f, 0f, 0f);
+        }
+
+        return true; // ammo was overridden, so skip remaining vanilla updates
     }
 
     private static void CustomAmmoCountDisplayIL(ILContext il)
