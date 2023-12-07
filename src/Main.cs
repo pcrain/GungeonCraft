@@ -214,7 +214,7 @@ public class Initialisation : BaseUnityPlugin
                 Pincushion.Add();
                 Crapshooter.Add();
                 CarpetBomber.Add();
-                // Uppskeruvel.Add();
+                Uppskeruvel.Add();
             #endregion
             // tempWatch.Stop(); ETGModConsole.Log($"part 1 finished in "+(tempWatch.ElapsedMilliseconds/1000.0f)+" seconds"); tempWatch = System.Diagnostics.Stopwatch.StartNew();
 

@@ -756,12 +756,14 @@ public static class Extensions
       TrailController trail = VFX.CreateTrailObject(
         spritePath, colliderDimensions, colliderOffsets, animPaths, animFPS, startAnimPaths, startAnimFPS, timeTillAnimStart, cascadeTimer, softMaxLength, destroyOnEmpty);
       trail.gameObject.transform.parent = target.transform;
+      target.gameObject.AddComponent<VFX.TrailActivator>();
       return trail;
   }
 
   public static TrailController AddTrailToProjectile(this Projectile target, TrailController trail)
   {
       trail.gameObject.transform.parent = target.transform;
+      target.gameObject.AddComponent<VFX.TrailActivator>();
       return trail;
   }
 
