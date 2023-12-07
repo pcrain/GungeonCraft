@@ -751,19 +751,19 @@ public static class Extensions
       gun.ClearDefaultAudio();
   }
 
-  public static TrailController AddTrailToProjectile(this Projectile target, string spritePath, Vector2 colliderDimensions, Vector2 colliderOffsets, List<string> animPaths = null, int animFPS = -1, List<string> startAnimPaths = null, int startAnimFPS = -1, float timeTillAnimStart = -1, float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false)
+  public static TrailController AddTrailToProjectilePrefab(this Projectile target, string spritePath, Vector2 colliderDimensions, Vector2 colliderOffsets, List<string> animPaths = null, int animFPS = -1, List<string> startAnimPaths = null, int startAnimFPS = -1, float timeTillAnimStart = -1, float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false)
   {
       TrailController trail = VFX.CreateTrailObject(
         spritePath, colliderDimensions, colliderOffsets, animPaths, animFPS, startAnimPaths, startAnimFPS, timeTillAnimStart, cascadeTimer, softMaxLength, destroyOnEmpty);
+      trail.gameObject.SetActive(true); // parent projectile is deactivated, so we want to re-activate ourselves so we display correctly when the projectile becomes active
       trail.gameObject.transform.parent = target.transform;
-      target.gameObject.AddComponent<VFX.TrailActivator>();
       return trail;
   }
 
-  public static TrailController AddTrailToProjectile(this Projectile target, TrailController trail)
+  public static TrailController AddTrailToProjectilePrefab(this Projectile target, TrailController trail)
   {
+      trail.gameObject.SetActive(true); // parent projectile is deactivated, so we want to re-activate ourselves so we display correctly when the projectile becomes active
       trail.gameObject.transform.parent = target.transform;
-      target.gameObject.AddComponent<VFX.TrailActivator>();
       return trail;
   }
 

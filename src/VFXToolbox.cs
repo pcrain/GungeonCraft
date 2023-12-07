@@ -478,20 +478,6 @@ public static class VFX
         yield break;
     }
 
-    // Small helper class to let us attach deactivated TrailControllers to prefabs and avoid null dereferences / non-working Trails (see commit 7bdb7f3)
-    public class TrailActivator : MonoBehaviour
-    {
-        private void Start()
-        {
-            for (int i = 0; i < base.transform.childCount; ++i)
-            {
-                Transform child = base.transform.GetChild(i);
-                if (child.GetComponent<TrailController>())
-                    child.gameObject.SetActive(true);
-            }
-        }
-    }
-
     // yoinked from SomeBunny
     public static TrailController CreateTrailObject(string spritePath, Vector2 colliderDimensions, Vector2 colliderOffsets, List<string> animPaths = null, int animFPS = -1, List<string> startAnimPaths = null, int startAnimFPS = -1, float timeTillAnimStart = -1, float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false)
     {

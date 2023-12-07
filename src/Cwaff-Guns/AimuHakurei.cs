@@ -45,7 +45,7 @@ public class AimuHakurei : AdvancedGunBehavior
         _ProjBase = gun.InitFirstProjectile(new(damage: 8f, speed: 44f, range: 100f, force: 3f));
 
         Projectile beamProj = Items._38Special.CloneProjectile(new(damage: 16.0f, speed: 300.0f));
-            TrailController tc = beamProj.AddTrailToProjectile(ResMap.Get("aimu_beam_mid")[0], new Vector2(25, 39), new Vector2(0, 0),
+            TrailController tc = beamProj.AddTrailToProjectilePrefab(ResMap.Get("aimu_beam_mid")[0], new Vector2(25, 39), new Vector2(0, 0),
                 ResMap.Get("aimu_beam_mid"), 60, ResMap.Get("aimu_beam_start"), 60, cascadeTimer: C.FRAME, destroyOnEmpty: true);
                 tc.UsesDispersalParticles = true;
                 tc.DispersalParticleSystemPrefab = (ItemHelper.Get(Items.FlashRay) as Gun).DefaultModule.projectiles[0].GetComponentInChildren<TrailController>().DispersalParticleSystemPrefab;
