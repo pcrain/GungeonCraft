@@ -72,7 +72,7 @@ public static class FancyRoomBuilder
       idleSpritePaths                   : ResMap.Get($"{npcName}_idle"),
       idleFps                           : 2,
       talkSpritePaths                   : ResMap.Get($"{npcName}_talk"),
-      talkFps                           : 2,
+      talkFps                           : 5,
       lootTable                         : lootTable,
       currency                          : (removeCurrency == null) ? CustomShopItemController.ShopCurrencyType.COINS : CustomShopItemController.ShopCurrencyType.CUSTOM,
       runBasedMultilineGenericStringKey : $"#{npcNameUpper}_GENERIC_TALK",

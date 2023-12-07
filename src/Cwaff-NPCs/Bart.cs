@@ -17,6 +17,9 @@ public class Bart
         List<int> shopItems      = new();
         List<string> moddedItems = new();
 
+        $"#BARTER_SHOP_SIGN".SetupDBStrings(new(){"HOW TO BARTER:\n\ndrop an item whose quality is\nat least the quality shown on\nthe item you wish to trade for."});
+
+
         // NOTE: resizing the Atlas when first adding a sprite takes 4 seconds (old method) and 1 second (current method, still slow)
         //       not sure this can be sped up any further in the future, but something to be aware of and possibly disable when
         //       doing heavy testing
@@ -41,7 +44,7 @@ public class Bart
             allowedTilesets        : (int)( GlobalDungeonData.ValidTilesets.GUNGEON | GlobalDungeonData.ValidTilesets.MINEGEON ),
             prequisiteValidator    : OnSecondOrThirdFloor, // can glitchily spawn on other floors, so add extra insurance
             // prequisiteValidator    : null,
-            talkPointOffset        : C.PIXEL_SIZE * new Vector2(7, 22 + 16),
+            talkPointOffset        : C.PIXEL_SIZE * new Vector2(7, 22),
             npcPosition            : C.PIXEL_SIZE * new Vector2(10, 60 + 16),
             itemPositions          : ShopAPI.defaultItemPositions.ShiftAll(C.PIXEL_SIZE * new Vector2(-25, 0 + 16)),
             // exactlyOncePerRun      : false,  // completely busted past the first floor for some reason, do not set to true
@@ -129,7 +132,7 @@ public class Bart
                 continue; // not a pickup
             if (!pickup.CanBeSold)
                 continue; // not sellable
-            if ((pickup.sprite.WorldCenter - player.sprite.WorldCenter).sqrMagnitude >= _BARTER_RADIUS_SQR)
+            if (pickup.sprite.WorldCenter.GetAbsoluteRoom() != player.CurrentRoom)
                 continue; // too far
             if (bestCandidate != null)
                 return null; // more than one item nearby
