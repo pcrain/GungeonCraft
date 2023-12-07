@@ -297,6 +297,8 @@ public class AlligatorCableHandler : MonoBehaviour
 
         for (int i = _extantSparks.Count() - 1; i >= 0; --i)
         {
+            if (!this._enemy?.healthHaver)
+                break;  // can happen if a previous spark killed the enemy
             float percentDone = (curTime - _extantSpawnTimes[i]) / _SPARK_TRAVEL_TIME;
             if (percentDone > 1f)
             {

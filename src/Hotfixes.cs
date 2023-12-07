@@ -86,33 +86,38 @@ public static class DuctTapeSaveLoadHotfix
     }
 }
 
-// Fix guns with extremely large animations having enormous pickup ranges and appearing very weirdly on pedestals
+// Fix guns with extremely large animations having enormous pickup ranges and appearing very weirdly on pedestals, in shops, and when picked up or dropped
 public static class LargeGunAnimationHotfix
 {
     internal const string _TRIM_ANIMATION = "idle_trimmed";
 
     public static void Init()
     {
+        // Fix oversized idle animations in vanilla shops
         new ILHook(
             typeof(ShopItemController).GetMethod("InitializeInternal", BindingFlags.Instance | BindingFlags.NonPublic),
             OnInitializeVanillaShopItemIL
             );
 
+        // Fix oversized idle animations in modded (Alexandria) shops
         new ILHook(
             typeof(CustomShopItemController).GetMethod("InitializeInternal", BindingFlags.Instance | BindingFlags.Public),
             OnInitializeCustomShopItemIL
             );
 
+        // Fix oversized idle animations on reward pedestals
         new ILHook(
             typeof(RewardPedestal).GetMethod("DetermineContents", BindingFlags.Instance | BindingFlags.NonPublic),
             OnDetermineContentsIL
             );
 
+        // Change from the fixed to the normal idle animation when picking up a gun
         new Hook(
             typeof(GunInventory).GetMethod("AddGunToInventory", BindingFlags.Instance | BindingFlags.Public),
             typeof(LargeGunAnimationHotfix).GetMethod("OnAddGunToInventory", BindingFlags.Static | BindingFlags.NonPublic)
             );
 
+        // Change from the normal to the fixed idle animation when dropping a gun
         new Hook(
             typeof(Gun).GetMethod("DropGun", BindingFlags.Instance | BindingFlags.Public),
             typeof(LargeGunAnimationHotfix).GetMethod("OnDropGun", BindingFlags.Static | BindingFlags.NonPublic)
