@@ -65,6 +65,15 @@ public class WhiteMage
             "ski:baby_good_dodogama",
         };
 
+        // if (C.DEBUG_BUILD)  // test some wonky offsets
+        // {
+        //     shopItems.Clear();
+        //     moddedItems.Clear();
+        //     moddedItems.Add("cg:alligator");
+        //     moddedItems.Add("cg:platinum_star");
+        //     moddedItems.Add("cg:alyx");
+        // }
+
         FancyShopData shop = FancyRoomBuilder.MakeFancyShop(
             npcName                : "white_mage",
             shopItems              : shopItems,

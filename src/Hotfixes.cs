@@ -94,6 +94,16 @@ public static class LargeGunAnimationHotfix
     public static void Init()
     {
         new ILHook(
+            typeof(ShopItemController).GetMethod("InitializeInternal", BindingFlags.Instance | BindingFlags.NonPublic),
+            OnInitializeVanillaShopItemIL
+            );
+
+        new ILHook(
+            typeof(CustomShopItemController).GetMethod("InitializeInternal", BindingFlags.Instance | BindingFlags.Public),
+            OnInitializeCustomShopItemIL
+            );
+
+        new ILHook(
             typeof(RewardPedestal).GetMethod("DetermineContents", BindingFlags.Instance | BindingFlags.NonPublic),
             OnDetermineContentsIL
             );
@@ -109,6 +119,73 @@ public static class LargeGunAnimationHotfix
             );
     }
 
+    private static tk2dSpriteAnimationClip GetTrimmedIdleAnimation(this Gun gun)
+    {
+        return gun.spriteAnimator?.GetClipByName($"{gun.InternalSpriteName()}_{_TRIM_ANIMATION}");
+    }
+
+    // Make sure guns in vanilla shops are aligned properly
+    private static void OnInitializeVanillaShopItemIL(ILContext il)
+    {
+        ILCursor cursor = new ILCursor(il);
+        // cursor.DumpILOnce("OnInitializeVanillaShopItemIL");
+
+        if (!cursor.TryGotoNext(MoveType.Before,
+          instr => instr.MatchStfld<ShopItemController>("UseOmnidirectionalItemFacing"),
+          instr => instr.MatchLdarg(0),
+          instr => instr.MatchCall<BraveBehaviour>("get_sprite"),
+          instr => instr.MatchLdarg(0)
+          ))
+            return;
+
+        // skip past UseOmnidirectionalItemFacing and loading the ShopItemController, then proceed as with custom shop items
+        //   and finally replace the ShopItemController arg at the end
+        cursor.Index += 2;
+        cursor.Emit(OpCodes.Ldarg_1);  // PickupObject
+        cursor.Emit(OpCodes.Call, typeof(LargeGunAnimationHotfix).GetMethod("FixVanillaShopItemSpriteIfNecessary", BindingFlags.Static | BindingFlags.NonPublic));
+        cursor.Emit(OpCodes.Ldarg_0);  // ShopItemController
+        // ETGModConsole.Log($"  prepatched vanilla shop!");
+    }
+
+    private static void FixVanillaShopItemSpriteIfNecessary(CustomShopItemController item, PickupObject pickup)
+    {
+        if (pickup.GetComponent<Gun>() is not Gun gun)
+            return;
+
+        tk2dSpriteAnimationClip idleClip = gun.GetTrimmedIdleAnimation();
+        if (idleClip == null || idleClip.frames == null || idleClip.frames.Count() == 0)
+            return;  // the idle animation clip is missing frames, so there's nothing to do
+
+        item.sprite.SetSprite(idleClip.frames[0].spriteCollection, idleClip.frames[0].spriteId);
+    }
+
+    // Make sure guns in modded shops are aligned properly
+    private static void OnInitializeCustomShopItemIL(ILContext il)
+    {
+        ILCursor cursor = new ILCursor(il);
+        // cursor.DumpILOnce("OnInitializeCustomShopItemIL");
+
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchStfld<CustomShopItemController>("UseOmnidirectionalItemFacing")))
+            return;
+
+        cursor.Emit(OpCodes.Ldarg_0);  // CustomShopItemController
+        cursor.Emit(OpCodes.Ldarg_1);  // PickupObject
+        cursor.Emit(OpCodes.Call, typeof(LargeGunAnimationHotfix).GetMethod("FixCustomShopItemSpriteIfNecessary", BindingFlags.Static | BindingFlags.NonPublic));
+        // ETGModConsole.Log($"  prepatched custom shop!");
+    }
+
+    private static void FixCustomShopItemSpriteIfNecessary(CustomShopItemController item, PickupObject pickup)
+    {
+        if (pickup.GetComponent<Gun>() is not Gun gun)
+            return;
+
+        tk2dSpriteAnimationClip idleClip = gun.GetTrimmedIdleAnimation();
+        if (idleClip == null || idleClip.frames == null || idleClip.frames.Count() == 0)
+            return;  // the idle animation clip is missing frames, so there's nothing to do
+
+        item.sprite.SetSprite(idleClip.frames[0].spriteCollection, idleClip.frames[0].spriteId);
+    }
+
     // private static void DebugSetRewardPedestal(RewardPedestal reward)
     // {
     //     if (!C.DEBUG_BUILD)
@@ -120,14 +197,14 @@ public static class LargeGunAnimationHotfix
     // }
 
     // Use the first frame of the gun's (potentially trimmed) idle animation as its reward pedestal sprite
-    private static void FixGunSpriteIfNecessary(RewardPedestal reward)
+    private static void FixRewardPedestalSpriteIfNecessary(RewardPedestal reward)
     {
         if (reward.contents.GetComponent<Gun>() is not Gun gun)
             return;  // we don't have a gun, so there's nothing to do
         if (!gun.idleAnimation.Contains(_TRIM_ANIMATION))
             return;  // the gun doesn't have a trimmed idle animation, so there's nothing to do
 
-        tk2dSpriteAnimationClip idleClip = gun.spriteAnimator?.GetClipByName(gun.idleAnimation);
+        tk2dSpriteAnimationClip idleClip = gun.GetTrimmedIdleAnimation();
         if (idleClip == null || idleClip.frames == null || idleClip.frames.Count() == 0)
             return;  // the idle animation clip is missing frames, so there's nothing to do
 
@@ -150,7 +227,7 @@ public static class LargeGunAnimationHotfix
             return;
 
         cursor.Emit(OpCodes.Ldarg_0);
-        cursor.Emit(OpCodes.Call, typeof(LargeGunAnimationHotfix).GetMethod("FixGunSpriteIfNecessary", BindingFlags.Static | BindingFlags.NonPublic));
+        cursor.Emit(OpCodes.Call, typeof(LargeGunAnimationHotfix).GetMethod("FixRewardPedestalSpriteIfNecessary", BindingFlags.Static | BindingFlags.NonPublic));
     }
 
     private static Gun OnAddGunToInventory(Func<GunInventory, Gun, bool, Gun> orig, GunInventory inventory, Gun gun, bool makeActive)
@@ -161,7 +238,7 @@ public static class LargeGunAnimationHotfix
         string fixedIdleAnimation = $"{gun.InternalSpriteName()}_{_TRIM_ANIMATION}";
         if (gun.spriteAnimator.GetClipIdByName(fixedIdleAnimation) != -1)
         {
-            gun.idleAnimation = $"{gun.InternalSpriteName()}_idle";  // restore the gun's original (untrimmed) idle animation
+            gun.idleAnimation = $"{gun.InternalSpriteName()}_idle";  // restore the gun's original (untrimmed) idle animation when picked up
             gun.spriteAnimator.defaultClipId = gun.spriteAnimator.GetClipIdByName(gun.idleAnimation);
         }
 
@@ -177,7 +254,7 @@ public static class LargeGunAnimationHotfix
         {
             Vector2 center = gun.sprite.WorldCenter;
             gun.spriteAnimator.defaultClipId = gun.spriteAnimator.GetClipIdByName(fixedIdleAnimation);
-            gun.spriteAnimator.Play(fixedIdleAnimation);
+            gun.spriteAnimator.Play(fixedIdleAnimation);  // play the gun's fixed (trimmed) idle animation when dropped
             gun.sprite.PlaceAtPositionByAnchor(center, Anchor.MiddleCenter);
         }
         return debris;
