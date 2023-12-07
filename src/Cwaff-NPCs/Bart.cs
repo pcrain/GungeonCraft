@@ -25,10 +25,10 @@ public class Bart
         //       doing heavy testing
         if (!C.FAST_LOAD)
         {
-            _BarterSpriteS = AtlasFixer.BetterAddCustomCurrencyType(ResMap.Get("barter_s_icon")[0]+".png", $"{C.MOD_PREFIX}:S_TIER_ITEM", Assembly.GetCallingAssembly());
-            _BarterSpriteA = AtlasFixer.BetterAddCustomCurrencyType(ResMap.Get("barter_a_icon")[0]+".png", $"{C.MOD_PREFIX}:A_TIER_ITEM", Assembly.GetCallingAssembly());
-            _BarterSpriteB = AtlasFixer.BetterAddCustomCurrencyType(ResMap.Get("barter_b_icon")[0]+".png", $"{C.MOD_PREFIX}:B_TIER_ITEM", Assembly.GetCallingAssembly());
-            _BarterSpriteC = AtlasFixer.BetterAddCustomCurrencyType(ResMap.Get("barter_c_icon")[0]+".png", $"{C.MOD_PREFIX}:C_TIER_ITEM", Assembly.GetCallingAssembly());
+            _BarterSpriteS = ShopAPI.AddCustomCurrencyType(ResMap.Get("barter_s_icon")[0]+".png", $"{C.MOD_PREFIX}:S_TIER_ITEM", Assembly.GetCallingAssembly());
+            _BarterSpriteA = ShopAPI.AddCustomCurrencyType(ResMap.Get("barter_a_icon")[0]+".png", $"{C.MOD_PREFIX}:A_TIER_ITEM", Assembly.GetCallingAssembly());
+            _BarterSpriteB = ShopAPI.AddCustomCurrencyType(ResMap.Get("barter_b_icon")[0]+".png", $"{C.MOD_PREFIX}:B_TIER_ITEM", Assembly.GetCallingAssembly());
+            _BarterSpriteC = ShopAPI.AddCustomCurrencyType(ResMap.Get("barter_c_icon")[0]+".png", $"{C.MOD_PREFIX}:C_TIER_ITEM", Assembly.GetCallingAssembly());
         }
 
         FancyShopData shop = FancyRoomBuilder.MakeFancyShop(

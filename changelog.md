@@ -2,6 +2,7 @@
 
 ## Current
 
+- Updated Alexandria to 0.3.26
 - Insurance Broker guaranteed to spawn if you have a sellable S or A tier item in your inventory
 - Insurance Policy can no longer be sold
 
