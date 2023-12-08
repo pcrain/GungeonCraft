@@ -72,48 +72,57 @@ public class Initialisation : BaseUnityPlugin
             if (C.DEBUG_BUILD)
                 ETGModConsole.Log("Cwaffing the Gungy initialising...");
 
-            // BraveMemory.EnsureHeapSize(1024*1024); ETGModConsole.Log("Ensured 1GB heap...");
+            // #region Memory Setup
+            //     System.Diagnostics.Stopwatch setupMemoryWatch = System.Diagnostics.Stopwatch.StartNew();
+            //     BraveMemory.EnsureHeapSize(1024*1024); Lazy.DebugLog("Ensured 1GB heap...");
+            //     setupMemoryWatch.Stop();
+            // #endregion
 
             Instance = this;
 
-            System.Diagnostics.Stopwatch setupSpritesWatch = System.Diagnostics.Stopwatch.StartNew();
-            ETGMod.Assets.SetupSpritesFromAssembly(Assembly.GetExecutingAssembly(), "CwaffingTheGungy.Resources");
-            setupSpritesWatch.Stop();
+            #region Sprite Setup
+                System.Diagnostics.Stopwatch setupSpritesWatch = System.Diagnostics.Stopwatch.StartNew();
+                ETGMod.Assets.SetupSpritesFromAssembly(Assembly.GetExecutingAssembly(), "CwaffingTheGungy.Resources");
+                setupSpritesWatch.Stop();
+            #endregion
 
-            System.Diagnostics.Stopwatch preConfigWatch = System.Diagnostics.Stopwatch.StartNew();
-            // Build resource map for ease of access
-            ResMap.Build();
+            #region Pre-Config
+                System.Diagnostics.Stopwatch setupConfigWatch = System.Diagnostics.Stopwatch.StartNew();
+                // Build resource map for ease of access
+                ResMap.Build();
 
-            //Tools and Toolboxes
-            // StaticReferences.Init();
-            // Tools.Init();
-            CwaffEvents.Init();
+                //Tools and Toolboxes
+                CwaffEvents.Init();
 
-            FakePrefabHooks.Init();
-            HUDController.Init(); // Need to load early
-            CustomAmmoDisplay.Init(); // Also need to load early
-            ModdedShopItemAdder.Init(); // Need to load after CwaffEvents.Init()
+                // HUDController.Init(); // Need to load early (unused for now)
+                CustomAmmoDisplay.Init(); // Also need to load early
+                ModdedShopItemAdder.Init(); // Need to load after CwaffEvents.Init()
 
-            ItemBuilder.Init();
-            SaveAPI.SaveAPIManager.Setup("cg");
-            AudioResourceLoader.InitAudio();
-            ETGModMainBehaviour.Instance.gameObject.AddComponent<AudioSource>();
+                SaveAPI.SaveAPIManager.Setup("cg");  // Needed for prerequisite checking and save serialization
+                ETGModMainBehaviour.Instance.gameObject.AddComponent<AudioSource>();
 
-            PlayerToolsSetup.Init();
-            VFX.Init();
+                PlayerToolsSetup.Init();
+                VFX.Init();
 
-            //Status Effect Setup
-            SoulLinkStatus.Init();
-            //Goop Setup
-            EasyGoopDefinitions.DefineDefaultGoops();
+                //Status Effect Setup
+                SoulLinkStatus.Init();
+                //Goop Setup
+                EasyGoopDefinitions.DefineDefaultGoops();
 
-            //Hats
-            // HatUtility.NecessarySetup();
-            // HatDefinitions.Init();
+                //Hats
+                // HatUtility.NecessarySetup();
+                // HatDefinitions.Init();
 
-            //Commands and Other Console Utilities
-            Commands.Init();
-            preConfigWatch.Stop();
+                //Commands and Other Console Utilities
+                Commands.Init();
+                setupConfigWatch.Stop();
+            #endregion
+
+            #region Audio
+                System.Diagnostics.Stopwatch setupAudioWatch = System.Diagnostics.Stopwatch.StartNew();
+                AudioResourceLoader.AutoloadFromAssembly("CwaffingTheGungy");  // Load Audio Banks
+                setupAudioWatch.Stop();
+            #endregion
 
             #region Actives
                 System.Diagnostics.Stopwatch setupActivesWatch = System.Diagnostics.Stopwatch.StartNew();
@@ -168,8 +177,6 @@ public class Initialisation : BaseUnityPlugin
                 setupPassivesWatch.Stop();
             #endregion
 
-            // System.Diagnostics.Stopwatch tempWatch = System.Diagnostics.Stopwatch.StartNew();
-            // tempWatch.Stop(); ETGModConsole.Log($"part 1 finished in "+(tempWatch.ElapsedMilliseconds/1000.0f)+" seconds"); tempWatch = System.Diagnostics.Stopwatch.StartNew();
             #region Guns
                 System.Diagnostics.Stopwatch setupGunsWatch = System.Diagnostics.Stopwatch.StartNew();
                 IronMaid.Add();
@@ -240,17 +247,6 @@ public class Initialisation : BaseUnityPlugin
                 // InsuranceBoi.Init();
                 WhiteMage.Init();
                 Bart.Init();
-                // CwaffEvents.OnCleanStart += () => {
-                //     ETGModConsole.Log($"  we have {GameManager.Instance.GlobalInjectionData.entries.Count} entries");
-                //     foreach (MetaInjectionDataEntry m in GameManager.Instance.GlobalInjectionData.entries)
-                //     {
-                //         ETGModConsole.Log($"  is null? {m == null}");
-                //         ETGModConsole.Log($"    has injectionData? {m?.injectionData == null}");
-                //         ETGModConsole.Log($"    has flow data? {m?.injectionData?.InjectionData == null}");
-                //         ETGModConsole.Log($"    how much? {m?.injectionData?.InjectionData?.Count ?? -1}");
-                //         ETGModConsole.Log($"    annotation? {m?.injectionData?.InjectionData?[0]?.annotation ?? null}");
-                //     }
-                // };
                 setupShopsWatch.Stop();
             #endregion
 
@@ -283,25 +279,21 @@ public class Initialisation : BaseUnityPlugin
                     braveResources  = ResourceManager.LoadAssetBundle("brave_resources_001");
                     enemiesBase     = ResourceManager.LoadAssetBundle("enemies_base_001");
                     encounterAssets = ResourceManager.LoadAssetBundle("encounters_base_001");
-                    // Init Prefab Databases
+
                     CwaffDungeonPrefabs.InitCustomPrefabs(sharedAssets, sharedAssets2, braveResources, enemiesBase);
-                    // Init Custom Enemy Prefabs
-                    // ExpandCustomEnemyDatabase.InitPrefabs(expandSharedAssets1);
-                    // Init Custom Room Prefabs
-                    // ExpandRoomPrefabs.InitCustomRooms(sharedAssets, sharedAssets2, braveResources, enemiesBase);
-                    // Init Custom DungeonFlow(s)
                     CwaffDungeonFlow.InitDungeonFlowsAndHooks(sharedAssets2);
                 } catch (Exception ex) {
                     ETGModConsole.Log("[CtG] ERROR: Exception occured while building prefabs!", true);
                     Debug.LogException(ex);
                 } finally {
                     // Null bundles when done with them to avoid game crash issues
-                    sharedAssets = null;
-                    sharedAssets2 = null;
-                    braveResources = null;
-                    enemiesBase = null;
+                    sharedAssets    = null;
+                    sharedAssets2   = null;
+                    sharedBase      = null;
+                    braveResources  = null;
+                    enemiesBase     = null;
+                    encounterAssets = null;
                 }
-
 
                 // Actual floor Initialization
                 CwaffDungeons.Init(); // must be done before creating any custom floors / flows
@@ -342,41 +334,45 @@ public class Initialisation : BaseUnityPlugin
                 // }
             #endregion
 
-            //Misc. Initialization and Tweaks
-            System.Diagnostics.Stopwatch setupMiscWatch = System.Diagnostics.Stopwatch.StartNew();
-            CwaffPrerequisite.Init();
-            CustomNoteDoer.Init();
-            CustomDodgeRoll.InitCustomDodgeRollHooks();
-            CwaffTweaks.Init();
-            HeckedMode.Init();
-            setupMiscWatch.Stop();
+            #region Misc. Initialization and Tweaks
+                System.Diagnostics.Stopwatch setupMiscWatch = System.Diagnostics.Stopwatch.StartNew();
+                CwaffPrerequisite.Init();
+                CustomNoteDoer.Init();
+                CustomDodgeRoll.InitCustomDodgeRollHooks();
+                CwaffTweaks.Init();
+                HeckedMode.Init();
+                setupMiscWatch.Stop();
+            #endregion
 
-            // Hotfixes for bugs and issues mostly out of my control
-            System.Diagnostics.Stopwatch setupHotfixesWatch = System.Diagnostics.Stopwatch.StartNew();
-            DragunFightHotfix.Init();
-            CoopTurboModeHotfix.Init();
-            LargeGunAnimationHotfix.Init();
-            DuctTapeSaveLoadHotfix.Init();
-            // CoopDrillSoftlockHotfix.Init(); // incomplete
-            QuickRestartRoomCacheHotfix.Init();
-            RoomShuffleOffByOneHotfix.Init();
-            setupHotfixesWatch.Stop();
+            #region Hotfixes for bugs and issues mostly out of my control
+                System.Diagnostics.Stopwatch setupHotfixesWatch = System.Diagnostics.Stopwatch.StartNew();
+                DragunFightHotfix.Init();
+                CoopTurboModeHotfix.Init();
+                LargeGunAnimationHotfix.Init();
+                DuctTapeSaveLoadHotfix.Init();
+                // CoopDrillSoftlockHotfix.Init(); // incomplete
+                QuickRestartRoomCacheHotfix.Init();
+                RoomShuffleOffByOneHotfix.Init();
+                setupHotfixesWatch.Stop();
+            #endregion
 
             watch.Stop();
             ETGModConsole.Log($"Yay! :D Initialized <color=#aaffaaff>{C.MOD_NAME} v{C.MOD_VERSION}</color> in "+(watch.ElapsedMilliseconds/1000.0f)+" seconds");
             if (C.DEBUG_BUILD)
             {
-                ETGModConsole.Log($"    setupSprites   finished in "+(setupSpritesWatch.ElapsedMilliseconds/1000.0f)+" seconds");
-                ETGModConsole.Log($"    preConfig      finished in "+(preConfigWatch.ElapsedMilliseconds/1000.0f)+" seconds");
-                ETGModConsole.Log($"    setupActives   finished in "+(setupActivesWatch.ElapsedMilliseconds/1000.0f)+" seconds");
-                ETGModConsole.Log($"    setupPassives  finished in "+(setupPassivesWatch.ElapsedMilliseconds/1000.0f)+" seconds");
-                ETGModConsole.Log($"    setupGuns      finished in "+(setupGunsWatch.ElapsedMilliseconds/1000.0f)+" seconds");
-                ETGModConsole.Log($"    setupSynergies finished in "+(setupSynergiesWatch.ElapsedMilliseconds/1000.0f)+" seconds");
-                ETGModConsole.Log($"    setupShops     finished in "+(setupShopsWatch.ElapsedMilliseconds/1000.0f)+" seconds");
-                ETGModConsole.Log($"    setupBosses    finished in "+(setupBossesWatch.ElapsedMilliseconds/1000.0f)+" seconds");
-                ETGModConsole.Log($"    setupFloors    finished in "+(setupFloorsWatch.ElapsedMilliseconds/1000.0f)+" seconds");
-                ETGModConsole.Log($"    setupMisc      finished in "+(setupMiscWatch.ElapsedMilliseconds/1000.0f)+" seconds");
-                ETGModConsole.Log($"    setupHotfixes  finished in "+(setupHotfixesWatch.ElapsedMilliseconds/1000.0f)+" seconds");
+                // ETGModConsole.Log($"    setupMemory    finished in "+(setupMemoryWatch.ElapsedMilliseconds/1000.0f)+" seconds");
+                ETGModConsole.Log($"    setupSprites   finished in {setupSpritesWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    setupConfig    finished in {setupConfigWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    setupAudio     finished in {setupAudioWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    setupActives   finished in {setupActivesWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    setupPassives  finished in {setupPassivesWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    setupGuns      finished in {setupGunsWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    setupSynergies finished in {setupSynergiesWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    setupShops     finished in {setupShopsWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    setupBosses    finished in {setupBossesWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    setupFloors    finished in {setupFloorsWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    setupMisc      finished in {setupMiscWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    setupHotfixes  finished in {setupHotfixesWatch.ElapsedMilliseconds} milliseconds");
                 AkSoundEngine.PostEvent("vc_kirby_appeal01", ETGModMainBehaviour.Instance.gameObject);
             }
 

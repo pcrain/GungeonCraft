@@ -376,13 +376,9 @@ public class SpawnObjectManager : MonoBehaviour // stolen from nn
 
 public class AudioResourceLoader // example audio resource loading class and functions
 {
-
-    public static void InitAudio() { AutoloadFromAssembly(Assembly.GetExecutingAssembly(), "CwaffingTheGungy"); }
-
-    public static void AutoloadFromAssembly(Assembly assembly, string prefix)
+    public static void AutoloadFromAssembly(string prefix)
     {
-        bool flag = assembly == null;
-        if (flag) { throw new ArgumentNullException("assembly", "Assembly cannot be null."); }
+        Assembly assembly = Assembly.GetExecutingAssembly();
         bool flag2 = prefix == null;
         if (flag2) { throw new ArgumentNullException("prefix", "Prefix name cannot be null."); }
         prefix = prefix.Trim();
@@ -393,6 +389,9 @@ public class AudioResourceLoader // example audio resource loading class and fun
         for (int i = 0; i < list.Count; i++)
         {
             string text = list[i];
+            if (text.LastIndexOf(".bnk") != text.Length - ".bnk".Length)
+                continue;
+
             string text2 = text;
             text2 = text2.Replace('/', Path.DirectorySeparatorChar);
             text2 = text2.Replace('\\', Path.DirectorySeparatorChar);
@@ -400,14 +399,10 @@ public class AudioResourceLoader // example audio resource loading class and fun
                 continue;
 
             text2 = text2.Substring(text2.IndexOf(prefix) + prefix.Length);
-            if (text2.LastIndexOf(".bnk") != text2.Length - ".bnk".Length)
-                continue;
-
             text2 = text2.Substring(0, text2.Length - ".bnk".Length);
             bool flag6 = text2.IndexOf(Path.DirectorySeparatorChar) == 0;
             if (flag6) { text2 = text2.Substring(1); }
             text2 = prefix + ":" + text2;
-            // Console.WriteLine(string.Format("{0}: Soundbank found, attempting to autoload: name='{1}' resource='{2}'", "hi", text2, text));
             using (Stream manifestResourceStream = assembly.GetManifestResourceStream(text))
             {
                 LoadSoundbankFromStream(manifestResourceStream, text2);
@@ -415,37 +410,17 @@ public class AudioResourceLoader // example audio resource loading class and fun
         }
     }
 
-    private static void LoadSoundbankFromStream(Stream stream, string name)
+    private static unsafe void LoadSoundbankFromStream(Stream stream, string name)
     {
-        byte[] array = StreamToByteArray(stream);
-        IntPtr intPtr = Marshal.AllocHGlobal(array.Length);
-        try
+        byte[] array = new byte[stream.Length];
+        stream.Read(array, 0, array.Length);
+        fixed (byte* p = array)
         {
-            Marshal.Copy(array, 0, intPtr, array.Length);
-            uint num;
-            AKRESULT akresult = AkSoundEngine.LoadAndDecodeBankFromMemory(intPtr, (uint)array.Length, false, name, false, out num);
+            AKRESULT akresult = AkSoundEngine.LoadAndDecodeBankFromMemory((IntPtr)p, (uint)array.Length, false, name, false, out var num);
             // Console.WriteLine(string.Format("Result of soundbank load: {0}.", akresult));
         }
-        finally
-        {
-            Marshal.FreeHGlobal(intPtr);
-        }
-    }
-
-    public static byte[] StreamToByteArray(Stream input)
-    {
-        byte[] array = new byte[16384];
-        byte[] result;
-        using (MemoryStream memoryStream = new MemoryStream())
-        {
-            int count;
-            while ((count = input.Read(array, 0, array.Length)) > 0) { memoryStream.Write(array, 0, count); }
-            result = memoryStream.ToArray();
-        }
-        return result;
     }
 }
-
 
 // Easing functions from https://gist.github.com/Kryzarel/bba64622057f21a1d6d44879f9cd7bd4
 // Made with the help of this great post: https://joshondesign.com/2013/03/01/improvedEasingEquations
