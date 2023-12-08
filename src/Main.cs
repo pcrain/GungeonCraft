@@ -12,6 +12,7 @@
     global using System.Globalization; // CultureInfo
     global using System.ComponentModel;  // Debug stuff
     global using System.Runtime.InteropServices; // Audio loading
+    global using System.Threading;
 
     global using BepInEx;
     global using UnityEngine;
@@ -64,6 +65,7 @@ public class Initialisation : BaseUnityPlugin
     {
         ETGModMainBehaviour.WaitForGameManagerStart(GMStart);
     }
+
     public void GMStart(GameManager manager)
     {
         try
@@ -80,48 +82,77 @@ public class Initialisation : BaseUnityPlugin
 
             Instance = this;
 
+            #region Round 1 Config (hooks and database stuff where no sprites are needed, so it can be async)
+            System.Diagnostics.Stopwatch setupConfig1Watch = null;
+            bool asyncConfig1Setup = false;
+            ThreadPool.QueueUserWorkItem((object stateInfo) => {
+                setupConfig1Watch = System.Diagnostics.Stopwatch.StartNew();
+
+                // Build resource map for ease of access
+                ResMap.Build();
+
+                //Tools and Toolboxes
+                CwaffEvents.Init();  // Event handlers
+                CwaffPrerequisite.Init();  // must be set up after CwaffEvents
+                // HUDController.Init(); // Need to load early (unused for now)
+                CustomAmmoDisplay.Init(); // Also need to load early
+                CustomDodgeRoll.InitCustomDodgeRollHooks();
+                ModdedShopItemAdder.Init(); // must be set up after CwaffEvents
+                PlayerToolsSetup.Init();
+                //Commands and Other Console Utilities
+                Commands.Init();
+
+                // Game tweaks
+                HeckedMode.Init();
+
+                asyncConfig1Setup = true;
+                setupConfig1Watch.Stop();
+            });
+            #endregion
+
+            #region Save API Setup (Async)
+                bool asyncSaveApiSetup = false;
+                System.Diagnostics.Stopwatch setupSaveWatch = null;
+                ThreadPool.QueueUserWorkItem((object stateInfo) => {
+                    setupSaveWatch = System.Diagnostics.Stopwatch.StartNew();
+                    SaveAPI.SaveAPIManager.Setup("cg");  // Needed for prerequisite checking and save serialization
+                    asyncSaveApiSetup = true;
+                    setupSaveWatch.Stop();
+                });
+            #endregion
+
             #region Sprite Setup
                 System.Diagnostics.Stopwatch setupSpritesWatch = System.Diagnostics.Stopwatch.StartNew();
                 ETGMod.Assets.SetupSpritesFromAssembly(Assembly.GetExecutingAssembly(), "CwaffingTheGungy.Resources");
                 setupSpritesWatch.Stop();
             #endregion
 
-            #region Pre-Config
-                System.Diagnostics.Stopwatch setupConfigWatch = System.Diagnostics.Stopwatch.StartNew();
-                // Build resource map for ease of access
-                ResMap.Build();
-
-                //Tools and Toolboxes
-                CwaffEvents.Init();
-
-                // HUDController.Init(); // Need to load early (unused for now)
-                CustomAmmoDisplay.Init(); // Also need to load early
-                ModdedShopItemAdder.Init(); // Need to load after CwaffEvents.Init()
-
-                SaveAPI.SaveAPIManager.Setup("cg");  // Needed for prerequisite checking and save serialization
-                ETGModMainBehaviour.Instance.gameObject.AddComponent<AudioSource>();
-
-                PlayerToolsSetup.Init();
+            #region Round 2 Config (Anything that requires sprites, cannot be async)
+                System.Diagnostics.Stopwatch setupConfig2Watch = System.Diagnostics.Stopwatch.StartNew();
+                while (!asyncConfig1Setup) Thread.Sleep(10); // we need to wait for our ResMap to be built, so wait here
+                // Basic VFX Setup
                 VFX.Init();
-
                 //Status Effect Setup
                 SoulLinkStatus.Init();
                 //Goop Setup
                 EasyGoopDefinitions.DefineDefaultGoops();
-
-                //Hats
-                // HatUtility.NecessarySetup();
-                // HatDefinitions.Init();
-
-                //Commands and Other Console Utilities
-                Commands.Init();
-                setupConfigWatch.Stop();
+                // Note Does Setup
+                CustomNoteDoer.Init();
+                // Miscellaneous tweaks
+                CwaffTweaks.Init();
+                setupConfig2Watch.Stop();
             #endregion
 
-            #region Audio
-                System.Diagnostics.Stopwatch setupAudioWatch = System.Diagnostics.Stopwatch.StartNew();
-                AudioResourceLoader.AutoloadFromAssembly("CwaffingTheGungy");  // Load Audio Banks
-                setupAudioWatch.Stop();
+            #region Audio (Async)
+                bool asyncLoadedAudio = false;
+                System.Diagnostics.Stopwatch setupAudioWatch = null;
+                ThreadPool.QueueUserWorkItem((object stateInfo) => {
+                    setupAudioWatch = System.Diagnostics.Stopwatch.StartNew();
+                    ETGModMainBehaviour.Instance.gameObject.AddComponent<AudioSource>(); // is this necessary?
+                    AudioResourceLoader.AutoloadFromAssembly("CwaffingTheGungy");  // Load Audio Banks
+                    asyncLoadedAudio = true;
+                    setupAudioWatch.Stop();
+                });
             #endregion
 
             #region Actives
@@ -233,13 +264,25 @@ public class Initialisation : BaseUnityPlugin
                 Uppskeruvel.Add();
                 setupGunsWatch.Stop();
             #endregion
-            // tempWatch.Stop(); ETGModConsole.Log($"part 1 finished in "+(tempWatch.ElapsedMilliseconds/1000.0f)+" seconds"); tempWatch = System.Diagnostics.Stopwatch.StartNew();
 
             #region Synergies
                 System.Diagnostics.Stopwatch setupSynergiesWatch = System.Diagnostics.Stopwatch.StartNew();
                 CwaffSynergies.Init();
                 setupSynergiesWatch.Stop();
+            #endregion
 
+            #region UI Sprites (cannot be async, must set up textures on main thread)
+                System.Diagnostics.Stopwatch setupUIWatch = System.Diagnostics.Stopwatch.StartNew();
+                if (!C.SKIP_UI_LOAD)  // skip loading UI sprites in debug fast load mode
+                {
+                    Assembly ourAssembly = Assembly.GetExecutingAssembly();
+                    ShopAPI.AddCustomCurrencyType(ResMap.Get("barter_s_icon")[0]+".png", Bart._BarterSpriteS, ourAssembly);
+                    ShopAPI.AddCustomCurrencyType(ResMap.Get("barter_a_icon")[0]+".png", Bart._BarterSpriteA, ourAssembly);
+                    ShopAPI.AddCustomCurrencyType(ResMap.Get("barter_b_icon")[0]+".png", Bart._BarterSpriteB, ourAssembly);
+                    ShopAPI.AddCustomCurrencyType(ResMap.Get("barter_c_icon")[0]+".png", Bart._BarterSpriteC, ourAssembly);
+                    ShopAPI.AddCustomCurrencyType(ResMap.Get("soul_sprite_ui_icon")[0]+".png", Uppskeruvel._SoulSpriteUI, ourAssembly);
+                }
+                setupUIWatch.Stop();
             #endregion
 
             #region Shop NPCs
@@ -334,16 +377,6 @@ public class Initialisation : BaseUnityPlugin
                 // }
             #endregion
 
-            #region Misc. Initialization and Tweaks
-                System.Diagnostics.Stopwatch setupMiscWatch = System.Diagnostics.Stopwatch.StartNew();
-                CwaffPrerequisite.Init();
-                CustomNoteDoer.Init();
-                CustomDodgeRoll.InitCustomDodgeRollHooks();
-                CwaffTweaks.Init();
-                HeckedMode.Init();
-                setupMiscWatch.Stop();
-            #endregion
-
             #region Hotfixes for bugs and issues mostly out of my control
                 System.Diagnostics.Stopwatch setupHotfixesWatch = System.Diagnostics.Stopwatch.StartNew();
                 DragunFightHotfix.Init();
@@ -356,14 +389,24 @@ public class Initialisation : BaseUnityPlugin
                 setupHotfixesWatch.Stop();
             #endregion
 
+            #region Wait for Async stuff to finish up
+                System.Diagnostics.Stopwatch awaitAsyncWatch = System.Diagnostics.Stopwatch.StartNew();
+                while (!asyncLoadedAudio) Thread.Sleep(10);
+                while (!asyncSaveApiSetup) Thread.Sleep(10);
+                awaitAsyncWatch.Stop();
+            #endregion
+
             watch.Stop();
             ETGModConsole.Log($"Yay! :D Initialized <color=#aaffaaff>{C.MOD_NAME} v{C.MOD_VERSION}</color> in "+(watch.ElapsedMilliseconds/1000.0f)+" seconds");
             if (C.DEBUG_BUILD)
             {
                 // ETGModConsole.Log($"    setupMemory    finished in "+(setupMemoryWatch.ElapsedMilliseconds/1000.0f)+" seconds");
+                ETGModConsole.Log($"    setupConfig1   finished in {setupConfig1Watch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupSprites   finished in {setupSpritesWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    setupConfig    finished in {setupConfigWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    setupAudio     finished in {setupAudioWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    setupConfig2   finished in {setupConfig2Watch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    setupSave      finished in {setupSaveWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
+                ETGModConsole.Log($"    setupAudio     finished in {setupAudioWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
+                ETGModConsole.Log($"    setupUI        finished in {setupUIWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupActives   finished in {setupActivesWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupPassives  finished in {setupPassivesWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupGuns      finished in {setupGunsWatch.ElapsedMilliseconds} milliseconds");
@@ -371,8 +414,8 @@ public class Initialisation : BaseUnityPlugin
                 ETGModConsole.Log($"    setupShops     finished in {setupShopsWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupBosses    finished in {setupBossesWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupFloors    finished in {setupFloorsWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    setupMisc      finished in {setupMiscWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupHotfixes  finished in {setupHotfixesWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    awaitAsync     finished in {awaitAsyncWatch.ElapsedMilliseconds} milliseconds");
                 AkSoundEngine.PostEvent("vc_kirby_appeal01", ETGModMainBehaviour.Instance.gameObject);
             }
 

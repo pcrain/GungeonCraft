@@ -2,8 +2,8 @@ namespace CwaffingTheGungy;
 
 public class C // constants
 {
-    public static readonly bool DEBUG_BUILD = true; // set to false for release builds (must be readonly instead of const to avoid build warnings)
-    public static readonly bool FAST_LOAD   = false && DEBUG_BUILD; // set to true to speed up load times while testing
+    public static readonly bool DEBUG_BUILD  = true; // set to false for release builds (must be readonly instead of const to avoid build warnings)
+    public static readonly bool SKIP_UI_LOAD = false && DEBUG_BUILD; // set to true to speed up load times while testing
 
     public const string MOD_NAME        = "GungeonCraft";
     public const string MOD_INT_NAME    = "CwaffingTheGungy";

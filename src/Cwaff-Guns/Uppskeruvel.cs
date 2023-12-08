@@ -9,7 +9,7 @@ public class Uppskeruvel : AdvancedGunBehavior
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
 
-    internal static string _SoulSpriteUI = null;
+    internal const string _SoulSpriteUI = $"{C.MOD_PREFIX}:_SoulSpriteUI";  // need the string immediately for safe(ish) async loading
 
     public int souls = 0;
 
@@ -25,11 +25,6 @@ public class Uppskeruvel : AdvancedGunBehavior
         );
 
         gun.gameObject.AddComponent<UppskeruvelAmmoDisplay>();
-
-        if (!C.FAST_LOAD)
-        {
-            _SoulSpriteUI = ShopAPI.AddCustomCurrencyType(ResMap.Get("soul_sprite_ui_icon")[0]+".png", $"{C.MOD_PREFIX}:_SoulSpriteUI", Assembly.GetCallingAssembly());
-        }
     }
 }
 

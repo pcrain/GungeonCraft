@@ -5,10 +5,10 @@ public class Bart
 {
     internal static GenericLootTable _BarterTable = null;
 
-    internal static string _BarterSpriteS = null;
-    internal static string _BarterSpriteA = null;
-    internal static string _BarterSpriteB = null;
-    internal static string _BarterSpriteC = null;
+    internal const string _BarterSpriteS = $"{C.MOD_PREFIX}:S_TIER_ITEM";  // need the string immediately for safe(ish) async loading
+    internal const string _BarterSpriteA = $"{C.MOD_PREFIX}:A_TIER_ITEM";
+    internal const string _BarterSpriteB = $"{C.MOD_PREFIX}:B_TIER_ITEM";
+    internal const string _BarterSpriteC = $"{C.MOD_PREFIX}:C_TIER_ITEM";
 
     public static void Init()
     {
@@ -18,18 +18,6 @@ public class Bart
         List<string> moddedItems = new();
 
         $"#BARTER_SHOP_SIGN".SetupDBStrings(new(){"HOW TO BARTER:\n\ndrop an item whose quality is\nat least the quality shown on\nthe item you wish to trade for."});
-
-
-        // NOTE: resizing the Atlas when first adding a sprite takes 4 seconds (old method) and 1 second (current method, still slow)
-        //       not sure this can be sped up any further in the future, but something to be aware of and possibly disable when
-        //       doing heavy testing
-        if (!C.FAST_LOAD)
-        {
-            _BarterSpriteS = ShopAPI.AddCustomCurrencyType(ResMap.Get("barter_s_icon")[0]+".png", $"{C.MOD_PREFIX}:S_TIER_ITEM", Assembly.GetCallingAssembly());
-            _BarterSpriteA = ShopAPI.AddCustomCurrencyType(ResMap.Get("barter_a_icon")[0]+".png", $"{C.MOD_PREFIX}:A_TIER_ITEM", Assembly.GetCallingAssembly());
-            _BarterSpriteB = ShopAPI.AddCustomCurrencyType(ResMap.Get("barter_b_icon")[0]+".png", $"{C.MOD_PREFIX}:B_TIER_ITEM", Assembly.GetCallingAssembly());
-            _BarterSpriteC = ShopAPI.AddCustomCurrencyType(ResMap.Get("barter_c_icon")[0]+".png", $"{C.MOD_PREFIX}:C_TIER_ITEM", Assembly.GetCallingAssembly());
-        }
 
         FancyShopData shop = FancyRoomBuilder.MakeFancyShop(
             npcName                : "bart",
