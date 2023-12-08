@@ -42,12 +42,11 @@ public class Bart
             spawnPrerequisite      : CwaffPrerequisites.BARTER_SHOP_PREREQUISITE,
             // Guaranteed spawn on 2nd or 3rd floor
             allowedTilesets        : (int)( GlobalDungeonData.ValidTilesets.GUNGEON | GlobalDungeonData.ValidTilesets.MINEGEON ),
-            prequisiteValidator    : OnSecondOrThirdFloor, // can glitchily spawn on other floors, so add extra insurance
+            prequisiteValidator    : OnSecondOrThirdFloor,
             // prequisiteValidator    : null,
             talkPointOffset        : C.PIXEL_SIZE * new Vector2(7, 22),
             npcPosition            : C.PIXEL_SIZE * new Vector2(10, 60 + 16),
             itemPositions          : ShopAPI.defaultItemPositions.ShiftAll(C.PIXEL_SIZE * new Vector2(-25, 0 + 16)),
-            // exactlyOncePerRun      : false,  // completely busted past the first floor for some reason, do not set to true
             exactlyOncePerRun      : true,
             // voice                  : "sans", // will play audio "Play_CHR_<voice>_voice_01"
             genericDialog          : new(){

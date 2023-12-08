@@ -76,8 +76,11 @@ public class Initialisation : BaseUnityPlugin
 
             Instance = this;
 
+            System.Diagnostics.Stopwatch setupSpritesWatch = System.Diagnostics.Stopwatch.StartNew();
             ETGMod.Assets.SetupSpritesFromAssembly(Assembly.GetExecutingAssembly(), "CwaffingTheGungy.Resources");
+            setupSpritesWatch.Stop();
 
+            System.Diagnostics.Stopwatch preConfigWatch = System.Diagnostics.Stopwatch.StartNew();
             // Build resource map for ease of access
             ResMap.Build();
 
@@ -110,8 +113,10 @@ public class Initialisation : BaseUnityPlugin
 
             //Commands and Other Console Utilities
             Commands.Init();
+            preConfigWatch.Stop();
 
             #region Actives
+                System.Diagnostics.Stopwatch setupActivesWatch = System.Diagnostics.Stopwatch.StartNew();
                 BorrowedTime.Init();
                 BulletThatCanKillTheFuture.Init();
                 GunPowderer.Init();
@@ -125,9 +130,11 @@ public class Initialisation : BaseUnityPlugin
                 IceCream.Init();
                 // GungeonitePickaxe.Init();
                 ChamberJammer.Init();
+                setupActivesWatch.Stop();
             #endregion
 
             #region Passives
+                System.Diagnostics.Stopwatch setupPassivesWatch = System.Diagnostics.Stopwatch.StartNew();
                 // Shine.Init(); unfinished
                 // Superstitious.Init(); unfinished
                 DriftersHeadgear.Init();
@@ -158,11 +165,13 @@ public class Initialisation : BaseUnityPlugin
                 AdrenalineShot.Init();
                 StuntHelmet.Init();
                 ComfySlippers.Init();
+                setupPassivesWatch.Stop();
             #endregion
 
             // System.Diagnostics.Stopwatch tempWatch = System.Diagnostics.Stopwatch.StartNew();
             // tempWatch.Stop(); ETGModConsole.Log($"part 1 finished in "+(tempWatch.ElapsedMilliseconds/1000.0f)+" seconds"); tempWatch = System.Diagnostics.Stopwatch.StartNew();
             #region Guns
+                System.Diagnostics.Stopwatch setupGunsWatch = System.Diagnostics.Stopwatch.StartNew();
                 IronMaid.Add();
                 Natascha.Add();
                 PaintballCannon.Add();
@@ -215,14 +224,19 @@ public class Initialisation : BaseUnityPlugin
                 Crapshooter.Add();
                 CarpetBomber.Add();
                 Uppskeruvel.Add();
+                setupGunsWatch.Stop();
             #endregion
             // tempWatch.Stop(); ETGModConsole.Log($"part 1 finished in "+(tempWatch.ElapsedMilliseconds/1000.0f)+" seconds"); tempWatch = System.Diagnostics.Stopwatch.StartNew();
 
             #region Synergies
+                System.Diagnostics.Stopwatch setupSynergiesWatch = System.Diagnostics.Stopwatch.StartNew();
                 CwaffSynergies.Init();
+                setupSynergiesWatch.Stop();
+
             #endregion
 
             #region Shop NPCs
+                System.Diagnostics.Stopwatch setupShopsWatch = System.Diagnostics.Stopwatch.StartNew();
                 // InsuranceBoi.Init();
                 WhiteMage.Init();
                 Bart.Init();
@@ -237,6 +251,7 @@ public class Initialisation : BaseUnityPlugin
                 //         ETGModConsole.Log($"    annotation? {m?.injectionData?.InjectionData?[0]?.annotation ?? null}");
                 //     }
                 // };
+                setupShopsWatch.Stop();
             #endregion
 
             #region Fancy NPCs
@@ -244,11 +259,16 @@ public class Initialisation : BaseUnityPlugin
             #endregion
 
             #region Bosses yo
+                System.Diagnostics.Stopwatch setupBossesWatch = System.Diagnostics.Stopwatch.StartNew();
                 BossBuilder.Init();
                 SansBoss.Init();
+                setupBossesWatch.Stop();
             #endregion
 
-            #region Flow stuff stolen from Apache
+            #region Floor and Flow Initialization
+                System.Diagnostics.Stopwatch setupFloorsWatch = System.Diagnostics.Stopwatch.StartNew();
+
+                // Flow stuff stolen from Apache
                 AssetBundle sharedAssets;
                 AssetBundle sharedAssets2;
                 AssetBundle sharedBase;
@@ -281,15 +301,20 @@ public class Initialisation : BaseUnityPlugin
                     braveResources = null;
                     enemiesBase = null;
                 }
-            #endregion
 
-            #region Floor Initialization
+
+                // Actual floor Initialization
                 CwaffDungeons.Init(); // must be done before creating any custom floors / flows
                 SansDungeon.Init();
+
+                // Modified version of Anywhere mod, further stolen and modified from Apache's version
+                FlowCommands.Install();
+
+                setupFloorsWatch.Stop();
             #endregion
 
             #region Old Asset Stuff
-                Dissect.FindDefaultResource("DefaultTorch");
+                // Dissect.FindDefaultResource("DefaultTorch");
                 // ETGModConsole.Log("Trying to load some stuff");
                 // try
                 // {
@@ -317,19 +342,17 @@ public class Initialisation : BaseUnityPlugin
                 // }
             #endregion
 
-            // Modified version of Anywhere mod, further stolen and modified from Apache's version
-            FlowCommands.Install();
-
-            //Misc. Initialization
+            //Misc. Initialization and Tweaks
+            System.Diagnostics.Stopwatch setupMiscWatch = System.Diagnostics.Stopwatch.StartNew();
             CwaffPrerequisite.Init();
-
-            //Misc. Tweaks
             CustomNoteDoer.Init();
             CustomDodgeRoll.InitCustomDodgeRollHooks();
             CwaffTweaks.Init();
             HeckedMode.Init();
+            setupMiscWatch.Stop();
 
             // Hotfixes for bugs and issues mostly out of my control
+            System.Diagnostics.Stopwatch setupHotfixesWatch = System.Diagnostics.Stopwatch.StartNew();
             DragunFightHotfix.Init();
             CoopTurboModeHotfix.Init();
             LargeGunAnimationHotfix.Init();
@@ -337,11 +360,25 @@ public class Initialisation : BaseUnityPlugin
             // CoopDrillSoftlockHotfix.Init(); // incomplete
             QuickRestartRoomCacheHotfix.Init();
             RoomShuffleOffByOneHotfix.Init();
+            setupHotfixesWatch.Stop();
 
             watch.Stop();
             ETGModConsole.Log($"Yay! :D Initialized <color=#aaffaaff>{C.MOD_NAME} v{C.MOD_VERSION}</color> in "+(watch.ElapsedMilliseconds/1000.0f)+" seconds");
             if (C.DEBUG_BUILD)
+            {
+                ETGModConsole.Log($"    setupSprites   finished in "+(setupSpritesWatch.ElapsedMilliseconds/1000.0f)+" seconds");
+                ETGModConsole.Log($"    preConfig      finished in "+(preConfigWatch.ElapsedMilliseconds/1000.0f)+" seconds");
+                ETGModConsole.Log($"    setupActives   finished in "+(setupActivesWatch.ElapsedMilliseconds/1000.0f)+" seconds");
+                ETGModConsole.Log($"    setupPassives  finished in "+(setupPassivesWatch.ElapsedMilliseconds/1000.0f)+" seconds");
+                ETGModConsole.Log($"    setupGuns      finished in "+(setupGunsWatch.ElapsedMilliseconds/1000.0f)+" seconds");
+                ETGModConsole.Log($"    setupSynergies finished in "+(setupSynergiesWatch.ElapsedMilliseconds/1000.0f)+" seconds");
+                ETGModConsole.Log($"    setupShops     finished in "+(setupShopsWatch.ElapsedMilliseconds/1000.0f)+" seconds");
+                ETGModConsole.Log($"    setupBosses    finished in "+(setupBossesWatch.ElapsedMilliseconds/1000.0f)+" seconds");
+                ETGModConsole.Log($"    setupFloors    finished in "+(setupFloorsWatch.ElapsedMilliseconds/1000.0f)+" seconds");
+                ETGModConsole.Log($"    setupMisc      finished in "+(setupMiscWatch.ElapsedMilliseconds/1000.0f)+" seconds");
+                ETGModConsole.Log($"    setupHotfixes  finished in "+(setupHotfixesWatch.ElapsedMilliseconds/1000.0f)+" seconds");
                 AkSoundEngine.PostEvent("vc_kirby_appeal01", ETGModMainBehaviour.Instance.gameObject);
+            }
 
             // Debug.LogError("Gungy o.o!");
             // Debug.LogAssertion("Gungy o.o!");

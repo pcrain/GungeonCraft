@@ -3450,6 +3450,13 @@
     <EmbeddedResource Include="Resources\ObjectSprites\gifts\green_gift_wrap_001.png"/>
     <EmbeddedResource Include="Resources\ObjectSprites\gifts\red_gift_wrap_007.png"/>
     <EmbeddedResource Include="Resources\ObjectSprites\gifts\black_gift_wrap_010.png"/>
+    <EmbeddedResource Include="Resources\UISprites\barter_c_icon.png"/>
+    <EmbeddedResource Include="Resources\UISprites\adrenaline_heart.png"/>
+    <EmbeddedResource Include="Resources\UISprites\soul_sprite_ui_icon.png"/>
+    <EmbeddedResource Include="Resources\UISprites\barter_s_icon.png"/>
+    <EmbeddedResource Include="Resources\UISprites\barter_b_icon.png"/>
+    <EmbeddedResource Include="Resources\UISprites\barter_a_icon.png"/>
+    <EmbeddedResource Include="Resources\UISprites\barter_d_icon.png"/>
     <EmbeddedResource Include="Resources\sans_bosscard.png"/>
     <EmbeddedResource Include="Resources\CustomClips\iron_maid_clipempty_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\racket_launcher_clipempty_001.png"/>
@@ -3703,7 +3710,6 @@
     <EmbeddedResource Include="Resources\Companions\Wolf\wolf_pet_004.png"/>
     <EmbeddedResource Include="Resources\Companions\Wolf\wolf_pet_left_004.png"/>
     <EmbeddedResource Include="Resources\EmbeddedRooms\BoomhildrRoom.room"/>
-    <EmbeddedResource Include="Resources\UISpritesa\adrenaline_heart.png"/>
     <EmbeddedResource Include="Resources\Sounds\CwaffingTheGungy.bnk"/>
     <EmbeddedResource Include="Resources\EnemySprites\bullet_smile_right_002.png"/>
     <EmbeddedResource Include="Resources\EnemySprites\bullet_smile_left_002.png"/>
@@ -3725,15 +3731,10 @@
     <EmbeddedResource Include="Resources\NPCSprites\insurance_boi\insurance_boi_talk.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\insurance_boi\insurance_boi_idle.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\insurance_boi\insurance_boi_icon.png"/>
-    <EmbeddedResource Include="Resources\NPCSprites\bart\barter_c_icon.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\bart\bart_icon1.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\bart\bart_talk_001.png"/>
-    <EmbeddedResource Include="Resources\NPCSprites\bart\barter_s_icon.png"/>
-    <EmbeddedResource Include="Resources\NPCSprites\bart\barter_b_icon.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\bart\bart_talk_002.png"/>
-    <EmbeddedResource Include="Resources\NPCSprites\bart\barter_a_icon.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\bart\bart_idle_002.png"/>
-    <EmbeddedResource Include="Resources\NPCSprites\bart\barter_d_icon.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\bart\bart_idle_001.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\GrinReaper\grin_allsprites2.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\GrinReaper\grin_allsprites10.png"/>

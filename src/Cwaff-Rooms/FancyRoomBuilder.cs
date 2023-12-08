@@ -318,7 +318,7 @@ public static class FancyRoomBuilder
       {
         if (((int)tileset & allowedTilesets) == (int)tileset)
         {
-          Lazy.DebugLog($"  have tileset {Enum.GetName(typeof(GlobalDungeonData.ValidTilesets), tileset)}");
+          // Lazy.DebugLog($"  have tileset {Enum.GetName(typeof(GlobalDungeonData.ValidTilesets), tileset)}");
           ++numValidTilesets;
         }
       }
