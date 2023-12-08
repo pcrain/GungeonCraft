@@ -242,13 +242,8 @@ public static class AnimatedBullet // stolen and modified from NN
             float pixelScale = pixelScales[i];
             IntVector2? overrideColliderPixelSize = overrideColliderPixelSizes[i];
             IntVector2? overrideColliderOffset = overrideColliderOffsets[i];
-            Vector3? manualOffset = manualOffsets[i];
             bool anchorChangesCollider = anchorsChangeColliders[i];
             bool fixesScale = fixesScales[i];
-            if (!manualOffset.HasValue)
-            {
-                manualOffset = new Vector2?(Vector2.zero);
-            }
             Anchor anchor = anchors[i];
             bool lightened = lighteneds[i];
             Projectile overrideProjectileToCopyFrom = overrideProjectilesToCopyFrom[i];
@@ -257,8 +252,7 @@ public static class AnimatedBullet // stolen and modified from NN
             frame.spriteId = frame.spriteCollection.inst.GetSpriteIdByName(name);
             frames.Add(frame);
             IntVector2 truePixelSize = (C.PIXELS_PER_TILE * frame.spriteCollection.GetSpriteDefinition(name).position3.XY()).ToIntVector2();
-            IntVector2 pixelSize = new Vector2(pixelScale * truePixelSize.x, pixelScale * truePixelSize.y).ToIntVector2();
-            // ETGModConsole.Log($"  sprite size for {name} is {truePixelSize.x}x{truePixelSize.y}");
+            IntVector2 pixelSize = new IntVector2((int)(pixelScale * truePixelSize.x), (int)(pixelScale * truePixelSize.y));
             int? overrideColliderPixelWidth = null;
             int? overrideColliderPixelHeight = null;
             if (overrideColliderPixelSize.HasValue)
@@ -276,10 +270,14 @@ public static class AnimatedBullet // stolen and modified from NN
             tk2dSpriteDefinition def = GunTools.SetupDefinitionForProjectileSprite(name, frame.spriteId, pixelSize.x, pixelSize.y, lightened, overrideColliderPixelWidth, overrideColliderPixelHeight, overrideColliderOffsetX, overrideColliderOffsetY,
                 overrideProjectileToCopyFrom);
             def.ConstructOffsetsFromAnchor(anchor, def.position3, fixesScale, anchorChangesCollider);
-            def.position0 += manualOffset.Value;
-            def.position1 += manualOffset.Value;
-            def.position2 += manualOffset.Value;
-            def.position3 += manualOffset.Value;
+            if (manualOffsets[i].HasValue)
+            {
+                Vector3 manualOffset = manualOffsets[i].Value;
+                def.position0 += manualOffset;
+                def.position1 += manualOffset;
+                def.position2 += manualOffset;
+                def.position3 += manualOffset;
+            }
         }
         clip.wrapMode = loops ? tk2dSpriteAnimationClip.WrapMode.Loop : tk2dSpriteAnimationClip.WrapMode.Once;
         clip.frames = frames.ToArray();

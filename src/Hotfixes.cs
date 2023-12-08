@@ -1,5 +1,43 @@
 namespace CwaffingTheGungy;
 
+// Prevent MtG API from loading sprites that don't belong to any collection by skipping the entire relevant branch (turns out not to speed up very much)
+public static class UnprocessedSpriteHotfix
+{
+    public static void Init()
+    {
+        new ILHook(
+            typeof(ETGMod.Assets).GetMethod("SetupSpritesFromAssembly", BindingFlags.Static | BindingFlags.Public),
+            SetupSpritesFromAssemblyIL
+            );
+    }
+
+    private static void SetupSpritesFromAssemblyIL(ILContext il)
+    {
+        ILCursor cursor = new ILCursor(il);
+        // cursor.DumpILOnce("SetupSpritesFromAssemblyIL");
+
+        // Move before the 3rd new Texture2D that we want to skip
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchNewobj<Texture2D>()))
+            return;
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchNewobj<Texture2D>()))
+            return;
+        if (!cursor.TryGotoNext(MoveType.Before, instr => instr.MatchNewobj<Texture2D>()))
+            return;
+
+        // Move back to the unconditional jump to the end of the loop from the "if" half of the branch, and mark the label
+        ILLabel nextLoopJump = null;
+        if (!cursor.TryGotoPrev(MoveType.Before, instr => instr.MatchBr(out nextLoopJump)))
+            return;
+
+        // Move to the next const load, remove it, and move to the next iteration immediately
+        int constload;
+        if (!cursor.TryGotoNext(MoveType.Before, instr => instr.MatchLdcI4(out constload)))
+            return;
+        cursor.Remove();
+        cursor.Emit(OpCodes.Br, nextLoopJump);
+    }
+}
+
 // All 3 of Gungeon's list-shuffling implementations are flawed due to off by one errors, so we need to fix them
 //   We can't hook generic methods directly, so focus on GenerationShuffle<int>(), which is the main issue for floor room generation
 public static class RoomShuffleOffByOneHotfix

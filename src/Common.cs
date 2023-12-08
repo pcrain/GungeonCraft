@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class C // constants
 {
     public static readonly bool DEBUG_BUILD  = true; // set to false for release builds (must be readonly instead of const to avoid build warnings)
-    public static readonly bool SKIP_UI_LOAD = false && DEBUG_BUILD; // set to true to speed up load times while testing
 
     public const string MOD_NAME        = "GungeonCraft";
     public const string MOD_INT_NAME    = "CwaffingTheGungy";
@@ -266,8 +265,8 @@ public static class Dissect // reflection helper methods for being a lazy dumdum
                 GameObject res = ResourceManager.LoadAssetBundle(bundle).LoadAsset<GameObject>(name);
                 if (res == null)
                     continue;
-                if (C.DEBUG_BUILD)
-                    ETGModConsole.Log($"found asset {name} in bundle {bundle}");
+                // if (C.DEBUG_BUILD)
+                //     ETGModConsole.Log($"found asset {name} in bundle {bundle}");
                 return res;
             }
             catch (Exception)
@@ -287,8 +286,8 @@ public static class Dissect // reflection helper methods for being a lazy dumdum
         {
             if (ResourceManager.LoadAssetBundle(bundle).LoadAsset<T>(name) == null)
                 continue;
-            if (C.DEBUG_BUILD)
-                ETGModConsole.Log($"found asset {name} in bundle {bundle}");
+            // if (C.DEBUG_BUILD)
+            //     ETGModConsole.Log($"found asset {name} in bundle {bundle}");
             break;
         }
     }

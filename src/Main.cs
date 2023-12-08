@@ -72,20 +72,19 @@ public class Initialisation : BaseUnityPlugin
         {
             var watch = System.Diagnostics.Stopwatch.StartNew();
             if (C.DEBUG_BUILD)
-                ETGModConsole.Log("Cwaffing the Gungy initialising...");
+                ETGModConsole.Log("Cwaffing the Gungy initializing...");
 
-            // #region Memory Setup
+            #region Memory Setup (just slows things down, so disabled for now)
             //     System.Diagnostics.Stopwatch setupMemoryWatch = System.Diagnostics.Stopwatch.StartNew();
             //     BraveMemory.EnsureHeapSize(1024*1024); Lazy.DebugLog("Ensured 1GB heap...");
             //     setupMemoryWatch.Stop();
-            // #endregion
+            #endregion
 
             Instance = this;
 
             #region Round 1 Config (hooks and database stuff where no sprites are needed, so it can be async)
             System.Diagnostics.Stopwatch setupConfig1Watch = null;
-            bool asyncConfig1Setup = false;
-            ThreadPool.QueueUserWorkItem((object stateInfo) => {
+            Thread setupConfig1Thread = new Thread(() => {
                 setupConfig1Watch = System.Diagnostics.Stopwatch.StartNew();
 
                 // Build resource map for ease of access
@@ -105,15 +104,14 @@ public class Initialisation : BaseUnityPlugin
                 // Game tweaks
                 HeckedMode.Init();
 
-                asyncConfig1Setup = true;
                 setupConfig1Watch.Stop();
             });
+            setupConfig1Thread.Start();
             #endregion
 
             #region Hotfixes for bugs and issues mostly out of my control (Async)
-                bool asyncHotfixSetup = false;
                 System.Diagnostics.Stopwatch setupHotfixesWatch = null;
-                ThreadPool.QueueUserWorkItem((object stateInfo) => {
+                Thread setupHotfixesThread = new Thread(() => {
                     setupHotfixesWatch = System.Diagnostics.Stopwatch.StartNew();
                     DragunFightHotfix.Init();
                     CoopTurboModeHotfix.Init();
@@ -122,24 +120,23 @@ public class Initialisation : BaseUnityPlugin
                     // CoopDrillSoftlockHotfix.Init(); // incomplete
                     QuickRestartRoomCacheHotfix.Init();
                     RoomShuffleOffByOneHotfix.Init();
-
-                    asyncHotfixSetup = true;
                     setupHotfixesWatch.Stop();
                 });
+                setupHotfixesThread.Start();
             #endregion
 
             #region Save API Setup (Async)
-                bool asyncSaveApiSetup = false;
                 System.Diagnostics.Stopwatch setupSaveWatch = null;
-                ThreadPool.QueueUserWorkItem((object stateInfo) => {
+                Thread setupSaveThread = new Thread(() => {
                     setupSaveWatch = System.Diagnostics.Stopwatch.StartNew();
                     SaveAPI.SaveAPIManager.Setup("cg");  // Needed for prerequisite checking and save serialization
-                    asyncSaveApiSetup = true;
                     setupSaveWatch.Stop();
                 });
+                setupSaveThread.Start();
             #endregion
 
             #region Sprite Setup (Anything that requires sprites cannot be async)
+                // UnprocessedSpriteHotfix.Init();  // prevent SetupSpritesFromAssembly() from loading unprocessed sprites (hotfix doesn't speed anything up, as it turns out)
                 System.Diagnostics.Stopwatch setupSpritesWatch = System.Diagnostics.Stopwatch.StartNew();
                 ETGMod.Assets.SetupSpritesFromAssembly(Assembly.GetExecutingAssembly(), "CwaffingTheGungy.Resources");
                 setupSpritesWatch.Stop();
@@ -147,7 +144,7 @@ public class Initialisation : BaseUnityPlugin
 
             #region Round 2 Config (Requires sprites, cannot be async)
                 System.Diagnostics.Stopwatch setupConfig2Watch = System.Diagnostics.Stopwatch.StartNew();
-                while (!asyncConfig1Setup) Thread.Sleep(10); // we need to wait for our ResMap to be built, so wait here
+                setupConfig1Thread.Join(); // we need to wait for our ResMap to be built, so wait here
                 // Basic VFX Setup
                 VFX.Init();
                 //Status Effect Setup
@@ -162,15 +159,14 @@ public class Initialisation : BaseUnityPlugin
             #endregion
 
             #region Audio (Async)
-                bool asyncLoadedAudio = false;
                 System.Diagnostics.Stopwatch setupAudioWatch = null;
-                ThreadPool.QueueUserWorkItem((object stateInfo) => {
+                Thread setupAudioThread = new Thread(() => {
                     setupAudioWatch = System.Diagnostics.Stopwatch.StartNew();
                     ETGModMainBehaviour.Instance.gameObject.AddComponent<AudioSource>(); // is this necessary?
                     AudioResourceLoader.AutoloadFromAssembly("CwaffingTheGungy");  // Load Audio Banks
-                    asyncLoadedAudio = true;
                     setupAudioWatch.Stop();
                 });
+                setupAudioThread.Start();
             #endregion
 
             #region Actives
@@ -284,49 +280,24 @@ public class Initialisation : BaseUnityPlugin
             #endregion
 
             #region Synergies (Async)
-                bool asyncSynergySetup = false;
                 System.Diagnostics.Stopwatch setupSynergiesWatch = null;
-                ThreadPool.QueueUserWorkItem((object stateInfo) => {
+                Thread setupSynergiesThread = new Thread(() => {
                     setupSynergiesWatch = System.Diagnostics.Stopwatch.StartNew();
                     CwaffSynergies.Init();
-                    asyncSynergySetup = true;
                     setupSynergiesWatch.Stop();
                 });
+                setupSynergiesThread.Start();
             #endregion
 
             #region UI Sprites (cannot be async, must set up textures on main thread)
                 System.Diagnostics.Stopwatch setupUIWatch = System.Diagnostics.Stopwatch.StartNew();
-                if (!C.SKIP_UI_LOAD)  // skip loading UI sprites in debug fast load mode
-                {
-                    BetterAtlas.AddUISpriteBatch(new(){
-                        ResMap.Get("barter_s_icon")[0]+".png",       Bart._BarterSpriteS,
-                        ResMap.Get("barter_a_icon")[0]+".png",       Bart._BarterSpriteA,
-                        ResMap.Get("barter_b_icon")[0]+".png",       Bart._BarterSpriteB,
-                        ResMap.Get("barter_c_icon")[0]+".png",       Bart._BarterSpriteC,
-                        ResMap.Get("soul_sprite_ui_icon")[0]+".png", Uppskeruvel._SoulSpriteUI,
-                    });
-                    // Assembly ourAssembly = Assembly.GetExecutingAssembly();
-                    // System.Diagnostics.Stopwatch tex1Watch = System.Diagnostics.Stopwatch.StartNew();
-                    // ShopAPI.AddCustomCurrencyType(ResMap.Get("barter_s_icon")[0]+".png", Bart._BarterSpriteS, ourAssembly);
-                    // tex1Watch.Stop();
-                    // System.Diagnostics.Stopwatch tex2Watch = System.Diagnostics.Stopwatch.StartNew();
-                    // ShopAPI.AddCustomCurrencyType(ResMap.Get("barter_a_icon")[0]+".png", Bart._BarterSpriteA, ourAssembly);
-                    // tex2Watch.Stop();
-                    // System.Diagnostics.Stopwatch tex3Watch = System.Diagnostics.Stopwatch.StartNew();
-                    // ShopAPI.AddCustomCurrencyType(ResMap.Get("barter_b_icon")[0]+".png", Bart._BarterSpriteB, ourAssembly);
-                    // tex3Watch.Stop();
-                    // System.Diagnostics.Stopwatch tex4Watch = System.Diagnostics.Stopwatch.StartNew();
-                    // ShopAPI.AddCustomCurrencyType(ResMap.Get("barter_c_icon")[0]+".png", Bart._BarterSpriteC, ourAssembly);
-                    // tex4Watch.Stop();
-                    // System.Diagnostics.Stopwatch tex5Watch = System.Diagnostics.Stopwatch.StartNew();
-                    // ShopAPI.AddCustomCurrencyType(ResMap.Get("soul_sprite_ui_icon")[0]+".png", Uppskeruvel._SoulSpriteUI, ourAssembly);
-                    // tex5Watch.Stop();
-                    // ETGModConsole.Log($"    tex1 finished in "+(tex1Watch.ElapsedMilliseconds/1000.0f)+" seconds");
-                    // ETGModConsole.Log($"    tex2 finished in "+(tex2Watch.ElapsedMilliseconds/1000.0f)+" seconds");
-                    // ETGModConsole.Log($"    tex3 finished in "+(tex3Watch.ElapsedMilliseconds/1000.0f)+" seconds");
-                    // ETGModConsole.Log($"    tex4 finished in "+(tex4Watch.ElapsedMilliseconds/1000.0f)+" seconds");
-                    // ETGModConsole.Log($"    tex5 finished in "+(tex5Watch.ElapsedMilliseconds/1000.0f)+" seconds");
-                }
+                BetterAtlas.AddUISpriteBatch(new(){
+                    ResMap.Get("barter_s_icon")[0]+".png",       Bart._BarterSpriteS,
+                    ResMap.Get("barter_a_icon")[0]+".png",       Bart._BarterSpriteA,
+                    ResMap.Get("barter_b_icon")[0]+".png",       Bart._BarterSpriteB,
+                    ResMap.Get("barter_c_icon")[0]+".png",       Bart._BarterSpriteC,
+                    ResMap.Get("soul_sprite_ui_icon")[0]+".png", Uppskeruvel._SoulSpriteUI,
+                });
                 setupUIWatch.Stop();
             #endregion
 
@@ -424,11 +395,11 @@ public class Initialisation : BaseUnityPlugin
 
             #region Wait for Async stuff to finish up
                 System.Diagnostics.Stopwatch awaitAsyncWatch = System.Diagnostics.Stopwatch.StartNew();
-                while (!asyncConfig1Setup) Thread.Sleep(10); // we need to wait for our ResMap to be built, so wait here
-                while (!asyncHotfixSetup) Thread.Sleep(10);
-                while (!asyncSaveApiSetup) Thread.Sleep(10);
-                while (!asyncLoadedAudio) Thread.Sleep(10);
-                while (!asyncSynergySetup) Thread.Sleep(10);
+                setupConfig1Thread.Join();
+                setupHotfixesThread.Join();
+                setupSaveThread.Join();
+                setupAudioThread.Join();
+                setupSynergiesThread.Join();
                 awaitAsyncWatch.Stop();
             #endregion
 

@@ -75,11 +75,10 @@ public static class VFX
             Anchor.LowerCenter,
             baseDef.position3);
 
-        tk2dSpriteCollectionData VFXSpriteCollection = SpriteBuilder.ConstructCollection(Obj, (name + "_Pool"));
-        int spriteID = SpriteBuilder.AddSpriteToCollection(spritePaths[0], VFXSpriteCollection);
+        int spriteID = SpriteBuilder.AddSpriteToCollection(spritePaths[0], OverheadVFXCollection);
 
         tk2dSprite sprite = Obj.GetOrAddComponent<tk2dSprite>();
-        sprite.SetSprite(VFXSpriteCollection, spriteID);
+        sprite.SetSprite(OverheadVFXCollection, spriteID);
         tk2dSpriteDefinition defaultDef = sprite.GetCurrentSpriteDef();
 
         if (dimensions is IntVector2 dims)
@@ -108,9 +107,8 @@ public static class VFX
         List<tk2dSpriteAnimationFrame> frames = new List<tk2dSpriteAnimationFrame>();
         for (int i = 0; i < spritePaths.Count; i++)
         {
-            tk2dSpriteCollectionData collection = VFXSpriteCollection;
-            int frameSpriteId                   = SpriteBuilder.AddSpriteToCollection(spritePaths[i], collection);
-            tk2dSpriteDefinition frameDef       = collection.spriteDefinitions[frameSpriteId];
+            int frameSpriteId                   = SpriteBuilder.AddSpriteToCollection(spritePaths[i], OverheadVFXCollection);
+            tk2dSpriteDefinition frameDef       = OverheadVFXCollection.spriteDefinitions[frameSpriteId];
             frameDef.ConstructOffsetsFromAnchor(anchor);
             frameDef.colliderVertices = defaultDef.colliderVertices;
             frameDef.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
@@ -126,7 +124,7 @@ public static class VFX
                 frameDef.material.SetColor("_EmissiveColor", (Color)emissiveColour);
                 frameDef.materialInst.SetColor("_EmissiveColor", (Color)emissiveColour);
             }
-            frames.Add(new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = collection });
+            frames.Add(new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = OverheadVFXCollection });
         }
         if (emissivePower > 0) {
             sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
