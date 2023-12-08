@@ -110,6 +110,24 @@ public class Initialisation : BaseUnityPlugin
             });
             #endregion
 
+            #region Hotfixes for bugs and issues mostly out of my control (Async)
+                bool asyncHotfixSetup = false;
+                System.Diagnostics.Stopwatch setupHotfixesWatch = null;
+                ThreadPool.QueueUserWorkItem((object stateInfo) => {
+                    setupHotfixesWatch = System.Diagnostics.Stopwatch.StartNew();
+                    DragunFightHotfix.Init();
+                    CoopTurboModeHotfix.Init();
+                    LargeGunAnimationHotfix.Init();
+                    DuctTapeSaveLoadHotfix.Init();
+                    // CoopDrillSoftlockHotfix.Init(); // incomplete
+                    QuickRestartRoomCacheHotfix.Init();
+                    RoomShuffleOffByOneHotfix.Init();
+
+                    asyncHotfixSetup = true;
+                    setupHotfixesWatch.Stop();
+                });
+            #endregion
+
             #region Save API Setup (Async)
                 bool asyncSaveApiSetup = false;
                 System.Diagnostics.Stopwatch setupSaveWatch = null;
@@ -121,13 +139,13 @@ public class Initialisation : BaseUnityPlugin
                 });
             #endregion
 
-            #region Sprite Setup
+            #region Sprite Setup (Anything that requires sprites cannot be async)
                 System.Diagnostics.Stopwatch setupSpritesWatch = System.Diagnostics.Stopwatch.StartNew();
                 ETGMod.Assets.SetupSpritesFromAssembly(Assembly.GetExecutingAssembly(), "CwaffingTheGungy.Resources");
                 setupSpritesWatch.Stop();
             #endregion
 
-            #region Round 2 Config (Anything that requires sprites, cannot be async)
+            #region Round 2 Config (Requires sprites, cannot be async)
                 System.Diagnostics.Stopwatch setupConfig2Watch = System.Diagnostics.Stopwatch.StartNew();
                 while (!asyncConfig1Setup) Thread.Sleep(10); // we need to wait for our ResMap to be built, so wait here
                 // Basic VFX Setup
@@ -265,22 +283,49 @@ public class Initialisation : BaseUnityPlugin
                 setupGunsWatch.Stop();
             #endregion
 
-            #region Synergies
-                System.Diagnostics.Stopwatch setupSynergiesWatch = System.Diagnostics.Stopwatch.StartNew();
-                CwaffSynergies.Init();
-                setupSynergiesWatch.Stop();
+            #region Synergies (Async)
+                bool asyncSynergySetup = false;
+                System.Diagnostics.Stopwatch setupSynergiesWatch = null;
+                ThreadPool.QueueUserWorkItem((object stateInfo) => {
+                    setupSynergiesWatch = System.Diagnostics.Stopwatch.StartNew();
+                    CwaffSynergies.Init();
+                    asyncSynergySetup = true;
+                    setupSynergiesWatch.Stop();
+                });
             #endregion
 
             #region UI Sprites (cannot be async, must set up textures on main thread)
                 System.Diagnostics.Stopwatch setupUIWatch = System.Diagnostics.Stopwatch.StartNew();
                 if (!C.SKIP_UI_LOAD)  // skip loading UI sprites in debug fast load mode
                 {
-                    Assembly ourAssembly = Assembly.GetExecutingAssembly();
-                    ShopAPI.AddCustomCurrencyType(ResMap.Get("barter_s_icon")[0]+".png", Bart._BarterSpriteS, ourAssembly);
-                    ShopAPI.AddCustomCurrencyType(ResMap.Get("barter_a_icon")[0]+".png", Bart._BarterSpriteA, ourAssembly);
-                    ShopAPI.AddCustomCurrencyType(ResMap.Get("barter_b_icon")[0]+".png", Bart._BarterSpriteB, ourAssembly);
-                    ShopAPI.AddCustomCurrencyType(ResMap.Get("barter_c_icon")[0]+".png", Bart._BarterSpriteC, ourAssembly);
-                    ShopAPI.AddCustomCurrencyType(ResMap.Get("soul_sprite_ui_icon")[0]+".png", Uppskeruvel._SoulSpriteUI, ourAssembly);
+                    BetterAtlas.AddUISpriteBatch(new(){
+                        ResMap.Get("barter_s_icon")[0]+".png",       Bart._BarterSpriteS,
+                        ResMap.Get("barter_a_icon")[0]+".png",       Bart._BarterSpriteA,
+                        ResMap.Get("barter_b_icon")[0]+".png",       Bart._BarterSpriteB,
+                        ResMap.Get("barter_c_icon")[0]+".png",       Bart._BarterSpriteC,
+                        ResMap.Get("soul_sprite_ui_icon")[0]+".png", Uppskeruvel._SoulSpriteUI,
+                    });
+                    // Assembly ourAssembly = Assembly.GetExecutingAssembly();
+                    // System.Diagnostics.Stopwatch tex1Watch = System.Diagnostics.Stopwatch.StartNew();
+                    // ShopAPI.AddCustomCurrencyType(ResMap.Get("barter_s_icon")[0]+".png", Bart._BarterSpriteS, ourAssembly);
+                    // tex1Watch.Stop();
+                    // System.Diagnostics.Stopwatch tex2Watch = System.Diagnostics.Stopwatch.StartNew();
+                    // ShopAPI.AddCustomCurrencyType(ResMap.Get("barter_a_icon")[0]+".png", Bart._BarterSpriteA, ourAssembly);
+                    // tex2Watch.Stop();
+                    // System.Diagnostics.Stopwatch tex3Watch = System.Diagnostics.Stopwatch.StartNew();
+                    // ShopAPI.AddCustomCurrencyType(ResMap.Get("barter_b_icon")[0]+".png", Bart._BarterSpriteB, ourAssembly);
+                    // tex3Watch.Stop();
+                    // System.Diagnostics.Stopwatch tex4Watch = System.Diagnostics.Stopwatch.StartNew();
+                    // ShopAPI.AddCustomCurrencyType(ResMap.Get("barter_c_icon")[0]+".png", Bart._BarterSpriteC, ourAssembly);
+                    // tex4Watch.Stop();
+                    // System.Diagnostics.Stopwatch tex5Watch = System.Diagnostics.Stopwatch.StartNew();
+                    // ShopAPI.AddCustomCurrencyType(ResMap.Get("soul_sprite_ui_icon")[0]+".png", Uppskeruvel._SoulSpriteUI, ourAssembly);
+                    // tex5Watch.Stop();
+                    // ETGModConsole.Log($"    tex1 finished in "+(tex1Watch.ElapsedMilliseconds/1000.0f)+" seconds");
+                    // ETGModConsole.Log($"    tex2 finished in "+(tex2Watch.ElapsedMilliseconds/1000.0f)+" seconds");
+                    // ETGModConsole.Log($"    tex3 finished in "+(tex3Watch.ElapsedMilliseconds/1000.0f)+" seconds");
+                    // ETGModConsole.Log($"    tex4 finished in "+(tex4Watch.ElapsedMilliseconds/1000.0f)+" seconds");
+                    // ETGModConsole.Log($"    tex5 finished in "+(tex5Watch.ElapsedMilliseconds/1000.0f)+" seconds");
                 }
                 setupUIWatch.Stop();
             #endregion
@@ -377,22 +422,13 @@ public class Initialisation : BaseUnityPlugin
                 // }
             #endregion
 
-            #region Hotfixes for bugs and issues mostly out of my control
-                System.Diagnostics.Stopwatch setupHotfixesWatch = System.Diagnostics.Stopwatch.StartNew();
-                DragunFightHotfix.Init();
-                CoopTurboModeHotfix.Init();
-                LargeGunAnimationHotfix.Init();
-                DuctTapeSaveLoadHotfix.Init();
-                // CoopDrillSoftlockHotfix.Init(); // incomplete
-                QuickRestartRoomCacheHotfix.Init();
-                RoomShuffleOffByOneHotfix.Init();
-                setupHotfixesWatch.Stop();
-            #endregion
-
             #region Wait for Async stuff to finish up
                 System.Diagnostics.Stopwatch awaitAsyncWatch = System.Diagnostics.Stopwatch.StartNew();
-                while (!asyncLoadedAudio) Thread.Sleep(10);
+                while (!asyncConfig1Setup) Thread.Sleep(10); // we need to wait for our ResMap to be built, so wait here
+                while (!asyncHotfixSetup) Thread.Sleep(10);
                 while (!asyncSaveApiSetup) Thread.Sleep(10);
+                while (!asyncLoadedAudio) Thread.Sleep(10);
+                while (!asyncSynergySetup) Thread.Sleep(10);
                 awaitAsyncWatch.Stop();
             #endregion
 
@@ -402,19 +438,19 @@ public class Initialisation : BaseUnityPlugin
             {
                 // ETGModConsole.Log($"    setupMemory    finished in "+(setupMemoryWatch.ElapsedMilliseconds/1000.0f)+" seconds");
                 ETGModConsole.Log($"    setupConfig1   finished in {setupConfig1Watch.ElapsedMilliseconds} milliseconds (ASYNC)");
+                ETGModConsole.Log($"    setupHotfixes  finished in {setupHotfixesWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
+                ETGModConsole.Log($"    setupSave      finished in {setupSaveWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupSprites   finished in {setupSpritesWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupConfig2   finished in {setupConfig2Watch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    setupSave      finished in {setupSaveWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupAudio     finished in {setupAudioWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupUI        finished in {setupUIWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupActives   finished in {setupActivesWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupPassives  finished in {setupPassivesWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupGuns      finished in {setupGunsWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    setupSynergies finished in {setupSynergiesWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    setupSynergies finished in {setupSynergiesWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupShops     finished in {setupShopsWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupBosses    finished in {setupBossesWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupFloors    finished in {setupFloorsWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    setupHotfixes  finished in {setupHotfixesWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    awaitAsync     finished in {awaitAsyncWatch.ElapsedMilliseconds} milliseconds");
                 AkSoundEngine.PostEvent("vc_kirby_appeal01", ETGModMainBehaviour.Instance.gameObject);
             }

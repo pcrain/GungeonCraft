@@ -82,6 +82,7 @@
     <Compile Include="src\Cwaff-Enemies\Bosses\Sans\Sans.cs"/>
     <Compile Include="src\Cwaff-Enemies\Bosses\Sans\SansAttacks.cs"/>
     <Compile Include="src\Cwaff-Enemies\PathableBullet.cs"/>
+    <Compile Include="src\AtlasStuff.cs"/>
     <Compile Include="src\Cwaff-Rooms\FancyRoomBuilder.cs"/>
     <Compile Include="src\Extensions.cs"/>
     <Compile Include="src\Cwaff-NPCs\WhiteMage.cs"/>
