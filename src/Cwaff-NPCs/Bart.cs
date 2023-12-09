@@ -5,7 +5,7 @@ public class Bart
 {
     internal static GenericLootTable _BarterTable = null;
 
-    internal const string _BarterSpriteS = $"{C.MOD_PREFIX}:S_TIER_ITEM";  // need the string immediately for safe(ish) async loading
+    internal const string _BarterSpriteS = $"{C.MOD_PREFIX}:S_TIER_ITEM";  // need the strings immediately for preloading in Main()
     internal const string _BarterSpriteA = $"{C.MOD_PREFIX}:A_TIER_ITEM";
     internal const string _BarterSpriteB = $"{C.MOD_PREFIX}:B_TIER_ITEM";
     internal const string _BarterSpriteC = $"{C.MOD_PREFIX}:C_TIER_ITEM";
