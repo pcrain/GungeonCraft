@@ -787,6 +787,13 @@ public static class Extensions
       return instantiatedTrail.GetComponent<TrailController>();
   }
 
+  public static SpriteTrailController AddTrailToSpriteInstance(this tk2dBaseSprite target, SpriteTrailController trail)
+  {
+      GameObject instantiatedTrail = UnityEngine.Object.Instantiate(trail.gameObject);
+      instantiatedTrail.transform.parent = target.transform;
+      return instantiatedTrail.GetComponent<SpriteTrailController>();
+  }
+
   // Set the rotation of a projectile manually
   public static void SetRotation(this Projectile p, float angle)
   {

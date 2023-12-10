@@ -9,17 +9,23 @@ public class Uppskeruvel : AdvancedGunBehavior
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
 
+    internal const int _MAX_SOULS = 100;
+    internal const float _DAMAGE_PER_SOUL = 10f;
+    internal const float _SOUL_LAUNCH_SPEED = 7f;
+    internal const float _SOULS_PER_HEALTH  = 0.1f;
     internal const string _SoulSpriteUI   = $"{C.MOD_PREFIX}:_SoulSpriteUI";  // need the string immediately for preloading in Main()
 
     internal static int        _UppskeruvelId    = -1;
     internal static GameObject _LostSoulPrefab   = null;
     internal static GameObject _CombatSoulPrefab = null;
     internal static GameObject _SoulCollectVFX   = null;
+    internal static SpriteTrailController _SoulTrailPrefab = null;
 
     public int souls = 0;
 
     private List<UppskeruvelCombatSoul> _extantSouls = new();
     private List<int> _usedIndices = new();
+    private UppskeruvelCombatSoul[] _soulTracker = Enumerable.Repeat((UppskeruvelCombatSoul)null, _MAX_SOULS).ToArray();
 
     public static void Add()
     {
@@ -35,6 +41,9 @@ public class Uppskeruvel : AdvancedGunBehavior
         );
 
         gun.gameObject.AddComponent<UppskeruvelAmmoDisplay>();
+
+        _SoulTrailPrefab = VFX.CreateSpriteTrailObject(ResMap.Get("holy_water_gun_middle_break")[0], new Vector2(16, 5), new Vector2(0, 0),
+            ResMap.Get("holy_water_gun_middle_break"), 60, ResMap.Get("holy_water_gun_middle_break"), 60, cascadeTimer: 4f * C.FRAME, softMaxLength: 2f, destroyOnEmpty: false);
 
         _LostSoulPrefab = VFX.Create("poe_soul", fps: 8, loops: true, anchor: Anchor.LowerCenter/*, emissivePower: 0.4f*/);
             _LostSoulPrefab.AddComponent<UppskeruvelLostSoul>();
@@ -52,18 +61,19 @@ public class Uppskeruvel : AdvancedGunBehavior
         if (!this.everPickedUpByPlayer)
         {
             for (int i = 0; i < 5; ++i)
-                SpawnSoul();
+                SpawnCombatSoul();
         }
         base.OnPickup(owner);
     }
 
-    public int GetNextAvailableIndex()
+    public int GetNextAvailableIndex(UppskeruvelCombatSoul soul)
     {
-        for (int i = 0; i < 100; ++i)
+        for (int i = 0; i < _MAX_SOULS; ++i)
         {
             if (!this._usedIndices.Contains(i))
             {
                 this._usedIndices.Add(i);
+                this._soulTracker[i] = soul;
                 return i;
             }
         }
@@ -71,37 +81,57 @@ public class Uppskeruvel : AdvancedGunBehavior
         return -1;
     }
 
-    public void LaunchNextAvailableSoul(AIActor enemy)
+    public void LaunchAvailableSouls(AIActor enemy)
     {
-        int minIndex = 999;
-        UppskeruvelCombatSoul nextSoul = null;
-        foreach (UppskeruvelCombatSoul soul in this._extantSouls)
-        {
-            if (!soul.CanLaunch() || !soul.index.HasValue || soul.index.Value >= minIndex)
-                continue;
-            nextSoul = soul;
-            minIndex = soul.index.Value;
-        }
-        if (!nextSoul)
+        // Launch enough souls to kill the enemy, or all of them if we don't have enough
+        int soulsToLaunch = Mathf.Min(Mathf.CeilToInt(enemy.healthHaver.currentHealth / _DAMAGE_PER_SOUL), this._usedIndices.Count);
+        if (soulsToLaunch == 0)
             return;
 
-        RemoveIndex(nextSoul.index.Value);
-        nextSoul.index = null;
-        nextSoul.Launch(enemy);
+        int maxIndex = this._usedIndices.Max();
+        int soulsLaunched = 0;
+        for (int i = 0; i <= maxIndex; ++i)
+        {
+            if (this._soulTracker[i] is not UppskeruvelCombatSoul soul)
+                continue;
+            if (!soul.CanLaunch() || !soul.index.HasValue)
+                continue;
+
+            LaunchCombatSoul(soul, enemy, ++soulsLaunched);
+            if (soulsLaunched == soulsToLaunch)
+                break;
+        }
     }
 
-    private void RemoveIndex(int i)
+    private void LaunchCombatSoul(UppskeruvelCombatSoul soul, AIActor enemy, int order)
     {
+        int i = soul.index.Value;
+        this._soulTracker[i] = null;
         this._usedIndices.Remove(i);
+        soul.Launch(enemy, order);
     }
 
-    public UppskeruvelCombatSoul SpawnSoul()
+    private UppskeruvelCombatSoul SpawnCombatSoul()
     {
         UppskeruvelCombatSoul soul = UnityEngine.Object.Instantiate(
             Uppskeruvel._CombatSoulPrefab, this.Player.CenterPosition, Quaternion.identity).GetComponent<UppskeruvelCombatSoul>();
         this._extantSouls.Add(soul);
         soul.Setup(this.Player, this);
         return soul;
+    }
+
+    public static void DropLostSouls(AIActor enemy)
+    {
+        Vector2 ppos = enemy.CenterPosition;
+        int soulsToSpawn = Mathf.CeilToInt(_SOULS_PER_HEALTH * (enemy.healthHaver?.GetMaxHealth() ?? 0));
+        for (int i = 0; i < soulsToSpawn; ++i)
+        {
+            float angle = Lazy.RandomAngle();
+            Vector2 finalPos = ppos + BraveMathCollege.DegreesToVector(angle);
+            UnityEngine.Object.Instantiate(Uppskeruvel._LostSoulPrefab, finalPos, Quaternion.identity
+                ).GetComponent<UppskeruvelLostSoul>(
+                ).Setup(angle.ToVector(_SOUL_LAUNCH_SPEED));
+        }
     }
 }
 
@@ -133,9 +163,6 @@ public class UppskeruvelAmmoDisplay : CustomAmmoDisplay
 
 public class UppskeruvelProjectile : MonoBehaviour
 {
-    private const float _SOUL_LAUNCH_SPEED = 7f;
-    private const float _SOULS_PER_HEALTH  = 0.1f;
-
     private Projectile _projectile = null;
     private PlayerController _owner = null;
     private Uppskeruvel _gun = null;
@@ -156,7 +183,7 @@ public class UppskeruvelProjectile : MonoBehaviour
     {
         if (!enemy?.aiActor)
             return;
-        this._gun.LaunchNextAvailableSoul(enemy.aiActor);
+        this._gun.LaunchAvailableSouls(enemy.aiActor);
     }
 
     private void OnWillKillEnemy(Projectile bullet, SpeculativeRigidbody enemy)
@@ -164,16 +191,7 @@ public class UppskeruvelProjectile : MonoBehaviour
         if (!(enemy?.aiActor?.IsHostile() ?? false))
             return; // avoid processing effect for non-hostile enemies
 
-        Vector2 ppos = enemy.UnitCenter;
-        int soulsToSpawn = Mathf.CeilToInt(_SOULS_PER_HEALTH * (enemy.healthHaver?.GetMaxHealth() ?? 0));
-        for (int i = 0; i < soulsToSpawn; ++i)
-        {
-            float angle = Lazy.RandomAngle();
-            Vector2 finalPos = ppos + BraveMathCollege.DegreesToVector(angle);
-            UnityEngine.Object.Instantiate(Uppskeruvel._LostSoulPrefab, finalPos, Quaternion.identity
-                ).GetComponent<UppskeruvelLostSoul>(
-                ).Setup(angle.ToVector(_SOUL_LAUNCH_SPEED));
-        }
+        Uppskeruvel.DropLostSouls(enemy.aiActor);
     }
 }
 
@@ -209,7 +227,9 @@ public class UppskeruvelLostSoul : MonoBehaviour
         if (!this._setup)
             return;
 
-        this._lifetime += BraveTime.DeltaTime;
+        if (GameManager.Instance.PrimaryPlayer.AcceptingAnyInput)
+            this._lifetime += BraveTime.DeltaTime; // don't increase life timer unless player can move
+
         if (this._owner)
         {
             Vector2 delta = (this._owner.CenterPosition - base.transform.position.XY());
@@ -218,7 +238,7 @@ public class UppskeruvelLostSoul : MonoBehaviour
             // Weighted average of natural and direct velocity towards player
             this._velocity = this._homeSpeed * Vector2.Lerp((this._velocity.normalized + deltaNorm).normalized, deltaNorm, 0.2f);
             this._basePos += (this._velocity * BraveTime.DeltaTime).ToVector3ZUp();
-            base.transform.position = new Vector2(this._basePos.x, this._basePos.y + _BOB_HEIGHT * Mathf.Sin(_BOB_SPEED * this._lifetime)).ToVector3ZisY();
+            base.transform.position = new Vector2(this._basePos.x, this._basePos.y + _BOB_HEIGHT * Mathf.Sin(_BOB_SPEED * BraveTime.ScaledTimeSinceStartup)).ToVector3ZisY();
 
             FancyVFX.Spawn(Outbreak._OutbreakSmokeVFX, base.transform.position, Lazy.RandomEulerZ(),
                 velocity: Lazy.RandomVector(0.1f), lifetime: 0.25f, fadeOutTime: 0.5f);
@@ -250,7 +270,7 @@ public class UppskeruvelLostSoul : MonoBehaviour
         }
         else
             this._velocity = this._velocity.normalized;
-        base.transform.position = new Vector2(this._basePos.x, this._basePos.y + _BOB_HEIGHT * Mathf.Sin(_BOB_SPEED * this._lifetime)).ToVector3ZisY();
+        base.transform.position = new Vector2(this._basePos.x, this._basePos.y + _BOB_HEIGHT * Mathf.Sin(_BOB_SPEED * BraveTime.ScaledTimeSinceStartup)).ToVector3ZisY();
 
         if (this._lifetime > _MAX_LIFE)
         {
@@ -282,17 +302,21 @@ public class UppskeruvelCombatSoul : MonoBehaviour
     private enum State {
         SPAWNING,   // spawning in after fulfilling requirements to spawn or entering a new floor
         FOLLOWING,  // following the player around after spawning in
+        PRELAUNCH,  // queued for laucnh after hitting an enemy with a projectile
         SEEKING,    // seeking an enemy that has been recently shot by a projectile
-        COOLDOWN,   // on cooldown after hitting an enemy
+        VANISH,     // vanish after hitting an enemy
+        COOLDOWN,   // on cooldown after vanishing but before reappearing
     }
 
     public int? index                = null;
 
     private const float _SPAWN_TIME  = 0.5f;
     private const float _VANISH_TIME = 0.25f;
+    private const float _LAUNCH_GAP  = 0.1f;
+    private const float _COOLDOWN    = 3.0f;
     private const float _ACCEL_SEC   = 0.5f;
     private const float _HALF_TIME   = 0.1f;  // in GlideTowardsTarget mode, time required to get halfway to our target
-    private const float _SPACING     = 0.5f;  // spacing between followers
+    private const float _SPACING     = 0.6f;  // spacing between followers
 
     private bool _setup             = false;
     private PlayerController _owner = null;
@@ -307,6 +331,7 @@ public class UppskeruvelCombatSoul : MonoBehaviour
     private float _jiggle           = 0f; // random offset from directly behind player
     private float _timer            = 0.0f;
     private State _state            = State.SPAWNING;
+    private SpriteTrailController _trail = null;
 
     public void Setup(PlayerController owner, Uppskeruvel gun)
     {
@@ -317,12 +342,13 @@ public class UppskeruvelCombatSoul : MonoBehaviour
         this._timer   = _SPAWN_TIME;
         this._jiggle  = UnityEngine.Random.Range(-30f,30f);
         this._sprite.SetAlphaImmediate(0.0f);
+        this._trail = this._sprite.AddTrailToSpriteInstance(Uppskeruvel._SoulTrailPrefab);
         this._setup   = true;
     }
 
     private Vector2 BehindPlayer()
     {
-        this.index ??= this._gun.GetNextAvailableIndex();
+        this.index ??= this._gun.GetNextAvailableIndex(this);
         return this._owner.CenterPosition + (this._owner.m_currentGunAngle + 180f + this._jiggle).Clamp360().ToVector(1f + _SPACING * this.index.Value);
     }
 
@@ -346,10 +372,26 @@ public class UppskeruvelCombatSoul : MonoBehaviour
         this._basePos += this._velocity.ToVector3ZUp();
     }
 
+    public bool CanLaunch()
+    {
+        return this._state == State.FOLLOWING;
+    }
+
+    public void Launch(AIActor enemy, int order)
+    {
+        this.index = null;
+        this._enemy = enemy;
+        this._state = State.PRELAUNCH;
+        this._timer = _LAUNCH_GAP * order;
+        AkSoundEngine.PostEvent("soul_launch_sound", base.gameObject);
+    }
+
     private void Update()
     {
         if (!this._setup)
             return;
+        if (BraveTime.DeltaTime == 0)
+            return; // don't do anything if we're paused
 
         this._timer -= BraveTime.DeltaTime;
 
@@ -366,48 +408,66 @@ public class UppskeruvelCombatSoul : MonoBehaviour
                 this._targetPos = BehindPlayer();
                 GlideTowardsTarget();
                 break;
+            case State.PRELAUNCH:
+                if (!(this._enemy?.healthHaver?.IsAlive ?? false))
+                {
+                    this._state = State.FOLLOWING; // if we lost our target before getting to it, revert to following
+                    break;
+                }
+                if (this._timer <= 0)
+                {
+                    this._state = State.SEEKING;
+                    break;
+                }
+                this._targetPos = BehindPlayer();
+                GlideTowardsTarget();
+                break;
             case State.SEEKING:
                 if (!(this._enemy?.healthHaver?.IsAlive ?? false))
                 {
-                    this._timer = _VANISH_TIME;
-                    this._state = State.COOLDOWN;
+                    this._state = State.FOLLOWING; // if we lost our target before getting to it, revert to following
                     break;
                 }
                 this._targetPos = this._enemy.CenterPosition;
                 HomeTowardsTarget();
                 if ((this._basePos - this._targetPos).sqrMagnitude < 1f)
                 {
-                    this._enemy?.healthHaver?.ApplyDamage(10f, this._velocity, "Uppskeruvel Soul", CoreDamageTypes.None, DamageCategory.Collision);
+                    this._enemy?.healthHaver?.ApplyDamage(Uppskeruvel._DAMAGE_PER_SOUL, this._velocity, "Uppskeruvel Soul", CoreDamageTypes.None, DamageCategory.Collision);
+                    if (this._enemy?.healthHaver?.IsDead ?? false)
+                        Uppskeruvel.DropLostSouls(this._enemy);
+                    Lazy.DoSmokeAt(this._targetPos.XY() + Lazy.RandomVector(0.4f));
+                    AkSoundEngine.PostEvent("carpet_bomber_shoot_sound_stop_all", base.gameObject);
+                    AkSoundEngine.PostEvent("carpet_bomber_shoot_sound", base.gameObject);
+                    this._trail.Toggle(false);
                     this._timer = _VANISH_TIME;
-                    this._state = State.COOLDOWN;
+                    this._state = State.VANISH;
+                }
+                break;
+            case State.VANISH:
+                this._sprite.SetAlpha(this._timer / _VANISH_TIME);
+                if (this._timer <= 0)
+                {
+                    this._timer     = _COOLDOWN;
+                    this._state     = State.COOLDOWN;
                 }
                 break;
             case State.COOLDOWN:
-                this._sprite.SetAlpha(this._timer / _VANISH_TIME);
                 if (this._timer <= 0)
                 {
                     this._targetPos = BehindPlayer();
                     this._jiggle    = UnityEngine.Random.Range(-30f,30f);
                     this._basePos   = this._targetPos;
+                    this._trail.Toggle(true);
                     this._timer     = _SPAWN_TIME;
                     this._state     = State.SPAWNING;
+                    this._sprite.renderer.enabled = true;
                 }
+                else
+                    this._sprite.renderer.enabled = false;
                 break;
         }
 
         base.transform.position = new Vector2(this._basePos.x,
             this._basePos.y + UppskeruvelLostSoul._BOB_HEIGHT * Mathf.Sin(UppskeruvelLostSoul._BOB_SPEED * this._lifetime)).ToVector3ZisY();
-    }
-
-    public bool CanLaunch()
-    {
-        return this._state == State.FOLLOWING;
-    }
-
-    public void Launch(AIActor enemy)
-    {
-        this._enemy = enemy;
-        this._state = State.SEEKING;
-        AkSoundEngine.PostEvent("soul_launch_sound", base.gameObject);
     }
 }
