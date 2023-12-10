@@ -185,13 +185,11 @@ public class VacuumParticle : MonoBehaviour
         // Shrink on our way to the vacuum
         float scale = mag / this._startDistance;
         this._sprite.scale = new Vector3(this._startScaleX * scale, this._startScaleY * scale, 1f);
-        // Compute our natural velocity from accelerating towards the vacuum
-        float accel = VacuumCleaner._ACCEL_SEC * BraveTime.DeltaTime;
-        Vector2 naturalVelocity = this._velocity + (accel * towardsVacuum.normalized);
-        // Compute a direct velocity from redirecting all of our momentum towards the vacuum
-        Vector2 directVelocity  = (this._velocity.magnitude + accel) * towardsVacuum.normalized;
-        // Average the natural and direct velocity to make sure our particles get to the vacuum eventually
-        this._velocity = 0.5f * naturalVelocity + 0.5f * directVelocity;
+        this._velocity = this._sprite.transform.position.XY().LerpNaturalAndDirectVelocity(
+            target          : this._gun.barrelOffset.position,
+            naturalVelocity : this._velocity,
+            accel           : VacuumCleaner._ACCEL_SEC * BraveTime.DeltaTime,
+            lerpFactor      : 0.5f);
         this.gameObject.transform.position += (this._velocity * C.FPS * BraveTime.DeltaTime).ToVector3ZUp(0f);
     }
 }

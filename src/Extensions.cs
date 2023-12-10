@@ -364,11 +364,24 @@ public static class Extensions
     g.GetComponent<Renderer>()?.SetAlpha(a);
   }
 
+  // Set the Alpha of a Component's sprite (attached to the base component)
+  public static void SetAlpha(this Component c, float a)
+  {
+    c.GetComponent<Renderer>()?.SetAlpha(a);
+  }
+
   // Set the Alpha of a GameObject's sprite immediately and avoid the 1-frame opacity delay upon creation
   public static void SetAlphaImmediate(this GameObject g, float a)
   {
     g.GetComponent<Renderer>()?.SetAlpha(a);
     g.GetComponent<tk2dSpriteAnimator>()?.LateUpdate();
+  }
+
+  // Set the Alpha of a Component's sprite immediately and avoid the 1-frame opacity delay upon creation
+  public static void SetAlphaImmediate(this Component c, float a)
+  {
+    c.GetComponent<Renderer>()?.SetAlpha(a);
+    c.GetComponent<tk2dSpriteAnimator>()?.LateUpdate();
   }
 
   // Add emissiveness to a game object
@@ -1035,5 +1048,17 @@ public static class Extensions
               return shopItem;
       }
       return null;
+  }
+
+  // Pseudo-homing behavior
+  public static Vector2 LerpNaturalAndDirectVelocity(this Vector2 position, Vector2 target, Vector2 naturalVelocity, float accel, float lerpFactor)
+  {
+      Vector2 towardsTarget = target - position;
+      // Compute our natural velocity from accelerating towards our target
+      Vector2 newNaturalVelocity = naturalVelocity + (accel * towardsTarget.normalized);
+      // Compute a direct velocity from redirecting all of our momentum towards our target
+      Vector2 newDirectVelocity = (naturalVelocity.magnitude + accel) * towardsTarget.normalized;
+      // Take a weighted average
+      return Vector2.Lerp(newDirectVelocity, newNaturalVelocity, lerpFactor);
   }
 }

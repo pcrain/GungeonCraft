@@ -291,6 +291,7 @@ public static class Enemies {
 }
 
 // Internal IDs for vanilla items (from the wiki / https://mtgmodders.gitbook.io/etg-modding-guide/various-lists-of-ids-sounds-etc./list-of-item-and-gun-ids)
+// TODO: cross reference with actual up to date list from: https://github.com/SpecialAPI/ModTheGungeonAPI/blob/main/ModTheGungeonAPI/Content/items.txt
 public enum Items {
     MagicLamp                          = 0, //
     Winchester                         = 1, //
