@@ -568,4 +568,10 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
     {
         return Gungeon.Game.Items.GetSafe(itemName);
     }
+
+    private static readonly float _INVLOG2 = 1f / Mathf.Log(2);
+    public static float Log2(float f)
+    {
+        return _INVLOG2 * Mathf.Log(f);
+    }
 }

@@ -109,4 +109,6 @@ carpet_bomber_shoot_sound,-2.0,1,sound
 carpet_bomber_reload_sound,-4.0,1,sound
 carpet_bomber_charge_stage,-8.0,1,sound
 pickup_poe_soul_sound,8.0,1,sound
-soul_launch_sound,-7.0,1,sound
+soul_launch_sound,-10.0,1,sound
+soul_impact_sound,4.0,1,sound
+uppskeruvel_fire_sound,-4.0,1,sound
