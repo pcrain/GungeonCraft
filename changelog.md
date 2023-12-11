@@ -1,10 +1,26 @@
 # Changelog
 
-## Current
+## 1.5.0 (2023-12-10)
 
-- Updated Alexandria to 0.3.26
-- Insurance Broker guaranteed to spawn if you have a sellable S or A tier item in your inventory
-- Insurance Policy can no longer be sold
+#### Features and Polish:
+- Added Companion Shop
+- Added Bartering Shop
+- Added Uppskeruvel
+
+#### Bugfixes:
+- Fixed vanilla bug where quick restarting wouldn't properly reset the chances of spawning "Once Per Run" rooms (e.g., specialty shops)
+- Fixed vanilla bug in RNG where randomly selecting the first item from a list of two items would always return the first item
+- Fixed guns having extremely large interaction ranges in shops
+- Fixed beam sprite from Aimu Hakurei's max level not rendering 
+- Fixed buggy ammo display caused by repeatedly switching between Aimu Hakurei and an infinite ammo gun 
+- Fixed null dereference error caused by trying to use Borrowed Time in an unregistered room
+- Fixed null dereference error caused by Alligator sparks trying to move towards a non-existent enemy 
+- Fixed items not being added to modded shops that spawned on the first floor
+
+#### Misc:
+- Insurance Policy can no longer be sold to shops
+- Optimized startup loading time to be about 1.5x faster
+- Updated Alexandria to 0.3.26 for faster UI sprite loading (thanks SomeBunny!)
 
 ## 1.4.0 (2023-12-01)
 

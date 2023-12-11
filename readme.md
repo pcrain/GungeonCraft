@@ -8,11 +8,14 @@
 
 ### Features
 
-- 73 new items including
-	+ 35 new guns 
+- 74 new items including
+	+ 36 new guns 
 	+ 26 new passive items
 	+ 12 new active items
 - Lore for all new guns and items
+- Two New Shops
+	+ Companion Shop: sells 3 random unlocked companions (including modded) at half price. Guaranteed to spawn on the first floor each run.
+	+ Bartering Shop: trades 3 random D-A tier items for any higher-tiered item. Guaranteed to spawn on the second or third floor each run.
 - A new boss!
 - Vanilla bugfixes
 - You can pet Junior \o/
@@ -31,6 +34,8 @@
 ### Vanilla Bugs Fixed
 * In co-op Turbo Mode, the 2nd player now has the same speed as the first player without having to die first
 * When saving and reloading a run, guns no longer lose any other guns duct-taped to them
+* Rooms that can only spawn once per run (e.g., specialty shops) are now properly marked as "not spawned this run" after a Quick Restart
+* Certain algorithms for shuffling the order of a list (e.g., for floor generation) will now randomly shuffle the first and last items in the list
 
 ### FAQ
 
