@@ -108,9 +108,7 @@ public class BorrowedTime : PlayerItem
     {
         if (_lastCheckedRoom == null)
             return false;
-        List<AIActor> activeEnemies =
-            this._owner.GetAbsoluteParentRoom().GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
-        foreach (AIActor enemy in activeEnemies)
+        foreach (AIActor enemy in this._owner.GetAbsoluteParentRoom()?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All).EmptyIfNull())
             if (enemy.healthHaver.IsBoss)
                 return true;
         return false;
