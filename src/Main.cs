@@ -71,14 +71,10 @@ public class Initialisation : BaseUnityPlugin
         try
         {
             var watch = System.Diagnostics.Stopwatch.StartNew();
+            System.Diagnostics.Process currentProcess = System.Diagnostics.Process.GetCurrentProcess();
+            long oldMemory = currentProcess.WorkingSet64;
             if (C.DEBUG_BUILD)
                 ETGModConsole.Log("Cwaffing the Gungy initializing...");
-
-            #region Memory Setup (just slows things down, so disabled for now)
-            //     System.Diagnostics.Stopwatch setupMemoryWatch = System.Diagnostics.Stopwatch.StartNew();
-            //     BraveMemory.EnsureHeapSize(1024*1024); Lazy.DebugLog("Ensured 1GB heap...");
-            //     setupMemoryWatch.Stop();
-            #endregion
 
             Instance = this;
 
@@ -136,9 +132,12 @@ public class Initialisation : BaseUnityPlugin
             #endregion
 
             #region Sprite Setup (Anything that requires sprites cannot be async)
-                // UnprocessedSpriteHotfix.Init();  // prevent SetupSpritesFromAssembly() from loading unprocessed sprites (hotfix doesn't speed anything up, as it turns out)
                 System.Diagnostics.Stopwatch setupSpritesWatch = System.Diagnostics.Stopwatch.StartNew();
+                long usedMemoryBeforeSpriteSetup = currentProcess.WorkingSet64;
+                // UnprocessedSpriteHotfix.Init();  // prevent SetupSpritesFromAssembly() from loading unprocessed sprites (saves about 50MB of RAM, which is a good chunk)
                 ETGMod.Assets.SetupSpritesFromAssembly(Assembly.GetExecutingAssembly(), "CwaffingTheGungy.Resources");
+                // UnprocessedSpriteHotfix.DeInit();  // we don't want to affect other mods
+                ETGModConsole.Log($"  allocated {(currentProcess.WorkingSet64 - usedMemoryBeforeSpriteSetup).ToString("N0")} bytes of memory for sprite setup");
                 setupSpritesWatch.Stop();
             #endregion
 
@@ -407,7 +406,6 @@ public class Initialisation : BaseUnityPlugin
             ETGModConsole.Log($"Yay! :D Initialized <color=#aaffaaff>{C.MOD_NAME} v{C.MOD_VERSION}</color> in "+(watch.ElapsedMilliseconds/1000.0f)+" seconds");
             if (C.DEBUG_BUILD)
             {
-                // ETGModConsole.Log($"    setupMemory    finished in "+(setupMemoryWatch.ElapsedMilliseconds/1000.0f)+" seconds");
                 ETGModConsole.Log($"    setupConfig1   finished in {setupConfig1Watch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupHotfixes  finished in {setupHotfixesWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupSave      finished in {setupSaveWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
@@ -423,6 +421,8 @@ public class Initialisation : BaseUnityPlugin
                 ETGModConsole.Log($"    setupBosses    finished in {setupBossesWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupFloors    finished in {setupFloorsWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    awaitAsync     finished in {awaitAsyncWatch.ElapsedMilliseconds} milliseconds");
+                long newMemory = currentProcess.WorkingSet64;
+                ETGModConsole.Log($"allocated {(newMemory - oldMemory).ToString("N0")} bytes of memory along the way");
                 AkSoundEngine.PostEvent("vc_kirby_appeal01", ETGModMainBehaviour.Instance.gameObject);
             }
 

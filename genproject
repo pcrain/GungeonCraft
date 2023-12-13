@@ -299,7 +299,7 @@ if [ $# -gt 0 ] && [ "$1" == "-t" ]; then
   else
     tdir="./_thunderstore_package"
     /bin/mkdir -p "${tdir}"
-    cat "./readme.md" | grep -vE "^\|" > "${tdir}/README.md" # remove gallery since Thunderstore can't display inline images
+    cat "./readme.md" | sed -re 's@\(previews/@\(https://raw.githubusercontent.com/pcrain/GungeonCraft/master/previews/@g' > "${tdir}/README.md" # change images to absolute github links so Thunderstore can display inline images
     /bin/cp -f "./changelog.md" "${tdir}/CHANGELOG.md"
     /bin/cp -f "./previews/icon.png" "${tdir}/icon.png"
     echo "${manifesttemplate}" > "${tdir}/manifest.json"

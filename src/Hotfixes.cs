@@ -3,12 +3,21 @@ namespace CwaffingTheGungy;
 // Prevent MtG API from loading sprites that don't belong to any collection by skipping the entire relevant branch (turns out not to speed up very much)
 public static class UnprocessedSpriteHotfix
 {
+
+    private static ILHook _SpriteSetupHook = null;
+
     public static void Init()
     {
-        new ILHook(
+        _SpriteSetupHook = new ILHook(
             typeof(ETGMod.Assets).GetMethod("SetupSpritesFromAssembly", BindingFlags.Static | BindingFlags.Public),
             SetupSpritesFromAssemblyIL
             );
+    }
+
+    public static void DeInit()
+    {
+        if (_SpriteSetupHook != null)
+            _SpriteSetupHook.Dispose();
     }
 
     private static void SetupSpritesFromAssemblyIL(ILContext il)
