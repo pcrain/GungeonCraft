@@ -5,7 +5,7 @@ public static class MenuMaster
     private static dfButton _PrototypeButton = null;
 
     // TODO: issues caching this, so build it fresh each time
-    internal static dfButton GetPrototypeButton()
+    internal static dfButton GetPrototypeRawButton()
     {
       return GameUIRoot.Instance.PauseMenuPanel.GetComponent<PauseMenuController>().OptionsMenu.PreOptionsMenu.m_panel.Find<dfButton>("AudioTab (1)");
       // if (_PrototypeButton == null || _PrototypeButton.gameObject == null)
@@ -73,28 +73,26 @@ public static class MenuMaster
       return GetPrototypeLeftRightInnerPanel().Find<dfLabel>("OptionsArrowSelectorSelection");
     }
 
+    internal static dfPanel GetPrototypeButtonWrapperPanel()
+    {
+      return GameUIRoot.Instance.PauseMenuPanel.GetComponent<PauseMenuController>().OptionsMenu.TabControls.Find<dfPanel>("EditKeyboardBindingsButtonPanel");
+    }
 
-    public static void PrintControlRecursive(dfControl control, string indent = "->")
+    internal static dfPanel GetPrototypeButtonInnerPanel()
+    {
+      return GetPrototypeButtonWrapperPanel().Find<dfPanel>("PanelEnsmallenerThatmakesDavesLifeHardandBrentsLifeEasy");
+    }
+
+    internal static dfButton GetPrototypeButton()
+    {
+      return GetPrototypeButtonInnerPanel().Find<dfButton>("EditKeyboardBindingsButton");
+    }
+
+    public static void PrintControlRecursive(dfControl control, string indent = "->", bool dissect = false)
     {
         System.Console.WriteLine($"  {indent} control with name={control.name}, position={control.Position}, type={control.GetType()}");
-
-        // PrintEventInfo(control, "KeyPress");
-        // PrintEventInfo(control, "KeyDown");
-        // PrintEventInfo(control, "KeyUp");
-        // Debug.Log($"{indent}  KeyPress has {control.KeyPress?.GetInvocationList().Length} listeners");
-        // Debug.Log($"{indent}  KeyDown has {control.KeyDown?.GetInvocationList().Length} listeners");
-        // Debug.Log($"{indent}  KeyUp has {control.KeyUp?.GetInvocationList().Length} listeners");
-        // Debug.Log($"{indent}  MouseEnter has {control.MouseEnter?.GetInvocationList().Length} listeners");
-        // Debug.Log($"{indent}  MouseMove has {control.MouseMove?.GetInvocationList().Length} listeners");
-        // Debug.Log($"{indent}  MouseHover has {control.MouseHover?.GetInvocationList().Length} listeners");
-        // Debug.Log($"{indent}  MouseLeave has {control.MouseLeave?.GetInvocationList().Length} listeners");
-        // Debug.Log($"{indent}  MouseDown has {control.MouseDown?.GetInvocationList().Length} listeners");
-        // Debug.Log($"{indent}  MouseUp has {control.MouseUp?.GetInvocationList().Length} listeners");
-        // Debug.Log($"{indent}  MouseWheel has {control.MouseWheel?.GetInvocationList().Length} listeners");
-        // Debug.Log($"{indent}  Click has {control.Click?.GetInvocationList().Length} listeners");
-        // Debug.Log($"{indent}  DoubleClick has {control.DoubleClick?.GetInvocationList().Length} listeners");
-
-        Dissect.DumpFieldsAndProperties(control);
+        if (dissect)
+          Dissect.DumpFieldsAndProperties(control);
         foreach (dfControl child in control.controls)
             PrintControlRecursive(child, "--"+indent);
     }
@@ -185,7 +183,7 @@ public static class MenuMaster
       self.AllowSignalEvents = other.AllowSignalEvents;
       self.MinimumSize       = other.MinimumSize;
       self.MaximumSize       = other.MaximumSize;
-      self.ZOrder            = other.ZOrder;
+      // self.ZOrder            = other.ZOrder;  // don't set this or children won't be processed in the order we add them
       self.TabIndex          = other.TabIndex;
       self.IsInteractive     = other.IsInteractive;
       self.Pivot             = other.Pivot;
@@ -203,7 +201,7 @@ public static class MenuMaster
       self.enabled           = other.enabled;
     }
 
-    public static dfButton InsertButton(this dfPanel panel, string previousButtonName, string label, MouseEventHandler onclick)
+    public static dfButton InsertRawButton(this dfPanel panel, string previousButtonName, string label, MouseEventHandler onclick)
     {
         dfButton prevButton = panel.Find<dfButton>(previousButtonName);
         if (prevButton == null)
@@ -214,7 +212,7 @@ public static class MenuMaster
         dfControl nextButton = prevButton.GetComponent<UIKeyControls>().down;
 
         dfButton newButton = panel.AddControl<dfButton>();
-        newButton.CopyAttributes(GetPrototypeButton());
+        newButton.CopyAttributes(GetPrototypeRawButton());
         newButton.Text = label;
         newButton.name = label;
         newButton.RelativePosition = newButton.RelativePosition + new Vector3(300.0f, 10.0f, 0.0f);
@@ -292,11 +290,13 @@ public static class MenuMaster
         // newPanel.Tag = refPanel.Tag;
         newPanel.IsLocalized = refPanel.IsLocalized;
         newPanel.HotZoneScale = refPanel.HotZoneScale;
-        newPanel.AutoFocus = refPanel.AutoFocus;
         newPanel.useGUILayout = refPanel.useGUILayout;
-        newPanel.autoReset = true;
-        newPanel.autoLayout = true;
-        newPanel.enabled = refPanel.enabled;
+        newPanel.AutoFocus = refPanel.AutoFocus;
+        newPanel.AutoLayout = refPanel.AutoLayout;
+        newPanel.AutoReset = refPanel.AutoReset;
+        newPanel.AutoScrollPadding = refPanel.AutoScrollPadding;
+        newPanel.AutoFitVirtualTiles = refPanel.AutoFitVirtualTiles;
+        // newPanel.enabled = refPanel.enabled;
         newPanel.Enable();
 
       newPanel.HackyRefresh();
@@ -330,18 +330,18 @@ public static class MenuMaster
       control.Invalidate();
     }
 
-    public static void AddButton(this dfScrollPanel panel, string label, MouseEventHandler onclick)
+    public static void AddRawButton(this dfScrollPanel panel, string label, MouseEventHandler onclick)
     {
       dfButton newButton = panel.AddControl<dfButton>();
-      newButton.CopyAttributes(GetPrototypeButton());
+      newButton.CopyAttributes(GetPrototypeRawButton());
 
       // newButton.Position = new Vector3(-400f, 0f, 0f);
       newButton.Text = label;
       newButton.name = label;
-      newButton.Position = new Vector3(0.0f, 0.0f, 0.0f);
-      newButton.RelativePosition = new Vector3(0.0f, 0.0f, 0.0f);
-      newButton.CanFocus = true;
-      newButton.AutoFocus = true;
+      // newButton.Position = new Vector3(0.0f, 0.0f, 0.0f);
+      // newButton.RelativePosition = new Vector3(0.0f, 0.0f, 0.0f);
+      // newButton.CanFocus = true;
+      // newButton.AutoFocus = true;
       newButton.Click += onclick;
       // newButton.IsVisible = true;
       // Dissect.DumpFieldsAndProperties<dfButton>(newButton);
@@ -352,7 +352,7 @@ public static class MenuMaster
     }
 
     // based on V-SyncCheckBoxPanel
-    public static void AddCheckBox(this dfScrollPanel panel, string label, MouseEventHandler onclick = null, PropertyChangedEventHandler<bool> onchange = null)
+    public static void AddCheckBox(this dfScrollPanel panel, string label, PropertyChangedEventHandler<bool> onchange = null)
     {
       dfPanel newCheckboxWrapperPanel = panel.AddControl<dfPanel>();
       newCheckboxWrapperPanel.CopyAttributes(GetPrototypeCheckboxWrapperPanel());
@@ -371,46 +371,8 @@ public static class MenuMaster
 
       dfLabel newCheckboxLabel = newCheckboxInnerPanel.AddControl<dfLabel>();
       newCheckboxLabel.CopyAttributes(GetPrototypeCheckboxLabel());
+
       newCheckboxLabel.Text = label;
-
-      newCheckbox.ClickWhenSpacePressed = true;
-      newCheckbox.IsInteractive = true;
-      newCheckbox.CanFocus = true;
-      newCheckbox.AutoFocus = true;
-      newCheckbox.CheckIcon = newCheckedCheckboxSprite;
-      newCheckbox.Label = newCheckboxLabel;
-      newCheckbox.GroupContainer = null;
-      if (onchange != null)
-        newCheckbox.CheckChanged += onchange;
-      if (onclick != null)
-        newCheckbox.Click += onclick;
-      newCheckbox.Show();
-      newCheckbox.Enable();
-
-      newCheckboxWrapperPanel.IsInteractive = true;
-      newCheckboxWrapperPanel.CanFocus = true;
-      newCheckboxWrapperPanel.AutoFocus = true;
-      newCheckboxWrapperPanel.Enable();
-
-      newCheckboxInnerPanel.IsInteractive = true;
-      newCheckboxInnerPanel.CanFocus = true;
-      newCheckboxInnerPanel.AutoFocus = true;
-      // newCheckboxInnerPanel.Click += onclick;
-      newCheckboxInnerPanel.Enable();
-
-      newCheckboxLabel.IsInteractive = true;
-      newCheckboxLabel.CanFocus = true;
-      newCheckboxLabel.AutoFocus = true;
-      // newCheckboxLabel.Click += onclick;
-      newCheckboxLabel.Enable();
-
-      // newCheckboxWrapperPanel.Text = label;
-      // newCheckboxWrapperPanel.name = label;
-      // newCheckboxWrapperPanel.Position = new Vector3(0.0f, 0.0f, 0.0f);
-      // newCheckboxWrapperPanel.RelativePosition = new Vector3(0.0f, 0.0f, 0.0f);
-      // newCheckboxWrapperPanel.CanFocus = true;
-      // newCheckboxWrapperPanel.AutoFocus = true;
-      // newCheckboxWrapperPanel.Click += onclick;
 
       BraveOptionsMenuItem menuItem = newCheckboxWrapperPanel.gameObject.AddComponent<BraveOptionsMenuItem>();
         menuItem.optionType           = BraveOptionsMenuItem.BraveOptionsOptionType.NONE;
@@ -431,9 +393,9 @@ public static class MenuMaster
         menuItem.selectOnAction       = true;
         menuItem.OnNewControlSelected = null;
 
+      newCheckboxWrapperPanel.name = $"{label} panel";
       panel.RegisterBraveMenuItem(newCheckboxWrapperPanel);
       menuItem.gameObject.AddComponent<CustomCheckboxHandler>().onChanged += onchange;
-      // newCheckboxWrapperPanel.Click += onclick;
 
       newEmptyCheckboxSprite.HackyInit();
       newCheckedCheckboxSprite.HackyInit();
@@ -446,7 +408,7 @@ public static class MenuMaster
     }
 
     // based on VisualPresetArrowSelectorPanel
-    public static void AddArrowBox(this dfScrollPanel panel, string label, List<string> options, MouseEventHandler onclick = null, PropertyChangedEventHandler<string> onchange = null)
+    public static void AddArrowBox(this dfScrollPanel panel, string label, List<string> options, PropertyChangedEventHandler<string> onchange = null)
     {
       dfPanel newArrowboxWrapperPanel = panel.AddControl<dfPanel>();
       newArrowboxWrapperPanel.CopyAttributes(GetPrototypeLeftRightWrapperPanel());
@@ -468,39 +430,6 @@ public static class MenuMaster
 
       newArrowSelectorLabel.Text = label;
 
-      // newArrowSelectorLabel.IsInteractive = true;
-      // newArrowSelectorLabel.CanFocus = true;
-      // newArrowSelectorLabel.AutoFocus = true;
-      // newArrowSelectorLabel.Show();
-      // newArrowSelectorLabel.Enable();
-
-      // newArrowSelectorSelection.IsInteractive = true;
-      // newArrowSelectorSelection.CanFocus = true;
-      // newArrowSelectorSelection.AutoFocus = true;
-      // newArrowSelectorSelection.Show();
-      // newArrowSelectorSelection.Enable();
-
-      // newArrowLeftSprite.IsInteractive = true;
-      // newArrowLeftSprite.CanFocus = true;
-      // newArrowLeftSprite.AutoFocus = true;
-      // newArrowLeftSprite.Enable();
-
-      // newArrowRightSprite.IsInteractive = true;
-      // newArrowRightSprite.CanFocus = true;
-      // newArrowRightSprite.AutoFocus = true;
-      // newArrowRightSprite.Enable();
-
-      // newArrowboxInnerPanel.IsInteractive = true;
-      // newArrowboxInnerPanel.CanFocus = true;
-      // newArrowboxInnerPanel.AutoFocus = true;
-      // // newCheckboxInnerPanel.Click += onclick;
-      // newArrowboxInnerPanel.Enable();
-
-      // newArrowboxWrapperPanel.IsInteractive = true;
-      // newArrowboxWrapperPanel.CanFocus = true;
-      // newArrowboxWrapperPanel.AutoFocus = true;
-      // newArrowboxWrapperPanel.Enable();
-
       BraveOptionsMenuItem menuItem = newArrowboxWrapperPanel.gameObject.AddComponent<BraveOptionsMenuItem>();
         menuItem.optionType           = BraveOptionsMenuItem.BraveOptionsOptionType.NONE;
         menuItem.itemType             = BraveOptionsMenuItem.BraveOptionsMenuItemType.LeftRightArrow;
@@ -520,6 +449,7 @@ public static class MenuMaster
         menuItem.selectOnAction       = true;
         menuItem.OnNewControlSelected = null;
 
+      newArrowboxWrapperPanel.name = $"{label} panel";
       panel.RegisterBraveMenuItem(newArrowboxWrapperPanel);
       menuItem.gameObject.AddComponent<CustomLeftRightArrowHandler>().onChanged += onchange;
 
@@ -533,23 +463,68 @@ public static class MenuMaster
       panel.HackyRefresh();
     }
 
+    // based on EditKeyboardBindingsButtonPanel
+    public static void AddButton(this dfScrollPanel panel, string label, Action<dfControl> onclick = null)
+    {
+      dfPanel newButtonWrapperPanel = panel.AddControl<dfPanel>();
+      newButtonWrapperPanel.CopyAttributes(GetPrototypeButtonWrapperPanel());
+
+      dfPanel newButtonInnerPanel = newButtonWrapperPanel.AddControl<dfPanel>();
+      newButtonInnerPanel.CopyAttributes(GetPrototypeButtonInnerPanel());
+
+      dfButton newButton = newButtonInnerPanel.AddControl<dfButton>();
+      newButton.CopyAttributes(GetPrototypeButton());
+
+      newButton.Text = label;
+      // Dissect.DumpFieldsAndProperties(newButton);
+
+      BraveOptionsMenuItem menuItem = newButtonWrapperPanel.gameObject.AddComponent<BraveOptionsMenuItem>();
+        menuItem.optionType           = BraveOptionsMenuItem.BraveOptionsOptionType.NONE;
+        menuItem.itemType             = BraveOptionsMenuItem.BraveOptionsMenuItemType.Button;
+        menuItem.labelControl         = null;
+        menuItem.selectedLabelControl = null;
+        menuItem.infoControl          = null;
+        menuItem.fillbarControl       = null;
+        menuItem.buttonControl        = newButton;
+        menuItem.checkboxChecked      = null;
+        menuItem.checkboxUnchecked    = null;
+        menuItem.labelOptions         = null;
+        menuItem.infoOptions          = null;
+        menuItem.up                   = null;
+        menuItem.down                 = null;
+        menuItem.left                 = null;
+        menuItem.right                = null;
+        menuItem.selectOnAction       = true;
+        menuItem.OnNewControlSelected = null;
+
+      newButtonWrapperPanel.name = $"{label} panel";
+      panel.RegisterBraveMenuItem(newButtonWrapperPanel);
+      menuItem.gameObject.AddComponent<CustomButtonHandler>().onClicked += onclick;
+
+      newButton.HackyInit();
+      newButtonInnerPanel.HackyInit();
+      newButtonWrapperPanel.HackyInit();
+
+      panel.HackyRefresh();
+    }
+
     public static void RegisterBraveMenuItem(this dfScrollPanel panel, dfControl item)
     {
       if (panel.controls == null || panel.controls.Count < 2) // includes this object
         return;
       BraveOptionsMenuItem menuItem = item.GetComponent<BraveOptionsMenuItem>();
-      dfControl firstItem = panel.controls[0];
-      dfControl lastItem  = panel.controls[panel.controls.Count - 2];
-      menuItem.up = lastItem;
-      menuItem.down = firstItem;
-      if (firstItem.GetComponent<BraveOptionsMenuItem>() is BraveOptionsMenuItem firstMenuItem)
-        firstMenuItem.up = item;
-      else if (firstItem.GetComponent<UIKeyControls>() is UIKeyControls firstMenuItemUI)
-        firstMenuItemUI.up = item;
-      if (lastItem.GetComponent<BraveOptionsMenuItem>() is BraveOptionsMenuItem lastMenuItem)
-        lastMenuItem.down = item;
-      else if (lastItem.GetComponent<UIKeyControls>() is UIKeyControls lastMenuItemUI)
-        lastMenuItemUI.up = item;
+      dfControl nextItem = panel.controls[0];
+      dfControl prevItem  = panel.controls[panel.controls.Count - 2];
+      menuItem.up = prevItem;
+      menuItem.down = nextItem;
+      if (nextItem.GetComponent<BraveOptionsMenuItem>() is BraveOptionsMenuItem nextMenuItem)
+        nextMenuItem.up = item;
+      else if (nextItem.GetComponent<UIKeyControls>() is UIKeyControls nextMenuItemUI)
+        nextMenuItemUI.up = item;
+      if (prevItem.GetComponent<BraveOptionsMenuItem>() is BraveOptionsMenuItem prevMenuItem)
+        prevMenuItem.down = item;
+      else if (prevItem.GetComponent<UIKeyControls>() is UIKeyControls prevMenuItemUI)
+        prevMenuItemUI.down = item;
     }
 
     private static bool _DidInitHooks = false;
@@ -558,14 +533,22 @@ public static class MenuMaster
       if (_DidInitHooks)
         return;
 
+      // Custom checkbox events
       new Hook(
           typeof(BraveOptionsMenuItem).GetMethod("HandleCheckboxValueChanged", BindingFlags.Instance | BindingFlags.NonPublic),
           typeof(MenuMaster).GetMethod("HandleCheckboxValueChanged", BindingFlags.Static | BindingFlags.NonPublic)
           );
 
+      // Custom arrowbox events
       new Hook(
           typeof(BraveOptionsMenuItem).GetMethod("HandleLeftRightArrowValueChanged", BindingFlags.Instance | BindingFlags.NonPublic),
           typeof(MenuMaster).GetMethod("HandleLeftRightArrowValueChanged", BindingFlags.Static | BindingFlags.NonPublic)
+          );
+
+      // Custom button events
+      new Hook(
+          typeof(BraveOptionsMenuItem).GetMethod("DoSelectedAction", BindingFlags.Instance | BindingFlags.NonPublic),
+          typeof(MenuMaster).GetMethod("DoSelectedAction", BindingFlags.Static | BindingFlags.NonPublic)
           );
 
       _DidInitHooks = true;
@@ -573,10 +556,9 @@ public static class MenuMaster
 
     private static void HandleCheckboxValueChanged(Action<BraveOptionsMenuItem> orig, BraveOptionsMenuItem item)
     {
+      orig(item);
       if (item.GetComponent<CustomCheckboxHandler>() is CustomCheckboxHandler handler)
         handler.onChanged(item.m_self, item.m_selectedIndex == 1);
-      else
-        orig(item);
     }
 
     private static void HandleLeftRightArrowValueChanged(Action<BraveOptionsMenuItem> orig, BraveOptionsMenuItem item)
@@ -584,6 +566,13 @@ public static class MenuMaster
       orig(item);
       if (item.GetComponent<CustomLeftRightArrowHandler>() is CustomLeftRightArrowHandler handler)
         handler.onChanged(item.m_self, item.labelOptions[item.m_selectedIndex]);
+    }
+
+    private static void DoSelectedAction(Action<BraveOptionsMenuItem> orig, BraveOptionsMenuItem item)
+    {
+      orig(item);
+      if (item.GetComponent<CustomButtonHandler>() is CustomButtonHandler handler)
+        handler.onClicked(item.m_self);
     }
 
     /* TODO:
@@ -605,13 +594,13 @@ public static class MenuMaster
         dfScrollPanel newOptionsPanel = NewOptionsPanel(fullOptions.m_panel);
 
         // Add a few test items
-        newOptionsPanel.AddButton(label: "Test Button", onclick: (control, args) => {
+        newOptionsPanel.AddButton(label: "Test Button", onclick: (control) => {
           ETGModConsole.Log($"did a new clickyboi");
         });
-        newOptionsPanel.AddButton(label: "Test Button 2", onclick:  (control, args) => {
+        newOptionsPanel.AddButton(label: "Test Button 2", onclick:  (control) => {
           ETGModConsole.Log($"did another new clickyboi");
         });
-        newOptionsPanel.AddCheckBox(label: "Test Checkbox", /*onclick*/ onchange:  (control, boolValue) => {
+        newOptionsPanel.AddCheckBox(label: "Test Checkbox", onchange:  (control, boolValue) => {
           ETGModConsole.Log($"checkeroo {boolValue} on {control.name}");
         });
         newOptionsPanel.AddArrowBox(label: "Test Arrowbox", options: new(){"hello", "world", ":D"}, onchange:  (control, stringValue) => {
@@ -619,14 +608,14 @@ public static class MenuMaster
         });
 
         // Register the new button on the PreOptions menu
-        dfButton newButton = preOptions.m_panel.InsertButton(previousButtonName: "AudioTab (1)", label: "Yo New Button Dropped O:", onclick: (control, args) => {
+        dfButton newButton = preOptions.m_panel.InsertRawButton(previousButtonName: "AudioTab (1)", label: "Yo New Button Dropped O:", onclick: (control, args) => {
           ETGModConsole.Log($"did a clickyboi");
           newOptionsPanel.IsVisible = true;
           preOptions.ToggleToPanel(newOptionsPanel, true);
         });
 
         // Dissect.DumpFieldsAndProperties<dfScrollPanel>(newOptionsPanel);
-        // PrintControlRecursive(pausePanel.GetComponent<PauseMenuController>().OptionsMenu.TabVideo);
+        // PrintControlRecursive(pausePanel.GetComponent<PauseMenuController>().OptionsMenu.TabControls);
     }
 
 }
@@ -639,4 +628,9 @@ internal class CustomCheckboxHandler : MonoBehaviour
 internal class CustomLeftRightArrowHandler : MonoBehaviour
 {
   public PropertyChangedEventHandler<string> onChanged;
+}
+
+internal class CustomButtonHandler : MonoBehaviour
+{
+  public Action<dfControl> onClicked;
 }
