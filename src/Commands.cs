@@ -23,7 +23,8 @@ public class Commands
         });
         ETGModConsole.Commands.AddGroup("ff", delegate (string[] args)
         {
-            OneOffDebugDungeonFlow.CreateAndWarp("boomhildr");
+            MenuMaster.SetupUITest();
+            // OneOffDebugDungeonFlow.CreateAndWarp("boomhildr");
             // ETGModConsole.Log("<size=100><color=#ff0000ff>Please specify a command. Type 'nn help' for a list of commands.</color></size>", false);
         });
         ETGModConsole.Commands.AddGroup("shaderfix", delegate (string[] args)

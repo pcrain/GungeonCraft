@@ -131,6 +131,8 @@ public static class Dissect // reflection helper methods for being a lazy dumdum
             Console.WriteLine(String.Format("field {0} = {1}", f.Name, f.GetValue(o)));
         foreach(PropertyDescriptor d in TypeDescriptor.GetProperties(o))
             Console.WriteLine(" prop {0} = {1}", d.Name, d.GetValue(o));
+        // foreach(EventDescriptor ev in TypeDescriptor.GetEvents(o))
+        //     Console.WriteLine(" event {0} = {1}", ev.Name, ev.GetValue(o));
     }
 
     public static void CompareFieldsAndProperties<T>(T o1, T o2)

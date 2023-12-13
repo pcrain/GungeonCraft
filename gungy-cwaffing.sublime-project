@@ -48,7 +48,7 @@
       "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
       "name": "Anaconda Python Builder",
       "selector": "source.python",
-      "shell_cmd": "\"/usr/bin/python\" -u \"$file\""
+      "shell_cmd": "\"/usr/bin/python\" -u \"$file\"",
     },
   ],
   "settings":
@@ -57,8 +57,8 @@
     {
       "OmniSharp":
       {
-        "enabled": true
-      }
-    }
+        "enabled": true,
+      },
+    },
   },
 }
