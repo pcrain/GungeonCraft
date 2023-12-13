@@ -228,14 +228,16 @@ public static class MenuMaster
     {
         if (GameUIRoot.Instance.PauseMenuPanel is not dfPanel pausePanel)
             return;
-        if (pausePanel.GetComponent<PauseMenuController>().OptionsMenu.PreOptionsMenu is not PreOptionsMenuController preOptions)
+        if (pausePanel.GetComponent<PauseMenuController>().OptionsMenu is not FullOptionsMenuController fullOptions)
+          return;
+        if (fullOptions.PreOptionsMenu is not PreOptionsMenuController preOptions)
             return;
 
         dfButton basicButton = preOptions.m_panel.Find<dfButton>("AudioTab (1)");
 
         ETGModConsole.Log($"got a pause panel");
         // PrintControlRecursive(preOptionsPanel);
-        dfScrollPanel newOptionsPanel = NewOptionsPanel(preOptions.m_panel, basicButton);
+        dfScrollPanel newOptionsPanel = NewOptionsPanel(fullOptions.m_panel, basicButton);
         newOptionsPanel.NewOptions(basicButton, "Test", (control, args) => {
           ETGModConsole.Log($"did a new clickyboi");
         });
@@ -245,8 +247,8 @@ public static class MenuMaster
 
         dfButton newButton = preOptions.m_panel.AddNewButton("AudioTab (1)", "Yo New Button Dropped O:", (control, args) => {
           ETGModConsole.Log($"did a clickyboi");
-          preOptions.ToggleToPanel(newOptionsPanel, true);
           newOptionsPanel.IsVisible = true;
+          preOptions.ToggleToPanel(newOptionsPanel, true);
           // PrintControlRecursive(newOptionsPanel);
           // Dissect.DumpFieldsAndProperties<dfScrollPanel>(newOptionsPanel);
         });
