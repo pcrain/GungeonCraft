@@ -109,12 +109,12 @@ public static class MenuMaster
         return newButton;
     }
 
-    public static dfScrollPanel NewOptionsPanel(dfButton firstButtonToCopy)
+    public static dfScrollPanel NewOptionsPanel(dfControl parent, dfButton firstButtonToCopy)
     {
       dfScrollPanel refPanel = GameUIRoot.Instance.PauseMenuPanel.GetComponent<PauseMenuController>().OptionsMenu.TabVideo;
       // Dissect.DumpFieldsAndProperties<dfScrollPanel>(refPanel);
       // dfScrollPanel newPanel = refPanel.transform.parent.gameObject.AddComponent<dfScrollPanel>(); // new dfScrollPanel(){
-      dfScrollPanel newPanel = GameUIRoot.Instance.PauseMenuPanel.AddControl<dfScrollPanel>();
+      dfScrollPanel newPanel = parent.AddControl<dfScrollPanel>();
         newPanel.UseScrollMomentum = refPanel.UseScrollMomentum;
         newPanel.ScrollWithArrowKeys = refPanel.ScrollWithArrowKeys;
         newPanel.Atlas = refPanel.Atlas;
@@ -162,30 +162,96 @@ public static class MenuMaster
         newPanel.HotZoneScale = refPanel.HotZoneScale;
         newPanel.AutoFocus = refPanel.AutoFocus;
         newPanel.useGUILayout = refPanel.useGUILayout;
+        newPanel.autoReset = true;
+        newPanel.autoLayout = true;
         newPanel.enabled = refPanel.enabled;
+        newPanel.Enable();
+
       dfButton testButton = newPanel.AddControl<dfButton>();
       testButton.CopyAttributes(firstButtonToCopy);
-      testButton.Text = "Text";
+      testButton.Text = "Dummy";
+      testButton.name = "Dummy";
       testButton.AutoFocus = true;
       testButton.AutoSize = true;
+      // testButton.Position = new Vector3(0.0f, 0.0f, 0.0f);
+      // testButton.RelativePosition = new Vector3(0.0f, 0.0f, 0.0f);
+      // testButton.CanFocus = true;
+      // testButton.AutoFocus = true;
+      // testButton.IsVisible = true;
+
+      newPanel.Reset();
+      newPanel.FitToContents();
+      newPanel.CenterChildControls();
+      newPanel.ScrollToTop();
+
+      newPanel.ResetLayout(true, true);
+      newPanel.PerformLayout();
+      newPanel.Disable();
+      newPanel.Enable();
       return newPanel;
+    }
+
+    public static void NewOptions(this dfScrollPanel panel, dfButton baseButton, string newbuttonName, MouseEventHandler onclick)
+    {
+      dfButton newButton = panel.AddControl<dfButton>();
+      newButton.CopyAttributes(baseButton);
+
+      // newButton.Position = new Vector3(-400f, 0f, 0f);
+      newButton.Text = newbuttonName;
+      newButton.name = newbuttonName;
+      newButton.Position = new Vector3(0.0f, 0.0f, 0.0f);
+      newButton.RelativePosition = new Vector3(0.0f, 0.0f, 0.0f);
+      newButton.CanFocus = true;
+      newButton.AutoFocus = true;
+      newButton.Click += onclick;
+      // newButton.IsVisible = true;
+      // Dissect.DumpFieldsAndProperties<dfButton>(newButton);
+
+      newButton.Invalidate();
+      newButton.BringToFront();
+      newButton.ForceUpdateCachedParentTransform();
+      newButton.Show();
+      newButton.Enable();
+      newButton.ForceUpdateCachedParentTransform();
+      newButton.Invalidate();
+      panel.ResetLayout(true, true);
+      panel.PerformLayout();
+      panel.Disable();
+      panel.Enable();
     }
 
     /* TODO:
       - apparently needs to be initialized each run before the pause menu is opened for the first time
+      - menu items are creating one screen too far back
     */
     public static void SetupUITest()
     {
         if (GameUIRoot.Instance.PauseMenuPanel is not dfPanel pausePanel)
             return;
+        if (pausePanel.GetComponent<PauseMenuController>().OptionsMenu.PreOptionsMenu is not PreOptionsMenuController preOptions)
+            return;
+
+        dfButton basicButton = preOptions.m_panel.Find<dfButton>("AudioTab (1)");
+
         ETGModConsole.Log($"got a pause panel");
-        // PrintControlRecursive(pausePanel);
-        dfScrollPanel newOptionsPanel = NewOptionsPanel(pausePanel.Find<dfButton>("OptionsButton"));
-        dfButton newButton = pausePanel.AddNewButton("OptionsButton", "Yo New Button Dropped O:", (control, args) => {
-          ETGModConsole.Log($"did a clickyboi");
-          GameUIRoot.Instance.PauseMenuPanel.GetComponent<PauseMenuController>().OptionsMenu.ToggleToPanel(newOptionsPanel, true);
+        // PrintControlRecursive(preOptionsPanel);
+        dfScrollPanel newOptionsPanel = NewOptionsPanel(preOptions.m_panel, basicButton);
+        newOptionsPanel.NewOptions(basicButton, "Test", (control, args) => {
+          ETGModConsole.Log($"did a new clickyboi");
         });
-        // PrintControlRecursive(pausePanel);
+        newOptionsPanel.NewOptions(basicButton, "Test 2", (control, args) => {
+          ETGModConsole.Log($"did another new clickyboi");
+        });
+
+        dfButton newButton = preOptions.m_panel.AddNewButton("AudioTab (1)", "Yo New Button Dropped O:", (control, args) => {
+          ETGModConsole.Log($"did a clickyboi");
+          preOptions.ToggleToPanel(newOptionsPanel, true);
+          newOptionsPanel.IsVisible = true;
+          // PrintControlRecursive(newOptionsPanel);
+          // Dissect.DumpFieldsAndProperties<dfScrollPanel>(newOptionsPanel);
+        });
+
+        // PrintControlRecursive(pausePanel.GetComponent<PauseMenuController>().OptionsMenu.TabVideo);
     }
 
 }
