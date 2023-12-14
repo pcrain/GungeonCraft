@@ -1,9 +1,10 @@
 namespace CwaffingTheGungy;
 
-
 /* What needs to be done:
-    - get aligment sorted on mod options page
+    - get scrollpanel clipping working
     - get mouse hover working for custom panels
+      - light up on hover
+      - don't make sounds when selecting sub-elements
     - allow for mod options subpages
     - load status of checkboxes and arrowboxes from persistent storage
     - store status of checkboxes and arrowboxes to persistent storage
@@ -182,7 +183,7 @@ public static class MenuMaster
 
     public static void PrintControlRecursive(dfControl control, string indent = "->", bool dissect = false)
     {
-        System.Console.WriteLine($"  {indent} control with name={control.name}, position={control.Position}, type={control.GetType()}");
+        System.Console.WriteLine($"  {indent} control with name={control.name}, type={control.GetType()}, position={control.Position}, relposition={control.RelativePosition}, anchor={control.Anchor}, pivot={control.Pivot}");
         if (dissect)
           Dissect.DumpFieldsAndProperties(control);
         foreach (dfControl child in control.controls)
@@ -291,6 +292,9 @@ public static class MenuMaster
       self.Size              = other.Size;
       self.Opacity           = other.Opacity;
       self.enabled           = other.enabled;
+
+      self.renderOrder       = other.renderOrder;
+      self.isControlClipped  = other.isControlClipped;
     }
 
     public static dfButton InsertRawButton(this dfPanel panel, string previousButtonName, string label, MouseEventHandler onclick)
@@ -336,7 +340,7 @@ public static class MenuMaster
         return newButton;
     }
 
-    public static dfScrollPanel NewOptionsPanel(dfControl parent)
+    public static dfScrollPanel NewOptionsPanel(dfPanel parent)
     {
       dfScrollPanel refPanel = GameUIRoot.Instance.PauseMenuPanel.GetComponent<PauseMenuController>().OptionsMenu.TabVideo;
       // Dissect.DumpFieldsAndProperties<dfScrollPanel>(refPanel);
@@ -347,10 +351,7 @@ public static class MenuMaster
         newPanel.Atlas                = refPanel.Atlas;
         newPanel.BackgroundSprite     = refPanel.BackgroundSprite;
         newPanel.BackgroundColor      = refPanel.BackgroundColor;
-        newPanel.AutoReset            = refPanel.AutoReset;
         newPanel.ScrollPadding        = refPanel.ScrollPadding;
-        newPanel.AutoScrollPadding    = refPanel.AutoScrollPadding;
-        newPanel.AutoLayout           = refPanel.AutoLayout;
         newPanel.WrapLayout           = refPanel.WrapLayout;
         newPanel.FlowDirection        = refPanel.FlowDirection;
         newPanel.FlowPadding          = refPanel.FlowPadding;
@@ -360,7 +361,6 @@ public static class MenuMaster
         newPanel.VertScrollbar        = refPanel.VertScrollbar;
         newPanel.WheelScrollDirection = refPanel.WheelScrollDirection;
         newPanel.UseVirtualScrolling  = refPanel.UseVirtualScrolling;
-        newPanel.AutoFitVirtualTiles  = refPanel.AutoFitVirtualTiles;
         newPanel.VirtualScrollingTile = refPanel.VirtualScrollingTile;
         newPanel.CanFocus             = refPanel.CanFocus;
         newPanel.AllowSignalEvents    = refPanel.AllowSignalEvents;
@@ -373,14 +373,12 @@ public static class MenuMaster
         newPanel.Color                = refPanel.Color;
         newPanel.DisabledColor        = refPanel.DisabledColor;
         newPanel.Pivot                = refPanel.Pivot;
-        newPanel.RelativePosition     = refPanel.RelativePosition;
-        newPanel.Position             = refPanel.Position;
-        newPanel.Size                 = refPanel.Size;
+        // newPanel.Size                 = refPanel.Size;  // don't set size manually since we want to clip
         newPanel.Width                = refPanel.Width;
         newPanel.Height               = refPanel.Height;
         newPanel.MinimumSize          = refPanel.MinimumSize;
         newPanel.MaximumSize          = refPanel.MaximumSize;
-        newPanel.ZOrder               = refPanel.ZOrder;
+        // newPanel.ZOrder               = refPanel.ZOrder;
         newPanel.TabIndex             = refPanel.TabIndex;
         newPanel.ClipChildren         = refPanel.ClipChildren;
         newPanel.InverseClipChildren  = refPanel.InverseClipChildren;
@@ -393,73 +391,18 @@ public static class MenuMaster
         newPanel.AutoReset            = refPanel.AutoReset;
         newPanel.AutoScrollPadding    = refPanel.AutoScrollPadding;
         newPanel.AutoFitVirtualTiles  = refPanel.AutoFitVirtualTiles;
+        newPanel.AutoFitVirtualTiles  = refPanel.AutoFitVirtualTiles;
         // newPanel.enabled = refPanel.enabled;
-        newPanel.Enable();
 
-      newPanel.HackyRefresh();
+        // newPanel.RelativePosition = new Vector3(100f, 100f, 0f);
+        newPanel.Anchor               = dfAnchorStyle.CenterVertical;
+        // newPanel.ZOrder               = 4;
+        newPanel.Enable();
 
       // Add it to our known panels so we can make visible / invisible as necessary
       _RegisteredTabs.Add(newPanel);
 
       return newPanel;
-    }
-
-    // TODO: figure out how much of this is actually necessary
-    public static void HackyRefresh(this dfScrollPanel panel)
-    {
-      panel.Reset();
-      panel.FitToContents();
-      // panel.CenterChildControls();
-      // panel.ScrollToTop();
-
-      panel.ResetLayout(true, true);
-      panel.PerformLayout();
-      // panel.Disable();
-      // panel.Enable();
-    }
-
-    // TODO: figure out how much of this is actually necessary
-    public static void HackyInit<T>(this T control) where T : dfControl
-    {
-      control.Invalidate();
-      control.BringToFront();
-      control.ForceUpdateCachedParentTransform();
-      control.Show();
-      control.Enable();
-      control.ForceUpdateCachedParentTransform();
-      control.Invalidate();
-    }
-
-    public static void AddRawButton(this dfScrollPanel panel, string label, MouseEventHandler onclick)
-    {
-      dfButton newButton = panel.AddControl<dfButton>();
-      newButton.CopyAttributes(GetPrototypeRawButton());
-
-      // newButton.Position = new Vector3(-400f, 0f, 0f);
-      newButton.Text = label;
-      newButton.name = label;
-      // newButton.Position = new Vector3(0.0f, 0.0f, 0.0f);
-      // newButton.RelativePosition = new Vector3(0.0f, 0.0f, 0.0f);
-      // newButton.CanFocus = true;
-      // newButton.AutoFocus = true;
-      newButton.Click += onclick;
-      // newButton.ClickWhenSpacePressed = true;
-      // newButton.IsVisible = true;
-      // Dissect.DumpFieldsAndProperties<dfButton>(newButton);
-
-      // UIKeyControls menuItem = newButton.gameObject.AddComponent<UIKeyControls>();
-      //   menuItem.button                 = newButton;
-      //   menuItem.up                     = null;
-      //   menuItem.down                   = null;
-      //   // menuItem.left                   = null;
-      //   // menuItem.right                  = null;
-      //   menuItem.selectOnAction         = true;
-      //   menuItem.clearRepeatingOnSelect = true;
-      //   // menuItem.OnNewControlSelected = null;
-
-      newButton.HackyInit();
-
-      panel.HackyRefresh();
     }
 
     // based on V-SyncCheckBoxPanel
@@ -489,13 +432,13 @@ public static class MenuMaster
         menuItem.optionType           = BraveOptionsMenuItem.BraveOptionsOptionType.NONE;
         menuItem.itemType             = BraveOptionsMenuItem.BraveOptionsMenuItemType.Checkbox;
         menuItem.labelControl         = newCheckboxLabel;
-        menuItem.selectedLabelControl = newCheckboxLabel /*null*/;
+        menuItem.selectedLabelControl = null;
         menuItem.infoControl          = null;
         menuItem.fillbarControl       = null;
         menuItem.buttonControl        = null;
         menuItem.checkboxChecked      = newCheckedCheckboxSprite;
         menuItem.checkboxUnchecked    = newEmptyCheckboxSprite;
-        menuItem.labelOptions         = null; // useful for left / right arrows
+        menuItem.labelOptions         = null;
         menuItem.infoOptions          = null;
         menuItem.up                   = null;
         menuItem.down                 = null;
@@ -509,15 +452,6 @@ public static class MenuMaster
       newCheckboxWrapperPanel.name = $"{label} panel";
       panel.RegisterBraveMenuItem(newCheckboxWrapperPanel);
       menuItem.gameObject.AddComponent<CustomCheckboxHandler>().onChanged += onchange;
-
-      newEmptyCheckboxSprite.HackyInit();
-      newCheckedCheckboxSprite.HackyInit();
-      newCheckboxLabel.HackyInit();
-      newCheckbox.HackyInit();
-      newCheckboxInnerPanel.HackyInit();
-      newCheckboxWrapperPanel.HackyInit();
-
-      panel.HackyRefresh();
     }
 
     // based on VisualPresetArrowSelectorPanel
@@ -567,15 +501,6 @@ public static class MenuMaster
       newArrowboxWrapperPanel.name = $"{label} panel";
       panel.RegisterBraveMenuItem(newArrowboxWrapperPanel);
       menuItem.gameObject.AddComponent<CustomLeftRightArrowHandler>().onChanged += onchange;
-
-      newArrowLeftSprite.HackyInit();
-      newArrowRightSprite.HackyInit();
-      newArrowSelectorLabel.HackyInit();
-      newArrowSelectorSelection.HackyInit();
-      newArrowboxInnerPanel.HackyInit();
-      newArrowboxWrapperPanel.HackyInit();
-
-      panel.HackyRefresh();
     }
 
     // based on EditKeyboardBindingsButtonPanel
@@ -591,8 +516,6 @@ public static class MenuMaster
       newButton.CopyAttributes(GetPrototypeButton());
 
       newButton.Text = label;
-      // newButton.GotFocus += (control, _) => AkSoundEngine.PostEvent("Play_UI_menu_select_01", control.gameObject);;
-      // newButton.EnterFocus += (control, _) => AkSoundEngine.PostEvent("Play_UI_menu_select_01", control.gameObject);;
 
       BraveOptionsMenuItem menuItem = newButtonWrapperPanel.gameObject.AddComponent<BraveOptionsMenuItem>();
         menuItem.optionType           = BraveOptionsMenuItem.BraveOptionsOptionType.NONE;
@@ -618,12 +541,6 @@ public static class MenuMaster
       newButtonWrapperPanel.name = $"{label} panel";
       panel.RegisterBraveMenuItem(newButtonWrapperPanel);
       menuItem.gameObject.AddComponent<CustomButtonHandler>().onClicked += onclick;
-
-      newButton.HackyInit();
-      newButtonInnerPanel.HackyInit();
-      newButtonWrapperPanel.HackyInit();
-
-      panel.HackyRefresh();
     }
 
     public static void RegisterBraveMenuItem(this dfScrollPanel panel, dfControl item)
@@ -657,7 +574,6 @@ public static class MenuMaster
           return;
         if (fullOptions.PreOptionsMenu is not PreOptionsMenuController preOptions)
             return;
-
         ETGModConsole.Log($"got a pause panel");
 
         // Clear out all registered UI tabs, since we need to build everything fresh
@@ -667,18 +583,18 @@ public static class MenuMaster
         dfScrollPanel newOptionsPanel = NewOptionsPanel(fullOptions.m_panel);
 
         // Add a few test items
-        newOptionsPanel.AddButton(label: "Test Button", onclick: (control) => {
-          ETGModConsole.Log($"did a new clickyboi");
-        });
-        newOptionsPanel.AddButton(label: "Test Button 2", onclick:  (control) => {
-          ETGModConsole.Log($"did another new clickyboi");
-        });
-        newOptionsPanel.AddCheckBox(label: "Test Checkbox", onchange:  (control, boolValue) => {
-          ETGModConsole.Log($"checkeroo {boolValue} on {control.name}");
-        });
-        newOptionsPanel.AddArrowBox(label: "Test Arrowbox", options: new(){"hello", "world", ":D"}, onchange:  (control, stringValue) => {
-          ETGModConsole.Log($"arrowboi {stringValue} on {control.name}");
-        });
+        for (int i = 1; i <= 5; ++i)
+        {
+          newOptionsPanel.AddButton(label: $"Test Button {i}", onclick: (control) => {
+            ETGModConsole.Log($"clikin on {control.name}");
+          });
+          newOptionsPanel.AddCheckBox(label: $"Test Checkbox {i}", onchange:  (control, boolValue) => {
+            ETGModConsole.Log($"checkeroo {boolValue} on {control.name}");
+          });
+          newOptionsPanel.AddArrowBox(label: $"Test Arrowbox {i}", options: new(){"hello", "world", ":D"}, onchange:  (control, stringValue) => {
+            ETGModConsole.Log($"arrowboi {stringValue} on {control.name}");
+          });
+        }
 
         // Register the new button on the PreOptions menu
         dfButton newButton = preOptions.m_panel.InsertRawButton(previousButtonName: "AudioTab (1)", label: "Yo New Button Dropped O:", onclick: (control, args) => {
@@ -688,6 +604,6 @@ public static class MenuMaster
         });
 
         // Dissect.DumpFieldsAndProperties<dfScrollPanel>(newOptionsPanel);
-        // PrintControlRecursive(pausePanel.GetComponent<PauseMenuController>().OptionsMenu.TabControls);
+        PrintControlRecursive(newOptionsPanel);
     }
 }
