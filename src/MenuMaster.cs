@@ -1,7 +1,6 @@
 namespace CwaffingTheGungy;
 
 /* Major API stuff to be done, from highest to lowest priority
-    - fix placement of mod options menu item on pre-options page
     - store status of checkboxes and arrowboxes to persistent storage
     - load status of checkboxes and arrowboxes from persistent storage
     - create actual API surface
@@ -11,6 +10,7 @@ namespace CwaffingTheGungy;
     - changing padding on standalone labels / arrow boxes / info boxes
 
    Nitpicks I really don't care to fix at all, but should be aware of:
+    - can't colorize info boxes
     - can't back out of one level of menus at a time (vanilla behavior; maybe hook CloseAndMaybeApplyChangesWithPrompt)
     - haven't implemented progress / fill bars
     - can't dynamically enable / disable options
@@ -29,7 +29,7 @@ internal class CustomButtonHandler : MonoBehaviour
 
 public static class MenuMaster
 {
-    private const string _MOD_MENU_LABEL = "Yo New Button Dropped O:";
+    private const string _MOD_MENU_LABEL = "MOD CONFIG";
 
     private static bool _DidInitHooks = false;
     private static List<dfControl> _RegisteredTabs = new();
@@ -133,7 +133,7 @@ public static class MenuMaster
       if (item.optionType != BraveOptionsMenuItem.BraveOptionsOptionType.NONE)
         return;
 
-      item.infoControl.Color = Color.green; // TODO: dynamic color
+      item.infoControl.Color = Color.cyan; // TODO: dynamic color
       item.infoControl.Text = item.infoOptions[item.m_selectedIndex];
     }
 
@@ -177,12 +177,6 @@ public static class MenuMaster
     private static void PlayMenuCursorSound(dfControl control, dfFocusEventArgs args)
     {
       PlayMenuCursorSound(control);
-    }
-
-    // TODO: issues caching this, so build it fresh each time
-    internal static dfButton GetPrototypeRawButton()
-    {
-      return GameUIRoot.Instance.PauseMenuPanel.GetComponent<PauseMenuController>().OptionsMenu.PreOptionsMenu.m_panel.Find<dfButton>("AudioTab (1)");
     }
 
     internal static dfPanel GetPrototypeCheckboxWrapperPanel()
@@ -310,7 +304,7 @@ public static class MenuMaster
       return GetPrototypeLabelInnerPanel().Find<dfLabel>("Label");
     }
 
-    public static void PrintControlRecursive(dfControl control, string indent = "->", bool dissect = false)
+    internal static void PrintControlRecursive(dfControl control, string indent = "->", bool dissect = false)
     {
         System.Console.WriteLine($"  {indent} control with name={control.name}, type={control.GetType()}, position={control.Position}, relposition={control.RelativePosition}, size={control.Size}, anchor={control.Anchor}, pivot={control.Pivot}");
         if (dissect)
@@ -319,7 +313,7 @@ public static class MenuMaster
             PrintControlRecursive(child, "--"+indent);
     }
 
-    public static void CopyAttributes<T>(this T self, T other) where T : dfControl
+    internal static void CopyAttributes<T>(this T self, T other) where T : dfControl
     {
       if (self is dfButton button && other is dfButton otherButton)
       {
@@ -426,25 +420,43 @@ public static class MenuMaster
       self.isControlClipped  = other.isControlClipped;
     }
 
-    public static dfButton InsertRawButton(this dfPanel panel, string previousButtonName, string label, MouseEventHandler onclick)
+    internal static void CreateModConfigButton(this PreOptionsMenuController preOptions, dfScrollPanel newOptionsPanel)
     {
-        dfButton prevButton = panel.Find<dfButton>(previousButtonName);
-        if (prevButton == null)
-        {
-          ETGModConsole.Log($"  no button {previousButtonName} to clone");
-          return null;
-        }
+        dfPanel panel        = preOptions.m_panel;
+        dfButton prevButton  = panel.Find<dfButton>("AudioTab (1)");
         dfControl nextButton = prevButton.GetComponent<UIKeyControls>().down;
 
+        // Get a list of all buttons in the menu
+        List<dfButton> buttonsInMenu  = new();
+        foreach (dfControl control in panel.Controls)
+          if (control is dfButton button)
+            buttonsInMenu.Add(button);
+
+        // Sort them from top to bottom and compute the new gap needed after adding a new button
+        buttonsInMenu.Sort((a,b) => (a.Position.y < b.Position.y) ? 1 : -1);
+        float minY = buttonsInMenu.First().Position.y;
+        float maxY = buttonsInMenu.Last().Position.y;
+        float gap  = (maxY - minY) / buttonsInMenu.Count;
+
+        // Shift the buttons up to make room for the new button
+        for (int i = 0; i < buttonsInMenu.Count; ++i)
+          buttonsInMenu[i].Position = buttonsInMenu[i].Position.WithY(minY + gap * i);
+
+        // Add the new button to the list
         dfButton newButton = panel.AddControl<dfButton>();
-        newButton.CopyAttributes(GetPrototypeRawButton());
-        newButton.Text = label;
-        newButton.name = label;
-        newButton.RelativePosition = newButton.RelativePosition + new Vector3(300.0f, 10.0f, 0.0f);
-        newButton.Click += onclick;
+        newButton.CopyAttributes(prevButton);
+        newButton.Text = _MOD_MENU_LABEL;
+        newButton.name = _MOD_MENU_LABEL;
+        newButton.Position = newButton.Position.WithY(maxY);  // Add it to the original position of the final button
+        newButton.Click += (control, args) => {
+          if (C.DEBUG_BUILD)
+            ETGModConsole.Log($"entered modded options menu");
+          preOptions.ToggleToPanel(newOptionsPanel, true, force: true); // force true so it works even if the pre-options menu is invisible
+        };
         newButton.MouseEnter += FocusControl;
         newButton.GotFocus += PlayMenuCursorSound;
 
+        // Add it to the UI
         UIKeyControls uikeys = newButton.gameObject.AddComponent<UIKeyControls>();
         uikeys.button                                 = newButton;
         uikeys.selectOnAction                         = true;
@@ -454,19 +466,9 @@ public static class MenuMaster
         prevButton.GetComponent<UIKeyControls>().down = newButton;
         nextButton.GetComponent<UIKeyControls>().up   = newButton;
 
-        newButton.Invalidate();
-        newButton.BringToFront();
-        newButton.ForceUpdateCachedParentTransform();
-        newButton.Show();
-        newButton.Enable();
-        newButton.ForceUpdateCachedParentTransform();
-        newButton.Invalidate();
-        panel.ResetLayout(true, true);
+        // Adjust the layout
+        newButton.PerformLayout();
         panel.PerformLayout();
-        panel.Disable();
-        panel.Enable();
-
-        return newButton;
     }
 
     public static dfScrollPanel NewOptionsPanel(string name)
@@ -709,12 +711,18 @@ public static class MenuMaster
       panel.PerformLayout();  // register all changes
     }
 
+    public static void OpenSubMenu(dfScrollPanel panel)
+    {
+      GameUIRoot.Instance.PauseMenuPanel.GetComponent<PauseMenuController>(
+        ).OptionsMenu.PreOptionsMenu.ToggleToPanel(panel, true, force: true); // force true so it works even if it's invisible
+    }
+
     public static void RebuildOptionsPanels()
     {
         if (GameUIRoot.Instance.PauseMenuPanel.GetComponent<PauseMenuController>().OptionsMenu.PreOptionsMenu is not PreOptionsMenuController preOptions)
           return;
 
-        System.Diagnostics.Stopwatch tempWatchWatch = System.Diagnostics.Stopwatch.StartNew();
+        System.Diagnostics.Stopwatch panelBuildWatch = System.Diagnostics.Stopwatch.StartNew();
 
         // Clear out all registered UI tabs, since we need to build everything fresh
         _RegisteredTabs.Clear();
@@ -741,7 +749,7 @@ public static class MenuMaster
           // Add our subpanel to our main panel
           newOptionsPanel.AddButton(label: $"Secret Menu O:", onclick: (control) => {
             ETGModConsole.Log($"entered secret options menu");
-            preOptions.ToggleToPanel(subOptionsPanel, true, force: true); // force true so it works even if it's invisible
+            OpenSubMenu(subOptionsPanel);
           });
 
           // Add some normal options
@@ -757,20 +765,17 @@ public static class MenuMaster
             newOptionsPanel.AddArrowBox(label: $"ArrowBox {i}", options: new(){$"Align {i}", "^O^", ">>>o<<<"}, onchange:  (control, stringValue) => {
               ETGModConsole.Log($"arrowboi {stringValue} on {control.name}");
             });
-            newOptionsPanel.AddArrowBox(label: $"InfoBox {i}", options: new(){$"Align {i}", "^O^", ">>>o<<<"}, info: new(){$"hi there C:", "how's it going? O:", "what are you up to?"}, onchange:  (control, stringValue) => {
+            newOptionsPanel.AddArrowBox(label: $"InfoBox {i}", options: new(){$"Align {i}", "^O^", ">>>o<<<"}, info: new(){$"hi there C:\nmultiline test\none more for good measure", "how's it going? O:", "what are you up to?"}, onchange:  (control, stringValue) => {
               ETGModConsole.Log($"da infobox {stringValue} on {control.name}");
             });
           }
         newOptionsPanel.Finalize();
 
         // Register the new button on the PreOptions menu
-        dfButton newButton = preOptions.m_panel.InsertRawButton(previousButtonName: "AudioTab (1)", label: _MOD_MENU_LABEL, onclick: (control, args) => {
-          ETGModConsole.Log($"entered modded options menu");
-          preOptions.ToggleToPanel(newOptionsPanel, true, force: true); // force true so it works even if it's invisible
-        });
+        preOptions.CreateModConfigButton(newOptionsPanel);
 
         // Dissect.DumpFieldsAndProperties<dfScrollPanel>(newOptionsPanel);
         // PrintControlRecursive(newOptionsPanel);
-        tempWatchWatch.Stop(); System.Console.WriteLine($"    panel built in {tempWatchWatch.ElapsedMilliseconds} milliseconds");
+        panelBuildWatch.Stop(); System.Console.WriteLine($"    panel built in {panelBuildWatch.ElapsedMilliseconds} milliseconds");
     }
 }
