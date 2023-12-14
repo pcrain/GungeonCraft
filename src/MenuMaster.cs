@@ -4,9 +4,9 @@ namespace CwaffingTheGungy;
     - fix placement of mod options menu item on pre-options page
     - allow for mod options subpages
 
-    - automatically load in mod menu on run start / gui Awake()
     - load status of checkboxes and arrowboxes from persistent storage
     - store status of checkboxes and arrowboxes to persistent storage
+    - make first item of mod menu subpage highlight
 
    Minor issues I'm not worrying about now
     - allow markup on dfControls
@@ -78,9 +78,16 @@ public static class MenuMaster
 
     private static void ToggleToPanel(Action<FullOptionsMenuController, dfScrollPanel, bool> orig, FullOptionsMenuController controller, dfScrollPanel targetPanel, bool doFocus)
     {
+      bool isOurPanel = false;
       foreach (dfControl tab in _RegisteredTabs)
-        tab.IsVisible = (tab == targetPanel);
+      {
+        bool match = (tab == targetPanel);  // need to cache this because tab.IsVisible property doesn't return as expected
+        tab.IsVisible = match;
+        isOurPanel |= match;
+      }
       orig(controller, targetPanel, doFocus);
+      if (isOurPanel)
+        targetPanel.controls.First().HighlightChildrenAndFocus();  // fix bug where first item isn't highlighted
     }
 
     private static void HandleCheckboxValueChanged(Action<BraveOptionsMenuItem> orig, BraveOptionsMenuItem item)
@@ -601,25 +608,18 @@ public static class MenuMaster
         prevMenuItemUI.down = item;
     }
 
-    public static void ResetAllLayouts(this dfControl control)
-    {
-      control.ResetLayout();
-      foreach (dfControl child in control.controls)
-        child.ResetAllLayouts();
-    }
-
-    private static void HighlightAllChildrenAsIfTheyWereEnabled(this dfControl root)
+    private static void HighlightChildrenAndFocus(this dfControl root, bool canFocus = true)
     {
       root.Color = Color.white;
       if (root is dfButton button)
         button.TextColor = Color.white;
+
+      root.canFocus  = canFocus;
+      root.AutoFocus = true;
       foreach (dfControl child in root.controls)
-        child.HighlightAllChildrenAsIfTheyWereEnabled();
+        child.HighlightChildrenAndFocus(canFocus: false);
     }
 
-    /* TODO:
-      - apparently needs to be initialized each run before the pause menu is opened for the first time
-    */
     public static void RebuildOptionsPanels()
     {
         if (GameUIRoot.Instance.PauseMenuPanel is not dfPanel pausePanel)
@@ -628,8 +628,8 @@ public static class MenuMaster
           return;
         if (fullOptions.PreOptionsMenu is not PreOptionsMenuController preOptions)
           return;
-        ETGModConsole.Log($"got a pause panel");
-      System.Diagnostics.Stopwatch tempWatchWatch = System.Diagnostics.Stopwatch.StartNew();
+
+        System.Diagnostics.Stopwatch tempWatchWatch = System.Diagnostics.Stopwatch.StartNew();
 
         // Clear out all registered UI tabs, since we need to build everything fresh
         _RegisteredTabs.Clear();
@@ -646,12 +646,6 @@ public static class MenuMaster
         newOptionsPanel.Size -= new Vector2(0, 50f);  //TODO: figure out why this offset is wrong in the first place
         newOptionsPanel.Position -= new Vector3(0, 50f, 0f);  //TODO: figure out why this offset is wrong in the first place
         // newOptionsPanel.Anchor               = dfAnchorStyle.CenterVertical | dfAnchorStyle.Proportional;
-        // newOptionsPanel.ResetLayout(true, false);
-
-        // newOptionsPanel.ResetVirtualScrollingData();
-        // newOptionsPanel.ResetAllLayouts();
-        // newOptionsPanel.Reset();
-        // newOptionsPanel.PerformLayout();
 
         // Add a few test items
         for (int i = 1; i <= 5; ++i)
@@ -667,24 +661,12 @@ public static class MenuMaster
           });
         }
 
-        // // newOptionsPanel.MaximumSize = new Vector2(110f, 110f);
-        // newOptionsPanel.ClipChildren = true;
-        // newOptionsPanel.InverseClipChildren = true;
-        // // newOptionsPanel.ScrollPadding = new RectOffset(0,0,0,0);
-        // // newOptionsPanel.Size -= new Vector2(0, 150f);
-        // newOptionsPanel.Anchor               = dfAnchorStyle.CenterVertical | dfAnchorStyle.Proportional;
-        // // newOptionsPanel.ResetVirtualScrollingData();
-        // newOptionsPanel.ResetLayout(true, false);
-        // newOptionsPanel.ResetAllLayouts();
-        // newOptionsPanel.Reset();
         newOptionsPanel.controls.Last().Height += 16f; // fix a weird clipping issue for arrowboxes at the bottom
-        // newOptionsPanel.controls.First().HighlightAllChildrenAsIfTheyWereEnabled();
         newOptionsPanel.PerformLayout();
 
         // Register the new button on the PreOptions menu
         dfButton newButton = preOptions.m_panel.InsertRawButton(previousButtonName: "AudioTab (1)", label: _MOD_MENU_LABEL, onclick: (control, args) => {
           ETGModConsole.Log($"entered modded options menu");
-          // newOptionsPanel.IsVisible = true;
           preOptions.ToggleToPanel(newOptionsPanel, true);
         });
 
