@@ -2,7 +2,6 @@ namespace CwaffingTheGungy;
 
 /* What needs to be done:
     - fix placement of mod options menu item on pre-options page
-    - make mod options menu load from main menu and non-quickstart breach
 
     - load status of checkboxes and arrowboxes from persistent storage
     - store status of checkboxes and arrowboxes to persistent storage
@@ -35,7 +34,13 @@ public static class MenuMaster
       if (_DidInitHooks)
         return;
 
-      // Make sure our menus are loaded
+      // Make sure our menus are loaded in the main menu
+      new Hook(
+          typeof(MainMenuFoyerController).GetMethod("InitializeMainMenu", BindingFlags.Instance | BindingFlags.Public),
+          typeof(MenuMaster).GetMethod("InitializeMainMenu", BindingFlags.Static | BindingFlags.NonPublic)
+          );
+
+      // Make sure our menus are loaded in game
       new Hook(
           typeof(GameManager).GetMethod("Pause", BindingFlags.Instance | BindingFlags.Public),
           typeof(MenuMaster).GetMethod("Pause", BindingFlags.Static | BindingFlags.NonPublic)
@@ -66,6 +71,14 @@ public static class MenuMaster
           );
 
       _DidInitHooks = true;
+    }
+
+    private static void InitializeMainMenu(Action<MainMenuFoyerController> orig, MainMenuFoyerController mm)
+    {
+      if (GameUIRoot.Instance.PauseMenuPanel.GetComponent<PauseMenuController>().OptionsMenu.PreOptionsMenu is PreOptionsMenuController preOptions)
+        if (!preOptions.m_panel.Find<dfButton>(_MOD_MENU_LABEL))
+          RebuildOptionsPanels();
+      orig(mm);
     }
 
     private static void Pause(Action<GameManager> orig, GameManager gm)
