@@ -8,12 +8,12 @@ namespace CwaffingTheGungy;
     - clean up code
 
    Minor issues I'm not worrying about now, from highest to lowest priority
-    - can't back out of one level of menus at a time (look into CloseAndMaybeApplyChangesWithPrompt)
-    - allow adding descriptions to arrowBoxes
-    - changing padding on standalone labels
-    - dynamically enabling / disabling options
+    - changing padding on standalone labels / arrow boxes / info boxes
 
    Nitpicks I really don't care to fix at all, but should be aware of:
+    - can't back out of one level of menus at a time (vanilla behavior; maybe hook CloseAndMaybeApplyChangesWithPrompt)
+    - haven't implemented progress / fill bars
+    - can't dynamically enable / disable options
     - can't have first item of submenu be a label or it doesn't get focused correctly
     - using magic numbers in a few places to fix panel offsets
 */
@@ -63,6 +63,12 @@ public static class MenuMaster
           typeof(MenuMaster).GetMethod("ToggleToPanel", BindingFlags.Static | BindingFlags.NonPublic)
           );
 
+      // Custom infobox updates
+      new Hook(
+          typeof(BraveOptionsMenuItem).GetMethod("UpdateInfoControl", BindingFlags.Instance | BindingFlags.NonPublic),
+          typeof(MenuMaster).GetMethod("UpdateInfoControl", BindingFlags.Static | BindingFlags.NonPublic)
+          );
+
       // Custom checkbox events
       new Hook(
           typeof(BraveOptionsMenuItem).GetMethod("HandleCheckboxValueChanged", BindingFlags.Instance | BindingFlags.NonPublic),
@@ -86,7 +92,6 @@ public static class MenuMaster
 
     private static void ReturnToPreOptionsMenu(Action<PreOptionsMenuController> orig, PreOptionsMenuController pm)
     {
-      Debug.Log($"PREPAUSE");
       orig(pm);
     }
 
@@ -108,18 +113,28 @@ public static class MenuMaster
 
     private static void ToggleToPanel(Action<FullOptionsMenuController, dfScrollPanel, bool> orig, FullOptionsMenuController controller, dfScrollPanel targetPanel, bool doFocus)
     {
-      ETGModConsole.Log($"toggling to panel {targetPanel.name}");
       bool isOurPanel = false;
       foreach (dfControl tab in _RegisteredTabs)
       {
         bool match = (tab == targetPanel);  // need to cache this because tab.IsVisible property doesn't return as expected
-        ETGModConsole.Log($"  matches {tab.name}? {match}");
         tab.IsVisible = match;
         isOurPanel |= match;
       }
       orig(controller, targetPanel, doFocus);
       if (isOurPanel)
         targetPanel.controls.First().HighlightChildrenAndFocus();  // fix bug where first item isn't highlighted
+    }
+
+    private static void UpdateInfoControl(Action<BraveOptionsMenuItem> orig, BraveOptionsMenuItem item)
+    {
+      orig(item);
+      if (item.itemType != BraveOptionsMenuItem.BraveOptionsMenuItemType.LeftRightArrowInfo)
+        return;
+      if (item.optionType != BraveOptionsMenuItem.BraveOptionsOptionType.NONE)
+        return;
+
+      item.infoControl.Color = Color.green; // TODO: dynamic color
+      item.infoControl.Text = item.infoOptions[item.m_selectedIndex];
     }
 
     private static void HandleCheckboxValueChanged(Action<BraveOptionsMenuItem> orig, BraveOptionsMenuItem item)
@@ -228,6 +243,41 @@ public static class MenuMaster
     internal static dfLabel GetPrototypeLeftRightPanelSelection()
     {
       return GetPrototypeLeftRightInnerPanel().Find<dfLabel>("OptionsArrowSelectorSelection");
+    }
+
+    internal static dfPanel GetPrototypeInfoWrapperPanel()
+    {
+      return GameUIRoot.Instance.PauseMenuPanel.GetComponent<PauseMenuController>().OptionsMenu.TabVideo.Find<dfPanel>("ResolutionArrowSelectorPanelWithInfoBox");
+    }
+
+    internal static dfPanel GetPrototypeInfoInnerPanel()
+    {
+      return GetPrototypeInfoWrapperPanel().Find<dfPanel>("PanelEnsmallenerThatmakesDavesLifeHardandBrentsLifeEasy");
+    }
+
+    internal static dfLabel GetPrototypeInfoPanelLabel()
+    {
+      return GetPrototypeInfoInnerPanel().Find<dfLabel>("OptionsArrowSelectorLabel");
+    }
+
+    internal static dfSprite GetPrototypeInfoPanelLeftSprite()
+    {
+      return GetPrototypeInfoInnerPanel().Find<dfSprite>("OptionsArrowSelectorArrowLeft");
+    }
+
+    internal static dfSprite GetPrototypeInfoPanelRightSprite()
+    {
+      return GetPrototypeInfoInnerPanel().Find<dfSprite>("OptionsArrowSelectorArrowRight");
+    }
+
+    internal static dfLabel GetPrototypeInfoPanelSelection()
+    {
+      return GetPrototypeInfoInnerPanel().Find<dfLabel>("OptionsArrowSelectorSelection");
+    }
+
+    internal static dfLabel GetPrototypeInfoInfoPanel()
+    {
+      return GetPrototypeInfoWrapperPanel().Find<dfLabel>("OptionsArrowSelectorInfoLabel");
     }
 
     internal static dfPanel GetPrototypeButtonWrapperPanel()
@@ -374,14 +424,6 @@ public static class MenuMaster
 
       self.renderOrder       = other.renderOrder;
       self.isControlClipped  = other.isControlClipped;
-
-      // self.Anchor            = dfAnchorStyle.CenterHorizontal | dfAnchorStyle.CenterVertical;
-
-      // self.Invalidate();
-      // self.ResetLayout();
-      // self.PerformLayout();
-      // self.Hide();
-      // self.Disable();
     }
 
     public static dfButton InsertRawButton(this dfPanel panel, string previousButtonName, string label, MouseEventHandler onclick)
@@ -390,7 +432,7 @@ public static class MenuMaster
         if (prevButton == null)
         {
           ETGModConsole.Log($"  no button {previousButtonName} to clone");
-          return null; //
+          return null;
         }
         dfControl nextButton = prevButton.GetComponent<UIKeyControls>().down;
 
@@ -411,7 +453,6 @@ public static class MenuMaster
         uikeys.down                                   = nextButton;
         prevButton.GetComponent<UIKeyControls>().down = newButton;
         nextButton.GetComponent<UIKeyControls>().up   = newButton;
-        // uikeys.OnNewControlSelected                  += PlayMenuCursorSound;
 
         newButton.Invalidate();
         newButton.BringToFront();
@@ -467,7 +508,7 @@ public static class MenuMaster
         newPanel.Height               = refPanel.Height;
         newPanel.MinimumSize          = refPanel.MinimumSize;
         newPanel.MaximumSize          = refPanel.MaximumSize;
-        // newPanel.ZOrder               = refPanel.ZOrder;
+        // newPanel.ZOrder               = refPanel.ZOrder; // don't set this or children won't be processed in the order we add them
         newPanel.TabIndex             = refPanel.TabIndex;
         newPanel.ClipChildren         = refPanel.ClipChildren;
         newPanel.InverseClipChildren  = refPanel.InverseClipChildren;
@@ -481,7 +522,6 @@ public static class MenuMaster
         newPanel.AutoScrollPadding    = refPanel.AutoScrollPadding;
         newPanel.AutoFitVirtualTiles  = refPanel.AutoFitVirtualTiles;
         newPanel.AutoFitVirtualTiles  = refPanel.AutoFitVirtualTiles;
-        // newPanel.enabled = refPanel.enabled;
 
       // Set up a few additional variables to suit our needs
       newPanel.ClipChildren         = true;
@@ -490,9 +530,6 @@ public static class MenuMaster
       newPanel.AutoScrollPadding    = new RectOffset(0,0,0,0);
       newPanel.Size                -= new Vector2(0, 50f);  //TODO: figure out why this offset is wrong in the first place
       newPanel.Position            -= new Vector3(0, 50f, 0f);  //TODO: figure out why this offset is wrong in the first place
-      // newOptionsPanel.Anchor               = dfAnchorStyle.CenterVertical | dfAnchorStyle.Proportional;
-      // newPanel.RelativePosition = new Vector3(100f, 100f, 0f);
-      // newPanel.ZOrder               = 4;
       newPanel.name = name;
       newPanel.Enable();
 
@@ -529,20 +566,9 @@ public static class MenuMaster
         menuItem.optionType           = BraveOptionsMenuItem.BraveOptionsOptionType.NONE;
         menuItem.itemType             = BraveOptionsMenuItem.BraveOptionsMenuItemType.Checkbox;
         menuItem.labelControl         = newCheckboxLabel;
-        menuItem.selectedLabelControl = null;
-        menuItem.infoControl          = null;
-        menuItem.fillbarControl       = null;
-        menuItem.buttonControl        = null;
         menuItem.checkboxChecked      = newCheckedCheckboxSprite;
         menuItem.checkboxUnchecked    = newEmptyCheckboxSprite;
-        menuItem.labelOptions         = null;
-        menuItem.infoOptions          = null;
-        menuItem.up                   = null;
-        menuItem.down                 = null;
-        menuItem.left                 = null;
-        menuItem.right                = null;
         menuItem.selectOnAction       = true;
-        menuItem.OnNewControlSelected = null;
 
       menuItem.checkboxChecked.IsVisible = menuItem.m_selectedIndex == 1;
 
@@ -553,51 +579,49 @@ public static class MenuMaster
       menuItem.gameObject.AddComponent<CustomCheckboxHandler>().onChanged += onchange;
     }
 
-    // based on VisualPresetArrowSelectorPanel
-    public static void AddArrowBox(this dfScrollPanel panel, string label, List<string> options, PropertyChangedEventHandler<string> onchange = null)
+    // based on VisualPresetArrowSelectorPanel (without info) and ResolutionArrowSelectorPanelWithInfoBox (with info)
+    public static void AddArrowBox(this dfScrollPanel panel, string label, List<string> options, List<string> info = null, PropertyChangedEventHandler<string> onchange = null)
     {
+      bool hasInfo = (info != null && info.Count > 0 && info.Count == options.Count);
+
       dfPanel newArrowboxWrapperPanel = panel.AddControl<dfPanel>();
-      newArrowboxWrapperPanel.CopyAttributes(GetPrototypeLeftRightWrapperPanel());
+      newArrowboxWrapperPanel.CopyAttributes(hasInfo ? GetPrototypeInfoWrapperPanel() : GetPrototypeLeftRightWrapperPanel());
       newArrowboxWrapperPanel.Anchor = dfAnchorStyle.CenterVertical | dfAnchorStyle.CenterHorizontal;
-      // newArrowboxWrapperPanel.Size += new Vector2(0, 4);  // TODO: fixes clipping near the bottom of the scroll box, but really shouldn't be necessary
 
       dfPanel newArrowboxInnerPanel = newArrowboxWrapperPanel.AddControl<dfPanel>();
-      newArrowboxInnerPanel.CopyAttributes(GetPrototypeLeftRightInnerPanel());
+      newArrowboxInnerPanel.CopyAttributes(hasInfo ? GetPrototypeInfoInnerPanel() : GetPrototypeLeftRightInnerPanel());
 
       dfLabel newArrowSelectorLabel = newArrowboxInnerPanel.AddControl<dfLabel>();
-      newArrowSelectorLabel.CopyAttributes(GetPrototypeLeftRightPanelLabel());
+      newArrowSelectorLabel.CopyAttributes(hasInfo ? GetPrototypeInfoPanelLabel() : GetPrototypeLeftRightPanelLabel());
 
       dfLabel newArrowSelectorSelection = newArrowboxInnerPanel.AddControl<dfLabel>();
-      newArrowSelectorSelection.CopyAttributes(GetPrototypeLeftRightPanelSelection());
-      // newArrowSelectorSelection.RelativePosition += new Vector3(0, -10f, 0); // TODO: figure out why this offset is wrong in the first place
+      newArrowSelectorSelection.CopyAttributes(hasInfo ? GetPrototypeInfoPanelSelection() : GetPrototypeLeftRightPanelSelection());
 
       dfSprite newArrowLeftSprite = newArrowboxInnerPanel.AddControl<dfSprite>();
-      newArrowLeftSprite.CopyAttributes(GetPrototypeLeftRightPanelLeftSprite());
+      newArrowLeftSprite.CopyAttributes(hasInfo ? GetPrototypeInfoPanelLeftSprite() : GetPrototypeLeftRightPanelLeftSprite());
 
       dfSprite newArrowRightSprite = newArrowboxInnerPanel.AddControl<dfSprite>();
-      newArrowRightSprite.CopyAttributes(GetPrototypeLeftRightPanelRightSprite());
+      newArrowRightSprite.CopyAttributes(hasInfo ? GetPrototypeInfoPanelRightSprite() : GetPrototypeLeftRightPanelRightSprite());
+
+      dfLabel newArrowInfoLabel = hasInfo ? newArrowboxWrapperPanel.AddControl<dfLabel>() : null;
+      newArrowInfoLabel?.CopyAttributes(GetPrototypeInfoInfoPanel());
 
       newArrowSelectorLabel.Text = label;
       newArrowSelectorSelection.Text = options[0];
+      if (newArrowInfoLabel != null)
+        newArrowInfoLabel.Text = info[0];
 
       BraveOptionsMenuItem menuItem = newArrowboxWrapperPanel.gameObject.AddComponent<BraveOptionsMenuItem>();
         menuItem.optionType           = BraveOptionsMenuItem.BraveOptionsOptionType.NONE;
-        menuItem.itemType             = BraveOptionsMenuItem.BraveOptionsMenuItemType.LeftRightArrow;
+        menuItem.itemType             = hasInfo ? BraveOptionsMenuItem.BraveOptionsMenuItemType.LeftRightArrowInfo : BraveOptionsMenuItem.BraveOptionsMenuItemType.LeftRightArrow;
         menuItem.labelControl         = newArrowSelectorLabel;
-        menuItem.selectedLabelControl = newArrowSelectorSelection/*null*/;
-        menuItem.infoControl          = null;  // TODO: allow info boxes
-        menuItem.fillbarControl       = null;
-        menuItem.buttonControl        = null;
-        menuItem.checkboxChecked      = null;
-        menuItem.checkboxUnchecked    = null;
+        menuItem.selectedLabelControl = newArrowSelectorSelection;
+        menuItem.infoControl          = newArrowInfoLabel;
         menuItem.labelOptions         = options.ToArray();
-        menuItem.infoOptions          = null;  // TODO: allow info boxes
-        menuItem.up                   = null;
-        menuItem.down                 = null;
+        menuItem.infoOptions          = hasInfo ? info.ToArray() : null;
         menuItem.left                 = newArrowLeftSprite;
         menuItem.right                = newArrowRightSprite;
         menuItem.selectOnAction       = true;
-        menuItem.OnNewControlSelected = null;
 
       newArrowboxWrapperPanel.MouseEnter += FocusControl;
       newArrowboxWrapperPanel.GotFocus += PlayMenuCursorSound;
@@ -623,21 +647,8 @@ public static class MenuMaster
       BraveOptionsMenuItem menuItem = newButtonWrapperPanel.gameObject.AddComponent<BraveOptionsMenuItem>();
         menuItem.optionType           = BraveOptionsMenuItem.BraveOptionsOptionType.NONE;
         menuItem.itemType             = BraveOptionsMenuItem.BraveOptionsMenuItemType.Button;
-        menuItem.labelControl         = null;
-        menuItem.selectedLabelControl = null;
-        menuItem.infoControl          = null;
-        menuItem.fillbarControl       = null;
         menuItem.buttonControl        = newButton;
-        menuItem.checkboxChecked      = null;
-        menuItem.checkboxUnchecked    = null;
-        menuItem.labelOptions         = null;
-        menuItem.infoOptions          = null;
-        menuItem.up                   = null;
-        menuItem.down                 = null;
-        menuItem.left                 = null;
-        menuItem.right                = null;
         menuItem.selectOnAction       = true;
-        menuItem.OnNewControlSelected = null;
 
       newButtonWrapperPanel.MouseEnter += FocusControl;
       newButtonWrapperPanel.GotFocus += PlayMenuCursorSound;
@@ -737,14 +748,17 @@ public static class MenuMaster
           for (int i = 1; i <= 5; ++i)
           {
             newOptionsPanel.AddLabel(label: $"Secret Label {i}", color: new Color(0.75f, 1.0f, 0.75f));
-            newOptionsPanel.AddButton(label: $"Align {i}", onclick: (control) => {
+            newOptionsPanel.AddButton(label: $"Button {i}", onclick: (control) => {
               ETGModConsole.Log($"clikin on {control.name}");
             });
-            newOptionsPanel.AddCheckBox(label: $"Align {i}", onchange:  (control, boolValue) => {
+            newOptionsPanel.AddCheckBox(label: $"CheckBox {i}", onchange:  (control, boolValue) => {
               ETGModConsole.Log($"checkeroo {boolValue} on {control.name}");
             });
-            newOptionsPanel.AddArrowBox(label: $"Align {i}", options: new(){$"Align {i}", "^O^", ">>>o<<<"}, onchange:  (control, stringValue) => {
+            newOptionsPanel.AddArrowBox(label: $"ArrowBox {i}", options: new(){$"Align {i}", "^O^", ">>>o<<<"}, onchange:  (control, stringValue) => {
               ETGModConsole.Log($"arrowboi {stringValue} on {control.name}");
+            });
+            newOptionsPanel.AddArrowBox(label: $"InfoBox {i}", options: new(){$"Align {i}", "^O^", ">>>o<<<"}, info: new(){$"hi there C:", "how's it going? O:", "what are you up to?"}, onchange:  (control, stringValue) => {
+              ETGModConsole.Log($"da infobox {stringValue} on {control.name}");
             });
           }
         newOptionsPanel.Finalize();
