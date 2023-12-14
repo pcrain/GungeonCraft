@@ -280,7 +280,7 @@ public static class MenuMaster
       self.TabIndex          = other.TabIndex;
       self.IsInteractive     = other.IsInteractive;
       self.Pivot             = other.Pivot;
-      self.Position          = other.Position;
+      // self.Position          = other.Position;
       self.RelativePosition  = other.RelativePosition;
       self.HotZoneScale      = other.HotZoneScale;
       self.useGUILayout      = other.useGUILayout;
@@ -467,6 +467,7 @@ public static class MenuMaster
 
       dfLabel newArrowSelectorSelection = newArrowboxInnerPanel.AddControl<dfLabel>();
       newArrowSelectorSelection.CopyAttributes(GetPrototypeLeftRightPanelSelection());
+      newArrowSelectorSelection.RelativePosition += new Vector3(0, -10f, 0); // TODO: figure out why this offset is wrong in the first place
 
       dfSprite newArrowLeftSprite = newArrowboxInnerPanel.AddControl<dfSprite>();
       newArrowLeftSprite.CopyAttributes(GetPrototypeLeftRightPanelLeftSprite());
@@ -561,6 +562,13 @@ public static class MenuMaster
         prevMenuItemUI.down = item;
     }
 
+    public static void ResetAllLayouts(this dfControl control)
+    {
+      control.ResetLayout();
+      foreach (dfControl child in control.controls)
+        child.ResetAllLayouts();
+    }
+
     /* TODO:
       - apparently needs to be initialized each run before the pause menu is opened for the first time
     */
@@ -583,12 +591,19 @@ public static class MenuMaster
         // newOptionsPanel.MaximumSize = new Vector2(110f, 110f);
         newOptionsPanel.ClipChildren = true;
         newOptionsPanel.InverseClipChildren = true;
-        newOptionsPanel.Anchor               = dfAnchorStyle.CenterVertical | dfAnchorStyle.Proportional;
+        ETGModConsole.Log($"scroll padding was {newOptionsPanel.ScrollPadding}");
         newOptionsPanel.ScrollPadding = new RectOffset(0,0,0,0);
-        newOptionsPanel.Size -= new Vector2(0, 100f);
-        newOptionsPanel.ResetVirtualScrollingData();
-        newOptionsPanel.ResetLayout(true, true);
-        newOptionsPanel.Reset();
+        ETGModConsole.Log($"AutoScrollPadding was {newOptionsPanel.AutoScrollPadding}");
+        newOptionsPanel.AutoScrollPadding = new RectOffset(0,0,0,0);
+        newOptionsPanel.Size -= new Vector2(0, 50f);  //TODO: figure out why this offset is wrong in the first place
+        // newOptionsPanel.Anchor               = dfAnchorStyle.CenterVertical | dfAnchorStyle.Proportional;
+        newOptionsPanel.Position -= new Vector3(0, 50f, 0f);  //TODO: figure out why this offset is wrong in the first place
+        // newOptionsPanel.ResetLayout(true, false);
+
+        // newOptionsPanel.ResetVirtualScrollingData();
+        // newOptionsPanel.ResetAllLayouts();
+        // newOptionsPanel.Reset();
+        // newOptionsPanel.PerformLayout();
 
         // Add a few test items
         for (int i = 1; i <= 5; ++i)
@@ -604,6 +619,19 @@ public static class MenuMaster
           });
         }
 
+        // // newOptionsPanel.MaximumSize = new Vector2(110f, 110f);
+        // newOptionsPanel.ClipChildren = true;
+        // newOptionsPanel.InverseClipChildren = true;
+        // // newOptionsPanel.ScrollPadding = new RectOffset(0,0,0,0);
+        // // newOptionsPanel.Size -= new Vector2(0, 150f);
+        // newOptionsPanel.Anchor               = dfAnchorStyle.CenterVertical | dfAnchorStyle.Proportional;
+        // // newOptionsPanel.ResetVirtualScrollingData();
+        // newOptionsPanel.ResetLayout(true, false);
+        // newOptionsPanel.ResetAllLayouts();
+        // newOptionsPanel.Reset();
+        // newOptionsPanel.PerformLayout();
+        // // newOptionsPanel.
+
         // Register the new button on the PreOptions menu
         dfButton newButton = preOptions.m_panel.InsertRawButton(previousButtonName: "AudioTab (1)", label: "Yo New Button Dropped O:", onclick: (control, args) => {
           ETGModConsole.Log($"did a clickyboi");
@@ -611,7 +639,7 @@ public static class MenuMaster
           preOptions.ToggleToPanel(newOptionsPanel, true);
         });
 
-        Dissect.DumpFieldsAndProperties<dfScrollPanel>(newOptionsPanel);
+        // Dissect.DumpFieldsAndProperties<dfScrollPanel>(newOptionsPanel);
         // PrintControlRecursive(newOptionsPanel);
     }
 }
