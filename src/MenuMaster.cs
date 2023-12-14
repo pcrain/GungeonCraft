@@ -1,15 +1,20 @@
 namespace CwaffingTheGungy;
 
-/* What needs to be done:
+/* Major API stuff to be done, from highest to lowest priority
     - fix placement of mod options menu item on pre-options page
-
-    - load status of checkboxes and arrowboxes from persistent storage
     - store status of checkboxes and arrowboxes to persistent storage
+    - load status of checkboxes and arrowboxes from persistent storage
+    - create actual API surface
+    - clean up code
 
-   Minor issues I'm not worrying about now
-    - arrows in arrow boxes are not dynamically sized to largest element
-    - allow markup on dfControls
-    - can't back out of one level of menus at a time
+   Minor issues I'm not worrying about now, from highest to lowest priority
+    - can't back out of one level of menus at a time (look into CloseAndMaybeApplyChangesWithPrompt)
+    - allow adding descriptions to arrowBoxes
+    - changing padding on standalone labels
+    - dynamically enabling / disabling options
+
+   Nitpicks I really don't care to fix at all, but should be aware of:
+    - can't have first item of submenu be a label or it doesn't get focused correctly
     - using magic numbers in a few places to fix panel offsets
 */
 
@@ -33,6 +38,12 @@ public static class MenuMaster
     {
       if (_DidInitHooks)
         return;
+
+      // for backing out of one menu at a time -> calls CloseAndMaybeApplyChangesWithPrompt() when escape is pressed
+      // new Hook(
+      //     typeof(PreOptionsMenuController).GetMethod("ReturnToPreOptionsMenu", BindingFlags.Instance | BindingFlags.Public),
+      //     typeof(MenuMaster).GetMethod("ReturnToPreOptionsMenu", BindingFlags.Static | BindingFlags.NonPublic)
+      //     );
 
       // Make sure our menus are loaded in the main menu
       new Hook(
@@ -71,6 +82,12 @@ public static class MenuMaster
           );
 
       _DidInitHooks = true;
+    }
+
+    private static void ReturnToPreOptionsMenu(Action<PreOptionsMenuController> orig, PreOptionsMenuController pm)
+    {
+      Debug.Log($"PREPAUSE");
+      orig(pm);
     }
 
     private static void InitializeMainMenu(Action<MainMenuFoyerController> orig, MainMenuFoyerController mm)
@@ -228,6 +245,21 @@ public static class MenuMaster
       return GetPrototypeButtonInnerPanel().Find<dfButton>("EditKeyboardBindingsButton");
     }
 
+    internal static dfPanel GetPrototypeLabelWrapperPanel()
+    {
+      return GameUIRoot.Instance.PauseMenuPanel.GetComponent<PauseMenuController>().OptionsMenu.TabControls.Find<dfPanel>("PlayerOneLabelPanel");
+    }
+
+    internal static dfPanel GetPrototypeLabelInnerPanel()
+    {
+      return GetPrototypeLabelWrapperPanel().Find<dfPanel>("PanelEnsmallenerThatmakesDavesLifeHardandBrentsLifeEasy");
+    }
+
+    internal static dfLabel GetPrototypeLabel()
+    {
+      return GetPrototypeLabelInnerPanel().Find<dfLabel>("Label");
+    }
+
     public static void PrintControlRecursive(dfControl control, string indent = "->", bool dissect = false)
     {
         System.Console.WriteLine($"  {indent} control with name={control.name}, type={control.GetType()}, position={control.Position}, relposition={control.RelativePosition}, size={control.Size}, anchor={control.Anchor}, pivot={control.Pivot}");
@@ -302,7 +334,7 @@ public static class MenuMaster
         label.TextScaleMode     = otherLabel.TextScaleMode;
         label.CharacterSpacing  = otherLabel.CharacterSpacing;
         label.ColorizeSymbols   = otherLabel.ColorizeSymbols;
-        label.ProcessMarkup     = otherLabel.ProcessMarkup;
+        label.ProcessMarkup     = true; // always want this to be true
         label.ShowGradient      = otherLabel.ShowGradient;
         label.BottomColor       = otherLabel.BottomColor;
         label.Text              = otherLabel.Text;
@@ -327,7 +359,7 @@ public static class MenuMaster
       self.TabIndex          = other.TabIndex;
       self.IsInteractive     = other.IsInteractive;
       self.Pivot             = other.Pivot;
-      // self.Position          = other.Position;
+      // self.Position          = other.Position;  // not sure this actually matters, as long as we set RelativePosition
       self.RelativePosition  = other.RelativePosition;
       self.HotZoneScale      = other.HotZoneScale;
       self.useGUILayout      = other.useGUILayout;
@@ -553,13 +585,13 @@ public static class MenuMaster
         menuItem.itemType             = BraveOptionsMenuItem.BraveOptionsMenuItemType.LeftRightArrow;
         menuItem.labelControl         = newArrowSelectorLabel;
         menuItem.selectedLabelControl = newArrowSelectorSelection/*null*/;
-        menuItem.infoControl          = null;
+        menuItem.infoControl          = null;  // TODO: allow info boxes
         menuItem.fillbarControl       = null;
         menuItem.buttonControl        = null;
         menuItem.checkboxChecked      = null;
         menuItem.checkboxUnchecked    = null;
         menuItem.labelOptions         = options.ToArray();
-        menuItem.infoOptions          = null;
+        menuItem.infoOptions          = null;  // TODO: allow info boxes
         menuItem.up                   = null;
         menuItem.down                 = null;
         menuItem.left                 = newArrowLeftSprite;
@@ -614,23 +646,38 @@ public static class MenuMaster
       menuItem.gameObject.AddComponent<CustomButtonHandler>().onClicked += onclick;
     }
 
+    // based on PlayerOneLabelPanel
+    public static void AddLabel(this dfScrollPanel panel, string label, Color? color = null)
+    {
+      dfPanel newLabelWrapperPanel = panel.AddControl<dfPanel>();
+      newLabelWrapperPanel.CopyAttributes(GetPrototypeLabelWrapperPanel());
+
+      dfPanel newLabelInnerPanel = newLabelWrapperPanel.AddControl<dfPanel>();
+      newLabelInnerPanel.CopyAttributes(GetPrototypeLabelInnerPanel());
+
+      dfLabel newLabel = newLabelInnerPanel.AddControl<dfLabel>();
+      newLabel.CopyAttributes(GetPrototypeLabel());
+
+      newLabel.Text = label;
+      newLabel.Color = color ?? Color.white;
+
+      newLabelWrapperPanel.name = $"{label} panel";
+    }
+
     public static void RegisterBraveMenuItem(this dfScrollPanel panel, dfControl item)
     {
       if (panel.controls == null || panel.controls.Count < 2) // includes this object
         return;
       BraveOptionsMenuItem menuItem = item.GetComponent<BraveOptionsMenuItem>();
-      dfControl nextItem = panel.controls[0];
-      dfControl prevItem  = panel.controls[panel.controls.Count - 2];
-      menuItem.up = prevItem;
-      menuItem.down = nextItem;
-      if (nextItem.GetComponent<BraveOptionsMenuItem>() is BraveOptionsMenuItem nextMenuItem)
-        nextMenuItem.up = item;
-      else if (nextItem.GetComponent<UIKeyControls>() is UIKeyControls nextMenuItemUI)
-        nextMenuItemUI.up = item;
-      if (prevItem.GetComponent<BraveOptionsMenuItem>() is BraveOptionsMenuItem prevMenuItem)
+      for (int prevItemIndex = panel.Controls.Count - 2; prevItemIndex >= 0; prevItemIndex--)
+      {
+        dfControl prevItem = panel.controls[prevItemIndex];
+        if (prevItem.GetComponent<BraveOptionsMenuItem>() is not BraveOptionsMenuItem prevMenuItem)
+          continue;
+        menuItem.up = prevItem;
         prevMenuItem.down = item;
-      else if (prevItem.GetComponent<UIKeyControls>() is UIKeyControls prevMenuItemUI)
-        prevMenuItemUI.down = item;
+        break;
+      }
     }
 
     private static void HighlightChildrenAndFocus(this dfControl root, bool canFocus = true)
@@ -664,6 +711,7 @@ public static class MenuMaster
         // Create the new modded options panel and add a few test items
         dfScrollPanel newOptionsPanel = NewOptionsPanel("modded options");
 
+          // newOptionsPanel.AddLabel(label: $"First Label", color: new Color(1.0f, 0.75f, 0.75f));  // TODO: we can't have a label as the first item since it can't be focused -> vanilla oversight
           // Add a subpanel
           dfScrollPanel subOptionsPanel = NewOptionsPanel("secret modded options");
             for (int i = 1; i <= 2; ++i)
@@ -674,7 +722,7 @@ public static class MenuMaster
               subOptionsPanel.AddCheckBox(label: $"Secret Align {i}", onchange:  (control, boolValue) => {
                 ETGModConsole.Log($"secret checkeroo {boolValue} on {control.name}");
               });
-              subOptionsPanel.AddArrowBox(label: $"Secret Align {i}", options: new(){$"Align {i}", "^O^", ">>>o<<<"}, onchange:  (control, stringValue) => {
+              subOptionsPanel.AddArrowBox(label: $"Secret Align {i}", options: new(){$"Align {i}", "^O^", ">>>o<<<", "LOOOOOOOOOOOOOOOOOOOOOOONG"}, onchange:  (control, stringValue) => {
                 ETGModConsole.Log($"secret arrowboi {stringValue} on {control.name}");
               });
             }
@@ -688,6 +736,7 @@ public static class MenuMaster
           // Add some normal options
           for (int i = 1; i <= 5; ++i)
           {
+            newOptionsPanel.AddLabel(label: $"Secret Label {i}", color: new Color(0.75f, 1.0f, 0.75f));
             newOptionsPanel.AddButton(label: $"Align {i}", onclick: (control) => {
               ETGModConsole.Log($"clikin on {control.name}");
             });
