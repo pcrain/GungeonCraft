@@ -1,13 +1,16 @@
 namespace CwaffingTheGungy;
 
 /* What needs to be done:
-    - get scrollpanel clipping working (dfRenderGroup?)
     - get mouse hover working for custom panels
       - light up on hover
       - don't make sounds when selecting sub-elements
     - allow for mod options subpages
     - load status of checkboxes and arrowboxes from persistent storage
     - store status of checkboxes and arrowboxes to persistent storage
+
+   Minor issues I'm not worrying about now
+    - using magic numbers in a few places to fix panel offsets
+    - in arrowboxes, letters with underhangs are cut off at the bottom of the scroll panel
 */
 
 internal class CustomCheckboxHandler : MonoBehaviour
@@ -295,6 +298,12 @@ public static class MenuMaster
 
       self.renderOrder       = other.renderOrder;
       self.isControlClipped  = other.isControlClipped;
+
+      // self.Invalidate();
+      // self.ResetLayout();
+      // self.PerformLayout();
+      // self.Hide();
+      // self.Disable();
     }
 
     public static dfButton InsertRawButton(this dfPanel panel, string previousButtonName, string label, MouseEventHandler onclick)
@@ -458,6 +467,7 @@ public static class MenuMaster
     {
       dfPanel newArrowboxWrapperPanel = panel.AddControl<dfPanel>();
       newArrowboxWrapperPanel.CopyAttributes(GetPrototypeLeftRightWrapperPanel());
+      newArrowboxWrapperPanel.Size += new Vector2(0, 4);  // TODO: fixes clipping near the bottom of the scroll box, but really shouldn't be necessary
 
       dfPanel newArrowboxInnerPanel = newArrowboxWrapperPanel.AddControl<dfPanel>();
       newArrowboxInnerPanel.CopyAttributes(GetPrototypeLeftRightInnerPanel());
@@ -476,6 +486,7 @@ public static class MenuMaster
       newArrowRightSprite.CopyAttributes(GetPrototypeLeftRightPanelRightSprite());
 
       newArrowSelectorLabel.Text = label;
+      newArrowSelectorSelection.Text = options[0];
 
       BraveOptionsMenuItem menuItem = newArrowboxWrapperPanel.gameObject.AddComponent<BraveOptionsMenuItem>();
         menuItem.optionType           = BraveOptionsMenuItem.BraveOptionsOptionType.NONE;
@@ -608,13 +619,13 @@ public static class MenuMaster
         // Add a few test items
         for (int i = 1; i <= 5; ++i)
         {
-          newOptionsPanel.AddButton(label: $"Test Button {i}", onclick: (control) => {
+          newOptionsPanel.AddButton(label: $"Align {i}", onclick: (control) => {
             ETGModConsole.Log($"clikin on {control.name}");
           });
-          newOptionsPanel.AddCheckBox(label: $"Test Checkbox {i}", onchange:  (control, boolValue) => {
+          newOptionsPanel.AddCheckBox(label: $"Align {i}", onchange:  (control, boolValue) => {
             ETGModConsole.Log($"checkeroo {boolValue} on {control.name}");
           });
-          newOptionsPanel.AddArrowBox(label: $"Test Arrowbox {i}", options: new(){"hello", "world", ":D"}, onchange:  (control, stringValue) => {
+          newOptionsPanel.AddArrowBox(label: $"Align {i}", options: new(){$"Align {i}", ">>>>>>>>>>>O<<<<<<<<<<<", ">>>o<<<"}, onchange:  (control, stringValue) => {
             ETGModConsole.Log($"arrowboi {stringValue} on {control.name}");
           });
         }
@@ -630,7 +641,6 @@ public static class MenuMaster
         // newOptionsPanel.ResetAllLayouts();
         // newOptionsPanel.Reset();
         // newOptionsPanel.PerformLayout();
-        // // newOptionsPanel.
 
         // Register the new button on the PreOptions menu
         dfButton newButton = preOptions.m_panel.InsertRawButton(previousButtonName: "AudioTab (1)", label: "Yo New Button Dropped O:", onclick: (control, args) => {
@@ -640,6 +650,6 @@ public static class MenuMaster
         });
 
         // Dissect.DumpFieldsAndProperties<dfScrollPanel>(newOptionsPanel);
-        // PrintControlRecursive(newOptionsPanel);
+        PrintControlRecursive(newOptionsPanel);
     }
 }
