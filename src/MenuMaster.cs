@@ -2,15 +2,15 @@ namespace CwaffingTheGungy;
 
 /* What needs to be done:
     - fix placement of mod options menu item on pre-options page
-    - allow for mod options subpages
+    - make mod options menu load from main menu and non-quickstart breach
 
     - load status of checkboxes and arrowboxes from persistent storage
     - store status of checkboxes and arrowboxes to persistent storage
-    - make first item of mod menu subpage highlight
 
    Minor issues I'm not worrying about now
-    - allow markup on dfControls
     - arrows in arrow boxes are not dynamically sized to largest element
+    - allow markup on dfControls
+    - can't back out of one level of menus at a time
     - using magic numbers in a few places to fix panel offsets
 */
 
@@ -78,10 +78,12 @@ public static class MenuMaster
 
     private static void ToggleToPanel(Action<FullOptionsMenuController, dfScrollPanel, bool> orig, FullOptionsMenuController controller, dfScrollPanel targetPanel, bool doFocus)
     {
+      ETGModConsole.Log($"toggling to panel {targetPanel.name}");
       bool isOurPanel = false;
       foreach (dfControl tab in _RegisteredTabs)
       {
         bool match = (tab == targetPanel);  // need to cache this because tab.IsVisible property doesn't return as expected
+        ETGModConsole.Log($"  matches {tab.name}? {match}");
         tab.IsVisible = match;
         isOurPanel |= match;
       }
@@ -381,12 +383,13 @@ public static class MenuMaster
         return newButton;
     }
 
-    public static dfScrollPanel NewOptionsPanel(dfPanel parent)
+    public static dfScrollPanel NewOptionsPanel(string name)
     {
+      // Get a reference options panel
       dfScrollPanel refPanel = GameUIRoot.Instance.PauseMenuPanel.GetComponent<PauseMenuController>().OptionsMenu.TabVideo;
-      // Dissect.DumpFieldsAndProperties<dfScrollPanel>(refPanel);
-      // dfScrollPanel newPanel = refPanel.transform.parent.gameObject.AddComponent<dfScrollPanel>(); // new dfScrollPanel(){
-      dfScrollPanel newPanel = parent.AddControl<dfScrollPanel>();
+
+      // Add our options panel to the PauseMenuController and copy some basic attributes from our reference
+      dfScrollPanel newPanel = GameUIRoot.Instance.PauseMenuPanel.GetComponent<PauseMenuController>().OptionsMenu.m_panel.AddControl<dfScrollPanel>();
         newPanel.UseScrollMomentum    = refPanel.UseScrollMomentum;
         newPanel.ScrollWithArrowKeys  = refPanel.ScrollWithArrowKeys;
         newPanel.Atlas                = refPanel.Atlas;
@@ -435,9 +438,18 @@ public static class MenuMaster
         newPanel.AutoFitVirtualTiles  = refPanel.AutoFitVirtualTiles;
         // newPanel.enabled = refPanel.enabled;
 
-        // newPanel.RelativePosition = new Vector3(100f, 100f, 0f);
-        // newPanel.ZOrder               = 4;
-        newPanel.Enable();
+      // Set up a few additional variables to suit our needs
+      newPanel.ClipChildren         = true;
+      newPanel.InverseClipChildren  = true;
+      newPanel.ScrollPadding        = new RectOffset(0,0,0,0);
+      newPanel.AutoScrollPadding    = new RectOffset(0,0,0,0);
+      newPanel.Size                -= new Vector2(0, 50f);  //TODO: figure out why this offset is wrong in the first place
+      newPanel.Position            -= new Vector3(0, 50f, 0f);  //TODO: figure out why this offset is wrong in the first place
+      // newOptionsPanel.Anchor               = dfAnchorStyle.CenterVertical | dfAnchorStyle.Proportional;
+      // newPanel.RelativePosition = new Vector3(100f, 100f, 0f);
+      // newPanel.ZOrder               = 4;
+      newPanel.name = name;
+      newPanel.Enable();
 
       // Add it to our known panels so we can make visible / invisible as necessary
       _RegisteredTabs.Add(newPanel);
@@ -620,13 +632,15 @@ public static class MenuMaster
         child.HighlightChildrenAndFocus(canFocus: false);
     }
 
+    public static void Finalize(this dfScrollPanel panel)
+    {
+      panel.controls.Last().Height += 16f; // fix a weird clipping issue for arrowboxes at the bottom
+      panel.PerformLayout();  // register all changes
+    }
+
     public static void RebuildOptionsPanels()
     {
-        if (GameUIRoot.Instance.PauseMenuPanel is not dfPanel pausePanel)
-          return;
-        if (pausePanel.GetComponent<PauseMenuController>().OptionsMenu is not FullOptionsMenuController fullOptions)
-          return;
-        if (fullOptions.PreOptionsMenu is not PreOptionsMenuController preOptions)
+        if (GameUIRoot.Instance.PauseMenuPanel.GetComponent<PauseMenuController>().OptionsMenu.PreOptionsMenu is not PreOptionsMenuController preOptions)
           return;
 
         System.Diagnostics.Stopwatch tempWatchWatch = System.Diagnostics.Stopwatch.StartNew();
@@ -634,40 +648,49 @@ public static class MenuMaster
         // Clear out all registered UI tabs, since we need to build everything fresh
         _RegisteredTabs.Clear();
 
-        // Create the new modded options panel
-        dfScrollPanel newOptionsPanel = NewOptionsPanel(fullOptions.m_panel);
-        // newOptionsPanel.MaximumSize = new Vector2(110f, 110f);
-        newOptionsPanel.ClipChildren = true;
-        newOptionsPanel.InverseClipChildren = true;
-        // ETGModConsole.Log($"scroll padding was {newOptionsPanel.ScrollPadding}");
-        newOptionsPanel.ScrollPadding = new RectOffset(0,0,0,0);
-        // ETGModConsole.Log($"AutoScrollPadding was {newOptionsPanel.AutoScrollPadding}");
-        newOptionsPanel.AutoScrollPadding = new RectOffset(0,0,0,0);
-        newOptionsPanel.Size -= new Vector2(0, 50f);  //TODO: figure out why this offset is wrong in the first place
-        newOptionsPanel.Position -= new Vector3(0, 50f, 0f);  //TODO: figure out why this offset is wrong in the first place
-        // newOptionsPanel.Anchor               = dfAnchorStyle.CenterVertical | dfAnchorStyle.Proportional;
+        // Create the new modded options panel and add a few test items
+        dfScrollPanel newOptionsPanel = NewOptionsPanel("modded options");
 
-        // Add a few test items
-        for (int i = 1; i <= 5; ++i)
-        {
-          newOptionsPanel.AddButton(label: $"Align {i}", onclick: (control) => {
-            ETGModConsole.Log($"clikin on {control.name}");
+          // Add a subpanel
+          dfScrollPanel subOptionsPanel = NewOptionsPanel("secret modded options");
+            for (int i = 1; i <= 2; ++i)
+            {
+              subOptionsPanel.AddButton(label: $"Secret Align {i}", onclick: (control) => {
+                ETGModConsole.Log($"secret clikin on {control.name}");
+              });
+              subOptionsPanel.AddCheckBox(label: $"Secret Align {i}", onchange:  (control, boolValue) => {
+                ETGModConsole.Log($"secret checkeroo {boolValue} on {control.name}");
+              });
+              subOptionsPanel.AddArrowBox(label: $"Secret Align {i}", options: new(){$"Align {i}", "^O^", ">>>o<<<"}, onchange:  (control, stringValue) => {
+                ETGModConsole.Log($"secret arrowboi {stringValue} on {control.name}");
+              });
+            }
+          subOptionsPanel.Finalize();
+          // Add our subpanel to our main panel
+          newOptionsPanel.AddButton(label: $"Secret Menu O:", onclick: (control) => {
+            ETGModConsole.Log($"entered secret options menu");
+            preOptions.ToggleToPanel(subOptionsPanel, true, force: true); // force true so it works even if it's invisible
           });
-          newOptionsPanel.AddCheckBox(label: $"Align {i}", onchange:  (control, boolValue) => {
-            ETGModConsole.Log($"checkeroo {boolValue} on {control.name}");
-          });
-          newOptionsPanel.AddArrowBox(label: $"Align {i}", options: new(){$"Align {i}", "\\o/", ">>>o<<<"}, onchange:  (control, stringValue) => {
-            ETGModConsole.Log($"arrowboi {stringValue} on {control.name}");
-          });
-        }
 
-        newOptionsPanel.controls.Last().Height += 16f; // fix a weird clipping issue for arrowboxes at the bottom
-        newOptionsPanel.PerformLayout();
+          // Add some normal options
+          for (int i = 1; i <= 5; ++i)
+          {
+            newOptionsPanel.AddButton(label: $"Align {i}", onclick: (control) => {
+              ETGModConsole.Log($"clikin on {control.name}");
+            });
+            newOptionsPanel.AddCheckBox(label: $"Align {i}", onchange:  (control, boolValue) => {
+              ETGModConsole.Log($"checkeroo {boolValue} on {control.name}");
+            });
+            newOptionsPanel.AddArrowBox(label: $"Align {i}", options: new(){$"Align {i}", "^O^", ">>>o<<<"}, onchange:  (control, stringValue) => {
+              ETGModConsole.Log($"arrowboi {stringValue} on {control.name}");
+            });
+          }
+        newOptionsPanel.Finalize();
 
         // Register the new button on the PreOptions menu
         dfButton newButton = preOptions.m_panel.InsertRawButton(previousButtonName: "AudioTab (1)", label: _MOD_MENU_LABEL, onclick: (control, args) => {
           ETGModConsole.Log($"entered modded options menu");
-          preOptions.ToggleToPanel(newOptionsPanel, true);
+          preOptions.ToggleToPanel(newOptionsPanel, true, force: true); // force true so it works even if it's invisible
         });
 
         // Dissect.DumpFieldsAndProperties<dfScrollPanel>(newOptionsPanel);
