@@ -186,7 +186,7 @@ public static class MenuMaster
 
     public static void PrintControlRecursive(dfControl control, string indent = "->", bool dissect = false)
     {
-        System.Console.WriteLine($"  {indent} control with name={control.name}, type={control.GetType()}, position={control.Position}, relposition={control.RelativePosition}, anchor={control.Anchor}, pivot={control.Pivot}");
+        System.Console.WriteLine($"  {indent} control with name={control.name}, type={control.GetType()}, position={control.Position}, relposition={control.RelativePosition}, size={control.Size}, anchor={control.Anchor}, pivot={control.Pivot}");
         if (dissect)
           Dissect.DumpFieldsAndProperties(control);
         foreach (dfControl child in control.controls)
@@ -298,6 +298,8 @@ public static class MenuMaster
 
       self.renderOrder       = other.renderOrder;
       self.isControlClipped  = other.isControlClipped;
+
+      // self.Anchor            = dfAnchorStyle.CenterHorizontal | dfAnchorStyle.CenterVertical;
 
       // self.Invalidate();
       // self.ResetLayout();
@@ -467,7 +469,8 @@ public static class MenuMaster
     {
       dfPanel newArrowboxWrapperPanel = panel.AddControl<dfPanel>();
       newArrowboxWrapperPanel.CopyAttributes(GetPrototypeLeftRightWrapperPanel());
-      newArrowboxWrapperPanel.Size += new Vector2(0, 4);  // TODO: fixes clipping near the bottom of the scroll box, but really shouldn't be necessary
+      newArrowboxWrapperPanel.Anchor = dfAnchorStyle.CenterVertical | dfAnchorStyle.CenterHorizontal;
+      // newArrowboxWrapperPanel.Size += new Vector2(0, 4);  // TODO: fixes clipping near the bottom of the scroll box, but really shouldn't be necessary
 
       dfPanel newArrowboxInnerPanel = newArrowboxWrapperPanel.AddControl<dfPanel>();
       newArrowboxInnerPanel.CopyAttributes(GetPrototypeLeftRightInnerPanel());
@@ -477,7 +480,7 @@ public static class MenuMaster
 
       dfLabel newArrowSelectorSelection = newArrowboxInnerPanel.AddControl<dfLabel>();
       newArrowSelectorSelection.CopyAttributes(GetPrototypeLeftRightPanelSelection());
-      newArrowSelectorSelection.RelativePosition += new Vector3(0, -10f, 0); // TODO: figure out why this offset is wrong in the first place
+      // newArrowSelectorSelection.RelativePosition += new Vector3(0, -10f, 0); // TODO: figure out why this offset is wrong in the first place
 
       dfSprite newArrowLeftSprite = newArrowboxInnerPanel.AddControl<dfSprite>();
       newArrowLeftSprite.CopyAttributes(GetPrototypeLeftRightPanelLeftSprite());
@@ -607,8 +610,8 @@ public static class MenuMaster
         ETGModConsole.Log($"AutoScrollPadding was {newOptionsPanel.AutoScrollPadding}");
         newOptionsPanel.AutoScrollPadding = new RectOffset(0,0,0,0);
         newOptionsPanel.Size -= new Vector2(0, 50f);  //TODO: figure out why this offset is wrong in the first place
-        // newOptionsPanel.Anchor               = dfAnchorStyle.CenterVertical | dfAnchorStyle.Proportional;
         newOptionsPanel.Position -= new Vector3(0, 50f, 0f);  //TODO: figure out why this offset is wrong in the first place
+        // newOptionsPanel.Anchor               = dfAnchorStyle.CenterVertical | dfAnchorStyle.Proportional;
         // newOptionsPanel.ResetLayout(true, false);
 
         // newOptionsPanel.ResetVirtualScrollingData();
@@ -640,7 +643,12 @@ public static class MenuMaster
         // newOptionsPanel.ResetLayout(true, false);
         // newOptionsPanel.ResetAllLayouts();
         // newOptionsPanel.Reset();
-        // newOptionsPanel.PerformLayout();
+        newOptionsPanel.controls.Last().Height += 16f; // fix a weird clipping issue for arrowboxes at the bottom
+        newOptionsPanel.PerformLayout();
+
+        // System.Console.WriteLine("ScrollPanel Bounds: " + newOptionsPanel.GetBounds());
+        // System.Console.WriteLine("Last Child Bounds: " + newOptionsPanel.controls.Last().GetBounds());
+
 
         // Register the new button on the PreOptions menu
         dfButton newButton = preOptions.m_panel.InsertRawButton(previousButtonName: "AudioTab (1)", label: "Yo New Button Dropped O:", onclick: (control, args) => {
