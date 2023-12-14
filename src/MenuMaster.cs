@@ -1,7 +1,7 @@
 namespace CwaffingTheGungy;
 
 /* What needs to be done:
-    - get scrollpanel clipping working
+    - get scrollpanel clipping working (dfRenderGroup?)
     - get mouse hover working for custom panels
       - light up on hover
       - don't make sounds when selecting sub-elements
@@ -395,7 +395,6 @@ public static class MenuMaster
         // newPanel.enabled = refPanel.enabled;
 
         // newPanel.RelativePosition = new Vector3(100f, 100f, 0f);
-        newPanel.Anchor               = dfAnchorStyle.CenterVertical;
         // newPanel.ZOrder               = 4;
         newPanel.Enable();
 
@@ -581,6 +580,15 @@ public static class MenuMaster
 
         // Create the new modded options panel
         dfScrollPanel newOptionsPanel = NewOptionsPanel(fullOptions.m_panel);
+        // newOptionsPanel.MaximumSize = new Vector2(110f, 110f);
+        newOptionsPanel.ClipChildren = true;
+        newOptionsPanel.InverseClipChildren = true;
+        newOptionsPanel.Anchor               = dfAnchorStyle.CenterVertical | dfAnchorStyle.Proportional;
+        newOptionsPanel.ScrollPadding = new RectOffset(0,0,0,0);
+        newOptionsPanel.Size -= new Vector2(0, 100f);
+        newOptionsPanel.ResetVirtualScrollingData();
+        newOptionsPanel.ResetLayout(true, true);
+        newOptionsPanel.Reset();
 
         // Add a few test items
         for (int i = 1; i <= 5; ++i)
@@ -603,7 +611,7 @@ public static class MenuMaster
           preOptions.ToggleToPanel(newOptionsPanel, true);
         });
 
-        // Dissect.DumpFieldsAndProperties<dfScrollPanel>(newOptionsPanel);
-        PrintControlRecursive(newOptionsPanel);
+        Dissect.DumpFieldsAndProperties<dfScrollPanel>(newOptionsPanel);
+        // PrintControlRecursive(newOptionsPanel);
     }
 }
