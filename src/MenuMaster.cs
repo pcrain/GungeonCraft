@@ -1,9 +1,6 @@
 namespace CwaffingTheGungy;
 
 /* What needs to be done:
-    - get mouse hover working for custom panels
-      - light up on hover
-      - don't make sounds when selecting sub-elements
     - allow for mod options subpages
     - load status of checkboxes and arrowboxes from persistent storage
     - store status of checkboxes and arrowboxes to persistent storage
@@ -85,6 +82,11 @@ public static class MenuMaster
       orig(item);
       if (item.GetComponent<CustomButtonHandler>() is CustomButtonHandler handler)
         handler.onClicked(item.m_self);
+    }
+
+    private static void FocusControl(dfControl control, dfMouseEventArgs args)
+    {
+      control.Focus();
     }
 
     // TODO: make this more selective about when it plays
@@ -324,6 +326,7 @@ public static class MenuMaster
         newButton.name = label;
         newButton.RelativePosition = newButton.RelativePosition + new Vector3(300.0f, 10.0f, 0.0f);
         newButton.Click += onclick;
+        newButton.MouseEnter += FocusControl;
         newButton.GotFocus += PlayMenuCursorSound;
 
         UIKeyControls uikeys = newButton.gameObject.AddComponent<UIKeyControls>();
@@ -457,7 +460,7 @@ public static class MenuMaster
         menuItem.selectOnAction       = true;
         menuItem.OnNewControlSelected = null;
 
-      newCheckboxWrapperPanel.MouseEnter += PlayMenuCursorSound;
+      newCheckboxWrapperPanel.MouseEnter += FocusControl;
       newCheckboxWrapperPanel.GotFocus += PlayMenuCursorSound;
       newCheckboxWrapperPanel.name = $"{label} panel";
       panel.RegisterBraveMenuItem(newCheckboxWrapperPanel);
@@ -510,7 +513,7 @@ public static class MenuMaster
         menuItem.selectOnAction       = true;
         menuItem.OnNewControlSelected = null;
 
-      newArrowboxWrapperPanel.MouseEnter += PlayMenuCursorSound;
+      newArrowboxWrapperPanel.MouseEnter += FocusControl;
       newArrowboxWrapperPanel.GotFocus += PlayMenuCursorSound;
       newArrowboxWrapperPanel.name = $"{label} panel";
       panel.RegisterBraveMenuItem(newArrowboxWrapperPanel);
@@ -550,7 +553,7 @@ public static class MenuMaster
         menuItem.selectOnAction       = true;
         menuItem.OnNewControlSelected = null;
 
-      newButtonWrapperPanel.MouseEnter += PlayMenuCursorSound;
+      newButtonWrapperPanel.MouseEnter += FocusControl;
       newButtonWrapperPanel.GotFocus += PlayMenuCursorSound;
       newButtonWrapperPanel.name = $"{label} panel";
       panel.RegisterBraveMenuItem(newButtonWrapperPanel);
@@ -646,10 +649,6 @@ public static class MenuMaster
         newOptionsPanel.controls.Last().Height += 16f; // fix a weird clipping issue for arrowboxes at the bottom
         newOptionsPanel.PerformLayout();
 
-        // System.Console.WriteLine("ScrollPanel Bounds: " + newOptionsPanel.GetBounds());
-        // System.Console.WriteLine("Last Child Bounds: " + newOptionsPanel.controls.Last().GetBounds());
-
-
         // Register the new button on the PreOptions menu
         dfButton newButton = preOptions.m_panel.InsertRawButton(previousButtonName: "AudioTab (1)", label: "Yo New Button Dropped O:", onclick: (control, args) => {
           ETGModConsole.Log($"did a clickyboi");
@@ -658,6 +657,6 @@ public static class MenuMaster
         });
 
         // Dissect.DumpFieldsAndProperties<dfScrollPanel>(newOptionsPanel);
-        PrintControlRecursive(newOptionsPanel);
+        // PrintControlRecursive(newOptionsPanel);
     }
 }
