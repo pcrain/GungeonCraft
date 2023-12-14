@@ -475,6 +475,10 @@ public class Initialisation : BaseUnityPlugin
                 AkSoundEngine.PostEvent("vc_kirby_appeal01", ETGModMainBehaviour.Instance.gameObject);
             }
 
+            // GameManager.Instance.OnNewLevelFullyLoaded += MenuMaster.RebuildOptionsPanels;
+            MenuMaster.InitHooksIfNecessary();
+
+
             // Debug.LogError("Gungy o.o!");
             // Debug.LogAssertion("Gungy o.o!");
             // Debug.LogWarning("Gungy o.o!");
