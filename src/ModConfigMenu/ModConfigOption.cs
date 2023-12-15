@@ -115,8 +115,8 @@ internal class ModConfigOption : MonoBehaviour
       bool isChecked = (this._currentValue.Trim() == "1");
       // ETGModConsole.Log($"  creating checkbox for {this._lookupKey} with state {isChecked}");
       checkBox.IsVisible = isChecked;
-      if (menuItem.checkboxUnchecked is dfControl checkBoxUnched)
-        checkBoxUnched.IsVisible = true;
+      if (menuItem.checkboxUnchecked is dfControl checkBoxUnchecked)
+        checkBoxUnchecked.IsVisible = true;
       menuItem.m_selectedIndex = isChecked ? 1 : 0;
       this._control.gameObject.AddComponent<ModConfigMenu.CustomCheckboxHandler>().onChanged += OnControlChanged;
     }

@@ -14,7 +14,7 @@ public partial class ModConfig
   private class Item
   {
     internal ItemType                _itemType   = ItemType.Label;
-    internal ModConfigUpdate     _updateType = ModConfigUpdate.OnConfirm;
+    internal ModConfigUpdate         _updateType = ModConfigUpdate.OnConfirm;
     internal string                  _key        = null;
     internal string                  _label      = null;
     internal List<string>            _values     = null;
@@ -27,7 +27,8 @@ public partial class ModConfig
   private Dictionary<string, string> _options                  = new(); // dictionary of mod options as key value pairs
   private List<Item> _registeredOptions                        = new(); // list of options from which we can dynamically regenerate the options panel
 
-  private static readonly List<string> _CheckBoxValues         = new(){"0", "1"};
+  private static readonly List<string> _UncheckedBoxValues     = new(){"0", "1"};
+  private static readonly List<string> _CheckedBoxValues       = new(){"1", "0"};
   private static readonly List<string> _ButtonValues           = new(){"1"};
 
   private bool _dirty = false; // whether we've been changed since last saving to disk
@@ -106,7 +107,7 @@ public partial class ModConfig
           break;
         case ItemType.CheckBox:
           subOptionsPanel.AddCheckBox(label: item._label).gameObject.AddComponent<ModConfigOption>()
-            .Setup(parentConfig: this, key: item._key, values: _CheckBoxValues, update: item._callback, updateType: item._updateType);
+            .Setup(parentConfig: this, key: item._key, values: item._values, update: item._callback, updateType: item._updateType);
           break;
         case ItemType.ArrowBox:
           subOptionsPanel.AddArrowBox(label: item._label, options: item._values, info: item._info).gameObject.AddComponent<ModConfigOption>()
