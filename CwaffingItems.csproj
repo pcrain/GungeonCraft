@@ -206,6 +206,7 @@
     <Compile Include="src\VFXToolbox.cs"/>
     <Compile Include="src\Main.cs"/>
     <Compile Include="src\CwaffConfig.cs"/>
+    <Compile Include="src\QoLConfig.cs"/>
     <EmbeddedResource Include="Resources\WeaponCollection\lightwing_idle_trimmed_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_fire_005.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_reload_007.json"/>

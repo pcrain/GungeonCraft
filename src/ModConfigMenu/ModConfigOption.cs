@@ -2,7 +2,7 @@ namespace CwaffingTheGungy;
 
 internal class ModConfigOption : MonoBehaviour
 {
-  private static List<ModConfigOption> pendingUpdatesOnConfirm = new();
+  private static List<ModConfigOption> _PendingUpdatesOnConfirm = new();
   // private static List<ModConfigOption> pendingUpdatesOnNextRun = new();
 
   private string _lookupKey                      = "";                        // key for looking up in our configuration file
@@ -18,16 +18,16 @@ internal class ModConfigOption : MonoBehaviour
   private static void OnMenuCancel(Action<FullOptionsMenuController> orig, FullOptionsMenuController menu) // hooked to call when menu choices are cancelled
   {
     // ETGModConsole.Log($"menu cancelled, discarding {pendingUpdatesOnConfirm.Count} changes");
-    foreach (ModConfigOption option in pendingUpdatesOnConfirm)
+    foreach (ModConfigOption option in _PendingUpdatesOnConfirm)
       option.ResetMenuItemState();
-    pendingUpdatesOnConfirm.Clear();
+    _PendingUpdatesOnConfirm.Clear();
     orig(menu);
   }
 
   private static void OnMenuConfirm(Action<FullOptionsMenuController> orig, FullOptionsMenuController menu) // hooked to call when menu choices are confirmed
   {
     // ETGModConsole.Log($"menu confirmed, applying {pendingUpdatesOnConfirm.Count} changes");
-    foreach (ModConfigOption option in pendingUpdatesOnConfirm)
+    foreach (ModConfigOption option in _PendingUpdatesOnConfirm)
     {
       if (option._updateType == ModConfigUpdate.OnConfirm)
         option.CommitPendingChanges();
@@ -39,7 +39,7 @@ internal class ModConfigOption : MonoBehaviour
       option._parent.Set(option._lookupKey, option._pendingValue);  // register change in the config handler even if the option's pending changes are deferred
     }
     ModConfig.SaveActiveConfigsToDisk();  // save all committed changes
-    pendingUpdatesOnConfirm.Clear();
+    _PendingUpdatesOnConfirm.Clear();
     orig(menu);
   }
 
@@ -50,6 +50,11 @@ internal class ModConfigOption : MonoBehaviour
   //     option.CommitPendingChanges();
   //   pendingUpdatesOnNextRun.Clear();
   // }
+
+  public static bool HasPendingChanges()
+  {
+    return _PendingUpdatesOnConfirm.Count > 0;
+  }
 
   private void CommitPendingChanges()
   {
@@ -91,8 +96,8 @@ internal class ModConfigOption : MonoBehaviour
   {
     if (this._updateType == ModConfigUpdate.Immediate)
       CommitPendingChanges();
-    else if (!pendingUpdatesOnConfirm.Contains(this))
-      pendingUpdatesOnConfirm.Add(this);
+    else if (!_PendingUpdatesOnConfirm.Contains(this))
+      _PendingUpdatesOnConfirm.Add(this);
   }
 
   private void ResetMenuItemState()

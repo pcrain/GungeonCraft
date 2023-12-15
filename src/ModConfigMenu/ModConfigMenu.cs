@@ -46,6 +46,12 @@ internal static class ModConfigMenu
           typeof(ModConfigMenu).GetMethod("ToggleToPanel", BindingFlags.Static | BindingFlags.NonPublic)
           );
 
+      // Make sure we respect discarded changes
+      new Hook(
+          typeof(GameOptions).GetMethod("CompareSettings", BindingFlags.Static | BindingFlags.Public),
+          typeof(ModConfigMenu).GetMethod("CompareSettings", BindingFlags.Static | BindingFlags.NonPublic)
+          );
+
       // Custom infobox updates
       new Hook(
           typeof(BraveOptionsMenuItem).GetMethod("UpdateInfoControl", BindingFlags.Instance | BindingFlags.NonPublic),
@@ -124,6 +130,13 @@ internal static class ModConfigMenu
       orig(controller, targetPanel, doFocus);
       if (isOurPanel)
         targetPanel.controls.First().HighlightChildrenAndFocus();  // fix bug where first item isn't highlighted
+    }
+
+    private static bool CompareSettings(Func<GameOptions, GameOptions, bool> orig, GameOptions clone, GameOptions source)
+    {
+      if (ModConfigOption.HasPendingChanges())
+        return false; // we have pending updates, so prompt to discard
+      return orig(clone, source);
     }
 
     private static void UpdateInfoControl(Action<BraveOptionsMenuItem> orig, BraveOptionsMenuItem item)

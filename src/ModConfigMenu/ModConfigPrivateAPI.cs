@@ -103,7 +103,7 @@ public partial class ModConfig
           break;
         case ItemType.Button:
           subOptionsPanel.AddButton(label: item._label).gameObject.AddComponent<ModConfigOption>()
-            .Setup(parentConfig: this, key: item._key, values: _ButtonValues, update: item._callback, updateType: item._updateType);
+            .Setup(parentConfig: this, key: item._key, values: item._values, update: item._callback, updateType: item._updateType);
           break;
         case ItemType.CheckBox:
           subOptionsPanel.AddCheckBox(label: item._label).gameObject.AddComponent<ModConfigOption>()
