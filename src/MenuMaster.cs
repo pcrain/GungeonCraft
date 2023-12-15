@@ -20,9 +20,10 @@ namespace CwaffingTheGungy;
 
 public static class MenuMaster
 {
-    private const string _MOD_MENU_LABEL = "MOD CONFIG";
+    internal const string _GUNFIG_EXTENSION        = "gunfig";
 
-    private static bool _DidInitHooks = false;
+    private const string _MOD_MENU_LABEL           = "MOD CONFIG";
+    private static bool _DidInitHooks              = false;
     private static List<dfControl> _RegisteredTabs = new();
 
     internal class CustomCheckboxHandler : MonoBehaviour
@@ -86,6 +87,24 @@ public static class MenuMaster
           typeof(BraveOptionsMenuItem).GetMethod("DoSelectedAction", BindingFlags.Instance | BindingFlags.NonPublic),
           typeof(MenuMaster).GetMethod("DoSelectedAction", BindingFlags.Static | BindingFlags.NonPublic)
           );
+
+      // Update config options when menu choices are cancelled
+      new Hook(
+          typeof(FullOptionsMenuController).GetMethod("CloseAndRevertChanges", BindingFlags.Instance | BindingFlags.NonPublic),
+          typeof(ModConfigOption).GetMethod("OnMenuCancel", BindingFlags.Static | BindingFlags.NonPublic)
+          );
+
+      // Update config options when menu choices are confirmed
+      new Hook(
+          typeof(FullOptionsMenuController).GetMethod("CloseAndApplyChanges", BindingFlags.Instance | BindingFlags.NonPublic),
+          typeof(ModConfigOption).GetMethod("OnMenuConfirm", BindingFlags.Static | BindingFlags.NonPublic)
+          );
+
+      // Update config options when a new run is started TODO: not implemented
+      // new Hook(
+      //     typeof(___).GetMethod("___", BindingFlags.Instance | BindingFlags.NonPublic),
+      //     typeof(ModConfigOption).GetMethod("OnNextRun", BindingFlags.Static | BindingFlags.NonPublic)
+      //     );
 
       _DidInitHooks = true;
     }
@@ -448,8 +467,8 @@ public static class MenuMaster
         newButton.name = _MOD_MENU_LABEL;
         newButton.Position = newButton.Position.WithY(maxY);  // Add it to the original position of the final button
         newButton.Click += (control, args) => {
-          if (C.DEBUG_BUILD)
-            ETGModConsole.Log($"entered modded options menu");
+          // if (C.DEBUG_BUILD)
+          //   ETGModConsole.Log($"entered modded options menu");
           preOptions.ToggleToPanel(newOptionsPanel, true, force: true); // force true so it works even if the pre-options menu is invisible
         };
         newButton.MouseEnter += FocusControl;
@@ -792,8 +811,11 @@ public static class MenuMaster
       if (_configBuilt)
         return;
 
-      config.AddToggle("test", "Hello there! :D", (_, newVal) => ETGModConsole.Log($"it worked O: {(newVal == "1" ? "on" : "off")}") );
-
+      config.AddToggle("testCheck", "Hello there! :D", (_, newVal) => ETGModConsole.Log($"it worked O: {(newVal == "1" ? "on" : "off")}") );
+      config.AddLabel("A Label *O*");
+      config.AddScrollBox("testScroll", "Look at it Go!", options: new(){"this", "that", "the other"}, info: new(){"good", "bad", "ugly"},
+        callback: (_, newVal) => ETGModConsole.Log($"toggled to: {newVal}"));
+      config.AddButton("testButton", "Click me!", callback: (key, _) => ETGModConsole.Log($"{key} button clicked!"));
       _configBuilt = true;
     }
 
@@ -819,7 +841,7 @@ public static class MenuMaster
           ModConfig modConfig = ModConfig._ActiveConfigs[modName];
           dfScrollPanel modConfigPage = modConfig.RegenConfigPage();
           newOptionsPanel.AddButton(label: modName, onclick: (control) => {
-            Lazy.DebugLog($"entered {modName} options menu");
+            // Lazy.DebugLog($"entered {modName} options menu");
             OpenSubMenu(modConfigPage);
           });
         }
@@ -872,14 +894,49 @@ public class ModConfig
   private string _configFile = null; // the file on disk to which we're writing
   private string _modName = null;
 
-  public void AddToggle(string key, string label, Action<string, string> callback)
+  public void AddToggle(string key, string label, Action<string, string> callback, ModConfigOption.Update updateType = ModConfigOption.Update.OnConfirm)
   {
     this._registeredOptions.Add(new ModConfigMenuItem(){
       _itemType   = ItemType.CheckBox,
+      _updateType = updateType,
+      _key        = key,
+      _label      = label,
+      _callback   = callback,
+    });
+  }
+
+  public void AddScrollBox(string key, string label, List<string> options, Action<string, string> callback, List<string> info = null, ModConfigOption.Update updateType = ModConfigOption.Update.OnConfirm)
+  {
+    this._registeredOptions.Add(new ModConfigMenuItem(){
+      _itemType   = ItemType.ArrowBox,
+      _updateType = updateType,
+      _key        = key,
+      _label      = label,
+      _callback   = callback,
+      _values     = options,
+      _info       = info,
+    });
+  }
+
+  public void AddButton(string key, string label, Action<string, string> callback)
+  {
+    this._registeredOptions.Add(new ModConfigMenuItem(){
+      _itemType   = ItemType.Button,
       _updateType = ModConfigOption.Update.Immediate,
       _key        = key,
       _label      = label,
       _callback   = callback,
+    });
+  }
+
+  public void AddLabel(string label)
+  {
+    this._registeredOptions.Add(new ModConfigMenuItem(){
+      _itemType   = ItemType.Label,
+      _updateType = ModConfigOption.Update.Immediate,
+      _key        = $"{label} label",
+      _label      = label,
+      _callback   = null,
     });
   }
 
@@ -890,7 +947,7 @@ public class ModConfig
       Lazy.DebugLog($"Creating new ModConfig instance for {modName}");
       ModConfig modConfig     = new ModConfig();
       modConfig._modName      = modName;
-      modConfig._configFile   = Path.Combine(SaveManager.SavePath, $"{modName}.gunfig");
+      modConfig._configFile   = Path.Combine(SaveManager.SavePath, $"{modName}.{MenuMaster._GUNFIG_EXTENSION}");
       modConfig.LoadFromDisk();
       _ActiveConfigs[modName] = modConfig;
     }
@@ -924,7 +981,7 @@ public class ModConfig
           string val = tokens[1].Trim();
           if (key.Length == 0 || val.Length == 0)
             continue;
-          Lazy.DebugLog($"    loading config option {key} = {val}");
+          // Lazy.DebugLog($"    loading config option {key} = {val}");
           this._options[key] = val;
         }
     }
@@ -942,7 +999,7 @@ public class ModConfig
       {
           foreach(string key in this._options.Keys)
           {
-            Lazy.DebugLog($"    saving config option {key} = {this._options[key]}");
+            // Lazy.DebugLog($"    saving config option {key} = {this._options[key]}");
             file.WriteLine($"{key} = {this._options[key]}");
           }
       }
@@ -961,6 +1018,7 @@ public class ModConfig
       switch (item._itemType)
       {
         case ItemType.Label:
+          subOptionsPanel.AddLabel(label: item._label, color: Color.green);
           break;
         case ItemType.Button:
           subOptionsPanel.AddButton(label: item._label).gameObject.AddComponent<ModConfigOption>()
@@ -984,6 +1042,7 @@ public class ModConfig
   internal string Set(string key, string value)
   {
     this._options[key] = value;
+    this._dirty = true;
     return value;
   }
 
@@ -1003,12 +1062,12 @@ public class ModConfigOption : MonoBehaviour
   public enum Update {
     Immediate, // updates immediately when changed (without confirmation)
     OnConfirm, // updates when menu is closed with changes confirmed
-    OnNextRun, // updates when a new run is started with changes confirmed
+    // OnNextRun, // updates when a new run is started with changes confirmed
     OnRestart, // updates when game is closed with changes confirmed (just saved to the configuration file, but not updates in game)
   }
 
   private static List<ModConfigOption> pendingUpdatesOnConfirm = new();
-  private static List<ModConfigOption> pendingUpdatesOnNextRun = new();
+  // private static List<ModConfigOption> pendingUpdatesOnNextRun = new();
 
   private string _lookupKey                      = "";               // key for looking up in our configuration file
   private string _defaultValue                   = "";               // our default value if the key is not found in the configuration file
@@ -1020,45 +1079,58 @@ public class ModConfigOption : MonoBehaviour
   private dfControl _control                     = null;             // the dfControl to which we're attached
   private ModConfig _parent                      = null;             // the ModConfig instance that's handling us
 
-  private static void OnMenuCancel() // hooked to call when menu choices are cancelled
+  private static void OnMenuCancel(Action<FullOptionsMenuController> orig, FullOptionsMenuController menu) // hooked to call when menu choices are cancelled
   {
+    // ETGModConsole.Log($"menu cancelled, discarding {pendingUpdatesOnConfirm.Count} changes");
+    foreach (ModConfigOption option in pendingUpdatesOnConfirm)
+      option.ResetMenuItemState();
     pendingUpdatesOnConfirm.Clear();
+    orig(menu);
   }
 
-  private static void OnMenuConfirm() // hooked to call when menu choices are confirmed
+  private static void OnMenuConfirm(Action<FullOptionsMenuController> orig, FullOptionsMenuController menu) // hooked to call when menu choices are confirmed
   {
+    // ETGModConsole.Log($"menu confirmed, applying {pendingUpdatesOnConfirm.Count} changes");
     foreach (ModConfigOption option in pendingUpdatesOnConfirm)
     {
       if (option._updateType == Update.OnConfirm)
         option.CommitPendingChanges();
-      else if (option._updateType == Update.OnNextRun)
-      {
-        if (!pendingUpdatesOnNextRun.Contains(option))
-          pendingUpdatesOnNextRun.Add(option);
-      }
+      // else if (option._updateType == Update.OnNextRun)
+      // {
+      //   if (!pendingUpdatesOnNextRun.Contains(option))
+      //     pendingUpdatesOnNextRun.Add(option);
+      // }
       option._parent.Set(option._lookupKey, option._pendingValue);  // register change in the config handler even if the option's pending changes are deferred
     }
     ModConfig.SaveActiveConfigsToDisk();  // save all committed changes
     pendingUpdatesOnConfirm.Clear();
+    orig(menu);
   }
 
-  private static void OnNextRun()  // hooked to call when a new run is started
-  {
-    foreach (ModConfigOption option in pendingUpdatesOnNextRun)
-      option.CommitPendingChanges();
-    pendingUpdatesOnNextRun.Clear();
-  }
+  // private static void OnNextRun()  // hooked to call when a new run is started UNIMPLEMENTED
+  // {
+  //   ETGModConsole.Log($"new run started");
+  //   foreach (ModConfigOption option in pendingUpdatesOnNextRun)
+  //     option.CommitPendingChanges();
+  //   pendingUpdatesOnNextRun.Clear();
+  // }
 
   private void CommitPendingChanges()
   {
     if (this._pendingValue == this._currentValue)
       return;  // we didn't change, so we shouldn't do anything
 
-    ETGModConsole.Log($"  applying changes for {this._lookupKey} -> {this._pendingValue}");
+    // ETGModConsole.Log($"  applying changes for {this._lookupKey} -> {this._pendingValue}");
     if (this._onApplyChanges != null)
       this._onApplyChanges(this._lookupKey, this._pendingValue);
 
     this._currentValue = this._pendingValue;  // set our current value to our pending value after applying changes in case we throw an exception and break the config
+
+    if (this._updateType == Update.Immediate) // register and save immediate changes to disk TODO: maybe be more conservative with this?
+    {
+      this._parent.Set(this._lookupKey, this._pendingValue);
+      ModConfig.SaveActiveConfigsToDisk();
+    }
   }
 
   private void OnControlChanged(dfControl control, string stringValue)
@@ -1073,12 +1145,59 @@ public class ModConfigOption : MonoBehaviour
     OnControlChanged();
   }
 
+  private void OnButtonClicked(dfControl control)
+  {
+    if (this._onApplyChanges != null)
+      this._onApplyChanges(this._lookupKey, this._pendingValue);
+  }
+
   private void OnControlChanged()
   {
     if (this._updateType == Update.Immediate)
       CommitPendingChanges();
     else if (!pendingUpdatesOnConfirm.Contains(this))
       pendingUpdatesOnConfirm.Add(this);
+  }
+
+  private void ResetMenuItemState()
+  {
+    // Make sure we have a menu item
+    BraveOptionsMenuItem menuItem = base.GetComponent<BraveOptionsMenuItem>();
+    if (!menuItem)
+    {
+      ETGModConsole.Log($"  NULL BRAVE MENU ITEM");
+      return;
+    }
+
+    // Set up the state of our menu item from our config
+    if (menuItem.buttonControl is dfButton button)
+    {
+      this._control.gameObject.AddComponent<MenuMaster.CustomButtonHandler>().onClicked += OnButtonClicked;
+    }
+    if (menuItem.checkboxChecked is dfControl checkBox)
+    {
+      bool isChecked = (this._currentValue.Trim() == "1");
+      // ETGModConsole.Log($"  creating checkbox for {this._lookupKey} with state {isChecked}");
+      checkBox.IsVisible = isChecked;
+      if (menuItem.checkboxUnchecked is dfControl checkBoxUnched)
+        checkBoxUnched.IsVisible = true;
+      menuItem.m_selectedIndex = isChecked ? 1 : 0;
+      this._control.gameObject.AddComponent<MenuMaster.CustomCheckboxHandler>().onChanged += OnControlChanged;
+    }
+    if ((menuItem.selectedLabelControl is dfLabel settingLabel) && menuItem.labelOptions != null)
+    {
+      for (int i = 0; i < menuItem.labelOptions.Length; ++i)
+      {
+        if (menuItem.labelOptions[i] != this._currentValue)
+          continue;
+        settingLabel.Text = menuItem.labelOptions[i];
+        if ((menuItem.infoControl is dfLabel infoLabel) && menuItem.infoOptions != null && menuItem.infoOptions.Length < i)
+          infoLabel.Text = menuItem.infoOptions[i];
+        menuItem.m_selectedIndex = i;
+        break;
+      }
+      this._control.gameObject.AddComponent<MenuMaster.CustomLeftRightArrowHandler>().onChanged += OnControlChanged;
+    }
   }
 
   public void Setup(ModConfig parentConfig, string key, List<string> values, Action<string, string> update, Update updateType = Update.OnConfirm)
@@ -1095,34 +1214,8 @@ public class ModConfigOption : MonoBehaviour
     this._currentValue = this._parent.Get(this._lookupKey) ?? this._parent.Set(this._lookupKey, this._defaultValue);
     this._pendingValue = this._currentValue;
 
-    // Make sure we have a menu item
-    BraveOptionsMenuItem menuItem = base.GetComponent<BraveOptionsMenuItem>();
-    if (!menuItem)
-    {
-      ETGModConsole.Log($"  NULL BRAVE MENU ITEM");
-      return;
-    }
+    // ETGModConsole.Log($">>> current value of {this._lookupKey} is {this._currentValue}");
 
-    // Set up the state of our menu item from our config
-    if (menuItem.checkboxChecked is dfControl checkBox)
-    {
-      bool isChecked = (this._defaultValue.Trim() == "1");
-      checkBox.IsVisible = isChecked;
-      menuItem.m_selectedIndex = isChecked ? 1 : 0;
-      this._control.gameObject.AddComponent<MenuMaster.CustomCheckboxHandler>().onChanged += OnControlChanged;
-    }
-    if ((menuItem.selectedLabelControl is dfLabel settingLabel) && menuItem.labelOptions != null)
-    {
-      int selectedOption = menuItem.labelOptions.IndexOf(this._currentValue);
-      if (selectedOption != -1)
-      {
-        settingLabel.Text = menuItem.labelOptions[selectedOption];
-        if ((menuItem.infoControl is dfLabel infoLabel) && menuItem.infoOptions != null && menuItem.infoOptions.Length < selectedOption)
-          infoLabel.Text = menuItem.infoOptions[selectedOption];
-        menuItem.m_selectedIndex = selectedOption;
-      }
-      this._control.gameObject.AddComponent<MenuMaster.CustomLeftRightArrowHandler>().onChanged += OnControlChanged;
-    }
-
+    ResetMenuItemState();
   }
 }
