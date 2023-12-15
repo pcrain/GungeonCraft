@@ -106,7 +106,6 @@
     <Compile Include="src\Cwaff-Actives\InsurancePolicy.cs"/>
     <Compile Include="src\Cwaff-Actives\Itemfinder.cs"/>
     <Compile Include="src\Hotfixes.cs"/>
-    <Compile Include="src\MenuMaster.cs"/>
     <Compile Include="src\Cwaff-Guns\Lightwing.cs"/>
     <Compile Include="src\Cwaff-Guns\VacuumCleaner.cs"/>
     <Compile Include="src\Cwaff-Guns\IronMaid.cs"/>
@@ -192,6 +191,9 @@
     <Compile Include="src\NonstandardApi\MiniInteractable.cs"/>
     <Compile Include="src\NonstandardApi\BeamHelpers.cs"/>
     <Compile Include="src\NonstandardApi\Cwaff-GenericNPC.cs"/>
+    <Compile Include="src\ModConfigMenu\ModConfigOption.cs"/>
+    <Compile Include="src\ModConfigMenu\ModConfigMenu.cs"/>
+    <Compile Include="src\ModConfigMenu\ModConfig.cs"/>
     <Compile Include="src\Databases.cs"/>
     <Compile Include="src\SharedItemBehaviors.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffPrerequisite.cs"/>

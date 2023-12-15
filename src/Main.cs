@@ -66,48 +66,6 @@ public class Initialisation : BaseUnityPlugin
         ETGModMainBehaviour.WaitForGameManagerStart(GMStart);
     }
 
-    public void PrintEventInfo(dfControl control, string eventName)
-    {
-        // var eventInfo = control.GetType().GetEvent(eventName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-        // var eventDelegate = (MulticastDelegate)control.GetType().GetField(eventName, BindingFlags.Instance | BindingFlags.NonPublic).GetValue(control);
-        // Debug.Log($"  event {eventName} has {eventDelegate?.GetInvocationList()?.Length >> 0} listeners");
-
-
-        foreach (EventInfo ev in control.GetType().GetEvents())
-        {
-            ETGModConsole.Log($"found event {ev.Name}");
-            // Dissect.DumpFieldsAndProperties(control);
-            FieldInfo fi = control.GetType().GetField(ev.Name, BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy | BindingFlags.IgnoreCase);
-            ETGModConsole.Log($"found fi {fi.Name}");
-            Delegate del = (Delegate)fi.GetValue(ev);
-            ETGModConsole.Log($"found del {del}");
-            var list = del.GetInvocationList();
-            foreach (var d in list)
-            {
-                Console.WriteLine("{0}", d.Method.Name);
-            }
-        }
-
-
-        // var eventField = control.GetType().GetEvent(eventName, BindingFlags.GetField | BindingFlags.Public | BindingFlags.Instance);
-        // if (eventField == null)
-        // {
-        //     ETGModConsole.Log($"no event");
-        //     return;
-        // }
-
-        // var subscriberCount = ((EventHandler)eventField.GetValue(control))
-        //             .GetInvocationList().Length;
-
-        // if (eventDelegate != null)
-        // {
-        //   foreach (var handler in eventDelegate.GetInvocationList())
-        //   {
-        //     handler.Method.Invoke(handler.Target, new object[] { tExForm, eventArgs });
-        //   }
-        // }
-    }
-
     public void GMStart(GameManager manager)
     {
         try
@@ -476,8 +434,7 @@ public class Initialisation : BaseUnityPlugin
             }
 
             // GameManager.Instance.OnNewLevelFullyLoaded += MenuMaster.RebuildOptionsPanels;
-            MenuMaster.InitHooksIfNecessary();
-
+            ModConfigMenu.InitHooksIfNecessary();
 
             // Debug.LogError("Gungy o.o!");
             // Debug.LogAssertion("Gungy o.o!");
