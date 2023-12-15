@@ -18,21 +18,21 @@ namespace CwaffingTheGungy;
     - using magic numbers in a few places to fix panel offsets
 */
 
-internal class CustomCheckboxHandler : MonoBehaviour
-  { public PropertyChangedEventHandler<bool> onChanged; }
-
-internal class CustomLeftRightArrowHandler : MonoBehaviour
-  { public PropertyChangedEventHandler<string> onChanged; }
-
-internal class CustomButtonHandler : MonoBehaviour
-  { public Action<dfControl> onClicked; }
-
 public static class MenuMaster
 {
     private const string _MOD_MENU_LABEL = "MOD CONFIG";
 
     private static bool _DidInitHooks = false;
     private static List<dfControl> _RegisteredTabs = new();
+
+    internal class CustomCheckboxHandler : MonoBehaviour
+      { public PropertyChangedEventHandler<bool> onChanged; }
+
+    internal class CustomLeftRightArrowHandler : MonoBehaviour
+      { public PropertyChangedEventHandler<string> onChanged; }
+
+    internal class CustomButtonHandler : MonoBehaviour
+      { public Action<dfControl> onClicked; }
 
     public static void InitHooksIfNecessary()
     {
@@ -163,7 +163,6 @@ public static class MenuMaster
       control.Focus();
     }
 
-    // TODO: make this more selective about when it plays
     private static void PlayMenuCursorSound(dfControl control)
     {
       AkSoundEngine.PostEvent("Play_UI_menu_select_01", control.gameObject);
@@ -778,4 +777,234 @@ public static class MenuMaster
         // PrintControlRecursive(newOptionsPanel);
         panelBuildWatch.Stop(); System.Console.WriteLine($"    panel built in {panelBuildWatch.ElapsedMilliseconds} milliseconds");
     }
+}
+
+public class ModConfig
+{
+  /* TODO:
+      - on startup, need to register a mod to use the config menu
+      - on startup, for all registered mods, need to load current configuration from a file if it exists, or create defaults is not
+      - need to save configuration to file on menu exit
+      - need to revert changes to non-immediate options on menu cancel
+  */
+
+  private static Dictionary<string, ModConfig> _activeConfigs = new(); // dictionary of all mods using ModConfig to their respective configurations
+  private Dictionary<string, string> _options = new(); // dictionary of mod options as key value pairs
+
+  private bool _dirty = false; // whether we've been changed since last saving to disk
+  private string _configFile = null; // the file on disk to which we're writing
+
+  public static ModConfig GetConfigForMod(string modName)
+  {
+    if (!_activeConfigs.ContainsKey(modName))
+    {
+      Lazy.DebugLog($"Creating new ModConfig instance for {modName}");
+      ModConfig modConfig = new ModConfig();
+      modConfig._configFile = Path.Combine(SaveManager.SavePath, $"{modName}.gunfig");
+      modConfig.LoadFromDisk();
+      _activeConfigs[modName] = modConfig;
+    }
+    return _activeConfigs[modName];
+  }
+
+  internal static void SaveActiveConfigsToDisk()
+  {
+    foreach (ModConfig config in _activeConfigs.Values)
+    {
+      if (!config._dirty)
+        continue;
+      config.SaveToDisk();
+      config._dirty = false;
+    }
+  }
+
+  private void LoadFromDisk()
+  {
+    if (!File.Exists(this._configFile))
+        return;
+    try
+    {
+        string[] lines = File.ReadAllLines(this._configFile);
+        foreach (string line in lines)
+        {
+          string[] tokens = line.Split('=');
+          if (tokens.Length != 2 || tokens[0] == null || tokens[1] == null)
+            continue;
+          string key = tokens[0].Trim();
+          string val = tokens[1].Trim();
+          if (key.Length == 0 || val.Length == 0)
+            continue;
+          Lazy.DebugLog($"    loading config option {key} = {val}");
+          this._options[key] = val;
+        }
+    }
+    catch (Exception e)
+    {
+      ETGModConsole.Log($"    error loading mod config file {this._configFile}: {e}");
+    }
+  }
+
+  private void SaveToDisk()
+  {
+    try
+    {
+      using (StreamWriter file = File.CreateText(this._configFile))
+      {
+          foreach(string key in this._options.Keys)
+          {
+            Lazy.DebugLog($"    saving config option {key} = {this._options[key]}");
+            file.WriteLine($"{key} = {this._options[key]}");
+          }
+      }
+    }
+    catch (Exception e)
+    {
+      ETGModConsole.Log($"    error saving mod config file {this._configFile}: {e}");
+    }
+  }
+
+  // Set a config key to a value and return the value
+  internal string Set(string key, string value)
+  {
+    this._options[key] = value;
+    return value;
+  }
+
+  public string Get(string key)
+  {
+    return this._options.ContainsKey(key) ? this._options[key] : null;
+  }
+
+  public bool? GetBool(string key)
+  {
+    return this._options.ContainsKey(key) ? (this._options[key] == "1") : null;
+  }
+}
+
+public class ModConfigOption : MonoBehaviour
+{
+  public enum Update {
+    Immediate, // updates immediately when changed (without confirmation)
+    OnConfirm, // updates when menu is closed with changes confirmed
+    OnNextRun, // updates when a new run is started with changes confirmed
+    OnRestart, // updates when game is closed with changes confirmed (just saved to the configuration file, but not updates in game)
+  }
+
+  private static List<ModConfigOption> pendingUpdatesOnConfirm = new();
+  private static List<ModConfigOption> pendingUpdatesOnNextRun = new();
+
+  private string _lookupKey                      = "";               // key for looking up in our configuration file
+  private string _defaultValue                   = "";               // our default value if the key is not found in the configuration file
+  private string _currentValue                   = "";               // our current effective value, barring any pending changes
+  private string _pendingValue                   = "";               // our pending value after changes are applies
+  private Update _updateType                     = Update.OnConfirm; // when to apply any pending changes
+  private List<string> _validValues              = new();            // valid values for the option (auto populated with "true" and "false" for toggles)
+  private Action<string, string> _onApplyChanges = null;             // event handler for execution
+  private dfControl _control                     = null;             // the dfControl to which we're attached
+  private ModConfig _parent                      = null;             // the ModConfig instance that's handling us
+
+  private static void OnMenuCancel() // hooked to call when menu choices are cancelled
+  {
+    pendingUpdatesOnConfirm.Clear();
+  }
+
+  private static void OnMenuConfirm() // hooked to call when menu choices are confirmed
+  {
+    foreach (ModConfigOption option in pendingUpdatesOnConfirm)
+    {
+      if (option._updateType == Update.OnConfirm)
+        option.CommitPendingChanges();
+      else if (option._updateType == Update.OnNextRun)
+      {
+        if (!pendingUpdatesOnNextRun.Contains(option))
+          pendingUpdatesOnNextRun.Add(option);
+      }
+      option._parent.Set(option._lookupKey, option._pendingValue);  // register change in the config handler even if the option's pending changes are deferred
+    }
+    ModConfig.SaveActiveConfigsToDisk();  // save all committed changes
+    pendingUpdatesOnConfirm.Clear();
+  }
+
+  private static void OnNextRun()  // hooked to call when a new run is started
+  {
+    foreach (ModConfigOption option in pendingUpdatesOnNextRun)
+      option.CommitPendingChanges();
+    pendingUpdatesOnNextRun.Clear();
+  }
+
+  private void CommitPendingChanges()
+  {
+    if (this._pendingValue == this._currentValue)
+      return;  // we didn't change, so we shouldn't do anything
+
+    if (this._onApplyChanges != null)
+      this._onApplyChanges(this._lookupKey, this._pendingValue);
+
+    this._currentValue = this._pendingValue;  // set our current value to our pending value after applying changes in case we throw an exception and break the config
+  }
+
+  private void OnControlChanged(dfControl control, string stringValue)
+  {
+    this._pendingValue = stringValue;
+    OnControlChanged();
+  }
+
+  private void OnControlChanged(dfControl control, bool toggleValue)
+  {
+    this._pendingValue = toggleValue ? "1" : "0";
+    OnControlChanged();
+  }
+
+  private void OnControlChanged()
+  {
+    if (this._updateType == Update.Immediate)
+      CommitPendingChanges();
+    else if (!pendingUpdatesOnConfirm.Contains(this))
+      pendingUpdatesOnConfirm.Add(this);
+  }
+
+  public void Setup(ModConfig parentConfig, string key, List<string> values, Action<string, string> update, Update updateType = Update.OnConfirm)
+  {
+    this._control        = base.GetComponent<dfControl>();
+    this._parent         = parentConfig;
+    this._lookupKey      = key;
+    this._validValues    = values;
+    this._onApplyChanges = update;
+    this._updateType     = updateType;
+
+    // Load our default and current values from our config, or from the options passed to us
+    this._defaultValue = values[0];
+    this._currentValue = this._parent.Get(this._lookupKey) ?? this._parent.Set(this._lookupKey, this._defaultValue);
+    this._pendingValue = this._currentValue;
+
+    // Make sure we have a menu item
+    BraveOptionsMenuItem menuItem = base.GetComponent<BraveOptionsMenuItem>();
+    if (!menuItem)
+    {
+      ETGModConsole.Log($"  NULL BRAVE MENU ITEM");
+      return;
+    }
+
+    // Set up the state of our menu item from our config
+    if (menuItem.checkboxChecked is dfControl checkBox)
+    {
+      bool isChecked = (this._defaultValue.Trim() == "1");
+      checkBox.IsVisible = isChecked;
+      menuItem.m_selectedIndex = isChecked ? 1 : 0;
+      this._control.gameObject.AddComponent<MenuMaster.CustomCheckboxHandler>().onChanged += OnControlChanged;
+    }
+    if ((menuItem.selectedLabelControl is dfLabel settingLabel) && menuItem.labelOptions != null)
+    {
+      int selectedOption = menuItem.labelOptions.IndexOf(this._currentValue);
+      if (selectedOption != -1)
+      {
+        settingLabel.Text = menuItem.labelOptions[selectedOption];
+        if ((menuItem.infoControl is dfLabel infoLabel) && menuItem.infoOptions != null && menuItem.infoOptions.Length < selectedOption)
+          infoLabel.Text = menuItem.infoOptions[selectedOption];
+        menuItem.m_selectedIndex = selectedOption;
+      }
+      this._control.gameObject.AddComponent<MenuMaster.CustomLeftRightArrowHandler>().onChanged += OnControlChanged;
+    }
+
+  }
 }
