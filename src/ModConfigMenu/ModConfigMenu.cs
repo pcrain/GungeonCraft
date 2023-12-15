@@ -4,12 +4,10 @@ namespace CwaffingTheGungy;
     - create actual API surface
     - clean up code
 
-   Minor issues I'm not worrying about now, from highest to lowest priority
-    - changing padding on standalone labels / arrow boxes / info boxes
-
    Nitpicks I really don't care to fix at all, but should be aware of:
     - can't colorize anything except labels
     - can't back out of one level of menus at a time (vanilla behavior; maybe hook CloseAndMaybeApplyChangesWithPrompt)
+    - double select sound when entering a mod menu
     - can't dynamically enable / disable options
     - haven't implemented progress / fill bars
     - can't have first item of submenu be a label or it doesn't get focused correctly
@@ -600,13 +598,13 @@ public static class ModConfigMenu
     }
 
     // based on VisualPresetArrowSelectorPanel (without info) and ResolutionArrowSelectorPanelWithInfoBox (with info)
-    public static dfPanel AddArrowBox(this dfScrollPanel panel, string label, List<string> options, List<string> info = null, PropertyChangedEventHandler<string> onchange = null)
+    public static dfPanel AddArrowBox(this dfScrollPanel panel, string label, List<string> options, List<string> info = null, PropertyChangedEventHandler<string> onchange = null, bool compact = true)
     {
       bool hasInfo = (info != null && info.Count > 0 && info.Count == options.Count);
 
       dfPanel newArrowboxWrapperPanel = panel.AddControl<dfPanel>();
       newArrowboxWrapperPanel.CopyAttributes(hasInfo ? GetPrototypeInfoWrapperPanel() : GetPrototypeLeftRightWrapperPanel());
-      newArrowboxWrapperPanel.Anchor = dfAnchorStyle.CenterVertical | dfAnchorStyle.CenterHorizontal;
+      // newArrowboxWrapperPanel.Anchor = dfAnchorStyle.CenterVertical | dfAnchorStyle.CenterHorizontal;
 
       dfPanel newArrowboxInnerPanel = newArrowboxWrapperPanel.AddControl<dfPanel>();
       newArrowboxInnerPanel.CopyAttributes(hasInfo ? GetPrototypeInfoInnerPanel() : GetPrototypeLeftRightInnerPanel());
@@ -630,6 +628,20 @@ public static class ModConfigMenu
       newArrowSelectorSelection.Text = options[0];
       if (newArrowInfoLabel != null)
         newArrowInfoLabel.Text = info[0];
+
+      if (compact)
+      {
+        if (hasInfo)
+        {
+          int maxLines = 1;
+          foreach (string line in info)
+            maxLines = Mathf.Max(maxLines, line.Split('\n').Length);
+          // newArrowboxWrapperPanel.Anchor = dfAnchorStyle.None;
+          newArrowboxWrapperPanel.Size -= new Vector2(0, 66f - 22f * maxLines);  // NOTE: don't shrink it too small or scrolling gets very messed up
+        }
+        else
+          newArrowboxWrapperPanel.Size -= new Vector2(0, 8f);  // NOTE: don't shrink it too small or scrolling gets very messed up
+      }
 
       BraveOptionsMenuItem menuItem = newArrowboxWrapperPanel.gameObject.AddComponent<BraveOptionsMenuItem>();
         menuItem.optionType           = BraveOptionsMenuItem.BraveOptionsOptionType.NONE;
@@ -682,7 +694,7 @@ public static class ModConfigMenu
     }
 
     // based on PlayerOneLabelPanel
-    public static dfPanel AddLabel(this dfScrollPanel panel, string label, Color? color = null)
+    public static dfPanel AddLabel(this dfScrollPanel panel, string label, Color? color = null, bool compact = true)
     {
       dfPanel newLabelWrapperPanel = panel.AddControl<dfPanel>();
       newLabelWrapperPanel.CopyAttributes(GetPrototypeLabelWrapperPanel());
@@ -695,6 +707,14 @@ public static class ModConfigMenu
 
       newLabel.Text = label;
       newLabel.Color = color ?? Color.white;
+
+      if (compact)
+      {
+        newLabelWrapperPanel.Size -= new Vector2(0, 56f);
+        newLabelInnerPanel.Position += new Vector3(0, 56f, 0);
+        // newLabelInnerPanel.Size -= new Vector2(0, 48f);
+        // newLabel.Size -= new Vector2(0, 48f);
+      }
 
       newLabelWrapperPanel.name = $"{label} panel";
 
@@ -747,11 +767,20 @@ public static class ModConfigMenu
       if (_configBuilt)
         return;
 
-      config.AddToggle("testCheck", "Hello there! :D", (_, newVal) => ETGModConsole.Log($"it worked O: {(newVal == "1" ? "on" : "off")}") );
-      config.AddLabel("A Label *O*");
-      config.AddScrollBox("testScroll", "Look at it Go!", options: new(){"this", "that", "the other"}, info: new(){"good", "bad", "ugly"},
-        callback: (_, newVal) => ETGModConsole.Log($"toggled to: {newVal}"));
-      config.AddButton("testButton", "Click me!", callback: (key, _) => ETGModConsole.Log($"{key} button clicked!"));
+      for (int i = 0; i < 3; ++i)
+      {
+        config.AddToggle("testCheck", "Hello there! :D", (_, newVal) => ETGModConsole.Log($"it worked O: {(newVal == "1" ? "on" : "off")}") );
+        config.AddLabel("A Label *O*");
+        config.AddScrollBox("testScroll", "Look at it Go!", options: new(){"this", "that", "the other"}, info: new(){"good", "bad\nbad\nbad", "ugly"},
+          callback: (_, newVal) => ETGModConsole.Log($"toggled to: {newVal}"));
+        config.AddScrollBox("testScroll", "Line Test!", options: new(){"one", "two"}, info: new(){"one line", "two\nlines"},
+          callback: (_, newVal) => ETGModConsole.Log($"toggled to: {newVal}"));
+        config.AddScrollBox("testScroll", "Another Line Test!", options: new(){"one", "two"}, info: new(){"one line", "still one line"},
+          callback: (_, newVal) => ETGModConsole.Log($"toggled to: {newVal}"));
+        config.AddScrollBox("testScroll", "Last Line Test!", options: new(){"one", "two"},
+          callback: (_, newVal) => ETGModConsole.Log($"toggled to: {newVal}"));
+        config.AddButton("testButton", "Click me!", callback: (key, _) => ETGModConsole.Log($"{key} button clicked!"));
+      }
 
       _configBuilt = true;
     }
