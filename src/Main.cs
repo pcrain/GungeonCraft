@@ -435,6 +435,7 @@ public class Initialisation : BaseUnityPlugin
 
             // GameManager.Instance.OnNewLevelFullyLoaded += MenuMaster.RebuildOptionsPanels;
             ModConfigMenu.InitHooksIfNecessary();
+            CwaffConfig.Init();
 
             // Debug.LogError("Gungy o.o!");
             // Debug.LogAssertion("Gungy o.o!");

@@ -1,26 +1,19 @@
 namespace CwaffingTheGungy;
 
-public class ModConfigOption : MonoBehaviour
+internal class ModConfigOption : MonoBehaviour
 {
-  public enum Update {
-    Immediate, // updates immediately when changed (without confirmation)
-    OnConfirm, // updates when menu is closed with changes confirmed
-    // OnNextRun, // updates when a new run is started with changes confirmed
-    OnRestart, // updates when game is closed with changes confirmed (just saved to the configuration file, but not updates in game)
-  }
-
   private static List<ModConfigOption> pendingUpdatesOnConfirm = new();
   // private static List<ModConfigOption> pendingUpdatesOnNextRun = new();
 
-  private string _lookupKey                      = "";               // key for looking up in our configuration file
-  private string _defaultValue                   = "";               // our default value if the key is not found in the configuration file
-  private string _currentValue                   = "";               // our current effective value, barring any pending changes
-  private string _pendingValue                   = "";               // our pending value after changes are applies
-  private Update _updateType                     = Update.OnConfirm; // when to apply any pending changes
-  private List<string> _validValues              = new();            // valid values for the option (auto populated with "true" and "false" for toggles)
-  private Action<string, string> _onApplyChanges = null;             // event handler for execution
-  private dfControl _control                     = null;             // the dfControl to which we're attached
-  private ModConfig _parent                      = null;             // the ModConfig instance that's handling us
+  private string _lookupKey                      = "";                        // key for looking up in our configuration file
+  private string _defaultValue                   = "";                        // our default value if the key is not found in the configuration file
+  private string _currentValue                   = "";                        // our current effective value, barring any pending changes
+  private string _pendingValue                   = "";                        // our pending value after changes are applies
+  private ModConfigUpdate _updateType            = ModConfigUpdate.OnConfirm; // when to apply any pending changes
+  private List<string> _validValues              = new();                     // valid values for the option (auto populated with "true" and "false" for toggles)
+  private Action<string, string> _onApplyChanges = null;                      // event handler for execution
+  private dfControl _control                     = null;                      // the dfControl to which we're attached
+  private ModConfig _parent                      = null;                      // the ModConfig instance that's handling us
 
   private static void OnMenuCancel(Action<FullOptionsMenuController> orig, FullOptionsMenuController menu) // hooked to call when menu choices are cancelled
   {
@@ -36,7 +29,7 @@ public class ModConfigOption : MonoBehaviour
     // ETGModConsole.Log($"menu confirmed, applying {pendingUpdatesOnConfirm.Count} changes");
     foreach (ModConfigOption option in pendingUpdatesOnConfirm)
     {
-      if (option._updateType == Update.OnConfirm)
+      if (option._updateType == ModConfigUpdate.OnConfirm)
         option.CommitPendingChanges();
       // else if (option._updateType == Update.OnNextRun)
       // {
@@ -69,7 +62,7 @@ public class ModConfigOption : MonoBehaviour
 
     this._currentValue = this._pendingValue;  // set our current value to our pending value after applying changes in case we throw an exception and break the config
 
-    if (this._updateType == Update.Immediate) // register and save immediate changes to disk TODO: maybe be more conservative with this?
+    if (this._updateType == ModConfigUpdate.Immediate) // register and save immediate changes to disk TODO: maybe be more conservative with this?
     {
       this._parent.Set(this._lookupKey, this._pendingValue);
       ModConfig.SaveActiveConfigsToDisk();
@@ -96,7 +89,7 @@ public class ModConfigOption : MonoBehaviour
 
   private void OnControlChanged()
   {
-    if (this._updateType == Update.Immediate)
+    if (this._updateType == ModConfigUpdate.Immediate)
       CommitPendingChanges();
     else if (!pendingUpdatesOnConfirm.Contains(this))
       pendingUpdatesOnConfirm.Add(this);
@@ -143,7 +136,7 @@ public class ModConfigOption : MonoBehaviour
     }
   }
 
-  public void Setup(ModConfig parentConfig, string key, List<string> values, Action<string, string> update, Update updateType = Update.OnConfirm)
+  internal void Setup(ModConfig parentConfig, string key, List<string> values, Action<string, string> update, ModConfigUpdate updateType = ModConfigUpdate.OnConfirm)
   {
     this._control        = base.GetComponent<dfControl>();
     this._parent         = parentConfig;

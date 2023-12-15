@@ -192,8 +192,9 @@
     <Compile Include="src\NonstandardApi\BeamHelpers.cs"/>
     <Compile Include="src\NonstandardApi\Cwaff-GenericNPC.cs"/>
     <Compile Include="src\ModConfigMenu\ModConfigOption.cs"/>
+    <Compile Include="src\ModConfigMenu\ModConfigPrivateAPI.cs"/>
     <Compile Include="src\ModConfigMenu\ModConfigMenu.cs"/>
-    <Compile Include="src\ModConfigMenu\ModConfig.cs"/>
+    <Compile Include="src\ModConfigMenu\ModConfigAPI.cs"/>
     <Compile Include="src\Databases.cs"/>
     <Compile Include="src\SharedItemBehaviors.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffPrerequisite.cs"/>
@@ -204,6 +205,7 @@
     <Compile Include="src\Cwaff-Misc\CwaffHUD.cs"/>
     <Compile Include="src\VFXToolbox.cs"/>
     <Compile Include="src\Main.cs"/>
+    <Compile Include="src\CwaffConfig.cs"/>
     <EmbeddedResource Include="Resources\WeaponCollection\lightwing_idle_trimmed_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_fire_005.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_reload_007.json"/>

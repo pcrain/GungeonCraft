@@ -1,8 +1,8 @@
 namespace CwaffingTheGungy;
 
-public class ModConfig
+// Private portion of ModConfig API
+public partial class ModConfig
 {
-
   private enum ItemType
   {
     Label,
@@ -14,7 +14,7 @@ public class ModConfig
   private class Item
   {
     internal ItemType                _itemType   = ItemType.Label;
-    internal ModConfigOption.Update  _updateType = ModConfigOption.Update.OnConfirm;
+    internal ModConfigUpdate     _updateType = ModConfigUpdate.OnConfirm;
     internal string                  _key        = null;
     internal string                  _label      = null;
     internal List<string>            _values     = null;
@@ -33,66 +33,6 @@ public class ModConfig
   private bool _dirty = false; // whether we've been changed since last saving to disk
   private string _configFile = null; // the file on disk to which we're writing
   private string _modName = null;
-
-  public void AddToggle(string key, string label, Action<string, string> callback, ModConfigOption.Update updateType = ModConfigOption.Update.OnConfirm)
-  {
-    this._registeredOptions.Add(new Item(){
-      _itemType   = ItemType.CheckBox,
-      _updateType = updateType,
-      _key        = key,
-      _label      = label,
-      _callback   = callback,
-    });
-  }
-
-  public void AddScrollBox(string key, string label, List<string> options, Action<string, string> callback, List<string> info = null, ModConfigOption.Update updateType = ModConfigOption.Update.OnConfirm)
-  {
-    this._registeredOptions.Add(new Item(){
-      _itemType   = ItemType.ArrowBox,
-      _updateType = updateType,
-      _key        = key,
-      _label      = label,
-      _callback   = callback,
-      _values     = options,
-      _info       = info,
-    });
-  }
-
-  public void AddButton(string key, string label, Action<string, string> callback)
-  {
-    this._registeredOptions.Add(new Item(){
-      _itemType   = ItemType.Button,
-      _updateType = ModConfigOption.Update.Immediate,
-      _key        = key,
-      _label      = label,
-      _callback   = callback,
-    });
-  }
-
-  public void AddLabel(string label)
-  {
-    this._registeredOptions.Add(new Item(){
-      _itemType   = ItemType.Label,
-      _updateType = ModConfigOption.Update.Immediate,
-      _key        = $"{label} label",
-      _label      = label,
-      _callback   = null,
-    });
-  }
-
-  public static ModConfig GetConfigForMod(string modName)
-  {
-    if (!_ActiveConfigs.ContainsKey(modName))
-    {
-      Lazy.DebugLog($"Creating new ModConfig instance for {modName}");
-      ModConfig modConfig     = new ModConfig();
-      modConfig._modName      = modName;
-      modConfig._configFile   = Path.Combine(SaveManager.SavePath, $"{modName}.{ModConfigMenu._GUNFIG_EXTENSION}");
-      modConfig.LoadFromDisk();
-      _ActiveConfigs[modName] = modConfig;
-    }
-    return _ActiveConfigs[modName];
-  }
 
   internal static void SaveActiveConfigsToDisk()
   {
@@ -184,15 +124,5 @@ public class ModConfig
     this._options[key] = value;
     this._dirty = true;
     return value;
-  }
-
-  public string Get(string key)
-  {
-    return this._options.ContainsKey(key) ? this._options[key] : null;
-  }
-
-  public bool? GetBool(string key)
-  {
-    return this._options.ContainsKey(key) ? (this._options[key] == "1") : null;
   }
 }

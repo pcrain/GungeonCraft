@@ -1,20 +1,6 @@
 namespace CwaffingTheGungy;
 
-/* Major API stuff to be done, from highest to lowest priority
-    - create actual API surface
-    - clean up code
-
-   Nitpicks I really don't care to fix at all, but should be aware of:
-    - can't colorize anything except labels
-    - can't back out of one level of menus at a time (vanilla behavior; maybe hook CloseAndMaybeApplyChangesWithPrompt)
-    - double select sound when entering a mod menu
-    - can't dynamically enable / disable options
-    - haven't implemented progress / fill bars
-    - can't have first item of submenu be a label or it doesn't get focused correctly
-    - using magic numbers in a few places to fix panel offsets
-*/
-
-public static class ModConfigMenu
+internal static class ModConfigMenu
 {
     internal const string _GUNFIG_EXTENSION        = "gunfig";
 
@@ -31,7 +17,7 @@ public static class ModConfigMenu
     internal class CustomButtonHandler : MonoBehaviour
       { public Action<dfControl> onClicked; }
 
-    public static void InitHooksIfNecessary()
+    internal static void InitHooksIfNecessary()
     {
       if (_DidInitHooks)
         return;
@@ -193,132 +179,58 @@ public static class ModConfigMenu
       PlayMenuCursorSound(control);
     }
 
-    internal static dfPanel GetPrototypeCheckboxWrapperPanel()
-    {
-      return GameUIRoot.Instance.PauseMenuPanel.GetComponent<PauseMenuController>().OptionsMenu.TabVideo.Find<dfPanel>("V-SyncCheckBoxPanel");
-    }
+    private static dfPanel GetPrototypeCheckboxWrapperPanel() =>
+      GameUIRoot.Instance.PauseMenuPanel.GetComponent<PauseMenuController>().OptionsMenu.TabVideo.Find<dfPanel>("V-SyncCheckBoxPanel");
+    private static dfPanel GetPrototypeCheckboxInnerPanel() =>
+      GetPrototypeCheckboxWrapperPanel().Find<dfPanel>("Panel");
+    private static dfCheckbox GetPrototypeCheckbox() =>
+      GetPrototypeCheckboxInnerPanel().Find<dfCheckbox>("Checkbox");
+    private static dfSprite GetPrototypeEmptyCheckboxSprite() =>
+      GetPrototypeCheckbox().Find<dfSprite>("EmptyCheckbox");
+    private static dfSprite GetPrototypeCheckedCheckboxSprite() =>
+      GetPrototypeCheckbox().Find<dfSprite>("CheckedCheckbox");
+    private static dfLabel GetPrototypeCheckboxLabel() =>
+      GetPrototypeCheckboxInnerPanel().Find<dfLabel>("CheckboxLabel");
+    private static dfPanel GetPrototypeLeftRightWrapperPanel() =>
+      GameUIRoot.Instance.PauseMenuPanel.GetComponent<PauseMenuController>().OptionsMenu.TabVideo.Find<dfPanel>("VisualPresetArrowSelectorPanel");
+    private static dfPanel GetPrototypeLeftRightInnerPanel() =>
+      GetPrototypeLeftRightWrapperPanel().Find<dfPanel>("PanelEnsmallenerThatmakesDavesLifeHardandBrentsLifeEasy");
+    private static dfLabel GetPrototypeLeftRightPanelLabel() =>
+      GetPrototypeLeftRightInnerPanel().Find<dfLabel>("OptionsArrowSelectorLabel");
+    private static dfSprite GetPrototypeLeftRightPanelLeftSprite() =>
+      GetPrototypeLeftRightInnerPanel().Find<dfSprite>("OptionsArrowSelectorArrowLeft");
+    private static dfSprite GetPrototypeLeftRightPanelRightSprite() =>
+      GetPrototypeLeftRightInnerPanel().Find<dfSprite>("OptionsArrowSelectorArrowRight");
+    private static dfLabel GetPrototypeLeftRightPanelSelection() =>
+      GetPrototypeLeftRightInnerPanel().Find<dfLabel>("OptionsArrowSelectorSelection");
+    private static dfPanel GetPrototypeInfoWrapperPanel() =>
+      GameUIRoot.Instance.PauseMenuPanel.GetComponent<PauseMenuController>().OptionsMenu.TabVideo.Find<dfPanel>("ResolutionArrowSelectorPanelWithInfoBox");
+    private static dfPanel GetPrototypeInfoInnerPanel() =>
+      GetPrototypeInfoWrapperPanel().Find<dfPanel>("PanelEnsmallenerThatmakesDavesLifeHardandBrentsLifeEasy");
+    private static dfLabel GetPrototypeInfoPanelLabel() =>
+      GetPrototypeInfoInnerPanel().Find<dfLabel>("OptionsArrowSelectorLabel");
+    private static dfSprite GetPrototypeInfoPanelLeftSprite() =>
+      GetPrototypeInfoInnerPanel().Find<dfSprite>("OptionsArrowSelectorArrowLeft");
+    private static dfSprite GetPrototypeInfoPanelRightSprite() =>
+      GetPrototypeInfoInnerPanel().Find<dfSprite>("OptionsArrowSelectorArrowRight");
+    private static dfLabel GetPrototypeInfoPanelSelection() =>
+      GetPrototypeInfoInnerPanel().Find<dfLabel>("OptionsArrowSelectorSelection");
+    private static dfLabel GetPrototypeInfoInfoPanel() =>
+      GetPrototypeInfoWrapperPanel().Find<dfLabel>("OptionsArrowSelectorInfoLabel");
+    private static dfPanel GetPrototypeButtonWrapperPanel() =>
+      GameUIRoot.Instance.PauseMenuPanel.GetComponent<PauseMenuController>().OptionsMenu.TabControls.Find<dfPanel>("EditKeyboardBindingsButtonPanel");
+    private static dfPanel GetPrototypeButtonInnerPanel() =>
+      GetPrototypeButtonWrapperPanel().Find<dfPanel>("PanelEnsmallenerThatmakesDavesLifeHardandBrentsLifeEasy");
+    private static dfButton GetPrototypeButton() =>
+      GetPrototypeButtonInnerPanel().Find<dfButton>("EditKeyboardBindingsButton");
+    private static dfPanel GetPrototypeLabelWrapperPanel() =>
+      GameUIRoot.Instance.PauseMenuPanel.GetComponent<PauseMenuController>().OptionsMenu.TabControls.Find<dfPanel>("PlayerOneLabelPanel");
+    private static dfPanel GetPrototypeLabelInnerPanel() =>
+      GetPrototypeLabelWrapperPanel().Find<dfPanel>("PanelEnsmallenerThatmakesDavesLifeHardandBrentsLifeEasy");
+    private static dfLabel GetPrototypeLabel() =>
+      GetPrototypeLabelInnerPanel().Find<dfLabel>("Label");
 
-    internal static dfPanel GetPrototypeCheckboxInnerPanel()
-    {
-      return GetPrototypeCheckboxWrapperPanel().Find<dfPanel>("Panel");
-    }
-
-    internal static dfCheckbox GetPrototypeCheckbox()
-    {
-      return GetPrototypeCheckboxInnerPanel().Find<dfCheckbox>("Checkbox");
-    }
-
-    internal static dfSprite GetPrototypeEmptyCheckboxSprite()
-    {
-      return GetPrototypeCheckbox().Find<dfSprite>("EmptyCheckbox");
-    }
-
-    internal static dfSprite GetPrototypeCheckedCheckboxSprite()
-    {
-      return GetPrototypeCheckbox().Find<dfSprite>("CheckedCheckbox");
-    }
-
-    internal static dfLabel GetPrototypeCheckboxLabel()
-    {
-      return GetPrototypeCheckboxInnerPanel().Find<dfLabel>("CheckboxLabel");
-    }
-
-    internal static dfPanel GetPrototypeLeftRightWrapperPanel()
-    {
-      return GameUIRoot.Instance.PauseMenuPanel.GetComponent<PauseMenuController>().OptionsMenu.TabVideo.Find<dfPanel>("VisualPresetArrowSelectorPanel");
-    }
-
-    internal static dfPanel GetPrototypeLeftRightInnerPanel()
-    {
-      return GetPrototypeLeftRightWrapperPanel().Find<dfPanel>("PanelEnsmallenerThatmakesDavesLifeHardandBrentsLifeEasy");
-    }
-
-    internal static dfLabel GetPrototypeLeftRightPanelLabel()
-    {
-      return GetPrototypeLeftRightInnerPanel().Find<dfLabel>("OptionsArrowSelectorLabel");
-    }
-
-    internal static dfSprite GetPrototypeLeftRightPanelLeftSprite()
-    {
-      return GetPrototypeLeftRightInnerPanel().Find<dfSprite>("OptionsArrowSelectorArrowLeft");
-    }
-
-    internal static dfSprite GetPrototypeLeftRightPanelRightSprite()
-    {
-      return GetPrototypeLeftRightInnerPanel().Find<dfSprite>("OptionsArrowSelectorArrowRight");
-    }
-
-    internal static dfLabel GetPrototypeLeftRightPanelSelection()
-    {
-      return GetPrototypeLeftRightInnerPanel().Find<dfLabel>("OptionsArrowSelectorSelection");
-    }
-
-    internal static dfPanel GetPrototypeInfoWrapperPanel()
-    {
-      return GameUIRoot.Instance.PauseMenuPanel.GetComponent<PauseMenuController>().OptionsMenu.TabVideo.Find<dfPanel>("ResolutionArrowSelectorPanelWithInfoBox");
-    }
-
-    internal static dfPanel GetPrototypeInfoInnerPanel()
-    {
-      return GetPrototypeInfoWrapperPanel().Find<dfPanel>("PanelEnsmallenerThatmakesDavesLifeHardandBrentsLifeEasy");
-    }
-
-    internal static dfLabel GetPrototypeInfoPanelLabel()
-    {
-      return GetPrototypeInfoInnerPanel().Find<dfLabel>("OptionsArrowSelectorLabel");
-    }
-
-    internal static dfSprite GetPrototypeInfoPanelLeftSprite()
-    {
-      return GetPrototypeInfoInnerPanel().Find<dfSprite>("OptionsArrowSelectorArrowLeft");
-    }
-
-    internal static dfSprite GetPrototypeInfoPanelRightSprite()
-    {
-      return GetPrototypeInfoInnerPanel().Find<dfSprite>("OptionsArrowSelectorArrowRight");
-    }
-
-    internal static dfLabel GetPrototypeInfoPanelSelection()
-    {
-      return GetPrototypeInfoInnerPanel().Find<dfLabel>("OptionsArrowSelectorSelection");
-    }
-
-    internal static dfLabel GetPrototypeInfoInfoPanel()
-    {
-      return GetPrototypeInfoWrapperPanel().Find<dfLabel>("OptionsArrowSelectorInfoLabel");
-    }
-
-    internal static dfPanel GetPrototypeButtonWrapperPanel()
-    {
-      return GameUIRoot.Instance.PauseMenuPanel.GetComponent<PauseMenuController>().OptionsMenu.TabControls.Find<dfPanel>("EditKeyboardBindingsButtonPanel");
-    }
-
-    internal static dfPanel GetPrototypeButtonInnerPanel()
-    {
-      return GetPrototypeButtonWrapperPanel().Find<dfPanel>("PanelEnsmallenerThatmakesDavesLifeHardandBrentsLifeEasy");
-    }
-
-    internal static dfButton GetPrototypeButton()
-    {
-      return GetPrototypeButtonInnerPanel().Find<dfButton>("EditKeyboardBindingsButton");
-    }
-
-    internal static dfPanel GetPrototypeLabelWrapperPanel()
-    {
-      return GameUIRoot.Instance.PauseMenuPanel.GetComponent<PauseMenuController>().OptionsMenu.TabControls.Find<dfPanel>("PlayerOneLabelPanel");
-    }
-
-    internal static dfPanel GetPrototypeLabelInnerPanel()
-    {
-      return GetPrototypeLabelWrapperPanel().Find<dfPanel>("PanelEnsmallenerThatmakesDavesLifeHardandBrentsLifeEasy");
-    }
-
-    internal static dfLabel GetPrototypeLabel()
-    {
-      return GetPrototypeLabelInnerPanel().Find<dfLabel>("Label");
-    }
-
-    internal static void PrintControlRecursive(dfControl control, string indent = "->", bool dissect = false)
+    private static void PrintControlRecursive(dfControl control, string indent = "->", bool dissect = false)
     {
         System.Console.WriteLine($"  {indent} control with name={control.name}, type={control.GetType()}, position={control.Position}, relposition={control.RelativePosition}, size={control.Size}, anchor={control.Anchor}, pivot={control.Pivot}");
         if (dissect)
@@ -327,7 +239,7 @@ public static class ModConfigMenu
             PrintControlRecursive(child, "--"+indent);
     }
 
-    internal static void CopyAttributes<T>(this T self, T other) where T : dfControl
+    private static void CopyAttributes<T>(this T self, T other) where T : dfControl
     {
       if (self is dfButton button && other is dfButton otherButton)
       {
@@ -434,7 +346,7 @@ public static class ModConfigMenu
       self.isControlClipped  = other.isControlClipped;
     }
 
-    internal static void CreateModConfigButton(this PreOptionsMenuController preOptions, dfScrollPanel newOptionsPanel)
+    private static void CreateModConfigButton(this PreOptionsMenuController preOptions, dfScrollPanel newOptionsPanel)
     {
         dfPanel panel        = preOptions.m_panel;
         dfButton prevButton  = panel.Find<dfButton>("AudioTab (1)");
@@ -485,7 +397,7 @@ public static class ModConfigMenu
         panel.PerformLayout();
     }
 
-    public static dfScrollPanel NewOptionsPanel(string name)
+    internal static dfScrollPanel NewOptionsPanel(string name)
     {
       // Get a reference options panel
       dfScrollPanel refPanel = GameUIRoot.Instance.PauseMenuPanel.GetComponent<PauseMenuController>().OptionsMenu.TabVideo;
@@ -556,7 +468,7 @@ public static class ModConfigMenu
     }
 
     // based on V-SyncCheckBoxPanel
-    public static dfPanel AddCheckBox(this dfScrollPanel panel, string label, PropertyChangedEventHandler<bool> onchange = null)
+    internal static dfPanel AddCheckBox(this dfScrollPanel panel, string label, PropertyChangedEventHandler<bool> onchange = null)
     {
       dfPanel newCheckboxWrapperPanel = panel.AddControl<dfPanel>();
       newCheckboxWrapperPanel.CopyAttributes(GetPrototypeCheckboxWrapperPanel());
@@ -598,7 +510,7 @@ public static class ModConfigMenu
     }
 
     // based on VisualPresetArrowSelectorPanel (without info) and ResolutionArrowSelectorPanelWithInfoBox (with info)
-    public static dfPanel AddArrowBox(this dfScrollPanel panel, string label, List<string> options, List<string> info = null, PropertyChangedEventHandler<string> onchange = null, bool compact = true)
+    internal static dfPanel AddArrowBox(this dfScrollPanel panel, string label, List<string> options, List<string> info = null, PropertyChangedEventHandler<string> onchange = null, bool compact = true)
     {
       bool hasInfo = (info != null && info.Count > 0 && info.Count == options.Count);
 
@@ -665,7 +577,7 @@ public static class ModConfigMenu
     }
 
     // based on EditKeyboardBindingsButtonPanel
-    public static dfPanel AddButton(this dfScrollPanel panel, string label, Action<dfControl> onclick = null)
+    internal static dfPanel AddButton(this dfScrollPanel panel, string label, Action<dfControl> onclick = null)
     {
       dfPanel newButtonWrapperPanel = panel.AddControl<dfPanel>();
       newButtonWrapperPanel.CopyAttributes(GetPrototypeButtonWrapperPanel());
@@ -694,7 +606,7 @@ public static class ModConfigMenu
     }
 
     // based on PlayerOneLabelPanel
-    public static dfPanel AddLabel(this dfScrollPanel panel, string label, Color? color = null, bool compact = true)
+    internal static dfPanel AddLabel(this dfScrollPanel panel, string label, Color? color = null, bool compact = true)
     {
       dfPanel newLabelWrapperPanel = panel.AddControl<dfPanel>();
       newLabelWrapperPanel.CopyAttributes(GetPrototypeLabelWrapperPanel());
@@ -721,7 +633,7 @@ public static class ModConfigMenu
       return newLabelWrapperPanel;
     }
 
-    public static void RegisterBraveMenuItem(this dfScrollPanel panel, dfControl item)
+    private static void RegisterBraveMenuItem(this dfScrollPanel panel, dfControl item)
     {
       if (panel.controls == null || panel.controls.Count < 2) // includes this object
         return;
@@ -749,43 +661,19 @@ public static class ModConfigMenu
         child.HighlightChildrenAndFocus(canFocus: false);
     }
 
-    public static void Finalize(this dfScrollPanel panel)
+    internal static void Finalize(this dfScrollPanel panel)
     {
       panel.controls.Last().Height += 16f; // fix a weird clipping issue for arrowboxes at the bottom
       panel.PerformLayout();  // register all changes
     }
 
-    public static void OpenSubMenu(dfScrollPanel panel)
+    private static void OpenSubMenu(dfScrollPanel panel)
     {
       GameUIRoot.Instance.PauseMenuPanel.GetComponent<PauseMenuController>(
         ).OptionsMenu.PreOptionsMenu.ToggleToPanel(panel, true, force: true); // force true so it works even if it's invisible
     }
 
-    private static bool _configBuilt = false;
-    private static void OneTimeBuildConfig(this ModConfig config)
-    {
-      if (_configBuilt)
-        return;
-
-      for (int i = 0; i < 3; ++i)
-      {
-        config.AddToggle("testCheck", "Hello there! :D", (_, newVal) => ETGModConsole.Log($"it worked O: {(newVal == "1" ? "on" : "off")}") );
-        config.AddLabel("A Label *O*");
-        config.AddScrollBox("testScroll", "Look at it Go!", options: new(){"this", "that", "the other"}, info: new(){"good", "bad\nbad\nbad", "ugly"},
-          callback: (_, newVal) => ETGModConsole.Log($"toggled to: {newVal}"));
-        config.AddScrollBox("testScroll", "Line Test!", options: new(){"one", "two"}, info: new(){"one line", "two\nlines"},
-          callback: (_, newVal) => ETGModConsole.Log($"toggled to: {newVal}"));
-        config.AddScrollBox("testScroll", "Another Line Test!", options: new(){"one", "two"}, info: new(){"one line", "still one line"},
-          callback: (_, newVal) => ETGModConsole.Log($"toggled to: {newVal}"));
-        config.AddScrollBox("testScroll", "Last Line Test!", options: new(){"one", "two"},
-          callback: (_, newVal) => ETGModConsole.Log($"toggled to: {newVal}"));
-        config.AddButton("testButton", "Click me!", callback: (key, _) => ETGModConsole.Log($"{key} button clicked!"));
-      }
-
-      _configBuilt = true;
-    }
-
-    public static void RebuildOptionsPanels()
+    private static void RebuildOptionsPanels()
     {
         if (GameUIRoot.Instance.PauseMenuPanel.GetComponent<PauseMenuController>().OptionsMenu.PreOptionsMenu is not PreOptionsMenuController preOptions)
           return;
@@ -794,9 +682,6 @@ public static class ModConfigMenu
 
         // Clear out all registered UI tabs, since we need to build everything fresh
         _RegisteredTabs.Clear();
-
-        // Get and build the GungeonCraft Mod Config
-        ModConfig.GetConfigForMod("GungeonCraft").OneTimeBuildConfig();
 
         // Create the new modded options panel
         dfScrollPanel newOptionsPanel = NewOptionsPanel("modded options");
