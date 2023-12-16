@@ -46,13 +46,6 @@ internal class ModConfigOption : MonoBehaviour
     orig(menu);
   }
 
-  // private static void OnAwake(Action<BraveOptionsMenuItem> orig, BraveOptionsMenuItem menuItem)
-  // {
-  //   orig(menuItem);
-  //   if (menuItem.GetComponent<ModConfigOption>() is ModConfigOption option)
-  //     option.UpdateColors(menuItem, dim: true);
-  // }
-
   private static void OnGotFocus(Action<BraveOptionsMenuItem, dfControl, dfFocusEventArgs> orig, BraveOptionsMenuItem menuItem, dfControl control, dfFocusEventArgs args)
   {
     orig(menuItem, control, args);
@@ -60,9 +53,9 @@ internal class ModConfigOption : MonoBehaviour
       option.UpdateColors(menuItem, dim: false);
   }
 
-  private static void OnLostFocus(Action<BraveOptionsMenuItem, dfControl, dfFocusEventArgs> orig, BraveOptionsMenuItem menuItem, dfControl control, dfFocusEventArgs args)
+  private static void OnSetUnselectedColors(Action<BraveOptionsMenuItem> orig, BraveOptionsMenuItem menuItem)
   {
-    orig(menuItem, control, args);
+    orig(menuItem);
     if (menuItem.GetComponent<ModConfigOption>() is ModConfigOption option)
       option.UpdateColors(menuItem, dim: true);
   }

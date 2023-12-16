@@ -6,7 +6,7 @@ public static class CwaffConfig
 
   public static void Init()
   {
-    Gunfig = ModConfig.GetConfigForMod("GungeonCraft");
+    Gunfig = ModConfig.GetConfigForMod("GungeonCraft".WithColor(C.MOD_COLOR));
 
     for (int i = 0; i < 3; ++i)
     {

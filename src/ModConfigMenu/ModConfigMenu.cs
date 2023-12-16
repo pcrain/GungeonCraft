@@ -5,6 +5,7 @@ internal static class ModConfigMenu
     internal const string _GUNFIG_EXTENSION        = "gunfig";
 
     private const string _MOD_MENU_LABEL           = "MOD CONFIG";
+    private const string _MOD_MENU_TITLE           = "Modded Options";
     private static bool _DidInitHooks              = false;
     private static List<dfControl> _RegisteredTabs = new();
 
@@ -96,8 +97,8 @@ internal static class ModConfigMenu
 
       // Update custom colors on focus lost
       new Hook(
-          typeof(BraveOptionsMenuItem).GetMethod("LostFocus", BindingFlags.Instance | BindingFlags.Public),
-          typeof(ModConfigOption).GetMethod("OnLostFocus", BindingFlags.Static | BindingFlags.NonPublic)
+          typeof(BraveOptionsMenuItem).GetMethod("SetUnselectedColors", BindingFlags.Instance | BindingFlags.NonPublic),
+          typeof(ModConfigOption).GetMethod("OnSetUnselectedColors", BindingFlags.Static | BindingFlags.NonPublic)
           );
 
       // Update config options when a new run is started TODO: not implemented
@@ -141,7 +142,22 @@ internal static class ModConfigMenu
       }
       orig(controller, targetPanel, doFocus);
       if (isOurPanel)
+      {
         targetPanel.controls.First().RecursiveFocus();  // fix bug where first item isn't highlighted
+        SetOptionsPageTitle(targetPanel.name);
+      }
+      else
+        SetOptionsPageTitle("Options");
+      // if (isOurPanel)
+      // {
+      //   foreach (dfControl control in targetPanel.controls) // find first focusable element and select it
+      //   {
+      //     if (!control.GetComponent<BraveOptionsMenuItem>())
+      //       continue;
+      //     control.RecursiveFocus();  // fix bug where first item isn't highlighted
+      //     break;
+      //   }
+      // }
     }
 
     private static bool CompareSettings(Func<GameOptions, GameOptions, bool> orig, GameOptions clone, GameOptions source)
@@ -471,6 +487,7 @@ internal static class ModConfigMenu
       newPanel.AutoScrollPadding    = new RectOffset(0,0,0,0);
       newPanel.Size                -= new Vector2(0, 50f);  //TODO: figure out why this offset is wrong in the first place
       newPanel.Position            -= new Vector3(0, 50f, 0f);  //TODO: figure out why this offset is wrong in the first place
+
       newPanel.name = name;
       newPanel.Enable();
 
@@ -561,7 +578,6 @@ internal static class ModConfigMenu
           int maxLines = 1;
           foreach (string line in info)
             maxLines = Mathf.Max(maxLines, line.Split('\n').Length);
-          // newArrowboxWrapperPanel.Anchor = dfAnchorStyle.None;
           newArrowboxWrapperPanel.Size -= new Vector2(0, 66f - 22f * maxLines);  // NOTE: don't shrink it too small or scrolling gets very messed up
         }
         else
@@ -638,8 +654,6 @@ internal static class ModConfigMenu
       {
         newLabelWrapperPanel.Size -= new Vector2(0, 56f);
         newLabelInnerPanel.Position += new Vector3(0, 56f, 0);
-        // newLabelInnerPanel.Size -= new Vector2(0, 48f);
-        // newLabel.Size -= new Vector2(0, 48f);
       }
 
       newLabelWrapperPanel.name = $"{label} panel";
@@ -669,6 +683,7 @@ internal static class ModConfigMenu
       control.AutoFocus = true;
       foreach (dfControl child in control.controls)
         child.RecursiveFocus(isRoot: false);
+      // control.focusOnNextFrame();
     }
 
     internal static void Finalize(this dfScrollPanel panel)
@@ -693,6 +708,16 @@ internal static class ModConfigMenu
         ).OptionsMenu.PreOptionsMenu.ToggleToPanel(panel, true, force: true); // force true so it works even if it's invisible
     }
 
+    private static void SetOptionsPageTitle(string title)
+    {
+      if (GameUIRoot.Instance.PauseMenuPanel.GetComponent<PauseMenuController>().OptionsMenu is not FullOptionsMenuController optionsMenu)
+        return;
+      Color color;
+      dfLabel titleControl = optionsMenu.m_panel.Find<dfLabel>("Title");
+      titleControl.Text = title.ProcessColors(out color);
+      titleControl.Color = color;
+    }
+
     private static void RebuildOptionsPanels()
     {
         if (GameUIRoot.Instance.PauseMenuPanel.GetComponent<PauseMenuController>().OptionsMenu.PreOptionsMenu is not PreOptionsMenuController preOptions)
@@ -704,17 +729,16 @@ internal static class ModConfigMenu
         _RegisteredTabs.Clear();
 
         // Create the new modded options panel
-        dfScrollPanel newOptionsPanel = NewOptionsPanel("modded options");
+        dfScrollPanel newOptionsPanel = NewOptionsPanel(_MOD_MENU_TITLE);
 
         // Add submenus for each active mod
         foreach (string modName in ModConfig._ActiveConfigs.Keys)
         {
           ModConfig modConfig = ModConfig._ActiveConfigs[modName];
           dfScrollPanel modConfigPage = modConfig.RegenConfigPage();
-          newOptionsPanel.AddButton(label: modName, onclick: (control) => {
-            // Lazy.DebugLog($"entered {modName} options menu");
-            OpenSubMenu(modConfigPage);
-          });
+          newOptionsPanel.AddButton(label: modName).gameObject.AddComponent<ModConfigOption>().Setup(
+            parentConfig: modConfig, key: $"{modName} subpage button", values: new(){"1"},
+            updateType: ModConfigUpdate.Immediate, update: (_, _) => OpenSubMenu(modConfigPage));
         }
 
         // Finalize the options panel
@@ -724,7 +748,7 @@ internal static class ModConfigMenu
         preOptions.CreateModConfigButton(newOptionsPanel);
 
         // Dissect.DumpFieldsAndProperties<dfScrollPanel>(newOptionsPanel);
-        // PrintControlRecursive(newOptionsPanel);
+        // PrintControlRecursive(GameUIRoot.Instance.PauseMenuPanel.GetComponent<PauseMenuController>().OptionsMenu.m_panel);
         panelBuildWatch.Stop(); System.Console.WriteLine($"    panel built in {panelBuildWatch.ElapsedMilliseconds} milliseconds");
     }
 }

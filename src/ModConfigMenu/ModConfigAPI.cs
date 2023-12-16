@@ -2,13 +2,12 @@ namespace CwaffingTheGungy;
 
 /*
    QoL improvements to make, from most to least important:
-    - OnNextRun updater not implemented
-    - can't colorize anything except labels
     - can't back out of one level of menus at a time (vanilla behavior; maybe hook CloseAndMaybeApplyChangesWithPrompt)
     - occasional double select sound when entering a mod menu
+    - OnNextRun updater not implemented
     - can't dynamically enable / disable options
     - haven't implemented progress / fill bars
-    - can't have first item of submenu be a label or it doesn't get focused correctly
+    - can't have first item of submenu be a label or it doesn't get focused correctly (vanilla ToggleToPanel() function assumed first control is selectable)
     - using magic numbers in a few places to fix panel offsets
 */
 

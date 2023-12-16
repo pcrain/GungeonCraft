@@ -8,6 +8,8 @@ public class C // constants
     public const string MOD_INT_NAME    = "CwaffingTheGungy";
     public const string MOD_VERSION     = "1.5.0";
 
+    public static readonly Color MOD_COLOR = new Color(0.67f, 1.00f, 0.67f);
+
     public const string MOD_PREFIX      = "cg";
     public const float  PIXELS_PER_TILE = 16f;
     public const float  PIXELS_PER_CELL = 64f;
