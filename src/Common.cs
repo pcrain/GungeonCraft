@@ -4,9 +4,10 @@ public class C // constants
 {
     public static readonly bool DEBUG_BUILD  = true; // set to false for release builds (must be readonly instead of const to avoid build warnings)
 
-    public const string MOD_NAME        = "GungeonCraft";
-    public const string MOD_INT_NAME    = "CwaffingTheGungy";
-    public const string MOD_VERSION     = "1.5.0";
+    public const string MOD_NAME     = "GungeonCraft";
+    public const string MOD_INT_NAME = "CwaffingTheGungy";
+    public const string MOD_VERSION  = "1.5.0";
+    public const string MOD_GUID     = "pretzel.etg.cwaff";
 
     public static readonly Color MOD_COLOR = new Color(0.67f, 1.00f, 0.67f);
 

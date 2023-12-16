@@ -1,5 +1,7 @@
 namespace CwaffingTheGungy;
 
+using Gunfiguration;
+
 public static class CwaffConfig
 {
   public static ModConfig Gunfig = null;
@@ -23,5 +25,4 @@ public static class CwaffConfig
       Gunfig.AddButton(key: "testButton", label: "Click me!", callback: (key, _) => ETGModConsole.Log($"{key} button clicked!"));
     }
   }
-
 }

@@ -272,10 +272,11 @@ if [ $rebuild -eq 1 ]; then
   #Actually rebuild the project
   echo -e "[${GRN}>${BLN}] Building project"
   dotnet build --no-restore -m -noLogo -warnAsMessage:"${nowarn}" -v:minimal -clp:"Summary"
-  killall dotnet # fixes a dumb bug where the child process doesn't terminate...thanks microsoft D:
+  error="$?"
+  killall dotnet >/dev/null 2>&1 # fixes a dumb bug where the child process doesn't terminate...thanks microsoft D:
   # dotnet build -m -noLogo -warnAsMessage:"${nowarn}" -v:minimal -clp:"Summary;Verbosity=minimal"
   # msbuild -m -noLogo -warnAsMessage:"${nowarn}" -v:minimal -clp:"Summary;Verbosity=minimal"
-  if [ $? -gt 0 ]; then
+  if [ $error -gt 0 ]; then
     echo -e "[${RED}@${BLN}] Build failed! D: Check errors above"
     exit
   else

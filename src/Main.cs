@@ -43,19 +43,20 @@ global using Component         = UnityEngine.Component;
 global using ShopAPI           = Alexandria.NPCAPI.ShopAPI;
 global using RoomFactory       = Alexandria.DungeonAPI.RoomFactory;
 
+// global using Gunfiguration;
+
 global using static ProjectileModule; //ShootStyle, ProjectileSequenceStyle
 global using static tk2dBaseSprite;   //Anchor
 global using static PickupObject;     //ItemQuality
 
 namespace CwaffingTheGungy;
 
-[BepInPlugin(GUID, "Cwaffing the Gungy", C.MOD_VERSION)]
+[BepInPlugin(C.MOD_GUID, "Cwaffing the Gungy", C.MOD_VERSION)]
 [BepInDependency(ETGModMainBehaviour.GUID)]
-[BepInDependency("etgmodding.etg.mtgapi")]
 [BepInDependency("alexandria.etgmod.alexandria")]
+[BepInDependency(Gunfiguration.C.MOD_GUID)]
 public class Initialisation : BaseUnityPlugin
 {
-    public const string GUID = "pretzel.etg.cwaff";
     public static Initialisation Instance;
 
     public void Awake()
@@ -434,8 +435,6 @@ public class Initialisation : BaseUnityPlugin
             }
 
             // GameManager.Instance.OnNewLevelFullyLoaded += MenuMaster.RebuildOptionsPanels;
-            ModConfigMenu.InitHooksIfNecessary();
-            QoLConfig.Init();
             CwaffConfig.Init();
 
             // Debug.LogError("Gungy o.o!");
