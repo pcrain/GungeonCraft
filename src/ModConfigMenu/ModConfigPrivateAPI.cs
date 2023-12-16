@@ -29,7 +29,7 @@ public partial class ModConfig
 
   private static readonly List<string> _UncheckedBoxValues     = new(){"0", "1"};
   private static readonly List<string> _CheckedBoxValues       = new(){"1", "0"};
-  private static readonly List<string> _ButtonValues           = new(){"1"};
+  private static readonly List<string> _DefaultValues          = new(){"1"};
 
   private bool _dirty = false; // whether we've been changed since last saving to disk
   private string _configFile = null; // the file on disk to which we're writing
@@ -96,24 +96,26 @@ public partial class ModConfig
     dfScrollPanel subOptionsPanel = ModConfigMenu.NewOptionsPanel($"{this._modName}");
     foreach (Item item in this._registeredOptions)
     {
+      dfControl itemControl;
       switch (item._itemType)
       {
+        default:
         case ItemType.Label:
-          subOptionsPanel.AddLabel(label: item._label, color: Color.green);
+          itemControl = subOptionsPanel.AddLabel(label: item._label);
           break;
         case ItemType.Button:
-          subOptionsPanel.AddButton(label: item._label).gameObject.AddComponent<ModConfigOption>()
-            .Setup(parentConfig: this, key: item._key, values: item._values, update: item._callback, updateType: item._updateType);
+          itemControl = subOptionsPanel.AddButton(label: item._label);
           break;
         case ItemType.CheckBox:
-          subOptionsPanel.AddCheckBox(label: item._label).gameObject.AddComponent<ModConfigOption>()
-            .Setup(parentConfig: this, key: item._key, values: item._values, update: item._callback, updateType: item._updateType);
+          itemControl = subOptionsPanel.AddCheckBox(label: item._label);
           break;
         case ItemType.ArrowBox:
-          subOptionsPanel.AddArrowBox(label: item._label, options: item._values, info: item._info).gameObject.AddComponent<ModConfigOption>()
-            .Setup(parentConfig: this, key: item._key, values: item._values, update: item._callback, updateType: item._updateType);
+          itemControl = subOptionsPanel.AddArrowBox(label: item._label, options: item._values, info: item._info);
           break;
       }
+      if (item._itemType != ItemType.Label) // pure labels don't need a ModConfigOption and handle markup processing on site
+        itemControl.gameObject.AddComponent<ModConfigOption>().Setup(
+          parentConfig: this, key: item._key, values: item._values, update: item._callback, updateType: item._updateType);
     }
     subOptionsPanel.Finalize();
     return subOptionsPanel;

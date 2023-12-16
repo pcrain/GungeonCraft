@@ -52,12 +52,6 @@ internal static class ModConfigMenu
           typeof(ModConfigMenu).GetMethod("CompareSettings", BindingFlags.Static | BindingFlags.NonPublic)
           );
 
-      // Custom infobox updates
-      new Hook(
-          typeof(BraveOptionsMenuItem).GetMethod("UpdateInfoControl", BindingFlags.Instance | BindingFlags.NonPublic),
-          typeof(ModConfigMenu).GetMethod("UpdateInfoControl", BindingFlags.Static | BindingFlags.NonPublic)
-          );
-
       // Custom checkbox events
       new Hook(
           typeof(BraveOptionsMenuItem).GetMethod("HandleCheckboxValueChanged", BindingFlags.Instance | BindingFlags.NonPublic),
@@ -86,6 +80,24 @@ internal static class ModConfigMenu
       new Hook(
           typeof(FullOptionsMenuController).GetMethod("CloseAndApplyChanges", BindingFlags.Instance | BindingFlags.NonPublic),
           typeof(ModConfigOption).GetMethod("OnMenuConfirm", BindingFlags.Static | BindingFlags.NonPublic)
+          );
+
+      // Update custom colors when loaded in
+      // new Hook(
+      //     typeof(BraveOptionsMenuItem).GetMethod("Awake", BindingFlags.Instance | BindingFlags.Public),
+      //     typeof(ModConfigOption).GetMethod("OnAwake", BindingFlags.Static | BindingFlags.NonPublic)
+      //     );
+
+      // Update custom colors on focus gained
+      new Hook(
+          typeof(BraveOptionsMenuItem).GetMethod("DoFocus", BindingFlags.Instance | BindingFlags.NonPublic),
+          typeof(ModConfigOption).GetMethod("OnGotFocus", BindingFlags.Static | BindingFlags.NonPublic)
+          );
+
+      // Update custom colors on focus lost
+      new Hook(
+          typeof(BraveOptionsMenuItem).GetMethod("LostFocus", BindingFlags.Instance | BindingFlags.Public),
+          typeof(ModConfigOption).GetMethod("OnLostFocus", BindingFlags.Static | BindingFlags.NonPublic)
           );
 
       // Update config options when a new run is started TODO: not implemented
@@ -129,7 +141,7 @@ internal static class ModConfigMenu
       }
       orig(controller, targetPanel, doFocus);
       if (isOurPanel)
-        targetPanel.controls.First().HighlightChildrenAndFocus();  // fix bug where first item isn't highlighted
+        targetPanel.controls.First().RecursiveFocus();  // fix bug where first item isn't highlighted
     }
 
     private static bool CompareSettings(Func<GameOptions, GameOptions, bool> orig, GameOptions clone, GameOptions source)
@@ -137,18 +149,6 @@ internal static class ModConfigMenu
       if (ModConfigOption.HasPendingChanges())
         return false; // we have pending updates, so prompt to discard
       return orig(clone, source);
-    }
-
-    private static void UpdateInfoControl(Action<BraveOptionsMenuItem> orig, BraveOptionsMenuItem item)
-    {
-      orig(item);
-      if (item.itemType != BraveOptionsMenuItem.BraveOptionsMenuItemType.LeftRightArrowInfo)
-        return;
-      if (item.optionType != BraveOptionsMenuItem.BraveOptionsOptionType.NONE)
-        return;
-
-      item.infoControl.Color = Color.cyan; // TODO: dynamic color
-      item.infoControl.Text = item.infoOptions[item.m_selectedIndex];
     }
 
     private static void HandleCheckboxValueChanged(Action<BraveOptionsMenuItem> orig, BraveOptionsMenuItem item)
@@ -619,7 +619,7 @@ internal static class ModConfigMenu
     }
 
     // based on PlayerOneLabelPanel
-    internal static dfPanel AddLabel(this dfScrollPanel panel, string label, Color? color = null, bool compact = true)
+    internal static dfPanel AddLabel(this dfScrollPanel panel, string label, bool compact = true)
     {
       dfPanel newLabelWrapperPanel = panel.AddControl<dfPanel>();
       newLabelWrapperPanel.CopyAttributes(GetPrototypeLabelWrapperPanel());
@@ -630,8 +630,9 @@ internal static class ModConfigMenu
       dfLabel newLabel = newLabelInnerPanel.AddControl<dfLabel>();
       newLabel.CopyAttributes(GetPrototypeLabel());
 
-      newLabel.Text = label;
-      newLabel.Color = color ?? Color.white;
+      Color color;
+      newLabel.Text = label.ProcessColors(out color);
+      newLabel.Color = color;
 
       if (compact)
       {
@@ -662,21 +663,27 @@ internal static class ModConfigMenu
       }
     }
 
-    private static void HighlightChildrenAndFocus(this dfControl root, bool canFocus = true)
+    private static void RecursiveFocus(this dfControl control, bool isRoot = true)
     {
-      root.Color = Color.white;
-      if (root is dfButton button)
-        button.TextColor = Color.white;
-
-      root.canFocus  = canFocus;
-      root.AutoFocus = true;
-      foreach (dfControl child in root.controls)
-        child.HighlightChildrenAndFocus(canFocus: false);
+      control.canFocus  = isRoot;
+      control.AutoFocus = true;
+      foreach (dfControl child in control.controls)
+        child.RecursiveFocus(isRoot: false);
     }
 
     internal static void Finalize(this dfScrollPanel panel)
     {
       panel.controls.Last().Height += 16f; // fix a weird clipping issue for arrowboxes at the bottom
+      foreach (dfControl child in panel.controls)
+      {
+        if (child.GetComponent<BraveOptionsMenuItem>() is not BraveOptionsMenuItem menuItem)
+          continue;
+        if (child.GetComponent<ModConfigOption>() is not ModConfigOption option)
+          continue;
+        // ETGModConsole.Log($"updating colors for {child.name}");
+        option.UpdateColors(menuItem, true); // make sure our colors our properly set on first load
+        child.PerformLayout();
+      }
       panel.PerformLayout();  // register all changes
     }
 

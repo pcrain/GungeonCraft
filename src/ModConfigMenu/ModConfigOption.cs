@@ -14,6 +14,9 @@ internal class ModConfigOption : MonoBehaviour
   private Action<string, string> _onApplyChanges = null;                      // event handler for execution
   private dfControl _control                     = null;                      // the dfControl to which we're attached
   private ModConfig _parent                      = null;                      // the ModConfig instance that's handling us
+  private Color _labelColor                      = Color.white;
+  private List<Color> _optionColors              = new();
+  private List<Color> _infoColors                = new();
 
   private static void OnMenuCancel(Action<FullOptionsMenuController> orig, FullOptionsMenuController menu) // hooked to call when menu choices are cancelled
   {
@@ -41,6 +44,39 @@ internal class ModConfigOption : MonoBehaviour
     ModConfig.SaveActiveConfigsToDisk();  // save all committed changes
     _PendingUpdatesOnConfirm.Clear();
     orig(menu);
+  }
+
+  // private static void OnAwake(Action<BraveOptionsMenuItem> orig, BraveOptionsMenuItem menuItem)
+  // {
+  //   orig(menuItem);
+  //   if (menuItem.GetComponent<ModConfigOption>() is ModConfigOption option)
+  //     option.UpdateColors(menuItem, dim: true);
+  // }
+
+  private static void OnGotFocus(Action<BraveOptionsMenuItem, dfControl, dfFocusEventArgs> orig, BraveOptionsMenuItem menuItem, dfControl control, dfFocusEventArgs args)
+  {
+    orig(menuItem, control, args);
+    if (menuItem.GetComponent<ModConfigOption>() is ModConfigOption option)
+      option.UpdateColors(menuItem, dim: false);
+  }
+
+  private static void OnLostFocus(Action<BraveOptionsMenuItem, dfControl, dfFocusEventArgs> orig, BraveOptionsMenuItem menuItem, dfControl control, dfFocusEventArgs args)
+  {
+    orig(menuItem, control, args);
+    if (menuItem.GetComponent<ModConfigOption>() is ModConfigOption option)
+      option.UpdateColors(menuItem, dim: true);
+  }
+
+  internal void UpdateColors(BraveOptionsMenuItem menuItem, bool dim)
+  {
+    if (menuItem.labelControl != null)
+      menuItem.labelControl.Color = this._labelColor.Dim(dim);
+    if (menuItem.buttonControl != null)
+      menuItem.buttonControl.TextColor = this._labelColor.Dim(dim);
+    if (menuItem.selectedLabelControl != null)
+      menuItem.selectedLabelControl.Color = this._optionColors[menuItem.m_selectedIndex % this._optionColors.Count].Dim(dim);
+    if (menuItem.infoControl != null)
+      menuItem.infoControl.Color = this._infoColors[menuItem.m_selectedIndex % this._infoColors.Count].Dim(dim);
   }
 
   // private static void OnNextRun()  // hooked to call when a new run is started UNIMPLEMENTED
@@ -98,9 +134,44 @@ internal class ModConfigOption : MonoBehaviour
       CommitPendingChanges();
     else if (!_PendingUpdatesOnConfirm.Contains(this))
       _PendingUpdatesOnConfirm.Add(this);
+    UpdateColors(base.GetComponent<BraveOptionsMenuItem>(), dim: false);  // we can probably safely assume we have focus
   }
 
-  private void ResetMenuItemState()
+  private void ProcessColors()
+  {
+    // Make sure we have a menu item
+    BraveOptionsMenuItem menuItem = base.GetComponent<BraveOptionsMenuItem>();
+    if (!menuItem)
+    {
+      ETGModConsole.Log($"  NULL BRAVE MENU ITEM");
+      return;
+    }
+
+    // Set up color info from individual label texts
+    if (menuItem.labelControl is dfLabel label)
+      label.Text = label.Text.ProcessColors(out this._labelColor);
+    if (menuItem.buttonControl is dfButton button)
+      button.Text = button.Text.ProcessColors(out this._labelColor);
+    if ((menuItem.selectedLabelControl is dfLabel settingLabel) && menuItem.labelOptions != null)
+    {
+      Color c;
+      bool hasInfo = ((menuItem.infoControl != null) && (menuItem.infoOptions != null) && (menuItem.labelOptions.Length == menuItem.infoOptions.Length));
+      for (int i = 0; i < menuItem.labelOptions.Length; ++i)
+      {
+        menuItem.labelOptions[i] = menuItem.labelOptions[i].ProcessColors(out c);
+        this._optionColors.Add(c);
+        if (hasInfo)
+        {
+          menuItem.infoOptions[i] = menuItem.infoOptions[i].ProcessColors(out c);
+          this._infoColors.Add(c);
+        }
+      }
+    }
+
+    this._control.IsVisibleChanged += (_,_) => UpdateColors(menuItem, true);
+  }
+
+  private void ResetMenuItemState(bool addHandlers = false)
   {
     // Make sure we have a menu item
     BraveOptionsMenuItem menuItem = base.GetComponent<BraveOptionsMenuItem>();
@@ -113,7 +184,8 @@ internal class ModConfigOption : MonoBehaviour
     // Set up the state of our menu item from our config
     if (menuItem.buttonControl is dfButton button)
     {
-      this._control.gameObject.AddComponent<ModConfigMenu.CustomButtonHandler>().onClicked += OnButtonClicked;
+      if (addHandlers)
+        this._control.gameObject.AddComponent<ModConfigMenu.CustomButtonHandler>().onClicked += OnButtonClicked;
     }
     if (menuItem.checkboxChecked is dfControl checkBox)
     {
@@ -123,22 +195,27 @@ internal class ModConfigOption : MonoBehaviour
       if (menuItem.checkboxUnchecked is dfControl checkBoxUnchecked)
         checkBoxUnchecked.IsVisible = true;
       menuItem.m_selectedIndex = isChecked ? 1 : 0;
-      this._control.gameObject.AddComponent<ModConfigMenu.CustomCheckboxHandler>().onChanged += OnControlChanged;
+      if (addHandlers)
+        this._control.gameObject.AddComponent<ModConfigMenu.CustomCheckboxHandler>().onChanged += OnControlChanged;
     }
     if ((menuItem.selectedLabelControl is dfLabel settingLabel) && menuItem.labelOptions != null)
     {
+      bool hasInfo = ((menuItem.infoControl != null) && (menuItem.infoOptions != null) && (menuItem.labelOptions.Length == menuItem.infoOptions.Length));
       for (int i = 0; i < menuItem.labelOptions.Length; ++i)
       {
         if (menuItem.labelOptions[i] != this._currentValue)
           continue;
         settingLabel.Text = menuItem.labelOptions[i];
-        if ((menuItem.infoControl is dfLabel infoLabel) && menuItem.infoOptions != null && menuItem.infoOptions.Length < i)
-          infoLabel.Text = menuItem.infoOptions[i];
+        if (hasInfo)
+          menuItem.infoControl.Text = menuItem.infoOptions[i];
         menuItem.m_selectedIndex = i;
         break;
       }
-      this._control.gameObject.AddComponent<ModConfigMenu.CustomLeftRightArrowHandler>().onChanged += OnControlChanged;
+      if (addHandlers)
+        this._control.gameObject.AddComponent<ModConfigMenu.CustomLeftRightArrowHandler>().onChanged += OnControlChanged;
     }
+
+    UpdateColors(menuItem, dim: true);
   }
 
   internal void Setup(ModConfig parentConfig, string key, List<string> values, Action<string, string> update, ModConfigUpdate updateType = ModConfigUpdate.OnConfirm)
@@ -151,12 +228,11 @@ internal class ModConfigOption : MonoBehaviour
     this._updateType     = updateType;
 
     // Load our default and current values from our config, or from the options passed to us
-    this._defaultValue = values[0];
+    this._defaultValue = values[0].ProcessColors(out Color _);
     this._currentValue = this._parent.Get(this._lookupKey) ?? this._parent.Set(this._lookupKey, this._defaultValue);
     this._pendingValue = this._currentValue;
 
-    // ETGModConsole.Log($">>> current value of {this._lookupKey} is {this._currentValue}");
-
-    ResetMenuItemState();
+    ProcessColors();
+    ResetMenuItemState(addHandlers: true);
   }
 }

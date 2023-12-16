@@ -2,7 +2,6 @@ namespace CwaffingTheGungy;
 
 /*
    QoL improvements to make, from most to least important:
-    - show Discard Changes prompt when discarding changes
     - OnNextRun updater not implemented
     - can't colorize anything except labels
     - can't back out of one level of menus at a time (vanilla behavior; maybe hook CloseAndMaybeApplyChangesWithPrompt)
@@ -120,7 +119,7 @@ public partial class ModConfig
       _key        = key,
       _label      = label ?? key,
       _callback   = callback,
-      _values     = _ButtonValues,
+      _values     = _DefaultValues,
     });
   }
 
@@ -135,6 +134,7 @@ public partial class ModConfig
       _updateType = ModConfigUpdate.Immediate,
       _key        = $"{label} label",
       _label      = label,
+      _values     = _DefaultValues,
     });
   }
 
