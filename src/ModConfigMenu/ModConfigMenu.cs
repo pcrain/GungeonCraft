@@ -738,7 +738,7 @@ internal static class ModConfigMenu
           dfScrollPanel modConfigPage = modConfig.RegenConfigPage();
           newOptionsPanel.AddButton(label: modName).gameObject.AddComponent<ModConfigOption>().Setup(
             parentConfig: modConfig, key: $"{modName} subpage button", values: new(){"1"},
-            updateType: ModConfigUpdate.Immediate, update: (_, _) => OpenSubMenu(modConfigPage));
+            updateType: ModConfig.Update.Immediate, update: (_, _) => OpenSubMenu(modConfigPage));
         }
 
         // Finalize the options panel

@@ -9,7 +9,7 @@ internal class ModConfigOption : MonoBehaviour
   private string _defaultValue                   = "";                        // our default value if the key is not found in the configuration file
   private string _currentValue                   = "";                        // our current effective value, barring any pending changes
   private string _pendingValue                   = "";                        // our pending value after changes are applies
-  private ModConfigUpdate _updateType            = ModConfigUpdate.OnConfirm; // when to apply any pending changes
+  private ModConfig.Update _updateType           = ModConfig.Update.OnConfirm; // when to apply any pending changes
   private List<string> _validValues              = new();                     // valid values for the option (auto populated with "true" and "false" for toggles)
   private Action<string, string> _onApplyChanges = null;                      // event handler for execution
   private dfControl _control                     = null;                      // the dfControl to which we're attached
@@ -20,7 +20,6 @@ internal class ModConfigOption : MonoBehaviour
 
   private static void OnMenuCancel(Action<FullOptionsMenuController> orig, FullOptionsMenuController menu) // hooked to call when menu choices are cancelled
   {
-    // ETGModConsole.Log($"menu cancelled, discarding {pendingUpdatesOnConfirm.Count} changes");
     foreach (ModConfigOption option in _PendingUpdatesOnConfirm)
       option.ResetMenuItemState();
     _PendingUpdatesOnConfirm.Clear();
@@ -29,10 +28,9 @@ internal class ModConfigOption : MonoBehaviour
 
   private static void OnMenuConfirm(Action<FullOptionsMenuController> orig, FullOptionsMenuController menu) // hooked to call when menu choices are confirmed
   {
-    // ETGModConsole.Log($"menu confirmed, applying {pendingUpdatesOnConfirm.Count} changes");
     foreach (ModConfigOption option in _PendingUpdatesOnConfirm)
     {
-      if (option._updateType == ModConfigUpdate.OnConfirm)
+      if (option._updateType == ModConfig.Update.OnConfirm)
         option.CommitPendingChanges();
       // else if (option._updateType == Update.OnNextRun)
       // {
@@ -82,7 +80,10 @@ internal class ModConfigOption : MonoBehaviour
 
   public static bool HasPendingChanges()
   {
-    return _PendingUpdatesOnConfirm.Count > 0;
+    foreach (ModConfigOption option in _PendingUpdatesOnConfirm)
+      if (option._pendingValue != option._currentValue)
+        return true;
+    return false;
   }
 
   private void CommitPendingChanges()
@@ -96,7 +97,7 @@ internal class ModConfigOption : MonoBehaviour
 
     this._currentValue = this._pendingValue;  // set our current value to our pending value after applying changes in case we throw an exception and break the config
 
-    if (this._updateType == ModConfigUpdate.Immediate) // register and save immediate changes to disk TODO: maybe be more conservative with this?
+    if (this._updateType == ModConfig.Update.Immediate) // register and save immediate changes to disk TODO: maybe be more conservative with this?
     {
       this._parent.Set(this._lookupKey, this._pendingValue);
       ModConfig.SaveActiveConfigsToDisk();
@@ -123,7 +124,7 @@ internal class ModConfigOption : MonoBehaviour
 
   private void OnControlChanged()
   {
-    if (this._updateType == ModConfigUpdate.Immediate)
+    if (this._updateType == ModConfig.Update.Immediate)
       CommitPendingChanges();
     else if (!_PendingUpdatesOnConfirm.Contains(this))
       _PendingUpdatesOnConfirm.Add(this);
@@ -211,7 +212,7 @@ internal class ModConfigOption : MonoBehaviour
     UpdateColors(menuItem, dim: true);
   }
 
-  internal void Setup(ModConfig parentConfig, string key, List<string> values, Action<string, string> update, ModConfigUpdate updateType = ModConfigUpdate.OnConfirm)
+  internal void Setup(ModConfig parentConfig, string key, List<string> values, Action<string, string> update, ModConfig.Update updateType = ModConfig.Update.OnConfirm)
   {
     this._control        = base.GetComponent<dfControl>();
     this._parent         = parentConfig;

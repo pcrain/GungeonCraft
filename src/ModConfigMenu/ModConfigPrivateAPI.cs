@@ -14,7 +14,7 @@ public partial class ModConfig
   private class Item
   {
     internal ItemType                _itemType   = ItemType.Label;
-    internal ModConfigUpdate         _updateType = ModConfigUpdate.OnConfirm;
+    internal ModConfig.Update        _updateType = ModConfig.Update.OnConfirm;
     internal string                  _key        = null;
     internal string                  _label      = null;
     internal List<string>            _values     = null;

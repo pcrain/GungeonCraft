@@ -2,41 +2,48 @@ namespace CwaffingTheGungy;
 
 /*
    QoL improvements to make, from most to least important:
+    - can't dynamically enable / disable options at runtime (must restart the game)
     - can't back out of one level of menus at a time (vanilla behavior; maybe hook CloseAndMaybeApplyChangesWithPrompt)
-    - occasional double select sound when entering a mod menu
-    - OnNextRun updater not implemented
-    - can't dynamically enable / disable options
-    - haven't implemented progress / fill bars
-    - can't have first item of submenu be a label or it doesn't get focused correctly (vanilla ToggleToPanel() function assumed first control is selectable)
-    - using magic numbers in a few places to fix panel offsets
+
+   Unimportant stuff I probably won't do:
+    - haven't implemented OnNextRun updater (not 100% clear on the API for this, probably best left for implementation by individual mods via callbacks)
+    - haven't implemented progress / fill bars (not particularly useful outside vanilla volume controls, so not in a hurry to implement this)
+    - haven't implemented sprites for options (e.g. like vanilla crosshair selection) (very hard, requires modifying sprite atlas, and it is minimally useful)
+    - can't have first item of submenu be a label or it breaks focusing (vanilla ToggleToPanel() function assumes first control is selectable)
 */
 
 /// <summary>
-/// ModConfigUpdate determines when the following events should happen:
-///   1) when calling <c>Get()</c>, <c>Enabled()</c>, or <c>Disabled()</c> should return the new option value,
-///   2) when the callback (if any) associated with the option should be triggered,
-///   3) when the new value for the option should be written back to the configuration file.
-/// For all update types except <c>Immediate</c>, if the player backs out of the menu without confirming changes, none of the above events will occur.
+/// Public portion of ModConfig API
 /// </summary>
-public enum ModConfigUpdate {
-  /// <summary>
-  /// Updates immediately when changed, without confirmation.
-  /// </summary>
-  Immediate,
-  /// <summary>
-  /// (Default) Updates when the options menu is closed with changes confirmed, or discards the change if the menu is closed without confirming changes
-  /// </summary>
-  OnConfirm,
-  // OnNextRun, // updates when a new run is started with changes confirmed (NOT IMPLEMENTED YET)
-  /// <summary>
-  /// Saves the new option to the configuration file when the options menu is closed with changes confirmed, or discards the change if the menu is closed without confirming changes
-  /// </summary>
-  OnRestart,
-}
-
-// Public portion of ModConfig API
 public partial class ModConfig
 {
+  /// <summary>
+  /// ModConfig.Update determines
+  ///   1) when the new value for an option is actully set (i.e., when <c>Get()</c>, <c>Enabled()</c>, or <c>Disabled()</c> will return the new value),
+  ///   2) when the callback (if any) associated with the option should be triggered, and
+  ///   3) when the new value for the option should be written back to the configuration file.
+  /// For all update types except <c>Immediate</c>, if the player backs out of the menu without confirming changes, none of the above events will occur.
+  /// </summary>
+  public enum Update {
+    /// <summary>
+    /// Immediately sets the option's new value, writes it to the gunfig file, and triggers any callbacks when the menu item is changed, without confirmation.
+    /// </summary>
+    Immediate,
+
+    /// <summary>
+    /// (Default) Sets the option's new value, writes it to the gunfig file, and triggers any callbacks when the options menu is closed with changes confirmed.
+    /// Discards the change if the menu is closed without confirming changes.
+    /// </summary>
+    OnConfirm,
+
+    /// <summary>
+    /// Writes the new option's value to the gunfig file when the options menu is closed with changes confirmed.
+    /// Does not set the option's value in memory or trigger any callbacks.
+    /// Discards the change if the menu is closed without confirming changes.
+    /// </summary>
+    OnRestart,
+  }
+
   /// <summary>
   /// Retrieves the unique ModConfig associated with the given <paramref name="modName"/>, creating it if it doesn't yet exist.
   /// </summary>
@@ -65,8 +72,8 @@ public partial class ModConfig
   /// <param name="callback">An optional Action to call when changes to the toggle are applied.
   /// The callback's first argument will be the toggle's <paramref name="key"/>.
   /// The callback's second argument will be the toggle's value ("1" if enabled, "0" if disabled).</param>
-  /// <param name="updateType">Determines when changes to the option are applied. See <see cref="ModConfigUpdate"/> documentation for descriptions of each option.</param>
-  public void AddToggle(string key, bool enabled = false, string label = null, Action<string, string> callback = null, ModConfigUpdate updateType = ModConfigUpdate.OnConfirm)
+  /// <param name="updateType">Determines when changes to the option are applied. See <see cref="ModConfig.Update"/> documentation for descriptions of each option.</param>
+  public void AddToggle(string key, bool enabled = false, string label = null, Action<string, string> callback = null, ModConfig.Update updateType = ModConfig.Update.OnConfirm)
   {
     this._registeredOptions.Add(new Item(){
       _itemType   = ItemType.CheckBox,
@@ -88,8 +95,8 @@ public partial class ModConfig
   /// The callback's first argument will be the scrollbox's <paramref name="key"/>.
   /// The callback's second argument will be the scrollbox's displayed value.</param>
   /// <param name="info">A list of strings determining informational text to be displayed alongside each value of the scrollbox. Must match the length of <paramref name="options"/> exactly.</param>
-  /// <param name="updateType">Determines when changes to the option are applied. See <see cref="ModConfigUpdate"/> documentation for descriptions of each option.</param>
-  public void AddScrollBox(string key, List<string> options, string label = null, Action<string, string> callback = null, List<string> info = null, ModConfigUpdate updateType = ModConfigUpdate.OnConfirm)
+  /// <param name="updateType">Determines when changes to the option are applied. See <see cref="ModConfig.Update"/> documentation for descriptions of each option.</param>
+  public void AddScrollBox(string key, List<string> options, string label = null, Action<string, string> callback = null, List<string> info = null, ModConfig.Update updateType = ModConfig.Update.OnConfirm)
   {
     this._registeredOptions.Add(new Item(){
       _itemType   = ItemType.ArrowBox,
@@ -114,7 +121,7 @@ public partial class ModConfig
   {
     this._registeredOptions.Add(new Item(){
       _itemType   = ItemType.Button,
-      _updateType = ModConfigUpdate.Immediate,
+      _updateType = ModConfig.Update.Immediate,
       _key        = key,
       _label      = label ?? key,
       _callback   = callback,
@@ -130,7 +137,7 @@ public partial class ModConfig
   {
     this._registeredOptions.Add(new Item(){
       _itemType   = ItemType.Label,
-      _updateType = ModConfigUpdate.Immediate,
+      _updateType = ModConfig.Update.Immediate,
       _key        = $"{label} label",
       _label      = label,
       _values     = _DefaultValues,
