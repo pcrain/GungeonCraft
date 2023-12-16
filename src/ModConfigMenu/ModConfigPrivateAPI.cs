@@ -27,13 +27,13 @@ public partial class ModConfig
   private Dictionary<string, string> _options                  = new(); // dictionary of mod options as key value pairs
   private List<Item> _registeredOptions                        = new(); // list of options from which we can dynamically regenerate the options panel
 
-  private static readonly List<string> _UncheckedBoxValues     = new(){"0", "1"};
-  private static readonly List<string> _CheckedBoxValues       = new(){"1", "0"};
-  private static readonly List<string> _DefaultValues          = new(){"1"};
+  internal static readonly List<string> _UncheckedBoxValues     = new(){"0", "1"};
+  internal static readonly List<string> _CheckedBoxValues       = new(){"1", "0"};
+  internal static readonly List<string> _DefaultValues          = new(){"1"};
 
   private bool _dirty = false; // whether we've been changed since last saving to disk
   private string _configFile = null; // the file on disk to which we're writing
-  private string _modName = null;
+  internal string _modName = null;
 
   internal static void SaveActiveConfigsToDisk()
   {

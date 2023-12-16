@@ -68,7 +68,7 @@ public partial class ModConfig
   /// </summary>
   /// <param name="key">The key for accessing the toggle's value through <c>GetBool()</c> and passed as the first parameter to the toggle's <paramref name="callback"/>.</param>
   /// <param name="enabled">Whether the toggle should be enabled by default if no prior configuration has been set.</param>
-  /// <param name="label">The label displayed for the toggle on the config page. The toggle's <paramref name="key"/> will be displayed if no label is specified.</param>
+  /// <param name="label">The label displayed for the toggle on the config page. The toggle's <paramref name="key"/> will be displayed if no label is specified. Can be colorized using <see cref="WithColor()"/>.</param>
   /// <param name="callback">An optional Action to call when changes to the toggle are applied.
   /// The callback's first argument will be the toggle's <paramref name="key"/>.
   /// The callback's second argument will be the toggle's value ("1" if enabled, "0" if disabled).</param>
@@ -89,12 +89,12 @@ public partial class ModConfig
   /// Appends a new scrollbox option to the current <paramref name="ModConfig"/>'s config page.
   /// </summary>
   /// <param name="key">The key for accessing the scrollbox's value through <c>Get()</c> and passed as the first parameter to the scrollbox's <paramref name="callback"/>.</param>
-  /// <param name="options">A list of strings determining the valid values for the scrollbox, displayed verbatim on the config page.</param>
-  /// <param name="label">The label displayed for the scrollbox on the config page. The scrollbox's <paramref name="key"/> will be displayed if no label is specified.</param>
+  /// <param name="options">A list of strings determining the valid values for the scrollbox, displayed verbatim on the config page. Can be individually colorized using <see cref="WithColor()"/>.</param>
+  /// <param name="label">The label displayed for the scrollbox on the config page. The scrollbox's <paramref name="key"/> will be displayed if no label is specified. Can be colorized using <see cref="WithColor()"/>.</param>
   /// <param name="callback">An optional Action to call when changes to the scrollbox are applied.
   /// The callback's first argument will be the scrollbox's <paramref name="key"/>.
   /// The callback's second argument will be the scrollbox's displayed value.</param>
-  /// <param name="info">A list of strings determining informational text to be displayed alongside each value of the scrollbox. Must match the length of <paramref name="options"/> exactly.</param>
+  /// <param name="info">A list of strings determining informational text to be displayed alongside each value of the scrollbox. Must match the length of <paramref name="options"/> exactly. Can be individually colorized using <see cref="WithColor()"/>.</param>
   /// <param name="updateType">Determines when changes to the option are applied. See <see cref="ModConfig.Update"/> documentation for descriptions of each option.</param>
   public void AddScrollBox(string key, List<string> options, string label = null, Action<string, string> callback = null, List<string> info = null, ModConfig.Update updateType = ModConfig.Update.OnConfirm)
   {
@@ -113,7 +113,7 @@ public partial class ModConfig
   /// Appends a new button to the current <paramref name="ModConfig"/>'s config page.
   /// </summary>
   /// <param name="key">A unique key associated with the button, passed as the first parameter to the scrollbox's <paramref name="callback"/>.</param>
-  /// <param name="label">The label displayed for the button on the config page. The button's <paramref name="key"/> will be displayed if no label is specified.</param>
+  /// <param name="label">The label displayed for the button on the config page. The button's <paramref name="key"/> will be displayed if no label is specified. Can be colorized using <see cref="WithColor()"/>.</param>
   /// <param name="callback">An optional Action to call when the button is pressed.
   /// The callback's first argument will be the button's <paramref name="key"/>.
   /// The callback's second argument will always be "1", and is only set for compatibility with other option callbacks.</param>
@@ -132,7 +132,7 @@ public partial class ModConfig
   /// <summary>
   /// Appends a new label to the current <paramref name="ModConfig"/>'s config page.
   /// </summary>
-  /// <param name="label">The text displayed for the label on the config page.</param>
+  /// <param name="label">The text displayed for the label on the config page. Can be colorized using <see cref="WithColor()"/>.</param>
   public void AddLabel(string label)
   {
     this._registeredOptions.Add(new Item(){

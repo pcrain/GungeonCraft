@@ -720,12 +720,12 @@ internal static class ModConfigMenu
         dfScrollPanel newOptionsPanel = NewOptionsPanel(_MOD_MENU_TITLE);
 
         // Add submenus for each active mod
-        foreach (string modName in ModConfig._ActiveConfigs.Keys)
+        foreach (string key in ModConfig._ActiveConfigs.Keys)
         {
-          ModConfig modConfig = ModConfig._ActiveConfigs[modName];
+          ModConfig modConfig = ModConfig._ActiveConfigs[key];
           dfScrollPanel modConfigPage = modConfig.RegenConfigPage();
-          newOptionsPanel.AddButton(label: modName).gameObject.AddComponent<ModConfigOption>().Setup(
-            parentConfig: modConfig, key: null, values: new(){"1"},
+          newOptionsPanel.AddButton(label: modConfig._modName).gameObject.AddComponent<ModConfigOption>().Setup(
+            parentConfig: modConfig, key: null, values: ModConfig._DefaultValues,
             updateType: ModConfig.Update.Immediate, update: (_, _) => OpenSubMenu(modConfigPage));
         }
 
