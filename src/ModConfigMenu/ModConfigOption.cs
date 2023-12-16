@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 internal class ModConfigOption : MonoBehaviour
 {
   private static List<ModConfigOption> _PendingUpdatesOnConfirm = new();
-  // private static List<ModConfigOption> pendingUpdatesOnNextRun = new();
 
   private string _lookupKey                      = "";                        // key for looking up in our configuration file
   private string _defaultValue                   = "";                        // our default value if the key is not found in the configuration file
@@ -32,11 +31,6 @@ internal class ModConfigOption : MonoBehaviour
     {
       if (option._updateType == ModConfig.Update.OnConfirm)
         option.CommitPendingChanges();
-      // else if (option._updateType == Update.OnNextRun)
-      // {
-      //   if (!pendingUpdatesOnNextRun.Contains(option))
-      //     pendingUpdatesOnNextRun.Add(option);
-      // }
       option._parent.Set(option._lookupKey, option._pendingValue);  // register change in the config handler even if the option's pending changes are deferred
     }
     ModConfig.SaveActiveConfigsToDisk();  // save all committed changes
@@ -70,14 +64,6 @@ internal class ModConfigOption : MonoBehaviour
       menuItem.infoControl.Color = this._infoColors[menuItem.m_selectedIndex % this._infoColors.Count].Dim(dim);
   }
 
-  // private static void OnNextRun()  // hooked to call when a new run is started UNIMPLEMENTED
-  // {
-  //   ETGModConsole.Log($"new run started");
-  //   foreach (ModConfigOption option in pendingUpdatesOnNextRun)
-  //     option.CommitPendingChanges();
-  //   pendingUpdatesOnNextRun.Clear();
-  // }
-
   public static bool HasPendingChanges()
   {
     foreach (ModConfigOption option in _PendingUpdatesOnConfirm)
@@ -91,7 +77,6 @@ internal class ModConfigOption : MonoBehaviour
     if (this._pendingValue == this._currentValue)
       return;  // we didn't change, so we shouldn't do anything
 
-    // ETGModConsole.Log($"  applying changes for {this._lookupKey} -> {this._pendingValue}");
     if (this._onApplyChanges != null)
       this._onApplyChanges(this._lookupKey, this._pendingValue);
 
@@ -184,7 +169,6 @@ internal class ModConfigOption : MonoBehaviour
     if (menuItem.checkboxChecked is dfControl checkBox)
     {
       bool isChecked = (this._currentValue.Trim() == "1");
-      // ETGModConsole.Log($"  creating checkbox for {this._lookupKey} with state {isChecked}");
       checkBox.IsVisible = isChecked;
       if (menuItem.checkboxUnchecked is dfControl checkBoxUnchecked)
         checkBoxUnchecked.IsVisible = true;

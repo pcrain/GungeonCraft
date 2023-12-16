@@ -83,12 +83,6 @@ internal static class ModConfigMenu
           typeof(ModConfigOption).GetMethod("OnMenuConfirm", BindingFlags.Static | BindingFlags.NonPublic)
           );
 
-      // Update custom colors when loaded in
-      // new Hook(
-      //     typeof(BraveOptionsMenuItem).GetMethod("Awake", BindingFlags.Instance | BindingFlags.Public),
-      //     typeof(ModConfigOption).GetMethod("OnAwake", BindingFlags.Static | BindingFlags.NonPublic)
-      //     );
-
       // Update custom colors on focus gained
       new Hook(
           typeof(BraveOptionsMenuItem).GetMethod("DoFocus", BindingFlags.Instance | BindingFlags.NonPublic),
@@ -100,12 +94,6 @@ internal static class ModConfigMenu
           typeof(BraveOptionsMenuItem).GetMethod("SetUnselectedColors", BindingFlags.Instance | BindingFlags.NonPublic),
           typeof(ModConfigOption).GetMethod("OnSetUnselectedColors", BindingFlags.Static | BindingFlags.NonPublic)
           );
-
-      // Update config options when a new run is started TODO: not implemented
-      // new Hook(
-      //     typeof(___).GetMethod("___", BindingFlags.Instance | BindingFlags.NonPublic),
-      //     typeof(ModConfigOption).GetMethod("OnNextRun", BindingFlags.Static | BindingFlags.NonPublic)
-      //     );
 
       _DidInitHooks = true;
     }

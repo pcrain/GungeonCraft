@@ -6,7 +6,6 @@ namespace CwaffingTheGungy;
     - can't back out of one level of menus at a time (vanilla behavior; maybe hook CloseAndMaybeApplyChangesWithPrompt)
 
    Unimportant stuff I probably won't do:
-    - haven't implemented OnNextRun updater (not 100% clear on the API for this, probably best left for implementation by individual mods via callbacks)
     - haven't implemented progress / fill bars (not particularly useful outside vanilla volume controls, so not in a hurry to implement this)
     - haven't implemented sprites for options (e.g. like vanilla crosshair selection) (very hard, requires modifying sprite atlas, and it is minimally useful)
     - can't have first item of submenu be a label or it breaks focusing (vanilla ToggleToPanel() function assumes first control is selectable)
