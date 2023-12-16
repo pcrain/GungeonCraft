@@ -23,6 +23,14 @@ public class Commands
         });
         ETGModConsole.Commands.AddGroup("ff", delegate (string[] args)
         {
+            // ETGModConsole.Log($"  > Herobrine status: {(QoLConfig.Gunfig.Enabled(QoLConfig.HEROBRINE) ? "you're safe :D" : "he's around o.o")}");
+            // MenuMaster.RebuildOptionsPanels();
+            // OneOffDebugDungeonFlow.CreateAndWarp("boomhildr");
+            // ETGModConsole.Log("<size=100><color=#ff0000ff>Please specify a command. Type 'nn help' for a list of commands.</color></size>", false);
+        });
+        ETGModConsole.Commands.AddGroup("herobrine", delegate (string[] args)
+        {
+            ETGModConsole.Log($"  > Herobrine status: {(QoLConfig.Gunfig.Enabled(QoLConfig.HEROBRINE) ? "you're safe :D" : "he's around o.o")}");
             // MenuMaster.RebuildOptionsPanels();
             // OneOffDebugDungeonFlow.CreateAndWarp("boomhildr");
             // ETGModConsole.Log("<size=100><color=#ff0000ff>Please specify a command. Type 'nn help' for a list of commands.</color></size>", false);

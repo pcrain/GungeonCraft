@@ -206,9 +206,12 @@ internal class ModConfigOption : MonoBehaviour
     this._updateType     = updateType;
 
     // Load our default and current values from our config, or from the options passed to us
-    this._defaultValue = values[0].ProcessColors(out Color _);
-    this._currentValue = this._parent.Get(this._lookupKey) ?? this._parent.Set(this._lookupKey, this._defaultValue);
-    this._pendingValue = this._currentValue;
+    if (!string.IsNullOrEmpty(key))  // null or empty key == pseudo-option used for its callback only
+    {
+      this._defaultValue = values[0].ProcessColors(out Color _);
+      this._currentValue = this._parent.Get(this._lookupKey) ?? this._parent.Set(this._lookupKey, this._defaultValue);
+      this._pendingValue = this._currentValue;
+    }
 
     ProcessColors();
     ResetMenuItemState(addHandlers: true);

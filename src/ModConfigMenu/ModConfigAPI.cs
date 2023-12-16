@@ -50,16 +50,17 @@ public partial class ModConfig
   /// <returns>A unique <paramref name="ModConfig"/> associated with the given <paramref name="modName"/>. This can be safely stored in a variable and retrieved for later use.</returns>
   public static ModConfig GetConfigForMod(string modName)
   {
-    if (!_ActiveConfigs.ContainsKey(modName))
+    string cleanModName = modName.ProcessColors(out Color _);
+    if (!_ActiveConfigs.ContainsKey(cleanModName))
     {
-      Lazy.DebugLog($"Creating new ModConfig instance for {modName}");
+      Lazy.DebugLog($"Creating new ModConfig instance for {cleanModName}");
       ModConfig modConfig     = new ModConfig();
-      modConfig._modName      = modName;
-      modConfig._configFile   = Path.Combine(SaveManager.SavePath, $"{modName}.{ModConfigMenu._GUNFIG_EXTENSION}");
+      modConfig._modName      = modName;  // need to keep colors intact here
+      modConfig._configFile   = Path.Combine(SaveManager.SavePath, $"{cleanModName}.{ModConfigMenu._GUNFIG_EXTENSION}");
       modConfig.LoadFromDisk();
-      _ActiveConfigs[modName] = modConfig;
+      _ActiveConfigs[cleanModName] = modConfig;
     }
-    return _ActiveConfigs[modName];
+    return _ActiveConfigs[cleanModName];
   }
 
   /// <summary>

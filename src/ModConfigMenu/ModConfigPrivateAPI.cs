@@ -80,6 +80,8 @@ public partial class ModConfig
       {
           foreach(string key in this._options.Keys)
           {
+            if (string.IsNullOrEmpty(key))
+              continue;
             // Lazy.DebugLog($"    saving config option {key} = {this._options[key]}");
             file.WriteLine($"{key} = {this._options[key]}");
           }
@@ -124,6 +126,8 @@ public partial class ModConfig
   // Set a config key to a value and return the value
   internal string Set(string key, string value)
   {
+    if (string.IsNullOrEmpty(key))
+      return null;
     this._options[key] = value;
     this._dirty = true;
     return value;
