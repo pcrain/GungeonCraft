@@ -4039,6 +4039,7 @@
     <Reference Include="Alexandria"/>
     <Reference Include="BepInEx"/>
     <Reference Include="ModTheGungeonAPI"/>
+    <Reference Include="Gunfig"/>
     <Reference Include="Mono.Cecil.Rocks"/>
     <Reference Include="Mono.Cecil"/>
     <Reference Include="Mono.Cecil.Pdb"/>
