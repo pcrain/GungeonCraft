@@ -1280,7 +1280,7 @@ public class Nametag : MonoBehaviour
     private static int _NumNames = 0;
     private static Font _Font;
 
-    private void Start()
+    public void Setup()
     {
         _Font ??= Resources.GetBuiltinResource(typeof(Font), "Arial.ttf") as Font;
         this._actor = base.GetComponent<AIActor>();
@@ -1312,6 +1312,8 @@ public class Nametag : MonoBehaviour
         rectTransform.sizeDelta = new Vector2(500, 100); // make this big enough to fit a pretty big name
 
         this._actor.healthHaver.OnPreDeath += (_) => HandleEnemyDied();
+
+        UpdateWhileParentAlive();  // fixes rendering over the player instead of the enemy on the first frame
     }
 
     public void SetName(string name)

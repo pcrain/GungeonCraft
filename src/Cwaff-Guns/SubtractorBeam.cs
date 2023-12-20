@@ -98,7 +98,11 @@ public class SubtractorBeam : AdvancedGunBehavior
             if (!enemy.IsHostile())
                 continue;
             if (!enemy.gameObject.GetComponent<Nametag>())
-                _Nametags[enemy.GetHashCode()] = enemy.gameObject.AddComponent<Nametag>();
+            {
+                Nametag nametag = enemy.gameObject.AddComponent<Nametag>();
+                nametag.Setup();
+                _Nametags[enemy.GetHashCode()] = nametag;
+            }
             enemy.gameObject.GetComponent<Nametag>().SetName($"{enemy.healthHaver.GetCurrentHealth()}");
         }
     }
