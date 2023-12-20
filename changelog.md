@@ -4,7 +4,8 @@
 - Fixed null dereference in Ki Blast caused by looking up sprites for non-existent enemies
 - Fixed null dereference in Iron Maind caused by trying to update the Gun while the level is loading
 - Fixed null dereference in Subtractor Beam caused by trying to update text to the position of non-existent enemies
-- Fixed null dereference Drifter's Headgear and Gyroscope from not checking if they actually have an owner when destroyed
+- Fixed null dereference in Drifter's Headgear and Gyroscope from not checking if they actually have an owner when destroyed
+- Fixed null dereference in Paintball Cannon during Dragun fight due to trying to color a non-existent AIActor
 
 ## 1.5.0 (2023-12-10)
 

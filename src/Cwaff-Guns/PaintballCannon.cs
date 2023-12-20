@@ -43,7 +43,6 @@ public class PaintballCannon : AdvancedGunBehavior
 
 public class PaintballColorizer : MonoBehaviour
 {
-    public  bool       applyColourToHitEnemies = true;
     public  int        tintPriority = 1;
     public  Color      selectedColour;
     private Projectile _projectile;
@@ -58,8 +57,8 @@ public class PaintballColorizer : MonoBehaviour
     {
         this._projectile = base.GetComponent<Projectile>();
         this._projectile.AdjustPlayerProjectileTint(selectedColour, tintPriority);
-        if (applyColourToHitEnemies)
-            this._projectile.OnHitEnemy += this.OnHitEnemy;
+
+        this._projectile.OnHitEnemy += this.OnHitEnemy;
     }
 
     private void OnHitEnemy(Projectile bullet, SpeculativeRigidbody enemy, bool what)
@@ -75,7 +74,7 @@ public class PaintballColorizer : MonoBehaviour
             duration                 = 10000000,
             effectIdentifier         = "Paintballed",
         };
-        enemy.aiActor.RemoveEffect("Paintballed");
-        enemy.aiActor.ApplyEffect(tint);
+        enemy.aiActor?.RemoveEffect("Paintballed");
+        enemy.aiActor?.ApplyEffect(tint);
     }
 }
