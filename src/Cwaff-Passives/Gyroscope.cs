@@ -54,7 +54,8 @@ public class Gyroscope : PassiveItem
 
     public override void OnDestroy()
     {
-        _dodgeRoller.AbortDodgeRoll();
+        if (this._dodgeRoller)
+            _dodgeRoller.AbortDodgeRoll();
         base.OnDestroy();
     }
 }

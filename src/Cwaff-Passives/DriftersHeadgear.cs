@@ -66,7 +66,8 @@ public class DriftersHeadgear : PassiveItem
 
     public override void OnDestroy()
     {
-        this._dodgeRoller.AbortDodgeRoll();
+        if (this._dodgeRoller)
+            this._dodgeRoller.AbortDodgeRoll();
         base.OnDestroy();
     }
 }

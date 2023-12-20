@@ -166,10 +166,10 @@ public class BarteringPriceFixer : MonoBehaviour
 {
     private void Start()
     {
-        if (base.gameObject?.transform?.parent is not Transform shopTransdorm)
+        if (base.gameObject?.transform?.parent is not Transform shopTransform)
             return;
         // Lazy.DebugLog($"Fixing barter prices!");
-        foreach (Transform child in shopTransdorm)
+        foreach (Transform child in shopTransform)
         {
             CustomShopItemController[] shopItems =child?.gameObject?.GetComponentsInChildren<CustomShopItemController>();
             if ((shopItems?.Length ?? 0) == 0)
