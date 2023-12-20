@@ -42,8 +42,7 @@ public class KiBlast : AdvancedGunBehavior
             trail.LifeTime   = 0.1f;
             trail.BaseColor  = Color.cyan;
             trail.EndColor   = Color.cyan;
-          }
-          ).Attach<ArcTowardsTargetBehavior>(
+          }).Attach<ArcTowardsTargetBehavior>(
           ).Attach<KiBlastBehavior>(  //TODO: KiBlastBehavior must init before ArcTowardsTargetBehavior so we can call Setup() before Start()
           );
     }
@@ -223,7 +222,7 @@ public class KiBlastBehavior : MonoBehaviour
             enemy = enemy.GetAbsoluteParentRoom().GetRandomActiveEnemy(false);
         SlashDoer.DoSwordSlash(
             player.sprite.WorldCenter,
-            (enemy.sprite.WorldCenter-player.sprite.WorldCenter).ToAngle(),
+            (enemy.CenterPosition-player.sprite.WorldCenter).ToAngle(),
             this._projectile.Owner,
             _BasicSlashData);
     }
