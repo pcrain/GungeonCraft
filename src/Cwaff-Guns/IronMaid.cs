@@ -77,6 +77,8 @@ public class IronMaid : AdvancedGunBehavior
     protected override void Update()
     {
         base.Update();
+        if (GameManager.Instance.IsLoadingLevel)
+            return;
         if (this.Player is not PlayerController pc)
             return;
 
