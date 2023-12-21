@@ -33,10 +33,10 @@ public static class FancyRoomBuilder
   public static FancyShopData MakeFancyShop(string npcName, List<int> shopItems, string roomPath, List<string> moddedItems = null,
     float spawnChance = 1f, Vector2? carpetOffset = null,
     CwaffPrerequisites spawnPrerequisite = CwaffPrerequisites.NONE, SpawnCondition prequisiteValidator = null, string voice = null,
-    List<String> genericDialog = null, List<String> stopperDialog = null, List<String> purchaseDialog = null,
+    List<String> genericDialog = null, List<String> stopperDialog = null, List<String> purchaseDialog = null, List<String> stolenDialog = null,
     List<String> noSaleDialog = null, List<String> introDialog = null, List<String> attackedDialog = null, bool allowDupes = false,
     float mainPoolChance = 0.0f, Vector3? talkPointOffset = null, Vector3? npcPosition = null, List<Vector3> itemPositions = null,
-    bool exactlyOncePerRun = true, int allowedTilesets = 127, float costModifier = 1f,
+    bool exactlyOncePerRun = true, int allowedTilesets = 127, float costModifier = 1f, bool canBeRobbed = true,
     Func<CustomShopController, PlayerController, int, bool> customCanBuy = null,
     Func<CustomShopController, PlayerController, int, int> removeCurrency = null,
     Func<CustomShopController, CustomShopItemController, PickupObject, int> customPrice = null,
@@ -56,6 +56,7 @@ public static class FancyRoomBuilder
     $"#{npcNameUpper}_NOSALE_TALK".SetupDBStrings(noSaleDialog ?? _DefaultLine);
     $"#{npcNameUpper}_INTRO_TALK".SetupDBStrings(introDialog ?? _DefaultLine);
     $"#{npcNameUpper}_ATTACKED_TALK".SetupDBStrings(attackedDialog ?? _DefaultLine);
+    $"#{npcNameUpper}_STOLEN_TALK".SetupDBStrings(stolenDialog ?? _DefaultLine);
 
     List<DungeonPrerequisite> dungeonPrerequisites = new(){
       new CwaffPrerequisite { prerequisite = spawnPrerequisite.SetupPrerequisite(prequisiteValidator) }
@@ -97,7 +98,7 @@ public static class FancyRoomBuilder
       currencyIconPath                  : currencyIcon,
       currencyName                      : "",
       // currencyName                      : "ui_coin",
-      canBeRobbed                       : true,
+      canBeRobbed                       : canBeRobbed,
       hasCarpet                         : ResMap.Get($"{npcName}_carpet", quietFailure: true)?[0] != null,
       carpetSpritePath                  : ResMap.Get($"{npcName}_carpet", quietFailure: true)?[0],
       CarpetOffset                      : carpetOffset,

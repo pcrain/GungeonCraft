@@ -6,6 +6,7 @@
 - Fixed null dereference in Subtractor Beam caused by trying to update text to the position of non-existent enemies
 - Fixed null dereference in Drifter's Headgear and Gyroscope from not checking if they actually have an owner when destroyed
 - Fixed null dereference in Paintball Cannon during Dragun fight due to trying to color a non-existent AIActor
+- Made Companion Shop un-robbable
 
 ## 1.5.0 (2023-12-10)
 

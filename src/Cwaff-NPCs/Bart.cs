@@ -52,6 +52,11 @@ public class Bart
                 "Have a good one.",
                 "Done deal.",
                 },
+            stolenDialog           : new(){
+                "I'll remember that.",
+                "Hope you're happy.",
+                "That's not yours.",
+                },
             noSaleDialog           : new(){
                 "Give me something better.",
                 "Not interested.",
@@ -76,6 +81,7 @@ public class Bart
 
         _BarterTable = shop.loot;
         shop.owner.gameObject.AddComponent<BarteringPriceFixer>();
+        shop.shop.AddComponent<ForceOutOfStockOnFailedSteal>();
     }
 
     public static bool OnSecondOrThirdFloor(SpawnConditions conds)
@@ -103,6 +109,7 @@ public class Bart
                 continue;  // we don't care about excluded objects
             _BarterTable.AddItemToPool(item.PickupObjectId);
         }
+        Debug.Log($"  added {_BarterTable.defaultItemDrops.elements.Count} items to bartering pool");
         // tempWatch.Stop(); ETGModConsole.Log($"  finished in "+(tempWatch.ElapsedMilliseconds/1000.0f)+" seconds");
     }
 
@@ -186,5 +193,39 @@ public class BarteringPriceFixer : MonoBehaviour
                 case ItemQuality.D: shopItem.customPriceSprite = Bart._BarterSpriteC; break;
             }
         }
+    }
+}
+
+public class ForceOutOfStockOnFailedSteal : MonoBehaviour
+{
+    private CustomShopController _shop = null;
+    private bool _didOutOfStock = false;
+
+    private void Start()
+    {
+        this._shop = base.GetComponent<CustomShopController>();
+    }
+
+    private void Update()
+    {
+        if (this._didOutOfStock)
+            return;
+        if (!this._shop.m_wasCaughtStealing)
+            return;
+
+        foreach (Transform child in base.transform)
+        {
+            CustomShopItemController[] shopItems =child?.gameObject?.GetComponentsInChildren<CustomShopItemController>();
+            if ((shopItems?.Length ?? 0) == 0)
+                continue;
+            if (shopItems[0] is not CustomShopItemController shopItem)
+                continue;
+            if (!shopItem.item)
+                continue;
+            if (!shopItem.pickedUp)
+                shopItem.ForceOutOfStock();
+        }
+
+        this._didOutOfStock = true;
     }
 }

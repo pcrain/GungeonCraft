@@ -92,6 +92,7 @@ public class WhiteMage
             carpetOffset           : C.PIXEL_SIZE * new Vector2(-23, 0),
             itemPositions          : ShopAPI.defaultItemPositions.ShiftAll(C.PIXEL_SIZE * new Vector2(-25, 0)),
             exactlyOncePerRun      : true,
+            canBeRobbed            : false,
             // voice                  : "sans", // will play audio "Play_CHR_<voice>_voice_01"
             genericDialog          : new(){
                 "Aren't they just precious!?",
