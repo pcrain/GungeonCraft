@@ -54,7 +54,7 @@ namespace CwaffingTheGungy;
 [BepInPlugin(C.MOD_GUID, "Cwaffing the Gungy", C.MOD_VERSION)]
 [BepInDependency(ETGModMainBehaviour.GUID)]
 [BepInDependency("alexandria.etgmod.alexandria")]
-[BepInDependency(Gunfiguration.C.MOD_GUID)]
+// [BepInDependency(Gunfiguration.C.MOD_GUID)]
 public class Initialisation : BaseUnityPlugin
 {
     public static Initialisation Instance;
@@ -434,8 +434,7 @@ public class Initialisation : BaseUnityPlugin
                 AkSoundEngine.PostEvent("vc_kirby_appeal01", ETGModMainBehaviour.Instance.gameObject);
             }
 
-            // GameManager.Instance.OnNewLevelFullyLoaded += MenuMaster.RebuildOptionsPanels;
-            CwaffConfig.Init();
+            // CwaffConfig.Init();
 
             // Debug.LogError("Gungy o.o!");
             // Debug.LogAssertion("Gungy o.o!");
