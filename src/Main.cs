@@ -79,13 +79,6 @@ public class Initialisation : BaseUnityPlugin
 
             Instance = this;
 
-            // if (C.DEBUG_BUILD)
-            // {
-            //     MenuMaster.SetupUITest();
-            //     AkSoundEngine.PostEvent("vc_kirby_appeal01", ETGModMainBehaviour.Instance.gameObject);
-            //     return;
-            // }
-
             #region Round 1 Config (hooks and database stuff where no sprites are needed, so it can be async)
             System.Diagnostics.Stopwatch setupConfig1Watch = null;
             Thread setupConfig1Thread = new Thread(() => {
@@ -283,6 +276,7 @@ public class Initialisation : BaseUnityPlugin
                 Crapshooter.Add();
                 CarpetBomber.Add();
                 Uppskeruvel.Add();
+                Glockarina.Add();
                 setupGunsWatch.Stop();
             #endregion
 

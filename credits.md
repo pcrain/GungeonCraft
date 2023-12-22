@@ -14,6 +14,7 @@ I have no artistic talent beyond making minor sprite and sound edits, so all bas
 	- [mrgranade from Reddit](https://www.reddit.com/r/EnterTheGungeon/comments/zo5ak8/i_designed_some_crazy_guns_i_wish_were_available/)
 	- mrgranade's game, [Raining Blood](https://store.steampowered.com/app/2147530/Raining_Blood_Hellfire/)
 	- [Terraria](https://terraria.wiki.gg/wiki/Guns) and many of its various mods including (but probably not limited to) [Tremor](https://tremormod.fandom.com/wiki/Weapons#Guns), [Exodus](https://exodusmod.fandom.com/wiki/Weapons#Guns), [The Spirit Mod](https://spiritmod.wiki.gg/wiki/Weapons#Guns), [Calamity](https://calamitymod.fandom.com/wiki/Guns), [Thorium](https://thoriummod.fandom.com/wiki/Guns), [Shadows of Abaddon](https://shadowsofabaddon.wiki.gg/wiki/Weapons#Guns), and [Mod of Redemption](https://modofredemption.wiki.gg/wiki/Weapons#Guns)
+	- [Duck Game](https://store.steampowered.com/app/312530/Duck_Game/)
 	- Most animation edits are my own, but probably aren't as good as the animations of the guns in their respective games / mods, so please check the original sources out!
 * Several custom clip and projectiles sprites by [Lynceus](https://enter-the-gungeon.thunderstore.io/package/Lynceus/The_Captain_Custom_Character/) from the Mod the Gungeon Discord
 * Shopkeeper sprites and various item sprites by [Dallan](https://enter-the-gungeon.thunderstore.io/package/Dallan/Breach_Renovations/) from the Mod the Gungeon Discord
