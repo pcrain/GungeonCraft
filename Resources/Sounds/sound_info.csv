@@ -112,3 +112,5 @@ pickup_poe_soul_sound,8.0,1,sound
 soul_launch_sound,-10.0,1,sound
 soul_impact_sound,4.0,1,sound
 uppskeruvel_fire_sound,-4.0,1,sound
+glockarina_shoot_sound,-2.5,1,sound
+glockarina_reload_sound,-2.5,1,sound

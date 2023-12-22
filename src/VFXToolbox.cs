@@ -698,22 +698,22 @@ public class FancyVFX : MonoBehaviour
     }
 
     // Make a new FancyVFX from a normal SpawnManager.SpawnVFX
-    public static FancyVFX Spawn(GameObject prefab, Vector3 position, Quaternion rotation,
-        Vector2 velocity, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false)
+    public static FancyVFX Spawn(GameObject prefab, Vector3 position, Quaternion? rotation = null,
+        Vector2? velocity = null, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false)
     {
-        GameObject v = SpawnManager.SpawnVFX(prefab, position, rotation, ignoresPools: false);
+        GameObject v = SpawnManager.SpawnVFX(prefab, position, rotation ?? Quaternion.identity, ignoresPools: false);
         FancyVFX fv = v.AddComponent<FancyVFX>();
-        fv.Setup(velocity, lifetime, fadeOutTime, parent, emissivePower, emissiveColor, fadeIn);
+        fv.Setup(velocity ?? Vector2.zero, lifetime, fadeOutTime, parent, emissivePower, emissiveColor, fadeIn);
         return fv;
     }
 
     // Make a new FancyVFX from a normal SpawnManager.SpawnVFX, ignoring pools (necessary for adding custom components)
-    public static FancyVFX SpawnUnpooled(GameObject prefab, Vector3 position, Quaternion rotation,
-        Vector2 velocity, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false)
+    public static FancyVFX SpawnUnpooled(GameObject prefab, Vector3 position, Quaternion? rotation = null,
+        Vector2? velocity = null, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false)
     {
-        GameObject v = SpawnManager.SpawnVFX(prefab, position, rotation, ignoresPools: true);
+        GameObject v = SpawnManager.SpawnVFX(prefab, position, rotation ?? Quaternion.identity, ignoresPools: true);
         FancyVFX fv = v.AddComponent<FancyVFX>();
-        fv.Setup(velocity, lifetime, fadeOutTime, parent, emissivePower, emissiveColor, fadeIn);
+        fv.Setup(velocity ?? Vector2.zero, lifetime, fadeOutTime, parent, emissivePower, emissiveColor, fadeIn);
         return fv;
     }
 

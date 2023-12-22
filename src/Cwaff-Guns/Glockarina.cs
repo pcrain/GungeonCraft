@@ -2,12 +2,8 @@
 
 
 /* TODO:
-    - gun animations
-    - mode sprites in item box
-    - better shooting sound
-    - fading note sprites when playing the ocarina
-    - electric immunity in storm mode
-    - secret song implementations
+    - play puzzle jingle when opening chest
+    - figure out song of time not slowing shotgun kin + other bullets
 */
 
 public class Glockarina : AdvancedGunBehavior
@@ -19,18 +15,24 @@ public class Glockarina : AdvancedGunBehavior
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
 
+    internal const string _StormSpriteUI = $"{C.MOD_PREFIX}:_GlockStormSpriteUI";
+    internal const string _TimeSpriteUI  = $"{C.MOD_PREFIX}:_GlockTimeSpriteUI";
+    internal const string _SariaSpriteUI = $"{C.MOD_PREFIX}:_GlockSariaSpriteUI";
+    internal const string _EmptySpriteUI = $"{C.MOD_PREFIX}:_GlockEmptySpriteUI";
+
     private const float _DEAD_ZONE_SQR = 4f;
     private const float _DECOY_LIFE    = 2f;
 
-    private enum Mode {
+    internal enum Mode {
         DEFAULT,  // no special effects
         STORM,    // lightning shoots from notes when close to enemies
         TIME,     // slows down enemy bullets close to notes
         SARIA,    // homes in on nearby enemies
         EMPTY,    // killed enemies become decoys
-        // DOUBLE,   // not a real mode, but song should clear room for 1/3 of max ammo
-        // SUN,      // not a real mode, but song should clear darkness effects
-        // PRELUDE,  // not a real mode, but song should warp player to shop
+
+        DOUBLE,   // not a real mode, but song should clear room for 1/3 of max ammo
+        SUN,      // not a real mode, but song should clear darkness effects
+        PRELUDE,  // not a real mode, but song should warp player to shop
     }
 
     private enum Note {
@@ -41,30 +43,34 @@ public class Glockarina : AdvancedGunBehavior
         A,
     }
 
-    internal static GameObject _DecoyPrefab = null;
+    internal static GameObject _DecoyPrefab   = null;
+    internal static GameObject _NoteVFXPrefab = null;
     private static List<List<Note>> _Songs = new(){
         /* DEFAULT */ null,
         /* STORM   */ new(){Note.A, Note.DOWN, Note.UP, Note.A, Note.DOWN, Note.UP},
         /* TIME    */ new(){Note.RIGHT, Note.A, Note.DOWN, Note.RIGHT, Note.A, Note.DOWN},
         /* SARIA   */ new(){Note.DOWN, Note.RIGHT, Note.LEFT, Note.DOWN, Note.RIGHT, Note.LEFT},
         /* EMPTY   */ new(){Note.RIGHT, Note.LEFT, Note.RIGHT, Note.DOWN, Note.RIGHT, Note.UP, Note.LEFT},
-        // /* DOUBLE  */ new(){Note.RIGHT, Note.RIGHT, Note.A, Note.A, Note.DOWN, Note.DOWN},
-        // /* SUN     */ new(){Note.RIGHT, Note.DOWN, Note.UP, Note.RIGHT, Note.DOWN, Note.UP},
-        // /* PRELUDE */ new(){Note.UP, Note.RIGHT, Note.UP, Note.RIGHT, Note.LEFT, Note.UP},
+        /* DOUBLE  */ new(){Note.RIGHT, Note.RIGHT, Note.A, Note.A, Note.DOWN, Note.DOWN},
+        /* SUN     */ new(){Note.RIGHT, Note.DOWN, Note.UP, Note.RIGHT, Note.DOWN, Note.UP},
+        /* PRELUDE */ new(){Note.UP, Note.RIGHT, Note.UP, Note.RIGHT, Note.LEFT, Note.UP},
     };
 
-    private Mode _mode = Mode.DEFAULT;
+    internal Mode _mode = Mode.DEFAULT;
     private List<Note> _lastNotes = new();
+    private DamageTypeModifier _electricImmunity = null;
 
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Glockarina>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.2f, ammo: 80, canReloadNoMatterAmmo: true);
+            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.2f, ammo: 800, canReloadNoMatterAmmo: true);
             gun.SetAnimationFPS(gun.shootAnimation, 30);
-            gun.SetAnimationFPS(gun.reloadAnimation, 40);
+            gun.SetAnimationFPS(gun.reloadAnimation, 20);
             gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
-            gun.SetFireAudio("blowgun_fire_sound");
-            gun.SetReloadAudio("blowgun_reload_sound");
+            gun.SetFireAudio("glockarina_shoot_sound");
+            gun.SetReloadAudio("glockarina_reload_sound");
+
+        gun.gameObject.AddComponent<GlockarinaAmmoDisplay>();
 
         gun.InitProjectile(new(clipSize: 12, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, speed: 35f,
           sprite: "glockarina_projectile", fps: 12, anchor: Anchor.MiddleLeft, shouldRotate: false));
@@ -72,6 +78,89 @@ public class Glockarina : AdvancedGunBehavior
         _DecoyPrefab = ItemHelper.Get(Items.Decoy).GetComponent<SpawnObjectPlayerItem>().objectToSpawn.ClonePrefab();
         Decoy decoy = _DecoyPrefab.GetComponent<Decoy>();
             decoy.DeathExplosionTimer = _DECOY_LIFE;
+
+        _NoteVFXPrefab = VFX.Create("note_vfx", 0.01f, loops: false, anchor: Anchor.MiddleCenter); // FPS must be nonzero or sprites don't update properly
+    }
+
+    private void UpdateMode()
+    {
+        if (this.Owner is not PlayerController pc)
+            return;
+        if (this._mode == Mode.STORM && pc.healthHaver.damageTypeModifiers.Contains(this._electricImmunity))
+            pc.healthHaver.damageTypeModifiers.Add(this._electricImmunity);
+        if (this._mode != Mode.STORM && pc.healthHaver.damageTypeModifiers.Contains(this._electricImmunity))
+            pc.healthHaver.damageTypeModifiers.Remove(this._electricImmunity);
+    }
+
+    protected override void OnPickedUpByPlayer(PlayerController player)
+    {
+        if (!everPickedUpByPlayer)
+            this._electricImmunity = new DamageTypeModifier {
+                damageType = CoreDamageTypes.Electric,
+                damageMultiplier = 0f,
+            };
+        base.OnPickedUpByPlayer(player);
+        UpdateMode();
+    }
+
+    protected override void OnPostDroppedByPlayer(PlayerController player)
+    {
+        base.OnPostDroppedByPlayer(player);
+
+        if (player.healthHaver.damageTypeModifiers.Contains(this._electricImmunity))
+            player.healthHaver.damageTypeModifiers.Remove(this._electricImmunity);
+    }
+
+    // Returns true if we handled a special song, false if we pass it along
+    private bool HandleSpecialSong(Mode song)
+    {
+        if (this.Owner is not PlayerController player)
+            return false;
+
+        switch (song)
+        {
+            case Mode.DOUBLE:
+                if (this.gun.CurrentAmmo < 0.35f * this.gun.AdjustedMaxAmmo)
+                    return false; // can't nuke enemies under 1/3 ammo
+                if (player.CurrentRoom == null || player.CurrentRoom.area.PrototypeRoomCategory == PrototypeDungeonRoom.RoomCategory.BOSS)
+                    return false; // can't insta-clear boss rooms
+                List<AIActor> activeEnemies = player.CurrentRoom.GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
+                if (activeEnemies == null)
+                    return false; // can't insta-clear rooms that are already clear
+                player.CurrentRoom.ClearReinforcementLayers();
+                for (int i = activeEnemies.Count - 1; i >= 0; --i)
+                {
+                    AIActor otherEnemy = activeEnemies[i];
+                    if (otherEnemy.IsHostileAndNotABoss(canBeNeutral: true))
+                        otherEnemy.healthHaver.ApplyDamage(10000000f, Vector2.zero, "Double Time",
+                            CoreDamageTypes.Void, DamageCategory.Unstoppable, true);
+                }
+                this.gun.LoseAmmo(Mathf.CeilToInt(0.35f * this.gun.AdjustedMaxAmmo));
+                return true;
+
+            case Mode.SUN:
+                if (player.CurrentRoom != null && player.CurrentRoom.IsDarkAndTerrifying)
+                {
+                    player.CurrentRoom.EndTerrifyingDarkRoom();
+                    return true;
+                }
+                return false;
+
+            case Mode.PRELUDE:
+                if (!(player.CurrentRoom?.CanTeleportFromRoom() ?? false))
+                    return false;
+                foreach (RoomHandler room in GameManager.Instance.Dungeon.data.rooms)
+                {
+                    if (room.area.PrototypeRoomCategory != PrototypeDungeonRoom.RoomCategory.SPECIAL)
+                        continue;
+                    if (room.area.PrototypeRoomSpecialSubcategory != PrototypeDungeonRoom.RoomSpecialSubCategory.STANDARD_SHOP)
+                        continue;
+                    player.AttemptTeleportToRoom(room, force: true, noFX: false);
+                    return true;
+                }
+                return false;
+        }
+        return false;
     }
 
     public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
@@ -109,7 +198,11 @@ public class Glockarina : AdvancedGunBehavior
             case Note.A:     AkSoundEngine.PostEvent("ocarina_note_neutral", base.gameObject); break;
         }
 
-        // Trim our list of notes played
+        FancyVFX fv = FancyVFX.Spawn(_NoteVFXPrefab, position: player.sprite.WorldTopCenter,
+            velocity: UnityEngine.Random.Range(40f,50f).ToVector(4f), lifetime: 0.65f, fadeOutTime: 0.4f);
+        fv.sprite.SetSprite(fv.GetComponent<tk2dSpriteAnimator>().currentClip.frames[(int)note].spriteId);
+
+        // Trim our list of notes played if necessary
         if (this._lastNotes.Count >= 8)
             this._lastNotes.RemoveAt(0);
 
@@ -138,7 +231,18 @@ public class Glockarina : AdvancedGunBehavior
         if (finishedSong.Value == this._mode)
             return;
 
+        if (finishedSong.Value >= Mode.DOUBLE)
+        {
+            if (HandleSpecialSong(finishedSong.Value))
+            {
+                AkSoundEngine.PostEvent("ocarina_song_success", base.gameObject);
+                this._lastNotes.Clear();
+            }
+            return;
+        }
+
         this._mode = finishedSong.Value;
+        UpdateMode();
         AkSoundEngine.PostEvent("ocarina_song_success", base.gameObject);
         this._lastNotes.Clear();
     }
@@ -164,12 +268,75 @@ public class Glockarina : AdvancedGunBehavior
                 HomingModifier home         = projectile.gameObject.AddComponent<HomingModifier>();
                 home.HomingRadius           = 10f;
                 home.AngularVelocity        = 720f;
-                projectile.baseData.damage *= 2f;
+                projectile.baseData.damage *= 1.5f;
                 break;
             case Mode.EMPTY:
                 projectile.gameObject.AddComponent<CreateDecoyOnKill>();
                 break;
         }
+    }
+
+    private static float _LastReloadNoteSpriteTime = 0.0f;
+    protected override void Update()
+    {
+        base.Update();
+        if (BraveTime.DeltaTime == 0.0f)
+            return;
+        if (!this.gun.IsReloading)
+            return;
+        if ((BraveTime.ScaledTimeSinceStartup - _LastReloadNoteSpriteTime) < 0.1f)
+            return;
+        int frame = this.gun.spriteAnimator.CurrentFrame;
+        if (frame < 4 || frame > 12)
+            return; // don't play notes from the ocarina unless it's near our character's face
+        _LastReloadNoteSpriteTime = BraveTime.ScaledTimeSinceStartup;
+        FancyVFX fv = FancyVFX.Spawn(_NoteVFXPrefab, position: this.Owner.sprite.WorldTopCenter,
+            velocity: UnityEngine.Random.Range(45f,135f).ToVector(4f), lifetime: 0.65f, fadeOutTime: 0.4f);
+        fv.sprite.SetSprite(fv.GetComponent<tk2dSpriteAnimator>().currentClip.frames[UnityEngine.Random.Range(0,5)].spriteId);
+    }
+
+    private void LateUpdate()
+    {
+        if (this.gun.spriteAnimator.currentClip.name == this.gun.reloadAnimation)
+            this.gun.RenderInFrontOfPlayer();
+    }
+}
+
+public class GlockarinaAmmoDisplay : CustomAmmoDisplay
+{
+    private Gun _gun;
+    private Glockarina _glock;
+    private PlayerController _owner;
+    private void Start()
+    {
+        this._gun = base.GetComponent<Gun>();
+        this._glock = this._gun.GetComponent<Glockarina>();
+        this._owner = this._gun.CurrentOwner as PlayerController;
+    }
+
+    public override bool DoCustomAmmoDisplay(GameUIAmmoController uic)
+    {
+        if (!this._owner)
+            return false;
+
+        uic.SetAmmoCountLabelColor(Color.white);
+        Vector3 relVec = Vector3.zero;
+        uic.GunAmmoCountLabel.AutoHeight = true; // enable multiline text
+        uic.GunAmmoCountLabel.ProcessMarkup = true; // enable multicolor text
+
+        string uiString = null;
+        switch(this._glock._mode)
+        {
+            case Glockarina.Mode.STORM: uiString = Glockarina._StormSpriteUI; break;
+            case Glockarina.Mode.TIME:  uiString = Glockarina._TimeSpriteUI;  break;
+            case Glockarina.Mode.SARIA: uiString = Glockarina._SariaSpriteUI; break;
+            case Glockarina.Mode.EMPTY: uiString = Glockarina._EmptySpriteUI; break;
+            default:
+                return false;
+        }
+
+        uic.GunAmmoCountLabel.Text = $"[sprite \"{uiString}\"]\n{this._gun.CurrentAmmo}/{this._gun.AdjustedMaxAmmo}";
+        return true;
     }
 }
 
@@ -202,8 +369,13 @@ public class SlowNearbyBullets : MonoBehaviour
                 continue;
 
             p.AddComponent<SlowedByGlockarina>();
-            ETGModConsole.Log($"slowing projectile {p.GetHashCode()}!");
             p.baseData.speed *= 0.33f;
+            p.LastVelocity *= 0.33f;
+            p.Speed *= 0.33f;
+            p.OverrideMotionModule = null;
+            p.specRigidbody.Velocity *= 0.33f;
+            p.specRigidbody.LastVelocity *= 0.33f;
+            p.SendInDirection(p.specRigidbody.Velocity, false, true);
             p.UpdateSpeed();
         }
     }

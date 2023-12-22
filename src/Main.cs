@@ -293,11 +293,15 @@ public class Initialisation : BaseUnityPlugin
             #region UI Sprites (cannot be async, must set up textures on main thread)
                 System.Diagnostics.Stopwatch setupUIWatch = System.Diagnostics.Stopwatch.StartNew();
                 BetterAtlas.AddUISpriteBatch(new(){
-                    ResMap.Get("barter_s_icon")[0]+".png",       Bart._BarterSpriteS,
-                    ResMap.Get("barter_a_icon")[0]+".png",       Bart._BarterSpriteA,
-                    ResMap.Get("barter_b_icon")[0]+".png",       Bart._BarterSpriteB,
-                    ResMap.Get("barter_c_icon")[0]+".png",       Bart._BarterSpriteC,
-                    ResMap.Get("soul_sprite_ui_icon")[0]+".png", Uppskeruvel._SoulSpriteUI,
+                    ResMap.Get("barter_s_icon")[0]+".png",         Bart._BarterSpriteS,
+                    ResMap.Get("barter_a_icon")[0]+".png",         Bart._BarterSpriteA,
+                    ResMap.Get("barter_b_icon")[0]+".png",         Bart._BarterSpriteB,
+                    ResMap.Get("barter_c_icon")[0]+".png",         Bart._BarterSpriteC,
+                    ResMap.Get("soul_sprite_ui_icon")[0]+".png",   Uppskeruvel._SoulSpriteUI,
+                    ResMap.Get("glockarina_storm_ui_icon")[0]+".png", Glockarina._StormSpriteUI,
+                    ResMap.Get("glockarina_time_ui_icon")[0]+".png",  Glockarina._TimeSpriteUI,
+                    ResMap.Get("glockarina_saria_ui_icon")[0]+".png", Glockarina._SariaSpriteUI,
+                    ResMap.Get("glockarina_empty_ui_icon")[0]+".png", Glockarina._EmptySpriteUI,
                 });
                 setupUIWatch.Stop();
             #endregion
