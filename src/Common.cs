@@ -223,12 +223,12 @@ public static class Dissect // reflection helper methods for being a lazy dumdum
     }
 
     // Dump IL instructions for an IL Hook
-    private static HashSet<string> _DumpedKeys = new();
-    public static void DumpILOnce(this ILCursor cursor, string key)
+    // private static HashSet<string> _DumpedKeys = new();
+    public static void DumpIL(this ILCursor cursor)
     {
-        if (_DumpedKeys.Contains(key))
-            return;
-        _DumpedKeys.Add(key);
+        // if (_DumpedKeys.Contains(key))
+        //     return;
+        // _DumpedKeys.Add(key);
         foreach (Instruction c in cursor.Instrs)
             DumpILInstruction(c);
     }

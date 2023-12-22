@@ -22,11 +22,11 @@ public class RatPoison : PassiveItem
         ratPoisonId   = item.PickupObjectId;
         ratPoisonHook = new Hook(
             typeof(PickupObject).GetMethod("ShouldBeTakenByRat", BindingFlags.Instance | BindingFlags.NonPublic),
-            typeof(RatPoison).GetMethod("ShouldBeTakenByRat", BindingFlags.Static | BindingFlags.Public)
+            typeof(RatPoison).GetMethod("ShouldBeTakenByRat", BindingFlags.Static | BindingFlags.NonPublic)
             );
     }
 
-    public static bool ShouldBeTakenByRat(Func<PickupObject, Vector2, bool> orig, PickupObject pickup, Vector2 point)
+    private static bool ShouldBeTakenByRat(Func<PickupObject, Vector2, bool> orig, PickupObject pickup, Vector2 point)
     {
         if (GameManager.Instance.AnyPlayerHasPickupID(ratPoisonId))
             return false;

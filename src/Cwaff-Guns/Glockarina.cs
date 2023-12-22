@@ -1,11 +1,5 @@
 ﻿namespace CwaffingTheGungy;
 
-
-/* TODO:
-    - play puzzle jingle when opening chest
-    - figure out song of time not slowing shotgun kin + other bullets
-*/
-
 public class Glockarina : AdvancedGunBehavior
 {
     public static string ItemName         = "Glockarina";
@@ -27,7 +21,7 @@ public class Glockarina : AdvancedGunBehavior
         DEFAULT,  // no special effects
         STORM,    // lightning shoots from notes when close to enemies
         TIME,     // slows down enemy bullets close to notes
-        SARIA,    // homes in on nearby enemies
+        SARIA,    // homes in on nearby enemies with slightly increased damage
         EMPTY,    // killed enemies become decoys
 
         DOUBLE,   // not a real mode, but song should clear room for 1/3 of max ammo
@@ -45,6 +39,8 @@ public class Glockarina : AdvancedGunBehavior
 
     internal static GameObject _DecoyPrefab   = null;
     internal static GameObject _NoteVFXPrefab = null;
+    private static ILHook _ChestOpenHookIL    = null;
+    private static int _GlockarinaPickupID    = -1;
     private static List<List<Note>> _Songs = new(){
         /* DEFAULT */ null,
         /* STORM   */ new(){Note.A, Note.DOWN, Note.UP, Note.A, Note.DOWN, Note.UP},
@@ -63,8 +59,8 @@ public class Glockarina : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Glockarina>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.2f, ammo: 800, canReloadNoMatterAmmo: true);
-            gun.SetAnimationFPS(gun.shootAnimation, 30);
+            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.2f, ammo: 400, canReloadNoMatterAmmo: true);
+            gun.SetAnimationFPS(gun.shootAnimation, 24);
             gun.SetAnimationFPS(gun.reloadAnimation, 20);
             gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
             gun.SetFireAudio("glockarina_shoot_sound");
@@ -72,7 +68,7 @@ public class Glockarina : AdvancedGunBehavior
 
         gun.gameObject.AddComponent<GlockarinaAmmoDisplay>();
 
-        gun.InitProjectile(new(clipSize: 12, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, speed: 35f,
+        gun.InitProjectile(new(clipSize: 12, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, speed: 35f, damage: 4f,
           sprite: "glockarina_projectile", fps: 12, anchor: Anchor.MiddleLeft, shouldRotate: false));
 
         _DecoyPrefab = ItemHelper.Get(Items.Decoy).GetComponent<SpawnObjectPlayerItem>().objectToSpawn.ClonePrefab();
@@ -80,6 +76,28 @@ public class Glockarina : AdvancedGunBehavior
             decoy.DeathExplosionTimer = _DECOY_LIFE;
 
         _NoteVFXPrefab = VFX.Create("note_vfx", 0.01f, loops: false, anchor: Anchor.MiddleCenter); // FPS must be nonzero or sprites don't update properly
+
+        _ChestOpenHookIL = new ILHook(  // dark magic to hook into ienumerator
+            typeof(Chest).GetNestedType("<PresentItem>c__Iterator6", BindingFlags.NonPublic | BindingFlags.Instance).GetMethod("MoveNext"),
+            OnSpewContentsOntoGroundIL
+            );
+
+        _GlockarinaPickupID = gun.PickupObjectId;
+    }
+
+    private static void OnSpewContentsOntoGroundIL(ILContext il)
+    {
+        ILCursor cursor = new ILCursor(il);
+        Type iterType = typeof(Chest).GetNestedType("<PresentItem>c__Iterator6", BindingFlags.NonPublic | BindingFlags.Instance);
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchStfld(iterType.FullName, "<displayTime>__1")))
+            return; // play our sound right before we begin the item display countdown
+        cursor.Emit(OpCodes.Call, typeof(Glockarina).GetMethod("OnChestOpen", BindingFlags.Static | BindingFlags.NonPublic));
+    }
+
+    private static void OnChestOpen()
+    {
+        if (GameManager.Instance.AnyPlayerHasPickupID(_GlockarinaPickupID))
+            AkSoundEngine.PostEvent("zelda_chest_sound", GameManager.Instance.gameObject);
     }
 
     private void UpdateMode()
@@ -125,7 +143,7 @@ public class Glockarina : AdvancedGunBehavior
                 if (player.CurrentRoom == null || player.CurrentRoom.area.PrototypeRoomCategory == PrototypeDungeonRoom.RoomCategory.BOSS)
                     return false; // can't insta-clear boss rooms
                 List<AIActor> activeEnemies = player.CurrentRoom.GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
-                if (activeEnemies == null)
+                if ((activeEnemies?.Count ?? 0) == 0)
                     return false; // can't insta-clear rooms that are already clear
                 player.CurrentRoom.ClearReinforcementLayers();
                 for (int i = activeEnemies.Count - 1; i >= 0; --i)
@@ -159,6 +177,7 @@ public class Glockarina : AdvancedGunBehavior
                     return true;
                 }
                 return false;
+
         }
         return false;
     }
@@ -243,6 +262,13 @@ public class Glockarina : AdvancedGunBehavior
 
         this._mode = finishedSong.Value;
         UpdateMode();
+
+        for (int i = 0; i < 6; ++i)
+        {
+            FancyVFX fv2 = FancyVFX.Spawn(_NoteVFXPrefab, position: this.Owner.sprite.WorldTopCenter,
+                velocity: UnityEngine.Random.Range(45f + 15f * i, 45f + 15f * (i + 1)).ToVector(4f), lifetime: 0.65f, fadeOutTime: 0.4f);
+            fv2.sprite.SetSprite(fv2.GetComponent<tk2dSpriteAnimator>().currentClip.frames[UnityEngine.Random.Range(0,5)].spriteId);
+        }
         AkSoundEngine.PostEvent("ocarina_song_success", base.gameObject);
         this._lastNotes.Clear();
     }
@@ -258,7 +284,7 @@ public class Glockarina : AdvancedGunBehavior
                 goopmod.CollisionSpawnRadius   = 1f;
                 goopmod.SpawnGoopInFlight      = true;
                 goopmod.InFlightSpawnRadius    = 0.4f;
-                goopmod.InFlightSpawnFrequency = 0.01f;
+                goopmod.InFlightSpawnFrequency = C.FRAME;
                 goopmod.goopDefinition         = EasyGoopDefinitions.WaterGoop;
                 break;
             case Mode.TIME:
@@ -268,7 +294,7 @@ public class Glockarina : AdvancedGunBehavior
                 HomingModifier home         = projectile.gameObject.AddComponent<HomingModifier>();
                 home.HomingRadius           = 10f;
                 home.AngularVelocity        = 720f;
-                projectile.baseData.damage *= 1.5f;
+                projectile.baseData.damage *= 1.25f;
                 break;
             case Mode.EMPTY:
                 projectile.gameObject.AddComponent<CreateDecoyOnKill>();
@@ -344,10 +370,12 @@ public class SlowNearbyBullets : MonoBehaviour
 {
     private class SlowedByGlockarina : MonoBehaviour {}
 
-    private const float REACH_SQR = 16f;
+    private const float _REACH_SQR         = 4f;
+    private const float _BULLET_TIME_SCALE = 0.5f;
 
     private Projectile _projectile;
     private PlayerController _owner;
+
     private void Start()
     {
         this._projectile = base.GetComponent<Projectile>();
@@ -365,18 +393,15 @@ public class SlowNearbyBullets : MonoBehaviour
             if (p.GetComponent<SlowedByGlockarina>())
                 continue;
             float sqrDistance = (p.transform.position - this._projectile.transform.position).sqrMagnitude;
-            if (sqrDistance > REACH_SQR)
+            if (sqrDistance > _REACH_SQR)
                 continue;
 
-            p.AddComponent<SlowedByGlockarina>();
-            p.baseData.speed *= 0.33f;
-            p.LastVelocity *= 0.33f;
-            p.Speed *= 0.33f;
-            p.OverrideMotionModule = null;
-            p.specRigidbody.Velocity *= 0.33f;
-            p.specRigidbody.LastVelocity *= 0.33f;
-            p.SendInDirection(p.specRigidbody.Velocity, false, true);
+            if (p.GetComponent<BulletScriptBehavior>()?.bullet is Bullet bullet)
+                bullet.Speed *= _BULLET_TIME_SCALE;
+            else
+                p.baseData.speed *= _BULLET_TIME_SCALE;
             p.UpdateSpeed();
+            p.AddComponent<SlowedByGlockarina>();
         }
     }
 }
@@ -385,6 +410,7 @@ public class CreateDecoyOnKill : MonoBehaviour
 {
     private Projectile _projectile;
     private PlayerController _owner;
+
     private void Start()
     {
         this._projectile = base.GetComponent<Projectile>();
