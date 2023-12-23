@@ -1068,4 +1068,24 @@ public static class Extensions
       // Take a weighted average
       return Vector2.Lerp(newDirectVelocity, newNaturalVelocity, lerpFactor);
   }
+
+
+  // Get Debris objects within a cone of vision from some reference position
+  public static IEnumerable<DebrisObject> DebrisWithinCone(this Vector2 start, float squareReach, float angle, float spread)
+  {
+      float minAngle = angle - spread;
+      float maxAngle = angle + spread;
+      foreach(DebrisObject debris in StaticReferenceManager.AllDebris)
+      {
+          if (!debris.HasBeenTriggered)
+              continue; // not triggered yet
+          if (debris.IsPickupObject || debris.Priority == EphemeralObject.EphemeralPriority.Critical)
+              continue; // don't vacuum up important objects
+          Vector2 deltaVec = (debris.gameObject.transform.position.XY() - start);
+          if (deltaVec.sqrMagnitude > squareReach || !deltaVec.ToAngle().IsNearAngle(angle, spread))
+              continue; // out of range
+          yield return debris;
+      }
+      yield break;
+  }
 }

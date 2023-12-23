@@ -277,6 +277,7 @@ public class Initialisation : BaseUnityPlugin
                 CarpetBomber.Add();
                 Uppskeruvel.Add();
                 Glockarina.Add();
+                Magunet.Add();
                 setupGunsWatch.Stop();
             #endregion
 

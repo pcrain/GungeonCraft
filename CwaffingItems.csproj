@@ -108,6 +108,7 @@
     <Compile Include="src\Hotfixes.cs"/>
     <Compile Include="src\Cwaff-Guns\Lightwing.cs"/>
     <Compile Include="src\Cwaff-Guns\VacuumCleaner.cs"/>
+    <Compile Include="src\Cwaff-Guns\Magunet.cs"/>
     <Compile Include="src\Cwaff-Guns\IronMaid.cs"/>
     <Compile Include="src\Cwaff-Guns\AimuHakurei.cs"/>
     <Compile Include="src\Cwaff-Guns\Unfinished\DeathNote.cs"/>
@@ -166,6 +167,7 @@
     <Compile Include="src\Cwaff-Flows\FlowPrefabs.cs"/>
     <Compile Include="src\NonstandardApi\ModdedShopItemAdder.cs"/>
     <Compile Include="src\NonstandardApi\CustomAmmoDisplay.cs"/>
+    <Compile Include="src\NonstandardApi\FloorDebrisManager.cs"/>
     <Compile Include="src\NonstandardApi\FakeShopItem.cs"/>
     <Compile Include="src\NonstandardApi\GungoSaveAPI\SpecialPickupObject.cs"/>
     <Compile Include="src\NonstandardApi\GungoSaveAPI\SaveTools.cs"/>
@@ -552,6 +554,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\glockarina_reload_012.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_048.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\glockarina_reload_007.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\magunet_idle_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_026.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_1_gun_010.json"/>
@@ -761,6 +764,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_6_gun_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\lightwing_reload_026.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_026.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\magunet_idle_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_5_gun_019.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\aimu_hakurei_fire_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_048.png"/>
@@ -1504,6 +1508,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\paintball_cannon_reload_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\glockarina_fire_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_2_gun_014.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\magunet_reload_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\crapshooter_reload_009.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\aimu_hakurei_fire_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_015.json"/>
@@ -1736,6 +1741,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_reload_019.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alligator_reload_019.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_fire_006.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\magunet_reload_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_charge_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_reload_024.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_1_gun_009.png"/>
@@ -2543,6 +2549,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_023.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\ice_cream_gun_idle_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_fire_004.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\magunet_fire_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_4_gun_016.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_fire_006.png"/>
@@ -2627,6 +2634,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\lightwing_reload_024.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_fire_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\missiletoe_fire_005.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\magunet_fire_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\crapshooter_reload_026.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_3_gun_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_008.json"/>
@@ -2997,6 +3005,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\soul_collect1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\midas_sparkle1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\echo_effect1.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\magunet_wave_sprite1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\hail_collision2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\shine.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\hail_collision1.png"/>
@@ -3040,6 +3049,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\pencil_sparkles3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\poe_soul6.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\whip_segment_base.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\magunet_wave_sprite3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\saiyan_spark4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\egg_break2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\soul_link_particle1.png"/>
@@ -3139,6 +3149,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\siren22.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\graze_vfx2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren7.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\magunet_wave_sprite2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\echo_effect2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\drowsy_cloud4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire_c4.png"/>
@@ -3179,6 +3190,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\siren1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\exorcism_particles2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\graze_vfx3.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\magbeam_alt.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\saiyan_spark3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\pencil_runes4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\gunbrella_target_reticle6.png"/>
@@ -3905,6 +3917,7 @@
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\blackjack_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\kings_law_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\pincushion_idle_001.png"/>
+    <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\magunet_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\aimu_hakurei_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\paintball_cannon_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\ice_cream_gun_idle_001.png"/>

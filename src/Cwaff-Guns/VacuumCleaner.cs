@@ -13,8 +13,6 @@ public class VacuumCleaner : AdvancedGunBehavior
 
     internal const float _REACH       =  8.00f; // how far (in tiles) the gun reaches
     internal const float _SPREAD      =    10f; // width (in degrees) of how wide our cone of suction is at the end of our reach
-    internal const float _BEG_WIDTH   =  0.40f; // width (in tiles) of cone of suction at the beginning of the gun's muzzle
-    internal const float _END_WIDTH   =  1.00f; // width (in tiles) of cone of suction at the end of the gun's range
     internal const float _ACCEL_SEC   =  1.80f; // speed (in tiles per second) at which debris accelerates towards the gun near the end of the gun's reach
     internal const float _UPDATE_RATE =   0.1f; // amount of time between debris checks / updates
     internal const float _AMMO_CHANCE =  0.01f; // percent chance debris restores ammo
@@ -94,17 +92,10 @@ public class VacuumCleaner : AdvancedGunBehavior
         // TODO: figure out how to make this less resource intensive...there can be a lot of debris
         float minAngle = this.gun.CurrentAngle - _SPREAD;
         float maxAngle = this.gun.CurrentAngle + _SPREAD;
-        foreach(DebrisObject debris in StaticReferenceManager.AllDebris)
+        foreach(DebrisObject debris in gunpos.DebrisWithinCone(_SQR_REACH, this.gun.CurrentAngle, _SPREAD))
         {
-            if (!debris.HasBeenTriggered)
-                continue; // not triggered yet
-            if (debris.IsPickupObject || debris.Priority == EphemeralObject.EphemeralPriority.Critical)
-                continue; // don't vacuum up important objects
             if (debris.gameObject.GetComponent<VacuumParticle>())
                 continue; // already added a vacuum particle component
-            Vector2 deltaVec = (debris.gameObject.transform.position.XY() - gunpos);
-            if (deltaVec.sqrMagnitude > _SQR_REACH || !deltaVec.ToAngle().IsBetweenRange(minAngle, maxAngle))
-                continue; // out of range
 
             // Make sure our debris doesn't glitch out with existing additional movement modifiers
             debris.ClearVelocity();
@@ -116,7 +107,7 @@ public class VacuumCleaner : AdvancedGunBehavior
             debris.enabled = false;
 
             // Actually add the VacuumParticle component to it
-            debris.gameObject.AddComponent<VacuumParticle>().Setup(this.gun, deltaVec.magnitude);
+            debris.gameObject.AddComponent<VacuumParticle>().Setup(this.gun, (debris.gameObject.transform.position.XY() - gunpos).magnitude);
             ++this._debrisSucked;
             MaybeRestoreAmmo();
         }
