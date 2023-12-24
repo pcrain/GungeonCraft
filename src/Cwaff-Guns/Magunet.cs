@@ -30,7 +30,7 @@ public class Magunet : AdvancedGunBehavior
 
         gun.InitProjectile(new(clipSize: -1, shootStyle: ShootStyle.Charged, ammoType: GameUIAmmoType.AmmoType.BEAM, chargeTime: float.MaxValue)); // absurdly high charge value so we never actually shoot
 
-        _MagunetVFX = VFX.Create(/*"magunet_wave_sprite"*/"magbeam_alt", fps: 30, loops: true, anchor: Anchor.MiddleCenter, scale: 0.65f, emissivePower: 1f);
+        _MagunetVFX = VFX.Create("magbeam_alt", fps: 30, loops: true, anchor: Anchor.MiddleCenter, scale: 0.65f, emissivePower: 1f);
     }
 
     private const float _NUM_PARTICLES = 3f;
@@ -73,6 +73,8 @@ public class Magunet : AdvancedGunBehavior
         {
             if (debris.gameObject.GetComponent<MagnetParticle>())
                 continue; // already added a vacuum particle component
+            if (debris.gameObject.GetComponent<Projectile>())
+                continue; // can't vacuum active projectiles
 
             // Make sure our debris doesn't glitch out with existing additional movement modifiers
             debris.ClearVelocity();
@@ -103,7 +105,7 @@ public class DebrisProjectile : Projectile
     {
         base.Update();
         base.specRigidbody.Position = new Position(this._debris.m_currentPosition);
-        base.specRigidbody.Velocity = this._debris.m_velocity.XY();
+        base.specRigidbody.Velocity = this._debris.m_velocity.XY(); // necessary for some reason to register collisions
         if (base.specRigidbody.Velocity.sqrMagnitude < 1)
             DieInAir(true, false, false, true);
     }
@@ -145,37 +147,31 @@ public class MagnetParticle : MonoBehaviour
         this._startScaleY   = this._sprite.scale.y;
         this._startAngle    = offsetAngle;
 
-        // get rid of any previously-cached projectile and speculativerigidbody information
-        this._debris?.gameObject.GetComponent<DebrisProjectile>()?.DieInAir();
+        // get rid of any previously-cached speculativerigidbody information
         if (this._debris?.specRigidbody)
         {
             UnityEngine.Object.Destroy(this._debris.specRigidbody);
             this._debris.specRigidbody = null;
+            this._debris.RegenerateCache();
         }
     }
 
     private void LaunchDebrisInStasis(Vector2 velocity)
     {
         int collisionWidth = 16;
-        if (this._debris.specRigidbody is not SpeculativeRigidbody body)
-        {
-            body                    = this._debris.gameObject.AddComponent<SpeculativeRigidbody>();
-            body.CollideWithTileMap = true;
-            body.CollideWithOthers  = true;
-            body.PixelColliders     = new List<PixelCollider>{new(){
-                CollisionLayer         = CollisionLayer.Projectile,
-                Enabled                = true,
-                ColliderGenerationMode = PixelCollider.PixelColliderGeneration.Manual,
-                ManualOffsetX          = collisionWidth / -2,
-                ManualOffsetY          = collisionWidth / -2,
-                ManualWidth            = collisionWidth,
-                ManualHeight           = collisionWidth,
-            }};
-            body.Initialize();
-            this._debris.specRigidbody = body;
-        }
-        else
-            Lazy.DebugLog($"SHOULD NEVER HAPPEN 2");  // TODO: and yet it does, figure out why
+        this._debris.specRigidbody ??= this._debris.gameObject.GetOrAddComponent<SpeculativeRigidbody>();
+        SpeculativeRigidbody body = this._debris.specRigidbody;
+        body.CollideWithTileMap = true;
+        body.CollideWithOthers  = true;
+        body.PixelColliders     = new List<PixelCollider>{new(){
+            CollisionLayer         = CollisionLayer.Projectile,
+            Enabled                = true,
+            ColliderGenerationMode = PixelCollider.PixelColliderGeneration.Manual,
+            ManualOffsetX          = collisionWidth / -2,
+            ManualOffsetY          = collisionWidth / -2,
+            ManualWidth            = collisionWidth,
+            ManualHeight           = collisionWidth,
+        }};
 
         if (!body)
         {
@@ -195,6 +191,9 @@ public class MagnetParticle : MonoBehaviour
         p.DestroyMode         = Projectile.ProjectileDestroyMode.DestroyComponent;
         p.collidesWithPlayer  = false;
         p.ManualControl       = true; // let debris velocity take care of movement
+
+        body.RegenerateCache();
+        body.Reinitialize();
         p.Start();
 
         this._debris.enabled           = true;
