@@ -20,7 +20,6 @@ public class VacuumCleaner : AdvancedGunBehavior
 
     internal const float _SQR_REACH   = _REACH * _REACH; // avoid an unnecessary sqrt() by using sqrmagnitude
 
-    private float _timeOfLastCheck = 0.0f;
     private int _debrisSucked = 0;
 
     public static void Add()
@@ -85,14 +84,9 @@ public class VacuumCleaner : AdvancedGunBehavior
             o.AddComponent<VacuumParticle>().Setup(this.gun, _REACH);
         }
 
-        if (BraveTime.ScaledTimeSinceStartup - this._timeOfLastCheck < _UPDATE_RATE)
-            return; // don't need to update 60 times a second
-        this._timeOfLastCheck = BraveTime.ScaledTimeSinceStartup;
-
-        // TODO: figure out how to make this less resource intensive...there can be a lot of debris
         float minAngle = this.gun.CurrentAngle - _SPREAD;
         float maxAngle = this.gun.CurrentAngle + _SPREAD;
-        foreach(DebrisObject debris in gunpos.DebrisWithinCone(_SQR_REACH, this.gun.CurrentAngle, _SPREAD))
+        foreach(DebrisObject debris in gunpos.DebrisWithinCone(_SQR_REACH, this.gun.CurrentAngle, _SPREAD, limit: 100))
         {
             if (debris.gameObject.GetComponent<VacuumParticle>())
                 continue; // already added a vacuum particle component

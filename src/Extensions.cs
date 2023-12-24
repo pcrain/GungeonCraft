@@ -1070,15 +1070,35 @@ public static class Extensions
   }
 
 
-  // Get Debris objects within a cone of vision from some reference position
-  public static IEnumerable<DebrisObject> DebrisWithinCone(this Vector2 start, float squareReach, float angle, float spread)
+  // Get Debris objects within a cone of vision from some reference position, optionally checking at most limit debris
+  private static int _nextDebris = 0;
+  public static IEnumerable<DebrisObject> DebrisWithinCone(this Vector2 start, float squareReach, float angle, float spread, int limit = -1)
   {
+      int total = StaticReferenceManager.AllDebris.Count;
+      if (total == 0)
+        yield break;
+
+      int next  = 0;
+      int last  = total;
+      if (limit > 0 && limit < total)
+      {
+        next = _nextDebris % total;
+        last = (next + limit) % total;
+      }
+
       float minAngle = angle - spread;
       float maxAngle = angle + spread;
-      // Debug.Log($"checking {StaticReferenceManager.AllDebris.Count} debris");
-      foreach(DebrisObject debris in StaticReferenceManager.AllDebris)
+      for (; next != last; ++next)
       {
-          if (!debris.HasBeenTriggered)
+          if (next == total)
+          {
+            next = 0;
+            if (next == last)
+              break;
+          }
+
+          DebrisObject debris = StaticReferenceManager.AllDebris[next];
+          if (!debris || !debris.HasBeenTriggered)
               continue; // not triggered yet
           if (debris.IsPickupObject || debris.Priority == EphemeralObject.EphemeralPriority.Critical)
               continue; // don't vacuum up important objects
@@ -1087,6 +1107,8 @@ public static class Extensions
               continue; // out of range
           yield return debris;
       }
+
+      _nextDebris = last;
       yield break;
   }
 }

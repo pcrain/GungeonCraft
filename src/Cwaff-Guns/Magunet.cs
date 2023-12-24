@@ -9,7 +9,8 @@ public class Magunet : AdvancedGunBehavior
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
 
-    internal static GameObject _MagunetVFX = null;
+    internal static GameObject _MagunetVFX      = null;
+    internal static GameObject _DebrisImpactVFX = null;
 
     internal const float _REACH       =  8.00f; // how far (in tiles) the gun reaches
     internal const float _SPREAD      =    35f; // width (in degrees) of how wide our cone of suction is at the end of our reach
@@ -31,6 +32,8 @@ public class Magunet : AdvancedGunBehavior
         gun.InitProjectile(new(clipSize: -1, shootStyle: ShootStyle.Charged, ammoType: GameUIAmmoType.AmmoType.BEAM, chargeTime: float.MaxValue)); // absurdly high charge value so we never actually shoot
 
         _MagunetVFX = VFX.Create("magbeam_alt", fps: 30, loops: true, anchor: Anchor.MiddleCenter, scale: 0.65f, emissivePower: 1f);
+
+        _DebrisImpactVFX = Pincushion._Microdust.effects[0].effects[0].effect;
     }
 
     private const float _NUM_PARTICLES = 3f;
@@ -63,13 +66,7 @@ public class Magunet : AdvancedGunBehavior
             }
         }
 
-        if (BraveTime.ScaledTimeSinceStartup - this._timeOfLastCheck < _UPDATE_RATE)
-            return; // don't need to update debris 60 times a second
-
-        this._timeOfLastCheck = BraveTime.ScaledTimeSinceStartup;
-
-        // TODO: figure out how to make this less resource intensive...there can be a lot of debris
-        foreach(DebrisObject debris in gunpos.DebrisWithinCone(_SQR_REACH, this.gun.CurrentAngle, _SPREAD))
+        foreach(DebrisObject debris in gunpos.DebrisWithinCone(_SQR_REACH, this.gun.CurrentAngle, _SPREAD, limit: 100))
         {
             if (debris.gameObject.GetComponent<MagnetParticle>())
                 continue; // already added a vacuum particle component
@@ -93,6 +90,9 @@ public class Magunet : AdvancedGunBehavior
 
 public class DebrisProjectile : Projectile
 {
+    private const float _MIN_PROJ_SPEED     = 4f;  // minimum speed for the debris to be considered a projectile
+    private const float _MIN_PROJ_SPEED_SQR = _MIN_PROJ_SPEED * _MIN_PROJ_SPEED;
+
     private DebrisObject _debris;
 
     public override void Start()
@@ -106,7 +106,7 @@ public class DebrisProjectile : Projectile
         base.Update();
         base.specRigidbody.Position = new Position(this._debris.m_currentPosition);
         base.specRigidbody.Velocity = this._debris.m_velocity.XY(); // necessary for some reason to register collisions
-        if (base.specRigidbody.Velocity.sqrMagnitude < 1)
+        if (base.specRigidbody.Velocity.sqrMagnitude < _MIN_PROJ_SPEED_SQR)
             DieInAir(true, false, false, true);
     }
 }
@@ -118,6 +118,8 @@ public class MagnetParticle : MonoBehaviour
     private const float _MIN_ALPHA          = 0.3f;
     private const float _MAX_ALPHA          = 1.0f;
     private const float _DLT_ALPHA          = _MAX_ALPHA - _MIN_ALPHA;
+    private const float _MIN_LAUNCH_SPEED   = 24f;
+    private const float _MAX_LAUNCH_SPEED   = 40f;
 
     private Gun _gun               = null;
     private tk2dBaseSprite _sprite = null;
@@ -134,7 +136,7 @@ public class MagnetParticle : MonoBehaviour
     private bool  _inStasis        = false;
     private float _statisAngle     = 0.0f;
     private float _statisMag       = 0.0f;
-    private float _launchAngle     = 0.0f;
+    private float _trueAngle     = 0.0f;
 
     public void Setup(Gun g, float startDistance = 0.0f, float offsetAngle = 0f)
     {
@@ -147,7 +149,8 @@ public class MagnetParticle : MonoBehaviour
         this._startScaleY   = this._sprite.scale.y;
         this._startAngle    = offsetAngle;
 
-        // get rid of any previously-cached speculativerigidbody information
+        // get rid of any previously-cached speculativerigidbody information so that enemies we've previously
+        //   collided with don't detect us as the same projectile and ignore us
         if (this._debris?.specRigidbody)
         {
             UnityEngine.Object.Destroy(this._debris.specRigidbody);
@@ -156,11 +159,25 @@ public class MagnetParticle : MonoBehaviour
         }
     }
 
+    private static float _LastSoundTime = 0.0f;
     private void LaunchDebrisInStasis(Vector2 velocity)
     {
-        int collisionWidth = 16;
+        int collisionWidth = 8;
         this._debris.specRigidbody ??= this._debris.gameObject.GetOrAddComponent<SpeculativeRigidbody>();
         SpeculativeRigidbody body = this._debris.specRigidbody;
+        if (!body)
+        {
+            // ETGModConsole.Log($"SHOULD NEVER HAPPEN 3");
+            UnityEngine.Object.Destroy(base.gameObject); //TODO: this does indeed happen, figure out why
+            return;
+        }
+
+        if (BraveTime.ScaledTimeSinceStartup - _LastSoundTime > 0.1f)
+        {
+            _LastSoundTime = BraveTime.ScaledTimeSinceStartup;
+            AkSoundEngine.PostEvent("magunet_launch_sound", base.gameObject);
+        }
+
         body.CollideWithTileMap = true;
         body.CollideWithOthers  = true;
         body.PixelColliders     = new List<PixelCollider>{new(){
@@ -173,13 +190,6 @@ public class MagnetParticle : MonoBehaviour
             ManualHeight           = collisionWidth,
         }};
 
-        if (!body)
-        {
-            Lazy.DebugLog($"SHOULD NEVER HAPPEN 3");
-            UnityEngine.Object.Destroy(base.gameObject);
-            return;
-        }
-
         DebrisProjectile p    = this._debris.gameObject.AddComponent<DebrisProjectile>();
         p.specRigidbody       = body;
         p.Owner               = this._gun.CurrentOwner;
@@ -191,6 +201,7 @@ public class MagnetParticle : MonoBehaviour
         p.DestroyMode         = Projectile.ProjectileDestroyMode.DestroyComponent;
         p.collidesWithPlayer  = false;
         p.ManualControl       = true; // let debris velocity take care of movement
+        p.OnHitEnemy         += OnHitEnemy;
 
         body.RegenerateCache();
         body.Reinitialize();
@@ -201,6 +212,12 @@ public class MagnetParticle : MonoBehaviour
         this._debris.ApplyVelocity(velocity);
 
         UnityEngine.Object.Destroy(this);
+    }
+
+    private void OnHitEnemy(Projectile bullet, SpeculativeRigidbody body, bool what)
+    {
+        SpawnManager.SpawnVFX(Magunet._DebrisImpactVFX, body.UnitCenter + Lazy.RandomVector(0.5f), Quaternion.identity);
+        UnityEngine.Object.Destroy(bullet.gameObject);
     }
 
     // Using LateUpdate() here so alpha is updated correctly
@@ -214,12 +231,14 @@ public class MagnetParticle : MonoBehaviour
         {
             if (!this._gun || !this._gun.IsCharging)
             {
-                LaunchDebrisInStasis(this._launchAngle.ToVector(UnityEngine.Random.Range(20f,30f)));
+                float launchAngle = this._statisAngle * (Magunet._SPREAD / 180f);
+                LaunchDebrisInStasis((this._gun.CurrentAngle + launchAngle)
+                    .ToVector(UnityEngine.Random.Range(_MIN_LAUNCH_SPEED, _MAX_LAUNCH_SPEED)));
                 return;
             }
-            this._launchAngle = (this._gun.CurrentAngle + this._statisAngle);
+            this._trueAngle = (this._gun.CurrentAngle + this._statisAngle);
             this.gameObject.transform.position = this._gun.barrelOffset.position.XY() +
-                this._launchAngle.Clamp360().ToVector(this._statisMag);
+                this._trueAngle.Clamp360().ToVector(this._statisMag);
             return;
         }
 
@@ -243,9 +262,8 @@ public class MagnetParticle : MonoBehaviour
         float mag = fromVacuum.magnitude;
         if (mag < _MIN_DIST_TO_VACUUM)
         {
-            // UnityEngine.GameObject.Destroy(base.gameObject);
             this._inStasis    = true;
-            this._statisAngle = (fromVacuum.ToAngle() - this._gun.CurrentAngle);
+            this._statisAngle = (fromVacuum.ToAngle() - this._gun.CurrentAngle).Clamp180();
             this._statisMag   = fromVacuum.magnitude;
             return;
         }
