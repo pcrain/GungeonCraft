@@ -1075,6 +1075,7 @@ public static class Extensions
   {
       float minAngle = angle - spread;
       float maxAngle = angle + spread;
+      // Debug.Log($"checking {StaticReferenceManager.AllDebris.Count} debris");
       foreach(DebrisObject debris in StaticReferenceManager.AllDebris)
       {
           if (!debris.HasBeenTriggered)

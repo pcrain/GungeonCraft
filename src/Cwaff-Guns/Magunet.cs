@@ -106,10 +106,6 @@ public class DebrisProjectile : Projectile
         base.specRigidbody.Velocity = this._debris.m_velocity.XY();
         if (base.specRigidbody.Velocity.sqrMagnitude < 1)
             DieInAir(true, false, false, true);
-
-        PixelCollider c = base.specRigidbody.PrimaryPixelCollider;
-        // SpawnManager.SpawnVFX(VFX.MiniPickup, C.PIXEL_SIZE * (c.Position + c.Dimensions / 2).ToVector3(0), Quaternion.identity);
-        // base.specRigidbody.transform.position = this._debris.m_currentPosition;
     }
 }
 
@@ -149,14 +145,8 @@ public class MagnetParticle : MonoBehaviour
         this._startScaleY   = this._sprite.scale.y;
         this._startAngle    = offsetAngle;
 
-        if (this._debris?.gameObject.GetComponent<DebrisProjectile>() is DebrisProjectile p)
-        {
-            Debug.Log($"destroying old DebrisProjectile");
-            p.DieInAir();
-            // if (p.specRigidbody)
-            //     UnityEngine.Object.Destroy(p.specRigidbody);
-            // UnityEngine.Object.Destroy(p);
-        }
+        // get rid of any previously-cached projectile and speculativerigidbody information
+        this._debris?.gameObject.GetComponent<DebrisProjectile>()?.DieInAir();
         if (this._debris?.specRigidbody)
         {
             UnityEngine.Object.Destroy(this._debris.specRigidbody);
@@ -166,21 +156,13 @@ public class MagnetParticle : MonoBehaviour
 
     private void LaunchDebrisInStasis(Vector2 velocity)
     {
-        if (!this._debris)
-        {
-            ETGModConsole.Log($"SHOULD NEVER HAPPEN");
-            UnityEngine.Object.Destroy(base.gameObject);
-            return;
-        }
-
         int collisionWidth = 16;
         if (this._debris.specRigidbody is not SpeculativeRigidbody body)
         {
-            body                        = this._debris.gameObject.AddComponent<SpeculativeRigidbody>();
-            body.CollideWithTileMap     = true;
-            body.CollideWithOthers      = true;
-            body.PixelColliders = new List<PixelCollider>{new(){
-                // Enabled                = false,
+            body                    = this._debris.gameObject.AddComponent<SpeculativeRigidbody>();
+            body.CollideWithTileMap = true;
+            body.CollideWithOthers  = true;
+            body.PixelColliders     = new List<PixelCollider>{new(){
                 CollisionLayer         = CollisionLayer.Projectile,
                 Enabled                = true,
                 ColliderGenerationMode = PixelCollider.PixelColliderGeneration.Manual,
@@ -193,11 +175,11 @@ public class MagnetParticle : MonoBehaviour
             this._debris.specRigidbody = body;
         }
         else
-            ETGModConsole.Log($"SHOULD NEVER HAPPEN 2");
+            Lazy.DebugLog($"SHOULD NEVER HAPPEN 2");  // TODO: and yet it does, figure out why
 
         if (!body)
         {
-            ETGModConsole.Log($"SHOULD NEVER HAPPEN 3");
+            Lazy.DebugLog($"SHOULD NEVER HAPPEN 3");
             UnityEngine.Object.Destroy(base.gameObject);
             return;
         }
@@ -206,46 +188,21 @@ public class MagnetParticle : MonoBehaviour
         p.specRigidbody       = body;
         p.Owner               = this._gun.CurrentOwner;
         p.Shooter             = p.Owner.specRigidbody;
-        p.baseData.damage     = 10f;
+        p.baseData.damage     = 1f;
         p.baseData.range      = 1000000f;
         p.baseData.speed      = velocity.magnitude;
         p.baseData.force      = 50f;
         p.DestroyMode         = Projectile.ProjectileDestroyMode.DestroyComponent;
-        // p.OnDestruction      += DestroyTrail;
-        p.collidesWithEnemies = true;
         p.collidesWithPlayer  = false;
         p.ManualControl       = true; // let debris velocity take care of movement
-        // p.BulletScriptSettings.surviveTileCollisions = true;
-        p.RegenerateCache(); // TODO: can have stale transform caches somehow, figure out why this is necessary
         p.Start();
-        body.Reinitialize();
-
-        // if (!p.GetComponent<EasyTrailBullet>())
-        // {
-        //     EasyTrailBullet trail = p.gameObject.AddComponent<EasyTrailBullet>();
-        //     trail.StartWidth      = 0.1f;
-        //     trail.EndWidth        = 0f;
-        //     trail.LifeTime        = 0.25f;
-        //     trail.BaseColor       = Color.yellow;
-        //     trail.StartColor      = Color.yellow;
-        //     trail.EndColor        = Color.yellow;
-        // }
 
         this._debris.enabled           = true;
         this._debris.m_currentPosition = this.gameObject.transform.position.WithZ(0f);
         this._debris.ApplyVelocity(velocity);
-        // this._debris.m_hasBeenTriggered = false;
 
         UnityEngine.Object.Destroy(this);
     }
-
-    // private static void DestroyTrail(Projectile p)
-    // {
-    //     // ETGModConsole.Log($"destroying projectile");
-    //     // Lazy.DoSmokeAt(p.transform.position);
-    //     if (p.GetComponent<EasyTrailBullet>() is EasyTrailBullet trail)
-    //         UnityEngine.Object.Destroy(trail);
-    // }
 
     // Using LateUpdate() here so alpha is updated correctly
     private void LateUpdate()
@@ -258,7 +215,7 @@ public class MagnetParticle : MonoBehaviour
         {
             if (!this._gun || !this._gun.IsCharging)
             {
-                LaunchDebrisInStasis(this._launchAngle/*.Clamp360()*/.ToVector(30f));
+                LaunchDebrisInStasis(this._launchAngle.ToVector(UnityEngine.Random.Range(20f,30f)));
                 return;
             }
             this._launchAngle = (this._gun.CurrentAngle + this._statisAngle);
