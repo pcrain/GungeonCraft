@@ -30,7 +30,7 @@ public class Magunet : AdvancedGunBehavior
 
         gun.InitProjectile(new(clipSize: -1, shootStyle: ShootStyle.Charged, ammoType: GameUIAmmoType.AmmoType.BEAM, chargeTime: float.MaxValue)); // absurdly high charge value so we never actually shoot
 
-        _MagunetVFX = VFX.Create(/*"magunet_wave_sprite"*/"magbeam_alt", fps: 30, loops: true, anchor: Anchor.MiddleCenter, scale: 0.5f, emissivePower: 1f);
+        _MagunetVFX = VFX.Create(/*"magunet_wave_sprite"*/"magbeam_alt", fps: 30, loops: true, anchor: Anchor.MiddleCenter, scale: 0.65f, emissivePower: 1f);
     }
 
     private const float _NUM_PARTICLES = 3f;
@@ -89,11 +89,28 @@ public class Magunet : AdvancedGunBehavior
     }
 }
 
+public class DebrisProjectile : Projectile
+{
+    private DebrisObject _debris;
+
+    public override void Start()
+    {
+        base.Start();
+        this._debris = base.GetComponent<DebrisObject>();
+    }
+
+    public override void Update()
+    {
+        base.Update();
+        base.specRigidbody.transform.position = this._debris.m_currentPosition;
+    }
+}
+
 // TODO: setting alpha on the first frame a sprite exists doesn't seem to work, so we create a dummy sprite
 public class MagnetParticle : MonoBehaviour
 {
     private const float _MAX_LIFE           = 0.5f;
-    private const float _MIN_DIST_TO_VACUUM = 0.5f;
+    private const float _MIN_DIST_TO_VACUUM = 1.25f;
     private const float _MIN_ALPHA          = 0.3f;
     private const float _MAX_ALPHA          = 1.0f;
     private const float _DLT_ALPHA          = _MAX_ALPHA - _MIN_ALPHA;
@@ -110,6 +127,10 @@ public class MagnetParticle : MonoBehaviour
     private float _startScaleX     = 1.0f;
     private float _startScaleY     = 1.0f;
     private float _startAngle      = 1.0f;
+    private bool  _inStasis        = false;
+    private float _statisAngle     = 0.0f;
+    private float _statisMag       = 0.0f;
+    private float _launchAngle     = 0.0f;
 
     public void Setup(Gun g, float startDistance = 0.0f, float offsetAngle = 0f)
     {
@@ -121,6 +142,87 @@ public class MagnetParticle : MonoBehaviour
         this._startScaleX   = this._sprite.scale.x;
         this._startScaleY   = this._sprite.scale.y;
         this._startAngle    = offsetAngle;
+
+        if (this._debris?.gameObject.GetComponent<DebrisProjectile>() is DebrisProjectile p)
+        {
+            Debug.Log($"destroying old DebrisProjectile");
+            UnityEngine.Object.Destroy(p);
+        }
+    }
+
+    private void LaunchDebrisInStasis(Vector2 velocity)
+    {
+        if (!this._debris)
+        {
+            ETGModConsole.Log($"SHOULD NEVER HAPPEN");
+            UnityEngine.Object.Destroy(base.gameObject);
+            return;
+        }
+
+        int collisionWidth = 16;
+        if (this._debris.specRigidbody is not SpeculativeRigidbody body)
+        {
+            body                        = this._debris.gameObject.AddComponent<SpeculativeRigidbody>();
+            body.CollideWithTileMap     = true;
+            body.CollideWithOthers      = true;
+            body.PixelColliders = new List<PixelCollider>{new(){
+                // Enabled                = false,
+                CollisionLayer         = CollisionLayer.Projectile,
+                Enabled                = true,
+                ColliderGenerationMode = PixelCollider.PixelColliderGeneration.Manual,
+                ManualOffsetX          = collisionWidth / -2,
+                ManualOffsetY          = collisionWidth / -2,
+                ManualWidth            = collisionWidth,
+                ManualHeight           = collisionWidth,
+            }};
+            body.Initialize();
+            this._debris.specRigidbody = body;
+        }
+
+        Projectile p    = this._debris.gameObject.AddComponent<Projectile>();
+        p.specRigidbody       = body;
+        p.Owner               = this._gun.CurrentOwner;
+        p.Shooter             = p.Owner.specRigidbody;
+        p.baseData.damage     = 10f;
+        p.baseData.range      = 1000000f;
+        p.baseData.speed      = velocity.magnitude;
+        p.baseData.force      = 50f;
+        p.DestroyMode         = Projectile.ProjectileDestroyMode.DestroyComponent;
+        // p.DestroyMode         = Projectile.ProjectileDestroyMode.BecomeDebris;
+        p.OnDestruction      += DestroyTrail;
+        // body.OnRigidbodyCollision += OnRigidbodyCollision;
+        p.collidesWithEnemies = true;
+        p.collidesWithPlayer  = false;
+        p.ManualControl = true; // let debris velocity take care of movement
+        // p.shouldRotate = false;
+        p.Start();
+        body.Reinitialize();
+
+        // if (!p.GetComponent<EasyTrailBullet>())
+        // {
+        //     EasyTrailBullet trail = p.gameObject.AddComponent<EasyTrailBullet>();
+        //     trail.StartWidth      = 0.1f;
+        //     trail.EndWidth        = 0f;
+        //     trail.LifeTime        = 0.25f;
+        //     trail.BaseColor       = Color.yellow;
+        //     trail.StartColor      = Color.yellow;
+        //     trail.EndColor        = Color.yellow;
+        // }
+
+        this._debris.enabled           = true;
+        this._debris.m_currentPosition = this.gameObject.transform.position.WithZ(0f);
+        this._debris.ApplyVelocity(velocity);
+        // this._debris.m_hasBeenTriggered = false;
+
+        UnityEngine.Object.Destroy(this);
+    }
+
+    private static void DestroyTrail(Projectile p)
+    {
+        // ETGModConsole.Log($"destroying projectile");
+        // Lazy.DoSmokeAt(p.transform.position);
+        if (p.GetComponent<EasyTrailBullet>() is EasyTrailBullet trail)
+            UnityEngine.Object.Destroy(trail);
     }
 
     // Using LateUpdate() here so alpha is updated correctly
@@ -128,6 +230,20 @@ public class MagnetParticle : MonoBehaviour
     {
         if (BraveTime.DeltaTime == 0.0f)
             return; // nothing to do if time isn't passing
+
+        // handle particles in stasis
+        if (this._inStasis)
+        {
+            if (!this._gun || !this._gun.IsCharging)
+            {
+                LaunchDebrisInStasis(this._launchAngle/*.Clamp360()*/.ToVector(30f));
+                return;
+            }
+            this._launchAngle = (this._gun.CurrentAngle + this._statisAngle);
+            this.gameObject.transform.position = this._gun.barrelOffset.position.XY() +
+                this._launchAngle.Clamp360().ToVector(this._statisMag);
+            return;
+        }
 
         // handle particle fading logic exclusive to the magnet particles
         if (!this._isDebris)
@@ -139,22 +255,24 @@ public class MagnetParticle : MonoBehaviour
             this.gameObject.transform.position = this._gun.barrelOffset.position.XY() +
                 curAngle.Clamp360().ToVector(lerpFactor * this._startDistance);
             this._sprite.transform.rotation = curAngle.EulerZ();
+            this._sprite.scale = new Vector3(this._startScaleX * lerpFactor, this._startScaleY * lerpFactor, 1f);
             if (!this._gun || this._lifetime > _MAX_LIFE)
                 UnityEngine.GameObject.Destroy(base.gameObject);
             return;
         }
 
-        Vector2 towardsVacuum = (this._gun.barrelOffset.position - this._sprite.transform.position);
-        float mag = towardsVacuum.magnitude;
+        Vector2 fromVacuum = (this._sprite.transform.position - this._gun.barrelOffset.position);
+        float mag = fromVacuum.magnitude;
         if (mag < _MIN_DIST_TO_VACUUM)
         {
-            UnityEngine.GameObject.Destroy(base.gameObject);
+            // UnityEngine.GameObject.Destroy(base.gameObject);
+            this._inStasis    = true;
+            this._statisAngle = (fromVacuum.ToAngle() - this._gun.CurrentAngle);
+            this._statisMag   = fromVacuum.magnitude;
             return;
         }
 
-        // Shrink on our way to the magnet
-        float scale = mag / this._startDistance;
-        this._sprite.scale = new Vector3(this._startScaleX * scale, this._startScaleY * scale, 1f);
+        // Home towards the magnet
         this._velocity = this._sprite.transform.position.XY().LerpNaturalAndDirectVelocity(
             target          : this._gun.barrelOffset.position,
             naturalVelocity : this._velocity,
