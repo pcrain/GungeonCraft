@@ -102,11 +102,17 @@ public class DebrisProjectile : Projectile
     public override void Update()
     {
         base.Update();
-        base.specRigidbody.transform.position = this._debris.m_currentPosition;
+        base.specRigidbody.Position = new Position(this._debris.m_currentPosition);
+        base.specRigidbody.Velocity = this._debris.m_velocity.XY();
+        if (base.specRigidbody.Velocity.sqrMagnitude < 1)
+            DieInAir(true, false, false, true);
+
+        PixelCollider c = base.specRigidbody.PrimaryPixelCollider;
+        // SpawnManager.SpawnVFX(VFX.MiniPickup, C.PIXEL_SIZE * (c.Position + c.Dimensions / 2).ToVector3(0), Quaternion.identity);
+        // base.specRigidbody.transform.position = this._debris.m_currentPosition;
     }
 }
 
-// TODO: setting alpha on the first frame a sprite exists doesn't seem to work, so we create a dummy sprite
 public class MagnetParticle : MonoBehaviour
 {
     private const float _MAX_LIFE           = 0.5f;
@@ -146,7 +152,15 @@ public class MagnetParticle : MonoBehaviour
         if (this._debris?.gameObject.GetComponent<DebrisProjectile>() is DebrisProjectile p)
         {
             Debug.Log($"destroying old DebrisProjectile");
-            UnityEngine.Object.Destroy(p);
+            p.DieInAir();
+            // if (p.specRigidbody)
+            //     UnityEngine.Object.Destroy(p.specRigidbody);
+            // UnityEngine.Object.Destroy(p);
+        }
+        if (this._debris?.specRigidbody)
+        {
+            UnityEngine.Object.Destroy(this._debris.specRigidbody);
+            this._debris.specRigidbody = null;
         }
     }
 
@@ -178,8 +192,17 @@ public class MagnetParticle : MonoBehaviour
             body.Initialize();
             this._debris.specRigidbody = body;
         }
+        else
+            ETGModConsole.Log($"SHOULD NEVER HAPPEN 2");
 
-        Projectile p    = this._debris.gameObject.AddComponent<Projectile>();
+        if (!body)
+        {
+            ETGModConsole.Log($"SHOULD NEVER HAPPEN 3");
+            UnityEngine.Object.Destroy(base.gameObject);
+            return;
+        }
+
+        DebrisProjectile p    = this._debris.gameObject.AddComponent<DebrisProjectile>();
         p.specRigidbody       = body;
         p.Owner               = this._gun.CurrentOwner;
         p.Shooter             = p.Owner.specRigidbody;
@@ -188,13 +211,12 @@ public class MagnetParticle : MonoBehaviour
         p.baseData.speed      = velocity.magnitude;
         p.baseData.force      = 50f;
         p.DestroyMode         = Projectile.ProjectileDestroyMode.DestroyComponent;
-        // p.DestroyMode         = Projectile.ProjectileDestroyMode.BecomeDebris;
-        p.OnDestruction      += DestroyTrail;
-        // body.OnRigidbodyCollision += OnRigidbodyCollision;
+        // p.OnDestruction      += DestroyTrail;
         p.collidesWithEnemies = true;
         p.collidesWithPlayer  = false;
-        p.ManualControl = true; // let debris velocity take care of movement
-        // p.shouldRotate = false;
+        p.ManualControl       = true; // let debris velocity take care of movement
+        // p.BulletScriptSettings.surviveTileCollisions = true;
+        p.RegenerateCache(); // TODO: can have stale transform caches somehow, figure out why this is necessary
         p.Start();
         body.Reinitialize();
 
@@ -217,13 +239,13 @@ public class MagnetParticle : MonoBehaviour
         UnityEngine.Object.Destroy(this);
     }
 
-    private static void DestroyTrail(Projectile p)
-    {
-        // ETGModConsole.Log($"destroying projectile");
-        // Lazy.DoSmokeAt(p.transform.position);
-        if (p.GetComponent<EasyTrailBullet>() is EasyTrailBullet trail)
-            UnityEngine.Object.Destroy(trail);
-    }
+    // private static void DestroyTrail(Projectile p)
+    // {
+    //     // ETGModConsole.Log($"destroying projectile");
+    //     // Lazy.DoSmokeAt(p.transform.position);
+    //     if (p.GetComponent<EasyTrailBullet>() is EasyTrailBullet trail)
+    //         UnityEngine.Object.Destroy(trail);
+    // }
 
     // Using LateUpdate() here so alpha is updated correctly
     private void LateUpdate()
