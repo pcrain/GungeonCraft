@@ -2982,6 +2982,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\poe_soul8.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\soul_link_particle3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\gunbrella_target_reticle4.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\magunet_charge_vfx2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\icicle_crash_particles2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\PumpChargeMeter3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren15.png"/>
@@ -3059,6 +3060,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\graze_vfx1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\fancy_line (copy 1).png"/>
     <EmbeddedResource Include="Resources\MiscVFX\subtractor_beam_hit_effect2.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\magunet_charge_vfx1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\note_vfx_5.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\soul_link_soul2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\soul_explode1.png"/>
@@ -3182,6 +3184,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\gunbrella_target_reticle5.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\soul_collect2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\soul_link_particle2.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\magunet_charge_vfx3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\poe_soul9.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\spark_vfx5.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\whip_segment.png"/>
@@ -3205,6 +3208,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\spark_vfx2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\exorcism_particles4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren5.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\magunet_charge_vfx4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\drowsy_cloud5.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire_d4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\zenkai_aura3.png"/>
