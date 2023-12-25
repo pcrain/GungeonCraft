@@ -1069,7 +1069,6 @@ public static class Extensions
       return Vector2.Lerp(newDirectVelocity, newNaturalVelocity, lerpFactor);
   }
 
-
   // Get Debris objects within a cone of vision from some reference position, optionally checking at most limit debris
   private static int _nextDebris = 0;
   public static IEnumerable<DebrisObject> DebrisWithinCone(this Vector2 start, float squareReach, float angle, float spread, int limit = -1)
@@ -1111,4 +1110,22 @@ public static class Extensions
       _nextDebris = last;
       yield break;
   }
+
+  // Get impact VFX from a specific Gun as a VFXPool
+  public static VFXPool EnemyImpactPool(this Items item, int proj = 0)
+    => (ItemHelper.Get(item) as Gun).DefaultModule.projectiles[proj].hitEffects.enemy;
+  public static VFXPool HorizontalImpactPool(this Items item, int proj = 0)
+    => (ItemHelper.Get(item) as Gun).DefaultModule.projectiles[proj].hitEffects.tileMapHorizontal;
+  public static VFXPool VerticalImpactPool(this Items item, int proj = 0)
+    => (ItemHelper.Get(item) as Gun).DefaultModule.projectiles[proj].hitEffects.tileMapVertical;
+
+  // Get impact VFX from a specific Gun as a GameObject
+  public static GameObject EnemyImpactVFX(this Items item, int proj = 0)
+    => (ItemHelper.Get(item) as Gun).DefaultModule.projectiles[proj].hitEffects.enemy.effects[0].effects[0].effect;
+  public static GameObject HorizontalImpactVFX(this Items item, int proj = 0)
+    => (ItemHelper.Get(item) as Gun).DefaultModule.projectiles[proj].hitEffects.tileMapHorizontal.effects[0].effects[0].effect;
+  public static GameObject VerticalImpactVFX(this Items item, int proj = 0)
+    => (ItemHelper.Get(item) as Gun).DefaultModule.projectiles[proj].hitEffects.tileMapVertical.effects[0].effects[0].effect;
+  public static GameObject AirImpactVFX(this Items item, int proj = 0)
+    => (ItemHelper.Get(item) as Gun).DefaultModule.projectiles[proj].hitEffects.overrideMidairDeathVFX;
 }

@@ -1,5 +1,12 @@
 namespace CwaffingTheGungy;
 
+/* TODO:
+    - better launch sound
+    - stasis animations
+    - gun animations
+    - charge vfx
+*/
+
 public class Magunet : AdvancedGunBehavior
 {
     public static string ItemName         = "Magunet";
@@ -9,8 +16,9 @@ public class Magunet : AdvancedGunBehavior
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
 
-    internal static GameObject _MagunetVFX      = null;
-    internal static GameObject _DebrisImpactVFX = null;
+    internal static GameObject _MagunetVFX         = null;
+    internal static GameObject _DebrisImpactVFX    = null;
+    internal static GameObject _DebrisBigImpactVFX = null;
 
     internal const float _REACH       =  8.00f; // how far (in tiles) the gun reaches
     internal const float _SPREAD      =    35f; // width (in degrees) of how wide our cone of suction is at the end of our reach
@@ -22,6 +30,7 @@ public class Magunet : AdvancedGunBehavior
 
     private float _timeOfLastCheck = 0.0f;
     private float _timeOfLastFX    = 0.0f;
+    private bool  _wasCharging     = false;
 
     public static void Add()
     {
@@ -33,7 +42,8 @@ public class Magunet : AdvancedGunBehavior
 
         _MagunetVFX = VFX.Create("magbeam_alt", fps: 30, loops: true, anchor: Anchor.MiddleCenter, scale: 0.65f, emissivePower: 1f);
 
-        _DebrisImpactVFX = Pincushion._Microdust.effects[0].effects[0].effect;
+        _DebrisBigImpactVFX = Items.Ak47.EnemyImpactVFX();
+        _DebrisImpactVFX    = Items.HegemonyRifle.EnemyImpactVFX();
     }
 
     private const float _NUM_PARTICLES = 3f;
@@ -43,7 +53,17 @@ public class Magunet : AdvancedGunBehavior
         if (BraveTime.DeltaTime == 0.0f)
             return;
         if (!this.gun.IsCharging)
+        {
+            if (this._wasCharging)
+            {
+                AkSoundEngine.PostEvent("magunet_launch_sound", base.gameObject);
+                Exploder.DoDistortionWave(center: this.gun.barrelOffset.position.XY() + this.gun.gunAngle.ToVector(0.5f),
+                    distortionIntensity: 1.5f, distortionRadius: 0.05f, maxRadius: 2.75f, duration: 0.25f);
+            }
+            this._wasCharging = false;
             return;
+        }
+        this._wasCharging = true;
 
         Vector2 gunpos = this.gun.barrelOffset.position;
 
@@ -81,6 +101,7 @@ public class Magunet : AdvancedGunBehavior
                 body.enabled = false;
             debris.isStatic = true;
             debris.enabled = false;
+            // debris.sprite.transform.position = debris.gameObject.transform.position;
 
             // Actually add the MagnetParticle component to it
             debris.gameObject.AddComponent<MagnetParticle>().Setup(this.gun, (debris.gameObject.transform.position.XY() - gunpos).magnitude);
@@ -136,7 +157,7 @@ public class MagnetParticle : MonoBehaviour
     private bool  _inStasis        = false;
     private float _statisAngle     = 0.0f;
     private float _statisMag       = 0.0f;
-    private float _trueAngle     = 0.0f;
+    private float _trueAngle       = 0.0f;
 
     public void Setup(Gun g, float startDistance = 0.0f, float offsetAngle = 0f)
     {
@@ -159,7 +180,6 @@ public class MagnetParticle : MonoBehaviour
         }
     }
 
-    private static float _LastSoundTime = 0.0f;
     private void LaunchDebrisInStasis(Vector2 velocity)
     {
         int collisionWidth = 8;
@@ -170,12 +190,6 @@ public class MagnetParticle : MonoBehaviour
             // ETGModConsole.Log($"SHOULD NEVER HAPPEN 3");
             UnityEngine.Object.Destroy(base.gameObject); //TODO: this does indeed happen, figure out why
             return;
-        }
-
-        if (BraveTime.ScaledTimeSinceStartup - _LastSoundTime > 0.1f)
-        {
-            _LastSoundTime = BraveTime.ScaledTimeSinceStartup;
-            AkSoundEngine.PostEvent("magunet_launch_sound", base.gameObject);
         }
 
         body.CollideWithTileMap = true;
@@ -194,7 +208,7 @@ public class MagnetParticle : MonoBehaviour
         p.specRigidbody       = body;
         p.Owner               = this._gun.CurrentOwner;
         p.Shooter             = p.Owner.specRigidbody;
-        p.baseData.damage     = 1f;
+        p.baseData.damage     = this._debris.IsCorpse ? 10f : 1f;
         p.baseData.range      = 1000000f;
         p.baseData.speed      = velocity.magnitude;
         p.baseData.force      = 50f;
@@ -202,13 +216,38 @@ public class MagnetParticle : MonoBehaviour
         p.collidesWithPlayer  = false;
         p.ManualControl       = true; // let debris velocity take care of movement
         p.OnHitEnemy         += OnHitEnemy;
+        p.shouldRotate        = true;
 
         body.RegenerateCache();
         body.Reinitialize();
         p.Start();
 
+        // ETGModConsole.Log($"rotation status");
+        // ETGModConsole.Log($"  gameObject z       {this.gameObject.transform.rotation.z}");
+        // ETGModConsole.Log($"  sprite z           {this._debris.sprite.transform.rotation.z}");
+        // ETGModConsole.Log($"  sprite m z         {this._debris.sprite.m_transform.rotation.z}");
+        // ETGModConsole.Log($"  debris z           {this._debris.transform.rotation.z}");
+        // ETGModConsole.Log($"  debris m z         {this._debris.m_transform.rotation.z}");
+        // ETGModConsole.Log($"  gameObject local z {this.gameObject.transform.localRotation.z}");
+        // ETGModConsole.Log($"  sprite local z     {this._debris.sprite.transform.localRotation.z}");
+        // ETGModConsole.Log($"  sprite local m z   {this._debris.sprite.m_transform.localRotation.z}");
+        // ETGModConsole.Log($"  debris local z     {this._debris.transform.localRotation.z}");
+        // ETGModConsole.Log($"  debris local m z   {this._debris.m_transform.localRotation.z}");
+        this._debris.m_currentPosition    = this.gameObject.transform.position.WithZ(0f);
+        this._debris.m_transform.rotation = this.gameObject.transform.rotation;
+
+        // this._debris.sprite.transform.rotation
+        //     = this._debris.sprite.m_transform.rotation
+        //     = this._debris.transform.rotation
+        //     = this._debris.m_transform.rotation
+        //     = this.gameObject.transform.localRotation
+        //     = this._debris.sprite.transform.localRotation
+        //     = this._debris.sprite.m_transform.localRotation
+        //     = this._debris.transform.localRotation
+        //     = this._debris.m_transform.localRotation
+        //     = this.gameObject.transform.rotation;
+
         this._debris.enabled           = true;
-        this._debris.m_currentPosition = this.gameObject.transform.position.WithZ(0f);
         this._debris.ApplyVelocity(velocity);
 
         UnityEngine.Object.Destroy(this);
@@ -216,7 +255,10 @@ public class MagnetParticle : MonoBehaviour
 
     private void OnHitEnemy(Projectile bullet, SpeculativeRigidbody body, bool what)
     {
-        SpawnManager.SpawnVFX(Magunet._DebrisImpactVFX, body.UnitCenter + Lazy.RandomVector(0.5f), Quaternion.identity);
+        SpawnManager.SpawnVFX(
+            prefab: this._debris.IsCorpse ? Magunet._DebrisBigImpactVFX : Magunet._DebrisImpactVFX,
+            position: body.UnitCenter + Lazy.RandomVector(0.5f),
+            rotation: Quaternion.identity);
         UnityEngine.Object.Destroy(bullet.gameObject);
     }
 
@@ -225,22 +267,6 @@ public class MagnetParticle : MonoBehaviour
     {
         if (BraveTime.DeltaTime == 0.0f)
             return; // nothing to do if time isn't passing
-
-        // handle particles in stasis
-        if (this._inStasis)
-        {
-            if (!this._gun || !this._gun.IsCharging)
-            {
-                float launchAngle = this._statisAngle * (Magunet._SPREAD / 180f);
-                LaunchDebrisInStasis((this._gun.CurrentAngle + launchAngle)
-                    .ToVector(UnityEngine.Random.Range(_MIN_LAUNCH_SPEED, _MAX_LAUNCH_SPEED)));
-                return;
-            }
-            this._trueAngle = (this._gun.CurrentAngle + this._statisAngle);
-            this.gameObject.transform.position = this._gun.barrelOffset.position.XY() +
-                this._trueAngle.Clamp360().ToVector(this._statisMag);
-            return;
-        }
 
         // handle particle fading logic exclusive to the magnet particles
         if (!this._isDebris)
@@ -258,7 +284,32 @@ public class MagnetParticle : MonoBehaviour
             return;
         }
 
+        // handle no more charging / no more gun state
+        if (!this._gun || !this._gun.IsCharging)
+        {
+            if (this._inStasis)
+            {
+                float launchAngle = this._statisAngle * (Magunet._SPREAD / 180f);
+                LaunchDebrisInStasis((this._gun.CurrentAngle + launchAngle)
+                    .ToVector(UnityEngine.Random.Range(_MIN_LAUNCH_SPEED, _MAX_LAUNCH_SPEED)));
+                return;
+            }
+            UnityEngine.Object.Destroy(this);
+            return;
+        }
+
+        // handle particles in stasis
         Vector2 fromVacuum = (this._sprite.transform.position - this._gun.barrelOffset.position);
+        this.gameObject.transform.rotation = fromVacuum.ToAngle().EulerZ();
+        if (this._inStasis)
+        {
+            this._trueAngle = (this._gun.CurrentAngle + this._statisAngle);
+            this.gameObject.transform.position = this._gun.barrelOffset.position.XY() +
+                this._trueAngle.Clamp360().ToVector(this._statisMag);
+            this.gameObject.transform.rotation = this._gun.CurrentAngle.EulerZ();
+            return;
+        }
+
         float mag = fromVacuum.magnitude;
         if (mag < _MIN_DIST_TO_VACUUM)
         {
