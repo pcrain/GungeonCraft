@@ -346,7 +346,7 @@ public class GyroscopeRoll : CustomDodgeRoll
 
                 if (chargePercent >= STUMBLE_THRES)
                 {
-                    string stumbleAnim = Lazy.GetBaseDodgeAnimationName(this.owner,this.owner.specRigidbody.Velocity);
+                    string stumbleAnim = Lazy.GetBaseDodgeAnimationName(this.owner, this.owner.specRigidbody.Velocity);
                     this.stumbleClip = this.owner.spriteAnimator.GetClipByName(stumbleAnim);
                     this.owner.QueueSpecificAnimation(stumbleClip.name);
                     this.owner.spriteAnimator.SetFrame(0, false);

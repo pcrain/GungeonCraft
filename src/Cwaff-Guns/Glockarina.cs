@@ -6,7 +6,7 @@ public class Glockarina : AdvancedGunBehavior
     public static string SpriteName       = "glockarina";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "ShOOT 'em Up";
-    public static string LongDescription  = "TBD";
+    public static string LongDescription  = " Fires musical notes as projectiles. Reloading with a full clip while aiming in a cardinal direction will play a note corresponding to that direction. Playing certain songs can change the properties of the projectiles or have other side effects.";
     public static string Lore             = "TBD";
 
     internal const string _StormSpriteUI = $"{C.MOD_PREFIX}:_GlockStormSpriteUI";
