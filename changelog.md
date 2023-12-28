@@ -5,6 +5,7 @@
 - Added custom ammo clips for Alligator, Carpet Bomber, Crapshooter, Glockarina, King's Law, Lightwing, Subtractor Beam, and Uppskeruvel, thanks to Lynceus!
 - Fixed Barter shop not having items if first run was not started through quickstart
 - Fixed modded item injection between shops not working if first run was not started through quickstart
+- Fixed modded shops not spawning at all on the first run if the run was not started through quickstart
 
 ## 1.5.1 (2023-12-20)
 - Made Companion Shop items non-stealable

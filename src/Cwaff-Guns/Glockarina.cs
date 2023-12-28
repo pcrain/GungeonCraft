@@ -104,7 +104,7 @@ public class Glockarina : AdvancedGunBehavior
     {
         if (this.Owner is not PlayerController pc)
             return;
-        if (this._mode == Mode.STORM && pc.healthHaver.damageTypeModifiers.Contains(this._electricImmunity))
+        if (this._mode == Mode.STORM && !pc.healthHaver.damageTypeModifiers.Contains(this._electricImmunity))
             pc.healthHaver.damageTypeModifiers.Add(this._electricImmunity);
         if (this._mode != Mode.STORM && pc.healthHaver.damageTypeModifiers.Contains(this._electricImmunity))
             pc.healthHaver.damageTypeModifiers.Remove(this._electricImmunity);
