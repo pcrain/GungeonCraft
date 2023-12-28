@@ -3,10 +3,11 @@
 ## 1.6.0
 - Added Glockarina, Magunet, Wavefront, and Cuppajoe
 - Added custom ammo clips for Alligator, Carpet Bomber, Crapshooter, Glockarina, King's Law, Lightwing, Subtractor Beam, and Uppskeruvel, thanks to Lynceus!
-- Fixed Barter shop not having items if first run was not started through quickstart
-- Fixed modded item injection between shops not working if first run was not started through quickstart
-- Fixed modded shops not spawning at all on the first run if the run was not started through quickstart
+- Fixed barter shop not having items if first run was not started through quickstart
+- Fixed barter shop and companion shop not spawning at all on the first run if the run was not started through quickstart
+- Fixed cross-mod shop item injection not working if first run was not started through quickstart
 - Fixed some modded guns with large idle animations dropping in weird places when spawned from chests
+- Fixed Iron Maid's offset in the weapon display panel
 
 ## 1.5.1 (2023-12-20)
 - Made Companion Shop items non-stealable
