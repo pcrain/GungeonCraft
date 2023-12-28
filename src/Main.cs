@@ -280,7 +280,7 @@ public class Initialisation : BaseUnityPlugin
                 Uppskeruvel.Add();
                 Glockarina.Add();
                 Magunet.Add();
-                TeslaCannon.Add();
+                Wavefront.Add();
                 setupGunsWatch.Stop();
             #endregion
 
