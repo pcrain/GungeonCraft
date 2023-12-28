@@ -184,7 +184,7 @@ public class Initialisation : BaseUnityPlugin
                 IceCream.Init();
                 // GungeonitePickaxe.Init();
                 ChamberJammer.Init();
-                // Cuppajoe.Init();
+                Cuppajoe.Init();
                 setupActivesWatch.Stop();
             #endregion
 

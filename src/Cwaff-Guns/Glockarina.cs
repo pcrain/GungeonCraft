@@ -68,7 +68,7 @@ public class Glockarina : AdvancedGunBehavior
 
         gun.gameObject.AddComponent<GlockarinaAmmoDisplay>();
 
-        gun.InitProjectile(new(clipSize: 12, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, speed: 35f, damage: 4f,
+        gun.InitProjectile(new(clipSize: 12, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, speed: 35f, damage: 4f, customClip: SpriteName,
           sprite: "glockarina_projectile", fps: 12, anchor: Anchor.MiddleLeft, shouldRotate: false));
 
         _DecoyPrefab = ItemHelper.Get(Items.Decoy).GetComponent<SpawnObjectPlayerItem>().objectToSpawn.ClonePrefab();

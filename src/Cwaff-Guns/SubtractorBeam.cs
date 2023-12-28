@@ -33,7 +33,7 @@ public class SubtractorBeam : AdvancedGunBehavior
             scale: 0.5f, anchor: Anchor.MiddleCenter, emissivePower: 10f);
 
         gun.InitProjectile(new(clipSize: 4, cooldown: 0.25f, angleVariance: 5.0f, shootStyle: ShootStyle.SemiAutomatic,
-          damage: 0.0f, speed: 300.0f, force: 0.0f, range: 300.0f
+          damage: 0.0f, speed: 300.0f, force: 0.0f, range: 300.0f, customClip: SpriteName
           )).Attach<PierceProjModifier>(pierce => {
             pierce.penetration            = 999;
             pierce.penetratesBreakables   = true;

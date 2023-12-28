@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.0
+- Added Glockarina, Magunet, Wavefront, and Cuppajoe
+- Added custom ammo clips for Alligator, Carpet Bomber, Crapshooter, Glockarina, King's Law, Lightwing, Subtractor Beam, and Uppskeruvel, thanks to Lynceus!
+
 ## 1.5.1 (2023-12-20)
 - Made Companion Shop items non-stealable
 - Forced Barter Shop to go out of stock on successful steal

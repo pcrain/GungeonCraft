@@ -45,7 +45,7 @@ public class Uppskeruvel : AdvancedGunBehavior
             gun.SetAnimationFPS(gun.reloadAnimation, 30);
             gun.SetMuzzleVFX("muzzle_platinum_star", fps: 60, scale: 0.2f, anchor: Anchor.MiddleCenter);
 
-        gun.InitProjectile(new(clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.Automatic, damage: 4f,
+        gun.InitProjectile(new(clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.Automatic, damage: 4f, customClip: SpriteName,
           sprite: "uppskeruvel_projectile", fps: 12, anchor: Anchor.MiddleLeft)).Attach<UppskeruvelProjectile>();
 
         gun.gameObject.AddComponent<UppskeruvelAmmoDisplay>();
