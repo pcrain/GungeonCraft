@@ -8,6 +8,9 @@
 - Fixed cross-mod shop item injection not working if first run was not started through quickstart
 - Fixed some modded guns with large idle animations dropping in weird places when spawned from chests
 - Fixed Iron Maid's offset in the weapon display panel
+- Nerfed Itemfinder: 
+	+ reduced max items per floor from 6 (should have been 5 but I'm bad at programming) to 4
+	+ reduced chances of finding more than 1 item per floor
 
 ## 1.5.1 (2023-12-20)
 - Made Companion Shop items non-stealable

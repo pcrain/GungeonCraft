@@ -8,8 +8,8 @@ public class Itemfinder : PlayerItem
     public static string LongDescription  = "Beeps when near hidden treasure. Using near hidden treasure uncovers an item or gun with varying rarity.";
     public static string Lore             = "Ox and Cadence commissioned the development of this handy little gadget for helping them find wares to sell at their shop. Their inventory has expanded considerably since they switched over from using a traditional metal detector, which had the unfortunate habit of going off around just about everything in the Gungeon. As this included the Gundead themselves, Ox and Cadence's medical expenses have also gone down considerably since foregoing the metal detector.";
 
-    // Chance for getting at least 0, 1, 2, 3, 4, or 5 treasures per floor
-    internal readonly float[] _TREASURE_CHANCES = {1.00f, 1.00f, 1.00f, 0.50f, 0.20f, 0.05f};
+    // Chance for getting at least 1, 2, 3, or 4 treasures per floor
+    internal readonly float[] _TREASURE_CHANCES = {1.00f, 0.50f, 0.20f, 0.05f};
     // Chance each individual treasure is at least D, C, B, A, or S tier
     internal readonly float[] _QUALITY_CHANCES  = {1.00f, 0.60f, 0.27f, 0.09f, 0.03f};
 
