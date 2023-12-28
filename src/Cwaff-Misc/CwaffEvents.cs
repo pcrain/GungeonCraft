@@ -41,6 +41,10 @@ public static class CwaffEvents // global custom events we can listen for
         if (OnAllModsLoaded != null)
             OnAllModsLoaded();
 
+        // for some reason, if we don't do this, custom rooms won't be loaded on the first run started from the breach
+        //   this method is already called if we quickstart a run
+        GameManager.Instance.GlobalInjectionData.PreprocessRun();
+
         return iter;
     }
 
