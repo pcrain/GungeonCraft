@@ -3,6 +3,8 @@
 ## 1.6.0
 - Added Glockarina, Magunet, Wavefront, and Cuppajoe
 - Added custom ammo clips for Alligator, Carpet Bomber, Crapshooter, Glockarina, King's Law, Lightwing, Subtractor Beam, and Uppskeruvel, thanks to Lynceus!
+- Fixed Barter shop not having items if first run was not started through quickstart
+- Fixed modded item injection between shops not working if first run was not started through quickstart
 
 ## 1.5.1 (2023-12-20)
 - Made Companion Shop items non-stealable
@@ -10,7 +12,7 @@
 - Added steal dialogue to Barter Shop
 - Added debug output to track down Barter Shop not having any items sometimes
 - Fixed null dereference in Ki Blast caused by looking up sprites for non-existent enemies
-- Fixed null dereference in Iron Maind caused by trying to update the Gun while the level is loading
+- Fixed null dereference in Iron Maid caused by trying to update the Gun while the level is loading
 - Fixed null dereference in Subtractor Beam caused by trying to update text to the position of non-existent enemies
 - Fixed null dereference in Drifter's Headgear and Gyroscope from not checking if they actually have an owner when destroyed
 - Fixed null dereference in Paintball Cannon during Dragun fight due to trying to color a non-existent AIActor

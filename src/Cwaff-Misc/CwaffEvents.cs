@@ -26,20 +26,22 @@ public static class CwaffEvents // global custom events we can listen for
             typeof(GameManager).GetMethod("ClearActiveGameData", BindingFlags.Instance | BindingFlags.Public),
             typeof(CwaffEvents).GetMethod("ClearActiveGameDataHook"));
 
-        new Hook(
-            typeof(GameManager).GetMethod("SetNextLevelIndex", BindingFlags.Instance | BindingFlags.Public),
-            typeof(CwaffEvents).GetMethod("SetNextLevelIndexHook"));
+        new Hook( // doesn't actually hook the ienumerator itsef, only the implicit method that calls it
+            typeof(FinalIntroSequenceManager).GetMethod("Start", BindingFlags.Instance | BindingFlags.NonPublic),
+            typeof(CwaffEvents).GetMethod("OnFinalIntroSequenceManagerStartHook"));
     }
 
-    public static void SetNextLevelIndexHook(Action<GameManager, int> orig, GameManager self, int index)
+    public static IEnumerator OnFinalIntroSequenceManagerStartHook(Func<FinalIntroSequenceManager, IEnumerator> orig, FinalIntroSequenceManager self)
     {
-        orig(self, index);
+        IEnumerator iter = orig(self);
         if (_AllModsLoaded)
-            return;
+            return iter;
 
         _AllModsLoaded = true;
         if (OnAllModsLoaded != null)
             OnAllModsLoaded();
+
+        return iter;
     }
 
     public static void ClearActiveGameDataHook(Action<GameManager, bool, bool> orig, GameManager self, bool destroyGameManager, bool endSession)

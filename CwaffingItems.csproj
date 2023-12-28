@@ -3732,7 +3732,6 @@
     <EmbeddedResource Include="Resources\CustomClips\subtractor_beam_clipfull_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\lightwing_clipfull_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\uppskeruvel_clipempty_001.png"/>
-    <EmbeddedResource Include="Resources\CustomClips\carpet_bomber_projectile_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\alligator_clipempty_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\outbreak_clipempty_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\carpet_bomber_clipfull_001.png"/>

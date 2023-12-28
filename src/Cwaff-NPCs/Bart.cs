@@ -96,7 +96,6 @@ public class Bart
 
     internal static void SetupBarterTable()
     {
-        Lazy.DebugLog($"setting up bartering table");
         // System.Diagnostics.Stopwatch tempWatch = System.Diagnostics.Stopwatch.StartNew();
         foreach (PickupObject item in PickupObjectDatabase.Instance.Objects)
         {
@@ -109,7 +108,6 @@ public class Bart
                 continue;  // we don't care about excluded objects
             _BarterTable.AddItemToPool(item.PickupObjectId);
         }
-        Debug.Log($"  added {_BarterTable.defaultItemDrops.elements.Count} items to bartering pool");
         // tempWatch.Stop(); ETGModConsole.Log($"  finished in "+(tempWatch.ElapsedMilliseconds/1000.0f)+" seconds");
     }
 
@@ -175,7 +173,6 @@ public class BarteringPriceFixer : MonoBehaviour
     {
         if (base.gameObject?.transform?.parent is not Transform shopTransform)
             return;
-        // Lazy.DebugLog($"Fixing barter prices!");
         foreach (Transform child in shopTransform)
         {
             CustomShopItemController[] shopItems =child?.gameObject?.GetComponentsInChildren<CustomShopItemController>();
