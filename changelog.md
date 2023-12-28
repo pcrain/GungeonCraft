@@ -6,6 +6,7 @@
 - Fixed Barter shop not having items if first run was not started through quickstart
 - Fixed modded item injection between shops not working if first run was not started through quickstart
 - Fixed modded shops not spawning at all on the first run if the run was not started through quickstart
+- Fixed some modded guns with large idle animations dropping in weird places when spawned from chests
 
 ## 1.5.1 (2023-12-20)
 - Made Companion Shop items non-stealable

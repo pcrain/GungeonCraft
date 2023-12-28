@@ -133,7 +133,8 @@ public static class DuctTapeSaveLoadHotfix
     }
 }
 
-// Fix guns with extremely large animations having enormous pickup ranges and appearing very weirdly on pedestals, in shops, and when picked up or dropped
+// Fix guns with extremely large animations having enormous pickup ranges and appearing very weirdly
+//   on pedestals, in chests, in shops, and when picked up or dropped
 public static class LargeGunAnimationHotfix
 {
     internal const string _TRIM_ANIMATION = "idle_trimmed";
@@ -158,6 +159,17 @@ public static class LargeGunAnimationHotfix
             OnDetermineContentsIL
             );
 
+        // Fix oversized idle animations in chests
+        new ILHook(  // dark magic to hook into ienumerator
+            typeof(Chest).GetNestedType("<PresentItem>c__Iterator6", BindingFlags.NonPublic | BindingFlags.Instance).GetMethod("MoveNext"),
+            OnPresentItemIL
+            );
+        // if (C.DEBUG_BUILD)
+        //     new Hook(  // debug set contents to something with an oversized sprite
+        //         typeof(Chest).GetMethod("DetermineContents", BindingFlags.Instance | BindingFlags.NonPublic),
+        //         typeof(LargeGunAnimationHotfix).GetMethod("OnDetermineChestContents", BindingFlags.Static | BindingFlags.NonPublic)
+        //         );
+
         // Change from the fixed to the normal idle animation when picking up a gun
         new Hook(
             typeof(GunInventory).GetMethod("AddGunToInventory", BindingFlags.Instance | BindingFlags.Public),
@@ -170,6 +182,12 @@ public static class LargeGunAnimationHotfix
             typeof(LargeGunAnimationHotfix).GetMethod("OnDropGun", BindingFlags.Static | BindingFlags.NonPublic)
             );
     }
+
+    // private static void OnDetermineChestContents(Action<Chest, PlayerController, int> orig, Chest chest, PlayerController player, int tierShift)
+    // {
+    //     chest.forceContentIds = new(){IDs.Pickups["platinum_star"]}; // for debugging
+    //     orig(chest, player, tierShift);
+    // }
 
     private static tk2dSpriteAnimationClip GetTrimmedIdleAnimation(this Gun gun)
     {
@@ -248,22 +266,6 @@ public static class LargeGunAnimationHotfix
     //     // reward.contents = PickupObjectDatabase.GetById(IDs.Pickups["jugglernaut"]);
     // }
 
-    // Use the first frame of the gun's (potentially trimmed) idle animation as its reward pedestal sprite
-    private static void FixRewardPedestalSpriteIfNecessary(RewardPedestal reward)
-    {
-        if (reward.contents.GetComponent<Gun>() is not Gun gun)
-            return;  // we don't have a gun, so there's nothing to do
-        if (!gun.idleAnimation.Contains(_TRIM_ANIMATION))
-            return;  // the gun doesn't have a trimmed idle animation, so there's nothing to do
-
-        tk2dSpriteAnimationClip idleClip = gun.GetTrimmedIdleAnimation();
-        if (idleClip == null || idleClip.frames == null || idleClip.frames.Count() == 0)
-            return;  // the idle animation clip is missing frames, so there's nothing to do
-
-        // actually adjust the sprite to display properly on the reward pedestal
-        reward.m_itemDisplaySprite.SetSprite(idleClip.frames[0].spriteCollection, idleClip.frames[0].spriteId);
-    }
-
     private static void OnDetermineContentsIL(ILContext il)
     {
         ILCursor cursor = new ILCursor(il);
@@ -280,6 +282,42 @@ public static class LargeGunAnimationHotfix
 
         cursor.Emit(OpCodes.Ldarg_0);
         cursor.Emit(OpCodes.Call, typeof(LargeGunAnimationHotfix).GetMethod("FixRewardPedestalSpriteIfNecessary", BindingFlags.Static | BindingFlags.NonPublic));
+    }
+
+    // Use the first frame of the gun's (potentially trimmed) idle animation as its reward pedestal sprite
+    private static void FixRewardPedestalSpriteIfNecessary(RewardPedestal reward)
+    {
+        if (reward.contents.GetComponent<Gun>() is not Gun gun)
+            return;  // we don't have a gun, so there's nothing to do
+        if (!gun.idleAnimation.Contains(_TRIM_ANIMATION))
+            return;  // the gun doesn't have a trimmed idle animation, so there's nothing to do
+
+        tk2dSpriteAnimationClip idleClip = gun.GetTrimmedIdleAnimation();
+        if (idleClip == null || idleClip.frames == null || idleClip.frames.Count() == 0)
+            return;  // the idle animation clip is missing frames, so there's nothing to do
+
+        // actually adjust the sprite to display properly on the reward pedestal
+        reward.m_itemDisplaySprite.SetSprite(idleClip.frames[0].spriteCollection, idleClip.frames[0].spriteId);
+    }
+
+    private static void OnPresentItemIL(ILContext il)
+    {
+        ILCursor cursor = new ILCursor(il);
+        int spriteVal = -1;
+        if (!cursor.TryGotoNext(MoveType.After,
+              instr => instr.MatchCall<tk2dSprite>("AddComponent"),
+              instr => instr.MatchStloc(out spriteVal)))
+            return; //
+
+        cursor.Emit(OpCodes.Ldloc_3); // PickupObject
+        cursor.Emit(OpCodes.Ldloc, spriteVal);  //tk2dSprite
+        cursor.Emit(OpCodes.Call, typeof(LargeGunAnimationHotfix).GetMethod("FixGunsFromChest", BindingFlags.Static | BindingFlags.NonPublic));
+    }
+
+    private static void FixGunsFromChest(PickupObject pickup, tk2dSprite sprite)
+    {
+        if ((pickup as Gun)?.GetTrimmedIdleAnimation() is tk2dSpriteAnimationClip trimmed)
+            sprite.SetSprite(trimmed.frames[0].spriteCollection, trimmed.frames[0].spriteId);
     }
 
     private static Gun OnAddGunToInventory(Func<GunInventory, Gun, bool, Gun> orig, GunInventory inventory, Gun gun, bool makeActive)
