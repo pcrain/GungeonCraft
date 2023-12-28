@@ -184,7 +184,7 @@ public class Initialisation : BaseUnityPlugin
                 IceCream.Init();
                 // GungeonitePickaxe.Init();
                 ChamberJammer.Init();
-                Cuppajoe.Init();
+                // Cuppajoe.Init();
                 setupActivesWatch.Stop();
             #endregion
 
@@ -220,6 +220,7 @@ public class Initialisation : BaseUnityPlugin
                 AdrenalineShot.Init();
                 StuntHelmet.Init();
                 ComfySlippers.Init();
+                // DisplayStand.Init();  // scrapped since discouraging item use is not very fun
                 setupPassivesWatch.Stop();
             #endregion
 
@@ -279,6 +280,7 @@ public class Initialisation : BaseUnityPlugin
                 Uppskeruvel.Add();
                 Glockarina.Add();
                 Magunet.Add();
+                TeslaCannon.Add();
                 setupGunsWatch.Stop();
             #endregion
 

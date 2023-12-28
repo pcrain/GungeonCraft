@@ -13,7 +13,6 @@ public class Cuppajoe : PlayerItem
     private Caffeination.State _State
     {
         get => this._caffeine?._state ?? Caffeination.State.NEUTRAL;
-        set => this._caffeine._state = value;
     }
     private Caffeination _caffeine = null;
     private PlayerController _owner = null;
