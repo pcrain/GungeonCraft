@@ -4,9 +4,9 @@ public class Cuppajoe : PlayerItem
 {
     public static string ItemName         = "Cuppajoe";
     public static string SpritePath       = "cuppajoe_icon";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string ShortDescription = "Not A Morning Person";
+    public static string LongDescription  = "Dramatically increases rate of fire, reload speed, movement speed, and dodge roll speed for 12 seconds, but dramatically decreases these stats for 8 seconds afterwards.";
+    public static string Lore             = "Coffee is something of a miracle beverage, letting you move faster, react quicker, focus harder, aim better, think better, learn better, practice more effectively, earn more money, heal all your illnesses, find true love, cure cancer, achieve world peace, end world hunger, open your third eye, see the future, reach nirvana, rule the galaxy, observe the multiverse...and it tastes good. Coffee's great isn't it!? Have another cup!!";
 
     private static Hook _CaffeinatedAnimationHook;
 
