@@ -31,9 +31,8 @@ public class Bart
             // Guaranteed spawn on 2nd or 3rd floor
             allowedTilesets        : (int)( GlobalDungeonData.ValidTilesets.GUNGEON | GlobalDungeonData.ValidTilesets.MINEGEON ),
             prequisiteValidator    : OnSecondOrThirdFloor,
-            // prequisiteValidator    : null,
-            talkPointOffset        : C.PIXEL_SIZE * new Vector2(7, 22),
-            npcPosition            : C.PIXEL_SIZE * new Vector2(10, 60 + 16),
+            talkPointOffset        : C.PIXEL_SIZE * new Vector2(32, 51),
+            npcPosition            : C.PIXEL_SIZE * new Vector2(-15, 76),
             itemPositions          : ShopAPI.defaultItemPositions.ShiftAll(C.PIXEL_SIZE * new Vector2(-25, 0 + 16)),
             exactlyOncePerRun      : true,
             // voice                  : "sans", // will play audio "Play_CHR_<voice>_voice_01"
@@ -81,7 +80,11 @@ public class Bart
 
         _BarterTable = shop.loot;
         shop.owner.gameObject.AddComponent<BarteringPriceFixer>();
+        shop.owner.gameObject.AddComponent<AddShotAnimation>();  // need to add at runtime since Reset() is called on the DialogueBox FsmStateAction
         shop.shop.AddComponent<ForceOutOfStockOnFailedSteal>();
+
+        // NOTE: can't use ShopAPI version because it relies on GetCallingAssembly() for embedded resources, which doesn't work with nested function calls
+        FancyRoomBuilder.AddParentedAnimationToShopFixed(shop.shop, ResMap.Get("bart_shot"), 1, "shot");
     }
 
     public static bool OnSecondOrThirdFloor(SpawnConditions conds)
@@ -164,6 +167,20 @@ public class Bart
     internal static bool OnSteal(PlayerController player, PickupObject pickup, int price)
     {
         return false;
+    }
+}
+
+public class AddShotAnimation : MonoBehaviour
+{
+    private void Start()
+    {
+        foreach (FsmStateAction action in base.GetComponent<PlayMakerFSM>().FsmStates[8].Actions)
+        {
+            if (action is not DialogueBox dialogue)
+                continue;
+            dialogue.SuppressDefaultAnims = false;
+            dialogue.OverrideTalkAnim     = "shot";
+        }
     }
 }
 

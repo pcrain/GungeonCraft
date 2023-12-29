@@ -3997,8 +3997,14 @@
     <EmbeddedResource Include="Resources\NPCSprites\insurance_boi\insurance_boi_talk.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\insurance_boi\insurance_boi_idle.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\insurance_boi\insurance_boi_icon.png"/>
-    <EmbeddedResource Include="Resources\NPCSprites\bart\bart_icon1.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\bart\bart_talk_004.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\bart\bart_icon_001.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\bart\bart_idle_004.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\bart\bart_idle_005.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\bart\bart_idle_003.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\bart\bart_talk_001.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\bart\bart_shot_001.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\bart\bart_talk_003.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\bart\bart_talk_002.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\bart\bart_idle_002.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\bart\bart_idle_001.png"/>
@@ -4012,6 +4018,11 @@
     <EmbeddedResource Include="Resources\NPCSprites\GrinReaper\grin_allsprites1.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\GrinReaper\grin_allsprites7.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\GrinReaper\grin_allsprites8.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\bart-alt\bart_alt_idle_001.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\bart-alt\bart_alt_icon1.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\bart-alt\bart_alt_idle_002.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\bart-alt\bart_alt_talk_002.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\bart-alt\bart_alt_talk_001.png"/>
     <EmbeddedResource Include="Resources\HUD\Coolness.png"/>
     <EmbeddedResource Include="Resources\HUD\Curse.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\natascha_idle_001.png"/>

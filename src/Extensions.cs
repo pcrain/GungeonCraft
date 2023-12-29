@@ -1128,4 +1128,13 @@ public static class Extensions
     => (ItemHelper.Get(item) as Gun).DefaultModule.projectiles[proj].hitEffects.tileMapVertical.effects[0].effects[0].effect;
   public static GameObject AirImpactVFX(this Items item, int proj = 0)
     => (ItemHelper.Get(item) as Gun).DefaultModule.projectiles[proj].hitEffects.overrideMidairDeathVFX;
+
+  // Append a string to all strings in a list
+  public static List<string> AppendAll(this List<string> strings, string suffix)
+  {
+    List<string> newStrings = new();
+    foreach (string s in strings)
+      newStrings.Add(s+suffix);
+    return newStrings;
+  }
 }

@@ -354,4 +354,54 @@ public static class FancyRoomBuilder
         // validTilesets                    = (GlobalDungeonData.ValidTilesets)127 // everything before Bullet Hell
       });
   }
+
+  // need to call this locally because the Alexandria version of SpriteBuilder.AddSpriteToCollection uses it's own AssemblyName due to how it's implemented
+  public static void AddParentedAnimationToShopFixed(GameObject self, List<string> yourPaths, float YourAnimFPS, string AnimationName)
+  {
+      var collection = self.GetComponentInChildren<tk2dSprite>().Collection;
+      tk2dSpriteAnimator spriteAnimator = self.GetComponentInChildren<tk2dSpriteAnimator>();
+      AIAnimator aianimator = self.GetComponentInChildren<AIAnimator>();
+      if (yourPaths != null)
+      {
+          var stealIdsList = new List<int>();
+          foreach (string sprite in yourPaths)
+          {
+              stealIdsList.Add(SpriteBuilder.AddSpriteToCollection(sprite, collection));
+          }
+          // ShopAPI.CreateDirectionalAnimation(spriteAnimator, collection, aianimator, stealIdsList, AnimationName, YourAnimFPS);
+          CreateDirectionalAnimation(spriteAnimator, collection, aianimator, stealIdsList, AnimationName, YourAnimFPS);
+      }
+  }
+
+  private static void CreateDirectionalAnimation(tk2dSpriteAnimator spriteAnimator, tk2dSpriteCollectionData collection, AIAnimator aianimator, List<int> IdsList, string animationName, float FPS)
+  {
+      SpriteBuilder.AddAnimation(spriteAnimator, collection, IdsList, animationName, tk2dSpriteAnimationClip.WrapMode.Once, FPS);
+      DirectionalAnimation aa = new DirectionalAnimation
+      {
+          Type = DirectionalAnimation.DirectionType.Single,
+          Prefix = animationName,
+          AnimNames = new string[1],
+          Flipped = new DirectionalAnimation.FlipType[1]
+      };
+      if (aianimator.OtherAnimations != null)
+      {
+          aianimator.OtherAnimations.Add(
+          new AIAnimator.NamedDirectionalAnimation
+          {
+              name = animationName,
+              anim = aa
+          });
+      }
+      else
+      {
+          aianimator.OtherAnimations = new List<AIAnimator.NamedDirectionalAnimation>
+          {
+              new AIAnimator.NamedDirectionalAnimation
+              {
+                  name = animationName,
+                  anim = aa
+              }
+          };
+      }
+  }
 }

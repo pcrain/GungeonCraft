@@ -28,6 +28,8 @@
 
     global using Gungeon;
     global using Dungeonator;
+    global using HutongGames.PlayMaker; //FSM___ stuff
+    global using HutongGames.PlayMaker.Actions; //FSM___ stuff
     global using Alexandria.ItemAPI;
     global using Alexandria.EnemyAPI;
     global using Alexandria.DungeonAPI;
@@ -45,9 +47,9 @@ global using RoomFactory       = Alexandria.DungeonAPI.RoomFactory;
 
 // global using Gunfiguration;
 
-global using static ProjectileModule; //ShootStyle, ProjectileSequenceStyle
-global using static tk2dBaseSprite;   //Anchor
-global using static PickupObject;     //ItemQuality
+global using static ProjectileModule;      //ShootStyle, ProjectileSequenceStyle
+global using static tk2dBaseSprite;        //Anchor
+global using static PickupObject;          //ItemQuality
 
 namespace CwaffingTheGungy;
 
