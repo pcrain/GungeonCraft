@@ -83,12 +83,12 @@ public static class ModdedShopItemAdder
 
         if (C.DEBUG_BUILD)
             ETGModConsole.Log($"scanning custom items: ");
-        foreach (GameObject shop in FancyRoomBuilder.DelayedModdedLootAdditions.Keys)
+        foreach (GameObject shop in FancyShopBuilder.DelayedModdedLootAdditions.Keys)
         {
             if (C.DEBUG_BUILD)
                 ETGModConsole.Log($"  looking in shop {shop.name}");
             GenericLootTable lootTable = shop.GetComponent<BaseShopController>().shopItems;
-            foreach (string moddedItem in FancyRoomBuilder.DelayedModdedLootAdditions[shop])
+            foreach (string moddedItem in FancyShopBuilder.DelayedModdedLootAdditions[shop])
             {
                 PickupObject moddedPickup = Lazy.GetModdedItem(moddedItem);
                 if (!moddedPickup)

@@ -11,7 +11,7 @@ public enum CwaffPrerequisites
 
 public class SpawnConditions
 {
-  public FancyRoomBuilder.SpawnCondition validator              = null;
+  public FancyShopBuilder.SpawnCondition validator              = null;
   public int                             spawnsThisRun          = 0;
   public float                           randomNumberForThisRun = 0.0f;
 }
@@ -40,7 +40,7 @@ public class CwaffPrerequisite : CustomDungeonPrerequisite
     }
   }
 
-  public static void AddPrequisiteValidator(CwaffPrerequisites prereq, FancyRoomBuilder.SpawnCondition validator)
+  public static void AddPrequisiteValidator(CwaffPrerequisites prereq, FancyShopBuilder.SpawnCondition validator)
   {
     if (SpawnConditions[(int)prereq] != null)
     {

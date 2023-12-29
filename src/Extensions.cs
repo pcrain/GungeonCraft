@@ -1024,7 +1024,7 @@ public static class Extensions
   // Convert a list of pickup ids to an evenly-weighted loot table
   public static GenericLootTable ToLootTable(this List<int> ids)
   {
-    GenericLootTable loot = FancyRoomBuilder.CreateLootTable();
+    GenericLootTable loot = FancyShopBuilder.CreateLootTable();
     foreach (int id in ids)
         loot.AddItemToPool(id);
     return loot;

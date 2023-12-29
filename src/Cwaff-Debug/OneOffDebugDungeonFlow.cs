@@ -3,7 +3,7 @@ namespace CwaffingTheGungy;
 public static class OneOffDebugDungeonFlow {
 
     public static DungeonFlow CreateAndWarp(string shopName) {
-        PrototypeDungeonRoom theRoom = FancyRoomBuilder.FancyShopRooms[shopName];
+        PrototypeDungeonRoom theRoom = FancyShopBuilder.FancyShopRooms[shopName];
         DungeonFlow m_CachedFlow = CreateFlowWithSingleTestRoom(theRoom);
         m_CachedFlow.name = shopName;
 

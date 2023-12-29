@@ -74,7 +74,7 @@ public class WhiteMage
         //     moddedItems.Add("cg:alyx");
         // }
 
-        FancyShopData shop = FancyRoomBuilder.MakeFancyShop(
+        FancyShopData shop = FancyShopBuilder.MakeFancyShop(
             npcName                : "white_mage",
             shopItems              : shopItems,
             moddedItems            : moddedItems,

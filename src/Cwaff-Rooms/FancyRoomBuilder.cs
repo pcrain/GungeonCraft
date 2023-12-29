@@ -16,7 +16,7 @@ public class FancyShopData
   public GenericLootTable loot;
 }
 
-public static class FancyRoomBuilder
+public static class FancyShopBuilder
 {
   public delegate bool SpawnCondition(SpawnConditions conds);
 
@@ -31,12 +31,12 @@ public static class FancyRoomBuilder
   private static List<string> _DefaultLine = new(){"Buy somethin', will ya!"};
 
   public static FancyShopData MakeFancyShop(string npcName, List<int> shopItems, string roomPath, List<string> moddedItems = null,
-    float spawnChance = 1f, Vector2? carpetOffset = null,
+    float spawnChance = 1f, Vector2? carpetOffset = null, int? idleFps = null, int? talkFps = null,
     CwaffPrerequisites spawnPrerequisite = CwaffPrerequisites.NONE, SpawnCondition prequisiteValidator = null, string voice = null,
     List<String> genericDialog = null, List<String> stopperDialog = null, List<String> purchaseDialog = null, List<String> stolenDialog = null,
     List<String> noSaleDialog = null, List<String> introDialog = null, List<String> attackedDialog = null, bool allowDupes = false,
     float mainPoolChance = 0.0f, Vector3? talkPointOffset = null, Vector3? npcPosition = null, List<Vector3> itemPositions = null,
-    bool exactlyOncePerRun = true, int allowedTilesets = 127, float costModifier = 1f, bool canBeRobbed = true,
+    bool exactlyOncePerRun = true, int allowedTilesets = 127, float costModifier = 1f, bool canBeRobbed = true, bool flipTowardsPlayer = true,
     Func<CustomShopController, PlayerController, int, bool> customCanBuy = null,
     Func<CustomShopController, PlayerController, int, int> removeCurrency = null,
     Func<CustomShopController, CustomShopItemController, PickupObject, int> customPrice = null,
@@ -71,9 +71,9 @@ public static class FancyRoomBuilder
       name                              : npcName,
       prefix                            : C.MOD_PREFIX,
       idleSpritePaths                   : ResMap.Get($"{npcName}_idle"),
-      idleFps                           : 2,
+      idleFps                           : idleFps ?? 2,
       talkSpritePaths                   : ResMap.Get($"{npcName}_talk"),
-      talkFps                           : 5,
+      talkFps                           : talkFps ?? 5,
       lootTable                         : lootTable,
       currency                          : (removeCurrency == null) ? CustomShopItemController.ShopCurrencyType.COINS : CustomShopItemController.ShopCurrencyType.CUSTOM,
       runBasedMultilineGenericStringKey : $"#{npcNameUpper}_GENERIC_TALK",
@@ -119,7 +119,8 @@ public static class FancyRoomBuilder
     shop.AddComponent<CwaffPrerequisite.Tracker>().Setup(spawnPrerequisite);
 
     TalkDoerLite npc = shop.GetComponentInChildren<TalkDoerLite>();
-    npc.gameObject.AddComponent<FlipsToFacePlayer>();
+    if (flipTowardsPlayer)
+      npc.gameObject.AddComponent<FlipsToFacePlayer>();
     if (!string.IsNullOrEmpty(voice))
       npc.audioCharacterSpeechTag = voice;
 
@@ -173,7 +174,7 @@ public static class FancyRoomBuilder
   }
 
   // Extension for checking shop activation conditions using CwaffPrerequisite and returning CwaffPrerequisite for inline setup
-  public static CwaffPrerequisites SetupPrerequisite(this CwaffPrerequisites prereq, FancyRoomBuilder.SpawnCondition validator)
+  public static CwaffPrerequisites SetupPrerequisite(this CwaffPrerequisites prereq, FancyShopBuilder.SpawnCondition validator)
   {
     if (prereq != CwaffPrerequisites.NONE)
       CwaffPrerequisite.AddPrequisiteValidator(prereq, validator);
@@ -356,8 +357,9 @@ public static class FancyRoomBuilder
   }
 
   // need to call this locally because the Alexandria version of SpriteBuilder.AddSpriteToCollection uses it's own AssemblyName due to how it's implemented
-  public static void AddParentedAnimationToShopFixed(GameObject self, List<string> yourPaths, float YourAnimFPS, string AnimationName)
+  public static void AddParentedAnimationToShopFixed(this FancyShopData shop, List<string> yourPaths, float YourAnimFPS, string AnimationName)
   {
+      GameObject self = shop.shop;
       var collection = self.GetComponentInChildren<tk2dSprite>().Collection;
       tk2dSpriteAnimator spriteAnimator = self.GetComponentInChildren<tk2dSpriteAnimator>();
       AIAnimator aianimator = self.GetComponentInChildren<AIAnimator>();
@@ -404,4 +406,59 @@ public static class FancyRoomBuilder
           };
       }
   }
+
+  public static void SetShotAnimation(this FancyShopData shop, List<string> paths, float fps)
+  {
+      shop.AddParentedAnimationToShopFixed(paths, fps, "shot");
+      // need to update when instantiated since Reset() is called on the DialogueBox FsmStateAction
+      shop.owner.gameObject.AddComponent<AddShotAnimation>();
+  }
+
+  private class AddShotAnimation : MonoBehaviour
+  {
+      private void Start()
+      {
+          foreach (FsmStateAction action in base.GetComponent<PlayMakerFSM>().FsmStates[8].Actions)
+          {
+              if (action is not DialogueBox dialogue)
+                  continue;
+              dialogue.SuppressDefaultAnims = false;
+              dialogue.OverrideTalkAnim     = "shot";
+          }
+      }
+  }
+}
+
+public class ForceOutOfStockOnFailedSteal : MonoBehaviour
+{
+    private CustomShopController _shop = null;
+    private bool _didOutOfStock = false;
+
+    private void Start()
+    {
+        this._shop = base.GetComponent<CustomShopController>();
+    }
+
+    private void Update()
+    {
+        if (this._didOutOfStock)
+            return;
+        if (!this._shop.m_wasCaughtStealing)
+            return;
+
+        foreach (Transform child in base.transform)
+        {
+            CustomShopItemController[] shopItems =child?.gameObject?.GetComponentsInChildren<CustomShopItemController>();
+            if ((shopItems?.Length ?? 0) == 0)
+                continue;
+            if (shopItems[0] is not CustomShopItemController shopItem)
+                continue;
+            if (!shopItem.item)
+                continue;
+            if (!shopItem.pickedUp)
+                shopItem.ForceOutOfStock();
+        }
+
+        this._didOutOfStock = true;
+    }
 }

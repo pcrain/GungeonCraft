@@ -19,7 +19,7 @@ public class Bart
 
         $"#BARTER_SHOP_SIGN".SetupDBStrings(new(){"HOW TO BARTER:\n\ndrop an item whose quality is\nat least the quality shown on\nthe item you wish to trade for."});
 
-        FancyShopData shop = FancyRoomBuilder.MakeFancyShop(
+        FancyShopData shop = FancyShopBuilder.MakeFancyShop(
             npcName                : "bart",
             shopItems              : shopItems,
             moddedItems            : moddedItems,
@@ -31,6 +31,9 @@ public class Bart
             // Guaranteed spawn on 2nd or 3rd floor
             allowedTilesets        : (int)( GlobalDungeonData.ValidTilesets.GUNGEON | GlobalDungeonData.ValidTilesets.MINEGEON ),
             prequisiteValidator    : OnSecondOrThirdFloor,
+            idleFps                : 6,
+            talkFps                : 6,
+            flipTowardsPlayer      : false,
             talkPointOffset        : C.PIXEL_SIZE * new Vector2(32, 51),
             npcPosition            : C.PIXEL_SIZE * new Vector2(-15, 76),
             itemPositions          : ShopAPI.defaultItemPositions.ShiftAll(C.PIXEL_SIZE * new Vector2(-25, 0 + 16)),
@@ -80,11 +83,8 @@ public class Bart
 
         _BarterTable = shop.loot;
         shop.owner.gameObject.AddComponent<BarteringPriceFixer>();
-        shop.owner.gameObject.AddComponent<AddShotAnimation>();  // need to add at runtime since Reset() is called on the DialogueBox FsmStateAction
+        shop.SetShotAnimation(paths: ResMap.Get("bart_shot"), fps: 1);
         shop.shop.AddComponent<ForceOutOfStockOnFailedSteal>();
-
-        // NOTE: can't use ShopAPI version because it relies on GetCallingAssembly() for embedded resources, which doesn't work with nested function calls
-        FancyRoomBuilder.AddParentedAnimationToShopFixed(shop.shop, ResMap.Get("bart_shot"), 1, "shot");
     }
 
     public static bool OnSecondOrThirdFloor(SpawnConditions conds)
@@ -170,20 +170,6 @@ public class Bart
     }
 }
 
-public class AddShotAnimation : MonoBehaviour
-{
-    private void Start()
-    {
-        foreach (FsmStateAction action in base.GetComponent<PlayMakerFSM>().FsmStates[8].Actions)
-        {
-            if (action is not DialogueBox dialogue)
-                continue;
-            dialogue.SuppressDefaultAnims = false;
-            dialogue.OverrideTalkAnim     = "shot";
-        }
-    }
-}
-
 public class BarteringPriceFixer : MonoBehaviour
 {
     private void Start()
@@ -207,39 +193,5 @@ public class BarteringPriceFixer : MonoBehaviour
                 case ItemQuality.D: shopItem.customPriceSprite = Bart._BarterSpriteC; break;
             }
         }
-    }
-}
-
-public class ForceOutOfStockOnFailedSteal : MonoBehaviour
-{
-    private CustomShopController _shop = null;
-    private bool _didOutOfStock = false;
-
-    private void Start()
-    {
-        this._shop = base.GetComponent<CustomShopController>();
-    }
-
-    private void Update()
-    {
-        if (this._didOutOfStock)
-            return;
-        if (!this._shop.m_wasCaughtStealing)
-            return;
-
-        foreach (Transform child in base.transform)
-        {
-            CustomShopItemController[] shopItems =child?.gameObject?.GetComponentsInChildren<CustomShopItemController>();
-            if ((shopItems?.Length ?? 0) == 0)
-                continue;
-            if (shopItems[0] is not CustomShopItemController shopItem)
-                continue;
-            if (!shopItem.item)
-                continue;
-            if (!shopItem.pickedUp)
-                shopItem.ForceOutOfStock();
-        }
-
-        this._didOutOfStock = true;
     }
 }
