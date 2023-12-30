@@ -4,6 +4,7 @@
 - Added Glockarina, Magunet, Wavefront, Cuppajoe, Safety Gloves, and Drab Outfit
 - Added custom ammo clips for Alligator, Carpet Bomber, Crapshooter, Glockarina, King's Law, Lightwing, Subtractor Beam, and Uppskeruvel, thanks to Lynceus!
 - Overhauled barter shopkeeper NPC sprites thanks again to Lynceus!
+- Fixed null dereference in Library Cardtridge caused by scanning for items in nonexistent shops
 - Fixed barter shop not having items if first run was not started through quickstart
 - Fixed barter shop and companion shop not spawning at all on the first run if the run was not started through quickstart
 - Fixed cross-mod shop item injection not working if first run was not started through quickstart

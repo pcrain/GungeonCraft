@@ -138,12 +138,12 @@ public class LibraryCardtridge : PassiveItem
 
     private void MakeBooksFree()
     {
-        foreach (BaseShopController shop in StaticReferenceManager.AllShops)
+        foreach (BaseShopController shop in StaticReferenceManager.AllShops.EmptyIfNull())
         {
-            foreach(ShopItemController shopItem in shop.m_itemControllers)
+            foreach(ShopItemController shopItem in shop?.m_itemControllers.EmptyIfNull())
             {
                 // Only apply discounts to whitelisted items
-                if (!_BookItemIDs.Contains(shopItem.item.PickupObjectId))
+                if (!shopItem?.item || !_BookItemIDs.Contains(shopItem.item.PickupObjectId))
                     continue;
 
                 // Don't apply discount to things with special currency
