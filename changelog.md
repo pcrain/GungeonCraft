@@ -1,7 +1,7 @@
 # Changelog
 
 ## 1.6.0
-- Added Glockarina, Magunet, Wavefront, and Cuppajoe
+- Added Glockarina, Magunet, Wavefront, Cuppajoe, Safety Gloves, and Drab Outfit
 - Added custom ammo clips for Alligator, Carpet Bomber, Crapshooter, Glockarina, King's Law, Lightwing, Subtractor Beam, and Uppskeruvel, thanks to Lynceus!
 - Overhauled barter shopkeeper NPC sprites thanks again to Lynceus!
 - Fixed barter shop not having items if first run was not started through quickstart

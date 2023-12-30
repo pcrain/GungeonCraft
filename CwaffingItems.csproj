@@ -55,6 +55,7 @@
     <Compile Include="src\Cwaff-Passives\LibraryCardtridge.cs"/>
     <Compile Include="src\Cwaff-Passives\GorgunEye.cs"/>
     <Compile Include="src\Cwaff-Passives\ComfySlippers.cs"/>
+    <Compile Include="src\Cwaff-Passives\DrabOutfit.cs"/>
     <Compile Include="src\Cwaff-Passives\CatEarHeadband.cs"/>
     <Compile Include="src\Cwaff-Passives\FourDBullets.cs"/>
     <Compile Include="src\Cwaff-Passives\WeddingRing.cs"/>
@@ -227,6 +228,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_3_gun_016.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_019.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_023.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\wavefront_idle_trimmed_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_reload_015.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_028.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_reload_007.json"/>
@@ -284,6 +286,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\vacuum_cleaner_charge_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_1_gun_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\outbreak_fire_001.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\magunet_idle_trimmed_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\lightwing_reload_018.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_049.json"/>
@@ -621,6 +624,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\paintball_cannon_fire_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_050.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\crapshooter_reload_004.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\glockarina_idle_trimmed_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_017.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_009.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_006.json"/>
@@ -1291,6 +1295,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_1_gun_024.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alligator_idle_trimmed_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\ki_blast_reload_001.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\wavefront_idle_trimmed_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\missiletoe_fire_008.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\vacuum_cleaner_charge_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_022.json"/>
@@ -1327,6 +1332,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\platinum_star_reload_013.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\lightwing_reload_028.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\wavefront_idle_trimmed_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\glockarina_fire_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_reload_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_5_gun_005.png"/>
@@ -1576,6 +1582,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\alligator_reload_022.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_reload_034.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\platinum_star_reload_021.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\wavefront_idle_trimmed_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_012.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_027.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_051.png"/>
@@ -3353,6 +3360,7 @@
     <EmbeddedResource Include="Resources\ItemSprites\adrenaline_shot_icon_old.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\insurance_policy_hunter_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\insurance_policy_gunslinger_icon.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\drab_outfit_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\display_stand_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\cat_ear_headband_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\zoolander_icon.png"/>

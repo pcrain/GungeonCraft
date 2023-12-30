@@ -224,6 +224,7 @@ public class Initialisation : BaseUnityPlugin
                 ComfySlippers.Init();
                 // DisplayStand.Init();  // scrapped since discouraging item use is not very fun
                 SafetyGloves.Init();
+                DrabOutfit.Init();
                 setupPassivesWatch.Stop();
             #endregion
 

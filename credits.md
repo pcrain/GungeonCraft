@@ -8,6 +8,8 @@ I have no artistic talent beyond making minor sprite and sound edits, so all bas
 
 ### Sprites
 
+* Several custom shopkeeper, clip, and projectile sprites by [Lynceus](https://enter-the-gungeon.thunderstore.io/package/Lynceus/The_Captain_Custom_Character/) from the Mod the Gungeon Discord
+* Various gun, item, and NPC sprites by [Dallan](https://enter-the-gungeon.thunderstore.io/package/Dallan/Breach_Renovations/) from the Mod the Gungeon Discord
 * Base Gun sprites from several sources, including the following:
  	- Classical from The Gungeon Discord
 	- [IdioticMuffin from Reddit](https://www.reddit.com/r/EnterTheGungeon/comments/et316d/yet_even_more_gun_concepts_for_gungeon/)
@@ -16,8 +18,6 @@ I have no artistic talent beyond making minor sprite and sound edits, so all bas
 	- [Terraria](https://terraria.wiki.gg/wiki/Guns) and many of its various mods including (but probably not limited to) [Tremor](https://tremormod.fandom.com/wiki/Weapons#Guns), [Exodus](https://exodusmod.fandom.com/wiki/Weapons#Guns), [The Spirit Mod](https://spiritmod.wiki.gg/wiki/Weapons#Guns), [Calamity](https://calamitymod.fandom.com/wiki/Guns), [Thorium](https://thoriummod.fandom.com/wiki/Guns), [Shadows of Abaddon](https://shadowsofabaddon.wiki.gg/wiki/Weapons#Guns), and [Mod of Redemption](https://modofredemption.wiki.gg/wiki/Weapons#Guns)
 	- [Duck Game](https://store.steampowered.com/app/312530/Duck_Game/)
 	- Most animation edits are my own, but probably aren't as good as the animations of the guns in their respective games / mods, so please check the original sources out!
-* Several custom clip and projectiles sprites by [Lynceus](https://enter-the-gungeon.thunderstore.io/package/Lynceus/The_Captain_Custom_Character/) from the Mod the Gungeon Discord
-* Shopkeeper sprites and various item sprites by [Dallan](https://enter-the-gungeon.thunderstore.io/package/Dallan/Breach_Renovations/) from the Mod the Gungeon Discord
 * More item sprites from various games including Knights in the Nightmare, Blaze Union, Pokemon, Dragonball Z: Buu's Fury, and Minecraft
 * [SPOILERS] boss sprites [by askywalker from Spriter's Resource](https://www.spriters-resource.com/custom_edited/undertalecustoms/sheet/126792/)
 * [SPOILERS] boss card art [by synistersyrup from DeviantArt](https://www.deviantart.com/synistersyrup/art/Sans-Uses-Flirt-665517108)
@@ -27,11 +27,11 @@ I have no artistic talent beyond making minor sprite and sound edits, so all bas
 	
 ### Sounds
 
-* A few sounds from [OpenGameArt.org](https://opengameart.org), and the rest from various games including Paper Mario 64 / TTYD, Terraria, Super Smash Bros. Melee, Elder Scrolls: Morrowind, Dragonball Z Budokai Tenkaichi 3, Donkey Kong 64, Kirby: Squeak Squad, Minecraft, and Undertale
+* A few sounds from [OpenGameArt.org](https://opengameart.org), and the rest from various games including Paper Mario 64 / TTYD, Terraria, Super Smash Bros. Melee, The Elder Scrolls: Morrowind, Dragonball Z Budokai Tenkaichi 3, Donkey Kong 64, Kirby: Squeak Squad, Minecraft, Undertale, and The Legend of Zelda: The Minish Cap 
 
 ## Special Thanks
 
+- Lynceus, for generously donating time and effort to making a bunch of beautiful custom shopkeeper, clip, and projectile sprites, in addition to helping writes some of the shopkeeper dialogue, beta test the mod, and find a few bugs
 - NeverNamed, for making [Once More Into the Breach](https://enter-the-gungeon.thunderstore.io/package/Nevernamed/Once_More_Into_The_Breach/) and providing a very useful code base to reference as I was learning to mod Enter the Gungeon
 - [ApacheThunder](https://enter-the-gungeon.thunderstore.io/package/ApacheThunder/ExpandTheGungeon/), [SpecialAPI](https://enter-the-gungeon.thunderstore.io/package/SpecialAPI/SpecialAPIs_Stuff/), and [Some Bunny](https://enter-the-gungeon.thunderstore.io/package/TeamPlanetside/Planetside_Of_Gunymede_PreRelease/) for answering a lot of questions and troubleshooting a lot of issues related to Gungeon modding and Unity in general
-- Lynceus, for generously donating time and effort to making a bunch of beautiful custom clip and projectile sprites, in addition to helping beta test the mod and find a few bugs
 - Dallan, Dulsam, June, Lichton, Neighborino, QAday, Skilotar, and the rest of the Mod the Gungeon Discord, for general help, friendly chat, and moral support. You are all beautiful people and I love you all <3 :D
