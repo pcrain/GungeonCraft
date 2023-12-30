@@ -44,7 +44,6 @@ public class GorgunEye : PassiveItem
 
         Vector2 ppos         = player.sprite.WorldCenter;
         float gunAngle       = player.m_currentGunAngle;
-        float minAngle       = gunAngle;
         AIActor closestEnemy = null;
         float closestDist    = 999999f;
         foreach(AIActor enemy in this.Owner.GetAbsoluteParentRoom().GetActiveEnemies(RoomHandler.ActiveEnemyType.All))

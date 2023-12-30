@@ -240,7 +240,6 @@ public class Missiletoe : AdvancedGunBehavior
     internal void RecalculateClip()
     {
         wrappedQualities.Add(ItemQuality.D);  // make sure our list has at least one item
-        ETGModConsole.Log($"  shuffling {wrappedQualities.Count} presents");
         _shuffledQualities = wrappedQualities.CopyAndShuffle();
         wrappedQualities.Pop();
         this.gun.DefaultModule.numberOfShotsInClip = _shuffledQualities.Count();
@@ -487,50 +486,30 @@ public class WrappableGift : MonoBehaviour
         this._animator.Play();
         AkSoundEngine.PostEvent(wrapping ? "present_wrap_sound" : "present_unwrap_sound", base.gameObject);
 
-        // Make it magically hover over to the present
-        if (unwrapping)// Wait for the appropriate point in the animation, then drop the original pickup
+        // If we're wrapping the pickup, make it magically hover over to the present
+        if (wrapping)
         {
-            yield return new WaitForSeconds(animLength * (1f - _VANISH_PERCENT));
-            Vector2 trueTarget = targetPosition - this._pickup.sprite.GetRelativePositionFromAnchor(Anchor.LowerCenter);
-            if (isGun)
-                trueTarget += _EXTRA_OFFSET; // guns are weirdly offset for some reason
-            LootEngine.DropItemWithoutInstantiating(this._pickup.gameObject, trueTarget, Vector2.zero, 0f, true, false, true);
-            if (this._pickup.GetComponent<PlayerItem>() is PlayerItem active)
-            {
-                active.RegisterMinimapIcon();
-                active.m_pickedUp = false;
-            }
-            else if (this._pickup.GetComponent<PassiveItem>() is PassiveItem passive)
-            {
-                passive.RegisterMinimapIcon();
-                passive.m_pickedUp = false;
-            }
-            this._pickup.m_isBeingEyedByRat = this._wasEyedByRat;
-            // else if (this._pickup.GetComponent<PassiveItem>() is PassiveItem passive)
+            pickupvfx.ArcTowards(
+              animLength: animLength, targetSprite: this._vfx.sprite, useBottom: true, minScale: _MIN_SCALE, vanishPercent: _VANISH_PERCENT);
             yield break;
         }
 
-        // Setup the VFX object for the pickup
-        pickupvfx.Setup(velocity: Vector2.zero, lifetime: animLength * _VANISH_PERCENT, fadeOutTime: animLength * _VANISH_PERCENT, fadeIn: unwrapping);
-
-        // Suck the pickup into the present and wait for the animation to play out
-        Vector2 startPosition  = unwrapping ? targetPosition : pickupvfx.sprite.WorldCenter;
-        float loopLength = animLength * _VANISH_PERCENT;
-        for (float elapsed = 0f; elapsed < loopLength; elapsed += BraveTime.DeltaTime)
+        // Otherwise, for the appropriate point in the animation, then drop the original pickup
+        yield return new WaitForSeconds(animLength * (1f - _VANISH_PERCENT));
+        Vector2 trueTarget = targetPosition - this._pickup.sprite.GetRelativePositionFromAnchor(Anchor.LowerCenter);
+        if (isGun)
+            trueTarget += _EXTRA_OFFSET; // guns are weirdly offset for some reason
+        LootEngine.DropItemWithoutInstantiating(this._pickup.gameObject, trueTarget, Vector2.zero, 0f, true, false, true);
+        if (this._pickup.GetComponent<PlayerItem>() is PlayerItem active2)
         {
-            if (!pickupvfx)
-                break;
-
-            float percentDone = Mathf.Clamp01(elapsed / loopLength);
-            float cubicLerp = Ease.OutCubic(percentDone);
-            Vector2 extraOffset = new Vector2(0f, 2f * Mathf.Sin(Mathf.PI * cubicLerp));
-            Vector2 curPosition = extraOffset + Vector2.Lerp(startPosition, targetPosition, cubicLerp);
-            float scale = ((1f - _MIN_SCALE) * cubicLerp);
-            if (wrapping)
-                scale = 1f - scale;
-            pickupvfx.sprite.transform.localScale = new Vector3(scale, scale, 1f);
-            pickupvfx.sprite.PlaceAtScaledPositionByAnchor(curPosition, Anchor.MiddleCenter);
-            yield return null;
+            active2.RegisterMinimapIcon();
+            active2.m_pickedUp = false;
         }
+        else if (this._pickup.GetComponent<PassiveItem>() is PassiveItem passive2)
+        {
+            passive2.RegisterMinimapIcon();
+            passive2.m_pickedUp = false;
+        }
+        this._pickup.m_isBeingEyedByRat = this._wasEyedByRat;
     }
 }

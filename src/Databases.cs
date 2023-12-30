@@ -2,6 +2,14 @@ namespace CwaffingTheGungy;
 
 // GUIDs for various enemies (notes by NN)
 public static class Enemies {
+    public static readonly HashSet<string> BulletKinVariants = new(){
+        BulletKin, AK47BulletKin, BandanaBulletKin, VeteranBulletKin, TreadnaughtsBulletKin, Minelet,
+        Cardinal, Shroomer, AshenBulletKin, MutantBulletKin, FallenBulletKin, HoodedBullet, OfficeBulletKin,
+        OfficeBulletteKin, Brollet, WesternBulletKin, PirateBulletKin, ArmoredBulletKin, RedShotgunKin,
+        BlueShotgunKin, VeteranShotgunKin, MutantShotgunKin, Executioner, AshenShotgunKin, Shotgrub, Creech,
+        WesternShotgunKin, PirateShotgunKin,
+    };
+
     //Bullet Kin & Variants
     public const string BulletKin                     = "01972dee89fc4404a5c408d50007dad5";
     public const string AK47BulletKin                 = "db35531e66ce41cbb81d507a34366dfe";
