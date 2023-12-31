@@ -392,7 +392,7 @@ public static class Extensions
     sprite.SetGlowiness(a);
   }
 
-  public static void SetGlowiness(this tk2dBaseSprite sprite, float a, Color? color = null, bool clampBrightness = true)
+  public static void SetGlowiness(this tk2dBaseSprite sprite, float glowAmount, Color? glowColor = null, Color? overrideColor = null, bool clampBrightness = true)
   {
     sprite.usesOverrideMaterial = true;
     Material m = sprite.renderer.material;
@@ -402,12 +402,14 @@ public static class Extensions
       m.DisableKeyword("BRIGHTNESS_CLAMP_ON");
       m.EnableKeyword("BRIGHTNESS_CLAMP_OFF");
     }
-    m.SetFloat("_EmissivePower", a);
-    if (color is Color c)
+    m.SetFloat("_EmissivePower", glowAmount);
+    if (glowColor is Color c)
     {
       m.SetFloat("_EmissiveColorPower", 1.55f);
       m.SetColor("_EmissiveColor", c);
     }
+    if (overrideColor is Color c2)
+      m.SetColor("_OverrideColor", c2);
   }
 
   // Randomly add or subtract an amount from an angle

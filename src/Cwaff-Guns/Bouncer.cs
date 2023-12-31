@@ -141,13 +141,8 @@ public class HarmlessUntilBounce : MonoBehaviour
         }
 
         HandleBounceSounds();
-        this._projectile.sprite.usesOverrideMaterial = true;
+        this._projectile.sprite.SetGlowiness(glowAmount: 0f, glowColor: Color.yellow, overrideColor: Color.yellow);
         Material m = this._projectile.sprite.renderer.material;
-            m.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-            m.SetFloat("_EmissivePower", 0f);
-            m.SetFloat("_EmissiveColorPower", 1.55f);
-            m.SetColor("_EmissiveColor", Color.yellow);
-            m.SetColor("_OverrideColor", Color.yellow);
 
         // Stretch
         for (int i = 1; i < BOUNCE_TIME; ++i)

@@ -271,12 +271,8 @@ public class KingsLawBullets : MonoBehaviour
         Vector2 originalPlayerPosition   = this._owner.CurrentGun.barrelOffset.PositionVector2();
         this._runeLarge.transform.parent = null;
         this._runeSmall.transform.parent = null;
-        this._projectile.sprite.usesOverrideMaterial = true;
+        this._projectile.sprite.SetGlowiness(glowAmount: 0f, glowColor: Color.cyan);
         Material m = this._projectile.sprite.renderer.material;
-            m.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-            m.SetFloat("_EmissivePower", 0f);
-            m.SetFloat("_EmissiveColorPower", 1.55f);
-            m.SetColor("_EmissiveColor", Color.cyan);
         AkSoundEngine.PostEvent("knife_gun_glow_stop_all", this._projectile.gameObject);
         AkSoundEngine.PostEvent("knife_gun_glow", this._projectile.gameObject);
         float moveTimer = _GLOW_TIME;

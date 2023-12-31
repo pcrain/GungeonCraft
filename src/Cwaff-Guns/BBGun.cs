@@ -81,12 +81,7 @@ public class TheBB : MonoBehaviour
         this._projectile.OnDestruction += CreateInteractible;
         this._maxSpeed = this._projectile.baseData.speed;
 
-        this._projectile.sprite.usesOverrideMaterial = true;
-        Material m = this._projectile.sprite.renderer.material;
-            m.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-            m.SetFloat("_EmissivePower", 1000f);
-            m.SetFloat("_EmissiveColorPower", 1.55f);
-            m.SetColor("_EmissiveColor", Color.magenta);
+        this._projectile.sprite.SetGlowiness(glowAmount: 1000f, glowColor: Color.magenta);
 
         BounceProjModifier bounce = this._projectile.gameObject.GetOrAddComponent<BounceProjModifier>();
             bounce.numberOfBounces     = Mathf.Max(bounce.numberOfBounces, 999);
@@ -111,12 +106,7 @@ public class TheBB : MonoBehaviour
           this._projectile.sprite.WorldCenter,
           BBInteractScript);
             mi.doHover = true;
-            mi.sprite.usesOverrideMaterial = true;
-            Material mat = mi.sprite.renderer.material;
-                mat.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-                mat.SetFloat("_EmissivePower", _BASE_EMISSION);
-                mat.SetFloat("_EmissiveColorPower", 1.55f);
-                mat.SetColor("_EmissiveColor", Color.magenta);
+            mi.sprite.SetGlowiness(glowAmount: _BASE_EMISSION, glowColor: Color.magenta);
         // UnityEngine.Object.Destroy(p.gameObject);
     }
 

@@ -58,12 +58,7 @@ public class TeslaProjectileBehavior : MonoBehaviour
             trail.StartColor = _TrailColor;
             trail.EndColor   = _TrailColor;
 
-        this._projectile.sprite.usesOverrideMaterial = true;
-        Material m = this._projectile.sprite.renderer.material;
-            m.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-            m.SetFloat("_EmissivePower", 1f);
-            m.SetFloat("_EmissiveColorPower", 1.55f);
-            m.SetColor("_EmissiveColor", Color.cyan);
+        this._projectile.sprite.SetGlowiness(glowAmount: 1f, glowColor: Color.cyan);
     }
 
     private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)

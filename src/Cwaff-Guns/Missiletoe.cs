@@ -330,19 +330,10 @@ public class GlowyChristmasProjectileBehavior : MonoBehaviour
 
     private void Start()
     {
-        Projectile _projectile = base.GetComponent<Projectile>();
-
-        _projectile.sprite.spriteAnimator.Play(_projectile.sprite.spriteAnimator.Library.clips.ChooseRandom());
-
-        if (this.glow == 0f)
-            return;
-
-        _projectile.sprite.usesOverrideMaterial = true;
-        Material m = _projectile.sprite.renderer.material;
-            m.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-            m.SetFloat("_EmissivePower", 40f);
-            m.SetFloat("_EmissiveColorPower", 1.55f);
-            m.SetColor("_EmissiveColor", Color.white);
+        Projectile proj = base.GetComponent<Projectile>();
+        proj.sprite.spriteAnimator.Play(proj.sprite.spriteAnimator.Library.clips.ChooseRandom());
+        if (this.glow > 0f)
+            proj.sprite.SetGlowiness(glowAmount: this.glow, glowColor: Color.white);
     }
 
     public void Glow(float amount)
