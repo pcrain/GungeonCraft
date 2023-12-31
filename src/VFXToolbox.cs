@@ -707,6 +707,60 @@ public class FancyVFX : MonoBehaviour
         return fv;
     }
 
+    public enum Rot
+    {
+        None,     // do note rotate the VFX
+        Random,   // rotate the VFX randomly
+        Position, // rotation matches the VFX's position relative to the base position
+        Velocity, // rotation matches the VFX's velocity
+    }
+
+    public enum Vel
+    {
+        Random,       // base velocity is augmented by a random vector with magnitude between 0 and velocityVariance
+        Radial,       // base velocity is augmented by a random vector with magnitude of exactly velocityVariance
+        Away,         // base velocity is augmented by a vector away from position with magnitude between 0 and velocityVariance
+        AwayRadial,   // base velocity is augmented by a vector away from position with magnitude of exactly velocityVariance
+    }
+
+    // Spawn a burst of VFX
+    public static void SpawnBurst(GameObject prefab, int numToSpawn, Vector2 basePosition, float positionVariance = 0f, Vector2? baseVelocity = null, float velocityVariance = 0f,
+        Vel velType = Vel.Random, Rot rotType = Rot.None, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false)
+    {
+        Vector2 realBaseVelocity = baseVelocity ?? Vector2.zero;
+        for (int i = 0; i < numToSpawn; ++i)
+        {
+            float posOffsetAngle = Lazy.RandomAngle();
+            Vector2 finalpos = (positionVariance > 0)
+                ? basePosition + posOffsetAngle.ToVector(UnityEngine.Random.value * positionVariance)
+                : basePosition;
+            Vector2 velocity = velType switch {
+                Vel.Random     => realBaseVelocity + Lazy.RandomAngle().ToVector(UnityEngine.Random.value * velocityVariance),
+                Vel.Radial     => realBaseVelocity + Lazy.RandomAngle().ToVector(velocityVariance),
+                Vel.Away       => realBaseVelocity + posOffsetAngle.ToVector(UnityEngine.Random.value * velocityVariance),
+                Vel.AwayRadial => realBaseVelocity + posOffsetAngle.ToVector(velocityVariance),
+                _              => realBaseVelocity,
+            };
+            Quaternion rot = rotType switch {
+                Rot.Random   => UnityEngine.Random.Range(0f,360f).EulerZ(),
+                Rot.Position => posOffsetAngle.EulerZ(),
+                Rot.Velocity => velocity.EulerZ(),
+                _            => Quaternion.identity,
+                };
+            FancyVFX.Spawn(
+                prefab        : prefab,
+                position      : finalpos,
+                rotation      : rot,
+                velocity      : velocity,
+                lifetime      : lifetime,
+                fadeIn        : fadeIn,
+                fadeOutTime   : fadeOutTime,
+                emissivePower : emissivePower,
+                emissiveColor : emissiveColor,
+                parent        : parent);
+        }
+    }
+
     // Make a new FancyVFX from a normal SpawnManager.SpawnVFX, ignoring pools (necessary for adding custom components)
     public static FancyVFX SpawnUnpooled(GameObject prefab, Vector3 position, Quaternion? rotation = null,
         Vector2? velocity = null, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false)

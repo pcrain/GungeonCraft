@@ -265,7 +265,7 @@ public class Glockarina : AdvancedGunBehavior
 
         for (int i = 0; i < 6; ++i)
         {
-            FancyVFX fv2 = FancyVFX.Spawn(_NoteVFXPrefab, position: this.Owner.sprite.WorldTopCenter,
+            FancyVFX fv2 = FancyVFX.Spawn(prefab: _NoteVFXPrefab, position: this.Owner.sprite.WorldTopCenter,
                 velocity: UnityEngine.Random.Range(45f + 15f * i, 45f + 15f * (i + 1)).ToVector(4f), lifetime: 0.65f, fadeOutTime: 0.4f);
             fv2.sprite.SetSprite(fv2.GetComponent<tk2dSpriteAnimator>().currentClip.frames[UnityEngine.Random.Range(0,5)].spriteId);
         }

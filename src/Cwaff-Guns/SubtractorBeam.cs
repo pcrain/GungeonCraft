@@ -164,13 +164,10 @@ public class SubtractorProjectile : MonoBehaviour
             return;
         }
 
-        Vector2 epos = enemy.sprite.WorldCenter;
-        for (int i = 0; i < _NUM_HIT_PARTICLES; ++i)
-        {
-            float angle = Lazy.RandomAngle();
-            Vector2 finalpos = epos + BraveMathCollege.DegreesToVector(angle);
-            FancyVFX.Spawn(SubtractorBeam._HitEffects, finalpos, Quaternion.identity, velocity: Lazy.RandomVector(1f), lifetime: 0.5f, fadeOutTime: 0.5f);
-        }
+        FancyVFX.SpawnBurst(prefab: SubtractorBeam._HitEffects, numToSpawn: _NUM_HIT_PARTICLES, basePosition: enemy.sprite.WorldCenter,
+            positionVariance: 1f, baseVelocity: Vector2.zero, velocityVariance: 1f, velType: FancyVFX.Vel.Radial,
+            lifetime: 0.5f, fadeOutTime: 0.5f);
+
         AkSoundEngine.PostEvent("subtractor_beam_impact_sound_stop_all", enemy.gameObject);
         AkSoundEngine.PostEvent("subtractor_beam_impact_sound", enemy.gameObject);
 

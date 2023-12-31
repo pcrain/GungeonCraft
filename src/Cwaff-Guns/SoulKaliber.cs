@@ -142,14 +142,9 @@ public class SoulLinkStatus : MonoBehaviour
             return false; // don't play any sounds
 
         this._lastVfxTime = BraveTime.ScaledTimeSinceStartup;
-        Vector2 ppos = this._enemy.sprite.WorldCenter;
-        for (int i = 0; i < _NUM_HIT_PARTICLES; ++i)
-        {
-            float angle = Lazy.RandomAngle();
-            Vector2 finalpos = ppos + BraveMathCollege.DegreesToVector(angle);
-            FancyVFX.Spawn(_SoulLinkSoulVFX, finalpos, 0f.EulerZ(),
-                velocity: _SOUL_PART_SPEED * Vector2.up, lifetime: 0.5f, fadeOutTime: 0.5f, emissivePower: 50f, emissiveColor: Color.white);
-        }
+        FancyVFX.SpawnBurst(prefab: _SoulLinkSoulVFX, numToSpawn: _NUM_HIT_PARTICLES, basePosition: this._enemy.sprite.WorldCenter,
+            positionVariance: 1f, baseVelocity: _SOUL_PART_SPEED * Vector2.up, lifetime: 0.5f, fadeOutTime: 0.5f,
+            emissivePower: 50f, emissiveColor: Color.white);
         return true; // now we can play sounds
     }
 }

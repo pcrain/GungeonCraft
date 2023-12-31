@@ -363,11 +363,9 @@ public class UppskeruvelLostSoul : MonoBehaviour
 
         if (this._lifetime > _MAX_LIFE)
         {
-            for (int i = 0; i < 4; ++i)
-            {
-                FancyVFX.Spawn(Outbreak._OutbreakSmokeVFX, base.transform.position, Lazy.RandomEulerZ(),
-                    velocity: Lazy.RandomVector(0.5f), lifetime: 0.3f, fadeOutTime: 0.6f);
-            }
+            FancyVFX.SpawnBurst(prefab: Outbreak._OutbreakSmokeVFX, numToSpawn: 4, basePosition: base.transform.position,
+                baseVelocity: Vector2.zero, velocityVariance: 0.5f, velType: FancyVFX.Vel.Radial, rotType: FancyVFX.Rot.Random,
+                lifetime: 0.3f, fadeOutTime: 0.6f);
             UnityEngine.Object.Destroy(base.gameObject);
             return;
         }

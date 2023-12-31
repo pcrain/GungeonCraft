@@ -163,14 +163,9 @@ public class GoldenDeath : MonoBehaviour
         this._sprite.renderer.material.SetFloat("_EmissiveColorPower", 1.55f);
         this._sprite.renderer.material.SetColor("_EmissiveColor", ExtendedColours.paleYellow);
 
-        Vector2 ppos = this._sprite.WorldCenter;
-        for (int i = 0; i < _NUM_PARTICLES; ++i)
-        {
-            float angle = Lazy.RandomAngle();
-            Vector2 finalpos = ppos + BraveMathCollege.DegreesToVector(angle, magnitude: _PART_SPREAD);
-            FancyVFX.Spawn(QuarterPounder._MidasParticleVFX, finalpos, Lazy.RandomEulerZ(),
-                velocity: Lazy.RandomVector(_PART_SPEED), lifetime: _PART_LIFE, fadeOutTime: _PART_LIFE, emissivePower: _PART_EMIT, emissiveColor: Color.white);
-        }
+        FancyVFX.SpawnBurst(prefab: QuarterPounder._MidasParticleVFX, numToSpawn: _NUM_PARTICLES, basePosition: this._sprite.WorldCenter,
+            positionVariance: _PART_SPREAD, baseVelocity: Vector2.zero, velocityVariance: _PART_SPEED, velType: FancyVFX.Vel.Radial,
+            rotType: FancyVFX.Rot.Random, lifetime: _PART_LIFE, fadeOutTime: _PART_LIFE, emissivePower: _PART_EMIT, emissiveColor: Color.white);
 
         AkSoundEngine.PostEvent("turn_to_gold", base.gameObject);
     }
