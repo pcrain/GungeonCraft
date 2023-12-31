@@ -8,11 +8,15 @@ public class AdrenalineShot : PassiveItem
     public static string LongDescription  = "Upon taking fatal damage, the player is put in a critical 0-health state and has 60 seconds to restore at least half a heart or exit the current floor. Taking any damage in this state decreases the countdown by 4 seconds. This item cannot be used by the Robot or other 0-health characters, and gives 20 casings instead.";
     public static string Lore             = "This otherwise normal-looking epinephrine injector has approximately 5 times the doctor-approved amount of adrenaline deemed necessary for your everyday anaphylaxis. While there's no telling what kinds of long-term effects that much adrenaline might have on your health, it's reasonable to assume it probably won't be worse than the short-term effects of having your vital organs punctured by bullets...probably.";
 
+    internal const string _FullHeartSpriteUI  = $"{C.MOD_PREFIX}:_AdrenalineFullShotHeartSpriteUI";
+    internal const string _HalfHeartSpriteUI  = $"{C.MOD_PREFIX}:_AdrenalineHalfShotHeartSpriteUI";
+    internal const string _EmptyHeartSpriteUI = $"{C.MOD_PREFIX}:_AdrenalineEmptyShotHeartSpriteUI";
+
     internal const float _MAX_ADRENALINE_TIME = 60f;
     internal const float _MAX_ADRENALINE_LOSS = 4f; // loss from taking damage while under effects of adrenaline
     internal const int   _CASINGS_FOR_ROBOT   = 20;
-    internal static int _AdrenalineShotId;
-    internal static dfSprite _AdrenalineHeart;
+    // internal static int _AdrenalineShotId;
+    // internal static dfSprite _AdrenalineHeart;
     internal static float _LastHeartbeatTime = 0f;
 
     private bool  _adrenalineActive = false;
@@ -24,73 +28,94 @@ public class AdrenalineShot : PassiveItem
         item.quality      = ItemQuality.C;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
-        _AdrenalineHeart = Lazy.SetupUISprite(ResMap.Get("adrenaline_heart"));
+        // _AdrenalineHeart = Lazy.SetupUISprite(ResMap.Get("adrenaline_heart"));
 
-        _AdrenalineShotId = item.PickupObjectId;
+        // _AdrenalineShotId = item.PickupObjectId;
+
+        // Old hacky method, new one is better and more robust, but keeping this around in case i ever need different kinds of hearts
+        // new Hook(
+        //     typeof(GameUIHeartController).GetMethod("UpdateHealth", BindingFlags.Public | BindingFlags.Instance),
+        //     typeof(AdrenalineShot).GetMethod("UpdateHealth", BindingFlags.NonPublic | BindingFlags.Static));
 
         new Hook(
-            typeof(GameUIHeartController).GetMethod("UpdateHealth", BindingFlags.Public | BindingFlags.Instance),
-            typeof(AdrenalineShot).GetMethod("UpdateHealth", BindingFlags.NonPublic | BindingFlags.Static));
+            typeof(GameUIHeartController).GetMethod("ProcessHeartSpriteModifications", BindingFlags.NonPublic | BindingFlags.Instance),
+            typeof(AdrenalineShot).GetMethod("OnProcessHeartSpriteModifications", BindingFlags.NonPublic | BindingFlags.Static));
     }
 
-    private static void UpdateHealth(Action<GameUIHeartController, HealthHaver> orig, GameUIHeartController guihc, HealthHaver hh)
+    private static void OnProcessHeartSpriteModifications(Action<GameUIHeartController, PlayerController> orig, GameUIHeartController guihc, PlayerController associatedPlayer)
     {
-        orig(guihc, hh);
-        if (hh?.m_player is not PlayerController player)
-            return;
+        orig(guihc, associatedPlayer);
 
-        int nHearts = guihc.extantHearts.Count();
-        if (nHearts == 0)
-            return; // we have nothing to do if there are no hearts
-
-        if (!player.gameObject.GetComponent<UnderAdrenalineEffects>())
-            nHearts = 0; // if we don't have this item, we have 0 adrenaline hearts
-
-        AdrenalineHeartOverlay overlay = guihc.gameObject.GetOrAddComponent<AdrenalineHeartOverlay>();
-        int aHearts = overlay.adrenalineHearts.Count();
-        if (aHearts == nHearts)
-            return; // if our current and cached hearts are the same, we have nothing to do
-
-        float scale = Pixelator.Instance.CurrentTileScale;
-
-        // Remove old hearts as necessary (all hearts except the first have a grandparent that manages them)
-        dfControl heartManager = guihc.extantHearts[0].Parent?.Parent ?? guihc.extantHearts[0].Parent;
-        if (!heartManager) // should never happen
+        foreach (PassiveItem passive in associatedPlayer?.passiveItems.EmptyIfNull())
         {
-            if (C.DEBUG_BUILD)
-                ETGModConsole.Log($"NO HEART MANAGER");
-            return;
-        }
-
-        for (int i = aHearts - 1; i >= nHearts; --i)
-        {
-            overlay.adrenalineHearts[i].transform.parent = null;
-            heartManager.RemoveControl(overlay.adrenalineHearts[i].GetComponent<dfControl>());
-            UnityEngine.Object.Destroy(overlay.adrenalineHearts[i]);
-            overlay.adrenalineHearts.RemoveAt(i);
-        }
-
-        // Add new hearts as necessary
-        for (int i = aHearts; i < nHearts; ++i)
-        {
-            dfSprite heart = guihc.extantHearts[i];
-            if (!heart)
-                continue;
-            GameObject gameObject = UnityEngine.Object.Instantiate(_AdrenalineHeart.gameObject);
-            gameObject.transform.parent = guihc.transform.parent;
-            gameObject.layer = guihc.gameObject.layer;
-            dfSprite component = gameObject.GetComponent<dfSprite>();
-            component.BringToFront();
-            heartManager.AddControl(component);
-            heartManager.BringToFront();
-            component.ZOrder = heart.ZOrder - 1;
-            component.RelativePosition = heart.RelativePosition + new Vector3(scale, 2 * scale, 0f);
-            component.Size = component.SpriteInfo.sizeInPixels * scale;
-            overlay.adrenalineHearts.Add(gameObject);
-
-            gameObject.transform.parent = heart.transform;  // make sure it disappears when minimap or pause is toggled
+            if (passive is AdrenalineShot shot && shot._adrenalineActive)
+            {
+                guihc.m_currentFullHeartName  = _FullHeartSpriteUI;
+                guihc.m_currentHalfHeartName  = _HalfHeartSpriteUI;
+                guihc.m_currentEmptyHeartName = _EmptyHeartSpriteUI;
+                break;
+            }
         }
     }
+
+    // private static void UpdateHealth(Action<GameUIHeartController, HealthHaver> orig, GameUIHeartController guihc, HealthHaver hh)
+    // {
+    //     orig(guihc, hh);
+    //     if (hh?.m_player is not PlayerController player)
+    //         return;
+
+    //     int nHearts = guihc.extantHearts.Count();
+    //     if (nHearts == 0)
+    //         return; // we have nothing to do if there are no hearts
+
+    //     if (!player.gameObject.GetComponent<UnderAdrenalineEffects>())
+    //         nHearts = 0; // if we don't have this item, we have 0 adrenaline hearts
+
+    //     AdrenalineHeartOverlay overlay = guihc.gameObject.GetOrAddComponent<AdrenalineHeartOverlay>();
+    //     int aHearts = overlay.adrenalineHearts.Count();
+    //     if (aHearts == nHearts)
+    //         return; // if our current and cached hearts are the same, we have nothing to do
+
+    //     float scale = Pixelator.Instance.CurrentTileScale;
+
+    //     // Remove old hearts as necessary (all hearts except the first have a grandparent that manages them)
+    //     dfControl heartManager = guihc.extantHearts[0].Parent?.Parent ?? guihc.extantHearts[0].Parent;
+    //     if (!heartManager) // should never happen
+    //     {
+    //         if (C.DEBUG_BUILD)
+    //             ETGModConsole.Log($"NO HEART MANAGER");
+    //         return;
+    //     }
+
+    //     for (int i = aHearts - 1; i >= nHearts; --i)
+    //     {
+    //         overlay.adrenalineHearts[i].transform.parent = null;
+    //         heartManager.RemoveControl(overlay.adrenalineHearts[i].GetComponent<dfControl>());
+    //         UnityEngine.Object.Destroy(overlay.adrenalineHearts[i]);
+    //         overlay.adrenalineHearts.RemoveAt(i);
+    //     }
+
+    //     // Add new hearts as necessary
+    //     for (int i = aHearts; i < nHearts; ++i)
+    //     {
+    //         dfSprite heart = guihc.extantHearts[i];
+    //         if (!heart)
+    //             continue;
+    //         GameObject gameObject = UnityEngine.Object.Instantiate(_AdrenalineHeart.gameObject);
+    //         gameObject.transform.parent = guihc.transform.parent;
+    //         gameObject.layer = guihc.gameObject.layer;
+    //         dfSprite component = gameObject.GetComponent<dfSprite>();
+    //         component.BringToFront();
+    //         heartManager.AddControl(component);
+    //         heartManager.BringToFront();
+    //         component.ZOrder = heart.ZOrder - 1;
+    //         component.RelativePosition = heart.RelativePosition + new Vector3(scale, 2 * scale, 0f);
+    //         component.Size = component.SpriteInfo.sizeInPixels * scale;
+    //         overlay.adrenalineHearts.Add(gameObject);
+
+    //         gameObject.transform.parent = heart.transform;  // make sure it disappears when minimap or pause is toggled
+    //     }
+    // }
 
     public override void Pickup(PlayerController player)
     {
@@ -234,9 +259,9 @@ public class AdrenalineShot : PassiveItem
     }
 }
 
-public class AdrenalineHeartOverlay : MonoBehaviour
-{
-    public List<GameObject> adrenalineHearts = new();
-}
+// public class AdrenalineHeartOverlay : MonoBehaviour
+// {
+//     public List<GameObject> adrenalineHearts = new();
+// }
 
 public class UnderAdrenalineEffects : MonoBehaviour {}

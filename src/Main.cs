@@ -310,6 +310,10 @@ public class Initialisation : BaseUnityPlugin
                     ResMap.Get("glockarina_time_ui_icon")[0]+".png",  Glockarina._TimeSpriteUI,
                     ResMap.Get("glockarina_saria_ui_icon")[0]+".png", Glockarina._SariaSpriteUI,
                     ResMap.Get("glockarina_empty_ui_icon")[0]+".png", Glockarina._EmptySpriteUI,
+                    // needs to be three separate sprites or the UI breaks
+                    ResMap.Get("adrenaline_heart")[0]+".png", AdrenalineShot._FullHeartSpriteUI,
+                    ResMap.Get("adrenaline_heart")[0]+".png", AdrenalineShot._HalfHeartSpriteUI,
+                    ResMap.Get("adrenaline_heart")[0]+".png", AdrenalineShot._EmptyHeartSpriteUI,
                 });
                 setupUIWatch.Stop();
             #endregion
