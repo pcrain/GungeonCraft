@@ -8,10 +8,10 @@
 
 ### Features
 
-- 74 new items including
-	+ 36 new guns 
-	+ 26 new passive items
-	+ 12 new active items
+- 80 new items, including
+	+ 39 new guns 
+	+ 28 new passive items
+	+ 13 new active items
 - Lore for all new guns and items
 - Two New Shops
 	+ Companion Shop: sells 3 random unlocked companions (including modded) at half price. Guaranteed to spawn on the first floor each run.
