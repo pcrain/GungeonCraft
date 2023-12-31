@@ -53,9 +53,9 @@ global using static PickupObject;          //ItemQuality
 
 namespace CwaffingTheGungy;
 
-[BepInPlugin(C.MOD_GUID, "Cwaffing the Gungy", C.MOD_VERSION)]
+[BepInPlugin(C.MOD_GUID, C.MOD_NAME, C.MOD_VERSION)]
 [BepInDependency(ETGModMainBehaviour.GUID)]
-[BepInDependency("alexandria.etgmod.alexandria")]
+[BepInDependency(Alexandria.Alexandria.GUID)]
 // [BepInDependency(Gunfiguration.C.MOD_GUID)]
 public class Initialisation : BaseUnityPlugin
 {
@@ -128,7 +128,7 @@ public class Initialisation : BaseUnityPlugin
                 System.Diagnostics.Stopwatch setupSaveWatch = null;
                 Thread setupSaveThread = new Thread(() => {
                     setupSaveWatch = System.Diagnostics.Stopwatch.StartNew();
-                    SaveAPI.SaveAPIManager.Setup("cg");  // Needed for prerequisite checking and save serialization
+                    SaveAPI.SaveAPIManager.Setup(C.MOD_PREFIX);  // Needed for prerequisite checking and save serialization
                     setupSaveWatch.Stop();
                 });
                 setupSaveThread.Start();
@@ -138,7 +138,7 @@ public class Initialisation : BaseUnityPlugin
                 System.Diagnostics.Stopwatch setupSpritesWatch = System.Diagnostics.Stopwatch.StartNew();
                 long usedMemoryBeforeSpriteSetup = currentProcess.WorkingSet64;
                 // UnprocessedSpriteHotfix.Init();  // prevent SetupSpritesFromAssembly() from loading unprocessed sprites (saves about 50MB of RAM, which is a good chunk)
-                ETGMod.Assets.SetupSpritesFromAssembly(Assembly.GetExecutingAssembly(), "CwaffingTheGungy.Resources");
+                ETGMod.Assets.SetupSpritesFromAssembly(Assembly.GetExecutingAssembly(), $"{C.MOD_INT_NAME}.Resources");
                 // UnprocessedSpriteHotfix.DeInit();  // we don't want to affect other mods
                 ETGModConsole.Log($"  allocated {(currentProcess.WorkingSet64 - usedMemoryBeforeSpriteSetup).ToString("N0")} bytes of memory for sprite setup");
                 setupSpritesWatch.Stop();
@@ -165,7 +165,7 @@ public class Initialisation : BaseUnityPlugin
                 Thread setupAudioThread = new Thread(() => {
                     setupAudioWatch = System.Diagnostics.Stopwatch.StartNew();
                     ETGModMainBehaviour.Instance.gameObject.AddComponent<AudioSource>(); // is this necessary?
-                    AudioResourceLoader.AutoloadFromAssembly("CwaffingTheGungy");  // Load Audio Banks
+                    AudioResourceLoader.AutoloadFromAssembly(C.MOD_INT_NAME);  // Load Audio Banks
                     setupAudioWatch.Stop();
                 });
                 setupAudioThread.Start();
