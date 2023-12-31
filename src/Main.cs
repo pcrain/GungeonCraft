@@ -140,7 +140,8 @@ public class Initialisation : BaseUnityPlugin
                 // UnprocessedSpriteHotfix.Init();  // prevent SetupSpritesFromAssembly() from loading unprocessed sprites (saves about 50MB of RAM, which is a good chunk)
                 ETGMod.Assets.SetupSpritesFromAssembly(Assembly.GetExecutingAssembly(), $"{C.MOD_INT_NAME}.Resources");
                 // UnprocessedSpriteHotfix.DeInit();  // we don't want to affect other mods
-                ETGModConsole.Log($"  allocated {(currentProcess.WorkingSet64 - usedMemoryBeforeSpriteSetup).ToString("N0")} bytes of memory for sprite setup");
+                if (C.DEBUG_BUILD)
+                    ETGModConsole.Log($"  allocated {(currentProcess.WorkingSet64 - usedMemoryBeforeSpriteSetup).ToString("N0")} bytes of memory for sprite setup");
                 setupSpritesWatch.Stop();
             #endregion
 

@@ -1,23 +1,32 @@
 # Changelog
 
-## 1.6.0
+## 1.6.0 (2023-12-30)
+
+#### Features and Polish:
 - Added Glockarina, Magunet, Wavefront, Cuppajoe, Safety Gloves, and Drab Outfit
 - Added custom ammo clips for Alligator, Carpet Bomber, Crapshooter, Glockarina, King's Law, Lightwing, Subtractor Beam, and Uppskeruvel, thanks to Lynceus!
+- Overhauled sprites for barter shopkeeper NPC thanks again to Lynceus!
+
+#### Balance Changes:
 - Nerfed Itemfinder: 
 	+ reduced max items per floor from 6 (should have been 5 but I'm bad at programming) to 4
 	+ reduced chances of finding more than 1 item per floor
 - Nerfed Plot Armor: 
 	+ reverted 1.2.1 changes so it once again gives at least 1 (not 2) armor and brings the player up to a minimum of 3 (not 4) armor
 	+ kept change to A quality so it should still be more common than pre-1.2.1 Plot Armor
-- Overhauled barter shopkeeper NPC sprites thanks again to Lynceus!
-- Fixed null dereference in Library Cardtridge caused by scanning for items in nonexistent shops
+	
+#### Bugfixes:
 - Fixed barter shop not having items if first run was not started through quickstart
 - Fixed barter shop and companion shop not spawning at all on the first run if the run was not started through quickstart
 - Fixed cross-mod shop item injection not working if first run was not started through quickstart
 - Fixed some modded guns with large idle animations dropping in weird places when spawned from chests
+- Fixed null dereference in Library Cardtridge caused by scanning for items in nonexistent shops
 - Fixed Iron Maid's offset in the weapon display panel
-- Use true UI sprites for Adrenaline Shot hearts (rather than using buggy fake UI sprites)
-- Removed debug output from Missiletoe
+
+#### Misc:
+- Made Adrenaline Shot use true UI sprites (rather than buggy fake UI sprites) for adrenaline hearts
+- Made Mod actually properly shows up as "GungeonCraft" in the mod's list
+- Removed debug output from Missiletoe that was polluting the console
 
 ## 1.5.1 (2023-12-20)
 - Made Companion Shop items non-stealable
