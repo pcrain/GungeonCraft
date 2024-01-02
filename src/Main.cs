@@ -322,7 +322,7 @@ public class Initialisation : BaseUnityPlugin
             #region Shop NPCs
                 System.Diagnostics.Stopwatch setupShopsWatch = System.Diagnostics.Stopwatch.StartNew();
                 // InsuranceBoi.Init();
-                WhiteMage.Init();
+                Cammy.Init();
                 Bart.Init();
                 setupShopsWatch.Stop();
             #endregion

@@ -1,7 +1,7 @@
 namespace CwaffingTheGungy;
 
 // Shop that sells companions :>
-public class WhiteMage
+public class Cammy
 {
     public static void Init()
     {
@@ -75,7 +75,7 @@ public class WhiteMage
         // }
 
         FancyShopData shop = FancyShopBuilder.MakeFancyShop(
-            npcName                : "white_mage",
+            npcName                : "cammy",
             shopItems              : shopItems,
             moddedItems            : moddedItems,
             roomPath               : "CwaffingTheGungy/Resources/Rooms/petshop.newroom",
@@ -86,9 +86,13 @@ public class WhiteMage
             // Guaranteed spawn on 1st floor
             allowedTilesets        : (int)( GlobalDungeonData.ValidTilesets.CASTLEGEON ),
             prequisiteValidator    : CwaffPrerequisite.OnFirstFloor,
+            idleFps                : 6,
+            talkFps                : 4,
             // prequisiteValidator    : null,
-            talkPointOffset        : C.PIXEL_SIZE * new Vector2(7, 22),
-            npcPosition            : C.PIXEL_SIZE * new Vector2(10, 60),
+            // talkPointOffset        : C.PIXEL_SIZE * new Vector2(7, 22),
+            talkPointOffset        : C.PIXEL_SIZE * new Vector2(11, 52),
+            // npcPosition            : C.PIXEL_SIZE * new Vector2(10, 60),
+            npcPosition            : C.PIXEL_SIZE * new Vector2(7, 44),
             carpetOffset           : C.PIXEL_SIZE * new Vector2(-23, 0),
             itemPositions          : ShopAPI.defaultItemPositions.ShiftAll(C.PIXEL_SIZE * new Vector2(-25, 0)),
             exactlyOncePerRun      : true,
@@ -125,6 +129,10 @@ public class WhiteMage
                 "Aahhhh!!!",
                 }
             );
+
+        shop.AddParentedAnimationToShopFixed(ResMap.Get("cammy_excited"), 4, "purchase");
+        shop.AddParentedAnimationToShopFixed(ResMap.Get("cammy_sad"), 4, "denied");
+        shop.AddParentedAnimationToShopFixed(ResMap.Get("cammy_sad"), 4, "stolen");
         // shopRoom.ForceSpawnForDebugPurposes();
     }
 }
