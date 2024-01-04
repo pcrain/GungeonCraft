@@ -125,7 +125,7 @@ public class Jugglernaut : AdvancedGunBehavior
     private static Vector3 FixWeaponBoxSprite(Func<GameUIAmmoController, Gun, bool, Vector3> orig, GameUIAmmoController guiac, Gun gun, bool flipped)
     {
         Vector3 vec = orig(guiac, gun, flipped);
-        if (gun.GetComponent<Jugglernaut>() is not Jugglernaut jugglernaut)
+        if (gun?.GetComponent<Jugglernaut>() is not Jugglernaut jugglernaut)
             return vec;
         return vec + _WeaponBoxCorrection;
     }
