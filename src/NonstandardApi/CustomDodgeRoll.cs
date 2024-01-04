@@ -40,7 +40,7 @@ public class CustomDodgeRoll : MonoBehaviour, ICustomDodgeRoll
         // Figure out all of our passives that give us a custom dodge roll
         List<CustomDodgeRoll> overrides = new List<CustomDodgeRoll>();
         foreach (PassiveItem p in player.passiveItems)
-            if (p.GetComponent<CustomDodgeRoll>() is CustomDodgeRoll overrideDodgeRoll)
+            if (p?.GetComponent<CustomDodgeRoll>() is CustomDodgeRoll overrideDodgeRoll)
                 overrides.Add(overrideDodgeRoll);
         if (overrides.Count == 0)  // fall back to default behavior if we don't have overrides
             return orig(player,direction);
