@@ -6,64 +6,125 @@ public class Natascha : AdvancedGunBehavior
     public static string SpriteName       = "natascha";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Fear no Man";
-    public static string LongDescription  = "Rate of fire increases and movement speed decreases as this gun is continuously fired.";
+    public static string LongDescription  = "Rate of fire increases and movement speed decreases as this gun is continuously fired. Reloading toggles whether the gun remains spun up while not firing, maintaining both the increased fire rate and reduced movement speed.";
     public static string Lore             = "The beloved gun of an amicable literature Ph.D., who refused to let anyone else so much as touch his precious Natascha. That is, until convinced by a hulking Australian man to grant ownership rights in exchange for unlimited lifetime access to the \"best sandwiches south of the equator.\"";
 
     internal static float _BaseCooldownTime    = 0.4f;
     internal static int   _FireAnimationFrames = 8;
 
-    private float _speedMult = 1.0f;
+    private float _speedMult     = 1.0f;
+    private bool _maintainSpinup = false;
 
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Natascha>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 2500);
+            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f, ammo: 1500);
             gun.SetAnimationFPS(gun.shootAnimation, (int)((float)_FireAnimationFrames / _BaseCooldownTime) + 1);
             gun.SetMuzzleVFX("muzzle_natascha", fps: 60, scale: 0.3f, anchor: Anchor.MiddleCenter);
+            gun.SetCasing(Items.Ak47);
             gun.AddToSubShop(ItemBuilder.ShopType.Trorc);
             gun.AddToSubShop(ModdedShopType.Rusty);
 
-        gun.InitProjectile(new(clipSize: -1, cooldown: _BaseCooldownTime, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, damage: 3.0f, speed: 20.0f,
+        gun.InitProjectile(new(clipSize: -1, cooldown: _BaseCooldownTime, angleVariance: 15.0f,
+          shootStyle: ShootStyle.Automatic, damage: 3.0f, speed: 20.0f, slow: 1.0f,
           sprite: "natascha_bullet", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter));
+    }
+
+    protected override void Update()
+    {
+        base.Update();
+
+        if (this.Owner is not PlayerController player)
+            return;
+
+        if (player.IsDodgeRolling || (!this._maintainSpinup && !this.gun.IsFiring))
+        {
+            if (this._speedMult != 1.0f)
+                ResetSpinup();
+            return;
+        }
+
+        if (this._maintainSpinup && this.gun.spriteAnimator.currentClip.name != gun.shootAnimation)
+        {
+            if (this._speedMult == 1.0f)
+            {
+                AkSoundEngine.PostEvent("minigun_wind_down_stop", gun.gameObject);
+                // AkSoundEngine.PostEvent("minigun_wind_up", gun.gameObject);
+                AkSoundEngine.PostEvent("minigun_spin", gun.gameObject);
+            }
+            this.gun.spriteAnimator.currentClip = gun.spriteAnimator.GetClipByName(gun.shootAnimation);
+            this.gun.spriteAnimator.Play();
+        }
+
+        if (this._speedMult > 0.15f)
+            ResetSpinup(Mathf.Max(0.15f, this._speedMult - BraveTime.DeltaTime * 0.4f));
+    }
+
+    public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
+    {
+        base.OnReloadPressed(player, gun, manualReload);
+        if (!player.IsDodgeRolling && player.AcceptingNonMotionInput)
+            this._maintainSpinup = !this._maintainSpinup;
     }
 
     public override void OnPostFired(PlayerController player, Gun gun)
     {
         base.OnPostFired(player, gun);
         AkSoundEngine.PostEvent("tomislav_shoot", gun.gameObject);
-        if (this._speedMult <= 0.15f)
-            return;
-
-        this._speedMult *= 0.85f;
-        float secondsBetweenShots = this._speedMult * _BaseCooldownTime;
-        gun.AdjustAnimation( // add 1 to FPS to make sure the animation doesn't skip a loop
-            gun.shootAnimation, fps: (int)((float)_FireAnimationFrames / secondsBetweenShots) + 1);
-        this.RecalculateGunStats();
-    }
-
-    public override void OnFinishAttack(PlayerController player, Gun gun)
-    {
-        this._speedMult = 1.0f;
-        gun.AdjustAnimation( // add 1 to FPS to make sure the animation doesn't skip a loop
-            gun.shootAnimation, fps: (int)((float)_FireAnimationFrames / _BaseCooldownTime) + 1);
-        this.RecalculateGunStats();
+        if (this._speedMult == 1.0f)
+        {
+            AkSoundEngine.PostEvent("minigun_wind_down_stop", gun.gameObject);
+            // AkSoundEngine.PostEvent("minigun_wind_up", gun.gameObject);
+            AkSoundEngine.PostEvent("minigun_spin", gun.gameObject);
+        }
     }
 
     protected override void OnPickedUpByPlayer(PlayerController player)
     {
         base.OnPickedUpByPlayer(player);
         player.OnRollStarted += this.OnDodgeRoll;
+        this._maintainSpinup = false;
+        ResetSpinup();
     }
 
     protected override void OnPostDroppedByPlayer(PlayerController player)
     {
         base.OnPostDroppedByPlayer(player);
         player.OnRollStarted -= this.OnDodgeRoll;
+        this._maintainSpinup = false;
+        ResetSpinup();
+    }
+
+    public override void OnSwitchedAwayFromThisGun()
+    {
+        base.OnSwitchedAwayFromThisGun();
+        this._maintainSpinup = false;
+        ResetSpinup();
     }
 
     private void OnDodgeRoll(PlayerController player, Vector2 dirVec)
     {
-        this._speedMult = 1.0f;
+        this._maintainSpinup = false;
+        ResetSpinup();
+    }
+
+    public override void OnFinishAttack(PlayerController player, Gun gun)
+    {
+        if (!this._maintainSpinup)
+            ResetSpinup();
+    }
+
+    private void ResetSpinup(float speedMult = 1.0f)
+    {
+        if (this._speedMult < 1.0f && speedMult == 1.0f)
+        {
+            AkSoundEngine.PostEvent("minigun_spin_stop", gun.gameObject);
+            AkSoundEngine.PostEvent("minigun_wind_up_stop", gun.gameObject);
+            AkSoundEngine.PostEvent("minigun_wind_down", gun.gameObject);
+        }
+        this._speedMult = speedMult;
+        gun.AdjustAnimation( // add 1 to FPS to make sure the animation doesn't skip a loop
+            gun.shootAnimation, fps: (int)((float)_FireAnimationFrames / (this._speedMult * _BaseCooldownTime)) + 1);
         this.RecalculateGunStats();
     }
 

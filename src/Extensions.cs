@@ -655,6 +655,12 @@ public static class Extensions
     gun.CriticalMuzzleFlashEffects = otherGun.CriticalMuzzleFlashEffects;
   }
 
+  public static void SetCasing(this Gun gun, Items otherGun)
+  {
+    gun.shellCasing = (ItemHelper.Get(otherGun) as Gun).shellCasing;
+  }
+
+
   public static bool Contains(this List<PassiveItem> items, int itemId)
   {
     foreach(PassiveItem item in items)

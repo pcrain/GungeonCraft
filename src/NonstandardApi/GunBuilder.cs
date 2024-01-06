@@ -18,6 +18,7 @@ public class GunBuildData
   public float poison;
   public float fire;
   public float freeze;
+  public float slow;
   public bool? collidesWithEnemies;
   public bool? ignoreDamageCaps;
   public bool? collidesWithProjectiles;
@@ -59,6 +60,7 @@ public class GunBuildData
   /// <param name="poison">The chance for the projectile to apply poison.</param>
   /// <param name="fire">The chance for the projectile to apply fire.</param>
   /// <param name="freeze">The chance for the projectile to apply freeze.</param>
+  /// <param name="slow">The chance for the projectile to apply slow.</param>
   /// <param name="collidesWithEnemies">If false, projectile won't collide with enemies.</param>
   /// <param name="ignoreDamageCaps">If true, ignores DPS caps on bosses.</param>
   /// <param name="collidesWithProjectiles">If true, projectile will collide with other projectiles.</param>
@@ -85,7 +87,7 @@ public class GunBuildData
   /// <param name="useDummyChargeModule"></param>
   public GunBuildData(int? clipSize = null, float? cooldown = null, float? angleVariance = null,
     ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1, GameUIAmmoType.AmmoType? ammoType = null,
-    string customClip = null, float? damage = null, float? speed = null, float? force = null, float? range = null, float poison = 0.0f, float fire = 0.0f, float freeze = 0.0f,
+    string customClip = null, float? damage = null, float? speed = null, float? force = null, float? range = null, float poison = 0.0f, float fire = 0.0f, float freeze = 0.0f, float slow = 0.0f,
     bool? collidesWithEnemies = null, bool? ignoreDamageCaps = null, bool? collidesWithProjectiles = null, bool? surviveRigidbodyCollisions = null, bool? collidesWithTilemap = null,
     string sprite = null, int fps = 2, Anchor anchor = Anchor.MiddleCenter, float scale = 1.0f, bool anchorsChangeColliders = true, bool fixesScales = true, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null,
     IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null, float bossDamageMult = 1.0f, string destroySound = null, bool? shouldRotate = null, int barrageSize = 1,
@@ -107,6 +109,7 @@ public class GunBuildData
       this.poison                        = poison;
       this.fire                          = fire;
       this.freeze                        = freeze;
+      this.slow                          = slow;
       this.collidesWithEnemies           = collidesWithEnemies;
       this.ignoreDamageCaps              = ignoreDamageCaps;
       this.collidesWithProjectiles       = collidesWithProjectiles;
@@ -210,14 +213,19 @@ public static class GunBuilder
       p.healthEffect = ItemHelper.Get(Items.IrradiatedLead).GetComponent<BulletStatusEffectItem>().HealthModifierEffect;
 
     p.FireApplyChance = b.fire;
-    p.AppliesFire   = b.fire > 0.0f;
+    p.AppliesFire     = b.fire > 0.0f;
     if (p.AppliesFire)
       p.fireEffect = ItemHelper.Get(Items.HotLead).GetComponent<BulletStatusEffectItem>().FireModifierEffect;
 
     p.FreezeApplyChance = b.freeze;
-    p.AppliesFreeze   = b.freeze > 0.0f;
+    p.AppliesFreeze     = b.freeze > 0.0f;
     if (p.AppliesFreeze)
       p.freezeEffect = ItemHelper.Get(Items.FrostBullets).GetComponent<BulletStatusEffectItem>().FreezeModifierEffect;
+
+    p.SpeedApplyChance     = b.slow;
+    p.AppliesSpeedModifier = b.slow > 0.0f;
+    if (p.AppliesSpeedModifier)
+      p.speedEffect = (ItemHelper.Get(Items.TripleCrossbow) as Gun).DefaultModule.projectiles[0].speedEffect;
 
     return p;
   }

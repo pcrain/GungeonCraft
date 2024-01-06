@@ -2,6 +2,15 @@
 
 ## Future
 
+- Reworked Natascha
+	- Reloading now toggles whether the gun remains spun up when not firing
+		- Maintains increased fire rate and decreased movement speed while spun up
+	- Projectiles now apply a slow effect on hit
+	- Decreased max ammo from 2500 to 1500
+	- Gun class changed from BEAM (why???) to FULLAUTO 
+	- Added spin up and spin down sounds
+	- Added casing sprites
+
 - Made guns that were supposed to have silent reloads actually have silent reloads (rather than Blasphemy's quiet reloads)
 - Fixed potential null dereference in Jugglernaut weapon panel sprite hook
 - Fixed potential null dereference with Gyroscope and Drifter's Headgear custom dodge roll hook
