@@ -4,6 +4,9 @@ public static class HeckedMode
 {
     public static bool HeckedModeEnabled = false; // the world isn't ready yet o.o
 
+    // public readonly static List<int> HeckedModeGunWhiteList = new(){
+    //     (int)Items.SniperRifle,
+    // };
     public readonly static List<int> HeckedModeGunWhiteList = new(){
         // Unfair Hitscan D:
         (int)Items.LightGun,
@@ -58,29 +61,29 @@ public static class HeckedMode
         (int)Items.BubbleBlaster,
 
         // Semi-broken
-        (int)Items.Mailbox, // final package projectile doesn't seem to work quite right
-        (int)Items.VoidCoreAssaultRifle, // slow shoot speed, burst not respected
-        (int)Items.AlienSidearm, // only fires the large scary projectiles
-        (int)Items.Blunderbuss, // only puts out one projectile
-        (int)Items.Jk47, // very noisy on floor entrance, but seems fine otherwise
+        // (int)Items.Mailbox, // final package projectile doesn't seem to work quite right
+        // (int)Items.VoidCoreAssaultRifle, // slow shoot speed, burst not respected
+        // (int)Items.AlienSidearm, // only fires the large scary projectiles
+        // (int)Items.Blunderbuss, // only puts out one projectile
+        // (int)Items.Jk47, // very noisy on floor entrance, but seems fine otherwise
 
-        // Beeg broken
-        (int)Items.SkullSpitter, // invariably homes in on other enemies
-        (int)Items.AlienEngine, // AI doesn't fire until getting really close, and behaviorspeculators mess up from there
-        (int)Items.LowerCaseR, // bursts don't seem to work quite right, no sound effects
-        (int)Items.DirectionalPad, // same as lowercaser
-        (int)Items.Railgun, // completely non-functional, doesn't even appear on enemy sprites
-        (int)Items.PrototypeRailgun,  // same as railgun
-        (int)Items.CobaltHammer, // enemies literally just self-destruct. would put it in goofy, but this has no function
-        (int)Items.CrownOfGuns, // doesn't appear on heads, behaviorspeculators mess up eventually
+        // // Beeg broken
+        // (int)Items.SkullSpitter, // invariably homes in on other enemies
+        // (int)Items.AlienEngine, // AI doesn't fire until getting really close, and behaviorspeculators mess up from there
+        // (int)Items.LowerCaseR, // bursts don't seem to work quite right, no sound effects
+        // (int)Items.DirectionalPad, // same as lowercaser
+        // (int)Items.Railgun, // completely non-functional, doesn't even appear on enemy sprites
+        // (int)Items.PrototypeRailgun,  // same as railgun
+        // (int)Items.CobaltHammer, // enemies literally just self-destruct. would put it in goofy, but this has no function
+        // (int)Items.CrownOfGuns, // doesn't appear on heads, behaviorspeculators mess up eventually
 
-        // Beam broken
-        (int)Items.Disintegrator, // beams stay in place on screen after firing and loop their firing sound nonstop o.o
-        (int)Items.ProtonBackpack,  // beams weapons are very evidently a mistake
-        (int)Items.ScienceCannon, // yup, still bad
+        // // Beam broken
+        // (int)Items.Disintegrator, // beams stay in place on screen after firing and loop their firing sound nonstop o.o
+        // (int)Items.ProtonBackpack,  // beams weapons are very evidently a mistake
+        // (int)Items.ScienceCannon, // yup, still bad
 
         // Testing
-        (int)Items.RobotsLeftHand,
+        // (int)Items.RobotsLeftHand,
         // (int)Items.
     };
 
@@ -152,7 +155,7 @@ public static class HeckedMode
     {
         if (HeckedModeEnabled)
         {
-            Items replacementGunId = (Items)HeckedModeGunWhiteList[HeckedModeGunWhiteList.Count-1];
+            Items replacementGunId = (Items)HeckedModeGunWhiteList.ChooseRandom();
             enemy.HeckedShootGunBehavior(ItemHelper.Get(replacementGunId) as Gun);
         }
         action(enemy);
@@ -186,10 +189,12 @@ public static class HeckedMode
             pewpew.ReloadSpeed           = replacementGun.reloadTime;
             pewpew.Range                 = replacementGun.DefaultModule.projectiles[0].baseData.range;
 
-            pewpew.EmptiesClip           = false;
-            pewpew.RequiresLineOfSight = true;
+            // ETGModConsole.Log($"replaced gun {replacementGun.name} with cooldown {replacementGun.DefaultModule.cooldownTime}");
+
+            // pewpew.EmptiesClip                  = false;  // setting to false prevents dumb firing behaviors, but also makes them fire ludicrously fast
+            pewpew.RequiresLineOfSight          = true;
             pewpew.AimAtFacingDirectionWhenSafe = true;
-            pewpew.StopDuringAttack = true;  // enemies shouldn't move while attacking
+            pewpew.StopDuringAttack             = true;  // enemies shouldn't move while attacking
 
             /* Default bulletkin behavior
 
@@ -243,29 +248,29 @@ public static class HeckedMode
         }
     }
 
-    public static void AttachStats(this AIShooter shooter)
-    {
-        ETGModConsole.Log($"  equipped gun is {shooter.EquippedGun.name}");
-        ETGModConsole.Log($"  current gun is {shooter.CurrentGun.name}");
-        ETGModConsole.Log($"  handObject is {shooter.handObject != null}");
-        for (int i = shooter.sprite.attachedRenderers.Count() - 1; i >= 0; --i)
-            ETGModConsole.Log($"    sprite attached: {shooter.sprite.attachedRenderers[i].name}");
-        for (int i = shooter.CurrentGun.GetSprite().attachedRenderers.Count() - 1; i >= 0; --i)
-            ETGModConsole.Log($"    gun attached: {shooter.CurrentGun.GetSprite().attachedRenderers[i].name}");
-        for (int i = shooter.m_attachedHands.Count() - 1; i >= 0; --i)
-            ETGModConsole.Log($"    hands attached: {shooter.m_attachedHands[i].name}");
+    // public static void AttachStats(this AIShooter shooter)
+    // {
+    //     ETGModConsole.Log($"  equipped gun is {shooter.EquippedGun.name}");
+    //     ETGModConsole.Log($"  current gun is {shooter.CurrentGun.name}");
+    //     ETGModConsole.Log($"  handObject is {shooter.handObject != null}");
+    //     for (int i = shooter.sprite.attachedRenderers.Count() - 1; i >= 0; --i)
+    //         ETGModConsole.Log($"    sprite attached: {shooter.sprite.attachedRenderers[i].name}");
+    //     for (int i = shooter.CurrentGun.GetSprite().attachedRenderers.Count() - 1; i >= 0; --i)
+    //         ETGModConsole.Log($"    gun attached: {shooter.CurrentGun.GetSprite().attachedRenderers[i].name}");
+    //     for (int i = shooter.m_attachedHands.Count() - 1; i >= 0; --i)
+    //         ETGModConsole.Log($"    hands attached: {shooter.m_attachedHands[i].name}");
 
-        for (int i = shooter.transform.childCount - 1; i >= 0; --i)
-        {
-            Transform t = shooter.transform.GetChild(i);
-            ETGModConsole.Log($"    transform attached: {t.name}");
-            for (int ti = t.gameObject.transform.childCount - 1; ti >= 0; --ti)
-            {
-                Transform ts = t.gameObject.transform.GetChild(ti);
-                ETGModConsole.Log($"      transform subattached: {ts.name}");
-            }
-        }
-    }
+    //     for (int i = shooter.transform.childCount - 1; i >= 0; --i)
+    //     {
+    //         Transform t = shooter.transform.GetChild(i);
+    //         ETGModConsole.Log($"    transform attached: {t.name}");
+    //         for (int ti = t.gameObject.transform.childCount - 1; ti >= 0; --ti)
+    //         {
+    //             Transform ts = t.gameObject.transform.GetChild(ti);
+    //             ETGModConsole.Log($"      transform subattached: {ts.name}");
+    //         }
+    //     }
+    // }
 
     // If an enemy has already run their Awake() method, replacing their guns gets a lot more complicated
     // All of this code is basically undoing AIShooter.Initialize() in reverse order

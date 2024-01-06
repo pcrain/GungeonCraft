@@ -1,5 +1,10 @@
 # Changelog
 
+## Future
+
+- Fixed potential null dereference in Jugglernaut weapon panel sprite hook
+- Fixed potential null dereference with Gyroscope and Drifter's Headgear custom dodge roll hook
+
 ## 1.6.0 (2023-12-30)
 
 #### Features and Polish:
