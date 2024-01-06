@@ -554,7 +554,7 @@ public static class Extensions
     }
 
     if (useSilentGroup)
-      gun.gunSwitchGroup = (ItemHelper.Get(Items.Blasphemy) as Gun).gunSwitchGroup; // quietest gun audio
+      gun.gunSwitchGroup = (ItemHelper.Get(Items.Casey) as Gun).gunSwitchGroup; // casey has silent reload audio
 
     gun.PreventNormalFireAudio = true;
     gun.OverrideNormalFireAudioEvent = "";
