@@ -135,11 +135,13 @@ public class HarmlessUntilBounce : MonoBehaviour
         this._projectile.StartCoroutine(DoElasticBounce());
     }
 
-    private const float BOUNCE_TIME = 10.0f; // frames for half a bounce
+    private const float _BOUNCE_TIME = 0.1f; // frames for half a bounce
     private IEnumerator DoElasticBounce()
     {
         float oldSpeed = this._projectile.baseData.speed;
         Vector3 oldScale = this._projectile.spriteAnimator.transform.localScale;
+        this._projectile.specRigidbody.CollideWithTileMap = false;
+        this._projectile.specRigidbody.CollideWithOthers = false;
 
         this._projectile.baseData.damage = this._damageMult * oldSpeed * Bouncer._DAMAGE_FACTOR;  // base damage should scale with speed
         this._projectile.baseData.force = oldSpeed * Bouncer._FORCE_FACTOR;  // force should scale with speed
@@ -148,10 +150,10 @@ public class HarmlessUntilBounce : MonoBehaviour
         this._projectile.specRigidbody.Reinitialize();
 
         // Squeeze
-        float bounceScale = 1.0f / BOUNCE_TIME;
-        for (int i = (int)BOUNCE_TIME; i > 1; --i)
+        for (float elapsed = 0f; elapsed < _BOUNCE_TIME; elapsed += BraveTime.DeltaTime)
         {
-            this._projectile.spriteAnimator.transform.localScale = oldScale.WithX(bounceScale*i);
+            float percentDone = elapsed / _BOUNCE_TIME;
+            this._projectile.spriteAnimator.transform.localScale = oldScale.WithX(Mathf.Max(0.1f, 1f - percentDone));
             yield return null;
         }
 
@@ -160,17 +162,14 @@ public class HarmlessUntilBounce : MonoBehaviour
         Material m = this._projectile.sprite.renderer.material;
 
         // Stretch
-        for (int i = 1; i < BOUNCE_TIME; ++i)
+        for (float elapsed = 0f; elapsed < _BOUNCE_TIME; elapsed += BraveTime.DeltaTime)
         {
-            float percentDone = bounceScale*i;
-            Color newColor = new Color(
-                r: Mathf.Lerp(Color.white.r, Color.yellow.r, percentDone),
-                g: Mathf.Lerp(Color.white.g, Color.yellow.g, percentDone),
-                b: Mathf.Lerp(Color.white.b, Color.yellow.b, percentDone));
+            float percentDone = elapsed / _BOUNCE_TIME;
+            Color newColor = Color.Lerp(Color.white, Color.yellow, 0.8f * percentDone);
             m.SetFloat("_EmissivePower", 100f * percentDone);
             m.SetColor("_EmissiveColor", newColor);
             m.SetColor("_OverrideColor", newColor);
-            this._projectile.spriteAnimator.transform.localScale = oldScale.WithX(percentDone);
+            this._projectile.spriteAnimator.transform.localScale = oldScale.WithX(Mathf.Max(0.1f, percentDone));
             yield return null;
         }
         this._projectile.spriteAnimator.transform.localScale = oldScale;
@@ -180,5 +179,7 @@ public class HarmlessUntilBounce : MonoBehaviour
         this._projectile.specRigidbody.Reinitialize();
 
         this._bounceFinished = true;
+        this._projectile.specRigidbody.CollideWithTileMap = true;
+        this._projectile.specRigidbody.CollideWithOthers = true;
     }
 }

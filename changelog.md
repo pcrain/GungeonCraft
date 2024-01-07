@@ -17,9 +17,11 @@
 	- Projectiles now bounce 3 times instead of once, exploding only after bouncing 3 times
 	- Projectile damage decreased by 40% to compensate for increased longevity
 	- Projectile damage now scales with player's damage stat
+	- Time projectiles stick on wall before bouncing decreased from 
 	- Reload time increased from 0.8 seconds to 1.3 seconds
 	- Updated description to clarify that projectiles' damage scales with their speed (which was always true, but never mentioned)
-	- Fixed bug where projectile acceleration was tied to the frame rate (yikes)
+	- Fixed bug where projectile acceleration and bounce time were tied to the frame rate (yikes)
+	- Fixed projectiles sometimes getting stuck in walls
 	- Added brand new reload animation and sounds
 	- Tweaked firing animation
 	- Tweaked volume of firing and bouncing sounds
