@@ -3099,6 +3099,7 @@
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_natascha5.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\poe_soul8.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\soul_link_particle3.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\sheep_vfx.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\gunbrella_target_reticle4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\magunet_charge_vfx2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\icicle_crash_particles2.png"/>
@@ -3152,6 +3153,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\subtractor_beam_hit_effect1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\egg_break1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\microdust2.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\sleep_impact_vfx.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\echo_effect6.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren23.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\drowsy_cloud8.png"/>
@@ -3206,6 +3208,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\poe_soul4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\soul_explode8.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren3.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\tranquilizer_impact.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\reticle_orange.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren24.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\reticle_blue.png"/>

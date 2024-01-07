@@ -17,14 +17,19 @@
 	- Projectiles now bounce 3 times instead of once, exploding only after bouncing 3 times
 	- Projectile damage decreased by 40% to compensate for increased longevity
 	- Projectile damage now scales with player's damage stat
-	- Time projectiles stick on wall before bouncing decreased from 
 	- Reload time increased from 0.8 seconds to 1.3 seconds
-	- Updated description to clarify that projectiles' damage scales with their speed (which was always true, but never mentioned)
+	- Clarified in Ammonomicon that projectiles' damage scales with speed (which was always true, but never mentioned)
 	- Fixed bug where projectile acceleration and bounce time were tied to the frame rate (yikes)
 	- Fixed projectiles sometimes getting stuck in walls
 	- Added brand new reload animation and sounds
-	- Tweaked firing animation
-	- Tweaked volume of firing and bouncing sounds
+	- Tweaked firing animation and firing sound volume
+
+- Reworked Tranquilizer
+	- Hitting an enemy with multiple projectiles now speeds up the tranquilization process
+	- Projectiles no longer deal any damage, only knockback
+	- Added new projectile impact effects
+	- Added new overhead effects for asleep enemies
+	- Added new sound cue for when an enemy is fully tranquilized
 
 - Made guns that were supposed to have silent reloads actually have silent reloads (rather than Blasphemy's quiet reloads)
 - Fixed potential null dereference in Jugglernaut weapon panel sprite hook

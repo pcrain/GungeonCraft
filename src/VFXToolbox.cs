@@ -623,6 +623,9 @@ public class FancyVFX : MonoBehaviour
     private float      _maxLifeTime   = 0.0f;
     private bool       _setup         = false;
     private bool       _fadeIn        = false;
+    private float      _startScale    = 1.0f;
+    private float      _endScale      = 1.0f;
+    private bool       _changesScale  = false;
 
     private void Start()
     {
@@ -640,7 +643,8 @@ public class FancyVFX : MonoBehaviour
             return;
         }
         this._curLifeTime += BraveTime.DeltaTime;
-        if (this._curLifeTime > this._maxLifeTime)
+        float percentDone = this._curLifeTime / this._maxLifeTime;
+        if (percentDone >= 1.0f)
         {
             if (this._vfx)
                 UnityEngine.Object.Destroy(this._vfx);
@@ -649,6 +653,11 @@ public class FancyVFX : MonoBehaviour
         }
 
         this.sprite.transform.position += this._velocity;
+        if (this._changesScale)
+        {
+            float scale = Mathf.Lerp(this._startScale, this._endScale, percentDone);
+            this.sprite.transform.localScale = new Vector3(scale, scale, 1.0f);
+        }
 
         if (this._fadeOut && this._curLifeTime > this._fadeStartTime)
         {
@@ -661,7 +670,8 @@ public class FancyVFX : MonoBehaviour
     }
 
     // todo: fading and emission are not simultaneously compatible
-    public void Setup(Vector2 velocity, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false)
+    public void Setup(Vector2 velocity, float lifetime = 0, float? fadeOutTime = null, Transform parent = null,
+        float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false, float startScale = 1.0f, float endScale = 1.0f, float? height = null)
     {
         this._vfx = base.gameObject;
         this.sprite = this._vfx.GetComponent<tk2dSprite>();
@@ -676,7 +686,16 @@ public class FancyVFX : MonoBehaviour
             this._fadeTotalTime = fadeOutTime.Value;
             this._fadeStartTime = this._maxLifeTime - this._fadeTotalTime;
         }
+        if (height.HasValue)
+        {
+            this.sprite.HeightOffGround = height.Value;
+            this.sprite.UpdateZDepth();
+        }
         this.transform.parent = parent;
+
+        this._startScale   = startScale;
+        this._endScale     = endScale;
+        this._changesScale = this._startScale != this._endScale;
 
         if (emissivePower > 0)
         {
@@ -699,11 +718,12 @@ public class FancyVFX : MonoBehaviour
 
     // Make a new FancyVFX from a normal SpawnManager.SpawnVFX
     public static FancyVFX Spawn(GameObject prefab, Vector3 position, Quaternion? rotation = null,
-        Vector2? velocity = null, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false)
+        Vector2? velocity = null, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0, Color? emissiveColor = null,
+        bool fadeIn = false, float startScale = 1.0f, float endScale = 1.0f, float? height = null)
     {
         GameObject v = SpawnManager.SpawnVFX(prefab, position, rotation ?? Quaternion.identity, ignoresPools: false);
         FancyVFX fv = v.AddComponent<FancyVFX>();
-        fv.Setup(velocity ?? Vector2.zero, lifetime, fadeOutTime, parent, emissivePower, emissiveColor, fadeIn);
+        fv.Setup(velocity ?? Vector2.zero, lifetime, fadeOutTime, parent, emissivePower, emissiveColor, fadeIn, startScale, endScale, height);
         return fv;
     }
 
@@ -725,12 +745,14 @@ public class FancyVFX : MonoBehaviour
 
     // Spawn a burst of VFX
     public static void SpawnBurst(GameObject prefab, int numToSpawn, Vector2 basePosition, float positionVariance = 0f, Vector2? baseVelocity = null, float velocityVariance = 0f,
-        Vel velType = Vel.Random, Rot rotType = Rot.None, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false)
+        Vel velType = Vel.Random, Rot rotType = Rot.None, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0,
+        Color? emissiveColor = null, bool fadeIn = false, bool uniform = false)
     {
         Vector2 realBaseVelocity = baseVelocity ?? Vector2.zero;
+        float baseAngle = Lazy.RandomAngle();
         for (int i = 0; i < numToSpawn; ++i)
         {
-            float posOffsetAngle = Lazy.RandomAngle();
+            float posOffsetAngle = uniform ? (baseAngle + 360f * ((float)i / numToSpawn)).Clamp360() : Lazy.RandomAngle();
             Vector2 finalpos = (positionVariance > 0)
                 ? basePosition + posOffsetAngle.ToVector(UnityEngine.Random.value * positionVariance)
                 : basePosition;
@@ -843,8 +865,13 @@ public class OrbitalEffect : MonoBehaviour
     private bool             _isEmissive  = false;
     private bool             _overhead    = false;
     private bool             _didSetup    = false;
+    private bool             _rotates     = false;
+    private bool             _flips       = false;
+    private bool             _fades       = false;
+    private float            _bobAmount   = 0.0f;
 
-    public void SetupOrbitals(GameObject vfx, int numOrbitals = 3, float rps = 0.5f, bool isEmissive = false, bool isOverhead = false)
+    public void SetupOrbitals(GameObject vfx, int numOrbitals = 3, float rps = 0.5f, bool isEmissive = false,
+        bool isOverhead = false, bool rotates = true, bool flips = false, bool fades = false, float bobAmount = 0.0f)
     {
         this._enemy        = base.GetComponent<AIActor>();
         this._enemyGirth   = this._enemy.sprite.GetBounds().size.x / 2.0f; // get the x radius of the enemy's sprite
@@ -857,6 +884,10 @@ public class OrbitalEffect : MonoBehaviour
         this._overhead     = isOverhead;
         this._rps          = rps;
         this._spr          = 1.0f / this._rps;
+        this._rotates      = rotates;
+        this._flips        = flips;
+        this._fades        = fades;
+        this._bobAmount    = bobAmount;
 
         // Spawn orbitals
         for (int i = 0; i < this._numOrbitals; ++i)
@@ -865,6 +896,15 @@ public class OrbitalEffect : MonoBehaviour
         UpdateOrbitals();
 
         this._didSetup = true;
+    }
+
+    public void ClearOrbitals()
+    {
+        foreach (GameObject g in this._orbitals)
+            UnityEngine.Object.Destroy(g);
+        this._orbitals.Clear();
+        this._numOrbitals = 0;
+        this._orbitalGap  = 360.0f;
     }
 
     public void AddOrbital(GameObject vfx)
@@ -925,10 +965,18 @@ public class OrbitalEffect : MonoBehaviour
             tk2dSprite sprite = g.GetComponent<tk2dSprite>();
             sprite.renderer.enabled = this._enemy.renderer.enabled;
             float angle = (this._orbitalGap * i + 360.0f * orbitOffset).Clamp360();
+            float radAngle = angle / 57.29578f;
             Vector2 avec   = angle.ToVector();
             Vector2 offset = new Vector2(1.5f * this._enemyGirth * avec.x, 0.75f * this._enemyGirth * avec.y + OverheadOffset());
+            if (this._bobAmount > 0)
+                offset += new Vector2(0f, this._bobAmount * Mathf.Sin(radAngle));
             g.transform.position = (this._enemy.sprite.WorldCenter + offset).ToVector3ZisY(angle < 180 ? z : -z);
-            g.transform.rotation = angle.EulerZ();
+            if (this._rotates)
+                g.transform.rotation = angle.EulerZ();
+            if (this._flips)
+                g.transform.localScale = new Vector3(-Mathf.Sin(radAngle), 1f, 1f);
+            if (this._fades)
+                sprite.SetAlpha((avec.y > 0) ? 0f : Mathf.Abs(Mathf.Sin(radAngle)));
 
             if (this._isEmissive)
                 sprite.renderer.material.SetFloat("_EmissivePower", power);
