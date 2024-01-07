@@ -2,6 +2,8 @@
 
 ## Future
 
+- Overhauled sprites for companion shopkeeper NPC, thanks to Lynceus!
+
 - Reworked Natascha
 	- Reloading now toggles whether the gun remains spun up when not firing
 		- Maintains increased fire rate and decreased movement speed while spun up
@@ -10,6 +12,17 @@
 	- Gun class changed from BEAM (why???) to FULLAUTO 
 	- Added spin up and spin down sounds
 	- Added casing sprites
+	
+- Reworked Bouncer
+	- Projectiles now bounce 3 times instead of once, exploding only after bouncing 3 times
+	- Projectile damage decreased by 40% to compensate for increased longevity
+	- Projectile damage now scales with player's damage stat
+	- Reload time increased from 0.8 seconds to 1.3 seconds
+	- Updated description to clarify that projectiles' damage scales with their speed (which was always true, but never mentioned)
+	- Fixed bug where projectile acceleration was tied to the frame rate (yikes)
+	- Added brand new reload animation and sounds
+	- Tweaked firing animation
+	- Tweaked volume of firing and bouncing sounds
 
 - Made guns that were supposed to have silent reloads actually have silent reloads (rather than Blasphemy's quiet reloads)
 - Fixed potential null dereference in Jugglernaut weapon panel sprite hook

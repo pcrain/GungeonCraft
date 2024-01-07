@@ -6,24 +6,24 @@ public class Bouncer : AdvancedGunBehavior
     public static string SpriteName       = "bouncer";
     public static string ProjectileName   = "38_special"; //for rotation niceness
     public static string ShortDescription = "Rebound to Go Wrong";
-    public static string LongDescription  = "Fires strong projectiles that phase through enemies and objects until bouncing at least once, creating a small explosion on the final impact.";
+    public static string LongDescription  = "Fires slow but rapidly accelerating projectiles that phase through enemies and objects until bouncing at least once. The damage of each projectile scales with its speed upon initially bouncing. Projectiles bounce up to 3 times, creating a small explosion on their 4th impact.";
     public static string Lore             = "Originally developed as a proof-of-concept back in a time before true bouncing bullets existed, many Gungeoneers today still prefer this older design for flexing their \"mad trickshotting skillz yo\" and its ability to hit enemies behind cover.";
 
-    internal static ExplosionData           _MiniExplosion      = null;
-    internal static float                   _Damage_Factor      = 0.5f; // % of speed converted to damage
-    internal static float                   _Force_Factor       = 0.5f; // % of speed converted to force
-
-    internal const float                    _ACCELERATION       = 1.9f;
+    internal static ExplosionData _MiniExplosion  = null;
+    internal const float          _DAMAGE_FACTOR  = 0.3f; // % of speed converted to damage
+    internal const float          _FORCE_FACTOR   = 0.5f; // % of speed converted to force
+    internal const float          _ACCELERATION   = 1.9f;
 
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Bouncer>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 0.8f, ammo: 300);
+            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 1.3f, ammo: 300);
             gun.SetAnimationFPS(gun.shootAnimation, 14);
-            gun.SetAnimationFPS(gun.reloadAnimation, 20);
+            gun.SetAnimationFPS(gun.reloadAnimation, 30);
             gun.SetMuzzleVFX(Items.Magnum);
             gun.SetFireAudio("MC_RocsCape");
-            gun.SetReloadAudio("MC_Link_Grow");
+            gun.SetReloadAudio("bouncer_reload_short", 5, 10, 15, 20);
+            gun.SetReloadAudio("bouncer_reload", 25);
             gun.AddToSubShop(ModdedShopType.Boomhildr);
             gun.AddToSubShop(ModdedShopType.Rusty);
 
@@ -61,8 +61,11 @@ public class HarmlessUntilBounce : MonoBehaviour
 {
     private Projectile _projectile;
     private PlayerController _owner;
-    private bool _bounceStarted = false;
+    private bool _bounceStarted  = false;
     private bool _bounceFinished = false;
+    private int _currentBounces  = 0;
+    private int _maxBounces      = 0;
+    private float _damageMult    = 1.0f;
 
     private void Start()
     {
@@ -70,22 +73,32 @@ public class HarmlessUntilBounce : MonoBehaviour
         if (this._projectile.Owner is not PlayerController pc)
             return;
         this._owner = pc;
+        this._damageMult = this._owner.stats.GetStatValue(PlayerStats.StatType.Damage);
 
         BounceProjModifier bounce = this._projectile.gameObject.GetOrAddComponent<BounceProjModifier>();
-            bounce.numberOfBounces     = 1; // needs to be more than 1 or projectile dies immediately in special handling code below
+            bounce.numberOfBounces     = 3; // needs to be more than 1 or projectile dies immediately in special handling code below
             bounce.chanceToDieOnBounce = 0f;
             bounce.OnBounce += OnBounce;
             bounce.onlyBounceOffTiles = true;
 
+        this._maxBounces = bounce.numberOfBounces;
+
         this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
+        this._projectile.OnDestruction += this.OnDestruction;
     }
 
     private void Update()
     {
         if (_bounceStarted)
             return;
-        this._projectile.baseData.speed += Bouncer._ACCELERATION;
+        this._projectile.baseData.speed += C.FPS * BraveTime.DeltaTime * Bouncer._ACCELERATION;
         this._projectile.UpdateSpeed();
+    }
+
+    private void OnDestruction(Projectile p)
+    {
+        if (this._currentBounces == this._maxBounces) // explode only on final bounce
+            Exploder.Explode(p.sprite.WorldCenter, Bouncer._MiniExplosion, p.Direction);
     }
 
     private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
@@ -116,18 +129,20 @@ public class HarmlessUntilBounce : MonoBehaviour
 
     private void OnBounce()
     {
+        ++this._currentBounces;
+
         this._bounceStarted = true;
         this._projectile.StartCoroutine(DoElasticBounce());
     }
 
-    private const float BOUNCE_TIME = 15.0f; // frames for half a bounce
+    private const float BOUNCE_TIME = 10.0f; // frames for half a bounce
     private IEnumerator DoElasticBounce()
     {
         float oldSpeed = this._projectile.baseData.speed;
         Vector3 oldScale = this._projectile.spriteAnimator.transform.localScale;
 
-        this._projectile.baseData.damage = oldSpeed * Bouncer._Damage_Factor;  // base damage should scale with speed
-        this._projectile.baseData.force = oldSpeed * Bouncer._Force_Factor;  // force should scale with speed
+        this._projectile.baseData.damage = this._damageMult * oldSpeed * Bouncer._DAMAGE_FACTOR;  // base damage should scale with speed
+        this._projectile.baseData.force = oldSpeed * Bouncer._FORCE_FACTOR;  // force should scale with speed
         this._projectile.baseData.speed = 0.001f;
         this._projectile.UpdateSpeed();
         this._projectile.specRigidbody.Reinitialize();
@@ -163,8 +178,6 @@ public class HarmlessUntilBounce : MonoBehaviour
         this._projectile.baseData.speed = oldSpeed;
         this._projectile.UpdateSpeed();
         this._projectile.specRigidbody.Reinitialize();
-        this._projectile.OnDestruction += (Projectile p) => Exploder.Explode(
-            this._projectile.sprite.WorldCenter, Bouncer._MiniExplosion, p.Direction);
 
         this._bounceFinished = true;
     }
