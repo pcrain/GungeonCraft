@@ -99,6 +99,7 @@ public class RainCheckBullets : MonoBehaviour
     private const float _GLOW_MAX               = 10f;
     private const float _LAUNCH_DELAY           = 0.04f;
     private const float _LAUNCH_SPEED           = 50f;
+    private const float _BASE_GLOW              = 3f;
 
     private PlayerController _owner;
     private Projectile       _projectile;
@@ -127,6 +128,7 @@ public class RainCheckBullets : MonoBehaviour
     private IEnumerator TakeARainCheck()
     {
         // Phase 1 / 5 -- the initial fire
+        this._projectile.sprite.SetGlowiness(glowAmount: _BASE_GLOW, glowColor: Color.cyan);
         this._moveTimer = _TIME_BEFORE_STASIS;
         float decel = this._projectile.baseData.speed / (C.FPS * _TIME_BEFORE_STASIS);
         while (this._moveTimer > 0 && !this._launchSequenceStarted)
@@ -153,7 +155,6 @@ public class RainCheckBullets : MonoBehaviour
         }
 
         // Phase 3 / 5 -- the glow
-        this._projectile.sprite.SetGlowiness(glowAmount: 0f, glowColor: Color.cyan);
         Material m = this._projectile.sprite.renderer.material;
         AkSoundEngine.PostEvent("knife_gun_glow_stop_all", this._projectile.gameObject);
         AkSoundEngine.PostEvent("knife_gun_glow", this._projectile.gameObject);
@@ -161,7 +162,7 @@ public class RainCheckBullets : MonoBehaviour
         while (this._moveTimer > 0)
         {
             float glowAmount = (_GLOW_TIME - this._moveTimer) / _GLOW_TIME;
-            m.SetFloat("_EmissivePower", glowAmount * _GLOW_MAX);
+            m.SetFloat("_EmissivePower", _BASE_GLOW + glowAmount * _GLOW_MAX);
             this._moveTimer -= BraveTime.DeltaTime;
             yield return null;
         }

@@ -32,6 +32,7 @@
 	- Added new sound cue for when an enemy is fully tranquilized
 
 - Made guns that were supposed to have silent reloads actually have silent reloads (rather than Blasphemy's quiet reloads)
+- Fixed visual bug during glow phase of Iron Maid causing projectiles to dim before glowing
 - Fixed potential null dereference in Jugglernaut weapon panel sprite hook
 - Fixed potential null dereference with Gyroscope and Drifter's Headgear custom dodge roll hook
 
