@@ -4230,9 +4230,11 @@
     <EmbeddedResource Include="Resources\BeamSprites\subtractor_beam_red_mid_004.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\subtractor_beam_red_start_001.png"/>
     <EmbeddedResource Include="Resources\Rooms\barter-old.newroom"/>
+    <EmbeddedResource Include="Resources\Rooms\petshop-old.newroom"/>
     <EmbeddedResource Include="Resources\Rooms\barter.newroom"/>
     <EmbeddedResource Include="Resources\Rooms\BasicShopRoom.room"/>
     <EmbeddedResource Include="Resources\Rooms\petshop.newroom"/>
+    <EmbeddedResource Include="Resources\Rooms\petshop-old2.newroom"/>
     <EmbeddedResource Include="Resources\Rooms\BasicShopRoom.newroom"/>
     <EmbeddedResource Include="Resources\Rooms\BasicShopRoom2.newroom"/>
     <Reference Include="UnityEngine.ClothModule"/>

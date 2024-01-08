@@ -1,18 +1,20 @@
 # Changelog
 
-## Future
+## 1.6.1 (2024-01-07)
 
+#### Features and Polish:
 - Overhauled sprites for companion shopkeeper NPC, thanks to Lynceus!
+- Added critters to the companion shop and changed the room to be more outdoors-y
 
+#### Balance Changes:
+- Companion shop discount reduced from 50% to 30% (i.e., companions now cost 70% of full price)
 - Reworked Natascha
-	- Reloading now toggles whether the gun remains spun up when not firing
-		- Maintains increased fire rate and decreased movement speed while spun up
+	- Reloading now toggles whether the gun remains spun up when not firing, maintaining its increased fire rate and decreased movement speed
 	- Projectiles now apply a slow effect on hit
 	- Decreased max ammo from 2500 to 1500
 	- Gun class changed from BEAM (why???) to FULLAUTO 
 	- Added spin up and spin down sounds
 	- Added casing sprites
-	
 - Reworked Bouncer
 	- Projectiles now bounce 3 times instead of once, exploding only after bouncing 3 times
 	- Projectile damage decreased by 40% to compensate for increased longevity
@@ -23,7 +25,6 @@
 	- Fixed projectiles sometimes getting stuck in walls
 	- Added brand new reload animation and sounds
 	- Tweaked firing animation and firing sound volume
-
 - Reworked Tranquilizer
 	- Hitting an enemy with multiple projectiles now speeds up the tranquilization process
 	- Projectiles no longer deal any damage, only knockback
@@ -31,7 +32,8 @@
 	- Added new overhead effects for asleep enemies
 	- Added new sound cue for when an enemy is fully tranquilized
 
-- Changed default reload sound for guns from quiet (Blasphemy) to silent (Banana)
+#### Bugfixes and Misc:
+- Fixed Blasphemy reload sound playing when reloading some guns
 - Fixed visual bug during glow phase of Iron Maid causing projectiles to dim before glowing
 - Fixed potential null dereference in Jugglernaut weapon panel sprite hook
 - Fixed potential null dereference with Gyroscope and Drifter's Headgear custom dodge roll hook

@@ -80,7 +80,7 @@ public class Cammy
             moddedItems            : moddedItems,
             roomPath               : "CwaffingTheGungy/Resources/Rooms/petshop.newroom",
             allowDupes             : false,
-            costModifier           : 0.5f,
+            costModifier           : 0.7f,
             spawnChance            : 1.0f,
             spawnPrerequisite      : CwaffPrerequisites.WHITE_MAGE_PREREQUISITE,
             // Guaranteed spawn on 1st floor
