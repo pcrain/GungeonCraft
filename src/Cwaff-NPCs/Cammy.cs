@@ -90,9 +90,9 @@ public class Cammy
             talkFps                : 4,
             // prequisiteValidator    : null,
             // talkPointOffset        : C.PIXEL_SIZE * new Vector2(7, 22),
-            talkPointOffset        : C.PIXEL_SIZE * new Vector2(11, 52),
+            talkPointOffset        : C.PIXEL_SIZE * new Vector2(19, 52),
             // npcPosition            : C.PIXEL_SIZE * new Vector2(10, 60),
-            npcPosition            : C.PIXEL_SIZE * new Vector2(7, 44),
+            npcPosition            : C.PIXEL_SIZE * new Vector2(-3, 44),
             carpetOffset           : C.PIXEL_SIZE * new Vector2(-23, 0),
             itemPositions          : ShopAPI.defaultItemPositions.ShiftAll(C.PIXEL_SIZE * new Vector2(-25, 0)),
             exactlyOncePerRun      : true,
@@ -130,7 +130,7 @@ public class Cammy
                 }
             );
 
-        shop.AddParentedAnimationToShopFixed(ResMap.Get("cammy_excited"), 4, "purchase");
+        shop.AddParentedAnimationToShopFixed(ResMap.Get("cammy_excited"), 10, "purchase");
         shop.AddParentedAnimationToShopFixed(ResMap.Get("cammy_sad"), 4, "denied");
         shop.AddParentedAnimationToShopFixed(ResMap.Get("cammy_sad"), 4, "stolen");
         // shopRoom.ForceSpawnForDebugPurposes();

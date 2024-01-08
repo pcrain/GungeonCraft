@@ -4069,12 +4069,15 @@
     <EmbeddedResource Include="Resources\NPCSprites\bart-alt\bart_alt_idle_002.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\bart-alt\bart_alt_talk_002.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\bart-alt\bart_alt_talk_001.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\cammy\cammy_excited_006.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\cammy\cammy_talk_004.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\cammy\cammy_excited_001.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\cammy\cammy_excited_007.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\cammy\cammy_icon.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\cammy\cammy_talk_002.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\cammy\cammy_idle_006.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\cammy\cammy_excited_004.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\cammy\cammy_excited_008.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\cammy\cammy_sad_004.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\cammy\cammy_idle_001.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\cammy\cammy_carpet.png"/>
@@ -4085,6 +4088,7 @@
     <EmbeddedResource Include="Resources\NPCSprites\cammy\cammy_excited_002.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\cammy\cammy_sad_001.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\cammy\cammy_idle_002.png"/>
+    <EmbeddedResource Include="Resources\NPCSprites\cammy\cammy_excited_005.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\cammy\cammy_idle_005.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\cammy\cammy_idle_003.png"/>
     <EmbeddedResource Include="Resources\NPCSprites\cammy\cammy_talk_003.png"/>
