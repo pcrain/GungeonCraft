@@ -79,6 +79,8 @@ public class Initialisation : BaseUnityPlugin
             if (C.DEBUG_BUILD)
                 ETGModConsole.Log("Cwaffing the Gungy initializing...");
 
+            ETGModConsole.Log($"{Assembly.GetExecutingAssembly().GetName()}");
+
             Instance = this;
 
             #region Round 1 Config (hooks and database stuff where no sprites are needed, so it can be async)
@@ -286,6 +288,7 @@ public class Initialisation : BaseUnityPlugin
                 Glockarina.Add();
                 Magunet.Add();
                 Wavefront.Add();
+                Scotsman.Add();
                 setupGunsWatch.Stop();
             #endregion
 

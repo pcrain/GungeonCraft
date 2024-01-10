@@ -49,6 +49,7 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
         {
             // Interpret paths with slashes as fully-qualified resource paths, and use our ResMap otherwise
             string spriteName = spritePath.Contains("/") ? spritePath : ResMap.Get(spritePath)[0];
+            ETGModConsole.Log($"loading sprite name {spriteName}");
             GameObject obj = new GameObject(itemName);
             item = obj.AddComponent<TItemSpecific>();
             ItemBuilder.AddSpriteToObject(itemName, spriteName, obj);

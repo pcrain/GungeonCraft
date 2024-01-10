@@ -114,7 +114,7 @@ public class ArcTowardsTargetBehavior : MonoBehaviour
         Vector2 curpos = this._projectile.specRigidbody.Position.GetPixelVector2();
         Vector2 delta  = (this._targetPos-curpos);
         this._targetAngle = delta.ToAngle();
-        float distanceToTarget = Vector2.Distance(curpos,this._targetPos);
+        float distanceToTarget = Vector2.Distance(curpos, this._targetPos);
         this._projectile.baseData.speed = Mathf.Max(distanceToTarget / _maxSecsToReachTarget, _minSpeed);
         this._actualTimeToReachTarget = distanceToTarget / this._projectile.baseData.speed;
         this._projectile.UpdateSpeed();
