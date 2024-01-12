@@ -9,7 +9,14 @@ public class Scotsman : AdvancedGunBehavior
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
 
+    private const float _MAX_RETICLE_RANGE = 16f;
+    private const float _MAX_SPREAD        = 2f;
+
     internal static ExplosionData _ScotsmanExplosion = null;
+    internal static GameObject _ScotsmanReticle = null;
+
+    private Vector2 _aimPoint            = Vector2.zero;
+    private GameObject _targetingReticle = null;
 
     private int _nextIndex                    = 0;
     private Vector2 _whereIsThePlayerLooking  = Vector2.zero;
@@ -24,10 +31,12 @@ public class Scotsman : AdvancedGunBehavior
             gun.SetMuzzleVFX("muzzle_iron_maid", fps: 30, scale: 0.5f, anchor: Anchor.MiddleLeft);
             gun.SetFireAudio("stickybomblauncher_shoot");
             gun.SetReloadAudio("stickybomblauncher_worldreload");
-            // gun.AddToSubShop(ItemBuilder.ShopType.Trorc);
+            gun.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
         gun.InitProjectile(new(clipSize: 20, cooldown: 0.22f, shootStyle: ShootStyle.SemiAutomatic,
           damage: 5.0f, speed: 40.0f, sprite: "stickybomb_projectile", fps: 12, anchor: Anchor.MiddleCenter)).Attach<Stickybomb>();
+
+        _ScotsmanReticle = VFX.Create("scotsman_reticle", fps: 12, loops: true, anchor: Anchor.MiddleCenter);
 
         // Initialize our explosion data
         _ScotsmanExplosion = new ExplosionData()
@@ -41,7 +50,7 @@ public class Scotsman : AdvancedGunBehavior
             doDestroyProjectiles   = false,
             doForce                = true,
             debrisForce            = 10f,
-            preventPlayerForce     = true,
+            preventPlayerForce     = false,
             explosionDelay         = 0.01f,
             usesComprehensiveDelay = false,
             doScreenShake          = false,
@@ -58,8 +67,60 @@ public class Scotsman : AdvancedGunBehavior
         DetonateStickies(player);
     }
 
-    private const float _MAX_RETICLE_RANGE = 10f;
-    private const float _MAX_SPREAD = 2f;
+    public override void OnSwitchedAwayFromThisGun()
+    {
+        if (this.Owner is PlayerController pc)
+        {
+            ETGModConsole.Log($"aim nulled");
+            pc.forceAimPoint = null;
+        }
+        if (this._targetingReticle)
+        {
+            UnityEngine.Object.Destroy(this._targetingReticle);
+            this._targetingReticle = null;
+        }
+        base.OnSwitchedAwayFromThisGun();
+    }
+
+    protected override void Update()
+    {
+        base.Update();
+        if (this.Owner is not PlayerController player)
+            return;
+
+        // smoothly handle reticle postion, compensating extra distance for controller users (modified from Gunbrella)
+        if (player.IsKeyboardAndMouse())
+        {
+            player.forceAimPoint = null;
+            this._aimPoint = player.unadjustedAimPoint.XY();
+            Vector2 gunPos = player.CurrentGun.barrelOffset.PositionVector2();
+            if ((this._aimPoint - player.CenterPosition).sqrMagnitude < 32f)
+                this._aimPoint = gunPos + player.m_currentGunAngle.ToVector(1f);
+            if (this._targetingReticle)
+            {
+                UnityEngine.Object.Destroy(this._targetingReticle);
+                this._targetingReticle = null;
+            }
+            return;
+        }
+
+        this._targetingReticle ??= Instantiate<GameObject>(_ScotsmanReticle, base.transform.position, Quaternion.identity);
+        Vector2 rawAim = player.m_activeActions.Aim.Vector;
+        bool showReticle = ((rawAim != Vector2.zero) && (rawAim.sqrMagnitude > 0.02f));
+        if (showReticle)
+        {
+            this._aimPoint = player.CenterPosition + _MAX_RETICLE_RANGE * rawAim;
+            player.forceAimPoint = this._aimPoint;
+            this._targetingReticle.SetAlpha(1.0f);
+        }
+        else
+        {
+            this._aimPoint = player.CenterPosition + player.m_currentGunAngle.ToVector(_MAX_RETICLE_RANGE);
+            this._targetingReticle.SetAlpha(0.0f);
+        }
+        this._targetingReticle.transform.position = this._aimPoint;
+    }
+
     public override void PostProcessProjectile(Projectile projectile)
     {
         base.PostProcessProjectile(projectile);
@@ -69,16 +130,8 @@ public class Scotsman : AdvancedGunBehavior
         Stickybomb sticky = projectile.GetComponent<Stickybomb>();
         this._extantStickies.Add(sticky);
 
-        // smoothly handle reticle postion, compensating extra distance for controller users (taken from Gunbrella)
-        // TODO: maybe unlock reticle range on controller?
         float spread = _MAX_SPREAD * player.stats.GetStatValue(PlayerStats.StatType.Accuracy);
-        Vector2 newTargetPos = player.IsKeyboardAndMouse()
-            ? player.unadjustedAimPoint.XY()
-            : player.sprite.WorldCenter + (1f + _MAX_RETICLE_RANGE) * player.m_activeActions.Aim.Vector;
-        // Vector2 gunPos       = this.gun.barrelOffset.PositionVector2();
-        // Vector2 offset = newTargetPos - gunPos;
-        // sticky.Setup(gunPos + UnityEngine.Random.Range(0.9f, 1.1f) * offset.Rotate(UnityEngine.Random.Range(-spread, spread)));
-        Vector2 adjustedTarget = newTargetPos + Lazy.RandomVector(spread * UnityEngine.Random.value);
+        Vector2 adjustedTarget = this._aimPoint + Lazy.RandomVector(spread * UnityEngine.Random.value);
         projectile.SendInDirection(adjustedTarget - this.gun.barrelOffset.PositionVector2(), true);
         sticky.Setup(adjustedTarget);
     }
@@ -93,20 +146,13 @@ public class Scotsman : AdvancedGunBehavior
         }
         this._extantStickies = remainingStickies;
     }
-
-    // protected override void Update()
-    // {
-    //     base.Update();
-    //     if (GameManager.Instance.IsLoadingLevel)
-    //         return;
-    //     if (this.Player is not PlayerController pc)
-    //         return;
-    // }
 }
 
 public class Stickybomb : MonoBehaviour
 {
     private const float _DET_TIMER = 0.6f;
+    private const float _BASE_GLOW = 10f;
+    private const float _DET_GLOW  = 100f;
 
     private PlayerController _owner;
     private Projectile       _projectile;
@@ -152,19 +198,19 @@ public class Stickybomb : MonoBehaviour
     private void StickToSurface(CollisionData rigidbodyCollision)
     {
         StickToSurface(rigidbodyCollision.Contact);
-        if (rigidbodyCollision.OtherRigidbody?.GetComponent<AIActor>() is AIActor enemy)
-        {
-            // ETGModConsole.Log($"enemy collision!");
-            this._stuckEnemy = enemy;
-            this._stickPoint -= enemy.specRigidbody.transform.position.XY();
-            this._projectile.specRigidbody.transform.parent = enemy.specRigidbody.transform;
-        }
+        if (rigidbodyCollision.OtherRigidbody?.GetComponent<AIActor>() is not AIActor enemy)
+            return;
+
+        this._stuckEnemy = enemy;
+        this._stickPoint -= enemy.specRigidbody.transform.position.XY();
+        this._projectile.specRigidbody.transform.parent = enemy.specRigidbody.transform;
     }
 
     private void Update()
     {
         if (!this._stuckEnemy?.specRigidbody)
             return;
+
         this._projectile.specRigidbody.Position = new Position(this._stickPoint + this._stuckEnemy.specRigidbody.transform.position.XY());
         this._projectile.specRigidbody.UpdateColliderPositions();
     }
@@ -173,6 +219,7 @@ public class Stickybomb : MonoBehaviour
     {
         float launchTime = BraveTime.ScaledTimeSinceStartup;
         float originalDamage = this._projectile.baseData.damage;
+        this._projectile.sprite.SetGlowiness(glowAmount: _BASE_GLOW, glowColor: Color.red);
 
         // Phase 1, fire towards target
         this._projectile.shouldRotate = false; // prevent automatic rotation after creation
@@ -199,6 +246,7 @@ public class Stickybomb : MonoBehaviour
         }
 
         // Phase 2, lie in wait
+        this._projectile.damageTypes &= (~CoreDamageTypes.Electric);  // remove electric effect after stopping
         while (!this._detonateSequenceStarted)
             yield return null;
 
@@ -206,9 +254,9 @@ public class Stickybomb : MonoBehaviour
         for (int i = 0; i < 3; ++i)
         {
             AkSoundEngine.PostEvent("stickybomblauncher_det", base.gameObject);
-            this._projectile.sprite.SetGlowiness(glowAmount: 100f, glowColor: Color.red);
+            this._projectile.sprite.SetGlowiness(glowAmount: _DET_GLOW, glowColor: Color.red);
             yield return new WaitForSeconds(_DET_TIMER / 6);
-            this._projectile.sprite.SetGlowiness(glowAmount: 10f, glowColor: Color.red);
+            this._projectile.sprite.SetGlowiness(glowAmount: _BASE_GLOW, glowColor: Color.red);
             yield return new WaitForSeconds(_DET_TIMER / 6);
         }
 

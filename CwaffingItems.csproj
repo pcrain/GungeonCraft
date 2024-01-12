@@ -3336,6 +3336,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\siren5.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\magunet_charge_vfx4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\wavefront_impact_particles3.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\scotsman_reticle.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\drowsy_cloud5.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire_d4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\zenkai_aura3.png"/>
