@@ -46,7 +46,7 @@ public class GorgunEye : PassiveItem
         float gunAngle       = player.m_currentGunAngle;
         AIActor closestEnemy = null;
         float closestDist    = 999999f;
-        foreach(AIActor enemy in this.Owner.GetAbsoluteParentRoom().GetActiveEnemies(RoomHandler.ActiveEnemyType.All))
+        foreach(AIActor enemy in this.Owner.GetAbsoluteParentRoom()?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All).EmptyIfNull())
         {
             if (!enemy.IsHostileAndNotABoss())
                 continue; // enemy is not one we should be targeting

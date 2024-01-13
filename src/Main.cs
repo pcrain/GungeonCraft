@@ -289,6 +289,7 @@ public class Initialisation : BaseUnityPlugin
                 Magunet.Add();
                 Wavefront.Add();
                 Scotsman.Add();
+                ChekhovsGun.Add();
                 setupGunsWatch.Stop();
             #endregion
 

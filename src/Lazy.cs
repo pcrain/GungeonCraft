@@ -517,9 +517,11 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
             if (!ignoreWalls && !start.HasLineOfSight(tentativeTarget))
                 continue;
             Vector2 delta        = (tentativeTarget - start);
-            float dist           = delta.magnitude;
             float angle          = delta.ToAngle().Clamp360();
-            float angleDeviation = Mathf.Abs(coneAngle - angle);
+            float angleDeviation = Mathf.Abs((coneAngle - angle).Clamp180());
+            if (angleDeviation > maxDeviation)
+                continue;
+            float dist           = delta.magnitude;
             bool bestSoFar       = useNearestAngleInsteadOfDistance
                 ? (angleDeviation < bestAngle)
                 : (dist < bestDist);

@@ -114,6 +114,7 @@
     <Compile Include="src\Cwaff-Guns\VacuumCleaner.cs"/>
     <Compile Include="src\Cwaff-Guns\Magunet.cs"/>
     <Compile Include="src\Cwaff-Guns\IronMaid.cs"/>
+    <Compile Include="src\Cwaff-Guns\ChekhovsGun.cs"/>
     <Compile Include="src\Cwaff-Guns\AimuHakurei.cs"/>
     <Compile Include="src\Cwaff-Guns\Unfinished\DeathNote.cs"/>
     <Compile Include="src\Cwaff-Guns\Unfinished\PopcornGun.cs"/>
@@ -499,6 +500,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\ki_blast_reload_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alligator_idle_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_3_gun_017.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\chekhovs_gun_fire_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\lightwing_reload_011.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_3_gun_012.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_fire_012.png"/>
@@ -634,6 +636,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_009.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_006.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alligator_reload_020.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\chekhovs_gun_fire_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_4_gun_024.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\kings_law_idle_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_reload_041.json"/>
@@ -1122,6 +1125,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_048.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_3_gun_023.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_fire_015.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\chekhovs_gun_idle_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_024.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_fire_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\missiletoe_fire_007.json"/>
@@ -2586,6 +2590,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_040.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_018.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_033.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\chekhovs_gun_idle_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_fire_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\crapshooter_reload_029.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_reload_036.png"/>
@@ -2972,6 +2977,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_5_gun_005.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\glockarina_reload_012.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_reload_004.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\chekhovs_gun_reload_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alligator_fire_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_reload_022.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_reload_018.png"/>
@@ -2988,6 +2994,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_trimmed_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_020.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\chekhovs_gun_reload_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\wavefront_reload_014.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_051.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_011.png"/>
@@ -3849,6 +3856,7 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\wavefront_projectile_alt1.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\kunai.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\uppskeruvel_projectile3.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\chekhov_projectile.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\uppskeruvel_projectile4.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\soap_bubble_projectile_002.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\lightwing_projectile_return4.png"/>
@@ -4124,6 +4132,7 @@
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\hatchling_gun_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\iron_maid_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\racket_launcher_idle_001.png"/>
+    <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\chekhovs_gun_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\crapshooter_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\pistol_whip_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\grandmaster_idle_001.png"/>
