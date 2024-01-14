@@ -73,6 +73,7 @@
     <Compile Include="src\Cwaff-Passives\CreditCard.cs"/>
     <Compile Include="src\Cwaff-Passives\Gyroscope.cs"/>
     <Compile Include="src\Cwaff-Passives\JohnsWick.cs"/>
+    <Compile Include="src\Cwaff-Passives\RingOfDefenestration.cs"/>
     <Compile Include="src\Lazy.cs"/>
     <Compile Include="src\Commands.cs"/>
     <Compile Include="src\HatsStolenFromNN\HatController.cs"/>
@@ -3387,6 +3388,7 @@
     <EmbeddedResource Include="Resources\ItemSprites\bionic_finger_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\chamber_jammer_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\gorgun_eye_icon.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\ring_of_defenestration_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\borrowed_time_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\insurance_policy_pilot_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\insurance_policy_robot_icon.png"/>

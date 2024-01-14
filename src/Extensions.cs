@@ -1157,4 +1157,14 @@ public static class Extensions
   {
     if (c) UnityEngine.Object.Destroy(c);
   }
+
+  // Select a pickup id from a weighted list
+  public static int GetWeightedPickupID(this List<IntVector2> weights)
+  {
+    int targetWeight = UnityEngine.Random.Range(0, weights.Sum(item => item.y));
+    foreach (IntVector2 weight in weights)
+      if ((targetWeight -= weight.y) < 0)
+        return weight.x;
+    return 0;
+  }
 }

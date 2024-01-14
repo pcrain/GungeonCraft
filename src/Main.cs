@@ -228,6 +228,7 @@ public class Initialisation : BaseUnityPlugin
                 // DisplayStand.Init();  // scrapped since discouraging item use is not very fun
                 SafetyGloves.Init();
                 DrabOutfit.Init();
+                RingOfDefenestration.Init();
                 setupPassivesWatch.Stop();
             #endregion
 
