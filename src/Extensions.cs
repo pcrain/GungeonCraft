@@ -1145,4 +1145,16 @@ public static class Extensions
       newStrings.Add(s+suffix);
     return newStrings;
   }
+
+  // Destroy a GameObject if it is non-null
+  public static void SafeDestroy(this GameObject g)
+  {
+    if (g) UnityEngine.Object.Destroy(g);
+  }
+
+  // Destroy a Component if it is non-null
+  public static void SafeDestroy<T>(this T c) where T : Component
+  {
+    if (c) UnityEngine.Object.Destroy(c);
+  }
 }

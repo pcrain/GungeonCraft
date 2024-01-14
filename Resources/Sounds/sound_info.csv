@@ -122,3 +122,5 @@ minigun_spin,-2.0,0,sound
 bouncer_reload_short,-5.0,1,sound
 bouncer_reload,-5.0,1,sound
 fall_asleep_sound,-6.5,1,sound
+chekhovs_gun_place_sound,-5.0,1,sound
+chekhovs_gun_launch_sound_alt,-5.0,1,sound

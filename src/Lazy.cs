@@ -503,6 +503,20 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
         return _NullProjectilePrefab;
     }
 
+    public static bool AnyEnemyInLineOfSight(Vector2 start, Vector2 end, bool canBeNeutral = true)
+    {
+        Vector2 intersection = Vector2.zero;
+        foreach (AIActor enemy in start.GetAbsoluteRoom()?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All).EmptyIfNull())
+        {
+            if (!enemy.IsHostile(canBeNeutral: canBeNeutral))
+                continue;
+            PixelCollider collider = enemy.specRigidbody.HitboxPixelCollider;
+            if (BraveUtility.LineIntersectsAABB(start, end, collider.UnitBottomLeft, collider.UnitDimensions, out intersection))
+                return true;
+        }
+        return false;
+    }
+
     public static Vector2? NearestEnemyWithinConeOfVision(Vector2 start, float coneAngle, float maxDeviation, bool useNearestAngleInsteadOfDistance, bool ignoreWalls = false)
     {
         bool foundTarget   = false;
