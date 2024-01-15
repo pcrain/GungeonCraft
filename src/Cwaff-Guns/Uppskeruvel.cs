@@ -449,8 +449,7 @@ public class UppskeruvelCombatSoul : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (this._trail)
-            UnityEngine.Object.Destroy(this._trail.gameObject);
+        this._trail.SafeDestroy();
     }
 
     private Vector2 BehindPlayer()

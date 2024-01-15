@@ -95,8 +95,7 @@ public class Shine : PassiveItem
             return;
 
         this.isShining = false;
-        if (theShine)
-            UnityEngine.Object.Destroy(theShine);
+        theShine.SafeDestroy();
         player.healthHaver.IsVulnerable = true;
         player.ClearOverrideShader();
         player.sprite.usesOverrideMaterial = this.m_usedOverrideMaterial;

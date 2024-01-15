@@ -646,8 +646,7 @@ public class FancyVFX : MonoBehaviour
         float percentDone = this._curLifeTime / this._maxLifeTime;
         if (percentDone >= 1.0f)
         {
-            if (this._vfx)
-                UnityEngine.Object.Destroy(this._vfx);
+            this._vfx.SafeDestroy();
             UnityEngine.Object.Destroy(this);
             return;
         }

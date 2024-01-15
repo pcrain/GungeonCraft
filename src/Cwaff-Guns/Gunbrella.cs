@@ -134,9 +134,7 @@ public class Gunbrella : AdvancedGunBehavior
 
     private void DestroyReticle()
     {
-        if (!this._targetingReticle)
-            return;
-        UnityEngine.Object.Destroy(this._targetingReticle);
+        this._targetingReticle.SafeDestroy();
         this._targetingReticle = null;
     }
 

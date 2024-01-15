@@ -253,8 +253,7 @@ public class AlligatorCableHandler : MonoBehaviour
     private void OnDestroy()
     {
         _PlayerExtantCables[this._ownerId].Remove(this);
-        if (this._clippyboi)
-            UnityEngine.Object.Destroy(this._clippyboi);
+        this._clippyboi.SafeDestroy();
         if (this._stringFilter)
             UnityEngine.Object.Destroy(this._stringFilter.gameObject);
         for (int i = 0; i < _extantSparks.Count(); ++i)

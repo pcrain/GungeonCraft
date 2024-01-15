@@ -265,8 +265,7 @@ public class ZenkaiAura : MonoBehaviour
 
         ++this._zenkaiLevel;
 
-        if (this._extantAura != null)
-            UnityEngine.Object.Destroy(this._extantAura);
+        this._extantAura.SafeDestroy();
         this._extantAura                  = SpawnManager.SpawnVFX(WarriorsGi._ZenkaiAura, this._saiyan.sprite.WorldBottomCenter, Quaternion.identity);
         this._extantAura.transform.parent = this._saiyan.transform;
         this._auraLife                    = _AURA_LIFE;

@@ -267,8 +267,7 @@ public class Insured : MonoBehaviour
 
     private void OnDrop()
     {
-        if (this.vfx != null)
-            UnityEngine.Object.Destroy(this.vfx);
+        this.vfx.SafeDestroy();
         this.vfx = SpawnManager.SpawnVFX(InsurancePolicy.GetVFXForCharacter(), this._pickup.sprite.WorldTopCenter + new Vector2(0f, 0.5f), Quaternion.identity);
         this.vfx.transform.parent = this._pickup.gameObject.transform;
         this._pickup.StartCoroutine(SpinIntoExistence(this.vfx));

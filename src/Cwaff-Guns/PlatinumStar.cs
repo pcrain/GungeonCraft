@@ -126,8 +126,7 @@ public class OraOra : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (this._stand != null)
-            UnityEngine.Object.Destroy(this._stand);
+        this._stand.SafeDestroy();
         this._stand = null;
     }
 

@@ -76,11 +76,8 @@ public class SafetyGloves : PassiveItem
             return;
         }
 
-        if (this._extantVfx != null)
-        {
-            UnityEngine.Object.Destroy(this._extantVfx);
-            this._extantVfx = null;
-        }
+        this._extantVfx.SafeDestroy();
+        this._extantVfx = null;
 
         FancyVFX.FromCurrentFrame(closestEnemy.sprite).ArcTowards(0.5f, pc.sprite, false, 0.1f, 1.0f);
         AkSoundEngine.PostEvent("safety_glove_grab_sound", pc.gameObject);

@@ -73,11 +73,8 @@ public class Scotsman : AdvancedGunBehavior
             ETGModConsole.Log($"aim nulled");
             pc.forceAimPoint = null;
         }
-        if (this._targetingReticle)
-        {
-            UnityEngine.Object.Destroy(this._targetingReticle);
-            this._targetingReticle = null;
-        }
+        this._targetingReticle.SafeDestroy();
+        this._targetingReticle = null;
         base.OnSwitchedAwayFromThisGun();
     }
 
@@ -95,11 +92,8 @@ public class Scotsman : AdvancedGunBehavior
             Vector2 gunPos = player.CurrentGun.barrelOffset.PositionVector2();
             if ((this._aimPoint - player.CenterPosition).sqrMagnitude < 32f)
                 this._aimPoint = gunPos + player.m_currentGunAngle.ToVector(1f);
-            if (this._targetingReticle)
-            {
-                UnityEngine.Object.Destroy(this._targetingReticle);
-                this._targetingReticle = null;
-            }
+            this._targetingReticle.SafeDestroy();
+            this._targetingReticle = null;
             return;
         }
 

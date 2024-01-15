@@ -205,10 +205,8 @@ public class KingsLawBullets : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (this._runeLarge)
-            UnityEngine.Object.Destroy(this._runeLarge);
-        if (this._runeSmall)
-            UnityEngine.Object.Destroy(this._runeSmall);
+        this._runeLarge.SafeDestroy();
+        this._runeSmall.SafeDestroy();
     }
 
     private void SkipCorpseCollisions(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)

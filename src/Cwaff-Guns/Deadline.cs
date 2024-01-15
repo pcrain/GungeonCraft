@@ -118,16 +118,10 @@ public class Deadline : AdvancedGunBehavior
 
     private void DisableLaserSights()
     {
-        if (this._myLaserSight)
-        {
-            UnityEngine.Object.Destroy(this._myLaserSight);
-            this._myLaserSight = null;
-        }
-        if (this._debugLaserSight)
-        {
-            UnityEngine.Object.Destroy(this._debugLaserSight);
-            this._debugLaserSight = null;
-        }
+        this._myLaserSight.SafeDestroy();
+        this._myLaserSight = null;
+        this._debugLaserSight.SafeDestroy();
+        this._debugLaserSight = null;
     }
 
     private void UpdateLaserSight()
@@ -434,8 +428,7 @@ public class Deadline : AdvancedGunBehavior
 
             if (needToRecreate || this._laserVfx == null)
             {
-                if (this._laserVfx != null)
-                    UnityEngine.Object.Destroy(this._laserVfx);
+                this._laserVfx.SafeDestroy();
                 this._laserVfx = VFX.CreateLaserSight(this.start,curLength,1,this._angle,this._color,this._power);
                 this.laserComp = _laserVfx.GetComponent<tk2dTiledSprite>();
                 this.laserMat  = this.laserComp.sprite.renderer.material;

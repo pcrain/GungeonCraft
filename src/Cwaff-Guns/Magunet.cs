@@ -52,11 +52,8 @@ public class Magunet : AdvancedGunBehavior
             return;
         if (!this.gun.IsCharging)
         {
-            if (this._extantChargeVFX != null)
-            {
-                UnityEngine.Object.Destroy(this._extantChargeVFX);
-                this._extantChargeVFX = null;
-            }
+            this._extantChargeVFX.SafeDestroy();
+            this._extantChargeVFX = null;
             if (this._wasCharging)
             {
                 AkSoundEngine.PostEvent("magunet_launch_sound", base.gameObject);

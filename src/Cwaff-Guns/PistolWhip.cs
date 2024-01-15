@@ -111,8 +111,7 @@ public class WhipChainStart : MonoBehaviour
     private void OnDestroy()
     {
         foreach (GameObject g in this._links)
-            if (g)
-                UnityEngine.Object.Destroy(g);
+            g.SafeDestroy();
         this._links.Clear();
     }
 
