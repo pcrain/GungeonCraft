@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class GorgunEye : PassiveItem
 {
     public static string ItemName         = "Gorgun Eye";
-    public static string SpritePath       = "gorgun_eye_icon";
     public static string ShortDescription = "Staredown";
     public static string LongDescription  = "Stuns enemies while looking directly at them.";
     public static string Lore             = "Contrary to popular belief, Gorgun eyes have no intrinsic petrification properties. Gungeon archaeologists have discovered that Gorgun shamans traditionally imbue the eyes of their peers with petrification magic during infancy. More recently, it appears that Gorguns have begun to prefer enchanting synthetic eyes and disposable contact lenses, presumably after collectively realizing that petrifying everyone you meet was mildly inconvenient during social gatherings.";
@@ -19,7 +18,7 @@ public class GorgunEye : PassiveItem
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<GorgunEye>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
+        PickupObject item = Lazy.SetupPassive<GorgunEye>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.B;
         item.AddToSubShop(ItemBuilder.ShopType.Cursula);
 

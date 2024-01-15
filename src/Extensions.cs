@@ -866,8 +866,10 @@ public static class Extensions
   }
 
   // Set up custom ammo types from default resource paths
-  public static void SetupCustomAmmoClip(this ProjectileModule mod, string clipname)
+  public static void SetupCustomAmmoClip(this ProjectileModule mod, GunBuildData b)
   {
+      string clipname    = b.gun.EncounterNameOrDisplayName.SafeName();
+      ETGModConsole.Log($"  getting clip {$"{clipname}_clip"}");
       mod.ammoType       = GameUIAmmoType.AmmoType.CUSTOM;
       mod.customAmmoType = CustomClipAmmoTypeToolbox.AddCustomAmmoType($"{clipname}_clip", ResMap.Get($"{clipname}_clipfull")[0], ResMap.Get($"{clipname}_clipempty")[0]);
   }
@@ -992,6 +994,12 @@ public static class Extensions
   public static string InternalSpriteName(this Gun gun)
   {
     return gun.InternalName().Replace("'",""); // keep in parity with SetupItem()
+  }
+
+  // Get the internal name of an item / gun corresponding to its sprite
+  public static string SafeName(this string s)
+  {
+    return s.Replace(" ", "_").Replace("'","").Replace(".","").ToLower();
   }
 
   // Set the FPS for a gun's idle animation (including the fixed idle animation, if available)

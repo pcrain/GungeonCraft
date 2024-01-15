@@ -3,7 +3,6 @@
 public class Alligator : AdvancedGunBehavior
 {
     public static string ItemName         = "Alligator";
-    public static string SpriteName       = "alligator";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Shockingly Effective";
     public static string LongDescription  = "Fires clips that clamp onto enemies and periodically channel electricity from the player. Energy output is proportional to the player's damage stat, and increases further while rolling or while in electrified goop. Each clip channels the full energy output, and up to 8 clips can be attached to each enemy. Passively grants electric immunity while in inventory.";
@@ -20,7 +19,7 @@ public class Alligator : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Alligator>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Alligator>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.CHARGE, reloadTime: 2.0f, ammo: 300);
             gun.SetAnimationFPS(gun.shootAnimation, 20);
             gun.SetAnimationFPS(gun.reloadAnimation, 16);
@@ -28,7 +27,7 @@ public class Alligator : AdvancedGunBehavior
             gun.SetFireAudio("alligator_shoot_sound");
             gun.SetReloadAudio("alligator_reload_sound");
 
-        gun.InitProjectile(new(clipSize: 8, cooldown: 0.4f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, customClip: SpriteName,
+        gun.InitProjectile(new(clipSize: 8, cooldown: 0.4f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, customClip: true,
           damage: 1.0f, speed: 36.0f, sprite: "alligator_projectile", fps: 2, anchor: Anchor.MiddleCenter
           )).Attach<AlligatorProjectile>();
 

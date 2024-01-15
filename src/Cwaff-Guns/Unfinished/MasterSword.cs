@@ -3,7 +3,6 @@
 public class MasterSword : AdvancedGunBehavior
 {
     public static string ItemName         = "Master Sword";
-    public static string SpriteName       = "carnwennan";
     public static string ProjectileName   = "86"; //marine sidearm
     public static string ShortDescription = "Dangerous Alone";
     public static string LongDescription  = "(shoots beams until you get hit, stylish hat)";
@@ -11,7 +10,7 @@ public class MasterSword : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<MasterSword>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<MasterSword>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
 
         gun.DefaultModule.ammoCost               = 1;
         gun.DefaultModule.shootStyle             = ShootStyle.SemiAutomatic;

@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class HolyWaterGun : AdvancedGunBehavior
 {
     public static string ItemName         = "Holy Water Gun";
-    public static string SpriteName       = "holy_water_gun";
     public static string ProjectileName   = "10"; // mega douser
     public static string ShortDescription = "Water, Gun, & Holy Soak";
     public static string LongDescription  = "Deals quadruple damage to the Jammed. Killing a Jammed enemy reduces curse by 1.";
@@ -16,7 +15,7 @@ public class HolyWaterGun : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<HolyWaterGun>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<HolyWaterGun>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.BEAM, reloadTime: 1.0f, ammo: 500, audioFrom: Items.MegaDouser, defaultAudio: true);
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);

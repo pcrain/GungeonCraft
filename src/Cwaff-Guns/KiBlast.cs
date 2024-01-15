@@ -3,7 +3,6 @@
 public class KiBlast : AdvancedGunBehavior
 {
     public static string ItemName         = "Ki Blast";
-    public static string SpriteName       = "ki_blast";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Dragunball Z";
     public static string LongDescription  = "Fires alternating ki blasts that may be reflected by sufficiently strong enemies. Reloading reflects the nearest ki blast back at the enemy, amplifying the damage after every successive reflect.";
@@ -20,7 +19,7 @@ public class KiBlast : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<KiBlast>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<KiBlast>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 999, infiniteAmmo: true);
             gun.SetIdleAnimationFPS(10);
             _FireLeftAnim  = gun.shootAnimation;

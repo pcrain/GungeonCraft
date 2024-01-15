@@ -3,7 +3,6 @@
 public class HatchlingGun : AdvancedGunBehavior
 {
     public static string ItemName         = "Hatchling Gun";
-    public static string SpriteName       = "hatchling_gun";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Yolked In";
     public static string LongDescription  = $"Fires eggs which spawn chicks on impact. Chicks randomly wander the room, blocking enemies and their projectiles until taking damage.";
@@ -11,14 +10,14 @@ public class HatchlingGun : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<HatchlingGun>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<HatchlingGun>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.RIFLE, reloadTime: 25f / 20f /* frames / fps*/, ammo: 500);
             gun.SetAnimationFPS(gun.shootAnimation, 40);
             gun.SetAnimationFPS(gun.reloadAnimation, 20);
             gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
             gun.SetReloadAudio("hatchling_gun_bounce_sound", 0, 6, 14);
 
-        gun.InitProjectile(new(clipSize: 12, cooldown: 0.2f, angleVariance: 15.0f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName,
+        gun.InitProjectile(new(clipSize: 12, cooldown: 0.2f, angleVariance: 15.0f, shootStyle: ShootStyle.SemiAutomatic, customClip: true,
           damage: 3.0f, speed: 24.0f, sprite: "egg", fps: 12, scale: 1.5f, anchor: Anchor.MiddleCenter
           )).SetAllImpactVFX(VFX.CreatePool("egg_break", fps: 16, loops: false, scale: 0.75f, anchor: Anchor.MiddleCenter)
           ).Attach<HatchlingProjectile>();

@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class AmazonPrimer : PlayerItem
 {
     public static string ItemName         = "Amazon Primer";
-    public static string SpritePath       = "amazon_primer_icon";
     public static string ShortDescription = "Cancel Any* Time!";
     public static string LongDescription  = "Begins a Primer subscription when consumed. Subscription drains 5 casings per combat encounter, but doubles fire rate and projectile speed and slightly boosts damage. Per-room subscription cost increases by 5 casings each floor. Cannot be activated with less than 25 casings.";
     public static string Lore             = "Once upon a time, money couldn't buy firearm proficiency, and gun-toting peasants needed to practice things often described using buzzwords such as \"aiming,\" \"timing,\" and \"strategy\". Fortunately, the stone ages are behind us, and for a low** fee, you too can join the dozens of happy*** Primers and shoot with the best of them!\n\n*(any time you run out of money, your subscription will be automatically cancelled for your convenience)\n\n**(low fee increases as you descend lower into the Gungeon)\n\n***(happiness is subjective and relative)";
@@ -12,7 +11,7 @@ public class AmazonPrimer : PlayerItem
 
     public static void Init()
     {
-        PlayerItem item = Lazy.SetupActive<AmazonPrimer>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
+        PlayerItem item = Lazy.SetupActive<AmazonPrimer>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.A;
         item.consumable   = true;
         item.CanBeDropped = true;

@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class Gyroscope : PassiveItem
 {
     public static string ItemName         = "Gyroscope";
-    public static string SpritePath       = "gyroscope_icon";
     public static string ShortDescription = "Spin to Win";
     public static string LongDescription  = "Grants a chargeable dodge roll that transforms the user into a rampant tornado, reflecting projectiles but effectively randomizing shooting direction. Longer charges result in longer invulnerability periods, but may cause dizziness leaving the user briefly immobile and vulnerable.";
     public static string Lore             = "Watching this simple toy spin for even a few seconds is completely mesmerizing. Its trifold axes of rotation inspire truly revolutionary possibilities for avoiding projectiles.";
@@ -15,7 +14,7 @@ public class Gyroscope : PassiveItem
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<Gyroscope>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
+        PickupObject item = Lazy.SetupPassive<Gyroscope>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.A;
 
         var comp = item.gameObject.AddComponent<GyroscopeRoll>();

@@ -3,7 +3,6 @@
 public class Scotsman : AdvancedGunBehavior
 {
     public static string ItemName         = "Scotsman";
-    public static string SpriteName       = "scotsman";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "TBD";
     public static string LongDescription  = "TBD";
@@ -24,7 +23,7 @@ public class Scotsman : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Scotsman>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Scotsman>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.PISTOL, reloadTime: 2.00f, ammo: 300, canReloadNoMatterAmmo: true);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
             gun.SetAnimationFPS(gun.reloadAnimation, 24);

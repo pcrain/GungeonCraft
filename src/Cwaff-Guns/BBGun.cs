@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class BBGun : AdvancedGunBehavior
 {
     public static string ItemName         = "B. B. Gun";
-    public static string SpriteName       = "b_b_gun";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Spare No One";
     public static string LongDescription  = "Fires a single large projectile that bounces off walls and knocks enemies around with extreme force. Ammo can only be regained by interacting with the projectiles once they have come to a halt.";
@@ -14,7 +13,7 @@ public class BBGun : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<BBGun>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<BBGun>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 0.5f, ammo: 3, canGainAmmo: false);
             gun.muzzleFlashEffects = (ItemHelper.Get(Items.SeriousCannon) as Gun).muzzleFlashEffects;
             gun.SetAnimationFPS(gun.shootAnimation, 10);
@@ -26,7 +25,7 @@ public class BBGun : AdvancedGunBehavior
 
         Projectile p = gun.InitProjectile(new(
           clipSize: 3, cooldown: 0.7f, angleVariance: 10.0f, shootStyle: ShootStyle.Charged, sequenceStyle: ProjectileSequenceStyle.Ordered,
-          customClip: SpriteName, speed: 20f, range: 999999f, sprite: "bball", fps: 20, anchor: Anchor.MiddleCenter,
+          customClip: true, speed: 20f, range: 999999f, sprite: "bball", fps: 20, anchor: Anchor.MiddleCenter,
           anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(2, 2))); // prevent uneven colliders from glitching into walls
 
         for (int i = 0; i < _CHARGE_LEVELS.Length; i++)

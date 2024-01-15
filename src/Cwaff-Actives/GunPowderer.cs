@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class GunPowderer : PlayerItem
 {
     public static string ItemName         = "Gun Powderer";
-    public static string SpritePath       = "gun_powderer_icon";
     public static string ShortDescription = "Ground Up Guns";
     public static string LongDescription  = "Converts the nearest dropped gun to 1-5 spread ammo boxes, depending on its remaining ammo percentage.";
     public static string Lore             = "The art of gun powdering is relatively modern, despite the required implements all being rather primitive. This is perhaps because ammunition was in much higher supply in the Gungeon's early days, and powdering was largely unnecessary. Nowadays, resourceful Gungeoneers understand the value of smashing up their old and unused guns for ammo, and one can only hope they will eventually understand they wouldn't need so much ammo in the first place if they didn't miss 90% of their shots.";
@@ -12,7 +11,7 @@ public class GunPowderer : PlayerItem
 
     public static void Init()
     {
-        PlayerItem item = Lazy.SetupActive<GunPowderer>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
+        PlayerItem item = Lazy.SetupActive<GunPowderer>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.A;
         item.consumable   = false;
         item.CanBeDropped = true;

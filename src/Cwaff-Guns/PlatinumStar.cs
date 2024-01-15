@@ -3,7 +3,6 @@
 public class PlatinumStar : AdvancedGunBehavior
 {
     public static string ItemName         = "Platinum Star";
-    public static string SpriteName       = "platinum_star";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Unbreakable";
     public static string LongDescription  = "Fires projectiles that deal no damage on initial impact. When reloaded, summons manifestations of the user's soul to attack all previously-shot enemies with a flurry of rapid punches.";
@@ -13,7 +12,7 @@ public class PlatinumStar : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<PlatinumStar>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<PlatinumStar>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.PISTOL, reloadTime: 1f, ammo: 480);
             gun.SetAnimationFPS(gun.shootAnimation, 20);
             gun.SetAnimationFPS(gun.reloadAnimation, 40);
@@ -22,7 +21,7 @@ public class PlatinumStar : AdvancedGunBehavior
             gun.SetReloadAudio("platinum_reload_sound", frame: 5);
             gun.AddToSubShop(ModdedShopType.TimeTrader);
 
-        gun.InitProjectile(new(clipSize: 28, cooldown: 0.125f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, customClip: SpriteName,
+        gun.InitProjectile(new(clipSize: 28, cooldown: 0.125f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, customClip: true,
           damage: 3.0f, speed: 50.0f, force: 1.0f, range: 50.0f, sprite: "platinum_star_projectile", fps: 12, anchor: Anchor.MiddleLeft
           )).Attach<PlatinumProjectile>();
 

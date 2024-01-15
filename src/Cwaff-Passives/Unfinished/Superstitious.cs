@@ -3,7 +3,7 @@ namespace CwaffingTheGungy;
 public class Superstitious : PassiveItem
 {
     public static string ItemName         = "Superstitious";
-    public static string SpritePath       = "88888888_icon";
+    // public static string SpritePath       = "88888888_icon";
     public static string ShortDescription = "Writings on the HUD";
     public static string LongDescription  = "(6s and 7s)";
     public static string Lore             = "TBD";
@@ -16,7 +16,7 @@ public class Superstitious : PassiveItem
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<Superstitious>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
+        PickupObject item = Lazy.SetupPassive<Superstitious>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
 
         els.Add(new HUDElement("Coolness","","CwaffingTheGungy/Resources/HUD/Coolness.png"));

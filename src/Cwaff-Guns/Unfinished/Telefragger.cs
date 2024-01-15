@@ -3,7 +3,6 @@
 public class Telefragger : AdvancedGunBehavior
 {
     public static string ItemName         = "Telefragger";
-    public static string SpriteName       = "multiplicator";
     public static string ProjectileName   = "ak-47";
     public static string ShortDescription = "Voip";
     public static string LongDescription  = "(teleports to projectile upon wall collision and creates a blank)";
@@ -11,7 +10,7 @@ public class Telefragger : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Telefragger>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Telefragger>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
 
         gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
         gun.DefaultModule.ammoCost            = 1;

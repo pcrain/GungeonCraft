@@ -3,7 +3,6 @@
 public class Outbreak : AdvancedGunBehavior
 {
     public static string ItemName         = "Outbreak";
-    public static string SpriteName       = "outbreak";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Going Viral";
     public static string LongDescription  = "Fires a parasitic projectile that infects enemies on contact. All infected enemies fire additional parasitic projectiles towards the player's target whenever this gun is fired.";
@@ -17,7 +16,7 @@ public class Outbreak : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Outbreak>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Outbreak>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 1.2f, ammo: 300);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
             gun.SetAnimationFPS(gun.reloadAnimation, 20);
@@ -26,7 +25,7 @@ public class Outbreak : AdvancedGunBehavior
             gun.SetReloadAudio("outbreak_reload_sound");
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
 
-        _InfectionProjectile = gun.InitProjectile(new(clipSize: 10, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName,
+        _InfectionProjectile = gun.InitProjectile(new(clipSize: 10, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, customClip: true,
           damage: 8.0f, speed: 17.0f, range: 100.0f, sprite: "outbreak_projectile", fps: 12, anchor: Anchor.MiddleLeft
           )).Attach<InfectionBehavior>();
 

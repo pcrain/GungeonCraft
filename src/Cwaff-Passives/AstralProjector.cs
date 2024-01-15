@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class AstralProjector : PassiveItem
 {
     public static string ItemName         = "Astral Projector";
-    public static string SpritePath       = "astral_projector_icon";
     public static string ShortDescription = "Enter the Gungeon's Walls";
     public static string LongDescription  = "Allows phasing through the inner walls of most rooms. Can not shoot, reload, teleport, or use items while phased.";
     public static string Lore             = "Created after Bello accidentally dropped a run-of-the-mill projector into one of the cosmic rifts scattered throughout the Gungeon, the {ItemName} is now completely useless for its original purpose of displaying HD videos in decidedly non-HD quality on the walls of Bello's shop. Bello is still searching for a good projector and prefers not to talk about the whole incident.";
@@ -24,7 +23,7 @@ public class AstralProjector : PassiveItem
 
     public static void Init()
     {
-        PickupObject item  = Lazy.SetupPassive<AstralProjector>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
+        PickupObject item  = Lazy.SetupPassive<AstralProjector>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality       = ItemQuality.A;
         item.AddToSubShop(ModdedShopType.TimeTrader);
 

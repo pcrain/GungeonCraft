@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class Blazer : PassiveItem
 {
     public static string ItemName         = "Blazer";
-    public static string SpritePath       = "blazer_icon";
     public static string ShortDescription = "Get 'em While It's Hot";
     public static string LongDescription  = "Fire rate, charge time, and reload speed are doubled for 3 seconds upon entering combat.";
     public static string Lore             = "A simple yet timeless garment, its light weight, loose fit, and hot pallette get office managers and Gungeoneers alike in the mood for taking care of business as soon as they walk into a room.";
@@ -16,7 +15,7 @@ public class Blazer : PassiveItem
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<Blazer>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
+        PickupObject item = Lazy.SetupPassive<Blazer>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.A;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
 

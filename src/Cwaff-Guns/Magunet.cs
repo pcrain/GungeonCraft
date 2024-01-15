@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class Magunet : AdvancedGunBehavior
 {
     public static string ItemName         = "Magunet";
-    public static string SpriteName       = "magunet";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "An Attractive Option";
     public static string LongDescription  = "Attracts debris in a cone in front of the player and holds it in stasis while fire is held. Upon releasing fire, launches all attracted debris forwards, damaging any enemies in the way. Corpses deal extra damage when launched. Increases curse by 1 while in inventory.";
@@ -29,7 +28,7 @@ public class Magunet : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Magunet>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Magunet>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true);
             gun.SetAnimationFPS(gun.chargeAnimation, 16);
             gun.AddStatToGun(PlayerStats.StatType.Curse, 1f, StatModifier.ModifyMethod.ADDITIVE);

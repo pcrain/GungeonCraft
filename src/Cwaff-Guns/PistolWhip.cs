@@ -3,7 +3,6 @@
 public class PistolWhip : AdvancedGunBehavior
 {
     public static string ItemName         = "Pistol Whip";
-    public static string SpriteName       = "pistol_whip";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "What a Horrible Night";
     public static string LongDescription  = "A long range weapon that deals high melee damage at its tip and fires a fast projectile when fully extended. Can only melee hit enemies when fully extended. Increases curse by 3 while in inventory.";
@@ -14,7 +13,7 @@ public class PistolWhip : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<PistolWhip>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<PistolWhip>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 0.01f, ammo: 100);
             gun.SetAnimationFPS(gun.shootAnimation, 30);
             gun.SetAnimationFPS(gun.reloadAnimation, 40);

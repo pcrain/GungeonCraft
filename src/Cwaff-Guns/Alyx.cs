@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class Alyx : AdvancedGunBehavior
 {
     public static string ItemName         = "Alyx";
-    public static string SpriteName       = "alyx";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Welcome to the New Age";
     public static string LongDescription  = "Fires shots that poison and ignite enemies. Current and max ammo decay exponentially, leaving radioactive waste behind in the process. Gun decays completely at 10 max ammo.";
@@ -24,7 +23,7 @@ public class Alyx : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Alyx>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Alyx>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.FULLAUTO, reloadTime: 0.5f, ammo: _BASE_MAX_AMMO);
             gun.SetAnimationFPS(gun.reloadAnimation, 20);
             gun.SetAnimationFPS(gun.shootAnimation, 20);
@@ -32,7 +31,7 @@ public class Alyx : AdvancedGunBehavior
             gun.SetReloadAudio("alyx_reload_sound");
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
-        gun.InitProjectile(new(clipSize: 10, shootStyle: ShootStyle.Automatic, customClip: SpriteName, damage: 15.0f, speed: 20.0f,
+        gun.InitProjectile(new(clipSize: 10, shootStyle: ShootStyle.Automatic, customClip: true, damage: 15.0f, speed: 20.0f,
           poison: 1.0f, fire: 1.0f, sprite: "alyx_projectile", fps: 16, scale: 0.5625f, anchor: Anchor.MiddleCenter));
     }
 

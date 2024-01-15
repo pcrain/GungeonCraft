@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class KalibersJustice : PlayerItem
 {
     public static string ItemName         = "Kaliber's Justice";
-    public static string SpritePath       = "kalibers_justice_icon";
     public static string ShortDescription = "Knows What You Need";
     public static string LongDescription  = "Gives one or more items based on what you currently need most, but may take away items that you have in excess. Reward quality scales with the quality and quantity of items you lose.";
     public static string Lore             = "Praying to Kaliber for assistance is something of a mixed bag, even among her followers. On the one hand, she tends to be highly responsive to prayers and considerate of one's present situation when choosing her mode of assistance. On the flipside, she is less than thrilled by the modern trend of praying to her only when in need something, and has been known to make the equally modern decision of treating her blessings as business transactions and taking as much as she gives. Still, she has been known to freely offer her aid to those who remain humble.";
@@ -12,7 +11,7 @@ public class KalibersJustice : PlayerItem
 
     public static void Init()
     {
-        PlayerItem item = Lazy.SetupActive<KalibersJustice>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
+        PlayerItem item = Lazy.SetupActive<KalibersJustice>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.B;
         item.consumable   = false;
         item.CanBeDropped = true;

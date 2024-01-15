@@ -3,7 +3,6 @@
 public class Tranquilizer : AdvancedGunBehavior
 {
     public static string ItemName         = "Tranquilizer";
-    public static string SpriteName       = "tranquilizer";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Zzzzzz";
     public static string LongDescription  = "Fires darts that permastun enemies after a few seconds, scaling logarithmically with their current health. Each subsequent dart decreases an enemy's tranquilization timer by 3 seconds.";
@@ -16,7 +15,7 @@ public class Tranquilizer : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Tranquilizer>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Tranquilizer>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.POISON, reloadTime: 1.2f, ammo: 80);
             gun.SetAnimationFPS(gun.shootAnimation, 30);
             gun.SetAnimationFPS(gun.reloadAnimation, 40);
@@ -24,7 +23,7 @@ public class Tranquilizer : AdvancedGunBehavior
             gun.SetFireAudio("blowgun_fire_sound");
             gun.SetReloadAudio("blowgun_reload_sound");
 
-        gun.InitProjectile(new(clipSize: 1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName, damage: 0f,
+        gun.InitProjectile(new(clipSize: 1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, damage: 0f,
           sprite: "tranquilizer_projectile", fps: 12, anchor: Anchor.MiddleLeft)).Attach<TranquilizerBehavior>();
 
         _DrowsyVFX      = VFX.Create("drowsy_cloud", fps: 6, loops: true, anchor: Anchor.MiddleCenter, scale: 0.5f);

@@ -3,7 +3,6 @@
 public class Wavefront : AdvancedGunBehavior
 {
     public static string ItemName         = "Wavefront";
-    public static string SpriteName       = "wavefront";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Particle-larly Interesting";
     public static string LongDescription  = "Fires bullets that persistently orbit and gravitate towards the player for up to 30 seconds until they collide with an enemy.";
@@ -11,7 +10,7 @@ public class Wavefront : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Wavefront>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Wavefront>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.RIFLE, reloadTime: 1.0f, ammo: 320);
             gun.SetAnimationFPS(gun.idleAnimation, 12);
             gun.SetAnimationFPS(gun.shootAnimation, 50);

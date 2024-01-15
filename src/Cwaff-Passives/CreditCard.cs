@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class CreditCard : PassiveItem
 {
     public static string ItemName         = "Credit Card";
-    public static string SpritePath       = "credit_card_icon";
     public static string ShortDescription = "Shop 'til You Drop";
     public static string LongDescription  = "Grants 500 shells while picked up. Grants 1 curse for every 50 shells below 500, and 1 coolness for every 50 shells above 500. Cannot be dropped when possessing fewer than 500 shells.";
     public static string Lore             = "Perhaps the greatest emblem of 20th century economics, this handly little piece of plastic gives unprecedented purchasing power for all of your Gungeon needs. Comes with the teensiest of interest rates, charged directly to your soul for your convenience.";
@@ -17,7 +16,7 @@ public class CreditCard : PassiveItem
 
     public static void Init()
     {
-        PickupObject item  = Lazy.SetupPassive<CreditCard>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
+        PickupObject item  = Lazy.SetupPassive<CreditCard>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality       = ItemQuality.B;
         item.AddToSubShop(ItemBuilder.ShopType.Cursula);
     }

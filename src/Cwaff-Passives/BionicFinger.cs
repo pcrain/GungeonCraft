@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class BionicFinger : PassiveItem
 {
     public static string ItemName         = "Bionic Finger";
-    public static string SpritePath       = "bionic_finger_icon";
     public static string ShortDescription = "Trigger Happiest";
     public static string LongDescription  = "Allows semi-automatic weapons to automatically fire at their maximum manual fire rate.";
     public static string Lore             = "The latest and greatest in cyborg prosthetic technology. In addition to negating one of the only downsides of using semi-automatic weaponry, this finger has the added benefit of reducing the incidence rate of carpal tunnel syndrome and repetitive wrist strain among arms-bearers, making it a must-have for both the health-conscious and the lazy alike.";
@@ -13,7 +12,7 @@ public class BionicFinger : PassiveItem
 
     public static void Init()
     {
-        PickupObject item  = Lazy.SetupPassive<BionicFinger>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
+        PickupObject item  = Lazy.SetupPassive<BionicFinger>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality       = ItemQuality.C;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
         item.AddToSubShop(ModdedShopType.Rusty);

@@ -7,7 +7,6 @@ namespace CwaffingTheGungy;
 public class BulletThatCanKillTheFuture : PlayerItem
 {
     public static string ItemName         = "Bullet That Can Kill the Future";
-    public static string SpritePath       = "future_killing_bullet_icon";
     public static string ShortDescription = "Seriously, Don't Miss";
     public static string LongDescription  = "Any enemy shot with Bullet That Can Kill the Future will not spawn for the rest of the run.";
     public static string Lore             = "Very little is known about this bullet, as few know it exists at all. It was originally given to Bello by a mysterious blue-clad skeleton, who claims to have found it behind the Hero Shrine in the Keep of the Lead Lord. It's almost as if it's calling out to be fired.";
@@ -23,7 +22,7 @@ public class BulletThatCanKillTheFuture : PlayerItem
 
     public static void Init()
     {
-        PlayerItem item   = Lazy.SetupActive<BulletThatCanKillTheFuture>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
+        PlayerItem item   = Lazy.SetupActive<BulletThatCanKillTheFuture>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.SPECIAL;
         item.consumable   = true;
         item.CanBeDropped = true;

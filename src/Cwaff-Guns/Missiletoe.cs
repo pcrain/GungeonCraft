@@ -3,7 +3,6 @@
 public class Missiletoe : AdvancedGunBehavior
 {
     public static string ItemName         = "Missiletoe";
-    public static string SpriteName       = "missiletoe";
     public static string ProjectileName   = "38_special"; // has rotation, but overridden later
     public static string ShortDescription = "O Tannenbomb";
     public static string LongDescription  = "Fires wrapped gifts with special attributes depending on the quality of item they contain. Reloading with a full clip while a dropped item or gun is nearby wraps it and adds it to the gun's clip. Reloading with a full clip while no items are nearby unwraps the most recently wrapped item and removes it from the gun's clip. Items and guns do not count as part of the player's normal inventory while they are wrapped.";
@@ -51,7 +50,7 @@ public class Missiletoe : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Missiletoe>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Missiletoe>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARM, reloadTime: 1.0f, ammo: 300, canReloadNoMatterAmmo: true);
             gun.SetAnimationFPS(gun.shootAnimation, 45);
             gun.SetAnimationFPS(gun.reloadAnimation, 20);
@@ -60,7 +59,7 @@ public class Missiletoe : AdvancedGunBehavior
             gun.SetReloadAudio("missiletoe_reload_sound");
             gun.AddToSubShop(ModdedShopType.Boomhildr);
 
-        gun.DefaultModule.SetAttributes(new(clipSize: 1, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName));
+        gun.DefaultModule.SetAttributes(new(gun: gun, clipSize: 1, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, customClip: true));
 
         ExplosionData giftExplosion = new ExplosionData();
             giftExplosion.CopyFrom(Bouncer._MiniExplosion);

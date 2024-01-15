@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class Itemfinder : PlayerItem
 {
     public static string ItemName         = "Itemfinder";
-    public static string SpritePath       = "itemfinder_icon";
     public static string ShortDescription = "Scavenger Hunt";
     public static string LongDescription  = "Beeps when near hidden treasure. Using near hidden treasure uncovers an item or gun with varying rarity.";
     public static string Lore             = "Ox and Cadence commissioned the development of this handy little gadget for helping them find wares to sell at their shop. Their inventory has expanded considerably since they switched over from using a traditional metal detector, which had the unfortunate habit of going off around just about everything in the Gungeon. As this included the Gundead themselves, Ox and Cadence's medical expenses have also gone down considerably since foregoing the metal detector.";
@@ -25,7 +24,7 @@ public class Itemfinder : PlayerItem
 
     public static void Init()
     {
-        PlayerItem item = Lazy.SetupActive<Itemfinder>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
+        PlayerItem item = Lazy.SetupActive<Itemfinder>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.A;
         item.consumable   = false;
         item.CanBeDropped = true;

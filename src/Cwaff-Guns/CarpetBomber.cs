@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class CarpetBomber : AdvancedGunBehavior
 {
     public static string ItemName         = "Carpet Bomber";
-    public static string SpriteName       = "carpet_bomber";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Rugged Terrain";
     public static string LongDescription  = "Fires a barrage of explosive bouncing carpets. Launches more carpets with more force the longer it is charged.";
@@ -22,7 +21,7 @@ public class CarpetBomber : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<CarpetBomber>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<CarpetBomber>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.5f, ammo: 360);
             gun.muzzleFlashEffects = (ItemHelper.Get(Items.SeriousCannon) as Gun).muzzleFlashEffects;
             gun.SetAnimationFPS(gun.shootAnimation, 30);
@@ -35,7 +34,7 @@ public class CarpetBomber : AdvancedGunBehavior
             gun.SetChargeAudio("carpet_bomber_charge_stage", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
         Projectile p = gun.InitSpecialProjectile<FancyGrenadeProjectile>(new(
-          clipSize: 3, cooldown: 0.15f, angleVariance: 10.0f, shootStyle: ShootStyle.Charged, range: 9999f, customClip: SpriteName,
+          clipSize: 3, cooldown: 0.15f, angleVariance: 10.0f, shootStyle: ShootStyle.Charged, range: 9999f, customClip: true,
           sequenceStyle: ProjectileSequenceStyle.Ordered, sprite: "carpet_projectile", fps: 20, anchor: Anchor.MiddleCenter,
           scale: 0.5f, barrageSize: _MAX_PROJECTILES, shouldRotate: true, shouldFlipHorizontally: true, surviveRigidbodyCollisions: true,
           anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(8, 8)

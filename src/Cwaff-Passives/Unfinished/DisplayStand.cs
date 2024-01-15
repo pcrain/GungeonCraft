@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class DisplayStand : PassiveItem
 {
     public static string ItemName         = "Display Stand";
-    public static string SpritePath       = "display_stand_icon";
     public static string ShortDescription = "TBD";
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
@@ -30,7 +29,7 @@ public class DisplayStand : PassiveItem
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<DisplayStand>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
+        PickupObject item = Lazy.SetupPassive<DisplayStand>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.D;
 
         displayStandId   = item.PickupObjectId;

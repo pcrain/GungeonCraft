@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class RingOfDefenestration : PassiveItem
 {
     public static string ItemName         = "Ring of Defenestration";
-    public static string SpritePath       = "ring_of_defenestration_icon";
     public static string ShortDescription = "TBD";
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
@@ -22,7 +21,7 @@ public class RingOfDefenestration : PassiveItem
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<RingOfDefenestration>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
+        PickupObject item = Lazy.SetupPassive<RingOfDefenestration>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
         ID                = item.PickupObjectId;
         new Hook(

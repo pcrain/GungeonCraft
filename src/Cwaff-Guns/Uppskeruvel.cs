@@ -3,7 +3,6 @@
 public class Uppskeruvel : AdvancedGunBehavior
 {
     public static string ItemName         = "Uppskeruvel";
-    public static string SpriteName       = "uppskeruvel";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Aimless Souls";
     public static string LongDescription  = "Enemies killed with this gun drop soul fragments proportional to their max health. Collecting these fragments spawns Aimless Souls that will attack enemies shot by this gun. New souls are spawned after collecting 10, 30, 60, 100, 150, etc. fragments.";
@@ -37,7 +36,7 @@ public class Uppskeruvel : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Uppskeruvel>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Uppskeruvel>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARM, reloadTime: 1.25f, ammo: 400);
             gun.SetFireAudio("uppskeruvel_fire_sound");
             gun.SetReloadAudio("uppskeruvel_reload_sound", 4, 22);
@@ -45,7 +44,7 @@ public class Uppskeruvel : AdvancedGunBehavior
             gun.SetAnimationFPS(gun.reloadAnimation, 30);
             gun.SetMuzzleVFX("muzzle_platinum_star", fps: 60, scale: 0.2f, anchor: Anchor.MiddleCenter);
 
-        gun.InitProjectile(new(clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.Automatic, damage: 4f, customClip: SpriteName,
+        gun.InitProjectile(new(clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.Automatic, damage: 4f, customClip: true,
           sprite: "uppskeruvel_projectile", fps: 12, anchor: Anchor.MiddleLeft)).Attach<UppskeruvelProjectile>();
 
         gun.gameObject.AddComponent<UppskeruvelAmmoDisplay>();

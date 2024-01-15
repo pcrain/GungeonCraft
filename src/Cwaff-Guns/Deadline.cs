@@ -8,7 +8,6 @@
 public class Deadline : AdvancedGunBehavior
 {
     public static string ItemName         = "Deadline";
-    public static string SpriteName       = "deadline";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Pythagoras Would be Proud";
     public static string LongDescription  = "Upon colliding with walls, projectiles create laser beams perpendicular to the wall at their point of collision. If two such lasers intersect, a large explosion is created at the point of intersection.";
@@ -26,7 +25,7 @@ public class Deadline : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Deadline>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Deadline>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 0.9f, ammo: 64);
             gun.SetIdleAnimationFPS(10);
             gun.SetAnimationFPS(gun.shootAnimation, 20);

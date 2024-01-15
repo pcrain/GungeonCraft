@@ -3,7 +3,6 @@
 public class SeltzerPelter : AdvancedGunBehavior
 {
     public static string ItemName         = "Seltzer Pelter";
-    public static string SpriteName       = "seltzer_pelter";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Shaken, not Stirred";
     public static string LongDescription  = "Launches soda cans that fly around wildly after initial impact, pushing enemies away with highly pressurized streams of seltzer water. Seltzer water cannot be electrified, but otherwise behaves like normal water.";
@@ -16,7 +15,7 @@ public class SeltzerPelter : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<SeltzerPelter>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<SeltzerPelter>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.0f, ammo: 150);
             gun.SetAnimationFPS(gun.shootAnimation, 36);
             gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
@@ -38,7 +37,7 @@ public class SeltzerPelter : AdvancedGunBehavior
             }
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
-        gun.InitProjectile(new(clipSize: 1, cooldown: 0.5f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName,
+        gun.InitProjectile(new(clipSize: 1, cooldown: 0.5f, shootStyle: ShootStyle.SemiAutomatic, customClip: true,
           damage: 16.0f, speed: 30.0f, force: 75.0f, range: 999.0f, sprite: "can_projectile", fps: 1,  anchor: Anchor.MiddleCenter, // 1 FPS minimum, stop animator manually later
           anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(2, 2) // prevent uneven colliders from glitching into walls
           )).Attach<SeltzerProjectile>();

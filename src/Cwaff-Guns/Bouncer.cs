@@ -3,7 +3,6 @@
 public class Bouncer : AdvancedGunBehavior
 {
     public static string ItemName         = "Bouncer";
-    public static string SpriteName       = "bouncer";
     public static string ProjectileName   = "38_special"; //for rotation niceness
     public static string ShortDescription = "Rebound to Go Wrong";
     public static string LongDescription  = "Fires slow but rapidly accelerating projectiles that phase through enemies and objects until bouncing at least once. The damage of each projectile scales with its speed upon initially bouncing. Projectiles bounce up to 3 times, creating a small explosion on their 4th impact.";
@@ -16,7 +15,7 @@ public class Bouncer : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Bouncer>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Bouncer>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 1.3f, ammo: 300);
             gun.SetAnimationFPS(gun.shootAnimation, 14);
             gun.SetAnimationFPS(gun.reloadAnimation, 30);

@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class DrabOutfit : PassiveItem
 {
     public static string ItemName         = "Drab Outfit";
-    public static string SpritePath       = "drab_outfit_icon";
     public static string ShortDescription = "Completely Unremarkable";
     public static string LongDescription  = "Sets Magnificence stat to 0 while in inventory, increasing the frequency of red and black chest spawns.";
     public static string Lore             = "This garment seems to go slightly out of its way to be as plain and boring as possible. It does not go completely out of its way, however, as that would actually make it notable in some sense. Which it certainly isn't.";
@@ -13,7 +12,7 @@ public class DrabOutfit : PassiveItem
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<DrabOutfit>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
+        PickupObject item = Lazy.SetupPassive<DrabOutfit>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.D;
         item.AddToSubShop(ModdedShopType.Rusty);
 

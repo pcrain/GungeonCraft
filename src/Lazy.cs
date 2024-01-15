@@ -49,7 +49,9 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
         {
             // Interpret paths with slashes as fully-qualified resource paths, and use our ResMap otherwise
             string spriteName = spritePath.Contains("/") ? spritePath : ResMap.Get(spritePath)[0];
-            ETGModConsole.Log($"loading sprite name {spriteName}");
+            string altName = itemName.SafeName() + "_icon";
+            if (spritePath != altName)
+                ETGModConsole.Log($"  {spritePath} != {altName}");
             GameObject obj = new GameObject(itemName);
             item = obj.AddComponent<TItemSpecific>();
             ItemBuilder.AddSpriteToObject(itemName, spriteName, obj);
@@ -95,19 +97,19 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
     /// <summary>
     /// Perform basic initialization for a new passive item definition.
     /// </summary>
-    public static PickupObject SetupPassive<T>(string itemName, string spritePath, string shortDescription, string longDescription, string lore, bool hideFromAmmonomicon = false)
+    public static PickupObject SetupPassive<T>(string itemName, string shortDescription, string longDescription, string lore, bool hideFromAmmonomicon = false)
         where T : PickupObject
     {
-        return SetupItem<PickupObject, T>(itemName, spritePath, "", shortDescription, longDescription, lore, hideFromAmmonomicon: hideFromAmmonomicon);
+        return SetupItem<PickupObject, T>(itemName, $"{itemName.SafeName()}_icon", "", shortDescription, longDescription, lore, hideFromAmmonomicon: hideFromAmmonomicon);
     }
 
     /// <summary>
     /// Perform basic initialization for a new active item definition.
     /// </summary>
-    public static PlayerItem SetupActive<T>(string itemName, string spritePath, string shortDescription, string longDescription, string lore, bool hideFromAmmonomicon = false)
+    public static PlayerItem SetupActive<T>(string itemName, string shortDescription, string longDescription, string lore, bool hideFromAmmonomicon = false)
         where T : PlayerItem
     {
-        return SetupItem<PlayerItem, T>(itemName, spritePath, "", shortDescription, longDescription, lore, hideFromAmmonomicon: hideFromAmmonomicon);
+        return SetupItem<PlayerItem, T>(itemName, $"{itemName.SafeName()}_icon", "", shortDescription, longDescription, lore, hideFromAmmonomicon: hideFromAmmonomicon);
     }
 
     /// <summary>
@@ -127,10 +129,10 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
     /// <summary>
     /// Perform basic initialization for a new gun definition.
     /// </summary>
-    public static Gun SetupGun<T>(string gunName, string spritePath, string projectileName, string shortDescription, string longDescription, string lore, bool hideFromAmmonomicon = false)
+    public static Gun SetupGun<T>(string gunName, string projectileName, string shortDescription, string longDescription, string lore, bool hideFromAmmonomicon = false)
         where T : Alexandria.ItemAPI.AdvancedGunBehavior
     {
-        Gun gun = SetupItem<Gun, Gun>(gunName, spritePath, projectileName, shortDescription, longDescription, lore, hideFromAmmonomicon: hideFromAmmonomicon);
+        Gun gun = SetupItem<Gun, Gun>(gunName, gunName.SafeName(), projectileName, shortDescription, longDescription, lore, hideFromAmmonomicon: hideFromAmmonomicon);
         gun.gameObject.AddComponent<T>();
         _GunSpriteCollection ??= gun.sprite.collection; // need to initialize at least once
 

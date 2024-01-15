@@ -5,7 +5,6 @@ using tk2dRuntime.TileMap;
 public class GungeonitePickaxe : PlayerItem
 {
     public static string ItemName         = "Gungeonite Pickaxe";
-    public static string SpritePath       = "gungeonite_pickaxe_icon";
     public static string ShortDescription = "So We Back in the Mines";
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
@@ -27,7 +26,7 @@ public class GungeonitePickaxe : PlayerItem
 
     public static void Init()
     {
-        PlayerItem item = Lazy.SetupActive<GungeonitePickaxe>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
+        PlayerItem item = Lazy.SetupActive<GungeonitePickaxe>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.D;
         item.consumable   = false;
         item.CanBeDropped = true;

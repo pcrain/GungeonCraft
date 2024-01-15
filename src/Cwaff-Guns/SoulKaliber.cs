@@ -3,7 +3,6 @@
 public class SoulKaliber : AdvancedGunBehavior
 {
     public static string ItemName         = "Soul Kaliber";
-    public static string SpriteName       = "soul_kaliber";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Gundead or Alive";
     public static string LongDescription  = "Fires projectiles that give enemies the soul link status effect. All soul linked enemies receive damage when any one of them is hit.";
@@ -11,7 +10,7 @@ public class SoulKaliber : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<SoulKaliber>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<SoulKaliber>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.1f, ammo: 250);
             gun.muzzleFlashEffects.type              = VFXPoolType.None;
             gun.SetAnimationFPS(gun.shootAnimation, 24);

@@ -7,7 +7,6 @@ namespace CwaffingTheGungy;
 public class Gunbrella : AdvancedGunBehavior
 {
     public static string ItemName         = "Gunbrella";
-    public static string SpriteName       = "gunbrella";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Cloudy with a Chance of Pain";
     public static string LongDescription  = "Charging and releasing fires projectiles that hail from the sky at the cursor's position.";
@@ -30,14 +29,14 @@ public class Gunbrella : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Gunbrella>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Gunbrella>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARGE, reloadTime: 1.0f, ammo: 60);
             gun.SetAnimationFPS(gun.shootAnimation, 60);
             gun.SetAnimationFPS(gun.chargeAnimation, 16);
             gun.LoopAnimation(gun.chargeAnimation, 17);
             gun.SetMuzzleVFX("muzzle_gunbrella", fps: 30, scale: 0.5f, anchor: Anchor.MiddleCenter);
 
-        gun.InitProjectile(new(clipSize: 1, shootStyle: ShootStyle.Charged, customClip: SpriteName, ammoCost: 0,
+        gun.InitProjectile(new(clipSize: 1, shootStyle: ShootStyle.Charged, customClip: true, ammoCost: 0,
           damage: _PROJ_DAMAGE, sprite: "gunbrella_projectile", fps: 16, anchor: Anchor.MiddleLeft, freeze: 0.33f, chargeTime: _MIN_CHARGE_TIME,
           destroySound: "icicle_crash", bossDamageMult: 0.6f // bosses are big and this does a lot of damage, so tone it down
           )).SetAllImpactVFX(VFX.CreatePool("icicle_crash_particles", fps: 30, loops: false, anchor: Anchor.MiddleCenter, scale: 0.35f)

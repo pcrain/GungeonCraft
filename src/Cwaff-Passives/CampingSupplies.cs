@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class CampingSupplies : PassiveItem
 {
     public static string ItemName         = "Camping Supplies";
-    public static string SpritePath       = "cozy_camper_icon";
     public static string ShortDescription = "In for the Long Gun";
     public static string LongDescription  = "Increases damage over time while standing still. Damage boost is reset after moving.";
     public static string Lore             = "Camping has proven time and again to be an effective strategy to any Gungeoneer that has the mental fortitude to endure insults to their skill, their mother, their face, and their mother's face.";
@@ -35,7 +34,7 @@ public class CampingSupplies : PassiveItem
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<CampingSupplies>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
+        PickupObject item = Lazy.SetupPassive<CampingSupplies>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
 
         _SmokePrefab     = ResourceCache.Acquire("Global VFX/VFX_Item_Spawn_Poof") as GameObject;

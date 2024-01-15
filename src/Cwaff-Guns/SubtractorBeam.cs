@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class SubtractorBeam : AdvancedGunBehavior
 {
     public static string ItemName         = "Subtractor Beam";
-    public static string SpriteName       = "subtractor_beam";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "What's the Difference?";
     public static string LongDescription  = "Fires a fast piercing beam that uses the health of the first enemy it hits as its damage. The beam's damage is reduced by the health of each subsequent enemy it hits, and dissipates once its damage reaches zero. Cannot damage the first enemy it hits. Reveals enemies' health while active.";
@@ -17,7 +16,7 @@ public class SubtractorBeam : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<SubtractorBeam>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<SubtractorBeam>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.FULLAUTO, reloadTime: 1.25f, ammo: 300);
             gun.SetIdleAnimationFPS(10);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
@@ -33,7 +32,7 @@ public class SubtractorBeam : AdvancedGunBehavior
             scale: 0.5f, anchor: Anchor.MiddleCenter, emissivePower: 10f);
 
         gun.InitProjectile(new(clipSize: 4, cooldown: 0.25f, angleVariance: 5.0f, shootStyle: ShootStyle.SemiAutomatic,
-          damage: 0.0f, speed: 300.0f, force: 0.0f, range: 300.0f, customClip: SpriteName
+          damage: 0.0f, speed: 300.0f, force: 0.0f, range: 300.0f, customClip: true
           )).Attach<PierceProjModifier>(pierce => {
             pierce.penetration            = 999;
             pierce.penetratesBreakables   = true;

@@ -3,7 +3,6 @@
 public class Pincushion : AdvancedGunBehavior
 {
     public static string ItemName         = "Pincushion";
-    public static string SpriteName       = "pincushion";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Needless Violence";
     public static string LongDescription  = "Fires an extraordinarily fast barrage of extremely weak pins that lose accuracy as the clip is depleted. Pins cannot damage anything other than enemies, and are completely blocked by barrels, crates, etc.";
@@ -21,7 +20,7 @@ public class Pincushion : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Pincushion>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Pincushion>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.BEAM, reloadTime: 1.8f, ammo: 10000, doesScreenShake: false);
             gun.SetAnimationFPS(gun.shootAnimation, 30);
             gun.SetAnimationFPS(gun.reloadAnimation, 24);

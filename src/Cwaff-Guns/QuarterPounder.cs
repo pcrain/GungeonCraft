@@ -3,7 +3,6 @@
 public class QuarterPounder : AdvancedGunBehavior
 {
     public static string ItemName         = "Quarter Pounder";
-    public static string SpriteName       = "quarter_pounder";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Pay Per Pew";
     public static string LongDescription  = "Uses casings as ammo. Fires high-powered projectiles that transmute enemies to gold upon death.\n\nLegend says that Dionysus granted King Midas' wish that everything he touched would turn to gold. Midas was overjoyed at first, but upon turning his food and daughter to gold, realized his wish was ill thought out, and eventually died of starvation.";
@@ -15,7 +14,7 @@ public class QuarterPounder : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<QuarterPounder>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<QuarterPounder>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.RIFLE, reloadTime: 1.1f, ammo: 9999, canGainAmmo: false);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
             gun.SetAnimationFPS(gun.reloadAnimation, 16);
@@ -23,7 +22,7 @@ public class QuarterPounder : AdvancedGunBehavior
             gun.SetFireAudio("fire_coin_sound");
             gun.SetReloadAudio("coin_gun_reload");
 
-        gun.InitProjectile(new(clipSize: 10, angleVariance: 15.0f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName, damage: 20.0f, speed: 44.0f,
+        gun.InitProjectile(new(clipSize: 10, angleVariance: 15.0f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, damage: 20.0f, speed: 44.0f,
           sprite: "coin_gun_projectile", fps: 2, anchor: Anchor.MiddleCenter)).Attach<MidasProjectile>();
 
         _MidasParticleVFX = VFX.Create("midas_sparkle",

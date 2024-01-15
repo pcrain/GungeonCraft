@@ -3,7 +3,6 @@
 public class PaintballCannon : AdvancedGunBehavior
 {
     public static string ItemName         = "Paintball Cannon";
-    public static string SpriteName       = "paintball_cannon";
     public static string ProjectileName   = "86"; //marine sidearm
     public static string ShortDescription = "The T is Silent";
     public static string LongDescription  = "Shoots various colored projectiles that stain enemies and leave colored goop in their wake.";
@@ -11,7 +10,7 @@ public class PaintballCannon : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<PaintballCannon>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<PaintballCannon>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 0.9f, ammo: 600);
             gun.SetAnimationFPS(gun.shootAnimation, 14);
             gun.SetAnimationFPS(gun.reloadAnimation, 4);

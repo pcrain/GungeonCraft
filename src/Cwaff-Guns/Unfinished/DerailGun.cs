@@ -9,7 +9,6 @@ TODO (hardest to easiest):
 public class DerailGun : AdvancedGunBehavior
 {
     public static string ItemName         = "Derail Gun";
-    public static string SpriteName       = "alphabeam";
     public static string ProjectileName   = "86"; //marine sidearm
     public static string ShortDescription = "I Choo Choose You";
     public static string LongDescription  = "(o:)";
@@ -24,7 +23,7 @@ public class DerailGun : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<DerailGun>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<DerailGun>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
         gun.isAudioLoop                          = true;
         gun.doesScreenShake                      = false;
         gun.DefaultModule.ammoCost               = 1;

@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class Ticonderogun : AdvancedGunBehavior
 {
     public static string ItemName         = "Ticonderogun";
-    public static string SpriteName       = "ticonderogun";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "A Picture is Worth 1000 Swords";
     public static string LongDescription  = "Creates magic brushstrokes at the cursor while continuously fired. Encircling enemies with brushstrokes damages them, and multiple enemies can be encircled at once for slightly reduced per-enemy damage. (On controller, brushstrokes auto-lock onto nearby enemies.) Increases curse by 2 while in inventory.";
@@ -42,7 +41,7 @@ public class Ticonderogun : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Ticonderogun>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Ticonderogun>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.0f, ammo: 150);
             gun.SetAnimationFPS(gun.shootAnimation, 1);
             gun.SetAnimationFPS(gun.reloadAnimation, 1);

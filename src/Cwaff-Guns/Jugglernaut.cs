@@ -12,7 +12,6 @@
 public class Jugglernaut : AdvancedGunBehavior
 {
     public static string ItemName         = "Jugglernaut";
-    public static string SpriteName       = "jugglernaut";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Balancing Act";
     public static string LongDescription  = "Fires projectiles whose damage scales with the number of unique enemies hit in a row, represented by the number of guns being juggled. The juggling multiplier caps at 6 and resets upon switching guns or taking damage.";
@@ -34,7 +33,7 @@ public class Jugglernaut : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Jugglernaut>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Jugglernaut>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 150/*, defaultAudio: true*/);
             gun.SetAnimationFPS(gun.shootAnimation, 30);
             gun.SetAnimationFPS(gun.reloadAnimation, 40);

@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class AimuHakurei : AdvancedGunBehavior
 {
     public static string ItemName         = "Aimu Hakurei";
-    public static string SpriteName       = "aimu_hakurei";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Highly Responsive";
     public static string LongDescription  = "Fires a variety of projectiles based on its current level. Grazing nearby enemy projectiles while the gun is active increases the graze counter, with the gun's level increasing at 10, 30, 60, and 100 graze. Reloading toggles focus mode, which slows down time to enable precision grazing. Focus mode is cancelled by reloading, firing, dodge rolling, or switching guns.";
@@ -30,7 +29,7 @@ public class AimuHakurei : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<AimuHakurei>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<AimuHakurei>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f,
                 ammo: 200, /*infiniteAmmo: true,*/ canGainAmmo: false, canReloadNoMatterAmmo: true);
             gun.Volley.ModulesAreTiers = true;
@@ -54,28 +53,28 @@ public class AimuHakurei : AdvancedGunBehavior
         // set up tiered projectiles
         gun.Volley.projectiles = new(){
             // Tier 0 / Level 1
-            AimuMod(level: 1, fireRate: 16, projectiles: new(){
+            AimuMod(level: 1, fireRate: 16, gun: gun, projectiles: new(){
                 AimuProj(invert: false, amplitude: 0.0f, sound: "aimu_shoot_sound",      trailWidth: 0.2f),
                 }),
             // Tier 1 / Level 2
-            AimuMod(level: 2, fireRate: 12, projectiles: new(){
+            AimuMod(level: 2, fireRate: 12, gun: gun, projectiles: new(){
                 AimuProj(invert: false, amplitude: 0.75f, sound: "aimu_shoot_sound",     trailWidth: 0.3f),
                 AimuProj(invert: true,  amplitude: 0.75f, sound: "aimu_shoot_sound",     trailWidth: 0.3f),
                 }),
             // Tier 2 / Level 3
-            AimuMod(level: 3, fireRate: 8, projectiles: new(){
+            AimuMod(level: 3, fireRate: 8, gun: gun, projectiles: new(){
                 AimuProj(invert: false, amplitude: 0.75f, sound: "aimu_shoot_sound",     trailWidth: 0.4f),
                 AimuProj(invert: true,  amplitude: 0.75f, sound: "aimu_shoot_sound",     trailWidth: 0.4f),
                 }),
             // Tier 3 / Level 4
-            AimuMod(level: 4, fireRate: 4, projectiles: new(){
+            AimuMod(level: 4, fireRate: 4, gun: gun, projectiles: new(){
                 AimuProj(invert: false, amplitude: 0.75f, sound: "aimu_shoot_sound",     trailWidth: 0.5f),
                 AimuProj(invert: true,  amplitude: 0.75f, sound: "aimu_shoot_sound",     trailWidth: 0.5f),
                 AimuProj(invert: false, amplitude: 2.25f, sound: "aimu_shoot_sound_alt", trailWidth: 0.5f, trailColor: Color.white),
                 AimuProj(invert: true,  amplitude: 2.25f, sound: "aimu_shoot_sound_alt", trailWidth: 0.5f, trailColor: Color.white),
                 }),
             // Tier 4 / Level 5
-            AimuMod(level: 5, fireRate: 2, projectiles: new(){
+            AimuMod(level: 5, fireRate: 2, gun: gun, projectiles: new(){
                 AimuProj(invert: false, amplitude: 0.75f, sound: "aimu_shoot_sound",     trailWidth: 0.5f),
                 AimuProj(invert: true,  amplitude: 0.75f, sound: "aimu_shoot_sound",     trailWidth: 0.5f),
                 AimuProj(invert: false, amplitude: 2.25f, sound: "aimu_shoot_sound_alt", trailWidth: 0.5f, trailColor: Color.white),
@@ -170,11 +169,11 @@ public class AimuHakurei : AdvancedGunBehavior
         }
     }
 
-    private static ProjectileModule AimuMod(List<Projectile> projectiles, float fireRate, int level)
+    private static ProjectileModule AimuMod(List<Projectile> projectiles, float fireRate, int level, Gun gun)
     {
         ProjectileModule mod = new ProjectileModule().SetAttributes(new(
-            ammoCost: 0, clipSize: -1, cooldown: C.FRAME * fireRate, angleVariance: 15f - (2 * level),
-            shootStyle: ShootStyle.Burst, sequenceStyle: ProjectileSequenceStyle.Ordered, customClip: SpriteName));
+            gun: gun, ammoCost: 0, clipSize: -1, cooldown: C.FRAME * fireRate, angleVariance: 15f - (2 * level),
+            shootStyle: ShootStyle.Burst, sequenceStyle: ProjectileSequenceStyle.Ordered, customClip: true));
         mod.projectiles         = projectiles;
         mod.burstShotCount      = mod.projectiles.Count();
         mod.burstCooldownTime   = C.FRAME * fireRate;

@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class FourDBullets : PassiveItem
 {
     public static string ItemName         = "4D Bullets";
-    public static string SpritePath       = "4d_bullets_icon";
     public static string ShortDescription = "No-Clipping Clips"; //"Thinking Outside the Tesseract";
     public static string LongDescription  = "Bullets can phase through the inner walls of a room, but lose half their power for every wall they phase through.";
     public static string Lore             = "Wall hacks are almost universally despised for the completely one-sided advantage they give to those who possess them. Although most Gungeoneers aren't concerned for the Gundead's feelings, wall hacks also unfortuntaely don't exist in the real world. Historical attempts to create guns and gadgets that emulate wall hacks have generally ended in the loss of lives and, in some extreme cases, the loss of some pretty nice guns. The latest generation of technology has at least partially succeeded in emulating wall hacks by augmenting guns to shoot bullets into the 4th dimension. However, due to most Gungeoneers' inability to see said 4th dimension, their bullets tend to ricochet off walls in 4D space, losing a lot of their oomph in the process.";
@@ -12,7 +11,7 @@ public class FourDBullets : PassiveItem
 
     public static void Init()
     {
-        PickupObject item  = Lazy.SetupPassive<FourDBullets>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
+        PickupObject item  = Lazy.SetupPassive<FourDBullets>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality       = ItemQuality.A;
         item.AddToSubShop(ModdedShopType.TimeTrader);
     }

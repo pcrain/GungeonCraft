@@ -3,7 +3,6 @@
 public class PopcornGun : AdvancedGunBehavior
 {
     public static string ItemName         = "Popcorn Gun";
-    public static string SpriteName       = "arcpistol";
     public static string ProjectileName   = "ak-47";
     public static string ShortDescription = "The Weasel";
     public static string LongDescription  = "(split split split again)";
@@ -13,7 +12,7 @@ public class PopcornGun : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<PopcornGun>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<PopcornGun>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
 
         gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
         gun.DefaultModule.ammoCost            = 1;

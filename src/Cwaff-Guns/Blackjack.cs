@@ -3,7 +3,6 @@
 public class Blackjack : AdvancedGunBehavior
 {
     public static string ItemName         = "Blackjack";
-    public static string SpriteName       = "blackjack";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Gambit's Queens";
     public static string LongDescription  = "Fires cards whose range increase with accuracy. Ammo can only be regained by picking up cards from the floor.";
@@ -18,7 +17,7 @@ public class Blackjack : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Blackjack>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Blackjack>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.8f, ammo: _DECK_SIZE * _NUM_DECKS, canGainAmmo: false);
             gun.SetAnimationFPS(gun.shootAnimation, 30);
             gun.SetAnimationFPS(gun.reloadAnimation, 30);
@@ -26,7 +25,7 @@ public class Blackjack : AdvancedGunBehavior
             gun.SetReloadAudio("card_shuffle_sound"); // todo: this is still playing the default reload sound as well, for some reason
 
         gun.InitProjectile(new(clipSize: _CLIP_SIZE, cooldown: 0.16f, angleVariance: 24.0f, shootStyle: ShootStyle.Automatic,
-          customClip: SpriteName, damage: 8f, speed: 18f, range: 999f
+          customClip: true, damage: 8f, speed: 18f, range: 999f
           )).AddAnimations(
             AnimatedBullet.Create(refClip: ref _BulletSprite, name: "playing_card",      fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft),
             AnimatedBullet.Create(refClip: ref _BackSprite,   name: "playing_card_back", fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft)

@@ -3,7 +3,6 @@
 public class Grandmaster : AdvancedGunBehavior
 {
     public static string ItemName         = "Grandmaster";
-    public static string SpriteName       = "grandmaster";
     public static string ProjectileName   = "ak-47"; // no rotation
     public static string ShortDescription = "Mate in Gun";
     public static string LongDescription  = "Fires assorted chess pieces that home towards enemies in discrete steps.";
@@ -18,7 +17,7 @@ public class Grandmaster : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Grandmaster>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Grandmaster>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.0f, ammo: 350);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
             gun.SetAnimationFPS(gun.reloadAnimation, 16);
@@ -26,7 +25,7 @@ public class Grandmaster : AdvancedGunBehavior
             gun.SetFireAudio("chess_gun_fire");
             gun.SetReloadAudio("chess_gun_reload");
 
-        gun.InitProjectile(new(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName, speed: 30f
+        gun.InitProjectile(new(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, speed: 30f
           )).AddAnimations(
             AnimatedBullet.Create(refClip: ref _PawnSprite,   name: "chess_pawn",   scale: 0.8f, anchor: Anchor.MiddleCenter),
             AnimatedBullet.Create(refClip: ref _RookSprite,   name: "chess_rook",   scale: 0.8f, anchor: Anchor.MiddleCenter),

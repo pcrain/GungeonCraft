@@ -3,7 +3,6 @@
 public class ChekhovsGun : AdvancedGunBehavior
 {
     public static string ItemName         = "Chekhov's Gun";
-    public static string SpriteName       = "chekhovs_gun";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "TBD";
     public static string LongDescription  = "TBD";
@@ -16,7 +15,7 @@ public class ChekhovsGun : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<ChekhovsGun>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<ChekhovsGun>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1f, ammo: 200);
             gun.SetAnimationFPS(gun.shootAnimation, 30);
             gun.SetAnimationFPS(gun.reloadAnimation, 40);

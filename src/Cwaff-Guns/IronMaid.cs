@@ -3,7 +3,6 @@
 public class IronMaid : AdvancedGunBehavior
 {
     public static string ItemName         = "Iron Maid";
-    public static string SpriteName       = "iron_maid";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "For a Rainy Day";
     public static string LongDescription  = "Bullets quickly decelerate and enter stasis after firing. Reloading or switching to a different gun releases all bullets towards the nearest wall or enemy in the player's line of sight.";
@@ -14,7 +13,7 @@ public class IronMaid : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<IronMaid>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<IronMaid>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 0.75f, ammo: 400);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
             gun.SetAnimationFPS(gun.reloadAnimation, 24);
@@ -23,7 +22,7 @@ public class IronMaid : AdvancedGunBehavior
             gun.SetReloadAudio("knife_gun_reload");
             gun.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
-        gun.InitProjectile(new(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName,
+        gun.InitProjectile(new(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true,
           damage: 5.0f, speed: 40.0f, sprite: "kunai", fps: 12, anchor: Anchor.MiddleCenter)).Attach<RainCheckBullets>();
     }
 

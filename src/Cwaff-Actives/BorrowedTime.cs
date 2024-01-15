@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class BorrowedTime : PlayerItem
 {
     public static string ItemName         = "Borrowed Time";
-    public static string SpritePath       = "borrowed_time_icon";
     public static string ShortDescription = "Mafuba";
     public static string LongDescription  = "Captures all non-jammed, non-boss enemies in a room. Using in an empty combat room will release all captured enemies, with a chance for enemies to spawn Jammed. All captured enemies will be forcibly released in boss rooms. Cannot be dropped while enemies are captured.";
     public static string Lore             = "The first Gungeoneer to discover this hourglass believed they had stumbled upon an incomprehensibly powerful artifact, when in fact it was quite the opposite: a dangerous failure of a prototype thrown out and forgotten about by the Sorceress. The poor Gungeoneer couldn't believe their luck as they breezed through room after room, only to reach the Trigger Twins and find themselves fighting far more than the 2 oversized Bullet Kin they signed up for....";
@@ -21,7 +20,7 @@ public class BorrowedTime : PlayerItem
 
     public static void Init()
     {
-        PlayerItem item = Lazy.SetupActive<BorrowedTime>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
+        PlayerItem item = Lazy.SetupActive<BorrowedTime>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality    = ItemQuality.C;
         item.AddToSubShop(ModdedShopType.TimeTrader);
 

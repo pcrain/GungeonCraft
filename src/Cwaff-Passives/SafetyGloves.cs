@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class SafetyGloves : PassiveItem
 {
     public static string ItemName         = "Safety Gloves";
-    public static string SpritePath       = "safety_gloves_icon";
     public static string ShortDescription = "Handling with Care";
     public static string LongDescription  = "Pressing interact near most Bullet Kin variants instantly defeats them and restores 10% ammo to the current gun.";
     public static string Lore             = "Bullet Kin, despite being animated by the magic of the Gungeon, are still just ammunition at the end of the day, and the only thing preventing them from being used as such is the difficulty of getting near them and grabbing hold of them. A sturdy enough glove will solve exactly one of those issues, so by extension, two such gloves should solve both of those issues.";
@@ -18,7 +17,7 @@ public class SafetyGloves : PassiveItem
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<SafetyGloves>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
+        PickupObject item = Lazy.SetupPassive<SafetyGloves>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
 
         _HandlingVFX = VFX.Create("safety_gloves_icon", 2, loops: true, anchor: Anchor.LowerCenter);

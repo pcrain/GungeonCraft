@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class StuntHelmet : PassiveItem
 {
     public static string ItemName         = "Stunt Helmet";
-    public static string SpritePath       = "stunt_helmet_icon";
     public static string ShortDescription = "Aim for the Bushes";
     public static string LongDescription  = "Nullifies damage and quadruples knockback from all explosions that would otherwise affect the player. Increases base damage by 200% for 5 seconds after being pushed by an explosion.";
     public static string Lore             = "In the grand scheme of things, a helmet won't really protect you from catching ablaze when being shot through a ring of fire, shattering all of your bones after falling off a motorcycle, or most of the other things that can go wrong while performing stunts. No, the helmet is there because it makes you look cool, and because it makes you easier to replace after your likely untimely demise. Despite that, the completely unwarranted feelings of safety and confidence it instills in some people is enough to incite extremely high-risk, medium-reward behaviors they otherwise wouldn't be inclined to engage in. And heck, some of those people are even still alive, so maybe this helmet thing has something going for it after all.";
@@ -21,7 +20,7 @@ public class StuntHelmet : PassiveItem
 
     public static void Init()
     {
-        PickupObject item  = Lazy.SetupPassive<StuntHelmet>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
+        PickupObject item  = Lazy.SetupPassive<StuntHelmet>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality       = ItemQuality.C;
 
         _StuntStats = new StatModifier {

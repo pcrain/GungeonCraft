@@ -3,7 +3,6 @@
 public class Crapshooter : AdvancedGunBehavior
 {
     public static string ItemName         = "Crapshooter";
-    public static string SpriteName       = "crapshooter";
     public static string ProjectileName   = "38_special"; // 19 / grenade_launcher
     public static string ShortDescription = "Reloaded Dice";
     public static string LongDescription  = "Shoots a die whose face value corresponds to the one currently shown on the gun. Dice have different effects corresponding to their face value: 1) weak + slow, 2) normal, 3) explosive, 4) homing, 5) flak, 6) strong + piercing. The face shown on the gun cycles from 1 to 6, and shooting immediately resets the value to 1, so shots may be timed to repeatedly roll the desired value.";
@@ -22,7 +21,7 @@ public class Crapshooter : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Crapshooter>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Crapshooter>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.PISTOL, reloadTime: 1.5f, ammo: 300);
             gun.SetIdleAnimationFPS(6);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
@@ -34,7 +33,7 @@ public class Crapshooter : AdvancedGunBehavior
             gun.SetReloadAudio(_DiceSounds[2], 2, 18, 23, 25, 31);
 
         _BaseCrapshooterProjectile = gun.InitSpecialProjectile<GrenadeProjectile>(new(clipSize: 12, cooldown: 0.16f,
-            shootStyle: ShootStyle.Automatic, scale: 2.0f, damage: 3f, speed: 24f, force: 10f, range: 30f, customClip: SpriteName,
+            shootStyle: ShootStyle.Automatic, scale: 2.0f, damage: 3f, speed: 24f, force: 10f, range: 30f, customClip: true,
             sprite: "crapshooter_projectile", fps: 12, anchor: Anchor.MiddleCenter, shouldRotate: false
           )).Attach<GrenadeProjectile>(g => {
             g.startingHeight = 0.5f;

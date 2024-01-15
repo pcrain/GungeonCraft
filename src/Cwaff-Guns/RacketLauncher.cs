@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class RacketLauncher : AdvancedGunBehavior
 {
     public static string ItemName         = "Racket Launcher";
-    public static string SpriteName       = "racket_launcher";
     public static string ProjectileName   = "86"; //marine sidearm
     public static string ShortDescription = "Paddle to the Metal";
     public static string LongDescription  = "Launches a tennis ball that bounces off of walls, enemies, projectiles, and other obstructions. The ball can be volleyed repeatedly and increases in power, speed, and knockback with each successive volley.";
@@ -17,7 +16,7 @@ public class RacketLauncher : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<RacketLauncher>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<RacketLauncher>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: _AMMO, canReloadNoMatterAmmo: true);
             gun.muzzleFlashEffects.type              = VFXPoolType.None;
             gun.SetIdleAnimationFPS(_IDLE_FPS);
@@ -25,7 +24,7 @@ public class RacketLauncher : AdvancedGunBehavior
             gun.LoopAnimation(gun.idleAnimation, 0);
             gun.spriteAnimator.playAutomatically = false; // don't autoplay idle animation when dropped
 
-        gun.InitProjectile(new(ammoCost: 0, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: SpriteName,
+        gun.InitProjectile(new(ammoCost: 0, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true,
           damage: 10.0f, speed: 20.0f, range: 300.0f, sprite: "tennis_ball", fps: 12, scale: 0.6f, anchor: Anchor.MiddleCenter, surviveRigidbodyCollisions: true
           )).Attach<TennisBall>(); // DestroyMode must be set at creation time
     }

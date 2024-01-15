@@ -3,7 +3,6 @@
 public class Lightwing : AdvancedGunBehavior
 {
     public static string ItemName         = "Lightwing";
-    public static string SpriteName       = "lightwing";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Falcon Captain";
     public static string LongDescription  = "Fires birds that return to the user after hitting an enemy. Shooting an enemy's projectile will destroy it and cause the bird to home in on that enemy with increased speed and damage. When returning to the user, birds will attempt to retrieve an additional projectile belonging to the enemy they hit, restoring additional ammo if successful.";
@@ -16,7 +15,7 @@ public class Lightwing : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Lightwing>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Lightwing>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.0f, ammo: 120);
             gun.SetAnimationFPS(gun.shootAnimation, 32);
             gun.SetAnimationFPS(gun.reloadAnimation, 30);
@@ -24,7 +23,7 @@ public class Lightwing : AdvancedGunBehavior
             gun.SetFireAudio("lightwing_fire_sound");
             gun.SetReloadAudio("lightwing_reload_sound");
 
-        gun.InitProjectile(new(clipSize: 20, cooldown: 0.28f, shootStyle: ShootStyle.SemiAutomatic, damage: 4.0f, customClip: SpriteName,
+        gun.InitProjectile(new(clipSize: 20, cooldown: 0.28f, shootStyle: ShootStyle.SemiAutomatic, damage: 4.0f, customClip: true,
           speed: 20.0f, collidesWithProjectiles: true // collidesWithProjectiles needs to be set up front because...Unity
           )).AddAnimations(
             AnimatedBullet.Create(refClip: ref _NeutralSprite,    name: "lightwing_projectile",          fps: 12, anchor: Anchor.MiddleLeft),

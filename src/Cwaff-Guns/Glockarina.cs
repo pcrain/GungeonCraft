@@ -3,7 +3,6 @@
 public class Glockarina : AdvancedGunBehavior
 {
     public static string ItemName         = "Glockarina";
-    public static string SpriteName       = "glockarina";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "ShOOT 'em Up";
     public static string LongDescription  = " Fires musical notes as projectiles. Reloading with a full clip while aiming in a cardinal direction will play a note corresponding to that direction. Playing certain songs can change the properties of the projectiles or have other side effects.";
@@ -58,7 +57,7 @@ public class Glockarina : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Glockarina>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Glockarina>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.2f, ammo: 400, canReloadNoMatterAmmo: true);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
             gun.SetAnimationFPS(gun.reloadAnimation, 20);
@@ -68,7 +67,7 @@ public class Glockarina : AdvancedGunBehavior
 
         gun.gameObject.AddComponent<GlockarinaAmmoDisplay>();
 
-        gun.InitProjectile(new(clipSize: 12, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, speed: 35f, damage: 4f, customClip: SpriteName,
+        gun.InitProjectile(new(clipSize: 12, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, speed: 35f, damage: 4f, customClip: true,
           sprite: "glockarina_projectile", fps: 12, anchor: Anchor.MiddleLeft, shouldRotate: false));
 
         _DecoyPrefab = ItemHelper.Get(Items.Decoy).GetComponent<SpawnObjectPlayerItem>().objectToSpawn.ClonePrefab();

@@ -2,6 +2,7 @@ namespace CwaffingTheGungy;
 
 public class GunBuildData
 {
+  public Gun gun;
   public int? clipSize;
   public float? cooldown;
   public float? angleVariance;
@@ -10,7 +11,7 @@ public class GunBuildData
   public float chargeTime;
   public int ammoCost;
   public GameUIAmmoType.AmmoType? ammoType;
-  public string customClip;
+  public bool customClip;
   public float? damage;
   public float? speed;
   public float? force;
@@ -43,6 +44,7 @@ public class GunBuildData
   public bool  useDummyChargeModule;
 
   /// <summary>Helper class containing setup information for a single module, single projectile gun.</summary>
+  /// <param name="gun">The gun we're attaching to (can be null, only used for custom clip sprite name resolution for now).</param>
   /// <param name="clipSize">The number of shots the gun can fired before reloading.</param>
   /// <param name="cooldown">The minimum number of seconds between shots</param>
   /// <param name="angleVariance">Maximum deviation from shooting angle (in degrees) a bullet may actually be fired.</param>
@@ -51,7 +53,7 @@ public class GunBuildData
   /// <param name="chargeTime">If shootStyle is Charged, how long the projectile must charge for.</param>
   /// <param name="ammoCost">How much ammo is depleted per shot fired from a module.</param>
   /// <param name="ammoType">If using base game ammo clips, the type of ammo clip to use.</param>
-  /// <param name="customClip">If using custom ammo clips, the base name of the sprite of the clip to use.</param>
+  /// <param name="customClip">Whether to use a custom ammo clip</param>
 
   /// <param name="damage">The damage of the projectile.</param>
   /// <param name="speed">The speed of the projectile.</param>
@@ -85,14 +87,15 @@ public class GunBuildData
   /// <param name="shouldFlipHorizontally"></param>
   /// <param name="shouldFlipVertically"></param>
   /// <param name="useDummyChargeModule"></param>
-  public GunBuildData(int? clipSize = null, float? cooldown = null, float? angleVariance = null,
+  public GunBuildData(Gun gun = null, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
     ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1, GameUIAmmoType.AmmoType? ammoType = null,
-    string customClip = null, float? damage = null, float? speed = null, float? force = null, float? range = null, float poison = 0.0f, float fire = 0.0f, float freeze = 0.0f, float slow = 0.0f,
+    bool customClip = false, float? damage = null, float? speed = null, float? force = null, float? range = null, float poison = 0.0f, float fire = 0.0f, float freeze = 0.0f, float slow = 0.0f,
     bool? collidesWithEnemies = null, bool? ignoreDamageCaps = null, bool? collidesWithProjectiles = null, bool? surviveRigidbodyCollisions = null, bool? collidesWithTilemap = null,
     string sprite = null, int fps = 2, Anchor anchor = Anchor.MiddleCenter, float scale = 1.0f, bool anchorsChangeColliders = true, bool fixesScales = true, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null,
     IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null, float bossDamageMult = 1.0f, string destroySound = null, bool? shouldRotate = null, int barrageSize = 1,
     bool? shouldFlipHorizontally = null, bool? shouldFlipVertically = null, bool useDummyChargeModule = false)
   {
+      this.gun                           = gun; // set by InitSpecialProjectile()
       this.clipSize                      = clipSize;
       this.cooldown                      = cooldown;
       this.angleVariance                 = angleVariance;
@@ -145,6 +148,8 @@ public static class GunBuilder
   {
     // If we haven't passed any GunBuildData in, use sane defaults
     b ??= GunBuildData.Default;
+    // Add a reference to our current gun to the gun build data (needed for custom projectile setup)
+    b.gun = gun;
 
     // Set up the gun's default module, default projectile, and default projectile animation
     ProjectileModule mod = gun.SetupDefaultModule(b);
@@ -359,8 +364,8 @@ public static class GunBuilder
     mod.sequenceStyle       = b.sequenceStyle;
     if (b.angleVariance.HasValue)
       mod.angleVariance = b.angleVariance.Value;
-    if (!string.IsNullOrEmpty(b.customClip))
-      mod.SetupCustomAmmoClip(b.customClip);
+    if (b.customClip)
+      mod.SetupCustomAmmoClip(b);
     else if (b.ammoType.HasValue)
       mod.ammoType = b.ammoType.Value;
 

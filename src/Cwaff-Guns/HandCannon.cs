@@ -3,7 +3,6 @@
 public class HandCannon : AdvancedGunBehavior
 {
     public static string ItemName         = "Hand Cannon";
-    public static string SpriteName       = "hand_cannon";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Fire Arms";
     public static string LongDescription  = "Fires a high-powered glove that slaps enemies perpendicular to the glove's trajectory with extreme force.";
@@ -17,7 +16,7 @@ public class HandCannon : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<HandCannon>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<HandCannon>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 0.75f, ammo: 100);
             gun.SetAnimationFPS(gun.shootAnimation, 30);
             gun.SetAnimationFPS(gun.reloadAnimation, (int)(gun.spriteAnimator.GetClipByName(gun.reloadAnimation).frames.Length / gun.reloadTime));
@@ -30,7 +29,7 @@ public class HandCannon : AdvancedGunBehavior
             gun.SetChargeAudio("hand_cannon_charge_sound", frame: 10);
 
         gun.InitProjectile(new(clipSize: 2, cooldown: 0.1f, angleVariance: 15.0f, shootStyle: ShootStyle.Charged,
-          customClip: SpriteName, damage: 40.0f, speed: 40.0f, sprite: "slappp", fps: 30, scale: 0.5f, anchor: Anchor.MiddleCenter,
+          customClip: true, damage: 40.0f, speed: 40.0f, sprite: "slappp", fps: 30, scale: 0.5f, anchor: Anchor.MiddleCenter,
           overrideColliderPixelSizes: new IntVector2(8,8), chargeTime: _CHARGE_TIME)).Attach<SlappProjectile>();
 
         _SlapppAnimation = VFX.Create("slappp", fps: 30, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f);

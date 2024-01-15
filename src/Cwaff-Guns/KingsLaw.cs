@@ -3,7 +3,6 @@
 public class KingsLaw : AdvancedGunBehavior
 {
     public static string ItemName         = "King's Law";
-    public static string SpriteName       = "kings_law";
     public static string ProjectileName   = "AK-47";
     public static string ShortDescription = "Accept Your Fate";
     public static string LongDescription  = "Conjures projectiles that hover behind the player as long as the fire button is held. Projectiles are launched with a short delay when fire is released, when reloading, or when changing weapons.";
@@ -28,12 +27,12 @@ public class KingsLaw : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<KingsLaw>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<KingsLaw>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARGE, reloadTime: 0.75f, ammo: 700, doesScreenShake: false);
             gun.SetMuzzleVFX();
             gun.SetReloadAudio("knife_gun_reload");
 
-        gun.InitProjectile(new(clipSize: 20, shootStyle: ShootStyle.Automatic, damage: 7.5f, speed: 40.0f, range: 999999f, customClip: SpriteName,
+        gun.InitProjectile(new(clipSize: 20, shootStyle: ShootStyle.Automatic, damage: 7.5f, speed: 40.0f, range: 999999f, customClip: true,
           cooldown: _SPAWN_RATE, sprite: "kings_law_projectile", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter,
           useDummyChargeModule: true)).Attach<KingsLawBullets>();
 

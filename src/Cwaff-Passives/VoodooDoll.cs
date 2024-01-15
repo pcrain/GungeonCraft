@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class VoodooDoll : PassiveItem
 {
     public static string ItemName         = "Voodoo Doll";
-    public static string SpritePath       = "voodoo_doll_icon";
     public static string ShortDescription = "Pew Pew Unto Others";
     public static string LongDescription  = "Whenever a player-owned projectile hits an enemy, all other enemies of the same type take damage.";
     public static string Lore             = "There are actually two types of voodoo dolls. Traditional voodoo dolls are created in the likeness of a single, specific individual, and doing physical damage to the doll inflicts equivalent physical damage to the individual it depicts. By contrast, the dolls found in the Gungeon depict an unknown figure smiling in the face of life's hardships, motivating the Gundead to do their best. Upon seeing their peers struggle, this motivation is promptly shattered, inflicting (arguably more powerful) emotional damage instead.";
@@ -14,7 +13,7 @@ public class VoodooDoll : PassiveItem
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<VoodooDoll>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
+        PickupObject item = Lazy.SetupPassive<VoodooDoll>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.A;
         item.AddToSubShop(ItemBuilder.ShopType.Cursula);
 

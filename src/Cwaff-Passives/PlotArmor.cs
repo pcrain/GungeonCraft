@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class PlotArmor : PassiveItem
 {
     public static string ItemName         = "Plot Armor";
-    public static string SpritePath       = "plot_armor_icon";
     public static string ShortDescription = "Can't Die Yet";
     public static string LongDescription  = "Gain enough armor before every boss fight to have 3 total armor (4 for zero-health characters). Always grants at least 1 armor.";
     public static string Lore             = "The single most effective piece of armor ever created, under the right circumstances. The amount of protection it actually offers seems to vary from person to person over time, and the Gungeon's best blacksmiths are still trying to figure out how to fully harness the properties of \"plot\" to their advantage.";
@@ -15,7 +14,7 @@ public class PlotArmor : PassiveItem
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<PlotArmor>(ItemName, SpritePath, ShortDescription, LongDescription, Lore);
+        PickupObject item = Lazy.SetupPassive<PlotArmor>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.A;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
         item.AddToSubShop(ModdedShopType.Ironside);

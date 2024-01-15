@@ -3,7 +3,6 @@
 public class Natascha : AdvancedGunBehavior
 {
     public static string ItemName         = "Natascha";
-    public static string SpriteName       = "natascha";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Fear no Man";
     public static string LongDescription  = "Rate of fire increases and movement speed decreases as this gun is continuously fired. Reloading toggles whether the gun remains spun up while not firing, maintaining both the increased fire rate and reduced movement speed.";
@@ -17,7 +16,7 @@ public class Natascha : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Natascha>(ItemName, SpriteName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Natascha>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f, ammo: 1500);
             gun.SetAnimationFPS(gun.shootAnimation, (int)((float)_FireAnimationFrames / _BaseCooldownTime) + 1);
             gun.SetMuzzleVFX("muzzle_natascha", fps: 60, scale: 0.3f, anchor: Anchor.MiddleCenter);
