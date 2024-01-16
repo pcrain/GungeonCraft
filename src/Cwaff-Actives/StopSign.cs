@@ -1,0 +1,66 @@
+namespace CwaffingTheGungy;
+
+public class StopSign : PlayerItem
+{
+    public static string ItemName         = "Stop Sign";
+    public static string ShortDescription = "TBD";
+    public static string LongDescription  = "Any enemies that are currently moving are briefly stunned and indefinitely immobilized.";
+    public static string Lore             = "TBD";
+
+    internal static GameActorSpeedEffect _SpeedEffect;
+    internal static GameObject _StopSignVFX;
+
+    private class StoppedInTheirTracks : MonoBehaviour {}
+
+    public static void Init()
+    {
+        PlayerItem item = Lazy.SetupActive<StopSign>(ItemName, ShortDescription, LongDescription, Lore);
+        item.quality    = ItemQuality.C;
+        item.consumable = false;
+        item.SetCooldownType(ItemBuilder.CooldownType.Damage, 160f);
+
+        _StopSignVFX = VFX.Create("stop_sign_icon", 2, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 1f);
+
+        _SpeedEffect = new GameActorSpeedEffect {
+            SpeedMultiplier    = 0f,
+            CooldownMultiplier = 1f,
+            AffectsPlayers     = false,
+            AffectsEnemies     = true,
+            effectIdentifier   = "stopped",
+            resistanceType     = EffectResistanceType.None,
+            stackMode          = GameActorEffect.EffectStackingMode.Refresh,
+            duration           = 3600f,
+            maxStackedDuration = -1f,
+            AppliesTint        = false,
+            AppliesDeathTint   = false,
+            AppliesOutlineTint = false,
+            OverheadVFX        = (ItemHelper.Get(Items.TripleCrossbow) as Gun).DefaultModule.projectiles[0].speedEffect.OverheadVFX,
+            PlaysVFXOnActor    = false,
+        };
+    }
+
+    public override void DoEffect(PlayerController user)
+    {
+        bool didAnything = false;
+        foreach (AIActor enemy in user.CurrentRoom?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All).EmptyIfNull())
+        {
+            if (!enemy || !enemy.IsHostile(canBeNeutral: true))
+                continue;
+            if (!enemy.behaviorSpeculator || enemy.behaviorSpeculator.ImmuneToStun)
+                continue;
+            if (enemy.VoluntaryMovementVelocity.magnitude < 0.1f)
+                continue;
+            if (enemy.GetComponent<StoppedInTheirTracks>())
+                continue;
+            FancyVFX.Spawn(_StopSignVFX, (enemy.sprite?.WorldTopCenter ?? enemy.CenterPosition) + new Vector2(0, 1f),
+                lifetime: 0.25f, fadeOutTime: 0.5f, endScale: 2f, height: 1f);
+            enemy.behaviorSpeculator.Stun(2f);
+            enemy.ApplyEffect(_SpeedEffect);
+            enemy.gameObject.AddComponent<StoppedInTheirTracks>();
+            didAnything = true;
+        }
+        if (!didAnything)
+            return;
+        AkSoundEngine.PostEvent("stop_sign_sound", base.gameObject);
+    }
+}

@@ -229,6 +229,7 @@ public class Initialisation : BaseUnityPlugin
                 SafetyGloves.Init();
                 DrabOutfit.Init();
                 RingOfDefenestration.Init();
+                StopSign.Init();
                 setupPassivesWatch.Stop();
             #endregion
 

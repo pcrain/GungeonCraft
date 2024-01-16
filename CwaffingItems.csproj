@@ -107,6 +107,7 @@
     <Compile Include="src\Cwaff-Actives\IceCream.cs"/>
     <Compile Include="src\Cwaff-Actives\EmergencySiren.cs"/>
     <Compile Include="src\Cwaff-Actives\KalibersJustice.cs"/>
+    <Compile Include="src\Cwaff-Actives\StopSign.cs"/>
     <Compile Include="src\Cwaff-Actives\GasterBlaster.cs"/>
     <Compile Include="src\Cwaff-Actives\InsurancePolicy.cs"/>
     <Compile Include="src\Cwaff-Actives\Itemfinder.cs"/>
@@ -3401,6 +3402,7 @@
     <EmbeddedResource Include="Resources\ItemSprites\utility_vest_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\camping_supplies_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\blank_checks_icon.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\stop_sign_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\itemfinder_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\kalibers_justice_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\curators_badge_icon.png"/>
