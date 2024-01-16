@@ -418,7 +418,6 @@ public static class Extensions
     return angle + (Lazy.CoinFlip() ? 1f : -1f) * spread * UnityEngine.Random.value;
   }
 
-
   // Get a list including all of a players' passives, actives, and guns
   public static List<PickupObject> AllItems(this PlayerController player)
   {
@@ -431,6 +430,18 @@ public static class Extensions
           allItems.Add(item);
       return allItems;
   }
+
+  // Get a passive item owned by the player
+  public static T GetPassive<T>(this PlayerController p) where T : PassiveItem
+    => p.passiveItems.Find(item => item is T) as T;
+
+  // Get an active item owned by the player
+  public static T GetActive<T>(this PlayerController p)  where T : PlayerItem
+    => p.activeItems.Find(item => item is T) as T;
+
+  // Get a gun owned by the player
+  public static T GetGun<T>(this PlayerController p)     where T : Gun
+    => p.inventory.AllGuns.Find(item => item is T) as T;
 
   // Clamps a float between two numbers (default 0 and 1)
   public static float Clamp(this float f, float min = 0f, float max = 1f)

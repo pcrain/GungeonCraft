@@ -114,12 +114,13 @@ public class LibraryCardtridge : PassiveItem
         {
             // Add modded items to the book items list
             // _BookItemIDs.Add(IDs.Pickups["zoolanders_diary"]);
+            _BookItemIDs.Add(IDs.Pickups["ammo_conservation_manual"]);
             _DidLateInit = true;
         }
 
         base.Pickup(player);
         MakeBooksFree();
-        GameManager.Instance.OnNewLevelFullyLoaded += this.OnNewFloor;
+        GameManager.Instance.OnNewLevelFullyLoaded += this.MakeBooksFree;
         player.OnEnteredCombat += this.OnEnteredCombat;
         ETGMod.AIActor.OnPreStart += this.OnEnemySpawn;
     }
@@ -128,12 +129,10 @@ public class LibraryCardtridge : PassiveItem
     {
         ETGMod.AIActor.OnPreStart -= this.OnEnemySpawn;
         player.OnEnteredCombat -= this.OnEnteredCombat;
-        GameManager.Instance.OnNewLevelFullyLoaded -= this.OnNewFloor;
+        GameManager.Instance.OnNewLevelFullyLoaded -= this.MakeBooksFree;
         NoMoreFreeBooks();
         return base.Drop(player);
     }
-
-    private void OnNewFloor() => MakeBooksFree();
 
     private void MakeBooksFree()
     {

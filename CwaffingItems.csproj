@@ -67,6 +67,7 @@
     <Compile Include="src\Cwaff-Passives\Blazer.cs"/>
     <Compile Include="src\Cwaff-Passives\AdrenalineShot.cs"/>
     <Compile Include="src\Cwaff-Passives\CampingSupplies.cs"/>
+    <Compile Include="src\Cwaff-Passives\AmmoConservationManual.cs"/>
     <Compile Include="src\Cwaff-Passives\BubbleWand.cs"/>
     <Compile Include="src\Cwaff-Passives\WarriorsGi.cs"/>
     <Compile Include="src\Cwaff-Passives\DeadRinger.cs"/>
@@ -3420,6 +3421,7 @@
     <EmbeddedResource Include="Resources\ItemSprites\insurance_policy_hunter_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\insurance_policy_gunslinger_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\drab_outfit_icon.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\ammo_conservation_manual_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\display_stand_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\cat_ear_headband_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\zoolander_icon.png"/>
