@@ -26,7 +26,7 @@ public class Scotsman : AdvancedGunBehavior
         Gun gun = Lazy.SetupGun<Scotsman>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.PISTOL, reloadTime: 2.00f, ammo: 300, canReloadNoMatterAmmo: true);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
-            gun.SetAnimationFPS(gun.reloadAnimation, 24);
+            gun.SetAnimationFPS(gun.reloadAnimation, 12);
             gun.SetMuzzleVFX("muzzle_iron_maid", fps: 30, scale: 0.5f, anchor: Anchor.MiddleLeft);
             gun.SetFireAudio("stickybomblauncher_shoot");
             gun.SetReloadAudio("stickybomblauncher_worldreload");
