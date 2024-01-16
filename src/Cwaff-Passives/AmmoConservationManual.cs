@@ -49,4 +49,16 @@ public class AmmoConservationManual : PassiveItem
         LootEngine.SpawnItem(ItemHelper.Get(Items.Ammo).gameObject, p.CenterPosition, Vector2.zero, 0f, doDefaultItemPoof: true);
         // p.DoGenericItemActivation(manual);
     }
+
+    public override void MidGameSerialize(List<object> data)
+    {
+        base.MidGameSerialize(data);
+        data.Add(this._conservedAmmo);
+    }
+
+    public override void MidGameDeserialize(List<object> data)
+    {
+        base.MidGameDeserialize(data);
+        this._conservedAmmo = (float)data[0];
+    }
 }
