@@ -4,24 +4,25 @@ public class ChekhovsGun : AdvancedGunBehavior
 {
     public static string ItemName         = "Chekhov's Gun";
     public static string ProjectileName   = "38_special";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string ShortDescription = "Keeps its Promise";
+    public static string LongDescription  = "Places a rifle that automatically fires a single round at any enemy that crosses its line of sight. Cannot fire within 3 seconds of its placement. Half of all unfired shots are returned as ammo on room clear.";
+    public static string Lore             = "";
 
     internal static TrailController _ChekhovTrailPrefab = null;
-    internal static GameObject _ChekhovGunVFX = null;
+    internal static GameObject _ChekhovGunVFX           = null;
+    internal static GameObject _ChekhovGunFireVFX       = null;
 
-    private List<ChekhovBullet> _extantBullets = new();
+    private List<ChekhovBullet> _extantBullets          = new();
 
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<ChekhovsGun>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1f, ammo: 200);
-            gun.SetAnimationFPS(gun.shootAnimation, 30);
-            gun.SetAnimationFPS(gun.reloadAnimation, 40);
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 0.75f, ammo: 200);
+            gun.SetAnimationFPS(gun.shootAnimation, 16);
+            gun.SetAnimationFPS(gun.reloadAnimation, 16);
             gun.SetMuzzleVFX("muzzle_chekhovs_gun"); // innocuous muzzle flash effects
             gun.SetFireAudio("chekhovs_gun_place_sound");
-            // gun.SetReloadAudio("blowgun_reload_sound");
+            gun.SetReloadAudio("chekhovs_gun_reload_sound");
 
         Projectile proj = gun.InitProjectile(new(clipSize: 8, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
           damage: 15f, range: 1000f, speed: 200f, sprite: "chekhov_projectile", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter)
@@ -31,6 +32,8 @@ public class ChekhovsGun : AdvancedGunBehavior
             ResMap.Get("chekhov_trail_mid"), 60, ResMap.Get("chekhov_trail_start"), 60, cascadeTimer: C.FRAME, destroyOnEmpty: true);
 
         _ChekhovGunVFX = VFX.Create("chekhovs_gun_idle", 12, loops: true, anchor: Anchor.UpperRight);
+
+        _ChekhovGunFireVFX = VFX.Create("chekhovs_gun_fire", 12, loops: false, anchor: Anchor.UpperRight);
     }
 
     protected override void OnPickedUpByPlayer(PlayerController player)
@@ -157,6 +160,8 @@ public class ChekhovBullet : MonoBehaviour
         this._projectile.AddTrailToProjectileInstance(ChekhovsGun._ChekhovTrailPrefab).gameObject.SetGlowiness(_TRAIL_GLOW);
         UnityEngine.Object.Destroy(this._sightline);
         this._sightline = null;
+        FancyVFX.Spawn(ChekhovsGun._ChekhovGunFireVFX, this._gunVfx.transform.position, this._gunVfx.transform.rotation,
+            lifetime: 0.25f, fadeOutTime: 0.25f);
         UnityEngine.Object.Destroy(this._gunVfx);
         this._gunVfx = null;
         this._projectile.specRigidbody.CollideWithOthers  = true;
