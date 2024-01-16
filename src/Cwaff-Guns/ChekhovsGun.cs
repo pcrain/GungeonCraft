@@ -156,6 +156,7 @@ public class ChekhovBullet : MonoBehaviour
         }
 
         // Phase 3: launch
+        AkSoundEngine.PostEvent("chekhovs_gun_launch_sound_alt_stop_all", base.gameObject);
         AkSoundEngine.PostEvent("chekhovs_gun_launch_sound_alt", base.gameObject);
         this._projectile.AddTrailToProjectileInstance(ChekhovsGun._ChekhovTrailPrefab).gameObject.SetGlowiness(_TRAIL_GLOW);
         UnityEngine.Object.Destroy(this._sightline);
