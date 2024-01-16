@@ -35,7 +35,7 @@ public class CarpetBomber : AdvancedGunBehavior
 
         Projectile p = gun.InitSpecialProjectile<FancyGrenadeProjectile>(new(
           clipSize: 3, cooldown: 0.15f, angleVariance: 10.0f, shootStyle: ShootStyle.Charged, range: 9999f, customClip: true,
-          sequenceStyle: ProjectileSequenceStyle.Ordered, sprite: "carpet_projectile", fps: 20, anchor: Anchor.MiddleCenter,
+          sequenceStyle: ProjectileSequenceStyle.Ordered, sprite: "carpet_bomber_projectile", fps: 20, anchor: Anchor.MiddleCenter,
           scale: 0.5f, barrageSize: _MAX_PROJECTILES, shouldRotate: true, shouldFlipHorizontally: true, surviveRigidbodyCollisions: true,
           anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(8, 8)
         )).Attach<BounceProjModifier>(bounce => {

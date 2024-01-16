@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.7.0 (TBD)
+
+- Added Scotsman, Chekhov's Gun, Ring of Defenestration, Ammo Conservation Manual, and Stop Sign
+	- Ring of Defenestration, Ammo Conservation Manual, and Stop Sign sprites thanks to Dallan!
+- Added several new sprites thanks to Lynceus!
+	- Brand new sprites for John's Wick, Emergency Siren, and Amazon Primer
+	- Polished projectile sprites for Carpet Bomber
+	- Polished item sprites for Cozy Camper and Gyroscope
+	- Custom ammo clip sprites for Wavefront
+- Clarified in Emergency Siren's description that it opens sealed combat doors rather than actual locked doors
+- Fixed backwards sprite for Pincushion in Ammonomicon
+- Fixed a few typos in various item descriptions in Ammonomicon
+- Added some missing sprite credits in earlier Changelog entries
+
 ## 1.6.1 (2024-01-07)
 
 #### Features and Polish:
@@ -115,6 +129,7 @@
 
 ## 1.3.0 (2023-11-22)
 - Added Subtractor Beam, Alligator, Lightwing, Stunt Helmet, Comfy Slippers, and Chamber Jammer
+	- Stunt Helmet and Chamber Jammer sprites thanks to Dallan!
 - Added muzzle effects for all guns!
 - Added custom projectile and ammo clip to Platinum Star, thanks to Lynceus!
 - Added hand animations for Ki Blast
@@ -161,6 +176,7 @@
 
 #### Features and Polish:
 - Added Aimu Hakurei, Seltzer Pelter, Missiletoe, Bubble Wand, Insurance Policy, and Ice Cream
+	- Insurance Policy and Missiletoe sprites thanks to Dallan!
 - Items can now be found in specialty shops (subshops), including support for modded shops (Planetside of Gunymede & Once More Into the Breach)
 - Added a few new sprites for Bullet Kin (they love ice cream :>)
 - All of the mod's guns now spawn with their idle animations playing by default (before, they would be stuck on the first frame)

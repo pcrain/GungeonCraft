@@ -4,7 +4,7 @@ public class EmergencySiren : PlayerItem
 {
     public static string ItemName         = "Emergency Siren";
     public static string ShortDescription = "WEE WOO! WEE WOO!";
-    public static string LongDescription  = "Opens locked doors and renders enemies harmless until leaving a room. Any room unlocked in this way does not count as visited, and enemies will respawn if it is revisited later. Cannot be used in a room if you have fired a gun or if any enemy has otherwise taken damage.";
+    public static string LongDescription  = "Opens sealed combat doors and renders enemies harmless until leaving a room. Any room unsealed in this way does not count as visited, and enemies will respawn if it is revisited later. Cannot be used in a room if you have fired a gun or if any enemy has otherwise taken damage.";
     public static string Lore             = "Despite their hostility towards adventurers, even the Gundead understand and abide by the Geneva conventions, and will immediately cease fire in the presence of emergency personnel. As impersonating a medical professional is already dangerously close to violating the Geneva conventions, it would be wise not to press your luck trying to take advantage of the cease-fire by sneaking in a few shots. Besides, only a real monster would attempt something like that anyway.";
 
     private static StatModifier[] _EmergencyMods = null;

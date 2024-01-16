@@ -5,7 +5,7 @@ public class ComfySlippers : PassiveItem
     public static string ItemName         = "Comfy Slippers";
     public static string ShortDescription = "Furry Foot Friends";
     public static string LongDescription  = "Increases movement speed and dodge roll speed while on carpeted surfaces.";
-    public static string Lore             = "The fluffiest and fuzziest footwear that stray casings you picked off of the ground can buy. On top of being fashionable and adorable as all get-out, the padded insoles and added arch support reduce ankle strain and let you glide effortlessly across suitably soft floors. As an added bonus, your new slipper buddies provide some much-needed companionship on those cold, musty Gungeon nights, and will always be there to remind you that looking down at your feet while scurrying through the Gungeon is rather dangerous and probably isn't a fantastic idea and WATCH OUT FOR THAT PITF--.";
+    public static string Lore             = "The fluffiest and fuzziest footwear that stray casings you picked up off of the ground can buy. On top of being fashionable and adorable as all get-out, the padded insoles and added arch support reduce ankle strain and let you glide effortlessly across suitably soft floors. As an added bonus, your new slipper buddies provide some much-needed companionship on those cold, musty Gungeon nights, and will always be there to remind you that looking down at your feet while scurrying through the Gungeon is rather dangerous and probably isn't a fantastic idea and WATCH OUT FOR THAT PITF--.";
 
     internal const float _MOVEMENT_BOOST                = 2.0f;
     internal const float _DODGE_BOOST                   = 0.2f;

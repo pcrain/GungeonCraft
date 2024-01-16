@@ -802,6 +802,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\alligator_reload_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_6_gun_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\lightwing_reload_026.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\chekhovs_gun_idle_trimmed_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_026.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\magunet_idle_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_5_gun_019.json"/>
@@ -1218,6 +1219,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\alyx_reload_007.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_reload_025.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_020.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\scotsman_idle_trimmed_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_reload_021.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_fire_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_023.png"/>
@@ -3806,6 +3808,7 @@
     <EmbeddedResource Include="Resources\CustomClips\tranquilizer_clipfull_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\hatchling_gun_clipfull_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\crapshooter_clipfull_001.png"/>
+    <EmbeddedResource Include="Resources\CustomClips\wavefront_clipempty_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\blackjack_clipfull_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\outbreak_clipfull_alt_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\b_b_gun_clipfull_001.png"/>
@@ -3847,6 +3850,7 @@
     <EmbeddedResource Include="Resources\CustomClips\racket_launcher_clipfull_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\uppskeruvel_clipfull_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\schrodingers_gat_clipempty_001.png"/>
+    <EmbeddedResource Include="Resources\CustomClips\wavefront_clipfull_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\missiletoe_clipfull_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\platinum_star_clipfull_001.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\wavefront_projectile2.png"/>
@@ -3891,6 +3895,7 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile_old12.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\alyx_projectile2.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\coin_gun_projectile7.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\carpet_bomber_projectile_005.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\coin_gun_projectile10.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\alligator_projectile_clamped.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\train_projectile_002.png"/>
@@ -3926,6 +3931,7 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\gift_projectile_green.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\ora_fist_fast.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball020.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\carpet_bomber_projectile_002.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\carpet_projectile9.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\carpet_projectile8.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\outbreak_projectile_alt_002.png"/>
@@ -3947,6 +3953,7 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\slappp4.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\alyx_projectile3.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball010.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\carpet_bomber_projectile_003.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\ki_blast_red_002.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball001.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\ki_blast_001.png"/>
@@ -4013,6 +4020,7 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\platinum_projectile1.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile_old11.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\schrodinger_bullet.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\carpet_bomber_projectile_001.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\crapshooter_projectile5.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\slappp15.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile_old14.png"/>
@@ -4029,6 +4037,8 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\wavefront_projectile1.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\carpet_projectile2.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\alyx_projectile4.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\carpet_bomber_projectile_008.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\carpet_bomber_projectile_004.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\natascha_bullet_002.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile_old8.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\glockarina_projectile4.png"/>
@@ -4037,12 +4047,14 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\lightwing_projectile_hunt1.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile_old7.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tennis_ball6.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\carpet_bomber_projectile_007.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile_old1.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\exploding_ornament_projectile.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\wavefront_projectile5.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\lightwing_projectile_return1.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\ki_blast_red_004.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\deadline_projectile.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\carpet_bomber_projectile_006.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\carpet_projectile5.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball004.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\coin_gun_projectile3.png"/>
