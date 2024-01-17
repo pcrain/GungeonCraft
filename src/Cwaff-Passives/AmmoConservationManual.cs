@@ -5,7 +5,7 @@ public class AmmoConservationManual : PassiveItem
     public static string ItemName         = "Ammo Conservation Manual";
     public static string ShortDescription = "Waste Not, Want Not";
     public static string LongDescription  = "Picking up any ammo box that would fill the current gun past 100% ammo will conserve half of any overfilled ammo for later. Spawns an extra ammo box for every 100% ammo conserved.";
-    public static string Lore             = "TBD";
+    public static string Lore             = "The immediate reaction of most unenlightened Gungeoneers upon encountering an ammo box is to dump all of the ammo out of their weapon before replenishing it with the ammo in the box. The pages of this manual are completely blank aside from a single line on the first page that reads 'hey moron, you can just replace the missing ammo and save the rest for later.' Seeing as the manual's a bestseller at the local bookstore, apparently a lot of people needed these words of wisdom.";
     public static int    ID;
 
     private const float _PERCENT_AMMO_TO_CONSERVE = 0.5f;

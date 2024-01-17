@@ -3,9 +3,9 @@ namespace CwaffingTheGungy;
 public class RingOfDefenestration : PassiveItem
 {
     public static string ItemName         = "Ring of Defenestration";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string ShortDescription = "Babies AND Bathwater";
+    public static string LongDescription  = "Pushing an enemy into a pit has an 80% chance to spawn casings and a 20% chance to spawn a random pickup.";
+    public static string Lore             = "Every warrior worth their salt occasionally tosses their opponents out of a window or moving vehicle to plummet towards their doom. While stylish and assertive, this maneuver unfortunately makes it very difficult to retrieve any loot the victims may have been carrying. This ring represents a pact with the Pit Lord to return any loot carried by those sacrificed to the pits of the Gungeon.";
     public static int    ID;
 
     internal static readonly List<IntVector2> _RewardWeights = new() {

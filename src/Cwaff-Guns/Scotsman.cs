@@ -4,8 +4,8 @@ public class Scotsman : AdvancedGunBehavior
 {
     public static string ItemName         = "Scotsman";
     public static string ProjectileName   = "38_special";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
+    public static string ShortDescription = "Situationally Sticky";
+    public static string LongDescription  = "Launches sticky bombs that stick to enemies, obstacles, walls, and the floor. Reloading detonates all stationary sticky bombs after a short delay.";
     public static string Lore             = "TBD";
 
     private const float _MAX_RETICLE_RANGE = 16f;

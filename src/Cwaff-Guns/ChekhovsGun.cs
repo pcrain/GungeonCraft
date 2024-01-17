@@ -6,7 +6,7 @@ public class ChekhovsGun : AdvancedGunBehavior
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Keeps its Promise";
     public static string LongDescription  = "Places a rifle that automatically fires a single round at any enemy that crosses its line of sight. Cannot fire within 3 seconds of its placement. Half of all unfired shots are returned as ammo on room clear.";
-    public static string Lore             = "";
+    public static string Lore             = "TBD";
 
     internal static TrailController _ChekhovTrailPrefab = null;
     internal static GameObject _ChekhovGunVFX           = null;

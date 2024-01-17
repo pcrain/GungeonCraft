@@ -3,8 +3,8 @@ namespace CwaffingTheGungy;
 public class StopSign : PlayerItem
 {
     public static string ItemName         = "Stop Sign";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "Any enemies that are currently moving are briefly stunned and indefinitely immobilized.";
+    public static string ShortDescription = "Believing";
+    public static string LongDescription  = "Briefly stuns any enemies that are currently moving, indefinitely immobilizing them after the stun wears off.";
     public static string Lore             = "TBD";
 
     internal static GameActorSpeedEffect _SpeedEffect;
