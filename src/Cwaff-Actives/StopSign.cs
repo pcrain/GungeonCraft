@@ -5,7 +5,7 @@ public class StopSign : PlayerItem
     public static string ItemName         = "Stop Sign";
     public static string ShortDescription = "Believing";
     public static string LongDescription  = "Briefly stuns any enemies that are currently moving, indefinitely immobilizing them after the stun wears off.";
-    public static string Lore             = "TBD";
+    public static string Lore             = "There is nothing more effective at stopping the Gundead in their tracks than plastering giant metal street signs in front of their faces as they're darting about. Except for possibly bullets. Or goop. Or pits. Or...okay, maybe a lot of things are more effective. But nothing is quite as octagonally satisfying.";
 
     internal static GameActorSpeedEffect _SpeedEffect;
     internal static GameObject _StopSignVFX;
