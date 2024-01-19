@@ -561,7 +561,7 @@ public enum Items {
     MimicToothNecklace                 = 293, // (MimicToothNecklaceItem)
     RingOfMimicFriendship              = 294, // (MimicRingItem)
     HotLead                            = 295, // (BulletStatusEffectItem)
-    YariLauncherDupe1                  = 296, // (ItemBlueprintItem)
+    MetashopBreachItemOld              = 296, // (ItemBlueprintItem) was YariLauncherDupe1
     HegemonyCredit                     = 297, // (CurrencyPickup)
     ShockRounds                        = 298, // (ComplexProjectileModifier)
     SuperSpaceTurtlesGun               = 299, //
@@ -671,7 +671,7 @@ public enum Items {
     ReplacementArm                     = 415, // (RobotArmItem)
     Balloon                            = 416, // (RobotArmBalloonsItem)
     Blasphemy                          = 417, //
-    BugBootsDupe1                      = 418, // (ItemBlueprintItem)
+    TrorcBreachItem                    = 418, // (ItemBlueprintItem) was BugBootsDupe1
     HeartHolster                       = 421, // (BasicStatPickup)
     HeartLunchbox                      = 422, // (BasicStatPickup)
     HeartLocket                        = 423, // (BasicStatPickup)
@@ -679,7 +679,7 @@ public enum Items {
     HeartPurse                         = 425, // (BasicStatPickup)
     ShotgaCola                         = 426, // (BasicStatPickup)
     ShotgunCoffee                      = 427, // (BasicStatPickup)
-    BugBootsDupe2                      = 429, // (ItemBlueprintItem)
+    GooptonBreachItem                  = 429, // (ItemBlueprintItem) was BugBootsDupe2
     LiquidValkyrie                     = 431, // (EnemyBulletSpeedItem)
     JarOfBees                          = 432, // (SpawnObjectPlayerItem)
     StuffedStar                        = 433, // (TemporaryInvulnerabilityPlayerItem)
@@ -742,14 +742,14 @@ public enum Items {
     BriefcaseOfCash                    = 493, // (BriefcaseFullOfCashItem)
     GalacticMedalOfValor               = 494, // (BasicStatPickup)
     Unity                              = 495, // (OurPowersCombinedItem)
-    YariLauncherDupe2                  = 497, // (ItemBlueprintItem)
+    MetashopBreachItemGun              = 497, // (ItemBlueprintItem) was YariLauncherDupe2
     ElderBlank                         = 499, // (ReusableBlankitem)
     HipHolster                         = 500, // (FireOnReloadItem)
-    YariLauncherDupe3                  = 501, // (ItemBlueprintItem)
+    MetashopBreachItemItem             = 501, // (ItemBlueprintItem) was YariLauncherDupe3
     HmAbsolutionRockets                = 502, // (DoNothingActiveItem)
     Bullet                             = 503, //
     HyperLightBlaster                  = 504, //
-    HuntsmanDupe1                      = 505, //
+    MagnumWickedSister                 = 505, // was HuntsmanDupe1
     ReallySpecialLute                  = 506, //
     Starpew                            = 507, //
     DuelingLaser                       = 508, //
@@ -760,8 +760,8 @@ public enum Items {
     DirectionalPad                     = 514, //
     MourningStar                       = 515, //
     TripleGun                          = 516, //
-    TheJudgeDupe1                      = 517, //
-    TheJudgeDupe2                      = 518, //
+    TripleGunForm2                     = 517, // was TheJudgeDupe1
+    TripleGunForm3                     = 518, // was TheJudgeDupe2
     CombinedRifle                      = 519, //
     BalloonGun                         = 520, //
     ChanceBullets                      = 521, // (ProjectileRandomizerItem)
@@ -776,7 +776,7 @@ public enum Items {
     FlakBullets                        = 531, // (ComplexProjectileModifier)
     GildedBullets                      = 532, // (ScalingStatBoostItem)
     MagicBullets                       = 533, // (BulletStatusEffectItem)
-    BowDupe1                           = 535, //
+    RealCoolBow                        = 535, // was BowDupe1 (unfinished item???)
     Relodestone                        = 536, // (RelodestoneItem)
     VorpalGun                          = 537, //
     SilverBullets                      = 538, // (SilverBulletsPassiveItem)
@@ -785,7 +785,7 @@ public enum Items {
     Casey                              = 541, //
     StrafeGun                          = 542, //
     ThePredator                        = 543, //
-    PatriotDupe1                       = 544, //
+    Ac15Unarmored                      = 544, // was PatriotDupe1
     Ac15                               = 545, //
     Windgunner                         = 546, //
     KnightsGun                         = 550, //
@@ -804,7 +804,7 @@ public enum Items {
     ChickenFlute                       = 572, // (CompanionItem)
     ChestTeleporter                    = 573, // (ChestTeleporterItem)
     WoodenBlasphemy                    = 574, //
-    BugBootsDupe3                      = 575, // (ItemBlueprintItem)
+    DougBreachItem                     = 575, // (ItemBlueprintItem) was BugBootsDupe3
     RobotsLeftHand                     = 576, //
     TurboGun                           = 577, //
     Sprun                              = 578, // (SprenOrbitalItem)
@@ -866,10 +866,10 @@ public enum Items {
     GunPiece                           = 654, // (FragileGunItemPiece)
     HungryBullets                      = 655, // (ComplexProjectileModifier)
     KrullerGlaive                      = 656, //
-    FlashRayDupe1                      = 657, //
-    ProtonBackpackDupe1                = 658, //
-    TheExoticDupe1                     = 659, //
-    RegularShotgunDupe1                = 660, //
+    ChamberGunOubliette                = 657, // was FlashRayDupe1
+    ChamberGunForge                    = 658, // was ProtonBackpackDupe1
+    ChamberGunHollow                   = 659, // was TheExoticDupe1
+    ChamberGunProper                   = 660, // was RegularShotgunDupe1
     OrbitalBullets                     = 661, // (GunVolleyModificationItem)
     PartiallyEatenCheese               = 662, // (CheeseWheelItem)
     ResourcefulSack                    = 663, // (RatPackItem)
@@ -889,7 +889,7 @@ public enum Items {
     BlunderbussBlunderbrace            = 678, //
     SnowballerSnowballShotgun          = 679, //
     ExcaliberArmoredCorps              = 680, //
-    _38SpecialUnknown                  = 681, //
+    _38SpecialDetectiveMode            = 681, // was _38SpecialUnknown
     PlaguePistolPandemicPistol         = 682, //
     ThunderclapAlistairsLadder         = 683, //
     M1M1MultiTool                      = 684, //
@@ -936,12 +936,12 @@ public enum Items {
     TearJerkerUnknown                  = 725, //
     Akey47AkeyBreaky                   = 726, //
     RatKey                             = 727, // (KeyBulletPickup)
-    Unknown7                           = 728, //
-    Unknown8                           = 729, //
-    Unknown9                           = 730, //
-    Unknown10                          = 731, //
+    GunderfuryLv50                     = 728, // was Unknown7
+    GunderfuryLv60                     = 729, // was Unknown8
+    GunderfuryLv40                     = 730, // was Unknown9
+    GunderfuryLv30                     = 731, // was Unknown10
     GunderfuryLv10                     = 732, //
-    Unknown11                          = 733, //
+    GunderfuryLv20                     = 733, // was Unknown11
     MimicGun                           = 734, //
     Serpent                            = 735, // (PlayerOrbitalItem)
     PhoenixPhoenixUp                   = 736, //
@@ -954,26 +954,26 @@ public enum Items {
     RadGunKungFuHippieRappinSurfer     = 743, //
     OriguniParchmental                 = 744, //
     IceBreakerGunderlord               = 745, //
-    HighDragunfireUnknown              = 747, //
+    TurtineGun                         = 747, // was HighDragunfireUnknown
     SunlightJavelin                    = 748, //
     ShotbowSecondAccident              = 749, //
     DungeonEagleDontHootTheMessenger   = 750, //
-    MagnumUnknownSynergy               = 751, //
-    SmileysRevolverUnknownSynergy1     = 752, //
-    SmileysRevolverUnknownSynergy2     = 753, //
-    SmileysRevolverUnknownSynergy3     = 754, //
+    BigGun                             = 751, // was MagnumUnknownSynergy
+    WestBroNomesRevolver               = 752, // was SmileysRevolverUnknownSynergy1
+    WestBroTucosRevolver               = 753, // was SmileysRevolverUnknownSynergy2
+    WestBroAngelsRevolver              = 754, // was SmileysRevolverUnknownSynergy3
     Evolver                            = 755, //
-    ShellUnknownSynergy1               = 756, //
-    ShellUnknownSynergy2               = 757, //
-    ShellUnknownSynergy3               = 758, //
-    ShellUnknownSynergy4               = 759, //
-    ShellUnknownSynergy5               = 760, //
+    EvolverSponge                      = 756, // was ShellUnknownSynergy1
+    EvolverFlatworm                    = 757, // was ShellUnknownSynergy2
+    EvolverSnail                       = 758, // was ShellUnknownSynergy3
+    EvolverFrog                        = 759, // was ShellUnknownSynergy4
+    EvolverDragon                      = 760, // was ShellUnknownSynergy5
     HighKaliber                        = 761, //
     FinishedGun                        = 762, //
-    RegularShotgunUnknownSynergy1      = 763, //
-    UnfinishedGunUnknownSynergy2       = 806, //
-    UnfinishedGunUnknownSynergy3       = 807, //
-    TheExoticUnknownSynergy1           = 808, //
+    ChamberGunHell                     = 763, // was RegularShotgunUnknownSynergy1
+    ChamberGunAbbey                    = 806, // was UnfinishedGunUnknownSynergy2
+    ChamberGunMines                    = 807, // was UnfinishedGunUnknownSynergy3
+    ChamberGunRatLair                  = 808, // was TheExoticUnknownSynergy1
     MarineSidearmAlt                   = 809, //
     RustySidearmAlt                    = 810, //
     DartGunAlt                         = 811, //
@@ -981,14 +981,14 @@ public enum Items {
     BlasphemyAlt                       = 813, //
     MagazineRack                       = 814, // (MagazineRackItem)
     LichsEyeBullets                    = 815, // (SynergyCompletionItem)
-    TrankGunDupe1                      = 816, //
+    TrankGunINeedScissors              = 816, // was TrankGunDupe1
     CatBulletKingThrone                = 817, // (WingsItem)
     BabyGoodShelleton                  = 818, // (CompanionItem)
     GlassCannonSteelSkin               = 819, //
     ShadowClone                        = 820, // (SpawnObjectPlayerItem)
     Scouter                            = 821, // (RatchetScouterItem)
     KatanaBullets                      = 822, // (ComplexProjectileModifier)
-    WoodBeamDupe1                      = 823, //
+    ChamberGunRNG                      = 823, // was WoodBeamDupe1
 }
 
 public static class ItemHelper {
@@ -1094,7 +1094,7 @@ public static class EasyGoopDefinitions  // mostly stolen from NN
     public static GoopDefinition SeltzerGoop;
     public static GoopDefinition CharmGoopDef = ItemHelper.Get(Items.FairyWings)?.GetComponent<WingsItem>()?.RollGoop;
     public static GoopDefinition GreenFireDef = (ItemHelper.Get(Items.FlameHandMaximizeSpell) as Gun).DefaultModule.projectiles[0].GetComponent<GoopModifier>().goopDefinition;
-    public static GoopDefinition CheeseDef    = (ItemHelper.Get(Items.TheExoticUnknownSynergy1) as Gun).DefaultModule.projectiles[0].GetComponent<GoopModifier>().goopDefinition;
+    public static GoopDefinition CheeseDef    = (ItemHelper.Get(Items.ChamberGunRatLair) as Gun).DefaultModule.projectiles[0].GetComponent<GoopModifier>().goopDefinition;
 
     public static List<GoopDefinition> ColorGoops = new List<GoopDefinition>();
     public static List<Color> ColorGoopColors     = new List<Color>
