@@ -2,17 +2,128 @@ namespace CwaffingTheGungy;
 
 public static class HeckedMode
 {
-    public static bool HeckedModeEnabled = false; // the world isn't ready yet o.o
+    public static bool HeckedModeEnabled = C.DEBUG_BUILD; // the world isn't ready yet o.o
 
-    // public readonly static List<int> HeckedModeGunWhiteList = new(){
-    //     (int)Items.SniperRifle,
-    // };
     public readonly static List<int> HeckedModeGunWhiteList = new(){
+        (int)Items.FlareGun,
+        // (int)Items.Corsair,
+        // (int)Items.ChargeShot,
+        // (int)Items.ZillaShotgun,
+        // (int)Items.TheEmperor,
+        // (int)Items.ScienceCannon,
+        // (int)Items.LilBomber,
+        // (int)Items.WindUpGun,
+        // (int)Items.Silencer,
+        // (int)Items.Pitchfork,
+        // (int)Items.CompositeGun,
+        // (int)Items.Gunther,
+        // (int)Items.Mahoguny,
+        // (int)Items.Buzzkill,
+        // (int)Items.Huntsman,
+        // (int)Items.Shotgrub,
+        // (int)Items.Railgun,
+        // (int)Items.CompressedAirTank,
+        // (int)Items.Snakemaker,
+        // (int)Items.BulletBore,
+        // (int)Items.TrickGun,
+        // (int)Items.MassShotgun,
+        // (int)Items.ElTigre,
+        // (int)Items.BaitLauncher,
+        // (int)Items.PrototypeRailgun,
+        // (int)Items.RcRocket,
+        // (int)Items.BrickBreaker,
+        // (int)Items.Excaliber,
+        // (int)Items.Derringer,
+        // (int)Items.ShotgunFullOfLove,
+        // (int)Items.BetrayersShield,
+        // (int)Items.TripleCrossbow,
+        // (int)Items.Sling,
+        // (int)Items.FlashRay,
+        // (int)Items.Phoenix,
+        // (int)Items.Hexagun,
+        // (int)Items.FrostGiant,
+        // (int)Items.CobaltHammer,
+        // (int)Items.Anvillain,
+        // (int)Items.MineCutter,
+        // (int)Items.StaffOfFirepower,
+        // (int)Items.Gungine,
+        // (int)Items.Snowballer,
+        // (int)Items.Siren,
+        // (int)Items.Rattler,
+        // (int)Items.Trident,
+        // (int)Items.TheScrambler,
+        // (int)Items.Shellegun,
+        // (int)Items.GummyGun,
+        // (int)Items.AbyssalTentacle,
+        // (int)Items.QuadLaser,
+        // (int)Items.MicrotransactionGun,
+        // (int)Items.Origuni,
+        // (int)Items.Banana,
+        // (int)Items.SuperMeatGun,
+        // (int)Items.MakeshiftCannon,
+        // (int)Items.Camera,
+        // (int)Items.Gunzheng,
+        // (int)Items.Tetrominator,
+        // (int)Items.Devolver,
+        // (int)Items.Bullet,
+        // (int)Items.HyperLightBlaster,
+        // (int)Items.ReallySpecialLute,
+        // (int)Items.Starpew,
+        // (int)Items.DuelingLaser,
+        // (int)Items.Jk47,
+        // (int)Items.Shell,
+        // (int)Items.Poxcannon,
+        // (int)Items.DirectionalPad,
+        // (int)Items.TripleGun,
+        // (int)Items.TripleGunForm2,
+        // (int)Items.TripleGunForm3,
+        // (int)Items.CombinedRifle,
+        // (int)Items.BalloonGun,
+        // (int)Items.VorpalGun,
+        // (int)Items.BoxingGlove,
+        // (int)Items.GlassCannon,
+        // (int)Items.StrafeGun,
+        // (int)Items.ThePredator,
+        // (int)Items.Ac15,
+        // (int)Items.KnightsGun,
+        // (int)Items.CrownOfGuns,
+        // (int)Items.TheFatLine,
+        // (int)Items.TheExotic,
+        // (int)Items.RadGun,
+        // (int)Items.TurboGun,
+        // (int)Items.VoidCoreCannon,
+        // (int)Items.MoonlightTiara,
+        // (int)Items.LifeOrb,
+        // (int)Items.Teapot,
+        // (int)Items.MrAccretionJr,
+        // (int)Items.StoneDome,
+        // (int)Items.BigShotgun,
+        // (int)Items.Gunner,
+        // (int)Items.Slinger,
+        // (int)Items.WoodBeam,
+        // (int)Items.Elimentaler,
+        // (int)Items.ChamberGun,
+        // (int)Items.KrullerGlaive,
+        // (int)Items.HighKaliber,
+    };
+    public readonly static List<int> HeckedModeGunWhiteList2 = new(){
         // Unfair Hitscan D:
+        (int)Items.ShockRifle, // robot's amusingly immune, but still
+        (int)Items.LaserRifle,
         (int)Items.LightGun,
         (int)Items.SniperRifle,
+        (int)Items.HeckBlaster,
 
         // Terrifying O.O
+        (int)Items.LuxinCannon,  // only mildly bad at first, but upgrades to large shots sometimes at random o.o
+        (int)Items.GreyMauser,
+        (int)Items.GungeonAnt,
+        (int)Items.TheMembrane,
+        (int)Items.Dragunfire,
+        (int)Items.ShotgunFullOfHate,
+        (int)Items.RubeAdynePrototype,
+        (int)Items.CrescentCrossbow,
+        (int)Items.SeriousCannon,
         (int)Items.Com4nd0,
         (int)Items.RubeAdyneMk2,
         (int)Items.VulcanCannon,
@@ -23,6 +134,45 @@ public static class HeckedMode
         (int)Items.SunlightJavelin,
 
         // Ouchie
+        (int)Items.Fightsabre,
+        (int)Items.HegemonyCarbine,
+        (int)Items.Wristbow,  // imagine needing to charge
+        (int)Items.IceBreaker,
+        (int)Items.Cold45,
+        (int)Items.PlaguePistol,
+        (int)Items.MachineFist,
+        (int)Items.TheJudge,
+        (int)Items.Crestfaller,
+        (int)Items.Tangler,
+        (int)Items.BigIron,
+        (int)Items.LaserLotus,
+        (int)Items.Trashcannon,
+        (int)Items.TheKiln,
+        (int)Items.TShirtCannon,
+        (int)Items.WitchPistol,
+        (int)Items.Glacier,
+        (int)Items.M16,
+        (int)Items.Akey47,
+        (int)Items.Mac10,
+        (int)Items.OldGoldie,
+        (int)Items.RobotsRightHand,
+        (int)Items.UnfinishedGun,
+        (int)Items.BudgetRevolver,
+        (int)Items.BundleOfWands,
+        (int)Items.Saa,
+        (int)Items.Jolter,
+        (int)Items.MachinePistol,
+        (int)Items.TrankGun,
+        (int)Items.Magnum,
+        (int)Items.SmileysRevolver,
+        (int)Items.Klobbe,
+        (int)Items.M1911,
+        (int)Items.M1, // hitscan but slowish rate of fire (slightly faster than awp)
+        (int)Items.DungeonEagle,
+        (int)Items.Bow,
+        (int)Items.Zorgun,
+        (int)Items.Awp,  // hitscan but slowish rate of fire
+        (int)Items.Screecher,
         (int)Items.Siren,
         (int)Items.FrostGiant,
         (int)Items.Hexagun,
@@ -43,6 +193,31 @@ public static class HeckedMode
         (int)Items.Snowballer,
 
         // Balanced Enough
+        (int)Items.GildedHydra,
+        (int)Items.Helix,
+        (int)Items.Particulator, // as dangerous to other enemies as it is to you
+        (int)Items.SawedOff,  // only scary at close range
+        (int)Items.PeaShooter,
+        (int)Items.SerManuelsRevolver,
+        (int)Items.WinchesterRifle,
+        (int)Items.Grasschopper,
+        (int)Items.RustySidearm,
+        (int)Items.RogueSpecial,
+        (int)Items.MarineSidearm,
+        (int)Items.Deck4rd,
+        (int)Items.Makarov,
+        (int)Items.Colt1851,
+        (int)Items._38Special,
+        (int)Items.VoidShotgun,
+        (int)Items.AuGun,
+        (int)Items.RegularShotgun,
+        (int)Items.TearJerker,
+        (int)Items.DartGun,
+        (int)Items.ShadesRevolver,
+        (int)Items.Thunderclap,
+        (int)Items.DuelingPistol,
+        (int)Items.Barrel,
+        (int)Items.MagicLamp,
         (int)Items.BalloonGun,
         (int)Items.Tetrominator,
         (int)Items.PulseCannon,
@@ -57,10 +232,16 @@ public static class HeckedMode
         (int)Items.Mahoguny,
 
         // Goofy
+        (int)Items.CatClaw, // barely threatening and very goofy looking
+        (int)Items.Casey, // actually damages unlike Blasphemy, but still funny
+        (int)Items.Blasphemy, // no damage except from collision
+        (int)Items.GunslingersAshes,
         (int)Items.MolotovLauncher,
         (int)Items.BubbleBlaster,
 
         // Semi-broken
+        // (int)Items.AlienEngine,  // no knockback, underwhelming when not at point blank
+        // (int)Items.FaceMelter, // works fine, but sounds never stop playing
         // (int)Items.Mailbox, // final package projectile doesn't seem to work quite right
         // (int)Items.VoidCoreAssaultRifle, // slow shoot speed, burst not respected
         // (int)Items.AlienSidearm, // only fires the large scary projectiles
@@ -76,11 +257,15 @@ public static class HeckedMode
         // (int)Items.PrototypeRailgun,  // same as railgun
         // (int)Items.CobaltHammer, // enemies literally just self-destruct. would put it in goofy, but this has no function
         // (int)Items.CrownOfGuns, // doesn't appear on heads, behaviorspeculators mess up eventually
+        // (int)Items.Singularity, // doesn't work at all
+        // (int)Items.CharmedBow, // doesn't work at all
 
         // // Beam broken
         // (int)Items.Disintegrator, // beams stay in place on screen after firing and loop their firing sound nonstop o.o
         // (int)Items.ProtonBackpack,  // beams weapons are very evidently a mistake
         // (int)Items.ScienceCannon, // yup, still bad
+        // (int)Items.FossilizedGun,
+        // (int)Items.Plunger,
 
         // Testing
         // (int)Items.RobotsLeftHand,

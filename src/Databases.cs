@@ -858,11 +858,11 @@ public enum Items {
     PortableTableDevice                = 644, // (FoldingTableItem)
     TurtleProblem                      = 645, // (MulticompanionItem)
     ChamberGun                         = 647, //
-    LowerCaseRDupe1                    = 648, //
+    TanglerFullCircle                  = 648, // was LowerCaseRDupe1
     UppercaseR                         = 649, //
     PaydayWinchester                   = 650, //
-    RogueSpecialDupe1                  = 651, //
-    BudgetRevolverDupe1                = 652, //
+    RogueSpecialAlt                    = 651, // was RogueSpecialDupe1
+    BudgetRevolverAlt                  = 652, // was BudgetRevolverDupe1
     GunPiece                           = 654, // (FragileGunItemPiece)
     HungryBullets                      = 655, // (ComplexProjectileModifier)
     KrullerGlaive                      = 656, //
