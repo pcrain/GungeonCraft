@@ -2,7 +2,7 @@ namespace CwaffingTheGungy;
 
 public static class HeckedMode
 {
-    public static bool HeckedModeEnabled = C.DEBUG_BUILD; // the world is almost ready o.o
+    public static bool HeckedModeEnabled = false; // the world is almost ready o.o
 
     public readonly static List<int> HeckedModeGunWhiteList = new(){
         // Unfair Hitscan D:
@@ -258,6 +258,8 @@ public static class HeckedMode
     private static ILHook _DisablePrefireAnimationHook;
     private static ILHook _DisablePrefireStateHook;
 
+    internal static readonly string _CONFIG_KEY = "Hecked Mode";
+
     public static void Init()
     {
         _EnemyAwakeHook = new Hook(
@@ -274,6 +276,10 @@ public static class HeckedMode
         // _EnemyShootHook = new Hook(
         //     typeof(AIShooter).GetMethod("Shoot", BindingFlags.Public | BindingFlags.Instance),
         //     typeof(HeckedMode).GetMethod("OnEnemyShoot"));
+
+        CwaffEvents.BeforeRunStart += () => {  // load hecked mode status before the start of each run
+            HeckedModeEnabled = (CwaffConfig._Gunfig.Value(_CONFIG_KEY) != "Disabled");
+        };
     }
 
     // public static void OnEnemyShoot(Action<AIShooter, string> action, AIShooter shooter, string overrideBulletName)

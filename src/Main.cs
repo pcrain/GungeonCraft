@@ -45,7 +45,7 @@ global using Component         = UnityEngine.Component;
 global using ShopAPI           = Alexandria.NPCAPI.ShopAPI;
 global using RoomFactory       = Alexandria.DungeonAPI.RoomFactory;
 
-// global using Gunfiguration;
+global using Gunfiguration;
 
 global using static ProjectileModule;      //ShootStyle, ProjectileSequenceStyle
 global using static tk2dBaseSprite;        //Anchor
@@ -56,7 +56,7 @@ namespace CwaffingTheGungy;
 [BepInPlugin(C.MOD_GUID, C.MOD_NAME, C.MOD_VERSION)]
 [BepInDependency(ETGModMainBehaviour.GUID)]
 [BepInDependency(Alexandria.Alexandria.GUID)]
-// [BepInDependency(Gunfiguration.C.MOD_GUID)]
+[BepInDependency(Gunfiguration.C.MOD_GUID)]
 public class Initialisation : BaseUnityPlugin
 {
     public static Initialisation Instance;
@@ -87,6 +87,9 @@ public class Initialisation : BaseUnityPlugin
             System.Diagnostics.Stopwatch setupConfig1Watch = null;
             Thread setupConfig1Thread = new Thread(() => {
                 setupConfig1Watch = System.Diagnostics.Stopwatch.StartNew();
+
+                // Load our configuration files
+                CwaffConfig.Init();
 
                 // Build resource map for ease of access
                 ResMap.Build();
@@ -451,8 +454,6 @@ public class Initialisation : BaseUnityPlugin
                 ETGModConsole.Log($"allocated {(newMemory - oldMemory).ToString("N0")} bytes of memory along the way");
                 AkSoundEngine.PostEvent("vc_kirby_appeal01", ETGModMainBehaviour.Instance.gameObject);
             }
-
-            // CwaffConfig.Init();
 
             // Debug.LogError("Gungy o.o!");
             // Debug.LogAssertion("Gungy o.o!");
