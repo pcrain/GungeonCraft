@@ -2,14 +2,15 @@
 
 |                                 |                                       |                                      |
 | -------------                   | :-------------:                       | :-------------:                      |
-| ![](previews/clip5-volley.webp) |                                       | ![](previews/clip1-the-slap.webp)    |
+| ![](previews/clip6-hecked.webp) | ![](previews/clip7-magunet.webp)      | ![](previews/clip8-spinning.webp)    |
+| ![](previews/clip5-volley.webp) | ![](previews/clip9-jojo.webp)         | ![](previews/clip1-the-slap.webp)    |
 | ![](previews/clip4-zoom.webp)   | ![](previews/clip3-janitor-time.webp) | ![](previews/clip2-pet-da-wolf.webp) |
 |                                 |                                       |                                      |
 
 ### Features
 
 - 85 new items, including
-	+ 41 new guns 
+	+ 41 new guns
 	+ 30 new passive items
 	+ 14 new active items
 - Lore for all new guns and items
@@ -24,8 +25,8 @@
 
 ### Goals
 
-- **Balance and Diversity**: no item should be so underwhelming you never want to use it, nor so overpowered you never want to use anything else
-- **Fun New Mechanics**: most items and guns should offer their own distinct ways of interacting with the Gungeon, and low tier items shouldn't be low fun items as well
+- **Balance and Diversity**: all items and guns should be both fun and useful without being overpowered
+- **Fun New Mechanics**: most items and guns should offer their own distinct ways of interacting with the Gungeon
 - **Playstyle Variety**: defensive and strategic play should feel as rewarding as aggressive and proactive play
 
 ### Known Bugs

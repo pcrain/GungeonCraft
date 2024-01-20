@@ -1,5 +1,13 @@
 namespace CwaffingTheGungy;
 
+/* TODO:
+    - fix FindPredictedTargetPosition error
+    - fix charged weapons to actually respect charge
+    - fix beam weapons to not persist when restarting
+    - fix burst weapons to fire more than one shot
+    - fix audio on all noisy weapons to stop playing when appropriate
+*/
+
 public static class HeckedMode
 {
     public static bool HeckedModeEnabled = false; // the world is almost ready o.o
