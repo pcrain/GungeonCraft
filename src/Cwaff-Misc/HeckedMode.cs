@@ -296,8 +296,8 @@ public static class HeckedMode
 
         CwaffEvents.BeforeRunStart += () => {  // load hecked mode status before the start of each run
             HeckedModeEnabled = (CwaffConfig._Gunfig.Value(_CONFIG_KEY) != "Disabled");
-            if (C.DEBUG_BUILD)
-                ETGModConsole.Log($"  hecked mode status: {CwaffConfig._Gunfig.Value(_CONFIG_KEY)}");
+            // if (C.DEBUG_BUILD)
+            //     ETGModConsole.Log($"  hecked mode status: {CwaffConfig._Gunfig.Value(_CONFIG_KEY)}");
         };
     }
 

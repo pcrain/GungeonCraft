@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.7.0 (TBD)
+## 1.7.0 (2024-01-20)
 
 #### Features and Polish:
 - Added Hecked Mode O_O
@@ -17,7 +17,7 @@
 - [Gunfig](https://enter-the-gungeon.thunderstore.io/package/CaptainPretzel/Gunfig/) is now a required dependency of GungeonCraft 
 - Toned down volume of Pistol Whip sound effects
 - Clarified in Emergency Siren's description that it opens sealed combat doors rather than actual locked doors
-- Fixed potential null dereference when Magunet and Vacuum Cleaner try to grab invalid debris
+- Fixed potential null dereference when Magunet and Vacuum Cleaner try to grab inactive debris
 - Fixed backwards sprite for Pincushion in Ammonomicon
 - Fixed a few typos in various item descriptions in Ammonomicon
 - Added some missing sprite credits in earlier Changelog entries
