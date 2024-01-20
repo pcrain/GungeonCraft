@@ -132,7 +132,7 @@ public class ChekhovBullet : MonoBehaviour
         this._sightline = VFX.CreateLaserSight(start, length: length, width: 1f, angle: angle, colour: Color.white, power: 0f);
         this._sightline.transform.parent = this._projectile.transform;
         this._sightline.SetAlpha(0.05f);
-        this._gunVfx = SpawnManager.SpawnVFX(ChekhovsGun._ChekhovGunVFX, start, angle.EulerZ());
+        this._gunVfx = SpawnManager.SpawnVFX(ChekhovsGun._ChekhovGunVFX, start, angle.EulerZ(), ignoresPools: true);
 
         float lifeTime = 0.0f;
         while (lifeTime < _MIN_FREEZE_TIME)
