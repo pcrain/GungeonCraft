@@ -1,5 +1,11 @@
 namespace CwaffingTheGungy;
 
+
+/* TODO:
+    - Foyer Awake seems to be causing issues in Gunfig on floor 2
+    - whatever gun uses HoveringGunSynergyProcessor is broken
+*/
+
 public static class HeckedMode
 {
     public static bool HeckedModeEnabled = false; // the world is almost ready o.o
@@ -325,7 +331,7 @@ public static class HeckedMode
 
     public static void OnEnemyPreAwake(Action<AIActor> action, AIActor enemy)
     {
-        if (HeckedModeEnabled)
+        if (HeckedModeEnabled && !enemy.IsABoss())
         {
             Items replacementGunId = (Items)HeckedModeGunWhiteList.ChooseRandom();
             enemy.HeckedShootGunBehavior(ItemHelper.Get(replacementGunId) as Gun);

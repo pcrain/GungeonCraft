@@ -2,13 +2,19 @@
 
 ## 1.7.0 (TBD)
 
+#### Features and Polish:
+- Added Hecked Mode O_O
+	- Enable it in the Mod Config pause menu (Options -> Mod Config -> GungeonCraft)
 - Added Scotsman, Chekhov's Gun, Ring of Defenestration, Ammo Conservation Manual, and Stop Sign
 	- Ring of Defenestration, Ammo Conservation Manual, and Stop Sign sprites thanks to Dallan!
 - Added several new sprites thanks to Lynceus!
-	- Brand new sprites for John's Wick, Emergency Siren, and Amazon Primer
-	- Polished projectile sprites for Carpet Bomber
+	- Brand new item sprites for John's Wick, Emergency Siren, and Amazon Primer
 	- Polished item sprites for Cozy Camper and Gyroscope
+	- Polished projectile sprites for Carpet Bomber
 	- Custom ammo clip sprites for Wavefront
+	
+#### Bugfixes and Misc:
+- [Gunfig](https://enter-the-gungeon.thunderstore.io/package/CaptainPretzel/Gunfig/) is now a required dependency of GungeonCraft 
 - Toned down volume of Pistol Whip sound effects
 - Clarified in Emergency Siren's description that it opens sealed combat doors rather than actual locked doors
 - Fixed backwards sprite for Pincushion in Ammonomicon
