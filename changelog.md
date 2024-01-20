@@ -9,6 +9,7 @@
 	- Polished projectile sprites for Carpet Bomber
 	- Polished item sprites for Cozy Camper and Gyroscope
 	- Custom ammo clip sprites for Wavefront
+- Toned down volume of Pistol Whip sound effects
 - Clarified in Emergency Siren's description that it opens sealed combat doors rather than actual locked doors
 - Fixed backwards sprite for Pincushion in Ammonomicon
 - Fixed a few typos in various item descriptions in Ammonomicon

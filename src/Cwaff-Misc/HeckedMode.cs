@@ -251,10 +251,6 @@ public static class HeckedMode
         // (int)Items.ScienceCannon, // yup, still bad
         // (int)Items.FossilizedGun,
         // (int)Items.Plunger,
-
-        // Testing
-        // (int)Items.RobotsLeftHand,
-        // (int)Items.
     };
 
     private static Hook _EnemyAwakeHook;
