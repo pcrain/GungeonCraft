@@ -880,7 +880,8 @@ public static class Extensions
   public static void SetupCustomAmmoClip(this ProjectileModule mod, GunBuildData b)
   {
       string clipname    = b.gun.EncounterNameOrDisplayName.SafeName();
-      ETGModConsole.Log($"  getting clip {$"{clipname}_clip"}");
+      // if (C.DEBUG_BUILD)
+      //   ETGModConsole.Log($"  getting clip {$"{clipname}_clip"}");
       mod.ammoType       = GameUIAmmoType.AmmoType.CUSTOM;
       mod.customAmmoType = CustomClipAmmoTypeToolbox.AddCustomAmmoType($"{clipname}_clip", ResMap.Get($"{clipname}_clipfull")[0], ResMap.Get($"{clipname}_clipempty")[0]);
   }

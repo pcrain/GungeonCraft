@@ -23,7 +23,7 @@ public static class HeckedMode
         (int)Items.MrAccretionJr,  // but hilarious
         (int)Items.MoonlightTiara,
         (int)Items.TheFatLine,
-        (int)Items.TripleGunForm3,
+        // (int)Items.TripleGunForm3,  // normal beam + audio issues (but it's hilariously threatening and makes for good content)
         (int)Items.Shell,
         (int)Items.Bullet,
         (int)Items.Gunzheng,
