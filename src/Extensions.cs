@@ -1187,4 +1187,24 @@ public static class Extensions
         return weight.x;
     return 0;
   }
+
+  // Get the first element of a list if possible, returning null otherwise
+  public static T SafeFirst<T>(this List<T> c)
+  {
+    return ((c?.Count ?? 0) == 0) ? default(T) : c[0];
+  }
+
+  // Get the first element of a list if possible, returning null otherwise
+  public static Projectile FirstValidChargeProjectile(this ProjectileModule mod)
+  {
+    List<ChargeProjectile> c = mod.chargeProjectiles;
+    if ((c?.Count ?? 0) == 0)
+      return null;
+    foreach (ChargeProjectile cp in c)
+    {
+      if (cp.Projectile is Projectile p)
+        return p;
+    }
+    return null;
+  }
 }

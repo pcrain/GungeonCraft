@@ -1,17 +1,15 @@
 namespace CwaffingTheGungy;
 
-
-/* TODO:
-    - Foyer Awake seems to be causing issues in Gunfig on floor 2
-    - whatever gun uses HoveringGunSynergyProcessor is broken
-*/
-
 public static class HeckedMode
 {
     public static bool HeckedModeEnabled = false; // the world is almost ready o.o
 
+    // public readonly static List<int> HeckedModeGunWhiteList = new(){
+    // };
     public readonly static List<int> HeckedModeGunWhiteList = new(){
         // Unfair Hitscan D:
+        (int)Items.PrototypeRailgun,
+        (int)Items.EyeOfTheBeholster,
         (int)Items.StrafeGun,
         (int)Items.GlassCannon,  // almost fair due to cooldown, but not quite
         (int)Items.DuelingLaser,
@@ -26,6 +24,7 @@ public static class HeckedMode
         (int)Items.HeckBlaster,
 
         // Terrifying O.O
+        (int)Items.Railgun,
         (int)Items.MrAccretionJr,  // but hilarious
         (int)Items.MoonlightTiara,
         (int)Items.TheFatLine,
@@ -42,7 +41,6 @@ public static class HeckedMode
         (int)Items.ChargeShot,  // terrifying charge shot o.o
         (int)Items.LuxinCannon,  // only mildly bad at first, but upgrades to large shots sometimes at random o.o
         (int)Items.GreyMauser,
-        (int)Items.GungeonAnt,
         (int)Items.TheMembrane,
         (int)Items.Dragunfire,
         (int)Items.ShotgunFullOfHate,
@@ -59,13 +57,14 @@ public static class HeckedMode
         (int)Items.SunlightJavelin,
 
         // Ouchie
+        (int)Items.ZillaShotgun,
         (int)Items.Elimentaler,
         (int)Items.BigShotgun,  // can team kill
         (int)Items.VoidCoreCannon,  // can't hit other enemies, but arcs towards them
         (int)Items.TurboGun,
         (int)Items.RadGun,
         (int)Items.KnightsGun,
-        (int)Items.ThePredator,
+        (int)Items.ThePredator, // spams the debug log, but harmless otherwise
         (int)Items.VorpalGun,  // can team kill
         (int)Items.TripleGunForm2,
         (int)Items.HyperLightBlaster,
@@ -147,6 +146,8 @@ public static class HeckedMode
         (int)Items.Snowballer,
 
         // Balanced Enough
+        (int)Items.MakeshiftCannon, // surprisingly low fire rate
+        (int)Items.KrullerGlaive, // generally avoids the player, but movement is erratic
         (int)Items.HighKaliber,
         (int)Items.Gunner,
         (int)Items.StoneDome,  // generally avoids the player (dome does not appear on top of enemies' heads though)
@@ -199,14 +200,13 @@ public static class HeckedMode
         (int)Items.Mahoguny,
 
         // Easy to Deal With
+        (int)Items.SkullSpitter, // invariably homes in on other enemies
+        (int)Items.Starpew, // only fires a single projectile at a time
         (int)Items.BoxingGlove,
         (int)Items.QuadLaser,
         (int)Items.Casey, // actually damages unlike Blasphemy, but still funny
         (int)Items.GunslingersAshes,
         (int)Items.BubbleBlaster,
-
-        // Ineffective
-        (int)Items.Blasphemy, // no damage except from collision
 
         // Hilarious
         (int)Items.Camera, // free room clear
@@ -214,15 +214,22 @@ public static class HeckedMode
         (int)Items.CatClaw, // barely threatening and very goofy looking
         (int)Items.MolotovLauncher,
 
-        // Semi-broken
-        // (int)Items.ChamberGun,  // very possibly works, but only tested the 1st chamber
-        // (int)Items.CombinedRifle, // null derefs after first volley is fired
+        // Semi-broken, projectile module related
+        // (int)Items.GungeonAnt, // null deref looking up a projectile module
+        // (int)Items.CombinedRifle, // null deref looking up a projectile module
+        // (int)Items.StaffOfFirepower, // null deref looking up a projectile module
+        // (int)Items.TripleCrossbow, // null deref looking up a projectile module
+
+        // Semi-broken, sound-related
         // (int)Items.ReallySpecialLute,  // overlapping sounds
-        // (int)Items.StaffOfFirepower, // null derefs after first volley is fired
-        // (int)Items.TripleCrossbow, // null derefs after first volley is fired
-        // (int)Items.ElTigre, // very noisy and a little silly projectile orbiting behavior, but seems fine otherwise
-        // (int)Items.AlienEngine,  // no knockback, underwhelming when not at point blank
         // (int)Items.FaceMelter, // works fine, but sounds never stop playing
+        // (int)Items.ElTigre, // very noisy and a little silly projectile orbiting behavior, but seems fine otherwise
+
+        // Semi-broken
+        // (int)Items.Blasphemy, // no damage except from collision, null derefs on slash
+        // (int)Items.CharmedBow, // fires every single frame, fixable once i figure out how to incorporate charge time
+        // (int)Items.ChamberGun,  // very possibly works, but only tested the 1st chamber
+        // (int)Items.AlienEngine,  // no knockback, underwhelming when not at point blank
         // (int)Items.Mailbox, // final package projectile doesn't seem to work quite right
         // (int)Items.VoidCoreAssaultRifle, // slow shoot speed, burst not respected
         // (int)Items.AlienSidearm, // only fires the large scary projectiles
@@ -230,26 +237,18 @@ public static class HeckedMode
         // (int)Items.Jk47, // very noisy on floor entrance, but seems fine otherwise
 
         // // Beeg broken
-        // (int)Items.SkullSpitter, // invariably homes in on other enemies
         // (int)Items.AlienEngine, // AI doesn't fire until getting really close, and behaviorspeculators mess up from there
         // (int)Items.LowerCaseR, // bursts don't seem to work quite right, no sound effects
         // (int)Items.DirectionalPad, // same as lowercaser
-        // (int)Items.Railgun, // completely non-functional, doesn't even appear on enemy sprites
-        // (int)Items.PrototypeRailgun,  // same as railgun
         // (int)Items.CobaltHammer, // enemies literally just self-destruct. would put it in goofy, but this has no function
         // (int)Items.CrownOfGuns, // doesn't appear on heads, behaviorspeculators mess up eventually
         // (int)Items.Singularity, // doesn't work at all
-        // (int)Items.CharmedBow, // doesn't work at all
-        // (int)Items.ZillaShotgun, // doesn't work at all
-        // (int)Items.CompositeGun, // doesn't work at all
+        // (int)Items.CompositeGun, // doesn't work at all, very difficult to get a working projectile from it
         // (int)Items.TrickGun, // alt form doesn't work at all
-        // (int)Items.MakeshiftCannon, // doesn't work at all
-        // (int)Items.Starpew, // doesn't work at all
-        // (int)Items.Ac15, // doesn't work at all
-        // (int)Items.LifeOrb, // doesn't work at all
-        // (int)Items.KrullerGlaive, // doesn't work at all
+        // (int)Items.Ac15, // doesn't work at all (null deref looking up a projectile module after charge projectile fix)
 
         // // Beam broken
+        // (int)Items.LifeOrb, // broken like any other beam after deleting LifeOrbGunModifier component
         // (int)Items.WoodBeam,
         // (int)Items.AbyssalTentacle, // GOOD LORD THE HORROR O_O
         // (int)Items.Disintegrator, // beams stay in place on screen after firing and loop their firing sound nonstop o.o
@@ -263,6 +262,7 @@ public static class HeckedMode
     // private static Hook _EnemyShootHook;
     private static ILHook _DisablePrefireAnimationHook;
     private static ILHook _DisablePrefireStateHook;
+    private static Hook _InitializeShootHook;
 
     internal static readonly string _CONFIG_KEY = "Hecked Mode";
 
@@ -279,12 +279,17 @@ public static class HeckedMode
             typeof(ShootGunBehavior).GetMethod("ContinuousUpdate", BindingFlags.Instance | BindingFlags.Public),
             DisablePrefireStateDuringHeckedModeIL
             );
+        _InitializeShootHook = new Hook(
+            typeof(AIShooter).GetMethod("Initialize", BindingFlags.Public | BindingFlags.Instance),
+            typeof(HeckedMode).GetMethod("OnInitializeShooter"));
         // _EnemyShootHook = new Hook(
         //     typeof(AIShooter).GetMethod("Shoot", BindingFlags.Public | BindingFlags.Instance),
         //     typeof(HeckedMode).GetMethod("OnEnemyShoot"));
 
         CwaffEvents.BeforeRunStart += () => {  // load hecked mode status before the start of each run
             HeckedModeEnabled = (CwaffConfig._Gunfig.Value(_CONFIG_KEY) != "Disabled");
+            if (C.DEBUG_BUILD)
+                ETGModConsole.Log($"  hecked mode status: {CwaffConfig._Gunfig.Value(_CONFIG_KEY)}");
         };
     }
 
@@ -339,10 +344,49 @@ public static class HeckedMode
         action(enemy);
     }
 
+    // Removes some player-only components from guns to make them work with AI
+    public static void OnInitializeShooter(Action<AIShooter> orig, AIShooter shooter)
+    {
+        orig(shooter);
+        if (shooter?.CurrentGun is not Gun gun)
+            return;
+        gun.GetComponent<HoveringGunSynergyProcessor>().SafeDestroy();                 // fix Blooper, etc.
+        gun.GetComponent<MotionTriggeredStatSynergyProcessor>().SafeDestroy();         // fix Gungine, etc.
+        gun.GetComponent<TalkingGunModifier>().SafeDestroy();                          // fix Gunther
+        // gun.GetComponent<LifeOrbGunModifier>().SafeDestroy();                       // fix Life Orb, not useful until beams are fixed in general
+        if (gun.GetComponent<StealthOnReloadPressed>() is StealthOnReloadPressed sorp) // fix GreyMauser, etc.
+        {
+            gun.OnAutoReload -= sorp.HandleReloadPressedSimple;
+            gun.OnReloadPressed -= sorp.HandleReloadPressed;
+            sorp.SafeDestroy();
+        }
+    }
+
     public static void HeckedShootGunBehavior(this AIActor enemy, Gun replacementGun)
     {
         if (enemy.aiShooter is not AIShooter shooter)
             return;
+
+        // if (replacementGun?.DefaultModule?.projectiles?[0] is not Projectile)
+        // {
+        //     Lazy.DebugLog($"failed to initialize default projectiles for enemy");
+        //     return;
+        // }
+
+        // if (shooter?.behaviorSpeculator?.AttackBehaviors is not List<AttackBehaviorBase>)
+        // {
+        //     Lazy.DebugLog($"failed to initialize attack behaviors for enemy");
+        //     return;
+        // }
+
+        ProjectileModule mod = replacementGun.DefaultModule;
+        Projectile defaultProjectile = (
+          ((mod.shootStyle == ShootStyle.Charged) && ((mod.chargeProjectiles?.Count ?? 0) > 0))
+            ? mod.FirstValidChargeProjectile()
+            : mod.projectiles[0]
+          )
+          ?? replacementGun.singleModule?.projectiles.SafeFirst()
+          ?? throw new Exception($"failed to get Hecked Mode projectile for gun {replacementGun.EncounterNameOrDisplayName}");
 
         shooter.equippedGunId = replacementGun.PickupObjectId;
         shooter.customShootCooldownPeriod = 0f;
@@ -351,6 +395,7 @@ public static class HeckedMode
         {
             if (attack is not ShootGunBehavior pewpew)
                 continue;
+
             // ETGModConsole.Log($"  found attack behavior with cooldown {pewpew.Cooldown}");
             pewpew.WeaponType            = WeaponType.AIShooterProjectile;
             pewpew.OverrideBulletName    = null; // must be null to allow firing normal gun projectiles
@@ -365,7 +410,7 @@ public static class HeckedMode
             pewpew.TimeBetweenShots      = replacementGun.DefaultModule.cooldownTime;
             pewpew.MagazineCapacity      = replacementGun.ClipCapacity;
             pewpew.ReloadSpeed           = replacementGun.reloadTime;
-            pewpew.Range                 = replacementGun.DefaultModule.projectiles[0].baseData.range;
+            pewpew.Range                 = defaultProjectile.baseData.range;
 
             // ETGModConsole.Log($"replaced gun {replacementGun.name} with cooldown {replacementGun.DefaultModule.cooldownTime}");
 
