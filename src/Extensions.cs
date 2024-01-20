@@ -1125,7 +1125,7 @@ public static class Extensions
           }
 
           DebrisObject debris = StaticReferenceManager.AllDebris[next];
-          if (!debris || !debris.HasBeenTriggered)
+          if (!debris || !debris.isActiveAndEnabled || !debris.HasBeenTriggered)
               continue; // not triggered yet
           if (debris.IsPickupObject || debris.Priority == EphemeralObject.EphemeralPriority.Critical)
               continue; // don't vacuum up important objects
