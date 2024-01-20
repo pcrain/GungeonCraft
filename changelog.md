@@ -13,6 +13,9 @@
 	- Polished projectile sprites for Carpet Bomber
 	- Custom ammo clip sprites for Wavefront
 	
+#### Balance Changes:
+- Library Cardtridge now makes "books and paper-based items" free at shops, which now includes Origuni
+
 #### Bugfixes and Misc:
 - [Gunfig](https://enter-the-gungeon.thunderstore.io/package/CaptainPretzel/Gunfig/) is now a required dependency of GungeonCraft 
 - Toned down volume of Pistol Whip sound effects
