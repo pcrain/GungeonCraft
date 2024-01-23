@@ -2,6 +2,8 @@
 
 ## 1.7.1 (TBD)
 - Fixed another rare edge case where Astral Projector could get the player stuck in walls
+- Made companion shopkeeper no longer face towards player
+- Added instructions for enabling Hecked Mode to readme 
 
 ## 1.7.0 (2024-01-20)
 

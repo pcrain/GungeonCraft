@@ -88,6 +88,7 @@ public class Cammy
             prequisiteValidator    : CwaffPrerequisite.OnFirstFloor,
             idleFps                : 6,
             talkFps                : 4,
+            flipTowardsPlayer      : false,
             // prequisiteValidator    : null,
             // talkPointOffset        : C.PIXEL_SIZE * new Vector2(7, 22),
             talkPointOffset        : C.PIXEL_SIZE * new Vector2(19, 52),

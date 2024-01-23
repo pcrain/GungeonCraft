@@ -16,7 +16,7 @@
 - Lore for all new guns and items
 - Companion Shop: sells 3 random unlocked companions at a 30% discount. Guaranteed to spawn on the first floor each run
 - Bartering Shop: trades 3 random D-A tier items for any higher-tiered item. Guaranteed to spawn on the second or third floor each run
-- Hecked Mode: randomize enemies' guns for a truly hecked playing experience
+- Hecked Mode: randomize enemies' guns for a truly hecked playing experience. Enable it in Options -> Mod Config -> GungeonCraft -> Hecked Mode.
 - A new boss!
 - Vanilla bugfixes
 - You can pet Junior \o/
