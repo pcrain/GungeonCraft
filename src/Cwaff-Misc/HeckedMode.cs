@@ -1,6 +1,9 @@
 namespace CwaffingTheGungy;
 
 /* TODO:
+    - fix GunnerGunController.Engage() null deref
+    - test Bsg
+
     - fix FindPredictedTargetPosition error
     - fix charged weapons to actually respect charge
     - fix beam weapons to not persist when restarting

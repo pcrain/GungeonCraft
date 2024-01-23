@@ -11,7 +11,7 @@ public class AstralProjector : PassiveItem
 
     private bool _phased = false;
     private bool _intangible = false;
-    private int _insideWalls = 0;
+    private bool _insideWalls = false;
     private float _intangibleTimer = 0.0f;
     private Shader _originalShader;
     private RoomHandler _phasedRoom;
@@ -98,8 +98,13 @@ public class AstralProjector : PassiveItem
         }
         _LastSanePosition = ppos;
 
-        if (--this._insideWalls == 0)
-            this._phased = false;
+        if (this._insideWalls)
+        {
+            this._insideWalls = false;
+            return;
+        }
+        this._phased = false;
+        // this._intangibleTimer = 0; BecomeTangible(); // for testing
     }
 
     private void OnPreTileCollision(SpeculativeRigidbody me, PixelCollider myPixelCollider, PhysicsEngine.Tile other, PixelCollider otherPixelCollider)
@@ -112,8 +117,9 @@ public class AstralProjector : PassiveItem
         else if (!this.Owner.FullyWithinRoom(targetRoom))
             return; // outside the room
 
-        this._phasedRoom = this.Owner.CurrentRoom;
-        this._insideWalls = 2;  // 2 frames of leniency for checking if we're inside walls
+        if (!this._phased)
+            this._phasedRoom = this.Owner.CurrentRoom;
+        this._insideWalls = true;  // 2 frames of leniency for checking if we're inside walls
         this._intangibleTimer = _UNPHASE_TIMER;
         PhysicsEngine.SkipCollision = true;
 

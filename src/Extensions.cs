@@ -690,7 +690,7 @@ public static class Extensions
   {
     Rect roomRect = room.GetBoundingRect();
     Rect roomPixelRect = new Rect(16 * roomRect.xMin, 16 * roomRect.yMin, 16 * roomRect.width, 16 * roomRect.height);
-    return roomPixelRect.Inset(1, 1, _ROOM_PIXEL_FUDGE_FACTOR, 1);
+    return roomPixelRect.Inset(1, 1, _ROOM_PIXEL_FUDGE_FACTOR, 1).Inset(8);
   }
 
   public static bool FullyWithinRoom(this PlayerController pc, RoomHandler room = null)

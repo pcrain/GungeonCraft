@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.7.1 (TBD)
+- Fixed another rare edge case where Astral Projector could get the player stuck in walls
+
 ## 1.7.0 (2024-01-20)
 
 #### Features and Polish:
