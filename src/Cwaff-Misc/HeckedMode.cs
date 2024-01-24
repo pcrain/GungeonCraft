@@ -535,36 +535,41 @@ public static class HeckedMode
     {
         if (enemy.aiShooter is not AIShooter shooter)
         {
-            if (/*true || */!C.DEBUG_BUILD)
+            if (!C.DEBUG_BUILD)
                 return;  // disable extra guns outside the debug build for now
-            _BulletKin ??= EnemyDatabase.GetOrLoadByGuid(Enemies.BulletKin)/*.ClonePrefab()*/;
+            _BulletKin ??= EnemyDatabase.GetOrLoadByGuid(Enemies.BulletKin);
             if (!enemy.gameObject.GetComponent<AIBulletBank>())
                 enemy.gameObject.AddComponent<AIBulletBank>().CopyAIBulletBank(_BulletKin.bulletBank);
             shooter = enemy.gameObject.AddComponent<AIShooter>();
             shooter.CopyAIShooter(_BulletKin.aiShooter);
             shooter.RegenerateCache();
-            // ETGModConsole.Log($"  have a shooter now? {(enemy.aiShooter == null ? "no" : "yes")}");
 
             shooter.equippedGunId = replacementGun.PickupObjectId;
             shooter.customShootCooldownPeriod = 0f;
             shooter.bulletName = null;
 
-            // ETGModConsole.Log($"got spec {shooter.behaviorSpeculator.aiActor.ActorName}");
-            foreach (AttackBehaviorBase myAttack in shooter.behaviorSpeculator.AttackBehaviors)
-                shooter.behaviorSpeculator.m_behaviors.Remove(myAttack);
-            shooter.behaviorSpeculator.AttackBehaviors.Clear();
+            if ((shooter.behaviorSpeculator.TargetBehaviors?.Count ?? 0) == 0)
+            {
+                shooter.RegenerateCache();
+                TargetEnemiesBehavior targetEnemies = new TargetEnemiesBehavior{};
+                shooter.behaviorSpeculator.TargetBehaviors = new(){targetEnemies};
+                targetEnemies.Init(enemy.gameObject, enemy, shooter);
+                targetEnemies.Start();
+                shooter.behaviorSpeculator.m_behaviors.Add(targetEnemies);
+                shooter.RegenerateCache();
+            }
+            // foreach (AttackBehaviorBase myAttack in shooter.behaviorSpeculator.AttackBehaviors)
+            //     shooter.behaviorSpeculator.m_behaviors.Remove(myAttack);
+            // shooter.behaviorSpeculator.AttackBehaviors.Clear();
             foreach (AttackBehaviorBase defaultAttack in _BulletKin.aiShooter.behaviorSpeculator.AttackBehaviors)
             {
                 if (defaultAttack is not ShootGunBehavior defaultPewpew)
                     continue;
-                // ETGModConsole.Log($"arming a {enemy.ActorName}");
                 ShootGunBehavior myPewpew = defaultPewpew.CopyShootGunBehavior();
                 myPewpew.m_behaviorSpeculator = shooter.behaviorSpeculator;
                 shooter.behaviorSpeculator.AttackBehaviors.Add(myPewpew);
                 myPewpew.Init(enemy.gameObject, enemy, shooter);
                 myPewpew.Start();
-                // ETGModConsole.Log($"  with a {shooter.EquippedGun?.EncounterNameOrDisplayName}");
-                // ETGModConsole.Log($"  with a {shooter.CurrentGun?.EncounterNameOrDisplayName}");
                 shooter.behaviorSpeculator.m_behaviors.Add(myPewpew);
                 break;
             }
@@ -572,19 +577,11 @@ public static class HeckedMode
             shooter.RegenerateCache();
             shooter.behaviorSpeculator.aiActor = enemy;
             foreach (MovementBehaviorBase move in shooter.behaviorSpeculator.MovementBehaviors)
-            {
-                // ETGModConsole.Log($"  fixing movement behavior1");
                 move.m_aiActor = enemy;
-            }
             shooter.RegenerateCache();
             // shooter.behaviorSpeculator./*Fully*/RefreshBehaviors();
             // shooter.RegenerateCache();
         }
-        else
-        {
-            // ETGModConsole.Log($"already armed: {enemy.ActorName}");
-        }
-        // enemy.gameObject.DumpComponents();
 
         // if (replacementGun?.DefaultModule?.projectiles?[0] is not Projectile)
         // {
