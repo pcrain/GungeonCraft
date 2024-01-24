@@ -293,6 +293,11 @@ public static class HeckedMode
         _InitializeShootHook = new Hook(
             typeof(AIShooter).GetMethod("Initialize", BindingFlags.Public | BindingFlags.Instance),
             typeof(HeckedMode).GetMethod("OnInitializeShooter"));
+
+        new Hook(
+            typeof(AIShooter).GetMethod("ToggleGunRenderers", BindingFlags.Public | BindingFlags.Instance),
+            typeof(HeckedMode).GetMethod("ToggleGunRenderers", BindingFlags.NonPublic | BindingFlags.Static));
+
         // _EnemyShootHook = new Hook(
         //     typeof(AIShooter).GetMethod("Shoot", BindingFlags.Public | BindingFlags.Instance),
         //     typeof(HeckedMode).GetMethod("OnEnemyShoot"));
@@ -312,6 +317,12 @@ public static class HeckedMode
     //     }
     //     action(shooter, overrideBulletName);
     // }
+
+    private static void ToggleGunRenderers(Action<AIShooter, bool, string> orig, AIShooter shooter, bool value, string reason)
+    {
+        // ETGModConsole.Log($"toggling gun renderers for {shooter.aiActor.ActorName} with gun {shooter.CurrentGun} and hand {(shooter.handObject == null ? "false" : "true")}");
+        orig(shooter, value, reason);
+    }
 
     // disable prefire animations in hecked mode since they mess with fire rate
     private static bool HeckedModeShouldSkipPrefireAnimationCheck(ShootGunBehavior sgb, string s)
@@ -358,7 +369,10 @@ public static class HeckedMode
     // Removes some player-only components from guns to make them work with AI
     public static void OnInitializeShooter(Action<AIShooter> orig, AIShooter shooter)
     {
+        // ETGModConsole.Log($"    initializing aishooter for {shooter.aiActor.ActorName}");
+        // ETGModConsole.Log($"      EquippedGun {shooter.EquippedGun?.EncounterNameOrDisplayName}");
         orig(shooter);
+        // ETGModConsole.Log($"      CurrentGun {shooter.CurrentGun?.EncounterNameOrDisplayName}");
         if (shooter?.CurrentGun is not Gun gun)
             return;
         gun.GetComponent<HoveringGunSynergyProcessor>().SafeDestroy();                 // fix Blooper, etc.
@@ -373,10 +387,204 @@ public static class HeckedMode
         }
     }
 
+    private static void CopyAIBulletBank(this AIBulletBank me, AIBulletBank other)
+    {
+        // me.Name                             = other.Name;
+        // me.BulletObject                     = other.BulletObject;
+        // me.OverrideProjectile               = other.OverrideProjectile;
+        // me.ProjectileData                   = other.ProjectileData;
+        // me.PlayAudio                        = other.PlayAudio;
+        // me.AudioSwitch                      = other.AudioSwitch;
+        // me.AudioEvent                       = other.AudioEvent;
+        // me.AudioLimitOncePerFrame           = other.AudioLimitOncePerFrame;
+        // me.AudioLimitOncePerAttack          = other.AudioLimitOncePerAttack;
+        // me.MuzzleFlashEffects               = other.MuzzleFlashEffects;
+        // me.MuzzleLimitOncePerFrame          = other.MuzzleLimitOncePerFrame;
+        // me.MuzzleInheritsTransformDirection = other.MuzzleInheritsTransformDirection;
+        // me.SpawnShells                      = other.SpawnShells;
+        // me.ShellTransform                   = other.ShellTransform;
+        // me.ShellPrefab                      = other.ShellPrefab;
+        // me.ShellForce                       = other.ShellForce;
+        // me.ShellForceVariance               = other.ShellForceVariance;
+        // me.DontRotateShell                  = other.DontRotateShell;
+        // me.ShellGroundOffset                = other.ShellGroundOffset;
+        // me.ShellsLimitOncePerFrame          = other.ShellsLimitOncePerFrame;
+        // me.rampBullets                      = other.rampBullets;
+        // me.rampStartHeight                  = other.rampStartHeight;
+        // me.rampTime                         = other.rampTime;
+        // me.conditionalMinDegFromNorth       = other.conditionalMinDegFromNorth;
+        // me.forceCanHitEnemies               = other.forceCanHitEnemies;
+        // me.suppressHitEffectsIfOffscreen    = other.suppressHitEffectsIfOffscreen;
+        // me.preloadCount                     = other.preloadCount;
+        // me.m_playedAudioThisFrame           = other.m_playedAudioThisFrame;
+        // me.m_playedEffectsThisFrame         = other.m_playedEffectsThisFrame;
+        // me.m_playedShellsThisFrame          = other.m_playedShellsThisFrame;
+        me.Bullets                          = other.Bullets;
+        me.useDefaultBulletIfMissing        = other.useDefaultBulletIfMissing;
+        me.transforms                       = other.transforms;
+        me.OnProjectileCreated              = other.OnProjectileCreated;
+        me.OnProjectileCreatedWithSource    = other.OnProjectileCreatedWithSource;
+        me.FixedPlayerPosition              = other.FixedPlayerPosition;
+    }
+
+    private static void CopyAIShooter(this AIShooter me, AIShooter other)
+    {
+        me.volley                           = other.volley;
+        me.equippedGunId                    = other.equippedGunId;
+        me.shouldUseGunReload               = other.shouldUseGunReload;
+        me.volleyShellCasing                = other.volleyShellCasing;
+        me.volleyShootVfx                   = other.volleyShootVfx;
+        me.usesOctantShootVFX               = other.usesOctantShootVFX;
+        me.bulletName                       = other.bulletName;
+        me.customShootCooldownPeriod        = other.customShootCooldownPeriod;
+        me.doesScreenShake                  = other.doesScreenShake;
+        me.rampBullets                      = other.rampBullets;
+        me.rampStartHeight                  = other.rampStartHeight;
+        me.rampTime                         = other.rampTime;
+        me.overallGunAttachOffset           = other.overallGunAttachOffset;
+        me.flippedGunAttachOffset           = other.flippedGunAttachOffset;
+        me.handObject                       = other.handObject;
+        me.AllowTwoHands                    = other.AllowTwoHands;
+        me.ForceGunOnTop                    = other.ForceGunOnTop;
+        me.IsReallyBigBoy                   = other.IsReallyBigBoy;
+        me.BackupAimInMoveDirection         = other.BackupAimInMoveDirection;
+        me.PostProcessProjectile            = other.PostProcessProjectile;
+
+        me.volleyShootPosition     = null; // other.volleyShootPosition;
+        me.volleyShellTransform    = null; // other.volleyShellTransform;
+        me.bulletScriptAttachPoint = null; // other.bulletScriptAttachPoint;
+
+        // need our own attach point transforms so we don't muck up bulletkin
+        GameObject g         = new GameObject("attachyboi");
+        g.transform.position = me.transform.position;
+        g.transform.parent   = me.transform;
+        me.gunAttachPoint    = g.transform;
+        // me.gunAttachPoint          = other.gunAttachPoint;
+
+        // me.volleyShootPosition     = null; //me.gameObject.AddChild(new GameObject());// other.volleyShootPosition?.position ?? Vector3.zero;
+        // me.volleyShellTransform    = null; //me.gameObject.AddChild(new GameObject());// other.volleyShellTransform?.position ?? Vector3.zero;
+        // me.gunAttachPoint          = null; //me.gameObject.AddChild(new GameObject());// other.gunAttachPoint?.position ?? Vector3.zero;
+        // me.bulletScriptAttachPoint = null; //me.gameObject.AddChild(new GameObject());// other.bulletScriptAttachPoint?.position ?? Vector3.zero;
+
+        // me.volleyShootPosition.position     = other.volleyShootPosition?.position ?? Vector3.zero;
+        // me.volleyShellTransform.position    = other.volleyShellTransform?.position ?? Vector3.zero;
+        // me.gunAttachPoint.position          = other.gunAttachPoint?.position ?? Vector3.zero;
+        // me.bulletScriptAttachPoint.position = other.bulletScriptAttachPoint?.position ?? Vector3.zero;
+    }
+
+    private static ShootGunBehavior CopyShootGunBehavior(this ShootGunBehavior other)
+    {
+        return new ShootGunBehavior{
+            Cooldown                         = other.Cooldown,
+            CooldownVariance                 = other.CooldownVariance,
+            AttackCooldown                   = other.AttackCooldown,
+            GlobalCooldown                   = other.GlobalCooldown,
+            InitialCooldown                  = other.InitialCooldown,
+            InitialCooldownVariance          = other.InitialCooldownVariance,
+            GroupName                        = other.GroupName,
+            GroupCooldown                    = other.GroupCooldown,
+            MinRange                         = other.MinRange,
+            Range                            = other.Range,
+            MinWallDistance                  = other.MinWallDistance,
+            MaxEnemiesInRoom                 = other.MaxEnemiesInRoom,
+            MinHealthThreshold               = other.MinHealthThreshold,
+            MaxHealthThreshold               = other.MaxHealthThreshold,
+            HealthThresholds                 = other.HealthThresholds,
+            AccumulateHealthThresholds       = other.AccumulateHealthThresholds,
+            targetAreaStyle                  = other.targetAreaStyle,
+            IsBlackPhantom                   = other.IsBlackPhantom,
+            resetCooldownOnDamage            = other.resetCooldownOnDamage,
+            RequiresLineOfSight              = other.RequiresLineOfSight,
+            MaxUsages                        = other.MaxUsages,
+            m_cooldownTimer                  = other.m_cooldownTimer,
+            m_resetCooldownOnDamageCooldown  = other.m_resetCooldownOnDamageCooldown,
+            // m_behaviorSpeculator             = other.m_behaviorSpeculator,
+            m_healthThresholdCredits         = other.m_healthThresholdCredits,
+            m_lowestRecordedHealthPercentage = other.m_lowestRecordedHealthPercentage,
+            m_numTimesUsed                   = other.m_numTimesUsed,
+
+            GroupCooldownVariance            = other.GroupCooldownVariance,
+            LineOfSight                      = other.LineOfSight,
+            WeaponType                       = other.WeaponType,
+            OverrideBulletName               = other.OverrideBulletName,
+            BulletScript                     = other.BulletScript,
+            FixTargetDuringAttack            = other.FixTargetDuringAttack,
+            StopDuringAttack                 = other.StopDuringAttack,
+            LeadAmount                       = other.LeadAmount,
+            LeadChance                       = other.LeadChance,
+            RespectReload                    = other.RespectReload,
+            MagazineCapacity                 = other.MagazineCapacity,
+            ReloadSpeed                      = other.ReloadSpeed,
+            EmptiesClip                      = other.EmptiesClip,
+            SuppressReloadAnim               = other.SuppressReloadAnim,
+            TimeBetweenShots                 = other.TimeBetweenShots,
+            PreventTargetSwitching           = other.PreventTargetSwitching,
+            OverrideAnimation                = other.OverrideAnimation,
+            OverrideDirectionalAnimation     = other.OverrideDirectionalAnimation,
+            HideGun                          = other.HideGun,
+            UseLaserSight                    = other.UseLaserSight,
+            UseGreenLaser                    = other.UseGreenLaser,
+            PreFireLaserTime                 = other.PreFireLaserTime,
+            AimAtFacingDirectionWhenSafe     = other.AimAtFacingDirectionWhenSafe,
+        };
+    }
+
+
+    private static AIActor _BulletKin = null;
     public static void HeckedShootGunBehavior(this AIActor enemy, Gun replacementGun)
     {
         if (enemy.aiShooter is not AIShooter shooter)
-            return;
+        {
+            if (/*true || */!C.DEBUG_BUILD)
+                return;  // disable extra guns outside the debug build for now
+            _BulletKin ??= EnemyDatabase.GetOrLoadByGuid(Enemies.BulletKin)/*.ClonePrefab()*/;
+            if (!enemy.gameObject.GetComponent<AIBulletBank>())
+                enemy.gameObject.AddComponent<AIBulletBank>().CopyAIBulletBank(_BulletKin.bulletBank);
+            shooter = enemy.gameObject.AddComponent<AIShooter>();
+            shooter.CopyAIShooter(_BulletKin.aiShooter);
+            shooter.RegenerateCache();
+            // ETGModConsole.Log($"  have a shooter now? {(enemy.aiShooter == null ? "no" : "yes")}");
+
+            shooter.equippedGunId = replacementGun.PickupObjectId;
+            shooter.customShootCooldownPeriod = 0f;
+            shooter.bulletName = null;
+
+            // ETGModConsole.Log($"got spec {shooter.behaviorSpeculator.aiActor.ActorName}");
+            foreach (AttackBehaviorBase myAttack in shooter.behaviorSpeculator.AttackBehaviors)
+                shooter.behaviorSpeculator.m_behaviors.Remove(myAttack);
+            shooter.behaviorSpeculator.AttackBehaviors.Clear();
+            foreach (AttackBehaviorBase defaultAttack in _BulletKin.aiShooter.behaviorSpeculator.AttackBehaviors)
+            {
+                if (defaultAttack is not ShootGunBehavior defaultPewpew)
+                    continue;
+                // ETGModConsole.Log($"arming a {enemy.ActorName}");
+                ShootGunBehavior myPewpew = defaultPewpew.CopyShootGunBehavior();
+                myPewpew.m_behaviorSpeculator = shooter.behaviorSpeculator;
+                shooter.behaviorSpeculator.AttackBehaviors.Add(myPewpew);
+                myPewpew.Init(enemy.gameObject, enemy, shooter);
+                myPewpew.Start();
+                // ETGModConsole.Log($"  with a {shooter.EquippedGun?.EncounterNameOrDisplayName}");
+                // ETGModConsole.Log($"  with a {shooter.CurrentGun?.EncounterNameOrDisplayName}");
+                shooter.behaviorSpeculator.m_behaviors.Add(myPewpew);
+                break;
+            }
+
+            shooter.RegenerateCache();
+            shooter.behaviorSpeculator.aiActor = enemy;
+            foreach (MovementBehaviorBase move in shooter.behaviorSpeculator.MovementBehaviors)
+            {
+                // ETGModConsole.Log($"  fixing movement behavior1");
+                move.m_aiActor = enemy;
+            }
+            shooter.RegenerateCache();
+            // shooter.behaviorSpeculator./*Fully*/RefreshBehaviors();
+            // shooter.RegenerateCache();
+        }
+        else
+        {
+            // ETGModConsole.Log($"already armed: {enemy.ActorName}");
+        }
+        // enemy.gameObject.DumpComponents();
 
         // if (replacementGun?.DefaultModule?.projectiles?[0] is not Projectile)
         // {
@@ -406,6 +614,8 @@ public static class HeckedMode
         {
             if (attack is not ShootGunBehavior pewpew)
                 continue;
+
+            // ETGModConsole.Log($"  givem a gun!");
 
             // ETGModConsole.Log($"  found attack behavior with cooldown {pewpew.Cooldown}");
             pewpew.WeaponType            = WeaponType.AIShooterProjectile;

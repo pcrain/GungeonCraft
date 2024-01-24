@@ -873,6 +873,8 @@ public static class Extensions
   public static void FullyRefreshBehaviors(this BehaviorSpeculator self)
   {
     self.m_behaviors.Clear();
+    if (self.aiActor == null)
+      ETGModConsole.Log($"  null actor!");
     self.RefreshBehaviors();
   }
 
