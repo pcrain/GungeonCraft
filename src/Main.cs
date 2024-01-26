@@ -3,23 +3,23 @@
     global using System.Collections;
     global using System.Collections.Generic;
     global using System.Linq;
-    global using System.Text;
+    // global using System.Text;
     global using System.Text.RegularExpressions;
     global using System.Reflection;
-    global using System.Runtime;
+    // global using System.Runtime;
     global using System.Collections.ObjectModel;
     global using System.IO;
-    global using System.Globalization; // CultureInfo
+    // global using System.Globalization; // CultureInfo
     global using System.ComponentModel;  // Debug stuff
-    global using System.Runtime.InteropServices; // Audio loading
+    // global using System.Runtime.InteropServices; // Audio loading
     global using System.Threading;
 
     global using BepInEx;
     global using UnityEngine;
     global using UnityEngine.UI;
-    global using UnityEngine.Events; // UnityEventBase
+    // global using UnityEngine.Events; // UnityEventBase
     global using MonoMod.RuntimeDetour;
-    global using MonoMod.Utils;
+    // global using MonoMod.Utils;
     global using MonoMod.Cil;
     global using Mono.Cecil.Cil; //Instruction
     global using SGUI;
@@ -32,7 +32,7 @@
     global using HutongGames.PlayMaker.Actions; //FSM___ stuff
     global using Alexandria.ItemAPI;
     global using Alexandria.EnemyAPI;
-    global using Alexandria.DungeonAPI;
+    // global using Alexandria.DungeonAPI;
     global using Alexandria.Misc;
     global using Alexandria.NPCAPI;
     global using Brave.BulletScript;

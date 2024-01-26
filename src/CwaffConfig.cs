@@ -1,7 +1,5 @@
 namespace CwaffingTheGungy;
 
-using Gunfiguration;
-
 public static class CwaffConfig
 {
   internal static Gunfig _Gunfig = null;

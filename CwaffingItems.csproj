@@ -4372,16 +4372,15 @@
     <Reference Include="UnityEngine.SpatialTracking"/>
     <Reference Include="UnityEngine.TilemapModule"/>
     <Reference Include="UnityEngine.ImageConversionModule"/>
-    <Reference Include="Gunfig"/>
     <Reference Include="MonoMod.Utils"/>
     <Reference Include="MonoMod.RuntimeDetour"/>
     <Reference Include="Assembly-CSharp"/>
     <Reference Include="PlayMaker"/>
+    <Reference Include="Gunfig"/>
     <Reference Include="0Harmony"/>
     <Reference Include="Alexandria"/>
     <Reference Include="BepInEx"/>
     <Reference Include="ModTheGungeonAPI"/>
-    <Reference Include="Gunfig"/>
     <Reference Include="Mono.Cecil.Rocks"/>
     <Reference Include="Mono.Cecil"/>
     <Reference Include="Mono.Cecil.Pdb"/>
