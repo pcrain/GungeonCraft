@@ -146,6 +146,10 @@ done <<< $(find "packages" -path "*net35*.dll" | sed -r 's@/@\\@g')
 if [ $USEXTERNALASSEMBLY -eq 1 ]; then
   maindll=$(echo -e "<Reference Include=\"Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL\">\n  <SpecificVersion>False</SpecificVersion>\n  <HintPath>/xmedia/pretzel/Steam/steamapps/common/Enter the Gungeon/EtG_Data/Managed/Assembly-CSharp.dll</HintPath>\n</Reference>")
   includes+=("${maindll}")
+else
+  : # unsuccessful hacks to get lsp working
+  # maindll=$(echo -e "<Reference Include=\"Assembly-CSharp-Full, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL\"><SpecificVersion>False</SpecificVersion><HintPath>/xmedia/pretzel/Steam/steamapps/common/Enter the Gungeon/EtG_Data/Managed/Assembly-CSharp.dll</HintPath></Reference>")
+  # includes+=("${maindll}")
 fi
 
 #Generate the template .csproj file (FrameworkPathOverride points to the .NET 3.5 development packages)
@@ -272,7 +276,8 @@ if [ $rebuild -eq 1 ]; then
 
   #Actually rebuild the project
   echo -e "[${GRN}>${BLN}] Building project"
-  dotnet build --no-restore -m -noLogo -warnAsMessage:"${nowarn}" -v:minimal -clp:"Summary"
+  # cat "${projfile}" | sed '/Assembly-CSharp-Full/,+3d' > "${projfile}.fixed"
+  dotnet build --no-restore -m -noLogo -warnAsMessage:"${nowarn}" -v:minimal -clp:"Summary" # "${projfile}.fixed"
   error="$?"
   killall dotnet >/dev/null 2>&1 # fixes a dumb bug where the child process doesn't terminate...thanks microsoft D:
   # dotnet build -m -noLogo -warnAsMessage:"${nowarn}" -v:minimal -clp:"Summary;Verbosity=minimal"

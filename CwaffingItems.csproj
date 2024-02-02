@@ -112,6 +112,7 @@
     <Compile Include="src\Cwaff-Actives\GasterBlaster.cs"/>
     <Compile Include="src\Cwaff-Actives\InsurancePolicy.cs"/>
     <Compile Include="src\Cwaff-Actives\Itemfinder.cs"/>
+    <Compile Include="src\Cwaff-Actives\Protractor.cs"/>
     <Compile Include="src\Hotfixes.cs"/>
     <Compile Include="src\Cwaff-Guns\Lightwing.cs"/>
     <Compile Include="src\Cwaff-Guns\VacuumCleaner.cs"/>
@@ -153,6 +154,7 @@
     <Compile Include="src\Cwaff-Guns\Natascha.cs"/>
     <Compile Include="src\Cwaff-Guns\Wavefront.cs"/>
     <Compile Include="src\Cwaff-Guns\Pincushion.cs"/>
+    <Compile Include="src\Cwaff-Guns\Suncaster.cs"/>
     <Compile Include="src\Cwaff-Guns\CarpetBomber.cs"/>
     <Compile Include="src\Cwaff-Guns\Ticonderogun.cs"/>
     <Compile Include="src\Cwaff-Guns\SchrodingersGat.cs"/>
@@ -3442,6 +3444,7 @@
     <EmbeddedResource Include="Resources\ItemSprites\stop_sign_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\itemfinder_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\kalibers_justice_icon.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\protractor_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\curators_badge_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\drifters_headgear_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\ice_cream_icon.png"/>

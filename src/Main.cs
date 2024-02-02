@@ -232,6 +232,7 @@ public class Initialisation : BaseUnityPlugin
                 RingOfDefenestration.Init();
                 StopSign.Init();
                 AmmoConservationManual.Init();
+                Protractor.Init();
                 setupPassivesWatch.Stop();
             #endregion
 
