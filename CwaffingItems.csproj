@@ -233,6 +233,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_5_gun_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_reload_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_5_gun_024.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\vladimir_charge_005.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\bouncer_fire_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\quarter_pounder_reload_008.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_3_gun_016.json"/>
@@ -313,6 +314,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_036.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\missiletoe_fire_009.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_024.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\vladimir_charge_005.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\lightwing_reload_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_007.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_fire_014.json"/>
@@ -606,6 +608,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_trimmed_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_fire_011.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_006.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\vladimir_fire_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_reload_007.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\scotsman_fire_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_027.json"/>
@@ -661,6 +664,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_013.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\missiletoe_fire_012.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_reload_014.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\vladimir_fire_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_fire_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\wavefront_reload_024.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_fire_014.json"/>
@@ -697,6 +701,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\platinum_star_reload_023.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_018.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\platinum_star_reload_021.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\vladimir_fire_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_1_gun_020.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_2_gun_020.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_trimmed_039.png"/>
@@ -920,6 +925,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\natascha_fire_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_reload_015.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\platinum_star_fire_004.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\vladimir_charge_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_045.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_reload_022.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_013.png"/>
@@ -1050,6 +1056,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_025.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_reload_014.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\vladimir_charge_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\scotsman_fire_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_fire_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_047.png"/>
@@ -1355,6 +1362,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_reload_011.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\missiletoe_fire_012.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\bouncer_reload_013.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\vladimir_charge_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_reload_026.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_029.png"/>
@@ -1488,6 +1496,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_charge_008.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_042.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\uppskeruvel_reload_023.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\vladimir_charge_007.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_fire_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\glockarina_reload_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_027.png"/>
@@ -1578,6 +1587,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\aimu_hakurei_fire_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\uppskeruvel_reload_019.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\ticonderogun_charge_001.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\vladimir_charge_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_021.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_charge_009.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_6_gun_010.png"/>
@@ -1610,6 +1620,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_fire_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\ki_blast_fire_alt_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_1_gun_008.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\vladimir_charge_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_006.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alligator_reload_026.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_009.png"/>
@@ -1716,6 +1727,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_026.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_012.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_1_gun_014.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\vladimir_charge_006.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_013.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alyx_reload_011.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_fire_009.json"/>
@@ -1744,6 +1756,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\ticonderogun_charge_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_reload_010.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\crapshooter_reload_025.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\vladimir_charge_008.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alligator_reload_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_idle_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_029.png"/>
@@ -1814,6 +1827,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_fire_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\platinum_star_idle_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_002.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\vladimir_fire_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_trimmed_020.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_016.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_fire_009.json"/>
@@ -1913,6 +1927,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\bouncer_reload_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\lightwing_reload_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\glockarina_reload_010.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\vladimir_charge_007.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\crapshooter_reload_006.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_010.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_047.json"/>
@@ -1940,6 +1955,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\crapshooter_reload_017.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\lightwing_idle_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_011.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\vladimir_charge_006.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_009.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\crapshooter_reload_021.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\lightwing_reload_014.json"/>
@@ -2049,6 +2065,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\iron_maid_reload_008.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\aimu_hakurei_idle_trimmed_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\crapshooter_reload_029.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\vladimir_reload_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\crapshooter_fire_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tennis_rocket_gun_fire_007.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_005.png"/>
@@ -2091,6 +2108,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_fire_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\wavefront_fire_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\lightwing_reload_029.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\vladimir_fire_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\natascha_reload_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_3_gun_011.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_038.json"/>
@@ -2262,6 +2280,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_fire_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_024.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_020.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\vladimir_charge_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_charge_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_6_gun_017.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\quarter_pounder_fire_004.json"/>
@@ -2432,6 +2451,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\alligator_fire_008.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_fire_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_047.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\vladimir_idle_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_012.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_006.json"/>
@@ -2483,6 +2503,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\crapshooter_reload_019.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\quarter_pounder_reload_011.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_trimmed_010.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\vladimir_fire_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_019.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_reload_013.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\crapshooter_fire_003.png"/>
@@ -2539,6 +2560,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_047.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_reload_017.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\missiletoe_idle_001.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\vladimir_idle_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\missiletoe_reload_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_fire_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_reload_007.png"/>
@@ -2572,6 +2594,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_052.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_006.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_029.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\vladimir_charge_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_4_gun_023.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\uppskeruvel_reload_005.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_014.json"/>
@@ -2747,6 +2770,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\lightwing_reload_025.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_5_gun_018.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\kings_law_idle_trimmed_001.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\vladimir_charge_008.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_039.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_030.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_reload_001.json"/>
@@ -2765,6 +2789,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_048.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\uppskeruvel_reload_009.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_019.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\vladimir_reload_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\quarter_pounder_idle_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_020.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_trimmed_003.png"/>
@@ -2938,6 +2963,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_013.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_reload_005.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_idle_001.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\vladimir_charge_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\lightwing_reload_008.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hand_cannon_reload_006.json"/>
@@ -3108,6 +3134,7 @@
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_aimu1.png"/>
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_gunbrella1.png"/>
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_kings_law3.png"/>
+    <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_vladimir3.png"/>
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_outbreak3.png"/>
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_chekhovs_gun1.png"/>
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_lightwing4.png"/>
@@ -3118,6 +3145,7 @@
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_deadline1.png"/>
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_b_b_gun8.png"/>
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_subtractor_beam2.png"/>
+    <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_vladimir1.png"/>
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_alyx4.png"/>
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_hand_cannon3.png"/>
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_hand_cannon1.png"/>
@@ -3130,7 +3158,9 @@
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_subtractor_beam1.png"/>
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_kings_law7.png"/>
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_natascha4.png"/>
+    <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_vladimir4.png"/>
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_lightwing3.png"/>
+    <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_vladimir2.png"/>
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_kings_law14.png"/>
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_kings_law4.png"/>
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_b_b_gun2.png"/>
@@ -3150,6 +3180,7 @@
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_kings_law9.png"/>
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_gunbrella2.png"/>
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_b_b_gun6.png"/>
+    <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_vladimir5.png"/>
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_platinum_star3.png"/>
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_outbreak1.png"/>
     <EmbeddedResource Include="Resources\MuzzleVFX\muzzle_quarter_pounder3.png"/>
@@ -3982,6 +4013,7 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\bball_old_5.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\energy_bounce4.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\glockarina_projectile5.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\vladimir_hitbox.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball008.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\coin_gun_projectile1.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\slappp3.png"/>
@@ -4211,6 +4243,7 @@
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\wavefront_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\soul_kaliber_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\glockarina_idle_001.png"/>
+    <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\vladimir_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\seltzer_pelter_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\alyx_idle_001.png"/>
     <EmbeddedResource Include="Resources\Ammonomicon Encounter Icon Collection\bouncer_idle_001.png"/>

@@ -295,6 +295,7 @@ public class Initialisation : BaseUnityPlugin
                 Wavefront.Add();
                 Scotsman.Add();
                 ChekhovsGun.Add();
+                Vladimir.Add();
                 setupGunsWatch.Stop();
             #endregion
 

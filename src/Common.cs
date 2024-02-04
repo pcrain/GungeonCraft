@@ -352,6 +352,7 @@ public class SpawnObjectManager : MonoBehaviour // stolen from nn
 
         return newObject;
     }
+
     private static void CorrectForWalls(GameObject portal)
     {
         SpeculativeRigidbody rigidbody = portal.GetComponent<SpeculativeRigidbody>();
@@ -374,7 +375,7 @@ public class SpawnObjectManager : MonoBehaviour // stolen from nn
                     return;
             }
         }
-        UnityEngine.Debug.LogError("FREEZE AVERTED!  TELL RUBEL!  (you're welcome) 147");
+        // UnityEngine.Debug.LogError("FREEZE AVERTED!  TELL RUBEL!  (you're welcome) 147");
     }
 }
 

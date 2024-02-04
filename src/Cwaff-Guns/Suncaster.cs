@@ -112,7 +112,7 @@ public class SuncasterPrism : MonoBehaviour
       Suncaster._ExtantPrisms.Add(this);
     }
 
-    private void Destroy()
+    private void OnDestroy()
     {
       Suncaster._ExtantPrisms.Remove(this);
     }
