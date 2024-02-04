@@ -715,7 +715,20 @@ public class FancyVFX : MonoBehaviour
         this._setup = true;
     }
 
-    // Make a new FancyVFX from a normal SpawnManager.SpawnVFX
+    /// <summary>Spawn a single FancyVFX from a normal SpawnManager.SpawnVFX</summary>
+    /// <param name="prefab">Prefab for the VFX we want to spawn</param>
+    /// <param name="position">Position at which the VFX is spawned</param>
+    /// <param name="rotation">Rotation of the VFX sprite.</param>
+    /// <param name="velocity">Velocity with which the VFX is launched</param>
+    /// <param name="lifetime">Time before VFX automatically despawn. Set to 0 for no automatic despawning.</param>
+    /// <param name="fadeOutTime">Time before VFX fade out to 0 alpha. If greater than lifetime, VFX will spawn in partially faded. Disabled if null.</param>
+    /// <param name="parent">If non-null, VFX will automatically move with the parent transform.</param>
+    /// <param name="emissivePower">Emissive power of the VFX.</param>
+    /// <param name="emissiveColor">Emissive color of the VFX.</param>
+    /// <param name="fadeIn">If true, VFX will fade in instead of fading out.</param>
+    /// <param name="startScale">Starting scale of the VFX sprite.</param>
+    /// <param name="endScale">Ending scale of the VFX sprite.</param>
+    /// <param name="height">Height of the VFX above the ground. Positive = in front of most things, negative = behind most things.</param>
     public static FancyVFX Spawn(GameObject prefab, Vector3 position, Quaternion? rotation = null,
         Vector2? velocity = null, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0, Color? emissiveColor = null,
         bool fadeIn = false, float startScale = 1.0f, float endScale = 1.0f, float? height = null)
@@ -742,10 +755,38 @@ public class FancyVFX : MonoBehaviour
         AwayRadial,   // base velocity is augmented by a vector away from position with magnitude of exactly velocityVariance
     }
 
-    // Spawn a burst of VFX
+    /// <summary>Spawn a burst of FancyVFX</summary>
+    /// <param name="prefab">Prefab for the VFX we want to spawn</param>
+    /// <param name="numToSpawn">Number of VFX to spawn</param>
+    /// <param name="basePosition">Anchor position from which all VFX are spawned relative to</param>
+    /// <param name="positionVariance">Maximum distance from the anchor position from which VFX will spawn</param>
+    /// <param name="baseVelocity">Anchor velocity for which all VFX are launched relative to</param>
+    /// <param name="velocityVariance">Maximum magnitude of deviance for each individual VFX from the baseVelocity</param>
+    /// <param name="velType">Relation between baseVelocity and velocityVariance. Possible values:<br/><br/>
+    ///   Random: base velocity is augmented by a random vector with magnitude between 0 and velocityVariance<br/>
+    ///   Radial: base velocity is augmented by a random vector with magnitude of exactly velocityVariance<br/>
+    ///   Away: base velocity is augmented by a vector away from position with magnitude between 0 and velocityVariance<br/>
+    ///   AwayRadial base velocity is augmented by a vector away from position with magnitude of exactly velocityVariance<br/>
+    /// </param>
+    /// <param name="rotType">How the VFX are rotated. Possible values:<br/><br/>
+    ///   None: do note rotate the VFX<br/>
+    ///   Random: rotate the VFX randomly<br/>
+    ///   Position rotation matches the VFX's position relative to the base position<br/>
+    ///   Velocity rotation matches the VFX's velocity<br/>
+    /// </param>
+    /// <param name="lifetime">Time before VFX automatically despawn. Set to 0 for no automatic despawning.</param>
+    /// <param name="fadeOutTime">Time before VFX fade out to 0 alpha. If greater than lifetime, VFX will spawn in partially faded. Disabled if null.</param>
+    /// <param name="parent">If non-null, VFX will automatically move with the parent transform.</param>
+    /// <param name="emissivePower">Emissive power of the VFX.</param>
+    /// <param name="emissiveColor">Emissive color of the VFX.</param>
+    /// <param name="fadeIn">If true, VFX will fade in instead of fading out.</param>
+    /// <param name="uniform">If true, VFX will spawn with uniform angles around basePosition with magnitude positionVariance.</param>
+    /// <param name="startScale">Starting scale of the VFX sprite.</param>
+    /// <param name="endScale">Ending scale of the VFX sprite.</param>
+    /// <param name="height">Height of the VFX above the ground. Positive = in front of most things, negative = behind most things.</param>
     public static void SpawnBurst(GameObject prefab, int numToSpawn, Vector2 basePosition, float positionVariance = 0f, Vector2? baseVelocity = null, float velocityVariance = 0f,
         Vel velType = Vel.Random, Rot rotType = Rot.None, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0,
-        Color? emissiveColor = null, bool fadeIn = false, bool uniform = false)
+        Color? emissiveColor = null, bool fadeIn = false, bool uniform = false, float startScale = 1.0f, float endScale = 1.0f, float? height = null)
     {
         Vector2 realBaseVelocity = baseVelocity ?? Vector2.zero;
         float baseAngle = Lazy.RandomAngle();
@@ -753,7 +794,7 @@ public class FancyVFX : MonoBehaviour
         {
             float posOffsetAngle = uniform ? (baseAngle + 360f * ((float)i / numToSpawn)).Clamp360() : Lazy.RandomAngle();
             Vector2 finalpos = (positionVariance > 0)
-                ? basePosition + posOffsetAngle.ToVector(UnityEngine.Random.value * positionVariance)
+                ? basePosition + posOffsetAngle.ToVector((uniform ? 1f : UnityEngine.Random.value) * positionVariance)
                 : basePosition;
             Vector2 velocity = velType switch {
                 Vel.Random     => realBaseVelocity + Lazy.RandomAngle().ToVector(UnityEngine.Random.value * velocityVariance),
@@ -778,7 +819,11 @@ public class FancyVFX : MonoBehaviour
                 fadeOutTime   : fadeOutTime,
                 emissivePower : emissivePower,
                 emissiveColor : emissiveColor,
-                parent        : parent);
+                parent        : parent,
+                startScale    : startScale,
+                endScale      : endScale,
+                height        : height
+                );
         }
     }
 

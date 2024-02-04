@@ -1209,4 +1209,52 @@ public static class Extensions
     }
     return null;
   }
+
+  private static readonly SpeculativeRigidbody[] _NoRigidBodies = Enumerable.Empty<SpeculativeRigidbody>().ToArray();
+  // Determine whether a SpeculativeRigidBodsy is inside a wall
+  public static bool InsideWall(this SpeculativeRigidbody body)
+  {
+    return PhysicsEngine.Instance.OverlapCast(
+      rigidbody              : body,
+      overlappingCollisions  : null,
+      collideWithTiles       : true,
+      collideWithRigidbodies : false,
+      overrideCollisionMask  : null,
+      ignoreCollisionMask    : null,
+      collideWithTriggers    : false,
+      overridePosition       : null,
+      rigidbodyExcluder      : null,
+      ignoreList             : _NoRigidBodies
+      );
+  }
+
+  // Move a SpeculativeRigidBody from start towards target in steps increments, stopping if we hit a wall. Returns true iff we reach our target without a wall collision.
+  public static bool MoveTowardsTargetOrWall(this SpeculativeRigidbody body, Vector2 start, Vector2 target, int steps = 10)
+  {
+      Vector2 delta        = (target - start);
+      Vector2 step         = delta / (float)steps;
+      Vector2 lastCheckPos = start;
+      tk2dSprite sprite = body.GetComponent<tk2dSprite>();
+      for (int i = 0; i < steps; ++i)
+      {
+          Vector2 checkPos = start + (i * step);
+          sprite.PlaceAtPositionByAnchor(checkPos, Anchor.MiddleCenter);
+          body.Reinitialize();
+          if (body.InsideWall())
+          {
+              body.gameObject.transform.position = lastCheckPos;
+              body.Reinitialize();
+              return false;
+          }
+          lastCheckPos = checkPos;
+      }
+      return true;
+  }
+
+  /// <summary>End a BehaviorSpeculator's stun and reset it to a new, potentially smaller value</summary>
+  public static void ResetStun(this BehaviorSpeculator bs, float duration, bool createVFX = true)
+  {
+      bs.EndStun();
+      bs.Stun(duration: duration, createVFX: createVFX);
+  }
 }

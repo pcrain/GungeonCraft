@@ -3277,6 +3277,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\siren9.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\graze_vfx1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\subtractor_beam_hit_effect2.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\vladimir_impale_projectile_vfx.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\magunet_charge_vfx1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\note_vfx_5.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\soul_link_soul2.png"/>
