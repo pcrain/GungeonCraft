@@ -1257,4 +1257,10 @@ public static class Extensions
       bs.EndStun();
       bs.Stun(duration: duration, createVFX: createVFX);
   }
+
+  /// <summary>Get the player's current damage multiplier</summary>
+  public static float DamageMult(this PlayerController p) => p.stats.GetStatValue(PlayerStats.StatType.Damage);
+
+  /// <summary>Get the player's current accuracy (spread) multiplier</summary>
+  public static float AccuracyMult(this PlayerController p) => p.stats.GetStatValue(PlayerStats.StatType.Accuracy);
 }

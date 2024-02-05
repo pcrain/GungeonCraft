@@ -190,7 +190,7 @@ public class KingsLawBullets : MonoBehaviour
 
         Vector3 baseOffset = KingsLaw._OffsetAnglesMagsAndRings[this._index];
         // offset angle can be reduced by at most half of the max depending on the player's accuracy
-        this._offsetAngle  = baseOffset.x * Mathf.Min(1.5f, 0.5f + 0.5f * this._owner.stats.GetStatValue(PlayerStats.StatType.Accuracy));
+        this._offsetAngle  = baseOffset.x * Mathf.Min(1.5f, 0.5f + 0.5f * this._owner.AccuracyMult());
         this._offsetMag    = baseOffset.y;
         this._offsetRing   = baseOffset.z;
 

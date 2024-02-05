@@ -9,7 +9,7 @@ public class Vladimir : AdvancedGunBehavior
     public static string Lore             = "TBD";
 
     internal const float _LAUNCH_FORCE                 = 150f;
-    internal const float _SKEWER_DAMAGE                = 10f;
+    internal const float _SKEWER_DAMAGE                = 14.0f;
 
     internal static List<Vector3> _IdleBarrelOffsets   = new();
     internal static List<Vector3> _ShootBarrelOffsets  = new();
@@ -28,7 +28,7 @@ public class Vladimir : AdvancedGunBehavior
             gun.SetFireAudio("vladimir_fire_sound");
 
         // TODO: make our own impact vfx
-        gun.InitProjectile(new(ammoCost: 0, clipSize: -1, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic,
+        gun.InitProjectile(new(ammoCost: 0, clipSize: -1, cooldown: 0.3f, shootStyle: ShootStyle.SemiAutomatic,
           damage: 7.0f, speed: 100f, range: 0.1f, sprite: "vladimir_hitbox")  // low range ensures the projectile dissipates swiftly
         ).SetAllImpactVFX(VFX.CreatePool("whip_particles", fps: 20, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f)
         ).Attach<VladimirProjectile>(
@@ -50,19 +50,44 @@ public class Vladimir : AdvancedGunBehavior
         UpdateOffsets();
 
         Vector2 gunPos = this.gun.barrelOffset.position.XY();
+        Vector2 gunVec = this.gun.CurrentAngle.ToVector(0.5f);
+        int skewerCount = 0;
         for (int i = this._skeweredEnemies.Count - 1; i >=0; --i)
         {
             AIActor enemy = this._skeweredEnemies[i];
-            if (enemy?.healthHaver?.IsAlive ?? false)
+            if (!(enemy?.healthHaver?.IsAlive ?? false))
             {
-                enemy.sprite.PlaceAtPositionByAnchor(gunPos.ToVector3ZisY(), Anchor.MiddleCenter);
-                enemy.specRigidbody?.Reinitialize();
-            }
-            else
                 this._skeweredEnemies.RemoveAt(i);
+                continue;
+            }
+
+            enemy.sprite.PlaceAtPositionByAnchor((gunPos - (skewerCount * gunVec)).ToVector3ZisY(), Anchor.MiddleCenter);
+            ++skewerCount;
+
+            if (!enemy.specRigidbody)
+                continue;
+
+            enemy.specRigidbody.Reinitialize();
+            PixelCollider collider = enemy.specRigidbody.PrimaryPixelCollider;
+            for (int j = StaticReferenceManager.AllProjectiles.Count - 1; j >= 0; --j)
+            {
+                Projectile proj = StaticReferenceManager.AllProjectiles[j];
+                if (proj?.specRigidbody is not SpeculativeRigidbody body)
+                    continue;
+                if (!collider.AABBOverlaps(body.PrimaryPixelCollider))
+                    continue;
+
+                LinearCastResult lcr   = LinearCastResult.Pool.Allocate();
+                lcr.Contact            = enemy.CenterPosition;
+                lcr.Normal             = Vector2.right;
+                lcr.OtherPixelCollider = body.PrimaryPixelCollider;
+                lcr.MyPixelCollider    = collider;
+                proj.ForceCollision(enemy.specRigidbody, lcr);
+                LinearCastResult.Pool.Free(ref lcr);
+            }
         }
-        this.gun.m_unswitchableGun = (this._skeweredEnemies.Count > 0);
-        this.gun.CanBeDropped = !this.gun.m_unswitchableGun;
+        bool gunLocked = (this._skeweredEnemies.Count > 0);
+        pc.inventory.GunLocked.SetOverride(ItemName, gunLocked);
     }
 
     private void UpdateOffsets()
@@ -85,34 +110,40 @@ public class Vladimir : AdvancedGunBehavior
     {
         base.OnPostFired(player, gun);
         Vector2 launchDir = gun.CurrentAngle.ToVector();
+        float damage = _SKEWER_DAMAGE * player.DamageMult();
         for (int i = this._skeweredEnemies.Count - 1; i >=0; --i)
         {
             AIActor enemy = this._skeweredEnemies[i];
             if (enemy?.healthHaver is not HealthHaver hh)
                 continue;
-            hh.ApplyDamage(damage: _SKEWER_DAMAGE, direction: launchDir, sourceName: ItemName,
+            hh.ApplyDamage(damage: damage, direction: launchDir, sourceName: ItemName,
                 damageTypes: CoreDamageTypes.None, damageCategory: DamageCategory.Normal);
             if (!hh.IsAlive)
+            {
+                enemy.specRigidbody.RegisterSpecificCollisionException(player.specRigidbody);
                 TossOff(enemy: enemy, launchDir: launchDir);
+            }
         }
 
-        if (this._power <= 0)
-            return;
+        // Old code for being able to launch projectiles back, not using for now
+        // if (this._power <= 0)
+        //     return;
 
-        Vector2 gunPos  = this.gun.barrelOffset.position.XY();
-        //TODO: use our own projectile here
-        Projectile proj = SpawnManager.SpawnProjectile(PistolWhip._PistolWhipProjectile.gameObject, gunPos, this.gun.CurrentAngle.EulerZ()
-          ).GetComponent<Projectile>();
-        proj.Owner               = player;
-        proj.collidesWithEnemies = true;
-        proj.collidesWithPlayer  = false;
-        foreach (AIActor enemy in this._skeweredEnemies)
-        {
-            if (enemy?.specRigidbody)
-                proj.specRigidbody.RegisterSpecificCollisionException(enemy.specRigidbody);
-        }
-        AkSoundEngine.PostEvent("whip_crack_sound", player.gameObject);
-        --this._power;
+        // Vector2 gunPos  = this.gun.barrelOffset.position.XY();
+        // // use our own projectile here if we ever decide to do this for real
+        // Projectile proj = SpawnManager.SpawnProjectile(PistolWhip._PistolWhipProjectile.gameObject, gunPos, this.gun.CurrentAngle.EulerZ()
+        //   ).GetComponent<Projectile>();
+        // proj.Owner               = player;
+        // proj.collidesWithEnemies = true;
+        // proj.collidesWithPlayer  = false;
+        // foreach (AIActor enemy in this._skeweredEnemies)
+        // {
+        //     if (enemy?.specRigidbody)
+        //         proj.specRigidbody.RegisterSpecificCollisionException(enemy.specRigidbody);
+        // }
+        // AkSoundEngine.PostEvent("whip_crack_sound", player.gameObject);
+        // if ((--this._power) == 0)
+        //     this.gun.sprite.gameObject.SetGlowiness(0f);
     }
 
     public void Impale(AIActor enemy)
@@ -127,8 +158,7 @@ public class Vladimir : AdvancedGunBehavior
         this._skeweredEnemies.Add(enemy);
         enemy.gameObject.AddComponent<ImpaledOnGunBehaviour>();
         enemy.behaviorSpeculator.Stun(duration: 36000f, createVFX: true);
-        this.gun.m_unswitchableGun = true;
-        this.gun.CanBeDropped = false;
+        pc.inventory.GunLocked.SetOverride(ItemName, true);
     }
 
     public void TossOff(AIActor enemy, Vector2 launchDir)
@@ -144,11 +174,14 @@ public class Vladimir : AdvancedGunBehavior
     {
         AkSoundEngine.PostEvent("subtractor_beam_fire_sound", this.gun.gameObject);
         FancyVFX.SpawnBurst(prefab: _AbsorbVFX, numToSpawn: 8, basePosition: p.SafeCenter, positionVariance: 0.2f,
-            baseVelocity: null, velocityVariance: 2f, velType: FancyVFX.Vel.AwayRadial, rotType: FancyVFX.Rot.None,
+            baseVelocity: Vector2.zero, velocityVariance: 2f, velType: FancyVFX.Vel.AwayRadial, rotType: FancyVFX.Rot.None,
             lifetime: 0.5f, fadeOutTime: 0.5f, parent: null, emissivePower: 0f, emissiveColor: null, fadeIn: false,
             uniform: true, startScale: 1.0f, endScale: 1.0f, height: null);
         p.DieInAir(suppressInAirEffects: true, allowActorSpawns: false, allowProjectileSpawns: false, killedEarly: true);
-        ++this._power;
+
+        // Old code for being able to launch projectiles back, not using for now
+        // ++this._power;
+        // this.gun.sprite.gameObject.SetGlowiness(250f);
     }
 }
 
@@ -178,8 +211,9 @@ public class VladimirProjectile : MonoBehaviour
             return;
 
         Vector2 myPos = this._projectile.SafeCenter;
-        foreach (Projectile p in StaticReferenceManager.AllProjectiles)
+        for (int i = StaticReferenceManager.AllProjectiles.Count - 1; i >= 0; --i)
         {
+            Projectile p = StaticReferenceManager.AllProjectiles[i];
             if (!p.isActiveAndEnabled)
                 continue;
             if (p.Owner is not AIActor)
@@ -187,6 +221,7 @@ public class VladimirProjectile : MonoBehaviour
             if ((myPos - p.SafeCenter).sqrMagnitude > _PROJ_GRAB_RANGE_SQR)
                 continue;
             this._gun.AbsorbProjectile(p);
+            break;
         }
     }
 

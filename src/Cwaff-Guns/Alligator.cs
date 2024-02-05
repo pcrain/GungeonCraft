@@ -216,7 +216,7 @@ public class AlligatorCableHandler : MonoBehaviour
             return;
         _LastEnergyCheck[this._ownerId] = now;
 
-        float energyOutput = this._owner.stats.GetStatValue(PlayerStats.StatType.Damage);
+        float energyOutput = this._owner.DamageMult();
         if (this._owner.IsDodgeRolling)
             energyOutput *= _ROLLING_ENERGY_BONUS;
         if (_PlayerElectrified[this._ownerId])

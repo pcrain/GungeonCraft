@@ -187,9 +187,9 @@ public class HappyIceCreamHaver : MonoBehaviour
         this._enemy.CurrentGun.sprite.HeightOffGround = 0.2f;   // render in front of the enemy
 
         if (!this._enemy.CanTargetEnemies)
-            this._enemy.CanTargetEnemies = true; // WARNING: calling these nullifies the PlayerTarget every time, so do it as little as possible
+            this._enemy.CanTargetEnemies = true; // NOTE: calling these nullifies the PlayerTarget every time, so do it as little as possible
         if (!this._enemy.CanTargetPlayers)
-            this._enemy.CanTargetPlayers = true; // WARNING: calling these nullifies the PlayerTarget every time, so do it as little as possible
+            this._enemy.CanTargetPlayers = true; // NOTE: calling these nullifies the PlayerTarget every time, so do it as little as possible
 
         if (this._enemy.aiShooter is not AIShooter shooter)
             return;

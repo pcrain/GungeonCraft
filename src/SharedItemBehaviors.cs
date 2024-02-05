@@ -987,7 +987,7 @@ public class OwnerConnectLightningModifier : MonoBehaviour // mostly stolen from
         if (owner is PlayerController)
         {
             float damage = DamagePerTick;
-            damage *= self.ProjectilePlayerOwner().stats.GetStatValue(PlayerStats.StatType.Damage);
+            damage *= self.ProjectilePlayerOwner().DamageMult();
             for (int i = 0; i < StaticReferenceManager.AllEnemies.Count; i++)
             {
                 AIActor aiactor = StaticReferenceManager.AllEnemies[i];

@@ -288,7 +288,7 @@ public class TennisBall : MonoBehaviour
         }
         this._returning = true;
         float dirToOwner = (this._owner.sprite.WorldCenter - this._projectile.sprite.WorldCenter).ToAngle();
-        float acc = this._owner.stats.GetStatValue(PlayerStats.StatType.Accuracy);
+        float acc = this._owner.AccuracyMult();
         this._projectile.SendInDirection(dirToOwner.AddRandomSpread(_SPREAD * Mathf.Sqrt(acc)).ToVector(), true);
         AkSoundEngine.PostEvent("racket_hit", this._projectile.gameObject);
     }

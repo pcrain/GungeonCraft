@@ -58,7 +58,7 @@ public class Pincushion : AdvancedGunBehavior
         if (this.Owner as PlayerController is not PlayerController pc)
             return;
         float spread = _MIN_SPREAD + _DLT_SPREAD * (1f - ((float)this.gun.ClipShotsRemaining / (float)this.gun.ClipCapacity));
-        spread *= pc.stats.GetStatValue(PlayerStats.StatType.Accuracy);
+        spread *= pc.AccuracyMult();
         projectile.SendInDirection((pc.m_currentGunAngle + spread*(2f*UnityEngine.Random.value - 1f)).ToVector(), false);
     }
 

@@ -124,7 +124,7 @@ public class Ticonderogun : AdvancedGunBehavior
 
     private float ComputeCircleDamage(Vector2 hullCenter, int numEncircled)
     {
-        float baseDamage = _BASE_DAMAGE * this._owner.stats.GetStatValue(PlayerStats.StatType.Damage);
+        float baseDamage = _BASE_DAMAGE * this._owner.DamageMult();
         switch(numEncircled)
         {
             case 1:  return baseDamage;        // 10 * 1 = 10
@@ -138,12 +138,12 @@ public class Ticonderogun : AdvancedGunBehavior
     private float ComputeCircleDamageOld(Vector2 hullCenter)
     {
         if (!this._owner.IsKeyboardAndMouse()) // controller users always get max damage because this weapon is already hard enough to use with controllers
-            return Mathf.Ceil(_BASE_DAMAGE * this._owner.stats.GetStatValue(PlayerStats.StatType.Damage));
+            return Mathf.Ceil(_BASE_DAMAGE * this._owner.DamageMult());
 
         float maxSquareDistToCenter = 0f;
         foreach (Vector2 point in this._extantPoints)
             maxSquareDistToCenter = Mathf.Max(maxSquareDistToCenter, (hullCenter - point).sqrMagnitude);
-        return Mathf.Ceil(_BASE_DAMAGE * this._owner.stats.GetStatValue(PlayerStats.StatType.Damage) * Mathf.Min(1f, 10f / maxSquareDistToCenter));
+        return Mathf.Ceil(_BASE_DAMAGE * this._owner.DamageMult() * Mathf.Min(1f, 10f / maxSquareDistToCenter));
     }
 
     private void DoEncirclingMagic(AIActor enemy, float damage)

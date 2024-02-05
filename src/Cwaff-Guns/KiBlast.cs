@@ -139,7 +139,7 @@ public class KiBlastBehavior : MonoBehaviour
         float angle = 0;
         if (this._owner.CurrentGun.GetComponent<KiBlast>() is KiBlast k)
         {
-            float playerAccuracy = this._owner.stats.GetStatValue(PlayerStats.StatType.Accuracy);
+            float playerAccuracy = this._owner.AccuracyMult();
             angle = Mathf.Max(UnityEngine.Random.value*playerAccuracy*_MaxAngleVariance,_MinAngleVariance)*k.nextKiBlastSign;
             k.nextKiBlastSign *= -1;
         }

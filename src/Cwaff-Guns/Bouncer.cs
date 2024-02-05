@@ -72,7 +72,7 @@ public class HarmlessUntilBounce : MonoBehaviour
         if (this._projectile.Owner is not PlayerController pc)
             return;
         this._owner = pc;
-        this._damageMult = this._owner.stats.GetStatValue(PlayerStats.StatType.Damage);
+        this._damageMult = this._owner.DamageMult();
 
         BounceProjModifier bounce = this._projectile.gameObject.GetOrAddComponent<BounceProjModifier>();
             bounce.numberOfBounces     = 3; // needs to be more than 1 or projectile dies immediately in special handling code below

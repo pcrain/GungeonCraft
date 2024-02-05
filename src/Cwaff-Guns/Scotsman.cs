@@ -123,7 +123,7 @@ public class Scotsman : AdvancedGunBehavior
         Stickybomb sticky = projectile.GetComponent<Stickybomb>();
         this._extantStickies.Add(sticky);
 
-        float spread = _MAX_SPREAD * player.stats.GetStatValue(PlayerStats.StatType.Accuracy);
+        float spread = _MAX_SPREAD * player.AccuracyMult();
         Vector2 adjustedTarget = this._aimPoint + Lazy.RandomVector(spread * UnityEngine.Random.value);
         projectile.SendInDirection(adjustedTarget - this.gun.barrelOffset.PositionVector2(), true);
         sticky.Setup(adjustedTarget);

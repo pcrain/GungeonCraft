@@ -95,7 +95,7 @@ public class ThrownCard : MonoBehaviour
 
     private void CalculateStatsFromPlayerStats()
     {
-        float acc            = this._owner.stats.GetStatModifier(PlayerStats.StatType.Accuracy);
+        float acc            = this._owner.AccuracyMult();
         float inverseRootAcc = Mathf.Sqrt(1.0f / acc);
         this._timeAtMaxPower = _BASE_LIFE * inverseRootAcc * UnityEngine.Random.Range(0.8f, 1.2f);
         this._projectile.baseData.damage *= inverseRootAcc;
