@@ -4,8 +4,8 @@ public class Vladimir : AdvancedGunBehavior
 {
     public static string ItemName         = "Vladimir";
     public static string ProjectileName   = "38_special";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
+    public static string ShortDescription = "Poke 'em On";
+    public static string LongDescription  = "Attacking performs a swift melee thrust that impales enemies within range. While impaled, enemies are permastunned, take damage from subsequent thrusts, and are vulnerable to other enemies' projectiles. Each thrust can also destroy a single enemy projectile. Cannot be dropped or switched while an enemy is impaled. Increases curse by 1 while in inventory.";
     public static string Lore             = "TBD";
 
     internal const float _LAUNCH_FORCE                 = 150f;
@@ -26,6 +26,8 @@ public class Vladimir : AdvancedGunBehavior
               infiniteAmmo: true, canReloadNoMatterAmmo: true);
             gun.SetMuzzleVFX("muzzle_vladimir", fps: 30, scale: 0.3f, anchor: Anchor.MiddleCenter);
             gun.SetFireAudio("vladimir_fire_sound");
+            gun.AddStatToGun(PlayerStats.StatType.Curse, 1f, StatModifier.ModifyMethod.ADDITIVE);
+            gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
 
         // TODO: make our own impact vfx
         gun.InitProjectile(new(ammoCost: 0, clipSize: -1, cooldown: 0.3f, shootStyle: ShootStyle.SemiAutomatic,
@@ -69,14 +71,20 @@ public class Vladimir : AdvancedGunBehavior
 
             enemy.specRigidbody.Reinitialize();
             PixelCollider collider = enemy.specRigidbody.PrimaryPixelCollider;
+            IntVector2 epos = enemy.sprite.WorldBottomLeft.ToIntVector2();
+            IntVector2 edim = (enemy.sprite.WorldTopRight - enemy.sprite.WorldBottomLeft).ToIntVector2();
             for (int j = StaticReferenceManager.AllProjectiles.Count - 1; j >= 0; --j)
             {
                 Projectile proj = StaticReferenceManager.AllProjectiles[j];
+                if (!proj.isActiveAndEnabled)
+                    continue;
                 if (proj?.specRigidbody is not SpeculativeRigidbody body)
                     continue;
-                if (!collider.AABBOverlaps(body.PrimaryPixelCollider))
+                // if (!collider.AABBOverlaps(body.PrimaryPixelCollider))
+                if (!proj.sprite.Overlaps(enemy.sprite))
                     continue;
 
+                // forces projectile to collide with enemies even if it normally wouldn't
                 LinearCastResult lcr   = LinearCastResult.Pool.Allocate();
                 lcr.Contact            = enemy.CenterPosition;
                 lcr.Normal             = Vector2.right;
@@ -192,6 +200,7 @@ public class VladimirProjectile : MonoBehaviour
     private Projectile _projectile;
     private PlayerController _owner;
     private Vladimir _gun = null;
+    private bool _absorbedProjectile = false;
 
     private void Start()
     {
@@ -207,7 +216,7 @@ public class VladimirProjectile : MonoBehaviour
 
     private void Update()
     {
-        if (!this._gun)
+        if (!this._gun || this._absorbedProjectile)
             return;
 
         Vector2 myPos = this._projectile.SafeCenter;
@@ -221,6 +230,7 @@ public class VladimirProjectile : MonoBehaviour
             if ((myPos - p.SafeCenter).sqrMagnitude > _PROJ_GRAB_RANGE_SQR)
                 continue;
             this._gun.AbsorbProjectile(p);
+            this._absorbedProjectile = true;
             break;
         }
     }

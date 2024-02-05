@@ -1263,4 +1263,15 @@ public static class Extensions
 
   /// <summary>Get the player's current accuracy (spread) multiplier</summary>
   public static float AccuracyMult(this PlayerController p) => p.stats.GetStatValue(PlayerStats.StatType.Accuracy);
+
+  /// <summary>returns true if sprite a overlaps sprite b in the world</summary>
+  public static bool Overlaps(this tk2dBaseSprite a, tk2dBaseSprite b)
+  {
+      return IntVector2.AABBOverlap(
+        posA        : a.sprite.WorldBottomLeft.ToIntVector2(),
+        dimensionsA : (a.sprite.WorldTopRight - a.sprite.WorldBottomLeft).ToIntVector2(),
+        posB        : b.sprite.WorldBottomLeft.ToIntVector2(),
+        dimensionsB : (b.sprite.WorldTopRight - b.sprite.WorldBottomLeft).ToIntVector2()
+        );
+  }
 }
