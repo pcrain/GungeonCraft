@@ -142,7 +142,7 @@ public class GunBuildData
 
 public static class GunBuilder
 {
-  // General-purpose starting point for setting up most guns -- sets up default module, default projectile, and default animation for projectile
+  /// <summary>General-purpose starting point for setting up most guns -- sets up default module, default projectile, and default animation for projectile</summary>
   public static ProjectileType InitSpecialProjectile<ProjectileType>(this Gun gun, GunBuildData b = null)
     where ProjectileType : Projectile
   {
@@ -180,13 +180,13 @@ public static class GunBuilder
     return proj;
   }
 
-  // Generic version of the above, assuming we just want a normal projectile
+  /// <summary>Generic version of InitProjectile, assuming we just want a normal projectile</summary>
   public static Projectile InitProjectile(this Gun gun, GunBuildData b = null)
   {
     return gun.InitSpecialProjectile<Projectile>(b);
   }
 
-  // Clone, modify, and return a specific projectile
+  /// <summary>Clone, modify, and return a specific projectile</summary>
   public static ProjectileType CloneSpecial<ProjectileType>(this ProjectileType projectile, GunBuildData b = null)
     where ProjectileType : Projectile
   {
@@ -235,13 +235,13 @@ public static class GunBuilder
     return p;
   }
 
-  // Generic version of the above, assuming we just want a normal projectile
+  /// <summary>Generic version of Clone, assuming we just want a normal projectile</summary>
   public static Projectile Clone(this Projectile projectile, GunBuildData b = null)
   {
     return projectile.CloneSpecial<Projectile>(b);
   }
 
-  // Copy fields from a Projectile to a subclass of that Projectile, then attach it to the base projectile's gameObject and destroy the base projectile
+  /// <summary>Copy fields from a Projectile to a subclass of that Projectile, then attach it to the base projectile's gameObject and destroy the base projectile</summary>
   public static ProjectileType ConvertToSpecialtyType<ProjectileType>(this Projectile baseProj) where ProjectileType : Projectile
   {
     ProjectileType p = baseProj.gameObject.AddComponent<ProjectileType>();
@@ -320,7 +320,7 @@ public static class GunBuilder
     return p;
   }
 
-  // Initializes and returns the first projectile from the default module of a gun
+  /// <summary>Initializes and returns the first projectile from the default module of a gun</summary>
   public static ProjectileType InitFirstProjectileOfType<ProjectileType>(this Gun gun, GunBuildData b)
     where ProjectileType : Projectile
   {
@@ -333,25 +333,25 @@ public static class GunBuilder
     return p;
   }
 
-  // Generic version of the above, assuming we just want a normal projectile
+  /// <summary>Generic version of InitFirstProjectileOfType, assuming we just want a normal projectile</summary>
   public static Projectile InitFirstProjectile(this Gun gun, GunBuildData b = null)
   {
     return gun.InitFirstProjectileOfType<Projectile>(b);
   }
 
-  // Clone and return a projectile from a specific gun (Gun version)
+  /// <summary>Clone and return a projectile from a specific gun (Gun version)</summary>
   public static Projectile CloneProjectile(this Gun gun, GunBuildData b = null)
   {
       return gun.DefaultModule.projectiles[0].Clone(b);
   }
 
-  // Clone and return a projectile from a specific gun (Items version)
+  /// <summary>Clone and return a projectile from a specific gun (Items version)</summary>
   public static Projectile CloneProjectile(this Items gunItem, GunBuildData b = null)
   {
       return (ItemHelper.Get(gunItem) as Gun).DefaultModule.projectiles[0].Clone(b);
   }
 
-  // Set basic attributes for a projectile module and return it
+  /// <summary>Set basic attributes for a projectile module and return it</summary>
   public static ProjectileModule SetAttributes(this ProjectileModule mod, GunBuildData b = null)
   {
     b ??= GunBuildData.Default;
@@ -372,13 +372,13 @@ public static class GunBuilder
     return mod;
   }
 
-  // Set basic attributes for a gun's default projectile module and return it
+  /// <summary>Set basic attributes for a gun's default projectile module and return it</summary>
   public static ProjectileModule SetupDefaultModule(this Gun gun, GunBuildData b = null)
   {
     return gun.DefaultModule.SetAttributes(b);
   }
 
-  // Add a component to a projectile's GameObject, perform setup if necessary, and return the projectile
+  /// <summary>Add a component to a projectile's GameObject, perform setup if necessary, and return the projectile</summary>
   public static Projectile Attach<T>(this Projectile projectile, Action<T> predicate = null, bool allowDuplicates = false) where T : MonoBehaviour
   {
     T component = allowDuplicates ? projectile.AddComponent<T>() : projectile.GetOrAddComponent<T>();
@@ -387,7 +387,7 @@ public static class GunBuilder
     return projectile;
   }
 
-  // Add each animation from a list in turn to a projectile and return that projectile
+  /// <summary>Add each animation from a list in turn to a projectile and return that projectile</summary>
   public static Projectile AddAnimations(this Projectile proj, params tk2dSpriteAnimationClip[] animations)
   {
     foreach(tk2dSpriteAnimationClip clip in animations)
@@ -395,8 +395,8 @@ public static class GunBuilder
     return proj;
   }
 
-  // Get a dummy charge module and add it to a gun (useful for weapons that need to check if they're being charged)
   private static ProjectileModule _DummyChargeModule = null;
+  /// <summary>Get a dummy charge module and add it to a gun (useful for weapons that need to check if they're being charged)</summary>
   public static void AddDummyChargeModule(this Gun gun)
   {
     if (_DummyChargeModule == null)
