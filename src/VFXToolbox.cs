@@ -642,6 +642,7 @@ public class FancyVFX : MonoBehaviour
             UnityEngine.Object.Destroy(this);
             return;
         }
+
         this._curLifeTime += BraveTime.DeltaTime;
         float percentDone = this._curLifeTime / this._maxLifeTime;
         if (percentDone >= 1.0f)
@@ -651,7 +652,7 @@ public class FancyVFX : MonoBehaviour
             return;
         }
 
-        this.sprite.transform.position += this._velocity;
+        this.sprite.transform.position += this._velocity * BraveTime.DeltaTime;
         if (this._changesScale)
         {
             float scale = Mathf.Lerp(this._startScale, this._endScale, percentDone);
