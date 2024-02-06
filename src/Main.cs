@@ -100,6 +100,8 @@ public class Initialisation : BaseUnityPlugin
                 CustomDodgeRoll.InitCustomDodgeRollHooks();
                 ModdedShopItemAdder.Init(); // must be set up after CwaffEvents
                 PlayerToolsSetup.Init();
+                DamageAdjuster.Init();
+
                 //Commands and Other Console Utilities
                 Commands.Init();
 
@@ -296,6 +298,7 @@ public class Initialisation : BaseUnityPlugin
                 Scotsman.Add();
                 ChekhovsGun.Add();
                 Vladimir.Add();
+                Blamethrower.Add();
                 setupGunsWatch.Stop();
             #endregion
 

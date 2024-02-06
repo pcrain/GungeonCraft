@@ -207,6 +207,7 @@
     <Compile Include="src\NonstandardApi\GunBuilder.cs"/>
     <Compile Include="src\NonstandardApi\MiniInteractable.cs"/>
     <Compile Include="src\NonstandardApi\BeamHelpers.cs"/>
+    <Compile Include="src\NonstandardApi\DamageAdjuster.cs"/>
     <Compile Include="src\NonstandardApi\Cwaff-GenericNPC.cs"/>
     <Compile Include="src\Databases.cs"/>
     <Compile Include="src\SharedItemBehaviors.cs"/>
@@ -3959,8 +3960,10 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\bball011.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tennis_ball3.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\chess_rook.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\blamethrower_projectile3.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\missiletoe_projectile_wreath_001.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tennis_ball7.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\blamethrower_projectile4.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\outbreak_projectile_old3.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\missiletoe_projectile_star_001.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball_old_2.png"/>
@@ -4000,6 +4003,7 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\ki_blast_red_002.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball001.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\ki_blast_001.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\blamethrower_projectile1.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball007.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\natascha_bullet_001.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\glockarina_projectile1.png"/>
@@ -4040,6 +4044,7 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\uppskeruvel_projectile1.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\lightwing_projectile2.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\jugglernaut_ball1.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\blamethrower_projectile2.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile_old9.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\soap_bubble_projectile_004.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball003.png"/>
@@ -4085,6 +4090,7 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\carpet_bomber_projectile_004.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\natascha_bullet_002.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile_old8.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\blamethrower_projectile5.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\glockarina_projectile4.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\platinum_star_projectile.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\chess_queen.png"/>
