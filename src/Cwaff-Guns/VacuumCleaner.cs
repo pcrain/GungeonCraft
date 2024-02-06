@@ -53,7 +53,7 @@ public class VacuumCleaner : AdvancedGunBehavior
 
         // Pick a gun
         Gun gunToGainAmmo = candidates.ChooseRandom();
-        int ammoToRestore = Lazy.RoundWeighted(_AMMO_AMT * gunToGainAmmo.AdjustedMaxAmmo);
+        int ammoToRestore = (_AMMO_AMT * gunToGainAmmo.AdjustedMaxAmmo).RoundWeighted();
         if (ammoToRestore == 0)
             return; // our fractional ammo gain did not restore anything
 

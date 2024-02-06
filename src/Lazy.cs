@@ -1,26 +1,25 @@
 namespace CwaffingTheGungy;
 
-public static class Lazy // all-purpose helper methods for being a lazy dumdum
+/// <summary>All-purpose helper methods for being a lazy dumdum</summary>
+public static class Lazy
 {
-    private static tk2dSpriteCollectionData _GunSpriteCollection = null;
+    internal static tk2dSpriteCollectionData _GunSpriteCollection = null;
 
-    // Log with the console only in debug mode
+    /// <summary>Log with the console only in debug mode</summary>
     public static void DebugLog(object text)
     {
     if (C.DEBUG_BUILD)
       ETGModConsole.Log(text);
     }
 
-    // Warn with the console only in debug mode
+    /// <summary>Warn with the console only in debug mode</summary>
     public static void DebugWarn(string text)
     {
     if (C.DEBUG_BUILD)
       ETGModConsole.Log($"<color=#ffffaaff>{text}</color>");
     }
 
-    /// <summary>
-    /// Perform basic initialization for a new passive, active, or gun item definition.
-    /// </summary>
+    /// <summary>Perform basic initialization for a new passive, active, or gun item definition.</summary>
     public static TItemClass SetupItem<TItemClass, TItemSpecific>(string itemName, string spritePath, string projectileName, string shortDescription, string longDescription, string lore, bool hideFromAmmonomicon = false)
         where TItemClass : PickupObject   // must be PickupObject for passive items, PlayerItem for active items, or Gun for guns
         where TItemSpecific : TItemClass  // must be a subclass of TItemClass
@@ -113,20 +112,6 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
     }
 
     /// <summary>
-    /// Get attach points for an animation clip
-    /// </summary>
-    public static tk2dSpriteDefinition.AttachPoint[] AttachPointsForClip(this Gun gun, string clipName)
-    {
-        _GunSpriteCollection ??= gun.sprite.collection; // need to initialize at least once
-        tk2dSpriteAnimationClip clip = gun.GetComponent<tk2dSpriteAnimator>().GetClipByName(clipName);
-        if (clip == null)
-            return null;
-        int spriteid = clip.frames[0].spriteId;
-        int attachIndex = _GunSpriteCollection.SpriteIDsWithAttachPoints.IndexOf(spriteid);
-        return _GunSpriteCollection.SpriteDefinedAttachPoints[attachIndex].attachPoints;
-    }
-
-    /// <summary>
     /// Perform basic initialization for a new gun definition.
     /// </summary>
     public static Gun SetupGun<T>(string gunName, string projectileName, string shortDescription, string longDescription, string lore, bool hideFromAmmonomicon = false)
@@ -177,65 +162,6 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
     }
 
     /// <summary>
-    /// Perform basic initialization of beam sprites for a projectile, override the beam controller's existing sprites if they exist
-    /// </summary>
-    public static BasicBeamController SetupBeamSprites(this Projectile projectile, string spriteName, int fps, Vector2 dims, Vector2? impactDims = null, int impactFps = -1)
-    {
-        // Fix breakage with GenerateBeamPrefab() expecting a non-null specrigidbody
-        projectile.specRigidbody = projectile.gameObject.GetOrAddComponent<SpeculativeRigidbody>();
-
-        // Unnecessary to delete these
-        // UnityEngine.Object.Destroy(projectile.GetComponentInChildren<tk2dSpriteAnimation>());
-        // UnityEngine.Object.Destroy(projectile.GetComponentInChildren<tk2dTiledSprite>());
-        // UnityEngine.Object.Destroy(projectile.GetComponentInChildren<tk2dSpriteAnimator>());
-        // UnityEngine.Object.Destroy(projectile.GetComponentInChildren<BasicBeamController>());
-
-        // Compute beam offsets from middle-left of sprite
-        Vector2 offsets = new Vector2(0, Mathf.Ceil(dims.y / 2f));
-        // Compute impact offsets from true center of sprite
-        Vector2? impactOffsets = impactDims.HasValue ? new Vector2(Mathf.Ceil(impactDims.Value.x / 2f), Mathf.Ceil(impactDims.Value.y / 2f)) : null;
-
-        // Create the beam itself using our resource map lookup
-        BasicBeamController beamComp = projectile.FixedGenerateBeamPrefab(
-            spritePath                  : ResMap.Get($"{spriteName}_mid")[0],
-            colliderDimensions          : dims,
-            colliderOffsets             : offsets,
-            beamAnimationPaths          : ResMap.Get($"{spriteName}_mid"),
-            beamFPS                     : fps,
-            //Impact
-            impactVFXAnimationPaths     : ResMap.Get($"{spriteName}_impact", quietFailure: true),
-            beamImpactFPS               : (impactFps > 0) ? impactFps : fps,
-            impactVFXColliderDimensions : impactDims,
-            impactVFXColliderOffsets    : impactOffsets,
-            //End
-            endVFXAnimationPaths        : ResMap.Get($"{spriteName}_end", quietFailure: true),
-            beamEndFPS                  : fps,
-            endVFXColliderDimensions    : dims,
-            endVFXColliderOffsets       : offsets,
-            //Beginning
-            muzzleVFXAnimationPaths     : ResMap.Get($"{spriteName}_start", quietFailure: true),
-            beamMuzzleFPS               : fps,
-            muzzleVFXColliderDimensions : dims,
-            muzzleVFXColliderOffsets    : offsets //,
-            //Other Variables
-            // glowAmount                  : 0f,
-            // emissivecolouramt           : 0f
-            );
-
-
-        // fix some more animation glitches (don't consistently work, check and enable on a case by case basis)
-        // beamComp.usesChargeDelay = false;
-        // beamComp.muzzleAnimation = "beam_start;
-        // beamComp.beamStartAnimation = null;
-        // beamComp.chargeAnimation = null;
-        // beamComp.rotateChargeAnimation = true;
-        // projectile.shouldRotate = true;
-        // projectile.shouldFlipVertically = true;
-
-        return beamComp;
-    }
-
-    /// <summary>
     /// Post a custom item pickup notification to the bottom of the screen
     /// </summary>
     public static void CustomNotification(string header, string text, tk2dBaseSprite sprite = null, UINotificationController.NotificationColor? color = null)
@@ -273,17 +199,7 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
         return theList;
     }
 
-    // Stolen from NN
-    // public static bool PlayerHasActiveSynergy(this PlayerController player, string synergyNameToCheck)
-    // {
-    //     foreach (int index in player.ActiveExtraSynergies)
-    //     {
-    //         if (GameManager.Instance.SynergyManager.synergies[index].NameKey == synergyNameToCheck)
-    //             return true;
-    //     }
-    //     return false;
-    // }
-
+    /// <summary>Moves the player towards a wall in small increments, stopping if we would hit the wall. See also MoveTowardsTargetOrWall</summary>
     public static void MovePlayerTowardsPositionUntilHittingWall(PlayerController player, Vector2 position)
     {
         int num_steps = 100;
@@ -307,6 +223,7 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
         }
     }
 
+    /// <summary>Get the player's idle animation associated with the provided gun angle</summary>
     public static string GetBaseIdleAnimationName(PlayerController p, float gunAngle)
     {
         string anim = string.Empty;
@@ -346,41 +263,43 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
         return "idle"+anim;
     }
 
+    /// <summary>Get the player's dodge animation associated with the provided angle vector</summary>
     public static string GetBaseDodgeAnimationName(PlayerController p, Vector2 vector)
     {
         return ((!(Mathf.Abs(vector.x) < 0.1f)) ? (((!(vector.y > 0.1f)) ? "dodge_left" : "dodge_left_bw") + ((!p.UseArmorlessAnim) ? string.Empty : "_armorless")) : (((!(vector.y > 0.1f)) ? "dodge" : "dodge_bw") + ((!p.UseArmorlessAnim) ? string.Empty : "_armorless")));
     }
 
-    // Get a random angle in range [-180,180]
+    /// <summary>Get a random angle in range [-180,180]</summary>
     public static float RandomAngle()
     {
       return UnityEngine.Random.Range(-180f,180f);
     }
 
-    // Get a random vector
+    /// <summary>Get a random vector with the specified magnitude</summary>
     public static Vector2 RandomVector(float magnitude = 1f)
     {
       return magnitude * RandomAngle().ToVector();
     }
 
-    // Get a random Quaternion rotated on the Z axis
+    /// <summary>Get a random Quaternion rotated on the Z axis</summary>
     public static Quaternion RandomEulerZ()
     {
       return RandomAngle().EulerZ();
     }
 
-    // Get a random boolean
+    /// <summary>Get a random boolean</summary>
     public static bool CoinFlip()
     {
       return UnityEngine.Random.Range(0,2) == 1;
     }
 
-    // Get the defautl projectile for a gun by id
+    /// <summary>Get the defautl projectile for a gun by id</summary>
     public static Projectile GunDefaultProjectile(int gunid)
     {
         return (PickupObjectDatabase.GetById(gunid) as Gun).DefaultModule.projectiles[0];
     }
 
+    // REFACTOR: use Color.Lerp
     // Blend two colors
     public static Color Blend(Color a, Color b, float t = 0.5f, bool blendAlpha = true)
     {
@@ -392,16 +311,7 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
             );
     }
 
-    // Given a floating point amount (e.g., 45.71), use the fractional component (e.g., .71) as the odds to return
-    //  the ceiling of the amount (e.g., 48), returning the floor of the amount (e.g., 47) otherwise
-    public static int RoundWeighted(this float amount)
-    {
-        return (UnityEngine.Random.value <= (amount - Math.Truncate(amount))
-            ? Mathf.CeilToInt(amount)
-            : Mathf.FloorToInt(amount));
-    }
-
-    // Get an enemy's idle animation blended with a color of choice, with optional sheen
+    /// <summary>Get an enemy's idle animation blended with a color of choice, with optional sheen</summary>
     public static Texture2D GetTexturedEnemyIdleAnimation(AIActor enemy, Color blendColor, float blendAmount, Color? sheenColor = null, float sheenWidth = 20.0f)
     {
         // Get the best idle sprite for the enemy
@@ -435,6 +345,7 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
     }
 
     internal static Dictionary<string, float> _SoundTimers = new();
+    /// <summary>Play a sound on a GameObject until the GameObject is destroyed or the provided timer expires</summary>
     public static void PlaySoundUntilDeathOrTimeout(string soundName, GameObject source, float timer)
     {
         if (_SoundTimers.ContainsKey(soundName))
@@ -443,7 +354,7 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
             GameManager.Instance.StartCoroutine(PlaySoundUntilDeathOrTimeout_CR(soundName, source, timer)); // play the sound
     }
 
-    public static IEnumerator PlaySoundUntilDeathOrTimeout_CR(string soundName, GameObject source, float timer)
+    private static IEnumerator PlaySoundUntilDeathOrTimeout_CR(string soundName, GameObject source, float timer)
     {
         _SoundTimers[soundName] = timer;
         AkSoundEngine.PostEvent(soundName, source);
@@ -456,6 +367,7 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
         _SoundTimers.Remove(soundName);
     }
 
+    /// <summary>Create some smoke VFX at the specified position</summary>
     public static void DoSmokeAt(Vector3 pos)
     {
         UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global VFX/VFX_Item_Spawn_Poof") as GameObject)
@@ -463,6 +375,7 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
             .PlaceAtPositionByAnchor(pos, Anchor.MiddleCenter);
     }
 
+    /// <summary>Create a pickup spawn poof VFX at the specified position</summary>
     public static void DoPickupAt(Vector3 pos)
     {
         GameObject original = (GameObject)ResourceCache.Acquire("Global VFX/VFX_Item_Pickup");
@@ -474,6 +387,7 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
         AkSoundEngine.PostEvent("Play_OBJ_item_pickup_01", gameObject);
     }
 
+    /// <summary>Create some debris from the current frame of the given sprite</summary>
     public static DebrisObject MakeDebrisFromSprite(tk2dBaseSprite sprite, Vector3 position, Vector2? initialVelocity = null, float? angularVelocity = null)
     {
         GameObject debrisObject = new GameObject("debrisboi");
@@ -486,12 +400,14 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
         return debris;
     }
 
+    /// <summary>Get the current room of the game's primary player</summary>
     public static RoomHandler CurrentRoom()
     {
-        return GameManager.Instance.PrimaryPlayer.CurrentRoom;
+        return GameManager.Instance.PrimaryPlayer.CurrentRoom; //REFACTOR: use the best player instead of the primary player
     }
 
     private static Projectile _NullProjectilePrefab = null;
+    /// <summary>Return a dummy projectile for instances where we need a projectile but don't want it to do anything</summary>
     public static Projectile NoProjectile()
     {
         if (_NullProjectilePrefab == null)
@@ -505,6 +421,7 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
         return _NullProjectilePrefab;
     }
 
+    /// <summary>Determine whether any enemy is in an line between start and end (does not account for walls)</summary>
     public static bool AnyEnemyInLineOfSight(Vector2 start, Vector2 end, bool canBeNeutral = true)
     {
         Vector2 intersection = Vector2.zero;
@@ -519,6 +436,7 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
         return false;
     }
 
+    /// <summary>Determine the nearest enemy inside a cone of vision from position start within maxDeviation degree of coneAngle</summary>
     public static Vector2? NearestEnemyWithinConeOfVision(Vector2 start, float coneAngle, float maxDeviation, bool useNearestAngleInsteadOfDistance, bool ignoreWalls = false)
     {
         bool foundTarget   = false;
@@ -552,11 +470,13 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
         return foundTarget ? bestTarget : null;
     }
 
+    /// <summary>Determine the nearest enemy to position start</summary>
     public static Vector2? NearestEnemy(Vector2 start, float coneAngle, bool useNearestAngleInsteadOfDistance = false, bool ignoreWalls = false)
     {
         return NearestEnemyWithinConeOfVision(start, coneAngle, 360f, useNearestAngleInsteadOfDistance, ignoreWalls);
     }
 
+    /// <summary>Spawn a chest with a single guaranteed item inside of it</summary>
     public static Chest SpawnChestWithSpecificItem(PickupObject pickup, IntVector2 position, ItemQuality? overrideChestQuality = null)
     {
       Chest chestPrefab =
@@ -568,27 +488,31 @@ public static class Lazy // all-purpose helper methods for being a lazy dumdum
     }
 
     // https://martin.ankerl.com/2007/10/04/optimized-pow-approximation-for-java-and-c-c/
+    /// <summary>Compute a fast approximation for a^b</summary>
     public static double FastPow(double a, double b) {
         int tmp = (int)(BitConverter.DoubleToInt64Bits(a) >> 32);
         int tmp2 = (int)(b * (tmp - 1072632447) + 1072632447);
         return BitConverter.Int64BitsToDouble(((long)tmp2) << 32);
     }
 
-    public static dfSprite SetupUISprite(List<string> resourcePaths)
-    {
-        dfSprite uiSprite = CustomClipAmmoTypeToolbox.SetupDfSpriteFromTexture<dfSprite>(
-            new GameObject().RegisterPrefab(),
-            ResourceExtractor.GetTextureFromResource(resourcePaths[0] + ".png"),
-            ShaderCache.Acquire("Daikon Forge/Default UI Shader"));
-        return uiSprite;
-    }
+    /// <summary>Set up a UI sprite from the provided resource paths</summary>
+    // public static dfSprite SetupUISprite(List<string> resourcePaths)
+    // {
+    //     dfSprite uiSprite = CustomClipAmmoTypeToolbox.SetupDfSpriteFromTexture<dfSprite>(
+    //         new GameObject().RegisterPrefab(),
+    //         ResourceExtractor.GetTextureFromResource(resourcePaths[0] + ".png"),
+    //         ShaderCache.Acquire("Daikon Forge/Default UI Shader"));
+    //     return uiSprite;
+    // }
 
+    /// <summary>Get a modded item by id, returning null if it doesn't exit</summary>
     public static PickupObject GetModdedItem(string itemName)
     {
         return Gungeon.Game.Items.GetSafe(itemName);
     }
 
     private static readonly float _INVLOG2 = 1f / Mathf.Log(2);
+    /// <summary>Returns log_2(f)</summary>
     public static float Log2(float f)
     {
         return _INVLOG2 * Mathf.Log(f);

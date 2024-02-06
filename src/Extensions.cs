@@ -2,7 +2,8 @@ namespace CwaffingTheGungy;
 
 public static class Extensions
 {
-  public class Expiration : MonoBehaviour  // destroy a game object after a fixed amount of time, with optional fadeout
+  /// <summary>destroy a game object after a fixed amount of time, with optional fadeout</summary>
+  public class Expiration : MonoBehaviour
   {
     public void ExpireIn(float seconds, float fadeFor = 0f, float startAlpha = 1f, bool shrink = false)
     {
@@ -39,19 +40,19 @@ public static class Extensions
     }
   }
 
-  // Add an expiration timer to a GameObject
+  /// <summary>Add an expiration timer to a GameObject</summary>
   public static void ExpireIn(this GameObject self, float seconds, float fadeFor = 0f, float startAlpha = 1f, bool shrink = false)
   {
     self.GetOrAddComponent<Expiration>().ExpireIn(seconds, fadeFor, startAlpha, shrink);
   }
 
-  // Check if a rectangle contains a point
+  /// <summary>Check if a rectangle contains a point</summary>
   public static bool Contains(this Rect self, Vector2 point)
   {
     return (point.x >= self.xMin && point.x <= self.xMax && point.y >= self.yMin && point.y <= self.yMax);
   }
 
-  // Insets the borders of a rectangle by a specified amount on each side
+  /// <summary>Insets the borders of a rectangle by a specified amount on each side</summary>
   public static Rect Inset(this Rect self, float topInset, float rightInset, float bottomInset, float leftInset)
   {
     // ETGModConsole.Log($"  old bounds are {self.xMin},{self.yMin} to {self.xMax},{self.yMax}");
@@ -60,29 +61,29 @@ public static class Extensions
     return r;
   }
 
-  // Insets the borders of a rectangle by a specified amount on each axis
+  /// <summary>Insets the borders of a rectangle by a specified amount on each axis</summary>
   public static Rect Inset(this Rect self, float xInset, float yInset)
   {
     return self.Inset(yInset,xInset,yInset,xInset);
   }
 
-  // Insets the borders of a rectangle by a specified amount on all sides
+  /// <summary>Insets the borders of a rectangle by a specified amount on all sides</summary>
   public static Rect Inset(this Rect self, float inset)
   {
     return self.Inset(inset,inset,inset,inset);
   }
 
-  // Gets the center of a rectangle
+  /// <summary>Gets the center of a rectangle</summary>
   public static Vector2 Center(this Rect self)
   {
     return new Vector2(self.xMin + self.width / 2, self.yMin + self.height / 2);
   }
 
-  // Get a random point on the perimeter of a rectangle
+  /// <summary>Get a random point on the perimeter of a rectangle</summary>
   public static Vector2 RandomPointOnPerimeter(this Rect self)
     { return self.PointOnPerimeter(UnityEngine.Random.Range(0.0f,1.0f)); }
 
-  // Get a given point on the perimeter of a rectangle scales from 0 to 1 (counterclockwise from bottom-left)
+  /// <summary>Get a given point on the perimeter of a rectangle scales from 0 to 1 (counterclockwise from bottom-left)</summary>
   public static Vector2 PointOnPerimeter(this Rect self, float t)
   {
     // ETGModConsole.Log($"bounds are {self.xMin},{self.yMin} to {self.xMax},{self.yMax}");
@@ -101,7 +102,7 @@ public static class Extensions
     return retPoint;
   }
 
-  // Given an angle and wall Rect, determine the intersection point from a ray cast from self to theWall
+  /// <summary>Given an angle and wall Rect, determine the intersection point from a ray cast from self to theWall</summary>
   public static Vector2 RaycastToWall(this Vector2 self, float angle, Rect theWall)
   {
     Vector2 intersection = Vector2.positiveInfinity;
@@ -112,13 +113,13 @@ public static class Extensions
     return intersection;
   }
 
-  // Add a named bullet from a named enemy to a bullet bank
+  /// <summary>Add a named bullet from a named enemy to a bullet bank</summary>
   public static void AddBulletFromEnemy(this AIBulletBank self, string enemyGuid, string bulletName)
   {
     self.Bullets.Add(EnemyDatabase.GetOrLoadByGuid(enemyGuid).bulletBank.GetBullet(bulletName));
   }
 
-  // Register a game object as a prefab
+  /// <summary>Register a game object as a prefab</summary>
   public static GameObject RegisterPrefab(this GameObject self, bool deactivate = true, bool markFake = true, bool dontUnload = true)
   {
     if (deactivate)
@@ -130,7 +131,7 @@ public static class Extensions
     return self;
   }
 
-  // Register a game object as a prefab, with generic support
+  /// <summary>Register a game object as a prefab, with generic support</summary>
   public static T RegisterPrefab<T>(this T self, bool deactivate = true, bool markFake = true, bool dontUnload = true)
     where T : Component
   {
@@ -138,98 +139,98 @@ public static class Extensions
     return self;
   }
 
-  // Instantiate a prefab and clone it as a new prefab
+  /// <summary>Instantiate a prefab and clone it as a new prefab</summary>
   public static GameObject ClonePrefab(this GameObject self, bool deactivate = true, bool markFake = true, bool dontUnload = true)
   {
     return UnityEngine.Object.Instantiate(self).RegisterPrefab(deactivate, markFake, dontUnload).gameObject;
   }
 
-  // Instantiate a prefab and clone it as a new prefab, with generic support
+  /// <summary>Instantiate a prefab and clone it as a new prefab, with generic support</summary>
   public static T ClonePrefab<T>(this T self, bool deactivate = true, bool markFake = true, bool dontUnload = true)
     where T : Component
   {
     return UnityEngine.Object.Instantiate<T>(self).RegisterPrefab<T>(deactivate, markFake, dontUnload);
   }
 
-  // Convert degrees to a Vector2 angle
+  /// <summary>Convert degrees to a Vector2 angle</summary>
   public static Vector2 ToVector(this float self, float magnitude = 1f)
   {
     return magnitude * (Vector2)(Quaternion.Euler(0f, 0f, self) * Vector2.right);
   }
 
-  // Rotate a Vector2 by specified number of degrees
+  /// <summary>Rotate a Vector2 by specified number of degrees</summary>
   public static Vector2 Rotate(this Vector2 self, float rotation)
   {
     return (Vector2)(Quaternion.Euler(0f, 0f, rotation) * self);
   }
 
-  // Clamp a floating point number between -absoluteMax and absoluteMax
+  /// <summary>Clamp a floating point number between -absoluteMax and absoluteMax</summary>
   public static float ClampAbsolute(this float self, float absoluteMax)
   {
     return (Mathf.Abs(self) <= absoluteMax) ? self : Mathf.Sign(self)*absoluteMax;
   }
 
-  // Clamp a floating point angle in degrees to [-180,180]
+  /// <summary>Clamp a floating point angle in degrees to [-180,180]</summary>
   public static float Clamp180(this float self)
   {
     return BraveMathCollege.ClampAngle180(self);
   }
 
-  // Clamp a floating point angle in degrees to [0,360]
+  /// <summary>Clamp a floating point angle in degrees to [0,360]</summary>
   public static float Clamp360(this float self)
   {
     return BraveMathCollege.ClampAngle360(self);
   }
 
-  // Determine the relative angle (in degrees) between two angles
+  /// <summary>Determine the relative angle (in degrees) between two angles</summary>
   public static float RelAngleTo(this float angle, float other)
   {
     return (other - angle).Clamp180();
   }
 
-  // Determine the absolute angle (in degrees) between two angles
+  /// <summary>Determine the absolute angle (in degrees) between two angles</summary>
   public static float AbsAngleTo(this float angle, float other)
   {
     return Mathf.Abs((other - angle).Clamp180());
   }
 
-  // Determine whether an angle is within a degree tolerance of a floating point angle
+  /// <summary>Determine whether an angle is within a degree tolerance of a floating point angle</summary>
   public static bool IsNearAngle(this float angle, float other, float tolerance)
   {
     return angle.AbsAngleTo(other) <= tolerance;
   }
 
-  // Determine whether a Vector is within a degree tolerance of a floating point angle
+  /// <summary>Determine whether a Vector is within a degree tolerance of a floating point angle</summary>
   public static bool IsNearAngle(this Vector2 v, float angle, float tolerance)
   {
     return v.ToAngle().IsNearAngle(angle, tolerance);
   }
 
-  // Get a bullet's direction to the primary player
+  /// <summary>Get a bullet's direction to the primary player</summary>
   public static float DirToNearestPlayer(this Bullet self)
   {
     return (GameManager.Instance.GetPlayerClosestToPoint(self.Position).CenterPosition - self.Position).ToAngle();
   }
 
-  // Get a bullet's current velocity (because Velocity doesn't work)
+  /// <summary>Get a bullet's current velocity (because Velocity doesn't work)</summary>
   public static Vector2 RealVelocity(this Bullet self)
   {
     return (self.Speed / C.PIXELS_PER_CELL) * self.Direction.ToVector();
   }
 
-  // Get a Quaternion representing an angle rotated on the Z axis
+  /// <summary>Get a Quaternion representing an angle rotated on the Z axis</summary>
   public static Quaternion EulerZ(this float self)
   {
     return Quaternion.Euler(0f, 0f, self);
   }
 
-  // Get a Quaternion representing a vector rotated on the Z axis
+  /// <summary>Get a Quaternion representing a vector rotated on the Z axis</summary>
   public static Quaternion EulerZ(this Vector2 self)
   {
     return Quaternion.Euler(0f, 0f, BraveMathCollege.Atan2Degrees(self));
   }
 
-  // Add custom firing audio to a gun
+  /// <summary>Add custom firing audio to a gun</summary>
   public static void SetFireAudio<T>(this T agun, string audioEventName = null)
     where T : Alexandria.ItemAPI.AdvancedGunBehavior
   {
@@ -241,7 +242,7 @@ public static class Extensions
     // agun.GetComponent<tk2dSpriteAnimator>().GetClipByName(agun.shootAnimation).frames[0].eventAudio = audioEventName;
   }
 
-  // Add custom reloading audio to a gun
+  /// <summary>Add custom reloading audio to a gun</summary>
   public static void SetReloadAudio<T>(this T agun, string audioEventName = null)
     where T : Alexandria.ItemAPI.AdvancedGunBehavior
   {
@@ -250,14 +251,14 @@ public static class Extensions
       agun.overrideNormalReloadAudio = audioEventName;
   }
 
-  // Loop a gun's animation
+  /// <summary>Loop a gun's animation</summary>
   public static void LoopAnimation(this Gun gun, string animationName, int loopStart)
   {
     gun.GetComponent<tk2dSpriteAnimator>().GetClipByName(animationName).wrapMode = tk2dSpriteAnimationClip.WrapMode.LoopSection;
     gun.GetComponent<tk2dSpriteAnimator>().GetClipByName(animationName).loopStart = loopStart;
   }
 
-  // Set a projectile's horizontal impact VFX
+  /// <summary>Set a projectile's horizontal impact VFX</summary>
   public static Projectile SetHorizontalImpactVFX(this Projectile p, VFXPool vfx)
   {
     p.hitEffects.tileMapHorizontal = vfx;  // necessary
@@ -265,7 +266,7 @@ public static class Extensions
     return p;
   }
 
-  // Set a gun's horizontal impact VFX
+  /// <summary>Set a gun's horizontal impact VFX</summary>
   public static void SetHorizontalImpactVFX(this Gun gun, VFXPool vfx)
   {
     foreach (ProjectileModule mod in gun.Volley.projectiles)
@@ -273,7 +274,7 @@ public static class Extensions
         p.SetHorizontalImpactVFX(vfx);
   }
 
-  // Set a projectile's vertical impact VFX
+  /// <summary>Set a projectile's vertical impact VFX</summary>
   public static Projectile SetVerticalImpactVFX(this Projectile p, VFXPool vfx)
   {
     p.hitEffects.tileMapVertical = vfx;  // necessary
@@ -281,7 +282,7 @@ public static class Extensions
     return p;
   }
 
-  // Set a gun's vertical impact VFX
+  /// <summary>Set a gun's vertical impact VFX</summary>
   public static void SetVerticalImpactVFX(this Gun gun, VFXPool vfx)
   {
     foreach (ProjectileModule mod in gun.Volley.projectiles)
@@ -289,7 +290,7 @@ public static class Extensions
         p.SetVerticalImpactVFX(vfx);
   }
 
-  // Set a projectile's enemy impact VFX
+  /// <summary>Set a projectile's enemy impact VFX</summary>
   public static Projectile SetEnemyImpactVFX(this Projectile p, VFXPool vfx)
   {
     p.hitEffects.enemy = vfx;  // necessary
@@ -297,7 +298,7 @@ public static class Extensions
     return p;
   }
 
-  // Set a gun's enemy impact VFX
+  /// <summary>Set a gun's enemy impact VFX</summary>
   public static void SetEnemyImpactVFX(this Gun gun, VFXPool vfx)
   {
     foreach (ProjectileModule mod in gun.Volley.projectiles)
@@ -305,7 +306,7 @@ public static class Extensions
         p.SetEnemyImpactVFX(vfx);
   }
 
-  // Set a projectile's midair impact / death VFX
+  /// <summary>Set a projectile's midair impact / death VFX</summary>
   public static Projectile SetAirImpactVFX(this Projectile p, VFXPool vfx)
   {
     p.hitEffects.suppressMidairDeathVfx = false;
@@ -313,7 +314,7 @@ public static class Extensions
     return p;
   }
 
-  // Set a gun's midair impact / death VFX
+  /// <summary>Set a gun's midair impact / death VFX</summary>
   public static void SetAirImpactVFX(this Gun gun, VFXPool vfx)
   {
     foreach (ProjectileModule mod in gun.Volley.projectiles)
@@ -321,7 +322,7 @@ public static class Extensions
         p.SetAirImpactVFX(vfx);
   }
 
-  // Set a projectile's impact VFX across the board
+  /// <summary>Set a projectile's impact VFX across the board</summary>
   public static Projectile SetAllImpactVFX(this Projectile p, VFXPool vfx)
   {
     p.SetHorizontalImpactVFX(vfx);
@@ -331,60 +332,60 @@ public static class Extensions
     return p;
   }
 
-  // Set a gun's impact VFX across the board
+  /// <summary>Set a gun's impact VFX across the board</summary>
   public static void SetAllImpactVFX(this Gun gun, VFXPool vfx)
   {
     gun.DefaultModule.projectiles[0].SetAllImpactVFX(vfx);
   }
 
-  // Check if an enemy is hostile
+  /// <summary>Check if an enemy is hostile</summary>
   public static bool IsHostile(this AIActor e, bool canBeDead = false, bool canBeNeutral = false)
   {
     HealthHaver h = e?.healthHaver;
     return e && !e.IsGone && (canBeNeutral || !e.IsHarmlessEnemy) && h && (canBeDead || (h.IsAlive && !h.IsDead)) && !h.isPlayerCharacter;
   }
 
-  // Check if an enemy is hostile and a non-boss
+  /// <summary>Check if an enemy is hostile and a non-boss</summary>
   public static bool IsHostileAndNotABoss(this AIActor e, bool canBeDead = false, bool canBeNeutral = false)
   {
     HealthHaver h = e?.healthHaver;
     return e && !e.IsGone && (canBeNeutral || !e.IsHarmlessEnemy) && h && !h.IsBoss && !h.IsSubboss &&  (canBeDead || (h.IsAlive && !h.IsDead)) && !h.isPlayerCharacter;
   }
 
-  // Check if an enemy is a boss
+  /// <summary>Check if an enemy is a boss</summary>
   public static bool IsABoss(this AIActor e, bool canBeDead = false)
   {
     HealthHaver h = e?.healthHaver;
     return e && !e.IsGone && h && (h.IsBoss || h.IsSubboss) && (canBeDead || (h.IsAlive && !h.IsDead));
   }
 
-  // Set the Alpha of a GameObject's sprite
+  /// <summary>Set the Alpha of a GameObject's sprite</summary>
   public static void SetAlpha(this GameObject g, float a)
   {
     g.GetComponent<Renderer>()?.SetAlpha(a);
   }
 
-  // Set the Alpha of a Component's sprite (attached to the base component)
+  /// <summary>Set the Alpha of a Component's sprite (attached to the base component)</summary>
   public static void SetAlpha(this Component c, float a)
   {
     c.GetComponent<Renderer>()?.SetAlpha(a);
   }
 
-  // Set the Alpha of a GameObject's sprite immediately and avoid the 1-frame opacity delay upon creation
+  /// <summary>Set the Alpha of a GameObject's sprite immediately and avoid the 1-frame opacity delay upon creation</summary>
   public static void SetAlphaImmediate(this GameObject g, float a)
   {
     g.GetComponent<Renderer>()?.SetAlpha(a);
     g.GetComponent<tk2dSpriteAnimator>()?.LateUpdate();
   }
 
-  // Set the Alpha of a Component's sprite immediately and avoid the 1-frame opacity delay upon creation
+  /// <summary>Set the Alpha of a Component's sprite immediately and avoid the 1-frame opacity delay upon creation</summary>
   public static void SetAlphaImmediate(this Component c, float a)
   {
     c.GetComponent<Renderer>()?.SetAlpha(a);
     c.GetComponent<tk2dSpriteAnimator>()?.LateUpdate();
   }
 
-  // Add emissiveness to a game object
+  /// <summary>Add emissiveness to a game object</summary>
   public static void SetGlowiness(this GameObject g, float a)
   {
     if (g.GetComponent<tk2dBaseSprite>() is not tk2dBaseSprite sprite)
@@ -412,13 +413,13 @@ public static class Extensions
       m.SetColor("_OverrideColor", c2);
   }
 
-  // Randomly add or subtract an amount from an angle
+  /// <summary>Randomly add or subtract an amount from an angle</summary>
   public static float AddRandomSpread(this float angle, float spread)
   {
     return angle + (Lazy.CoinFlip() ? 1f : -1f) * spread * UnityEngine.Random.value;
   }
 
-  // Get a list including all of a players' passives, actives, and guns
+  /// <summary>Get a list including all of a players' passives, actives, and guns</summary>
   public static List<PickupObject> AllItems(this PlayerController player)
   {
       List<PickupObject> allItems = new();
@@ -431,25 +432,25 @@ public static class Extensions
       return allItems;
   }
 
-  // Get a passive item owned by the player
+  /// <summary>Get a passive item owned by the player</summary>
   public static T GetPassive<T>(this PlayerController p) where T : PassiveItem
     => p.passiveItems.Find(item => item is T) as T;
 
-  // Get an active item owned by the player
+  /// <summary>Get an active item owned by the player</summary>
   public static T GetActive<T>(this PlayerController p)  where T : PlayerItem
     => p.activeItems.Find(item => item is T) as T;
 
-  // Get a gun owned by the player
+  /// <summary>Get a gun owned by the player</summary>
   public static T GetGun<T>(this PlayerController p)     where T : Gun
     => p.inventory.AllGuns.Find(item => item is T) as T;
 
-  // Clamps a float between two numbers (default 0 and 1)
+  /// <summary>Clamps a float between two numbers (default 0 and 1)</summary>
   public static float Clamp(this float f, float min = 0f, float max = 1f)
   {
     return (f < min) ? min : ((f > max) ? max : f);
   }
 
-  // Check if a player is one hit from death
+  /// <summary>Check if a player is one hit from death</summary>
   public static bool IsOneHitFromDeath(this PlayerController player)
   {
     if (player.ForceZeroHealthState)
@@ -457,13 +458,13 @@ public static class Extensions
     return player.healthHaver.GetCurrentHealth() == 0.5f;
   }
 
-  // Check if a player is in a boss room
+  /// <summary>Check if a player is in a boss room</summary>
   public static bool InBossRoom(this PlayerController player)
   {
       return player.GetAbsoluteParentRoom().area.PrototypeRoomCategory == PrototypeDungeonRoom.RoomCategory.BOSS;
   }
 
-  // https://forum.unity.com/threads/clever-way-to-shuffle-a-list-t-in-one-line-of-c-code.241052/
+  /// <summary>https://forum.unity.com/threads/clever-way-to-shuffle-a-list-t-in-one-line-of-c-code.241052/</summary>
   public static void Shuffle<T>(this IList<T> ts) {
       var count = ts.Count;
       var last = count - 1;
@@ -475,7 +476,7 @@ public static class Extensions
       }
   }
 
-  // Copy and shuffle a list
+  /// <summary>Copy and shuffle a list</summary>
   public static List<T> CopyAndShuffle<T>(this List<T> list)
   {
     List<T> shuffled = new();
@@ -485,7 +486,7 @@ public static class Extensions
     return shuffled;
   }
 
-  // Get a numerical quality for a PickupObject
+  /// <summary>Get a numerical quality for a PickupObject</summary>
   public static int QualityGrade (this PickupObject pickup)
   {
     switch (pickup.quality)
@@ -499,7 +500,7 @@ public static class Extensions
     }
   }
 
-  // Get the highest quality item in a list
+  /// <summary>Get the highest quality item in a list</summary>
   public static PickupObject HighestQualityItem<T>(this List<T> pickups) where T : PickupObject
   {
     if (pickups == null || pickups.Count == 0)
@@ -513,7 +514,7 @@ public static class Extensions
     return best;
   }
 
-  // Select a random element from an array
+  /// <summary>Select a random element from an array</summary>
   public static T ChooseRandom<T>(this T[] source)
   {
       if (source.Length == 0)
@@ -521,7 +522,7 @@ public static class Extensions
       return source[UnityEngine.Random.Range(0,source.Length)];
   }
 
-  // Select a random element from a list
+  /// <summary>Select a random element from a list</summary>
   public static T ChooseRandom<T>(this List<T> source)
   {
       if (source == null || source.Count == 0)
@@ -529,14 +530,14 @@ public static class Extensions
       return source[UnityEngine.Random.Range(0,source.Count)];
   }
 
-  // Select a random element from an enum
+  /// <summary>Select a random element from an enum</summary>
   public static T ChooseRandom<T>() where T : Enum
   {
       var v = Enum.GetValues(typeof (T));
       return (T) v.GetValue(UnityEngine.Random.Range(0,v.Length));
   }
 
-  // Check if enemies are actively spawning in a room
+  /// <summary>Check if enemies are actively spawning in a room</summary>
   public static bool NewWaveOfEnemiesIsSpawning(this RoomHandler room)
   {
     foreach (AIActor enemy in room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All))
@@ -545,7 +546,7 @@ public static class Extensions
     return false;
   }
 
-  // Check if we have line of sight to a target from start without walls interfering
+  /// <summary>Check if we have line of sight to a target from start without walls interfering</summary>
   public static bool HasLineOfSight(this Vector2 start, Vector2 target)
   {
     Vector2 dirVec = target - start;
@@ -555,7 +556,7 @@ public static class Extensions
     return !collided;
   }
 
-  // Clear a gun's default audio events
+  /// <summary>Clear a gun's default audio events</summary>
   public static void ClearDefaultAudio(this Gun gun, bool useSilentGroup = true)
   {
     if (gun.GetComponent<Alexandria.ItemAPI.AdvancedGunBehavior>() is Alexandria.ItemAPI.AdvancedGunBehavior agun)
@@ -590,7 +591,7 @@ public static class Extensions
       }
   }
 
-  // Set an audio event for a specific frame of a gun's animation
+  /// <summary>Set an audio event for a specific frame of a gun's animation</summary>
   public static void SetGunAudio(this Gun gun, string name = null, string audio = "", int frame = 0)
   {
     tk2dSpriteAnimationFrame aframe = gun.spriteAnimator.GetClipByName(name).frames[frame];
@@ -605,7 +606,7 @@ public static class Extensions
   //       AkSoundEngine.PostEvent(audio, gun.gameObject);
   //     };
   // }
-  // needs to use Alexandria version because fireaudio overrides are not serialized
+  /// <summary>needs to use Alexandria version because fireaudio overrides are not serialized</summary>
   public static void SetFireAudio(this Gun gun, string audio = "", int frame = 0)
   {
     gun.SetGunAudio(name: gun.shootAnimation, audio: audio, frame: frame);
@@ -684,7 +685,7 @@ public static class Extensions
   // Gets the actual rectangle corresponding to the the outermost walls of a room
   //   - Useful for boss fights
   //   - Useful for phasing checks
-  // private const int _ROOM_PIXEL_FUDGE_FACTOR = 16;
+  /// <summary>private const int _ROOM_PIXEL_FUDGE_FACTOR = 16;</summary>
   private const int _ROOM_PIXEL_FUDGE_FACTOR = 8;
   public static Rect GetRoomPixelBorder(this RoomHandler room)
   {
@@ -748,13 +749,13 @@ public static class Extensions
     return adjusted;
   }
 
-  // Check if a PixelColider is fully within a rectangle
+  /// <summary>Check if a PixelColider is fully within a rectangle</summary>
   public static bool FullyWithin(this PixelCollider self, Rect other)
   {
     return new Rect(self.MinX, self.MinY, self.Dimensions.X, self.Dimensions.Y).FullyWithin(other);
   }
 
-  // Check if a rectangle is fully within another rectangle
+  /// <summary>Check if a rectangle is fully within another rectangle</summary>
   public static bool FullyWithin(this Rect self, Rect other)
   {
     bool xwithin = self.xMin > other.xMin && self.xMax < other.xMax;
@@ -762,7 +763,7 @@ public static class Extensions
     return xwithin && ywithin;
   }
 
-  // Set some basic attributes for each gun
+  /// <summary>Set some basic attributes for each gun</summary>
   public static void SetAttributes(this Gun gun, ItemQuality quality, GunClass gunClass, float reloadTime, int ammo,
     Items audioFrom = Items.Blasphemy, bool defaultAudio = false, bool infiniteAmmo = false, bool canGainAmmo = true, bool canReloadNoMatterAmmo = false, bool? doesScreenShake = null)
   {
@@ -783,6 +784,7 @@ public static class Extensions
       gun.ClearDefaultAudio();
   }
 
+  /// <summary>Create a prefab trail and add it to a prefab projectile</summary>
   public static TrailController AddTrailToProjectilePrefab(this Projectile target, string spritePath, Vector2 colliderDimensions, Vector2 colliderOffsets, List<string> animPaths = null, int animFPS = -1, List<string> startAnimPaths = null, int startAnimFPS = -1, float timeTillAnimStart = -1, float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false)
   {
       TrailController trail = VFX.CreateTrailObject(
@@ -792,6 +794,7 @@ public static class Extensions
       return trail;
   }
 
+  /// <summary>Add an existing prefab trail to a prefab projectile</summary>
   public static TrailController AddTrailToProjectilePrefab(this Projectile target, TrailController trail)
   {
       trail.gameObject.SetActive(true); // parent projectile is deactivated, so we want to re-activate ourselves so we display correctly when the projectile becomes active
@@ -799,6 +802,7 @@ public static class Extensions
       return trail;
   }
 
+  /// <summary>Add an existing prefab trail to a projectile instance</summary>
   public static TrailController AddTrailToProjectileInstance(this Projectile target, TrailController trail)
   {
       GameObject instantiatedTrail = UnityEngine.Object.Instantiate(trail.gameObject);
@@ -806,6 +810,7 @@ public static class Extensions
       return instantiatedTrail.GetComponent<TrailController>();
   }
 
+  /// <summary>Add an existing prefab trail to a sprite instance</summary>
   public static SpriteTrailController AddTrailToSpriteInstance(this tk2dBaseSprite target, SpriteTrailController trail)
   {
       GameObject instantiatedTrail = UnityEngine.Object.Instantiate(trail.gameObject);
@@ -813,13 +818,13 @@ public static class Extensions
       return instantiatedTrail.GetComponent<SpriteTrailController>();
   }
 
-  // Set the rotation of a projectile manually
+  /// <summary>Set the rotation of a projectile manually</summary>
   public static void SetRotation(this Projectile p, float angle)
   {
     p.m_transform.eulerAngles = new Vector3(0f, 0f, angle);
   }
 
-  // Add a new animation to the same collection as a reference sprite
+  /// <summary>Add a new animation to the same collection as a reference sprite</summary>
   public static string SetUpAnimation(this tk2dBaseSprite sprite, string animationName, float fps, tk2dSpriteAnimationClip.WrapMode wrapMode = tk2dSpriteAnimationClip.WrapMode.Once, bool copyShaders = false)
   {
     tk2dSpriteCollectionData collection = sprite.collection;
@@ -841,7 +846,7 @@ public static class Extensions
     return animationName;
   }
 
-  // Same as PlaceAtPositionByAnchor(), but adjusted for sprite's current scale
+  /// <summary>Same as PlaceAtPositionByAnchor(), but adjusted for sprite's current scale</summary>
   public static void PlaceAtScaledPositionByAnchor(this tk2dBaseSprite sprite, Vector3 position, Anchor anchor)
   {
       Vector2 scale = sprite.transform.localScale.XY();
@@ -851,7 +856,7 @@ public static class Extensions
       sprite.transform.position = position - relativePositionFromAnchor.ToVector3ZUp();
   }
 
-  // Same as PlaceAtPositionByAnchor(), but adjusted for sprite's current scale and rotation
+  /// <summary>Same as PlaceAtPositionByAnchor(), but adjusted for sprite's current scale and rotation</summary>
   public static void PlaceAtRotatedPositionByAnchor(this tk2dBaseSprite sprite, Vector3 position, Anchor anchor)
   {
       Vector2 scale = sprite.transform.localScale.XY();
@@ -861,7 +866,7 @@ public static class Extensions
       sprite.transform.position = position - relativePositionFromAnchor.ToVector3ZUp();
   }
 
-  // Remove and return last element from list
+  /// <summary>Remove and return last element from list</summary>
   public static T Pop<T>(this List<T> items)
   {
     T item = items[items.Count - 1];
@@ -869,7 +874,7 @@ public static class Extensions
     return item;
   }
 
-  // Clear out all old behaviors for a BehaviorSpeculator and restart everything
+  /// <summary>Clear out all old behaviors for a BehaviorSpeculator and restart everything</summary>
   public static void FullyRefreshBehaviors(this BehaviorSpeculator self)
   {
     self.m_behaviors.Clear();
@@ -878,7 +883,7 @@ public static class Extensions
     self.RefreshBehaviors();
   }
 
-  // Set up custom ammo types from default resource paths
+  /// <summary>Set up custom ammo types from default resource paths</summary>
   public static void SetupCustomAmmoClip(this ProjectileModule mod, GunBuildData b)
   {
       string clipname    = b.gun.EncounterNameOrDisplayName.SafeName();
@@ -888,7 +893,7 @@ public static class Extensions
       mod.customAmmoType = CustomClipAmmoTypeToolbox.AddCustomAmmoType($"{clipname}_clip", ResMap.Get($"{clipname}_clipfull")[0], ResMap.Get($"{clipname}_clipempty")[0]);
   }
 
-  // Check if a player will die from next hit
+  /// <summary>Check if a player will die from next hit</summary>
   public static bool PlayerWillDieFromHit(this HealthHaver hh, HealthHaver.ModifyDamageEventArgs data)
   {
     if (data == EventArgs.Empty || data.ModifiedDamage <= 0f || !hh.IsVulnerable)
@@ -903,7 +908,7 @@ public static class Extensions
     return true;
   }
 
-  // Remove a shader from a gameObject
+  /// <summary>Remove a shader from a gameObject</summary>
   public static void RemoveShader(this GameObject g, Shader shader)
   {
     if (g?.GetComponent<MeshRenderer>() is not MeshRenderer component)
@@ -918,7 +923,7 @@ public static class Extensions
     component.sharedMaterials = list.ToArray();
   }
 
-  // Add a shader to a gameObject, and return the material for that shader
+  /// <summary>Add a shader to a gameObject, and return the material for that shader</summary>
   public static Material GetOrAddShader(this GameObject g, Shader shader, bool atBeginning = true)
   {
     if (g?.GetComponent<MeshRenderer>() is not MeshRenderer component)
@@ -942,7 +947,7 @@ public static class Extensions
     return material;
   }
 
-  // Check if a goop position is electrificed
+  /// <summary>Check if a goop position is electrificed</summary>
   public static bool IsPositionElectrified(this DeadlyDeadlyGoopManager goopManager, Vector2 position)
   {
     IntVector2 key = (position / DeadlyDeadlyGoopManager.GOOP_GRID_SIZE).ToIntVector2(VectorConversions.Floor);
@@ -954,7 +959,7 @@ public static class Extensions
     return false;
   }
 
-  // Returns a singleton of an empty IEnumerable when the collection being extended is empty
+  /// <summary>Returns a singleton of an empty IEnumerable when the collection being extended is empty</summary>
   public static IEnumerable<T> EmptyIfNull<T>(this IEnumerable<T> enumerable)
   {
     return enumerable ?? Enumerable.Empty<T>();
@@ -962,7 +967,7 @@ public static class Extensions
 
   internal static  tk2dSpriteCollectionData _GunCollection = null;
 
-  // Get a list of barrel offsets for a gun's animation
+  /// <summary>Get a list of barrel offsets for a gun's animation</summary>
   public static List<Vector3> GetBarrelOffsetsForAnimation(this Gun gun, string animationName)
   {
     List<Vector3> offsets = new();
@@ -980,50 +985,50 @@ public static class Extensions
     return offsets;
   }
 
-  // Returns true if a projectile was fired from a gun without depleting ammo
+  /// <summary>Returns true if a projectile was fired from a gun without depleting ammo</summary>
   public static bool FiredForFree(this Projectile proj, Gun gun, ProjectileModule mod)
   {
     return (mod.ammoCost == 0 || gun.InfiniteAmmo || gun.LocalInfiniteAmmo /*|| gun.CanGainAmmo*/ || ((proj.Owner as PlayerController)?.InfiniteAmmo?.Value ?? false));
   }
 
-  // Add a component to a projectile's GameObject and return the component
+  /// <summary>Add a component to a projectile's GameObject and return the component</summary>
   public static T AddComponent<T>(this Projectile projectile) where T : MonoBehaviour
   {
     return projectile.gameObject.AddComponent<T>();
   }
 
-  // Returns or adds a component to a projectile's GameObject and return the component
+  /// <summary>Returns or adds a component to a projectile's GameObject and return the component</summary>
   public static T GetOrAddComponent<T>(this Projectile projectile) where T : MonoBehaviour
   {
     return projectile.gameObject.GetOrAddComponent<T>();
   }
 
-  // Get the internal sprite name for each gun (keep in parity with SetupItem())
+  /// <summary>Get the internal sprite name for each gun (keep in parity with SetupItem())</summary>
   public static string InternalName(this Gun gun)
   {
     return gun.gunName.Replace("-", "").Replace(".", "").Replace(" ", "_").ToLower(); // keep in parity with SetupItem()
   }
 
-  // Get the internal sprite name for each gun (keep in parity with SetupItem())
+  /// <summary>Get the internal sprite name for each gun (keep in parity with SetupItem())</summary>
   public static string InternalSpriteName(this Gun gun)
   {
     return gun.InternalName().Replace("'",""); // keep in parity with SetupItem()
   }
 
-  // Get the internal name of an item / gun corresponding to its sprite
+  /// <summary>Get the internal name of an item / gun corresponding to its sprite</summary>
   public static string SafeName(this string s)
   {
     return s.Replace(" ", "_").Replace("'","").Replace(".","").ToLower();
   }
 
-  // Set the FPS for a gun's idle animation (including the fixed idle animation, if available)
+  /// <summary>Set the FPS for a gun's idle animation (including the fixed idle animation, if available)</summary>
   public static void SetIdleAnimationFPS(this Gun gun, int fps)
   {
     gun.SetAnimationFPS($"{gun.InternalSpriteName()}_idle", fps);
     gun.SetAnimationFPS($"{gun.InternalSpriteName()}_{LargeGunAnimationHotfix._TRIM_ANIMATION}", fps);
   }
 
-  // Force a gun to render on top of the player (call this in LateUpdate())
+  /// <summary>Force a gun to render on top of the player (call this in LateUpdate())</summary>
   public static void RenderInFrontOfPlayer(this Gun gun)
   {
     if (gun.CurrentOwner is not PlayerController pc)
@@ -1035,7 +1040,7 @@ public static class Extensions
     gun.GetSprite().UpdateZDepth();
   }
 
-  // Set an animated projectile to play a singular frame
+  /// <summary>Set an animated projectile to play a singular frame</summary>
   public static void SetFrame(this Projectile projectile, int frame)
   {
       projectile.spriteAnimator.deferNextStartClip = true;
@@ -1043,7 +1048,7 @@ public static class Extensions
       projectile.spriteAnimator.Stop();
   }
 
-  // Add strings to the global string database
+  /// <summary>Add strings to the global string database</summary>
   public static void SetupDBStrings(this string key, List<string> values)
   {
     StringDBTable table = ETGMod.Databases.Strings.Core;
@@ -1051,7 +1056,7 @@ public static class Extensions
       table.AddComplex(key, v);
   }
 
-  // Convert a list of pickup ids to an evenly-weighted loot table
+  /// <summary>Convert a list of pickup ids to an evenly-weighted loot table</summary>
   public static GenericLootTable ToLootTable(this List<int> ids)
   {
     GenericLootTable loot = FancyShopBuilder.CreateLootTable();
@@ -1060,7 +1065,7 @@ public static class Extensions
     return loot;
   }
 
-  // Shift all vectors in a list by a different vector
+  /// <summary>Shift all vectors in a list by a different vector</summary>
   public static List<Vector3> ShiftAll(this IEnumerable<Vector3> vecList, Vector3 shift)
   {
     List<Vector3> vecs = new();
@@ -1069,7 +1074,7 @@ public static class Extensions
     return vecs;
   }
 
-  // Find a custom shop item currently under consideration by player
+  /// <summary>Find a custom shop item currently under consideration by player</summary>
   public static CustomShopItemController GetTargetedItemByPlayer(this CustomShopController shop, PlayerController player)
   {
       if (!shop?.transform)
@@ -1087,7 +1092,7 @@ public static class Extensions
       return null;
   }
 
-  // Pseudo-homing behavior
+  /// <summary>Pseudo-homing behavior</summary>
   public static Vector2 LerpNaturalAndDirectVelocity(this Vector2 position, Vector2 target, Vector2 naturalVelocity, float accel, float lerpFactor)
   {
       Vector2 towardsTarget = target - position;
@@ -1099,7 +1104,7 @@ public static class Extensions
       return Vector2.Lerp(newDirectVelocity, newNaturalVelocity, lerpFactor);
   }
 
-  // Get Debris objects within a cone of vision from some reference position, optionally checking at most limit debris
+  /// <summary>Get Debris objects within a cone of vision from some reference position, optionally checking at most limit debris</summary>
   private static int _nextDebris = 0;
   public static IEnumerable<DebrisObject> DebrisWithinCone(this Vector2 start, float squareReach, float angle, float spread, int limit = -1)
   {
@@ -1141,7 +1146,7 @@ public static class Extensions
       yield break;
   }
 
-  // Get impact VFX from a specific Gun as a VFXPool
+  /// <summary>Get impact VFX from a specific Gun as a VFXPool</summary>
   public static VFXPool EnemyImpactPool(this Items item, int proj = 0)
     => (ItemHelper.Get(item) as Gun).DefaultModule.projectiles[proj].hitEffects.enemy;
   public static VFXPool HorizontalImpactPool(this Items item, int proj = 0)
@@ -1149,7 +1154,7 @@ public static class Extensions
   public static VFXPool VerticalImpactPool(this Items item, int proj = 0)
     => (ItemHelper.Get(item) as Gun).DefaultModule.projectiles[proj].hitEffects.tileMapVertical;
 
-  // Get impact VFX from a specific Gun as a GameObject
+  /// <summary>Get impact VFX from a specific Gun as a GameObject</summary>
   public static GameObject EnemyImpactVFX(this Items item, int proj = 0)
     => (ItemHelper.Get(item) as Gun).DefaultModule.projectiles[proj].hitEffects.enemy.effects[0].effects[0].effect;
   public static GameObject HorizontalImpactVFX(this Items item, int proj = 0)
@@ -1159,7 +1164,7 @@ public static class Extensions
   public static GameObject AirImpactVFX(this Items item, int proj = 0)
     => (ItemHelper.Get(item) as Gun).DefaultModule.projectiles[proj].hitEffects.overrideMidairDeathVFX;
 
-  // Append a string to all strings in a list
+  /// <summary>Append a string to all strings in a list</summary>
   public static List<string> AppendAll(this List<string> strings, string suffix)
   {
     List<string> newStrings = new();
@@ -1168,19 +1173,19 @@ public static class Extensions
     return newStrings;
   }
 
-  // Destroy a GameObject if it is non-null
+  /// <summary>Destroy a GameObject if it is non-null</summary>
   public static void SafeDestroy(this GameObject g)
   {
     if (g) UnityEngine.Object.Destroy(g);
   }
 
-  // Destroy a Component if it is non-null
+  /// <summary>Destroy a Component if it is non-null</summary>
   public static void SafeDestroy<T>(this T c) where T : Component
   {
     if (c) UnityEngine.Object.Destroy(c);
   }
 
-  // Select a pickup id from a weighted list
+  /// <summary>Select a pickup id from a weighted list</summary>
   public static int GetWeightedPickupID(this List<IntVector2> weights)
   {
     int targetWeight = UnityEngine.Random.Range(0, weights.Sum(item => item.y));
@@ -1190,13 +1195,13 @@ public static class Extensions
     return 0;
   }
 
-  // Get the first element of a list if possible, returning null otherwise
+  /// <summary>Get the first element of a list if possible, returning null otherwise</summary>
   public static T SafeFirst<T>(this List<T> c)
   {
     return ((c?.Count ?? 0) == 0) ? default(T) : c[0];
   }
 
-  // Get the first element of a list if possible, returning null otherwise
+  /// <summary>Get the first element of a list if possible, returning null otherwise</summary>
   public static Projectile FirstValidChargeProjectile(this ProjectileModule mod)
   {
     List<ChargeProjectile> c = mod.chargeProjectiles;
@@ -1211,7 +1216,7 @@ public static class Extensions
   }
 
   private static readonly SpeculativeRigidbody[] _NoRigidBodies = Enumerable.Empty<SpeculativeRigidbody>().ToArray();
-  // Determine whether a SpeculativeRigidBodsy is inside a wall
+  /// <summary>Determine whether a SpeculativeRigidBodsy is inside a wall</summary>
   public static bool InsideWall(this SpeculativeRigidbody body)
   {
     return PhysicsEngine.Instance.OverlapCast(
@@ -1228,7 +1233,7 @@ public static class Extensions
       );
   }
 
-  // Move a SpeculativeRigidBody from start towards target in steps increments, stopping if we hit a wall. Returns true iff we reach our target without a wall collision.
+  /// <summary>Move a SpeculativeRigidBody from start towards target in steps increments, stopping if we hit a wall. Returns true iff we reach our target without a wall collision.</summary>
   public static bool MoveTowardsTargetOrWall(this SpeculativeRigidbody body, Vector2 start, Vector2 target, int steps = 10)
   {
       Vector2 delta        = (target - start);
@@ -1273,5 +1278,89 @@ public static class Extensions
         posB        : b.sprite.WorldBottomLeft.ToIntVector2(),
         dimensionsB : (b.sprite.WorldTopRight - b.sprite.WorldBottomLeft).ToIntVector2()
         );
+  }
+
+  /// <summary>
+  /// Given a floating point amount (e.g., 45.71), use the fractional component (e.g., .71) as the odds to return the ceiling of the
+  /// amount (e.g., 48), returning the floor of the amount (e.g., 47) otherwise
+  /// </summary>
+  public static int RoundWeighted(this float amount)
+  {
+      return (UnityEngine.Random.value <= (amount - Math.Truncate(amount))
+          ? Mathf.CeilToInt(amount)
+          : Mathf.FloorToInt(amount));
+  }
+
+  /// <summary>
+  /// Perform basic initialization of beam sprites for a projectile, override the beam controller's existing sprites if they exist
+  /// </summary>
+  public static BasicBeamController SetupBeamSprites(this Projectile projectile, string spriteName, int fps, Vector2 dims, Vector2? impactDims = null, int impactFps = -1)
+  {
+      // Fix breakage with GenerateBeamPrefab() expecting a non-null specrigidbody
+      projectile.specRigidbody = projectile.gameObject.GetOrAddComponent<SpeculativeRigidbody>();
+
+      // Unnecessary to delete these
+      // UnityEngine.Object.Destroy(projectile.GetComponentInChildren<tk2dSpriteAnimation>());
+      // UnityEngine.Object.Destroy(projectile.GetComponentInChildren<tk2dTiledSprite>());
+      // UnityEngine.Object.Destroy(projectile.GetComponentInChildren<tk2dSpriteAnimator>());
+      // UnityEngine.Object.Destroy(projectile.GetComponentInChildren<BasicBeamController>());
+
+      // Compute beam offsets from middle-left of sprite
+      Vector2 offsets = new Vector2(0, Mathf.Ceil(dims.y / 2f));
+      // Compute impact offsets from true center of sprite
+      Vector2? impactOffsets = impactDims.HasValue ? new Vector2(Mathf.Ceil(impactDims.Value.x / 2f), Mathf.Ceil(impactDims.Value.y / 2f)) : null;
+
+      // Create the beam itself using our resource map lookup
+      BasicBeamController beamComp = projectile.FixedGenerateBeamPrefab(
+          spritePath                  : ResMap.Get($"{spriteName}_mid")[0],
+          colliderDimensions          : dims,
+          colliderOffsets             : offsets,
+          beamAnimationPaths          : ResMap.Get($"{spriteName}_mid"),
+          beamFPS                     : fps,
+          //Impact
+          impactVFXAnimationPaths     : ResMap.Get($"{spriteName}_impact", quietFailure: true),
+          beamImpactFPS               : (impactFps > 0) ? impactFps : fps,
+          impactVFXColliderDimensions : impactDims,
+          impactVFXColliderOffsets    : impactOffsets,
+          //End
+          endVFXAnimationPaths        : ResMap.Get($"{spriteName}_end", quietFailure: true),
+          beamEndFPS                  : fps,
+          endVFXColliderDimensions    : dims,
+          endVFXColliderOffsets       : offsets,
+          //Beginning
+          muzzleVFXAnimationPaths     : ResMap.Get($"{spriteName}_start", quietFailure: true),
+          beamMuzzleFPS               : fps,
+          muzzleVFXColliderDimensions : dims,
+          muzzleVFXColliderOffsets    : offsets //,
+          //Other Variables
+          // glowAmount                  : 0f,
+          // emissivecolouramt           : 0f
+          );
+
+
+      // fix some more animation glitches (don't consistently work, check and enable on a case by case basis)
+      // beamComp.usesChargeDelay = false;
+      // beamComp.muzzleAnimation = "beam_start;
+      // beamComp.beamStartAnimation = null;
+      // beamComp.chargeAnimation = null;
+      // beamComp.rotateChargeAnimation = true;
+      // projectile.shouldRotate = true;
+      // projectile.shouldFlipVertically = true;
+
+      return beamComp;
+  }
+
+  /// <summary>
+  /// Get attach points for an animation clip
+  /// </summary>
+  public static tk2dSpriteDefinition.AttachPoint[] AttachPointsForClip(this Gun gun, string clipName)
+  {
+      Lazy._GunSpriteCollection ??= gun.sprite.collection; // need to initialize at least once
+      tk2dSpriteAnimationClip clip = gun.GetComponent<tk2dSpriteAnimator>().GetClipByName(clipName);
+      if (clip == null)
+          return null;
+      int spriteid = clip.frames[0].spriteId;
+      int attachIndex = Lazy._GunSpriteCollection.SpriteIDsWithAttachPoints.IndexOf(spriteid);
+      return Lazy._GunSpriteCollection.SpriteDefinedAttachPoints[attachIndex].attachPoints;
   }
 }

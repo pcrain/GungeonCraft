@@ -119,7 +119,7 @@ public class Alyx : AdvancedGunBehavior
 
     internal static int ComputeExponentialDecay(float startAmount, float lambda, float timeElapsed)
     {
-        return Lazy.RoundWeighted(startAmount * Mathf.Exp(-lambda * timeElapsed));
+        return (startAmount * Mathf.Exp(-lambda * timeElapsed)).RoundWeighted();
     }
 
     private void RecalculateAmmo()
