@@ -71,7 +71,7 @@ internal class EnemyBlamedBehavior : MonoBehaviour
     internal static readonly List<string> _BlameQuotes = new(){
         "It's my fault!",
         "I messed up!",
-        "I did it!",
+        "It was me, I did it!",
         "Won't happen again!",
         "I'm sorry!",
         "My apologies!",
@@ -81,12 +81,19 @@ internal class EnemyBlamedBehavior : MonoBehaviour
         "I confess!",
         "I have no excuse!",
         "That's my bad!",
+        "I'm in so much trouble!",
+        "My mistake!",
+        "What have I done?!",
+        "That's on me!",
+        "I slipped up!",
     };
 
     public void Setup(Projectile p)
     {
         AIActor enemy = base.GetComponent<AIActor>();
         if ((enemy?.healthHaver?.currentHealth ?? 0) <= 0)
+            return;
+        if (p.Owner is not PlayerController player)
             return;
 
         if (TextBoxManager.HasTextBox(enemy.sprite.transform))
@@ -100,7 +107,7 @@ internal class EnemyBlamedBehavior : MonoBehaviour
             instant          : false,
             showContinueText : true
             );
-        enemy.StartCoroutine(DoFearEffect(enemy, p.Owner as PlayerController));
+        enemy.StartCoroutine(DoFearEffect(enemy, player));
     }
 
     public static IEnumerator DoFearEffect(AIActor enemy, PlayerController player)

@@ -281,7 +281,7 @@ public class Missiletoe : AdvancedGunBehavior
         {
             int pickupId = (int)data[i++];
             PickupObject pickup = UnityEngine.Object.Instantiate(
-                PickupObjectDatabase.GetById(pickupId).gameObject, Vector3.zero, Quaternion.identity).GetComponent<PickupObject>();
+                PickupObjectDatabase.GetById(pickupId).gameObject).GetComponent<PickupObject>();
 
             if (pickup.GetComponent<PlayerItem>() is PlayerItem active)
             {

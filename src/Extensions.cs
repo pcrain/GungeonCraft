@@ -1363,4 +1363,19 @@ public static class Extensions
       int attachIndex = Lazy._GunSpriteCollection.SpriteIDsWithAttachPoints.IndexOf(spriteid);
       return Lazy._GunSpriteCollection.SpriteDefinedAttachPoints[attachIndex].attachPoints;
   }
+
+  /// <summary>Instantiate a prefab with the specified position and rotation, optionally anchoring its sprite and clamping it to the pixel grid</summary>
+  public static GameObject Instantiate(this GameObject original, Vector3? position = null, Quaternion? rotation = null, Anchor? anchor = null, bool quantize = true)
+  {
+    Vector3 pos = position ?? Vector3.zero;
+    GameObject g = UnityEngine.Object.Instantiate(original: original, position: pos, rotation: rotation ?? Quaternion.identity);
+    if (anchor.HasValue && g.GetComponent<tk2dBaseSprite>() is tk2dBaseSprite sprite)
+    {
+      sprite.PlaceAtPositionByAnchor(pos, anchor.Value);
+      if (quantize)
+        sprite.transform.position = sprite.transform.position.Quantize(0.0625f);
+      g.GetComponent<SpeculativeRigidbody>()?.Reinitialize();
+    }
+    return g;
+  }
 }

@@ -73,17 +73,14 @@ public class StackOfTorches : PlayerItem
         bool placeOnFloor = delta.magnitude > _MAX_WALL_DIST;
 
         // Actually create the torch
-        GameObject torch;
         if (placeOnFloor)
         {
-            torch = UnityEngine.Object.Instantiate(_Torches.ChooseRandom(), user.sprite.WorldCenter, Quaternion.identity) as GameObject;
-            torch.GetComponent<tk2dSprite>().PlaceAtPositionByAnchor(user.sprite.WorldCenter + _MAX_WALL_DIST * delta.normalized, Anchor.MiddleCenter);
+            _Torches.ChooseRandom().Instantiate(position: user.sprite.WorldCenter + _MAX_WALL_DIST * delta.normalized, anchor: Anchor.MiddleCenter);
             AkSoundEngine.PostEvent("mc_torch_place", base.gameObject);
         }
         else
         {
-            torch = UnityEngine.Object.Instantiate(_SconcePrefab, user.sprite.WorldCenter, Quaternion.identity) as GameObject;
-            torch.GetComponent<tk2dSprite>().PlaceAtPositionByAnchor(target, Anchor.LowerCenter);
+            _SconcePrefab.Instantiate(position: target, anchor: Anchor.LowerCenter);
             AkSoundEngine.PostEvent("mc_lantern_place", base.gameObject);
         }
 

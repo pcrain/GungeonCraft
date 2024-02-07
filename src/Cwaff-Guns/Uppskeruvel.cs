@@ -188,8 +188,7 @@ public class Uppskeruvel : AdvancedGunBehavior
 
     private UppskeruvelCombatSoul SpawnCombatSoul()
     {
-        UppskeruvelCombatSoul soul = UnityEngine.Object.Instantiate(
-            Uppskeruvel._CombatSoulPrefab, this.Player.CenterPosition, Quaternion.identity).GetComponent<UppskeruvelCombatSoul>();
+        UppskeruvelCombatSoul soul = Uppskeruvel._CombatSoulPrefab.Instantiate(this.Player.CenterPosition).GetComponent<UppskeruvelCombatSoul>();
         this._extantSouls.Add(soul);
         soul.Setup(this.Player, this);
         return soul;
@@ -203,8 +202,7 @@ public class Uppskeruvel : AdvancedGunBehavior
         {
             float angle = Lazy.RandomAngle();
             Vector2 finalPos = ppos + BraveMathCollege.DegreesToVector(angle);
-            UnityEngine.Object.Instantiate(Uppskeruvel._LostSoulPrefab, finalPos, Quaternion.identity
-                ).GetComponent<UppskeruvelLostSoul>(
+            Uppskeruvel._LostSoulPrefab.Instantiate(finalPos).GetComponent<UppskeruvelLostSoul>(
                 ).Setup(angle.ToVector(_SOUL_LAUNCH_SPEED * UnityEngine.Random.Range(0.8f, 1.2f)));
         }
     }

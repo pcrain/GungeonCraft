@@ -420,10 +420,7 @@ public class CreateDecoyOnKill : MonoBehaviour
 
     private void OnWillKillEnemy(Projectile bullet, SpeculativeRigidbody enemy)
     {
-        GameObject gameObject = UnityEngine.Object.Instantiate(Glockarina._DecoyPrefab, enemy.UnitCenter, Quaternion.identity);
-        tk2dBaseSprite sprite = gameObject.GetComponent<tk2dBaseSprite>();
-        sprite.PlaceAtPositionByAnchor(enemy.UnitCenter.ToVector3ZUp(sprite.transform.position.z), tk2dBaseSprite.Anchor.MiddleCenter);
-        sprite.specRigidbody?.RegisterGhostCollisionException(this._owner.specRigidbody);
-        gameObject.transform.position = gameObject.transform.position.Quantize(0.0625f);
+        GameObject decoy = Glockarina._DecoyPrefab.Instantiate(position: enemy.UnitCenter.ToVector3ZUp(), anchor: Anchor.LowerCenter);
+        decoy.GetComponent<SpeculativeRigidbody>()?.RegisterGhostCollisionException(this._owner.specRigidbody);
     }
 }

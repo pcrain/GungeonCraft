@@ -36,7 +36,7 @@ public class Suncaster : AdvancedGunBehavior
         base.OnReloadPressed(player, gun, manualReload);
         if (player.IsDodgeRolling || !player.AcceptingNonMotionInput || gun.CurrentAmmo <= _PRISM_AMMO_COST)
           return;
-        GameObject prism = UnityEngine.Object.Instantiate(_PrismVFX, gun.barrelOffset.position, Quaternion.identity);
+        GameObject prism = _PrismVFX.Instantiate(position: gun.barrelOffset.position);
         prism.AddComponent<SuncasterPrism>().Setup(gun.CurrentAngle.ToVector(_PRISM_LAUNCH_SPEED));
         gun.LoseAmmo(_PRISM_AMMO_COST);
         AkSoundEngine.PostEvent("fire_coin_sound", gun.gameObject);

@@ -91,7 +91,7 @@ public class MidasProjectile : MonoBehaviour
             goldSprite = Lazy.GetTexturedEnemyIdleAnimation(enemy.aiActor, _Gold, 0.3f, _White, _SHEEN_WIDTH);
             _GoldenTextures[enemy.aiActor.EnemyGuid] = goldSprite; // Cache the texture for this enemy for later
         }
-        GameObject g                        = UnityEngine.Object.Instantiate(new GameObject(), enemy.sprite.WorldBottomLeft.ToVector3ZUp(), Quaternion.identity);
+        GameObject g                        = new();
         _GoldSpriteCollection             ??= SpriteBuilder.ConstructCollection(g, "goldcollection");
         int spriteId                        = SpriteBuilder.AddSpriteToCollection(goldSprite, _GoldSpriteCollection, "goldsprite");
         tk2dBaseSprite sprite               = g.AddComponent<tk2dSprite>();

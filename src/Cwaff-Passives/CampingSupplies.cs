@@ -135,9 +135,7 @@ public class CampingSupplies : PassiveItem
 
     private void DoSmokeAt(Vector3 pos)
     {
-        UnityEngine.Object.Instantiate(_SmokePrefab)
-            .GetComponent<tk2dBaseSprite>()
-            .PlaceAtPositionByAnchor(pos, Anchor.MiddleCenter);
+        _SmokePrefab.Instantiate(position: pos, anchor: Anchor.MiddleCenter);
     }
 
     private void TossASodaCan()

@@ -132,12 +132,6 @@ public class DeadRinger : PassiveItem
         GameObject smokePrefab = ResourceCache.Acquire("Global VFX/VFX_Item_Spawn_Poof") as GameObject;
         Vector2 ppos = this.Owner.sprite.WorldCenter;
         for (int i = 0; i < amount; ++i)
-        {
-            GameObject smoke = UnityEngine.Object.Instantiate(smokePrefab);
-            tk2dBaseSprite sprite = smoke.GetComponent<tk2dBaseSprite>();
-            sprite.PlaceAtPositionByAnchor((ppos + Lazy.RandomVector(
-                UnityEngine.Random.Range(0f,0.5f))).ToVector3ZisY(), Anchor.MiddleCenter);
-            sprite.transform.position = sprite.transform.position.Quantize(0.0625f);
-        }
+            smokePrefab.Instantiate(position: (ppos + Lazy.RandomVector( UnityEngine.Random.Range(0f,0.5f))), anchor: Anchor.MiddleCenter);
     }
 }

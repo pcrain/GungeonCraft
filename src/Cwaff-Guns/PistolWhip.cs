@@ -125,7 +125,7 @@ public class WhipChainStart : MonoBehaviour
         this._owner.CurrentGun.ToggleRenderers(false);
         AkSoundEngine.PostEvent("whip_sound", base.gameObject);
 
-        GameObject pistol = UnityEngine.Object.Instantiate(new GameObject(), Vector3.zero, Quaternion.identity);
+        GameObject pistol = new();
         tk2dSprite pistolSprite = pistol.AddComponent<tk2dSprite>();
             pistolSprite.SetSprite(gunSprite.collection, gunSprite.spriteId);
             pistolSprite.transform.rotation = baseEuler;
