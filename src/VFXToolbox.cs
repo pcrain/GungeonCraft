@@ -652,7 +652,7 @@ public class FancyVFX : MonoBehaviour
             return;
         }
 
-        this.sprite.transform.position += this._velocity * BraveTime.DeltaTime;
+        this.sprite.transform.position += this._velocity * C.FPS * BraveTime.DeltaTime;
         if (this._changesScale)
         {
             float scale = Mathf.Lerp(this._startScale, this._endScale, percentDone);
