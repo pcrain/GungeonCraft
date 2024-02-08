@@ -671,7 +671,8 @@ public class FancyVFX : MonoBehaviour
 
     // todo: fading and emission are not simultaneously compatible
     public void Setup(Vector2 velocity, float lifetime = 0, float? fadeOutTime = null, Transform parent = null,
-        float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false, float startScale = 1.0f, float endScale = 1.0f, float? height = null)
+        float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false, float startScale = 1.0f, float endScale = 1.0f, float? height = null,
+        bool randomFrame = false)
     {
         this._vfx = base.gameObject;
         this.sprite = this._vfx.GetComponent<tk2dSprite>();
@@ -713,6 +714,9 @@ public class FancyVFX : MonoBehaviour
             }
         }
 
+        if (randomFrame)
+            this._vfx.PickFrame();
+
         this._setup = true;
     }
 
@@ -730,13 +734,14 @@ public class FancyVFX : MonoBehaviour
     /// <param name="startScale">Starting scale of the VFX sprite.</param>
     /// <param name="endScale">Ending scale of the VFX sprite.</param>
     /// <param name="height">Height of the VFX above the ground. Positive = in front of most things, negative = behind most things.</param>
+    /// <param name="randomFrame">If true, animation frames are treated as separate VFX, and one is selected at random.</param>
     public static FancyVFX Spawn(GameObject prefab, Vector3 position, Quaternion? rotation = null,
         Vector2? velocity = null, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0, Color? emissiveColor = null,
-        bool fadeIn = false, float startScale = 1.0f, float endScale = 1.0f, float? height = null)
+        bool fadeIn = false, float startScale = 1.0f, float endScale = 1.0f, float? height = null, bool randomFrame = false)
     {
         GameObject v = SpawnManager.SpawnVFX(prefab, position, rotation ?? Quaternion.identity, ignoresPools: false);
         FancyVFX fv = v.AddComponent<FancyVFX>();
-        fv.Setup(velocity ?? Vector2.zero, lifetime, fadeOutTime, parent, emissivePower, emissiveColor, fadeIn, startScale, endScale, height);
+        fv.Setup(velocity ?? Vector2.zero, lifetime, fadeOutTime, parent, emissivePower, emissiveColor, fadeIn, startScale, endScale, height, randomFrame);
         return fv;
     }
 
@@ -785,9 +790,10 @@ public class FancyVFX : MonoBehaviour
     /// <param name="startScale">Starting scale of the VFX sprite.</param>
     /// <param name="endScale">Ending scale of the VFX sprite.</param>
     /// <param name="height">Height of the VFX above the ground. Positive = in front of most things, negative = behind most things.</param>
+    /// <param name="randomFrame">If true, animation frames are treated as separate VFX, and one is selected at random.</param>
     public static void SpawnBurst(GameObject prefab, int numToSpawn, Vector2 basePosition, float positionVariance = 0f, Vector2? baseVelocity = null, float velocityVariance = 0f,
         Vel velType = Vel.Random, Rot rotType = Rot.None, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0,
-        Color? emissiveColor = null, bool fadeIn = false, bool uniform = false, float startScale = 1.0f, float endScale = 1.0f, float? height = null)
+        Color? emissiveColor = null, bool fadeIn = false, bool uniform = false, float startScale = 1.0f, float endScale = 1.0f, float? height = null, bool randomFrame = false)
     {
         Vector2 realBaseVelocity = baseVelocity ?? Vector2.zero;
         float baseAngle = Lazy.RandomAngle();
@@ -823,7 +829,8 @@ public class FancyVFX : MonoBehaviour
                 parent        : parent,
                 startScale    : startScale,
                 endScale      : endScale,
-                height        : height
+                height        : height,
+                randomFrame   : randomFrame
                 );
         }
     }

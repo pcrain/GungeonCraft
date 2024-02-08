@@ -8,61 +8,76 @@ public class Blamethrower : AdvancedGunBehavior
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
 
-    private const float _BLAME_MULT = 4f;
+    internal static GameObject _BlameImpact = null;
+    internal static GameObject _BlameTrail = null;
 
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Blamethrower>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARM, reloadTime: 1.2f, ammo: 400, doesScreenShake: false);
-            // gun.SetAnimationFPS(gun.shootAnimation, 30);
-            // gun.SetAnimationFPS(gun.reloadAnimation, 40);
-            // gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARM, reloadTime: 1.2f, ammo: 750, doesScreenShake: false);
+            gun.SetAnimationFPS(gun.shootAnimation, 30);
+            gun.SetMuzzleVFX("blamethrower_trail", fps: 30);
             // gun.SetFireAudio("blowgun_fire_sound");
-            // gun.SetReloadAudio("blowgun_reload_sound");
 
-        gun.InitProjectile(new(clipSize: -1, cooldown: 0.08f, shootStyle: ShootStyle.Automatic,
+        Projectile proj = gun.InitProjectile(new(clipSize: -1, cooldown: 0.08f, shootStyle: ShootStyle.Automatic,
           damage: 2f, angleVariance: 30f, speed: 17f, range: 17f,
           sprite: "blamethrower_projectile", scale: 2.0f, fps: 10, anchor: Anchor.MiddleCenter, shouldRotate: false)
         ).Attach<BlameDamage>(
         ).Attach<BlamethrowerProjectile>();
+
+        _BlameImpact = VFX.Create("blamethrower_projectile", fps: 1, loops: false, anchor: Anchor.MiddleCenter);
+        _BlameTrail = VFX.Create("blamethrower_trail", fps: 16, loops: true, anchor: Anchor.MiddleCenter);
     }
 
     private class BlameDamage : DamageAdjuster
     {
+        private const float _BLAME_MULT = 4f;
+
         protected override float AdjustDamage(float currentDamage, Projectile proj, AIActor enemy)
-        {
-            if (enemy.GetComponent<EnemyBlamedBehavior>())
-                return currentDamage * _BLAME_MULT;
-            return currentDamage;
-        }
+          => currentDamage * (enemy.GetComponent<EnemyBlamedBehavior>() ? _BLAME_MULT : 1f);
     }
 }
 
 public class BlamethrowerProjectile : MonoBehaviour
 {
     private const float _FEAR_CHANCE = 0.125f;
+    private const float _VFX_RATE = 0.1f;
+
+    private float _vfxTimer = 0.0f;
+    private Projectile _projectile = null;
 
     private void Start()
     {
-        Projectile proj = base.GetComponent<Projectile>();
-        proj.spriteAnimator.PlayFromFrame(
-          UnityEngine.Random.Range(0, proj.spriteAnimator.CurrentClip.frames.Count() - 1));
-        proj.spriteAnimator.Stop(); // stop animating immediately after creation so we can stick with our initial sprite
+        this._projectile = base.GetComponent<Projectile>();
+        this._projectile.PickFrame();
         AkSoundEngine.PostEvent($"blame_sound_{UnityEngine.Random.Range(1, 6)}", base.gameObject);
-
-        if (UnityEngine.Random.value > _FEAR_CHANCE)
-            return;
-
-        proj.OnHitEnemy += this.OnHitEnemy;
+        this._projectile.OnHitEnemy += this.OnHitEnemy;
     }
 
     private void OnHitEnemy(Projectile p, SpeculativeRigidbody enemy, bool killed)
     {
+        AkSoundEngine.PostEvent("blamethrower_impact_sound", base.gameObject);
+
+        FancyVFX.SpawnBurst(prefab: Blamethrower._BlameImpact, numToSpawn: 2, basePosition: enemy.sprite.WorldCenter,
+            positionVariance: 1f, baseVelocity: 10f * Vector2.up, velocityVariance: 5f, velType: FancyVFX.Vel.Radial,
+            lifetime: 0.5f, fadeOutTime: 0.5f, randomFrame: true);
+
+        if (UnityEngine.Random.value > _FEAR_CHANCE)
+            return;
         if (!(enemy.aiActor?.IsHostileAndNotABoss() ?? false))
             return;
         if (enemy.aiActor.gameObject.GetComponent<EnemyBlamedBehavior>())
             return;
         enemy.aiActor.gameObject.AddComponent<EnemyBlamedBehavior>().Setup(p);
+    }
+
+    private void Update()
+    {
+        if ((this._vfxTimer += BraveTime.DeltaTime) < _VFX_RATE)
+            return;
+        this._vfxTimer -= 0.1f;
+        FancyVFX.Spawn(Blamethrower._BlameTrail, this._projectile.sprite.WorldCenter.ToVector3ZisY(-1f), velocity: 0.2f * this._projectile.LastVelocity,
+            rotation: this._projectile.LastVelocity.EulerZ(), lifetime: 0.18f, fadeOutTime: 0.15f);
     }
 }
 
@@ -74,9 +89,10 @@ internal class EnemyBlamedBehavior : MonoBehaviour
         "It was me, I did it!",
         "Won't happen again!",
         "I'm sorry!",
+        "I'm so sorry!",
         "My apologies!",
         "Please excuse me!",
-        "Don't tell my parents!",
+        // "Don't tell my parents!",
         "Don't tell my boss!",
         "I confess!",
         "I have no excuse!",
@@ -84,7 +100,7 @@ internal class EnemyBlamedBehavior : MonoBehaviour
         "I'm in so much trouble!",
         "My mistake!",
         "What have I done?!",
-        "That's on me!",
+        // "That's on me!",
         "I slipped up!",
     };
 
@@ -107,17 +123,11 @@ internal class EnemyBlamedBehavior : MonoBehaviour
             instant          : false,
             showContinueText : true
             );
-        enemy.StartCoroutine(DoFearEffect(enemy, player));
-    }
-
-    public static IEnumerator DoFearEffect(AIActor enemy, PlayerController player)
-    {
-        if (enemy.behaviorSpeculator is not BehaviorSpeculator bs)
-            yield break;
-        bs.FleePlayerData = new(){
-            Player        = player,
-            StartDistance = 100f,
-            StopDistance  = 100f,
-        };
+        if (enemy.behaviorSpeculator is BehaviorSpeculator bs)
+            bs.FleePlayerData = new(){
+                Player        = player,
+                StartDistance = 100f,
+                StopDistance  = 100f,
+            };
     }
 }

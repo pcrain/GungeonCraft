@@ -126,3 +126,9 @@ chekhovs_gun_place_sound,-5.0,1,sound
 chekhovs_gun_launch_sound_alt,-6.0,1,sound
 stop_sign_sound,6.0,1,sound
 vladimir_fire_sound,-6.0,1,sound
+blame_sound_1,-4.0,1,sound
+blame_sound_2,-4.0,1,sound
+blame_sound_3,-4.0,1,sound
+blame_sound_4,-4.0,1,sound
+blame_sound_5,-4.0,1,sound
+blamethrower_impact_sound,-4.0,1,sound

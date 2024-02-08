@@ -1378,4 +1378,25 @@ public static class Extensions
     }
     return g;
   }
+
+  /// <summary>Pick and pause on a frame (random if frame == -1) from a tk2dSpriteAnimator</summary>
+  public static void PickFrame(this tk2dSpriteAnimator animator, int frame = -1)
+  {
+    tk2dSpriteAnimationFrame[] frames = animator.currentClip.frames;
+    // animator.deferNextStartClip = false;
+    animator.SetSprite(
+      spriteCollection: frames[0].spriteCollection,
+      spriteId: (frame >= 0) ? frame : frames[UnityEngine.Random.Range(0, frames.Count())].spriteId);
+    animator.Pause(); // stop animating immediately after creation so we can stick with our initial sprite
+  }
+
+  /// <summary>Pick and pause on a frame (random if frame == -1) from a gameObject's tk2dSpriteAnimator</summary>
+  public static void PickFrame(this GameObject g, int frame = -1) => g.GetComponent<tk2dSpriteAnimator>().PickFrame(frame);
+
+  /// <summary>Pick and pause on a frame (random if frame == -1) from a component's tk2dSpriteAnimator</summary>
+  public static void PickFrame(this Component c, int frame = -1) => c.GetComponent<tk2dSpriteAnimator>().PickFrame(frame);
+
+  /// <summary>Pick and pause on a frame (random if frame == -1) from a projectiles's tk2dSpriteAnimator</summary>
+  /// <remarks>Potentially the same as the Projectile.SetFrame() extension</remarks>
+  public static void PickFrame(this Projectile p, int frame = -1) => p.spriteAnimator.PickFrame(frame);
 }

@@ -816,6 +816,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\lightwing_reload_026.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\chekhovs_gun_idle_trimmed_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_026.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\blamethrower_fire_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\magunet_idle_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_5_gun_019.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\aimu_hakurei_fire_001.png"/>
@@ -1277,6 +1278,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_042.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_fire_008.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_trimmed_007.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\blamethrower_fire_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_4_gun_021.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\blackjack_reload_022.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\outbreak_reload_010.png"/>
@@ -1619,6 +1621,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\glockarina_reload_014.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\lightwing_reload_015.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_fire_001.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\blamethrower_fire_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\ki_blast_fire_alt_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_1_gun_008.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\vladimir_charge_002.png"/>
@@ -1950,6 +1953,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_016.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\soul_kaliber_reload_005.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_014.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\blamethrower_fire_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_fire_013.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_5_gun_023.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_idle_trimmed_004.png"/>
@@ -2237,6 +2241,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_fire_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\uppskeruvel_reload_019.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\carpet_bomber_reload_025.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\blamethrower_fire_002.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_idle_040.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_2_gun_021.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_6_gun_004.json"/>
@@ -2783,6 +2788,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\wavefront_fire_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_049.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_fire_003.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\blamethrower_fire_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\platinum_star_reload_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_fire_010.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alyx_reload_008.json"/>
@@ -3373,6 +3379,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\siren7.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\magunet_wave_sprite2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\echo_effect2.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\blamethrower_trail.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\drowsy_cloud4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire_c4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\zenkai_aura8.png"/>
