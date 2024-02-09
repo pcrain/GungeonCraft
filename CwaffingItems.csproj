@@ -898,6 +898,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_reload_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_016.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_reload_023.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\blamethrower_fire_006.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\hatchling_gun_reload_006.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_reload_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_fire_001.png"/>
@@ -1350,6 +1351,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\tranquilizer_fire_006.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_1_gun_024.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\alligator_idle_trimmed_001.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\blamethrower_fire_006.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\ki_blast_reload_001.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\wavefront_idle_trimmed_004.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\missiletoe_fire_008.png"/>
@@ -1544,6 +1546,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_c_022.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_fire_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\grandmaster_reload_001.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\blamethrower_fire_005.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_fire_010.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_trimmed_003.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_028.png"/>
@@ -2296,6 +2299,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_fire_008.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\lightwing_reload_026.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_2_gun_008.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\blamethrower_fire_005.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_fire_006.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\crapshooter_reload_021.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_fire_015.png"/>
@@ -3221,6 +3225,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\law_rune_small.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\mini_pickup2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\gunbrella_target_reticle3.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\playbullet_decoy_vfx.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren14.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\saiyan_spark1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\vacuum_wind_sprite_a2.png"/>
@@ -3318,6 +3323,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\reticle_orange.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren24.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\reticle_blue.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\goat_vfx.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\mini_pickup4.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\poe_soul7.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren18.png"/>
@@ -3423,6 +3429,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\magbeam_alt.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\saiyan_spark3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\pencil_runes4.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\scapegoat_vfx.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\gunbrella_target_reticle6.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\soul_explode5.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\exorcism_particles1.png"/>
@@ -3522,6 +3529,7 @@
     <EmbeddedResource Include="Resources\ItemSprites\4d_bullets_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\insurance_policy_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\amazon_primer_icon.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\playbullet_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\gaster_blaster_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\cuppajoe_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\gyroscope_icon.png"/>

@@ -680,7 +680,7 @@ public class FancyVFX : MonoBehaviour
         this._fadeIn = fadeIn;
 
         this._velocity = (1.0f / C.PIXELS_PER_CELL) * velocity.ToVector3ZisY(0);
-        this._maxLifeTime = lifetime;
+        this._maxLifeTime = (lifetime > 0) ? lifetime : 3600f;
         this._fadeOut = fadeOutTime.HasValue;
         if (this._fadeOut)
         {

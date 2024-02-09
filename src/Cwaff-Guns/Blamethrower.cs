@@ -4,18 +4,19 @@ public class Blamethrower : AdvancedGunBehavior
 {
     public static string ItemName         = "Blamethrower";
     public static string ProjectileName   = "38_special";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
+    public static string ShortDescription = "Take It Up with HR";
+    public static string LongDescription  = "Fires harsh words that deal emotional damage and may inflict blame, making enemies run away and take 4x emotional damage. Taking damage from an enemy projectile assigns a random scapegoat, who becomes 100% susceptible to blame and drops an appropriate health / armor pickup when killed with the Blamethrower.";
     public static string Lore             = "TBD";
 
     internal static GameObject _BlameImpact = null;
     internal static GameObject _BlameTrail = null;
+    internal static GameObject _ScapeGoatVFX = null;
 
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Blamethrower>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARM, reloadTime: 1.2f, ammo: 750, doesScreenShake: false);
-            gun.SetAnimationFPS(gun.shootAnimation, 30);
+            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARM, reloadTime: 1.2f, ammo: 300, doesScreenShake: false);
+            gun.SetAnimationFPS(gun.shootAnimation, 40);
             gun.SetMuzzleVFX("blamethrower_trail", fps: 30);
             // gun.SetFireAudio("blowgun_fire_sound");
 
@@ -27,6 +28,39 @@ public class Blamethrower : AdvancedGunBehavior
 
         _BlameImpact = VFX.Create("blamethrower_projectile", fps: 1, loops: false, anchor: Anchor.MiddleCenter);
         _BlameTrail = VFX.Create("blamethrower_trail", fps: 16, loops: true, anchor: Anchor.MiddleCenter);
+        _ScapeGoatVFX = VFX.Create("goat_vfx", fps: 16, loops: true, scale: 1f, anchor: Anchor.MiddleCenter);
+    }
+
+    protected override void OnPickedUpByPlayer(PlayerController player)
+    {
+        base.OnPickedUpByPlayer(player);
+        player.OnReceivedDamage += this.OnReceivedDamage;
+    }
+
+    protected override void OnPostDroppedByPlayer(PlayerController player)
+    {
+        player.OnReceivedDamage += this.OnReceivedDamage;
+        base.OnPostDroppedByPlayer(player);
+    }
+
+    private void OnReceivedDamage(PlayerController player)
+    {
+        if (player.CurrentRoom?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> enemies)
+            return;
+        if (enemies.Count() == 0)
+            return;
+
+        const int tries = 10;
+        for (int i = 0; i < tries; ++i)
+        {
+            AIActor enemy = enemies.ChooseRandom();
+            if (!(enemy?.IsHostileAndNotABoss() ?? false))
+                continue;
+            if (enemy.GetComponent<EnemyBlamedBehavior>())
+                continue;  // can't scapegoat the same enemy twice
+            enemy.gameObject?.GetOrAddComponent<ScapeGoat>();
+            break;
+        }
     }
 
     private class BlameDamage : DamageAdjuster
@@ -38,10 +72,52 @@ public class Blamethrower : AdvancedGunBehavior
     }
 }
 
+internal class ScapeGoat : MonoBehaviour
+{
+    private bool _active = true;
+
+    private IEnumerator Start()
+    {
+        // make sure our enemy is alive
+        if (base.GetComponent<AIActor>() is not AIActor enemy)
+            yield break;
+        if (base.GetComponent<HealthHaver>() is not HealthHaver hh)
+            yield break;
+        if (base.GetComponent<EnemyBlamedBehavior>())
+            yield break;  // can't scapegoat the same enemy twice
+
+        // spawn scapegoat VFX above their head
+        Vector2 offset = new Vector2(0f, 0.5f);
+        GameObject vfx = SpawnManager.SpawnVFX(Blamethrower._ScapeGoatVFX, enemy.sprite.WorldTopCenter + offset, Quaternion.identity);
+        tk2dSprite sprite = vfx.GetComponent<tk2dSprite>();
+
+        // destroy the VFX once the enemy is dead
+        while (this._active && enemy && hh && hh.IsAlive)
+        {
+            // sprite.PlaceAtScaledPositionByAnchor(enemy.sprite.WorldTopCenter + offset, Anchor.MiddleCenter);
+            sprite.PlaceAtPositionByAnchor(enemy.sprite.WorldTopCenter + offset
+              + new Vector2(0f, 0.25f + 0.1f * Mathf.Sin(10f * BraveTime.ScaledTimeSinceStartup)), Anchor.MiddleCenter);
+            yield return null;
+        }
+
+        vfx.SafeDestroy();
+        this.SafeDestroy();
+    }
+
+    public void TakeTheBlame(PlayerController player)
+    {
+        AIActor enemy = base.GetComponent<AIActor>();
+        Items item = player.ForceZeroHealthState ? Items.Armor : (enemy.IsBlackPhantom ? Items.Heart : Items.HalfHeart);
+        LootEngine.SpawnItem(item: ItemHelper.Get(item).gameObject, spawnPosition: enemy.CenterPosition,
+            spawnDirection: Vector2.zero, force: 0f, doDefaultItemPoof: true);
+        this._active = false;
+    }
+}
+
 public class BlamethrowerProjectile : MonoBehaviour
 {
     private const float _FEAR_CHANCE = 0.125f;
-    private const float _VFX_RATE = 0.1f;
+    private const float _VFX_RATE    = 0.1f;
 
     private float _vfxTimer = 0.0f;
     private Projectile _projectile = null;
@@ -62,13 +138,21 @@ public class BlamethrowerProjectile : MonoBehaviour
             positionVariance: 1f, baseVelocity: 10f * Vector2.up, velocityVariance: 5f, velType: FancyVFX.Vel.Radial,
             lifetime: 0.5f, fadeOutTime: 0.5f, randomFrame: true);
 
-        if (UnityEngine.Random.value > _FEAR_CHANCE)
+        if (p.Owner is not PlayerController player)
             return;
+
+        // if we succesfully blame the scapegoat, return some armor
+        ScapeGoat scapeGoat = enemy.GetComponent<ScapeGoat>();
+        if (killed && scapeGoat)
+            scapeGoat.TakeTheBlame(player);
+
+        if ((UnityEngine.Random.value > _FEAR_CHANCE) && !scapeGoat)
+            return;  // if we fail the fear check and we're not already a designated scapegoat, we're done
         if (!(enemy.aiActor?.IsHostileAndNotABoss() ?? false))
             return;
-        if (enemy.aiActor.gameObject.GetComponent<EnemyBlamedBehavior>())
+        if (enemy.GetComponent<EnemyBlamedBehavior>())
             return;
-        enemy.aiActor.gameObject.AddComponent<EnemyBlamedBehavior>().Setup(p);
+        enemy.gameObject.AddComponent<EnemyBlamedBehavior>().Setup(p);
     }
 
     private void Update()
