@@ -159,7 +159,7 @@ public class BlamethrowerProjectile : MonoBehaviour
     {
         if ((this._vfxTimer += BraveTime.DeltaTime) < _VFX_RATE)
             return;
-        this._vfxTimer -= 0.1f;
+        this._vfxTimer -= _VFX_RATE;
         FancyVFX.Spawn(Blamethrower._BlameTrail, this._projectile.sprite.WorldCenter.ToVector3ZisY(-1f), velocity: 0.2f * this._projectile.LastVelocity,
             rotation: this._projectile.LastVelocity.EulerZ(), lifetime: 0.18f, fadeOutTime: 0.15f);
     }

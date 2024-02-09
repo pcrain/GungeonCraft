@@ -517,4 +517,37 @@ public static class Lazy
     {
         return _INVLOG2 * Mathf.Log(f);
     }
+
+    /// <summary>Check whether a line intersects a circle with a given position and radius</summary>
+    /// <remarks>See https://stackoverflow.com/questions/53173712/calculating-distance-of-point-to-linear-line</remarks>
+    public static bool LineIntersectsCircle(Vector2 startp, Vector2 endp, Vector2 p, float radius)
+    {
+      // float a = (startp - endp).magnitude;
+      // float b = (startp - p).magnitude;
+      // float c = (endp - p).magnitude;
+      // float s = (a + b + c) / 2f;
+      // float distance = 2 * Mathf.Sqrt(s*(s-a)*(s-b)*(s-c)) / a;
+      // return distance < radius;
+
+      // ChatGPT version: https://chat.openai.com/c/fe69576b-462a-4f49-a54e-d7462e42c6c7
+      // Calculate direction vector of the line segment
+      Vector2 d = endp - startp;
+      // Calculate vectors between the circle center and the start/end points of the line segment
+      Vector2 f = startp - p;
+      Vector2 e = endp - p;
+      // Calculate the squared length of the line segment
+      float lengthSq = d.sqrMagnitude;
+      // Project the circle center onto the line segment
+      float t = Vector2.Dot(p - startp, d) / lengthSq;
+      // Clamp t to be within the range [0,1] to ensure the projected point is on the line segment
+      t = Mathf.Clamp01(t);
+      // Calculate the closest point on the line segment to the circle center
+      Vector2 closestPoint = startp + t * d;
+      // Calculate the squared distance between the circle center and the closest point on the line segment
+      float distanceSq = (p - closestPoint).sqrMagnitude;
+      // Check if the squared distance is less than or equal to the squared radius
+      bool near = distanceSq <= radius * radius;
+      // ETGModConsole.Log($"checking if {startp} to {endp} is within {radius} of {p}: {near}");
+      return near;
+    }
 }

@@ -300,6 +300,7 @@ public class Initialisation : BaseUnityPlugin
                 ChekhovsGun.Add();
                 Vladimir.Add();
                 Blamethrower.Add();
+                Suncaster.Add();
                 setupGunsWatch.Stop();
             #endregion
 
