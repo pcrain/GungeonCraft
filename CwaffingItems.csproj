@@ -4307,6 +4307,7 @@
     <EmbeddedResource Include="Resources\BeamSprites\aimu_beam_mid_004.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\gaster_beam_start_001.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\bubble_beam_mid_004.png"/>
+    <EmbeddedResource Include="Resources\BeamSprites\suncaster_beam_final_mid4.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\subtractor_beam_mid_005.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\subtractor_beam_mid_004.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\chekhov_trail_start_004.png"/>
@@ -4327,6 +4328,7 @@
     <EmbeddedResource Include="Resources\BeamSprites\suncaster_beam_mid3.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\alphabeam_mid_001.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\holy_water_gun_middle_break_005.png"/>
+    <EmbeddedResource Include="Resources\BeamSprites\suncaster_beam_final_mid3.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\bubble_beam_mid_001.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\holy_water_gun_mid_003.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\bubble_stream_mid_004.png"/>
@@ -4359,6 +4361,8 @@
     <EmbeddedResource Include="Resources\BeamSprites\gaster_beam_start_003.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\suncaster_beam_mid5.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\subtractor_beam_red_start_002.png"/>
+    <EmbeddedResource Include="Resources\BeamSprites\suncaster_beam_final_mid1.png"/>
+    <EmbeddedResource Include="Resources\BeamSprites\suncaster_beam_final_mid5.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\holy_water_gun_start_005.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\suncaster_beam_refracted_mid2.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\gaster_beam_mid_002.png"/>
@@ -4371,6 +4375,7 @@
     <EmbeddedResource Include="Resources\BeamSprites\aimu_beam_mid_002.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\gaster_beam_mid_001.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\aimu_beam_mid_001.png"/>
+    <EmbeddedResource Include="Resources\BeamSprites\suncaster_beam_final_mid2.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\holy_water_gun_start_003.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\holy_water_gun_middle_break_002.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\holy_water_gun_middle_break_001.png"/>
