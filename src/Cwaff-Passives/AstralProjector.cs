@@ -1,5 +1,7 @@
 namespace CwaffingTheGungy;
 
+//TODO: look into cellData.isRoomInternal
+
 public class AstralProjector : PassiveItem
 {
     public static string ItemName         = "Astral Projector";

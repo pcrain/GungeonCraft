@@ -24,14 +24,27 @@ public class Suncaster : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Suncaster>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.FIRE, reloadTime: 0.0f, ammo: 500, canReloadNoMatterAmmo: true, infiniteAmmo: true, doesScreenShake: false);
+            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.FIRE, reloadTime: 0.0f, ammo: 10, canReloadNoMatterAmmo: true, infiniteAmmo: true, doesScreenShake: false);
             gun.SetAnimationFPS(gun.shootAnimation, 30);
             gun.SetAnimationFPS(gun.reloadAnimation, 40);
 
-        _SuncasterProjectile = gun.InitProjectile(new(clipSize: -1, cooldown: 0.22f, shootStyle: ShootStyle.SemiAutomatic,
+        _SuncasterProjectile = gun.InitProjectile(new(clipSize: -1, cooldown: 0.22f, shootStyle: ShootStyle.Charged,
           damage: 2f, speed: 100f, range: 999999f, fps: 12, anchor: Anchor.MiddleLeft)
         ).Attach<PierceProjModifier>(pierce => pierce.penetration = 999
         ).Attach<SuncasterProjectile>();
+        _SuncasterProjectile.pierceMinorBreakables = true;
+        _SuncasterProjectile.PenetratesInternalWalls = true;
+
+        gun.DefaultModule.chargeProjectiles = new(){
+          new ProjectileModule.ChargeProjectile {
+            Projectile = _SuncasterProjectile.Clone().Attach<SuncasterProjectile>(s => s.charged = false),
+            ChargeTime = 0.0f,
+          },
+          new ProjectileModule.ChargeProjectile {
+            Projectile = _SuncasterProjectile.Clone().Attach<SuncasterProjectile>(s => s.charged = true),
+            ChargeTime = 0.5f,
+          },
+        };
 
         _SunTrailPrefab = VFX.CreateTrailObject(ResMap.Get("suncaster_beam_mid")[0], new Vector2(20, 4), new Vector2(0, 0),
             ResMap.Get("suncaster_beam_mid"), 60, cascadeTimer: C.FRAME,  softMaxLength: 1, destroyOnEmpty: false);
@@ -71,7 +84,7 @@ public class Suncaster : AdvancedGunBehavior
     public override void PostProcessProjectile(Projectile projectile)
     {
         base.PostProcessProjectile(projectile);
-        projectile.GetComponent<SuncasterProjectile>().FiredFromGun();
+        projectile.GetComponent<SuncasterProjectile>().FiredFromGun(this);
         // AkSoundEngine.PostEvent("subtractor_beam_fire_sound_stop_all", projectile.gameObject);
         AkSoundEngine.PostEvent("snd_select", projectile.gameObject);
     }
@@ -80,6 +93,7 @@ public class Suncaster : AdvancedGunBehavior
 public class SuncasterProjectile : MonoBehaviour
 {
     private const float _DAMAGE_SCALING = 1f;
+    private const int _MAX_LOOPS = 8;
 
     protected List<SuncasterPrism> _hitPrisms  = new();
     protected SuncasterPrism       _lastPrism  = null;
@@ -90,16 +104,23 @@ public class SuncasterProjectile : MonoBehaviour
     private Vector2              _lastPos     = Vector2.zero;
     private int                  _amps        = 0;
     private TrailController      _trail       = null;
-    private bool                 _fromGun     = false;
+    private Suncaster            _gun         = null;
+    private int                  _prismsLeft  = 0;
+
+    public bool                  charged      = false;
 
     private void Start()
     {
         this._proj  = base.GetComponent<Projectile>();
         this._owner = this._proj.ProjectilePlayerOwner();
         this._trail = this._proj.AddTrailToProjectileInstance(
-          this._fromGun ? Suncaster._SunTrailPrefab :
-          this._canRefract ? Suncaster._SunTrailRefractedPrefab : Suncaster._SunTrailFinalPrefab);
+          this.charged        ? Suncaster._SunTrailRefractedPrefab :
+          (this._gun != null) ? Suncaster._SunTrailPrefab :
+                                Suncaster._SunTrailFinalPrefab);
         this._trail.gameObject.SetGlowiness(100f);
+
+        if (this._gun)
+          this._prismsLeft = this._gun._extantPrisms.Count * (this.charged ? _MAX_LOOPS : 1);
 
         this._proj.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
     }
@@ -120,14 +141,35 @@ public class SuncasterProjectile : MonoBehaviour
         this._trail.gameObject.SafeDestroy();
     }
 
+    private Projectile Refract(SuncasterPrism prism, Vector2 newDirection, bool canRefract)
+    {
+      Projectile p = SpawnManager.SpawnProjectile(
+          prefab   : Suncaster._SuncasterProjectile.gameObject,
+          position : prism.transform.position,
+          rotation : Quaternion.identity).GetComponent<Projectile>();
+      p.Owner           = this._owner;
+      p.baseData.speed  = this._proj.baseData.speed;
+      p.baseData.damage = this._proj.baseData.damage;
+      p.SendInDirection(newDirection, true);
+      p.GetComponent<SuncasterProjectile>()._lastPrism = prism;
+      p.GetComponent<SuncasterProjectile>()._canRefract = canRefract;
+      return p;
+    }
+
     private void Amplify(SuncasterPrism prism)
     {
       ++this._amps;
 
+      if (this.charged)
+      {
+        if ((--this._prismsLeft) <= 0)
+          return;
+      }
+
       this._lastPrism = prism;
       if (this._hitPrisms.Contains(prism))
       {
-        if (!this._fromGun)
+        if (!this._gun)
           return; // refracted projectiles can only pass through each prism once, so we're done here
       }
       else
@@ -138,27 +180,23 @@ public class SuncasterProjectile : MonoBehaviour
 
       if (this._canRefract)
       {
-        Projectile p = SpawnManager.SpawnProjectile(
-            prefab   : Suncaster._SuncasterProjectile.gameObject,
-            position : prism.transform.position,
-            rotation : Quaternion.identity).GetComponent<Projectile>();
-        p.Owner           = this._owner;
-        p.baseData.speed  = this._proj.baseData.speed;
-        p.baseData.damage = this._proj.baseData.damage;
-        p.GetComponent<SuncasterProjectile>()._lastPrism = prism;
-        if (this._fromGun)
-          p.SendInDirection(prism.Angle(), true);
-        else
+        if (this.charged)
         {
-          float myAngle = this._proj.LastVelocity.ToAngle();
-          float prismAngle = prism.Angle().ToAngle();
-          float angleDelta = prismAngle.RelAngleTo(myAngle);
-          // p.SendInDirection((myAngle + angleDelta).ToVector(), true);
-          p.SendInDirection(this._proj.LastVelocity, true);
-          p.GetComponent<SuncasterProjectile>()._canRefract = false;
+          // Refract(prism, newDirection: this._proj.LastVelocity, canRefract: false);
           this._proj.SendInDirection(prism.Angle(), true);
           this._proj.UpdateSpeed();
         }
+        // else // if (this._gun)
+        {
+          foreach (SuncasterPrism other in this._gun._extantPrisms)
+            if (other != prism)
+              Refract(prism, newDirection: other.transform.position - prism.transform.position, canRefract: false);
+          // this._proj.DieInAir(suppressInAirEffects: true, allowActorSpawns: false, allowProjectileSpawns: false, killedEarly: true);
+        }
+        // else
+        // {
+        //   Refract(prism, newDirection: prism.Angle(), canRefract: true);
+        // }
       }
 
       this._proj.sprite.SetGlowiness(this._proj.baseData.damage);
@@ -167,7 +205,7 @@ public class SuncasterProjectile : MonoBehaviour
       AkSoundEngine.PostEvent("snd_select", base.gameObject);
     }
 
-    public void FiredFromGun() => this._fromGun    = true;
+    public void FiredFromGun(Suncaster gun) => this._gun = gun;
 }
 
 public class SuncasterPrism : MonoBehaviour, IPlayerInteractable
