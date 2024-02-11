@@ -139,17 +139,12 @@ public class TheBB : MonoBehaviour
 
     public static IEnumerator BBInteractScript(MiniInteractable i, PlayerController p)
     {
-        foreach (Gun gun in p.inventory.AllGuns)
+        if ((p.FindBaseGun<BBGun>() is Gun gun) && (gun.CurrentAmmo < gun.AdjustedMaxAmmo))
         {
-            if (!gun.GetComponent<BBGun>())
-                continue;
-            if (gun.CurrentAmmo >= gun.AdjustedMaxAmmo)
-                break;
             gun.CurrentAmmo += 1;
             gun.ForceImmediateReload();
             Lazy.DoPickupAt(i.sprite.WorldCenter);
             UnityEngine.Object.Destroy(i.gameObject);
-            break;
         }
         i.interacting = false;
         yield break;

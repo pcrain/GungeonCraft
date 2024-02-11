@@ -1417,4 +1417,22 @@ public static class Extensions
   public static Vector2 LargerComponent(this Vector2 v)  => (Mathf.Abs(v.x) > Mathf.Abs(v.y)) ? v.WithY(0) : v.WithX(0);
   /// <summary>Returns a vector with the larger component set to 0.</summary>
   public static Vector2 SmallerComponent(this Vector2 v) => (Mathf.Abs(v.x) < Mathf.Abs(v.y)) ? v.WithY(0) : v.WithX(0);
+
+  /// <summary>Get the first matching gun in the Player's inventory</summary>
+  public static GunType FindGun<GunType>(this PlayerController p) where GunType : MonoBehaviour
+  {
+    foreach (Gun gun in p.inventory.AllGuns)
+      if (gun.GetComponent<GunType>() is GunType g)
+        return g;
+    return null;
+  }
+
+  /// <summary>Get the Gun behavior for the first matching gun in the Player's inventory</summary>
+  public static Gun FindBaseGun<GunType>(this PlayerController p) where GunType : MonoBehaviour
+  {
+    foreach (Gun gun in p.inventory.AllGuns)
+      if (gun.GetComponent<GunType>() is GunType g)
+        return gun;
+    return null;
+  }
 }

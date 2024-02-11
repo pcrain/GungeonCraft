@@ -118,7 +118,7 @@ public class TennisBall : MonoBehaviour
     private bool                _returning     = false;
     private bool                _missedPlayer  = false;
     private bool                _dead          = false;
-    private RacketLauncher        _parentGun     = null;
+    private RacketLauncher      _parentGun     = null;
     private EasyTrailBullet     _trail         = null;
     private float               _baseSpeed     = 0f;
     private float               _baseDamage    = 0f;
@@ -135,17 +135,7 @@ public class TennisBall : MonoBehaviour
         // this._projectile.DestroyMode = Projectile.ProjectileDestroyMode.BecomeDebris;
         this._projectile.DestroyMode = Projectile.ProjectileDestroyMode.DestroyComponent;
 
-        if (pc.CurrentGun.GetComponent<RacketLauncher>() is RacketLauncher tr)
-            this._parentGun = tr;
-        else foreach (Gun g in pc.inventory.AllGuns)
-        {
-            if (g.GetComponent<RacketLauncher>() is RacketLauncher tr2)
-            {
-                this._parentGun = tr2;
-                break;
-            }
-        }
-        if (this._parentGun)
+        if (this._parentGun = pc.FindGun<RacketLauncher>())
         {
             this._parentGun.AddExtantTennisBall(this);
             this._projectile.BulletScriptSettings.surviveRigidbodyCollisions = true;

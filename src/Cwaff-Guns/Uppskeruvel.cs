@@ -239,7 +239,6 @@ public class UppskeruvelAmmoDisplay : CustomAmmoDisplay
             return false;
 
         uic.SetAmmoCountLabelColor(Color.white);
-        Vector3 relVec = Vector3.zero;
         uic.GunAmmoCountLabel.AutoHeight = true; // enable multiline text
         uic.GunAmmoCountLabel.ProcessMarkup = true; // enable multicolor text
         uic.GunAmmoCountLabel.Text = $"[sprite \"{Uppskeruvel._SoulSpriteUI}\"][color #6666dd]x{this._uppies.souls}[/color]\n{this._gun.CurrentAmmo}/{this._gun.AdjustedMaxAmmo}";
@@ -267,7 +266,7 @@ public class UppskeruvelProjectile : MonoBehaviour
 
     private void OnHitEnemy(Projectile bullet, SpeculativeRigidbody enemy, bool killed)
     {
-        if (!enemy?.aiActor)
+        if (!enemy?.aiActor || killed)
             return;
         this._gun.LaunchAvailableSouls(enemy.aiActor);
     }
@@ -332,13 +331,7 @@ public class UppskeruvelLostSoul : MonoBehaviour
             if (delta.sqrMagnitude > _PICKUP_RADIUS_SQR)
                 return;
 
-            foreach (Gun gun in this._owner.inventory.AllGuns)
-            {
-                if (gun.GetComponent<Uppskeruvel>() is not Uppskeruvel uppies)
-                    continue;
-                uppies.AcquireSoul();
-                break;
-            }
+            this._owner.FindGun<Uppskeruvel>()?.AcquireSoul();
             base.gameObject.PlayUnique("pickup_poe_soul_sound");
             float rotOffset = 90f * UnityEngine.Random.value;
             for (int i = 0; i < 4; ++i)

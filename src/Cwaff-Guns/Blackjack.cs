@@ -151,18 +151,12 @@ public class ThrownCard : MonoBehaviour
 
     public IEnumerator PickUpPlayingCardScript(MiniInteractable i, PlayerController p)
     {
-        foreach (Gun gun in p.inventory.AllGuns)
+        if ((p.FindBaseGun<Blackjack>() is Gun gun) && (gun.CurrentAmmo < gun.AdjustedMaxAmmo))
         {
-            if (!gun.GetComponent<Blackjack>())
-                continue;
-            if (gun.CurrentAmmo >= gun.AdjustedMaxAmmo)
-                break;
             gun.CurrentAmmo += 1;
-            p.gameObject.Play("card_pickup_sound_stop_all");
-            p.gameObject.Play("card_pickup_sound");
+            p.gameObject.PlayUnique("card_pickup_sound");
             SpawnManager.SpawnVFX(VFX.MiniPickup, i.sprite.WorldCenter, Lazy.RandomEulerZ());
             UnityEngine.Object.Destroy(i.gameObject);
-            break;
         }
         i.interacting = false;
         yield break;
