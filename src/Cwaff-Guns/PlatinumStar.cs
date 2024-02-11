@@ -232,7 +232,6 @@ public class OraOra : MonoBehaviour
                         };
                     }
                     proj.SendInDirection(angleVec, false);
-                    proj.UpdateSpeed();
                     proj.gameObject.PlayUnique("ora_fist_fire");
 
                 if (spec && !spec.ImmuneToStun)

@@ -398,8 +398,7 @@ public class SlowNearbyBullets : MonoBehaviour
             if (p.GetComponent<BulletScriptBehavior>()?.bullet is Bullet bullet)
                 bullet.Speed *= _BULLET_TIME_SCALE;
             else
-                p.baseData.speed *= _BULLET_TIME_SCALE;
-            p.UpdateSpeed();
+                p.MultiplySpeed(_BULLET_TIME_SCALE);
             p.AddComponent<SlowedByGlockarina>();
         }
     }

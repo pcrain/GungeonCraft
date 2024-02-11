@@ -134,13 +134,11 @@ public class RainCheckBullets : MonoBehaviour
         {
             this._moveTimer -= BraveTime.DeltaTime;
             yield return null;
-            this._projectile.baseData.speed -= decel;
-            this._projectile.UpdateSpeed();
+            this._projectile.Accelerate(-decel);
         }
 
         // Phase 2 / 5 -- the freeze
-        this._projectile.baseData.speed = 0.01f;
-        this._projectile.UpdateSpeed();
+        this._projectile.SetSpeed(0.01f);
         this._wasEverInStasis = true;
         Vector2 pos = this._projectile.sprite.WorldCenter;
         Vector2 targetDir = Vector2.zero;
@@ -174,9 +172,8 @@ public class RainCheckBullets : MonoBehaviour
         }
 
         // Phase 5 / 5 -- the launch
-        this._projectile.baseData.speed = _LAUNCH_SPEED;
+        this._projectile.SetSpeed(_LAUNCH_SPEED);
         _projectile.SendInDirection(targetDir, true);
-        _projectile.UpdateSpeed();
         this._projectile.gameObject.Play("knife_gun_launch");
 
         yield break;

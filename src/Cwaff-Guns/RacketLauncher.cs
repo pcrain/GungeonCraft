@@ -242,7 +242,7 @@ public class TennisBall : MonoBehaviour
         this._projectile.baseData.damage = this._baseDamage + _MAX_DAMAGE_BOOST * percentPower;
         this._projectile.baseData.force  = this._baseForce  + _MAX_FORCE_BOOST * percentPower;
         this._trail.LifeTime             = 0.1f + (this._volleys * 0.02f);
-        Color newColor                   = Lazy.Blend(ExtendedColours.lime, Color.red, 0.1f * (float)this._volleys);
+        Color newColor                   = Color.Lerp(ExtendedColours.lime, Color.red, 0.1f * (float)this._volleys);
         this._trail.BaseColor            = newColor;
         this._trail.StartColor           = newColor;
         this._trail.UpdateTrail();
@@ -251,7 +251,6 @@ public class TennisBall : MonoBehaviour
         this._missedPlayer = false;
         this._projectile.Speed = this._projectile.baseData.speed;
         this._projectile.SendInDirection(direction, true);
-        this._projectile.UpdateSpeed();
         // this._projectile.gameObject.Play("racket_hit");
         this._projectile.gameObject.Play("monkey_tennis_hit_return_mid");
         if (this._volleys > 6)

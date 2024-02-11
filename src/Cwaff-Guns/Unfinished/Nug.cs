@@ -120,8 +120,7 @@ public class NugBehavior : MonoBehaviour
 
     private void OnCollision(CollisionData tileCollision)
     {
-        this.m_projectile.baseData.speed *= 0f;
-        this.m_projectile.UpdateSpeed();
+        this.m_projectile.SetSpeed(0);
         float m_hitNormal = tileCollision.Normal.ToAngle();
         PhysicsEngine.PostSliceVelocity = new Vector2?(default(Vector2));
         SpeculativeRigidbody specRigidbody = this.m_projectile.specRigidbody;

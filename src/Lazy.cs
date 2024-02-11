@@ -299,18 +299,6 @@ public static class Lazy
         return (PickupObjectDatabase.GetById(gunid) as Gun).DefaultModule.projectiles[0];
     }
 
-    // REFACTOR: use Color.Lerp
-    // Blend two colors
-    public static Color Blend(Color a, Color b, float t = 0.5f, bool blendAlpha = true)
-    {
-        return new Color(
-            (1f - t) * a.r + t * b.r,
-            (1f - t) * a.g + t * b.g,
-            (1f - t) * a.b + t * b.b,
-            blendAlpha ? ((1f - t) * a.a + t * b.a) : a.a
-            );
-    }
-
     /// <summary>Get an enemy's idle animation blended with a color of choice, with optional sheen</summary>
     public static Texture2D GetTexturedEnemyIdleAnimation(AIActor enemy, Color blendColor, float blendAmount, Color? sheenColor = null, float sheenWidth = 20.0f)
     {
@@ -400,10 +388,10 @@ public static class Lazy
         return debris;
     }
 
-    /// <summary>Get the current room of the game's primary player</summary>
+    /// <summary>Get the current room of the game's best active player</summary>
     public static RoomHandler CurrentRoom()
     {
-        return GameManager.Instance.PrimaryPlayer.CurrentRoom; //REFACTOR: use the best player instead of the primary player
+        return GameManager.Instance.BestActivePlayer.CurrentRoom;
     }
 
     private static Projectile _NullProjectilePrefab = null;
@@ -459,13 +447,12 @@ public static class Lazy
             bool bestSoFar       = useNearestAngleInsteadOfDistance
                 ? (angleDeviation < bestAngle)
                 : (dist < bestDist);
-            if (bestSoFar)
-            {
-                foundTarget = true;
-                bestTarget  = tentativeTarget;
-                bestAngle   = angleDeviation;
-                bestDist    = dist;
-            }
+            if (!bestSoFar)
+                continue;
+            foundTarget = true;
+            bestTarget  = tentativeTarget;
+            bestAngle   = angleDeviation;
+            bestDist    = dist;
         }
         return foundTarget ? bestTarget : null;
     }
@@ -511,24 +498,13 @@ public static class Lazy
         return Gungeon.Game.Items.GetSafe(itemName);
     }
 
-    private static readonly float _INVLOG2 = 1f / Mathf.Log(2);
     /// <summary>Returns log_2(f)</summary>
-    public static float Log2(float f)
-    {
-        return _INVLOG2 * Mathf.Log(f);
-    }
+    public static float Log2(float f) => Mathf.Log(f, 2);
 
     /// <summary>Check whether a line intersects a circle with a given position and radius</summary>
     /// <remarks>See https://stackoverflow.com/questions/53173712/calculating-distance-of-point-to-linear-line</remarks>
     public static bool LineIntersectsCircle(Vector2 startp, Vector2 endp, Vector2 p, float radius)
     {
-      // float a = (startp - endp).magnitude;
-      // float b = (startp - p).magnitude;
-      // float c = (endp - p).magnitude;
-      // float s = (a + b + c) / 2f;
-      // float distance = 2 * Mathf.Sqrt(s*(s-a)*(s-b)*(s-c)) / a;
-      // return distance < radius;
-
       // ChatGPT version: https://chat.openai.com/c/fe69576b-462a-4f49-a54e-d7462e42c6c7
       // Calculate direction vector of the line segment
       Vector2 d = endp - startp;
@@ -546,9 +522,7 @@ public static class Lazy
       // Calculate the squared distance between the circle center and the closest point on the line segment
       float distanceSq = (p - closestPoint).sqrMagnitude;
       // Check if the squared distance is less than or equal to the squared radius
-      bool near = distanceSq <= radius * radius;
-      // ETGModConsole.Log($"checking if {startp} to {endp} is within {radius} of {p}: {near}");
-      return near;
+      return distanceSq <= radius * radius;
     }
 
     /// <summary>

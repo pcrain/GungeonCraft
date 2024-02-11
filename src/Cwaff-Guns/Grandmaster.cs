@@ -137,19 +137,17 @@ public abstract class ChessPiece : MonoBehaviour
         {
             this._targetVec = target - this._projectile.sprite.WorldCenter;
             float adjSpeed = this._targetVec.magnitude / _BaseMoveTime;
-            this._projectile.baseData.speed = Mathf.Min(this._speed, adjSpeed);
+            this._projectile.SetSpeed(Mathf.Min(this._speed, adjSpeed));
         }
         else
-            this._projectile.baseData.speed = this._speed;
+            this._projectile.SetSpeed(this._speed);
         this._projectile.SendInDirection(this._targetVec, true);
-        this._projectile.UpdateSpeed();
     }
 
     public void StopMoving()
     {
         this.gameObject.Play("chess_move");
-        this._projectile.baseData.speed = 0.001f;
-        this._projectile.UpdateSpeed();
+        this._projectile.SetSpeed(0.001f);
     }
 
     protected float LockAngleToOneOf(float angle, IEnumerable<float> angles)

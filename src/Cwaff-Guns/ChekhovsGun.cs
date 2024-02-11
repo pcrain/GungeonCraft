@@ -115,8 +115,7 @@ public class ChekhovBullet : MonoBehaviour
         float oldSpeed = this._projectile.baseData.speed;
         bool wasElectric = (this._projectile.damageTypes & CoreDamageTypes.Electric) > 0;
         this._projectile.damageTypes &= (~CoreDamageTypes.Electric);
-        this._projectile.baseData.speed = 0.0001f;
-        this._projectile.UpdateSpeed();
+        this._projectile.SetSpeed(0.0001f);
         this._projectile.specRigidbody.CollideWithOthers  = false;
         this._projectile.specRigidbody.CollideWithTileMap = false;
         this._projectile.sprite.renderer.enabled = false;
@@ -166,8 +165,7 @@ public class ChekhovBullet : MonoBehaviour
         this._gunVfx = null;
         this._projectile.specRigidbody.CollideWithOthers  = true;
         this._projectile.specRigidbody.CollideWithTileMap = true;
-        this._projectile.baseData.speed = oldSpeed;
-        this._projectile.UpdateSpeed();
+        this._projectile.SetSpeed(oldSpeed);
         // this._projectile.SendInDirection(target.Value - this._projectile.SafeCenter, true);
         if (wasElectric)
             this._projectile.damageTypes |= CoreDamageTypes.Electric;

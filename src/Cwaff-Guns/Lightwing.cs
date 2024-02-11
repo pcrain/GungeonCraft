@@ -202,12 +202,11 @@ public class LightwingProjectile : MonoBehaviour
                 this._projectile.SendInDirection(targetDir, true);
             else
             {
-                this._projectile.baseData.speed *= (_TURN_FRICTION * relTime);
+                this._projectile.ApplyFriction(_TURN_FRICTION);
                 this._projectile.SendInDirection((curAngle + turnRate * Mathf.Sign(angleDelta)).ToVector(), true);
             }
         }
-        this._projectile.baseData.speed += ((this._state == State.NEUTRAL ? _BASE_ACCEL : _HUNT_ACCEL) * relTime);
-        this._projectile.UpdateSpeed();
+        this._projectile.Accelerate(C.FPS * (this._state == State.NEUTRAL ? _BASE_ACCEL : _HUNT_ACCEL));
     }
 
     private void OnCollision(CollisionData collision)
@@ -246,7 +245,7 @@ public class LightwingProjectile : MonoBehaviour
     {
         if (this._state != State.NEUTRAL && this._state != State.RETRIEVING)
             return;
-        if (projectile.Owner is not AIActor enemy)
+        if (projectile.Owner is not AIActor enemy)  //TODO: figure out why this works for Lightwing on Darknuts / Shotgun Kin, but not for Blamethrower
             return;
         if (this._state == State.RETRIEVING && this._target != enemy)
             return; // we collided with a projectile that wasn't owned by the enemy we were originally targeting

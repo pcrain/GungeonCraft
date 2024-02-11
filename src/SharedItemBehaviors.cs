@@ -115,9 +115,8 @@ public class ArcTowardsTargetBehavior : MonoBehaviour
         Vector2 delta  = (this._targetPos-curpos);
         this._targetAngle = delta.ToAngle();
         float distanceToTarget = Vector2.Distance(curpos, this._targetPos);
-        this._projectile.baseData.speed = Mathf.Max(distanceToTarget / _maxSecsToReachTarget, _minSpeed);
+        this._projectile.SetSpeed(Mathf.Max(distanceToTarget / _maxSecsToReachTarget, _minSpeed));
         this._actualTimeToReachTarget = distanceToTarget / this._projectile.baseData.speed;
-        this._projectile.UpdateSpeed();
         this._projectile.SendInDirection(BraveMathCollege.DegreesToVector(this._targetAngle-this._arcAngle), true);
     }
 
@@ -1409,5 +1408,34 @@ public class FancyGrenadeProjectile : Projectile
     public void Redirect(Vector2 direction)
     {
         m_currentDirection = direction;
+    }
+}
+
+public class SkipAllCollisionsBehavior : MonoBehaviour
+{
+    private void Start()
+    {
+        if (base.GetComponent<SpeculativeRigidbody>() is not SpeculativeRigidbody body)
+            return;
+        body.OnPreRigidbodyCollision += this.OnPreRigidbodyCollision;
+        body.OnPreTileCollision += this.OnPreTileCollision;
+    }
+
+    private void OnDestroy()
+    {
+        if (base.GetComponent<SpeculativeRigidbody>() is not SpeculativeRigidbody body)
+            return;
+        body.OnPreRigidbodyCollision -= this.OnPreRigidbodyCollision;
+        body.OnPreTileCollision -= this.OnPreTileCollision;
+    }
+
+    private void OnPreRigidbodyCollision(SpeculativeRigidbody me, PixelCollider myPixelCollider, SpeculativeRigidbody other, PixelCollider otherPixelCollider)
+    {
+        PhysicsEngine.SkipCollision = true;
+    }
+
+    private void OnPreTileCollision(SpeculativeRigidbody me, PixelCollider myPixelCollider, PhysicsEngine.Tile other, PixelCollider otherPixelCollider)
+    {
+        PhysicsEngine.SkipCollision = true;
     }
 }

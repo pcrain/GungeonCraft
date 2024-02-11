@@ -113,10 +113,8 @@ public class TheBB : MonoBehaviour
     {
         float deltatime = BraveTime.DeltaTime;
         this._lifetime += deltatime;
-        this._projectile.UpdateSpeed();
         float newSpeed = Mathf.Max(this._projectile.baseData.speed-_BB_SPEED_DECAY*deltatime,0.0001f);
-        this._projectile.baseData.speed = newSpeed;
-        this._projectile.UpdateSpeed();
+        this._projectile.SetSpeed(newSpeed);
 
         this._projectile.sprite.renderer.material.SetFloat(
             "_EmissivePower", _BASE_EMISSION+_EXTRA_EMISSION*(newSpeed/_maxSpeed));

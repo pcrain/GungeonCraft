@@ -191,6 +191,8 @@ public class Vladimir : AdvancedGunBehavior
         // ++this._power;
         // this.gun.sprite.gameObject.SetGlowiness(250f);
     }
+
+    private class ImpaledOnGunBehaviour : SkipAllCollisionsBehavior {}
 }
 
 public class VladimirProjectile : MonoBehaviour
@@ -239,32 +241,5 @@ public class VladimirProjectile : MonoBehaviour
     {
         if (!killed)
             this._gun.Impale(enemy?.aiActor);
-    }
-}
-
-public class ImpaledOnGunBehaviour : MonoBehaviour
-{
-    private void Start()
-    {
-        SpeculativeRigidbody body = base.GetComponent<SpeculativeRigidbody>();
-        body.OnPreRigidbodyCollision += this.OnPreRigidbodyCollision;
-        body.OnPreTileCollision += this.OnPreTileCollision;
-    }
-
-    private void OnDestroy()
-    {
-        SpeculativeRigidbody body = base.GetComponent<SpeculativeRigidbody>();
-        body.OnPreRigidbodyCollision -= this.OnPreRigidbodyCollision;
-        body.OnPreTileCollision -= this.OnPreTileCollision;
-    }
-
-    private void OnPreRigidbodyCollision(SpeculativeRigidbody me, PixelCollider myPixelCollider, SpeculativeRigidbody other, PixelCollider otherPixelCollider)
-    {
-        PhysicsEngine.SkipCollision = true;
-    }
-
-    private void OnPreTileCollision(SpeculativeRigidbody me, PixelCollider myPixelCollider, PhysicsEngine.Tile other, PixelCollider otherPixelCollider)
-    {
-        PhysicsEngine.SkipCollision = true;
     }
 }

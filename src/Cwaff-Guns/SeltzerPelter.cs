@@ -129,8 +129,7 @@ public class SeltzerProjectile : MonoBehaviour
         }
 
         base.gameObject.Play("seltzer_pelter_collide_sound");
-        this._canProjectile.baseData.speed *= 0.5f;
-        this._canProjectile.UpdateSpeed();
+        this._canProjectile.MultiplySpeed(0.5f);
     }
 
     private void StartSprayingSoda()
@@ -138,8 +137,7 @@ public class SeltzerProjectile : MonoBehaviour
         this._startedSpraying = true;
         this._bounce.OnBounce -= this.StartSprayingSoda;
         this._bounce.OnBounce += this.RestartBeamOnBounce;
-        this._canProjectile.baseData.speed *= 0.5f;
-        this._canProjectile.UpdateSpeed();
+        this._canProjectile.MultiplySpeed(0.5f);
         this._canProjectile.OnDestruction += this.DestroyBeam;
         this._canProjectile.StartCoroutine(SpraySoda_CR(this, this._canProjectile));
 
@@ -184,7 +182,7 @@ public class SeltzerProjectile : MonoBehaviour
     private const float SPIN_TIME  = 4f;
     private const float ACCEL      = 40f;
     // private const float _AIR_DRAG  = 0.25f;
-    private const double _AIR_DRAG  = 0.25;
+    private const float _AIR_DRAG  = 0.25f;
     private const float _SOUND_RATE = 0.2f;
 
     private static IEnumerator SpraySoda_CR(SeltzerProjectile seltzer, Projectile p)
@@ -216,9 +214,8 @@ public class SeltzerProjectile : MonoBehaviour
                 Vector2 oldSpeed = p.LastVelocity;
                 curAngle += seltzer._rotationRate;
                 Vector2 newSpeed = oldSpeed + curAngle.ToVector(ACCEL * BraveTime.DeltaTime);
-                p.baseData.speed = newSpeed.magnitude;
+                p.SetSpeed(newSpeed.magnitude);
                 p.SendInDirection(newSpeed, false, false);
-                p.UpdateSpeed();
                 p.SetRotation(newSpeed.ToAngle());
                 seltzer._beam.Origin = p.sprite.WorldCenter;
                 seltzer._beam.Direction = -p.LastVelocity;
@@ -246,11 +243,7 @@ public class SeltzerProjectile : MonoBehaviour
                 }
 
                 if (p.baseData.speed > 0.1f)
-                {
-                    // p.baseData.speed *= Mathf.Pow(_AIR_DRAG, BraveTime.DeltaTime); // TODO: this is probably very expensive
-                    p.baseData.speed = (float)(p.baseData.speed * Lazy.FastPow(_AIR_DRAG, BraveTime.DeltaTime));
-                    p.UpdateSpeed();
-                }
+                    p.ApplyFriction(_AIR_DRAG);
                 seltzer._rotationRate += rotIncrease * BraveTime.DeltaTime;
                 curAngle += seltzer._rotationRate * C.FPS * BraveTime.DeltaTime;
                 p.SetRotation(curAngle);
@@ -267,10 +260,5 @@ public class SeltzerProjectile : MonoBehaviour
         #endregion
 
         yield break;
-    }
-
-    private void Update()
-    {
-
     }
 }

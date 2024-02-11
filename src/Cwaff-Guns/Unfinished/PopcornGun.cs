@@ -56,8 +56,7 @@ public class PopcornBehavior : MonoBehaviour
             this.m_owner      = this.m_projectile.Owner as PlayerController;
             this.m_angle      = this.m_owner.CurrentGun.CurrentAngle;
             currentAngle      = this.m_angle;
-            this.m_projectile.baseData.speed = this.speed;
-            this.m_projectile.UpdateSpeed();
+            this.m_projectile.SetSpeed(this.speed);
         }
         Invoke("DoPop",popTimer);
     }
@@ -89,10 +88,8 @@ public class PopcornBehavior : MonoBehaviour
             float newspeed                   = this.speed*this.speedFalloff;
             this.speed                       = newspeed;
             otherPop.speed                   = newspeed;
-            this.m_projectile.baseData.speed = newspeed;
-            other.baseData.speed             = newspeed;
-            this.m_projectile.UpdateSpeed();
-            other.UpdateSpeed();
+            this.m_projectile.SetSpeed(newspeed);
+            other.SetSpeed(newspeed);
 
             this.m_projectile.gameObject.Play("Play_WPN_smileyrevolver_shot_01");
             Invoke("DoPop",popTimer);

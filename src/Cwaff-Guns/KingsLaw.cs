@@ -220,8 +220,7 @@ public class KingsLawBullets : MonoBehaviour
     private IEnumerator TheLaw()
     {
         // Phase 1 / 5 -- the initial fire
-        this._projectile.baseData.speed = 0.01f;
-        this._projectile.UpdateSpeed();
+        this._projectile.SetSpeed(0.01f);
         this._projectile.specRigidbody.CollideWithTileMap = false;
         this._projectile.specRigidbody.CollideWithOthers = false;
         this._projectile.specRigidbody.Reinitialize();
@@ -294,11 +293,10 @@ public class KingsLawBullets : MonoBehaviour
         }
 
         // Phase 5 / 5 -- the launch
-        this._projectile.baseData.speed = _LAUNCH_SPEED;
+        this._projectile.SetSpeed(_LAUNCH_SPEED);
         this._projectile.specRigidbody.CollideWithOthers = true;
         this._projectile.specRigidbody.Reinitialize();
         _projectile.SendInDirection(targetDir, true);
-        _projectile.UpdateSpeed();
         this._projectile.gameObject.Play("knife_gun_launch");
 
         // Post-launch: wait for the projectiles to pass the player's original point at their launch, then re-enable tile collision

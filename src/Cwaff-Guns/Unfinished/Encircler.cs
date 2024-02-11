@@ -81,8 +81,7 @@ public class EncirclerBehavior : MonoBehaviour
             this.targetAngle  = this.m_owner.CurrentGun.CurrentAngle;
             this.offsetAngle  = this.targetAngle + this.angle;
 
-            this.m_projectile.baseData.speed = 0;
-            this.m_projectile.UpdateSpeed();
+            this.m_projectile.SetSpeed(0);
         }
         Invoke("DoLaunch",launchTimer+0.02f*UnityEngine.Random.Range(0, 30));
     }
@@ -97,8 +96,7 @@ public class EncirclerBehavior : MonoBehaviour
             // NOTE: SendInDirection doesn't account for vector magnitude, so calculating speed before
             //   calculating vectors leads to some janky, non-circular movement,
             //   but I'm leaving it in because it looks neat :D
-            this.m_projectile.baseData.speed = driftSpeed;
-            this.m_projectile.UpdateSpeed();
+            this.m_projectile.SetSpeed(driftSpeed);
 
             Vector2 circularComponent =
                 BraveMathCollege.DegreesToVector(this.offsetAngle+angularSpeed*(this.lifetime - Mathf.Floor(this.lifetime)),newspeed);
@@ -112,8 +110,7 @@ public class EncirclerBehavior : MonoBehaviour
     private void DoLaunch()
     {
         this.runningInCircles = false;
-        this.m_projectile.baseData.speed = this.launchSpeed;
-        this.m_projectile.UpdateSpeed();
+        this.m_projectile.SetSpeed(this.launchSpeed);
         this.m_projectile.SendInDirection(BraveMathCollege.DegreesToVector(this.targetAngle), true);
         this.m_projectile.gameObject.Play("Play_WPN_blasphemy_shot_01");
     }

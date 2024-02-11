@@ -1435,4 +1435,32 @@ public static class Extensions
         return gun;
     return null;
   }
+
+  /// <summary>Set the speed of a projectile and update the cached baseData.speed</summary>
+  public static void SetSpeed(this Projectile p, float newSpeed)
+  {
+    p.baseData.speed = newSpeed;
+    p.UpdateSpeed();
+  }
+
+  /// <summary>Multiply the speed of a projectile and update the cached baseData.speed</summary>
+  public static void MultiplySpeed(this Projectile p, float factor)
+  {
+    p.baseData.speed *= factor;
+    p.UpdateSpeed();
+  }
+
+  /// <summary>Accelerates a projectile and update the cached baseData.speed</summary>
+  public static void Accelerate(this Projectile p, float accel)
+  {
+    p.baseData.speed += accel * p.LocalDeltaTime;
+    p.UpdateSpeed();
+  }
+
+  /// <summary>Apply friction to a projectile and update the cached baseData.speed</summary>
+  public static void ApplyFriction(this Projectile p, float friction)
+  {
+    p.baseData.speed *= (float)Lazy.FastPow(friction, p.LocalDeltaTime * C.FPS);
+    p.UpdateSpeed();
+  }
 }

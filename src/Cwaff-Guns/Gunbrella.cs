@@ -229,14 +229,13 @@ public class GunbrellaProjectile : MonoBehaviour
 
         Vector2 targetLaunchVelocity = (85f + 10f*UnityEngine.Random.value).ToVector(1f);
         this._projectile.IgnoreTileCollisionsFor(_TIME_TO_REACH_TARGET);
-        this._projectile.baseData.speed = _LAUNCH_SPEED;
+        this._projectile.SetSpeed(_LAUNCH_SPEED);
         this._projectile.baseData.range = float.MaxValue;
         this._launching = true;
         while (this._lifetime < _LAUNCH_TIME)
         {
             this._startVelocity = ((1f - _HOME_STRENGTH) * this._startVelocity) + (_HOME_STRENGTH * targetLaunchVelocity);
             this._projectile.SendInDirection(this._startVelocity, true);
-            this._projectile.UpdateSpeed();
             yield return null;
             this._lifetime += BraveTime.DeltaTime;
         }
@@ -244,7 +243,7 @@ public class GunbrellaProjectile : MonoBehaviour
 
         // Phase 2 / 4 -- slight delay
         this._launching = false;
-        this._projectile.baseData.speed = 0.01f;
+        this._projectile.SetSpeed(0.01f);
         while (this._lifetime < (_HANG_TIME + this._extraDelay))
         {
             yield return null;
@@ -255,12 +254,11 @@ public class GunbrellaProjectile : MonoBehaviour
         // Phase 3 / 4 -- fall from the skies
         this._falling = true;
         Vector2 targetFallVelocity = (250f + 40f*UnityEngine.Random.value).ToVector(1f);
-        this._projectile.baseData.speed = _LAUNCH_SPEED;
+        this._projectile.SetSpeed(_LAUNCH_SPEED);
         Vector2 offsetTarget = this._exactTarget + Lazy.RandomVector(_SPREAD * UnityEngine.Random.value);
         this._projectile.specRigidbody.Position = new Position(offsetTarget + (_FALL_TIME * _LAUNCH_SPEED) * (-targetFallVelocity));
         this._projectile.specRigidbody.UpdateColliderPositions();
         this._projectile.SendInDirection(targetFallVelocity, true);
-        this._projectile.UpdateSpeed();
         while (this._lifetime + BraveTime.DeltaTime < _FALL_TIME) // stop a frame early so we can collide with enemies on our last frame
         {
             this._lifetime += BraveTime.DeltaTime;

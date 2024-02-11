@@ -69,10 +69,7 @@ public class Scotsman : AdvancedGunBehavior
     public override void OnSwitchedAwayFromThisGun()
     {
         if (this.Owner is PlayerController pc)
-        {
-            ETGModConsole.Log($"aim nulled");
             pc.forceAimPoint = null;
-        }
         this._targetingReticle.SafeDestroy();
         this._targetingReticle = null;
         base.OnSwitchedAwayFromThisGun();
@@ -179,8 +176,7 @@ public class Stickybomb : MonoBehaviour
         this._stickPoint = stickPoint;
         this._projectile.specRigidbody.Position = new Position(this._stickPoint);
         this._projectile.specRigidbody.UpdateColliderPositions();
-        this._projectile.baseData.speed = 0f;
-        this._projectile.UpdateSpeed();
+        this._projectile.SetSpeed(0f);
 
         this._projectile.sprite.HeightOffGround = 10f;
         this._projectile.sprite.UpdateZDepth();

@@ -19,61 +19,46 @@ public class PaintballCannon : AdvancedGunBehavior
             gun.SetReloadAudio("paintball_reload_sound");
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
-        gun.InitProjectile(new(clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic, damage: 9.0f
-          )).Attach<PaintballColorizer>();
-    }
-
-    public override void PostProcessProjectile(Projectile projectile)
-    {
-        PaintballColorizer pbc =
-            projectile.gameObject.GetComponent<PaintballColorizer>();
-
-        GoopModifier goopmod           = projectile.gameObject.AddComponent<GoopModifier>();
-        goopmod.SpawnGoopOnCollision   = true;
-        goopmod.CollisionSpawnRadius   = 1f;
-        goopmod.SpawnGoopInFlight      = true;
-        goopmod.InFlightSpawnRadius    = 0.4f;
-        goopmod.InFlightSpawnFrequency = 0.01f;
-        goopmod.goopDefinition         = pbc.setColorAndGetGoop();
-
-        base.PostProcessProjectile(projectile);
+        gun.InitProjectile(new(clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic, damage: 9.0f)
+          ).Attach<PaintballColorizer>(
+          ).Attach<GoopModifier>(g => {
+            g.SpawnGoopOnCollision   = true;
+            g.CollisionSpawnRadius   = 1f;
+            g.SpawnGoopInFlight      = true;
+            g.InFlightSpawnRadius    = 0.4f;
+            g.InFlightSpawnFrequency = 0.01f;
+          });
     }
 }
 
 public class PaintballColorizer : MonoBehaviour
 {
-    public  int        tintPriority = 1;
-    public  Color      selectedColour;
-    private Projectile _projectile;
-
-    public GoopDefinition setColorAndGetGoop()
-    {
-        int selectedIndex = UnityEngine.Random.Range(0, EasyGoopDefinitions.ColorGoopColors.Count);
-        selectedColour = EasyGoopDefinitions.ColorGoopColors[selectedIndex];
-        return EasyGoopDefinitions.ColorGoops[selectedIndex];
-    }
+    private Color _tint;
 
     private void Start()
     {
-        this._projectile = base.GetComponent<Projectile>();
-        this._projectile.AdjustPlayerProjectileTint(selectedColour, tintPriority);
+        Projectile p = base.GetComponent<Projectile>();
 
-        this._projectile.OnHitEnemy += this.OnHitEnemy;
+        int i = UnityEngine.Random.Range(0, EasyGoopDefinitions.ColorGoopColors.Count);
+        this._tint = EasyGoopDefinitions.ColorGoopColors[i];
+        p.GetComponent<GoopModifier>().goopDefinition = EasyGoopDefinitions.ColorGoops[i];
+
+        p.AdjustPlayerProjectileTint(_tint, priority: 1);
+        p.OnHitEnemy += this.OnHitEnemy;
     }
 
-    private void OnHitEnemy(Projectile bullet, SpeculativeRigidbody enemy, bool what)
+    private void OnHitEnemy(Projectile bullet, SpeculativeRigidbody enemy, bool killed)
     {
-        GameActorHealthEffect tint = new GameActorHealthEffect()
-        {
-            TintColor                = selectedColour,
-            DeathTintColor           = selectedColour,
+        GameActorHealthEffect tint = new GameActorHealthEffect() {
+            TintColor                = this._tint,
+            DeathTintColor           = this._tint,
             AppliesTint              = true,
             AppliesDeathTint         = true,
             AffectsEnemies           = true,
             DamagePerSecondToEnemies = 0f,
             duration                 = 10000000,
             effectIdentifier         = "Paintballed",
-        };
+            };
         enemy.aiActor?.RemoveEffect("Paintballed");
         enemy.aiActor?.ApplyEffect(tint);
     }

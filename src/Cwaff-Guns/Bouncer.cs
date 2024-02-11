@@ -90,8 +90,7 @@ public class HarmlessUntilBounce : MonoBehaviour
     {
         if (_bounceStarted)
             return;
-        this._projectile.baseData.speed += C.FPS * BraveTime.DeltaTime * Bouncer._ACCELERATION;
-        this._projectile.UpdateSpeed();
+        this._projectile.Accelerate(C.FPS * Bouncer._ACCELERATION);
     }
 
     private void OnDestruction(Projectile p)
@@ -144,8 +143,7 @@ public class HarmlessUntilBounce : MonoBehaviour
 
         this._projectile.baseData.damage = this._damageMult * oldSpeed * Bouncer._DAMAGE_FACTOR;  // base damage should scale with speed
         this._projectile.baseData.force = oldSpeed * Bouncer._FORCE_FACTOR;  // force should scale with speed
-        this._projectile.baseData.speed = 0.001f;
-        this._projectile.UpdateSpeed();
+        this._projectile.SetSpeed(0.001f);
         this._projectile.specRigidbody.Reinitialize();
 
         // Squeeze
@@ -173,8 +171,7 @@ public class HarmlessUntilBounce : MonoBehaviour
         }
         this._projectile.spriteAnimator.transform.localScale = oldScale;
 
-        this._projectile.baseData.speed = oldSpeed;
-        this._projectile.UpdateSpeed();
+        this._projectile.SetSpeed(oldSpeed);
         this._projectile.specRigidbody.Reinitialize();
 
         this._bounceFinished = true;

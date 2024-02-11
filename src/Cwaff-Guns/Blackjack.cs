@@ -111,7 +111,6 @@ public class ThrownCard : MonoBehaviour
         if (BraveTime.DeltaTime == 0)
             return;
 
-        float timeScale = BraveTime.DeltaTime * C.FPS;
         this._lifetime += BraveTime.DeltaTime;
         if (this._faltering || this._lifetime >= this._timeAtMaxPower)
         {
@@ -120,11 +119,10 @@ public class ThrownCard : MonoBehaviour
                 this._faltering = true;
                 this._curveAmount = (Lazy.CoinFlip() ? -1f : 1f) * 5f * UnityEngine.Random.value;
             }
-            // this._projectile.baseData.speed *= _AIR_DRAG;
-            this._projectile.baseData.speed *= Mathf.Pow(_AIR_DRAG, timeScale); // todo: see if this slows things down too much
+            float timeScale = BraveTime.DeltaTime * C.FPS;
+            this._projectile.ApplyFriction(_AIR_DRAG);
             this._projectile.SendInDirection(
                 (this._projectile.m_currentDirection.ToAngle() + this._curveAmount * timeScale).ToVector(), true, true);
-            this._projectile.UpdateSpeed();
         }
 
         this._distanceTraveled += BraveTime.DeltaTime * this._projectile.baseData.speed;

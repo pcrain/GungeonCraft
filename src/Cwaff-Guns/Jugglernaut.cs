@@ -181,7 +181,6 @@ public class Jugglernaut : AdvancedGunBehavior
 
         // Animation wonkiness due to manually adjusting carry offsets messes with aim position, so redirect towards the cursor
         projectile.SendInDirection((this.Player.unadjustedAimPoint.XY() - projectile.sprite.WorldCenter), resetDistance: true);
-        projectile.UpdateSpeed();
 
         gun.gameObject.Play("alyx_shoot_sound");
     }

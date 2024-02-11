@@ -113,7 +113,7 @@ public class EchoProjectileSpawner : MonoBehaviour
         if (!echo)
             return;
 
-        echo.baseData.speed      = speedScale * this._echoVelocity.magnitude;
+        echo.SetSpeed(speedScale * this._echoVelocity.magnitude);
         echo.baseData.damage     = damageScale * this._echoDamage;
         echo.baseData.range      = this._echoRange;
         echo.baseData.force      = 0.01f;
@@ -128,7 +128,6 @@ public class EchoProjectileSpawner : MonoBehaviour
         echo.sprite.gameObject.SetAlpha(damageScale);
 
         echo.SendInDirection(this._echoVelocity, true);
-        echo.UpdateSpeed();
 
         echo.gameObject.ExpireIn(seconds: 0.5f, fadeFor: 0.5f, startAlpha: Mathf.Sqrt(damageScale));
         echo.sprite.gameObject.ExpireIn(seconds: 0.5f, fadeFor: 0.5f, startAlpha: Mathf.Sqrt(damageScale));

@@ -88,8 +88,7 @@ public class TeslaProjectileBehavior : MonoBehaviour
         Vector2 playerVec = (this._owner.CenterPosition - this._projectile.transform.position.XY());
         Vector2 newVel    = oldVel + _ACCEL * BraveTime.DeltaTime * playerVec.normalized.Rotate(_PRECESSION);
 
-        this._projectile.baseData.speed = Mathf.Min(this._myMaxSpeed, newVel.magnitude);
+        this._projectile.SetSpeed(Mathf.Min(this._myMaxSpeed, newVel.magnitude));
         this._projectile.SendInDirection(newVel, true);
-        this._projectile.UpdateSpeed();
     }
 }

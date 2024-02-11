@@ -271,7 +271,6 @@ public class SuncasterProjectile : MonoBehaviour
         if ((--this._prismsLeft) <= 0)
           return;
         this._proj.SendInDirection(prism.Angle(), true);
-        this._proj.UpdateSpeed();
       }
 
       this._lastPrism = prism;

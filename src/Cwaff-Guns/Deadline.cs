@@ -167,7 +167,7 @@ public class Deadline : AdvancedGunBehavior
             t = 0.0f;
         else
             return; // unknown animation, nothing to do
-        Color c = Lazy.Blend(_Green, _Red, t);
+        Color c = Color.Lerp(_Green, _Red, t);
         sprite.renderer.material.SetColor("_OverrideColor", c);
         sprite.renderer.material.SetColor("_EmissiveColor", c);
     }

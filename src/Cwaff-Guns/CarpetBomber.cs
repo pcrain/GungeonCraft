@@ -104,7 +104,7 @@ public class CarpetBomber : AdvancedGunBehavior
 public class CarpetProjectile : MonoBehaviour
 {
     private const int _MAX_BOUNCES          = 3;
-    private const double _AIR_FRICTION      = 0.8d;
+    private const float _AIR_FRICTION       = 0.8f;
     private const float _BOUNCE_FRICTION    = 0.75f;
 
     private Projectile _projectile          = null;
@@ -125,7 +125,6 @@ public class CarpetProjectile : MonoBehaviour
         if (this._projectile.specRigidbody)
             this._projectile.specRigidbody.OnRigidbodyCollision += (CollisionData rigidbodyCollision) => {
                 this._grenade?.Redirect(rigidbodyCollision.Normal);
-                this._projectile.UpdateSpeed();
                 OnGroundBounce();
             };
     }
@@ -134,7 +133,6 @@ public class CarpetProjectile : MonoBehaviour
     {
         if (!this._projectile)
             return;
-
 
         if (this._bounces >= _MAX_BOUNCES)
         {
@@ -145,8 +143,7 @@ public class CarpetProjectile : MonoBehaviour
         if (this._bounces == 0)
             return;
 
-        this._projectile.baseData.speed *= (float)Lazy.FastPow(_AIR_FRICTION, this._projectile.LocalDeltaTime);
-        this._projectile.UpdateSpeed();
+        this._projectile.ApplyFriction(_AIR_FRICTION);
     }
 
     public void OnGroundBounce()

@@ -145,10 +145,9 @@ public class DiceProjectile : MonoBehaviour
         if (newHeight < 0) // we just bounced, so play some nice dice sounds
             base.gameObject.Play(Crapshooter._DiceSounds.ChooseRandom());
 
-        this._projectile.baseData.speed *= _AIR_FRICTION;
+        this._projectile.ApplyFriction(_AIR_FRICTION);
         if (this._projectile.baseData.speed < _MIN_SPEED)
             this._projectile.DieInAir(suppressInAirEffects: true);
-        this._projectile.UpdateSpeed();
 
         if (!this._projectile.specRigidbody)
             return;
