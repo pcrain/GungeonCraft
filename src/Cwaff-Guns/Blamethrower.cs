@@ -126,13 +126,13 @@ public class BlamethrowerProjectile : MonoBehaviour
     {
         this._projectile = base.GetComponent<Projectile>();
         this._projectile.PickFrame();
-        AkSoundEngine.PostEvent($"blame_sound_{UnityEngine.Random.Range(1, 6)}", base.gameObject);
+        base.gameObject.Play($"blame_sound_{UnityEngine.Random.Range(1, 6)}");
         this._projectile.OnHitEnemy += this.OnHitEnemy;
     }
 
     private void OnHitEnemy(Projectile p, SpeculativeRigidbody enemy, bool killed)
     {
-        AkSoundEngine.PostEvent("blamethrower_impact_sound", base.gameObject);
+        base.gameObject.Play("blamethrower_impact_sound");
 
         FancyVFX.SpawnBurst(prefab: Blamethrower._BlameImpact, numToSpawn: 2, basePosition: enemy.sprite.WorldCenter,
             positionVariance: 1f, baseVelocity: 10f * Vector2.up, velocityVariance: 5f, velType: FancyVFX.Vel.Radial,

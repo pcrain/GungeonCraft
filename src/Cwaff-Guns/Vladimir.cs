@@ -149,7 +149,7 @@ public class Vladimir : AdvancedGunBehavior
         //     if (enemy?.specRigidbody)
         //         proj.specRigidbody.RegisterSpecificCollisionException(enemy.specRigidbody);
         // }
-        // AkSoundEngine.PostEvent("whip_crack_sound", player.gameObject);
+        // player.gameObject.Play("whip_crack_sound");
         // if ((--this._power) == 0)
         //     this.gun.sprite.gameObject.SetGlowiness(0f);
     }
@@ -180,7 +180,7 @@ public class Vladimir : AdvancedGunBehavior
 
     public void AbsorbProjectile(Projectile p)
     {
-        AkSoundEngine.PostEvent("subtractor_beam_fire_sound", this.gun.gameObject);
+        this.gun.gameObject.Play("subtractor_beam_fire_sound");
         FancyVFX.SpawnBurst(prefab: _AbsorbVFX, numToSpawn: 8, basePosition: p.SafeCenter, positionVariance: 0.2f,
             baseVelocity: Vector2.zero, velocityVariance: 2f, velType: FancyVFX.Vel.AwayRadial, rotType: FancyVFX.Rot.None,
             lifetime: 0.5f, fadeOutTime: 0.5f, parent: null, emissivePower: 0f, emissiveColor: null, fadeIn: false,

@@ -258,7 +258,7 @@ public class LightwingProjectile : MonoBehaviour
 
         if (this._state == State.NEUTRAL)
         {
-            AkSoundEngine.PostEvent("lightwing_hunt_sound", base.gameObject);
+            base.gameObject.Play("lightwing_hunt_sound");
             this._target = enemy;
             this._state  = State.HUNTING;
         }
@@ -276,7 +276,7 @@ public class LightwingProjectile : MonoBehaviour
         {
             case State.NEUTRAL:
             case State.HUNTING:
-                AkSoundEngine.PostEvent("lightwing_impact_sound", base.gameObject);
+                base.gameObject.Play("lightwing_impact_sound");
                 this._target                         = enemy;
                 this._projectile.collidesWithEnemies = false;
                 this._state                          = State.RETRIEVING;

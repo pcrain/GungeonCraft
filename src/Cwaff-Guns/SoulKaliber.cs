@@ -31,7 +31,7 @@ public class SoulLinkProjectile : MonoBehaviour
         Projectile proj = base.GetComponent<Projectile>();
         proj.sprite.SetGlowiness(glowAmount: 100f, glowColor: Color.magenta);
         proj.OnHitEnemy += (Projectile p, SpeculativeRigidbody enemy, bool _) => {
-            AkSoundEngine.PostEvent("soul_kaliber_impact", p.gameObject);
+            p.gameObject.Play("soul_kaliber_impact");
             enemy.aiActor.gameObject.GetOrAddComponent<SoulLinkStatus>();
         };
     }
@@ -119,7 +119,7 @@ public class SoulLinkStatus : MonoBehaviour
                 shouldPlaySound = soulLink.ShareThePain(data.ModifiedDamage);
             }
             if (shouldPlaySound)
-                AkSoundEngine.PostEvent("soul_kaliber_drain", hh.gameObject);
+                hh.gameObject.Play("soul_kaliber_drain");
         }
         finally
         {

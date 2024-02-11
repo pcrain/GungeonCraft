@@ -80,8 +80,8 @@ public class SafetyGloves : PassiveItem
         this._extantVfx = null;
 
         FancyVFX.FromCurrentFrame(closestEnemy.sprite).ArcTowards(0.5f, pc.sprite, false, 0.1f, 1.0f);
-        AkSoundEngine.PostEvent("safety_glove_grab_sound", pc.gameObject);
-        AkSoundEngine.PostEvent("Play_ENM_Death", closestEnemy.gameObject);
+        pc.gameObject.Play("safety_glove_grab_sound");
+        closestEnemy.gameObject.Play("Play_ENM_Death");
         closestEnemy.EraseFromExistence(suppressDeathSounds: true);
         gun.GainAmmo(gun.AdjustedMaxAmmo / 10);
     }

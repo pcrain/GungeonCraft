@@ -466,7 +466,7 @@ public class WrappableGift : MonoBehaviour
         yield return null;
         this._vfx.gameObject.SetAlpha(1f);
         this._animator.StopAndResetFrame();
-        AkSoundEngine.PostEvent("present_create_sound", base.gameObject);
+        base.gameObject.Play("present_create_sound");
         for (float elapsed = 0f; elapsed < _GROW_TIME; elapsed += BraveTime.DeltaTime)
         {
             float percentDone = elapsed / _GROW_TIME;
@@ -474,7 +474,7 @@ public class WrappableGift : MonoBehaviour
             yield return null;
         }
         this._animator.Play();
-        AkSoundEngine.PostEvent(wrapping ? "present_wrap_sound" : "present_unwrap_sound", base.gameObject);
+        base.gameObject.Play(wrapping ? "present_wrap_sound" : "present_unwrap_sound");
 
         // If we're wrapping the pickup, make it magically hover over to the present
         if (wrapping)

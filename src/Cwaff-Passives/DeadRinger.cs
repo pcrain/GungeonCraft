@@ -48,7 +48,7 @@ public class DeadRinger : PassiveItem
 
     private void FeignDeath()
     {
-        AkSoundEngine.PostEvent("spy_uncloak_feigndeath", this.Owner.gameObject);
+        this.Owner.gameObject.Play("spy_uncloak_feigndeath");
         StartCoroutine(AnimateTheCorpse(this.Owner));
     }
 
@@ -110,7 +110,7 @@ public class DeadRinger : PassiveItem
         this.Owner.PostProcessProjectile -= SneakAttackProcessor;
         this.Owner.SetIsStealthed(false, "DeadRinger");
         this.Owner.SetCapableOfStealing(false, "DeadRinger");
-        AkSoundEngine.PostEvent("medigun_heal_detach", this.Owner.gameObject);
+        this.Owner.gameObject.Play("medigun_heal_detach");
         DoSmokeAroundPlayer(8);
     }
 

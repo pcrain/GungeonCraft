@@ -59,7 +59,7 @@ public class SansNPC : BossNPC
         "shrug", "shrug", "sans_laugh");
       yield return Converse("...cause I won't be",
         "idle_empty", "idle_empty", "sans_laugh");
-      AkSoundEngine.PostEvent("sans_stop_all", base.aiActor.gameObject);
+      base.aiActor.gameObject.Play("sans_stop_all");
       StartBossFight(); // accept
     }
     else

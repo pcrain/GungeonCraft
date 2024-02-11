@@ -83,7 +83,7 @@ public class TranquilizerBehavior : MonoBehaviour
             this._orb = this._enemy.gameObject.AddComponent<OrbitalEffect>();
             this._orb.SetupOrbitals(vfx: Tranquilizer._DrowsyVFX, numOrbitals: 1, rps: 0.2f, isEmissive: false, isOverhead: true, rotates: true, flips: false);
 
-            AkSoundEngine.PostEvent("drowsy_sound", this._enemy.gameObject);
+            this._enemy.gameObject.Play("drowsy_sound");
             this.timeUntilStun = Mathf.Max(1, Mathf.CeilToInt(Mathf.Log(this._enemy.healthHaver.currentHealth) / Mathf.Log(2)));
         }
 
@@ -105,7 +105,7 @@ public class TranquilizerBehavior : MonoBehaviour
 
             FancyVFX.Spawn(Tranquilizer._SleepImpactVFX, this._enemy.CenterPosition, Quaternion.identity,
                 lifetime: 0.5f, fadeOutTime: 1.0f, parent: this._enemy.transform, startScale: 0.25f, endScale: 2f, height: 10f);
-            AkSoundEngine.PostEvent("fall_asleep_sound", this._enemy.gameObject);
+            this._enemy.gameObject.Play("fall_asleep_sound");
             this._orb.ClearOrbitals();
             this._orb.SetupOrbitals(vfx: Tranquilizer._SleepyVFX, numOrbitals: 2, rps: 0.4f, isEmissive: false, isOverhead: true, rotates: false, flips: true, fades: true, bobAmount: 0.25f);
         }

@@ -94,7 +94,7 @@ public class PopcornBehavior : MonoBehaviour
             this.m_projectile.UpdateSpeed();
             other.UpdateSpeed();
 
-            AkSoundEngine.PostEvent("Play_WPN_smileyrevolver_shot_01", this.m_projectile.gameObject);
+            this.m_projectile.gameObject.Play("Play_WPN_smileyrevolver_shot_01");
             Invoke("DoPop",popTimer);
         }
     }

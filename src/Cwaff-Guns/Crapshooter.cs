@@ -41,7 +41,7 @@ public class Crapshooter : AdvancedGunBehavior
             bounce.percentVelocityToLoseOnBounce = 0.5f;
             bounce.numberOfBounces = Mathf.Max(bounce.numberOfBounces, 0) + 3;
             bounce.OnBounce += () => {
-                AkSoundEngine.PostEvent(_DiceSounds.ChooseRandom(), bounce.gameObject);
+                bounce.gameObject.Play(_DiceSounds.ChooseRandom());
             };
           }).Attach<DiceProjectile>(
           );
@@ -50,7 +50,7 @@ public class Crapshooter : AdvancedGunBehavior
     public override void PostProcessProjectile(Projectile projectile)
     {
         base.PostProcessProjectile(projectile);
-        AkSoundEngine.PostEvent(_DiceSounds.ChooseRandom(), base.gameObject);
+        base.gameObject.Play(_DiceSounds.ChooseRandom());
         projectile.SetFrame(this._nextRoll);
         projectile.DestroyMode = Projectile.ProjectileDestroyMode.BecomeDebris;
         switch (this._nextRoll + 1)
@@ -143,7 +143,7 @@ public class DiceProjectile : MonoBehaviour
 
         float newHeight = this._grenade.m_currentHeight + (this._grenade.m_current3DVelocity.z + this._projectile.LocalDeltaTime * -10f) * this._projectile.LocalDeltaTime;
         if (newHeight < 0) // we just bounced, so play some nice dice sounds
-            AkSoundEngine.PostEvent(Crapshooter._DiceSounds.ChooseRandom(), base.gameObject);
+            base.gameObject.Play(Crapshooter._DiceSounds.ChooseRandom());
 
         this._projectile.baseData.speed *= _AIR_FRICTION;
         if (this._projectile.baseData.speed < _MIN_SPEED)

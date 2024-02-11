@@ -246,7 +246,7 @@ public class Stickybomb : MonoBehaviour
         // Phase 3, primed for detonation
         for (int i = 0; i < 3; ++i)
         {
-            AkSoundEngine.PostEvent("stickybomblauncher_det", base.gameObject);
+            base.gameObject.Play("stickybomblauncher_det");
             this._projectile.sprite.SetGlowiness(glowAmount: _DET_GLOW, glowColor: Color.red);
             yield return new WaitForSeconds(_DET_TIMER / 6);
             this._projectile.sprite.SetGlowiness(glowAmount: _BASE_GLOW, glowColor: Color.red);

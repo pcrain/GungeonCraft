@@ -458,7 +458,7 @@ public class Initialisation : BaseUnityPlugin
                 ETGModConsole.Log($"    awaitAsync     finished in {awaitAsyncWatch.ElapsedMilliseconds} milliseconds");
                 long newMemory = currentProcess.WorkingSet64;
                 ETGModConsole.Log($"allocated {(newMemory - oldMemory).ToString("N0")} bytes of memory along the way");
-                AkSoundEngine.PostEvent("vc_kirby_appeal01", ETGModMainBehaviour.Instance.gameObject);
+                ETGModMainBehaviour.Instance.gameObject.Play("vc_kirby_appeal01");
             }
 
             // Debug.LogError("Gungy o.o!");

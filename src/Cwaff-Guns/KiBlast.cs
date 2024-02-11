@@ -132,8 +132,7 @@ public class KiBlastBehavior : MonoBehaviour
         this._startingDamage = this._projectile.baseData.damage;
         this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
         this._projectile.specRigidbody.OnCollision += (_) => {
-            AkSoundEngine.PostEvent("ki_blast_explode_sound_stop_all", this._projectile.gameObject);
-            AkSoundEngine.PostEvent("ki_blast_explode_sound", this._projectile.gameObject);
+            this._projectile.gameObject.PlayUnique("ki_blast_explode_sound");
         };
 
         float angle = 0;
@@ -147,9 +146,8 @@ public class KiBlastBehavior : MonoBehaviour
         this._arc = base.GetComponent<ArcTowardsTargetBehavior>();
         this._arc.Setup(arcAngle: angle, maxSecsToReachTarget: 0.5f, minSpeed: 15.0f);
 
-        AkSoundEngine.PostEvent("ki_blast_return_sound_stop_all", this._projectile.gameObject);
-        AkSoundEngine.PostEvent("ki_blast_sound_stop_all", this._projectile.gameObject);
-        AkSoundEngine.PostEvent("ki_blast_sound", this._projectile.gameObject);
+        this._projectile.gameObject.Play("ki_blast_return_sound_stop_all");
+        this._projectile.gameObject.PlayUnique("ki_blast_sound");
     }
 
     private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
@@ -184,9 +182,8 @@ public class KiBlastBehavior : MonoBehaviour
             trail.EndColor = Color.red;
             trail.UpdateTrail();
 
-        AkSoundEngine.PostEvent("ki_blast_return_sound_stop_all", this._projectile.gameObject);
-        AkSoundEngine.PostEvent("ki_blast_sound_stop_all", this._projectile.gameObject);
-        AkSoundEngine.PostEvent("ki_blast_return_sound", this._projectile.gameObject);
+        this._projectile.gameObject.Play("ki_blast_sound_stop_all");
+        this._projectile.gameObject.PlayUnique("ki_blast_return_sound");
     }
 
     public void ReturnFromPlayer(PlayerController player)
@@ -213,9 +210,8 @@ public class KiBlastBehavior : MonoBehaviour
             trail.EndColor = Color.cyan;
             trail.UpdateTrail();
 
-        AkSoundEngine.PostEvent("ki_blast_return_sound_stop_all", this._projectile.gameObject);
-        AkSoundEngine.PostEvent("ki_blast_sound_stop_all", this._projectile.gameObject);
-        AkSoundEngine.PostEvent("ki_blast_return_sound", this._projectile.gameObject);
+        this._projectile.gameObject.Play("ki_blast_sound_stop_all");
+        this._projectile.gameObject.PlayUnique("ki_blast_return_sound");
         int enemiesToCheck = 10;
         while (enemy.healthHaver.currentHealth <= 0 && --enemiesToCheck >= 0)
             enemy = enemy.GetAbsoluteParentRoom().GetRandomActiveEnemy(false);

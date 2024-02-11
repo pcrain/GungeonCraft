@@ -74,10 +74,7 @@ public class GorgunEye : PassiveItem
             closestEnemy?.ApplyEffect(_GorgunTint);
             this._afflictedEnemy = closestEnemy;
             if (closestEnemy)
-            {
-                AkSoundEngine.PostEvent("gorgun_eye_activate_stop_all", closestEnemy.gameObject);
-                AkSoundEngine.PostEvent("gorgun_eye_activate", closestEnemy.gameObject);
-            }
+                closestEnemy.gameObject.PlayUnique("gorgun_eye_activate");
         }
         closestEnemy?.behaviorSpeculator?.Stun(_STUN_LINGER_TIME, createVFX: false);
     }

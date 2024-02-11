@@ -459,7 +459,7 @@ public static class SlashDoer // stolen from NN
         Transform parentTransform = null)
     {
         if (slashParameters.doVFX && slashParameters.VFX != null) slashParameters.VFX.SpawnAtPosition(position, angle, parentTransform, null, null, -0.05f);
-        if (!string.IsNullOrEmpty( slashParameters.soundEvent) && owner != null && owner.gameObject != null) AkSoundEngine.PostEvent(slashParameters.soundEvent, owner.gameObject);
+        if (!string.IsNullOrEmpty( slashParameters.soundEvent) && owner != null && owner.gameObject != null) owner.gameObject.Play(slashParameters.soundEvent);
         GameManager.Instance.StartCoroutine(HandleSlash(position, angle, owner, slashParameters));
     }
     private static IEnumerator HandleSlash(Vector2 position, float angle, GameActor owner, SlashData slashParameters)

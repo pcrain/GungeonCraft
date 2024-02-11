@@ -598,14 +598,7 @@ public static class Extensions
     aframe.triggerEvent = !string.IsNullOrEmpty(audio);
     aframe.eventAudio = audio;
   }
-  //  doesn't work
-  // public static void SetProjectileAudio(this Gun gun, string audio = "")
-  // {
-  //     gun.OnPostFired += (_, _) => {
-  //       ETGModConsole.Log($"making a projectile!");
-  //       AkSoundEngine.PostEvent(audio, gun.gameObject);
-  //     };
-  // }
+
   /// <summary>needs to use Alexandria version because fireaudio overrides are not serialized</summary>
   public static void SetFireAudio(this Gun gun, string audio = "", int frame = 0)
   {

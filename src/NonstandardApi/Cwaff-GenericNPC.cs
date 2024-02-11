@@ -245,10 +245,7 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
             float timer = 0;
             bool playingTalkingAnimation = true;
             if (!string.IsNullOrEmpty(audioEvent))
-            {
-                AkSoundEngine.PostEvent(audioEvent+"_stop_all", base.gameObject);
-                AkSoundEngine.PostEvent(audioEvent, base.gameObject);
-            }
+                base.gameObject.PlayUnique(audioEvent);
             while (!BraveInput.GetInstanceForPlayer(this.m_interactor.PlayerIDX).ActiveActions.GetActionFromType(GungeonActions.GungeonActionType.Interact).WasPressed || timer < MIN_TEXTBOX_TIME)
             {
                 timer += BraveTime.DeltaTime;

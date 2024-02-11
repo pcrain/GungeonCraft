@@ -47,9 +47,9 @@ public class Natascha : AdvancedGunBehavior
         {
             if (this._speedMult == 1.0f)
             {
-                AkSoundEngine.PostEvent("minigun_wind_down_stop", gun.gameObject);
-                // AkSoundEngine.PostEvent("minigun_wind_up", gun.gameObject);
-                AkSoundEngine.PostEvent("minigun_spin", gun.gameObject);
+                gun.gameObject.Play("minigun_wind_down_stop");
+                // gun.gameObject.Play("minigun_wind_up");
+                gun.gameObject.Play("minigun_spin");
             }
             this.gun.spriteAnimator.currentClip = gun.spriteAnimator.GetClipByName(gun.shootAnimation);
             this.gun.spriteAnimator.Play();
@@ -69,12 +69,12 @@ public class Natascha : AdvancedGunBehavior
     public override void OnPostFired(PlayerController player, Gun gun)
     {
         base.OnPostFired(player, gun);
-        AkSoundEngine.PostEvent("tomislav_shoot", gun.gameObject);
+        gun.gameObject.Play("tomislav_shoot");
         if (this._speedMult == 1.0f)
         {
-            AkSoundEngine.PostEvent("minigun_wind_down_stop", gun.gameObject);
-            // AkSoundEngine.PostEvent("minigun_wind_up", gun.gameObject);
-            AkSoundEngine.PostEvent("minigun_spin", gun.gameObject);
+            gun.gameObject.Play("minigun_wind_down_stop");
+            // gun.gameObject.Play("minigun_wind_up");
+            gun.gameObject.Play("minigun_spin");
         }
     }
 
@@ -117,9 +117,9 @@ public class Natascha : AdvancedGunBehavior
     {
         if (this._speedMult < 1.0f && speedMult == 1.0f)
         {
-            AkSoundEngine.PostEvent("minigun_spin_stop", gun.gameObject);
-            AkSoundEngine.PostEvent("minigun_wind_up_stop", gun.gameObject);
-            AkSoundEngine.PostEvent("minigun_wind_down", gun.gameObject);
+            gun.gameObject.Play("minigun_spin_stop");
+            gun.gameObject.Play("minigun_wind_up_stop");
+            gun.gameObject.Play("minigun_wind_down");
         }
         this._speedMult = speedMult;
         gun.AdjustAnimation( // add 1 to FPS to make sure the animation doesn't skip a loop

@@ -26,7 +26,7 @@ public class HatchlingGun : AdvancedGunBehavior
     public override void OnPostFired(PlayerController player, Gun gun)
     {
         base.OnPostFired(player, gun);
-        AkSoundEngine.PostEvent("hatchling_gun_shoot_sound", gun.gameObject);
+        gun.gameObject.Play("hatchling_gun_shoot_sound");
     }
 }
 
@@ -65,7 +65,7 @@ public class HatchlingProjectile : MonoBehaviour
         cc.aiActor.CanTargetEnemies       = true;  // original was true
         cc.aiActor.State                  = AIActor.ActorState.Normal;
         cc.healthHaver.OnDamaged += (float resultValue, float maxValue, CoreDamageTypes damageTypes, DamageCategory damageCategory, Vector2 damageDirection) => {
-            AkSoundEngine.PostEvent("bird_chirp", cc.gameObject);
+            cc.gameObject.Play("bird_chirp");
             UnityEngine.Object.Destroy(cc.gameObject);
         };
         cc.aiActor.ParentRoom = p.transform.position.GetAbsoluteRoom(); // needed to avoid null deref for MoveErraticallyBehavior
@@ -130,7 +130,7 @@ public class HatchlingBehavior : MonoBehaviour
     {
         this._startRoom = this.gameObject.transform.position.GetAbsoluteRoom();
         this._actor = base.gameObject.GetComponent<AIActor>();
-        AkSoundEngine.PostEvent("bird_chirp", base.gameObject);
+        base.gameObject.Play("bird_chirp");
     }
 
     public void Setup(PlayerController pc)

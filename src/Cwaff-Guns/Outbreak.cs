@@ -61,7 +61,7 @@ public class Outbreak : AdvancedGunBehavior
             p.specRigidbody.RegisterSpecificCollisionException(enemy.specRigidbody);
         }
         if (found)
-            AkSoundEngine.PostEvent("outbreak_spread_sound", player.gameObject);
+            player.gameObject.Play("outbreak_spread_sound");
     }
 }
 
@@ -101,7 +101,7 @@ public class InfectedBehavior : MonoBehaviour
         if ((this._enemy?.healthHaver?.currentHealth ?? 0) <= 0)
             return;
 
-        AkSoundEngine.PostEvent("outbreak_infect_sound", this._enemy.gameObject);
+        this._enemy.gameObject.Play("outbreak_infect_sound");
     }
 
     private void Update()

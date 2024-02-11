@@ -140,8 +140,7 @@ public class AstralProjector : PassiveItem
         sprite.usesOverrideMaterial = true;
         this._originalShader = sprite.renderer.material.shader;
         sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/HologramShader");
-        AkSoundEngine.PostEvent("phase_through_wall_sound_stop_all", this.Owner.gameObject);
-        AkSoundEngine.PostEvent("phase_through_wall_sound", this.Owner.gameObject);
+        this.Owner.gameObject.PlayUnique("phase_through_wall_sound");
     }
 
     private void BecomeTangible()
@@ -153,8 +152,7 @@ public class AstralProjector : PassiveItem
         tk2dBaseSprite sprite = this.Owner.sprite;
         sprite.usesOverrideMaterial = true;
         sprite.renderer.material.shader = this._originalShader;
-        AkSoundEngine.PostEvent("phase_through_wall_sound_stop_all", this.Owner.gameObject);
-        AkSoundEngine.PostEvent("phase_through_wall_sound", this.Owner.gameObject);
+        this.Owner.gameObject.PlayUnique("phase_through_wall_sound");
     }
 
     /* References for using ILHooks:

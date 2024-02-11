@@ -197,7 +197,7 @@ public class GunbrellaProjectile : MonoBehaviour
         if (_LastFireSound < BraveTime.ScaledTimeSinceStartup)
         {
             _LastFireSound = BraveTime.ScaledTimeSinceStartup;
-            AkSoundEngine.PostEvent("gunbrella_fire_sound", this._projectile.gameObject);
+            this._projectile.gameObject.Play("gunbrella_fire_sound");
         }
 
         this._projectile.collidesWithEnemies = false;

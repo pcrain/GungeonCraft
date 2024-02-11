@@ -115,6 +115,6 @@ public class EncirclerBehavior : MonoBehaviour
         this.m_projectile.baseData.speed = this.launchSpeed;
         this.m_projectile.UpdateSpeed();
         this.m_projectile.SendInDirection(BraveMathCollege.DegreesToVector(this.targetAngle), true);
-        AkSoundEngine.PostEvent("Play_WPN_blasphemy_shot_01", this.m_projectile.gameObject);
+        this.m_projectile.gameObject.Play("Play_WPN_blasphemy_shot_01");
     }
 }

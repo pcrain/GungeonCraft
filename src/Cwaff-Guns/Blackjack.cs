@@ -89,8 +89,7 @@ public class ThrownCard : MonoBehaviour
         this._cardBack   = Blackjack._BackSprite.GetFrame(0).spriteId;
         this._startScale = (Lazy.CoinFlip() ? -1f : 1f);
 
-        AkSoundEngine.PostEvent("card_throw_sound_stop_all", this._projectile.gameObject);
-        AkSoundEngine.PostEvent("card_throw_sound", this._projectile.gameObject);
+        this._projectile.gameObject.PlayUnique("card_throw_sound");
     }
 
     private void CalculateStatsFromPlayerStats()
@@ -159,8 +158,8 @@ public class ThrownCard : MonoBehaviour
             if (gun.CurrentAmmo >= gun.AdjustedMaxAmmo)
                 break;
             gun.CurrentAmmo += 1;
-            AkSoundEngine.PostEvent("card_pickup_sound_stop_all", p.gameObject);
-            AkSoundEngine.PostEvent("card_pickup_sound", p.gameObject);
+            p.gameObject.Play("card_pickup_sound_stop_all");
+            p.gameObject.Play("card_pickup_sound");
             SpawnManager.SpawnVFX(VFX.MiniPickup, i.sprite.WorldCenter, Lazy.RandomEulerZ());
             UnityEngine.Object.Destroy(i.gameObject);
             break;

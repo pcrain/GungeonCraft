@@ -91,10 +91,7 @@ public class AimuHakurei : AdvancedGunBehavior
         base.PostProcessProjectile(projectile);
         SetFocus(false);
         if (projectile.GetComponentInChildren<TrailController>())
-        {
-            AkSoundEngine.PostEvent("aimu_beam_sound_2_stop_all", this.Owner.gameObject);
-            AkSoundEngine.PostEvent("aimu_beam_sound_2", this.Owner.gameObject);
-        }
+            this.Owner.gameObject.PlayUnique("aimu_beam_sound_2");
     }
 
     protected override void OnPickedUpByPlayer(PlayerController player)
@@ -151,7 +148,7 @@ public class AimuHakurei : AdvancedGunBehavior
         this.gun.CanBeDropped = !focus;
         BraveTime.SetTimeScaleMultiplier(focus ? 0.65f : 1.0f, base.gameObject);
         if (this._focused)
-            AkSoundEngine.PostEvent("aimu_focus_sound", this.Owner.gameObject);
+            this.Owner.gameObject.Play("aimu_focus_sound");
 
         this.gun.RemoveStatFromGun(PlayerStats.StatType.MovementSpeed);
         // NOTE: since time is slowed down, the player's effective speed is 0.65 * 0.65. This is intentional
@@ -212,7 +209,7 @@ public class AimuHakurei : AdvancedGunBehavior
     private void PowerUp()
     {
         ++this.gun.CurrentStrengthTier;
-        AkSoundEngine.PostEvent("aimu_power_up_sound", this.Owner.gameObject);
+        this.Owner.gameObject.Play("aimu_power_up_sound");
         this.gun.gameObject.SetGlowiness(this.gun.CurrentStrengthTier * this.gun.CurrentStrengthTier);
     }
 
@@ -338,7 +335,7 @@ public class AimuHakureiProjectileBehavior : MonoBehaviour
             this._aimu.amplitude = this.amplitude;
         this._projectile.OverrideMotionModule = this._aimu;
 
-        AkSoundEngine.PostEvent(this.sound, base.gameObject);
+        base.gameObject.Play(this.sound);
     }
 }
 

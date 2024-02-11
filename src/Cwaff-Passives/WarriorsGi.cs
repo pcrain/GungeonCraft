@@ -214,7 +214,7 @@ public class ZenkaiAura : MonoBehaviour
         if (this._nextSparkTime > 0f)
             return;
 
-        AkSoundEngine.PostEvent("dbz_spark_sound", this._saiyan.gameObject);
+        this._saiyan.gameObject.Play("dbz_spark_sound");
         GameObject v = SpawnManager.SpawnVFX(WarriorsGi._SaiyanSpark, (this._saiyan.sprite.WorldCenter + Lazy.RandomVector(0.3f)).ToVector3ZUp(10f), Lazy.RandomEulerZ());
             tk2dSprite sprite = v.GetComponent<tk2dSprite>();
             sprite.HeightOffGround = 10f;
@@ -272,7 +272,7 @@ public class ZenkaiAura : MonoBehaviour
         this._nextSparkTime               =
             UnityEngine.Random.Range(_MIN_SPARK_GAPS[this._zenkaiLevel], _MAX_SPARK_GAPS[this._zenkaiLevel]);
 
-        AkSoundEngine.PostEvent("zenkai_aura_sound", this._saiyan.gameObject);
+        this._saiyan.gameObject.Play("zenkai_aura_sound");
     }
 
     public int GetPower()

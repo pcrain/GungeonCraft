@@ -160,7 +160,7 @@ public class AdrenalineShot : PassiveItem
         if (BraveTime.ScaledTimeSinceStartup - _LastHeartbeatTime > heartRate)
         {
             _LastHeartbeatTime = BraveTime.ScaledTimeSinceStartup;
-            AkSoundEngine.PostEvent("heartbeat", this.Owner.gameObject);
+            this.Owner.gameObject.Play("heartbeat");
         }
 
         if (this._adrenalineTimer > 0f)
@@ -182,7 +182,7 @@ public class AdrenalineShot : PassiveItem
             this._adrenalineTimer -= _MAX_ADRENALINE_LOSS;
             if (this._adrenalineTimer <= 0)
                 return;
-            AkSoundEngine.PostEvent("adrenaline_tank_damage_sound", hh.gameObject);
+            hh.gameObject.Play("adrenaline_tank_damage_sound");
         }
 
         data.ModifiedDamage = 0f;
@@ -252,7 +252,7 @@ public class AdrenalineShot : PassiveItem
         this.Owner.healthHaver.ForceSetCurrentHealth(Mathf.Max(this.Owner.healthHaver.currentHealth - 0.5f, 0.5f));
         this.Owner.baseFlatColorOverride = Color.clear;
         this.Owner.ChangeFlatColorOverride(Color.clear);
-        AkSoundEngine.PostEvent("adrenaline_deactivate_sound", this.Owner.gameObject);
+        this.Owner.gameObject.Play("adrenaline_deactivate_sound");
 
         UnityEngine.Object.Destroy(this.Owner.gameObject.GetComponent<UnderAdrenalineEffects>());
     }

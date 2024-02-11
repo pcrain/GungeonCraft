@@ -157,7 +157,7 @@ public class Jugglernaut : AdvancedGunBehavior
         if (this._juggledEnemies.Count() == 0)
             return;
 
-        AkSoundEngine.PostEvent("juggle_drop_sound", this.Player.gameObject);
+        this.Player.gameObject.Play("juggle_drop_sound");
         ResetJuggle();
     }
 
@@ -183,7 +183,7 @@ public class Jugglernaut : AdvancedGunBehavior
         projectile.SendInDirection((this.Player.unadjustedAimPoint.XY() - projectile.sprite.WorldCenter), resetDistance: true);
         projectile.UpdateSpeed();
 
-        AkSoundEngine.PostEvent("alyx_shoot_sound", gun.gameObject);
+        gun.gameObject.Play("alyx_shoot_sound");
     }
 
     public void RegisterEnemyHit(AIActor enemy)
@@ -240,8 +240,8 @@ public class Jugglernaut : AdvancedGunBehavior
 
         Material m = gun.sprite.renderer.material;
         m.SetFloat("_EmissivePower", 0f);
-        AkSoundEngine.PostEvent("juggle_add_sound", gun.gameObject);
-        // AkSoundEngine.PostEvent("gunbrella_fire_sound", gun.gameObject);
+        gun.gameObject.Play("juggle_add_sound");
+        // gun.gameObject.Play("gunbrella_fire_sound");
 
         for (float elapsed = 0f; elapsed < GLOW_TIME; elapsed += BraveTime.DeltaTime)
         {

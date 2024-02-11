@@ -82,7 +82,7 @@ public class PrimerSubscription : MonoBehaviour
             this._primer.OnEnteredCombat -= AnyPrimers;
             this._primer.OnRoomClearEvent -= ThanksForPriming;
             GameManager.Instance.OnNewLevelFullyLoaded -= Inflation;
-            AkSoundEngine.PostEvent("prime_ran_out", this._primer.gameObject);
+            this._primer.gameObject.Play("prime_ran_out");
             Lazy.CustomNotification("Primer Expired", "Thanks for Trying Amazon Primer", ItemHelper.Get((Items)IDs.Pickups["amazon_primer"]).sprite);
             UnityEngine.Object.Destroy(this);
             return;
@@ -106,7 +106,7 @@ public class PrimerSubscription : MonoBehaviour
 
     private void DoPrimeVFX()
     {
-        AkSoundEngine.PostEvent("prime_sound", this._primer.gameObject);
+        this._primer.gameObject.Play("prime_sound");
         GameObject v = SpawnManager.SpawnVFX(AmazonPrimer._PrimeLogo, this._primer.sprite.WorldTopCenter + new Vector2(0f, 0.5f), Quaternion.identity);
             v.transform.parent = this._primer.transform;
             v.ExpireIn(1f);

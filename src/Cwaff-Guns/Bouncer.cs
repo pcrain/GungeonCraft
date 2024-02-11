@@ -122,8 +122,8 @@ public class HarmlessUntilBounce : MonoBehaviour
         if ((now - _LastBouncePlayed) < _MIN_SOUND_GAP)
             return;
         _LastBouncePlayed = now;
-        AkSoundEngine.PostEvent("MC_RocsCape", this._projectile.gameObject);
-        AkSoundEngine.PostEvent("MC_Mushroom_Bounce", this._projectile.gameObject);
+        this._projectile.gameObject.Play("MC_RocsCape");
+        this._projectile.gameObject.Play("MC_Mushroom_Bounce");
     }
 
     private void OnBounce()

@@ -56,7 +56,7 @@ public class Magunet : AdvancedGunBehavior
             this._extantChargeVFX = null;
             if (this._wasCharging)
             {
-                AkSoundEngine.PostEvent("magunet_launch_sound", base.gameObject);
+                base.gameObject.Play("magunet_launch_sound");
                 Exploder.DoDistortionWave(center: this.gun.barrelOffset.position.XY() + this.gun.gunAngle.ToVector(0.5f),
                     distortionIntensity: 1.5f, distortionRadius: 0.05f, maxRadius: 2.75f, duration: 0.25f);
             }
@@ -73,7 +73,7 @@ public class Magunet : AdvancedGunBehavior
         // Particle effects
         if (BraveTime.ScaledTimeSinceStartup - this._timeOfLastFX >= _FX_RATE)
         {
-            AkSoundEngine.PostEvent("magunet_attract_sound", this.gun.gameObject);
+            this.gun.gameObject.Play("magunet_attract_sound");
             this._timeOfLastFX = BraveTime.ScaledTimeSinceStartup;
             for (int i = 0; i < _NUM_PARTICLES; ++i)
             {

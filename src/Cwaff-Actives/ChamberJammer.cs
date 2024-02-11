@@ -49,7 +49,7 @@ public class ChamberJammer : PlayerItem
             360f, 20f, 0f,
             systemType: GlobalSparksDoer.SparksType.BLACK_PHANTOM_SMOKE);
 
-        AkSoundEngine.PostEvent("chamber_eater_activate_sound", user.gameObject);
+        user.gameObject.Play("chamber_eater_activate_sound");
     }
 }
 

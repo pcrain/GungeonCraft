@@ -166,7 +166,7 @@ public class GoldenDeath : MonoBehaviour
             positionVariance: _PART_SPREAD, baseVelocity: Vector2.zero, velocityVariance: _PART_SPEED, velType: FancyVFX.Vel.Radial,
             rotType: FancyVFX.Rot.Random, lifetime: _PART_LIFE, fadeOutTime: _PART_LIFE, emissivePower: _PART_EMIT, emissiveColor: Color.white);
 
-        AkSoundEngine.PostEvent("turn_to_gold", base.gameObject);
+        base.gameObject.Play("turn_to_gold");
     }
 
     private void Update()

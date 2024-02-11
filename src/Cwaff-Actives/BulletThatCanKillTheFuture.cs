@@ -199,7 +199,7 @@ public class BulletThatCanKillTheFuture : PlayerItem
                 if (!m_isPlayingChargeAudio)
                 {
                     m_isPlayingChargeAudio = true;
-                    AkSoundEngine.PostEvent("Play_OBJ_pastkiller_charge_01", interactor.gameObject);
+                    interactor.gameObject.Play("Play_OBJ_pastkiller_charge_01");
                 }
                 shotTargetTime += BraveTime.DeltaTime;
             }
@@ -209,7 +209,7 @@ public class BulletThatCanKillTheFuture : PlayerItem
                 if (m_isPlayingChargeAudio)
                 {
                     m_isPlayingChargeAudio = false;
-                    AkSoundEngine.PostEvent("Stop_OBJ_pastkiller_charge_01", interactor.gameObject);
+                    interactor.gameObject.Play("Stop_OBJ_pastkiller_charge_01");
                 }
             }
             if ((currentInput.ActiveActions.UseItemAction.WasReleased || currentInput.ActiveActions.ShootAction.WasReleased)

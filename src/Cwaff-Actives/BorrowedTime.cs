@@ -88,7 +88,7 @@ public class BorrowedTime : PlayerItem
                 TargetActor.BecomeBlackPhantom();
             PhysicsEngine.Instance.RegisterOverlappingGhostCollisionExceptions(TargetActor.specRigidbody, null, false);
 
-            AkSoundEngine.PostEvent("Play_OBJ_chestwarp_use_01", gameObject);
+            gameObject.Play("Play_OBJ_chestwarp_use_01");
             SpawnManager.SpawnVFX(tpvfx, TargetActor.sprite.WorldCenter, Quaternion.identity, true);
             yield return new WaitForSeconds(0.05f);
         }
@@ -139,7 +139,7 @@ public class BorrowedTime : PlayerItem
         base.sprite.SetSprite(_FullId);
         VFXPool vfx = VFX.CreatePoolFromVFXGameObject((ItemHelper.Get(Items.MagicLamp) as Gun
             ).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
-        AkSoundEngine.PostEvent("borrowed_time_capture_sound", gameObject);
+        gameObject.Play("borrowed_time_capture_sound");
         foreach (AIActor otherEnemy in activeEnemies)
         {
             if (!otherEnemy.IsHostileAndNotABoss() || otherEnemy.IsBlackPhantom)

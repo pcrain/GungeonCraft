@@ -86,8 +86,7 @@ public class GasterBlaster : PlayerItem
             rotcomp.m_end_angle    = (180f + angle).Clamp180();
             rotcomp.m_rotate_time  = 0.5f;
             rotcomp.Setup();
-        AkSoundEngine.PostEvent("gaster_blaster_sound_effect_stop_all", blaster);
-        AkSoundEngine.PostEvent("gaster_blaster_sound_effect", blaster);
+        blaster.PlayUnique("gaster_blaster_sound_effect");
         yield return new WaitForSeconds(0.75f);
 
         BeamController beam = BeamAPI.FreeFireBeamFromAnywhere(

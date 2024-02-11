@@ -36,7 +36,7 @@ public class Taomislav : AdvancedGunBehavior
     public override void OnPostFired(PlayerController player, Gun gun)
     {
         base.OnPostFired(player, gun);
-        AkSoundEngine.PostEvent("tomislav_shoot", gun.gameObject);
+        gun.gameObject.Play("tomislav_shoot");
     }
 
     private void RecalculateGunStats()

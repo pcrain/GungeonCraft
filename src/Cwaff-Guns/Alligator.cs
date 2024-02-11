@@ -301,8 +301,7 @@ public class AlligatorCableHandler : MonoBehaviour
             if (percentDone > 1f)
             {
                 this._enemy.healthHaver.ApplyDamage(1f, Vector2.zero, Alligator.ItemName, CoreDamageTypes.Electric, DamageCategory.Normal);
-                AkSoundEngine.PostEvent("electrocution_sound_stop_all", base.gameObject);
-                AkSoundEngine.PostEvent("electrocution_sound", base.gameObject);
+                base.gameObject.PlayUnique("electrocution_sound");
                 UnityEngine.Object.Destroy(_extantSparks[i]);
                 this._extantSparks.RemoveAt(i);
                 this._extantSpawnTimes.RemoveAt(i);

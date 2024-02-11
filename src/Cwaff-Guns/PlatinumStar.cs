@@ -33,7 +33,7 @@ public class PlatinumStar : AdvancedGunBehavior
     public override void OnPostFired(PlayerController player, Gun gun)
     {
         base.OnPostFired(player, gun);
-        AkSoundEngine.PostEvent("tomislav_shoot", gun.gameObject);
+        gun.gameObject.Play("tomislav_shoot");
         // Material m = this.gun.gameObject.GetOrAddShader(Shader.Find("Brave/ItemSpecific/LootGlintAdditivePass"));
         // m.SetColor("_OverrideColor", Color.yellow);
         // m.SetFloat("_Period", 1.0f);
@@ -98,7 +98,7 @@ public class PlatinumProjectile : MonoBehaviour
         this._projectile.baseData.damage = 0f;
 
         this._projectile.OnHitEnemy += (Projectile p, SpeculativeRigidbody enemy, bool _) => {
-            AkSoundEngine.PostEvent("soul_kaliber_impact", p.gameObject);
+            p.gameObject.Play("soul_kaliber_impact");
             OraOra oraora = enemy.aiActor.gameObject.GetOrAddComponent<OraOra>();
                 oraora.BankDamage(this._bankedDamage, this._angle);
         };
@@ -222,20 +222,18 @@ public class OraOra : MonoBehaviour
                     {
                         proj.baseData.force = numBursts * _BURST_SIZE;
                         proj.OnDestruction += (Projectile p) => {
-                            AkSoundEngine.PostEvent("ora_final_hit_sound", p.gameObject);
+                            p.gameObject.Play("ora_final_hit_sound");
                         };
                     }
                     else
                     {
                         proj.OnDestruction += (Projectile p) => {
-                            AkSoundEngine.PostEvent("ora_hit_sound_stop_all", p.gameObject);
-                            AkSoundEngine.PostEvent("ora_hit_sound", p.gameObject);
+                            p.gameObject.PlayUnique("ora_hit_sound");
                         };
                     }
                     proj.SendInDirection(angleVec, false);
                     proj.UpdateSpeed();
-                    AkSoundEngine.PostEvent("ora_fist_fire_stop_all", proj.gameObject);
-                    AkSoundEngine.PostEvent("ora_fist_fire", proj.gameObject);
+                    proj.gameObject.PlayUnique("ora_fist_fire");
 
                 if (spec && !spec.ImmuneToStun)
                     spec.UpdateStun(1f);

@@ -243,7 +243,7 @@ public class KalibersJustice : PlayerItem
             SpawnManager.SpawnVFX(vfx, where + angle.ToVector(1.5f), Quaternion.identity);
         }
 
-        AkSoundEngine.PostEvent("Play_OBJ_dice_bless_01", user.gameObject);
+        user.gameObject.Play("Play_OBJ_dice_bless_01");
         Lazy.CustomNotification(
             "Kaliber's Justice",
             $"Offered {whatToOffer?.type ?? NeedType.Nothing}, Received {whatToReceive.type}",

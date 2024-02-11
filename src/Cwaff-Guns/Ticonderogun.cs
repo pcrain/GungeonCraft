@@ -102,7 +102,7 @@ public class Ticonderogun : AdvancedGunBehavior
 
     private void CheckIfEnemiesAreEncircled(Vector2 hullCenter)
     {
-        AkSoundEngine.PostEvent("pencil_circle_sound", base.gameObject);
+        base.gameObject.Play("pencil_circle_sound");
         if (!this._owner)
             return;
         List<AIActor> activeEnemies = this._owner.CurrentRoom?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
@@ -320,8 +320,7 @@ public class Ticonderogun : AdvancedGunBehavior
         if (_LastWriteSound + 0.1f < BraveTime.ScaledTimeSinceStartup)
         {
             _LastWriteSound = BraveTime.ScaledTimeSinceStartup;
-            AkSoundEngine.PostEvent("pencil_write_stop", base.gameObject);
-            AkSoundEngine.PostEvent("pencil_write", base.gameObject);
+            base.gameObject.PlayOnce("pencil_write");
         }
 
         // Add the point and register the last cursor position

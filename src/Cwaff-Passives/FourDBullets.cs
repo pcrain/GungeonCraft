@@ -101,7 +101,6 @@ public class PhaseThroughInnerWallsBehavior : MonoBehaviour
         tk2dBaseSprite sprite = this._projectile.sprite;
         sprite.usesOverrideMaterial = true;
         sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/HologramShader");
-        AkSoundEngine.PostEvent("phase_through_wall_sound_stop_all", base.gameObject);
-        AkSoundEngine.PostEvent("phase_through_wall_sound", base.gameObject);
+        base.gameObject.PlayUnique("phase_through_wall_sound");
     }
 }

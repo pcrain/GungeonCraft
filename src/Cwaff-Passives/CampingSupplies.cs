@@ -146,7 +146,7 @@ public class CampingSupplies : PassiveItem
             return; // don't toss cans too frequently
         this._lastCanToss = BraveTime.ScaledTimeSinceStartup;
 
-        AkSoundEngine.PostEvent("pop_soda_can_sound", this.Owner.gameObject);
+        this.Owner.gameObject.Play("pop_soda_can_sound");
         GameObject can        = SpawnManager.SpawnVFX(_SodaCanPrefabs.ChooseRandom(), this.Owner.sprite.WorldCenter, Quaternion.identity);
         Vector3 startingForce = Lazy.RandomVector(5f).ToVector3ZUp(UnityEngine.Random.Range(1f,3f));
         float startingHeight  = 1f;

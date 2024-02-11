@@ -63,7 +63,7 @@ public class Itemfinder : PlayerItem
         if (nearAnyTreasure && (BraveTime.ScaledTimeSinceStartup - _LastSoundPlayTime) > 1f)
         {
             base.sprite.SetSprite(_BlinkId);
-            AkSoundEngine.PostEvent("itemfinder_sound", user.gameObject);
+            user.gameObject.Play("itemfinder_sound");
             _LastSoundPlayTime = BraveTime.ScaledTimeSinceStartup;
         }
         if ((BraveTime.ScaledTimeSinceStartup - _LastSoundPlayTime) > 0.5f)
@@ -88,7 +88,7 @@ public class Itemfinder : PlayerItem
             return;
 
         LootEngine.SpawnItem(nearestTreasure.pickup.gameObject, nearestTreasure.location, Vector2.zero, 0f, true, true, false);
-        AkSoundEngine.PostEvent("itemfinder_get_item", user.gameObject);
+        user.gameObject.Play("itemfinder_get_item");
 
         _Treasure.Remove(nearestTreasure);
         UnityEngine.GameObject.Destroy(nearestTreasure.gameObject);

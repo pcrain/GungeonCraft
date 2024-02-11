@@ -195,7 +195,7 @@ public abstract class ChessPiece : MonoBehaviour
 
     public void StopMoving()
     {
-        AkSoundEngine.PostEvent("chess_move", this.gameObject);
+        this.gameObject.Play("chess_move");
         this._projectile.baseData.speed = 0.001f;
         this._projectile.UpdateSpeed();
     }

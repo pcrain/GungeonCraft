@@ -113,7 +113,7 @@ public class SeltzerProjectile : MonoBehaviour
 
         this._canProjectile.spriteAnimator.Stop(); // stop animating immediately after creation so we can stick with our initial sprite
 
-        AkSoundEngine.PostEvent("seltzer_shoot_sound_alt_2", base.gameObject);
+        base.gameObject.Play("seltzer_shoot_sound_alt_2");
     }
 
     private void OnRigidbodyCollision(CollisionData rigidbodyCollision)
@@ -128,7 +128,7 @@ public class SeltzerProjectile : MonoBehaviour
             return;
         }
 
-        AkSoundEngine.PostEvent("seltzer_pelter_collide_sound", base.gameObject);
+        base.gameObject.Play("seltzer_pelter_collide_sound");
         this._canProjectile.baseData.speed *= 0.5f;
         this._canProjectile.UpdateSpeed();
     }
@@ -143,8 +143,8 @@ public class SeltzerProjectile : MonoBehaviour
         this._canProjectile.OnDestruction += this.DestroyBeam;
         this._canProjectile.StartCoroutine(SpraySoda_CR(this, this._canProjectile));
 
-        AkSoundEngine.PostEvent("seltzer_shoot_sound", base.gameObject);
-        AkSoundEngine.PostEvent("seltzer_pelter_collide_sound", base.gameObject);
+        base.gameObject.Play("seltzer_shoot_sound");
+        base.gameObject.Play("seltzer_pelter_collide_sound");
     }
 
     private void CreateBeam()
@@ -167,7 +167,7 @@ public class SeltzerProjectile : MonoBehaviour
             this._canProjectile.baseData.speed *= 0.5f;
         this._beam?.CeaseAttack();
         this._beam = null;
-        AkSoundEngine.PostEvent("seltzer_pelter_collide_sound", base.gameObject);
+        base.gameObject.Play("seltzer_pelter_collide_sound");
     }
 
     private void UpdateRotationRate()
@@ -194,7 +194,7 @@ public class SeltzerProjectile : MonoBehaviour
         float curAngle = startAngle;
         seltzer.UpdateRotationRate();
 
-        AkSoundEngine.PostEvent("seltzer_spray_sound", p.gameObject);
+        p.gameObject.Play("seltzer_spray_sound");
         float lastSoundTime = BraveTime.ScaledTimeSinceStartup;
 
         #region The Ballistics
@@ -210,7 +210,7 @@ public class SeltzerProjectile : MonoBehaviour
                 if (lastSoundTime + _SOUND_RATE < BraveTime.ScaledTimeSinceStartup)
                 {
                     lastSoundTime = BraveTime.ScaledTimeSinceStartup;
-                    AkSoundEngine.PostEvent("seltzer_spray_sound", p.gameObject);
+                    p.gameObject.Play("seltzer_spray_sound");
                 }
 
                 Vector2 oldSpeed = p.LastVelocity;
@@ -242,7 +242,7 @@ public class SeltzerProjectile : MonoBehaviour
                 if (lastSoundTime + _SOUND_RATE < BraveTime.ScaledTimeSinceStartup)
                 {
                     lastSoundTime = BraveTime.ScaledTimeSinceStartup;
-                    AkSoundEngine.PostEvent("seltzer_spray_sound", p.gameObject);
+                    p.gameObject.Play("seltzer_spray_sound");
                 }
 
                 if (p.baseData.speed > 0.1f)

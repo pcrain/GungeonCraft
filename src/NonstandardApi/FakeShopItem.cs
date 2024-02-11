@@ -291,7 +291,7 @@ public class FakeShopItem : BraveBehaviour, IPlayerInteractable
     LootEngine.GivePrefabToPlayer(item.gameObject, purchaser);
 
     GameUIRoot.Instance.DeregisterDefaultLabel(base.transform);
-    AkSoundEngine.PostEvent("Play_OBJ_item_purchase_01", base.gameObject);
+    base.gameObject.Play("Play_OBJ_item_purchase_01");
 
     GameObject gameObject2 = (GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global VFX/VFX_Item_Spawn_Poof"));
     tk2dBaseSprite component2 = gameObject2.GetComponent<tk2dBaseSprite>();

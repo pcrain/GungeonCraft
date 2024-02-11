@@ -311,8 +311,8 @@ public class GungeonitePickaxe : PlayerItem
         // Pixelator.Instance.MarkOcclusionDirty();
         // Pixelator.Instance.ProcessOcclusionChange(r.Epicenter, 1f, r, false);
 
-        AkSoundEngine.PostEvent("Play_OBJ_rock_break_01", GameManager.Instance.gameObject);
-        AkSoundEngine.PostEvent("Play_OBJ_stone_crumble_01", GameManager.Instance.gameObject);
+        GameManager.Instance.gameObject.Play("Play_OBJ_rock_break_01");
+        GameManager.Instance.gameObject.Play("Play_OBJ_stone_crumble_01");
 
         DeadlyDeadlyGoopManager.ReinitializeData();
     }

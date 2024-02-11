@@ -218,7 +218,7 @@ public class Bombo : FancyNPC
                 this.transform.position.GetAbsoluteRoom().RegisterInteractable(item);
             item.purchasingScript = this.StrikeADealScript;
             item.Initialize(po);
-        AkSoundEngine.PostEvent("Play_ENM_spawn_appear_01", base.gameObject);
+        base.gameObject.Play("Play_ENM_spawn_appear_01");
 
         GameObject smoke = (GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global VFX/VFX_Item_Spawn_Poof"));
         tk2dBaseSprite smokesprite = smoke.GetComponent<tk2dBaseSprite>();
@@ -442,8 +442,8 @@ public class Bombo : FancyNPC
         {
             Vector2 ppos = p.sprite.WorldCenter + BraveMathCollege.DegreesToVector(i*UnityEngine.Random.Range(0f,360f),1.75f);
             v.SpawnAtPosition(ppos.ToVector3ZisY(-1f), 0, null, null, null, -0.05f);
-            // AkSoundEngine.PostEvent("Play_OBJ_crystal_shatter_01", base.gameObject);
-            AkSoundEngine.PostEvent("Play_ENM_cannonball_explode_01", p.gameObject);
+            // base.gameObject.Play("Play_OBJ_crystal_shatter_01");
+            p.gameObject.Play("Play_ENM_cannonball_explode_01");
 
             if (i % 3 == 0)
             {
@@ -456,7 +456,7 @@ public class Bombo : FancyNPC
         }
         Vector2 ppos2 = p.sprite.WorldCenter + new Vector2(0f,-0.05f);
         v2.SpawnAtPosition(ppos2.ToVector3ZisY(1f), 0, null, null, null, 5f);
-        AkSoundEngine.PostEvent("Play_OBJ_lightning_flash_01", base.gameObject);
+        base.gameObject.Play("Play_OBJ_lightning_flash_01");
         Pixelator.Instance.FadeToColor(0.5f, Color.white, false, 0f);
         yield return new WaitForSeconds(0.5f);
         Pixelator.Instance.FadeToColor(0.5f, Color.white, true, 0f);

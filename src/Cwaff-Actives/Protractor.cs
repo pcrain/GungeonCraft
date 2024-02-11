@@ -50,7 +50,7 @@ public class Protractor : PlayerItem
         this._lines.Add(line);
       }
       this._vertices.Add(ppos);
-      AkSoundEngine.PostEvent("chekhovs_gun_place_sound", this.LastOwner.gameObject);
+      this.LastOwner.gameObject.Play("chekhovs_gun_place_sound");
     }
 
     private float _nextCheck = 0.0f;
@@ -70,7 +70,7 @@ public class Protractor : PlayerItem
             proj.Owner = this.LastOwner;
             proj.collidesWithEnemies = true;
             proj.collidesWithPlayer = false;
-            AkSoundEngine.PostEvent("whip_crack_sound", this.LastOwner.gameObject);
+            this.LastOwner.gameObject.Play("whip_crack_sound");
         }
     }
 

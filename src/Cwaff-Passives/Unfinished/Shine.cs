@@ -56,7 +56,7 @@ public class Shine : PassiveItem
         specRigidbody.OnPreRigidbodyCollision = (SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate)Delegate.Combine(specRigidbody.OnPreRigidbodyCollision, new SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate(this.OnPreCollision));
         player.healthHaver.IsVulnerable = false;
         RecomputePlayerSpeed(player);
-        if (this) AkSoundEngine.PostEvent("reflector", base.gameObject);
+        base.gameObject.Play("reflector");
     }
 
 

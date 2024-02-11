@@ -339,8 +339,7 @@ public class UppskeruvelLostSoul : MonoBehaviour
                 uppies.AcquireSoul();
                 break;
             }
-            AkSoundEngine.PostEvent("pickup_poe_soul_sound_stop_all", base.gameObject);
-            AkSoundEngine.PostEvent("pickup_poe_soul_sound", base.gameObject);
+            base.gameObject.PlayUnique("pickup_poe_soul_sound");
             float rotOffset = 90f * UnityEngine.Random.value;
             for (int i = 0; i < 4; ++i)
                 FancyVFX.Spawn(Uppskeruvel._SoulCollectVFX, base.transform.position, Lazy.RandomEulerZ(),
@@ -428,7 +427,7 @@ public class UppskeruvelCombatSoul : MonoBehaviour
         this._jiggle  = UnityEngine.Random.Range(-30f,30f);
         this._sprite.SetAlphaImmediate(0.0f);
         this._trail = this._sprite.AddTrailToSpriteInstance(Uppskeruvel._SoulTrailPrefab);
-        AkSoundEngine.PostEvent("soul_spawn_sound", base.gameObject);
+        base.gameObject.Play("soul_spawn_sound");
         this._setup   = true;
     }
 
@@ -487,7 +486,7 @@ public class UppskeruvelCombatSoul : MonoBehaviour
         this._enemy = enemy;
         this._state = State.PRELAUNCH;
         this._timer = _LAUNCH_GAP * order;
-        AkSoundEngine.PostEvent("soul_launch_sound", base.gameObject);
+        base.gameObject.Play("soul_launch_sound");
     }
 
     private void Update()
@@ -541,8 +540,7 @@ public class UppskeruvelCombatSoul : MonoBehaviour
                     if (this._enemy?.healthHaver?.IsDead ?? false)
                         Uppskeruvel.DropLostSouls(this._enemy);
                     SpawnManager.SpawnVFX(Uppskeruvel._SoulExplodePrefab, this._targetPos.XY() + Lazy.RandomVector(0.4f), Quaternion.identity);
-                    AkSoundEngine.PostEvent("soul_impact_sound_stop_all", base.gameObject);
-                    AkSoundEngine.PostEvent("soul_impact_sound", base.gameObject);
+                    base.gameObject.PlayUnique("soul_impact_sound");
                     this._trail.Toggle(false);
                     this._timer = _VANISH_TIME;
                     this._state = State.VANISH;
@@ -565,7 +563,7 @@ public class UppskeruvelCombatSoul : MonoBehaviour
                     this._trail.Toggle(true);
                     this._timer     = _SPAWN_TIME;
                     this._state     = State.SPAWNING;
-                    AkSoundEngine.PostEvent("soul_spawn_sound", base.gameObject);
+                    base.gameObject.Play("soul_spawn_sound");
                     this._sprite.renderer.enabled = true;
                 }
                 else

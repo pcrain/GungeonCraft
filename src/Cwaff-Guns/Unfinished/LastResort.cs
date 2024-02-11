@@ -119,7 +119,7 @@ public class LastResort : AdvancedGunBehavior
         this.overrideNormalFireAudio = "Play_WPN_blasphemy_shot_01";
         if (ammoless > 0)
         {
-            AkSoundEngine.PostEvent("Play_OBJ_silenceblank_small_01", this.gameObject);
+            this.gameObject.Play("Play_OBJ_silenceblank_small_01");
             this.Player.ShowOverheadVFX(lastResortLevelSprites[ammoless-1], 1);
         }
         this.Player.ShowOverheadAnimatedVFX(_PumpChargeAnimationName, 2);

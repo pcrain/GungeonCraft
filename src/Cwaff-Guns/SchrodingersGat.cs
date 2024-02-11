@@ -30,7 +30,7 @@ public class SchrodingersGat : AdvancedGunBehavior
     public override void OnPostFired(PlayerController player, Gun gun)
     {
         base.OnPostFired(player, gun);
-        AkSoundEngine.PostEvent("schrodingers_gat_fire_sound", gun.gameObject);
+        gun.gameObject.Play("schrodingers_gat_fire_sound");
     }
 
     protected override void OnPickup(GameActor owner)
@@ -125,7 +125,7 @@ public class SchrodingersStat : MonoBehaviour
                 SchrodingersGat.CheckFromQuantumEnemyOwner(p);
         }
 
-        AkSoundEngine.PostEvent("schrodinger_bullet_hit", base.gameObject);
+        base.gameObject.Play("schrodinger_bullet_hit");
     }
 
     private void OnPreCollision(SpeculativeRigidbody me, PixelCollider myPixelCollider, SpeculativeRigidbody other, PixelCollider otherPixelCollider)
@@ -204,7 +204,7 @@ public class SchrodingersStat : MonoBehaviour
             fe.Setup(Vector2.zero, 1.0f, 1.0f);
             fe.StartCoroutine(PhaseOut(fe, Vector2.right, 25f, 90f));
 
-        AkSoundEngine.PostEvent("schrodinger_dead_sound", base.gameObject);
+        base.gameObject.Play("schrodinger_dead_sound");
         this._enemy.EraseFromExistenceWithRewards(false);
     }
 

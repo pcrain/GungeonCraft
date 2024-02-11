@@ -357,13 +357,13 @@ public static class Lazy
     private static IEnumerator PlaySoundUntilDeathOrTimeout_CR(string soundName, GameObject source, float timer)
     {
         _SoundTimers[soundName] = timer;
-        AkSoundEngine.PostEvent(soundName, source);
+        source.Play(soundName);
         while (source != null && _SoundTimers[soundName] > 0)
         {
             _SoundTimers[soundName] -= BraveTime.DeltaTime;
             yield return null;
         }
-        AkSoundEngine.PostEvent($"{soundName}_stop_all", source);
+        source.Play($"{soundName}_stop_all");
         _SoundTimers.Remove(soundName);
     }
 
@@ -384,7 +384,7 @@ public static class Lazy
                 sprite.PlaceAtPositionByAnchor(pos, Anchor.MiddleCenter);
                 sprite.HeightOffGround = 6f;
                 sprite.UpdateZDepth();
-        AkSoundEngine.PostEvent("Play_OBJ_item_pickup_01", gameObject);
+        gameObject.Play("Play_OBJ_item_pickup_01");
     }
 
     /// <summary>Create some debris from the current frame of the given sprite</summary>

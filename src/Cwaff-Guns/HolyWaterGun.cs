@@ -153,7 +153,7 @@ public class GhostlyDeath : MonoBehaviour
 
     private void Start()
     {
-        AkSoundEngine.PostEvent("ghost_soul_sound", base.gameObject);
+        base.gameObject.Play("ghost_soul_sound");
     }
 
     private void Update()

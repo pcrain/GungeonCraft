@@ -61,6 +61,6 @@ public class StopSign : PlayerItem
         }
         if (!didAnything)
             return;
-        AkSoundEngine.PostEvent("stop_sign_sound", base.gameObject);
+        base.gameObject.Play("stop_sign_sound");
     }
 }

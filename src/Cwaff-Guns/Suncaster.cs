@@ -100,9 +100,8 @@ public class Suncaster : AdvancedGunBehavior
     {
         base.PostProcessProjectile(projectile);
         projectile.GetComponent<SuncasterProjectile>().FiredFromGun(this);
-        // AkSoundEngine.PostEvent("prism_refract_sound", projectile.gameObject);
-        AkSoundEngine.PostEvent("suncaster_fire_sound_stop", base.gameObject);
-        AkSoundEngine.PostEvent("suncaster_fire_sound", base.gameObject);
+        // projectile.gameObject.Play("prism_refract_sound");
+        base.gameObject.PlayOnce("suncaster_fire_sound");
     }
 
     protected override void OnPostDroppedByPlayer(PlayerController player)
@@ -297,13 +296,12 @@ public class SuncasterProjectile : MonoBehaviour
       this._proj.specRigidbody.UpdateColliderPositions();
 
       // stop audio events locally only on the prism object
-      // AkSoundEngine.PostEvent("prism_refract_sound_stop", prism.gameObject);
+      // prism.gameObject.Play("prism_refract_sound_stop");
       // ...on second thought it's noisy, so stop them everywhere
       if ((_LastRefractSound + _REFRACT_SOUND_RATE) < BraveTime.ScaledTimeSinceStartup)
       {
         _LastRefractSound = BraveTime.ScaledTimeSinceStartup;
-        AkSoundEngine.PostEvent("suncaster_fire_sound_high_stop_all", prism.gameObject);
-        AkSoundEngine.PostEvent("suncaster_fire_sound_high", prism.gameObject);
+        prism.gameObject.PlayUnique("suncaster_fire_sound_high");
       }
     }
 
@@ -336,7 +334,7 @@ public class SuncasterPrism : MonoBehaviour, IPlayerInteractable
 
     public void Setup(PlayerController owner, Suncaster gun, RoomHandler room, Vector2 velocity)
     {
-      AkSoundEngine.PostEvent("fire_coin_sound", base.gameObject);
+      base.gameObject.Play("fire_coin_sound");
       this._owner    = owner;
       this._velocity = velocity;
       this._angle    = velocity.normalized;
@@ -443,8 +441,7 @@ public class SuncasterPrism : MonoBehaviour, IPlayerInteractable
     public void Selfdestruct()
     {
       Lazy.DoSmokeAt(base.transform.position);
-      AkSoundEngine.PostEvent("prism_destroy_sound_stop_all", GameManager.Instance.gameObject);
-      AkSoundEngine.PostEvent("prism_destroy_sound", GameManager.Instance.gameObject);
+      GameManager.Instance.gameObject.PlayUnique("prism_destroy_sound");
       UnityEngine.Object.Destroy(base.gameObject);
     }
 
@@ -456,7 +453,7 @@ public class SuncasterPrism : MonoBehaviour, IPlayerInteractable
       // this._target = null; // disable auto-targeting
       // this._autotarget = false;
       // this._angle = this._newAngle;
-      // AkSoundEngine.PostEvent("prism_interact_sound", base.gameObject);
+      // base.gameObject.Play("prism_interact_sound");
     }
 
     public void OnEnteredRange(PlayerController interactor)

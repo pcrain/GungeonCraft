@@ -42,8 +42,7 @@ public class SubtractorBeam : AdvancedGunBehavior
     public override void PostProcessProjectile(Projectile projectile)
     {
         base.PostProcessProjectile(projectile);
-        AkSoundEngine.PostEvent("subtractor_beam_fire_sound_stop_all", this.Owner.gameObject);
-        AkSoundEngine.PostEvent("subtractor_beam_fire_sound", this.Owner.gameObject);
+        this.Owner.gameObject.PlayUnique("subtractor_beam_fire_sound");
     }
 
     protected override void OnPostDroppedByPlayer(PlayerController player)
@@ -167,8 +166,7 @@ public class SubtractorProjectile : MonoBehaviour
             positionVariance: 1f, baseVelocity: Vector2.zero, velocityVariance: 1f, velType: FancyVFX.Vel.Radial,
             lifetime: 0.5f, fadeOutTime: 0.5f);
 
-        AkSoundEngine.PostEvent("subtractor_beam_impact_sound_stop_all", enemy.gameObject);
-        AkSoundEngine.PostEvent("subtractor_beam_impact_sound", enemy.gameObject);
+        enemy.gameObject.PlayUnique("subtractor_beam_impact_sound");
 
         this._damage                     = this._postHitDamage;
         this._projectile.baseData.damage = this._damage;

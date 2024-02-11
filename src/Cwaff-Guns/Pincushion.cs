@@ -65,7 +65,7 @@ public class Pincushion : AdvancedGunBehavior
     public override void OnPostFired(PlayerController player, Gun gun)
     {
         base.OnPostFired(player, gun);
-        AkSoundEngine.PostEvent("soul_kaliber_fire", gun.gameObject);
+        gun.gameObject.Play("soul_kaliber_fire");
     }
 
     private static void VeryFragileIL(ILContext il)

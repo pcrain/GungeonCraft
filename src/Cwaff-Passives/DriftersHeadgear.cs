@@ -110,7 +110,7 @@ public class HLDRoll : CustomDodgeRoll
 
         Vector2 vel = dashspeed * this.owner.m_lastNonzeroCommandedDirection.normalized;
 
-        AkSoundEngine.PostEvent("teledasher", this.owner.gameObject);
+        this.owner.gameObject.Play("teledasher");
         this.owner.SetInputOverride("hld");
         this.owner.SetIsFlying(true, "hld");
 

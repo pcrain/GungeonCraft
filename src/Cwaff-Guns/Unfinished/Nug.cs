@@ -80,7 +80,7 @@ public class Nug : AdvancedGunBehavior
             return;
         gun.ClipShotsRemaining = 1;
         gun.CurrentAmmo = 1;
-        AkSoundEngine.PostEvent("Play_WPN_crossbow_reload_01", gameObject);
+        gameObject.Play("Play_WPN_crossbow_reload_01");
         base.OnReloadPressed(player, gun, manualReload);
     }
 }
@@ -93,7 +93,7 @@ public class NugRedBehavior : MonoBehaviour
     {
         this.m_projectile = base.GetComponent<Projectile>();
         this.m_projectile.AdjustPlayerProjectileTint(Color.red, 2);
-        AkSoundEngine.PostEvent("Play_WPN_smileyrevolver_shot_01", this.m_projectile.gameObject);
+        this.m_projectile.gameObject.Play("Play_WPN_smileyrevolver_shot_01");
     }
 }
 

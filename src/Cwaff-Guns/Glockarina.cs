@@ -96,7 +96,7 @@ public class Glockarina : AdvancedGunBehavior
     private static void OnChestOpen()
     {
         if (GameManager.Instance.AnyPlayerHasPickupID(_GlockarinaPickupID))
-            AkSoundEngine.PostEvent("zelda_chest_sound", GameManager.Instance.gameObject);
+            GameManager.Instance.gameObject.Play("zelda_chest_sound");
     }
 
     private void UpdateMode()
@@ -202,18 +202,18 @@ public class Glockarina : AdvancedGunBehavior
         }
 
         // Stop all note sounds and play the correct sound pertaining to the note
-        AkSoundEngine.PostEvent("ocarina_note_up_stop_all",      base.gameObject);
-        AkSoundEngine.PostEvent("ocarina_note_left_stop_all",    base.gameObject);
-        AkSoundEngine.PostEvent("ocarina_note_right_stop_all",   base.gameObject);
-        AkSoundEngine.PostEvent("ocarina_note_down_stop_all",    base.gameObject);
-        AkSoundEngine.PostEvent("ocarina_note_neutral_stop_all", base.gameObject);
+        base.gameObject.Play("ocarina_note_up_stop_all");
+        base.gameObject.Play("ocarina_note_left_stop_all");
+        base.gameObject.Play("ocarina_note_right_stop_all");
+        base.gameObject.Play("ocarina_note_down_stop_all");
+        base.gameObject.Play("ocarina_note_neutral_stop_all");
         switch(note)
         {
-            case Note.UP:    AkSoundEngine.PostEvent("ocarina_note_up",      base.gameObject); break;
-            case Note.LEFT:  AkSoundEngine.PostEvent("ocarina_note_left",    base.gameObject); break;
-            case Note.RIGHT: AkSoundEngine.PostEvent("ocarina_note_right",   base.gameObject); break;
-            case Note.DOWN:  AkSoundEngine.PostEvent("ocarina_note_down",    base.gameObject); break;
-            case Note.A:     AkSoundEngine.PostEvent("ocarina_note_neutral", base.gameObject); break;
+            case Note.UP:    base.gameObject.Play("ocarina_note_up");      break;
+            case Note.LEFT:  base.gameObject.Play("ocarina_note_left");    break;
+            case Note.RIGHT: base.gameObject.Play("ocarina_note_right");   break;
+            case Note.DOWN:  base.gameObject.Play("ocarina_note_down");    break;
+            case Note.A:     base.gameObject.Play("ocarina_note_neutral"); break;
         }
 
         FancyVFX fv = FancyVFX.Spawn(_NoteVFXPrefab, position: player.sprite.WorldTopCenter,
@@ -253,7 +253,7 @@ public class Glockarina : AdvancedGunBehavior
         {
             if (HandleSpecialSong(finishedSong.Value))
             {
-                AkSoundEngine.PostEvent("ocarina_song_success", base.gameObject);
+                base.gameObject.Play("ocarina_song_success");
                 this._lastNotes.Clear();
             }
             return;
@@ -268,7 +268,7 @@ public class Glockarina : AdvancedGunBehavior
                 velocity: UnityEngine.Random.Range(45f + 15f * i, 45f + 15f * (i + 1)).ToVector(4f), lifetime: 0.65f, fadeOutTime: 0.4f);
             fv2.sprite.SetSprite(fv2.GetComponent<tk2dSpriteAnimator>().currentClip.frames[UnityEngine.Random.Range(0,5)].spriteId);
         }
-        AkSoundEngine.PostEvent("ocarina_song_success", base.gameObject);
+        base.gameObject.Play("ocarina_song_success");
         this._lastNotes.Clear();
     }
 

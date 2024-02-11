@@ -310,7 +310,7 @@ public class Deadline : AdvancedGunBehavior
             newest.UpdateEndPoint(closestPosition);
             newest.InitiateDeathSequenceAt(Vector2.zero,false);
             _myLasers[closestIndex].InitiateDeathSequenceAt(closestPosition.ToVector3ZisY(-1f),true);
-            AkSoundEngine.PostEvent("gaster_blaster_sound_effect", ETGModMainBehaviour.Instance.gameObject);
+            ETGModMainBehaviour.Instance.gameObject.Play("gaster_blaster_sound_effect");
 
             new FakeExplosion(Instantiate<GameObject>(_SplodeVFX, closestPosition, Quaternion.identity));
         }

@@ -87,7 +87,7 @@ public class HeadCannonBullets : MonoBehaviour
         player.sprite.renderer.enabled = false;
         player.specRigidbody.enabled = false;
 
-        AkSoundEngine.PostEvent("Play_OBJ_chestwarp_use_01", player.gameObject);
+        player.gameObject.Play("Play_OBJ_chestwarp_use_01");
         vfx.SpawnAtPosition(start.ToVector3ZisY(-1f), 0, null, null, null, -0.05f);
 
         while (timer < duration)
@@ -98,7 +98,7 @@ public class HeadCannonBullets : MonoBehaviour
             yield return null;
         }
 
-        AkSoundEngine.PostEvent("Play_OBJ_chestwarp_use_01", player.gameObject);
+        player.gameObject.Play("Play_OBJ_chestwarp_use_01");
         vfx.SpawnAtPosition(end.ToVector3ZisY(-1f), 0, null, null, null, -0.05f);
         this.m_owner.DoEasyBlank(end, EasyBlankType.MINI);
 

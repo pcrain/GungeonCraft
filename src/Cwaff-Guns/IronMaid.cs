@@ -118,7 +118,7 @@ public class RainCheckBullets : MonoBehaviour
         this._index                 = this._raincheck.GetNextIndex();
 
         this._projectile.specRigidbody.OnCollision += (_) => {
-            AkSoundEngine.PostEvent("knife_gun_hit", this._projectile.gameObject);
+            this._projectile.gameObject.Play("knife_gun_hit");
         };
 
         StartCoroutine(TakeARainCheck());
@@ -155,8 +155,7 @@ public class RainCheckBullets : MonoBehaviour
 
         // Phase 3 / 5 -- the glow
         Material m = this._projectile.sprite.renderer.material;
-        AkSoundEngine.PostEvent("knife_gun_glow_stop_all", this._projectile.gameObject);
-        AkSoundEngine.PostEvent("knife_gun_glow", this._projectile.gameObject);
+        this._projectile.gameObject.PlayUnique("knife_gun_glow");
         this._moveTimer = _GLOW_TIME;
         while (this._moveTimer > 0)
         {
@@ -178,7 +177,7 @@ public class RainCheckBullets : MonoBehaviour
         this._projectile.baseData.speed = _LAUNCH_SPEED;
         _projectile.SendInDirection(targetDir, true);
         _projectile.UpdateSpeed();
-        AkSoundEngine.PostEvent("knife_gun_launch", this._projectile.gameObject);
+        this._projectile.gameObject.Play("knife_gun_launch");
 
         yield break;
     }

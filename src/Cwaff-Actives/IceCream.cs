@@ -145,7 +145,7 @@ public class HappyIceCreamHaver : MonoBehaviour
         if (this._enemy.EnemyGuid == Enemies.BulletKin)
             this._enemy.aiAnimator.OverrideIdleAnimation = "smile";
 
-        AkSoundEngine.PostEvent("ice_cream_shared", base.gameObject);
+        base.gameObject.Play("ice_cream_shared");
     }
 
     private void AdjustBehaviors()

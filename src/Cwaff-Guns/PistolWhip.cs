@@ -123,7 +123,7 @@ public class WhipChainStart : MonoBehaviour
         Quaternion baseEuler = this._angle.EulerZ();
 
         this._owner.CurrentGun.ToggleRenderers(false);
-        AkSoundEngine.PostEvent("whip_sound", base.gameObject);
+        base.gameObject.Play("whip_sound");
 
         GameObject pistol = new();
         tk2dSprite pistolSprite = pistol.AddComponent<tk2dSprite>();
@@ -194,7 +194,7 @@ public class WhipChainStart : MonoBehaviour
                     proj2.collidesWithEnemies = true;
                     proj2.collidesWithPlayer = false;
 
-                AkSoundEngine.PostEvent("whip_crack_sound", this._owner.gameObject);
+                this._owner.gameObject.Play("whip_crack_sound");
                 spawnProjectile = false;
             }
 

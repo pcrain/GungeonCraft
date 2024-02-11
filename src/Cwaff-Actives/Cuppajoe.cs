@@ -278,7 +278,7 @@ internal class Caffeination : MonoBehaviour
 
     private IEnumerator AnotherCup_CR()
     {
-        AkSoundEngine.PostEvent("coffee_drink_sound", this._owner.gameObject);
+        this._owner.gameObject.Play("coffee_drink_sound");
         this._state = State.CAFFEINATED;
         foreach (StatModifier stat in this._caffeineBuffs)
             this._owner.ownerlessStatModifiers.Add(stat);

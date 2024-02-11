@@ -38,7 +38,7 @@ public class Alyx : AdvancedGunBehavior
     public override void OnPostFired(PlayerController player, Gun gun)
     {
         base.OnPostFired(player, gun);
-        AkSoundEngine.PostEvent("alyx_shoot_sound", gun.gameObject);
+        gun.gameObject.Play("alyx_shoot_sound");
     }
 
     public override void Start()

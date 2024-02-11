@@ -76,12 +76,12 @@ public class StackOfTorches : PlayerItem
         if (placeOnFloor)
         {
             _Torches.ChooseRandom().Instantiate(position: user.sprite.WorldCenter + _MAX_WALL_DIST * delta.normalized, anchor: Anchor.MiddleCenter);
-            AkSoundEngine.PostEvent("mc_torch_place", base.gameObject);
+            base.gameObject.Play("mc_torch_place");
         }
         else
         {
             _SconcePrefab.Instantiate(position: target, anchor: Anchor.LowerCenter);
-            AkSoundEngine.PostEvent("mc_lantern_place", base.gameObject);
+            base.gameObject.Play("mc_lantern_place");
         }
 
         // Nothing else to do if current room is invalid

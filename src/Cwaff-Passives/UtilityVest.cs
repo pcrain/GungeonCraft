@@ -58,7 +58,7 @@ public class UtilityVest : PassiveItem
 
     private void UsedItemAsArmor(PickupObject item)
     {
-        AkSoundEngine.PostEvent("sentry_shoot", this.Owner.gameObject);
+        this.Owner.gameObject.Play("sentry_shoot");
         this.Owner.ForceBlank();
         this.Owner.healthHaver.TriggerInvulnerabilityPeriod();
 

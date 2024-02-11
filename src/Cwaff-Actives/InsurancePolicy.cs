@@ -180,7 +180,7 @@ public class InsurancePolicy : PlayerItem
 
         // Lazy.CustomNotification(nearestPickup.DisplayName,"Item Insured", nearestPickup.sprite,
         //     color: UINotificationController.NotificationColor.PURPLE);
-        AkSoundEngine.PostEvent("the_sound_of_buying_insurance", base.gameObject);
+        base.gameObject.Play("the_sound_of_buying_insurance");
     }
 
     internal static void SaveInsuredItems()

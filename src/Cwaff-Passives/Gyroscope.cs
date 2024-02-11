@@ -97,7 +97,7 @@ public class GyroscopeRoll : CustomDodgeRoll
         this.forcedDirection = newDirection;
         if (this.forcedDirection > 180)
         {
-            AkSoundEngine.PostEvent("undertale_arrow", this.owner.gameObject);
+            this.owner.gameObject.Play("undertale_arrow");
             this.forcedDirection -= 360;
         }
 
@@ -158,8 +158,7 @@ public class GyroscopeRoll : CustomDodgeRoll
         this.rollDamageModifier.amount = Mathf.Sqrt(this.targetVelocity.magnitude);
         this.owner.stats.RecalculateStats(this.owner,true);
         this.owner.ApplyRollDamage(aIActor);
-        AkSoundEngine.PostEvent("undertale_damage_stop", this.owner.gameObject);
-        AkSoundEngine.PostEvent("undertale_damage", this.owner.gameObject);
+        this.owner.gameObject.PlayOnce("undertale_damage");
     }
 
     private void ExtinguishFire()
@@ -328,7 +327,7 @@ public class GyroscopeRoll : CustomDodgeRoll
                 this.owner.spriteAnimator.Stop();
                 this.owner.QueueSpecificAnimation(this.owner.spriteAnimator.GetClipByName("spinfall"/*"timefall"*/).name);
                 this.owner.spriteAnimator.SetFrame(0, false);
-                AkSoundEngine.PostEvent("Play_Fall", this.owner.gameObject);
+                this.owner.gameObject.Play("Play_Fall");
                 float spinTimer = 0.65f;
                 for (float timer = spinTimer; timer > 0; timer -= BraveTime.DeltaTime)
                 {

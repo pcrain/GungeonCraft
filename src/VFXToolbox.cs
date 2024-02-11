@@ -454,7 +454,7 @@ public static class VFX
         const float SPIN_RATE  = 1.5f * 2f * Mathf.PI;
 
         if (playSound)
-            AkSoundEngine.PostEvent("minecraft_totem_pop_sound", player.gameObject);
+            player.gameObject.Play("minecraft_totem_pop_sound");
 
         GameObject g = UnityEngine.Object.Instantiate(new GameObject(), player.sprite.WorldCenter, Quaternion.identity);
         tk2dSprite sprite = g.AddComponent<tk2dSprite>();

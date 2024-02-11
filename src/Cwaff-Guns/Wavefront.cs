@@ -65,7 +65,7 @@ public class TeslaProjectileBehavior : MonoBehaviour
         if (!otherRigidbody.GetComponent<AIActor>())
             PhysicsEngine.SkipCollision = true;
         else
-            AkSoundEngine.PostEvent("wavefront_projectile_impact_sound", base.gameObject);
+            base.gameObject.Play("wavefront_projectile_impact_sound");
     }
 
     private void Update()

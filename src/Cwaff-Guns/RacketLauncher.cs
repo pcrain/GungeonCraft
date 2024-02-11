@@ -161,7 +161,7 @@ public class TennisBall : MonoBehaviour
                 if (p.GetComponent<TennisBall>() is TennisBall tc)
                     this._parentGun.RemoveExtantTennisBall(tc);
             };
-            AkSoundEngine.PostEvent("monkey_tennis_hit_serve", this._projectile.gameObject);
+            this._projectile.gameObject.Play("monkey_tennis_hit_serve");
         }
 
         this._bounce = this._projectile.gameObject.GetOrAddComponent<BounceProjModifier>();
@@ -183,7 +183,7 @@ public class TennisBall : MonoBehaviour
         this._baseDamage = this._projectile.baseData.damage;
         this._baseForce  = this._projectile.baseData.force;
 
-        // AkSoundEngine.PostEvent("racket_hit", this._projectile.gameObject);
+        // this._projectile.gameObject.Play("racket_hit");
     }
 
     private void ReflectProjectiles(SpeculativeRigidbody myRigidbody, PixelCollider myCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherCollider)
@@ -232,7 +232,7 @@ public class TennisBall : MonoBehaviour
         UnityEngine.GameObject.Destroy(debris.GetComponent<TennisBall>()); // destroy the TennisBall component
 
         this._dead = true;
-        AkSoundEngine.PostEvent("monkey_tennis_bounce_second", this._projectile.gameObject);
+        this._projectile.gameObject.Play("monkey_tennis_bounce_second");
         this._projectile.DieInAir(suppressInAirEffects: true);
     }
 
@@ -262,12 +262,12 @@ public class TennisBall : MonoBehaviour
         this._projectile.Speed = this._projectile.baseData.speed;
         this._projectile.SendInDirection(direction, true);
         this._projectile.UpdateSpeed();
-        // AkSoundEngine.PostEvent("racket_hit", this._projectile.gameObject);
-        AkSoundEngine.PostEvent("monkey_tennis_hit_return_mid", this._projectile.gameObject);
+        // this._projectile.gameObject.Play("racket_hit");
+        this._projectile.gameObject.Play("monkey_tennis_hit_return_mid");
         if (this._volleys > 6)
-            AkSoundEngine.PostEvent("sonic_olympic_smash", this._projectile.gameObject);
+            this._projectile.gameObject.Play("sonic_olympic_smash");
         else if (this._volleys > 3)
-            AkSoundEngine.PostEvent("sonic_olympic_sidespin"/*"monkey_tennis_hit_return_mid"*/, this._projectile.gameObject);
+            this._projectile.gameObject.Play("sonic_olympic_sidespin"/*"monkey_tennis_hit_return_mid"*/);
     }
 
     private IEnumerator DieNextFrame()
@@ -290,7 +290,7 @@ public class TennisBall : MonoBehaviour
         float dirToOwner = (this._owner.sprite.WorldCenter - this._projectile.sprite.WorldCenter).ToAngle();
         float acc = this._owner.AccuracyMult();
         this._projectile.SendInDirection(dirToOwner.AddRandomSpread(_SPREAD * Mathf.Sqrt(acc)).ToVector(), true);
-        AkSoundEngine.PostEvent("racket_hit", this._projectile.gameObject);
+        this._projectile.gameObject.Play("racket_hit");
     }
 
     private void HomeTowardsTarget(Vector2 targetPos, Vector2 curVelocity)

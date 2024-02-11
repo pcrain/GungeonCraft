@@ -106,8 +106,7 @@ public class StuntHelmet : PassiveItem
 
     private static IEnumerator HandleDamageBoost(PlayerController target, StuntHelmet helmet)
     {
-        AkSoundEngine.PostEvent("stunt_time_stop_all", target.gameObject);
-        AkSoundEngine.PostEvent("stunt_time", target.gameObject);
+        target.gameObject.PlayUnique("stunt_time");
         SpriteOutlineManager.GetOutlineMaterial(target.sprite)?.SetColor("_OverrideColor", new Color(128f, 0f, 16f));
         target.ownerlessStatModifiers.Add(_StuntStats);
         target.stats.RecalculateStats(target);

@@ -195,11 +195,11 @@ public class KingsLawBullets : MonoBehaviour
         this._offsetRing   = baseOffset.z;
 
         this._projectile.specRigidbody.OnCollision += (_) => {
-            AkSoundEngine.PostEvent("knife_gun_hit", this._projectile.gameObject);
+            this._projectile.gameObject.Play("knife_gun_hit");
         };
         this._projectile.specRigidbody.OnPreRigidbodyCollision += SkipCorpseCollisions;
 
-        AkSoundEngine.PostEvent("snd_undynedis", base.gameObject);
+        base.gameObject.Play("snd_undynedis");
         StartCoroutine(TheLaw());
     }
 
@@ -270,8 +270,7 @@ public class KingsLawBullets : MonoBehaviour
         this._runeSmall.transform.parent = null;
         this._projectile.sprite.SetGlowiness(glowAmount: 0f, glowColor: Color.cyan);
         Material m = this._projectile.sprite.renderer.material;
-        AkSoundEngine.PostEvent("knife_gun_glow_stop_all", this._projectile.gameObject);
-        AkSoundEngine.PostEvent("knife_gun_glow", this._projectile.gameObject);
+        this._projectile.gameObject.PlayUnique("knife_gun_glow");
         float moveTimer = _GLOW_TIME;
         while (moveTimer > 0)
         {
@@ -300,7 +299,7 @@ public class KingsLawBullets : MonoBehaviour
         this._projectile.specRigidbody.Reinitialize();
         _projectile.SendInDirection(targetDir, true);
         _projectile.UpdateSpeed();
-        AkSoundEngine.PostEvent("knife_gun_launch", this._projectile.gameObject);
+        this._projectile.gameObject.Play("knife_gun_launch");
 
         // Post-launch: wait for the projectiles to pass the player's original point at their launch, then re-enable tile collision
         while (this._owner && (this._projectile?.isActiveAndEnabled ?? false))
