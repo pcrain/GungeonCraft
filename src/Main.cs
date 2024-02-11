@@ -322,6 +322,7 @@ public class Initialisation : BaseUnityPlugin
                     ResMap.Get("barter_b_icon")[0]+".png",         Bart._BarterSpriteB,
                     ResMap.Get("barter_c_icon")[0]+".png",         Bart._BarterSpriteC,
                     ResMap.Get("soul_sprite_ui_icon")[0]+".png",   Uppskeruvel._SoulSpriteUI,
+                    ResMap.Get("prism_ui_icon")[0]+".png",         Suncaster._PrismUI,
                     ResMap.Get("glockarina_storm_ui_icon")[0]+".png", Glockarina._StormSpriteUI,
                     ResMap.Get("glockarina_time_ui_icon")[0]+".png",  Glockarina._TimeSpriteUI,
                     ResMap.Get("glockarina_saria_ui_icon")[0]+".png", Glockarina._SariaSpriteUI,

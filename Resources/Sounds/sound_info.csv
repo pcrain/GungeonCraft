@@ -132,3 +132,6 @@ blame_sound_3,-4.0,1,sound
 blame_sound_4,-4.0,1,sound
 blame_sound_5,-4.0,1,sound
 blamethrower_impact_sound,-4.0,1,sound
+prism_refract_sound,-3.5,1,sound
+suncaster_fire_sound,-4.0,1,sound
+suncaster_fire_sound_high,-4.0,1,sound

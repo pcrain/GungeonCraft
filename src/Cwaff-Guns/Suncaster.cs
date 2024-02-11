@@ -4,31 +4,41 @@ public class Suncaster : AdvancedGunBehavior
 {
     public static string ItemName         = "Suncaster";
     public static string ProjectileName   = "38_special";
-    public static string ShortDescription = "Kaleido-noscope";
-    public static string LongDescription  = "TBD";
+    public static string ShortDescription = "Reflaktive";
+    public static string LongDescription  = "Fires weak beams of sunlight. Reload to toss a refractive prism. Uncharged shots that hit a prism will refract sunlight to all other prisms. Charged shots continuously bounce between and refract off of all placed prisms for a short period. Prisms can be reclaimed by interacting with them or by entering a new room. Cannot gaim ammo normally, but passively restores ammo over time.";
     public static string Lore             = "TBD";
 
-    internal const int _PRISM_AMMO_COST                      = 5;
-    internal const float _PRISM_LAUNCH_SPEED                 = 20f;
+    internal const  string          _PrismUI                 = $"{C.MOD_PREFIX}:_PrismUI";  // need the string immediately for preloading in Main()
+    internal const  int             _BASE_MAX_PRISMS         = 6;
+    internal const  int             _PRISM_AMMO_COST         = 5;
+    internal const  float           _PRISM_LAUNCH_SPEED      = 20f;
+    internal const  float           _CHARGE_RATE             = 0.3f;
+    internal const  float           _CHARGE_TIME             = 0.65f;
+    internal const  int             _CHARGE_AMMO_COST        = 15;
 
-    internal static GameObject _PrismPrefab                  = null;
-    internal static GameObject _TraceVFX                     = null;
-    internal static GameObject _NewTraceVFX                  = null;
+    internal static GameObject      _PrismPrefab             = null;
+    internal static GameObject      _TraceVFX                = null;
+    internal static GameObject      _NewTraceVFX             = null;
     internal static TrailController _SunTrailPrefab          = null;
     internal static TrailController _SunTrailRefractedPrefab = null;
     internal static TrailController _SunTrailFinalPrefab     = null;
-    internal static Projectile _SuncasterProjectile          = null;
+    internal static Projectile      _SuncasterProjectile     = null;
 
-    internal List<SuncasterPrism> _extantPrisms = new();
+    [SerializeField] // make sure we keep this when the gun is dropped and picked back up
+    private float _lastChargeTime            = 0.0f;
+
+    public List<SuncasterPrism> extantPrisms = new();
+    public int maxPrisms                     = _BASE_MAX_PRISMS;
 
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Suncaster>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.FIRE, reloadTime: 0.0f, ammo: 10, canReloadNoMatterAmmo: true, infiniteAmmo: true, doesScreenShake: false);
+            gun.SetAttributes(quality: ItemQuality.S, gunClass: GunClass.FIRE, reloadTime: 0.0f, ammo: 30,
+              canReloadNoMatterAmmo: true, canGainAmmo: false, doesScreenShake: false);
             gun.SetAnimationFPS(gun.shootAnimation, 30);
             gun.SetAnimationFPS(gun.reloadAnimation, 40);
 
-        _SuncasterProjectile = gun.InitProjectile(new(clipSize: -1, cooldown: 0.22f, shootStyle: ShootStyle.Charged,
+        _SuncasterProjectile = gun.InitProjectile(new(clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.Charged,
           damage: 2f, speed: 100f, range: 999999f, fps: 12, anchor: Anchor.MiddleLeft)
         ).Attach<PierceProjModifier>(pierce => pierce.penetration = 999
         ).Attach<SuncasterProjectile>();
@@ -42,7 +52,9 @@ public class Suncaster : AdvancedGunBehavior
           },
           new ProjectileModule.ChargeProjectile {
             Projectile = _SuncasterProjectile.Clone().Attach<SuncasterProjectile>(s => s.charged = true),
-            ChargeTime = 0.5f,
+            ChargeTime = _CHARGE_TIME,
+            AmmoCost   = _CHARGE_AMMO_COST,
+            UsedProperties = ChargeProjectileProperties.ammo,
           },
         };
 
@@ -58,8 +70,8 @@ public class Suncaster : AdvancedGunBehavior
 
         _PrismPrefab = VFX.Create("prism_vfx", fps: 7, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 5f);
         SpeculativeRigidbody body = _PrismPrefab.GetOrAddComponent<SpeculativeRigidbody>();
-        body.CanBePushed = true;
-        body.PixelColliders = new List<PixelCollider>(){new(){
+        body.CanBePushed          = true;
+        body.PixelColliders       = new List<PixelCollider>(){new(){
           ColliderGenerationMode = PixelCollider.PixelColliderGeneration.Manual,
           ManualOffsetX          = -6,
           ManualOffsetY          = -18,
@@ -69,45 +81,138 @@ public class Suncaster : AdvancedGunBehavior
           Enabled                = true,
           IsTrigger              = false,
         }};
+
+        gun.gameObject.AddComponent<SuncasterAmmoDisplay>();
     }
 
     public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
     {
         base.OnReloadPressed(player, gun, manualReload);
-        if (player.IsDodgeRolling || !player.AcceptingNonMotionInput/* || (gun.ClipShotsRemaining < gun.ClipCapacity) || gun.CurrentAmmo <= _PRISM_AMMO_COST*/)
+        if (player.IsDodgeRolling || !player.AcceptingNonMotionInput || this.extantPrisms.Count >= this.maxPrisms)
+          return;
+        if (player.CurrentRoom is not RoomHandler room)
           return;
         GameObject prism = _PrismPrefab.Instantiate(position: gun.barrelOffset.position);
-        prism.AddComponent<SuncasterPrism>().Setup(player, this, gun.CurrentAngle.ToVector(_PRISM_LAUNCH_SPEED));
-        // gun.LoseAmmo(_PRISM_AMMO_COST);
+        prism.AddComponent<SuncasterPrism>().Setup(player, this, room, gun.CurrentAngle.ToVector(_PRISM_LAUNCH_SPEED));
     }
 
     public override void PostProcessProjectile(Projectile projectile)
     {
         base.PostProcessProjectile(projectile);
         projectile.GetComponent<SuncasterProjectile>().FiredFromGun(this);
-        // AkSoundEngine.PostEvent("subtractor_beam_fire_sound_stop_all", projectile.gameObject);
-        AkSoundEngine.PostEvent("snd_select", projectile.gameObject);
+        // AkSoundEngine.PostEvent("prism_refract_sound", projectile.gameObject);
+        AkSoundEngine.PostEvent("suncaster_fire_sound_stop", base.gameObject);
+        AkSoundEngine.PostEvent("suncaster_fire_sound", base.gameObject);
+    }
+
+    protected override void OnPostDroppedByPlayer(PlayerController player)
+    {
+        base.OnPostDroppedByPlayer(player);
+        foreach (SuncasterPrism prism in this.extantPrisms)
+          prism.Selfdestruct();
+        this.extantPrisms.Clear();
+    }
+
+    protected override void Update()
+    {
+        base.Update();
+        gun.sprite.gameObject.SetGlowiness(10f + 40f * Mathf.Abs(Mathf.Sin(10f * BraveTime.ScaledTimeSinceStartup)));
+        if (!this.Player)
+            return;
+
+        float now = BraveTime.ScaledTimeSinceStartup;
+        float elapsed = (now - this._lastChargeTime);
+        if (elapsed >= _CHARGE_RATE)
+        {
+          int ammoToRestore = Mathf.FloorToInt(elapsed / _CHARGE_RATE);  // account for ammo gained / lost while inactive
+          this._lastChargeTime += _CHARGE_RATE * ammoToRestore;
+          if (this.gun.CurrentAmmo < this.gun.AdjustedMaxAmmo)
+            this.gun.ammo = Math.Min(this.gun.ammo + ammoToRestore, this.gun.AdjustedMaxAmmo);
+        }
+        // if we have less than the ammo required to shoot a charge shot, make the charge time obscenely long
+        this.gun.DefaultModule.chargeProjectiles[1].ChargeTime = (this.gun.ammo >= _CHARGE_AMMO_COST) ? _CHARGE_TIME : 3600f;
+    }
+
+    public void AddPrism(SuncasterPrism prism)
+    {
+      this.extantPrisms.Add(prism);
+    }
+
+    public void RemovePrism(SuncasterPrism prism, bool adjustTargets = true)
+    {
+      this.extantPrisms.Remove(prism);
+      if (!adjustTargets)
+        return;
+
+      // adjust autotargets for all remaining prisms
+      foreach (SuncasterPrism p in this.extantPrisms)
+      {
+        if (p.target != prism)
+          continue;
+        p.target = prism.target;
+        if (p.target == p)
+          p.target = null;  // don't target ourselfs
+      }
+    }
+
+    public override void MidGameSerialize(List<object> data, int i)
+    {
+        base.MidGameSerialize(data, i);
+        data.Add(this.maxPrisms);
+    }
+
+    public override void MidGameDeserialize(List<object> data, ref int i)
+    {
+        base.MidGameDeserialize(data, ref i);
+        this.maxPrisms = (int)data[i++];
+    }
+}
+
+public class SuncasterAmmoDisplay : CustomAmmoDisplay
+{
+    private Gun              _gun       = null;
+    private Suncaster        _suncaster = null;
+    private PlayerController _owner     = null;
+
+    private void Start()
+    {
+        this._gun       = base.GetComponent<Gun>();
+        this._suncaster = this._gun.GetComponent<Suncaster>();
+        this._owner     = this._gun.CurrentOwner as PlayerController;
+    }
+
+    public override bool DoCustomAmmoDisplay(GameUIAmmoController uic)
+    {
+        if (!this._owner)
+            return false;
+
+        uic.SetAmmoCountLabelColor(Color.white);
+        Vector3 relVec = Vector3.zero;
+        uic.GunAmmoCountLabel.AutoHeight = true; // enable multiline text
+        uic.GunAmmoCountLabel.ProcessMarkup = true; // enable multicolor text
+        int prismsLeft = this._suncaster.maxPrisms - this._suncaster.extantPrisms.Count;
+        uic.GunAmmoCountLabel.Text = $"[sprite \"{Suncaster._PrismUI}\"][color #6666dd]x{prismsLeft}[/color]\n{this._gun.CurrentAmmo}";
+        return true;
     }
 }
 
 public class SuncasterProjectile : MonoBehaviour
 {
-    private const float _DAMAGE_SCALING = 1f;
-    private const int _MAX_LOOPS = 8;
+    private const float            _DAMAGE_SCALING = 1f;
+    private const int              _MAX_LOOPS      = 8;
 
-    protected List<SuncasterPrism> _hitPrisms  = new();
-    protected SuncasterPrism       _lastPrism  = null;
-    protected bool                 _canRefract = true;
+    private Projectile             _proj           = null;
+    private PlayerController       _owner          = null;
+    private Vector2                _lastPos        = Vector2.zero;
+    private TrailController        _trail          = null;
+    private Suncaster              _gun            = null;
+    private int                    _prismsLeft     = 0;
 
-    private Projectile           _proj        = null;
-    private PlayerController     _owner       = null;
-    private Vector2              _lastPos     = Vector2.zero;
-    private int                  _amps        = 0;
-    private TrailController      _trail       = null;
-    private Suncaster            _gun         = null;
-    private int                  _prismsLeft  = 0;
+    protected List<SuncasterPrism> _hitPrisms      = new();
+    protected SuncasterPrism       _lastPrism      = null;
+    protected bool                 _canRefract     = true;
 
-    public bool                  charged      = false;
+    public bool                    charged         = false;
 
     private void Start()
     {
@@ -120,7 +225,7 @@ public class SuncasterProjectile : MonoBehaviour
         this._trail.gameObject.SetGlowiness(100f);
 
         if (this._gun)
-          this._prismsLeft = this._gun._extantPrisms.Count * (this.charged ? _MAX_LOOPS : 1);
+          this._prismsLeft = this._gun.extantPrisms.Count * (this.charged ? _MAX_LOOPS : 1);
 
         this._proj.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
     }
@@ -141,7 +246,7 @@ public class SuncasterProjectile : MonoBehaviour
         this._trail.gameObject.SafeDestroy();
     }
 
-    private Projectile Refract(SuncasterPrism prism, Vector2 newDirection, bool canRefract)
+    private Projectile Refract(SuncasterPrism prism, Vector2 newDirection)
     {
       Projectile p = SpawnManager.SpawnProjectile(
           prefab   : Suncaster._SuncasterProjectile.gameObject,
@@ -151,19 +256,23 @@ public class SuncasterProjectile : MonoBehaviour
       p.baseData.speed  = this._proj.baseData.speed;
       p.baseData.damage = this._proj.baseData.damage;
       p.SendInDirection(newDirection, true);
-      p.GetComponent<SuncasterProjectile>()._lastPrism = prism;
-      p.GetComponent<SuncasterProjectile>()._canRefract = canRefract;
+
+      SuncasterProjectile s = p.GetComponent<SuncasterProjectile>();
+      s._lastPrism = prism;
+      s._canRefract = false;
       return p;
     }
 
+    private const float _REFRACT_SOUND_RATE = 0.16f;
+    private static float _LastRefractSound  = 0.0f;
     private void Amplify(SuncasterPrism prism)
     {
-      ++this._amps;
-
       if (this.charged)
       {
         if ((--this._prismsLeft) <= 0)
           return;
+        this._proj.SendInDirection(prism.Angle(), true);
+        this._proj.UpdateSpeed();
       }
 
       this._lastPrism = prism;
@@ -179,30 +288,23 @@ public class SuncasterProjectile : MonoBehaviour
       }
 
       if (this._canRefract)
-      {
-        if (this.charged)
-        {
-          // Refract(prism, newDirection: this._proj.LastVelocity, canRefract: false);
-          this._proj.SendInDirection(prism.Angle(), true);
-          this._proj.UpdateSpeed();
-        }
-        // else // if (this._gun)
-        {
-          foreach (SuncasterPrism other in this._gun._extantPrisms)
-            if (other != prism)
-              Refract(prism, newDirection: other.transform.position - prism.transform.position, canRefract: false);
-          // this._proj.DieInAir(suppressInAirEffects: true, allowActorSpawns: false, allowProjectileSpawns: false, killedEarly: true);
-        }
-        // else
-        // {
-        //   Refract(prism, newDirection: prism.Angle(), canRefract: true);
-        // }
-      }
+        foreach (SuncasterPrism other in this._gun.extantPrisms)
+          if (other != prism)
+            Refract(prism, newDirection: other.transform.position - prism.transform.position);
 
       this._proj.sprite.SetGlowiness(this._proj.baseData.damage);
       this._proj.specRigidbody.Position = new Position(prism.BasePosition());
       this._proj.specRigidbody.UpdateColliderPositions();
-      AkSoundEngine.PostEvent("snd_select", base.gameObject);
+
+      // stop audio events locally only on the prism object
+      // AkSoundEngine.PostEvent("prism_refract_sound_stop", prism.gameObject);
+      // ...on second thought it's noisy, so stop them everywhere
+      if ((_LastRefractSound + _REFRACT_SOUND_RATE) < BraveTime.ScaledTimeSinceStartup)
+      {
+        _LastRefractSound = BraveTime.ScaledTimeSinceStartup;
+        AkSoundEngine.PostEvent("suncaster_fire_sound_high_stop_all", prism.gameObject);
+        AkSoundEngine.PostEvent("suncaster_fire_sound_high", prism.gameObject);
+      }
     }
 
     public void FiredFromGun(Suncaster gun) => this._gun = gun;
@@ -227,17 +329,20 @@ public class SuncasterPrism : MonoBehaviour, IPlayerInteractable
     private bool    _trace             = false;
     private float   _last_trace        = 0.0f;
     private Suncaster _gun             = null;
-    private SuncasterPrism _target     = null;
     private bool _autotarget           = true;
+    private RoomHandler _room          = null;
 
-    public void Setup(PlayerController owner, Suncaster gun, Vector2 velocity)
+    public SuncasterPrism target       = null;
+
+    public void Setup(PlayerController owner, Suncaster gun, RoomHandler room, Vector2 velocity)
     {
       AkSoundEngine.PostEvent("fire_coin_sound", base.gameObject);
       this._owner    = owner;
       this._velocity = velocity;
       this._angle    = velocity.normalized;
+      this._room     = room;
       this._sprite   = base.GetComponent<tk2dSprite>();
-      base.transform.position.GetAbsoluteRoom()?.RegisterInteractable(this);
+      this._room.RegisterInteractable(this);
 
       this._body = gameObject.GetComponent<SpeculativeRigidbody>();
       this._body.OnPreRigidbodyCollision += this.OnPreCollision;
@@ -250,12 +355,12 @@ public class SuncasterPrism : MonoBehaviour, IPlayerInteractable
       this._gun = gun;
       if (this._gun)
       {
-        if (this._gun._extantPrisms.Count > 0)
+        if (this._gun.extantPrisms.Count > 0)
         {
-          this._target = this._gun._extantPrisms.Last();
-          this._gun._extantPrisms.First()._target = this;
+          this.target = this._gun.extantPrisms.Last();
+          this._gun.extantPrisms.First().target = this;
         }
-        this._gun._extantPrisms.Add(this);
+        this._gun.AddPrism(this);
       }
 
       this._setup    = true;
@@ -286,8 +391,9 @@ public class SuncasterPrism : MonoBehaviour, IPlayerInteractable
 
     private void OnDestroy()
     {
-      base.transform.position.GetAbsoluteRoom()?.DeregisterInteractable(this);
-      this._gun._extantPrisms.Remove(this);
+      this._room.DeregisterInteractable(this);
+      if (this._gun)
+        this._gun.RemovePrism(this);
     }
 
     private void Update()
@@ -295,65 +401,78 @@ public class SuncasterPrism : MonoBehaviour, IPlayerInteractable
         if (!this._setup)
           return;
 
-        if (base.transform.position.GetAbsoluteRoom() != this._owner.CurrentRoom)
+        if (this._room != this._owner.CurrentRoom)
         {
-          base.gameObject.SafeDestroy();
+          Selfdestruct();
           return;
         }
 
-        if (this._target && this._autotarget)
-          this._angle = ((this._target.transform.position - base.transform.position).normalized);
+        if (this.target && this._autotarget)
+          this._angle = ((this.target.transform.position - base.transform.position).normalized);
 
         if ((this._lifetime += BraveTime.DeltaTime) > _MAX_LIFE)
         {
-          Lazy.DoSmokeAt(base.transform.position);
-          UnityEngine.Object.Destroy(base.gameObject);
+          Selfdestruct();
           return;
         }
 
-        if (this._body.Velocity.sqrMagnitude >= 1f)
-          this._body.Velocity *= (float)Lazy.FastPow(_FRICTION, C.FPS * BraveTime.DeltaTime);
-        else
+        if (this._body.Velocity.sqrMagnitude < 1f)
           this._body.Velocity = Vector2.zero;
+        else
+          this._body.Velocity *= (float)Lazy.FastPow(_FRICTION, C.FPS * BraveTime.DeltaTime);
 
-        if (((this._last_trace + _TRACE_RATE) < BraveTime.ScaledTimeSinceStartup))
-        {
-          this._last_trace = BraveTime.ScaledTimeSinceStartup;
-          FancyVFX.Spawn(Suncaster._TraceVFX, base.transform.position, velocity: 12f * this._angle, lifetime: 0.5f, fadeOutTime: 0.5f);
-          if (this._trace && this._owner)
-          {
-            this._newAngle = this._owner.m_currentGunAngle.ToVector().normalized;
-            FancyVFX.Spawn(Suncaster._NewTraceVFX, base.transform.position, velocity: 12f * this._newAngle, lifetime: 0.5f, fadeOutTime: 0.5f);
-          }
-        }
+        // old trace targeting code, targeting is unused outside of circumstances where there's only one prism so we don't really need this anymore
+
+        // if (((this._last_trace + _TRACE_RATE) < BraveTime.ScaledTimeSinceStartup))
+        // {
+        //   this._last_trace = BraveTime.ScaledTimeSinceStartup;
+        //   FancyVFX.Spawn(Suncaster._TraceVFX, base.transform.position, velocity: 12f * this._angle, lifetime: 0.5f, fadeOutTime: 0.5f);
+        //   // if (this._trace && this._owner)
+        //   // {
+        //   //   this._newAngle = this._owner.m_currentGunAngle.ToVector().normalized;
+        //   //   FancyVFX.Spawn(Suncaster._NewTraceVFX, base.transform.position, velocity: 12f * this._newAngle, lifetime: 0.5f, fadeOutTime: 0.5f);
+        //   // }
+        // }
     }
+
+    public void SetTarget(SuncasterPrism prism) => this.target = prism;
 
     public Vector2 Angle() => this._angle;
     public Vector2 BasePosition() => base.transform.position;
 
+    public void Selfdestruct()
+    {
+      Lazy.DoSmokeAt(base.transform.position);
+      AkSoundEngine.PostEvent("prism_destroy_sound_stop_all", GameManager.Instance.gameObject);
+      AkSoundEngine.PostEvent("prism_destroy_sound", GameManager.Instance.gameObject);
+      UnityEngine.Object.Destroy(base.gameObject);
+    }
+
     public void Interact(PlayerController interactor)
     {
-      if (interactor != this._owner)
-        return;
+      if (interactor == this._owner)
+        Selfdestruct();
 
-      this._target = null; // disable auto-targeting
-      this._autotarget = false;
-      this._angle = this._newAngle;
-      AkSoundEngine.PostEvent("prism_interact_sound", base.gameObject);
+      // this._target = null; // disable auto-targeting
+      // this._autotarget = false;
+      // this._angle = this._newAngle;
+      // AkSoundEngine.PostEvent("prism_interact_sound", base.gameObject);
     }
 
     public void OnEnteredRange(PlayerController interactor)
     {
-        if (interactor == this._owner)
-          this._trace = true;
+        if (interactor != this._owner)
+          return;
+        // this._trace = true;
         SpriteOutlineManager.AddOutlineToSprite(this._sprite, Color.white, 1f, 0f, SpriteOutlineManager.OutlineType.NORMAL);
         this._sprite.UpdateZDepth();
     }
 
     public void OnExitRange(PlayerController interactor)
     {
-        if (interactor == this._owner)
-          this._trace = false;
+        if (interactor != this._owner)
+          return;
+        // this._trace = false;
         SpriteOutlineManager.AddOutlineToSprite(this._sprite, Color.black, 1f, 0f, SpriteOutlineManager.OutlineType.NORMAL);
     }
 
