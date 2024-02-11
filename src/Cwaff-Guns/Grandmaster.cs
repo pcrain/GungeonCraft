@@ -65,11 +65,6 @@ public abstract class ChessPiece : MonoBehaviour
     protected AIActor _targetEnemy    = null;  // which enemy, if any, we're currently targeting
     protected bool _twoPhaseMove      = false; // whether the piece moves in two phases; true only for knight
 
-    private void Start()
-    {
-        // ETGModConsole.Log($"chose {this.GetType()}");
-    }
-
     private void Update()
     {
         this._lifetime += BraveTime.DeltaTime;
@@ -83,62 +78,25 @@ public abstract class ChessPiece : MonoBehaviour
                 this._movePhase                      = 1;
                 this._lifetime                       = 0.0f;
                 if (this._twoPhaseMove)
-                {
-                    // Get the magnitude of the both components of the vector
-                    float xmag = Mathf.Abs(this._targetVec.x);
-                    float ymag = Mathf.Abs(this._targetVec.y);
-                    // Return the larger component on phase 1
-                    Vector2 axisVec;
-                    if (xmag > ymag)
-                        axisVec = this._targetVec.WithY(0);
-                    else
-                        axisVec = this._targetVec.WithX(0);
-                    // ETGModConsole.Log($"sending in major direction {axisVec}");
-                    this._projectile.SendInDirection(axisVec, true);
-                }
+                    this._projectile.SendInDirection(this._targetVec.LargerComponent(), true);
             }
-            else
-                UpdatePaused();
         }
         else if (this._twoPhaseMove && this._movePhase == 1)
         {
             if (this._lifetime >= _BaseMoveTime)
             {
-                // Get the magnitude of the both components of the vector
-                float xmag = Mathf.Abs(this._targetVec.x);
-                float ymag = Mathf.Abs(this._targetVec.y);
-                // Return the smaller component on phase 2
-                Vector2 axisVec;
-                if (xmag > ymag)
-                    axisVec = this._targetVec.WithX(0);
-                else
-                    axisVec = this._targetVec.WithY(0);
-                // ETGModConsole.Log($"sending in minor direction {axisVec}");
-                this._projectile.SendInDirection(axisVec, true);
+                this._projectile.SendInDirection(this._targetVec.SmallerComponent(), true);
                 this._movePhase = 2; // very intentionally not resetting lifetime here
             }
-            else
-                UpdateMoving();
         }
-        else
+        else if (this._lifetime >= (_BaseMoveTime * this._movePhase)) // double the wait time for knight moves
         {
-            if (this._lifetime >= (_BaseMoveTime * this._movePhase)) // double the wait time for knight moves
-            {
-                StopMoving();
-                this._trail.Disable();
-                this._projectile.collidesWithEnemies = false;
-                this._movePhase                      = 0;
-                this._lifetime                       = 0.0f;
-            }
-            else
-                UpdateMoving();
+            StopMoving();
+            this._trail.Disable();
+            this._projectile.collidesWithEnemies = false;
+            this._movePhase                      = 0;
+            this._lifetime                       = 0.0f;
         }
-        UpdateAlways();
-    }
-
-    protected float ComputeSpeed(float dist, float time)
-    {
-        return dist / (time * C.FPS);
     }
 
     public virtual void Setup(Projectile projectile, PlayerController owner)
@@ -162,19 +120,15 @@ public abstract class ChessPiece : MonoBehaviour
         UpdateCreate();
     }
 
+    protected float ComputeSpeed(float dist, float time) => dist / (time * C.FPS);
+
     protected abstract tk2dSpriteAnimationClip GetSprite();
     protected abstract float GetMoveDistance();
     protected abstract float GetMoveTime();
     protected abstract Color GetTrailColor();
 
-    protected virtual Vector2? ChooseNewTarget()
-    {
-        return null; // don't change target by default
-    }
-    protected virtual void UpdateCreate() { /* do nothing by default */ }
-    protected virtual void UpdatePaused() { /* do nothing by default */ }
-    protected virtual void UpdateMoving() { /* do nothing by default */ }
-    protected virtual void UpdateAlways() { /* do nothing by default */ }
+    protected virtual Vector2? ChooseNewTarget() => null; // don't change target by default
+    protected virtual void UpdateCreate() {} /* do nothing by default */
 
     public void StartMoving()
     {
@@ -186,9 +140,7 @@ public abstract class ChessPiece : MonoBehaviour
             this._projectile.baseData.speed = Mathf.Min(this._speed, adjSpeed);
         }
         else
-        {
             this._projectile.baseData.speed = this._speed;
-        }
         this._projectile.SendInDirection(this._targetVec, true);
         this._projectile.UpdateSpeed();
     }
@@ -200,14 +152,10 @@ public abstract class ChessPiece : MonoBehaviour
         this._projectile.UpdateSpeed();
     }
 
-    protected float LockAngleToOneOf(float angle, List<float> angles)
+    protected float LockAngleToOneOf(float angle, IEnumerable<float> angles)
     {
-        if (angles.Count == 0)
-            return angle; // all angles are valid
-
-        float a = angle.Clamp360();
-
-        float best      = 0.0f;
+        float a         = angle.Clamp360();
+        float best      = angle;
         float bestDelta = 999f;
         foreach(float c in angles)
         {
@@ -220,32 +168,9 @@ public abstract class ChessPiece : MonoBehaviour
         return best;
     }
 
-    protected float GetBestValidAngleForPiece(float angle)
-    {
-        return LockAngleToOneOf(angle, GetValidAnglesForPiece());
-    }
+    protected float GetBestValidAngleForPiece(float angle) => LockAngleToOneOf(angle, GetValidAnglesForPiece());
 
-    protected virtual List<float> GetValidAnglesForPiece()
-    {
-        return new();
-    }
-
-    protected Vector2? PointOrthognalTo(Vector2 start, Vector2 target, Vector2 dir, float projAmount = 1000f)
-    {
-        // Project a point outward from start in direction dir by amount projAmount
-        Vector2 projection = start + (projAmount * dir);
-
-        // Project a line orthogonal to dir through our target
-        Vector2 ortho = projAmount * dir.Rotate(degrees: 90);
-        Vector2 bbeg  = target + ortho;
-        Vector2 bend  = target - ortho;
-
-        // Find the orthogonal intersection point, or return null if no such point exists
-        Vector2 ipoint;
-        if (!BraveUtility.LineIntersectsLine(start, projection, bbeg, bend, out ipoint))
-            return null;
-        return ipoint;
-    }
+    protected virtual IEnumerable<float> GetValidAnglesForPiece() => Enumerable.Empty<float>();
 
     protected Vector2? ScanForTarget()
     {
@@ -255,7 +180,7 @@ public abstract class ChessPiece : MonoBehaviour
             if (!this._targetEnemy.healthHaver.IsDead)
             {
                 float bestAngle = GetBestValidAngleForPiece((this._targetEnemy.sprite.WorldCenter - this._projectile.sprite.WorldCenter).ToAngle());
-                return PointOrthognalTo(this._projectile.sprite.WorldCenter, this._targetEnemy.sprite.WorldCenter, bestAngle.ToVector());
+                return Lazy.PointOrthognalTo(this._projectile.sprite.WorldCenter, this._targetEnemy.sprite.WorldCenter, bestAngle.ToVector());
             }
             this._targetEnemy = null; // reset our target and march onward
         }
@@ -283,7 +208,7 @@ public abstract class ChessPiece : MonoBehaviour
             Vector2 dirVec = Vector2.zero;
             foreach(float candidateAngle in GetValidAnglesForPiece())
             {
-                ipoint = PointOrthognalTo(ppos, epos, candidateAngle.ToVector());
+                ipoint = Lazy.PointOrthognalTo(ppos, epos, candidateAngle.ToVector());
                 if (ipoint.HasValue)
                     break;
             }
@@ -311,62 +236,50 @@ public class PawnPiece   : ChessPiece {
 
 public class RookPiece : ChessPiece
 {
-    protected override tk2dSpriteAnimationClip GetSprite() => Grandmaster._RookSprite;
-    protected override float GetMoveDistance()             => 450f;
-    protected override float GetMoveTime()                 => ChessPiece._BaseMoveTime;
-    protected override Color GetTrailColor()               => Color.magenta;
+    private static readonly List<float> _AnglesOf90 = new(){0f, 90f, 180f, 270f};
+
+    protected override tk2dSpriteAnimationClip GetSprite()         => Grandmaster._RookSprite;
+    protected override float GetMoveDistance()                     => 450f;
+    protected override float GetMoveTime()                         => ChessPiece._BaseMoveTime;
+    protected override Color GetTrailColor()                       => Color.magenta;
+    protected override IEnumerable<float> GetValidAnglesForPiece() => _AnglesOf90;
+    protected override Vector2? ChooseNewTarget()                  => ScanForTarget();
 
     protected override void UpdateCreate()
     {
         // Rook should snap to 90 degree angles after initial shot
         this._targetVec = GetBestValidAngleForPiece(this._projectile.m_currentDirection.ToAngle()).ToVector();
     }
-
-    private static List<float> _AnglesOf90 = new(){0f, 90f, 180f, 270f};
-
-    protected override List<float> GetValidAnglesForPiece()
-    {
-        return _AnglesOf90;
-    }
-
-    protected override Vector2? ChooseNewTarget()
-    {
-        return ScanForTarget();
-    }
 }
 
 public class BishopPiece : ChessPiece
 {
-    protected override tk2dSpriteAnimationClip GetSprite() => Grandmaster._BishopSprite;
-    protected override float GetMoveDistance()             => 350f;
-    protected override float GetMoveTime()                 => ChessPiece._BaseMoveTime;
-    protected override Color GetTrailColor()               => Color.cyan;
+    private static readonly List<float> _AnglesOf45 = new(){45f, 135f, 225f, 315f};
+
+    protected override tk2dSpriteAnimationClip GetSprite()         => Grandmaster._BishopSprite;
+    protected override float GetMoveDistance()                     => 350f;
+    protected override float GetMoveTime()                         => ChessPiece._BaseMoveTime;
+    protected override Color GetTrailColor()                       => Color.cyan;
+    protected override IEnumerable<float> GetValidAnglesForPiece() => _AnglesOf45;
+    protected override Vector2? ChooseNewTarget()                  => ScanForTarget();
 
     protected override void UpdateCreate()
     {
         // Bishop should snap to 45 degree angles after initial shot
         this._targetVec = GetBestValidAngleForPiece(this._projectile.m_currentDirection.ToAngle()).ToVector();
     }
-
-    private static List<float> _AnglesOf45 = new(){45f, 135f, 225f, 315f};
-
-    protected override List<float> GetValidAnglesForPiece()
-    {
-        return _AnglesOf45;
-    }
-
-    protected override Vector2? ChooseNewTarget()
-    {
-        return ScanForTarget();
-    }
 }
 
 public class KnightPiece : ChessPiece
 {
-    protected override tk2dSpriteAnimationClip GetSprite() => Grandmaster._KnightSprite;
-    protected override float GetMoveDistance()             => 200f;
-    protected override float GetMoveTime()                 => ChessPiece._BaseMoveTime;
-    protected override Color GetTrailColor()               => Color.green;
+    private static List<float> _AnglesOf30 = new(){30f, 60f, 120f, 150f, 210f, 240f, 300f, 330f};
+
+    protected override tk2dSpriteAnimationClip GetSprite()         => Grandmaster._KnightSprite;
+    protected override float GetMoveDistance()                     => 200f;
+    protected override float GetMoveTime()                         => ChessPiece._BaseMoveTime;
+    protected override Color GetTrailColor()                       => Color.green;
+    protected override IEnumerable<float> GetValidAnglesForPiece() => _AnglesOf30;
+    protected override Vector2? ChooseNewTarget()                  => ScanForTarget();
 
     protected override void UpdateCreate()
     {
@@ -375,45 +288,25 @@ public class KnightPiece : ChessPiece
 
         // Knights also have a two step move
         this._twoPhaseMove = true;
-        this._movePhase = 2;
-    }
-
-    private static List<float> _AnglesOf30 = new(){30f, 60f, 120f, 150f, 210f, 240f, 300f, 330f};
-
-    protected override List<float> GetValidAnglesForPiece()
-    {
-        return _AnglesOf30;
-    }
-
-    protected override Vector2? ChooseNewTarget()
-    {
-        return ScanForTarget();
+        this._movePhase    = 2;
     }
 }
 
 public class QueenPiece : ChessPiece
 {
-    protected override tk2dSpriteAnimationClip GetSprite() => Grandmaster._QueenSprite;
-    protected override float GetMoveDistance()             => 500f;
-    protected override float GetMoveTime()                 => ChessPiece._BaseMoveTime;
-    protected override Color GetTrailColor()               => Color.yellow;
+    private static List<float> _AnglesOf45And90 = new(){0f, 45f, 90f, 135f, 180f, 225f, 270f, 315f};
+
+    protected override tk2dSpriteAnimationClip GetSprite()         => Grandmaster._QueenSprite;
+    protected override float GetMoveDistance()                     => 500f;
+    protected override float GetMoveTime()                         => ChessPiece._BaseMoveTime;
+    protected override Color GetTrailColor()                       => Color.yellow;
+    protected override IEnumerable<float> GetValidAnglesForPiece() => _AnglesOf45And90;
+    protected override Vector2? ChooseNewTarget()                  => ScanForTarget();
 
     protected override void UpdateCreate()
     {
         // Queen should snap to 45 and 90 degree angles after initial shot
         this._targetVec = GetBestValidAngleForPiece(this._projectile.m_currentDirection.ToAngle()).ToVector();
-    }
-
-    private static List<float> _AnglesOf45And90 = new(){0f, 45f, 90f, 135f, 180f, 225f, 270f, 315f};
-
-    protected override List<float> GetValidAnglesForPiece()
-    {
-        return _AnglesOf45And90;
-    }
-
-    protected override Vector2? ChooseNewTarget()
-    {
-        return ScanForTarget();
     }
 }
 
@@ -431,7 +324,7 @@ public class PlayChessBehavior : MonoBehaviour
     private PlayerController _owner = null;
     private ChessPiece _piece       = null;
 
-    private static List<ChessPieces> _PiecePool = new() {
+    private static readonly List<ChessPieces> _PiecePool = new() {
         ChessPieces.Pawn,
         ChessPieces.Pawn,
         ChessPieces.Pawn,
@@ -452,35 +345,21 @@ public class PlayChessBehavior : MonoBehaviour
     private void Start()
     {
         this._projectile = base.GetComponent<Projectile>();
-        if (this._projectile.Owner is not PlayerController pc)
+        this._owner      = this._projectile.Owner as PlayerController;
+        if (!this._owner)
             return;
-        this._owner = pc;
 
         switch(_PiecePool.ChooseRandom())
         {
-            case ChessPieces.Pawn:
-                this._piece = this._projectile.gameObject.AddComponent<PawnPiece>();
-                break;
-            case ChessPieces.Rook:
-                this._piece = this._projectile.gameObject.AddComponent<RookPiece>();
-                break;
-            case ChessPieces.Bishop:
-                this._piece = this._projectile.gameObject.AddComponent<BishopPiece>();
-                break;
-            case ChessPieces.Knight:
-                this._piece = this._projectile.gameObject.AddComponent<KnightPiece>();
-                break;
-            case ChessPieces.Queen:
-                this._piece = this._projectile.gameObject.AddComponent<QueenPiece>();
-                break;
-            // case ChessPieces.King:
-            //     this._piece = this._projectile.gameObject.AddComponent<KingPiece>();
-            //     break;
-            default:
-                this._piece = this._projectile.gameObject.AddComponent<PawnPiece>();
-                break;
+            case ChessPieces.Pawn:   this._piece = this._projectile.gameObject.AddComponent<PawnPiece>();   break;
+            case ChessPieces.Rook:   this._piece = this._projectile.gameObject.AddComponent<RookPiece>();   break;
+            case ChessPieces.Bishop: this._piece = this._projectile.gameObject.AddComponent<BishopPiece>(); break;
+            case ChessPieces.Knight: this._piece = this._projectile.gameObject.AddComponent<KnightPiece>(); break;
+            case ChessPieces.Queen:  this._piece = this._projectile.gameObject.AddComponent<QueenPiece>();  break;
+            // case ChessPieces.King:   this._piece = this._projectile.gameObject.AddComponent<KingPiece>();   break;
+            default:                 this._piece = this._projectile.gameObject.AddComponent<PawnPiece>();   break;
         }
 
-        this._piece.Setup(this._projectile, pc);
+        this._piece.Setup(this._projectile, this._owner);
     }
 }

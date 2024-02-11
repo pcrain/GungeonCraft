@@ -1412,4 +1412,9 @@ public static class Extensions
     AkSoundEngine.PostEvent(sound+"_stop_all", g);
     AkSoundEngine.PostEvent(sound, g);
   }
+
+  /// <summary>Returns a vector with the smaller component set to 0.</summary>
+  public static Vector2 LargerComponent(this Vector2 v)  => (Mathf.Abs(v.x) > Mathf.Abs(v.y)) ? v.WithY(0) : v.WithX(0);
+  /// <summary>Returns a vector with the larger component set to 0.</summary>
+  public static Vector2 SmallerComponent(this Vector2 v) => (Mathf.Abs(v.x) < Mathf.Abs(v.y)) ? v.WithY(0) : v.WithX(0);
 }

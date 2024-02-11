@@ -550,4 +550,23 @@ public static class Lazy
       // ETGModConsole.Log($"checking if {startp} to {endp} is within {radius} of {p}: {near}");
       return near;
     }
+
+    /// <summary>
+    /// Given a ray `r` extending from start towards direction `dir`, returns the point `p` such that the segment between `target` and `p` is orthogonal to `r`.
+    /// Returns `null` if no such point exists.
+    /// </summary>
+    public static Vector2? PointOrthognalTo(Vector2 start, Vector2 target, Vector2 dir, float projAmount = 1000f)
+    {
+        // Project a point outward from start in direction dir by amount projAmount
+        Vector2 end = start + (projAmount * dir);
+
+        // Project a line orthogonal to dir through our target
+        Vector2 ortho = projAmount * dir.Rotate(degrees: 90);
+
+        // Find the orthogonal intersection point, or return null if no such point exists
+        Vector2 ipoint;
+        if (!BraveUtility.LineIntersectsLine(start, end, target + ortho, target - ortho, out ipoint))
+            return null;
+        return ipoint;
+    }
 }
