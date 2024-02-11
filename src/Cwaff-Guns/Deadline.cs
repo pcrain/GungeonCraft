@@ -1,9 +1,7 @@
 ﻿namespace CwaffingTheGungy;
 
-/* TODO:
-    - disable auto aim
-    - fix rare hitscan issues
-*/
+//TODO: disable auto aim
+//TODO: fix rare hitscan issues
 
 public class Deadline : AdvancedGunBehavior
 {
@@ -129,8 +127,6 @@ public class Deadline : AdvancedGunBehavior
         if (!this._myLaserSight)
             return;
 
-        // Vector2 target = Raycast.ToNearestWall(this.gun.barrelOffset.transform.position, this.gun.CurrentAngle, minDistance: 0.01f);
-        // float length = C.PIXELS_PER_TILE*Vector2.Distance(this.gun.barrelOffset.transform.position,target);
         int rayMask = CollisionMask.LayerToMask(CollisionLayer.HighObstacle/*, CollisionLayer.BulletBlocker, CollisionLayer.BulletBreakable*/);
         RaycastResult result;
         if (!PhysicsEngine.Instance.Raycast(this.gun.barrelOffset.transform.position.XY(), this.gun.CurrentAngle.ToVector(), 999f, out result, true, false, rayMask, null, false))
@@ -145,8 +141,6 @@ public class Deadline : AdvancedGunBehavior
         gun.sprite.ForceRotationRebuild();
         tk2dTiledSprite sprite = this._myLaserSight.GetComponent<tk2dTiledSprite>();
         sprite.renderer.enabled = true;
-        // sprite.IsPerpendicular = false;
-        // sprite.HeightOffGround = 7f;
         sprite.dimensions = new Vector2(length, _SIGHT_WIDTH);
         this._myLaserSight.transform.rotation = this.gun.CurrentAngle.EulerZ();
         this._myLaserSight.transform.parent = this.gun.barrelOffset;
@@ -178,11 +172,9 @@ public class Deadline : AdvancedGunBehavior
         sprite.renderer.material.SetColor("_EmissiveColor", c);
     }
 
-    // protected override void Update()
-    // Using LateUpdate() here so laser sight is updated correctly without jittering
+    // Using LateUpdate() here instead of Update() so laser sight is updated correctly without jittering
     private void LateUpdate()
     {
-        // base.Update();
         if (!this.Player)
             return;
 
@@ -495,34 +487,15 @@ public class DeadlineProjectile : MonoBehaviour
         specRigidBody.OnCollision += this.OnCollision;
     }
 
-    // private static PrototypeDungeonRoom.RoomCategory[] _BannedRoomTypes = {
-    //     PrototypeDungeonRoom.RoomCategory.BOSS,
-    //     PrototypeDungeonRoom.RoomCategory.CONNECTOR,
-    //     PrototypeDungeonRoom.RoomCategory.ENTRANCE,
-    //     PrototypeDungeonRoom.RoomCategory.EXIT,
-    // };
-
     // Only collide with tiles
     private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
     {
         if (!(otherRigidbody?.PrimaryPixelCollider?.IsTileCollider ?? false))
             PhysicsEngine.SkipCollision = true;
-
-        // RoomHandler room = myPixelCollider.UnitCenter.GetAbsoluteRoom();
-        // if (_BannedRoomTypes.Contains(room.area.PrototypeRoomCategory) || !myPixelCollider.FullyWithin(room.GetBoundingRect()))
-        //     PhysicsEngine.SkipCollision = true;
     }
 
     private void OnCollision(CollisionData tileCollision)
     {
-        // this._projectile.baseData.speed = 0.01f;
-        // this._projectile.UpdateSpeed();
-        // float m_hitNormal = tileCollision.Normal.ToAngle();
-        // PhysicsEngine.PostSliceVelocity = new Vector2?(default(Vector2));
-        // SpeculativeRigidbody specRigidbody = this._projectile.specRigidbody;
-        // specRigidbody.OnCollision -= this.OnCollision;
-        // Vector2 spawnPoint = tileCollision.PostCollisionUnitCenter;
-        // _gun?.CreateALaser(spawnPoint,m_hitNormal);
         _gun?.CreateALaser(this._start.Value, this._end.Value);
         this._projectile.DieInAir();
     }

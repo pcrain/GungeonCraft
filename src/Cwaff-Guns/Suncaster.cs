@@ -5,7 +5,7 @@ public class Suncaster : AdvancedGunBehavior
     public static string ItemName         = "Suncaster";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Reflaktive";
-    public static string LongDescription  = "Fires weak beams of sunlight. Reload to toss a refractive prism. Uncharged shots that hit a prism will refract sunlight to all other prisms. Charged shots continuously bounce between and refract off of all placed prisms for a short period. Prisms can be reclaimed by interacting with them or by entering a new room. Cannot gaim ammo normally, but passively restores ammo over time.";
+    public static string LongDescription  = "Fires weak piercing beams of sunlight. Reload to toss a refractive prism. Uncharged shots that hit a prism will refract sunlight to all other prisms. Charged shots continuously bounce between and refract off of all placed prisms for a short period. Prisms can be reclaimed by interacting with them or by entering a new room. Cannot gaim ammo normally, but passively restores ammo over time.";
     public static string Lore             = "TBD";
 
     internal const  string          _PrismUI                 = $"{C.MOD_PREFIX}:_PrismUI";  // need the string immediately for preloading in Main()
@@ -24,7 +24,7 @@ public class Suncaster : AdvancedGunBehavior
     internal static TrailController _SunTrailFinalPrefab     = null;
     internal static Projectile      _SuncasterProjectile     = null;
 
-    [SerializeField] // make sure we keep this when the gun is dropped and picked back up
+    [SerializeField] // make sure we keep this when the gun is dropped and picked back ups
     private float _lastChargeTime            = 0.0f;
 
     public List<SuncasterPrism> extantPrisms = new();

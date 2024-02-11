@@ -1399,4 +1399,24 @@ public static class Extensions
   /// <summary>Pick and pause on a frame (random if frame == -1) from a projectiles's tk2dSpriteAnimator</summary>
   /// <remarks>Potentially the same as the Projectile.SetFrame() extension</remarks>
   public static void PickFrame(this Projectile p, int frame = -1) => p.spriteAnimator.PickFrame(frame);
+
+  /// <summary>Play a sound on a GameObject</summary>
+  public static void Play(this GameObject g, string sound)
+  {
+    AkSoundEngine.PostEvent(sound, g);
+  }
+
+  /// <summary>Play a sound on a GameObject, stopping any instances of the sound on that object.</summary>
+  public static void PlayOnce(this GameObject g, string sound)
+  {
+    AkSoundEngine.PostEvent(sound+"_stop", g);
+    AkSoundEngine.PostEvent(sound, g);
+  }
+
+  /// <summary>Play a sound on a GameObject, stopping any instances of the sound globally.</summary>
+  public static void PlayUnique(this GameObject g, string sound)
+  {
+    AkSoundEngine.PostEvent(sound+"_stop_all", g);
+    AkSoundEngine.PostEvent(sound, g);
+  }
 }

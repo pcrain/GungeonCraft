@@ -46,7 +46,8 @@ public class PaintballColorizer : MonoBehaviour
     public  Color      selectedColour;
     private Projectile _projectile;
 
-    public GoopDefinition setColorAndGetGoop() {
+    public GoopDefinition setColorAndGetGoop()
+    {
         int selectedIndex = UnityEngine.Random.Range(0, EasyGoopDefinitions.ColorGoopColors.Count);
         selectedColour = EasyGoopDefinitions.ColorGoopColors[selectedIndex];
         return EasyGoopDefinitions.ColorGoops[selectedIndex];
