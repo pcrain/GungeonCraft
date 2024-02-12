@@ -5,8 +5,8 @@ public class Vladimir : AdvancedGunBehavior
     public static string ItemName         = "Vladimir";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Poke 'em On";
-    public static string LongDescription  = "Attacking performs a swift melee stab that impales enemies within range. While impaled, enemies are vulnerable to other enemies' projectiles and take damage from subsequent stabs. Each stab can also destroy a single enemy projectile. Cannot be dropped or switched while an enemy is impaled. Increases curse by 1 while in inventory.";
-    public static string Lore             = "";
+    public static string LongDescription  = "Attacking performs a swift melee stab that impales enemies within range. While impaled, enemies are vulnerable to other enemies' projectiles and take damage from subsequent stabs. Each stab can destroy a single enemy projectile. Cannot be dropped or switched while an enemy is impaled. Increases curse by 1 while in inventory.";
+    public static string Lore             = "Wielded by and named after a mad warrior who was addicted to impaling his enemies -- enough so that he would frequently count the number of times he was able to bounce them on his trident before they gave out on him. They say some of his madness still lingers within the weapon, but what that means is up to interpretation. On an unrelated note, you find yourself wondering how many stabs a Gun Nut can withstand.";
 
     internal const float _LAUNCH_FORCE                 = 150f;
     internal const float _SKEWER_DAMAGE                = 14.0f;

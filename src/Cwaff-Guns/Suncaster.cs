@@ -6,7 +6,7 @@ public class Suncaster : AdvancedGunBehavior
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Reflaktive";
     public static string LongDescription  = "Fires weak piercing beams of sunlight. Reload to toss a refractive prism. Uncharged shots that hit a prism will refract towards all other prisms. Charged shots continuously bounce between and refract off of all placed prisms for a short period. Prisms can be reclaimed by interacting with them or by entering a new room. Cannot gaim ammo normally, but passively restores ammo over time.";
-    public static string Lore             = "";
+    public static string Lore             = "An exotic firearm feared throughout the galaxy for its potent solar projectiles. The absence of sunlight in the Gungeon dramatically reduces its ability to gather energy, yet it remains a force to be reckoned with once its energy stores are sufficient.";
 
     internal const  string          _PrismUI                 = $"{C.MOD_PREFIX}:_PrismUI";  // need the string immediately for preloading in Main()
     internal const  int             _BASE_MAX_PRISMS         = 6;
@@ -24,7 +24,7 @@ public class Suncaster : AdvancedGunBehavior
     internal static TrailController _SunTrailFinalPrefab     = null;
     internal static Projectile      _SuncasterProjectile     = null;
 
-    [SerializeField] // make sure we keep this when the gun is dropped and picked back ups
+    [SerializeField] // make sure we keep this when the gun is dropped and picked back up
     private float _lastChargeTime            = 0.0f;
 
     public List<SuncasterPrism> extantPrisms = new();
@@ -102,6 +102,7 @@ public class Suncaster : AdvancedGunBehavior
         projectile.GetComponent<SuncasterProjectile>().FiredFromGun(this);
         // projectile.gameObject.Play("prism_refract_sound");
         base.gameObject.PlayOnce("suncaster_fire_sound");
+        this._lastChargeTime = BraveTime.ScaledTimeSinceStartup; // reset charge timer after firing
     }
 
     protected override void OnPostDroppedByPlayer(PlayerController player)
