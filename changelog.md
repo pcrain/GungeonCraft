@@ -1,9 +1,22 @@
 # Changelog
 
-## 1.7.1 (TBD)
+## 1.8.0 (2024-02-11)
+
+#### Features and Polish:
+- Added Vladimir, Blamethrower, and Suncaster
+
+#### Bugfixes:
 - Fixed another rare edge case where Astral Projector could get the player stuck in walls
-- Made companion shopkeeper no longer face towards player
+- Fixed Gyroscope and Drifter's Headgear preventing the player from dodge rolling in the Aimless Void
+- Fixed Gyroscope and Drifter's Headgear polluting the debug log with error messages when used
+- Fixed Gorgun's Eye and Hand Cannon attempting to stun unstunnable enemies
+- Fixed several projectiles ignoring the frame rate during physics calculations
+- Fixed several visual effects ignoring the frame rate during physics calculations
+- Fixed a few typos in item descriptions
+
+#### Misc:
 - Added instructions for enabling Hecked Mode to readme 
+- Made companion shopkeeper no longer face towards player since the shading looked weird
 
 ## 1.7.0 (2024-01-20)
 

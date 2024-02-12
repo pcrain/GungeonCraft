@@ -6,7 +6,7 @@ public class Blamethrower : AdvancedGunBehavior
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Take It Up with HR";
     public static string LongDescription  = "Fires harsh words that deal emotional damage and may inflict blame, making enemies run away and take 4x emotional damage. Taking damage from an enemy projectile assigns a random scapegoat, who becomes 100% susceptible to blame and drops an appropriate health / armor pickup when killed with the Blamethrower.";
-    public static string Lore             = "TBD";
+    public static string Lore             = "";
 
     internal static GameObject _BlameImpact = null;
     internal static GameObject _BlameTrail = null;

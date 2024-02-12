@@ -5,8 +5,8 @@ public class Vladimir : AdvancedGunBehavior
     public static string ItemName         = "Vladimir";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Poke 'em On";
-    public static string LongDescription  = "Attacking performs a swift melee thrust that impales enemies within range. While impaled, enemies are permastunned, take damage from subsequent thrusts, and are vulnerable to other enemies' projectiles. Each thrust can also destroy a single enemy projectile. Cannot be dropped or switched while an enemy is impaled. Increases curse by 1 while in inventory.";
-    public static string Lore             = "TBD";
+    public static string LongDescription  = "Attacking performs a swift melee stab that impales enemies within range. While impaled, enemies are vulnerable to other enemies' projectiles and take damage from subsequent stabs. Each stab can also destroy a single enemy projectile. Cannot be dropped or switched while an enemy is impaled. Increases curse by 1 while in inventory.";
+    public static string Lore             = "";
 
     internal const float _LAUNCH_FORCE                 = 150f;
     internal const float _SKEWER_DAMAGE                = 14.0f;

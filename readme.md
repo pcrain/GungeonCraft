@@ -9,8 +9,8 @@
 
 ### Features
 
-- 85 new items, including
-	+ 41 new guns
+- 88 new items, including
+	+ 44 new guns
 	+ 30 new passive items
 	+ 14 new active items
 - Lore for all new guns and items
