@@ -147,7 +147,7 @@ public class ThrownCard : MonoBehaviour
         mi.sprite.renderer.material = p.sprite.renderer.material;
     }
 
-    public IEnumerator PickUpPlayingCardScript(MiniInteractable i, PlayerController p)
+    public static IEnumerator PickUpPlayingCardScript(MiniInteractable i, PlayerController p)
     {
         if ((p.FindBaseGun<Blackjack>() is Gun gun) && (gun.CurrentAmmo < gun.AdjustedMaxAmmo))
         {

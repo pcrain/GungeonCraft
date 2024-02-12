@@ -93,19 +93,19 @@ public class FakeShopItem : BraveBehaviour, IPlayerInteractable
     SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black, 0.1f, 0.05f);
     base.sprite.UpdateZDepth();
 
-    SpeculativeRigidbody orAddComponent = base.gameObject.GetOrAddComponent<SpeculativeRigidbody>();
-    orAddComponent.PixelColliders = new List<PixelCollider>();
-    PixelCollider pixelCollider = new PixelCollider();
-    pixelCollider.ColliderGenerationMode = PixelCollider.PixelColliderGeneration.Circle;
-    pixelCollider.CollisionLayer = CollisionLayer.HighObstacle;
-    pixelCollider.ManualDiameter = 14;
+    SpeculativeRigidbody body = base.gameObject.GetOrAddComponent<SpeculativeRigidbody>();
     Vector2 vector = base.sprite.WorldCenter - base.transform.position.XY();
-    pixelCollider.ManualOffsetX = PhysicsEngine.UnitToPixel(vector.x) - 7;
-    pixelCollider.ManualOffsetY = PhysicsEngine.UnitToPixel(vector.y) - 7;
-    orAddComponent.PixelColliders.Add(pixelCollider);
-    orAddComponent.Initialize();
-    orAddComponent.OnPreRigidbodyCollision = null;
-    orAddComponent.OnPreRigidbodyCollision = (SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate)Delegate.Combine(orAddComponent.OnPreRigidbodyCollision, new SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate(ItemOnPreRigidbodyCollision));
+    body.PixelColliders = new () {
+      new PixelCollider(){
+        ColliderGenerationMode = PixelCollider.PixelColliderGeneration.Circle,
+        CollisionLayer         = CollisionLayer.HighObstacle,
+        ManualDiameter         = 14,
+        ManualOffsetX          = PhysicsEngine.UnitToPixel(vector.x) - 7,
+        ManualOffsetY          = PhysicsEngine.UnitToPixel(vector.y) - 7,
+      }
+    };
+    body.Initialize();
+    body.OnPreRigidbodyCollision += ItemOnPreRigidbodyCollision;
     RegenerateCache();
   }
 

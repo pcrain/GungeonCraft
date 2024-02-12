@@ -262,7 +262,7 @@ public class Insured : MonoBehaviour
         if (this.vfx == null)
             return;
 
-        this.vfx.transform.position = this._pickup.sprite.WorldTopCenter + new Vector2(0f, 0.75f + 0.25f * Mathf.Sin(4f * BraveTime.ScaledTimeSinceStartup));
+        this.vfx.transform.position = this._pickup.sprite.WorldTopCenter.HoverAt(amplitude: 0.25f, frequency: 4f, offset: 0.75f);
     }
 
     private void OnDrop()

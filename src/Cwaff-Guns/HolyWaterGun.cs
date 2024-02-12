@@ -114,7 +114,7 @@ public class Exorcisable : MonoBehaviour
                 sprite.PlaceAtPositionByAnchor(pos, Anchor.MiddleCenter);
             g.AddComponent<GhostlyDeath>().Setup(beam.Direction);
         }
-        this._enemy.healthHaver.ApplyDamage(
+        this._enemy.healthHaver.ApplyDamage( //REFACTOR: use DamageAdjuster?
             epower, beam.Direction, "Exorcism", CoreDamageTypes.Water, DamageCategory.Unstoppable, true, null, true);
 
         // Create particles

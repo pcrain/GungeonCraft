@@ -1463,4 +1463,21 @@ public static class Extensions
     p.baseData.speed *= (float)Lazy.FastPow(friction, p.LocalDeltaTime * C.FPS);
     p.UpdateSpeed();
   }
+
+  /// <summary>Forces all ProjectileModules in a gun to reload with the DefaultModule</summary>
+  public static void SynchronizeReloadAcrossAllModules(this Gun gun)
+  {  //TODO: compare this to ChargeProjectile's DepleteAmmo() / IncrementModuleFireCountAndMarkReload()
+      if (!gun.m_moduleData[gun.DefaultModule].needsReload)
+        return;
+      foreach (ProjectileModule mod in gun.Volley.projectiles)
+          gun.m_moduleData[mod].needsReload = true;
+  }
+
+  /// <summary>Return a position near a position that bobs up and down relative to the scaled time since startup</summary>
+  public static Vector2 HoverAt(this Vector2 pos, float amplitude = 1f, float frequency = 6.28f, float offset = 0.0f, float phase = 0.0f)
+    => new Vector2(pos.x, pos.y + offset + amplitude * Mathf.Sin(phase + frequency * BraveTime.ScaledTimeSinceStartup));
+
+  /// <summary>Return a position near a position that bobs up and down relative to the scaled time since startup (Vector3 version)</summary>
+  public static Vector3 HoverAt(this Vector3 pos, float amplitude = 1f, float frequency = 6.28f, float offset = 0.0f, float phase = 0.0f)
+    => pos.XY().HoverAt(amplitude: amplitude, frequency: frequency, offset: offset, phase: phase).ToVector3ZisY();
 }

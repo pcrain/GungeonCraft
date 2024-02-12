@@ -95,7 +95,7 @@ public class TheBB : MonoBehaviour
 
     private void OnBounce()
     {
-        this._projectile.baseData.speed *= _BOUNCE_SPEED_DECAY;
+        this._projectile.MultiplySpeed(_BOUNCE_SPEED_DECAY);
     }
 
     private void CreateInteractible(Projectile p)
@@ -130,7 +130,6 @@ public class TheBB : MonoBehaviour
             return;
         }
 
-        // CreateInteractible(this);
         this._projectile.DieInAir(suppressInAirEffects: true);
         return;
     }

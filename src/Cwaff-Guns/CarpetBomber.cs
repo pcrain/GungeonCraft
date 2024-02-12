@@ -91,13 +91,8 @@ public class CarpetBomber : AdvancedGunBehavior
     protected override void Update()
     {
         base.Update();
-        if (!this.Player)
-            return;
-
-        // Synchronize ammo clips between projectile modules as necessary
-        bool needsReload = this.gun.m_moduleData[this.gun.DefaultModule].needsReload;
-        foreach (ProjectileModule mod in this.gun.Volley.projectiles)
-            this.gun.m_moduleData[mod].needsReload |= needsReload;
+        if (this.Player) // Synchronize ammo clips between projectile modules as necessary
+            this.gun.SynchronizeReloadAcrossAllModules();
     }
 }
 

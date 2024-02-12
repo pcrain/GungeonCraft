@@ -9,7 +9,7 @@ public class Crapshooter : AdvancedGunBehavior
     public static string Lore             = "Dice are the core component of several games, ranging from family-friendly ones (like Monopoly) to those that inevitably end in homicide (like Monopoly). The dice themselves are rarely the vessels used to carry out these acts of violence, but when stuffed inside a firearm, they prove to be at least somewhat effective projectiles, if not unpredictable ones.";
 
     internal static Projectile _BaseCrapshooterProjectile;
-    internal static List<string> _DiceSounds = new(){
+    internal static readonly List<string> _DiceSounds = new(){
         "dice_sound_1",
         "dice_sound_2",
         "dice_sound_3",

@@ -53,7 +53,7 @@ public class Shine : PassiveItem
         player.sprite.usesOverrideMaterial = true;
         player.SetOverrideShader(ShaderCache.Acquire("Brave/ItemSpecific/MetalSkinShader"));
         SpeculativeRigidbody specRigidbody = player.specRigidbody;
-        specRigidbody.OnPreRigidbodyCollision = (SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate)Delegate.Combine(specRigidbody.OnPreRigidbodyCollision, new SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate(this.OnPreCollision));
+        specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
         player.healthHaver.IsVulnerable = false;
         RecomputePlayerSpeed(player);
         base.gameObject.Play("reflector");
@@ -100,7 +100,7 @@ public class Shine : PassiveItem
         player.ClearOverrideShader();
         player.sprite.usesOverrideMaterial = this.m_usedOverrideMaterial;
         SpeculativeRigidbody specRigidbody2 = player.specRigidbody;
-        specRigidbody2.OnPreRigidbodyCollision = (SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate)Delegate.Remove(specRigidbody2.OnPreRigidbodyCollision, new SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate(this.OnPreCollision));
+        specRigidbody2.OnPreRigidbodyCollision -= this.OnPreCollision;
         RecomputePlayerSpeed(player);
     }
 

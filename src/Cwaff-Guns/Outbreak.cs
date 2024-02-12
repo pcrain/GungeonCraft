@@ -44,7 +44,7 @@ public class Outbreak : AdvancedGunBehavior
         if (_INFECT_TOWARDS_CURSOR)
             target = player.sprite.WorldCenter.ToNearestWallOrEnemyOrObject(player.m_currentGunAngle, 1f);
 
-        foreach (AIActor enemy in StaticReferenceManager.AllEnemies)
+        foreach (AIActor enemy in StaticReferenceManager.AllEnemies) //REFACTOR: limit this to current room
         {
             if (enemy.GetComponent<InfectedBehavior>() is not InfectedBehavior infection)
                 continue;

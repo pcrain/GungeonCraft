@@ -87,16 +87,14 @@ internal class ScapeGoat : MonoBehaviour
             yield break;  // can't scapegoat the same enemy twice
 
         // spawn scapegoat VFX above their head
-        Vector2 offset = new Vector2(0f, 0.5f);
-        GameObject vfx = SpawnManager.SpawnVFX(Blamethrower._ScapeGoatVFX, enemy.sprite.WorldTopCenter + offset, Quaternion.identity);
+        GameObject vfx = SpawnManager.SpawnVFX(Blamethrower._ScapeGoatVFX, enemy.sprite.WorldTopCenter, Quaternion.identity);
         tk2dSprite sprite = vfx.GetComponent<tk2dSprite>();
 
         // destroy the VFX once the enemy is dead
         while (this._active && enemy && hh && hh.IsAlive)
         {
-            // sprite.PlaceAtScaledPositionByAnchor(enemy.sprite.WorldTopCenter + offset, Anchor.MiddleCenter);
-            sprite.PlaceAtPositionByAnchor(enemy.sprite.WorldTopCenter + offset
-              + new Vector2(0f, 0.25f + 0.1f * Mathf.Sin(10f * BraveTime.ScaledTimeSinceStartup)), Anchor.MiddleCenter);
+            sprite.PlaceAtPositionByAnchor(enemy.sprite.WorldTopCenter.HoverAt(
+                amplitude: 0.1f, frequency: 10f, offset: 0.75f), Anchor.MiddleCenter);
             yield return null;
         }
 

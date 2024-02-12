@@ -140,8 +140,7 @@ public class HatchlingBehavior : MonoBehaviour
 
     private void Update()
     {
-        this._lastCheck += BraveTime.DeltaTime;
-        if (this._lastCheck < _CHECK_INTERVAL)
+        if ((this._lastCheck += BraveTime.DeltaTime) < _CHECK_INTERVAL)
             return;
         this._lastCheck = 0.0f;
 
@@ -158,8 +157,7 @@ public class HatchlingBehavior : MonoBehaviour
 
         // Check if we're offscreen, and destroy if so
         Vector3 pos = this._actor.Position;
-        bool offscreen = pos.x < _CachedCameraMin.x || pos.x > _CachedCameraMax.x || pos.y < _CachedCameraMin.y || pos.y > _CachedCameraMax.y;
-        if (offscreen)
+        if (pos.x < _CachedCameraMin.x || pos.x > _CachedCameraMax.x || pos.y < _CachedCameraMin.y || pos.y > _CachedCameraMax.y)
             UnityEngine.Object.Destroy(base.gameObject);
     }
 }

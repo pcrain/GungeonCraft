@@ -145,9 +145,7 @@ public class KingsLaw : AdvancedGunBehavior
         Reset();
         // Synchronize ammo clips between projectile modules as necessary
         // (don't do while charging or bullets will all be forcibly released)
-        bool needsReload = this.gun.m_moduleData[this.gun.DefaultModule].needsReload;
-        foreach (ProjectileModule mod in this.gun.Volley.projectiles)
-            this.gun.m_moduleData[mod].needsReload |= needsReload;
+        this.gun.SynchronizeReloadAcrossAllModules();
     }
 }
 

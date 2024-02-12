@@ -71,8 +71,7 @@ public class SafetyGloves : PassiveItem
         {
             this._shouldClearVfx = false;
             this._extantVfx ??= SpawnManager.SpawnVFX(_HandlingVFX, closestEnemy.sprite.WorldTopCenter + new Vector2(0f, 0.5f), Quaternion.identity);
-            this._extantVfx.transform.position = closestEnemy.sprite.WorldTopCenter
-                + new Vector2(0f, 0.5f + 0.25f * Mathf.Sin(10f * BraveTime.ScaledTimeSinceStartup));
+            this._extantVfx.transform.position = closestEnemy.sprite.WorldTopCenter.HoverAt(amplitude: 0.25f, frequency: 10f, offset: 0.5f);
             return;
         }
 

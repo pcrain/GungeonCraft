@@ -323,7 +323,7 @@ public class UppskeruvelLostSoul : MonoBehaviour
             // Weighted average of natural and direct velocity towards player
             this._velocity = this._homeSpeed * Vector2.Lerp((this._velocity.normalized + deltaNorm).normalized, deltaNorm, 0.2f);
             this._basePos += (this._velocity * BraveTime.DeltaTime).ToVector3ZUp();
-            base.transform.position = new Vector2(this._basePos.x, this._basePos.y + _BOB_HEIGHT * Mathf.Sin(_BOB_SPEED * BraveTime.ScaledTimeSinceStartup)).ToVector3ZisY();
+            base.transform.position = this._basePos.HoverAt(amplitude: _BOB_HEIGHT, frequency: _BOB_SPEED);
 
             FancyVFX.Spawn(Outbreak._OutbreakSmokeVFX, base.transform.position, Lazy.RandomEulerZ(),
                 velocity: Lazy.RandomVector(0.1f), lifetime: 0.25f, fadeOutTime: 0.5f);
@@ -348,7 +348,7 @@ public class UppskeruvelLostSoul : MonoBehaviour
         }
         else
             this._velocity = this._velocity.normalized;
-        base.transform.position = new Vector2(this._basePos.x, this._basePos.y + _BOB_HEIGHT * Mathf.Sin(_BOB_SPEED * BraveTime.ScaledTimeSinceStartup)).ToVector3ZisY();
+        base.transform.position = this._basePos.HoverAt(amplitude: _BOB_HEIGHT, frequency: _BOB_SPEED);
 
         if (this._lifetime > _MAX_LIFE)
         {
@@ -569,7 +569,6 @@ public class UppskeruvelCombatSoul : MonoBehaviour
                 break;
         }
 
-        base.transform.position = new Vector2(this._basePos.x,
-            this._basePos.y + UppskeruvelLostSoul._BOB_HEIGHT * Mathf.Sin(UppskeruvelLostSoul._BOB_SPEED * this._lifetime)).ToVector3ZisY();
+        base.transform.position = this._basePos.HoverAt(amplitude: UppskeruvelLostSoul._BOB_HEIGHT, frequency: UppskeruvelLostSoul._BOB_SPEED);
     }
 }
