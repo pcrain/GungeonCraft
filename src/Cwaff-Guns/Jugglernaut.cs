@@ -240,7 +240,6 @@ public class Jugglernaut : AdvancedGunBehavior
         Material m = gun.sprite.renderer.material;
         m.SetFloat("_EmissivePower", 0f);
         gun.gameObject.Play("juggle_add_sound");
-        // gun.gameObject.Play("gunbrella_fire_sound");
 
         for (float elapsed = 0f; elapsed < GLOW_TIME; elapsed += BraveTime.DeltaTime)
         {
@@ -273,7 +272,7 @@ public class JugglernautProjectile : MonoBehaviour
         this._projectile.OnHitEnemy += OnHitEnemy;
     }
 
-    private void OnHitEnemy(Projectile bullet, SpeculativeRigidbody body, bool what)
+    private void OnHitEnemy(Projectile bullet, SpeculativeRigidbody body, bool killed)
     {
         if (body.aiActor is AIActor enemy)
             this._jugglernaut?.RegisterEnemyHit(enemy);

@@ -37,16 +37,14 @@ public class BBGun : AdvancedGunBehavior
 
     public override void PostProcessProjectile(Projectile projectile)
     {
-        projectile.baseData.speed = 100 * this._lastCharge;
         base.PostProcessProjectile(projectile);
+        projectile.SetSpeed(100f * this._lastCharge);
     }
 
     protected override void Update()
     {
         base.Update();
-        if (!this.Player)
-            return;
-        if (this.gun.IsCharging)
+        if (this.Player && this.gun.IsCharging)
             this._lastCharge = this.gun.GetChargeFraction();
     }
 }
@@ -65,7 +63,6 @@ public class TheBB : MonoBehaviour
 
     private Projectile _projectile;
     private PlayerController _owner;
-    private float _lifetime = 0f;
     private float _maxSpeed = 0f;
     private float _lastBounceTime = 0f;
 
@@ -106,32 +103,27 @@ public class TheBB : MonoBehaviour
           BBInteractScript);
             mi.doHover = true;
             mi.sprite.SetGlowiness(glowAmount: _BASE_EMISSION, glowColor: Color.magenta);
-        // UnityEngine.Object.Destroy(p.gameObject);
     }
 
     private void Update()
     {
-        float deltatime = BraveTime.DeltaTime;
-        this._lifetime += deltatime;
-        float newSpeed = Mathf.Max(this._projectile.baseData.speed-_BB_SPEED_DECAY*deltatime,0.0001f);
-        this._projectile.SetSpeed(newSpeed);
+        float newSpeed = Mathf.Max(this._projectile.baseData.speed - _BB_SPEED_DECAY * BraveTime.DeltaTime,0.0001f);
 
-        this._projectile.sprite.renderer.material.SetFloat(
-            "_EmissivePower", _BASE_EMISSION+_EXTRA_EMISSION*(newSpeed/_maxSpeed));
-        this._projectile.sprite.renderer.material.SetFloat(
-            "_Cutoff", 0.1f);
+        Material m = this._projectile.sprite.renderer.material;
+        m.SetFloat("_EmissivePower", _BASE_EMISSION + _EXTRA_EMISSION * (newSpeed / _maxSpeed));
+        m.SetFloat("_Cutoff", 0.1f);
 
-        if (newSpeed > 1)
+        if (newSpeed <= 1)
         {
-            this._projectile.baseData.damage = _BB_DAMAGE_SCALE * newSpeed;
-            this._projectile.baseData.force = _BB_FORCE_SCALE * newSpeed;
-            this._projectile.spriteAnimator.ClipFps = Mathf.Min(_BASE_ANIM_SPEED*newSpeed, 60f);
-            Lazy.PlaySoundUntilDeathOrTimeout("bb_rolling", this._projectile.gameObject, 0.1f);
+            this._projectile.DieInAir(suppressInAirEffects: true);
             return;
         }
 
-        this._projectile.DieInAir(suppressInAirEffects: true);
-        return;
+        this._projectile.SetSpeed(newSpeed);
+        this._projectile.baseData.damage        = _BB_DAMAGE_SCALE * newSpeed;
+        this._projectile.baseData.force         = _BB_FORCE_SCALE * newSpeed;
+        this._projectile.spriteAnimator.ClipFps = Mathf.Min(_BASE_ANIM_SPEED * newSpeed, 60f);
+        Lazy.PlaySoundUntilDeathOrTimeout("bb_rolling", this._projectile.gameObject, 0.1f);
     }
 
     public static IEnumerator BBInteractScript(MiniInteractable i, PlayerController p)
