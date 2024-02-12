@@ -55,13 +55,13 @@ public class CustomDodgeRoll : MonoBehaviour, ICustomDodgeRoll
         {
             foreach (CustomDodgeRoll customDodgeRoll in overrides)
                 customDodgeRoll.dodgeButtonHeld = false;
-            return false;
+            return orig(player,direction);
         }
-        instanceForPlayer.ConsumeButtonDown(GungeonActions.GungeonActionType.DodgeRoll);
         if (!player.AcceptingNonMotionInput || player.IsDodgeRolling)
-            return false;
+            return orig(player,direction);
 
         // Begin the dodge roll for all of our custom dodge rolls available
+        // instanceForPlayer.ConsumeButtonDown(GungeonActions.GungeonActionType.DodgeRoll);
         foreach (CustomDodgeRoll customDodgeRoll in overrides)
         {
             if (customDodgeRoll.dodgeButtonHeld)
