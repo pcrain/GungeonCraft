@@ -103,13 +103,13 @@ public class SlappProjectile : MonoBehaviour
         Vector2 victimPos = this._slapVictim.sprite.WorldCenter;
         foreach (AIActor enemy in StaticReferenceManager.AllEnemies)
         {
-            if (!enemy.IsHostileAndNotABoss(canBeNeutral: true))
+            if (enemy.behaviorSpeculator?.ImmuneToStun ?? true)
                 continue;
             if (enemy?.healthHaver is not HealthHaver hh)
                 continue;
             if ((enemy.sprite.WorldCenter - victimPos).magnitude > _SLAPP_RADIUS_SQUARED)
                 continue;
-            enemy.behaviorSpeculator?.Stun(_SLAPPP_STUN);
+            enemy.behaviorSpeculator.Stun(_SLAPPP_STUN);
             hh.ApplyDamage(this._slapDamage, Vector2.zero, "SLAPPP", CoreDamageTypes.None, DamageCategory.Collision, true);
             if (!hh.IsBoss && !hh.IsSubboss)
                 hh.knockbackDoer?.ApplyKnockback(this._slapAngle.ToVector(), _SLAPPP_FORCE);

@@ -49,6 +49,8 @@ public class GorgunEye : PassiveItem
         {
             if (!enemy.IsHostileAndNotABoss())
                 continue; // enemy is not one we should be targeting
+            if (enemy.behaviorSpeculator?.ImmuneToStun ?? true)
+                continue; // enemy cannot be stunned
 
             Vector2 epos  = enemy.sprite.WorldCenter;
             Vector2 delta = epos - ppos;
@@ -73,9 +75,11 @@ public class GorgunEye : PassiveItem
             this._afflictedEnemy?.RemoveEffect(_EFFECT_NAME);
             closestEnemy?.ApplyEffect(_GorgunTint);
             this._afflictedEnemy = closestEnemy;
-            if (closestEnemy)
-                closestEnemy.gameObject.PlayUnique("gorgun_eye_activate");
         }
-        closestEnemy?.behaviorSpeculator?.Stun(_STUN_LINGER_TIME, createVFX: false);
+        if (this._afflictedEnemy)
+        {
+            closestEnemy.gameObject.PlayUnique("gorgun_eye_activate");
+            closestEnemy.behaviorSpeculator.Stun(_STUN_LINGER_TIME, createVFX: false);
+        }
     }
 }
