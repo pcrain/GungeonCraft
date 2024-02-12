@@ -37,6 +37,10 @@ public class CustomDodgeRoll : MonoBehaviour, ICustomDodgeRoll
 
     public static bool CustomDodgeRollHook(Func<PlayerController,Vector2,bool> orig, PlayerController player, Vector2 direction)
     {
+        // Make sure we can actually have all of our movements available (fixes not being able to dodge roll in the Aimless Void)
+        if (player.CurrentInputState != PlayerInputState.AllInput)
+            return orig(player,direction);
+
         // Figure out all of our passives that give us a custom dodge roll
         List<CustomDodgeRoll> overrides = new List<CustomDodgeRoll>();
         foreach (PassiveItem p in player.passiveItems)
