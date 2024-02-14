@@ -36,7 +36,7 @@ public class Vladimir : AdvancedGunBehavior
         ).Attach<VladimirProjectile>(
         );
 
-        _IdleBarrelOffsets   = gun.GetBarrelOffsetsForAnimation(gun.idleAnimation);
+        // _IdleBarrelOffsets   = gun.GetBarrelOffsetsForAnimation(gun.idleAnimation);  //WARNING: this breaks animation loading with trimmed sprites
         _ShootBarrelOffsets  = gun.GetBarrelOffsetsForAnimation(gun.shootAnimation);
         _ChargeBarrelOffsets = gun.GetBarrelOffsetsForAnimation(gun.chargeAnimation);
 
@@ -103,8 +103,8 @@ public class Vladimir : AdvancedGunBehavior
         tk2dSpriteAnimator anim = gun.spriteAnimator;
         if (anim.IsPlaying(gun.shootAnimation))
             gun.barrelOffset.localPosition = _ShootBarrelOffsets[anim.CurrentFrame];
-        else if (anim.IsPlaying(gun.idleAnimation))
-            gun.barrelOffset.localPosition = _IdleBarrelOffsets[anim.CurrentFrame];
+        // else if (anim.IsPlaying(gun.idleAnimation))
+        //     gun.barrelOffset.localPosition = _IdleBarrelOffsets[anim.CurrentFrame];
         else if (anim.IsPlaying(gun.chargeAnimation))
             gun.barrelOffset.localPosition = _ChargeBarrelOffsets[anim.CurrentFrame];
         else
