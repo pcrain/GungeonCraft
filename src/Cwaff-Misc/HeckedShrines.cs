@@ -1,0 +1,147 @@
+namespace CwaffingTheGungy;
+
+public class HeckedShrine : MonoBehaviour, IPlayerInteractable
+{
+    private static HeckedShrine _RetrashedShrine    = null;
+    private static HeckedShrine _LordFortressShrine = null;
+
+    public tk2dBaseSprite       sprite         = null;
+    public SpeculativeRigidbody body           = null;
+    public List<string>         text           = new();
+    public Vector2              positionInRoom = Vector2.zero;
+
+    public static void Init()
+    {
+      _RetrashedShrine    = SetupShrine("retrashed_statue",    new(){"retrashed"},    new Vector2(2f, 1f));
+      _LordFortressShrine = SetupShrine("lordfortress_statue", new(){"lordfortress"}, new Vector2(-2f, 1f));
+
+      CwaffEvents.OnFirstFloorFullyLoaded += SpawnInShrines;
+    }
+
+    internal static HeckedShrine SetupShrine(string spritePath, List<string> flavorText, Vector2 positionInRoom)
+    {
+      GameObject g = VFX.Create(spritePath, 2);
+      HeckedShrine shrine = g.AddComponent<HeckedShrine>();
+
+      shrine.sprite = g.GetComponent<tk2dBaseSprite>();
+      SpeculativeRigidbody body = shrine.body = g.AddComponent<SpeculativeRigidbody>();
+      body.CanBePushed          = true;
+      body.PixelColliders       = new List<PixelCollider>(){new(){
+        ColliderGenerationMode = PixelCollider.PixelColliderGeneration.Manual,
+        ManualOffsetX          = 4,
+        ManualOffsetY          = 4,
+        ManualWidth            = 4,
+        ManualHeight           = 4,
+        CollisionLayer         = CollisionLayer.HighObstacle,
+        Enabled                = true,
+        IsTrigger              = false,
+      }};
+
+      shrine.text           = flavorText;
+      shrine.positionInRoom = positionInRoom;
+
+      return shrine;
+    }
+
+    private static void SpawnInShrines()
+    {
+      GameManager.Instance.StartCoroutine(SpawnInShrines_CR());
+    }
+
+    private static IEnumerator SpawnInShrines_CR()
+    {
+        while (GameManager.Instance.IsLoadingLevel)
+            yield return null;  //wait for level to fully load
+
+        Vector3 v3          = Vector3.zero;
+        bool found          = false;
+        PlayerController p1 = GameManager.Instance.BestActivePlayer;
+        foreach (AdvancedShrineController a in StaticReferenceManager.AllAdvancedShrineControllers)
+        {
+            if (a.IsLegendaryHeroShrine)
+            {
+                found = true;
+                v3 = a.transform.position + (new Vector2(a.sprite.GetCurrentSpriteDef().position3.x/2,-3f)).ToVector3ZisY(0);
+            }
+        }
+        if (!found)
+        {
+          ETGModConsole.Log($"failed to find hero shrine");
+          yield break;
+        }
+
+      SpawnIn(_RetrashedShrine, v3);
+      SpawnIn(_LordFortressShrine, v3);
+    }
+
+    private static void SpawnIn(HeckedShrine shrinePrefab, Vector3 heroShrinePos)
+    {
+      HeckedShrine shrine = shrinePrefab.gameObject.Instantiate(heroShrinePos + shrinePrefab.positionInRoom.ToVector3ZisY()).GetComponent<HeckedShrine>();
+      heroShrinePos.GetAbsoluteRoom().RegisterInteractable(shrine.GetComponent<IPlayerInteractable>());
+    }
+
+    private void Update()
+    {
+      this.sprite.SetGlowiness(10f * Mathf.Abs(Mathf.Sin(10f * BraveTime.ScaledTimeSinceStartup)));
+    }
+
+    public void Interact(PlayerController interactor)
+    {
+      interactor.CurrentRoom.DeregisterInteractable(this);
+      StartCoroutine(InteractWithShrine(interactor));
+    }
+
+    private IEnumerator InteractWithShrine(PlayerController interactor)
+    {
+      Transform talkPoint = base.transform;
+      TextBoxManager.ShowStoneTablet(base.transform.position, talkPoint, -1f, this.text[0]);
+      interactor.SetInputOverride("shrineConversation");
+      yield return null;
+
+      GameUIRoot.Instance.DisplayPlayerConversationOptions(interactor, null, "cool O:", string.Empty);
+      while (!GameUIRoot.Instance.GetPlayerConversationResponse(out int selectedResponse))
+        yield return null;
+
+      interactor.ClearInputOverride("shrineConversation");
+      TextBoxManager.ClearTextBox(talkPoint);
+      base.transform.position.GetAbsoluteRoom().RegisterInteractable(base.GetComponent<IPlayerInteractable>());
+      yield break;
+    }
+
+    public void OnEnteredRange(PlayerController interactor)
+    {
+      if (!this)
+        return;
+      SpriteOutlineManager.RemoveOutlineFromSprite(this.sprite);
+      SpriteOutlineManager.AddOutlineToSprite(this.sprite, Color.white, 0.01f, 0.005f);
+    }
+
+    public void OnExitRange(PlayerController interactor)
+    {
+      if (!this)
+        return;
+      SpriteOutlineManager.RemoveOutlineFromSprite(this.sprite);
+      SpriteOutlineManager.AddOutlineToSprite(this.sprite, Color.black, 0.01f, 0.005f);
+    }
+
+    public float GetDistanceToPoint(Vector2 point)
+    {
+      if (!this)
+        return 1000f;
+      if (this.sprite == null)
+        return 100f;
+      Vector3 v = BraveMathCollege.ClosestPointOnRectangle(point, this.body.UnitBottomLeft, this.body.UnitDimensions);
+      return Vector2.Distance(point, v) / 1.5f;
+    }
+
+    public float GetOverrideMaxDistance()
+    {
+      return -1f;
+    }
+
+    public string GetAnimationState(PlayerController interactor, out bool shouldBeFlipped)
+    {
+      shouldBeFlipped = false;
+      return string.Empty;
+    }
+}

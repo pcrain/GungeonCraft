@@ -212,6 +212,7 @@
     <Compile Include="src\Databases.cs"/>
     <Compile Include="src\SharedItemBehaviors.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffPrerequisite.cs"/>
+    <Compile Include="src\Cwaff-Misc\HeckedShrines.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffTweaks.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffSynergies.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffEvents.cs"/>
@@ -240,6 +241,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_3_gun_016.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\deadline_reload_019.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_023.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\vladimir_idle_trimmed_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\wavefront_idle_trimmed_002.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\subtractor_beam_reload_015.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_028.png"/>
@@ -1791,6 +1793,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\pincushion_reload_039.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_3_gun_013.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\schrodingers_gat_idle_trimmed_005.png"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\blamethrower_idle_trimmed_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\racket_launcher_fire_004.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\b_b_gun_charge_018.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\seltzer_pelter_reload_b_009.png"/>
@@ -1829,6 +1832,7 @@
     <EmbeddedResource Include="Resources\WeaponCollection\wavefront_fire_006.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\missiletoe_fire_011.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\gunbrella_charge_011.json"/>
+    <EmbeddedResource Include="Resources\WeaponCollection\suncaster_idle_trimmed_001.png"/>
     <EmbeddedResource Include="Resources\WeaponCollection\jugglernaut_5_gun_008.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\ki_blast_idle_003.json"/>
     <EmbeddedResource Include="Resources\WeaponCollection\crapshooter_reload_031.json"/>
@@ -3878,6 +3882,8 @@
     <EmbeddedResource Include="Resources\ObjectSprites\gifts\green_gift_wrap_001.png"/>
     <EmbeddedResource Include="Resources\ObjectSprites\gifts\red_gift_wrap_007.png"/>
     <EmbeddedResource Include="Resources\ObjectSprites\gifts\black_gift_wrap_010.png"/>
+    <EmbeddedResource Include="Resources\ObjectSprites\tribute_statues\retrashed_statue.png"/>
+    <EmbeddedResource Include="Resources\ObjectSprites\tribute_statues\lordfortress_statue.png"/>
     <EmbeddedResource Include="Resources\UISprites\prism_ui_icon.png"/>
     <EmbeddedResource Include="Resources\UISprites\glockarina_time_ui_icon.png"/>
     <EmbeddedResource Include="Resources\UISprites\barter_c_icon.png"/>
