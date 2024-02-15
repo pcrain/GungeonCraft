@@ -3882,8 +3882,11 @@
     <EmbeddedResource Include="Resources\ObjectSprites\gifts\green_gift_wrap_001.png"/>
     <EmbeddedResource Include="Resources\ObjectSprites\gifts\red_gift_wrap_007.png"/>
     <EmbeddedResource Include="Resources\ObjectSprites\gifts\black_gift_wrap_010.png"/>
+    <EmbeddedResource Include="Resources\ObjectSprites\tribute_statues\retrashed_statue_older.png"/>
+    <EmbeddedResource Include="Resources\ObjectSprites\tribute_statues\lordfortress_statue_old.png"/>
     <EmbeddedResource Include="Resources\ObjectSprites\tribute_statues\retrashed_statue.png"/>
     <EmbeddedResource Include="Resources\ObjectSprites\tribute_statues\lordfortress_statue.png"/>
+    <EmbeddedResource Include="Resources\ObjectSprites\tribute_statues\retrashed_statue_old.png"/>
     <EmbeddedResource Include="Resources\UISprites\prism_ui_icon.png"/>
     <EmbeddedResource Include="Resources\UISprites\glockarina_time_ui_icon.png"/>
     <EmbeddedResource Include="Resources\UISprites\barter_c_icon.png"/>

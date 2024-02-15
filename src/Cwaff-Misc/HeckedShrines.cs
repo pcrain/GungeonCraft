@@ -5,29 +5,31 @@ public class HeckedShrine : MonoBehaviour, IPlayerInteractable
     const Anchor SHRINE_ANCHOR = Anchor.LowerCenter;
 
     private static HeckedShrine _RetrashedShrine    = null;
-    private static HeckedShrine _LordFortressShrine = null;
+    private static HeckedShrine _LordfortressShrine = null;
 
     public tk2dBaseSprite       sprite         = null;
     public SpeculativeRigidbody body           = null;
     public string               text           = "";
+    public bool                 fancy          = false;
     public Vector2              positionInRoom = Vector2.zero;
 
     public static void Init()
     {
-      _RetrashedShrine    = SetupShrine("retrashed_statue",    _RetrashedText,    new Vector2( 4f, 3f));
-      _LordFortressShrine = SetupShrine("lordfortress_statue", _LordFortressText, new Vector2(-4f, 3f));
+      _RetrashedShrine    = SetupShrine("retrashed_statue",    _RetrashedText,    new Vector2( 4f, 3f), fancy: true);
+      _LordfortressShrine = SetupShrine("lordfortress_statue", _LordfortressText, new Vector2( 6f, 3f), fancy: false);
 
       CwaffEvents.OnFirstFloorFullyLoaded += SpawnInShrines;
     }
 
-    internal static HeckedShrine SetupShrine(string spritePath, string flavorText, Vector2 positionInRoom)
+    internal static HeckedShrine SetupShrine(string spritePath, string flavorText, Vector2 positionInRoom, bool fancy)
     {
-      GameObject g        = VFX.Create(spritePath, 2, scale: 2.0f, anchor: SHRINE_ANCHOR);
+      GameObject g        = VFX.Create(spritePath, 2, scale: fancy ? 2.0f : 1.0f, anchor: SHRINE_ANCHOR);
       HeckedShrine shrine = g.AddComponent<HeckedShrine>();
         shrine.body           = null; // defer setup until spawn time so we can account for sprite flipping
         shrine.sprite         = g.GetComponent<tk2dBaseSprite>();
         shrine.text           = flavorText;
         shrine.positionInRoom = positionInRoom;
+        shrine.fancy          = fancy;
       return shrine;
     }
 
@@ -59,32 +61,27 @@ public class HeckedShrine : MonoBehaviour, IPlayerInteractable
         }
 
       SpawnIn(_RetrashedShrine, v3);
-      SpawnIn(_LordFortressShrine, v3);
+      SpawnIn(_LordfortressShrine, v3);
     }
 
     private static void SpawnIn(HeckedShrine shrinePrefab, Vector3 heroShrinePos)
     {
       HeckedShrine shrine = shrinePrefab.gameObject.Instantiate(heroShrinePos + shrinePrefab.positionInRoom.ToVector3ZisY()).GetComponent<HeckedShrine>();
       heroShrinePos.GetAbsoluteRoom().RegisterInteractable(shrine.GetComponent<IPlayerInteractable>());
-      // Material m = shrine.gameObject.GetOrAddShader(Shader.Find("Brave/Internal/GlitterPassAdditive"));
-      // Material m = shrine.gameObject.GetOrAddShader(Shader.Find("Brave/Effects/InterdimensionalHorrorPortal"));
-      Material m = shrine.gameObject.GetOrAddShader(Shader.Find("Brave/GoopShader"));
-      // m.SetColor("_OverrideColor", Color.yellow);
-      // m.SetFloat("_Period", 1.0f);
-      // m.SetFloat("_PixelWidth", 5.0f);
-      // m.SetFloat("_Perpendicular", 0f);
+      if (shrine.fancy)
+        shrine.sprite.SetGlowiness(100f);
 
-      // shrine.sprite.transform.localScale = shrine.sprite.transform.localScale.WithX(-1f);
-      shrine.sprite.FlipX = shrinePrefab.positionInRoom.x < 0;
+      shrine.body                   = shrine.gameObject.AutoRigidBody(anchor: SHRINE_ANCHOR/*, canBePushed: true*/);
+      shrine.sprite.FlipX           = shrinePrefab.positionInRoom.x < 0;
       shrine.sprite.HeightOffGround = -2f;
       shrine.sprite.UpdateZDepth();
-      shrine.body         = shrine.gameObject.AutoRigidBody(anchor: SHRINE_ANCHOR/*, canBePushed: true*/);
       SpriteOutlineManager.AddOutlineToSprite(shrine.sprite, Color.black, 1f, 0.005f);
     }
 
     private void Update()
     {
-      // this.sprite.SetGlowiness(10f + 100f * Mathf.Abs(Mathf.Sin(3f * BraveTime.ScaledTimeSinceStartup)));
+      if (this.fancy)
+        this.sprite.SetGlowiness(50f + 50f * Mathf.Abs(Mathf.Sin(0.75f * BraveTime.ScaledTimeSinceStartup)));
     }
 
     public void Interact(PlayerController interactor)
@@ -100,7 +97,7 @@ public class HeckedShrine : MonoBehaviour, IPlayerInteractable
       interactor.SetInputOverride("shrineConversation");
       yield return null;
 
-      GameUIRoot.Instance.DisplayPlayerConversationOptions(interactor, null, "cool O:", string.Empty);
+      GameUIRoot.Instance.DisplayPlayerConversationOptions(interactor, null, "Cool. O:", string.Empty);
       while (!GameUIRoot.Instance.GetPlayerConversationResponse(out int selectedResponse))
         yield return null;
 
@@ -150,21 +147,15 @@ public class HeckedShrine : MonoBehaviour, IPlayerInteractable
 
     private static string _RetrashedText =
 """
-hello there
-  how's it going
+A monument to Retrashed, Challenger to Kaliber. The inscription reads:
 
-    pretty good eh?
-
-~ pat
+Skill Beyond This World
+Even Seven Hundred Guns
+{wj}COULD NOT SAVE THE LICH{w}
 """;
 
-    private static string _LordFortressText =
+    private static string _LordfortressText =
 """
-hello there
-  how's it going
-
-    pretty good eh?
-
-~ pat
+A monument to Lordfortress, first to defeat the Dragun while persevering the trials of the Hecked.
 """;
 }
