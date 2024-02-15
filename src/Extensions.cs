@@ -1480,4 +1480,31 @@ public static class Extensions
   /// <summary>Return a position near a position that bobs up and down relative to the scaled time since startup (Vector3 version)</summary>
   public static Vector3 HoverAt(this Vector3 pos, float amplitude = 1f, float frequency = 6.28f, float offset = 0.0f, float phase = 0.0f)
     => pos.XY().HoverAt(amplitude: amplitude, frequency: frequency, offset: offset, phase: phase).ToVector3ZisY();
+
+  /// <summary>Set up a SpeculativeRigidBody for a VFX sprite based on the sprite's dimensions, FlipX status, and Anchor</summary>
+  public static SpeculativeRigidbody AutoRigidBody(this GameObject g, Anchor anchor, bool canBePushed = false)
+  {
+    SpeculativeRigidbody body = g.AddComponent<SpeculativeRigidbody>();
+
+    tk2dBaseSprite sprite     = g.GetComponent<tk2dBaseSprite>();
+    IntVector2 spriteSize     = (C.PIXELS_PER_TILE * sprite.GetBounds().size.XY()).ToIntVector2();
+    IntVector2 rawOffsets     = tk2dSpriteGeomGen.GetAnchorOffset(anchor, spriteSize.x, spriteSize.y).ToIntVector2();
+    IntVector2 spriteOffsets = rawOffsets - spriteSize;
+    if (!sprite.FlipX)  // NOTE: VFX sprites are set up by default with a LowerCenter anchor, so these shenanigans are necessary to get the body right
+      spriteOffsets = spriteOffsets.WithX(-rawOffsets.x);
+    body.PixelColliders       = new List<PixelCollider>(){new(){
+      ColliderGenerationMode = PixelCollider.PixelColliderGeneration.Manual,
+      ManualOffsetX          = spriteOffsets.x,
+      ManualOffsetY          = spriteOffsets.y,
+      ManualWidth            = spriteSize.x,
+      ManualHeight           = spriteSize.y,
+      CollisionLayer         = CollisionLayer.HighObstacle,
+      Enabled                = true,
+      IsTrigger              = false,
+    }};
+    body.CanBePushed = canBePushed;
+
+    return body;
+  }
+
 }

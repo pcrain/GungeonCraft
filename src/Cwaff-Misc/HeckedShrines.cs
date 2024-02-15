@@ -12,34 +12,23 @@ public class HeckedShrine : MonoBehaviour, IPlayerInteractable
 
     public static void Init()
     {
-      _RetrashedShrine    = SetupShrine("retrashed_statue",    new(){"retrashed"},    new Vector2(2f, 1f));
-      _LordFortressShrine = SetupShrine("lordfortress_statue", new(){"lordfortress"}, new Vector2(-2f, 1f));
+      _RetrashedShrine    = SetupShrine("retrashed_statue",    new(){"retrashed"},    new Vector2( 4f, 3f));
+      _LordFortressShrine = SetupShrine("lordfortress_statue", new(){"lordfortress"}, new Vector2(-4f, 3f));
 
-      // CwaffEvents.OnFirstFloorFullyLoaded += SpawnInShrines;
+      CwaffEvents.OnFirstFloorFullyLoaded += SpawnInShrines;
     }
 
+    const Anchor SHRINE_ANCHOR = Anchor.LowerCenter;
+    // const Anchor SHRINE_ANCHOR = Anchor.UpperLeft;
+    // const Anchor SHRINE_ANCHOR = Anchor.LowerRight;
     internal static HeckedShrine SetupShrine(string spritePath, List<string> flavorText, Vector2 positionInRoom)
     {
-      GameObject g = VFX.Create(spritePath, 2);
+      GameObject g        = VFX.Create(spritePath, 2, scale: 2.0f, anchor: SHRINE_ANCHOR);
       HeckedShrine shrine = g.AddComponent<HeckedShrine>();
-
-      shrine.sprite = g.GetComponent<tk2dBaseSprite>();
-      SpeculativeRigidbody body = shrine.body = g.AddComponent<SpeculativeRigidbody>();
-      body.CanBePushed          = true;
-      body.PixelColliders       = new List<PixelCollider>(){new(){
-        ColliderGenerationMode = PixelCollider.PixelColliderGeneration.Manual,
-        ManualOffsetX          = 4,
-        ManualOffsetY          = 4,
-        ManualWidth            = 4,
-        ManualHeight           = 4,
-        CollisionLayer         = CollisionLayer.HighObstacle,
-        Enabled                = true,
-        IsTrigger              = false,
-      }};
-
-      shrine.text           = flavorText;
-      shrine.positionInRoom = positionInRoom;
-
+        shrine.body           = null; // defer setup until spawn time so we can account for sprite flipping
+        shrine.sprite         = g.GetComponent<tk2dBaseSprite>();
+        shrine.text           = flavorText;
+        shrine.positionInRoom = positionInRoom;
       return shrine;
     }
 
@@ -85,8 +74,10 @@ public class HeckedShrine : MonoBehaviour, IPlayerInteractable
       // m.SetFloat("_Period", 1.0f);
       // m.SetFloat("_PixelWidth", 5.0f);
       // m.SetFloat("_Perpendicular", 0f);
+
       // shrine.sprite.transform.localScale = shrine.sprite.transform.localScale.WithX(-1f);
-      shrine.sprite.FlipX = true;
+      shrine.sprite.FlipX = shrinePrefab.positionInRoom.x < 0;
+      shrine.body         = shrine.gameObject.AutoRigidBody(anchor: SHRINE_ANCHOR, canBePushed: true);
     }
 
     private void Update()
