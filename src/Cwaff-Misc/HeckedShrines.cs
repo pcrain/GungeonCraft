@@ -2,26 +2,25 @@ namespace CwaffingTheGungy;
 
 public class HeckedShrine : MonoBehaviour, IPlayerInteractable
 {
+    const Anchor SHRINE_ANCHOR = Anchor.LowerCenter;
+
     private static HeckedShrine _RetrashedShrine    = null;
     private static HeckedShrine _LordFortressShrine = null;
 
     public tk2dBaseSprite       sprite         = null;
     public SpeculativeRigidbody body           = null;
-    public List<string>         text           = new();
+    public string               text           = "";
     public Vector2              positionInRoom = Vector2.zero;
 
     public static void Init()
     {
-      _RetrashedShrine    = SetupShrine("retrashed_statue",    new(){"retrashed"},    new Vector2( 4f, 3f));
-      _LordFortressShrine = SetupShrine("lordfortress_statue", new(){"lordfortress"}, new Vector2(-4f, 3f));
+      _RetrashedShrine    = SetupShrine("retrashed_statue",    _RetrashedText,    new Vector2( 4f, 3f));
+      _LordFortressShrine = SetupShrine("lordfortress_statue", _LordFortressText, new Vector2(-4f, 3f));
 
       CwaffEvents.OnFirstFloorFullyLoaded += SpawnInShrines;
     }
 
-    const Anchor SHRINE_ANCHOR = Anchor.LowerCenter;
-    // const Anchor SHRINE_ANCHOR = Anchor.UpperLeft;
-    // const Anchor SHRINE_ANCHOR = Anchor.LowerRight;
-    internal static HeckedShrine SetupShrine(string spritePath, List<string> flavorText, Vector2 positionInRoom)
+    internal static HeckedShrine SetupShrine(string spritePath, string flavorText, Vector2 positionInRoom)
     {
       GameObject g        = VFX.Create(spritePath, 2, scale: 2.0f, anchor: SHRINE_ANCHOR);
       HeckedShrine shrine = g.AddComponent<HeckedShrine>();
@@ -77,7 +76,10 @@ public class HeckedShrine : MonoBehaviour, IPlayerInteractable
 
       // shrine.sprite.transform.localScale = shrine.sprite.transform.localScale.WithX(-1f);
       shrine.sprite.FlipX = shrinePrefab.positionInRoom.x < 0;
-      shrine.body         = shrine.gameObject.AutoRigidBody(anchor: SHRINE_ANCHOR, canBePushed: true);
+      shrine.sprite.HeightOffGround = -2f;
+      shrine.sprite.UpdateZDepth();
+      shrine.body         = shrine.gameObject.AutoRigidBody(anchor: SHRINE_ANCHOR/*, canBePushed: true*/);
+      SpriteOutlineManager.AddOutlineToSprite(shrine.sprite, Color.black, 1f, 0.005f);
     }
 
     private void Update()
@@ -94,7 +96,7 @@ public class HeckedShrine : MonoBehaviour, IPlayerInteractable
     private IEnumerator InteractWithShrine(PlayerController interactor)
     {
       Transform talkPoint = base.transform;
-      TextBoxManager.ShowStoneTablet(base.transform.position, talkPoint, -1f, this.text[0]);
+      TextBoxManager.ShowStoneTablet(this.sprite.WorldTopCenter, talkPoint, -1f, this.text);
       interactor.SetInputOverride("shrineConversation");
       yield return null;
 
@@ -113,7 +115,7 @@ public class HeckedShrine : MonoBehaviour, IPlayerInteractable
       if (!this)
         return;
       SpriteOutlineManager.RemoveOutlineFromSprite(this.sprite);
-      SpriteOutlineManager.AddOutlineToSprite(this.sprite, Color.white, 0.01f, 0.005f);
+      SpriteOutlineManager.AddOutlineToSprite(this.sprite, Color.white, 1f, 0.005f);
     }
 
     public void OnExitRange(PlayerController interactor)
@@ -121,7 +123,7 @@ public class HeckedShrine : MonoBehaviour, IPlayerInteractable
       if (!this)
         return;
       SpriteOutlineManager.RemoveOutlineFromSprite(this.sprite);
-      SpriteOutlineManager.AddOutlineToSprite(this.sprite, Color.black, 0.01f, 0.005f);
+      SpriteOutlineManager.AddOutlineToSprite(this.sprite, Color.black, 1f, 0.005f);
     }
 
     public float GetDistanceToPoint(Vector2 point)
@@ -144,4 +146,25 @@ public class HeckedShrine : MonoBehaviour, IPlayerInteractable
       shouldBeFlipped = false;
       return string.Empty;
     }
+
+
+    private static string _RetrashedText =
+"""
+hello there
+  how's it going
+
+    pretty good eh?
+
+~ pat
+""";
+
+    private static string _LordFortressText =
+"""
+hello there
+  how's it going
+
+    pretty good eh?
+
+~ pat
+""";
 }
