@@ -15,7 +15,7 @@ public class HeckedShrine : MonoBehaviour, IPlayerInteractable
       _RetrashedShrine    = SetupShrine("retrashed_statue",    new(){"retrashed"},    new Vector2(2f, 1f));
       _LordFortressShrine = SetupShrine("lordfortress_statue", new(){"lordfortress"}, new Vector2(-2f, 1f));
 
-      CwaffEvents.OnFirstFloorFullyLoaded += SpawnInShrines;
+      // CwaffEvents.OnFirstFloorFullyLoaded += SpawnInShrines;
     }
 
     internal static HeckedShrine SetupShrine(string spritePath, List<string> flavorText, Vector2 positionInRoom)
@@ -78,11 +78,20 @@ public class HeckedShrine : MonoBehaviour, IPlayerInteractable
     {
       HeckedShrine shrine = shrinePrefab.gameObject.Instantiate(heroShrinePos + shrinePrefab.positionInRoom.ToVector3ZisY()).GetComponent<HeckedShrine>();
       heroShrinePos.GetAbsoluteRoom().RegisterInteractable(shrine.GetComponent<IPlayerInteractable>());
+      // Material m = shrine.gameObject.GetOrAddShader(Shader.Find("Brave/Internal/GlitterPassAdditive"));
+      // Material m = shrine.gameObject.GetOrAddShader(Shader.Find("Brave/Effects/InterdimensionalHorrorPortal"));
+      Material m = shrine.gameObject.GetOrAddShader(Shader.Find("Brave/GoopShader"));
+      // m.SetColor("_OverrideColor", Color.yellow);
+      // m.SetFloat("_Period", 1.0f);
+      // m.SetFloat("_PixelWidth", 5.0f);
+      // m.SetFloat("_Perpendicular", 0f);
+      // shrine.sprite.transform.localScale = shrine.sprite.transform.localScale.WithX(-1f);
+      shrine.sprite.FlipX = true;
     }
 
     private void Update()
     {
-      this.sprite.SetGlowiness(10f * Mathf.Abs(Mathf.Sin(10f * BraveTime.ScaledTimeSinceStartup)));
+      // this.sprite.SetGlowiness(10f + 100f * Mathf.Abs(Mathf.Sin(3f * BraveTime.ScaledTimeSinceStartup)));
     }
 
     public void Interact(PlayerController interactor)

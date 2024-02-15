@@ -530,6 +530,29 @@ public static class HeckedMode
         };
     }
 
+    private static void ShowAllBehaviors(this AIActor enemy)
+    {
+        if (!C.DEBUG_BUILD)
+            return; // don't print stuff when not in debug mode
+
+        ETGModConsole.Log($"showing behaviors for {enemy.ActorName}");
+        if (enemy.behaviorSpeculator is not BehaviorSpeculator bs)
+        {
+            ETGModConsole.Log($"  no behaviorspeculator");
+            return;
+        }
+
+        foreach (BehaviorBase bb in bs.TargetBehaviors.EmptyIfNull())
+            ETGModConsole.Log($"  target: {bb.GetType().Name}");
+        foreach (BehaviorBase bb in bs.MovementBehaviors.EmptyIfNull())
+            ETGModConsole.Log($"  movement: {bb.GetType().Name}");
+        foreach (BehaviorBase bb in bs.AttackBehaviors.EmptyIfNull())
+            ETGModConsole.Log($"  attack: {bb.GetType().Name}");
+        foreach (BehaviorBase bb in bs.OtherBehaviors.EmptyIfNull())
+            ETGModConsole.Log($"  other: {bb.GetType().Name}");
+        foreach (BehaviorBase bb in bs.OverrideBehaviors.EmptyIfNull())
+            ETGModConsole.Log($"  override: {bb.GetType().Name}");
+    }
 
     private static AIActor _BulletKin = null;
     public static void HeckedShootGunBehavior(this AIActor enemy, Gun replacementGun)
@@ -549,19 +572,35 @@ public static class HeckedMode
             shooter.customShootCooldownPeriod = 0f;
             shooter.bulletName = null;
 
-            if ((shooter.behaviorSpeculator.TargetBehaviors?.Count ?? 0) == 0)
+            // enemy.ShowAllBehaviors();
+
+            shooter.behaviorSpeculator.TargetBehaviors ??= new();
+            // foreach (BehaviorBase tb in shooter.behaviorSpeculator.OtherBehaviors)
+            //     ETGModConsole.Log($"behavior: {tb.GetType().Name}");
+            if (shooter.behaviorSpeculator.TargetBehaviors.Count == 0)
             {
                 shooter.RegenerateCache();
-                TargetEnemiesBehavior targetEnemies = new TargetEnemiesBehavior{};
-                shooter.behaviorSpeculator.TargetBehaviors = new(){targetEnemies};
-                targetEnemies.Init(enemy.gameObject, enemy, shooter);
-                targetEnemies.Start();
-                shooter.behaviorSpeculator.m_behaviors.Add(targetEnemies);
+                if (enemy.GetComponent<CompanionController>())
+                {
+                    TargetPlayerBehavior targetPlayerButActuallyEnemies = new TargetPlayerBehavior{};  // why does this target enemies???
+                    shooter.behaviorSpeculator.TargetBehaviors.Add(targetPlayerButActuallyEnemies);
+                    targetPlayerButActuallyEnemies.Init(enemy.gameObject, enemy, shooter);
+                    targetPlayerButActuallyEnemies.Start();
+                    shooter.behaviorSpeculator.m_behaviors.Add(targetPlayerButActuallyEnemies);
+                }
+                else
+                {
+                    TargetEnemiesBehavior targetEnemies = new TargetEnemiesBehavior{};  // why does this target players???
+                    shooter.behaviorSpeculator.TargetBehaviors.Add(targetEnemies);
+                    targetEnemies.Init(enemy.gameObject, enemy, shooter);
+                    targetEnemies.Start();
+                    shooter.behaviorSpeculator.m_behaviors.Add(targetEnemies);
+                }
                 shooter.RegenerateCache();
             }
             // foreach (AttackBehaviorBase myAttack in shooter.behaviorSpeculator.AttackBehaviors)
             //     shooter.behaviorSpeculator.m_behaviors.Remove(myAttack);
-            // shooter.behaviorSpeculator.AttackBehaviors.Clear();
+            shooter.behaviorSpeculator.AttackBehaviors ??= new();
             foreach (AttackBehaviorBase defaultAttack in _BulletKin.aiShooter.behaviorSpeculator.AttackBehaviors)
             {
                 if (defaultAttack is not ShootGunBehavior defaultPewpew)
@@ -572,14 +611,21 @@ public static class HeckedMode
                 myPewpew.Init(enemy.gameObject, enemy, shooter);
                 myPewpew.Start();
                 shooter.behaviorSpeculator.m_behaviors.Add(myPewpew);
+                shooter.RegenerateCache();
                 break;
             }
+
+            // shooter.behaviorSpeculator.OtherBehaviors ??= new();
+            // shooter.behaviorSpeculator.OtherBehaviors.Clear(); // little guy o7
 
             shooter.RegenerateCache();
             shooter.behaviorSpeculator.aiActor = enemy;
             foreach (MovementBehaviorBase move in shooter.behaviorSpeculator.MovementBehaviors)
                 move.m_aiActor = enemy;
             shooter.RegenerateCache();
+
+            // enemy.ShowAllBehaviors();
+
             // shooter.behaviorSpeculator./*Fully*/RefreshBehaviors();
             // shooter.RegenerateCache();
         }
