@@ -10,11 +10,28 @@ namespace CwaffingTheGungy;
     - fix beam weapons to not persist when restarting
     - fix burst weapons to fire more than one shot
     - fix audio on all noisy weapons to stop playing when appropriate
+
+   Retrashed Mode Changes:
+    - no easy guns
+
+    ? shopkeepers have guns
+
+    + all bosses are jammed
+    + everyone has guns
+    + no bullet that can kill the future
+    + every chest is fused
+    + stealth doesn't work
 */
 
 public static class HeckedMode
 {
-    public static bool HeckedModeEnabled = false; // the world is almost ready o.o
+    public enum Hecked {
+        Disabled,
+        Classic,
+        Retrashed,
+    }
+
+    internal static Hecked _HeckedModeStatus = Hecked.Disabled;
 
     // public readonly static List<int> HeckedModeGunWhiteList = new(){
     // };
@@ -275,6 +292,10 @@ public static class HeckedMode
     private static ILHook _DisablePrefireAnimationHook;
     private static ILHook _DisablePrefireStateHook;
     private static Hook _InitializeShootHook;
+    private static ILHook _FusedChestHook;
+    private static ILHook _NoStealthForYouHook;
+    private static Hook _GetActivePlayerClosestToPointHook;
+    private static ILHook _ForceJammedBossesHook;
 
     internal static readonly string _CONFIG_KEY = "Hecked Mode";
 
@@ -294,6 +315,18 @@ public static class HeckedMode
         _InitializeShootHook = new Hook(
             typeof(AIShooter).GetMethod("Initialize", BindingFlags.Public | BindingFlags.Instance),
             typeof(HeckedMode).GetMethod("OnInitializeShooter"));
+        _FusedChestHook = new ILHook(
+            typeof(Chest).GetMethod("RoomEntered", BindingFlags.NonPublic | BindingFlags.Instance),
+            FusedChestHookIL);
+        _NoStealthForYouHook = new ILHook(
+            typeof(TargetPlayerBehavior).GetMethod("Update", BindingFlags.Public | BindingFlags.Instance),
+            NoStealthForYouIL);
+        _GetActivePlayerClosestToPointHook = new Hook(
+            typeof(GameManager).GetMethod("GetActivePlayerClosestToPoint", BindingFlags.Public | BindingFlags.Instance),
+            typeof(HeckedMode).GetMethod("OnGetActivePlayerClosestToPoint", BindingFlags.NonPublic | BindingFlags.Static));
+        _ForceJammedBossesHook = new ILHook(
+            typeof(AIActor).GetMethod("CheckForBlackPhantomness", BindingFlags.NonPublic | BindingFlags.Instance),
+            _ForceJammedBossesIL);
 
         new Hook(
             typeof(AIShooter).GetMethod("ToggleGunRenderers", BindingFlags.Public | BindingFlags.Instance),
@@ -303,10 +336,17 @@ public static class HeckedMode
         //     typeof(AIShooter).GetMethod("Shoot", BindingFlags.Public | BindingFlags.Instance),
         //     typeof(HeckedMode).GetMethod("OnEnemyShoot"));
 
-        CwaffEvents.BeforeRunStart += () => {  // load hecked mode status before the start of each run
-            HeckedModeEnabled = (CwaffConfig._Gunfig.Value(_CONFIG_KEY) != "Disabled");
-            // if (C.DEBUG_BUILD)
-            //     ETGModConsole.Log($"  hecked mode status: {CwaffConfig._Gunfig.Value(_CONFIG_KEY)}");
+        CwaffEvents.BeforeRunStart += SetupHeckedMode;  // load hecked mode status before the start of each run
+    }
+
+    private static void SetupHeckedMode()
+    {
+        string heckedConfig = CwaffConfig._Gunfig.Value(_CONFIG_KEY);
+        _HeckedModeStatus = heckedConfig switch {
+            "Disabled"  => Hecked.Disabled,
+            "Hecked"    => Hecked.Classic,
+            "Retrashed" => Hecked.Retrashed,
+            _           => Hecked.Disabled,
         };
     }
 
@@ -328,12 +368,12 @@ public static class HeckedMode
     // disable prefire animations in hecked mode since they mess with fire rate
     private static bool HeckedModeShouldSkipPrefireAnimationCheck(ShootGunBehavior sgb, string s)
     {
-        return HeckedModeEnabled || string.IsNullOrEmpty(s);
+        return (_HeckedModeStatus != Hecked.Disabled) || string.IsNullOrEmpty(s);
     }
 
     private static bool HeckedModeShouldSkipPrefireStateCheck(bool wouldSkipAnyway)
     {
-        return HeckedModeEnabled || wouldSkipAnyway;
+        return (_HeckedModeStatus != Hecked.Disabled) || wouldSkipAnyway;
     }
 
     private static void DisablePrefireStateDuringHeckedModeIL(ILContext il)
@@ -359,7 +399,7 @@ public static class HeckedMode
 
     public static void OnEnemyPreAwake(Action<AIActor> action, AIActor enemy)
     {
-        if (HeckedModeEnabled && !enemy.IsABoss())
+        if ((_HeckedModeStatus != Hecked.Disabled) && !enemy.IsABoss())
         {
             Items replacementGunId = (Items)HeckedModeGunWhiteList.ChooseRandom();
             enemy.HeckedShootGunBehavior(ItemHelper.Get(replacementGunId) as Gun);
@@ -386,6 +426,68 @@ public static class HeckedMode
             gun.OnReloadPressed -= sorp.HandleReloadPressed;
             sorp.SafeDestroy();
         }
+    }
+
+    // private static bool OnRandomShouldBecomeMimic(Func<SharedDungeonSettings, float, bool> orig, SharedDungeonSettings sds, float overrideChance)
+    // {
+    //     if (HeckedModeStatus == Hecked.Retrashed)
+    //         return orig(sds, 1.0f); // 100% of chests should be mimics in retrashed mode
+    //     return orig(sds, overrideChance);
+    // }
+
+    private static void FusedChestHookIL(ILContext il)
+    {
+        ILCursor cursor = new ILCursor(il);
+        if (!cursor.TryGotoNext(MoveType.After,
+          instr => instr.MatchCall<UnityEngine.Random>("get_value"),
+          instr => instr.MatchLdloc(0)
+          ))
+            return; // couldn't find the appropriate hook
+
+        cursor.Emit(OpCodes.Call,
+            typeof(HeckedMode).GetMethod("AdjustHeckedFuseTimers", BindingFlags.Static | BindingFlags.NonPublic));
+    }
+
+    private static float AdjustHeckedFuseTimers(float original)
+    {
+        return (_HeckedModeStatus == Hecked.Retrashed) ? 1f : original;
+    }
+
+    private static void NoStealthForYouIL(ILContext il)
+    {
+        ILCursor cursor = new ILCursor(il);
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<GameActor>("get_IsStealthed")))
+            return; // couldn't find the appropriate hook
+
+        cursor.Emit(OpCodes.Call,
+            typeof(HeckedMode).GetMethod("IsReallyStealthed", BindingFlags.Static | BindingFlags.NonPublic));
+    }
+
+    private static bool IsReallyStealthed(bool stealthed)
+    {
+        return stealthed && (_HeckedModeStatus != Hecked.Retrashed);
+    }
+
+    private static PlayerController OnGetActivePlayerClosestToPoint(Func<GameManager, Vector2, bool, PlayerController> orig,
+        GameManager gm, Vector2 point, bool allowStealth)
+    {
+        return orig(gm, point, allowStealth || (_HeckedModeStatus == Hecked.Retrashed));
+    }
+
+    private static void _ForceJammedBossesIL(ILContext il)
+    {
+        ILCursor cursor = new ILCursor(il);
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<AIActor>("ForceBlackPhantom")))
+            return; // couldn't find the appropriate hook
+
+        cursor.Emit(OpCodes.Ldarg_0);
+        cursor.Emit(OpCodes.Call,
+            typeof(HeckedMode).GetMethod("ForceJammedBosses", BindingFlags.Static | BindingFlags.NonPublic));
+    }
+
+    private static bool ForceJammedBosses(bool original, AIActor actor)
+    {
+        return original || (actor && actor.healthHaver && (actor.healthHaver.IsBoss || actor.healthHaver.IsSubboss));
     }
 
     private static void CopyAIBulletBank(this AIBulletBank me, AIBulletBank other)
@@ -559,7 +661,7 @@ public static class HeckedMode
     {
         if (enemy.aiShooter is not AIShooter shooter)
         {
-            if (!C.DEBUG_BUILD)
+            if (_HeckedModeStatus != Hecked.Retrashed)
                 return;  // disable extra guns outside the debug build for now
             _BulletKin ??= EnemyDatabase.GetOrLoadByGuid(Enemies.BulletKin);
             if (!enemy.gameObject.GetComponent<AIBulletBank>())
@@ -575,8 +677,6 @@ public static class HeckedMode
             // enemy.ShowAllBehaviors();
 
             shooter.behaviorSpeculator.TargetBehaviors ??= new();
-            // foreach (BehaviorBase tb in shooter.behaviorSpeculator.OtherBehaviors)
-            //     ETGModConsole.Log($"behavior: {tb.GetType().Name}");
             if (shooter.behaviorSpeculator.TargetBehaviors.Count == 0)
             {
                 shooter.RegenerateCache();
