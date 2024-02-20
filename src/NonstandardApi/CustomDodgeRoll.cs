@@ -38,7 +38,7 @@ public class CustomDodgeRoll : MonoBehaviour, ICustomDodgeRoll
     public static bool CustomDodgeRollHook(Func<PlayerController,Vector2,bool> orig, PlayerController player, Vector2 direction)
     {
         // Make sure we can actually have all of our movements available (fixes not being able to dodge roll in the Aimless Void)
-        if (player.CurrentInputState != PlayerInputState.AllInput)
+        if (player.CurrentInputState != PlayerInputState.AllInput || !player.AcceptingNonMotionInput || player.IsDodgeRolling)
             return orig(player,direction);
 
         // Figure out all of our passives that give us a custom dodge roll
@@ -55,10 +55,8 @@ public class CustomDodgeRoll : MonoBehaviour, ICustomDodgeRoll
         {
             foreach (CustomDodgeRoll customDodgeRoll in overrides)
                 customDodgeRoll.dodgeButtonHeld = false;
-            return orig(player,direction);
+            return false;
         }
-        if (!player.AcceptingNonMotionInput || player.IsDodgeRolling)
-            return orig(player,direction);
 
         // Begin the dodge roll for all of our custom dodge rolls available
         // instanceForPlayer.ConsumeButtonDown(GungeonActions.GungeonActionType.DodgeRoll);
