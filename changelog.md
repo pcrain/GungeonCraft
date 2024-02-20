@@ -1,9 +1,16 @@
 # Changelog
 
+## 1.8.1 (2024-02-20)
+- Fixed null dereference causing Gyroscope and Drifter's Headgear to break after boss fights
+- Fixed some pickup bounding box weirdness on Vladimir, Blamethrower, and Suncaster
+- Added ammo clip sprites for Suncaster and Blamethrower thanks to Lynceus!
+- Added some missing sprite credits
+
 ## 1.8.0 (2024-02-11)
 
 #### Features and Polish:
 - Added Vladimir, Blamethrower, and Suncaster
+	- Vladimir sprite thanks to Dallan!
 
 #### Bugfixes:
 - Fixed another rare edge case where Astral Projector could get the player stuck in walls

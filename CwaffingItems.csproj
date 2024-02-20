@@ -3913,10 +3913,12 @@
     <EmbeddedResource Include="Resources\CustomClips\wavefront_clipempty_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\blackjack_clipfull_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\outbreak_clipfull_alt_001.png"/>
+    <EmbeddedResource Include="Resources\CustomClips\suncaster_clipfull_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\b_b_gun_clipfull_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\platinum_star_clipempty_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\aimu_hakurei_clipfull_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\grandmaster_clipempty_001.png"/>
+    <EmbeddedResource Include="Resources\CustomClips\suncaster_clipempty_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\hand_cannon_clipfull_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\quarter_pounder_clipempty_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\seltzer_pelter_clipempty_001.png"/>
@@ -3931,6 +3933,7 @@
     <EmbeddedResource Include="Resources\CustomClips\lightwing_clipempty_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\grandmaster_clipfull_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\outbreak_clipempty_alt_001.png"/>
+    <EmbeddedResource Include="Resources\CustomClips\blamethrower_clipempty_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\hatchling_gun_clipempty_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\kings_law_clipfull_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\kings_law_clipempty_001.png"/>
@@ -3949,6 +3952,7 @@
     <EmbeddedResource Include="Resources\CustomClips\b_b_gun_clipempty_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\crapshooter_clipempty_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\outbreak_clipfull_001.png"/>
+    <EmbeddedResource Include="Resources\CustomClips\blamethrower_clipfull_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\racket_launcher_clipfull_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\uppskeruvel_clipfull_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\schrodingers_gat_clipempty_001.png"/>

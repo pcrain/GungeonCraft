@@ -14,12 +14,12 @@ public static class CwaffConfig
       options : new(){
         "Disabled",
         "Hecked".Yellow(),
-        "Retrashed".Yellow(),
+        // "Retrashed".Yellow(),
         },
       info    : new(){
         "Enemies spawn with their normal guns.\n\nTakes effect next run.".Green(),
         "Enemies spawn with completely random guns.\nNot for the faint of heart.\nTakes effect next run.".Green(),
-        "All enemies are armed to the teeth.\n.Nowhere is safe.\nTakes effect next run.".Green(),
+        // "All enemies are armed to the teeth.\n.Nowhere is safe.\nTakes effect next run.".Green(),
         }
       );
 

@@ -22,7 +22,7 @@ public class Blamethrower : AdvancedGunBehavior
             // gun.SetFireAudio("blowgun_fire_sound");
 
         Projectile proj = gun.InitProjectile(new(clipSize: -1, cooldown: 0.08f, shootStyle: ShootStyle.Automatic,
-          damage: 2f, angleVariance: 30f, speed: 17f, range: 17f,
+          damage: 2f, angleVariance: 30f, speed: 17f, range: 17f, customClip: true,
           sprite: "blamethrower_projectile", scale: 2.0f, fps: 10, anchor: Anchor.MiddleCenter, shouldRotate: false)
         ).Attach<BlameDamage>(
         ).Attach<BlamethrowerProjectile>();
