@@ -3885,6 +3885,7 @@
     <EmbeddedResource Include="Resources\ObjectSprites\tribute_statues\retrashed_statue_older.png"/>
     <EmbeddedResource Include="Resources\ObjectSprites\tribute_statues\lordfortress_statue_old.png"/>
     <EmbeddedResource Include="Resources\ObjectSprites\tribute_statues\retrashed_statue.png"/>
+    <EmbeddedResource Include="Resources\ObjectSprites\tribute_statues\retrash_statue.png"/>
     <EmbeddedResource Include="Resources\ObjectSprites\tribute_statues\lordfortress_statue.png"/>
     <EmbeddedResource Include="Resources\ObjectSprites\tribute_statues\retrashed_statue_old.png"/>
     <EmbeddedResource Include="Resources\UISprites\prism_ui_icon.png"/>

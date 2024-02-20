@@ -12,15 +12,13 @@ namespace CwaffingTheGungy;
     - fix audio on all noisy weapons to stop playing when appropriate
 
    Retrashed Mode Changes:
-    - no easy guns
-
-    ? shopkeepers have guns
-
-    + all bosses are jammed
     + everyone has guns
-    + no bullet that can kill the future
+    + no easy guns
     + every chest is fused
-    + stealth doesn't work
+    + enemies ignore stealth
+    + 10x shop prices
+    + all bosses are jammed
+    + no bullet that can kill the future
 */
 
 public static class HeckedMode
@@ -287,6 +285,8 @@ public static class HeckedMode
         // (int)Items.Plunger,
     };
 
+    public readonly static int _FirstWeakGun = HeckedModeGunWhiteList.IndexOf((int)Items.MakeshiftCannon);
+
     private static Hook _EnemyAwakeHook;
     // private static Hook _EnemyShootHook;
     private static ILHook _DisablePrefireAnimationHook;
@@ -337,6 +337,7 @@ public static class HeckedMode
         //     typeof(HeckedMode).GetMethod("OnEnemyShoot"));
 
         CwaffEvents.BeforeRunStart += SetupHeckedMode;  // load hecked mode status before the start of each run
+        CwaffEvents.OnFirstFloorFullyLoaded += OnFirstHeckedFloorLoaded;
     }
 
     private static void SetupHeckedMode()
@@ -348,6 +349,20 @@ public static class HeckedMode
             "Retrashed" => Hecked.Retrashed,
             _           => Hecked.Disabled,
         };
+    }
+
+    private static void OnFirstHeckedFloorLoaded()
+    {
+        if (_HeckedModeStatus != Hecked.Retrashed)
+            return;
+
+        // 10x shop price multiplier
+        GameManager.Instance.PrimaryPlayer.ownerlessStatModifiers.Add(new(){
+            statToBoost = PlayerStats.StatType.GlobalPriceMultiplier,
+            modifyType = StatModifier.ModifyMethod.MULTIPLICATIVE,
+            amount = 10f
+        });
+        GameManager.Instance.PrimaryPlayer.stats.RecalculateStats(GameManager.Instance.PrimaryPlayer);
     }
 
     // public static void OnEnemyShoot(Action<AIShooter, string> action, AIShooter shooter, string overrideBulletName)
@@ -401,7 +416,11 @@ public static class HeckedMode
     {
         if ((_HeckedModeStatus != Hecked.Disabled) && !enemy.IsABoss())
         {
-            Items replacementGunId = (Items)HeckedModeGunWhiteList.ChooseRandom();
+            Items replacementGunId;
+            if (_HeckedModeStatus == Hecked.Retrashed)
+                replacementGunId = (Items)HeckedModeGunWhiteList[UnityEngine.Random.Range(0, _FirstWeakGun)];
+            else
+                replacementGunId = (Items)HeckedModeGunWhiteList.ChooseRandom();
             enemy.HeckedShootGunBehavior(ItemHelper.Get(replacementGunId) as Gun);
         }
         action(enemy);
