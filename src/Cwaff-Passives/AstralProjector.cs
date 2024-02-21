@@ -19,7 +19,6 @@ public class AstralProjector : PassiveItem
     private RoomHandler _phasedRoom;
 
     private static int _AstralProjectorId;
-    private static ILHook _AstralProjectorILHook;
 
     private static Vector2 _LastSanePosition = Vector2.zero;
 
@@ -30,10 +29,6 @@ public class AstralProjector : PassiveItem
         item.AddToSubShop(ModdedShopType.TimeTrader);
 
         _AstralProjectorId   = item.PickupObjectId;
-        _AstralProjectorILHook = new ILHook(
-            typeof(PlayerController).GetMethod("HandlePlayerInput", BindingFlags.Instance | BindingFlags.NonPublic),
-            HandlePlayerPhasingInputIL
-            );
     }
 
     public override void Pickup(PlayerController player)
@@ -155,11 +150,6 @@ public class AstralProjector : PassiveItem
         this.Owner.gameObject.PlayUnique("phase_through_wall_sound");
     }
 
-    /* References for using ILHooks:
-        https://en.wikipedia.org/wiki/List_of_CIL_instructions
-        https://github.com/StrawberryJam2021/StrawberryJam2021/blob/21079f1c2521aa704fc5ddc91f67ff3ebc95c317/Triggers/SkateboardTrigger.cs#L18
-        https://github.com/lostinnowhere314/CelesteCollabUtils2/blob/b6b7fde825a6bdc218d201bf1a4feaa709487f3b/Entities/MiniHeartDoor.cs#L17
-    */
     public static float PreventRigidbodyCastDuringHandlePlayerInput(PlayerController pc, float inValue)
     {
         if (pc.passiveItems.Contains(_AstralProjectorId))
@@ -167,65 +157,45 @@ public class AstralProjector : PassiveItem
         return inValue; // return the original value
     }
 
+    [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.HandlePlayerInput))]
+    private class HandlePlayerPhasingInputPatch
+    {
     // This IL Hook replaces some checks in HandlePlayerInput that do RigidBodyCasts on each axis if the absolutely velocity is greater than 0.01
     // If we have this item, this hook instead checks if each axis has an absolute velocity greater than 999,
     //   ensuring the RigidBodyCasts will never run under any sane circumstance
-    private static void HandlePlayerPhasingInputIL(ILContext il)
-    {
-        ILCursor cursor = new ILCursor(il);
-        // cursor.DumpILOnce("HandlePlayerPhasingInputIL");
-
-        //Replace positive movement checks
-        while (cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdcR4(0.01f)))
+        [HarmonyILManipulator]
+        private static void HandlePlayerPhasingInputIL(ILContext il)
         {
-            cursor.Emit(OpCodes.Pop); // pop the check for 0.01f itself
-            cursor.Emit(OpCodes.Ldarg_0); // load the player instance as arg0
-            cursor.Emit(OpCodes.Ldc_R4, 0.01f); // replace the check for 0.01f as arg1
+            ILCursor cursor = new ILCursor(il);
+            // cursor.DumpILOnce("HandlePlayerPhasingInputIL");
 
-            // call our method with player instance and original threshold value as args
-            cursor.Emit(OpCodes.Call, typeof(AstralProjector).GetMethod("PreventRigidbodyCastDuringHandlePlayerInput"));
-            // the return value from our hook is now on the stack, replacing 0.01f with 999f if we have the item
-            // this ensures the RigidBodyCast() will never happen
+            //Replace positive movement checks
+            while (cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdcR4(0.01f)))
+            {
+                cursor.Emit(OpCodes.Pop); // pop the check for 0.01f itself
+                cursor.Emit(OpCodes.Ldarg_0); // load the player instance as arg0
+                cursor.Emit(OpCodes.Ldc_R4, 0.01f); // replace the check for 0.01f as arg1
+
+                // call our method with player instance and original threshold value as args
+                cursor.Emit(OpCodes.Call, typeof(AstralProjector).GetMethod("PreventRigidbodyCastDuringHandlePlayerInput"));
+                // the return value from our hook is now on the stack, replacing 0.01f with 999f if we have the item
+                // this ensures the RigidBodyCast() will never happen
+            }
+
+            // Replcae negative movement checks
+            cursor.Index = 0;
+            while (cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdcR4(-0.01f)))
+            {
+                cursor.Emit(OpCodes.Pop); // pop the check for -0.01f itself
+                cursor.Emit(OpCodes.Ldarg_0); // load the player instance as arg0
+                cursor.Emit(OpCodes.Ldc_R4, -0.01f); // replace the check for -0.01f as arg1
+
+                // call our method with player instance and original threshold value as args
+                cursor.Emit(OpCodes.Call, typeof(AstralProjector).GetMethod("PreventRigidbodyCastDuringHandlePlayerInput"));
+                // the return value from our hook is now on the stack, replacing -0.01f with -999f if we have the item
+                // this ensures the RigidBodyCast() will never happen
+            }
+            return;
         }
-
-        // Replcae negative movement checks
-        cursor.Index = 0;
-        while (cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdcR4(-0.01f)))
-        {
-            cursor.Emit(OpCodes.Pop); // pop the check for -0.01f itself
-            cursor.Emit(OpCodes.Ldarg_0); // load the player instance as arg0
-            cursor.Emit(OpCodes.Ldc_R4, -0.01f); // replace the check for -0.01f as arg1
-
-            // call our method with player instance and original threshold value as args
-            cursor.Emit(OpCodes.Call, typeof(AstralProjector).GetMethod("PreventRigidbodyCastDuringHandlePlayerInput"));
-            // the return value from our hook is now on the stack, replacing -0.01f with -999f if we have the item
-            // this ensures the RigidBodyCast() will never happen
-        }
-        return;
     }
-
-    // OBSOLETE: better ILHook method above that effectively disables the checks on the spot and saves some RigidBodyCasts
-    // we have to do this nonsense because even when we're ignoring tile collisions, HandlePlayerInput insists on zeroing our movement unless we're rolling
-    // private static Vector2 HandlePlayerPhasingInput(Func<PlayerController, Vector2> orig, PlayerController player)
-    // {
-    //     // Run the original movement function and return its output if we don't have this item
-    //     Vector2 ovec = orig(player);
-    //     if (!player.passiveItems.Contains(astralProjectorId))
-    //         return ovec;
-
-    //     #region Perform all of the original checks to make sure we're not doing illegal movements
-    //         if (player.m_activeActions == null)
-    //             return ovec; // If we have no active actions, we're not doing anything, so return
-    //         if (player.CurrentInputState == PlayerInputState.NoMovement)
-    //             return ovec; // AdjustInputVector never gets called if we are in the NoMovement input state, so return
-    //         if (player.IsGhost)
-    //             return ovec; // Original function checks if we're a ghost and returns immediately if so. Ironically, we need to respect walls if we're a ghost
-    //     #endregion
-
-    //     // If we've made it here, then only the RigidbodyCast() functions could have reset our movement vector to zero, so recalculate AdjustInputVector()
-    //     Vector2 moveVector = player.AdjustInputVector(player.m_activeActions.Move.Vector, BraveInput.MagnetAngles.movementCardinal, BraveInput.MagnetAngles.movementOrdinal);
-    //     if (moveVector.magnitude > 1f)
-    //         moveVector.Normalize();
-    //     return moveVector;
-    // }
 }

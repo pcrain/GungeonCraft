@@ -14,9 +14,7 @@ public class StuntHelmet : PassiveItem
     internal static StatModifier _StuntStats;
     internal static int _StuntHelmetId;
 
-    private static ILHook _StuntExplosionILHook;
-
-    private Coroutine _extantDamageBoostCoroutine = null;
+        private Coroutine _extantDamageBoostCoroutine = null;
 
     public static void Init()
     {
@@ -30,58 +28,64 @@ public class StuntHelmet : PassiveItem
             };
 
         _StuntHelmetId   = item.PickupObjectId;
-        _StuntExplosionILHook = new ILHook(
-            typeof(Exploder).GetNestedType("<HandleExplosion>c__Iterator4", BindingFlags.Instance | BindingFlags.NonPublic).GetMethod("MoveNext"),
-            StuntExplosionIL
-            );
     }
 
-    private static void StuntExplosionIL(ILContext il)
+    [HarmonyPatch]
+    private class StuntExplosionPatch
     {
-        ILCursor cursor = new ILCursor(il);
-        // cursor.DumpILOnce("StuntExplosionIL");
+        static MethodBase TargetMethod() {
+          // refer to C# reflection documentation:
+          return typeof(Exploder).GetNestedType("<HandleExplosion>c__Iterator4", BindingFlags.Instance | BindingFlags.NonPublic).GetMethod("MoveNext");
+        }
 
-        #region Ignore all damage from explosions
-            ILLabel branchPoint = null;
-            if (!cursor.TryGotoNext(MoveType.After,
-                instr => instr.MatchLdfld<PlayerController>("IsEthereal"),
-                instr => instr.MatchBrtrue(out branchPoint)))
-                return;
+        [HarmonyILManipulator]
+        private static void StuntExplosionIL(ILContext il)
+        {
+            ILCursor cursor = new ILCursor(il);
+            // cursor.DumpILOnce("StuntExplosionIL");
 
-            // after finding the check that ignores explosion damage if we're ethereal, we also want to completely ignore damage if we have the Stunt Helmet
-            cursor.Emit(OpCodes.Ldloc_S, (byte)13); // V_13 == the PlayerController
-            cursor.Emit(OpCodes.Call, typeof(StuntHelmet).GetMethod("PlayerHasStuntHelmet", BindingFlags.Static | BindingFlags.NonPublic));
-            cursor.Emit(OpCodes.Brtrue, branchPoint);
-        #endregion
+            #region Ignore all damage from explosions
+                ILLabel branchPoint = null;
+                if (!cursor.TryGotoNext(MoveType.After,
+                    instr => instr.MatchLdfld<PlayerController>("IsEthereal"),
+                    instr => instr.MatchBrtrue(out branchPoint)))
+                    return;
 
-        #region Quadruple all knockback from explosions
-            ILLabel branchPoint2 = null;
-            if (!cursor.TryGotoNext(MoveType.Before,
-                instr => instr.MatchLdfld<ExplosionData>("preventPlayerForce"),
-                instr => instr.MatchBrfalse(out branchPoint2)))
-                return;
+                // after finding the check that ignores explosion damage if we're ethereal, we also want to completely ignore damage if we have the Stunt Helmet
+                cursor.Emit(OpCodes.Ldloc_S, (byte)13); // V_13 == the PlayerController
+                cursor.Emit(OpCodes.Call, typeof(StuntHelmet).GetMethod("PlayerHasStuntHelmet", BindingFlags.Static | BindingFlags.NonPublic));
+                cursor.Emit(OpCodes.Brtrue, branchPoint);
+            #endregion
 
-            // IL_0a48: ldarg.0
-            // IL_0a49: ldfld ExplosionData Exploder/<HandleExplosion>c__Iterator4::data
-            // --------WE ARE NOW HERE---------
-            // IL_0a4e: ldfld System.Boolean ExplosionData::preventPlayerForce
-            // IL_0a53: brfalse IL_0a70
-            // IL_0a58: ldloc.s V_10
-            cursor.Index -= 2; // jump back to right after computing num2 = 1f - num / data.pushRadius;
+            #region Quadruple all knockback from explosions
+                ILLabel branchPoint2 = null;
+                if (!cursor.TryGotoNext(MoveType.Before,
+                    instr => instr.MatchLdfld<ExplosionData>("preventPlayerForce"),
+                    instr => instr.MatchBrfalse(out branchPoint2)))
+                    return;
 
-            ILLabel branchToTakeIfNoHelmet = cursor.DefineLabel();
-            cursor.Emit(OpCodes.Ldloc_S, (byte)13); // V_13 == the PlayerController
-            cursor.Emit(OpCodes.Call, typeof(StuntHelmet).GetMethod("PlayerHasStuntHelmet", BindingFlags.Static | BindingFlags.NonPublic));
-            cursor.Emit(OpCodes.Brfalse, branchToTakeIfNoHelmet);
-                cursor.Emit(OpCodes.Ldloc_S, (byte)26); // V_26 == force multiplier
-                cursor.Emit(OpCodes.Ldc_R4, _EXPLOSION_FORCE_MULT);
-                cursor.Emit(OpCodes.Mul);
-                cursor.Emit(OpCodes.Stloc_S, (byte)26);
-                cursor.Emit(OpCodes.Ldloc_S, (byte)13);
-                cursor.Emit(OpCodes.Call, typeof(StuntHelmet).GetMethod("DoStuntHelmetBoost", BindingFlags.Static | BindingFlags.NonPublic));
-                cursor.Emit(OpCodes.Br, branchPoint2);  // skip over the preventPlayerForce check entirely
-            cursor.MarkLabel(branchToTakeIfNoHelmet); // move onto the preventPlayerForce check as normal
-        #endregion
+                // IL_0a48: ldarg.0
+                // IL_0a49: ldfld ExplosionData Exploder/<HandleExplosion>c__Iterator4::data
+                // --------WE ARE NOW HERE---------
+                // IL_0a4e: ldfld System.Boolean ExplosionData::preventPlayerForce
+                // IL_0a53: brfalse IL_0a70
+                // IL_0a58: ldloc.s V_10
+                cursor.Index -= 2; // jump back to right after computing num2 = 1f - num / data.pushRadius;
+
+                ILLabel branchToTakeIfNoHelmet = cursor.DefineLabel();
+                cursor.Emit(OpCodes.Ldloc_S, (byte)13); // V_13 == the PlayerController
+                cursor.Emit(OpCodes.Call, typeof(StuntHelmet).GetMethod("PlayerHasStuntHelmet", BindingFlags.Static | BindingFlags.NonPublic));
+                cursor.Emit(OpCodes.Brfalse, branchToTakeIfNoHelmet);
+                    cursor.Emit(OpCodes.Ldloc_S, (byte)26); // V_26 == force multiplier
+                    cursor.Emit(OpCodes.Ldc_R4, _EXPLOSION_FORCE_MULT);
+                    cursor.Emit(OpCodes.Mul);
+                    cursor.Emit(OpCodes.Stloc_S, (byte)26);
+                    cursor.Emit(OpCodes.Ldloc_S, (byte)13);
+                    cursor.Emit(OpCodes.Call, typeof(StuntHelmet).GetMethod("DoStuntHelmetBoost", BindingFlags.Static | BindingFlags.NonPublic));
+                    cursor.Emit(OpCodes.Br, branchPoint2);  // skip over the preventPlayerForce check entirely
+                cursor.MarkLabel(branchToTakeIfNoHelmet); // move onto the preventPlayerForce check as normal
+            #endregion
+        }
     }
 
     private static bool PlayerHasStuntHelmet(PlayerController player)

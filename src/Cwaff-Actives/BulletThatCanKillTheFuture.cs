@@ -15,9 +15,6 @@ public class BulletThatCanKillTheFuture : PlayerItem
     internal static tk2dBaseSprite _Sprite = null;
     internal static bool _BulletSpawnedThisRun = false;
 
-    private static Hook _RevertLevelHook = null;
-    private static string NameOfPreviousFloor = ""; // used to set the floor elevator should take us to
-
     private PlayerController _owner = null;
 
     public static void Init()
@@ -326,32 +323,32 @@ public class BulletThatCanKillTheFuture : PlayerItem
         {
             UnityEngine.Object.Destroy(clockhair.gameObject);
             yield return new WaitForSeconds(0.25f);
-            NameOfPreviousFloor = GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName;
+            _NameOfPreviousFloor = GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName;
             GameManager.Instance.OnNewLevelFullyLoaded += ForceElevatorToReturnToPreviousFloor;
             GameManager.Instance.LoadCustomLevel(SansDungeon.INTERNAL_NAME);
         }
         yield break;
     }
 
+    private static string _NameOfPreviousFloor = ""; // used to set the floor elevator should take us to
+    private static bool _ShouldReturnToPreviousFloor = false;
     private static void ForceElevatorToReturnToPreviousFloor()
     {
         GameManager.Instance.OnNewLevelFullyLoaded -= ForceElevatorToReturnToPreviousFloor;
-        if (_RevertLevelHook != null)
-            _RevertLevelHook.Dispose();
-        _RevertLevelHook = new Hook(  //REFACTOR: figure out how to do these temporary hook shenanigans with Harmony at some point
-            typeof(ElevatorDepartureController).GetMethod("TransitionToDepart", BindingFlags.Instance | BindingFlags.NonPublic),
-            typeof(BulletThatCanKillTheFuture).GetMethod("TransitionToDepartHook", BindingFlags.Static | BindingFlags.NonPublic)
-            );
+        _ShouldReturnToPreviousFloor = true;
     }
 
-    private static void TransitionToDepartHook(Action<ElevatorDepartureController, tk2dSpriteAnimator, tk2dSpriteAnimationClip> orig, ElevatorDepartureController self, tk2dSpriteAnimator animator, tk2dSpriteAnimationClip clip)
+    [HarmonyPatch(typeof(ElevatorDepartureController), nameof(ElevatorDepartureController.TransitionToDepart))]
+    private class TransitionToDepartPatch
     {
-        self.UsesOverrideTargetFloor = false;
-        if (GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName == SansDungeon.INTERNAL_NAME)
-            GameManager.Instance.InjectedLevelName = NameOfPreviousFloor;
+        static void Prefix(ElevatorDepartureController __instance, tk2dSpriteAnimator animator, tk2dSpriteAnimationClip clip)
+        {
+            if (!_ShouldReturnToPreviousFloor)
+                return;
 
-        _RevertLevelHook.Dispose();
-        _RevertLevelHook = null;
-        orig(self, animator, clip);
+            __instance.UsesOverrideTargetFloor = false;
+            GameManager.Instance.InjectedLevelName = _NameOfPreviousFloor;
+            _ShouldReturnToPreviousFloor = false;
+        }
     }
 }

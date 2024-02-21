@@ -38,7 +38,6 @@ public class Glockarina : AdvancedGunBehavior
 
     internal static GameObject _DecoyPrefab   = null;
     internal static GameObject _NoteVFXPrefab = null;
-    private static ILHook _ChestOpenHookIL    = null;
     private static int _GlockarinaPickupID    = -1;
     private static List<List<Note>> _Songs = new(){
         /* DEFAULT */ null,
@@ -76,21 +75,26 @@ public class Glockarina : AdvancedGunBehavior
 
         _NoteVFXPrefab = VFX.Create("note_vfx", 0.01f, loops: false, anchor: Anchor.MiddleCenter); // FPS must be nonzero or sprites don't update properly
 
-        _ChestOpenHookIL = new ILHook(  // dark magic to hook into ienumerator
-            typeof(Chest).GetNestedType("<PresentItem>c__Iterator6", BindingFlags.NonPublic | BindingFlags.Instance).GetMethod("MoveNext"),
-            OnSpewContentsOntoGroundIL
-            );
-
         _GlockarinaPickupID = gun.PickupObjectId;
     }
 
-    private static void OnSpewContentsOntoGroundIL(ILContext il)
+    [HarmonyPatch]
+    private class ChestOpenPatch
     {
-        ILCursor cursor = new ILCursor(il);
-        Type iterType = typeof(Chest).GetNestedType("<PresentItem>c__Iterator6", BindingFlags.NonPublic | BindingFlags.Instance);
-        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchStfld(iterType.FullName, "<displayTime>__1")))
-            return; // play our sound right before we begin the item display countdown
-        cursor.Emit(OpCodes.Call, typeof(Glockarina).GetMethod("OnChestOpen", BindingFlags.Static | BindingFlags.NonPublic));
+        private static readonly Type _IterType = typeof(Chest).GetNestedType("<PresentItem>c__Iterator6", BindingFlags.NonPublic | BindingFlags.Instance);
+        static MethodBase TargetMethod() {
+          // refer to C# reflection documentation:
+          return _IterType.GetMethod("MoveNext");
+        }
+
+        [HarmonyILManipulator]
+        private static void OnSpewContentsOntoGroundIL(ILContext il)
+        {
+            ILCursor cursor = new ILCursor(il);
+            if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchStfld(_IterType.FullName, "<displayTime>__1")))
+                return; // play our sound right before we begin the item display countdown
+            cursor.Emit(OpCodes.Call, typeof(Glockarina).GetMethod("OnChestOpen", BindingFlags.Static | BindingFlags.NonPublic));
+        }
     }
 
     private static void OnChestOpen()

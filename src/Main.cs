@@ -97,9 +97,7 @@ public class Initialisation : BaseUnityPlugin
                 //Tools and Toolboxes
                 CwaffPrerequisite.Init();  // must be set up after CwaffEvents
                 // HUDController.Init(); // Need to load early (unused for now)
-                CustomAmmoDisplay.Init(); // Also need to load early
                 ModdedShopItemAdder.Init(); // must be set up after CwaffEvents
-                DamageAdjuster.Init();
 
                 //Commands and Other Console Utilities
                 Commands.Init();
@@ -110,21 +108,6 @@ public class Initialisation : BaseUnityPlugin
                 setupConfig1Watch.Stop();
             });
             setupConfig1Thread.Start();
-            #endregion
-
-            #region Hotfixes for bugs and issues mostly out of my control (Async)
-                System.Diagnostics.Stopwatch setupHotfixesWatch = null;
-                Thread setupHotfixesThread = new Thread(() => {
-                    setupHotfixesWatch = System.Diagnostics.Stopwatch.StartNew();
-                    DragunFightHotfix.Init();
-                    CoopTurboModeHotfix.Init();
-                    LargeGunAnimationHotfix.Init();
-                    // CoopDrillSoftlockHotfix.Init(); // incomplete
-                    QuickRestartRoomCacheHotfix.Init();
-                    RoomShuffleOffByOneHotfix.Init();
-                    setupHotfixesWatch.Stop();
-                });
-                setupHotfixesThread.Start();
             #endregion
 
             #region Save API Setup (Async)
@@ -429,7 +412,6 @@ public class Initialisation : BaseUnityPlugin
             #region Wait for Async stuff to finish up
                 System.Diagnostics.Stopwatch awaitAsyncWatch = System.Diagnostics.Stopwatch.StartNew();
                 setupConfig1Thread.Join();
-                setupHotfixesThread.Join();
                 setupSaveThread.Join();
                 setupAudioThread.Join();
                 setupSynergiesThread.Join();
@@ -441,7 +423,6 @@ public class Initialisation : BaseUnityPlugin
             if (C.DEBUG_BUILD)
             {
                 ETGModConsole.Log($"    setupConfig1   finished in {setupConfig1Watch.ElapsedMilliseconds} milliseconds (ASYNC)");
-                ETGModConsole.Log($"    setupHotfixes  finished in {setupHotfixesWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupSave      finished in {setupSaveWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupSprites   finished in {setupSpritesWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupConfig2   finished in {setupConfig2Watch.ElapsedMilliseconds} milliseconds");

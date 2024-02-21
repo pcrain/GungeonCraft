@@ -8,7 +8,6 @@ public class BionicFinger : PassiveItem
     public static string Lore             = "The latest and greatest in cyborg prosthetic technology. In addition to negating one of the only downsides of using semi-automatic weaponry, this finger has the added benefit of reducing the incidence rate of carpal tunnel syndrome and repetitive wrist strain among arms-bearers, making it a must-have for both the health-conscious and the lazy alike.";
 
     private static int _BionicFingerId;
-    private static ILHook _RemoveSemiautoCooldownHookIL;
 
     public static void Init()
     {
@@ -18,31 +17,30 @@ public class BionicFinger : PassiveItem
         item.AddToSubShop(ModdedShopType.Rusty);
 
         _BionicFingerId   = item.PickupObjectId;
-
-        // Remove cooldown for semiautomatic weapons
-        _RemoveSemiautoCooldownHookIL = new ILHook(
-          typeof(PlayerController).GetMethod("HandleGunFiringInternal", BindingFlags.Instance | BindingFlags.NonPublic),
-          HandleGunFiringInternalIL
-          );
     }
 
-    private static void HandleGunFiringInternalIL(ILContext il)
+    [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.HandleGunFiringInternal))]
+    private class RemoveSemiAutoCooldownPatch // Remove cooldown for semiautomatic weapons
     {
-        ILCursor cursor = new ILCursor(il);
-        // cursor.DumpIL("HandlePlayerPhasingInputIL");
-        while (cursor.TryGotoNext(MoveType.After, instr => instr.MatchAdd(), instr => instr.MatchStfld<PlayerController>("m_controllerSemiAutoTimer")))
+        [HarmonyILManipulator]
+        private static void HandleGunFiringInternalIL(ILContext il)
         {
-            /* the next four instructions after this point are as follows
-                [keep   ] IL_0272: ldarg.0
-                [keep   ] IL_0273: ldfld System.Single PlayerController::m_controllerSemiAutoTimer
-                [replace] IL_0278: call System.Single BraveInput::get_ControllerFakeSemiAutoCooldown()
-                [keep   ] 637 ... ble.un ... MonoMod.Cil.ILLabel
-            */
-            cursor.Index += 2; // skip the next two instructions so we still have m_controllerSemiAutoTimer on the stack
-            cursor.Remove(); // remove the get_ControllerFakeSemiAutoCooldown() instruction
-            cursor.Emit(OpCodes.Ldarg_0); // load the player instance as arg0
-            cursor.Emit(OpCodes.Call, typeof(BionicFinger).GetMethod("OverrideSemiAutoCooldown", BindingFlags.Static | BindingFlags.NonPublic)); // replace with our own custom hook
-            break; // we only care about the first occurrence of this pattern in the function
+            ILCursor cursor = new ILCursor(il);
+            // cursor.DumpIL("HandlePlayerPhasingInputIL");
+            while (cursor.TryGotoNext(MoveType.After, instr => instr.MatchAdd(), instr => instr.MatchStfld<PlayerController>("m_controllerSemiAutoTimer")))
+            {
+                /* the next four instructions after this point are as follows
+                    [keep   ] IL_0272: ldarg.0
+                    [keep   ] IL_0273: ldfld System.Single PlayerController::m_controllerSemiAutoTimer
+                    [replace] IL_0278: call System.Single BraveInput::get_ControllerFakeSemiAutoCooldown()
+                    [keep   ] 637 ... ble.un ... MonoMod.Cil.ILLabel
+                */
+                cursor.Index += 2; // skip the next two instructions so we still have m_controllerSemiAutoTimer on the stack
+                cursor.Remove(); // remove the get_ControllerFakeSemiAutoCooldown() instruction
+                cursor.Emit(OpCodes.Ldarg_0); // load the player instance as arg0
+                cursor.Emit(OpCodes.Call, typeof(BionicFinger).GetMethod("OverrideSemiAutoCooldown", BindingFlags.Static | BindingFlags.NonPublic)); // replace with our own custom hook
+                break; // we only care about the first occurrence of this pattern in the function
+            }
         }
     }
 

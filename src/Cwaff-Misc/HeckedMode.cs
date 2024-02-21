@@ -287,39 +287,10 @@ public static class HeckedMode
 
     public readonly static int _FirstWeakGun = HeckedModeGunWhiteList.IndexOf((int)Items.MakeshiftCannon);
 
-    // private static Hook _EnemyShootHook;
-    private static ILHook _DisablePrefireAnimationHook;
-    private static ILHook _DisablePrefireStateHook;
-    private static ILHook _FusedChestHook;
-    private static ILHook _NoStealthForYouHook;
-    private static ILHook _ForceJammedBossesHook;
-
     internal static readonly string _CONFIG_KEY = "Hecked Mode";
 
     public static void Init()
     {
-        _DisablePrefireAnimationHook = new ILHook(
-            typeof(ShootGunBehavior).GetMethod("Start", BindingFlags.Instance | BindingFlags.Public),
-            DisablePrefireAnimationDuringHeckedModeIL
-            );
-        _DisablePrefireStateHook = new ILHook(
-            typeof(ShootGunBehavior).GetMethod("ContinuousUpdate", BindingFlags.Instance | BindingFlags.Public),
-            DisablePrefireStateDuringHeckedModeIL
-            );
-        _FusedChestHook = new ILHook(
-            typeof(Chest).GetMethod("RoomEntered", BindingFlags.NonPublic | BindingFlags.Instance),
-            FusedChestHookIL);
-        _NoStealthForYouHook = new ILHook(
-            typeof(TargetPlayerBehavior).GetMethod("Update", BindingFlags.Public | BindingFlags.Instance),
-            NoStealthForYouIL);
-        _ForceJammedBossesHook = new ILHook(
-            typeof(AIActor).GetMethod("CheckForBlackPhantomness", BindingFlags.NonPublic | BindingFlags.Instance),
-            _ForceJammedBossesIL);
-
-        // _EnemyShootHook = new Hook(
-        //     typeof(AIShooter).GetMethod("Shoot", BindingFlags.Public | BindingFlags.Instance),
-        //     typeof(HeckedMode).GetMethod("OnEnemyShoot"));
-
         CwaffEvents.BeforeRunStart += SetupHeckedMode;  // load hecked mode status before the start of each run
         CwaffEvents.OnFirstFloorFullyLoaded += OnFirstHeckedFloorLoaded;
     }
@@ -349,15 +320,6 @@ public static class HeckedMode
         GameManager.Instance.PrimaryPlayer.stats.RecalculateStats(GameManager.Instance.PrimaryPlayer);
     }
 
-    // public static void OnEnemyShoot(Action<AIShooter, string> action, AIShooter shooter, string overrideBulletName)
-    // {
-    //     if (shooter.aiActor.EnemyGuid == Enemies.BulletKin)
-    //     {
-    //         overrideBulletName = null;
-    //     }
-    //     action(shooter, overrideBulletName);
-    // }
-
     // disable prefire animations in hecked mode since they mess with fire rate
     private static bool HeckedModeShouldSkipPrefireAnimationCheck(ShootGunBehavior sgb, string s)
     {
@@ -369,25 +331,35 @@ public static class HeckedMode
         return (_HeckedModeStatus != Hecked.Disabled) || wouldSkipAnyway;
     }
 
-    private static void DisablePrefireStateDuringHeckedModeIL(ILContext il)
+    [HarmonyPatch(typeof(ShootGunBehavior), nameof(ShootGunBehavior.ContinuousUpdate))]
+    private class DisablePrefireStateDuringHeckedModePatch
     {
-        ILCursor cursor = new ILCursor(il);
-        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<AIShooter>("get_IsPreFireComplete")))
-            return; // couldn't find the appropriate hook
+        [HarmonyILManipulator]
+        private static void DisablePrefireStateDuringHeckedModeIL(ILContext il)
+        {
+            ILCursor cursor = new ILCursor(il);
+            if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<AIShooter>("get_IsPreFireComplete")))
+                return; // couldn't find the appropriate hook
 
-        // we have a brfalse immediately after us that skips the method we want to call, so just replace that with out own method
-        cursor.Emit(OpCodes.Call, typeof(HeckedMode).GetMethod("HeckedModeShouldSkipPrefireStateCheck", BindingFlags.Static | BindingFlags.NonPublic)); // replace it with our own
+            // we have a brfalse immediately after us that skips the method we want to call, so just replace that with out own method
+            cursor.Emit(OpCodes.Call, typeof(HeckedMode).GetMethod("HeckedModeShouldSkipPrefireStateCheck", BindingFlags.Static | BindingFlags.NonPublic)); // replace it with our own
+        }
     }
 
-    private static void DisablePrefireAnimationDuringHeckedModeIL(ILContext il)
+    [HarmonyPatch(typeof(ShootGunBehavior), nameof(ShootGunBehavior.Start))]
+    private class DisablePrefireAnimationDuringHeckedModePatch
     {
-        ILCursor cursor = new ILCursor(il);
-        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<Gun>("enemyPreFireAnimation")))
-            return; // couldn't find the appropriate hook
+        [HarmonyILManipulator]
+        private static void DisablePrefireAnimationDuringHeckedModeIL(ILContext il)
+        {
+            ILCursor cursor = new ILCursor(il);
+            if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<Gun>("enemyPreFireAnimation")))
+                return; // couldn't find the appropriate hook
 
-        cursor.Remove(); // remove the string.IsNullOrEmpty check
-        cursor.Emit(OpCodes.Ldarg_0); // load the player instance as arg0
-        cursor.Emit(OpCodes.Call, typeof(HeckedMode).GetMethod("HeckedModeShouldSkipPrefireAnimationCheck", BindingFlags.Static | BindingFlags.NonPublic)); // replace it with our own
+            cursor.Remove(); // remove the string.IsNullOrEmpty check
+            cursor.Emit(OpCodes.Ldarg_0); // load the player instance as arg0
+            cursor.Emit(OpCodes.Call, typeof(HeckedMode).GetMethod("HeckedModeShouldSkipPrefireAnimationCheck", BindingFlags.Static | BindingFlags.NonPublic)); // replace it with our own
+        }
     }
 
     [HarmonyPatch(typeof(AIActor), nameof(AIActor.Awake))]
@@ -437,17 +409,22 @@ public static class HeckedMode
     //     return orig(sds, overrideChance);
     // }
 
-    private static void FusedChestHookIL(ILContext il)
+    [HarmonyPatch(typeof(Chest), nameof(Chest.RoomEntered))]
+    private class HeckedFusedChestPatch
     {
-        ILCursor cursor = new ILCursor(il);
-        if (!cursor.TryGotoNext(MoveType.After,
-          instr => instr.MatchCall<UnityEngine.Random>("get_value"),
-          instr => instr.MatchLdloc(0)
-          ))
-            return; // couldn't find the appropriate hook
+        [HarmonyILManipulator]
+        private static void FusedChestHookIL(ILContext il)
+        {
+            ILCursor cursor = new ILCursor(il);
+            if (!cursor.TryGotoNext(MoveType.After,
+              instr => instr.MatchCall<UnityEngine.Random>("get_value"),
+              instr => instr.MatchLdloc(0)
+              ))
+                return; // couldn't find the appropriate hook
 
-        cursor.Emit(OpCodes.Call,
-            typeof(HeckedMode).GetMethod("AdjustHeckedFuseTimers", BindingFlags.Static | BindingFlags.NonPublic));
+            cursor.Emit(OpCodes.Call,
+                typeof(HeckedMode).GetMethod("AdjustHeckedFuseTimers", BindingFlags.Static | BindingFlags.NonPublic));
+        }
     }
 
     private static float AdjustHeckedFuseTimers(float original)
@@ -455,14 +432,19 @@ public static class HeckedMode
         return (_HeckedModeStatus == Hecked.Retrashed) ? 1f : original;
     }
 
-    private static void NoStealthForYouIL(ILContext il)
+    [HarmonyPatch(typeof(TargetPlayerBehavior), nameof(TargetPlayerBehavior.Update))]
+    private class HeckedNoStealthPatch
     {
-        ILCursor cursor = new ILCursor(il);
-        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<GameActor>("get_IsStealthed")))
-            return; // couldn't find the appropriate hook
+        [HarmonyILManipulator]
+        private static void NoStealthForYouIL(ILContext il)
+        {
+            ILCursor cursor = new ILCursor(il);
+            if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<GameActor>("get_IsStealthed")))
+                return; // couldn't find the appropriate hook
 
-        cursor.Emit(OpCodes.Call,
-            typeof(HeckedMode).GetMethod("IsReallyStealthed", BindingFlags.Static | BindingFlags.NonPublic));
+            cursor.Emit(OpCodes.Call,
+                typeof(HeckedMode).GetMethod("IsReallyStealthed", BindingFlags.Static | BindingFlags.NonPublic));
+        }
     }
 
     private static bool IsReallyStealthed(bool stealthed)
@@ -479,15 +461,20 @@ public static class HeckedMode
         }
     }
 
-    private static void _ForceJammedBossesIL(ILContext il)
+    [HarmonyPatch(typeof(AIActor), nameof(AIActor.CheckForBlackPhantomness))]
+    private class ForceJammedBossesPatch
     {
-        ILCursor cursor = new ILCursor(il);
-        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<AIActor>("ForceBlackPhantom")))
-            return; // couldn't find the appropriate hook
+        [HarmonyILManipulator]
+        private static void ForceJammedBossesIL(ILContext il)
+        {
+            ILCursor cursor = new ILCursor(il);
+            if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<AIActor>("ForceBlackPhantom")))
+                return; // couldn't find the appropriate hook
 
-        cursor.Emit(OpCodes.Ldarg_0);
-        cursor.Emit(OpCodes.Call,
-            typeof(HeckedMode).GetMethod("ForceJammedBosses", BindingFlags.Static | BindingFlags.NonPublic));
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Emit(OpCodes.Call,
+                typeof(HeckedMode).GetMethod("ForceJammedBosses", BindingFlags.Static | BindingFlags.NonPublic));
+        }
     }
 
     private static bool ForceJammedBosses(bool original, AIActor actor)

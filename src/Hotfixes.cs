@@ -1,81 +1,83 @@
 namespace CwaffingTheGungy;
 
 // Prevent MtG API from loading sprites that don't belong to any collection by skipping the entire relevant branch (turns out not to speed up very much)
-public static class UnprocessedSpriteHotfix
-{
+// public static class UnprocessedSpriteHotfix
+// {
 
-    private static ILHook _SpriteSetupHook = null;
+//     private static ILHook _SpriteSetupHook = null;
 
-    public static void Init()
-    {
-        _SpriteSetupHook = new ILHook(
-            typeof(ETGMod.Assets).GetMethod("SetupSpritesFromAssembly", BindingFlags.Static | BindingFlags.Public),
-            SetupSpritesFromAssemblyIL
-            );
-    }
+//     public static void Init()
+//     {
+//         _SpriteSetupHook = new ILHook(
+//             typeof(ETGMod.Assets).GetMethod("SetupSpritesFromAssembly", BindingFlags.Static | BindingFlags.Public),
+//             SetupSpritesFromAssemblyIL
+//             );
+//     }
 
-    public static void DeInit()
-    {
-        if (_SpriteSetupHook != null)
-            _SpriteSetupHook.Dispose();
-    }
+//     public static void DeInit()
+//     {
+//         if (_SpriteSetupHook != null)
+//             _SpriteSetupHook.Dispose();
+//     }
 
-    private static void SetupSpritesFromAssemblyIL(ILContext il)
-    {
-        ILCursor cursor = new ILCursor(il);
-        // cursor.DumpILOnce("SetupSpritesFromAssemblyIL");
+//     private static void SetupSpritesFromAssemblyIL(ILContext il)
+//     {
+//         ILCursor cursor = new ILCursor(il);
+//         // cursor.DumpILOnce("SetupSpritesFromAssemblyIL");
 
-        // Move before the 3rd new Texture2D that we want to skip
-        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchNewobj<Texture2D>()))
-            return;
-        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchNewobj<Texture2D>()))
-            return;
-        if (!cursor.TryGotoNext(MoveType.Before, instr => instr.MatchNewobj<Texture2D>()))
-            return;
+//         // Move before the 3rd new Texture2D that we want to skip
+//         if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchNewobj<Texture2D>()))
+//             return;
+//         if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchNewobj<Texture2D>()))
+//             return;
+//         if (!cursor.TryGotoNext(MoveType.Before, instr => instr.MatchNewobj<Texture2D>()))
+//             return;
 
-        // Move back to the unconditional jump to the end of the loop from the "if" half of the branch, and mark the label
-        ILLabel nextLoopJump = null;
-        if (!cursor.TryGotoPrev(MoveType.Before, instr => instr.MatchBr(out nextLoopJump)))
-            return;
+//         // Move back to the unconditional jump to the end of the loop from the "if" half of the branch, and mark the label
+//         ILLabel nextLoopJump = null;
+//         if (!cursor.TryGotoPrev(MoveType.Before, instr => instr.MatchBr(out nextLoopJump)))
+//             return;
 
-        // Move to the next const load, remove it, and move to the next iteration immediately
-        int constload;
-        if (!cursor.TryGotoNext(MoveType.Before, instr => instr.MatchLdcI4(out constload)))
-            return;
-        cursor.Remove();
-        cursor.Emit(OpCodes.Br, nextLoopJump);
-    }
-}
+//         // Move to the next const load, remove it, and move to the next iteration immediately
+//         int constload;
+//         if (!cursor.TryGotoNext(MoveType.Before, instr => instr.MatchLdcI4(out constload)))
+//             return;
+//         cursor.Remove();
+//         cursor.Emit(OpCodes.Br, nextLoopJump);
+//     }
+// }
 
 // All 3 of Gungeon's list-shuffling implementations are flawed due to off by one errors, so we need to fix them
 //   We can't hook generic methods directly, so focus on GenerationShuffle<int>(), which is the main issue for floor room generation
 public static class RoomShuffleOffByOneHotfix
 {
-    public static void Init()
+    [HarmonyPatch]
+    private class RoomShuffleOffByOnePatch
     {
-        new ILHook(
-            typeof(BraveUtility).GetMethod("GenerationShuffle", BindingFlags.Static | BindingFlags.Public).MakeGenericMethod(typeof(int)),
-            GenerationShuffleFixIL
-            );
-    }
+        static MethodBase TargetMethod() {
+          // refer to C# reflection documentation:
+          return typeof(BraveUtility).GetMethod("GenerationShuffle", BindingFlags.Static | BindingFlags.Public).MakeGenericMethod(typeof(int));
+        }
 
-    private static void GenerationShuffleFixIL(ILContext il)
-    {
-        ILCursor cursor = new ILCursor(il);
-        // cursor.DumpILOnce("GenerationShuffleFixIL");
+        [HarmonyILManipulator]
+        private static void GenerationShuffleFixIL(ILContext il)
+        {
+            ILCursor cursor = new ILCursor(il);
+            // cursor.DumpILOnce("GenerationShuffleFixIL");
 
-        // GenerationRandomRange(0, num) should be GenerationRandomRange(0, num + 1)
-        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdloc(0)))
-            return;
-        cursor.Emit(OpCodes.Ldc_I4_1);
-        cursor.Emit(OpCodes.Add);
+            // GenerationRandomRange(0, num) should be GenerationRandomRange(0, num + 1)
+            if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdloc(0)))
+                return;
+            cursor.Emit(OpCodes.Ldc_I4_1);
+            cursor.Emit(OpCodes.Add);
 
-        // num > 1 should be num >= 1
-        ILLabel forLabel = null;
-        if (!cursor.TryGotoNext(MoveType.Before, instr => instr.MatchBgt(out forLabel)))
-            return;
-        cursor.Remove();
-        cursor.Emit(OpCodes.Bge, forLabel);
+            // num > 1 should be num >= 1
+            ILLabel forLabel = null;
+            if (!cursor.TryGotoNext(MoveType.Before, instr => instr.MatchBgt(out forLabel)))
+                return;
+            cursor.Remove();
+            cursor.Emit(OpCodes.Bge, forLabel);
+        }
     }
 }
 
@@ -83,27 +85,24 @@ public static class RoomShuffleOffByOneHotfix
 // GameManager.Instance.GlobalInjectionData.PreprocessRun();
 public static class QuickRestartRoomCacheHotfix
 {
-    public static void Init()
+    [HarmonyPatch(typeof(GameManager), nameof(GameManager.QuickRestart))]
+    private class QuickRestartRoomCachePatch
     {
-        new ILHook(
-            typeof(GameManager).GetMethod("QuickRestart", BindingFlags.Instance | BindingFlags.Public),
-            OnQuickRestartIL
-            );
-    }
+        [HarmonyILManipulator]
+        private static void OnQuickRestartIL(ILContext il)
+        {
+            ILCursor cursor = new ILCursor(il);
 
-    private static void OnQuickRestartIL(ILContext il)
-    {
-        ILCursor cursor = new ILCursor(il);
+            if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdstr("Quick Restarting...")))
+                return;
+            cursor.Index++; // skip over Debug.Log() call
 
-        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdstr("Quick Restarting...")))
-            return;
-        cursor.Index++; // skip over Debug.Log() call
+            // if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCall<GameManager>("FlushAudio")))
+            //     return;
 
-        // if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCall<GameManager>("FlushAudio")))
-        //     return;
-
-        cursor.Emit(OpCodes.Ldarg_0); // load the game manager
-        cursor.Emit(OpCodes.Call, typeof(QuickRestartRoomCacheHotfix).GetMethod("ForcePreprocessRunForQuickStart", BindingFlags.Static | BindingFlags.NonPublic));
+            cursor.Emit(OpCodes.Ldarg_0); // load the game manager
+            cursor.Emit(OpCodes.Call, typeof(QuickRestartRoomCacheHotfix).GetMethod("ForcePreprocessRunForQuickStart", BindingFlags.Static | BindingFlags.NonPublic));
+        }
     }
 
     private static void ForcePreprocessRunForQuickStart(GameManager gm)
@@ -134,38 +133,6 @@ public static class LargeGunAnimationHotfix
 {
     internal const string _TRIM_ANIMATION = "idle_trimmed";
 
-    public static void Init()
-    {
-        // Fix oversized idle animations in vanilla shops
-        new ILHook(
-            typeof(ShopItemController).GetMethod("InitializeInternal", BindingFlags.Instance | BindingFlags.NonPublic),
-            OnInitializeVanillaShopItemIL
-            );
-
-        // Fix oversized idle animations in modded (Alexandria) shops
-        new ILHook(
-            typeof(CustomShopItemController).GetMethod("InitializeInternal", BindingFlags.Instance | BindingFlags.Public),
-            OnInitializeCustomShopItemIL
-            );
-
-        // Fix oversized idle animations on reward pedestals
-        new ILHook(
-            typeof(RewardPedestal).GetMethod("DetermineContents", BindingFlags.Instance | BindingFlags.NonPublic),
-            OnDetermineContentsIL
-            );
-
-        // Fix oversized idle animations in chests
-        new ILHook(  // dark magic to hook into ienumerator
-            typeof(Chest).GetNestedType("<PresentItem>c__Iterator6", BindingFlags.NonPublic | BindingFlags.Instance).GetMethod("MoveNext"),
-            OnPresentItemIL
-            );
-        // if (C.DEBUG_BUILD)
-        //     new Hook(  // debug set contents to something with an oversized sprite
-        //         typeof(Chest).GetMethod("DetermineContents", BindingFlags.Instance | BindingFlags.NonPublic),
-        //         typeof(LargeGunAnimationHotfix).GetMethod("OnDetermineChestContents", BindingFlags.Static | BindingFlags.NonPublic)
-        //         );
-    }
-
     // private static void OnDetermineChestContents(Action<Chest, PlayerController, int> orig, Chest chest, PlayerController player, int tierShift)
     // {
     //     chest.forceContentIds = new(){IDs.Pickups["platinum_star"]}; // for debugging
@@ -177,30 +144,34 @@ public static class LargeGunAnimationHotfix
         return gun.spriteAnimator?.GetClipByName($"{gun.InternalSpriteName()}_{_TRIM_ANIMATION}");
     }
 
-    // Make sure guns in vanilla shops are aligned properly
-    private static void OnInitializeVanillaShopItemIL(ILContext il)
+    [HarmonyPatch(typeof(ShopItemController), nameof(ShopItemController.InitializeInternal))]
+    private class InitializeVanillaShopItemPatch // Fix oversized gun idle animations in vanilla shops and make sure they are aligned properly
     {
-        ILCursor cursor = new ILCursor(il);
-        // cursor.DumpILOnce("OnInitializeVanillaShopItemIL");
+        [HarmonyILManipulator]
+        private static void OnInitializeVanillaShopItemIL(ILContext il)
+        {
+            ILCursor cursor = new ILCursor(il);
+            // cursor.DumpILOnce("OnInitializeVanillaShopItemIL");
 
-        if (!cursor.TryGotoNext(MoveType.Before,
-          instr => instr.MatchStfld<ShopItemController>("UseOmnidirectionalItemFacing"),
-          instr => instr.MatchLdarg(0),
-          instr => instr.MatchCall<BraveBehaviour>("get_sprite"),
-          instr => instr.MatchLdarg(0)
-          ))
-            return;
+            if (!cursor.TryGotoNext(MoveType.Before,
+              instr => instr.MatchStfld<ShopItemController>("UseOmnidirectionalItemFacing"),
+              instr => instr.MatchLdarg(0),
+              instr => instr.MatchCall<BraveBehaviour>("get_sprite"),
+              instr => instr.MatchLdarg(0)
+              ))
+                return;
 
-        // skip past UseOmnidirectionalItemFacing and loading the ShopItemController, then proceed as with custom shop items
-        //   and finally replace the ShopItemController arg at the end
-        cursor.Index += 2;
-        cursor.Emit(OpCodes.Ldarg_1);  // PickupObject
-        cursor.Emit(OpCodes.Call, typeof(LargeGunAnimationHotfix).GetMethod("FixVanillaShopItemSpriteIfNecessary", BindingFlags.Static | BindingFlags.NonPublic));
-        cursor.Emit(OpCodes.Ldarg_0);  // ShopItemController
-        // ETGModConsole.Log($"  prepatched vanilla shop!");
+            // skip past UseOmnidirectionalItemFacing and loading the ShopItemController, then proceed as with custom shop items
+            //   and finally replace the ShopItemController arg at the end
+            cursor.Index += 2;
+            cursor.Emit(OpCodes.Ldarg_1);  // PickupObject
+            cursor.Emit(OpCodes.Call, typeof(LargeGunAnimationHotfix).GetMethod("FixVanillaShopItemSpriteIfNecessary", BindingFlags.Static | BindingFlags.NonPublic));
+            cursor.Emit(OpCodes.Ldarg_0);  // ShopItemController
+            // ETGModConsole.Log($"  prepatched vanilla shop!");
+        }
     }
 
-    private static void FixVanillaShopItemSpriteIfNecessary(CustomShopItemController item, PickupObject pickup)
+    private static void FixVanillaShopItemSpriteIfNecessary(ShopItemController item, PickupObject pickup)
     {
         if (pickup.GetComponent<Gun>() is not Gun gun)
             return;
@@ -212,19 +183,23 @@ public static class LargeGunAnimationHotfix
         item.sprite.SetSprite(idleClip.frames[0].spriteCollection, idleClip.frames[0].spriteId);
     }
 
-    // Make sure guns in modded shops are aligned properly
-    private static void OnInitializeCustomShopItemIL(ILContext il)
+    [HarmonyPatch(typeof(CustomShopItemController), nameof(CustomShopItemController.InitializeInternal))]
+    private class InitializeCustomShopItemPatch // Fix oversized gun idle animations in custom shops and make sure they are aligned properly
     {
-        ILCursor cursor = new ILCursor(il);
-        // cursor.DumpILOnce("OnInitializeCustomShopItemIL");
+        [HarmonyILManipulator]
+        private static void OnInitializeCustomShopItemIL(ILContext il)
+        {
+            ILCursor cursor = new ILCursor(il);
+            // cursor.DumpILOnce("OnInitializeCustomShopItemIL");
 
-        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchStfld<CustomShopItemController>("UseOmnidirectionalItemFacing")))
-            return;
+            if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchStfld<CustomShopItemController>("UseOmnidirectionalItemFacing")))
+                return;
 
-        cursor.Emit(OpCodes.Ldarg_0);  // CustomShopItemController
-        cursor.Emit(OpCodes.Ldarg_1);  // PickupObject
-        cursor.Emit(OpCodes.Call, typeof(LargeGunAnimationHotfix).GetMethod("FixCustomShopItemSpriteIfNecessary", BindingFlags.Static | BindingFlags.NonPublic));
-        // ETGModConsole.Log($"  prepatched custom shop!");
+            cursor.Emit(OpCodes.Ldarg_0);  // CustomShopItemController
+            cursor.Emit(OpCodes.Ldarg_1);  // PickupObject
+            cursor.Emit(OpCodes.Call, typeof(LargeGunAnimationHotfix).GetMethod("FixCustomShopItemSpriteIfNecessary", BindingFlags.Static | BindingFlags.NonPublic));
+            // ETGModConsole.Log($"  prepatched custom shop!");
+        }
     }
 
     private static void FixCustomShopItemSpriteIfNecessary(CustomShopItemController item, PickupObject pickup)
@@ -249,22 +224,27 @@ public static class LargeGunAnimationHotfix
     //     // reward.contents = PickupObjectDatabase.GetById(IDs.Pickups["jugglernaut"]);
     // }
 
-    private static void OnDetermineContentsIL(ILContext il)
+    [HarmonyPatch(typeof(RewardPedestal), nameof(RewardPedestal.DetermineContents))]
+    private class DetermineRewardPedestalContentsPatch // Fix oversized idle animations on reward pedestals
     {
-        ILCursor cursor = new ILCursor(il);
+        [HarmonyILManipulator]
+        private static void OnDetermineContentsIL(ILContext il)
+        {
+            ILCursor cursor = new ILCursor(il);
 
-        // if (C.DEBUG_BUILD)
-        //     if (cursor.TryGotoNext(MoveType.Before, instr => instr.MatchLdstr("Display Sprite")))
-        //     {
-        //         cursor.Emit(OpCodes.Ldarg_0);
-        //         cursor.Emit(OpCodes.Call, typeof(LargeGunAnimationHotfix).GetMethod("DebugSetRewardPedestal", BindingFlags.Static | BindingFlags.NonPublic));
-        //     }
+            // if (C.DEBUG_BUILD)
+            //     if (cursor.TryGotoNext(MoveType.Before, instr => instr.MatchLdstr("Display Sprite")))
+            //     {
+            //         cursor.Emit(OpCodes.Ldarg_0);
+            //         cursor.Emit(OpCodes.Call, typeof(LargeGunAnimationHotfix).GetMethod("DebugSetRewardPedestal", BindingFlags.Static | BindingFlags.NonPublic));
+            //     }
 
-        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchStfld<RewardPedestal>("m_itemDisplaySprite")))
-            return;
+            if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchStfld<RewardPedestal>("m_itemDisplaySprite")))
+                return;
 
-        cursor.Emit(OpCodes.Ldarg_0);
-        cursor.Emit(OpCodes.Call, typeof(LargeGunAnimationHotfix).GetMethod("FixRewardPedestalSpriteIfNecessary", BindingFlags.Static | BindingFlags.NonPublic));
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Emit(OpCodes.Call, typeof(LargeGunAnimationHotfix).GetMethod("FixRewardPedestalSpriteIfNecessary", BindingFlags.Static | BindingFlags.NonPublic));
+        }
     }
 
     // Use the first frame of the gun's (potentially trimmed) idle animation as its reward pedestal sprite
@@ -283,18 +263,28 @@ public static class LargeGunAnimationHotfix
         reward.m_itemDisplaySprite.SetSprite(idleClip.frames[0].spriteCollection, idleClip.frames[0].spriteId);
     }
 
-    private static void OnPresentItemIL(ILContext il)
+    [HarmonyPatch]
+    private class PresentItemPatch // Fix oversized idle animations in chests
     {
-        ILCursor cursor = new ILCursor(il);
-        int spriteVal = -1;
-        if (!cursor.TryGotoNext(MoveType.After,
-              instr => instr.MatchCall<tk2dSprite>("AddComponent"),
-              instr => instr.MatchStloc(out spriteVal)))
-            return; //
+        static MethodBase TargetMethod() {
+          // refer to C# reflection documentation:
+          return typeof(Chest).GetNestedType("<PresentItem>c__Iterator6", BindingFlags.NonPublic | BindingFlags.Instance).GetMethod("MoveNext");
+        }
 
-        cursor.Emit(OpCodes.Ldloc_3); // PickupObject
-        cursor.Emit(OpCodes.Ldloc, spriteVal);  //tk2dSprite
-        cursor.Emit(OpCodes.Call, typeof(LargeGunAnimationHotfix).GetMethod("FixGunsFromChest", BindingFlags.Static | BindingFlags.NonPublic));
+        [HarmonyILManipulator]
+        private static void OnPresentItemIL(ILContext il)
+        {
+            ILCursor cursor = new ILCursor(il);
+            int spriteVal = -1;
+            if (!cursor.TryGotoNext(MoveType.After,
+                  instr => instr.MatchCall<tk2dSprite>("AddComponent"),
+                  instr => instr.MatchStloc(out spriteVal)))
+                return; //
+
+            cursor.Emit(OpCodes.Ldloc_3); // PickupObject
+            cursor.Emit(OpCodes.Ldloc, spriteVal);  //tk2dSprite
+            cursor.Emit(OpCodes.Call, typeof(LargeGunAnimationHotfix).GetMethod("FixGunsFromChest", BindingFlags.Static | BindingFlags.NonPublic));
+        }
     }
 
     private static void FixGunsFromChest(PickupObject pickup, tk2dSprite sprite)
@@ -338,113 +328,120 @@ public static class LargeGunAnimationHotfix
 }
 
 // Fix softlock when one player dies in a payday drill room (can't get the bug to trigger consistently enough to test this, so disabling this for now)
-public static class CoopDrillSoftlockHotfix
-{
-    // private static ILHook _CoopDrillSoftlockHotfixHook;
+// public static class CoopDrillSoftlockHotfix
+// {
+//     // private static ILHook _CoopDrillSoftlockHotfixHook;
 
-    public static void Init()
-    {
-        // _CoopDrillSoftlockHotfixHook = new ILHook(
-        //     typeof(PaydayDrillItem).GetNestedType("<HandleTransitionToFallbackCombatRoom>c__Iterator1", BindingFlags.NonPublic | BindingFlags.Instance).GetMethod("MoveNext"),
-        //     CoopDrillSoftlockHotfixHookIL
-        //     );
-    }
+//     public static void Init()
+//     {
+//         // _CoopDrillSoftlockHotfixHook = new ILHook(
+//         //     typeof(PaydayDrillItem).GetNestedType("<HandleTransitionToFallbackCombatRoom>c__Iterator1", BindingFlags.NonPublic | BindingFlags.Instance).GetMethod("MoveNext"),
+//         //     CoopDrillSoftlockHotfixHookIL
+//         //     );
+//     }
 
-    private static void CoopDrillSoftlockHotfixHookIL(ILContext il)
-    {
-        ILCursor cursor = new ILCursor(il);
-        // cursor.DumpILOnce("CoopDrillSoftlockHotfixHook");
+//     private static void CoopDrillSoftlockHotfixHookIL(ILContext il)
+//     {
+//         ILCursor cursor = new ILCursor(il);
+//         // cursor.DumpILOnce("CoopDrillSoftlockHotfixHook");
 
-        if (!cursor.TryGotoNext(MoveType.After,
-          instr => instr.MatchCallvirt<Chest>("ForceUnlock"),
-          instr => instr.MatchLdarg(0)
-          ))
-            return; // failed to find what we need
+//         if (!cursor.TryGotoNext(MoveType.After,
+//           instr => instr.MatchCallvirt<Chest>("ForceUnlock"),
+//           instr => instr.MatchLdarg(0)
+//           ))
+//             return; // failed to find what we need
 
-        ETGModConsole.Log($"found!");
+//         ETGModConsole.Log($"found!");
 
-        // partial fix
-        cursor.Remove(); // remove loading false into our bool
-        cursor.Emit(OpCodes.Ldc_I4_1); // load true into the bool instead so we can immediately skip the loop
+//         // partial fix
+//         cursor.Remove(); // remove loading false into our bool
+//         cursor.Emit(OpCodes.Ldc_I4_1); // load true into the bool instead so we can immediately skip the loop
 
-        // debugging
-        // cursor.Emit(OpCodes.Call, typeof(CoopDrillSoftlockHotfix).GetMethod("SanityCheck"));
+//         // debugging
+//         // cursor.Emit(OpCodes.Call, typeof(CoopDrillSoftlockHotfix).GetMethod("SanityCheck"));
 
-        return;
-    }
+//         return;
+//     }
 
-    public static void SanityCheck()
-    {
-        ETGModConsole.Log($"sanity checking");
-        for (int j = 0; j < GameManager.Instance.AllPlayers.Length; j++)
-        {
-            ETGModConsole.Log($"position for player {j+1}");
-            ETGModConsole.Log($"{GameManager.Instance.AllPlayers[j].CenterPosition}");
-        }
-    }
-}
+//     public static void SanityCheck()
+//     {
+//         ETGModConsole.Log($"sanity checking");
+//         for (int j = 0; j < GameManager.Instance.AllPlayers.Length; j++)
+//         {
+//             ETGModConsole.Log($"position for player {j+1}");
+//             ETGModConsole.Log($"{GameManager.Instance.AllPlayers[j].CenterPosition}");
+//         }
+//     }
+// }
 
 // Fix player two not getting Turbo Mode speed buffs in Coop
 public static class CoopTurboModeHotfix
 {
-    private static ILHook _CoopTurboModeFixHook;
-
-    public static void Init()
+    [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.UpdateTurboModeStats))]
+    private class CoopTurboModePatch
     {
-        _CoopTurboModeFixHook = new ILHook(
-            typeof(PlayerController).GetMethod("UpdateTurboModeStats", BindingFlags.Instance | BindingFlags.NonPublic),
-            CoopTurboModeFixHookIL
-            );
-    }
+        [HarmonyILManipulator]
+        private static void CoopTurboModeFixHookIL(ILContext il)
+        {
+            ILCursor cursor = new ILCursor(il);
+            // cursor.DumpILOnce("CoopTurboModeFixHookIL");
 
-    private static void CoopTurboModeFixHookIL(ILContext il)
-    {
-        ILCursor cursor = new ILCursor(il);
-        // cursor.DumpILOnce("CoopTurboModeFixHookIL");
+            if (!cursor.TryGotoNext(MoveType.After,
+              instr => instr.MatchLdfld<PlayerController>("m_turboSpeedModifier"),
+              instr => instr.OpCode == OpCodes.Callvirt  // can't match List<StatModified>::Add() for some reason
+              ))
+                return; // failed to find what we need
 
-        if (!cursor.TryGotoNext(MoveType.After,
-          instr => instr.MatchLdfld<PlayerController>("m_turboSpeedModifier"),
-          instr => instr.OpCode == OpCodes.Callvirt  // can't match List<StatModified>::Add() for some reason
-          ))
-            return; // failed to find what we need
+            // Recalculate stats after adjusting turbo speed modifier (mirrors IL code for other calls to stats.RecalculateStats())
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Emit(OpCodes.Ldfld, typeof(PlayerController).GetField("stats", BindingFlags.Instance | BindingFlags.Public));
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Emit(OpCodes.Ldc_I4_0);
+            cursor.Emit(OpCodes.Ldc_I4_0);
+            cursor.Emit(OpCodes.Callvirt, typeof(PlayerStats).GetMethod("RecalculateStats", BindingFlags.Instance | BindingFlags.Public));
 
-        // Recalculate stats after adjusting turbo speed modifier (mirrors IL code for other calls to stats.RecalculateStats())
-        cursor.Emit(OpCodes.Ldarg_0);
-        cursor.Emit(OpCodes.Ldfld, typeof(PlayerController).GetField("stats", BindingFlags.Instance | BindingFlags.Public));
-        cursor.Emit(OpCodes.Ldarg_0);
-        cursor.Emit(OpCodes.Ldc_I4_0);
-        cursor.Emit(OpCodes.Ldc_I4_0);
-        cursor.Emit(OpCodes.Callvirt, typeof(PlayerStats).GetMethod("RecalculateStats", BindingFlags.Instance | BindingFlags.Public));
+            if (!cursor.TryGotoNext(MoveType.After,
+              instr => instr.MatchLdfld<PlayerController>("m_turboRollSpeedModifier"),
+              instr => instr.OpCode == OpCodes.Callvirt  // can't match List<StatModified>::Add() for some reason
+              ))
+                return; // failed to find what we need
 
-        if (!cursor.TryGotoNext(MoveType.After,
-          instr => instr.MatchLdfld<PlayerController>("m_turboRollSpeedModifier"),
-          instr => instr.OpCode == OpCodes.Callvirt  // can't match List<StatModified>::Add() for some reason
-          ))
-            return; // failed to find what we need
+            // Recalculate stats after adjusting turbo roll speed modifier (mirrors IL code for other calls to stats.RecalculateStats())
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Emit(OpCodes.Ldfld, typeof(PlayerController).GetField("stats", BindingFlags.Instance | BindingFlags.Public));
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Emit(OpCodes.Ldc_I4_0);
+            cursor.Emit(OpCodes.Ldc_I4_0);
+            cursor.Emit(OpCodes.Callvirt, typeof(PlayerStats).GetMethod("RecalculateStats", BindingFlags.Instance | BindingFlags.Public));
 
-        // Recalculate stats after adjusting turbo roll speed modifier (mirrors IL code for other calls to stats.RecalculateStats())
-        cursor.Emit(OpCodes.Ldarg_0);
-        cursor.Emit(OpCodes.Ldfld, typeof(PlayerController).GetField("stats", BindingFlags.Instance | BindingFlags.Public));
-        cursor.Emit(OpCodes.Ldarg_0);
-        cursor.Emit(OpCodes.Ldc_I4_0);
-        cursor.Emit(OpCodes.Ldc_I4_0);
-        cursor.Emit(OpCodes.Callvirt, typeof(PlayerStats).GetMethod("RecalculateStats", BindingFlags.Instance | BindingFlags.Public));
-
-        return;
+            return;
+        }
     }
 }
 
 // Temporary hotfix until I can figure out why the Dragun fight crashes with PSOG
 public static class DragunFightHotfix
 {
-    private static ILHook _BossTriggerZoneNullDereferenceFixHook;
-
-    public static void Init()
+    [HarmonyPatch(typeof(BossTriggerZone), nameof(BossTriggerZone.OnTriggerCollision))]
+    private class BossTriggerZoneNullDereferencePatch
     {
-        _BossTriggerZoneNullDereferenceFixHook = new ILHook(
-            typeof(BossTriggerZone).GetMethod("OnTriggerCollision", BindingFlags.Instance | BindingFlags.NonPublic),
-            BossTriggerZoneNullDereferenceFixIL
-            );
+        [HarmonyILManipulator]
+        private static void BossTriggerZoneNullDereferenceFixIL(ILContext il)
+        {
+            ILCursor cursor = new ILCursor(il);
+
+            // Sanity check the trigger zone itself
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Emit(OpCodes.Ldarg_1);
+            cursor.Emit(OpCodes.Ldarg_2);
+            cursor.Emit(OpCodes.Ldarg_3);
+            cursor.Emit(OpCodes.Call, typeof(DragunFightHotfix).GetMethod("BossTriggerZoneSanityCheck"));
+
+            // Sanity check the healthhaver to make sure it's not a boss without an ObjectVisibilityManager
+            if (cursor.TryGotoNext(MoveType.Before, instr => instr.MatchCallvirt<HealthHaver>("get_IsBoss")))
+                cursor.Emit(OpCodes.Call, typeof(DragunFightHotfix).GetMethod("HealthHaverSanityCheck"));
+            return;
+        }
     }
 
     public static void BossTriggerZoneSanityCheck(BossTriggerZone zone, SpeculativeRigidbody otherRigidbody, SpeculativeRigidbody myRigidbody, CollisionData collisionData)
@@ -485,22 +482,5 @@ public static class DragunFightHotfix
             }
         }
         return hh;
-    }
-
-    private static void BossTriggerZoneNullDereferenceFixIL(ILContext il)
-    {
-        ILCursor cursor = new ILCursor(il);
-
-        // Sanity check the trigger zone itself
-        cursor.Emit(OpCodes.Ldarg_0);
-        cursor.Emit(OpCodes.Ldarg_1);
-        cursor.Emit(OpCodes.Ldarg_2);
-        cursor.Emit(OpCodes.Ldarg_3);
-        cursor.Emit(OpCodes.Call, typeof(DragunFightHotfix).GetMethod("BossTriggerZoneSanityCheck"));
-
-        // Sanity check the healthhaver to make sure it's not a boss without an ObjectVisibilityManager
-        if (cursor.TryGotoNext(MoveType.Before, instr => instr.MatchCallvirt<HealthHaver>("get_IsBoss")))
-            cursor.Emit(OpCodes.Call, typeof(DragunFightHotfix).GetMethod("HealthHaverSanityCheck"));
-        return;
     }
 }

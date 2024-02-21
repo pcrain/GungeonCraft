@@ -16,8 +16,6 @@ public class Pincushion : AdvancedGunBehavior
 
     internal static VFXPool _Microdust;
 
-    private static ILHook _VeryFragileILHook;
-
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Pincushion>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
@@ -44,11 +42,6 @@ public class Pincushion : AdvancedGunBehavior
             trail.BaseColor  = Color.gray;
             trail.EndColor   = Color.gray;
           });
-
-        _VeryFragileILHook = new ILHook(
-            typeof(MinorBreakable).GetMethod("OnPreCollision", BindingFlags.Instance | BindingFlags.NonPublic),
-            VeryFragileIL
-            );
     }
 
     // GetLowDiscrepancyRandom() makes projectiles not spread as randomly as they could, so override that randomness with our own spread
@@ -68,20 +61,25 @@ public class Pincushion : AdvancedGunBehavior
         gun.gameObject.Play("soul_kaliber_fire");
     }
 
-    private static void VeryFragileIL(ILContext il)
+    [HarmonyPatch(typeof(MinorBreakable), nameof(MinorBreakable.OnPreCollision))]
+    private class VeryFragileProjectilePatch
     {
-        ILCursor cursor = new ILCursor(il);
+        [HarmonyILManipulator]
+        private static void VeryFragileIL(ILContext il)
+        {
+            ILCursor cursor = new ILCursor(il);
 
-        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchStloc(0)))
-            return;
+            if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchStloc(0)))
+                return;
 
-        // Skip past the part where the MinorBreakable actually breaks if we have the VeryFragileProjectile component
-        ILLabel projectileIsNotFragileLabel = cursor.DefineLabel();
-        cursor.Emit(OpCodes.Ldloc_0);
-        cursor.Emit(OpCodes.Call, typeof(Pincushion).GetMethod("BreakFragileProjectiles", BindingFlags.Static | BindingFlags.NonPublic));
-        cursor.Emit(OpCodes.Brfalse, projectileIsNotFragileLabel);
-        cursor.Emit(OpCodes.Ret);
-        cursor.MarkLabel(projectileIsNotFragileLabel);
+            // Skip past the part where the MinorBreakable actually breaks if we have the VeryFragileProjectile component
+            ILLabel projectileIsNotFragileLabel = cursor.DefineLabel();
+            cursor.Emit(OpCodes.Ldloc_0);
+            cursor.Emit(OpCodes.Call, typeof(Pincushion).GetMethod("BreakFragileProjectiles", BindingFlags.Static | BindingFlags.NonPublic));
+            cursor.Emit(OpCodes.Brfalse, projectileIsNotFragileLabel);
+            cursor.Emit(OpCodes.Ret);
+            cursor.MarkLabel(projectileIsNotFragileLabel);
+        }
     }
 
     private static bool BreakFragileProjectiles(Projectile p)
