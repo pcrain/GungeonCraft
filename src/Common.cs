@@ -6,7 +6,7 @@ public class C // constants
 
     public const string MOD_NAME     = "GungeonCraft";
     public const string MOD_INT_NAME = "CwaffingTheGungy";
-    public const string MOD_VERSION  = "1.8.1";
+    public const string MOD_VERSION  = "1.8.2";
     public const string MOD_GUID     = "pretzel.etg.cwaff";
     public const string MOD_PREFIX   = "cg";
 

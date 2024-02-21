@@ -506,7 +506,7 @@ public static class HeckedMode
 
     private static bool ForceJammedBosses(bool original, AIActor actor)
     {
-        return original || (actor && actor.healthHaver && (actor.healthHaver.IsBoss || actor.healthHaver.IsSubboss));
+        return original || ((_HeckedModeStatus == Hecked.Retrashed) && actor && actor.healthHaver && (actor.healthHaver.IsBoss || actor.healthHaver.IsSubboss));
     }
 
     private static void CopyAIBulletBank(this AIBulletBank me, AIBulletBank other)

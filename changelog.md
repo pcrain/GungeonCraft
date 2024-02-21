@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.8.2 (2024-02-21)
+- Fixed accidentally making all bosses jammed whoops D:
+
 ## 1.8.1 (2024-02-20)
 - Fixed null dereference causing Gyroscope and Drifter's Headgear to break after boss fights
 - Fixed some pickup bounding box weirdness on Vladimir, Blamethrower, and Suncaster
