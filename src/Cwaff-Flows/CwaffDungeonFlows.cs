@@ -3,24 +3,28 @@ namespace CwaffingTheGungy;
 // Stealing from ApacheThunder this time .o.
 public class CwaffDungeonFlow {
 
-    public static Hook loadCustomFlowHook; //Hook for making sure we can load custom flows okay
+    [HarmonyPatch(typeof(FlowDatabase), nameof(FlowDatabase.GetOrLoadByName))]
+    private class LoadCustomFlowPatch // Patch for making sure we can load custom flows okay
+    {
+        static bool Prefix(string name, ref DungeonFlow __result)
+        {
+            ETGModConsole.Log($"loading a custom flow");
+            string flowName = name;
+            if (flowName.Contains("/"))
+                flowName = flowName.Substring(flowName.LastIndexOf("/") + 1);
 
-    public static DungeonFlow LoadCustomFlow(Func<string, DungeonFlow>orig, string target) {
-        string flowName = target;
-        if (flowName.Contains("/")) { flowName = target.Substring(target.LastIndexOf("/") + 1); }
-
-        if (KnownFlows != null && KnownFlows.Count > 0) {
-            foreach (DungeonFlow flow in KnownFlows) {
-                if (flow.name != null && flow.name != string.Empty) {
-                    if (flowName.ToLower() == flow.name.ToLower()) {
-                        DebugTime.RecordStartTime();
-                        DebugTime.Log("AssetBundle.LoadAsset<DungeonFlow>({0})", new object[] { flowName });
-                        return flow;
+            if (KnownFlows != null && KnownFlows.Count > 0) {
+                foreach (DungeonFlow flow in KnownFlows) {
+                    if (flow.name != null && flow.name != string.Empty) {
+                        if (flowName.ToLower() == flow.name.ToLower()) {
+                            __result = flow;
+                            return false;
+                        }
                     }
                 }
             }
+            return true;
         }
-        return orig(target);
     }
 
     public static DungeonFlow LoadOfficialFlow(string target) {
@@ -102,14 +106,6 @@ public class CwaffDungeonFlow {
 
     // Initialize KnownFlows array with custom + official flows.
     public static void InitDungeonFlowsAndHooks(AssetBundle sharedAssets2, bool refreshFlows = false) {
-
-        // Stolen fromm elsewhere, but we need a hook for loading flows
-        // TODO: this should be relocated
-        loadCustomFlowHook = new Hook(
-            typeof(FlowDatabase).GetMethod("GetOrLoadByName", BindingFlags.Public | BindingFlags.Static),
-            typeof(CwaffDungeonFlow).GetMethod("LoadCustomFlow", BindingFlags.Public | BindingFlags.Static)
-        );
-
         Dungeon TutorialPrefab = DungeonDatabase.GetOrLoadByName("Base_Tutorial");
         Dungeon CastlePrefab = DungeonDatabase.GetOrLoadByName("Base_Castle");
         Dungeon SewerPrefab = DungeonDatabase.GetOrLoadByName("Base_Sewer");

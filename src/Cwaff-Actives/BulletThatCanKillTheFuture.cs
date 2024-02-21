@@ -271,7 +271,7 @@ public class BulletThatCanKillTheFuture : PlayerItem
         bool killedOwnFuture = (pdist < Mathf.Min(2f, victimDistance));
         if (!killedOwnFuture && victim != null)
         {
-            CwaffToolbox.enemyWithoutAFuture = victim.EnemyGuid;
+            CwaffToolbox.EnemyWithoutAFuture = victim.EnemyGuid;
             Lazy.CustomNotification("Future Erased", victim.GetActorName(), _Sprite);
             // ETGModConsole.Log("future erased for "+victim.EnemyGuid);
             VFXPool vfx = VFX.CreatePoolFromVFXGameObject((ItemHelper.Get(Items.MagicLamp) as Gun
@@ -328,7 +328,7 @@ public class BulletThatCanKillTheFuture : PlayerItem
             yield return new WaitForSeconds(0.25f);
             NameOfPreviousFloor = GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName;
             GameManager.Instance.OnNewLevelFullyLoaded += ForceElevatorToReturnToPreviousFloor;
-            GameManager.Instance.LoadCustomLevel("cg_sansfloor"); //TODO: rename later
+            GameManager.Instance.LoadCustomLevel(SansDungeon.INTERNAL_NAME);
         }
         yield break;
     }
@@ -338,7 +338,7 @@ public class BulletThatCanKillTheFuture : PlayerItem
         GameManager.Instance.OnNewLevelFullyLoaded -= ForceElevatorToReturnToPreviousFloor;
         if (_RevertLevelHook != null)
             _RevertLevelHook.Dispose();
-        _RevertLevelHook = new Hook(
+        _RevertLevelHook = new Hook(  //REFACTOR: figure out how to do these temporary hook shenanigans with Harmony at some point
             typeof(ElevatorDepartureController).GetMethod("TransitionToDepart", BindingFlags.Instance | BindingFlags.NonPublic),
             typeof(BulletThatCanKillTheFuture).GetMethod("TransitionToDepartHook", BindingFlags.Static | BindingFlags.NonPublic)
             );
@@ -347,7 +347,7 @@ public class BulletThatCanKillTheFuture : PlayerItem
     private static void TransitionToDepartHook(Action<ElevatorDepartureController, tk2dSpriteAnimator, tk2dSpriteAnimationClip> orig, ElevatorDepartureController self, tk2dSpriteAnimator animator, tk2dSpriteAnimationClip clip)
     {
         self.UsesOverrideTargetFloor = false;
-        if (GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName == "cg_sansfloor")
+        if (GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName == SansDungeon.INTERNAL_NAME)
             GameManager.Instance.InjectedLevelName = NameOfPreviousFloor;
 
         _RevertLevelHook.Dispose();

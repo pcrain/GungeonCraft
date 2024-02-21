@@ -287,23 +287,17 @@ public static class HeckedMode
 
     public readonly static int _FirstWeakGun = HeckedModeGunWhiteList.IndexOf((int)Items.MakeshiftCannon);
 
-    private static Hook _EnemyAwakeHook;
     // private static Hook _EnemyShootHook;
     private static ILHook _DisablePrefireAnimationHook;
     private static ILHook _DisablePrefireStateHook;
-    private static Hook _InitializeShootHook;
     private static ILHook _FusedChestHook;
     private static ILHook _NoStealthForYouHook;
-    private static Hook _GetActivePlayerClosestToPointHook;
     private static ILHook _ForceJammedBossesHook;
 
     internal static readonly string _CONFIG_KEY = "Hecked Mode";
 
     public static void Init()
     {
-        _EnemyAwakeHook = new Hook(
-            typeof(AIActor).GetMethod("Awake", BindingFlags.Public | BindingFlags.Instance),
-            typeof(HeckedMode).GetMethod("OnEnemyPreAwake"));
         _DisablePrefireAnimationHook = new ILHook(
             typeof(ShootGunBehavior).GetMethod("Start", BindingFlags.Instance | BindingFlags.Public),
             DisablePrefireAnimationDuringHeckedModeIL
@@ -312,25 +306,15 @@ public static class HeckedMode
             typeof(ShootGunBehavior).GetMethod("ContinuousUpdate", BindingFlags.Instance | BindingFlags.Public),
             DisablePrefireStateDuringHeckedModeIL
             );
-        _InitializeShootHook = new Hook(
-            typeof(AIShooter).GetMethod("Initialize", BindingFlags.Public | BindingFlags.Instance),
-            typeof(HeckedMode).GetMethod("OnInitializeShooter"));
         _FusedChestHook = new ILHook(
             typeof(Chest).GetMethod("RoomEntered", BindingFlags.NonPublic | BindingFlags.Instance),
             FusedChestHookIL);
         _NoStealthForYouHook = new ILHook(
             typeof(TargetPlayerBehavior).GetMethod("Update", BindingFlags.Public | BindingFlags.Instance),
             NoStealthForYouIL);
-        _GetActivePlayerClosestToPointHook = new Hook(
-            typeof(GameManager).GetMethod("GetActivePlayerClosestToPoint", BindingFlags.Public | BindingFlags.Instance),
-            typeof(HeckedMode).GetMethod("OnGetActivePlayerClosestToPoint", BindingFlags.NonPublic | BindingFlags.Static));
         _ForceJammedBossesHook = new ILHook(
             typeof(AIActor).GetMethod("CheckForBlackPhantomness", BindingFlags.NonPublic | BindingFlags.Instance),
             _ForceJammedBossesIL);
-
-        new Hook(
-            typeof(AIShooter).GetMethod("ToggleGunRenderers", BindingFlags.Public | BindingFlags.Instance),
-            typeof(HeckedMode).GetMethod("ToggleGunRenderers", BindingFlags.NonPublic | BindingFlags.Static));
 
         // _EnemyShootHook = new Hook(
         //     typeof(AIShooter).GetMethod("Shoot", BindingFlags.Public | BindingFlags.Instance),
@@ -374,12 +358,6 @@ public static class HeckedMode
     //     action(shooter, overrideBulletName);
     // }
 
-    private static void ToggleGunRenderers(Action<AIShooter, bool, string> orig, AIShooter shooter, bool value, string reason)
-    {
-        // ETGModConsole.Log($"toggling gun renderers for {shooter.aiActor.ActorName} with gun {shooter.CurrentGun} and hand {(shooter.handObject == null ? "false" : "true")}");
-        orig(shooter, value, reason);
-    }
-
     // disable prefire animations in hecked mode since they mess with fire rate
     private static bool HeckedModeShouldSkipPrefireAnimationCheck(ShootGunBehavior sgb, string s)
     {
@@ -412,38 +390,43 @@ public static class HeckedMode
         cursor.Emit(OpCodes.Call, typeof(HeckedMode).GetMethod("HeckedModeShouldSkipPrefireAnimationCheck", BindingFlags.Static | BindingFlags.NonPublic)); // replace it with our own
     }
 
-    public static void OnEnemyPreAwake(Action<AIActor> action, AIActor enemy)
+    [HarmonyPatch(typeof(AIActor), nameof(AIActor.Awake))]
+    private class HeckedEnemyAwakePatch
     {
-        if ((_HeckedModeStatus != Hecked.Disabled) && !enemy.IsABoss())
+        static void Prefix(AIActor __instance)
         {
+            if ((_HeckedModeStatus == Hecked.Disabled) || __instance.IsABoss())
+                return;
+
             Items replacementGunId;
             if (_HeckedModeStatus == Hecked.Retrashed)
                 replacementGunId = (Items)HeckedModeGunWhiteList[UnityEngine.Random.Range(0, _FirstWeakGun)];
             else
                 replacementGunId = (Items)HeckedModeGunWhiteList.ChooseRandom();
-            enemy.HeckedShootGunBehavior(ItemHelper.Get(replacementGunId) as Gun);
+            __instance.HeckedShootGunBehavior(ItemHelper.Get(replacementGunId) as Gun);
         }
-        action(enemy);
     }
 
-    // Removes some player-only components from guns to make them work with AI
-    public static void OnInitializeShooter(Action<AIShooter> orig, AIShooter shooter)
+    [HarmonyPatch(typeof(AIShooter), nameof(AIShooter.Initialize))]
+    private class HeckedRemoveBadComponentsPatch // Removes some player-only components from guns to make them work with AI
     {
-        // ETGModConsole.Log($"    initializing aishooter for {shooter.aiActor.ActorName}");
-        // ETGModConsole.Log($"      EquippedGun {shooter.EquippedGun?.EncounterNameOrDisplayName}");
-        orig(shooter);
-        // ETGModConsole.Log($"      CurrentGun {shooter.CurrentGun?.EncounterNameOrDisplayName}");
-        if (shooter?.CurrentGun is not Gun gun)
-            return;
-        gun.GetComponent<HoveringGunSynergyProcessor>().SafeDestroy();                 // fix Blooper, etc.
-        gun.GetComponent<MotionTriggeredStatSynergyProcessor>().SafeDestroy();         // fix Gungine, etc.
-        gun.GetComponent<TalkingGunModifier>().SafeDestroy();                          // fix Gunther
-        // gun.GetComponent<LifeOrbGunModifier>().SafeDestroy();                       // fix Life Orb, not useful until beams are fixed in general
-        if (gun.GetComponent<StealthOnReloadPressed>() is StealthOnReloadPressed sorp) // fix GreyMauser, etc.
+        static void Postfix(AIShooter __instance)
         {
-            gun.OnAutoReload -= sorp.HandleReloadPressedSimple;
-            gun.OnReloadPressed -= sorp.HandleReloadPressed;
-            sorp.SafeDestroy();
+            // ETGModConsole.Log($"    initializing aishooter for {shooter.aiActor.ActorName}");
+            // ETGModConsole.Log($"      EquippedGun {shooter.EquippedGun?.EncounterNameOrDisplayName}");
+            // ETGModConsole.Log($"      CurrentGun {shooter.CurrentGun?.EncounterNameOrDisplayName}");
+            if (!__instance || __instance.CurrentGun is not Gun gun)
+                return;
+            gun.GetComponent<HoveringGunSynergyProcessor>().SafeDestroy();                 // fix Blooper, etc.
+            gun.GetComponent<MotionTriggeredStatSynergyProcessor>().SafeDestroy();         // fix Gungine, etc.
+            gun.GetComponent<TalkingGunModifier>().SafeDestroy();                          // fix Gunther
+            // gun.GetComponent<LifeOrbGunModifier>().SafeDestroy();                       // fix Life Orb, not useful until beams are fixed in general
+            if (gun.GetComponent<StealthOnReloadPressed>() is StealthOnReloadPressed sorp) // fix GreyMauser, etc.
+            {
+                gun.OnAutoReload -= sorp.HandleReloadPressedSimple;
+                gun.OnReloadPressed -= sorp.HandleReloadPressed;
+                sorp.SafeDestroy();
+            }
         }
     }
 
@@ -487,10 +470,13 @@ public static class HeckedMode
         return stealthed && (_HeckedModeStatus != Hecked.Retrashed);
     }
 
-    private static PlayerController OnGetActivePlayerClosestToPoint(Func<GameManager, Vector2, bool, PlayerController> orig,
-        GameManager gm, Vector2 point, bool allowStealth)
+    [HarmonyPatch(typeof(GameManager), nameof(GameManager.GetActivePlayerClosestToPoint))]
+    private class HeckedIgnoreStealthPatch // allow enemies to target stealthed players in Retrashed Mode
     {
-        return orig(gm, point, allowStealth || (_HeckedModeStatus == Hecked.Retrashed));
+        static void Prefix(Vector2 point, ref bool allowStealth)
+        {
+            allowStealth |= (_HeckedModeStatus == Hecked.Retrashed);
+        }
     }
 
     private static void _ForceJammedBossesIL(ILContext il)

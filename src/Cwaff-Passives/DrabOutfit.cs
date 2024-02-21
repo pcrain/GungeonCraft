@@ -8,7 +8,6 @@ public class DrabOutfit : PassiveItem
     public static string Lore             = "This garment seems to go slightly out of its way to be as plain and boring as possible. It does not go completely out of its way, however, as that would actually make it notable in some sense. Which it certainly isn't.";
 
     private static int _DrabOutfitId;
-    private static Hook _DrabOutfitHook;
 
     public static void Init()
     {
@@ -17,16 +16,18 @@ public class DrabOutfit : PassiveItem
         item.AddToSubShop(ModdedShopType.Rusty);
 
         _DrabOutfitId   = item.PickupObjectId;
-        _DrabOutfitHook = new Hook(
-            typeof(FloorRewardData).GetMethod("DetermineCurrentMagnificence", BindingFlags.Instance | BindingFlags.Public),
-            typeof(DrabOutfit).GetMethod("OnDetermineCurrentMagnificence", BindingFlags.Static | BindingFlags.NonPublic)
-            );
     }
 
-    private static float OnDetermineCurrentMagnificence(Func<FloorRewardData, bool, float> orig, FloorRewardData rewardData, bool isGenerationForMagnificence)
+    [HarmonyPatch(typeof(FloorRewardData), nameof(FloorRewardData.DetermineCurrentMagnificence))]
+    private class DrabOutfitPatch
     {
-        if (GameManager.Instance.AnyPlayerHasPickupID(_DrabOutfitId))
-            return 0f;  // completely disable the vanilla magnificence system as long as we have Drab Outfit
-        return orig(rewardData, isGenerationForMagnificence);
+        static bool Prefix(bool isGenerationForMagnificence, ref float __result)
+        {
+            if (!GameManager.Instance.AnyPlayerHasPickupID(_DrabOutfitId))
+                return true;
+
+            __result = 0f;  // set magnificence to 0
+            return false;  // skip the original check
+        }
     }
 }

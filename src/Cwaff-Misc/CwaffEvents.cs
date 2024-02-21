@@ -18,77 +18,67 @@ public static class CwaffEvents // global custom events we can listen for
     internal static bool _OnFirstFloor = false;
     internal static bool _AllModsLoaded = false;
 
-    public static void Init()
+    [HarmonyPatch(typeof(FinalIntroSequenceManager), nameof(FinalIntroSequenceManager.Start))]
+    private class FinalIntroSequenceManagerStartPatch // doesn't actually hook the ienumerator itsef, only the implicit method that calls it
     {
-        new Hook(
-            typeof(Dungeon).GetMethod("FloorReached", BindingFlags.Instance | BindingFlags.Public),
-            typeof(CwaffEvents).GetMethod("FloorReachedHook"));
-
-        new Hook(
-            typeof(GameManager).GetMethod("ClearActiveGameData", BindingFlags.Instance | BindingFlags.Public),
-            typeof(CwaffEvents).GetMethod("ClearActiveGameDataHook"));
-
-        new Hook(
-            typeof(GameManager).GetMethod("LoadNextLevel", BindingFlags.Instance | BindingFlags.Public),
-            typeof(CwaffEvents).GetMethod("LoadNextLevelHook"));
-
-        new Hook( // doesn't actually hook the ienumerator itsef, only the implicit method that calls it
-            typeof(FinalIntroSequenceManager).GetMethod("Start", BindingFlags.Instance | BindingFlags.NonPublic),
-            typeof(CwaffEvents).GetMethod("OnFinalIntroSequenceManagerStartHook"));
-    }
-
-    public static IEnumerator OnFinalIntroSequenceManagerStartHook(Func<FinalIntroSequenceManager, IEnumerator> orig, FinalIntroSequenceManager self)
-    {
-        IEnumerator iter = orig(self);
-        if (_AllModsLoaded)
-            return iter;
-
-        _AllModsLoaded = true;
-        if (OnAllModsLoaded != null)
-            OnAllModsLoaded();
-
-        if (OnCleanStart != null)
-            OnCleanStart(); // the first run counts as a clean start as well
-
-        // for some reason, if we don't do this, custom rooms won't be loaded on the first run started from the breach
-        //   this method is already called if we quickstart a run
-        GameManager.Instance.GlobalInjectionData.PreprocessRun();
-
-        return iter;
-    }
-
-    public static void LoadNextLevelHook(Action<GameManager> orig, GameManager self)
-    {
-        if (BeforeRunStart != null && self.nextLevelIndex == 1 || (GameManager.SKIP_FOYER && self.nextLevelIndex == 0))
+        static void Prefix()
         {
-            GameStatsManager gsm = GameStatsManager.Instance;
-            bool reallyStartedNewRun = gsm.GetSessionStatValue(TrackedStats.TIME_PLAYED) < 0.1f;
-            if (reallyStartedNewRun)
-                BeforeRunStart();
+            if (_AllModsLoaded)
+                return;
+
+            _AllModsLoaded = true;
+            if (OnAllModsLoaded != null)
+                OnAllModsLoaded();
+
+            if (OnCleanStart != null)
+                OnCleanStart(); // the first run counts as a clean start as well
+
+            // for some reason, if we don't do this, custom rooms won't be loaded on the first run started from the breach
+            //   this method is already called if we quickstart a run
+            GameManager.Instance.GlobalInjectionData.PreprocessRun();
         }
-        orig(self);
     }
 
-    public static void ClearActiveGameDataHook(Action<GameManager, bool, bool> orig, GameManager self, bool destroyGameManager, bool endSession)
+    [HarmonyPatch(typeof(GameManager), nameof(GameManager.LoadNextLevel))]
+    private class LoadNextLevelPatch
     {
-        orig(self, destroyGameManager, endSession);
-        if (OnCleanStart != null)
-            OnCleanStart();
+        static void Prefix(GameManager __instance)
+        {
+            if (BeforeRunStart != null && (__instance.nextLevelIndex == 1 || (GameManager.SKIP_FOYER && __instance.nextLevelIndex == 0)))
+            {
+                bool reallyStartedNewRun = GameStatsManager.Instance.GetSessionStatValue(TrackedStats.TIME_PLAYED) < 0.1f;
+                if (reallyStartedNewRun)
+                    BeforeRunStart();
+            }
+        }
     }
 
-    public static void FloorReachedHook(Action<Dungeon> orig, Dungeon self)
+    [HarmonyPatch(typeof(GameManager), nameof(GameManager.ClearActiveGameData))]
+    private class ClearActiveGameDataPatch
     {
-        orig(self);
-        GameManager gm = GameManager.Instance;
-        GameStatsManager gsm = GameStatsManager.Instance;
-        if (gm == null || !(gsm?.IsInSession ?? false))
-            return;
+        static void Postfix(bool destroyGameManager, bool endSession)
+        {
+            if (OnCleanStart != null)
+                OnCleanStart();
+        }
+    }
 
-        _OnFirstFloor = gsm.GetSessionStatValue(TrackedStats.TIME_PLAYED) < 0.1f;
-        if (_OnFirstFloor && OnRunStart != null)
-            OnRunStart(gm.PrimaryPlayer, gm.SecondaryPlayer, gm.CurrentGameMode);
+    [HarmonyPatch(typeof(Dungeon), nameof(Dungeon.FloorReached))]
+    private class FloorReachedPatch
+    {
+        static void Postfix()
+        {
+            GameManager gm = GameManager.Instance;
+            GameStatsManager gsm = GameStatsManager.Instance;
+            if (gm == null || !(gsm?.IsInSession ?? false))
+                return;
 
-        gm.OnNewLevelFullyLoaded += OnNewFloorFullyLoadedTempHook;
+            _OnFirstFloor = gsm.GetSessionStatValue(TrackedStats.TIME_PLAYED) < 0.1f;
+            if (_OnFirstFloor && OnRunStart != null)
+                OnRunStart(gm.PrimaryPlayer, gm.SecondaryPlayer, gm.CurrentGameMode);
+
+            gm.OnNewLevelFullyLoaded += OnNewFloorFullyLoadedTempHook;
+        }
     }
 
     private static void OnNewFloorFullyLoadedTempHook()

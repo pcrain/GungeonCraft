@@ -35,25 +35,20 @@ public class AdrenalineShot : PassiveItem
         // new Hook(
         //     typeof(GameUIHeartController).GetMethod("UpdateHealth", BindingFlags.Public | BindingFlags.Instance),
         //     typeof(AdrenalineShot).GetMethod("UpdateHealth", BindingFlags.NonPublic | BindingFlags.Static));
-
-        new Hook(
-            typeof(GameUIHeartController).GetMethod("ProcessHeartSpriteModifications", BindingFlags.NonPublic | BindingFlags.Instance),
-            typeof(AdrenalineShot).GetMethod("OnProcessHeartSpriteModifications", BindingFlags.NonPublic | BindingFlags.Static));
     }
 
-    private static void OnProcessHeartSpriteModifications(Action<GameUIHeartController, PlayerController> orig, GameUIHeartController guihc, PlayerController associatedPlayer)
+    [HarmonyPatch(typeof(GameUIHeartController), nameof(GameUIHeartController.ProcessHeartSpriteModifications))]
+    private class AdrenalineShotPatch
     {
-        orig(guihc, associatedPlayer);
-
-        foreach (PassiveItem passive in associatedPlayer?.passiveItems.EmptyIfNull())
+        static void Postfix(GameUIHeartController __instance, PlayerController associatedPlayer)
         {
-            if (passive is AdrenalineShot shot && shot._adrenalineActive)
-            {
-                guihc.m_currentFullHeartName  = _FullHeartSpriteUI;
-                guihc.m_currentHalfHeartName  = _HalfHeartSpriteUI;
-                guihc.m_currentEmptyHeartName = _EmptyHeartSpriteUI;
-                break;
-            }
+            if (associatedPlayer.GetPassive<AdrenalineShot>() is not AdrenalineShot shot)
+                return;
+            if (!shot._adrenalineActive)
+                return;
+            __instance.m_currentFullHeartName  = _FullHeartSpriteUI;
+            __instance.m_currentHalfHeartName  = _HalfHeartSpriteUI;
+            __instance.m_currentEmptyHeartName = _EmptyHeartSpriteUI;
         }
     }
 

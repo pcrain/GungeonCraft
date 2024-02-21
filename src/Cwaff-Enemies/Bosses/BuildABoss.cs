@@ -1129,24 +1129,6 @@ public static class BH
       }
   }
 
-  private static Hook selectBossHook = null;
-  public static void InitSelectBossHook()
-  {
-      if (selectBossHook != null)
-        return;
-      selectBossHook = new Hook(
-        typeof(BossFloorEntry).GetMethod("SelectBoss", BindingFlags.Public | BindingFlags.Instance),
-        typeof(BH).GetMethod("SelectBossHook", BindingFlags.Public | BindingFlags.Static));
-  }
-
-  public static IndividualBossFloorEntry SelectBossHook(Func<BossFloorEntry, IndividualBossFloorEntry> orig, BossFloorEntry self)
-  {
-    if (C.DEBUG_BUILD)
-      foreach (IndividualBossFloorEntry i in self.Bosses)
-        ETGModConsole.Log($"    {i.TargetRoomTable.name} -> {i.BossWeight}");
-    return orig(self);
-  }
-
   // SpecificIntroDoer extension method for playing boss music
   public static uint PlayBossMusic(this AIActor aiActor, string musicName, int loopPoint = -1, int rewindAmount = -1)
   {

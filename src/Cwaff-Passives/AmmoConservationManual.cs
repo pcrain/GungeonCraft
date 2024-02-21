@@ -18,36 +18,40 @@ public class AmmoConservationManual : PassiveItem
         item.quality      = ItemQuality.B;
 
         ID = item.PickupObjectId;
-        new Hook(
-            typeof(AmmoPickup).GetMethod("Pickup", BindingFlags.Instance | BindingFlags.Public),
-            typeof(AmmoConservationManual).GetMethod("OnAmmoPickup", BindingFlags.Static | BindingFlags.NonPublic)
-            );
     }
 
-    private static void OnAmmoPickup(Action<AmmoPickup, PlayerController> orig, AmmoPickup ammo, PlayerController p)
+    [HarmonyPatch(typeof(AmmoPickup), nameof(AmmoPickup.Pickup))]
+    private class AmmoConservationManualPatch
     {
-        AmmoConservationManual manual = p.GetPassive<AmmoConservationManual>();
-        if (!manual || p.CurrentGun.InfiniteAmmo || p.CurrentGun.AdjustedMaxAmmo <= 0)
+        static void Prefix(PlayerController player, ref float __state)
         {
-            orig(ammo, p);
-            return;
+            // need to calculate ammo percent before actually doing the pickup
+            if (player.CurrentGun.InfiniteAmmo || player.CurrentGun.AdjustedMaxAmmo <= 0)
+                __state = 0f;
+            else
+                __state = (float)player.CurrentGun.CurrentAmmo / (float)player.CurrentGun.AdjustedMaxAmmo;
         }
 
-        float currentAmmoPercent = (float)p.CurrentGun.CurrentAmmo / (float)p.CurrentGun.AdjustedMaxAmmo;
-        orig(ammo, p); // need to calculate ammo percent before actually doing the pickup
+        static void Postfix(AmmoPickup __instance, PlayerController player, float __state)
+        {
+            AmmoConservationManual manual = player.GetPassive<AmmoConservationManual>();
+            if (!manual)
+                return;
+            float currentAmmoPercent = __state;
 
-        float extraAmmo = ammo.mode switch {
-            AmmoPickup.AmmoPickupMode.FULL_AMMO   => currentAmmoPercent,
-            AmmoPickup.AmmoPickupMode.SPREAD_AMMO => Mathf.Max(0f, currentAmmoPercent - 0.5f),
-            _                                     => 0f,
-        };
-        manual._conservedAmmo += _PERCENT_AMMO_TO_CONSERVE * extraAmmo;
-        if (manual._conservedAmmo < 1f)
-            return;
+            float extraAmmo = __instance.mode switch {
+                AmmoPickup.AmmoPickupMode.FULL_AMMO   => currentAmmoPercent,
+                AmmoPickup.AmmoPickupMode.SPREAD_AMMO => Mathf.Max(0f, currentAmmoPercent - 0.5f),
+                _                                     => 0f,
+            };
+            manual._conservedAmmo += _PERCENT_AMMO_TO_CONSERVE * extraAmmo;
+            if (manual._conservedAmmo < 1f)
+                return;
 
-        manual._conservedAmmo -= 1f;
-        LootEngine.SpawnItem(ItemHelper.Get(Items.Ammo).gameObject, p.CenterPosition, Vector2.zero, 0f, doDefaultItemPoof: true);
-        // p.DoGenericItemActivation(manual);
+            manual._conservedAmmo -= 1f;
+            LootEngine.SpawnItem(ItemHelper.Get(Items.Ammo).gameObject, player.CenterPosition, Vector2.zero, 0f, doDefaultItemPoof: true);
+            // p.DoGenericItemActivation(manual);
+        }
     }
 
     public override void MidGameSerialize(List<object> data)

@@ -13,22 +13,6 @@ public class CwaffDungeons
 
     public static Dictionary<string, CwaffDungeons> Flows = new();
 
-    private static Hook _GetOrLoadByNameHook = null;
-    private static Hook _ForceCustomMusicHook;
-
-    public static void Init()
-    {
-        _GetOrLoadByNameHook = new Hook(
-            typeof(DungeonDatabase).GetMethod("GetOrLoadByName", BindingFlags.Static | BindingFlags.Public),
-            typeof(CwaffDungeons).GetMethod("GetOrLoadByNameHook", BindingFlags.Static | BindingFlags.Public)
-        );
-
-        _ForceCustomMusicHook = new Hook(
-            typeof(DungeonFloorMusicController).GetMethod("ResetForNewFloor", BindingFlags.Instance | BindingFlags.Public),
-            typeof(CwaffDungeons).GetMethod("PlayFloorMusicHook", BindingFlags.Static | BindingFlags.NonPublic)
-        );
-    }
-
     public static CwaffDungeons Register(string internalName, string floorName, Func<Dungeon, Dungeon> dungeonGenerator,
         string dungeonPrefabTemplate = null, GameLevelDefinition gameLevelDefinition = null, string floorMusic = null,
         int loopPoint = -1, int rewindAmount = -1)
@@ -57,52 +41,60 @@ public class CwaffDungeons
         return Flows[internalName];
     }
 
-    public static Dungeon GetOrLoadByNameHook(Func<string, Dungeon> orig, string name)
+    [HarmonyPatch(typeof(DungeonDatabase), nameof(DungeonDatabase.GetOrLoadByName))]
+    private class GetOrLoadCustomDungeonPatch
     {
-        CwaffDungeons dungeonData;
-        // Lazy.DebugLog($"attempting to find custom flow with name {name}");
-        if (!Flows.TryGetValue(name, out dungeonData))
-            return orig(name);
-        Lazy.DebugLog($"  found {name}!!");
-
-        if (dungeonData.gameLevelDefinition != null && !GameManager.Instance.customFloors.Contains(dungeonData.gameLevelDefinition))
-            GameManager.Instance.customFloors.Add(dungeonData.gameLevelDefinition); // fixes a bug where returning to the breach deletes the floor, thanks Bunny!
-
-        Dungeon dungeon = null;
-        if (name.ToLower() == dungeonData.internalName)
+        static bool Prefix(string name, ref Dungeon __result)
         {
-            try
+            CwaffDungeons dungeonData;
+            // Lazy.DebugLog($"attempting to find custom flow with name {name}");
+            if (!Flows.TryGetValue(name, out dungeonData))
+                return true; // fall back on original method
+            Lazy.DebugLog($"  found {name}!!");
+
+            if (dungeonData.gameLevelDefinition != null && !GameManager.Instance.customFloors.Contains(dungeonData.gameLevelDefinition))
+                GameManager.Instance.customFloors.Add(dungeonData.gameLevelDefinition); // fixes a bug where returning to the breach deletes the floor, thanks Bunny!
+
+            Dungeon dungeon = null;
+            if (name.ToLower() == dungeonData.internalName)
             {
-                dungeon = dungeonData.dungeonGenerator(GetOrLoadByName_Orig(dungeonData.dungeonPrefabTemplate ?? "Base_Gungeon"));
+                try
+                {
+                    dungeon = dungeonData.dungeonGenerator(GetOrLoadByName_Orig(dungeonData.dungeonPrefabTemplate ?? "Base_Gungeon"));
+                }
+                catch (Exception e)
+                {
+                    Lazy.DebugLog($"  exception: {e}");
+                }
             }
-            catch (Exception e)
-            {
-                Lazy.DebugLog($"  exception: {e}");
-            }
+            if (!dungeon)
+                return true; // fall back on original method
+
+            __result = dungeon;
+            return false; // skip original method
         }
-        return dungeon ?? orig(name);
     }
 
     public static Dungeon GetOrLoadByName_Orig(string name)
     {
         AssetBundle assetBundle = ResourceManager.LoadAssetBundle("dungeons/" + name.ToLower());
-        DebugTime.RecordStartTime();
-        Dungeon component = assetBundle.LoadAsset<GameObject>(name).GetComponent<Dungeon>();
-        DebugTime.Log("AssetBundle.LoadAsset<Dungeon>({0})", new object[] { name });
-        return component;
+        return assetBundle.LoadAsset<GameObject>(name).GetComponent<Dungeon>();
     }
 
-    internal static void PlayFloorMusicHook(Action<DungeonFloorMusicController, Dungeon> orig, DungeonFloorMusicController musicController, Dungeon d)
+    [HarmonyPatch(typeof(DungeonFloorMusicController), nameof(DungeonFloorMusicController.ResetForNewFloor))]
+    private class ForceCustomMusicPatch
     {
-        orig(musicController, d);
-        foreach (CwaffDungeons cd in Flows.Values)
+        static void Postfix(Dungeon d)
         {
-            if (d.DungeonFloorName != cd.floorName)
-                continue;
-            if (!string.IsNullOrEmpty(cd.floorMusic))
-                GameManager.Instance.DungeonMusicController.LoopMusic(
-                    musicName: cd.floorMusic, loopPoint: cd.loopPoint, rewindAmount: cd.rewindAmount);
-            break;
+            foreach (CwaffDungeons cd in Flows.Values)
+            {
+                if (d.DungeonFloorName != cd.floorName)
+                    continue;
+                if (!string.IsNullOrEmpty(cd.floorMusic))
+                    GameManager.Instance.DungeonMusicController.LoopMusic(
+                        musicName: cd.floorMusic, loopPoint: cd.loopPoint, rewindAmount: cd.rewindAmount);
+                break;
+            }
         }
     }
 }

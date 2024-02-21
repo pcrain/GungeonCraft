@@ -26,48 +26,46 @@ public class CustomDodgeRoll : MonoBehaviour, ICustomDodgeRoll
     public virtual bool canMultidodge => false;
     public virtual bool putsOutFire   => true;
 
-    private static Hook customDodgeRollHook = null;
-
-    public static void InitCustomDodgeRollHooks()
+    [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.HandleStartDodgeRoll))]
+    private class CustomDodgeRollPatch
     {
-        customDodgeRollHook = new Hook(
-            typeof(PlayerController).GetMethod("HandleStartDodgeRoll", BindingFlags.NonPublic | BindingFlags.Instance),
-            typeof(CustomDodgeRoll).GetMethod("CustomDodgeRollHook"));
-    }
-
-    public static bool CustomDodgeRollHook(Func<PlayerController,Vector2,bool> orig, PlayerController player, Vector2 direction)
-    {
-        // Make sure we can actually have all of our movements available (fixes not being able to dodge roll in the Aimless Void)
-        if (player.CurrentInputState != PlayerInputState.AllInput || !player.AcceptingNonMotionInput || player.IsDodgeRolling)
-            return orig(player,direction);
-
-        // Figure out all of our passives that give us a custom dodge roll
-        List<CustomDodgeRoll> overrides = new List<CustomDodgeRoll>();
-        foreach (PassiveItem p in player.passiveItems)
-            if (p && p.GetComponent<CustomDodgeRoll>() is CustomDodgeRoll overrideDodgeRoll)
-                overrides.Add(overrideDodgeRoll);
-        if (overrides.Count == 0)  // fall back to default behavior if we don't have overrides
-            return orig(player,direction);
-
-        // Turn off dodgeButtonHeld state for all custom rolls if we aren't pushing the dodge button
-        BraveInput instanceForPlayer = BraveInput.GetInstanceForPlayer(player.PlayerIDX);
-        if (!instanceForPlayer.ActiveActions.DodgeRollAction.IsPressed)
+        static bool Prefix(ref PlayerController __instance, Vector2 direction, ref bool __result)
         {
+            PlayerController player = __instance;
+            // Make sure we can actually have all of our movements available (fixes not being able to dodge roll in the Aimless Void)
+            if (player.CurrentInputState != PlayerInputState.AllInput || !player.AcceptingNonMotionInput || player.IsDodgeRolling)
+                return true;
+
+            // Figure out all of our passives that give us a custom dodge roll
+            List<CustomDodgeRoll> overrides = new List<CustomDodgeRoll>();
+            foreach (PassiveItem p in player.passiveItems)
+                if (p && p.GetComponent<CustomDodgeRoll>() is CustomDodgeRoll overrideDodgeRoll)
+                    overrides.Add(overrideDodgeRoll);
+            if (overrides.Count == 0)  // fall back to default behavior if we don't have overrides
+                return true;
+
+            // Turn off dodgeButtonHeld state for all custom rolls if we aren't pushing the dodge button
+            BraveInput instanceForPlayer = BraveInput.GetInstanceForPlayer(player.PlayerIDX);
+            if (!instanceForPlayer.ActiveActions.DodgeRollAction.IsPressed)
+            {
+                foreach (CustomDodgeRoll customDodgeRoll in overrides)
+                    customDodgeRoll.dodgeButtonHeld = false;
+                __result = false; // dodge roll failed
+                return false; // skip original method
+            }
+
+            // Begin the dodge roll for all of our custom dodge rolls available
+            // instanceForPlayer.ConsumeButtonDown(GungeonActions.GungeonActionType.DodgeRoll);
             foreach (CustomDodgeRoll customDodgeRoll in overrides)
-                customDodgeRoll.dodgeButtonHeld = false;
-            return false;
+            {
+                if (customDodgeRoll.dodgeButtonHeld)
+                    continue;
+                customDodgeRoll.dodgeButtonHeld = true;
+                customDodgeRoll.TryDodgeRoll();
+            }
+            __result = true; // dodge roll succeeded
+            return false; // skip original method
         }
-
-        // Begin the dodge roll for all of our custom dodge rolls available
-        // instanceForPlayer.ConsumeButtonDown(GungeonActions.GungeonActionType.DodgeRoll);
-        foreach (CustomDodgeRoll customDodgeRoll in overrides)
-        {
-            if (customDodgeRoll.dodgeButtonHeld)
-                continue;
-            customDodgeRoll.dodgeButtonHeld = true;
-            customDodgeRoll.TryDodgeRoll();
-        }
-        return true;
     }
 
     public virtual void BeginDodgeRoll()

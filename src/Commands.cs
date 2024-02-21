@@ -2,15 +2,14 @@
 
 public class Commands
 {
-    internal static Hook _DebugInputHook;
+    internal static bool _DebugStealth    = false;
+    internal static bool _DebugCameraLock = false;
 
     public static void Init()
     {
         if (!C.DEBUG_BUILD)
             return; // do nothing in non-debug builds
 
-        // Handle debug keyboard input
-        InitDebugKeys();
         // Base command for doing whatever I'm testing at the moment
         ETGModConsole.Commands.AddGroup("gg", delegate (string[] args)
         {
@@ -82,7 +81,7 @@ public class Commands
         });
         ETGModConsole.Commands.AddGroup("ss", delegate (string[] args)
         {
-            GameManager.Instance.LoadCustomLevel("cg_sansfloor"); //TODO: rename later
+            GameManager.Instance.LoadCustomLevel(SansDungeon.INTERNAL_NAME);
         });
         // Another base command for loading my latest debug flow
         // ETGModConsole.Commands.AddGroup("ff", delegate (string[] args)
@@ -175,38 +174,31 @@ public class Commands
         });
     }
 
-    internal static void InitDebugKeys()
+    [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.HandlePlayerInput))]
+    private class DebugInputPatch // handle debug input
     {
-        // HandlePlayerInput
-        _DebugInputHook = new Hook(
-            typeof(PlayerController).GetMethod("HandlePlayerInput", BindingFlags.Instance | BindingFlags.NonPublic),
-            typeof(Commands).GetMethod("HandleDebugInput", BindingFlags.Static | BindingFlags.NonPublic)
-            );
-    }
-
-    internal static bool _DebugStealth = false;
-    internal static bool _DebugCameraLock = false;
-    internal static Vector2 HandleDebugInput(Func<PlayerController, Vector2> orig, PlayerController pc)
-    {
-        if (!C.DEBUG_BUILD)
-            return orig(pc); // disable debug keys in non-debug builds
-        if (!Input.GetKey(KeyCode.LeftControl))
-            return orig(pc); // all debug keys require left control to be held
-
-        if (Input.GetKeyDown(KeyCode.S)) // debug stealth
+        static bool Prefix(PlayerController __instance)
         {
-            _DebugStealth = !_DebugStealth;
-            pc.SetIsStealthed(_DebugStealth, "Debug stealth");
-        }
+            if (!C.DEBUG_BUILD)
+                return true; // disable debug keys in non-debug builds
+            if (!Input.GetKey(KeyCode.LeftControl))
+                return true; // all debug keys require left control to be held
 
-        if (Input.GetKeyDown(KeyCode.C)) // debug camera lock
-        {
-            _DebugCameraLock = !_DebugCameraLock;
-            GameManager.Instance.MainCameraController.OverridePosition = GameManager.Instance.MainCameraController.previousBasePosition;
-            GameManager.Instance.MainCameraController.SetManualControl(_DebugCameraLock, true);
-        }
+            if (Input.GetKeyDown(KeyCode.S)) // debug stealth
+            {
+                _DebugStealth = !_DebugStealth;
+                __instance.SetIsStealthed(_DebugStealth, "Debug stealth");
+            }
 
-        return orig(pc);
+            if (Input.GetKeyDown(KeyCode.C)) // debug camera lock
+            {
+                _DebugCameraLock = !_DebugCameraLock;
+                GameManager.Instance.MainCameraController.OverridePosition = GameManager.Instance.MainCameraController.previousBasePosition;
+                GameManager.Instance.MainCameraController.SetManualControl(_DebugCameraLock, true);
+            }
+
+            return true;
+        }
     }
 }
 

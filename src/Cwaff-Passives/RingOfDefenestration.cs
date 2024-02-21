@@ -24,27 +24,26 @@ public class RingOfDefenestration : PassiveItem
         PickupObject item = Lazy.SetupPassive<RingOfDefenestration>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
         ID                = item.PickupObjectId;
-        new Hook(
-            typeof(GameStatsManager).GetMethod("RegisterStatChange", BindingFlags.Instance | BindingFlags.Public),
-            typeof(RingOfDefenestration).GetMethod("OnRegisterStatChange", BindingFlags.Static | BindingFlags.NonPublic)
-            );
     }
 
-    private static void OnRegisterStatChange(Action<GameStatsManager, TrackedStats, float> orig, GameStatsManager manager, TrackedStats stat, float value)
+    [HarmonyPatch(typeof(GameStatsManager), nameof(GameStatsManager.RegisterStatChange))]
+    private class RingOfDefenestrationPatch
     {
-        orig(manager, stat, value);
-        if (stat != TrackedStats.ENEMIES_KILLED_WITH_PITS || !GameManager.Instance.AnyPlayerHasPickupID(ID))
-            return;
+        static void Postfix(TrackedStats stat, float value)
+        {
+            if (stat != TrackedStats.ENEMIES_KILLED_WITH_PITS || !GameManager.Instance.AnyPlayerHasPickupID(ID))
+                return;
 
-        int pickupID = _RewardWeights.GetWeightedPickupID();
-        if (pickupID < 0) // currency
-            LootEngine.SpawnCurrency(GameManager.Instance.BestActivePlayer.CenterPosition, -pickupID);
-        else
-            LootEngine.SpawnItem(
-              item              : PickupObjectDatabase.GetById(pickupID).gameObject,
-              spawnPosition     : GameManager.Instance.BestActivePlayer.CenterPosition,
-              spawnDirection    : Vector2.zero,
-              force             : 0,
-              doDefaultItemPoof : true);
+            int pickupID = _RewardWeights.GetWeightedPickupID();  //REFACTOR: change to GetWeighted(), doesn't need to be pickup IDs
+            if (pickupID < 0) // currency
+                LootEngine.SpawnCurrency(GameManager.Instance.BestActivePlayer.CenterPosition, -pickupID);
+            else
+                LootEngine.SpawnItem(
+                  item              : PickupObjectDatabase.GetById(pickupID).gameObject,
+                  spawnPosition     : GameManager.Instance.BestActivePlayer.CenterPosition,
+                  spawnDirection    : Vector2.zero,
+                  force             : 0,
+                  doDefaultItemPoof : true);
+        }
     }
 }

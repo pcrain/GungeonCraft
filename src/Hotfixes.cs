@@ -118,18 +118,13 @@ public static class QuickRestartRoomCacheHotfix
 // Duct tape gun ids aren't serialized, so dropping them clears out the duct tape gun list and breaks save serialization
 public static class DuctTapeSaveLoadHotfix
 {
-    public static void Init()
+    [HarmonyPatch(typeof(Gun), nameof(Gun.CopyStateFrom))]
+    private class DuctTapeSaveLoadPatch
     {
-        new Hook(
-            typeof(Gun).GetMethod("CopyStateFrom", BindingFlags.Instance | BindingFlags.Public),
-            typeof(DuctTapeSaveLoadHotfix).GetMethod("CopyStateFromHook", BindingFlags.Static | BindingFlags.NonPublic)
-            );
-    }
-
-    private static void CopyStateFromHook(Action<Gun, Gun> orig, Gun gun, Gun other)
-    {
-        orig(gun, other);
-        gun.DuctTapeMergedGunIDs = other.DuctTapeMergedGunIDs;
+        static void Postfix(Gun __instance, Gun other)
+        {
+            __instance.DuctTapeMergedGunIDs = other.DuctTapeMergedGunIDs;
+        }
     }
 }
 
@@ -169,18 +164,6 @@ public static class LargeGunAnimationHotfix
         //         typeof(Chest).GetMethod("DetermineContents", BindingFlags.Instance | BindingFlags.NonPublic),
         //         typeof(LargeGunAnimationHotfix).GetMethod("OnDetermineChestContents", BindingFlags.Static | BindingFlags.NonPublic)
         //         );
-
-        // Change from the fixed to the normal idle animation when picking up a gun
-        new Hook(
-            typeof(GunInventory).GetMethod("AddGunToInventory", BindingFlags.Instance | BindingFlags.Public),
-            typeof(LargeGunAnimationHotfix).GetMethod("OnAddGunToInventory", BindingFlags.Static | BindingFlags.NonPublic)
-            );
-
-        // Change from the normal to the fixed idle animation when dropping a gun
-        new Hook(
-            typeof(Gun).GetMethod("DropGun", BindingFlags.Instance | BindingFlags.Public),
-            typeof(LargeGunAnimationHotfix).GetMethod("OnDropGun", BindingFlags.Static | BindingFlags.NonPublic)
-            );
     }
 
     // private static void OnDetermineChestContents(Action<Chest, PlayerController, int> orig, Chest chest, PlayerController player, int tierShift)
@@ -320,34 +303,37 @@ public static class LargeGunAnimationHotfix
             sprite.SetSprite(trimmed.frames[0].spriteCollection, trimmed.frames[0].spriteId);
     }
 
-    private static Gun OnAddGunToInventory(Func<GunInventory, Gun, bool, Gun> orig, GunInventory inventory, Gun gun, bool makeActive)
+    [HarmonyPatch(typeof(GunInventory), nameof(GunInventory.AddGunToInventory))]
+    private class AddGunToInventoryPatch // Change from the fixed to the normal idle animation when picking up a gun
     {
-         if (!gun)
-            return orig(inventory, gun, makeActive);
-
-        string fixedIdleAnimation = $"{gun.InternalSpriteName()}_{_TRIM_ANIMATION}";
-        if (gun.spriteAnimator.GetClipIdByName(fixedIdleAnimation) != -1)
+        static void Prefix(Gun gun, bool makeActive)
         {
-            gun.idleAnimation = $"{gun.InternalSpriteName()}_idle";  // restore the gun's original (untrimmed) idle animation when picked up
-            gun.spriteAnimator.defaultClipId = gun.spriteAnimator.GetClipIdByName(gun.idleAnimation);
+            if (!gun)
+                return;
+            string fixedIdleAnimation = $"{gun.InternalSpriteName()}_{_TRIM_ANIMATION}";
+            if (gun.spriteAnimator.GetClipIdByName(fixedIdleAnimation) != -1)
+            {
+                gun.idleAnimation = $"{gun.InternalSpriteName()}_idle";  // restore the gun's original (untrimmed) idle animation when picked up
+                gun.spriteAnimator.defaultClipId = gun.spriteAnimator.GetClipIdByName(gun.idleAnimation);
+            }
         }
-
-        return orig(inventory, gun, makeActive);
     }
 
-    private static DebrisObject OnDropGun(Func<Gun, float, DebrisObject> orig, Gun gun, float dropHeight)
+    [HarmonyPatch(typeof(Gun), nameof(Gun.DropGun))]
+    private class DropGunPatch // Change from the normal to the fixed idle animation when dropping a gun
     {
-        DebrisObject debris = orig(gun, dropHeight);
-
-        string fixedIdleAnimation = $"{gun.InternalSpriteName()}_{_TRIM_ANIMATION}";
-        if (gun.spriteAnimator.GetClipIdByName(fixedIdleAnimation) != -1)
+        static void Postfix(Gun __instance, float dropHeight)
         {
-            Vector2 center = gun.sprite.WorldCenter;
-            gun.spriteAnimator.defaultClipId = gun.spriteAnimator.GetClipIdByName(fixedIdleAnimation);
-            gun.spriteAnimator.Play(fixedIdleAnimation);  // play the gun's fixed (trimmed) idle animation when dropped
-            gun.sprite.PlaceAtPositionByAnchor(center, Anchor.MiddleCenter);
+            Gun gun = __instance;
+            string fixedIdleAnimation = $"{gun.InternalSpriteName()}_{_TRIM_ANIMATION}";
+            if (gun.spriteAnimator.GetClipIdByName(fixedIdleAnimation) != -1)
+            {
+                Vector2 center = gun.sprite.WorldCenter;
+                gun.spriteAnimator.defaultClipId = gun.spriteAnimator.GetClipIdByName(fixedIdleAnimation);
+                gun.spriteAnimator.Play(fixedIdleAnimation);  // play the gun's fixed (trimmed) idle animation when dropped
+                gun.sprite.PlaceAtPositionByAnchor(center, Anchor.MiddleCenter);
+            }
         }
-        return debris;
     }
 }
 

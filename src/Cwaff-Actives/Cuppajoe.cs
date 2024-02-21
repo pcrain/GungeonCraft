@@ -7,8 +7,6 @@ public class Cuppajoe : PlayerItem
     public static string LongDescription  = "Dramatically increases rate of fire, reload speed, movement speed, and dodge roll speed for 12 seconds, but dramatically decreases these stats for 8 seconds afterwards.";
     public static string Lore             = "Coffee is something of a miracle beverage, letting you move faster, react quicker, focus harder, aim better, think better, learn better, practice more effectively, earn more money, heal all your illnesses, find true love, cure cancer, achieve world peace, end world hunger, open your third eye, see the future, reach nirvana, rule the galaxy, observe the multiverse...and it tastes good. Coffee's great isn't it!? Have another cup!!";
 
-    private static Hook _CaffeinatedAnimationHook;
-
     private Caffeination.State _State
     {
         get => this._caffeine?._state ?? Caffeination.State.NEUTRAL;
@@ -23,11 +21,6 @@ public class Cuppajoe : PlayerItem
         item.consumable   = false;
         item.CanBeDropped = true;
         item.SetCooldownType(ItemBuilder.CooldownType.Timed, Caffeination._BOOST_TIME + Caffeination._CRASH_TIME);
-
-        _CaffeinatedAnimationHook = new Hook(
-            typeof(PlayerController).GetMethod("GetBaseAnimationName", BindingFlags.Instance | BindingFlags.NonPublic),
-            typeof(Cuppajoe).GetMethod("OnGetBaseAnimationName", BindingFlags.Static | BindingFlags.NonPublic)
-            );
     }
 
     public override void Pickup(PlayerController player)
@@ -69,12 +62,17 @@ public class Cuppajoe : PlayerItem
         this._owner.spriteAnimator.ClipFps = this._owner.spriteAnimator.CurrentClip.fps * animSpeed;
     }
 
-    internal delegate string GetBaseAnimationNameCB(PlayerController pc, Vector2 v, float gunAngle, bool invertThresholds, bool forceTwoHands);
-    internal static string OnGetBaseAnimationName(GetBaseAnimationNameCB orig, PlayerController pc, Vector2 v, float gunAngle, bool invertThresholds, bool forceTwoHands)
+    [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.GetBaseAnimationName))]
+    private class CuppajoeAnimationPatch
     {
-        if (pc.GetComponent<Caffeination>()?._state == Caffeination.State.CAFFEINATED)
-            return GetCaffeinatedAnimationName(pc, v, gunAngle, invertThresholds, forceTwoHands);
-        return orig(pc, v, gunAngle, invertThresholds, forceTwoHands);
+        static bool Prefix(PlayerController __instance, Vector2 v, float gunAngle, bool invertThresholds, bool forceTwoHands, ref string __result)
+        {
+            if (__instance.GetComponent<Caffeination>()?._state != Caffeination.State.CAFFEINATED)
+                return true;
+
+            __result = GetCaffeinatedAnimationName(__instance, v, gunAngle, invertThresholds, forceTwoHands);
+            return false;  // skip the original check
+        }
     }
 
     // Base game's GetBaseAnimationName() function, with all idle animations replace with running animations

@@ -22,14 +22,14 @@ public class Jugglernaut : AdvancedGunBehavior
     internal static List<string> _JuggleAnimations;
     internal static List<float> _MinEmission = new(){0f, 10f, 50f, 100f, 200f, 400f};
     internal static string _TrueIdleAnimation;
-    internal static Hook _AdjustAnimationHook;
-    internal static Hook _AdjustWeaponPanelHook;
     internal static IntVector2 _CarryOffset        = new IntVector2(21, -8);
     internal static IntVector2 _FlippedCarryOffset = new IntVector2(-14, -8);
 
     private int _juggleLevel = 0;
     private Coroutine _glowRoutine = null;
     private List<AIActor> _juggledEnemies = new();
+    private bool _cachedFlipped = false;
+    private bool _firstSpriteCheck = true;
 
     public static void Add()
     {
@@ -51,14 +51,6 @@ public class Jugglernaut : AdvancedGunBehavior
             gun.preventRotation                 = true;
             gun.barrelOffset.transform.position = new Vector3(0.75f, 0.75f, 0f);
             gun.carryPixelOffset                = _CarryOffset;
-            _AdjustAnimationHook                = new Hook(
-                typeof(Gun).GetMethod("HandleSpriteFlip", BindingFlags.Instance | BindingFlags.Public),
-                typeof(Jugglernaut).GetMethod("FixAttachPointsImmediately", BindingFlags.Static | BindingFlags.NonPublic)
-                );
-            _AdjustWeaponPanelHook              = new Hook(
-                typeof(GameUIAmmoController).GetMethod("GetOffsetVectorForGun", BindingFlags.Instance | BindingFlags.Public),
-                typeof(Jugglernaut).GetMethod("FixWeaponBoxSprite", BindingFlags.Static | BindingFlags.NonPublic)
-                );
 
             string tossSound = "juggle_toss_sound";
             for (int i = 0; i < _JuggleAnimations.Count(); ++i)
@@ -100,33 +92,43 @@ public class Jugglernaut : AdvancedGunBehavior
           sprite: "jugglernaut_ball", fps: 12, scale: 0.5f, anchor: Anchor.MiddleLeft));
     }
 
-    private bool _cachedFlipped = false;
-    private bool _firstCheck = true;
-    private static void FixAttachPointsImmediately(Action<Gun, bool> orig, Gun gun, bool flipped)
+    [HarmonyPatch(typeof(Gun), nameof(Gun.HandleSpriteFlip))]
+    private class JugglernautAnimationPatch
     {
-        orig(gun, flipped);
-        if (gun.GetComponent<Jugglernaut>() is not Jugglernaut jugglernaut)
-            return;
-        if (gun.CurrentOwner is not PlayerController player)
-            return;
-        if (flipped == jugglernaut._cachedFlipped && !jugglernaut._firstCheck)
-            return;
+        static void Prefix(bool flipped, ref bool __state)
+        {
+            __state = flipped;  // we need to remember whether we were flipped before entering the original method
+        }
 
-        if (flipped)
-            gun.carryPixelOffset = _CarryOffset;
-        else
-            gun.carryPixelOffset = _FlippedCarryOffset;
-        jugglernaut._cachedFlipped = flipped;
-        jugglernaut._firstCheck = false;
+        static void Postfix(Gun __instance, bool flipped, bool __state)
+        {
+            bool wasFlipped = __state;
+            if (__instance.GetComponent<Jugglernaut>() is not Jugglernaut jugglernaut)
+                return;
+            if (__instance.CurrentOwner is not PlayerController player)
+                return;
+            if (wasFlipped == jugglernaut._cachedFlipped && !jugglernaut._firstSpriteCheck)
+                return;
+
+            if (wasFlipped)
+                __instance.carryPixelOffset = _CarryOffset;
+            else
+                __instance.carryPixelOffset = _FlippedCarryOffset;
+            jugglernaut._cachedFlipped = wasFlipped;
+            jugglernaut._firstSpriteCheck = false;
+        }
     }
 
-    private static Vector3 _WeaponBoxCorrection = new Vector3(-0.125f, -0.125f, 0f);
-    private static Vector3 FixWeaponBoxSprite(Func<GameUIAmmoController, Gun, bool, Vector3> orig, GameUIAmmoController guiac, Gun gun, bool flipped)
+    [HarmonyPatch(typeof(GameUIAmmoController), nameof(GameUIAmmoController.GetOffsetVectorForGun))]
+    private class JugglernautWeaponBoxPatch
     {
-        Vector3 vec = orig(guiac, gun, flipped);
-        if (gun?.GetComponent<Jugglernaut>() is not Jugglernaut jugglernaut)
-            return vec;
-        return vec + _WeaponBoxCorrection;
+        private static readonly Vector3 _WeaponBoxCorrection = new Vector3(-0.125f, -0.125f, 0f);
+
+        static void Postfix(Gun newGun, bool isFlippingGun, ref Vector3 __result)
+        {
+            if (newGun.GetComponent<Jugglernaut>())
+                __result += _WeaponBoxCorrection;
+        }
     }
 
     protected override void OnPickedUpByPlayer(PlayerController player)

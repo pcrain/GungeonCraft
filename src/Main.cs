@@ -24,6 +24,7 @@
     global using Mono.Cecil.Cil; //Instruction
     global using SGUI;
     global using FullSerializer;
+    global using HarmonyLib;
     // global using ETGGUI; // unneeded???
 
     global using Gungeon;
@@ -80,6 +81,7 @@ public class Initialisation : BaseUnityPlugin
                 ETGModConsole.Log("Cwaffing the Gungy initializing...");
 
             Instance = this;
+            new Harmony(C.MOD_GUID).PatchAll();
 
             #region Round 1 Config (hooks and database stuff where no sprites are needed, so it can be async)
             System.Diagnostics.Stopwatch setupConfig1Watch = null;
@@ -93,13 +95,10 @@ public class Initialisation : BaseUnityPlugin
                 ResMap.Build();
 
                 //Tools and Toolboxes
-                CwaffEvents.Init();  // Event handlers
                 CwaffPrerequisite.Init();  // must be set up after CwaffEvents
                 // HUDController.Init(); // Need to load early (unused for now)
                 CustomAmmoDisplay.Init(); // Also need to load early
-                CustomDodgeRoll.InitCustomDodgeRollHooks();
                 ModdedShopItemAdder.Init(); // must be set up after CwaffEvents
-                PlayerToolsSetup.Init();
                 DamageAdjuster.Init();
 
                 //Commands and Other Console Utilities
@@ -120,7 +119,6 @@ public class Initialisation : BaseUnityPlugin
                     DragunFightHotfix.Init();
                     CoopTurboModeHotfix.Init();
                     LargeGunAnimationHotfix.Init();
-                    DuctTapeSaveLoadHotfix.Init();
                     // CoopDrillSoftlockHotfix.Init(); // incomplete
                     QuickRestartRoomCacheHotfix.Init();
                     RoomShuffleOffByOneHotfix.Init();
@@ -391,7 +389,6 @@ public class Initialisation : BaseUnityPlugin
                 }
 
                 // Actual floor Initialization
-                CwaffDungeons.Init(); // must be done before creating any custom floors / flows
                 SansDungeon.Init();
 
                 // Modified version of Anywhere mod, further stolen and modified from Apache's version

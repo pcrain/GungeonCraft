@@ -17,16 +17,18 @@ public class RatPoison : PassiveItem
         item.AddToSubShop(ItemBuilder.ShopType.Cursula);
 
         ID = item.PickupObjectId;
-        new Hook(
-            typeof(PickupObject).GetMethod("ShouldBeTakenByRat", BindingFlags.Instance | BindingFlags.NonPublic),
-            typeof(RatPoison).GetMethod("ShouldBeTakenByRat", BindingFlags.Static | BindingFlags.NonPublic)
-            );
     }
 
-    private static bool ShouldBeTakenByRat(Func<PickupObject, Vector2, bool> orig, PickupObject pickup, Vector2 point)
+    [HarmonyPatch(typeof(PickupObject), nameof(PickupObject.ShouldBeTakenByRat))]
+    private class RatPoisonPatch
     {
-        if (GameManager.Instance.AnyPlayerHasPickupID(ID))
-            return false;
-        return orig(pickup, point);
+        static bool Prefix(Vector2 point, ref bool __result)
+        {
+            if (!GameManager.Instance.AnyPlayerHasPickupID(ID))
+                return true;
+
+            __result = false;  // don't let rat take any items
+            return false;  // skip the original check
+        }
     }
 }

@@ -1,62 +1,35 @@
 namespace CwaffingTheGungy;
 
-public static class PlayerToolsSetup  // hooks and stuff for PlayerControllers on game start
-{
-    public static Hook playerStartHook;
-    public static Hook enemySpawnHook;
-
-    public static void Init()
-    {
-        playerStartHook = new Hook(
-            typeof(PlayerController).GetMethod("Start", BindingFlags.Public | BindingFlags.Instance),
-            typeof(PlayerToolsSetup).GetMethod("DoSetup"));
-
-        enemySpawnHook = new Hook(
-            typeof(AIActor).GetMethod("Start", BindingFlags.Public | BindingFlags.Instance),
-            typeof(CwaffToolbox).GetMethod("OnEnemyPreSpawn"));
-    }
-    public static void DoSetup(Action<PlayerController> action, PlayerController player)
-    {
-        action(player);
-        if (player.GetComponent<HatController>() == null) player.gameObject.AddComponent<HatController>();
-        if (player.GetComponent<CwaffToolbox>() == null) player.gameObject.AddComponent<CwaffToolbox>();
-    }
-}
-
 class CwaffToolbox : MonoBehaviour
 {
-    private PlayerController m_attachedPlayer;
-    private bool isSecondaryPlayer;
-
     // public static string enemyWithoutAFuture = "01972dee89fc4404a5c408d50007dad5"; // bullet kin for testing
-    public static string enemyWithoutAFuture = "";
+    public static string EnemyWithoutAFuture = "";
+    public static Texture2D EeveeTexture = null;
 
-    public static Texture2D eeveeTexture;
-
-    private void Start()
+    [HarmonyPatch(typeof(AIActor), nameof(AIActor.Start))]
+    private class MemorializeFuturelessEnemiesPatch
     {
-        m_attachedPlayer = base.GetComponent<PlayerController>();
-        if (m_attachedPlayer)
-            isSecondaryPlayer = (GameManager.Instance.SecondaryPlayer == m_attachedPlayer);
+        static bool Prefix(AIActor __instance)
+        {
+            if (string.IsNullOrEmpty(EnemyWithoutAFuture) || __instance.EnemyGuid != EnemyWithoutAFuture)
+                return true;
 
-        eeveeTexture = ResourceManager.LoadAssetBundle("shared_auto_001").LoadAsset<Texture2D>("nebula_reducednoise");
-
-        enemyWithoutAFuture = ""; //reset so enemies don't stay dead between runs
+            Memorialize(__instance);
+            UnityEngine.Object.Destroy(__instance.gameObject);
+            return false; // skip original check
+        }
     }
 
-    public static void OnEnemyPreSpawn(Action<AIActor> action, AIActor enemy)
+    [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.Start))]
+    private class PlayerControllerSetupPatch
     {
-        // ETGModConsole.Log("spawning "+enemy.GetActorName() + " ("+enemy.EnemyGuid+")");
-        // if (true || enemy.EnemyGuid == enemyWithoutAFuture)
-        if (string.IsNullOrEmpty(enemyWithoutAFuture) || enemy.EnemyGuid != enemyWithoutAFuture)
+        static void Postfix(PlayerController __instance)
         {
-            action(enemy);
-            return;
-        }
+            __instance.gameObject.GetOrAddComponent<HatController>();
 
-        // ETGModConsole.Log("  ded o.o");
-        Memorialize(enemy);
-        UnityEngine.Object.Destroy(enemy.gameObject);
+            EeveeTexture ??= ResourceManager.LoadAssetBundle("shared_auto_001").LoadAsset<Texture2D>("nebula_reducednoise");
+            EnemyWithoutAFuture = ""; //reset so enemies don't stay dead between runs  //TODO: this might not play well with midgame saves
+        }
     }
 
     public static int GetIdForBestIdleAnimation(AIActor enemy)
@@ -148,11 +121,11 @@ class CwaffToolbox : MonoBehaviour
         // gsprite.renderer.sharedMaterial.shader = ShaderCache.Acquire("Brave/Internal/HologramShader");
 
         gsprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/GlitchEevee");
-            gsprite.renderer.material.SetTexture("_EeveeTex", eeveeTexture);
+            gsprite.renderer.material.SetTexture("_EeveeTex", EeveeTexture);
             gsprite.renderer.material.SetFloat("_WaveIntensity", 0.9f);
             gsprite.renderer.material.SetFloat("_ColorIntensity", 0.95f);
         gsprite.renderer.sharedMaterial.shader = ShaderCache.Acquire("Brave/Internal/GlitchEevee");
-            gsprite.renderer.sharedMaterial.SetTexture("_EeveeTex", eeveeTexture);
+            gsprite.renderer.sharedMaterial.SetTexture("_EeveeTex", EeveeTexture);
             gsprite.renderer.sharedMaterial.SetFloat("_WaveIntensity", 0.9f);
             gsprite.renderer.sharedMaterial.SetFloat("_ColorIntensity", 0.95f);
 

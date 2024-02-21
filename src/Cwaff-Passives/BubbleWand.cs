@@ -8,7 +8,6 @@ public class BubbleWand : PassiveItem
     public static string Lore             = "Bubble blowing is a surprisingly popular pastime among the Gundead -- at least for those who have hands -- yet it is rare for Gungeoneers to actually encounter any Gundead enjoying their bubbles. It is believed that they are rather self-conscious about their below-average bubble-blowing abilities, and that showing a shared interest in their passion might be enough to get some of them to open up a bit more.";
 
     private static int _BubbleWandId;
-    private static Hook _BubbleWandHook;
 
     public static void Init()
     {
@@ -17,15 +16,15 @@ public class BubbleWand : PassiveItem
         item.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
         _BubbleWandId   = item.PickupObjectId;
-        _BubbleWandHook = new Hook(
-            typeof(AIActor).GetMethod("Start", BindingFlags.Public | BindingFlags.Instance),
-            typeof(BubbleWand).GetMethod("OnEnemyPreStart"));
     }
 
-    public static void OnEnemyPreStart(Action<AIActor> action, AIActor enemy)
+    [HarmonyPatch(typeof(AIActor), nameof(AIActor.Start))]
+    private class BubbleWandPatch
     {
-        if (GameManager.Instance.AnyPlayerHasPickupID(_BubbleWandId) && Lazy.CoinFlip())
-            enemy.ReplaceGun(Items.BubbleBlaster);
-        action(enemy);
+        static void Prefix(AIActor __instance)
+        {
+            if (GameManager.Instance.AnyPlayerHasPickupID(_BubbleWandId) && Lazy.CoinFlip())
+                __instance.ReplaceGun(Items.BubbleBlaster);
+        }
     }
 }
