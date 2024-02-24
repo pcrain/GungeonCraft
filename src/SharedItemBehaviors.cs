@@ -1439,3 +1439,44 @@ public class SkipAllCollisionsBehavior : MonoBehaviour
         PhysicsEngine.SkipCollision = true;
     }
 }
+
+public static class MovingDistortionWave
+{
+    public static void DoMovingDistortionWave(this Transform parent, float distortionIntensity, float distortionRadius, float maxRadius, float duration)
+    {
+        Exploder component = new GameObject("temp_explosion_processor", typeof(Exploder)).GetComponent<Exploder>();
+        component.StartCoroutine(DoMovingDistortionWaveLocal(parent, distortionIntensity, distortionRadius, maxRadius, duration));
+    }
+
+    private static Vector4 GetCenterPointInScreenUV(Vector2 centerPoint, float dIntensity, float dRadius)
+    {
+        Vector3 vector = GameManager.Instance.MainCameraController.Camera.WorldToViewportPoint(centerPoint.ToVector3ZUp());
+        return new Vector4(vector.x, vector.y, dRadius, dIntensity);
+    }
+
+    private static IEnumerator DoMovingDistortionWaveLocal(Transform parent, float distortionIntensity, float distortionRadius, float maxRadius, float duration)
+    {
+        Material distMaterial = new Material(ShaderCache.Acquire("Brave/Internal/DistortionWave"));
+        Vector2 center = (parent != null) ? parent.position : Vector2.zero;
+        Vector4 distortionSettings2 = GetCenterPointInScreenUV(center, distortionIntensity, distortionRadius);
+        distMaterial.SetVector("_WaveCenter", distortionSettings2);
+        Pixelator.Instance.RegisterAdditionalRenderPass(distMaterial);
+        float elapsed = 0f;
+        while (elapsed < duration && (!BraveUtility.isLoadingLevel || !GameManager.Instance.IsLoadingLevel))
+        {
+            elapsed += BraveTime.DeltaTime;
+            float t2 = elapsed / duration;
+            t2 = BraveMathCollege.LinearToSmoothStepInterpolate(0f, 1f, t2);
+            if (parent != null)
+                center = parent.position;
+            distortionSettings2 = GetCenterPointInScreenUV(center, distortionIntensity, distortionRadius);
+            distortionSettings2.w = Mathf.Lerp(distortionSettings2.w, 0f, t2);
+            distMaterial.SetVector("_WaveCenter", distortionSettings2);
+            float currentRadius = Mathf.Lerp(0f, maxRadius, t2);
+            distMaterial.SetFloat("_DistortProgress", currentRadius / maxRadius * (maxRadius / 33.75f));
+            yield return null;
+        }
+        Pixelator.Instance.DeregisterAdditionalRenderPass(distMaterial);
+        UnityEngine.Object.Destroy(distMaterial);
+    }
+}

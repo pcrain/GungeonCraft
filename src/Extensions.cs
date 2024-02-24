@@ -599,6 +599,13 @@ public static class Extensions
     aframe.eventAudio = audio;
   }
 
+  /// <summary>Set an audio event for several frames of a gun's animation</summary>
+  public static void SetGunAudio(this Gun gun, string name = null, string audio = "", params int[] frames)
+  {
+    foreach (int frame in frames)
+      gun.SetGunAudio(name: name, audio: audio, frame: frame);
+  }
+
   /// <summary>needs to use Alexandria version because fireaudio overrides are not serialized</summary>
   public static void SetFireAudio(this Gun gun, string audio = "", int frame = 0)
   {
@@ -1507,4 +1514,12 @@ public static class Extensions
     return body;
   }
 
+  /// <summary>Get the current charge level of a ProjectileModule</summary>
+  public static int GetChargeLevel(this Gun gun, ProjectileModule mod = null)
+  {
+    mod ??= gun.DefaultModule;
+    if (mod.chargeProjectiles == null)
+      return -1;
+    return mod.chargeProjectiles.IndexOf(mod.GetChargeProjectile(gun.m_moduleData[mod].chargeTime));
+  }
 }

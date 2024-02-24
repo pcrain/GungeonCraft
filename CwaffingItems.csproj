@@ -4158,6 +4158,7 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\tranquilizer_projectile_old13.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\lightwing_projectile_return3.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\carpet_projectile3.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\kali_projectile2.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\chess_king.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball014.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\bball017.png"/>
@@ -4175,6 +4176,7 @@
     <EmbeddedResource Include="Resources\ProjectileCollection\tennis_ball4.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\wavefront_projectile_alt4.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\schrodingers_gat_projectile_001.png"/>
+    <EmbeddedResource Include="Resources\ProjectileCollection\kali_projectile1.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\wavefront_projectile_alt1.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\kunai.png"/>
     <EmbeddedResource Include="Resources\ProjectileCollection\uppskeruvel_projectile3.png"/>
@@ -4527,12 +4529,14 @@
     <EmbeddedResource Include="Resources\BeamSprites\alphabeam_mid_001.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\holy_water_gun_middle_break_005.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\suncaster_beam_final_mid3.png"/>
+    <EmbeddedResource Include="Resources\BeamSprites\kali_trail1.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\bubble_beam_mid_001.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\holy_water_gun_mid_003.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\bubble_stream_mid_004.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\subtractor_beam_start_005.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\subtractor_beam_start_004.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\chekhov_trail_mid_001.png"/>
+    <EmbeddedResource Include="Resources\BeamSprites\kali_trail2.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\aimu_beam_start_007.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\bubble_stream_impact_002.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\suncaster_beam_refracted_mid5.png"/>
@@ -4585,6 +4589,7 @@
     <EmbeddedResource Include="Resources\BeamSprites\subtractor_beam_start_003.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\bubble_stream_mid_001.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\chekhov_trail_start_002.png"/>
+    <EmbeddedResource Include="Resources\BeamSprites\kali_trail3.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\aimu_beam_mid_005.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\aimu_beam_start_006.png"/>
     <EmbeddedResource Include="Resources\BeamSprites\subtractor_beam_red_start_003.png"/>

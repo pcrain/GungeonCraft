@@ -135,3 +135,5 @@ blamethrower_impact_sound,-4.0,1,sound
 prism_refract_sound,-3.5,1,sound
 suncaster_fire_sound,-4.0,1,sound
 suncaster_fire_sound_high,-4.0,1,sound
+kali_charge_sound,-3.0,1,sound
+kali_activate_sound,-8.0,1,sound
