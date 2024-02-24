@@ -284,6 +284,7 @@ public class Initialisation : BaseUnityPlugin
                 Vladimir.Add();
                 Blamethrower.Add();
                 Suncaster.Add();
+                KALI.Add();
                 setupGunsWatch.Stop();
             #endregion
 

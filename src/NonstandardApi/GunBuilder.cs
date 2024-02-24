@@ -42,6 +42,7 @@ public class GunBuildData
   public bool? shouldFlipHorizontally;
   public bool? shouldFlipVertically;
   public bool  useDummyChargeModule;
+  public bool  invisibleProjectile;
 
   /// <summary>Helper class containing setup information for a single module, single projectile gun.</summary>
   /// <param name="gun">The gun we're attaching to (can be null, only used for custom clip sprite name resolution for now).</param>
@@ -87,13 +88,14 @@ public class GunBuildData
   /// <param name="shouldFlipHorizontally"></param>
   /// <param name="shouldFlipVertically"></param>
   /// <param name="useDummyChargeModule"></param>
+  /// <param name="invisibleProjectile"></param>
   public GunBuildData(Gun gun = null, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
     ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1, GameUIAmmoType.AmmoType? ammoType = null,
     bool customClip = false, float? damage = null, float? speed = null, float? force = null, float? range = null, float poison = 0.0f, float fire = 0.0f, float freeze = 0.0f, float slow = 0.0f,
     bool? collidesWithEnemies = null, bool? ignoreDamageCaps = null, bool? collidesWithProjectiles = null, bool? surviveRigidbodyCollisions = null, bool? collidesWithTilemap = null,
     string sprite = null, int fps = 2, Anchor anchor = Anchor.MiddleCenter, float scale = 1.0f, bool anchorsChangeColliders = true, bool fixesScales = true, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null,
     IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null, float bossDamageMult = 1.0f, string destroySound = null, bool? shouldRotate = null, int barrageSize = 1,
-    bool? shouldFlipHorizontally = null, bool? shouldFlipVertically = null, bool useDummyChargeModule = false)
+    bool? shouldFlipHorizontally = null, bool? shouldFlipVertically = null, bool useDummyChargeModule = false, bool invisibleProjectile = false)
   {
       this.gun                           = gun; // set by InitSpecialProjectile()
       this.clipSize                      = clipSize;
@@ -135,6 +137,7 @@ public class GunBuildData
       this.shouldFlipHorizontally        = shouldFlipHorizontally;
       this.shouldFlipVertically          = shouldFlipVertically;
       this.useDummyChargeModule          = useDummyChargeModule;
+      this.invisibleProjectile           = invisibleProjectile;
   }
 
   public static GunBuildData Default = new GunBuildData();
@@ -155,6 +158,9 @@ public static class GunBuilder
     ProjectileModule mod = gun.SetupDefaultModule(b);
     ProjectileType proj = gun.InitFirstProjectileOfType<ProjectileType>(b);
       proj.AddDefaultAnimation(b);
+
+    // Determine whether we have an invisible projectile
+    proj.sprite.renderer.enabled = !b.invisibleProjectile;
 
     // Need to set up charge projectiles after both module and base projectile have been set up
     if (b.shootStyle == ShootStyle.Charged)
