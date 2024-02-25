@@ -53,6 +53,7 @@
     <Compile Include="src\Cwaff-Passives\RatPoison.cs"/>
     <Compile Include="src\Cwaff-Passives\BlankChecks.cs"/>
     <Compile Include="src\Cwaff-Passives\LibraryCardtridge.cs"/>
+    <Compile Include="src\Cwaff-Passives\ReserveAmmolet.cs"/>
     <Compile Include="src\Cwaff-Passives\GorgunEye.cs"/>
     <Compile Include="src\Cwaff-Passives\ComfySlippers.cs"/>
     <Compile Include="src\Cwaff-Passives\DrabOutfit.cs"/>
@@ -3743,6 +3744,7 @@
     <EmbeddedResource Include="Resources\ItemSprites\johns_wick_icon_old.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\yellow_bandana_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\credit_card_icon.png"/>
+    <EmbeddedResource Include="Resources\ItemSprites\reserve_ammolet_icon.png"/>
     <EmbeddedResource Include="Resources\ItemSprites\gun_powderer_icon.png"/>
     <EmbeddedResource Include="Resources\sans\sans_throw_right_12.png"/>
     <EmbeddedResource Include="Resources\sans\sans_throw_right_7.png"/>
