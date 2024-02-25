@@ -2,32 +2,32 @@ namespace CwaffingTheGungy;
 
 public class KALI : AdvancedGunBehavior
 {
-    public static string ItemName         = "KALI";
+    public static string ItemName         = "K.A.L.I.";
     public static string ProjectileName   = "38_special";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
+    public static string ShortDescription = "Fission";
+    public static string LongDescription  = "Fires insanely high-velocity piercing particles with high recoil. Projectile damage, velocity, and recoil are doubled at level 2 charge and again at level 3. Destroys enemy projectiles at level 3 charge. Continuously drains ammo while charging. Killed enemies are obliterated and do not drop casings or pickups. ";
     public static string Lore             = "TBD";
 
+    private const float _AMMO_DRAIN_RATE = 1.0f;
+
+    internal static GameObject _IonizeVFX = null;
     internal static Projectile _KaliProjectile = null;
-    internal static string _ChargeBase = null;
-    internal static string _ChargeMore = null;
-    internal static string _ChargeMost = null;
     internal static List<string> _ChargeAnimations = null;
 
     internal GameObject _timeShifter = null;
 
     private int _chargeLevel = -1;
+    private float _timeCharging = 0f;
 
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<KALI>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 0.1f, ammo: 100, audioFrom: Items.Banana /* silent charge */);
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 0.1f, ammo: 200, audioFrom: Items.Banana /* silent charge */);
             // gun.SetFireAudio("alligator_shoot_sound");
             gun.SetFireAudio("kali_shoot_sound");
 
-        _KaliProjectile = gun.InitProjectile(new(damage: 100f, speed: 700f, range: 9999f, force: 3f, cooldown: 0.1f,
+        _KaliProjectile = gun.InitProjectile(new(range: 9999f, force: 3f, cooldown: 0.1f, collidesWithProjectiles: true,
           clipSize: 1, sprite: "kali_projectile", shootStyle: ShootStyle.Charged)
-        ).Attach<KaliProjectile>(
         ).Attach<PierceProjModifier>(pierce => { pierce.penetration = 999; pierce.penetratesBreakables = true; }
         // ).Attach<BounceProjModifier>(bounce => { bounce.numberOfBounces = Mathf.Max(bounce.numberOfBounces, 99); }
         );
@@ -51,33 +51,37 @@ public class KALI : AdvancedGunBehavior
         mod.projectiles.Clear();
         mod.chargeProjectiles = new List<ProjectileModule.ChargeProjectile>(){
             new(){
-                Projectile = _KaliProjectile.Clone(),
+                Projectile = _KaliProjectile.Clone(new(damage: 25f, speed: 175f, recoil: 100f)
+                  ).Attach<KaliProjectile>(k => k.SetChargeLevel(1)
+                  ),
                 ChargeTime = 1f,
             },
             new(){
-                Projectile = _KaliProjectile.Clone(),
-                ChargeTime = 2f,
+                Projectile = _KaliProjectile.Clone(new(damage: 50f, speed: 350f, recoil: 200f)
+                  ).Attach<KaliProjectile>(k => k.SetChargeLevel(2)
+                  ),
+                ChargeTime = 2.5f,
             },
             new(){
-                Projectile = _KaliProjectile.Clone(),
-                ChargeTime = 3f,
+                Projectile = _KaliProjectile.Clone(new(damage: 100f, speed: 700f, recoil: 400f)
+                  ).Attach<KaliProjectile>(k => k.SetChargeLevel(3)
+                  ),
+                ChargeTime = 4.5f,
             },
         };
 
-        _ChargeBase = gun.UpdateAnimation("charge", returnToIdle: false);
-            gun.SetAnimationFPS(_ChargeBase, 20);
+        string chargeAnim1 = gun.UpdateAnimation("charge", returnToIdle: false);
+            gun.SetAnimationFPS(chargeAnim1, 20);
             // gun.SetGunAudio(_ChargeBase, "kali_charge_sound", 0);
-        _ChargeMore = gun.UpdateAnimation("charge_more", returnToIdle: false);
-            gun.SetAnimationFPS(_ChargeMore, 40);
+        string chargeAnim2 = gun.UpdateAnimation("charge_more", returnToIdle: false);
+            gun.SetAnimationFPS(chargeAnim2, 40);
             // gun.SetGunAudio(_ChargeMore, "kali_charge_sound", 0);
-        _ChargeMost = gun.UpdateAnimation("charge_most", returnToIdle: false);
-            gun.SetAnimationFPS(_ChargeMost, 60);
-            gun.SetGunAudio(_ChargeMost, "kali_charge_sound", 0);
-        _ChargeAnimations = new(){
-            _ChargeBase,
-            _ChargeMore,
-            _ChargeMost,
-        };
+        string chargeAnim3 = gun.UpdateAnimation("charge_most", returnToIdle: false);
+            gun.SetAnimationFPS(chargeAnim3, 60);
+            gun.SetGunAudio(chargeAnim3, "kali_charge_sound", 0);
+        _ChargeAnimations = new(){chargeAnim1, chargeAnim2, chargeAnim3};
+
+        _IonizeVFX = VFX.Create("kali_ionize_particle", fps: 7, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 100f);
     }
 
     protected override void Update()
@@ -91,11 +95,18 @@ public class KALI : AdvancedGunBehavior
         if (!this.gun.IsCharging)
         {
             this._chargeLevel = -1;
+            this._timeCharging = 0f;
             this.gun.chargeAnimation = _ChargeAnimations[0];
             this.gun.sprite.usesOverrideMaterial = false;
             this.gun.sprite.renderer.material.SetFloat("_EmissivePower", 0f);
             this.gun.sprite.UpdateMaterial();
             return;
+        }
+
+        if ((this._timeCharging += BraveTime.DeltaTime) > _AMMO_DRAIN_RATE)
+        {
+            this._timeCharging -= _AMMO_DRAIN_RATE;
+            this.gun.LoseAmmo(1);
         }
 
         int newChargeLevel = 1 + this.gun.GetChargeLevel();
@@ -107,12 +118,12 @@ public class KALI : AdvancedGunBehavior
         this.gun.spriteAnimator.currentClip = this.gun.spriteAnimator.GetClipByName(this.gun.chargeAnimation);
         if (newChargeLevel == 0)
         {
-            AkSoundEngine.PostEvent("kali_activate_sound", base.gameObject);
+            base.gameObject.Play("kali_activate_sound");
             this.gun.spriteAnimator.Play();
         }
         else if (newChargeLevel < 3)
         {
-            AkSoundEngine.PostEvent("kali_charge_sound", base.gameObject);
+            base.gameObject.Play("kali_charge_sound");
             this.gun.spriteAnimator.Play();
         }
         else
@@ -142,56 +153,136 @@ public class KALI : AdvancedGunBehavior
         if (projectile.GetComponent<KaliProjectile>() is not KaliProjectile kp)
             return;
 
-        projectile.Attach<SpawnProjModifier>(s => {
-          s.spawnProjectilesOnCollision  = true;
-          s.numberToSpawnOnCollison      = 9;
-          s.startAngle                   = 180;
-          s.projectileToSpawnOnCollision = KALI._KaliProjectile;
-          s.collisionSpawnStyle          = SpawnProjModifier.CollisionSpawnStyle.RADIAL;
-        });
-
-        this._timeShifter.GetComponent<KaliTimeshifter>().Reset();
-        projectile.transform.DoMovingDistortionWave(distortionIntensity: 1.5f, distortionRadius: 0.5f, maxRadius: 0.75f, duration: 0.25f);
-        // projectile.transform.DoMovingDistortionWave(distortionIntensity: 1.5f, distortionRadius: 0.05f, maxRadius: 0.75f, duration: 0.25f);
-        base.gameObject.Play("magunet_launch_sound");
+        if (kp.GetChargeLevel() == 3)
+            this._timeShifter.GetComponent<KaliTimeshifter>().Reset();
+        projectile.transform.DoMovingDistortionWave(distortionIntensity: 2.5f, distortionRadius: 0.25f, maxRadius: 0.25f, duration: 0.75f);
     }
 }
 
 public class KaliProjectile : MonoBehaviour
 {
+    [SerializeField]
+    private int _chargeLevel = 0;
+
     private void Start()
     {
         base.GetComponentInChildren<TrailController>().gameObject.SetGlowiness(100f);
+        Projectile p = base.GetComponent<Projectile>();
+        p.OnWillKillEnemy += OnWillKillEnemy;
+        p.OnHitEnemy += OnHitEnemy;
+        p.specRigidbody.OnPreRigidbodyCollision += this.MaybeVaporizeProjectiles;
+        p.specRigidbody.OnRigidbodyCollision += this.VaporizeProjectiles;
+    }
+
+    private void MaybeVaporizeProjectiles(SpeculativeRigidbody me, PixelCollider myPixelCollider, SpeculativeRigidbody other, PixelCollider otherPixelCollider)
+    {
+        if (other.GetComponent<Projectile>() is not Projectile p)
+            return; // do nothing if we didn't run into a projectile
+        if (this._chargeLevel != 3)
+            PhysicsEngine.SkipCollision = true; // don't vaporize except at final charge level
+        else if (p.Owner is PlayerController)
+            PhysicsEngine.SkipCollision = true; // doin't vaporize player projectiles
+    }
+
+    private void VaporizeProjectiles(CollisionData rigidbodyCollision)
+    {
+        if (this._chargeLevel != 3)
+            return;
+        if (rigidbodyCollision.OtherRigidbody.GetComponent<Projectile>() is not Projectile other)
+            return;
+        if (other.Owner is PlayerController)
+            return;
+        FancyVFX glowyBoi = FancyVFX.FromCurrentFrame(other.sprite);
+        glowyBoi.sprite.SetGlowiness(300f, overrideColor: Color.cyan, glowColor: Color.cyan, clampBrightness: false);
+        glowyBoi.sprite.StartCoroutine(CriticalGlow(glowyBoi.sprite));
+        other.DieInAir(suppressInAirEffects: true, allowActorSpawns: false, allowProjectileSpawns: false, killedEarly: true);
+    }
+
+    public void SetChargeLevel(int level) => this._chargeLevel = level;
+    public int GetChargeLevel() => this._chargeLevel;
+
+    private static void OnHitEnemy(Projectile p, SpeculativeRigidbody enemy, bool killed)
+    {
+        enemy.gameObject.Play("kali_impact_sound");
+    }
+
+    private static void OnWillKillEnemy(Projectile p, SpeculativeRigidbody body)
+    {
+        if (!body.aiActor || body.aiActor.IsABoss(canBeDead: true))
+            return;
+        FancyVFX glowyBoi = FancyVFX.FromCurrentFrame(body.aiActor.sprite);
+        glowyBoi.sprite.SetGlowiness(300f, overrideColor: Color.cyan, glowColor: Color.cyan, clampBrightness: false);
+        glowyBoi.sprite.StartCoroutine(CriticalGlow(glowyBoi.sprite));
+        body.aiActor.EraseFromExistence(true);
+    }
+
+    private static IEnumerator CriticalGlow(tk2dSprite sprite)
+    {
+        Material m = sprite.renderer.material;
+        for (float elapsed = 0f; elapsed < 0.5f; elapsed += BraveTime.DeltaTime)
+        {
+            float percentDone = elapsed / 0.5f;
+            m.SetFloat("_EmissivePower", 300f + 2700f * percentDone);
+            yield return null;
+        }
+        FancyVFX.SpawnBurst(
+            prefab           : KALI._IonizeVFX,
+            numToSpawn       : 50,
+            basePosition     : sprite.WorldCenter,
+            positionVariance : 1f,
+            baseVelocity     : null,
+            minVelocity      : 40f,
+            velocityVariance : 40f,
+            velType          : FancyVFX.Vel.Away,
+            rotType          : FancyVFX.Rot.None,
+            lifetime         : 0.5f,
+            parent           : null,
+            emissivePower    : 300f,
+            emissiveColor    : Color.cyan,
+            fadeIn           : false,
+            uniform          : false,
+            startScale       : 1.0f,
+            endScale         : 1.0f,
+            height           : null
+          );
+        sprite.gameObject.PlayUnique("kali_explode_sound");
+        UnityEngine.Object.Destroy(sprite.gameObject);
     }
 }
 
 public class KaliTimeshifter : MonoBehaviour
 {
-    private const float _BASE_TIME_SCALE = 0.1f;
-    private const float _TIME_SCALE_FACTOR = 2.0f;
+    private const float _MIN_TIME_SCALE = 0.1f;
+    private const float _DLT_TIME_SCALE = 1f - _MIN_TIME_SCALE;
+    private const float _EASE_TIME = 0.7f;
 
-    private float _timeScale = 1.0f;
+    private float _curTime = 0.0f;
 
     private void Start()
     {
-        this._timeScale = 1.0f;
+        this._curTime = _EASE_TIME;
     }
 
     private void Update()
     {
-        this._timeScale = Mathf.Min(this._timeScale + _TIME_SCALE_FACTOR * BraveTime.DeltaTime, 1.0f);
-        if (this._timeScale >= 1f)
+        if (BraveTime.DeltaTime == 0.0f)
+            return;
+
+        this._curTime += Time.unscaledDeltaTime; // NOTE: specifically not using BraveTime here because that would slow down the game to crawl
+        if (this._curTime >= _EASE_TIME)
         {
             BraveTime.ClearMultiplier(base.gameObject);
             return;
         }
 
-        BraveTime.SetTimeScaleMultiplier(this._timeScale, base.gameObject);
+        float percentDone = this._curTime / _EASE_TIME;
+        float cubicEase = percentDone * percentDone * percentDone;
+        BraveTime.SetTimeScaleMultiplier(_MIN_TIME_SCALE + _DLT_TIME_SCALE * cubicEase, base.gameObject);
     }
 
     public void Reset()
     {
-        this._timeScale = _BASE_TIME_SCALE;
+        this._curTime = 0.0f;
     }
 
     private void OnDestroy()

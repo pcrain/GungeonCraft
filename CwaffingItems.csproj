@@ -3594,6 +3594,7 @@
     <EmbeddedResource Include="Resources\MiscVFX\hail_collision3.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\campfire_b2.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\note_vfx_2.png"/>
+    <EmbeddedResource Include="Resources\MiscVFX\kali_ionize_particle.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\spark_vfx6.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\saiyan_spark6.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\law_rune_mini.png"/>

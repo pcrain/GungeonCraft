@@ -61,6 +61,12 @@ public static class VFX
     /// </summary>
     public static void RegisterVFX(string name, List<string> spritePaths, float fps, bool loops = true, int loopStart = -1, float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true)
     {
+        if (animations.ContainsKey(name))
+        {
+            Lazy.DebugWarn($"  HEY! re-creating VFX with name {name}. If this is intentional, please reuse the original VFX, don't create it twice.");
+            return;
+        }
+
         // GameObject Obj     = new GameObject(name);
         GameObject Obj     = SpriteBuilder.SpriteFromResource(spritePaths[0], new GameObject(name));
         VFXComplex complex = new VFXComplex();
@@ -728,8 +734,8 @@ public class FancyVFX : MonoBehaviour
     /// <param name="lifetime">Time before VFX automatically despawn. Set to 0 for no automatic despawning.</param>
     /// <param name="fadeOutTime">Time before VFX fade out to 0 alpha. If greater than lifetime, VFX will spawn in partially faded. Disabled if null.</param>
     /// <param name="parent">If non-null, VFX will automatically move with the parent transform.</param>
-    /// <param name="emissivePower">Emissive power of the VFX.</param>
-    /// <param name="emissiveColor">Emissive color of the VFX.</param>
+    /// <param name="emissivePower">Emissive power of the VFX. Ignored if fadeOutTime is non-null.</param>
+    /// <param name="emissiveColor">Emissive color of the VFX. Ignored if fadeOutTime is non-null.</param>
     /// <param name="fadeIn">If true, VFX will fade in instead of fading out.</param>
     /// <param name="startScale">Starting scale of the VFX sprite.</param>
     /// <param name="endScale">Ending scale of the VFX sprite.</param>
@@ -767,6 +773,7 @@ public class FancyVFX : MonoBehaviour
     /// <param name="basePosition">Anchor position from which all VFX are spawned relative to</param>
     /// <param name="positionVariance">Maximum distance from the anchor position from which VFX will spawn</param>
     /// <param name="baseVelocity">Anchor velocity for which all VFX are launched relative to</param>
+    /// <param name="minVelocity">Minimum magnitude of velocity for each individual VFX</param>
     /// <param name="velocityVariance">Maximum magnitude of deviance for each individual VFX from the baseVelocity</param>
     /// <param name="velType">Relation between baseVelocity and velocityVariance. Possible values:<br/><br/>
     ///   Random: base velocity is augmented by a random vector with magnitude between 0 and velocityVariance<br/>
@@ -783,15 +790,15 @@ public class FancyVFX : MonoBehaviour
     /// <param name="lifetime">Time before VFX automatically despawn. Set to 0 for no automatic despawning.</param>
     /// <param name="fadeOutTime">Time before VFX fade out to 0 alpha. If greater than lifetime, VFX will spawn in partially faded. Disabled if null.</param>
     /// <param name="parent">If non-null, VFX will automatically move with the parent transform.</param>
-    /// <param name="emissivePower">Emissive power of the VFX.</param>
-    /// <param name="emissiveColor">Emissive color of the VFX.</param>
+    /// <param name="emissivePower">Emissive power of the VFX. Ignored if fadeOutTime is non-null.</param>
+    /// <param name="emissiveColor">Emissive color of the VFX. Ignored if fadeOutTime is non-null.</param>
     /// <param name="fadeIn">If true, VFX will fade in instead of fading out.</param>
     /// <param name="uniform">If true, VFX will spawn with uniform angles around basePosition with magnitude positionVariance.</param>
     /// <param name="startScale">Starting scale of the VFX sprite.</param>
     /// <param name="endScale">Ending scale of the VFX sprite.</param>
     /// <param name="height">Height of the VFX above the ground. Positive = in front of most things, negative = behind most things.</param>
     /// <param name="randomFrame">If true, animation frames are treated as separate VFX, and one is selected at random.</param>
-    public static void SpawnBurst(GameObject prefab, int numToSpawn, Vector2 basePosition, float positionVariance = 0f, Vector2? baseVelocity = null, float velocityVariance = 0f,
+    public static void SpawnBurst(GameObject prefab, int numToSpawn, Vector2 basePosition, float positionVariance = 0f, Vector2? baseVelocity = null, float minVelocity = 0f, float velocityVariance = 0f,
         Vel velType = Vel.Random, Rot rotType = Rot.None, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0,
         Color? emissiveColor = null, bool fadeIn = false, bool uniform = false, float startScale = 1.0f, float endScale = 1.0f, float? height = null, bool randomFrame = false)
     {
@@ -804,10 +811,10 @@ public class FancyVFX : MonoBehaviour
                 ? basePosition + posOffsetAngle.ToVector((uniform ? 1f : UnityEngine.Random.value) * positionVariance)
                 : basePosition;
             Vector2 velocity = velType switch {
-                Vel.Random     => realBaseVelocity + Lazy.RandomAngle().ToVector(UnityEngine.Random.value * velocityVariance),
-                Vel.Radial     => realBaseVelocity + Lazy.RandomAngle().ToVector(velocityVariance),
-                Vel.Away       => realBaseVelocity + posOffsetAngle.ToVector(UnityEngine.Random.value * velocityVariance),
-                Vel.AwayRadial => realBaseVelocity + posOffsetAngle.ToVector(velocityVariance),
+                Vel.Random     => realBaseVelocity + Lazy.RandomAngle().ToVector(minVelocity + UnityEngine.Random.value * velocityVariance),
+                Vel.Radial     => realBaseVelocity + Lazy.RandomAngle().ToVector(minVelocity + velocityVariance),
+                Vel.Away       => realBaseVelocity + posOffsetAngle.ToVector(minVelocity + UnityEngine.Random.value * velocityVariance),
+                Vel.AwayRadial => realBaseVelocity + posOffsetAngle.ToVector(minVelocity + velocityVariance),
                 _              => realBaseVelocity,
             };
             Quaternion rot = rotType switch {

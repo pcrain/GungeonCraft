@@ -16,6 +16,7 @@ public class GunBuildData
   public float? speed;
   public float? force;
   public float? range;
+  public float? recoil;
   public float poison;
   public float fire;
   public float freeze;
@@ -60,6 +61,7 @@ public class GunBuildData
   /// <param name="speed">The speed of the projectile.</param>
   /// <param name="force">The force of the projectile.</param>
   /// <param name="range">The range of the projectile.</param>
+  /// <param name="recoil">The recoil force of the projectile on the owner.</param>
   /// <param name="poison">The chance for the projectile to apply poison.</param>
   /// <param name="fire">The chance for the projectile to apply fire.</param>
   /// <param name="freeze">The chance for the projectile to apply freeze.</param>
@@ -91,7 +93,7 @@ public class GunBuildData
   /// <param name="invisibleProjectile"></param>
   public GunBuildData(Gun gun = null, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
     ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1, GameUIAmmoType.AmmoType? ammoType = null,
-    bool customClip = false, float? damage = null, float? speed = null, float? force = null, float? range = null, float poison = 0.0f, float fire = 0.0f, float freeze = 0.0f, float slow = 0.0f,
+    bool customClip = false, float? damage = null, float? speed = null, float? force = null, float? range = null, float? recoil = null, float poison = 0.0f, float fire = 0.0f, float freeze = 0.0f, float slow = 0.0f,
     bool? collidesWithEnemies = null, bool? ignoreDamageCaps = null, bool? collidesWithProjectiles = null, bool? surviveRigidbodyCollisions = null, bool? collidesWithTilemap = null,
     string sprite = null, int fps = 2, Anchor anchor = Anchor.MiddleCenter, float scale = 1.0f, bool anchorsChangeColliders = true, bool fixesScales = true, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null,
     IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null, float bossDamageMult = 1.0f, string destroySound = null, bool? shouldRotate = null, int barrageSize = 1,
@@ -111,6 +113,7 @@ public class GunBuildData
       this.speed                         = speed;
       this.force                         = force;
       this.range                         = range;
+      this.recoil                        = recoil;
       this.poison                        = poison;
       this.fire                          = fire;
       this.freeze                        = freeze;
@@ -213,6 +216,11 @@ public static class GunBuilder
     p.BulletScriptSettings.surviveRigidbodyCollisions = b.surviveRigidbodyCollisions ?? p.BulletScriptSettings.surviveRigidbodyCollisions;
     if (p.specRigidbody)
       p.specRigidbody.CollideWithTileMap              = b.collidesWithTilemap ?? p.specRigidbody.CollideWithTileMap;  // doesn't work!
+    if (b.recoil.HasValue && b.recoil.Value != 0f)
+    {
+      p.AppliesKnockbackToPlayer = true;
+      p.PlayerKnockbackForce = b.recoil.Value;
+    }
 
     // Non-defaulted
     p.BossDamageMultiplier                            = b.bossDamageMult;

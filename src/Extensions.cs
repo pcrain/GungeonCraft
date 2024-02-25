@@ -1514,7 +1514,7 @@ public static class Extensions
     return body;
   }
 
-  /// <summary>Get the current charge level of a ProjectileModule</summary>
+  /// <summary>Get the current charge level of a ProjectileModule. Returns -1 if no charged projectile is currently valid.</summary>
   public static int GetChargeLevel(this Gun gun, ProjectileModule mod = null)
   {
     mod ??= gun.DefaultModule;
