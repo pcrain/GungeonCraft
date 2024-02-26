@@ -1,5 +1,47 @@
 namespace CwaffingTheGungy;
 
+// public static class GunBuilderHotfix
+// {
+//     [HarmonyPatch(typeof(GunExt), nameof(GunExt.UpdateAnimations))]
+//     private class GunUpdateAnimationsPatch
+//     {
+//         static bool Prefix(Gun gun, tk2dSpriteCollectionData collection)
+//         {
+//             collection ??= ETGMod.Databases.Items.WeaponCollection;
+
+//             var clips = new List<tk2dSpriteAnimationClip>();
+
+//             gun.idleAnimation = gun.UpdateAnimationAddClipsLater("idle", collection, clipsToAddLater: clips);
+//             // gun.dodgeAnimation = gun.UpdateAnimationAddClipsLater("dodge", collection, clipsToAddLater: clips);
+//             // gun.introAnimation = gun.UpdateAnimationAddClipsLater("intro", collection, true, clipsToAddLater: clips);
+//             // gun.emptyAnimation = gun.UpdateAnimationAddClipsLater("empty", collection, clipsToAddLater: clips);
+//             gun.shootAnimation = gun.UpdateAnimationAddClipsLater("fire", collection, true, clipsToAddLater: clips);
+//             gun.reloadAnimation = gun.UpdateAnimationAddClipsLater("reload", collection, true, clipsToAddLater: clips);
+//             gun.chargeAnimation = gun.UpdateAnimationAddClipsLater("charge", collection, clipsToAddLater: clips);
+//             // gun.outOfAmmoAnimation = gun.UpdateAnimationAddClipsLater("out_of_ammo", collection, clipsToAddLater: clips);
+//             // gun.dischargeAnimation = gun.UpdateAnimationAddClipsLater("discharge", collection, clipsToAddLater: clips);
+//             // gun.finalShootAnimation = gun.UpdateAnimationAddClipsLater("final_fire", collection, true, clipsToAddLater: clips);
+//             // gun.emptyReloadAnimation = gun.UpdateAnimationAddClipsLater("empty_reload", collection, true, clipsToAddLater: clips);
+//             // gun.criticalFireAnimation = gun.UpdateAnimationAddClipsLater("critical_fire", collection, true, clipsToAddLater: clips);
+//             // gun.enemyPreFireAnimation = gun.UpdateAnimationAddClipsLater("enemy_pre_fire", collection, clipsToAddLater: clips);
+//             // gun.alternateShootAnimation = gun.UpdateAnimationAddClipsLater("alternate_shoot", collection, true, clipsToAddLater: clips);
+//             // gun.alternateReloadAnimation = gun.UpdateAnimationAddClipsLater("alternate_reload", collection, true, clipsToAddLater: clips);
+//             // gun.alternateIdleAnimation = gun.UpdateAnimationAddClipsLater("alternate_idle", collection, clipsToAddLater: clips);
+
+//             if(clips.Count > 0)
+//             {
+//                 Array.Resize(ref gun.spriteAnimator.Library.clips, gun.spriteAnimator.Library.clips.Length + clips.Count);
+//                 for(int i = 0; i < clips.Count; i++)
+//                 {
+//                     gun.spriteAnimator.Library.clips[gun.spriteAnimator.Library.clips.Length - clips.Count + i] = clips[i];
+//                 }
+//             }
+
+//             return false;    // skip the original method
+//         }
+//     }
+// }
+
 // Alexandria's method unnecessarily rebuilds the entire sprite dictionary after every sprite is added
 public static class SpriteBuilderHotfix
 {

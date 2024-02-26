@@ -81,8 +81,13 @@ public class Initialisation : BaseUnityPlugin
                 ETGModConsole.Log("Cwaffing the Gungy initializing...");
 
             Instance = this;
+
+            #region Set up Harmony Patches
+            System.Diagnostics.Stopwatch setupHarmonyWatch = System.Diagnostics.Stopwatch.StartNew();
             Harmony harmony = new Harmony(C.MOD_GUID);
             harmony.PatchAll();
+            setupHarmonyWatch.Stop();
+            #endregion
 
             #region Round 1 Config (hooks and database stuff where no sprites are needed, so it can be async)
             System.Diagnostics.Stopwatch setupConfig1Watch = null;
@@ -428,6 +433,7 @@ public class Initialisation : BaseUnityPlugin
             ETGModConsole.Log($"Yay! :D Initialized <color=#{ColorUtility.ToHtmlStringRGB(C.MOD_COLOR).ToLower()}>{C.MOD_NAME} v{C.MOD_VERSION}</color> in "+(watch.ElapsedMilliseconds/1000.0f)+" seconds");
             if (C.DEBUG_BUILD)
             {
+                ETGModConsole.Log($"    setupHarmony   finished in {setupHarmonyWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupConfig1   finished in {setupConfig1Watch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupSave      finished in {setupSaveWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupSprites   finished in {setupSpritesWatch.ElapsedMilliseconds} milliseconds");
