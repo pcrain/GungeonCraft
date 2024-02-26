@@ -176,6 +176,7 @@ public class Initialisation : BaseUnityPlugin
                 // GungeonitePickaxe.Init();
                 ChamberJammer.Init();
                 Cuppajoe.Init();
+                StopSign.Init();
                 setupActivesWatch.Stop();
             #endregion
 
@@ -215,7 +216,6 @@ public class Initialisation : BaseUnityPlugin
                 SafetyGloves.Init();
                 DrabOutfit.Init();
                 RingOfDefenestration.Init();
-                StopSign.Init();
                 AmmoConservationManual.Init();
                 ReserveAmmolet.Init();
                 // Protractor.Init();  // unfinished
@@ -286,6 +286,7 @@ public class Initialisation : BaseUnityPlugin
                 Blamethrower.Add();
                 Suncaster.Add();
                 KALI.Add();
+                AlienNailgun.Add();
                 setupGunsWatch.Stop();
             #endregion
 
