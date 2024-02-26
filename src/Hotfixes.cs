@@ -1,5 +1,30 @@
 namespace CwaffingTheGungy;
 
+// Alexandria's method unnecessarily rebuilds the entire sprite dictionary after every sprite is added
+public static class SpriteBuilderHotfix
+{
+    [HarmonyPatch(typeof(SpriteBuilder), nameof(SpriteBuilder.AddSpriteToCollection), typeof(tk2dSpriteDefinition), typeof(tk2dSpriteCollectionData))]
+    private class AddSpritePatch
+    {
+        static bool Prefix(tk2dSpriteDefinition spriteDefinition, tk2dSpriteCollectionData collection, ref int __result)
+        {
+            //Initialize the sprite lookup dictionary if necessary
+            if (collection.spriteNameLookupDict == null)
+                collection.InitDictionary();
+
+            //Add definition to collection
+            int oldLength = collection.spriteDefinitions.Length;
+            Array.Resize(ref collection.spriteDefinitions, oldLength + 1);
+            collection.spriteDefinitions[oldLength] = spriteDefinition;
+
+            //Add definition to sprite lookup dictionary
+            collection.spriteNameLookupDict[spriteDefinition.name] = oldLength;
+            __result = oldLength;
+            return false;    // skip the original method
+        }
+    }
+}
+
 // TrailControllers for projectiles moving at extremely highspeed drift down and to the left, making them apparently never hit
 // the top or right walls at all. I don't know why multiplying their offset by 19/16 fixes things, but it comes darn close.
 public static class TrailControllerHotfix
