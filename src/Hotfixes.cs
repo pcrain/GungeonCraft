@@ -3,18 +3,29 @@ namespace CwaffingTheGungy;
 // Alexandria's method unnecessarily rebuilds the entire sprite dictionary after every sprite is added
 public static class SpriteBuilderHotfix
 {
+    internal static bool _UsePatchedSpriteAdder = true;
+
     [HarmonyPatch(typeof(SpriteBuilder), nameof(SpriteBuilder.AddSpriteToCollection), typeof(tk2dSpriteDefinition), typeof(tk2dSpriteCollectionData))]
     private class AddSpritePatch
     {
         static bool Prefix(tk2dSpriteDefinition spriteDefinition, tk2dSpriteCollectionData collection, ref int __result)
         {
+            if (!_UsePatchedSpriteAdder)
+                return true; // run original method
+
             //Initialize the sprite lookup dictionary if necessary
             if (collection.spriteNameLookupDict == null)
                 collection.InitDictionary();
 
             //Add definition to collection
-            int oldLength = collection.spriteDefinitions.Length;
-            Array.Resize(ref collection.spriteDefinitions, oldLength + 1);
+            int oldLength = collection.spriteNameLookupDict.Keys.Count; // the number of keys in our lookup dict is our actual number of sprites
+            if (oldLength >= collection.spriteDefinitions.Length)
+            {
+                int newLength = Mathf.Max(8, oldLength * 2);  // double array size if necessary
+                Array.Resize(ref collection.spriteDefinitions, newLength);
+                for (int i = oldLength + 1; i < newLength; ++i)
+                    collection.spriteDefinitions[i] = new(){name = ""}; // make sure our new definitions are non-null, but valid
+            }
             collection.spriteDefinitions[oldLength] = spriteDefinition;
 
             //Add definition to sprite lookup dictionary

@@ -81,7 +81,8 @@ public class Initialisation : BaseUnityPlugin
                 ETGModConsole.Log("Cwaffing the Gungy initializing...");
 
             Instance = this;
-            new Harmony(C.MOD_GUID).PatchAll();
+            Harmony harmony = new Harmony(C.MOD_GUID);
+            harmony.PatchAll();
 
             #region Round 1 Config (hooks and database stuff where no sprites are needed, so it can be async)
             System.Diagnostics.Stopwatch setupConfig1Watch = null;
@@ -418,6 +419,8 @@ public class Initialisation : BaseUnityPlugin
                 setupSaveThread.Join();
                 setupAudioThread.Join();
                 setupSynergiesThread.Join();
+                // Disconnect sprite setup Harmony patch
+                SpriteBuilderHotfix._UsePatchedSpriteAdder = false;
                 awaitAsyncWatch.Stop();
             #endregion
 
