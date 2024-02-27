@@ -36,6 +36,7 @@ public static class Lazy
             Gun gun = ETGMod.Databases.Items.NewGun(itemName, spriteName);  //create a new gun using specified sprite name
             Game.Items.Rename("outdated_gun_mods:"+baseItemName, IDs.InternalNames[itemName]);  //rename the gun for commands
 
+            // Replace old SetupSprite code to use our packed textures
             // gun.SetupSprite(null, spriteName+"_idle_001"); //set the gun's ammonomicon sprite
             gun.encounterTrackable.journalData.AmmonomiconSprite = spriteName+"_ammonomicon";
             gun.UpdateAnimations();
@@ -60,7 +61,7 @@ public static class Lazy
             GameObject obj = new GameObject(itemName).RegisterPrefab();
             item = obj.AddComponent<TItemSpecific>();
 
-            // Replace old AddSpriteToObject to code to use our packed textures
+            // Replace old AddSpriteToObject code to use our packed textures
             // ItemBuilder.AddSpriteToObject(itemName, spriteName, obj);
             tk2dSprite sprite = obj.AddComponent<tk2dSprite>();
             tk2dSpriteCollectionData coll = ItemHelper.Get(Items.AmmoSynthesizer).sprite.Collection;
