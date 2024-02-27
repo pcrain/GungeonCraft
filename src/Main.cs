@@ -80,10 +80,14 @@ public class Initialisation : BaseUnityPlugin
             if (C.DEBUG_BUILD)
                 ETGModConsole.Log("Cwaffing the Gungy initializing...");
 
+            #region Set up Packed Texture Atlases
+            System.Diagnostics.Stopwatch setupAtlasesWatch = System.Diagnostics.Stopwatch.StartNew();
             for (int i = 1; i <= 5; ++i)
-            PackerHelper.LoadPackedTextureResource(
-                $"CwaffingTheGungy.Resources.Atlases.atlas_{i}.png",
-                $"CwaffingTheGungy.Resources.Atlases.atlas_{i}.atlas");
+                PackerHelper.LoadPackedTextureResource(
+                  textureResourcePath:  $"CwaffingTheGungy.Resources.Atlases.atlas_{i}.png",
+                  metaDataResourcePath: $"CwaffingTheGungy.Resources.Atlases.atlas_{i}.atlas");
+            setupAtlasesWatch.Stop();
+            #endregion
 
             Instance = this;
 
@@ -442,6 +446,7 @@ public class Initialisation : BaseUnityPlugin
             ETGModConsole.Log($"Yay! :D Initialized <color=#{ColorUtility.ToHtmlStringRGB(C.MOD_COLOR).ToLower()}>{C.MOD_NAME} v{C.MOD_VERSION}</color> in "+(watch.ElapsedMilliseconds/1000.0f)+" seconds");
             if (C.DEBUG_BUILD)
             {
+                ETGModConsole.Log($"    setupAtlases   finished in {setupAtlasesWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupHarmony   finished in {setupHarmonyWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupConfig1   finished in {setupConfig1Watch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupSave      finished in {setupSaveWatch.ElapsedMilliseconds} milliseconds (ASYNC)");

@@ -3423,7 +3423,6 @@
     <EmbeddedResource Include="Resources\CustomClips\wavefront_clipfull_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\missiletoe_clipfull_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\platinum_star_clipfull_001.png"/>
-    <EmbeddedResource Include="Resources\EmbeddedRooms\BoomhildrRoom.room"/>
     <EmbeddedResource Include="Resources\Atlases\atlas_5.png"/>
     <EmbeddedResource Include="Resources\Atlases\atlas_4.png"/>
     <EmbeddedResource Include="Resources\Atlases\atlas_2.atlas"/>

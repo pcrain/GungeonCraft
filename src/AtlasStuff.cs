@@ -154,13 +154,9 @@ public static class PackerHelper
   public static tk2dSpriteDefinition NamedSpriteInPackedTexture(string s)
   {
     return _PackedTextures.TryGetValue(s.Split('/').Last(), out tk2dSpriteDefinition value) ? value : null;
-    // if (!_PackedTextures.TryGetValue(s, out SpriteInfo si))
-    // {
-    //   ETGModConsole.Log($"failed to retrieve sprite {s} from packed textures");
-    //   return null;
-    // }
-    // return si.atlas.SpriteDefFromSegment(si.x, si.y, si.w, si.h);
   }
+
+  internal static tk2dSpriteCollectionData _WeaponCollection = ItemHelper.Get(Items.Ak47).sprite.Collection;
 
   /// <summary>Load a packed texture from a resource string</summary>
   public static void LoadPackedTextureResource(string textureResourcePath, string metaDataResourcePath)
@@ -179,14 +175,39 @@ public static class PackerHelper
         string[] tokens = line.Split('\t');
         if (tokens.Length < 9)
           continue; // first line, skip it since it doesn't have relevant information
-        string spriteName = tokens[0].Split('/').Last().Split('.').First();  // trim off path and extension
+        string[] pathName = tokens[0].Split('/'); // trim off path and extension
+        string collName   = pathName.First();
+        string spriteName = pathName.Last().Split('.').First();  // trim off path and extension
         int x = Int32.Parse(tokens[1]);
         int y = Int32.Parse(tokens[2]);
         int w = Int32.Parse(tokens[3]);
         int h = Int32.Parse(tokens[4]);
         // _PackedTextures[spriteName] = new SpriteInfo{atlas = atlas, x = x, y = y, w = w, h = h};
-        _PackedTextures[spriteName] = atlas.SpriteDefFromSegment(spriteName, x, y, w, h);
+        tk2dSpriteDefinition def = _PackedTextures[spriteName] = atlas.SpriteDefFromSegment(spriteName, x, y, w, h);
         // ETGModConsole.Log($"loaded packed {w}x{h} sprite {spriteName} at {x},{y}");
+        if (collName != "WeaponCollection")
+          continue;
+
+        int id = SpriteBuilder.AddSpriteToCollection(def, _WeaponCollection);
+        // ETGModConsole.Log($"added {spriteName} to weapons");
+        string json = $"CwaffingTheGungy.Resources.{collName}.{spriteName}.json";
+
+        using var jstream = asmb.GetManifestResourceStream(json);
+        if (jstream == null)
+          continue;
+        AssetSpriteData frameData = default;
+        try
+        {
+            frameData = JSONHelper.ReadJSON<AssetSpriteData>(jstream);
+        }
+        catch {
+          ETGModConsole.Log("Error: invalid json at project path " + json);
+          jstream.Dispose();
+          continue;
+        }
+        _WeaponCollection.SetAttachPoints(id, frameData.attachPoints);
+        if (_WeaponCollection.inst != _WeaponCollection)
+            _WeaponCollection.inst.SetAttachPoints(id, frameData.attachPoints);
       }
     }
   }
