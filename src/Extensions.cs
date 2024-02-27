@@ -890,7 +890,8 @@ public static class Extensions
       // if (C.DEBUG_BUILD)
       //   ETGModConsole.Log($"  getting clip {$"{clipname}_clip"}");
       mod.ammoType       = GameUIAmmoType.AmmoType.CUSTOM;
-      mod.customAmmoType = CustomClipAmmoTypeToolbox.AddCustomAmmoType($"{clipname}_clip", ResMap.Get($"{clipname}_clipfull")[0], ResMap.Get($"{clipname}_clipempty")[0]);
+      // mod.customAmmoType = CustomClipAmmoTypeToolbox.AddCustomAmmoType($"{clipname}_clip", ResMap.Get($"{clipname}_clipfull")[0], ResMap.Get($"{clipname}_clipempty")[0]);
+      mod.customAmmoType = PackerHelper.AddCustomAmmoType($"{clipname}_clip", ResMap.Get($"{clipname}_clipfull")[0], ResMap.Get($"{clipname}_clipempty")[0]);
   }
 
   /// <summary>Check if a player will die from next hit</summary>

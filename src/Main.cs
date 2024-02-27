@@ -108,6 +108,7 @@ public class Initialisation : BaseUnityPlugin
                 ShaderCache.Acquire("Brave/Internal/SinglePassOutline");
                 ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
                 ShaderCache.Acquire("Brave/Internal/SimpleAlphaFadeUnlit");
+                ShaderCache.Acquire("Daikon Forge/Default UI Shader");
                 setupShadersWatch.Stop();
             #endregion
 

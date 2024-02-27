@@ -236,6 +236,52 @@ public static class PackerHelper
     }
   }
 
+  /// <summary>Modification of Alexandria method using our own packed textures</summary>
+  public static string AddCustomAmmoType(string name, string ammoTypeSpritePath, string ammoBackgroundSpritePath)
+  {
+      tk2dSpriteDefinition fgTexture = _PackedTextures[ammoTypeSpritePath];
+      tk2dSpriteDefinition bgTexture = _PackedTextures[ammoBackgroundSpritePath];
+
+      GameObject fgSpriteObject = new GameObject("sprite fg").RegisterPrefab();
+      GameObject bgSpriteObject = new GameObject("sprite bg").RegisterPrefab();
+
+      GameUIAmmoType uiammotype = new GameUIAmmoType {
+          ammoBarBG      = bgSpriteObject.SetupDfSpriteFromDef<dfTiledSprite>(bgTexture, ShaderCache.Acquire("Daikon Forge/Default UI Shader")),
+          ammoBarFG      = fgSpriteObject.SetupDfSpriteFromDef<dfTiledSprite>(fgTexture, ShaderCache.Acquire("Daikon Forge/Default UI Shader")),
+          ammoType       = GameUIAmmoType.AmmoType.CUSTOM,
+          customAmmoType = name
+      };
+      Alexandria.ItemAPI.CustomClipAmmoTypeToolbox.addedAmmoTypes.Add(uiammotype);
+      foreach (GameUIAmmoController uiammocontroller in GameUIRoot.Instance.ammoControllers)
+          Alexandria.ItemAPI.CustomClipAmmoTypeToolbox.Add(ref uiammocontroller.ammoTypes, uiammotype);
+      return name;
+  }
+
+  /// <summary>Modification of Alexandria method using our own packed textures</summary>
+  public static T SetupDfSpriteFromDef<T>(this GameObject obj, tk2dSpriteDefinition def, Shader shader) where T : dfSprite
+  {
+      T sprite = obj.GetOrAddComponent<T>();
+      dfAtlas atlas = obj.GetOrAddComponent<dfAtlas>();
+      atlas.Material = new Material(shader);
+      atlas.Material.mainTexture = def.material.mainTexture;
+      atlas.Items.Clear();
+      dfAtlas.ItemInfo info = new dfAtlas.ItemInfo
+      {
+          border       = new RectOffset(),
+          deleted      = false,
+          name         = "main_sprite",
+          region       = new Rect(def.uvs[0], def.uvs[3] - def.uvs[0]),
+          rotated      = false,
+          sizeInPixels = (C.PIXELS_PER_TILE * def.untrimmedBoundsDataExtents.XY()),
+          texture      = null,
+          textureGUID  = "main_sprite"
+      };
+      atlas.AddItem(info);
+      sprite.Atlas = atlas;
+      sprite.SpriteName = "main_sprite";
+      return sprite;
+  }
+
   internal static tk2dSpriteCollectionData itemCollection = PickupObjectDatabase.GetById(155).sprite.Collection;
 
   /// <summary>Patched version of Alexandria's SpriteFromResource</summary>
