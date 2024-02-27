@@ -47,7 +47,7 @@ public static class SpriteBuilderHotfix
 {
     internal static bool _UsePatchedSpriteAdder = true;
 
-    [HarmonyPatch(typeof(SpriteBuilder), nameof(SpriteBuilder.AddSpriteToCollection), typeof(tk2dSpriteDefinition), typeof(tk2dSpriteCollectionData))]
+    // [HarmonyPatch(typeof(SpriteBuilder), nameof(SpriteBuilder.AddSpriteToCollection), typeof(tk2dSpriteDefinition), typeof(tk2dSpriteCollectionData))]
     private class AddSpritePatch
     {
         static bool Prefix(tk2dSpriteDefinition spriteDefinition, tk2dSpriteCollectionData collection, ref int __result)

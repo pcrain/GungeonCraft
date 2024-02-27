@@ -89,10 +89,10 @@ public static class PackerHelper
     public int h           = 0;
   }
 
-  private static Dictionary<string, SpriteInfo> _PackedTextures = new();
+  private static Dictionary<string, tk2dSpriteDefinition> _PackedTextures = new();
 
   /// <summary>Construct a tk2dSpriteDefinition from a segment of a packed texture</summary>
-  public static tk2dSpriteDefinition SpriteDefFromSegment(this Texture2D texture, int x, int y, int w, int h)
+  public static tk2dSpriteDefinition SpriteDefFromSegment(this Texture2D texture, string spriteName, int x, int y, int w, int h)
   {
     Material material = new Material(ShaderCache.Acquire(PlayerController.DefaultShaderName));
     material.mainTexture = texture;
@@ -102,6 +102,7 @@ public static class PackerHelper
     float hh = (float)h / 16f;
     tk2dSpriteDefinition tk2dSpriteDefinition = new tk2dSpriteDefinition
       {
+        name = spriteName,
         normals = new Vector3[]
         {
           new Vector3(0f, 0f, -1f),
@@ -152,12 +153,13 @@ public static class PackerHelper
   /// <summary>Retrieve a tk2dSprite by name</summary>
   public static tk2dSpriteDefinition NamedSpriteInPackedTexture(string s)
   {
-    if (!_PackedTextures.TryGetValue(s, out SpriteInfo si))
-    {
-      ETGModConsole.Log($"failed to retrieve sprite {s} from packed textures");
-      return null;
-    }
-    return si.atlas.SpriteDefFromSegment(si.x, si.y, si.w, si.h);
+    return _PackedTextures.TryGetValue(s.Split('/').Last(), out tk2dSpriteDefinition value) ? value : null;
+    // if (!_PackedTextures.TryGetValue(s, out SpriteInfo si))
+    // {
+    //   ETGModConsole.Log($"failed to retrieve sprite {s} from packed textures");
+    //   return null;
+    // }
+    // return si.atlas.SpriteDefFromSegment(si.x, si.y, si.w, si.h);
   }
 
   /// <summary>Load a packed texture from a resource string</summary>
@@ -177,13 +179,14 @@ public static class PackerHelper
         string[] tokens = line.Split('\t');
         if (tokens.Length < 9)
           continue; // first line, skip it since it doesn't have relevant information
-        string spriteName = tokens[0].Split('/').Last();
+        string spriteName = tokens[0].Split('/').Last().Split('.').First();  // trim off path and extension
         int x = Int32.Parse(tokens[1]);
         int y = Int32.Parse(tokens[2]);
         int w = Int32.Parse(tokens[3]);
         int h = Int32.Parse(tokens[4]);
-        _PackedTextures[spriteName] = new SpriteInfo{atlas = atlas, x = x, y = y, w = w, h = h};
-        ETGModConsole.Log($"loaded packed {w}x{h} sprite {spriteName} at {x},{y}");
+        // _PackedTextures[spriteName] = new SpriteInfo{atlas = atlas, x = x, y = y, w = w, h = h};
+        _PackedTextures[spriteName] = atlas.SpriteDefFromSegment(spriteName, x, y, w, h);
+        // ETGModConsole.Log($"loaded packed {w}x{h} sprite {spriteName} at {x},{y}");
       }
     }
   }

@@ -51,9 +51,16 @@ public static class Lazy
             string altName = itemName.SafeName() + "_icon";
             if (spritePath != altName)
                 ETGModConsole.Log($"  {spritePath} != {altName}");
-            GameObject obj = new GameObject(itemName);
+            GameObject obj = new GameObject(itemName).RegisterPrefab();
             item = obj.AddComponent<TItemSpecific>();
-            ItemBuilder.AddSpriteToObject(itemName, spriteName, obj);
+            // ItemBuilder.AddSpriteToObject(itemName, spriteName, obj);
+            tk2dSprite sprite = obj.AddComponent<tk2dSprite>();
+            tk2dSpriteCollectionData coll = ItemHelper.Get(Items.AmmoSynthesizer).sprite.Collection;
+            tk2dSpriteDefinition dd = PackerHelper.NamedSpriteInPackedTexture(spritePath);
+            if (dd == null || coll == null)
+                ETGModConsole.Log($"YIKES O_O_O_O");
+            int spriteID = SpriteBuilder.AddSpriteToCollection(dd, coll);
+            sprite.SetSprite(coll, spriteID);
             // SpriteBuilder.SpriteFromTexture(ETGMod.Assets.TextureMap[$"sprites/ItemSprites/{altName}"], spriteName, obj);
 
             ETGMod.Databases.Items.SetupItem(item, item.name);

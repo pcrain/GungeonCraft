@@ -67,8 +67,11 @@ public static class VFX
             return;
         }
 
-        // GameObject Obj     = new GameObject(name);
-        GameObject Obj     = SpriteBuilder.SpriteFromResource(spritePaths[0], new GameObject(name));
+        int spriteID = SpriteBuilder.AddSpriteToCollection(PackerHelper.NamedSpriteInPackedTexture(spritePaths[0]), OverheadVFXCollection);
+
+        GameObject Obj     = new GameObject(name);
+            Obj.AddComponent<tk2dSprite>().SetSprite(OverheadVFXCollection, spriteID);
+        // GameObject Obj     = SpriteBuilder.SpriteFromResource(spritePaths[0], new GameObject(name));
         VFXComplex complex = new VFXComplex();
         VFXObject vfObj    = new VFXObject();
         VFXPool pool       = new VFXPool();
@@ -81,7 +84,12 @@ public static class VFX
             Anchor.LowerCenter,
             baseDef.position3);
 
-        int spriteID = SpriteBuilder.AddSpriteToCollection(spritePaths[0], OverheadVFXCollection);
+        // int spriteID = SpriteBuilder.AddSpriteToCollection(spritePaths[0], OverheadVFXCollection);
+        // ETGModConsole.Log($"attempting to load {spritePaths[0]}");
+        // tk2dSpriteDefinition altDef = PackerHelper.NamedSpriteInPackedTexture(spritePaths[0]);
+        // if (altDef == null)
+        //     ETGModConsole.Log($"YIKES O_O");
+        // int spriteID = SpriteBuilder.AddSpriteToCollection(altDef, OverheadVFXCollection);
 
         tk2dSprite sprite = Obj.GetOrAddComponent<tk2dSprite>();
         sprite.SetSprite(OverheadVFXCollection, spriteID);
@@ -113,7 +121,7 @@ public static class VFX
         List<tk2dSpriteAnimationFrame> frames = new List<tk2dSpriteAnimationFrame>();
         for (int i = 0; i < spritePaths.Count; i++)
         {
-            int frameSpriteId                   = SpriteBuilder.AddSpriteToCollection(spritePaths[i], OverheadVFXCollection);
+            int frameSpriteId                   = SpriteBuilder.AddSpriteToCollection(PackerHelper.NamedSpriteInPackedTexture(spritePaths[i]), OverheadVFXCollection);
             tk2dSpriteDefinition frameDef       = OverheadVFXCollection.spriteDefinitions[frameSpriteId];
             frameDef.ConstructOffsetsFromAnchor(anchor);
             frameDef.colliderVertices = defaultDef.colliderVertices;

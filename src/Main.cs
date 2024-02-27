@@ -85,9 +85,10 @@ public class Initialisation : BaseUnityPlugin
             // {
             //     ETGModConsole.Log($"{resource}");
             // }
+            for (int i = 1; i <= 5; ++i)
             PackerHelper.LoadPackedTextureResource(
-                "CwaffingTheGungy.Resources.Atlases.atlas_1.png",
-                "CwaffingTheGungy.Resources.Atlases.atlas_1.atlas");
+                $"CwaffingTheGungy.Resources.Atlases.atlas_{i}.png",
+                $"CwaffingTheGungy.Resources.Atlases.atlas_{i}.atlas");
 
             Instance = this;
 
