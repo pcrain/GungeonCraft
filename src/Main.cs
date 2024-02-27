@@ -80,49 +80,65 @@ public class Initialisation : BaseUnityPlugin
             if (C.DEBUG_BUILD)
                 ETGModConsole.Log("Cwaffing the Gungy initializing...");
 
-            #region Set up Packed Texture Atlases (absolutely cannot be async, handles the meat of texture loading)
-            System.Diagnostics.Stopwatch setupAtlasesWatch = System.Diagnostics.Stopwatch.StartNew();
-            for (int i = 1; i <= 5; ++i)  //BUG: shouldn't hard code last texture
-                PackerHelper.LoadPackedTextureResource(
-                  textureResourcePath:  $"CwaffingTheGungy.Resources.Atlases.atlas_{i}.png",
-                  metaDataResourcePath: $"CwaffingTheGungy.Resources.Atlases.atlas_{i}.atlas");
-            setupAtlasesWatch.Stop();
-            #endregion
-
             Instance = this;
 
-            #region Set up Harmony Patches (cannot be async without creating a huge mess)
-            System.Diagnostics.Stopwatch setupHarmonyWatch = System.Diagnostics.Stopwatch.StartNew();
-            Harmony harmony = new Harmony(C.MOD_GUID);
-            harmony.PatchAll();
-            setupHarmonyWatch.Stop();
+            #region Set up Harmony Patches (can be async while textures are being set up)
+                System.Diagnostics.Stopwatch setupHarmonyWatch = null;
+                Thread setupHarmonyThread = new Thread(() => {
+                    setupHarmonyWatch = System.Diagnostics.Stopwatch.StartNew();
+                    Harmony harmony = new Harmony(C.MOD_GUID);
+                    harmony.PatchAll();
+                    setupHarmonyWatch.Stop();
+                });
+                setupHarmonyThread.Start();
+            #endregion
+
+            #region Set up Packed Texture Atlases (absolutely cannot be async, handles the meat of texture loading)
+                System.Diagnostics.Stopwatch setupAtlasesWatch = System.Diagnostics.Stopwatch.StartNew();
+                for (int i = 1; i <= 5; ++i)  //BUG: shouldn't hard code number of atlases
+                    PackerHelper.LoadPackedTextureResource(
+                      textureResourcePath:  $"CwaffingTheGungy.Resources.Atlases.atlas_{i}.png",
+                      metaDataResourcePath: $"CwaffingTheGungy.Resources.Atlases.atlas_{i}.atlas");
+                setupAtlasesWatch.Stop();
+            #endregion
+
+            #region Acquire Shaders (absolutely cannot be async when calling Shader.Find(), but once they're cached we're fine)
+                System.Diagnostics.Stopwatch setupShadersWatch = System.Diagnostics.Stopwatch.StartNew();
+                ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+                ShaderCache.Acquire("Brave/Internal/SinglePassOutline");
+                ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
+                ShaderCache.Acquire("Brave/Internal/SimpleAlphaFadeUnlit");
+                setupShadersWatch.Stop();
             #endregion
 
             #region Round 1 Config (hooks and database stuff where no sprites are needed, so it can be async)
-            System.Diagnostics.Stopwatch setupConfig1Watch = null;
-            Thread setupConfig1Thread = new Thread(() => {
-                setupConfig1Watch = System.Diagnostics.Stopwatch.StartNew();
+                System.Diagnostics.Stopwatch setupConfig1Watch = null;
+                Thread setupConfig1Thread = new Thread(() => {
+                    setupConfig1Watch = System.Diagnostics.Stopwatch.StartNew();
 
-                // Load our configuration files
-                CwaffConfig.Init();
+                    // We have to wait for Harmony to finish patching before we can do anything
+                    setupHarmonyThread.Join(); //
 
-                // Build resource map for ease of access
-                ResMap.Build();
+                    // Load our configuration files
+                    CwaffConfig.Init();
 
-                //Tools and Toolboxes
-                CwaffPrerequisite.Init();  // must be set up after CwaffEvents
-                // HUDController.Init(); // Need to load early (unused for now)
-                ModdedShopItemAdder.Init(); // must be set up after CwaffEvents
+                    // Build resource map for ease of access
+                    ResMap.Build();
 
-                //Commands and Other Console Utilities
-                Commands.Init();
+                    //Tools and Toolboxes
+                    CwaffPrerequisite.Init();  // must be set up after CwaffEvents
+                    // HUDController.Init(); // Need to load early (unused for now)
+                    ModdedShopItemAdder.Init(); // must be set up after CwaffEvents
 
-                // Game tweaks
-                HeckedMode.Init();
+                    //Commands and Other Console Utilities
+                    Commands.Init();
 
-                setupConfig1Watch.Stop();
-            });
-            setupConfig1Thread.Start();
+                    // Game tweaks
+                    HeckedMode.Init();
+
+                    setupConfig1Watch.Stop();
+                });
+                setupConfig1Thread.Start();
             #endregion
 
             #region Save API Setup (Async)
@@ -146,20 +162,23 @@ public class Initialisation : BaseUnityPlugin
 
             #region Round 2 Config (Requires sprites, cannot be async)
                 System.Diagnostics.Stopwatch setupConfig2Watch = System.Diagnostics.Stopwatch.StartNew();
-                setupConfig1Thread.Join(); // we need to wait for our ResMap to be built, so wait here
-                // Basic VFX Setup
-                VFX.Init();
-                //Status Effect Setup
-                SoulLinkStatus.Init();
-                //Goop Setup
-                EasyGoopDefinitions.DefineDefaultGoops();
-                // Note Does Setup
-                CustomNoteDoer.Init();
-                // Miscellaneous tweaks
-                CwaffTweaks.Init();
-                // Hecked Mode Tribute Statues
-                HeckedShrine.Init();
-                setupConfig2Watch.Stop();
+                Thread setupConfig2Thread = new Thread(() => {
+                    setupConfig1Thread.Join(); // we need to wait for our ResMap to be built, so wait here
+                    // Basic VFX Setup
+                    VFX.Init();
+                    //Status Effect Setup
+                    SoulLinkStatus.Init();
+                    //Goop Setup
+                    EasyGoopDefinitions.DefineDefaultGoops();
+                    // Note Does Setup
+                    CustomNoteDoer.Init();
+                    // Miscellaneous tweaks
+                    CwaffTweaks.Init();
+                    // Hecked Mode Tribute Statues
+                    HeckedShrine.Init();
+                    setupConfig2Watch.Stop();
+                });
+                setupConfig2Thread.Start();
             #endregion
 
             #region Audio (Async)
@@ -173,10 +192,13 @@ public class Initialisation : BaseUnityPlugin
                 setupAudioThread.Start();
             #endregion
 
+            setupConfig2Thread.Join(); // need to wait for round 2 configuration so all VFX / Goops are loaded
+
             #region Guns
                 System.Diagnostics.Stopwatch setupGunsWatch = null;
                 Thread setupGunsThread = new Thread(() => {
                     setupGunsWatch = System.Diagnostics.Stopwatch.StartNew();
+
                     IronMaid.Add();
                     Natascha.Add();
                     PaintballCannon.Add();
@@ -203,7 +225,7 @@ public class Initialisation : BaseUnityPlugin
                     Grandmaster.Add();
                     QuarterPounder.Add();
                     // DeathNote.Add(); unfinished
-                    // HolyWaterGun.Add(); //BUG: thread causes shader problems on load
+                    HolyWaterGun.Add();
                     Alyx.Add();
                     VacuumCleaner.Add();
                     Gunbrella.Add();
@@ -216,7 +238,7 @@ public class Initialisation : BaseUnityPlugin
                     HatchlingGun.Add();
                     Ticonderogun.Add();
                     AimuHakurei.Add();
-                    // SeltzerPelter.Add(); //BUG: thread causes shader problems on load
+                    SeltzerPelter.Add();
                     Missiletoe.Add();
                     PlatinumStar.Add();
                     PistolWhip.Add();
@@ -230,7 +252,7 @@ public class Initialisation : BaseUnityPlugin
                     CarpetBomber.Add();
                     Uppskeruvel.Add();
                     Glockarina.Add();
-                    // Magunet.Add(); //BUG: thread causes shader problems on load
+                    Magunet.Add();
                     Wavefront.Add();
                     Scotsman.Add();
                     ChekhovsGun.Add();
@@ -258,7 +280,7 @@ public class Initialisation : BaseUnityPlugin
                     KalibersJustice.Init();
                     GasterBlaster.Init();
                     StackOfTorches.Init();
-                    // InsurancePolicy.Init(); //BUG: thread causes shader problems on load
+                    InsurancePolicy.Init();
                     IceCream.Init();
                     // GungeonitePickaxe.Init();
                     ChamberJammer.Init();
@@ -460,12 +482,13 @@ public class Initialisation : BaseUnityPlugin
             ETGModConsole.Log($"Yay! :D Initialized <color=#{ColorUtility.ToHtmlStringRGB(C.MOD_COLOR).ToLower()}>{C.MOD_NAME} v{C.MOD_VERSION}</color> in "+(watch.ElapsedMilliseconds/1000.0f)+" seconds");
             if (C.DEBUG_BUILD)
             {
+                ETGModConsole.Log($"    setupHarmony   finished in {setupHarmonyWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupAtlases   finished in {setupAtlasesWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    setupHarmony   finished in {setupHarmonyWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    setupShaders   finished in {setupShadersWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupConfig1   finished in {setupConfig1Watch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupSave      finished in {setupSaveWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 // ETGModConsole.Log($"    setupSprites   finished in {setupSpritesWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    setupConfig2   finished in {setupConfig2Watch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    setupConfig2   finished in {setupConfig2Watch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupAudio     finished in {setupAudioWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupUI        finished in {setupUIWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupGuns      finished in {setupGunsWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
