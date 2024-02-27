@@ -35,7 +35,13 @@ public static class Lazy
             string spriteName = spritePath; // TODO: guns use names, regular items use full paths -- should be made uniform eventually
             Gun gun = ETGMod.Databases.Items.NewGun(itemName, spriteName);  //create a new gun using specified sprite name
             Game.Items.Rename("outdated_gun_mods:"+baseItemName, IDs.InternalNames[itemName]);  //rename the gun for commands
-            gun.SetupSprite(null, spriteName+"_idle_001"); //set the gun's ammonomicon sprite
+
+            // gun.SetupSprite(null, spriteName+"_idle_001"); //set the gun's ammonomicon sprite
+            gun.encounterTrackable.journalData.AmmonomiconSprite = spriteName+"_ammonomicon";
+            gun.UpdateAnimations();
+            gun.GetSprite().SetSprite(
+                ETGMod.Databases.Items.WeaponCollection,
+                gun.DefaultSpriteID = ETGMod.Databases.Items.WeaponCollection.GetSpriteIdByName(spriteName+"_idle_001"));
 
             int projectileId = 0;
             if (int.TryParse(projectileName, out projectileId))
@@ -53,6 +59,8 @@ public static class Lazy
                 ETGModConsole.Log($"  {spritePath} != {altName}");
             GameObject obj = new GameObject(itemName).RegisterPrefab();
             item = obj.AddComponent<TItemSpecific>();
+
+            // Replace old AddSpriteToObject to code to use our packed textures
             // ItemBuilder.AddSpriteToObject(itemName, spriteName, obj);
             tk2dSprite sprite = obj.AddComponent<tk2dSprite>();
             tk2dSpriteCollectionData coll = ItemHelper.Get(Items.AmmoSynthesizer).sprite.Collection;

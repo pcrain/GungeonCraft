@@ -100,8 +100,8 @@ public static class PackerHelper
     float yy = 0f;
     float ww = (float)w / 16f;
     float hh = (float)h / 16f;
-    tk2dSpriteDefinition tk2dSpriteDefinition = new tk2dSpriteDefinition
-      {
+    tk2dSpriteDefinition def = new tk2dSpriteDefinition
+    {
         name = spriteName,
         normals = new Vector3[]
         {
@@ -126,7 +126,7 @@ public static class PackerHelper
         flipped = tk2dSpriteDefinition.FlipMode.None,
         complexGeometry = false,
         physicsEngine = tk2dSpriteDefinition.PhysicsEngine.Physics3D,
-        colliderType = tk2dSpriteDefinition.ColliderType.None,
+        colliderType = tk2dSpriteDefinition.ColliderType.Box,
         collisionLayer = CollisionLayer.HighObstacle,
         position0 = new Vector3(xx,      yy,      0f),
         position1 = new Vector3(xx + ww, yy,      0f),
@@ -146,8 +146,8 @@ public static class PackerHelper
         boundsDataExtents          = new Vector3(ww,      hh, 0f),
         untrimmedBoundsDataCenter  = new Vector3(ww / 2f, hh / 2f, 0f),
         untrimmedBoundsDataExtents = new Vector3(ww,      hh, 0f)
-      };
-    return tk2dSpriteDefinition;
+    };
+    return def;
   }
 
   /// <summary>Retrieve a tk2dSprite by name</summary>
@@ -168,6 +168,8 @@ public static class PackerHelper
     if (atlas == null)
       return;
     ETGModConsole.Log($"extracted texture {textureResourcePath}");
+    if (atlas.width != 1024 || atlas.height != 1024)
+      ETGModConsole.Log($"D:D:D:");
     using (Stream stream = asmb.GetManifestResourceStream(metaDataResourcePath))
     using (StreamReader reader = new StreamReader(stream))
     {

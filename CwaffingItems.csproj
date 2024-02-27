@@ -1728,7 +1728,6 @@
     <EmbeddedResource Include="Resources\UISprites\barter_b_icon.png"/>
     <EmbeddedResource Include="Resources\UISprites\barter_a_icon.png"/>
     <EmbeddedResource Include="Resources\UISprites\barter_d_icon.png"/>
-    <EmbeddedResource Include="Resources\sans_bosscard.png"/>
     <EmbeddedResource Include="Resources\CustomClips\iron_maid_clipempty_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\alligator_clipfull_001.png"/>
     <EmbeddedResource Include="Resources\CustomClips\racket_launcher_clipempty_001.png"/>
