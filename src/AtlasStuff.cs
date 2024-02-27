@@ -158,6 +158,7 @@ public static class PackerHelper
 
   // internal static tk2dSpriteCollectionData _WeaponCollection = ItemHelper.Get(Items.Ak47).sprite.Collection;
   internal static tk2dSpriteCollectionData _WeaponCollection = ETGMod.Databases.Items.WeaponCollection;
+  internal static tk2dSpriteCollectionData _AmmonomiconCollection = AmmonomiconController.ForceInstance.EncounterIconCollection;
 
   /// <summary>Load a packed texture from a resource string</summary>
   public static void LoadPackedTextureResource(string textureResourcePath, string metaDataResourcePath)
@@ -193,6 +194,13 @@ public static class PackerHelper
           continue;
         }
 
+        if (collName == "Ammonomicon Encounter Icon Collection")
+        {
+          SpriteBuilder.AddSpriteToCollection(def, _AmmonomiconCollection);
+          continue;
+        }
+
+        // everything from here onward only applies to weapon collection
         if (collName != "WeaponCollection")
           continue;
 
