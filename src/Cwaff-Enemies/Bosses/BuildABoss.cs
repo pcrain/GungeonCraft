@@ -703,6 +703,10 @@ public static class BH
   public static Regex rx_anim = new Regex(@"^(?:([^_]*?)_)?(.*)_([0-9]+)\.png$",
         RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
+    // Regular expression for teasing apart animation names from packed textures
+  public static Regex rx_anim_no_ext = new Regex(@"^(?:([^_]*?)_)?(.*)_([0-9]+)$",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
   public static List<int> Range(int start, int end)
   {
     return Enumerable.Range(start, end-start+1).ToList();
@@ -910,12 +914,15 @@ public static class BH
     if (C.DEBUG_BUILD)
       ETGModConsole.Log($"loading sprites from {resourcePath}");
     Dictionary<string,string[]> spriteMaps = new Dictionary<string,string[]>();
-    foreach (string s in ResourceExtractor.GetResourceNames())
+    // foreach (string s in ResourceExtractor.GetResourceNames())
+    foreach (string s in PackerHelper._PackedTextures.Keys)
     {
-      if (!s.StartsWith(realPath))
-        continue;
-      string name = s.Substring(realPath.Length);  // get name of resource relative to the path
-      MatchCollection matches = rx_anim.Matches(name);
+      // if (!s.StartsWith(realPath))
+      //   continue;
+      // string name = s.Substring(realPath.Length);  // get name of resource relative to the path
+      string name = s; // new method now that we're loading from a packed texture
+      // MatchCollection matches = rx_anim.Matches(name);
+      MatchCollection matches = rx_anim_no_ext.Matches(name);
       foreach (Match match in matches)
       {
         string spriteName = match.Groups[1].Value;  //TODO: verification?

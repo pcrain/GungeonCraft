@@ -8,24 +8,6 @@ public static class CwaffTweaks
     {
         GetDogPettingAnimation();
 
-        string[] testPet = new string[] {
-            "CwaffingTheGungy/Resources/Companions/Wolf/wolf_pet_001",
-            "CwaffingTheGungy/Resources/Companions/Wolf/wolf_pet_002",
-            "CwaffingTheGungy/Resources/Companions/Wolf/wolf_pet_003",
-            "CwaffingTheGungy/Resources/Companions/Wolf/wolf_pet_004",
-            "CwaffingTheGungy/Resources/Companions/Wolf/wolf_pet_005",
-            "CwaffingTheGungy/Resources/Companions/Wolf/wolf_pet_006",
-        };
-
-        string[] testPet2 = new string[] {
-            "CwaffingTheGungy/Resources/Companions/Wolf/wolf_pet_left_001",  //TODO: testing jankiness
-            "CwaffingTheGungy/Resources/Companions/Wolf/wolf_pet_left_002",
-            "CwaffingTheGungy/Resources/Companions/Wolf/wolf_pet_left_003",
-            "CwaffingTheGungy/Resources/Companions/Wolf/wolf_pet_left_004",
-            "CwaffingTheGungy/Resources/Companions/Wolf/wolf_pet_left_005",
-            "CwaffingTheGungy/Resources/Companions/Wolf/wolf_pet_left_006",
-        };
-
         //Make Wolf pettable
         string[] defaultCompanions = new string[] {
             "wolf",
@@ -36,7 +18,9 @@ public static class CwaffTweaks
         {
             if (C.DEBUG_BUILD)
                 ETGModConsole.Log("Making "+c+" pettable");
-            Gungeon.Game.Items[c].GetComponent<CompanionItem>().MakePettable(testPet,testPet2);
+            Gungeon.Game.Items[c].GetComponent<CompanionItem>().MakePettable(
+                ResMap.Get("wolf_pet").ToArray(),
+                ResMap.Get("wolf_pet_left").ToArray());
         }
     }
 

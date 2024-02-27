@@ -152,7 +152,7 @@ public class Initialisation : BaseUnityPlugin
                 // Note Does Setup
                 CustomNoteDoer.Init();
                 // Miscellaneous tweaks
-                // CwaffTweaks.Init(); // TODO: reenable
+                CwaffTweaks.Init();
                 // Hecked Mode Tribute Statues
                 HeckedShrine.Init();
                 setupConfig2Watch.Stop();
