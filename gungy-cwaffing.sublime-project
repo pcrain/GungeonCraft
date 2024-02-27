@@ -57,7 +57,7 @@
     {
       "OmniSharp":
       {
-        "enabled": true,
+        "enabled": false,
       },
       "polymer-ide":
       {

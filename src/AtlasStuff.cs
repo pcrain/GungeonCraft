@@ -96,8 +96,8 @@ public static class PackerHelper
   {
     Material material = new Material(ShaderCache.Acquire(PlayerController.DefaultShaderName));
     material.mainTexture = texture;
-    float xx = (float)x/16f;
-    float yy = (float)y/16f;
+    float xx = 0f;
+    float yy = 0f;
     float ww = (float)w / 16f;
     float hh = (float)h / 16f;
     tk2dSpriteDefinition tk2dSpriteDefinition = new tk2dSpriteDefinition
@@ -128,19 +128,19 @@ public static class PackerHelper
         physicsEngine = tk2dSpriteDefinition.PhysicsEngine.Physics3D,
         colliderType = tk2dSpriteDefinition.ColliderType.None,
         collisionLayer = CollisionLayer.HighObstacle,
-        position0 = new Vector3(xx, yy, 0f),
-        position1 = new Vector3(xx + ww, yy, 0f),
-        position2 = new Vector3(xx, yy + hh, 0f),
+        position0 = new Vector3(xx,      yy,      0f),
+        position1 = new Vector3(xx + ww, yy,      0f),
+        position2 = new Vector3(xx,      yy + hh, 0f),
         position3 = new Vector3(xx + ww, yy + hh, 0f),
         material = material,
         materialInst = material,
         materialId = 0,
         uvs = new Vector2[]
-        {
-          new Vector2((float) x      / (float)texture.width, (float) y      / (float)texture.height),
-          new Vector2((float)(x + w) / (float)texture.width, (float) y      / (float)texture.height),
-          new Vector2((float) x      / (float)texture.width, (float)(y + h) / (float)texture.height),
-          new Vector2((float)(x + w) / (float)texture.width, (float)(y + h) / (float)texture.height),
+        {  // texture is flipped vertically in memory
+          new Vector2((float) x      / (float)texture.width, 1f - (float)(y + h) / (float)texture.height),
+          new Vector2((float)(x + w) / (float)texture.width, 1f - (float)(y + h) / (float)texture.height),
+          new Vector2((float) x      / (float)texture.width, 1f - (float) y      / (float)texture.height),
+          new Vector2((float)(x + w) / (float)texture.width, 1f - (float) y      / (float)texture.height),
         },
         boundsDataCenter           = new Vector3(ww / 2f, hh / 2f, 0f),
         boundsDataExtents          = new Vector3(ww,      hh, 0f),
