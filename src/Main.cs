@@ -80,6 +80,15 @@ public class Initialisation : BaseUnityPlugin
             if (C.DEBUG_BUILD)
                 ETGModConsole.Log("Cwaffing the Gungy initializing...");
 
+            // var resources = Assembly.GetExecutingAssembly().GetManifestResourceNames();
+            // foreach (var resource in resources)
+            // {
+            //     ETGModConsole.Log($"{resource}");
+            // }
+            PackerHelper.LoadPackedTextureResource(
+                "CwaffingTheGungy.Resources.Atlases.atlas_1.png",
+                "CwaffingTheGungy.Resources.Atlases.atlas_1.atlas");
+
             Instance = this;
 
             #region Set up Harmony Patches
@@ -134,6 +143,8 @@ public class Initialisation : BaseUnityPlugin
                 // UnprocessedSpriteHotfix.DeInit();  // we don't want to affect other mods
                 if (C.DEBUG_BUILD)
                     ETGModConsole.Log($"  allocated {(currentProcess.WorkingSet64 - usedMemoryBeforeSpriteSetup).ToString("N0")} bytes of memory for sprite setup");
+                // foreach (string key in ETGMod.Assets.TextureMap.Keys)
+                //     ETGModConsole.Log($"have collection {key}");
                 setupSpritesWatch.Stop();
             #endregion
 
@@ -167,23 +178,29 @@ public class Initialisation : BaseUnityPlugin
             #endregion
 
             #region Actives
-                System.Diagnostics.Stopwatch setupActivesWatch = System.Diagnostics.Stopwatch.StartNew();
-                BorrowedTime.Init();
-                BulletThatCanKillTheFuture.Init();
-                GunPowderer.Init();
-                AmazonPrimer.Init();
-                EmergencySiren.Init();
-                Itemfinder.Init();
-                KalibersJustice.Init();
-                GasterBlaster.Init();
-                StackOfTorches.Init();
-                InsurancePolicy.Init();
-                IceCream.Init();
-                // GungeonitePickaxe.Init();
-                ChamberJammer.Init();
-                Cuppajoe.Init();
-                StopSign.Init();
-                setupActivesWatch.Stop();
+                System.Diagnostics.Stopwatch setupActivesWatch = null;
+                // Thread setupActivesThread = new Thread(() => {
+                    setupActivesWatch = System.Diagnostics.Stopwatch.StartNew();
+
+                    BorrowedTime.Init();
+                    BulletThatCanKillTheFuture.Init();
+                    GunPowderer.Init();
+                    AmazonPrimer.Init();
+                    EmergencySiren.Init();
+                    Itemfinder.Init();
+                    KalibersJustice.Init();
+                    GasterBlaster.Init();
+                    StackOfTorches.Init();
+                    InsurancePolicy.Init();
+                    IceCream.Init();
+                    // GungeonitePickaxe.Init();
+                    ChamberJammer.Init();
+                    Cuppajoe.Init();
+                    StopSign.Init();
+
+                    setupActivesWatch.Stop();
+                // });
+                // setupActivesThread.Start();
             #endregion
 
             #region Passives

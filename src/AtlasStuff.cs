@@ -76,3 +76,115 @@ public static class BetterAtlas
         return items;
     }
 }
+
+/// <summary>Class for setting up sprites from textures packed with cheetah</summary>
+public static class PackerHelper
+{
+  private class SpriteInfo
+  {
+    public Texture2D atlas = null;
+    public int x           = 0;
+    public int y           = 0;
+    public int w           = 0;
+    public int h           = 0;
+  }
+
+  private static Dictionary<string, SpriteInfo> _PackedTextures = new();
+
+  /// <summary>Construct a tk2dSpriteDefinition from a segment of a packed texture</summary>
+  public static tk2dSpriteDefinition SpriteDefFromSegment(this Texture2D texture, int x, int y, int w, int h)
+  {
+    Material material = new Material(ShaderCache.Acquire(PlayerController.DefaultShaderName));
+    material.mainTexture = texture;
+    float xx = (float)x/16f;
+    float yy = (float)y/16f;
+    float ww = (float)w / 16f;
+    float hh = (float)h / 16f;
+    tk2dSpriteDefinition tk2dSpriteDefinition = new tk2dSpriteDefinition
+      {
+        normals = new Vector3[]
+        {
+          new Vector3(0f, 0f, -1f),
+          new Vector3(0f, 0f, -1f),
+          new Vector3(0f, 0f, -1f),
+          new Vector3(0f, 0f, -1f)
+        },
+        tangents = new Vector4[]
+        {
+          new Vector4(1f, 0f, 0f, 1f),
+          new Vector4(1f, 0f, 0f, 1f),
+          new Vector4(1f, 0f, 0f, 1f),
+          new Vector4(1f, 0f, 0f, 1f)
+        },
+        texelSize = new Vector2(0.0625f, 0.0625f),
+        extractRegion = false,
+        regionX = 0,
+        regionY = 0,
+        regionW = 0,
+        regionH = 0,
+        flipped = tk2dSpriteDefinition.FlipMode.None,
+        complexGeometry = false,
+        physicsEngine = tk2dSpriteDefinition.PhysicsEngine.Physics3D,
+        colliderType = tk2dSpriteDefinition.ColliderType.None,
+        collisionLayer = CollisionLayer.HighObstacle,
+        position0 = new Vector3(xx, yy, 0f),
+        position1 = new Vector3(xx + ww, yy, 0f),
+        position2 = new Vector3(xx, yy + hh, 0f),
+        position3 = new Vector3(xx + ww, yy + hh, 0f),
+        material = material,
+        materialInst = material,
+        materialId = 0,
+        uvs = new Vector2[]
+        {
+          new Vector2((float) x      / (float)texture.width, (float) y      / (float)texture.height),
+          new Vector2((float)(x + w) / (float)texture.width, (float) y      / (float)texture.height),
+          new Vector2((float) x      / (float)texture.width, (float)(y + h) / (float)texture.height),
+          new Vector2((float)(x + w) / (float)texture.width, (float)(y + h) / (float)texture.height),
+        },
+        boundsDataCenter           = new Vector3(ww / 2f, hh / 2f, 0f),
+        boundsDataExtents          = new Vector3(ww,      hh, 0f),
+        untrimmedBoundsDataCenter  = new Vector3(ww / 2f, hh / 2f, 0f),
+        untrimmedBoundsDataExtents = new Vector3(ww,      hh, 0f)
+      };
+    return tk2dSpriteDefinition;
+  }
+
+  /// <summary>Retrieve a tk2dSprite by name</summary>
+  public static tk2dSpriteDefinition NamedSpriteInPackedTexture(string s)
+  {
+    if (!_PackedTextures.TryGetValue(s, out SpriteInfo si))
+    {
+      ETGModConsole.Log($"failed to retrieve sprite {s} from packed textures");
+      return null;
+    }
+    return si.atlas.SpriteDefFromSegment(si.x, si.y, si.w, si.h);
+  }
+
+  /// <summary>Load a packed texture from a resource string</summary>
+  public static void LoadPackedTextureResource(string textureResourcePath, string metaDataResourcePath)
+  {
+    Assembly asmb = Assembly.GetCallingAssembly();
+    Texture2D atlas = ResourceExtractor.GetTextureFromResource(textureResourcePath, asmb);
+    if (atlas == null)
+      return;
+    ETGModConsole.Log($"extracted texture {textureResourcePath}");
+    using (Stream stream = asmb.GetManifestResourceStream(metaDataResourcePath))
+    using (StreamReader reader = new StreamReader(stream))
+    {
+      string line = null;
+      while ((line = reader.ReadLine()) != null)
+      {
+        string[] tokens = line.Split('\t');
+        if (tokens.Length < 9)
+          continue; // first line, skip it since it doesn't have relevant information
+        string spriteName = tokens[0].Split('/').Last();
+        int x = Int32.Parse(tokens[1]);
+        int y = Int32.Parse(tokens[2]);
+        int w = Int32.Parse(tokens[3]);
+        int h = Int32.Parse(tokens[4]);
+        _PackedTextures[spriteName] = new SpriteInfo{atlas = atlas, x = x, y = y, w = w, h = h};
+        ETGModConsole.Log($"loaded packed {w}x{h} sprite {spriteName} at {x},{y}");
+      }
+    }
+  }
+}

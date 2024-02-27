@@ -3470,7 +3470,6 @@
     <EmbeddedResource Include="Resources\MiscVFX\echo_effect1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\magunet_wave_sprite1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\hail_collision2.png"/>
-    <EmbeddedResource Include="Resources\MiscVFX\shine.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\hail_collision1.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\pencil_runes5.png"/>
     <EmbeddedResource Include="Resources\MiscVFX\siren12.png"/>
@@ -4422,6 +4421,16 @@
     <EmbeddedResource Include="Resources\Companions\Wolf\wolf_pet_004.png"/>
     <EmbeddedResource Include="Resources\Companions\Wolf\wolf_pet_left_004.png"/>
     <EmbeddedResource Include="Resources\EmbeddedRooms\BoomhildrRoom.room"/>
+    <EmbeddedResource Include="Resources\Atlases\atlas_5.png"/>
+    <EmbeddedResource Include="Resources\Atlases\atlas_4.png"/>
+    <EmbeddedResource Include="Resources\Atlases\atlas_2.atlas"/>
+    <EmbeddedResource Include="Resources\Atlases\atlas_1.png"/>
+    <EmbeddedResource Include="Resources\Atlases\atlas_3.atlas"/>
+    <EmbeddedResource Include="Resources\Atlases\atlas_5.atlas"/>
+    <EmbeddedResource Include="Resources\Atlases\atlas_3.png"/>
+    <EmbeddedResource Include="Resources\Atlases\atlas_4.atlas"/>
+    <EmbeddedResource Include="Resources\Atlases\atlas_2.png"/>
+    <EmbeddedResource Include="Resources\Atlases\atlas_1.atlas"/>
     <EmbeddedResource Include="Resources\Sounds\CwaffingTheGungy.bnk"/>
     <EmbeddedResource Include="Resources\EnemySprites\bullet_smile_right_002.png"/>
     <EmbeddedResource Include="Resources\EnemySprites\bullet_smile_left_002.png"/>

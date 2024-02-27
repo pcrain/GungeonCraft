@@ -59,6 +59,10 @@
       {
         "enabled": true,
       },
+      "polymer-ide":
+      {
+				"enabled": false,
+			},
     },
   },
 }

@@ -1,6 +1,9 @@
 #!/bin/bash
 #Helper script for generating my gungeon mod's .csproj file
 
+# Generate texture atlas: https://github.com/scriptum/Cheetah-Texture-Packer?tab=readme-ov-file
+# ./cheetah-texture-packer -s 1024x1024 --border-size 2 -o ~/downloads/atlas/atlas ~/workspace/gungy-cwaffing/Resources/
+
 #Important top level variables
 namespace="CwaffingTheGungy"                     #namespace used throughout source code; need to change for my own mod eventually
 projectname="GungeonCraft"                       #name of the DLL to create

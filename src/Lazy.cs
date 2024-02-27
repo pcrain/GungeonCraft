@@ -54,6 +54,7 @@ public static class Lazy
             GameObject obj = new GameObject(itemName);
             item = obj.AddComponent<TItemSpecific>();
             ItemBuilder.AddSpriteToObject(itemName, spriteName, obj);
+            // SpriteBuilder.SpriteFromTexture(ETGMod.Assets.TextureMap[$"sprites/ItemSprites/{altName}"], spriteName, obj);
 
             ETGMod.Databases.Items.SetupItem(item, item.name);
 
