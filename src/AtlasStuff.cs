@@ -293,15 +293,6 @@ public static class PackerHelper
     return result;
   }
 
-  // /// <summary>Thread-safe wrapper around SpriteBuilder.AddSpriteToCollection()</summary>
-  // public static int AddSpriteToCollection(string resourcePath, string name, tk2dSpriteCollectionData collection)
-  // {
-  //   _AddSpriteMutex.WaitOne();
-  //   int result = SpriteBuilder.AddSpriteToCollection(resourcePath, name, collection);
-  //   _AddSpriteMutex.ReleaseMutex();
-  //   return result;
-  // }
-
   /// <summary>Thread-safe wrapper around SpriteBuilder.AddSpriteToCollection()</summary>
   public static int AddSpriteToCollection(tk2dSpriteDefinition def, tk2dSpriteCollectionData collection)
   {
@@ -319,7 +310,7 @@ public static class PackerHelper
   {
     public static bool Prefix(string spriteName, GameObject obj, Assembly assembly, ref GameObject __result)
     {
-        // ETGModConsole.Log($"CALLING PATCHED SpriteFromResource for {spriteName}");
+        System.Console.WriteLine($"CALLING PATCHED SpriteFromResource for {spriteName}");
         if (obj == null)
           obj = new GameObject();
 

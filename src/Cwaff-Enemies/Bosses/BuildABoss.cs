@@ -84,7 +84,7 @@ public class BossController : DungeonPlaceableBehaviour, IPlaceConfigurable
     RegisterAnyInteractables(enemy);
     GenericIntroDoer gid = enemy.GetComponent<GenericIntroDoer>();
     if (!string.IsNullOrEmpty(gid.preIntroAnim))
-      enemy.aiAnimator.PlayUntilCancelled(gid.preIntroAnim); // hack to forcibly play the pre-intro animation before room entry
+      enemy.aiAnimator.PlayUntilCancelled(gid.preIntroAnim); //HACK: forcibly play the pre-intro animation before room entry
     enemy.healthHaver.healthHaver.ManualDeathHandling = true; // make sure we manually handle our death as necessary
   }
 
@@ -113,7 +113,7 @@ public class BossController : DungeonPlaceableBehaviour, IPlaceConfigurable
     BossNPC npc = enemy.GetComponent<BossNPC>();
     if (npc != null)
     {
-      enemy.aiAnimator.StartCoroutine(RemoveOutlines(enemy)); // hack because trying to remove outlines instantaneously doesn't work for some reason
+      enemy.aiAnimator.StartCoroutine(RemoveOutlines(enemy)); //HACK: because trying to remove outlines instantaneously doesn't work for some reason
       npc.startedFight = true;
       enemy.gameObject.transform.position.GetAbsoluteRoom().DeregisterInteractable(npc);
     }
@@ -217,6 +217,7 @@ public class BuildABoss
     // Do some basic boss prefab / guid setup
     BuildABoss bb = new BuildABoss();
     bb.guid = guid;
+    ETGModConsole.Log($"BUILDING SANS");
     bb.prefab = BossBuilder.BuildPrefab(bossname, bb.guid, defaultSprite,
       IntVector2.Zero, hitboxSize, false, true);
 
@@ -915,10 +916,11 @@ public static class BH
       ETGModConsole.Log($"loading sprites from {resourcePath}");
     Dictionary<string,string[]> spriteMaps = new Dictionary<string,string[]>();
     // foreach (string s in ResourceExtractor.GetResourceNames())
+    string bossName = resourcePath.Split('/').Last();  //HACK: assuming boss sprites are in their own folder, probably not the best
     foreach (string s in PackerHelper._PackedTextures.Keys)
     {
-      // if (!s.StartsWith(realPath))
-      //   continue;
+      if (!s.StartsWith(bossName))
+        continue;
       // string name = s.Substring(realPath.Length);  // get name of resource relative to the path
       string name = s; // new method now that we're loading from a packed texture
       // MatchCollection matches = rx_anim.Matches(name);
@@ -969,9 +971,6 @@ public static class BH
       // ETGModConsole.Log($"calling self.AddAnimation(bossSprites, BH.Range({firstAnim}, {lastAnim-1}), \"{entry.Key}\", {defaultFps}, {true}, {dir});");
       self.AddAnimation(bossSprites, BH.Range(firstAnim, lastAnim-1), entry.Key, defaultFps, true, dir);
     }
-
-    // string [] fileEntries = Directory.GetFiles(targetDirectory);
-    //   foreach(string fileName in fileEntries)
   }
 
   public static tk2dSpriteCollectionData LoadSpriteCollection(GameObject prefab, string[] spritePaths)

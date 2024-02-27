@@ -152,15 +152,6 @@ public class Initialisation : BaseUnityPlugin
                 setupSaveThread.Start();
             #endregion
 
-            // #region Sprite Setup (Anything that requires sprites cannot be async)
-            //     System.Diagnostics.Stopwatch setupSpritesWatch = System.Diagnostics.Stopwatch.StartNew();
-            //     long usedMemoryBeforeSpriteSetup = currentProcess.WorkingSet64;
-            //     // ETGMod.Assets.SetupSpritesFromAssembly(Assembly.GetExecutingAssembly(), $"{C.MOD_INT_NAME}.Resources");
-            //     if (C.DEBUG_BUILD)
-            //         ETGModConsole.Log($"  allocated {(currentProcess.WorkingSet64 - usedMemoryBeforeSpriteSetup).ToString("N0")} bytes of memory for sprite setup");
-            //     setupSpritesWatch.Stop();
-            // #endregion
-
             #region Round 2 Config (Requires sprites, cannot be async)
                 System.Diagnostics.Stopwatch setupConfig2Watch = System.Diagnostics.Stopwatch.StartNew();
                 Thread setupConfig2Thread = new Thread(() => {

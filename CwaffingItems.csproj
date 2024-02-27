@@ -1728,6 +1728,7 @@
     <EmbeddedResource Include="Resources\UISprites\barter_b_icon.png"/>
     <EmbeddedResource Include="Resources\UISprites\barter_a_icon.png"/>
     <EmbeddedResource Include="Resources\UISprites\barter_d_icon.png"/>
+    <EmbeddedResource Include="Resources\sans_bosscard.png"/>
     <EmbeddedResource Include="Resources\Atlases\atlas_5.png"/>
     <EmbeddedResource Include="Resources\Atlases\atlas_4.png"/>
     <EmbeddedResource Include="Resources\Atlases\atlas_2.atlas"/>
