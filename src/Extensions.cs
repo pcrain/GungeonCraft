@@ -1361,6 +1361,11 @@ public static class Extensions
           return null;
       int spriteid = clip.frames[0].spriteId;
       int attachIndex = Lazy._GunSpriteCollection.SpriteIDsWithAttachPoints.IndexOf(spriteid);
+      if (attachIndex == -1)
+      {
+        ETGModConsole.Log($"failed to find attach points for {clipName} == {spriteid}");
+        return null;
+      }
       return Lazy._GunSpriteCollection.SpriteDefinedAttachPoints[attachIndex].attachPoints;
   }
 

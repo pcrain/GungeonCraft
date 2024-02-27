@@ -188,7 +188,7 @@ public class Initialisation : BaseUnityPlugin
                     GasterBlaster.Init();
                     StackOfTorches.Init();
                     InsurancePolicy.Init();
-                    IceCream.Init();
+                    // IceCream.Init();  //TODO: put back later
                     // GungeonitePickaxe.Init();
                     ChamberJammer.Init();
                     Cuppajoe.Init();
@@ -244,69 +244,69 @@ public class Initialisation : BaseUnityPlugin
 
             #region Guns
                 System.Diagnostics.Stopwatch setupGunsWatch = System.Diagnostics.Stopwatch.StartNew();
-                // IronMaid.Add();
-                // Natascha.Add();
-                // PaintballCannon.Add();
-                // // DerailGun.Add(); unfinished
-                // // PopcornGun.Add(); no sprite
-                // Tranquilizer.Add();
-                // // LastResort.Add(); no sprite
-                // // MasterSword.Add(); unfinished
-                // // Encircler.Add(); no sprite
-                // // Nug.Add(); no sprite
-                // SoulKaliber.Add();
-                // // GamblersFallacy.Add(); no sprite
-                // // GasterBlaster.Add(); no sprite
-                // // Commitment.Add(); no sprite
-                // // HeadCannon.Add(); unfinished
-                // // Telefragger.Add(); no sprite
-                // // Kinsurrection.Add(); unfinished
-                // // SpinCycle.Add(); no sprite
-                // // TimingGun.Add(); unfinished
-                // KiBlast.Add();
-                // Deadline.Add();
-                // BBGun.Add();
-                // Bouncer.Add();
-                // Grandmaster.Add();
-                // QuarterPounder.Add();
-                // // DeathNote.Add(); unfinished
-                // HolyWaterGun.Add();
-                // Alyx.Add();
-                // VacuumCleaner.Add();
-                // Gunbrella.Add();
-                // Blackjack.Add();
-                // SchrodingersGat.Add();
-                // // Taomislav.Add(); unfinished
-                // RacketLauncher.Add();
-                // Outbreak.Add();
-                // HandCannon.Add();
-                // HatchlingGun.Add();
-                // Ticonderogun.Add();
-                // AimuHakurei.Add();
-                // SeltzerPelter.Add();
-                // Missiletoe.Add();
-                // PlatinumStar.Add();
-                // PistolWhip.Add();
-                // Jugglernaut.Add();
-                // SubtractorBeam.Add();
-                // Alligator.Add();
-                // Lightwing.Add();
-                // KingsLaw.Add();
-                // Pincushion.Add();
-                // Crapshooter.Add();
-                // CarpetBomber.Add();
-                // Uppskeruvel.Add();
-                // Glockarina.Add();
-                // Magunet.Add();
-                // Wavefront.Add();
-                // Scotsman.Add();
-                // ChekhovsGun.Add();
-                // Vladimir.Add();
-                // Blamethrower.Add();
-                // Suncaster.Add();
-                // KALI.Add();
-                // AlienNailgun.Add();
-                setupGunsWatch.Stop();  //TODO: put this back later
+                IronMaid.Add();
+                Natascha.Add();
+                PaintballCannon.Add();
+                // DerailGun.Add(); unfinished
+                // PopcornGun.Add(); no sprite
+                Tranquilizer.Add();
+                // LastResort.Add(); no sprite
+                // MasterSword.Add(); unfinished
+                // Encircler.Add(); no sprite
+                // Nug.Add(); no sprite
+                SoulKaliber.Add();
+                // GamblersFallacy.Add(); no sprite
+                // GasterBlaster.Add(); no sprite
+                // Commitment.Add(); no sprite
+                // HeadCannon.Add(); unfinished
+                // Telefragger.Add(); no sprite
+                // Kinsurrection.Add(); unfinished
+                // SpinCycle.Add(); no sprite
+                // TimingGun.Add(); unfinished
+                KiBlast.Add();
+                Deadline.Add();
+                BBGun.Add();
+                Bouncer.Add();
+                Grandmaster.Add();
+                QuarterPounder.Add();
+                // DeathNote.Add(); unfinished
+                HolyWaterGun.Add();
+                Alyx.Add();
+                VacuumCleaner.Add();
+                Gunbrella.Add();
+                Blackjack.Add();
+                SchrodingersGat.Add();
+                // Taomislav.Add(); unfinished
+                RacketLauncher.Add();
+                Outbreak.Add();
+                HandCannon.Add();
+                HatchlingGun.Add();
+                Ticonderogun.Add();
+                AimuHakurei.Add();
+                SeltzerPelter.Add();
+                Missiletoe.Add();
+                PlatinumStar.Add();
+                PistolWhip.Add();
+                Jugglernaut.Add();
+                SubtractorBeam.Add();
+                Alligator.Add();
+                Lightwing.Add();
+                KingsLaw.Add();
+                Pincushion.Add();
+                Crapshooter.Add();
+                CarpetBomber.Add();
+                Uppskeruvel.Add();
+                Glockarina.Add();
+                Magunet.Add();
+                Wavefront.Add();
+                Scotsman.Add();
+                ChekhovsGun.Add();
+                Vladimir.Add();
+                Blamethrower.Add();
+                Suncaster.Add();
+                KALI.Add();
+                AlienNailgun.Add();
+                setupGunsWatch.Stop();
             #endregion
 
             #region Synergies (Async)

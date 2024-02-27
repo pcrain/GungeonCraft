@@ -156,7 +156,8 @@ public static class PackerHelper
     return _PackedTextures.TryGetValue(s.Split('/').Last(), out tk2dSpriteDefinition value) ? value : null;
   }
 
-  internal static tk2dSpriteCollectionData _WeaponCollection = ItemHelper.Get(Items.Ak47).sprite.Collection;
+  // internal static tk2dSpriteCollectionData _WeaponCollection = ItemHelper.Get(Items.Ak47).sprite.Collection;
+  internal static tk2dSpriteCollectionData _WeaponCollection = ETGMod.Databases.Items.WeaponCollection;
 
   /// <summary>Load a packed texture from a resource string</summary>
   public static void LoadPackedTextureResource(string textureResourcePath, string metaDataResourcePath)
@@ -185,6 +186,13 @@ public static class PackerHelper
         // _PackedTextures[spriteName] = new SpriteInfo{atlas = atlas, x = x, y = y, w = w, h = h};
         tk2dSpriteDefinition def = _PackedTextures[spriteName] = atlas.SpriteDefFromSegment(spriteName, x, y, w, h);
         // ETGModConsole.Log($"loaded packed {w}x{h} sprite {spriteName} at {x},{y}");
+
+        if (collName == "ProjectileCollection")
+        {
+          SpriteBuilder.AddSpriteToCollection(def, ETGMod.Databases.Items.ProjectileCollection);
+          continue;
+        }
+
         if (collName != "WeaponCollection")
           continue;
 
@@ -193,18 +201,23 @@ public static class PackerHelper
         string json = $"CwaffingTheGungy.Resources.{collName}.{spriteName}.json";
 
         using var jstream = asmb.GetManifestResourceStream(json);
-        if (jstream == null)
+        if (jstream == null) // should only happen for _trimmed sprites
+        {
+          // ETGModConsole.Log($"could not find resource {json}");
           continue;
+        }
         AssetSpriteData frameData = default;
         try
         {
             frameData = JSONHelper.ReadJSON<AssetSpriteData>(jstream);
         }
-        catch {
+        catch
+        {
           ETGModConsole.Log("Error: invalid json at project path " + json);
           jstream.Dispose();
           continue;
         }
+        // ETGModConsole.Log($"setting attach points for {id} == {spriteName}");
         _WeaponCollection.SetAttachPoints(id, frameData.attachPoints);
         if (_WeaponCollection.inst != _WeaponCollection)
             _WeaponCollection.inst.SetAttachPoints(id, frameData.attachPoints);
