@@ -167,7 +167,8 @@ public static class PackerHelper
     Texture2D atlas = ResourceExtractor.GetTextureFromResource(textureResourcePath, asmb);
     if (atlas == null)
       return;
-    ETGModConsole.Log($"extracted texture {textureResourcePath}");
+    if (C.DEBUG_BUILD)
+      ETGModConsole.Log($"extracted texture {textureResourcePath}");
     if (atlas.width != 1024 || atlas.height != 1024)
       ETGModConsole.Log($"D:D:D:");
     using (Stream stream = asmb.GetManifestResourceStream(metaDataResourcePath))

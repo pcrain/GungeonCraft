@@ -80,9 +80,9 @@ public class Initialisation : BaseUnityPlugin
             if (C.DEBUG_BUILD)
                 ETGModConsole.Log("Cwaffing the Gungy initializing...");
 
-            #region Set up Packed Texture Atlases
+            #region Set up Packed Texture Atlases (absolutely cannot be async, handles the meat of texture loading)
             System.Diagnostics.Stopwatch setupAtlasesWatch = System.Diagnostics.Stopwatch.StartNew();
-            for (int i = 1; i <= 5; ++i)
+            for (int i = 1; i <= 5; ++i)  //BUG: shouldn't hard code last texture
                 PackerHelper.LoadPackedTextureResource(
                   textureResourcePath:  $"CwaffingTheGungy.Resources.Atlases.atlas_{i}.png",
                   metaDataResourcePath: $"CwaffingTheGungy.Resources.Atlases.atlas_{i}.atlas");
@@ -91,7 +91,7 @@ public class Initialisation : BaseUnityPlugin
 
             Instance = this;
 
-            #region Set up Harmony Patches
+            #region Set up Harmony Patches (cannot be async without creating a huge mess)
             System.Diagnostics.Stopwatch setupHarmonyWatch = System.Diagnostics.Stopwatch.StartNew();
             Harmony harmony = new Harmony(C.MOD_GUID);
             harmony.PatchAll();
@@ -135,14 +135,14 @@ public class Initialisation : BaseUnityPlugin
                 setupSaveThread.Start();
             #endregion
 
-            #region Sprite Setup (Anything that requires sprites cannot be async)
-                System.Diagnostics.Stopwatch setupSpritesWatch = System.Diagnostics.Stopwatch.StartNew();
-                long usedMemoryBeforeSpriteSetup = currentProcess.WorkingSet64;
-                // ETGMod.Assets.SetupSpritesFromAssembly(Assembly.GetExecutingAssembly(), $"{C.MOD_INT_NAME}.Resources");
-                if (C.DEBUG_BUILD)
-                    ETGModConsole.Log($"  allocated {(currentProcess.WorkingSet64 - usedMemoryBeforeSpriteSetup).ToString("N0")} bytes of memory for sprite setup");
-                setupSpritesWatch.Stop();
-            #endregion
+            // #region Sprite Setup (Anything that requires sprites cannot be async)
+            //     System.Diagnostics.Stopwatch setupSpritesWatch = System.Diagnostics.Stopwatch.StartNew();
+            //     long usedMemoryBeforeSpriteSetup = currentProcess.WorkingSet64;
+            //     // ETGMod.Assets.SetupSpritesFromAssembly(Assembly.GetExecutingAssembly(), $"{C.MOD_INT_NAME}.Resources");
+            //     if (C.DEBUG_BUILD)
+            //         ETGModConsole.Log($"  allocated {(currentProcess.WorkingSet64 - usedMemoryBeforeSpriteSetup).ToString("N0")} bytes of memory for sprite setup");
+            //     setupSpritesWatch.Stop();
+            // #endregion
 
             #region Round 2 Config (Requires sprites, cannot be async)
                 System.Diagnostics.Stopwatch setupConfig2Watch = System.Diagnostics.Stopwatch.StartNew();
@@ -321,6 +321,12 @@ public class Initialisation : BaseUnityPlugin
                 System.Diagnostics.Stopwatch setupSynergiesWatch = null;
                 Thread setupSynergiesThread = new Thread(() => {
                     setupSynergiesWatch = System.Diagnostics.Stopwatch.StartNew();
+
+                    // Need to wait for all items to be loaded
+                    setupActivesThread.Join();
+                    setupPassivesThread.Join();
+                    setupGunsThread.Join();
+
                     CwaffSynergies.Init();
                     setupSynergiesWatch.Stop();
                 });
@@ -344,7 +350,7 @@ public class Initialisation : BaseUnityPlugin
                 //     ResMap.Get("adrenaline_heart")[0]+".png", AdrenalineShot._FullHeartSpriteUI,
                 //     ResMap.Get("adrenaline_heart")[0]+".png", AdrenalineShot._HalfHeartSpriteUI,
                 //     ResMap.Get("adrenaline_heart")[0]+".png", AdrenalineShot._EmptyHeartSpriteUI,
-                // });  //TODO: put this back later
+                // }); //BUG: put this back later
                 setupUIWatch.Stop();
             #endregion
 
@@ -363,7 +369,7 @@ public class Initialisation : BaseUnityPlugin
             #region Bosses yo
                 System.Diagnostics.Stopwatch setupBossesWatch = System.Diagnostics.Stopwatch.StartNew();
                 BossBuilder.Init();
-                SansBoss.Init();
+                SansBoss.Init(); //BUG: boss card isn't loaded properly
                 setupBossesWatch.Stop();
             #endregion
 
@@ -444,9 +450,6 @@ public class Initialisation : BaseUnityPlugin
                 setupConfig1Thread.Join();
                 setupSaveThread.Join();
                 setupAudioThread.Join();
-                setupActivesThread.Join();
-                setupPassivesThread.Join();
-                setupGunsThread.Join();
                 setupSynergiesThread.Join();
                 // Disconnect sprite setup Harmony patch
                 SpriteBuilderHotfix._UsePatchedSpriteAdder = false;
@@ -461,13 +464,13 @@ public class Initialisation : BaseUnityPlugin
                 ETGModConsole.Log($"    setupHarmony   finished in {setupHarmonyWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupConfig1   finished in {setupConfig1Watch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupSave      finished in {setupSaveWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
-                ETGModConsole.Log($"    setupSprites   finished in {setupSpritesWatch.ElapsedMilliseconds} milliseconds");
+                // ETGModConsole.Log($"    setupSprites   finished in {setupSpritesWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupConfig2   finished in {setupConfig2Watch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupAudio     finished in {setupAudioWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupUI        finished in {setupUIWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    setupGuns      finished in {setupGunsWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupActives   finished in {setupActivesWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupPassives  finished in {setupPassivesWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
-                ETGModConsole.Log($"    setupGuns      finished in {setupGunsWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupSynergies finished in {setupSynergiesWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupShops     finished in {setupShopsWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupBosses    finished in {setupBossesWatch.ElapsedMilliseconds} milliseconds");

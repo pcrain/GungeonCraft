@@ -63,7 +63,8 @@ public static class VFX
     {
         if (animations.ContainsKey(name))
         {
-            Lazy.DebugWarn($"  HEY! re-creating VFX with name {name}. If this is intentional, please reuse the original VFX, don't create it twice.");
+            if (C._WARN_DUPLICATE_VFX)
+                Lazy.DebugWarn($"  HEY! re-creating VFX with name {name}. If this is intentional, please reuse the original VFX, don't create it twice.");
             return;
         }
 

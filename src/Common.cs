@@ -17,6 +17,8 @@ public class C // constants
     public const float  FPS             = 60f;
     public const float  FRAME           = 1f / FPS;
     public const float  PIXEL_SIZE      = 1f / PIXELS_PER_TILE;
+
+    internal static readonly bool _WARN_DUPLICATE_VFX = false;
 }
 
 public class IDs // global IDs for this mod's guns and items
