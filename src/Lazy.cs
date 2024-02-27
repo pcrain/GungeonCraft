@@ -19,8 +19,6 @@ public static class Lazy
       ETGModConsole.Log($"<color=#ffffaaff>{text}</color>");
     }
 
-    internal static Mutex _AddSpriteMutex = new(); // adding more than one sprite at once seems to causes issues, so protect it
-
     /// <summary>Perform basic initialization for a new passive, active, or gun item definition.</summary>
     public static TItemClass SetupItem<TItemClass, TItemSpecific>(string itemName, string spritePath, string projectileName, string shortDescription, string longDescription, string lore, bool hideFromAmmonomicon = false)
         where TItemClass : PickupObject   // must be PickupObject for passive items, PlayerItem for active items, or Gun for guns
@@ -32,7 +30,6 @@ public static class Lazy
 
         TItemClass item;
 
-        _AddSpriteMutex.WaitOne();
         if (typeof(TItemClass) == typeof(Gun))
         {
             string spriteName = spritePath; // TODO: guns use names, regular items use full paths -- should be made uniform eventually
@@ -69,7 +66,7 @@ public static class Lazy
             tk2dSprite sprite = obj.AddComponent<tk2dSprite>();
             tk2dSpriteCollectionData coll = ItemHelper.Get(Items.AmmoSynthesizer).sprite.Collection;
             tk2dSpriteDefinition dd = PackerHelper.NamedSpriteInPackedTexture(spritePath);
-            int spriteID = SpriteBuilder.AddSpriteToCollection(dd, coll);
+            int spriteID = PackerHelper.AddSpriteToCollection(dd, coll);
             sprite.SetSprite(coll, spriteID);
             sprite.SortingOrder = 0;
             sprite.IsPerpendicular = true;
@@ -81,7 +78,6 @@ public static class Lazy
             SpriteBuilder.AddToAmmonomicon(item.sprite.GetCurrentSpriteDef());
             item.encounterTrackable.journalData.AmmonomiconSprite = item.sprite.GetCurrentSpriteDef().name;
         }
-        _AddSpriteMutex.ReleaseMutex();
 
         item.itemName = itemName;
         item.encounterTrackable.EncounterGuid = C.MOD_PREFIX+"-"+baseItemName; //create a unique guid for the item
@@ -199,7 +195,7 @@ public static class Lazy
     }
 
     /// <summary>
-    /// Create a basic list of named directional animations given a list of animation names previously setup with SpriteBuilder.AddSpriteToCollection
+    /// Create a basic list of named directional animations given a list of animation names previously setup with PackerHelper.AddSpriteToCollection
     /// </summary>
     public static List<AIAnimator.NamedDirectionalAnimation> EasyNamedDirectionalAnimations(string[] animNameList)
     {

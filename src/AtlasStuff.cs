@@ -193,13 +193,13 @@ public static class PackerHelper
 
         if (collName == "ProjectileCollection")
         {
-          SpriteBuilder.AddSpriteToCollection(def, ETGMod.Databases.Items.ProjectileCollection);
+          PackerHelper.AddSpriteToCollection(def, ETGMod.Databases.Items.ProjectileCollection);
           continue;
         }
 
         if (collName == "Ammonomicon Encounter Icon Collection")
         {
-          SpriteBuilder.AddSpriteToCollection(def, _AmmonomiconCollection);
+          PackerHelper.AddSpriteToCollection(def, _AmmonomiconCollection);
           continue;
         }
 
@@ -207,7 +207,7 @@ public static class PackerHelper
         if (collName != "WeaponCollection")
           continue;
 
-        int id = SpriteBuilder.AddSpriteToCollection(def, _WeaponCollection);
+        int id = PackerHelper.AddSpriteToCollection(def, _WeaponCollection);
         // ETGModConsole.Log($"added {spriteName} to weapons");
         string json = $"CwaffingTheGungy.Resources.{collName}.{spriteName}.json";
 
@@ -282,6 +282,35 @@ public static class PackerHelper
       return sprite;
   }
 
+  internal static Mutex _AddSpriteMutex = new(); // adding more than one sprite at once seems to causes issues, so protect it
+
+  /// <summary>Thread-safe wrapper around SpriteBuilder.AddSpriteToCollection()</summary>
+  public static int AddSpriteToCollection(string resourcePath, tk2dSpriteCollectionData collection)
+  {
+    _AddSpriteMutex.WaitOne();
+    int result = SpriteBuilder.AddSpriteToCollection(resourcePath, collection);
+    _AddSpriteMutex.ReleaseMutex();
+    return result;
+  }
+
+  // /// <summary>Thread-safe wrapper around SpriteBuilder.AddSpriteToCollection()</summary>
+  // public static int AddSpriteToCollection(string resourcePath, string name, tk2dSpriteCollectionData collection)
+  // {
+  //   _AddSpriteMutex.WaitOne();
+  //   int result = SpriteBuilder.AddSpriteToCollection(resourcePath, name, collection);
+  //   _AddSpriteMutex.ReleaseMutex();
+  //   return result;
+  // }
+
+  /// <summary>Thread-safe wrapper around SpriteBuilder.AddSpriteToCollection()</summary>
+  public static int AddSpriteToCollection(tk2dSpriteDefinition def, tk2dSpriteCollectionData collection)
+  {
+    _AddSpriteMutex.WaitOne();
+    int result = SpriteBuilder.AddSpriteToCollection(def, collection);
+    _AddSpriteMutex.ReleaseMutex();
+    return result;
+  }
+
   internal static tk2dSpriteCollectionData itemCollection = PickupObjectDatabase.GetById(155).sprite.Collection;
 
   /// <summary>Patched version of Alexandria's SpriteFromResource</summary>
@@ -297,7 +326,7 @@ public static class PackerHelper
         tk2dSprite sprite;
         sprite = obj.AddComponent<tk2dSprite>();
 
-        int id = SpriteBuilder.AddSpriteToCollection(PackerHelper.NamedSpriteInPackedTexture(spriteName), itemCollection);
+        int id = PackerHelper.AddSpriteToCollection(PackerHelper.NamedSpriteInPackedTexture(spriteName), itemCollection);
         sprite.SetSprite(itemCollection, id);
         sprite.SortingOrder = 0;
         sprite.IsPerpendicular = true;
@@ -310,13 +339,13 @@ public static class PackerHelper
   }
 
   /// <summary>Patched version of Alexandria's AddSpriteToCollection(string, ...)</summary>
-  [HarmonyPatch(typeof(SpriteBuilder), nameof(SpriteBuilder.AddSpriteToCollection), typeof(string), typeof(tk2dSpriteCollectionData), /*typeof(string), */typeof(Assembly))]
+  [HarmonyPatch(typeof(SpriteBuilder), nameof(PackerHelper.AddSpriteToCollection), typeof(string), typeof(tk2dSpriteCollectionData), /*typeof(string), */typeof(Assembly))]
   private class AddSpriteToCollectionPatch
   {
     public static bool Prefix(string resourcePath, tk2dSpriteCollectionData collection, /*string name, */Assembly assembly, ref int __result)
     {
         // ETGModConsole.Log($"CALLING PATCHED AddSpriteToCollection for {resourcePath}");
-        __result = SpriteBuilder.AddSpriteToCollection(PackerHelper.NamedSpriteInPackedTexture(resourcePath), collection);
+        __result = PackerHelper.AddSpriteToCollection(PackerHelper.NamedSpriteInPackedTexture(resourcePath), collection);
         return false; // skip original method
     }
   }

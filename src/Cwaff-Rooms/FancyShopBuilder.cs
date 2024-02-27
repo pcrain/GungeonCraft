@@ -356,7 +356,7 @@ public static class FancyShopBuilder
       });
   }
 
-  // need to call this locally because the Alexandria version of SpriteBuilder.AddSpriteToCollection uses it's own AssemblyName due to how it's implemented
+  // need to call this locally because the Alexandria version of PackerHelper.AddSpriteToCollection uses it's own AssemblyName due to how it's implemented
   public static void AddParentedAnimationToShopFixed(this FancyShopData shop, List<string> yourPaths, float YourAnimFPS, string AnimationName)
   {
       GameObject self = shop.shop;
@@ -368,7 +368,7 @@ public static class FancyShopBuilder
           var stealIdsList = new List<int>();
           foreach (string sprite in yourPaths)
           {
-              stealIdsList.Add(SpriteBuilder.AddSpriteToCollection(sprite, collection));
+              stealIdsList.Add(PackerHelper.AddSpriteToCollection(sprite, collection));
           }
           // ShopAPI.CreateDirectionalAnimation(spriteAnimator, collection, aianimator, stealIdsList, AnimationName, YourAnimFPS);
           CreateDirectionalAnimation(spriteAnimator, collection, aianimator, stealIdsList, AnimationName, YourAnimFPS);

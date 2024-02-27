@@ -45,14 +45,14 @@ public class InsurancePolicy : PlayerItem
         item.CanBeSold    = false;  // no reselling insurance!
         item.SetCooldownType(ItemBuilder.CooldownType.Timed, 0.5f);
 
-        _InsuranceSpriteRobot      = SpriteBuilder.AddSpriteToCollection(ResMap.Get("insurance_policy_robot_icon")[0],      item.sprite.Collection);
-        _InsuranceSpriteConvict    = SpriteBuilder.AddSpriteToCollection(ResMap.Get("insurance_policy_convict_icon")[0],    item.sprite.Collection);
-        _InsuranceSpritePilot      = SpriteBuilder.AddSpriteToCollection(ResMap.Get("insurance_policy_pilot_icon")[0],      item.sprite.Collection);
-        _InsuranceSpriteParadox    = SpriteBuilder.AddSpriteToCollection(ResMap.Get("insurance_policy_paradox_icon")[0],    item.sprite.Collection);
-        _InsuranceSpriteGunslinger = SpriteBuilder.AddSpriteToCollection(ResMap.Get("insurance_policy_gunslinger_icon")[0], item.sprite.Collection);
-        _InsuranceSpriteHunter     = SpriteBuilder.AddSpriteToCollection(ResMap.Get("insurance_policy_hunter_icon")[0],     item.sprite.Collection);
-        _InsuranceSpriteMarine     = SpriteBuilder.AddSpriteToCollection(ResMap.Get("insurance_policy_marine_icon")[0],     item.sprite.Collection);
-        _InsuranceSpriteBullet     = SpriteBuilder.AddSpriteToCollection(ResMap.Get("insurance_policy_bullet_icon")[0],     item.sprite.Collection);
+        _InsuranceSpriteRobot      = PackerHelper.AddSpriteToCollection(ResMap.Get("insurance_policy_robot_icon")[0],      item.sprite.Collection);
+        _InsuranceSpriteConvict    = PackerHelper.AddSpriteToCollection(ResMap.Get("insurance_policy_convict_icon")[0],    item.sprite.Collection);
+        _InsuranceSpritePilot      = PackerHelper.AddSpriteToCollection(ResMap.Get("insurance_policy_pilot_icon")[0],      item.sprite.Collection);
+        _InsuranceSpriteParadox    = PackerHelper.AddSpriteToCollection(ResMap.Get("insurance_policy_paradox_icon")[0],    item.sprite.Collection);
+        _InsuranceSpriteGunslinger = PackerHelper.AddSpriteToCollection(ResMap.Get("insurance_policy_gunslinger_icon")[0], item.sprite.Collection);
+        _InsuranceSpriteHunter     = PackerHelper.AddSpriteToCollection(ResMap.Get("insurance_policy_hunter_icon")[0],     item.sprite.Collection);
+        _InsuranceSpriteMarine     = PackerHelper.AddSpriteToCollection(ResMap.Get("insurance_policy_marine_icon")[0],     item.sprite.Collection);
+        _InsuranceSpriteBullet     = PackerHelper.AddSpriteToCollection(ResMap.Get("insurance_policy_bullet_icon")[0],     item.sprite.Collection);
 
         _InsuranceVFXRobot      = VFX.Create("insurance_policy_robot_icon",      fps: 1, loops: true, anchor: Anchor.MiddleCenter);
         _InsuranceVFXConvict    = VFX.Create("insurance_policy_convict_icon",    fps: 1, loops: true, anchor: Anchor.MiddleCenter);

@@ -378,7 +378,7 @@ public static class GunBuilder
     mod.sequenceStyle       = b.sequenceStyle;
     if (b.angleVariance.HasValue)
       mod.angleVariance = b.angleVariance.Value;
-    if (b.customClip) //BUG: put back before release
+    if (b.customClip)
       mod.SetupCustomAmmoClip(b);
     else if (b.ammoType.HasValue)
       mod.ammoType = b.ammoType.Value;

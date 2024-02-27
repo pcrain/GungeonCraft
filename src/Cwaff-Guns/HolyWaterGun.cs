@@ -108,7 +108,7 @@ public class Exorcisable : MonoBehaviour
             Vector3 pos                         = this._enemy.sprite.WorldCenter.ToVector3ZisY(-10f);
             GameObject g                        = UnityEngine.Object.Instantiate(new GameObject(), pos, Quaternion.identity);
             tk2dSpriteCollectionData collection = SpriteBuilder.ConstructCollection(g, "ghostcollection");
-            int spriteId                        = SpriteBuilder.AddSpriteToCollection(ghostSprite, collection, "ghostsprite");
+            int spriteId                        = SpriteBuilder.AddSpriteToCollection(ghostSprite, collection, "ghostsprite");  //NOTE: this doesn't use PackerHelper since it's done at runtime
             tk2dBaseSprite sprite               = g.AddComponent<tk2dSprite>();
                 sprite.SetSprite(collection, spriteId);
                 sprite.PlaceAtPositionByAnchor(pos, Anchor.MiddleCenter);

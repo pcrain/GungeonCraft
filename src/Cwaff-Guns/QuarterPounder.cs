@@ -93,7 +93,7 @@ public class MidasProjectile : MonoBehaviour
         }
         GameObject g                        = new();
         _GoldSpriteCollection             ??= SpriteBuilder.ConstructCollection(g, "goldcollection");
-        int spriteId                        = SpriteBuilder.AddSpriteToCollection(goldSprite, _GoldSpriteCollection, "goldsprite");
+        int spriteId                        = SpriteBuilder.AddSpriteToCollection(goldSprite, _GoldSpriteCollection, "goldsprite"); //NOTE: this doesn't use PackerHelper since it's done at runtime
         tk2dBaseSprite sprite               = g.AddComponent<tk2dSprite>();
             sprite.SetSprite(_GoldSpriteCollection, spriteId);
             sprite.PlaceAtPositionByAnchor(enemy.sprite.WorldCenter.ToVector3ZisY(), Anchor.MiddleCenter);

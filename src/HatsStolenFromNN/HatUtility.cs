@@ -59,7 +59,7 @@ public class HatUtility
             collectionName = collectionName.Replace(" ", "_");
             tk2dSpriteCollectionData HatSpriteCollection = SpriteBuilder.ConstructCollection(hatObj, (collectionName + "_Collection"));
 
-            int spriteID = SpriteBuilder.AddSpriteToCollection(spritePaths[0], HatSpriteCollection);
+            int spriteID = PackerHelper.AddSpriteToCollection(spritePaths[0], HatSpriteCollection);
             tk2dSprite hatBaseSprite = hatObj.GetOrAddComponent<tk2dSprite>();
             hatBaseSprite.SetSprite(HatSpriteCollection, spriteID);
             tk2dSpriteDefinition def = hatBaseSprite.GetCurrentSpriteDef();
@@ -151,7 +151,7 @@ public class HatUtility
                 foreach (string path in SouthAnimation)
                 {
                     tk2dSpriteCollectionData collection = HatSpriteCollection;
-                    int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
+                    int frameSpriteId = PackerHelper.AddSpriteToCollection(path, collection);
                     tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
                     frameDef.colliderVertices = def.colliderVertices;
                     frameDef.ConstructOffsetsFromAnchor(Anchor.LowerCenter);
@@ -169,7 +169,7 @@ public class HatUtility
                 foreach (string path in NorthAnimation)
                 {
                     tk2dSpriteCollectionData collection = HatSpriteCollection;
-                    int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
+                    int frameSpriteId = PackerHelper.AddSpriteToCollection(path, collection);
                     tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
                     frameDef.colliderVertices = def.colliderVertices;
                     frameDef.ConstructOffsetsFromAnchor(Anchor.LowerCenter);
@@ -187,7 +187,7 @@ public class HatUtility
                 foreach (string path in WestAnimation)
                 {
                     tk2dSpriteCollectionData collection = HatSpriteCollection;
-                    int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
+                    int frameSpriteId = PackerHelper.AddSpriteToCollection(path, collection);
                     tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
                     frameDef.colliderVertices = def.colliderVertices;
                     frameDef.ConstructOffsetsFromAnchor(Anchor.LowerCenter);
@@ -205,7 +205,7 @@ public class HatUtility
                 foreach (string path in EastAnimation)
                 {
                     tk2dSpriteCollectionData collection = HatSpriteCollection;
-                    int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
+                    int frameSpriteId = PackerHelper.AddSpriteToCollection(path, collection);
                     tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
                     frameDef.colliderVertices = def.colliderVertices;
                     frameDef.ConstructOffsetsFromAnchor(Anchor.LowerCenter);
@@ -223,7 +223,7 @@ public class HatUtility
                 foreach (string path in NorthEastAnimation)
                 {
                     tk2dSpriteCollectionData collection = HatSpriteCollection;
-                    int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
+                    int frameSpriteId = PackerHelper.AddSpriteToCollection(path, collection);
                     tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
                     frameDef.colliderVertices = def.colliderVertices;
                     frameDef.ConstructOffsetsFromAnchor(Anchor.LowerCenter);
@@ -241,7 +241,7 @@ public class HatUtility
                 foreach (string path in NorthWestAnimation)
                 {
                     tk2dSpriteCollectionData collection = HatSpriteCollection;
-                    int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
+                    int frameSpriteId = PackerHelper.AddSpriteToCollection(path, collection);
                     tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
                     frameDef.colliderVertices = def.colliderVertices;
                     frameDef.ConstructOffsetsFromAnchor(Anchor.LowerCenter);
@@ -259,7 +259,7 @@ public class HatUtility
                 foreach (string path in SouthWestAnimation)
                 {
                     tk2dSpriteCollectionData collection = HatSpriteCollection;
-                    int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
+                    int frameSpriteId = PackerHelper.AddSpriteToCollection(path, collection);
                     tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
                     frameDef.colliderVertices = def.colliderVertices;
                     frameDef.ConstructOffsetsFromAnchor(Anchor.LowerCenter);
@@ -277,7 +277,7 @@ public class HatUtility
                 foreach (string path in SouthEastAnimation)
                 {
                     tk2dSpriteCollectionData collection = HatSpriteCollection;
-                    int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
+                    int frameSpriteId = PackerHelper.AddSpriteToCollection(path, collection);
                     tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
                     frameDef.colliderVertices = def.colliderVertices;
                     frameDef.ConstructOffsetsFromAnchor(Anchor.LowerCenter);
