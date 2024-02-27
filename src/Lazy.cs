@@ -57,18 +57,11 @@ public static class Lazy
             tk2dSprite sprite = obj.AddComponent<tk2dSprite>();
             tk2dSpriteCollectionData coll = ItemHelper.Get(Items.AmmoSynthesizer).sprite.Collection;
             tk2dSpriteDefinition dd = PackerHelper.NamedSpriteInPackedTexture(spritePath);
-            if (dd == null || coll == null)
-                ETGModConsole.Log($"YIKES O_O_O_O");
             int spriteID = SpriteBuilder.AddSpriteToCollection(dd, coll);
             sprite.SetSprite(coll, spriteID);
             sprite.SortingOrder = 0;
             sprite.IsPerpendicular = true;
             obj.GetComponent<BraveBehaviour>().sprite = sprite;
-            // ETGModConsole.Log($"found sprite for {sprite.GetCurrentSpriteDef().name} at:");
-            // foreach (Vector2 uv in sprite.GetCurrentSpriteDef().uvs)
-            //     ETGModConsole.Log($"  {uv.x.ToString("n5")},{uv.y.ToString("n5")}");
-
-            // SpriteBuilder.SpriteFromTexture(ETGMod.Assets.TextureMap[$"sprites/ItemSprites/{altName}"], spriteName, obj);
 
             ETGMod.Databases.Items.SetupItem(item, item.name);
 

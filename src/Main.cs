@@ -80,11 +80,6 @@ public class Initialisation : BaseUnityPlugin
             if (C.DEBUG_BUILD)
                 ETGModConsole.Log("Cwaffing the Gungy initializing...");
 
-            // var resources = Assembly.GetExecutingAssembly().GetManifestResourceNames();
-            // foreach (var resource in resources)
-            // {
-            //     ETGModConsole.Log($"{resource}");
-            // }
             for (int i = 1; i <= 5; ++i)
             PackerHelper.LoadPackedTextureResource(
                 $"CwaffingTheGungy.Resources.Atlases.atlas_{i}.png",
@@ -139,13 +134,9 @@ public class Initialisation : BaseUnityPlugin
             #region Sprite Setup (Anything that requires sprites cannot be async)
                 System.Diagnostics.Stopwatch setupSpritesWatch = System.Diagnostics.Stopwatch.StartNew();
                 long usedMemoryBeforeSpriteSetup = currentProcess.WorkingSet64;
-                // UnprocessedSpriteHotfix.Init();  // prevent SetupSpritesFromAssembly() from loading unprocessed sprites (saves about 50MB of RAM, which is a good chunk)
-                ETGMod.Assets.SetupSpritesFromAssembly(Assembly.GetExecutingAssembly(), $"{C.MOD_INT_NAME}.Resources");
-                // UnprocessedSpriteHotfix.DeInit();  // we don't want to affect other mods
+                // ETGMod.Assets.SetupSpritesFromAssembly(Assembly.GetExecutingAssembly(), $"{C.MOD_INT_NAME}.Resources");
                 if (C.DEBUG_BUILD)
                     ETGModConsole.Log($"  allocated {(currentProcess.WorkingSet64 - usedMemoryBeforeSpriteSetup).ToString("N0")} bytes of memory for sprite setup");
-                // foreach (string key in ETGMod.Assets.TextureMap.Keys)
-                //     ETGModConsole.Log($"have collection {key}");
                 setupSpritesWatch.Stop();
             #endregion
 
@@ -161,7 +152,7 @@ public class Initialisation : BaseUnityPlugin
                 // Note Does Setup
                 CustomNoteDoer.Init();
                 // Miscellaneous tweaks
-                CwaffTweaks.Init();
+                // CwaffTweaks.Init(); // TODO: reenable
                 // Hecked Mode Tribute Statues
                 HeckedShrine.Init();
                 setupConfig2Watch.Stop();
@@ -249,69 +240,69 @@ public class Initialisation : BaseUnityPlugin
 
             #region Guns
                 System.Diagnostics.Stopwatch setupGunsWatch = System.Diagnostics.Stopwatch.StartNew();
-                IronMaid.Add();
-                Natascha.Add();
-                PaintballCannon.Add();
-                // DerailGun.Add(); unfinished
-                // PopcornGun.Add(); no sprite
-                Tranquilizer.Add();
-                // LastResort.Add(); no sprite
-                // MasterSword.Add(); unfinished
-                // Encircler.Add(); no sprite
-                // Nug.Add(); no sprite
-                SoulKaliber.Add();
-                // GamblersFallacy.Add(); no sprite
-                // GasterBlaster.Add(); no sprite
-                // Commitment.Add(); no sprite
-                // HeadCannon.Add(); unfinished
-                // Telefragger.Add(); no sprite
-                // Kinsurrection.Add(); unfinished
-                // SpinCycle.Add(); no sprite
-                // TimingGun.Add(); unfinished
-                KiBlast.Add();
-                Deadline.Add();
-                BBGun.Add();
-                Bouncer.Add();
-                Grandmaster.Add();
-                QuarterPounder.Add();
-                // DeathNote.Add(); unfinished
-                HolyWaterGun.Add();
-                Alyx.Add();
-                VacuumCleaner.Add();
-                Gunbrella.Add();
-                Blackjack.Add();
-                SchrodingersGat.Add();
-                // Taomislav.Add(); unfinished
-                RacketLauncher.Add();
-                Outbreak.Add();
-                HandCannon.Add();
-                HatchlingGun.Add();
-                Ticonderogun.Add();
-                AimuHakurei.Add();
-                SeltzerPelter.Add();
-                Missiletoe.Add();
-                PlatinumStar.Add();
-                PistolWhip.Add();
-                Jugglernaut.Add();
-                SubtractorBeam.Add();
-                Alligator.Add();
-                Lightwing.Add();
-                KingsLaw.Add();
-                Pincushion.Add();
-                Crapshooter.Add();
-                CarpetBomber.Add();
-                Uppskeruvel.Add();
-                Glockarina.Add();
-                Magunet.Add();
-                Wavefront.Add();
-                Scotsman.Add();
-                ChekhovsGun.Add();
-                Vladimir.Add();
-                Blamethrower.Add();
-                Suncaster.Add();
-                KALI.Add();
-                AlienNailgun.Add();
-                setupGunsWatch.Stop();
+                // IronMaid.Add();
+                // Natascha.Add();
+                // PaintballCannon.Add();
+                // // DerailGun.Add(); unfinished
+                // // PopcornGun.Add(); no sprite
+                // Tranquilizer.Add();
+                // // LastResort.Add(); no sprite
+                // // MasterSword.Add(); unfinished
+                // // Encircler.Add(); no sprite
+                // // Nug.Add(); no sprite
+                // SoulKaliber.Add();
+                // // GamblersFallacy.Add(); no sprite
+                // // GasterBlaster.Add(); no sprite
+                // // Commitment.Add(); no sprite
+                // // HeadCannon.Add(); unfinished
+                // // Telefragger.Add(); no sprite
+                // // Kinsurrection.Add(); unfinished
+                // // SpinCycle.Add(); no sprite
+                // // TimingGun.Add(); unfinished
+                // KiBlast.Add();
+                // Deadline.Add();
+                // BBGun.Add();
+                // Bouncer.Add();
+                // Grandmaster.Add();
+                // QuarterPounder.Add();
+                // // DeathNote.Add(); unfinished
+                // HolyWaterGun.Add();
+                // Alyx.Add();
+                // VacuumCleaner.Add();
+                // Gunbrella.Add();
+                // Blackjack.Add();
+                // SchrodingersGat.Add();
+                // // Taomislav.Add(); unfinished
+                // RacketLauncher.Add();
+                // Outbreak.Add();
+                // HandCannon.Add();
+                // HatchlingGun.Add();
+                // Ticonderogun.Add();
+                // AimuHakurei.Add();
+                // SeltzerPelter.Add();
+                // Missiletoe.Add();
+                // PlatinumStar.Add();
+                // PistolWhip.Add();
+                // Jugglernaut.Add();
+                // SubtractorBeam.Add();
+                // Alligator.Add();
+                // Lightwing.Add();
+                // KingsLaw.Add();
+                // Pincushion.Add();
+                // Crapshooter.Add();
+                // CarpetBomber.Add();
+                // Uppskeruvel.Add();
+                // Glockarina.Add();
+                // Magunet.Add();
+                // Wavefront.Add();
+                // Scotsman.Add();
+                // ChekhovsGun.Add();
+                // Vladimir.Add();
+                // Blamethrower.Add();
+                // Suncaster.Add();
+                // KALI.Add();
+                // AlienNailgun.Add();
+                setupGunsWatch.Stop();  //TODO: put this back later
             #endregion
 
             #region Synergies (Async)
@@ -326,22 +317,22 @@ public class Initialisation : BaseUnityPlugin
 
             #region UI Sprites (cannot be async, must set up textures on main thread)
                 System.Diagnostics.Stopwatch setupUIWatch = System.Diagnostics.Stopwatch.StartNew();
-                BetterAtlas.AddUISpriteBatch(new(){
-                    ResMap.Get("barter_s_icon")[0]+".png",         Bart._BarterSpriteS,
-                    ResMap.Get("barter_a_icon")[0]+".png",         Bart._BarterSpriteA,
-                    ResMap.Get("barter_b_icon")[0]+".png",         Bart._BarterSpriteB,
-                    ResMap.Get("barter_c_icon")[0]+".png",         Bart._BarterSpriteC,
-                    ResMap.Get("soul_sprite_ui_icon")[0]+".png",   Uppskeruvel._SoulSpriteUI,
-                    ResMap.Get("prism_ui_icon")[0]+".png",         Suncaster._PrismUI,
-                    ResMap.Get("glockarina_storm_ui_icon")[0]+".png", Glockarina._StormSpriteUI,
-                    ResMap.Get("glockarina_time_ui_icon")[0]+".png",  Glockarina._TimeSpriteUI,
-                    ResMap.Get("glockarina_saria_ui_icon")[0]+".png", Glockarina._SariaSpriteUI,
-                    ResMap.Get("glockarina_empty_ui_icon")[0]+".png", Glockarina._EmptySpriteUI,
-                    // needs to be three separate sprites or the UI breaks
-                    ResMap.Get("adrenaline_heart")[0]+".png", AdrenalineShot._FullHeartSpriteUI,
-                    ResMap.Get("adrenaline_heart")[0]+".png", AdrenalineShot._HalfHeartSpriteUI,
-                    ResMap.Get("adrenaline_heart")[0]+".png", AdrenalineShot._EmptyHeartSpriteUI,
-                });
+                // BetterAtlas.AddUISpriteBatch(new(){
+                //     ResMap.Get("barter_s_icon")[0]+".png",         Bart._BarterSpriteS,
+                //     ResMap.Get("barter_a_icon")[0]+".png",         Bart._BarterSpriteA,
+                //     ResMap.Get("barter_b_icon")[0]+".png",         Bart._BarterSpriteB,
+                //     ResMap.Get("barter_c_icon")[0]+".png",         Bart._BarterSpriteC,
+                //     ResMap.Get("soul_sprite_ui_icon")[0]+".png",   Uppskeruvel._SoulSpriteUI,
+                //     ResMap.Get("prism_ui_icon")[0]+".png",         Suncaster._PrismUI,
+                //     ResMap.Get("glockarina_storm_ui_icon")[0]+".png", Glockarina._StormSpriteUI,
+                //     ResMap.Get("glockarina_time_ui_icon")[0]+".png",  Glockarina._TimeSpriteUI,
+                //     ResMap.Get("glockarina_saria_ui_icon")[0]+".png", Glockarina._SariaSpriteUI,
+                //     ResMap.Get("glockarina_empty_ui_icon")[0]+".png", Glockarina._EmptySpriteUI,
+                //     // needs to be three separate sprites or the UI breaks
+                //     ResMap.Get("adrenaline_heart")[0]+".png", AdrenalineShot._FullHeartSpriteUI,
+                //     ResMap.Get("adrenaline_heart")[0]+".png", AdrenalineShot._HalfHeartSpriteUI,
+                //     ResMap.Get("adrenaline_heart")[0]+".png", AdrenalineShot._EmptyHeartSpriteUI,
+                // });  //TODO: put this back later
                 setupUIWatch.Stop();
             #endregion
 

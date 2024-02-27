@@ -53,7 +53,7 @@ public static class VFX
     /// </summary>
     public static void RegisterSprite(string path)
     {
-        sprites[path.Substring(path.LastIndexOf("/")+1)] = SpriteBuilder.AddSpriteToCollection(path, OverheadVFXCollection);
+        sprites[path.Substring(path.LastIndexOf("/")+1)] = SpriteBuilder.AddSpriteToCollection(PackerHelper.NamedSpriteInPackedTexture(path), OverheadVFXCollection);
     }
 
     /// <summary>

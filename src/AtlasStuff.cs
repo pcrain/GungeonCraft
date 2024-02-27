@@ -89,7 +89,7 @@ public static class PackerHelper
     public int h           = 0;
   }
 
-  private static Dictionary<string, tk2dSpriteDefinition> _PackedTextures = new();
+  internal static Dictionary<string, tk2dSpriteDefinition> _PackedTextures = new();
 
   /// <summary>Construct a tk2dSpriteDefinition from a segment of a packed texture</summary>
   public static tk2dSpriteDefinition SpriteDefFromSegment(this Texture2D texture, string spriteName, int x, int y, int w, int h)
@@ -188,6 +188,45 @@ public static class PackerHelper
         _PackedTextures[spriteName] = atlas.SpriteDefFromSegment(spriteName, x, y, w, h);
         // ETGModConsole.Log($"loaded packed {w}x{h} sprite {spriteName} at {x},{y}");
       }
+    }
+  }
+
+  internal static tk2dSpriteCollectionData itemCollection = PickupObjectDatabase.GetById(155).sprite.Collection;
+
+  /// <summary>Patched version of Alexandria's SpriteFromResource</summary>
+  [HarmonyPatch(typeof(SpriteBuilder), nameof(SpriteBuilder.SpriteFromResource))]
+  private class SpriteFromResourcePatch
+  {
+    public static bool Prefix(string spriteName, GameObject obj, Assembly assembly, ref GameObject __result)
+    {
+        // ETGModConsole.Log($"CALLING PATCHED SpriteFromResource for {spriteName}");
+        if (obj == null)
+          obj = new GameObject();
+
+        tk2dSprite sprite;
+        sprite = obj.AddComponent<tk2dSprite>();
+
+        int id = SpriteBuilder.AddSpriteToCollection(PackerHelper.NamedSpriteInPackedTexture(spriteName), itemCollection);
+        sprite.SetSprite(itemCollection, id);
+        sprite.SortingOrder = 0;
+        sprite.IsPerpendicular = true;
+
+        obj.GetComponent<BraveBehaviour>().sprite = sprite;
+
+        __result = obj;
+        return false; // skip original method
+    }
+  }
+
+  /// <summary>Patched version of Alexandria's AddSpriteToCollection(string, ...)</summary>
+  [HarmonyPatch(typeof(SpriteBuilder), nameof(SpriteBuilder.AddSpriteToCollection), typeof(string), typeof(tk2dSpriteCollectionData), /*typeof(string), */typeof(Assembly))]
+  private class AddSpriteToCollectionPatch
+  {
+    public static bool Prefix(string resourcePath, tk2dSpriteCollectionData collection, /*string name, */Assembly assembly, ref int __result)
+    {
+        // ETGModConsole.Log($"CALLING PATCHED AddSpriteToCollection for {resourcePath}");
+        __result = SpriteBuilder.AddSpriteToCollection(PackerHelper.NamedSpriteInPackedTexture(resourcePath), collection);
+        return false; // skip original method
     }
   }
 }
