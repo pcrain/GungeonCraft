@@ -8,8 +8,9 @@
 namespace="CwaffingTheGungy"                     #namespace used throughout source code; need to change for my own mod eventually
 projectname="GungeonCraft"                       #name of the DLL to create
 projfile="./CwaffingItems.csproj"                #the name of the csproj file to generate
-sourcechecksums="./_${namespace}-checksums-src"  #file containing checksums of all source files to determing recompilation
-audiochecksums="./_${namespace}-checksums-audio" #file containing checksums of all source files to determing recompilation
+sourcechecksums="./_${namespace}-checksums-src"  #file containing checksums of all source files to determine recompilation
+gfxchecksums="./_${namespace}-checksums-gfx"     #file containing checksums of all graphics to determine rebuilding atlases
+audiochecksums="./_${namespace}-checksums-audio" #file containing checksums of all audio files to determine rebuilding audio bank
 externalupdate="./_${namespace}-externalupdate"  #file containing the last time an external resource was added
 audioupdate="./_${namespace}-audioupdate"        #file containing the last time an audio resource / csv was added / updated
 dllname="./bin/Debug/${projectname}.dll"         #DLL name is directly based on the project name
@@ -32,6 +33,16 @@ manifesttemplate=`cat <<HERE
   ]
 }
 HERE`
+
+thunderstore=0
+if [ $# -gt 0 ] && [ "$1" == "-t" ]; then
+  thunderstore=1 #prepare for publishing on Thunderstore
+fi
+
+if [ $thunderstore -eq 1 ]; then
+  echo -e "[${GRN}>${BLN}] Trimming gun idle animations"
+  ./trim-idle-animations >/dev/null
+fi
 
 #Base directory we're copying our plugin to
 plugindir="/xmedia/pretzel/Steam/steamapps/common/Enter the Gungeon/BepInEx/plugins"
@@ -56,12 +67,38 @@ includes+=('<Reference Include="System" />') #needed for LinkedList
 # includes+=('<Folder Include="Characters\Shade\newspritesetup\custom\" />')
 # includes+=('<Reference Include="Ionic.Zip, Version=1.9.1.8"/>')
 
+#Regenerate atlases if necessary
+echo -e "[${GRN}>${BLN}] Checking for changes to sprites"
+updategfx=0
+gfxdata="$(/bin/ls -RAl "RawResources/" | grep -vE "(^total|.json$)")"
+if [ ! -e "${gfxchecksums}" ]; then
+  echo -e "[${GRN}>${BLN}]   Graphics checksum file does not exist, rebuilding sprite atlases"
+  updategfx=1
+else
+  oldgfxdata="$(cat "${gfxchecksums}")"
+  if [[ "${gfxdata}" != "${oldgfxdata}" ]]; then
+    echo -e "[${GRN}>${BLN}]   At least one image file was changed, rebuilding sprite atlases and project"
+    updategfx=1
+  else
+    echo -e "[${GRN}>${BLN}]   No image files changed, skipping sprite atlas rebuild"
+  fi
+fi
+
+if [ $updategfx -eq 1 ]; then
+  rebuild=1
+  echo -e "[${GRN}>${BLN}] Regenerating sprite atlases"
+  cheetah-texture-packer -s 1024x1024 --square --disable-merge --disable-crop --border-size 2 -o "./Resources/Atlases/atlas" "./RawResources/"
+
+  echo -e "[${GRN}>${BLN}]   Regenerating checksums for sprites"
+  echo "$gfxdata" > "${gfxchecksums}"
+fi
+
 #Regenerate audio sources if necessary
 echo -e "[${GRN}>${BLN}] Checking for changes to audio files"
 lastmodifiedaudio="$(find "Resources" -type f -path "*.wav" -o -path "*.csv" -printf "%T+\n" | sort -nr | head -n 1)"
 # lastmodifiedaudio="$(find "Resources" -type f -path "*.wav" -o -type f -path "*.ogg" -o -path "*.csv" -printf "%T+\n" | sort -nr | head -n 1)"
 updateaudio=0
-audiodata=""
+audiodata="$(/bin/ls -Al "Resources/Sounds/" | grep -vE "(^total|.bnk$)")"
 if [ ! -e "./Resources/Sounds/${namespace}.bnk" ]; then
   echo -e "[${GRN}>${BLN}]   Audio bank does not exist, regenerating sound bank"
   updateaudio=1
@@ -71,7 +108,6 @@ elif [ ! -e "${audiochecksums}" ]; then
 # elif [ "${lastmodifiedaudio}" == "$(cat "$audioupdate")" ]; then
 #   updateaudio=0 #todo: this doesn't work for newly-added files with old modification times
 else
-  audiodata="$(/bin/ls -Al "Resources/Sounds/" | grep -vE "(^total|.bnk$)")"
   oldaudiodata="$(cat "${audiochecksums}")"
   if [[ "${audiodata}" != "${oldaudiodata}" ]]; then
     echo -e "[${GRN}>${BLN}]   At least one audio file was changed, rebuilding sound bank and project"
@@ -81,8 +117,6 @@ else
   fi
   echo "${lastmodifiedaudio}" > "$audioupdate";
 fi
-
-[ -z "$audiodata" ] && audiodata="$(/bin/ls -Al "Resources/Sounds/" | grep -vE "(^total|.bnk$)")"
 
 if [ $updateaudio -eq 1 ]; then
   rebuild=1
@@ -299,11 +333,9 @@ if [ $rebuild -eq 1 ]; then
 fi
 
 #Generate new Thunderstore Package
-if [ $# -gt 0 ] && [ "$1" == "-t" ]; then
+if [ $thunderstore -eq 1 ]; then
   echo -e "[${GRN}>${BLN}] Regenerating item tips"
   ./gen-itemtips.py
-  echo -e "[${GRN}>${BLN}] Trimming gun idle animations"
-  ./trim-idle-animations >/dev/null
   echo -e "[${GRN}>${BLN}] Assembling Thunderstore package"
   if [ $debugbuild -gt 0 ]; then
     echo -e "[${RED}@${BLN}] Trying to build Thunderstore package from debug build, refusing"

@@ -1,7 +1,7 @@
 #!/bin/bash
 #Helper script for creating trimmed versions of gun idle animations
 
-spritedir="./Resources/WeaponCollection"
+spritedir="./RawResources/WeaponCollection"
 while read -r line; do
   weaponname="$(echo $line | rev | cut -f 3- -d'_' | rev)"
   echo "  trimming $weaponname"
