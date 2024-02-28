@@ -324,6 +324,9 @@ public static class PackerHelper
   {
     public static bool Prefix(string spriteName, GameObject obj, Assembly assembly, ref GameObject __result)
     {
+        if (C._ModSetupFinished)
+          return true; // call original method
+
         // System.Console.WriteLine($"CALLING PATCHED SpriteFromResource for {spriteName}");
         if (obj == null)
           obj = new GameObject();
@@ -349,6 +352,9 @@ public static class PackerHelper
   {
     public static bool Prefix(string resourcePath, tk2dSpriteCollectionData collection, /*string name, */Assembly assembly, ref int __result)
     {
+        if (C._ModSetupFinished)
+          return true; // call original method
+
         // ETGModConsole.Log($"CALLING PATCHED AddSpriteToCollection for {resourcePath}");
         __result = PackerHelper.SafeAddSpriteToCollection(PackerHelper.NamedSpriteInPackedTexture(resourcePath), collection);
         return false; // skip original method

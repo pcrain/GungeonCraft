@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class C // constants
+public class C // constants and common variables
 {
     public static readonly bool DEBUG_BUILD = true; // set to false for release builds (must be readonly instead of const to avoid build warnings)
 
@@ -19,6 +19,8 @@ public class C // constants
     public const float  PIXEL_SIZE      = 1f / PIXELS_PER_TILE;
 
     internal static readonly bool _WARN_DUPLICATE_VFX = false;
+
+    internal static bool _ModSetupFinished = false; // set to true at the end of setup to disable some patches
 }
 
 public class IDs // global IDs for this mod's guns and items

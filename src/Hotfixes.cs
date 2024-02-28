@@ -45,15 +45,13 @@ namespace CwaffingTheGungy;
 // Alexandria's method unnecessarily rebuilds the entire sprite dictionary after every sprite is added
 public static class SpriteBuilderHotfix
 {
-    internal static bool _UsePatchedSpriteAdder = true;
-
     // [HarmonyPatch(typeof(SpriteBuilder), nameof(PackerHelper.AddSpriteToCollection), typeof(tk2dSpriteDefinition), typeof(tk2dSpriteCollectionData))]
     private class AddSpritePatch
     {
         static bool Prefix(tk2dSpriteDefinition spriteDefinition, tk2dSpriteCollectionData collection, ref int __result)
         {
-            if (!_UsePatchedSpriteAdder)
-                return true; // run original method
+            if (C._ModSetupFinished)
+                return true; // run original method if our mod is set up
 
             //Initialize the sprite lookup dictionary if necessary
             if (collection.spriteNameLookupDict == null)
