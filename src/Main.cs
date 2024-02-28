@@ -121,6 +121,10 @@ public class Initialisation : BaseUnityPlugin
                 }
                 // foreach (Thread t in atlasThreads)
                 //     t.Join();
+
+                // Build resource map for ease of access
+                ResMap.Build();
+
                 setupAtlasesWatch.Stop();
             #endregion
 
@@ -131,6 +135,10 @@ public class Initialisation : BaseUnityPlugin
                 ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
                 ShaderCache.Acquire("Brave/Internal/SimpleAlphaFadeUnlit");
                 ShaderCache.Acquire("Daikon Forge/Default UI Shader");
+
+                // We have to wait for Harmony to finish patching before we can do anything else
+                setupHarmonyThread.Join(); //
+
                 setupShadersWatch.Stop();
             #endregion
 
@@ -139,14 +147,8 @@ public class Initialisation : BaseUnityPlugin
                 Thread setupConfig1Thread = new Thread(() => {
                     setupConfig1Watch = System.Diagnostics.Stopwatch.StartNew();
 
-                    // We have to wait for Harmony to finish patching before we can do anything
-                    setupHarmonyThread.Join(); //
-
                     // Load our configuration files
                     CwaffConfig.Init();
-
-                    // Build resource map for ease of access
-                    ResMap.Build();
 
                     //Tools and Toolboxes
                     CwaffPrerequisite.Init();  // must be set up after CwaffEvents
@@ -174,10 +176,10 @@ public class Initialisation : BaseUnityPlugin
                 setupSaveThread.Start();
             #endregion
 
-            #region Round 2 Config (Requires sprites, cannot be async)
+            #region Round 2 Config (Requires sprites, can technically be async but stuff below might need it)
                 System.Diagnostics.Stopwatch setupConfig2Watch = System.Diagnostics.Stopwatch.StartNew();
                 Thread setupConfig2Thread = new Thread(() => {
-                    setupConfig1Thread.Join(); // we need to wait for our ResMap to be built, so wait here
+                    // setupConfig1Thread.Join(); // we need to wait for our ResMap to be built, so wait here
                     // Basic VFX Setup
                     VFX.Init();
                     //Status Effect Setup
@@ -195,17 +197,7 @@ public class Initialisation : BaseUnityPlugin
                 setupConfig2Thread.Start();
             #endregion
 
-            #region Audio (Async)
-                System.Diagnostics.Stopwatch setupAudioWatch = null;
-                Thread setupAudioThread = new Thread(() => {
-                    setupAudioWatch = System.Diagnostics.Stopwatch.StartNew();
-                    ETGModMainBehaviour.Instance.gameObject.AddComponent<AudioSource>(); // is this necessary?
-                    AudioResourceLoader.AutoloadFromAssembly(C.MOD_INT_NAME);  // Load Audio Banks
-                    setupAudioWatch.Stop();
-                });
-                setupAudioThread.Start();
-            #endregion
-
+            setupConfig1Thread.Join();
             setupConfig2Thread.Join(); // need to wait for round 2 configuration so all VFX / Goops are loaded
 
             #region Guns
@@ -251,6 +243,14 @@ public class Initialisation : BaseUnityPlugin
                     HandCannon.Add();
                     HatchlingGun.Add();
                     Ticonderogun.Add();
+                    setupGunsWatch.Stop();
+                });
+                setupGunsThread.Start();
+
+                System.Diagnostics.Stopwatch setupGuns2Watch = null;
+                Thread setupGuns2Thread = new Thread(() => {
+                    setupGuns2Watch = System.Diagnostics.Stopwatch.StartNew();
+
                     AimuHakurei.Add();
                     SeltzerPelter.Add();
                     Missiletoe.Add();
@@ -275,9 +275,9 @@ public class Initialisation : BaseUnityPlugin
                     Suncaster.Add();
                     KALI.Add();
                     AlienNailgun.Add();
-                    setupGunsWatch.Stop();
+                    setupGuns2Watch.Stop();
                 });
-                setupGunsThread.Start();
+                setupGuns2Thread.Start();
             #endregion
 
             #region Actives
@@ -362,11 +362,23 @@ public class Initialisation : BaseUnityPlugin
                     setupActivesThread.Join();
                     setupPassivesThread.Join();
                     setupGunsThread.Join();
+                    setupGuns2Thread.Join();
 
                     CwaffSynergies.Init();
                     setupSynergiesWatch.Stop();
                 });
                 setupSynergiesThread.Start();
+            #endregion
+
+            #region Audio (Async)
+                System.Diagnostics.Stopwatch setupAudioWatch = null;
+                Thread setupAudioThread = new Thread(() => {
+                    setupAudioWatch = System.Diagnostics.Stopwatch.StartNew();
+                    ETGModMainBehaviour.Instance.gameObject.AddComponent<AudioSource>(); // is this necessary?
+                    AudioResourceLoader.AutoloadFromAssembly(C.MOD_INT_NAME);  // Load Audio Banks
+                    setupAudioWatch.Stop();
+                });
+                setupAudioThread.Start();
             #endregion
 
             #region Shop NPCs
@@ -503,11 +515,12 @@ public class Initialisation : BaseUnityPlugin
                 ETGModConsole.Log($"    setupSave      finished in {setupSaveWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 // ETGModConsole.Log($"    setupSprites   finished in {setupSpritesWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupConfig2   finished in {setupConfig2Watch.ElapsedMilliseconds} milliseconds (ASYNC)");
-                ETGModConsole.Log($"    setupAudio     finished in {setupAudioWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupGuns      finished in {setupGunsWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
+                ETGModConsole.Log($"    setupGuns2     finished in {setupGuns2Watch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupActives   finished in {setupActivesWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupPassives  finished in {setupPassivesWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupSynergies finished in {setupSynergiesWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
+                ETGModConsole.Log($"    setupAudio     finished in {setupAudioWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupShops     finished in {setupShopsWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupBosses    finished in {setupBossesWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupFloors    finished in {setupFloorsWatch.ElapsedMilliseconds} milliseconds");

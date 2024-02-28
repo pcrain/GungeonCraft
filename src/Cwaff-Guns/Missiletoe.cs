@@ -61,9 +61,27 @@ public class Missiletoe : AdvancedGunBehavior
 
         gun.DefaultModule.SetAttributes(new(gun: gun, clipSize: 1, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, customClip: true));
 
-        ExplosionData giftExplosion = new ExplosionData();
-            giftExplosion.CopyFrom(Bouncer._MiniExplosion);
-            giftExplosion.damageRadius      = 0.5f;
+        ExplosionData defaultExplosion = GameManager.Instance.Dungeon.sharedSettingsPrefab.DefaultSmallExplosionData;
+        ExplosionData giftExplosion = new ExplosionData()
+        {
+            forceUseThisRadius     = true,
+            pushRadius             = 0.5f,
+            damageRadius           = 0.5f,
+            damageToPlayer         = 0f,
+            doDamage               = true,
+            damage                 = 10,
+            doDestroyProjectiles   = false,
+            doForce                = true,
+            debrisForce            = 10f,
+            preventPlayerForce     = true,
+            explosionDelay         = 0.01f,
+            usesComprehensiveDelay = false,
+            doScreenShake          = false,
+            playDefaultSFX         = true,
+            effect                 = defaultExplosion.effect,
+            ignoreList             = defaultExplosion.ignoreList,
+            ss                     = defaultExplosion.ss,
+        };
 
         tk2dSpriteAnimationClip ball        = AnimatedBullet.Create(name: "missiletoe_projectile_ball",        anchor: Anchor.MiddleLeft);
         tk2dSpriteAnimationClip gingerbread = AnimatedBullet.Create(name: "missiletoe_projectile_gingerbread", anchor: Anchor.MiddleLeft);
