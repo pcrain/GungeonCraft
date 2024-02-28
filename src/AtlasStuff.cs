@@ -159,14 +159,9 @@ public static class PackerHelper
   internal static tk2dSpriteCollectionData _AmmonomiconCollection = AmmonomiconController.ForceInstance.EncounterIconCollection;
 
   /// <summary>Load a packed texture from a resource string</summary>
-  public static void LoadPackedTextureResource(string textureResourcePath, string metaDataResourcePath)
+  public static void LoadPackedTextureResource(Texture2D atlas, string metaDataResourcePath)
   {
     Assembly asmb = Assembly.GetCallingAssembly();
-    Texture2D atlas = ResourceExtractor.GetTextureFromResource(textureResourcePath, asmb);
-    if (atlas == null)
-      return;
-    if (C.DEBUG_BUILD)
-      ETGModConsole.Log($"extracted texture {textureResourcePath}");
     if (atlas.width != 1024 || atlas.height != 1024)
       ETGModConsole.Log($"D:D:D:");
     using (Stream stream = asmb.GetManifestResourceStream(metaDataResourcePath))
@@ -185,9 +180,7 @@ public static class PackerHelper
         int y = Int32.Parse(tokens[2]);
         int w = Int32.Parse(tokens[3]);
         int h = Int32.Parse(tokens[4]);
-        // _PackedTextures[spriteName] = new SpriteInfo{atlas = atlas, x = x, y = y, w = w, h = h};
         tk2dSpriteDefinition def = _PackedTextures[spriteName] = atlas.SpriteDefFromSegment(spriteName, x, y, w, h);
-        // ETGModConsole.Log($"loaded packed {w}x{h} sprite {spriteName} at {x},{y}");
 
         if (collName == "ProjectileCollection")
         {
