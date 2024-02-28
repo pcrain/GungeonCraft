@@ -9,3 +9,4 @@ obj/*
 *.aseprite
 Sounds-unedited/*
 .todo
+Resources/Atlases/*
