@@ -94,63 +94,56 @@ public static class PackerHelper
   }
 
   internal static Dictionary<string, tk2dSpriteDefinition> _PackedTextures = new();
+  private static readonly Vector2 _TexelSize = new Vector2(0.0625f, 0.0625f);
 
   /// <summary>Construct a tk2dSpriteDefinition from a segment of a packed texture</summary>
   public static tk2dSpriteDefinition SpriteDefFromSegment(this Texture2D texture, string spriteName, int x, int y, int w, int h)
   {
-    Material material = new Material(ShaderCache.Acquire(PlayerController.DefaultShaderName));
+    Material material    = new Material(ShaderCache.Acquire(PlayerController.DefaultShaderName));
     material.mainTexture = texture;
-    float xx = 0f;
-    float yy = 0f;
-    float ww = (float)w / 16f;
-    float hh = (float)h / 16f;
+    float ww             = (float)w / C.PIXELS_PER_TILE;
+    float hh             = (float)h / C.PIXELS_PER_TILE;
+    Vector3 center       = new Vector3(ww / 2f, hh / 2f, 0f);
+    Vector3 extents      = new Vector3(ww,      hh, 0f);
+    float xmin           = (float) x      / (float)texture.width;
+    float xmax           = (float)(x + w) / (float)texture.width;
+    float ymin           = 1f - (float)(y + h) / (float)texture.height;
+    float ymax           = 1f - (float) y      / (float)texture.height;
+
     tk2dSpriteDefinition def = new tk2dSpriteDefinition
     {
-        name = spriteName,
-        normals = new Vector3[]
-        {
-          new Vector3(0f, 0f, -1f),
-          new Vector3(0f, 0f, -1f),
-          new Vector3(0f, 0f, -1f),
-          new Vector3(0f, 0f, -1f)
-        },
-        tangents = new Vector4[]
-        {
-          new Vector4(1f, 0f, 0f, 1f),
-          new Vector4(1f, 0f, 0f, 1f),
-          new Vector4(1f, 0f, 0f, 1f),
-          new Vector4(1f, 0f, 0f, 1f)
-        },
-        texelSize = new Vector2(0.0625f, 0.0625f),
-        extractRegion = false,
-        regionX = 0,
-        regionY = 0,
-        regionW = 0,
-        regionH = 0,
-        flipped = tk2dSpriteDefinition.FlipMode.None,
-        complexGeometry = false,
-        physicsEngine = tk2dSpriteDefinition.PhysicsEngine.Physics3D,
-        colliderType = tk2dSpriteDefinition.ColliderType.Box,
-        // colliderType = tk2dSpriteDefinition.ColliderType.None, // how it used to be in reference code -- not sure if this makes a difference
-        collisionLayer = CollisionLayer.HighObstacle,
-        position0 = new Vector3(xx,      yy,      0f),
-        position1 = new Vector3(xx + ww, yy,      0f),
-        position2 = new Vector3(xx,      yy + hh, 0f),
-        position3 = new Vector3(xx + ww, yy + hh, 0f),
-        material = material,
-        materialInst = material,
-        materialId = 0,
+        name                       = spriteName,
+        normals                    = null,
+        tangents                   = null,
+        texelSize                  = _TexelSize,
+        extractRegion              = false,
+        regionX                    = 0,
+        regionY                    = 0,
+        regionW                    = 0,
+        regionH                    = 0,
+        flipped                    = tk2dSpriteDefinition.FlipMode.None,
+        complexGeometry            = false,
+        physicsEngine              = tk2dSpriteDefinition.PhysicsEngine.Physics3D,
+        colliderType               = tk2dSpriteDefinition.ColliderType.Box, // used to be "None" in reference code -- not sure if this makes a difference
+        collisionLayer             = CollisionLayer.HighObstacle,
+        position0                  = Vector3.zero,
+        position1                  = new Vector3(ww, 0, 0f),
+        position2                  = new Vector3(0,  hh, 0f),
+        position3                  = extents,
+        material                   = material,
+        materialInst               = material,
+        materialId                 = 0,
+        boundsDataCenter           = center,
+        boundsDataExtents          = extents,
+        untrimmedBoundsDataCenter  = center,
+        untrimmedBoundsDataExtents = extents,
         uvs = new Vector2[]
-        {  // texture is flipped vertically in memory
-          new Vector2((float) x      / (float)texture.width, 1f - (float)(y + h) / (float)texture.height),
-          new Vector2((float)(x + w) / (float)texture.width, 1f - (float)(y + h) / (float)texture.height),
-          new Vector2((float) x      / (float)texture.width, 1f - (float) y      / (float)texture.height),
-          new Vector2((float)(x + w) / (float)texture.width, 1f - (float) y      / (float)texture.height),
+        { //NOTE: texture is flipped vertically in memory
+          new Vector2(xmin, ymin),
+          new Vector2(xmax, ymin),
+          new Vector2(xmin, ymax),
+          new Vector2(xmax, ymax),
         },
-        boundsDataCenter           = new Vector3(ww / 2f, hh / 2f, 0f),
-        boundsDataExtents          = new Vector3(ww,      hh, 0f),
-        untrimmedBoundsDataCenter  = new Vector3(ww / 2f, hh / 2f, 0f),
-        untrimmedBoundsDataExtents = new Vector3(ww,      hh, 0f)
     };
     return def;
   }
