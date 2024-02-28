@@ -335,4 +335,52 @@ public static class PackerHelper
         return false; // skip original method
     }
   }
+
+  /// <summary>Patched, thread-safe version of vanilla GetClipByName()</summary>
+  [HarmonyPatch(typeof(tk2dSpriteAnimation), nameof(tk2dSpriteAnimation.GetClipByName))]
+  [HarmonyPatch(typeof(tk2dSpriteAnimation), nameof(tk2dSpriteAnimation.GetClipById))]
+  [HarmonyPatch(typeof(tk2dSpriteAnimation), nameof(tk2dSpriteAnimation.GetClipIdByName), typeof(string))]
+  [HarmonyPatch(typeof(tk2dSpriteAnimation), nameof(tk2dSpriteAnimation.GetClipIdByName), typeof(tk2dSpriteAnimationClip))]
+  private class SafeGetClipPatch
+  {
+    public static void Prefix()
+    {
+        // ETGModConsole.Log($"safety first");
+        if (!C._ModSetupFinished)
+          _AddSpriteMutex.WaitOne();
+    }
+    public static void Postfix()
+    {
+        if (!C._ModSetupFinished)
+          _AddSpriteMutex.ReleaseMutex();
+        // ETGModConsole.Log($"  safety last");
+    }
+  }
+
+  /// <summary>Patched to make sure SetActive() is only called on the main thread</summary>
+  [HarmonyPatch(typeof(GameObject), nameof(GameObject.SetActive))]
+  private class SafeSetActivePatch
+  {
+    // public static bool Prefix()
+    // {
+    //     if (C._ModSetupFinished)
+    //       return true; // call original method
+
+    //     ETGModConsole.Log($"activating");
+    //     return false; // skip original method
+    // }
+
+    public static void Prefix()
+    {
+        // ETGModConsole.Log($"safety first");
+        if (!C._ModSetupFinished)
+          _AddSpriteMutex.WaitOne();
+    }
+    public static void Postfix()
+    {
+        if (!C._ModSetupFinished)
+          _AddSpriteMutex.ReleaseMutex();
+        // ETGModConsole.Log($"  safety last");
+    }
+  }
 }
