@@ -66,7 +66,7 @@ public static class Lazy
             tk2dSprite sprite = obj.AddComponent<tk2dSprite>();
             tk2dSpriteCollectionData coll = ItemHelper.Get(Items.AmmoSynthesizer).sprite.Collection;
             tk2dSpriteDefinition dd = PackerHelper.NamedSpriteInPackedTexture(spritePath);
-            int spriteID = PackerHelper.AddSpriteToCollection(dd, coll);
+            int spriteID = PackerHelper.SafeAddSpriteToCollection(dd, coll);
             sprite.SetSprite(coll, spriteID);
             sprite.SortingOrder = 0;
             sprite.IsPerpendicular = true;
@@ -75,7 +75,7 @@ public static class Lazy
             ETGMod.Databases.Items.SetupItem(item, item.name);
 
             Gungeon.Game.Items.Add(IDs.InternalNames[itemName], item);
-            SpriteBuilder.AddToAmmonomicon(item.sprite.GetCurrentSpriteDef());
+            PackerHelper.SafeAddToAmmonomicon(item.sprite.GetCurrentSpriteDef());
             item.encounterTrackable.journalData.AmmonomiconSprite = item.sprite.GetCurrentSpriteDef().name;
         }
 

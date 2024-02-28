@@ -18,7 +18,7 @@ public static class BeamHelpers
             float convertedOffsetX = colliderOffsets.x / 16f;
             float convertedOffsetY = colliderOffsets.y / 16f;
 
-            int spriteID = PackerHelper.AddSpriteToCollection(spritePath, ETGMod.Databases.Items.ProjectileCollection);
+            int spriteID = PackerHelper.SafeAddSpriteToCollection(spritePath, ETGMod.Databases.Items.ProjectileCollection);
             tk2dTiledSprite tiledSprite = projectile.gameObject.GetOrAddComponent<tk2dTiledSprite>();
 
 
@@ -51,7 +51,7 @@ public static class BeamHelpers
                 foreach (string path in spritePaths)
                 {
                     tk2dSpriteCollectionData collection = ETGMod.Databases.Items.ProjectileCollection;
-                    int frameSpriteId = PackerHelper.AddSpriteToCollection(path, collection);
+                    int frameSpriteId = PackerHelper.SafeAddSpriteToCollection(path, collection);
                     tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
                     frameDef.ConstructOffsetsFromAnchor(Anchor.MiddleLeft);
                     frameDef.colliderVertices = def.colliderVertices;
@@ -163,7 +163,7 @@ public static class BeamHelpers
         foreach (string path in spritePaths)
         {
             tk2dSpriteCollectionData collection = ETGMod.Databases.Items.ProjectileCollection;
-            int frameSpriteId = PackerHelper.AddSpriteToCollection(path, collection);
+            int frameSpriteId = PackerHelper.SafeAddSpriteToCollection(path, collection);
             tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
             frameDef.ConstructOffsetsFromAnchor(anchorOverride ?? Anchor.MiddleLeft);
             if (overrideVertices != null)

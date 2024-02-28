@@ -53,7 +53,7 @@ public static class VFX
     /// </summary>
     public static void RegisterSprite(string path)
     {
-        sprites[path.Substring(path.LastIndexOf("/")+1)] = PackerHelper.AddSpriteToCollection(PackerHelper.NamedSpriteInPackedTexture(path), OverheadVFXCollection);
+        sprites[path.Substring(path.LastIndexOf("/")+1)] = PackerHelper.SafeAddSpriteToCollection(PackerHelper.NamedSpriteInPackedTexture(path), OverheadVFXCollection);
     }
 
     /// <summary>
@@ -69,7 +69,7 @@ public static class VFX
             // return;
         }
 
-        int spriteID = PackerHelper.AddSpriteToCollection(PackerHelper.NamedSpriteInPackedTexture(spritePaths[0]), OverheadVFXCollection);
+        int spriteID = PackerHelper.SafeAddSpriteToCollection(spritePaths[0], OverheadVFXCollection);
 
         GameObject Obj     = new GameObject(name);
             Obj.AddComponent<tk2dSprite>().SetSprite(OverheadVFXCollection, spriteID);
@@ -83,15 +83,7 @@ public static class VFX
         tk2dBaseSprite baseSprite = Obj.GetComponent<tk2dBaseSprite>();
         tk2dSpriteDefinition baseDef = baseSprite.GetCurrentSpriteDef();
         baseDef.ConstructOffsetsFromAnchor(
-            Anchor.LowerCenter,
-            baseDef.position3);
-
-        // int spriteID = PackerHelper.AddSpriteToCollection(spritePaths[0], OverheadVFXCollection);
-        // ETGModConsole.Log($"attempting to load {spritePaths[0]}");
-        // tk2dSpriteDefinition altDef = PackerHelper.NamedSpriteInPackedTexture(spritePaths[0]);
-        // if (altDef == null)
-        //     ETGModConsole.Log($"YIKES O_O");
-        // int spriteID = PackerHelper.AddSpriteToCollection(altDef, OverheadVFXCollection);
+            Anchor.LowerCenter, Vector2.zero); //NOTE: this used to be baseDef.position3, but changed during migration to packed textures...still unsure why
 
         tk2dSprite sprite = Obj.GetOrAddComponent<tk2dSprite>();
         sprite.SetSprite(OverheadVFXCollection, spriteID);
@@ -123,7 +115,7 @@ public static class VFX
         List<tk2dSpriteAnimationFrame> frames = new List<tk2dSpriteAnimationFrame>();
         for (int i = 0; i < spritePaths.Count; i++)
         {
-            int frameSpriteId                   = PackerHelper.AddSpriteToCollection(PackerHelper.NamedSpriteInPackedTexture(spritePaths[i]), OverheadVFXCollection);
+            int frameSpriteId                   = PackerHelper.SafeAddSpriteToCollection(spritePaths[i], OverheadVFXCollection);
             tk2dSpriteDefinition frameDef       = OverheadVFXCollection.spriteDefinitions[frameSpriteId];
             frameDef.ConstructOffsetsFromAnchor(anchor);
             frameDef.colliderVertices = defaultDef.colliderVertices;
@@ -506,7 +498,7 @@ public static class VFX
           float convertedOffsetX = colliderOffsets.x / 16f;
           float convertedOffsetY = colliderOffsets.y / 16f;
 
-          int spriteID = PackerHelper.AddSpriteToCollection(spritePath, ETGMod.Databases.Items.ProjectileCollection);
+          int spriteID = PackerHelper.SafeAddSpriteToCollection(spritePath, ETGMod.Databases.Items.ProjectileCollection);
           tk2dTiledSprite tiledSprite = newTrailObject.GetOrAddComponent<tk2dTiledSprite>();
 
           tiledSprite.SetSprite(ETGMod.Databases.Items.ProjectileCollection, spriteID);
@@ -572,7 +564,7 @@ public static class VFX
           float convertedOffsetX = colliderOffsets.x / 16f;
           float convertedOffsetY = colliderOffsets.y / 16f;
 
-          int spriteID = PackerHelper.AddSpriteToCollection(spritePath, ETGMod.Databases.Items.ProjectileCollection);
+          int spriteID = PackerHelper.SafeAddSpriteToCollection(spritePath, ETGMod.Databases.Items.ProjectileCollection);
           tk2dTiledSprite tiledSprite = newTrailObject.GetOrAddComponent<tk2dTiledSprite>();
 
           tiledSprite.SetSprite(ETGMod.Databases.Items.ProjectileCollection, spriteID);

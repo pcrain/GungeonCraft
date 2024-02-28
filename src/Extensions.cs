@@ -833,7 +833,7 @@ public static class Extensions
     List<int> spriteIds = new();
     foreach (string spritePath in ResMap.Get(animationName))
     {
-        int frameSpriteId = PackerHelper.AddSpriteToCollection(spritePath, collection);
+        int frameSpriteId = PackerHelper.SafeAddSpriteToCollection(spritePath, collection);
         spriteIds.Add(frameSpriteId);
         if (copyShaders)
         {

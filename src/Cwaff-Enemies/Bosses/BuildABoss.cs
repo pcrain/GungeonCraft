@@ -959,7 +959,7 @@ public static class BH
         if (String.IsNullOrEmpty(v))
           continue;
         // ETGModConsole.Log($"  {v}");
-        PackerHelper.AddSpriteToCollection($"{resourcePath}/{v}", bossSprites);
+        PackerHelper.SafeAddSpriteToCollection($"{resourcePath}/{v}", bossSprites);
         ++lastAnim;
       }
       DirectionalAnimation.DirectionType dir;
@@ -977,7 +977,7 @@ public static class BH
     tk2dSpriteCollectionData bossSprites = SpriteBuilder.ConstructCollection(prefab, (prefab.name+" Collection").Replace(" ","_"));
     UnityEngine.Object.DontDestroyOnLoad(bossSprites);
     for (int i = 0; i < spritePaths.Length; i++)
-      PackerHelper.AddSpriteToCollection(spritePaths[i], bossSprites);
+      PackerHelper.SafeAddSpriteToCollection(spritePaths[i], bossSprites);
     return bossSprites;
   }
 
