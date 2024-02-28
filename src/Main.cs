@@ -95,33 +95,22 @@ public class Initialisation : BaseUnityPlugin
 
             #region Set up Packed Texture Atlases (absolutely cannot be async, handles the meat of texture loading)
                 System.Diagnostics.Stopwatch setupAtlasesWatch = System.Diagnostics.Stopwatch.StartNew();
-                // System.Threading.Tasks.
 
                 Assembly asmb = Assembly.GetExecutingAssembly();
-                List<Texture2D> atlases = new();
-                for (int i = 1; i <= 5; ++i)
+                for (int i = 1; ; ++i)
                 {
-                    atlases.Add(ResourceExtractor.GetTextureFromResource($"CwaffingTheGungy.Resources.Atlases.atlas_{i}.png", asmb));
+                    string atlasPath = $"CwaffingTheGungy.Resources.Atlases.atlas_{i}.png";
+                    using (Stream s = asmb.GetManifestResourceStream(atlasPath))
+                    {
+                      if (s == null)
+                          break;
+                    }
+                    Texture2D atlas = ResourceExtractor.GetTextureFromResource(atlasPath, asmb);
                     if (C.DEBUG_BUILD)
                         ETGModConsole.Log($"extracted texture from atlas {i}");
+                    PackerHelper.LoadPackedTextureResource(
+                      atlas: atlas, metaDataResourcePath: $"CwaffingTheGungy.Resources.Atlases.atlas_{i}.atlas");
                 }
-
-                // List<Thread> atlasThreads = new();
-                for (int i = 1; i <= 5; ++i)  //BUG: shouldn't hard code number of atlases
-                {
-                    // atlasThreads.Add(new Thread(new ParameterizedThreadStart((data) => {
-                        // int index = (int)data;
-                        int index = i;
-                        // ETGModConsole.Log($"starting texture thread {index}");
-                        PackerHelper.LoadPackedTextureResource(
-                          atlas:  atlases[index-1],
-                          metaDataResourcePath: $"CwaffingTheGungy.Resources.Atlases.atlas_{index}.atlas");
-                    // })));
-                    // atlasThreads[i-1].Start(i);
-                }
-                // foreach (Thread t in atlasThreads)
-                //     t.Join();
-
                 // Build resource map for ease of access
                 ResMap.Build();
 
