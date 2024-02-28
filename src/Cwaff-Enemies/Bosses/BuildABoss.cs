@@ -217,7 +217,6 @@ public class BuildABoss
     // Do some basic boss prefab / guid setup
     BuildABoss bb = new BuildABoss();
     bb.guid = guid;
-    ETGModConsole.Log($"BUILDING SANS");
     bb.prefab = BossBuilder.BuildPrefab(bossname, bb.guid, defaultSprite,
       IntVector2.Zero, hitboxSize, false, true);
 

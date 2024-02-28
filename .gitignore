@@ -7,5 +7,5 @@ obj/*
 # .bnk files double the size if we're already including the .wav files
 *.bnk
 *.aseprite
-Resources/Sounds-unedited/*
+Sounds-unedited/*
 .todo

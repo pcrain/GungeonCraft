@@ -347,27 +347,6 @@ public class Initialisation : BaseUnityPlugin
                 setupSynergiesThread.Start();
             #endregion
 
-            #region UI Sprites (cannot be async, must set up textures on main thread)
-                System.Diagnostics.Stopwatch setupUIWatch = System.Diagnostics.Stopwatch.StartNew();
-                // BetterAtlas.AddUISpriteBatch(new(){
-                //     ResMap.Get("barter_s_icon")[0]+".png",         Bart._BarterSpriteS,
-                //     ResMap.Get("barter_a_icon")[0]+".png",         Bart._BarterSpriteA,
-                //     ResMap.Get("barter_b_icon")[0]+".png",         Bart._BarterSpriteB,
-                //     ResMap.Get("barter_c_icon")[0]+".png",         Bart._BarterSpriteC,
-                //     ResMap.Get("soul_sprite_ui_icon")[0]+".png",   Uppskeruvel._SoulSpriteUI,
-                //     ResMap.Get("prism_ui_icon")[0]+".png",         Suncaster._PrismUI,
-                //     ResMap.Get("glockarina_storm_ui_icon")[0]+".png", Glockarina._StormSpriteUI,
-                //     ResMap.Get("glockarina_time_ui_icon")[0]+".png",  Glockarina._TimeSpriteUI,
-                //     ResMap.Get("glockarina_saria_ui_icon")[0]+".png", Glockarina._SariaSpriteUI,
-                //     ResMap.Get("glockarina_empty_ui_icon")[0]+".png", Glockarina._EmptySpriteUI,
-                //     // needs to be three separate sprites or the UI breaks
-                //     ResMap.Get("adrenaline_heart")[0]+".png", AdrenalineShot._FullHeartSpriteUI,
-                //     ResMap.Get("adrenaline_heart")[0]+".png", AdrenalineShot._HalfHeartSpriteUI,
-                //     ResMap.Get("adrenaline_heart")[0]+".png", AdrenalineShot._EmptyHeartSpriteUI,
-                // }); //BUG: put this back later
-                setupUIWatch.Stop();
-            #endregion
-
             #region Shop NPCs
                 System.Diagnostics.Stopwatch setupShopsWatch = System.Diagnostics.Stopwatch.StartNew();
                 // InsuranceBoi.Init();
@@ -383,7 +362,7 @@ public class Initialisation : BaseUnityPlugin
             #region Bosses yo
                 System.Diagnostics.Stopwatch setupBossesWatch = System.Diagnostics.Stopwatch.StartNew();
                 BossBuilder.Init();
-                SansBoss.Init(); //BUG: boss card isn't loaded properly
+                SansBoss.Init();
                 setupBossesWatch.Stop();
             #endregion
 
@@ -457,6 +436,27 @@ public class Initialisation : BaseUnityPlugin
                 // {
                 //     ETGModConsole.Log($"  you broke it: {ex}");
                 // }
+            #endregion
+
+            #region UI Sprites (cannot be async, must set up textures on main thread)
+                System.Diagnostics.Stopwatch setupUIWatch = System.Diagnostics.Stopwatch.StartNew();
+                BetterAtlas.AddUISpriteBatch(new(){
+                    "barter_s_icon",            Bart._BarterSpriteS,
+                    "barter_a_icon",            Bart._BarterSpriteA,
+                    "barter_b_icon",            Bart._BarterSpriteB,
+                    "barter_c_icon",            Bart._BarterSpriteC,
+                    "soul_sprite_ui_icon",      Uppskeruvel._SoulSpriteUI,
+                    "prism_ui_icon",            Suncaster._PrismUI,
+                    "glockarina_storm_ui_icon", Glockarina._StormSpriteUI,
+                    "glockarina_time_ui_icon",  Glockarina._TimeSpriteUI,
+                    "glockarina_saria_ui_icon", Glockarina._SariaSpriteUI,
+                    "glockarina_empty_ui_icon", Glockarina._EmptySpriteUI,
+                    // needs to be three separate sprites or the UI breaks
+                    "adrenaline_heart",         AdrenalineShot._FullHeartSpriteUI,
+                    "adrenaline_heart",         AdrenalineShot._HalfHeartSpriteUI,
+                    "adrenaline_heart",         AdrenalineShot._EmptyHeartSpriteUI,
+                });
+                setupUIWatch.Stop();
             #endregion
 
             #region Wait for Async stuff to finish up
