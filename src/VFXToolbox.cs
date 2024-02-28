@@ -65,7 +65,8 @@ public static class VFX
         {
             if (C._WARN_DUPLICATE_VFX)
                 Lazy.DebugWarn($"  HEY! re-creating VFX with name {name}. If this is intentional, please reuse the original VFX, don't create it twice.");
-            return;
+            //NOTE: can't return early here since it's valid to reuse the same sprite for two different VFX...it'll just overwrite the animations dict
+            // return;
         }
 
         int spriteID = PackerHelper.AddSpriteToCollection(PackerHelper.NamedSpriteInPackedTexture(spritePaths[0]), OverheadVFXCollection);

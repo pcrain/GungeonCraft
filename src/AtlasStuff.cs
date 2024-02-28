@@ -314,7 +314,7 @@ public static class PackerHelper
   {
     public static bool Prefix(string spriteName, GameObject obj, Assembly assembly, ref GameObject __result)
     {
-        System.Console.WriteLine($"CALLING PATCHED SpriteFromResource for {spriteName}");
+        // System.Console.WriteLine($"CALLING PATCHED SpriteFromResource for {spriteName}");
         if (obj == null)
           obj = new GameObject();
 
