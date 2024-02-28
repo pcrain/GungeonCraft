@@ -202,27 +202,16 @@ public static class PackerHelper
         // ETGModConsole.Log($"added {spriteName} to weapons");
         string json = $"CwaffingTheGungy.Resources.{collName}.{spriteName}.json";
 
-        using var jstream = asmb.GetManifestResourceStream(json);
-        if (jstream == null) // should only happen for _trimmed sprites
+        using (Stream jstream = asmb.GetManifestResourceStream(json))
         {
-          // ETGModConsole.Log($"could not find resource {json}");
-          continue;
+          if (jstream == null) // should only happen for _trimmed sprites
+            continue;
+          AssetSpriteData frameData = JSONHelper.ReadJSON<AssetSpriteData>(jstream);
+          _WeaponCollection.SetAttachPoints(id, frameData.attachPoints);
+          if (_WeaponCollection.inst != _WeaponCollection)
+              _WeaponCollection.inst.SetAttachPoints(id, frameData.attachPoints);
+          // ETGModConsole.Log($"setting attach points for {id} == {spriteName}");
         }
-        AssetSpriteData frameData = default;
-        try
-        {
-            frameData = JSONHelper.ReadJSON<AssetSpriteData>(jstream);
-        }
-        catch
-        {
-          ETGModConsole.Log("Error: invalid json at project path " + json);
-          jstream.Dispose();
-          continue;
-        }
-        // ETGModConsole.Log($"setting attach points for {id} == {spriteName}");
-        _WeaponCollection.SetAttachPoints(id, frameData.attachPoints);
-        if (_WeaponCollection.inst != _WeaponCollection)
-            _WeaponCollection.inst.SetAttachPoints(id, frameData.attachPoints);
       }
     }
   }
