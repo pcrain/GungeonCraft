@@ -101,7 +101,9 @@ public class Initialisation : BaseUnityPlugin
                 System.Diagnostics.Stopwatch attachPointsWatch = System.Diagnostics.Stopwatch.StartNew();
                 Dictionary<string, tk2dSpriteDefinition.AttachPoint[]> attachPoints =
                     PackerHelper.ReadAttachPointsFromTSV(asmb, $"CwaffingTheGungy.Resources.Atlases.attach_points.tsv");
-                attachPointsWatch.Stop(); ETGModConsole.Log($"    attachPoints finished in {attachPointsWatch.ElapsedMilliseconds} milliseconds");
+                attachPointsWatch.Stop();
+                if (C.DEBUG_BUILD)
+                    ETGModConsole.Log($"    attachPoints finished in {attachPointsWatch.ElapsedMilliseconds} milliseconds");
 
                 //WARNING: I know this looks like it can be threaded, but it can't...I've tried three times now, so much can go wrong...don't do it pretzel D:
                 for (int i = 1; ; ++i)
@@ -431,7 +433,7 @@ public class Initialisation : BaseUnityPlugin
                 // setupBossesThread.Start();
             #endregion
 
-            // Need to wait for all items to be loaded before setting up synergies, shops, and bosses
+            // Need to wait for all items to be loaded before setting up synergies and shops
             System.Diagnostics.Stopwatch awaitItemsWatch = System.Diagnostics.Stopwatch.StartNew();
             setupActivesThread.Join();
             setupPassivesThread.Join();

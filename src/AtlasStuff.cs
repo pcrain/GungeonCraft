@@ -166,6 +166,12 @@ public static class PackerHelper
     Assembly asmb = Assembly.GetCallingAssembly();
     if (atlas.width != 1024 || atlas.height != 1024)
       ETGModConsole.Log($"D:D:D:");
+
+    List<tk2dSpriteDefinition> projectileSprites = new();
+    List<tk2dSpriteDefinition> ammonomiconSprites = new();
+    List<tk2dSpriteDefinition> weaponSprites = new();
+    List<tk2dSpriteDefinition.AttachPoint[]> weaponAttachPoints = new();
+
     using (Stream stream = asmb.GetManifestResourceStream(metaDataResourcePath))
     using (StreamReader reader = new StreamReader(stream))
     {
@@ -184,32 +190,77 @@ public static class PackerHelper
         int h = Int32.Parse(tokens[4]);
         tk2dSpriteDefinition def = _PackedTextures[spriteName] = atlas.SpriteDefFromSegment(spriteName, x, y, w, h);
 
+        //NOTE: we don't need to use SafeAddSpriteToCollection() since this is all happening on the main thread
         if (collName == "ProjectileCollection")
         {
-          PackerHelper.SafeAddSpriteToCollection(def, ETGMod.Databases.Items.ProjectileCollection);
+          projectileSprites.Add(def);
+          // SpriteBuilder.AddSpriteToCollection(def, ETGMod.Databases.Items.ProjectileCollection);
           continue;
         }
 
         if (collName == "Ammonomicon Encounter Icon Collection")
         {
-          PackerHelper.SafeAddSpriteToCollection(def, _AmmonomiconCollection);
+          ammonomiconSprites.Add(def);
+          // SpriteBuilder.AddSpriteToCollection(def, _AmmonomiconCollection);
           continue;
         }
 
         // everything from here onward only applies to weapon collection
-        if (collName != "WeaponCollection")
+        if (collName == "WeaponCollection")
+        {
+          weaponSprites.Add(def);
+          if (attachPoints.TryGetValue(spriteName, out tk2dSpriteDefinition.AttachPoint[] aps))
+            weaponAttachPoints.Add(aps);
+          else
+            weaponAttachPoints.Add(null);
           continue;
+        }
 
-        int id = PackerHelper.SafeAddSpriteToCollection(def, _WeaponCollection);
-        if (!attachPoints.TryGetValue(spriteName, out tk2dSpriteDefinition.AttachPoint[] aps))
-          continue;
+        // int id = SpriteBuilder.AddSpriteToCollection(def, _WeaponCollection);
+        //   continue;
 
-        _WeaponCollection.SetAttachPoints(id, aps);
-        if (_WeaponCollection.inst != _WeaponCollection)
-            _WeaponCollection.inst.SetAttachPoints(id, aps);
+        // _WeaponCollection.SetAttachPoints(id, aps);
+        // if (_WeaponCollection.inst != _WeaponCollection)
+        //     _WeaponCollection.inst.SetAttachPoints(id, aps);
         // ETGModConsole.Log($"setting attach points for {id} == {spriteName}");
       }
     }
+
+    AddSpritesToCollection(projectileSprites, ETGMod.Databases.Items.ProjectileCollection);
+    AddSpritesToCollection(ammonomiconSprites, _AmmonomiconCollection);
+    AddSpritesToCollection(weaponSprites, _WeaponCollection, weaponAttachPoints);
+  }
+
+  /// <summary>Helper method for adding multiple sprites to a collection at once</summary>
+  private static void AddSpritesToCollection(List<tk2dSpriteDefinition> newDefs, tk2dSpriteCollectionData collection, List<tk2dSpriteDefinition.AttachPoint[]> attachPoints = null)
+  {
+      if (collection.spriteNameLookupDict == null)
+          collection.InitDictionary();
+
+      //Add definition to collection
+      int oldLength = collection.spriteDefinitions.Length;
+      Array.Resize(ref collection.spriteDefinitions, oldLength + newDefs.Count);
+      int i = oldLength;
+      foreach (tk2dSpriteDefinition def in newDefs)
+      {
+        collection.spriteDefinitions[i] = def;
+        collection.spriteNameLookupDict[def.name] = i;
+        i++;
+      }
+
+      // Add attach points if they're available
+      if (attachPoints == null)
+        return;
+      for (int j = 0; j < attachPoints.Count; ++j)
+      {
+        tk2dSpriteDefinition.AttachPoint[] aps = attachPoints[j];
+        if (aps == null)
+          continue;
+        collection.SetAttachPoints(oldLength + j, aps);
+        if (collection.inst != collection)
+            collection.inst.SetAttachPoints(oldLength + j, aps);
+        // ETGModConsole.Log($"setting attach points for {id} == {spriteName}");
+      }
   }
 
   public static Dictionary<string, tk2dSpriteDefinition.AttachPoint[]> ReadAttachPointsFromTSV(Assembly asmb, string tsvPath)

@@ -45,7 +45,7 @@ namespace CwaffingTheGungy;
 // Alexandria's method unnecessarily rebuilds the entire sprite dictionary after every sprite is added
 public static class SpriteBuilderHotfix
 {
-    // [HarmonyPatch(typeof(SpriteBuilder), nameof(PackerHelper.AddSpriteToCollection), typeof(tk2dSpriteDefinition), typeof(tk2dSpriteCollectionData))]
+    // [HarmonyPatch(typeof(SpriteBuilder), nameof(SpriteBuilder.AddSpriteToCollection), typeof(tk2dSpriteDefinition), typeof(tk2dSpriteCollectionData))]
     private class AddSpritePatch
     {
         static bool Prefix(tk2dSpriteDefinition spriteDefinition, tk2dSpriteCollectionData collection, ref int __result)
@@ -53,11 +53,14 @@ public static class SpriteBuilderHotfix
             if (C._ModSetupFinished)
                 return true; // run original method if our mod is set up
 
+            // ETGModConsole.Log($"patched version");
+
             //Initialize the sprite lookup dictionary if necessary
             if (collection.spriteNameLookupDict == null)
                 collection.InitDictionary();
 
             //Add definition to collection
+            //WARNING: this messes up sprite indexing, don't do it
             int oldLength = collection.spriteNameLookupDict.Keys.Count; // the number of keys in our lookup dict is our actual number of sprites
             if (oldLength >= collection.spriteDefinitions.Length)
             {
