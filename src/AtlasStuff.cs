@@ -159,7 +159,7 @@ public static class PackerHelper
   internal static tk2dSpriteCollectionData _AmmonomiconCollection = AmmonomiconController.ForceInstance.EncounterIconCollection;
 
   /// <summary>Load a packed texture from a resource string</summary>
-  public static void LoadPackedTextureResource(Texture2D atlas, string metaDataResourcePath)
+  public static void LoadPackedTextureResource(Texture2D atlas, Dictionary<string, tk2dSpriteDefinition.AttachPoint[]> attachPoints, string metaDataResourcePath)
   {
     Assembly asmb = Assembly.GetCallingAssembly();
     if (atlas.width != 1024 || atlas.height != 1024)
@@ -199,21 +199,42 @@ public static class PackerHelper
           continue;
 
         int id = PackerHelper.SafeAddSpriteToCollection(def, _WeaponCollection);
-        // ETGModConsole.Log($"added {spriteName} to weapons");
-        string json = $"CwaffingTheGungy.Resources.{collName}.{spriteName}.json";
+        if (!attachPoints.TryGetValue(spriteName, out tk2dSpriteDefinition.AttachPoint[] aps))
+          continue;
 
-        using (Stream jstream = asmb.GetManifestResourceStream(json))
+        _WeaponCollection.SetAttachPoints(id, aps);
+        if (_WeaponCollection.inst != _WeaponCollection)
+            _WeaponCollection.inst.SetAttachPoints(id, aps);
+        // ETGModConsole.Log($"setting attach points for {id} == {spriteName}");
+      }
+    }
+  }
+
+  public static Dictionary<string, tk2dSpriteDefinition.AttachPoint[]> ReadAttachPointsFromTSV(Assembly asmb, string tsvPath)
+  {
+    Dictionary<string, tk2dSpriteDefinition.AttachPoint[]> attachPointDict = new();
+
+    using (Stream stream = asmb.GetManifestResourceStream(tsvPath))
+    using (StreamReader reader = new StreamReader(stream))
+    {
+      string line = null;
+      while ((line = reader.ReadLine()) != null)
+      {
+        string[] tokens = line.Split('\t');
+        tk2dSpriteDefinition.AttachPoint[] aps = attachPointDict[tokens[0]] = new tk2dSpriteDefinition.AttachPoint[(tokens.Length - 1) / 3];
+        int index = 0;
+        for (int i = 1; i < tokens.Length; i += 3)
         {
-          if (jstream == null) // should only happen for _trimmed sprites
-            continue;
-          AssetSpriteData frameData = JSONHelper.ReadJSON<AssetSpriteData>(jstream);
-          _WeaponCollection.SetAttachPoints(id, frameData.attachPoints);
-          if (_WeaponCollection.inst != _WeaponCollection)
-              _WeaponCollection.inst.SetAttachPoints(id, frameData.attachPoints);
-          // ETGModConsole.Log($"setting attach points for {id} == {spriteName}");
+          aps[index] = new tk2dSpriteDefinition.AttachPoint(){
+            name = tokens[i],
+            position = new Vector3(float.Parse(tokens[i+1]), float.Parse(tokens[i+2]), 0f)
+          };
+          ++index;
         }
       }
     }
+
+    return attachPointDict;
   }
 
   /// <summary>Modification of Alexandria method using our own packed textures</summary>

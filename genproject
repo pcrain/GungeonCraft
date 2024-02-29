@@ -127,6 +127,13 @@ if [ $updateaudio -eq 1 ]; then
   echo "$audiodata" > "${audiochecksums}"
 fi
 
+# The below magic reads in each JSON, grabs the attachPoints array, flattens it to a sequence of (name, x, y) triplets, prepends the filename to each array,
+#   joins it into a larger array of arrays, and maps it to a TSV file
+echo -e "[${GRN}>${BLN}] Regenerating attach point data"
+jq -r -n \
+  'reduce inputs as $s (.; . += [($s.attachPoints[1:] | [(input_filename | split("/")[-1] | sub("\\.json$";"") ), (.[] | .name, .position.x, .position.y)])]) | map(@tsv)[]' \
+  ./RawResources/WeaponCollection/*.json > ./Resources/Atlases/attach_points.tsv
+
 #Source files
 echo -e "[${GRN}>${BLN}] Scanning for source files"
 while read -r line; do

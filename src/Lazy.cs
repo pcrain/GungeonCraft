@@ -160,7 +160,7 @@ public static class Lazy
                 gun.idleAnimation                = fixedIdleAnimation;
                 gun.spriteAnimator.defaultClipId = fixedIdleAnimationClipId;
 
-                // Fix pickup object sprite
+                // Fix pickup object sprite (handled by a Harmony patch now)
                 // gun.m_defaultSpriteID = fixedIdleAnimationSpriteId;
                 // gun.GetComponent<PickupObject>().sprite.spriteId = fixedIdleAnimationSpriteId;
                 // _GunSpriteCollection.SpriteIDsWithAttachPoints.Add(fixedIdleAnimationSpriteId);

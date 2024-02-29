@@ -97,6 +97,12 @@ public class Initialisation : BaseUnityPlugin
                 System.Diagnostics.Stopwatch setupAtlasesWatch = System.Diagnostics.Stopwatch.StartNew();
 
                 Assembly asmb = Assembly.GetExecutingAssembly();
+
+                System.Diagnostics.Stopwatch attachPointsWatch = System.Diagnostics.Stopwatch.StartNew();
+                Dictionary<string, tk2dSpriteDefinition.AttachPoint[]> attachPoints =
+                    PackerHelper.ReadAttachPointsFromTSV(asmb, $"CwaffingTheGungy.Resources.Atlases.attach_points.tsv");
+                attachPointsWatch.Stop(); ETGModConsole.Log($"    attachPoints finished in {attachPointsWatch.ElapsedMilliseconds} milliseconds");
+
                 for (int i = 1; ; ++i)
                 {
                     string atlasPath = $"CwaffingTheGungy.Resources.Atlases.atlas_{i}.png";
@@ -109,7 +115,7 @@ public class Initialisation : BaseUnityPlugin
                     if (C.DEBUG_BUILD)
                         ETGModConsole.Log($"extracted texture from atlas {i}");
                     PackerHelper.LoadPackedTextureResource(
-                      atlas: atlas, metaDataResourcePath: $"CwaffingTheGungy.Resources.Atlases.atlas_{i}.atlas");
+                      atlas: atlas, attachPoints: attachPoints, metaDataResourcePath: $"CwaffingTheGungy.Resources.Atlases.atlas_{i}.atlas");
                 }
                 // Build resource map for ease of access
                 ResMap.Build();
