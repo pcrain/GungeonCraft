@@ -11,8 +11,6 @@ public class IceCream : PlayerItem
 
     public static void Init()
     {
-        IceCreamGun.Add(); // add the gun here because it's a pseudo-gun
-
         PlayerItem item = Lazy.SetupActive<IceCream>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
         item.consumable   = false;

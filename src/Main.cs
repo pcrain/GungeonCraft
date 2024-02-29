@@ -184,16 +184,6 @@ public class Initialisation : BaseUnityPlugin
                 setupConfig1Thread.Start();
             #endregion
 
-            #region Save API Setup (Async)
-                System.Diagnostics.Stopwatch setupSaveWatch = null;
-                Thread setupSaveThread = new Thread(() => {
-                    setupSaveWatch = System.Diagnostics.Stopwatch.StartNew();
-                    SaveAPI.SaveAPIManager.Setup(C.MOD_PREFIX);  // Needed for prerequisite checking and save serialization
-                    setupSaveWatch.Stop();
-                });
-                setupSaveThread.Start();
-            #endregion
-
             #region Round 2 Config (Requires sprites, can technically be async but stuff below might need it)
                 System.Diagnostics.Stopwatch setupConfig2Watch = System.Diagnostics.Stopwatch.StartNew();
                 Thread setupConfig2Thread = new Thread(() => {
@@ -215,8 +205,10 @@ public class Initialisation : BaseUnityPlugin
                 setupConfig2Thread.Start();
             #endregion
 
+            System.Diagnostics.Stopwatch awaitConfigWatch = System.Diagnostics.Stopwatch.StartNew();
             setupConfig1Thread.Join();
             setupConfig2Thread.Join(); // need to wait for round 2 configuration so all VFX / Goops are loaded
+            awaitConfigWatch.Stop();
 
             #region Guns
                 System.Diagnostics.Stopwatch setupGunsWatch = null;
@@ -261,14 +253,7 @@ public class Initialisation : BaseUnityPlugin
                     HandCannon.Add();
                     HatchlingGun.Add();
                     Ticonderogun.Add();
-                    setupGunsWatch.Stop();
-                });
-                setupGunsThread.Start();
-
-                System.Diagnostics.Stopwatch setupGuns2Watch = null;
-                Thread setupGuns2Thread = new Thread(() => {
-                    setupGuns2Watch = System.Diagnostics.Stopwatch.StartNew();
-
+                    IceCreamGun.Add(); //NOTE: adding this here because it's a pseudo-gun and it ruins threading if initialized with other items
                     AimuHakurei.Add();
                     SeltzerPelter.Add();
                     Missiletoe.Add();
@@ -293,9 +278,9 @@ public class Initialisation : BaseUnityPlugin
                     Suncaster.Add();
                     KALI.Add();
                     AlienNailgun.Add();
-                    setupGuns2Watch.Stop();
+                    setupGunsWatch.Stop();
                 });
-                setupGuns2Thread.Start();
+                setupGunsThread.Start();
             #endregion
 
             #region Actives
@@ -382,7 +367,17 @@ public class Initialisation : BaseUnityPlugin
                 setupAudioThread.Start();
             #endregion
 
-            #region Floor and Flow Initialization
+            #region Save API Setup (Async)
+                System.Diagnostics.Stopwatch setupSaveWatch = null;
+                Thread setupSaveThread = new Thread(() => {
+                    setupSaveWatch = System.Diagnostics.Stopwatch.StartNew();
+                    SaveAPI.SaveAPIManager.Setup(C.MOD_PREFIX);  // Needed for prerequisite checking and save serialization
+                    setupSaveWatch.Stop();
+                });
+                setupSaveThread.Start();
+            #endregion
+
+            #region Floor and Flow Initialization (sync for now, might not need to be)
                 System.Diagnostics.Stopwatch setupFloorsWatch = System.Diagnostics.Stopwatch.StartNew();
 
                 // Flow stuff stolen from Apache
@@ -425,13 +420,35 @@ public class Initialisation : BaseUnityPlugin
                 setupFloorsWatch.Stop();
             #endregion
 
+            #region Bosses yo (not async for now due to needing to load boss card textures)
+                System.Diagnostics.Stopwatch setupBossesWatch = null;
+                // Thread setupBossesThread = new Thread(() => {
+                    setupBossesWatch = System.Diagnostics.Stopwatch.StartNew();
+                    BossBuilder.Init();
+                    SansBoss.Init();
+                    setupBossesWatch.Stop();
+                // });
+                // setupBossesThread.Start();
+            #endregion
+
             // Need to wait for all items to be loaded before setting up synergies, shops, and bosses
             System.Diagnostics.Stopwatch awaitItemsWatch = System.Diagnostics.Stopwatch.StartNew();
             setupActivesThread.Join();
             setupPassivesThread.Join();
             setupGunsThread.Join();
-            setupGuns2Thread.Join();
             awaitItemsWatch.Stop();
+
+            #region Shop NPCs (Async)
+                System.Diagnostics.Stopwatch setupShopsWatch = null;
+                Thread setupShopsThread = new Thread(() => {
+                    setupShopsWatch = System.Diagnostics.Stopwatch.StartNew();
+                    // InsuranceBoi.Init();
+                    Cammy.Init();
+                    Bart.Init();
+                    setupShopsWatch.Stop();
+                });
+                setupShopsThread.Start();
+            #endregion
 
             #region Synergies (Async)
                 System.Diagnostics.Stopwatch setupSynergiesWatch = null;
@@ -442,21 +459,6 @@ public class Initialisation : BaseUnityPlugin
                     setupSynergiesWatch.Stop();
                 });
                 setupSynergiesThread.Start();
-            #endregion
-
-            #region Shop NPCs
-                System.Diagnostics.Stopwatch setupShopsWatch = System.Diagnostics.Stopwatch.StartNew();
-                // InsuranceBoi.Init();
-                Cammy.Init();
-                Bart.Init();
-                setupShopsWatch.Stop();
-            #endregion
-
-            #region Bosses yo
-                System.Diagnostics.Stopwatch setupBossesWatch = System.Diagnostics.Stopwatch.StartNew();
-                BossBuilder.Init();
-                SansBoss.Init();
-                setupBossesWatch.Stop();
             #endregion
 
             #region Old Asset Stuff
@@ -494,6 +496,8 @@ public class Initialisation : BaseUnityPlugin
                 setupSaveThread.Join();
                 setupAudioThread.Join();
                 setupSynergiesThread.Join();
+                setupShopsThread.Join();
+                // setupBossesThread.Join();
                 // Disconnect sprite setup Harmony patch
                 awaitAsyncWatch.Stop();
             #endregion
@@ -509,18 +513,18 @@ public class Initialisation : BaseUnityPlugin
                 ETGModConsole.Log($"    setupUI        finished in {setupUIWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    awaitHarmony   finished in {awaitHarmonyWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupConfig1   finished in {setupConfig1Watch.ElapsedMilliseconds} milliseconds (ASYNC)");
-                ETGModConsole.Log($"    setupSave      finished in {setupSaveWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupConfig2   finished in {setupConfig2Watch.ElapsedMilliseconds} milliseconds (ASYNC)");
+                ETGModConsole.Log($"    awaitConfig    finished in {awaitConfigWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupGuns      finished in {setupGunsWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
-                ETGModConsole.Log($"    setupGuns2     finished in {setupGuns2Watch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupActives   finished in {setupActivesWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupPassives  finished in {setupPassivesWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupAudio     finished in {setupAudioWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
+                ETGModConsole.Log($"    setupSave      finished in {setupSaveWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupFloors    finished in {setupFloorsWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    setupSynergies finished in {setupSynergiesWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
-                ETGModConsole.Log($"    awaitItems finished in {awaitItemsWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    setupShops     finished in {setupShopsWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupBosses    finished in {setupBossesWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    awaitItems     finished in {awaitItemsWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    setupShops     finished in {setupShopsWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
+                ETGModConsole.Log($"    setupSynergies finished in {setupSynergiesWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    awaitAsync     finished in {awaitAsyncWatch.ElapsedMilliseconds} milliseconds");
                 long newMemory = currentProcess.WorkingSet64;
                 ETGModConsole.Log($"allocated {(newMemory - oldMemory).ToString("N0")} bytes of memory along the way");
