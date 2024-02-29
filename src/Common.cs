@@ -2,7 +2,7 @@ namespace CwaffingTheGungy;
 
 public class C // constants and common variables
 {
-    public static readonly bool DEBUG_BUILD = true; // set to false for release builds (must be readonly instead of const to avoid build warnings)
+    public static readonly bool DEBUG_BUILD = false; // set to false for release builds (must be readonly instead of const to avoid build warnings)
 
     public const string MOD_NAME     = "GungeonCraft";
     public const string MOD_INT_NAME = "CwaffingTheGungy";
@@ -37,13 +37,17 @@ public static class ResMap // Resource map from PNG stem names to lists of paths
     private static Regex _NumberAtEnd = new Regex(@"^(.*?)(_?)([0-9]+)$",
       RegexOptions.Compiled | RegexOptions.IgnoreCase);
     private static Dictionary<string, List<string>> _ResMap = new ();
+    private static readonly object _ResMapLock = new();
 
     // Gets a list of resource paths with numbered sprites from the resource's base name
     // Does not work with CreateProjectileAnimation(), which expects direct sprite names in the mod's "sprites" directory
     public static List<string> Get(string resource, bool quietFailure = false)
     {
-        if (_ResMap.ContainsKey(resource))
-            return _ResMap[resource];
+        lock(_ResMapLock)  // make sure threaded access is safe
+        {
+            if (_ResMap.ContainsKey(resource))
+                return _ResMap[resource];
+        }
         if (!quietFailure)
             ETGModConsole.Log($"failed to retrieve \"{resource}\" from resmap");
         return null;

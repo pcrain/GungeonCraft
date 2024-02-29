@@ -63,8 +63,8 @@ public static class VFX
     {
         if (animations.ContainsKey(name))
         {
-            if (C._WARN_DUPLICATE_VFX)
-                Lazy.DebugWarn($"  HEY! re-creating VFX with name {name}. If this is intentional, please reuse the original VFX, don't create it twice.");
+            if (C.DEBUG_BUILD && C._WARN_DUPLICATE_VFX)
+                Lazy.DebugWarn($"  HEY! re-creating VFX {name} can cause scale / anchor conflicts. Please reuse the original VFX or use a different sprite for this VFX.");
             //NOTE: can't return early here since it's valid to reuse the same sprite for two different VFX...it'll just overwrite the animations dict
             // return;
         }
@@ -167,6 +167,7 @@ public static class VFX
         vfObj.alignment            = alignment;
         vfObj.destructible         = false;
 
+        // BUG: this causes interference when two VFX share a sprite with different scales (e.g., muzzle for platinum star / uppskeruvel
         if (scale != 1.0f)
             sprite.scale = new Vector3(scale, scale, scale);
 

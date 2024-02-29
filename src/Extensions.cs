@@ -594,7 +594,11 @@ public static class Extensions
   /// <summary>Set an audio event for a specific frame of a gun's animation</summary>
   public static void SetGunAudio(this Gun gun, string name = null, string audio = "", int frame = 0)
   {
-    tk2dSpriteAnimationFrame aframe = gun.spriteAnimator.GetClipByName(name).frames[frame];
+    tk2dSpriteAnimationFrame aframe;
+    lock(Lazy._GunSetupLock)
+    {
+      aframe = gun.spriteAnimator.GetClipByName(name).frames[frame]; //NOTE: threaded access to frames seems to be causing crashes
+    }
     aframe.triggerEvent = !string.IsNullOrEmpty(audio);
     aframe.eventAudio = audio;
   }
@@ -1356,13 +1360,16 @@ public static class Extensions
   /// </summary>
   public static tk2dSpriteDefinition.AttachPoint[] AttachPointsForClip(this Gun gun, string clipName)
   {
-      Lazy._GunSpriteCollection ??= gun.sprite.collection; // need to initialize at least once
-      tk2dSpriteAnimationClip clip = gun.GetComponent<tk2dSpriteAnimator>().GetClipByName(clipName);
-      if (clip == null)
-          return null;
-      int spriteid = clip.frames[0].spriteId;
-      int attachIndex = Lazy._GunSpriteCollection.SpriteIDsWithAttachPoints.IndexOf(spriteid);
-      return Lazy._GunSpriteCollection.SpriteDefinedAttachPoints[attachIndex].attachPoints;
+      lock(Lazy._GunSetupLock)
+      {
+        Lazy._GunSpriteCollection ??= gun.sprite.collection; // need to initialize at least once
+        tk2dSpriteAnimationClip clip = gun.GetComponent<tk2dSpriteAnimator>().GetClipByName(clipName);
+        if (clip == null)
+            return null;
+        int spriteid = clip.frames[0].spriteId;
+        int attachIndex = Lazy._GunSpriteCollection.SpriteIDsWithAttachPoints.IndexOf(spriteid);
+        return Lazy._GunSpriteCollection.SpriteDefinedAttachPoints[attachIndex].attachPoints;
+      }
   }
 
   /// <summary>Instantiate a prefab with the specified position and rotation, optionally anchoring its sprite and clamping it to the pixel grid</summary>

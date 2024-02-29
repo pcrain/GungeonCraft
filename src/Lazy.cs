@@ -128,6 +128,8 @@ public static class Lazy
         return SetupItem<PlayerItem, T>(itemName, $"{itemName.SafeName()}_icon", "", shortDescription, longDescription, lore, hideFromAmmonomicon: hideFromAmmonomicon);
     }
 
+    internal static readonly object _GunSetupLock = new();
+
     /// <summary>
     /// Perform basic initialization for a new gun definition.
     /// </summary>
@@ -152,7 +154,11 @@ public static class Lazy
             if (fixedIdleAnimationClipId != -1)
             {
                 string originalIdleAnimation = gun.idleAnimation;
-                int fixedIdleAnimationSpriteId = gun.spriteAnimator.GetClipByName(fixedIdleAnimation).frames[0].spriteId;
+                int fixedIdleAnimationSpriteId;
+                lock(_GunSetupLock)  //NOTE: threaded access to frames breaks things, so this lock is necessary
+                {
+                    fixedIdleAnimationSpriteId = gun.spriteAnimator.GetClipByName(fixedIdleAnimation).frames[0].spriteId;
+                }
 
                 // Fix sprite animator
                 gun.SetAnimationFPS(fixedIdleAnimation, (int)originalIdleClip.fps);

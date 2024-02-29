@@ -93,6 +93,8 @@ public static class PackerHelper
     public int h           = 0;
   }
 
+  internal static Mutex _AddSpriteMutex = new(); // adding more than one sprite at once seems to causes issues, so protect it
+
   internal static Dictionary<string, tk2dSpriteDefinition> _PackedTextures = new();
   private static readonly Vector2 _TexelSize = new Vector2(0.0625f, 0.0625f);
 
@@ -283,8 +285,6 @@ public static class PackerHelper
       return sprite;
   }
 
-  internal static Mutex _AddSpriteMutex = new(); // adding more than one sprite at once seems to causes issues, so protect it
-
   /// <summary>Thread-safe wrapper around SpriteBuilder.AddSpriteToCollection()</summary>
   public static int SafeAddSpriteToCollection(string resourcePath, tk2dSpriteCollectionData collection)
   {
@@ -357,40 +357,15 @@ public static class PackerHelper
     }
   }
 
-  /// <summary>Patched, thread-safe version of vanilla GetClipByName()</summary>
+  /// <summary>Patched, thread-safe versions of various sensitive functions</summary>
   [HarmonyPatch(typeof(tk2dSpriteAnimation), nameof(tk2dSpriteAnimation.GetClipByName))]
   [HarmonyPatch(typeof(tk2dSpriteAnimation), nameof(tk2dSpriteAnimation.GetClipById))]
   [HarmonyPatch(typeof(tk2dSpriteAnimation), nameof(tk2dSpriteAnimation.GetClipIdByName), typeof(string))]
   [HarmonyPatch(typeof(tk2dSpriteAnimation), nameof(tk2dSpriteAnimation.GetClipIdByName), typeof(tk2dSpriteAnimationClip))]
-  private class SafeGetClipPatch
-  {
-    public static void Prefix()
-    {
-        // ETGModConsole.Log($"safety first");
-        if (!C._ModSetupFinished)
-          _AddSpriteMutex.WaitOne();
-    }
-    public static void Postfix()
-    {
-        if (!C._ModSetupFinished)
-          _AddSpriteMutex.ReleaseMutex();
-        // ETGModConsole.Log($"  safety last");
-    }
-  }
-
-  /// <summary>Patched to make sure SetActive() is only called on the main thread</summary>
   [HarmonyPatch(typeof(GameObject), nameof(GameObject.SetActive))]
-  private class SafeSetActivePatch
+  [HarmonyPatch(typeof(GunExt), nameof(GunExt.UpdateAnimation))]
+  private class ThreadSafeUnityStuffPatch
   {
-    // public static bool Prefix()
-    // {
-    //     if (C._ModSetupFinished)
-    //       return true; // call original method
-
-    //     ETGModConsole.Log($"activating");
-    //     return false; // skip original method
-    // }
-
     public static void Prefix()
     {
         // ETGModConsole.Log($"safety first");
