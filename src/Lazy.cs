@@ -19,6 +19,8 @@ public static class Lazy
       ETGModConsole.Log($"<color=#ffffaaff>{text}</color>");
     }
 
+    private static readonly object _AmmonomiconUpdateLock = new();
+
     /// <summary>Perform basic initialization for a new passive, active, or gun item definition.</summary>
     public static TItemClass SetupItem<TItemClass, TItemSpecific>(string itemName, string spritePath, string projectileName, string shortDescription, string longDescription, string lore, bool hideFromAmmonomicon = false)
         where TItemClass : PickupObject   // must be PickupObject for passive items, PlayerItem for active items, or Gun for guns
@@ -33,8 +35,12 @@ public static class Lazy
         if (typeof(TItemClass) == typeof(Gun))
         {
             string spriteName = spritePath; // TODO: guns use names, regular items use full paths -- should be made uniform eventually
-            Gun gun = ETGMod.Databases.Items.NewGun(itemName, spriteName);  //create a new gun using specified sprite name
-            Game.Items.Rename("outdated_gun_mods:"+baseItemName, IDs.InternalNames[itemName]);  //rename the gun for commands
+            Gun gun;
+            lock(_AmmonomiconUpdateLock)
+            {
+                gun = ETGMod.Databases.Items.NewGun(itemName, spriteName);  //create a new gun using specified sprite name
+                Game.Items.Rename("outdated_gun_mods:"+baseItemName, IDs.InternalNames[itemName]);  //rename the gun for commands
+            }
 
             // Replace old SetupSprite code to use our packed textures
             // gun.SetupSprite(null, spriteName+"_idle_001"); //set the gun's ammonomicon sprite
@@ -72,17 +78,23 @@ public static class Lazy
             sprite.IsPerpendicular = true;
             obj.GetComponent<BraveBehaviour>().sprite = sprite;
 
-            ETGMod.Databases.Items.SetupItem(item, item.name);
+            lock(_AmmonomiconUpdateLock)
+            {
+                ETGMod.Databases.Items.SetupItem(item, item.name);
+                Gungeon.Game.Items.Add(IDs.InternalNames[itemName], item);
+            }
 
-            Gungeon.Game.Items.Add(IDs.InternalNames[itemName], item);
             PackerHelper.SafeAddToAmmonomicon(item.sprite.GetCurrentSpriteDef());
             item.encounterTrackable.journalData.AmmonomiconSprite = item.sprite.GetCurrentSpriteDef().name;
         }
 
         item.itemName = itemName;
         item.encounterTrackable.EncounterGuid = C.MOD_PREFIX+"-"+baseItemName; //create a unique guid for the item
-        item.SetShortDescription(shortDescription);
-        item.SetLongDescription($"{longDescription}\n\n{lore}");
+        lock(_AmmonomiconUpdateLock)
+        {
+            item.SetShortDescription(shortDescription);
+            item.SetLongDescription($"{longDescription}\n\n{lore}");
+        }
         ETGMod.Databases.Items.Add(item);
 
         if (hideFromAmmonomicon)
