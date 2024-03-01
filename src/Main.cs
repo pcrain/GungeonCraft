@@ -515,7 +515,6 @@ public class Initialisation : BaseUnityPlugin
                 setupSynergiesThread.Join();
                 // setupShopsThread.Join();
                 // setupBossesThread.Join();
-                // Disconnect sprite setup Harmony patch
                 awaitAsyncWatch.Stop();
             #endregion
 

@@ -365,6 +365,7 @@ public static class PackerHelper
 
   internal static tk2dSpriteCollectionData itemCollection = PickupObjectDatabase.GetById(155).sprite.Collection;
 
+  /// <summary>Manually initialize some Harmony patches we need very early on to enable threaded setup</summary>
   public static void InitSetupPatches(Harmony harmony)
   {
       BindingFlags anyFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
@@ -384,6 +385,8 @@ public static class PackerHelper
       harmony.Patch(typeof(GameObject).GetMethod("SetActive", bindingAttr: anyFlags),
         prefix: new HarmonyMethod(threadSafePrefix), postfix:  new HarmonyMethod(threadSafePostfix));
       harmony.Patch(typeof(GunExt).GetMethod("UpdateAnimation", bindingAttr: anyFlags),
+        prefix: new HarmonyMethod(threadSafePrefix), postfix:  new HarmonyMethod(threadSafePostfix));
+      harmony.Patch(typeof(EnemyDatabase).GetMethod("GetOrLoadByGuid", bindingAttr: anyFlags),
         prefix: new HarmonyMethod(threadSafePrefix), postfix:  new HarmonyMethod(threadSafePostfix));
 
       harmony.Patch(typeof(SpriteBuilder).GetMethod("SpriteFromResource", bindingAttr: anyFlags),
