@@ -23,7 +23,7 @@ public class KiBlast : AdvancedGunBehavior
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 999, infiniteAmmo: true);
             gun.SetIdleAnimationFPS(10);
             _FireLeftAnim  = gun.shootAnimation;
-            _FireRightAnim = gun.UpdateAnimation("fire_alt", returnToIdle: true);
+            _FireRightAnim = gun.QuickUpdateGunAnimation("fire_alt", returnToIdle: true);
             gun.SetAnimationFPS(_FireLeftAnim, 24);
             gun.SetAnimationFPS(_FireRightAnim, 24);
             gun.SetMuzzleVFX("muzzle_iron_maid", fps: 30, scale: 0.5f, anchor: Anchor.MiddleLeft);

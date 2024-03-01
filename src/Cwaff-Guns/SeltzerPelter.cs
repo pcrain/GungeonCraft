@@ -20,9 +20,9 @@ public class SeltzerPelter : AdvancedGunBehavior
             gun.SetAnimationFPS(gun.shootAnimation, 36);
             gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
             _ReloadAnimations = new(){
-                gun.UpdateAnimation("reload",   returnToIdle: true), // coke can
-                gun.UpdateAnimation("reload_b", returnToIdle: true), // pepsi can
-                gun.UpdateAnimation("reload_c", returnToIdle: true), // sprite can
+                gun.QuickUpdateGunAnimation("reload",   returnToIdle: true), // coke can
+                gun.QuickUpdateGunAnimation("reload_b", returnToIdle: true), // pepsi can
+                gun.QuickUpdateGunAnimation("reload_c", returnToIdle: true), // sprite can
             };
             foreach(string animation in _ReloadAnimations)
             {

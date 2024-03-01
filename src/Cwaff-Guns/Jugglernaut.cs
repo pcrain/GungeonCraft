@@ -38,12 +38,12 @@ public class Jugglernaut : AdvancedGunBehavior
             gun.SetAnimationFPS(gun.shootAnimation, 30);
             gun.SetAnimationFPS(gun.reloadAnimation, 40);
             _JuggleAnimations = new(){
-                gun.UpdateAnimation("1_gun", returnToIdle: false),
-                gun.UpdateAnimation("2_gun", returnToIdle: false),
-                gun.UpdateAnimation("3_gun", returnToIdle: false),
-                gun.UpdateAnimation("4_gun", returnToIdle: false),
-                gun.UpdateAnimation("5_gun", returnToIdle: false),
-                gun.UpdateAnimation("6_gun", returnToIdle: false),
+                gun.QuickUpdateGunAnimation("1_gun", returnToIdle: false),
+                gun.QuickUpdateGunAnimation("2_gun", returnToIdle: false),
+                gun.QuickUpdateGunAnimation("3_gun", returnToIdle: false),
+                gun.QuickUpdateGunAnimation("4_gun", returnToIdle: false),
+                gun.QuickUpdateGunAnimation("5_gun", returnToIdle: false),
+                gun.QuickUpdateGunAnimation("6_gun", returnToIdle: false),
             };
             gun.muzzleFlashEffects              = null;
             // gun.SetMuzzleVFX("muzzle_jugglernaut", fps: 10, scale: 0.2f, anchor: Anchor.MiddleCenter);

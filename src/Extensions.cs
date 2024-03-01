@@ -557,7 +557,7 @@ public static class Extensions
   }
 
   /// <summary>Clear a gun's default audio events</summary>
-  public static void ClearDefaultAudio(this Gun gun, bool useSilentGroup = true)
+  public static void ClearDefaultAudio(this Gun gun)
   {
     if (gun.GetComponent<Alexandria.ItemAPI.AdvancedGunBehavior>() is Alexandria.ItemAPI.AdvancedGunBehavior agun)
     {
@@ -565,30 +565,9 @@ public static class Extensions
       agun.SetReloadAudio();
     }
 
-    if (useSilentGroup)
-      gun.gunSwitchGroup = (ItemHelper.Get(Items.Banana) as Gun).gunSwitchGroup; // banana has silent reload and charge audio
-
+    gun.gunSwitchGroup = (ItemHelper.Get(Items.Banana) as Gun).gunSwitchGroup; // banana has silent reload and charge audio
     gun.PreventNormalFireAudio = true;
     gun.OverrideNormalFireAudioEvent = "";
-
-    if (gun.spriteAnimator.GetClipByName(gun.shootAnimation) is tk2dSpriteAnimationClip shootAnimation)
-      foreach (tk2dSpriteAnimationFrame f in shootAnimation.frames)
-      {
-        f.triggerEvent = false;
-        f.eventAudio   = "";
-      }
-    if (gun.spriteAnimator.GetClipByName(gun.chargeAnimation) is tk2dSpriteAnimationClip chargeAnimation)
-      foreach (tk2dSpriteAnimationFrame f in chargeAnimation.frames)
-      {
-        f.triggerEvent = false;
-        f.eventAudio   = "";
-      }
-    if (gun.spriteAnimator.GetClipByName(gun.reloadAnimation) is tk2dSpriteAnimationClip reloadAnimation)
-      foreach (tk2dSpriteAnimationFrame f in reloadAnimation.frames)
-      {
-        f.triggerEvent = false;
-        f.eventAudio   = "";
-      }
   }
 
   /// <summary>Set an audio event for a specific frame of a gun's animation</summary>
@@ -1523,5 +1502,86 @@ public static class Extensions
     if (mod.chargeProjectiles == null)
       return -1;
     return mod.chargeProjectiles.IndexOf(mod.GetChargeProjectile(gun.m_moduleData[mod].chargeTime));
+  }
+
+  /// <summary>Faster version of the MtG API equivalent using our ResMap()</summary>
+  public static void QuickUpdateGunAnimations(this Gun gun)
+  {
+      tk2dSpriteCollectionData collection = ETGMod.Databases.Items.WeaponCollection;
+
+      var clips = new List<tk2dSpriteAnimationClip>();
+
+      gun.idleAnimation = gun.QuickUpdateAnimationAddClipsLater("idle", collection, clipsToAddLater: clips);
+      gun.dodgeAnimation = gun.QuickUpdateAnimationAddClipsLater("dodge", collection, clipsToAddLater: clips);
+      gun.introAnimation = gun.QuickUpdateAnimationAddClipsLater("intro", collection, true, clipsToAddLater: clips);
+      gun.emptyAnimation = gun.QuickUpdateAnimationAddClipsLater("empty", collection, clipsToAddLater: clips);
+      gun.shootAnimation = gun.QuickUpdateAnimationAddClipsLater("fire", collection, true, clipsToAddLater: clips);
+      gun.reloadAnimation = gun.QuickUpdateAnimationAddClipsLater("reload", collection, true, clipsToAddLater: clips);
+      gun.chargeAnimation = gun.QuickUpdateAnimationAddClipsLater("charge", collection, clipsToAddLater: clips);
+      gun.outOfAmmoAnimation = gun.QuickUpdateAnimationAddClipsLater("out_of_ammo", collection, clipsToAddLater: clips);
+      gun.dischargeAnimation = gun.QuickUpdateAnimationAddClipsLater("discharge", collection, clipsToAddLater: clips);
+      gun.finalShootAnimation = gun.QuickUpdateAnimationAddClipsLater("final_fire", collection, true, clipsToAddLater: clips);
+      gun.emptyReloadAnimation = gun.QuickUpdateAnimationAddClipsLater("empty_reload", collection, true, clipsToAddLater: clips);
+      gun.criticalFireAnimation = gun.QuickUpdateAnimationAddClipsLater("critical_fire", collection, true, clipsToAddLater: clips);
+      gun.enemyPreFireAnimation = gun.QuickUpdateAnimationAddClipsLater("enemy_pre_fire", collection, clipsToAddLater: clips);
+      gun.alternateShootAnimation = gun.QuickUpdateAnimationAddClipsLater("alternate_shoot", collection, true, clipsToAddLater: clips);
+      gun.alternateReloadAnimation = gun.QuickUpdateAnimationAddClipsLater("alternate_reload", collection, true, clipsToAddLater: clips);
+      gun.alternateIdleAnimation = gun.QuickUpdateAnimationAddClipsLater("alternate_idle", collection, clipsToAddLater: clips);
+
+      if(clips.Count == 0)
+        return;
+
+      // default sprite should be the first frame of the idle animation
+      gun.DefaultSpriteID = clips[0].frames[0].spriteId;
+      gun.GetSprite().SetSprite(collection, gun.DefaultSpriteID);
+
+      Array.Resize(ref gun.spriteAnimator.Library.clips, gun.spriteAnimator.Library.clips.Length + clips.Count);
+      for(int i = 0; i < clips.Count; i++)
+          gun.spriteAnimator.Library.clips[gun.spriteAnimator.Library.clips.Length - clips.Count + i] = clips[i];
+  }
+
+  /// <summary>Faster version of the MtG API equivalent using our ResMap()</summary>
+  public static string QuickUpdateAnimationAddClipsLater(this Gun gun, string name, tk2dSpriteCollectionData collection, bool returnToIdle = false, List<tk2dSpriteAnimationClip> clipsToAddLater = null)
+  {
+      string clipName = gun.name + "_" + name;
+      if (ResMap.Get(clipName, true) is not List<string> frameNames)
+        return null;
+
+      tk2dSpriteAnimationClip clip = new(){
+        name     = clipName,
+        fps      = 15,
+        wrapMode = returnToIdle ? tk2dSpriteAnimationClip.WrapMode.Once : default,
+        frames   = collection.CreateAnimationFrames(frameNames),
+      };
+
+      if(clipsToAddLater == null)
+      {
+          Array.Resize(ref gun.spriteAnimator.Library.clips, gun.spriteAnimator.Library.clips.Length + 1);
+          gun.spriteAnimator.Library.clips[gun.spriteAnimator.Library.clips.Length - 1] = clip;
+      }
+      else
+          clipsToAddLater.Add(clip);
+
+      return clipName;
+  }
+
+  /// <summary>Convert a list of resource names into a set of animation frames</summary>
+  public static tk2dSpriteAnimationFrame[] CreateAnimationFrames(this tk2dSpriteCollectionData collection, List<string> frameNames)
+  {
+    tk2dSpriteAnimationFrame[] frames = new tk2dSpriteAnimationFrame[frameNames.Count];
+    int i = 0;
+    foreach (string name in frameNames)
+      frames[i++] = new(){
+        spriteCollection = collection,
+        spriteId         = collection.spriteNameLookupDict[name],
+      };
+    return frames;
+  }
+
+  /// <summary>Faster version of the MtG API equivalent using our ResMap()</summary>
+  public static string QuickUpdateGunAnimation(this Gun gun, string name, tk2dSpriteCollectionData collection = null, bool returnToIdle = false)
+  {
+      collection ??= ETGMod.Databases.Items.WeaponCollection;
+      return QuickUpdateAnimationAddClipsLater(gun, name, collection, returnToIdle);
   }
 }

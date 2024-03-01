@@ -43,12 +43,8 @@ public static class Lazy
             }
 
             // Replace old SetupSprite code to use our packed textures
-            // gun.SetupSprite(null, spriteName+"_idle_001"); //set the gun's ammonomicon sprite
             gun.encounterTrackable.journalData.AmmonomiconSprite = spriteName+"_ammonomicon";
-            gun.UpdateAnimations();
-            gun.GetSprite().SetSprite(
-                ETGMod.Databases.Items.WeaponCollection,
-                gun.DefaultSpriteID = ETGMod.Databases.Items.WeaponCollection.GetSpriteIdByName(spriteName+"_idle_001"));
+            gun.QuickUpdateGunAnimations();  // includes setting the default sprite
 
             int projectileId = 0;
             if (int.TryParse(projectileName, out projectileId))
@@ -62,7 +58,7 @@ public static class Lazy
             // Interpret paths with slashes as fully-qualified resource paths, and use our ResMap otherwise
             string spriteName = spritePath.Contains("/") ? spritePath : ResMap.Get(spritePath)[0];
             string altName = itemName.SafeName() + "_icon";
-            if (spritePath != altName)
+            if (C.DEBUG_BUILD && spritePath != altName)
                 ETGModConsole.Log($"  {spritePath} != {altName}");
             GameObject obj = new GameObject(itemName).RegisterPrefab();
             item = obj.AddComponent<TItemSpecific>();
@@ -78,9 +74,9 @@ public static class Lazy
             sprite.IsPerpendicular = true;
             obj.GetComponent<BraveBehaviour>().sprite = sprite;
 
+            ETGMod.Databases.Items.SetupItem(item, item.name);
             lock(_AmmonomiconUpdateLock)
             {
-                ETGMod.Databases.Items.SetupItem(item, item.name);
                 Gungeon.Game.Items.Add(IDs.InternalNames[itemName], item);
             }
 
@@ -157,7 +153,7 @@ public static class Lazy
         #endregion
 
         #region Set up trimmed idle sprites so we don't have wonky hitboxes for very large animations
-            gun.UpdateAnimation(LargeGunAnimationHotfix._TRIM_ANIMATION, returnToIdle: true);
+            gun.QuickUpdateGunAnimation(LargeGunAnimationHotfix._TRIM_ANIMATION, returnToIdle: true);
             string fixedIdleAnimation = $"{gun.InternalSpriteName()}_{LargeGunAnimationHotfix._TRIM_ANIMATION}";
             tk2dSpriteAnimationClip originalIdleClip = gun.spriteAnimator.GetClipByName(gun.idleAnimation);
             int fixedIdleAnimationClipId = gun.spriteAnimator.GetClipIdByName(fixedIdleAnimation);

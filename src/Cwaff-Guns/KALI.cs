@@ -70,13 +70,13 @@ public class KALI : AdvancedGunBehavior
             },
         };
 
-        string chargeAnim1 = gun.UpdateAnimation("charge", returnToIdle: false);
+        string chargeAnim1 = gun.QuickUpdateGunAnimation("charge", returnToIdle: false);
             gun.SetAnimationFPS(chargeAnim1, 20);
             // gun.SetGunAudio(_ChargeBase, "kali_charge_sound", 0);
-        string chargeAnim2 = gun.UpdateAnimation("charge_more", returnToIdle: false);
+        string chargeAnim2 = gun.QuickUpdateGunAnimation("charge_more", returnToIdle: false);
             gun.SetAnimationFPS(chargeAnim2, 40);
             // gun.SetGunAudio(_ChargeMore, "kali_charge_sound", 0);
-        string chargeAnim3 = gun.UpdateAnimation("charge_most", returnToIdle: false);
+        string chargeAnim3 = gun.QuickUpdateGunAnimation("charge_most", returnToIdle: false);
             gun.SetAnimationFPS(chargeAnim3, 60);
             gun.SetGunAudio(chargeAnim3, "kali_charge_sound", 0);
         _ChargeAnimations = new(){chargeAnim1, chargeAnim2, chargeAnim3};
