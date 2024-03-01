@@ -136,27 +136,6 @@ public class Initialisation : BaseUnityPlugin
                 setupShadersWatch.Stop();
             #endregion
 
-            #region UI Sprites (cannot be async, must set up textures on main thread)
-                System.Diagnostics.Stopwatch setupUIWatch = System.Diagnostics.Stopwatch.StartNew();
-                BetterAtlas.AddUISpriteBatch(new(){
-                    "barter_s_icon",            Bart._BarterSpriteS,
-                    "barter_a_icon",            Bart._BarterSpriteA,
-                    "barter_b_icon",            Bart._BarterSpriteB,
-                    "barter_c_icon",            Bart._BarterSpriteC,
-                    "soul_sprite_ui_icon",      Uppskeruvel._SoulSpriteUI,
-                    "prism_ui_icon",            Suncaster._PrismUI,
-                    "glockarina_storm_ui_icon", Glockarina._StormSpriteUI,
-                    "glockarina_time_ui_icon",  Glockarina._TimeSpriteUI,
-                    "glockarina_saria_ui_icon", Glockarina._SariaSpriteUI,
-                    "glockarina_empty_ui_icon", Glockarina._EmptySpriteUI,
-                    // needs to be three separate sprites or the UI breaks
-                    "adrenaline_heart",         AdrenalineShot._FullHeartSpriteUI,
-                    "adrenaline_heart",         AdrenalineShot._HalfHeartSpriteUI,
-                    "adrenaline_heart",         AdrenalineShot._EmptyHeartSpriteUI,
-                });
-                setupUIWatch.Stop();
-            #endregion
-
             System.Diagnostics.Stopwatch awaitHarmonyWatch = System.Diagnostics.Stopwatch.StartNew();
             // We have to wait for Harmony to finish patching before we can do anything else
             setupHarmonyThread.Join(); //
@@ -379,6 +358,27 @@ public class Initialisation : BaseUnityPlugin
                 setupSaveThread.Start();
             #endregion
 
+            #region UI Sprites (cannot be async, must set up textures on main thread)
+                System.Diagnostics.Stopwatch setupUIWatch = System.Diagnostics.Stopwatch.StartNew();
+                BetterAtlas.AddUISpriteBatch(new(){
+                    "barter_s_icon",            Bart._BarterSpriteS,
+                    "barter_a_icon",            Bart._BarterSpriteA,
+                    "barter_b_icon",            Bart._BarterSpriteB,
+                    "barter_c_icon",            Bart._BarterSpriteC,
+                    "soul_sprite_ui_icon",      Uppskeruvel._SoulSpriteUI,
+                    "prism_ui_icon",            Suncaster._PrismUI,
+                    "glockarina_storm_ui_icon", Glockarina._StormSpriteUI,
+                    "glockarina_time_ui_icon",  Glockarina._TimeSpriteUI,
+                    "glockarina_saria_ui_icon", Glockarina._SariaSpriteUI,
+                    "glockarina_empty_ui_icon", Glockarina._EmptySpriteUI,
+                    // needs to be three separate sprites or the UI breaks
+                    "adrenaline_heart",         AdrenalineShot._FullHeartSpriteUI,
+                    "adrenaline_heart",         AdrenalineShot._HalfHeartSpriteUI,
+                    "adrenaline_heart",         AdrenalineShot._EmptyHeartSpriteUI,
+                });
+                setupUIWatch.Stop();
+            #endregion
+
             #region Floor and Flow Initialization (sync for now, might not need to be)
                 System.Diagnostics.Stopwatch setupFloorsWatch = System.Diagnostics.Stopwatch.StartNew();
 
@@ -440,18 +440,6 @@ public class Initialisation : BaseUnityPlugin
             setupGunsThread.Join();
             awaitItemsWatch.Stop();
 
-            #region Shop NPCs (Async)
-                System.Diagnostics.Stopwatch setupShopsWatch = null;
-                Thread setupShopsThread = new Thread(() => {
-                    setupShopsWatch = System.Diagnostics.Stopwatch.StartNew();
-                    // InsuranceBoi.Init();
-                    Cammy.Init();
-                    Bart.Init();
-                    setupShopsWatch.Stop();
-                });
-                setupShopsThread.Start();
-            #endregion
-
             #region Synergies (Async)
                 System.Diagnostics.Stopwatch setupSynergiesWatch = null;
                 Thread setupSynergiesThread = new Thread(() => {
@@ -461,6 +449,18 @@ public class Initialisation : BaseUnityPlugin
                     setupSynergiesWatch.Stop();
                 });
                 setupSynergiesThread.Start();
+            #endregion
+
+            #region Shop NPCs (can't be async due to post-load barter table setup issues causing null derefs)
+                System.Diagnostics.Stopwatch setupShopsWatch = null;
+                // Thread setupShopsThread = new Thread(() => {
+                    setupShopsWatch = System.Diagnostics.Stopwatch.StartNew();
+                    // InsuranceBoi.Init();
+                    Cammy.Init();
+                    Bart.Init();
+                    setupShopsWatch.Stop();
+                // });
+                // setupShopsThread.Start();
             #endregion
 
             #region Old Asset Stuff
@@ -498,7 +498,7 @@ public class Initialisation : BaseUnityPlugin
                 setupSaveThread.Join();
                 setupAudioThread.Join();
                 setupSynergiesThread.Join();
-                setupShopsThread.Join();
+                // setupShopsThread.Join();
                 // setupBossesThread.Join();
                 // Disconnect sprite setup Harmony patch
                 awaitAsyncWatch.Stop();
@@ -512,7 +512,6 @@ public class Initialisation : BaseUnityPlugin
                 ETGModConsole.Log($"    setupHarmony   finished in {setupHarmonyWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupAtlases   finished in {setupAtlasesWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupShaders   finished in {setupShadersWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    setupUI        finished in {setupUIWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    awaitHarmony   finished in {awaitHarmonyWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupConfig1   finished in {setupConfig1Watch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupConfig2   finished in {setupConfig2Watch.ElapsedMilliseconds} milliseconds (ASYNC)");
@@ -522,11 +521,12 @@ public class Initialisation : BaseUnityPlugin
                 ETGModConsole.Log($"    setupPassives  finished in {setupPassivesWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupAudio     finished in {setupAudioWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupSave      finished in {setupSaveWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
+                ETGModConsole.Log($"    setupUI        finished in {setupUIWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupFloors    finished in {setupFloorsWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupBosses    finished in {setupBossesWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    awaitItems     finished in {awaitItemsWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    setupShops     finished in {setupShopsWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupSynergies finished in {setupSynergiesWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
+                ETGModConsole.Log($"    setupShops     finished in {setupShopsWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    awaitAsync     finished in {awaitAsyncWatch.ElapsedMilliseconds} milliseconds");
                 long newMemory = currentProcess.WorkingSet64;
                 ETGModConsole.Log($"allocated {(newMemory - oldMemory).ToString("N0")} bytes of memory along the way");
