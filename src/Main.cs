@@ -81,16 +81,26 @@ public class Initialisation : BaseUnityPlugin
                 ETGModConsole.Log("Cwaffing the Gungy initializing...");
 
             Instance = this;
+            Harmony harmony = new Harmony(C.MOD_GUID);
 
-            #region Set up Harmony Patches (can be async while textures are being set up)
-                System.Diagnostics.Stopwatch setupHarmonyWatch = null;
-                Thread setupHarmonyThread = new Thread(() => {
-                    setupHarmonyWatch = System.Diagnostics.Stopwatch.StartNew();
-                    Harmony harmony = new Harmony(C.MOD_GUID);
-                    harmony.PatchAll();
-                    setupHarmonyWatch.Stop();
+            #region Set up Early Harmony Patches (async, but needed as soon as atlases and shaders are loaded)
+                System.Diagnostics.Stopwatch setupEarlyHarmonyWatch = null;
+                Thread setupEarlyHarmonyThread = new Thread(() => {
+                    setupEarlyHarmonyWatch = System.Diagnostics.Stopwatch.StartNew();
+                    PackerHelper.InitSetupPatches(harmony);
+                    setupEarlyHarmonyWatch.Stop();
                 });
-                setupHarmonyThread.Start();
+                setupEarlyHarmonyThread.Start();
+            #endregion
+
+            #region Set up Late Harmony Patches (async, nothing else is needed until floor loading patches)
+                System.Diagnostics.Stopwatch setupLateHarmonyWatch = null;
+                Thread setupLateHarmonyThread = new Thread(() => {
+                    setupLateHarmonyWatch = System.Diagnostics.Stopwatch.StartNew();
+                    harmony.PatchAll();
+                    setupLateHarmonyWatch.Stop();
+                });
+                setupLateHarmonyThread.Start();
             #endregion
 
             #region Set up Packed Texture Atlases (absolutely cannot be async, handles the meat of texture loading)
@@ -136,10 +146,10 @@ public class Initialisation : BaseUnityPlugin
                 setupShadersWatch.Stop();
             #endregion
 
-            System.Diagnostics.Stopwatch awaitHarmonyWatch = System.Diagnostics.Stopwatch.StartNew();
-            // We have to wait for Harmony to finish patching before we can do anything else
-            setupHarmonyThread.Join(); //
-            awaitHarmonyWatch.Stop();
+            System.Diagnostics.Stopwatch awaitEarlyHarmonyWatch = System.Diagnostics.Stopwatch.StartNew();
+            // We have to wait for Harmony to finish early patches before we can do anything else
+            setupEarlyHarmonyThread.Join();
+            awaitEarlyHarmonyWatch.Stop();
 
             #region Round 1 Config (hooks and database stuff where no sprites are needed, so it can be async)
                 System.Diagnostics.Stopwatch setupConfig1Watch = null;
@@ -379,6 +389,11 @@ public class Initialisation : BaseUnityPlugin
                 setupUIWatch.Stop();
             #endregion
 
+            // we have to wait for the rest of the harmony patches to finish before loading in floors
+            System.Diagnostics.Stopwatch awaitLateHarmonyWatch = System.Diagnostics.Stopwatch.StartNew();
+            setupLateHarmonyThread.Join();
+            awaitLateHarmonyWatch.Stop();
+
             #region Floor and Flow Initialization (sync for now, might not need to be)
                 System.Diagnostics.Stopwatch setupFloorsWatch = System.Diagnostics.Stopwatch.StartNew();
 
@@ -509,25 +524,27 @@ public class Initialisation : BaseUnityPlugin
             ETGModConsole.Log($"Yay! :D Initialized <color=#{ColorUtility.ToHtmlStringRGB(C.MOD_COLOR).ToLower()}>{C.MOD_NAME} v{C.MOD_VERSION}</color> in "+(watch.ElapsedMilliseconds/1000.0f)+" seconds");
             if (C.DEBUG_BUILD)
             {
-                ETGModConsole.Log($"    setupHarmony   finished in {setupHarmonyWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
-                ETGModConsole.Log($"    setupAtlases   finished in {setupAtlasesWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    setupShaders   finished in {setupShadersWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    awaitHarmony   finished in {awaitHarmonyWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    setupConfig1   finished in {setupConfig1Watch.ElapsedMilliseconds} milliseconds (ASYNC)");
-                ETGModConsole.Log($"    setupConfig2   finished in {setupConfig2Watch.ElapsedMilliseconds} milliseconds (ASYNC)");
-                ETGModConsole.Log($"    awaitConfig    finished in {awaitConfigWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    setupGuns      finished in {setupGunsWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
-                ETGModConsole.Log($"    setupActives   finished in {setupActivesWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
-                ETGModConsole.Log($"    setupPassives  finished in {setupPassivesWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
-                ETGModConsole.Log($"    setupAudio     finished in {setupAudioWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
-                ETGModConsole.Log($"    setupSave      finished in {setupSaveWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
-                ETGModConsole.Log($"    setupUI        finished in {setupUIWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    setupFloors    finished in {setupFloorsWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    setupBosses    finished in {setupBossesWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    awaitItems     finished in {awaitItemsWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    setupSynergies finished in {setupSynergiesWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
-                ETGModConsole.Log($"    setupShops     finished in {setupShopsWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    awaitAsync     finished in {awaitAsyncWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    setupEarlyHarmony finished in {setupEarlyHarmonyWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
+                ETGModConsole.Log($"    setupLateHarmony  finished in {setupLateHarmonyWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
+                ETGModConsole.Log($"    setupAtlases      finished in {setupAtlasesWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    setupShaders      finished in {setupShadersWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    awaitEarlyHarmony finished in {awaitEarlyHarmonyWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    setupConfig1      finished in {setupConfig1Watch.ElapsedMilliseconds} milliseconds (ASYNC)");
+                ETGModConsole.Log($"    setupConfig2      finished in {setupConfig2Watch.ElapsedMilliseconds} milliseconds (ASYNC)");
+                ETGModConsole.Log($"    awaitConfig       finished in {awaitConfigWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    setupGuns         finished in {setupGunsWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
+                ETGModConsole.Log($"    setupActives      finished in {setupActivesWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
+                ETGModConsole.Log($"    setupPassives     finished in {setupPassivesWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
+                ETGModConsole.Log($"    setupAudio        finished in {setupAudioWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
+                ETGModConsole.Log($"    setupSave         finished in {setupSaveWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
+                ETGModConsole.Log($"    setupUI           finished in {setupUIWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    awaitLateHarmony  finished in {awaitLateHarmonyWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    setupFloors       finished in {setupFloorsWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    setupBosses       finished in {setupBossesWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    awaitItems        finished in {awaitItemsWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    setupSynergies    finished in {setupSynergiesWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
+                ETGModConsole.Log($"    setupShops        finished in {setupShopsWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    awaitAsync        finished in {awaitAsyncWatch.ElapsedMilliseconds} milliseconds");
                 long newMemory = currentProcess.WorkingSet64;
                 ETGModConsole.Log($"allocated {(newMemory - oldMemory).ToString("N0")} bytes of memory along the way");
                 ETGModMainBehaviour.Instance.gameObject.Play("vc_kirby_appeal01");

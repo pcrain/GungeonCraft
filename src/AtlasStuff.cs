@@ -365,8 +365,36 @@ public static class PackerHelper
 
   internal static tk2dSpriteCollectionData itemCollection = PickupObjectDatabase.GetById(155).sprite.Collection;
 
+  public static void InitSetupPatches(Harmony harmony)
+  {
+      BindingFlags anyFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+
+      MethodInfo threadSafePrefix = typeof(PackerHelper.ThreadSafeUnityStuffPatch).GetMethod(
+        "Prefix", bindingAttr: BindingFlags.Static | BindingFlags.Public);
+      MethodInfo threadSafePostfix = typeof(PackerHelper.ThreadSafeUnityStuffPatch).GetMethod(
+        "Postfix", bindingAttr: BindingFlags.Static | BindingFlags.Public);
+      harmony.Patch(typeof(tk2dSpriteAnimation).GetMethod("GetClipByName", bindingAttr: anyFlags),
+        prefix: new HarmonyMethod(threadSafePrefix), postfix:  new HarmonyMethod(threadSafePostfix));
+      harmony.Patch(typeof(tk2dSpriteAnimation).GetMethod("GetClipById", bindingAttr: anyFlags),
+        prefix: new HarmonyMethod(threadSafePrefix), postfix:  new HarmonyMethod(threadSafePostfix));
+      harmony.Patch(typeof(tk2dSpriteAnimation).GetMethod("GetClipIdByName", types: new[]{typeof(string)}),
+        prefix: new HarmonyMethod(threadSafePrefix), postfix:  new HarmonyMethod(threadSafePostfix));
+      harmony.Patch(typeof(tk2dSpriteAnimation).GetMethod("GetClipIdByName", types: new[]{typeof(tk2dSpriteAnimationClip)}),
+        prefix: new HarmonyMethod(threadSafePrefix), postfix:  new HarmonyMethod(threadSafePostfix));
+      harmony.Patch(typeof(GameObject).GetMethod("SetActive", bindingAttr: anyFlags),
+        prefix: new HarmonyMethod(threadSafePrefix), postfix:  new HarmonyMethod(threadSafePostfix));
+      harmony.Patch(typeof(GunExt).GetMethod("UpdateAnimation", bindingAttr: anyFlags),
+        prefix: new HarmonyMethod(threadSafePrefix), postfix:  new HarmonyMethod(threadSafePostfix));
+
+      harmony.Patch(typeof(SpriteBuilder).GetMethod("SpriteFromResource", bindingAttr: anyFlags),
+        prefix: new HarmonyMethod(typeof(SpriteFromResourcePatch).GetMethod("Prefix", bindingAttr: anyFlags)));
+
+      harmony.Patch(typeof(SpriteBuilder).GetMethod("AddSpriteToCollection", types: new[]{typeof(string), typeof(tk2dSpriteCollectionData), typeof(Assembly)}),
+        prefix: new HarmonyMethod(typeof(AddSpriteToCollectionPatch).GetMethod("Prefix", bindingAttr: anyFlags)));
+  }
+
   /// <summary>Patched version of Alexandria's SpriteFromResource</summary>
-  [HarmonyPatch(typeof(SpriteBuilder), nameof(SpriteBuilder.SpriteFromResource))]
+  // [HarmonyPatch(typeof(SpriteBuilder), nameof(SpriteBuilder.SpriteFromResource))]
   private class SpriteFromResourcePatch
   {
     public static bool Prefix(string spriteName, GameObject obj, Assembly assembly, ref GameObject __result)
@@ -394,7 +422,7 @@ public static class PackerHelper
   }
 
   /// <summary>Patched version of Alexandria's AddSpriteToCollection(string, ...)</summary>
-  [HarmonyPatch(typeof(SpriteBuilder), nameof(SpriteBuilder.AddSpriteToCollection), typeof(string), typeof(tk2dSpriteCollectionData), /*typeof(string), */typeof(Assembly))]
+  // [HarmonyPatch(typeof(SpriteBuilder), nameof(SpriteBuilder.AddSpriteToCollection), typeof(string), typeof(tk2dSpriteCollectionData), /*typeof(string), */typeof(Assembly))]
   private class AddSpriteToCollectionPatch
   {
     public static bool Prefix(string resourcePath, tk2dSpriteCollectionData collection, /*string name, */Assembly assembly, ref int __result)
@@ -409,12 +437,12 @@ public static class PackerHelper
   }
 
   /// <summary>Patched, thread-safe versions of various sensitive functions</summary>
-  [HarmonyPatch(typeof(tk2dSpriteAnimation), nameof(tk2dSpriteAnimation.GetClipByName))]
-  [HarmonyPatch(typeof(tk2dSpriteAnimation), nameof(tk2dSpriteAnimation.GetClipById))]
-  [HarmonyPatch(typeof(tk2dSpriteAnimation), nameof(tk2dSpriteAnimation.GetClipIdByName), typeof(string))]
-  [HarmonyPatch(typeof(tk2dSpriteAnimation), nameof(tk2dSpriteAnimation.GetClipIdByName), typeof(tk2dSpriteAnimationClip))]
-  [HarmonyPatch(typeof(GameObject), nameof(GameObject.SetActive))]
-  [HarmonyPatch(typeof(GunExt), nameof(GunExt.UpdateAnimation))]
+  // [HarmonyPatch(typeof(tk2dSpriteAnimation), nameof(tk2dSpriteAnimation.GetClipByName))]
+  // [HarmonyPatch(typeof(tk2dSpriteAnimation), nameof(tk2dSpriteAnimation.GetClipById))]
+  // [HarmonyPatch(typeof(tk2dSpriteAnimation), nameof(tk2dSpriteAnimation.GetClipIdByName), typeof(string))]
+  // [HarmonyPatch(typeof(tk2dSpriteAnimation), nameof(tk2dSpriteAnimation.GetClipIdByName), typeof(tk2dSpriteAnimationClip))]
+  // [HarmonyPatch(typeof(GameObject), nameof(GameObject.SetActive))]
+  // [HarmonyPatch(typeof(GunExt), nameof(GunExt.UpdateAnimation))]
   private class ThreadSafeUnityStuffPatch
   {
     public static void Prefix()
