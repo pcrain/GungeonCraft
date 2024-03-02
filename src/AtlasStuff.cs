@@ -370,6 +370,7 @@ public static class PackerHelper
   {
       BindingFlags anyFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
+      // Safe shared resource access
       MethodInfo threadSafePrefix = typeof(PackerHelper.ThreadSafeUnityStuffPatch).GetMethod(
         "Prefix", bindingAttr: BindingFlags.Static | BindingFlags.Public);
       MethodInfo threadSafePostfix = typeof(PackerHelper.ThreadSafeUnityStuffPatch).GetMethod(
@@ -389,14 +390,16 @@ public static class PackerHelper
       harmony.Patch(typeof(EnemyDatabase).GetMethod("GetOrLoadByGuid", bindingAttr: anyFlags),
         prefix: new HarmonyMethod(threadSafePrefix), postfix:  new HarmonyMethod(threadSafePostfix));
 
+      // Load sprites from our own atlases
       harmony.Patch(typeof(SpriteBuilder).GetMethod("SpriteFromResource", bindingAttr: anyFlags),
         prefix: new HarmonyMethod(typeof(SpriteFromResourcePatch).GetMethod("Prefix", bindingAttr: anyFlags)));
 
+      // Add sprites to collections from our own atlases
       harmony.Patch(typeof(SpriteBuilder).GetMethod("AddSpriteToCollection", types: new[]{typeof(string), typeof(tk2dSpriteCollectionData), typeof(Assembly)}),
         prefix: new HarmonyMethod(typeof(AddSpriteToCollectionPatch).GetMethod("Prefix", bindingAttr: anyFlags)));
   }
 
-  /// <summary>Patched version of Alexandria's SpriteFromResource</summary>
+  /// <summary>Patched version of Alexandria's SpriteFromResource (manually added through InitSetupPatches())</summary>
   // [HarmonyPatch(typeof(SpriteBuilder), nameof(SpriteBuilder.SpriteFromResource))]
   private class SpriteFromResourcePatch
   {
@@ -424,7 +427,7 @@ public static class PackerHelper
     }
   }
 
-  /// <summary>Patched version of Alexandria's AddSpriteToCollection(string, ...)</summary>
+  /// <summary>Patched version of Alexandria's AddSpriteToCollection(string, ...) (manually added through InitSetupPatches())</summary>
   // [HarmonyPatch(typeof(SpriteBuilder), nameof(SpriteBuilder.AddSpriteToCollection), typeof(string), typeof(tk2dSpriteCollectionData), /*typeof(string), */typeof(Assembly))]
   private class AddSpriteToCollectionPatch
   {
@@ -439,7 +442,7 @@ public static class PackerHelper
     }
   }
 
-  /// <summary>Patched, thread-safe versions of various sensitive functions</summary>
+  /// <summary>Patched, thread-safe versions of various sensitive functions (manually added through InitSetupPatches())</summary>
   // [HarmonyPatch(typeof(tk2dSpriteAnimation), nameof(tk2dSpriteAnimation.GetClipByName))]
   // [HarmonyPatch(typeof(tk2dSpriteAnimation), nameof(tk2dSpriteAnimation.GetClipById))]
   // [HarmonyPatch(typeof(tk2dSpriteAnimation), nameof(tk2dSpriteAnimation.GetClipIdByName), typeof(string))]

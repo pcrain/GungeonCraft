@@ -74,9 +74,9 @@ public static class Lazy
             sprite.IsPerpendicular = true;
             obj.GetComponent<BraveBehaviour>().sprite = sprite;
 
-            ETGMod.Databases.Items.SetupItem(item, item.name);
             lock(_AmmonomiconUpdateLock)
             {
+                ETGMod.Databases.Items.SetupItem(item, item.name);
                 Gungeon.Game.Items.Add(IDs.InternalNames[itemName], item);
             }
 
