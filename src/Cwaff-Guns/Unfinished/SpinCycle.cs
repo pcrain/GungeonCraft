@@ -59,14 +59,14 @@ public class SpinCycle : AdvancedGunBehavior
             pierce2.penetratesBreakables  = true;
 
         BasicBeamController chainBeam = chain.GenerateBeamPrefab(
-            "CwaffingTheGungy/Resources/BeamSprites/alphabeam_mid_001",
+            $"{C.MOD_INT_NAME}/Resources/BeamSprites/alphabeam_mid_001",
             new Vector2(15, 7),
             new Vector2(0, 4),
             new() {
-                "CwaffingTheGungy/Resources/BeamSprites/alphabeam_mid_001",
-                // "CwaffingTheGungy/Resources/BeamSprites/alphabeam_mid_002",
-                // "CwaffingTheGungy/Resources/BeamSprites/alphabeam_mid_003",
-                // "CwaffingTheGungy/Resources/BeamSprites/alphabeam_mid_004",
+                $"{C.MOD_INT_NAME}/Resources/BeamSprites/alphabeam_mid_001",
+                // $"{C.MOD_INT_NAME}/Resources/BeamSprites/alphabeam_mid_002",
+                // $"{C.MOD_INT_NAME}/Resources/BeamSprites/alphabeam_mid_003",
+                // $"{C.MOD_INT_NAME}/Resources/BeamSprites/alphabeam_mid_004",
             },
             13,glowAmount:100,emissivecolouramt:100
         );

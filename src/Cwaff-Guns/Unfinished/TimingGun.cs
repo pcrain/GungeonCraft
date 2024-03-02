@@ -48,7 +48,7 @@ public class TimingGun : AdvancedGunBehavior
         {
             string istring = i.ToString();
             VFX.RegisterVFX(istring, new List<string>() {
-                    "CwaffingTheGungy/Resources/MiscVFX/Numbers/"+istring,
+                    $"{C.MOD_INT_NAME}/Resources/MiscVFX/Numbers/"+istring,
                 }, 1, loops: false, anchor: Anchor.LowerCenter, persist: true);
         }
 

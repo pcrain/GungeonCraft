@@ -16,10 +16,10 @@ public class HatDefinitions
         // berserker.frontDiagonalUseLeftRight = true;
         // List<string> berserkerSprites = new List<string>()
         // {
-        //     "CwaffingTheGungy/Resources/Hats/theberserker_south_001",
-        //     "CwaffingTheGungy/Resources/Hats/theberserker_north_001",
-        //     "CwaffingTheGungy/Resources/Hats/theberserker_west_001",
-        //     "CwaffingTheGungy/Resources/Hats/theberserker_east_001",
+        //     $"{C.MOD_INT_NAME}/Resources/Hats/theberserker_south_001",
+        //     $"{C.MOD_INT_NAME}/Resources/Hats/theberserker_north_001",
+        //     $"{C.MOD_INT_NAME}/Resources/Hats/theberserker_west_001",
+        //     $"{C.MOD_INT_NAME}/Resources/Hats/theberserker_east_001",
         // };
         // HatUtility.SetupHatSprites(berserkerSprites, berserkerObj, 1, new Vector2(14, 11));
         // berserkerObj.SetActive(false);
@@ -37,7 +37,7 @@ public class HatDefinitions
         // //numberOne.hatOffset = new Vector2(0, -0.12f);
         // List<string> numberOneSprites = new List<string>()
         // {
-        //     "CwaffingTheGungy/Resources/Hats/numberoneplaceholder_south_001",
+        //     $"{C.MOD_INT_NAME}/Resources/Hats/numberoneplaceholder_south_001",
         // };
         // HatUtility.SetupHatSprites(numberOneSprites, numberOneObj, 1, new Vector2(14, 11));
         // numberOneObj.SetActive(false);
@@ -55,7 +55,7 @@ public class HatDefinitions
         // stovepipe.hatOffset = new Vector2(0, -0.12f);
         // List<string> stovepipeSprites = new List<string>()
         // {
-        //     "CwaffingTheGungy/Resources/Hats/thestovepipe_south_001",
+        //     $"{C.MOD_INT_NAME}/Resources/Hats/thestovepipe_south_001",
         // };
         // HatUtility.SetupHatSprites(stovepipeSprites, stovepipeObj, 1, new Vector2(14, 12));
         // stovepipeObj.SetActive(false);

@@ -19,8 +19,8 @@ public class Superstitious : PassiveItem
         PickupObject item = Lazy.SetupPassive<Superstitious>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
 
-        els.Add(new HUDElement("Coolness","","CwaffingTheGungy/Resources/HUD/Coolness.png"));
-        // els.Add(new HUDElement("Curse","","CwaffingTheGungy/Resources/HUD/Curse.png"));
+        els.Add(new HUDElement("Coolness","",$"{C.MOD_INT_NAME}/Resources/HUD/Coolness.png"));
+        // els.Add(new HUDElement("Curse","",$"{C.MOD_INT_NAME}/Resources/HUD/Curse.png"));
         // els.Add(new HUDElement("Basic2","basic text",null));
     }
 

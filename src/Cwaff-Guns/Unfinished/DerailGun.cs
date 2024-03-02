@@ -47,19 +47,19 @@ public class DerailGun : AdvancedGunBehavior
 
         List<string> BeamAnimPaths = new List<string>()
         {
-            "CwaffingTheGungy/Resources/BeamSprites/railbeam_mid_001",
+            $"{C.MOD_INT_NAME}/Resources/BeamSprites/railbeam_mid_001",
         };
         List<string> BeamStartPaths = new List<string>()
         {
-            "CwaffingTheGungy/Resources/BeamSprites/railbeam_mid_001",
+            $"{C.MOD_INT_NAME}/Resources/BeamSprites/railbeam_mid_001",
         };
         List<string> BeamEndPaths = new List<string>()
         {
-            "CwaffingTheGungy/Resources/BeamSprites/railbeam_mid_001",
+            $"{C.MOD_INT_NAME}/Resources/BeamSprites/railbeam_mid_001",
         };
         List<string> BeamImpactPaths = new List<string>()
         {
-            "CwaffingTheGungy/Resources/BeamSprites/railbeam_mid_001",
+            $"{C.MOD_INT_NAME}/Resources/BeamSprites/railbeam_mid_001",
         };
 
         Projectile projectile              = gun.InitFirstProjectile(new(damage: 0.0f, speed: 0.1f, force: 0.0f, range: 200.0f));
@@ -70,7 +70,7 @@ public class DerailGun : AdvancedGunBehavior
 
         Projectile projectile2         = Items.MarineSidearm.CloneProjectile(new(damage: 0.0f, force: 0.0f, range: 999f));
         BasicBeamController beamComp2  = projectile2.GenerateBeamPrefab(
-            /*sprite path*/                    "CwaffingTheGungy/Resources/BeamSprites/railbeam_mid_001",
+            /*sprite path*/                    $"{C.MOD_INT_NAME}/Resources/BeamSprites/railbeam_mid_001",
             /*collider dimensions*/            new Vector2(15, 7),
             /*collider offsets*/               new Vector2(0, 4),
             /*beam sprites*/                   BeamAnimPaths,

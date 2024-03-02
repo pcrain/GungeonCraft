@@ -140,7 +140,7 @@ public class HUDElement
 
     private float timeSinceLastUpdate = 0f;
     private static Texture2D defaultIcon =
-        ResourceExtractor.GetTextureFromResource("CwaffingTheGungy/Resources/HUD/Coolness.png");
+        ResourceExtractor.GetTextureFromResource($"{C.MOD_INT_NAME}/Resources/HUD/Coolness.png");
 
     public HUDElement(string name, string initText = null, string initIconPath = null, bool addImmediately = true)
     {

@@ -23,7 +23,7 @@ public class Bart
             npcName                : "bart",
             shopItems              : shopItems,
             moddedItems            : moddedItems,
-            roomPath               : "CwaffingTheGungy/Resources/Rooms/barter.newroom",
+            roomPath               : $"{C.MOD_INT_NAME}/Resources/Rooms/barter.newroom",
             allowDupes             : false,
             costModifier           : 1f,
             spawnChance            : 1.0f,

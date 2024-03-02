@@ -56,20 +56,20 @@ public class Bombo : FancyNPC
             prefix        : "cg",
             animationData : new List<SimpleAnimationData>() {
                new SimpleAnimationData("idler",3, new List<string>() {
-                   "CwaffingTheGungy/Resources/NPCSprites/GrinReaper/grin_allsprites3",
-                   "CwaffingTheGungy/Resources/NPCSprites/GrinReaper/grin_allsprites4",
+                   $"{C.MOD_INT_NAME}/Resources/NPCSprites/GrinReaper/grin_allsprites3",
+                   $"{C.MOD_INT_NAME}/Resources/NPCSprites/GrinReaper/grin_allsprites4",
                    }),
                new SimpleAnimationData("talker",5, new List<string>() {
-                   "CwaffingTheGungy/Resources/NPCSprites/GrinReaper/grin_allsprites1",
-                   "CwaffingTheGungy/Resources/NPCSprites/GrinReaper/grin_allsprites2",
+                   $"{C.MOD_INT_NAME}/Resources/NPCSprites/GrinReaper/grin_allsprites1",
+                   $"{C.MOD_INT_NAME}/Resources/NPCSprites/GrinReaper/grin_allsprites2",
                    }),
                new SimpleAnimationData("sad",3, new List<string>() {
-                   "CwaffingTheGungy/Resources/NPCSprites/GrinReaper/grin_allsprites5",
-                   "CwaffingTheGungy/Resources/NPCSprites/GrinReaper/grin_allsprites6",
+                   $"{C.MOD_INT_NAME}/Resources/NPCSprites/GrinReaper/grin_allsprites5",
+                   $"{C.MOD_INT_NAME}/Resources/NPCSprites/GrinReaper/grin_allsprites6",
                    }),
                new SimpleAnimationData("point",3, new List<string>() {
-                   "CwaffingTheGungy/Resources/NPCSprites/GrinReaper/grin_allsprites9",
-                   "CwaffingTheGungy/Resources/NPCSprites/GrinReaper/grin_allsprites10",
+                   $"{C.MOD_INT_NAME}/Resources/NPCSprites/GrinReaper/grin_allsprites9",
+                   $"{C.MOD_INT_NAME}/Resources/NPCSprites/GrinReaper/grin_allsprites10",
                    })
             }
             // talkPointAdjust : new Vector3(2.5f, 2.5f, 0)

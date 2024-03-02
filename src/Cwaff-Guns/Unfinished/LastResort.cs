@@ -40,11 +40,11 @@ public class LastResort : AdvancedGunBehavior
         lastResortProjectiles.Add(p0);
 
         // TODO: antiquated VFX registering from my early days, clean this up if I ever come back to this
-        VFX.RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/PumpChargeMeter1");
-        VFX.RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/PumpChargeMeter2");
-        VFX.RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/PumpChargeMeter3");
-        VFX.RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/PumpChargeMeter4");
-        VFX.RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/PumpChargeMeter5");
+        VFX.RegisterSprite($"{C.MOD_INT_NAME}/Resources/MiscVFX/PumpChargeMeter1");
+        VFX.RegisterSprite($"{C.MOD_INT_NAME}/Resources/MiscVFX/PumpChargeMeter2");
+        VFX.RegisterSprite($"{C.MOD_INT_NAME}/Resources/MiscVFX/PumpChargeMeter3");
+        VFX.RegisterSprite($"{C.MOD_INT_NAME}/Resources/MiscVFX/PumpChargeMeter4");
+        VFX.RegisterSprite($"{C.MOD_INT_NAME}/Resources/MiscVFX/PumpChargeMeter5");
         VFX.RegisterVFX(_PumpChargeAnimationName, ResMap.Get("PumpChargeMeter"),
             fps: 4, loops: true, anchor: Anchor.LowerCenter);
 

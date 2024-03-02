@@ -8,6 +8,7 @@ public static class AtlasHelper
     internal static Dictionary<string, tk2dSpriteDefinition> _PackedTextures = new();
     private static readonly Vector2 _TexelSize = new Vector2(0.0625f, 0.0625f);
 
+    /// <summary>Batches UI sprite additions from an alternating list of texture paths and sprite names</summary>
     public static void AddUISpriteBatch(List<string> pathsAndNames)
     {
       Assembly assembly = Assembly.GetCallingAssembly();

@@ -110,7 +110,7 @@ public class Initialisation : BaseUnityPlugin
 
                 System.Diagnostics.Stopwatch attachPointsWatch = System.Diagnostics.Stopwatch.StartNew();
                 Dictionary<string, tk2dSpriteDefinition.AttachPoint[]> attachPoints =
-                    AtlasHelper.ReadAttachPointsFromTSV(asmb, $"CwaffingTheGungy.Resources.Atlases.attach_points.tsv");
+                    AtlasHelper.ReadAttachPointsFromTSV(asmb, $"{C.MOD_INT_NAME}.Resources.Atlases.attach_points.tsv");
                 attachPointsWatch.Stop();
                 if (C.DEBUG_BUILD)
                     ETGModConsole.Log($"    attachPoints finished in {attachPointsWatch.ElapsedMilliseconds} milliseconds");
@@ -118,7 +118,7 @@ public class Initialisation : BaseUnityPlugin
                 //WARNING: I know this looks like it can be threaded, but it can't...I've tried three times now, so much can go wrong...don't do it pretzel D:
                 for (int i = 1; ; ++i)
                 {
-                    string atlasPath = $"CwaffingTheGungy.Resources.Atlases.atlas_{i}.png";
+                    string atlasPath = $"{C.MOD_INT_NAME}.Resources.Atlases.atlas_{i}.png";
                     using (Stream s = asmb.GetManifestResourceStream(atlasPath))
                     {
                       if (s == null)
@@ -128,7 +128,7 @@ public class Initialisation : BaseUnityPlugin
                     if (C.DEBUG_BUILD)
                         ETGModConsole.Log($"extracted texture from atlas {i}");
                     AtlasHelper.LoadPackedTextureResource(
-                      atlas: atlas, attachPoints: attachPoints, metaDataResourcePath: $"CwaffingTheGungy.Resources.Atlases.atlas_{i}.atlas");
+                      atlas: atlas, attachPoints: attachPoints, metaDataResourcePath: $"{C.MOD_INT_NAME}.Resources.Atlases.atlas_{i}.atlas");
                 }
                 // Build resource map for ease of access
                 ResMap.Build();

@@ -37,12 +37,12 @@ public static class VFX
 
         #region Shared VFX
             // Shared by Sans and potentially future reticle users
-            RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/reticle_white");
-            RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/reticle_orange");
-            RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/reticle_blue");
-            RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/fancy_line");
-            RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/whip_segment");
-            RegisterSprite("CwaffingTheGungy/Resources/MiscVFX/whip_segment_base");
+            RegisterSprite($"{C.MOD_INT_NAME}/Resources/MiscVFX/reticle_white");
+            RegisterSprite($"{C.MOD_INT_NAME}/Resources/MiscVFX/reticle_orange");
+            RegisterSprite($"{C.MOD_INT_NAME}/Resources/MiscVFX/reticle_blue");
+            RegisterSprite($"{C.MOD_INT_NAME}/Resources/MiscVFX/fancy_line");
+            RegisterSprite($"{C.MOD_INT_NAME}/Resources/MiscVFX/whip_segment");
+            RegisterSprite($"{C.MOD_INT_NAME}/Resources/MiscVFX/whip_segment_base");
             // Shared by Blackjack and possibly future auto-pickup items
             MiniPickup = VFX.Create("mini_pickup", 12, loops: false, anchor: Anchor.MiddleCenter);
         #endregion

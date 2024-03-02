@@ -5,7 +5,7 @@ public partial class SansBoss : AIActor
   public  const  string BOSS_GUID              = "Sans Boss";
   private const  string BOSS_NAME              = "Sans Gundertale";
   private const  string SUBTITLE               = "Introducing...";
-  private const  string SPRITE_PATH            = "CwaffingTheGungy/Resources/sans";
+  private const  string SPRITE_PATH            = $"{C.MOD_INT_NAME}/Resources/sans";
 
   private static GameObject _NapalmReticle      = null;
   private static AIBulletBank.Entry _BoneBullet = null;

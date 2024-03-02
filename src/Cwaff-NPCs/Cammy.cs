@@ -78,7 +78,7 @@ public class Cammy
             npcName                : "cammy",
             shopItems              : shopItems,
             moddedItems            : moddedItems,
-            roomPath               : "CwaffingTheGungy/Resources/Rooms/petshop.newroom",
+            roomPath               : $"{C.MOD_INT_NAME}/Resources/Rooms/petshop.newroom",
             allowDupes             : false,
             costModifier           : 0.7f,
             spawnChance            : 1.0f,

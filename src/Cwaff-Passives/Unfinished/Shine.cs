@@ -29,7 +29,7 @@ public class Shine : PassiveItem
         };
 
         // Can't use resmap because sprite has number in it
-        // _ShineVFX = VFX.RegisterVFXObject("Shine", new (){"CwaffingTheGungy/Resources/MiscVFX/shine2"},
+        // _ShineVFX = VFX.RegisterVFXObject("Shine", new (){$"{C.MOD_INT_NAME}/Resources/MiscVFX/shine2"},
         //     fps: 1, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 100);
     }
     private void PostProcessProjectile(Projectile bullet, float thing)

@@ -34,7 +34,7 @@
 //             npcName                : "white_mage",
 //             shopItems              : shopItems,
 //             moddedItems            : moddedItems,
-//             roomPath               : "CwaffingTheGungy/Resources/Rooms/BasicShopRoom2.newroom",
+//             roomPath               : $"{C.MOD_INT_NAME}/Resources/Rooms/BasicShopRoom2.newroom",
 //             allowDupes             : false,
 //             costModifier           : 2f / 9f, // insurance should cost 2/9 of 90 == 20 casings
 //             spawnChance            : 1.0f,
