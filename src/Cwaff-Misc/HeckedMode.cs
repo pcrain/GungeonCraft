@@ -2,7 +2,6 @@ namespace CwaffingTheGungy;
 
 /* TODO:
     - fix FindPredictedTargetPosition error
-    - fix GunnerGunController.Engage() null deref
     - fix Gun.ClearCooldowns() null deref
     - test Bsg
 
@@ -392,6 +391,7 @@ public static class HeckedMode
             gun.GetComponent<HoveringGunSynergyProcessor>().SafeDestroy();                 // fix Blooper, etc.
             gun.GetComponent<MotionTriggeredStatSynergyProcessor>().SafeDestroy();         // fix Gungine, etc.
             gun.GetComponent<TalkingGunModifier>().SafeDestroy();                          // fix Gunther
+            gun.GetComponent<GunnerGunController>().SafeDestroy();                         // fix GuNNER
             // gun.GetComponent<LifeOrbGunModifier>().SafeDestroy();                       // fix Life Orb, not useful until beams are fixed in general
             if (gun.GetComponent<StealthOnReloadPressed>() is StealthOnReloadPressed sorp) // fix GreyMauser, etc.
             {
