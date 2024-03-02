@@ -64,7 +64,7 @@ public static class VFX
         if (animations.ContainsKey(name))
         {
             Lazy.DebugWarn($"  HEY! re-creating VFX {name} can cause scale / anchor conflicts. Please reuse the original VFX or use a different sprite for this VFX.");
-            return; //BUG: this causes issues whether we return early (poe souls) or not (uppskeruvel muzzle)...these issues really need to be handled as they come up
+            return; //NOTE: this causes issues whether we return early (poe souls) or not (uppskeruvel muzzle)...these issues really need to be handled as they come up
         }
 
         int spriteID = AtlasHelper.SafeAddSpriteToCollection(spritePaths[0], OverheadVFXCollection);

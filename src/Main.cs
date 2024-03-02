@@ -435,11 +435,12 @@ public class Initialisation : BaseUnityPlugin
                 // setupBossesThread.Start();
             #endregion
 
-            // Need to wait for all items to be loaded before setting up synergies and shops
+            // Need to wait for all items and SaveAPI to be loaded before setting up synergies and shops
             System.Diagnostics.Stopwatch awaitItemsWatch = System.Diagnostics.Stopwatch.StartNew();
             setupActivesThread.Join();
             setupPassivesThread.Join();
             setupGunsThread.Join();
+            setupSaveThread.Join();
             awaitItemsWatch.Stop();
 
             #region Synergies (Async)
@@ -494,13 +495,10 @@ public class Initialisation : BaseUnityPlugin
                 // }
             #endregion
 
-            #region Wait for Async stuff to finish up
+            #region Wait for remaining async stuff to finish up
                 System.Diagnostics.Stopwatch awaitAsyncWatch = System.Diagnostics.Stopwatch.StartNew();
-                setupSaveThread.Join();
                 setupAudioThread.Join();
                 setupSynergiesThread.Join();
-                // setupShopsThread.Join();
-                // setupBossesThread.Join();
                 awaitAsyncWatch.Stop();
             #endregion
 
