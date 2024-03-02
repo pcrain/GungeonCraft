@@ -18,7 +18,7 @@ public class C // constants and common variables
     public const float  FRAME           = 1f / FPS;
     public const float  PIXEL_SIZE      = 1f / PIXELS_PER_TILE;
 
-    internal static readonly bool _WARN_DUPLICATE_VFX = false;
+    internal static readonly bool _WARN_DUPLICATE_VFX = true;
 
     internal static bool _ModSetupFinished = false; // set to true at the end of setup to disable some patches
 }

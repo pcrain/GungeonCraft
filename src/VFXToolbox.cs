@@ -65,8 +65,7 @@ public static class VFX
         {
             if (C.DEBUG_BUILD && C._WARN_DUPLICATE_VFX)
                 Lazy.DebugWarn($"  HEY! re-creating VFX {name} can cause scale / anchor conflicts. Please reuse the original VFX or use a different sprite for this VFX.");
-            //NOTE: can't return early here since it's valid to reuse the same sprite for two different VFX...it'll just overwrite the animations dict
-            // return;
+            return; //BUG: this causes issues whether we return early (poe souls) or not (uppskeruvel muzzle)...these issues really need to be handled as they come up
         }
 
         int spriteID = PackerHelper.SafeAddSpriteToCollection(spritePaths[0], OverheadVFXCollection);

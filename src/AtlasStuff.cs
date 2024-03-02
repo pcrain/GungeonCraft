@@ -103,42 +103,28 @@ public static class PackerHelper
   {
     Material material    = new Material(ShaderCache.Acquire(PlayerController.DefaultShaderName));
     material.mainTexture = texture;
-    float ww             = C.PIXEL_SIZE * w;
-    float hh             = C.PIXEL_SIZE * h;
-    Vector3 center       = new Vector3(ww / 2f, hh / 2f, 0f);
-    Vector3 extents      = new Vector3(ww,      hh, 0f);
     float xmin           = (float) x      / (float)texture.width;
     float xmax           = (float)(x + w) / (float)texture.width;
     float ymin           = 1f - (float)(y + h) / (float)texture.height;
     float ymax           = 1f - (float) y      / (float)texture.height;
     Vector3 offset       = C.PIXEL_SIZE * new Vector3(ox, oh - oy - h, 0f); //NOTE: texture is flipped vertically in memory
+    Vector3 extents      = C.PIXEL_SIZE * new Vector3(w, h, 0f);
     Vector3 trueExtents  = C.PIXEL_SIZE * new Vector3(ow, oh, 0f);
-    // Vector3 trueCenter   = /*0.5f * */C.PIXEL_SIZE * new Vector3(w + ox, h + oy, 0f);
     Vector3 trueCenter   = 0.5f * trueExtents;
-    // Vector3 trueCenter   = C.PIXEL_SIZE * new Vector3(ox + 0.5f * w, oy + 0.5f * h, 0f); //
 
     tk2dSpriteDefinition def = new tk2dSpriteDefinition
     {
         name                       = spriteName,
-        normals                    = null,
-        tangents                   = null,
         texelSize                  = _TexelSize,
-        extractRegion              = false,
-        regionX                    = 0,
-        regionY                    = 0,
-        regionW                    = 0,
-        regionH                    = 0,
         flipped                    = tk2dSpriteDefinition.FlipMode.None,
-        complexGeometry            = false,
         physicsEngine              = tk2dSpriteDefinition.PhysicsEngine.Physics3D,
-        colliderType               = tk2dSpriteDefinition.ColliderType.Box, // used to be "None" in reference code -- not sure if this makes a difference
+        colliderType               = tk2dSpriteDefinition.ColliderType.None,
         collisionLayer             = CollisionLayer.HighObstacle,
         material                   = material,
         materialInst               = material,
-        materialId                 = 0,
-        position0                  = offset + Vector3.zero,
-        position1                  = offset + new Vector3(ww, 0, 0f),
-        position2                  = offset + new Vector3(0,  hh, 0f),
+        position0                  = offset,
+        position1                  = offset + extents.WithY(0f),
+        position2                  = offset + extents.WithX(0f),
         position3                  = offset + extents,
         boundsDataExtents          = trueExtents,
         boundsDataCenter           = trueCenter,

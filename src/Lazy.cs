@@ -20,6 +20,7 @@ public static class Lazy
     }
 
     private static readonly object _AmmonomiconUpdateLock = new();
+    private static readonly object _GUIUpdateLock = new();
 
     /// <summary>Perform basic initialization for a new passive, active, or gun item definition.</summary>
     public static TItemClass SetupItem<TItemClass, TItemSpecific>(string itemName, string spritePath, string projectileName, string shortDescription, string longDescription, string lore, bool hideFromAmmonomicon = false)
@@ -95,19 +96,34 @@ public static class Lazy
         {
             IDs.Guns[baseItemName] = item.PickupObjectId; //register item in gun ID database
             if (C.DEBUG_BUILD && !hideFromAmmonomicon)
-                ETGModConsole.Log($"Lazy Initialized Gun: {baseItemName} ({item.DisplayName})");
+            {
+                lock(_GUIUpdateLock)
+                {
+                    ETGModConsole.Log($"Lazy Initialized Gun: {baseItemName} ({item.DisplayName})");
+                }
+            }
         }
         else if (item is PlayerItem)
         {
             IDs.Actives[baseItemName] = item.PickupObjectId; //register item in active ID database
             if (C.DEBUG_BUILD && !hideFromAmmonomicon)
-                ETGModConsole.Log($"Lazy Initialized Active: {baseItemName} ({item.DisplayName})");
+            {
+                lock(_GUIUpdateLock)
+                {
+                    ETGModConsole.Log($"Lazy Initialized Active: {baseItemName} ({item.DisplayName})");
+                }
+            }
         }
         else
         {
             IDs.Passives[baseItemName] = item.PickupObjectId; //register item in passive ID database
             if (C.DEBUG_BUILD && !hideFromAmmonomicon)
-                ETGModConsole.Log($"Lazy Initialized Passive: {baseItemName} ({item.DisplayName})");
+            {
+                lock(_GUIUpdateLock)
+                {
+                    ETGModConsole.Log($"Lazy Initialized Passive: {baseItemName} ({item.DisplayName})");
+                }
+            }
         }
         return item;
     }
