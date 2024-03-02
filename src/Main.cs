@@ -179,6 +179,8 @@ public class Initialisation : BaseUnityPlugin
                 SoulLinkStatus.Init();
                 //Goop Setup
                 EasyGoopDefinitions.DefineDefaultGoops();
+                // Boss Builder API //WARNING: moved from boss setup due to threading error in PathologicalGames.PoolManagerUtils.SetActive()
+                BossBuilder.Init();
                 // Note Does Setup
                 CustomNoteDoer.Init();
                 // Miscellaneous tweaks
@@ -428,7 +430,6 @@ public class Initialisation : BaseUnityPlugin
                 System.Diagnostics.Stopwatch setupBossesWatch = null;
                 // Thread setupBossesThread = new Thread(() => {
                     setupBossesWatch = System.Diagnostics.Stopwatch.StartNew();
-                    BossBuilder.Init();
                     SansBoss.Init();
                     setupBossesWatch.Stop();
                 // });
@@ -443,15 +444,15 @@ public class Initialisation : BaseUnityPlugin
             setupSaveThread.Join();
             awaitItemsWatch.Stop();
 
-            #region Synergies (Async)
+            #region Synergies (not async due to safety concerns + it's fast already)
                 System.Diagnostics.Stopwatch setupSynergiesWatch = null;
-                Thread setupSynergiesThread = new Thread(() => {
+                // Thread setupSynergiesThread = new Thread(() => {
                     setupSynergiesWatch = System.Diagnostics.Stopwatch.StartNew();
 
                     CwaffSynergies.Init();
                     setupSynergiesWatch.Stop();
-                });
-                setupSynergiesThread.Start();
+                // });
+                // setupSynergiesThread.Start();
             #endregion
 
             #region Shop NPCs (can't be async due to post-load barter table setup issues causing null derefs)
@@ -498,7 +499,7 @@ public class Initialisation : BaseUnityPlugin
             #region Wait for remaining async stuff to finish up
                 System.Diagnostics.Stopwatch awaitAsyncWatch = System.Diagnostics.Stopwatch.StartNew();
                 setupAudioThread.Join();
-                setupSynergiesThread.Join();
+                // setupSynergiesThread.Join();
                 awaitAsyncWatch.Stop();
             #endregion
 
@@ -524,7 +525,7 @@ public class Initialisation : BaseUnityPlugin
                 ETGModConsole.Log($"    setupFloors       finished in {setupFloorsWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupBosses       finished in {setupBossesWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    awaitItems        finished in {awaitItemsWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    setupSynergies    finished in {setupSynergiesWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
+                ETGModConsole.Log($"    setupSynergies    finished in {setupSynergiesWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupShops        finished in {setupShopsWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    awaitAsync        finished in {awaitAsyncWatch.ElapsedMilliseconds} milliseconds");
                 long newMemory = currentProcess.WorkingSet64;
