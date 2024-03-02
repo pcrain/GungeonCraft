@@ -87,7 +87,7 @@ public class Initialisation : BaseUnityPlugin
                 System.Diagnostics.Stopwatch setupEarlyHarmonyWatch = null;
                 Thread setupEarlyHarmonyThread = new Thread(() => {
                     setupEarlyHarmonyWatch = System.Diagnostics.Stopwatch.StartNew();
-                    PackerHelper.InitSetupPatches(harmony);
+                    AtlasHelper.InitSetupPatches(harmony);
                     setupEarlyHarmonyWatch.Stop();
                 });
                 setupEarlyHarmonyThread.Start();
@@ -110,7 +110,7 @@ public class Initialisation : BaseUnityPlugin
 
                 System.Diagnostics.Stopwatch attachPointsWatch = System.Diagnostics.Stopwatch.StartNew();
                 Dictionary<string, tk2dSpriteDefinition.AttachPoint[]> attachPoints =
-                    PackerHelper.ReadAttachPointsFromTSV(asmb, $"CwaffingTheGungy.Resources.Atlases.attach_points.tsv");
+                    AtlasHelper.ReadAttachPointsFromTSV(asmb, $"CwaffingTheGungy.Resources.Atlases.attach_points.tsv");
                 attachPointsWatch.Stop();
                 if (C.DEBUG_BUILD)
                     ETGModConsole.Log($"    attachPoints finished in {attachPointsWatch.ElapsedMilliseconds} milliseconds");
@@ -127,7 +127,7 @@ public class Initialisation : BaseUnityPlugin
                     Texture2D atlas = ResourceExtractor.GetTextureFromResource(atlasPath, asmb);
                     if (C.DEBUG_BUILD)
                         ETGModConsole.Log($"extracted texture from atlas {i}");
-                    PackerHelper.LoadPackedTextureResource(
+                    AtlasHelper.LoadPackedTextureResource(
                       atlas: atlas, attachPoints: attachPoints, metaDataResourcePath: $"CwaffingTheGungy.Resources.Atlases.atlas_{i}.atlas");
                 }
                 // Build resource map for ease of access
@@ -370,7 +370,7 @@ public class Initialisation : BaseUnityPlugin
 
             #region UI Sprites (cannot be async, must set up textures on main thread)
                 System.Diagnostics.Stopwatch setupUIWatch = System.Diagnostics.Stopwatch.StartNew();
-                BetterAtlas.AddUISpriteBatch(new(){
+                AtlasHelper.AddUISpriteBatch(new(){
                     "barter_s_icon",            Bart._BarterSpriteS,
                     "barter_a_icon",            Bart._BarterSpriteA,
                     "barter_b_icon",            Bart._BarterSpriteB,

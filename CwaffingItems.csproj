@@ -88,7 +88,6 @@
     <Compile Include="src\Cwaff-Enemies\Bosses\Sans\Sans.cs"/>
     <Compile Include="src\Cwaff-Enemies\Bosses\Sans\SansAttacks.cs"/>
     <Compile Include="src\Cwaff-Enemies\PathableBullet.cs"/>
-    <Compile Include="src\AtlasStuff.cs"/>
     <Compile Include="src\Cwaff-Rooms\FancyShopBuilder.cs"/>
     <Compile Include="src\Extensions.cs"/>
     <Compile Include="src\Cwaff-NPCs\Bombo.cs"/>
@@ -98,6 +97,7 @@
     <Compile Include="src\Cwaff-NPCs\Bart.cs"/>
     <Compile Include="src\Cwaff-Debug\OneOffDebugDungeonFlow.cs"/>
     <Compile Include="src\Common.cs"/>
+    <Compile Include="src\AtlasHelper.cs"/>
     <Compile Include="src\Cwaff-Actives\AmazonPrimer.cs"/>
     <Compile Include="src\Cwaff-Actives\Unfinished\GungeonitePickaxe.cs"/>
     <Compile Include="src\Cwaff-Actives\Unfinished\Protractor.cs"/>

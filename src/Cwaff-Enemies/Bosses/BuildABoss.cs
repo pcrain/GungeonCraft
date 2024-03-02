@@ -916,7 +916,7 @@ public static class BH
     Dictionary<string,string[]> spriteMaps = new Dictionary<string,string[]>();
     // foreach (string s in ResourceExtractor.GetResourceNames())
     string bossName = resourcePath.Split('/').Last();  //HACK: assuming boss sprites are in their own folder, probably not the best
-    foreach (string s in PackerHelper._PackedTextures.Keys)
+    foreach (string s in AtlasHelper._PackedTextures.Keys)
     {
       if (!s.StartsWith(bossName))
         continue;
@@ -959,7 +959,7 @@ public static class BH
         if (String.IsNullOrEmpty(v))
           continue;
         // ETGModConsole.Log($"  {v}");
-        PackerHelper.SafeAddSpriteToCollection($"{resourcePath}/{v}", bossSprites);
+        AtlasHelper.SafeAddSpriteToCollection($"{resourcePath}/{v}", bossSprites);
         ++lastAnim;
       }
       DirectionalAnimation.DirectionType dir;
@@ -977,7 +977,7 @@ public static class BH
     tk2dSpriteCollectionData bossSprites = SpriteBuilder.ConstructCollection(prefab, (prefab.name+" Collection").Replace(" ","_"));
     UnityEngine.Object.DontDestroyOnLoad(bossSprites);
     for (int i = 0; i < spritePaths.Length; i++)
-      PackerHelper.SafeAddSpriteToCollection(spritePaths[i], bossSprites);
+      AtlasHelper.SafeAddSpriteToCollection(spritePaths[i], bossSprites);
     return bossSprites;
   }
 

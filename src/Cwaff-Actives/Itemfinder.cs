@@ -31,7 +31,7 @@ public class Itemfinder : PlayerItem
         item.SetCooldownType(ItemBuilder.CooldownType.Timed, 1f);
 
         _NormalId = item.sprite.spriteId;
-        _BlinkId  = PackerHelper.SafeAddSpriteToCollection(ResMap.Get("itemfinder_blink_icon")[0], item.sprite.Collection);
+        _BlinkId  = AtlasHelper.SafeAddSpriteToCollection(ResMap.Get("itemfinder_blink_icon")[0], item.sprite.Collection);
     }
 
     public override void Pickup(PlayerController player)

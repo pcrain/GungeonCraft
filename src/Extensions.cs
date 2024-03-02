@@ -813,7 +813,7 @@ public static class Extensions
     List<int> spriteIds = new();
     foreach (string spritePath in ResMap.Get(animationName))
     {
-        int frameSpriteId = PackerHelper.SafeAddSpriteToCollection(spritePath, collection);
+        int frameSpriteId = AtlasHelper.SafeAddSpriteToCollection(spritePath, collection);
         spriteIds.Add(frameSpriteId);
         if (copyShaders)
         {
@@ -871,7 +871,7 @@ public static class Extensions
       //   ETGModConsole.Log($"  getting clip {$"{clipname}_clip"}");
       mod.ammoType       = GameUIAmmoType.AmmoType.CUSTOM;
       // mod.customAmmoType = CustomClipAmmoTypeToolbox.AddCustomAmmoType($"{clipname}_clip", ResMap.Get($"{clipname}_clipfull")[0], ResMap.Get($"{clipname}_clipempty")[0]);
-      mod.customAmmoType = PackerHelper.AddCustomAmmoType($"{clipname}_clip", ResMap.Get($"{clipname}_clipfull")[0], ResMap.Get($"{clipname}_clipempty")[0]);
+      mod.customAmmoType = AtlasHelper.AddCustomAmmoType($"{clipname}_clip", ResMap.Get($"{clipname}_clipfull")[0], ResMap.Get($"{clipname}_clipempty")[0]);
   }
 
   /// <summary>Check if a player will die from next hit</summary>

@@ -1,7 +1,13 @@
 namespace CwaffingTheGungy;
 
-public static class BetterAtlas
+/// <summary>Class for setting up sprites from textures packed with cheetah</summary>
+public static class AtlasHelper
 {
+    internal static Mutex _AddSpriteMutex = new(); // adding more than one sprite at once seems to causes issues, so protect it
+
+    internal static Dictionary<string, tk2dSpriteDefinition> _PackedTextures = new();
+    private static readonly Vector2 _TexelSize = new Vector2(0.0625f, 0.0625f);
+
     public static void AddUISpriteBatch(List<string> pathsAndNames)
     {
       Assembly assembly = Assembly.GetCallingAssembly();
@@ -9,7 +15,7 @@ public static class BetterAtlas
       List<string> names = new();
       for (int i = 0; i < pathsAndNames.Count; i += 2)
       {
-        defs.Add(PackerHelper._PackedTextures[pathsAndNames[i]]);
+        defs.Add(AtlasHelper._PackedTextures[pathsAndNames[i]]);
         names.Add(pathsAndNames[i+1]);
       }
       GameUIRoot.Instance.ConversationBar.portraitSprite.Atlas.AddMultipleItemsToAtlas(defs, names);
@@ -79,24 +85,6 @@ public static class BetterAtlas
 
         return items;
     }
-}
-
-/// <summary>Class for setting up sprites from textures packed with cheetah</summary>
-public static class PackerHelper
-{
-  private class SpriteInfo
-  {
-    public Texture2D atlas = null;
-    public int x           = 0;
-    public int y           = 0;
-    public int w           = 0;
-    public int h           = 0;
-  }
-
-  internal static Mutex _AddSpriteMutex = new(); // adding more than one sprite at once seems to causes issues, so protect it
-
-  internal static Dictionary<string, tk2dSpriteDefinition> _PackedTextures = new();
-  private static readonly Vector2 _TexelSize = new Vector2(0.0625f, 0.0625f);
 
   /// <summary>Construct a tk2dSpriteDefinition from a segment of a packed texture</summary>
   public static tk2dSpriteDefinition SpriteDefFromSegment(this Texture2D texture, string spriteName, int x, int y, int w, int h, int ox, int oy, int ow, int oh)
@@ -147,7 +135,6 @@ public static class PackerHelper
     return _PackedTextures.TryGetValue(s.Split('/').Last(), out tk2dSpriteDefinition value) ? value : null;
   }
 
-  // internal static tk2dSpriteCollectionData _WeaponCollection = ItemHelper.Get(Items.Ak47).sprite.Collection;
   internal static tk2dSpriteCollectionData _WeaponCollection = ETGMod.Databases.Items.WeaponCollection;
   internal static tk2dSpriteCollectionData _AmmonomiconCollection = AmmonomiconController.ForceInstance.EncounterIconCollection;
 
@@ -155,8 +142,6 @@ public static class PackerHelper
   public static void LoadPackedTextureResource(Texture2D atlas, Dictionary<string, tk2dSpriteDefinition.AttachPoint[]> attachPoints, string metaDataResourcePath)
   {
     Assembly asmb = Assembly.GetCallingAssembly();
-    if (atlas.width != 1024 || atlas.height != 1024)
-      ETGModConsole.Log($"D:D:D:");
 
     List<tk2dSpriteDefinition> projectileSprites = new();
     List<tk2dSpriteDefinition> ammonomiconSprites = new();
@@ -189,14 +174,12 @@ public static class PackerHelper
         if (collName == "ProjectileCollection")
         {
           projectileSprites.Add(def);
-          // SpriteBuilder.AddSpriteToCollection(def, ETGMod.Databases.Items.ProjectileCollection);
           continue;
         }
 
         if (collName == "Ammonomicon Encounter Icon Collection")
         {
           ammonomiconSprites.Add(def);
-          // SpriteBuilder.AddSpriteToCollection(def, _AmmonomiconCollection);
           continue;
         }
 
@@ -210,20 +193,12 @@ public static class PackerHelper
             weaponAttachPoints.Add(null);
           continue;
         }
-
-        // int id = SpriteBuilder.AddSpriteToCollection(def, _WeaponCollection);
-        //   continue;
-
-        // _WeaponCollection.SetAttachPoints(id, aps);
-        // if (_WeaponCollection.inst != _WeaponCollection)
-        //     _WeaponCollection.inst.SetAttachPoints(id, aps);
-        // ETGModConsole.Log($"setting attach points for {id} == {spriteName}");
       }
     }
 
-    AddSpritesToCollection(projectileSprites, ETGMod.Databases.Items.ProjectileCollection);
-    AddSpritesToCollection(ammonomiconSprites, _AmmonomiconCollection);
-    AddSpritesToCollection(weaponSprites, _WeaponCollection, weaponAttachPoints);
+    AddSpritesToCollection(newDefs: projectileSprites,  collection: ETGMod.Databases.Items.ProjectileCollection);
+    AddSpritesToCollection(newDefs: ammonomiconSprites, collection: _AmmonomiconCollection);
+    AddSpritesToCollection(newDefs: weaponSprites,      collection: _WeaponCollection, attachPoints: weaponAttachPoints);
   }
 
   /// <summary>Helper method for adding multiple sprites to a collection at once</summary>
@@ -366,9 +341,9 @@ public static class PackerHelper
       BindingFlags anyFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
       // Safe shared resource access
-      MethodInfo threadSafePrefix = typeof(PackerHelper.ThreadSafeUnityStuffPatch).GetMethod(
+      MethodInfo threadSafePrefix = typeof(AtlasHelper.ThreadSafeUnityStuffPatch).GetMethod(
         "Prefix", bindingAttr: BindingFlags.Static | BindingFlags.Public);
-      MethodInfo threadSafePostfix = typeof(PackerHelper.ThreadSafeUnityStuffPatch).GetMethod(
+      MethodInfo threadSafePostfix = typeof(AtlasHelper.ThreadSafeUnityStuffPatch).GetMethod(
         "Postfix", bindingAttr: BindingFlags.Static | BindingFlags.Public);
       harmony.Patch(typeof(tk2dSpriteAnimation).GetMethod("GetClipByName", bindingAttr: anyFlags),
         prefix: new HarmonyMethod(threadSafePrefix), postfix:  new HarmonyMethod(threadSafePostfix));
@@ -395,7 +370,6 @@ public static class PackerHelper
   }
 
   /// <summary>Patched version of Alexandria's SpriteFromResource (manually added through InitSetupPatches())</summary>
-  // [HarmonyPatch(typeof(SpriteBuilder), nameof(SpriteBuilder.SpriteFromResource))]
   private class SpriteFromResourcePatch
   {
     public static bool Prefix(string spriteName, GameObject obj, Assembly assembly, ref GameObject __result)
@@ -410,7 +384,7 @@ public static class PackerHelper
         tk2dSprite sprite;
         sprite = obj.AddComponent<tk2dSprite>();
 
-        int id = PackerHelper.SafeAddSpriteToCollection(PackerHelper.NamedSpriteInPackedTexture(spriteName), itemCollection);
+        int id = AtlasHelper.SafeAddSpriteToCollection(AtlasHelper.NamedSpriteInPackedTexture(spriteName), itemCollection);
         sprite.SetSprite(itemCollection, id);
         sprite.SortingOrder = 0;
         sprite.IsPerpendicular = true;
@@ -423,7 +397,6 @@ public static class PackerHelper
   }
 
   /// <summary>Patched version of Alexandria's AddSpriteToCollection(string, ...) (manually added through InitSetupPatches())</summary>
-  // [HarmonyPatch(typeof(SpriteBuilder), nameof(SpriteBuilder.AddSpriteToCollection), typeof(string), typeof(tk2dSpriteCollectionData), /*typeof(string), */typeof(Assembly))]
   private class AddSpriteToCollectionPatch
   {
     public static bool Prefix(string resourcePath, tk2dSpriteCollectionData collection, /*string name, */Assembly assembly, ref int __result)
@@ -432,23 +405,16 @@ public static class PackerHelper
           return true; // call original method
 
         // ETGModConsole.Log($"CALLING PATCHED AddSpriteToCollection for {resourcePath}");
-        __result = PackerHelper.SafeAddSpriteToCollection(PackerHelper.NamedSpriteInPackedTexture(resourcePath), collection);
+        __result = AtlasHelper.SafeAddSpriteToCollection(AtlasHelper.NamedSpriteInPackedTexture(resourcePath), collection);
         return false; // skip original method
     }
   }
 
   /// <summary>Patched, thread-safe versions of various sensitive functions (manually added through InitSetupPatches())</summary>
-  // [HarmonyPatch(typeof(tk2dSpriteAnimation), nameof(tk2dSpriteAnimation.GetClipByName))]
-  // [HarmonyPatch(typeof(tk2dSpriteAnimation), nameof(tk2dSpriteAnimation.GetClipById))]
-  // [HarmonyPatch(typeof(tk2dSpriteAnimation), nameof(tk2dSpriteAnimation.GetClipIdByName), typeof(string))]
-  // [HarmonyPatch(typeof(tk2dSpriteAnimation), nameof(tk2dSpriteAnimation.GetClipIdByName), typeof(tk2dSpriteAnimationClip))]
-  // [HarmonyPatch(typeof(GameObject), nameof(GameObject.SetActive))]
-  // [HarmonyPatch(typeof(GunExt), nameof(GunExt.UpdateAnimation))]
   private class ThreadSafeUnityStuffPatch
   {
     public static void Prefix()
     {
-        // ETGModConsole.Log($"safety first");
         if (!C._ModSetupFinished)
           _AddSpriteMutex.WaitOne();
     }
@@ -456,7 +422,6 @@ public static class PackerHelper
     {
         if (!C._ModSetupFinished)
           _AddSpriteMutex.ReleaseMutex();
-        // ETGModConsole.Log($"  safety last");
     }
   }
 }

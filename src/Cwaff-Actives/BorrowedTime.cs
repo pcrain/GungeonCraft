@@ -29,7 +29,7 @@ public class BorrowedTime : PlayerItem
         item.CanBeDropped = true;
 
         _EmptyId = item.sprite.spriteId;
-        _FullId  = PackerHelper.SafeAddSpriteToCollection(ResMap.Get("borrowed_time_full_icon")[0], item.sprite.Collection);
+        _FullId  = AtlasHelper.SafeAddSpriteToCollection(ResMap.Get("borrowed_time_full_icon")[0], item.sprite.Collection);
     }
 
     public override void Pickup(PlayerController player)

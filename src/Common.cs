@@ -70,7 +70,7 @@ public static class ResMap // Resource map from PNG stem names to lists of paths
         Dictionary<string, string[]> tempMap = new ();
         // Get the name of each PNG resource and stuff it into a sorted array by its index number
         // foreach(string s in ResourceExtractor.GetResourceNames())
-        foreach(string s in PackerHelper._PackedTextures.Keys)
+        foreach(string s in AtlasHelper._PackedTextures.Keys)
         {
             // if (!s.EndsWithInvariant(".png"))
             //     continue;

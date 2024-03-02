@@ -53,7 +53,7 @@ public static class VFX
     /// </summary>
     public static void RegisterSprite(string path)
     {
-        sprites[path.Substring(path.LastIndexOf("/")+1)] = PackerHelper.SafeAddSpriteToCollection(PackerHelper.NamedSpriteInPackedTexture(path), OverheadVFXCollection);
+        sprites[path.Substring(path.LastIndexOf("/")+1)] = AtlasHelper.SafeAddSpriteToCollection(AtlasHelper.NamedSpriteInPackedTexture(path), OverheadVFXCollection);
     }
 
     /// <summary>
@@ -68,7 +68,7 @@ public static class VFX
             return; //BUG: this causes issues whether we return early (poe souls) or not (uppskeruvel muzzle)...these issues really need to be handled as they come up
         }
 
-        int spriteID = PackerHelper.SafeAddSpriteToCollection(spritePaths[0], OverheadVFXCollection);
+        int spriteID = AtlasHelper.SafeAddSpriteToCollection(spritePaths[0], OverheadVFXCollection);
 
         GameObject Obj     = new GameObject(name);
             Obj.AddComponent<tk2dSprite>().SetSprite(OverheadVFXCollection, spriteID);
@@ -114,7 +114,7 @@ public static class VFX
         List<tk2dSpriteAnimationFrame> frames = new List<tk2dSpriteAnimationFrame>();
         for (int i = 0; i < spritePaths.Count; i++)
         {
-            int frameSpriteId                   = PackerHelper.SafeAddSpriteToCollection(spritePaths[i], OverheadVFXCollection);
+            int frameSpriteId                   = AtlasHelper.SafeAddSpriteToCollection(spritePaths[i], OverheadVFXCollection);
             tk2dSpriteDefinition frameDef       = OverheadVFXCollection.spriteDefinitions[frameSpriteId];
             frameDef.ConstructOffsetsFromAnchor(anchor);
             frameDef.colliderVertices = defaultDef.colliderVertices;
@@ -498,7 +498,7 @@ public static class VFX
           float convertedOffsetX = colliderOffsets.x / 16f;
           float convertedOffsetY = colliderOffsets.y / 16f;
 
-          int spriteID = PackerHelper.SafeAddSpriteToCollection(spritePath, ETGMod.Databases.Items.ProjectileCollection);
+          int spriteID = AtlasHelper.SafeAddSpriteToCollection(spritePath, ETGMod.Databases.Items.ProjectileCollection);
           tk2dTiledSprite tiledSprite = newTrailObject.GetOrAddComponent<tk2dTiledSprite>();
 
           tiledSprite.SetSprite(ETGMod.Databases.Items.ProjectileCollection, spriteID);
@@ -564,7 +564,7 @@ public static class VFX
           float convertedOffsetX = colliderOffsets.x / 16f;
           float convertedOffsetY = colliderOffsets.y / 16f;
 
-          int spriteID = PackerHelper.SafeAddSpriteToCollection(spritePath, ETGMod.Databases.Items.ProjectileCollection);
+          int spriteID = AtlasHelper.SafeAddSpriteToCollection(spritePath, ETGMod.Databases.Items.ProjectileCollection);
           tk2dTiledSprite tiledSprite = newTrailObject.GetOrAddComponent<tk2dTiledSprite>();
 
           tiledSprite.SetSprite(ETGMod.Databases.Items.ProjectileCollection, spriteID);
