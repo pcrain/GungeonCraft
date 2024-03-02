@@ -42,7 +42,7 @@ public class Uppskeruvel : AdvancedGunBehavior
             gun.SetReloadAudio("uppskeruvel_reload_sound", 4, 22);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
             gun.SetAnimationFPS(gun.reloadAnimation, 30);
-            gun.SetMuzzleVFX("muzzle_platinum_star", fps: 60, scale: 0.2f, anchor: Anchor.MiddleCenter);
+            gun.SetMuzzleVFX("muzzle_uppskeruvel", fps: 60, scale: 0.2f, anchor: Anchor.MiddleCenter);
 
         gun.InitProjectile(new(clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.Automatic, damage: 4f, customClip: true,
           sprite: "uppskeruvel_projectile", fps: 12, anchor: Anchor.MiddleLeft)).Attach<UppskeruvelProjectile>();
@@ -55,7 +55,7 @@ public class Uppskeruvel : AdvancedGunBehavior
         _LostSoulPrefab = VFX.Create("poe_soul", fps: 8, loops: true, anchor: Anchor.LowerCenter/*, emissivePower: 0.4f*/);
             _LostSoulPrefab.AddComponent<UppskeruvelLostSoul>();
 
-        _CombatSoulPrefab = VFX.Create("poe_soul", fps: 8, loops: true, anchor: Anchor.MiddleCenter, scale: 2.0f/*, emissivePower: 0.4f*/);
+        _CombatSoulPrefab = VFX.Create("large_poe_soul", fps: 8, loops: true, anchor: Anchor.MiddleCenter, scale: 2.0f/*, emissivePower: 0.4f*/);
             _CombatSoulPrefab.AddComponent<UppskeruvelCombatSoul>();
 
         _SoulExplodePrefab = VFX.Create("soul_explode", fps: 32, loops: false, anchor: Anchor.MiddleCenter);

@@ -63,8 +63,7 @@ public static class VFX
     {
         if (animations.ContainsKey(name))
         {
-            if (C.DEBUG_BUILD && C._WARN_DUPLICATE_VFX)
-                Lazy.DebugWarn($"  HEY! re-creating VFX {name} can cause scale / anchor conflicts. Please reuse the original VFX or use a different sprite for this VFX.");
+            Lazy.DebugWarn($"  HEY! re-creating VFX {name} can cause scale / anchor conflicts. Please reuse the original VFX or use a different sprite for this VFX.");
             return; //BUG: this causes issues whether we return early (poe souls) or not (uppskeruvel muzzle)...these issues really need to be handled as they come up
         }
 

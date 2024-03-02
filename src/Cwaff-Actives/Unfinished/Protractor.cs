@@ -18,7 +18,7 @@ public class Protractor : PlayerItem
         item.consumable   = false;
         item.SetCooldownType(ItemBuilder.CooldownType.Timed, 1f);
 
-        _RulerVFX = VFX.Create("pencil_sparkles", 12, loops: false, anchor: Anchor.MiddleCenter);
+        // _RulerVFX = VFX.Create("pencil_sparkles", 12, loops: false, anchor: Anchor.MiddleCenter);
     }
 
     public override void OnPreDrop(PlayerController user)

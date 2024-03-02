@@ -28,7 +28,7 @@ public class CarpetBomber : AdvancedGunBehavior
             gun.SetAnimationFPS(gun.reloadAnimation, 20);
             gun.SetAnimationFPS(gun.chargeAnimation, (int)(1f / _CHARGE_PER_PROJECTILE));
             gun.LoopAnimation(gun.chargeAnimation, 10);
-            gun.SetMuzzleVFX("muzzle_b_b_gun", fps: 30, scale: 0.5f, anchor: Anchor.MiddleCenter);
+            gun.SetMuzzleVFX("muzzle_carpet_bomber", fps: 30, scale: 0.5f, anchor: Anchor.MiddleCenter);
             gun.SetFireAudio("carpet_bomber_shoot_sound");
             gun.SetReloadAudio("carpet_bomber_reload_sound", 2, 10, 18);
             gun.SetChargeAudio("carpet_bomber_charge_stage", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);

@@ -18,7 +18,7 @@ public class Blamethrower : AdvancedGunBehavior
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARM, reloadTime: 0.0f, ammo: 300,
                 doesScreenShake: false, canReloadNoMatterAmmo: true);
             gun.SetAnimationFPS(gun.shootAnimation, 40);
-            gun.SetMuzzleVFX("blamethrower_trail", fps: 30);
+            gun.SetMuzzleVFX("muzzle_blamethrower", fps: 30);
             // gun.SetFireAudio("blowgun_fire_sound");
 
         Projectile proj = gun.InitProjectile(new(clipSize: -1, cooldown: 0.08f, shootStyle: ShootStyle.Automatic,

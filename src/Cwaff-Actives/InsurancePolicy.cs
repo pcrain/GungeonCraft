@@ -78,7 +78,7 @@ public class InsurancePolicy : PlayerItem
         _InsuranceFile     = Path.Combine(SaveManager.SavePath,"insurance.csv");
         _InsurancePickupId = item.PickupObjectId;
 
-        _InsuranceParticleVFX = VFX.Create("midas_sparkle",
+        _InsuranceParticleVFX = VFX.Create("insurance_sparkle",
             fps: 8, loops: false, anchor: Anchor.MiddleCenter, emissivePower: 5);
 
         CwaffEvents.OnFirstFloorFullyLoaded += InsuranceCheck;

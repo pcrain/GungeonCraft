@@ -32,7 +32,7 @@ public class Vladimir : AdvancedGunBehavior
         // TODO: make our own impact vfx
         gun.InitProjectile(new(ammoCost: 0, clipSize: -1, cooldown: 0.3f, shootStyle: ShootStyle.SemiAutomatic,
           damage: 7.0f, speed: 100f, range: 0.1f, sprite: "vladimir_hitbox")  // low range ensures the projectile dissipates swiftly
-        ).SetAllImpactVFX(VFX.CreatePool("whip_particles", fps: 20, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f)
+        ).SetAllImpactVFX(VFX.CreatePool("vladimir_particles", fps: 20, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f)
         ).Attach<VladimirProjectile>(
         );
 

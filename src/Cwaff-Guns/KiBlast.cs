@@ -26,7 +26,7 @@ public class KiBlast : AdvancedGunBehavior
             _FireRightAnim = gun.QuickUpdateGunAnimation("fire_alt", returnToIdle: true);
             gun.SetAnimationFPS(_FireLeftAnim, 24);
             gun.SetAnimationFPS(_FireRightAnim, 24);
-            gun.SetMuzzleVFX("muzzle_iron_maid", fps: 30, scale: 0.5f, anchor: Anchor.MiddleLeft);
+            gun.SetMuzzleVFX("muzzle_ki_blast", fps: 30, scale: 0.5f, anchor: Anchor.MiddleLeft);
             gun.SetFireAudio("ki_blast_sound");
             gun.AddToSubShop(ModdedShopType.Boomhildr);
 

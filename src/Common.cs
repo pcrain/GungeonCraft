@@ -2,7 +2,7 @@ namespace CwaffingTheGungy;
 
 public class C // constants and common variables
 {
-    public static readonly bool DEBUG_BUILD = true; // set to false for release builds (must be readonly instead of const to avoid build warnings)
+    public static readonly bool DEBUG_BUILD = false; // set to false for release builds (must be readonly instead of const to avoid build warnings)
 
     public const string MOD_NAME     = "GungeonCraft";
     public const string MOD_INT_NAME = "CwaffingTheGungy";
@@ -17,8 +17,6 @@ public class C // constants and common variables
     public const float  FPS             = 60f;
     public const float  FRAME           = 1f / FPS;
     public const float  PIXEL_SIZE      = 1f / PIXELS_PER_TILE;
-
-    internal static readonly bool _WARN_DUPLICATE_VFX = true;
 
     internal static bool _ModSetupFinished = false; // set to true at the end of setup to disable some patches
 }
