@@ -151,55 +151,42 @@ public class Initialisation : BaseUnityPlugin
             setupEarlyHarmonyThread.Join();
             awaitEarlyHarmonyWatch.Stop();
 
-            #region Round 1 Config (hooks and database stuff where no sprites are needed, so it can be async)
-                System.Diagnostics.Stopwatch setupConfig1Watch = null;
-                Thread setupConfig1Thread = new Thread(() => {
-                    setupConfig1Watch = System.Diagnostics.Stopwatch.StartNew();
+            #region Round 1 Config (could be async since it's mostly hooks and database stuff where no sprites are needed, but it's fast enough that we just leave it sync)
+                System.Diagnostics.Stopwatch setupConfig1Watch = System.Diagnostics.Stopwatch.StartNew();
 
-                    // Load our configuration files
-                    CwaffConfig.Init();
+                // Load our configuration files
+                CwaffConfig.Init();
 
-                    //Tools and Toolboxes
-                    CwaffPrerequisite.Init();  // must be set up after CwaffEvents
-                    // HUDController.Init(); // Need to load early (unused for now)
-                    ModdedShopItemAdder.Init(); // must be set up after CwaffEvents
+                //Tools and Toolboxes
+                CwaffPrerequisite.Init();  // must be set up after CwaffEvents
+                // HUDController.Init(); // Need to load early (unused for now)
+                ModdedShopItemAdder.Init(); // must be set up after CwaffEvents
 
-                    //Commands and Other Console Utilities
-                    Commands.Init();
+                //Commands and Other Console Utilities
+                Commands.Init();
 
-                    // Game tweaks
-                    HeckedMode.Init();
+                // Game tweaks
+                HeckedMode.Init();
 
-                    setupConfig1Watch.Stop();
-                });
-                setupConfig1Thread.Start();
+                setupConfig1Watch.Stop();
             #endregion
 
-            #region Round 2 Config (Requires sprites, can technically be async but stuff below might need it)
+            #region Round 2 Config (Requires sprites and bundled asset loading, cannot be async)
                 System.Diagnostics.Stopwatch setupConfig2Watch = System.Diagnostics.Stopwatch.StartNew();
-                Thread setupConfig2Thread = new Thread(() => {
-                    // setupConfig1Thread.Join(); // we need to wait for our ResMap to be built, so wait here
-                    // Basic VFX Setup
-                    VFX.Init();
-                    //Status Effect Setup
-                    SoulLinkStatus.Init();
-                    //Goop Setup
-                    EasyGoopDefinitions.DefineDefaultGoops();
-                    // Note Does Setup
-                    CustomNoteDoer.Init();
-                    // Miscellaneous tweaks
-                    CwaffTweaks.Init();
-                    // Hecked Mode Tribute Statues
-                    HeckedShrine.Init();
-                    setupConfig2Watch.Stop();
-                });
-                setupConfig2Thread.Start();
+                // Basic VFX Setup
+                VFX.Init(); //NOTE: accesses shared resource databases, so must be synchronous
+                //Status Effect Setup
+                SoulLinkStatus.Init();
+                //Goop Setup
+                EasyGoopDefinitions.DefineDefaultGoops();
+                // Note Does Setup
+                CustomNoteDoer.Init();
+                // Miscellaneous tweaks
+                CwaffTweaks.Init();
+                // Hecked Mode Tribute Statues
+                HeckedShrine.Init();
+                setupConfig2Watch.Stop();
             #endregion
-
-            System.Diagnostics.Stopwatch awaitConfigWatch = System.Diagnostics.Stopwatch.StartNew();
-            setupConfig1Thread.Join();
-            setupConfig2Thread.Join(); // need to wait for round 2 configuration so all VFX / Goops are loaded
-            awaitConfigWatch.Stop();
 
             #region Guns
                 System.Diagnostics.Stopwatch setupGunsWatch = null;
@@ -509,7 +496,6 @@ public class Initialisation : BaseUnityPlugin
 
             #region Wait for Async stuff to finish up
                 System.Diagnostics.Stopwatch awaitAsyncWatch = System.Diagnostics.Stopwatch.StartNew();
-                setupConfig1Thread.Join();
                 setupSaveThread.Join();
                 setupAudioThread.Join();
                 setupSynergiesThread.Join();
@@ -528,9 +514,8 @@ public class Initialisation : BaseUnityPlugin
                 ETGModConsole.Log($"    setupAtlases      finished in {setupAtlasesWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupShaders      finished in {setupShadersWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    awaitEarlyHarmony finished in {awaitEarlyHarmonyWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    setupConfig1      finished in {setupConfig1Watch.ElapsedMilliseconds} milliseconds (ASYNC)");
-                ETGModConsole.Log($"    setupConfig2      finished in {setupConfig2Watch.ElapsedMilliseconds} milliseconds (ASYNC)");
-                ETGModConsole.Log($"    awaitConfig       finished in {awaitConfigWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    setupConfig1      finished in {setupConfig1Watch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    setupConfig2      finished in {setupConfig2Watch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupGuns         finished in {setupGunsWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupActives      finished in {setupActivesWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupPassives     finished in {setupPassivesWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
