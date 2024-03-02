@@ -42,12 +42,10 @@ public static class Lazy
                 Game.Items.Rename("outdated_gun_mods:"+baseItemName, IDs.InternalNames[itemName]);  //rename the gun for commands
             }
 
-            // Replace old SetupSprite code to use our packed textures
             gun.encounterTrackable.journalData.AmmonomiconSprite = spriteName+"_ammonomicon";
-            gun.QuickUpdateGunAnimations();  // includes setting the default sprite
+            gun.QuickUpdateGunAnimations(); // includes setting the default sprite
 
-            int projectileId = 0;
-            if (int.TryParse(projectileName, out projectileId))
+            if (int.TryParse(projectileName, out int projectileId))
                 gun.AddProjectileModuleFrom(PickupObjectDatabase.GetById(projectileId) as Gun, true, true); //set the gun's default projectile to inherit
             else
                 gun.AddProjectileModuleFrom(projectileName, true, false); //set the gun's default projectile to inherit
@@ -55,18 +53,14 @@ public static class Lazy
         }
         else
         {
-            // Interpret paths with slashes as fully-qualified resource paths, and use our ResMap otherwise
-            string spriteName = spritePath.Contains("/") ? spritePath : ResMap.Get(spritePath)[0];
             string altName = itemName.SafeName() + "_icon";
             if (C.DEBUG_BUILD && spritePath != altName)
                 ETGModConsole.Log($"  {spritePath} != {altName}");
             GameObject obj = new GameObject(itemName).RegisterPrefab();
             item = obj.AddComponent<TItemSpecific>();
 
-            // Replace old AddSpriteToObject code to use our packed textures
-            // ItemBuilder.AddSpriteToObject(itemName, spriteName, obj);
             tk2dSprite sprite = obj.AddComponent<tk2dSprite>();
-            tk2dSpriteCollectionData coll = ItemHelper.Get(Items.AmmoSynthesizer).sprite.Collection;
+            tk2dSpriteCollectionData coll = ETGMod.Databases.Items.ItemCollection;
             tk2dSpriteDefinition dd = PackerHelper.NamedSpriteInPackedTexture(spritePath);
             int spriteID = PackerHelper.SafeAddSpriteToCollection(dd, coll);
             sprite.SetSprite(coll, spriteID);
