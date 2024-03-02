@@ -58,8 +58,10 @@ public static class AtlasHelper
               continue;
           }
           Texture2D tex   = def.material.mainTexture as Texture2D;
+          IntVector2 texOffset = (C.PIXELS_PER_TILE * def.position0.XY()).ToIntVector2();
           Vector2 texPos  = new Vector2(tex.width * def.uvs[0].x, tex.height * def.uvs[0].y);
           Vector2 texSize = C.PIXELS_PER_TILE * def.untrimmedBoundsDataExtents;
+          Vector2 croppedTexSize = new Vector2(tex.width * def.uvs[3].x, tex.height * def.uvs[3].y) - texPos;
           dfAtlas.ItemInfo item = new dfAtlas.ItemInfo
           {
               border = new RectOffset(),
@@ -76,10 +78,10 @@ public static class AtlasHelper
               textureGUID = name
           };
           cumulativeWidth += (int)texSize.x;
-          int startPointX = Mathf.RoundToInt(item.region.x * atlas.Texture.width);
-          int startPointY = Mathf.RoundToInt(item.region.y * atlas.Texture.height);
-          atlas.Texture.SetPixels(startPointX, startPointY, (int)texSize.x, (int)texSize.y,
-            item.texture.GetPixels((int)texPos.x, (int)texPos.y, (int)texSize.x, (int)texSize.y));
+          int startPointX = texOffset.x + Mathf.RoundToInt(item.region.x * atlas.Texture.width);
+          int startPointY = texOffset.y + Mathf.RoundToInt(item.region.y * atlas.Texture.height);
+          atlas.Texture.SetPixels(startPointX, startPointY, (int)croppedTexSize.x, (int)croppedTexSize.y,
+            item.texture.GetPixels((int)texPos.x, (int)texPos.y, (int)croppedTexSize.x, (int)croppedTexSize.y));
           atlas.Texture.Apply();
           atlas.AddItem(item);
         }
