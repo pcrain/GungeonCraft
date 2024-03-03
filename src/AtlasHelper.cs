@@ -94,14 +94,19 @@ public static class AtlasHelper
   {
     Material material    = new Material(ShaderCache.Acquire(PlayerController.DefaultShaderName));
     material.mainTexture = texture;
-    float xmin           = (float) x      / (float)texture.width;
-    float xmax           = (float)(x + w) / (float)texture.width;
+    float xmin           =      (float) x      / (float)texture.width;
+    float xmax           =      (float)(x + w) / (float)texture.width;
     float ymin           = 1f - (float)(y + h) / (float)texture.height;
     float ymax           = 1f - (float) y      / (float)texture.height;
+    // NOTE: POSITIVE y is up on the screen but NEGATIVE y is up in atlas
+    // works for Uppskeruvel, is 0 for poe soul (jitters around) [calculates top margin]
     Vector3 offset       = C.PIXEL_SIZE * new Vector3(ox, oh - oy - h, 0f); //NOTE: texture is flipped vertically in memory
+    // works for Poe Soul, messes up Uppskeruvel (too high above player, distorts bowling ball projectile)
+    // Vector3 offset       = C.PIXEL_SIZE * new Vector3(ox, oh - oy, 0f); //NOTE: texture is flipped vertically in memory
+    // Vector3 offset       = C.PIXEL_SIZE * new Vector3(-(ow - ox - w), oh - oy - h, 0f); //NOTE: texture is flipped vertically in memory
+
     Vector3 extents      = C.PIXEL_SIZE * new Vector3(w, h, 0f);
     Vector3 trueExtents  = C.PIXEL_SIZE * new Vector3(ow, oh, 0f);
-    Vector3 trueCenter   = 0.5f * trueExtents;
 
     tk2dSpriteDefinition def = new tk2dSpriteDefinition
     {
@@ -113,14 +118,14 @@ public static class AtlasHelper
         collisionLayer             = CollisionLayer.HighObstacle,
         material                   = material,
         materialInst               = material,
-        position0                  = offset,
+        position0                  = offset + Vector3.zero,
         position1                  = offset + extents.WithY(0f),
         position2                  = offset + extents.WithX(0f),
         position3                  = offset + extents,
-        boundsDataExtents          = trueExtents,
-        boundsDataCenter           = trueCenter,
+        boundsDataExtents          = extents,
+        boundsDataCenter           = offset + 0.5f * extents,
         untrimmedBoundsDataExtents = trueExtents,
-        untrimmedBoundsDataCenter  = trueCenter,
+        untrimmedBoundsDataCenter  = 0.5f * trueExtents,
         uvs = new Vector2[]
         { //NOTE: texture is flipped vertically in memory
           new Vector2(xmin, ymin),
