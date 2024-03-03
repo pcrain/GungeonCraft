@@ -3,8 +3,6 @@ namespace CwaffingTheGungy;
 /// <summary>Class for setting up sprites from textures packed with cheetah</summary>
 public static class AtlasHelper
 {
-    internal static Mutex _AddSpriteMutex = new(); // adding more than one sprite at once seems to causes issues, so protect it
-
     internal static Dictionary<string, tk2dSpriteDefinition> _PackedTextures = new();
     private static readonly Vector2 _TexelSize = new Vector2(0.0625f, 0.0625f);
 
@@ -175,7 +173,6 @@ public static class AtlasHelper
         int oh = Int32.Parse(tokens[8]);
         tk2dSpriteDefinition def = _PackedTextures[spriteName] = atlas.SpriteDefFromSegment(spriteName, x, y, w, h, ox, oy, ow, oh);
 
-        //NOTE: we don't need to use SafeAddSpriteToCollection() since this is all happening on the main thread
         if (collName == "ProjectileCollection")
         {
           projectileSprites.Add(def);
@@ -311,59 +308,12 @@ public static class AtlasHelper
       return sprite;
   }
 
-  /// <summary>Thread-safe wrapper around SpriteBuilder.AddSpriteToCollection()</summary>
-  public static int SafeAddSpriteToCollection(string resourcePath, tk2dSpriteCollectionData collection)
-  {
-    _AddSpriteMutex.WaitOne();
-    int result = SpriteBuilder.AddSpriteToCollection(resourcePath, collection);
-    _AddSpriteMutex.ReleaseMutex();
-    return result;
-  }
-
-  /// <summary>Thread-safe wrapper around SpriteBuilder.AddSpriteToCollection()</summary>
-  public static int SafeAddSpriteToCollection(tk2dSpriteDefinition def, tk2dSpriteCollectionData collection)
-  {
-    _AddSpriteMutex.WaitOne();
-    int result = SpriteBuilder.AddSpriteToCollection(def, collection);
-    _AddSpriteMutex.ReleaseMutex();
-    return result;
-  }
-
-  /// <summary>Thread-safe wrapper around SpriteBuilder.AddToAmmonomicon()</summary>
-  public static int SafeAddToAmmonomicon(tk2dSpriteDefinition spriteDefinition, string prefix = "")
-  {
-    _AddSpriteMutex.WaitOne();
-    int result = SpriteBuilder.AddToAmmonomicon(spriteDefinition, prefix);
-    _AddSpriteMutex.ReleaseMutex();
-    return result;
-  }
-
   internal static tk2dSpriteCollectionData itemCollection = PickupObjectDatabase.GetById(155).sprite.Collection;
 
   /// <summary>Manually initialize some Harmony patches we need very early on to enable threaded setup</summary>
   public static void InitSetupPatches(Harmony harmony)
   {
       BindingFlags anyFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-
-      // Safe shared resource access
-      MethodInfo threadSafePrefix = typeof(AtlasHelper.ThreadSafeUnityStuffPatch).GetMethod(
-        "Prefix", bindingAttr: BindingFlags.Static | BindingFlags.Public);
-      MethodInfo threadSafePostfix = typeof(AtlasHelper.ThreadSafeUnityStuffPatch).GetMethod(
-        "Postfix", bindingAttr: BindingFlags.Static | BindingFlags.Public);
-      harmony.Patch(typeof(tk2dSpriteAnimation).GetMethod("GetClipByName", bindingAttr: anyFlags),
-        prefix: new HarmonyMethod(threadSafePrefix), postfix:  new HarmonyMethod(threadSafePostfix));
-      harmony.Patch(typeof(tk2dSpriteAnimation).GetMethod("GetClipById", bindingAttr: anyFlags),
-        prefix: new HarmonyMethod(threadSafePrefix), postfix:  new HarmonyMethod(threadSafePostfix));
-      harmony.Patch(typeof(tk2dSpriteAnimation).GetMethod("GetClipIdByName", types: new[]{typeof(string)}),
-        prefix: new HarmonyMethod(threadSafePrefix), postfix:  new HarmonyMethod(threadSafePostfix));
-      harmony.Patch(typeof(tk2dSpriteAnimation).GetMethod("GetClipIdByName", types: new[]{typeof(tk2dSpriteAnimationClip)}),
-        prefix: new HarmonyMethod(threadSafePrefix), postfix:  new HarmonyMethod(threadSafePostfix));
-      harmony.Patch(typeof(GameObject).GetMethod("SetActive", bindingAttr: anyFlags),
-        prefix: new HarmonyMethod(threadSafePrefix), postfix:  new HarmonyMethod(threadSafePostfix));
-      harmony.Patch(typeof(GunExt).GetMethod("UpdateAnimation", bindingAttr: anyFlags),
-        prefix: new HarmonyMethod(threadSafePrefix), postfix:  new HarmonyMethod(threadSafePostfix));
-      harmony.Patch(typeof(EnemyDatabase).GetMethod("GetOrLoadByGuid", bindingAttr: anyFlags),
-        prefix: new HarmonyMethod(threadSafePrefix), postfix:  new HarmonyMethod(threadSafePostfix));
 
       // Load sprites from our own atlases
       harmony.Patch(typeof(SpriteBuilder).GetMethod("SpriteFromResource", bindingAttr: anyFlags),
@@ -389,7 +339,7 @@ public static class AtlasHelper
         tk2dSprite sprite;
         sprite = obj.AddComponent<tk2dSprite>();
 
-        int id = AtlasHelper.SafeAddSpriteToCollection(AtlasHelper.NamedSpriteInPackedTexture(spriteName), itemCollection);
+        int id = SpriteBuilder.AddSpriteToCollection(AtlasHelper.NamedSpriteInPackedTexture(spriteName), itemCollection);
         sprite.SetSprite(itemCollection, id);
         sprite.SortingOrder = 0;
         sprite.IsPerpendicular = true;
@@ -410,23 +360,8 @@ public static class AtlasHelper
           return true; // call original method
 
         // ETGModConsole.Log($"CALLING PATCHED AddSpriteToCollection for {resourcePath}");
-        __result = AtlasHelper.SafeAddSpriteToCollection(AtlasHelper.NamedSpriteInPackedTexture(resourcePath), collection);
+        __result = SpriteBuilder.AddSpriteToCollection(AtlasHelper.NamedSpriteInPackedTexture(resourcePath), collection);
         return false; // skip original method
-    }
-  }
-
-  /// <summary>Patched, thread-safe versions of various sensitive functions (manually added through InitSetupPatches())</summary>
-  private class ThreadSafeUnityStuffPatch
-  {
-    public static void Prefix()
-    {
-        if (!C._ModSetupFinished)
-          _AddSpriteMutex.WaitOne();
-    }
-    public static void Postfix()
-    {
-        if (!C._ModSetupFinished)
-          _AddSpriteMutex.ReleaseMutex();
     }
   }
 }

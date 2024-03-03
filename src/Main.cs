@@ -190,9 +190,30 @@ public class Initialisation : BaseUnityPlugin
                 setupConfig2Watch.Stop();
             #endregion
 
+            #region Audio (Async)
+                System.Diagnostics.Stopwatch setupAudioWatch = null;
+                Thread setupAudioThread = new Thread(() => {
+                    setupAudioWatch = System.Diagnostics.Stopwatch.StartNew();
+                    ETGModMainBehaviour.Instance.gameObject.AddComponent<AudioSource>(); // is this necessary?
+                    AudioResourceLoader.AutoloadFromAssembly(C.MOD_INT_NAME);  // Load Audio Banks
+                    setupAudioWatch.Stop();
+                });
+                setupAudioThread.Start();
+            #endregion
+
+            #region Save API Setup (Async)
+                System.Diagnostics.Stopwatch setupSaveWatch = null;
+                Thread setupSaveThread = new Thread(() => {
+                    setupSaveWatch = System.Diagnostics.Stopwatch.StartNew();
+                    SaveAPI.SaveAPIManager.Setup(C.MOD_PREFIX);  // Needed for prerequisite checking and save serialization
+                    setupSaveWatch.Stop();
+                });
+                setupSaveThread.Start();
+            #endregion
+
             #region Guns
                 System.Diagnostics.Stopwatch setupGunsWatch = null;
-                Thread setupGunsThread = new Thread(() => {
+                // Thread setupGunsThread = new Thread(() => {
                     setupGunsWatch = System.Diagnostics.Stopwatch.StartNew();
 
                     IronMaid.Add();
@@ -259,13 +280,13 @@ public class Initialisation : BaseUnityPlugin
                     KALI.Add();
                     AlienNailgun.Add();
                     setupGunsWatch.Stop();
-                });
-                setupGunsThread.Start();
+                // });
+                // setupGunsThread.Start();
             #endregion
 
             #region Actives
                 System.Diagnostics.Stopwatch setupActivesWatch = null;
-                Thread setupActivesThread = new Thread(() => {
+                // Thread setupActivesThread = new Thread(() => {
                     setupActivesWatch = System.Diagnostics.Stopwatch.StartNew();
 
                     BorrowedTime.Init();
@@ -285,13 +306,13 @@ public class Initialisation : BaseUnityPlugin
                     StopSign.Init();
 
                     setupActivesWatch.Stop();
-                });
-                setupActivesThread.Start();
+                // });
+                // setupActivesThread.Start();
             #endregion
 
             #region Passives
                 System.Diagnostics.Stopwatch setupPassivesWatch = null;
-                Thread setupPassivesThread = new Thread(() => {
+                // Thread setupPassivesThread = new Thread(() => {
                     setupPassivesWatch = System.Diagnostics.Stopwatch.StartNew();
                     // Shine.Init(); unfinished
                     // Superstitious.Init(); unfinished
@@ -332,29 +353,8 @@ public class Initialisation : BaseUnityPlugin
                     // Protractor.Init();  // unfinished
                     // PlaybulletMagazine.Init();
                     setupPassivesWatch.Stop();
-                });
-                setupPassivesThread.Start();
-            #endregion
-
-            #region Audio (Async)
-                System.Diagnostics.Stopwatch setupAudioWatch = null;
-                Thread setupAudioThread = new Thread(() => {
-                    setupAudioWatch = System.Diagnostics.Stopwatch.StartNew();
-                    ETGModMainBehaviour.Instance.gameObject.AddComponent<AudioSource>(); // is this necessary?
-                    AudioResourceLoader.AutoloadFromAssembly(C.MOD_INT_NAME);  // Load Audio Banks
-                    setupAudioWatch.Stop();
-                });
-                setupAudioThread.Start();
-            #endregion
-
-            #region Save API Setup (Async)
-                System.Diagnostics.Stopwatch setupSaveWatch = null;
-                Thread setupSaveThread = new Thread(() => {
-                    setupSaveWatch = System.Diagnostics.Stopwatch.StartNew();
-                    SaveAPI.SaveAPIManager.Setup(C.MOD_PREFIX);  // Needed for prerequisite checking and save serialization
-                    setupSaveWatch.Stop();
-                });
-                setupSaveThread.Start();
+                // });
+                // setupPassivesThread.Start();
             #endregion
 
             #region UI Sprites (cannot be async, must set up textures on main thread)
@@ -438,9 +438,9 @@ public class Initialisation : BaseUnityPlugin
 
             // Need to wait for all items and SaveAPI to be loaded before setting up synergies and shops
             System.Diagnostics.Stopwatch awaitItemsWatch = System.Diagnostics.Stopwatch.StartNew();
-            setupActivesThread.Join();
-            setupPassivesThread.Join();
-            setupGunsThread.Join();
+            // setupActivesThread.Join();
+            // setupPassivesThread.Join();
+            // setupGunsThread.Join();
             setupSaveThread.Join();
             awaitItemsWatch.Stop();
 
@@ -515,11 +515,11 @@ public class Initialisation : BaseUnityPlugin
                 ETGModConsole.Log($"    awaitEarlyHarmony finished in {awaitEarlyHarmonyWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupConfig1      finished in {setupConfig1Watch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupConfig2      finished in {setupConfig2Watch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    setupGuns         finished in {setupGunsWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
-                ETGModConsole.Log($"    setupActives      finished in {setupActivesWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
-                ETGModConsole.Log($"    setupPassives     finished in {setupPassivesWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupAudio        finished in {setupAudioWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
                 ETGModConsole.Log($"    setupSave         finished in {setupSaveWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
+                ETGModConsole.Log($"    setupGuns         finished in {setupGunsWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    setupActives      finished in {setupActivesWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"    setupPassives     finished in {setupPassivesWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupUI           finished in {setupUIWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    awaitLateHarmony  finished in {awaitLateHarmonyWatch.ElapsedMilliseconds} milliseconds");
                 ETGModConsole.Log($"    setupFloors       finished in {setupFloorsWatch.ElapsedMilliseconds} milliseconds");

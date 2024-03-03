@@ -60,7 +60,7 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
                     var idList = new List<int>();
                     foreach (string sprite in ad.animPaths)
                     {
-                        int fid = AtlasHelper.SafeAddSpriteToCollection(sprite, collection);
+                        int fid = SpriteBuilder.AddSpriteToCollection(sprite, collection);
                         idList.Add(fid);
                         collection.spriteDefinitions[fid].BetterConstructOffsetsFromAnchor(Anchor.LowerCenter);
                     }

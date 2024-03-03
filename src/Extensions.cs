@@ -813,7 +813,7 @@ public static class Extensions
     List<int> spriteIds = new();
     foreach (string spritePath in ResMap.Get(animationName))
     {
-        int frameSpriteId = AtlasHelper.SafeAddSpriteToCollection(spritePath, collection);
+        int frameSpriteId = SpriteBuilder.AddSpriteToCollection(spritePath, collection);
         spriteIds.Add(frameSpriteId);
         if (copyShaders)
         {

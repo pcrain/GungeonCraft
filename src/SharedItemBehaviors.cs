@@ -267,12 +267,8 @@ public static class AnimatedBullet // stolen and modified from NN
                 overrideColliderOffsetX = overrideColliderOffset.Value.x;
                 overrideColliderOffsetY = overrideColliderOffset.Value.y;
             }
-            //NOTE: threaded gun creation can fail somewhere in this method (happened for B.B. Gun) -- might be this line? hopefully the mutex fixes it
-            AtlasHelper._AddSpriteMutex.WaitOne();
             tk2dSpriteDefinition def = GunTools.SetupDefinitionForProjectileSprite(name, frame.spriteId, pixelSize.x, pixelSize.y, lightened, overrideColliderPixelWidth, overrideColliderPixelHeight, overrideColliderOffsetX, overrideColliderOffsetY,
                 overrideProjectileToCopyFrom);
-            AtlasHelper._AddSpriteMutex.ReleaseMutex();
-            // NOTE: might need to change def.position3 to null or something else
             def.BetterConstructOffsetsFromAnchor(anchor, fixesScale ? def.position3 : null, fixesScale, anchorChangesCollider);
             if (manualOffsets[i].HasValue)
             {

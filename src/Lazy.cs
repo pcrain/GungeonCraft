@@ -19,9 +19,6 @@ public static class Lazy
       ETGModConsole.Log($"<color=#ffffaaff>{text}</color>");
     }
 
-    private static readonly object _AmmonomiconUpdateLock = new();
-    private static readonly object _GUIUpdateLock = new();
-
     /// <summary>Perform basic initialization for a new passive, active, or gun item definition.</summary>
     public static TItemClass SetupItem<TItemClass, TItemSpecific>(string itemName, string spritePath, string projectileName, string shortDescription, string longDescription, string lore, bool hideFromAmmonomicon = false)
         where TItemClass : PickupObject   // must be PickupObject for passive items, PlayerItem for active items, or Gun for guns
@@ -36,12 +33,8 @@ public static class Lazy
         if (typeof(TItemClass) == typeof(Gun))
         {
             string spriteName = spritePath; // TODO: guns use names, regular items use full paths -- should be made uniform eventually
-            Gun gun;
-            lock(_AmmonomiconUpdateLock)
-            {
-                gun = ETGMod.Databases.Items.NewGun(itemName, spriteName);  //create a new gun using specified sprite name
-                Game.Items.Rename("outdated_gun_mods:"+baseItemName, IDs.InternalNames[itemName]);  //rename the gun for commands
-            }
+            Gun gun = ETGMod.Databases.Items.NewGun(itemName, spriteName);  //create a new gun using specified sprite name
+            Game.Items.Rename("outdated_gun_mods:"+baseItemName, IDs.InternalNames[itemName]);  //rename the gun for commands
 
             gun.encounterTrackable.journalData.AmmonomiconSprite = spriteName+"_ammonomicon";
             gun.QuickUpdateGunAnimations(); // includes setting the default sprite
@@ -63,29 +56,23 @@ public static class Lazy
             tk2dSprite sprite = obj.AddComponent<tk2dSprite>();
             tk2dSpriteCollectionData coll = ETGMod.Databases.Items.ItemCollection;
             tk2dSpriteDefinition dd = AtlasHelper.NamedSpriteInPackedTexture(spritePath);
-            int spriteID = AtlasHelper.SafeAddSpriteToCollection(dd, coll);
+            int spriteID = SpriteBuilder.AddSpriteToCollection(dd, coll);
             sprite.SetSprite(coll, spriteID);
             sprite.SortingOrder = 0;
             sprite.IsPerpendicular = true;
             obj.GetComponent<BraveBehaviour>().sprite = sprite;
 
-            lock(_AmmonomiconUpdateLock)
-            {
-                ETGMod.Databases.Items.SetupItem(item, item.name);
-                Gungeon.Game.Items.Add(IDs.InternalNames[itemName], item);
-            }
+            ETGMod.Databases.Items.SetupItem(item, item.name);
+            Gungeon.Game.Items.Add(IDs.InternalNames[itemName], item);
 
-            AtlasHelper.SafeAddToAmmonomicon(item.sprite.GetCurrentSpriteDef());
+            SpriteBuilder.AddToAmmonomicon(item.sprite.GetCurrentSpriteDef());
             item.encounterTrackable.journalData.AmmonomiconSprite = item.sprite.GetCurrentSpriteDef().name;
         }
 
         item.itemName = itemName;
         item.encounterTrackable.EncounterGuid = C.MOD_PREFIX+"-"+baseItemName; //create a unique guid for the item
-        lock(_AmmonomiconUpdateLock)
-        {
-            item.SetShortDescription(shortDescription);
-            item.SetLongDescription($"{longDescription}\n\n{lore}");
-        }
+        item.SetShortDescription(shortDescription);
+        item.SetLongDescription($"{longDescription}\n\n{lore}");
         ETGMod.Databases.Items.Add(item);
 
         if (hideFromAmmonomicon)
@@ -96,34 +83,19 @@ public static class Lazy
         {
             IDs.Guns[baseItemName] = item.PickupObjectId; //register item in gun ID database
             if (C.DEBUG_BUILD && !hideFromAmmonomicon)
-            {
-                lock(_GUIUpdateLock)
-                {
-                    ETGModConsole.Log($"Lazy Initialized Gun: {baseItemName} ({item.DisplayName})");
-                }
-            }
+                ETGModConsole.Log($"Lazy Initialized Gun: {baseItemName} ({item.DisplayName})");
         }
         else if (item is PlayerItem)
         {
             IDs.Actives[baseItemName] = item.PickupObjectId; //register item in active ID database
             if (C.DEBUG_BUILD && !hideFromAmmonomicon)
-            {
-                lock(_GUIUpdateLock)
-                {
-                    ETGModConsole.Log($"Lazy Initialized Active: {baseItemName} ({item.DisplayName})");
-                }
-            }
+                ETGModConsole.Log($"Lazy Initialized Active: {baseItemName} ({item.DisplayName})");
         }
         else
         {
             IDs.Passives[baseItemName] = item.PickupObjectId; //register item in passive ID database
             if (C.DEBUG_BUILD && !hideFromAmmonomicon)
-            {
-                lock(_GUIUpdateLock)
-                {
-                    ETGModConsole.Log($"Lazy Initialized Passive: {baseItemName} ({item.DisplayName})");
-                }
-            }
+                ETGModConsole.Log($"Lazy Initialized Passive: {baseItemName} ({item.DisplayName})");
         }
         return item;
     }

@@ -368,7 +368,7 @@ public static class FancyShopBuilder
           var stealIdsList = new List<int>();
           foreach (string sprite in yourPaths)
           {
-              stealIdsList.Add(AtlasHelper.SafeAddSpriteToCollection(sprite, collection));
+              stealIdsList.Add(SpriteBuilder.AddSpriteToCollection(sprite, collection));
           }
           // ShopAPI.CreateDirectionalAnimation(spriteAnimator, collection, aianimator, stealIdsList, AnimationName, YourAnimFPS);
           CreateDirectionalAnimation(spriteAnimator, collection, aianimator, stealIdsList, AnimationName, YourAnimFPS);
