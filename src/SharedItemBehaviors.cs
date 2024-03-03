@@ -249,8 +249,9 @@ public static class AnimatedBullet // stolen and modified from NN
             tk2dSpriteAnimationFrame frame = new tk2dSpriteAnimationFrame();
             frame.spriteCollection = ETGMod.Databases.Items.ProjectileCollection;
             frame.spriteId = frame.spriteCollection.inst.GetSpriteIdByName(name);
+            tk2dSpriteDefinition baseDef = frame.spriteCollection.inst.spriteDefinitions[frame.spriteId];
             frames.Add(frame);
-            IntVector2 truePixelSize = (C.PIXELS_PER_TILE * frame.spriteCollection.GetSpriteDefinition(name).position3.XY()).ToIntVector2();
+            IntVector2 truePixelSize = (C.PIXELS_PER_TILE * (baseDef.position3 - baseDef.position0).XY()).ToIntVector2();
             IntVector2 pixelSize = new IntVector2((int)(pixelScale * truePixelSize.x), (int)(pixelScale * truePixelSize.y));
             int? overrideColliderPixelWidth = null;
             int? overrideColliderPixelHeight = null;
@@ -272,7 +273,7 @@ public static class AnimatedBullet // stolen and modified from NN
                 overrideProjectileToCopyFrom);
             AtlasHelper._AddSpriteMutex.ReleaseMutex();
             // NOTE: might need to change def.position3 to null or something else
-            def.BetterConstructOffsetsFromAnchor(anchor, def.position3, fixesScale, anchorChangesCollider);
+            def.BetterConstructOffsetsFromAnchor(anchor, fixesScale ? def.position3 : null, fixesScale, anchorChangesCollider);
             if (manualOffsets[i].HasValue)
             {
                 Vector3 manualOffset = manualOffsets[i].Value;

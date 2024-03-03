@@ -117,8 +117,10 @@ public static class AtlasHelper
         position1                  = offset + extents.WithY(0f),
         position2                  = offset + extents.WithX(0f),
         position3                  = offset + extents,
-        boundsDataExtents          = /*trueExtents*/ extents,
-        boundsDataCenter           = /*0.5f * trueExtents*/ offset + 0.5f * extents,
+        boundsDataExtents          = extents,
+        boundsDataCenter           = offset + 0.5f * extents,
+        // boundsDataExtents          = trueExtents,
+        // boundsDataCenter           = 0.5f * trueExtents,
         untrimmedBoundsDataExtents = trueExtents,
         untrimmedBoundsDataCenter  = 0.5f * trueExtents,
         uvs = new Vector2[]
