@@ -35,6 +35,7 @@ public class KALI : AdvancedGunBehavior
                 ResMap.Get("kali_trail"), 60, cascadeTimer: C.FRAME, softMaxLength: 1f, destroyOnEmpty: false);
                 tc.UsesDispersalParticles = true;
                 tc.DispersalParticleSystemPrefab = (ItemHelper.Get(Items.FlashRay) as Gun).DefaultModule.projectiles[0].GetComponentInChildren<TrailController>().DispersalParticleSystemPrefab;
+                tc.gameObject.AddComponent<TrailControllerHotfix.Fix>(); //NOTE: high speed projectiles don't always collide with walls cleanly in vanilla, so patch that
             // p.SetAllImpactVFX(VFX.CreatePool("gaster_beam_impact", fps: 20, loops: false, scale: 1.0f, anchor: Anchor.MiddleCenter));
 
             // TrailController tc = (ItemHelper.Get(Items.Railgun) as Gun)

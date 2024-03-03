@@ -81,20 +81,23 @@ public static class SpriteBuilderHotfix
 
 // TrailControllers for projectiles moving at extremely highspeed drift down and to the left, making them apparently never hit
 // the top or right walls at all. I don't know why multiplying their offset by 19/16 fixes things, but it comes darn close.
-// WARNING: this breaks a lot of vanilla projectiles (and Suncaster) so I'm disabling it for now
+// NOTE: this breaks a lot of vanilla projectiles (and Suncaster), so individual projectiles can opt in with a TrailControllerHotfix.Fix component
 public static class TrailControllerHotfix
 {
-    // [HarmonyPatch(typeof(TrailController), nameof(TrailController.SetTiledSpriteGeom))]
+    public class Fix : MonoBehaviour {} // dummy class for projectiles we want to apply this fix too
+    [HarmonyPatch(typeof(TrailController), nameof(TrailController.SetTiledSpriteGeom))]
     private class TrailGeomPatch
     {
         static bool Prefix(TrailController __instance, Vector3[] pos, Vector2[] uv, int offset, out Vector3 boundsCenter, out Vector3 boundsExtents, tk2dSpriteDefinition spriteDef, Vector3 scale, Vector2 dimensions, tk2dBaseSprite.Anchor anchor, float colliderOffsetZ, float colliderExtentZ)
         {
+            boundsCenter = (__instance.m_minBonePosition + __instance.m_maxBonePosition) / 2f;
+            boundsExtents = (__instance.m_maxBonePosition - __instance.m_minBonePosition) / 2f;
+            if (__instance.GetComponent<TrailControllerHotfix.Fix>() is not TrailControllerHotfix.Fix)
+                return true; // call the original method if we haven't opted in
             int num = Mathf.RoundToInt(spriteDef.untrimmedBoundsDataExtents.x / spriteDef.texelSize.x);
             int num2 = num / 4;
             int num3 = Mathf.Max(__instance.m_bones.Count - 1, 0);
             int num4 = Mathf.CeilToInt((float)num3 / (float)num2);
-            boundsCenter = (__instance.m_minBonePosition + __instance.m_maxBonePosition) / 2f;
-            boundsExtents = (__instance.m_maxBonePosition - __instance.m_minBonePosition) / 2f;
             LinkedListNode<TrailController.Bone> linkedListNode = __instance.m_bones.First;
             int num5 = 0;
             for (int i = 0; i < num4; i++)
