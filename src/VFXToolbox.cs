@@ -4,8 +4,6 @@ public static class VFX
 {
     private const int PIXELS_ABOVE_HEAD = 2;
 
-    private static GameObject VFXScapegoat = new();
-    private static tk2dSpriteCollectionData OverheadVFXCollection;
     private static Dictionary<GameActor,List<GameObject>> extantSprites = new();
 
     public static Dictionary<string,int> sprites = new();
@@ -16,21 +14,11 @@ public static class VFX
 
     public static GameObject LaserSightPrefab;
     public static GameObject MiniPickup;
-
-    public static tk2dSpriteCollectionData SpriteCollection
-    {
-        get { return OverheadVFXCollection; }
-    }
+    public static readonly tk2dSpriteCollectionData Collection =
+         SpriteBuilder.ConstructCollection(new GameObject().RegisterPrefab(false, false, true), $"{C.MOD_NAME}_VFX_Collection");
 
     public static void Init()
     {
-        // Initialize VFX collections
-        #region VFX Initialization
-            OverheadVFXCollection = SpriteBuilder.ConstructCollection(VFXScapegoat, "OverheadVFX_Collection");
-            UnityEngine.Object.DontDestroyOnLoad(VFXScapegoat);
-            UnityEngine.Object.DontDestroyOnLoad(OverheadVFXCollection);
-        #endregion
-
         #region Shared Assets
             LaserSightPrefab = LoadHelper.LoadAssetFromAnywhere("assets/resourcesbundle/global vfx/vfx_lasersight.prefab") as GameObject;
         #endregion
@@ -40,7 +28,9 @@ public static class VFX
             RegisterSprite($"{C.MOD_INT_NAME}/Resources/MiscVFX/reticle_white");
             RegisterSprite($"{C.MOD_INT_NAME}/Resources/MiscVFX/reticle_orange");
             RegisterSprite($"{C.MOD_INT_NAME}/Resources/MiscVFX/reticle_blue");
+            // Shared by Protractor and Ticonderogun
             RegisterSprite($"{C.MOD_INT_NAME}/Resources/MiscVFX/fancy_line");
+            // Shared by Pistol Whip and...nothing else at the moment //TODO: can be moved
             RegisterSprite($"{C.MOD_INT_NAME}/Resources/MiscVFX/whip_segment");
             RegisterSprite($"{C.MOD_INT_NAME}/Resources/MiscVFX/whip_segment_base");
             // Shared by Blackjack and possibly future auto-pickup items
@@ -53,7 +43,7 @@ public static class VFX
     /// </summary>
     public static void RegisterSprite(string path)
     {
-        sprites[path.Substring(path.LastIndexOf("/")+1)] = SpriteBuilder.AddSpriteToCollection(AtlasHelper.NamedSpriteInPackedTexture(path), OverheadVFXCollection);
+        sprites[path.Substring(path.LastIndexOf("/")+1)] = SpriteBuilder.AddSpriteToCollection(AtlasHelper.NamedSpriteInPackedTexture(path), Collection);
     }
 
     /// <summary>
@@ -68,10 +58,10 @@ public static class VFX
         }
 
         // System.Diagnostics.Stopwatch vfxWatch = System.Diagnostics.Stopwatch.StartNew();
-        int spriteID = SpriteBuilder.AddSpriteToCollection(spritePaths[0], OverheadVFXCollection);
+        int spriteID = Collection.GetSpriteIdByName(spritePaths[0]);
 
         GameObject Obj     = new GameObject(name).RegisterPrefab();
-            Obj.AddComponent<tk2dSprite>().SetSprite(OverheadVFXCollection, spriteID);
+            Obj.AddComponent<tk2dSprite>().SetSprite(Collection, spriteID);
         // GameObject Obj     = SpriteBuilder.SpriteFromResource(spritePaths[0], new GameObject(name));
         VFXComplex complex = new VFXComplex();
         VFXObject vfObj    = new VFXObject();
@@ -81,7 +71,7 @@ public static class VFX
         tk2dBaseSprite baseSprite = Obj.GetComponent<tk2dBaseSprite>();
 
         tk2dSprite sprite = Obj.GetOrAddComponent<tk2dSprite>();
-        sprite.SetSprite(OverheadVFXCollection, spriteID);
+        sprite.SetSprite(Collection, spriteID);
         tk2dSpriteDefinition defaultDef = sprite.GetCurrentSpriteDef();
 
         if (dimensions is IntVector2 dims)
@@ -97,8 +87,8 @@ public static class VFX
         List<tk2dSpriteAnimationFrame> frames = new List<tk2dSpriteAnimationFrame>();
         for (int i = 0; i < spritePaths.Count; i++)
         {
-            int frameSpriteId                   = SpriteBuilder.AddSpriteToCollection(spritePaths[i], OverheadVFXCollection);
-            tk2dSpriteDefinition frameDef       = OverheadVFXCollection.spriteDefinitions[frameSpriteId];
+            int frameSpriteId                   = Collection.GetSpriteIdByName(spritePaths[i]);
+            tk2dSpriteDefinition frameDef       = Collection.spriteDefinitions[frameSpriteId];
             frameDef.BetterConstructOffsetsFromAnchor(anchor);
             frameDef.colliderVertices = defaultDef.colliderVertices;
             frameDef.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
@@ -114,7 +104,7 @@ public static class VFX
                 frameDef.material.SetColor("_EmissiveColor", (Color)emissiveColour);
                 frameDef.materialInst.SetColor("_EmissiveColor", (Color)emissiveColour);
             }
-            frames.Add(new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = OverheadVFXCollection });
+            frames.Add(new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = Collection });
         }
         if (emissivePower > 0) {
             sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
@@ -310,7 +300,7 @@ public static class VFX
             gunOwner.sprite.WorldTopCenter.y + PIXELS_ABOVE_HEAD/C.PIXELS_PER_TILE);
         tk2dSprite overheadSprite = newSprite.AddComponent<tk2dSprite>();
         extantSprites[gunOwner].Add(newSprite);
-        overheadSprite.SetSprite(OverheadVFXCollection, sprites[name]);
+        overheadSprite.SetSprite(Collection, sprites[name]);
         overheadSprite.PlaceAtPositionByAnchor(newSprite.transform.position, Anchor.LowerCenter);
         overheadSprite.transform.localPosition = overheadSprite.transform.localPosition.Quantize(0.0625f);
         newSprite.transform.parent = gunOwner.transform;

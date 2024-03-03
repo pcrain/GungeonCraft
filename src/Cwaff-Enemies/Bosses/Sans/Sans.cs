@@ -61,7 +61,7 @@ public partial class SansBoss : AIActor
   {
     // Targeting reticle
     _NapalmReticle = ResourceManager.LoadAssetBundle("shared_auto_002").LoadAsset<GameObject>("NapalmStrikeReticle").ClonePrefab();
-      _NapalmReticle.GetComponent<tk2dSlicedSprite>().SetSprite(VFX.SpriteCollection, VFX.sprites["reticle_white"]);
+      _NapalmReticle.GetComponent<tk2dSlicedSprite>().SetSprite(VFX.Collection, VFX.sprites["reticle_white"]);
       UnityEngine.Object.Destroy(_NapalmReticle.GetComponent<ReticleRiserEffect>());  // delete risers for use with DoomZoneGrowth component later
     // Bone bullet
     Projectile boneBulletProjectile = Items.HegemonyRifle.CloneProjectile();
@@ -96,7 +96,7 @@ public partial class SansBoss : AIActor
     GameObject reticle    = UnityEngine.Object.Instantiate(_NapalmReticle);
     tk2dSlicedSprite quad = reticle.GetComponent<tk2dSlicedSprite>();
       if (sprite != null)
-        quad.SetSprite(VFX.SpriteCollection, VFX.sprites[sprite]);
+        quad.SetSprite(VFX.Collection, VFX.sprites[sprite]);
       quad.dimensions              = C.PIXELS_PER_TILE * (new Vector2(delta.magnitude / growthTime, width));
       quad.transform.localRotation = delta.EulerZ();
       quad.transform.position      = start + (0.5f * width * delta.normalized.Rotate(-90f));

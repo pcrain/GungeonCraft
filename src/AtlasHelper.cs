@@ -148,10 +148,11 @@ public static class AtlasHelper
   {
     Assembly asmb = Assembly.GetCallingAssembly();
 
-    List<tk2dSpriteDefinition> projectileSprites = new();
-    List<tk2dSpriteDefinition> ammonomiconSprites = new();
-    List<tk2dSpriteDefinition> itemSprites = new();
-    List<tk2dSpriteDefinition> weaponSprites = new();
+    List<tk2dSpriteDefinition> projectileSprites                = new();
+    List<tk2dSpriteDefinition> ammonomiconSprites               = new();
+    List<tk2dSpriteDefinition> itemSprites                      = new();
+    List<tk2dSpriteDefinition> weaponSprites                    = new();
+    List<tk2dSpriteDefinition> miscSprites                      = new();
     List<tk2dSpriteDefinition.AttachPoint[]> weaponAttachPoints = new();
 
     using (Stream stream = asmb.GetManifestResourceStream(metaDataResourcePath))
@@ -204,6 +205,8 @@ public static class AtlasHelper
             weaponAttachPoints.Add(null);
           continue;
         }
+
+        miscSprites.Add(def);
       }
     }
 
@@ -211,6 +214,7 @@ public static class AtlasHelper
     AddSpritesToCollection(newDefs: ammonomiconSprites, collection: _AmmonomiconCollection);
     AddSpritesToCollection(newDefs: itemSprites,        collection: _ItemCollection);
     AddSpritesToCollection(newDefs: weaponSprites,      collection: _WeaponCollection, attachPoints: weaponAttachPoints);
+    AddSpritesToCollection(newDefs: miscSprites,        collection: VFX.Collection); // NOTE: all miscellaneous sprites go into the VFX collection
   }
 
   /// <summary>Helper method for adding multiple sprites to a collection at once</summary>
@@ -275,15 +279,11 @@ public static class AtlasHelper
   /// <summary>Modification of Alexandria method using our own packed textures</summary>
   public static string AddCustomAmmoType(string name, string ammoTypeSpritePath, string ammoBackgroundSpritePath)
   {
-      tk2dSpriteDefinition fgTexture = _PackedTextures[ammoTypeSpritePath];
-      tk2dSpriteDefinition bgTexture = _PackedTextures[ammoBackgroundSpritePath];
-
-      GameObject fgSpriteObject = new GameObject("sprite fg").RegisterPrefab();
-      GameObject bgSpriteObject = new GameObject("sprite bg").RegisterPrefab();
-
       GameUIAmmoType uiammotype = new GameUIAmmoType {
-          ammoBarBG      = bgSpriteObject.SetupDfSpriteFromDef<dfTiledSprite>(bgTexture, ShaderCache.Acquire("Daikon Forge/Default UI Shader")),
-          ammoBarFG      = fgSpriteObject.SetupDfSpriteFromDef<dfTiledSprite>(fgTexture, ShaderCache.Acquire("Daikon Forge/Default UI Shader")),
+          ammoBarBG      = new GameObject("sprite bg").RegisterPrefab().SetupDfSpriteFromDef<dfTiledSprite>(
+            _PackedTextures[ammoBackgroundSpritePath], ShaderCache.Acquire("Daikon Forge/Default UI Shader")),
+          ammoBarFG      = new GameObject("sprite fg").RegisterPrefab().SetupDfSpriteFromDef<dfTiledSprite>(
+            _PackedTextures[ammoTypeSpritePath], ShaderCache.Acquire("Daikon Forge/Default UI Shader")),
           ammoType       = GameUIAmmoType.AmmoType.CUSTOM,
           customAmmoType = name
       };
