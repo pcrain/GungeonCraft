@@ -62,7 +62,7 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
                     {
                         int fid = AtlasHelper.SafeAddSpriteToCollection(sprite, collection);
                         idList.Add(fid);
-                        collection.spriteDefinitions[fid].ConstructOffsetsFromAnchor(Anchor.LowerCenter);
+                        collection.spriteDefinitions[fid].BetterConstructOffsetsFromAnchor(Anchor.LowerCenter);
                     }
                     SpriteBuilder.AddAnimation(spriteAnimator, collection, idList, ad.animName, tk2dSpriteAnimationClip.WrapMode.Loop, ad.animFPS);
                     animNames.Add(ad.animName);

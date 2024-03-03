@@ -569,6 +569,6 @@ public class UppskeruvelCombatSoul : MonoBehaviour
                 break;
         }
 
-        base.transform.position = this._basePos.HoverAt(amplitude: UppskeruvelLostSoul._BOB_HEIGHT, frequency: UppskeruvelLostSoul._BOB_SPEED);
+        base.transform.position = this._basePos;//.HoverAt(amplitude: UppskeruvelLostSoul._BOB_HEIGHT, frequency: UppskeruvelLostSoul._BOB_SPEED);
     }
 }

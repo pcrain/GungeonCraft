@@ -29,7 +29,7 @@ public static class BeamHelpers
                 new Vector3(convertedColliderX, convertedColliderY, 0f)
             };
 
-            def.ConstructOffsetsFromAnchor(Anchor.MiddleLeft);
+            def.BetterConstructOffsetsFromAnchor(Anchor.MiddleLeft);
 
             //tiledSprite.anchor = Anchor.MiddleCenter;
             tk2dSpriteAnimator animator = projectile.gameObject.GetOrAddComponent<tk2dSpriteAnimator>();
@@ -53,7 +53,7 @@ public static class BeamHelpers
                     tk2dSpriteCollectionData collection = ETGMod.Databases.Items.ProjectileCollection;
                     int frameSpriteId = AtlasHelper.SafeAddSpriteToCollection(path, collection);
                     tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
-                    frameDef.ConstructOffsetsFromAnchor(Anchor.MiddleLeft);
+                    frameDef.BetterConstructOffsetsFromAnchor(Anchor.MiddleLeft);
                     frameDef.colliderVertices = def.colliderVertices;
                     frames.Add(new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = collection });
                 }
@@ -165,7 +165,7 @@ public static class BeamHelpers
             tk2dSpriteCollectionData collection = ETGMod.Databases.Items.ProjectileCollection;
             int frameSpriteId = AtlasHelper.SafeAddSpriteToCollection(path, collection);
             tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
-            frameDef.ConstructOffsetsFromAnchor(anchorOverride ?? Anchor.MiddleLeft);
+            frameDef.BetterConstructOffsetsFromAnchor(anchorOverride ?? Anchor.MiddleLeft);
             if (overrideVertices != null)
             {
                 frameDef.colliderVertices = overrideVertices;

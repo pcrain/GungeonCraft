@@ -80,8 +80,8 @@ public static class VFX
 
         tk2dBaseSprite baseSprite = Obj.GetComponent<tk2dBaseSprite>();
         tk2dSpriteDefinition baseDef = baseSprite.GetCurrentSpriteDef();
-        baseDef.ConstructOffsetsFromAnchor(
-            Anchor.LowerCenter, Vector2.zero); //NOTE: this used to be baseDef.position3, but changed during migration to packed textures...still unsure why
+        // baseDef.BetterConstructOffsetsFromAnchor(
+        //     Anchor.MiddleCenter); //NOTE: this used to be baseDef.position3, but changed during migration to packed textures...still unsure why
 
         tk2dSprite sprite = Obj.GetOrAddComponent<tk2dSprite>();
         sprite.SetSprite(OverheadVFXCollection, spriteID);
@@ -115,7 +115,7 @@ public static class VFX
         {
             int frameSpriteId                   = AtlasHelper.SafeAddSpriteToCollection(spritePaths[i], OverheadVFXCollection);
             tk2dSpriteDefinition frameDef       = OverheadVFXCollection.spriteDefinitions[frameSpriteId];
-            frameDef.ConstructOffsetsFromAnchor(anchor);
+            frameDef.BetterConstructOffsetsFromAnchor(anchor);
             frameDef.colliderVertices = defaultDef.colliderVertices;
             frameDef.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
             frameDef.materialInst.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
@@ -507,7 +507,7 @@ public static class VFX
               new Vector3(convertedColliderX, convertedColliderY, 0f)
           };
 
-          def.ConstructOffsetsFromAnchor(Anchor.MiddleLeft);
+          def.BetterConstructOffsetsFromAnchor(Anchor.MiddleLeft);
 
           tk2dSpriteAnimator animator = newTrailObject.GetOrAddComponent<tk2dSpriteAnimator>();
           tk2dSpriteAnimation animation = newTrailObject.GetOrAddComponent<tk2dSpriteAnimation>();
@@ -573,7 +573,7 @@ public static class VFX
               new Vector3(convertedColliderX, convertedColliderY, 0f)
           };
 
-          def.ConstructOffsetsFromAnchor(Anchor.MiddleLeft);
+          def.BetterConstructOffsetsFromAnchor(Anchor.MiddleLeft);
 
           tk2dSpriteAnimator animator = newTrailObject.GetOrAddComponent<tk2dSpriteAnimator>();
           tk2dSpriteAnimation animation = newTrailObject.GetOrAddComponent<tk2dSpriteAnimation>();

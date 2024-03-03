@@ -271,7 +271,8 @@ public static class AnimatedBullet // stolen and modified from NN
             tk2dSpriteDefinition def = GunTools.SetupDefinitionForProjectileSprite(name, frame.spriteId, pixelSize.x, pixelSize.y, lightened, overrideColliderPixelWidth, overrideColliderPixelHeight, overrideColliderOffsetX, overrideColliderOffsetY,
                 overrideProjectileToCopyFrom);
             AtlasHelper._AddSpriteMutex.ReleaseMutex();
-            def.ConstructOffsetsFromAnchor(anchor, def.position3, fixesScale, anchorChangesCollider);
+            // NOTE: might need to change def.position3 to null or something else
+            def.BetterConstructOffsetsFromAnchor(anchor, def.position3, fixesScale, anchorChangesCollider);
             if (manualOffsets[i].HasValue)
             {
                 Vector3 manualOffset = manualOffsets[i].Value;
