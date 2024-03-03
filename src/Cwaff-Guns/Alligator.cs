@@ -94,6 +94,8 @@ public class AlligatorProjectile : MonoBehaviour
     {
         if (body.aiActor is not AIActor aiActor)
             return;
+        if (body.healthHaver is not HealthHaver hh)
+            return;
         if (!aiActor.IsHostile(canBeNeutral: true) || aiActor.gameObject.GetComponents<AlligatorCableHandler>().Count() >= _MAX_CLIPS_PER_ENEMY)
             return;
         AlligatorCableHandler cable = aiActor.gameObject.AddComponent<AlligatorCableHandler>();
@@ -295,7 +297,7 @@ public class AlligatorCableHandler : MonoBehaviour
 
         for (int i = _extantSparks.Count() - 1; i >= 0; --i)
         {
-            if (!this._enemy?.healthHaver)
+            if (!this._enemy || !this._enemy.healthHaver)
                 break;  // can happen if a previous spark killed the enemy
             float percentDone = (curTime - _extantSpawnTimes[i]) / _SPARK_TRAVEL_TIME;
             if (percentDone > 1f)
