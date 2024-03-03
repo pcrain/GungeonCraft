@@ -482,7 +482,7 @@ public static class VFX
           float convertedOffsetX = colliderOffsets.x / 16f;
           float convertedOffsetY = colliderOffsets.y / 16f;
 
-          int spriteID = SpriteBuilder.AddSpriteToCollection(spritePath, ETGMod.Databases.Items.ProjectileCollection);
+          int spriteID = ETGMod.Databases.Items.ProjectileCollection.GetSpriteIdByName(spritePath);
           tk2dTiledSprite tiledSprite = newTrailObject.GetOrAddComponent<tk2dTiledSprite>();
 
           tiledSprite.SetSprite(ETGMod.Databases.Items.ProjectileCollection, spriteID);
@@ -549,7 +549,7 @@ public static class VFX
           float convertedOffsetX = colliderOffsets.x / 16f;
           float convertedOffsetY = colliderOffsets.y / 16f;
 
-          int spriteID = SpriteBuilder.AddSpriteToCollection(spritePath, ETGMod.Databases.Items.ProjectileCollection);
+          int spriteID = ETGMod.Databases.Items.ProjectileCollection.GetSpriteIdByName(spritePath);
           tk2dTiledSprite tiledSprite = newTrailObject.GetOrAddComponent<tk2dTiledSprite>();
 
           tiledSprite.SetSprite(ETGMod.Databases.Items.ProjectileCollection, spriteID);

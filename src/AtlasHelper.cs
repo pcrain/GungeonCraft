@@ -138,8 +138,10 @@ public static class AtlasHelper
     return _PackedTextures.TryGetValue(s.Split('/').Last(), out tk2dSpriteDefinition value) ? value : null;
   }
 
-  internal static tk2dSpriteCollectionData _WeaponCollection = ETGMod.Databases.Items.WeaponCollection;
-  internal static tk2dSpriteCollectionData _AmmonomiconCollection = AmmonomiconController.ForceInstance.EncounterIconCollection;
+  internal static readonly tk2dSpriteCollectionData _ProjectileCollection  = ETGMod.Databases.Items.ProjectileCollection;
+  internal static readonly tk2dSpriteCollectionData _AmmonomiconCollection = AmmonomiconController.ForceInstance.EncounterIconCollection;
+  internal static readonly tk2dSpriteCollectionData _ItemCollection        = ETGMod.Databases.Items.ItemCollection;
+  internal static readonly tk2dSpriteCollectionData _WeaponCollection      = ETGMod.Databases.Items.WeaponCollection;
 
   /// <summary>Load a packed texture from a resource string</summary>
   public static void LoadPackedTextureResource(Texture2D atlas, Dictionary<string, tk2dSpriteDefinition.AttachPoint[]> attachPoints, string metaDataResourcePath)
@@ -148,6 +150,7 @@ public static class AtlasHelper
 
     List<tk2dSpriteDefinition> projectileSprites = new();
     List<tk2dSpriteDefinition> ammonomiconSprites = new();
+    List<tk2dSpriteDefinition> itemSprites = new();
     List<tk2dSpriteDefinition> weaponSprites = new();
     List<tk2dSpriteDefinition.AttachPoint[]> weaponAttachPoints = new();
 
@@ -185,6 +188,12 @@ public static class AtlasHelper
           continue;
         }
 
+        if (collName == "ItemSprites")
+        {
+          itemSprites.Add(def);
+          continue;
+        }
+
         // everything from here onward only applies to weapon collection
         if (collName == "WeaponCollection")
         {
@@ -198,8 +207,9 @@ public static class AtlasHelper
       }
     }
 
-    AddSpritesToCollection(newDefs: projectileSprites,  collection: ETGMod.Databases.Items.ProjectileCollection);
+    AddSpritesToCollection(newDefs: projectileSprites,  collection: _ProjectileCollection);
     AddSpritesToCollection(newDefs: ammonomiconSprites, collection: _AmmonomiconCollection);
+    AddSpritesToCollection(newDefs: itemSprites,        collection: _ItemCollection);
     AddSpritesToCollection(newDefs: weaponSprites,      collection: _WeaponCollection, attachPoints: weaponAttachPoints);
   }
 

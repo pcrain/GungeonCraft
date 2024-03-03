@@ -18,9 +18,9 @@ public static class BeamHelpers
             float convertedOffsetX = colliderOffsets.x / 16f;
             float convertedOffsetY = colliderOffsets.y / 16f;
 
-            int spriteID = SpriteBuilder.AddSpriteToCollection(spritePath, ETGMod.Databases.Items.ProjectileCollection);
+            tk2dSpriteCollectionData collection = ETGMod.Databases.Items.ProjectileCollection;
+            int spriteID = collection.GetSpriteIdByName(spritePath);
             tk2dTiledSprite tiledSprite = projectile.gameObject.GetOrAddComponent<tk2dTiledSprite>();
-
 
             tiledSprite.SetSprite(ETGMod.Databases.Items.ProjectileCollection, spriteID);
             tk2dSpriteDefinition def = tiledSprite.GetCurrentSpriteDef();
@@ -48,8 +48,7 @@ public static class BeamHelpers
                 List<tk2dSpriteAnimationFrame> frames = new List<tk2dSpriteAnimationFrame>();
                 foreach (string path in spritePaths)
                 {
-                    tk2dSpriteCollectionData collection = ETGMod.Databases.Items.ProjectileCollection;
-                    int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
+                    int frameSpriteId = collection.GetSpriteIdByName(path);
                     tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
                     frameDef.BetterConstructOffsetsFromAnchor(Anchor.MiddleLeft);
                     frameDef.colliderVertices = def.colliderVertices;
@@ -166,7 +165,7 @@ public static class BeamHelpers
         foreach (string path in spritePaths)
         {
             tk2dSpriteCollectionData collection = ETGMod.Databases.Items.ProjectileCollection;
-            int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
+            int frameSpriteId = collection.GetSpriteIdByName(path);
             tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
             if (shouldConstructOffsets)
                 frameDef.BetterConstructOffsetsFromAnchor(anchorOverride ?? Anchor.MiddleLeft);

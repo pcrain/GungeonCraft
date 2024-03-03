@@ -53,11 +53,9 @@ public static class Lazy
             GameObject obj = new GameObject(itemName).RegisterPrefab();
             item = obj.AddComponent<TItemSpecific>();
 
-            tk2dSprite sprite = obj.AddComponent<tk2dSprite>();
             tk2dSpriteCollectionData coll = ETGMod.Databases.Items.ItemCollection;
-            tk2dSpriteDefinition dd = AtlasHelper.NamedSpriteInPackedTexture(spritePath);
-            int spriteID = SpriteBuilder.AddSpriteToCollection(dd, coll);
-            sprite.SetSprite(coll, spriteID);
+            tk2dSprite sprite = obj.AddComponent<tk2dSprite>();
+            sprite.SetSprite(coll, coll.GetSpriteIdByName(spritePath));
             sprite.SortingOrder = 0;
             sprite.IsPerpendicular = true;
             obj.GetComponent<BraveBehaviour>().sprite = sprite;

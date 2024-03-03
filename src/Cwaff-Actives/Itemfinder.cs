@@ -31,13 +31,14 @@ public class Itemfinder : PlayerItem
         item.SetCooldownType(ItemBuilder.CooldownType.Timed, 1f);
 
         _NormalId = item.sprite.spriteId;
-        _BlinkId  = SpriteBuilder.AddSpriteToCollection(ResMap.Get("itemfinder_blink_icon")[0], item.sprite.Collection);
+        _BlinkId  = item.sprite.collection.GetSpriteIdByName("itemfinder_blink_icon");
     }
 
     public override void Pickup(PlayerController player)
     {
         if (!this.m_pickedUpThisRun)
             InitializeTreasureForFloor();
+        GameManager.Instance.OnNewLevelFullyLoaded -= InitializeTreasureForFloor; //TODO: look into whether this is necessary or not
         GameManager.Instance.OnNewLevelFullyLoaded += InitializeTreasureForFloor;
         base.Pickup(player);
     }
