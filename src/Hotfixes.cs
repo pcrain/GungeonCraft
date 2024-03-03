@@ -81,9 +81,10 @@ public static class SpriteBuilderHotfix
 
 // TrailControllers for projectiles moving at extremely highspeed drift down and to the left, making them apparently never hit
 // the top or right walls at all. I don't know why multiplying their offset by 19/16 fixes things, but it comes darn close.
+// WARNING: this breaks a lot of vanilla projectiles (and Suncaster) so I'm disabling it for now
 public static class TrailControllerHotfix
 {
-    [HarmonyPatch(typeof(TrailController), nameof(TrailController.SetTiledSpriteGeom))]
+    // [HarmonyPatch(typeof(TrailController), nameof(TrailController.SetTiledSpriteGeom))]
     private class TrailGeomPatch
     {
         static bool Prefix(TrailController __instance, Vector3[] pos, Vector2[] uv, int offset, out Vector3 boundsCenter, out Vector3 boundsExtents, tk2dSpriteDefinition spriteDef, Vector3 scale, Vector2 dimensions, tk2dBaseSprite.Anchor anchor, float colliderOffsetZ, float colliderExtentZ)
