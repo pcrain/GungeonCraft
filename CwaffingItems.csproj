@@ -78,10 +78,6 @@
     <Compile Include="src\Cwaff-Passives\RingOfDefenestration.cs"/>
     <Compile Include="src\Lazy.cs"/>
     <Compile Include="src\Commands.cs"/>
-    <Compile Include="src\HatsStolenFromNN\HatController.cs"/>
-    <Compile Include="src\HatsStolenFromNN\HatUtility.cs"/>
-    <Compile Include="src\HatsStolenFromNN\Hat.cs"/>
-    <Compile Include="src\HatsStolenFromNN\HatDefinitions.cs"/>
     <Compile Include="src\Cwaff-Enemies\BulletScriptHelper.cs"/>
     <Compile Include="src\Cwaff-Enemies\Bosses\BuildABoss.cs"/>
     <Compile Include="src\Cwaff-Enemies\Bosses\Sans\SansNPC.cs"/>

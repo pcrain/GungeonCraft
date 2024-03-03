@@ -25,7 +25,7 @@ class CwaffToolbox : MonoBehaviour
     {
         static void Postfix(PlayerController __instance)
         {
-            __instance.gameObject.GetOrAddComponent<HatController>();
+            // __instance.gameObject.GetOrAddComponent<HatController>();
 
             EeveeTexture ??= ResourceManager.LoadAssetBundle("shared_auto_001").LoadAsset<Texture2D>("nebula_reducednoise");
             EnemyWithoutAFuture = ""; //reset so enemies don't stay dead between runs  //TODO: this might not play well with midgame saves
