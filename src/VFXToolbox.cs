@@ -67,43 +67,27 @@ public static class VFX
             return; //NOTE: this causes issues whether we return early (poe souls) or not (uppskeruvel muzzle)...these issues really need to be handled as they come up
         }
 
+        // System.Diagnostics.Stopwatch vfxWatch = System.Diagnostics.Stopwatch.StartNew();
         int spriteID = SpriteBuilder.AddSpriteToCollection(spritePaths[0], OverheadVFXCollection);
 
-        GameObject Obj     = new GameObject(name);
+        GameObject Obj     = new GameObject(name).RegisterPrefab();
             Obj.AddComponent<tk2dSprite>().SetSprite(OverheadVFXCollection, spriteID);
         // GameObject Obj     = SpriteBuilder.SpriteFromResource(spritePaths[0], new GameObject(name));
         VFXComplex complex = new VFXComplex();
         VFXObject vfObj    = new VFXObject();
         VFXPool pool       = new VFXPool();
         pool.type          = VFXPoolType.All;
-        Obj.RegisterPrefab();
 
         tk2dBaseSprite baseSprite = Obj.GetComponent<tk2dBaseSprite>();
-        tk2dSpriteDefinition baseDef = baseSprite.GetCurrentSpriteDef();
-        // baseDef.BetterConstructOffsetsFromAnchor(
-        //     Anchor.MiddleCenter); //NOTE: this used to be baseDef.position3, but changed during migration to packed textures...still unsure why
 
         tk2dSprite sprite = Obj.GetOrAddComponent<tk2dSprite>();
         sprite.SetSprite(OverheadVFXCollection, spriteID);
         tk2dSpriteDefinition defaultDef = sprite.GetCurrentSpriteDef();
 
         if (dimensions is IntVector2 dims)
-        {
-            defaultDef.colliderVertices = new Vector3[]{
-                      new Vector3(0f, 0f, 0f),
-                      new Vector3((dims.x / C.PIXELS_PER_TILE), (dims.y / C.PIXELS_PER_TILE), 0f)
-                  };
-        }
+            defaultDef.colliderVertices = new Vector3[]{Vector3.zero, C.PIXEL_SIZE * dims.ToVector3()};
         else
-        {
-            defaultDef.colliderVertices = new Vector3[]{
-                      new Vector3(0f, 0f, 0f),
-                      new Vector3(
-                        baseSprite.GetCurrentSpriteDef().position3.x / C.PIXELS_PER_TILE,
-                        baseSprite.GetCurrentSpriteDef().position3.y / C.PIXELS_PER_TILE,
-                        0f)
-                  };
-        }
+            defaultDef.colliderVertices = new Vector3[]{Vector3.zero, baseSprite.GetCurrentSpriteDef().position3};
 
         tk2dSpriteAnimator animator           = Obj.GetOrAddComponent<tk2dSpriteAnimator>();
         tk2dSpriteAnimation animation         = Obj.GetOrAddComponent<tk2dSpriteAnimation>();
@@ -176,6 +160,7 @@ public static class VFX
         vfxpool[name]    = pool;
         vfxcomplex[name] = complex;
         animations[name] = Obj;
+        // vfxWatch.Stop(); System.Console.WriteLine($"    vfx {name} created in {vfxWatch.ElapsedMilliseconds} milliseconds");
     }
 
     /// <summary>

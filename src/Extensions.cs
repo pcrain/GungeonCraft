@@ -745,7 +745,7 @@ public static class Extensions
 
   /// <summary>Set some basic attributes for each gun</summary>
   public static void SetAttributes(this Gun gun, ItemQuality quality, GunClass gunClass, float reloadTime, int ammo,
-    Items audioFrom = Items.Blasphemy, bool defaultAudio = false, bool infiniteAmmo = false, bool canGainAmmo = true, bool canReloadNoMatterAmmo = false, bool? doesScreenShake = null)
+    Items audioFrom = Items.Banana, bool defaultAudio = false, bool infiniteAmmo = false, bool canGainAmmo = true, bool canReloadNoMatterAmmo = false, bool? doesScreenShake = null)
   {
     gun.quality = quality;
     gun.reloadTime = reloadTime;
@@ -1585,58 +1585,36 @@ public static class Extensions
       return QuickUpdateAnimationAddClipsLater(gun, name, collection, returnToIdle);
   }
 
-
   /// <summary>Fixed version fo Alexandria's ConstructOffsetsFromAnchor() to deal with atlas sprites correctly</summary>
   public static void BetterConstructOffsetsFromAnchor(this tk2dSpriteDefinition def, tk2dBaseSprite.Anchor anchor, Vector2? scale = null, bool fixesScale = false, bool changesCollider = true)
   {
-      if (!scale.HasValue)
-      {
-          scale = new Vector2?(def.untrimmedBoundsDataExtents);
-      }
+      Vector2 scaling = scale ?? def.untrimmedBoundsDataExtents.XY();
       if (fixesScale)
-      {
-          Vector2 fixedScale = scale.Value - def.position0.XY();
-          scale = new Vector2?(fixedScale);
-      }
+          scaling -= def.position0.XY();
+
       float xOffset = 0;
       if (anchor == tk2dBaseSprite.Anchor.LowerCenter || anchor == tk2dBaseSprite.Anchor.MiddleCenter || anchor == tk2dBaseSprite.Anchor.UpperCenter)
-      {
-          xOffset = -(scale.Value.x / 2f);
-      }
+          xOffset = -(0.5f * scaling.x);
       else if (anchor == tk2dBaseSprite.Anchor.LowerRight || anchor == tk2dBaseSprite.Anchor.MiddleRight || anchor == tk2dBaseSprite.Anchor.UpperRight)
-      {
-          xOffset = -scale.Value.x;
-      }
+          xOffset = -scaling.x;
       float yOffset = 0;
       if (anchor == tk2dBaseSprite.Anchor.MiddleLeft || anchor == tk2dBaseSprite.Anchor.MiddleCenter || anchor == tk2dBaseSprite.Anchor.MiddleLeft)
-      {
-          yOffset = -(scale.Value.y / 2f);
-      }
+          yOffset = -(0.5f * scaling.y);
       else if (anchor == tk2dBaseSprite.Anchor.UpperLeft || anchor == tk2dBaseSprite.Anchor.UpperCenter || anchor == tk2dBaseSprite.Anchor.UpperRight)
-      {
-          yOffset = -scale.Value.y;
-      }
-      def.MakeOffset(new Vector2(xOffset, yOffset), false);
+          yOffset = -scaling.y;
+      def.ShiftBy(new Vector3(xOffset, yOffset, 0f), false);
       if (changesCollider && def.colliderVertices != null && def.colliderVertices.Length > 0)
       {
           float colliderXOffset = 0;
           if (anchor == tk2dBaseSprite.Anchor.LowerLeft || anchor == tk2dBaseSprite.Anchor.MiddleLeft || anchor == tk2dBaseSprite.Anchor.UpperLeft)
-          {
-              colliderXOffset = (scale.Value.x / 2f);
-          }
+              colliderXOffset = (scaling.x / 2f);
           else if (anchor == tk2dBaseSprite.Anchor.LowerRight || anchor == tk2dBaseSprite.Anchor.MiddleRight || anchor == tk2dBaseSprite.Anchor.UpperRight)
-          {
-              colliderXOffset = -(scale.Value.x / 2f);
-          }
+              colliderXOffset = -(scaling.x / 2f);
           float colliderYOffset = 0;
           if (anchor == tk2dBaseSprite.Anchor.LowerLeft || anchor == tk2dBaseSprite.Anchor.LowerCenter || anchor == tk2dBaseSprite.Anchor.LowerRight)
-          {
-              colliderYOffset = (scale.Value.y / 2f);
-          }
+              colliderYOffset = (scaling.y / 2f);
           else if (anchor == tk2dBaseSprite.Anchor.UpperLeft || anchor == tk2dBaseSprite.Anchor.UpperCenter || anchor == tk2dBaseSprite.Anchor.UpperRight)
-          {
-              colliderYOffset = -(scale.Value.y / 2f);
-          }
+              colliderYOffset = -(scaling.y / 2f);
           def.colliderVertices[0] += new Vector3(colliderXOffset, colliderYOffset, 0);
       }
   }
@@ -1652,5 +1630,21 @@ public static class Extensions
     def.boundsDataExtents          *= scale;
     def.untrimmedBoundsDataCenter  *= scale;
     def.untrimmedBoundsDataExtents *= scale;
+  }
+
+
+  /// <summary>Shift a sprite definition by an offset.</summary>
+  public static void ShiftBy(this tk2dSpriteDefinition def, Vector3 offset, bool changesCollider = false)
+  {
+      def.position0                  += offset;
+      def.position1                  += offset;
+      def.position2                  += offset;
+      def.position3                  += offset;
+      def.boundsDataCenter           += offset;
+      def.boundsDataExtents          += offset;
+      def.untrimmedBoundsDataCenter  += offset;
+      def.untrimmedBoundsDataExtents += offset;
+      if (def.colliderVertices != null && def.colliderVertices.Length > 0 && changesCollider)
+          def.colliderVertices[0] += offset;
   }
 }

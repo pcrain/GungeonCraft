@@ -159,8 +159,8 @@ public static class GunBuilder
 
     // Set up the gun's default module, default projectile, and default projectile animation
     ProjectileModule mod = gun.SetupDefaultModule(b);
-    ProjectileType proj = gun.InitFirstProjectileOfType<ProjectileType>(b); //NOTE: slow??
-      proj.AddDefaultAnimation(b); //NOTE: slow??
+    ProjectileType proj = gun.InitFirstProjectileOfType<ProjectileType>(b);
+      proj.AddDefaultAnimation(b);
 
     // Determine whether we have an invisible projectile
     proj.sprite.renderer.enabled = !b.invisibleProjectile;
@@ -339,8 +339,7 @@ public static class GunBuilder
     where ProjectileType : Projectile
   {
     Projectile clone = gun.DefaultModule.projectiles[0].Clone(b);
-    ProjectileType p = clone as ProjectileType;
-    if (p == null)
+    if (clone is not ProjectileType p)
       p = clone.ConvertToSpecialtyType<ProjectileType>();
     gun.DefaultModule.projectiles[0] = p;
     p.transform.parent = gun.barrelOffset;
