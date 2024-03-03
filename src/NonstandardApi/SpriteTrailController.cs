@@ -125,7 +125,7 @@ public class SpriteTrailController : BraveBehaviour
     trail_sprite.OverrideGetTiledSpriteGeomDesc = GetTiledSpriteGeomDesc;
     trail_sprite.OverrideSetTiledSpriteGeom = SetTiledSpriteGeom;
     tk2dSpriteDefinition currentSpriteDef = trail_sprite.GetCurrentSpriteDef();
-    m_spriteSubtileWidth = Mathf.RoundToInt(currentSpriteDef.boundsDataExtents.x / currentSpriteDef.texelSize.x) / 4;
+    m_spriteSubtileWidth = Mathf.RoundToInt(currentSpriteDef.untrimmedBoundsDataExtents.x / currentSpriteDef.texelSize.x) / 4;
     float heightOffset = ((!rampHeight) ? 0f : rampStartHeight);
     m_bones.AddLast(new Bone(parent_sprite.WorldCenter + boneSpawnOffset, 0f, heightOffset));
     m_bones.AddLast(new Bone(parent_sprite.WorldCenter + boneSpawnOffset, 0f, heightOffset));
@@ -147,7 +147,7 @@ public class SpriteTrailController : BraveBehaviour
 
   public void Update()
   {
-    int num = Mathf.RoundToInt(trail_sprite.GetCurrentSpriteDef().boundsDataExtents.x / trail_sprite.GetCurrentSpriteDef().texelSize.x);
+    int num = Mathf.RoundToInt(trail_sprite.GetCurrentSpriteDef().untrimmedBoundsDataExtents.x / trail_sprite.GetCurrentSpriteDef().texelSize.x);
     int num2 = num / 4;
     m_globalTimer += BraveTime.DeltaTime;
     m_rampTimer += BraveTime.DeltaTime;
@@ -387,7 +387,7 @@ public class SpriteTrailController : BraveBehaviour
 
   public void SetTiledSpriteGeom(Vector3[] pos, Vector2[] uv, int offset, out Vector3 boundsCenter, out Vector3 boundsExtents, tk2dSpriteDefinition spriteDef, Vector3 scale, Vector2 dimensions, tk2dBaseSprite.Anchor anchor, float colliderOffsetZ, float colliderExtentZ)
   {
-    int trailPixelLength = Mathf.RoundToInt(spriteDef.boundsDataExtents.x / spriteDef.texelSize.x);
+    int trailPixelLength = Mathf.RoundToInt(spriteDef.untrimmedBoundsDataExtents.x / spriteDef.texelSize.x);
     int num2 = trailPixelLength / 4;
     int lastBoneIndex = Mathf.Max(m_bones.Count - 1, 0);
     int num4 = Mathf.CeilToInt((float)lastBoneIndex / (float)num2);
