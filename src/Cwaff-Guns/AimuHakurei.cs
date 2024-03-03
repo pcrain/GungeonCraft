@@ -48,7 +48,7 @@ public class AimuHakurei : AdvancedGunBehavior
                 ResMap.Get("aimu_beam_mid"), 60, ResMap.Get("aimu_beam_start"), 60, cascadeTimer: C.FRAME, destroyOnEmpty: true);
                 tc.UsesDispersalParticles = true;
                 tc.DispersalParticleSystemPrefab = (ItemHelper.Get(Items.FlashRay) as Gun).DefaultModule.projectiles[0].GetComponentInChildren<TrailController>().DispersalParticleSystemPrefab;
-            beamProj.SetAllImpactVFX(VFX.CreatePool("gaster_beam_impact", fps: 20, loops: false, scale: 1.0f, anchor: Anchor.MiddleCenter));
+            beamProj.SetAllImpactVFX(VFX.CreatePool("aimu_beam_impact", fps: 20, loops: false, scale: 1.0f, anchor: Anchor.MiddleCenter));
 
         // set up tiered projectiles
         gun.Volley.projectiles = new(){
@@ -270,7 +270,7 @@ public class AimuHakurei : AdvancedGunBehavior
             FancyVFX.Spawn(AimuHakurei._GrazeVFX, bottom, Quaternion.identity, parent: pc.sprite?.transform,
                 velocity: 5f * Vector2.up, lifetime: 0.2f, fadeOutTime: 0.4f, /*emissivePower: 50f,*/ emissiveColor: Color.white);
 
-            if (this.gun.CurrentStrengthTier < _GRAZE_TIER_THRESHOLDS.Count() && graze >= _GRAZE_TIER_THRESHOLDS[this.gun.CurrentStrengthTier])
+            while (this.gun.CurrentStrengthTier < _GRAZE_TIER_THRESHOLDS.Count() && graze >= _GRAZE_TIER_THRESHOLDS[this.gun.CurrentStrengthTier])
                 PowerUp();
         }
     }
