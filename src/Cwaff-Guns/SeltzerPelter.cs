@@ -195,18 +195,21 @@ public class SeltzerProjectile : MonoBehaviour
         p.gameObject.Play("seltzer_spray_sound");
         float lastSoundTime = BraveTime.ScaledTimeSinceStartup;
 
+        int maxSounds = 20; // if the cans get stuck, things can get really noisy, so don't let them make too much noise
+
         #region The Ballistics
             for (float elapsed = 0f; elapsed < SPRAY_TIME; elapsed += BraveTime.DeltaTime)
             {
                 while (BraveTime.DeltaTime == 0)
                     yield return null;
-                if (!p.isActiveAndEnabled || p.HasDiedInAir)
+                if (!p || !p.isActiveAndEnabled || p.HasDiedInAir)
                     break;
                 if (!seltzer._beam)
                     seltzer.CreateBeam();
 
-                if (lastSoundTime + _SOUND_RATE < BraveTime.ScaledTimeSinceStartup)
+                if ((maxSounds > 0) && (lastSoundTime + _SOUND_RATE < BraveTime.ScaledTimeSinceStartup))
                 {
+                    --maxSounds;
                     lastSoundTime = BraveTime.ScaledTimeSinceStartup;
                     p.gameObject.Play("seltzer_spray_sound");
                 }

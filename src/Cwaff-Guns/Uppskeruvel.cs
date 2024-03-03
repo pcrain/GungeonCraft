@@ -50,7 +50,7 @@ public class Uppskeruvel : AdvancedGunBehavior
         gun.gameObject.AddComponent<UppskeruvelAmmoDisplay>();
 
         _SoulTrailPrefab = VFX.CreateSpriteTrailObject(ResMap.Get("uppskeruvel_soul_trail")[0], new Vector2(16, 5), new Vector2(0, 0),
-            ResMap.Get("uppskeruvel_soul_trail"), 60, ResMap.Get("uppskeruvel_soul_trail"), 60, cascadeTimer: 4f * C.FRAME, softMaxLength: 2f, destroyOnEmpty: false);
+            ResMap.Get("uppskeruvel_soul_trail"), 60, cascadeTimer: 4f * C.FRAME, softMaxLength: 2f, destroyOnEmpty: false);
 
         _LostSoulPrefab = VFX.Create("poe_soul", fps: 8, loops: true, anchor: Anchor.LowerCenter/*, emissivePower: 0.4f*/);
             _LostSoulPrefab.AddComponent<UppskeruvelLostSoul>();
