@@ -125,7 +125,7 @@ public class SpriteTrailController : BraveBehaviour
     trail_sprite.OverrideGetTiledSpriteGeomDesc = GetTiledSpriteGeomDesc;
     trail_sprite.OverrideSetTiledSpriteGeom = SetTiledSpriteGeom;
     tk2dSpriteDefinition currentSpriteDef = trail_sprite.GetCurrentSpriteDef();
-    m_spriteSubtileWidth = Mathf.RoundToInt(currentSpriteDef.untrimmedBoundsDataExtents.x / currentSpriteDef.texelSize.x) / 4;
+    m_spriteSubtileWidth = Mathf.RoundToInt(currentSpriteDef.boundsDataExtents.x / currentSpriteDef.texelSize.x) / 4;
     float heightOffset = ((!rampHeight) ? 0f : rampStartHeight);
     m_bones.AddLast(new Bone(parent_sprite.WorldCenter + boneSpawnOffset, 0f, heightOffset));
     m_bones.AddLast(new Bone(parent_sprite.WorldCenter + boneSpawnOffset, 0f, heightOffset));
@@ -147,7 +147,7 @@ public class SpriteTrailController : BraveBehaviour
 
   public void Update()
   {
-    int num = Mathf.RoundToInt(trail_sprite.GetCurrentSpriteDef().untrimmedBoundsDataExtents.x / trail_sprite.GetCurrentSpriteDef().texelSize.x);
+    int num = Mathf.RoundToInt(trail_sprite.GetCurrentSpriteDef().boundsDataExtents.x / trail_sprite.GetCurrentSpriteDef().texelSize.x);
     int num2 = num / 4;
     m_globalTimer += BraveTime.DeltaTime;
     m_rampTimer += BraveTime.DeltaTime;
@@ -387,92 +387,91 @@ public class SpriteTrailController : BraveBehaviour
 
   public void SetTiledSpriteGeom(Vector3[] pos, Vector2[] uv, int offset, out Vector3 boundsCenter, out Vector3 boundsExtents, tk2dSpriteDefinition spriteDef, Vector3 scale, Vector2 dimensions, tk2dBaseSprite.Anchor anchor, float colliderOffsetZ, float colliderExtentZ)
   {
-    int num = Mathf.RoundToInt(spriteDef.untrimmedBoundsDataExtents.x / spriteDef.texelSize.x);
-    int num2 = num / 4;
-    int num3 = Mathf.Max(m_bones.Count - 1, 0);
-    int num4 = Mathf.CeilToInt((float)num3 / (float)num2);
+    int trailPixelLength = Mathf.RoundToInt(spriteDef.boundsDataExtents.x / spriteDef.texelSize.x);
+    int num2 = trailPixelLength / 4;
+    int lastBoneIndex = Mathf.Max(m_bones.Count - 1, 0);
+    int num4 = Mathf.CeilToInt((float)lastBoneIndex / (float)num2);
     boundsCenter = (m_minBonePosition + m_maxBonePosition) / 2f;
     boundsExtents = (m_maxBonePosition - m_minBonePosition) / 2f;
     LinkedListNode<Bone> linkedListNode = m_bones.First;
-    int num5 = 0;
+    int uvIndex = 0;
     for (int i = 0; i < num4; i++)
     {
-      int num6 = 0;
       int num7 = num2 - 1;
-      if (i == num4 - 1 && num3 % num2 != 0)
+      if (i == num4 - 1 && lastBoneIndex % num2 != 0)
       {
-        num7 = num3 % num2 - 1;
+        num7 = lastBoneIndex % num2 - 1;
       }
-      tk2dSpriteDefinition tk2dSpriteDefinition2 = spriteDef;
+      tk2dSpriteDefinition segmentSprite = spriteDef;
       if (usesStartAnimation && i == 0)
       {
-        int num8 = Mathf.Clamp(Mathf.FloorToInt(linkedListNode.Value.AnimationTimer * m_startAnimationClip.fps), 0, m_startAnimationClip.frames.Length - 1);
-        tk2dSpriteDefinition2 = trail_sprite.Collection.spriteDefinitions[m_startAnimationClip.frames[num8].spriteId];
+        int startAnimationFrame = Mathf.Clamp(Mathf.FloorToInt(linkedListNode.Value.AnimationTimer * m_startAnimationClip.fps), 0, m_startAnimationClip.frames.Length - 1);
+        segmentSprite = trail_sprite.Collection.spriteDefinitions[m_startAnimationClip.frames[startAnimationFrame].spriteId];
       }
       else if (usesAnimation && linkedListNode.Value.IsAnimating)
       {
-        int num9 = Mathf.Min((int)(linkedListNode.Value.AnimationTimer * m_animationClip.fps), m_animationClip.frames.Length - 1);
-        tk2dSpriteDefinition2 = trail_sprite.Collection.spriteDefinitions[m_animationClip.frames[num9].spriteId];
+        int animationFrame = Mathf.Min((int)(linkedListNode.Value.AnimationTimer * m_animationClip.fps), m_animationClip.frames.Length - 1);
+        segmentSprite = trail_sprite.Collection.spriteDefinitions[m_animationClip.frames[animationFrame].spriteId];
       }
       float num10 = 0f;
-      for (int j = num6; j <= num7; j++)
+      for (int j = 0; j <= num7; j++)
       {
         float num11 = 1f;
         if (i == num4 - 1 && j == num7)
         {
           num11 = Vector2.Distance(linkedListNode.Next.Value.pos, linkedListNode.Value.pos);
         }
-        int num12 = offset + num5;
-        pos[num12++] = linkedListNode.Value.pos + linkedListNode.Value.normal * tk2dSpriteDefinition2.position0.y - m_minBonePosition;
-        pos[num12++] = linkedListNode.Next.Value.pos + linkedListNode.Next.Value.normal * tk2dSpriteDefinition2.position1.y - m_minBonePosition;
-        pos[num12++] = linkedListNode.Value.pos + linkedListNode.Value.normal * tk2dSpriteDefinition2.position2.y - m_minBonePosition;
-        pos[num12++] = linkedListNode.Next.Value.pos + linkedListNode.Next.Value.normal * tk2dSpriteDefinition2.position3.y - m_minBonePosition;
-        num12 = offset + num5;
-        pos[num12++] += new Vector3(0f, 0f, 0f - linkedListNode.Value.HeightOffset);
-        pos[num12++] += new Vector3(0f, 0f, 0f - linkedListNode.Next.Value.HeightOffset);
-        pos[num12++] += new Vector3(0f, 0f, 0f - linkedListNode.Value.HeightOffset);
-        pos[num12++] += new Vector3(0f, 0f, 0f - linkedListNode.Next.Value.HeightOffset);
-        Vector2 vector = Vector2.Lerp(tk2dSpriteDefinition2.uvs[0], tk2dSpriteDefinition2.uvs[1], num10);
-        Vector2 vector2 = Vector2.Lerp(tk2dSpriteDefinition2.uvs[2], tk2dSpriteDefinition2.uvs[3], num10 + num11 / (float)num2);
-        num12 = offset + num5;
-        if (tk2dSpriteDefinition2.flipped == tk2dSpriteDefinition.FlipMode.Tk2d)
+        int uvCurrent = offset + uvIndex;
+        pos[uvCurrent++] = linkedListNode.Value.pos + linkedListNode.Value.normal * segmentSprite.position0.y - m_minBonePosition;
+        pos[uvCurrent++] = linkedListNode.Next.Value.pos + linkedListNode.Next.Value.normal * segmentSprite.position1.y - m_minBonePosition;
+        pos[uvCurrent++] = linkedListNode.Value.pos + linkedListNode.Value.normal * segmentSprite.position2.y - m_minBonePosition;
+        pos[uvCurrent++] = linkedListNode.Next.Value.pos + linkedListNode.Next.Value.normal * segmentSprite.position3.y - m_minBonePosition;
+        uvCurrent = offset + uvIndex;
+        pos[uvCurrent++] += new Vector3(0f, 0f, 0f - linkedListNode.Value.HeightOffset);
+        pos[uvCurrent++] += new Vector3(0f, 0f, 0f - linkedListNode.Next.Value.HeightOffset);
+        pos[uvCurrent++] += new Vector3(0f, 0f, 0f - linkedListNode.Value.HeightOffset);
+        pos[uvCurrent++] += new Vector3(0f, 0f, 0f - linkedListNode.Next.Value.HeightOffset);
+        Vector2 vector = Vector2.Lerp(segmentSprite.uvs[0], segmentSprite.uvs[1], num10);
+        Vector2 vector2 = Vector2.Lerp(segmentSprite.uvs[2], segmentSprite.uvs[3], num10 + num11 / (float)num2);
+        uvCurrent = offset + uvIndex;
+        if (segmentSprite.flipped == tk2dSpriteDefinition.FlipMode.Tk2d)
         {
-          uv[num12++] = new Vector2(vector.x, vector.y);
-          uv[num12++] = new Vector2(vector.x, vector2.y);
-          uv[num12++] = new Vector2(vector2.x, vector.y);
-          uv[num12++] = new Vector2(vector2.x, vector2.y);
+          uv[uvCurrent++] = new Vector2(vector.x, vector.y);
+          uv[uvCurrent++] = new Vector2(vector.x, vector2.y);
+          uv[uvCurrent++] = new Vector2(vector2.x, vector.y);
+          uv[uvCurrent++] = new Vector2(vector2.x, vector2.y);
         }
-        else if (tk2dSpriteDefinition2.flipped == tk2dSpriteDefinition.FlipMode.TPackerCW)
+        else if (segmentSprite.flipped == tk2dSpriteDefinition.FlipMode.TPackerCW)
         {
-          uv[num12++] = new Vector2(vector.x, vector.y);
-          uv[num12++] = new Vector2(vector2.x, vector.y);
-          uv[num12++] = new Vector2(vector.x, vector2.y);
-          uv[num12++] = new Vector2(vector2.x, vector2.y);
+          uv[uvCurrent++] = new Vector2(vector.x, vector.y);
+          uv[uvCurrent++] = new Vector2(vector2.x, vector.y);
+          uv[uvCurrent++] = new Vector2(vector.x, vector2.y);
+          uv[uvCurrent++] = new Vector2(vector2.x, vector2.y);
         }
         else
         {
-          uv[num12++] = new Vector2(vector.x, vector.y);
-          uv[num12++] = new Vector2(vector2.x, vector.y);
-          uv[num12++] = new Vector2(vector.x, vector2.y);
-          uv[num12++] = new Vector2(vector2.x, vector2.y);
+          uv[uvCurrent++] = new Vector2(vector.x, vector.y);
+          uv[uvCurrent++] = new Vector2(vector2.x, vector.y);
+          uv[uvCurrent++] = new Vector2(vector.x, vector2.y);
+          uv[uvCurrent++] = new Vector2(vector2.x, vector2.y);
         }
         if (linkedListNode.Value.Hide)
         {
-          uv[num12 - 4] = Vector2.zero;
-          uv[num12 - 3] = Vector2.zero;
-          uv[num12 - 2] = Vector2.zero;
-          uv[num12 - 1] = Vector2.zero;
+          uv[uvCurrent - 4] = Vector2.zero;
+          uv[uvCurrent - 3] = Vector2.zero;
+          uv[uvCurrent - 2] = Vector2.zero;
+          uv[uvCurrent - 1] = Vector2.zero;
         }
         if (FlipUvsY)
         {
-          Vector2 vector3 = uv[num12 - 4];
-          uv[num12 - 4] = uv[num12 - 2];
-          uv[num12 - 2] = vector3;
-          vector3 = uv[num12 - 3];
-          uv[num12 - 3] = uv[num12 - 1];
-          uv[num12 - 1] = vector3;
+          Vector2 vector3 = uv[uvCurrent - 4];
+          uv[uvCurrent - 4] = uv[uvCurrent - 2];
+          uv[uvCurrent - 2] = vector3;
+          vector3 = uv[uvCurrent - 3];
+          uv[uvCurrent - 3] = uv[uvCurrent - 1];
+          uv[uvCurrent - 1] = vector3;
         }
-        num5 += 4;
+        uvIndex += 4;
         num10 += num11 / (float)m_spriteSubtileWidth;
         if (linkedListNode != null)
         {

@@ -99,7 +99,6 @@ public static class AtlasHelper
     float ymin           = 1f - (float)(y + h) / (float)texture.height;
     float ymax           = 1f - (float) y      / (float)texture.height;
     // NOTE: POSITIVE y is up on the screen but NEGATIVE y is up in atlas
-    // works for Uppskeruvel, is 0 for poe soul (jitters around) [calculates top margin]
     Vector3 offset       = C.PIXEL_SIZE * new Vector3(ox, oh - h - oy, 0f); //NOTE: texture is flipped vertically in memory
     Vector3 extents      = C.PIXEL_SIZE * new Vector3(w, h, 0f);
     Vector3 trueExtents  = C.PIXEL_SIZE * new Vector3(ow, oh, 0f);
@@ -118,8 +117,8 @@ public static class AtlasHelper
         position1                  = offset + extents.WithY(0f),
         position2                  = offset + extents.WithX(0f),
         position3                  = offset + extents,
-        boundsDataExtents          = extents,
-        boundsDataCenter           = offset + 0.5f * extents,
+        boundsDataExtents          = /*trueExtents*/ extents,
+        boundsDataCenter           = /*0.5f * trueExtents*/ offset + 0.5f * extents,
         untrimmedBoundsDataExtents = trueExtents,
         untrimmedBoundsDataCenter  = 0.5f * trueExtents,
         uvs = new Vector2[]

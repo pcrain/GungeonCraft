@@ -29,8 +29,6 @@ public static class BeamHelpers
                 new Vector3(convertedColliderX, convertedColliderY, 0f)
             };
 
-            def.BetterConstructOffsetsFromAnchor(Anchor.MiddleLeft);
-
             //tiledSprite.anchor = Anchor.MiddleCenter;
             tk2dSpriteAnimator animator = projectile.gameObject.GetOrAddComponent<tk2dSpriteAnimator>();
             tk2dSpriteAnimation animation = projectile.gameObject.GetOrAddComponent<tk2dSpriteAnimation>();
@@ -61,6 +59,11 @@ public static class BeamHelpers
                 animation.clips = animation.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
                 beamController.beamAnimation = "beam_idle";
             }
+            else
+            {
+                // construct an offset definition for the singular sprite
+                def.BetterConstructOffsetsFromAnchor(Anchor.MiddleLeft);
+            }
 
             //------------- Sets up the animation for the part of the beam that touches the wall
             if (endVFXAnimationPaths != null && endVFXColliderDimensions != null && endVFXColliderOffsets != null)
@@ -70,7 +73,7 @@ public static class BeamHelpers
             }
             else
             {
-                SetupBeamPart(animation, beamAnimationPaths, "beam_end", beamFPS, null, null, def.colliderVertices);
+                SetupBeamPart(animation, beamAnimationPaths, "beam_end", beamFPS, null, null, def.colliderVertices, shouldConstructOffsets: false);
                 beamController.beamEndAnimation = "beam_end";
             }
 
@@ -89,7 +92,7 @@ public static class BeamHelpers
             }
             else
             {
-                SetupBeamPart(animation, beamAnimationPaths, "beam_start", beamFPS, null, null, def.colliderVertices);
+                SetupBeamPart(animation, beamAnimationPaths, "beam_start", beamFPS, null, null, def.colliderVertices, shouldConstructOffsets: false);
                 beamController.beamStartAnimation = "beam_start";
             }
 
@@ -154,7 +157,7 @@ public static class BeamHelpers
         }
 
     }
-    internal static void SetupBeamPart(tk2dSpriteAnimation beamAnimation, List<string> animSpritePaths, string animationName, int fps, Vector2? colliderDimensions = null, Vector2? colliderOffsets = null, Vector3[] overrideVertices = null, tk2dSpriteAnimationClip.WrapMode wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop, Anchor? anchorOverride = null)
+    internal static void SetupBeamPart(tk2dSpriteAnimation beamAnimation, List<string> animSpritePaths, string animationName, int fps, Vector2? colliderDimensions = null, Vector2? colliderOffsets = null, Vector3[] overrideVertices = null, tk2dSpriteAnimationClip.WrapMode wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop, Anchor? anchorOverride = null, bool shouldConstructOffsets = true)
     {
         tk2dSpriteAnimationClip clip = new tk2dSpriteAnimationClip() { name = animationName, frames = new tk2dSpriteAnimationFrame[0], fps = fps };
         List<string> spritePaths = animSpritePaths;
@@ -165,7 +168,8 @@ public static class BeamHelpers
             tk2dSpriteCollectionData collection = ETGMod.Databases.Items.ProjectileCollection;
             int frameSpriteId = AtlasHelper.SafeAddSpriteToCollection(path, collection);
             tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
-            frameDef.BetterConstructOffsetsFromAnchor(anchorOverride ?? Anchor.MiddleLeft);
+            if (shouldConstructOffsets)
+                frameDef.BetterConstructOffsetsFromAnchor(anchorOverride ?? Anchor.MiddleLeft);
             if (overrideVertices != null)
             {
                 frameDef.colliderVertices = overrideVertices;

@@ -49,8 +49,8 @@ public class Uppskeruvel : AdvancedGunBehavior
 
         gun.gameObject.AddComponent<UppskeruvelAmmoDisplay>();
 
-        _SoulTrailPrefab = VFX.CreateSpriteTrailObject(ResMap.Get("holy_water_gun_middle_break")[0], new Vector2(16, 5), new Vector2(0, 0),
-            ResMap.Get("holy_water_gun_middle_break"), 60, ResMap.Get("holy_water_gun_middle_break"), 60, cascadeTimer: 4f * C.FRAME, softMaxLength: 2f, destroyOnEmpty: false);
+        _SoulTrailPrefab = VFX.CreateSpriteTrailObject(ResMap.Get("uppskeruvel_soul_trail")[0], new Vector2(16, 5), new Vector2(0, 0),
+            ResMap.Get("uppskeruvel_soul_trail"), 60, ResMap.Get("uppskeruvel_soul_trail"), 60, cascadeTimer: 4f * C.FRAME, softMaxLength: 2f, destroyOnEmpty: false);
 
         _LostSoulPrefab = VFX.Create("poe_soul", fps: 8, loops: true, anchor: Anchor.LowerCenter/*, emissivePower: 0.4f*/);
             _LostSoulPrefab.AddComponent<UppskeruvelLostSoul>();
@@ -569,6 +569,6 @@ public class UppskeruvelCombatSoul : MonoBehaviour
                 break;
         }
 
-        base.transform.position = this._basePos;//.HoverAt(amplitude: UppskeruvelLostSoul._BOB_HEIGHT, frequency: UppskeruvelLostSoul._BOB_SPEED);
+        base.transform.position = this._basePos.HoverAt(amplitude: UppskeruvelLostSoul._BOB_HEIGHT, frequency: UppskeruvelLostSoul._BOB_SPEED);
     }
 }

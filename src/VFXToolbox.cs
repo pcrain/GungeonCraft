@@ -507,8 +507,6 @@ public static class VFX
               new Vector3(convertedColliderX, convertedColliderY, 0f)
           };
 
-          def.BetterConstructOffsetsFromAnchor(Anchor.MiddleLeft);
-
           tk2dSpriteAnimator animator = newTrailObject.GetOrAddComponent<tk2dSpriteAnimator>();
           tk2dSpriteAnimation animation = newTrailObject.GetOrAddComponent<tk2dSpriteAnimation>();
           animation.clips = new tk2dSpriteAnimationClip[0];
@@ -524,7 +522,10 @@ public static class VFX
               trail.usesAnimation = true;
           }
           else
+          {
+              def.BetterConstructOffsetsFromAnchor(Anchor.MiddleLeft); //NOTE: this is already done in SetupBeamPart(), and we don't want to do it twice
               trail.usesAnimation = false;
+          }
 
           if (startAnimPaths != null)
           {
@@ -573,8 +574,6 @@ public static class VFX
               new Vector3(convertedColliderX, convertedColliderY, 0f)
           };
 
-          def.BetterConstructOffsetsFromAnchor(Anchor.MiddleLeft);
-
           tk2dSpriteAnimator animator = newTrailObject.GetOrAddComponent<tk2dSpriteAnimator>();
           tk2dSpriteAnimation animation = newTrailObject.GetOrAddComponent<tk2dSpriteAnimation>();
           animation.clips = new tk2dSpriteAnimationClip[0];
@@ -590,7 +589,10 @@ public static class VFX
               trail.usesAnimation = true;
           }
           else
+          {
+              def.BetterConstructOffsetsFromAnchor(Anchor.MiddleLeft); //NOTE: this is already done in SetupBeamPart(), and we don't want to do it twice
               trail.usesAnimation = false;
+          }
 
           if (startAnimPaths != null)
           {
