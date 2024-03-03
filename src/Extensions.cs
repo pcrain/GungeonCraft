@@ -1640,4 +1640,17 @@ public static class Extensions
           def.colliderVertices[0] += new Vector3(colliderXOffset, colliderYOffset, 0);
       }
   }
+
+  /// <summary>Scale a sprite definition by a factor.</summary>
+  public static void ScaleBy(this tk2dSpriteDefinition def, float scale)
+  {
+    def.position0                  *= scale;
+    def.position1                  *= scale;
+    def.position2                  *= scale;
+    def.position3                  *= scale;
+    def.boundsDataCenter           *= scale;
+    def.boundsDataExtents          *= scale;
+    def.untrimmedBoundsDataCenter  *= scale;
+    def.untrimmedBoundsDataExtents *= scale;
+  }
 }

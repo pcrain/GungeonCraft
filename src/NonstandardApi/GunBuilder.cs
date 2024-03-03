@@ -159,8 +159,8 @@ public static class GunBuilder
 
     // Set up the gun's default module, default projectile, and default projectile animation
     ProjectileModule mod = gun.SetupDefaultModule(b);
-    ProjectileType proj = gun.InitFirstProjectileOfType<ProjectileType>(b);
-      proj.AddDefaultAnimation(b);
+    ProjectileType proj = gun.InitFirstProjectileOfType<ProjectileType>(b); //NOTE: slow??
+      proj.AddDefaultAnimation(b); //NOTE: slow??
 
     // Determine whether we have an invisible projectile
     proj.sprite.renderer.enabled = !b.invisibleProjectile;

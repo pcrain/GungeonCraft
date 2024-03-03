@@ -231,45 +231,34 @@ public static class AnimatedBullet // stolen and modified from NN
             Lazy.DebugWarn($"  HEY! re-creating projectile sprite {names[0]}. If this is intentional, please reuse the original clip, don't create it twice.");
             return null;
         }
-        tk2dSpriteAnimationClip clip = new tk2dSpriteAnimationClip();
-        clip.name = names[0]+"_clip";
-        clip.fps = fps;
-        List<tk2dSpriteAnimationFrame> frames = new List<tk2dSpriteAnimationFrame>();
+        tk2dSpriteAnimationClip clip = new(){
+            name     = names[0]+"_clip",
+            fps      = fps,
+            wrapMode = loops ? tk2dSpriteAnimationClip.WrapMode.Loop : tk2dSpriteAnimationClip.WrapMode.Once,
+            frames   = new tk2dSpriteAnimationFrame[names.Count],
+        };
+        tk2dSpriteCollectionData coll = ETGMod.Databases.Items.ProjectileCollection;
         for (int i = 0; i < names.Count; i++)
         {
-            string name = names[i];
-            float pixelScale = pixelScales[i];
-            IntVector2? overrideColliderPixelSize = overrideColliderPixelSizes[i];
-            IntVector2? overrideColliderOffset = overrideColliderOffsets[i];
-            bool anchorChangesCollider = anchorsChangeColliders[i];
-            bool fixesScale = fixesScales[i];
-            Anchor anchor = anchors[i];
-            bool lightened = lighteneds[i];
-            Projectile overrideProjectileToCopyFrom = overrideProjectilesToCopyFrom[i];
-            tk2dSpriteAnimationFrame frame = new tk2dSpriteAnimationFrame();
-            frame.spriteCollection = ETGMod.Databases.Items.ProjectileCollection;
-            frame.spriteId = frame.spriteCollection.inst.GetSpriteIdByName(name);
-            tk2dSpriteDefinition baseDef = frame.spriteCollection.inst.spriteDefinitions[frame.spriteId];
-            frames.Add(frame);
-            IntVector2 truePixelSize = (C.PIXELS_PER_TILE * (baseDef.position3 - baseDef.position0).XY()).ToIntVector2();
-            IntVector2 pixelSize = new IntVector2((int)(pixelScale * truePixelSize.x), (int)(pixelScale * truePixelSize.y));
-            int? overrideColliderPixelWidth = null;
-            int? overrideColliderPixelHeight = null;
-            if (overrideColliderPixelSize.HasValue)
-            {
-                overrideColliderPixelWidth = overrideColliderPixelSize.Value.x;
-                overrideColliderPixelHeight = overrideColliderPixelSize.Value.y;
-            }
-            int? overrideColliderOffsetX = null;
-            int? overrideColliderOffsetY = null;
-            if (overrideColliderOffset.HasValue)
-            {
-                overrideColliderOffsetX = overrideColliderOffset.Value.x;
-                overrideColliderOffsetY = overrideColliderOffset.Value.y;
-            }
-            tk2dSpriteDefinition def = GunTools.SetupDefinitionForProjectileSprite(name, frame.spriteId, pixelSize.x, pixelSize.y, lightened, overrideColliderPixelWidth, overrideColliderPixelHeight, overrideColliderOffsetX, overrideColliderOffsetY,
-                overrideProjectileToCopyFrom);
-            def.BetterConstructOffsetsFromAnchor(anchor, fixesScale ? def.position3 : null, fixesScale, anchorChangesCollider);
+            int spriteId = coll.inst.GetSpriteIdByName(names[i]);
+            float scale = pixelScales[i];
+            clip.frames[i] = new(){
+                spriteCollection = coll,
+                spriteId         = spriteId,
+            };
+            tk2dSpriteDefinition def = coll.inst.spriteDefinitions[spriteId];
+            if (scale != 1.0f)
+                def.ScaleBy(scale);
+            //NOTE: set up default colliders, could maybe do at atlas build time but not all sprites need it, so doing it here for now on an as-needed basis
+            def.colliderVertices = new Vector3[2]{
+                overrideColliderOffsets[i].HasValue
+                    ? C.PIXEL_SIZE * overrideColliderOffsets[i].Value.ToVector3()
+                    : def.position0, // offset
+                0.5f * (overrideColliderPixelSizes[i].HasValue
+                    ? (C.PIXEL_SIZE * overrideColliderPixelSizes[i].Value.ToVector3())
+                    : def.boundsDataExtents) // radius
+            };
+            def.BetterConstructOffsetsFromAnchor(anchors[i], fixesScales[i] ? def.position3 : null, fixesScales[i], anchorsChangeColliders[i]);
             if (manualOffsets[i].HasValue)
             {
                 Vector3 manualOffset = manualOffsets[i].Value;
@@ -279,8 +268,6 @@ public static class AnimatedBullet // stolen and modified from NN
                 def.position3 += manualOffset;
             }
         }
-        clip.wrapMode = loops ? tk2dSpriteAnimationClip.WrapMode.Loop : tk2dSpriteAnimationClip.WrapMode.Once;
-        clip.frames = frames.ToArray();
         // Lazy.DebugLog($"  created clip {clip.name} with id {clip.frames[0].spriteId}");
         _KnownClips.Add(names[0]);
         return clip;
