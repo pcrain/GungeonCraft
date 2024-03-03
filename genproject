@@ -87,6 +87,7 @@ fi
 if [ $updategfx -eq 1 ]; then
   rebuild=1
   echo -e "[${GRN}>${BLN}] Regenerating sprite atlases"
+  mkdir -p "./Resources/Atlases/atlas"
   cheetah-texture-packer -s 1024x1024 --square --border-size 3 -o "./Resources/Atlases/atlas" "./RawResources/"
   # cheetah-texture-packer -s 1024x1024 --square --disable-merge --disable-crop --border-size 2 -o "./Resources/Atlases/atlas" "./RawResources/"
 

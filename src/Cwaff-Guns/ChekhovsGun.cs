@@ -31,9 +31,9 @@ public class ChekhovsGun : AdvancedGunBehavior
         _ChekhovTrailPrefab = VFX.CreateTrailObject(ResMap.Get("chekhov_trail_mid")[0], new Vector2(24, 4), new Vector2(0, 0),
             ResMap.Get("chekhov_trail_mid"), 60, ResMap.Get("chekhov_trail_start"), 60, cascadeTimer: C.FRAME, destroyOnEmpty: true);
 
-        _ChekhovGunVFX = VFX.Create("chekhovs_gun_idle", 12, loops: true, anchor: Anchor.UpperRight);
-
-        _ChekhovGunFireVFX = VFX.Create("chekhovs_gun_fire", 12, loops: false, anchor: Anchor.UpperRight);
+        //WARNING: don't use actual gun animations for VFX or the actual gun's sprites can get messed up
+        _ChekhovGunVFX = VFX.Create("chekhovs_gun_idle_vfx", 12, loops: true, anchor: Anchor.UpperRight);
+        _ChekhovGunFireVFX = VFX.Create("chekhovs_gun_fire_vfx", 12, loops: false, anchor: Anchor.UpperRight);
     }
 
     protected override void OnPickedUpByPlayer(PlayerController player)
