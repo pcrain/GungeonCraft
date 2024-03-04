@@ -192,6 +192,7 @@ public static class AtlasHelper
         if (collName == "ItemSprites")
         {
           itemSprites.Add(def);
+          ammonomiconSprites.Add(def); //NOTE: all items also need to be added to the Ammonomicon
           continue;
         }
 

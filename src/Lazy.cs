@@ -26,17 +26,28 @@ public static class Lazy
     {
         string newItemName  = itemName.Replace("-", "").Replace(".", "");  //get sane gun for item rename
         string baseItemName = newItemName.Replace(" ", "_").ToLower();  //get saner gun name for commands
-        IDs.InternalNames[itemName] = C.MOD_PREFIX+":"+baseItemName;
+        string internalName = C.MOD_PREFIX+":"+baseItemName;
+        IDs.InternalNames[itemName] = internalName;
 
         TItemClass item;
 
         if (typeof(TItemClass) == typeof(Gun))
         {
-            string spriteName = spritePath; // TODO: guns use names, regular items use full paths -- should be made uniform eventually
-            Gun gun = ETGMod.Databases.Items.NewGun(itemName, spriteName);  //create a new gun using specified sprite name
-            Game.Items.Rename("outdated_gun_mods:"+baseItemName, IDs.InternalNames[itemName]);  //rename the gun for commands
+            GameObject go          = UnityEngine.Object.Instantiate(ItemHelper.Get(Items.PeaShooter).gameObject);
+            go.name                = spritePath;
 
-            gun.encounterTrackable.journalData.AmmonomiconSprite = spriteName+"_ammonomicon";
+            Gun gun                = go.GetComponent<Gun>();
+            gun.gunName            = itemName;
+            gun.gunSwitchGroup     = spritePath;
+            gun.modifiedVolley     = null;
+            gun.singleModule       = null;
+            gun.RawSourceVolley    = ScriptableObject.CreateInstance<ProjectileVolleyData>();
+            gun.Volley.projectiles = new List<ProjectileModule>();
+
+            ETGMod.Databases.Items.SetupItem(gun, itemName);
+            Gungeon.Game.Items.Add(internalName, gun);
+
+            gun.encounterTrackable.journalData.AmmonomiconSprite = spritePath+"_ammonomicon";
             gun.QuickUpdateGunAnimations(); // includes setting the default sprite
 
             if (int.TryParse(projectileName, out int projectileId))
@@ -47,9 +58,6 @@ public static class Lazy
         }
         else
         {
-            string altName = itemName.SafeName() + "_icon";
-            if (C.DEBUG_BUILD && spritePath != altName)
-                ETGModConsole.Log($"  {spritePath} != {altName}");
             GameObject obj = new GameObject(itemName).RegisterPrefab();
             item = obj.AddComponent<TItemSpecific>();
 
@@ -62,9 +70,7 @@ public static class Lazy
 
             ETGMod.Databases.Items.SetupItem(item, item.name);
             Gungeon.Game.Items.Add(IDs.InternalNames[itemName], item);
-
-            SpriteBuilder.AddToAmmonomicon(item.sprite.GetCurrentSpriteDef());
-            item.encounterTrackable.journalData.AmmonomiconSprite = item.sprite.GetCurrentSpriteDef().name;
+            item.encounterTrackable.journalData.AmmonomiconSprite = spritePath;
         }
 
         item.itemName = itemName;
