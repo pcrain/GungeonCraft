@@ -53,29 +53,24 @@ public static class VFX
                 (loopStart > 0) ? tk2dSpriteAnimationClip.WrapMode.LoopSection :
                 loops           ? tk2dSpriteAnimationClip.WrapMode.Loop : tk2dSpriteAnimationClip.WrapMode.Once
         };
+        Shader shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
         for (int i = 0; i < spritePaths.Count; i++)
         {
             int frameSpriteId             = Collection.GetSpriteIdByName(spritePaths[i]);
             tk2dSpriteDefinition frameDef = Collection.spriteDefinitions[frameSpriteId];
             frameDef.BetterConstructOffsetsFromAnchor(anchor);
             frameDef.colliderVertices = defaultDef.colliderVertices; //NOTE: this overrides any prespecified collider vertices, unsure we want this
-            frameDef.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-            frameDef.materialInst.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+            frameDef.material.shader = shader; //NOTE: materialInst is the same as material for all of our sprites, so we don't need to adjust it separately
             if (emissivePower > 0) {
                 frameDef.material.SetFloat("_EmissivePower", emissivePower);
                 frameDef.material.SetFloat("_EmissiveColorPower", 1.55f);
-                frameDef.materialInst.SetFloat("_EmissivePower", emissivePower);
-                frameDef.materialInst.SetFloat("_EmissiveColorPower", 1.55f);
             }
             if (emissiveColour != null)
-            {
                 frameDef.material.SetColor("_EmissiveColor", (Color)emissiveColour);
-                frameDef.materialInst.SetColor("_EmissiveColor", (Color)emissiveColour);
-            }
             clip.frames[i] = new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = Collection };
         }
         if (emissivePower > 0) {
-            sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+            sprite.renderer.material.shader = shader;
             sprite.renderer.material.SetFloat("_EmissivePower", emissivePower);
             sprite.renderer.material.SetFloat("_EmissiveColorPower", 1.55f);
         }
