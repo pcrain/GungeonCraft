@@ -80,9 +80,9 @@ public static class AtlasHelper
           int startPointY = texOffset.y + Mathf.RoundToInt(item.region.y * atlas.Texture.height);
           atlas.Texture.SetPixels(startPointX, startPointY, (int)croppedTexSize.x, (int)croppedTexSize.y,
             item.texture.GetPixels((int)texPos.x, (int)texPos.y, (int)croppedTexSize.x, (int)croppedTexSize.y));
-          atlas.Texture.Apply();
           atlas.AddItem(item);
         }
+        atlas.Texture.Apply();
 
         return items;
     }
