@@ -120,9 +120,11 @@ public static class Extensions
   }
 
   /// <summary>Register a game object as a prefab</summary>
-  public static GameObject RegisterPrefab(this GameObject self, bool deactivate = true, bool markFake = true, bool dontUnload = true)
+  public static GameObject RegisterPrefab(this GameObject self, bool deactivate = true, bool markFake = true, bool dontUnload = true, bool activate = false)
   {
-    if (deactivate)
+    if (activate)
+      self.gameObject.SetActive(true); //activate the object upon request
+    else if (deactivate)
       self.gameObject.SetActive(false); //make sure we aren't an active game object
     if (markFake)
       FakePrefab.MarkAsFakePrefab(self.gameObject); //mark the object as a fake prefab

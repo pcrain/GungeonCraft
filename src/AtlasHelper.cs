@@ -346,6 +346,7 @@ public static class AtlasHelper
         prefix: new HarmonyMethod(typeof(AddSpriteToCollectionPatch).GetMethod("Prefix", bindingAttr: anyFlags)));
   }
 
+  // NOTE: this is only called by BossBuilder.BuildPrefab() at this point
   /// <summary>Patched version of Alexandria's SpriteFromResource (manually added through InitSetupPatches())</summary>
   private class SpriteFromResourcePatch
   {
@@ -373,6 +374,7 @@ public static class AtlasHelper
     }
   }
 
+  // NOTE: this should theoretically be unused now, and could possibly be safely removed
   /// <summary>Patched version of Alexandria's AddSpriteToCollection(string, ...) (manually added through InitSetupPatches())</summary>
   private class AddSpriteToCollectionPatch
   {
