@@ -6,10 +6,10 @@ public static class VFX
 
     private static Dictionary<GameActor,List<GameObject>> extantSprites = new();
 
-    public static Dictionary<string,GameObject> animations = new();
-    public static Dictionary<string,VFXPool> vfxpool = new();
-    public static Dictionary<string,VFXComplex> vfxcomplex = new();
-    private static Dictionary<GameObject,VFXPool> vfxObjectToPoolMap = new();
+    public static Dictionary<string,GameObject> animations              = new();
+    public static Dictionary<string,VFXPool> vfxpool                    = new();
+    public static Dictionary<string,VFXComplex> vfxcomplex              = new();
+    private static Dictionary<GameObject,VFXPool> vfxObjectToPoolMap    = new();
 
     public static readonly tk2dSpriteCollectionData Collection =
          SpriteBuilder.ConstructCollection(new GameObject().RegisterPrefab(false, false, true), $"{C.MOD_NAME}_VFX_Collection");
@@ -34,39 +34,31 @@ public static class VFX
             return; //NOTE: this causes issues whether we return early (poe souls) or not (uppskeruvel muzzle)...these issues really need to be handled as they come up
         }
 
-        // System.Diagnostics.Stopwatch vfxWatch = System.Diagnostics.Stopwatch.StartNew();
-        int spriteID = Collection.GetSpriteIdByName(spritePaths[0]);
-
-        GameObject Obj     = new GameObject(name).RegisterPrefab();
-            Obj.AddComponent<tk2dSprite>().SetSprite(Collection, spriteID);
-        VFXComplex complex = new VFXComplex();
-        VFXObject vfObj    = new VFXObject();
-        VFXPool pool       = new VFXPool();
-        pool.type          = VFXPoolType.All;
-
-        tk2dBaseSprite baseSprite = Obj.GetComponent<tk2dBaseSprite>();
-
-        tk2dSprite sprite = Obj.GetOrAddComponent<tk2dSprite>();
-        sprite.SetSprite(Collection, spriteID);
+        GameObject vfxEffect = new GameObject(name).RegisterPrefab();
+        tk2dSprite sprite = vfxEffect.AddComponent<tk2dSprite>();
+        sprite.SetSprite(Collection, Collection.GetSpriteIdByName(spritePaths[0]));
         tk2dSpriteDefinition defaultDef = sprite.GetCurrentSpriteDef();
 
         if (dimensions is IntVector2 dims)
             defaultDef.colliderVertices = new Vector3[]{Vector3.zero, C.PIXEL_SIZE * dims.ToVector3()};
         else
-            defaultDef.colliderVertices = new Vector3[]{Vector3.zero, baseSprite.GetCurrentSpriteDef().position3};
+            defaultDef.colliderVertices = new Vector3[]{Vector3.zero, defaultDef.position3}; //NOTE: the original code for this was wrong and probably unused
 
-        tk2dSpriteAnimator animator           = Obj.GetOrAddComponent<tk2dSpriteAnimator>();
-        tk2dSpriteAnimation animation         = Obj.GetOrAddComponent<tk2dSpriteAnimation>();
-        animation.clips                       = new tk2dSpriteAnimationClip[0];
-        animator.Library                      = animation;
-        tk2dSpriteAnimationClip clip          = new tk2dSpriteAnimationClip() { name = "start", frames = new tk2dSpriteAnimationFrame[0], fps = fps };
-        List<tk2dSpriteAnimationFrame> frames = new List<tk2dSpriteAnimationFrame>();
+        tk2dSpriteAnimationClip clip = new tk2dSpriteAnimationClip() {
+            name      = "start",
+            fps       = fps,
+            frames    = new tk2dSpriteAnimationFrame[spritePaths.Count],
+            loopStart = loopStart,
+            wrapMode  =
+                (loopStart > 0) ? tk2dSpriteAnimationClip.WrapMode.LoopSection :
+                loops           ? tk2dSpriteAnimationClip.WrapMode.Loop : tk2dSpriteAnimationClip.WrapMode.Once
+        };
         for (int i = 0; i < spritePaths.Count; i++)
         {
-            int frameSpriteId                   = Collection.GetSpriteIdByName(spritePaths[i]);
-            tk2dSpriteDefinition frameDef       = Collection.spriteDefinitions[frameSpriteId];
+            int frameSpriteId             = Collection.GetSpriteIdByName(spritePaths[i]);
+            tk2dSpriteDefinition frameDef = Collection.spriteDefinitions[frameSpriteId];
             frameDef.BetterConstructOffsetsFromAnchor(anchor);
-            frameDef.colliderVertices = defaultDef.colliderVertices;
+            frameDef.colliderVertices = defaultDef.colliderVertices; //NOTE: this overrides any prespecified collider vertices, unsure we want this
             frameDef.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
             frameDef.materialInst.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
             if (emissivePower > 0) {
@@ -80,7 +72,7 @@ public static class VFX
                 frameDef.material.SetColor("_EmissiveColor", (Color)emissiveColour);
                 frameDef.materialInst.SetColor("_EmissiveColor", (Color)emissiveColour);
             }
-            frames.Add(new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = Collection });
+            clip.frames[i] = new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = Collection };
         }
         if (emissivePower > 0) {
             sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
@@ -89,44 +81,44 @@ public static class VFX
         }
         if (emissiveColour != null)
             sprite.renderer.material.SetColor("_EmissiveColor", (Color)emissiveColour);
-        clip.frames     = frames.ToArray();
-        if (loopStart > 0)
-        {
-            clip.wrapMode  = tk2dSpriteAnimationClip.WrapMode.LoopSection;
-            clip.loopStart = loopStart;
-        }
-        else
-            clip.wrapMode   = loops ? tk2dSpriteAnimationClip.WrapMode.Loop : tk2dSpriteAnimationClip.WrapMode.Once;
-        animation.clips = animation.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
+
+        tk2dSpriteAnimator animator   = vfxEffect.GetOrAddComponent<tk2dSpriteAnimator>();
+        tk2dSpriteAnimation animation = vfxEffect.GetOrAddComponent<tk2dSpriteAnimation>();
+        animation.clips               = new tk2dSpriteAnimationClip[1]{clip};
+        animator.Library              = animation;
+        animator.playAutomatically    = true;
+        animator.DefaultClipId        = 0; //NOTE: trivially true as long as we only have 1 clip
         if (!persist)
         {
             SpriteAnimatorKiller kill = animator.gameObject.AddComponent<SpriteAnimatorKiller>();
-            kill.fadeTime = -1f;
-            kill.animator = animator;
+            kill.animator             = animator;
+            kill.fadeTime             = -1f;
             kill.delayDestructionTime = -1f;
         }
-        animator.playAutomatically = true;
-        animator.DefaultClipId     = animator.GetClipIdByName("start");
-        vfObj.attached             = attached;
-        vfObj.orphaned             = orphaned;
-        vfObj.persistsOnDeath      = persist;
-        vfObj.usesZHeight          = usesZHeight;
-        vfObj.zHeight              = zHeightOffset;
-        vfObj.alignment            = alignment;
-        vfObj.destructible         = false;
-
-        // BUG: this causes interference when two VFX share a sprite with different scales (e.g., muzzle for platinum star / uppskeruvel
         if (scale != 1.0f)
             sprite.scale = new Vector3(scale, scale, scale);
 
-        vfObj.effect               = Obj;
-        complex.effects            = new VFXObject[] { vfObj };
-        pool.effects               = new VFXComplex[] { complex };
+        VFXObject vfxObject = new(){
+            attached        = attached,
+            orphaned        = orphaned,
+            persistsOnDeath = persist,
+            usesZHeight     = usesZHeight,
+            zHeight         = zHeightOffset,
+            alignment       = alignment,
+            destructible    = false,
+            effect          = vfxEffect
+        };
+        VFXComplex complex = new(){
+            effects = new VFXObject[]{ vfxObject }
+        };
+        VFXPool pool = new(){
+            type = VFXPoolType.All,
+            effects = new VFXComplex[]{ complex }
+        };
 
         vfxpool[name]    = pool;
         vfxcomplex[name] = complex;
-        animations[name] = Obj;
-        // vfxWatch.Stop(); System.Console.WriteLine($"    vfx {name} created in {vfxWatch.ElapsedMilliseconds} milliseconds");
+        animations[name] = vfxEffect;
     }
 
     /// <summary>
