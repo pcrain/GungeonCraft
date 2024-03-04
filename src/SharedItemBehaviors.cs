@@ -1179,13 +1179,9 @@ public static class CustomNoteDoer
 
     public static void Init()
     {
-        GameObject noteSpriteObject = SpriteBuilder.SpriteFromResource(ResMap.Get("note_icon")[0], null);
-            FakePrefab.MarkAsFakePrefab(noteSpriteObject);
-            tk2dSprite noteSprite = noteSpriteObject.GetComponent<tk2dSprite>();
-
         GameObject noteItem = new GameObject("Custom Note Item");
         tk2dSprite noteSpriteComp = noteItem.GetOrAddComponent<tk2dSprite>();
-            noteSpriteComp.SetSprite(noteSprite.Collection, noteSprite.spriteId);
+            noteSpriteComp.SetSprite(VFX.Collection, VFX.Collection.GetSpriteIdByName("note_icon"));
             noteSpriteComp.PlaceAtPositionByAnchor(noteItem.transform.position, Anchor.LowerCenter);
         prefab = noteItem.AddComponent<NoteDoer>();
         prefab.gameObject.SetActive(false);

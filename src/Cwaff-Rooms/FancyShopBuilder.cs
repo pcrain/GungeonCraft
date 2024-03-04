@@ -365,11 +365,7 @@ public static class FancyShopBuilder
       AIAnimator aianimator = self.GetComponentInChildren<AIAnimator>();
       if (yourPaths != null)
       {
-          var stealIdsList = new List<int>();
-          foreach (string sprite in yourPaths)
-          {
-              stealIdsList.Add(SpriteBuilder.AddSpriteToCollection(sprite, collection));
-          }
+          List<int> stealIdsList = AtlasHelper.AddSpritesToCollection(yourPaths, collection).AsRange();
           // ShopAPI.CreateDirectionalAnimation(spriteAnimator, collection, aianimator, stealIdsList, AnimationName, YourAnimFPS);
           CreateDirectionalAnimation(spriteAnimator, collection, aianimator, stealIdsList, AnimationName, YourAnimFPS);
       }

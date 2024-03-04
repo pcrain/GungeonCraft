@@ -810,18 +810,14 @@ public static class Extensions
     tk2dSpriteCollectionData collection = sprite.collection;
     tk2dSpriteDefinition referenceFrameDef = collection.spriteDefinitions[sprite.spriteId];
     tk2dSpriteAnimator anim = sprite.spriteAnimator;
-    List<int> spriteIds = new();
-    foreach (string spritePath in ResMap.Get(animationName))
-    {
-        int frameSpriteId = SpriteBuilder.AddSpriteToCollection(spritePath, collection);
-        spriteIds.Add(frameSpriteId);
-        if (copyShaders)
-        {
-          tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
+    List<int> spriteIds = AtlasHelper.AddSpritesToCollection(ResMap.Get(animationName), collection).AsRange();
+    if (copyShaders)
+      foreach (int fid in spriteIds)
+      {
+          tk2dSpriteDefinition frameDef = collection.spriteDefinitions[fid];
           frameDef.material.shader = referenceFrameDef.material.shader;
           // frameDef.materialInst.shader = referenceFrameDef.materialInst.shader;
-        }
-    }
+      }
     tk2dSpriteAnimationClip clip = SpriteBuilder.AddAnimation(anim, collection, spriteIds, animationName, wrapMode, fps);
     return animationName;
   }
@@ -1646,5 +1642,15 @@ public static class Extensions
       def.untrimmedBoundsDataExtents += offset;
       if (def.colliderVertices != null && def.colliderVertices.Length > 0 && changesCollider)
           def.colliderVertices[0] += offset;
+  }
+
+  /// <summary>Gives a list of vec.y consecutive ints starting from vec.x</summary>
+  public static List<int> AsRange(this IntVector2 vec)
+  {
+    int x = vec.x;
+    List<int> ints = new(vec.y);
+    for (int i = 0; i < vec.y; ++i)
+      ints.Add(x++);
+    return ints;
   }
 }

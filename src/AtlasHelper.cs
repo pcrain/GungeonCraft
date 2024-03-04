@@ -218,8 +218,8 @@ public static class AtlasHelper
     AddSpritesToCollection(newDefs: miscSprites,        collection: VFX.Collection); // NOTE: all miscellaneous sprites go into the VFX collection
   }
 
-  /// <summary>Helper method for adding multiple sprites to a collection at once</summary>
-  private static void AddSpritesToCollection(List<tk2dSpriteDefinition> newDefs, tk2dSpriteCollectionData collection, List<tk2dSpriteDefinition.AttachPoint[]> attachPoints = null)
+  /// <summary>Helper method for adding multiple sprites to a collection at once. Returns the id of the first sprite added and the number of sprites added.</summary>
+  private static IntVector2 AddSpritesToCollection(List<tk2dSpriteDefinition> newDefs, tk2dSpriteCollectionData collection, List<tk2dSpriteDefinition.AttachPoint[]> attachPoints = null)
   {
       if (collection.spriteNameLookupDict == null)
           collection.InitDictionary();
@@ -237,7 +237,7 @@ public static class AtlasHelper
 
       // Add attach points if they're available
       if (attachPoints == null)
-        return;
+        return new IntVector2(oldLength, newDefs.Count);
       for (int j = 0; j < attachPoints.Count; ++j)
       {
         tk2dSpriteDefinition.AttachPoint[] aps = attachPoints[j];
@@ -248,6 +248,17 @@ public static class AtlasHelper
             collection.inst.SetAttachPoints(oldLength + j, aps);
         // ETGModConsole.Log($"setting attach points for {id} == {spriteName}");
       }
+
+      return new IntVector2(oldLength, newDefs.Count);
+  }
+
+  /// <summary>Helper method for adding multiple sprites to a collection at once (public path-based version). Returns the id of the first sprite added and the number of sprites added.</summary>
+  public static IntVector2 AddSpritesToCollection(IEnumerable<string> paths, tk2dSpriteCollectionData collection)
+  {
+    List<tk2dSpriteDefinition> defs = new();
+    foreach (string path in paths)
+      defs.Add(_PackedTextures[path]);
+    return AddSpritesToCollection(defs, collection);
   }
 
   public static Dictionary<string, tk2dSpriteDefinition.AttachPoint[]> ReadAttachPointsFromTSV(Assembly asmb, string tsvPath)

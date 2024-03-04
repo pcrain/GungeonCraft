@@ -1138,6 +1138,7 @@ public static class EasyGoopDefinitions  // mostly stolen from NN
             goopDefinition.name = text.Replace("assets/data/goops/", "").Replace(".asset", "");
             baseGoops.Add(goopDefinition);
         }
+        assetBundle = null;
 
         //Define the asset bundle goops
         FireDef         = baseGoops[0];

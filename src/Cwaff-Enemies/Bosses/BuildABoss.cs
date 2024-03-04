@@ -954,14 +954,15 @@ public static class BH
     {
       int firstAnim = lastAnim;
       // ETGModConsole.Log($"Showing sprites for {entry.Key}");
+      List<string> newSprites = new();
       foreach(string v in entry.Value)
       {
         if (String.IsNullOrEmpty(v))
           continue;
-        // ETGModConsole.Log($"  {v}");
-        SpriteBuilder.AddSpriteToCollection($"{resourcePath}/{v}", bossSprites);
-        ++lastAnim;
+        newSprites.Add(v);
       }
+      AtlasHelper.AddSpritesToCollection(newSprites, bossSprites); //TODO: this could feasibly be hoisted to the outer loop
+      lastAnim += newSprites.Count;
       DirectionalAnimation.DirectionType dir;
       if (entry.Key == "idle")
         dir = DirectionalAnimation.DirectionType.Single;
@@ -972,14 +973,13 @@ public static class BH
     }
   }
 
-  public static tk2dSpriteCollectionData LoadSpriteCollection(GameObject prefab, string[] spritePaths)
-  {
-    tk2dSpriteCollectionData bossSprites = SpriteBuilder.ConstructCollection(prefab, (prefab.name+" Collection").Replace(" ","_"));
-    UnityEngine.Object.DontDestroyOnLoad(bossSprites);
-    for (int i = 0; i < spritePaths.Length; i++)
-      SpriteBuilder.AddSpriteToCollection(spritePaths[i], bossSprites);
-    return bossSprites;
-  }
+  // public static tk2dSpriteCollectionData LoadSpriteCollection(GameObject prefab, string[] spritePaths)
+  // {
+  //   tk2dSpriteCollectionData bossSprites = SpriteBuilder.ConstructCollection(prefab, (prefab.name+" Collection").Replace(" ","_"));
+  //   UnityEngine.Object.DontDestroyOnLoad(bossSprites);
+  //   AtlasHelper.AddSpritesToCollection(spritePaths, bossSprites);
+  //   return bossSprites;
+  // }
 
   //Stolen from Apache
   public static void AddObjectToRoom(PrototypeDungeonRoom room, Vector2 position, DungeonPlaceable PlacableContents = null, DungeonPlaceableBehaviour NonEnemyBehaviour = null, string EnemyBehaviourGuid = null, float SpawnChance = 1f, int xOffset = 0, int yOffset = 0, int layer = 0, int PathID = -1, int PathStartNode = 0) {

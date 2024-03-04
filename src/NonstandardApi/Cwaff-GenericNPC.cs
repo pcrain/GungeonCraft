@@ -57,13 +57,9 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
                 List<string> animNames = new List<string>();
                 foreach (SimpleAnimationData ad in animationData)
                 {
-                    var idList = new List<int>();
-                    foreach (string sprite in ad.animPaths)
-                    {
-                        int fid = SpriteBuilder.AddSpriteToCollection(sprite, collection);
-                        idList.Add(fid);
+                    List<int> idList = AtlasHelper.AddSpritesToCollection(ad.animPaths, collection).AsRange();
+                    foreach (int fid in idList)
                         collection.spriteDefinitions[fid].BetterConstructOffsetsFromAnchor(Anchor.LowerCenter);
-                    }
                     SpriteBuilder.AddAnimation(spriteAnimator, collection, idList, ad.animName, tk2dSpriteAnimationClip.WrapMode.Loop, ad.animFPS);
                     animNames.Add(ad.animName);
                 }

@@ -108,12 +108,8 @@ public class Initialisation : BaseUnityPlugin
 
                 Assembly asmb = Assembly.GetExecutingAssembly();
 
-                System.Diagnostics.Stopwatch attachPointsWatch = System.Diagnostics.Stopwatch.StartNew();
                 Dictionary<string, tk2dSpriteDefinition.AttachPoint[]> attachPoints =
                     AtlasHelper.ReadAttachPointsFromTSV(asmb, $"{C.MOD_INT_NAME}.Resources.Atlases.attach_points.tsv");
-                attachPointsWatch.Stop();
-                if (C.DEBUG_BUILD)
-                    ETGModConsole.Log($"    attachPoints finished in {attachPointsWatch.ElapsedMilliseconds} milliseconds");
 
                 //WARNING: I know this looks like it can be threaded, but it can't...I've tried three times now, so much can go wrong...don't do it pretzel D:
                 for (int i = 1; ; ++i)
@@ -125,8 +121,6 @@ public class Initialisation : BaseUnityPlugin
                           break;
                     }
                     Texture2D atlas = ResourceExtractor.GetTextureFromResource(atlasPath, asmb);
-                    if (C.DEBUG_BUILD)
-                        ETGModConsole.Log($"extracted texture from atlas {i}");
                     AtlasHelper.LoadPackedTextureResource(
                       atlas: atlas, attachPoints: attachPoints, metaDataResourcePath: $"{C.MOD_INT_NAME}.Resources.Atlases.atlas_{i}.atlas");
                 }
@@ -136,6 +130,7 @@ public class Initialisation : BaseUnityPlugin
                 setupAtlasesWatch.Stop();
             #endregion
 
+            //NOTE: add any new shaders we ever need to use here
             #region Acquire Shaders (absolutely cannot be async when calling Shader.Find(), but once they're cached we're fine)
                 System.Diagnostics.Stopwatch setupShadersWatch = System.Diagnostics.Stopwatch.StartNew();
                 ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
