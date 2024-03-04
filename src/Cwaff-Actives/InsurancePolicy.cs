@@ -45,23 +45,23 @@ public class InsurancePolicy : PlayerItem
         item.CanBeSold    = false;  // no reselling insurance!
         item.SetCooldownType(ItemBuilder.CooldownType.Timed, 0.5f);
 
-        _InsuranceVFXRobot      = VFX.Create("insurance_policy_robot_icon",      fps: 1, loops: true, anchor: Anchor.MiddleCenter);
-        _InsuranceVFXConvict    = VFX.Create("insurance_policy_convict_icon",    fps: 1, loops: true, anchor: Anchor.MiddleCenter);
-        _InsuranceVFXPilot      = VFX.Create("insurance_policy_pilot_icon",      fps: 1, loops: true, anchor: Anchor.MiddleCenter);
-        _InsuranceVFXParadox    = VFX.Create("insurance_policy_paradox_icon",    fps: 1, loops: true, anchor: Anchor.MiddleCenter);
-        _InsuranceVFXGunslinger = VFX.Create("insurance_policy_gunslinger_icon", fps: 1, loops: true, anchor: Anchor.MiddleCenter);
-        _InsuranceVFXHunter     = VFX.Create("insurance_policy_hunter_icon",     fps: 1, loops: true, anchor: Anchor.MiddleCenter);
-        _InsuranceVFXMarine     = VFX.Create("insurance_policy_marine_icon",     fps: 1, loops: true, anchor: Anchor.MiddleCenter);
-        _InsuranceVFXBullet     = VFX.Create("insurance_policy_bullet_icon",     fps: 1, loops: true, anchor: Anchor.MiddleCenter);
+        _InsuranceVFXRobot      = VFX.Create("insurance_policy_robot_vfx",      fps: 1, loops: true, anchor: Anchor.MiddleCenter);
+        _InsuranceVFXConvict    = VFX.Create("insurance_policy_convict_vfx",    fps: 1, loops: true, anchor: Anchor.MiddleCenter);
+        _InsuranceVFXPilot      = VFX.Create("insurance_policy_pilot_vfx",      fps: 1, loops: true, anchor: Anchor.MiddleCenter);
+        _InsuranceVFXParadox    = VFX.Create("insurance_policy_paradox_vfx",    fps: 1, loops: true, anchor: Anchor.MiddleCenter);
+        _InsuranceVFXGunslinger = VFX.Create("insurance_policy_gunslinger_vfx", fps: 1, loops: true, anchor: Anchor.MiddleCenter);
+        _InsuranceVFXHunter     = VFX.Create("insurance_policy_hunter_vfx",     fps: 1, loops: true, anchor: Anchor.MiddleCenter);
+        _InsuranceVFXMarine     = VFX.Create("insurance_policy_marine_vfx",     fps: 1, loops: true, anchor: Anchor.MiddleCenter);
+        _InsuranceVFXBullet     = VFX.Create("insurance_policy_bullet_vfx",     fps: 1, loops: true, anchor: Anchor.MiddleCenter);
 
-        _InsuranceSpriteRobot      = VFX.Collection.GetSpriteIdByName("insurance_policy_robot_icon");
-        _InsuranceSpriteConvict    = VFX.Collection.GetSpriteIdByName("insurance_policy_convict_icon");
-        _InsuranceSpritePilot      = VFX.Collection.GetSpriteIdByName("insurance_policy_pilot_icon");
-        _InsuranceSpriteParadox    = VFX.Collection.GetSpriteIdByName("insurance_policy_paradox_icon");
-        _InsuranceSpriteGunslinger = VFX.Collection.GetSpriteIdByName("insurance_policy_gunslinger_icon");
-        _InsuranceSpriteHunter     = VFX.Collection.GetSpriteIdByName("insurance_policy_hunter_icon");
-        _InsuranceSpriteMarine     = VFX.Collection.GetSpriteIdByName("insurance_policy_marine_icon");
-        _InsuranceSpriteBullet     = VFX.Collection.GetSpriteIdByName("insurance_policy_bullet_icon");
+        _InsuranceSpriteRobot      = item.sprite.collection.GetSpriteIdByName("insurance_policy_robot_icon");
+        _InsuranceSpriteConvict    = item.sprite.collection.GetSpriteIdByName("insurance_policy_convict_icon");
+        _InsuranceSpritePilot      = item.sprite.collection.GetSpriteIdByName("insurance_policy_pilot_icon");
+        _InsuranceSpriteParadox    = item.sprite.collection.GetSpriteIdByName("insurance_policy_paradox_icon");
+        _InsuranceSpriteGunslinger = item.sprite.collection.GetSpriteIdByName("insurance_policy_gunslinger_icon");
+        _InsuranceSpriteHunter     = item.sprite.collection.GetSpriteIdByName("insurance_policy_hunter_icon");
+        _InsuranceSpriteMarine     = item.sprite.collection.GetSpriteIdByName("insurance_policy_marine_icon");
+        _InsuranceSpriteBullet     = item.sprite.collection.GetSpriteIdByName("insurance_policy_bullet_icon");
 
         _InsuranceChestPrefab = GameManager.Instance.RewardManager.GetTargetChestPrefab(ItemQuality.B).gameObject.ClonePrefab().GetComponent<Chest>();
             _InsuranceChestPrefab.groundHitDelay = 0.10f;
@@ -119,7 +119,7 @@ public class InsurancePolicy : PlayerItem
     public override void Start()
     {
         base.Start();
-        base.sprite.SetSprite(VFX.Collection, GetSpriteIdForCharacter());
+        base.sprite.SetSprite(GetSpriteIdForCharacter());
     }
 
     public static void InsuranceCheck()
