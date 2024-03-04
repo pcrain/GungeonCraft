@@ -34,15 +34,18 @@ public static class VFX
             return; //NOTE: this causes issues whether we return early (poe souls) or not (uppskeruvel muzzle)...these issues really need to be handled as they come up
         }
 
-        GameObject vfxEffect = new GameObject(name).RegisterPrefab();
-        tk2dSprite sprite = vfxEffect.AddComponent<tk2dSprite>();
-        sprite.SetSprite(Collection, Collection.GetSpriteIdByName(spritePaths[0]));
-        tk2dSpriteDefinition defaultDef = sprite.GetCurrentSpriteDef();
+        GameObject          vfxEffect = new GameObject(name).RegisterPrefab();
+        tk2dSprite          sprite    = vfxEffect.AddComponent<tk2dSprite>();
+        tk2dSpriteAnimator  animator  = vfxEffect.AddComponent<tk2dSpriteAnimator>();
+        tk2dSpriteAnimation animation = vfxEffect.AddComponent<tk2dSpriteAnimation>();
 
+        int spriteId = Collection.GetSpriteIdByName(spritePaths[0]);
+        tk2dSpriteDefinition defaultDef = Collection.spriteDefinitions[spriteId];
         if (dimensions is IntVector2 dims)
             defaultDef.colliderVertices = new Vector3[]{Vector3.zero, C.PIXEL_SIZE * dims.ToVector3()};
         else
             defaultDef.colliderVertices = new Vector3[]{Vector3.zero, defaultDef.position3}; //NOTE: the original code for this was wrong and probably unused
+        sprite.SetSprite(Collection, spriteId);
 
         tk2dSpriteAnimationClip clip = new tk2dSpriteAnimationClip() {
             name      = "start",
@@ -53,6 +56,7 @@ public static class VFX
                 (loopStart > 0) ? tk2dSpriteAnimationClip.WrapMode.LoopSection :
                 loops           ? tk2dSpriteAnimationClip.WrapMode.Loop : tk2dSpriteAnimationClip.WrapMode.Once
         };
+
         Shader shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
         for (int i = 0; i < spritePaths.Count; i++)
         {
@@ -77,15 +81,13 @@ public static class VFX
         if (emissiveColour != null)
             sprite.renderer.material.SetColor("_EmissiveColor", (Color)emissiveColour);
 
-        tk2dSpriteAnimator animator   = vfxEffect.GetOrAddComponent<tk2dSpriteAnimator>();
-        tk2dSpriteAnimation animation = vfxEffect.GetOrAddComponent<tk2dSpriteAnimation>();
-        animation.clips               = new tk2dSpriteAnimationClip[1]{clip};
-        animator.Library              = animation;
-        animator.playAutomatically    = true;
-        animator.DefaultClipId        = 0; //NOTE: trivially true as long as we only have 1 clip
-        if (!persist)
+        animation.clips            = new tk2dSpriteAnimationClip[1]{clip};
+        animator.Library           = animation;
+        animator.playAutomatically = true;
+        // animator.DefaultClipId     = 0; //NOTE: trivially true as long as we only have 1 clip
+        if (!loops && !persist) //NOTE: looping sprites by definition never finish their animation, so this code just adds overhead
         {
-            SpriteAnimatorKiller kill = animator.gameObject.AddComponent<SpriteAnimatorKiller>();
+            SpriteAnimatorKiller kill = vfxEffect.AddComponent<SpriteAnimatorKiller>();
             kill.animator             = animator;
             kill.fadeTime             = -1f;
             kill.delayDestructionTime = -1f;
@@ -103,13 +105,8 @@ public static class VFX
             destructible    = false,
             effect          = vfxEffect
         };
-        VFXComplex complex = new(){
-            effects = new VFXObject[]{ vfxObject }
-        };
-        VFXPool pool = new(){
-            type = VFXPoolType.All,
-            effects = new VFXComplex[]{ complex }
-        };
+        VFXComplex complex  = new(){ effects = new VFXObject[]{ vfxObject } };
+        VFXPool pool        = new(){ effects = new VFXComplex[]{ complex }, type = VFXPoolType.All };
 
         vfxpool[name]    = pool;
         vfxcomplex[name] = complex;

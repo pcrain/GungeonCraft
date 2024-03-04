@@ -949,11 +949,11 @@ public static class Extensions
   /// <summary>Get a list of barrel offsets for a gun's animation</summary>
   public static List<Vector3> GetBarrelOffsetsForAnimation(this Gun gun, string animationName)
   {
-    List<Vector3> offsets = new();
     _GunCollection ??= gun.sprite.collection;
 
     tk2dSpriteAnimationClip clip = gun.GetComponent<tk2dSpriteAnimator>().GetClipByName(animationName);
-    for (int i = 0; i < clip.frames.Count(); ++i)
+    List<Vector3> offsets = new(clip.frames.Length);
+    for (int i = 0; i < clip.frames.Length; ++i)
     {
         int attachIndex = _GunCollection.SpriteIDsWithAttachPoints.IndexOf(clip.frames[i].spriteId);
         foreach (tk2dSpriteDefinition.AttachPoint a in _GunCollection.SpriteDefinedAttachPoints[attachIndex].attachPoints)
