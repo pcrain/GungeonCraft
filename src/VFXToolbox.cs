@@ -6,44 +6,21 @@ public static class VFX
 
     private static Dictionary<GameActor,List<GameObject>> extantSprites = new();
 
-    public static Dictionary<string,int> sprites = new();
     public static Dictionary<string,GameObject> animations = new();
     public static Dictionary<string,VFXPool> vfxpool = new();
     public static Dictionary<string,VFXComplex> vfxcomplex = new();
     private static Dictionary<GameObject,VFXPool> vfxObjectToPoolMap = new();
 
-    public static GameObject LaserSightPrefab;
-    public static GameObject MiniPickup;
     public static readonly tk2dSpriteCollectionData Collection =
          SpriteBuilder.ConstructCollection(new GameObject().RegisterPrefab(false, false, true), $"{C.MOD_NAME}_VFX_Collection");
 
+    public static GameObject LaserSightPrefab;
+    public static GameObject MiniPickup;
+
     public static void Init()
     {
-        #region Shared Assets
-            LaserSightPrefab = LoadHelper.LoadAssetFromAnywhere("assets/resourcesbundle/global vfx/vfx_lasersight.prefab") as GameObject;
-        #endregion
-
-        #region Shared VFX
-            // Shared by Sans and potentially future reticle users
-            RegisterSprite($"{C.MOD_INT_NAME}/Resources/MiscVFX/reticle_white");
-            RegisterSprite($"{C.MOD_INT_NAME}/Resources/MiscVFX/reticle_orange");
-            RegisterSprite($"{C.MOD_INT_NAME}/Resources/MiscVFX/reticle_blue");
-            // Shared by Protractor and Ticonderogun
-            RegisterSprite($"{C.MOD_INT_NAME}/Resources/MiscVFX/fancy_line");
-            // Shared by Pistol Whip and...nothing else at the moment //TODO: can be moved
-            RegisterSprite($"{C.MOD_INT_NAME}/Resources/MiscVFX/whip_segment");
-            RegisterSprite($"{C.MOD_INT_NAME}/Resources/MiscVFX/whip_segment_base");
-            // Shared by Blackjack and possibly future auto-pickup items
-            MiniPickup = VFX.Create("mini_pickup", 12, loops: false, anchor: Anchor.MiddleCenter);
-        #endregion
-    }
-
-    /// <summary>
-    /// Register a single-frame static sprite
-    /// </summary>
-    public static void RegisterSprite(string path)
-    {
-        sprites[path.Substring(path.LastIndexOf("/")+1)] = SpriteBuilder.AddSpriteToCollection(AtlasHelper.NamedSpriteInPackedTexture(path), Collection);
+        LaserSightPrefab = LoadHelper.LoadAssetFromAnywhere("assets/resourcesbundle/global vfx/vfx_lasersight.prefab") as GameObject;
+        MiniPickup = VFX.Create("mini_pickup", 12, loops: false, anchor: Anchor.MiddleCenter);
     }
 
     /// <summary>
@@ -62,7 +39,6 @@ public static class VFX
 
         GameObject Obj     = new GameObject(name).RegisterPrefab();
             Obj.AddComponent<tk2dSprite>().SetSprite(Collection, spriteID);
-        // GameObject Obj     = SpriteBuilder.SpriteFromResource(spritePaths[0], new GameObject(name));
         VFXComplex complex = new VFXComplex();
         VFXObject vfObj    = new VFXObject();
         VFXPool pool       = new VFXPool();
@@ -300,7 +276,7 @@ public static class VFX
             gunOwner.sprite.WorldTopCenter.y + PIXELS_ABOVE_HEAD/C.PIXELS_PER_TILE);
         tk2dSprite overheadSprite = newSprite.AddComponent<tk2dSprite>();
         extantSprites[gunOwner].Add(newSprite);
-        overheadSprite.SetSprite(Collection, sprites[name]);
+        overheadSprite.SetSprite(Collection, Collection.GetSpriteIdByName(name));
         overheadSprite.PlaceAtPositionByAnchor(newSprite.transform.position, Anchor.LowerCenter);
         overheadSprite.transform.localPosition = overheadSprite.transform.localPosition.Quantize(0.0625f);
         newSprite.transform.parent = gunOwner.transform;

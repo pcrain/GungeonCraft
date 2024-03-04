@@ -39,12 +39,6 @@ public class LastResort : AdvancedGunBehavior
         Projectile p0 = projectile.Clone(new(damage: 2.0f));
         lastResortProjectiles.Add(p0);
 
-        // TODO: antiquated VFX registering from my early days, clean this up if I ever come back to this
-        VFX.RegisterSprite($"{C.MOD_INT_NAME}/Resources/MiscVFX/PumpChargeMeter1");
-        VFX.RegisterSprite($"{C.MOD_INT_NAME}/Resources/MiscVFX/PumpChargeMeter2");
-        VFX.RegisterSprite($"{C.MOD_INT_NAME}/Resources/MiscVFX/PumpChargeMeter3");
-        VFX.RegisterSprite($"{C.MOD_INT_NAME}/Resources/MiscVFX/PumpChargeMeter4");
-        VFX.RegisterSprite($"{C.MOD_INT_NAME}/Resources/MiscVFX/PumpChargeMeter5");
         VFX.RegisterVFX(_PumpChargeAnimationName, ResMap.Get("PumpChargeMeter"),
             fps: 4, loops: true, anchor: Anchor.LowerCenter);
 

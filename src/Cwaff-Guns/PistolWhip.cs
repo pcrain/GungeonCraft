@@ -204,7 +204,7 @@ public class WhipChainStart : MonoBehaviour
                 segEnd = basePos + baseEuler * (new Vector2((i + 1) * linkDistance, maxAmp * Mathf.Sin((i + 1) * freq)));
                 if (this._links[i] == null)
                     this._links[i] = Ticonderogun.FancyLine(
-                        segBegin, segEnd, _WHIP_WIDTH, spriteId: VFX.sprites[i >= _HANDLE_LENGTH ? "whip_segment" : "whip_segment_base"]);
+                        segBegin, segEnd, _WHIP_WIDTH, spriteId: VFX.Collection.GetSpriteIdByName(i >= _HANDLE_LENGTH ? "whip_segment" : "whip_segment_base"));
                 else
                 {
                     Vector2 delta                = segEnd - segBegin;

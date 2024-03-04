@@ -210,7 +210,7 @@ public class Ticonderogun : AdvancedGunBehavior
         Quaternion rot        = delta.EulerZ();
         GameObject reticle    = UnityEngine.Object.Instantiate(new GameObject(), start, rot);
         tk2dSlicedSprite quad = reticle.AddComponent<tk2dSlicedSprite>();
-        quad.SetSprite(VFX.Collection, spriteId ?? VFX.sprites["fancy_line"]);
+        quad.SetSprite(VFX.Collection, spriteId ?? VFX.Collection.GetSpriteIdByName("fancy_line"));
         quad.dimensions              = C.PIXELS_PER_TILE * (new Vector2(delta.magnitude, width));
         quad.transform.localRotation = rot;
         quad.transform.position      = start + (0.5f * width * delta.normalized.Rotate(-90f));
