@@ -35,7 +35,7 @@ public class Commitment : AdvancedGunBehavior
             gun.SetBaseMaxAmmo(500);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
 
-        Projectile projectile       = gun.InitFirstProjectile(new(damage: 16.0f, speed: 24.0f));
+        Projectile projectile       = gun.InitFirstProjectile(GunData.New(damage: 16.0f, speed: 24.0f));
     }
 
     public override void OnPostFired(PlayerController player, Gun gun)

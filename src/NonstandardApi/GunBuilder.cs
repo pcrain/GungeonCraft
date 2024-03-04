@@ -1,7 +1,15 @@
 namespace CwaffingTheGungy;
 
-public class GunBuildData
+/// <summary>Singleton class containing reusable data for GunBuilder</summary>
+/// <remarks>NOTE: operates under the assumption that you are only ever using one GunData at a time.</remarks>
+public sealed class GunData
 {
+  private static readonly GunData _Instance = new();
+
+  static GunData() {} // explicit static constructor to prevent premature initialization
+  private GunData() {} // private default constructor to prevent explicit instantiation
+  public static GunData Default { get { return GunData.New(); } } // get default settings for GunBuildData
+
   public Gun gun;
   public int? clipSize;
   public float? cooldown;
@@ -45,7 +53,7 @@ public class GunBuildData
   public bool  useDummyChargeModule;
   public bool  invisibleProjectile;
 
-  /// <summary>Helper class containing setup information for a single module, single projectile gun.</summary>
+  /// <summary>Pseudo-constructor holding most setup information required for a single projectile gun.</summary>
   /// <param name="gun">The gun we're attaching to (can be null, only used for custom clip sprite name resolution for now).</param>
   /// <param name="clipSize">The number of shots the gun can fired before reloading.</param>
   /// <param name="cooldown">The minimum number of seconds between shots</param>
@@ -91,7 +99,7 @@ public class GunBuildData
   /// <param name="shouldFlipVertically"></param>
   /// <param name="useDummyChargeModule"></param>
   /// <param name="invisibleProjectile"></param>
-  public GunBuildData(Gun gun = null, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
+  public static GunData New(Gun gun = null, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
     ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1, GameUIAmmoType.AmmoType? ammoType = null,
     bool customClip = false, float? damage = null, float? speed = null, float? force = null, float? range = null, float? recoil = null, float poison = 0.0f, float fire = 0.0f, float freeze = 0.0f, float slow = 0.0f,
     bool? collidesWithEnemies = null, bool? ignoreDamageCaps = null, bool? collidesWithProjectiles = null, bool? surviveRigidbodyCollisions = null, bool? collidesWithTilemap = null,
@@ -99,61 +107,60 @@ public class GunBuildData
     IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null, float bossDamageMult = 1.0f, string destroySound = null, bool? shouldRotate = null, int barrageSize = 1,
     bool? shouldFlipHorizontally = null, bool? shouldFlipVertically = null, bool useDummyChargeModule = false, bool invisibleProjectile = false)
   {
-      this.gun                           = gun; // set by InitSpecialProjectile()
-      this.clipSize                      = clipSize;
-      this.cooldown                      = cooldown;
-      this.angleVariance                 = angleVariance;
-      this.shootStyle                    = shootStyle;
-      this.sequenceStyle                 = sequenceStyle;
-      this.chargeTime                    = chargeTime;
-      this.ammoCost                      = ammoCost;
-      this.ammoType                      = ammoType;
-      this.customClip                    = customClip;
-      this.damage                        = damage;
-      this.speed                         = speed;
-      this.force                         = force;
-      this.range                         = range;
-      this.recoil                        = recoil;
-      this.poison                        = poison;
-      this.fire                          = fire;
-      this.freeze                        = freeze;
-      this.slow                          = slow;
-      this.collidesWithEnemies           = collidesWithEnemies;
-      this.ignoreDamageCaps              = ignoreDamageCaps;
-      this.collidesWithProjectiles       = collidesWithProjectiles;
-      this.surviveRigidbodyCollisions    = surviveRigidbodyCollisions;
-      this.collidesWithTilemap           = collidesWithTilemap;
-      this.sprite                        = sprite;
-      this.fps                           = fps;
-      this.anchor                        = anchor;
-      this.scale                         = scale;
-      this.anchorsChangeColliders        = anchorsChangeColliders;
-      this.fixesScales                   = fixesScales;
-      this.manualOffsets                 = manualOffsets;
-      this.overrideColliderPixelSizes    = overrideColliderPixelSizes;
-      this.overrideColliderOffsets       = overrideColliderOffsets;
-      this.overrideProjectilesToCopyFrom = overrideProjectilesToCopyFrom;
-      this.bossDamageMult                = bossDamageMult;
-      this.destroySound                  = destroySound;
-      this.shouldRotate                  = shouldRotate;
-      this.barrageSize                   = barrageSize;
-      this.shouldFlipHorizontally        = shouldFlipHorizontally;
-      this.shouldFlipVertically          = shouldFlipVertically;
-      this.useDummyChargeModule          = useDummyChargeModule;
-      this.invisibleProjectile           = invisibleProjectile;
+      _Instance.gun                           = gun; // set by InitSpecialProjectile()
+      _Instance.clipSize                      = clipSize;
+      _Instance.cooldown                      = cooldown;
+      _Instance.angleVariance                 = angleVariance;
+      _Instance.shootStyle                    = shootStyle;
+      _Instance.sequenceStyle                 = sequenceStyle;
+      _Instance.chargeTime                    = chargeTime;
+      _Instance.ammoCost                      = ammoCost;
+      _Instance.ammoType                      = ammoType;
+      _Instance.customClip                    = customClip;
+      _Instance.damage                        = damage;
+      _Instance.speed                         = speed;
+      _Instance.force                         = force;
+      _Instance.range                         = range;
+      _Instance.recoil                        = recoil;
+      _Instance.poison                        = poison;
+      _Instance.fire                          = fire;
+      _Instance.freeze                        = freeze;
+      _Instance.slow                          = slow;
+      _Instance.collidesWithEnemies           = collidesWithEnemies;
+      _Instance.ignoreDamageCaps              = ignoreDamageCaps;
+      _Instance.collidesWithProjectiles       = collidesWithProjectiles;
+      _Instance.surviveRigidbodyCollisions    = surviveRigidbodyCollisions;
+      _Instance.collidesWithTilemap           = collidesWithTilemap;
+      _Instance.sprite                        = sprite;
+      _Instance.fps                           = fps;
+      _Instance.anchor                        = anchor;
+      _Instance.scale                         = scale;
+      _Instance.anchorsChangeColliders        = anchorsChangeColliders;
+      _Instance.fixesScales                   = fixesScales;
+      _Instance.manualOffsets                 = manualOffsets;
+      _Instance.overrideColliderPixelSizes    = overrideColliderPixelSizes;
+      _Instance.overrideColliderOffsets       = overrideColliderOffsets;
+      _Instance.overrideProjectilesToCopyFrom = overrideProjectilesToCopyFrom;
+      _Instance.bossDamageMult                = bossDamageMult;
+      _Instance.destroySound                  = destroySound;
+      _Instance.shouldRotate                  = shouldRotate;
+      _Instance.barrageSize                   = barrageSize;
+      _Instance.shouldFlipHorizontally        = shouldFlipHorizontally;
+      _Instance.shouldFlipVertically          = shouldFlipVertically;
+      _Instance.useDummyChargeModule          = useDummyChargeModule;
+      _Instance.invisibleProjectile           = invisibleProjectile;
+      return _Instance;
   }
-
-  public static GunBuildData Default = new GunBuildData();
 }
 
 public static class GunBuilder
 {
   /// <summary>General-purpose starting point for setting up most guns -- sets up default module, default projectile, and default animation for projectile</summary>
-  public static ProjectileType InitSpecialProjectile<ProjectileType>(this Gun gun, GunBuildData b = null)
+  public static ProjectileType InitSpecialProjectile<ProjectileType>(this Gun gun, GunData b = null)
     where ProjectileType : Projectile
   {
     // If we haven't passed any GunBuildData in, use sane defaults
-    b ??= GunBuildData.Default;
+    b ??= GunData.Default;
     // Add a reference to our current gun to the gun build data (needed for custom projectile setup)
     b.gun = gun;
 
@@ -190,16 +197,16 @@ public static class GunBuilder
   }
 
   /// <summary>Generic version of InitProjectile, assuming we just want a normal projectile</summary>
-  public static Projectile InitProjectile(this Gun gun, GunBuildData b = null)
+  public static Projectile InitProjectile(this Gun gun, GunData b = null)
   {
     return gun.InitSpecialProjectile<Projectile>(b);
   }
 
   /// <summary>Clone, modify, and return a specific projectile</summary>
-  public static ProjectileType CloneSpecial<ProjectileType>(this ProjectileType projectile, GunBuildData b = null)
+  public static ProjectileType CloneSpecial<ProjectileType>(this ProjectileType projectile, GunData b = null)
     where ProjectileType : Projectile
   {
-    b ??= GunBuildData.Default;
+    b ??= GunData.Default;
     ProjectileType p = projectile.ClonePrefab();
 
     // Defaulted
@@ -250,7 +257,7 @@ public static class GunBuilder
   }
 
   /// <summary>Generic version of Clone, assuming we just want a normal projectile</summary>
-  public static Projectile Clone(this Projectile projectile, GunBuildData b = null)
+  public static Projectile Clone(this Projectile projectile, GunData b = null)
   {
     return projectile.CloneSpecial<Projectile>(b);
   }
@@ -335,7 +342,7 @@ public static class GunBuilder
   }
 
   /// <summary>Initializes and returns the first projectile from the default module of a gun</summary>
-  public static ProjectileType InitFirstProjectileOfType<ProjectileType>(this Gun gun, GunBuildData b)
+  public static ProjectileType InitFirstProjectileOfType<ProjectileType>(this Gun gun, GunData b)
     where ProjectileType : Projectile
   {
     Projectile clone = gun.DefaultModule.projectiles[0].Clone(b);
@@ -347,27 +354,27 @@ public static class GunBuilder
   }
 
   /// <summary>Generic version of InitFirstProjectileOfType, assuming we just want a normal projectile</summary>
-  public static Projectile InitFirstProjectile(this Gun gun, GunBuildData b = null)
+  public static Projectile InitFirstProjectile(this Gun gun, GunData b = null)
   {
     return gun.InitFirstProjectileOfType<Projectile>(b);
   }
 
   /// <summary>Clone and return a projectile from a specific gun (Gun version)</summary>
-  public static Projectile CloneProjectile(this Gun gun, GunBuildData b = null)
+  public static Projectile CloneProjectile(this Gun gun, GunData b = null)
   {
       return gun.DefaultModule.projectiles[0].Clone(b);
   }
 
   /// <summary>Clone and return a projectile from a specific gun (Items version)</summary>
-  public static Projectile CloneProjectile(this Items gunItem, GunBuildData b = null)
+  public static Projectile CloneProjectile(this Items gunItem, GunData b = null)
   {
       return (ItemHelper.Get(gunItem) as Gun).DefaultModule.projectiles[0].Clone(b);
   }
 
   /// <summary>Set basic attributes for a projectile module and return it</summary>
-  public static ProjectileModule SetAttributes(this ProjectileModule mod, GunBuildData b = null)
+  public static ProjectileModule SetAttributes(this ProjectileModule mod, GunData b = null)
   {
-    b ??= GunBuildData.Default;
+    b ??= GunData.Default;
     if (b.clipSize.HasValue)
       mod.numberOfShotsInClip = b.clipSize.Value;
     if (b.cooldown.HasValue)
@@ -386,7 +393,7 @@ public static class GunBuilder
   }
 
   /// <summary>Set basic attributes for a gun's default projectile module and return it</summary>
-  public static ProjectileModule SetupDefaultModule(this Gun gun, GunBuildData b = null)
+  public static ProjectileModule SetupDefaultModule(this Gun gun, GunData b = null)
   {
     return gun.DefaultModule.SetAttributes(b);
   }

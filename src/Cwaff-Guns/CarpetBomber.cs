@@ -33,7 +33,7 @@ public class CarpetBomber : AdvancedGunBehavior
             gun.SetReloadAudio("carpet_bomber_reload_sound", 2, 10, 18);
             gun.SetChargeAudio("carpet_bomber_charge_stage", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
-        Projectile p = gun.InitSpecialProjectile<FancyGrenadeProjectile>(new(
+        Projectile p = gun.InitSpecialProjectile<FancyGrenadeProjectile>(GunData.New(
           clipSize: 3, cooldown: 0.15f, angleVariance: 10.0f, shootStyle: ShootStyle.Charged, range: 9999f, customClip: true,
           sequenceStyle: ProjectileSequenceStyle.Ordered, sprite: "carpet_bomber_projectile", fps: 20, anchor: Anchor.MiddleCenter,
           scale: 0.5f, barrageSize: _MAX_PROJECTILES, shouldRotate: true, shouldFlipHorizontally: true, surviveRigidbodyCollisions: true,
@@ -52,7 +52,7 @@ public class CarpetBomber : AdvancedGunBehavior
             imod.triggerCooldownForAnyChargeAmount = true;
             for (int j = 0; j <= i; ++j)
                 gun.RawSourceVolley.projectiles[j].chargeProjectiles.Add(new ProjectileModule.ChargeProjectile {
-                    Projectile = p.Clone(new(
+                    Projectile = p.Clone(GunData.New(
                       // speed increases both with the charge and with the projectile's index in the array
                       speed: _MIN_SPEED + (_DLT_SPEED + _SPEED_PER_CHARGE * i) * (i == 0 ? 0.5f : ((float)j / (float)i)))
                       ).Attach<FancyGrenadeProjectile>(g => {

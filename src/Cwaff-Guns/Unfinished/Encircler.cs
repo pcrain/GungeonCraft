@@ -33,7 +33,7 @@ public class Encircler : AdvancedGunBehavior
         //GUN STATS
         foreach (ProjectileModule mod in gun.Volley.projectiles)
         {
-            Projectile projectile = mod.projectiles[0].Clone(new(damage: 12.0f, range: 15.0f));
+            Projectile projectile = mod.projectiles[0].Clone(GunData.New(damage: 12.0f, range: 15.0f));
             projectile.hitEffects.alwaysUseMidair = true;
             EncirclerBehavior pop = projectile.gameObject.AddComponent<EncirclerBehavior>();
             pop.angle = iterator*360/numProjectiles;

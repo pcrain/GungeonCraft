@@ -24,7 +24,7 @@ public class Kinsurrection : AdvancedGunBehavior
         gun.SetBaseMaxAmmo(1000);
         gun.SetAnimationFPS(gun.shootAnimation, 24);
 
-        Projectile projectile       = gun.InitFirstProjectile(new(damage: 30.0f, speed: 0.01f, force: 50.0f));
+        Projectile projectile = gun.InitFirstProjectile(GunData.New(damage: 30.0f, speed: 0.01f, force: 50.0f));
 
         projectile.PenetratesInternalWalls    = false;
         projectile.pierceMinorBreakables      = true;

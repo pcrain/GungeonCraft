@@ -24,7 +24,7 @@ public class ChekhovsGun : AdvancedGunBehavior
             gun.SetFireAudio("chekhovs_gun_place_sound");
             gun.SetReloadAudio("chekhovs_gun_reload_sound");
 
-        Projectile proj = gun.InitProjectile(new(clipSize: 8, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
+        Projectile proj = gun.InitProjectile(GunData.New(clipSize: 8, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
           damage: 15f, range: 1000f, speed: 200f, sprite: "chekhov_projectile", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter)
         ).Attach<ChekhovBullet>();
 

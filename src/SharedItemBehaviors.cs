@@ -331,7 +331,7 @@ public static class AnimatedBullet // stolen and modified from NN
         proj.SetAnimation(clip, frame);
     }
 
-    public static void AddDefaultAnimation(this Projectile proj, GunBuildData b, int frame = 0)
+    public static void AddDefaultAnimation(this Projectile proj, GunData b, int frame = 0)
     {
         if (string.IsNullOrEmpty(b.sprite))
             return; // if we haven't specified a sprite, make this a no-op

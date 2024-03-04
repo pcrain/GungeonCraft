@@ -23,7 +23,7 @@ public class Tranquilizer : AdvancedGunBehavior
             gun.SetFireAudio("blowgun_fire_sound");
             gun.SetReloadAudio("blowgun_reload_sound");
 
-        gun.InitProjectile(new(clipSize: 1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, damage: 0f,
+        gun.InitProjectile(GunData.New(clipSize: 1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, damage: 0f,
           sprite: "tranquilizer_projectile", fps: 12, anchor: Anchor.MiddleLeft)).Attach<TranquilizerBehavior>();
 
         _DrowsyVFX      = VFX.Create("drowsy_cloud", fps: 6, loops: true, anchor: Anchor.MiddleCenter, scale: 0.5f);

@@ -32,7 +32,7 @@ public class Scotsman : AdvancedGunBehavior
             gun.SetReloadAudio("stickybomblauncher_worldreload");
             gun.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
-        gun.InitProjectile(new(clipSize: 20, cooldown: 0.22f, shootStyle: ShootStyle.SemiAutomatic,
+        gun.InitProjectile(GunData.New(clipSize: 20, cooldown: 0.22f, shootStyle: ShootStyle.SemiAutomatic,
           damage: 5.0f, speed: 40.0f, sprite: "stickybomb_projectile", fps: 12, anchor: Anchor.MiddleCenter)).Attach<Stickybomb>();
 
         _ScotsmanReticle = VFX.Create("scotsman_reticle", fps: 12, loops: true, anchor: Anchor.MiddleCenter);

@@ -41,9 +41,9 @@ public class AimuHakurei : AdvancedGunBehavior
 
         _GrazeVFX = VFX.Create("graze_vfx", fps: 5, loops: true, anchor: Anchor.MiddleCenter, scale: 1.0f, emissivePower: 5f);
 
-        _ProjBase = gun.InitFirstProjectile(new(damage: 8f, speed: 44f, range: 100f, force: 3f));
+        _ProjBase = gun.InitFirstProjectile(GunData.New(damage: 8f, speed: 44f, range: 100f, force: 3f));
 
-        Projectile beamProj = Items._38Special.CloneProjectile(new(damage: 16.0f, speed: 300.0f));
+        Projectile beamProj = Items._38Special.CloneProjectile(GunData.New(damage: 16.0f, speed: 300.0f));
             TrailController tc = beamProj.AddTrailToProjectilePrefab(ResMap.Get("aimu_beam_mid")[0], new Vector2(25, 39), new Vector2(0, 0),
                 ResMap.Get("aimu_beam_mid"), 60, ResMap.Get("aimu_beam_start"), 60, cascadeTimer: C.FRAME, destroyOnEmpty: true);
                 tc.UsesDispersalParticles = true;
@@ -168,7 +168,7 @@ public class AimuHakurei : AdvancedGunBehavior
 
     private static ProjectileModule AimuMod(List<Projectile> projectiles, float fireRate, int level, Gun gun)
     {
-        ProjectileModule mod = new ProjectileModule().SetAttributes(new(
+        ProjectileModule mod = new ProjectileModule().SetAttributes(GunData.New(
             gun: gun, ammoCost: 0, clipSize: -1, cooldown: C.FRAME * fireRate, angleVariance: 15f - (2 * level),
             shootStyle: ShootStyle.Burst, sequenceStyle: ProjectileSequenceStyle.Ordered, customClip: true));
         mod.projectiles         = projectiles;

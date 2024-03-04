@@ -26,7 +26,7 @@ public class KALI : AdvancedGunBehavior
             // gun.SetFireAudio("alligator_shoot_sound");
             gun.SetFireAudio("kali_shoot_sound");
 
-        _KaliProjectile = gun.InitProjectile(new(range: 9999f, force: 3f, cooldown: 0.1f, collidesWithProjectiles: true,
+        _KaliProjectile = gun.InitProjectile(GunData.New(range: 9999f, force: 3f, cooldown: 0.1f, collidesWithProjectiles: true,
           clipSize: 1, sprite: "kali_projectile", shootStyle: ShootStyle.Charged)
         ).Attach<PierceProjModifier>(pierce => { pierce.penetration = 999; pierce.penetratesBreakables = true; }
         // ).Attach<BounceProjModifier>(bounce => { bounce.numberOfBounces = Mathf.Max(bounce.numberOfBounces, 99); }
@@ -52,19 +52,19 @@ public class KALI : AdvancedGunBehavior
         mod.projectiles.Clear();
         mod.chargeProjectiles = new List<ProjectileModule.ChargeProjectile>(){
             new(){
-                Projectile = _KaliProjectile.Clone(new(damage: 25f, speed: 175f, recoil: 100f)
+                Projectile = _KaliProjectile.Clone(GunData.New(damage: 25f, speed: 175f, recoil: 100f)
                   ).Attach<KaliProjectile>(k => k.SetChargeLevel(1)
                   ),
                 ChargeTime = 1f,
             },
             new(){
-                Projectile = _KaliProjectile.Clone(new(damage: 50f, speed: 350f, recoil: 200f)
+                Projectile = _KaliProjectile.Clone(GunData.New(damage: 50f, speed: 350f, recoil: 200f)
                   ).Attach<KaliProjectile>(k => k.SetChargeLevel(2)
                   ),
                 ChargeTime = 2.5f,
             },
             new(){
-                Projectile = _KaliProjectile.Clone(new(damage: 100f, speed: 700f, recoil: 400f)
+                Projectile = _KaliProjectile.Clone(GunData.New(damage: 100f, speed: 700f, recoil: 400f)
                   ).Attach<KaliProjectile>(k => k.SetChargeLevel(3)
                   ),
                 ChargeTime = 4.5f,

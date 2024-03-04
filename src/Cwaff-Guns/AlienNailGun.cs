@@ -19,7 +19,7 @@ public class AlienNailgun : AdvancedGunBehavior
             gun.SetReloadAudio("paintball_reload_sound");
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
-        gun.InitProjectile(new(clipSize: -1, cooldown: 0.7f, shootStyle: ShootStyle.SemiAutomatic, damage: 9.0f,
+        gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.7f, shootStyle: ShootStyle.SemiAutomatic, damage: 9.0f,
             sprite: "alien_nailgun_projectile", customClip: true)
           );
     }

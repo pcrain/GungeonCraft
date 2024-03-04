@@ -29,7 +29,7 @@ public class VacuumCleaner : AdvancedGunBehavior
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
             gun.AddToSubShop(ModdedShopType.Rusty);
 
-        gun.InitProjectile(new(clipSize: -1, shootStyle: ShootStyle.Charged, ammoType: GameUIAmmoType.AmmoType.BEAM, chargeTime: float.MaxValue)); // absurdly high charge value so we never actually shoot
+        gun.InitProjectile(GunData.New(clipSize: -1, shootStyle: ShootStyle.Charged, ammoType: GameUIAmmoType.AmmoType.BEAM, chargeTime: float.MaxValue)); // absurdly high charge value so we never actually shoot
 
         _VacuumVFX = VFX.Create("vacuum_wind_sprite_a", fps: 30, loops: true, loopStart: 6, anchor: Anchor.MiddleCenter, scale: 0.5f);
     }

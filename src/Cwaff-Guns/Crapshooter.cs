@@ -32,7 +32,7 @@ public class Crapshooter : AdvancedGunBehavior
             gun.SetReloadAudio(_DiceSounds[1], 3, 7, 12, 15, 21, 27);
             gun.SetReloadAudio(_DiceSounds[2], 2, 18, 23, 25, 31);
 
-        _BaseCrapshooterProjectile = gun.InitSpecialProjectile<GrenadeProjectile>(new(clipSize: 12, cooldown: 0.16f,
+        _BaseCrapshooterProjectile = gun.InitSpecialProjectile<GrenadeProjectile>(GunData.New(clipSize: 12, cooldown: 0.16f,
             shootStyle: ShootStyle.Automatic, scale: 2.0f, damage: 3f, speed: 24f, force: 10f, range: 30f, customClip: true,
             sprite: "crapshooter_projectile", fps: 12, anchor: Anchor.MiddleCenter, shouldRotate: false
           )).Attach<GrenadeProjectile>(g => {

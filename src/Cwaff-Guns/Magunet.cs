@@ -34,7 +34,7 @@ public class Magunet : AdvancedGunBehavior
             gun.AddStatToGun(PlayerStats.StatType.Curse, 1f, StatModifier.ModifyMethod.ADDITIVE);
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
 
-        gun.InitProjectile(new(clipSize: -1, shootStyle: ShootStyle.Charged, ammoType: GameUIAmmoType.AmmoType.BEAM, chargeTime: float.MaxValue)); // absurdly high charge value so we never actually shoot
+        gun.InitProjectile(GunData.New(clipSize: -1, shootStyle: ShootStyle.Charged, ammoType: GameUIAmmoType.AmmoType.BEAM, chargeTime: float.MaxValue)); // absurdly high charge value so we never actually shoot
 
         _MagunetBeamVFX = VFX.Create("magbeam_alt", fps: 30, loops: true, anchor: Anchor.MiddleCenter, scale: 0.65f, emissivePower: 1f);
         _MagunetChargeVFX = VFX.Create("magunet_charge_vfx", fps: 30, loops: true, anchor: Anchor.MiddleCenter, scale: 1.0f);

@@ -20,7 +20,7 @@ public class HolyWaterGun : AdvancedGunBehavior
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
-        Projectile projectile = gun.InitProjectile(new(clipSize: -1, shootStyle: ShootStyle.Beam, ammoType: GameUIAmmoType.AmmoType.BEAM, damage: 0.0f,
+        Projectile projectile = gun.InitProjectile(GunData.New(clipSize: -1, shootStyle: ShootStyle.Beam, ammoType: GameUIAmmoType.AmmoType.BEAM, damage: 0.0f,
           speed: 50.0f, force: 50.0f)).Attach<ExorcismJuice>();
 
         BasicBeamController beamComp = projectile.SetupBeamSprites(

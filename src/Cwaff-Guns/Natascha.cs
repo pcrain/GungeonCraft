@@ -24,7 +24,7 @@ public class Natascha : AdvancedGunBehavior
             gun.AddToSubShop(ItemBuilder.ShopType.Trorc);
             gun.AddToSubShop(ModdedShopType.Rusty);
 
-        gun.InitProjectile(new(clipSize: -1, cooldown: _BaseCooldownTime, angleVariance: 15.0f,
+        gun.InitProjectile(GunData.New(clipSize: -1, cooldown: _BaseCooldownTime, angleVariance: 15.0f,
           shootStyle: ShootStyle.Automatic, damage: 3.0f, speed: 20.0f, slow: 1.0f,
           sprite: "natascha_bullet", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter));
     }

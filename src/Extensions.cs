@@ -862,7 +862,7 @@ public static class Extensions
   }
 
   /// <summary>Set up custom ammo types from default resource paths</summary>
-  public static void SetupCustomAmmoClip(this ProjectileModule mod, GunBuildData b)
+  public static void SetupCustomAmmoClip(this ProjectileModule mod, GunData b)
   {
       string clipname    = b.gun.EncounterNameOrDisplayName.SafeName();
       // if (C.DEBUG_BUILD)

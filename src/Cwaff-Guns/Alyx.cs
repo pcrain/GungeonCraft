@@ -31,7 +31,7 @@ public class Alyx : AdvancedGunBehavior
             gun.SetReloadAudio("alyx_reload_sound");
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
-        gun.InitProjectile(new(clipSize: 10, shootStyle: ShootStyle.Automatic, customClip: true, damage: 15.0f, speed: 20.0f,
+        gun.InitProjectile(GunData.New(clipSize: 10, shootStyle: ShootStyle.Automatic, customClip: true, damage: 15.0f, speed: 20.0f,
           poison: 1.0f, fire: 1.0f, sprite: "alyx_projectile", fps: 16, scale: 0.5625f, anchor: Anchor.MiddleCenter));
     }
 

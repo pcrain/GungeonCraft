@@ -25,7 +25,7 @@ public class GasterBlaster : PlayerItem
 
         _GasterBlaster = VFX.Create("gaster_blaster", 2, loops: true, anchor: Anchor.MiddleCenter);
 
-        _GasterBlast = Items.MarineSidearm.CloneProjectile(new(damage: 700.0f, speed: 150.0f, force: 70.0f, range: 200.0f));
+        _GasterBlast = Items.MarineSidearm.CloneProjectile(GunData.New(damage: 700.0f, speed: 150.0f, force: 70.0f, range: 200.0f));
         _GasterBlast.ignoreDamageCaps        = false;
         _GasterBlast.PenetratesInternalWalls = true;
         _GasterBlast.pierceMinorBreakables   = true;

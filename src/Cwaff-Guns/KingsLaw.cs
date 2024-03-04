@@ -32,7 +32,7 @@ public class KingsLaw : AdvancedGunBehavior
             gun.SetMuzzleVFX();
             gun.SetReloadAudio("knife_gun_reload");
 
-        gun.InitProjectile(new(clipSize: 20, shootStyle: ShootStyle.Automatic, damage: 7.5f, speed: 40.0f, range: 999999f, customClip: true,
+        gun.InitProjectile(GunData.New(clipSize: 20, shootStyle: ShootStyle.Automatic, damage: 7.5f, speed: 40.0f, range: 999999f, customClip: true,
           cooldown: _SPAWN_RATE, sprite: "kings_law_projectile", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter,
           useDummyChargeModule: true)).Attach<KingsLawBullets>();
 

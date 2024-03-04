@@ -23,7 +23,7 @@ public class Lightwing : AdvancedGunBehavior
             gun.SetFireAudio("lightwing_fire_sound");
             gun.SetReloadAudio("lightwing_reload_sound");
 
-        gun.InitProjectile(new(clipSize: 20, cooldown: 0.28f, shootStyle: ShootStyle.SemiAutomatic, damage: 4.0f, customClip: true,
+        gun.InitProjectile(GunData.New(clipSize: 20, cooldown: 0.28f, shootStyle: ShootStyle.SemiAutomatic, damage: 4.0f, customClip: true,
           speed: 20.0f, collidesWithProjectiles: true // collidesWithProjectiles needs to be set up front because...Unity
           )).AddAnimations(
             AnimatedBullet.Create(refClip: ref _NeutralSprite,    name: "lightwing_projectile",          fps: 12, anchor: Anchor.MiddleLeft),

@@ -22,7 +22,7 @@ public class QuarterPounder : AdvancedGunBehavior
             gun.SetFireAudio("fire_coin_sound");
             gun.SetReloadAudio("coin_gun_reload");
 
-        gun.InitProjectile(new(clipSize: 10, angleVariance: 15.0f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, damage: 20.0f, speed: 44.0f,
+        gun.InitProjectile(GunData.New(clipSize: 10, angleVariance: 15.0f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, damage: 20.0f, speed: 44.0f,
           sprite: "coin_gun_projectile", fps: 2, anchor: Anchor.MiddleCenter)).Attach<MidasProjectile>();
 
         _MidasParticleVFX = VFX.Create("midas_sparkle",

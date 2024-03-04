@@ -24,7 +24,7 @@ public class Blackjack : AdvancedGunBehavior
             gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
             gun.SetReloadAudio("card_shuffle_sound"); // todo: this is still playing the default reload sound as well, for some reason
 
-        gun.InitProjectile(new(clipSize: _CLIP_SIZE, cooldown: 0.16f, angleVariance: 24.0f, shootStyle: ShootStyle.Automatic,
+        gun.InitProjectile(GunData.New(clipSize: _CLIP_SIZE, cooldown: 0.16f, angleVariance: 24.0f, shootStyle: ShootStyle.Automatic,
           customClip: true, damage: 8f, speed: 18f, range: 999f
           )).AddAnimations(
             AnimatedBullet.Create(refClip: ref _BulletSprite, name: "playing_card",      fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft),

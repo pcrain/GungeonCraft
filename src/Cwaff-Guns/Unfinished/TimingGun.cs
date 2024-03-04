@@ -37,10 +37,10 @@ public class TimingGun : AdvancedGunBehavior
         timingProjectiles = new List<Projectile>();
         timingLevelSprites = new List<string>();
 
-        Projectile projectile       = gun.InitFirstProjectile(new(damage: 0.0f, speed: 5.0f, range: 5.0f));
+        Projectile projectile = gun.InitFirstProjectile(GunData.New(damage: 0.0f, speed: 5.0f, range: 5.0f));
 
         // No guns without ammo (base stats)
-        Projectile p0 = projectile.Clone(new(damage: 1.0f, speed: 2.0f, range: 2.0f));
+        Projectile p0 = projectile.Clone(GunData.New(damage: 1.0f, speed: 2.0f, range: 2.0f));
         timingProjectiles.Add(p0);
 
         // TODO: antiquated sprite registration, figure out something better if I ever revamp this gun
@@ -56,7 +56,7 @@ public class TimingGun : AdvancedGunBehavior
         for(int i = 1; i < maxCharge; ++i)
         {
             Projectile po      = timingProjectiles[i-1];
-            Projectile pi      = po.Clone(new(damage: po.baseData.damage * 1.4f, speed: po.baseData.speed * 1.4f, range: po.baseData.range * 1.4f));
+            Projectile pi      = po.Clone(GunData.New(damage: po.baseData.damage * 1.4f, speed: po.baseData.speed * 1.4f, range: po.baseData.range * 1.4f));
             timingProjectiles.Add(pi);
             timingLevelSprites.Add(i.ToString());
         }

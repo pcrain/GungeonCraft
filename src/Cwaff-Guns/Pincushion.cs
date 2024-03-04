@@ -28,7 +28,7 @@ public class Pincushion : AdvancedGunBehavior
 
         _Microdust = VFX.CreatePool("microdust", fps: 30, loops: false);
 
-        gun.InitProjectile(new(clipSize: 1000 / _SIMULTANEOUS_BULLETS, cooldown: C.FRAME, angleVariance: 35.0f, shootStyle: ShootStyle.Automatic,
+        gun.InitProjectile(GunData.New(clipSize: 1000 / _SIMULTANEOUS_BULLETS, cooldown: C.FRAME, angleVariance: 35.0f, shootStyle: ShootStyle.Automatic,
           damage: 0.0f, speed: 200.0f, force: 0.0f, range: 999f, bossDamageMult: 0.65f, sprite: "needle", fps: 12,
           anchor: Anchor.MiddleLeft, barrageSize: 4
           )).SetAllImpactVFX(_Microdust

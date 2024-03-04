@@ -19,7 +19,7 @@ public class PaintballCannon : AdvancedGunBehavior
             gun.SetReloadAudio("paintball_reload_sound");
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
-        gun.InitProjectile(new(clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic, damage: 9.0f)
+        gun.InitProjectile(GunData.New(clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic, damage: 9.0f)
           ).Attach<PaintballColorizer>(
           ).Attach<GoopModifier>(g => {
             g.SpawnGoopOnCollision   = true;
