@@ -93,7 +93,7 @@ public class UtilityVest : PassiveItem
     {
         if (!item.CanActuallyBeDropped(this.Owner))
             return -1f;
-        if (item.PickupObjectId == IDs.Passives["utility_vest"])
+        if (item.PickupObjectId == IDs.Pickups["utility_vest"])
             return 0f;
         if (item.PickupObjectId == (int)Items.Junk)
             return 6f;

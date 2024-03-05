@@ -23,18 +23,15 @@ public class C // constants and common variables
 
 public class IDs // global IDs for this mod's guns and items
 {
-    public static Dictionary<string, int>    Pickups       { get; set; } = new Dictionary<string, int>();
-    public static Dictionary<string, int>    Guns          { get; set; } = new Dictionary<string, int>();
-    public static Dictionary<string, int>    Actives       { get; set; } = new Dictionary<string, int>();
-    public static Dictionary<string, int>    Passives      { get; set; } = new Dictionary<string, int>();
-    public static Dictionary<string, string> InternalNames { get; set; } = new Dictionary<string, string>();
+    public static readonly Dictionary<string, int>    Pickups       = new();
+    public static readonly Dictionary<string, string> InternalNames = new();
 }
 
 public static class ResMap // Resource map from PNG stem names to lists of paths to all PNGs with those names (i.e., animation frames)
 {
     private static Regex _NumberAtEnd = new Regex(@"^(.*?)(_?)([0-9]+)$",
       RegexOptions.Compiled | RegexOptions.IgnoreCase);
-    private static Dictionary<string, List<string>> _ResMap = new ();
+    private static Dictionary<string, List<string>> _ResMap = new();
 
     // Gets a list of resource paths with numbered sprites from the resource's base name
     // Does not work with CreateProjectileAnimation(), which expects direct sprite names in the mod's "sprites" directory
@@ -56,20 +53,15 @@ public static class ResMap // Resource map from PNG stem names to lists of paths
         return bases;
     }
 
-
     // Builds a resource map from every PNG embedded in the assembly
     public static void Build()
     {
         var watch = System.Diagnostics.Stopwatch.StartNew();
         Dictionary<string, string[]> tempMap = new ();
         // Get the name of each PNG resource and stuff it into a sorted array by its index number
-        // foreach(string s in ResourceExtractor.GetResourceNames())
         foreach(string s in AtlasHelper._PackedTextures.Keys)
         {
-            // if (!s.EndsWithInvariant(".png"))
-            //     continue;
-            // string path = s.Replace('.','/').Substring(0, s.Length - 4);
-            string path = s.Replace('.','/')/*.Substring(0, s.Length - 4)*/;
+            string path = s.Replace('.','/');
             string[] tokens = path.Split('/');
             string baseName = tokens[tokens.Length - 1];
             MatchCollection matches = _NumberAtEnd.Matches(baseName);
@@ -127,7 +119,6 @@ public static class Dissect // reflection helper methods for being a lazy dumdum
     {
         foreach (var c in g.GetComponents(typeof(object)))
             ETGModConsole.Log("  "+c.GetType().Name);
-
     }
 
     public static void DumpFieldsAndProperties<T>(T o)

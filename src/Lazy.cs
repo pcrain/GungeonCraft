@@ -8,15 +8,15 @@ public static class Lazy
     /// <summary>Log with the console only in debug mode</summary>
     public static void DebugLog(object text)
     {
-    if (C.DEBUG_BUILD)
-      ETGModConsole.Log(text);
+      if (C.DEBUG_BUILD)
+        ETGModConsole.Log(text);
     }
 
     /// <summary>Warn with the console only in debug mode</summary>
     public static void DebugWarn(string text)
     {
-    if (C.DEBUG_BUILD)
-      ETGModConsole.Log($"<color=#ffffaaff>{text}</color>");
+      if (C.DEBUG_BUILD)
+        ETGModConsole.Log($"<color=#ffffaaff>{text}</color>");
     }
 
     /// <summary>Perform basic initialization for a new passive, active, or gun item definition.</summary>
@@ -24,9 +24,9 @@ public static class Lazy
         where TItemClass : PickupObject   // must be PickupObject for passive items, PlayerItem for active items, or Gun for guns
         where TItemSpecific : TItemClass  // must be a subclass of TItemClass
     {
-        string newItemName  = itemName.Replace("-", "").Replace(".", "");  //get sane gun for item rename
-        string baseItemName = newItemName.Replace(" ", "_").ToLower();  //get saner gun name for commands
+        string baseItemName = itemName.Replace("-", "").Replace(".", "").Replace(" ", "_").ToLower();  //get saner gun name for commands
         string internalName = C.MOD_PREFIX+":"+baseItemName;
+        string ammonomiconSprite;
         IDs.InternalNames[itemName] = internalName;
 
         TItemClass item;
@@ -34,6 +34,7 @@ public static class Lazy
         if (typeof(TItemClass) == typeof(Gun))
         {
             GameObject go          = UnityEngine.Object.Instantiate(ItemHelper.Get(Items.PeaShooter).gameObject);
+            // GameObject go          = BasicGunFromScratch(itemName); //NOTE: this doesn't seem to be any faster and is error-prone
             go.name                = spritePath;
 
             Gun gun                = go.GetComponent<Gun>();
@@ -44,17 +45,15 @@ public static class Lazy
             gun.RawSourceVolley    = ScriptableObject.CreateInstance<ProjectileVolleyData>();
             gun.Volley.projectiles = new List<ProjectileModule>();
 
-            ETGMod.Databases.Items.SetupItem(gun, itemName);
-            Gungeon.Game.Items.Add(internalName, gun);
+            item = gun as TItemClass;
+            ammonomiconSprite = $"{spritePath}_ammonomicon";
 
-            gun.encounterTrackable.journalData.AmmonomiconSprite = spritePath+"_ammonomicon";
             gun.QuickUpdateGunAnimations(); // includes setting the default sprite
 
             if (int.TryParse(projectileName, out int projectileId))
                 gun.AddProjectileModuleFrom(PickupObjectDatabase.GetById(projectileId) as Gun, true, true); //set the gun's default projectile to inherit
             else
                 gun.AddProjectileModuleFrom(projectileName, true, false); //set the gun's default projectile to inherit
-            item = gun as TItemClass;
         }
         else
         {
@@ -68,37 +67,30 @@ public static class Lazy
             sprite.IsPerpendicular = true;
             obj.GetComponent<BraveBehaviour>().sprite = sprite;
 
-            ETGMod.Databases.Items.SetupItem(item, item.name);
-            Gungeon.Game.Items.Add(IDs.InternalNames[itemName], item);
-            item.encounterTrackable.journalData.AmmonomiconSprite = spritePath;
+            ammonomiconSprite = spritePath;
         }
 
+        ETGMod.Databases.Items.SetupItem(item, itemName);
+        Gungeon.Game.Items.Add(internalName, item);
+
         item.itemName = itemName;
-        item.encounterTrackable.EncounterGuid = C.MOD_PREFIX+"-"+baseItemName; //create a unique guid for the item
+        item.encounterTrackable.journalData.AmmonomiconSprite = ammonomiconSprite;
+        item.encounterTrackable.EncounterGuid = $"{C.MOD_PREFIX}-{baseItemName}"; //create a unique guid for the item
         item.SetShortDescription(shortDescription);
         item.SetLongDescription($"{longDescription}\n\n{lore}");
         ETGMod.Databases.Items.Add(item);
 
         if (hideFromAmmonomicon)
-            item.gameObject.GetComponent<EncounterTrackable>().journalData.SuppressInAmmonomicon = true;
+            item.encounterTrackable.journalData.SuppressInAmmonomicon = true;
 
         IDs.Pickups[baseItemName] = item.PickupObjectId; //register item in pickup ID database
-        if (item is Gun)
+        if (C.DEBUG_BUILD && !hideFromAmmonomicon)
         {
-            IDs.Guns[baseItemName] = item.PickupObjectId; //register item in gun ID database
-            if (C.DEBUG_BUILD && !hideFromAmmonomicon)
+            if (item is Gun)
                 ETGModConsole.Log($"Lazy Initialized Gun: {baseItemName} ({item.DisplayName})");
-        }
-        else if (item is PlayerItem)
-        {
-            IDs.Actives[baseItemName] = item.PickupObjectId; //register item in active ID database
-            if (C.DEBUG_BUILD && !hideFromAmmonomicon)
+            else if (item is PlayerItem)
                 ETGModConsole.Log($"Lazy Initialized Active: {baseItemName} ({item.DisplayName})");
-        }
-        else
-        {
-            IDs.Passives[baseItemName] = item.PickupObjectId; //register item in passive ID database
-            if (C.DEBUG_BUILD && !hideFromAmmonomicon)
+            else
                 ETGModConsole.Log($"Lazy Initialized Passive: {baseItemName} ({item.DisplayName})");
         }
         return item;

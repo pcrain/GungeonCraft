@@ -16,7 +16,7 @@ public static class CwaffSynergies
               This is to ensure that our automatic item tips generation script parses it correctly.
         */
 
-        // Makes Drifter's Headgear 20% longer and reflect bullets
+        // Makes Drifter's Headgear dash 20% longer and reflect bullets
         NewSynergy(HYPE_YOURSELF_UP, "Hype Yourself Up", new[]{IName(DriftersHeadgear.ItemName), "hyper_light_blaster"});
 
         SanityCheckAllSynergiesHaveBeenInitialized();
