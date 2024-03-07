@@ -467,35 +467,6 @@ public class Initialisation : BaseUnityPlugin
                 // setupShopsThread.Start();
             #endregion
 
-            #region Old Asset Stuff
-                // Dissect.FindDefaultResource("DefaultTorch");
-                // ETGModConsole.Log("Trying to load some stuff");
-                // try
-                // {
-                //     // ETGModConsole.Log($"  we got {sharedAssets.LoadAsset<GameObject>("Bonfire")?.name ?? "null"}");
-                //     // ETGModConsole.Log($"  we got {sharedAssets2.LoadAsset<GameObject>("Bonfire")?.name ?? "null"}");
-                //     // ETGModConsole.Log($"  we got {braveResources.LoadAsset<GameObject>("Bonfire")?.name ?? "null"}");
-                //     // ETGModConsole.Log($"  we got {enemiesBase.LoadAsset<GameObject>("Bonfire")?.name ?? "null"}");
-                //     // ETGModConsole.Log($"  we got {sharedBase.LoadAsset<GameObject>("Bonfire")?.name ?? "null"}");
-                //     // ETGModConsole.Log($"  we got {encounterAssets.LoadAsset<GameObject>("Bonfire")?.name ?? "null"}");
-                //     // ETGModConsole.Log($"  we got {sharedAssets.LoadAsset<GameObject>("NapalmStrikeReticle")?.name ?? "null"}");
-                //     // ETGModConsole.Log($"  we got {sharedAssets2.LoadAsset<GameObject>("NapalmStrikeReticle")?.name ?? "null"}");
-                //     // ETGModConsole.Log($"  we got {braveResources.LoadAsset<GameObject>("NapalmStrikeReticle")?.name ?? "null"}");
-                //     // ETGModConsole.Log($"  we got {enemiesBase.LoadAsset<GameObject>("NapalmStrikeReticle")?.name ?? "null"}");
-                //     // ETGModConsole.Log($"  we got {sharedBase.LoadAsset<GameObject>("NapalmStrikeReticle")?.name ?? "null"}");
-
-                //     // GameObject napalm = sharedAssets.LoadAsset<GameObject>("NapalmStrike");
-                //     // if (napalm != null)
-                //     //     ETGModConsole.Log($"  we got {napalm}");
-                //     // else
-                //     //     ETGModConsole.Log("  nullyboi o.o");
-                // }
-                // catch (Exception ex)
-                // {
-                //     ETGModConsole.Log($"  you broke it: {ex}");
-                // }
-            #endregion
-
             #region Wait for remaining async stuff to finish up
                 System.Diagnostics.Stopwatch awaitAsyncWatch = System.Diagnostics.Stopwatch.StartNew();
                 setupAudioThread.Join();
@@ -508,26 +479,26 @@ public class Initialisation : BaseUnityPlugin
             ETGModConsole.Log($"Yay! :D Initialized <color=#{ColorUtility.ToHtmlStringRGB(C.MOD_COLOR).ToLower()}>{C.MOD_NAME} v{C.MOD_VERSION}</color> in "+(watch.ElapsedMilliseconds/1000.0f)+" seconds");
             if (C.DEBUG_BUILD)
             {
-                ETGModConsole.Log($"    setupEarlyHarmony finished in {setupEarlyHarmonyWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
-                ETGModConsole.Log($"    setupLateHarmony  finished in {setupLateHarmonyWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
-                ETGModConsole.Log($"    setupAtlases      finished in {setupAtlasesWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    setupShaders      finished in {setupShadersWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    awaitEarlyHarmony finished in {awaitEarlyHarmonyWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    setupConfig1      finished in {setupConfig1Watch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    setupConfig2      finished in {setupConfig2Watch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    setupAudio        finished in {setupAudioWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
-                ETGModConsole.Log($"    setupSave         finished in {setupSaveWatch.ElapsedMilliseconds} milliseconds (ASYNC)");
-                ETGModConsole.Log($"    setupGuns         finished in {setupGunsWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    setupActives      finished in {setupActivesWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    setupPassives     finished in {setupPassivesWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    setupUI           finished in {setupUIWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    awaitLateHarmony  finished in {awaitLateHarmonyWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    setupFloors       finished in {setupFloorsWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    setupBosses       finished in {setupBossesWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    awaitItems        finished in {awaitItemsWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    setupSynergies    finished in {setupSynergiesWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    setupShops        finished in {setupShopsWatch.ElapsedMilliseconds} milliseconds");
-                ETGModConsole.Log($"    awaitAsync        finished in {awaitAsyncWatch.ElapsedMilliseconds} milliseconds");
+                ETGModConsole.Log($"  {setupEarlyHarmonyWatch.ElapsedMilliseconds, 5}ms ASYNC setupEarlyHarmony");
+                ETGModConsole.Log($"  {setupLateHarmonyWatch.ElapsedMilliseconds,  5}ms ASYNC setupLateHarmony ");
+                ETGModConsole.Log($"  {setupAtlasesWatch.ElapsedMilliseconds,      5}ms       setupAtlases     ");
+                ETGModConsole.Log($"  {setupShadersWatch.ElapsedMilliseconds,      5}ms       setupShaders     ");
+                ETGModConsole.Log($"  {awaitEarlyHarmonyWatch.ElapsedMilliseconds, 5}ms       awaitEarlyHarmony");
+                ETGModConsole.Log($"  {setupConfig1Watch.ElapsedMilliseconds,      5}ms       setupConfig1     ");
+                ETGModConsole.Log($"  {setupConfig2Watch.ElapsedMilliseconds,      5}ms       setupConfig2     ");
+                ETGModConsole.Log($"  {setupAudioWatch.ElapsedMilliseconds,        5}ms ASYNC setupAudio       ");
+                ETGModConsole.Log($"  {setupSaveWatch.ElapsedMilliseconds,         5}ms ASYNC setupSave        ");
+                ETGModConsole.Log($"  {setupGunsWatch.ElapsedMilliseconds,         5}ms       setupGuns        ");
+                ETGModConsole.Log($"  {setupActivesWatch.ElapsedMilliseconds,      5}ms       setupActives     ");
+                ETGModConsole.Log($"  {setupPassivesWatch.ElapsedMilliseconds,     5}ms       setupPassives    ");
+                ETGModConsole.Log($"  {setupUIWatch.ElapsedMilliseconds,           5}ms       setupUI          ");
+                ETGModConsole.Log($"  {awaitLateHarmonyWatch.ElapsedMilliseconds,  5}ms       awaitLateHarmony ");
+                ETGModConsole.Log($"  {setupFloorsWatch.ElapsedMilliseconds,       5}ms       setupFloors      ");
+                ETGModConsole.Log($"  {setupBossesWatch.ElapsedMilliseconds,       5}ms       setupBosses      ");
+                ETGModConsole.Log($"  {awaitItemsWatch.ElapsedMilliseconds,        5}ms       awaitItems       ");
+                ETGModConsole.Log($"  {setupSynergiesWatch.ElapsedMilliseconds,    5}ms       setupSynergies   ");
+                ETGModConsole.Log($"  {setupShopsWatch.ElapsedMilliseconds,        5}ms       setupShops       ");
+                ETGModConsole.Log($"  {awaitAsyncWatch.ElapsedMilliseconds,        5}ms       awaitAsync       ");
                 long newMemory = currentProcess.WorkingSet64;
                 ETGModConsole.Log($"allocated {(newMemory - oldMemory).ToString("N0")} bytes of memory along the way");
                 ETGModMainBehaviour.Instance.gameObject.Play("vc_kirby_appeal01");

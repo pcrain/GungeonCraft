@@ -225,13 +225,8 @@
     <EmbeddedResource Include="Resources\Atlases\atlas_1.png"/>
     <EmbeddedResource Include="Resources\Atlases\atlas_1.atlas"/>
     <EmbeddedResource Include="Resources\Sounds\CwaffingTheGungy.bnk"/>
-    <EmbeddedResource Include="Resources\Rooms\barter-old.newroom"/>
-    <EmbeddedResource Include="Resources\Rooms\petshop-old.newroom"/>
     <EmbeddedResource Include="Resources\Rooms\barter.newroom"/>
-    <EmbeddedResource Include="Resources\Rooms\BasicShopRoom.room"/>
     <EmbeddedResource Include="Resources\Rooms\petshop.newroom"/>
-    <EmbeddedResource Include="Resources\Rooms\petshop-old2.newroom"/>
-    <EmbeddedResource Include="Resources\Rooms\BasicShopRoom.newroom"/>
     <EmbeddedResource Include="Resources\Rooms\BasicShopRoom2.newroom"/>
     <Reference Include="UnityEngine.ClothModule"/>
     <Reference Include="UnityEngine.UnityConnectModule"/>

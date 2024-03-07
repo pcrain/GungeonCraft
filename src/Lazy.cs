@@ -34,7 +34,6 @@ public static class Lazy
         if (typeof(TItemClass) == typeof(Gun))
         {
             GameObject go          = UnityEngine.Object.Instantiate(ItemHelper.Get(Items.PeaShooter).gameObject);
-            // GameObject go          = BasicGunFromScratch(itemName); //NOTE: this doesn't seem to be any faster and is error-prone
             go.name                = spritePath;
 
             Gun gun                = go.GetComponent<Gun>();
@@ -44,21 +43,19 @@ public static class Lazy
             gun.singleModule       = null;
             gun.RawSourceVolley    = ScriptableObject.CreateInstance<ProjectileVolleyData>();
             gun.Volley.projectiles = new List<ProjectileModule>();
-
-            item = gun as TItemClass;
-            ammonomiconSprite = $"{spritePath}_ammonomicon";
-
             gun.QuickUpdateGunAnimations(); // includes setting the default sprite
 
             if (int.TryParse(projectileName, out int projectileId))
                 gun.AddProjectileModuleFrom(PickupObjectDatabase.GetById(projectileId) as Gun, true, true); //set the gun's default projectile to inherit
             else
                 gun.AddProjectileModuleFrom(projectileName, true, false); //set the gun's default projectile to inherit
+
+            ammonomiconSprite = $"{spritePath}_ammonomicon";
+            item = gun as TItemClass;
         }
         else
         {
             GameObject obj = new GameObject(itemName).RegisterPrefab();
-            item = obj.AddComponent<TItemSpecific>();
 
             tk2dSpriteCollectionData coll = ETGMod.Databases.Items.ItemCollection;
             tk2dSprite sprite = obj.AddComponent<tk2dSprite>();
@@ -68,6 +65,7 @@ public static class Lazy
             obj.GetComponent<BraveBehaviour>().sprite = sprite;
 
             ammonomiconSprite = spritePath;
+            item = obj.AddComponent<TItemSpecific>();
         }
 
         ETGMod.Databases.Items.SetupItem(item, itemName);
