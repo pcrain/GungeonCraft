@@ -604,10 +604,10 @@ public static class Lazy
             position1                  = opos + new Vector3((x+1) * newExtents.x, y       * newExtents.y, 0f),
             position2                  = opos + new Vector3(x     * newExtents.x, (y + 1) * newExtents.y, 0f),
             position3                  = opos + new Vector3((x+1) * newExtents.x, (y + 1) * newExtents.y, 0f),
-            boundsDataExtents          = orig.boundsDataExtents,
-            boundsDataCenter           = orig.boundsDataCenter,
-            untrimmedBoundsDataExtents = orig.untrimmedBoundsDataExtents,
-            untrimmedBoundsDataCenter  = orig.untrimmedBoundsDataCenter,
+            boundsDataExtents          = orig.boundsDataExtents/*.TransposeIf(isRotated)*/,
+            boundsDataCenter           = orig.boundsDataCenter/*.TransposeIf(isRotated)*/,
+            untrimmedBoundsDataExtents = orig.untrimmedBoundsDataExtents/*.TransposeIf(isRotated)*/,
+            untrimmedBoundsDataCenter  = orig.untrimmedBoundsDataCenter/*.TransposeIf(isRotated)*/,
             uvs                        = newUvs,
         };
         _FragmentDict[fragmentName] = def;

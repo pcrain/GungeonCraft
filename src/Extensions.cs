@@ -1684,4 +1684,30 @@ public static class Extensions
     // ETGModConsole.Log($"checked bullet script {bsb.bullet?.BulletBank?.ActorName ?? "unknown"}");
     return bsb.bullet?.BulletBank?.aiActor;
   }
+
+  /// <summary>Swaps the x and y components of a Vector2 if a boolean is set</summary>
+  public static Vector2 TransposeIf(this Vector2 self, bool condition)
+  {
+    if (condition)
+      return new Vector2(self.y, self.x);
+    return self;
+  }
+
+  /// <summary>Swaps the x and y components of a Vector3 if a boolean is set</summary>
+  public static Vector3 TransposeIf(this Vector3 self, bool condition)
+  {
+    if (condition)
+      return new Vector3(self.y, self.x, self.z);
+    return self;
+  }
+
+  /// <summary>Spawns an enemy in and skips the awakening animation + all other startup behaviors</summary>
+  public static void SpawnInInstantly(this AIActor enemy)
+  {
+    enemy.HasDonePlayerEnterCheck = true;
+    enemy.IsInReinforcementLayer = true;
+    enemy.ToggleRenderers(true);
+    enemy.OnEngaged(true);
+    enemy.aiAnimator.EndAnimation();
+  }
 }
