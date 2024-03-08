@@ -545,4 +545,72 @@ public static class Lazy
             return null;
         return ipoint;
     }
+
+    private static Dictionary<string, tk2dSpriteDefinition> _FragmentDict = new();
+    /// <summary>Breaks a sprite into edgeSize x edgeSize smaller sprite fragments, and returns a definition for the (x,y)th fragment </summary>
+    public static tk2dSpriteDefinition GetSpriteFragment(tk2dSpriteDefinition orig, int x, int y, int edgeSize)
+    {
+        string fragmentName = $"{orig.name}_{x}_{y}_{edgeSize}";
+        if (_FragmentDict.TryGetValue(fragmentName, out tk2dSpriteDefinition cachedDef))
+            return cachedDef;
+
+        // If the x coordinate of the first two UVs match, we're using a rotated sprite
+        bool isRotated = (orig.uvs[0].x == orig.uvs[1].x);
+
+        float fragSize     = 1f / (float)edgeSize;
+        Vector3 opos       = orig.position0;
+        Vector2 newExtents = fragSize * orig.boundsDataExtents;
+        Vector2 newgap     = fragSize * (orig.uvs[3] - orig.uvs[0]);
+
+        Vector2[] newUvs;
+        if (isRotated) // math gets a little more complicated when individual fragment UVs and positions need to be rotated
+        {
+            int rotx       = y;
+            int roty       = edgeSize - x - 1;
+            Vector2 newmin = orig.uvs[0] + new Vector2(rotx       * newgap.x, roty       * newgap.y);
+            Vector2 newmax = orig.uvs[0] + new Vector2((rotx + 1) * newgap.x, (roty + 1) * newgap.y);
+            newUvs         = new Vector2[]
+                { //NOTE: texture is flipped vertically in memory AND rotated horizontally in the atlas
+                  new Vector2(newmin.x, newmax.y),
+                  newmin,
+                  newmax,
+                  new Vector2(newmax.x, newmin.y),
+                };
+        }
+        else
+        {
+            Vector2 newmin = orig.uvs[0] + new Vector2(x       * newgap.x, y       * newgap.y);
+            Vector2 newmax = orig.uvs[0] + new Vector2((x + 1) * newgap.x, (y + 1) * newgap.y);
+            newUvs         = new Vector2[]
+                { //NOTE: texture is flipped vertically in memory
+                  newmin,
+                  new Vector2(newmax.x, newmin.y),
+                  new Vector2(newmin.x, newmax.y),
+                  newmax,
+                };
+        }
+
+        tk2dSpriteDefinition def = new tk2dSpriteDefinition
+        {
+            name                       = fragmentName,
+            texelSize                  = orig.texelSize,
+            flipped                    = orig.flipped,
+            physicsEngine              = orig.physicsEngine,
+            colliderType               = orig.colliderType,
+            collisionLayer             = orig.collisionLayer,
+            material                   = orig.material,
+            materialInst               = orig.materialInst,
+            position0                  = opos + new Vector3(x     * newExtents.x, y       * newExtents.y, 0f),
+            position1                  = opos + new Vector3((x+1) * newExtents.x, y       * newExtents.y, 0f),
+            position2                  = opos + new Vector3(x     * newExtents.x, (y + 1) * newExtents.y, 0f),
+            position3                  = opos + new Vector3((x+1) * newExtents.x, (y + 1) * newExtents.y, 0f),
+            boundsDataExtents          = orig.boundsDataExtents,
+            boundsDataCenter           = orig.boundsDataCenter,
+            untrimmedBoundsDataExtents = orig.untrimmedBoundsDataExtents,
+            untrimmedBoundsDataCenter  = orig.untrimmedBoundsDataCenter,
+            uvs                        = newUvs,
+        };
+        _FragmentDict[fragmentName] = def;
+        return def;
+    }
 }

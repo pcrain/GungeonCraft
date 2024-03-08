@@ -1,4 +1,4 @@
-﻿namespace CwaffingTheGungy;
+namespace CwaffingTheGungy;
 
 
 /* TODO:
@@ -30,12 +30,16 @@ public class AlienNailgun : AdvancedGunBehavior
     private const int _FRAGMENTS           = _FRAGMENT_EDGE * _FRAGMENT_EDGE;
     private const float _FRAGMENT_GAP      = _RECONSTRUCT_TIME / (float)_FRAGMENTS;
 
-    private Coroutine _dnaReconstruct = null;
+    internal static GameActorCharmEffect _Charm = null;
+    internal static List<AIActor> _Replicants       = new();
+
+    private Coroutine _dnaReconstruct       = null;
     private List<string> _registeredEnemies = new();
-    private int _spawnIndex = -1;
-    private string _targetGuid = null;
-    private float _curChargeTime = 0.0f;
-    private List<GameObject> _fragments = new();
+    private int _spawnIndex                 = -1;
+    private string _targetGuid              = null;
+    private float _curChargeTime            = 0.0f;
+    private bool _constructionComplete      = false;
+    private List<GameObject> _fragments     = new();
 
     public static void Add()
     {
@@ -51,6 +55,15 @@ public class AlienNailgun : AdvancedGunBehavior
         gun.InitProjectile(GunData.New(clipSize: 16, cooldown: 0.25f, shootStyle: ShootStyle.Charged, damage: 2.0f,
             sprite: "alien_nailgun_projectile", customClip: true, chargeTime: 0.0f, useDummyChargeModule: true)
           );
+
+        _Charm = new(){
+            AffectsPlayers   = false,
+            AffectsEnemies   = true,
+            effectIdentifier = "replicant",
+            resistanceType   = 0,
+            stackMode        = GameActorEffect.EffectStackingMode.Refresh,
+            duration         = 36000f,
+            };
     }
 
     public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
@@ -81,11 +94,13 @@ public class AlienNailgun : AdvancedGunBehavior
             return;
         if (BraveTime.DeltaTime == 0.0f)
             return;
-        if (!this.gun.IsCharging)
+        if (!this.gun.IsCharging || !this.Player.IsInCombat)
         {
             StopReconstruction();
             return;
         }
+        if (this._constructionComplete)
+            return; // idle until we release the charge button
         // this._dnaReconstruct ??= StartCoroutine(ReconstructFromDNA(this._targetGuid ?? Enemies.RedShotgunKin)); //NOTE: not rotated
         this._dnaReconstruct ??= StartCoroutine(ReconstructFromDNA(this._targetGuid ?? Enemies.GunNut)); //NOTE: rotated
         // this._dnaReconstruct ??= StartCoroutine(ReconstructFromDNA(this._targetGuid ?? Enemies.BulletKin)); //NOTE: rotated
@@ -112,19 +127,72 @@ public class AlienNailgun : AdvancedGunBehavior
             }
             yield return null;
         }
+
+        // finish reconstruction process
+        this._constructionComplete = true;
+        AIActor replicant = AIActor.Spawn(EnemyDatabase.GetOrLoadByGuid(guid), position.ToIntVector2(VectorConversions.Floor), position.GetAbsoluteRoom(), true);
+        if (replicant)
+        {
+            replicant.sprite.PlaceAtPositionByAnchor(position, Anchor.MiddleCenter);
+            replicant.specRigidbody.Initialize();
+            replicant.IgnoreForRoomClear = true;
+            replicant.ApplyEffect(AlienNailgun._Charm);
+            replicant.sprite.usesOverrideMaterial = true;
+            replicant.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/HologramShader");
+            _Replicants.Add(replicant);
+        }
+        foreach (GameObject g in this._fragments)
+            g.SafeDestroy();
+        this._fragments.Clear();
         yield break;
     }
 
-    public override void OnDropped()
+    //NOTE: makes sure AIActor is set properly on bullet script bullets; should probably be moved to a better location later
+    [HarmonyPatch(typeof(AIBulletBank), nameof(AIBulletBank.BulletSpawnedHandler))]
+    private class GetRealProjectileOwnerPatch
     {
-        base.OnDropped();
+        public static void Postfix(AIBulletBank __instance, Bullet bullet)
+        {
+            if (bullet.Parent.GetComponent<Projectile>() is not Projectile p)
+                return;
+            if (__instance.aiActor is not AIActor actor)
+                return;
+            p.Owner = actor;
+            CheckFromReplicantOwner(p);
+        }
+    }
+
+    protected override void OnPickedUpByPlayer(PlayerController player)
+    {
+        if (!this.everPickedUpByPlayer)
+            StaticReferenceManager.ProjectileAdded += CheckFromReplicantOwner;
+        base.OnPickedUpByPlayer(player);
+        player.OnRoomClearEvent += DestroyReplicants;
+    }
+
+    protected override void OnPostDroppedByPlayer(PlayerController player)
+    {
+        player.OnRoomClearEvent -= DestroyReplicants;
         StopReconstruction();
+        DestroyReplicants(player);
+        base.OnPostDroppedByPlayer(player);
     }
 
     public override void OnSwitchedAwayFromThisGun()
     {
         base.OnSwitchedAwayFromThisGun();
         StopReconstruction();
+    }
+
+    private static void CheckFromReplicantOwner(Projectile p)
+    {
+        if (!p || p.Owner is not AIActor enemy)
+            return;
+        if (!_Replicants.Contains(enemy))
+            return;
+        p.StopCollidingWithPlayers();
+        p.sprite.usesOverrideMaterial = true;
+        p.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/HologramShader");
     }
 
     private void StopReconstruction()
@@ -138,97 +206,51 @@ public class AlienNailgun : AdvancedGunBehavior
             this._fragments.Clear();
         }
         this._curChargeTime = 0.0f;
+        this._constructionComplete = false;
     }
 
     private static GameObject CreateEnemyFragment(string guid, int index, Vector2 position)
     {
-
         AIActor enemy                 = EnemyDatabase.GetOrLoadByGuid(guid);
         int bestSpriteId              = CwaffToolbox.GetIdForBestIdleAnimation(enemy);
         tk2dSpriteCollectionData coll = enemy.sprite.collection;
         tk2dSpriteDefinition baseDef  = coll.spriteDefinitions[bestSpriteId];
-        tk2dSpriteDefinition fragDef  = GetSpriteFragment(
+        tk2dSpriteDefinition fragDef  = Lazy.GetSpriteFragment(
             orig     : baseDef,
             x        : index % _FRAGMENT_EDGE,
             y        : index / _FRAGMENT_EDGE,
-            edgeSize : _FRAGMENT_EDGE,
-            coll     : coll
+            edgeSize : _FRAGMENT_EDGE
             );
-        int newSpriteId = coll.spriteDefinitions.Length;
-        Array.Resize(ref coll.spriteDefinitions, coll.spriteDefinitions.Length + 1);
-        coll.spriteDefinitions[newSpriteId] = fragDef;
+
+        string fragName = fragDef.name;
+        int newSpriteId;
+        if (coll.spriteNameLookupDict == null)
+            coll.InitDictionary();
+        if (!coll.spriteNameLookupDict.TryGetValue(fragName, out newSpriteId))
+        {
+            newSpriteId = coll.spriteDefinitions.Length;
+            Array.Resize(ref coll.spriteDefinitions, coll.spriteDefinitions.Length + 1);
+            coll.spriteDefinitions[newSpriteId] = fragDef;
+            coll.spriteNameLookupDict[fragName] = newSpriteId;
+        }
 
         GameObject g = new GameObject();
         tk2dSprite sprite = g.AddComponent<tk2dSprite>();
         sprite.SetSprite(coll, newSpriteId);
         sprite.PlaceAtPositionByAnchor(position, Anchor.MiddleCenter);
+        sprite.usesOverrideMaterial = true;
+        sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/HologramShader");
         return g;
     }
 
-    private static Dictionary<string, tk2dSpriteDefinition> _FragmentDict = new();
-    private static tk2dSpriteDefinition GetSpriteFragment(tk2dSpriteDefinition orig, int x, int y, int edgeSize, tk2dSpriteCollectionData coll)
+    private static void DestroyReplicants(PlayerController player)
     {
-        string fragmentName = $"{orig.name}_{x}_{y}_{edgeSize}";
-        if (_FragmentDict.TryGetValue(fragmentName, out tk2dSpriteDefinition cachedDef))
-            return cachedDef;
-
-        // If the x coordinate of the first two UVs match, we're using a rotated sprite
-        bool isRotated = (orig.uvs[0].x == orig.uvs[1].x);
-
-        float fragSize     = 1f / (float)edgeSize;
-        Vector3 opos       = orig.position0;
-        Vector2 newExtents = fragSize * orig.boundsDataExtents;
-        Vector2 newgap     = fragSize * (orig.uvs[3] - orig.uvs[0]);
-
-        Vector2[] newUvs;
-        if (isRotated) // math gets a little more complicated when individual fragment UVs and positions need to be rotated
+        foreach (AIActor replicant in _Replicants)
         {
-            int rotx = y;
-            int roty = edgeSize - x - 1;
-            Vector2 newmin = orig.uvs[0] + new Vector2(rotx       * newgap.x, roty       * newgap.y);
-            Vector2 newmax = orig.uvs[0] + new Vector2((rotx + 1) * newgap.x, (roty + 1) * newgap.y);
-            newUvs         = new Vector2[]
-                { //NOTE: texture is flipped vertically in memory AND rotated horizontally in the atlas
-                  new Vector2(newmin.x, newmax.y),
-                  newmin,
-                  newmax,
-                  new Vector2(newmax.x, newmin.y),
-                };
+            if (!replicant)
+                continue;
+            replicant.EraseFromExistence();
         }
-        else
-        {
-            Vector2 newmin = orig.uvs[0] + new Vector2(x       * newgap.x, y       * newgap.y);
-            Vector2 newmax = orig.uvs[0] + new Vector2((x + 1) * newgap.x, (y + 1) * newgap.y);
-            newUvs         = new Vector2[]
-                { //NOTE: texture is flipped vertically in memory
-                  newmin,
-                  new Vector2(newmax.x, newmin.y),
-                  new Vector2(newmin.x, newmax.y),
-                  newmax,
-                };
-        }
-
-        tk2dSpriteDefinition def = new tk2dSpriteDefinition
-        {
-            name                       = fragmentName,
-            texelSize                  = orig.texelSize,
-            flipped                    = orig.flipped,
-            physicsEngine              = orig.physicsEngine,
-            colliderType               = orig.colliderType,
-            collisionLayer             = orig.collisionLayer,
-            material                   = orig.material,
-            materialInst               = orig.materialInst,
-            position0                  = opos + new Vector3(x     * newExtents.x, y       * newExtents.y, 0f),
-            position1                  = opos + new Vector3((x+1) * newExtents.x, y       * newExtents.y, 0f),
-            position2                  = opos + new Vector3(x     * newExtents.x, (y + 1) * newExtents.y, 0f),
-            position3                  = opos + new Vector3((x+1) * newExtents.x, (y + 1) * newExtents.y, 0f),
-            boundsDataExtents          = orig.boundsDataExtents,
-            boundsDataCenter           = orig.boundsDataCenter,
-            untrimmedBoundsDataExtents = orig.untrimmedBoundsDataExtents,
-            untrimmedBoundsDataCenter  = orig.untrimmedBoundsDataCenter,
-            uvs                        = newUvs,
-        };
-        _FragmentDict[fragmentName] = def;
-        return def;
+        _Replicants.Clear();
     }
 }

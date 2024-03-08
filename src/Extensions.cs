@@ -1655,4 +1655,33 @@ public static class Extensions
       ints.Add(x++);
     return ints;
   }
+
+  /// <summary>Disable a projectile's collision with players</summary>
+  public static void StopCollidingWithPlayers(this Projectile p)
+  {
+      p.collidesWithPlayer = false;  // doesn't actually do anything directly, but semantically it's nice to set this
+      foreach (PixelCollider pc in p.specRigidbody.PixelColliders) // actually does the heavy lifting
+          pc.CollisionLayerIgnoreOverride |= CollisionMask.LayerToMask(CollisionLayer.PlayerHitBox);
+  }
+
+  /// <summary>Get true owner of projectile, including those that came from bullet scripts</summary>
+  public static GameActor GetTrueActor(this Projectile p)
+  {
+    // ETGModConsole.Log($"check performed");
+    if (p.GetComponent<BulletScriptBehavior>() is not BulletScriptBehavior bsb)
+      return p.Owner;
+    // ETGModConsole.Log($"owned by {p.OwnerName}");
+    // Dissect.DumpComponents(p.gameObject);
+    // Dissect.DumpFieldsAndProperties<Projectile>(p);
+    if (bsb.bullet == null)
+      return null;
+    // Dissect.DumpFieldsAndProperties<Bullet>(bsb.bullet);
+    // if (bsb.aiActor) ETGModConsole.Log($"actor");
+    // if (bsb.aiShooter) ETGModConsole.Log($"shooter");
+    // if (bsb.bulletBank) ETGModConsole.Log($"bank");
+    // if (bsb.gameActor) ETGModConsole.Log($"gameactor");
+    // if (bsb.encounterTrackable) ETGModConsole.Log($"encounterTrackable");
+    // ETGModConsole.Log($"checked bullet script {bsb.bullet?.BulletBank?.ActorName ?? "unknown"}");
+    return bsb.bullet?.BulletBank?.aiActor;
+  }
 }

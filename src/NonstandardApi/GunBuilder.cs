@@ -176,7 +176,7 @@ public static class GunBuilder
     if (b.shootStyle == ShootStyle.Charged)
     {
       mod.chargeProjectiles = new();
-      if (b.chargeTime > 0)
+      if (b.chargeTime >= 0) //WARNING: recently changed this from > to >=, verify nothing breaks
       {
         mod.chargeProjectiles.Add(new ProjectileModule.ChargeProjectile {
           Projectile = proj,
