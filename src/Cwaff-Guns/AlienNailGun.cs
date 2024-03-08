@@ -1,31 +1,20 @@
 namespace CwaffingTheGungy;
 
-
 /* TODO:
-    - when colliding with an enemy
-        - if enemy is killed
-            - fragment them into 16 mini sprites
-            - siphon fragments into alien nail gun
-            - register enemy as killed
-    - when reloading with full ammo
-        - switch with registered enemy will be spawned
-    - when firing charged shot
-        - decrease ammo by 10
-        - spawn a temporary charmed hologram of an enemy
-
-    - add save serialization stuff
+    - nothing for now :D
 */
 
 public class AlienNailgun : AdvancedGunBehavior
 {
     public static string ItemName         = "Alien Nailgun";
     public static string ProjectileName   = "38_special";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
+    public static string ShortDescription = "Attack, Adapt, Assimilate";
+    public static string LongDescription  = "Fires nails that extract DNA when dealing the fatal blow to enemies. Charging the gun while in combat consumes a full clip of ammo to assemble a replicant enemy from DNA. Replicants are invulnerable, have no collision, cannot harm the player with projectiles or contact damage, and dissipate when combat ends. Reloading with a full clip cycles through extracted DNA sequences.";
     public static string Lore             = "TBD";
 
-    private const float _RECONSTRUCT_DELAY   = 0.25f;
-    private const float _RECONSTRUCT_TIME    = 2.0f;
+    private const float _RECONSTRUCT_DELAY   = 0.2f;
+    private const float _RECONSTRUCT_TIME    = 1.3f;
+    private const int   _RECONSTRUCT_COST    = 16;
     private const float _FRAGMENT_SPAWN_TIME = 0.3f;
     private const float _PREVIEW_TIME        = 0.8f;
     private const int _FRAGMENT_EDGE         = 4;
@@ -47,17 +36,18 @@ public class AlienNailgun : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<AlienNailgun>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 0.7f, ammo: 480);
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 0.7f, ammo: 480);
             gun.SetAnimationFPS(gun.idleAnimation, 24);
             gun.SetAnimationFPS(gun.shootAnimation, 24);
+            gun.SetAnimationFPS(gun.reloadAnimation, 60);
+            gun.LoopAnimation(gun.reloadAnimation);
             gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
-            gun.SetFireAudio("paintball_shoot_sound");
-            gun.SetReloadAudio("paintball_reload_sound");
+            gun.SetFireAudio("alien_nailgun_shoot_sound");
+            gun.SetReloadAudio("gorgun_eye_activate");
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
-        gun.InitProjectile(GunData.New(clipSize: 16, cooldown: 0.25f, shootStyle: ShootStyle.Charged, damage: 2.0f,
-            sprite: "alien_nailgun_projectile", customClip: true, chargeTime: 0.0f, useDummyChargeModule: true)
-          );
+        gun.InitProjectile(GunData.New(clipSize: _RECONSTRUCT_COST, cooldown: 0.14f, shootStyle: ShootStyle.Charged, damage: 2.0f,
+            sprite: "alien_nailgun_projectile", customClip: true, chargeTime: 0.0f, useDummyChargeModule: true));
 
         _Charm = new(){
             AffectsPlayers   = false,
@@ -84,19 +74,8 @@ public class AlienNailgun : AdvancedGunBehavior
             return;
         if (player.IsDodgeRolling || !player.AcceptingNonMotionInput)
             return;
-
         if (this._registeredEnemies.Count == 0)
-        {
-            // if (C.DEBUG_BUILD)
-            // {
-            //     this._registeredEnemies.Add(Enemies.GunNut); //TODO: testing
-            //     this._registeredEnemies.Add(Enemies.RedShotgunKin); //TODO: testing
-            //     this._registeredEnemies.Add(Enemies.BulletKin); //TODO: testing
-            //     this._spawnIndex = 0;
-            // }
-            // else
-                return;
-        }
+            return;
 
         if (this._preview) // only cycle if the preview is already visiblew, otherwise just show the current selection
             this._spawnIndex = (this._spawnIndex + 1) % this._registeredEnemies.Count;
@@ -140,13 +119,16 @@ public class AlienNailgun : AdvancedGunBehavior
         if (!this.gun.IsCharging || !this.Player.IsInCombat)
         {
             StopReconstruction();
+            this.gun.SynchronizeReloadAcrossAllModules();
             return;
         }
         if (this._constructionComplete)
             return; // idle until we release the charge button
         if (string.IsNullOrEmpty(this._targetGuid))
             return; // nothing to construct
-        this._dnaReconstruct ??= StartCoroutine(ReconstructFromDNA(this._targetGuid)); //NOTE: rotated
+        if (this.gun.CurrentAmmo < _RECONSTRUCT_COST)
+            return; // can't afford to construct
+        this._dnaReconstruct ??= StartCoroutine(ReconstructFromDNA(this._targetGuid));
     }
 
     private IEnumerator ReconstructFromDNA(string guid)
@@ -177,14 +159,13 @@ public class AlienNailgun : AdvancedGunBehavior
         yield return new WaitForSeconds(_FRAGMENT_SPAWN_TIME);
         if (this.Player)
             this.Player.gameObject.Play("replicant_created_sound");
-        yield return new WaitForSeconds(_FRAGMENT_SPAWN_TIME);
 
         // finish reconstruction process
         AIActor replicant = AIActor.Spawn(
             prefabActor     : EnemyDatabase.GetOrLoadByGuid(guid),
             position        : position.ToIntVector2(VectorConversions.Floor),
             source          : position.GetAbsoluteRoom(),
-            correctForWalls : true,
+            correctForWalls : true, //NOTE: could possibly be false, Chain Gunners don't have good offsets when spawned like this
             awakenAnimType  : AIActor.AwakenAnimationType.Spawn
             );
         if (replicant)
@@ -194,22 +175,46 @@ public class AlienNailgun : AdvancedGunBehavior
             replicant.specRigidbody.Initialize();
             replicant.specRigidbody.CollideWithOthers = false;
             replicant.specRigidbody.CollideWithTileMap = false;
+            replicant.specRigidbody.AddCollisionLayerIgnoreOverride(CollisionMask.LayerToMask(CollisionLayer.Projectile));
+            replicant.HitByEnemyBullets = false;
             replicant.IgnoreForRoomClear = true;
             replicant.IsHarmlessEnemy = true;
             replicant.ApplyEffect(AlienNailgun._Charm);
             replicant.sprite.usesOverrideMaterial = true;
             replicant.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/HologramShader");
             replicant.sprite.renderer.material.SetFloat("_IsGreen", 1f);
+            if (replicant.GetComponent<SpawnEnemyOnDeath>() is SpawnEnemyOnDeath seod)
+                seod.chanceToSpawn = 0.0f; // prevent enemies such as Blobulons from replicating on death
+            if (replicant.healthHaver is HealthHaver hh)
+                hh.IsVulnerable = false; // can't be harmed
+            if (replicant.knockbackDoer is KnockbackDoer kb)
+                kb.SetImmobile(true, "replicant"); // can't be knocked back
+            if (replicant.CurrentGun is Gun gun)
+            {
+                gun.sprite.usesOverrideMaterial = true;
+                gun.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/HologramShader");
+                gun.sprite.renderer.material.SetFloat("_IsGreen", 1f);
+            }
+            for (int i = 0; i < replicant.transform.childCount; ++i)
+            {
+                Transform child = replicant.transform.GetChild(i);
+                if (child.GetComponent<tk2dSprite>() is not tk2dSprite sprite)
+                    continue;
+                sprite.usesOverrideMaterial = true;
+                sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/HologramShader");
+                sprite.renderer.material.SetFloat("_IsGreen", 1f);
+            }
             _Replicants.Add(replicant);
         }
         foreach (GameObject g in this._fragments)
             g.SafeDestroy();
         this._fragments.Clear();
+        this.gun.LoseAmmo(_RECONSTRUCT_COST);
         this._constructionComplete = true;
         yield break;
     }
 
-    //NOTE: makes sure AIActor is set properly on bullet script bullets; should probably be moved to a better location later
+    //NOTE: makes sure AIActor is set properly on bullet scripts; should probably factor out CheckFromReplicantOwner() and moved to a better location later
     [HarmonyPatch(typeof(AIBulletBank), nameof(AIBulletBank.BulletSpawnedHandler))]
     private class GetRealProjectileOwnerPatch
     {
@@ -328,6 +333,24 @@ public class AlienNailgun : AdvancedGunBehavior
         this._spawnIndex = this._registeredEnemies.Count - 1;
         SwitchEnemyToSpawn(this._registeredEnemies[this._spawnIndex], isNew: true);
     }
+
+    public override void MidGameSerialize(List<object> data, int i)
+    {
+        base.MidGameSerialize(data, i);
+        data.Add(this._registeredEnemies.Count);
+        foreach (string enemy in this._registeredEnemies)
+            data.Add(enemy);
+    }
+
+    public override void MidGameDeserialize(List<object> data, ref int i)
+    {
+        base.MidGameDeserialize(data, ref i);
+        int count = (int)data[i++];
+        for (int n = 0; n < count; ++n)
+            this._registeredEnemies.Add((string)data[i++]);
+        if (count > 0)
+            this._spawnIndex = 0;
+    }
 }
 
 public class EnemyFragment : MonoBehaviour
@@ -382,6 +405,7 @@ public class EnemyFragment : MonoBehaviour
     }
 }
 
+/// <summary>Class to temporarily make projectiles replicants without the shader effects bleeding back into the projectile pool</summary>
 public class ReplicantProjectile : MonoBehaviour
 {
     private Shader _oldShader = null;
@@ -423,8 +447,7 @@ public class ExtractDNAOnKill : MonoBehaviour
     {
         if (enemyBody.GetComponent<AIActor>() is not AIActor enemy)
             return;
-        if (!enemy.IsHostileAndNotABoss(canBeDead: true))
-            return;
-        this._gun.RegisterEnemyDNA(enemy.EnemyGuid);
+        if (enemy.IsHostileAndNotABoss(canBeDead: true, canBeNeutral: false))
+            this._gun.RegisterEnemyDNA(enemy.EnemyGuid);
     }
 }

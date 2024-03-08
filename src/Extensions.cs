@@ -254,7 +254,7 @@ public static class Extensions
   }
 
   /// <summary>Loop a gun's animation</summary>
-  public static void LoopAnimation(this Gun gun, string animationName, int loopStart)
+  public static void LoopAnimation(this Gun gun, string animationName, int loopStart = 0)
   {
     gun.GetComponent<tk2dSpriteAnimator>().GetClipByName(animationName).wrapMode = tk2dSpriteAnimationClip.WrapMode.LoopSection;
     gun.GetComponent<tk2dSpriteAnimator>().GetClipByName(animationName).loopStart = loopStart;
