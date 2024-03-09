@@ -422,16 +422,18 @@ public static class Extensions
   }
 
   /// <summary>Get a list including all of a players' passives, actives, and guns</summary>
-  public static List<PickupObject> AllItems(this PlayerController player)
+  public static IEnumerable<PickupObject> AllItems(this PlayerController player)
   {
-      List<PickupObject> allItems = new();
+      if (!player)
+          yield break;
+
       foreach(PickupObject item in player.passiveItems)
-          allItems.Add(item);
+          yield return item;
       foreach(PickupObject item in player.activeItems)
-          allItems.Add(item);
-      foreach(PickupObject item in player.inventory.AllGuns)
-          allItems.Add(item);
-      return allItems;
+          yield return item;
+      foreach(PickupObject item in player.inventory?.AllGuns.EmptyIfNull())
+          yield return item;
+      yield break;
   }
 
   /// <summary>Get a passive item owned by the player</summary>

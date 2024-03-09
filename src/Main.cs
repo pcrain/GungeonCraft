@@ -462,6 +462,7 @@ public class Initialisation : BaseUnityPlugin
                     // InsuranceBoi.Init();
                     Cammy.Init();
                     Bart.Init();
+                    Kevlar.Init();
                     setupShopsWatch.Stop();
                 // });
                 // setupShopsThread.Start();

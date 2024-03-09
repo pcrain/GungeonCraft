@@ -87,9 +87,9 @@
     <Compile Include="src\Cwaff-Rooms\FancyShopBuilder.cs"/>
     <Compile Include="src\Extensions.cs"/>
     <Compile Include="src\Cwaff-NPCs\Bombo.cs"/>
+    <Compile Include="src\Cwaff-NPCs\Kevlar.cs"/>
     <Compile Include="src\Cwaff-NPCs\Cammy.cs"/>
     <Compile Include="src\Cwaff-NPCs\WhiteMageScrapped.cs"/>
-    <Compile Include="src\Cwaff-NPCs\InsuranceBoi.cs"/>
     <Compile Include="src\Cwaff-NPCs\Bart.cs"/>
     <Compile Include="src\Cwaff-Debug\OneOffDebugDungeonFlow.cs"/>
     <Compile Include="src\Common.cs"/>
@@ -227,6 +227,7 @@
     <EmbeddedResource Include="Resources\Sounds\CwaffingTheGungy.bnk"/>
     <EmbeddedResource Include="Resources\Rooms\barter.newroom"/>
     <EmbeddedResource Include="Resources\Rooms\petshop.newroom"/>
+    <EmbeddedResource Include="Resources\Rooms\insurance.newroom"/>
     <EmbeddedResource Include="Resources\Rooms\BasicShopRoom2.newroom"/>
     <Reference Include="UnityEngine.ClothModule"/>
     <Reference Include="UnityEngine.UnityConnectModule"/>
