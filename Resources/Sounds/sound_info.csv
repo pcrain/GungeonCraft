@@ -141,3 +141,4 @@ kali_explode_sound,-2.0,1,sound
 kali_impact_sound,-3.0,1,sound
 kali_shoot_sound,-3.0,1,sound
 alien_nailgun_shoot_sound,-2.5,1,sound
+gun_synthesizer_activate_sound,4.0,1,sound

@@ -96,7 +96,7 @@ public class Cammy
             npcPosition            : C.PIXEL_SIZE * new Vector2(-3, 44),
             carpetOffset           : C.PIXEL_SIZE * new Vector2(-23, 0),
             itemPositions          : ShopAPI.defaultItemPositions.ShiftAll(C.PIXEL_SIZE * new Vector2(-25, 0)),
-            exactlyOncePerRun      : true,
+            exactlyOncePerRun      : true, //NOTE: necessary to make sure the validator doesn't have to do any heavy lifting (possibly makes validator redundant?)
             canBeRobbed            : false,
             // voice                  : "sans", // will play audio "Play_CHR_<voice>_voice_01"
             genericDialog          : new(){

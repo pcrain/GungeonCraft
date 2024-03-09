@@ -95,9 +95,7 @@ public class AlienNailgun : AdvancedGunBehavior
         this._preview = new GameObject();
         tk2dSprite sprite = this._preview.AddComponent<tk2dSprite>();
             sprite.SetSprite(actor.sprite.collection, CwaffToolbox.GetIdForBestIdleAnimation(actor));
-            sprite.usesOverrideMaterial = true;
-            sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/HologramShader");
-            sprite.renderer.material.SetFloat("_IsGreen", 1f);
+            sprite.MakeHolographic(green: true);
 
         sprite.PlaceAtPositionByAnchor(pc.sprite.WorldTopCenter + new Vector2(0f, 0.5f), Anchor.LowerCenter);
         this._preview.transform.parent = pc.transform;
@@ -180,9 +178,7 @@ public class AlienNailgun : AdvancedGunBehavior
             replicant.IgnoreForRoomClear = true;
             replicant.IsHarmlessEnemy = true;
             replicant.ApplyEffect(AlienNailgun._Charm);
-            replicant.sprite.usesOverrideMaterial = true;
-            replicant.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/HologramShader");
-            replicant.sprite.renderer.material.SetFloat("_IsGreen", 1f);
+            replicant.sprite.MakeHolographic(green: true);
             if (replicant.GetComponent<SpawnEnemyOnDeath>() is SpawnEnemyOnDeath seod)
                 seod.chanceToSpawn = 0.0f; // prevent enemies such as Blobulons from replicating on death
             if (replicant.healthHaver is HealthHaver hh)
@@ -190,19 +186,13 @@ public class AlienNailgun : AdvancedGunBehavior
             if (replicant.knockbackDoer is KnockbackDoer kb)
                 kb.SetImmobile(true, "replicant"); // can't be knocked back
             if (replicant.CurrentGun is Gun gun)
-            {
-                gun.sprite.usesOverrideMaterial = true;
-                gun.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/HologramShader");
-                gun.sprite.renderer.material.SetFloat("_IsGreen", 1f);
-            }
+                gun.sprite.MakeHolographic(green: true);
             for (int i = 0; i < replicant.transform.childCount; ++i)
             {
                 Transform child = replicant.transform.GetChild(i);
                 if (child.GetComponent<tk2dSprite>() is not tk2dSprite sprite)
                     continue;
-                sprite.usesOverrideMaterial = true;
-                sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/HologramShader");
-                sprite.renderer.material.SetFloat("_IsGreen", 1f);
+                sprite.MakeHolographic(green: true);
             }
             _Replicants.Add(replicant);
         }
@@ -306,10 +296,8 @@ public class AlienNailgun : AdvancedGunBehavior
         tk2dSprite sprite = g.AddComponent<tk2dSprite>();
         sprite.SetSprite(coll, newSpriteId);
         sprite.PlaceAtPositionByAnchor(startPosition, Anchor.MiddleCenter);
-        g.AddComponent<EnemyFragment>().Setup(startPosition, targetPosition, travelTime, delay, autoDestroy);
-        sprite.usesOverrideMaterial = true;
-        sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/HologramShader");
-        sprite.renderer.material.SetFloat("_IsGreen", 1f);
+        g.AddComponent<DissipatingSpriteFragment>().Setup(startPosition, targetPosition, travelTime, delay, autoDestroy);
+        sprite.MakeHolographic(green: true);
         return g;
     }
 
@@ -355,58 +343,6 @@ public class AlienNailgun : AdvancedGunBehavior
     }
 }
 
-public class EnemyFragment : MonoBehaviour
-{
-    Vector2 _start     = Vector2.zero;
-    Vector2 _target    = Vector2.zero;
-    float _time        = 0f;
-    float _lifetime    = 0f;
-    float _delay       = 0f;
-    bool _autoDestroy  = false;
-    bool _setup        = false;
-    tk2dSprite _sprite = null;
-
-    public void Setup(Vector2 start, Vector2 target, float time, float delay = 0.0f, bool autoDestroy = false)
-    {
-        this._start       = start;
-        this._target      = target;
-        this._time        = time;
-        this._sprite      = base.GetComponent<tk2dSprite>();
-        this._delay       = delay;
-        this._autoDestroy = autoDestroy;
-        this._setup       = true;
-    }
-
-    private void Update()
-    {
-        if (!this._setup)
-            return;
-
-        this._lifetime += BraveTime.DeltaTime;
-        if (this._delay > 0.0f)
-        {
-            if (this._lifetime < this._delay)
-                return;
-            this._lifetime -= this._delay;
-            this._delay = 0.0f;
-        }
-
-        if (this._lifetime >= this._time)
-        {
-            if (this._autoDestroy)
-                base.gameObject.SafeDestroy();
-            else
-                this._sprite.PlaceAtPositionByAnchor(this._target, Anchor.MiddleCenter);
-            return;
-        }
-
-        float percentLeft = 1f - this._lifetime / this._time;
-        float ease        = 1f - (percentLeft * percentLeft);
-        Vector2 pos       = Vector2.Lerp(this._start, this._target, ease);
-        this._sprite.PlaceAtPositionByAnchor(pos, Anchor.MiddleCenter);
-    }
-}
-
 /// <summary>Class to temporarily make projectiles replicants without the shader effects bleeding back into the projectile pool</summary>
 public class ReplicantProjectile : MonoBehaviour
 {
@@ -417,10 +353,8 @@ public class ReplicantProjectile : MonoBehaviour
         Projectile p = base.GetComponent<Projectile>();
         if (!p || !p.sprite)
             return;
-        p.sprite.usesOverrideMaterial = true;
         this._oldShader = p.sprite.renderer.material.shader;
-        p.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/HologramShader");
-        p.sprite.renderer.material.SetFloat("_IsGreen", 1f);
+        p.sprite.MakeHolographic(green: true);
         p.OnDestruction += DestroyReplicantProjectile;
     }
 

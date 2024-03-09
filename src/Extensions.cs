@@ -1712,4 +1712,13 @@ public static class Extensions
     enemy.OnEngaged(true);
     enemy.aiAnimator.EndAnimation();
   }
+
+  /// <summary>Add a holographic shader to a sprite</summary>
+  public static void MakeHolographic(this tk2dBaseSprite sprite, bool green = false)
+  {
+    sprite.usesOverrideMaterial = true;
+    sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/HologramShader");
+    if (green)
+      sprite.renderer.material.SetFloat("_IsGreen", 1f);
+  }
 }

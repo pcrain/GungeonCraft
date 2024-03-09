@@ -18,7 +18,7 @@ public class Suncaster : AdvancedGunBehavior
 
     internal static GameObject      _PrismPrefab             = null;
     internal static GameObject      _TraceVFX                = null;
-    internal static GameObject      _NewTraceVFX             = null;
+    // internal static GameObject      _NewTraceVFX             = null;
     internal static TrailController _SunTrailPrefab          = null;
     internal static TrailController _SunTrailRefractedPrefab = null;
     internal static TrailController _SunTrailFinalPrefab     = null;
@@ -66,7 +66,7 @@ public class Suncaster : AdvancedGunBehavior
             ResMap.Get("suncaster_beam_final_mid"), 60, cascadeTimer: C.FRAME,  softMaxLength: 1, destroyOnEmpty: false);
 
         _TraceVFX = VFX.Create("basic_square", fps: 7, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 10f);
-        _NewTraceVFX = VFX.Create("basic_green_square", fps: 7, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 10f);
+        // _NewTraceVFX = VFX.Create("basic_green_square", fps: 7, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 10f);
 
         _PrismPrefab = VFX.Create("prism_vfx", fps: 7, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 5f);
         SpeculativeRigidbody body = _PrismPrefab.GetOrAddComponent<SpeculativeRigidbody>();

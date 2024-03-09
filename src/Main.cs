@@ -304,6 +304,7 @@ public class Initialisation : BaseUnityPlugin
                     ChamberJammer.Init();
                     Cuppajoe.Init();
                     StopSign.Init();
+                    GunSynthesizer.Init();
 
                     setupActivesWatch.Stop();
                 // });

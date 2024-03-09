@@ -30,7 +30,7 @@ public class Kevlar
             talkPointOffset        : C.PIXEL_SIZE * new Vector2(26, 66),
             npcPosition            : C.PIXEL_SIZE * new Vector2(37, 80),
             itemPositions          : ShopAPI.defaultItemPositions.ShiftAll(C.PIXEL_SIZE * new Vector2(22, 20)),
-            exactlyOncePerRun      : false,
+            exactlyOncePerRun      : false, //NOTE: necessary to spawn on the first floor prequisiteValidator is fulfilled
             // voice                  : "sans", // will play audio "Play_CHR_<voice>_voice_01"
             genericDialog          : new(){
                 "Hath ye no desire to be heir to yourself? For a price, I will make it so.",
@@ -82,7 +82,6 @@ public class Kevlar
             );
 
         shop.AddParentedAnimationToShopFixed(ResMap.Get("kevlar_bow"), 10, "purchase");
-        // shop.AddParentedAnimationToShopFixed(ResMap.Get("cammy_sad"), 4, "denied");
         shop.AddParentedAnimationToShopFixed(ResMap.Get("kevlar_offended"), 8, "stolen");
         shop.SetShotAnimation(paths: ResMap.Get("kevlar_offended"), fps: 8);
 

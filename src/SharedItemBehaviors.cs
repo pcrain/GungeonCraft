@@ -1464,3 +1464,55 @@ public static class MovingDistortionWave
         UnityEngine.Object.Destroy(distMaterial);
     }
 }
+
+public class DissipatingSpriteFragment : MonoBehaviour
+{
+    Vector2 _start     = Vector2.zero;
+    Vector2 _target    = Vector2.zero;
+    float _time        = 0f;
+    float _lifetime    = 0f;
+    float _delay       = 0f;
+    bool _autoDestroy  = false;
+    bool _setup        = false;
+    tk2dSprite _sprite = null;
+
+    public void Setup(Vector2 start, Vector2 target, float time, float delay = 0.0f, bool autoDestroy = false)
+    {
+        this._start       = start;
+        this._target      = target;
+        this._time        = time;
+        this._sprite      = base.GetComponent<tk2dSprite>();
+        this._delay       = delay;
+        this._autoDestroy = autoDestroy;
+        this._setup       = true;
+    }
+
+    private void Update()
+    {
+        if (!this._setup)
+            return;
+
+        this._lifetime += BraveTime.DeltaTime;
+        if (this._delay > 0.0f)
+        {
+            if (this._lifetime < this._delay)
+                return;
+            this._lifetime -= this._delay;
+            this._delay = 0.0f;
+        }
+
+        if (this._lifetime >= this._time)
+        {
+            if (this._autoDestroy)
+                base.gameObject.SafeDestroy();
+            else
+                this._sprite.PlaceAtRotatedPositionByAnchor(this._target, Anchor.MiddleCenter);
+            return;
+        }
+
+        float percentLeft = 1f - this._lifetime / this._time;
+        float ease        = 1f - (percentLeft * percentLeft);
+        Vector2 pos       = Vector2.Lerp(this._start, this._target, ease);
+        this._sprite.PlaceAtRotatedPositionByAnchor(pos, Anchor.MiddleCenter);
+    }
+}

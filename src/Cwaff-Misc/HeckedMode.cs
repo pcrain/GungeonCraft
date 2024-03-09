@@ -678,6 +678,80 @@ public static class HeckedMode
             ETGModConsole.Log($"  override: {bb.GetType().Name}");
     }
 
+    /// <summary>Gives guns to enemies that don't normally have them.</summary>
+    public static AIShooter ArmToTheTeeth(this AIActor enemy, Gun replacementGun)
+    {
+        _BulletKin ??= EnemyDatabase.GetOrLoadByGuid(Enemies.BulletKin);
+
+        if (!enemy.gameObject.GetComponent<AIBulletBank>())
+            enemy.gameObject.AddComponent<AIBulletBank>().CopyAIBulletBank(_BulletKin.bulletBank);
+
+        AIShooter shooter = enemy.gameObject.AddComponent<AIShooter>();
+        shooter.CopyAIShooter(_BulletKin.aiShooter);
+        shooter.RegenerateCache();
+
+        shooter.equippedGunId = replacementGun.PickupObjectId;
+        shooter.customShootCooldownPeriod = 0f;
+        shooter.bulletName = null;
+
+        // enemy.ShowAllBehaviors();
+
+        shooter.behaviorSpeculator.TargetBehaviors ??= new();
+        if (shooter.behaviorSpeculator.TargetBehaviors.Count == 0)
+        {
+            shooter.RegenerateCache();
+            if (enemy.GetComponent<CompanionController>())
+            {
+                TargetPlayerBehavior targetPlayerButActuallyEnemies = new TargetPlayerBehavior{};  // why does this target enemies???
+                shooter.behaviorSpeculator.TargetBehaviors.Add(targetPlayerButActuallyEnemies);
+                targetPlayerButActuallyEnemies.Init(enemy.gameObject, enemy, shooter);
+                targetPlayerButActuallyEnemies.Start();
+                shooter.behaviorSpeculator.m_behaviors.Add(targetPlayerButActuallyEnemies);
+            }
+            else
+            {
+                TargetEnemiesBehavior targetEnemies = new TargetEnemiesBehavior{};  // why does this target players???
+                shooter.behaviorSpeculator.TargetBehaviors.Add(targetEnemies);
+                targetEnemies.Init(enemy.gameObject, enemy, shooter);
+                targetEnemies.Start();
+                shooter.behaviorSpeculator.m_behaviors.Add(targetEnemies);
+            }
+            shooter.RegenerateCache();
+        }
+        // foreach (AttackBehaviorBase myAttack in shooter.behaviorSpeculator.AttackBehaviors)
+        //     shooter.behaviorSpeculator.m_behaviors.Remove(myAttack);
+        shooter.behaviorSpeculator.AttackBehaviors ??= new();
+        foreach (AttackBehaviorBase defaultAttack in _BulletKin.aiShooter.behaviorSpeculator.AttackBehaviors)
+        {
+            if (defaultAttack is not ShootGunBehavior defaultPewpew)
+                continue;
+            ShootGunBehavior myPewpew = defaultPewpew.CopyShootGunBehavior();
+            myPewpew.m_behaviorSpeculator = shooter.behaviorSpeculator;
+            shooter.behaviorSpeculator.AttackBehaviors.Add(myPewpew);
+            myPewpew.Init(enemy.gameObject, enemy, shooter);
+            myPewpew.Start();
+            shooter.behaviorSpeculator.m_behaviors.Add(myPewpew);
+            shooter.RegenerateCache();
+            break;
+        }
+
+        // shooter.behaviorSpeculator.OtherBehaviors ??= new();
+        // shooter.behaviorSpeculator.OtherBehaviors.Clear(); // little guy o7
+
+        shooter.RegenerateCache();
+        shooter.behaviorSpeculator.aiActor = enemy;
+        foreach (MovementBehaviorBase move in shooter.behaviorSpeculator.MovementBehaviors)
+            move.m_aiActor = enemy;
+        shooter.RegenerateCache();
+
+        // enemy.ShowAllBehaviors();
+
+        // shooter.behaviorSpeculator./*Fully*/RefreshBehaviors();
+        // shooter.RegenerateCache();
+
+        return shooter;
+    }
+
     private static AIActor _BulletKin = null;
     public static void HeckedShootGunBehavior(this AIActor enemy, Gun replacementGun)
     {
@@ -685,71 +759,9 @@ public static class HeckedMode
         {
             if (_HeckedModeStatus != Hecked.Retrashed)
                 return;  // disable extra guns outside the debug build for now
-            _BulletKin ??= EnemyDatabase.GetOrLoadByGuid(Enemies.BulletKin);
-            if (!enemy.gameObject.GetComponent<AIBulletBank>())
-                enemy.gameObject.AddComponent<AIBulletBank>().CopyAIBulletBank(_BulletKin.bulletBank);
-            shooter = enemy.gameObject.AddComponent<AIShooter>();
-            shooter.CopyAIShooter(_BulletKin.aiShooter);
-            shooter.RegenerateCache();
-
-            shooter.equippedGunId = replacementGun.PickupObjectId;
-            shooter.customShootCooldownPeriod = 0f;
-            shooter.bulletName = null;
-
-            // enemy.ShowAllBehaviors();
-
-            shooter.behaviorSpeculator.TargetBehaviors ??= new();
-            if (shooter.behaviorSpeculator.TargetBehaviors.Count == 0)
-            {
-                shooter.RegenerateCache();
-                if (enemy.GetComponent<CompanionController>())
-                {
-                    TargetPlayerBehavior targetPlayerButActuallyEnemies = new TargetPlayerBehavior{};  // why does this target enemies???
-                    shooter.behaviorSpeculator.TargetBehaviors.Add(targetPlayerButActuallyEnemies);
-                    targetPlayerButActuallyEnemies.Init(enemy.gameObject, enemy, shooter);
-                    targetPlayerButActuallyEnemies.Start();
-                    shooter.behaviorSpeculator.m_behaviors.Add(targetPlayerButActuallyEnemies);
-                }
-                else
-                {
-                    TargetEnemiesBehavior targetEnemies = new TargetEnemiesBehavior{};  // why does this target players???
-                    shooter.behaviorSpeculator.TargetBehaviors.Add(targetEnemies);
-                    targetEnemies.Init(enemy.gameObject, enemy, shooter);
-                    targetEnemies.Start();
-                    shooter.behaviorSpeculator.m_behaviors.Add(targetEnemies);
-                }
-                shooter.RegenerateCache();
-            }
-            // foreach (AttackBehaviorBase myAttack in shooter.behaviorSpeculator.AttackBehaviors)
-            //     shooter.behaviorSpeculator.m_behaviors.Remove(myAttack);
-            shooter.behaviorSpeculator.AttackBehaviors ??= new();
-            foreach (AttackBehaviorBase defaultAttack in _BulletKin.aiShooter.behaviorSpeculator.AttackBehaviors)
-            {
-                if (defaultAttack is not ShootGunBehavior defaultPewpew)
-                    continue;
-                ShootGunBehavior myPewpew = defaultPewpew.CopyShootGunBehavior();
-                myPewpew.m_behaviorSpeculator = shooter.behaviorSpeculator;
-                shooter.behaviorSpeculator.AttackBehaviors.Add(myPewpew);
-                myPewpew.Init(enemy.gameObject, enemy, shooter);
-                myPewpew.Start();
-                shooter.behaviorSpeculator.m_behaviors.Add(myPewpew);
-                shooter.RegenerateCache();
-                break;
-            }
-
-            // shooter.behaviorSpeculator.OtherBehaviors ??= new();
-            // shooter.behaviorSpeculator.OtherBehaviors.Clear(); // little guy o7
-
-            shooter.RegenerateCache();
-            shooter.behaviorSpeculator.aiActor = enemy;
-            foreach (MovementBehaviorBase move in shooter.behaviorSpeculator.MovementBehaviors)
-                move.m_aiActor = enemy;
-            shooter.RegenerateCache();
-
-            // enemy.ShowAllBehaviors();
-
-            // shooter.behaviorSpeculator./*Fully*/RefreshBehaviors();
-            // shooter.RegenerateCache();
+            if (enemy.GetComponent<CompanionController>())
+                return; // companions should not get guns in retrashed mode
+            shooter = enemy.ArmToTheTeeth(replacementGun);
         }
 
         // if (replacementGun?.DefaultModule?.projectiles?[0] is not Projectile)
@@ -883,7 +895,7 @@ public static class HeckedMode
     // }
 
     // If an enemy has already run their Awake() method, replacing their guns gets a lot more complicated
-    // All of this code is basically undoing AIShooter.Initialize() in reverse order
+    // NOTE: All of this code is basically undoing AIShooter.Initialize() in reverse order
     public static void ReplaceGun(this AIActor enemy, Items replacementGunId)
     {
         if (enemy.aiShooter is not AIShooter shooter)
