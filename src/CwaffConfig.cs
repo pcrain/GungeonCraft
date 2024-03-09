@@ -14,14 +14,16 @@ public static class CwaffConfig
       options : new(){
         "Disabled",
         "Hecked".Yellow(),
-        // "Retrashed".Yellow(),
+        "Retrashed".Yellow(),
         },
       info    : new(){
         "Enemies spawn with their normal guns.\n\nTakes effect next run.".Green(),
         "Enemies spawn with completely random guns.\nNot for the faint of heart.\nTakes effect next run.".Green(),
-        // "All enemies are armed to the teeth.\n.Nowhere is safe.\nTakes effect next run.".Green(),
+        "All enemies have strong guns and ignore stealth.\nAll bosses are jammed. All chests are fused.\nShop prices x10. Takes effect next run.".Green(),
         }
       );
+
+      // "All enemies are armed to the teeth.\nNowhere is safe.\nTakes effect next run.".Green(),
 
     // for (int i = 0; i < 3; ++i)
     // {

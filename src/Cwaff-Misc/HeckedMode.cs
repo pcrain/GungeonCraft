@@ -1,14 +1,14 @@
 namespace CwaffingTheGungy;
 
 /* TODO:
-    - fix FindPredictedTargetPosition error
-    - fix Gun.ClearCooldowns() null deref
-    - test Bsg
-
+    - fix audio on all noisy weapons to stop playing when appropriate
     - fix charged weapons to actually respect charge
     - fix beam weapons to not persist when restarting
     - fix burst weapons to fire more than one shot
-    - fix audio on all noisy weapons to stop playing when appropriate
+    - test Bsg
+
+    + fix FindPredictedTargetPosition error (possibly fixed?)
+    + fix Gun.ClearCooldowns() null deref (possibly fixed?)
 
    Retrashed Mode Changes:
     + everyone has guns
@@ -18,6 +18,8 @@ namespace CwaffingTheGungy;
     + 10x shop prices
     + all bosses are jammed
     + no bullet that can kill the future
+
+    x no time slowing (too hard to implement)
 */
 
 public static class HeckedMode
@@ -392,6 +394,7 @@ public static class HeckedMode
             gun.GetComponent<MotionTriggeredStatSynergyProcessor>().SafeDestroy();         // fix Gungine, etc.
             gun.GetComponent<TalkingGunModifier>().SafeDestroy();                          // fix Gunther
             gun.GetComponent<GunnerGunController>().SafeDestroy();                         // fix GuNNER
+            gun.GetComponent<ShovelGunModifier>().SafeDestroy();                           // fix Knight's Gun
             // gun.GetComponent<LifeOrbGunModifier>().SafeDestroy();                       // fix Life Orb, not useful until beams are fixed in general
             if (gun.GetComponent<StealthOnReloadPressed>() is StealthOnReloadPressed sorp) // fix GreyMauser, etc.
             {
@@ -399,6 +402,8 @@ public static class HeckedMode
                 gun.OnReloadPressed -= sorp.HandleReloadPressed;
                 sorp.SafeDestroy();
             }
+            gun.RequiresFundsToShoot = false; // fix Microtransaction gun null deref in DecrementAmmoCost()
+            gun.IsTrickGun = false; // fixes Trick Gun null deref in FinishReload()
         }
     }
 
@@ -474,6 +479,31 @@ public static class HeckedMode
             cursor.Emit(OpCodes.Ldarg_0);
             cursor.Emit(OpCodes.Call,
                 typeof(HeckedMode).GetMethod("ForceJammedBosses", BindingFlags.Static | BindingFlags.NonPublic));
+        }
+    }
+
+    [HarmonyPatch(typeof(Gun), nameof(Gun.ClearCooldowns))]
+    [HarmonyPatch(typeof(Gun), nameof(Gun.ClearReloadData))]
+    private class FixModuleDataPatch
+    {
+        static void Prefix(Gun __instance)
+        {
+            if (__instance.Volley != null)
+            {
+                foreach (ProjectileModule mod in __instance.Volley.projectiles)
+                {
+                    if (!__instance.m_moduleData.TryGetValue(mod, out ModuleShootData msd))
+                    {
+                        ETGModConsole.Log($"shoot data wasn't set up for {__instance.gunName}");
+                        __instance.m_moduleData[mod] = new();
+                    }
+                }
+            }
+            else if (!__instance.m_moduleData.TryGetValue(__instance.singleModule, out ModuleShootData msd))
+            {
+                ETGModConsole.Log($"shoot data wasn't set up for {__instance.gunName}");
+                __instance.m_moduleData[__instance.singleModule] = new();
+            }
         }
     }
 

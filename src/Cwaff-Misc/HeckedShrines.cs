@@ -190,7 +190,7 @@ Even Seven Hundred Guns
 """
 {wj}SEVEN THOUSAND GUNS{w}
 {wj}KALIBER CAN'T PROTECT YOU{w}
-{wj}NOWHERE ELSE TO HIDE{w}
+{wj}GIVE UP WHILE YOU CAN{w}
 """;
 
     private static string _LordfortressText =
