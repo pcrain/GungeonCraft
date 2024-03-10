@@ -10,7 +10,7 @@ public class AlienNailgun : AdvancedGunBehavior
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Attack, Adapt, Assimilate";
     public static string LongDescription  = "Fires nails that extract DNA when dealing the fatal blow to enemies. Charging the gun while in combat consumes a full clip of ammo to assemble a replicant enemy from DNA. Replicants are invulnerable, have no collision, cannot harm the player with projectiles or contact damage, and dissipate when combat ends. Reloading with a full clip cycles through extracted DNA sequences.";
-    public static string Lore             = "TBD";
+    public static string Lore             = "Having arrived on Earth en masse in a strange meteorite, this gadget launches fingers that quickly retract on impact to physically scrape data off of recently-deceased life forms. Unbeknownst to Gungeoneers, the meteorite was actually an intergalactic standard wastebin, and this eons-old prototype was discarded after its inventors discovered light-based replicators were cheaper, faster, less convoluted, and ultimately less weird.";
 
     private const float _RECONSTRUCT_DELAY   = 0.2f;
     private const float _RECONSTRUCT_TIME    = 1.3f;

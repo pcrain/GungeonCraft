@@ -5,7 +5,7 @@ public class GunSynthesizer : PlayerItem
     public static string ItemName         = "Gun Synthesizer";
     public static string ShortDescription = "Transient Guns, Lasting Damage";
     public static string LongDescription  = "Synthesizes a random gun for 20 seconds. Synthesized guns have 25% of their max ammo and cannot be switched, thrown, or dropped. Recharges every 3 rooms.";
-    public static string Lore             = "TBD";
+    public static string Lore             = "A strange device made entirely of unrecognizable alien parts, save for a one quettabyte USB thumb drive sticking out of the side. Previous examinations have revealed the USB drive to contain detailed blueprints and specifications for almost every gun ever encountered in the Gungeon. The remaining 99.99999999995% of space on the drive is filled with assorted memes, cat pictures, and Touhou remixes.";
 
     private const float _SYNTH_LIFETIME       = 20f;
     private const float _AMMO_PERCENT         = 0.25f;

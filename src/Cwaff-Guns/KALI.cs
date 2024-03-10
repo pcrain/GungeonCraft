@@ -6,7 +6,7 @@ public class KALI : AdvancedGunBehavior
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Fission";
     public static string LongDescription  = "Fires insanely high-velocity piercing particles with high recoil. Projectile damage, velocity, and recoil are doubled at level 2 charge and again at level 3. Destroys enemy projectiles at level 3 charge. Continuously drains ammo while charging. Killed enemies are obliterated and do not drop casings or pickups. ";
-    public static string Lore             = "TBD";
+    public static string Lore             = "Developed by the nation of Gundia's Department of the Best Defense is a Good Offense, this high-powered handheld electron accelerator can instantaneously ionize most targets and anything in direct contact with them. Various ongoing attempts by the government to market the device to the nation's citizens as a children's toy, a water purifier, and a flashlight have all been criticized by major media outlets as 'irresponsible and asinine', although surveys suggest high market interest from the age 12-17 demographic.";
 
     private const float _AMMO_DRAIN_RATE = 1.0f;
 
