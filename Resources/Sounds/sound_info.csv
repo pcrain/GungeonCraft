@@ -55,7 +55,8 @@ phase_through_wall_sound,-3.0,1,sound
 pencil_write,4.0,1,sound
 mc_torch_place,5.0,1,sound
 mc_lantern_place,5.0,1,sound
-deadline_fire_sound,-5.0,1,sound
+deadline_fire_sound,-8.5,1,sound
+deadline_reload_sound,-4.5,1,sound
 outbreak_shoot_sound,-5.0,1,sound
 knife_gun_launch,-3.0,1,sound
 schrodingers_gat_fire_sound,-2.0,1,sound

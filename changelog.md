@@ -12,15 +12,16 @@
 	- Room and NPC design thanks to Lynceus!
 
 #### Bugfixes:
-	- Fixed a null derference when Alligator's projectiles hit enemies without HealthHavers
-	- Fixed certain guns in Hecked mode causing null reference exceptions when wielded by enemies
-	- Fixed some graphical glitches with Insurance Policy sprites
-	- Fixed some graphical glitches with various projectile trails
+- Fixed a null derference when Alligator's projectiles hit enemies without HealthHavers
+- Fixed certain guns in Hecked mode causing null reference exceptions when wielded by enemies
+- Fixed some graphical glitches with Insurance Policy sprites
+- Fixed some graphical glitches with various projectile trails
 
 #### Misc:
-	- Dramatically improved startup time due to better sprite loading techniques
-	- Reduced RAM and VRAM usage by packing all graphics into a single texture
-	- Silenced Seltzer Pelter's projectiles after a few bounces so they don't cause a racket if they get stuck
+- Dramatically improved startup time due to better sprite loading techniques
+- Reduced RAM and VRAM usage by packing all graphics into a single texture
+- Silenced Seltzer Pelter's projectiles after a few bounces so they don't cause a racket if they get stuck
+- Made Deadline's fire and reload sounds quieter
 
 ## 1.8.2 (2024-02-21)
 - Fixed accidentally making all bosses jammed whoops D:
