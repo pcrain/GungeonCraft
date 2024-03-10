@@ -10,7 +10,7 @@ namespace CwaffingTheGungy;
     + fix FindPredictedTargetPosition error (possibly fixed?)
     + fix Gun.ClearCooldowns() null deref (possibly fixed?)
 
-   Retrashed Mode Changes:
+   Retrashed Mode Changes (NEED TO ENABLE IN SetupHeckedMode()):
     + everyone has guns
     + no easy guns
     + every chest is fused
@@ -302,7 +302,7 @@ public static class HeckedMode
         _HeckedModeStatus = heckedConfig switch {
             "Disabled"  => Hecked.Disabled,
             "Hecked"    => Hecked.Classic,
-            "Retrashed" => Hecked.Retrashed,
+            // "Retrashed" => Hecked.Retrashed,  //NOTE: re-enable once Retrashed Mode is ready
             _           => Hecked.Disabled,
         };
     }

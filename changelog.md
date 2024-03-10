@@ -1,5 +1,27 @@
 # Changelog
 
+## 1.9.0 (2024-03-13)
+
+#### Features and Polish:
+- Added K.A.L.I., Alien Nailgun, Reserve Ammolet, and Gun Synthesizer
+	- Alien Nailgun sprites thanks to Lynceus!
+	- Reserve Ammolet and Gun Synthesizer sprites thanks to Dallan!
+- Added Insurance Shop
+	- Spawns if an A or S tier item is in your inventory at the beginning of a floor
+	- Sells Insurance Policy items that let you carry over an item to your next run
+	- Room and NPC design thanks to Lynceus!
+
+#### Bugfixes:
+	- Fixed a null derference when Alligator's projectiles hit enemies without HealthHavers
+	- Fixed certain guns in Hecked mode causing null reference exceptions when wielded by enemies
+	- Fixed some graphical glitches with Insurance Policy sprites
+	- Fixed some graphical glitches with various projectile trails
+
+#### Misc:
+	- Dramatically improved startup time due to better sprite loading techniques
+	- Reduced RAM and VRAM usage by packing all graphics into a single texture
+	- Silenced Seltzer Pelter's projectiles after a few bounces so they don't cause a racket if they get stuck
+
 ## 1.8.2 (2024-02-21)
 - Fixed accidentally making all bosses jammed whoops D:
 
