@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.9.0 (2024-03-13)
+## 1.9.0 (2024-03-10)
 
 #### Features and Polish:
 - Added K.A.L.I., Alien Nailgun, Reserve Ammolet, and Gun Synthesizer
@@ -12,7 +12,7 @@
 	- Room and NPC design thanks to Lynceus!
 
 #### Bugfixes:
-- Fixed a null derference when Alligator's projectiles hit enemies without HealthHavers
+- Fixed a null dereference when Alligator's projectiles hit enemies without HealthHavers
 - Fixed certain guns in Hecked mode causing null reference exceptions when wielded by enemies
 - Fixed some graphical glitches with Insurance Policy sprites
 - Fixed some graphical glitches with various projectile trails
@@ -222,7 +222,7 @@
 - Nerfed Gunbrella ammo and Blackjack clip size slightly 
 
 ## 1.1.2 (2023-11-06)
-- Fixed (kinda) null dereference randomly preventing the Dragun fight cutscene from triggers, and added some debug output in case anyone is ever able to reproduce it again
+- Fixed (kinda) null dereference randomly preventing the Dragun fight cutscene from triggering, and added some debug output in case anyone is ever able to reproduce it again
 - Fixed Aimu Hakurei being able to graze bullets that have already despawned
 - Fixed a few edge cases for Astral Projector that could get you stuck in walls when pausing, opening the Ammonomicon, or opening a debug console
 

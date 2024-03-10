@@ -378,7 +378,7 @@ public class UppskeruvelCombatSoul : MonoBehaviour
     private enum State {
         SPAWNING,   // spawning in after fulfilling requirements to spawn or entering a new floor
         FOLLOWING,  // following the player around after spawning in
-        PRELAUNCH,  // queued for laucnh after hitting an enemy with a projectile
+        PRELAUNCH,  // queued for launch after hitting an enemy with a projectile
         SEEKING,    // seeking an enemy that has been recently shot by a projectile
         VANISH,     // vanish after hitting an enemy
         COOLDOWN,   // on cooldown after vanishing but before reappearing
