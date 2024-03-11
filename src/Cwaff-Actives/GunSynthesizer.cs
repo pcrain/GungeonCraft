@@ -51,10 +51,24 @@ public class GunSynthesizer : PlayerItem
         user.gameObject.Play("gun_synthesizer_activate_sound");
     }
 
+    public override void Pickup(PlayerController player)
+    {
+        base.Pickup(player);
+        this._owner = player;
+    }
+
     public override void OnPreDrop(PlayerController player)
     {
         DestroySyntheticGun(player);
+        this._owner = null;
         base.OnPreDrop(player);
+    }
+
+    public override void OnDestroy()
+    {
+        if (this._owner)
+            DestroySyntheticGun(this._owner);
+        base.OnDestroy();
     }
 
     private const int _SPAWN_PARTICLES = 64;

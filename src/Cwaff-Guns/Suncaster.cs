@@ -113,6 +113,14 @@ public class Suncaster : AdvancedGunBehavior
         this.extantPrisms.Clear();
     }
 
+    public override void OnDestroy()
+    {
+        foreach (SuncasterPrism prism in this.extantPrisms)
+          prism.Selfdestruct();
+        this.extantPrisms.Clear();
+        base.OnDestroy();
+    }
+
     protected override void Update()
     {
         base.Update();

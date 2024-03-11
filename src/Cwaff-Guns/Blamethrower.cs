@@ -40,8 +40,15 @@ public class Blamethrower : AdvancedGunBehavior
 
     protected override void OnPostDroppedByPlayer(PlayerController player)
     {
-        player.OnReceivedDamage += this.OnReceivedDamage;
+        player.OnReceivedDamage -= this.OnReceivedDamage;
         base.OnPostDroppedByPlayer(player);
+    }
+
+    public override void OnDestroy()
+    {
+        if (this.Player)
+            this.Player.OnReceivedDamage -= this.OnReceivedDamage;
+        base.OnDestroy();
     }
 
     private void OnReceivedDamage(PlayerController player)

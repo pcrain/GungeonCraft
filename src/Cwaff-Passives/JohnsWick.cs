@@ -61,6 +61,17 @@ public class JohnsWick : PassiveItem
         return base.Drop(player);
     }
 
+    public override void OnDestroy()
+    {
+        if (this.Owner)
+        {
+            this.Owner.PostProcessProjectile -= this.PostProcessProjectile;
+            if (this.Owner.healthHaver && this.Owner.healthHaver.damageTypeModifiers.Contains(this._fireResistance))
+                this.Owner.healthHaver.damageTypeModifiers.Remove(this._fireResistance);
+        }
+        base.OnDestroy();
+    }
+
     private void PostProcessProjectile(Projectile proj, float effectChanceScalar)
     {
         if (!(this.Owner && this._wasOnFire))

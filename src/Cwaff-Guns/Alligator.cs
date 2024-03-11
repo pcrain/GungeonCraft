@@ -58,6 +58,16 @@ public class Alligator : AdvancedGunBehavior
             player.healthHaver.damageTypeModifiers.Remove(this._electricImmunity);
     }
 
+    public override void OnDestroy()
+    {
+        if (this.Player && this.Player.healthHaver)
+        {
+            if (this.Player.healthHaver.damageTypeModifiers.Contains(this._electricImmunity))
+                this.Player.healthHaver.damageTypeModifiers.Remove(this._electricImmunity);
+        }
+        base.OnDestroy();
+    }
+
     protected override void Update()
     {
         base.Update();

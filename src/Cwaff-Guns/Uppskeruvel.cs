@@ -85,6 +85,14 @@ public class Uppskeruvel : AdvancedGunBehavior
         DestroyExtantCombatSouls();
     }
 
+    public override void OnDestroy()
+    {
+        GameManager.Instance.OnNewLevelFullyLoaded -= this.OnNewFloor;
+        StopAllCoroutines();
+        DestroyExtantCombatSouls();
+        base.OnDestroy();
+    }
+
     public void AcquireSoul(int n = 1)
     {
         this.souls += n;

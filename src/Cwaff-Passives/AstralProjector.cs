@@ -44,6 +44,13 @@ public class AstralProjector : PassiveItem
         return base.Drop(player);
     }
 
+    public override void OnDestroy()
+    {
+        if (this.Owner)
+            this.Owner.specRigidbody.OnPreTileCollision -= this.OnPreTileCollision;
+        base.OnDestroy();
+    }
+
     private static PrototypeDungeonRoom.RoomCategory[] _BannedRoomTypes = {
         PrototypeDungeonRoom.RoomCategory.BOSS,
         PrototypeDungeonRoom.RoomCategory.CONNECTOR,

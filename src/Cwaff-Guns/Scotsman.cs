@@ -75,6 +75,14 @@ public class Scotsman : AdvancedGunBehavior
         base.OnSwitchedAwayFromThisGun();
     }
 
+    public override void OnDestroy()
+    {
+        if (this.Player)
+            this.Player.forceAimPoint = null;
+        this._targetingReticle.SafeDestroy();
+        base.OnDestroy();
+    }
+
     protected override void Update()
     {
         base.Update();

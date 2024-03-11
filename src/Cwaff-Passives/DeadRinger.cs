@@ -38,6 +38,16 @@ public class DeadRinger : PassiveItem
         return base.Drop(player);
     }
 
+    public override void OnDestroy()
+    {
+        if (this.Owner)
+        {
+            this.Owner.OnReceivedDamage -= this.OnReceivedDamage;
+            BreakStealth(this.Owner);
+        }
+        base.OnDestroy();
+    }
+
     private void OnReceivedDamage(PlayerController player)
     {
         if (this.Owner != player || player.IsStealthed)

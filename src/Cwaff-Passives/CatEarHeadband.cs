@@ -34,6 +34,13 @@ public class CatEarHeadband : PassiveItem
         return base.Drop(player);
     }
 
+    public override void OnDestroy()
+    {
+        if (this.Owner)
+            this.Owner.OnEnteredCombat -= this.OnEnteredCombat;
+        base.OnDestroy();
+    }
+
     private void OnEnteredCombat()
     {
         if (this._stealthedEntrance)

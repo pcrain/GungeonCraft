@@ -48,6 +48,13 @@ public class ChekhovsGun : AdvancedGunBehavior
         base.OnPostDroppedByPlayer(player);
     }
 
+    public override void OnDestroy()
+    {
+        if (this.Player)
+            this.Player.OnRoomClearEvent -= this.OnRoomClear;
+        base.OnDestroy();
+    }
+
     public override Projectile OnPreFireProjectileModifier(Gun gun, Projectile projectile, ProjectileModule mod)
     {
         if (projectile.GetComponent<ChekhovBullet>() is ChekhovBullet cb)

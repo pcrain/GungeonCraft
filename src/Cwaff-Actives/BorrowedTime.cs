@@ -46,6 +46,13 @@ public class BorrowedTime : PlayerItem
         base.OnPreDrop(player);
     }
 
+    public override void OnDestroy()
+    {
+        // if (this._owner)
+        //     this._owner.StartCoroutine(ReapWhatYouSow()); //WARNING: can't do this because it requires an object reference
+        base.OnDestroy();
+    }
+
     public override void Update()
     {
         base.Update();

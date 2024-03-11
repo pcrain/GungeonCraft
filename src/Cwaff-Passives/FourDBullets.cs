@@ -28,12 +28,17 @@ public class FourDBullets : PassiveItem
         return base.Drop(player);
     }
 
+    public override void OnDestroy()
+    {
+        if (this.Owner)
+            this.Owner.PostProcessProjectile -= this.PostProcessProjectile;
+        base.OnDestroy();
+    }
+
     private void PostProcessProjectile(Projectile proj, float effectChanceScalar)
     {
-        if (this.Owner is not PlayerController player)
-            return;
-
-        proj.gameObject.AddComponent<PhaseThroughInnerWallsBehavior>();
+        if (this.Owner)
+            proj.gameObject.AddComponent<PhaseThroughInnerWallsBehavior>();
     }
 }
 

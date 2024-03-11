@@ -49,6 +49,12 @@ public class Itemfinder : PlayerItem
         base.OnPreDrop(player);
     }
 
+    public override void OnDestroy()
+    {
+        GameManager.Instance.OnNewLevelFullyLoaded -= InitializeTreasureForFloor;
+        base.OnDestroy();
+    }
+
     public override bool CanBeUsed(PlayerController user)
     {
         bool nearAnyTreasure = false;

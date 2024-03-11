@@ -105,6 +105,12 @@ public class Deadline : AdvancedGunBehavior
         base.OnPostDroppedByPlayer(player);
     }
 
+    public override void OnDestroy()
+    {
+        DisableLaserSights();
+        base.OnDestroy();
+    }
+
     private void EnableLaserSight()
     {
         if (this._myLaserSight)

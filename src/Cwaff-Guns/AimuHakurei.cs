@@ -109,6 +109,13 @@ public class AimuHakurei : AdvancedGunBehavior
         player.OnRollStarted -= this.OnDodgeRoll;
     }
 
+    public override void OnDestroy()
+    {
+        if (this.Player)
+            this.Player.OnRollStarted -= this.OnDodgeRoll;
+        base.OnDestroy();
+    }
+
     private void OnDodgeRoll(PlayerController player, Vector2 dirVec)
     {
         SetFocus(false);

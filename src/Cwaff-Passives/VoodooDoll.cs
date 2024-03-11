@@ -33,6 +33,13 @@ public class VoodooDoll : PassiveItem
         return base.Drop(player);
     }
 
+    public override void OnDestroy()
+    {
+        if (this.Owner)
+            this.Owner.OnDealtDamageContext -= this.OnDealtDamage;
+        base.OnDestroy();
+    }
+
     private void OnDealtDamage(PlayerController source, float damage, bool fatal, HealthHaver enemy)
     {
         if (_VoodooDollEffectHappening)

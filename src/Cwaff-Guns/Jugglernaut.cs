@@ -154,6 +154,13 @@ public class Jugglernaut : AdvancedGunBehavior
         gun.spriteAnimator.StopAndResetFrameToDefault();
     }
 
+    public override void OnDestroy()
+    {
+        if (this.Player && this.Player.healthHaver)
+            this.Player.healthHaver.OnDamaged -= DroppingTheBall;
+        base.OnDestroy();
+    }
+
     private void DroppingTheBall(float resultValue, float maxValue, CoreDamageTypes damageTypes, DamageCategory damageCategory, Vector2 damageDirection)
     {
         if (this._juggledEnemies.Count() == 0)

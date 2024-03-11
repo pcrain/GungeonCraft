@@ -56,6 +56,18 @@ public class WeddingRing : PassiveItem
         return base.Drop(player);
     }
 
+    public override void OnDestroy()
+    {
+        if (this.Owner)
+        {
+            this.Owner.OnKilledEnemy -= this.OnKilledEnemy;
+            this.Owner.PostProcessProjectile -= this.PostProcessProjectile;
+            this.Owner.OnPreFireProjectileModifier -= this.ChanceToRefundAmmo;
+            UpdateCommitmentStats(this.Owner, reset: true);
+        }
+        base.OnDestroy();
+    }
+
     private void UpdateCommitmentStats(PlayerController player, bool reset = false)
     {
         this._commitmentMult = reset ? 1.00f : Mathf.Min(this._commitmentMult + _BONUS_PER_KILL, _MAX_BONUS);

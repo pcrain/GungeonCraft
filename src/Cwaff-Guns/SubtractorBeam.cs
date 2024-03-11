@@ -47,14 +47,20 @@ public class SubtractorBeam : AdvancedGunBehavior
 
     protected override void OnPostDroppedByPlayer(PlayerController player)
     {
-        base.OnPostDroppedByPlayer(player);
         WhoAreTheyAgain();
+        base.OnPostDroppedByPlayer(player);
+    }
+
+    public override void OnDestroy()
+    {
+        WhoAreTheyAgain();
+        base.OnDestroy();
     }
 
     public override void OnSwitchedAwayFromThisGun()
     {
-        base.OnSwitchedAwayFromThisGun();
         WhoAreTheyAgain();
+        base.OnSwitchedAwayFromThisGun();
     }
 
     protected override void Update()

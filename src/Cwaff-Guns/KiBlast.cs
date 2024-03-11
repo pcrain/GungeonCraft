@@ -55,25 +55,38 @@ public class KiBlast : AdvancedGunBehavior
     public override void OnSwitchedToThisGun()
     {
         base.OnSwitchedToThisGun();
-        if (this.Owner is not PlayerController owner)
+        if (this.Owner is not PlayerController player)
             return;
-        owner.ToggleGunRenderers(false, ItemName);
+        player.ToggleGunRenderers(false, ItemName);
     }
 
     public override void OnSwitchedAwayFromThisGun()
     {
         base.OnSwitchedAwayFromThisGun();
-        if (this.Owner is not PlayerController owner)
+        if (this.Owner is not PlayerController player)
             return;
-        owner.ToggleGunRenderers(true, ItemName);
+        player.ToggleGunRenderers(true, ItemName);
     }
 
     public override void OnInitializedWithOwner(GameActor actor)
     {
         base.OnInitializedWithOwner(actor);
-        if (actor is not PlayerController owner)
+        if (actor is not PlayerController player)
             return;
-        owner.ToggleGunRenderers(false, ItemName);
+        player.ToggleGunRenderers(false, ItemName);
+    }
+
+    protected override void OnPostDroppedByPlayer(PlayerController player)
+    {
+        player.ToggleGunRenderers(true, ItemName);
+        base.OnPostDroppedByPlayer(player);
+    }
+
+    public override void OnDestroy()
+    {
+        if (this.Player)
+            this.Player.ToggleGunRenderers(true, ItemName);
+        base.OnDestroy();
     }
 
     public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)

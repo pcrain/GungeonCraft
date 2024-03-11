@@ -13,6 +13,7 @@ public class EmergencySiren : PlayerItem
     private RoomHandler _roomToReset = null;
     private bool _anyEnemyInRoomDied = false;
     private bool _anyGunFiredInRoom = false;
+    private PlayerController _owner = null;
 
     public static void Init()
     {
@@ -37,6 +38,7 @@ public class EmergencySiren : PlayerItem
     public override void Pickup(PlayerController player)
     {
         base.Pickup(player);
+        this._owner = player;
         player.OnEnteredCombat += this.OnEnteredCombat;
         player.PostProcessProjectile += this.OnFired;
     }
@@ -45,7 +47,18 @@ public class EmergencySiren : PlayerItem
     {
         player.PostProcessProjectile -= this.OnFired;
         player.OnEnteredCombat -= this.OnEnteredCombat;
+        this._owner = null;
         base.OnPreDrop(player);
+    }
+
+    public override void OnDestroy()
+    {
+        if (this._owner)
+        {
+            this._owner.PostProcessProjectile -= this.OnFired;
+            this._owner.OnEnteredCombat -= this.OnEnteredCombat;
+        }
+        base.OnDestroy();
     }
 
     private void OnFired(Projectile p, float f)

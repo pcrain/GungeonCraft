@@ -132,6 +132,12 @@ public class Gunbrella : AdvancedGunBehavior
         DestroyReticle();
     }
 
+    public override void OnDestroy()
+    {
+        DestroyReticle();
+        base.OnDestroy();
+    }
+
     private void DestroyReticle()
     {
         this._targetingReticle.SafeDestroy();

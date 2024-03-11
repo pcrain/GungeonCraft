@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.9.1 (2024-03-10)
+
+- Fixed numerous items and guns causing issues when removed directly from the inventory (e.g., when using Gun Munchers)
+- Fixed Blamethrower scapegoat effect persisting after dropping the gun
+
 ## 1.9.0 (2024-03-10)
 
 #### Features and Polish:

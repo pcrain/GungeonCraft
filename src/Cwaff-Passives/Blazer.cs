@@ -53,6 +53,16 @@ public class Blazer : PassiveItem
         return base.Drop(player);
     }
 
+    public override void OnDestroy()
+    {
+        if (this.Owner)
+        {
+            this.Owner.OnEnteredCombat -= this.OnEnteredCombat;
+            RemoveBoosts(this.Owner);
+        }
+        base.OnDestroy();
+    }
+
     private void OnEnteredCombat()
     {
         if (this._boostedEntrance)

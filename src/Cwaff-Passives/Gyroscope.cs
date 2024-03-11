@@ -39,20 +39,22 @@ public class Gyroscope : PassiveItem
     public override void Pickup(PlayerController player)
     {
         base.Pickup(player);
-        _dodgeRoller = this.gameObject.GetComponent<GyroscopeRoll>();
-            _dodgeRoller.owner = player;
+        this._dodgeRoller = this.gameObject.GetComponent<GyroscopeRoll>();
+            this._dodgeRoller.owner = player;
         player.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
     }
 
     public override DebrisObject Drop(PlayerController player)
     {
         player.specRigidbody.OnPreRigidbodyCollision -= this.OnPreCollision;
-        _dodgeRoller.AbortDodgeRoll();
+        this._dodgeRoller.AbortDodgeRoll();
         return base.Drop(player);
     }
 
     public override void OnDestroy()
     {
+        if (this.Owner)
+            this.Owner.specRigidbody.OnPreRigidbodyCollision -= this.OnPreCollision;
         if (this._dodgeRoller)
             _dodgeRoller.AbortDodgeRoll();
         base.OnDestroy();

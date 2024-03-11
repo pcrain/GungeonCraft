@@ -31,6 +31,13 @@ public class EchoChamber : PassiveItem
         return base.Drop(player);
     }
 
+    public override void OnDestroy()
+    {
+        if (this.Owner)
+            this.Owner.PostProcessProjectile -= this.PostProcessProjectile;
+        base.OnDestroy();
+    }
+
     private void PostProcessProjectile(Projectile proj, float effectChanceScalar)
     {
         proj.gameObject.AddComponent<EchoingProjectile>();

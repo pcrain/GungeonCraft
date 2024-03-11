@@ -45,6 +45,13 @@ public class IronMaid : AdvancedGunBehavior
         this.Player.OnReceivedDamage -= LaunchAllBullets;
     }
 
+    public override void OnDestroy()
+    {
+        if (this.Player)
+            LaunchAllBullets(this.Player);
+        base.OnDestroy();
+    }
+
     public override void OnSwitchedAwayFromThisGun()
     {
         base.OnSwitchedAwayFromThisGun();

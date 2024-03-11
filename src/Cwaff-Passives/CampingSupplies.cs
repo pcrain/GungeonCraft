@@ -75,6 +75,13 @@ public class CampingSupplies : PassiveItem
         return base.Drop(player);
     }
 
+    public override void OnDestroy()
+    {
+        if (this.Owner)
+            ResetStats(this.Owner);
+        base.OnDestroy();
+    }
+
     public override void Update()
     {
         base.Update();

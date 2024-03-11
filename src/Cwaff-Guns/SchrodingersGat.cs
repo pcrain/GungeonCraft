@@ -3,6 +3,7 @@ namespace CwaffingTheGungy;
 /* TODO:
     - make enemy projectiles flash and disappear with enemy
     - add nicer particles and sounds for disappearance
+    - use new owner detection pioneered by alien nail gun for quantum detection
 */
 
 public class SchrodingersGat : AdvancedGunBehavior

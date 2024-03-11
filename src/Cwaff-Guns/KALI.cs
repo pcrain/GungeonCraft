@@ -148,6 +148,12 @@ public class KALI : AdvancedGunBehavior
         this._timeShifter.SafeDestroy();
     }
 
+    public override void OnDestroy()
+    {
+        this._timeShifter.SafeDestroy();
+        base.OnDestroy();
+    }
+
     public override void PostProcessProjectile(Projectile projectile)
     {
         base.PostProcessProjectile(projectile);

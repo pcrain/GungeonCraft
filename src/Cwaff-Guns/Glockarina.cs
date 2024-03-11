@@ -132,6 +132,16 @@ public class Glockarina : AdvancedGunBehavior
             player.healthHaver.damageTypeModifiers.Remove(this._electricImmunity);
     }
 
+    public override void OnDestroy()
+    {
+        if (this.Player && this.Player.healthHaver)
+        {
+            if (this.Player.healthHaver.damageTypeModifiers.Contains(this._electricImmunity))
+                this.Player.healthHaver.damageTypeModifiers.Remove(this._electricImmunity);
+        }
+        base.OnDestroy();
+    }
+
     // Returns true if we handled a special song, false if we pass it along
     private bool HandleSpecialSong(Mode song)
     {

@@ -94,6 +94,13 @@ public class Natascha : AdvancedGunBehavior
         ResetSpinup();
     }
 
+    public override void OnDestroy()
+    {
+        if (this.Player)
+            this.Player.OnRollStarted -= this.OnDodgeRoll;
+        base.OnDestroy();
+    }
+
     public override void OnSwitchedAwayFromThisGun()
     {
         base.OnSwitchedAwayFromThisGun();

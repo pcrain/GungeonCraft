@@ -135,6 +135,16 @@ public class LibraryCardtridge : PassiveItem
         return base.Drop(player);
     }
 
+    public override void OnDestroy()
+    {
+        if (this.Owner)
+            this.Owner.OnEnteredCombat -= this.OnEnteredCombat;
+        ETGMod.AIActor.OnPreStart -= this.OnEnemySpawn;
+        GameManager.Instance.OnNewLevelFullyLoaded -= this.MakeBooksFree;
+        NoMoreFreeBooks();
+        base.OnDestroy();
+    }
+
     private void MakeBooksFree()
     {
         foreach (BaseShopController shop in StaticReferenceManager.AllShops.EmptyIfNull())
