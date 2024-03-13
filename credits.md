@@ -8,7 +8,7 @@ I have no artistic talent beyond making minor sprite and sound edits, so all bas
 
 ### Sprites
 
-* Several custom shopkeeper, clip, and projectile sprites by [Lynceus](https://enter-the-gungeon.thunderstore.io/package/Lynceus/The_Captain_Custom_Character/) from the Mod the Gungeon Discord
+* Several custom shopkeeper, gun, item, clip, and projectile sprites by [Lynceus](https://enter-the-gungeon.thunderstore.io/package/Lynceus/The_Captain_Custom_Character/) from the Mod the Gungeon Discord
 * Various gun, item, and NPC sprites by [Dallan](https://enter-the-gungeon.thunderstore.io/package/Dallan/Breach_Renovations/) from the Mod the Gungeon Discord
 * Base Gun sprites from several sources, including the following:
  	- Classical from The Gungeon Discord

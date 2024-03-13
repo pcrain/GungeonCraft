@@ -426,7 +426,7 @@ public static class Lazy
         return false;
     }
 
-    /// <summary>Determine the nearest enemy inside a cone of vision from position start within maxDeviation degree of coneAngle</summary>
+    /// <summary>Determine position of the nearest enemy inside a cone of vision from position start within maxDeviation degree of coneAngle</summary>
     public static Vector2? NearestEnemyWithinConeOfVision(Vector2 start, float coneAngle, float maxDeviation, bool useNearestAngleInsteadOfDistance, bool ignoreWalls = false)
     {
         bool foundTarget   = false;
@@ -459,7 +459,7 @@ public static class Lazy
         return foundTarget ? bestTarget : null;
     }
 
-    /// <summary>Determine the nearest enemy to position start</summary>
+    /// <summary>Determine position of the nearest enemy to position start</summary>
     public static Vector2? NearestEnemy(Vector2 start, float coneAngle, bool useNearestAngleInsteadOfDistance = false, bool ignoreWalls = false)
     {
         return NearestEnemyWithinConeOfVision(start, coneAngle, 360f, useNearestAngleInsteadOfDistance, ignoreWalls);

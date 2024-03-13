@@ -3,8 +3,8 @@
 /*
    TODO
     - add proper grounded animation without black outline in the middle
-    - add proper projectile with trail / sound
     - add extra pointer mechanics
+
     - fix per character offsets if necessary
     - come up with a better name potentially
 */
@@ -13,22 +13,33 @@ public class OmnidirectionalLaser : AdvancedGunBehavior
 {
     public static string ItemName         = "Omnidirectional Laser";
     public static string ProjectileName   = "38_special";
-    public static string ShortDescription = "Spin to Win";
+    public static string ShortDescription = "Hula Hooplah";
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
+
+    private const int _BASE_FPS          = 10;
+    private const int _MAX_FPS           = 32;
+    private const int _FPS_STEP          = 1;
+    private const float _FPS_RESET_TIME  = 2.0f; // how long after firing we start slowing the reticle down
+    private const float _FPS_RESET_SPEED = 0.25f; // time increment between stepping down the reticle's speed
+    private const float _LOCKON_SNAP     = 30f; // if we fire a laser within this many degrees of an enemy, snap to the enemy
 
     private static List<int> _BackSpriteIds = new();
     private static List<Vector3> _BarrelOffsets = new();
     private static GameObject _OmniReticle  = null;
+    private static TrailController _OmniTrailPrefab  = null;
 
     private tk2dSprite _backside = null;
     private tk2dSprite _reticle = null;
+    private Vector2 _laserAngle = Vector2.zero;
+    private int _currentFps = _BASE_FPS;
+    private float _timeSinceLastShot = 0.0f;
 
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<OmnidirectionalLaser>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 150/*, defaultAudio: true*/);
-            gun.SetAnimationFPS(gun.idleAnimation, 10);
+            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 250/*, defaultAudio: true*/);
+            gun.SetAnimationFPS(gun.idleAnimation, _BASE_FPS);
             gun.SetIdleAudio("omni_spin_sound", 0, 1, 2, 3, 4, 5, 6, 7);
             gun.AddFlippedCarryPixelOffsets(offset: new IntVector2(5, -4), flippedOffset: new IntVector2(4, -4));
             gun.gunHandedness      = GunHandedness.NoHanded;
@@ -38,21 +49,21 @@ public class OmnidirectionalLaser : AdvancedGunBehavior
             gun.shootAnimation     = null; // animation shouldn't change when firing
             gun.PreventOutlines    = true; // messes up with two-part rendering
 
-
         for (int i = 1; i <= 8; ++i)
         {
             foreach (tk2dSpriteDefinition.AttachPoint a in gun.AttachPointsForClip(gun.idleAnimation, frame: i - 1).EmptyIfNull())
                 if (a.name == "Casing")
-                {
-                    ETGModConsole.Log($"  added barrel offset at {a.position}");
                     _BarrelOffsets.Add(a.position);
-                }
             _BackSpriteIds.Add(gun.sprite.Collection.GetSpriteIdByName($"omnidirectional_laser_idle_back_00{i}"));
         }
 
-        gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, speed: 200f));
+        gun.InitProjectile(GunData.New(sprite: "omnilaser_projectile", clipSize: -1, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic,
+            speed: 200f, damage: 16f));
 
-        _OmniReticle = VFX.Create("omnilaser_reticle", fps: 2, /*scale: 2.0f, */loops: true, anchor: Anchor.MiddleCenter);
+        _OmniTrailPrefab = VFX.CreateTrailObject(ResMap.Get("omnilaser_projectile_trail")[0], new Vector2(23, 4), new Vector2(0, 0),
+            ResMap.Get("omnilaser_projectile_trail"), 60, cascadeTimer: C.FRAME, destroyOnEmpty: true);
+
+        _OmniReticle = VFX.Create("omnilaser_reticle");
     }
 
     public override void Start()
@@ -83,6 +94,13 @@ public class OmnidirectionalLaser : AdvancedGunBehavior
     {
         this.gun.m_prepThrowTime = -999f; //HACK: prevent the gun from being thrown (the sprite looks ridiculous when rotated)
 
+        if ((this._timeSinceLastShot += BraveTime.DeltaTime) > _FPS_RESET_TIME && (this._currentFps >= _BASE_FPS))
+        {
+            this._timeSinceLastShot -= _FPS_RESET_SPEED;
+            this._currentFps = Math.Max(this._currentFps - _FPS_STEP, _BASE_FPS);
+            gun.spriteAnimator.ClipFps = this._currentFps;
+        }
+
         bool shouldRender
             = this._backside.renderer.enabled
             = this.gun.m_meshRenderer.enabled;
@@ -103,8 +121,8 @@ public class OmnidirectionalLaser : AdvancedGunBehavior
         if (!this.Player)
             return;
 
-        float laserAngle = (45f * (14 - this.gun.spriteAnimator.CurrentFrame)).Clamp360();
-        this._reticle.transform.position = this.Player.CenterPosition + laserAngle.ToVector(1.5f);
+        this._laserAngle = (270f - (45f * this.gun.spriteAnimator.clipTime)).ToVector();
+        this._reticle.transform.position = this.Player.CenterPosition + 1.5f * this._laserAngle;
     }
 
     public override void OnSwitchedAwayFromThisGun()
@@ -113,7 +131,7 @@ public class OmnidirectionalLaser : AdvancedGunBehavior
             return;
         this._backside.renderer.enabled = false;
         this._reticle.SetAlpha(0.0f);
-        // this._reticle.renderer.enabled = false;
+        // this._reticle.renderer.enabled = false;  //NOTE: doesn't work since it's parented
         this.Player.forceAimPoint = null;
         base.OnSwitchedAwayFromThisGun();
     }
@@ -122,11 +140,26 @@ public class OmnidirectionalLaser : AdvancedGunBehavior
     {
         base.PostProcessProjectile(projectile);
 
-        //subtract the current frame since we're counterclockwise, and use 14 to start at a 270 degree angle
-        float laserAngle = (45f * (14 - this.gun.spriteAnimator.CurrentFrame)).Clamp360();
-        projectile.SendInDirection(laserAngle.ToVector(), true, true);
-        projectile.AddTrailToProjectileInstance(ChekhovsGun._ChekhovTrailPrefab).gameObject.SetGlowiness(10f);
+        Vector2? targetPos = Lazy.NearestEnemyWithinConeOfVision(
+            start                            : this.gun.barrelOffset.position,
+            coneAngle                        : this._laserAngle.ToAngle().Clamp360(),
+            maxDeviation                     : _LOCKON_SNAP,
+            useNearestAngleInsteadOfDistance : true,
+            ignoreWalls                      : false
+            );
+        Vector2 angle =  targetPos.HasValue
+            ? (targetPos.Value - this.gun.barrelOffset.position.XY())
+            : this._laserAngle;
+        projectile.SendInDirection(angle, true, true);
+        projectile.AddTrailToProjectileInstance(_OmniTrailPrefab).gameObject.SetGlowiness(10f);
+    }
 
-        this.Owner.gameObject.PlayUnique("chekhovs_gun_launch_sound_alt");
+    public override void OnPostFired(PlayerController player, Gun gun)
+    {
+        base.OnPostFired(player, gun);
+        gun.gameObject.PlayUnique("omnilaser_shoot_sound");
+        this._timeSinceLastShot = 0.0f;
+        this._currentFps = Math.Min(this._currentFps + _FPS_STEP, _MAX_FPS);
+        gun.spriteAnimator.ClipFps = this._currentFps;
     }
 }

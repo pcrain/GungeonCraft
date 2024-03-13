@@ -521,4 +521,14 @@ public class Initialisation : BaseUnityPlugin
             ETGModConsole.Log(e.StackTrace);
         }
     }
+
+    // For Debugging chest stuff
+    // [HarmonyPatch(typeof(Chest), nameof(Chest.DetermineContents))]
+    // private class DetermineContentsPatch // Fix oversized gun idle animations in vanilla shops and make sure they are aligned properly
+    // {
+    //     private static void Prefix(Chest __instance, PlayerController player, int tierShift)
+    //     {
+    //         __instance.forceContentIds = new(){IDs.Pickups["platinum_star"]}; // for debugging
+    //     }
+    // }
 }
