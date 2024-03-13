@@ -22,8 +22,8 @@ public class Jugglernaut : AdvancedGunBehavior
     internal static List<string> _JuggleAnimations;
     internal static List<float> _MinEmission = new(){0f, 10f, 50f, 100f, 200f, 400f};
     internal static string _TrueIdleAnimation;
-    internal static IntVector2 _CarryOffset        = new IntVector2(21, -8);
-    internal static IntVector2 _FlippedCarryOffset = new IntVector2(-14, -8);
+    internal static IntVector2 _CarryOffset        = new IntVector2(-14, -8);
+    internal static IntVector2 _FlippedCarryOffset = new IntVector2(21, -8);
 
     private int _juggleLevel = 0;
     private Coroutine _glowRoutine = null;
@@ -50,7 +50,7 @@ public class Jugglernaut : AdvancedGunBehavior
             // Manual adjustments to prevent wonky firing animations
             gun.preventRotation                 = true;
             gun.barrelOffset.transform.position = new Vector3(0.75f, 0.75f, 0f);
-            gun.carryPixelOffset                = _CarryOffset;
+            gun.AddFlippedCarryPixelOffsets(offset: _CarryOffset, flippedOffset: _FlippedCarryOffset);
 
             string tossSound = "juggle_toss_sound";
             for (int i = 0; i < _JuggleAnimations.Count(); ++i)
@@ -90,33 +90,6 @@ public class Jugglernaut : AdvancedGunBehavior
 
         gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 1.0f, shootStyle: ShootStyle.SemiAutomatic, damage: 10.0f, speed: 70.0f,
           sprite: "jugglernaut_ball", fps: 12, scale: 0.5f, anchor: Anchor.MiddleLeft));
-    }
-
-    [HarmonyPatch(typeof(Gun), nameof(Gun.HandleSpriteFlip))]
-    private class JugglernautAnimationPatch
-    {
-        static void Prefix(bool flipped, ref bool __state)
-        {
-            __state = flipped;  // we need to remember whether we were flipped before entering the original method
-        }
-
-        static void Postfix(Gun __instance, bool flipped, bool __state)
-        {
-            bool wasFlipped = __state;
-            if (__instance.GetComponent<Jugglernaut>() is not Jugglernaut jugglernaut)
-                return;
-            if (__instance.CurrentOwner is not PlayerController player)
-                return;
-            if (wasFlipped == jugglernaut._cachedFlipped && !jugglernaut._firstSpriteCheck)
-                return;
-
-            if (wasFlipped)
-                __instance.carryPixelOffset = _CarryOffset;
-            else
-                __instance.carryPixelOffset = _FlippedCarryOffset;
-            jugglernaut._cachedFlipped = wasFlipped;
-            jugglernaut._firstSpriteCheck = false;
-        }
     }
 
     [HarmonyPatch(typeof(GameUIAmmoController), nameof(GameUIAmmoController.GetOffsetVectorForGun))]

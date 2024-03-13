@@ -1516,3 +1516,47 @@ public class DissipatingSpriteFragment : MonoBehaviour
         this._sprite.PlaceAtRotatedPositionByAnchor(pos, Anchor.MiddleCenter);
     }
 }
+
+/// <summary>Allow guns to have a different carryPixelOffset when flipped</summary>
+public class FlippedCarryPixelOffset : MonoBehaviour
+{
+    private bool _cachedFlipped = false;
+    private bool _firstSpriteCheck = true;
+
+    public IntVector2 carryOffset;
+    public IntVector2 flippedCarryOffset;
+
+    public static void AddTo(Gun gun, IntVector2 offset, IntVector2 flippedOffset)
+    {
+        FlippedCarryPixelOffset fixer = gun.gameObject.AddComponent<FlippedCarryPixelOffset>();
+        fixer.carryOffset = offset;
+        fixer.flippedCarryOffset = flippedOffset;
+    }
+
+    [HarmonyPatch(typeof(Gun), nameof(Gun.HandleSpriteFlip))]
+    private class GunSpriteFlipFixerPatch // patch for automatically fixing carryPixelOffsets for flipped guns
+    {
+        static void Prefix(bool flipped, ref bool __state)
+        {
+            __state = flipped;  // we need to remember whether we were flipped before entering the original method
+        }
+
+        static void Postfix(Gun __instance, bool flipped, bool __state)
+        {
+            bool wasFlipped = __state;
+            if (__instance.GetComponent<FlippedCarryPixelOffset>() is not FlippedCarryPixelOffset fixer)
+                return;
+            if (__instance.CurrentOwner is not PlayerController player)
+                return;
+            if (wasFlipped == fixer._cachedFlipped && !fixer._firstSpriteCheck)
+                return;
+
+            if (wasFlipped)
+                __instance.carryPixelOffset = fixer.flippedCarryOffset;
+            else
+                __instance.carryPixelOffset = fixer.carryOffset;
+            fixer._cachedFlipped = wasFlipped;
+            fixer._firstSpriteCheck = false;
+        }
+    }
+}

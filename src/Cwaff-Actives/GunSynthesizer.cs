@@ -202,7 +202,7 @@ public class GunSynthesizer : PlayerItem
         {
             if (!this._gun)
                 return;
-            this._gun.m_prepThrowTime = -999f; // hack to prevent the gun from being thrown
+            this._gun.m_prepThrowTime = -999f; //HACK: prevent the gun from being thrown
             this._gun.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/HologramShader");  // force holographics
         }
     }

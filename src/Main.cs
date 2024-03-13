@@ -279,6 +279,7 @@ public class Initialisation : BaseUnityPlugin
                     Suncaster.Add();
                     KALI.Add();
                     AlienNailgun.Add();
+                    OmnidirectionalLaser.Add();
                     setupGunsWatch.Stop();
                 // });
                 // setupGunsThread.Start();

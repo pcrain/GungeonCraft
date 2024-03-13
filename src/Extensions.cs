@@ -625,7 +625,11 @@ public static class Extensions
   {
     gun.SetGunAudio(name: gun.idleAnimation, audio: audio, frame: frame);
   }
-
+  public static void SetIdleAudio(this Gun gun, string audio = "", params int[] frames)
+  {
+    foreach (int frame in frames)
+      gun.SetGunAudio(name: gun.idleAnimation, audio: audio, frame: frame);
+  }
   public static void SetMuzzleVFX(this Gun gun, string resPath = null, float fps = 60, bool loops = false, float scale = 1.0f, Anchor anchor = Anchor.MiddleLeft, bool orphaned = false, float emissivePower = -1, bool continuous = false)
   {
     if (string.IsNullOrEmpty(resPath))
@@ -1334,13 +1338,13 @@ public static class Extensions
   /// <summary>
   /// Get attach points for an animation clip
   /// </summary>
-  public static tk2dSpriteDefinition.AttachPoint[] AttachPointsForClip(this Gun gun, string clipName)
+  public static tk2dSpriteDefinition.AttachPoint[] AttachPointsForClip(this Gun gun, string clipName, int frame = 0)
   {
       Lazy._GunSpriteCollection ??= gun.sprite.collection; // need to initialize at least once
       tk2dSpriteAnimationClip clip = gun.GetComponent<tk2dSpriteAnimator>().GetClipByName(clipName);
       if (clip == null)
           return null;
-      int spriteid = clip.frames[0].spriteId;
+      int spriteid = clip.frames[frame].spriteId;
       int attachIndex = Lazy._GunSpriteCollection.SpriteIDsWithAttachPoints.IndexOf(spriteid);
       return Lazy._GunSpriteCollection.SpriteDefinedAttachPoints[attachIndex].attachPoints;
   }
@@ -1720,5 +1724,12 @@ public static class Extensions
     sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/HologramShader");
     if (green)
       sprite.renderer.material.SetFloat("_IsGreen", 1f);
+  }
+
+  /// <summary>Add a flipped carry offset to a gun</summary>
+  public static void AddFlippedCarryPixelOffsets(this Gun gun, IntVector2 offset, IntVector2 flippedOffset)
+  {
+    gun.carryPixelOffset = offset;
+    FlippedCarryPixelOffset.AddTo(gun: gun, offset: offset, flippedOffset: flippedOffset);
   }
 }
