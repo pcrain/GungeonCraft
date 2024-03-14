@@ -53,7 +53,6 @@ public class ReflexAmmolet : BlankModificationItem
         private static void ReflexAmmoletIL(ILContext il)
         {
             ILCursor cursor = new ILCursor(il);
-            cursor.DumpIL();
 
             int user = 0;
             if (!cursor.TryGotoNext(MoveType.Before,

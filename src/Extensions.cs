@@ -1760,4 +1760,12 @@ public static class Extensions
         offsetGunslinger:  offsetGunslinger,  flippedOffsetGunslinger:  flippedOffsetGunslinger
       );
   }
+
+  /// <summary>Destroy all GameObjects in a less</summary>
+  public static void SafeDestroyAll(this List<GameObject> objects)
+  {
+    for (int i = 0; i < objects.Count; ++i)
+      objects[i].SafeDestroy();
+    objects.Clear();
+  }
 }

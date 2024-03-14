@@ -306,6 +306,7 @@ public class Initialisation : BaseUnityPlugin
                     Cuppajoe.Init();
                     StopSign.Init();
                     GunSynthesizer.Init();
+                    ChestScanner.Init();
 
                     setupActivesWatch.Stop();
                 // });
