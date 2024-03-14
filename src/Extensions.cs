@@ -1732,9 +1732,32 @@ public static class Extensions
   }
 
   /// <summary>Add a flipped carry offset to a gun</summary>
-  public static void AddFlippedCarryPixelOffsets(this Gun gun, IntVector2 offset, IntVector2 flippedOffset)
+  public static void AddFlippedCarryPixelOffsets(this Gun gun, IntVector2 offset, IntVector2 flippedOffset,
+      IntVector2? offsetPilot       = null, IntVector2? flippedOffsetPilot       = null,
+      IntVector2? offsetConvict     = null, IntVector2? flippedOffsetConvict     = null,
+      IntVector2? offsetRobot       = null, IntVector2? flippedOffsetRobot       = null,
+      IntVector2? offsetNinja       = null, IntVector2? flippedOffsetNinja       = null,
+      IntVector2? offsetCosmonaut   = null, IntVector2? flippedOffsetCosmonaut   = null,
+      IntVector2? offsetSoldier     = null, IntVector2? flippedOffsetSoldier     = null,
+      IntVector2? offsetGuide       = null, IntVector2? flippedOffsetGuide       = null,
+      IntVector2? offsetCoopCultist = null, IntVector2? flippedOffsetCoopCultist = null,
+      IntVector2? offsetBullet      = null, IntVector2? flippedOffsetBullet      = null,
+      IntVector2? offsetEevee       = null, IntVector2? flippedOffsetEevee       = null,
+      IntVector2? offsetGunslinger  = null, IntVector2? flippedOffsetGunslinger  = null)
   {
     gun.carryPixelOffset = offset;
-    FlippedCarryPixelOffset.AddTo(gun: gun, offset: offset, flippedOffset: flippedOffset);
+    FlippedCarryPixelOffset.AddTo(gun: gun, offset: offset, flippedOffset: flippedOffset,
+        offsetPilot:       offsetPilot,       flippedOffsetPilot:       flippedOffsetPilot,
+        offsetConvict:     offsetConvict,     flippedOffsetConvict:     flippedOffsetConvict,
+        offsetRobot:       offsetRobot,       flippedOffsetRobot:       flippedOffsetRobot,
+        offsetNinja:       offsetNinja,       flippedOffsetNinja:       flippedOffsetNinja,
+        offsetCosmonaut:   offsetCosmonaut,   flippedOffsetCosmonaut:   flippedOffsetCosmonaut,
+        offsetSoldier:     offsetSoldier,     flippedOffsetSoldier:     flippedOffsetSoldier,
+        offsetGuide:       offsetGuide,       flippedOffsetGuide:       flippedOffsetGuide,
+        offsetCoopCultist: offsetCoopCultist, flippedOffsetCoopCultist: flippedOffsetCoopCultist,
+        offsetBullet:      offsetBullet,      flippedOffsetBullet:      flippedOffsetBullet,
+        offsetEevee:       offsetEevee,       flippedOffsetEevee:       flippedOffsetEevee,
+        offsetGunslinger:  offsetGunslinger,  flippedOffsetGunslinger:  flippedOffsetGunslinger
+      );
   }
 }

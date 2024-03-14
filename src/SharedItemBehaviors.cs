@@ -1523,14 +1523,61 @@ public class FlippedCarryPixelOffset : MonoBehaviour
     private bool _cachedFlipped = false;
     private bool _firstSpriteCheck = true;
 
-    public IntVector2 carryOffset;
-    public IntVector2 flippedCarryOffset;
+    //NOTE: all public so they can be serialized
+    public IntVector2 defaultCarryOffset;
+    public IntVector2 defaultFlippedCarryOffset;
+    public IntVector2[] carryOffsets        = new IntVector2[1 + (int)PlayableCharacters.Gunslinger];
+    public IntVector2[] flippedCarryOffsets = new IntVector2[1 + (int)PlayableCharacters.Gunslinger];
 
-    public static void AddTo(Gun gun, IntVector2 offset, IntVector2 flippedOffset)
+    public static void AddTo(Gun gun, IntVector2 offset, IntVector2 flippedOffset,
+        IntVector2? offsetPilot       = null, IntVector2? flippedOffsetPilot       = null,
+        IntVector2? offsetConvict     = null, IntVector2? flippedOffsetConvict     = null,
+        IntVector2? offsetRobot       = null, IntVector2? flippedOffsetRobot       = null,
+        IntVector2? offsetNinja       = null, IntVector2? flippedOffsetNinja       = null,
+        IntVector2? offsetCosmonaut   = null, IntVector2? flippedOffsetCosmonaut   = null,
+        IntVector2? offsetSoldier     = null, IntVector2? flippedOffsetSoldier     = null,
+        IntVector2? offsetGuide       = null, IntVector2? flippedOffsetGuide       = null,
+        IntVector2? offsetCoopCultist = null, IntVector2? flippedOffsetCoopCultist = null,
+        IntVector2? offsetBullet      = null, IntVector2? flippedOffsetBullet      = null,
+        IntVector2? offsetEevee       = null, IntVector2? flippedOffsetEevee       = null,
+        IntVector2? offsetGunslinger  = null, IntVector2? flippedOffsetGunslinger  = null
+        )
     {
-        FlippedCarryPixelOffset fixer = gun.gameObject.AddComponent<FlippedCarryPixelOffset>();
-        fixer.carryOffset = offset;
-        fixer.flippedCarryOffset = flippedOffset;
+        FlippedCarryPixelOffset fixer   = gun.gameObject.AddComponent<FlippedCarryPixelOffset>();
+        fixer.defaultCarryOffset        = offset;
+        fixer.defaultFlippedCarryOffset = flippedOffset;
+
+        fixer.carryOffsets[(int)PlayableCharacters.Pilot]       = offsetPilot       ?? offset;
+        fixer.carryOffsets[(int)PlayableCharacters.Convict]     = offsetConvict     ?? offset;
+        fixer.carryOffsets[(int)PlayableCharacters.Robot]       = offsetRobot       ?? offset;
+        fixer.carryOffsets[(int)PlayableCharacters.Ninja]       = offsetNinja       ?? offset;
+        fixer.carryOffsets[(int)PlayableCharacters.Cosmonaut]   = offsetCosmonaut   ?? offset;
+        fixer.carryOffsets[(int)PlayableCharacters.Soldier]     = offsetSoldier     ?? offset;
+        fixer.carryOffsets[(int)PlayableCharacters.Guide]       = offsetGuide       ?? offset;
+        fixer.carryOffsets[(int)PlayableCharacters.CoopCultist] = offsetCoopCultist ?? offset;
+        fixer.carryOffsets[(int)PlayableCharacters.Bullet]      = offsetBullet      ?? offset;
+        fixer.carryOffsets[(int)PlayableCharacters.Eevee]       = offsetEevee       ?? offset;
+        fixer.carryOffsets[(int)PlayableCharacters.Gunslinger]  = offsetGunslinger  ?? offset;
+
+        fixer.flippedCarryOffsets[(int)PlayableCharacters.Pilot]       = flippedOffsetPilot       ?? flippedOffset;
+        fixer.flippedCarryOffsets[(int)PlayableCharacters.Convict]     = flippedOffsetConvict     ?? flippedOffset;
+        fixer.flippedCarryOffsets[(int)PlayableCharacters.Robot]       = flippedOffsetRobot       ?? flippedOffset;
+        fixer.flippedCarryOffsets[(int)PlayableCharacters.Ninja]       = flippedOffsetNinja       ?? flippedOffset;
+        fixer.flippedCarryOffsets[(int)PlayableCharacters.Cosmonaut]   = flippedOffsetCosmonaut   ?? flippedOffset;
+        fixer.flippedCarryOffsets[(int)PlayableCharacters.Soldier]     = flippedOffsetSoldier     ?? flippedOffset;
+        fixer.flippedCarryOffsets[(int)PlayableCharacters.Guide]       = flippedOffsetGuide       ?? flippedOffset;
+        fixer.flippedCarryOffsets[(int)PlayableCharacters.CoopCultist] = flippedOffsetCoopCultist ?? flippedOffset;
+        fixer.flippedCarryOffsets[(int)PlayableCharacters.Bullet]      = flippedOffsetBullet      ?? flippedOffset;
+        fixer.flippedCarryOffsets[(int)PlayableCharacters.Eevee]       = flippedOffsetEevee       ?? flippedOffset;
+        fixer.flippedCarryOffsets[(int)PlayableCharacters.Gunslinger]  = flippedOffsetGunslinger  ?? flippedOffset;
+    }
+
+    private IntVector2 GetOffset(PlayableCharacters identity, bool flipped)
+    {
+        int charId = (int)identity;
+        if (charId <= (int)PlayableCharacters.Gunslinger)
+            return flipped ? flippedCarryOffsets[charId] : carryOffsets[charId];
+        return flipped ? defaultFlippedCarryOffset : defaultCarryOffset;
     }
 
     [HarmonyPatch(typeof(Gun), nameof(Gun.HandleSpriteFlip))]
@@ -1551,12 +1598,9 @@ public class FlippedCarryPixelOffset : MonoBehaviour
             if (wasFlipped == fixer._cachedFlipped && !fixer._firstSpriteCheck)
                 return;
 
-            if (wasFlipped)
-                __instance.carryPixelOffset = fixer.flippedCarryOffset;
-            else
-                __instance.carryPixelOffset = fixer.carryOffset;
-            fixer._cachedFlipped = wasFlipped;
-            fixer._firstSpriteCheck = false;
+            __instance.carryPixelOffset = fixer.GetOffset(player.characterIdentity, wasFlipped);
+            fixer._cachedFlipped        = wasFlipped;
+            fixer._firstSpriteCheck     = false;
         }
     }
 }
