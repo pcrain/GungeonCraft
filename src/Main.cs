@@ -352,6 +352,7 @@ public class Initialisation : BaseUnityPlugin
                     RingOfDefenestration.Init();
                     AmmoConservationManual.Init();
                     ReserveAmmolet.Init();
+                    ReflexAmmolet.Init();
                     // Protractor.Init();  // unfinished
                     // PlaybulletMagazine.Init();
                     setupPassivesWatch.Stop();

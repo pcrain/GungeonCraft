@@ -14,7 +14,7 @@ public class Commands
         ETGModConsole.Commands.AddGroup("gg", delegate (string[] args)
         {
             LootEngine.SpawnItem(
-                PickupObjectDatabase.GetById(IDs.Pickups["omnidirectional_laser"]).gameObject,
+                PickupObjectDatabase.GetById(IDs.Pickups["reflex_ammolet"]).gameObject,
                 GameManager.Instance.PrimaryPlayer.CenterPosition,
                 Vector2.zero,
                 0);

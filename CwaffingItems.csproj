@@ -60,6 +60,7 @@
     <Compile Include="src\Cwaff-Passives\CatEarHeadband.cs"/>
     <Compile Include="src\Cwaff-Passives\FourDBullets.cs"/>
     <Compile Include="src\Cwaff-Passives\WeddingRing.cs"/>
+    <Compile Include="src\Cwaff-Passives\ReflexAmmolet.cs"/>
     <Compile Include="src\Cwaff-Passives\VoodooDoll.cs"/>
     <Compile Include="src\Cwaff-Passives\BionicFinger.cs"/>
     <Compile Include="src\Cwaff-Passives\UtilityVest.cs"/>
