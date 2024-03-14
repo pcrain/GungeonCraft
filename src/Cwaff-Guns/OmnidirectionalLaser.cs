@@ -2,8 +2,6 @@
 
 /*
    TODO
-    - #BUG: fix per character carry offsets (only works with robot for now)
-    - #BUG: fix reload slowing down reticle visually
     - add extra pointer mechanics maybe
 */
 
@@ -41,6 +39,7 @@ public class OmnidirectionalLaser : AdvancedGunBehavior
             gun.SetAnimationFPS(gun.shootAnimation, _BASE_FPS);
             gun.LoopAnimation(gun.shootAnimation);
             gun.SetFireAudio("omni_spin_sound", 0, 1, 2, 3, 4, 5, 6, 7);
+            gun.SuppressReloadAnimations();
             gun.AddFlippedCarryPixelOffsets(offset: new IntVector2(5, -4), flippedOffset: new IntVector2(4, -4),
                 offsetPilot:       new IntVector2(5, -4), flippedOffsetPilot:       new IntVector2(5, -4),
                 offsetConvict:     new IntVector2(5, -4), flippedOffsetConvict:     new IntVector2(5, -4),
@@ -52,12 +51,13 @@ public class OmnidirectionalLaser : AdvancedGunBehavior
                 offsetEevee:       new IntVector2(5, -4), flippedOffsetEevee:       new IntVector2(5, -4),  //no one good offset for this character, so deal with a good average
                 offsetGunslinger:  new IntVector2(5, -4), flippedOffsetGunslinger:  new IntVector2(5, -4)   //TODO: verify
                 );
-            gun.gunHandedness      = GunHandedness.NoHanded;
-            gun.muzzleFlashEffects = null;
-            gun.preventRotation    = true;
-            gun.reloadAnimation    = null; // animation shouldn't automatically change when reloading
-            gun.shootAnimation     = null; // animation shouldn't automatically change when firing
-            gun.PreventOutlines    = true; // messes up with two-part rendering
+            gun.gunHandedness           = GunHandedness.NoHanded;
+            gun.muzzleFlashEffects      = null;
+            gun.preventRotation         = true;
+            gun.reloadAnimation         = gun.idleAnimation; // animation shouldn't automatically change when reloading
+            gun.shootAnimation          = null; // animation shouldn't automatically change when firing
+            gun.PreventOutlines         = true; // messes up with two-part rendering
+            gun.OnlyUsesIdleInWeaponBox = true; // fixes half-sprite from appearing in weapon box
 
         for (int i = 1; i <= 8; ++i)
         {

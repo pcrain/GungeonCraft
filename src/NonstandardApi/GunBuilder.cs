@@ -435,4 +435,22 @@ public static class GunBuilder
     }
     gun.Volley.projectiles.Add(ProjectileModule.CreateClone(_DummyChargeModule, false, gun.Volley.projectiles.Count));
   }
+
+  /// <summary>Dummy class for suppressing reload animations on guns with reload times of 0</summary>
+  public class ReloadAnimationSuppressor : MonoBehaviour {}
+
+  /// <summary>Prevent a gun from ever playing reload animations when it's reload time is 0</summary>
+  public static void SuppressReloadAnimations(this Gun gun)
+    => gun.gameObject.GetOrAddComponent<ReloadAnimationSuppressor>();
+
+  /// <summary>Helper patch for enabling ReloadAnimationSuppressor's functionality</summary>
+  [HarmonyPatch(typeof(Gun), nameof(Gun.FinishReload))]
+  private class ReloadAnimationSuppressorPatch
+  {
+      static void Prefix(Gun __instance, bool activeReload, ref bool silent, bool isImmediate)
+      {
+          if (__instance.GetComponent<ReloadAnimationSuppressor>())
+              silent = true;
+      }
+  }
 }
