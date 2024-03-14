@@ -603,6 +603,11 @@ public static class Extensions
       agun.overrideNormalFireAudio = audio;
     }
   }
+  public static void SetFireAudio(this Gun gun, string audio = "", params int[] frames)
+  {
+    foreach (int frame in frames)
+      gun.SetFireAudio(audio: audio, frame: frame);
+  }
   public static void SetReloadAudio(this Gun gun, string audio = "", int frame = 0)
   {
     gun.SetGunAudio(name: gun.reloadAnimation, audio: audio, frame: frame);
