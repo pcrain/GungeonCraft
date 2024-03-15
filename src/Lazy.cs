@@ -94,6 +94,41 @@ public static class Lazy
         return item;
     }
 
+    /// <summary>Perform basic initialization for a new fake passive items for update / save serialization purposes.</summary>
+    public static FakeItem SetupFakeItem<TItemSpecific>() where TItemSpecific : FakeItem
+    {
+        string itemName = typeof(TItemSpecific).Name;
+        string baseItemName = itemName.Replace("-", "").Replace(".", "").Replace(" ", "_").ToLower();  //get saner gun name for commands
+        string internalName = C.MOD_PREFIX+":"+baseItemName;
+
+        GameObject obj = new GameObject(itemName).RegisterPrefab();
+
+        tk2dSprite sprite = obj.AddComponent<tk2dSprite>();
+        sprite.SetSprite(ETGMod.Databases.Items.ItemCollection, 0);
+        obj.GetComponent<BraveBehaviour>().sprite = sprite;
+
+        FakeItem item = obj.AddComponent<TItemSpecific>();
+
+        ETGMod.Databases.Items.SetupItem(item, itemName);
+        Gungeon.Game.Items.Add(internalName, item);
+
+        item.itemName = itemName;
+        item.encounterTrackable.EncounterGuid = $"{C.MOD_PREFIX}-{baseItemName}"; //create a unique guid for the item
+        ETGMod.Databases.Items.Add(item);
+
+        item.encounterTrackable.journalData.SuppressInAmmonomicon = true; //don't show up in ammonomicon
+        item.quality = ItemQuality.SPECIAL;                   // don't show up as rewards
+        item.ShouldBeExcludedFromShops               = true;  // don't show up in shops
+        item.encounterTrackable.SuppressInInventory  = true;  // don't show up in inventory
+        item.encounterTrackable.IgnoreDifferentiator = true;  // don't care how many times we encounter it
+        item.CanBeDropped                            = false; // can't be dropped
+        item.CanBeSold                               = false; // can't be sold
+        item.IgnoredByRat                            = true;  // can't be stolen
+        item.ClearIgnoredByRatFlagOnPickup           = false; // still can't be stolen
+
+        return item;
+    }
+
     /// <summary>
     /// Perform basic initialization for a new passive item definition.
     /// </summary>

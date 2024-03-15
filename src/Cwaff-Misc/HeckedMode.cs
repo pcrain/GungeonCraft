@@ -750,7 +750,7 @@ public static class HeckedMode
             move.m_aiActor = enemy;
         shooter.RegenerateCache();
 
-        enemy.ShowAllBehaviors();
+        // enemy.ShowAllBehaviors();
 
         // shooter.behaviorSpeculator./*Fully*/RefreshBehaviors();
         // shooter.RegenerateCache();

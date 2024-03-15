@@ -34,6 +34,22 @@ public class Expiration : MonoBehaviour  // kill projectile after a fixed amount
     }
 }
 
+/// <summary>Class for fake items that don't show up in inventory or ammonomicon, but can persistently update and get serialized during midgame saves</summary>
+public class FakeItem : PassiveItem
+{
+    private static Dictionary<Type, FakeItem> _Prefabs = new();
+
+    public static void Create<T>() where T : FakeItem
+    {
+        _Prefabs[typeof(T)] = Lazy.SetupFakeItem<T>();
+    }
+
+    public static FakeItem Acquire<T>() where T : FakeItem
+    {
+        return _Prefabs[typeof(T)];
+    }
+}
+
 public class BulletLifeTimer : MonoBehaviour
 {
     public BulletLifeTimer()

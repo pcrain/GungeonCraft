@@ -1768,4 +1768,18 @@ public static class Extensions
       objects[i].SafeDestroy();
     objects.Clear();
   }
+
+
+  /// <summary>Acquire a fake item and put it in a player's inventory</summary>
+  public static T AcquireFakeItem<T>(this PlayerController player) where T : FakeItem
+  {
+    GameObject gameObject = UnityEngine.Object.Instantiate(FakeItem.Acquire<T>().gameObject);
+    T fakePassive = gameObject.GetComponent<T>();
+    EncounterTrackable trackable = fakePassive.GetComponent<EncounterTrackable>();
+    if (trackable)
+      trackable.DoNotificationOnEncounter = false;
+    fakePassive.suppressPickupVFX = true;
+    fakePassive.Pickup(player);
+    return fakePassive;
+  }
 }
