@@ -322,7 +322,7 @@ public static class HeckedMode
     }
 
     // disable prefire animations in hecked mode since they mess with fire rate
-    private static bool HeckedModeShouldSkipPrefireAnimationCheck(ShootGunBehavior sgb, string s)
+    private static bool HeckedModeShouldSkipPrefireAnimationCheck(string s)
     {
         return (_HeckedModeStatus != Hecked.Disabled) || string.IsNullOrEmpty(s);
     }
@@ -358,7 +358,6 @@ public static class HeckedMode
                 return; // couldn't find the appropriate hook
 
             cursor.Remove(); // remove the string.IsNullOrEmpty check
-            cursor.Emit(OpCodes.Ldarg_0); // load the player instance as arg0
             cursor.Emit(OpCodes.Call, typeof(HeckedMode).GetMethod("HeckedModeShouldSkipPrefireAnimationCheck", BindingFlags.Static | BindingFlags.NonPublic)); // replace it with our own
         }
     }
