@@ -678,7 +678,7 @@ public static class HeckedMode
     }
 
     /// <summary>Gives guns to enemies that don't normally have them.</summary>
-    public static AIShooter ArmToTheTeeth(this AIActor enemy, Gun replacementGun)
+    public static AIShooter EnableGunShooting(this AIActor enemy, Gun replacementGun)
     {
         _BulletKin ??= EnemyDatabase.GetOrLoadByGuid(Enemies.BulletKin);
 
@@ -728,7 +728,14 @@ public static class HeckedMode
             myPewpew.m_behaviorSpeculator = shooter.behaviorSpeculator;
             shooter.behaviorSpeculator.AttackBehaviors.Add(myPewpew);
             myPewpew.Init(enemy.gameObject, enemy, shooter);
+            // ETGModConsole.Log($"{myPewpew.m_aiActor!=null}");
+            // ETGModConsole.Log($"{myPewpew.m_aiActor.CurrentGun!=null}");
+            // Gun gg = PickupObjectDatabase.GetById(myPewpew.m_aiShooter.equippedGunId) as Gun;
+            // ETGModConsole.Log($"{gg!=null}");
+            // ETGModConsole.Log($"{!string.IsNullOrEmpty(gg.enemyPreFireAnimation)}");
+            // ETGModConsole.Log($"{gg.spriteAnimator}");
             myPewpew.Start();
+            // ETGModConsole.Log($"survived");
             shooter.behaviorSpeculator.m_behaviors.Add(myPewpew);
             shooter.RegenerateCache();
             break;
@@ -743,7 +750,7 @@ public static class HeckedMode
             move.m_aiActor = enemy;
         shooter.RegenerateCache();
 
-        // enemy.ShowAllBehaviors();
+        enemy.ShowAllBehaviors();
 
         // shooter.behaviorSpeculator./*Fully*/RefreshBehaviors();
         // shooter.RegenerateCache();
@@ -751,30 +758,8 @@ public static class HeckedMode
         return shooter;
     }
 
-    private static AIActor _BulletKin = null;
-    public static void HeckedShootGunBehavior(this AIActor enemy, Gun replacementGun)
+    public static void ArmToTheTeeth(this AIShooter shooter, Gun replacementGun)
     {
-        if (enemy.aiShooter is not AIShooter shooter)
-        {
-            if (_HeckedModeStatus != Hecked.Retrashed)
-                return;  // disable extra guns outside the debug build for now
-            if (enemy.GetComponent<CompanionController>())
-                return; // companions should not get guns in retrashed mode
-            shooter = enemy.ArmToTheTeeth(replacementGun);
-        }
-
-        // if (replacementGun?.DefaultModule?.projectiles?[0] is not Projectile)
-        // {
-        //     Lazy.DebugLog($"failed to initialize default projectiles for enemy");
-        //     return;
-        // }
-
-        // if (shooter?.behaviorSpeculator?.AttackBehaviors is not List<AttackBehaviorBase>)
-        // {
-        //     Lazy.DebugLog($"failed to initialize attack behaviors for enemy");
-        //     return;
-        // }
-
         ProjectileModule mod = replacementGun.DefaultModule;
         Projectile defaultProjectile = (
           ((mod.shootStyle == ShootStyle.Charged) && ((mod.chargeProjectiles?.Count ?? 0) > 0))
@@ -867,6 +852,33 @@ public static class HeckedMode
 
             */
         }
+    }
+
+    private static AIActor _BulletKin = null;
+    public static void HeckedShootGunBehavior(this AIActor enemy, Gun replacementGun)
+    {
+        if (enemy.aiShooter is not AIShooter shooter)
+        {
+            if (_HeckedModeStatus != Hecked.Retrashed)
+                return;  // disable extra guns outside the debug build for now
+            if (enemy.GetComponent<CompanionController>())
+                return; // companions should not get guns in retrashed mode
+            shooter = enemy.EnableGunShooting(replacementGun);
+        }
+
+        // if (replacementGun?.DefaultModule?.projectiles?[0] is not Projectile)
+        // {
+        //     Lazy.DebugLog($"failed to initialize default projectiles for enemy");
+        //     return;
+        // }
+
+        // if (shooter?.behaviorSpeculator?.AttackBehaviors is not List<AttackBehaviorBase>)
+        // {
+        //     Lazy.DebugLog($"failed to initialize attack behaviors for enemy");
+        //     return;
+        // }
+
+        shooter.ArmToTheTeeth(replacementGun);
     }
 
     // public static void AttachStats(this AIShooter shooter)

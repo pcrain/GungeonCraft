@@ -307,6 +307,7 @@ public class Initialisation : BaseUnityPlugin
                     StopSign.Init();
                     GunSynthesizer.Init();
                     ChestScanner.Init();
+                    BulletbotImplant.Init();
 
                     setupActivesWatch.Stop();
                 // });

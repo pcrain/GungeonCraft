@@ -107,6 +107,7 @@
     <Compile Include="src\Cwaff-Actives\Cuppajoe.cs"/>
     <Compile Include="src\Cwaff-Actives\IceCream.cs"/>
     <Compile Include="src\Cwaff-Actives\EmergencySiren.cs"/>
+    <Compile Include="src\Cwaff-Actives\BulletbotImplant.cs"/>
     <Compile Include="src\Cwaff-Actives\KalibersJustice.cs"/>
     <Compile Include="src\Cwaff-Actives\StopSign.cs"/>
     <Compile Include="src\Cwaff-Actives\GunSynthesizer.cs"/>
