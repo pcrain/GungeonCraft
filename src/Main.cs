@@ -280,6 +280,7 @@ public class Initialisation : BaseUnityPlugin
                     KALI.Add();
                     AlienNailgun.Add();
                     OmnidirectionalLaser.Add();
+                    RCLauncher.Add();
                     setupGunsWatch.Stop();
                 // });
                 // setupGunsThread.Start();

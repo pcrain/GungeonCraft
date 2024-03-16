@@ -151,6 +151,7 @@
     <Compile Include="src\Cwaff-Guns\Missiletoe.cs"/>
     <Compile Include="src\Cwaff-Guns\QuarterPounder.cs"/>
     <Compile Include="src\Cwaff-Guns\PistolWhip.cs"/>
+    <Compile Include="src\Cwaff-Guns\RCLauncher.cs"/>
     <Compile Include="src\Cwaff-Guns\Deadline.cs"/>
     <Compile Include="src\Cwaff-Guns\RacketLauncher.cs"/>
     <Compile Include="src\Cwaff-Guns\Scotsman.cs"/>

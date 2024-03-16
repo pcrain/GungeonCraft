@@ -648,4 +648,14 @@ public static class Lazy
         _FragmentDict[fragmentName] = def;
         return def;
     }
+
+    /// <summary>Returns a random color</summary>
+    public static Color RandomColor()
+    {
+        return new Color(
+            UnityEngine.Random.value,
+            UnityEngine.Random.value,
+            UnityEngine.Random.value
+            );
+    }
 }
