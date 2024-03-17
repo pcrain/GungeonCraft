@@ -15,11 +15,11 @@ public class Breegull : AdvancedGunBehavior
             gun.SetAnimationFPS(gun.shootAnimation, 20);
             gun.SetAnimationFPS(gun.reloadAnimation, 12);
             gun.SetAnimationFPS(gun.introAnimation, 8);
-            gun.SetMuzzleVFX(); // innocuous muzzle flash effects
+            gun.SetMuzzleVFX(); // no muzzle flash effects
             gun.SetFireAudio("breegull_shoot_sound");
             gun.SetReloadAudio("breegull_reload_sound", 0, 4, 8);
             gun.SetGunAudio(gun.introAnimation, "breegull_intro_sound");
-            gun.carryPixelOffset = new IntVector2(12, 0);
+            gun.carryPixelOffset = new IntVector2(6, 0);
 
         gun.InitProjectile(GunData.New(sprite: "breegull_projectile", clipSize: 10, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic, damage: 5.0f));
     }
