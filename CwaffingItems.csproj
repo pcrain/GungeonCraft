@@ -160,6 +160,7 @@
     <Compile Include="src\Cwaff-Guns\Pincushion.cs"/>
     <Compile Include="src\Cwaff-Guns\Suncaster.cs"/>
     <Compile Include="src\Cwaff-Guns\CarpetBomber.cs"/>
+    <Compile Include="src\Cwaff-Guns\Breegull.cs"/>
     <Compile Include="src\Cwaff-Guns\Ticonderogun.cs"/>
     <Compile Include="src\Cwaff-Guns\SchrodingersGat.cs"/>
     <Compile Include="src\Cwaff-Guns\KingsLaw.cs"/>

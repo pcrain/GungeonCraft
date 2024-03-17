@@ -638,10 +638,13 @@ public static class Extensions
   public static void SetMuzzleVFX(this Gun gun, string resPath = null, float fps = 60, bool loops = false, float scale = 1.0f, Anchor anchor = Anchor.MiddleLeft, bool orphaned = false, float emissivePower = -1, bool continuous = false)
   {
     if (string.IsNullOrEmpty(resPath))
+    {
       gun.muzzleFlashEffects = null; //.type = VFXPoolType.None;
-    else
-      gun.muzzleFlashEffects = VFX.CreatePool(resPath, fps: fps,
-        loops: loops, scale: scale, anchor: anchor, alignment: VFXAlignment.Fixed, orphaned: orphaned, attached: true, emissivePower: emissivePower);
+      return;
+    }
+
+    gun.muzzleFlashEffects = VFX.CreatePool(resPath, fps: fps,
+      loops: loops, scale: scale, anchor: anchor, alignment: VFXAlignment.Fixed, orphaned: orphaned, attached: true, emissivePower: emissivePower);
     gun.usesContinuousMuzzleFlash = continuous;
   }
 

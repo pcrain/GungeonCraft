@@ -150,3 +150,6 @@ rc_car_engine_sound,-14.0,0,sound
 rc_car_crash_sound,-4.0,1,sound
 rc_car_reload_sound,-2.0,1,sound
 pincushion_fire,-15.0,1,sound
+breegull_shoot_sound,-7.5,1,sound
+breegull_reload_sound,-5.0,1,sound
+breegull_intro_sound,0.0,1,sound

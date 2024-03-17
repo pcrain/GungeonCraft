@@ -14,7 +14,7 @@ public class Commands
         ETGModConsole.Commands.AddGroup("gg", delegate (string[] args)
         {
             LootEngine.SpawnItem(
-                PickupObjectDatabase.GetById(IDs.Pickups["rc_launcher"]).gameObject,
+                PickupObjectDatabase.GetById(IDs.Pickups["breegull"]).gameObject,
                 GameManager.Instance.PrimaryPlayer.CenterPosition,
                 Vector2.zero,
                 0);

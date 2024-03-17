@@ -281,6 +281,7 @@ public class Initialisation : BaseUnityPlugin
                     AlienNailgun.Add();
                     OmnidirectionalLaser.Add();
                     RCLauncher.Add();
+                    Breegull.Add();
                     setupGunsWatch.Stop();
                 // });
                 // setupGunsThread.Start();
