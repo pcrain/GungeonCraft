@@ -29,7 +29,8 @@ public class RCLauncher : AdvancedGunBehavior
 
         gun.InitSpecialProjectile<RCGuidedProjectile>(GunData.New(sprite: "rc_car_projectile", clipSize: 7, cooldown: 0.1f,
             shootStyle: ShootStyle.SemiAutomatic, speed: 20f, damage: 9f, range: 9999f,
-            shouldRotate: false, shouldFlipHorizontally: false, shouldFlipVertically: false)
+            shouldRotate: false, shouldFlipHorizontally: false, shouldFlipVertically: false,
+            spawnSound: "rc_car_engine_sound", stopSoundOnDeath: true, deathSound: "rc_car_crash_sound")
         ).Attach<RCGuidedProjectile>(igp => {
             igp.dumbfireTime          = 0.2f;
             igp.trackingSpeed         = 360f;
@@ -103,24 +104,17 @@ public class RCProjectileBehavior : MonoBehaviour
             this._trail.BaseColor  = lightc;
             this._trail.StartColor = lightc;
             this._trail.EndColor   = lightc;
-
-        base.gameObject.Play("rc_car_engine_sound");
     }
 
     private void Update()
     {
-      Projectile p = this._projectile;
-      int frameForRotation = Mathf.RoundToInt((float)this._numFrames * (1f + p.LastVelocity.ToAngle() / 360.0f)) % this._numFrames;
-      p.sprite.SetSprite(this._clip.frames[frameForRotation].spriteId);
-      // enter update code here
+      int frameForRotation = Mathf.RoundToInt((float)this._numFrames * (1f + this._projectile.LastVelocity.ToAngle() / 360.0f)) % this._numFrames;
+      this._projectile.sprite.SetSprite(this._clip.frames[frameForRotation].spriteId);
     }
 
     private void OnDestroy()
     {
-      base.gameObject.Play("rc_car_engine_sound_stop");
-      base.gameObject.Play("rc_car_crash_sound");
       Exploder.Explode(this._projectile.transform.position, RCLauncher._CarExplosion, this._projectile.Direction, ignoreQueues: true);
-      // enter destroy code here
     }
 }
 

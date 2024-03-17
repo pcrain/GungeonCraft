@@ -53,6 +53,11 @@ public sealed class GunData
   public bool  useDummyChargeModule;
   public bool  invisibleProjectile;
 
+  public string spawnSound;
+  public bool stopSoundOnDeath;
+  public string deathSound;
+  public bool uniqueSounds;
+
   /// <summary>Pseudo-constructor holding most setup information required for a single projectile gun.</summary>
   /// <param name="gun">The gun we're attaching to (can be null, only used for custom clip sprite name resolution for now).</param>
   /// <param name="clipSize">The number of shots the gun can fired before reloading.</param>
@@ -99,13 +104,20 @@ public sealed class GunData
   /// <param name="shouldFlipVertically"></param>
   /// <param name="useDummyChargeModule"></param>
   /// <param name="invisibleProjectile"></param>
+
+  /// <param name="spawnSound"></param>
+  /// <param name="stopSoundOnDeath"></param>
+  /// <param name="deathSound"></param>
+  /// <param name="uniqueSounds"></param>
   public static GunData New(Gun gun = null, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
     ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1, GameUIAmmoType.AmmoType? ammoType = null,
     bool customClip = false, float? damage = null, float? speed = null, float? force = null, float? range = null, float? recoil = null, float poison = 0.0f, float fire = 0.0f, float freeze = 0.0f, float slow = 0.0f,
     bool? collidesWithEnemies = null, bool? ignoreDamageCaps = null, bool? collidesWithProjectiles = null, bool? surviveRigidbodyCollisions = null, bool? collidesWithTilemap = null,
     string sprite = null, int fps = 2, Anchor anchor = Anchor.MiddleCenter, float scale = 1.0f, bool anchorsChangeColliders = true, bool fixesScales = true, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null,
     IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null, float bossDamageMult = 1.0f, string destroySound = null, bool? shouldRotate = null, int barrageSize = 1,
-    bool? shouldFlipHorizontally = null, bool? shouldFlipVertically = null, bool useDummyChargeModule = false, bool invisibleProjectile = false)
+    bool? shouldFlipHorizontally = null, bool? shouldFlipVertically = null, bool useDummyChargeModule = false, bool invisibleProjectile = false, string spawnSound = null, bool stopSoundOnDeath = true, string deathSound = null,
+    bool uniqueSounds = false
+    )
   {
       _Instance.gun                           = gun; // set by InitSpecialProjectile()
       _Instance.clipSize                      = clipSize;
@@ -149,6 +161,10 @@ public sealed class GunData
       _Instance.shouldFlipVertically          = shouldFlipVertically;
       _Instance.useDummyChargeModule          = useDummyChargeModule;
       _Instance.invisibleProjectile           = invisibleProjectile;
+      _Instance.spawnSound                    = spawnSound;
+      _Instance.stopSoundOnDeath              = stopSoundOnDeath;
+      _Instance.deathSound                    = deathSound;
+      _Instance.uniqueSounds                  = uniqueSounds;
       return _Instance;
   }
 }
@@ -252,6 +268,13 @@ public static class GunBuilder
     p.AppliesSpeedModifier = b.slow > 0.0f;
     if (p.AppliesSpeedModifier)
       p.speedEffect = (ItemHelper.Get(Items.TripleCrossbow) as Gun).DefaultModule.projectiles[0].speedEffect;
+
+
+    CwaffProjectile c = p.AddComponent<CwaffProjectile>();
+      c.spawnSound       = b.spawnSound;
+      c.stopSoundOnDeath = b.stopSoundOnDeath;
+      c.deathSound       = b.deathSound;
+      c.uniqueSounds     = b.uniqueSounds;
 
     return p;
   }

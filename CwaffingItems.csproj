@@ -212,6 +212,7 @@
     <Compile Include="src\NonstandardApi\GunBuilder.cs"/>
     <Compile Include="src\NonstandardApi\MiniInteractable.cs"/>
     <Compile Include="src\NonstandardApi\BeamHelpers.cs"/>
+    <Compile Include="src\NonstandardApi\CwaffProjectile.cs"/>
     <Compile Include="src\NonstandardApi\DamageAdjuster.cs"/>
     <Compile Include="src\NonstandardApi\Cwaff-GenericNPC.cs"/>
     <Compile Include="src\Databases.cs"/>
