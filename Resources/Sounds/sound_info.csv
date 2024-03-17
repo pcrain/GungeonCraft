@@ -145,3 +145,7 @@ alien_nailgun_shoot_sound,-2.5,1,sound
 gun_synthesizer_activate_sound,4.0,1,sound
 omni_spin_sound,-6.5,1,sound
 omnilaser_shoot_sound,-8.0,1,sound
+rc_car_launch_sound,-8.0,1,sound
+rc_car_engine_sound,-14.0,0,sound
+rc_car_crash_sound,-4.0,1,sound
+rc_car_reload_sound,-2.0,1,sound

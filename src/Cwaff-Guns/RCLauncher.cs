@@ -9,26 +9,64 @@ public class RCLauncher : AdvancedGunBehavior
 {
     public static string ItemName         = "R.C. Launcher";
     public static string ProjectileName   = "38_special";
-    public static string ShortDescription = "TBD";
+    public static string ShortDescription = "Pedal to the Metal";
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
+
+    private const float _FULL_RELOAD_TIME = 2.0f;
+
+    internal static ExplosionData _CarExplosion = null;
 
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<RCLauncher>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 250/*, defaultAudio: true*/);
+            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: _FULL_RELOAD_TIME, ammo: 240);
+            gun.LoopAnimation(gun.reloadAnimation);
+            gun.SetAnimationFPS(gun.shootAnimation, 30);
+            gun.SetAnimationFPS(gun.reloadAnimation, 16);
+            gun.SetFireAudio("rc_car_launch_sound");
+            gun.SetReloadAudio("rc_car_reload_sound");
 
-        gun.InitSpecialProjectile<RCGuidedProjectile>(GunData.New(sprite: "rc_car_projectile", clipSize: -1, cooldown: 0.1f,
-            shootStyle: ShootStyle.SemiAutomatic, speed: 10f, damage: 16f, range: 9999f,
+        gun.InitSpecialProjectile<RCGuidedProjectile>(GunData.New(sprite: "rc_car_projectile", clipSize: 7, cooldown: 0.1f,
+            shootStyle: ShootStyle.SemiAutomatic, speed: 20f, damage: 9f, range: 9999f,
             shouldRotate: false, shouldFlipHorizontally: false, shouldFlipVertically: false)
         ).Attach<RCGuidedProjectile>(igp => {
+            igp.dumbfireTime          = 0.2f;
             igp.trackingSpeed         = 360f;
-            igp.minSpeed              = 10f;
+            igp.minSpeed              = 20f;
             igp.accel                 = 15f;
             igp.followTheLeader       = true;
             igp.pierceMinorBreakables = true;
         }).Attach<RCProjectileBehavior>(
         );
+
+        // Initialize our explosion data
+        _CarExplosion = new ExplosionData()
+        {
+            forceUseThisRadius     = true,
+            pushRadius             = 0.5f,
+            damageRadius           = 0.5f,
+            damageToPlayer         = 0f,
+            doDamage               = true,
+            damage                 = 5f,
+            doDestroyProjectiles   = false,
+            doForce                = true,
+            debrisForce            = 10f,
+            preventPlayerForce     = true,
+            explosionDelay         = 0.01f,
+            usesComprehensiveDelay = false,
+            doScreenShake          = false,
+            playDefaultSFX         = true,
+            effect                 = Explosions.ExplosiveRounds.effect,
+            ignoreList             = Explosions.DefaultSmall.ignoreList,
+            ss                     = Explosions.DefaultSmall.ss,
+        };
+    }
+
+    protected override void Update()
+    {
+        base.Update();
+        this.gun.reloadTime = _FULL_RELOAD_TIME * (1f - (float)this.gun.ClipShotsRemaining / (float)this.gun.ClipCapacity);
     }
 }
 
@@ -56,7 +94,7 @@ public class RCProjectileBehavior : MonoBehaviour
             );
         Color lightc = Color.Lerp(c, Color.white, 0.5f);
         this._projectile.AdjustPlayerProjectileTint(lightc, priority: 1);
-        SpriteOutlineManager.AddOutlineToSprite(this._projectile.sprite, c, 0.2f);
+        SpriteOutlineManager.AddOutlineToSprite(this._projectile.sprite, c);
 
         this._trail = this._projectile.gameObject.AddComponent<EasyTrailBullet>();
             this._trail.StartWidth = 0.2f;
@@ -65,6 +103,8 @@ public class RCProjectileBehavior : MonoBehaviour
             this._trail.BaseColor  = lightc;
             this._trail.StartColor = lightc;
             this._trail.EndColor   = lightc;
+
+        base.gameObject.Play("rc_car_engine_sound");
     }
 
     private void Update()
@@ -77,6 +117,9 @@ public class RCProjectileBehavior : MonoBehaviour
 
     private void OnDestroy()
     {
+      base.gameObject.Play("rc_car_engine_sound_stop");
+      base.gameObject.Play("rc_car_crash_sound");
+      Exploder.Explode(this._projectile.transform.position, RCLauncher._CarExplosion, this._projectile.Direction, ignoreQueues: true);
       // enter destroy code here
     }
 }
@@ -142,6 +185,8 @@ public class RCGuidedProjectile : Projectile
             if (this.accel > 0f)
                 this.Accelerate(this.accel);
         }
+        else
+            base.specRigidbody.Velocity = m_currentDirection * m_currentSpeed;
         base.LastVelocity = base.specRigidbody.Velocity;
     }
 
