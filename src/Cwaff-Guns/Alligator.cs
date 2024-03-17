@@ -34,7 +34,7 @@ public class Alligator : AdvancedGunBehavior
         _ShootBarrelOffsets  = gun.GetBarrelOffsetsForAnimation(gun.shootAnimation);
         _ReloadBarrelOffsets = gun.GetBarrelOffsetsForAnimation(gun.reloadAnimation);
         _SparkVFX            = VFX.Create("spark_vfx", fps: 16, loops: true, anchor: Anchor.MiddleCenter, scale: 0.35f, emissivePower: 50f);
-        _ClipVFX             = VFX.Create("alligator_projectile_clamped", fps: 2, loops: true, anchor: Anchor.MiddleCenter);  //BUG: need to move this to MiscVFX, see github issue
+        _ClipVFX             = VFX.Create("alligator_clamped_vfx", fps: 2, loops: true, anchor: Anchor.MiddleCenter);
     }
 
     protected override void OnPickedUpByPlayer(PlayerController player)

@@ -39,7 +39,13 @@ public static class VFX
         tk2dSpriteAnimator  animator  = vfxEffect.AddComponent<tk2dSpriteAnimator>();
         tk2dSpriteAnimation animation = vfxEffect.AddComponent<tk2dSpriteAnimation>();
 
-        int spriteId = Collection.GetSpriteIdByName(spritePaths[0]);
+        int spriteId = Collection.GetSpriteIdByName(spritePaths[0], -1);
+        if (spriteId == -1)
+        {
+            Lazy.DebugWarn($"  HEY! Failed to get VFX for {name}, might be from the wrong collection");
+            spriteId = 0;
+        }
+
         tk2dSpriteDefinition defaultDef = Collection.spriteDefinitions[spriteId];
         if (dimensions is IntVector2 dims)
             defaultDef.colliderVertices = new Vector3[]{Vector3.zero, C.PIXEL_SIZE * dims.ToVector3()};
