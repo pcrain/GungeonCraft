@@ -33,7 +33,7 @@ public class KingsLaw : AdvancedGunBehavior
             gun.SetReloadAudio("knife_gun_reload");
 
         gun.InitProjectile(GunData.New(clipSize: 20, shootStyle: ShootStyle.Automatic, damage: 7.5f, speed: 40.0f, range: 999999f, customClip: true,
-          cooldown: _SPAWN_RATE, sprite: "kings_law_projectile", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter,
+          cooldown: _SPAWN_RATE, sprite: "kings_law_projectile", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter, spawnSound: "snd_undynedis",
           useDummyChargeModule: true)).Attach<KingsLawBullets>();
 
         // Projectiles should spawn in semi-circles around some offset point behind the player, filling in each
@@ -197,7 +197,6 @@ public class KingsLawBullets : MonoBehaviour
         };
         this._projectile.specRigidbody.OnPreRigidbodyCollision += SkipCorpseCollisions;
 
-        base.gameObject.Play("snd_undynedis");
         StartCoroutine(TheLaw());
     }
 

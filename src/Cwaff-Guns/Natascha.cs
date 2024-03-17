@@ -25,7 +25,7 @@ public class Natascha : AdvancedGunBehavior
             gun.AddToSubShop(ModdedShopType.Rusty);
 
         gun.InitProjectile(GunData.New(clipSize: -1, cooldown: _BaseCooldownTime, angleVariance: 15.0f,
-          shootStyle: ShootStyle.Automatic, damage: 3.0f, speed: 20.0f, slow: 1.0f,
+          shootStyle: ShootStyle.Automatic, damage: 3.0f, speed: 20.0f, slow: 1.0f, spawnSound: "tomislav_shoot",
           sprite: "natascha_bullet", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter));
     }
 
@@ -69,7 +69,6 @@ public class Natascha : AdvancedGunBehavior
     public override void OnPostFired(PlayerController player, Gun gun)
     {
         base.OnPostFired(player, gun);
-        gun.gameObject.Play("tomislav_shoot");
         if (this._speedMult == 1.0f)
         {
             gun.gameObject.Play("minigun_wind_down_stop");

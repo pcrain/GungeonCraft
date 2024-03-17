@@ -69,12 +69,6 @@ public class RacketLauncher : AdvancedGunBehavior
         return Lazy.NoProjectile();
     }
 
-    public override void OnPostFired(PlayerController player, Gun gun)
-    {
-        base.OnPostFired(player, gun);
-        // gun.IsGunBlocked()
-    }
-
     public override void OnAmmoChangedSafe(PlayerController player, Gun gun)
     {
         gun.ClipShotsRemaining = gun.CurrentAmmo;

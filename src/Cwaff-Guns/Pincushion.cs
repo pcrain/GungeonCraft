@@ -29,7 +29,7 @@ public class Pincushion : AdvancedGunBehavior
         _Microdust = VFX.CreatePool("microdust", fps: 30, loops: false);
 
         gun.InitProjectile(GunData.New(clipSize: 1000 / _SIMULTANEOUS_BULLETS, cooldown: C.FRAME, angleVariance: 35.0f, shootStyle: ShootStyle.Automatic,
-          damage: 0.0f, speed: 200.0f, force: 0.0f, range: 999f, bossDamageMult: 0.65f, sprite: "needle", fps: 12,
+          damage: 0.0f, speed: 200.0f, force: 0.0f, range: 999f, bossDamageMult: 0.65f, sprite: "needle", fps: 12, spawnSound: "pincushion_fire",
           anchor: Anchor.MiddleLeft, barrageSize: 4
           )).SetAllImpactVFX(_Microdust
           ).Attach<VeryFragileProjectile>(
@@ -53,12 +53,6 @@ public class Pincushion : AdvancedGunBehavior
         float spread = _MIN_SPREAD + _DLT_SPREAD * (1f - ((float)this.gun.ClipShotsRemaining / (float)this.gun.ClipCapacity));
         spread *= pc.AccuracyMult();
         projectile.SendInDirection((pc.m_currentGunAngle + spread*(2f*UnityEngine.Random.value - 1f)).ToVector(), false);
-    }
-
-    public override void OnPostFired(PlayerController player, Gun gun)
-    {
-        base.OnPostFired(player, gun);
-        gun.gameObject.Play("soul_kaliber_fire");
     }
 
     [HarmonyPatch(typeof(MinorBreakable), nameof(MinorBreakable.OnPreCollision))]

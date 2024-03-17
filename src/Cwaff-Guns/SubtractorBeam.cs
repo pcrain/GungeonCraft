@@ -32,17 +32,11 @@ public class SubtractorBeam : AdvancedGunBehavior
             scale: 0.5f, anchor: Anchor.MiddleCenter, emissivePower: 10f);
 
         gun.InitProjectile(GunData.New(clipSize: 4, cooldown: 0.25f, angleVariance: 5.0f, shootStyle: ShootStyle.SemiAutomatic,
-          damage: 0.0f, speed: 300.0f, force: 0.0f, range: 300.0f, customClip: true
+          damage: 0.0f, speed: 300.0f, force: 0.0f, range: 300.0f, customClip: true, spawnSound: "subtractor_beam_fire_sound", uniqueSounds: true
           )).Attach<PierceProjModifier>(pierce => {
             pierce.penetration            = 999;
             pierce.penetratesBreakables   = true;
           }).Attach<SubtractorProjectile>();
-    }
-
-    public override void PostProcessProjectile(Projectile projectile)
-    {
-        base.PostProcessProjectile(projectile);
-        this.Owner.gameObject.PlayUnique("subtractor_beam_fire_sound");
     }
 
     protected override void OnPostDroppedByPlayer(PlayerController player)

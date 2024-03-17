@@ -62,7 +62,7 @@ public class Gunbrella : AdvancedGunBehavior
             return;
         }
 
-        Lazy.PlaySoundUntilDeathOrTimeout(soundName: "gunbrella_charge_sound", source: this.gun.gameObject, timer: 0.05f);
+        Lazy.PlaySoundUntilDeathOrTimeout(soundName: "gunbrella_charge_sound", source: this.gun.gameObject, timer: 0.05f);  //TODO: could maybe be handled better
 
         if (this._curChargeTime == 0.0f)
             BeginCharge();

@@ -39,7 +39,7 @@ public class Suncaster : AdvancedGunBehavior
             gun.SetAnimationFPS(gun.reloadAnimation, 40);
 
         _SuncasterProjectile = gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.Charged,
-          damage: 2f, speed: 100f, range: 999999f, fps: 12, anchor: Anchor.MiddleLeft, customClip: true)
+          damage: 2f, speed: 100f, range: 999999f, fps: 12, anchor: Anchor.MiddleLeft, customClip: true, spawnSound: "suncaster_fire_sound", uniqueSounds: true)
         ).Attach<PierceProjModifier>(pierce => pierce.penetration = 999
         ).Attach<SuncasterProjectile>();
         _SuncasterProjectile.pierceMinorBreakables = true;
@@ -101,7 +101,6 @@ public class Suncaster : AdvancedGunBehavior
         base.PostProcessProjectile(projectile);
         projectile.GetComponent<SuncasterProjectile>().FiredFromGun(this);
         // projectile.gameObject.Play("prism_refract_sound");
-        base.gameObject.PlayOnce("suncaster_fire_sound");
         this._lastChargeTime = BraveTime.ScaledTimeSinceStartup; // reset charge timer after firing
     }
 

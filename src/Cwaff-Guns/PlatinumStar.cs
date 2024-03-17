@@ -22,7 +22,7 @@ public class PlatinumStar : AdvancedGunBehavior
             gun.AddToSubShop(ModdedShopType.TimeTrader);
 
         gun.InitProjectile(GunData.New(clipSize: 28, cooldown: 0.125f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, customClip: true,
-          damage: 3.0f, speed: 50.0f, force: 1.0f, range: 50.0f, sprite: "platinum_star_projectile", fps: 12, anchor: Anchor.MiddleLeft
+          damage: 3.0f, speed: 50.0f, force: 1.0f, range: 50.0f, sprite: "platinum_star_projectile", fps: 12, anchor: Anchor.MiddleLeft, spawnSound: "tomislav_shoot"
           )).Attach<PlatinumProjectile>();
 
         _OraBullet = Items.Polaris.CloneProjectile(GunData.New(damage: 1.0f, speed: 75.0f, force: 0.1f, range: 3.0f, shouldRotate: true
@@ -30,19 +30,19 @@ public class PlatinumStar : AdvancedGunBehavior
           ).Attach<PierceProjModifier>(pierce => pierce.penetration = 999);
     }
 
-    public override void OnPostFired(PlayerController player, Gun gun)
-    {
-        base.OnPostFired(player, gun);
-        gun.gameObject.Play("tomislav_shoot");
-        // Material m = this.gun.gameObject.GetOrAddShader(Shader.Find("Brave/ItemSpecific/LootGlintAdditivePass"));
-        // m.SetColor("_OverrideColor", Color.yellow);
-        // m.SetFloat("_Period", 1.0f);
-        // m.SetFloat("_PixelWidth", 5.0f);
-        // Material m3 = this.Owner.sprite.gameObject.GetOrAddShader(Shader.Find("Brave/ItemSpecific/LootGlintAdditivePass"));
-        // m3.SetColor("_OverrideColor", Color.yellow);
-        // m3.SetFloat("_Period", 1.0f);
-        // m3.SetFloat("_PixelWidth", 5.0f);
-    }
+    // public override void OnPostFired(PlayerController player, Gun gun)
+    // {
+    //     base.OnPostFired(player, gun);
+    //     gun.gameObject.Play("tomislav_shoot");
+    //     // Material m = this.gun.gameObject.GetOrAddShader(Shader.Find("Brave/ItemSpecific/LootGlintAdditivePass"));
+    //     // m.SetColor("_OverrideColor", Color.yellow);
+    //     // m.SetFloat("_Period", 1.0f);
+    //     // m.SetFloat("_PixelWidth", 5.0f);
+    //     // Material m3 = this.Owner.sprite.gameObject.GetOrAddShader(Shader.Find("Brave/ItemSpecific/LootGlintAdditivePass"));
+    //     // m3.SetColor("_OverrideColor", Color.yellow);
+    //     // m3.SetFloat("_Period", 1.0f);
+    //     // m3.SetFloat("_PixelWidth", 5.0f);
+    // }
 
     public override void OnReload(PlayerController player, Gun gun)
     {
@@ -99,8 +99,7 @@ public class PlatinumProjectile : MonoBehaviour
 
         this._projectile.OnHitEnemy += (Projectile p, SpeculativeRigidbody enemy, bool _) => {
             p.gameObject.Play("soul_kaliber_impact");
-            OraOra oraora = enemy.aiActor.gameObject.GetOrAddComponent<OraOra>();
-                oraora.BankDamage(this._bankedDamage, this._angle);
+            enemy.gameObject.GetOrAddComponent<OraOra>().BankDamage(this._bankedDamage, this._angle);
         };
     }
 }

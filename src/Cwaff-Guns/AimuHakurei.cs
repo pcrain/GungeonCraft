@@ -43,12 +43,12 @@ public class AimuHakurei : AdvancedGunBehavior
 
         _ProjBase = gun.InitFirstProjectile(GunData.New(damage: 8f, speed: 44f, range: 100f, force: 3f));
 
-        Projectile beamProj = Items._38Special.CloneProjectile(GunData.New(damage: 16.0f, speed: 300.0f));
+        Projectile beamProj = Items._38Special.CloneProjectile(GunData.New(damage: 16.0f, speed: 300.0f, spawnSound: "aimu_beam_sound_2"));
             TrailController tc = beamProj.AddTrailToProjectilePrefab(ResMap.Get("aimu_beam_mid")[0], new Vector2(25, 39), new Vector2(0, 0),
                 ResMap.Get("aimu_beam_mid"), 60, ResMap.Get("aimu_beam_start"), 60, cascadeTimer: C.FRAME, destroyOnEmpty: true);
                 tc.UsesDispersalParticles = true;
                 tc.DispersalParticleSystemPrefab = (ItemHelper.Get(Items.FlashRay) as Gun).DefaultModule.projectiles[0].GetComponentInChildren<TrailController>().DispersalParticleSystemPrefab;
-            beamProj.SetAllImpactVFX(VFX.CreatePool("aimu_beam_impact", fps: 20, loops: false, scale: 1.0f, anchor: Anchor.MiddleCenter));
+            beamProj.SetAllImpactVFX(VFX.CreatePool("aimu_beam_impact", fps: 20, loops: false, scale: 1.0f, anchor: Anchor.MiddleCenter)); //BUG: relocate aimu_beam_impact to vfx folder
 
         // set up tiered projectiles
         gun.Volley.projectiles = new(){
@@ -90,8 +90,6 @@ public class AimuHakurei : AdvancedGunBehavior
     {
         base.PostProcessProjectile(projectile);
         SetFocus(false);
-        if (projectile.GetComponentInChildren<TrailController>())
-            this.Owner.gameObject.PlayUnique("aimu_beam_sound_2");
     }
 
     protected override void OnPickedUpByPlayer(PlayerController player)

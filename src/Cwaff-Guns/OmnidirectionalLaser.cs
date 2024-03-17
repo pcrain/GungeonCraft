@@ -68,7 +68,7 @@ public class OmnidirectionalLaser : AdvancedGunBehavior
         }
 
         gun.InitProjectile(GunData.New(sprite: "omnilaser_projectile", clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
-            speed: 200f, damage: 16f));
+            speed: 200f, damage: 16f, spawnSound: "omnilaser_shoot_sound", uniqueSounds: true));
 
         _OmniTrailPrefab = VFX.CreateTrailObject(ResMap.Get("omnilaser_projectile_trail")[0], new Vector2(23, 4), new Vector2(0, 0),
             ResMap.Get("omnilaser_projectile_trail"), 60, cascadeTimer: C.FRAME, destroyOnEmpty: true);
@@ -177,7 +177,6 @@ public class OmnidirectionalLaser : AdvancedGunBehavior
     public override void OnPostFired(PlayerController player, Gun gun)
     {
         base.OnPostFired(player, gun);
-        gun.gameObject.PlayUnique("omnilaser_shoot_sound");
         this._timeSinceLastShot = 0.0f;
         this._currentFps = Math.Min(this._currentFps + _FPS_STEP, _MAX_FPS);
         gun.spriteAnimator.ClipFps = this._currentFps;
