@@ -54,14 +54,14 @@ public sealed class GunData
   public bool  invisibleProjectile;
 
   public string spawnSound;
-  public bool stopSoundOnDeath;
+  public bool? stopSoundOnDeath;
   public string deathSound;
-  public bool uniqueSounds;
+  public bool? uniqueSounds;
   public GameObject shrapnelVFX;
-  public int shrapnelCount;
-  public float shrapnelMinVelocity;
-  public float shrapnelMaxVelocity;
-  public float shrapnelLifetime;
+  public int? shrapnelCount;
+  public float? shrapnelMinVelocity;
+  public float? shrapnelMaxVelocity;
+  public float? shrapnelLifetime;
 
   /// <summary>Pseudo-constructor holding most setup information required for a single projectile gun.</summary>
   /// <param name="gun">The gun we're attaching to (can be null, only used for custom clip sprite name resolution for now).</param>
@@ -125,8 +125,8 @@ public sealed class GunData
     bool? collidesWithEnemies = null, bool? ignoreDamageCaps = null, bool? collidesWithProjectiles = null, bool? surviveRigidbodyCollisions = null, bool? collidesWithTilemap = null,
     string sprite = null, int fps = 2, Anchor anchor = Anchor.MiddleCenter, float scale = 1.0f, bool anchorsChangeColliders = true, bool fixesScales = true, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null,
     IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null, float bossDamageMult = 1.0f, string destroySound = null, bool? shouldRotate = null, int barrageSize = 1,
-    bool? shouldFlipHorizontally = null, bool? shouldFlipVertically = null, bool useDummyChargeModule = false, bool invisibleProjectile = false, string spawnSound = null, bool stopSoundOnDeath = false, string deathSound = null,
-    bool uniqueSounds = false, GameObject shrapnelVFX = null, int shrapnelCount = 10, float shrapnelMinVelocity = 4f, float shrapnelMaxVelocity = 8f, float shrapnelLifetime = 0.3f
+    bool? shouldFlipHorizontally = null, bool? shouldFlipVertically = null, bool useDummyChargeModule = false, bool invisibleProjectile = false, string spawnSound = null, bool? stopSoundOnDeath = null, string deathSound = null,
+    bool? uniqueSounds = null, GameObject shrapnelVFX = null, int? shrapnelCount = null, float? shrapnelMinVelocity = null, float? shrapnelMaxVelocity = null, float? shrapnelLifetime = null
     )
   {
       _Instance.gun                           = gun; // set by InitSpecialProjectile()
@@ -260,6 +260,17 @@ public static class GunBuilder
       p.PlayerKnockbackForce = b.recoil.Value;
     }
 
+    CwaffProjectile c = p.GetOrAddComponent<CwaffProjectile>();
+      c.spawnSound          = b.spawnSound          ?? c.spawnSound;
+      c.stopSoundOnDeath    = b.stopSoundOnDeath    ?? c.stopSoundOnDeath;
+      c.deathSound          = b.deathSound          ?? c.deathSound;
+      c.uniqueSounds        = b.uniqueSounds        ?? c.uniqueSounds;
+      c.shrapnelVFX         = b.shrapnelVFX         ?? c.shrapnelVFX;
+      c.shrapnelCount       = b.shrapnelCount       ?? c.shrapnelCount;
+      c.shrapnelMinVelocity = b.shrapnelMinVelocity ?? c.shrapnelMinVelocity;
+      c.shrapnelMaxVelocity = b.shrapnelMaxVelocity ?? c.shrapnelMaxVelocity;
+      c.shrapnelLifetime    = b.shrapnelLifetime    ?? c.shrapnelLifetime;
+
     // Non-defaulted
     p.BossDamageMultiplier                            = b.bossDamageMult;
     p.onDestroyEventName                              = b.destroySound;
@@ -283,17 +294,6 @@ public static class GunBuilder
     p.AppliesSpeedModifier = b.slow > 0.0f;
     if (p.AppliesSpeedModifier)
       p.speedEffect = (ItemHelper.Get(Items.TripleCrossbow) as Gun).DefaultModule.projectiles[0].speedEffect;
-
-    CwaffProjectile c = p.GetOrAddComponent<CwaffProjectile>();
-      c.spawnSound          = b.spawnSound;
-      c.stopSoundOnDeath    = b.stopSoundOnDeath;
-      c.deathSound          = b.deathSound;
-      c.uniqueSounds        = b.uniqueSounds;
-      c.shrapnelVFX         = b.shrapnelVFX;
-      c.shrapnelCount       = b.shrapnelCount;
-      c.shrapnelMinVelocity = b.shrapnelMinVelocity;
-      c.shrapnelMaxVelocity = b.shrapnelMaxVelocity;
-      c.shrapnelLifetime    = b.shrapnelLifetime;
 
     return p;
   }

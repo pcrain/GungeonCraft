@@ -3,16 +3,16 @@ namespace CwaffingTheGungy;
 /// <summary>Extensions for improved projectile handling</summary>
 public class CwaffProjectile : MonoBehaviour
 {
-    public string spawnSound;
-    public bool stopSoundOnDeath;
-    public string deathSound;
-    public bool uniqueSounds;
-
-    public GameObject shrapnelVFX;
-    public int shrapnelCount;
-    public float shrapnelMinVelocity;
-    public float shrapnelMaxVelocity;
-    public float shrapnelLifetime;
+    // sane defaults
+    public string spawnSound         = null;
+    public bool stopSoundOnDeath     = false;
+    public string deathSound         = null;
+    public bool uniqueSounds         = false;
+    public GameObject shrapnelVFX    = null;
+    public int shrapnelCount         = 10;
+    public float shrapnelMinVelocity = 4f;
+    public float shrapnelMaxVelocity = 8f;
+    public float shrapnelLifetime    = 0.3f;
 
     private Projectile _projectile;
     private PlayerController _owner;
