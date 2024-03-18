@@ -57,6 +57,11 @@ public sealed class GunData
   public bool stopSoundOnDeath;
   public string deathSound;
   public bool uniqueSounds;
+  public GameObject shrapnelVFX;
+  public int shrapnelCount;
+  public float shrapnelMinVelocity;
+  public float shrapnelMaxVelocity;
+  public float shrapnelLifetime;
 
   /// <summary>Pseudo-constructor holding most setup information required for a single projectile gun.</summary>
   /// <param name="gun">The gun we're attaching to (can be null, only used for custom clip sprite name resolution for now).</param>
@@ -109,6 +114,11 @@ public sealed class GunData
   /// <param name="stopSoundOnDeath"></param>
   /// <param name="deathSound"></param>
   /// <param name="uniqueSounds"></param>
+  /// <param name="shrapnelVFX"></param>
+  /// <param name="shrapnelCount"></param>
+  /// <param name="shrapnelMinVelocity"></param>
+  /// <param name="shrapnelMaxVelocity"></param>
+  /// <param name="shrapnelLifetime"></param>
   public static GunData New(Gun gun = null, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
     ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1, GameUIAmmoType.AmmoType? ammoType = null,
     bool customClip = false, float? damage = null, float? speed = null, float? force = null, float? range = null, float? recoil = null, float poison = 0.0f, float fire = 0.0f, float freeze = 0.0f, float slow = 0.0f,
@@ -116,7 +126,7 @@ public sealed class GunData
     string sprite = null, int fps = 2, Anchor anchor = Anchor.MiddleCenter, float scale = 1.0f, bool anchorsChangeColliders = true, bool fixesScales = true, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null,
     IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null, float bossDamageMult = 1.0f, string destroySound = null, bool? shouldRotate = null, int barrageSize = 1,
     bool? shouldFlipHorizontally = null, bool? shouldFlipVertically = null, bool useDummyChargeModule = false, bool invisibleProjectile = false, string spawnSound = null, bool stopSoundOnDeath = false, string deathSound = null,
-    bool uniqueSounds = false
+    bool uniqueSounds = false, GameObject shrapnelVFX = null, int shrapnelCount = 10, float shrapnelMinVelocity = 4f, float shrapnelMaxVelocity = 8f, float shrapnelLifetime = 0.3f
     )
   {
       _Instance.gun                           = gun; // set by InitSpecialProjectile()
@@ -165,6 +175,11 @@ public sealed class GunData
       _Instance.stopSoundOnDeath              = stopSoundOnDeath;
       _Instance.deathSound                    = deathSound;
       _Instance.uniqueSounds                  = uniqueSounds;
+      _Instance.shrapnelVFX                   = shrapnelVFX;
+      _Instance.shrapnelCount                 = shrapnelCount;
+      _Instance.shrapnelMinVelocity           = shrapnelMinVelocity;
+      _Instance.shrapnelMaxVelocity           = shrapnelMaxVelocity;
+      _Instance.shrapnelLifetime              = shrapnelLifetime;
       return _Instance;
   }
 }
@@ -183,7 +198,6 @@ public static class GunBuilder
     // Set up the gun's default module, default projectile, and default projectile animation
     ProjectileModule mod = gun.SetupDefaultModule(b);
     ProjectileType proj = gun.InitFirstProjectileOfType<ProjectileType>(b);
-      proj.AddDefaultAnimation(b);
 
     // Determine whether we have an invisible projectile
     proj.sprite.renderer.enabled = !b.invisibleProjectile;
@@ -224,6 +238,7 @@ public static class GunBuilder
   {
     b ??= GunData.Default;
     ProjectileType p = projectile.ClonePrefab();
+    p.AddDefaultAnimation(b);
 
     // Defaulted
     p.baseData.damage                                 = b.damage                     ?? p.baseData.damage;
@@ -269,12 +284,16 @@ public static class GunBuilder
     if (p.AppliesSpeedModifier)
       p.speedEffect = (ItemHelper.Get(Items.TripleCrossbow) as Gun).DefaultModule.projectiles[0].speedEffect;
 
-
-    CwaffProjectile c = p.AddComponent<CwaffProjectile>();
-      c.spawnSound       = b.spawnSound;
-      c.stopSoundOnDeath = b.stopSoundOnDeath;
-      c.deathSound       = b.deathSound;
-      c.uniqueSounds     = b.uniqueSounds;
+    CwaffProjectile c = p.GetOrAddComponent<CwaffProjectile>();
+      c.spawnSound          = b.spawnSound;
+      c.stopSoundOnDeath    = b.stopSoundOnDeath;
+      c.deathSound          = b.deathSound;
+      c.uniqueSounds        = b.uniqueSounds;
+      c.shrapnelVFX         = b.shrapnelVFX;
+      c.shrapnelCount       = b.shrapnelCount;
+      c.shrapnelMinVelocity = b.shrapnelMinVelocity;
+      c.shrapnelMaxVelocity = b.shrapnelMaxVelocity;
+      c.shrapnelLifetime    = b.shrapnelLifetime;
 
     return p;
   }

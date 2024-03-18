@@ -589,6 +589,7 @@ public class FancyVFX : MonoBehaviour
 
         if (!this._vfx)
         {
+            //TODO: i don't think this can actually happen o.o
             UnityEngine.Object.Destroy(this);
             return;
         }
@@ -598,6 +599,7 @@ public class FancyVFX : MonoBehaviour
         if (percentDone >= 1.0f)
         {
             this._vfx.SafeDestroy();
+            this._vfx = null;
             UnityEngine.Object.Destroy(this);
             return;
         }
@@ -614,7 +616,7 @@ public class FancyVFX : MonoBehaviour
             float alpha = (this._curLifeTime - this._fadeStartTime) / this._fadeTotalTime;
             if (!this._fadeIn)
                 alpha = 1.0f - alpha;
-            // ETGModConsole.Log($"  setting alpha to {}");
+            // ETGModConsole.Log($"  setting alpha to {alpha}");
             this.sprite.renderer.SetAlpha(alpha);
         }
     }
@@ -636,6 +638,7 @@ public class FancyVFX : MonoBehaviour
         {
             this._fadeTotalTime = fadeOutTime.Value;
             this._fadeStartTime = this._maxLifeTime - this._fadeTotalTime;
+            // ETGModConsole.Log($"setup with fade from {this._fadeStartTime} to {this._fadeTotalTime} with fadeIn {fadeIn}");
         }
         if (height.HasValue)
         {

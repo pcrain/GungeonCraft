@@ -8,6 +8,12 @@ public class CwaffProjectile : MonoBehaviour
     public string deathSound;
     public bool uniqueSounds;
 
+    public GameObject shrapnelVFX;
+    public int shrapnelCount;
+    public float shrapnelMinVelocity;
+    public float shrapnelMaxVelocity;
+    public float shrapnelLifetime;
+
     private Projectile _projectile;
     private PlayerController _owner;
 
@@ -35,6 +41,18 @@ public class CwaffProjectile : MonoBehaviour
 
     private void OnProjectileDestroy(Projectile p)
     {
+      #region Shrapnel Handling
+        if (shrapnelVFX)
+        {
+          p.SpawnShrapnel(
+              shrapnelVFX         : shrapnelVFX,
+              shrapnelCount       : shrapnelCount,
+              shrapnelMinVelocity : shrapnelMinVelocity,
+              shrapnelMaxVelocity : shrapnelMaxVelocity,
+              shrapnelLifetime    : shrapnelLifetime);
+        }
+      #endregion
+
       #region Sound Handling
         if (stopSoundOnDeath && !string.IsNullOrEmpty(spawnSound))
           base.gameObject.Play($"{spawnSound}_stop");
@@ -52,5 +70,10 @@ public class CwaffProjectile : MonoBehaviour
     private void OnDestroy()
     {
       // enter destroy code here
+    }
+
+    private void SpawnShrapnel()
+    {
+
     }
 }

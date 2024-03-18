@@ -323,7 +323,7 @@ public static class AnimatedBullet // stolen and modified from NN
         proj.sprite.spriteAnimator.PlayFromFrame(frame);
     }
 
-    public static void AddAnimation(this Projectile proj, tk2dSpriteAnimationClip clip)
+    public static void AddAnimation(this Projectile proj, tk2dSpriteAnimationClip clip, bool overwriteExisting = false)
     {
         if (proj.sprite.spriteAnimator == null)
         {
@@ -337,13 +337,16 @@ public static class AnimatedBullet // stolen and modified from NN
             proj.sprite.spriteAnimator.Library.enabled = true;
         }
 
-        proj.sprite.spriteAnimator.Library.clips = proj.sprite.spriteAnimator.Library.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
+        if (overwriteExisting)
+            proj.sprite.spriteAnimator.Library.clips = new tk2dSpriteAnimationClip[] { clip };
+        else
+            proj.sprite.spriteAnimator.Library.clips = proj.sprite.spriteAnimator.Library.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
         proj.sprite.spriteAnimator.deferNextStartClip = false;
     }
 
-    public static void AddDefaultAnimation(this Projectile proj, tk2dSpriteAnimationClip clip, int frame = 0)
+    public static void AddDefaultAnimation(this Projectile proj, tk2dSpriteAnimationClip clip, int frame = 0, bool overwriteExisting = false)
     {
-        proj.AddAnimation(clip);
+        proj.AddAnimation(clip, overwriteExisting: overwriteExisting);
         proj.SetAnimation(clip, frame);
     }
 
@@ -354,7 +357,7 @@ public static class AnimatedBullet // stolen and modified from NN
         proj.AddDefaultAnimation(AnimatedBullet.Create(
             name: b.sprite, fps: b.fps, anchor: b.anchor, scale: b.scale, anchorsChangeColliders: b.anchorsChangeColliders, fixesScales: b.fixesScales,
             manualOffsets: b.manualOffsets, overrideColliderPixelSizes: b.overrideColliderPixelSizes, overrideColliderOffsets: b.overrideColliderOffsets,
-            overrideProjectilesToCopyFrom: b.overrideProjectilesToCopyFrom), frame: frame);
+            overrideProjectilesToCopyFrom: b.overrideProjectilesToCopyFrom), frame: frame, overwriteExisting: true);
     }
 }
 

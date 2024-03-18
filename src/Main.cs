@@ -381,6 +381,12 @@ public class Initialisation : BaseUnityPlugin
                     "adrenaline_heart",         AdrenalineShot._FullHeartSpriteUI,
                     "adrenaline_heart",         AdrenalineShot._HalfHeartSpriteUI,
                     "adrenaline_heart",         AdrenalineShot._EmptyHeartSpriteUI,
+
+                    "breegull_clockwork_ui",    Breegull._ClockworkUI,
+                    "breegull_fire_ui",         Breegull._FireUI,
+                    "breegull_grenade_ui",      Breegull._GrenadeUI,
+                    "breegull_ice_ui",          Breegull._IceUI,
+                    "breegull_normal_ui",       Breegull._NormalUI,
                 });
                 setupUIWatch.Stop();
             #endregion

@@ -1772,7 +1772,6 @@ public static class Extensions
     objects.Clear();
   }
 
-
   /// <summary>Acquire a fake item and put it in a player's inventory</summary>
   public static T AcquireFakeItem<T>(this PlayerController player) where T : FakeItem
   {
@@ -1784,5 +1783,24 @@ public static class Extensions
     fakePassive.suppressPickupVFX = true;
     fakePassive.Pickup(player);
     return fakePassive;
+  }
+
+  /// <summary>Spawn shrapnel from a projectile</summary>
+  public static void SpawnShrapnel(this Projectile p, GameObject shrapnelVFX, int shrapnelCount = 10, float shrapnelMinVelocity = 20f, float shrapnelMaxVelocity = 25f, float shrapnelLifetime = 0.2f)
+  {
+      tk2dSpriteDefinition def = p.sprite.GetCurrentSpriteDef();
+      Vector2 spriteSize       = def.position3 - def.position0;
+      FancyVFX.SpawnBurst(
+          prefab           : shrapnelVFX,
+          numToSpawn       : shrapnelCount,
+          basePosition     : p.transform.position,
+          positionVariance : 0.5f * Mathf.Min(spriteSize.x, spriteSize.y),
+          minVelocity      : shrapnelMinVelocity,
+          velocityVariance : shrapnelMaxVelocity - shrapnelMinVelocity,
+          velType          : FancyVFX.Vel.Away,
+          rotType          : FancyVFX.Rot.Random,
+          lifetime         : shrapnelLifetime,
+          fadeOutTime      : shrapnelLifetime
+        );
   }
 }
