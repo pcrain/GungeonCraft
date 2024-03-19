@@ -9,7 +9,6 @@ public class HandCannon : AdvancedGunBehavior
     public static string Lore             = "Second only to guns, hands are widely considered to be one of the most effective weapons ever brought to the battlefield. In ancient times, combatants would often throw the severed hands of their fallen comrades at their enemies to simultaneously inflict physical and emotional damage, ergo the modern expression \"tossing hands\". The venerable Gun Tzu is thought to be the first to marry guns and hands with his legendary Finger Gun, known for inflicting panic and fear in all who opposed his army. The Hand Cannon is a direct descendant and natural evolution of Gun Tzu's original Finger Gun, packing enough force to make Vasilii Kamotskii blush.";
 
     internal static GameObject _SlapppAnimation;
-    internal static int                     _FireAnimationFrames = 8;
 
     private const float _CHARGE_TIME       = 0.5f;
     private const int   _CHARGE_LOOP_FRAME = 11;
@@ -25,12 +24,11 @@ public class HandCannon : AdvancedGunBehavior
             gun.SetMuzzleVFX("muzzle_hand_cannon", fps: 30, scale: 0.5f, anchor: Anchor.MiddleCenter);
             gun.SetFireAudio("hand_cannon_shoot_sound");
             gun.SetReloadAudio("hand_cannon_reload_sound");
-            gun.SetChargeAudio("hand_cannon_charge_sound", frame: 0);
-            gun.SetChargeAudio("hand_cannon_charge_sound", frame: 10);
+            gun.SetChargeAudio("hand_cannon_charge_sound", 0, 10);
 
         gun.InitProjectile(GunData.New(clipSize: 2, cooldown: 0.1f, angleVariance: 15.0f, shootStyle: ShootStyle.Charged,
           customClip: true, damage: 40.0f, speed: 40.0f, sprite: "slappp", fps: 30, scale: 0.5f, anchor: Anchor.MiddleCenter,
-          overrideColliderPixelSizes: new IntVector2(8,8), chargeTime: _CHARGE_TIME)).Attach<SlappProjectile>();
+          chargeTime: _CHARGE_TIME)).Attach<SlappProjectile>();
 
         _SlapppAnimation = VFX.Create("slappp_vfx", fps: 30, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f);
     }
