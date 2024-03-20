@@ -11,7 +11,7 @@ public class OmnidirectionalLaser : AdvancedGunBehavior
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Hula Hooplah";
     public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string Lore             = "Initially designed with hundreds of AI-guided lasers arounds its perimeter, budget cuts during production led to replacing the hundreds of lasers with a single laser that circled around the weapon's perimeter. Further budget cuts let to the removal of the AI targeting system, resulting in a final product that, while potent, is incredibly inconvenient to aim.";
 
     private const int _BASE_FPS          = 8;
     private const int _MAX_FPS           = 32;

@@ -5,7 +5,7 @@ public class ChestScanner : PlayerItem
     public static string ItemName         = "Chest Scanner";
     public static string ShortDescription = "Try Before You Buy";
     public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string Lore             = "The tricky thing about most chests in the Gungeon is that their contents are seemingly not determined until they are opened, making scanning them a largely fruitless endeavor. Similar to an over-eager child on Christmas Eve, this handy little device operates by shaking chests at a sub-atomic level, tricking them into thinking they've been opened before using half-century old x-ray technologies to determine their contents.";
 
     private PlayerController _owner = null;
     private Chest _nearestChest     = null;

@@ -4,9 +4,9 @@ public class Breegull : AdvancedGunBehavior
 {
     public static string ItemName         = "Breegull";
     public static string ProjectileName   = "38_special";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string ShortDescription = "Rare Wares";
+    public static string LongDescription  = "";
+    public static string Lore             = "With bear no more,\n  the bird's alone.\nAmidst the Gungeon's\n  walls of stone.\nArmed with her trusty\n  eggs and beak.\nShe'll help you kill\n  the past you seek.\n- Guntilda";
 
     internal static GameObject _Shrapnel     = null;
     internal static Projectile _EggNormal    = null;
@@ -35,7 +35,7 @@ public class Breegull : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Breegull>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.RIFLE, reloadTime: 1.0f, ammo: 320);
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.0f, ammo: 320);
             gun.SetAnimationFPS(gun.shootAnimation, 20);
             gun.SetAnimationFPS(gun.reloadAnimation, 12);
             gun.SetAnimationFPS(gun.introAnimation, 8);

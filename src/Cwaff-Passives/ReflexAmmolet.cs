@@ -5,7 +5,7 @@ public class ReflexAmmolet : BlankModificationItem
     public static string ItemName         = "Reflex Ammolet";
     public static string ShortDescription = "Blanks Return Fire";
     public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string Lore             = "Blanks are useful from a defensive perspective, but destroying projectiles is unnecessarily wasteful when you stop to think about it. Straight from ACNE Corporation's Ammolet Division's Sustainability Subdivision, the patent-pending Reflex Ammolet does away with unnecessary projectile waste and instead lets you *lay waste* to your enemies with their own projectiles.";
     public static int    ID;
 
     public static void Init()
