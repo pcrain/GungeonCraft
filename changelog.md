@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.10.1 (2024-03-20)
+
+- Fixed startup crash due to OmnidirectionalLaser trying to read non-existent attach points
+
 ## 1.10.0 (2024-03-20)
 
 #### Features and Polish:

@@ -61,7 +61,8 @@ public class OmnidirectionalLaser : AdvancedGunBehavior
 
         for (int i = 1; i <= 8; ++i)
         {
-            foreach (tk2dSpriteDefinition.AttachPoint a in gun.AttachPointsForClip(gun.idleAnimation, frame: i - 1).EmptyIfNull())
+            //NOTE: can't use gun.idleAnimation since it uses the trimmed variant by default
+            foreach (tk2dSpriteDefinition.AttachPoint a in gun.AttachPointsForClip("omnidirectional_laser_idle", frame: i - 1).EmptyIfNull())
                 if (a.name == "Casing")
                     _BarrelOffsets.Add(a.position);
             _BackSpriteIds.Add(gun.sprite.Collection.GetSpriteIdByName($"omnidirectional_laser_fire_back_00{i}"));
