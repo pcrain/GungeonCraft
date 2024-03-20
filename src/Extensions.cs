@@ -1803,4 +1803,16 @@ public static class Extensions
           fadeOutTime      : shrapnelLifetime
         );
   }
+
+  /// <summary>Retrieves a field from within an enumerator</summary>
+  private static Regex rx_enum_field = new Regex(@"^<(.*)>__[0-9]+$", RegexOptions.Compiled);
+  public static string GetEnumeratorField(this Type t, string s)
+  {
+      return AccessTools.GetDeclaredFields(t).Find(f => {
+          foreach (Match match in rx_enum_field.Matches(f.Name))
+            if (match.Groups[1].Value == s)
+              return true;
+          return false;
+      }).Name;
+  }
 }

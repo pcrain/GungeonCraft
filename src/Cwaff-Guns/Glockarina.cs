@@ -78,20 +78,15 @@ public class Glockarina : AdvancedGunBehavior
         _GlockarinaPickupID = gun.PickupObjectId;
     }
 
-    [HarmonyPatch]
+    [HarmonyPatch(typeof(Chest), nameof(Chest.PresentItem), MethodType.Enumerator)]
     private class ChestOpenPatch
     {
-        private static readonly Type _IterType = typeof(Chest).GetNestedType("<PresentItem>c__Iterator6", BindingFlags.NonPublic | BindingFlags.Instance);
-        static MethodBase TargetMethod() {
-          // refer to C# reflection documentation:
-          return _IterType.GetMethod("MoveNext");
-        }
-
         [HarmonyILManipulator]
-        private static void OnSpewContentsOntoGroundIL(ILContext il)
+        private static void OnSpewContentsOntoGroundIL(ILContext il, MethodBase original)
         {
             ILCursor cursor = new ILCursor(il);
-            if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchStfld(_IterType.FullName, "<displayTime>__1")))
+            Type ot = original.DeclaringType;
+            if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchStfld(ot, ot.GetEnumeratorField("displayTime"))))
                 return; // play our sound right before we begin the item display countdown
             cursor.Emit(OpCodes.Call, typeof(Glockarina).GetMethod("OnChestOpen", BindingFlags.Static | BindingFlags.NonPublic));
         }

@@ -62,11 +62,6 @@ public class Initialisation : BaseUnityPlugin
 {
     public static Initialisation Instance;
 
-    public unsafe void Test()
-    {
-        var nums = stackalloc int[3];
-    }
-
     public void Awake()
     {
     }

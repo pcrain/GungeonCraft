@@ -453,14 +453,9 @@ public static class LargeGunAnimationHotfix
         reward.m_itemDisplaySprite.SetSprite(idleClip.frames[0].spriteCollection, idleClip.frames[0].spriteId);
     }
 
-    [HarmonyPatch]
+    [HarmonyPatch(typeof(Chest), nameof(Chest.PresentItem), MethodType.Enumerator)]
     private class PresentItemPatch // Fix oversized idle animations in chests
     {
-        static MethodBase TargetMethod() {
-          // refer to C# reflection documentation:
-          return typeof(Chest).GetNestedType("<PresentItem>c__Iterator6", BindingFlags.NonPublic | BindingFlags.Instance).GetMethod("MoveNext");
-        }
-
         [HarmonyILManipulator]
         private static void OnPresentItemIL(ILContext il)
         {

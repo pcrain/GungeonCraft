@@ -30,14 +30,9 @@ public class StuntHelmet : PassiveItem
         _StuntHelmetId   = item.PickupObjectId;
     }
 
-    [HarmonyPatch]
+    [HarmonyPatch(typeof(Exploder), nameof(Exploder.HandleExplosion), MethodType.Enumerator)]
     private class StuntExplosionPatch
     {
-        static MethodBase TargetMethod() {
-          // refer to C# reflection documentation:
-          return typeof(Exploder).GetNestedType("<HandleExplosion>c__Iterator4", BindingFlags.Instance | BindingFlags.NonPublic).GetMethod("MoveNext");
-        }
-
         [HarmonyILManipulator]
         private static void StuntExplosionIL(ILContext il)
         {
