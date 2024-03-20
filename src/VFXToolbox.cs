@@ -993,7 +993,7 @@ public class OrbitalEffect : MonoBehaviour
 }
 
 // Fade in from complete transparency, emit light for a bit, then fade back out
-public class GlowAndFadeOut : MonoBehaviour
+public class GlowAndFadeOut : MonoBehaviour //NOTE: can't be used with pooled VFX
 {
     private const float _MAX_EMIT = 200f;
 

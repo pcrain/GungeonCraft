@@ -282,6 +282,7 @@ public class Initialisation : BaseUnityPlugin
                     OmnidirectionalLaser.Add();
                     RCLauncher.Add();
                     Breegull.Add();
+                    SubMachineGun.Add();
                     setupGunsWatch.Stop();
                 // });
                 // setupGunsThread.Start();

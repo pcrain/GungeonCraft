@@ -233,7 +233,7 @@ public class HappyIceCreamHaver : MonoBehaviour
     }
 }
 
-public class TargetPourSoulsWithoutIceCreamBehavior : TargetBehaviorBase
+public class TargetPourSoulsWithoutIceCreamBehavior : TargetBehaviorBase  //TODO: typo D:
 {
     public float Radius           = 10f;
     public bool  LineOfSight      = true;
