@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.10.0 (2024-03-20)
+
+#### Features and Polish:
+- Added Omnidirectional Laser, R.C. Launcher, Breegull, Sub Machine Gun, Reflex Ammolet, Chest Scanner, and Bulletbot Implant
+	- Omnidirectional Laser, Reflex Ammolet, Chest Scanner, and Bulletbot Implant sprites thanks to Dallan!
+	- Omnidirectional Laser concept thanks to Duudle!
+
+#### Bugfixes and Misc:
+- Fixed issue with faulty sprite references for Alligator, Aimu Hakurei, Blamethrower, and [REDACTED] projectile impact VFX, causing a large white flame to appear instead
+	- Added debug code to warn about faulty VFX sprite reuse to prevent similar bugs from occurring in the future
+- Fixed misplaced projectile when firing Hand Cannon
+- Fixed bad hook causing failures when trying to give certain enemies guns outside of Hecked Mode
+- Cleaned up sound handling code for guns / projectiles to make adjusting sounds slightly easier in the future
+- Substantially lowered Pincushion's firing sound
+
 ## 1.9.1 (2024-03-10)
 
 - Fixed numerous items and guns causing issues when removed directly from the inventory (e.g., when using Gun Munchers)

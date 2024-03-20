@@ -9,10 +9,10 @@
 
 ### Features
 
-- 92 new items, including
-	+ 46 new guns
-	+ 31 new passive items
-	+ 15 new active items
+- 99 new items, including
+	+ 50 new guns
+	+ 32 new passive items
+	+ 17 new active items
 - Lore for all new guns and items
 - Companion Shop: sells 3 random unlocked companions at a 30% discount. Guaranteed to spawn on the first floor each run
 - Bartering Shop: trades 3 random D-A tier items for any higher-tiered item. Guaranteed to spawn on the second or third floor each run
