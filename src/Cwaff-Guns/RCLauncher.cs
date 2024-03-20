@@ -10,7 +10,7 @@ public class RCLauncher : AdvancedGunBehavior
     public static string ItemName         = "R.C. Launcher";
     public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Pedal to the Metal";
-    public static string LongDescription  = "TBD";
+    public static string LongDescription  = "Launches R.C. cars that explode on impact. Each car follows the car fired before it, or the mouse cursor / controller aim direction if they are the lead car.";
     public static string Lore             = "A case study of the unreasonable effectiveness of retrofitting children's toys with AI and explosives, this launcher's steerable projectiles ensure swift and accurate destruction in the hands of a competent pilot. The projectiles also still make a surprisingly fun and entertaining diversion for children ages 4-14, provided they never crash into anything.";
 
     private const float _FULL_RELOAD_TIME = 2.0f;

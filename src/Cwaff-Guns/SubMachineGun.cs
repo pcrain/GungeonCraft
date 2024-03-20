@@ -4,8 +4,8 @@ public class SubMachineGun : AdvancedGunBehavior
 {
     public static string ItemName         = "Sub Machine Gun";
     public static string ProjectileName   = "38_special";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
+    public static string ShortDescription = "The Hero You Deserve";
+    public static string LongDescription  = "Fires harmless sandwiches that have a chance to permacharm enemies equal to the percent of health they have lost. Enemies are fully healed upon being charmed.";
     public static string Lore             = "Calling this object a gun stretches the definition of the word to its absolute limits, but it evidently scrapes by just enough to get a pass from both the legal system and the Breach's marketing division. Even so, this 'gun' doesn't seem to be particularly useful as a conventional firearm.";
 
     internal static GameObject _NourishVFX;
