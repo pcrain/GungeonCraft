@@ -404,9 +404,7 @@ public static class VFX
         if (playSound)
             player.gameObject.Play("minecraft_totem_pop_sound");
 
-        GameObject g = UnityEngine.Object.Instantiate(new GameObject(), player.sprite.WorldCenter, Quaternion.identity);
-        tk2dSprite sprite = g.AddComponent<tk2dSprite>();
-            sprite.SetSprite(item.sprite.collection, item.sprite.spriteId);
+        tk2dSprite sprite = Lazy.SpriteObject(item.sprite.collection, item.sprite.spriteId);
             sprite.PlaceAtPositionByAnchor(player.sprite.WorldTopCenter - new Vector2(0, BOB_OFFSET), Anchor.LowerCenter);
             sprite.transform.parent = player.transform;
 
@@ -419,8 +417,7 @@ public static class VFX
             yield return null;
         }
 
-        UnityEngine.Object.Destroy(sprite);
-        UnityEngine.Object.Destroy(g);
+        UnityEngine.Object.Destroy(sprite.gameObject);
         yield break;
     }
 
@@ -805,12 +802,12 @@ public class FancyVFX : MonoBehaviour
         if (!osprite)
             return null;
 
-        GameObject g = UnityEngine.Object.Instantiate(new GameObject(), osprite.WorldCenter, osprite.transform.rotation);
-        tk2dSprite sprite = g.AddComponent<tk2dSprite>();
-            sprite.SetSprite(osprite.collection, osprite.spriteId);
+        // GameObject g = UnityEngine.Object.Instantiate(new GameObject(), osprite.WorldCenter, osprite.transform.rotation);
+        tk2dSprite sprite = Lazy.SpriteObject(osprite.collection, osprite.spriteId);
+            sprite.transform.rotation = osprite.transform.rotation;
             sprite.PlaceAtPositionByAnchor(osprite.WorldCenter, Anchor.MiddleCenter);
 
-        FancyVFX fv = g.AddComponent<FancyVFX>();
+        FancyVFX fv = sprite.AddComponent<FancyVFX>();
             fv.sprite = sprite;
         return fv;
     }

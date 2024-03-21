@@ -1152,24 +1152,19 @@ public static class AfterImageHelpers
 
     public static void PlayerAfterImage(this PlayerController player)
     {
-        GameObject obj = UnityEngine.Object.Instantiate(new GameObject(), player.sprite.WorldBottomCenter, Quaternion.identity);
-        tk2dSprite sprite = obj.AddComponent<tk2dSprite>();
-
         tk2dSpriteAnimationFrame frame = player.spriteAnimator.CurrentClip.frames[player.spriteAnimator.CurrentFrame];
-        sprite.SetSprite(frame.spriteCollection, frame.spriteId);
-        sprite.FlipX = player.sprite.FlipX;
-        obj.GetComponent<BraveBehaviour>().sprite = sprite;
 
+        tk2dSprite sprite = Lazy.SpriteObject(frame.spriteCollection, frame.spriteId);
+        sprite.FlipX = player.sprite.FlipX;
         sprite.PlaceAtPositionByAnchor(
             player.sprite.transform.position,
             sprite.FlipX ? Anchor.LowerRight : Anchor.LowerLeft);
 
-        obj.GetComponent<BraveBehaviour>().StartCoroutine(Fade(obj,_LIFETIME));
+        sprite.StartCoroutine(Fade(sprite, _LIFETIME));
     }
 
-    private static IEnumerator Fade(GameObject obj, float fadeTime, float flickerRate = 0.05f)
+    private static IEnumerator Fade(tk2dSprite sprite, float fadeTime, float flickerRate = 0.05f)
     {
-        tk2dSprite sprite = obj.GetComponent<tk2dSprite>();
         sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitBlendUber");
         sprite.renderer.material.SetFloat("_VertexColor", 1f);
 
@@ -1187,31 +1182,26 @@ public static class AfterImageHelpers
             sprite.color = afterImageYellow.WithAlpha(flickerOn ? 1.0f : 0.35f);
             yield return null;
         }
-        UnityEngine.Object.Destroy(obj);
+        UnityEngine.Object.Destroy(sprite.gameObject);
         yield break;
     }
 }
 
 public static class CustomNoteDoer
 {
-    private static NoteDoer prefab = null;
+    private static NoteDoer _Prefab = null;
 
     public static void Init()
     {
-        GameObject noteItem = new GameObject("Custom Note Item");
-        tk2dSprite noteSpriteComp = noteItem.GetOrAddComponent<tk2dSprite>();
-            noteSpriteComp.SetSprite(VFX.Collection, VFX.Collection.GetSpriteIdByName("note_icon"));
-            noteSpriteComp.PlaceAtPositionByAnchor(noteItem.transform.position, Anchor.LowerCenter);
-        prefab = noteItem.AddComponent<NoteDoer>();
-        prefab.gameObject.SetActive(false);
-        FakePrefab.MarkAsFakePrefab(prefab.gameObject);
-        UnityEngine.Object.DontDestroyOnLoad(prefab);
+        tk2dSprite noteSpriteComp = Lazy.SpriteObject(spriteColl: VFX.Collection, spriteId: VFX.Collection.GetSpriteIdByName("note_icon")).RegisterPrefab();
+            noteSpriteComp.PlaceAtPositionByAnchor(noteSpriteComp.gameObject.transform.position, Anchor.LowerCenter);
+        _Prefab = noteSpriteComp.AddComponent<NoteDoer>();
     }
 
     public static NoteDoer CreateNote(Vector2 position, string formattedNoteText, NoteDoer.NoteBackgroundType background = NoteDoer.NoteBackgroundType.NOTE, bool destroyOnRead = true, bool poofIn = true, tk2dSprite customSprite = null)
     {
         NoteDoer noteDoer = UnityEngine.Object.Instantiate(
-            prefab.gameObject,
+            _Prefab.gameObject,
             position.ToVector3ZisY(-1f),
             Quaternion.identity).GetComponent<NoteDoer>();
 

@@ -93,11 +93,9 @@ public class ScannedChest : MonoBehaviour
         float cumulativeWidth = 0f;
         foreach (PickupObject p in this._chest.contents.EmptyIfNull())
         {
-            GameObject g = new GameObject();
-            this._pickups.Add(g);
-            tk2dSprite s = g.AddComponent<tk2dSprite>();
-            s.SetSprite(p.sprite.collection, p.sprite.spriteId);
+            tk2dSprite s = Lazy.SpriteObject(p.sprite.collection, p.sprite.spriteId);
             s.SetAlpha(0.5f);
+            this._pickups.Add(s.gameObject);
             this._offsets.Add(new Vector2(cumulativeWidth, 0f));
             cumulativeWidth += 0.25f + s.GetCurrentSpriteDef().boundsDataExtents.x;
             ++i;

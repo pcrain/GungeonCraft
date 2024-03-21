@@ -159,14 +159,12 @@ public class GunSynthesizer : PlayerItem
         float delay       = 0.0f;
         foreach (int id in ids)
         {
-            GameObject g = new GameObject();
-            tk2dSprite sprite = g.AddComponent<tk2dSprite>();
-            sprite.SetSprite(coll, id);
+            tk2dSprite sprite = Lazy.SpriteObject(coll, id);
             sprite.FlipX = gun.sprite.FlipX;
             sprite.FlipY = gun.sprite.FlipY;
             sprite.transform.rotation = gun.sprite.transform.rotation;
             sprite.PlaceAtRotatedPositionByAnchor(gunPos, Anchor.MiddleCenter);
-            g.AddComponent<DissipatingSpriteFragment>().Setup(gunPos, targetPos, 0.5f, delay, true);
+            sprite.AddComponent<DissipatingSpriteFragment>().Setup(gunPos, targetPos, 0.5f, delay, true);
             sprite.MakeHolographic(green: true);
             delay += _DECONSTRUCT_DELAY;
         }

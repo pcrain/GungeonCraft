@@ -80,8 +80,9 @@ public class OmnidirectionalLaser : AdvancedGunBehavior
     public override void Start()
     {
         base.Start();
-        tk2dSprite backSprite = this._backside = new GameObject().AddComponent<tk2dSprite>();
-        backSprite.SetSprite(this.gun.sprite.Collection, this.gun.sprite.Collection.GetSpriteIdByName($"{gun.InternalName()}_idle_back_001"));
+        tk2dSprite backSprite = this._backside = Lazy.SpriteObject(
+            spriteColl: this.gun.sprite.Collection,
+            spriteId: this.gun.sprite.Collection.GetSpriteIdByName($"{gun.InternalName()}_idle_back_001"));
         backSprite.transform.position = gun.transform.position;
         // backSprite.transform.parent = gun.transform;  //NOTE: prevents renderer from disabling properly
         backSprite.HeightOffGround = -0.5f;

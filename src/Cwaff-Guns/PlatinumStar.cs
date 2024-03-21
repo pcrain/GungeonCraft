@@ -176,14 +176,12 @@ public class OraOra : MonoBehaviour
         _bankedDamage.Clear();
         _bankedAngles.Clear();
 
-        this._stand = new GameObject();
-        tk2dSprite standSprite = this._stand.AddComponent<tk2dSprite>();
-            standSprite.SetSprite(
-                newCollection: pc.spriteAnimator.CurrentClip.frames[0].spriteCollection,
-                newSpriteId: pc.spriteAnimator.GetClipByName(Lazy.GetBaseIdleAnimationName(pc, bankedAngles[0])).frames[0].spriteId);
+        tk2dSprite standSprite = Lazy.SpriteObject(
+                spriteColl: pc.spriteAnimator.CurrentClip.frames[0].spriteCollection,
+                spriteId: pc.spriteAnimator.GetClipByName(Lazy.GetBaseIdleAnimationName(pc, bankedAngles[0])).frames[0].spriteId);
             standSprite.usesOverrideMaterial = true;
             standSprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/HologramShader");
-        this._stand.GetComponent<BraveBehaviour>().sprite = standSprite;
+        this._stand = standSprite.gameObject;
 
         for (float elapsed = BraveTime.DeltaTime; elapsed < _MOVE_TIME; elapsed += BraveTime.DeltaTime)
         {

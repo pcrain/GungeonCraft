@@ -82,6 +82,7 @@ class CwaffToolbox : MonoBehaviour
         return bestSpriteId;
     }
 
+    //TODO: this entire method can be cleaned up substantially
     public static void Memorialize(AIActor enemy)
     {
         GameObject obj = new GameObject();
@@ -101,7 +102,7 @@ class CwaffToolbox : MonoBehaviour
                 enemy.sprite.transform.position,
                 sprite.FlipX ? Anchor.LowerRight : Anchor.LowerLeft);
             // sprite.allowDefaultLayer
-        g.GetComponent<BraveBehaviour>().sprite = sprite;
+        g.GetComponent<BraveBehaviour>().sprite = sprite; //TODO: probably completely unnecessary
 
         g.GetComponent<BraveBehaviour>().StartCoroutine(Flicker(g));
     }

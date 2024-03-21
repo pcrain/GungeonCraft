@@ -92,12 +92,11 @@ public class AlienNailgun : AdvancedGunBehavior
             this._preview.SafeDestroy();
 
         AIActor actor = EnemyDatabase.GetOrLoadByGuid(guid);
-        this._preview = new GameObject();
-        tk2dSprite sprite = this._preview.AddComponent<tk2dSprite>();
-            sprite.SetSprite(actor.sprite.collection, CwaffToolbox.GetIdForBestIdleAnimation(actor));
+        tk2dSprite sprite = Lazy.SpriteObject(actor.sprite.collection, CwaffToolbox.GetIdForBestIdleAnimation(actor));
+            sprite.PlaceAtPositionByAnchor(pc.sprite.WorldTopCenter + new Vector2(0f, 0.5f), Anchor.LowerCenter);
             sprite.MakeHolographic(green: true);
 
-        sprite.PlaceAtPositionByAnchor(pc.sprite.WorldTopCenter + new Vector2(0f, 0.5f), Anchor.LowerCenter);
+        this._preview = sprite.gameObject;
         this._preview.transform.parent = pc.transform;
 
         this._preview.ExpireIn(_PREVIEW_TIME);
@@ -292,13 +291,11 @@ public class AlienNailgun : AdvancedGunBehavior
             coll.spriteNameLookupDict[fragName] = newSpriteId;
         }
 
-        GameObject g = new GameObject();
-        tk2dSprite sprite = g.AddComponent<tk2dSprite>();
-        sprite.SetSprite(coll, newSpriteId);
+        tk2dSprite sprite = Lazy.SpriteObject(spriteColl: coll, spriteId: newSpriteId);
         sprite.PlaceAtPositionByAnchor(startPosition, Anchor.MiddleCenter);
-        g.AddComponent<DissipatingSpriteFragment>().Setup(startPosition, targetPosition, travelTime, delay, autoDestroy);
+        sprite.AddComponent<DissipatingSpriteFragment>().Setup(startPosition, targetPosition, travelTime, delay, autoDestroy);
         sprite.MakeHolographic(green: true);
-        return g;
+        return sprite.gameObject;
     }
 
     private static void DestroyReplicants(PlayerController player)

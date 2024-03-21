@@ -62,7 +62,6 @@ public static class Lazy
             sprite.SetSprite(coll, coll.GetSpriteIdByName(spritePath));
             sprite.SortingOrder = 0;
             sprite.IsPerpendicular = true;
-            obj.GetComponent<BraveBehaviour>().sprite = sprite;
 
             ammonomiconSprite = spritePath;
             item = obj.AddComponent<TItemSpecific>();
@@ -101,13 +100,9 @@ public static class Lazy
         string baseItemName = itemName.Replace("-", "").Replace(".", "").Replace(" ", "_").ToLower();  //get saner gun name for commands
         string internalName = C.MOD_PREFIX+":"+baseItemName;
 
-        GameObject obj = new GameObject(itemName).RegisterPrefab();
+        tk2dSprite sprite = Lazy.SpriteObject(ETGMod.Databases.Items.ItemCollection, 0).RegisterPrefab();
 
-        tk2dSprite sprite = obj.AddComponent<tk2dSprite>();
-        sprite.SetSprite(ETGMod.Databases.Items.ItemCollection, 0);
-        obj.GetComponent<BraveBehaviour>().sprite = sprite;
-
-        FakeItem item = obj.AddComponent<TItemSpecific>();
+        FakeItem item = sprite.AddComponent<TItemSpecific>();
 
         ETGMod.Databases.Items.SetupItem(item, itemName);
         Gungeon.Game.Items.Add(internalName, item);
@@ -657,5 +652,14 @@ public static class Lazy
             UnityEngine.Random.value,
             UnityEngine.Random.value
             );
+    }
+
+    /// <summary>Create a new GameObject with a specific sprite</summary>
+    public static tk2dSprite SpriteObject(tk2dSpriteCollectionData spriteColl, int spriteId)
+    {
+        GameObject g = new();
+        tk2dSprite sprite = g.AddComponent<tk2dSprite>();
+        sprite.SetSprite(spriteColl, spriteId);
+        return sprite;
     }
 }

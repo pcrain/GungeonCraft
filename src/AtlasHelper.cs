@@ -367,7 +367,7 @@ public static class AtlasHelper
         sprite.SortingOrder = 0;
         sprite.IsPerpendicular = true;
 
-        obj.GetComponent<BraveBehaviour>().sprite = sprite;
+        obj.GetComponent<BraveBehaviour>().sprite = sprite;  //TODO: probably completely unnecessary
 
         __result = obj;
         return false; // skip original method

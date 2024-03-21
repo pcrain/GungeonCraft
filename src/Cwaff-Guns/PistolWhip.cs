@@ -110,9 +110,7 @@ public class WhipChainStart : MonoBehaviour
 
     private void OnDestroy()
     {
-        foreach (GameObject g in this._links)
-            g.SafeDestroy();
-        this._links.Clear();
+        this._links.SafeDestroyAll();
     }
 
     private IEnumerator WhipItGood()
@@ -125,9 +123,7 @@ public class WhipChainStart : MonoBehaviour
         this._owner.CurrentGun.ToggleRenderers(false);
         base.gameObject.Play("whip_sound");
 
-        GameObject pistol = new();
-        tk2dSprite pistolSprite = pistol.AddComponent<tk2dSprite>();
-            pistolSprite.SetSprite(gunSprite.collection, gunSprite.spriteId);
+        tk2dSprite pistolSprite = Lazy.SpriteObject(gunSprite.collection, gunSprite.spriteId);
             pistolSprite.transform.rotation = baseEuler;
             pistolSprite.transform.localScale = new Vector3(1f, flipped ? -1f : 1f, 1f);
 
@@ -223,7 +219,7 @@ public class WhipChainStart : MonoBehaviour
         }
 
         this._owner.CurrentGun.ToggleRenderers(true);
-        UnityEngine.Object.Destroy(pistol);
+        UnityEngine.Object.Destroy(pistolSprite.gameObject);
         UnityEngine.Object.Destroy(base.gameObject);
         yield break;
     }

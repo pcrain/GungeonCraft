@@ -360,7 +360,7 @@ public static class FancyShopBuilder
 
           if (hasCarpet)
           {
-              var carpetObj = new GameObject(prefix + ":" + name + "_Carpet").RegisterPrefab(activate: true);
+              GameObject carpetObj = new GameObject(prefix + ":" + name + "_Carpet").RegisterPrefab(activate: true);  // force our new game object to be active immediately
               tk2dSprite carpetSprite = carpetObj.AddComponent<tk2dSprite>();
               carpetSprite.SetSprite(VFX.Collection, VFX.Collection.GetSpriteIdByName(carpetSpritePath));
               carpetSprite.SortingOrder = 2;

@@ -984,16 +984,16 @@ public static class Extensions
     return (mod.ammoCost == 0 || gun.InfiniteAmmo || gun.LocalInfiniteAmmo /*|| gun.CanGainAmmo*/ || ((proj.Owner as PlayerController)?.InfiniteAmmo?.Value ?? false));
   }
 
-  /// <summary>Add a component to a projectile's GameObject and return the component</summary>
-  public static T AddComponent<T>(this Projectile projectile) where T : MonoBehaviour
+  /// <summary>Add a component to an existing component's GameObject and return the component</summary>
+  public static T AddComponent<T>(this Component component) where T : MonoBehaviour
   {
-    return projectile.gameObject.AddComponent<T>();
+    return component.gameObject.AddComponent<T>();
   }
 
-  /// <summary>Returns or adds a component to a projectile's GameObject and return the component</summary>
-  public static T GetOrAddComponent<T>(this Projectile projectile) where T : MonoBehaviour
+  /// <summary>Returns or adds a component to an existing component's GameObject and return the component</summary>
+  public static T GetOrAddComponent<T>(this Component component) where T : MonoBehaviour
   {
-    return projectile.gameObject.GetOrAddComponent<T>();
+    return component.gameObject.GetOrAddComponent<T>();
   }
 
   /// <summary>Get the internal sprite name for each gun (keep in parity with SetupItem())</summary>
@@ -1176,6 +1176,14 @@ public static class Extensions
   public static void SafeDestroy<T>(this T c) where T : Component
   {
     if (c) UnityEngine.Object.Destroy(c);
+  }
+
+  /// <summary>Destroy all GameObjects in a less</summary>
+  public static void SafeDestroyAll(this List<GameObject> objects)
+  {
+    for (int i = 0; i < objects.Count; ++i)
+      objects[i].SafeDestroy();
+    objects.Clear();
   }
 
   /// <summary>Select a pickup id from a weighted list</summary>
@@ -1762,14 +1770,6 @@ public static class Extensions
         offsetEevee:       offsetEevee,       flippedOffsetEevee:       flippedOffsetEevee,
         offsetGunslinger:  offsetGunslinger,  flippedOffsetGunslinger:  flippedOffsetGunslinger
       );
-  }
-
-  /// <summary>Destroy all GameObjects in a less</summary>
-  public static void SafeDestroyAll(this List<GameObject> objects)
-  {
-    for (int i = 0; i < objects.Count; ++i)
-      objects[i].SafeDestroy();
-    objects.Clear();
   }
 
   /// <summary>Acquire a fake item and put it in a player's inventory</summary>
