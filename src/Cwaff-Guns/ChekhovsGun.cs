@@ -3,7 +3,6 @@
 public class ChekhovsGun : AdvancedGunBehavior
 {
     public static string ItemName         = "Chekhov's Gun";
-    public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Keeps its Promise";
     public static string LongDescription  = "Places a rifle that automatically fires a single round at any enemy that crosses its line of sight. Cannot fire within 3 seconds of its placement. Half of all unfired shots are returned as ammo on room clear.";
     public static string Lore             = "There is no record of this gun having ever been brought into the Gungeon, nor of it having belonged to anyone named Chekhov. Rather, the arcane magics enveloping the Gungeon have seemingly managed to produce a physical manifestation of a purely metaphorical weapon. Whether its unique properties will render it a deus ex machina or a brick joke remains to be seen.";
@@ -16,7 +15,7 @@ public class ChekhovsGun : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<ChekhovsGun>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<ChekhovsGun>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 0.75f, ammo: 200, shootFps: 16, reloadFps: 16,
                 muzzleVFX: "muzzle_chekhovs_gun", fireAudio: "chekhovs_gun_place_sound", reloadAudio: "chekhovs_gun_reload_sound");
 

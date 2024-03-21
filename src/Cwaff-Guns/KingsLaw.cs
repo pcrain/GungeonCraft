@@ -3,7 +3,6 @@
 public class KingsLaw : AdvancedGunBehavior
 {
     public static string ItemName         = "King's Law";
-    public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Accept Your Fate";
     public static string LongDescription  = "Conjures projectiles that hover behind the player as long as the fire button is held. Projectiles are launched with a short delay when fire is released, when reloading, or when changing weapons.";
     public static string Lore             = "The trusty weapon of an ancient sorcerer-king who ruled Gunymede with an iron fist. Imbued with only a small fraction of his power and weakened further by the passage of time, this gun still resonates with enough destructive magic to wipe out hordes of lesser Gundead in the blink of an eye.";
@@ -27,7 +26,7 @@ public class KingsLaw : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<KingsLaw>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<KingsLaw>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARGE, reloadTime: 0.75f, ammo: 700, doesScreenShake: false, reloadAudio: "knife_gun_reload");
 
         gun.InitProjectile(GunData.New(clipSize: 20, shootStyle: ShootStyle.Automatic, damage: 7.5f, speed: 40.0f, range: 999999f, force: 9f, customClip: true,

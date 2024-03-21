@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class SubtractorBeam : AdvancedGunBehavior
 {
     public static string ItemName         = "Subtractor Beam";
-    public static string ProjectileName   = "38_special";
     public static string ShortDescription = "What's the Difference?";
     public static string LongDescription  = "Fires a fast piercing beam that uses the health of the first enemy it hits as its damage. The beam's damage is reduced by the health of each subsequent enemy it hits, and dissipates once its damage reaches zero. Cannot damage the first enemy it hits. Reveals enemies' health while active.";
     public static string Lore             = "In a time and place where weaponry seems to have an ever-increasing disregard for the biology, chemistry, and physics that govern our universe, the Subtractor Beam spits in the face of something even more fundamental: math. Invented by someone who wasn't a mad scientist so much as a moderately irritable elementary school professor, the destructive potential of this gun has been calibrated to vary with the resilience of the first object it passes through. As to why a weapon with near limitless potential would be designed with such arbitrary limitations, the creator has claimed it is 'to show the kids that subtraction tables ARE useful in real life! Now if only I could do something for multiplication tables....'";
@@ -16,7 +15,7 @@ public class SubtractorBeam : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<SubtractorBeam>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<SubtractorBeam>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.FULLAUTO, reloadTime: 1.25f, ammo: 300, idleFps: 10, shootFps: 24, reloadFps: 30,
                 muzzleVFX: "muzzle_subtractor_beam", muzzleFps: 30, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter, reloadAudio: "subtractor_beam_reload_sound");
 

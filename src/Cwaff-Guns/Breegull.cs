@@ -3,7 +3,6 @@
 public class Breegull : AdvancedGunBehavior
 {
     public static string ItemName         = "Breegull";
-    public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Rare Wares";
     public static string LongDescription  = "Fires eggs with varying effects & (ammo costs). Reloading with a full clip cycles egg types:\n (1) Normal: no effect\n (2) Fire: ignites\n (5) Grenade: large explosion\n (2) Ice: freezes\n (4) Clockwork: homing";
     public static string Lore             = "With bear no more,\n  the bird's alone.\nAmidst the Gungeon's\n  walls of stone.\nArmed with her trusty\n  eggs and beak.\nShe'll help you kill\n  the past you seek.\n- Guntilda";
@@ -34,7 +33,7 @@ public class Breegull : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Breegull>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Breegull>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.0f, ammo: 320, shootFps: 20, reloadFps: 12,
                 introFps: 8, fireAudio: "breegull_shoot_sound", introAudio: "breegull_intro_sound", carryOffset: new IntVector2(6, 0));
             gun.SetReloadAudio("breegull_reload_sound", 0, 4, 8);

@@ -3,7 +3,6 @@
 public class Alligator : AdvancedGunBehavior
 {
     public static string ItemName         = "Alligator";
-    public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Shockingly Effective";
     public static string LongDescription  = "Fires clips that clamp onto enemies and periodically channel electricity from the player. Energy output is proportional to the player's damage stat, and increases further while rolling or while in electrified goop. Each clip channels the full energy output, and up to 8 clips can be attached to each enemy. Passively grants electric immunity while in inventory.";
     public static string Lore             = "Most of the Gundead are either made of metal or carrying metal weaponry on them, making them rather hilariously susceptible to contact with live wires. Thanks to some fancy electrical engineering far beyond your comprehension, the Alligator allows you to channel the ambient static electricity you passively collect directly into the bodies of anything you can clip onto. Outside the Gungeon, it also doubles as an extremely handy tool for do-it-yourself home wiring projects.";
@@ -19,7 +18,7 @@ public class Alligator : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Alligator>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Alligator>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.CHARGE, reloadTime: 2.0f, ammo: 300, shootFps: 20, reloadFps: 10,
                 muzzleVFX: "muzzle_alligator", muzzleFps: 60, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter, muzzleEmission: 50f,
                 fireAudio: "alligator_shoot_sound", reloadAudio: "alligator_reload_sound");

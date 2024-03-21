@@ -7,7 +7,6 @@ namespace CwaffingTheGungy;
 public class AlienNailgun : AdvancedGunBehavior
 {
     public static string ItemName         = "Alien Nailgun";
-    public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Attack, Adapt, Assimilate";
     public static string LongDescription  = "Fires nails that extract DNA when dealing the fatal blow to enemies. Charging the gun while in combat consumes a full clip of ammo to assemble a replicant enemy from DNA. Replicants are invulnerable, have no collision, cannot harm the player with projectiles or contact damage, and dissipate when combat ends. Reloading with a full clip cycles through extracted DNA sequences.";
     public static string Lore             = "Having arrived on Earth en masse in a strange meteorite, this gadget launches fingers that quickly retract on impact to physically scrape data off of recently-deceased life forms. Unbeknownst to Gungeoneers, the meteorite was actually an intergalactic standard wastebin, and this eons-old prototype was discarded after its inventors discovered light-based replicators were cheaper, faster, less convoluted, and ultimately less weird.";
@@ -35,7 +34,7 @@ public class AlienNailgun : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<AlienNailgun>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<AlienNailgun>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 0.7f, ammo: 480, idleFps: 24, shootFps: 24, reloadFps: 60,
                 loopReloadAt: 0, muzzleFrom: Items.Mailbox, fireAudio: "alien_nailgun_shoot_sound", reloadAudio: "gorgun_eye_activate");
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);

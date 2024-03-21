@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class CarpetBomber : AdvancedGunBehavior
 {
     public static string ItemName         = "Carpet Bomber";
-    public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Rugged Terrain";
     public static string LongDescription  = "Fires a barrage of explosive bouncing carpets. Launches more carpets with more force the longer it is charged.";
     public static string Lore             = "Developed by Mike (of 'Mike' fame), this ornate launcher fires carpets that have been tightly rolled using hydraulics, laced with glued-on patches of C4, and vacuum-sealed to preserve freshness.";
@@ -21,7 +20,7 @@ public class CarpetBomber : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<CarpetBomber>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<CarpetBomber>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.5f, ammo: 360, shootFps: 30, reloadFps: 20,
                 chargeFps: (int)(1f / _CHARGE_PER_PROJECTILE), loopChargeAt: 10, muzzleVFX: "muzzle_carpet_bomber", muzzleFps: 30,
                 muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter, fireAudio: "carpet_bomber_shoot_sound");

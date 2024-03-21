@@ -49,7 +49,6 @@ public class IceCream : PlayerItem
 public class IceCreamGun : AdvancedGunBehavior
 {
     public static string ItemName         = "Ice Cream Gun";
-    public static string ProjectileName   = "38_special";
     public static string ShortDescription = ":>";
     public static string LongDescription  = "EYE KEEM! 'v'";
     public static string Lore             = "EYYYYYEEEE KEEEEEMM";
@@ -58,7 +57,7 @@ public class IceCreamGun : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<IceCreamGun>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore, hideFromAmmonomicon: true);
+        Gun gun = Lazy.SetupGun<IceCreamGun>(ItemName, ShortDescription, LongDescription, Lore, hideFromAmmonomicon: true);
             gun.SetAttributes(quality: ItemQuality.SPECIAL, gunClass: GunClass.SILLY, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true);
             gun.SetAnimationFPS(gun.chargeAnimation, 16);
             gun.muzzleFlashEffects = null;

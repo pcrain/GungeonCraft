@@ -4,7 +4,6 @@
 //     {
 //         public static string gunName          = "Head Cannon";
 //         public static string spriteName       = "multiplicator";
-//         public static string projectileName   = "ak-47";
 //         public static string shortDescription = "Better Than One";
 //         public static string longDescription  = "(launches you :D)";
 

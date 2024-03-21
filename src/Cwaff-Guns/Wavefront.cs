@@ -3,14 +3,13 @@
 public class Wavefront : AdvancedGunBehavior
 {
     public static string ItemName         = "Wavefront";
-    public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Particle-larly Interesting";
     public static string LongDescription  = "Fires bullets that persistently orbit and gravitate towards the player for up to 30 seconds until they collide with an enemy.";
     public static string Lore             = "The primary difficulty of working with projectiles that gravitate towards you is, hopefully unsurprisingly, the fact that those projectiles can hit you. The Gungineer in charge of redesigning this gun to meet modern safety standards came up with a rather ingenious workaround for this issue: do nothing, but claim that you have incorporated proprietary technology that reduces the likelihood of shooting yourself so people will buy it anyway. The redesigned gun received 100% approval from those who survived using it, and the Gungineer received an employee of the year award from management shortly after the redesign went live.";
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Wavefront>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Wavefront>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.RIFLE, reloadTime: 1.0f, ammo: 320, idleFps: 12, shootFps: 50, reloadFps: 16,
                 muzzleVFX: "muzzle_wavefront", muzzleFps: 30, muzzleAnchor: Anchor.MiddleCenter, muzzleEmission: 10f, fireAudio: "wavefront_fire_sound");
             gun.SetReloadAudio("wavefront_reload_sound", 0, 6, 12, 18);

@@ -3,7 +3,6 @@
 public class Vladimir : AdvancedGunBehavior
 {
     public static string ItemName         = "Vladimir";
-    public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Poke 'em On";
     public static string LongDescription  = "Attacking performs a swift melee stab that impales enemies within range. While impaled, enemies are vulnerable to other enemies' projectiles and take damage from subsequent stabs. Each stab can destroy a single enemy projectile. Cannot be dropped or switched while an enemy is impaled. Increases curse by 1 while in inventory.";
     public static string Lore             = "Wielded by and named after a mad warrior who was addicted to impaling his enemies -- enough so that he would frequently count the number of times he was able to bounce them on his trident before they gave out on him. They say some of his madness still lingers within the weapon, but what that means is up to interpretation. On an unrelated note, you find yourself wondering how many stabs a Gun Nut can withstand.";
@@ -21,7 +20,7 @@ public class Vladimir : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Vladimir>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Vladimir>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.1f, ammo: 100,
               infiniteAmmo: true, canReloadNoMatterAmmo: true, fireAudio: "vladimir_fire_sound", muzzleVFX: "muzzle_vladimir",
               muzzleFps: 30, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter, curse: 1f);

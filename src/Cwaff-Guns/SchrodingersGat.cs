@@ -9,7 +9,6 @@ namespace CwaffingTheGungy;
 public class SchrodingersGat : AdvancedGunBehavior
 {
     public static string ItemName         = "Schrodinger's Gat";
-    public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Proba-ballistic";
     public static string LongDescription  = "Fires bullets that leave enemies in a quantum state until they are observed by either dealing or receiving damage. Once observed, enemies have a 50% chance of already being dead, revealing themselves and their projectiles as illusions. Bullets from this gun cannot affect the same enemy twice.";
     public static string Lore             = "Famously used by a mad scientist who would often fire dozens of rounds into a locked box with an animal inside, claiming it was both alive and dead until the box was opened. That scientist eventually landed in prison on charges for kidnapping and murdering dozens of pet cats, insisting \"we don't know if I kidnapped and murdered dozens of cats until we observe it!\" throughout the entire court procedings.";
@@ -18,7 +17,7 @@ public class SchrodingersGat : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<SchrodingersGat>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<SchrodingersGat>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f, ammo: 250, idleFps: 24, shootFps: 24);
 
         gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.125f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, customClip: true,

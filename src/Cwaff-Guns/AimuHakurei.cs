@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class AimuHakurei : AdvancedGunBehavior
 {
     public static string ItemName         = "Aimu Hakurei";
-    public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Highly Responsive";
     public static string LongDescription  = "Fires a variety of projectiles based on its current level. Grazing nearby enemy projectiles while the gun is active increases the graze counter, with the gun's level increasing at 10, 30, 60, and 100 graze. Reloading toggles focus mode, which slows down time to enable precision grazing. Focus mode is cancelled by reloading, firing, dodge rolling, or switching guns.";
     public static string Lore             = "One of the finest weapons ever crafted in Gunsokyo, a land whose denizens are renowned for their otherworldly bullet-dodging abilities that would put most Gungeoneers to shame. The potential dakka output of this gun is enough to keep up even with these impressive abilities. However, the Gunsokyo warriors being the showboats that they are, reaching this gun's full potential requires placing oneself in some rather precarious situations, making it a weapon of truly ludicrous risk and reward.";
@@ -29,7 +28,7 @@ public class AimuHakurei : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<AimuHakurei>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<AimuHakurei>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f,
                 ammo: 200, canGainAmmo: false, canReloadNoMatterAmmo: true, modulesAreTiers: true, shootFps: 60, muzzleVFX: "muzzle_aimu",
                 muzzleFps: 30, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter);

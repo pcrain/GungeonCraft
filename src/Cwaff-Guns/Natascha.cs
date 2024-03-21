@@ -3,7 +3,6 @@
 public class Natascha : AdvancedGunBehavior
 {
     public static string ItemName         = "Natascha";
-    public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Fear no Man";
     public static string LongDescription  = "Rate of fire increases and movement speed decreases as this gun is continuously fired. Reloading toggles whether the gun remains spun up while not firing, maintaining both the increased fire rate and reduced movement speed.";
     public static string Lore             = "The beloved gun of an amicable literature Ph.D., who refused to let anyone else so much as touch his precious Natascha. That is, until convinced by a hulking Australian man to grant ownership rights in exchange for unlimited lifetime access to the \"best sandwiches south of the equator.\"";
@@ -16,7 +15,7 @@ public class Natascha : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Natascha>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Natascha>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f, ammo: 1500,
                 shootFps: (int)((float)_FireAnimationFrames / _BaseCooldownTime) + 1,
                 muzzleVFX: "muzzle_natascha", muzzleFps: 60, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter);

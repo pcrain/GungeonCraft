@@ -3,14 +3,13 @@
 public class PaintballCannon : AdvancedGunBehavior
 {
     public static string ItemName         = "Paintball Cannon";
-    public static string ProjectileName   = "38_special";  //WARNING:  changing this from marine sidearm changed the sprite, so replace it later
     public static string ShortDescription = "The T is Silent";
     public static string LongDescription  = "Shoots various colored projectiles that stain enemies and leave colored goop in their wake.";
     public static string Lore             = "Paintball guns are traditionally known for their usage in niche sporting events moreso than their viability in actual combat. A product of executive meddling and rebranding, the paintball cannon is a slightly beefed-up paintball gun with the potential to do at least a passable amount of damage. The increased projectile size has led to the leakage of paint as the gun's projectiles are in transit. Ironically, many Gungeoneers find the resulting paint streaks charming and therapeutic, making this design flaw the gun's primary selling point that sets it apart from otherwise more functional weapons.";
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<PaintballCannon>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<PaintballCannon>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 0.9f, ammo: 600, shootFps: 14, reloadFps: 4,
                 muzzleFrom: Items.Mailbox, fireAudio: "paintball_shoot_sound", reloadAudio: "paintball_reload_sound");
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);

@@ -3,7 +3,6 @@
 public class Bouncer : AdvancedGunBehavior
 {
     public static string ItemName         = "Bouncer";
-    public static string ProjectileName   = "38_special"; //for rotation niceness
     public static string ShortDescription = "Rebound to Go Wrong";
     public static string LongDescription  = "Fires slow but rapidly accelerating projectiles that phase through enemies and objects until bouncing at least once. The damage of each projectile scales with its speed upon initially bouncing. Projectiles bounce up to 3 times, creating a small explosion on their 4th impact.";
     public static string Lore             = "Originally developed as a proof-of-concept back in a time before true bouncing bullets existed, many Gungeoneers today still prefer this older design for flexing their \"mad trickshotting skillz yo\" and its ability to hit enemies behind cover.";
@@ -15,7 +14,7 @@ public class Bouncer : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Bouncer>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Bouncer>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 1.3f, ammo: 300, shootFps: 14, reloadFps: 30,
                 muzzleFrom: Items.Magnum, fireAudio: "MC_RocsCape");
             gun.SetReloadAudio("bouncer_reload_short", 5, 10, 15, 20);

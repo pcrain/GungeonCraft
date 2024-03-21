@@ -11,7 +11,6 @@
 public class Commitment : AdvancedGunBehavior
 {
     public static string ItemName         = "Commitment";
-    public static string ProjectileName   = "86"; //marine sidearm
     public static string ShortDescription = "Going Until It's Gone";
     public static string LongDescription  = "(cannot switch weapons or stop firing until out of ammo)";
     public static string Lore             = "TBD";
@@ -20,7 +19,7 @@ public class Commitment : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Commitment>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Commitment>(ItemName, ShortDescription, LongDescription, Lore);
             gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
             gun.DefaultModule.ammoCost            = 1;
             gun.DefaultModule.shootStyle          = ShootStyle.Automatic;

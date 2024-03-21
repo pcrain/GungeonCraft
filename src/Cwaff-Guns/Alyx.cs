@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class Alyx : AdvancedGunBehavior
 {
     public static string ItemName         = "Alyx";
-    public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Welcome to the New Age";
     public static string LongDescription  = "Fires shots that poison and ignite enemies. Current and max ammo decay exponentially, leaving radioactive waste behind in the process. Gun decays completely at 10 max ammo.";
     public static string Lore             = "A little known fact of nuclear chemistry is that sufficiently large quantities of Uranium -- under specific circumstances not fully understood at present -- can decay directly into guns. These guns have extremely limited lifespans before decaying completely into radiactive goo, but their sheer utility in battle make them a prized treasure for experienced gungeoneers who are willing to absorb a few gamma rays in the name of DPS";
@@ -23,7 +22,7 @@ public class Alyx : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Alyx>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Alyx>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.FULLAUTO, reloadTime: 0.5f, ammo: _BASE_MAX_AMMO,
                 shootFps: 20, reloadFps: 20, muzzleVFX: "muzzle_alyx", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter,
                 reloadAudio: "alyx_reload_sound");

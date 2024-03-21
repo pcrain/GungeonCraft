@@ -3,7 +3,6 @@
 public class Lightwing : AdvancedGunBehavior
 {
     public static string ItemName         = "Lightwing";
-    public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Falcon Captain";
     public static string LongDescription  = "Fires birds that return to the user after hitting an enemy. Shooting an enemy's projectile will destroy it and cause the bird to home in on that enemy with increased speed and damage. When returning to the user, birds will attempt to retrieve an additional projectile belonging to the enemy they hit, restoring additional ammo if successful.";
     public static string Lore             = "Falconry is an art that is on the verge of being lost to time, with this weapon being one gunsmith's attempt to revive the art with a modern coat of paint. Boasting state-of-the-art military artificial intelligence in every projectile, the Lightwing allows its user to experience everything traditional falconry has to offer, except perhaps the bond between falcon and falconer. An improved model with projectiles that exhibit more realistic perching and pooping behaviors is currently under development.";
@@ -15,7 +14,7 @@ public class Lightwing : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Lightwing>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Lightwing>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.0f, ammo: 120, shootFps: 32, reloadFps: 30,
                 muzzleVFX: "muzzle_lightwing", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter,
                 fireAudio: "lightwing_fire_sound", reloadAudio: "lightwing_reload_sound");

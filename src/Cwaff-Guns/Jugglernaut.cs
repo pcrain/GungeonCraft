@@ -12,7 +12,6 @@
 public class Jugglernaut : AdvancedGunBehavior
 {
     public static string ItemName         = "Jugglernaut";
-    public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Balancing Act";
     public static string LongDescription  = "Fires projectiles whose damage scales with the number of unique enemies hit in a row, represented by the number of guns being juggled. The juggling multiplier caps at 6 and resets upon switching guns or taking damage.";
     public static string Lore             = "Somehow even more impressive and dangerous than juggling swords, gun juggling is a burgeoning art form among Gungeoneers trying to justify their ever-growing collections of guns. Several enthusiasts have attempted at various points to establish gun juggling as a mainstream circus act, an international olympic sport, and a legitimate martial art, with each of these attempts resulting in some variation of the response: 'absolutely not, and please stop throwing those things around near us, it's terrifying and we're scared for our lives.'";
@@ -33,7 +32,7 @@ public class Jugglernaut : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Jugglernaut>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Jugglernaut>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 150, shootFps: 30, reloadFps: 40, preventRotation: true);
             _JuggleAnimations = new(){
                 gun.QuickUpdateGunAnimation("1_gun", returnToIdle: false),

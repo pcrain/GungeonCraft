@@ -3,7 +3,6 @@
 public class Crapshooter : AdvancedGunBehavior
 {
     public static string ItemName         = "Crapshooter";
-    public static string ProjectileName   = "38_special"; // 19 / grenade_launcher
     public static string ShortDescription = "Reloaded Dice";
     public static string LongDescription  = "Shoots a die whose face value corresponds to the one currently shown on the gun. Dice have different effects corresponding to their face value: 1) weak + slow, 2) normal, 3) explosive, 4) homing, 5) flak, 6) strong + piercing. The face shown on the gun cycles from 1 to 6, and shooting immediately resets the value to 1, so shots may be timed to repeatedly roll the desired value.";
     public static string Lore             = "Dice are the core component of several games, ranging from family-friendly ones (like Monopoly) to those that inevitably end in homicide (like Monopoly). The dice themselves are rarely the vessels used to carry out these acts of violence, but when stuffed inside a firearm, they prove to be at least somewhat effective projectiles, if not unpredictable ones.";
@@ -21,7 +20,7 @@ public class Crapshooter : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Crapshooter>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Crapshooter>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.PISTOL, reloadTime: 1.5f, ammo: 300, idleFps: 6, shootFps: 24,
                 reloadFps: 24, muzzleFrom: Items.Mailbox, fireAudio: "crapshooter_shoot_sound");
             gun.SetReloadAudio(_DiceSounds[0], 0, 6, 11, 14, 17, 19, 28);

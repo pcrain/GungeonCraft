@@ -3,7 +3,6 @@
 public class Blamethrower : AdvancedGunBehavior
 {
     public static string ItemName         = "Blamethrower";
-    public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Take It Up with HR";
     public static string LongDescription  = "Fires harsh words that deal emotional damage and may inflict blame, making enemies run away and take 4x emotional damage. Taking damage from an enemy projectile assigns a random scapegoat, who becomes 100% susceptible to blame and drops an appropriate health / armor pickup when killed with the Blamethrower.";
     public static string Lore             = "Whoever claimed that actions speak louder than words has clearly never stared down the barrel of a military-grade bullhorn. As the saying goes, sticks and stones may break your bones, but words can get you grounded, expelled, fired, ostracized, defenestrated, imprisoned, executed, or flipped off depending on your specific life circumstances.";
@@ -14,7 +13,7 @@ public class Blamethrower : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Blamethrower>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Blamethrower>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARM, reloadTime: 0.0f, ammo: 300,
                 doesScreenShake: false, canReloadNoMatterAmmo: true, shootFps: 40, muzzleVFX: "muzzle_blamethrower", muzzleFps: 30);
 

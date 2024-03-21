@@ -3,7 +3,6 @@
 public class Scotsman : AdvancedGunBehavior
 {
     public static string ItemName         = "Scotsman";
-    public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Situationally Sticky";
     public static string LongDescription  = "Launches sticky bombs that stick to enemies, obstacles, walls, and the floor. Reloading detonates all stationary sticky bombs after a short delay.";
     public static string Lore             = "Hailing straight from the Motherland, this weapon is a favorite among the explosion-loving Scots whose name it bears. The gun's sticky projectiles and ability to detonate them on command takes out much of the guesswork involved when using traditional firearms, ensuring substantial destructive output even when its wielder happens to be drunk, half-blind, or both.";
@@ -23,7 +22,7 @@ public class Scotsman : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Scotsman>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Scotsman>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.PISTOL, reloadTime: 2.00f, ammo: 300, canReloadNoMatterAmmo: true,
                 shootFps: 24, reloadFps: 12, fireAudio: "stickybomblauncher_shoot", reloadAudio: "stickybomblauncher_worldreload",
                 muzzleVFX: "muzzle_scotsman", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleLeft);

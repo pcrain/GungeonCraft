@@ -3,7 +3,6 @@
 public class IronMaid : AdvancedGunBehavior
 {
     public static string ItemName         = "Iron Maid";
-    public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Night of Knives";
     public static string LongDescription  = "Bullets quickly decelerate and enter stasis after firing. Reloading or switching to a different gun releases all bullets towards the nearest wall or enemy in the player's line of sight.";
     public static string Lore             = "An urban legend tells the story of a Gungeoneer who happened upon a cosmic rift deep in the Gungeon. Upon entering the rift, they found themselves in a great mansion guarded by a maid who wielded no guns, yet produced more bullets than the mind could comprehend. After holding their own for all of 1.3 seconds, the Gungeoneer was overwhelmed by knife-like projectiles that appeared out of nowhere in seeming defiance of time and space. The Gungeoneer awoke to find themself back in the Breach, with this gun lying by their side as the only evidence of their journey.";
@@ -13,7 +12,7 @@ public class IronMaid : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<IronMaid>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<IronMaid>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 0.75f, ammo: 400, shootFps: 24, reloadFps: 24,
                 muzzleVFX: "muzzle_iron_maid", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleLeft, fireAudio: "knife_gun_launch",
                 reloadAudio: "knife_gun_reload");

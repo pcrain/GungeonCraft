@@ -3,7 +3,6 @@
 public class Outbreak : AdvancedGunBehavior
 {
     public static string ItemName         = "Outbreak";
-    public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Going Viral";
     public static string LongDescription  = "Fires a parasitic projectile that infects enemies on contact. All infected enemies fire additional parasitic projectiles towards the player's target whenever this gun is fired.";
     public static string Lore             = "For years, Gungineers have tried to develop synthetic self-replicating projectiles in the lab, with the closest they've gotten being the discovery that glass beakers shatter when you throw them against the wall. As a last ditch effort after research funding inevitably ran dry, one Gungineer decided to stuff live parasites of unknown origin into a casing and fire it at a target dummy. To everyone's surprise, a new projectile emerged right back from the puncture area. After a few generations of design tweaks and genetic mutations, the {ItemName} emerged in its current form.";
@@ -16,7 +15,7 @@ public class Outbreak : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Outbreak>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Outbreak>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 1.2f, ammo: 300, shootFps: 24, reloadFps: 20,
                 muzzleVFX: "muzzle_outbreak", muzzleFps: 40, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter,
                 fireAudio: "outbreak_shoot_sound", reloadAudio: "outbreak_reload_sound");

@@ -8,7 +8,6 @@
 public class RCLauncher : AdvancedGunBehavior
 {
     public static string ItemName         = "R.C. Launcher";
-    public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Pedal to the Metal";
     public static string LongDescription  = "Launches R.C. cars that explode on impact. Each car follows the car fired before it, or the mouse cursor / controller aim direction if they are the lead car.";
     public static string Lore             = "A case study of the unreasonable effectiveness of retrofitting children's toys with AI and explosives, this launcher's steerable projectiles ensure swift and accurate destruction in the hands of a competent pilot. The projectiles also still make a surprisingly fun and entertaining diversion for children ages 4-14, provided they never crash into anything.";
@@ -19,7 +18,7 @@ public class RCLauncher : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<RCLauncher>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<RCLauncher>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: _FULL_RELOAD_TIME, ammo: 240, shootFps: 30, reloadFps: 16,
                 loopReloadAt: 0, fireAudio: "rc_car_launch_sound", reloadAudio: "rc_car_reload_sound");
 

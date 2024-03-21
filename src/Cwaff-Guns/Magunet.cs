@@ -3,7 +3,6 @@ namespace CwaffingTheGungy;
 public class Magunet : AdvancedGunBehavior
 {
     public static string ItemName         = "Magunet";
-    public static string ProjectileName   = "38_special";
     public static string ShortDescription = "An Attractive Option";
     public static string LongDescription  = "Attracts debris in a cone in front of the player and holds it in stasis while fire is held. Upon releasing fire, launches all attracted debris forwards, damaging any enemies in the way. Corpses deal extra damage when launched. Increases curse by 1 while in inventory.";
     public static string Lore             = "Standing in sharp defiance of all that the Gungeon, electrical engineering, and common sense stand for, the Magunet manages to weaponize the messiness of battle-torn Gungeon rooms through questionable physics that only vaguely approximate how actual magnets operate.";
@@ -28,7 +27,7 @@ public class Magunet : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Magunet>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Magunet>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true,
                 chargeFps: 16, curse: 1f);
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);

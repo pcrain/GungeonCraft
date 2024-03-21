@@ -3,7 +3,6 @@
 public class Suncaster : AdvancedGunBehavior
 {
     public static string ItemName         = "Suncaster";
-    public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Reflaktive";
     public static string LongDescription  = "Fires weak piercing beams of sunlight. Reload to toss a refractive prism. Uncharged shots that hit a prism will refract towards all other prisms. Charged shots continuously bounce between and refract off of all placed prisms for a short period. Prisms can be reclaimed by interacting with them or by entering a new room. Cannot gaim ammo normally, but passively restores ammo over time.";
     public static string Lore             = "An exotic firearm feared throughout the galaxy for its potent solar projectiles. The absence of sunlight in the Gungeon dramatically reduces its ability to gather energy, yet it remains a force to be reckoned with once its energy stores are sufficient.";
@@ -32,7 +31,7 @@ public class Suncaster : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Suncaster>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Suncaster>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.S, gunClass: GunClass.FIRE, reloadTime: 0.0f, ammo: 30,
               canReloadNoMatterAmmo: true, canGainAmmo: false, doesScreenShake: false, shootFps: 30, reloadFps: 40);
 

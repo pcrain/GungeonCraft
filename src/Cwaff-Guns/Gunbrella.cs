@@ -7,7 +7,6 @@ namespace CwaffingTheGungy;
 public class Gunbrella : AdvancedGunBehavior
 {
     public static string ItemName         = "Gunbrella";
-    public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Cloudy with a Chance of Pain";
     public static string LongDescription  = "Charging and releasing fires projectiles that hail from the sky at the cursor's position.";
     public static string Lore             = "A normal umbrella that was genetically modified to fire bullets, older models fired projectiles from the front much like a traditional firearm. Gungeoneers quickly grew frustrated at being unable to actually see where they were shooting at due to the Gunbrella's large frame. With modern advances in technology and magic, newer models include a touchscreen and GPS that allows the user to target enemies directly with projectiles summoned from the sky itself.";
@@ -29,7 +28,7 @@ public class Gunbrella : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Gunbrella>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Gunbrella>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARGE, reloadTime: 1.0f, ammo: 60, shootFps: 60, chargeFps: 16,
                 loopChargeAt: 17, muzzleVFX: "muzzle_gunbrella", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter);
 

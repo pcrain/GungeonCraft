@@ -3,7 +3,6 @@
 public class QuarterPounder : AdvancedGunBehavior
 {
     public static string ItemName         = "Quarter Pounder";
-    public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Pay Per Pew";
     public static string LongDescription  = "Uses casings as ammo. Fires high-powered projectiles that transmute enemies to gold upon death.";
     public static string Lore             = "Legend says that Dionysus granted King Midas' wish that everything he touched would turn to gold. Midas was overjoyed at first, but upon turning his food and daughter to gold, realized his wish was ill thought out, and eventually died of starvation.\n\nThe average person might interpret King Midas as a cautionary tale to be mindful of what you wish for. One gunsmith, however, heard the tale and thought, \"wow, turning my enemies to gold sure would be useful!\". Despite completely missing the moral of King Midas, the gunsmith did succeed in forging a rather powerful weapon, proving that the meaning of art is indeed up to the beholder.";
@@ -14,7 +13,7 @@ public class QuarterPounder : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<QuarterPounder>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<QuarterPounder>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.RIFLE, reloadTime: 1.1f, ammo: 9999, canGainAmmo: false,
                 shootFps: 24, reloadFps: 16, muzzleVFX: "muzzle_quarter_pounder", muzzleFps: 30, muzzleScale: 0.4f, muzzleAnchor: Anchor.MiddleCenter,
                 fireAudio: "fire_coin_sound", reloadAudio: "coin_gun_reload");

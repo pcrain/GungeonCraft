@@ -3,7 +3,6 @@
 public class Uppskeruvel : AdvancedGunBehavior
 {
     public static string ItemName         = "Uppskeruvel";
-    public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Aimless Souls";
     public static string LongDescription  = "Enemies killed with this gun drop soul fragments proportional to their max health. Collecting these fragments spawns Aimless Souls that will attack enemies shot by this gun. New souls are spawned after collecting 10, 30, 60, 100, 150, etc. fragments.";
     public static string Lore             = "The Gungeon has claimed its share of lives from Gungeoneers and Gundead alike. With a few notable exceptions, their souls wander the Gungeon aimlessly, yearning to bear arms once more. The Uppskeruvel calls out to these Aimless Souls and gives them purpose, transforming them into the projectiles they were always meant to be.\n\n\"By the sweat of your brow you will fire your weapon until your last projectile falls to the ground from whence you were both taken; for gunpowder you are and to gunpowder you will return.\" ~ Gunesis 3:19";
@@ -36,7 +35,7 @@ public class Uppskeruvel : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Uppskeruvel>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Uppskeruvel>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARM, reloadTime: 1.25f, ammo: 400, shootFps: 24, reloadFps: 30,
                 muzzleVFX: "muzzle_uppskeruvel", muzzleFps: 60, muzzleScale: 0.2f, muzzleAnchor: Anchor.MiddleCenter,
                 fireAudio: "uppskeruvel_fire_sound");

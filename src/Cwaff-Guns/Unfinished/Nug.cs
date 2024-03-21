@@ -3,7 +3,6 @@
 public class Nug : AdvancedGunBehavior
 {
     public static string ItemName         = "Nug";
-    public static string ProjectileName   = "magnum"; //38
     public static string ShortDescription = "Noegnug Eht Retne";
     public static string LongDescription  = "(everything's backwards D:)";
     public static string Lore             = "TBD";
@@ -15,7 +14,7 @@ public class Nug : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Nug>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<Nug>(ItemName, ShortDescription, LongDescription, Lore);
 
         gun.muzzleFlashEffects.type           = VFXPoolType.None;
         gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
