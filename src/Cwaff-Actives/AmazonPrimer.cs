@@ -17,6 +17,7 @@ public class AmazonPrimer : PlayerItem
         item.CanBeDropped = true;
 
         _PrimeLogo = VFX.Create("prime_logo_overhead", 2, loops: true, anchor: Anchor.LowerCenter, emissivePower: 100f);
+        FakeItem.Create<PrimerSubscription>();
     }
 
     public override bool CanBeUsed(PlayerController user)
@@ -26,11 +27,11 @@ public class AmazonPrimer : PlayerItem
 
     public override void DoEffect(PlayerController user)
     {
-        user.gameObject.GetOrAddComponent<PrimerSubscription>();
+        user.AcquireFakeItem<PrimerSubscription>().Setup();
     }
 }
 
-public class PrimerSubscription : MonoBehaviour
+public class PrimerSubscription : FakeItem
 {
     internal const int _PRIME_SUB_COST  = 5;
     internal const int _FLOOR_INFLATION = 5;
@@ -39,9 +40,9 @@ public class PrimerSubscription : MonoBehaviour
     private StatModifier[]   _primeBenefits = null;
     private int              _currentCost   = _PRIME_SUB_COST;
 
-    private void Start()
+    public void Setup()
     {
-        this._primer = base.gameObject.GetComponent<PlayerController>();
+        this._primer = base.Owner;
         this._primer.OnEnteredCombat += AnyPrimers;
         this._primer.OnRoomClearEvent += ThanksForPriming;
         GameManager.Instance.OnNewLevelFullyLoaded += Inflation;
@@ -110,5 +111,18 @@ public class PrimerSubscription : MonoBehaviour
         GameObject v = SpawnManager.SpawnVFX(AmazonPrimer._PrimeLogo, this._primer.sprite.WorldTopCenter + new Vector2(0f, 0.5f), Quaternion.identity);
             v.transform.parent = this._primer.transform;
             v.ExpireIn(1f);
+    }
+
+    public override void MidGameSerialize(List<object> data)
+    {
+        base.MidGameSerialize(data);
+        data.Add(this._currentCost);
+    }
+
+    public override void MidGameDeserialize(List<object> data)
+    {
+        base.MidGameDeserialize(data);
+        this._currentCost = (int)data[0];
+        this.Setup();
     }
 }

@@ -30,8 +30,7 @@
 - **Playstyle Variety**: defensive and strategic play should feel as rewarding as aggressive and proactive play
 
 ### Known Bugs
-* Mid-run saving might not correctly save the internal state of Amazon Primer
-* If you find any more, please let me know!
+* None at the moment! If you find any, please let me know!
 
 ### Vanilla Bugs Fixed
 * In co-op Turbo Mode, the 2nd player now has the same speed as the first player without having to die first
