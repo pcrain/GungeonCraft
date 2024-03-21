@@ -1,5 +1,9 @@
 # Changelog
 
+## Future
+
+- Fixed bug where Insurance Shop could spawn on first floor even without an S or A tier item
+
 ## 1.10.1 (2024-03-20)
 
 - Fixed startup crash due to OmnidirectionalLaser trying to read non-existent attach points

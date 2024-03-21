@@ -18,7 +18,7 @@ public class Kevlar
             shopItems              : shopItems,
             moddedItems            : new(),
             roomPath               : $"{C.MOD_INT_NAME}/Resources/Rooms/insurance.newroom",
-            allowDupes             : true,
+            allowDupes             : true, // allow multiple insurance policies
             costModifier           : 3f / 9f, // insurance should cost 3/9 of 90 == 30 casings
             spawnChance            : 1.0f,
             spawnPrerequisite      : CwaffPrerequisites.INSURANCE_PREREQUISITE,
@@ -92,6 +92,10 @@ public class Kevlar
     {
       if (_SpawnedThisRun)
         return false; // can't spawn if we already spawned this run
+
+      //TODO: figure out why Kevlar was spawning on first floor without this check, since player should never have an S or A tier item otherwise
+      if (CwaffPrerequisite.OnFirstFloor(conds))
+        return false; // can't spawn on first floor no matter what
 
       foreach (PickupObject p in GameManager.Instance.PrimaryPlayer.AllItems())
         if (p.quality == ItemQuality.S || p.quality == ItemQuality.A)
