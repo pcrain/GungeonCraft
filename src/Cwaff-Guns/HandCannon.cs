@@ -7,17 +7,17 @@ public class HandCannon : AdvancedGunBehavior
     public static string LongDescription  = "Fires a high-powered glove that slaps enemies perpendicular to the glove's trajectory with extreme force.";
     public static string Lore             = "Second only to guns, hands are widely considered to be one of the most effective weapons ever brought to the battlefield. In ancient times, combatants would often throw the severed hands of their fallen comrades at their enemies to simultaneously inflict physical and emotional damage, ergo the modern expression \"tossing hands\". The venerable Gun Tzu is thought to be the first to marry guns and hands with his legendary Finger Gun, known for inflicting panic and fear in all who opposed his army. The Hand Cannon is a direct descendant and natural evolution of Gun Tzu's original Finger Gun, packing enough force to make Vasilii Kamotskii blush.";
 
-    internal static GameObject _SlapppAnimation;
-
     private const float _CHARGE_TIME       = 0.5f;
-    private const int   _CHARGE_LOOP_FRAME = 11;
+    private const float _CHARGE_LOOP_FRAME = 11f;
+
+    internal static GameObject _SlapppAnimation;
 
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<HandCannon>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 0.75f, ammo: 100, shootFps: 30,
                 reloadFps: (int)(gun.spriteAnimator.GetClipByName(gun.reloadAnimation).frames.Length / gun.reloadTime),
-                chargeFps: (int)((1.0f / _CHARGE_TIME) * _CHARGE_LOOP_FRAME), loopChargeAt: _CHARGE_LOOP_FRAME,
+                chargeFps: (int)(_CHARGE_LOOP_FRAME / _CHARGE_TIME), loopChargeAt: (int)_CHARGE_LOOP_FRAME,
                 muzzleVFX: "muzzle_hand_cannon", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter,
                 fireAudio: "hand_cannon_shoot_sound", reloadAudio: "hand_cannon_reload_sound");
             gun.SetChargeAudio("hand_cannon_charge_sound", 0, 10);
@@ -35,78 +35,64 @@ public class SlappProjectile : MonoBehaviour
     private const int   _SLAPPP_FRAME         = 8;   // frame 8 is the meat of the slappp animation
     private const float _SLAPPP_FORCE         = 300f;
     private const float _SLAPPP_STUN          = 2f;
-    private const float _SLAPP_RADIUS_SQUARED = 3f;
+    private const float _SLAPP_RADIUS_SQUARED = 9f;
 
-    private Projectile _projectile;
-    private PlayerController _owner;
-    private AIActor _slapVictim = null;
-    private float _slapAngle = 0f;
-    private bool _flipped = false;
-    private float _slapDamage = 0f;
-    private FancyVFX _vfx = null;
+    private Projectile _projectile = null;
+    private AIActor    _slapVictim = null;
+    private Vector2    _slapAngle  = Vector2.zero;
+    private bool       _flipped    = false;
+    private float      _slapDamage = 0f;
+    private FancyVFX   _vfx        = null;
+
     private void Start()
     {
         this._projectile = base.GetComponent<Projectile>();
-        this._owner = this._projectile.Owner as PlayerController;
-
-        this._projectile.spriteAnimator.Stop(); // 0 FPS for now since we only care about the first frame
-        this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
-
-        this._flipped = this._owner.sprite.FlipX;
+        this._flipped    = this._projectile.Owner ? this._projectile.Owner.sprite.FlipX : false;
         this._slapDamage = this._projectile.baseData.damage;
+        this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
     }
 
     private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
     {
-        if (otherRigidbody?.healthHaver?.gameActor is not AIActor enemy)
+        if (!otherRigidbody || otherRigidbody.gameActor is not AIActor enemy || !enemy.IsHostile(canBeNeutral: true))
             return;
 
-        if (!enemy.IsHostile())
-            return;
-
-        // Set up SLAPPP parameters
-        this._slapVictim = enemy;
-        this._slapAngle = (this._projectile.Direction.ToAngle() + (this._flipped ? -90f : 90f)).Clamp180();
-
-        this._vfx = FancyVFX.SpawnUnpooled( //NOTE: absolutely MUST ignore pools or VFX objects with preexisting FancyVFX components might get reused
-            prefab       : HandCannon._SlapppAnimation,
-            position     : this._projectile.sprite.transform.position,
-            rotation     : this._projectile.sprite.transform.rotation,
-            velocity     : Vector2.zero,
-            lifetime     : 0.5f,
-            fadeOutTime  : 0.20f,
-            parent       : enemy.sprite.transform);
-        this._vfx.sprite.FlipY = this._flipped;  //smack in the opposite direction by flipping vertically, not horizontally
-        if (this._vfx.GetComponent<tk2dSpriteAnimator>() is tk2dSpriteAnimator animator)
-        {
-            animator.AnimationEventTriggered += SlapppEvent;
-            animator.DefaultClip.frames[_SLAPPP_FRAME].triggerEvent = true;
-            animator.DefaultClip.frames[_SLAPPP_FRAME].eventAudio = "slappp_sound";
-            animator.Play(animator.DefaultClip);
-        }
         PhysicsEngine.SkipCollision = true;
+        this._slapVictim = enemy;
+        this._slapAngle = this._projectile.Direction.Rotate(this._flipped ? -90f : 90f);
+        this._vfx = FancyVFX.SpawnUnpooled( //NOTE: absolutely MUST ignore pools or VFX objects with preexisting FancyVFX components might get reused
+            prefab      : HandCannon._SlapppAnimation,
+            position    : this._projectile.sprite.transform.position,
+            rotation    : this._projectile.sprite.transform.rotation,
+            lifetime    : 0.5f,
+            fadeOutTime : 0.20f,
+            parent      : enemy.sprite.transform);
+        this._vfx.sprite.FlipY = this._flipped; //smack in the opposite direction by flipping vertically, not horizontally
+        this._vfx.gameObject.AddAnimationEvent(SlapppEvent, _SLAPPP_FRAME, "slappp_sound");
         this._projectile.DieInAir(suppressInAirEffects: true, allowActorSpawns: false, allowProjectileSpawns: false, killedEarly: false);
     }
 
-    private /*static*/ void SlapppEvent(tk2dSpriteAnimator animator, tk2dSpriteAnimationClip clip, int frame)
+    private void SlapppEvent(tk2dSpriteAnimator animator, tk2dSpriteAnimationClip clip, int frame)
     {
-        this._vfx.transform.parent = null;  // don't follow the enemy after we've followed through on the slap
-        if (!this._slapVictim?.sprite)
+        this._vfx.transform.parent = null; // don't follow the enemy after we've followed through on the slap
+        if (!this._slapVictim)
             return;
 
-        Vector2 victimPos = this._slapVictim.sprite.WorldCenter;
+        Vector2 victimPos = this._slapVictim.CenterPosition;
         foreach (AIActor enemy in StaticReferenceManager.AllEnemies)
         {
             if (!enemy || !enemy.behaviorSpeculator || enemy.behaviorSpeculator.ImmuneToStun)
                 continue;
-            if (enemy?.healthHaver is not HealthHaver hh)
+            if (enemy.healthHaver is not HealthHaver hh)
                 continue;
-            if ((enemy.sprite.WorldCenter - victimPos).magnitude > _SLAPP_RADIUS_SQUARED)
+            if (enemy.knockbackDoer is not KnockbackDoer kb)
+                continue;
+            if ((enemy.sprite.WorldCenter - victimPos).sqrMagnitude > _SLAPP_RADIUS_SQUARED)
                 continue;
             enemy.behaviorSpeculator.Stun(_SLAPPP_STUN);
             hh.ApplyDamage(this._slapDamage, Vector2.zero, "SLAPPP", CoreDamageTypes.None, DamageCategory.Collision, true);
             if (!hh.IsBoss && !hh.IsSubboss)
-                hh.knockbackDoer?.ApplyKnockback(this._slapAngle.ToVector(), _SLAPPP_FORCE);
+                kb.ApplyKnockback(this._slapAngle, _SLAPPP_FORCE);
         }
         UnityEngine.Object.Destroy(this);
     }

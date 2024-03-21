@@ -1865,4 +1865,18 @@ public static class Extensions
       il.Body.Variables.Add(v);
       return v;
   }
+
+  /// <summary>Add an animation event to the tk2dSpriteAnimator of a GameObject</summary>
+  public static void AddAnimationEvent(this GameObject g, Action<tk2dSpriteAnimator, tk2dSpriteAnimationClip, int> action, int frame, string sound)
+  {
+      if (g.GetComponent<tk2dSpriteAnimator>() is not tk2dSpriteAnimator anim)
+      {
+        Lazy.DebugWarn("Trying to play animation event on nonexistent animator");
+        return;
+      }
+      anim.AnimationEventTriggered += action;
+      tk2dSpriteAnimationFrame f = anim.DefaultClip.frames[frame];
+        f.triggerEvent = true;
+        f.eventAudio   = "slappp_sound";
+  }
 }
