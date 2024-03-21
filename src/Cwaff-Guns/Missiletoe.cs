@@ -51,12 +51,8 @@ public class Missiletoe : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Missiletoe>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARM, reloadTime: 1.0f, ammo: 300, canReloadNoMatterAmmo: true);
-            gun.SetAnimationFPS(gun.shootAnimation, 45);
-            gun.SetAnimationFPS(gun.reloadAnimation, 20);
-            gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
-            gun.SetFireAudio("missiletoe_shoot_sound_1");
-            gun.SetReloadAudio("missiletoe_reload_sound");
+            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARM, reloadTime: 1.0f, ammo: 300, canReloadNoMatterAmmo: true,
+                shootFps: 45, reloadFps: 20, muzzleFrom: Items.Mailbox, fireAudio: "missiletoe_shoot_sound_1", reloadAudio: "missiletoe_reload_sound");
             gun.AddToSubShop(ModdedShopType.Boomhildr);
 
         gun.DefaultModule.SetAttributes(GunData.New(gun: gun, clipSize: 1, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, customClip: true));

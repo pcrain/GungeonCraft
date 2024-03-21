@@ -36,14 +36,8 @@ public class AlienNailgun : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<AlienNailgun>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 0.7f, ammo: 480);
-            gun.SetAnimationFPS(gun.idleAnimation, 24);
-            gun.SetAnimationFPS(gun.shootAnimation, 24);
-            gun.SetAnimationFPS(gun.reloadAnimation, 60);
-            gun.LoopAnimation(gun.reloadAnimation);
-            gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
-            gun.SetFireAudio("alien_nailgun_shoot_sound");
-            gun.SetReloadAudio("gorgun_eye_activate");
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 0.7f, ammo: 480, idleFps: 24, shootFps: 24, reloadFps: 60,
+                loopReloadAt: 0, muzzleFrom: Items.Mailbox, fireAudio: "alien_nailgun_shoot_sound", reloadAudio: "gorgun_eye_activate");
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
         gun.InitProjectile(GunData.New(clipSize: _RECONSTRUCT_COST, cooldown: 0.14f, shootStyle: ShootStyle.Charged, damage: 2.0f,

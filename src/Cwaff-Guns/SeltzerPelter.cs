@@ -16,9 +16,7 @@ public class SeltzerPelter : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<SeltzerPelter>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.0f, ammo: 150);
-            gun.SetAnimationFPS(gun.shootAnimation, 36);
-            gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.0f, ammo: 150, shootFps: 36, muzzleFrom: Items.Mailbox);
             _ReloadAnimations = new(){
                 gun.QuickUpdateGunAnimation("reload",   returnToIdle: true), // coke can
                 gun.QuickUpdateGunAnimation("reload_b", returnToIdle: true), // pepsi can
@@ -27,13 +25,8 @@ public class SeltzerPelter : AdvancedGunBehavior
             foreach(string animation in _ReloadAnimations)
             {
                 gun.SetAnimationFPS(animation, 52);
-                gun.SetGunAudio(name: animation, audio: "seltzer_shake_sound", frame: 0);
-                gun.SetGunAudio(name: animation, audio: "seltzer_shake_sound", frame: 10);
-                gun.SetGunAudio(name: animation, audio: "seltzer_shake_sound", frame: 22);
-                gun.SetGunAudio(name: animation, audio: "seltzer_shake_sound", frame: 29);
-                gun.SetGunAudio(name: animation, audio: "seltzer_shake_sound", frame: 35);
-                gun.SetGunAudio(name: animation, audio: "seltzer_shake_sound", frame: 42);
-                gun.SetGunAudio(name: animation, audio: "seltzer_insert_sound", frame: 42);
+                gun.SetGunAudio(animation, "seltzer_shake_sound", 0, 10, 22, 29, 35);
+                gun.SetGunAudio(animation, "seltzer_insert_sound", 42);
             }
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 

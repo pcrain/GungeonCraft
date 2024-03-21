@@ -47,11 +47,7 @@ public class Ticonderogun : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Ticonderogun>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.0f, ammo: 150);
-            gun.SetAnimationFPS(gun.shootAnimation, 1);
-            gun.SetAnimationFPS(gun.reloadAnimation, 1);
-            gun.SetAnimationFPS(gun.chargeAnimation, 24);
-            gun.AddStatToGun(PlayerStats.StatType.Curse, 2f, StatModifier.ModifyMethod.ADDITIVE);
+            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.0f, ammo: 150, shootFps: 1, reloadFps: 1, chargeFps: 24, curse: 2f);
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
 
         gun.SetupDefaultModule(GunData.New(ammoCost: 0, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.Charged, ammoType: GameUIAmmoType.AmmoType.BEAM));

@@ -57,12 +57,8 @@ public class Glockarina : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Glockarina>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.2f, ammo: 400, canReloadNoMatterAmmo: true);
-            gun.SetAnimationFPS(gun.shootAnimation, 24);
-            gun.SetAnimationFPS(gun.reloadAnimation, 20);
-            gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
-            gun.SetFireAudio("glockarina_shoot_sound");
-            gun.SetReloadAudio("glockarina_reload_sound");
+            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.2f, ammo: 400, canReloadNoMatterAmmo: true,
+                shootFps: 24, reloadFps: 20, muzzleFrom: Items.Mailbox, fireAudio: "glockarina_shoot_sound", reloadAudio: "glockarina_reload_sound");
 
         gun.gameObject.AddComponent<GlockarinaAmmoDisplay>();
 

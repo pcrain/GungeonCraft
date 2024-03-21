@@ -22,9 +22,7 @@ public class KALI : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<KALI>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 0.1f, ammo: 200, audioFrom: Items.Banana /* silent charge */);
-            // gun.SetFireAudio("alligator_shoot_sound");
-            gun.SetFireAudio("kali_shoot_sound");
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 0.1f, ammo: 200, fireAudio: "kali_shoot_sound");
 
         _KaliProjectile = gun.InitProjectile(GunData.New(range: 9999f, force: 3f, cooldown: 0.1f, collidesWithProjectiles: true,
           clipSize: 1, sprite: "kali_projectile", shootStyle: ShootStyle.Charged)
@@ -37,16 +35,6 @@ public class KALI : AdvancedGunBehavior
                 tc.DispersalParticleSystemPrefab = (ItemHelper.Get(Items.FlashRay) as Gun).DefaultModule.projectiles[0].GetComponentInChildren<TrailController>().DispersalParticleSystemPrefab;
                 tc.gameObject.AddComponent<TrailControllerHotfix.Fix>(); //NOTE: high speed projectiles don't always collide with walls cleanly in vanilla, so patch that
             // p.SetAllImpactVFX(VFX.CreatePool("gaster_beam_impact", fps: 20, loops: false, scale: 1.0f, anchor: Anchor.MiddleCenter));
-
-            // TrailController tc = (ItemHelper.Get(Items.Railgun) as Gun)
-            //     .DefaultModule
-            //     .chargeProjectiles[1]
-            //     .Projectile
-            //     .GetComponentInChildren<TrailController>()
-            //     .gameObject
-            //     .ClonePrefab()
-            //     .GetComponent<TrailController>();
-            // p.AddTrailToProjectilePrefab(tc);
 
         ProjectileModule mod = gun.DefaultModule;
         mod.projectiles.Clear();

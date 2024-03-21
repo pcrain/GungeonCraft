@@ -13,11 +13,8 @@ public class PlatinumStar : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<PlatinumStar>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.PISTOL, reloadTime: 1f, ammo: 480);
-            gun.SetAnimationFPS(gun.shootAnimation, 20);
-            gun.SetAnimationFPS(gun.reloadAnimation, 40);
-            gun.SetMuzzleVFX("muzzle_platinum_star", fps: 60, scale: 0.25f, anchor: Anchor.MiddleCenter);
-            gun.SetFireAudio("platinum_fire_sound");
+            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.PISTOL, reloadTime: 1f, ammo: 480, shootFps: 20, reloadFps: 40,
+                muzzleVFX: "muzzle_platinum_star", muzzleFps: 60, muzzleScale: 0.25f, muzzleAnchor: Anchor.MiddleCenter, fireAudio: "platinum_fire_sound");
             gun.SetReloadAudio("platinum_reload_sound", frame: 5);
             gun.AddToSubShop(ModdedShopType.TimeTrader);
 

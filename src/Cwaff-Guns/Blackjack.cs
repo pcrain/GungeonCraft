@@ -18,11 +18,8 @@ public class Blackjack : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Blackjack>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.8f, ammo: _DECK_SIZE * _NUM_DECKS, canGainAmmo: false);
-            gun.SetAnimationFPS(gun.shootAnimation, 30);
-            gun.SetAnimationFPS(gun.reloadAnimation, 30);
-            gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
-            gun.SetReloadAudio("card_shuffle_sound"); // todo: this is still playing the default reload sound as well, for some reason
+            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.8f, ammo: _DECK_SIZE * _NUM_DECKS, canGainAmmo: false,
+                shootFps: 30, reloadFps: 30, muzzleFrom: Items.Mailbox, reloadAudio: "card_shuffle_sound");
 
         gun.InitProjectile(GunData.New(clipSize: _CLIP_SIZE, cooldown: 0.16f, angleVariance: 24.0f, shootStyle: ShootStyle.Automatic,
           customClip: true, damage: 8f, speed: 18f, range: 999f

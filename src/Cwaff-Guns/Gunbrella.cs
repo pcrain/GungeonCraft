@@ -30,11 +30,8 @@ public class Gunbrella : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Gunbrella>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARGE, reloadTime: 1.0f, ammo: 60);
-            gun.SetAnimationFPS(gun.shootAnimation, 60);
-            gun.SetAnimationFPS(gun.chargeAnimation, 16);
-            gun.LoopAnimation(gun.chargeAnimation, 17);
-            gun.SetMuzzleVFX("muzzle_gunbrella", fps: 30, scale: 0.5f, anchor: Anchor.MiddleCenter);
+            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARGE, reloadTime: 1.0f, ammo: 60, shootFps: 60, chargeFps: 16,
+                loopChargeAt: 17, muzzleVFX: "muzzle_gunbrella", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter);
 
         gun.InitProjectile(GunData.New(clipSize: 1, shootStyle: ShootStyle.Charged, customClip: true, ammoCost: 0,
           damage: _PROJ_DAMAGE, sprite: "gunbrella_projectile", fps: 16, anchor: Anchor.MiddleLeft, freeze: 0.33f, chargeTime: _MIN_CHARGE_TIME,

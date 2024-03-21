@@ -35,15 +35,9 @@ public class Breegull : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Breegull>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.0f, ammo: 320);
-            gun.SetAnimationFPS(gun.shootAnimation, 20);
-            gun.SetAnimationFPS(gun.reloadAnimation, 12);
-            gun.SetAnimationFPS(gun.introAnimation, 8);
-            gun.SetMuzzleVFX(); // no muzzle flash effects
-            gun.SetFireAudio("breegull_shoot_sound");
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.0f, ammo: 320, shootFps: 20, reloadFps: 12,
+                introFps: 8, fireAudio: "breegull_shoot_sound", introAudio: "breegull_intro_sound", carryOffset: new IntVector2(6, 0));
             gun.SetReloadAudio("breegull_reload_sound", 0, 4, 8);
-            gun.SetGunAudio(gun.introAnimation, "breegull_intro_sound");
-            gun.carryPixelOffset = new IntVector2(6, 0);
 
         gun.gameObject.AddComponent<BreegullAmmoDisplay>();
 

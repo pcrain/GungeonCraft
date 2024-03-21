@@ -24,13 +24,9 @@ public class Deadline : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Deadline>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 0.9f, ammo: 64);
-            gun.SetIdleAnimationFPS(10);
-            gun.SetAnimationFPS(gun.shootAnimation, 20);
-            gun.SetAnimationFPS(gun.reloadAnimation, 30);
-            gun.SetMuzzleVFX("muzzle_deadline", fps: 20, scale: 0.4f, anchor: Anchor.MiddleCenter);
-            gun.SetFireAudio("deadline_fire_sound");
-            gun.SetReloadAudio("deadline_reload_sound");
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 0.9f, ammo: 64, idleFps: 10, shootFps: 20,
+                reloadFps: 30, muzzleVFX: "muzzle_deadline", muzzleFps: 20, muzzleScale: 0.4f, muzzleAnchor: Anchor.MiddleCenter,
+                fireAudio: "deadline_fire_sound", reloadAudio: "deadline_reload_sound");
             gun.AddToSubShop(ModdedShopType.TimeTrader);
             gun.AddToSubShop(ModdedShopType.Boomhildr);
 

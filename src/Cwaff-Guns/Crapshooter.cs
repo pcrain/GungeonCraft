@@ -22,12 +22,8 @@ public class Crapshooter : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Crapshooter>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.PISTOL, reloadTime: 1.5f, ammo: 300);
-            gun.SetIdleAnimationFPS(6);
-            gun.SetAnimationFPS(gun.shootAnimation, 24);
-            gun.SetAnimationFPS(gun.reloadAnimation, 24);
-            gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
-            gun.SetFireAudio("crapshooter_shoot_sound");
+            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.PISTOL, reloadTime: 1.5f, ammo: 300, idleFps: 6, shootFps: 24,
+                reloadFps: 24, muzzleFrom: Items.Mailbox, fireAudio: "crapshooter_shoot_sound");
             gun.SetReloadAudio(_DiceSounds[0], 0, 6, 11, 14, 17, 19, 28);
             gun.SetReloadAudio(_DiceSounds[1], 3, 7, 12, 15, 21, 27);
             gun.SetReloadAudio(_DiceSounds[2], 2, 18, 23, 25, 31);

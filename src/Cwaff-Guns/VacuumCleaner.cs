@@ -24,8 +24,7 @@ public class VacuumCleaner : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<VacuumCleaner>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.CHARGE, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true);
-            gun.SetAnimationFPS(gun.chargeAnimation, 16);
+            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.CHARGE, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true, chargeFps: 16);
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
             gun.AddToSubShop(ModdedShopType.Rusty);
 

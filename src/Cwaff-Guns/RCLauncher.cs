@@ -20,12 +20,8 @@ public class RCLauncher : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<RCLauncher>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: _FULL_RELOAD_TIME, ammo: 240);
-            gun.LoopAnimation(gun.reloadAnimation);
-            gun.SetAnimationFPS(gun.shootAnimation, 30);
-            gun.SetAnimationFPS(gun.reloadAnimation, 16);
-            gun.SetFireAudio("rc_car_launch_sound");
-            gun.SetReloadAudio("rc_car_reload_sound");
+            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: _FULL_RELOAD_TIME, ammo: 240, shootFps: 30, reloadFps: 16,
+                loopReloadAt: 0, fireAudio: "rc_car_launch_sound", reloadAudio: "rc_car_reload_sound");
 
         gun.InitSpecialProjectile<RCGuidedProjectile>(GunData.New(sprite: "rc_car_projectile", clipSize: 7, cooldown: 0.1f,
             shootStyle: ShootStyle.SemiAutomatic, speed: 20f, damage: 9f, range: 9999f,

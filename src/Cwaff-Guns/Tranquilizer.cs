@@ -16,12 +16,8 @@ public class Tranquilizer : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Tranquilizer>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.POISON, reloadTime: 1.2f, ammo: 80);
-            gun.SetAnimationFPS(gun.shootAnimation, 30);
-            gun.SetAnimationFPS(gun.reloadAnimation, 40);
-            gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
-            gun.SetFireAudio("blowgun_fire_sound");
-            gun.SetReloadAudio("blowgun_reload_sound");
+            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.POISON, reloadTime: 1.2f, ammo: 80, shootFps: 30, reloadFps: 40,
+                muzzleFrom: Items.Mailbox, fireAudio: "blowgun_fire_sound", reloadAudio: "blowgun_reload_sound");
 
         gun.InitProjectile(GunData.New(clipSize: 1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, damage: 0f,
           sprite: "tranquilizer_projectile", fps: 12, anchor: Anchor.MiddleLeft)).Attach<TranquilizerBehavior>();

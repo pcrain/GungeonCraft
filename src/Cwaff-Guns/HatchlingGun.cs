@@ -11,10 +11,8 @@ public class HatchlingGun : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<HatchlingGun>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.RIFLE, reloadTime: 25f / 20f /* frames / fps*/, ammo: 500);
-            gun.SetAnimationFPS(gun.shootAnimation, 40);
-            gun.SetAnimationFPS(gun.reloadAnimation, 20);
-            gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
+            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.RIFLE, reloadTime: 25f / 20f, ammo: 500,
+                shootFps: 40, reloadFps: 20, muzzleFrom: Items.Mailbox);
             gun.SetReloadAudio("hatchling_gun_bounce_sound", 0, 6, 14);
 
         gun.InitProjectile(GunData.New(clipSize: 12, cooldown: 0.2f, angleVariance: 15.0f, shootStyle: ShootStyle.SemiAutomatic, customClip: true,

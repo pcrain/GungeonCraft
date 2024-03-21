@@ -17,9 +17,9 @@ public class Natascha : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Natascha>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f, ammo: 1500);
-            gun.SetAnimationFPS(gun.shootAnimation, (int)((float)_FireAnimationFrames / _BaseCooldownTime) + 1);
-            gun.SetMuzzleVFX("muzzle_natascha", fps: 60, scale: 0.3f, anchor: Anchor.MiddleCenter);
+            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f, ammo: 1500,
+                shootFps: (int)((float)_FireAnimationFrames / _BaseCooldownTime) + 1,
+                muzzleVFX: "muzzle_natascha", muzzleFps: 60, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter);
             gun.SetCasing(Items.Ak47);
             gun.AddToSubShop(ItemBuilder.ShopType.Trorc);
             gun.AddToSubShop(ModdedShopType.Rusty);

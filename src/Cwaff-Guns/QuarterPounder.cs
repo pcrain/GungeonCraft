@@ -15,12 +15,9 @@ public class QuarterPounder : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<QuarterPounder>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.RIFLE, reloadTime: 1.1f, ammo: 9999, canGainAmmo: false);
-            gun.SetAnimationFPS(gun.shootAnimation, 24);
-            gun.SetAnimationFPS(gun.reloadAnimation, 16);
-            gun.SetMuzzleVFX("muzzle_quarter_pounder", fps: 30, scale: 0.4f, anchor: Anchor.MiddleCenter);
-            gun.SetFireAudio("fire_coin_sound");
-            gun.SetReloadAudio("coin_gun_reload");
+            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.RIFLE, reloadTime: 1.1f, ammo: 9999, canGainAmmo: false,
+                shootFps: 24, reloadFps: 16, muzzleVFX: "muzzle_quarter_pounder", muzzleFps: 30, muzzleScale: 0.4f, muzzleAnchor: Anchor.MiddleCenter,
+                fireAudio: "fire_coin_sound", reloadAudio: "coin_gun_reload");
 
         gun.InitProjectile(GunData.New(clipSize: 10, angleVariance: 15.0f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, damage: 20.0f, speed: 44.0f,
           sprite: "coin_gun_projectile", fps: 2, anchor: Anchor.MiddleCenter)).Attach<MidasProjectile>();

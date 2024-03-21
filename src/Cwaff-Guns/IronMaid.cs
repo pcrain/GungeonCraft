@@ -14,12 +14,9 @@ public class IronMaid : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<IronMaid>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 0.75f, ammo: 400);
-            gun.SetAnimationFPS(gun.shootAnimation, 24);
-            gun.SetAnimationFPS(gun.reloadAnimation, 24);
-            gun.SetMuzzleVFX("muzzle_iron_maid", fps: 30, scale: 0.5f, anchor: Anchor.MiddleLeft);
-            gun.SetFireAudio("knife_gun_launch");
-            gun.SetReloadAudio("knife_gun_reload");
+            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 0.75f, ammo: 400, shootFps: 24, reloadFps: 24,
+                muzzleVFX: "muzzle_iron_maid", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleLeft, fireAudio: "knife_gun_launch",
+                reloadAudio: "knife_gun_reload");
             gun.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
         gun.InitProjectile(GunData.New(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true,

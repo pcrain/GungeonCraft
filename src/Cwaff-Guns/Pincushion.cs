@@ -19,12 +19,10 @@ public class Pincushion : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Pincushion>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.BEAM, reloadTime: 1.8f, ammo: 10000, doesScreenShake: false);
-            gun.SetAnimationFPS(gun.shootAnimation, 30);
-            gun.SetAnimationFPS(gun.reloadAnimation, 24);
-            gun.SetReloadAudio("pincushion_reload_start_sound", frame: 0);
+            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.BEAM, reloadTime: 1.8f, ammo: 10000, doesScreenShake: false,
+                shootFps: 30, reloadFps: 24);
+            gun.SetReloadAudio("pincushion_reload_start_sound", 0);
             gun.SetReloadAudio("pincushion_reload_sound", 8, 13, 18, 23, 28, 35);
-            gun.SetMuzzleVFX(null); // too many projectiles to benefit from muzzle VFX
 
         _Microdust = VFX.CreatePool("microdust", fps: 30, loops: false);
 

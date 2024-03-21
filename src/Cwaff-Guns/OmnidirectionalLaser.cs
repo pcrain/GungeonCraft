@@ -34,10 +34,8 @@ public class OmnidirectionalLaser : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<OmnidirectionalLaser>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 250/*, defaultAudio: true*/);
-            gun.SetAnimationFPS(gun.idleAnimation, _BASE_FPS);
-            gun.SetAnimationFPS(gun.shootAnimation, _BASE_FPS);
-            gun.LoopAnimation(gun.shootAnimation);
+            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 250,
+                idleFps: _BASE_FPS, shootFps: _BASE_FPS, loopFireAt: 0, preventRotation: true);
             gun.SetFireAudio("omni_spin_sound", 0, 1, 2, 3, 4, 5, 6, 7);
             gun.SuppressReloadAnimations();
             gun.AddFlippedCarryPixelOffsets(offset: new IntVector2(5, -4), flippedOffset: new IntVector2(4, -4),
@@ -52,8 +50,6 @@ public class OmnidirectionalLaser : AdvancedGunBehavior
                 offsetGunslinger:  new IntVector2(5, -4), flippedOffsetGunslinger:  new IntVector2(5, -4)   //TODO: verify
                 );
             gun.gunHandedness           = GunHandedness.NoHanded;
-            gun.muzzleFlashEffects      = null;
-            gun.preventRotation         = true;
             gun.reloadAnimation         = gun.idleAnimation; // animation shouldn't automatically change when reloading
             gun.shootAnimation          = null; // animation shouldn't automatically change when firing
             gun.PreventOutlines         = true; // messes up with two-part rendering

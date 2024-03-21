@@ -31,10 +31,8 @@ public class AimuHakurei : AdvancedGunBehavior
     {
         Gun gun = Lazy.SetupGun<AimuHakurei>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f,
-                ammo: 200, /*infiniteAmmo: true,*/ canGainAmmo: false, canReloadNoMatterAmmo: true);
-            gun.Volley.ModulesAreTiers = true;
-            gun.SetAnimationFPS(gun.shootAnimation, 60);
-            gun.SetMuzzleVFX("muzzle_aimu", fps: 30, scale: 0.3f, anchor: Anchor.MiddleCenter);
+                ammo: 200, canGainAmmo: false, canReloadNoMatterAmmo: true, modulesAreTiers: true, shootFps: 60, muzzleVFX: "muzzle_aimu",
+                muzzleFps: 30, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter);
             gun.AddToSubShop(ModdedShopType.TimeTrader);
 
         _BulletSprite = AnimatedBullet.Create(name: "aimu_projectile", fps: 2, scale: 0.625f, anchor: Anchor.MiddleCenter);

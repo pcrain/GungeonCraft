@@ -11,12 +11,8 @@ public class PaintballCannon : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<PaintballCannon>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 0.9f, ammo: 600);
-            gun.SetAnimationFPS(gun.shootAnimation, 14);
-            gun.SetAnimationFPS(gun.reloadAnimation, 4);
-            gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
-            gun.SetFireAudio("paintball_shoot_sound");
-            gun.SetReloadAudio("paintball_reload_sound");
+            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 0.9f, ammo: 600, shootFps: 14, reloadFps: 4,
+                muzzleFrom: Items.Mailbox, fireAudio: "paintball_shoot_sound", reloadAudio: "paintball_reload_sound");
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
         gun.InitProjectile(GunData.New(clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic, damage: 9.0f)

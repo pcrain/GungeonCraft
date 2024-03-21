@@ -34,9 +34,7 @@ public class Suncaster : AdvancedGunBehavior
     {
         Gun gun = Lazy.SetupGun<Suncaster>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.S, gunClass: GunClass.FIRE, reloadTime: 0.0f, ammo: 30,
-              canReloadNoMatterAmmo: true, canGainAmmo: false, doesScreenShake: false);
-            gun.SetAnimationFPS(gun.shootAnimation, 30);
-            gun.SetAnimationFPS(gun.reloadAnimation, 40);
+              canReloadNoMatterAmmo: true, canGainAmmo: false, doesScreenShake: false, shootFps: 30, reloadFps: 40);
 
         _SuncasterProjectile = gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.Charged,
           damage: 2f, speed: 100f, range: 999999f, fps: 12, anchor: Anchor.MiddleLeft, customClip: true, spawnSound: "suncaster_fire_sound", uniqueSounds: true)

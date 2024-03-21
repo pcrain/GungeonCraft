@@ -16,12 +16,9 @@ public class Lightwing : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Lightwing>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.0f, ammo: 120);
-            gun.SetAnimationFPS(gun.shootAnimation, 32);
-            gun.SetAnimationFPS(gun.reloadAnimation, 30);
-            gun.SetMuzzleVFX("muzzle_lightwing", fps: 30, scale: 0.5f, anchor: Anchor.MiddleCenter);
-            gun.SetFireAudio("lightwing_fire_sound");
-            gun.SetReloadAudio("lightwing_reload_sound");
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.0f, ammo: 120, shootFps: 32, reloadFps: 30,
+                muzzleVFX: "muzzle_lightwing", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter,
+                fireAudio: "lightwing_fire_sound", reloadAudio: "lightwing_reload_sound");
 
         gun.InitProjectile(GunData.New(clipSize: 20, cooldown: 0.28f, shootStyle: ShootStyle.SemiAutomatic, damage: 4.0f, customClip: true,
           speed: 20.0f, collidesWithProjectiles: true // collidesWithProjectiles needs to be set up front because...Unity

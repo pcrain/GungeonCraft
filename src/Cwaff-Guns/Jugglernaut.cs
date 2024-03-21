@@ -34,9 +34,7 @@ public class Jugglernaut : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Jugglernaut>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 150/*, defaultAudio: true*/);
-            gun.SetAnimationFPS(gun.shootAnimation, 30);
-            gun.SetAnimationFPS(gun.reloadAnimation, 40);
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 150, shootFps: 30, reloadFps: 40, preventRotation: true);
             _JuggleAnimations = new(){
                 gun.QuickUpdateGunAnimation("1_gun", returnToIdle: false),
                 gun.QuickUpdateGunAnimation("2_gun", returnToIdle: false),
@@ -45,10 +43,7 @@ public class Jugglernaut : AdvancedGunBehavior
                 gun.QuickUpdateGunAnimation("5_gun", returnToIdle: false),
                 gun.QuickUpdateGunAnimation("6_gun", returnToIdle: false),
             };
-            gun.muzzleFlashEffects              = null;
-            // gun.SetMuzzleVFX("muzzle_jugglernaut", fps: 10, scale: 0.2f, anchor: Anchor.MiddleCenter);
             // Manual adjustments to prevent wonky firing animations
-            gun.preventRotation                 = true;
             gun.barrelOffset.transform.position = new Vector3(0.75f, 0.75f, 0f);
             gun.AddFlippedCarryPixelOffsets(offset: _CarryOffset, flippedOffset: _FlippedCarryOffset);
 

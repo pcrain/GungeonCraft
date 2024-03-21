@@ -17,12 +17,9 @@ public class Outbreak : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Outbreak>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 1.2f, ammo: 300);
-            gun.SetAnimationFPS(gun.shootAnimation, 24);
-            gun.SetAnimationFPS(gun.reloadAnimation, 20);
-            gun.SetMuzzleVFX("muzzle_outbreak", fps: 40, scale: 0.3f, anchor: Anchor.MiddleCenter);
-            gun.SetFireAudio("outbreak_shoot_sound");
-            gun.SetReloadAudio("outbreak_reload_sound");
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 1.2f, ammo: 300, shootFps: 24, reloadFps: 20,
+                muzzleVFX: "muzzle_outbreak", muzzleFps: 40, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter,
+                fireAudio: "outbreak_shoot_sound", reloadAudio: "outbreak_reload_sound");
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
 
         _InfectionProjectile = gun.InitProjectile(GunData.New(clipSize: 10, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, customClip: true,

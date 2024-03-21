@@ -37,12 +37,10 @@ public class Uppskeruvel : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Uppskeruvel>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARM, reloadTime: 1.25f, ammo: 400);
-            gun.SetFireAudio("uppskeruvel_fire_sound");
+            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARM, reloadTime: 1.25f, ammo: 400, shootFps: 24, reloadFps: 30,
+                muzzleVFX: "muzzle_uppskeruvel", muzzleFps: 60, muzzleScale: 0.2f, muzzleAnchor: Anchor.MiddleCenter,
+                fireAudio: "uppskeruvel_fire_sound");
             gun.SetReloadAudio("uppskeruvel_reload_sound", 4, 22);
-            gun.SetAnimationFPS(gun.shootAnimation, 24);
-            gun.SetAnimationFPS(gun.reloadAnimation, 30);
-            gun.SetMuzzleVFX("muzzle_uppskeruvel", fps: 60, scale: 0.2f, anchor: Anchor.MiddleCenter);
 
         gun.InitProjectile(GunData.New(clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.Automatic, damage: 4f, customClip: true,
           sprite: "uppskeruvel_projectile", fps: 12, anchor: Anchor.MiddleLeft)).Attach<UppskeruvelProjectile>();

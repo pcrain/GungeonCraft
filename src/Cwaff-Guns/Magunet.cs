@@ -29,9 +29,8 @@ public class Magunet : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Magunet>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true);
-            gun.SetAnimationFPS(gun.chargeAnimation, 16);
-            gun.AddStatToGun(PlayerStats.StatType.Curse, 1f, StatModifier.ModifyMethod.ADDITIVE);
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true,
+                chargeFps: 16, curse: 1f);
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
 
         //TODO: can possibly use dummy charge module here

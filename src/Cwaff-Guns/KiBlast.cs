@@ -20,14 +20,12 @@ public class KiBlast : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<KiBlast>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 999, infiniteAmmo: true);
-            gun.SetIdleAnimationFPS(10);
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 999, infiniteAmmo: true, idleFps: 10,
+                fireAudio: "ki_blast_sound", muzzleVFX: "muzzle_ki_blast", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleLeft);
             _FireLeftAnim  = gun.shootAnimation;
             _FireRightAnim = gun.QuickUpdateGunAnimation("fire_alt", returnToIdle: true);
             gun.SetAnimationFPS(_FireLeftAnim, 24);
             gun.SetAnimationFPS(_FireRightAnim, 24);
-            gun.SetMuzzleVFX("muzzle_ki_blast", fps: 30, scale: 0.5f, anchor: Anchor.MiddleLeft);
-            gun.SetFireAudio("ki_blast_sound");
             gun.AddToSubShop(ModdedShopType.Boomhildr);
 
         gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,

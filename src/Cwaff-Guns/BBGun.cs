@@ -14,14 +14,9 @@ public class BBGun : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<BBGun>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 0.5f, ammo: 3, canGainAmmo: false);
-            gun.muzzleFlashEffects = (ItemHelper.Get(Items.SeriousCannon) as Gun).muzzleFlashEffects;
-            gun.SetAnimationFPS(gun.shootAnimation, 10);
-            gun.SetAnimationFPS(gun.chargeAnimation, 16);
-            gun.LoopAnimation(gun.chargeAnimation, 32);
-            gun.SetMuzzleVFX("muzzle_b_b_gun", fps: 30, scale: 0.5f, anchor: Anchor.MiddleCenter);
-            gun.SetFireAudio("Play_WPN_seriouscannon_shot_01");
-            gun.SetReloadAudio("Play_ENM_flame_veil_01");
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 0.5f, ammo: 3, canGainAmmo: false,
+                shootFps: 10, chargeFps: 16, loopChargeAt: 32, muzzleVFX: "muzzle_b_b_gun", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter,
+                fireAudio: "Play_WPN_seriouscannon_shot_01", reloadAudio: "Play_ENM_flame_veil_01");
 
         Projectile p = gun.InitProjectile(GunData.New(
           clipSize: 3, cooldown: 0.7f, angleVariance: 10.0f, shootStyle: ShootStyle.Charged, sequenceStyle: ProjectileSequenceStyle.Ordered,

@@ -11,12 +11,8 @@ public class Wavefront : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Wavefront>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.RIFLE, reloadTime: 1.0f, ammo: 320);
-            gun.SetAnimationFPS(gun.idleAnimation, 12);
-            gun.SetAnimationFPS(gun.shootAnimation, 50);
-            gun.SetAnimationFPS(gun.reloadAnimation, 16);
-            gun.SetMuzzleVFX("muzzle_wavefront", fps: 30, scale: 1.0f, anchor: Anchor.MiddleCenter, emissivePower: 10f);
-            gun.SetFireAudio("wavefront_fire_sound");
+            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.RIFLE, reloadTime: 1.0f, ammo: 320, idleFps: 12, shootFps: 50, reloadFps: 16,
+                muzzleVFX: "muzzle_wavefront", muzzleFps: 30, muzzleAnchor: Anchor.MiddleCenter, muzzleEmission: 10f, fireAudio: "wavefront_fire_sound");
             gun.SetReloadAudio("wavefront_reload_sound", 0, 6, 12, 18);
 
         gun.InitProjectile(GunData.New(clipSize: 8, cooldown: 0.125f, shootStyle: ShootStyle.Automatic, range: 999999f, speed: 60f, shouldRotate: true,

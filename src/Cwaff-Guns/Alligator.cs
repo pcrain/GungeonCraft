@@ -20,12 +20,9 @@ public class Alligator : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Alligator>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.CHARGE, reloadTime: 2.0f, ammo: 300);
-            gun.SetAnimationFPS(gun.shootAnimation, 20);
-            gun.SetAnimationFPS(gun.reloadAnimation, 16);
-            gun.SetMuzzleVFX("muzzle_alligator", fps: 60, scale: 0.5f, anchor: Anchor.MiddleCenter, emissivePower: 50f);
-            gun.SetFireAudio("alligator_shoot_sound");
-            gun.SetReloadAudio("alligator_reload_sound");
+            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.CHARGE, reloadTime: 2.0f, ammo: 300, shootFps: 20, reloadFps: 10,
+                muzzleVFX: "muzzle_alligator", muzzleFps: 60, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter, muzzleEmission: 50f,
+                fireAudio: "alligator_shoot_sound", reloadAudio: "alligator_reload_sound");
 
         gun.InitProjectile(GunData.New(clipSize: 8, cooldown: 0.4f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, customClip: true,
           damage: 1.0f, speed: 36.0f, sprite: "alligator_projectile", fps: 2, anchor: Anchor.MiddleCenter

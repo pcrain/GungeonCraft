@@ -13,12 +13,9 @@ public class SubMachineGun : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<SubMachineGun>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.CHARM, reloadTime: 1.5f, ammo: 200);
-            gun.SetAnimationFPS(gun.shootAnimation, 20);
-            gun.SetAnimationFPS(gun.reloadAnimation, 10);
-            gun.SetMuzzleVFX("muzzle_sub_machine_gun", fps: 30, scale: 0.5f, anchor: Anchor.MiddleCenter);
-            gun.SetFireAudio("sub_machine_gun_fire_sound");
-            gun.SetReloadAudio("sub_machine_gun_reload_sound");
+            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.CHARM, reloadTime: 1.5f, ammo: 200, shootFps: 20, reloadFps: 10,
+                muzzleVFX: "muzzle_sub_machine_gun", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter,
+                fireAudio: "sub_machine_gun_fire_sound", reloadAudio: "sub_machine_gun_reload_sound");
 
         gun.InitProjectile(GunData.New(sprite: "sandwich_projectile", clipSize: 5, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic,
             damage: 0.0f, shouldRotate: false)).Attach<NourishingProjectile>();

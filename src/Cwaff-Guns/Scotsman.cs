@@ -24,12 +24,9 @@ public class Scotsman : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Scotsman>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.PISTOL, reloadTime: 2.00f, ammo: 300, canReloadNoMatterAmmo: true);
-            gun.SetAnimationFPS(gun.shootAnimation, 24);
-            gun.SetAnimationFPS(gun.reloadAnimation, 12);
-            gun.SetMuzzleVFX("muzzle_scotsman", fps: 30, scale: 0.5f, anchor: Anchor.MiddleLeft);
-            gun.SetFireAudio("stickybomblauncher_shoot");
-            gun.SetReloadAudio("stickybomblauncher_worldreload");
+            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.PISTOL, reloadTime: 2.00f, ammo: 300, canReloadNoMatterAmmo: true,
+                shootFps: 24, reloadFps: 12, fireAudio: "stickybomblauncher_shoot", reloadAudio: "stickybomblauncher_worldreload",
+                muzzleVFX: "muzzle_scotsman", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleLeft);
             gun.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
         gun.InitProjectile(GunData.New(clipSize: 20, cooldown: 0.22f, shootStyle: ShootStyle.SemiAutomatic,

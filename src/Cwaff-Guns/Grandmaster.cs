@@ -18,12 +18,8 @@ public class Grandmaster : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Grandmaster>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.0f, ammo: 350);
-            gun.SetAnimationFPS(gun.shootAnimation, 24);
-            gun.SetAnimationFPS(gun.reloadAnimation, 16);
-            gun.SetMuzzleVFX(Items.Mailbox); // innocuous muzzle flash effects
-            gun.SetFireAudio("chess_gun_fire");
-            gun.SetReloadAudio("chess_gun_reload");
+            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.0f, ammo: 350, shootFps: 24, reloadFps: 16,
+                muzzleFrom: Items.Mailbox, fireAudio: "chess_gun_fire", reloadAudio: "chess_gun_reload");
 
         gun.InitProjectile(GunData.New(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, speed: 30f
           )).AddAnimations(

@@ -14,12 +14,8 @@ public class PistolWhip : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<PistolWhip>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 0.01f, ammo: 100);
-            gun.SetAnimationFPS(gun.shootAnimation, 30);
-            gun.SetAnimationFPS(gun.reloadAnimation, 40);
-            gun.AddStatToGun(PlayerStats.StatType.Curse, 3f, StatModifier.ModifyMethod.ADDITIVE);
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 0.01f, ammo: 100, shootFps: 30, reloadFps: 40, curse: 3f);
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
-            gun.muzzleFlashEffects = null;
 
         gun.InitProjectile(GunData.New(ammoCost: 0, clipSize: -1, cooldown: WhipChainStart.TOTAL_TIME + C.FRAME, shootStyle: ShootStyle.SemiAutomatic,
           damage: 0.0f, speed: 0.01f, range: 999.0f)).Attach<WhipChainStartProjectile>();

@@ -22,14 +22,9 @@ public class CarpetBomber : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<CarpetBomber>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.5f, ammo: 360);
-            gun.muzzleFlashEffects = (ItemHelper.Get(Items.SeriousCannon) as Gun).muzzleFlashEffects;
-            gun.SetAnimationFPS(gun.shootAnimation, 30);
-            gun.SetAnimationFPS(gun.reloadAnimation, 20);
-            gun.SetAnimationFPS(gun.chargeAnimation, (int)(1f / _CHARGE_PER_PROJECTILE));
-            gun.LoopAnimation(gun.chargeAnimation, 10);
-            gun.SetMuzzleVFX("muzzle_carpet_bomber", fps: 30, scale: 0.5f, anchor: Anchor.MiddleCenter);
-            gun.SetFireAudio("carpet_bomber_shoot_sound");
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.5f, ammo: 360, shootFps: 30, reloadFps: 20,
+                chargeFps: (int)(1f / _CHARGE_PER_PROJECTILE), loopChargeAt: 10, muzzleVFX: "muzzle_carpet_bomber", muzzleFps: 30,
+                muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter, fireAudio: "carpet_bomber_shoot_sound");
             gun.SetReloadAudio("carpet_bomber_reload_sound", 2, 10, 18);
             gun.SetChargeAudio("carpet_bomber_charge_stage", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 

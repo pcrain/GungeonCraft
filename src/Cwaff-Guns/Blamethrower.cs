@@ -16,10 +16,7 @@ public class Blamethrower : AdvancedGunBehavior
     {
         Gun gun = Lazy.SetupGun<Blamethrower>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARM, reloadTime: 0.0f, ammo: 300,
-                doesScreenShake: false, canReloadNoMatterAmmo: true);
-            gun.SetAnimationFPS(gun.shootAnimation, 40);
-            gun.SetMuzzleVFX("muzzle_blamethrower", fps: 30);
-            // gun.SetFireAudio("blowgun_fire_sound");
+                doesScreenShake: false, canReloadNoMatterAmmo: true, shootFps: 40, muzzleVFX: "muzzle_blamethrower", muzzleFps: 30);
 
         Projectile proj = gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.08f, shootStyle: ShootStyle.Automatic,
           damage: 2f, angleVariance: 30f, speed: 17f, range: 17f, customClip: true,

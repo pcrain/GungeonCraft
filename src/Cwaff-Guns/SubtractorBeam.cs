@@ -17,12 +17,8 @@ public class SubtractorBeam : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<SubtractorBeam>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.FULLAUTO, reloadTime: 1.25f, ammo: 300);
-            gun.SetIdleAnimationFPS(10);
-            gun.SetAnimationFPS(gun.shootAnimation, 24);
-            gun.SetAnimationFPS(gun.reloadAnimation, 30);
-            gun.SetMuzzleVFX("muzzle_subtractor_beam", fps: 30, scale: 0.3f, anchor: Anchor.MiddleCenter);
-            gun.SetReloadAudio("subtractor_beam_reload_sound");
+            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.FULLAUTO, reloadTime: 1.25f, ammo: 300, idleFps: 10, shootFps: 24, reloadFps: 30,
+                muzzleVFX: "muzzle_subtractor_beam", muzzleFps: 30, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter, reloadAudio: "subtractor_beam_reload_sound");
 
         _GreenTrailPrefab = VFX.CreateTrailObject(ResMap.Get("subtractor_beam_mid")[0], new Vector2(20, 4), new Vector2(0, 0),
             ResMap.Get("subtractor_beam_mid"), 60, ResMap.Get("subtractor_beam_start"), 60, cascadeTimer: C.FRAME, destroyOnEmpty: true);

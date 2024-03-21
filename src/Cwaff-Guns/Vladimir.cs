@@ -23,10 +23,8 @@ public class Vladimir : AdvancedGunBehavior
     {
         Gun gun = Lazy.SetupGun<Vladimir>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.1f, ammo: 100,
-              infiniteAmmo: true, canReloadNoMatterAmmo: true);
-            gun.SetMuzzleVFX("muzzle_vladimir", fps: 30, scale: 0.3f, anchor: Anchor.MiddleCenter);
-            gun.SetFireAudio("vladimir_fire_sound");
-            gun.AddStatToGun(PlayerStats.StatType.Curse, 1f, StatModifier.ModifyMethod.ADDITIVE);
+              infiniteAmmo: true, canReloadNoMatterAmmo: true, fireAudio: "vladimir_fire_sound", muzzleVFX: "muzzle_vladimir",
+              muzzleFps: 30, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter, curse: 1f);
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
 
         // TODO: make our own impact vfx

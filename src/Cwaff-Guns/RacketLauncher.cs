@@ -17,11 +17,8 @@ public class RacketLauncher : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<RacketLauncher>(ItemName, ProjectileName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: _AMMO, canReloadNoMatterAmmo: true);
-            gun.muzzleFlashEffects.type              = VFXPoolType.None;
-            gun.SetIdleAnimationFPS(_IDLE_FPS);
-            gun.SetAnimationFPS(gun.shootAnimation, 60);
-            gun.LoopAnimation(gun.idleAnimation, 0);
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: _AMMO, canReloadNoMatterAmmo: true,
+                idleFps: _IDLE_FPS, shootFps: 60);
             gun.spriteAnimator.playAutomatically = false; // don't autoplay idle animation when dropped
 
         gun.InitProjectile(GunData.New(ammoCost: 0, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true,
