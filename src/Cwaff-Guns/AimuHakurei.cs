@@ -160,7 +160,7 @@ public class AimuHakurei : AdvancedGunBehavior
 
     private IEnumerator DecayWhileInactive()
     {
-        while (this.gameObject != null)
+        while (this.gameObject)
         {
             if (!GameManager.Instance.IsPaused && !GameManager.Instance.IsLoadingLevel)
                 UpdateGraze();
@@ -210,15 +210,21 @@ public class AimuHakurei : AdvancedGunBehavior
 
     private void PowerUp()
     {
-        ++this.gun.CurrentStrengthTier;
-        this.Owner.gameObject.Play("aimu_power_up_sound");
-        this.gun.gameObject.SetGlowiness(this.gun.CurrentStrengthTier * this.gun.CurrentStrengthTier);
+        while (this.gun.CurrentStrengthTier < _GRAZE_TIER_THRESHOLDS.Count() && this.graze >= _GRAZE_TIER_THRESHOLDS[this.gun.CurrentStrengthTier])
+        {
+            ++this.gun.CurrentStrengthTier;
+            this.Owner.gameObject.Play("aimu_power_up_sound");
+            this.gun.gameObject.SetGlowiness(this.gun.CurrentStrengthTier * this.gun.CurrentStrengthTier);
+        }
     }
 
     private void PowerDown()
     {
-        --this.gun.CurrentStrengthTier;
-        this.gun.gameObject.SetGlowiness(this.gun.CurrentStrengthTier * this.gun.CurrentStrengthTier);
+        while (this.gun.CurrentStrengthTier > 0 && this.graze < _GRAZE_TIER_THRESHOLDS[this.gun.CurrentStrengthTier - 1])
+        {
+            --this.gun.CurrentStrengthTier;
+            this.gun.gameObject.SetGlowiness(this.gun.CurrentStrengthTier * this.gun.CurrentStrengthTier);
+        }
     }
 
     private static Dictionary<Projectile, int> _GrazeDict = new();
@@ -231,16 +237,14 @@ public class AimuHakurei : AdvancedGunBehavior
         if (this.graze > 0 && (this._lastDecayTime + _GRAZE_DECAY_RATE <= BraveTime.ScaledTimeSinceStartup))
         {
             --this.graze;
-            if (this.gun.CurrentStrengthTier > 0 && graze < _GRAZE_TIER_THRESHOLDS[this.gun.CurrentStrengthTier-1])
-                PowerDown();
+            PowerDown();
             this._lastDecayTime = BraveTime.ScaledTimeSinceStartup;
         }
 
         if (!pc.healthHaver.IsVulnerable)
             return; // can't graze if we're invincible, that's cheating!!!
-
         if (pc.CurrentGun != this.gun)
-            return;// if this isn't our active gun, we can't benefit from grazing
+            return; // if this isn't our active gun, we can't benefit from grazing
 
         Vector2 ppos = pc.sprite.WorldCenter;
         Vector2 bottom = pc.sprite.WorldBottomCenter;
@@ -248,14 +252,10 @@ public class AimuHakurei : AdvancedGunBehavior
         {
             if (!p.isActiveAndEnabled || !p.sprite.renderer.enabled || !p.collidesWithPlayer || p.Owner == this.Owner)
                 continue; // if the projectile can't collide with us, we're not impressed
-
-            if (p.sprite?.WorldCenter is not Vector2 epos)
-                continue; // don't care about projectiles without sprites
-
-            if ((epos-ppos).sqrMagnitude >= _GRAZE_THRES_SQUARED)
+            if ((p.SafeCenter - ppos).sqrMagnitude >= _GRAZE_THRES_SQUARED)
                 continue; // bullet's too far away, so doesn't need to be considered
 
-            // Shenanigans to make sure pooled projectiles don't count as already-grazed when they respawn from the pool
+            //NOTE: Shenanigans to make sure pooled projectiles don't count as already-grazed when they respawn from the pool
             if (!_GrazeTimeDict.ContainsKey(p))
                 _GrazeTimeDict[p] = 0;
             if (_GrazeTimeDict[p] + _GRAZE_COOLDOWN < BraveTime.ScaledTimeSinceStartup)
@@ -265,15 +265,13 @@ public class AimuHakurei : AdvancedGunBehavior
                 continue; // we've already grazed the bullet a bunch, so put it on cooldown
 
             ++_GrazeDict[p];
-            if (++this.graze > _GRAZE_MAX)
-                this.graze = _GRAZE_MAX;
+            if (this.graze < _GRAZE_MAX)
+                ++this.graze;
 
-            // Vector2 finalpos = ppos + BraveMathCollege.DegreesToVector(Lazy.RandomAngle());
             FancyVFX.Spawn(AimuHakurei._GrazeVFX, bottom, Quaternion.identity, parent: pc.sprite?.transform,
-                velocity: 5f * Vector2.up, lifetime: 0.2f, fadeOutTime: 0.4f, /*emissivePower: 50f,*/ emissiveColor: Color.white);
+                velocity: 5f * Vector2.up, lifetime: 0.2f, fadeOutTime: 0.4f, emissiveColor: Color.white);
 
-            while (this.gun.CurrentStrengthTier < _GRAZE_TIER_THRESHOLDS.Count() && graze >= _GRAZE_TIER_THRESHOLDS[this.gun.CurrentStrengthTier])
-                PowerUp();
+            PowerUp();
         }
     }
 }
@@ -312,10 +310,6 @@ public class AimuHakureiAmmoDisplay : CustomAmmoDisplay
 
 public class AimuHakureiProjectileBehavior : MonoBehaviour
 {
-    private Projectile _projectile;
-    private PlayerController _owner;
-    private AimuHakureiProjectileMotionModule _aimu;
-
     // must be public or it won't serialize in prefab
     public bool invert;
     public float amplitude;
@@ -323,20 +317,15 @@ public class AimuHakureiProjectileBehavior : MonoBehaviour
 
     public void Setup(bool invert, float amplitude, string sound)
     {
-        this.invert = invert;
+        this.invert    = invert;
         this.amplitude = amplitude;
-        this.sound = sound;
+        this.sound     = sound;
     }
 
     private void Start()
     {
-        this._projectile = base.GetComponent<Projectile>();
-        this._owner = this._projectile.Owner as PlayerController;
-        this._aimu = new AimuHakureiProjectileMotionModule();
-            this._aimu.ForceInvert = this.invert;
-            this._aimu.amplitude = this.amplitude;
-        this._projectile.OverrideMotionModule = this._aimu;
-
+        base.GetComponent<Projectile>().OverrideMotionModule =
+            new AimuHakureiProjectileMotionModule(){ ForceInvert = this.invert, amplitude = this.amplitude };
         base.gameObject.Play(this.sound);
     }
 }
@@ -355,23 +344,18 @@ public class AimuHakureiProjectileMotionModule : ProjectileMotionModule
     private float _xDisplacement;
     private float _yDisplacement;
 
-    public override void UpdateDataOnBounce(float angleDiff)
+    private void ResetAngle(float angleDiff)
     {
         if (float.IsNaN(angleDiff))
             return;
 
-        _initialUpVector = Quaternion.Euler(0f, 0f, angleDiff) * _initialUpVector;
-        _initialRightVector = Quaternion.Euler(0f, 0f, angleDiff) * _initialRightVector;
+        Quaternion q        = Quaternion.Euler(0f, 0f, angleDiff);
+        _initialUpVector    = q * _initialUpVector;
+        _initialRightVector = q * _initialRightVector;
     }
 
-    public override void AdjustRightVector(float angleDiff)
-    {
-        if (float.IsNaN(angleDiff))
-            return;
-
-        _initialUpVector = Quaternion.Euler(0f, 0f, angleDiff) * _initialUpVector;
-        _initialRightVector = Quaternion.Euler(0f, 0f, angleDiff) * _initialRightVector;
-    }
+    public override void UpdateDataOnBounce(float angleDiff) => ResetAngle(angleDiff);
+    public override void AdjustRightVector(float angleDiff) => ResetAngle(angleDiff);
 
     private void Initialize(Vector2 lastPosition, Transform projectileTransform, float m_timeElapsed, Vector2 m_currentDirection, bool shouldRotate)
     {
@@ -391,18 +375,18 @@ public class AimuHakureiProjectileMotionModule : ProjectileMotionModule
         if (!_initialized)
             Initialize(oldPos, projectileTransform, m_timeElapsed, m_currentDirection, shouldRotate);
         m_timeElapsed   += BraveTime.DeltaTime;
-        int invertSign           = ((!(Inverted ^ ForceInvert)) ? 1 : (-1));
-        float phaseAngle         = (float)Math.PI * baseData.speed / wavelength;
+        int invertSign           = (Inverted ^ ForceInvert) ? -1 : 1;
+        float phaseAngle         = Mathf.PI * baseData.speed / wavelength;
         float newDisplacementX   = m_timeElapsed * baseData.speed;
-        float newDisplacementY   = (float)invertSign * amplitude * Mathf.Sin(m_timeElapsed * phaseAngle);
+        float newDisplacementY   = invertSign * amplitude * Mathf.Sin(m_timeElapsed * phaseAngle);
         float deltaDisplacementX = newDisplacementX - _xDisplacement;
         float deltaDisplacementY = newDisplacementY - _yDisplacement;
         Vector2 newPos           = (_privateLastPosition = _privateLastPosition + _initialRightVector * deltaDisplacementX + _initialUpVector * deltaDisplacementY);
         if (shouldRotate)
         {
-            float futureDisplacementY = (float)invertSign * amplitude * Mathf.Sin((m_timeElapsed + 0.01f) * phaseAngle);
+            float futureDisplacementY = invertSign * amplitude * Mathf.Sin((m_timeElapsed + 0.01f) * phaseAngle);
             float angleFromStart = BraveMathCollege.Atan2Degrees(futureDisplacementY - newDisplacementY, 0.01f * baseData.speed);
-            projectileTransform.localRotation = Quaternion.Euler(0f, 0f, angleFromStart + _initialRightVector.ToAngle());
+            projectileTransform.localRotation = (angleFromStart + _initialRightVector.ToAngle()).EulerZ();
         }
         Vector2 velocity = (newPos - oldPos) / BraveTime.DeltaTime;
         if (!float.IsNaN(BraveMathCollege.Atan2Degrees(velocity)))
