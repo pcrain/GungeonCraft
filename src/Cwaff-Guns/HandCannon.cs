@@ -97,7 +97,7 @@ public class SlappProjectile : MonoBehaviour
         Vector2 victimPos = this._slapVictim.sprite.WorldCenter;
         foreach (AIActor enemy in StaticReferenceManager.AllEnemies)
         {
-            if (enemy.behaviorSpeculator?.ImmuneToStun ?? true)
+            if (!enemy || !enemy.behaviorSpeculator || enemy.behaviorSpeculator.ImmuneToStun)
                 continue;
             if (enemy?.healthHaver is not HealthHaver hh)
                 continue;
