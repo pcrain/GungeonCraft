@@ -23,6 +23,10 @@ public class HolyWaterGun : AdvancedGunBehavior
         Projectile projectile = gun.InitProjectile(GunData.New(clipSize: -1, shootStyle: ShootStyle.Beam, ammoType: GameUIAmmoType.AmmoType.BEAM, damage: 0.0f,
           speed: 50.0f, force: 50.0f)).Attach<ExorcismJuice>();
 
+        //HACK: this is necessary when copying Mega Douser to avoid weird beam offsets from walls...why???
+        projectile.gameObject.transform.localScale = Vector3.one;
+        projectile.gameObject.transform.localPosition = Vector3.zero;
+
         BasicBeamController beamComp = projectile.SetupBeamSprites(
           spriteName: "holy_water_gun", fps: 20, dims: new Vector2(15, 15), impactDims: new Vector2(7, 7));
             beamComp.sprite.usesOverrideMaterial = true;

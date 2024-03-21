@@ -1339,8 +1339,8 @@ public static class Extensions
   /// </summary>
   public static BasicBeamController SetupBeamSprites(this Projectile projectile, string spriteName, int fps, Vector2 dims, Vector2? impactDims = null, int impactFps = -1)
   {
-      // Fix breakage with GenerateBeamPrefab() expecting a non-null specrigidbody
-      projectile.specRigidbody = projectile.gameObject.GetOrAddComponent<SpeculativeRigidbody>();
+      // Fix breakage with GenerateBeamPrefab() expecting a non-null specrigidbody (no longer necessary with FixedGenerateBeamPrefab())
+      // projectile.specRigidbody = projectile.gameObject.GetOrAddComponent<SpeculativeRigidbody>();
 
       // Unnecessary to delete these
       // UnityEngine.Object.Destroy(projectile.GetComponentInChildren<tk2dSpriteAnimation>());
@@ -1856,5 +1856,13 @@ public static class Extensions
               return true;
           return false;
       }).Name;
+  }
+
+  /// <summary>Declare a local variable in an ILManipulator</summary>
+  public static VariableDefinition DeclareLocal<T>(this ILContext il)
+  {
+      VariableDefinition v = new VariableDefinition(il.Import(typeof(T)));
+      il.Body.Variables.Add(v);
+      return v;
   }
 }
