@@ -1879,4 +1879,16 @@ public static class Extensions
         f.triggerEvent = true;
         f.eventAudio   = "slappp_sound";
   }
+
+  /// <summary>Increases a player's curse</summary>
+  public static void IncreaseCurse(this PlayerController player, float curse = 1f, bool updateStats = true)
+  {
+    player.ownerlessStatModifiers.Add(new(){
+        amount      = curse,
+        modifyType  = StatModifier.ModifyMethod.ADDITIVE,
+        statToBoost = PlayerStats.StatType.Curse
+    });
+    if (updateStats)
+      player.stats.RecalculateStats(player);
+  }
 }

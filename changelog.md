@@ -3,6 +3,11 @@
 ## Future
 
 - Fixed bug where Insurance Shop could spawn on first floor even without an S or A tier item
+- Fixed Holy Water Gun's beam hitbox not extending all the way to its point of collision
+- Fixed Holy Water Gun spamming the debug log due to improperly-set colliders
+- Fixed Blank Checks activation inconsistently happening before / after trying to blank
+	- Blank Checks now consistently activate prior to triggering blanks, so using a blank with none in your inventory will always give 3 blanks and use 1 immediately
+- Fixed Blank Checks spamming the debug log whenever activated
 
 ## 1.10.1 (2024-03-20)
 
