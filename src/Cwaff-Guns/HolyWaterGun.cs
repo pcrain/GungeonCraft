@@ -3,7 +3,7 @@ namespace CwaffingTheGungy;
 public class HolyWaterGun : AdvancedGunBehavior
 {
     public static string ItemName         = "Holy Water Gun";
-    public static string ProjectileName   = "10"; // mega douser
+    public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Water, Gun, & Holy Soak";
     public static string LongDescription  = "Deals quadruple damage to the Jammed. Killing a Jammed enemy reduces curse by 1.";
     public static string Lore             = "Rumored to have been used in exorcisms by the High Priest back while he was still the Low Priest. While the exact composition of the holy water is unknown, scientists have been able to reasonably ascertain the fluid contains koi pond water, primer, rat saliva, and moonshine. In any case, it has proven extremely effective at exorcizing the Jammed and nauseating everyone else.";
@@ -20,8 +20,9 @@ public class HolyWaterGun : AdvancedGunBehavior
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
-        Projectile projectile = gun.InitProjectile(GunData.New(clipSize: -1, shootStyle: ShootStyle.Beam, ammoType: GameUIAmmoType.AmmoType.BEAM, damage: 0.0f,
-          speed: 50.0f, force: 50.0f)).Attach<ExorcismJuice>();
+        //TODO: refactor to use new DamageAdjuster class to apply different damage to Jammed enemies
+        Projectile projectile = gun.InitProjectile(GunData.New(baseProjectile: Items.MegaDouser.Projectile(), clipSize: -1, shootStyle: ShootStyle.Beam,
+            ammoType: GameUIAmmoType.AmmoType.BEAM, damage: 0.0f, speed: 50.0f, force: 50.0f)).Attach<ExorcismJuice>();
 
         //HACK: this is necessary when copying Mega Douser to avoid weird beam offsets from walls...why???
         projectile.gameObject.transform.localScale = Vector3.one;

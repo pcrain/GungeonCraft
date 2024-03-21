@@ -3,7 +3,7 @@
 public class Grandmaster : AdvancedGunBehavior
 {
     public static string ItemName         = "Grandmaster";
-    public static string ProjectileName   = "ak-47"; // no rotation
+    public static string ProjectileName   = "38_special";
     public static string ShortDescription = "Mate in Gun";
     public static string LongDescription  = "Fires assorted chess pieces that home towards enemies in discrete steps.";
     public static string Lore             = "This gun was wielded by the legendary Magnum Carlsen in his bullet chess world championship match against the equally legendary Garry Makarov. While the match ended in a draw, it was notable for being Makarov's final match before retiring to a life of mentorship for the new generation of aspiring Gungeoneers.";
@@ -21,7 +21,8 @@ public class Grandmaster : AdvancedGunBehavior
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.0f, ammo: 350, shootFps: 24, reloadFps: 16,
                 muzzleFrom: Items.Mailbox, fireAudio: "chess_gun_fire", reloadAudio: "chess_gun_reload");
 
-        gun.InitProjectile(GunData.New(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, speed: 30f
+        gun.InitProjectile(GunData.New(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true,
+            speed: 30f, damage: 5.5f, force: 9f, range: 1000f, shouldRotate: false
           )).AddAnimations(
             AnimatedBullet.Create(refClip: ref _PawnSprite,   name: "chess_pawn",   scale: 0.8f, anchor: Anchor.MiddleCenter),
             AnimatedBullet.Create(refClip: ref _RookSprite,   name: "chess_rook",   scale: 0.8f, anchor: Anchor.MiddleCenter),

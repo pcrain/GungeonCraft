@@ -11,6 +11,7 @@ public sealed class GunData
   public static GunData Default { get { return GunData.New(); } } // get default settings for GunBuildData
 
   public Gun gun;
+  public Projectile baseProjectile;
   public int? clipSize;
   public float? cooldown;
   public float? angleVariance;
@@ -65,6 +66,7 @@ public sealed class GunData
 
   /// <summary>Pseudo-constructor holding most setup information required for a single projectile gun.</summary>
   /// <param name="gun">The gun we're attaching to (can be null, only used for custom clip sprite name resolution for now).</param>
+  /// <param name="baseProjectile">The projectile we're using as a base (if null, reuses the first projectile of the gun's default module).</param>
   /// <param name="clipSize">The number of shots the gun can fired before reloading.</param>
   /// <param name="cooldown">The minimum number of seconds between shots</param>
   /// <param name="angleVariance">Maximum deviation from shooting angle (in degrees) a bullet may actually be fired.</param>
@@ -119,7 +121,7 @@ public sealed class GunData
   /// <param name="shrapnelMinVelocity"></param>
   /// <param name="shrapnelMaxVelocity"></param>
   /// <param name="shrapnelLifetime"></param>
-  public static GunData New(Gun gun = null, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
+  public static GunData New(Gun gun = null, Projectile baseProjectile = null, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
     ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1, GameUIAmmoType.AmmoType? ammoType = null,
     bool customClip = false, float? damage = null, float? speed = null, float? force = null, float? range = null, float? recoil = null, float poison = 0.0f, float fire = 0.0f, float freeze = 0.0f, float slow = 0.0f,
     bool? collidesWithEnemies = null, bool? ignoreDamageCaps = null, bool? collidesWithProjectiles = null, bool? surviveRigidbodyCollisions = null, bool? collidesWithTilemap = null,
@@ -130,6 +132,7 @@ public sealed class GunData
     )
   {
       _Instance.gun                           = gun; // set by InitSpecialProjectile()
+      _Instance.baseProjectile                = baseProjectile;
       _Instance.clipSize                      = clipSize;
       _Instance.cooldown                      = cooldown;
       _Instance.angleVariance                 = angleVariance;
@@ -387,7 +390,7 @@ public static class GunBuilder
   public static ProjectileType InitFirstProjectileOfType<ProjectileType>(this Gun gun, GunData b)
     where ProjectileType : Projectile
   {
-    Projectile clone = gun.DefaultModule.projectiles[0].Clone(b);
+    Projectile clone = (b.baseProjectile ?? gun.DefaultModule.projectiles[0]).Clone(b);
     if (clone is not ProjectileType p)
       p = clone.ConvertToSpecialtyType<ProjectileType>();
     gun.DefaultModule.projectiles[0] = p;
@@ -411,6 +414,12 @@ public static class GunBuilder
   public static Projectile CloneProjectile(this Items gunItem, GunData b = null)
   {
       return (ItemHelper.Get(gunItem) as Gun).DefaultModule.projectiles[0].Clone(b);
+  }
+
+  /// <summary>Returns a projectile from a specific gun (Items version)</summary>
+  public static Projectile Projectile(this Items gunItem)
+  {
+      return (ItemHelper.Get(gunItem) as Gun).DefaultModule.projectiles[0];
   }
 
   /// <summary>Set basic attributes for a projectile module and return it</summary>
