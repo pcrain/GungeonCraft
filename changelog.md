@@ -13,6 +13,7 @@
 - Fixed King's Law breaking if it somehow manages to spawn hundreds of bullets in stasis
 - Fixed Adrenaline Shot still being able to activate after it's been dropped
 - Added sound effect for tanking damage while Adrenaline Shot is active
+- Gave Paintball Cannon a slightly larger projectile
 
 ## 1.10.1 (2024-03-20)
 
