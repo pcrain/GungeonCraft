@@ -7,10 +7,6 @@ public class Cuppajoe : PlayerItem
     public static string LongDescription  = "Dramatically increases rate of fire, reload speed, movement speed, and dodge roll speed for 12 seconds, but dramatically decreases these stats for 8 seconds afterwards.";
     public static string Lore             = "Coffee is something of a miracle beverage, letting you move faster, react quicker, focus harder, aim better, think better, learn better, practice more effectively, earn more money, heal all your illnesses, find true love, cure cancer, achieve world peace, end world hunger, open your third eye, see the future, reach nirvana, rule the galaxy, observe the multiverse...and it tastes good. Coffee's great isn't it!? Have another cup!!";
 
-    private Caffeination.State _State
-    {
-        get => this._caffeine?._state ?? Caffeination.State.NEUTRAL;
-    }
     private Caffeination _caffeine = null;
     private PlayerController _owner = null;
 
@@ -20,7 +16,7 @@ public class Cuppajoe : PlayerItem
         item.quality      = ItemQuality.D;
         item.consumable   = false;
         item.CanBeDropped = true;
-        item.SetCooldownType(ItemBuilder.CooldownType.Timed, Caffeination._BOOST_TIME + Caffeination._CRASH_TIME);
+        item.SetCooldownType(ItemBuilder.CooldownType.Timed, Caffeination._CRASH_TIME);
     }
 
     public override void Pickup(PlayerController player)
@@ -39,12 +35,15 @@ public class Cuppajoe : PlayerItem
 
     public override bool CanBeUsed(PlayerController user)
     {
-        return this._State == Caffeination.State.NEUTRAL;
+        return !this._caffeine || (this._caffeine._state == Caffeination.State.NEUTRAL);
     }
 
     public override void DoEffect(PlayerController user)
     {
         this._caffeine.AnotherCup();
+        this.m_activeDuration  = Caffeination._BOOST_TIME;
+        this.m_activeElapsed   = 0f;
+        this.IsCurrentlyActive = true;
     }
 
     public override void Update()
@@ -53,14 +52,121 @@ public class Cuppajoe : PlayerItem
         if (!this._owner)
             return;
 
+        if (this.IsCurrentlyActive && (this.m_activeElapsed >= this.m_activeDuration))
+        {
+            this.IsCurrentlyActive = false;
+            this.CurrentTimeCooldown = Caffeination._CRASH_TIME;
+        }
+    }
+}
+
+internal class Caffeination : MonoBehaviour
+{
+    internal enum State
+    {
+        NEUTRAL,
+        CAFFEINATED,
+        CRASHED,
+    }
+
+    internal const float _BOOST_TIME = 12f;
+    internal const float _CRASH_TIME = 8f;
+
+    private PlayerController _owner         = null;
+    private StatModifier[]   _caffeineBuffs = null;
+    private StatModifier[]   _crashNerfs    = null;
+
+    internal State _state = State.NEUTRAL;
+
+    private void Start()
+    {
+        this._owner = base.GetComponent<PlayerController>();
+        this._caffeineBuffs = new[] {
+            new StatModifier(){
+                amount      = 1.50f,
+                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
+                statToBoost = PlayerStats.StatType.RateOfFire,
+            },
+            new StatModifier(){
+                amount      = 1.50f,
+                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
+                statToBoost = PlayerStats.StatType.DodgeRollSpeedMultiplier,
+            },
+            new StatModifier(){
+                amount      = 1.50f,
+                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
+                statToBoost = PlayerStats.StatType.MovementSpeed,
+            },
+            new StatModifier(){
+                amount      = 0.75f,
+                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
+                statToBoost = PlayerStats.StatType.ReloadSpeed,
+            },
+        };
+        this._crashNerfs = new[] {
+            new StatModifier(){
+                amount      = 0.65f,
+                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
+                statToBoost = PlayerStats.StatType.RateOfFire,
+            },
+            new StatModifier(){
+                amount      = 0.75f,
+                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
+                statToBoost = PlayerStats.StatType.DodgeRollSpeedMultiplier,
+            },
+            new StatModifier(){
+                amount      = 0.65f,
+                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
+                statToBoost = PlayerStats.StatType.MovementSpeed,
+            },
+            new StatModifier(){
+                amount      = 1.5f,
+                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
+                statToBoost = PlayerStats.StatType.ReloadSpeed,
+            },
+        };
+    }
+
+    private void Update()
+    {
         float animSpeed = 1.0f;
-        if (this._State == Caffeination.State.CAFFEINATED)
+        if (this._state == Caffeination.State.CAFFEINATED)
             animSpeed = (this._owner.specRigidbody.Velocity.sqrMagnitude > 1f) ? 4f : 2.5f;
-        else if (this._State == Caffeination.State.CRASHED)
+        else if (this._state == Caffeination.State.CRASHED)
             animSpeed = 0.5f;
 
         this._owner.spriteAnimator.ClipFps = this._owner.spriteAnimator.CurrentClip.fps * animSpeed;
     }
+
+    public void AnotherCup()
+    {
+        if (this._state == State.NEUTRAL)
+            this._owner.StartCoroutine(AnotherCup_CR());
+    }
+
+    private IEnumerator AnotherCup_CR()
+    {
+        this._owner.gameObject.Play("coffee_drink_sound");
+        this._state = State.CAFFEINATED;
+        foreach (StatModifier stat in this._caffeineBuffs)
+            this._owner.ownerlessStatModifiers.Add(stat);
+        this._owner.stats.RecalculateStats(this._owner);
+        yield return new WaitForSeconds(_BOOST_TIME);
+
+        this._state = State.CRASHED;
+        foreach (StatModifier stat in this._caffeineBuffs)
+            this._owner.ownerlessStatModifiers.Remove(stat);
+        foreach (StatModifier stat in this._crashNerfs)
+            this._owner.ownerlessStatModifiers.Add(stat);
+        this._owner.stats.RecalculateStats(this._owner);
+        yield return new WaitForSeconds(_CRASH_TIME);
+
+        this._state = State.NEUTRAL;
+        foreach (StatModifier stat in this._crashNerfs)
+            this._owner.ownerlessStatModifiers.Remove(stat);
+        this._owner.stats.RecalculateStats(this._owner);
+    }
+
 
     [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.GetBaseAnimationName))]
     private class CuppajoeAnimationPatch
@@ -76,7 +182,7 @@ public class Cuppajoe : PlayerItem
     }
 
     // Base game's GetBaseAnimationName() function, with all idle animations replace with running animations
-    public static string GetCaffeinatedAnimationName(PlayerController pc, Vector2 v, float gunAngle, bool invertThresholds = false, bool forceTwoHands = false)
+    private static string GetCaffeinatedAnimationName(PlayerController pc, Vector2 v, float gunAngle, bool invertThresholds = false, bool forceTwoHands = false)
     {
       string empty = string.Empty;
       bool hasGun = pc.CurrentGun != null;
@@ -187,113 +293,5 @@ public class Cuppajoe : PlayerItem
         empty += "_armorless";
       }
       return empty;
-    }
-}
-
-internal class Caffeination : MonoBehaviour
-{
-    internal enum State
-    {
-        NEUTRAL,
-        CAFFEINATED,
-        CRASHED,
-    }
-
-    internal const float _BOOST_TIME = 12f;
-    internal const float _CRASH_TIME = 8f;
-
-    private PlayerController _owner         = null;
-    private float _timer                    = 0.0f;
-    private StatModifier[]   _caffeineBuffs = null;
-    private StatModifier[]   _crashNerfs    = null;
-
-    internal State _state = State.NEUTRAL;
-
-    private void Start()
-    {
-        this._owner = base.GetComponent<PlayerController>();
-        this._caffeineBuffs = new[] {
-            new StatModifier(){
-                amount      = 1.50f,
-                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = PlayerStats.StatType.RateOfFire,
-            },
-            new StatModifier(){
-                amount      = 1.50f,
-                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = PlayerStats.StatType.DodgeRollSpeedMultiplier,
-            },
-            new StatModifier(){
-                amount      = 1.50f,
-                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = PlayerStats.StatType.MovementSpeed,
-            },
-            new StatModifier(){
-                amount      = 0.75f,
-                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = PlayerStats.StatType.ReloadSpeed,
-            },
-        };
-        this._crashNerfs = new[] {
-            new StatModifier(){
-                amount      = 0.65f,
-                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = PlayerStats.StatType.RateOfFire,
-            },
-            new StatModifier(){
-                amount      = 0.75f,
-                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = PlayerStats.StatType.DodgeRollSpeedMultiplier,
-            },
-            new StatModifier(){
-                amount      = 0.65f,
-                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = PlayerStats.StatType.MovementSpeed,
-            },
-            new StatModifier(){
-                amount      = 1.5f,
-                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = PlayerStats.StatType.ReloadSpeed,
-            },
-        };
-    }
-
-    private void Update()
-    {
-        if (this._state == State.NEUTRAL)
-            return;
-
-        this._timer -= BraveTime.DeltaTime;
-        if (this._timer > 0)
-            return;
-    }
-
-    public void AnotherCup()
-    {
-        if (this._state == State.NEUTRAL)
-            this._owner.StartCoroutine(AnotherCup_CR());
-    }
-
-    private IEnumerator AnotherCup_CR()
-    {
-        this._owner.gameObject.Play("coffee_drink_sound");
-        this._state = State.CAFFEINATED;
-        foreach (StatModifier stat in this._caffeineBuffs)
-            this._owner.ownerlessStatModifiers.Add(stat);
-        this._owner.stats.RecalculateStats(this._owner);
-        yield return new WaitForSeconds(_BOOST_TIME);
-
-        this._state = State.CRASHED;
-        foreach (StatModifier stat in this._caffeineBuffs)
-            this._owner.ownerlessStatModifiers.Remove(stat);
-        foreach (StatModifier stat in this._crashNerfs)
-            this._owner.ownerlessStatModifiers.Add(stat);
-        this._owner.stats.RecalculateStats(this._owner);
-        yield return new WaitForSeconds(_CRASH_TIME);
-
-        this._state = State.NEUTRAL;
-        foreach (StatModifier stat in this._crashNerfs)
-            this._owner.ownerlessStatModifiers.Remove(stat);
-        this._owner.stats.RecalculateStats(this._owner);
     }
 }

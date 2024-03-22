@@ -8,6 +8,8 @@
 - Fixed Blank Checks activation inconsistently happening before / after trying to blank
 	- Blank Checks now consistently activate prior to triggering blanks, so using a blank with none in your inventory will always give 3 blanks and use 1 immediately
 - Fixed Blank Checks spamming the debug log whenever activated
+- Bulletbot Implant, Carpet Bomber, King's Law, Ammo Conservation Manual, and Stunt Helmet can now appear in various vanilla / modded sub-shops
+- Cuppajoe cooldown bar now shows caffeine time remaining while ticking down and crash time remaining while ticking up
 
 ## 1.10.1 (2024-03-20)
 
