@@ -1,6 +1,6 @@
 # Changelog
 
-## Future
+## 1.10.2 (2024-03-22)
 
 #### Bugfixes:
 - Fixed Insurance Shop sometimes spawning on the first floor even without an S or A tier item in the player's inventory
