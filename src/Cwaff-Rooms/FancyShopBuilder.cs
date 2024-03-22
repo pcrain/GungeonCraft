@@ -31,7 +31,7 @@ public static class FancyShopBuilder
   private static List<string> _DefaultLine = new(){"Buy somethin', will ya!"};
 
   public static FancyShopData MakeFancyShop(string npcName, List<int> shopItems, string roomPath, List<string> moddedItems = null,
-    float spawnChance = 1f, Vector2? carpetOffset = null, int? idleFps = null, int? talkFps = null,
+    float spawnChance = 1f, Vector2? carpetOffset = null, int? idleFps = null, int? talkFps = null, bool loopTalk = true,
     CwaffPrerequisites spawnPrerequisite = CwaffPrerequisites.NONE, SpawnCondition prequisiteValidator = null, string voice = null,
     List<String> genericDialog = null, List<String> stopperDialog = null, List<String> purchaseDialog = null, List<String> stolenDialog = null,
     List<String> noSaleDialog = null, List<String> introDialog = null, List<String> attackedDialog = null, bool allowDupes = false,
@@ -74,6 +74,7 @@ public static class FancyShopBuilder
       idleFps                           : idleFps ?? 2,
       talkSpritePaths                   : ResMap.Get($"{npcName}_talk"),
       talkFps                           : talkFps ?? 5,
+      loopTalk                          : loopTalk,
       lootTable                         : lootTable,
       currency                          : (removeCurrency == null) ? CustomShopItemController.ShopCurrencyType.COINS : CustomShopItemController.ShopCurrencyType.CUSTOM,
       runBasedMultilineGenericStringKey : $"#{npcNameUpper}_GENERIC_TALK",
@@ -164,7 +165,7 @@ public static class FancyShopBuilder
       StatModifier[] statsToGiveOnPurchase = null, Func<CustomShopController, PlayerController, int, bool> CustomCanBuy = null, Func<CustomShopController, PlayerController, int, int> CustomRemoveCurrency = null, Func<CustomShopController, CustomShopItemController, PickupObject, int> CustomPrice = null,
       Func<PlayerController, PickupObject, int, bool> OnPurchase = null, Func<PlayerController, PickupObject, int, bool> OnSteal = null, string currencyIconPath = "", string currencyName = "", bool canBeRobbed = true, bool hasCarpet = false, string carpetSpritePath = "",
       Vector2? CarpetOffset = null, bool hasMinimapIcon = false, string minimapIconSpritePath = "", bool addToMainNpcPool = false, float percentChanceForMainPool = 0.1f, DungeonPrerequisite[] prerequisites = null, float fortunesFavorRadius = 2,
-      CustomShopController.ShopItemPoolType poolType = CustomShopController.ShopItemPoolType.DEFAULT, bool RainbowModeImmunity = false, IntVector2? hitboxSize = null, IntVector2? hitboxOffset = null)
+      CustomShopController.ShopItemPoolType poolType = CustomShopController.ShopItemPoolType.DEFAULT, bool RainbowModeImmunity = false, IntVector2? hitboxSize = null, IntVector2? hitboxOffset = null, bool loopTalk = true)
   {
 
       try
@@ -189,7 +190,7 @@ public static class FancyShopBuilder
           tk2dSpriteAnimator spriteAnimator = npcObj.AddComponent<tk2dSpriteAnimator>();
 
           SpriteBuilder.AddAnimation(spriteAnimator, collection, idleIdsList, "idle", tk2dSpriteAnimationClip.WrapMode.Loop, idleFps);
-          SpriteBuilder.AddAnimation(spriteAnimator, collection, talkIdsList, "talk", tk2dSpriteAnimationClip.WrapMode.Loop, talkFps);
+          SpriteBuilder.AddAnimation(spriteAnimator, collection, talkIdsList, "talk", loopTalk ? tk2dSpriteAnimationClip.WrapMode.Loop : tk2dSpriteAnimationClip.WrapMode.Once, talkFps);
 
           hitboxSize ??= new IntVector2(20, 18);
           if (hitboxOffset == null) new IntVector2(5, 0); //NOTE: this doesn't do anything, but it's broken in the API as well

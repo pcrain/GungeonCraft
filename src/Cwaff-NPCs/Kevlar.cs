@@ -24,7 +24,8 @@ public class Kevlar
             spawnPrerequisite      : CwaffPrerequisites.INSURANCE_PREREQUISITE,
             prequisiteValidator    : PlayerHasGoodItem,
             idleFps                : 2,
-            talkFps                : 2,
+            talkFps                : 8,
+            loopTalk               : false,
             // spawnPrequisiteChecker : null,
             flipTowardsPlayer      : false,
             talkPointOffset        : C.PIXEL_SIZE * new Vector2(26, 66),
@@ -81,7 +82,7 @@ public class Kevlar
                 }
             );
 
-        shop.AddParentedAnimationToShopFixed(ResMap.Get("kevlar_bow"), 10, "purchase");
+        shop.AddParentedAnimationToShopFixed(ResMap.Get("kevlar_bow"), 8, "purchase");
         shop.AddParentedAnimationToShopFixed(ResMap.Get("kevlar_offended"), 8, "stolen");
         shop.SetShotAnimation(paths: ResMap.Get("kevlar_offended"), fps: 8);
 

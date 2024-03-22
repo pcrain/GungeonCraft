@@ -14,6 +14,7 @@
 - Fixed Adrenaline Shot still being able to activate after it's been dropped
 - Added sound effect for tanking damage while Adrenaline Shot is active
 - Gave Paintball Cannon a slightly larger projectile
+- Tweaked Insurance Shopkeeper's animations
 
 ## 1.10.1 (2024-03-20)
 
