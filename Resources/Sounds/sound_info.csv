@@ -156,3 +156,4 @@ breegull_intro_sound,0.0,1,sound
 egg_hit_enemy_sound,-3.5,1,sound
 sub_machine_gun_fire_sound,-4.5,1,sound
 sub_machine_gun_reload_sound,3.0,1,sound
+adrenaline_tank_damage_sound,2.5,1,sound

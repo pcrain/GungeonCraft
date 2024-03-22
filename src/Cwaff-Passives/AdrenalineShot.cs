@@ -124,6 +124,8 @@ public class AdrenalineShot : PassiveItem
     {
         if (this._adrenalineActive)
             DeactivateAdrenaline(); // shouldn't ever be able to happen, but just in case
+        if (!player.ForceZeroHealthState)
+            player.healthHaver.ModifyDamage -= this.OnTakeDamage;
         return base.Drop(player);
     }
 
