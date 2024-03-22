@@ -184,7 +184,7 @@ public class KingsLawBullets : MonoBehaviour
             this._naturalSpawn = true;
         }
 
-        Vector3 baseOffset = KingsLaw._OffsetAnglesMagsAndRings[this._index];
+        Vector3 baseOffset = KingsLaw._OffsetAnglesMagsAndRings[this._index % KingsLaw._MAX_BULLETS];
         // offset angle can be reduced by at most half of the max depending on the player's accuracy
         this._offsetAngle  = baseOffset.x * Mathf.Min(1.5f, 0.5f + 0.5f * this._owner.AccuracyMult());
         this._offsetMag    = baseOffset.y;

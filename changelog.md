@@ -10,6 +10,7 @@
 - Fixed Blank Checks spamming the debug log whenever activated
 - Bulletbot Implant, Carpet Bomber, King's Law, Ammo Conservation Manual, and Stunt Helmet can now appear in various vanilla / modded sub-shops
 - Cuppajoe cooldown bar now shows caffeine time remaining while ticking down and crash time remaining while ticking up
+- Fixed King's Law breaking if it somehow manages to spawn hundreds of bullets in stasis
 
 ## 1.10.1 (2024-03-20)
 
