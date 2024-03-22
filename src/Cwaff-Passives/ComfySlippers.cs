@@ -37,6 +37,13 @@ public class ComfySlippers : PassiveItem
         return base.Drop(player);
     }
 
+    public override void OnDestroy()
+    {
+        this._lastFloorType = CellVisualData.CellFloorType.Stone;
+        SetComfiness(false);
+        base.OnDestroy();
+    }
+
     public override void Update()
     {
         base.Update();

@@ -12,9 +12,8 @@ public class StuntHelmet : PassiveItem
     const float _STUNT_TIME           = 5f;
 
     internal static StatModifier _StuntStats;
-    internal static int _StuntHelmetId;
 
-        private Coroutine _extantDamageBoostCoroutine = null;
+    private Coroutine _extantDamageBoostCoroutine = null;
 
     public static void Init()
     {
@@ -27,8 +26,6 @@ public class StuntHelmet : PassiveItem
             statToBoost = PlayerStats.StatType.Damage,
             modifyType  = StatModifier.ModifyMethod.ADDITIVE
             };
-
-        _StuntHelmetId   = item.PickupObjectId;
     }
 
     [HarmonyPatch(typeof(Exploder), nameof(Exploder.HandleExplosion), MethodType.Enumerator)]
@@ -88,14 +85,13 @@ public class StuntHelmet : PassiveItem
     {
         if (!player)
             return false;
-        return player.HasPickupID(_StuntHelmetId);
+        return player.GetPassive<StuntHelmet>();
     }
 
     private static void DoStuntHelmetBoost(PlayerController player)
     {
-        if (!player)
+        if (!player || player.GetPassive<StuntHelmet>() is not StuntHelmet helmet)
             return;
-        StuntHelmet helmet = player.passiveItems.Find(x => x.PickupObjectId == _StuntHelmetId)?.GetComponent<StuntHelmet>();
         if (helmet._extantDamageBoostCoroutine != null)
         {
             player.ownerlessStatModifiers.Remove(_StuntStats);

@@ -6,7 +6,6 @@ public class BlankChecks : PassiveItem
     public static string ShortDescription = "Write-off";
     public static string LongDescription  = "Trying to use a blank without one in your inventory gives you 3 blanks and +1 curse. Will not work if you already have 10 or more curse.";
     public static string Lore             = "Rumor has it that blank checks were originally conceived of outside the domain of weaponry entirely, and were developed primarily for use in large-scale business transactions. As firearms are only very rarely involved in such transactions, why so many business people have any use for extra blanks remains a mystery to this day.";
-    public static int    ID;
 
     public static void Init()
     {
@@ -14,8 +13,6 @@ public class BlankChecks : PassiveItem
         item.quality       = ItemQuality.B;
         item.AddToSubShop(ItemBuilder.ShopType.Cursula);
         item.AddToSubShop(ItemBuilder.ShopType.OldRed);
-
-        ID = item.PickupObjectId;
     }
 
     public override void Pickup(PlayerController player)
@@ -30,7 +27,7 @@ public class BlankChecks : PassiveItem
     {
         static void Prefix(PlayerController __instance)
         {
-            if (!__instance.HasPassiveItem(ID))
+            if (!__instance.GetPassive<BlankChecks>())
                 return; // if we don't have Blank Checks, we have nothing to do
             if (__instance.Blanks > 0)
                 return; // if we have more than 1 blank, we have nothing to do

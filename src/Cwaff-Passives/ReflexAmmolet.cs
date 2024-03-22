@@ -6,7 +6,6 @@ public class ReflexAmmolet : BlankModificationItem
     public static string ShortDescription = "Blanks Return Fire";
     public static string LongDescription  = "Blanks reflect projectiles back towards their respective nearest enemies. Grants 1 additional blank per floor.";
     public static string Lore             = "Blanks are useful from a defensive perspective, but destroying projectiles is unnecessarily wasteful when you stop to think about it. Straight from ACNE Corporation's Ammolet Division's Sustainability Subdivision, the patent-pending Reflex Ammolet does away with unnecessary projectile waste, and instead lets you *lay waste* to your enemies with their own projectiles.";
-    public static int    ID;
 
     public static void Init()
     {
@@ -14,15 +13,13 @@ public class ReflexAmmolet : BlankModificationItem
         item.quality      = ItemQuality.B;
         ItemBuilder.AddPassiveStatModifier(item, PlayerStats.StatType.AdditionalBlanksPerFloor, 1f, StatModifier.ModifyMethod.ADDITIVE);
         item.AddToSubShop(ItemBuilder.ShopType.OldRed);
-
-        ID = item.PickupObjectId;
     }
 
     /// <summary>Make reflex ammolet reflect all bullets by hijacking the Elder Blanks synergy</summary>
     [HarmonyPatch(typeof(SilencerInstance), nameof(SilencerInstance.TriggerSilencer))]
     private class ReflexAmmoletReflectPatch
     {
-        private static bool BlankShouldReflect(bool orig, PlayerController user) => orig || user.HasPassiveItem(ReflexAmmolet.ID);
+        private static bool BlankShouldReflect(bool orig, PlayerController user) => orig || user.GetPassive<ReflexAmmolet>();
 
         [HarmonyILManipulator]
         private static void ReflexAmmoletIL(ILContext il)
@@ -47,7 +44,7 @@ public class ReflexAmmolet : BlankModificationItem
     [HarmonyPatch(typeof(SilencerInstance), nameof(SilencerInstance.DestroyBulletsInRange))]
     private class ReflexAmmoletSpeedPatch
     {
-        private static float ReflectSpeed(float orig, PlayerController user) => user.HasPassiveItem(ReflexAmmolet.ID) ? 50f : orig;
+        private static float ReflectSpeed(float orig, PlayerController user) => user.GetPassive<ReflexAmmolet>() ? 50f : orig;
 
         [HarmonyILManipulator]
         private static void ReflexAmmoletIL(ILContext il)
