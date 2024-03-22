@@ -658,4 +658,24 @@ public static class Lazy
         sprite.SetSprite(spriteColl, spriteId);
         return sprite;
     }
+
+    /// <summary>Create a hovering gun from the player's current active gun</summary>
+    public static void CreateHoveringGun(PlayerController player)
+    {
+        GameObject hg = UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global Prefabs/HoveringGun") as GameObject, player.CenterPosition.ToVector3ZisY(), Quaternion.identity);
+        hg.transform.parent = player.transform;
+        HoveringGunController hgc = hg.GetComponent<HoveringGunController>();
+        // hgc.ShootAudioEvent              = ShootAudioEvent;
+        // hgc.OnEveryShotAudioEvent        = OnEveryShotAudioEvent;
+        // hgc.FinishedShootingAudioEvent   = FinishedShootingAudioEvent;
+        hgc.ConsumesTargetGunAmmo        = false;
+        hgc.ChanceToConsumeTargetGunAmmo = 0f;
+        hgc.Position                     = HoveringGunController.HoverPosition.CIRCULATE;
+        hgc.Aim                          = HoveringGunController.AimType.PLAYER_AIM;
+        hgc.Trigger                      = HoveringGunController.FireType.ON_FIRED_GUN;
+        hgc.CooldownTime                 = 1f;
+        hgc.ShootDuration                = 2f;
+        hgc.OnlyOnEmptyReload            = false;
+        hgc.Initialize(player.CurrentGun, player);
+    }
 }

@@ -2,16 +2,19 @@
 
 ## Future
 
-- Fixed bug where Insurance Shop could spawn on first floor even without an S or A tier item
+#### Bugfixes:
+- Fixed Insurance Shop sometimes spawning on the first floor even without an S or A tier item in the player's inventory
 - Fixed Holy Water Gun's beam hitbox not extending all the way to its point of collision
 - Fixed Holy Water Gun spamming the debug log due to improperly-set colliders
-- Fixed Blank Checks activation inconsistently happening before / after trying to blank
-	- Blank Checks now consistently activate prior to triggering blanks, so using a blank with none in your inventory will always give 3 blanks and use 1 immediately
-- Fixed Blank Checks spamming the debug log whenever activated
+- Fixed Blank Checks inconsistently activating before / after triggering blanks (sometimes using one, sometimes not)
+	- Blank Checks now consistently activates prior to triggering blanks, so using a blank with none in your inventory will always give 3 blanks and use 1 immediately
+- Fixed Blank Checks spamming the debug log whenever attempting to use a blank
+- Fixed Adrenaline Shot still being able to activate after it's been dropped
+- Fixed King's Law breaking if it somehow manages to spawn hundreds of bullets in stasis
+
+#### Polish:
 - Bulletbot Implant, Carpet Bomber, King's Law, Ammo Conservation Manual, and Stunt Helmet can now appear in various vanilla / modded sub-shops
 - Cuppajoe cooldown bar now shows caffeine time remaining while ticking down and crash time remaining while ticking up
-- Fixed King's Law breaking if it somehow manages to spawn hundreds of bullets in stasis
-- Fixed Adrenaline Shot still being able to activate after it's been dropped
 - Added sound effect for tanking damage while Adrenaline Shot is active
 - Gave Paintball Cannon a slightly larger projectile
 - Tweaked Insurance Shopkeeper's animations

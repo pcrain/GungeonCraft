@@ -20,6 +20,13 @@ public class Commands
                 0);
             // ETGModConsole.Log("<size=100><color=#ff0000ff>Please specify a command. Type 'nn help' for a list of commands.</color></size>", false);
         });
+        ETGModConsole.Commands.AddGroup("oo", delegate (string[] args)
+        {
+            Lazy.CreateHoveringGun(GameManager.Instance.PrimaryPlayer);
+            // MenuMaster.RebuildOptionsPanels();
+            // OneOffDebugDungeonFlow.CreateAndWarp("boomhildr");
+            // ETGModConsole.Log("<size=100><color=#ff0000ff>Please specify a command. Type 'nn help' for a list of commands.</color></size>", false);
+        });
         ETGModConsole.Commands.AddGroup("ff", delegate (string[] args)
         {
             // MenuMaster.RebuildOptionsPanels();
