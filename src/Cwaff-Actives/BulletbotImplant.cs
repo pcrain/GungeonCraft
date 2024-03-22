@@ -20,6 +20,7 @@ public class BulletbotImplant : PlayerItem
         item.quality    = ItemQuality.A;
         item.consumable = true;
         item.canStack   = false;
+        item.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
         FakeItem.Create<UsedBulletbotImplant>();
     }

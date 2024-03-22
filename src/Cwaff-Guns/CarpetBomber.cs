@@ -26,6 +26,7 @@ public class CarpetBomber : AdvancedGunBehavior
                 muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter, fireAudio: "carpet_bomber_shoot_sound");
             gun.SetReloadAudio("carpet_bomber_reload_sound", 2, 10, 18);
             gun.SetChargeAudio("carpet_bomber_charge_stage", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+            gun.AddToSubShop(ModdedShopType.Boomhildr);
 
         Projectile p = gun.InitSpecialProjectile<FancyGrenadeProjectile>(GunData.New(
           clipSize: 3, cooldown: 0.15f, angleVariance: 10.0f, shootStyle: ShootStyle.Charged, range: 9999f, customClip: true,
