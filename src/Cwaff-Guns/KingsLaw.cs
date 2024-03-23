@@ -104,6 +104,9 @@ public class KingsLaw : AdvancedGunBehavior
 
     private void Reset()
     {
+        if (this._nextIndex == 0)
+            return;
+
         this._nextIndex = 0;
         ++this._curBatch;
     }

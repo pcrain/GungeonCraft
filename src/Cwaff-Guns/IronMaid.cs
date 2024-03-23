@@ -22,9 +22,9 @@ public class IronMaid : AdvancedGunBehavior
           damage: 5.0f, speed: 40.0f, sprite: "kunai", fps: 12, anchor: Anchor.MiddleCenter)).Attach<RainCheckBullets>();
     }
 
-    public override void OnReload(PlayerController player, Gun gun)
+    public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
     {
-        base.OnReload(player, gun);
+        base.OnReloadPressed(player, gun, manualReload);
         LaunchAllBullets(player);
     }
 
@@ -118,7 +118,7 @@ public class RainCheckBullets : MonoBehaviour
         this._raincheck             = this._owner.CurrentGun.GetComponent<IronMaid>();
         this._launchSequenceStarted = false;
         this._wasEverInStasis       = false;
-        this._index                 = this._raincheck.GetNextIndex();
+        this._index                 = this._raincheck ? this._raincheck.GetNextIndex() : 0;
 
         this._projectile.specRigidbody.OnCollision += (_) => {
             this._projectile.gameObject.Play("knife_gun_hit");
@@ -144,8 +144,8 @@ public class RainCheckBullets : MonoBehaviour
         this._projectile.SetSpeed(0.01f);
         this._wasEverInStasis = true;
         Vector2 pos = this._projectile.sprite.WorldCenter;
-        Vector2 targetDir = Vector2.zero;
-        while (true)
+        Vector2 targetDir = this._projectile.Direction;
+        while (this._raincheck)
         {
             targetDir = this._raincheck.PointWherePlayerIsLooking() - pos;
             _projectile.SendInDirection(targetDir, true); // rotate the projectile
@@ -184,9 +184,7 @@ public class RainCheckBullets : MonoBehaviour
 
     public void StartLaunchSequenceForPlayer(PlayerController pc)
     {
-        if (pc != this._owner)
-            return; // don't launch projectiles that don't belong to us
-
-        this._launchSequenceStarted = true;
+        if (pc == this._owner) // don't launch projectiles that don't belong to us
+            this._launchSequenceStarted = true;
     }
 }
