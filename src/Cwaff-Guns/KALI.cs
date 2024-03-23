@@ -160,12 +160,16 @@ public class KaliProjectile : MonoBehaviour
 
     private void Start()
     {
-        base.GetComponentInChildren<TrailController>().gameObject.SetGlowiness(100f);
+        if (base.GetComponentInChildren<TrailController>() is TrailController tc)
+            tc.gameObject.SetGlowiness(100f);
         Projectile p = base.GetComponent<Projectile>();
         p.OnWillKillEnemy += OnWillKillEnemy;
         p.OnHitEnemy += OnHitEnemy;
-        p.specRigidbody.OnPreRigidbodyCollision += this.MaybeVaporizeProjectiles;
-        p.specRigidbody.OnRigidbodyCollision += this.VaporizeProjectiles;
+        if (p.specRigidbody)
+        {
+            p.specRigidbody.OnPreRigidbodyCollision += this.MaybeVaporizeProjectiles;
+            p.specRigidbody.OnRigidbodyCollision += this.VaporizeProjectiles;
+        }
     }
 
     private void MaybeVaporizeProjectiles(SpeculativeRigidbody me, PixelCollider myPixelCollider, SpeculativeRigidbody other, PixelCollider otherPixelCollider)

@@ -9,6 +9,7 @@
 - Deadline projectiles are now hitscan projectiles
 - Fixed B. B. Gun being able to launch glitchy uncharged projectiles
 - Fixed freebie projectiles from B. B. Gun being able to restore ammo
+- Fixed null dereference when K.A.L.I. projectiles are spawned by, e.g., Ring of Triggers
 
 ## 1.10.2 (2024-03-22)
 
