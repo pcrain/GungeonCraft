@@ -22,6 +22,7 @@ public class BBGun : AdvancedGunBehavior
           customClip: true, speed: 20f, range: 999999f, sprite: "bball", fps: 20, anchor: Anchor.MiddleCenter,
           anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(2, 2))); // prevent uneven colliders from glitching into walls
 
+        gun.DefaultModule.chargeProjectiles.Clear();
         for (int i = 0; i < _CHARGE_LEVELS.Length; i++)
             gun.DefaultModule.chargeProjectiles.Add(new ProjectileModule.ChargeProjectile {
                 Projectile = p.Clone().Attach<TheBB>(bb => bb.chargeLevel = i+1),

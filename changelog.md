@@ -7,6 +7,7 @@
 - Fixed Deadline projectiles not respecting aim deviation from items like Backup Gun or Scattershot
 - Fixed Deadline projectiles not working properly when not spawned from Deadline (e.g., with Duct Tape or Chance Bullets)
 - Deadline projectiles are now hitscan projectiles
+- Fixed B. B. Gun being able to launch glitchy uncharged projectiles
 
 ## 1.10.2 (2024-03-22)
 
