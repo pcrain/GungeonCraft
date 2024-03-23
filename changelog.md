@@ -2,6 +2,7 @@
 
 ## Future
 - Fixed Natascha firing every single frame with certain projectile-duplicating items such as Scattershot, Backup Gun, and Helix Bullets
+- Fixed King's Law not launching bullets when player has instant reloads
 
 ## 1.10.2 (2024-03-22)
 

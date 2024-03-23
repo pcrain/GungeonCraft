@@ -21,6 +21,7 @@ public class KingsLaw : AdvancedGunBehavior
     internal static GameObject _RuneMuzzle;
 
     private int        _nextIndex        = 0;
+    private int        _curBatch        = 0;
     private GameObject _extantMuzzleRune = null;
     private float      _muzzleRuneAlpha  = 0.0f;
 
@@ -75,9 +76,9 @@ public class KingsLaw : AdvancedGunBehavior
         _RuneMuzzle = VFX.Create("muzzle_kings_law", fps: 10);
     }
 
-    public override void OnReload(PlayerController player, Gun gun)
+    public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
     {
-        base.OnReload(player, gun);
+        base.OnReloadPressed(player, gun, manualReload);
         Reset();
     }
 
@@ -104,11 +105,17 @@ public class KingsLaw : AdvancedGunBehavior
     private void Reset()
     {
         this._nextIndex = 0;
+        ++this._curBatch;
     }
 
     public int GetNextIndex()
     {
         return this._nextIndex++;
+    }
+
+    public int GetBatch()
+    {
+        return this._curBatch;
     }
 
     protected override void Update()
@@ -168,6 +175,7 @@ public class KingsLawBullets : MonoBehaviour
     private float            _offsetMag             = 0.0f;
     private float            _offsetRing            = 0.0f;
     private int              _index                 = 0;
+    private int              _batch                 = 0;
     private bool             _naturalSpawn          = false;
 
     private void Start()
@@ -181,6 +189,7 @@ public class KingsLawBullets : MonoBehaviour
         if (this._owner.CurrentGun.GetComponent<KingsLaw>() is KingsLaw king)
         {
             this._index = king.GetNextIndex();
+            this._batch = king.GetBatch();
             this._naturalSpawn = true;
         }
 
@@ -243,18 +252,21 @@ public class KingsLawBullets : MonoBehaviour
         }
 
         // Phase 2 / 5 -- the freeze (skipped if the projectile didn't spawn with King's Law)
-        while (this._naturalSpawn && this._owner && this._owner.CurrentGun?.GetComponent<KingsLaw>() && (this._owner.CurrentGun?.IsCharging ?? false))
-        {
-            float behindPlayerAngle = this._owner.m_currentGunAngle + 180f;
-            Vector2 offset          = (behindPlayerAngle + this._offsetAngle).Clamp360().ToVector(this._offsetMag);
-            this._projectile.specRigidbody.Position = new Position(this._owner.CenterPosition + offset);
-            this._projectile.SendInDirection(this._owner.m_currentGunAngle.ToVector(), resetDistance: true);
-            this._projectile.transform.localRotation = this._owner.m_currentGunAngle.EulerZ();
-            this._projectile.specRigidbody.UpdateColliderPositions();
-            this._runeLarge.transform.localRotation = (_RUNE_ROT_FAST * BraveTime.ScaledTimeSinceStartup).EulerZ();
-            this._runeSmall.transform.localRotation = (-_RUNE_ROT_SLOW * BraveTime.ScaledTimeSinceStartup).EulerZ();
-            yield return null;
-        }
+        if (this._owner.CurrentGun && this._owner.CurrentGun.GetComponent<KingsLaw>() is KingsLaw k)
+            while (this._naturalSpawn && this._owner && this._owner.CurrentGun && this._owner.CurrentGun.GetComponent<KingsLaw>() && (this._owner.CurrentGun?.IsCharging ?? false))
+            {
+                if (!k || this._batch != k.GetBatch())
+                    break; // King's Law has disappeared or moved onto a new batch, so launch our current projectiles
+                float behindPlayerAngle = this._owner.m_currentGunAngle + 180f;
+                Vector2 offset          = (behindPlayerAngle + this._offsetAngle).Clamp360().ToVector(this._offsetMag);
+                this._projectile.specRigidbody.Position = new Position(this._owner.CenterPosition + offset);
+                this._projectile.SendInDirection(this._owner.m_currentGunAngle.ToVector(), resetDistance: true);
+                this._projectile.transform.localRotation = this._owner.m_currentGunAngle.EulerZ();
+                this._projectile.specRigidbody.UpdateColliderPositions();
+                this._runeLarge.transform.localRotation = (_RUNE_ROT_FAST * BraveTime.ScaledTimeSinceStartup).EulerZ();
+                this._runeSmall.transform.localRotation = (-_RUNE_ROT_SLOW * BraveTime.ScaledTimeSinceStartup).EulerZ();
+                yield return null;
+            }
 
         // Phase 3 / 5 -- the glow
         float targetAngle                = this._owner.m_currentGunAngle;
