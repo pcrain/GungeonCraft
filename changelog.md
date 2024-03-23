@@ -1,5 +1,8 @@
 # Changelog
 
+## Future
+- Fixed Natascha firing every single frame with certain projectile-duplicating items such as Scattershot, Backup Gun, and Helix Bullets
+
 ## 1.10.2 (2024-03-22)
 
 #### Bugfixes:
