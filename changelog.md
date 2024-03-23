@@ -4,6 +4,9 @@
 - Fixed Natascha firing every single frame with certain projectile-duplicating items such as Scattershot, Backup Gun, and Helix Bullets
 - Fixed King's Law and Iron Maid not launching bullets when player has instant reloads
 - Fixed null dereference caused by spawning Iron Maid projectiles from other guns (e.g., with Duct Tape or Chance Bullets)
+- Fixed Deadline projectiles not respecting aim deviation from items like Backup Gun or Scattershot
+- Fixed Deadline projectiles not working properly when not spawned from Deadline (e.g., with Duct Tape or Chance Bullets)
+- Deadline projectiles are now hitscan projectiles
 
 ## 1.10.2 (2024-03-22)
 

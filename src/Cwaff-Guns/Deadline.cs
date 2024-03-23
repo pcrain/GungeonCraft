@@ -15,7 +15,7 @@ public class Deadline : AdvancedGunBehavior
     internal static ExplosionData _DeadlineExplosion = null;
     internal static GameObject _SplodeVFX;
 
-    private List <DeadlineLaser> _myLasers = new();
+    private static List <DeadlineLaser> _MyLasers = new();
     private float _myTimer = 0;
     private GameObject _myLaserSight = null;
     private GameObject _debugLaserSight = null;
@@ -192,22 +192,22 @@ public class Deadline : AdvancedGunBehavior
             UpdateLaserSight();
             // DrawSpeculativeLaser();
         }
+    }
 
-        this._myTimer += BraveTime.DeltaTime;
-        float power = 200.0f + 400.0f * Mathf.Abs(Mathf.Sin(16 * this._myTimer));
-        foreach (DeadlineLaser laser in _myLasers)
-            laser.UpdateLaser(emissivePower : power);
+    public void GetSpeculativeLaserEndpoints(out Vector2? start, out Vector2? end)
+    {
+        GetSpeculativeLaserEndpoints(this.gun.barrelOffset.transform.position.XY(), this.gun.CurrentAngle, out start, out end);
     }
 
     private const int _RAYCAST_SPREAD = 1;
-    public void GetSpeculativeLaserEndpoints(out Vector2? start, out Vector2? end)
+    public static void GetSpeculativeLaserEndpoints(Vector2 from, float towardsAngle, out Vector2? start, out Vector2? end)
     {
         Vector2 normal1, normal2, normal3, trueNormal, normalb;
 
         // our speculative laser can hit the corner / seam of two tiles and produce the wrong normal, so do multiple raycasts to try to find the true normal
         int rayMask = CollisionMask.LayerToMask(CollisionLayer.HighObstacle/*, CollisionLayer.BulletBlocker, CollisionLayer.BulletBreakable*/);
         RaycastResult result;
-        bool success = PhysicsEngine.Instance.Raycast(this.gun.barrelOffset.transform.position.XY(), this.gun.CurrentAngle.ToVector(), 999f, out result, true, false, rayMask, null, false);
+        bool success = PhysicsEngine.Instance.Raycast(from, towardsAngle.ToVector(), 999f, out result, true, false, rayMask, null, false);
         if (!success)
         {
             start = null;
@@ -217,9 +217,9 @@ public class Deadline : AdvancedGunBehavior
         }
         start   = result.Contact;
         normal1 = result.Normal;
-        success = PhysicsEngine.Instance.Raycast(this.gun.barrelOffset.transform.position.XY(), (this.gun.CurrentAngle + _RAYCAST_SPREAD).ToVector(), 999f, out result, true, false, rayMask, null, false);
+        success = PhysicsEngine.Instance.Raycast(from, (towardsAngle + _RAYCAST_SPREAD).ToVector(), 999f, out result, true, false, rayMask, null, false);
         normal2 = success ? result.Normal : Vector2.zero;
-        success = PhysicsEngine.Instance.Raycast(this.gun.barrelOffset.transform.position.XY(), (this.gun.CurrentAngle - _RAYCAST_SPREAD).ToVector(), 999f, out result, true, false, rayMask, null, false);
+        success = PhysicsEngine.Instance.Raycast(from, (towardsAngle - _RAYCAST_SPREAD).ToVector(), 999f, out result, true, false, rayMask, null, false);
         normal3 = success ? result.Normal : Vector2.zero;
         RaycastResult.Pool.Free(ref result);
 
@@ -229,7 +229,7 @@ public class Deadline : AdvancedGunBehavior
         else // otherwise, use the second raycast normal
             trueNormal = normal2;
 
-        start -= this.gun.CurrentAngle.ToVector(C.PIXEL_SIZE); // move ever so slightly out of the wall
+        start -= towardsAngle.ToVector(C.PIXEL_SIZE); // move ever so slightly out of the wall
         float normangle = trueNormal.ToAngle().Clamp360();
         end = (start.Value + trueNormal).ToNearestWall(out normalb, normangle, minDistance: 0.01f);
         if (normalb != -trueNormal)
@@ -273,15 +273,15 @@ public class Deadline : AdvancedGunBehavior
 
     }
 
-    public void CreateALaser(Vector2 start, Vector2 end)
+    public static void CreateALaser(Vector2 start, Vector2 end)
     {
-        this._myLasers.Add(new DeadlineLaser(start, end, (end - start).ToAngle()));
-        this.CheckForLaserIntersections();
+        _MyLasers.Add(new GameObject().AddComponent<DeadlineLaser>().Setup(start, end, (end - start).ToAngle()));
+        CheckForLaserIntersections();
     }
 
-    public void CheckForLaserIntersections()
+    public static void CheckForLaserIntersections()
     {
-        if (_myLasers.Count < 2)
+        if (_MyLasers.Count < 2)
             return;
 
         float closest = 9999f;
@@ -289,12 +289,12 @@ public class Deadline : AdvancedGunBehavior
         Vector2 closestPosition = Vector2.zero;
 
         // find the nearest laser we'd collide with
-        DeadlineLaser newest = _myLasers[_myLasers.Count-1];
-        for (int i = 0; i < _myLasers.Count-1; ++i)
+        DeadlineLaser newest = _MyLasers[_MyLasers.Count-1];
+        for (int i = 0; i < _MyLasers.Count-1; ++i)
         {
-            if (_myLasers[i].markedForDestruction)
+            if (_MyLasers[i].markedForDestruction)
                 continue; //if we're already trying to explode, don't
-            Vector2? ipoint = newest.Intersects(_myLasers[i]);
+            Vector2? ipoint = newest.Intersects(_MyLasers[i]);
             if (!ipoint.HasValue)
                 continue;
             float distance = Vector2.Distance(newest.start,ipoint.Value);
@@ -310,16 +310,16 @@ public class Deadline : AdvancedGunBehavior
         {
             newest.UpdateEndPoint(closestPosition);
             newest.InitiateDeathSequenceAt(Vector2.zero,false);
-            _myLasers[closestIndex].InitiateDeathSequenceAt(closestPosition.ToVector3ZisY(-1f),true);
+            _MyLasers[closestIndex].InitiateDeathSequenceAt(closestPosition.ToVector3ZisY(-1f),true);
             ETGModMainBehaviour.Instance.gameObject.Play("gaster_blaster_sound_effect");
 
             new FakeExplosion(Instantiate<GameObject>(_SplodeVFX, closestPosition, Quaternion.identity));
         }
 
-        for (int i = _myLasers.Count - 1; i >= 0; i--)
+        for (int i = _MyLasers.Count - 1; i >= 0; i--)
         {
-            if (_myLasers[i].dead)
-                _myLasers.RemoveAt(i);
+            if (_MyLasers[i].dead)
+                _MyLasers.RemoveAt(i);
         }
     }
 
@@ -355,7 +355,7 @@ public class Deadline : AdvancedGunBehavior
 
     }
 
-    private class DeadlineLaser
+    private class DeadlineLaser : MonoBehaviour
     {
         private static float _GrowthTime = 0.15f;
         private static float _ExplosionDelay = 1.0f;
@@ -375,7 +375,7 @@ public class Deadline : AdvancedGunBehavior
         public bool markedForDestruction = false;
         public bool dead = false;
 
-        public DeadlineLaser(Vector2 p1, Vector2 p2, float angle)
+        public DeadlineLaser Setup(Vector2 p1, Vector2 p2, float angle)
         {
             this.start        = p1;
             this.end          = p2;
@@ -384,6 +384,7 @@ public class Deadline : AdvancedGunBehavior
             this._color       = Color.red;
             this._power       = 0;
             UpdateLaser();
+            return this;
         }
 
         public void UpdateEndPoint(Vector2 newEnd)
@@ -400,6 +401,12 @@ public class Deadline : AdvancedGunBehavior
             this.markedForDestruction = true;
             this._ipoint = ipoint;
             GameManager.Instance.StartCoroutine(ExplodeViolentlyAt(explode));
+        }
+
+        private void Update()
+        {
+            float power = 200.0f + 400.0f * Mathf.Abs(Mathf.Sin(16 * BraveTime.ScaledTimeSinceStartup));
+            UpdateLaser(emissivePower : power);
         }
 
         public void UpdateLaser(Color? color = null, float? emissivePower = null)
@@ -454,50 +461,24 @@ public class Deadline : AdvancedGunBehavior
 
         public Vector2? Intersects(DeadlineLaser other)
         {
-            Vector2 ipoint = Vector2.zero;
-            BraveUtility.LineIntersectsLine(start,end,other.start,other.end,out ipoint);
-            return (ipoint != Vector2.zero) ? ipoint : null;
+            return BraveUtility.LineIntersectsLine(start, end, other.start, other.end, out Vector2 ipoint) ? ipoint : null;
         }
     }
 }
 
 public class DeadlineProjectile : MonoBehaviour
 {
-    private Projectile _projectile  = null;
-    private PlayerController _owner = null;
-    private Deadline _gun           = null;
-
-    private Vector2? _start;
-    private Vector2? _end;
-
     private void Start()
     {
-        this._projectile = base.GetComponent<Projectile>();
-        if (this._projectile.Owner is not PlayerController pc)
+        Projectile p = base.GetComponent<Projectile>();
+        if (p.Owner is not PlayerController pc)
             return;
 
-        this._owner = pc;
-        this._gun = pc.CurrentGun.GetComponent<Deadline>();
-        this._gun.GetSpeculativeLaserEndpoints(out this._start, out this._end);
-        if (!this._start.HasValue)
+        Deadline.GetSpeculativeLaserEndpoints(p.SafeCenter, p.Direction.ToAngle(), out Vector2? start, out Vector2? end);
+        if (!start.HasValue)
             return;
 
-        SpeculativeRigidbody specRigidBody = this._projectile.specRigidbody;
-        this._projectile.BulletScriptSettings.surviveTileCollisions = true;
-        specRigidBody.OnPreRigidbodyCollision += this.OnPreCollision;
-        specRigidBody.OnCollision += this.OnCollision;
-    }
-
-    // Only collide with tiles
-    private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
-    {
-        if (!(otherRigidbody?.PrimaryPixelCollider?.IsTileCollider ?? false))
-            PhysicsEngine.SkipCollision = true;
-    }
-
-    private void OnCollision(CollisionData tileCollision)
-    {
-        _gun?.CreateALaser(this._start.Value, this._end.Value);
-        this._projectile.DieInAir();
+        Deadline.CreateALaser(start.Value, end.Value);
+        p.DieInAir();
     }
 }
