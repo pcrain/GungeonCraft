@@ -8,6 +8,7 @@
 - Fixed Deadline projectiles not working properly when not spawned from Deadline (e.g., with Duct Tape or Chance Bullets)
 - Deadline projectiles are now hitscan projectiles
 - Fixed B. B. Gun being able to launch glitchy uncharged projectiles
+- Fixed freebie projectiles from B. B. Gun being able to restore ammo
 
 ## 1.10.2 (2024-03-22)
 

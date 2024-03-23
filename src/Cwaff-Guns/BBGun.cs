@@ -20,27 +20,33 @@ public class BBGun : AdvancedGunBehavior
         Projectile p = gun.InitProjectile(GunData.New(
           clipSize: 3, cooldown: 0.7f, angleVariance: 10.0f, shootStyle: ShootStyle.Charged, sequenceStyle: ProjectileSequenceStyle.Ordered,
           customClip: true, speed: 20f, range: 999999f, sprite: "bball", fps: 20, anchor: Anchor.MiddleCenter,
-          anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(2, 2))); // prevent uneven colliders from glitching into walls
+          anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(2, 2)) // prevent uneven colliders from glitching into walls
+        ).Attach<PierceProjModifier>(pierce => {
+            pierce.penetration = Mathf.Max(pierce.penetration, 999);
+            pierce.penetratesBreakables = true;
+        }).Attach<BounceProjModifier>(bounce => {
+            bounce.numberOfBounces               = Mathf.Max(bounce.numberOfBounces, 999);
+            bounce.chanceToDieOnBounce           = 0f;
+            bounce.onlyBounceOffTiles            = true;
+        });
 
         gun.DefaultModule.chargeProjectiles.Clear();
         for (int i = 0; i < _CHARGE_LEVELS.Length; i++)
             gun.DefaultModule.chargeProjectiles.Add(new ProjectileModule.ChargeProjectile {
-                Projectile = p.Clone().Attach<TheBB>(bb => bb.chargeLevel = i+1),
+                Projectile = p.Clone(GunData.New(speed: 40f + 20f * i)).Attach<TheBB>(bb => bb.chargeLevel = i+1 ),
                 ChargeTime = _CHARGE_LEVELS[i],
             });
     }
 
-    public override void PostProcessProjectile(Projectile projectile)
+    public override Projectile OnPreFireProjectileModifier(Gun gun, Projectile projectile, ProjectileModule mod)
     {
-        base.PostProcessProjectile(projectile);
-        projectile.SetSpeed(100f * this._lastCharge);
-    }
+        if (projectile.GetComponent<TheBB>() is not TheBB bb)
+            return projectile;
+        if (gun.CurrentOwner is not PlayerController player)
+            return projectile;
 
-    protected override void Update()
-    {
-        base.Update();
-        if (this.Player && this.gun.IsCharging)
-            this._lastCharge = this.gun.GetChargeFraction();
+        bb.isAFreebie = projectile.FiredForFree(gun, mod);
+        return projectile;
     }
 }
 
@@ -55,11 +61,11 @@ public class TheBB : MonoBehaviour
     private const float _BOUNCE_SPEED_DECAY = 0.9f;
 
     public int chargeLevel = 0;
+    public bool isAFreebie = true; // false if we fired directly from the gun and it cost us ammo, true otherwise
 
     private Projectile _projectile;
     private PlayerController _owner;
     private float _maxSpeed = 0f;
-    private float _lastBounceTime = 0f;
 
     private void Start()
     {
@@ -69,23 +75,16 @@ public class TheBB : MonoBehaviour
 
         this._projectile.collidesWithPlayer = true;
         // this._projectile.DestroyMode = Projectile.ProjectileDestroyMode.DestroyComponent;
-        this._projectile.OnDestruction += CreateInteractible;
+        if (!this.isAFreebie)
+            this._projectile.OnDestruction += CreateInteractible;
         this._maxSpeed = this._projectile.baseData.speed;
 
         this._projectile.sprite.SetGlowiness(glowAmount: 1000f, glowColor: Color.magenta);
 
-        BounceProjModifier bounce = this._projectile.gameObject.GetOrAddComponent<BounceProjModifier>();
-            bounce.numberOfBounces     = Mathf.Max(bounce.numberOfBounces, 999);
-            bounce.chanceToDieOnBounce = 0f;
-            bounce.onlyBounceOffTiles  = true;
-            bounce.OnBounce += OnBounce;
-
-        PierceProjModifier pierce = this._projectile.gameObject.GetOrAddComponent<PierceProjModifier>();
-            pierce.penetration = Mathf.Max(pierce.penetration, 999);
-            pierce.penetratesBreakables = true;
+        this.GetComponent<BounceProjModifier>().OnBounce += this.OnBounce;
     }
 
-    private void OnBounce()
+    public void OnBounce()
     {
         this._projectile.MultiplySpeed(_BOUNCE_SPEED_DECAY);
     }
