@@ -45,6 +45,7 @@
 - Fixed Holy Water Gun having an invisible beam when used with Orbital Bullets
 - Fixed null dereference when dropping Iron Maid with active projectiles
 - Fixed extremely high fire rate for guns duct-taped to Natascha
+- Limited length of Aimu Hakurei and Subtractor Beam projectile trails after bouncing
 
 ## 1.10.2 (2024-03-22)
 

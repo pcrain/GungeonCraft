@@ -20,9 +20,9 @@ public class SubtractorBeam : AdvancedGunBehavior
                 muzzleVFX: "muzzle_subtractor_beam", muzzleFps: 30, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter, reloadAudio: "subtractor_beam_reload_sound");
 
         _GreenTrailPrefab = VFX.CreateTrailObject(ResMap.Get("subtractor_beam_mid")[0], new Vector2(20, 4), new Vector2(0, 0),
-            ResMap.Get("subtractor_beam_mid"), 60, ResMap.Get("subtractor_beam_start"), 60, cascadeTimer: C.FRAME, destroyOnEmpty: true);
+            ResMap.Get("subtractor_beam_mid"), 60, ResMap.Get("subtractor_beam_start"), 60, softMaxLength: 1f, cascadeTimer: C.FRAME, destroyOnEmpty: true);
         _RedTrailPrefab = VFX.CreateTrailObject(ResMap.Get("subtractor_beam_red_mid")[0], new Vector2(20, 4), new Vector2(0, 0),
-            ResMap.Get("subtractor_beam_red_mid"), 60, ResMap.Get("subtractor_beam_red_start"), 60, cascadeTimer: C.FRAME, destroyOnEmpty: true);
+            ResMap.Get("subtractor_beam_red_mid"), 60, ResMap.Get("subtractor_beam_red_start"), 60, softMaxLength: 1f, cascadeTimer: C.FRAME, destroyOnEmpty: true);
         _HitEffects = VFX.Create("subtractor_beam_hit_effect", 12, loops: true,
             scale: 0.5f, anchor: Anchor.MiddleCenter, emissivePower: 10f);
 
