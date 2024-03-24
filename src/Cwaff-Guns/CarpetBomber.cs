@@ -138,6 +138,7 @@ public class CarpetProjectile : MonoBehaviour
 
     public void OnGroundBounce()
     {
+        this._projectile.m_usesNormalMoveRegardless = true; // disable Helix projectile shenanigans after first bounce
         this._projectile.baseData.speed *= _BOUNCE_FRICTION;
         Exploder.Explode(this._projectile.transform.position, CarpetBomber._CarpetExplosion, this._projectile.Direction, ignoreQueues: true);
         ++this._bounces;

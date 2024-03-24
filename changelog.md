@@ -26,6 +26,7 @@
 - Fixed Gunbrella firing Backup Gun projectiles forwards
 - Made Gunbrella projectiles target a random enemy when no Gunbrella reticle is present
 - Fixed Seltzer Pelter projectiles freaking out when used with Helix Bullets
+- Fixed Carpet Bomber projectiles freaking out when used with Helix Bullets or Orbital Bullets
 
 ## 1.10.2 (2024-03-22)
 
