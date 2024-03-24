@@ -37,6 +37,7 @@
 - Fixed Ki Blast projectiles not working when used with Helix Bullets
 - Fixed Pincushion firing Backup Gun projectiles forwards
 - Fixed Jugglernaut not working well with Scattershot and Backup Gun
+- Fixed Blackjack projectiles freaking out when used with Helix Bullets or Orbital Bullets
 
 ## 1.10.2 (2024-03-22)
 

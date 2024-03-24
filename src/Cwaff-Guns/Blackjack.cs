@@ -56,6 +56,8 @@ public class ThrownCard : MonoBehaviour
     private bool             _faltering        = false;
     private float            _curveAmount      = 0.0f;
     private float            _startScale       = 1f;
+    private float            _startAngle       = 0f;
+    private bool             _bounced          = false;
 
     public bool isAFreebie = true; // false if we fired directly from the gun and it cost us ammo, true otherwise
 
@@ -75,7 +77,9 @@ public class ThrownCard : MonoBehaviour
             bounce.chanceToDieOnBounce = 0f;
             bounce.onlyBounceOffTiles  = false;
             bounce.OnBounce += () => {
-                this._faltering = true;
+                this._lifetime = this._timeAtMaxPower; // force falter next frame for Helix Bullets compatibility
+                this._bounced = true;
+                this._projectile.m_usesNormalMoveRegardless = true; // ignore Helix projectiles and other motion modifiers after bouncing
                 this._projectile.baseData.speed *= 0.4f;
             };
 
@@ -84,6 +88,7 @@ public class ThrownCard : MonoBehaviour
         this._cardFront  = Blackjack._BulletSprite.GetFrame(0).spriteId;
         this._cardBack   = Blackjack._BackSprite.GetFrame(0).spriteId;
         this._startScale = (Lazy.CoinFlip() ? -1f : 1f);
+        this._startAngle = this._projectile.OriginalDirection();
 
         this._projectile.gameObject.PlayUnique("card_throw_sound");
     }
@@ -110,15 +115,23 @@ public class ThrownCard : MonoBehaviour
         this._lifetime += BraveTime.DeltaTime;
         if (this._faltering || this._lifetime >= this._timeAtMaxPower)
         {
-            if (!this._faltering)
+            float oldAngle = this._projectile.Direction.ToAngle();
+            bool wasFaltering = this._faltering;
+            if (!wasFaltering)
             {
                 this._faltering = true;
                 this._curveAmount = (Lazy.CoinFlip() ? -1f : 1f) * 5f * UnityEngine.Random.value;
+                if (!this._bounced)
+                    oldAngle = this._startAngle; // if we start faltering while a projectilemotinmodule is active, we want to reference are original angle
             }
             float timeScale = BraveTime.DeltaTime * C.FPS;
             this._projectile.ApplyFriction(_AIR_DRAG);
-            this._projectile.SendInDirection(
-                (this._projectile.m_currentDirection.ToAngle() + this._curveAmount * timeScale).ToVector(), true, true);
+
+            float newAngle = (oldAngle + (this._curveAmount * timeScale));
+            if (wasFaltering && this._projectile.OverrideMotionModule is HelixProjectileMotionModule hpmm)
+                hpmm.AdjustRightVector(Mathf.DeltaAngle(oldAngle, newAngle));
+            else
+                this._projectile.SendInDirection(BraveMathCollege.DegreesToVector(newAngle), true);
         }
 
         this._distanceTraveled += BraveTime.DeltaTime * this._projectile.baseData.speed;
