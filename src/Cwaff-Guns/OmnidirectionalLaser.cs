@@ -159,15 +159,13 @@ public class OmnidirectionalLaser : AdvancedGunBehavior
 
         Vector2? targetPos = Lazy.NearestEnemyWithinConeOfVision(
             start                            : this.gun.barrelOffset.position,
-            coneAngle                        : this._laserAngle.ToAngle().Clamp360(),
+            coneAngle                        : projectile.Direction.ToAngle() /*this._laserAngle.ToAngle().Clamp360()*/,
             maxDeviation                     : _LOCKON_FACTOR * this._currentFps,  // between 16 and 64 degrees of lock-on
             useNearestAngleInsteadOfDistance : true,
             ignoreWalls                      : false
             );
-        Vector2 angle =  targetPos.HasValue
-            ? (targetPos.Value - this.gun.barrelOffset.position.XY())
-            : this._laserAngle;
-        projectile.SendInDirection(angle, true, true);
+        if (targetPos.HasValue)
+            projectile.SendInDirection((targetPos.Value - this.gun.barrelOffset.position.XY()), true, true);
         projectile.AddTrailToProjectileInstance(_OmniTrailPrefab).gameObject.SetGlowiness(10f);
     }
 
@@ -177,5 +175,33 @@ public class OmnidirectionalLaser : AdvancedGunBehavior
         this._timeSinceLastShot = 0.0f;
         this._currentFps = Math.Min(this._currentFps + _FPS_STEP, _MAX_FPS);
         gun.spriteAnimator.ClipFps = this._currentFps;
+    }
+
+    private static float ForceGunAngle(Gun gun, float oldAngle)
+    {
+        return (gun.GetComponent<OmnidirectionalLaser>() is OmnidirectionalLaser omni)
+            ? omni._laserAngle.ToAngle() : oldAngle;
+    }
+
+    [HarmonyPatch(typeof(Gun), nameof(Gun.HandleAimRotation))]
+    private class OmnidirectionalLaserAimPatch
+    {
+        [HarmonyILManipulator]
+        private static void OmnidirectionalLaserAimIL(ILContext il)
+        {
+            ILCursor cursor = new ILCursor(il);
+
+            int num2 = 0;
+            if (!cursor.TryGotoNext(MoveType.Before,
+                instr => instr.MatchLdloc(out num2), // num2 is unmodified aim angle
+                instr => instr.MatchStfld<Gun>("prevGunAngleUnmodified")))
+                return;
+
+            ++cursor.Index; // move right before the store to prevGunAngleUnmodified (Gun is already on stack)
+            cursor.Emit(OpCodes.Ldarg_0); // the gun itself
+            cursor.Emit(OpCodes.Ldloc_S, (byte)num2); // num2 is unmodified aim angle
+            cursor.Emit(OpCodes.Call, typeof(OmnidirectionalLaser).GetMethod("ForceGunAngle", BindingFlags.Static | BindingFlags.NonPublic));
+            cursor.Emit(OpCodes.Stloc_S, (byte)num2); // num2 is unmodified aim angle
+        }
     }
 }
