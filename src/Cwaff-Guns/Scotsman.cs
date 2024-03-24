@@ -12,12 +12,12 @@ public class Scotsman : AdvancedGunBehavior
     internal static ExplosionData _ScotsmanExplosion = null;
     internal static GameObject _ScotsmanReticle = null;
 
-    private Vector2 _aimPoint            = Vector2.zero;
-    private GameObject _targetingReticle = null;
+    internal List<Stickybomb> _extantStickies = new();
 
-    private int _nextIndex                    = 0;
-    private Vector2 _whereIsThePlayerLooking  = Vector2.zero;
-    private List<Stickybomb> _extantStickies = new();
+    private Vector2 _aimPoint                = Vector2.zero;
+    private GameObject _targetingReticle     = null;
+    private int _nextIndex                   = 0;
+    private Vector2 _whereIsThePlayerLooking = Vector2.zero;
 
     public static void Add()
     {
@@ -120,9 +120,7 @@ public class Scotsman : AdvancedGunBehavior
         if (this.Owner is not PlayerController player)
             return;
 
-        Stickybomb sticky = projectile.GetComponent<Stickybomb>();
-        this._extantStickies.Add(sticky);
-        sticky.Setup(this._aimPoint);
+        projectile.GetComponent<Stickybomb>().Setup(this._aimPoint);
     }
 
     private void DetonateStickies(PlayerController pc)
@@ -139,34 +137,46 @@ public class Scotsman : AdvancedGunBehavior
 
 public class Stickybomb : MonoBehaviour
 {
-    private const float _DET_TIMER = 0.6f;
-    private const float _BASE_GLOW = 10f;
-    private const float _DET_GLOW  = 100f;
+    private const float _DET_TIMER      = 0.6f;
+    private const float _BASE_GLOW      = 10f;
+    private const float _DET_GLOW       = 100f;
+    private const float _FALLBACK_RANGE = 3f; // range we launch if not launched from Scotsman
 
     private PlayerController _owner;
     private Projectile       _projectile;
-    private Scotsman         _scotsman;
+    private Scotsman         _scotsman = null;
     private bool             _detonateSequenceStarted;
     private bool             _stuck;
-    private Vector2          _target;
     private Vector2          _startPos;
     private float            _targetDist;
     private Vector2          _stickPoint = Vector2.zero;
     private AIActor          _stuckEnemy = null;
+    private bool             _setup = false;
 
-    public void Setup(Vector2 target)
+    private void Start()
     {
         this._projectile              = base.GetComponent<Projectile>();
         this._owner                   = _projectile.Owner as PlayerController;
-        this._scotsman                = this._owner.CurrentGun.GetComponent<Scotsman>();
+        if (this._owner && this._owner.CurrentGun)
+            if (this._scotsman = this._owner.CurrentGun.GetComponent<Scotsman>())
+                this._scotsman._extantStickies.Add(this);
         this._detonateSequenceStarted = false;
         this._stuck                   = false;
 
-        this._target     = target;
-        this._startPos   = base.transform.position.XY();
-        this._targetDist = (this._target - this._startPos).magnitude;
-
+        if (!this._setup)
+        {
+            this._startPos   = base.transform.position.XY();
+            this._targetDist = _FALLBACK_RANGE;
+        }
         StartCoroutine(LockAndLoad());
+    }
+
+    public void Setup(Vector2 target)
+    {
+        this._startPos   = base.transform.position.XY();
+        this._targetDist = (target - this._startPos).magnitude;
+
+        this._setup = true;
     }
 
     private void StickToSurface(Vector2 stickPoint)
