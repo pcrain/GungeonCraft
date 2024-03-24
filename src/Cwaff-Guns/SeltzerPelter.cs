@@ -129,6 +129,7 @@ public class SeltzerProjectile : MonoBehaviour
         this._startedSpraying = true;
         this._bounce.OnBounce -= this.StartSprayingSoda;
         this._bounce.OnBounce += this.RestartBeamOnBounce;
+        this._canProjectile.m_usesNormalMoveRegardless = true; // disable helix projectile shenanigans after hitting a wall
         this._canProjectile.MultiplySpeed(0.5f);
         this._canProjectile.OnDestruction += this.DestroyBeam;
         this._canProjectile.StartCoroutine(SpraySoda_CR(this, this._canProjectile));

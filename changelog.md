@@ -24,6 +24,8 @@
 - Fixed Pistol Whip not working well with Scattershot, Backup Gun, and Ring of Triggers
 - Fixed Gunbrella projectiles being non-functional when fired using Duct Tape or Ring of Triggers
 - Fixed Gunbrella firing Backup Gun projectiles forwards
+- Made Gunbrella projectiles target a random enemy when no Gunbrella reticle is present
+- Fixed Seltzer Pelter projectiles freaking out when used with Helix Bullets
 
 ## 1.10.2 (2024-03-22)
 
