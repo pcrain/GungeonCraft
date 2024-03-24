@@ -8,8 +8,8 @@ public class Natascha : AdvancedGunBehavior
     public static string Lore             = "The beloved gun of an amicable literature Ph.D., who refused to let anyone else so much as touch his precious Natascha. That is, until convinced by a hulking Australian man to grant ownership rights in exchange for unlimited lifetime access to the \"best sandwiches south of the equator.\"";
 
     private const float _SPIN_UP_TIME     = 3.5f;
-    private const float _MAX_SPIN_UP      = 14.0f;
-    private const float _BASE_COOLDOWN    = 0.8f;
+    private const float _MAX_SPIN_UP      = 8.0f;
+    private const float _BASE_COOLDOWN    = 0.05f;
     private const int   _FIRE_ANIM_FRAMES = 8;
 
     private float _rawSpinupTime = 0.0f;
@@ -26,6 +26,7 @@ public class Natascha : AdvancedGunBehavior
             gun.AddToSubShop(ItemBuilder.ShopType.Trorc);
             gun.AddToSubShop(ModdedShopType.Rusty);
             gun.GainsRateOfFireAsContinueAttack = true; //NOTE: necessary for the patch below to work
+            gun.RateOfFireMultiplierAdditionPerSecond = 0f; // also necessary for patch below
 
         gun.InitProjectile(GunData.New(clipSize: -1, cooldown: _BASE_COOLDOWN, angleVariance: 15.0f,
           shootStyle: ShootStyle.Automatic, damage: 3.0f, speed: 20.0f, slow: 1.0f, spawnSound: "tomislav_shoot",
@@ -130,10 +131,9 @@ public class Natascha : AdvancedGunBehavior
     //TODO: this might be useful for other guns
     private int ComputeAnimationSpeed()
     {
-        float fireMultiplier = this.Player.stats.GetStatValue(PlayerStats.StatType.RateOfFire) + this._speedMult;
+        float fireMultiplier = this.Player.stats.GetStatValue(PlayerStats.StatType.RateOfFire) * this.GetSpinupFireRate();
         float cooldownTime   = (this.gun.DefaultModule.cooldownTime + this.gun.gunCooldownModifier) / fireMultiplier;
         float fps            = ((float)_FIRE_ANIM_FRAMES / cooldownTime);
-        ETGModConsole.Log($"computed animation speed of {fps} fps");
         return 1 + Mathf.CeilToInt(fps); // add 1 to FPS to make sure the animation doesn't skip a loop
     }
 
@@ -152,7 +152,6 @@ public class Natascha : AdvancedGunBehavior
         this._speedMult = speedMult;
         gun.AdjustAnimation(gun.shootAnimation, fps: ComputeAnimationSpeed());
 
-
         this.gun.RemoveStatFromGun(PlayerStats.StatType.MovementSpeed);
         this.gun.AddStatToGun(PlayerStats.StatType.MovementSpeed, 1f / (float)Math.Sqrt(this._speedMult), StatModifier.ModifyMethod.MULTIPLICATIVE);
         //HACK: if we rebuild our stats while firing, certain projectile modifiers like scattershot or backup gun make the gun fire once per frame, so work around that
@@ -161,9 +160,11 @@ public class Natascha : AdvancedGunBehavior
         NataschaMovementSpeedPatch.skipRebuildingGunVolleys = false;
     }
 
-    private static float ModifyRateOfFire(float unmodifiedRate, Gun gun)
+    public float GetSpinupFireRate() => (this._speedMult / (1f + _MAX_SPIN_UP));
+
+    private static float ModifyRateOfFire(Gun gun)
     {
-        return (gun.GetComponent<Natascha>() is Natascha nat) ? nat._speedMult : unmodifiedRate;
+        return (gun.GetComponent<Natascha>() is Natascha nat) ? nat.GetSpinupFireRate() : 1f;
     }
 
     /// <summary>Use Natascha's custom rate of fire spinup code</summary>
@@ -175,15 +176,27 @@ public class Natascha : AdvancedGunBehavior
         {
             ILCursor cursor = new ILCursor(il);
             Type ot = original.DeclaringType;
-            if (!cursor.TryGotoNext(MoveType.After,
-              instr => instr.MatchLdfld<Gun>("m_continuousAttackTime"),
-              instr => instr.MatchMul()))
+
+            foreach (FieldInfo f in AccessTools.GetDeclaredFields(ot))
+                ETGModConsole.Log($"  {f.Name}");
+
+            if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchAdd())) // immediately after the first add is where we're looking for
                 return;
 
-            // load the gun itself onto the stack and call our fire speed
             cursor.Emit(OpCodes.Ldarg_0);  // load enumerator type
             cursor.Emit(OpCodes.Ldfld, AccessTools.GetDeclaredFields(ot).Find(f => f.Name == "$this")); // load actual "$this" field
             cursor.Emit(OpCodes.Call, typeof(Natascha).GetMethod("ModifyRateOfFire", BindingFlags.Static | BindingFlags.NonPublic));
+            cursor.Emit(OpCodes.Mul);  // multiply the additional natascha rate of fire by fireMultiplier
+
+            // if (!cursor.TryGotoNext(MoveType.After,
+            //   instr => instr.MatchLdfld<Gun>("m_continuousAttackTime"),
+            //   instr => instr.MatchMul()))
+            //     return;
+
+            // // load the gun itself onto the stack and call our fire speed
+            // cursor.Emit(OpCodes.Ldarg_0);  // load enumerator type
+            // cursor.Emit(OpCodes.Ldfld, AccessTools.GetDeclaredFields(ot).Find(f => f.Name == "$this")); // load actual "$this" field
+            // cursor.Emit(OpCodes.Call, typeof(Natascha).GetMethod("ModifyRateOfFire", BindingFlags.Static | BindingFlags.NonPublic));
         }
     }
 
