@@ -58,7 +58,7 @@ public class Blamethrower : AdvancedGunBehavior
         for (int i = 0; i < TRIES; ++i)
         {
             AIActor enemy = enemies.ChooseRandom();
-            if (!(enemy?.IsHostileAndNotABoss() ?? false))
+            if (!enemy || !enemy.IsHostileAndNotABoss())
                 continue;
             if (enemy.GetComponent<EnemyBlamedBehavior>())
                 continue;  // can't scapegoat the same enemy twice
