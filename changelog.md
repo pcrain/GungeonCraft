@@ -13,6 +13,7 @@
 - Fixed Scotsman projectiles all being sent in the same direction with Backup Gun
 - Fixed Scotsman ignoring mouse when used with Remote Bullets
 - Fixed Scotsman projectiles despawning immediately when not spawned with Scotsman (e.g., with Duct Tape or Chance Bullets)
+- Fixed Scotsman projectiles freaking out when used with Helix Bullets
 
 ## 1.10.2 (2024-03-22)
 

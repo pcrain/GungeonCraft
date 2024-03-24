@@ -245,6 +245,7 @@ public class Stickybomb : MonoBehaviour
         }
 
         // Phase 2, lie in wait
+        this._projectile.m_usesNormalMoveRegardless = true; // disable movement modifiers such as Helix Bullets
         this._projectile.damageTypes &= (~CoreDamageTypes.Electric);  // remove electric effect after stopping
         while (!this._detonateSequenceStarted && this._scotsman)  // skip this sequence if not fired from Scotsman
             yield return null;
