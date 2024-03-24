@@ -27,6 +27,7 @@
 - Made Gunbrella projectiles target a random enemy when no Gunbrella reticle is present
 - Fixed Seltzer Pelter projectiles freaking out when used with Helix Bullets
 - Fixed Carpet Bomber projectiles freaking out when used with Helix Bullets or Orbital Bullets
+- Fixed Lightwing projectiles freaking out when used with Helix Bullets or Orbital Bullets (by disregarding the modifiers completely)
 
 ## 1.10.2 (2024-03-22)
 

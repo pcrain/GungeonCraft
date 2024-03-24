@@ -112,6 +112,7 @@ public class LightwingProjectile : MonoBehaviour
         this._projectile.BulletScriptSettings.surviveRigidbodyCollisions = true;
         this._projectile.specRigidbody.OnCollision += this.OnCollision;
         this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
+        this._projectile.m_usesNormalMoveRegardless = true; // ignore all motion module overrides, we have very specific pathing requirements
 
         this._trail = this._projectile.gameObject.AddComponent<EasyTrailBullet>();
             this._trail.StartWidth = 0.35f;
