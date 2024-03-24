@@ -32,6 +32,9 @@
 - Fixed idle animation for Crapshooter playing way too fast
 - Fixed idle animation speed for Ki Blast, Deadline, Schrodinger's Gat, Racket Launcher, Subtractor Beam, Wavefront, and Alien Nailgun not being set correctly after recent changes
 - Fixed Omnidirectional Laser extra projectiles (e.g., from Backup Bullets and Scattershot) always firing towards the reticle and overlapping the original projectile
+- Fixed Ki Blast ignoring mouse when used with Remote Bullets
+- Fixed Ki Blast firing Backup Gun and Rign of Triggers projectiles forwards
+- Fixed Ki Blast projectiles not working when used with Helix Bullets
 
 ## 1.10.2 (2024-03-22)
 

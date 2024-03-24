@@ -93,31 +93,29 @@ public class ArcTowardsTargetBehavior : MonoBehaviour
     private Vector2 _targetPos             = Vector2.zero;
     private float _targetAngle             = 0;
     private float _actualTimeToReachTarget = 0;
+    private float _arcSpeed                = 0.0f;
+    private bool  _hasBeenSetup            = false;
 
     // Manualy Set
     private float _arcAngle                = 0;
     private float _maxSecsToReachTarget    = 3.0f;
     private float _minSpeed                = 5.0f;
-    private bool  _hasBeenSetup            = false;
 
-    public void Setup(float? arcAngle = null, float? maxSecsToReachTarget = null, float? minSpeed = null)
+    public void Setup(float arcAngle, float maxSecsToReachTarget, float minSpeed)
     {
         this._projectile = base.GetComponent<Projectile>();
         if (this._projectile.Owner is not PlayerController pc)
             return;
         this._owner = pc;
 
-        this._targetAngle  = this._owner.CurrentGun.CurrentAngle;
+        this._targetAngle  = this._projectile.Direction.ToAngle();
         this._targetPos    = Raycast.ToNearestWallOrEnemyOrObject(
             this._owner.sprite.WorldCenter,
             this._targetAngle);
 
-        if (arcAngle.HasValue)
-            this._arcAngle = arcAngle.Value;
-        if (maxSecsToReachTarget.HasValue)
-            this._maxSecsToReachTarget = maxSecsToReachTarget.Value;
-        if (minSpeed.HasValue)
-            this._minSpeed = minSpeed.Value;
+        this._arcAngle = arcAngle;
+        this._maxSecsToReachTarget = maxSecsToReachTarget;
+        this._minSpeed = minSpeed;
 
         SetNewTarget(this._targetPos);
         this._hasBeenSetup = true;
@@ -133,6 +131,7 @@ public class ArcTowardsTargetBehavior : MonoBehaviour
         float distanceToTarget = Vector2.Distance(curpos, this._targetPos);
         this._projectile.SetSpeed(Mathf.Max(distanceToTarget / _maxSecsToReachTarget, _minSpeed));
         this._actualTimeToReachTarget = distanceToTarget / this._projectile.baseData.speed;
+        this._arcSpeed = 2f * this._arcAngle / this._actualTimeToReachTarget;
         this._projectile.SendInDirection(BraveMathCollege.DegreesToVector(this._targetAngle-this._arcAngle), true);
     }
 
@@ -141,15 +140,18 @@ public class ArcTowardsTargetBehavior : MonoBehaviour
         if (!_hasBeenSetup)
             return;
 
-        float deltatime = BraveTime.DeltaTime;
-        this._lifetime += deltatime;
+        this._lifetime += BraveTime.DeltaTime;
         float percentDoneTurning = this._lifetime / this._actualTimeToReachTarget;
         if (percentDoneTurning > 1.0f)
             return;
 
-        float inflection = (2.0f*percentDoneTurning) - 1.0f;
-        float newAngle = this._targetAngle + inflection * this._arcAngle;
-        this._projectile.SendInDirection(BraveMathCollege.DegreesToVector(newAngle), true);
+        float oldAngle = this._projectile.Direction.ToAngle();
+        float newAngle = (oldAngle + (this._arcSpeed * BraveTime.DeltaTime));
+
+        if (this._projectile.OverrideMotionModule != null)
+            this._projectile.OverrideMotionModule.AdjustRightVector(Mathf.DeltaAngle(oldAngle, newAngle));
+        else
+            this._projectile.SendInDirection(BraveMathCollege.DegreesToVector(newAngle), true);
     }
 }
 

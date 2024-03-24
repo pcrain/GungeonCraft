@@ -28,7 +28,7 @@ public class KiBlast : AdvancedGunBehavior
             gun.AddToSubShop(ModdedShopType.Boomhildr);
 
         gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
-          ammoType: GameUIAmmoType.AmmoType.BEAM, damage: 4.0f, range: 10.0f, speed: 50.0f, sprite: "ki_blast", fps: 12, scale: 0.25f,
+          ammoType: GameUIAmmoType.AmmoType.BEAM, damage: 4.0f, range: 1000.0f, speed: 50.0f, sprite: "ki_blast", fps: 12, scale: 0.25f,
           anchor: Anchor.MiddleCenter, ignoreDamageCaps: true
           )).SetAllImpactVFX(VFX.CreatePool("ki_explosion", fps: 20, loops: false, scale: 0.5f)
           ).Attach<EasyTrailBullet>(trail => {
@@ -148,8 +148,7 @@ public class KiBlastBehavior : MonoBehaviour
         float angle = 0;
         if (this._owner.CurrentGun.GetComponent<KiBlast>() is KiBlast k)
         {
-            float playerAccuracy = this._owner.AccuracyMult();
-            angle = Mathf.Max(UnityEngine.Random.value*playerAccuracy*_MaxAngleVariance,_MinAngleVariance)*k.nextKiBlastSign;
+            angle = Mathf.Max(UnityEngine.Random.value * this._owner.AccuracyMult() * _MaxAngleVariance, _MinAngleVariance) * k.nextKiBlastSign;
             k.nextKiBlastSign *= -1;
         }
         else { ETGModConsole.Log("that should never happen o.o"); }
