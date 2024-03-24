@@ -80,11 +80,23 @@ public class CwaffProjectile : MonoBehaviour
 
     /// <summary>Prevent projectiles from being affected by Orbital Bullets if preventOrbiting is set</summary>
     [HarmonyPatch(typeof(GunVolleyModificationItem), nameof(GunVolleyModificationItem.HandleStartOrbit))]
-    private class PreventOrbitingPatch
+    private class PreventOrbitingProjectilePatch
     {
         static bool Prefix(GunVolleyModificationItem __instance, BounceProjModifier bouncer, SpeculativeRigidbody srb)
         {
             if (bouncer.projectile.GetComponent<CwaffProjectile>() is not CwaffProjectile c)
+              return true; // call the original method
+            return !c.preventOrbiting; // skip the original method iff we are supposed to prevent orbiting
+        }
+    }
+
+    /// <summary>Prevent beams from being affected by Orbital Bullets if preventOrbiting is set</summary>
+    [HarmonyPatch(typeof(GunVolleyModificationItem), nameof(GunVolleyModificationItem.PostProcessProjectileOrbitBeam))]
+    private class PreventOrbitingBeamPatch
+    {
+        static bool Prefix(GunVolleyModificationItem __instance, BeamController beam)
+        {
+            if (beam.projectile.GetComponent<CwaffProjectile>() is not CwaffProjectile c)
               return true; // call the original method
             return !c.preventOrbiting; // skip the original method iff we are supposed to prevent orbiting
         }
