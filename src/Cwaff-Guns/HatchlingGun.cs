@@ -50,6 +50,8 @@ public class HatchlingProjectile : MonoBehaviour
 
         // From CompanionItem.Initialize()
         cc.m_owner                        = this._owner; // original was player
+        cc.aiActor.IsHarmlessEnemy        = true;
+        cc.aiActor.IsWorthShootingAt      = false;
         cc.aiActor.IsNormalEnemy          = false;
         cc.aiActor.CompanionOwner         = this._owner; // original was player
         cc.aiActor.CanTargetPlayers       = false;

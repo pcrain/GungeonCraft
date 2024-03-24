@@ -48,6 +48,8 @@
 - Limited length of Aimu Hakurei and Subtractor Beam projectile trails after bouncing
 - Tweaked Natascha spin up rate and max spin up speed
 - Fixed null dereference in Schrodinger's Gat due to incorrectly referencing projectiles belonging to despawned enemies
+- Fixed chicks spawned from the Hatchling Gun not being marked as harmless enemies and being targeted by things they shouldn't be
+- Fixed several guns being able to target enemies internally marked as "not worth shooting at"
 
 ## 1.10.2 (2024-03-22)
 

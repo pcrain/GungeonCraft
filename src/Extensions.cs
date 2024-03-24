@@ -346,21 +346,21 @@ public static class Extensions
   public static bool IsHostile(this AIActor e, bool canBeDead = false, bool canBeNeutral = false)
   {
     HealthHaver h = e?.healthHaver;
-    return e && !e.IsGone && (canBeNeutral || !e.IsHarmlessEnemy) && h && (canBeDead || (h.IsAlive && !h.IsDead)) && !h.isPlayerCharacter;
+    return e && !e.IsGone && e.IsWorthShootingAt && (canBeNeutral || !e.IsHarmlessEnemy) && h && (canBeDead || (h.IsAlive && !h.IsDead)) && !h.isPlayerCharacter;
   }
 
   /// <summary>Check if an enemy is hostile and a non-boss</summary>
   public static bool IsHostileAndNotABoss(this AIActor e, bool canBeDead = false, bool canBeNeutral = false)
   {
     HealthHaver h = e?.healthHaver;
-    return e && !e.IsGone && (canBeNeutral || !e.IsHarmlessEnemy) && h && !h.IsBoss && !h.IsSubboss &&  (canBeDead || (h.IsAlive && !h.IsDead)) && !h.isPlayerCharacter;
+    return e && !e.IsGone && e.IsWorthShootingAt && (canBeNeutral || !e.IsHarmlessEnemy) && h && !h.IsBoss && !h.IsSubboss &&  (canBeDead || (h.IsAlive && !h.IsDead)) && !h.isPlayerCharacter;
   }
 
   /// <summary>Check if an enemy is a boss</summary>
   public static bool IsABoss(this AIActor e, bool canBeDead = false)
   {
     HealthHaver h = e?.healthHaver;
-    return e && !e.IsGone && h && (h.IsBoss || h.IsSubboss) && (canBeDead || (h.IsAlive && !h.IsDead));
+    return e && !e.IsGone && e.IsWorthShootingAt && h && (h.IsBoss || h.IsSubboss) && (canBeDead || (h.IsAlive && !h.IsDead));
   }
 
   /// <summary>Set the Alpha of a GameObject's sprite</summary>
