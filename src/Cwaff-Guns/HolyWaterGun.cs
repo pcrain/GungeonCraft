@@ -35,6 +35,7 @@ public class HolyWaterGun : AdvancedGunBehavior
             // fix some animation glitches (don't blindly copy paste; need to be set on a case by case basis depending on your beam's needs)
             beamComp.muzzleAnimation = beamComp.beamStartAnimation;  //use start animation for muzzle animation, make start animation null
             beamComp.beamStartAnimation = null;
+            beamComp.interpolateStretchedBones = false; // causes weird graphical glitches whether it's enabled or not, but enabled is worse
 
         _ExorcismParticleVFX = VFX.Create("exorcism_particles", fps: 12, loops: false, anchor: Anchor.MiddleCenter, emissivePower: 2);
     }

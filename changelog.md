@@ -42,6 +42,7 @@
 - Fixed deployed Chekhov's Gun sprites appearing far away from the player's gun sprites with certain rotations
 - Blacklisted Racket Launcher projectiles from being affected by Orbital Bullets
 - Blacklisted Seltzer Pelter projectiles from being affected by Orbital Bullets
+- Fixed Holy Water Gun having an invisible beam when used with Orbital Bullets
 
 ## 1.10.2 (2024-03-22)
 
