@@ -42,8 +42,11 @@ public class Jugglernaut : AdvancedGunBehavior
                 gun.QuickUpdateGunAnimation("5_gun", returnToIdle: false),
                 gun.QuickUpdateGunAnimation("6_gun", returnToIdle: false),
             };
-            // Manual adjustments to prevent wonky firing animations
-            gun.barrelOffset.transform.position = new Vector3(0.75f, 0.75f, 0f);
+
+            //NOTE: Manual adjustments to prevent wonky firing animations by effectively locking barrel offset in place
+            gun.LockedHorizontalOnCharge = true;
+            gun.LockedHorizontalCenterFireOffset = 0f;
+            gun.barrelOffset.transform.position -= (C.PIXEL_SIZE * _CarryOffset.ToVector3());
             gun.AddFlippedCarryPixelOffsets(offset: _CarryOffset, flippedOffset: _FlippedCarryOffset);
 
             string tossSound = "juggle_toss_sound";
@@ -86,6 +89,7 @@ public class Jugglernaut : AdvancedGunBehavior
           sprite: "jugglernaut_ball", fps: 12, scale: 0.5f, anchor: Anchor.MiddleLeft));
     }
 
+    /// <summary>Make sure Jugglernaut appears correctly in the weapons panel</summary>
     [HarmonyPatch(typeof(GameUIAmmoController), nameof(GameUIAmmoController.GetOffsetVectorForGun))]
     private class JugglernautWeaponBoxPatch
     {
@@ -95,6 +99,27 @@ public class Jugglernaut : AdvancedGunBehavior
         {
             if (newGun.GetComponent<Jugglernaut>())
                 __result += _WeaponBoxCorrection;
+        }
+    }
+
+    /// <summary>Prevent Gun.CeaseAttack() from updating Jugglernaut's attach points for a single frame and messing up the sprite</summary>
+    [HarmonyPatch(typeof(Gun), nameof(Gun.CeaseAttack))]
+    private class JugglernautCeaseAttackPatch
+    {
+        [HarmonyILManipulator]
+        private static void JugglernautCeaseAttackIL(ILContext il)
+        {
+            ILCursor cursor = new ILCursor(il);
+            if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<Gun>("LockedHorizontalOnCharge")))
+                return;
+
+            cursor.Emit(OpCodes.Ldarg_0); // load the gun
+            cursor.Emit(OpCodes.Call, typeof(JugglernautCeaseAttackPatch).GetMethod("ShouldUpdateAttachPoints", BindingFlags.Static | BindingFlags.NonPublic));
+        }
+
+        private static bool ShouldUpdateAttachPoints(bool origVal, Gun gun)
+        {
+            return origVal && !gun.GetComponent<Jugglernaut>();
         }
     }
 
@@ -153,12 +178,9 @@ public class Jugglernaut : AdvancedGunBehavior
     {
         base.PostProcessProjectile(projectile);
         projectile.gameObject.AddComponent<JugglernautProjectile>().Setup(this);
-            projectile.baseData.damage *= (1f + this._juggleLevel);
+        projectile.baseData.damage *= (1f + this._juggleLevel);
 
-        // Animation wonkiness due to manually adjusting carry offsets messes with aim position, so redirect towards the cursor
-        projectile.SendInDirection((this.Player.unadjustedAimPoint.XY() - projectile.sprite.WorldCenter), resetDistance: true);
-
-        gun.gameObject.Play("alyx_shoot_sound");
+        gun.gameObject.PlayOnce("alyx_shoot_sound"); // necessary here since the gun doesn't use a fire animation and won't trigger a fire audio event
     }
 
     public void RegisterEnemyHit(AIActor enemy)

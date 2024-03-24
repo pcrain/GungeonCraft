@@ -36,6 +36,7 @@
 - Fixed Ki Blast firing Backup Gun and Ring of Triggers projectiles forwards
 - Fixed Ki Blast projectiles not working when used with Helix Bullets
 - Fixed Pincushion firing Backup Gun projectiles forwards
+- Fixed Jugglernaut not working well with Scattershot and Backup Gun
 
 ## 1.10.2 (2024-03-22)
 
