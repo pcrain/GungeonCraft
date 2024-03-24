@@ -34,11 +34,11 @@ public class IronMaid : AdvancedGunBehavior
         LaunchAllBullets(this.Player);
     }
 
-    public override void OnDropped()
+    protected override void OnPostDroppedByPlayer(PlayerController player)
     {
-        base.OnDropped();
-        LaunchAllBullets(this.Player);
-        this.Player.OnReceivedDamage -= LaunchAllBullets;
+        LaunchAllBullets(player);
+        player.OnReceivedDamage -= LaunchAllBullets;
+        base.OnPostDroppedByPlayer(player);
     }
 
     public override void OnDestroy()

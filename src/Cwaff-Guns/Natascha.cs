@@ -25,7 +25,7 @@ public class Natascha : AdvancedGunBehavior
             gun.SetCasing(Items.Ak47);
             gun.AddToSubShop(ItemBuilder.ShopType.Trorc);
             gun.AddToSubShop(ModdedShopType.Rusty);
-            gun.GainsRateOfFireAsContinueAttack = true;
+            gun.GainsRateOfFireAsContinueAttack = true; //NOTE: necessary for the patch below to work
 
         gun.InitProjectile(GunData.New(clipSize: -1, cooldown: _BASE_COOLDOWN, angleVariance: 15.0f,
           shootStyle: ShootStyle.Automatic, damage: 3.0f, speed: 20.0f, slow: 1.0f, spawnSound: "tomislav_shoot",
@@ -133,6 +133,7 @@ public class Natascha : AdvancedGunBehavior
         float fireMultiplier = this.Player.stats.GetStatValue(PlayerStats.StatType.RateOfFire) + this._speedMult;
         float cooldownTime   = (this.gun.DefaultModule.cooldownTime + this.gun.gunCooldownModifier) / fireMultiplier;
         float fps            = ((float)_FIRE_ANIM_FRAMES / cooldownTime);
+        ETGModConsole.Log($"computed animation speed of {fps} fps");
         return 1 + Mathf.CeilToInt(fps); // add 1 to FPS to make sure the animation doesn't skip a loop
     }
 
