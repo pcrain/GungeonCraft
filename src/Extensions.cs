@@ -1900,4 +1900,10 @@ public static class Extensions
   {
     return $"{gun.InternalSpriteName()}_{LargeGunAnimationHotfix._TRIM_ANIMATION}";
   }
+
+  /// <summary>Get a Projectile's original direction for PostProcessProjectile purposes</summary>
+  public static float OriginalDirection(this Projectile p)
+  {
+    return p.transform.right.XY().ToAngle();
+  }
 }

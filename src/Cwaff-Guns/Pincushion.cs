@@ -25,7 +25,7 @@ public class Pincushion : AdvancedGunBehavior
 
         _Microdust = VFX.CreatePool("microdust", fps: 30, loops: false);
 
-        gun.InitProjectile(GunData.New(clipSize: 1000 / _SIMULTANEOUS_BULLETS, cooldown: C.FRAME, angleVariance: 35.0f, shootStyle: ShootStyle.Automatic,
+        gun.InitProjectile(GunData.New(clipSize: 1000 / _SIMULTANEOUS_BULLETS, cooldown: C.FRAME, angleVariance: 0.0f, shootStyle: ShootStyle.Automatic,
           damage: 0.0f, speed: 200.0f, force: 0.0f, range: 999f, bossDamageMult: 0.65f, sprite: "needle", fps: 12, spawnSound: "pincushion_fire",
           anchor: Anchor.MiddleLeft, barrageSize: 4
           )).SetAllImpactVFX(_Microdust
@@ -49,7 +49,7 @@ public class Pincushion : AdvancedGunBehavior
             return;
         float spread = _MIN_SPREAD + _DLT_SPREAD * (1f - ((float)this.gun.ClipShotsRemaining / (float)this.gun.ClipCapacity));
         spread *= pc.AccuracyMult();
-        projectile.SendInDirection((pc.m_currentGunAngle + spread*(2f*UnityEngine.Random.value - 1f)).ToVector(), false);
+        projectile.SendInDirection((projectile.OriginalDirection() + spread*(2f*UnityEngine.Random.value - 1f)).ToVector(), false);
     }
 
     [HarmonyPatch(typeof(MinorBreakable), nameof(MinorBreakable.OnPreCollision))]

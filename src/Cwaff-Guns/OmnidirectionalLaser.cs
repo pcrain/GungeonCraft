@@ -156,11 +156,10 @@ public class OmnidirectionalLaser : AdvancedGunBehavior
     public override void PostProcessProjectile(Projectile projectile)
     {
         base.PostProcessProjectile(projectile);
-
         Vector2? targetPos = Lazy.NearestEnemyWithinConeOfVision(
             start                            : this.gun.barrelOffset.position,
-            coneAngle                        : projectile.Direction.ToAngle() /*this._laserAngle.ToAngle().Clamp360()*/,
-            maxDeviation                     : _LOCKON_FACTOR * this._currentFps,  // between 16 and 64 degrees of lock-on
+            coneAngle                        : projectile.OriginalDirection(),
+            maxDeviation                     : _LOCKON_FACTOR * this._currentFps, // between 16 and 64 degrees of lock-on
             useNearestAngleInsteadOfDistance : true,
             ignoreWalls                      : false
             );
