@@ -45,7 +45,7 @@
 - Fixed Holy Water Gun having an invisible beam when used with Orbital Bullets
 - Fixed null dereference when dropping Iron Maid with active projectiles
 - Fixed extremely high fire rate for guns duct-taped to Natascha
-- Limited length of Aimu Hakurei and Subtractor Beam projectile trails after bouncing
+- Limited length of Aimu Hakurei, Subtractor Beam, and Omnidirectional Laser projectile trails after bouncing
 - Tweaked Natascha spin up rate and max spin up speed
 - Fixed null dereference in Schrodinger's Gat due to incorrectly referencing projectiles belonging to despawned enemies
 - Fixed chicks spawned from the Hatchling Gun not being marked as harmless enemies and being targeted by things they shouldn't be
