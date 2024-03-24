@@ -34,12 +34,10 @@ public class Gunbrella : AdvancedGunBehavior
 
         gun.InitProjectile(GunData.New(clipSize: 1, shootStyle: ShootStyle.Charged, customClip: true, ammoCost: 0,
           damage: _PROJ_DAMAGE, sprite: "gunbrella_projectile", fps: 16, anchor: Anchor.MiddleLeft, freeze: 0.33f, chargeTime: _MIN_CHARGE_TIME,
-          destroySound: "icicle_crash", bossDamageMult: 0.6f // bosses are big and this does a lot of damage, so tone it down
+          destroySound: "icicle_crash", barrageSize: _BARRAGE_SIZE, bossDamageMult: 0.6f // bosses are big and this does a lot of damage, so tone it down
           )).SetAllImpactVFX(VFX.CreatePool("icicle_crash_particles", fps: 30, loops: false, anchor: Anchor.MiddleCenter, scale: 0.35f)
           ).Attach<GunbrellaProjectile>();
 
-        for (int i = 1; i < _BARRAGE_SIZE; i++)
-            gun.AddProjectileModuleFrom(gun);
         gun.DefaultModule.ammoCost = 1; // everything defaults to 0, so make sure the default module costs 1 ammo
 
         _RainReticle = VFX.Create("gunbrella_target_reticle",
@@ -149,8 +147,16 @@ public class Gunbrella : AdvancedGunBehavior
     {
         return this._nextProjectileNumber++;
     }
-}
 
+    public override void PostProcessProjectile(Projectile projectile)
+    {
+        base.PostProcessProjectile(projectile);
+        if (this.Owner is not PlayerController player)
+            return;
+
+        projectile.GetComponent<GunbrellaProjectile>().Setup();
+    }
+}
 
 public class GunbrellaProjectile : MonoBehaviour
 {
@@ -163,7 +169,9 @@ public class GunbrellaProjectile : MonoBehaviour
     private const float _DELAY                = 0.03f;  // delay between firing projectiles
     private const float _TIME_TO_REACH_TARGET = _LAUNCH_TIME + _HANG_TIME + _FALL_TIME;
 
-    private static float _LastFireSound = 0.0f;
+    private static float _LastFireTime = 0.0f;
+    private static float _LastLaunchTime = 0.0f;
+    private static int   _LastLaunchIndex = 0;
 
     private Projectile _projectile   = null;
     private PlayerController _owner  = null;
@@ -174,33 +182,56 @@ public class GunbrellaProjectile : MonoBehaviour
 
     private bool _launching          = false;
     private bool _falling            = false;
-    private float _extraDelay          = 0.0f; // must be public so unity serializes it properly with the prefab
+    private float _extraDelay        = 0.0f; // must be public so unity serializes it properly with the prefab
+    private bool _naturalSpawn      = false;
+
+    public void Setup()
+    {
+        this._naturalSpawn = true;
+    }
 
     private void Start()
     {
         this._projectile = base.GetComponent<Projectile>();
         this._owner = this._projectile.Owner as PlayerController;
 
-        if (this._owner.CurrentGun.GetComponent<Gunbrella>() is not Gunbrella gun)
+        if (_LastLaunchTime < BraveTime.ScaledTimeSinceStartup)
         {
-            ETGModConsole.Log($"shooting a gunbrella projectile without a reticle, uh-oh o.o");
-            return;
+            _LastLaunchIndex = 0;
+            _LastLaunchTime  = BraveTime.ScaledTimeSinceStartup;
+            this._projectile.gameObject.PlayUnique("gunbrella_fire_sound");
         }
 
-        this._extraDelay   = _DELAY * gun.GetProjectileNumber();
-        this._exactTarget = gun.GetReticleCenter();
+        if (this._naturalSpawn && this._owner.CurrentGun.GetComponent<Gunbrella>() is Gunbrella gun)
+        {
+            this._extraDelay   = _DELAY * gun.GetProjectileNumber();
+            this._exactTarget = gun.GetReticleCenter();
+        }
+        else
+        {
+            this._extraDelay = _DELAY * (_LastLaunchIndex++);
+            AIActor target   = null;
+            List<AIActor> enemies = this._owner.CurrentRoom?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All).EmptyIfNull().ToList();
+            if (enemies.Count > 0)
+            {
+                const int TRIES = 10;
+                for (int i = 0; i < TRIES; ++i)
+                {
+                    AIActor enemy = enemies.ChooseRandom();
+                    if (!enemy || !enemy.healthHaver || enemy.healthHaver.IsDead)
+                        continue;
+                    target = enemy;
+                    break;
+                }
+            }
+            this._exactTarget = target ? target.CenterPosition : this._owner.CenterPosition;
+        }
 
         this._projectile.damageTypes &= (~CoreDamageTypes.Electric); // remove robot's electric damage type from the projectile
         this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
         this._projectile.specRigidbody.OnPreTileCollision += this.OnPreTileCollision;
 
-        this._startVelocity = this._owner.m_currentGunAngle.AddRandomSpread(10f).ToVector(1f);
-
-        if (_LastFireSound < BraveTime.ScaledTimeSinceStartup)
-        {
-            _LastFireSound = BraveTime.ScaledTimeSinceStartup;
-            this._projectile.gameObject.Play("gunbrella_fire_sound");
-        }
+        this._startVelocity = this._projectile.Direction.ToAngle().AddRandomSpread(10f).ToVector(1f);
 
         this._projectile.collidesWithEnemies = false;
         this._projectile.specRigidbody.CollideWithOthers = false;

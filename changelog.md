@@ -22,6 +22,8 @@
 - Gave Pistol Whip Infinite Ammo for its pistol projectile (whip itself already had infinite ammo)
 - Made Pistol Whip take spread into account instead of having perfect accuracy
 - Fixed Pistol Whip not working well with Scattershot, Backup Gun, and Ring of Triggers
+- Fixed Gunbrella projectiles being non-functional when fired using Duct Tape or Ring of Triggers
+- Fixed Gunbrella firing Backup Gun projectiles forwards
 
 ## 1.10.2 (2024-03-22)
 

@@ -54,8 +54,8 @@ public class Blamethrower : AdvancedGunBehavior
         if (enemies.Count() == 0)
             return;
 
-        const int tries = 10;
-        for (int i = 0; i < tries; ++i)
+        const int TRIES = 10;
+        for (int i = 0; i < TRIES; ++i)
         {
             AIActor enemy = enemies.ChooseRandom();
             if (!(enemy?.IsHostileAndNotABoss() ?? false))
