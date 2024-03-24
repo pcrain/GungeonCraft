@@ -53,6 +53,9 @@
 - Fixed Subtractor Beam not displaying health for neutral enemies like Chance Kin or Key Bullet Kin
 - Fixed Blamethrower being able to scapegoat enemies outside of the current room
 - Fixed Wavefront projectiles noisily colliding with player companions
+- Reduced Holy Water Gun ammo from 500 to 100
+- Reduced Holy Water Gun knockback from 50 to 15
+- Made Holy Water Gun respect bullet damage modifiers (rather than doing fixed damage)
 
 ## 1.10.2 (2024-03-22)
 

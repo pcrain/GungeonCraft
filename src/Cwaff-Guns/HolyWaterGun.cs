@@ -15,13 +15,14 @@ public class HolyWaterGun : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<HolyWaterGun>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.BEAM, reloadTime: 1.0f, ammo: 500, audioFrom: Items.MegaDouser, defaultAudio: true);
+            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.BEAM, reloadTime: 1.0f, ammo: 100, audioFrom: Items.MegaDouser, defaultAudio: true);
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
         //TODO: refactor to use new DamageAdjuster class to apply different damage to Jammed enemies
         Projectile projectile = gun.InitProjectile(GunData.New(baseProjectile: Items.MegaDouser.Projectile(), clipSize: -1, shootStyle: ShootStyle.Beam,
-            ammoType: GameUIAmmoType.AmmoType.BEAM, damage: 0.0f, speed: 50.0f, force: 50.0f)).Attach<ExorcismJuice>();
+            ammoType: GameUIAmmoType.AmmoType.BEAM, damage: Exorcisable._EXORCISM_DPS, speed: 50.0f, force: 15.0f)).Attach<ExorcismJuice>();
+            projectile.BlackPhantomDamageMultiplier = _JAMMED_DAMAGE_MULT;
 
         //HACK: this is necessary when copying Mega Douser to avoid weird beam offsets from walls...why???
         projectile.gameObject.transform.localScale = Vector3.one;
@@ -55,11 +56,64 @@ public class HolyWaterGun : AdvancedGunBehavior
     }
 }
 
-public class ExorcismJuice : MonoBehaviour {} // dummy component
+public class ExorcismJuice : MonoBehaviour
+{
+    private Projectile _projectile;
+    private PlayerController _owner;
+    private void Start()
+    {
+        this._projectile = base.GetComponent<Projectile>();
+        this._owner = this._projectile.Owner as PlayerController;
+
+        this._projectile.OnHitEnemy += ExorciseTheJammed;
+    }
+
+    private void ExorciseTheJammed(Projectile bullet, SpeculativeRigidbody body, bool willKill)
+    {
+        if (!willKill)
+            return;
+        if (!body || body.GetComponent<AIActor>() is not AIActor enemy)
+            return;
+        if (!enemy.IsBlackPhantom)
+            return;
+        if (bullet.Owner is not PlayerController pc)
+            return;
+        if (bullet.GetComponent<BasicBeamController>() is not BasicBeamController beam)
+            return;
+
+        pc.ownerlessStatModifiers.Add(new StatModifier() {
+            amount      = -1f,
+            modifyType  = StatModifier.ModifyMethod.ADDITIVE,
+            statToBoost = PlayerStats.StatType.Curse,
+            });
+        pc.stats.RecalculateStats(pc);
+
+        Texture2D ghostSprite;
+        if (HolyWaterGun._GhostTextures.ContainsKey(enemy.EnemyGuid))
+            ghostSprite = HolyWaterGun._GhostTextures[enemy.EnemyGuid]; // If we've already computed a texture for this enemy, don't do it again
+        else
+        {
+            ghostSprite = Lazy.GetTexturedEnemyIdleAnimation(enemy, new Color(1f,1f,1f,1f), 0.3f);
+            HolyWaterGun._GhostTextures[enemy.EnemyGuid] = ghostSprite; // Cache the texture for this enemy for later
+        }
+        Vector3 pos                         = enemy.sprite.WorldCenter.ToVector3ZisY(-10f);
+        GameObject g                        = UnityEngine.Object.Instantiate(new GameObject(), pos, Quaternion.identity);
+        tk2dSpriteCollectionData collection = SpriteBuilder.ConstructCollection(g, "ghostcollection");
+        int spriteId                        = SpriteBuilder.AddSpriteToCollection(ghostSprite, collection, "ghostsprite");  //NOTE: this doesn't use PackerHelper since it's done at runtime
+        tk2dBaseSprite sprite               = g.AddComponent<tk2dSprite>();
+            sprite.SetSprite(collection, spriteId);
+            sprite.FlipX = enemy.sprite.FlipX;
+            sprite.FlipY = enemy.sprite.FlipY;
+            sprite.transform.localScale = enemy.sprite.transform.localScale;
+            sprite.transform.rotation = enemy.sprite.transform.rotation;
+            sprite.PlaceAtRotatedPositionByAnchor(pos, Anchor.MiddleCenter);
+        g.AddComponent<GhostlyDeath>().Setup(beam.Direction);
+    }
+}
 
 public class Exorcisable : MonoBehaviour
 {
-    private const float _EXORCISM_DPS   = 15.0f; // damage per second
+    internal const float _EXORCISM_DPS   = 15.0f; // damage per second
     private const float _EXORCISM_POWER = _EXORCISM_DPS / C.FPS; // damage per frame
 
     private static uint ExorcismSoundId = 0;
@@ -91,37 +145,6 @@ public class Exorcisable : MonoBehaviour
         //     sprite.gameObject.GetOrAddComponent<Encircler>();
         // }
 
-        float epower = _EXORCISM_POWER * (this._enemy.IsBlackPhantom ? HolyWaterGun._JAMMED_DAMAGE_MULT : 1f);
-        if (this._enemy.IsBlackPhantom && epower >= this._enemy.healthHaver.currentHealth)
-        {
-            PlayerController pc = beam.projectile.Owner as PlayerController;
-            pc.ownerlessStatModifiers.Add(new StatModifier() {
-                amount      = -1f,
-                modifyType  = StatModifier.ModifyMethod.ADDITIVE,
-                statToBoost = PlayerStats.StatType.Curse,
-                });
-            pc.stats.RecalculateStats(pc);
-
-            Texture2D ghostSprite;
-            if (HolyWaterGun._GhostTextures.ContainsKey(this._enemy.EnemyGuid))
-                ghostSprite = HolyWaterGun._GhostTextures[this._enemy.EnemyGuid]; // If we've already computed a texture for this enemy, don't do it again
-            else
-            {
-                ghostSprite = Lazy.GetTexturedEnemyIdleAnimation(this._enemy, new Color(1f,1f,1f,1f), 0.3f);
-                HolyWaterGun._GhostTextures[this._enemy.EnemyGuid] = ghostSprite; // Cache the texture for this enemy for later
-            }
-            Vector3 pos                         = this._enemy.sprite.WorldCenter.ToVector3ZisY(-10f);
-            GameObject g                        = UnityEngine.Object.Instantiate(new GameObject(), pos, Quaternion.identity);
-            tk2dSpriteCollectionData collection = SpriteBuilder.ConstructCollection(g, "ghostcollection");
-            int spriteId                        = SpriteBuilder.AddSpriteToCollection(ghostSprite, collection, "ghostsprite");  //NOTE: this doesn't use PackerHelper since it's done at runtime
-            tk2dBaseSprite sprite               = g.AddComponent<tk2dSprite>();
-                sprite.SetSprite(collection, spriteId);
-                sprite.PlaceAtPositionByAnchor(pos, Anchor.MiddleCenter);
-            g.AddComponent<GhostlyDeath>().Setup(beam.Direction);
-        }
-        this._enemy.healthHaver.ApplyDamage( //REFACTOR: use DamageAdjuster?
-            epower, beam.Direction, "Exorcism", CoreDamageTypes.Water, DamageCategory.Unstoppable, true, null, true);
-
         // Create particles
         if (UnityEngine.Random.Range(0f, 1f) < 0.25f)
         {
@@ -140,7 +163,7 @@ public class Exorcisable : MonoBehaviour
 public class GhostlyDeath : MonoBehaviour
 {
     private const float _FADE_TIME   = 2.5f;
-    private const float _DRIFT_SPEED = 0.15f / C.PIXELS_PER_TILE;
+    private const float _DRIFT_SPEED = 0.25f * C.PIXEL_SIZE;
 
     private float _lifetime;
     private tk2dSprite _sprite;
