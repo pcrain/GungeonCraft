@@ -16,6 +16,8 @@
 - Fixed Scotsman projectiles freaking out when used with Helix Bullets
 - Fixed Grandmaster projectiles continuously bouncing against walls with Bouncy Bullets
 - Fixed Grandmaster projectiles freaking out when used with Helix Bullets
+- Made Bouncer projectiles number of bounces stack with Bouncy Bullets
+- Fixed Bouncer projectiles freaking out when used with Helix Bullets
 
 ## 1.10.2 (2024-03-22)
 

@@ -71,7 +71,7 @@ public class HarmlessUntilBounce : MonoBehaviour
         this._damageMult = this._owner.DamageMult();
 
         BounceProjModifier bounce = this._projectile.gameObject.GetOrAddComponent<BounceProjModifier>();
-            bounce.numberOfBounces     = 3; // needs to be more than 1 or projectile dies immediately in special handling code below
+            bounce.numberOfBounces     += 3; // needs to be more than 1 or projectile dies immediately in special handling code below
             bounce.chanceToDieOnBounce = 0f;
             bounce.OnBounce += OnBounce;
             bounce.onlyBounceOffTiles = true;
@@ -125,6 +125,7 @@ public class HarmlessUntilBounce : MonoBehaviour
     {
         ++this._currentBounces;
 
+        this._projectile.m_usesNormalMoveRegardless = true; // temporarily disable Helix Projectile shenanigans
         this._bounceStarted = true;
         this._projectile.StartCoroutine(DoElasticBounce());
     }
@@ -173,5 +174,6 @@ public class HarmlessUntilBounce : MonoBehaviour
         this._bounceFinished = true;
         this._projectile.specRigidbody.CollideWithTileMap = true;
         this._projectile.specRigidbody.CollideWithOthers = true;
+        this._projectile.m_usesNormalMoveRegardless = false; // reenable Helix Projectile shenanigans
     }
 }
