@@ -25,9 +25,12 @@
 - Fixed Gunbrella projectiles being non-functional when fired using Duct Tape or Ring of Triggers
 - Fixed Gunbrella firing Backup Gun projectiles forwards
 - Made Gunbrella projectiles target a random enemy when no Gunbrella reticle is present
+- Silence Gunbrella debug log spam when duct taped to another gun
 - Fixed Seltzer Pelter projectiles freaking out when used with Helix Bullets
 - Fixed Carpet Bomber projectiles freaking out when used with Helix Bullets or Orbital Bullets
 - Fixed Lightwing projectiles freaking out when used with Helix Bullets or Orbital Bullets (by disregarding the modifiers completely)
+- Fixed idle animation for Crapshooter playing way too fast
+- Fixed idle animation speed for Ki Blast, Deadline, Schrodinger's Gat, Racket Launcher, Subtractor Beam, Wavefront, and Alien Nailgun not being set correctly after recent changes
 
 ## 1.10.2 (2024-03-22)
 

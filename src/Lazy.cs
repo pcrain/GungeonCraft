@@ -156,7 +156,7 @@ public static class Lazy
 
         #region Set up trimmed idle sprites so we don't have wonky hitboxes for very large animations
             gun.QuickUpdateGunAnimation(LargeGunAnimationHotfix._TRIM_ANIMATION, returnToIdle: true);
-            string fixedIdleAnimation = $"{gun.InternalSpriteName()}_{LargeGunAnimationHotfix._TRIM_ANIMATION}";
+            string fixedIdleAnimation = gun.GetFixedIdleAnimationName();
             tk2dSpriteAnimationClip originalIdleClip = gun.spriteAnimator.GetClipByName(gun.idleAnimation);
             int fixedIdleAnimationClipId = gun.spriteAnimator.GetClipIdByName(fixedIdleAnimation);
             if (fixedIdleAnimationClipId != -1)

@@ -791,7 +791,11 @@ public static class Extensions
     if (carryOffset.HasValue)
       gun.carryPixelOffset = carryOffset.Value;
 
-    if (idleFps.HasValue)    gun.SetAnimationFPS(gun.idleAnimation, idleFps.Value);
+    if (idleFps.HasValue)
+    {
+      gun.SetAnimationFPS(gun.GetOriginalIdleAnimationName(), idleFps.Value);
+      gun.SetAnimationFPS(gun.GetFixedIdleAnimationName(), idleFps.Value);
+    }
     if (shootFps.HasValue)   gun.SetAnimationFPS(gun.shootAnimation, shootFps.Value);
     if (reloadFps.HasValue)  gun.SetAnimationFPS(gun.reloadAnimation, reloadFps.Value);
     if (chargeFps.HasValue)  gun.SetAnimationFPS(gun.chargeAnimation, chargeFps.Value);
@@ -1054,13 +1058,6 @@ public static class Extensions
   public static string SafeName(this string s)
   {
     return s.Replace(" ", "_").Replace("'","").Replace(".","").ToLower();
-  }
-
-  /// <summary>Set the FPS for a gun's idle animation (including the fixed idle animation, if available)</summary>
-  public static void SetIdleAnimationFPS(this Gun gun, int fps)
-  {
-    gun.SetAnimationFPS($"{gun.InternalSpriteName()}_idle", fps);
-    gun.SetAnimationFPS($"{gun.InternalSpriteName()}_{LargeGunAnimationHotfix._TRIM_ANIMATION}", fps);
   }
 
   /// <summary>Force a gun to render on top of the player (call this in LateUpdate())</summary>
@@ -1890,5 +1887,17 @@ public static class Extensions
     });
     if (updateStats)
       player.stats.RecalculateStats(player);
+  }
+
+  /// <summary>Get the original idle animation name for a gun</summary>
+  public static string GetOriginalIdleAnimationName(this Gun gun)
+  {
+    return $"{gun.InternalSpriteName()}_idle";
+  }
+
+  /// <summary>Get the trimmed idle animation name for a gun</summary>
+  public static string GetFixedIdleAnimationName(this Gun gun)
+  {
+    return $"{gun.InternalSpriteName()}_{LargeGunAnimationHotfix._TRIM_ANIMATION}";
   }
 }
