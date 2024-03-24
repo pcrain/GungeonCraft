@@ -13,7 +13,7 @@ public class PistolWhip : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<PistolWhip>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 0.01f, ammo: 100, shootFps: 30, reloadFps: 40, curse: 3f);
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 0.01f, ammo: 100, shootFps: 30, reloadFps: 40, curse: 3f, infiniteAmmo: true);
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
 
         gun.InitProjectile(GunData.New(ammoCost: 0, clipSize: -1, cooldown: WhipChainStart.TOTAL_TIME + C.FRAME, shootStyle: ShootStyle.SemiAutomatic,
@@ -36,7 +36,7 @@ public class PistolWhip : AdvancedGunBehavior
     }
 }
 
-public class PistolButtProjectile : MonoBehaviour
+public class PistolButtProjectile : MonoBehaviour  //TODO: possibly reuse this as a TransientProjectile (e.g., for Vladimir)
 {
     private void Start()
     {
@@ -59,7 +59,7 @@ public class WhipChainStartProjectile : MonoBehaviour
     {
         UnityEngine.GameObject.Instantiate(new GameObject(), Vector3.zero, Quaternion.identity)
             .AddComponent<WhipChainStart>()
-            .Setup(base.gameObject.GetComponent<Projectile>()?.Owner as PlayerController);
+            .Setup(base.gameObject.GetComponent<Projectile>().Owner as PlayerController, base.gameObject.GetComponent<Projectile>().Direction.ToAngle());
         UnityEngine.GameObject.Destroy(base.gameObject);
     }
 }
@@ -91,11 +91,11 @@ public class WhipChainStart : MonoBehaviour
     private float _angle;
     private List<GameObject> _links;
 
-    public void Setup(PlayerController owner)
+    public void Setup(PlayerController owner, float angle)
     {
         gunSprite ??= (ItemHelper.Get(Items.Magnum) as Gun).sprite;
         this._owner = owner;
-        this._angle = this._owner.m_currentGunAngle.Clamp180();
+        this._angle = angle;
         this._links = new();
         for (int i = 0; i < _CHAIN_LENGTH; ++i)
             this._links.Add(null);
@@ -171,14 +171,10 @@ public class WhipChainStart : MonoBehaviour
 
                 Vector3 pos = basePos + baseEuler * (_WHIP_RANGE * Vector2.right + barrelOffset);
 
-                if (this._owner.CurrentGun.GetComponent<PistolWhip>() && this._owner.CurrentGun.CurrentAmmo > 1)
-                {
-                    this._owner.CurrentGun.LoseAmmo(1);
-                    Projectile proj = SpawnManager.SpawnProjectile(PistolWhip._PistolWhipProjectile.gameObject, pos, baseEuler).GetComponent<Projectile>();
-                        proj.Owner = this._owner;
-                        proj.collidesWithEnemies = true;
-                        proj.collidesWithPlayer = false;
-                }
+                Projectile proj = SpawnManager.SpawnProjectile(PistolWhip._PistolWhipProjectile.gameObject, pos, baseEuler).GetComponent<Projectile>();
+                    proj.Owner = this._owner;
+                    proj.collidesWithEnemies = true;
+                    proj.collidesWithPlayer = false;
 
                 Projectile proj2 = SpawnManager.SpawnProjectile(PistolWhip._PistolButtProjectile.gameObject, pos, baseEuler).GetComponent<Projectile>();
                     proj2.Owner = this._owner;

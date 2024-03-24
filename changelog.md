@@ -19,6 +19,9 @@
 - Made Bouncer projectiles number of bounces stack with Bouncy Bullets
 - Fixed Bouncer projectiles freaking out when used with Helix Bullets
 - Fixed B. B. Gun projectiles freaking out when used with Helix Bullets
+- Gave Pistol Whip Infinite Ammo for its pistol projectile (whip itself already had infinite ammo)
+- Made Pistol Whip take spread into account instead of having perfect accuracy
+- Fixed Pistol Whip not working well with Scattershot, Backup Gun, and Ring of Triggers
 
 ## 1.10.2 (2024-03-22)
 
