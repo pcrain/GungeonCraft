@@ -63,6 +63,7 @@ public sealed class GunData
   public float? shrapnelMinVelocity;
   public float? shrapnelMaxVelocity;
   public float? shrapnelLifetime;
+  public bool? preventOrbiting;
 
   /// <summary>Pseudo-constructor holding most setup information required for a single projectile gun.</summary>
   /// <param name="gun">The gun we're attaching to (can be null, only used for custom clip sprite name resolution for now).</param>
@@ -121,6 +122,7 @@ public sealed class GunData
   /// <param name="shrapnelMinVelocity"></param>
   /// <param name="shrapnelMaxVelocity"></param>
   /// <param name="shrapnelLifetime"></param>
+  /// <param name="preventOrbiting"></param>
   public static GunData New(Gun gun = null, Projectile baseProjectile = null, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
     ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1, GameUIAmmoType.AmmoType? ammoType = null,
     bool customClip = false, float? damage = null, float? speed = null, float? force = null, float? range = null, float? recoil = null, float poison = 0.0f, float fire = 0.0f, float freeze = 0.0f, float slow = 0.0f,
@@ -128,7 +130,7 @@ public sealed class GunData
     string sprite = null, int fps = 2, Anchor anchor = Anchor.MiddleCenter, float scale = 1.0f, bool anchorsChangeColliders = true, bool fixesScales = true, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null,
     IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null, float bossDamageMult = 1.0f, string destroySound = null, bool? shouldRotate = null, int barrageSize = 1,
     bool? shouldFlipHorizontally = null, bool? shouldFlipVertically = null, bool useDummyChargeModule = false, bool invisibleProjectile = false, string spawnSound = null, bool? stopSoundOnDeath = null, string deathSound = null,
-    bool? uniqueSounds = null, GameObject shrapnelVFX = null, int? shrapnelCount = null, float? shrapnelMinVelocity = null, float? shrapnelMaxVelocity = null, float? shrapnelLifetime = null
+    bool? uniqueSounds = null, GameObject shrapnelVFX = null, int? shrapnelCount = null, float? shrapnelMinVelocity = null, float? shrapnelMaxVelocity = null, float? shrapnelLifetime = null, bool? preventOrbiting = null
     )
   {
       _Instance.gun                           = gun; // set by InitSpecialProjectile()
@@ -183,6 +185,7 @@ public sealed class GunData
       _Instance.shrapnelMinVelocity           = shrapnelMinVelocity;
       _Instance.shrapnelMaxVelocity           = shrapnelMaxVelocity;
       _Instance.shrapnelLifetime              = shrapnelLifetime;
+      _Instance.preventOrbiting               = preventOrbiting;
       return _Instance;
   }
 }
@@ -273,6 +276,7 @@ public static class GunBuilder
       c.shrapnelMinVelocity = b.shrapnelMinVelocity ?? c.shrapnelMinVelocity;
       c.shrapnelMaxVelocity = b.shrapnelMaxVelocity ?? c.shrapnelMaxVelocity;
       c.shrapnelLifetime    = b.shrapnelLifetime    ?? c.shrapnelLifetime;
+      c.preventOrbiting     = b.preventOrbiting     ?? c.preventOrbiting;
 
     // Non-defaulted
     p.BossDamageMultiplier                            = b.bossDamageMult;

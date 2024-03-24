@@ -20,7 +20,7 @@ public class RacketLauncher : AdvancedGunBehavior
                 idleFps: _IDLE_FPS, shootFps: 60);
             gun.spriteAnimator.playAutomatically = false; // don't autoplay idle animation when dropped
 
-        gun.InitProjectile(GunData.New(ammoCost: 0, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true,
+        gun.InitProjectile(GunData.New(ammoCost: 0, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, preventOrbiting: true,
           damage: 10.0f, speed: 20.0f, range: 300.0f, force: 12f, sprite: "tennis_ball", fps: 12, scale: 0.6f, anchor: Anchor.MiddleCenter, surviveRigidbodyCollisions: true
           )).Attach<TennisBall>(); // DestroyMode must be set at creation time
     }

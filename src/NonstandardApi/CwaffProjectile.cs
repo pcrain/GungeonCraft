@@ -13,6 +13,7 @@ public class CwaffProjectile : MonoBehaviour
     public float shrapnelMinVelocity = 4f;
     public float shrapnelMaxVelocity = 8f;
     public float shrapnelLifetime    = 0.3f;
+    public bool preventOrbiting      = false;
 
     private Projectile _projectile;
     private PlayerController _owner;
@@ -75,5 +76,17 @@ public class CwaffProjectile : MonoBehaviour
     private void SpawnShrapnel()
     {
 
+    }
+
+    /// <summary>Prevent projectiles from being affected by Orbital Bullets if preventOrbiting is set</summary>
+    [HarmonyPatch(typeof(GunVolleyModificationItem), nameof(GunVolleyModificationItem.HandleStartOrbit))]
+    private class PreventOrbitingPatch
+    {
+        static bool Prefix(GunVolleyModificationItem __instance, BounceProjModifier bouncer, SpeculativeRigidbody srb)
+        {
+            if (bouncer.projectile.GetComponent<CwaffProjectile>() is not CwaffProjectile c)
+              return true; // call the original method
+            return !c.preventOrbiting; // skip the original method iff we are supposed to prevent orbiting
+        }
     }
 }

@@ -40,6 +40,7 @@
 - Fixed Blackjack projectiles freaking out when used with Helix Bullets or Orbital Bullets
 - Fixed deployed Chekhov's Gun sightlines following the cursor when the player has Remote Bullets
 - Fixed deployed Chekhov's Gun sprites appearing far away from the player's gun sprites with certain rotations
+- Blacklisted Racket Launcher projectiles from being affected by Orbital Bullets
 
 ## 1.10.2 (2024-03-22)
 
