@@ -88,7 +88,7 @@ public class SubtractorBeam : AdvancedGunBehavior
 
         foreach (AIActor enemy in activeEnemies)
         {
-            if (!enemy.IsHostile())
+            if (!enemy.IsHostile(canBeNeutral: true))
                 continue;
             if (!enemy.gameObject.GetComponent<Nametag>())
             {

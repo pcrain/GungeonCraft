@@ -50,6 +50,7 @@
 - Fixed null dereference in Schrodinger's Gat due to incorrectly referencing projectiles belonging to despawned enemies
 - Fixed chicks spawned from the Hatchling Gun not being marked as harmless enemies and being targeted by things they shouldn't be
 - Fixed several guns being able to target enemies internally marked as "not worth shooting at"
+- Fixed Subtractor Beam not displaying health for neutral enemies like Chance Kin or Key Bullet Kin
 
 ## 1.10.2 (2024-03-22)
 
