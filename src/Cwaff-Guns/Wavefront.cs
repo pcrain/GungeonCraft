@@ -57,7 +57,7 @@ public class TeslaProjectileBehavior : MonoBehaviour
 
     private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
     {
-        if (!otherRigidbody.GetComponent<AIActor>())
+        if (otherRigidbody.GetComponent<AIActor>() is not AIActor enemy || !enemy.IsHostile(canBeNeutral: true))
             PhysicsEngine.SkipCollision = true;
         else
             base.gameObject.Play("wavefront_projectile_impact_sound");

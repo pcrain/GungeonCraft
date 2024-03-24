@@ -52,6 +52,7 @@
 - Fixed several guns being able to target enemies internally marked as "not worth shooting at"
 - Fixed Subtractor Beam not displaying health for neutral enemies like Chance Kin or Key Bullet Kin
 - Fixed Blamethrower being able to scapegoat enemies outside of the current room
+- Fixed Wavefront projectiles noisily colliding with player companions
 
 ## 1.10.2 (2024-03-22)
 
