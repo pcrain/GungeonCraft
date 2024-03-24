@@ -136,7 +136,11 @@ public abstract class ChessPiece : MonoBehaviour
             this._projectile.SetSpeed(Mathf.Min(this._speed, adjSpeed));
         }
         else
+        {
+            this._targetVec = this._speed * GetBestValidAngleForPiece(this._projectile.m_currentDirection.ToAngle()).ToVector();
             this._projectile.SetSpeed(this._speed);
+        }
+
         this._projectile.SendInDirection(this._targetVec, true);
     }
 
@@ -144,6 +148,7 @@ public abstract class ChessPiece : MonoBehaviour
     {
         this.gameObject.Play("chess_move");
         this._projectile.SetSpeed(0.001f);
+        this._projectile.m_usesNormalMoveRegardless = true; // disable movement modifiers such as Helix Bullets and Orbital Bullets
     }
 
     protected float LockAngleToOneOf(float angle, IEnumerable<float> angles)
