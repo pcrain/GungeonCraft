@@ -36,7 +36,9 @@ public class SchrodingersGat : AdvancedGunBehavior
     {
         if (!p || p.Owner is not AIActor enemy)
             return;
-        if (!(enemy.gameObject.GetComponent<SchrodingersStat>()?.IsActuallyDead() ?? false))
+        if (!enemy || !enemy.gameObject || enemy.gameObject.GetComponent<SchrodingersStat>() is not SchrodingersStat ss)
+            return;
+        if (!ss.IsActuallyDead())
             return;
         SchrodingersEnemyProjectile sp = p.gameObject.GetOrAddComponent<SchrodingersEnemyProjectile>();
     }
