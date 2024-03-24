@@ -33,7 +33,7 @@ public class BBGun : AdvancedGunBehavior
         gun.DefaultModule.chargeProjectiles.Clear();
         for (int i = 0; i < _CHARGE_LEVELS.Length; i++)
             gun.DefaultModule.chargeProjectiles.Add(new ProjectileModule.ChargeProjectile {
-                Projectile = p.Clone(GunData.New(speed: 40f + 20f * i)).Attach<TheBB>(bb => bb.chargeLevel = i+1 ),
+                Projectile = p.Clone(GunData.New(speed: 40f + 20f * i)).Attach<TheBB>(),
                 ChargeTime = _CHARGE_LEVELS[i],
             });
     }
@@ -60,7 +60,6 @@ public class TheBB : MonoBehaviour
     private const float _BASE_ANIM_SPEED    = 2.0f;
     private const float _BOUNCE_SPEED_DECAY = 0.9f;
 
-    public int chargeLevel = 0;
     public bool isAFreebie = true; // false if we fired directly from the gun and it cost us ammo, true otherwise
 
     private Projectile _projectile;
@@ -70,11 +69,8 @@ public class TheBB : MonoBehaviour
     private void Start()
     {
         this._projectile = base.GetComponent<Projectile>();
-        if (this._projectile.Owner is PlayerController pc)
-            this._owner = pc;
+        this._owner = this._projectile.Owner as PlayerController;
 
-        this._projectile.collidesWithPlayer = true;
-        // this._projectile.DestroyMode = Projectile.ProjectileDestroyMode.DestroyComponent;
         if (!this.isAFreebie)
             this._projectile.OnDestruction += CreateInteractible;
         this._maxSpeed = this._projectile.baseData.speed;
@@ -87,6 +83,7 @@ public class TheBB : MonoBehaviour
     public void OnBounce()
     {
         this._projectile.MultiplySpeed(_BOUNCE_SPEED_DECAY);
+        this._projectile.SendInDirection(this._projectile.m_currentDirection, resetDistance: false, updateRotation: true);
     }
 
     private void CreateInteractible(Projectile p)
