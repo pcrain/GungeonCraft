@@ -8,7 +8,6 @@ public class Scotsman : AdvancedGunBehavior
     public static string Lore             = "Hailing straight from the Motherland, this weapon is a favorite among the explosion-loving Scots whose name it bears. The gun's sticky projectiles and ability to detonate them on command takes out much of the guesswork involved when using traditional firearms, ensuring substantial destructive output even when its wielder happens to be drunk, half-blind, or both.";
 
     private const float _MAX_RETICLE_RANGE = 16f;
-    private const float _MAX_SPREAD        = 2f;
 
     internal static ExplosionData _ScotsmanExplosion = null;
     internal static GameObject _ScotsmanReticle = null;
@@ -123,11 +122,7 @@ public class Scotsman : AdvancedGunBehavior
 
         Stickybomb sticky = projectile.GetComponent<Stickybomb>();
         this._extantStickies.Add(sticky);
-
-        float spread = _MAX_SPREAD * player.AccuracyMult();
-        Vector2 adjustedTarget = this._aimPoint + Lazy.RandomVector(spread * UnityEngine.Random.value);
-        projectile.SendInDirection(adjustedTarget - this.gun.barrelOffset.PositionVector2(), true);
-        sticky.Setup(adjustedTarget);
+        sticky.Setup(this._aimPoint);
     }
 
     private void DetonateStickies(PlayerController pc)
@@ -154,6 +149,8 @@ public class Stickybomb : MonoBehaviour
     private bool             _detonateSequenceStarted;
     private bool             _stuck;
     private Vector2          _target;
+    private Vector2          _startPos;
+    private float            _targetDist;
     private Vector2          _stickPoint = Vector2.zero;
     private AIActor          _stuckEnemy = null;
 
@@ -164,7 +161,10 @@ public class Stickybomb : MonoBehaviour
         this._scotsman                = this._owner.CurrentGun.GetComponent<Scotsman>();
         this._detonateSequenceStarted = false;
         this._stuck                   = false;
-        this._target                  = target;
+
+        this._target     = target;
+        this._startPos   = base.transform.position.XY();
+        this._targetDist = (this._target - this._startPos).magnitude;
 
         StartCoroutine(LockAndLoad());
     }
@@ -221,26 +221,22 @@ public class Stickybomb : MonoBehaviour
         this._projectile.BulletScriptSettings.surviveTileCollisions = true;
         this._projectile.specRigidbody.OnRigidbodyCollision += this.StickToSurface;
         this._projectile.specRigidbody.OnTileCollision += this.StickToSurface;
-        float lastDistanceToTarget = 99999f;
         while (!this._stuck)
         {
-            Vector2 curpos = this._projectile.specRigidbody.Position.GetPixelVector2();
-            Vector2 delta = (this._target - curpos);
-            float distanceToTarget = delta.magnitude;
-            if (distanceToTarget > lastDistanceToTarget)
+            Vector2 curpos = base.transform.position.XY(); //NOTE: can't use specrigidbody position for first frame of existence as it's not valid
+            if ((this._startPos - curpos).magnitude > this._targetDist)
             {
                 StickToSurface(curpos);
                 break;
             }
             float lifetime = BraveTime.ScaledTimeSinceStartup - launchTime;
-            this._projectile.sprite.transform.localRotation = (delta.ToAngle() + 3000f * Mathf.Sin(lifetime)).EulerZ();
-            lastDistanceToTarget = distanceToTarget;
+            this._projectile.sprite.transform.localRotation = (3000f * Mathf.Sin(lifetime)).EulerZ();
             yield return null;
         }
 
         // Phase 2, lie in wait
         this._projectile.damageTypes &= (~CoreDamageTypes.Electric);  // remove electric effect after stopping
-        while (!this._detonateSequenceStarted)
+        while (!this._detonateSequenceStarted && this._scotsman)  // skip this sequence if not fired from Scotsman
             yield return null;
 
         // Phase 3, primed for detonation

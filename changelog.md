@@ -10,6 +10,8 @@
 - Fixed B. B. Gun being able to launch glitchy uncharged projectiles
 - Fixed freebie projectiles from B. B. Gun being able to restore ammo
 - Fixed null dereference when K.A.L.I. projectiles are spawned by, e.g., Ring of Triggers
+- Fixed Scotsman projectiles all being sent in the same direction with Backup Gun
+- Fixed Scotsman ignoring mouse when used with Remote Bullets
 
 ## 1.10.2 (2024-03-22)
 
