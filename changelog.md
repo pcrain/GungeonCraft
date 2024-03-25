@@ -1,61 +1,55 @@
 # Changelog
 
-## Future
-- Fixed Natascha firing every single frame with certain projectile-duplicating items such as Scattershot, Backup Gun, and Helix Bullets
+## 1.10.3 (2024-03-24)
+
+#### Bugfixes:
+- Fixed several guns being able to target enemies internally marked as "not worth shooting at"
+- Fixed idle animation speed for Ki Blast, Deadline, Schrodinger's Gat, Racket Launcher, Subtractor Beam, Wavefront, and Alien Nailgun not being set up correctly after a recent update
+- Fixed Grandmaster, Scotsman, Bouncer, B. B. Gun, Seltzer Pelter, Carpet Bomber, Lightwing, and Blackjack projectiles freaking out when used with Helix Bullets
+- Limited length of Aimu Hakurei, Subtractor Beam, and Omnidirectional Laser projectile trails after bouncing
+- Fixed Carpet Bomber, Lightwing, and Blackjack projectiles freaking out when used with Orbital Bullets
+- Fixed Pistol Whip, Jugglernaut, and Deadline projectiles not respecting aim deviation from items like Backup Gun or Scattershot
 - Fixed King's Law and Iron Maid not launching bullets when player has instant reloads
-- Fixed null dereference caused by spawning Iron Maid projectiles from other guns (e.g., with Duct Tape or Chance Bullets)
-- Fixed Deadline projectiles not respecting aim deviation from items like Backup Gun or Scattershot
-- Fixed Deadline projectiles not working properly when not spawned from Deadline (e.g., with Duct Tape or Chance Bullets)
-- Deadline projectiles are now hitscan projectiles
-- Fixed B. B. Gun being able to launch glitchy uncharged projectiles
-- Fixed freebie projectiles from B. B. Gun being able to restore ammo
-- Fixed null dereference when K.A.L.I. projectiles are spawned by, e.g., Ring of Triggers
-- Fixed Scotsman projectiles all being sent in the same direction with Backup Gun
-- Fixed Scotsman ignoring mouse when used with Remote Bullets
-- Fixed Scotsman projectiles despawning immediately when not spawned with Scotsman (e.g., with Duct Tape or Chance Bullets)
-- Fixed Scotsman projectiles freaking out when used with Helix Bullets
-- Fixed Grandmaster projectiles continuously bouncing against walls with Bouncy Bullets
-- Fixed Grandmaster projectiles freaking out when used with Helix Bullets
-- Made Bouncer projectiles number of bounces stack with Bouncy Bullets
-- Fixed Bouncer projectiles freaking out when used with Helix Bullets
-- Fixed B. B. Gun projectiles freaking out when used with Helix Bullets
-- Gave Pistol Whip Infinite Ammo for its pistol projectile (whip itself already had infinite ammo)
-- Made Pistol Whip take spread into account instead of having perfect accuracy
-- Fixed Pistol Whip not working well with Scattershot, Backup Gun, and Ring of Triggers
+- Blacklisted Racket Launcher and Seltzer Pelter projectiles from being affected by Orbital Bullets
+- Fixed Scotsman and Ki Blast projectiles ignoring reticle when used with Remote Bullets
 - Fixed Gunbrella projectiles being non-functional when fired using Duct Tape or Ring of Triggers
 - Fixed Gunbrella firing Backup Gun projectiles forwards
-- Made Gunbrella projectiles target a random enemy when no Gunbrella reticle is present
-- Silence Gunbrella debug log spam when duct taped to another gun
-- Fixed Seltzer Pelter projectiles freaking out when used with Helix Bullets
-- Fixed Carpet Bomber projectiles freaking out when used with Helix Bullets or Orbital Bullets
-- Fixed Lightwing projectiles freaking out when used with Helix Bullets or Orbital Bullets (by disregarding the modifiers completely)
-- Fixed idle animation for Crapshooter playing way too fast
-- Fixed idle animation speed for Ki Blast, Deadline, Schrodinger's Gat, Racket Launcher, Subtractor Beam, Wavefront, and Alien Nailgun not being set correctly after recent changes
-- Fixed Omnidirectional Laser extra projectiles (e.g., from Backup Bullets and Scattershot) always firing towards the reticle and overlapping the original projectile
-- Fixed Ki Blast ignoring mouse when used with Remote Bullets
+- Silenced Gunbrella debug log spam when duct taped to another gun
+- Fixed Scotsman projectiles all being sent in the same direction with Backup Gun
+- Fixed Scotsman projectiles despawning immediately when not spawned with Scotsman (e.g., with Duct Tape or Chance Bullets)
 - Fixed Ki Blast firing Backup Gun and Ring of Triggers projectiles forwards
-- Fixed Ki Blast projectiles not working when used with Helix Bullets
-- Fixed Pincushion firing Backup Gun projectiles forwards
-- Fixed Jugglernaut not working well with Scattershot and Backup Gun
-- Fixed Blackjack projectiles freaking out when used with Helix Bullets or Orbital Bullets
+- Fixed Ki Blast projectiles ignoring effects of Helix Bullets
 - Fixed deployed Chekhov's Gun sightlines following the cursor when the player has Remote Bullets
 - Fixed deployed Chekhov's Gun sprites appearing far away from the player's gun sprites with certain rotations
-- Blacklisted Racket Launcher projectiles from being affected by Orbital Bullets
-- Blacklisted Seltzer Pelter projectiles from being affected by Orbital Bullets
-- Fixed Holy Water Gun having an invisible beam when used with Orbital Bullets
+- Fixed null dereference caused by spawning Iron Maid projectiles from other guns (e.g., with Duct Tape or Chance Bullets)
 - Fixed null dereference when dropping Iron Maid with active projectiles
+- Fixed Natascha firing every single frame with certain projectile-duplicating items such as Scattershot, Backup Gun, and Helix Bullets
 - Fixed extremely high fire rate for guns duct-taped to Natascha
-- Limited length of Aimu Hakurei, Subtractor Beam, and Omnidirectional Laser projectile trails after bouncing
-- Tweaked Natascha spin up rate and max spin up speed
+- Fixed B. B. Gun being able to launch glitchy uncharged projectiles
+- Fixed freebie projectiles from B. B. Gun being able to restore ammo
+- Fixed Deadline projectiles not working properly when not spawned from Deadline (e.g., with Duct Tape or Chance Bullets)
+- Fixed null dereference when K.A.L.I. projectiles are spawned by Ring of Triggers
+- Fixed Grandmaster projectiles continuously bouncing against walls with Bouncy Bullets
+- Fixed idle animation for Crapshooter playing way too fast
+- Fixed Omnidirectional Laser secondary projectiles (e.g., from Backup Gun and Scattershot) always firing towards the reticle and overlapping the original projectile
+- Fixed Pincushion firing Backup Gun projectiles forwards
 - Fixed null dereference in Schrodinger's Gat due to incorrectly referencing projectiles belonging to despawned enemies
 - Fixed chicks spawned from the Hatchling Gun not being marked as harmless enemies and being targeted by things they shouldn't be
-- Fixed several guns being able to target enemies internally marked as "not worth shooting at"
 - Fixed Subtractor Beam not displaying health for neutral enemies like Chance Kin or Key Bullet Kin
 - Fixed Blamethrower being able to scapegoat enemies outside of the current room
 - Fixed Wavefront projectiles noisily colliding with player companions
+- Fixed Holy Water Gun having an invisible beam when used with Orbital Bullets
+
+#### Balance Changes:
 - Reduced Holy Water Gun ammo from 500 to 100
 - Reduced Holy Water Gun knockback from 50 to 15
-- Made Holy Water Gun respect bullet damage modifiers (rather than doing fixed damage)
+- Made Holy Water Gun respect bullet damage modifiers (previously dealt fixed damage)
+- Tweaked Natascha spin up mechanics, spin up rate, and max spin up speed
+- Made Gunbrella projectiles target a random enemy when no Gunbrella reticle is present
+- Gave Bouncer projectiles stacking bounces with Bouncy Bullets
+- Gave Deadline hitscan projectiles
+- Gave Pistol Whip infinite ammo for its pistol projectile (whip itself already had infinite ammo)
+- Made Pistol Whip take spread into account instead of having perfect accuracy
 
 ## 1.10.2 (2024-03-22)
 

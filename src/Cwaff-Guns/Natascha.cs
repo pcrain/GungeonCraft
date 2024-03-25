@@ -177,9 +177,6 @@ public class Natascha : AdvancedGunBehavior
             ILCursor cursor = new ILCursor(il);
             Type ot = original.DeclaringType;
 
-            foreach (FieldInfo f in AccessTools.GetDeclaredFields(ot))
-                ETGModConsole.Log($"  {f.Name}");
-
             if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchAdd())) // immediately after the first add is where we're looking for
                 return;
 
