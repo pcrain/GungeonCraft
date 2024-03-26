@@ -153,7 +153,7 @@ namespace Alexandria.cAPI
             // {"PlayerRogue(Clone)",  0f}, //TODO:
             // {"PlayerMarine(Clone)", 0f}, //TODO:
             {"PlayerGuide(Clone)", -14f/16f},
-            {"PlayerConvict(Clone)", -11f/16f}, //TODO:
+            {"PlayerConvict(Clone)", -11f/16f},
             {"PlayerRobot(Clone)", 0f},
             {"PlayerBullet(Clone)", -4f/16f},
             // {"PlayerGunslinger(Clone)", 0f}, //TODO:

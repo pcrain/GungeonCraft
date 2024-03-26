@@ -9,7 +9,7 @@ public static class CwaffHats
       GameObject toadHatObj = UnityEngine.Object.Instantiate(new GameObject())/*.RegisterPrefab()*/;
       Hat toadHatController = toadHatObj.AddComponent<Hat>();
       toadHatController.hatName = "toad_hat";
-      toadHatController.hatDepthType = Hat.HatDepthType.BehindWhenFacingBack;
+      // toadHatController.hatDepthType = Hat.HatDepthType.BehindWhenFacingBack;
 
       toadHatController.hatOffset = new Vector2(0f, -3f/16f);
       HatUtility.SetupHatSprites(ResMap.Get("toad_hat_south"), toadHatObj, 1, new Vector2(14f, 11f));

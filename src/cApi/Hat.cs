@@ -103,12 +103,6 @@ namespace Alexandria.cAPI
                 if (checkedDir != currentDirection) UpdateHatFacingDirection(checkedDir);
 
                 HandleAttachedSpriteDepth(m_currentGunAngle.GetTypedValue<float>(hatOwner));
-            }
-        }
-        private void FixedUpdate()
-		{
-            if (hatOwner)
-            {
                 HandleFlip();
             }
         }
@@ -467,8 +461,8 @@ namespace Alexandria.cAPI
         private IEnumerator FlipHatIENum()
         {
             currentState = HatState.FLIPPING;
-            endRollTime = Time.time + RollLength;
-            startTime = Time.time;
+            startRolTime = BraveTime.ScaledTimeSinceStartup;
+            endRollTime = startRolTime + RollLength;
 			yield return new WaitForSeconds(RollLength);
             StickHatToPlayer(hatOwner);
             if (GameManager.AUDIO_ENABLED && !string.IsNullOrEmpty(FlipEndedSound))
@@ -478,8 +472,8 @@ namespace Alexandria.cAPI
         }
 
 
+        float startRolTime;
         float endRollTime;
-        float startTime;
         private void HandleFlip()
         {
             
@@ -516,37 +510,42 @@ namespace Alexandria.cAPI
                                
                                 
                                 Vector3 rotatePoint = sprite.WorldCenter;
+                                float rollAmount = 360f * (BraveTime.DeltaTime / RollLength);
                                 if (FetchOwnerFacingDirection() == HatDirection.SOUTH || FetchOwnerFacingDirection() == HatDirection.NORTHEAST || FetchOwnerFacingDirection() == HatDirection.SOUTHEAST || FetchOwnerFacingDirection() == HatDirection.EAST)
                                 {
-                                    this.transform.RotateAround(this.sprite.WorldCenter, Vector3.forward, (-15 * (1 + Mathf.Abs(1 - hatOwner.rollStats.rollTimeMultiplier))) * SpinSpeedMultiplier);
+                                    this.transform.RotateAround(this.sprite.WorldCenter, Vector3.forward, -rollAmount * SpinSpeedMultiplier);
                                 }
                                 else
                                 {
-                                    this.transform.RotateAround(this.sprite.WorldCenter, Vector3.forward, (15 * (1 + Mathf.Abs(1 - hatOwner.rollStats.rollTimeMultiplier))) * SpinSpeedMultiplier);
+                                    this.transform.RotateAround(this.sprite.WorldCenter, Vector3.forward, rollAmount * SpinSpeedMultiplier);
                                 }
 
-                                if (Time.time - startTime < (endRollTime - startTime) * 0.01)
-                                    this.transform.position = GetHatPosition(hatOwner);
-                                else if (Time.time - startTime < (endRollTime - startTime) * 0.2)
-                                    this.transform.position += new Vector3(0, flipHeightMultiplier * 0.35f, 0);
-                                else if (Time.time - startTime < (endRollTime - startTime) * 0.2)
-                                    this.transform.position += new Vector3(0, flipHeightMultiplier * 0.3f, 0);
-                                else if (Time.time - startTime < (endRollTime - startTime) * 0.3)
-                                    this.transform.position += new Vector3(0, flipHeightMultiplier * 0.2f, 0);
-                                else if (Time.time - startTime < (endRollTime - startTime) * 0.4)
-                                    this.transform.position += new Vector3(0, flipHeightMultiplier * 0.15f, 0);
-                                else if (Time.time - startTime < (endRollTime - startTime) * 0.5)
-                                    this.transform.position += new Vector3(0, flipHeightMultiplier * 0.05f, 0);
-                                else if (Time.time - startTime < (endRollTime - startTime) * 0.6)
-                                    this.transform.position -= new Vector3(0, flipHeightMultiplier * 0.05f, 0);
-                                else if (Time.time - startTime < (endRollTime - startTime) * 0.7)
-                                    this.transform.position -= new Vector3(0, flipHeightMultiplier * 0.15f, 0);
-                                else if (Time.time - startTime < (endRollTime - startTime) * 0.8)
-                                    this.transform.position -= new Vector3(0, flipHeightMultiplier * 0.2f, 0);
-                                else if (Time.time - startTime < (endRollTime - startTime) * 0.9)
-                                    this.transform.position -= new Vector3(0, flipHeightMultiplier * 0.3f, 0);
-                                else
-                                    this.transform.position -= new Vector3(0, flipHeightMultiplier * 0.35f, 0);
+                                float elapsed = BraveTime.ScaledTimeSinceStartup - startRolTime;
+                                float percentDone = elapsed / RollLength;
+                                this.transform.position = GetHatPosition(hatOwner) + new Vector3(0, 2f * flipHeightMultiplier * Mathf.Sin(Mathf.PI * percentDone), 0);
+
+                                // if (elapsed < (endRollTime - startTime) * 0.01)
+                                //     this.transform.position = GetHatPosition(hatOwner);
+                                // else if (elapsed < (endRollTime - startTime) * 0.2)
+                                //     this.transform.position += new Vector3(0, flipHeightMultiplier * 0.35f, 0);
+                                // else if (elapsed < (endRollTime - startTime) * 0.2)
+                                //     this.transform.position += new Vector3(0, flipHeightMultiplier * 0.3f, 0);
+                                // else if (elapsed < (endRollTime - startTime) * 0.3)
+                                //     this.transform.position += new Vector3(0, flipHeightMultiplier * 0.2f, 0);
+                                // else if (elapsed < (endRollTime - startTime) * 0.4)
+                                //     this.transform.position += new Vector3(0, flipHeightMultiplier * 0.15f, 0);
+                                // else if (elapsed < (endRollTime - startTime) * 0.5)
+                                //     this.transform.position += new Vector3(0, flipHeightMultiplier * 0.05f, 0);
+                                // else if (elapsed < (endRollTime - startTime) * 0.6)
+                                //     this.transform.position -= new Vector3(0, flipHeightMultiplier * 0.05f, 0);
+                                // else if (elapsed < (endRollTime - startTime) * 0.7)
+                                //     this.transform.position -= new Vector3(0, flipHeightMultiplier * 0.15f, 0);
+                                // else if (elapsed < (endRollTime - startTime) * 0.8)
+                                //     this.transform.position -= new Vector3(0, flipHeightMultiplier * 0.2f, 0);
+                                // else if (elapsed < (endRollTime - startTime) * 0.9)
+                                //     this.transform.position -= new Vector3(0, flipHeightMultiplier * 0.3f, 0);
+                                // else
+                                //     this.transform.position -= new Vector3(0, flipHeightMultiplier * 0.35f, 0);
                             }
                         }
                         else
