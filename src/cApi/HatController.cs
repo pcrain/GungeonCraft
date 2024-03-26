@@ -152,10 +152,10 @@ namespace Alexandria.cAPI
         { //Vertical offset for where head-top hats should be placed on different characters (using character name)
             // {"PlayerRogue(Clone)",  0f}, //TODO:
             // {"PlayerMarine(Clone)", 0f}, //TODO:
-            // {"PlayerGuide(Clone)", 0f}, //TODO:
-            // {"PlayerConvict(Clone)", 0f}, //TODO:
+            {"PlayerGuide(Clone)", -14f/16f},
+            {"PlayerConvict(Clone)", -11f/16f}, //TODO:
             {"PlayerRobot(Clone)", 0f},
-            // {"PlayerBullet(Clone)", 0f}, //TODO:
+            {"PlayerBullet(Clone)", -4f/16f},
             // {"PlayerGunslinger(Clone)", 0f}, //TODO:
             // {"PlayerCoopCultist(Clone)", 0f}, //TODO:
         };
@@ -200,7 +200,7 @@ namespace Alexandria.cAPI
             {"PlayerGunslinger(Clone)", 0f}, //TODO:
             {"PlayerCoopCultist(Clone)", 0f}, //TODO:
         };
-        public static float defaultHeadLevelOffset = 0.37f;
+        public static float defaultHeadLevelOffset = -14f/16f;
         public static float defaultEyeLevelOffset = 0.06f;
         public static float defaultFlippedOffset = 0.00f;
         public static float defaultFrontOffset = 0.00f;

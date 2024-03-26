@@ -305,13 +305,44 @@ namespace Alexandria.cAPI
 
         }
 
+        public static readonly Dictionary<string, float> BobOffsets = new(){
+            {"convict_idle_002", -1/16f},
+            {"convict_idle_front_002", -1/16f},
+            {"convict_idle_back_002", -1/16f},
+            {"convict_idle_bw_002", -1/16f},
+            {"convict_idle_003", -1/16f},
+            {"convict_idle_front_003", -1/16f},
+            {"convict_idle_back_003", -1/16f},
+            {"convict_idle_bw_003", -1/16f},
+
+            {"convict_run_forward_001", -1/16f},
+            {"convict_run_forward_002", 2/16f},
+            {"convict_run_forward_004", -1/16f},
+            {"convict_run_forward_005", 2/16f},
+
+            {"convict_run_backwards_001", -1/16f},
+            {"convict_run_backwards_002", 2/16f},
+            {"convict_run_backwards_004", -1/16f},
+            {"convict_run_backwards_005", 2/16f},
+
+            {"convict_run_north_001", -1/16f},
+            {"convict_run_north_002", 2/16f},
+            {"convict_run_north_004", -1/16f},
+            {"convict_run_north_005", 2/16f},
+
+            {"convict_run_south_001", -1/16f},
+            {"convict_run_south_002", 2/16f},
+            {"convict_run_south_004", -1/16f},
+            {"convict_run_south_005", 2/16f},
+        };
+
 		public Vector3 GetHatPosition(PlayerController player)
         {
             // get the base offset for every character
             Vector2 baseOffset = new Vector2(player.SpriteBottomCenter.x, player.sprite.WorldTopCenter.y);
 
             // get the player specific offset
-            Vector2 playerOffset = Vector2.zero; //TODO: finish
+            Vector2 playerOffset = Vector2.zero;
             if (PlayerHatDatabase.CharacterNameHatHeadLevel.TryGetValue(player.name, out float headLevel))
                 playerOffset = new Vector2(0f, headLevel);
 
@@ -338,7 +369,14 @@ namespace Alexandria.cAPI
                     _                      => Vector2.zero,
                 };
 
-            return baseOffset + hatOffset.XY() + playerOffset + directionalOffset;
+            Vector2 bobOffset = Vector2.zero;
+            string baseFrame = player.sprite.GetCurrentSpriteDef().name.Replace("_hands2","").Replace("_hands","").Replace("_hand","").Replace("_twohands","").Replace("_armorless","");
+            // ETGModConsole.Log($"  frame is {player.sprite.GetCurrentSpriteDef().name}");
+            if (BobOffsets.TryGetValue(baseFrame, out float bobAmount))
+                bobOffset = new Vector2(0f, bobAmount);
+
+
+            return baseOffset + hatOffset.XY() + playerOffset + directionalOffset + bobOffset;
             // if (attachLevel == HatAttachLevel.HEAD_TOP)
             // {
             //     if (PlayerHatDatabase.CharacterNameHatHeadLevel.ContainsKey(player.name))
