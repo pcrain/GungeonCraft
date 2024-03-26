@@ -85,6 +85,11 @@
     <Compile Include="src\Cwaff-Enemies\Bosses\Sans\Sans.cs"/>
     <Compile Include="src\Cwaff-Enemies\Bosses\Sans\SansAttacks.cs"/>
     <Compile Include="src\Cwaff-Enemies\PathableBullet.cs"/>
+    <Compile Include="src\cApi\HatController.cs"/>
+    <Compile Include="src\cApi\HatControllerAdder.cs"/>
+    <Compile Include="src\cApi\HatUtility.cs"/>
+    <Compile Include="src\cApi\Hat.cs"/>
+    <Compile Include="src\cApi\cAPIToolBox.cs"/>
     <Compile Include="src\Cwaff-Rooms\FancyShopBuilder.cs"/>
     <Compile Include="src\Extensions.cs"/>
     <Compile Include="src\Cwaff-NPCs\Bombo.cs"/>
