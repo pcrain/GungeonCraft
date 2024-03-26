@@ -92,6 +92,8 @@ namespace Alexandria.cAPI
 
             if (hatOwner)
             {
+                if (currentState == HatState.SITTING)
+                    StickHatToPlayer(hatOwner);
                 //Make the Hat vanish upon pitfall, or when the player rolls if the hat is VANISH type
                 HandleVanish();
                 //if(ETGModGUI.CurrentMenu != ETGModGUI.MenuOpened.Console)
@@ -305,31 +307,70 @@ namespace Alexandria.cAPI
 
 		public Vector3 GetHatPosition(PlayerController player)
         {
-            Vector3 vec = new Vector3();
-            if (attachLevel == HatAttachLevel.HEAD_TOP)
-            {
-                if (PlayerHatDatabase.CharacterNameHatHeadLevel.ContainsKey(player.name))
-                {
-                    vec = new Vector3(player.sprite.WorldCenter.x, player.sprite.WorldCenter.y + PlayerHatDatabase.CharacterNameHatHeadLevel[player.name], player.transform.position.z +1);
-                }
-                else { vec = (player.sprite.WorldCenter + new Vector2(0, PlayerHatDatabase.defaultHeadLevelOffset)); }
-            }
-            else if (attachLevel == HatAttachLevel.EYE_LEVEL)
-            {
-                if (PlayerHatDatabase.CharacterNameEyeLevel.ContainsKey(player.name))
-                {
-                    vec = (player.sprite.WorldCenter + new Vector2(0, PlayerHatDatabase.CharacterNameEyeLevel[player.name]));
-                }
-                else { vec = (player.sprite.WorldCenter + new Vector2(0, PlayerHatDatabase.defaultEyeLevelOffset)); }
-            }
-            vec += new Vector3(0, 0.03f, player.transform.position.z + 1);
-            vec += hatOffset;
-            return vec;
+            // get the base offset for every character
+            Vector2 baseOffset = new Vector2(player.SpriteBottomCenter.x, player.sprite.WorldTopCenter.y);
+
+            // get the player specific offset
+            Vector2 playerOffset = Vector2.zero; //TODO: finish
+            if (PlayerHatDatabase.CharacterNameHatHeadLevel.TryGetValue(player.name, out float headLevel))
+                playerOffset = new Vector2(0f, headLevel);
+
+            // determine the hat direction from the current animation name
+            HatDirection hatDirection = HatDirection.NONE;
+            string curAnim = player.spriteAnimator.currentClip.name;
+            bool flipped = player.sprite.FlipX;
+            if (curAnim.Contains("forward") || curAnim.Contains("run_down"))
+                hatDirection = HatDirection.SOUTH;
+            else if (curAnim.Contains("backward") || curAnim.Contains("run_up"))
+                hatDirection = HatDirection.NORTH;
+            else if (curAnim.Contains("bw"))
+                hatDirection = HatDirection.NORTHEAST;
+            else
+                hatDirection = HatDirection.EAST;
+
+            Vector2 directionalOffset = Vector2.zero;
+            if (PlayerHatDatabase.CharacterDirectionalHatOffsets.TryGetValue(player.name, out HatOffsets playerDirectionalHatOffsets))
+                directionalOffset = hatDirection switch {
+                    HatDirection.SOUTH     => (flipped ? playerDirectionalHatOffsets.frontFlipped : playerDirectionalHatOffsets.front),
+                    HatDirection.NORTH     => (flipped ? playerDirectionalHatOffsets.backFlipped : playerDirectionalHatOffsets.back),
+                    HatDirection.NORTHEAST => (flipped ? playerDirectionalHatOffsets.bwFlipped : playerDirectionalHatOffsets.bw),
+                    HatDirection.EAST      => (flipped ? playerDirectionalHatOffsets.fwFlipped : playerDirectionalHatOffsets.fw),
+                    _                      => Vector2.zero,
+                };
+
+            return baseOffset + hatOffset.XY() + playerOffset + directionalOffset;
+            // if (attachLevel == HatAttachLevel.HEAD_TOP)
+            // {
+            //     if (PlayerHatDatabase.CharacterNameHatHeadLevel.ContainsKey(player.name))
+            //     {
+            //         vec = new Vector3(basePos.x, basePos.y + PlayerHatDatabase.CharacterNameHatHeadLevel[player.name], player.transform.position.z +1);
+            //     }
+            //     else { vec = (basePos + new Vector2(0, PlayerHatDatabase.defaultHeadLevelOffset)); }
+            // }
+            // else if (attachLevel == HatAttachLevel.EYE_LEVEL)
+            // {
+            //     if (PlayerHatDatabase.CharacterNameEyeLevel.ContainsKey(player.name))
+            //     {
+            //         vec = (basePos + new Vector2(0, PlayerHatDatabase.CharacterNameEyeLevel[player.name]));
+            //     }
+            //     else { vec = (basePos + new Vector2(0, PlayerHatDatabase.defaultEyeLevelOffset)); }
+            // }
+            // vec += new Vector3(0, 0.03f, player.transform.position.z + 1);
+            // vec += hatOffset;
+            // if (player.sprite.FlipX)
+            // {
+            //     if (PlayerHatDatabase.CharacterNameFlippedOffset.ContainsKey(player.name))
+            //         vec += new Vector3(PlayerHatDatabase.CharacterNameFlippedOffset[player.name], 0f, 0f);
+            //     else
+            //         vec += new Vector3(PlayerHatDatabase.defaultFlippedOffset, 0f, 0f);
+            // }
+            // return vec;
         }
 
         public void StickHatToPlayer(PlayerController player)
         {
-            if (hatOwner == null) hatOwner = player;
+            if (hatOwner == null)
+                hatOwner = player;
             Vector2 vec = GetHatPosition(player);
             transform.position = vec;
             transform.rotation = hatOwner.transform.rotation;

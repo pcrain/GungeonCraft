@@ -14,7 +14,7 @@ namespace Alexandria.cAPI
 {
     public static class HatUtility
     {
-        public static AutocompletionSettings HatAutoCompletionSettings = new AutocompletionSettings(delegate (string input) {
+        private static AutocompletionSettings HatAutoCompletionSettings = new AutocompletionSettings(delegate (string input) {
             List<string> ret = new List<string>();
             foreach (string key in Hatabase.Hats.Keys)
             {
@@ -37,7 +37,7 @@ namespace Alexandria.cAPI
             }
         }
 
-		public static void SetHat(string[] args)
+		private static void SetHat(string[] args)
 		{
             if (args == null)
             {

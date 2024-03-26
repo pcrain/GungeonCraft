@@ -111,35 +111,99 @@ namespace Alexandria.cAPI
         
     }
 
+    public class HatOffsets
+    {
+        public Vector2 back;
+        public Vector2 backFlipped;
+        public Vector2 bw;
+        public Vector2 bwFlipped;
+        public Vector2 fw;
+        public Vector2 fwFlipped;
+        public Vector2 front;
+        public Vector2 frontFlipped;
+    }
+
     public class PlayerHatDatabase
     {
+        public static Dictionary<string, HatOffsets> CharacterDirectionalHatOffsets = new ()
+        {
+            // {"PlayerRogue(Clone)",  0.43f}, //TODO:
+            // {"PlayerMarine(Clone)", 0.37f }, //TODO:
+            // {"PlayerGuide(Clone)", 0.31f }, //TODO:
+            // {"PlayerConvict(Clone)", 0.37f}, //TODO:
+            {"PlayerRobot(Clone)", new(){
+                back         = Vector2.zero,
+                backFlipped  = new Vector2(1f / 16f, 0f),
+                bw           = new Vector2(1f / 16f, 0f),
+                bwFlipped    = Vector2.zero,
+                fw           = new Vector2(1f / 16f, 0f),
+                fwFlipped    = Vector2.zero,
+                front        = Vector2.zero,
+                frontFlipped = new Vector2(1f / 16f, 0f)
+            }},
+            // {"PlayerBullet(Clone)", 0.68f }, //TODO:
+            // {"PlayerGunslinger(Clone)", 0.56f }, //TODO:
+            // {"PlayerCoopCultist(Clone)", 0.43f }, //TODO:
+        };
         public static Dictionary<string, string> StoredHats = new Dictionary<string, string>()
         {
         };
         public static Dictionary<string, float> CharacterNameHatHeadLevel = new Dictionary<string, float>()
         { //Vertical offset for where head-top hats should be placed on different characters (using character name)
-            {"PlayerRogue(Clone)",  0.43f},
-            {"PlayerMarine(Clone)", 0.37f },
-            {"PlayerGuide(Clone)", 0.31f },
-            {"PlayerConvict(Clone)", 0.37f},
-            {"PlayerRobot(Clone)", 0.56f},
-            {"PlayerBullet(Clone)", 0.68f },
-            {"PlayerGunslinger(Clone)", 0.56f },
-            {"PlayerCoopCultist(Clone)", 0.43f },
+            // {"PlayerRogue(Clone)",  0f}, //TODO:
+            // {"PlayerMarine(Clone)", 0f}, //TODO:
+            // {"PlayerGuide(Clone)", 0f}, //TODO:
+            // {"PlayerConvict(Clone)", 0f}, //TODO:
+            {"PlayerRobot(Clone)", 0f},
+            // {"PlayerBullet(Clone)", 0f}, //TODO:
+            // {"PlayerGunslinger(Clone)", 0f}, //TODO:
+            // {"PlayerCoopCultist(Clone)", 0f}, //TODO:
         };
         public static Dictionary<string, float> CharacterNameEyeLevel = new Dictionary<string, float>()
         { //Vertical offset for where head-top hats should be placed on different characters (using character name)
-            {"PlayerRogue(Clone)",  0.18f},
-            {"PlayerMarine(Clone)", 0.12f },
-            {"PlayerGuide(Clone)", -0.18f },
-            {"PlayerConvict(Clone)", -0.06f},
-            {"PlayerRobot(Clone)", 0.25f},
-            {"PlayerBullet(Clone)", -0.31f },
-            {"PlayerGunslinger(Clone)", 0.25f },
-            {"PlayerCoopCultist(Clone)", 0.06f },
+            // {"PlayerRogue(Clone)",  0.18f},
+            // {"PlayerMarine(Clone)", 0.12f },
+            // {"PlayerGuide(Clone)", -0.18f },
+            // {"PlayerConvict(Clone)", -0.06f},
+            // {"PlayerRobot(Clone)", 0.25f},
+            // {"PlayerBullet(Clone)", -0.31f },
+            // {"PlayerGunslinger(Clone)", 0.25f },
+            // {"PlayerCoopCultist(Clone)", 0.06f },
+            {"PlayerRogue(Clone)",  0.18f}, //TODO:
+            {"PlayerMarine(Clone)", 0.12f }, //TODO:
+            {"PlayerGuide(Clone)", -0.18f }, //TODO:
+            {"PlayerConvict(Clone)", -0.06f}, //TODO:
+            {"PlayerRobot(Clone)", 0.25f}, //TODO:
+            {"PlayerBullet(Clone)", -0.31f }, //TODO:
+            {"PlayerGunslinger(Clone)", 0.25f }, //TODO:
+            {"PlayerCoopCultist(Clone)", 0.06f }, //TODO:
+        };
+        public static Dictionary<string, float> CharacterNameFlippedOffset = new Dictionary<string, float>()
+        { //Vertical offset for where head-top hats should be placed on different characters (using character name)
+            {"PlayerRogue(Clone)", 0f}, //TODO:
+            {"PlayerMarine(Clone)", 0f}, //TODO:
+            {"PlayerGuide(Clone)", 0f}, //TODO:
+            {"PlayerConvict(Clone)", 0f}, //TODO:
+            {"PlayerRobot(Clone)", -1f/16f}, //TODO:
+            {"PlayerBullet(Clone)", 0f}, //TODO:
+            {"PlayerGunslinger(Clone)", 0f}, //TODO:
+            {"PlayerCoopCultist(Clone)", 0f}, //TODO:
+        };
+        public static Dictionary<string, float> CharacterNameFrontOffset = new Dictionary<string, float>()
+        { //Vertical offset for where head-top hats should be placed on different characters (using character name)
+            {"PlayerRogue(Clone)", 0f}, //TODO:
+            {"PlayerMarine(Clone)", 0f}, //TODO:
+            {"PlayerGuide(Clone)", 0f}, //TODO:
+            {"PlayerConvict(Clone)", 0f}, //TODO:
+            {"PlayerRobot(Clone)", -1f/16f}, //TODO:
+            {"PlayerBullet(Clone)", 0f}, //TODO:
+            {"PlayerGunslinger(Clone)", 0f}, //TODO:
+            {"PlayerCoopCultist(Clone)", 0f}, //TODO:
         };
         public static float defaultHeadLevelOffset = 0.37f;
         public static float defaultEyeLevelOffset = 0.06f;
+        public static float defaultFlippedOffset = 0.00f;
+        public static float defaultFrontOffset = 0.00f;
     }
 
     public static class Hatabase
