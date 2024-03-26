@@ -39,6 +39,7 @@
     global using Brave.BulletScript;
 
     global using SaveAPI; // only nonstandard api copied in from elsewhere, hopefully Alexandria standardizes this eventually
+    global using Alexandria.cAPI;       //cAPI
 #endregion
 
 global using ResourceExtractor = Alexandria.ItemAPI.ResourceExtractor;
@@ -182,6 +183,8 @@ public class Initialisation : BaseUnityPlugin
                 CwaffTweaks.Init();
                 // Hecked Mode Tribute Statues
                 HeckedShrine.Init();
+                // Hat Test
+                CwaffHats.Init();
                 setupConfig2Watch.Stop();
             #endregion
 

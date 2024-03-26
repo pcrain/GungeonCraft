@@ -165,8 +165,7 @@ namespace Alexandria.cAPI
 
         public static void AddHatToDatabase(GameObject hatObj)
         {
-            Hat hatComponent = hatObj.GetComponent<Hat>();
-            if (hatComponent != null)
+            if (hatObj.GetComponent<Hat>() is Hat hatComponent)
             {
                 Hatabase.Hats.Add(hatComponent.hatName.ToLower().Replace(" ","_"), hatComponent);
                 ETGModConsole.Log("Hat '" + hatComponent.hatName + "' correctly added to Hatabase!", true);

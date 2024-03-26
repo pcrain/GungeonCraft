@@ -61,8 +61,6 @@ namespace Alexandria.cAPI
             lastNonZeroField = typeof(PlayerController).GetField("m_lastNonzeroCommandedDirection", BindingFlags.NonPublic | BindingFlags.Instance);           
             lockedDodgeRollDirection = typeof(PlayerController).GetField("lockedDodgeRollDirection", BindingFlags.NonPublic | BindingFlags.Instance);
             m_currentGunAngle = typeof(PlayerController).GetField("m_currentGunAngle", BindingFlags.NonPublic | BindingFlags.Instance);
-            
-
 
             if (hatOwner != null)
             {
