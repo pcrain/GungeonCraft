@@ -11,11 +11,11 @@ public static class CwaffHats
       toadHatController.hatName = "toad_hat";
       // toadHatController.hatDepthType = Hat.HatDepthType.BehindWhenFacingBack;
 
-      // toadHatController.hatOffset = new Vector2(0f, -3f/16f);
-      // HatUtility.SetupHatSprites(ResMap.Get("toad_hat_south"), toadHatObj, 1, new Vector2(14f, 11f));
+      toadHatController.hatOffset = new Vector2(0f, -3f/16f);
+      HatUtility.SetupHatSprites(ResMap.Get("toad_hat_south"), toadHatObj, 1, new Vector2(14f, 11f));
 
-      toadHatController.hatOffset = Vector2.zero;
-      HatUtility.SetupHatSprites(ResMap.Get("cool_hat_south"), toadHatObj, 1, new Vector2(14f, 11f));
+      // toadHatController.hatOffset = Vector2.zero;
+      // HatUtility.SetupHatSprites(ResMap.Get("cool_hat_south"), toadHatObj, 1, new Vector2(14f, 11f));
 
       HatUtility.AddHatToDatabase(toadHatObj);
 

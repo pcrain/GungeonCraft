@@ -157,7 +157,7 @@ namespace Alexandria.cAPI
             {"PlayerRobot(Clone)", 0f},
             {"PlayerBullet(Clone)", -5f/16f},
             // {"PlayerGunslinger(Clone)", 0f}, //TODO:
-            // {"PlayerCoopCultist(Clone)", 0f}, //TODO:
+            {"PlayerCoopCultist(Clone)", -9f/16f},
         };
         public static Dictionary<string, float> CharacterNameEyeLevel = new Dictionary<string, float>()
         { //Vertical offset for where head-top hats should be placed on different characters (using character name)
