@@ -150,12 +150,12 @@ namespace Alexandria.cAPI
         };
         public static Dictionary<string, float> CharacterNameHatHeadLevel = new Dictionary<string, float>()
         { //Vertical offset for where head-top hats should be placed on different characters (using character name)
-            // {"PlayerRogue(Clone)",  0f}, //TODO:
-            // {"PlayerMarine(Clone)", 0f}, //TODO:
+            {"PlayerRogue(Clone)",  -8f/16f},
+            {"PlayerMarine(Clone)", -11f/16f},
             {"PlayerGuide(Clone)", -14f/16f},
             {"PlayerConvict(Clone)", -11f/16f},
             {"PlayerRobot(Clone)", 0f},
-            {"PlayerBullet(Clone)", -4f/16f},
+            {"PlayerBullet(Clone)", -5f/16f},
             // {"PlayerGunslinger(Clone)", 0f}, //TODO:
             // {"PlayerCoopCultist(Clone)", 0f}, //TODO:
         };
