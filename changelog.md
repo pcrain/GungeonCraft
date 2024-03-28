@@ -3,6 +3,7 @@
 ## Future
 
 - Fixed Subtractor Beam being completely broken and causing numerous null reference exceptions when killing enemies with health values visible
+- Fixed Hand Cannon being able to stun enemies that haven't spawned in yet
 
 ## 1.10.3 (2024-03-24)
 

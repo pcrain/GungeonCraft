@@ -68,7 +68,7 @@ public class PlatinumStar : AdvancedGunBehavior
     private void LaunchAllBullets(PlayerController pc)
     {
         foreach (AIActor enemy in StaticReferenceManager.AllEnemies)
-            if (enemy?.GetComponent<OraOra>() is OraOra oraora) oraora.OraOraOra(pc);
+            if (enemy && enemy.GetComponent<OraOra>() is OraOra oraora) oraora.OraOraOra(pc);
     }
 
     protected override void Update()
