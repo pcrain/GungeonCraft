@@ -79,6 +79,9 @@ public class MidasProjectile : MonoBehaviour
     private static tk2dSpriteCollectionData _GoldSpriteCollection = null;
     private void OnWillKillEnemy(Projectile bullet, SpeculativeRigidbody enemy)
     {
+        if (!enemy.aiActor || !enemy.healthHaver || enemy.healthHaver.IsBoss || enemy.healthHaver.IsSubboss)
+            return; // don't do anything to bosses //NOTE: technically works on most bosses, but causes problems with Dragun and who knows what modded bosses...so just disabling
+
         Texture2D goldSprite;
         if (_GoldenTextures.ContainsKey(enemy.aiActor.EnemyGuid))
             goldSprite = _GoldenTextures[enemy.aiActor.EnemyGuid]; // If we've already computed a texture for this enemy, don't do it again
@@ -120,8 +123,8 @@ public class MidasProjectile : MonoBehaviour
         g.AddComponent<GoldenDeath>();
         // g.GetOrAddShader(Shader.Find("Brave/ItemSpecific/LootGlintAdditivePass"))?.SetColor("_OverrideColor", Color.yellow);
 
-        if (enemy.aiActor.IsABoss()) // Unsure why this doesn't trigger normally, but this seems to fix it
-            enemy.aiActor.ParentRoom.HandleRoomClearReward(); //TODO: it's possible non-boss room rewards also don't spawn if final enemy is midas'd...look into later
+        // if (enemy.aiActor.IsABoss()) // Unsure why this doesn't trigger normally, but this seems to fix it
+        //     enemy.aiActor.ParentRoom.HandleRoomClearReward(); //TODO: it's possible non-boss room rewards also don't spawn if final enemy is midas'd...look into later
         enemy.aiActor.EraseFromExistenceWithRewards(true);
 
     }

@@ -6,6 +6,7 @@
 - Fixed Hand Cannon being able to stun enemies that haven't spawned in yet
 - Fixed Hand Cannon dealing 0 damage to enemies it can't stun
 - Fixed Hand Cannon dealing 0 damage to enemies it can't knock back
+- Fixed Quarter Pounder's midas effect applying to bosses and minibosses, potentially softlocking the game (e.g., against the Dragun)
 
 ## 1.10.3 (2024-03-24)
 
