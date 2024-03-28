@@ -7,6 +7,8 @@
 - Fixed Hand Cannon dealing 0 damage to enemies it can't stun
 - Fixed Hand Cannon dealing 0 damage to enemies it can't knock back
 - Fixed Quarter Pounder's midas effect applying to bosses and minibosses, potentially softlocking the game (e.g., against the Dragun)
+- Fixed Omnidirectional Laser reticle and renderer completely breaking when loading a new floor
+- Fixed Omnidirectional Laser renderer breaking when dropped and picked back up
 
 ## 1.10.3 (2024-03-24)
 

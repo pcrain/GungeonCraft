@@ -72,33 +72,69 @@ public class OmnidirectionalLaser : AdvancedGunBehavior
         _OmniReticle = VFX.Create("omnilaser_reticle");
     }
 
-    public override void Start()
+    private void CreateRenderersIfNecessary()
     {
-        base.Start();
-        tk2dSprite backSprite = this._backside = Lazy.SpriteObject(
-            spriteColl: this.gun.sprite.Collection,
-            spriteId: this.gun.sprite.Collection.GetSpriteIdByName($"{gun.InternalName()}_idle_back_001"));
-        backSprite.transform.position = gun.transform.position;
-        // backSprite.transform.parent = gun.transform;  //NOTE: prevents renderer from disabling properly
-        backSprite.HeightOffGround = -0.5f;
-        backSprite.UpdateZDepth();
-        gun.sprite.AttachRenderer(backSprite);
+        if (!this.Player)
+            return;
+        if (this.Player.CurrentInputState != PlayerInputState.AllInput)
+            return; // don't create a renderer until we're in full control of our character
 
-        this._reticle = SpawnManager.SpawnVFX(_OmniReticle, this.gun.transform.position, Quaternion.identity).GetComponent<tk2dSprite>();
-        this._reticle.SetAlphaImmediate(0.0f);
+        if (!this._reticle)
+        {
+            GameObject reticleObject = SpawnManager.SpawnVFX(_OmniReticle, this.gun.transform.position, Quaternion.identity);
+            if (!reticleObject)
+                return;  // SpawnManager is not active
+            this._reticle = reticleObject.GetComponent<tk2dSprite>();
+            this._reticle.SetAlphaImmediate(0.0f);
+        }
+
+        if (!this._backside)
+        {
+            ETGModConsole.Log($"new backside");
+            this._backside = Lazy.SpriteObject(
+                spriteColl: this.gun.sprite.Collection,
+                spriteId: this.gun.sprite.Collection.GetSpriteIdByName($"{this.gun.InternalName()}_idle_back_001"));
+            this._backside.transform.position = gun.transform.position;
+            this._backside.transform.parent = gun.transform;
+            this._backside.HeightOffGround = -0.5f;
+            this._backside.UpdateZDepth();
+            this.gun.sprite.AttachRenderer(this._backside);
+        }
     }
 
     public override void OnDestroy()
     {
-        this._backside.gameObject.SafeDestroy(); //WARNING: verify this works when loading new levels due to being unparented
+        if (this._backside)
+        {
+            this.gun.sprite.DetachRenderer(this._backside);
+            this._backside.transform.parent = null;
+            UnityEngine.Object.Destroy(this._backside.gameObject);
+        }
         this._backside = null;
-        this._reticle.gameObject.SafeDestroy();
+        if (this._reticle)
+            this._reticle.gameObject.SafeDestroy();
         this._reticle = null;
         base.OnDestroy();
     }
 
+    protected override void Update()
+    {
+        base.Update();
+        CreateRenderersIfNecessary();
+    }
+
     private void LateUpdate()
     {
+        if (!this._reticle || !this._backside)
+            return; // nothing to do
+
+        if (!this.Player) // if we have no player, remove our render parent since it can be destroyed and cause ghost sprites when picked back up
+        {
+            this._backside.transform.position = this.gun.transform.position;
+            this._backside.transform.parent = null;
+            return;
+        }
+
         this.gun.m_prepThrowTime = -999f; //HACK: prevent the gun from being thrown (the sprite looks ridiculous when rotated)
 
         if ((this._timeSinceLastShot += BraveTime.DeltaTime) > _FPS_RESET_TIME && (this._currentFps >= _BASE_FPS))
@@ -113,12 +149,17 @@ public class OmnidirectionalLaser : AdvancedGunBehavior
             = this.gun.m_meshRenderer.enabled;
         if (!shouldRender)
         {
+            this._backside.transform.parent = null;
             this._reticle.SetAlpha(0.0f);
             return;
         }
 
         this._reticle.SetAlpha(this.Player ? 1.0f : 0.0f);
-        this._backside.transform.position = this.gun.transform.position;
+        if (!this._backside.transform.parent)
+        {
+            this._backside.transform.parent = this.gun.transform;
+            this._backside.transform.position = this.gun.transform.position;
+        }
         this._backside.HeightOffGround = -0.5f;
         this._backside.UpdateZDepth();
         int frame = this.gun.spriteAnimator.CurrentFrame;
@@ -146,8 +187,13 @@ public class OmnidirectionalLaser : AdvancedGunBehavior
     {
         if (!this.Player)
             return;
-        this._backside.renderer.enabled = false;
-        this._reticle.SetAlpha(0.0f);
+        if (this._backside && this._backside.renderer)
+        {
+            this._backside.transform.parent = null;
+            this._backside.renderer.enabled = false;
+        }
+        if (this._reticle)
+            this._reticle.SetAlpha(0.0f);
         // this._reticle.renderer.enabled = false;  //NOTE: doesn't work since it's parented
         this.Player.forceAimPoint = null;
         base.OnSwitchedAwayFromThisGun();
