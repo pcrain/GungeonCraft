@@ -678,4 +678,18 @@ public static class Lazy
         hgc.OnlyOnEmptyReload            = false;
         hgc.Initialize(player.CurrentGun, player);
     }
+
+    /// <summary>Combine multiple lists into one</summary>
+    public static List<T> Combine<T>(params List<T>[] lists)
+    {
+        List<T> result = new();
+        foreach (List<T> list in lists)
+        {
+            if (list == null)
+                continue;
+            foreach (T t in list)
+                result.Add(t);
+        }
+        return result;
+    }
 }

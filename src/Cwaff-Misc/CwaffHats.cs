@@ -28,7 +28,7 @@ public static class CwaffHats
       hat.hatName = name;
       hat.hatOffset = offset ?? Vector2.zero;
       hat.flipXOffset = flipXOffset;
-      HatUtility.SetupHatSprites(spritePaths: ResMap.Get($"{name}_south"), hatObj: hatObj, fps: 1);
+      HatUtility.SetupHatSprites(spritePaths: Lazy.Combine(ResMap.Get($"{name}_south", true), ResMap.Get($"{name}_north", true)), hatObj: hatObj, fps: 1);
       HatUtility.AddHatToDatabase(hatObj);
     }
 }

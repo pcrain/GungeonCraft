@@ -174,32 +174,36 @@ namespace Alexandria.cAPI
             }
             else
             {
-                switch (targetDir)
+                // adjust the direction based on what our hat actually supports
+                HatDirection adjustedDir = targetDir;
+                if (hatDirectionality == HatDirectionality.NONE)
+                    adjustedDir = HatDirection.SOUTH;
+                else if (hatDirectionality == HatDirectionality.TWOWAYHORIZONTAL)
+                    adjustedDir = hatOwner.sprite.FlipX ? HatDirection.WEST : HatDirection.EAST;
+                else if (hatDirectionality == HatDirectionality.TWOWAYVERTICAL)
                 {
-                    case HatDirection.SOUTH:
-                        if (hatDirectionality != HatDirectionality.TWOWAYHORIZONTAL) { animToPlay = "hat_south"; }
-                        break;
-                    case HatDirection.NORTH:
-                        if (hatDirectionality != HatDirectionality.TWOWAYHORIZONTAL) { animToPlay = "hat_north"; }
-                        break;
-                    case HatDirection.WEST:
-                        if (hatDirectionality != HatDirectionality.TWOWAYVERTICAL) { animToPlay = "hat_west"; }
-                        break;
-                    case HatDirection.EAST:
-                        if (hatDirectionality != HatDirectionality.TWOWAYVERTICAL) { animToPlay = "hat_east"; }
-                        break;
-                    case HatDirection.SOUTHWEST:
-                        if (hatDirectionality == HatDirectionality.EIGHTWAY) { animToPlay = "hat_southwest"; }
-                        break;
-                    case HatDirection.SOUTHEAST:
-                        if (hatDirectionality == HatDirectionality.EIGHTWAY) { animToPlay = "hat_southeast"; }
-                        break;
-                    case HatDirection.NORTHWEST:
-                        if (hatDirectionality == HatDirectionality.SIXWAY || hatDirectionality == HatDirectionality.EIGHTWAY) { animToPlay = "hat_northwest"; }
-                        break;
-                    case HatDirection.NORTHEAST:
-                        if (hatDirectionality == HatDirectionality.SIXWAY || hatDirectionality == HatDirectionality.EIGHTWAY) { animToPlay = "hat_northeast"; }
-                        break;
+                    if (targetDir == HatDirection.NORTHWEST || targetDir == HatDirection.NORTHEAST || targetDir == HatDirection.NORTH)
+                        adjustedDir = HatDirection.NORTH;
+                    else
+                        adjustedDir = HatDirection.SOUTH;
+                }
+                else if (hatDirectionality == HatDirectionality.FOURWAY)
+                {
+                    if (targetDir == HatDirection.NORTHWEST)
+                        adjustedDir = HatDirection.WEST;
+                    else if (targetDir == HatDirection.NORTHEAST)
+                        adjustedDir = HatDirection.EAST;
+                }
+
+                // pick the appropriate animation
+                switch (adjustedDir)
+                {
+                    case HatDirection.SOUTH:     { animToPlay = "hat_south"; }     break;
+                    case HatDirection.NORTH:     { animToPlay = "hat_north"; }     break;
+                    case HatDirection.WEST:      { animToPlay = "hat_west"; }      break;
+                    case HatDirection.EAST:      { animToPlay = "hat_east"; }      break;
+                    case HatDirection.NORTHWEST: { animToPlay = "hat_northwest"; } break;
+                    case HatDirection.NORTHEAST: { animToPlay = "hat_northeast"; } break;
                     case HatDirection.NONE:
                         ETGModConsole.Log("ERROR: TRIED TO ROTATE HAT TO A NULL DIRECTION! (wtf?)");
                         break;
@@ -214,94 +218,30 @@ namespace Alexandria.cAPI
 
         public HatDirection FetchOwnerFacingDirection()
         {
-            HatDirection hatDir = HatDirection.NONE;
-            if (hatOwner != null)
-            {
-                if (hatOwner.CurrentGun == null)
-                {
-                    Vector2 m_playerCommandedDirection = commandedField.GetTypedValue<Vector2>(hatOwner);
-                    Vector2 m_lastNonzeroCommandedDirection = lastNonZeroField.GetTypedValue<Vector2>(hatOwner);
+            if (hatOwner == null || hatOwner.sprite == null)
+                return HatDirection.EAST; // return a sane default if we're ownerless
 
-                    float playerCommandedDir = BraveMathCollege.Atan2Degrees((!(m_playerCommandedDirection == Vector2.zero)) ? m_playerCommandedDirection : m_lastNonzeroCommandedDirection);
+            // figure out an approximate direction from the player's animation name
+            string animName = hatOwner.sprite.GetCurrentSpriteDef().name;
+            if (animName.Contains("north_"))       return HatDirection.NORTH;
+            if (animName.Contains("back_"))        return HatDirection.NORTH;
+            if (animName.Contains("south_"))       return HatDirection.SOUTH;
+            if (animName.Contains("front_"))       return HatDirection.SOUTH;
+            if (animName.Contains("back_right_"))  return hatOwner.sprite.FlipX ? HatDirection.NORTHWEST : HatDirection.NORTHEAST;
+            if (animName.Contains("backwards_"))   return hatOwner.sprite.FlipX ? HatDirection.NORTHWEST : HatDirection.NORTHEAST;
+            if (animName.Contains("backward_"))    return hatOwner.sprite.FlipX ? HatDirection.NORTHWEST : HatDirection.NORTHEAST;
+            if (animName.Contains("bw_"))          return hatOwner.sprite.FlipX ? HatDirection.NORTHWEST : HatDirection.NORTHEAST;
+            // if (animName.Contains("front_right_")) return HatDirection.EAST;
+            // if (animName.Contains("right_front_")) return HatDirection.EAST;
+            // if (animName.Contains("forward_"))     return HatDirection.EAST;
 
-                    switch (playerCommandedDir)
-                    {
-                        case 90:
-                            hatDir = HatDirection.NORTH;
-                            break;
-                        case 45:
-                            hatDir = HatDirection.NORTHEAST;
-                            break;
-                        case -90:
-                            hatDir = HatDirection.SOUTH;
-                            break;
-                        case -135:
-                            hatDir = HatDirection.SOUTHWEST;
-                            break;
-                        case -180:
-                            hatDir = HatDirection.WEST;
-                            break;
-                        case 135:
-                            hatDir = HatDirection.NORTHWEST;
-                            break;
-                        case -45:
-                            hatDir = HatDirection.SOUTHEAST;
-                            break;
-                        case 180:
-                            hatDir = HatDirection.WEST;
-                            break;
-                    }
-                    if (playerCommandedDir == 0 && hatOwner.Velocity != new Vector2(0f, 0))
-                    {
-                        hatDir = HatDirection.EAST;
-                    }
-                }
-                else
-                {
-                    int FacingDirection = Mathf.RoundToInt(hatOwner.FacingDirection / 45) * 45;
-                    switch (FacingDirection)
-                    {
-                        case 90:
-                            hatDir = HatDirection.NORTH;
-                            break;
-                        case 45:
-                            hatDir = HatDirection.NORTHEAST;
-                            break;
-                        case 0:
-                            hatDir = HatDirection.EAST;
-                            break;
-                        case -45:
-                            hatDir = HatDirection.SOUTHEAST;
-                            break;
-                        case -90:
-                            hatDir = HatDirection.SOUTH;
-                            break;
-                        case -135:
-                            hatDir = HatDirection.SOUTHWEST;
-                            break;
-                        case -180:
-                            hatDir = HatDirection.WEST;
-                            break;
-                        case 135:
-                            hatDir = HatDirection.NORTHWEST;
-                            break;
-                        case 180:                           
-                            hatDir = HatDirection.WEST;
-                            break;
-                    }
-                }
-            }
-
-            else Debug.LogError("Attempted to get hatOwner facing direction with a null hatOwner!");
-            if (hatDir == HatDirection.NONE) hatDir = HatDirection.SOUTH;
-            
-            return hatDir;
+            return hatOwner.sprite.FlipX ? HatDirection.WEST : HatDirection.EAST; // return a sane default if we're ownerless
         }
 		#endregion
 
         public int GetPlayerAnimFrame(PlayerController player)
 		{
-            return player.spriteAnimator.CurrentFrame;
+            return player.spriteAnimator.CurrentFrame; // return a sane default
 
         }
 
@@ -317,174 +257,203 @@ namespace Alexandria.cAPI
         }
 
         private static readonly Dictionary<string, FrameOffset> FrameOffsets = new(){
-            {"convict_idle_002",             new FrameOffset(offset: new Vector2( 0, -1))},
-            {"convict_idle_front_002",       new FrameOffset(offset: new Vector2( 0, -1))},
-            {"convict_idle_back_002",        new FrameOffset(offset: new Vector2( 0, -1))},
-            {"convict_idle_bw_002",          new FrameOffset(offset: new Vector2( 0, -1))},
-            {"convict_idle_003",             new FrameOffset(offset: new Vector2( 0, -1))},
-            {"convict_idle_front_003",       new FrameOffset(offset: new Vector2( 0, -1))},
-            {"convict_idle_back_003",        new FrameOffset(offset: new Vector2( 0, -1))},
-            {"convict_idle_bw_003",          new FrameOffset(offset: new Vector2( 0, -1))},
-            {"convict_run_forward_001",      new FrameOffset(offset: new Vector2( 0, -1))},
-            {"convict_run_forward_002",      new FrameOffset(offset: new Vector2( 0,  2))},
-            {"convict_run_forward_004",      new FrameOffset(offset: new Vector2( 0, -1))},
-            {"convict_run_forward_005",      new FrameOffset(offset: new Vector2( 0,  2))},
-            {"convict_run_backwards_001",    new FrameOffset(offset: new Vector2( 0, -1))},
-            {"convict_run_backwards_002",    new FrameOffset(offset: new Vector2( 0,  2))},
-            {"convict_run_backwards_004",    new FrameOffset(offset: new Vector2( 0, -1))},
-            {"convict_run_backwards_005",    new FrameOffset(offset: new Vector2( 0,  2))},
-            {"convict_run_north_001",        new FrameOffset(offset: new Vector2( 0,  0))},
-            {"convict_run_north_002",        new FrameOffset(offset: new Vector2( 0,  3))},
-            {"convict_run_north_003",        new FrameOffset(offset: new Vector2( 0,  2))},
-            {"convict_run_north_004",        new FrameOffset(offset: new Vector2( 0,  0))},
-            {"convict_run_north_005",        new FrameOffset(offset: new Vector2( 0,  3))},
-            {"convict_run_north_006",        new FrameOffset(offset: new Vector2( 0,  2))},
-            {"convict_run_south_001",        new FrameOffset(offset: new Vector2( 0,  0))},
-            {"convict_run_south_002",        new FrameOffset(offset: new Vector2( 0,  4))},
-            {"convict_run_south_003",        new FrameOffset(offset: new Vector2( 0,  2))},
-            {"convict_run_south_004",        new FrameOffset(offset: new Vector2( 0,  0))},
-            {"convict_run_south_005",        new FrameOffset(offset: new Vector2( 0,  4))},
-            {"convict_run_south_006",        new FrameOffset(offset: new Vector2( 0,  2))},
-            {"guide_idle_right_front_002",   new FrameOffset(offset: new Vector2( 0, -1))},
-            {"guide_idle_right_front_003",   new FrameOffset(offset: new Vector2( 0, -1))},
-            {"guide_idle_front_002",         new FrameOffset(offset: new Vector2( 0, -1))},
-            {"guide_idle_front_003",         new FrameOffset(offset: new Vector2( 0, -1))},
-            {"guide_idle_back_002",          new FrameOffset(offset: new Vector2( 0, -1))},
-            {"guide_idle_back_003",          new FrameOffset(offset: new Vector2( 0, -1))},
-            {"guide_idle_back_right_002",    new FrameOffset(offset: new Vector2( 0, -1))},
-            {"guide_idle_back_right_003",    new FrameOffset(offset: new Vector2( 0, -1))},
-            {"guide_run_right_front_001",    new FrameOffset(offset: new Vector2( 0,  2))},
-            {"guide_run_right_front_002",    new FrameOffset(offset: new Vector2( 0,  1))},
-            {"guide_run_right_front_003",    new FrameOffset(offset: new Vector2( 0, -1))},
-            {"guide_run_right_front_004",    new FrameOffset(offset: new Vector2( 0,  2))},
-            {"guide_run_right_front_006",    new FrameOffset(offset: new Vector2( 0, -1))},
-            {"guide_run_back_right_001",     new FrameOffset(offset: new Vector2( 0,  2))},
-            {"guide_run_back_right_002",     new FrameOffset(offset: new Vector2( 0,  1))},
-            {"guide_run_back_right_003",     new FrameOffset(offset: new Vector2( 0, -1))},
-            {"guide_run_back_right_004",     new FrameOffset(offset: new Vector2( 0,  2))},
-            {"guide_run_back_right_006",     new FrameOffset(offset: new Vector2( 0, -1))},
-            {"guide_run_front_001",          new FrameOffset(offset: new Vector2( 0,  2))},
-            {"guide_run_front_003",          new FrameOffset(offset: new Vector2( 0, -2))},
-            {"guide_run_front_004",          new FrameOffset(offset: new Vector2( 0,  2))},
-            {"guide_run_front_006",          new FrameOffset(offset: new Vector2( 0, -2))},
-            {"guide_run_back_001",           new FrameOffset(offset: new Vector2( 0,  2))},
-            {"guide_run_back_003",           new FrameOffset(offset: new Vector2( 0, -2))},
-            {"guide_run_back_004",           new FrameOffset(offset: new Vector2( 0,  2))},
-            {"guide_run_back_006",           new FrameOffset(offset: new Vector2( 0, -2))},
-            {"marine_idle_front_right_002",  new FrameOffset(offset: new Vector2( 0, -1))},
-            {"marine_idle_front_right_003",  new FrameOffset(offset: new Vector2( 0, -2))},
-            {"marine_idle_front_right_004",  new FrameOffset(offset: new Vector2( 0, -1))},
-            {"marine_idle_back_right_002",   new FrameOffset(offset: new Vector2( 0, -1))},
-            {"marine_idle_back_right_003",   new FrameOffset(offset: new Vector2( 0, -2))},
-            {"marine_idle_back_right_004",   new FrameOffset(offset: new Vector2( 0, -1))},
-            {"marine_idle_back_002",         new FrameOffset(offset: new Vector2( 0, -1))},
-            {"marine_idle_back_003",         new FrameOffset(offset: new Vector2( 0, -3))},
-            {"marine_idle_back_004",         new FrameOffset(offset: new Vector2( 0, -2))},
-            {"marine_idle_front_002",        new FrameOffset(offset: new Vector2( 0, -1))},
-            {"marine_idle_front_003",        new FrameOffset(offset: new Vector2( 0, -3))},
-            {"marine_idle_front_004",        new FrameOffset(offset: new Vector2( 0, -2))},
-            {"marine_run_front_right_001",   new FrameOffset(offset: new Vector2( 0,  2))},
-            {"marine_run_front_right_002",   new FrameOffset(offset: new Vector2( 0,  1))},
-            {"marine_run_front_right_003",   new FrameOffset(offset: new Vector2( 0, -2))},
-            {"marine_run_front_right_004",   new FrameOffset(offset: new Vector2( 0,  2))},
-            {"marine_run_front_right_005",   new FrameOffset(offset: new Vector2( 0,  1))},
-            {"marine_run_front_right_006",   new FrameOffset(offset: new Vector2( 0, -2))},
-            {"marine_run_back_right_001",    new FrameOffset(offset: new Vector2( 0,  2))},
-            {"marine_run_back_right_002",    new FrameOffset(offset: new Vector2( 0,  1))},
-            {"marine_run_back_right_003",    new FrameOffset(offset: new Vector2( 0, -2))},
-            {"marine_run_back_right_004",    new FrameOffset(offset: new Vector2( 0,  2))},
-            {"marine_run_back_right_005",    new FrameOffset(offset: new Vector2( 0,  1))},
-            {"marine_run_back_right_006",    new FrameOffset(offset: new Vector2( 0, -2))},
-            {"marine_run_front_001",         new FrameOffset(offset: new Vector2( 0,  1))},
-            {"marine_run_front_002",         new FrameOffset(offset: new Vector2( 0,  0))},
-            {"marine_run_front_003",         new FrameOffset(offset: new Vector2( 0, -2))},
-            {"marine_run_front_004",         new FrameOffset(offset: new Vector2( 0,  1))},
-            {"marine_run_front_005",         new FrameOffset(offset: new Vector2( 0,  0))},
-            {"marine_run_front_006",         new FrameOffset(offset: new Vector2( 0, -2))},
-            {"marine_run_back_001",          new FrameOffset(offset: new Vector2( 0,  2))},
-            {"marine_run_back_002",          new FrameOffset(offset: new Vector2( 0,  1))},
-            {"marine_run_back_003",          new FrameOffset(offset: new Vector2( 0, -1))},
-            {"marine_run_back_004",          new FrameOffset(offset: new Vector2( 0,  2))},
-            {"marine_run_back_005",          new FrameOffset(offset: new Vector2( 0,  1))},
-            {"marine_run_back_006",          new FrameOffset(offset: new Vector2( 0, -1))},
-            {"rogue_idle_002",               new FrameOffset(offset: new Vector2( 0, -1))},
-            {"rogue_idle_003",               new FrameOffset(offset: new Vector2( 0, -1))},
-            {"rogue_idle_back_002",          new FrameOffset(offset: new Vector2( 0, -1))},
-            {"rogue_idle_back_003",          new FrameOffset(offset: new Vector2( 0, -1))},
-            {"rogue_idle_backwards_002",     new FrameOffset(offset: new Vector2( 0, -1))},
-            {"rogue_idle_backwards_003",     new FrameOffset(offset: new Vector2( 0, -1))},
-            {"rogue_idle_front_002",         new FrameOffset(offset: new Vector2( 0, -1))},
-            {"rogue_idle_front_003",         new FrameOffset(offset: new Vector2( 0, -1))},
-            {"rogue_run_forward_001",        new FrameOffset(offset: new Vector2( 0, -1))},
-            {"rogue_run_forward_002",        new FrameOffset(offset: new Vector2( 0,  2))},
-            {"rogue_run_forward_003",        new FrameOffset(offset: new Vector2( 0,  0))},
-            {"rogue_run_forward_004",        new FrameOffset(offset: new Vector2( 0, -1))},
-            {"rogue_run_forward_005",        new FrameOffset(offset: new Vector2( 0,  3))},
-            {"rogue_run_forward_006",        new FrameOffset(offset: new Vector2( 0,  0))},
-            {"rogue_run_backward_001",       new FrameOffset(offset: new Vector2( 0, -1))},
-            {"rogue_run_backward_002",       new FrameOffset(offset: new Vector2( 0,  2))},
-            {"rogue_run_backward_003",       new FrameOffset(offset: new Vector2( 0,  0))},
-            {"rogue_run_backward_004",       new FrameOffset(offset: new Vector2( 0, -1))},
-            {"rogue_run_backward_005",       new FrameOffset(offset: new Vector2( 0,  3))},
-            {"rogue_run_backward_006",       new FrameOffset(offset: new Vector2( 0,  0))},
-            {"rogue_run_front_001",          new FrameOffset(offset: new Vector2( 0,  3))},
-            {"rogue_run_front_002",          new FrameOffset(offset: new Vector2( 0,  2))},
-            {"rogue_run_front_003",          new FrameOffset(offset: new Vector2( 0, -1))},
-            {"rogue_run_front_004",          new FrameOffset(offset: new Vector2( 0,  2))},
-            {"rogue_run_front_005",          new FrameOffset(offset: new Vector2( 0,  1))},
-            {"rogue_run_front_006",          new FrameOffset(offset: new Vector2( 0,  0))},
-            {"rogue_run_back_001",           new FrameOffset(offset: new Vector2( 0,  3))},
-            {"rogue_run_back_002",           new FrameOffset(offset: new Vector2( 0,  2))},
-            {"rogue_run_back_003",           new FrameOffset(offset: new Vector2( 0, -1))},
-            {"rogue_run_back_004",           new FrameOffset(offset: new Vector2( 0,  2))},
-            {"rogue_run_back_005",           new FrameOffset(offset: new Vector2( 0,  1))},
-            {"rogue_run_back_006",           new FrameOffset(offset: new Vector2( 0,  0))},
-            {"robot_idle_001",               new FrameOffset(offset: new Vector2( 1,  0), flipOffset: new Vector2(-1, 0))},
-            {"robot_idle_002",               new FrameOffset(offset: new Vector2( 1,  0), flipOffset: new Vector2(-1, 0))},
-            {"robot_idle_003",               new FrameOffset(offset: new Vector2( 1,  0), flipOffset: new Vector2(-1, 0))},
-            {"robot_idle_004",               new FrameOffset(offset: new Vector2( 1,  0), flipOffset: new Vector2(-1, 0))},
-            {"robot_idle_front_001",         new FrameOffset(offset: new Vector2( 0, -2))},
-            {"robot_idle_front_002",         new FrameOffset(offset: new Vector2( 0,  0))},
-            {"robot_idle_front_003",         new FrameOffset(offset: new Vector2( 0, -2))},
-            {"robot_idle_front_004",         new FrameOffset(offset: new Vector2( 0, -3))},
-            {"robot_run_front_001",          new FrameOffset(offset: new Vector2( 0,  0))},
-            {"robot_run_front_002",          new FrameOffset(offset: new Vector2( 0, -2))},
-            {"robot_run_front_003",          new FrameOffset(offset: new Vector2( 0, -2))},
-            {"robot_run_front_004",          new FrameOffset(offset: new Vector2( 0,  0))},
-            {"robot_run_front_005",          new FrameOffset(offset: new Vector2( 0, -2))},
-            {"robot_run_front_006",          new FrameOffset(offset: new Vector2( 0, -2))},
-            {"cultist_idle_front_right_003", new FrameOffset(offset: new Vector2( 0, -1))},
-            {"cultist_idle_front_right_004", new FrameOffset(offset: new Vector2( 0, -1))},
-            {"cultist_idle_back_right_003",  new FrameOffset(offset: new Vector2( 0, -1))},
-            {"cultist_idle_back_right_004",  new FrameOffset(offset: new Vector2( 0, -1))},
-            {"cultist_idle_front_003",       new FrameOffset(offset: new Vector2( 0, -1))},
-            {"cultist_idle_front_004",       new FrameOffset(offset: new Vector2( 0, -1))},
-            {"cultist_idle_back_003",        new FrameOffset(offset: new Vector2( 0, -1))},
-            {"cultist_idle_back_004",        new FrameOffset(offset: new Vector2( 0, -1))},
-            {"cultist_move_front_right_001", new FrameOffset(offset: new Vector2( 0,  2))},
-            {"cultist_move_front_right_002", new FrameOffset(offset: new Vector2( 0,  1))},
-            {"cultist_move_front_right_003", new FrameOffset(offset: new Vector2( 0,  0))},
-            {"cultist_move_front_right_004", new FrameOffset(offset: new Vector2( 0,  1))},
-            {"cultist_move_front_right_005", new FrameOffset(offset: new Vector2( 0,  0))},
-            {"cultist_move_front_right_006", new FrameOffset(offset: new Vector2( 0,  0))},
-            {"cultist_move_back_right_001",  new FrameOffset(offset: new Vector2( 0,  2))},
-            {"cultist_move_back_right_002",  new FrameOffset(offset: new Vector2( 0,  1))},
-            {"cultist_move_back_right_003",  new FrameOffset(offset: new Vector2( 0,  0))},
-            {"cultist_move_back_right_004",  new FrameOffset(offset: new Vector2( 0,  1))},
-            {"cultist_move_back_right_005",  new FrameOffset(offset: new Vector2( 0,  0))},
-            {"cultist_move_back_right_006",  new FrameOffset(offset: new Vector2( 0,  0))},
-            {"cultist_move_front_001",       new FrameOffset(offset: new Vector2( 0,  2))},
-            {"cultist_move_front_002",       new FrameOffset(offset: new Vector2( 0,  0))},
-            {"cultist_move_front_003",       new FrameOffset(offset: new Vector2( 0, -3))},
-            {"cultist_move_front_004",       new FrameOffset(offset: new Vector2( 0,  1))},
-            {"cultist_move_front_005",       new FrameOffset(offset: new Vector2( 0, -1))},
-            {"cultist_move_front_006",       new FrameOffset(offset: new Vector2( 0, -2))},
-            {"cultist_move_back_001",        new FrameOffset(offset: new Vector2( 0,  2))},
-            {"cultist_move_back_002",        new FrameOffset(offset: new Vector2( 0,  0))},
-            {"cultist_move_back_003",        new FrameOffset(offset: new Vector2( 0, -3))},
-            {"cultist_move_back_004",        new FrameOffset(offset: new Vector2( 0,  1))},
-            {"cultist_move_back_005",        new FrameOffset(offset: new Vector2( 0, -1))},
-            {"cultist_move_back_006",        new FrameOffset(offset: new Vector2( 0, -2))},
+            {"convict_idle_002",                     new FrameOffset(offset: new Vector2( 0, -1))},
+            {"convict_idle_front_002",               new FrameOffset(offset: new Vector2( 0, -1))},
+            {"convict_idle_back_002",                new FrameOffset(offset: new Vector2( 0, -1))},
+            {"convict_idle_bw_002",                  new FrameOffset(offset: new Vector2( 0, -1))},
+            {"convict_idle_003",                     new FrameOffset(offset: new Vector2( 0, -1))},
+            {"convict_idle_front_003",               new FrameOffset(offset: new Vector2( 0, -1))},
+            {"convict_idle_back_003",                new FrameOffset(offset: new Vector2( 0, -1))},
+            {"convict_idle_bw_003",                  new FrameOffset(offset: new Vector2( 0, -1))},
+            {"convict_run_forward_001",              new FrameOffset(offset: new Vector2( 0, -1))},
+            {"convict_run_forward_002",              new FrameOffset(offset: new Vector2( 0,  2))},
+            {"convict_run_forward_004",              new FrameOffset(offset: new Vector2( 0, -1))},
+            {"convict_run_forward_005",              new FrameOffset(offset: new Vector2( 0,  2))},
+            {"convict_run_backwards_001",            new FrameOffset(offset: new Vector2( 0, -1))},
+            {"convict_run_backwards_002",            new FrameOffset(offset: new Vector2( 0,  2))},
+            {"convict_run_backwards_004",            new FrameOffset(offset: new Vector2( 0, -1))},
+            {"convict_run_backwards_005",            new FrameOffset(offset: new Vector2( 0,  2))},
+            {"convict_run_north_001",                new FrameOffset(offset: new Vector2( 0,  0))},
+            {"convict_run_north_002",                new FrameOffset(offset: new Vector2( 0,  3))},
+            {"convict_run_north_003",                new FrameOffset(offset: new Vector2( 0,  2))},
+            {"convict_run_north_004",                new FrameOffset(offset: new Vector2( 0,  0))},
+            {"convict_run_north_005",                new FrameOffset(offset: new Vector2( 0,  3))},
+            {"convict_run_north_006",                new FrameOffset(offset: new Vector2( 0,  2))},
+            {"convict_run_south_001",                new FrameOffset(offset: new Vector2( 0,  0))},
+            {"convict_run_south_002",                new FrameOffset(offset: new Vector2( 0,  4))},
+            {"convict_run_south_003",                new FrameOffset(offset: new Vector2( 0,  2))},
+            {"convict_run_south_004",                new FrameOffset(offset: new Vector2( 0,  0))},
+            {"convict_run_south_005",                new FrameOffset(offset: new Vector2( 0,  4))},
+            {"convict_run_south_006",                new FrameOffset(offset: new Vector2( 0,  2))},
+            {"guide_idle_right_front_002",           new FrameOffset(offset: new Vector2( 0, -1))},
+            {"guide_idle_right_front_003",           new FrameOffset(offset: new Vector2( 0, -1))},
+            {"guide_idle_front_002",                 new FrameOffset(offset: new Vector2( 0, -1))},
+            {"guide_idle_front_003",                 new FrameOffset(offset: new Vector2( 0, -1))},
+            {"guide_idle_back_002",                  new FrameOffset(offset: new Vector2( 0, -1))},
+            {"guide_idle_back_003",                  new FrameOffset(offset: new Vector2( 0, -1))},
+            {"guide_idle_back_right_002",            new FrameOffset(offset: new Vector2( 0, -1))},
+            {"guide_idle_back_right_003",            new FrameOffset(offset: new Vector2( 0, -1))},
+            {"guide_run_right_front_001",            new FrameOffset(offset: new Vector2( 0,  2))},
+            {"guide_run_right_front_002",            new FrameOffset(offset: new Vector2( 0,  1))},
+            {"guide_run_right_front_003",            new FrameOffset(offset: new Vector2( 0, -1))},
+            {"guide_run_right_front_004",            new FrameOffset(offset: new Vector2( 0,  2))},
+            {"guide_run_right_front_006",            new FrameOffset(offset: new Vector2( 0, -1))},
+            {"guide_run_back_right_001",             new FrameOffset(offset: new Vector2( 0,  2))},
+            {"guide_run_back_right_002",             new FrameOffset(offset: new Vector2( 0,  1))},
+            {"guide_run_back_right_003",             new FrameOffset(offset: new Vector2( 0, -1))},
+            {"guide_run_back_right_004",             new FrameOffset(offset: new Vector2( 0,  2))},
+            {"guide_run_back_right_006",             new FrameOffset(offset: new Vector2( 0, -1))},
+            {"guide_run_front_001",                  new FrameOffset(offset: new Vector2( 0,  2))},
+            {"guide_run_front_003",                  new FrameOffset(offset: new Vector2( 0, -2))},
+            {"guide_run_front_004",                  new FrameOffset(offset: new Vector2( 0,  2))},
+            {"guide_run_front_006",                  new FrameOffset(offset: new Vector2( 0, -2))},
+            {"guide_run_back_001",                   new FrameOffset(offset: new Vector2( 0,  2))},
+            {"guide_run_back_003",                   new FrameOffset(offset: new Vector2( 0, -2))},
+            {"guide_run_back_004",                   new FrameOffset(offset: new Vector2( 0,  2))},
+            {"guide_run_back_006",                   new FrameOffset(offset: new Vector2( 0, -2))},
+            {"marine_idle_front_right_002",          new FrameOffset(offset: new Vector2( 0, -1))},
+            {"marine_idle_front_right_003",          new FrameOffset(offset: new Vector2( 0, -2))},
+            {"marine_idle_front_right_004",          new FrameOffset(offset: new Vector2( 0, -1))},
+            {"marine_idle_back_right_002",           new FrameOffset(offset: new Vector2( 0, -1))},
+            {"marine_idle_back_right_003",           new FrameOffset(offset: new Vector2( 0, -2))},
+            {"marine_idle_back_right_004",           new FrameOffset(offset: new Vector2( 0, -1))},
+            {"marine_idle_back_002",                 new FrameOffset(offset: new Vector2( 0, -1))},
+            {"marine_idle_back_003",                 new FrameOffset(offset: new Vector2( 0, -3))},
+            {"marine_idle_back_004",                 new FrameOffset(offset: new Vector2( 0, -2))},
+            {"marine_idle_front_002",                new FrameOffset(offset: new Vector2( 0, -1))},
+            {"marine_idle_front_003",                new FrameOffset(offset: new Vector2( 0, -3))},
+            {"marine_idle_front_004",                new FrameOffset(offset: new Vector2( 0, -2))},
+            {"marine_run_front_right_001",           new FrameOffset(offset: new Vector2( 0,  2))},
+            {"marine_run_front_right_002",           new FrameOffset(offset: new Vector2( 0,  1))},
+            {"marine_run_front_right_003",           new FrameOffset(offset: new Vector2( 0, -2))},
+            {"marine_run_front_right_004",           new FrameOffset(offset: new Vector2( 0,  2))},
+            {"marine_run_front_right_005",           new FrameOffset(offset: new Vector2( 0,  1))},
+            {"marine_run_front_right_006",           new FrameOffset(offset: new Vector2( 0, -2))},
+            {"marine_run_back_right_001",            new FrameOffset(offset: new Vector2( 0,  2))},
+            {"marine_run_back_right_002",            new FrameOffset(offset: new Vector2( 0,  1))},
+            {"marine_run_back_right_003",            new FrameOffset(offset: new Vector2( 0, -2))},
+            {"marine_run_back_right_004",            new FrameOffset(offset: new Vector2( 0,  2))},
+            {"marine_run_back_right_005",            new FrameOffset(offset: new Vector2( 0,  1))},
+            {"marine_run_back_right_006",            new FrameOffset(offset: new Vector2( 0, -2))},
+            {"marine_run_front_001",                 new FrameOffset(offset: new Vector2( 0,  1))},
+            {"marine_run_front_002",                 new FrameOffset(offset: new Vector2( 0,  0))},
+            {"marine_run_front_003",                 new FrameOffset(offset: new Vector2( 0, -2))},
+            {"marine_run_front_004",                 new FrameOffset(offset: new Vector2( 0,  1))},
+            {"marine_run_front_005",                 new FrameOffset(offset: new Vector2( 0,  0))},
+            {"marine_run_front_006",                 new FrameOffset(offset: new Vector2( 0, -2))},
+            {"marine_run_back_001",                  new FrameOffset(offset: new Vector2( 0,  2))},
+            {"marine_run_back_002",                  new FrameOffset(offset: new Vector2( 0,  1))},
+            {"marine_run_back_003",                  new FrameOffset(offset: new Vector2( 0, -1))},
+            {"marine_run_back_004",                  new FrameOffset(offset: new Vector2( 0,  2))},
+            {"marine_run_back_005",                  new FrameOffset(offset: new Vector2( 0,  1))},
+            {"marine_run_back_006",                  new FrameOffset(offset: new Vector2( 0, -1))},
+            {"rogue_idle_001",                       new FrameOffset(offset: new Vector2( 1,  0), flipOffset: new Vector2(-1,  0))},
+            {"rogue_idle_002",                       new FrameOffset(offset: new Vector2( 1, -1), flipOffset: new Vector2(-1, -1))},
+            {"rogue_idle_003",                       new FrameOffset(offset: new Vector2( 1, -1), flipOffset: new Vector2(-1, -1))},
+            {"rogue_idle_004",                       new FrameOffset(offset: new Vector2( 1,  0), flipOffset: new Vector2(-1,  0))},
+            {"rogue_idle_backwards_001",             new FrameOffset(offset: new Vector2( 1,  0), flipOffset: new Vector2(-1,  0))},
+            {"rogue_idle_backwards_002",             new FrameOffset(offset: new Vector2( 1, -1), flipOffset: new Vector2(-1, -1))},
+            {"rogue_idle_backwards_003",             new FrameOffset(offset: new Vector2( 1, -1), flipOffset: new Vector2(-1, -1))},
+            {"rogue_idle_backwards_004",             new FrameOffset(offset: new Vector2( 1,  0), flipOffset: new Vector2(-1,  0))},
+            {"rogue_idle_back_002",                  new FrameOffset(offset: new Vector2( 0, -1))},
+            {"rogue_idle_back_003",                  new FrameOffset(offset: new Vector2( 0, -1))},
+            {"rogue_idle_front_002",                 new FrameOffset(offset: new Vector2( 0, -2))},
+            {"rogue_idle_front_003",                 new FrameOffset(offset: new Vector2( 0, -2))},
+            {"rogue_idle_front_004",                 new FrameOffset(offset: new Vector2( 0, -1))},
+            {"rogue_run_forward_001",                new FrameOffset(offset: new Vector2( 0, -1), flipOffset: new Vector2( 0, -1))},
+            {"rogue_run_forward_002",                new FrameOffset(offset: new Vector2(-1,  1), flipOffset: new Vector2( 1,  1))},
+            {"rogue_run_forward_003",                new FrameOffset(offset: new Vector2(-1,  0), flipOffset: new Vector2( 1,  0))},
+            {"rogue_run_forward_004",                new FrameOffset(offset: new Vector2( 0, -1), flipOffset: new Vector2( 0, -1))},
+            {"rogue_run_forward_005",                new FrameOffset(offset: new Vector2( 1,  2), flipOffset: new Vector2(-1,  2))},
+            {"rogue_run_forward_006",                new FrameOffset(offset: new Vector2( 1,  0), flipOffset: new Vector2(-1,  0))},
+            {"rogue_run_backward_001",               new FrameOffset(offset: new Vector2( 0, -1))},
+            {"rogue_run_backward_002",               new FrameOffset(offset: new Vector2( 0,  2))},
+            {"rogue_run_backward_003",               new FrameOffset(offset: new Vector2( 0,  0))},
+            {"rogue_run_backward_004",               new FrameOffset(offset: new Vector2( 0, -1))},
+            {"rogue_run_backward_005",               new FrameOffset(offset: new Vector2( 0,  3))},
+            {"rogue_run_backward_006",               new FrameOffset(offset: new Vector2( 0,  0))},
+            {"rogue_run_front_001",                  new FrameOffset(offset: new Vector2( 0,  3))},
+            {"rogue_run_front_002",                  new FrameOffset(offset: new Vector2( 0,  2))},
+            {"rogue_run_front_003",                  new FrameOffset(offset: new Vector2( 0, -1))},
+            {"rogue_run_front_004",                  new FrameOffset(offset: new Vector2( 0,  2))},
+            {"rogue_run_front_005",                  new FrameOffset(offset: new Vector2( 0,  1))},
+            {"rogue_run_front_006",                  new FrameOffset(offset: new Vector2( 0,  0))},
+            {"rogue_run_back_001",                   new FrameOffset(offset: new Vector2( 0,  3))},
+            {"rogue_run_back_002",                   new FrameOffset(offset: new Vector2( 0,  2))},
+            {"rogue_run_back_003",                   new FrameOffset(offset: new Vector2( 0, -1))},
+            {"rogue_run_back_004",                   new FrameOffset(offset: new Vector2( 0,  2))},
+            {"rogue_run_back_005",                   new FrameOffset(offset: new Vector2( 0,  1))},
+            {"rogue_run_back_006",                   new FrameOffset(offset: new Vector2( 0,  0))},
+            {"robot_idle_001",                       new FrameOffset(offset: new Vector2( 1,  0), flipOffset: new Vector2(-1,  0))},
+            {"robot_idle_002",                       new FrameOffset(offset: new Vector2( 1,  0), flipOffset: new Vector2(-1,  0))},
+            {"robot_idle_003",                       new FrameOffset(offset: new Vector2( 1,  0), flipOffset: new Vector2(-1,  0))},
+            {"robot_idle_004",                       new FrameOffset(offset: new Vector2( 1,  0), flipOffset: new Vector2(-1,  0))},
+            {"robot_idle_front_001",                 new FrameOffset(offset: new Vector2( 0, -2))},
+            {"robot_idle_front_002",                 new FrameOffset(offset: new Vector2( 0,  0))},
+            {"robot_idle_front_003",                 new FrameOffset(offset: new Vector2( 0, -2))},
+            {"robot_idle_front_004",                 new FrameOffset(offset: new Vector2( 0, -3))},
+            {"robot_run_front_001",                  new FrameOffset(offset: new Vector2( 0,  0))},
+            {"robot_run_front_002",                  new FrameOffset(offset: new Vector2( 0, -2))},
+            {"robot_run_front_003",                  new FrameOffset(offset: new Vector2( 0, -2))},
+            {"robot_run_front_004",                  new FrameOffset(offset: new Vector2( 0,  0))},
+            {"robot_run_front_005",                  new FrameOffset(offset: new Vector2( 0, -2))},
+            {"robot_run_front_006",                  new FrameOffset(offset: new Vector2( 0, -2))},
+            {"cultist_idle_front_right_003",         new FrameOffset(offset: new Vector2( 0, -1))},
+            {"cultist_idle_front_right_004",         new FrameOffset(offset: new Vector2( 0, -1))},
+            {"cultist_idle_back_right_003",          new FrameOffset(offset: new Vector2( 0, -1))},
+            {"cultist_idle_back_right_004",          new FrameOffset(offset: new Vector2( 0, -1))},
+            {"cultist_idle_front_003",               new FrameOffset(offset: new Vector2( 0, -1))},
+            {"cultist_idle_front_004",               new FrameOffset(offset: new Vector2( 0, -1))},
+            {"cultist_idle_back_003",                new FrameOffset(offset: new Vector2( 0, -1))},
+            {"cultist_idle_back_004",                new FrameOffset(offset: new Vector2( 0, -1))},
+            {"cultist_move_front_right_001",         new FrameOffset(offset: new Vector2( 0,  2))},
+            {"cultist_move_front_right_002",         new FrameOffset(offset: new Vector2( 0,  1))},
+            {"cultist_move_front_right_003",         new FrameOffset(offset: new Vector2( 0,  0))},
+            {"cultist_move_front_right_004",         new FrameOffset(offset: new Vector2( 0,  1))},
+            {"cultist_move_front_right_005",         new FrameOffset(offset: new Vector2( 0,  0))},
+            {"cultist_move_front_right_006",         new FrameOffset(offset: new Vector2( 0,  0))},
+            {"cultist_move_back_right_001",          new FrameOffset(offset: new Vector2( 0,  2))},
+            {"cultist_move_back_right_002",          new FrameOffset(offset: new Vector2( 0,  1))},
+            {"cultist_move_back_right_003",          new FrameOffset(offset: new Vector2( 0,  0))},
+            {"cultist_move_back_right_004",          new FrameOffset(offset: new Vector2( 0,  1))},
+            {"cultist_move_back_right_005",          new FrameOffset(offset: new Vector2( 0,  0))},
+            {"cultist_move_back_right_006",          new FrameOffset(offset: new Vector2( 0,  0))},
+            {"cultist_move_front_001",               new FrameOffset(offset: new Vector2( 0,  2))},
+            {"cultist_move_front_002",               new FrameOffset(offset: new Vector2( 0,  0))},
+            {"cultist_move_front_003",               new FrameOffset(offset: new Vector2( 0, -3))},
+            {"cultist_move_front_004",               new FrameOffset(offset: new Vector2( 0,  1))},
+            {"cultist_move_front_005",               new FrameOffset(offset: new Vector2( 0, -1))},
+            {"cultist_move_front_006",               new FrameOffset(offset: new Vector2( 0, -2))},
+            {"cultist_move_back_001",                new FrameOffset(offset: new Vector2( 0,  2))},
+            {"cultist_move_back_002",                new FrameOffset(offset: new Vector2( 0,  0))},
+            {"cultist_move_back_003",                new FrameOffset(offset: new Vector2( 0, -3))},
+            {"cultist_move_back_004",                new FrameOffset(offset: new Vector2( 0,  1))},
+            {"cultist_move_back_005",                new FrameOffset(offset: new Vector2( 0, -1))},
+            {"cultist_move_back_006",                new FrameOffset(offset: new Vector2( 0, -2))},
+            {"bullet_player_move_front_right_001",   new FrameOffset(offset: new Vector2( 0,  1), flipOffset: new Vector2( 0,  1))},
+            {"bullet_player_move_front_right_002",   new FrameOffset(offset: new Vector2( 2,  1), flipOffset: new Vector2(-2,  1))},
+            {"bullet_player_move_front_right_003",   new FrameOffset(offset: new Vector2( 3,  2), flipOffset: new Vector2(-3,  2))},
+            {"bullet_player_move_front_right_004",   new FrameOffset(offset: new Vector2( 0,  1), flipOffset: new Vector2( 0,  1))},
+            {"bullet_player_move_front_right_005",   new FrameOffset(offset: new Vector2(-2,  1), flipOffset: new Vector2( 2,  1))},
+            {"bullet_player_move_front_right_006",   new FrameOffset(offset: new Vector2(-3,  1), flipOffset: new Vector2( 3,  1))},
+            {"bullet_player_move_front_001",         new FrameOffset(offset: new Vector2( 0,  1), flipOffset: new Vector2( 0,  1))},
+            {"bullet_player_move_front_002",         new FrameOffset(offset: new Vector2( 1,  1), flipOffset: new Vector2(-1,  1))},
+            {"bullet_player_move_front_003",         new FrameOffset(offset: new Vector2( 1,  1), flipOffset: new Vector2(-1,  1))},
+            {"bullet_player_move_front_004",         new FrameOffset(offset: new Vector2( 0,  1), flipOffset: new Vector2( 0,  1))},
+            {"bullet_player_move_front_005",         new FrameOffset(offset: new Vector2(-2,  1), flipOffset: new Vector2( 2,  1))},
+            {"bullet_player_move_front_006",         new FrameOffset(offset: new Vector2(-1,  1), flipOffset: new Vector2( 1,  1))},
+            {"bullet_player_move_back_right_001",    new FrameOffset(offset: new Vector2( 0,  1), flipOffset: new Vector2( 0,  1))},
+            {"bullet_player_move_back_right_002",    new FrameOffset(offset: new Vector2( 2,  1), flipOffset: new Vector2(-2,  1))},
+            {"bullet_player_move_back_right_003",    new FrameOffset(offset: new Vector2( 3,  2), flipOffset: new Vector2(-3,  2))},
+            {"bullet_player_move_back_right_004",    new FrameOffset(offset: new Vector2( 0,  1), flipOffset: new Vector2( 0,  1))},
+            {"bullet_player_move_back_right_005",    new FrameOffset(offset: new Vector2(-1,  1), flipOffset: new Vector2( 1,  1))},
+            {"bullet_player_move_back_right_006",    new FrameOffset(offset: new Vector2(-2,  1), flipOffset: new Vector2( 2,  1))},
+            {"bullet_player_move_back_001",          new FrameOffset(offset: new Vector2( 0,  1), flipOffset: new Vector2( 0,  1))},
+            {"bullet_player_move_back_002",          new FrameOffset(offset: new Vector2( 1,  1), flipOffset: new Vector2(-1,  1))},
+            {"bullet_player_move_back_003",          new FrameOffset(offset: new Vector2( 1,  1), flipOffset: new Vector2(-1,  1))},
+            {"bullet_player_move_back_004",          new FrameOffset(offset: new Vector2( 0,  1), flipOffset: new Vector2( 0,  1))},
+            {"bullet_player_move_back_005",          new FrameOffset(offset: new Vector2(-2,  1), flipOffset: new Vector2( 2,  1))},
+            {"bullet_player_move_back_006",          new FrameOffset(offset: new Vector2(-1,  1), flipOffset: new Vector2( 1,  1))},
         };
 
 		public Vector3 GetHatPosition(PlayerController player)
@@ -497,66 +466,18 @@ namespace Alexandria.cAPI
             if (PlayerHatDatabase.CharacterNameHatHeadLevel.TryGetValue(player.name, out float headLevel))
                 playerOffset = new Vector2(0f, headLevel);
 
-            // determine the hat direction from the current animation name
-            // HatDirection hatDirection = HatDirection.NONE;
-            string curAnim = player.spriteAnimator.currentClip.name;
+            // get the flipped offset if applicable
             bool flipped = player.sprite.FlipX;
-            // if (curAnim.Contains("forward") || curAnim.Contains("run_down"))
-            //     hatDirection = HatDirection.SOUTH;
-            // else if (curAnim.Contains("backward") || curAnim.Contains("run_up"))
-            //     hatDirection = HatDirection.NORTH;
-            // else if (curAnim.Contains("bw"))
-            //     hatDirection = HatDirection.NORTHEAST;
-            // else
-            //     hatDirection = HatDirection.EAST;
+            Vector2 hatFlipOffset = (flipped && flipHorizontalWithPlayer) ? new Vector2(flipXOffset, 0f) : Vector2.zero;
 
-            // Vector2 directionalOffset = Vector2.zero;
-            // if (PlayerHatDatabase.CharacterDirectionalHatOffsets.TryGetValue(player.name, out HatOffsets playerDirectionalHatOffsets))
-            //     directionalOffset = hatDirection switch {
-            //         HatDirection.SOUTH     => (flipped ? playerDirectionalHatOffsets.frontFlipped : playerDirectionalHatOffsets.front),
-            //         HatDirection.NORTH     => (flipped ? playerDirectionalHatOffsets.backFlipped : playerDirectionalHatOffsets.back),
-            //         HatDirection.NORTHEAST => (flipped ? playerDirectionalHatOffsets.bwFlipped : playerDirectionalHatOffsets.bw),
-            //         HatDirection.EAST      => (flipped ? playerDirectionalHatOffsets.fwFlipped : playerDirectionalHatOffsets.fw),
-            //         _                      => Vector2.zero,
-            //     };
-
-            Vector2 bobOffset = Vector2.zero;
+            // get the animation frame specific offset if applicable
+            Vector2 animationFrameOffset = Vector2.zero;
             string baseFrame = player.sprite.GetCurrentSpriteDef().name.Replace("_hands2","").Replace("_hands","").Replace("_hand_left","").Replace("_hand_right","").Replace("_hand","").Replace("_twohands","").Replace("_armorless","");
-            // ETGModConsole.Log($"  frame is {player.sprite.GetCurrentSpriteDef().name}");
             if (FrameOffsets.TryGetValue(baseFrame, out FrameOffset frameOffset))
-                bobOffset = flipped ? frameOffset.flipOffset : frameOffset.offset;
+                animationFrameOffset = flipped ? frameOffset.flipOffset : frameOffset.offset;
 
-            Vector2 flipOffset = Vector2.zero;
-            if (flipped && flipHorizontalWithPlayer)
-                flipOffset = new Vector2(flipXOffset, 0f);
-
-            return baseOffset + hatOffset.XY() + playerOffset + /*directionalOffset +*/ bobOffset + flipOffset;
-            // if (attachLevel == HatAttachLevel.HEAD_TOP)
-            // {
-            //     if (PlayerHatDatabase.CharacterNameHatHeadLevel.ContainsKey(player.name))
-            //     {
-            //         vec = new Vector3(basePos.x, basePos.y + PlayerHatDatabase.CharacterNameHatHeadLevel[player.name], player.transform.position.z +1);
-            //     }
-            //     else { vec = (basePos + new Vector2(0, PlayerHatDatabase.defaultHeadLevelOffset)); }
-            // }
-            // else if (attachLevel == HatAttachLevel.EYE_LEVEL)
-            // {
-            //     if (PlayerHatDatabase.CharacterNameEyeLevel.ContainsKey(player.name))
-            //     {
-            //         vec = (basePos + new Vector2(0, PlayerHatDatabase.CharacterNameEyeLevel[player.name]));
-            //     }
-            //     else { vec = (basePos + new Vector2(0, PlayerHatDatabase.defaultEyeLevelOffset)); }
-            // }
-            // vec += new Vector3(0, 0.03f, player.transform.position.z + 1);
-            // vec += hatOffset;
-            // if (player.sprite.FlipX)
-            // {
-            //     if (PlayerHatDatabase.CharacterNameFlippedOffset.ContainsKey(player.name))
-            //         vec += new Vector3(PlayerHatDatabase.CharacterNameFlippedOffset[player.name], 0f, 0f);
-            //     else
-            //         vec += new Vector3(PlayerHatDatabase.defaultFlippedOffset, 0f, 0f);
-            // }
-            // return vec;
+            // combine everything and return
+            return baseOffset + hatOffset.XY() + playerOffset + animationFrameOffset + hatFlipOffset;
         }
 
         public void StickHatToPlayer(PlayerController player)
@@ -673,41 +594,11 @@ namespace Alexandria.cAPI
                                 
                                 Vector3 rotatePoint = sprite.WorldCenter;
                                 float rollAmount = 360f * (BraveTime.DeltaTime / RollLength);
-                                if (FetchOwnerFacingDirection() == HatDirection.SOUTH || FetchOwnerFacingDirection() == HatDirection.NORTHEAST || FetchOwnerFacingDirection() == HatDirection.SOUTHEAST || FetchOwnerFacingDirection() == HatDirection.EAST)
-                                {
-                                    this.transform.RotateAround(this.sprite.WorldCenter, Vector3.forward, -rollAmount * SpinSpeedMultiplier);
-                                }
-                                else
-                                {
-                                    this.transform.RotateAround(this.sprite.WorldCenter, Vector3.forward, rollAmount * SpinSpeedMultiplier);
-                                }
+                                this.transform.RotateAround(this.sprite.WorldCenter, Vector3.forward, rollAmount * SpinSpeedMultiplier * (hatOwner.sprite.FlipX ? 1f : -1f));
 
                                 float elapsed = BraveTime.ScaledTimeSinceStartup - startRolTime;
                                 float percentDone = elapsed / RollLength;
                                 this.transform.position = GetHatPosition(hatOwner) + new Vector3(0, BASE_FLIP_HEIGHT * flipHeightMultiplier * Mathf.Sin(Mathf.PI * percentDone), 0);
-
-                                // if (elapsed < (endRollTime - startTime) * 0.01)
-                                //     this.transform.position = GetHatPosition(hatOwner);
-                                // else if (elapsed < (endRollTime - startTime) * 0.2)
-                                //     this.transform.position += new Vector3(0, flipHeightMultiplier * 0.35f, 0);
-                                // else if (elapsed < (endRollTime - startTime) * 0.2)
-                                //     this.transform.position += new Vector3(0, flipHeightMultiplier * 0.3f, 0);
-                                // else if (elapsed < (endRollTime - startTime) * 0.3)
-                                //     this.transform.position += new Vector3(0, flipHeightMultiplier * 0.2f, 0);
-                                // else if (elapsed < (endRollTime - startTime) * 0.4)
-                                //     this.transform.position += new Vector3(0, flipHeightMultiplier * 0.15f, 0);
-                                // else if (elapsed < (endRollTime - startTime) * 0.5)
-                                //     this.transform.position += new Vector3(0, flipHeightMultiplier * 0.05f, 0);
-                                // else if (elapsed < (endRollTime - startTime) * 0.6)
-                                //     this.transform.position -= new Vector3(0, flipHeightMultiplier * 0.05f, 0);
-                                // else if (elapsed < (endRollTime - startTime) * 0.7)
-                                //     this.transform.position -= new Vector3(0, flipHeightMultiplier * 0.15f, 0);
-                                // else if (elapsed < (endRollTime - startTime) * 0.8)
-                                //     this.transform.position -= new Vector3(0, flipHeightMultiplier * 0.2f, 0);
-                                // else if (elapsed < (endRollTime - startTime) * 0.9)
-                                //     this.transform.position -= new Vector3(0, flipHeightMultiplier * 0.3f, 0);
-                                // else
-                                //     this.transform.position -= new Vector3(0, flipHeightMultiplier * 0.35f, 0);
                             }
                         }
                         else

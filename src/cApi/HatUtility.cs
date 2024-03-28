@@ -126,6 +126,7 @@ namespace Alexandria.cAPI
                 hatness.hatDirectionality = Hat.HatDirectionality.SIXWAY;
             else
                 hatness.hatDirectionality = Hat.HatDirectionality.EIGHTWAY;
+            ETGModConsole.Log($"made hat {spritePaths[0]} with direction {hatness.hatDirectionality}");
 
             //SET UP THE ANIMATOR AND THE ANIMATION
             tk2dSpriteAnimator animator = hatObj.GetOrAddComponent<tk2dSpriteAnimator>();
