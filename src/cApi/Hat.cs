@@ -39,6 +39,9 @@ namespace Alexandria.cAPI
         public tk2dSprite hatSprite;
         public tk2dSpriteAnimator hatSpriteAnimator;
         private tk2dSpriteAnimator hatOwnerAnimator;
+
+        private tk2dSpriteDefinition cachedDef;
+        private Vector2 cachedDefOffset;
         
         private float RollLength = 0.65f; //The time it takes for a player with no dodge roll effects to roll
         public Hat()
@@ -56,6 +59,8 @@ namespace Alexandria.cAPI
             goldenPedastal = false;
             flipHorizontalWithPlayer = true;
             flipXOffset = 0f;
+            cachedDef = null;
+            cachedDefOffset = Vector2.zero;
         }
 
         private void Start()
@@ -95,7 +100,6 @@ namespace Alexandria.cAPI
 
         private void Update()
         {
-
             if (hatOwner)
             {
                 if (currentState == HatState.SITTING)
@@ -112,7 +116,53 @@ namespace Alexandria.cAPI
                 HandleFlip();
             }
         }
-		#region vanishing
+
+        private static Vector2 GetDefOffset(tk2dSpriteDefinition def)
+        {
+            Bounds b = new Bounds(
+              new Vector3(
+                def.boundsDataCenter.x,
+                def.boundsDataCenter.y,
+                def.boundsDataCenter.z),
+              new Vector3(
+                def.boundsDataExtents.x,
+                def.boundsDataExtents.y,
+                def.boundsDataExtents.z));
+            return new Vector2(0f, b.min.y + b.extents.y * 2f);
+        }
+
+        /// <summary>Preemptively move hat immediately after the player's sprite changes to avoid a 1-frame delay on hat offsets</summary>
+        [HarmonyPatch(typeof(tk2dSpriteAnimator), nameof(tk2dSpriteAnimator.SetFrameInternal))]
+        private class UpdateHatAnimationPatch
+        {
+            static void Prefix(tk2dSpriteAnimator __instance, int currFrame)
+            {
+                if (currFrame != 0 && __instance.previousFrame == currFrame)
+                    return; // nothing to do in the prefix if our frame hasn't changed or just been reset
+                if (__instance.GetComponent<Hat>())
+                    return; // we are the sprite animator for the Hat itself, don't do anything
+                if (__instance.transform.parent is not Transform parent)
+                    return; // unparented, not what we're looking for
+                if (!parent || !parent.gameObject || parent.GetComponent<HatController>() is not HatController hatController)
+                    return; // no player, nothing special needed
+                if (hatController.CurrentHat is not Hat hat)
+                    return; // no hat, nothing to do
+
+                tk2dSpriteAnimationFrame frame = __instance.currentClip.frames[currFrame];
+                tk2dSpriteDefinition def = frame.spriteCollection.spriteDefinitions[frame.spriteId];
+
+                if (def != hat.cachedDef)
+                {
+                    // Vector2 newCachedOffset = GetDefOffset(def);
+                    // hat.transform.position += (newCachedOffset - hat.cachedDefOffset).ToVector3ZUp();
+                    hat.cachedDef = def;
+                    // hat.cachedDefOffset = newCachedOffset;
+                    if (hat.hatOwner && hat.currentState == HatState.SITTING)
+                        hat.transform.position = hat.GetHatPosition(hat.hatOwner);
+                }
+            }
+        }
+
 		private void HandleVanish()
         {
             bool Visible = base.sprite.renderer.enabled;
@@ -133,7 +183,6 @@ namespace Alexandria.cAPI
                StickHatToPlayer(hatOwner);
             }
                 
-
             if (!Visible && !shouldBeVanished)
             {
                 base.sprite.renderer.enabled = true;
@@ -162,58 +211,52 @@ namespace Alexandria.cAPI
             if (hatOwner && hatOwner.HasPickupID(436)) shouldActuallyVanish = true;
             return shouldActuallyVanish;
         }
-		#endregion
-		#region facingCode
+
 		public void UpdateHatFacingDirection(HatDirection targetDir)
         {
-            string animToPlay = "null";
-            if (hatDirectionality == HatDirectionality.NONE)
-            {
-                animToPlay = "hat_south";
-                currentDirection = HatDirection.SOUTH;
-            }
-            else
-            {
-                // adjust the direction based on what our hat actually supports
-                HatDirection adjustedDir = targetDir;
-                if (hatDirectionality == HatDirectionality.NONE)
-                    adjustedDir = HatDirection.SOUTH;
-                else if (hatDirectionality == HatDirectionality.TWOWAYHORIZONTAL)
-                    adjustedDir = hatOwner.sprite.FlipX ? HatDirection.WEST : HatDirection.EAST;
-                else if (hatDirectionality == HatDirectionality.TWOWAYVERTICAL)
-                {
-                    if (targetDir == HatDirection.NORTHWEST || targetDir == HatDirection.NORTHEAST || targetDir == HatDirection.NORTH)
-                        adjustedDir = HatDirection.NORTH;
-                    else
-                        adjustedDir = HatDirection.SOUTH;
-                }
-                else if (hatDirectionality == HatDirectionality.FOURWAY)
-                {
-                    if (targetDir == HatDirection.NORTHWEST)
-                        adjustedDir = HatDirection.WEST;
-                    else if (targetDir == HatDirection.NORTHEAST)
-                        adjustedDir = HatDirection.EAST;
-                }
+            string animToPlay = null;
 
-                // pick the appropriate animation
-                switch (adjustedDir)
-                {
-                    case HatDirection.SOUTH:     { animToPlay = "hat_south"; }     break;
-                    case HatDirection.NORTH:     { animToPlay = "hat_north"; }     break;
-                    case HatDirection.WEST:      { animToPlay = "hat_west"; }      break;
-                    case HatDirection.EAST:      { animToPlay = "hat_east"; }      break;
-                    case HatDirection.NORTHWEST: { animToPlay = "hat_northwest"; } break;
-                    case HatDirection.NORTHEAST: { animToPlay = "hat_northeast"; } break;
-                    case HatDirection.NONE:
-                        ETGModConsole.Log("ERROR: TRIED TO ROTATE HAT TO A NULL DIRECTION! (wtf?)");
-                        break;
-                }
-                currentDirection = targetDir;
-            }
-            if (animToPlay != "null")
+            // adjust the direction based on what our hat actually supports
+            HatDirection adjustedDir = targetDir;
+            if (hatDirectionality == HatDirectionality.NONE)
+                adjustedDir = HatDirection.SOUTH;
+            else if (hatDirectionality == HatDirectionality.TWOWAYHORIZONTAL)
+                adjustedDir = hatOwner.sprite.FlipX ? HatDirection.WEST : HatDirection.EAST;
+            else if (hatDirectionality == HatDirectionality.TWOWAYVERTICAL)
             {
-                hatSpriteAnimator.Play(animToPlay);
+                if (targetDir == HatDirection.NORTHWEST || targetDir == HatDirection.NORTHEAST || targetDir == HatDirection.NORTH)
+                    adjustedDir = HatDirection.NORTH;
+                else
+                    adjustedDir = HatDirection.SOUTH;
             }
+            else if (hatDirectionality == HatDirectionality.FOURWAY)
+            {
+                if (targetDir == HatDirection.NORTHWEST)
+                    adjustedDir = HatDirection.WEST;
+                else if (targetDir == HatDirection.NORTHEAST)
+                    adjustedDir = HatDirection.EAST;
+            }
+
+            // pick the appropriate animation
+            switch (adjustedDir)
+            {
+                case HatDirection.SOUTH:     { animToPlay = "hat_south"; }     break;
+                case HatDirection.NORTH:     { animToPlay = "hat_north"; }     break;
+                case HatDirection.WEST:      { animToPlay = "hat_west"; }      break;
+                case HatDirection.EAST:      { animToPlay = "hat_east"; }      break;
+                case HatDirection.NORTHWEST: { animToPlay = "hat_northwest"; } break;
+                case HatDirection.NORTHEAST: { animToPlay = "hat_northeast"; } break;
+                case HatDirection.NONE:
+                    ETGModConsole.Log("ERROR: TRIED TO ROTATE HAT TO A NULL DIRECTION! (wtf?)");
+                    break;
+            }
+
+            // cache the actual targetDir rather than adjustedDir so we don't call this every frame unnecessarily
+            currentDirection = targetDir;
+
+            // play the animation if non-null
+            if (animToPlay != null)
+                hatSpriteAnimator.Play(animToPlay);
         }
 
         public HatDirection FetchOwnerFacingDirection()
@@ -237,7 +280,6 @@ namespace Alexandria.cAPI
 
             return hatOwner.sprite.FlipX ? HatDirection.WEST : HatDirection.EAST; // return a sane default if we're ownerless
         }
-		#endregion
 
         public int GetPlayerAnimFrame(PlayerController player)
 		{
@@ -251,7 +293,7 @@ namespace Alexandria.cAPI
             public Vector2 flipOffset;
             public FrameOffset(Vector2 offset, Vector2? flipOffset = null)
             {
-                this.offset     = 0.0625f * offset;
+                this.offset     = 0.0625f * offset; // convert from pixels to tile size
                 this.flipOffset = 0.0625f * (flipOffset ?? offset);
             }
         }
@@ -431,11 +473,11 @@ namespace Alexandria.cAPI
             {"cultist_move_back_005",                new FrameOffset(offset: new Vector2( 0, -1))},
             {"cultist_move_back_006",                new FrameOffset(offset: new Vector2( 0, -2))},
             {"bullet_player_move_front_right_001",   new FrameOffset(offset: new Vector2( 0,  1), flipOffset: new Vector2( 0,  1))},
-            {"bullet_player_move_front_right_002",   new FrameOffset(offset: new Vector2( 2,  1), flipOffset: new Vector2(-2,  1))},
-            {"bullet_player_move_front_right_003",   new FrameOffset(offset: new Vector2( 3,  2), flipOffset: new Vector2(-3,  2))},
+            {"bullet_player_move_front_right_002",   new FrameOffset(offset: new Vector2( 4,  1), flipOffset: new Vector2(-4,  1))},
+            {"bullet_player_move_front_right_003",   new FrameOffset(offset: new Vector2( 4,  0), flipOffset: new Vector2(-4,  0))},
             {"bullet_player_move_front_right_004",   new FrameOffset(offset: new Vector2( 0,  1), flipOffset: new Vector2( 0,  1))},
             {"bullet_player_move_front_right_005",   new FrameOffset(offset: new Vector2(-2,  1), flipOffset: new Vector2( 2,  1))},
-            {"bullet_player_move_front_right_006",   new FrameOffset(offset: new Vector2(-3,  1), flipOffset: new Vector2( 3,  1))},
+            {"bullet_player_move_front_right_006",   new FrameOffset(offset: new Vector2(-2,  1), flipOffset: new Vector2( 2,  1))},
             {"bullet_player_move_front_001",         new FrameOffset(offset: new Vector2( 0,  1), flipOffset: new Vector2( 0,  1))},
             {"bullet_player_move_front_002",         new FrameOffset(offset: new Vector2( 1,  1), flipOffset: new Vector2(-1,  1))},
             {"bullet_player_move_front_003",         new FrameOffset(offset: new Vector2( 1,  1), flipOffset: new Vector2(-1,  1))},
@@ -443,10 +485,10 @@ namespace Alexandria.cAPI
             {"bullet_player_move_front_005",         new FrameOffset(offset: new Vector2(-2,  1), flipOffset: new Vector2( 2,  1))},
             {"bullet_player_move_front_006",         new FrameOffset(offset: new Vector2(-1,  1), flipOffset: new Vector2( 1,  1))},
             {"bullet_player_move_back_right_001",    new FrameOffset(offset: new Vector2( 0,  1), flipOffset: new Vector2( 0,  1))},
-            {"bullet_player_move_back_right_002",    new FrameOffset(offset: new Vector2( 2,  1), flipOffset: new Vector2(-2,  1))},
-            {"bullet_player_move_back_right_003",    new FrameOffset(offset: new Vector2( 3,  2), flipOffset: new Vector2(-3,  2))},
+            {"bullet_player_move_back_right_002",    new FrameOffset(offset: new Vector2( 4,  1), flipOffset: new Vector2(-4,  1))},
+            {"bullet_player_move_back_right_003",    new FrameOffset(offset: new Vector2( 4,  0), flipOffset: new Vector2(-4,  0))},
             {"bullet_player_move_back_right_004",    new FrameOffset(offset: new Vector2( 0,  1), flipOffset: new Vector2( 0,  1))},
-            {"bullet_player_move_back_right_005",    new FrameOffset(offset: new Vector2(-1,  1), flipOffset: new Vector2( 1,  1))},
+            {"bullet_player_move_back_right_005",    new FrameOffset(offset: new Vector2(-2,  1), flipOffset: new Vector2( 2,  1))},
             {"bullet_player_move_back_right_006",    new FrameOffset(offset: new Vector2(-2,  1), flipOffset: new Vector2( 2,  1))},
             {"bullet_player_move_back_001",          new FrameOffset(offset: new Vector2( 0,  1), flipOffset: new Vector2( 0,  1))},
             {"bullet_player_move_back_002",          new FrameOffset(offset: new Vector2( 1,  1), flipOffset: new Vector2(-1,  1))},
@@ -456,10 +498,20 @@ namespace Alexandria.cAPI
             {"bullet_player_move_back_006",          new FrameOffset(offset: new Vector2(-1,  1), flipOffset: new Vector2( 1,  1))},
         };
 
+        private static string GetSpriteBaseName(string name)
+        {
+            return name.Replace("_hands2","").Replace("_hands","").Replace("_hand_left","").Replace("_hand_right","").Replace("_hand","").Replace("_twohands","").Replace("_armorless","");
+        }
+
 		public Vector3 GetHatPosition(PlayerController player)
         {
+            cachedDef ??= player.sprite.GetCurrentSpriteDef();
+
             // get the base offset for every character
-            Vector2 baseOffset = new Vector2(player.SpriteBottomCenter.x, player.sprite.WorldTopCenter.y);
+            Vector2 baseOffset = new Vector2(player.SpriteBottomCenter.x, player.sprite.transform.position.y);
+
+            // get the base offset for every character
+            // Vector2 baseOffset = new Vector2(player.SpriteBottomCenter.x, player.sprite.WorldTopCenter.y);
 
             // get the player specific offset
             Vector2 playerOffset = Vector2.zero;
@@ -471,10 +523,11 @@ namespace Alexandria.cAPI
             Vector2 hatFlipOffset = (flipped && flipHorizontalWithPlayer) ? new Vector2(flipXOffset, 0f) : Vector2.zero;
 
             // get the animation frame specific offset if applicable
-            Vector2 animationFrameOffset = Vector2.zero;
-            string baseFrame = player.sprite.GetCurrentSpriteDef().name.Replace("_hands2","").Replace("_hands","").Replace("_hand_left","").Replace("_hand_right","").Replace("_hand","").Replace("_twohands","").Replace("_armorless","");
+            Vector2 animationFrameOffset = GetDefOffset(cachedDef);
+            string baseFrame = GetSpriteBaseName(cachedDef.name);
             if (FrameOffsets.TryGetValue(baseFrame, out FrameOffset frameOffset))
-                animationFrameOffset = flipped ? frameOffset.flipOffset : frameOffset.offset;
+                animationFrameOffset += flipped ? frameOffset.flipOffset : frameOffset.offset;
+            cachedDefOffset = animationFrameOffset;
 
             // combine everything and return
             return baseOffset + hatOffset.XY() + playerOffset + animationFrameOffset + hatFlipOffset;
@@ -499,39 +552,26 @@ namespace Alexandria.cAPI
         {
 			if (hatDepthType == HatDepthType.BehindWhenFacingBack || hatDepthType == HatDepthType.InFrontWhenFacingBack)
 			{
-				float num = 1f;
 				if (hatOwner.CurrentGun is null)
 				{
                     Vector2 m_playerCommandedDirection = commandedField.GetTypedValue<Vector2>(hatOwner);
                     Vector2 m_lastNonzeroCommandedDirection = lastNonZeroField.GetTypedValue<Vector2>(hatOwner);
                     gunAngle = BraveMathCollege.Atan2Degrees((!(m_playerCommandedDirection == Vector2.zero)) ? m_playerCommandedDirection : m_lastNonzeroCommandedDirection);
                 }
-				float num2;
+                float forwardSign = 1f;
+				float baseDepth;
 				if (gunAngle <= 155f && gunAngle >= 25f)
 				{
-					num = -1f;
-					if (gunAngle < 120f && gunAngle >= 60f)
-					{
-						num2 = 0.15f;
-					}
-					else
-					{
-						num2 = 0.15f;
-					}
-				}
-				else if (gunAngle <= -60f && gunAngle >= -120f)
-				{
-					num2 = -0.15f;
+					forwardSign = -1f;
+					baseDepth = 0.15f;
 				}
 				else
-				{
-					num2 = -0.15f;
-				}
+					baseDepth = -0.15f;
 
                 if(hatDepthType == HatDepthType.BehindWhenFacingBack)
-				    hatSprite.HeightOffGround = num2 + num * 1;
+				    hatSprite.HeightOffGround = baseDepth + forwardSign * 1;
                 else
-                    hatSprite.HeightOffGround = num2 + num * -1;
+                    hatSprite.HeightOffGround = baseDepth + forwardSign * -1;
             }
 			else
 			{
