@@ -6,22 +6,29 @@ public static class CwaffHats
     {
       Alexandria.cAPI.HatUtility.NecessarySetup();
 
-      GameObject toadHatObj = UnityEngine.Object.Instantiate(new GameObject())/*.RegisterPrefab()*/;
-      Hat toadHatController = toadHatObj.AddComponent<Hat>();
-      toadHatController.hatName = "toad_hat";
-      // toadHatController.hatDepthType = Hat.HatDepthType.BehindWhenFacingBack;
-
-      toadHatController.hatOffset = new Vector2(0f, -3f/16f);
-      HatUtility.SetupHatSprites(ResMap.Get("toad_hat_south"), toadHatObj, 1, new Vector2(14f, 11f));
-
-      // toadHatController.hatOffset = Vector2.zero;
-      // HatUtility.SetupHatSprites(ResMap.Get("cool_hat_south"), toadHatObj, 1, new Vector2(14f, 11f));
-
-      HatUtility.AddHatToDatabase(toadHatObj);
+      EasyHat(name: "debug_hat",      offset: null);
+      EasyHat(name: "toad_hat",       offset: new Vector2(0f/16f, -3f/16f));
+      EasyHat(name: "bunny_hat",      offset: new Vector2(1f/16f, -3f/16f), flipXOffset: -2f/16f);
+      EasyHat(name: "jester_hat",     offset: new Vector2(0f/16f, -3f/16f));
+      // EasyHat(name: "bunny_ears_hat", offset: new Vector2(0f/16f, -5f/16f));
+      // EasyHat(name: "saiyan_hat",     offset: new Vector2(0f/16f, -3f/16f));
+      // EasyHat(name: "shades_glasses", offset: new Vector2(0f/16f, -3f/16f));
+      // EasyHat(name: "witch_hat",      offset: new Vector2(0f/16f, -3f/16f));
 
       CwaffEvents.OnRunStart += (p1, p2, gamemode) => {
           ETGModConsole.Log($"Hatting it up!");
           p1.AddComponent<HatController>();
       };
+    }
+
+    private static void EasyHat(string name, Vector2? offset = null, float flipXOffset = 0f)
+    {
+      GameObject hatObj = UnityEngine.Object.Instantiate(new GameObject());
+      Hat hat = hatObj.AddComponent<Hat>();
+      hat.hatName = name;
+      hat.hatOffset = offset ?? Vector2.zero;
+      hat.flipXOffset = flipXOffset;
+      HatUtility.SetupHatSprites(spritePaths: ResMap.Get($"{name}_south"), hatObj: hatObj, fps: 1);
+      HatUtility.AddHatToDatabase(hatObj);
     }
 }

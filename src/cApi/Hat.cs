@@ -16,6 +16,8 @@ namespace Alexandria.cAPI
     public class Hat : BraveBehaviour
     {
 
+        private const float BASE_FLIP_HEIGHT = 3f;
+
         public string   hatName;
         public Vector3 hatOffset;
         public HatDirectionality hatDirectionality;
@@ -28,6 +30,8 @@ namespace Alexandria.cAPI
         public float SpinSpeedMultiplier;
         public float flipHeightMultiplier;
         public bool goldenPedastal;
+        public bool flipHorizontalWithPlayer;
+        public float flipXOffset;
 
         private FieldInfo commandedField, lastNonZeroField, lockedDodgeRollDirection, m_currentGunAngle;
         private HatDirection currentDirection;
@@ -50,6 +54,8 @@ namespace Alexandria.cAPI
             FlipEndedSound = null;
             FlipStartedSound = null;
             goldenPedastal = false;
+            flipHorizontalWithPlayer = true;
+            flipXOffset = 0f;
         }
 
         private void Start()
@@ -299,173 +305,186 @@ namespace Alexandria.cAPI
 
         }
 
-        public static readonly Dictionary<string, float> BobOffsets = new(){
-            {"convict_idle_002", -1/16f},
-            {"convict_idle_front_002", -1/16f},
-            {"convict_idle_back_002", -1/16f},
-            {"convict_idle_bw_002", -1/16f},
-            {"convict_idle_003", -1/16f},
-            {"convict_idle_front_003", -1/16f},
-            {"convict_idle_back_003", -1/16f},
-            {"convict_idle_bw_003", -1/16f},
-            {"convict_run_forward_001", -1/16f},
-            {"convict_run_forward_002", 2/16f},
-            {"convict_run_forward_004", -1/16f},
-            {"convict_run_forward_005", 2/16f},
-            {"convict_run_backwards_001", -1/16f},
-            {"convict_run_backwards_002", 2/16f},
-            {"convict_run_backwards_004", -1/16f},
-            {"convict_run_backwards_005", 2/16f},
-            {"convict_run_north_001", -1/16f},
-            {"convict_run_north_002", 2/16f},
-            {"convict_run_north_004", -1/16f},
-            {"convict_run_north_005", 2/16f},
-            {"convict_run_south_001", -1/16f},
-            {"convict_run_south_002", 2/16f},
-            {"convict_run_south_004", -1/16f},
-            {"convict_run_south_005", 2/16f},
+        private class FrameOffset
+        {
+            public Vector2 offset;
+            public Vector2 flipOffset;
+            public FrameOffset(Vector2 offset, Vector2? flipOffset = null)
+            {
+                this.offset     = 0.0625f * offset;
+                this.flipOffset = 0.0625f * (flipOffset ?? offset);
+            }
+        }
 
-            {"guide_idle_right_front_002", -1/16f},
-            {"guide_idle_right_front_003", -1/16f},
-            {"guide_idle_front_002", -1/16f},
-            {"guide_idle_front_003", -1/16f},
-            {"guide_idle_back_002", -1/16f},
-            {"guide_idle_back_003", -1/16f},
-            {"guide_idle_back_right_002", -1/16f},
-            {"guide_idle_back_right_003", -1/16f},
-            {"guide_run_right_front_001", 2/16f},
-            {"guide_run_right_front_002", 1/16f},
-            {"guide_run_right_front_003", -1/16f},
-            {"guide_run_right_front_004", 2/16f},
-            {"guide_run_right_front_006", -1/16f},
-            {"guide_run_back_right_001", 2/16f},
-            {"guide_run_back_right_002", 1/16f},
-            {"guide_run_back_right_003", -1/16f},
-            {"guide_run_back_right_004", 2/16f},
-            {"guide_run_back_right_006", -1/16f},
-            {"guide_run_front_001", 2/16f},
-            {"guide_run_front_003", -2/16f},
-            {"guide_run_front_004", 2/16f},
-            {"guide_run_front_006", -2/16f},
-            {"guide_run_back_001", 2/16f},
-            {"guide_run_back_003", -2/16f},
-            {"guide_run_back_004", 2/16f},
-            {"guide_run_back_006", -2/16f},
-
-            {"marine_idle_front_right_002", -1/16f},
-            {"marine_idle_front_right_003", -2/16f},
-            {"marine_idle_front_right_004", -1/16f},
-            {"marine_idle_back_right_002", -1/16f},
-            {"marine_idle_back_right_003", -2/16f},
-            {"marine_idle_back_right_004", -1/16f},
-            {"marine_idle_back_002", -1/16f},
-            {"marine_idle_back_003", -3/16f},
-            {"marine_idle_back_004", -2/16f},
-            {"marine_idle_front_002", -1/16f},
-            {"marine_idle_front_003", -3/16f},
-            {"marine_idle_front_004", -2/16f},
-            {"marine_run_front_right_001", 2/16f},
-            {"marine_run_front_right_002", 1/16f},
-            {"marine_run_front_right_003", -2/16f},
-            {"marine_run_front_right_004", 2/16f},
-            {"marine_run_front_right_005", 1/16f},
-            {"marine_run_front_right_006", -2/16f},
-            {"marine_run_back_right_001", 2/16f},
-            {"marine_run_back_right_002", 1/16f},
-            {"marine_run_back_right_003", -2/16f},
-            {"marine_run_back_right_004", 2/16f},
-            {"marine_run_back_right_005", 1/16f},
-            {"marine_run_back_right_006", -2/16f},
-            {"marine_run_front_001", 1/16f},
-            {"marine_run_front_002", 0/16f},
-            {"marine_run_front_003", -2/16f},
-            {"marine_run_front_004", 1/16f},
-            {"marine_run_front_005", 0/16f},
-            {"marine_run_front_006", -2/16f},
-            {"marine_run_back_001", 2/16f},
-            {"marine_run_back_002", 1/16f},
-            {"marine_run_back_003", -1/16f},
-            {"marine_run_back_004", 2/16f},
-            {"marine_run_back_005", 1/16f},
-            {"marine_run_back_006", -1/16f},
-
-            {"rogue_idle_002", -1/16f},
-            {"rogue_idle_003", -1/16f},
-            {"rogue_idle_back_002", -1/16f},
-            {"rogue_idle_back_003", -1/16f},
-            {"rogue_idle_backwards_002", -1/16f},
-            {"rogue_idle_backwards_003", -1/16f},
-            {"rogue_idle_front_002", -1/16f},
-            {"rogue_idle_front_003", -1/16f},
-            {"rogue_run_forward_001", -1/16f},
-            {"rogue_run_forward_002", 2/16f},
-            {"rogue_run_forward_003", 0/16f},
-            {"rogue_run_forward_004", -1/16f},
-            {"rogue_run_forward_005", 3/16f},
-            {"rogue_run_forward_006", 0/16f},
-            {"rogue_run_backward_001", -1/16f},
-            {"rogue_run_backward_002", 2/16f},
-            {"rogue_run_backward_003", 0/16f},
-            {"rogue_run_backward_004", -1/16f},
-            {"rogue_run_backward_005", 3/16f},
-            {"rogue_run_backward_006", 0/16f},
-            {"rogue_run_front_001", 3/16f},
-            {"rogue_run_front_002", 2/16f},
-            {"rogue_run_front_003", -1/16f},
-            {"rogue_run_front_004", 2/16f},
-            {"rogue_run_front_005", 1/16f},
-            {"rogue_run_front_006", 0/16f},
-            {"rogue_run_back_001", 3/16f},
-            {"rogue_run_back_002", 2/16f},
-            {"rogue_run_back_003", -1/16f},
-            {"rogue_run_back_004", 2/16f},
-            {"rogue_run_back_005", 1/16f},
-            {"rogue_run_back_006", 0/16f},
-
-            {"robot_idle_front_001", -2/16f},
-            {"robot_idle_front_002", 0/16f},
-            {"robot_idle_front_003", -2/16f},
-            {"robot_idle_front_004", -3/16f},
-            {"robot_run_front_001", 0/16f},
-            {"robot_run_front_002", -2/16f},
-            {"robot_run_front_003", -2/16f},
-            {"robot_run_front_004", 0/16f},
-            {"robot_run_front_005", -2/16f},
-            {"robot_run_front_006", -2/16f},
-
-            {"cultist_idle_front_right_003", -1/16f},
-            {"cultist_idle_front_right_004", -1/16f},
-            {"cultist_idle_back_right_003", -1/16f},
-            {"cultist_idle_back_right_004", -1/16f},
-            {"cultist_idle_front_003", -1/16f},
-            {"cultist_idle_front_004", -1/16f},
-            {"cultist_idle_back_003", -1/16f},
-            {"cultist_idle_back_004", -1/16f},
-            {"cultist_move_front_right_001", 2/16f},
-            {"cultist_move_front_right_002", 1/16f},
-            {"cultist_move_front_right_003", 0/16f},
-            {"cultist_move_front_right_004", 1/16f},
-            {"cultist_move_front_right_005", 0/16f},
-            {"cultist_move_front_right_006", 0/16f},
-            {"cultist_move_back_right_001", 2/16f},
-            {"cultist_move_back_right_002", 1/16f},
-            {"cultist_move_back_right_003", 0/16f},
-            {"cultist_move_back_right_004", 1/16f},
-            {"cultist_move_back_right_005", 0/16f},
-            {"cultist_move_back_right_006", 0/16f},
-            {"cultist_move_front_001", 2/16f},
-            {"cultist_move_front_002", 0/16f},
-            {"cultist_move_front_003", -3/16f},
-            {"cultist_move_front_004", 1/16f},
-            {"cultist_move_front_005", -1/16f},
-            {"cultist_move_front_006", -2/16f},
-            {"cultist_move_back_001", 2/16f},
-            {"cultist_move_back_002", 0/16f},
-            {"cultist_move_back_003", -3/16f},
-            {"cultist_move_back_004", 1/16f},
-            {"cultist_move_back_005", -1/16f},
-            {"cultist_move_back_006", -2/16f},
-
+        private static readonly Dictionary<string, FrameOffset> FrameOffsets = new(){
+            {"convict_idle_002",             new FrameOffset(offset: new Vector2( 0, -1))},
+            {"convict_idle_front_002",       new FrameOffset(offset: new Vector2( 0, -1))},
+            {"convict_idle_back_002",        new FrameOffset(offset: new Vector2( 0, -1))},
+            {"convict_idle_bw_002",          new FrameOffset(offset: new Vector2( 0, -1))},
+            {"convict_idle_003",             new FrameOffset(offset: new Vector2( 0, -1))},
+            {"convict_idle_front_003",       new FrameOffset(offset: new Vector2( 0, -1))},
+            {"convict_idle_back_003",        new FrameOffset(offset: new Vector2( 0, -1))},
+            {"convict_idle_bw_003",          new FrameOffset(offset: new Vector2( 0, -1))},
+            {"convict_run_forward_001",      new FrameOffset(offset: new Vector2( 0, -1))},
+            {"convict_run_forward_002",      new FrameOffset(offset: new Vector2( 0,  2))},
+            {"convict_run_forward_004",      new FrameOffset(offset: new Vector2( 0, -1))},
+            {"convict_run_forward_005",      new FrameOffset(offset: new Vector2( 0,  2))},
+            {"convict_run_backwards_001",    new FrameOffset(offset: new Vector2( 0, -1))},
+            {"convict_run_backwards_002",    new FrameOffset(offset: new Vector2( 0,  2))},
+            {"convict_run_backwards_004",    new FrameOffset(offset: new Vector2( 0, -1))},
+            {"convict_run_backwards_005",    new FrameOffset(offset: new Vector2( 0,  2))},
+            {"convict_run_north_001",        new FrameOffset(offset: new Vector2( 0,  0))},
+            {"convict_run_north_002",        new FrameOffset(offset: new Vector2( 0,  3))},
+            {"convict_run_north_003",        new FrameOffset(offset: new Vector2( 0,  2))},
+            {"convict_run_north_004",        new FrameOffset(offset: new Vector2( 0,  0))},
+            {"convict_run_north_005",        new FrameOffset(offset: new Vector2( 0,  3))},
+            {"convict_run_north_006",        new FrameOffset(offset: new Vector2( 0,  2))},
+            {"convict_run_south_001",        new FrameOffset(offset: new Vector2( 0,  0))},
+            {"convict_run_south_002",        new FrameOffset(offset: new Vector2( 0,  4))},
+            {"convict_run_south_003",        new FrameOffset(offset: new Vector2( 0,  2))},
+            {"convict_run_south_004",        new FrameOffset(offset: new Vector2( 0,  0))},
+            {"convict_run_south_005",        new FrameOffset(offset: new Vector2( 0,  4))},
+            {"convict_run_south_006",        new FrameOffset(offset: new Vector2( 0,  2))},
+            {"guide_idle_right_front_002",   new FrameOffset(offset: new Vector2( 0, -1))},
+            {"guide_idle_right_front_003",   new FrameOffset(offset: new Vector2( 0, -1))},
+            {"guide_idle_front_002",         new FrameOffset(offset: new Vector2( 0, -1))},
+            {"guide_idle_front_003",         new FrameOffset(offset: new Vector2( 0, -1))},
+            {"guide_idle_back_002",          new FrameOffset(offset: new Vector2( 0, -1))},
+            {"guide_idle_back_003",          new FrameOffset(offset: new Vector2( 0, -1))},
+            {"guide_idle_back_right_002",    new FrameOffset(offset: new Vector2( 0, -1))},
+            {"guide_idle_back_right_003",    new FrameOffset(offset: new Vector2( 0, -1))},
+            {"guide_run_right_front_001",    new FrameOffset(offset: new Vector2( 0,  2))},
+            {"guide_run_right_front_002",    new FrameOffset(offset: new Vector2( 0,  1))},
+            {"guide_run_right_front_003",    new FrameOffset(offset: new Vector2( 0, -1))},
+            {"guide_run_right_front_004",    new FrameOffset(offset: new Vector2( 0,  2))},
+            {"guide_run_right_front_006",    new FrameOffset(offset: new Vector2( 0, -1))},
+            {"guide_run_back_right_001",     new FrameOffset(offset: new Vector2( 0,  2))},
+            {"guide_run_back_right_002",     new FrameOffset(offset: new Vector2( 0,  1))},
+            {"guide_run_back_right_003",     new FrameOffset(offset: new Vector2( 0, -1))},
+            {"guide_run_back_right_004",     new FrameOffset(offset: new Vector2( 0,  2))},
+            {"guide_run_back_right_006",     new FrameOffset(offset: new Vector2( 0, -1))},
+            {"guide_run_front_001",          new FrameOffset(offset: new Vector2( 0,  2))},
+            {"guide_run_front_003",          new FrameOffset(offset: new Vector2( 0, -2))},
+            {"guide_run_front_004",          new FrameOffset(offset: new Vector2( 0,  2))},
+            {"guide_run_front_006",          new FrameOffset(offset: new Vector2( 0, -2))},
+            {"guide_run_back_001",           new FrameOffset(offset: new Vector2( 0,  2))},
+            {"guide_run_back_003",           new FrameOffset(offset: new Vector2( 0, -2))},
+            {"guide_run_back_004",           new FrameOffset(offset: new Vector2( 0,  2))},
+            {"guide_run_back_006",           new FrameOffset(offset: new Vector2( 0, -2))},
+            {"marine_idle_front_right_002",  new FrameOffset(offset: new Vector2( 0, -1))},
+            {"marine_idle_front_right_003",  new FrameOffset(offset: new Vector2( 0, -2))},
+            {"marine_idle_front_right_004",  new FrameOffset(offset: new Vector2( 0, -1))},
+            {"marine_idle_back_right_002",   new FrameOffset(offset: new Vector2( 0, -1))},
+            {"marine_idle_back_right_003",   new FrameOffset(offset: new Vector2( 0, -2))},
+            {"marine_idle_back_right_004",   new FrameOffset(offset: new Vector2( 0, -1))},
+            {"marine_idle_back_002",         new FrameOffset(offset: new Vector2( 0, -1))},
+            {"marine_idle_back_003",         new FrameOffset(offset: new Vector2( 0, -3))},
+            {"marine_idle_back_004",         new FrameOffset(offset: new Vector2( 0, -2))},
+            {"marine_idle_front_002",        new FrameOffset(offset: new Vector2( 0, -1))},
+            {"marine_idle_front_003",        new FrameOffset(offset: new Vector2( 0, -3))},
+            {"marine_idle_front_004",        new FrameOffset(offset: new Vector2( 0, -2))},
+            {"marine_run_front_right_001",   new FrameOffset(offset: new Vector2( 0,  2))},
+            {"marine_run_front_right_002",   new FrameOffset(offset: new Vector2( 0,  1))},
+            {"marine_run_front_right_003",   new FrameOffset(offset: new Vector2( 0, -2))},
+            {"marine_run_front_right_004",   new FrameOffset(offset: new Vector2( 0,  2))},
+            {"marine_run_front_right_005",   new FrameOffset(offset: new Vector2( 0,  1))},
+            {"marine_run_front_right_006",   new FrameOffset(offset: new Vector2( 0, -2))},
+            {"marine_run_back_right_001",    new FrameOffset(offset: new Vector2( 0,  2))},
+            {"marine_run_back_right_002",    new FrameOffset(offset: new Vector2( 0,  1))},
+            {"marine_run_back_right_003",    new FrameOffset(offset: new Vector2( 0, -2))},
+            {"marine_run_back_right_004",    new FrameOffset(offset: new Vector2( 0,  2))},
+            {"marine_run_back_right_005",    new FrameOffset(offset: new Vector2( 0,  1))},
+            {"marine_run_back_right_006",    new FrameOffset(offset: new Vector2( 0, -2))},
+            {"marine_run_front_001",         new FrameOffset(offset: new Vector2( 0,  1))},
+            {"marine_run_front_002",         new FrameOffset(offset: new Vector2( 0,  0))},
+            {"marine_run_front_003",         new FrameOffset(offset: new Vector2( 0, -2))},
+            {"marine_run_front_004",         new FrameOffset(offset: new Vector2( 0,  1))},
+            {"marine_run_front_005",         new FrameOffset(offset: new Vector2( 0,  0))},
+            {"marine_run_front_006",         new FrameOffset(offset: new Vector2( 0, -2))},
+            {"marine_run_back_001",          new FrameOffset(offset: new Vector2( 0,  2))},
+            {"marine_run_back_002",          new FrameOffset(offset: new Vector2( 0,  1))},
+            {"marine_run_back_003",          new FrameOffset(offset: new Vector2( 0, -1))},
+            {"marine_run_back_004",          new FrameOffset(offset: new Vector2( 0,  2))},
+            {"marine_run_back_005",          new FrameOffset(offset: new Vector2( 0,  1))},
+            {"marine_run_back_006",          new FrameOffset(offset: new Vector2( 0, -1))},
+            {"rogue_idle_002",               new FrameOffset(offset: new Vector2( 0, -1))},
+            {"rogue_idle_003",               new FrameOffset(offset: new Vector2( 0, -1))},
+            {"rogue_idle_back_002",          new FrameOffset(offset: new Vector2( 0, -1))},
+            {"rogue_idle_back_003",          new FrameOffset(offset: new Vector2( 0, -1))},
+            {"rogue_idle_backwards_002",     new FrameOffset(offset: new Vector2( 0, -1))},
+            {"rogue_idle_backwards_003",     new FrameOffset(offset: new Vector2( 0, -1))},
+            {"rogue_idle_front_002",         new FrameOffset(offset: new Vector2( 0, -1))},
+            {"rogue_idle_front_003",         new FrameOffset(offset: new Vector2( 0, -1))},
+            {"rogue_run_forward_001",        new FrameOffset(offset: new Vector2( 0, -1))},
+            {"rogue_run_forward_002",        new FrameOffset(offset: new Vector2( 0,  2))},
+            {"rogue_run_forward_003",        new FrameOffset(offset: new Vector2( 0,  0))},
+            {"rogue_run_forward_004",        new FrameOffset(offset: new Vector2( 0, -1))},
+            {"rogue_run_forward_005",        new FrameOffset(offset: new Vector2( 0,  3))},
+            {"rogue_run_forward_006",        new FrameOffset(offset: new Vector2( 0,  0))},
+            {"rogue_run_backward_001",       new FrameOffset(offset: new Vector2( 0, -1))},
+            {"rogue_run_backward_002",       new FrameOffset(offset: new Vector2( 0,  2))},
+            {"rogue_run_backward_003",       new FrameOffset(offset: new Vector2( 0,  0))},
+            {"rogue_run_backward_004",       new FrameOffset(offset: new Vector2( 0, -1))},
+            {"rogue_run_backward_005",       new FrameOffset(offset: new Vector2( 0,  3))},
+            {"rogue_run_backward_006",       new FrameOffset(offset: new Vector2( 0,  0))},
+            {"rogue_run_front_001",          new FrameOffset(offset: new Vector2( 0,  3))},
+            {"rogue_run_front_002",          new FrameOffset(offset: new Vector2( 0,  2))},
+            {"rogue_run_front_003",          new FrameOffset(offset: new Vector2( 0, -1))},
+            {"rogue_run_front_004",          new FrameOffset(offset: new Vector2( 0,  2))},
+            {"rogue_run_front_005",          new FrameOffset(offset: new Vector2( 0,  1))},
+            {"rogue_run_front_006",          new FrameOffset(offset: new Vector2( 0,  0))},
+            {"rogue_run_back_001",           new FrameOffset(offset: new Vector2( 0,  3))},
+            {"rogue_run_back_002",           new FrameOffset(offset: new Vector2( 0,  2))},
+            {"rogue_run_back_003",           new FrameOffset(offset: new Vector2( 0, -1))},
+            {"rogue_run_back_004",           new FrameOffset(offset: new Vector2( 0,  2))},
+            {"rogue_run_back_005",           new FrameOffset(offset: new Vector2( 0,  1))},
+            {"rogue_run_back_006",           new FrameOffset(offset: new Vector2( 0,  0))},
+            {"robot_idle_001",               new FrameOffset(offset: new Vector2( 1,  0), flipOffset: new Vector2(-1, 0))},
+            {"robot_idle_002",               new FrameOffset(offset: new Vector2( 1,  0), flipOffset: new Vector2(-1, 0))},
+            {"robot_idle_003",               new FrameOffset(offset: new Vector2( 1,  0), flipOffset: new Vector2(-1, 0))},
+            {"robot_idle_004",               new FrameOffset(offset: new Vector2( 1,  0), flipOffset: new Vector2(-1, 0))},
+            {"robot_idle_front_001",         new FrameOffset(offset: new Vector2( 0, -2))},
+            {"robot_idle_front_002",         new FrameOffset(offset: new Vector2( 0,  0))},
+            {"robot_idle_front_003",         new FrameOffset(offset: new Vector2( 0, -2))},
+            {"robot_idle_front_004",         new FrameOffset(offset: new Vector2( 0, -3))},
+            {"robot_run_front_001",          new FrameOffset(offset: new Vector2( 0,  0))},
+            {"robot_run_front_002",          new FrameOffset(offset: new Vector2( 0, -2))},
+            {"robot_run_front_003",          new FrameOffset(offset: new Vector2( 0, -2))},
+            {"robot_run_front_004",          new FrameOffset(offset: new Vector2( 0,  0))},
+            {"robot_run_front_005",          new FrameOffset(offset: new Vector2( 0, -2))},
+            {"robot_run_front_006",          new FrameOffset(offset: new Vector2( 0, -2))},
+            {"cultist_idle_front_right_003", new FrameOffset(offset: new Vector2( 0, -1))},
+            {"cultist_idle_front_right_004", new FrameOffset(offset: new Vector2( 0, -1))},
+            {"cultist_idle_back_right_003",  new FrameOffset(offset: new Vector2( 0, -1))},
+            {"cultist_idle_back_right_004",  new FrameOffset(offset: new Vector2( 0, -1))},
+            {"cultist_idle_front_003",       new FrameOffset(offset: new Vector2( 0, -1))},
+            {"cultist_idle_front_004",       new FrameOffset(offset: new Vector2( 0, -1))},
+            {"cultist_idle_back_003",        new FrameOffset(offset: new Vector2( 0, -1))},
+            {"cultist_idle_back_004",        new FrameOffset(offset: new Vector2( 0, -1))},
+            {"cultist_move_front_right_001", new FrameOffset(offset: new Vector2( 0,  2))},
+            {"cultist_move_front_right_002", new FrameOffset(offset: new Vector2( 0,  1))},
+            {"cultist_move_front_right_003", new FrameOffset(offset: new Vector2( 0,  0))},
+            {"cultist_move_front_right_004", new FrameOffset(offset: new Vector2( 0,  1))},
+            {"cultist_move_front_right_005", new FrameOffset(offset: new Vector2( 0,  0))},
+            {"cultist_move_front_right_006", new FrameOffset(offset: new Vector2( 0,  0))},
+            {"cultist_move_back_right_001",  new FrameOffset(offset: new Vector2( 0,  2))},
+            {"cultist_move_back_right_002",  new FrameOffset(offset: new Vector2( 0,  1))},
+            {"cultist_move_back_right_003",  new FrameOffset(offset: new Vector2( 0,  0))},
+            {"cultist_move_back_right_004",  new FrameOffset(offset: new Vector2( 0,  1))},
+            {"cultist_move_back_right_005",  new FrameOffset(offset: new Vector2( 0,  0))},
+            {"cultist_move_back_right_006",  new FrameOffset(offset: new Vector2( 0,  0))},
+            {"cultist_move_front_001",       new FrameOffset(offset: new Vector2( 0,  2))},
+            {"cultist_move_front_002",       new FrameOffset(offset: new Vector2( 0,  0))},
+            {"cultist_move_front_003",       new FrameOffset(offset: new Vector2( 0, -3))},
+            {"cultist_move_front_004",       new FrameOffset(offset: new Vector2( 0,  1))},
+            {"cultist_move_front_005",       new FrameOffset(offset: new Vector2( 0, -1))},
+            {"cultist_move_front_006",       new FrameOffset(offset: new Vector2( 0, -2))},
+            {"cultist_move_back_001",        new FrameOffset(offset: new Vector2( 0,  2))},
+            {"cultist_move_back_002",        new FrameOffset(offset: new Vector2( 0,  0))},
+            {"cultist_move_back_003",        new FrameOffset(offset: new Vector2( 0, -3))},
+            {"cultist_move_back_004",        new FrameOffset(offset: new Vector2( 0,  1))},
+            {"cultist_move_back_005",        new FrameOffset(offset: new Vector2( 0, -1))},
+            {"cultist_move_back_006",        new FrameOffset(offset: new Vector2( 0, -2))},
         };
 
 		public Vector3 GetHatPosition(PlayerController player)
@@ -479,36 +498,39 @@ namespace Alexandria.cAPI
                 playerOffset = new Vector2(0f, headLevel);
 
             // determine the hat direction from the current animation name
-            HatDirection hatDirection = HatDirection.NONE;
+            // HatDirection hatDirection = HatDirection.NONE;
             string curAnim = player.spriteAnimator.currentClip.name;
             bool flipped = player.sprite.FlipX;
-            if (curAnim.Contains("forward") || curAnim.Contains("run_down"))
-                hatDirection = HatDirection.SOUTH;
-            else if (curAnim.Contains("backward") || curAnim.Contains("run_up"))
-                hatDirection = HatDirection.NORTH;
-            else if (curAnim.Contains("bw"))
-                hatDirection = HatDirection.NORTHEAST;
-            else
-                hatDirection = HatDirection.EAST;
+            // if (curAnim.Contains("forward") || curAnim.Contains("run_down"))
+            //     hatDirection = HatDirection.SOUTH;
+            // else if (curAnim.Contains("backward") || curAnim.Contains("run_up"))
+            //     hatDirection = HatDirection.NORTH;
+            // else if (curAnim.Contains("bw"))
+            //     hatDirection = HatDirection.NORTHEAST;
+            // else
+            //     hatDirection = HatDirection.EAST;
 
-            Vector2 directionalOffset = Vector2.zero;
-            if (PlayerHatDatabase.CharacterDirectionalHatOffsets.TryGetValue(player.name, out HatOffsets playerDirectionalHatOffsets))
-                directionalOffset = hatDirection switch {
-                    HatDirection.SOUTH     => (flipped ? playerDirectionalHatOffsets.frontFlipped : playerDirectionalHatOffsets.front),
-                    HatDirection.NORTH     => (flipped ? playerDirectionalHatOffsets.backFlipped : playerDirectionalHatOffsets.back),
-                    HatDirection.NORTHEAST => (flipped ? playerDirectionalHatOffsets.bwFlipped : playerDirectionalHatOffsets.bw),
-                    HatDirection.EAST      => (flipped ? playerDirectionalHatOffsets.fwFlipped : playerDirectionalHatOffsets.fw),
-                    _                      => Vector2.zero,
-                };
+            // Vector2 directionalOffset = Vector2.zero;
+            // if (PlayerHatDatabase.CharacterDirectionalHatOffsets.TryGetValue(player.name, out HatOffsets playerDirectionalHatOffsets))
+            //     directionalOffset = hatDirection switch {
+            //         HatDirection.SOUTH     => (flipped ? playerDirectionalHatOffsets.frontFlipped : playerDirectionalHatOffsets.front),
+            //         HatDirection.NORTH     => (flipped ? playerDirectionalHatOffsets.backFlipped : playerDirectionalHatOffsets.back),
+            //         HatDirection.NORTHEAST => (flipped ? playerDirectionalHatOffsets.bwFlipped : playerDirectionalHatOffsets.bw),
+            //         HatDirection.EAST      => (flipped ? playerDirectionalHatOffsets.fwFlipped : playerDirectionalHatOffsets.fw),
+            //         _                      => Vector2.zero,
+            //     };
 
             Vector2 bobOffset = Vector2.zero;
             string baseFrame = player.sprite.GetCurrentSpriteDef().name.Replace("_hands2","").Replace("_hands","").Replace("_hand_left","").Replace("_hand_right","").Replace("_hand","").Replace("_twohands","").Replace("_armorless","");
             // ETGModConsole.Log($"  frame is {player.sprite.GetCurrentSpriteDef().name}");
-            if (BobOffsets.TryGetValue(baseFrame, out float bobAmount))
-                bobOffset = new Vector2(0f, bobAmount);
+            if (FrameOffsets.TryGetValue(baseFrame, out FrameOffset frameOffset))
+                bobOffset = flipped ? frameOffset.flipOffset : frameOffset.offset;
 
+            Vector2 flipOffset = Vector2.zero;
+            if (flipped && flipHorizontalWithPlayer)
+                flipOffset = new Vector2(flipXOffset, 0f);
 
-            return baseOffset + hatOffset.XY() + playerOffset + directionalOffset + bobOffset;
+            return baseOffset + hatOffset.XY() + playerOffset + /*directionalOffset +*/ bobOffset + flipOffset;
             // if (attachLevel == HatAttachLevel.HEAD_TOP)
             // {
             //     if (PlayerHatDatabase.CharacterNameHatHeadLevel.ContainsKey(player.name))
@@ -541,6 +563,8 @@ namespace Alexandria.cAPI
         {
             if (hatOwner == null)
                 hatOwner = player;
+            if (flipHorizontalWithPlayer && player.sprite)
+                sprite.FlipX = player.sprite.FlipX;
             Vector2 vec = GetHatPosition(player);
             transform.position = vec;
             transform.rotation = hatOwner.transform.rotation;
@@ -660,7 +684,7 @@ namespace Alexandria.cAPI
 
                                 float elapsed = BraveTime.ScaledTimeSinceStartup - startRolTime;
                                 float percentDone = elapsed / RollLength;
-                                this.transform.position = GetHatPosition(hatOwner) + new Vector3(0, 2f * flipHeightMultiplier * Mathf.Sin(Mathf.PI * percentDone), 0);
+                                this.transform.position = GetHatPosition(hatOwner) + new Vector3(0, BASE_FLIP_HEIGHT * flipHeightMultiplier * Mathf.Sin(Mathf.PI * percentDone), 0);
 
                                 // if (elapsed < (endRollTime - startTime) * 0.01)
                                 //     this.transform.position = GetHatPosition(hatOwner);

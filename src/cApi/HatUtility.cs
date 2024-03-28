@@ -78,7 +78,7 @@ namespace Alexandria.cAPI
             }
         }
 
-		public static void SetupHatSprites(List<string> spritePaths, GameObject hatObj, int fps, Vector2 hatSize)
+		public static void SetupHatSprites(List<string> spritePaths, GameObject hatObj, int fps, Vector2? hatSize = null)
         {
             if (hatObj.GetComponent<Hat>() is not Hat hatness)
                 return;
@@ -92,7 +92,7 @@ namespace Alexandria.cAPI
             tk2dSpriteDefinition def = hatBaseSprite.GetCurrentSpriteDef();
             def.colliderVertices = new Vector3[]{
                 Vector3.zero,
-                new Vector3((hatSize.x / 16), (hatSize.y / 16), 0f)
+                hatSize.HasValue ? (0.0625f * hatSize.Value) : def.position3
             };
             hatBaseSprite.PlaceAtPositionByAnchor(hatObj.transform.position, tk2dBaseSprite.Anchor.LowerCenter);
             hatBaseSprite.depthUsesTrimmedBounds = true;
