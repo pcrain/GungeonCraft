@@ -81,18 +81,18 @@ public class SlappProjectile : MonoBehaviour
         Vector2 victimPos = this._slapVictim.CenterPosition;
         foreach (AIActor enemy in StaticReferenceManager.AllEnemies)
         {
-            if (!enemy || !enemy.isActiveAndEnabled || !enemy.behaviorSpeculator || enemy.behaviorSpeculator.ImmuneToStun)
-                continue;
-            if (enemy.healthHaver is not HealthHaver hh)
-                continue;
-            if (enemy.knockbackDoer is not KnockbackDoer kb)
+            if (!enemy || !enemy.isActiveAndEnabled)
                 continue;
             if ((enemy.sprite.WorldCenter - victimPos).sqrMagnitude > _SLAPP_RADIUS_SQUARED)
                 continue;
-            enemy.behaviorSpeculator.Stun(_SLAPPP_STUN);
+            if (enemy.healthHaver is not HealthHaver hh)
+                continue;
+
             hh.ApplyDamage(this._slapDamage, Vector2.zero, "SLAPPP", CoreDamageTypes.None, DamageCategory.Collision, true);
-            if (!hh.IsBoss && !hh.IsSubboss)
+            if (!hh.IsBoss && !hh.IsSubboss && enemy.knockbackDoer is KnockbackDoer kb)
                 kb.ApplyKnockback(this._slapAngle, _SLAPPP_FORCE);
+            if (enemy.behaviorSpeculator && !enemy.behaviorSpeculator.ImmuneToStun)
+                enemy.behaviorSpeculator.Stun(_SLAPPP_STUN);
         }
         UnityEngine.Object.Destroy(this);
     }
