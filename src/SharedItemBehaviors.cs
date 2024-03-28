@@ -1317,13 +1317,13 @@ public class Nametag : MonoBehaviour
 
     internal bool UpdateWhileParentAlive()
     {
-        if (this._actor?.healthHaver?.IsDead ?? true)
+        if (!this._actor || !this._actor.healthHaver || this._actor.healthHaver.IsDead)
         {
             HandleEnemyDied();
             return false;
         }
 
-        Vector3 screenPos = Camera.main.WorldToScreenPoint(this._actor.sprite.WorldTopCenter);
+        Vector3 screenPos = Camera.main.WorldToScreenPoint(this._actor.sprite ? this._actor.sprite.WorldTopCenter : this._actor.CenterPosition);
         this._nametag.transform.position = screenPos;
         return true;
     }

@@ -55,7 +55,7 @@ public class SubtractorBeam : AdvancedGunBehavior
     protected override void Update()
     {
         base.Update();
-        if ((this.Owner as PlayerController)?.healthHaver?.IsDead ?? true)
+        if ((this.Owner is not PlayerController player) || !player.healthHaver || player.healthHaver.IsDead)
             WhoAreTheyAgain();
         else
             YouShallKnowTheirNames();
@@ -83,10 +83,10 @@ public class SubtractorBeam : AdvancedGunBehavior
     private void YouShallKnowTheirNames()
     {
         UpdateNametags(true);
-        if (this.Owner?.GetAbsoluteParentRoom()?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> activeEnemies)
+        if (!this.Owner || this.Owner.GetAbsoluteParentRoom() is not RoomHandler room)
             return;
 
-        foreach (AIActor enemy in activeEnemies)
+        foreach (AIActor enemy in room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All).EmptyIfNull())
         {
             if (!enemy.IsHostile(canBeNeutral: true))
                 continue;
@@ -96,7 +96,7 @@ public class SubtractorBeam : AdvancedGunBehavior
                 nametag.Setup();
                 _Nametags[enemy.GetHashCode()] = nametag;
             }
-            enemy.gameObject.GetComponent<Nametag>().SetName($"{enemy.healthHaver.GetCurrentHealth()}");
+            enemy.GetComponent<Nametag>().SetName($"{enemy.healthHaver.GetCurrentHealth()}");
         }
     }
 }
@@ -151,7 +151,8 @@ public class SubtractorProjectile : MonoBehaviour
             this._hitFirstEnemy = true;
             this._damage = enemy.healthHaver.GetCurrentHealth();
             this._projectile.baseData.damage = this._damage;
-            this._trail?.DisconnectFromSpecRigidbody(); // we want to have a red trail after hitting the enemy, but want the old green trail around as well
+            if (this._trail)
+                this._trail.DisconnectFromSpecRigidbody(); // we want to have a red trail after hitting the enemy, but want the old green trail around as well
             this._trail = this._projectile.AddTrailToProjectileInstance(SubtractorBeam._RedTrailPrefab);
                 this._trail.gameObject.SetGlowiness(100f);
             return;

@@ -1,5 +1,9 @@
 # Changelog
 
+## Future
+
+- Fixed Subtractor Beam being completely broken and causing numerous null reference exceptions when killing enemies with health values visible
+
 ## 1.10.3 (2024-03-24)
 
 #### Bugfixes:
