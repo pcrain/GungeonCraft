@@ -148,9 +148,15 @@ namespace Alexandria.cAPI
         {
             if (hatObj.GetComponent<Hat>() is Hat hatComponent)
             {
-                Hatabase.Hats.Add(hatComponent.hatName.ToLower().Replace(" ","_"), hatComponent);
-                ETGModConsole.Log("Hat '" + hatComponent.hatName + "' correctly added to Hatabase!", true);
+                string hatDbName = hatComponent.hatName.GetDatabaseFriendlyName();
+                Hatabase.Hats[hatDbName] =  hatComponent;
+                ETGModConsole.Log("Hat '" + hatDbName + "' correctly added to Hatabase!", true);
             }
+        }
+
+        public static string GetDatabaseFriendlyName(this string hatName)
+        {
+            return hatName.ToLower().Replace(" ","_");
         }
     }
 }

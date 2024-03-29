@@ -43,7 +43,7 @@ namespace Alexandria.cAPI
                 return; // hat hasn't changed, nothing to do
             if (CurrentHat != null)
                 RemoveCurrentHat(); //Removes the current hat if it's not equal to the stored one
-            if (Hatabase.Hats.TryGetValue(storedHatName, out Hat hat))
+            if (Hatabase.Hats.TryGetValue(storedHatName.GetDatabaseFriendlyName(), out Hat hat))
                 SetHat(hat);
         }
 
@@ -55,12 +55,14 @@ namespace Alexandria.cAPI
             m_extantHatObject.SetActive(true);
             CurrentHat = m_extantHatObject.GetComponent<Hat>();
             CurrentHat.StickHatToPlayer(m_WearingPlayer);
+            ETGModConsole.Log($"adding hat {CurrentHat.hatName} for {m_WearingPlayer.name}");
             Hatabase.StoredHats[m_WearingPlayer.name] = CurrentHat.hatName;
         }
 
         public void RemoveCurrentHat()
         {
             UnityEngine.Object.Destroy(m_extantHatObject);
+            ETGModConsole.Log($"removing hat for {m_WearingPlayer.name}");
             Hatabase.StoredHats[m_WearingPlayer.name] = null;
             m_extantHatObject = null;
             CurrentHat = null;

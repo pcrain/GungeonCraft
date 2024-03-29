@@ -70,10 +70,12 @@ namespace Alexandria.cAPI
         {
             if (!hatOwner)
                 return;
+            HandleVanish(); //Make the Hat vanish upon pitfall, or when the player rolls if the hat is VANISH type
+            if (!base.sprite.renderer.enabled)
+                return; // nothing else to do while invisible
 
             if (currentState == HatState.SITTING)
                 StickHatToPlayer(hatOwner);
-            HandleVanish(); //Make the Hat vanish upon pitfall, or when the player rolls if the hat is VANISH type
             UpdateHatFacingDirection();
             HandleAttachedSpriteDepth();
             HandleFlip();
@@ -111,45 +113,55 @@ namespace Alexandria.cAPI
             }
         }
 
+        private bool ShouldBeVanished()
+        {
+            if (!hatOwner || !hatOwner.IsVisible || !hatOwner.sprite.renderer.enabled)
+                return true;
+            if (hatOwner.IsFalling)
+                return true;
+            if(!hatOwnerAnimator || hatOwnerAnimator.CurrentClip.name == "doorway" || hatOwnerAnimator.CurrentClip.name == "spinfall")
+                return true;
+            if ((PlayerHasAdditionalVanishOverride() || hatRollReaction == HatRollReaction.VANISH) && hatOwner.IsDodgeRolling)
+                return true;
+            if (hatOwner.IsSlidingOverSurface)
+                return true;
+            return false;
+        }
+
 		private void HandleVanish()
         {
             bool Visible = base.sprite.renderer.enabled;
-            bool shouldBeVanished = false;
-
-            if (hatOwner.IsFalling) 
-                shouldBeVanished = true;
-
-            if(hatOwnerAnimator.CurrentClip.name == "doorway" || hatOwnerAnimator.CurrentClip.name == "spinfall")
-                shouldBeVanished = true;
-
-            if ((PlayerHasAdditionalVanishOverride() || hatRollReaction == HatRollReaction.VANISH) && hatOwner.IsDodgeRolling) 
-                shouldBeVanished = true;
+            bool shouldBeVanished = ShouldBeVanished();
 
 			if (hatOwner.IsSlidingOverSurface) 
-            {
-               shouldBeVanished = true;
                StickHatToPlayer(hatOwner);
+
+            if (shouldBeVanished)
+            {
+                base.transform.parent = null;
+                base.sprite.renderer.enabled = false;
             }
-                
-            if (!Visible && !shouldBeVanished)
+            else
             {
                 base.sprite.renderer.enabled = true;
+            }
+
+            if (!Visible && !shouldBeVanished)
+            {
                 SpriteOutlineManager.AddOutlineToSprite(hatSprite, Color.black, 1);
-                StickHatToPlayer(hatOwner);
-                if (GameManager.AUDIO_ENABLED && !string.IsNullOrEmpty(FlipEndedSound))
-                {
-                    AkSoundEngine.PostEvent(FlipEndedSound, gameObject);
-                }
+                // StickHatToPlayer(hatOwner);
+                // if (GameManager.AUDIO_ENABLED && !string.IsNullOrEmpty(FlipEndedSound))
+                // {
+                //     AkSoundEngine.PostEvent(FlipEndedSound, gameObject);
+                // }
             }
             else if (Visible && shouldBeVanished)
             {
-                base.sprite.renderer.enabled = false;
                 SpriteOutlineManager.RemoveOutlineFromSprite(hatSprite);
-                StickHatToPlayer(hatOwner);
-                if (GameManager.AUDIO_ENABLED && !string.IsNullOrEmpty(FlipStartedSound))
-                {
-                    AkSoundEngine.PostEvent(FlipStartedSound, gameObject);
-                }
+                // if (GameManager.AUDIO_ENABLED && !string.IsNullOrEmpty(FlipStartedSound))
+                // {
+                //     AkSoundEngine.PostEvent(FlipStartedSound, gameObject);
+                // }
             }
         }
 
