@@ -15,15 +15,7 @@ namespace Alexandria.cAPI
     public static class HatUtility
     {
         private static AutocompletionSettings HatAutoCompletionSettings = new AutocompletionSettings(delegate (string input) {
-            List<string> ret = new List<string>();
-            foreach (string key in Hatabase.Hats.Keys)
-            {
-                if (key.AutocompletionMatch(input.ToLower()))
-                {
-                    ret.Add(key);
-                }
-            }
-            return ret.ToArray();
+            return Hatabase.Hats.Keys.Where(key => key.AutocompletionMatch(input.ToLower())).ToArray();
         });
 
         public static void NecessarySetup()
@@ -39,13 +31,7 @@ namespace Alexandria.cAPI
 
 		private static void SetHat(string[] args)
 		{
-            if (args == null)
-            {
-                ETGModConsole.Log("<size=100><color=#ff0000ff>Please Specify a Hat</color></size>", false);
-                return;
-            }
-
-            if (args[0] == "none")
+            if (args == null || args[0] == "none")
             {
                 PlayerController playa = GameManager.Instance.PrimaryPlayer;
                 HatController HatCont = playa.GetComponent<HatController>();
@@ -175,23 +161,20 @@ namespace Alexandria.cAPI
     }
 }
 
+//NOTE: these should already be in Alexandria and can probably be deleted from here once it's merged into Alexandria
 static class ExtensionMethods {
-    public static void MakeOffset(this tk2dSpriteDefinition def, Vector2 offset, bool changesCollider = false)
+    public static void MakeOffset(this tk2dSpriteDefinition def, Vector3 offset, bool changesCollider = false)
     {
-        float xOffset = offset.x;
-        float yOffset = offset.y;
-        def.position0 += new Vector3(xOffset, yOffset, 0);
-        def.position1 += new Vector3(xOffset, yOffset, 0);
-        def.position2 += new Vector3(xOffset, yOffset, 0);
-        def.position3 += new Vector3(xOffset, yOffset, 0);
-        def.boundsDataCenter += new Vector3(xOffset, yOffset, 0);
-        def.boundsDataExtents += new Vector3(xOffset, yOffset, 0);
-        def.untrimmedBoundsDataCenter += new Vector3(xOffset, yOffset, 0);
-        def.untrimmedBoundsDataExtents += new Vector3(xOffset, yOffset, 0);
+        def.position0 += offset;
+        def.position1 += offset;
+        def.position2 += offset;
+        def.position3 += offset;
+        def.boundsDataCenter += offset;
+        def.boundsDataExtents += offset;
+        def.untrimmedBoundsDataCenter += offset;
+        def.untrimmedBoundsDataExtents += offset;
         if (def.colliderVertices != null && def.colliderVertices.Length > 0 && changesCollider)
-        {
-            def.colliderVertices[0] += new Vector3(xOffset, yOffset, 0);
-        }
+            def.colliderVertices[0] += offset;
     }
 
     public static void ConstructOffsetsFromAnchor(this tk2dSpriteDefinition def, tk2dBaseSprite.Anchor anchor, Vector2? scale = null, bool fixesScale = false, bool changesCollider = true)
