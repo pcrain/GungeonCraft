@@ -16,7 +16,7 @@ namespace Alexandria.cAPI
     {
         private const float BASE_FLIP_HEIGHT = 3f;
 
-        public string   hatName;
+        public string hatName = null;
         public Vector3 hatOffset = Vector3.zero;
         public HatDirectionality hatDirectionality = HatDirectionality.NONE;
         public HatRollReaction hatRollReaction = HatRollReaction.FLIP;
@@ -29,25 +29,21 @@ namespace Alexandria.cAPI
         public float flipHeightMultiplier = 1f;
         public bool goldenPedastal = false;
         public bool flipHorizontalWithPlayer = true;
-        public float flipXOffset = 0f;
 
-        private HatDirection currentDirection;
-        private HatState currentState;
-        public tk2dSprite hatSprite;
-        public tk2dSpriteAnimator hatSpriteAnimator;
-        private tk2dSpriteAnimator hatOwnerAnimator;
-
+        private HatDirection currentDirection = HatDirection.NONE;
+        private HatState currentState = HatState.SITTING;
+        private tk2dSprite hatSprite = null;
+        private tk2dSpriteAnimator hatSpriteAnimator = null;
+        private tk2dSpriteAnimator hatOwnerAnimator = null;
         private tk2dSpriteDefinition cachedDef = null;
         private Vector2 cachedDefOffset = Vector2.zero;
         private float RollLength = 0.65f; //The time it takes for a player with no dodge roll effects to roll
+        private float startRolTime = 0.0f;
 
         private void Start()
         {
             if (!hatOwner)
-            {
-                Debug.LogError("hatOwner was somehow null in hat Start() ???");
                 return;
-            }
             hatSprite = base.GetComponent<tk2dSprite>();
             hatSpriteAnimator = base.GetComponent<tk2dSpriteAnimator>();
             SpriteOutlineManager.AddOutlineToSprite(hatSprite, Color.black, 1);
@@ -60,9 +56,7 @@ namespace Alexandria.cAPI
 		public override void OnDestroy()
         {
             if (hatOwner)
-            {
                 hatOwner.OnPreDodgeRoll -= this.HatReactToDodgeRoll;
-            }
             base.OnDestroy();
         }
 
@@ -247,25 +241,25 @@ namespace Alexandria.cAPI
             Vector2 baseOffset = new Vector2(player.SpriteBottomCenter.x, player.sprite.transform.position.y);
 
             // get the player specific offset
-            Vector2 playerOffset = Vector2.zero;
+            Vector2 playerSpecificOffset = Vector2.zero;
             bool onEyes = (attachLevel == HatAttachLevel.EYE_LEVEL);
             var headOffsets = onEyes ? Hatabase.CharacterNameEyeLevel : Hatabase.CharacterNameHatHeadLevel;
             if (headOffsets.TryGetValue(player.name, out float headLevel))
-                playerOffset = new Vector2(0f, headLevel);
+                playerSpecificOffset = new Vector2(0f, headLevel);
 
             // get the flipped offset if applicable
             bool flipped = player.sprite.FlipX;
-            Vector2 hatFlipOffset = (flipped && flipHorizontalWithPlayer) ? new Vector2(flipXOffset, 0f) : Vector2.zero;
+            Vector2 hatSpecificOffset = (flipped ? hatOffset.WithX(-hatOffset.x) : hatOffset).XY();
 
             // get the animation frame specific offset if applicable
-            Vector2 animationFrameOffset = GetDefOffset(cachedDef);
+            Vector2 animationFrameSpecificOffset = GetDefOffset(cachedDef);
             string baseFrame = GetSpriteBaseName(cachedDef.name);
             if ((onEyes ? Hatabase.EyeFrameOffsets : Hatabase.HeadFrameOffsets).TryGetValue(baseFrame, out Hatabase.FrameOffset frameOffset))
-                animationFrameOffset += flipped ? frameOffset.flipOffset : frameOffset.offset;
-            cachedDefOffset = animationFrameOffset;
+                animationFrameSpecificOffset += flipped ? frameOffset.flipOffset : frameOffset.offset;
+            cachedDefOffset = animationFrameSpecificOffset;
 
             // combine everything and return
-            return baseOffset + hatOffset.XY() + playerOffset + animationFrameOffset + hatFlipOffset;
+            return baseOffset + hatSpecificOffset + playerSpecificOffset + animationFrameSpecificOffset;
         }
 
         public void StickHatToPlayer(PlayerController player)
@@ -314,9 +308,11 @@ namespace Alexandria.cAPI
             }
         }
 
-        float startRolTime;
         private void HandleFlip()
         {
+            if (BraveTime.DeltaTime == 0.0f)
+                return; // don't do anything while time is frozen
+
             if (hatRollReaction != HatRollReaction.FLIP || PlayerHasAdditionalVanishOverride())
                 return; // no flipping needed
 
@@ -360,7 +356,6 @@ namespace Alexandria.cAPI
             this.transform.position = GetHatPosition(hatOwner) + new Vector3(0, BASE_FLIP_HEIGHT * flipHeightMultiplier * Mathf.Sin(Mathf.PI * percentDone), 0);
         }
 
-        #region enums
         public enum HatDepthType
         {
             AlwaysInFront,
@@ -377,17 +372,20 @@ namespace Alexandria.cAPI
             FOURWAY,
             SIXWAY,
         }
+
         public enum HatRollReaction
         {
             FLIP,
             VANISH,
             NONE,
         }
+
         public enum HatAttachLevel
         {
             HEAD_TOP,
             EYE_LEVEL,
         }
+
         public enum HatDirection
         {
             NORTH,
@@ -400,11 +398,11 @@ namespace Alexandria.cAPI
             SOUTHEAST,
             NONE,
         }
+
         public enum HatState
         {
             SITTING,
             FLIPPING,
         }
-		#endregion
 	}
 }
