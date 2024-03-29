@@ -10,7 +10,6 @@ using System.Collections;
 
 /* TODO:
     - get fading working again
-    - dog pathfinding gives null reference exceptions in hat room
 */
 
 namespace Alexandria.cAPI
@@ -41,6 +40,22 @@ namespace Alexandria.cAPI
             return;
           InfiniteRoom.Init();
           hatRoomNeedsInit = false;
+        }
+    }
+
+    /// <summary>Prevent Huntress' dog from throwing a zillion null reference exceptions due to being unable to pathfind in the hat room</summary>
+    [HarmonyPatch(typeof(AIActor), nameof(AIActor.PathfindToPosition))]
+    private class FixBrokenPathfindingPatch
+    {
+        static bool Prefix(AIActor __instance, Vector2 targetPosition, Vector2? overridePathEnd, bool smooth, Pathfinding.CellValidator cellValidator, Pathfinding.ExtraWeightingFunction extraWeightingFunction, CellTypes? overridePathableTiles, bool canPassOccupied)
+        {
+            int tilePosition = __instance.PathTile.x + __instance.PathTile.y * Pathfinding.Pathfinder.Instance.m_width;
+            if (tilePosition > Pathfinding.Pathfinder.Instance.m_nodes.Length)
+              return false; // skip the original method
+            if (Pathfinding.Pathfinder.Instance.m_nodes[tilePosition].CellData == null)
+              return false; // skip the original method
+
+            return true; // call the original method
         }
     }
 
