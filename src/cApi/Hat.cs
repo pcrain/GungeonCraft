@@ -51,6 +51,7 @@ namespace Alexandria.cAPI
             hatOwnerAnimator = playerSprite.GetComponent<tk2dSpriteAnimator>();
             hatOwner.OnPreDodgeRoll += this.HatReactToDodgeRoll;
             UpdateHatFacingDirection();
+            HandleAttachedSpriteDepth();
         }
 
 		public override void OnDestroy()

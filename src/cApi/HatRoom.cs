@@ -29,12 +29,6 @@ namespace Alexandria.cAPI
     private const float HAT_Z_OFFSET     = 1f;
     private const int MIN_ROOM_WIDTH     = 10;
 
-    private static int numRoomSegments = 10;
-    private static GameObject hallwaySegment;
-    private static GameObject entrance;
-    private static List<HatPedestal> pedestals = new List<HatPedestal>();
-    private static List<GameObject> objects = new List<GameObject>();
-    private static bool updateRoom = true;
     private static bool hatRoomNeedsInit = true;
 
     /// <summary>Regenerates the hat room every time the Breach loads</summary>
@@ -45,7 +39,7 @@ namespace Alexandria.cAPI
         {
           if (!hatRoomNeedsInit)
             return;
-          RegenHatRoom();
+          InfiniteRoom.Init();
           hatRoomNeedsInit = false;
         }
     }
@@ -58,14 +52,6 @@ namespace Alexandria.cAPI
         {
           hatRoomNeedsInit = true;
         }
-    }
-
-    public static void RegenHatRoom()
-    {
-        foreach (GameObject obj in InfiniteRoom.objects)
-            UnityEngine.GameObject.Destroy(obj);
-        InfiniteRoom.objects.Clear();
-        InfiniteRoom.Init();
     }
 
     private static void MakeRigidBody(this GameObject g, IntVector2 dimensions, IntVector2 offset)
@@ -84,13 +70,13 @@ namespace Alexandria.cAPI
       try
       {
         RoomHandler foyerRoom = GameManager.Instance.Dungeon.data.Entrance;
-        numRoomSegments = Mathf.Max(MIN_ROOM_WIDTH, Mathf.CeilToInt(Hatabase.Hats.Count / 2));
+        int numRoomSegments = Mathf.Max(MIN_ROOM_WIDTH, Mathf.CeilToInt(Hatabase.Hats.Count / 2));
 
-        hallwaySegment = ItemAPI.ItemBuilder.AddSpriteToObject("Hallway", $"{BASE_RES_PATH}hallway-seg.png");
+        GameObject hallwaySegment = ItemAPI.ItemBuilder.AddSpriteToObject("Hallway", $"{BASE_RES_PATH}hallway-seg.png");
         hallwaySegment.MakeRigidBody(dimensions: new IntVector2(32, 25), offset: new IntVector2(0, 100));
         hallwaySegment.GetComponent<tk2dSprite>().HeightOffGround = -15;
 
-        entrance = ItemAPI.ItemBuilder.AddSpriteToObject("Entrance", $"{BASE_RES_PATH}Entrance.png");
+        GameObject entrance = ItemAPI.ItemBuilder.AddSpriteToObject("Entrance", $"{BASE_RES_PATH}Entrance.png");
         entrance.MakeRigidBody(dimensions: new IntVector2(30, 30), offset: new IntVector2(20, 10));
         entrance.GetComponent<tk2dSprite>().HeightOffGround = -15;
 
@@ -112,24 +98,20 @@ namespace Alexandria.cAPI
 
         GameObject entranceObj = UnityEngine.Object.Instantiate(entrance, new Vector3(59.75f, 36f, 36.875f), Quaternion.identity);
         entranceObj.GetComponent<SpeculativeRigidbody>().OnCollision += WarpToHatRoom;
-        objects.Add(entranceObj);
 
-        GameObject firstSeg = UnityEngine.Object.Instantiate(hallwaySegment, new Vector3(HALLWAY_X, HALLWAY_Y, PEDESTAL_Z), Quaternion.identity);
-        objects.Add(firstSeg);
+        UnityEngine.Object.Instantiate(hallwaySegment, new Vector3(HALLWAY_X, HALLWAY_Y, PEDESTAL_Z), Quaternion.identity); // first top segment
 
-        GameObject firstBot = UnityEngine.Object.Instantiate(hallwaySegBottom, new Vector3(HALLWAY_X, HALLWAY_Y, PEDESTAL_Z), Quaternion.identity);
-        objects.Add(firstBot);
+        UnityEngine.Object.Instantiate(hallwaySegBottom, new Vector3(HALLWAY_X, HALLWAY_Y, PEDESTAL_Z), Quaternion.identity); // first bottom segment
 
         GameObject returner = UnityEngine.Object.Instantiate(new GameObject(), new Vector3(HALLWAY_X, HALLWAY_Y, PEDESTAL_Z), Quaternion.identity);
         returner.MakeRigidBody(dimensions: new IntVector2(2, 142), offset: new IntVector2(0, 0));
         returner.GetComponent<SpeculativeRigidbody>().OnCollision += WarpBackFromHatRoom;
-        objects.Add(returner);
 
         for (int i = 0; i < numRoomSegments; i++)
         {
             Vector3 pos = new Vector3(FIRST_SEGMENT_X + (SEGMENT_WIDTH * i), HALLWAY_Y, PEDESTAL_Z);
-            objects.Add(UnityEngine.Object.Instantiate(hallwaySegment, pos, Quaternion.identity));
-            objects.Add(UnityEngine.Object.Instantiate(hallwaySegBottom, pos, Quaternion.identity));
+            UnityEngine.Object.Instantiate(hallwaySegment, pos, Quaternion.identity);
+            UnityEngine.Object.Instantiate(hallwaySegBottom, pos, Quaternion.identity);
         }
 
         Hat[] allHats = Hatabase.Hats.Values.ToArray();
@@ -143,7 +125,6 @@ namespace Alexandria.cAPI
             hat.goldenPedestal ? goldPedestal : plainPedestal,
             new Vector3(FIRST_SEGMENT_X + (PEDESTAL_SPACING * segmentId), onTop ? 85.7f : 81f, PEDESTAL_Z),
             Quaternion.identity);
-          objects.Add(pedObj);
 
           HatPedestal pedestal = pedObj.AddComponent<HatPedestal>();
           pedestal.hat = hat;
@@ -158,20 +139,15 @@ namespace Alexandria.cAPI
           sprite.HeightOffGround = HAT_Z_OFFSET;
           sprite.UpdateZDepth();
           SpriteOutlineManager.AddOutlineToSprite(hat1.GetComponent<tk2dSprite>(), Color.black, HAT_Z_OFFSET);
-          pedestals.Add(pedestal);
 
           foyerRoom.RegisterInteractable(pedestal as IPlayerInteractable);
         }
 
-        GameObject end = UnityEngine.Object.Instantiate(hallwayEnd,
+        UnityEngine.Object.Instantiate(hallwayEnd, // last top segment
           new Vector3(FIRST_SEGMENT_X + (SEGMENT_WIDTH * numRoomSegments), HALLWAY_Y, PEDESTAL_Z), Quaternion.identity);
-        objects.Add(end);
 
-        GameObject finalBot = UnityEngine.Object.Instantiate(hallwaySegBottom,
+        UnityEngine.Object.Instantiate(hallwaySegBottom, // last bottom segment
           new Vector3(FIRST_SEGMENT_X + (SEGMENT_WIDTH * numRoomSegments), HALLWAY_Y, PEDESTAL_Z), Quaternion.identity);
-        objects.Add(finalBot);
-
-        updateRoom = false;
       }
       catch(Exception e)
       {
@@ -231,7 +207,6 @@ namespace Alexandria.cAPI
     public void Interact(PlayerController interactor)
     {
       interactor.GetComponent<HatController>().SetHat(hat);
-      // TextBoxManager.ShowInfoBox(new Vector2(transform.position.x + 0.75f, transform.position.y + 2), transform, 0.25f, hat.name);
     }
 
     public void OnEnteredRange(PlayerController interactor)
@@ -239,7 +214,7 @@ namespace Alexandria.cAPI
       //A method that runs whenever the player enters the interaction range of the interactable. This is what outlines it in white to show that it can be interacted with
       SpriteOutlineManager.RemoveOutlineFromSprite(base.sprite, true);
       SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.white);
-      TextBoxManager.ShowInfoBox(new Vector2(transform.position.x + 0.75f ,transform.position.y + 2), transform, 3600f, hat.name);  // 1 hour duration so it persists
+      TextBoxManager.ShowInfoBox(new Vector2(transform.position.x + 0.75f ,transform.position.y + 2), transform, 3600f, hat.hatName); // 1 hour duration so it persists
     }
 
     public void OnExitRange(PlayerController interactor)
@@ -247,7 +222,7 @@ namespace Alexandria.cAPI
       // A method that runs whenever the player exits the interaction range of the interactable.This is what removed the white outline to show that it cannot be currently interacted with
       SpriteOutlineManager.RemoveOutlineFromSprite(base.sprite, true);
       SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black);
-      TextBoxManager.ShowInfoBox(new Vector2(transform.position.x + 0.75f ,transform.position.y + 2), transform, 0f, hat.name);  // 0 duration = disappears instantly
+      TextBoxManager.ShowInfoBox(new Vector2(transform.position.x + 0.75f ,transform.position.y + 2), transform, 0f, hat.hatName); // 0 duration = disappears instantly
     }
   }
 

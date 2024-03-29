@@ -21,7 +21,7 @@ public static class CwaffHats
     {
       GameObject hatObj = UnityEngine.Object.Instantiate(new GameObject());
       Hat hat = hatObj.AddComponent<Hat>();
-      hat.hatName = name;
+      hat.hatName = name.Replace("_", " ").ToTitleCaseInvariant();
       hat.hatOffset = offset ?? Vector2.zero;
       if (onEyes)
       {
