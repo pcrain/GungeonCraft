@@ -14,6 +14,16 @@ namespace Alexandria.cAPI
 {
     public class HatController : MonoBehaviour
     {
+        /// <summary>Ensure any created PlayerControllers also have a HatController</summary>
+        [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.Start))]
+        private class EnsureHatControllerPatch
+        {
+            static void Postfix(PlayerController __instance)
+            {
+              __instance.gameObject.GetOrAddComponent<HatController>();
+            }
+        }
+
         public Hat CurrentHat { get; private set; }
         private GameObject m_extantHatObject;
         private PlayerController m_WearingPlayer;

@@ -17,69 +17,44 @@ namespace Alexandria.cAPI
         private const float BASE_FLIP_HEIGHT = 3f;
 
         public string   hatName;
-        public Vector3 hatOffset;
-        public HatDirectionality hatDirectionality;
-        public HatRollReaction hatRollReaction;
-        public HatAttachLevel attachLevel;
-        public string FlipStartedSound;
-        public string FlipEndedSound;
-        public HatDepthType hatDepthType;
-        public PlayerController hatOwner;
-        public float SpinSpeedMultiplier;
-        public float flipHeightMultiplier;
-        public bool goldenPedastal;
-        public bool flipHorizontalWithPlayer;
-        public float flipXOffset;
+        public Vector3 hatOffset = Vector3.zero;
+        public HatDirectionality hatDirectionality = HatDirectionality.NONE;
+        public HatRollReaction hatRollReaction = HatRollReaction.FLIP;
+        public HatAttachLevel attachLevel = HatAttachLevel.HEAD_TOP;
+        public string FlipStartedSound = null;
+        public string FlipEndedSound = null;
+        public HatDepthType hatDepthType = HatDepthType.AlwaysInFront;
+        public PlayerController hatOwner = null;
+        public float SpinSpeedMultiplier = 1f;
+        public float flipHeightMultiplier = 1f;
+        public bool goldenPedastal = false;
+        public bool flipHorizontalWithPlayer = true;
+        public float flipXOffset = 0f;
 
-        private FieldInfo commandedField, lastNonZeroField, lockedDodgeRollDirection, m_currentGunAngle;
         private HatDirection currentDirection;
         private HatState currentState;
         public tk2dSprite hatSprite;
         public tk2dSpriteAnimator hatSpriteAnimator;
         private tk2dSpriteAnimator hatOwnerAnimator;
 
-        private tk2dSpriteDefinition cachedDef;
-        private Vector2 cachedDefOffset;
-        
+        private tk2dSpriteDefinition cachedDef = null;
+        private Vector2 cachedDefOffset = Vector2.zero;
         private float RollLength = 0.65f; //The time it takes for a player with no dodge roll effects to roll
-        public Hat()
-        {
-            hatOffset = new Vector2(0, 0);
-            hatOwner = null;
-            SpinSpeedMultiplier = 1;
-            flipHeightMultiplier = 1;
-            hatRollReaction = HatRollReaction.FLIP;
-            hatDirectionality = HatDirectionality.NONE;
-            attachLevel = HatAttachLevel.HEAD_TOP;
-            hatDepthType = HatDepthType.AlwaysInFront;
-            FlipEndedSound = null;
-            FlipStartedSound = null;
-            goldenPedastal = false;
-            flipHorizontalWithPlayer = true;
-            flipXOffset = 0f;
-            cachedDef = null;
-            cachedDefOffset = Vector2.zero;
-        }
 
         private void Start()
         {
+            if (!hatOwner)
+            {
+                Debug.LogError("hatOwner was somehow null in hat Start() ???");
+                return;
+            }
             hatSprite = base.GetComponent<tk2dSprite>();
             hatSpriteAnimator = base.GetComponent<tk2dSpriteAnimator>();
-
-            commandedField = typeof(PlayerController).GetField("m_playerCommandedDirection", BindingFlags.NonPublic | BindingFlags.Instance);
-            lastNonZeroField = typeof(PlayerController).GetField("m_lastNonzeroCommandedDirection", BindingFlags.NonPublic | BindingFlags.Instance);           
-            lockedDodgeRollDirection = typeof(PlayerController).GetField("lockedDodgeRollDirection", BindingFlags.NonPublic | BindingFlags.Instance);
-            m_currentGunAngle = typeof(PlayerController).GetField("m_currentGunAngle", BindingFlags.NonPublic | BindingFlags.Instance);
-
-            if (hatOwner != null)
-            {
-                SpriteOutlineManager.AddOutlineToSprite(hatSprite, Color.black, 1);
-                GameObject playerSprite = hatOwner.transform.Find("PlayerSprite").gameObject;
-                hatOwnerAnimator = playerSprite.GetComponent<tk2dSpriteAnimator>();
-                hatOwner.OnPreDodgeRoll += this.HatReactToDodgeRoll;
-                UpdateHatFacingDirection();
-            }
-            else Debug.LogError("hatOwner was somehow null in hat Start() ???");
+            SpriteOutlineManager.AddOutlineToSprite(hatSprite, Color.black, 1);
+            GameObject playerSprite = hatOwner.transform.Find("PlayerSprite").gameObject;
+            hatOwnerAnimator = playerSprite.GetComponent<tk2dSpriteAnimator>();
+            hatOwner.OnPreDodgeRoll += this.HatReactToDodgeRoll;
+            UpdateHatFacingDirection();
         }
 
 		public override void OnDestroy()
@@ -93,34 +68,20 @@ namespace Alexandria.cAPI
 
         private void HatReactToDodgeRoll(PlayerController player)
         {
-            
+            /* unfinished */
         }
 
         private void Update()
         {
-            if (hatOwner)
-            {
-                if (currentState == HatState.SITTING)
-                    StickHatToPlayer(hatOwner);
-                HandleVanish(); //Make the Hat vanish upon pitfall, or when the player rolls if the hat is VANISH type
-                UpdateHatFacingDirection();
-                HandleAttachedSpriteDepth();
-                HandleFlip();
-            }
-        }
+            if (!hatOwner)
+                return;
 
-        private static Vector2 GetDefOffset(tk2dSpriteDefinition def)
-        {
-            Bounds b = new Bounds(
-              new Vector3(
-                def.boundsDataCenter.x,
-                def.boundsDataCenter.y,
-                def.boundsDataCenter.z),
-              new Vector3(
-                def.boundsDataExtents.x,
-                def.boundsDataExtents.y,
-                def.boundsDataExtents.z));
-            return new Vector2(0f, b.min.y + b.extents.y * 2f);
+            if (currentState == HatState.SITTING)
+                StickHatToPlayer(hatOwner);
+            HandleVanish(); //Make the Hat vanish upon pitfall, or when the player rolls if the hat is VANISH type
+            UpdateHatFacingDirection();
+            HandleAttachedSpriteDepth();
+            HandleFlip();
         }
 
         /// <summary>Preemptively move hat immediately after the player's sprite changes to avoid a 1-frame delay on hat offsets</summary>
@@ -145,7 +106,7 @@ namespace Alexandria.cAPI
                 if (def == hat.cachedDef)
                     return; // sprite hasn't changed, so nothing to do
 
-                hat.cachedDef = def;
+                hat.cachedDef = def; // cache the new sprite definition
                 if (hat.hatOwner && hat.currentState == HatState.SITTING)
                 {
                     hat.transform.position = hat.GetHatPosition(hat.hatOwner); // update the hat position in light of the new sprite definition
@@ -199,9 +160,7 @@ namespace Alexandria.cAPI
 
         private bool PlayerHasAdditionalVanishOverride()
         {
-            bool shouldActuallyVanish = false;
-            if (hatOwner && hatOwner.HasPickupID(436)) shouldActuallyVanish = true;
-            return shouldActuallyVanish;
+            return (hatOwner && hatOwner.HasPickupID(436)); // 436 == Bloodied Scarf
         }
 
 		public void UpdateHatFacingDirection()
@@ -209,8 +168,7 @@ namespace Alexandria.cAPI
             HatDirection targetDir = FetchOwnerFacingDirection();
             if (targetDir == currentDirection)
                 return; // nothing to update
-
-            string animToPlay = null;
+            currentDirection = targetDir; // cache the actual targetDir rather than adjustedDir so we don't call this every frame unnecessarily
 
             // adjust the direction based on what our hat actually supports
             HatDirection adjustedDir = targetDir;
@@ -236,23 +194,16 @@ namespace Alexandria.cAPI
             // pick the appropriate animation
             switch (adjustedDir)
             {
-                case HatDirection.SOUTH:     { animToPlay = "hat_south"; }     break;
-                case HatDirection.NORTH:     { animToPlay = "hat_north"; }     break;
-                case HatDirection.WEST:      { animToPlay = "hat_west"; }      break;
-                case HatDirection.EAST:      { animToPlay = "hat_east"; }      break;
-                case HatDirection.NORTHWEST: { animToPlay = "hat_northwest"; } break;
-                case HatDirection.NORTHEAST: { animToPlay = "hat_northeast"; } break;
+                case HatDirection.SOUTH:     { hatSpriteAnimator.Play("hat_south"); }     break;
+                case HatDirection.NORTH:     { hatSpriteAnimator.Play("hat_north"); }     break;
+                case HatDirection.WEST:      { hatSpriteAnimator.Play("hat_west"); }      break;
+                case HatDirection.EAST:      { hatSpriteAnimator.Play("hat_east"); }      break;
+                case HatDirection.NORTHWEST: { hatSpriteAnimator.Play("hat_northwest"); } break;
+                case HatDirection.NORTHEAST: { hatSpriteAnimator.Play("hat_northeast"); } break;
                 case HatDirection.NONE:
                     ETGModConsole.Log("ERROR: TRIED TO ROTATE HAT TO A NULL DIRECTION! (wtf?)");
                     break;
             }
-
-            // cache the actual targetDir rather than adjustedDir so we don't call this every frame unnecessarily
-            currentDirection = targetDir;
-
-            // play the animation if non-null
-            if (animToPlay != null)
-                hatSpriteAnimator.Play(animToPlay);
         }
 
         public HatDirection FetchOwnerFacingDirection()
@@ -270,6 +221,7 @@ namespace Alexandria.cAPI
             if (animName.Contains("backwards_"))   return hatOwner.sprite.FlipX ? HatDirection.NORTHWEST : HatDirection.NORTHEAST;
             if (animName.Contains("backward_"))    return hatOwner.sprite.FlipX ? HatDirection.NORTHWEST : HatDirection.NORTHEAST;
             if (animName.Contains("bw_"))          return hatOwner.sprite.FlipX ? HatDirection.NORTHWEST : HatDirection.NORTHEAST;
+            //NOTE: these are technically all unnecessary since we defaut to WEST / EAST anyway
             // if (animName.Contains("front_right_")) return hatOwner.sprite.FlipX ? HatDirection.WEST : HatDirection.EAST;
             // if (animName.Contains("right_front_")) return hatOwner.sprite.FlipX ? HatDirection.WEST : HatDirection.EAST;
             // if (animName.Contains("forward_"))     return hatOwner.sprite.FlipX ? HatDirection.WEST : HatDirection.EAST;
@@ -277,15 +229,14 @@ namespace Alexandria.cAPI
             return hatOwner.sprite.FlipX ? HatDirection.WEST : HatDirection.EAST; // return a sane default if we're ownerless
         }
 
-        public int GetPlayerAnimFrame(PlayerController player)
-		{
-            return player.spriteAnimator.CurrentFrame; // return a sane default
-
-        }
-
         private static string GetSpriteBaseName(string name)
         {
             return name.Replace("_hands2","").Replace("_hands","").Replace("_hand_left","").Replace("_hand_right","").Replace("_hand","").Replace("_twohands","").Replace("_armorless","");
+        }
+
+        private static Vector2 GetDefOffset(tk2dSpriteDefinition def)
+        {
+            return new Vector2(0f, def.boundsDataCenter.y + 0.5f * def.boundsDataExtents.y);
         }
 
 		public Vector3 GetHatPosition(PlayerController player)

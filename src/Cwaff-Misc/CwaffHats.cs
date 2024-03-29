@@ -15,11 +15,6 @@ public static class CwaffHats
       EasyHat(name: "witch_hat",      offset: new Vector2(-1f/16f, -3f/16f), flipXOffset: 2f/16f);
       EasyHat(name: "bunny_ears_hat", offset: new Vector2(0f/16f, -6f/16f));
       EasyHat(name: "shades_shades",  offset: new Vector2(-1f/16f, -2f/16f), flipXOffset: 2f/16f, glasses: true);
-
-      CwaffEvents.OnRunStart += (p1, p2, gamemode) => {
-          ETGModConsole.Log($"Hatting it up!");
-          p1.AddComponent<HatController>();
-      };
     }
 
     private static void EasyHat(string name, Vector2? offset = null, float flipXOffset = 0f, bool glasses = false)
