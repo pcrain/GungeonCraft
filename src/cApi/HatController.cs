@@ -111,18 +111,6 @@ namespace Alexandria.cAPI
         
     }
 
-    public class HatOffsets
-    {
-        public Vector2 back;
-        public Vector2 backFlipped;
-        public Vector2 bw;
-        public Vector2 bwFlipped;
-        public Vector2 fw;
-        public Vector2 fwFlipped;
-        public Vector2 front;
-        public Vector2 frontFlipped;
-    }
-
     public class PlayerHatDatabase
     {
         public static Dictionary<string, string> StoredHats = new Dictionary<string, string>()
@@ -141,22 +129,14 @@ namespace Alexandria.cAPI
         };
         public static Dictionary<string, float> CharacterNameEyeLevel = new Dictionary<string, float>()
         { //Vertical offset for where head-top hats should be placed on different characters (using character name)
-            // {"PlayerRogue(Clone)",  0.18f},
-            // {"PlayerMarine(Clone)", 0.12f },
-            // {"PlayerGuide(Clone)", -0.18f },
-            // {"PlayerConvict(Clone)", -0.06f},
-            // {"PlayerRobot(Clone)", 0.25f},
-            // {"PlayerBullet(Clone)", -0.31f },
-            // {"PlayerGunslinger(Clone)", 0.25f },
-            // {"PlayerCoopCultist(Clone)", 0.06f },
-            {"PlayerRogue(Clone)",  0.18f}, //TODO:
-            {"PlayerMarine(Clone)", 0.12f }, //TODO:
-            {"PlayerGuide(Clone)", -0.18f }, //TODO:
-            {"PlayerConvict(Clone)", -0.06f}, //TODO:
-            {"PlayerRobot(Clone)", 0.25f}, //TODO:
-            {"PlayerBullet(Clone)", -0.31f }, //TODO:
-            {"PlayerGunslinger(Clone)", 0.25f }, //TODO:
-            {"PlayerCoopCultist(Clone)", 0.06f }, //TODO:
+            {"PlayerRogue(Clone)",       -10f/16f},
+            {"PlayerMarine(Clone)",      -14f/16f},
+            {"PlayerGuide(Clone)",       -18f/16f},
+            {"PlayerConvict(Clone)",     -15f/16f},
+            {"PlayerRobot(Clone)",       - 5f/16f},
+            {"PlayerBullet(Clone)",      -16f/16f},
+            {"PlayerGunslinger(Clone)",   -6f/16f},
+            {"PlayerCoopCultist(Clone)", -12f/16f},
         };
         public static float defaultHeadLevelOffset = -14f/16f;
         public static float defaultEyeLevelOffset = 0.06f;
