@@ -4,7 +4,7 @@ public static class CwaffHats
 {
     public static void Init()
     {
-      Alexandria.cAPI.HatUtility.NecessarySetup();
+      Alexandria.cAPI.HatUtility.SetupConsoleCommands();
 
       EasyHat(name: "debug_hat",      offset: null);
       EasyHat(name: "debug_glasses",  offset: null, glasses: true);

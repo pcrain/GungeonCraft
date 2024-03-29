@@ -10,16 +10,10 @@ using Alexandria.ItemAPI;
 using System.Collections;
 using System.Globalization;
 
-
-/* TODO:
-    -
-*/
-
 namespace Alexandria.cAPI
 {
     public class Hat : BraveBehaviour
     {
-
         private const float BASE_FLIP_HEIGHT = 3f;
 
         public string   hatName;
@@ -315,7 +309,7 @@ namespace Alexandria.cAPI
             // get the animation frame specific offset if applicable
             Vector2 animationFrameOffset = GetDefOffset(cachedDef);
             string baseFrame = GetSpriteBaseName(cachedDef.name);
-            if ((onEyes ? Hatabase.EyeFrameOffsets : Hatabase.HeadFrameOffsets).TryGetValue(baseFrame, out FrameOffset frameOffset))
+            if ((onEyes ? Hatabase.EyeFrameOffsets : Hatabase.HeadFrameOffsets).TryGetValue(baseFrame, out Hatabase.FrameOffset frameOffset))
                 animationFrameOffset += flipped ? frameOffset.flipOffset : frameOffset.offset;
             cachedDefOffset = animationFrameOffset;
 

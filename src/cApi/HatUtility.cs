@@ -18,7 +18,7 @@ namespace Alexandria.cAPI
             return Hatabase.Hats.Keys.Where(key => key.AutocompletionMatch(input.ToLower())).ToArray();
         });
 
-        public static void NecessarySetup()
+        public static void SetupConsoleCommands()
         {
             try {
                 ETGModConsole.Commands.AddGroup("capi");
@@ -151,6 +151,7 @@ namespace Alexandria.cAPI
                 Hatabase.Hats.Add(hatComponent.hatName.ToLower().Replace(" ","_"), hatComponent);
                 ETGModConsole.Log("Hat '" + hatComponent.hatName + "' correctly added to Hatabase!", true);
             }
+            //NOTE: should be restored once integrated into Alexandria
             // foreach (var obj in InfiniteRoom.objects)
             // {
             //     UnityEngine.GameObject.Destroy(obj);
