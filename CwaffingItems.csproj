@@ -86,6 +86,7 @@
     <Compile Include="src\Cwaff-Enemies\Bosses\Sans\SansAttacks.cs"/>
     <Compile Include="src\Cwaff-Enemies\PathableBullet.cs"/>
     <Compile Include="src\cApi\HatController.cs"/>
+    <Compile Include="src\cApi\HatRoom.cs"/>
     <Compile Include="src\cApi\Hatabase.cs"/>
     <Compile Include="src\cApi\HatUtility.cs"/>
     <Compile Include="src\cApi\Hat.cs"/>
@@ -234,7 +235,6 @@
     <Compile Include="src\VFXToolbox.cs"/>
     <Compile Include="src\Main.cs"/>
     <Compile Include="src\CwaffConfig.cs"/>
-    <EmbeddedResource Include="Resources\sans_bosscard.png"/>
     <EmbeddedResource Include="Resources\Atlases\attach_points.tsv"/>
     <EmbeddedResource Include="Resources\Atlases\atlas_1.png"/>
     <EmbeddedResource Include="Resources\Atlases\atlas_1.atlas"/>

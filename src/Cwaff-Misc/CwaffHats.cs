@@ -15,6 +15,8 @@ public static class CwaffHats
       EasyHat(name: "witch_hat",      offset: new Vector2(-1f/16f, -3f/16f));
       EasyHat(name: "bunny_ears_hat", offset: new Vector2( 0f/16f, -4f/16f));
       EasyHat(name: "shades_shades",  offset: new Vector2(-1f/16f, -2f/16f), onEyes: true);
+
+      HatUtility.RegenHatRoom();
     }
 
     private static void EasyHat(string name, Vector2? offset = null, bool onEyes = false)
@@ -39,6 +41,6 @@ public static class CwaffHats
         ),
         hatObj: hatObj,
         fps: 1);
-      HatUtility.AddHatToDatabase(hatObj);
+      HatUtility.AddHatToDatabase(hatObj, regenHatRoom: false);
     }
 }

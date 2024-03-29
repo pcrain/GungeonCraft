@@ -17,7 +17,7 @@ namespace Alexandria.cAPI
         private const float BASE_FLIP_HEIGHT = 3f;
 
         public string hatName = null;
-        public Vector3 hatOffset = Vector3.zero;
+        public Vector2 hatOffset = Vector2.zero;
         public HatDirectionality hatDirectionality = HatDirectionality.NONE;
         public HatRollReaction hatRollReaction = HatRollReaction.FLIP;
         public HatAttachLevel attachLevel = HatAttachLevel.HEAD_TOP;
@@ -247,11 +247,11 @@ namespace Alexandria.cAPI
             if (headOffsets.TryGetValue(player.name, out float headLevel))
                 playerSpecificOffset = new Vector2(0f, headLevel);
 
-            // get the flipped offset if applicable
+            // get the hat specific offset
             bool flipped = player.sprite.FlipX;
-            Vector2 hatSpecificOffset = (flipped ? hatOffset.WithX(-hatOffset.x) : hatOffset).XY();
+            Vector2 hatSpecificOffset = (flipped ? hatOffset.WithX(-hatOffset.x) : hatOffset);
 
-            // get the animation frame specific offset if applicable
+            // get the animation frame specific offset, if one is available
             Vector2 animationFrameSpecificOffset = GetDefOffset(cachedDef);
             string baseFrame = GetSpriteBaseName(cachedDef.name);
             if ((onEyes ? Hatabase.EyeFrameOffsets : Hatabase.HeadFrameOffsets).TryGetValue(baseFrame, out Hatabase.FrameOffset frameOffset))
