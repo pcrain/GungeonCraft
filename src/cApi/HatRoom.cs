@@ -23,6 +23,8 @@ namespace Alexandria.cAPI
     private const string BASE_RES_PATH = "";
     private const string BASE_RES_SUFFIX = "";
 
+    private const float HAT_Z_OFFSET = 1f;
+
     static int roomWidth = 10;
     static GameObject hallwaySegment;
     static GameObject entrance;
@@ -123,22 +125,26 @@ namespace Alexandria.cAPI
               comp1.hat.sprite.collection,
               comp1.hat.sprite.spriteId
               );
-            hat1.GetComponent<tk2dSprite>().PlaceAtLocalPositionByAnchor(new Vector2(ped2.GetComponent<tk2dSprite>().WorldCenter.x, 87.2f).ToVector3ZisY(-1f), tk2dBaseSprite.Anchor.LowerCenter);
+            hat1.GetComponent<tk2dSprite>().PlaceAtLocalPositionByAnchor(new Vector2(ped2.GetComponent<tk2dSprite>().WorldCenter.x, 87.2f).ToVector3ZisY(0f), tk2dBaseSprite.Anchor.LowerCenter);
+            hat1.GetComponent<tk2dSprite>().HeightOffGround = HAT_Z_OFFSET;
+            hat1.GetComponent<tk2dSprite>().UpdateZDepth();
             newestAddedHat++;
 
             var comp2 = ped2.AddComponent<hatPedastal>();
             comp2.hat = Hatabase.Hats.Values.ToArray()[newestAddedHat];
             comp2.lowerPedastal = true;
-            // SpriteOutlineManager.AddOutlineToSprite(hat1.GetComponent<tk2dSprite>(), Color.black);
+            SpriteOutlineManager.AddOutlineToSprite(hat1.GetComponent<tk2dSprite>(), Color.black, HAT_Z_OFFSET);
 
             var hat2 = new GameObject();
             hat2.AddComponent<tk2dSprite>().SetSprite(
               comp2.hat.sprite.collection,
               comp2.hat.sprite.spriteId
               );
-            hat2.GetComponent<tk2dSprite>().PlaceAtLocalPositionByAnchor(new Vector2(ped2.GetComponent<tk2dSprite>().WorldCenter.x, 82.3f).ToVector3ZisY(-1f), tk2dBaseSprite.Anchor.LowerCenter);
+            hat2.GetComponent<tk2dSprite>().PlaceAtLocalPositionByAnchor(new Vector2(ped2.GetComponent<tk2dSprite>().WorldCenter.x, 82.3f).ToVector3ZisY(0f), tk2dBaseSprite.Anchor.LowerCenter);
+            hat2.GetComponent<tk2dSprite>().HeightOffGround = HAT_Z_OFFSET;
+            hat2.GetComponent<tk2dSprite>().UpdateZDepth();
 
-            // SpriteOutlineManager.AddOutlineToSprite(hat2.GetComponent<tk2dSprite>(), Color.black);
+            SpriteOutlineManager.AddOutlineToSprite(hat2.GetComponent<tk2dSprite>(), Color.black, HAT_Z_OFFSET);
 
             pedastals.Add(ped1.GetComponent<hatPedastal>());
             pedastals.Add(ped2.GetComponent<hatPedastal>());
@@ -156,9 +162,11 @@ namespace Alexandria.cAPI
               comp1.hat.sprite.collection,
               comp1.hat.sprite.spriteId
               );
-            hat1.GetComponent<tk2dSprite>().PlaceAtLocalPositionByAnchor(new Vector2(ped.GetComponent<tk2dSprite>().WorldCenter.x, 87.2f).ToVector3ZisY(-1f), tk2dBaseSprite.Anchor.LowerCenter);
+            hat1.GetComponent<tk2dSprite>().PlaceAtLocalPositionByAnchor(new Vector2(ped.GetComponent<tk2dSprite>().WorldCenter.x, 87.2f).ToVector3ZisY(0f), tk2dBaseSprite.Anchor.LowerCenter);
+            hat1.GetComponent<tk2dSprite>().HeightOffGround = HAT_Z_OFFSET;
+            hat1.GetComponent<tk2dSprite>().UpdateZDepth();
 
-            // SpriteOutlineManager.AddOutlineToSprite(hat1.GetComponent<tk2dSprite>(), Color.black);
+            SpriteOutlineManager.AddOutlineToSprite(hat1.GetComponent<tk2dSprite>(), Color.black, HAT_Z_OFFSET);
             pedastals.Add(ped.GetComponent<hatPedastal>());
             newestAddedHat++;
           }
