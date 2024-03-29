@@ -27,7 +27,7 @@ namespace Alexandria.cAPI
         public PlayerController hatOwner = null;
         public float SpinSpeedMultiplier = 1f;
         public float flipHeightMultiplier = 1f;
-        public bool goldenPedastal = false;
+        public bool goldenPedestal = false;
         public bool flipHorizontalWithPlayer = true;
 
         private HatDirection currentDirection = HatDirection.NONE;

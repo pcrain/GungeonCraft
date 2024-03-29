@@ -18,9 +18,7 @@ namespace Alexandria.cAPI
   public static class InfiniteRoom
   {
     // private const string BASE_RES_PATH = "Alexandria/cAPI/Resources/"; //NOTE: restore once reintegrated into Alexandria
-    // private const string BASE_RES_SUFFIX = ".png";
     private const string BASE_RES_PATH = "CwaffingTheGungy/Resources/";
-    private const string BASE_RES_SUFFIX = ".png";
 
     private const float HALLWAY_X        = 138.2f;
     private const float HALLWAY_Y        = 80.7f;
@@ -31,13 +29,13 @@ namespace Alexandria.cAPI
     private const float HAT_Z_OFFSET     = 1f;
     private const int MIN_ROOM_WIDTH     = 10;
 
-    static int roomWidth = 10;
-    static GameObject hallwaySegment;
-    static GameObject entrance;
-    static List<HatPedestal> pedastals = new List<HatPedestal>();
-    public static List<GameObject> objects = new List<GameObject>();
-    public static bool updateRoom = true;
-    public static bool hatRoomNeedsInit = true;
+    private static int numRoomSegments = 10;
+    private static GameObject hallwaySegment;
+    private static GameObject entrance;
+    private static List<HatPedestal> pedestals = new List<HatPedestal>();
+    private static List<GameObject> objects = new List<GameObject>();
+    private static bool updateRoom = true;
+    private static bool hatRoomNeedsInit = true;
 
     /// <summary>Regenerates the hat room every time the Breach loads</summary>
     [HarmonyPatch(typeof(Foyer), nameof(Foyer.ProcessPlayerEnteredFoyer))]
@@ -64,10 +62,15 @@ namespace Alexandria.cAPI
 
     public static void RegenHatRoom()
     {
-        foreach (var obj in InfiniteRoom.objects)
+        foreach (GameObject obj in InfiniteRoom.objects)
             UnityEngine.GameObject.Destroy(obj);
         InfiniteRoom.objects.Clear();
         InfiniteRoom.Init();
+    }
+
+    private static void MakeRigidBody(this GameObject g, IntVector2 dimensions, IntVector2 offset)
+    {
+      g.GenerateOrAddToRigidBody(CollisionLayer.HighObstacle, PixelCollider.PixelColliderGeneration.Manual, UsesPixelsAsUnitSize: true, dimensions: dimensions, offset: offset);
     }
 
     public static void Init()
@@ -81,51 +84,52 @@ namespace Alexandria.cAPI
       try
       {
         RoomHandler foyerRoom = GameManager.Instance.Dungeon.data.Entrance;
+        numRoomSegments = Mathf.Max(MIN_ROOM_WIDTH, Mathf.CeilToInt(Hatabase.Hats.Count / 2));
 
-        roomWidth = Mathf.Max(MIN_ROOM_WIDTH, Mathf.CeilToInt(Hatabase.Hats.Count / 2));
-        hallwaySegment = ItemAPI.ItemBuilder.AddSpriteToObject("Hallway", $"{BASE_RES_PATH}hallway-seg{BASE_RES_SUFFIX}");
-        var hallwayEnd = ItemAPI.ItemBuilder.AddSpriteToObject("HallwayEnd", $"{BASE_RES_PATH}hallwayEnd{BASE_RES_SUFFIX}");
-        entrance = ItemAPI.ItemBuilder.AddSpriteToObject("Entrance", $"{BASE_RES_PATH}Entrance{BASE_RES_SUFFIX}");
-        var plainPedestal = ItemAPI.ItemBuilder.AddSpriteToObject("plainPedastal", $"{BASE_RES_PATH}pedestal{BASE_RES_SUFFIX}");
-        var goldPedestal = ItemAPI.ItemBuilder.AddSpriteToObject("plainPedastal", $"{BASE_RES_PATH}pedestal_gold{BASE_RES_SUFFIX}");
-        var hallwaySegBottom = ItemAPI.ItemBuilder.AddSpriteToObject("HallwayBot", $"{BASE_RES_PATH}hallway-seg-bot{BASE_RES_SUFFIX}");
-        cAPIToolBox.GenerateOrAddToRigidBody(goldPedestal, CollisionLayer.HighObstacle, PixelCollider.PixelColliderGeneration.Manual, UsesPixelsAsUnitSize: true, dimensions: new IntVector2(26, 23), offset: new IntVector2(0, 0));
-        goldPedestal.GetComponent<tk2dSprite>().HeightOffGround = -3;
+        hallwaySegment = ItemAPI.ItemBuilder.AddSpriteToObject("Hallway", $"{BASE_RES_PATH}hallway-seg.png");
+        hallwaySegment.MakeRigidBody(dimensions: new IntVector2(32, 25), offset: new IntVector2(0, 100));
+        hallwaySegment.GetComponent<tk2dSprite>().HeightOffGround = -15;
 
-        cAPIToolBox.GenerateOrAddToRigidBody(plainPedestal, CollisionLayer.HighObstacle, PixelCollider.PixelColliderGeneration.Manual, UsesPixelsAsUnitSize: true, dimensions: new IntVector2(26, 23), offset: new IntVector2(0, 0));
-        plainPedestal.GetComponent<tk2dSprite>().HeightOffGround = -3;
-
-        cAPIToolBox.GenerateOrAddToRigidBody(hallwaySegment, CollisionLayer.HighObstacle, PixelCollider.PixelColliderGeneration.Manual, UsesPixelsAsUnitSize: true, dimensions: new IntVector2(32, 25), offset: new IntVector2(0, 100));
-        cAPIToolBox.GenerateOrAddToRigidBody(hallwaySegBottom, CollisionLayer.HighObstacle, PixelCollider.PixelColliderGeneration.Manual, UsesPixelsAsUnitSize: true, dimensions: new IntVector2(32, 9), offset: new IntVector2(0, -8));
-
-        cAPIToolBox.GenerateOrAddToRigidBody(hallwayEnd, CollisionLayer.HighObstacle, PixelCollider.PixelColliderGeneration.Manual, UsesPixelsAsUnitSize: true, dimensions: new IntVector2(32, 25), offset: new IntVector2(0, 100));
-        cAPIToolBox.GenerateOrAddToRigidBody(hallwayEnd, CollisionLayer.HighObstacle, PixelCollider.PixelColliderGeneration.Manual, UsesPixelsAsUnitSize: true, dimensions: new IntVector2(8, 142), offset: new IntVector2(23, 0));
-        var segmentSprite = hallwaySegment.GetComponent<tk2dSprite>();
-        segmentSprite.HeightOffGround = -15;
-        hallwayEnd.GetComponent<tk2dSprite>().HeightOffGround = -15;
-        entrance.GetComponent<tk2dSprite>().HeightOffGround = -4;
-        cAPIToolBox.GenerateOrAddToRigidBody(entrance, CollisionLayer.HighObstacle, PixelCollider.PixelColliderGeneration.Manual, UsesPixelsAsUnitSize: true, dimensions: new IntVector2(30, 30), offset: new IntVector2(20, 10));
+        entrance = ItemAPI.ItemBuilder.AddSpriteToObject("Entrance", $"{BASE_RES_PATH}Entrance.png");
+        entrance.MakeRigidBody(dimensions: new IntVector2(30, 30), offset: new IntVector2(20, 10));
         entrance.GetComponent<tk2dSprite>().HeightOffGround = -15;
 
-        var entranceObj = UnityEngine.Object.Instantiate(entrance, new Vector3(59.75f, 36f, 36.875f), Quaternion.identity);
+        GameObject hallwayEnd = ItemAPI.ItemBuilder.AddSpriteToObject("HallwayEnd", $"{BASE_RES_PATH}hallwayEnd.png");
+        hallwayEnd.MakeRigidBody(dimensions: new IntVector2(32, 25), offset: new IntVector2(0, 100));
+        hallwayEnd.MakeRigidBody(dimensions: new IntVector2(8, 142), offset: new IntVector2(23, 0));
+        hallwayEnd.GetComponent<tk2dSprite>().HeightOffGround = -15;
+
+        GameObject plainPedestal = ItemAPI.ItemBuilder.AddSpriteToObject("plainPedestal", $"{BASE_RES_PATH}pedestal.png");
+        plainPedestal.MakeRigidBody(dimensions: new IntVector2(26, 23), offset: new IntVector2(0, 0));
+        plainPedestal.GetComponent<tk2dSprite>().HeightOffGround = -3;
+
+        GameObject goldPedestal = ItemAPI.ItemBuilder.AddSpriteToObject("goldPedestal", $"{BASE_RES_PATH}pedestal_gold.png");
+        goldPedestal.MakeRigidBody(dimensions: new IntVector2(26, 23), offset: new IntVector2(0, 0));
+        goldPedestal.GetComponent<tk2dSprite>().HeightOffGround = -3;
+
+        GameObject hallwaySegBottom = ItemAPI.ItemBuilder.AddSpriteToObject("HallwayBot", $"{BASE_RES_PATH}hallway-seg-bot.png");
+        hallwaySegBottom.MakeRigidBody(dimensions: new IntVector2(32, 9), offset: new IntVector2(0, -8));
+
+        GameObject entranceObj = UnityEngine.Object.Instantiate(entrance, new Vector3(59.75f, 36f, 36.875f), Quaternion.identity);
         entranceObj.GetComponent<SpeculativeRigidbody>().OnCollision += WarpToHatRoom;
         objects.Add(entranceObj);
 
-        var firstSeg = UnityEngine.Object.Instantiate(hallwaySegment, new Vector3(HALLWAY_X, HALLWAY_Y, PEDESTAL_Z), Quaternion.identity);
+        GameObject firstSeg = UnityEngine.Object.Instantiate(hallwaySegment, new Vector3(HALLWAY_X, HALLWAY_Y, PEDESTAL_Z), Quaternion.identity);
         objects.Add(firstSeg);
 
-        var firstBot = UnityEngine.Object.Instantiate(hallwaySegBottom, new Vector3(HALLWAY_X, HALLWAY_Y, PEDESTAL_Z), Quaternion.identity);
+        GameObject firstBot = UnityEngine.Object.Instantiate(hallwaySegBottom, new Vector3(HALLWAY_X, HALLWAY_Y, PEDESTAL_Z), Quaternion.identity);
         objects.Add(firstBot);
 
-        var returner = UnityEngine.Object.Instantiate(new GameObject(), new Vector3(HALLWAY_X, HALLWAY_Y, PEDESTAL_Z), Quaternion.identity);
-        cAPIToolBox.GenerateOrAddToRigidBody(returner, CollisionLayer.HighObstacle, PixelCollider.PixelColliderGeneration.Manual, UsesPixelsAsUnitSize: true, dimensions: new IntVector2(2, 142), offset: new IntVector2(0, 0));
+        GameObject returner = UnityEngine.Object.Instantiate(new GameObject(), new Vector3(HALLWAY_X, HALLWAY_Y, PEDESTAL_Z), Quaternion.identity);
+        returner.MakeRigidBody(dimensions: new IntVector2(2, 142), offset: new IntVector2(0, 0));
         returner.GetComponent<SpeculativeRigidbody>().OnCollision += WarpBackFromHatRoom;
         objects.Add(returner);
 
-        for (int i = 0; i < roomWidth; i++)
+        for (int i = 0; i < numRoomSegments; i++)
         {
-            objects.Add(UnityEngine.Object.Instantiate(hallwaySegment, new Vector3(FIRST_SEGMENT_X + (SEGMENT_WIDTH * i), HALLWAY_Y, PEDESTAL_Z), Quaternion.identity));
-            objects.Add(UnityEngine.Object.Instantiate(hallwaySegBottom, new Vector3(FIRST_SEGMENT_X + (SEGMENT_WIDTH * i), HALLWAY_Y, PEDESTAL_Z), Quaternion.identity));
+            Vector3 pos = new Vector3(FIRST_SEGMENT_X + (SEGMENT_WIDTH * i), HALLWAY_Y, PEDESTAL_Z);
+            objects.Add(UnityEngine.Object.Instantiate(hallwaySegment, pos, Quaternion.identity));
+            objects.Add(UnityEngine.Object.Instantiate(hallwaySegBottom, pos, Quaternion.identity));
         }
 
         Hat[] allHats = Hatabase.Hats.Values.ToArray();
@@ -135,29 +139,36 @@ namespace Alexandria.cAPI
           int segmentId = i / 2;
           bool onTop = (i % 2) == 0;
 
-          GameObject ped1 = UnityEngine.Object.Instantiate(
-            hat.goldenPedastal ? goldPedestal : plainPedestal, new Vector3(FIRST_SEGMENT_X + (PEDESTAL_SPACING * segmentId), onTop ? 85.7f : 81f, PEDESTAL_Z), Quaternion.identity);
-          objects.Add(ped1);
+          GameObject pedObj = UnityEngine.Object.Instantiate(
+            hat.goldenPedestal ? goldPedestal : plainPedestal,
+            new Vector3(FIRST_SEGMENT_X + (PEDESTAL_SPACING * segmentId), onTop ? 85.7f : 81f, PEDESTAL_Z),
+            Quaternion.identity);
+          objects.Add(pedObj);
 
-          var comp1 = ped1.AddComponent<HatPedestal>();
-          comp1.hat = hat;
-          comp1.lowerPedastal = !onTop;
+          HatPedestal pedestal = pedObj.AddComponent<HatPedestal>();
+          pedestal.hat = hat;
+          pedestal.lowerPedestal = !onTop;
 
-          var hat1 = new GameObject();
+          GameObject hat1 = new GameObject();
           tk2dSprite sprite = hat1.AddComponent<tk2dSprite>();
-          sprite.SetSprite(comp1.hat.sprite.collection, comp1.hat.sprite.spriteId);
-          sprite.PlaceAtLocalPositionByAnchor(new Vector2(ped1.GetComponent<tk2dSprite>().WorldCenter.x, onTop ? 87.2f : 82.3f).ToVector3ZisY(0f), tk2dBaseSprite.Anchor.LowerCenter);
+          sprite.SetSprite(pedestal.hat.sprite.collection, pedestal.hat.sprite.spriteId);
+          sprite.PlaceAtLocalPositionByAnchor(
+            new Vector2(pedObj.GetComponent<tk2dSprite>().WorldCenter.x, onTop ? 87.2f : 82.3f).ToVector3ZisY(0f),
+            tk2dBaseSprite.Anchor.LowerCenter);
           sprite.HeightOffGround = HAT_Z_OFFSET;
           sprite.UpdateZDepth();
           SpriteOutlineManager.AddOutlineToSprite(hat1.GetComponent<tk2dSprite>(), Color.black, HAT_Z_OFFSET);
-          pedastals.Add(comp1);
+          pedestals.Add(pedestal);
 
-          foyerRoom.RegisterInteractable(comp1 as IPlayerInteractable);
+          foyerRoom.RegisterInteractable(pedestal as IPlayerInteractable);
         }
 
-        var end = UnityEngine.Object.Instantiate(hallwayEnd, new Vector3(FIRST_SEGMENT_X + (SEGMENT_WIDTH * roomWidth), HALLWAY_Y, PEDESTAL_Z), Quaternion.identity);
-        var finalBot = UnityEngine.Object.Instantiate(hallwaySegBottom, new Vector3(FIRST_SEGMENT_X + (SEGMENT_WIDTH * roomWidth), HALLWAY_Y, PEDESTAL_Z), Quaternion.identity);
+        GameObject end = UnityEngine.Object.Instantiate(hallwayEnd,
+          new Vector3(FIRST_SEGMENT_X + (SEGMENT_WIDTH * numRoomSegments), HALLWAY_Y, PEDESTAL_Z), Quaternion.identity);
         objects.Add(end);
+
+        GameObject finalBot = UnityEngine.Object.Instantiate(hallwaySegBottom,
+          new Vector3(FIRST_SEGMENT_X + (SEGMENT_WIDTH * numRoomSegments), HALLWAY_Y, PEDESTAL_Z), Quaternion.identity);
         objects.Add(finalBot);
 
         updateRoom = false;
@@ -189,22 +200,7 @@ namespace Alexandria.cAPI
     private static void WarpToPoint(PlayerController p, Vector2 position)
     {
       p.usingForcedInput = true;
-      if (updateRoom)
-      {
-        // Pixelator.Instance.FadeToBlack(0.5f, false);
-        foreach(var obj in objects)
-        {
-          UnityEngine.GameObject.Destroy(obj);
-        }
-        objects.Clear();
-        Init();
-        // yield return new WaitUntil(() => updateRoom == false);
-        // Pixelator.Instance.FadeToBlack(0.5f, true);
-      }
-      else
-      {
-        // Pixelator.Instance.FadeToBlack(0.5f, false, 0.3f);
-      }
+      // Pixelator.Instance.FadeToBlack(0.5f, false, 0.3f);
       p.WarpToPointAndBringCoopPartner(position, doFollowers: true);
       p.usingForcedInput = false;
     }
@@ -213,7 +209,7 @@ namespace Alexandria.cAPI
   class HatPedestal : BraveBehaviour, IPlayerInteractable
   {
     public Hat hat;
-    public bool lowerPedastal;
+    public bool lowerPedestal;
 
     public string GetAnimationState(PlayerController interactor, out bool shouldBeFlipped)
     {
@@ -229,7 +225,7 @@ namespace Alexandria.cAPI
 
     public float GetDistanceToPoint(Vector2 point)
     {
-      return Vector2.Distance(point, lowerPedastal ? gameObject.GetComponent<tk2dSprite>().WorldTopCenter : gameObject.GetComponent<tk2dSprite>().WorldCenter);
+      return Vector2.Distance(point, lowerPedestal ? gameObject.GetComponent<tk2dSprite>().WorldTopCenter : gameObject.GetComponent<tk2dSprite>().WorldCenter);
     }
 
     public void Interact(PlayerController interactor)
@@ -257,7 +253,7 @@ namespace Alexandria.cAPI
 
   public static class cAPIToolBox
   {
-      public static SpeculativeRigidbody GenerateOrAddToRigidBody(GameObject targetObject, CollisionLayer collisionLayer, PixelCollider.PixelColliderGeneration colliderGenerationMode = PixelCollider.PixelColliderGeneration.Tk2dPolygon, bool collideWithTileMap = false, bool CollideWithOthers = true, bool CanBeCarried = true, bool CanBePushed = false, bool RecheckTriggers = false, bool IsTrigger = false, bool replaceExistingColliders = false, bool UsesPixelsAsUnitSize = false, IntVector2? dimensions = null, IntVector2? offset = null)
+      public static SpeculativeRigidbody GenerateOrAddToRigidBody(this GameObject targetObject, CollisionLayer collisionLayer, PixelCollider.PixelColliderGeneration colliderGenerationMode = PixelCollider.PixelColliderGeneration.Tk2dPolygon, bool collideWithTileMap = false, bool CollideWithOthers = true, bool CanBeCarried = true, bool CanBePushed = false, bool RecheckTriggers = false, bool IsTrigger = false, bool replaceExistingColliders = false, bool UsesPixelsAsUnitSize = false, IntVector2? dimensions = null, IntVector2? offset = null)
       {
           SpeculativeRigidbody m_CachedRigidBody = GameObjectExtensions.GetOrAddComponent<SpeculativeRigidbody>(targetObject);
           m_CachedRigidBody.CollideWithOthers = CollideWithOthers;
