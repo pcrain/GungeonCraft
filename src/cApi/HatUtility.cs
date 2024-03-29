@@ -144,25 +144,13 @@ namespace Alexandria.cAPI
             animation.clips = animation.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
         }
 
-        public static void AddHatToDatabase(GameObject hatObj, bool regenHatRoom = true)
+        public static void AddHatToDatabase(GameObject hatObj)
         {
             if (hatObj.GetComponent<Hat>() is Hat hatComponent)
             {
                 Hatabase.Hats.Add(hatComponent.hatName.ToLower().Replace(" ","_"), hatComponent);
                 ETGModConsole.Log("Hat '" + hatComponent.hatName + "' correctly added to Hatabase!", true);
             }
-            if (regenHatRoom)
-                RegenHatRoom();
-        }
-
-        public static void RegenHatRoom()
-        {
-            foreach (var obj in InfiniteRoom.objects)
-            {
-                UnityEngine.GameObject.Destroy(obj);
-            }
-            InfiniteRoom.objects.Clear();
-            InfiniteRoom.Init();
         }
     }
 }

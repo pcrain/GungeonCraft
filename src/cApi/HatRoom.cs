@@ -10,8 +10,7 @@ using System.Collections;
 
 /* TODO:
     - get fading working again
-    - can't warp huntress with dog
-    - room doesn't generate when returning to breach after quick start
+    - dog pathfinding gives null reference exceptions in hat room
 */
 
 namespace Alexandria.cAPI
@@ -20,8 +19,8 @@ namespace Alexandria.cAPI
   {
     // private const string BASE_RES_PATH = "Alexandria/cAPI/Resources/"; //NOTE: restore once reintegrated into Alexandria
     // private const string BASE_RES_SUFFIX = ".png";
-    private const string BASE_RES_PATH = "";
-    private const string BASE_RES_SUFFIX = "";
+    private const string BASE_RES_PATH = "CwaffingTheGungy/Resources/";
+    private const string BASE_RES_SUFFIX = ".png";
 
     private const float HALLWAY_X        = 138.2f;
     private const float HALLWAY_Y        = 80.7f;
@@ -35,24 +34,53 @@ namespace Alexandria.cAPI
     static int roomWidth = 10;
     static GameObject hallwaySegment;
     static GameObject entrance;
-    static List<hatPedastal> pedastals = new List<hatPedastal>();
+    static List<HatPedestal> pedastals = new List<HatPedestal>();
     public static List<GameObject> objects = new List<GameObject>();
     public static bool updateRoom = true;
+    public static bool hatRoomNeedsInit = true;
+
+    /// <summary>Regenerates the hat room every time the Breach loads</summary>
+    [HarmonyPatch(typeof(Foyer), nameof(Foyer.ProcessPlayerEnteredFoyer))]
+    private class ProcessPlayerEnteredFoyerPatch
+    {
+        static void Postfix(Foyer __instance, PlayerController p)
+        {
+          if (!hatRoomNeedsInit)
+            return;
+          RegenHatRoom();
+          hatRoomNeedsInit = false;
+        }
+    }
+
+    /// <summary>Marks the hat room in need of regeneration every time the Breach is unloaded</summary>
+    [HarmonyPatch(typeof(Foyer), nameof(Foyer.OnDepartedFoyer))]
+    private class OnDepartedFoyerPatch
+    {
+        static void Postfix(Foyer __instance)
+        {
+          hatRoomNeedsInit = true;
+        }
+    }
+
+    public static void RegenHatRoom()
+    {
+        foreach (var obj in InfiniteRoom.objects)
+            UnityEngine.GameObject.Destroy(obj);
+        InfiniteRoom.objects.Clear();
+        InfiniteRoom.Init();
+    }
+
     public static void Init()
     {
+      if (Hatabase.Hats.Count == 0)
+      {
+        Debug.Log("No Hats so no hat room!");
+        return;
+      }
+
       try
       {
-        if (Hatabase.Hats.Count == 0)
-        {
-          Debug.Log("No Hats so no hat room!");
-          return;
-        }
-
-        foreach (var hatData in Hatabase.Hats)
-        {
-          ETGModConsole.Log($"found hat {hatData.Key} with name {hatData.Value.name} and hatname {hatData.Value.hatName} and collection {hatData.Value.sprite.collection} sprite id {hatData.Value.sprite.spriteId}");
-        }
-
+        RoomHandler foyerRoom = GameManager.Instance.Dungeon.data.Entrance;
 
         roomWidth = Mathf.Max(MIN_ROOM_WIDTH, Mathf.CeilToInt(Hatabase.Hats.Count / 2));
         hallwaySegment = ItemAPI.ItemBuilder.AddSpriteToObject("Hallway", $"{BASE_RES_PATH}hallway-seg{BASE_RES_SUFFIX}");
@@ -80,16 +108,20 @@ namespace Alexandria.cAPI
         entrance.GetComponent<tk2dSprite>().HeightOffGround = -15;
 
         var entranceObj = UnityEngine.Object.Instantiate(entrance, new Vector3(59.75f, 36f, 36.875f), Quaternion.identity);
-        var firstSeg = UnityEngine.Object.Instantiate(hallwaySegment, new Vector3(HALLWAY_X, HALLWAY_Y, PEDESTAL_Z), Quaternion.identity);
-        var firstBot = UnityEngine.Object.Instantiate(hallwaySegBottom, new Vector3(HALLWAY_X, HALLWAY_Y, PEDESTAL_Z), Quaternion.identity);
-        var returner = UnityEngine.Object.Instantiate(new GameObject(), new Vector3(HALLWAY_X, HALLWAY_Y, PEDESTAL_Z), Quaternion.identity);
-
+        entranceObj.GetComponent<SpeculativeRigidbody>().OnCollision += WarpToHatRoom;
         objects.Add(entranceObj);
+
+        var firstSeg = UnityEngine.Object.Instantiate(hallwaySegment, new Vector3(HALLWAY_X, HALLWAY_Y, PEDESTAL_Z), Quaternion.identity);
         objects.Add(firstSeg);
+
+        var firstBot = UnityEngine.Object.Instantiate(hallwaySegBottom, new Vector3(HALLWAY_X, HALLWAY_Y, PEDESTAL_Z), Quaternion.identity);
         objects.Add(firstBot);
-        objects.Add(returner);
+
+        var returner = UnityEngine.Object.Instantiate(new GameObject(), new Vector3(HALLWAY_X, HALLWAY_Y, PEDESTAL_Z), Quaternion.identity);
         cAPIToolBox.GenerateOrAddToRigidBody(returner, CollisionLayer.HighObstacle, PixelCollider.PixelColliderGeneration.Manual, UsesPixelsAsUnitSize: true, dimensions: new IntVector2(2, 142), offset: new IntVector2(0, 0));
-        returner.GetComponent<SpeculativeRigidbody>().OnCollision += warpBack;
+        returner.GetComponent<SpeculativeRigidbody>().OnCollision += WarpBackFromHatRoom;
+        objects.Add(returner);
+
         for (int i = 0; i < roomWidth; i++)
         {
             objects.Add(UnityEngine.Object.Instantiate(hallwaySegment, new Vector3(FIRST_SEGMENT_X + (SEGMENT_WIDTH * i), HALLWAY_Y, PEDESTAL_Z), Quaternion.identity));
@@ -105,24 +137,22 @@ namespace Alexandria.cAPI
 
           GameObject ped1 = UnityEngine.Object.Instantiate(
             hat.goldenPedastal ? goldPedestal : plainPedestal, new Vector3(FIRST_SEGMENT_X + (PEDESTAL_SPACING * segmentId), onTop ? 85.7f : 81f, PEDESTAL_Z), Quaternion.identity);
-          // cAPIToolBox.GenerateOrAddToRigidBody(ped2, CollisionLayer.HighObstacle, PixelCollider.PixelColliderGeneration.Manual, UsesPixelsAsUnitSize: true, dimensions: new IntVector2(26, 6), offset: new IntVector2(0, -6));
           objects.Add(ped1);
 
-          var comp1 = ped1.AddComponent<hatPedastal>();
+          var comp1 = ped1.AddComponent<HatPedestal>();
           comp1.hat = hat;
           comp1.lowerPedastal = !onTop;
 
           var hat1 = new GameObject();
           tk2dSprite sprite = hat1.AddComponent<tk2dSprite>();
-          sprite.SetSprite(
-            comp1.hat.sprite.collection,
-            comp1.hat.sprite.spriteId
-            );
+          sprite.SetSprite(comp1.hat.sprite.collection, comp1.hat.sprite.spriteId);
           sprite.PlaceAtLocalPositionByAnchor(new Vector2(ped1.GetComponent<tk2dSprite>().WorldCenter.x, onTop ? 87.2f : 82.3f).ToVector3ZisY(0f), tk2dBaseSprite.Anchor.LowerCenter);
           sprite.HeightOffGround = HAT_Z_OFFSET;
           sprite.UpdateZDepth();
           SpriteOutlineManager.AddOutlineToSprite(hat1.GetComponent<tk2dSprite>(), Color.black, HAT_Z_OFFSET);
-          pedastals.Add(ped1.GetComponent<hatPedastal>());
+          pedastals.Add(comp1);
+
+          foyerRoom.RegisterInteractable(comp1 as IPlayerInteractable);
         }
 
         var end = UnityEngine.Object.Instantiate(hallwayEnd, new Vector3(FIRST_SEGMENT_X + (SEGMENT_WIDTH * roomWidth), HALLWAY_Y, PEDESTAL_Z), Quaternion.identity);
@@ -130,7 +160,6 @@ namespace Alexandria.cAPI
         objects.Add(end);
         objects.Add(finalBot);
 
-        entranceObj.GetComponent<SpeculativeRigidbody>().OnCollision += warp;
         updateRoom = false;
       }
       catch(Exception e)
@@ -139,14 +168,22 @@ namespace Alexandria.cAPI
       }
     }
 
-    private static void warpBack(CollisionData obj)
+    private static void WarpToHatRoom(CollisionData obj)
     {
-      var player = obj.OtherRigidbody.gameObject.GetComponent<PlayerController>();
-      if (player != null)
-      {
-        WarpToPoint(player, new Vector2(57.75f, 36.75f));
-        Pixelator.Instance.DoOcclusionLayer = true;
-      }
+      if (obj.OtherRigidbody.gameObject.GetComponent<PlayerController>() is not PlayerController player)
+        return;
+
+      WarpToPoint(player, new Vector2(140.5f, 84.7f));
+      Pixelator.Instance.DoOcclusionLayer = false;
+    }
+
+    private static void WarpBackFromHatRoom(CollisionData obj)
+    {
+      if (obj.OtherRigidbody.gameObject.GetComponent<PlayerController>() is not PlayerController player)
+        return;
+
+      WarpToPoint(player, new Vector2(57.75f, 36.75f));
+      Pixelator.Instance.DoOcclusionLayer = true;
     }
 
     private static void WarpToPoint(PlayerController p, Vector2 position)
@@ -168,43 +205,15 @@ namespace Alexandria.cAPI
       {
         // Pixelator.Instance.FadeToBlack(0.5f, false, 0.3f);
       }
-      p.WarpToPointAndBringCoopPartner(position);
+      p.WarpToPointAndBringCoopPartner(position, doFollowers: true);
       p.usingForcedInput = false;
-    }
-
-    private static void warp(CollisionData obj)
-    {
-      var player = obj.OtherRigidbody.gameObject.GetComponent<PlayerController>();
-      if (player != null)
-      {
-        WarpToPoint(player, new Vector2(140.5f, 84.7f));
-        Pixelator.Instance.DoOcclusionLayer = false;
-      }
     }
   }
 
-  class hatPedastal : BraveBehaviour, IPlayerInteractable
+  class HatPedestal : BraveBehaviour, IPlayerInteractable
   {
     public Hat hat;
     public bool lowerPedastal;
-    void Update()
-    {
-      foreach (var player in GameManager.Instance.AllPlayers)
-      {
-          if (GetDistanceToPoint(player.transform.position) < GetOverrideMaxDistance() && BraveInput.GetInstanceForPlayer(player.PlayerIDX).ActiveActions.InteractAction.WasPressed)
-          {
-            Interact(player);
-          }
-          else if (GetDistanceToPoint(player.transform.position) < GetOverrideMaxDistance())
-          {
-            OnEnteredRange(player);
-          }
-          else
-          {
-            OnExitRange(player);
-          }
-      }
-    }
 
     public string GetAnimationState(PlayerController interactor, out bool shouldBeFlipped)
     {
@@ -215,33 +224,18 @@ namespace Alexandria.cAPI
 
     public float GetOverrideMaxDistance()
     {
-      if(lowerPedastal)
-        return 1.7f;
-
-      return 2.5f;
+      return 1f;
     }
 
-    public override void OnDestroy()
-    {
-      base.OnDestroy();
-    }
     public float GetDistanceToPoint(Vector2 point)
     {
-      if (lowerPedastal)
-      {
-        return Vector2.Distance(point, gameObject.GetComponent<tk2dSprite>().WorldCenter
-          .WithY(gameObject.GetComponent<tk2dSprite>().WorldBottomCenter.y)
-          .WithX(gameObject.GetComponent<tk2dSprite>().WorldBottomCenter.x - 1));
-      }
-      return Vector2.Distance(point, gameObject.GetComponent<tk2dSprite>().WorldCenter
-        .WithY(gameObject.GetComponent<tk2dSprite>().WorldTopCenter.y)
-        .WithX(gameObject.GetComponent<tk2dSprite>().WorldTopCenter.x - 1));
+      return Vector2.Distance(point, lowerPedastal ? gameObject.GetComponent<tk2dSprite>().WorldTopCenter : gameObject.GetComponent<tk2dSprite>().WorldCenter);
     }
 
     public void Interact(PlayerController interactor)
     {
       interactor.GetComponent<HatController>().SetHat(hat);
-      TextBoxManager.ShowInfoBox(new Vector2(transform.position.x + 0.75f, transform.position.y + 2), transform, 0, hat.name);
+      // TextBoxManager.ShowInfoBox(new Vector2(transform.position.x + 0.75f, transform.position.y + 2), transform, 0.25f, hat.name);
     }
 
     public void OnEnteredRange(PlayerController interactor)
@@ -249,7 +243,7 @@ namespace Alexandria.cAPI
       //A method that runs whenever the player enters the interaction range of the interactable. This is what outlines it in white to show that it can be interacted with
       SpriteOutlineManager.RemoveOutlineFromSprite(base.sprite, true);
       SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.white);
-      TextBoxManager.ShowInfoBox(new Vector2(transform.position.x + 0.75f ,transform.position.y + 2), transform, 0, hat.name);
+      TextBoxManager.ShowInfoBox(new Vector2(transform.position.x + 0.75f ,transform.position.y + 2), transform, 3600f, hat.name);  // 1 hour duration so it persists
     }
 
     public void OnExitRange(PlayerController interactor)
@@ -257,6 +251,7 @@ namespace Alexandria.cAPI
       // A method that runs whenever the player exits the interaction range of the interactable.This is what removed the white outline to show that it cannot be currently interacted with
       SpriteOutlineManager.RemoveOutlineFromSprite(base.sprite, true);
       SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black);
+      TextBoxManager.ShowInfoBox(new Vector2(transform.position.x + 0.75f ,transform.position.y + 2), transform, 0f, hat.name);  // 0 duration = disappears instantly
     }
   }
 

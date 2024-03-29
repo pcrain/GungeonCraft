@@ -235,6 +235,14 @@
     <Compile Include="src\VFXToolbox.cs"/>
     <Compile Include="src\Main.cs"/>
     <Compile Include="src\CwaffConfig.cs"/>
+    <EmbeddedResource Include="Resources\hallway-seg-bot.png"/>
+    <EmbeddedResource Include="Resources\empty.png"/>
+    <EmbeddedResource Include="Resources\pedestal.png"/>
+    <EmbeddedResource Include="Resources\hallway-seg.png"/>
+    <EmbeddedResource Include="Resources\Entrance.png"/>
+    <EmbeddedResource Include="Resources\sans_bosscard.png"/>
+    <EmbeddedResource Include="Resources\hallwayEnd.png"/>
+    <EmbeddedResource Include="Resources\pedestal_gold.png"/>
     <EmbeddedResource Include="Resources\Atlases\attach_points.tsv"/>
     <EmbeddedResource Include="Resources\Atlases\atlas_1.png"/>
     <EmbeddedResource Include="Resources\Atlases\atlas_1.atlas"/>
