@@ -7,6 +7,13 @@ using UnityEngine;
 using MonoMod.RuntimeDetour;
 using System.Collections;
 
+
+/* TODO:
+    - get fading working again
+    - can't warp huntress with dog
+    - room doesn't generate when returning to breach after quick start
+*/
+
 namespace Alexandria.cAPI
 {
   public static class InfiniteRoom
@@ -32,7 +39,13 @@ namespace Alexandria.cAPI
           Debug.Log("No Hats so no hat room!");
           return;
         }
-        ETGModConsole.Log(1);
+
+        foreach (var hatData in Hatabase.Hats)
+        {
+          ETGModConsole.Log($"found hat {hatData.Key} with name {hatData.Value.name} and hatname {hatData.Value.hatName} and collection {hatData.Value.sprite.collection} sprite id {hatData.Value.sprite.spriteId}");
+        }
+
+
         roomWidth = Mathf.Max(10, Mathf.CeilToInt(Hatabase.Hats.Count / 2));
         hallwaySegment = ItemAPI.ItemBuilder.AddSpriteToObject("Hallway", $"{BASE_RES_PATH}hallway-seg{BASE_RES_SUFFIX}");
         var hallwayEnd = ItemAPI.ItemBuilder.AddSpriteToObject("HallwayEnd", $"{BASE_RES_PATH}hallwayEnd{BASE_RES_SUFFIX}");
@@ -40,7 +53,6 @@ namespace Alexandria.cAPI
         var plainPedestal = ItemAPI.ItemBuilder.AddSpriteToObject("plainPedastal", $"{BASE_RES_PATH}pedestal{BASE_RES_SUFFIX}");
         var goldPedestal = ItemAPI.ItemBuilder.AddSpriteToObject("plainPedastal", $"{BASE_RES_PATH}pedestal_gold{BASE_RES_SUFFIX}");
         var hallwaySegBottom = ItemAPI.ItemBuilder.AddSpriteToObject("HallwayBot", $"{BASE_RES_PATH}hallway-seg-bot{BASE_RES_SUFFIX}");
-        ETGModConsole.Log(2);
         cAPIToolBox.GenerateOrAddToRigidBody(goldPedestal, CollisionLayer.HighObstacle, PixelCollider.PixelColliderGeneration.Manual, UsesPixelsAsUnitSize: true, dimensions: new IntVector2(26, 23), offset: new IntVector2(0, 0));
         goldPedestal.GetComponent<tk2dSprite>().HeightOffGround = -3;
 
@@ -52,7 +64,6 @@ namespace Alexandria.cAPI
 
         cAPIToolBox.GenerateOrAddToRigidBody(hallwayEnd, CollisionLayer.HighObstacle, PixelCollider.PixelColliderGeneration.Manual, UsesPixelsAsUnitSize: true, dimensions: new IntVector2(32, 25), offset: new IntVector2(0, 100));
         cAPIToolBox.GenerateOrAddToRigidBody(hallwayEnd, CollisionLayer.HighObstacle, PixelCollider.PixelColliderGeneration.Manual, UsesPixelsAsUnitSize: true, dimensions: new IntVector2(8, 142), offset: new IntVector2(23, 0));
-        ETGModConsole.Log(3);
         var sprite = hallwaySegment.GetComponent<tk2dSprite>();
         sprite.HeightOffGround = -15;
         hallwayEnd.GetComponent<tk2dSprite>().HeightOffGround = -15;
@@ -69,11 +80,9 @@ namespace Alexandria.cAPI
         objects.Add(firstSeg);
         objects.Add(firstBot);
         objects.Add(returner);
-        ETGModConsole.Log(4);
         cAPIToolBox.GenerateOrAddToRigidBody(returner, CollisionLayer.HighObstacle, PixelCollider.PixelColliderGeneration.Manual, UsesPixelsAsUnitSize: true, dimensions: new IntVector2(2, 142), offset: new IntVector2(0, 0));
         returner.GetComponent<SpeculativeRigidbody>().OnCollision += warpBack;
         int newestAddedHat = 0;
-        ETGModConsole.Log(5);
         for (int i = 0; i < roomWidth; i++)
         {
           var newestSeg = UnityEngine.Object.Instantiate(hallwaySegment, new Vector3(140.2f + (2 * i), 80.7f, 10.8f), Quaternion.identity);
@@ -109,26 +118,31 @@ namespace Alexandria.cAPI
             comp1.hat = Hatabase.Hats.Values.ToArray()[newestAddedHat];
             comp1.lowerPedastal = false;
 
-            var hat1 = ItemAPI.ItemBuilder.AddSpriteToObject("placeholder", $"{BASE_RES_PATH}empty{BASE_RES_SUFFIX}");
-            ItemAPI.SpriteBuilder.CopyFrom<tk2dBaseSprite>(hat1.GetComponent<tk2dBaseSprite>(), Hatabase.Hats.Values.ToArray()[newestAddedHat].sprite);
-            hat1.GetComponent<tk2dSprite>().PlaceAtLocalPositionByAnchor(new Vector3(ped2.GetComponent<tk2dSprite>().WorldCenter.x, 87.2f, 10.8f), tk2dBaseSprite.Anchor.LowerCenter);
+            var hat1 = new GameObject();
+            hat1.AddComponent<tk2dSprite>().SetSprite(
+              comp1.hat.sprite.collection,
+              comp1.hat.sprite.spriteId
+              );
+            hat1.GetComponent<tk2dSprite>().PlaceAtLocalPositionByAnchor(new Vector2(ped2.GetComponent<tk2dSprite>().WorldCenter.x, 87.2f).ToVector3ZisY(-1f), tk2dBaseSprite.Anchor.LowerCenter);
             newestAddedHat++;
 
             var comp2 = ped2.AddComponent<hatPedastal>();
             comp2.hat = Hatabase.Hats.Values.ToArray()[newestAddedHat];
             comp2.lowerPedastal = true;
-            SpriteOutlineManager.AddOutlineToSprite(hat1.GetComponent<tk2dSprite>(), Color.black);
+            // SpriteOutlineManager.AddOutlineToSprite(hat1.GetComponent<tk2dSprite>(), Color.black);
 
-            var hat2 = ItemAPI.ItemBuilder.AddSpriteToObject("placeholder", $"{BASE_RES_PATH}empty{BASE_RES_SUFFIX}");
-            ItemAPI.SpriteBuilder.CopyFrom<tk2dBaseSprite>(hat2.GetComponent<tk2dBaseSprite>(), Hatabase.Hats.Values.ToArray()[newestAddedHat].sprite);
-            hat2.GetComponent<tk2dSprite>().PlaceAtLocalPositionByAnchor(new Vector3(ped2.GetComponent<tk2dSprite>().WorldCenter.x, 82.3f, 10.8f), tk2dBaseSprite.Anchor.LowerCenter);
+            var hat2 = new GameObject();
+            hat2.AddComponent<tk2dSprite>().SetSprite(
+              comp2.hat.sprite.collection,
+              comp2.hat.sprite.spriteId
+              );
+            hat2.GetComponent<tk2dSprite>().PlaceAtLocalPositionByAnchor(new Vector2(ped2.GetComponent<tk2dSprite>().WorldCenter.x, 82.3f).ToVector3ZisY(-1f), tk2dBaseSprite.Anchor.LowerCenter);
 
-            SpriteOutlineManager.AddOutlineToSprite(hat2.GetComponent<tk2dSprite>(), Color.black);
+            // SpriteOutlineManager.AddOutlineToSprite(hat2.GetComponent<tk2dSprite>(), Color.black);
 
             pedastals.Add(ped1.GetComponent<hatPedastal>());
             pedastals.Add(ped2.GetComponent<hatPedastal>());
             newestAddedHat++;
-            ETGModConsole.Log(6);
           }
           else if (Hatabase.Hats.Count > newestAddedHat)
           {
@@ -137,14 +151,16 @@ namespace Alexandria.cAPI
             comp1.hat = Hatabase.Hats.Values.ToArray()[newestAddedHat];
             comp1.lowerPedastal = false;
             objects.Add(ped);
-            var hat1 = ItemAPI.ItemBuilder.AddSpriteToObject("placeholder", $"{BASE_RES_PATH}empty{BASE_RES_SUFFIX}");
-            ItemAPI.SpriteBuilder.CopyFrom<tk2dBaseSprite>(hat1.GetComponent<tk2dBaseSprite>(), Hatabase.Hats.Values.ToArray()[newestAddedHat].sprite);
-            hat1.GetComponent<tk2dSprite>().PlaceAtLocalPositionByAnchor(new Vector3(ped.GetComponent<tk2dSprite>().WorldCenter.x, 87.2f, 10.8f), tk2dBaseSprite.Anchor.LowerCenter);
+            var hat1 = new GameObject();
+            hat1.AddComponent<tk2dSprite>().SetSprite(
+              comp1.hat.sprite.collection,
+              comp1.hat.sprite.spriteId
+              );
+            hat1.GetComponent<tk2dSprite>().PlaceAtLocalPositionByAnchor(new Vector2(ped.GetComponent<tk2dSprite>().WorldCenter.x, 87.2f).ToVector3ZisY(-1f), tk2dBaseSprite.Anchor.LowerCenter);
 
-            SpriteOutlineManager.AddOutlineToSprite(hat1.GetComponent<tk2dSprite>(), Color.black);
+            // SpriteOutlineManager.AddOutlineToSprite(hat1.GetComponent<tk2dSprite>(), Color.black);
             pedastals.Add(ped.GetComponent<hatPedastal>());
             newestAddedHat++;
-            ETGModConsole.Log(7);
           }
         }
 
@@ -155,12 +171,11 @@ namespace Alexandria.cAPI
 
         entranceObj.GetComponent<SpeculativeRigidbody>().OnCollision += warp;
         updateRoom = false;
-        ETGModConsole.Log(8);
       }
       catch(Exception e)
-            {
+      {
         ETGModConsole.Log("Error setting up hat room: " + e);
-            }
+      }
     }
 
     private static void warpBack(CollisionData obj)
@@ -168,30 +183,29 @@ namespace Alexandria.cAPI
       var player = obj.OtherRigidbody.gameObject.GetComponent<PlayerController>();
       if (player != null)
       {
-        ETGMod.StartGlobalCoroutine(WarpToPoint(player, new Vector2(57.75f, 36.75f)));
+        WarpToPoint(player, new Vector2(57.75f, 36.75f));
         Pixelator.Instance.DoOcclusionLayer = true;
       }
     }
 
-    private static IEnumerator WarpToPoint(PlayerController p, Vector2 position)
+    private static void WarpToPoint(PlayerController p, Vector2 position)
     {
       p.usingForcedInput = true;
       if (updateRoom)
       {
-
-        Pixelator.Instance.FadeToBlack(0.5f, false);
+        // Pixelator.Instance.FadeToBlack(0.5f, false);
         foreach(var obj in objects)
         {
           UnityEngine.GameObject.Destroy(obj);
         }
         objects.Clear();
         Init();
-        yield return new WaitUntil(() => updateRoom == false);
-        Pixelator.Instance.FadeToBlack(0.5f, true);
+        // yield return new WaitUntil(() => updateRoom == false);
+        // Pixelator.Instance.FadeToBlack(0.5f, true);
       }
       else
       {
-        Pixelator.Instance.FadeToBlack(0.5f, false, 0.3f);
+        // Pixelator.Instance.FadeToBlack(0.5f, false, 0.3f);
       }
       p.WarpToPointAndBringCoopPartner(position);
       p.usingForcedInput = false;
@@ -202,7 +216,7 @@ namespace Alexandria.cAPI
       var player = obj.OtherRigidbody.gameObject.GetComponent<PlayerController>();
       if (player != null)
       {
-        ETGMod.StartGlobalCoroutine(WarpToPoint(player, new Vector2(140.5f, 84.7f)));
+        WarpToPoint(player, new Vector2(140.5f, 84.7f));
         Pixelator.Instance.DoOcclusionLayer = false;
       }
     }
