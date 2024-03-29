@@ -175,7 +175,7 @@ namespace Alexandria.cAPI
       if (obj.OtherRigidbody.gameObject.GetComponent<PlayerController>() is not PlayerController player)
         return;
 
-      WarpToPoint(player, new Vector2(140.5f, 84.7f));
+      GameManager.Instance.StartCoroutine(WarpToPoint(player, new Vector2(140.5f, 84f)));
       Pixelator.Instance.DoOcclusionLayer = false;
     }
 
@@ -184,15 +184,18 @@ namespace Alexandria.cAPI
       if (obj.OtherRigidbody.gameObject.GetComponent<PlayerController>() is not PlayerController player)
         return;
 
-      WarpToPoint(player, new Vector2(57.75f, 36.75f));
+      GameManager.Instance.StartCoroutine(WarpToPoint(player, new Vector2(57.75f, 36.75f)));
       Pixelator.Instance.DoOcclusionLayer = true;
     }
 
-    private static void WarpToPoint(PlayerController p, Vector2 position)
+    private static IEnumerator WarpToPoint(PlayerController p, Vector2 position)
     {
       p.usingForcedInput = true;
-      // Pixelator.Instance.FadeToBlack(0.5f, false, 0.3f);
+      Pixelator.Instance.FadeToBlack(0.1f, false);
+      yield return new WaitForSeconds(0.15f);
       p.WarpToPointAndBringCoopPartner(position, doFollowers: true);
+      yield return new WaitForSeconds(0.05f);
+      Pixelator.Instance.FadeToBlack(0.1f, true);
       p.usingForcedInput = false;
     }
   }
