@@ -83,7 +83,7 @@ namespace Alexandria.cAPI
                 GameObject playerSprite = hatOwner.transform.Find("PlayerSprite").gameObject;
                 hatOwnerAnimator = playerSprite.GetComponent<tk2dSpriteAnimator>();
                 hatOwner.OnPreDodgeRoll += this.HatReactToDodgeRoll;
-                UpdateHatFacingDirection(FetchOwnerFacingDirection());
+                UpdateHatFacingDirection();
             }
             else Debug.LogError("hatOwner was somehow null in hat Start() ???");
         }
@@ -108,15 +108,9 @@ namespace Alexandria.cAPI
             {
                 if (currentState == HatState.SITTING)
                     StickHatToPlayer(hatOwner);
-                //Make the Hat vanish upon pitfall, or when the player rolls if the hat is VANISH type
-                HandleVanish();
-                //if(ETGModGUI.CurrentMenu != ETGModGUI.MenuOpened.Console)
-                    //ETGModConsole.Log(hatOwnerAnimator.CurrentClip.name);
-                //UPDATE DIRECTIONS
-                HatDirection checkedDir = FetchOwnerFacingDirection();
-                if (checkedDir != currentDirection) UpdateHatFacingDirection(checkedDir);
-
-                HandleAttachedSpriteDepth(m_currentGunAngle.GetTypedValue<float>(hatOwner));
+                HandleVanish(); //Make the Hat vanish upon pitfall, or when the player rolls if the hat is VANISH type
+                UpdateHatFacingDirection();
+                HandleAttachedSpriteDepth();
                 HandleFlip();
             }
         }
@@ -159,7 +153,11 @@ namespace Alexandria.cAPI
 
                 hat.cachedDef = def;
                 if (hat.hatOwner && hat.currentState == HatState.SITTING)
+                {
                     hat.transform.position = hat.GetHatPosition(hat.hatOwner); // update the hat position in light of the new sprite definition
+                    hat.UpdateHatFacingDirection();
+                    hat.HandleAttachedSpriteDepth();
+                }
             }
         }
 
@@ -212,8 +210,12 @@ namespace Alexandria.cAPI
             return shouldActuallyVanish;
         }
 
-		public void UpdateHatFacingDirection(HatDirection targetDir)
+		public void UpdateHatFacingDirection()
         {
+            HatDirection targetDir = FetchOwnerFacingDirection();
+            if (targetDir == currentDirection)
+                return; // nothing to update
+
             string animToPlay = null;
 
             // adjust the direction based on what our hat actually supports
@@ -265,7 +267,7 @@ namespace Alexandria.cAPI
                 return HatDirection.EAST; // return a sane default if we're ownerless
 
             // figure out an approximate direction from the player's animation name
-            string animName = hatOwner.sprite.GetCurrentSpriteDef().name;
+            string animName = cachedDef.name;
             if (animName.Contains("north_"))       return HatDirection.NORTH;
             if (animName.Contains("back_"))        return HatDirection.NORTH;
             if (animName.Contains("south_"))       return HatDirection.SOUTH;
@@ -274,9 +276,9 @@ namespace Alexandria.cAPI
             if (animName.Contains("backwards_"))   return hatOwner.sprite.FlipX ? HatDirection.NORTHWEST : HatDirection.NORTHEAST;
             if (animName.Contains("backward_"))    return hatOwner.sprite.FlipX ? HatDirection.NORTHWEST : HatDirection.NORTHEAST;
             if (animName.Contains("bw_"))          return hatOwner.sprite.FlipX ? HatDirection.NORTHWEST : HatDirection.NORTHEAST;
-            // if (animName.Contains("front_right_")) return HatDirection.EAST;
-            // if (animName.Contains("right_front_")) return HatDirection.EAST;
-            // if (animName.Contains("forward_"))     return HatDirection.EAST;
+            // if (animName.Contains("front_right_")) return hatOwner.sprite.FlipX ? HatDirection.WEST : HatDirection.EAST;
+            // if (animName.Contains("right_front_")) return hatOwner.sprite.FlipX ? HatDirection.WEST : HatDirection.EAST;
+            // if (animName.Contains("forward_"))     return hatOwner.sprite.FlipX ? HatDirection.WEST : HatDirection.EAST;
 
             return hatOwner.sprite.FlipX ? HatDirection.WEST : HatDirection.EAST; // return a sane default if we're ownerless
         }
@@ -760,25 +762,17 @@ namespace Alexandria.cAPI
         }
 
         // Token: 0x0600818D RID: 33165 RVA: 0x0033787C File Offset: 0x00335A7C
-        private void HandleAttachedSpriteDepth(float gunAngle)
+        private void HandleAttachedSpriteDepth()
         {
 			if (hatDepthType == HatDepthType.BehindWhenFacingBack || hatDepthType == HatDepthType.InFrontWhenFacingBack)
 			{
-				if (hatOwner.CurrentGun is null)
-				{
-                    Vector2 m_playerCommandedDirection = commandedField.GetTypedValue<Vector2>(hatOwner);
-                    Vector2 m_lastNonzeroCommandedDirection = lastNonZeroField.GetTypedValue<Vector2>(hatOwner);
-                    gunAngle = BraveMathCollege.Atan2Degrees((!(m_playerCommandedDirection == Vector2.zero)) ? m_playerCommandedDirection : m_lastNonzeroCommandedDirection);
-                }
                 float forwardSign = 1f;
-				float baseDepth;
-				if (gunAngle <= 155f && gunAngle >= 25f)
+				float baseDepth = -0.15f;
+				if (currentDirection == HatDirection.NORTH || currentDirection == HatDirection.NORTHEAST || currentDirection == HatDirection.NORTHWEST)
 				{
 					forwardSign = -1f;
 					baseDepth = 0.15f;
 				}
-				else
-					baseDepth = -0.15f;
 
                 if(hatDepthType == HatDepthType.BehindWhenFacingBack)
 				    hatSprite.HeightOffGround = baseDepth + forwardSign * 1;
