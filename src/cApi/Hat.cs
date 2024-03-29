@@ -37,7 +37,7 @@ namespace Alexandria.cAPI
         private tk2dSpriteAnimator hatOwnerAnimator = null;
         private tk2dSpriteDefinition cachedDef = null;
         private Vector2 cachedDefOffset = Vector2.zero;
-        private float RollLength = 0.65f; //The time it takes for a player with no dodge roll effects to roll
+        private float rollLength = 0.65f; //The time it takes for a player with no dodge roll effects to roll
         private float startRolTime = 0.0f;
 
         private void Start()
@@ -309,63 +309,53 @@ namespace Alexandria.cAPI
                 hatSprite.HeightOffGround = facingBack ?  1.15f : -1.15f;
         }
 
-        private IEnumerator FlipHatIENum()
+        /// <summary>Initialize hat flipping immediately after initiating a dodge roll</summary>
+        [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.StartDodgeRoll))]
+        private class StartDodgeRolPatch
         {
+            static void Postfix(PlayerController __instance, Vector2 direction, ref bool __result)
+            {
+                if (!__result || __instance.DodgeRollIsBlink)
+                    return; // if we didn't start a dodge roll or we have a blink dodge roll, we can safely return
+                if (__instance.GetComponent<HatController>() is not HatController hatCon)
+                    return;
+                if (hatCon.CurrentHat is not Hat hat)
+                    return;
+                hat.StartFlipping();
+            }
+        }
+
+        private void StartFlipping()
+        {
+            if (GameManager.AUDIO_ENABLED && !string.IsNullOrEmpty(FlipStartedSound))
+                AkSoundEngine.PostEvent(FlipStartedSound, gameObject);
+            rollLength = hatOwner.rollStats.GetModifiedTime(hatOwner);
             currentState = HatState.FLIPPING;
             startRolTime = BraveTime.ScaledTimeSinceStartup;
-			yield return new WaitForSeconds(RollLength);
-            StickHatToPlayer(hatOwner);
-            if (GameManager.AUDIO_ENABLED && !string.IsNullOrEmpty(FlipEndedSound))
-            {
-                AkSoundEngine.PostEvent(FlipEndedSound, gameObject);
-            }
         }
 
         private void HandleFlip()
         {
             if (BraveTime.DeltaTime == 0.0f)
                 return; // don't do anything while time is frozen
-
             if (hatRollReaction != HatRollReaction.FLIP || PlayerHasAdditionalVanishOverride())
                 return; // no flipping needed
-
-            if (hatOwnerAnimator == null)
-            {
-                Debug.LogError("Attempted to flip a hat with a null hatOwnerAnimator!");
-                return;
-            }
-
-            if (hatOwner.IsDodgeRolling && currentState == HatState.SITTING && !hatOwner.IsSlidingOverSurface)
-            {
-                if (GameManager.AUDIO_ENABLED && !string.IsNullOrEmpty(FlipStartedSound))
-                    AkSoundEngine.PostEvent(FlipStartedSound, gameObject);
-                RollLength = hatOwner.rollStats.GetModifiedTime(hatOwner);
-                StartCoroutine(FlipHatIENum());
-            }
-
             if (currentState != HatState.FLIPPING)
                 return; // not flipping, so nothing to do
 
-            if (GameManager.Instance.IsPaused)
+            if (((BraveTime.ScaledTimeSinceStartup - startRolTime) >= rollLength) || hatOwner.IsSlidingOverSurface)
             {
                 StickHatToPlayer(hatOwner);
+                if (GameManager.AUDIO_ENABLED && !string.IsNullOrEmpty(FlipEndedSound))
+                    AkSoundEngine.PostEvent(FlipEndedSound, gameObject);
                 return;
             }
-
-            if (hatOwnerAnimator.CurrentClip == null)
-            {
-                Debug.LogError("hatOwnerAnimator.CurrentClip is NULL!");
-                return;
-            }
-
-            if(hatOwner.IsSlidingOverSurface)
-                return; // no flipping needed while sliding
 
             // logic for doing the actual flipping
-            float rollAmount = 360f * (BraveTime.DeltaTime / RollLength);
+            float rollAmount = 360f * (BraveTime.DeltaTime / rollLength);
             this.transform.RotateAround(this.sprite.WorldCenter, Vector3.forward, rollAmount * SpinSpeedMultiplier * (hatOwner.sprite.FlipX ? 1f : -1f));
             float elapsed = BraveTime.ScaledTimeSinceStartup - startRolTime;
-            float percentDone = elapsed / RollLength;
+            float percentDone = elapsed / rollLength;
             this.transform.position = GetHatPosition(hatOwner) + new Vector3(0, BASE_FLIP_HEIGHT * flipHeightMultiplier * Mathf.Sin(Mathf.PI * percentDone), 0);
         }
 
