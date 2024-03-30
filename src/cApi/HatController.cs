@@ -55,14 +55,12 @@ namespace Alexandria.cAPI
             m_extantHatObject.SetActive(true);
             CurrentHat = m_extantHatObject.GetComponent<Hat>();
             CurrentHat.StickHatToPlayer(m_WearingPlayer);
-            ETGModConsole.Log($"adding hat {CurrentHat.hatName} for {m_WearingPlayer.name}");
             Hatabase.StoredHats[m_WearingPlayer.name] = CurrentHat.hatName;
         }
 
         public void RemoveCurrentHat()
         {
             UnityEngine.Object.Destroy(m_extantHatObject);
-            ETGModConsole.Log($"removing hat for {m_WearingPlayer.name}");
             Hatabase.StoredHats[m_WearingPlayer.name] = null;
             m_extantHatObject = null;
             CurrentHat = null;

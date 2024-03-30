@@ -14,7 +14,7 @@ using System.Collections;
 
 namespace Alexandria.cAPI
 {
-  public static class InfiniteRoom
+  public static class HatRoom
   {
     // private const string BASE_RES_PATH = "Alexandria/cAPI/Resources/"; //NOTE: restore once reintegrated into Alexandria
     private const string BASE_RES_PATH = "CwaffingTheGungy/Resources/";
@@ -26,7 +26,7 @@ namespace Alexandria.cAPI
     private const float PEDESTAL_Z       = 10.8f;
     private const float PEDESTAL_SPACING = 2.4f; //NOTE: mildly concerning this isn't the same as SEGMENT_WIDTH
     private const float HAT_Z_OFFSET     = 1f;
-    private const int MIN_ROOM_WIDTH     = 10;
+    private const int MIN_SEGMENTS       = 10;
 
     private static bool hatRoomNeedsInit = true;
 
@@ -38,7 +38,7 @@ namespace Alexandria.cAPI
         {
           if (!hatRoomNeedsInit)
             return;
-          InfiniteRoom.Init();
+          HatRoom.Init();
           hatRoomNeedsInit = false;
         }
     }
@@ -85,7 +85,8 @@ namespace Alexandria.cAPI
       try
       {
         RoomHandler foyerRoom = GameManager.Instance.Dungeon.data.Entrance;
-        int numRoomSegments = Mathf.Max(MIN_ROOM_WIDTH, Mathf.CeilToInt(Hatabase.Hats.Count / 2));
+        //NOTE: funky math since segment width and pedestal spacing are not the same
+        int numRoomSegments = Mathf.Max(MIN_SEGMENTS, Mathf.CeilToInt((Mathf.Ceil(0.5f * Hatabase.Hats.Count) * PEDESTAL_SPACING) / SEGMENT_WIDTH));
 
         GameObject hallwaySegment = ItemAPI.ItemBuilder.AddSpriteToObject("Hallway", $"{BASE_RES_PATH}hallway-seg.png");
         hallwaySegment.MakeRigidBody(dimensions: new IntVector2(32, 25), offset: new IntVector2(0, 100));
