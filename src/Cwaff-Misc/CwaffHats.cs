@@ -17,7 +17,7 @@ public static class CwaffHats
       EasyHat(name: "saiyan_hat",     offset: new Vector2( 0f/16f, -4f/16f));
       EasyHat(name: "witch_hat",      offset: new Vector2(-1f/16f, -3f/16f));
       EasyHat(name: "bunny_ears_hat", offset: new Vector2( 0f/16f, -4f/16f));
-      EasyHat(name: "shades",         offset: new Vector2(-1f/16f, -2f/16f), onEyes: true);
+      EasyHat(name: "shades",         offset: new Vector2( 0f/16f, -2f/16f), onEyes: true);
 
       EasyHat(name: "samus_hat",      offset: new Vector2( 0f/16f, -6f/16f), onEyes: true);
       EasyHat(name: "goggles",        offset: new Vector2( 0f/16f, -3f/16f), onEyes: true);

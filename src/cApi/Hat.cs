@@ -208,18 +208,17 @@ namespace Alexandria.cAPI
 
             // figure out an approximate direction from the player's animation name
             string animName = cachedDef.name;
-            if (animName.Contains("north_"))       return HatDirection.NORTH;
-            if (animName.Contains("back_"))        return HatDirection.NORTH;
-            if (animName.Contains("south_"))       return HatDirection.SOUTH;
-            if (animName.Contains("front_"))       return HatDirection.SOUTH;
+            if (animName.Contains("front_right_")) return hatOwner.sprite.FlipX ? HatDirection.WEST      : HatDirection.EAST;
+            if (animName.Contains("right_front_")) return hatOwner.sprite.FlipX ? HatDirection.WEST      : HatDirection.EAST;
+            if (animName.Contains("forward_"))     return hatOwner.sprite.FlipX ? HatDirection.WEST      : HatDirection.EAST;
             if (animName.Contains("back_right_"))  return hatOwner.sprite.FlipX ? HatDirection.NORTHWEST : HatDirection.NORTHEAST;
             if (animName.Contains("backwards_"))   return hatOwner.sprite.FlipX ? HatDirection.NORTHWEST : HatDirection.NORTHEAST;
             if (animName.Contains("backward_"))    return hatOwner.sprite.FlipX ? HatDirection.NORTHWEST : HatDirection.NORTHEAST;
             if (animName.Contains("bw_"))          return hatOwner.sprite.FlipX ? HatDirection.NORTHWEST : HatDirection.NORTHEAST;
-            //NOTE: these are technically all unnecessary since we defaut to WEST / EAST anyway
-            // if (animName.Contains("front_right_")) return hatOwner.sprite.FlipX ? HatDirection.WEST : HatDirection.EAST;
-            // if (animName.Contains("right_front_")) return hatOwner.sprite.FlipX ? HatDirection.WEST : HatDirection.EAST;
-            // if (animName.Contains("forward_"))     return hatOwner.sprite.FlipX ? HatDirection.WEST : HatDirection.EAST;
+            if (animName.Contains("north_"))       return HatDirection.NORTH;
+            if (animName.Contains("back_"))        return HatDirection.NORTH;
+            if (animName.Contains("south_"))       return HatDirection.SOUTH;
+            if (animName.Contains("front_"))       return HatDirection.SOUTH;
 
             return hatOwner.sprite.FlipX ? HatDirection.WEST : HatDirection.EAST; // return a sane default if we're ownerless
         }
@@ -247,6 +246,8 @@ namespace Alexandria.cAPI
             var headOffsets = onEyes ? Hatabase.CharacterNameEyeLevel : Hatabase.CharacterNameHatHeadLevel;
             if (headOffsets.TryGetValue(player.name, out float headLevel))
                 playerSpecificOffset = new Vector2(0f, headLevel);
+            else
+                playerSpecificOffset = new Vector2(0f, onEyes ? Hatabase.defaultEyeLevelOffset : Hatabase.defaultHeadLevelOffset);
 
             // get the hat specific offset
             bool flipped = player.sprite.FlipX;
