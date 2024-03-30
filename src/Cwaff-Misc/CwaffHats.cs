@@ -18,14 +18,26 @@ public static class CwaffHats
       EasyHat(name: "witch_hat",      offset: new Vector2(-1f/16f, -3f/16f));
       EasyHat(name: "bunny_ears_hat", offset: new Vector2( 0f/16f, -4f/16f));
       EasyHat(name: "shades",         offset: new Vector2( 0f/16f, -2f/16f), onEyes: true);
-
-      EasyHat(name: "samus_hat",      offset: new Vector2( 0f/16f, -6f/16f), onEyes: true);
+      EasyHat(name: "samus_hat",      offset: new Vector2( 0f/16f, -8f/16f));
       EasyHat(name: "goggles",        offset: new Vector2( 0f/16f, -3f/16f), onEyes: true);
       EasyHat(name: "santa_hat",      offset: new Vector2(-1f/16f, -3f/16f));
       EasyHat(name: "crown",          offset: new Vector2( 0f/16f, -2f/16f));
-      EasyHat(name: "grand_crown",    offset: new Vector2( 0f/16f, -2f/16f));
+      EasyHat(name: "mitre",          offset: new Vector2( 0f/16f, -2f/16f));
       EasyHat(name: "tiara",          offset: new Vector2( 0f/16f, -2f/16f));
       EasyHat(name: "top_hat",        offset: new Vector2( 0f/16f, -2f/16f));
+      EasyHat(name: "beret",          offset: new Vector2( 0f/16f, -3f/16f));
+      EasyHat(name: "bowler",         offset: new Vector2( 0f/16f, -3f/16f));
+      EasyHat(name: "halo",           offset: new Vector2( 0f/16f,  2f/16f));
+      EasyHat(name: "kasa",           offset: new Vector2( 0f/16f, -3f/16f));
+      EasyHat(name: "pirate_hat",     offset: new Vector2( 0f/16f, -3f/16f));
+      EasyHat(name: "red_mage_hat",   offset: new Vector2( 0f/16f, -3f/16f));
+      EasyHat(name: "traffic_cone",   offset: new Vector2( 0f/16f, -3f/16f));
+      EasyHat(name: "cowl",           offset: new Vector2( 0f/16f, -9f/16f));
+      EasyHat(name: "fishbowl",       offset: new Vector2( 0f/16f, -8f/16f));
+      EasyHat(name: "bycocket",       offset: new Vector2(-1f/16f, -3f/16f));
+      EasyHat(name: "cowboy_hat",     offset: new Vector2(-1f/16f, -3f/16f));
+      EasyHat(name: "tattered_hat",   offset: new Vector2( 0f/16f, -1f/16f));
+      EasyHat(name: "zucchetto",      offset: new Vector2( 0f/16f, -2f/16f));
     }
 
     private static void EasyHat(string name, Vector2? offset = null, bool onEyes = false)
