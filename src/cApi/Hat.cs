@@ -93,12 +93,14 @@ namespace Alexandria.cAPI
             {
                 if (currFrame != 0 && __instance.previousFrame == currFrame)
                     return; // nothing to do in the prefix if our frame hasn't changed or just been reset
-                if (__instance.transform.parent is not Transform parent)
+                if (__instance.transform.parent is not Transform parent || !parent.gameObject)
                     return; // unparented, not what we're looking for
-                if (!parent.gameObject || parent.GetComponent<HatController>() is not HatController hatController)
+                if (parent.gameObject.GetComponent<PlayerController>() is not PlayerController player)
+                    return; // our parent is not the player, don't do anything
+                if (player.spriteAnimator != __instance)
+                    return; // we are not the player's sprite animator, don't do anything
+                if (parent.GetComponent<HatController>() is not HatController hatController)
                     return; // no player, nothing special needed
-                if (__instance.GetComponent<Hat>())
-                    return; // we are the sprite animator for the Hat itself, don't do anything
                 if (hatController.CurrentHat is not Hat hat)
                     return; // no hat, nothing to do
 
@@ -279,7 +281,7 @@ namespace Alexandria.cAPI
         {
             if (hatDepthType == HatDepthType.AlwaysInFront)
             {
-                hatSprite.HeightOffGround = 0.6f;
+                hatSprite.HeightOffGround = 0.01f;
                 return;
             }
             if (hatDepthType == HatDepthType.AlwaysBehind)
