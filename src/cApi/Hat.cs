@@ -72,7 +72,11 @@ namespace Alexandria.cAPI
                 return;
             HandleVanish(); //Make the Hat vanish upon pitfall, or when the player rolls if the hat is VANISH type
             if (!base.sprite.renderer.enabled)
+            {
+                if (hatOwner.IsSlidingOverSurface)
+                   StickHatToPlayer(hatOwner); //
                 return; // nothing else to do while invisible
+            }
 
             if (currentState == HatState.SITTING)
                 StickHatToPlayer(hatOwner);
@@ -133,36 +137,18 @@ namespace Alexandria.cAPI
             bool Visible = base.sprite.renderer.enabled;
             bool shouldBeVanished = ShouldBeVanished();
 
-			if (hatOwner.IsSlidingOverSurface) 
-               StickHatToPlayer(hatOwner);
-
             if (shouldBeVanished)
             {
                 base.transform.parent = null;
                 base.sprite.renderer.enabled = false;
             }
             else
-            {
                 base.sprite.renderer.enabled = true;
-            }
 
             if (!Visible && !shouldBeVanished)
-            {
                 SpriteOutlineManager.AddOutlineToSprite(hatSprite, Color.black, 1);
-                // StickHatToPlayer(hatOwner);
-                // if (GameManager.AUDIO_ENABLED && !string.IsNullOrEmpty(FlipEndedSound))
-                // {
-                //     AkSoundEngine.PostEvent(FlipEndedSound, gameObject);
-                // }
-            }
             else if (Visible && shouldBeVanished)
-            {
                 SpriteOutlineManager.RemoveOutlineFromSprite(hatSprite);
-                // if (GameManager.AUDIO_ENABLED && !string.IsNullOrEmpty(FlipStartedSound))
-                // {
-                //     AkSoundEngine.PostEvent(FlipStartedSound, gameObject);
-                // }
-            }
         }
 
         private bool PlayerHasAdditionalVanishOverride()

@@ -39,6 +39,8 @@ public static class CwaffHats
         ),
         hatObj: hatObj,
         fps: 1);
+      if (hat.hatDirectionality != Hat.HatDirectionality.NONE && hat.hatDirectionality != Hat.HatDirectionality.TWOWAYVERTICAL)
+        hat.flipHorizontalWithPlayer = false;
       HatUtility.AddHatToDatabase(hatObj);
     }
 }
