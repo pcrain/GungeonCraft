@@ -212,6 +212,7 @@ namespace Alexandria.cAPI
             if (animName.Contains("right_front_")) return hatOwner.sprite.FlipX ? HatDirection.WEST      : HatDirection.EAST;
             if (animName.Contains("forward_"))     return hatOwner.sprite.FlipX ? HatDirection.WEST      : HatDirection.EAST;
             if (animName.Contains("back_right_"))  return hatOwner.sprite.FlipX ? HatDirection.NORTHWEST : HatDirection.NORTHEAST;
+            if (animName.Contains("bright_"))      return hatOwner.sprite.FlipX ? HatDirection.NORTHWEST : HatDirection.NORTHEAST;
             if (animName.Contains("backwards_"))   return hatOwner.sprite.FlipX ? HatDirection.NORTHWEST : HatDirection.NORTHEAST;
             if (animName.Contains("backward_"))    return hatOwner.sprite.FlipX ? HatDirection.NORTHWEST : HatDirection.NORTHEAST;
             if (animName.Contains("bw_"))          return hatOwner.sprite.FlipX ? HatDirection.NORTHWEST : HatDirection.NORTHEAST;
