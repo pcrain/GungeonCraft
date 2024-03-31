@@ -236,23 +236,22 @@ namespace Alexandria.cAPI
         private static Vector2 jankyFlippedHatFixOffset = new Vector2(1f/32f, 0f);
 		public Vector3 GetHatPosition(PlayerController player)
         {
+            if (!hatSprite)
+                return Vector3.zero; // can't do anything if our hat doesn't have a sprite yet
+
             cachedDef ??= player.sprite.GetCurrentSpriteDef();
             bool flipped = player.sprite.FlipX;
 
             // get the base offset for every character
-            float effectiveX;
-            if (!flipped)  // if the sprite isn't flipped, the default rendering is fine
-                effectiveX = player.SpriteBottomCenter.x;
-            else // if the sprite IS flipped, we need to account for whether the player sprite and hat sprite are even / odd pixels and adjust the offset accordingly
+            float effectiveX = player.SpriteBottomCenter.x; // if the sprite isn't flipped, the default rendering is fine
+            if (flipped) // if the sprite IS flipped, we need to account for whether the player sprite and hat sprite are even / odd pixels and adjust the offset accordingly
             {
-                bool oddHatWidth     = (((16f * hatSprite.GetCurrentSpriteDef().colliderVertices[1].x) % 2) == 1);
-                bool oddSpriteRadius = (((16f * cachedDef.boundsDataExtents.x) % 2) == 1);
-                if (oddHatWidth)
-                    effectiveX = player.SpriteBottomCenter.x.Quantize(0.0625f) + 1f/32f;
-                else if (oddSpriteRadius)
-                    effectiveX = player.SpriteBottomCenter.x + 1f/32f;
-                else
-                    effectiveX = player.SpriteBottomCenter.x.Quantize(0.0625f);
+                bool evenHatWidth     = (((16f * hatSprite.GetCurrentSpriteDef().colliderVertices[1].x) % 2) == 0);
+                bool evenSpriteRadius = (((16f * cachedDef.boundsDataExtents.x) % 2) == 0);
+                if (evenSpriteRadius) // if our player sprite is an even number of pixels, we need to quantize our center point
+                    effectiveX = effectiveX.Quantize(0.0625f, evenHatWidth ? VectorConversions.Ceil : VectorConversions.Floor);
+                if (evenHatWidth ^ evenSpriteRadius) // if the sum of our player sprite width and hat sprite width is odd, we need to adjust by another half pixel
+                    effectiveX += 1f/32f;
             }
             Vector2 baseOffset = new Vector2(effectiveX, player.sprite.transform.position.y);
 
