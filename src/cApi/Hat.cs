@@ -225,7 +225,8 @@ namespace Alexandria.cAPI
 
         private static string GetSpriteBaseName(string name)
         {
-            return name.Replace("_hands2","").Replace("_hands","").Replace("_hand_left","").Replace("_hand_right","").Replace("_hand","").Replace("_twohands","").Replace("_armorless","");
+            return name.Replace("_hands2","").Replace("_hands","").Replace("_hand_left","").Replace("_hand_right","").Replace("_hand","")
+                .Replace("_twohands","").Replace("_armorless","").Replace("_0h","").Replace("_1h","").Replace("_2h","");
         }
 
         private static Vector2 GetDefOffset(tk2dSpriteDefinition def)
@@ -239,17 +240,18 @@ namespace Alexandria.cAPI
                 return Vector3.zero; // can't do anything if our hat doesn't have a sprite yet
 
             cachedDef ??= player.sprite.GetCurrentSpriteDef();
+            // Debug.Log($"{cachedDef.name}");
             bool flipped = player.sprite.FlipX;
 
             // get the base offset for every character
             float effectiveX = player.SpriteBottomCenter.x;
             if (flipped) // if the sprite is flipped, we need to account for whether the player sprite and hat sprite are even / odd pixels and adjust the offset accordingly
             {
-                int hatWidth     = Mathf.RoundToInt(16f * hatSprite.GetCurrentSpriteDef().colliderVertices[1].x);
-                int spriteRadius = Mathf.RoundToInt(16f * cachedDef.boundsDataExtents.x);
-                if (spriteRadius % 2 == 0) // if our player sprite is an even number of pixels, we need to quantize our center point
+                int hatWidth    = Mathf.RoundToInt(16f * hatSprite.GetCurrentSpriteDef().colliderVertices[1].x);
+                int playerWidth = Mathf.RoundToInt(16f * cachedDef.untrimmedBoundsDataExtents.x); // use untrimmed bounds to avoid missing pixels on alt skins
+                if (playerWidth % 2 == 0) // if our player sprite is an even number of pixels, we need to quantize our center point
                     effectiveX = effectiveX.Quantize(0.0625f, (hatWidth % 2 == 0) ? VectorConversions.Ceil : VectorConversions.Floor);
-                if ((hatWidth + spriteRadius) % 2 == 1) // if the sum of our player sprite width and hat sprite width is odd, we need to adjust by another half pixel
+                if ((hatWidth + playerWidth) % 2 == 1) // if the sum of our player sprite width and hat sprite width is odd, we need to adjust by another half pixel
                     effectiveX += 1f/32f;
             }
             Vector2 baseOffset = new Vector2(effectiveX, player.sprite.transform.position.y);
@@ -257,7 +259,7 @@ namespace Alexandria.cAPI
             // get the player specific offset
             bool onEyes = (attachLevel == HatAttachLevel.EYE_LEVEL);
             var headOffsets = onEyes ? Hatabase.CharacterNameEyeLevel : Hatabase.CharacterNameHatHeadLevel;
-            if (!headOffsets.TryGetValue(player.name, out Vector2 playerSpecificOffset))
+            if (!headOffsets.TryGetValue(player.sprite.spriteAnimator.library.name, out Vector2 playerSpecificOffset))
                 playerSpecificOffset = onEyes ? Hatabase.defaultEyeLevelOffset : Hatabase.defaultHeadLevelOffset;
 
             // get the hat specific offset
