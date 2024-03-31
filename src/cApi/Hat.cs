@@ -203,7 +203,7 @@ namespace Alexandria.cAPI
 
         public HatDirection FetchOwnerFacingDirection()
         {
-            if (hatOwner == null || hatOwner.sprite == null)
+            if (!hatOwner || !hatOwner.sprite || cachedDef == null)
                 return HatDirection.EAST; // return a sane default if we're ownerless
 
             // figure out an approximate direction from the player's animation name
@@ -220,7 +220,7 @@ namespace Alexandria.cAPI
             if (animName.Contains("south_"))       return HatDirection.SOUTH;
             if (animName.Contains("front_"))       return HatDirection.SOUTH;
 
-            return hatOwner.sprite.FlipX ? HatDirection.WEST : HatDirection.EAST; // return a sane default if we're ownerless
+            return hatOwner.sprite.FlipX ? HatDirection.WEST : HatDirection.EAST; // return a sane default
         }
 
         private static string GetSpriteBaseName(string name)
@@ -233,7 +233,6 @@ namespace Alexandria.cAPI
             return new Vector2(0f, def.boundsDataCenter.y + 0.5f * def.boundsDataExtents.y);
         }
 
-        private static Vector2 jankyFlippedHatFixOffset = new Vector2(1f/32f, 0f);
 		public Vector3 GetHatPosition(PlayerController player)
         {
             if (!hatSprite)
@@ -243,26 +242,23 @@ namespace Alexandria.cAPI
             bool flipped = player.sprite.FlipX;
 
             // get the base offset for every character
-            float effectiveX = player.SpriteBottomCenter.x; // if the sprite isn't flipped, the default rendering is fine
-            if (flipped) // if the sprite IS flipped, we need to account for whether the player sprite and hat sprite are even / odd pixels and adjust the offset accordingly
+            float effectiveX = player.SpriteBottomCenter.x;
+            if (flipped) // if the sprite is flipped, we need to account for whether the player sprite and hat sprite are even / odd pixels and adjust the offset accordingly
             {
-                bool evenHatWidth     = (((16f * hatSprite.GetCurrentSpriteDef().colliderVertices[1].x) % 2) == 0);
-                bool evenSpriteRadius = (((16f * cachedDef.boundsDataExtents.x) % 2) == 0);
-                if (evenSpriteRadius) // if our player sprite is an even number of pixels, we need to quantize our center point
-                    effectiveX = effectiveX.Quantize(0.0625f, evenHatWidth ? VectorConversions.Ceil : VectorConversions.Floor);
-                if (evenHatWidth ^ evenSpriteRadius) // if the sum of our player sprite width and hat sprite width is odd, we need to adjust by another half pixel
+                int hatWidth     = Mathf.RoundToInt(16f * hatSprite.GetCurrentSpriteDef().colliderVertices[1].x);
+                int spriteRadius = Mathf.RoundToInt(16f * cachedDef.boundsDataExtents.x);
+                if (spriteRadius % 2 == 0) // if our player sprite is an even number of pixels, we need to quantize our center point
+                    effectiveX = effectiveX.Quantize(0.0625f, (hatWidth % 2 == 0) ? VectorConversions.Ceil : VectorConversions.Floor);
+                if ((hatWidth + spriteRadius) % 2 == 1) // if the sum of our player sprite width and hat sprite width is odd, we need to adjust by another half pixel
                     effectiveX += 1f/32f;
             }
             Vector2 baseOffset = new Vector2(effectiveX, player.sprite.transform.position.y);
 
             // get the player specific offset
-            Vector2 playerSpecificOffset = Vector2.zero;
             bool onEyes = (attachLevel == HatAttachLevel.EYE_LEVEL);
             var headOffsets = onEyes ? Hatabase.CharacterNameEyeLevel : Hatabase.CharacterNameHatHeadLevel;
-            if (headOffsets.TryGetValue(player.name, out float headLevel))
-                playerSpecificOffset = new Vector2(0f, headLevel);
-            else
-                playerSpecificOffset = new Vector2(0f, onEyes ? Hatabase.defaultEyeLevelOffset : Hatabase.defaultHeadLevelOffset);
+            if (!headOffsets.TryGetValue(player.name, out Vector2 playerSpecificOffset))
+                playerSpecificOffset = onEyes ? Hatabase.defaultEyeLevelOffset : Hatabase.defaultHeadLevelOffset;
 
             // get the hat specific offset
             Vector2 hatSpecificOffset = (flipped ? hatOffset.WithX(-hatOffset.x) : hatOffset);
@@ -276,7 +272,6 @@ namespace Alexandria.cAPI
 
             // combine everything and return
             Vector2 finalPos = baseOffset + hatSpecificOffset + playerSpecificOffset + animationFrameSpecificOffset;
-            // ETGModConsole.Log($"positioning hat at {finalPos.x:F5},{finalPos.y:F5}");
             return finalPos;
         }
 

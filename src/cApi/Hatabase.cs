@@ -34,33 +34,33 @@ namespace Alexandria.cAPI
         public static readonly Dictionary<string, string> StoredHats = new();
 
         // Default offsets for unknown / custom characters
-        public static readonly float defaultHeadLevelOffset = -14f/16f;
-        public static readonly float defaultEyeLevelOffset  = -19f/16f;
+        public static readonly Vector2 defaultHeadLevelOffset = new Vector2(0f, -14f/16f);
+        public static readonly Vector2 defaultEyeLevelOffset  = new Vector2(0f, -19f/16f);
 
         // Vertical offsets for where head-top hats should be placed on different characters (using character name)
-        public static readonly Dictionary<string, float> CharacterNameHatHeadLevel = new Dictionary<string, float>()
+        public static readonly Dictionary<string, Vector2> CharacterNameHatHeadLevel = new()
         {
-            {"PlayerRogue(Clone)",       - 6f/16f},
-            {"PlayerMarine(Clone)",      -11f/16f},
-            {"PlayerGuide(Clone)",       -14f/16f},
-            {"PlayerConvict(Clone)",     -11f/16f},
-            {"PlayerRobot(Clone)",         0f/16f},
-            {"PlayerBullet(Clone)",      - 5f/16f},
-            {"PlayerGunslinger(Clone)",    0f/16f},
-            {"PlayerCoopCultist(Clone)", - 9f/16f},
+            {"PlayerRogue(Clone)",       new Vector2(0f, - 6f/16f)},
+            {"PlayerMarine(Clone)",      new Vector2(0f, -11f/16f)},
+            {"PlayerGuide(Clone)",       new Vector2(0f, -14f/16f)},
+            {"PlayerConvict(Clone)",     new Vector2(0f, -11f/16f)},
+            {"PlayerRobot(Clone)",       new Vector2(0f,   0f/16f)},
+            {"PlayerBullet(Clone)",      new Vector2(0f, - 5f/16f)},
+            {"PlayerGunslinger(Clone)",  new Vector2(0f,   0f/16f)},
+            {"PlayerCoopCultist(Clone)", new Vector2(0f, - 9f/16f)},
         };
 
         // Vertical offsets for where eye-level hats should be placed on different characters (using character name)
-        public static readonly Dictionary<string, float> CharacterNameEyeLevel = new Dictionary<string, float>()
+        public static readonly Dictionary<string, Vector2> CharacterNameEyeLevel = new()
         {
-            {"PlayerRogue(Clone)",       -10f/16f},
-            {"PlayerMarine(Clone)",      -14f/16f},
-            {"PlayerGuide(Clone)",       -18f/16f},
-            {"PlayerConvict(Clone)",     -15f/16f},
-            {"PlayerRobot(Clone)",       - 5f/16f},
-            {"PlayerBullet(Clone)",      -16f/16f},
-            {"PlayerGunslinger(Clone)",   -6f/16f},
-            {"PlayerCoopCultist(Clone)", -12f/16f},
+            {"PlayerRogue(Clone)",       new Vector2(0f, -10f/16f)},
+            {"PlayerMarine(Clone)",      new Vector2(0f, -14f/16f)},
+            {"PlayerGuide(Clone)",       new Vector2(0f, -18f/16f)},
+            {"PlayerConvict(Clone)",     new Vector2(0f, -15f/16f)},
+            {"PlayerRobot(Clone)",       new Vector2(0f, - 5f/16f)},
+            {"PlayerBullet(Clone)",      new Vector2(0f, -16f/16f)},
+            {"PlayerGunslinger(Clone)",  new Vector2(0f,  -6f/16f)},
+            {"PlayerCoopCultist(Clone)", new Vector2(0f, -12f/16f)},
         };
 
         // Animation frame-specific offsets for head-top hats
