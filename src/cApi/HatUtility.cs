@@ -55,7 +55,7 @@ namespace Alexandria.cAPI
                 ETGModConsole.Log("<size=100><color=#ff0000ff>Error: Hat '</color></size>" + processedHatName + "<size=100><color=#ff0000ff>' not found in Hatabase</color></size>", false);
         }
 
-		public static void SetupHatSprites(List<string> spritePaths, GameObject hatObj, int fps, Vector2? hatSize = null)
+		public static void SetupHatSprites(List<string> spritePaths, GameObject hatObj, int fps)
         {
             if (hatObj.GetComponent<Hat>() is not Hat hatness)
                 return;
@@ -67,10 +67,7 @@ namespace Alexandria.cAPI
             tk2dSprite hatBaseSprite = hatObj.GetOrAddComponent<tk2dSprite>();
             hatBaseSprite.SetSprite(HatSpriteCollection, spriteID);
             tk2dSpriteDefinition def = hatBaseSprite.GetCurrentSpriteDef();
-            def.colliderVertices = new Vector3[]{
-                Vector3.zero,
-                hatSize.HasValue ? (0.0625f * hatSize.Value) : def.position3
-            };
+            def.colliderVertices = new Vector3[]{ Vector3.zero, def.position3 };
             hatBaseSprite.PlaceAtPositionByAnchor(hatObj.transform.position, tk2dBaseSprite.Anchor.LowerCenter);
             hatBaseSprite.depthUsesTrimmedBounds = true;
             hatBaseSprite.IsPerpendicular = true;

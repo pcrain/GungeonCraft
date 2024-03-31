@@ -6,11 +6,11 @@ public static class CwaffHats
     {
       Alexandria.cAPI.HatUtility.SetupConsoleCommands();
 
-      if (C.DEBUG_BUILD)
-      {
-        EasyHat(name: "debug_hat",      offset: null);
-        EasyHat(name: "debug_glasses",  offset: null, onEyes: true);
-      }
+      // if (C.DEBUG_BUILD)
+      // {
+      //   EasyHat(name: "debug_hat",      offset: null);
+      //   EasyHat(name: "debug_glasses",  offset: null, onEyes: true);
+      // }
       EasyHat(name: "toad_hat",            offset: new Vector2( 0, -3));
       EasyHat(name: "bunny_hood",          offset: new Vector2( 0, -3));
       EasyHat(name: "jester_hat",          offset: new Vector2( 0, -3));

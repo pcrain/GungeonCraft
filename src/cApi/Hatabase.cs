@@ -40,41 +40,41 @@ namespace Alexandria.cAPI
         // Vertical offsets for where head-top hats should be placed on different characters (using character sprite collection name)
         public static readonly Dictionary<string, Vector2> CharacterNameHatHeadLevel = new()
         {
-            {"SpaceRogueAnimation",               new Vector2(0f, - 6f/16f)},
+            {"SpaceRogueAnimation",               new Vector2(0f,  -6f/16f)},
+            {"SpaceRogueSwapAnimation",           new Vector2(0f,  -3f/16f)},
             {"MarineAnimation",                   new Vector2(0f, -11f/16f)},
+            {"MarineSwapAnimation",               new Vector2(0f,  -2f/16f)},
             {"GuideAnimation",                    new Vector2(0f, -14f/16f)},
+            {"GuideSwapAnimation",                new Vector2(0f,   -7/16f)},
             {"ConvictAnimation",                  new Vector2(0f, -11f/16f)},
+            {"ConvictSwapAnimation",              new Vector2(0f,  -3f/16f)},
             {"RobotAnimation",                    new Vector2(0f,   0f/16f)},
-            {"Playable_Bulletman_Animation",      new Vector2(0f, - 5f/16f)},
-            {"Gunslinger_Animation",              new Vector2(0f,   0f/16f)},
-            {"CoopCultistAnimation",              new Vector2(0f, -8f/16f)},
-            {"GuideSwapAnimation",                new Vector2(0f, -7/16f)},
-            {"SpaceRogueSwapAnimation",           new Vector2(0f, -3f/16f)},
-            {"MarineSwapAnimation",               new Vector2(0f, -2f/16f)},
-            {"ConvictSwapAnimation",              new Vector2(0f, -3f/16f)},
             {"RobotSwapAnimation",                new Vector2(0f,   0f/16f)},
-            {"Playable_Bulletman_Swap_Animation", new Vector2(0f, - 5f/16f)},
-            {"CoopCultistSwapAnimation",          new Vector2(0f, - 8f/16f)},
+            {"Playable_Bulletman_Animation",      new Vector2(0f,  -5f/16f)},
+            {"Playable_Bulletman_Swap_Animation", new Vector2(0f,  -5f/16f)},
+            {"CoopCultistAnimation",              new Vector2(0f,  -8f/16f)},
+            {"CoopCultistSwapAnimation",          new Vector2(0f,  -7f/16f)},
+            {"Gunslinger_Animation",              new Vector2(0f,   0f/16f)},
         };
 
         // Vertical offsets for where eye-level hats should be placed on different characters (using character sprite collection name)
         public static readonly Dictionary<string, Vector2> CharacterNameEyeLevel = new()
         {
             {"SpaceRogueAnimation",                new Vector2(0f, -10f/16f)},
+            {"SpaceRogueSwapAnimation",            new Vector2(0f,  -8f/16f)},
             {"MarineAnimation",                    new Vector2(0f, -14f/16f)},
+            {"MarineSwapAnimation",                new Vector2(0f,  -6f/16f)},
             {"GuideAnimation",                     new Vector2(0f, -18f/16f)},
-            {"ConvictAnimation",                   new Vector2(0f, -15f/16f)},
-            {"RobotAnimation",                     new Vector2(0f, - 5f/16f)},
-            {"Playable_Bulletman_Animation",       new Vector2(0f, -16f/16f)},
-            {"Gunslinger_Animation",               new Vector2(0f,  -6f/16f)},
-            {"CoopCultistAnimation",               new Vector2(0f, -12f/16f)},
             {"GuideSwapAnimation",                 new Vector2(0f, -11f/16f)},
-            {"SpaceRogueSwapAnimation",            new Vector2(0f, -8/16f)},
-            {"MarineSwapAnimation",                new Vector2(0f, -6f/16f)},
-            {"ConvictSwapAnimation",               new Vector2(0f, -7f/16f)},
-            {"RobotSwapAnimation",                 new Vector2(0f, - 5f/16f)},
+            {"ConvictAnimation",                   new Vector2(0f, -15f/16f)},
+            {"ConvictSwapAnimation",               new Vector2(0f,  -7f/16f)},
+            {"RobotAnimation",                     new Vector2(0f,  -5f/16f)},
+            {"RobotSwapAnimation",                 new Vector2(0f,  -5f/16f)},
+            {"Playable_Bulletman_Animation",       new Vector2(0f, -16f/16f)},
             {"Playable_Bulletman_Swap_Animation",  new Vector2(0f, -16f/16f)},
+            {"CoopCultistAnimation",               new Vector2(0f, -12f/16f)},
             {"CoopCultistSwapAnimation",           new Vector2(0f, -12f/16f)},
+            {"Gunslinger_Animation",               new Vector2(0f,  -6f/16f)},
         };
 
         // Animation frame-specific offsets for head-top hats
