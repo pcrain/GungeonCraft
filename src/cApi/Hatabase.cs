@@ -50,8 +50,8 @@ namespace Alexandria.cAPI
             {"CoopCultistAnimation",              new Vector2(0f, - 9f/16f)},
             {"GuideSwapAnimation",                new Vector2(0f, -7/16f)},
             {"SpaceRogueSwapAnimation",           new Vector2(0f, -3f/16f)},
-            {"MarineSwapAnimation",               new Vector2(0f, -2f/16f)}, //TODO
-            // {"ConvictSwapAnimation",              new Vector2(0f, -11f/16f)}, //TODO
+            {"MarineSwapAnimation",               new Vector2(0f, -2f/16f)},
+            {"ConvictSwapAnimation",              new Vector2(0f, -3f/16f)}, //TODO
             // {"RobotSwapAnimation",                new Vector2(0f,   0f/16f)}, //TODO
             // {"Playable_Bulletman_Swap_Animation", new Vector2(0f, - 5f/16f)}, //TODO
             // {"CoopCultistSwapAnimation",          new Vector2(0f, - 9f/16f)}, //TODO
@@ -70,8 +70,8 @@ namespace Alexandria.cAPI
             {"CoopCultistAnimation",               new Vector2(0f, -12f/16f)},
             {"GuideSwapAnimation",                 new Vector2(0f, -11f/16f)},
             {"SpaceRogueSwapAnimation",            new Vector2(0f, -8/16f)},
-            {"MarineSwapAnimation",                new Vector2(0f, -6f/16f)}, //TODO
-            // {"ConvictSwapAnimation",               new Vector2(0f, -15f/16f)}, //TODO
+            {"MarineSwapAnimation",                new Vector2(0f, -6f/16f)},
+            {"ConvictSwapAnimation",               new Vector2(0f, -7f/16f)}, //TODO
             // {"RobotSwapAnimation",                 new Vector2(0f, - 5f/16f)}, //TODO
             // {"Playable_Bulletman_Swap_Animation",  new Vector2(0f, -16f/16f)}, //TODO
             // {"CoopCultistSwapAnimation",           new Vector2(0f, -12f/16f)}, //TODO
@@ -110,6 +110,25 @@ namespace Alexandria.cAPI
             {"convict_run_south_004",                new FrameOffset( 0,  3)},
             {"convict_run_south_005",                new FrameOffset( 0,  1)},
             {"convict_run_south_006",                new FrameOffset( 0, -1)},
+            {"jailbird_idle_front_002",              new FrameOffset( 0, -1)},
+            {"jailbird_move_front_001",              new FrameOffset( 1,  0)},
+            {"jailbird_move_front_002",              new FrameOffset( 1, -1)},
+            {"jailbird_move_front_003",              new FrameOffset( 0,  0)},
+            {"jailbird_move_front_004",              new FrameOffset(-1,  0)},
+            {"jailbird_move_front_005",              new FrameOffset(-1, -1)},
+            {"jailbird_move_front_006",              new FrameOffset( 0,  0)},
+            {"jailbird_move_right_001",              new FrameOffset( 0,  0)},
+            {"jailbird_move_right_002",              new FrameOffset(-1,  1)},
+            {"jailbird_move_right_003",              new FrameOffset(-1,  0)},
+            {"jailbird_move_right_004",              new FrameOffset( 0,  0)},
+            {"jailbird_move_right_005",              new FrameOffset( 1,  1)},
+            {"jailbird_move_right_006",              new FrameOffset( 1,  1)},
+            {"jailbird_move_back_right_001",         new FrameOffset( 0,  0)},
+            {"jailbird_move_back_right_002",         new FrameOffset(-1,  1)},
+            {"jailbird_move_back_right_003",         new FrameOffset(-1,  0)},
+            {"jailbird_move_back_right_004",         new FrameOffset( 0,  0)},
+            {"jailbird_move_back_right_005",         new FrameOffset( 1,  1)},
+            {"jailbird_move_back_right_006",         new FrameOffset( 1,  1)},
             {"guide_idle_right_front_002",           new FrameOffset( 0, -1)},
             {"guide_idle_right_front_003",           new FrameOffset( 0, -1)},
             {"guide_idle_front_002",                 new FrameOffset( 0, -1)},
@@ -172,7 +191,6 @@ namespace Alexandria.cAPI
             {"marine_run_back_004",                  new FrameOffset( 0,  2)},
             {"marine_run_back_005",                  new FrameOffset( 0,  1)},
             {"marine_run_back_006",                  new FrameOffset( 0, -1)},
-
             {"mar_move_front_001",                   new FrameOffset( 1,  0)},
             {"mar_move_front_002",                   new FrameOffset( 1,  0)},
             {"mar_move_front_003",                   new FrameOffset( 0,  0)},
@@ -197,7 +215,6 @@ namespace Alexandria.cAPI
             {"mar_move_bright_004",                  new FrameOffset( 1,  0)},
             {"mar_move_bright_005",                  new FrameOffset( 1,  0)},
             {"mar_move_bright_006",                  new FrameOffset( 0,  0)},
-
             {"marh_move_front_001",                  new FrameOffset( 1,  0)},
             {"marh_move_front_002",                  new FrameOffset( 1,  0)},
             {"marh_move_front_003",                  new FrameOffset( 0,  0)},
@@ -222,44 +239,6 @@ namespace Alexandria.cAPI
             {"marh_move_bright_004",                 new FrameOffset( 1,  0)},
             {"marh_move_bright_005",                 new FrameOffset( 1,  0)},
             {"marh_move_bright_006",                 new FrameOffset( 0,  0)},
-
-            // {"mar_idle_right_002",                   new FrameOffset( 0, -1)},
-            // {"mar_idle_right_003",                   new FrameOffset( 0, -2)},
-            // {"mar_idle_right_004",                   new FrameOffset( 0, -1)},
-            // {"mar_idle_bright_002",                  new FrameOffset( 0, -1)},
-            // {"mar_idle_bright_003",                  new FrameOffset( 0, -2)},
-            // {"mar_idle_bright_004",                  new FrameOffset( 0, -1)},
-            // {"mar_idle_back_002",                    new FrameOffset( 0, -1)},
-            // {"mar_idle_back_003",                    new FrameOffset( 0, -3)},
-            // {"mar_idle_back_004",                    new FrameOffset( 0, -2)},
-            // {"mar_idle_front_002",                   new FrameOffset( 0, -1)},
-            // {"mar_idle_front_003",                   new FrameOffset( 0, -3)},
-            // {"mar_idle_front_004",                   new FrameOffset( 0, -2)},
-            // {"mar_move_right_001",                   new FrameOffset( 0,  2)},
-            // {"mar_move_right_002",                   new FrameOffset( 1,  1)},
-            // {"mar_move_right_003",                   new FrameOffset( 1, -2)},
-            // {"mar_move_right_004",                   new FrameOffset( 0,  2)},
-            // {"mar_move_right_005",                   new FrameOffset( 1,  1)},
-            // {"mar_move_right_006",                   new FrameOffset( 1, -2)},
-            // {"mar_move_bright_001",                  new FrameOffset( 0,  2)},
-            // {"mar_move_bright_002",                  new FrameOffset( 0,  1)},
-            // {"mar_move_bright_003",                  new FrameOffset( 0, -2)},
-            // {"mar_move_bright_004",                  new FrameOffset( 0,  2)},
-            // {"mar_move_bright_005",                  new FrameOffset( 0,  1)},
-            // {"mar_move_bright_006",                  new FrameOffset( 0, -2)},
-            // {"mar_move_front_001",                   new FrameOffset( 0,  2)},
-            // {"mar_move_front_002",                   new FrameOffset( 0,  1)},
-            // {"mar_move_front_003",                   new FrameOffset( 0, -1)},
-            // {"mar_move_front_004",                   new FrameOffset( 0,  2)},
-            // {"mar_move_front_005",                   new FrameOffset( 0,  1)},
-            // {"mar_move_front_006",                   new FrameOffset( 0, -1)},
-            // {"mar_move_back_001",                    new FrameOffset( 0,  2)},
-            // {"mar_move_back_002",                    new FrameOffset( 0,  1)},
-            // {"mar_move_back_003",                    new FrameOffset( 0, -1)},
-            // {"mar_move_back_004",                    new FrameOffset( 0,  2)},
-            // {"mar_move_back_005",                    new FrameOffset( 0,  1)},
-            // {"mar_move_back_006",                    new FrameOffset( 0, -1)},
-
             {"rogue_idle_001",                       new FrameOffset( 1,  0)},
             {"rogue_idle_002",                       new FrameOffset( 1, -1)},
             {"rogue_idle_003",                       new FrameOffset( 1, -1)},
@@ -297,7 +276,6 @@ namespace Alexandria.cAPI
             {"rogue_run_back_004",                   new FrameOffset( 2,  2)},
             {"rogue_run_back_005",                   new FrameOffset( 2,  1)},
             {"rogue_run_back_006",                   new FrameOffset( 1,  0)},
-
             {"pilot_idle_right_001",                 new FrameOffset( 1, -1)},
             {"pilot_idle_right_002",                 new FrameOffset( 1, -1)},
             {"pilot_idle_right_003",                 new FrameOffset( 1,  0)},
@@ -336,7 +314,6 @@ namespace Alexandria.cAPI
             {"pilot_move_back_004",                  new FrameOffset( 0,  0)},
             {"pilot_move_back_005",                  new FrameOffset(-1, -1)},
             {"pilot_move_back_006",                  new FrameOffset(-1, -1)},
-
             {"robot_idle_001",                       new FrameOffset( 1,  0)},
             {"robot_idle_002",                       new FrameOffset( 1,  0)},
             {"robot_idle_003",                       new FrameOffset( 1,  0)},
