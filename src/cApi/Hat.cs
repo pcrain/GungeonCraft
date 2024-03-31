@@ -39,6 +39,7 @@ namespace Alexandria.cAPI
         private Vector2 cachedDefOffset = Vector2.zero;
         private float rollLength = 0.65f; //The time it takes for a player with no dodge roll effects to roll
         private float startRolTime = 0.0f;
+        private float centerOffset = 0f;
 
         private void Start()
         {
@@ -52,6 +53,8 @@ namespace Alexandria.cAPI
             hatOwner.OnPreDodgeRoll += this.HatReactToDodgeRoll;
             UpdateHatFacingDirection();
             HandleAttachedSpriteDepth();
+            if (((16f * hatSprite.GetCurrentSpriteDef().colliderVertices[1].x) % 2) == 1)
+                centerOffset = 1f/32f;
         }
 
 		public override void OnDestroy()
@@ -233,12 +236,14 @@ namespace Alexandria.cAPI
             return new Vector2(0f, def.boundsDataCenter.y + 0.5f * def.boundsDataExtents.y);
         }
 
+        private static Vector2 jankyFlippedHatFixOffset = new Vector2(1f/32f, 0f);
 		public Vector3 GetHatPosition(PlayerController player)
         {
             cachedDef ??= player.sprite.GetCurrentSpriteDef();
+            bool flipped = player.sprite.FlipX;
 
             // get the base offset for every character
-            Vector2 baseOffset = new Vector2(player.SpriteBottomCenter.x, player.sprite.transform.position.y);
+            Vector2 baseOffset = new Vector2(player.SpriteBottomCenter.x.Quantize(0.0625f) + (flipped ? centerOffset : 0f), player.sprite.transform.position.y);
 
             // get the player specific offset
             Vector2 playerSpecificOffset = Vector2.zero;
@@ -250,7 +255,6 @@ namespace Alexandria.cAPI
                 playerSpecificOffset = new Vector2(0f, onEyes ? Hatabase.defaultEyeLevelOffset : Hatabase.defaultHeadLevelOffset);
 
             // get the hat specific offset
-            bool flipped = player.sprite.FlipX;
             Vector2 hatSpecificOffset = (flipped ? hatOffset.WithX(-hatOffset.x) : hatOffset);
 
             // get the animation frame specific offset, if one is available
@@ -261,7 +265,9 @@ namespace Alexandria.cAPI
             cachedDefOffset = animationFrameSpecificOffset;
 
             // combine everything and return
-            return baseOffset + hatSpecificOffset + playerSpecificOffset + animationFrameSpecificOffset;
+            Vector2 finalPos = baseOffset + hatSpecificOffset + playerSpecificOffset + animationFrameSpecificOffset;
+            // ETGModConsole.Log($"positioning hat at {finalPos.x:F5},{finalPos.y:F5}");
+            return finalPos;
         }
 
         public void StickHatToPlayer(PlayerController player)
@@ -281,21 +287,18 @@ namespace Alexandria.cAPI
         private void HandleAttachedSpriteDepth()
         {
             if (hatDepthType == HatDepthType.AlwaysInFront)
-            {
                 hatSprite.HeightOffGround = 0.01f;
-                return;
-            }
-            if (hatDepthType == HatDepthType.AlwaysBehind)
-            {
+            else if (hatDepthType == HatDepthType.AlwaysBehind)
                 hatSprite.HeightOffGround = -0.6f;
-                return;
-            }
-
-            bool facingBack = (currentDirection == HatDirection.NORTH || currentDirection == HatDirection.NORTHEAST || currentDirection == HatDirection.NORTHWEST);
-            if(hatDepthType == HatDepthType.BehindWhenFacingBack)
-			    hatSprite.HeightOffGround = facingBack ? -0.85f :  0.85f;
             else
-                hatSprite.HeightOffGround = facingBack ?  1.15f : -1.15f;
+            {
+                bool facingBack = (currentDirection == HatDirection.NORTH || currentDirection == HatDirection.NORTHEAST || currentDirection == HatDirection.NORTHWEST);
+                if(hatDepthType == HatDepthType.BehindWhenFacingBack)
+    			    hatSprite.HeightOffGround = facingBack ? -0.85f :  0.85f;
+                else
+                    hatSprite.HeightOffGround = facingBack ?  1.15f : -1.15f;
+            }
+            hatSprite.UpdateZDepth();
         }
 
         /// <summary>Initialize hat flipping immediately after initiating a dodge roll</summary>
