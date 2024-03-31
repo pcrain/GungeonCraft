@@ -39,7 +39,6 @@ namespace Alexandria.cAPI
         private Vector2 cachedDefOffset = Vector2.zero;
         private float rollLength = 0.65f; //The time it takes for a player with no dodge roll effects to roll
         private float startRolTime = 0.0f;
-        private float centerOffset = 0f;
 
         private void Start()
         {
@@ -53,8 +52,6 @@ namespace Alexandria.cAPI
             hatOwner.OnPreDodgeRoll += this.HatReactToDodgeRoll;
             UpdateHatFacingDirection();
             HandleAttachedSpriteDepth();
-            if (((16f * hatSprite.GetCurrentSpriteDef().colliderVertices[1].x) % 2) == 1)
-                centerOffset = 1f/32f;
         }
 
 		public override void OnDestroy()
@@ -243,7 +240,21 @@ namespace Alexandria.cAPI
             bool flipped = player.sprite.FlipX;
 
             // get the base offset for every character
-            Vector2 baseOffset = new Vector2(player.SpriteBottomCenter.x.Quantize(0.0625f) + (flipped ? centerOffset : 0f), player.sprite.transform.position.y);
+            float effectiveX;
+            if (!flipped)  // if the sprite isn't flipped, the default rendering is fine
+                effectiveX = player.SpriteBottomCenter.x;
+            else // if the sprite IS flipped, we need to account for whether the player sprite and hat sprite are even / odd pixels and adjust the offset accordingly
+            {
+                bool oddHatWidth     = (((16f * hatSprite.GetCurrentSpriteDef().colliderVertices[1].x) % 2) == 1);
+                bool oddSpriteRadius = (((16f * cachedDef.boundsDataExtents.x) % 2) == 1);
+                if (oddHatWidth)
+                    effectiveX = player.SpriteBottomCenter.x.Quantize(0.0625f) + 1f/32f;
+                else if (oddSpriteRadius)
+                    effectiveX = player.SpriteBottomCenter.x + 1f/32f;
+                else
+                    effectiveX = player.SpriteBottomCenter.x.Quantize(0.0625f);
+            }
+            Vector2 baseOffset = new Vector2(effectiveX, player.sprite.transform.position.y);
 
             // get the player specific offset
             Vector2 playerSpecificOffset = Vector2.zero;
@@ -293,7 +304,7 @@ namespace Alexandria.cAPI
             else
             {
                 bool facingBack = (currentDirection == HatDirection.NORTH || currentDirection == HatDirection.NORTHEAST || currentDirection == HatDirection.NORTHWEST);
-                if(hatDepthType == HatDepthType.BehindWhenFacingBack)
+                if (hatDepthType == HatDepthType.BehindWhenFacingBack)
     			    hatSprite.HeightOffGround = facingBack ? -0.85f :  0.85f;
                 else
                     hatSprite.HeightOffGround = facingBack ?  1.15f : -1.15f;
