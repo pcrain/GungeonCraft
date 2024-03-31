@@ -20,7 +20,7 @@ namespace Alexandria.cAPI
         {
             public Vector2 offset;
             public Vector2 flipOffset;
-            public FrameOffset(float x, float y)
+            public FrameOffset(int x, int y)
             {
                 offset     = new Vector2( x / 16f, y / 16f);
                 flipOffset = new Vector2(-x / 16f, y / 16f);
@@ -53,8 +53,8 @@ namespace Alexandria.cAPI
             {"MarineSwapAnimation",               new Vector2(0f, -2f/16f)},
             {"ConvictSwapAnimation",              new Vector2(0f, -3f/16f)},
             {"RobotSwapAnimation",                new Vector2(0f,   0f/16f)},
-            // {"Playable_Bulletman_Swap_Animation", new Vector2(0f, - 5f/16f)}, //TODO
-            {"CoopCultistSwapAnimation",          new Vector2(0f, - 8f/16f)}, //TODO
+            {"Playable_Bulletman_Swap_Animation", new Vector2(0f, - 5f/16f)},
+            {"CoopCultistSwapAnimation",          new Vector2(0f, - 8f/16f)},
         };
 
         // Vertical offsets for where eye-level hats should be placed on different characters (using character sprite collection name)
@@ -73,8 +73,8 @@ namespace Alexandria.cAPI
             {"MarineSwapAnimation",                new Vector2(0f, -6f/16f)},
             {"ConvictSwapAnimation",               new Vector2(0f, -7f/16f)},
             {"RobotSwapAnimation",                 new Vector2(0f, - 5f/16f)},
-            // {"Playable_Bulletman_Swap_Animation",  new Vector2(0f, -16f/16f)}, //TODO
-            {"CoopCultistSwapAnimation",           new Vector2(0f, -12f/16f)}, //TODO
+            {"Playable_Bulletman_Swap_Animation",  new Vector2(0f, -16f/16f)},
+            {"CoopCultistSwapAnimation",           new Vector2(0f, -12f/16f)},
         };
 
         // Animation frame-specific offsets for head-top hats
@@ -448,6 +448,10 @@ namespace Alexandria.cAPI
             {"bullet_player_move_back_004",          new FrameOffset( 0,  1)},
             {"bullet_player_move_back_005",          new FrameOffset(-2,  1)},
             {"bullet_player_move_back_006",          new FrameOffset(-1,  1)},
+            {"playbun_move_front_right_002",         new FrameOffset( 0, -1)},
+            {"playbun_move_front_002",               new FrameOffset( 0, -1)},
+            {"playbun_idle_front_001",               new FrameOffset( 0, -1)},
+            {"playbun_idle_front_002",               new FrameOffset( 0, -1)},
         };
 
         // Animation frame-specific offsets for eye-level hats
