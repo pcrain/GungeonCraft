@@ -35,14 +35,12 @@ namespace Alexandria.cAPI
                 return; // no player means nothing to add a hat to
             if (!Hatabase.StoredHats.TryGetValue(m_WearingPlayer.name, out string storedHatName) || storedHatName == null)
             {
-                if (CurrentHat != null)
-                    RemoveCurrentHat(); //Removes the current hat if we don't have a stored one
+                RemoveCurrentHat(); //Removes the current hat if we don't have a stored one
                 return;
             }
             if (CurrentHat != null && storedHatName == CurrentHat.hatName)
                 return; // hat hasn't changed, nothing to do
-            if (CurrentHat != null)
-                RemoveCurrentHat(); //Removes the current hat if it's not equal to the stored one
+            RemoveCurrentHat(); //Removes the current hat if it's not equal to the stored one
             if (Hatabase.Hats.TryGetValue(storedHatName.GetDatabaseFriendlyName(), out Hat hat))
                 SetHat(hat);
         }
@@ -58,12 +56,16 @@ namespace Alexandria.cAPI
             Hatabase.StoredHats[m_WearingPlayer.name] = CurrentHat.hatName;
         }
 
-        public void RemoveCurrentHat()
+        public bool RemoveCurrentHat()
         {
+            if (!CurrentHat)
+                return false;
+
             UnityEngine.Object.Destroy(m_extantHatObject);
             Hatabase.StoredHats[m_WearingPlayer.name] = null;
             m_extantHatObject = null;
             CurrentHat = null;
+            return true;
         }
     }
 }
