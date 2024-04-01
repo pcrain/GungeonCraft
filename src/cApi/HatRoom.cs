@@ -198,9 +198,9 @@ namespace Alexandria.cAPI
         }
     }
 
-    const int ROOM_SIZE = 64;
+    // const int ROOM_SIZE = 64;
     // const int ROOM_SIZE = 32;
-    // const int ROOM_SIZE = 24;
+    const int ROOM_SIZE = 24;
     // const int ROOM_SIZE = 16;
     // const int ROOM_SIZE = 12;
     // const int ROOM_SIZE = 8;
@@ -219,7 +219,6 @@ namespace Alexandria.cAPI
       Pathfinding.Pathfinder.Instance.InitializeRegion(dungeon.data, newRoom.area.basePosition, newRoom.area.dimensions);
       int i = 0;
       IntVector2 cornerPos = newRoom.Cells[0];
-
 
       // GameObject gameObject = (GameObject)UnityEngine.Object.Instantiate(BraveResources.Load("RuntimeTileMap")); //WARNING: instantiating this breaks tilemap gen
       // tk2dTileMap tilemap = gameObject.GetComponent<tk2dTileMap>();
@@ -277,6 +276,9 @@ namespace Alexandria.cAPI
       Pixelator.Instance.MarkOcclusionDirty();
       Pixelator.Instance.ProcessOcclusionChange(newRoom.GetCenterCell(), 1f, newRoom, true);
 
+      CreatePrefabsIfNeeded();
+      CreateNewHatPedestals(newRoom);
+
       Vector2 newRoomPos = /*newRoom.GetCenterCell()*/newRoom.Epicenter.ToVector2();
       ETGModConsole.Log($"created new room at {newRoomPos}");
       Vector2 basePos = newRoom.area.basePosition.ToVector2();
@@ -324,46 +326,79 @@ namespace Alexandria.cAPI
       createdPrefabs = true;
     }
 
-    public static void Generate()
+    public static List<IntVector2> GetPedestalRingOffsets(int length)
     {
-      if (Hatabase.Hats.Count == 0)
+      List<IntVector2> offsets = new(length);
+      int remaining = length;
+      int nextRing = 2;
+      while (remaining > 0)
       {
-        Debug.Log("No Hats so no hat room!");
-        return;
-      }
-
-      try
-      {
-        CreatePrefabsIfNeeded();
-
-        RoomHandler foyerRoom = GameManager.Instance.Dungeon.data.Entrance;
-        //NOTE: funky math since segment width and pedestal spacing are not the same
-        int numRoomSegments = Mathf.Max(MIN_SEGMENTS, Mathf.CeilToInt((Mathf.Ceil(0.5f * Hatabase.Hats.Count) * PEDESTAL_SPACING) / SEGMENT_WIDTH));
-
-        // Set up hat room entrance and warp points
-        GameObject entranceObj = UnityEngine.Object.Instantiate(entrance, new Vector3(59.75f, 36f, 36.875f), Quaternion.identity);
-        entranceObj.GetComponent<SpeculativeRigidbody>().OnCollision += WarpToHatRoom;
-        GameObject returner = UnityEngine.Object.Instantiate(new GameObject(), new Vector3(HALLWAY_X, HALLWAY_Y, PEDESTAL_Z), Quaternion.identity);
-        returner.MakeRigidBody(dimensions: new IntVector2(2, 142), offset: new IntVector2(0, 0));
-        returner.GetComponent<SpeculativeRigidbody>().OnCollision += WarpBackFromHatRoom;
-
-        // Place down segments of the hat room hallway
-        UnityEngine.Object.Instantiate(hallwaySegment, // first top segment
-          new Vector3(HALLWAY_X, HALLWAY_Y, PEDESTAL_Z), Quaternion.identity);
-        UnityEngine.Object.Instantiate(hallwaySegBottom, // first bottom segment
-          new Vector3(HALLWAY_X, HALLWAY_Y, PEDESTAL_Z), Quaternion.identity);
-        for (int i = 0; i < numRoomSegments; i++)
+        int maxRingSize = nextRing * 8;
+        int ringSize = Math.Min(remaining, maxRingSize);
+        if ((remaining % 2) == 0 || ringSize == maxRingSize)
+          offsets.Add(new IntVector2(0, nextRing));
+        int halfRing = ringSize / 2;
+        int quarterRing = ringSize / 4;
+        int x = 0;
+        int y = nextRing;
+        for (int i = 1; i <= halfRing; ++i)
         {
-            Vector3 pos = new Vector3(FIRST_SEGMENT_X + (SEGMENT_WIDTH * i), HALLWAY_Y, PEDESTAL_Z);
-            UnityEngine.Object.Instantiate(hallwaySegment, pos, Quaternion.identity);
-            UnityEngine.Object.Instantiate(hallwaySegBottom, pos, Quaternion.identity);
+          if (y == -nextRing)
+            --x;
+          else if (x < nextRing)
+            ++x;
+          else
+            --y;
+          offsets.Add(new IntVector2(x, y));
+          offsets.Add(new IntVector2(-x, y));
         }
-        UnityEngine.Object.Instantiate(hallwayEnd, // last top segment
-          new Vector3(FIRST_SEGMENT_X + (SEGMENT_WIDTH * numRoomSegments), HALLWAY_Y, PEDESTAL_Z), Quaternion.identity);
-        UnityEngine.Object.Instantiate(hallwaySegBottom, // last bottom segment
-          new Vector3(FIRST_SEGMENT_X + (SEGMENT_WIDTH * numRoomSegments), HALLWAY_Y, PEDESTAL_Z), Quaternion.identity);
+        remaining -= ringSize;
+        nextRing += 1;
+      }
+      return offsets;
+    }
 
-        // Create the pedestals with hats on them
+    private static float NEW_PEDESTAL_X_SPACING = 3.0f;
+    private static float NEW_PEDESTAL_Y_SPACING = 2.5f;
+    public static void CreateNewHatPedestals(RoomHandler room)
+    {
+        // RoomHandler foyerRoom = GameManager.Instance.Dungeon.data.Entrance;
+        // Vector2 roomCenter = room.Epicenter.ToVector2();
+        Vector2 roomCenter = room.area.Center;
+        Hat[] allHats = Hatabase.Hats.Values.ToArray();
+        List<IntVector2> offsets = GetPedestalRingOffsets(allHats.Length);
+        for (int i = 0; i < allHats.Length; i++)
+        {
+          Hat hat = allHats[i];
+
+          // float pedX = roomCenter.x + 1.5f * PEDESTAL_SPACING * Mathf.Sin((2f / ringSize) * Mathf.PI * (0.5f + i));
+          // float pedY = roomCenter.y + 1.5f * PEDESTAL_SPACING * Mathf.Cos((2f / ringSize) * Mathf.PI * (0.5f + i));
+          float pedX = roomCenter.x + offsets[i].x * NEW_PEDESTAL_X_SPACING;
+          float pedY = roomCenter.y + offsets[i].y * NEW_PEDESTAL_Y_SPACING;
+
+          GameObject pedObj = UnityEngine.Object.Instantiate(hat.goldenPedestal ? goldPedestal : plainPedestal);
+          pedObj.GetComponent<tk2dSprite>().PlaceAtPositionByAnchor(new Vector3(pedX, pedY, PEDESTAL_Z), tk2dBaseSprite.Anchor.LowerCenter);
+
+          HatPedestal pedestal = pedObj.AddComponent<HatPedestal>();
+          pedestal.hat = hat;
+
+          GameObject hat1 = new GameObject();
+          tk2dSprite sprite = hat1.AddComponent<tk2dSprite>();
+          sprite.SetSprite(pedestal.hat.sprite.collection, pedestal.hat.sprite.spriteId);
+          sprite.PlaceAtLocalPositionByAnchor(
+            new Vector2(pedObj.GetComponent<tk2dSprite>().WorldCenter.x, pedY + 1.3f).ToVector3ZisY(0f),
+            tk2dBaseSprite.Anchor.LowerCenter);
+          sprite.HeightOffGround = HAT_Z_OFFSET;
+          sprite.UpdateZDepth();
+          SpriteOutlineManager.AddOutlineToSprite(hat1.GetComponent<tk2dSprite>(), Color.black, HAT_Z_OFFSET);
+
+          room.RegisterInteractable(pedestal as IPlayerInteractable);
+        }
+    }
+
+    public static void CreateHatPedestals()
+    {
+        RoomHandler foyerRoom = GameManager.Instance.Dungeon.data.Entrance;
         Hat[] allHats = Hatabase.Hats.Values.ToArray();
         for (int i = 0; i < allHats.Length; i++)
         {
@@ -393,6 +428,48 @@ namespace Alexandria.cAPI
 
           foyerRoom.RegisterInteractable(pedestal as IPlayerInteractable);
         }
+    }
+
+    public static void Generate()
+    {
+      if (Hatabase.Hats.Count == 0)
+      {
+        Debug.Log("No Hats so no hat room!");
+        return;
+      }
+
+      try
+      {
+        CreatePrefabsIfNeeded();
+
+        //NOTE: funky math since segment width and pedestal spacing are not the same
+        int numRoomSegments = Mathf.Max(MIN_SEGMENTS, Mathf.CeilToInt((Mathf.Ceil(0.5f * Hatabase.Hats.Count) * PEDESTAL_SPACING) / SEGMENT_WIDTH));
+
+        // Set up hat room entrance and warp points
+        GameObject entranceObj = UnityEngine.Object.Instantiate(entrance, new Vector3(59.75f, 36f, 36.875f), Quaternion.identity);
+        entranceObj.GetComponent<SpeculativeRigidbody>().OnCollision += WarpToHatRoom;
+        GameObject returner = UnityEngine.Object.Instantiate(new GameObject(), new Vector3(HALLWAY_X, HALLWAY_Y, PEDESTAL_Z), Quaternion.identity);
+        returner.MakeRigidBody(dimensions: new IntVector2(2, 142), offset: new IntVector2(0, 0));
+        returner.GetComponent<SpeculativeRigidbody>().OnCollision += WarpBackFromHatRoom;
+
+        // Place down segments of the hat room hallway
+        UnityEngine.Object.Instantiate(hallwaySegment, // first top segment
+          new Vector3(HALLWAY_X, HALLWAY_Y, PEDESTAL_Z), Quaternion.identity);
+        UnityEngine.Object.Instantiate(hallwaySegBottom, // first bottom segment
+          new Vector3(HALLWAY_X, HALLWAY_Y, PEDESTAL_Z), Quaternion.identity);
+        for (int i = 0; i < numRoomSegments; i++)
+        {
+            Vector3 pos = new Vector3(FIRST_SEGMENT_X + (SEGMENT_WIDTH * i), HALLWAY_Y, PEDESTAL_Z);
+            UnityEngine.Object.Instantiate(hallwaySegment, pos, Quaternion.identity);
+            UnityEngine.Object.Instantiate(hallwaySegBottom, pos, Quaternion.identity);
+        }
+        UnityEngine.Object.Instantiate(hallwayEnd, // last top segment
+          new Vector3(FIRST_SEGMENT_X + (SEGMENT_WIDTH * numRoomSegments), HALLWAY_Y, PEDESTAL_Z), Quaternion.identity);
+        UnityEngine.Object.Instantiate(hallwaySegBottom, // last bottom segment
+          new Vector3(FIRST_SEGMENT_X + (SEGMENT_WIDTH * numRoomSegments), HALLWAY_Y, PEDESTAL_Z), Quaternion.identity);
+
+        // Create the pedestals with hats on them
+        CreateHatPedestals();
       }
       catch(Exception e)
       {
