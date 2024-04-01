@@ -77,32 +77,111 @@ namespace Alexandria.cAPI
       g.GenerateOrAddToRigidBody(CollisionLayer.HighObstacle, PixelCollider.PixelColliderGeneration.Manual, UsesPixelsAsUnitSize: true, dimensions: dimensions, offset: offset);
     }
 
-    private static PrototypeDungeonRoom CreateEmptyRoom(int width = 12, int height = 12)
+
+
+    public static RoomHandler MyAddRuntimeRoom(Dungeon dungeon, PrototypeDungeonRoom prototype, Action<RoomHandler> postProcessCellData = null, DungeonData.LightGenerationStyle lightStyle = DungeonData.LightGenerationStyle.FORCE_COLOR)
+    {
+      //HACK: tweaking these two numbers magically fixes bad generation???
+      // int padding = 3;
+      int wallWidth = 3;
+      int borderSize = wallWidth * 2;
+      IntVector2 roomDimensions = new IntVector2(prototype.Width, prototype.Height);
+      IntVector2 newRoomOffset = new IntVector2(dungeon.data.Width + borderSize, borderSize);
+      int newWidth = dungeon.data.Width + borderSize * 2 + roomDimensions.x;
+      int newHeight = Mathf.Max(dungeon.data.Height, roomDimensions.y + borderSize * 2);
+      CellData[][] array = BraveUtility.MultidimensionalArrayResize(dungeon.data.cellData, dungeon.data.Width, dungeon.data.Height, newWidth, newHeight);
+      CellArea cellArea = new CellArea(newRoomOffset, roomDimensions);
+      cellArea.prototypeRoom = prototype;
+      dungeon.data.cellData = array;
+      dungeon.data.ClearCachedCellData();
+      RoomHandler roomHandler = new RoomHandler(cellArea);
+      for (int i = -borderSize; i < roomDimensions.x + borderSize; i++)
+      {
+        for (int j = -borderSize; j < roomDimensions.y + borderSize; j++)
+        {
+          IntVector2 p = new IntVector2(i, j) + newRoomOffset;
+          CellData cellData = new CellData(p);
+          cellData.positionInTilemap = cellData.positionInTilemap - newRoomOffset + new IntVector2(wallWidth, wallWidth);
+          cellData.parentArea = cellArea;
+          cellData.parentRoom = roomHandler;
+          cellData.nearestRoom = roomHandler;
+          cellData.distanceFromNearestRoom = 0f;
+          array[p.x][p.y] = cellData;
+        }
+      }
+      roomHandler.WriteRoomData(dungeon.data);
+      for (int k = -borderSize; k < roomDimensions.x + borderSize; k++)
+      {
+        for (int l = -borderSize; l < roomDimensions.y + borderSize; l++)
+        {
+          IntVector2 intVector2 = new IntVector2(k, l) + newRoomOffset;
+          array[intVector2.x][intVector2.y].breakable = true;
+        }
+      }
+      dungeon.data.rooms.Add(roomHandler);
+      GameObject gameObject = (GameObject)UnityEngine.Object.Instantiate(BraveResources.Load("RuntimeTileMap"));
+      tk2dTileMap component = gameObject.GetComponent<tk2dTileMap>();
+      component.Editor__SpriteCollection = dungeon.tileIndices.dungeonCollection;
+      GameManager.Instance.Dungeon.data.GenerateLightsForRoom(GameManager.Instance.Dungeon.decoSettings, roomHandler, GameObject.Find("_Lights").transform, lightStyle);
+      if (postProcessCellData != null)
+      {
+        postProcessCellData(roomHandler);
+      }
+      const int HACKY_SCALING_FACTOR = 32; //HACK: making the tilemap extra wide is the only way I've found to avoid rendering issues with black patches in rooms
+      TK2DDungeonAssembler.RuntimeResizeTileMap(component, HACKY_SCALING_FACTOR + roomDimensions.x + wallWidth * 2, roomDimensions.y + wallWidth * 2, dungeon.m_tilemap.partitionSizeX, dungeon.m_tilemap.partitionSizeY);
+      for (int m = -wallWidth; m < roomDimensions.x + wallWidth; m++)
+      {
+        for (int n = -wallWidth; n < roomDimensions.y + wallWidth; n++)
+        {
+          dungeon.assembler.BuildTileIndicesForCell(dungeon, component, newRoomOffset.x + m, newRoomOffset.y + n);
+        }
+      }
+      tk2dRuntime.TileMap.RenderMeshBuilder.CurrentCellXOffset = newRoomOffset.x - wallWidth;
+      tk2dRuntime.TileMap.RenderMeshBuilder.CurrentCellYOffset = newRoomOffset.y - wallWidth;
+      component.Build(tk2dTileMap.BuildFlags.ForceBuild);
+      tk2dRuntime.TileMap.RenderMeshBuilder.CurrentCellXOffset = 0;
+      tk2dRuntime.TileMap.RenderMeshBuilder.CurrentCellYOffset = 0;
+      component.renderData.transform.position = new Vector3(newRoomOffset.x - wallWidth, newRoomOffset.y - wallWidth, newRoomOffset.y - wallWidth);
+      roomHandler.OverrideTilemap = component;
+      Pathfinding.Pathfinder.Instance.InitializeRegion(dungeon.data, roomHandler.area.basePosition + new IntVector2(-wallWidth, -wallWidth), roomHandler.area.dimensions + new IntVector2(wallWidth, wallWidth));
+      roomHandler.PostGenerationCleanup();
+      DeadlyDeadlyGoopManager.ReinitializeData();
+      return roomHandler;
+    }
+
+    const int LIGHT_SPACING = 8;
+    private static PrototypeDungeonRoom CreateEmptyLitRoom(int width = 12)
     {
         try
         {
-            PrototypeDungeonRoom room = RoomFactory.GetNewPrototypeDungeonRoom(width, height);
+            // return CwaffingTheGungy.ItemHelper.Get(CwaffingTheGungy.Items.Drill).GetComponent<PaydayDrillItem>().GenericFallbackCombatRoom;
+            PrototypeDungeonRoom room = RoomFactory.GetNewPrototypeDungeonRoom(width, width);
             room.usesProceduralLighting = false;
+
             // AddExit(room, new Vector2(width / 2, height), DungeonData.Direction.NORTH);
             // AddExit(room, new Vector2(width / 2, 0), DungeonData.Direction.SOUTH);
             // AddExit(room, new Vector2(width, height / 2), DungeonData.Direction.EAST);
             // AddExit(room, new Vector2(0, height / 2), DungeonData.Direction.WEST);
 
             // room.overrideRoomVisualType = 0; // stone flooring
-            room.overrideRoomVisualType = 1; // wood flooring
             // room.overrideRoomVisualType = 2; // brick flooring
-            room.FullCellData = new PrototypeDungeonRoomCellData[width * height];
+            room.overrideRoomVisualType = 1; // wood flooring
+            room.FullCellData = new PrototypeDungeonRoomCellData[width * width];
+            int radius = width / 2;
             for (int x = 0; x < width; x++)
             {
-                for (int y = 0; y < height; y++)
+                for (int y = 0; y < width; y++)
                 {
+                    bool shouldBeLit = ((radius - Math.Min(x, width  - (x + 1))) % LIGHT_SPACING == (LIGHT_SPACING / 2)) &&
+                                       ((radius - Math.Min(y, width - (y + 1))) % LIGHT_SPACING == (LIGHT_SPACING / 2));
                     room.FullCellData[x + y * width] = new PrototypeDungeonRoomCellData()
                     {
-                        containsManuallyPlacedLight = false,
-                        state = /*(x == 0 || x == width - 1 || y == 0 || y == height - 1) ? CellType.WALL :*/ CellType.FLOOR,
+                        containsManuallyPlacedLight = shouldBeLit,
+                        state = CellType.FLOOR,
                         appearance = new PrototypeDungeonRoomCellAppearance()
                         {
-                            OverrideFloorType = CellVisualData.CellFloorType.Carpet,
+                            // overrideDungeonMaterialIndex = 0,
+                            // OverrideFloorType = CellVisualData.CellFloorType.Carpet,
                         },
                     };
                 }
@@ -119,25 +198,39 @@ namespace Alexandria.cAPI
         }
     }
 
-    const int ROOM_SIZE = 24;
+    const int ROOM_SIZE = 64;
+    // const int ROOM_SIZE = 32;
+    // const int ROOM_SIZE = 24;
+    // const int ROOM_SIZE = 16;
+    // const int ROOM_SIZE = 12;
+    // const int ROOM_SIZE = 8;
     private static void CreateRealHatRoom()
     {
       ETGModConsole.Log($"creating real hat room");
-      PrototypeDungeonRoom protoRoom = /*RoomFactory.*/CreateEmptyRoom(ROOM_SIZE, ROOM_SIZE); //TODO: this doesn't work for sizes smaller than 24x24 without graphical glitches...why?
-      // PrototypeDungeonRoom protoRoom = /*RoomFactory.*/CreateEmptyRoom(8, 8); //TODO: this doesn't work for sizes smaller than 24x24 without graphical glitches...why?
+      PrototypeDungeonRoom protoRoom = CreateEmptyLitRoom(ROOM_SIZE); //TODO: this doesn't work for sizes smaller than 24x24 without graphical glitches...why?
+      // PrototypeDungeonRoom protoRoom = /*RoomFactory.*/CreateEmptyLitRoom(8, 8); //TODO: this doesn't work for sizes smaller than 24x24 without graphical glitches...why?
       // PrototypeDungeonRoom protoRoom = RoomFactory.GetNewPrototypeDungeonRoom(12, 12);
       Dungeon dungeon = GameManager.Instance.Dungeon;
-      RoomHandler newRoom = dungeon.AddRuntimeRoom(protoRoom, lightStyle: DungeonData.LightGenerationStyle.STANDARD);
+      // RoomHandler newRoom = dungeon.AddRuntimeRoom(protoRoom, lightStyle: DungeonData.LightGenerationStyle.FORCE_COLOR);
+      RoomHandler newRoom = MyAddRuntimeRoom(dungeon, protoRoom, lightStyle: DungeonData.LightGenerationStyle.FORCE_COLOR);
       TK2DInteriorDecorator decorator = new TK2DInteriorDecorator(dungeon.assembler);
       // decorator.HandleRoomDecoration(newRoom, dungeon, dungeon.m_tilemap);  //TODO: adds janky carpet, fix later
       // decorator.UpholsterRoom(newRoom, dungeon, dungeon.m_tilemap);
       Pathfinding.Pathfinder.Instance.InitializeRegion(dungeon.data, newRoom.area.basePosition, newRoom.area.dimensions);
       int i = 0;
       IntVector2 cornerPos = newRoom.Cells[0];
+
+
+      // GameObject gameObject = (GameObject)UnityEngine.Object.Instantiate(BraveResources.Load("RuntimeTileMap")); //WARNING: instantiating this breaks tilemap gen
+      // tk2dTileMap tilemap = gameObject.GetComponent<tk2dTileMap>();
+      // tilemap.Editor__SpriteCollection = dungeon.tileIndices.dungeonCollection;
+      // gameObject = null;
+      tk2dTileMap tilemap = dungeon.m_tilemap;
+
       foreach (IntVector2 cellPos in newRoom.Cells)
       {
-        dungeon.assembler.ClearTileIndicesForCell(dungeon, dungeon.m_tilemap, cellPos.x, cellPos.y);
-        dungeon.assembler.BuildTileIndicesForCell(dungeon, dungeon.m_tilemap, cellPos.x, cellPos.y);
+        dungeon.assembler.ClearTileIndicesForCell(dungeon, tilemap, cellPos.x, cellPos.y);
+        dungeon.assembler.BuildTileIndicesForCell(dungeon, tilemap, cellPos.x, cellPos.y);
       }
       foreach (IntVector2 cellPos in newRoom.Cells)
       {
@@ -180,9 +273,9 @@ namespace Alexandria.cAPI
         ++i;
       }
       ETGModConsole.Log($"processed {i} cells");
-      // dungeon.RebuildTilemap(dungeon.m_tilemap);
+      // dungeon.RebuildTilemap(tilemap);
       Pixelator.Instance.MarkOcclusionDirty();
-      Pixelator.Instance.ProcessOcclusionChange(newRoom.GetCenterCell(), 100f, newRoom, true);
+      Pixelator.Instance.ProcessOcclusionChange(newRoom.GetCenterCell(), 1f, newRoom, true);
 
       Vector2 newRoomPos = /*newRoom.GetCenterCell()*/newRoom.Epicenter.ToVector2();
       ETGModConsole.Log($"created new room at {newRoomPos}");
