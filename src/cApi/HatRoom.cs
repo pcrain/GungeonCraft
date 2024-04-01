@@ -40,7 +40,8 @@ namespace Alexandria.cAPI
         {
           if (!needToGenHatRoom)
             return;
-          HatRoom.Generate();
+          HatRoom.CreateRealHatRoom();
+          // HatRoom.Generate();
           needToGenHatRoom = false;
         }
     }
@@ -74,6 +75,128 @@ namespace Alexandria.cAPI
     private static void MakeRigidBody(this GameObject g, IntVector2 dimensions, IntVector2 offset)
     {
       g.GenerateOrAddToRigidBody(CollisionLayer.HighObstacle, PixelCollider.PixelColliderGeneration.Manual, UsesPixelsAsUnitSize: true, dimensions: dimensions, offset: offset);
+    }
+
+    private static PrototypeDungeonRoom CreateEmptyRoom(int width = 12, int height = 12)
+    {
+        try
+        {
+            PrototypeDungeonRoom room = RoomFactory.GetNewPrototypeDungeonRoom(width, height);
+            room.usesProceduralLighting = false;
+            // AddExit(room, new Vector2(width / 2, height), DungeonData.Direction.NORTH);
+            // AddExit(room, new Vector2(width / 2, 0), DungeonData.Direction.SOUTH);
+            // AddExit(room, new Vector2(width, height / 2), DungeonData.Direction.EAST);
+            // AddExit(room, new Vector2(0, height / 2), DungeonData.Direction.WEST);
+
+            // room.overrideRoomVisualType = 0; // stone flooring
+            room.overrideRoomVisualType = 1; // wood flooring
+            // room.overrideRoomVisualType = 2; // brick flooring
+            room.FullCellData = new PrototypeDungeonRoomCellData[width * height];
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    room.FullCellData[x + y * width] = new PrototypeDungeonRoomCellData()
+                    {
+                        containsManuallyPlacedLight = false,
+                        state = /*(x == 0 || x == width - 1 || y == 0 || y == height - 1) ? CellType.WALL :*/ CellType.FLOOR,
+                        appearance = new PrototypeDungeonRoomCellAppearance()
+                        {
+                            OverrideFloorType = CellVisualData.CellFloorType.Carpet,
+                        },
+                    };
+                }
+            }
+
+            // room.OnBeforeSerialize();
+            // room.OnAfterDeserialize();
+            // room.UpdatePrecalculatedData();
+            return room;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+    const int ROOM_SIZE = 24;
+    private static void CreateRealHatRoom()
+    {
+      ETGModConsole.Log($"creating real hat room");
+      PrototypeDungeonRoom protoRoom = /*RoomFactory.*/CreateEmptyRoom(ROOM_SIZE, ROOM_SIZE); //TODO: this doesn't work for sizes smaller than 24x24 without graphical glitches...why?
+      // PrototypeDungeonRoom protoRoom = /*RoomFactory.*/CreateEmptyRoom(8, 8); //TODO: this doesn't work for sizes smaller than 24x24 without graphical glitches...why?
+      // PrototypeDungeonRoom protoRoom = RoomFactory.GetNewPrototypeDungeonRoom(12, 12);
+      Dungeon dungeon = GameManager.Instance.Dungeon;
+      RoomHandler newRoom = dungeon.AddRuntimeRoom(protoRoom, lightStyle: DungeonData.LightGenerationStyle.STANDARD);
+      TK2DInteriorDecorator decorator = new TK2DInteriorDecorator(dungeon.assembler);
+      // decorator.HandleRoomDecoration(newRoom, dungeon, dungeon.m_tilemap);  //TODO: adds janky carpet, fix later
+      // decorator.UpholsterRoom(newRoom, dungeon, dungeon.m_tilemap);
+      Pathfinding.Pathfinder.Instance.InitializeRegion(dungeon.data, newRoom.area.basePosition, newRoom.area.dimensions);
+      int i = 0;
+      IntVector2 cornerPos = newRoom.Cells[0];
+      foreach (IntVector2 cellPos in newRoom.Cells)
+      {
+        dungeon.assembler.ClearTileIndicesForCell(dungeon, dungeon.m_tilemap, cellPos.x, cellPos.y);
+        dungeon.assembler.BuildTileIndicesForCell(dungeon, dungeon.m_tilemap, cellPos.x, cellPos.y);
+      }
+      foreach (IntVector2 cellPos in newRoom.Cells)
+      {
+        IntVector2 roomPos = cellPos - cornerPos;
+        CellData cellData = dungeon.data.cellData[cellPos.x][cellPos.y];
+
+        cellData.cellVisualData.containsLight = false;
+        if (roomPos.x == 0)
+          cellData.cellVisualData.lightDirection = DungeonData.Direction.WEST;
+        else if (roomPos.x == ROOM_SIZE - 1)
+          cellData.cellVisualData.lightDirection = DungeonData.Direction.EAST;
+        else if (roomPos.y == 0)
+          cellData.cellVisualData.lightDirection = DungeonData.Direction.SOUTH;
+        else if (roomPos.y == ROOM_SIZE - 1)
+          cellData.cellVisualData.lightDirection = DungeonData.Direction.NORTH;
+        else
+          cellData.cellVisualData.containsLight = false;
+
+        if (cellData.cellVisualData.containsLight)
+        {
+          if (roomPos.y == 0 || roomPos.y == ROOM_SIZE - 1)
+          {
+            cellData.cellVisualData.facewallLightStampData = dungeon.roomMaterialDefinitions[newRoom.RoomVisualSubtype].sidewallLightStamps[0];
+            // cellData.cellVisualData.facewallLightStampData = dungeon.roomMaterialDefinitions[newRoom.RoomVisualSubtype].facewallLightStamps[0];
+            cellData.cellVisualData.sidewallLightStampData = null;
+          }
+          else
+          {
+            cellData.cellVisualData.facewallLightStampData = null;
+            cellData.cellVisualData.sidewallLightStampData = dungeon.roomMaterialDefinitions[newRoom.RoomVisualSubtype].sidewallLightStamps[0];
+          }
+        }
+        // TK2DInteriorDecorator.PlaceLightDecorationForCell(dungeon, dungeon.m_tilemap, cellData, cellPos);
+
+        // cellData.hasBeenGenerated = false;
+        cellData.HasCachedPhysicsTile = false;
+        cellData.CachedPhysicsTile = null;
+        // newRoom.UpdateCellVisualData(cellPos.x, cellPos.y);
+
+        ++i;
+      }
+      ETGModConsole.Log($"processed {i} cells");
+      // dungeon.RebuildTilemap(dungeon.m_tilemap);
+      Pixelator.Instance.MarkOcclusionDirty();
+      Pixelator.Instance.ProcessOcclusionChange(newRoom.GetCenterCell(), 100f, newRoom, true);
+
+      Vector2 newRoomPos = /*newRoom.GetCenterCell()*/newRoom.Epicenter.ToVector2();
+      ETGModConsole.Log($"created new room at {newRoomPos}");
+      Vector2 basePos = newRoom.area.basePosition.ToVector2();
+      ETGModConsole.Log($"new room basePos at {basePos}");
+      PlayerController pc = GameManager.Instance.PrimaryPlayer;
+      ETGModConsole.Log($"player is at {pc.CenterPosition}");
+      pc.WarpToPointAndBringCoopPartner(newRoomPos /*basePos*/, doFollowers: true);
+      pc.ForceChangeRoom(newRoom);
+      Vector2 oldPos = GameManager.Instance.MainCameraController.transform.position.XY() - pc.transform.position.XY();
+      GameManager.Instance.MainCameraController.SetManualControl(true, false);
+      GameManager.Instance.MainCameraController.transform.position =
+        (pc.transform.position.XY() + oldPos).ToVector3ZUp(GameManager.Instance.MainCameraController.transform.position.z);
+      GameManager.Instance.MainCameraController.SetManualControl(false, false);
     }
 
     private static void CreatePrefabsIfNeeded()
