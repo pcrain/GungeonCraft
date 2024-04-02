@@ -247,6 +247,7 @@
     <EmbeddedResource Include="Resources\Atlases\atlas_1.png"/>
     <EmbeddedResource Include="Resources\Atlases\atlas_1.atlas"/>
     <EmbeddedResource Include="Resources\Sounds\CwaffingTheGungy.bnk"/>
+    <EmbeddedResource Include="Resources\hat_room_exit.png"/>
     <EmbeddedResource Include="Resources\Rooms\barter.newroom"/>
     <EmbeddedResource Include="Resources\Rooms\petshop.newroom"/>
     <EmbeddedResource Include="Resources\Rooms\insurance.newroom"/>
