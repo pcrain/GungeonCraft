@@ -238,6 +238,7 @@ namespace Alexandria.cAPI
       returnerSprite.PlaceAtPositionByAnchor(hatRoomCenter + new Vector2(0, -1.5f), tk2dBaseSprite.Anchor.LowerCenter);
       returnerSprite.HeightOffGround = -3f;
       returnerSprite.UpdateZDepth();
+      returner.GetComponent<SpeculativeRigidbody>().OnPreRigidbodyCollision += PreWarpBackFromHatRoom;
       returner.GetComponent<SpeculativeRigidbody>().OnCollision += WarpBackFromHatRoom;
     }
 
@@ -336,27 +337,40 @@ namespace Alexandria.cAPI
       if (obj.OtherRigidbody.gameObject.GetComponent<PlayerController>() is not PlayerController player)
         return;
 
-      GameManager.Instance.StartCoroutine(WarpToPoint(player, hatRoomCenter + new Vector2(-player.SpriteDimensions.x / 2, -2.5f)));
+      GameManager.Instance.StartCoroutine(WarpToPoint(player, hatRoomCenter + new Vector2(-player.SpriteDimensions.x / 2, -2f), Vector2.down));
       Pixelator.Instance.DoOcclusionLayer = false;
+    }
+
+    private static void PreWarpBackFromHatRoom(SpeculativeRigidbody me, PixelCollider myPixelCollider, SpeculativeRigidbody other, PixelCollider otherPixelCollider)
+    {
+      if (other.gameObject.GetComponent<PlayerController>() is not PlayerController player)
+        return;
+      if (player.usingForcedInput || player.m_activeActions.Move.Vector.y <= 0f)
+        PhysicsEngine.SkipCollision = true;
     }
 
     private static void WarpBackFromHatRoom(CollisionData obj)
     {
       if (obj.OtherRigidbody.gameObject.GetComponent<PlayerController>() is not PlayerController player)
         return;
+      if (player.m_activeActions.Move.Vector.y <= 0f)
+        return; // only enter if we're facing up
 
-      GameManager.Instance.StartCoroutine(WarpToPoint(player, new Vector2(57.75f, 36.75f)));
+      GameManager.Instance.StartCoroutine(WarpToPoint(player, new Vector2(58.5f, 37.25f), Vector2.left));
       Pixelator.Instance.DoOcclusionLayer = true;
     }
 
-    private static IEnumerator WarpToPoint(PlayerController p, Vector2 position)
+    private static IEnumerator WarpToPoint(PlayerController p, Vector2 position, Vector2? forceDirection = null)
     {
       p.usingForcedInput = true;
       Pixelator.Instance.FadeToBlack(0.1f, false);
       yield return new WaitForSeconds(0.15f);
       p.WarpToPointAndBringCoopPartner(position, doFollowers: true);
+      GameManager.Instance.MainCameraController.ForceToPlayerPosition(p);
       yield return new WaitForSeconds(0.05f);
       Pixelator.Instance.FadeToBlack(0.1f, true);
+      if (forceDirection.HasValue)
+        p.ForceIdleFacePoint(forceDirection.Value);
       p.usingForcedInput = false;
     }
   }
