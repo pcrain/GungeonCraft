@@ -52,9 +52,10 @@ public static class CwaffHats
       EasyHat(name: "stovepipe",           offset: new Vector2( 0, -5));
       EasyHat(name: "u_s_a_general_hat",   offset: new Vector2( 0, -3));
       EasyHat(name: "witch_hat",           offset: new Vector2( 0, -3));
+      EasyHat(name: "arrow_hat",           offset: new Vector2( 0,  0), fps: 8);
     }
 
-    private static void EasyHat(string name, Vector2? offset = null, bool onEyes = false)
+    private static void EasyHat(string name, Vector2? offset = null, bool onEyes = false, int fps = 1)
     {
       GameObject hatObj = UnityEngine.Object.Instantiate(new GameObject());
       Hat hat = hatObj.AddComponent<Hat>();
@@ -75,7 +76,7 @@ public static class CwaffHats
           ResMap.Get($"{name}_northwest", true)
         ),
         hatObj: hatObj,
-        fps: 1);
+        fps: fps);
       if (hat.hatDirectionality != Hat.HatDirectionality.NONE && hat.hatDirectionality != Hat.HatDirectionality.TWOWAYVERTICAL)
         hat.flipHorizontalWithPlayer = false;
       HatUtility.AddHatToDatabase(hatObj);

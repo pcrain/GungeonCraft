@@ -150,12 +150,12 @@ namespace Alexandria.cAPI
     }
 
     const int LIGHT_SPACING = 8;
-    private static PrototypeDungeonRoom CreateEmptyLitRoom(int width = 12)
+    private static PrototypeDungeonRoom CreateEmptyLitRoom(int width, int height)
     {
         try
         {
             // return CwaffingTheGungy.ItemHelper.Get(CwaffingTheGungy.Items.Drill).GetComponent<PaydayDrillItem>().GenericFallbackCombatRoom;
-            PrototypeDungeonRoom room = RoomFactory.GetNewPrototypeDungeonRoom(width, width);
+            PrototypeDungeonRoom room = RoomFactory.GetNewPrototypeDungeonRoom(width, height);
             room.usesProceduralLighting = false;
 
             // AddExit(room, new Vector2(width / 2, height), DungeonData.Direction.NORTH);
@@ -166,14 +166,15 @@ namespace Alexandria.cAPI
             // room.overrideRoomVisualType = 0; // stone flooring
             // room.overrideRoomVisualType = 2; // brick flooring
             room.overrideRoomVisualType = 1; // wood flooring
-            room.FullCellData = new PrototypeDungeonRoomCellData[width * width];
-            int radius = width / 2;
+            room.FullCellData = new PrototypeDungeonRoomCellData[width * height];
+            int hradius = width / 2;
+            int vradius = height / 2;
             for (int x = 0; x < width; x++)
             {
-                for (int y = 0; y < width; y++)
+                for (int y = 0; y < height; y++)
                 {
-                    bool shouldBeLit = ((radius - Math.Min(x, width  - (x + 1))) % LIGHT_SPACING == (LIGHT_SPACING / 2)) &&
-                                       ((radius - Math.Min(y, width - (y + 1))) % LIGHT_SPACING == (LIGHT_SPACING / 2));
+                    bool shouldBeLit = ((hradius - Math.Min(x, width  - (x + 1))) % LIGHT_SPACING == (LIGHT_SPACING / 2)) &&
+                                       ((vradius - Math.Min(y, height - (y + 1))) % LIGHT_SPACING == (LIGHT_SPACING / 2));
                     room.FullCellData[x + y * width] = new PrototypeDungeonRoomCellData()
                     {
                         containsManuallyPlacedLight = shouldBeLit,
@@ -207,7 +208,10 @@ namespace Alexandria.cAPI
     private static void CreateRealHatRoom()
     {
       ETGModConsole.Log($"creating real hat room");
-      PrototypeDungeonRoom protoRoom = CreateEmptyLitRoom(ROOM_SIZE); //TODO: this doesn't work for sizes smaller than 24x24 without graphical glitches...why?
+      GetPedestalRingOffsets(DEBUG_HAT_MULT * Hatabase.Hats.Values.Count, out int maxRing);
+      int roomXSize = Mathf.CeilToInt(2 * (maxRing + 1) * NEW_PEDESTAL_X_SPACING);
+      int roomYSize = Mathf.CeilToInt(2 * (maxRing + 1) * NEW_PEDESTAL_Y_SPACING);
+      PrototypeDungeonRoom protoRoom = CreateEmptyLitRoom(roomXSize, roomYSize); //TODO: this doesn't work for sizes smaller than 24x24 without graphical glitches...why?
       // PrototypeDungeonRoom protoRoom = /*RoomFactory.*/CreateEmptyLitRoom(8, 8); //TODO: this doesn't work for sizes smaller than 24x24 without graphical glitches...why?
       // PrototypeDungeonRoom protoRoom = RoomFactory.GetNewPrototypeDungeonRoom(12, 12);
       Dungeon dungeon = GameManager.Instance.Dungeon;
@@ -279,7 +283,7 @@ namespace Alexandria.cAPI
       CreatePrefabsIfNeeded();
       CreateNewHatPedestals(newRoom);
 
-      Vector2 newRoomPos = /*newRoom.GetCenterCell()*/newRoom.Epicenter.ToVector2();
+      Vector2 newRoomPos = newRoom.area.Center;
       ETGModConsole.Log($"created new room at {newRoomPos}");
       Vector2 basePos = newRoom.area.basePosition.ToVector2();
       ETGModConsole.Log($"new room basePos at {basePos}");
@@ -326,38 +330,44 @@ namespace Alexandria.cAPI
       createdPrefabs = true;
     }
 
-    public static List<IntVector2> GetPedestalRingOffsets(int length)
+    private static List<IntVector2> pedestalOffsets = null;
+    public static void GetPedestalRingOffsets(int length, out int nextRing)
     {
-      List<IntVector2> offsets = new(length);
+      pedestalOffsets = new(length);
       int remaining = length;
-      int nextRing = 2;
+      nextRing = 1;
       while (remaining > 0)
       {
+        nextRing += 1;
         int maxRingSize = nextRing * 8;
         int ringSize = Math.Min(remaining, maxRingSize);
-        if ((remaining % 2) == 0 || ringSize == maxRingSize)
-          offsets.Add(new IntVector2(0, nextRing));
+        if ((remaining % 2) == 1 || ringSize == maxRingSize)
+          pedestalOffsets.Add(new IntVector2(0, nextRing));
         int halfRing = ringSize / 2;
-        int quarterRing = ringSize / 4;
         int x = 0;
         int y = nextRing;
         for (int i = 1; i <= halfRing; ++i)
         {
+          if (i == (maxRingSize / 2))
+          {
+            pedestalOffsets.Add(new IntVector2(0, -nextRing));
+            break;
+          }
           if (y == -nextRing)
             --x;
           else if (x < nextRing)
             ++x;
           else
             --y;
-          offsets.Add(new IntVector2(x, y));
-          offsets.Add(new IntVector2(-x, y));
+          pedestalOffsets.Add(new IntVector2(x, y));
+          pedestalOffsets.Add(new IntVector2(-x, y));
         }
         remaining -= ringSize;
-        nextRing += 1;
+        ETGModConsole.Log($"finished ring {nextRing} with {remaining} remaining");
       }
-      return offsets;
     }
 
+    const int DEBUG_HAT_MULT = 10;
     private static float NEW_PEDESTAL_X_SPACING = 3.0f;
     private static float NEW_PEDESTAL_Y_SPACING = 2.5f;
     public static void CreateNewHatPedestals(RoomHandler room)
@@ -366,15 +376,14 @@ namespace Alexandria.cAPI
         // Vector2 roomCenter = room.Epicenter.ToVector2();
         Vector2 roomCenter = room.area.Center;
         Hat[] allHats = Hatabase.Hats.Values.ToArray();
-        List<IntVector2> offsets = GetPedestalRingOffsets(allHats.Length);
-        for (int i = 0; i < allHats.Length; i++)
+        for (int i = 0; i < DEBUG_HAT_MULT * allHats.Length; i++)
         {
-          Hat hat = allHats[i];
+          Hat hat = allHats[i % allHats.Length];
 
           // float pedX = roomCenter.x + 1.5f * PEDESTAL_SPACING * Mathf.Sin((2f / ringSize) * Mathf.PI * (0.5f + i));
           // float pedY = roomCenter.y + 1.5f * PEDESTAL_SPACING * Mathf.Cos((2f / ringSize) * Mathf.PI * (0.5f + i));
-          float pedX = roomCenter.x + offsets[i].x * NEW_PEDESTAL_X_SPACING;
-          float pedY = roomCenter.y + offsets[i].y * NEW_PEDESTAL_Y_SPACING;
+          float pedX = roomCenter.x + pedestalOffsets[i].x * NEW_PEDESTAL_X_SPACING;
+          float pedY = roomCenter.y + pedestalOffsets[i].y * NEW_PEDESTAL_Y_SPACING;
 
           GameObject pedObj = UnityEngine.Object.Instantiate(hat.goldenPedestal ? goldPedestal : plainPedestal);
           pedObj.GetComponent<tk2dSprite>().PlaceAtPositionByAnchor(new Vector3(pedX, pedY, PEDESTAL_Z), tk2dBaseSprite.Anchor.LowerCenter);
