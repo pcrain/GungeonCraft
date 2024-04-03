@@ -45,10 +45,12 @@ namespace Alexandria.cAPI
         private tk2dSpriteAnimator hatSpriteAnimator = null;
         private tk2dSpriteAnimator hatOwnerAnimator = null;
         private tk2dSpriteDefinition cachedDef = null;
-        private Vector2 cachedDefOffset = Vector2.zero;
         private float rollLength = 0.65f; //The time it takes for a player with no dodge roll effects to roll
         private float startRolTime = 0.0f;
         private List<DungeonPrerequisite> unlockPrereqs = new();
+        private Vector2 playerSpecificOffset;
+        private Vector2 hatFlipOffset = Vector2.zero;
+        private Dictionary<string, Hatabase.FrameOffset> offsetDict;
 
         public void AddUnlockOnFlag(GungeonFlags flag) =>
             unlockPrereqs.Add(new() { prerequisiteType = DungeonPrerequisite.PrerequisiteType.FLAG, saveFlagToCheck = flag });
@@ -68,6 +70,16 @@ namespace Alexandria.cAPI
                 CachedP1Animator = hatOwnerAnimator;
             else if (hatOwner == GameManager.Instance.SecondaryPlayer)
                 CachedP2Animator = hatOwnerAnimator;
+
+            // get the player specific offset for the hat
+            bool onEyes = (attachLevel == HatAttachLevel.EYE_LEVEL);
+            var headOffsets = onEyes ? Hatabase.CharacterNameEyeLevel : Hatabase.CharacterNameHatHeadLevel;
+            if (!headOffsets.TryGetValue(hatOwner.sprite.spriteAnimator.library.name, out playerSpecificOffset))
+                playerSpecificOffset = onEyes ? Hatabase.defaultEyeLevelOffset : Hatabase.defaultHeadLevelOffset;
+
+            hatFlipOffset = hatOffset.WithX(-hatOffset.x);
+            offsetDict = ((attachLevel == HatAttachLevel.EYE_LEVEL) ? Hatabase.EyeFrameOffsets : Hatabase.HeadFrameOffsets);
+
             hatOwner.OnPreDodgeRoll += this.HatReactToDodgeRoll;
             UpdateHatFacingDirection();
             HandleAttachedSpriteDepth();
@@ -272,7 +284,6 @@ namespace Alexandria.cAPI
                 return Vector3.zero; // can't do anything if our hat doesn't have a sprite yet
 
             cachedDef ??= player.sprite.GetCurrentSpriteDef();
-            // Debug.Log($"{cachedDef.name}");
             bool flipped = player.sprite.FlipX;
 
             // get the base offset for every character
@@ -288,25 +299,13 @@ namespace Alexandria.cAPI
             }
             Vector2 baseOffset = new Vector2(effectiveX, player.sprite.transform.position.y);
 
-            // get the player specific offset
-            bool onEyes = (attachLevel == HatAttachLevel.EYE_LEVEL);
-            var headOffsets = onEyes ? Hatabase.CharacterNameEyeLevel : Hatabase.CharacterNameHatHeadLevel;
-            if (!headOffsets.TryGetValue(player.sprite.spriteAnimator.library.name, out Vector2 playerSpecificOffset))
-                playerSpecificOffset = onEyes ? Hatabase.defaultEyeLevelOffset : Hatabase.defaultHeadLevelOffset;
-
-            // get the hat specific offset
-            Vector2 hatSpecificOffset = (flipped ? hatOffset.WithX(-hatOffset.x) : hatOffset);
-
             // get the animation frame specific offset, if one is available
             Vector2 animationFrameSpecificOffset = GetDefOffset(cachedDef);
-            string baseFrame = GetSpriteBaseName(cachedDef.name);
-            if ((onEyes ? Hatabase.EyeFrameOffsets : Hatabase.HeadFrameOffsets).TryGetValue(baseFrame, out Hatabase.FrameOffset frameOffset))
+            if (offsetDict.TryGetValue(GetSpriteBaseName(cachedDef.name), out Hatabase.FrameOffset frameOffset))
                 animationFrameSpecificOffset += flipped ? frameOffset.flipOffset : frameOffset.offset;
-            cachedDefOffset = animationFrameSpecificOffset;
 
             // combine everything and return
-            Vector2 finalPos = baseOffset + hatSpecificOffset + playerSpecificOffset + animationFrameSpecificOffset;
-            return finalPos;
+            return baseOffset + animationFrameSpecificOffset + (flipped ? hatFlipOffset : hatOffset) + playerSpecificOffset;
         }
 
         public void StickHatToPlayer(PlayerController player)
