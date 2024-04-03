@@ -17,6 +17,9 @@ namespace Alexandria.cAPI
         private const string LOCKED_TEXT = "(LOCKED)";
         private const float BASE_FLIP_HEIGHT = 3f;
 
+        private static tk2dSpriteAnimator CachedP1Animator = null;
+        private static tk2dSpriteAnimator CachedP2Animator = null;
+
         public string hatName = null;
         public Vector2 hatOffset = Vector2.zero;
         public HatDirectionality hatDirectionality = HatDirectionality.NONE;
@@ -61,6 +64,10 @@ namespace Alexandria.cAPI
             SpriteOutlineManager.AddOutlineToSprite(hatSprite, Color.black, 1);
             GameObject playerSprite = hatOwner.transform.Find("PlayerSprite").gameObject;
             hatOwnerAnimator = playerSprite.GetComponent<tk2dSpriteAnimator>();
+            if (hatOwner == GameManager.Instance.PrimaryPlayer)
+                CachedP1Animator = hatOwnerAnimator;
+            else if (hatOwner == GameManager.Instance.SecondaryPlayer)
+                CachedP2Animator = hatOwnerAnimator;
             hatOwner.OnPreDodgeRoll += this.HatReactToDodgeRoll;
             UpdateHatFacingDirection();
             HandleAttachedSpriteDepth();
@@ -103,16 +110,10 @@ namespace Alexandria.cAPI
         {
             static void Prefix(tk2dSpriteAnimator __instance, int currFrame)
             {
-                if (currFrame != 0 && __instance.previousFrame == currFrame)
-                    return; // nothing to do in the prefix if our frame hasn't changed or just been reset
-                if (__instance.transform.parent is not Transform parent || !parent.gameObject)
-                    return; // unparented, not what we're looking for
-                if (parent.gameObject.GetComponent<PlayerController>() is not PlayerController player)
-                    return; // our parent is not the player, don't do anything
-                if (player.spriteAnimator != __instance)
-                    return; // we are not the player's sprite animator, don't do anything
-                if (parent.GetComponent<HatController>() is not HatController hatController)
-                    return; // no player, nothing special needed
+                if (__instance != CachedP1Animator && __instance != CachedP2Animator)
+                    return; // we are not a player's sprite animator, don't do anything
+                if (__instance.transform.parent.gameObject.GetComponent<HatController>() is not HatController hatController)
+                    return; // no hat controller, nothing to do
                 if (hatController.CurrentHat is not Hat hat)
                     return; // no hat, nothing to do
 
