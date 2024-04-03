@@ -21,6 +21,8 @@ namespace Alexandria.cAPI
     private const float NEW_PEDESTAL_X_SPACING = 3.2f;
     private const float NEW_PEDESTAL_Y_SPACING = 2.5f;
 
+    private static readonly Vector3 ENTRANCE_POSITION = new Vector3(59.75f, 36f, 36.875f);
+
     private static GameObject entrance              = null;
     private static GameObject hatRoomExit           = null;
     private static GameObject plainPedestal         = null;
@@ -29,6 +31,8 @@ namespace Alexandria.cAPI
     private static bool createdPrefabs              = false;
     private static List<IntVector2> pedestalOffsets = null;
     private static Vector2 hatRoomCenter            = Vector2.zero;
+    private static PrototypeDungeonRoom protoRoom   = null;
+    private static RoomHandler runtimeRoom          = null;
 
     /// <summary>Regenerates the hat room every time the Breach loads</summary>
     [HarmonyPatch(typeof(Foyer), nameof(Foyer.ProcessPlayerEnteredFoyer))]
@@ -36,10 +40,14 @@ namespace Alexandria.cAPI
     {
         static void Postfix(Foyer __instance, PlayerController p)
         {
-          if (!needToGenHatRoom)
+          if (!needToGenHatRoom || Hatabase.Hats.Count == 0)
             return;
-          HatRoom.CreateRealHatRoom();
-          // HatRoom.Generate();
+          CreatePrefabsIfNeeded();
+          CreateHatRoomPrototypeIfNeeded();
+          // Set up hat room entrance and warp points
+          UnityEngine.Object.Instantiate(entrance, ENTRANCE_POSITION, Quaternion.identity)
+            .GetComponent<SpeculativeRigidbody>().OnCollision += WarpToHatRoom;
+          runtimeRoom = null;
           needToGenHatRoom = false;
         }
     }
@@ -54,12 +62,82 @@ namespace Alexandria.cAPI
         }
     }
 
+    private static void CreatePrefabsIfNeeded()
+    {
+      if (createdPrefabs)
+        return;
+
+      entrance = ItemAPI.ItemBuilder.AddSpriteToObject("Entrance", $"{BASE_RES_PATH}/Entrance.png");
+      entrance.MakeRigidBody(dimensions: new IntVector2(30, 30), offset: new IntVector2(20, 10));
+      entrance.GetComponent<tk2dSprite>().HeightOffGround = -15;
+
+      plainPedestal = ItemAPI.ItemBuilder.AddSpriteToObject("plainPedestal", $"{BASE_RES_PATH}/pedestal.png");
+      plainPedestal.MakeRigidBody(dimensions: new IntVector2(26, 23), offset: new IntVector2(0, 0));
+      plainPedestal.GetComponent<tk2dSprite>().HeightOffGround = -3;
+
+      goldPedestal = ItemAPI.ItemBuilder.AddSpriteToObject("goldPedestal", $"{BASE_RES_PATH}/pedestal_gold.png");
+      goldPedestal.MakeRigidBody(dimensions: new IntVector2(26, 23), offset: new IntVector2(0, 0));
+      goldPedestal.GetComponent<tk2dSprite>().HeightOffGround = -3;
+
+      hatRoomExit = ItemAPI.ItemBuilder.AddSpriteToObject("HatRoomExit", $"{BASE_RES_PATH}/hat_room_exit.png");
+      hatRoomExit.MakeRigidBody(dimensions: new IntVector2(22, 16), offset: new IntVector2(12, 8));
+
+      createdPrefabs = true;
+    }
+
+    private static void CreateHatRoomPrototypeIfNeeded()
+    {
+      if (protoRoom != null)
+        return;
+
+      // Math our way to figuring out the room size
+      int numHats = Hatabase.Hats.Count;
+      GetPedestalRingOffsets(DEBUG_HAT_MULT * numHats, out int maxRing);
+      int roomXSize = Mathf.CeilToInt(2 * (maxRing + 1) * NEW_PEDESTAL_X_SPACING);
+      int roomYSize = Mathf.CeilToInt(2 * (maxRing + 1) * NEW_PEDESTAL_Y_SPACING);
+
+      protoRoom = CreateEmptyLitHatRoom(roomXSize, roomYSize);
+    }
+
+    private static PrototypeDungeonRoom CreateEmptyLitHatRoom(int width, int height)
+    {
+      PrototypeDungeonRoom room = RoomFactory.GetNewPrototypeDungeonRoom(width, height);
+      room.usesProceduralLighting = false;
+      room.overrideRoomVisualType = 1; // 0 = stone, 1 = wood, 2 = brick
+      room.FullCellData = new PrototypeDungeonRoomCellData[width * height];
+      int hradius = width / 2;
+      int vradius = height / 2;
+      for (int x = 0; x < width; x++)
+      {
+          for (int y = 0; y < height; y++)
+          {
+              // fancy math to space out lights evenly without too much overlap or dark spots
+              bool shouldBeLit = ((hradius - Math.Min(x, width  - (x + 1))) % LIGHT_SPACING == (LIGHT_SPACING / 2)) &&
+                                 ((vradius - Math.Min(y, height - (y + 1))) % LIGHT_SPACING == (LIGHT_SPACING / 2));
+              room.FullCellData[x + y * width] = new PrototypeDungeonRoomCellData()
+              {
+                  containsManuallyPlacedLight = shouldBeLit,
+                  state = CellType.FLOOR,
+                  appearance = new PrototypeDungeonRoomCellAppearance(),
+              };
+          }
+      }
+
+      // Add walls in the middle for the stairs
+      for (int x = hradius - 4; x < hradius + 4; x++)
+          for (int y = vradius; y < vradius + 4; y++)
+            room.FullCellData[x + y * width].state = CellType.WALL;
+
+      return room;
+    }
+
     private static void MakeRigidBody(this GameObject g, IntVector2 dimensions, IntVector2 offset)
     {
       g.GenerateOrAddToRigidBody(CollisionLayer.HighObstacle, PixelCollider.PixelColliderGeneration.Manual, UsesPixelsAsUnitSize: true, dimensions: dimensions, offset: offset);
     }
 
-    public static RoomHandler AddRuntimeHatRoom(Dungeon dungeon, PrototypeDungeonRoom prototype, Action<RoomHandler> postProcessCellData = null, DungeonData.LightGenerationStyle lightStyle = DungeonData.LightGenerationStyle.FORCE_COLOR)
+    /// <summary>Mostly identical to the base game AddRuntimeRoom() function, with a hack to work around tiles failing to render when adding the room to the Breach</summary>
+    private static RoomHandler AddRuntimeHatRoom(Dungeon dungeon, PrototypeDungeonRoom prototype, Action<RoomHandler> postProcessCellData = null, DungeonData.LightGenerationStyle lightStyle = DungeonData.LightGenerationStyle.FORCE_COLOR)
     {
       int wallWidth = 3;
       int borderSize = wallWidth * 2;
@@ -127,112 +205,19 @@ namespace Alexandria.cAPI
       return roomHandler;
     }
 
-    private static PrototypeDungeonRoom CreateEmptyLitRoom(int width, int height)
+    private static void InstantiateHatRoomIfNeeded()
     {
-      PrototypeDungeonRoom room = RoomFactory.GetNewPrototypeDungeonRoom(width, height);
-      room.usesProceduralLighting = false;
-      room.overrideRoomVisualType = 1; // 0 = stone, 1 = wood, 2 = brick
-      room.FullCellData = new PrototypeDungeonRoomCellData[width * height];
-      int hradius = width / 2;
-      int vradius = height / 2;
-      for (int x = 0; x < width; x++)
-      {
-          for (int y = 0; y < height; y++)
-          {
-              // fancy math to space out lights evenly without too much overlap or dark spots
-              bool shouldBeLit = ((hradius - Math.Min(x, width  - (x + 1))) % LIGHT_SPACING == (LIGHT_SPACING / 2)) &&
-                                 ((vradius - Math.Min(y, height - (y + 1))) % LIGHT_SPACING == (LIGHT_SPACING / 2));
-              room.FullCellData[x + y * width] = new PrototypeDungeonRoomCellData()
-              {
-                  containsManuallyPlacedLight = shouldBeLit,
-                  state = CellType.FLOOR,
-                  appearance = new PrototypeDungeonRoomCellAppearance(),
-              };
-          }
-      }
-
-      // Add walls in the middle for the stairs
-      for (int x = hradius - 4; x < hradius + 4; x++)
-          for (int y = vradius; y < vradius + 4; y++)
-            room.FullCellData[x + y * width].state = CellType.WALL;
-
-      return room;
-    }
-
-    private static void CreateRealHatRoom()
-    {
-      int numHats = Hatabase.Hats.Count;
-      if (numHats == 0)
-      {
-        Debug.Log("No Hats so no hat room!");
+      if (runtimeRoom != null)
         return;
-      }
 
-      // Math our way to figuring out the room size
-      GetPedestalRingOffsets(DEBUG_HAT_MULT * numHats, out int maxRing);
-      int roomXSize = Mathf.CeilToInt(2 * (maxRing + 1) * NEW_PEDESTAL_X_SPACING);
-      int roomYSize = Mathf.CeilToInt(2 * (maxRing + 1) * NEW_PEDESTAL_Y_SPACING);
-
-      PrototypeDungeonRoom protoRoom = CreateEmptyLitRoom(roomXSize, roomYSize); //TODO: this doesn't work for sizes smaller than 24x24 without graphical glitches...why?
+      // Create the hat room itself
       Dungeon dungeon = GameManager.Instance.Dungeon;
       RoomHandler newRoom = AddRuntimeHatRoom(dungeon, protoRoom, lightStyle: DungeonData.LightGenerationStyle.FORCE_COLOR);
-      // TK2DInteriorDecorator decorator = new TK2DInteriorDecorator(dungeon.assembler);
-      // decorator.HandleRoomDecoration(newRoom, dungeon, dungeon.m_tilemap);  //TODO: adds janky carpet, fix later
-      Pathfinding.Pathfinder.Instance.InitializeRegion(dungeon.data, newRoom.area.basePosition, newRoom.area.dimensions);
-
-      // foreach (IntVector2 cellPos in newRoom.Cells)
-      // {
-      //   dungeon.assembler.ClearTileIndicesForCell(dungeon, dungeon.m_tilemap, cellPos.x, cellPos.y);
-      //   dungeon.assembler.BuildTileIndicesForCell(dungeon, dungeon.m_tilemap, cellPos.x, cellPos.y);
-      // }
-      // foreach (IntVector2 cellPos in newRoom.Cells)
-      // {
-      //   IntVector2 roomPos = cellPos - newRoom.Cells[0];
-      //   CellData cellData = dungeon.data.cellData[cellPos.x][cellPos.y];
-
-      //   cellData.cellVisualData.containsLight = false;
-      //   if (roomPos.x == 0)
-      //     cellData.cellVisualData.lightDirection = DungeonData.Direction.WEST;
-      //   else if (roomPos.x == ROOM_SIZE - 1)
-      //     cellData.cellVisualData.lightDirection = DungeonData.Direction.EAST;
-      //   else if (roomPos.y == 0)
-      //     cellData.cellVisualData.lightDirection = DungeonData.Direction.SOUTH;
-      //   else if (roomPos.y == ROOM_SIZE - 1)
-      //     cellData.cellVisualData.lightDirection = DungeonData.Direction.NORTH;
-      //   else
-      //     cellData.cellVisualData.containsLight = false;
-
-      //   if (cellData.cellVisualData.containsLight)
-      //   {
-      //     if (roomPos.y == 0 || roomPos.y == ROOM_SIZE - 1)
-      //     {
-      //       cellData.cellVisualData.facewallLightStampData = dungeon.roomMaterialDefinitions[newRoom.RoomVisualSubtype].sidewallLightStamps[0];
-      //       // cellData.cellVisualData.facewallLightStampData = dungeon.roomMaterialDefinitions[newRoom.RoomVisualSubtype].facewallLightStamps[0];
-      //       cellData.cellVisualData.sidewallLightStampData = null;
-      //     }
-      //     else
-      //     {
-      //       cellData.cellVisualData.facewallLightStampData = null;
-      //       cellData.cellVisualData.sidewallLightStampData = dungeon.roomMaterialDefinitions[newRoom.RoomVisualSubtype].sidewallLightStamps[0];
-      //     }
-      //   }
-      //   // TK2DInteriorDecorator.PlaceLightDecorationForCell(dungeon, dungeon.m_tilemap, cellData, cellPos);
-
-      //   cellData.HasCachedPhysicsTile = false;
-      //   cellData.CachedPhysicsTile = null;
-      //   // newRoom.UpdateCellVisualData(cellPos.x, cellPos.y);
-      // }
-      // dungeon.RebuildTilemap(dungeon.m_tilemap);
       Pixelator.Instance.MarkOcclusionDirty();
       Pixelator.Instance.ProcessOcclusionChange(newRoom.GetCenterCell(), 1f, newRoom, true);
 
-      CreatePrefabsIfNeeded();
-      CreateNewHatPedestals(newRoom);
-
-      // Set up hat room entrance and warp points
+      // Set up the hat room exit
       hatRoomCenter = newRoom.area.Center;
-      GameObject entranceObj = UnityEngine.Object.Instantiate(entrance, new Vector3(59.75f, 36f, 36.875f), Quaternion.identity);
-      entranceObj.GetComponent<SpeculativeRigidbody>().OnCollision += WarpToHatRoom;
       GameObject returner = UnityEngine.Object.Instantiate(hatRoomExit);
       tk2dSprite returnerSprite = returner.GetComponent<tk2dSprite>();
       returnerSprite.PlaceAtPositionByAnchor(hatRoomCenter + new Vector2(0, -1.5f), tk2dBaseSprite.Anchor.LowerCenter);
@@ -240,33 +225,15 @@ namespace Alexandria.cAPI
       returnerSprite.UpdateZDepth();
       returner.GetComponent<SpeculativeRigidbody>().OnPreRigidbodyCollision += PreWarpBackFromHatRoom;
       returner.GetComponent<SpeculativeRigidbody>().OnCollision += WarpBackFromHatRoom;
-    }
 
-    private static void CreatePrefabsIfNeeded()
-    {
-      if (createdPrefabs)
-        return;
+      // Set up the hat pedestals
+      CreateHatPedestals(newRoom);
 
-      entrance = ItemAPI.ItemBuilder.AddSpriteToObject("Entrance", $"{BASE_RES_PATH}/Entrance.png");
-      entrance.MakeRigidBody(dimensions: new IntVector2(30, 30), offset: new IntVector2(20, 10));
-      entrance.GetComponent<tk2dSprite>().HeightOffGround = -15;
-
-      plainPedestal = ItemAPI.ItemBuilder.AddSpriteToObject("plainPedestal", $"{BASE_RES_PATH}/pedestal.png");
-      plainPedestal.MakeRigidBody(dimensions: new IntVector2(26, 23), offset: new IntVector2(0, 0));
-      plainPedestal.GetComponent<tk2dSprite>().HeightOffGround = -3;
-
-      goldPedestal = ItemAPI.ItemBuilder.AddSpriteToObject("goldPedestal", $"{BASE_RES_PATH}/pedestal_gold.png");
-      goldPedestal.MakeRigidBody(dimensions: new IntVector2(26, 23), offset: new IntVector2(0, 0));
-      goldPedestal.GetComponent<tk2dSprite>().HeightOffGround = -3;
-
-      hatRoomExit = ItemAPI.ItemBuilder.AddSpriteToObject("HatRoomExit", $"{BASE_RES_PATH}/hat_room_exit.png");
-      hatRoomExit.MakeRigidBody(dimensions: new IntVector2(22, 16), offset: new IntVector2(12, 8));
-
-      createdPrefabs = true;
+      runtimeRoom = newRoom;
     }
 
     /// <summary>Logic for getting offsets in symmetrical rings around the center of the hat room</summary>
-    public static void GetPedestalRingOffsets(int length, out int nextRing)
+    private static void GetPedestalRingOffsets(int length, out int nextRing)
     {
       pedestalOffsets = new(length);
       int remaining = length;
@@ -301,7 +268,7 @@ namespace Alexandria.cAPI
       }
     }
 
-    public static void CreateNewHatPedestals(RoomHandler room)
+    private static void CreateHatPedestals(RoomHandler room)
     {
         Vector2 roomCenter = room.area.Center;
         Hat[] allHats = Hatabase.Hats.Values.ToArray();
@@ -339,12 +306,15 @@ namespace Alexandria.cAPI
         }
     }
 
+    private static Vector2 HatRoomWarpPoint() => hatRoomCenter + new Vector2(-GameManager.Instance.PrimaryPlayer.SpriteDimensions.x / 2, -2f);
+    private static Vector2 HatRoomReturnPoint() => new Vector2(58.5f, 37.25f);
+
     private static void WarpToHatRoom(CollisionData obj)
     {
       if (obj.OtherRigidbody.gameObject.GetComponent<PlayerController>() is not PlayerController player)
         return;
 
-      GameManager.Instance.StartCoroutine(WarpToPoint(player, hatRoomCenter + new Vector2(-player.SpriteDimensions.x / 2, -2f), Vector2.down));
+      GameManager.Instance.StartCoroutine(WarpToPoint(player, HatRoomWarpPoint, Vector2.down, InstantiateHatRoomIfNeeded));
       Pixelator.Instance.DoOcclusionLayer = false;
     }
 
@@ -363,21 +333,23 @@ namespace Alexandria.cAPI
       if (player.m_activeActions.Move.Vector.y <= 0f)
         return; // only enter if we're facing up
 
-      GameManager.Instance.StartCoroutine(WarpToPoint(player, new Vector2(58.5f, 37.25f), Vector2.left));
+      GameManager.Instance.StartCoroutine(WarpToPoint(player, HatRoomReturnPoint, Vector2.left));
       Pixelator.Instance.DoOcclusionLayer = true;
     }
 
-    private static IEnumerator WarpToPoint(PlayerController p, Vector2 position, Vector2? forceDirection = null)
+    private static IEnumerator WarpToPoint(PlayerController p, Func<Vector2> positionFunc, Vector2? forceDirection = null, Action preWarpSetup = null)
     {
       p.usingForcedInput = true;
       Pixelator.Instance.FadeToBlack(0.1f, false);
       yield return new WaitForSeconds(0.15f);
-      p.WarpToPointAndBringCoopPartner(position, doFollowers: true);
+      if (preWarpSetup != null)
+        preWarpSetup();
+      p.WarpToPointAndBringCoopPartner(positionFunc(), doFollowers: true);
       GameManager.Instance.MainCameraController.ForceToPlayerPosition(p);
-      yield return new WaitForSeconds(0.05f);
-      Pixelator.Instance.FadeToBlack(0.1f, true);
       if (forceDirection.HasValue)
         p.ForceIdleFacePoint(forceDirection.Value);
+      yield return new WaitForSeconds(0.05f);
+      Pixelator.Instance.FadeToBlack(0.1f, true);
       p.usingForcedInput = false;
     }
   }
@@ -412,7 +384,6 @@ namespace Alexandria.cAPI
 
     public void OnEnteredRange(PlayerController interactor)
     {
-      //A method that runs whenever the player enters the interaction range of the interactable. This is what outlines it in white to show that it can be interacted with
       SpriteOutlineManager.RemoveOutlineFromSprite(base.sprite, true);
       SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.white);
       TextBoxManager.ShowInfoBox(new Vector2(transform.position.x + 0.75f ,transform.position.y + 2), transform, 3600f, hat.HasBeenUnlocked ? hat.hatName : hat.UnlockText); // 1 hour duration so it persists
@@ -420,7 +391,6 @@ namespace Alexandria.cAPI
 
     public void OnExitRange(PlayerController interactor)
     {
-      // A method that runs whenever the player exits the interaction range of the interactable.This is what removed the white outline to show that it cannot be currently interacted with
       SpriteOutlineManager.RemoveOutlineFromSprite(base.sprite, true);
       SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black);
       TextBoxManager.ShowInfoBox(new Vector2(transform.position.x + 0.75f ,transform.position.y + 2), transform, 0f, hat.HasBeenUnlocked ? hat.hatName : hat.UnlockText); // 0 duration = disappears instantly
