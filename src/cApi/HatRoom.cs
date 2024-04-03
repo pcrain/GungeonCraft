@@ -318,16 +318,23 @@ namespace Alexandria.cAPI
           HatPedestal pedestal = pedObj.AddComponent<HatPedestal>();
           pedestal.hat = hat;
 
-          GameObject pedestalHatObject = new GameObject();
-          tk2dSprite sprite = pedestalHatObject.AddComponent<tk2dSprite>();
-          sprite.SetSprite(pedestal.hat.sprite.collection, pedestal.hat.sprite.spriteId);
-          sprite.PlaceAtLocalPositionByAnchor(
-            new Vector2(pedObj.GetComponent<tk2dSprite>().WorldCenter.x, pedY + 1.3f).ToVector3ZisY(0f),
-            tk2dBaseSprite.Anchor.LowerCenter);
-          sprite.HeightOffGround = HAT_Z_OFFSET;
-          sprite.UpdateZDepth();
-          SpriteOutlineManager.AddOutlineToSprite(pedestalHatObject.GetComponent<tk2dSprite>(), Color.black, HAT_Z_OFFSET);
-
+          if (hat.HasBeenUnlocked || hat.showSilhouetteWhenLocked)
+          {
+            GameObject pedestalHatObject = new GameObject();
+            tk2dSprite sprite = pedestalHatObject.AddComponent<tk2dSprite>();
+            sprite.SetSprite(pedestal.hat.sprite.collection, pedestal.hat.sprite.spriteId);
+            if (!hat.HasBeenUnlocked)
+            {
+              sprite.usesOverrideMaterial = true;
+              sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/Black");
+            }
+            sprite.PlaceAtLocalPositionByAnchor(
+              new Vector2(pedObj.GetComponent<tk2dSprite>().WorldCenter.x, pedY + 1.3f).ToVector3ZisY(0f),
+              tk2dBaseSprite.Anchor.LowerCenter);
+            sprite.HeightOffGround = HAT_Z_OFFSET;
+            sprite.UpdateZDepth();
+            SpriteOutlineManager.AddOutlineToSprite(pedestalHatObject.GetComponent<tk2dSprite>(), Color.black, HAT_Z_OFFSET);
+          }
           room.RegisterInteractable(pedestal as IPlayerInteractable);
         }
     }
@@ -397,7 +404,10 @@ namespace Alexandria.cAPI
 
     public void Interact(PlayerController interactor)
     {
-      interactor.GetComponent<HatController>().SetHat(hat);
+      if (hat.HasBeenUnlocked)
+        interactor.GetComponent<HatController>().SetHat(hat);
+      else
+        AkSoundEngine.PostEvent("Play_OBJ_purchase_unable_01", base.gameObject);
     }
 
     public void OnEnteredRange(PlayerController interactor)
@@ -405,7 +415,7 @@ namespace Alexandria.cAPI
       //A method that runs whenever the player enters the interaction range of the interactable. This is what outlines it in white to show that it can be interacted with
       SpriteOutlineManager.RemoveOutlineFromSprite(base.sprite, true);
       SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.white);
-      TextBoxManager.ShowInfoBox(new Vector2(transform.position.x + 0.75f ,transform.position.y + 2), transform, 3600f, hat.hatName); // 1 hour duration so it persists
+      TextBoxManager.ShowInfoBox(new Vector2(transform.position.x + 0.75f ,transform.position.y + 2), transform, 3600f, hat.HasBeenUnlocked ? hat.hatName : hat.UnlockText); // 1 hour duration so it persists
     }
 
     public void OnExitRange(PlayerController interactor)
@@ -413,7 +423,7 @@ namespace Alexandria.cAPI
       // A method that runs whenever the player exits the interaction range of the interactable.This is what removed the white outline to show that it cannot be currently interacted with
       SpriteOutlineManager.RemoveOutlineFromSprite(base.sprite, true);
       SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black);
-      TextBoxManager.ShowInfoBox(new Vector2(transform.position.x + 0.75f ,transform.position.y + 2), transform, 0f, hat.hatName); // 0 duration = disappears instantly
+      TextBoxManager.ShowInfoBox(new Vector2(transform.position.x + 0.75f ,transform.position.y + 2), transform, 0f, hat.HasBeenUnlocked ? hat.hatName : hat.UnlockText); // 0 duration = disappears instantly
     }
   }
 

@@ -14,6 +14,7 @@ namespace Alexandria.cAPI
 {
     public class Hat : BraveBehaviour
     {
+        private const string LOCKED_TEXT = "(LOCKED)";
         private const float BASE_FLIP_HEIGHT = 3f;
 
         public string hatName = null;
@@ -29,6 +30,11 @@ namespace Alexandria.cAPI
         public float flipHeightMultiplier = 1f;
         public bool goldenPedestal = false;
         public bool flipHorizontalWithPlayer = true;
+        public string unlockHint = null;
+        public bool showSilhouetteWhenLocked = false;
+
+        public bool HasBeenUnlocked => unlockPrereqs.All(p => p.CheckConditionsFulfilled());
+        public string UnlockText => string.IsNullOrEmpty(unlockHint) ? LOCKED_TEXT : $"{LOCKED_TEXT}\n\n{unlockHint}";
 
         private HatDirection currentDirection = HatDirection.NONE;
         private HatState currentState = HatState.SITTING;
@@ -39,6 +45,12 @@ namespace Alexandria.cAPI
         private Vector2 cachedDefOffset = Vector2.zero;
         private float rollLength = 0.65f; //The time it takes for a player with no dodge roll effects to roll
         private float startRolTime = 0.0f;
+        private List<DungeonPrerequisite> unlockPrereqs = new();
+
+        public void AddUnlockOnFlag(GungeonFlags flag) =>
+            unlockPrereqs.Add(new() { prerequisiteType = DungeonPrerequisite.PrerequisiteType.FLAG, saveFlagToCheck = flag });
+
+        public void AddUnlockPrerequisite(DungeonPrerequisite prereq) => unlockPrereqs.Add(prereq);
 
         private void Start()
         {

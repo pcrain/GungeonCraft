@@ -52,7 +52,7 @@ public static class CwaffHats
       EasyHat(name: "stovepipe",             offset: new Vector2( 0, -5));
       EasyHat(name: "u_s_a_general_hat",     offset: new Vector2( 0, -3));
       EasyHat(name: "witch_hat",             offset: new Vector2( 0, -3));
-      EasyHat(name: "arrow_hat",             offset: new Vector2( 0,  0), fps: 8);
+      // EasyHat(name: "arrow_hat",             offset: new Vector2( 0,  0), fps: 8, locked: true);
       EasyHat(name: "aviator_helmet",        offset: new Vector2( 0, -7));
       EasyHat(name: "basque_beret",          offset: new Vector2( 0, -3));
       EasyHat(name: "beastmaster_hat",       offset: new Vector2( 0, -3));
@@ -70,7 +70,7 @@ public static class CwaffHats
       EasyHat(name: "zero_helmet",           offset: new Vector2( 0, -8));
     }
 
-    private static void EasyHat(string name, Vector2? offset = null, bool onEyes = false, int fps = 1)
+    private static void EasyHat(string name, Vector2? offset = null, bool onEyes = false, int fps = 1, bool locked = false)
     {
       GameObject hatObj = UnityEngine.Object.Instantiate(new GameObject());
       Hat hat = hatObj.AddComponent<Hat>();
@@ -94,6 +94,12 @@ public static class CwaffHats
         fps: fps);
       if (hat.hatDirectionality != Hat.HatDirectionality.NONE && hat.hatDirectionality != Hat.HatDirectionality.TWOWAYVERTICAL)
         hat.flipHorizontalWithPlayer = false;
+      if (locked)
+      {
+        hat.AddUnlockOnFlag(GungeonFlags.ITEMSPECIFIC_RAT_CHEESEWHEEL);
+        hat.unlockHint = "Sample Unlock Hint";
+        hat.showSilhouetteWhenLocked = true;
+      }
       HatUtility.AddHatToDatabase(hatObj);
     }
 }
