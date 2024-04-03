@@ -237,10 +237,14 @@ namespace Alexandria.cAPI
             return hatOwner.sprite.FlipX ? HatDirection.WEST : HatDirection.EAST; // return a sane default
         }
 
+        private static readonly Dictionary<string, string> CachedSpriteBaseNames = new();
         private static string GetSpriteBaseName(string name)
         {
-            return name.Replace("_hands2","").Replace("_hands","").Replace("_hand_left","").Replace("_hand_right","").Replace("_hand","")
-                .Replace("_twohands","").Replace("_armorless","").Replace("_0h","").Replace("_1h","").Replace("_2h","");
+            if (!CachedSpriteBaseNames.TryGetValue(name, out string baseName)) // string replacements are slow so cache the results as necessary
+                baseName = CachedSpriteBaseNames[name] = name.Replace("_hands2","").Replace("_hands","").Replace("_hand_left","")
+                    .Replace("_hand_right","").Replace("_hand","").Replace("_twohands","").Replace("_armorless","")
+                    .Replace("_0h","").Replace("_1h","").Replace("_2h","");
+            return baseName;
         }
 
         private static Vector2 GetDefOffset(tk2dSpriteDefinition def)
