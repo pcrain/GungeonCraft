@@ -214,27 +214,41 @@ namespace Alexandria.cAPI
             }
         }
 
-        public HatDirection FetchOwnerFacingDirection()
+        private static HatDirection GetBaseDirectionForSprite(string animName)
         {
-            if (!hatOwner || !hatOwner.sprite || cachedDef == null)
-                return HatDirection.EAST; // return a sane default if we're ownerless
-
-            // figure out an approximate direction from the player's animation name
-            string animName = cachedDef.name;
-            if (animName.Contains("front_right_")) return hatOwner.sprite.FlipX ? HatDirection.WEST      : HatDirection.EAST;
-            if (animName.Contains("right_front_")) return hatOwner.sprite.FlipX ? HatDirection.WEST      : HatDirection.EAST;
-            if (animName.Contains("forward_"))     return hatOwner.sprite.FlipX ? HatDirection.WEST      : HatDirection.EAST;
-            if (animName.Contains("back_right_"))  return hatOwner.sprite.FlipX ? HatDirection.NORTHWEST : HatDirection.NORTHEAST;
-            if (animName.Contains("bright_"))      return hatOwner.sprite.FlipX ? HatDirection.NORTHWEST : HatDirection.NORTHEAST;
-            if (animName.Contains("backwards_"))   return hatOwner.sprite.FlipX ? HatDirection.NORTHWEST : HatDirection.NORTHEAST;
-            if (animName.Contains("backward_"))    return hatOwner.sprite.FlipX ? HatDirection.NORTHWEST : HatDirection.NORTHEAST;
-            if (animName.Contains("bw_"))          return hatOwner.sprite.FlipX ? HatDirection.NORTHWEST : HatDirection.NORTHEAST;
+            if (animName.Contains("front_right_")) return HatDirection.EAST;
+            if (animName.Contains("right_front_")) return HatDirection.EAST;
+            if (animName.Contains("forward_"))     return HatDirection.EAST;
+            if (animName.Contains("back_right_"))  return HatDirection.NORTHEAST;
+            if (animName.Contains("bright_"))      return HatDirection.NORTHEAST;
+            if (animName.Contains("backwards_"))   return HatDirection.NORTHEAST;
+            if (animName.Contains("backward_"))    return HatDirection.NORTHEAST;
+            if (animName.Contains("bw_"))          return HatDirection.NORTHEAST;
             if (animName.Contains("north_"))       return HatDirection.NORTH;
             if (animName.Contains("back_"))        return HatDirection.NORTH;
             if (animName.Contains("south_"))       return HatDirection.SOUTH;
             if (animName.Contains("front_"))       return HatDirection.SOUTH;
+            return HatDirection.EAST; // return a sane default
+        }
 
-            return hatOwner.sprite.FlipX ? HatDirection.WEST : HatDirection.EAST; // return a sane default
+        private static readonly Dictionary<string, HatDirection> CachedSpriteDirections = new();
+        public HatDirection FetchOwnerFacingDirection()
+        {
+            if (cachedDef == null)
+                return HatDirection.EAST; // return a sane default if we're ownerless
+
+            // figure out an approximate direction from the player's animation name
+            if (!CachedSpriteDirections.TryGetValue(cachedDef.name, out HatDirection hatDir)) // Contains() is slow so cache the results as necessary
+                hatDir = CachedSpriteDirections[cachedDef.name] = GetBaseDirectionForSprite(cachedDef.name);
+
+            if (!hatOwner.sprite.FlipX)
+                return hatDir;
+            if (hatDir == HatDirection.EAST)
+                return HatDirection.WEST;
+            if (hatDir == HatDirection.NORTHEAST)
+                return HatDirection.NORTHWEST;
+
+            return hatDir;
         }
 
         private static readonly Dictionary<string, string> CachedSpriteBaseNames = new();
