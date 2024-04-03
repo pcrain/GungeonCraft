@@ -135,7 +135,7 @@ namespace Alexandria.cAPI
         {
             if (!hatOwner || !hatOwner.IsVisible || !hatOwner.sprite.renderer.enabled)
                 return true;
-            if (hatOwner.IsFalling)
+            if (hatOwner.IsFalling || hatOwner.IsGhost)
                 return true;
             if(!hatOwnerAnimator || hatOwnerAnimator.CurrentClip.name == "doorway" || hatOwnerAnimator.CurrentClip.name == "spinfall")
                 return true;
