@@ -51,6 +51,7 @@ namespace Alexandria.cAPI
         private Vector2 playerSpecificOffset;
         private Vector2 hatFlipOffset = Vector2.zero;
         private Dictionary<string, Hatabase.FrameOffset> offsetDict;
+        private int hatWidth = 0;
 
         public void AddUnlockOnFlag(GungeonFlags flag) =>
             unlockPrereqs.Add(new() { prerequisiteType = DungeonPrerequisite.PrerequisiteType.FLAG, saveFlagToCheck = flag });
@@ -64,8 +65,9 @@ namespace Alexandria.cAPI
             hatSprite = base.GetComponent<tk2dSprite>();
             hatSpriteAnimator = base.GetComponent<tk2dSpriteAnimator>();
             SpriteOutlineManager.AddOutlineToSprite(hatSprite, Color.black, 1);
-            GameObject playerSprite = hatOwner.transform.Find("PlayerSprite").gameObject;
-            hatOwnerAnimator = playerSprite.GetComponent<tk2dSpriteAnimator>();
+
+            // find and cache our player's animator
+            hatOwnerAnimator = hatOwner.transform.Find("PlayerSprite").gameObject.GetComponent<tk2dSpriteAnimator>();
             if (hatOwner == GameManager.Instance.PrimaryPlayer)
                 CachedP1Animator = hatOwnerAnimator;
             else if (hatOwner == GameManager.Instance.SecondaryPlayer)
@@ -77,6 +79,8 @@ namespace Alexandria.cAPI
             if (!headOffsets.TryGetValue(hatOwner.sprite.spriteAnimator.library.name, out playerSpecificOffset))
                 playerSpecificOffset = onEyes ? Hatabase.defaultEyeLevelOffset : Hatabase.defaultHeadLevelOffset;
 
+            // cache some useful variables
+            hatWidth = Mathf.RoundToInt(16f * hatSprite.GetCurrentSpriteDef().colliderVertices[1].x);
             hatFlipOffset = hatOffset.WithX(-hatOffset.x);
             offsetDict = ((attachLevel == HatAttachLevel.EYE_LEVEL) ? Hatabase.EyeFrameOffsets : Hatabase.HeadFrameOffsets);
 
@@ -290,7 +294,6 @@ namespace Alexandria.cAPI
             float effectiveX = player.SpriteBottomCenter.x;
             if (flipped) // if the sprite is flipped, we need to account for whether the player sprite and hat sprite are even / odd pixels and adjust the offset accordingly
             {
-                int hatWidth    = Mathf.RoundToInt(16f * hatSprite.GetCurrentSpriteDef().colliderVertices[1].x);
                 int playerWidth = Mathf.RoundToInt(16f * cachedDef.untrimmedBoundsDataExtents.x); // use untrimmed bounds to avoid missing pixels on alt skins
                 if (playerWidth % 2 == 0) // if our player sprite is an even number of pixels, we need to quantize our center point
                     effectiveX = effectiveX.Quantize(0.0625f, (hatWidth % 2 == 0) ? VectorConversions.Ceil : VectorConversions.Floor);
