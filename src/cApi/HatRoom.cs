@@ -107,9 +107,9 @@ namespace Alexandria.cAPI
       room.FullCellData = new PrototypeDungeonRoomCellData[width * height];
       int hradius = width / 2;
       int vradius = height / 2;
-      for (int x = 0; x < width; x++)
+      for (int y = 0; y < height; y++)
       {
-          for (int y = 0; y < height; y++)
+          for (int x = 0; x < width; x++)
           {
               // fancy math to space out lights evenly without too much overlap or dark spots
               bool shouldBeLit = ((hradius - Math.Min(x, width  - (x + 1))) % LIGHT_SPACING == (LIGHT_SPACING / 2)) &&
@@ -124,9 +124,9 @@ namespace Alexandria.cAPI
       }
 
       // Add walls in the middle for the stairs
-      for (int x = hradius - 4; x < hradius + 4; x++)
-          for (int y = vradius; y < vradius + 4; y++)
-            room.FullCellData[x + y * width].state = CellType.WALL;
+      for (int y = vradius; y < vradius + 4; y++)
+          for (int x = hradius - 4; x < hradius + 4; x++)
+              room.FullCellData[x + y * width].state = CellType.WALL;
 
       return room;
     }

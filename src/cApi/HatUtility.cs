@@ -55,13 +55,13 @@ namespace Alexandria.cAPI
                 ETGModConsole.Log("<size=100><color=#ff0000ff>Error: Hat '</color></size>" + processedHatName + "<size=100><color=#ff0000ff>' not found in Hatabase</color></size>", false);
         }
 
+        private static tk2dSpriteCollectionData HatSpriteCollection = null;
 		public static void SetupHatSprites(List<string> spritePaths, GameObject hatObj, int fps)
         {
             if (hatObj.GetComponent<Hat>() is not Hat hatness)
                 return;
 
-            string collectionName = hatness.hatName.Replace(" ", "_");
-            tk2dSpriteCollectionData HatSpriteCollection = SpriteBuilder.ConstructCollection(hatObj, (collectionName + "_Collection"));
+            HatSpriteCollection ??= SpriteBuilder.ConstructCollection(new GameObject(), ("HatCollection"));
             var callingASM = Assembly.GetCallingAssembly();
             int spriteID = SpriteBuilder.AddSpriteToCollection(spritePaths[0], HatSpriteCollection, callingASM);
             tk2dSprite hatBaseSprite = hatObj.GetOrAddComponent<tk2dSprite>();
@@ -96,23 +96,21 @@ namespace Alexandria.cAPI
                 hatness.hatDirectionality = Hat.HatDirectionality.FOURWAY;
             else
                 hatness.hatDirectionality = Hat.HatDirectionality.SIXWAY;
-            ETGModConsole.Log($"made hat {spritePaths[0]} with direction {hatness.hatDirectionality}");
 
             //SET UP THE ANIMATOR AND THE ANIMATION
-            tk2dSpriteAnimator animator = hatObj.GetOrAddComponent<tk2dSpriteAnimator>();
             tk2dSpriteAnimation animation = hatObj.GetOrAddComponent<tk2dSpriteAnimation>();
             animation.clips = new tk2dSpriteAnimationClip[0];
-            animator.Library = animation;
+            hatObj.GetOrAddComponent<tk2dSpriteAnimator>().Library = animation;
 
-            animation.AddHatAnimation(animationName: "hat_south",     spriteNames: SouthAnimation,     fps: fps, collection: HatSpriteCollection, callingASM: callingASM, def: def);
-            animation.AddHatAnimation(animationName: "hat_north",     spriteNames: NorthAnimation,     fps: fps, collection: HatSpriteCollection, callingASM: callingASM, def: def);
-            animation.AddHatAnimation(animationName: "hat_west",      spriteNames: WestAnimation,      fps: fps, collection: HatSpriteCollection, callingASM: callingASM, def: def);
-            animation.AddHatAnimation(animationName: "hat_east",      spriteNames: EastAnimation,      fps: fps, collection: HatSpriteCollection, callingASM: callingASM, def: def);
-            animation.AddHatAnimation(animationName: "hat_northeast", spriteNames: NorthEastAnimation, fps: fps, collection: HatSpriteCollection, callingASM: callingASM, def: def);
-            animation.AddHatAnimation(animationName: "hat_northwest", spriteNames: NorthWestAnimation, fps: fps, collection: HatSpriteCollection, callingASM: callingASM, def: def);
+            animation.AddHatAnimation(animationName: "hat_south",     spriteNames: SouthAnimation,     fps: fps, callingASM: callingASM, def: def);
+            animation.AddHatAnimation(animationName: "hat_north",     spriteNames: NorthAnimation,     fps: fps, callingASM: callingASM, def: def);
+            animation.AddHatAnimation(animationName: "hat_west",      spriteNames: WestAnimation,      fps: fps, callingASM: callingASM, def: def);
+            animation.AddHatAnimation(animationName: "hat_east",      spriteNames: EastAnimation,      fps: fps, callingASM: callingASM, def: def);
+            animation.AddHatAnimation(animationName: "hat_northeast", spriteNames: NorthEastAnimation, fps: fps, callingASM: callingASM, def: def);
+            animation.AddHatAnimation(animationName: "hat_northwest", spriteNames: NorthWestAnimation, fps: fps, callingASM: callingASM, def: def);
         }
 
-        private static void AddHatAnimation(this tk2dSpriteAnimation animation, string animationName, List<string> spriteNames, int fps, tk2dSpriteCollectionData collection,
+        private static void AddHatAnimation(this tk2dSpriteAnimation animation, string animationName, List<string> spriteNames, int fps,
             Assembly callingASM, tk2dSpriteDefinition def)
         {
             if (spriteNames == null || spriteNames.Count == 0)
@@ -123,11 +121,11 @@ namespace Alexandria.cAPI
             for (int i = 0; i < spriteNames.Count; ++i)
             {
                 string path = spriteNames[i];
-                int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection, callingASM);
-                tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
+                int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, HatSpriteCollection, callingASM);
+                tk2dSpriteDefinition frameDef = HatSpriteCollection.spriteDefinitions[frameSpriteId];
                 frameDef.colliderVertices = def.colliderVertices;
                 frameDef.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.LowerCenter);
-                clip.frames[i] = new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = collection };
+                clip.frames[i] = new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = HatSpriteCollection };
             }
             animation.clips = animation.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
         }
