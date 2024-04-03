@@ -176,7 +176,7 @@ namespace Alexandria.cAPI
       PrototypeDungeonRoom protoRoom = CreateEmptyLitRoom(roomXSize, roomYSize); //TODO: this doesn't work for sizes smaller than 24x24 without graphical glitches...why?
       Dungeon dungeon = GameManager.Instance.Dungeon;
       RoomHandler newRoom = AddRuntimeHatRoom(dungeon, protoRoom, lightStyle: DungeonData.LightGenerationStyle.FORCE_COLOR);
-      TK2DInteriorDecorator decorator = new TK2DInteriorDecorator(dungeon.assembler);
+      // TK2DInteriorDecorator decorator = new TK2DInteriorDecorator(dungeon.assembler);
       // decorator.HandleRoomDecoration(newRoom, dungeon, dungeon.m_tilemap);  //TODO: adds janky carpet, fix later
       Pathfinding.Pathfinder.Instance.InitializeRegion(dungeon.data, newRoom.area.basePosition, newRoom.area.dimensions);
 
@@ -394,7 +394,7 @@ namespace Alexandria.cAPI
 
     public float GetOverrideMaxDistance()
     {
-      return 1f;
+      return 1.5f;
     }
 
     public float GetDistanceToPoint(Vector2 point)
