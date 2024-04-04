@@ -307,11 +307,11 @@ namespace Alexandria.cAPI
         {
             if (hatOwner == null)
                 hatOwner = player;
-            if (flipHorizontalWithPlayer && player.sprite)
-                sprite.FlipX = player.sprite.FlipX;
+            transform.parent = player.transform;
             transform.position = GetHatPosition(player);
             transform.rotation = hatOwner.transform.rotation;
-            transform.parent = player.transform;
+            if (flipHorizontalWithPlayer && player.sprite)
+                sprite.FlipX = player.sprite.FlipX;
             player.sprite.AttachRenderer(gameObject.GetComponent<tk2dBaseSprite>());
             currentState = HatState.SITTING;
         }
@@ -368,7 +368,7 @@ namespace Alexandria.cAPI
             if (hatRollReaction != HatRollReaction.FLIP || vanishOverrides.Value)
                 return; // no flipping needed
 
-            if (((BraveTime.ScaledTimeSinceStartup - startRolTime) >= rollLength) || hatOwner.IsSlidingOverSurface)
+            if (((BraveTime.ScaledTimeSinceStartup - startRolTime) >= rollLength) || hatOwner.IsSlidingOverSurface || !hatOwner.IsDodgeRolling)
             {
                 StickHatToPlayer(hatOwner);
                 if (GameManager.AUDIO_ENABLED && !string.IsNullOrEmpty(flipEndedSound))
