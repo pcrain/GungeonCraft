@@ -138,21 +138,22 @@ namespace Alexandria.cAPI
             animation.clips = new tk2dSpriteAnimationClip[0];
             hatObj.GetOrAddComponent<tk2dSpriteAnimator>().Library = animation;
 
-            animation.AddHatAnimation(animationName: "hat_south",     spriteNames: SouthAnimation,     fps: fps, callingASM: callingASM, def: def);
-            animation.AddHatAnimation(animationName: "hat_north",     spriteNames: NorthAnimation,     fps: fps, callingASM: callingASM, def: def);
-            animation.AddHatAnimation(animationName: "hat_west",      spriteNames: WestAnimation,      fps: fps, callingASM: callingASM, def: def);
-            animation.AddHatAnimation(animationName: "hat_east",      spriteNames: EastAnimation,      fps: fps, callingASM: callingASM, def: def);
-            animation.AddHatAnimation(animationName: "hat_northeast", spriteNames: NorthEastAnimation, fps: fps, callingASM: callingASM, def: def);
-            animation.AddHatAnimation(animationName: "hat_northwest", spriteNames: NorthWestAnimation, fps: fps, callingASM: callingASM, def: def);
+            Vector2 lowerCenterOffset = new Vector2(-0.5f * def.position3.x, 0); // use the same offset for every sprite for a hat to avoid alignment jankiness
+            animation.AddHatAnimation(animName: "hat_south",     spriteNames: SouthAnimation,     fps: fps, callingASM: callingASM, def: def, offset: lowerCenterOffset);
+            animation.AddHatAnimation(animName: "hat_north",     spriteNames: NorthAnimation,     fps: fps, callingASM: callingASM, def: def, offset: lowerCenterOffset);
+            animation.AddHatAnimation(animName: "hat_west",      spriteNames: WestAnimation,      fps: fps, callingASM: callingASM, def: def, offset: lowerCenterOffset);
+            animation.AddHatAnimation(animName: "hat_east",      spriteNames: EastAnimation,      fps: fps, callingASM: callingASM, def: def, offset: lowerCenterOffset);
+            animation.AddHatAnimation(animName: "hat_northeast", spriteNames: NorthEastAnimation, fps: fps, callingASM: callingASM, def: def, offset: lowerCenterOffset);
+            animation.AddHatAnimation(animName: "hat_northwest", spriteNames: NorthWestAnimation, fps: fps, callingASM: callingASM, def: def, offset: lowerCenterOffset);
         }
 
-        private static void AddHatAnimation(this tk2dSpriteAnimation animation, string animationName, List<string> spriteNames, int fps,
-            Assembly callingASM, tk2dSpriteDefinition def)
+        private static void AddHatAnimation(this tk2dSpriteAnimation animation, string animName, List<string> spriteNames, int fps,
+            Assembly callingASM, tk2dSpriteDefinition def, Vector2 offset)
         {
             if (spriteNames == null || spriteNames.Count == 0)
                 return; // nothing to do
 
-            tk2dSpriteAnimationClip clip = new tk2dSpriteAnimationClip() { name = animationName, frames = new tk2dSpriteAnimationFrame[spriteNames.Count], fps = fps };
+            tk2dSpriteAnimationClip clip = new tk2dSpriteAnimationClip() { name = animName, frames = new tk2dSpriteAnimationFrame[spriteNames.Count], fps = fps };
             List<tk2dSpriteAnimationFrame> frames = new List<tk2dSpriteAnimationFrame>();
             for (int i = 0; i < spriteNames.Count; ++i)
             {
@@ -160,10 +161,22 @@ namespace Alexandria.cAPI
                 int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, HatSpriteCollection, callingASM);
                 tk2dSpriteDefinition frameDef = HatSpriteCollection.spriteDefinitions[frameSpriteId];
                 frameDef.colliderVertices = def.colliderVertices;
-                frameDef.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.LowerCenter);
+                frameDef.AdjustOffset(offset);
                 clip.frames[i] = new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = HatSpriteCollection };
             }
             animation.clips = animation.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
+        }
+
+        private static void AdjustOffset(this tk2dSpriteDefinition def, Vector3 offset)
+        {
+            def.position0 += offset;
+            def.position1 += offset;
+            def.position2 += offset;
+            def.position3 += offset;
+            def.boundsDataCenter += offset;
+            def.boundsDataExtents += offset;
+            def.untrimmedBoundsDataCenter += offset;
+            def.untrimmedBoundsDataExtents += offset;
         }
 
         private static void AddHatToDatabase(Hat hat)
@@ -174,77 +187,6 @@ namespace Alexandria.cAPI
         public static string GetDatabaseFriendlyHatName(this string hatName)
         {
             return hatName.ToLower().Replace(" ","_");
-        }
-    }
-}
-
-//NOTE: these should already be in Alexandria and can probably be deleted from here once it's merged into Alexandria
-static class ExtensionMethods {
-    public static void MakeOffset(this tk2dSpriteDefinition def, Vector3 offset, bool changesCollider = false)
-    {
-        def.position0 += offset;
-        def.position1 += offset;
-        def.position2 += offset;
-        def.position3 += offset;
-        def.boundsDataCenter += offset;
-        def.boundsDataExtents += offset;
-        def.untrimmedBoundsDataCenter += offset;
-        def.untrimmedBoundsDataExtents += offset;
-        if (def.colliderVertices != null && def.colliderVertices.Length > 0 && changesCollider)
-            def.colliderVertices[0] += offset;
-    }
-
-    public static void ConstructOffsetsFromAnchor(this tk2dSpriteDefinition def, tk2dBaseSprite.Anchor anchor, Vector2? scale = null, bool fixesScale = false, bool changesCollider = true)
-    {
-        if (!scale.HasValue)
-        {
-            scale = new Vector2?(def.position3);
-        }
-        if (fixesScale)
-        {
-            Vector2 fixedScale = scale.Value - def.position0.XY();
-            scale = new Vector2?(fixedScale);
-        }
-        float xOffset = 0;
-        if (anchor == tk2dBaseSprite.Anchor.LowerCenter || anchor == tk2dBaseSprite.Anchor.MiddleCenter || anchor == tk2dBaseSprite.Anchor.UpperCenter)
-        {
-            xOffset = -(scale.Value.x / 2f);
-        }
-        else if (anchor == tk2dBaseSprite.Anchor.LowerRight || anchor == tk2dBaseSprite.Anchor.MiddleRight || anchor == tk2dBaseSprite.Anchor.UpperRight)
-        {
-            xOffset = -scale.Value.x;
-        }
-        float yOffset = 0;
-        if (anchor == tk2dBaseSprite.Anchor.MiddleLeft || anchor == tk2dBaseSprite.Anchor.MiddleCenter || anchor == tk2dBaseSprite.Anchor.MiddleLeft)
-        {
-            yOffset = -(scale.Value.y / 2f);
-        }
-        else if (anchor == tk2dBaseSprite.Anchor.UpperLeft || anchor == tk2dBaseSprite.Anchor.UpperCenter || anchor == tk2dBaseSprite.Anchor.UpperRight)
-        {
-            yOffset = -scale.Value.y;
-        }
-        def.MakeOffset(new Vector2(xOffset, yOffset), false);
-        if (changesCollider && def.colliderVertices != null && def.colliderVertices.Length > 0)
-        {
-            float colliderXOffset = 0;
-            if (anchor == tk2dBaseSprite.Anchor.LowerLeft || anchor == tk2dBaseSprite.Anchor.MiddleLeft || anchor == tk2dBaseSprite.Anchor.UpperLeft)
-            {
-                colliderXOffset = (scale.Value.x / 2f);
-            }
-            else if (anchor == tk2dBaseSprite.Anchor.LowerRight || anchor == tk2dBaseSprite.Anchor.MiddleRight || anchor == tk2dBaseSprite.Anchor.UpperRight)
-            {
-                colliderXOffset = -(scale.Value.x / 2f);
-            }
-            float colliderYOffset = 0;
-            if (anchor == tk2dBaseSprite.Anchor.LowerLeft || anchor == tk2dBaseSprite.Anchor.LowerCenter || anchor == tk2dBaseSprite.Anchor.LowerRight)
-            {
-                colliderYOffset = (scale.Value.y / 2f);
-            }
-            else if (anchor == tk2dBaseSprite.Anchor.UpperLeft || anchor == tk2dBaseSprite.Anchor.UpperCenter || anchor == tk2dBaseSprite.Anchor.UpperRight)
-            {
-                colliderYOffset = -(scale.Value.y / 2f);
-            }
-            def.colliderVertices[0] += new Vector3(colliderXOffset, colliderYOffset, 0);
         }
     }
 }

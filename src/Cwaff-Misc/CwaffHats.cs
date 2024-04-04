@@ -15,7 +15,7 @@ public static class CwaffHats
       EasyHat(name: "jester_hat",            offset: new IntVector2( 0, -3));
       EasyHat(name: "saiyan_hat",            offset: new IntVector2( 0, -4));
       EasyHat(name: "wizard_hat",            offset: new IntVector2(-1, -3));
-      EasyHat(name: "cat_ears_hat",          offset: new IntVector2( 0, -4));
+      EasyHat(name: "cat_ears",              offset: new IntVector2( 0, -4));
       EasyHat(name: "shades",                offset: new IntVector2( 0, -2), onEyes: true);
       EasyHat(name: "samus_hat",             offset: new IntVector2( 0, -8));
       EasyHat(name: "goggles",               offset: new IntVector2( 0, -3), onEyes: true);
@@ -49,7 +49,7 @@ public static class CwaffHats
       EasyHat(name: "pompom_hat",            offset: new IntVector2(-1, -4));
       EasyHat(name: "spike_crown",           offset: new IntVector2( 1, -1));
       EasyHat(name: "stovepipe",             offset: new IntVector2( 0, -5));
-      EasyHat(name: "u_s_a_general_hat",     offset: new IntVector2( 0, -3));
+      EasyHat(name: "u_s_a_general_hat",     offset: new IntVector2( 0, -3), displayName: "U.S.A. General Hat");
       EasyHat(name: "witch_hat",             offset: new IntVector2( 0, -3));
       // EasyHat(name: "arrow_hat",             offset: new IntVector2( 0,  0), fps: 8, locked: true);
       EasyHat(name: "aviator_helmet",        offset: new IntVector2( 0, -7));
@@ -69,10 +69,10 @@ public static class CwaffHats
       EasyHat(name: "zero_helmet",           offset: new IntVector2( 0, -8));
     }
 
-    private static void EasyHat(string name, IntVector2? offset = null, bool onEyes = false, int fps = 1, bool locked = false)
+    private static void EasyHat(string name, IntVector2? offset = null, bool onEyes = false, int fps = 1, bool locked = false, string displayName = null)
     {
       HatUtility.SetupHat(
-        name: name.Replace("_", " ").ToTitleCaseInvariant(),
+        name: displayName ?? name.Replace("_", " ").ToTitleCaseInvariant(),
         spritePaths: Lazy.Combine(
           ResMap.Get($"{name}_south",     true),
           ResMap.Get($"{name}_north",     true),
