@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.11.0 (2024-04-04)
+
+- Added 56 cosmetic hats! :D
+	- Hats are accessible via a new hat room near Winchester in the Breach
+	- Hat sprites thanks to Dallan!
+	- Hat room pedestal and exit sprites thanks to Lynceus!
+	- Hat room entrance sprite thanks to an3s!
+- Fixed Gorgun Eye constantly making noise every frame
+
 ## 1.10.4 (2024-03-27)
 
 - Fixed Subtractor Beam being completely broken and causing numerous null reference exceptions when killing enemies with health values visible

@@ -14,10 +14,11 @@
 	+ 32 new passive items
 	+ 17 new active items
 - Lore for all new guns and items
+- 56 stylish cosmetic hats, accessible via a new hat room near Winchester in the Breach
 - Companion Shop: sells 3 random unlocked companions at a 30% discount. Guaranteed to spawn on the first floor each run
 - Bartering Shop: trades 3 random D-A tier items for any higher-tiered item. Guaranteed to spawn on the second or third floor each run
-- Insurance Shop: sells insurance policies that let you carry items over to the next run. Guaranteed to spawn after starting a floor holding an A or S tier item.
-- Hecked Mode: randomize enemies' guns for a truly hecked playing experience. Enable it in Options -> Mod Config -> GungeonCraft -> Hecked Mode.
+- Insurance Shop: sells insurance policies that let you carry items over to the next run. Guaranteed to spawn after starting a floor holding an A or S tier item
+- Hecked Mode: randomize enemies' guns for a truly hecked playing experience. Enable it in Options -> Mod Config -> GungeonCraft -> Hecked Mode
 - A new boss!
 - Vanilla bugfixes
 - You can pet Junior \o/
