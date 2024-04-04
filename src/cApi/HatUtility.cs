@@ -188,9 +188,18 @@ namespace Alexandria.cAPI
                 Hatabase.HatRoomHats.Add(hat);
         }
 
+        /// <summary>Converts a hat's display name to the format it's stored in within the hat database</summary>
         public static string GetDatabaseFriendlyHatName(this string hatName)
         {
             return hatName.ToLower().Replace(" ","_");
+        }
+
+        /// <summary>Retrieve's the player's current hat, if they're wearing one</summary>
+        public static Hat CurrentHat(this PlayerController player)
+        {
+            if (!player || player.GetComponent<HatController>() is not HatController hc)
+                return null;
+            return hc.CurrentHat;
         }
     }
 }
