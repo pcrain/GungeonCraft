@@ -14,12 +14,12 @@ namespace Alexandria.cAPI
     // private const string BASE_RES_PATH = "Alexandria/cAPI/Resources"; //NOTE: restore once reintegrated into Alexandria
     private const string BASE_RES_PATH = "CwaffingTheGungy/Resources";
 
-    private const float PEDESTAL_Z             = 10.8f;
-    private const float HAT_Z_OFFSET           = 1f;
-    private const int LIGHT_SPACING            = 8;
-    private const int DEBUG_HAT_MULT           = 1; // used for creating 100s of duplicate hats for stress testing hat room, should be 1 on release
-    private const float NEW_PEDESTAL_X_SPACING = 3.2f;
-    private const float NEW_PEDESTAL_Y_SPACING = 2.5f;
+    private const int LIGHT_SPACING        = 8;
+    private const int DEBUG_HAT_MULT       = 1; // used for creating 100s of duplicate hats for stress testing hat room, should be 1 on release
+    private const float PEDESTAL_X_SPACING = 3.125f;
+    private const float PEDESTAL_Y_SPACING = 3.125f;
+    private const float PEDESTAL_Z         = 10.8f;
+    private const float HAT_Z_OFFSET       = 1f;
 
     private static readonly Vector3 ENTRANCE_POSITION = new Vector3(59.75f, 36f, 36.875f);
 
@@ -27,6 +27,7 @@ namespace Alexandria.cAPI
     private static GameObject hatRoomExit           = null;
     private static GameObject plainPedestal         = null;
     private static GameObject goldPedestal          = null;
+    private static GameObject slimPedestal          = null;
     private static bool needToGenHatRoom            = true;
     private static bool createdPrefabs              = false;
     private static List<IntVector2> pedestalOffsets = null;
@@ -79,6 +80,10 @@ namespace Alexandria.cAPI
       goldPedestal.MakeRigidBody(dimensions: new IntVector2(26, 23), offset: new IntVector2(0, 0));
       goldPedestal.GetComponent<tk2dSprite>().HeightOffGround = -3;
 
+      slimPedestal = ItemAPI.ItemBuilder.AddSpriteToObject("slimPedestal", $"{BASE_RES_PATH}/hat_pedestal.png");
+      slimPedestal.MakeRigidBody(dimensions: new IntVector2(20, 21), offset: new IntVector2(0, 0));
+      slimPedestal.GetComponent<tk2dSprite>().HeightOffGround = -3;
+
       hatRoomExit = ItemAPI.ItemBuilder.AddSpriteToObject("HatRoomExit", $"{BASE_RES_PATH}/hat_room_exit.png");
       hatRoomExit.MakeRigidBody(dimensions: new IntVector2(22, 16), offset: new IntVector2(12, 8));
 
@@ -93,8 +98,8 @@ namespace Alexandria.cAPI
       // Math our way to figuring out the room size
       int numHats = Hatabase.Hats.Count;
       GetPedestalRingOffsets(DEBUG_HAT_MULT * numHats, out int maxRing);
-      int roomXSize = Mathf.CeilToInt(2 * (maxRing + 1) * NEW_PEDESTAL_X_SPACING);
-      int roomYSize = Mathf.CeilToInt(2 * (maxRing + 1) * NEW_PEDESTAL_Y_SPACING);
+      int roomXSize = Mathf.CeilToInt(2 * (maxRing + 1) * PEDESTAL_X_SPACING);
+      int roomYSize = Mathf.CeilToInt(2 * (maxRing + 1) * PEDESTAL_Y_SPACING);
 
       protoRoom = CreateEmptyLitHatRoom(roomXSize, roomYSize);
     }
@@ -284,10 +289,11 @@ namespace Alexandria.cAPI
         {
           Hat hat = allHats[i % allHats.Length];
 
-          float pedX = roomCenter.x + pedestalOffsets[i].x * NEW_PEDESTAL_X_SPACING;
-          float pedY = roomCenter.y + pedestalOffsets[i].y * NEW_PEDESTAL_Y_SPACING;
+          float pedX = roomCenter.x + pedestalOffsets[i].x * PEDESTAL_X_SPACING;
+          float pedY = roomCenter.y + pedestalOffsets[i].y * PEDESTAL_Y_SPACING;
 
-          GameObject pedObj = UnityEngine.Object.Instantiate(hat.goldenPedestal ? goldPedestal : plainPedestal);
+          // GameObject pedObj = UnityEngine.Object.Instantiate(hat.goldenPedestal ? goldPedestal : plainPedestal);
+          GameObject pedObj = UnityEngine.Object.Instantiate(slimPedestal);
           pedObj.GetComponent<tk2dSprite>().PlaceAtPositionByAnchor(new Vector3(pedX, pedY, PEDESTAL_Z), tk2dBaseSprite.Anchor.LowerCenter);
 
           HatPedestal pedestal = pedObj.AddComponent<HatPedestal>();
@@ -384,7 +390,14 @@ namespace Alexandria.cAPI
       public void Interact(PlayerController interactor)
       {
         if (hat.HasBeenUnlocked)
-          interactor.GetComponent<HatController>().SetHat(hat);
+        {
+          HatController hatCont = interactor.GetComponent<HatController>();
+          if (hatCont.CurrentHat != null && hatCont.CurrentHat.hatName == hat.hatName)
+            hatCont.RemoveCurrentHat();
+          else
+            hatCont.SetHat(hat);
+          LootEngine.DoDefaultItemPoof(interactor.sprite.WorldTopCenter);
+        }
         else
           AkSoundEngine.PostEvent("Play_OBJ_purchase_unable_01", base.gameObject);
       }

@@ -252,6 +252,7 @@
     <EmbeddedResource Include="Resources\Rooms\petshop.newroom"/>
     <EmbeddedResource Include="Resources\Rooms\insurance.newroom"/>
     <EmbeddedResource Include="Resources\Rooms\BasicShopRoom2.newroom"/>
+    <EmbeddedResource Include="Resources\hat_pedestal.png"/>
     <Reference Include="UnityEngine.ClothModule"/>
     <Reference Include="UnityEngine.UnityConnectModule"/>
     <Reference Include="UnityEngine.AIModule"/>
