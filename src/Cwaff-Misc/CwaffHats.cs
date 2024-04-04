@@ -9,6 +9,7 @@ public static class CwaffHats
       // {
       //   EasyHat(name: "debug_hat",      offset: null);
       //   EasyHat(name: "debug_glasses",  offset: null, onEyes: true);
+      //   EasyHat(name: "arrow_hat",      offset: new IntVector2( 0,  0), fps: 8, locked: true);
       // }
       EasyHat(name: "toad_hat",              offset: new IntVector2( 0, -3));
       EasyHat(name: "bunny_hood",            offset: new IntVector2( 0, -3));
@@ -51,7 +52,6 @@ public static class CwaffHats
       EasyHat(name: "stovepipe",             offset: new IntVector2( 0, -5));
       EasyHat(name: "u_s_a_general_hat",     offset: new IntVector2( 0, -3), displayName: "U.S.A. General Hat");
       EasyHat(name: "witch_hat",             offset: new IntVector2( 0, -3));
-      // EasyHat(name: "arrow_hat",             offset: new IntVector2( 0,  0), fps: 8, locked: true);
       EasyHat(name: "aviator_helmet",        offset: new IntVector2( 0, -7));
       EasyHat(name: "basque_beret",          offset: new IntVector2( 0, -3));
       EasyHat(name: "beastmaster_hat",       offset: new IntVector2( 0, -3));

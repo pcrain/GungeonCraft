@@ -72,14 +72,16 @@ public class GorgunEye : PassiveItem
 
         if (closestEnemy != this._afflictedEnemy)
         {
-            this._afflictedEnemy?.RemoveEffect(_EFFECT_NAME);
-            closestEnemy?.ApplyEffect(_GorgunTint);
+            if (this._afflictedEnemy)
+                this._afflictedEnemy.RemoveEffect(_EFFECT_NAME);
+            if (closestEnemy)
+            {
+                closestEnemy.ApplyEffect(_GorgunTint);
+                closestEnemy.gameObject.PlayUnique("gorgun_eye_activate");
+            }
             this._afflictedEnemy = closestEnemy;
         }
         if (this._afflictedEnemy)
-        {
-            closestEnemy.gameObject.PlayUnique("gorgun_eye_activate");
             closestEnemy.behaviorSpeculator.Stun(_STUN_LINGER_TIME, createVFX: false);
-        }
     }
 }
