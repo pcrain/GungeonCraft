@@ -30,6 +30,9 @@ namespace Alexandria.cAPI
         // Currently-known hats that have been set up
         public static readonly Dictionary<string, Hat> Hats = new();
 
+        // Hats that appear in the hat room
+        public static readonly List<Hat> HatRoomHats = new();
+
         // The last known hat each character was wearing
         public static readonly Dictionary<string, string> StoredHats = new();
 

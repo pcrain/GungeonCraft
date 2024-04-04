@@ -60,7 +60,8 @@ namespace Alexandria.cAPI
             Hat.HatAttachLevel attachLevel = Hat.HatAttachLevel.HEAD_TOP, Hat.HatDepthType depthType = Hat.HatDepthType.ALWAYS_IN_FRONT,
             Hat.HatRollReaction hatRollReaction = Hat.HatRollReaction.FLIP, string flipStartedSound = null, string flipEndedSound = null,
             float flipSpeed = 1f, float flipHeight = 1f, bool goldenPedestal = false, bool? flipHorizontalWithPlayer = null,
-            List<GungeonFlags> unlockFlags = null, List<DungeonPrerequisite> unlockPrereqs = null, string unlockHint = null, bool showSilhouetteWhenLocked = false
+            List<GungeonFlags> unlockFlags = null, List<DungeonPrerequisite> unlockPrereqs = null, string unlockHint = null, bool showSilhouetteWhenLocked = false,
+            bool excludeFromHatRoom = false
             )
         {
             Hat hat = UnityEngine.Object.Instantiate(new GameObject()).AddComponent<Hat>();
@@ -88,7 +89,7 @@ namespace Alexandria.cAPI
             hat.flipHorizontalWithPlayer = flipHorizontalWithPlayer ??
                 (hat.hatDirectionality == Hat.HatDirectionality.NONE || hat.hatDirectionality == Hat.HatDirectionality.TWO_WAY_VERTICAL);
 
-            AddHatToDatabase(hat);
+            AddHatToDatabase(hat, excludeFromHatRoom: excludeFromHatRoom);
             return hat;
         }
 
@@ -180,9 +181,11 @@ namespace Alexandria.cAPI
             def.untrimmedBoundsDataExtents += offset;
         }
 
-        private static void AddHatToDatabase(Hat hat)
+        private static void AddHatToDatabase(Hat hat, bool excludeFromHatRoom)
         {
             Hatabase.Hats[hat.hatName.GetDatabaseFriendlyHatName()] = hat;
+            if (!excludeFromHatRoom)
+                Hatabase.HatRoomHats.Add(hat);
         }
 
         public static string GetDatabaseFriendlyHatName(this string hatName)

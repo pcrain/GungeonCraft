@@ -41,7 +41,7 @@ namespace Alexandria.cAPI
     {
         static void Postfix(Foyer __instance, PlayerController p)
         {
-          if (!needToGenHatRoom || Hatabase.Hats.Count == 0)
+          if (!needToGenHatRoom || Hatabase.HatRoomHats.Count == 0)
             return;
           CreatePrefabsIfNeeded();
           CreateHatRoomPrototypeIfNeeded();
@@ -102,8 +102,7 @@ namespace Alexandria.cAPI
         return;
 
       // Math our way to figuring out the room size
-      int numHats = Hatabase.Hats.Count;
-      GetPedestalRingOffsets(DEBUG_HAT_MULT * numHats, out int maxRing);
+      GetPedestalRingOffsets(DEBUG_HAT_MULT * Hatabase.HatRoomHats.Count, out int maxRing);
       int roomXSize = Mathf.CeilToInt(2 * (maxRing + 1) * PEDESTAL_X_SPACING);
       int roomYSize = Mathf.CeilToInt(2 * (maxRing + 1) * PEDESTAL_Y_SPACING);
 
@@ -290,10 +289,9 @@ namespace Alexandria.cAPI
     private static void CreateHatPedestals(RoomHandler room)
     {
         Vector2 roomCenter = room.area.Center;
-        Hat[] allHats = Hatabase.Hats.Values.ToArray();
-        for (int i = 0; i < DEBUG_HAT_MULT * allHats.Length; i++)
+        for (int i = 0; i < DEBUG_HAT_MULT * Hatabase.HatRoomHats.Count; i++)
         {
-          Hat hat = allHats[i % allHats.Length];
+          Hat hat = Hatabase.HatRoomHats[i % Hatabase.HatRoomHats.Count];
 
           float pedX = roomCenter.x + pedestalOffsets[i].x * PEDESTAL_X_SPACING;
           float pedY = roomCenter.y + pedestalOffsets[i].y * PEDESTAL_Y_SPACING;

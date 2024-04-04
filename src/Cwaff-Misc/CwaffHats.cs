@@ -5,12 +5,12 @@ public static class CwaffHats
     public static void Init()
     {
       Alexandria.cAPI.HatUtility.SetupConsoleCommands();
-      // if (C.DEBUG_BUILD)
-      // {
-      //   EasyHat(name: "debug_hat",      offset: null);
-      //   EasyHat(name: "debug_glasses",  offset: null, onEyes: true);
-      //   EasyHat(name: "arrow_hat",      offset: new IntVector2( 0,  0), fps: 8, locked: true);
-      // }
+      if (C.DEBUG_BUILD)
+      {
+        EasyHat(name: "debug_hat",      offset: null, excluded: true);
+        EasyHat(name: "debug_glasses",  offset: null, onEyes: true, excluded: true);
+        EasyHat(name: "arrow_hat",      offset: new IntVector2( 0,  0), fps: 8, locked: true, excluded: true);
+      }
       EasyHat(name: "toad_hat",              offset: new IntVector2( 0, -3));
       EasyHat(name: "bunny_hood",            offset: new IntVector2( 0, -3));
       EasyHat(name: "jester_hat",            offset: new IntVector2( 0, -3));
@@ -69,7 +69,7 @@ public static class CwaffHats
       EasyHat(name: "zero_helmet",           offset: new IntVector2( 0, -8));
     }
 
-    private static void EasyHat(string name, IntVector2? offset = null, bool onEyes = false, int fps = 1, bool locked = false, string displayName = null)
+    private static void EasyHat(string name, IntVector2? offset = null, bool onEyes = false, int fps = 1, bool locked = false, string displayName = null, bool excluded = false)
     {
       HatUtility.SetupHat(
         name: displayName ?? name.Replace("_", " ").ToTitleCaseInvariant(),
@@ -88,7 +88,8 @@ public static class CwaffHats
         flipHorizontalWithPlayer: null,
         unlockFlags: locked ? new(){GungeonFlags.ITEMSPECIFIC_RAT_CHEESEWHEEL} : null,
         unlockHint: "Sample Unlock Hint",
-        showSilhouetteWhenLocked: true
+        showSilhouetteWhenLocked: true,
+        excludeFromHatRoom: excluded
         );
     }
 }
