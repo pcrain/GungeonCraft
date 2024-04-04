@@ -65,6 +65,8 @@ namespace Alexandria.cAPI
             )
         {
             Hat hat = UnityEngine.Object.Instantiate(new GameObject()).AddComponent<Hat>();
+            UnityEngine.Object.DontDestroyOnLoad(hat.gameObject);
+
             hat.hatName = name;
             hat.hatOffset = 0.0625f * ((pixelOffset ?? IntVector2.Zero).ToVector2());
             hat.attachLevel = attachLevel;
