@@ -18,7 +18,7 @@ namespace Alexandria.cAPI
             return Hatabase.Hats.Keys.Where(key => key.AutocompletionMatch(input.ToLower())).ToArray();
         });
 
-        public static void SetupConsoleCommands()
+        internal static void SetupConsoleCommands()
         {
             ETGModConsole.Commands.AddGroup("capi");
             ETGModConsole.Commands.GetGroup("capi").AddUnit("sethat", new Action<string[]>(SetHat1), HatAutoCompletionSettings);
@@ -55,14 +55,50 @@ namespace Alexandria.cAPI
                 ETGModConsole.Log("<size=100><color=#ff0000ff>Error: Hat '</color></size>" + processedHatName + "<size=100><color=#ff0000ff>' not found in Hatabase</color></size>", false);
         }
 
-        private static tk2dSpriteCollectionData HatSpriteCollection = null;
-		public static void SetupHatSprites(List<string> spritePaths, GameObject hatObj, int fps)
+        public static Hat SetupHat(
+            string name, List<string> spritePaths, IntVector2? pixelOffset = null, int fps = 4,
+            Hat.HatAttachLevel attachLevel = Hat.HatAttachLevel.HEAD_TOP, Hat.HatDepthType depthType = Hat.HatDepthType.ALWAYS_IN_FRONT,
+            Hat.HatRollReaction hatRollReaction = Hat.HatRollReaction.FLIP, string flipStartedSound = null, string flipEndedSound = null,
+            float flipSpeed = 1f, float flipHeight = 1f, bool goldenPedestal = false, bool? flipHorizontalWithPlayer = null,
+            List<GungeonFlags> unlockFlags = null, List<DungeonPrerequisite> unlockPrereqs = null, string unlockHint = null, bool showSilhouetteWhenLocked = false
+            )
         {
-            if (hatObj.GetComponent<Hat>() is not Hat hatness)
-                return;
+            Hat hat = UnityEngine.Object.Instantiate(new GameObject()).AddComponent<Hat>();
+            hat.hatName = name;
+            hat.hatOffset = 0.0625f * ((pixelOffset ?? IntVector2.Zero).ToVector2());
+            hat.attachLevel = attachLevel;
+            hat.hatDepthType = depthType;
+            hat.hatRollReaction = hatRollReaction;
+            hat.flipStartedSound = flipStartedSound;
+            hat.flipEndedSound = flipEndedSound;
+            hat.flipSpeedMultiplier = flipSpeed;
+            hat.flipHeightMultiplier = flipHeight;
+            hat.goldenPedestal = goldenPedestal;
+            hat.unlockHint = unlockHint;
+            hat.showSilhouetteWhenLocked = showSilhouetteWhenLocked;
 
-            HatSpriteCollection ??= SpriteBuilder.ConstructCollection(new GameObject(), ("HatCollection"));
-            var callingASM = Assembly.GetCallingAssembly();
+            if (unlockFlags != null)
+                foreach(GungeonFlags flag in unlockFlags)
+                    hat.AddUnlockOnFlag(flag);
+            if (unlockPrereqs != null)
+                foreach(DungeonPrerequisite prereq in unlockPrereqs)
+                    hat.AddUnlockPrerequisite(prereq);
+
+            hat.SetupHatSprites(spritePaths: spritePaths, fps: fps);
+            hat.flipHorizontalWithPlayer = flipHorizontalWithPlayer ??
+                (hat.hatDirectionality == Hat.HatDirectionality.NONE || hat.hatDirectionality == Hat.HatDirectionality.TWO_WAY_VERTICAL);
+
+            AddHatToDatabase(hat);
+            return hat;
+        }
+
+        private static tk2dSpriteCollectionData HatSpriteCollection = null;
+		private static void SetupHatSprites(this Hat hat, List<string> spritePaths, int fps)
+        {
+            GameObject hatObj = hat.gameObject;
+
+            HatSpriteCollection ??= SpriteBuilder.ConstructCollection(new GameObject(), "HatCollection");
+            Assembly callingASM = Assembly.GetCallingAssembly();
             int spriteID = SpriteBuilder.AddSpriteToCollection(spritePaths[0], HatSpriteCollection, callingASM);
             tk2dSprite hatBaseSprite = hatObj.GetOrAddComponent<tk2dSprite>();
             hatBaseSprite.SetSprite(HatSpriteCollection, spriteID);
@@ -86,16 +122,16 @@ namespace Alexandria.cAPI
                 if (EastAnimation.Count == 0 || WestAnimation.Count == 0)
                     throw new Exception("Hat Does Not Have Proper Animations");
                 else
-                    hatness.hatDirectionality = Hat.HatDirectionality.TWOWAYHORIZONTAL;
+                    hat.hatDirectionality = Hat.HatDirectionality.TWO_WAY_HORIZONTAL;
             }
             else if (NorthAnimation.Count == 0)
-                hatness.hatDirectionality = Hat.HatDirectionality.NONE;
+                hat.hatDirectionality = Hat.HatDirectionality.NONE;
             else if (EastAnimation.Count == 0 || WestAnimation.Count == 0)
-                hatness.hatDirectionality = Hat.HatDirectionality.TWOWAYVERTICAL;
+                hat.hatDirectionality = Hat.HatDirectionality.TWO_WAY_VERTICAL;
             else if (NorthEastAnimation.Count == 0 || NorthWestAnimation.Count == 0)
-                hatness.hatDirectionality = Hat.HatDirectionality.FOURWAY;
+                hat.hatDirectionality = Hat.HatDirectionality.FOUR_WAY;
             else
-                hatness.hatDirectionality = Hat.HatDirectionality.SIXWAY;
+                hat.hatDirectionality = Hat.HatDirectionality.SIX_WAY;
 
             //SET UP THE ANIMATOR AND THE ANIMATION
             tk2dSpriteAnimation animation = hatObj.GetOrAddComponent<tk2dSpriteAnimation>();
@@ -130,17 +166,12 @@ namespace Alexandria.cAPI
             animation.clips = animation.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
         }
 
-        public static void AddHatToDatabase(GameObject hatObj)
+        private static void AddHatToDatabase(Hat hat)
         {
-            if (hatObj.GetComponent<Hat>() is Hat hatComponent)
-            {
-                string hatDbName = hatComponent.hatName.GetDatabaseFriendlyName();
-                Hatabase.Hats[hatDbName] =  hatComponent;
-                ETGModConsole.Log("Hat '" + hatDbName + "' correctly added to Hatabase!", true);
-            }
+            Hatabase.Hats[hat.hatName.GetDatabaseFriendlyHatName()] = hat;
         }
 
-        public static string GetDatabaseFriendlyName(this string hatName)
+        public static string GetDatabaseFriendlyHatName(this string hatName)
         {
             return hatName.ToLower().Replace(" ","_");
         }

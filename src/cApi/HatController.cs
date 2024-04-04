@@ -41,7 +41,7 @@ namespace Alexandria.cAPI
             if (CurrentHat != null && storedHatName == CurrentHat.hatName)
                 return; // hat hasn't changed, nothing to do
             RemoveCurrentHat(); //Removes the current hat if it's not equal to the stored one
-            if (Hatabase.Hats.TryGetValue(storedHatName.GetDatabaseFriendlyName(), out Hat hat))
+            if (Hatabase.Hats.TryGetValue(storedHatName.GetDatabaseFriendlyHatName(), out Hat hat))
                 SetHat(hat);
         }
 

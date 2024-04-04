@@ -352,48 +352,48 @@ namespace Alexandria.cAPI
       Pixelator.Instance.FadeToBlack(0.1f, true);
       p.usingForcedInput = false;
     }
-  }
 
-  class HatPedestal : BraveBehaviour, IPlayerInteractable
-  {
-    public Hat hat;
-
-    public string GetAnimationState(PlayerController interactor, out bool shouldBeFlipped)
+    private class HatPedestal : BraveBehaviour, IPlayerInteractable
     {
-      shouldBeFlipped = false; //Some boilerplate code for determining if the interactable should be flipped
-      return string.Empty;
-    }
+      public Hat hat;
 
-    public float GetOverrideMaxDistance()
-    {
-      return 1.5f;
-    }
+      public string GetAnimationState(PlayerController interactor, out bool shouldBeFlipped)
+      {
+        shouldBeFlipped = false; //Some boilerplate code for determining if the interactable should be flipped
+        return string.Empty;
+      }
 
-    public float GetDistanceToPoint(Vector2 point)
-    {
-      return Vector2.Distance(point, gameObject.GetComponent<tk2dSprite>().WorldCenter);
-    }
+      public float GetOverrideMaxDistance()
+      {
+        return 1.5f;
+      }
 
-    public void Interact(PlayerController interactor)
-    {
-      if (hat.HasBeenUnlocked)
-        interactor.GetComponent<HatController>().SetHat(hat);
-      else
-        AkSoundEngine.PostEvent("Play_OBJ_purchase_unable_01", base.gameObject);
-    }
+      public float GetDistanceToPoint(Vector2 point)
+      {
+        return Vector2.Distance(point, gameObject.GetComponent<tk2dSprite>().WorldCenter);
+      }
 
-    public void OnEnteredRange(PlayerController interactor)
-    {
-      SpriteOutlineManager.RemoveOutlineFromSprite(base.sprite, true);
-      SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.white);
-      TextBoxManager.ShowInfoBox(new Vector2(transform.position.x + 0.75f ,transform.position.y + 2), transform, 3600f, hat.HasBeenUnlocked ? hat.hatName : hat.UnlockText); // 1 hour duration so it persists
-    }
+      public void Interact(PlayerController interactor)
+      {
+        if (hat.HasBeenUnlocked)
+          interactor.GetComponent<HatController>().SetHat(hat);
+        else
+          AkSoundEngine.PostEvent("Play_OBJ_purchase_unable_01", base.gameObject);
+      }
 
-    public void OnExitRange(PlayerController interactor)
-    {
-      SpriteOutlineManager.RemoveOutlineFromSprite(base.sprite, true);
-      SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black);
-      TextBoxManager.ShowInfoBox(new Vector2(transform.position.x + 0.75f ,transform.position.y + 2), transform, 0f, hat.HasBeenUnlocked ? hat.hatName : hat.UnlockText); // 0 duration = disappears instantly
+      public void OnEnteredRange(PlayerController interactor)
+      {
+        SpriteOutlineManager.RemoveOutlineFromSprite(base.sprite, true);
+        SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.white);
+        TextBoxManager.ShowInfoBox(new Vector2(transform.position.x + 0.75f ,transform.position.y + 2), transform, 3600f, hat.HasBeenUnlocked ? hat.hatName : hat.UnlockText); // 1 hour duration so it persists
+      }
+
+      public void OnExitRange(PlayerController interactor)
+      {
+        SpriteOutlineManager.RemoveOutlineFromSprite(base.sprite, true);
+        SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black);
+        TextBoxManager.ShowInfoBox(new Vector2(transform.position.x + 0.75f ,transform.position.y + 2), transform, 0f, hat.HasBeenUnlocked ? hat.hatName : hat.UnlockText); // 0 duration = disappears instantly
+      }
     }
   }
 

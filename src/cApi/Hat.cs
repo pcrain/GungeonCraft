@@ -14,44 +14,44 @@ namespace Alexandria.cAPI
 {
     public class Hat : BraveBehaviour
     {
-        private const string LOCKED_TEXT = "(LOCKED)";
+        private const string LOCKED_TEXT     = "(LOCKED)";
         private const float BASE_FLIP_HEIGHT = 3f;
 
         private static tk2dSpriteAnimator CachedP1Animator = null;
         private static tk2dSpriteAnimator CachedP2Animator = null;
 
-        public string hatName = null;
-        public Vector2 hatOffset = Vector2.zero;
-        public HatDirectionality hatDirectionality = HatDirectionality.NONE;
-        public HatRollReaction hatRollReaction = HatRollReaction.FLIP;
-        public HatAttachLevel attachLevel = HatAttachLevel.HEAD_TOP;
-        public string FlipStartedSound = null;
-        public string FlipEndedSound = null;
-        public HatDepthType hatDepthType = HatDepthType.AlwaysInFront;
-        public PlayerController hatOwner = null;
-        public float SpinSpeedMultiplier = 1f;
-        public float flipHeightMultiplier = 1f;
-        public bool goldenPedestal = false;
-        public bool flipHorizontalWithPlayer = true;
-        public string unlockHint = null;
-        public bool showSilhouetteWhenLocked = false;
+        public string            hatName                  = null;
+        public Vector2           hatOffset                = Vector2.zero;
+        public HatDirectionality hatDirectionality        = HatDirectionality.NONE;
+        public HatRollReaction   hatRollReaction          = HatRollReaction.FLIP;
+        public HatAttachLevel    attachLevel              = HatAttachLevel.HEAD_TOP;
+        public string            flipStartedSound         = null;
+        public string            flipEndedSound           = null;
+        public HatDepthType      hatDepthType             = HatDepthType.ALWAYS_IN_FRONT;
+        public float             flipSpeedMultiplier      = 1f;
+        public float             flipHeightMultiplier     = 1f;
+        public bool              goldenPedestal           = false;
+        public bool              flipHorizontalWithPlayer = true;
+        public string            unlockHint               = null;
+        public bool              showSilhouetteWhenLocked = false;
 
-        public bool HasBeenUnlocked => unlockPrereqs.All(p => p.CheckConditionsFulfilled());
-        public string UnlockText => string.IsNullOrEmpty(unlockHint) ? LOCKED_TEXT : $"{LOCKED_TEXT}\n\n{unlockHint}";
+        public bool   HasBeenUnlocked => unlockPrereqs.All(p => p.CheckConditionsFulfilled());
+        public string UnlockText      => string.IsNullOrEmpty(unlockHint) ? LOCKED_TEXT : $"{LOCKED_TEXT}\n\n{unlockHint}";
 
-        private HatDirection currentDirection = HatDirection.NONE;
-        private HatState currentState = HatState.SITTING;
-        private tk2dSprite hatSprite = null;
-        private tk2dSpriteAnimator hatSpriteAnimator = null;
-        private tk2dSpriteAnimator hatOwnerAnimator = null;
-        private tk2dSpriteDefinition cachedDef = null;
-        private float rollLength = 0.65f; //The time it takes for a player with no dodge roll effects to roll
-        private float startRolTime = 0.0f;
-        private List<DungeonPrerequisite> unlockPrereqs = new();
-        private Vector2 playerSpecificOffset;
-        private Vector2 hatFlipOffset = Vector2.zero;
-        private Dictionary<string, Hatabase.FrameOffset> offsetDict;
-        private int hatWidth = 0;
+        private PlayerController     hatOwner             = null;
+        private HatDirection         currentDirection     = HatDirection.NONE;
+        private HatState             currentState         = HatState.SITTING;
+        private tk2dSprite           hatSprite            = null;
+        private tk2dSpriteAnimator   hatSpriteAnimator    = null;
+        private tk2dSpriteAnimator   hatOwnerAnimator     = null;
+        private tk2dSpriteDefinition cachedDef            = null;
+        private float                rollLength           = 0.65f;
+        private float                startRolTime         = 0.0f;
+        private Vector2              playerSpecificOffset = Vector2.zero;
+        private Vector2              hatFlipOffset        = Vector2.zero;
+        private int                  hatWidth             = 0;
+        private List<DungeonPrerequisite> unlockPrereqs   = new();
+        private Dictionary<string, Hatabase.FrameOffset> offsetDict = null;
 
         public void AddUnlockOnFlag(GungeonFlags flag) =>
             unlockPrereqs.Add(new() { prerequisiteType = DungeonPrerequisite.PrerequisiteType.FLAG, saveFlagToCheck = flag });
@@ -174,7 +174,7 @@ namespace Alexandria.cAPI
             return (hatOwner && hatOwner.HasPickupID(436)); // 436 == Bloodied Scarf
         }
 
-		public void UpdateHatFacingDirection()
+		private void UpdateHatFacingDirection()
         {
             HatDirection targetDir = FetchOwnerFacingDirection();
             if (targetDir == currentDirection)
@@ -185,16 +185,16 @@ namespace Alexandria.cAPI
             HatDirection adjustedDir = targetDir;
             if (hatDirectionality == HatDirectionality.NONE)
                 adjustedDir = HatDirection.SOUTH;
-            else if (hatDirectionality == HatDirectionality.TWOWAYHORIZONTAL)
+            else if (hatDirectionality == HatDirectionality.TWO_WAY_HORIZONTAL)
                 adjustedDir = hatOwner.sprite.FlipX ? HatDirection.WEST : HatDirection.EAST;
-            else if (hatDirectionality == HatDirectionality.TWOWAYVERTICAL)
+            else if (hatDirectionality == HatDirectionality.TWO_WAY_VERTICAL)
             {
                 if (targetDir == HatDirection.NORTHWEST || targetDir == HatDirection.NORTHEAST || targetDir == HatDirection.NORTH)
                     adjustedDir = HatDirection.NORTH;
                 else
                     adjustedDir = HatDirection.SOUTH;
             }
-            else if (hatDirectionality == HatDirectionality.FOURWAY)
+            else if (hatDirectionality == HatDirectionality.FOUR_WAY)
             {
                 if (targetDir == HatDirection.NORTHWEST)
                     adjustedDir = HatDirection.WEST;
@@ -235,7 +235,7 @@ namespace Alexandria.cAPI
         }
 
         private static readonly Dictionary<string, HatDirection> CachedSpriteDirections = new();
-        public HatDirection FetchOwnerFacingDirection()
+        private HatDirection FetchOwnerFacingDirection()
         {
             if (cachedDef == null)
                 return HatDirection.EAST; // return a sane default if we're ownerless
@@ -271,7 +271,7 @@ namespace Alexandria.cAPI
 
         private static Vector2 baseOffset;
         private static Vector2 animationFrameSpecificOffset;
-		public Vector3 GetHatPosition(PlayerController player)
+		private Vector3 GetHatPosition(PlayerController player)
         {
             if (!hatSprite)
                 return Vector3.zero; // can't do anything if our hat doesn't have a sprite yet
@@ -300,7 +300,7 @@ namespace Alexandria.cAPI
             return baseOffset + animationFrameSpecificOffset + (flipped ? hatFlipOffset : hatOffset) + playerSpecificOffset;
         }
 
-        public void StickHatToPlayer(PlayerController player)
+        internal void StickHatToPlayer(PlayerController player)
         {
             if (hatOwner == null)
                 hatOwner = player;
@@ -315,17 +315,17 @@ namespace Alexandria.cAPI
 
         private void HandleAttachedSpriteDepth()
         {
-            if (hatDepthType == HatDepthType.AlwaysInFront)
+            if (hatDepthType == HatDepthType.ALWAYS_IN_FRONT)
                 hatSprite.HeightOffGround = 0.1f;
-            else if (hatDepthType == HatDepthType.AlwaysBehind)
+            else if (hatDepthType == HatDepthType.ALWAYS_BEHIND)
                 hatSprite.HeightOffGround = -0.6f;
             else
             {
                 bool facingBack = (currentDirection == HatDirection.NORTH || currentDirection == HatDirection.NORTHEAST || currentDirection == HatDirection.NORTHWEST);
-                if (hatDepthType == HatDepthType.BehindWhenFacingBack)
-    			    hatSprite.HeightOffGround = facingBack ? -0.85f :  0.85f;
+                if (hatDepthType == HatDepthType.BEHIND_WHEN_FACING_BACK)
+    			    hatSprite.HeightOffGround = facingBack ? -0.6f :  0.1f;
                 else
-                    hatSprite.HeightOffGround = facingBack ?  1.15f : -1.15f;
+                    hatSprite.HeightOffGround = facingBack ?  0.1f : -0.6f;
             }
             hatSprite.UpdateZDepth();
         }
@@ -348,8 +348,8 @@ namespace Alexandria.cAPI
 
         private void StartFlipping()
         {
-            if (GameManager.AUDIO_ENABLED && !string.IsNullOrEmpty(FlipStartedSound))
-                AkSoundEngine.PostEvent(FlipStartedSound, gameObject);
+            if (GameManager.AUDIO_ENABLED && !string.IsNullOrEmpty(flipStartedSound))
+                AkSoundEngine.PostEvent(flipStartedSound, gameObject);
             rollLength = hatOwner.rollStats.GetModifiedTime(hatOwner);
             currentState = HatState.FLIPPING;
             startRolTime = BraveTime.ScaledTimeSinceStartup;
@@ -368,14 +368,14 @@ namespace Alexandria.cAPI
             if (((BraveTime.ScaledTimeSinceStartup - startRolTime) >= rollLength) || hatOwner.IsSlidingOverSurface)
             {
                 StickHatToPlayer(hatOwner);
-                if (GameManager.AUDIO_ENABLED && !string.IsNullOrEmpty(FlipEndedSound))
-                    AkSoundEngine.PostEvent(FlipEndedSound, gameObject);
+                if (GameManager.AUDIO_ENABLED && !string.IsNullOrEmpty(flipEndedSound))
+                    AkSoundEngine.PostEvent(flipEndedSound, gameObject);
                 return;
             }
 
             // logic for doing the actual flipping
             float rollAmount = 360f * (BraveTime.DeltaTime / rollLength);
-            this.transform.RotateAround(this.sprite.WorldCenter, Vector3.forward, rollAmount * SpinSpeedMultiplier * (hatOwner.sprite.FlipX ? 1f : -1f));
+            this.transform.RotateAround(this.sprite.WorldCenter, Vector3.forward, rollAmount * flipSpeedMultiplier * (hatOwner.sprite.FlipX ? 1f : -1f));
             float percentDone = (BraveTime.ScaledTimeSinceStartup - startRolTime) / rollLength;
             flipOffset.y = BASE_FLIP_HEIGHT * flipHeightMultiplier * Mathf.Sin(Mathf.PI * percentDone);
             this.transform.position = GetHatPosition(hatOwner) + flipOffset;
@@ -383,19 +383,19 @@ namespace Alexandria.cAPI
 
         public enum HatDepthType
         {
-            AlwaysInFront,
-            AlwaysBehind,
-            BehindWhenFacingBack,
-            InFrontWhenFacingBack
+            ALWAYS_IN_FRONT,
+            ALWAYS_BEHIND,
+            BEHIND_WHEN_FACING_BACK,
+            IN_FRONT_WHEN_FACING_BACK
 		}
 
         public enum HatDirectionality
         {
             NONE,
-            TWOWAYHORIZONTAL,
-            TWOWAYVERTICAL,
-            FOURWAY,
-            SIXWAY,
+            TWO_WAY_HORIZONTAL,
+            TWO_WAY_VERTICAL,
+            FOUR_WAY,
+            SIX_WAY,
         }
 
         public enum HatRollReaction
