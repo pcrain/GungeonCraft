@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.11.1 (2024-04-04)
+
+- Fixed hang when trying to access the hat room after starting a run and returning to the Breach 
+
 ## 1.11.0 (2024-04-04)
 
 - Added 56 cosmetic hats! :D
