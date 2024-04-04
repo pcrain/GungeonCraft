@@ -164,7 +164,10 @@ namespace Alexandria.cAPI
                 base.sprite.renderer.enabled = true;
 
             if (!Visible && !shouldBeVanished)
+            {
                 SpriteOutlineManager.AddOutlineToSprite(hatSprite, Color.black, 1);
+                HandleAttachedSpriteDepth();
+            }
             else if (Visible && shouldBeVanished)
                 SpriteOutlineManager.RemoveOutlineFromSprite(hatSprite);
         }

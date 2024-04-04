@@ -84,6 +84,12 @@ namespace Alexandria.cAPI
       slimPedestal.MakeRigidBody(dimensions: new IntVector2(20, 21), offset: new IntVector2(0, 0));
       slimPedestal.GetComponent<tk2dSprite>().HeightOffGround = -3;
 
+      GameObject pedestalShadow = UnityEngine.Object.Instantiate(GameManager.Instance.Dungeon.sharedSettingsPrefab.ChestsForBosses.elements[0]
+        .gameObject.GetComponent<RewardPedestal>().transform.Find("Pedestal_Shadow").gameObject);
+      pedestalShadow.transform.parent = slimPedestal.transform;
+      pedestalShadow.transform.localPosition = new Vector2(-0.0625f, -0.25f);
+      pedestalShadow.transform.localScale = new Vector3(0.8f, 1f, 1f);
+
       hatRoomExit = ItemAPI.ItemBuilder.AddSpriteToObject("HatRoomExit", $"{BASE_RES_PATH}/hat_room_exit.png");
       hatRoomExit.MakeRigidBody(dimensions: new IntVector2(22, 16), offset: new IntVector2(12, 8));
 
@@ -233,7 +239,7 @@ namespace Alexandria.cAPI
       hatRoomCenter = newRoom.area.Center;
       GameObject returner = UnityEngine.Object.Instantiate(hatRoomExit);
       tk2dSprite returnerSprite = returner.GetComponent<tk2dSprite>();
-      returnerSprite.PlaceAtPositionByAnchor(hatRoomCenter + new Vector2(0, -1.5f), tk2dBaseSprite.Anchor.LowerCenter);
+      returnerSprite.PlaceAtPositionByAnchor(hatRoomCenter + new Vector2(0, -1.3125f), tk2dBaseSprite.Anchor.LowerCenter);
       returnerSprite.HeightOffGround = -3f;
       returnerSprite.UpdateZDepth();
       returner.GetComponent<SpeculativeRigidbody>().OnPreRigidbodyCollision += PreWarpBackFromHatRoom;
@@ -295,6 +301,7 @@ namespace Alexandria.cAPI
           // GameObject pedObj = UnityEngine.Object.Instantiate(hat.goldenPedestal ? goldPedestal : plainPedestal);
           GameObject pedObj = UnityEngine.Object.Instantiate(slimPedestal);
           pedObj.GetComponent<tk2dSprite>().PlaceAtPositionByAnchor(new Vector3(pedX, pedY, PEDESTAL_Z), tk2dBaseSprite.Anchor.LowerCenter);
+          SpriteOutlineManager.AddOutlineToSprite(pedObj.GetComponent<tk2dSprite>(), Color.black, zOffset: PEDESTAL_Z);
 
           HatPedestal pedestal = pedObj.AddComponent<HatPedestal>();
           pedestal.hat = hat;
@@ -314,7 +321,7 @@ namespace Alexandria.cAPI
               tk2dBaseSprite.Anchor.LowerCenter);
             sprite.HeightOffGround = HAT_Z_OFFSET;
             sprite.UpdateZDepth();
-            SpriteOutlineManager.AddOutlineToSprite(pedestalHatObject.GetComponent<tk2dSprite>(), Color.black, HAT_Z_OFFSET);
+            SpriteOutlineManager.AddOutlineToSprite(pedestalHatObject.GetComponent<tk2dSprite>(), Color.black, zOffset: HAT_Z_OFFSET);
           }
           room.RegisterInteractable(pedestal as IPlayerInteractable);
         }
@@ -358,6 +365,7 @@ namespace Alexandria.cAPI
       yield return new WaitForSeconds(0.15f);
       if (preWarpSetup != null)
         preWarpSetup();
+      p.ForceStopDodgeRoll();
       p.WarpToPointAndBringCoopPartner(positionFunc(), doFollowers: true);
       GameManager.Instance.MainCameraController.ForceToPlayerPosition(p);
       if (forceDirection.HasValue)
@@ -396,7 +404,7 @@ namespace Alexandria.cAPI
             hatCont.RemoveCurrentHat();
           else
             hatCont.SetHat(hat);
-          LootEngine.DoDefaultItemPoof(interactor.sprite.WorldTopCenter);
+          LootEngine.DoDefaultItemPoof(interactor.sprite.WorldBottomCenter + new Vector2(0f, 1f)); //TODO: sanity check this
         }
         else
           AkSoundEngine.PostEvent("Play_OBJ_purchase_unable_01", base.gameObject);

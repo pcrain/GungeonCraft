@@ -138,7 +138,8 @@ namespace Alexandria.cAPI
             animation.clips = new tk2dSpriteAnimationClip[0];
             hatObj.GetOrAddComponent<tk2dSpriteAnimator>().Library = animation;
 
-            Vector2 lowerCenterOffset = new Vector2(-0.5f * def.position3.x, 0); // use the same offset for every sprite for a hat to avoid alignment jankiness
+            // use the same offset for every sprite for a hat to avoid alignment jankiness
+            Vector2 lowerCenterOffset = new Vector2(-def.untrimmedBoundsDataCenter.x, 0);
             animation.AddHatAnimation(animName: "hat_south",     spriteNames: SouthAnimation,     fps: fps, callingASM: callingASM, def: def, offset: lowerCenterOffset);
             animation.AddHatAnimation(animName: "hat_north",     spriteNames: NorthAnimation,     fps: fps, callingASM: callingASM, def: def, offset: lowerCenterOffset);
             animation.AddHatAnimation(animName: "hat_west",      spriteNames: WestAnimation,      fps: fps, callingASM: callingASM, def: def, offset: lowerCenterOffset);
