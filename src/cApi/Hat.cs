@@ -34,6 +34,7 @@ namespace Alexandria.cAPI
         public bool              flipHorizontalWithPlayer = true;
         public string            unlockHint               = null;
         public bool              showSilhouetteWhenLocked = false;
+        public OverridableBool   vanishOverrides          = new(false);
 
         public bool   HasBeenUnlocked => unlockPrereqs.All(p => p.CheckConditionsFulfilled());
         public string UnlockText      => string.IsNullOrEmpty(unlockHint) ? LOCKED_TEXT : $"{LOCKED_TEXT}\n\n{unlockHint}";
@@ -139,11 +140,15 @@ namespace Alexandria.cAPI
         {
             if (!hatOwner || !hatOwner.IsVisible || !hatOwner.sprite.renderer.enabled)
                 return true;
+            if (vanishOverrides.Value)
+                return true;
             if (hatOwner.IsFalling || hatOwner.IsGhost)
                 return true;
             if(!hatOwnerAnimator || hatOwnerAnimator.CurrentClip.name == "doorway" || hatOwnerAnimator.CurrentClip.name == "spinfall")
                 return true;
-            if ((PlayerHasAdditionalVanishOverride() || hatRollReaction == HatRollReaction.VANISH) && hatOwner.IsDodgeRolling)
+            if (hatOwner.HasPickupID(436)) // 436 == Bloodied Scarf
+                return true;
+            if ((hatRollReaction == HatRollReaction.VANISH) && hatOwner.IsDodgeRolling)
                 return true;
             if (hatOwner.IsSlidingOverSurface)
                 return true;
@@ -170,11 +175,6 @@ namespace Alexandria.cAPI
             }
             else if (Visible && shouldBeVanished)
                 SpriteOutlineManager.RemoveOutlineFromSprite(hatSprite);
-        }
-
-        private bool PlayerHasAdditionalVanishOverride()
-        {
-            return (hatOwner && hatOwner.HasPickupID(436)); // 436 == Bloodied Scarf
         }
 
 		private void UpdateHatFacingDirection()
@@ -365,7 +365,7 @@ namespace Alexandria.cAPI
                 return; // don't do anything while time is frozen
             if (currentState != HatState.FLIPPING)
                 return; // not flipping, so nothing to do
-            if (hatRollReaction != HatRollReaction.FLIP || PlayerHasAdditionalVanishOverride())
+            if (hatRollReaction != HatRollReaction.FLIP || vanishOverrides.Value)
                 return; // no flipping needed
 
             if (((BraveTime.ScaledTimeSinceStartup - startRolTime) >= rollLength) || hatOwner.IsSlidingOverSurface)
