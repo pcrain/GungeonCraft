@@ -3,6 +3,7 @@
 ## Future
 
 - Fixed null deref in Comfy Slippers due to trying to get position of nonexistent owner when updating on the ground
+- Added 11 hats!
 
 ## 1.11.1 (2024-04-04)
 

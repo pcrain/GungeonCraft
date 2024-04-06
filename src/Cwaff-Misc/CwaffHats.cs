@@ -8,7 +8,7 @@ public static class CwaffHats
       {
         EasyHat(name: "debug_hat",      offset: null, excluded: true);
         EasyHat(name: "debug_glasses",  offset: null, onEyes: true, excluded: true);
-        EasyHat(name: "arrow_hat",      offset: new IntVector2( 0,  0), fps: 8, locked: true, excluded: true);
+        EasyHat(name: "arrow_hat",      offset: null, fps: 8, locked: true, excluded: true);
       }
       EasyHat(name: "toad_hat",              offset: new IntVector2( 0, -3));
       EasyHat(name: "bunny_hood",            offset: new IntVector2( 0, -3));
@@ -66,9 +66,20 @@ public static class CwaffHats
       EasyHat(name: "payday_bandana",        offset: new IntVector2(-2, -5));
       EasyHat(name: "winchester_hat",        offset: new IntVector2( 0, -3));
       EasyHat(name: "zero_helmet",           offset: new IntVector2( 0, -8));
+      EasyHat(name: "wizbang_hat",           offset: new IntVector2( 0, -3));
+      EasyHat(name: "police_hat",            offset: new IntVector2( 0, -6), autoFlip: true);
+      EasyHat(name: "sheriff_hat",           offset: new IntVector2( 0, -6), autoFlip: true);
+      EasyHat(name: "traffic_officer_hat",   offset: new IntVector2( 0, -6), autoFlip: true);
+      EasyHat(name: "nitra_hat",             offset: new IntVector2( 0, -1));
+      EasyHat(name: "rad_hat",               offset: new IntVector2( 1, -1));
+      EasyHat(name: "blobulon_hat",          offset: new IntVector2( 0, -2));
+      EasyHat(name: "cardboard_box",         offset: new IntVector2( 0, -3));
+      EasyHat(name: "squire_helmet",         offset: new IntVector2( 0, -5), onEyes: true/*, depth: Hat.HatDepthType.ALWAYS_IN_FRONT*/);
+      EasyHat(name: "jackolantern",          offset: new IntVector2( 0, -2), displayName: "Jack O'Lantern");
+      EasyHat(name: "pizza_hat",             offset: new IntVector2( 0, -3));
     }
 
-    private static void EasyHat(string name, IntVector2? offset = null, bool onEyes = false, int fps = 1, bool locked = false, string displayName = null, bool excluded = false)
+    private static void EasyHat(string name, IntVector2? offset = null, bool onEyes = false, int fps = 1, bool locked = false, string displayName = null, bool excluded = false, bool? autoFlip = null, Hat.HatDepthType? depth = null)
     {
       HatUtility.SetupHat(
         name: displayName ?? name.Replace("_", " ").ToTitleCaseInvariant(),
@@ -83,11 +94,11 @@ public static class CwaffHats
         pixelOffset: offset,
         fps: fps,
         attachLevel: onEyes ? Hat.HatAttachLevel.EYE_LEVEL : Hat.HatAttachLevel.HEAD_TOP,
-        depthType: onEyes ? Hat.HatDepthType.BEHIND_WHEN_FACING_BACK : Hat.HatDepthType.ALWAYS_IN_FRONT,
-        flipHorizontalWithPlayer: null,
-        unlockFlags: locked ? new(){GungeonFlags.ITEMSPECIFIC_RAT_CHEESEWHEEL} : null,
-        unlockHint: "Sample Unlock Hint",
-        showSilhouetteWhenLocked: true,
+        depthType: depth ?? (onEyes ? Hat.HatDepthType.BEHIND_WHEN_FACING_BACK : Hat.HatDepthType.ALWAYS_IN_FRONT),
+        flipHorizontalWithPlayer: autoFlip,
+        // unlockFlags: locked ? new(){GungeonFlags.ITEMSPECIFIC_RAT_CHEESEWHEEL} : null,
+        // unlockHint: "Sample Unlock Hint",
+        // showSilhouetteWhenLocked: true,
         excludeFromHatRoom: excluded
         );
     }
