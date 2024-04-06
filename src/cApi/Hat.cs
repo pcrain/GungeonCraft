@@ -291,8 +291,6 @@ namespace Alexandria.cAPI
             return def.boundsDataCenter.y + 0.5f * def.boundsDataExtents.y;
         }
 
-        private static Vector2 baseOffset;
-        private static Vector2 animationFrameSpecificOffset;
 		private Vector3 GetHatPosition(PlayerController player)
         {
             if (!hatSprite)
@@ -311,10 +309,10 @@ namespace Alexandria.cAPI
                 if ((hatWidth + playerWidth) % 2 == 1) // if the sum of our player sprite width and hat sprite width is odd, we need to adjust by another half pixel
                     effectiveX += 1f/32f;
             }
-            baseOffset.Set(effectiveX, player.sprite.transform.position.y);
+            Vector2 baseOffset = new(effectiveX, player.sprite.transform.position.y);
 
             // get the animation frame specific offset, if one is available
-            animationFrameSpecificOffset.Set(0, GetDefOffset(cachedDef));
+            Vector2 animationFrameSpecificOffset = new(0, GetDefOffset(cachedDef));
             if (offsetDict.TryGetValue(GetSpriteBaseName(cachedDef.name), out Hatabase.FrameOffset frameOffset))
                 animationFrameSpecificOffset += flipped ? frameOffset.flipOffset : frameOffset.offset;
 
@@ -377,7 +375,6 @@ namespace Alexandria.cAPI
             startRolTime = BraveTime.ScaledTimeSinceStartup;
         }
 
-        private static Vector3 flipOffset = new();
         private void HandleFlip()
         {
             if (BraveTime.DeltaTime == 0.0f)
@@ -399,7 +396,7 @@ namespace Alexandria.cAPI
             float rollAmount = 360f * (BraveTime.DeltaTime / rollLength);
             this.transform.RotateAround(this.sprite.WorldCenter, Vector3.forward, rollAmount * flipSpeedMultiplier * (hatOwner.sprite.FlipX ? 1f : -1f));
             float percentDone = (BraveTime.ScaledTimeSinceStartup - startRolTime) / rollLength;
-            flipOffset.y = BASE_FLIP_HEIGHT * flipHeightMultiplier * Mathf.Sin(Mathf.PI * percentDone);
+            Vector3 flipOffset = new(0f, BASE_FLIP_HEIGHT * flipHeightMultiplier * Mathf.Sin(Mathf.PI * percentDone), 0f);
             this.transform.position = GetHatPosition(hatOwner) + flipOffset;
         }
 
