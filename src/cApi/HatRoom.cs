@@ -21,12 +21,10 @@ namespace Alexandria.cAPI
     private const float PEDESTAL_Z         = 10.8f;
     private const float HAT_Z_OFFSET       = 1f;
 
-    private static readonly Vector3 ENTRANCE_POSITION = new Vector3(59.75f, 36f, 36.875f);
+    private static readonly Vector3 ENTRANCE_POSITION = new Vector3(60.0f - 1f/16f, 36.5f, 36.875f);
 
-    private static GameObject entrance              = null;
+    private static GameObject hatRoomEntrance       = null;
     private static GameObject hatRoomExit           = null;
-    private static GameObject plainPedestal         = null;
-    private static GameObject goldPedestal          = null;
     private static GameObject slimPedestal          = null;
     private static bool needToGenHatRoom            = true;
     private static bool createdPrefabs              = false;
@@ -46,7 +44,7 @@ namespace Alexandria.cAPI
           CreatePrefabsIfNeeded();
           CreateHatRoomPrototypeIfNeeded();
           // Set up hat room entrance and warp points
-          UnityEngine.Object.Instantiate(entrance, ENTRANCE_POSITION, Quaternion.identity)
+          UnityEngine.Object.Instantiate(hatRoomEntrance, ENTRANCE_POSITION, Quaternion.identity)
             .GetComponent<SpeculativeRigidbody>().OnCollision += WarpToHatRoom;
           runtimeRoom = null;
           needToGenHatRoom = false;
@@ -68,17 +66,9 @@ namespace Alexandria.cAPI
       if (createdPrefabs)
         return;
 
-      entrance = ItemAPI.ItemBuilder.AddSpriteToObject("Entrance", $"{BASE_RES_PATH}/Entrance.png");
-      entrance.MakeRigidBody(dimensions: new IntVector2(30, 30), offset: new IntVector2(20, 10));
-      entrance.GetComponent<tk2dSprite>().HeightOffGround = -15;
-
-      plainPedestal = ItemAPI.ItemBuilder.AddSpriteToObject("plainPedestal", $"{BASE_RES_PATH}/pedestal.png");
-      plainPedestal.MakeRigidBody(dimensions: new IntVector2(26, 23), offset: new IntVector2(0, 0));
-      plainPedestal.GetComponent<tk2dSprite>().HeightOffGround = -3;
-
-      goldPedestal = ItemAPI.ItemBuilder.AddSpriteToObject("goldPedestal", $"{BASE_RES_PATH}/pedestal_gold.png");
-      goldPedestal.MakeRigidBody(dimensions: new IntVector2(26, 23), offset: new IntVector2(0, 0));
-      goldPedestal.GetComponent<tk2dSprite>().HeightOffGround = -3;
+      hatRoomEntrance = ItemAPI.ItemBuilder.AddSpriteToObject("Entrance", $"{BASE_RES_PATH}/hat_room_entrance.png");
+      hatRoomEntrance.MakeRigidBody(dimensions: new IntVector2(30, 50), offset: new IntVector2(12, 0));
+      hatRoomEntrance.GetComponent<tk2dSprite>().HeightOffGround = -15;
 
       slimPedestal = ItemAPI.ItemBuilder.AddSpriteToObject("slimPedestal", $"{BASE_RES_PATH}/hat_pedestal.png");
       slimPedestal.MakeRigidBody(dimensions: new IntVector2(20, 21), offset: new IntVector2(0, 0));
