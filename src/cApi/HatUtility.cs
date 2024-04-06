@@ -23,12 +23,12 @@ namespace Alexandria.cAPI
             ETGModConsole.Commands.AddGroup("capi");
             ETGModConsole.Commands.GetGroup("capi").AddUnit("sethat", new Action<string[]>(SetHat1), HatAutoCompletionSettings);
             ETGModConsole.Commands.GetGroup("capi").AddUnit("2sethat", new Action<string[]>(SetHat2), HatAutoCompletionSettings);
-            ETGModConsole.Commands.GetGroup("capi").AddUnit("reload", new Action<string[]>(ReloadHats), HatAutoCompletionSettings);
+            ETGModConsole.Commands.GetGroup("capi").AddUnit("reload_offsets", new Action<string[]>(ReloadHatOffsets), HatAutoCompletionSettings);
         }
 
         private static void SetHat1(string[] args) => SetHat(args, GameManager.Instance.PrimaryPlayer);
         private static void SetHat2(string[] args) => SetHat(args, GameManager.Instance.SecondaryPlayer);
-        private static void ReloadHats(string[] args) => Hat.LazyLoadModdedHatData(force: true);
+        private static void ReloadHatOffsets(string[] args) => LazyLoadModdedHatData(force: true);
 
 		private static void SetHat(string[] args, PlayerController playa)
 		{
@@ -204,6 +204,85 @@ namespace Alexandria.cAPI
             if (!player || player.GetComponent<HatController>() is not HatController hc)
                 return null;
             return hc.CurrentHat;
+        }
+
+        private static bool loadedModdedHatData = false;
+        internal static void LazyLoadModdedHatData(bool force = false)
+        {
+            if (loadedModdedHatData && !force)
+                return;
+
+            string[] hatDataPaths = Directory.GetFiles(BepInEx.Paths.PluginPath, "hatdata.txt", SearchOption.AllDirectories);
+            foreach (string hatData in hatDataPaths)
+            {
+                string dir = Path.GetDirectoryName(hatData);
+                string charData = Path.Combine(dir, "characterdata.txt");
+                if (!File.Exists(charData))
+                    continue;
+                // ETGModConsole.Log($"found hatdata in {dir}");
+                Dictionary<string, Hatabase.FrameOffset> headOffsets = null;
+                Dictionary<string, Hatabase.FrameOffset> eyeOffsets = null;
+                string charName = null;
+                string charObjName = null;
+                foreach (string line in File.ReadAllLines(charData))
+                {
+                    if (!line.Contains("name short:"))
+                        continue;
+                    charName = line.Split(':')[1].Trim();
+                    // ETGModConsole.Log($"found character {charName}");
+                    charObjName = $"Player{charName}(Clone)";
+                    if (!Hatabase.ModdedHeadFrameOffsets.TryGetValue(charObjName, out headOffsets))
+                        headOffsets = Hatabase.ModdedHeadFrameOffsets[charObjName] = new();
+                    if (!Hatabase.ModdedEyeFrameOffsets.TryGetValue(charObjName, out eyeOffsets))
+                        eyeOffsets = Hatabase.ModdedEyeFrameOffsets[charObjName] = new();
+                    break;
+                }
+                if (charName == null)
+                {
+                    Debug.Log($"failed to find characterdata.txt in {dir}");
+                    continue;
+                }
+                foreach (string line in File.ReadAllLines(hatData))
+                {
+                    string[] fields = Regex.Replace(line, @"\s+", " ").Split(' ');
+                    if (fields.Length == 0 || fields[0].Length == 0 || fields[0][0] == '#')
+                        continue;
+                    try
+                    {
+                        if (fields.Length < 3)
+                            continue;
+                        string frame = fields[0];
+                        int headX = Int32.Parse(fields[1]);
+                        int headY = Int32.Parse(fields[2]);
+
+                        int eyeX = headX;
+                        int eyeY = headY;
+                        if (fields.Length >= 5)
+                        {
+                            eyeX = Int32.Parse(fields[3]);
+                            eyeY = Int32.Parse(fields[4]);
+                        }
+
+                        if (frame == "DEFAULT")
+                        {
+                            Hatabase.HeadLevel[charObjName] = new Vector2(0.0625f * headX, 0.0625f * headY);
+                            Hatabase.EyeLevel[charObjName] = new Vector2(0.0625f * eyeX, 0.0625f * eyeY);
+                        }
+                        else
+                        {
+                            headOffsets[frame] = new Hatabase.FrameOffset(headX, headY);
+                            eyeOffsets[frame] = new Hatabase.FrameOffset(eyeX, eyeY);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        continue; // failed to parse line, nothing to do
+                    }
+                }
+                Debug.Log($"loaded {headOffsets.Keys.Count} custom hat offsets for {charName}");
+            }
+
+            loadedModdedHatData = true;
         }
     }
 }

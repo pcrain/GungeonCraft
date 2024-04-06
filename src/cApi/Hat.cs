@@ -60,87 +60,6 @@ namespace Alexandria.cAPI
 
         public void AddUnlockPrerequisite(DungeonPrerequisite prereq) => unlockPrereqs.Add(prereq);
 
-        private static bool loadedModdedHatData = false;
-        internal static void LazyLoadModdedHatData(bool force = false)
-        {
-            if (loadedModdedHatData && !force)
-                return;
-
-            System.Diagnostics.Stopwatch hatWatch = System.Diagnostics.Stopwatch.StartNew();
-            string[] hatDataPaths = Directory.GetFiles(BepInEx.Paths.PluginPath, "hatdata.txt", SearchOption.AllDirectories);
-            foreach (string hatData in hatDataPaths)
-            {
-                string dir = Path.GetDirectoryName(hatData);
-                string charData = Path.Combine(dir, "characterdata.txt");
-                if (!File.Exists(charData))
-                    continue;
-                // ETGModConsole.Log($"found hatdata in {dir}");
-                Dictionary<string, Hatabase.FrameOffset> headOffsets = null;
-                Dictionary<string, Hatabase.FrameOffset> eyeOffsets = null;
-                string charName = null;
-                string charObjName = null;
-                foreach (string line in File.ReadAllLines(charData))
-                {
-                    if (!line.Contains("name short:"))
-                        continue;
-                    charName = line.Split(':')[1].Trim();
-                    // ETGModConsole.Log($"found character {charName}");
-                    charObjName = $"Player{charName}(Clone)";
-                    if (!Hatabase.ModdedHeadFrameOffsets.TryGetValue(charObjName, out headOffsets))
-                        headOffsets = Hatabase.ModdedHeadFrameOffsets[charObjName] = new();
-                    if (!Hatabase.ModdedEyeFrameOffsets.TryGetValue(charObjName, out eyeOffsets))
-                        eyeOffsets = Hatabase.ModdedEyeFrameOffsets[charObjName] = new();
-                    break;
-                }
-                if (charName == null)
-                {
-                    Debug.Log($"failed to find characterdata.txt in {dir}");
-                    continue;
-                }
-                foreach (string line in File.ReadAllLines(hatData))
-                {
-                    string[] fields = Regex.Replace(line, @"\s+", " ").Split(' ');
-                    if (fields.Length == 0 || fields[0].Length == 0 || fields[0][0] == '#')
-                        continue;
-                    try
-                    {
-                        if (fields.Length < 3)
-                            continue;
-                        string frame = fields[0];
-                        int xoff = Int32.Parse(fields[1]);
-                        int yoff = Int32.Parse(fields[2]);
-
-                        int eyex = xoff;
-                        int eyey = yoff;
-                        if (fields.Length >= 5)
-                        {
-                            eyex = Int32.Parse(fields[3]);
-                            eyey = Int32.Parse(fields[4]);
-                        }
-
-                        if (frame == "DEFAULT")
-                        {
-                            Hatabase.HeadLevel[charObjName] = new Vector2(0.0625f * xoff, 0.0625f * yoff);
-                            Hatabase.EyeLevel[charObjName] = new Vector2(0.0625f * eyex, 0.0625f * eyey);
-                        }
-                        else
-                        {
-                            headOffsets[frame] = new Hatabase.FrameOffset(xoff, yoff);
-                            eyeOffsets[frame] = new Hatabase.FrameOffset(eyex, eyey);
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        continue; // failed to parse line, nothing to do
-                    }
-                }
-                Debug.Log($"loaded {headOffsets.Keys.Count} custom frames for {charName}");
-            }
-            hatWatch.Stop(); System.Console.WriteLine($"    loaded modded hat data in {hatWatch.ElapsedMilliseconds,4}ms");
-
-            loadedModdedHatData = true;
-        }
-
         private void Start()
         {
             if (!hatOwner)
@@ -162,17 +81,17 @@ namespace Alexandria.cAPI
             ownerIsModdedChar = !headOffsets.TryGetValue(hatOwner.sprite.spriteAnimator.library.name, out playerSpecificOffset);
             if (ownerIsModdedChar)
             {
-                LazyLoadModdedHatData();
-                ETGModConsole.Log($"attempting to get hat offsets for modded character {hatOwner.gameObject.name}");
+                HatUtility.LazyLoadModdedHatData();
+                // ETGModConsole.Log($"attempting to get hat offsets for modded character {hatOwner.gameObject.name}");
                 if (!headOffsets.TryGetValue(hatOwner.gameObject.name, out playerSpecificOffset))
                 {
-                    ETGModConsole.Log($"  no default head level offset for {hatOwner.gameObject.name}");
+                    // ETGModConsole.Log($"  no default head level offset for {hatOwner.gameObject.name}");
                     playerSpecificOffset = onEyes ? Hatabase.defaultEyeLevelOffset : Hatabase.defaultHeadLevelOffset;
                 }
                 var moddedFrameOffsets = onEyes ? Hatabase.ModdedEyeFrameOffsets : Hatabase.ModdedHeadFrameOffsets;
                 if (!moddedFrameOffsets.TryGetValue(hatOwner.gameObject.name, out offsetDict))
                 {
-                    ETGModConsole.Log($"  no frame offset data for {hatOwner.gameObject.name}");
+                    // ETGModConsole.Log($"  no frame offset data for {hatOwner.gameObject.name}");
                     offsetDict = onEyes ? Hatabase.EyeFrameOffsets : Hatabase.HeadFrameOffsets;
                 }
             }
