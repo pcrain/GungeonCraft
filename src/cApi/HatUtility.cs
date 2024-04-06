@@ -57,13 +57,81 @@ namespace Alexandria.cAPI
                 ETGModConsole.Log("<size=100><color=#ff0000ff>Error: Hat '</color></size>" + processedHatName + "<size=100><color=#ff0000ff>' not found in Hatabase</color></size>", false);
         }
 
+        /// <summary>Set up a new custom hat and register it in the hatabase</summary>
+        /// <param name="name">
+        /// The name of the hat as displayed in the hat room. Mandatory parameter.
+        /// </param>
+        /// <param name="spritePaths">
+        /// A list of sprite paths for the hat. Sprite paths must end with [direction]_###.png, where ### is a three digit number starting with 001 and [direction]
+        ///  is one of "south", "north", "east", "west", "northeast", and "northwest". Hat directionality and animations are set up automatically depending on
+        ///  the list of sprite paths passed during set up. Mandatory parameter.
+        /// </param>
+        /// <param name="pixelOffset">
+        /// The pixel offset of the hat relative to the default hat / eyewear position. Positve x is right, negative x is left, positive y is up, negative y is down.
+        ///  Defaults to (0,0).
+        /// </param>
+        /// <param name="fps">
+        /// The frame rate of the hat's animations, if present. Defaults to 4.
+        /// </param>
+        /// <param name="attachLevel">
+        /// Where the hat is positioned relatived to the player. HEAD_TOP positions the hat relative to the player's head, and EYE_LEVEL positions the hat relative
+        ///  to the player's eyes. Defaults to HEAD_TOP.
+        /// </param>
+        /// <param name="depthType">
+        /// The poisitioning of the hat relative to the camera.
+        ///   ALWAYS_IN_FRONT makes the hat render closer to the camera than the player regardless of facing direction.
+        ///   ALWAYS_BEHIND makes the hat render farther from the camera than the player regardless of facing direction.
+        ///   BEHIND_WHEN_FACING_BACK makes the hat render closer to the camera when the player is facing forward, and farther from the camera when the player is facing backward.
+        ///   IN_FRONT_WHEN_FACING_BACK makes the hat render farther from the camera when the player is facing forward, and closer to the camera when the player is facing backward.
+        /// Defaults to ALWAYS_IN_FRONT.
+        /// </param>
+        /// <param name="hatRollReaction">
+        /// How the hat reacts to dodge rolls.
+        ///   FLIP makes the hat flip above the player for the duration of the dodge roll.
+        ///   VANISH makes the hat completely disappear while the player is dodge rolling.
+        ///   NONE continues to render the hat as normal while the player is dodge rolling.
+        /// Defaults to FLIP.
+        /// </param>
+        /// <param name="flipStartedSound">
+        /// An optional sound to play when the hat flips at the beginning of a dodge roll. Has no effect unless hatRollReaction is FLIP.
+        /// </param>
+        /// <param name="flipEndedSound">
+        /// An optional sound to play when the hat lands at the end of a dodge roll. Has no effect unless hatRollReaction is FLIP.
+        /// </param>
+        /// <param name="flipSpeed">
+        /// The number of full rotations the hat will make during a dodge roll. Can be fractional (e.g., 1.5f). Setting to 0 makes the hat go straight up and down.
+        ///  Has no effect unless hatRollReaction is FLIP. Defaults to 1f.
+        /// </param>
+        /// <param name="flipHeight">
+        /// A multiplier for how high the hat will flip relative to the default flip height. Has no effect unless hatRollReaction is FLIP. Defaults to 1f.
+        /// </param>
+        /// <param name="flipHorizontalWithPlayer">
+        /// Whether the hat sprite will flip horizontally with the player's sprite when facing left. Defaults to automatic (null), which is true for non-directional and
+        ///  north-south hats, and false for east-west, 4-way, and 6-way hats.
+        /// </param>
+        /// <param name="excludeFromHatRoom">
+        /// If true, this hat will not show up in the hat room, and can only be accessed via code and console commands. Defaults to false.
+        /// </param>
+        /// <param name="unlockFlags">
+        /// An optional list of GungeonFlags required to unlock this hat. Can be given custom flags using ExtendedEnums.
+        /// </param>
+        /// <param name="unlockPrereqs">
+        /// An optional list of DungeonPrerequisite required to unlock this hat. Can be given custom prerequisites using ExtendedEnums.
+        /// </param>
+        /// <param name="unlockHint">
+        /// An optional unlock hint to display when interacting with the hat's pedestal in the hat room while the hat is locked. Has no effect if the hat is not an
+        ///  unlockable hat or if the hat is excluded from the hat room.
+        /// </param>
+        /// <param name="showSilhouetteWhenLocked">
+        /// If true, a silhouette of the hat will appear above its pedestal in the hat room while the hat is locked; if false, the pedestal will simply be empty while
+        ///  the hat is locked. Has no effect if the hat is not an unlockable hat or if the hat is excluded from the hat room. Defaults to false.
+        /// </param>
         public static Hat SetupHat(
             string name, List<string> spritePaths, IntVector2? pixelOffset = null, int fps = 4,
             Hat.HatAttachLevel attachLevel = Hat.HatAttachLevel.HEAD_TOP, Hat.HatDepthType depthType = Hat.HatDepthType.ALWAYS_IN_FRONT,
             Hat.HatRollReaction hatRollReaction = Hat.HatRollReaction.FLIP, string flipStartedSound = null, string flipEndedSound = null,
-            float flipSpeed = 1f, float flipHeight = 1f, bool goldenPedestal = false, bool? flipHorizontalWithPlayer = null,
-            List<GungeonFlags> unlockFlags = null, List<DungeonPrerequisite> unlockPrereqs = null, string unlockHint = null, bool showSilhouetteWhenLocked = false,
-            bool excludeFromHatRoom = false
+            float flipSpeed = 1f, float flipHeight = 1f, bool? flipHorizontalWithPlayer = null, bool excludeFromHatRoom = false,
+            List<GungeonFlags> unlockFlags = null, List<DungeonPrerequisite> unlockPrereqs = null, string unlockHint = null, bool showSilhouetteWhenLocked = false
             )
         {
             Hat hat = UnityEngine.Object.Instantiate(new GameObject()).AddComponent<Hat>();
@@ -78,7 +146,7 @@ namespace Alexandria.cAPI
             hat.flipEndedSound = flipEndedSound;
             hat.flipSpeedMultiplier = flipSpeed;
             hat.flipHeightMultiplier = flipHeight;
-            hat.goldenPedestal = goldenPedestal;
+            hat.goldenPedestal = false; // TODO: might need to add this back in later
             hat.unlockHint = unlockHint;
             hat.showSilhouetteWhenLocked = showSilhouetteWhenLocked;
 
@@ -95,6 +163,41 @@ namespace Alexandria.cAPI
 
             AddHatToDatabase(hat, excludeFromHatRoom: excludeFromHatRoom);
             return hat;
+        }
+
+        /// <summary>Set up default hat offsets for a custom character</summary>
+        /// <param name="characterObjectName">
+        /// The name of the player prefab, as accessed by `prefabObject.name`. Will usually be "PlayerXXXX(Clone)".
+        /// </param>
+        /// <param name="defaultHeadXOffset">Default head-top hat pixel x-offset for the character.></param>
+        /// <param name="defaultHeadYOffset">Default head-top hat pixel y-offset for the character.></param>
+        /// <param name="defaultEyeXOffset">Default eye-level hat pixel x-offset for the character.></param>
+        /// <param name="defaultEyeYOffset">Default eye-level hat pixel y-offset for the character.></param>
+        public static void SetupHatOffsets(string characterObjectName, int defaultHeadXOffset, int defaultHeadYOffset, int defaultEyeXOffset, int defaultEyeYOffset)
+        {
+            Hatabase.HeadLevel[characterObjectName] = new Vector2(0.0625f * defaultHeadXOffset, 0.0625f * defaultHeadYOffset);
+            Hatabase.EyeLevel[characterObjectName] = new Vector2(0.0625f * defaultEyeXOffset, 0.0625f * defaultEyeYOffset);
+            Hatabase.ModdedHeadFrameOffsets[characterObjectName] = new();
+            Hatabase.ModdedEyeFrameOffsets[characterObjectName] = new();
+        }
+
+        /// <summary>Create additional frame-specific hat offsets for a custom character</summary>
+        /// <param name="characterObjectName">
+        /// The name of the player prefab, as accessed by `prefabObject.name`. Will usually be "PlayerXXXX(Clone)".
+        /// </param>
+        /// <param name="animationFrameName">
+        /// The name of the frame of animation whose offset should be adjusted.
+        /// </param>
+        /// <param name="headXOffset">Head-top hat pixel x-offset for the animation frame.></param>
+        /// <param name="headYOffset">Head-top hat pixel y-offset for the animation frame.></param>
+        /// <param name="eyeXOffset">Eye-level hat pixel x-offset for the animation frame.></param>
+        /// <param name="eyeYOffset">Eye-level hat pixel y-offset for the animation frame.></param>
+        public static void AddHatOffset(string characterObjectName, string animationFrameName, int headXOffset, int headYOffset, int? eyeXOffset = null, int? eyeYOffset = null)
+        {
+            Hatabase.ModdedHeadFrameOffsets[characterObjectName][animationFrameName] =
+                new Hatabase.FrameOffset(headXOffset, headYOffset);
+            Hatabase.ModdedEyeFrameOffsets[characterObjectName][animationFrameName] =
+                new Hatabase.FrameOffset(eyeXOffset ?? headXOffset, eyeYOffset ?? headYOffset);
         }
 
         private static tk2dSpriteCollectionData HatSpriteCollection = null;
