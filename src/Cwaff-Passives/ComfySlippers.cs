@@ -47,7 +47,7 @@ public class ComfySlippers : PassiveItem
     public override void Update()
     {
         base.Update();
-        if (!this.Owner?.specRigidbody)
+        if (!this.Owner || !this.Owner.specRigidbody)
             return;
 
         CellVisualData.CellFloorType cellFloorType = GameManager.Instance.Dungeon.GetFloorTypeFromPosition(this.Owner.specRigidbody.UnitBottomCenter);

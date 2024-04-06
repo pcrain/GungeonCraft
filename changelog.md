@@ -1,5 +1,9 @@
 # Changelog
 
+## Future
+
+- Fixed null deref in Comfy Slippers due to trying to get position of nonexistent owner when updating on the ground
+
 ## 1.11.1 (2024-04-04)
 
 - Fixed hang when trying to access the hat room after starting a run and returning to the Breach 
