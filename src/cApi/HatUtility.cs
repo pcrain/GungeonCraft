@@ -23,10 +23,12 @@ namespace Alexandria.cAPI
             ETGModConsole.Commands.AddGroup("capi");
             ETGModConsole.Commands.GetGroup("capi").AddUnit("sethat", new Action<string[]>(SetHat1), HatAutoCompletionSettings);
             ETGModConsole.Commands.GetGroup("capi").AddUnit("2sethat", new Action<string[]>(SetHat2), HatAutoCompletionSettings);
+            ETGModConsole.Commands.GetGroup("capi").AddUnit("reload", new Action<string[]>(ReloadHats), HatAutoCompletionSettings);
         }
 
         private static void SetHat1(string[] args) => SetHat(args, GameManager.Instance.PrimaryPlayer);
         private static void SetHat2(string[] args) => SetHat(args, GameManager.Instance.SecondaryPlayer);
+        private static void ReloadHats(string[] args) => Hat.LazyLoadModdedHatData(force: true);
 
 		private static void SetHat(string[] args, PlayerController playa)
 		{

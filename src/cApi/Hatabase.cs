@@ -37,11 +37,11 @@ namespace Alexandria.cAPI
         public static readonly Dictionary<string, string> StoredHats = new();
 
         // Default offsets for unknown / custom characters
-        public static readonly Vector2 defaultHeadLevelOffset = new Vector2(0f, -14f/16f);
-        public static readonly Vector2 defaultEyeLevelOffset  = new Vector2(0f, -19f/16f);
+        public static readonly Vector2 defaultHeadLevelOffset = new Vector2(0f,   0f/16f);
+        public static readonly Vector2 defaultEyeLevelOffset  = new Vector2(0f,  -5f/16f);
 
-        // Vertical offsets for where head-top hats should be placed on different characters (using character sprite collection name)
-        public static readonly Dictionary<string, Vector2> CharacterNameHatHeadLevel = new()
+        // Offsets for where head-top hats should be placed on different characters (using character sprite collection name)
+        public static readonly Dictionary<string, Vector2> HeadLevel = new()
         {
             {"SpaceRogueAnimation",               new Vector2(0f,  -6f/16f)},
             {"SpaceRogueSwapAnimation",           new Vector2(0f,  -3f/16f)},
@@ -60,8 +60,8 @@ namespace Alexandria.cAPI
             {"Gunslinger_Animation",              new Vector2(0f,   0f/16f)},
         };
 
-        // Vertical offsets for where eye-level hats should be placed on different characters (using character sprite collection name)
-        public static readonly Dictionary<string, Vector2> CharacterNameEyeLevel = new()
+        // Offsets for where eye-level hats should be placed on different characters (using character sprite collection name)
+        public static readonly Dictionary<string, Vector2> EyeLevel = new()
         {
             {"SpaceRogueAnimation",                new Vector2(0f, -10f/16f)},
             {"SpaceRogueSwapAnimation",            new Vector2(0f,  -8f/16f)},
@@ -723,5 +723,11 @@ namespace Alexandria.cAPI
             {"bullet_player_move_back_005",          new FrameOffset(-2,  1)},
             {"bullet_player_move_back_006",          new FrameOffset(-1,  1)},
         };
+
+        // Offsets for where head-top hats should be placed on different modded characters (using character gameObject name)
+        public static readonly Dictionary<string, Dictionary<string, FrameOffset>> ModdedHeadFrameOffsets = new();
+
+        // Offsets for where eye-level hats should be placed on different modded characters (using character gameObject name)
+        public static readonly Dictionary<string, Dictionary<string, FrameOffset>> ModdedEyeFrameOffsets = new();
     }
 }

@@ -20,6 +20,7 @@ namespace Alexandria.cAPI
         {
             static void Postfix(PlayerController __instance)
             {
+              Hat.LazyLoadModdedHatData();
               __instance.gameObject.GetOrAddComponent<HatController>();
             }
         }
