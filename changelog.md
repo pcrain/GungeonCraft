@@ -2,8 +2,9 @@
 
 ## Future
 
-- Fixed null deref in Comfy Slippers due to trying to get position of nonexistent owner when updating on the ground
 - Added 11 hats!
+- Fixed null deref in Comfy Slippers due to trying to get position of nonexistent owner when updating on the ground
+- Fixed null deref in Emergency Siren due to trying to check the user's current room without an active user
 
 ## 1.11.1 (2024-04-04)
 

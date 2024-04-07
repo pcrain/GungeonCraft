@@ -81,9 +81,10 @@ public class EmergencySiren : PlayerItem
 
     public override bool CanBeUsed(PlayerController user)
     {
-        RoomHandler room = user.CurrentRoom;
+        if (!user || user.CurrentRoom is not RoomHandler room)
+            return false;
         if (this._roomToReset != null || this._anyEnemyInRoomDied || this._anyGunFiredInRoom || user.InBossRoom()
-            || room.area.IsProceduralRoom || !user.IsInCombat || !room.IsSealed || !room.EverHadEnemies)
+          || (room.area == null) || room.area.IsProceduralRoom || !user.IsInCombat || !room.IsSealed || !room.EverHadEnemies)
             return false; // can only be used in sealed rooms with non-boss enemies before firing a gun or killing any enemy
 
         if (room.NewWaveOfEnemiesIsSpawning())
