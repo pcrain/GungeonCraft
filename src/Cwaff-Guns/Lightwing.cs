@@ -29,6 +29,17 @@ public class Lightwing : AdvancedGunBehavior
           ).Attach<LightwingProjectile>(
           );
     }
+
+    public override Projectile OnPreFireProjectileModifier(Gun gun, Projectile projectile, ProjectileModule mod)
+    {
+        if (projectile.GetComponent<LightwingProjectile>() is not LightwingProjectile lwp)
+            return projectile;
+        if (gun.CurrentOwner is not PlayerController player)
+            return projectile;
+
+        lwp.isAFreebie = projectile.FiredForFree(gun, mod);
+        return projectile;
+    }
 }
 
 public class LightwingProjectile : MonoBehaviour
@@ -47,6 +58,8 @@ public class LightwingProjectile : MonoBehaviour
     internal const float _HUNT_ACCEL        = 2.0f;
     internal const float _HUNT_SPEED_SCALE  = 2.0f;
     internal const float _HUNT_DAMAGE_SCALE = 2.0f;
+
+    public bool isAFreebie = true; // false if we fired directly from the gun and it cost us ammo, true otherwise
 
     private Projectile _projectile       = null;
     private PlayerController _owner      = null;
@@ -104,7 +117,7 @@ public class LightwingProjectile : MonoBehaviour
     {
         this._projectile = base.GetComponent<Projectile>();
         this._owner = this._projectile.Owner as PlayerController;
-        if (this._owner.CurrentGun.GetComponent<Lightwing>() is Lightwing lightwing)
+        if (!this.isAFreebie && this._owner.CurrentGun.GetComponent<Lightwing>() is Lightwing lightwing)
             this._gun = this._owner.CurrentGun;
 
         this._topSpeed = this._projectile.baseData.speed;
