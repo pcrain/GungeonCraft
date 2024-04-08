@@ -5,6 +5,7 @@
 - Added 11 hats! (sprites thanks to Dallan)
 - Migrated all hat code to Alexandria and updated required Alexandria version to 0.4.0
 - Lightwing projectiles no longer restore ammo if fired for free (e.g., with Scattershot)
+- Made Pistol Whip quieter when used with Scattershot
 - Fixed null deref in Comfy Slippers due to trying to get position of nonexistent owner when updating on the ground
 - Fixed null deref in Emergency Siren due to trying to check the user's current room without an active user
 - Fixed Vladimir impale point extending too far beyond the end of the weapon

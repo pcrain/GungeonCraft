@@ -1,5 +1,10 @@
 ﻿namespace CwaffingTheGungy;
 
+
+/* TODO:
+    - Make Pistol Whip projectiles respect players' stats
+*/
+
 public class PistolWhip : AdvancedGunBehavior
 {
     public static string ItemName         = "Pistol Whip";
@@ -57,9 +62,10 @@ public class WhipChainStartProjectile : MonoBehaviour
 {
     private void Start()
     {
+        Projectile p = base.gameObject.GetComponent<Projectile>();
         UnityEngine.GameObject.Instantiate(new GameObject(), Vector3.zero, Quaternion.identity)
             .AddComponent<WhipChainStart>()
-            .Setup(base.gameObject.GetComponent<Projectile>().Owner as PlayerController, base.gameObject.GetComponent<Projectile>().Direction.ToAngle());
+            .Setup(p.Owner as PlayerController, p.Direction.ToAngle());
         UnityEngine.GameObject.Destroy(base.gameObject);
     }
 }
@@ -93,6 +99,9 @@ public class WhipChainStart : MonoBehaviour
 
     public void Setup(PlayerController owner, float angle)
     {
+        if (!owner)
+            return;
+
         gunSprite ??= (ItemHelper.Get(Items.Magnum) as Gun).sprite;
         this._owner = owner;
         this._angle = angle;
@@ -116,7 +125,7 @@ public class WhipChainStart : MonoBehaviour
         Quaternion baseEuler = this._angle.EulerZ();
 
         this._owner.CurrentGun.ToggleRenderers(false);
-        base.gameObject.Play("whip_sound");
+        this._owner.gameObject.PlayOnce("whip_sound");
 
         tk2dSprite pistolSprite = Lazy.SpriteObject(gunSprite.collection, gunSprite.spriteId);
             pistolSprite.transform.rotation = baseEuler;
@@ -181,7 +190,7 @@ public class WhipChainStart : MonoBehaviour
                     proj2.collidesWithEnemies = true;
                     proj2.collidesWithPlayer = false;
 
-                this._owner.gameObject.Play("whip_crack_sound");
+                this._owner.gameObject.PlayOnce("whip_crack_sound");
                 spawnProjectile = false;
             }
 
