@@ -292,12 +292,12 @@
     <Reference Include="UnityEngine.TilemapModule"/>
     <Reference Include="UnityEngine.ImageConversionModule"/>
     <Reference Include="MonoMod.Utils"/>
+    <Reference Include="Alexandria"/>
     <Reference Include="MonoMod.RuntimeDetour"/>
     <Reference Include="Assembly-CSharp"/>
     <Reference Include="PlayMaker"/>
     <Reference Include="Gunfig"/>
     <Reference Include="0Harmony"/>
-    <Reference Include="Alexandria"/>
     <Reference Include="BepInEx"/>
     <Reference Include="ModTheGungeonAPI"/>
     <Reference Include="Mono.Cecil.Rocks"/>
