@@ -117,8 +117,6 @@ public static class AtlasHelper
         position3                  = offset + extents,
         boundsDataExtents          = extents,
         boundsDataCenter           = offset + 0.5f * extents,
-        // boundsDataExtents          = trueExtents,
-        // boundsDataCenter           = 0.5f * trueExtents,
         untrimmedBoundsDataExtents = trueExtents,
         untrimmedBoundsDataCenter  = 0.5f * trueExtents,
         uvs = new Vector2[]

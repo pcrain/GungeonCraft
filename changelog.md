@@ -2,10 +2,12 @@
 
 ## Future
 
-- Added 11 hats!
+- Added 11 hats! (sprites thanks to Dallan)
+- Migrated all hat code to Alexandria and updated required Alexandria version to 0.4.0
 - Fixed null deref in Comfy Slippers due to trying to get position of nonexistent owner when updating on the ground
 - Fixed null deref in Emergency Siren due to trying to check the user's current room without an active user
 - Fixed Vladimir impale point extending too far beyond the end of the weapon
+- Fixed wonky collision detection on shopkeepers
 
 ## 1.11.1 (2024-04-04)
 
@@ -16,8 +18,7 @@
 - Added 56 cosmetic hats! :D
 	- Hats are accessible via a new hat room near Winchester in the Breach
 	- Hat sprites thanks to Dallan!
-	- Hat room pedestal and exit sprites thanks to Lynceus!
-	- Hat room entrance sprite thanks to an3s!
+	- Hat room pedestal, entrance, and exit sprites thanks to Lynceus!
 - Fixed Gorgun Eye constantly making noise every frame
 
 ## 1.10.4 (2024-03-27)

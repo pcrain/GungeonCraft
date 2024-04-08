@@ -23,6 +23,9 @@ public static class FancyShopBuilder
   public static Dictionary<string, PrototypeDungeonRoom> FancyShopRooms = new();
   public static Dictionary<GameObject, List<string>> DelayedModdedLootAdditions = new();
 
+  private static int _RigidBodyHeight = 20;  // height (in pixels) of the shopkeeper's collider (width is set to the sprite's width)
+  private static IntVector2 _RigidBodyOffset = new IntVector2(0, -8); // amount beyond the bottom of the sprite the shopkeeper's rigidbody extends
+
   // public static Vector3[] defaultItemPositions = new Vector3[] {
   //   new Vector3(1.125f, 2.125f, 1),
   //   new Vector3(2.625f, 1f, 1),
@@ -65,6 +68,8 @@ public static class FancyShopBuilder
     string currencyIcon = ResMap.Get($"{npcName}_currency", quietFailure: true)?[0];
     if (!string.IsNullOrEmpty(currencyIcon))
       currencyIcon += ".png";
+
+    tk2dSpriteDefinition baseDef = VFX.Collection.GetSpriteDefinition(ResMap.Get($"{npcName}_idle")[0]);
 
     GenericLootTable lootTable = shopItems.ToLootTable();
     GameObject shop = BetterSetUpShop(
@@ -111,9 +116,8 @@ public static class FancyShopBuilder
       fortunesFavorRadius               : 2,
       poolType                          : allowDupes ? CustomShopController.ShopItemPoolType.DUPES : CustomShopController.ShopItemPoolType.DEFAULT,
       RainbowModeImmunity               : false,
-      // hitboxSize                        : null, // must be null, doesn't work properly
-      hitboxSize                        : new IntVector2(13, 19),            // must be null, doesn't work properly
-      hitboxOffset                      : new IntVector2(1, -3)            // must be null, doesn't work properly
+      hitboxSize                        : new IntVector2(Mathf.RoundToInt(C.PIXELS_PER_TILE * baseDef.boundsDataExtents.x), _RigidBodyHeight),
+      hitboxOffset                      : (C.PIXELS_PER_TILE * baseDef.position0.XY()).ToIntVector2() + _RigidBodyOffset
       );
 
     // Track how many times this shop room has been spawned in a run for prerequisite tracking purposes
