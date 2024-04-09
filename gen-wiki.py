@@ -16,13 +16,25 @@ You can download the mod or read more about it [https://thunderstore.io/c/enter-
 
 <b>NOTE: the contents of this page are generated automatically using a script.</b> Manual edits might be overwritten (sorry)! Please contact Captain Pretzel in the Mod the Gungeon Discord if anything looks amiss!
 ''',
+  "iconwidth" : "88px",
+  "tablestyle" : '''class="wikitable sortable mw-collapsible" style="text-align:center; width: 100%;"''',
 }
 
 def applyGunDataOverrides(gunData):
-  gunData["Bouncer"]["speed"]       = "Varies"
-  gunData["Carpet Bomber"]["speed"] = "Varies"
-  gunData["Aimu Hakurei"]["spread"] = "Varies"
-  gunData["Aimu Hakurei"]["firerate"] = "Varies"
+  gunData["Bouncer"]["speed"]            = "Varies"
+  gunData["Carpet Bomber"]["speed"]      = "Varies"
+  gunData["Aimu Hakurei"]["spread"]      = "Varies"
+  gunData["Aimu Hakurei"]["firerate"]    = "Varies"
+  gunData["Aimu Hakurei"]["ammo"]        = "{{infinity}}"
+  gunData["Quarter Pounder"]["ammo"]     = "# of casings"
+  gunData["Subtractor Beam"]["damage"]   = "Varies"
+  gunData["Pistol Whip"]["damage"]       = "30 (Whip), 15 (Proj.)"
+  gunData["Pistol Whip"]["firerate"]     = "0.42" # 0.40 + 1/60, rounded
+  gunData["Vacuum Cleaner"]["damage"]    = "N/A"
+  gunData["Vacuum Cleaner"]["speed"]     = "N/A"
+  gunData["Vacuum Cleaner"]["range"]     = "N/A"
+  gunData["Vacuum Cleaner"]["knockback"] = "N/A"
+  gunData["Pincushion"]["firerate"]      = "0.02" # 1/60, rounded
 
 def main():
   passiveData = scanPassives()
@@ -107,21 +119,21 @@ def resolveVariable(var, text):
   # print(f" could not resolve {var}")
   return "???"
 
-def computeCooldown(text):
+def computeItemCooldown(text):
   timed = findPattern(text, r"""ItemBuilder\.CooldownType\.Timed\s*,\s*(.+)\)""", default=None)
   if timed is not None:
     timed = resolveVariable(timed, text)
-    return f"""{timed}<br/>Second{("" if (float(timed) == 1) else "s")}"""
+    return f"""{timed} Second{("" if (float(timed) == 1) else "s")}"""
 
   damage = findPattern(text, r"""ItemBuilder\.CooldownType\.Damage\s*,\s*(.+)\)""", default=None)
   if damage is not None:
     damage = resolveVariable(damage, text)
-    return f"""{damage}<br/>Damage"""
+    return f"""{damage} Damage"""
 
   room = findPattern(text, r"""ItemBuilder\.CooldownType\.PerRoom\s*,\s*(.+)\)""", default=None)
   if room is not None:
     room = resolveVariable(room, text)
-    return f"""{room}<br/>Room{("" if (float(room) == 1) else "s")}"""
+    return f"""{room} Room{("" if (float(room) == 1) else "s")}"""
 
   return "Instant"
 
@@ -131,6 +143,13 @@ def computeClipSize(text):
   if size == -1:
     return "{{infinity}}"
   return size
+
+def computeAmmo(text):
+  infAmmo = findPattern(text, r"""infiniteAmmo\s*:\s*(.*?)(?:\.0)?f?[,\)]""") # range of pea shooter, the default gun
+  if infAmmo == "true":
+    return "{{infinity}}"
+  ammo = findPattern(text, r"""ammo\s*:\s*(.*?)[,\)]""", resolveVars = True)
+  return ammo
 
 def computeRange(text):
   gunRange = findPattern(text, r"""range\s*:\s*(.*?)(?:\.0)?f?[,\)]""", default="20") # range of pea shooter, the default gun
@@ -174,7 +193,7 @@ def scanActives():
       "itemname"    : itemname,
       "quality"     : findPattern(text, r"""item\.quality\s*=\s*ItemQuality\.(.);"""),
       "description" : makePrettyDescription(findPattern(text, r"""LongDescription\s*=\s*\"(.*)\";""")),
-      "cooldown"    : computeCooldown(text),
+      "cooldown"    : computeItemCooldown(text),
       "numuses"     : computeUses(text),
       }
     data[itemname] = entry
@@ -194,7 +213,7 @@ def scanGuns():
       "type"        : findPattern(text, r"""shootStyle\s*:\s*ShootStyle\.([A-Za-z_]+)""").replace("SemiAutomatic", "Semi-Automatic"),
       "class"       : findPattern(text, r"""GunClass\.([A-Z_]+)[,\)]"""),
       "magazine"    : computeClipSize(text),
-      "ammo"        : findPattern(text, r"""ammo\s*:\s*(.*?)[,\)]""", resolveVars = True),
+      "ammo"        : computeAmmo(text),
       "damage"      : findPattern(text, r"""damage\s*:\s*(.*?)(?:\.0)?f?[,\)]""", default="4", resolveVars = True), # damage of pea shooter, the default gun
       "speed"       : findPattern(text, r"""speed\s*:\s*(.*?)(?:\.0)?f?[,\)]""", default="20"), # velocity of pea shooter, the default gun
       "range"       : computeRange(text),
@@ -295,28 +314,28 @@ WIKI_TEMPLATE='''
 
 == Guns ==
 
-{{| class="wikitable sortable mw-collapsible" style="text-align:center; width: 95%;"
-!style="width: 20%"|Name
+{{| {tablestyle}
+!style="width: {iconwidth}"|Name
 !Qual.
 !Type
 !Class
-!Mag. Size
-!Ammo
-!Dmg.
-!{{{{Hover|Vel.|Projectile velocity}}}}
-!Range
-!{{{{Hover|Force|Projectile knockback}}}}
-!{{{{Hover|Fire Rate|Delay between shots; lower number means higher fire rate}}}}
-!{{{{Hover|Reload Speed|Number of seconds it takes to reload}}}}
-!{{{{Hover|Spread|Higher number means less accuracy}}}}
+!{{{{Hover|[[File:Drum_Clip.png]]|Clip Size}}}}
+!{{{{Hover|[[File:Ammo_Belt.png]]|Ammo Capacity}}}}
+!{{{{Hover|[[File:-1_Bullets.png]]|Projectile Damage}}}}
+!{{{{Hover|[[File:Rocket-Powered Bullets.png]]|Projectile Velocity}}}}
+!{{{{Hover|[[File:Grappling_Hook.png]]|Projectile Range}}}}
+!{{{{Hover|[[File:Heavy_Bullets.png]]|Projectile Knockback}}}}
+!{{{{Hover|[[File:Lichy Trigger Finger.png]]|Rate of fire: delay between shots; lower number means higher fire rate}}}}
+!{{{{Hover|[[File:Oiled_Cylinder.png]]|Reload Speed: Number of seconds it takes to reload}}}}
+!{{{{Hover|[[File:Scope.png]]|Spread: higher number means less accuracy}}}}
 !style="width: 50%"|Effect
 {guns}
 |}}
 
 == Active Items ==
 
-{{| class="wikitable sortable mw-collapsible" style="text-align:center; width: 95%;"
-!style="font-weight: bold; width: 20%"|Name
+{{| {tablestyle}
+!style="width: {iconwidth}"|Name
 !style="width: 48px;"|Quality
 !Cooldown
 !Uses
@@ -326,8 +345,8 @@ WIKI_TEMPLATE='''
 
 == Passive Items ==
 
-{{| class="wikitable sortable mw-collapsible" style="text-align:center; width: 95%;"
-!style="font-weight: bold; width: 20%"|Name
+{{| {tablestyle}
+!style="width: {iconwidth}"|Name
 !style="width: 48px;"|Quality
 !Effect
 {passives}
@@ -335,7 +354,7 @@ WIKI_TEMPLATE='''
 
 == NPCs ==
 
-{{| class="wikitable sortable mw-collapsible" style="text-align:center; width: 95%;"
+{{| {tablestyle}
 !style="font-weight: bold; width: 112px;"|Icon
 !Name
 !Room Icon
