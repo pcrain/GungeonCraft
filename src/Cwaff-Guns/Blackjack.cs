@@ -10,6 +10,7 @@ public class Blackjack : AdvancedGunBehavior
     private const int _DECK_SIZE = 52; // need to finish up individual playing cards later
     private const int _CLIP_SIZE = 13; // 1 suit
     private const int _NUM_DECKS = 2;
+    private const int _AMMO      = 104; // _DECK_SIZE * _NUM_DECKS //NOTE: set manually for now so wiki generation code has an easier time
 
     internal static tk2dSpriteAnimationClip _BulletSprite;
     internal static tk2dSpriteAnimationClip _BackSprite;
@@ -17,7 +18,7 @@ public class Blackjack : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Blackjack>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.8f, ammo: _DECK_SIZE * _NUM_DECKS, canGainAmmo: false,
+            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.8f, ammo: _AMMO, canGainAmmo: false,
                 shootFps: 30, reloadFps: 30, muzzleFrom: Items.Mailbox, reloadAudio: "card_shuffle_sound");
 
         gun.InitProjectile(GunData.New(clipSize: _CLIP_SIZE, cooldown: 0.16f, angleVariance: 24.0f, shootStyle: ShootStyle.Automatic,
