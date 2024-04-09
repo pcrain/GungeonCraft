@@ -50,7 +50,9 @@
 
 ### Wiki
 
-May or may not be coming soon, but all of the information and lore you'll ever need can be found in-game in the Ammonomicon. O:
+All of the information and lore you'll ever need can be found in-game in the Ammonomicon. O:
+
+That said, the GungeonCraft wiki page contains detailed information about the mod's weapons, items, and NPCs, and [can be found here](https://enterthegungeon.wiki.gg/wiki/Modding/GungeonCraft)!
 
 ### Changelog
 
