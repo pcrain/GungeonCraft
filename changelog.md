@@ -7,6 +7,7 @@
 - Fixed softlock caused by getting hit after dropping Warrior's Gi and starting a new floor
 - Fixed Ticonderogun being able to hit invulnerable enemies
 - Fixed insurance chests spawning past the first floor when continuing a saved run
+- Fixed null deref in Borrowed Time due to checking for whether non-existing rooms are combat rooms
 
 ## 1.11.2 (2024-04-07)
 
