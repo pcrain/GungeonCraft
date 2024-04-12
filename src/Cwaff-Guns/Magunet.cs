@@ -18,7 +18,8 @@ public class Magunet : AdvancedGunBehavior
     internal const float _UPDATE_RATE =   0.1f; // amount of time between debris checks / updates
     internal const float _FX_RATE     =  0.15f; // rate at which attraction vfx and sounds are played
 
-    internal const float _SQR_REACH   = _REACH * _REACH; // avoid an unnecessary sqrt() by using sqrmagnitude
+    internal const float _SQR_REACH    = _REACH * _REACH; // avoid an unnecessary sqrt() by using sqrmagnitude
+    private const float _NUM_PARTICLES = 3f;
 
     private float _timeOfLastCheck = 0.0f;
     private float _timeOfLastFX    = 0.0f;
@@ -43,7 +44,37 @@ public class Magunet : AdvancedGunBehavior
         _DebrisBigImpactVFX = Items.HegemonyRifle.EnemyImpactVFX();
     }
 
-    private const float _NUM_PARTICLES = 3f;
+    public override void OnSwitchedAwayFromThisGun()
+    {
+        CeaseCharging();
+        base.OnSwitchedAwayFromThisGun();
+    }
+
+    protected override void OnPostDroppedByPlayer(PlayerController player)
+    {
+        CeaseCharging();
+        base.OnPostDroppedByPlayer(player);
+    }
+
+    public override void OnDestroy()
+    {
+        CeaseCharging();
+        base.OnDestroy();
+    }
+
+    private void CeaseCharging()
+    {
+        this._extantChargeVFX.SafeDestroy();
+        this._extantChargeVFX = null;
+        if (this._wasCharging)
+        {
+            base.gameObject.Play("magunet_launch_sound");
+            Exploder.DoDistortionWave(center: this.gun.barrelOffset.position.XY() + this.gun.gunAngle.ToVector(0.5f),
+                distortionIntensity: 1.5f, distortionRadius: 0.05f, maxRadius: 2.75f, duration: 0.25f);
+        }
+        this._wasCharging = false;
+    }
+
     protected override void Update()
     {
         base.Update();
@@ -51,15 +82,7 @@ public class Magunet : AdvancedGunBehavior
             return;
         if (!this.gun.IsCharging)
         {
-            this._extantChargeVFX.SafeDestroy();
-            this._extantChargeVFX = null;
-            if (this._wasCharging)
-            {
-                base.gameObject.Play("magunet_launch_sound");
-                Exploder.DoDistortionWave(center: this.gun.barrelOffset.position.XY() + this.gun.gunAngle.ToVector(0.5f),
-                    distortionIntensity: 1.5f, distortionRadius: 0.05f, maxRadius: 2.75f, duration: 0.25f);
-            }
-            this._wasCharging = false;
+            CeaseCharging();
             return;
         }
         this._wasCharging = true;

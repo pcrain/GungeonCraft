@@ -2,6 +2,8 @@
 
 ## 1.11.3 (future)
 - Fixed invalid operation exception when trying to apply Soul Kaliber's soul link status effect to enemies
+- Fixed Magunet retaining it's charge when switched or dropped while charging
+- Fixed Magunet charge particles getting stuck in the air when switched or dropped while charging
 
 ## 1.11.2 (2024-04-07)
 
