@@ -3,6 +3,7 @@
 ## Future
 
 - Fixed null deref due to Gorgun Eye scanning for enemies without an active room
+- Fixed ghost sprites of items remaining on screen after activating Kaliber's Justice 
 
 ## 1.11.3 (2024-04-11)
 

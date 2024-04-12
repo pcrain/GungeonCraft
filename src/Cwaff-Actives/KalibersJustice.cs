@@ -135,7 +135,7 @@ public class KalibersJustice : PlayerItem
                                 continue; // try not to drop rare items if we're not doing a big trade
                         }
                         if (gunToDrop)
-                            UnityEngine.Object.Destroy(user.ForceDropGun(gunToDrop));
+                            UnityEngine.Object.Destroy(user.ForceDropGun(gunToDrop).gameObject);
                         else
                             ETGModConsole.Log($"dropping a gun went horrifically wrong o.o");
                     }
@@ -153,7 +153,7 @@ public class KalibersJustice : PlayerItem
                                 continue; // try not to drop rare items if we're not doing a big trade
                         }
                         if (passiveToDrop)
-                            UnityEngine.Object.Destroy(user.DropPassiveItem(passiveToDrop));
+                            UnityEngine.Object.Destroy(user.DropPassiveItem(passiveToDrop).gameObject);
                         else
                             ETGModConsole.Log($"dropping a passive went horrifically wrong o.o");
                     }
@@ -173,7 +173,7 @@ public class KalibersJustice : PlayerItem
                                 continue; // try not to drop rare items if we're not doing a big trade
                         }
                         if (activeToDrop)
-                            UnityEngine.Object.Destroy(user.DropActiveItem(activeToDrop));
+                            UnityEngine.Object.Destroy(user.DropActiveItem(activeToDrop).gameObject);
                         else
                             ETGModConsole.Log($"dropping an active went horrifically wrong o.o");
                     }
