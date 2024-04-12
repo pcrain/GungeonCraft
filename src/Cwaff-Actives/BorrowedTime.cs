@@ -144,9 +144,10 @@ public class BorrowedTime : PlayerItem
         VFXPool vfx = VFX.CreatePoolFromVFXGameObject((ItemHelper.Get(Items.MagicLamp) as Gun
             ).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
         gameObject.Play("borrowed_time_capture_sound");
-        foreach (AIActor otherEnemy in activeEnemies)
+        for (int n = activeEnemies.Count - 1; n >= 0; --n)
         {
-            if (!otherEnemy.IsHostileAndNotABoss() || otherEnemy.IsBlackPhantom)
+            AIActor otherEnemy = activeEnemies[n];
+            if (!otherEnemy || !otherEnemy.IsHostileAndNotABoss() || otherEnemy.IsBlackPhantom)
                 continue;
 
             Vector2 center = otherEnemy.sprite.WorldCenter;

@@ -8,6 +8,7 @@
 - Fixed Ticonderogun being able to hit invulnerable enemies
 - Fixed insurance chests spawning past the first floor when continuing a saved run
 - Fixed null deref in Borrowed Time due to checking for whether non-existing rooms are combat rooms
+- Fixed random invalid operation exceptions when trying to use Borrowed Time
 
 ## 1.11.2 (2024-04-07)
 
