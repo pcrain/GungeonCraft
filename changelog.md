@@ -1,6 +1,8 @@
 # Changelog
 
-## 1.11.3 (future)
+## 1.11.3 (2024-04-11)
+
+#### Bugfixes:
 - Fixed invalid operation exception when trying to apply Soul Kaliber's soul link status effect to enemies
 - Fixed Magunet retaining it's charge when switched or dropped while charging
 - Fixed Magunet charge particles getting stuck in the air when switched or dropped while charging
@@ -9,14 +11,18 @@
 - Fixed insurance chests spawning past the first floor when continuing a saved run
 - Fixed null deref in Borrowed Time due to checking for whether non-existing rooms are combat rooms
 - Fixed random invalid operation exceptions when trying to use Borrowed Time
-- Renamed Curator's Badge to Custodian's Badge, since I apparently forgot the difference between the two
-- Updated description of Custodian's Badge to mention removal from inventory after letting too many brekables break
+
+#### Balance Changes:
 - Added Ballot to list of items purchasable for free by Library Cardtridge
 - Chicks spawned by Hatchling Gun no longer deal obscene collision damage to enemies
 - Seltzer water from Seltzer Pelter's projectiles can now be electrified like normal water 
 - Switched Bouncer from C to D quality since it's ridiculously hard to use effectively
-- New Thunderstore Icon thanks to Lynceus! :D
+
+#### Misc.
+- Renamed Curator's Badge to Custodian's Badge, since I apparently forgot the difference between the two
+- Updated description of Custodian's Badge to mention removal from inventory after letting too many breakables break
 - Added directional sprites for a few hats
+- Updated Thunderstore Icon, huge thanks to Lynceus for the new one! :D <3
 
 ## 1.11.2 (2024-04-07)
 
