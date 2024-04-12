@@ -36,6 +36,7 @@ public class LibraryCardtridge : PassiveItem
             _BookItemIDs.Add((int)Items.TableTechSight);
             _BookItemIDs.Add((int)Items.TableTechStun);
             _BookItemIDs.Add((int)Items.Origuni);
+            _BookItemIDs.Add((int)Items.Ballot);
 
         // Add guids for book enemies to set
         _BookEnemyGUIDs = new();
