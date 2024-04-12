@@ -234,10 +234,13 @@ public class Insured : MonoBehaviour
     private void Start()
     {
         this._pickup = base.GetComponent<PickupObject>();
+        if (!this._pickup)
+            return;
+
         this._pickupId = this._pickup.PickupObjectId;
         this.dropped = true;
         OnDrop();
-        if (this._doSparkles)
+        if (this._doSparkles && this._pickup.sprite)
             this._pickup.StartCoroutine(DoSparkles_CR());
     }
 
@@ -259,7 +262,7 @@ public class Insured : MonoBehaviour
 
     private void UpdateVFX()
     {
-        if (this.vfx == null)
+        if (!this.vfx || !this._pickup || !this._pickup.sprite)
             return;
 
         this.vfx.transform.position = this._pickup.sprite.WorldTopCenter.HoverAt(amplitude: 0.25f, frequency: 4f, offset: 0.75f);
@@ -268,6 +271,8 @@ public class Insured : MonoBehaviour
     private void OnDrop()
     {
         this.vfx.SafeDestroy();
+        if (!this._pickup || !this._pickup.sprite)
+            return;
         this.vfx = SpawnManager.SpawnVFX(InsurancePolicy.GetVFXForCharacter(), this._pickup.sprite.WorldTopCenter + new Vector2(0f, 0.5f), Quaternion.identity);
         this.vfx.transform.parent = this._pickup.gameObject.transform;
         this._pickup.StartCoroutine(SpinIntoExistence(this.vfx));
@@ -278,6 +283,8 @@ public class Insured : MonoBehaviour
     const float SPIN_RADIANS = 2f * Mathf.PI * SPIN_AMOUNT;
     public static IEnumerator SpinIntoExistence(GameObject vfx)
     {
+        if (!vfx)
+            yield break;
         vfx.SetAlphaImmediate(0.5f);
         vfx.transform.localScale = vfx.transform.localScale.WithX(0f);
         for (float elapsed = 0f; elapsed < SPIN_TIME; elapsed += BraveTime.DeltaTime)
