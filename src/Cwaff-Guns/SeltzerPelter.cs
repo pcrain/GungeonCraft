@@ -181,6 +181,8 @@ public class SeltzerProjectile : MonoBehaviour
     private static IEnumerator SpraySoda_CR(SeltzerProjectile seltzer, Projectile p)
     {
         yield return null;
+        if (!p || !seltzer)
+            yield break;
         float startAngle = p.LastVelocity.ToAngle();
         float curAngle = startAngle;
         seltzer.UpdateRotationRate();
@@ -195,8 +197,8 @@ public class SeltzerProjectile : MonoBehaviour
             {
                 while (BraveTime.DeltaTime == 0)
                     yield return null;
-                if (!p || !p.isActiveAndEnabled || p.HasDiedInAir)
-                    break;
+                if (!p || !p.isActiveAndEnabled || p.HasDiedInAir || !seltzer)
+                    yield break;
                 if (!seltzer._beam)
                     seltzer.CreateBeam();
 
@@ -221,19 +223,22 @@ public class SeltzerProjectile : MonoBehaviour
         #endregion
 
         #region The Rapid Spin
+            if (!p)
+                yield break;
             curAngle = p.LastVelocity.ToAngle(); // reset this to match the actual sprite
             float rotIncrease = 5f * Mathf.Sign(seltzer._rotationRate);
             for (float elapsed = 0f; elapsed < SPIN_TIME; elapsed += BraveTime.DeltaTime)
             {
                 while (BraveTime.DeltaTime == 0)
                     yield return null;
-                if (!p.isActiveAndEnabled || p.HasDiedInAir)
-                    break;
+                if (!p || !p.isActiveAndEnabled || p.HasDiedInAir || !seltzer)
+                    yield break;
                 if (!seltzer._beam)
                     seltzer.CreateBeam();
 
-                if (lastSoundTime + _SOUND_RATE < BraveTime.ScaledTimeSinceStartup)
+                if ((maxSounds > 0) && (lastSoundTime + _SOUND_RATE < BraveTime.ScaledTimeSinceStartup))
                 {
+                    --maxSounds;
                     lastSoundTime = BraveTime.ScaledTimeSinceStartup;
                     p.gameObject.Play("seltzer_spray_sound");
                 }
@@ -251,8 +256,10 @@ public class SeltzerProjectile : MonoBehaviour
         #endregion
 
         #region Die Down
-            seltzer._beam.CeaseAttack();
-            p?.DieInAir();
+            if (seltzer && seltzer._beam)
+                seltzer._beam.CeaseAttack();
+            if (p)
+                p.DieInAir();
         #endregion
 
         yield break;
