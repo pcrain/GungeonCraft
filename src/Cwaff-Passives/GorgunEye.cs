@@ -40,16 +40,20 @@ public class GorgunEye : PassiveItem
         base.Update();
         if (this.Owner is not PlayerController player)
             return;
+        if (player.CurrentRoom is not RoomHandler room)
+            return;
+        if (room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> enemies)
+            return;
 
         Vector2 ppos         = player.sprite.WorldCenter;
         float gunAngle       = player.m_currentGunAngle;
         AIActor closestEnemy = null;
         float closestDist    = 999999f;
-        foreach(AIActor enemy in this.Owner.GetAbsoluteParentRoom()?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All).EmptyIfNull())
+        foreach(AIActor enemy in enemies)
         {
             if (!enemy.IsHostileAndNotABoss())
                 continue; // enemy is not one we should be targeting
-            if (enemy.behaviorSpeculator?.ImmuneToStun ?? true)
+            if (!enemy.behaviorSpeculator || enemy.behaviorSpeculator.ImmuneToStun)
                 continue; // enemy cannot be stunned
 
             Vector2 epos  = enemy.sprite.WorldCenter;

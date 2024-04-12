@@ -1,5 +1,9 @@
 # Changelog
 
+## Future
+
+- Fixed null deref due to Gorgun Eye scanning for enemies without an active room
+
 ## 1.11.3 (2024-04-11)
 
 #### Bugfixes:
