@@ -16,6 +16,7 @@
 - Seltzer water from Seltzer Pelter's projectiles can now be electrified like normal water 
 - Switched Bouncer from C to D quality since it's ridiculously hard to use effectively
 - New Thunderstore Icon thanks to Lynceus! :D
+- Added directional sprites for a few hats
 
 ## 1.11.2 (2024-04-07)
 

@@ -19,7 +19,7 @@ public static class CwaffHats
       EasyHat(name: "shades",                offset: new IntVector2( 0, -2), onEyes: true);
       EasyHat(name: "samus_hat",             offset: new IntVector2( 0, -8));
       EasyHat(name: "goggles",               offset: new IntVector2( 0, -3), onEyes: true);
-      EasyHat(name: "santa_hat",             offset: new IntVector2(-1, -3));
+      EasyHat(name: "santa_hat",             offset: new IntVector2( 0, -3));
       EasyHat(name: "crown",                 offset: new IntVector2( 0, -2));
       EasyHat(name: "mitre",                 offset: new IntVector2( 0, -2));
       EasyHat(name: "tiara",                 offset: new IntVector2( 0, -2));
@@ -63,7 +63,7 @@ public static class CwaffHats
       EasyHat(name: "gunzookie_helmet",      offset: new IntVector2( 0, -3));
       EasyHat(name: "megaman_helment",       offset: new IntVector2( 0, -8));
       EasyHat(name: "party_glasses",         offset: new IntVector2( 0, -3), onEyes: true);
-      EasyHat(name: "payday_bandana",        offset: new IntVector2(-2, -5));
+      EasyHat(name: "bandana",               offset: new IntVector2( 0, -6));
       EasyHat(name: "winchester_hat",        offset: new IntVector2( 0, -3));
       EasyHat(name: "zero_helmet",           offset: new IntVector2( 0, -8));
       EasyHat(name: "wizbang_hat",           offset: new IntVector2( 0, -3));
