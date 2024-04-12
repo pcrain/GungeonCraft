@@ -15,7 +15,7 @@ public class Bouncer : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Bouncer>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 1.3f, ammo: 300, shootFps: 14, reloadFps: 30,
+            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.PISTOL, reloadTime: 1.3f, ammo: 300, shootFps: 14, reloadFps: 30,
                 muzzleFrom: Items.Magnum, fireAudio: "MC_RocsCape");
             gun.SetReloadAudio("bouncer_reload_short", 5, 10, 15, 20);
             gun.SetReloadAudio("bouncer_reload", 25);

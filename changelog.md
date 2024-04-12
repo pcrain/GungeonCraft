@@ -14,6 +14,7 @@
 - Added Ballot to list of items purchasable for free by Library Cardtridge
 - Chicks spawned by Hatchling Gun no longer deal obscene collision damage to enemies
 - Seltzer water from Seltzer Pelter's projectiles can now be electrified like normal water 
+- Switched Bouncer from C to D quality since it's ridiculously hard to use effectively
 
 ## 1.11.2 (2024-04-07)
 
