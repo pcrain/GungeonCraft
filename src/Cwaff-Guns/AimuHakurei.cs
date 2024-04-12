@@ -108,6 +108,11 @@ public class AimuHakurei : AdvancedGunBehavior
     {
         if (this.Player)
             this.Player.OnRollStarted -= this.OnDodgeRoll;
+        if (this._decayCoroutine != null)
+        {
+            StopCoroutine(this._decayCoroutine);
+            this._decayCoroutine = null;
+        }
         base.OnDestroy();
     }
 
@@ -160,9 +165,9 @@ public class AimuHakurei : AdvancedGunBehavior
 
     private IEnumerator DecayWhileInactive()
     {
-        while (this.gameObject)
+        while (this && this.gameObject)
         {
-            if (!GameManager.Instance.IsPaused && !GameManager.Instance.IsLoadingLevel)
+            if (GameManager.Instance && !GameManager.Instance.IsPaused && !GameManager.Instance.IsLoadingLevel)
                 UpdateGraze();
             yield return null;
         }
@@ -241,7 +246,7 @@ public class AimuHakurei : AdvancedGunBehavior
             this._lastDecayTime = BraveTime.ScaledTimeSinceStartup;
         }
 
-        if (!pc.healthHaver.IsVulnerable)
+        if (!pc.healthHaver || !pc.healthHaver.IsVulnerable)
             return; // can't graze if we're invincible, that's cheating!!!
         if (pc.CurrentGun != this.gun)
             return; // if this isn't our active gun, we can't benefit from grazing
@@ -250,7 +255,7 @@ public class AimuHakurei : AdvancedGunBehavior
         Vector2 bottom = pc.sprite.WorldBottomCenter;
         foreach (Projectile p in StaticReferenceManager.AllProjectiles)
         {
-            if (!p.isActiveAndEnabled || !p.sprite.renderer.enabled || !p.collidesWithPlayer || p.Owner == this.Owner)
+            if (!p.isActiveAndEnabled || !p.sprite || !p.sprite.renderer || !p.sprite.renderer.enabled || !p.collidesWithPlayer || p.Owner == this.Owner)
                 continue; // if the projectile can't collide with us, we're not impressed
             if ((p.SafeCenter - ppos).sqrMagnitude >= _GRAZE_THRES_SQUARED)
                 continue; // bullet's too far away, so doesn't need to be considered

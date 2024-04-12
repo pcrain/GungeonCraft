@@ -6,6 +6,7 @@
 - Fixed ghost sprites of items remaining on screen after activating Kaliber's Justice 
 - Fixed null deref due to Seltzer Pelter projectiles trying to emit seltzer streams from expired projectiles
 - Fixed null deref due to Insurance Policy trying to reuse previously-destroyed VFX on insured items
+- Fixed null deref due to Aimu Hakurei (and potentially Alyx) trying to continue running a coroutine after being destroyed
 
 ## 1.11.3 (2024-04-11)
 

@@ -100,9 +100,9 @@ public class Alyx : AdvancedGunBehavior
 
     private IEnumerator DecayWhileInactive()
     {
-        while (this.gameObject != null)
+        while (this && this.gameObject)
         {
-            if (!GameManager.Instance.IsPaused && !GameManager.Instance.IsLoadingLevel)
+            if (GameManager.Instance && !GameManager.Instance.IsPaused && !GameManager.Instance.IsLoadingLevel)
                 RecalculateAmmo();
             yield return null;
         }
