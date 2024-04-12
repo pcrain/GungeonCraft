@@ -102,8 +102,9 @@ public class SoulLinkStatus : MonoBehaviour
                 return;
 
             bool shouldPlaySound = false;
-            foreach (AIActor otherEnemy in activeEnemies)
+            for (int i = activeEnemies.Count - 1; i >=0; --i)
             {
+                AIActor otherEnemy = activeEnemies[i];
                 if (!(otherEnemy.IsHostileAndNotABoss()))
                     continue; // we don't care about harmless enemies
                 if (enemy == otherEnemy)

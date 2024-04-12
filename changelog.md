@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.11.3 (future)
+- Fixed invalid operation exception when trying to apply Soul Kaliber's soul link status effect to enemies
+
 ## 1.11.2 (2024-04-07)
 
 - Added 11 hats! (sprites thanks to Dallan)
