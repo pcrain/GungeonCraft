@@ -107,7 +107,7 @@ public class Breegull : AdvancedGunBehavior
     private void UpdateEggs(bool playSound = false)
     {
         EggData e = _Eggs[this._currentEggType];
-        this.gun.DefaultModule.ammoCost = e.ammo;
+        this.gun.DefaultModule.ammoCost = e.ammo;  //BUG: with certain items, the ammo cost here seems to be ignored
         if (playSound)
             base.gameObject.Play(e.sound);
     }
