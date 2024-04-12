@@ -103,9 +103,9 @@ public class Ticonderogun : AdvancedGunBehavior
     private void CheckIfEnemiesAreEncircled(Vector2 hullCenter)
     {
         base.gameObject.Play("pencil_circle_sound");
-        if (!this._owner)
+        if (!this._owner || this._owner.CurrentRoom == null)
             return;
-        List<AIActor> activeEnemies = this._owner.CurrentRoom?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
+        List<AIActor> activeEnemies = this._owner.CurrentRoom.GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
         if (activeEnemies == null)
             return; // TODO: not sure why we don't need to do this check elsewhere
 
@@ -135,20 +135,10 @@ public class Ticonderogun : AdvancedGunBehavior
         }
     }
 
-    private float ComputeCircleDamageOld(Vector2 hullCenter)
-    {
-        if (!this._owner.IsKeyboardAndMouse()) // controller users always get max damage because this weapon is already hard enough to use with controllers
-            return Mathf.Ceil(_BASE_DAMAGE * this._owner.DamageMult());
-
-        float maxSquareDistToCenter = 0f;
-        foreach (Vector2 point in this._extantPoints)
-            maxSquareDistToCenter = Mathf.Max(maxSquareDistToCenter, (hullCenter - point).sqrMagnitude);
-        return Mathf.Ceil(_BASE_DAMAGE * this._owner.DamageMult() * Mathf.Min(1f, 10f / maxSquareDistToCenter));
-    }
-
     private void DoEncirclingMagic(AIActor enemy, float damage)
     {
-        enemy.healthHaver.ApplyDamage(damage, Vector2.zero, ItemName, CoreDamageTypes.Magic, DamageCategory.Normal);
+        if (enemy.healthHaver.IsVulnerable)
+            enemy.healthHaver.ApplyDamage(damage, Vector2.zero, ItemName, CoreDamageTypes.Magic, DamageCategory.Normal);
         for (int i = 0; i < _NUM_RUNES; ++i)
         {
             Vector2 offset = Lazy.RandomVector(0.3f);
