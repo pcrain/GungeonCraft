@@ -112,9 +112,11 @@ public class BorrowedTime : PlayerItem
 
     private bool CheckIfBossIsPresent()
     {
-        if (this._lastCheckedRoom == null || this._owner.GetAbsoluteParentRoom() is not RoomHandler room)
+        if (this._owner.CurrentRoom is not RoomHandler room)
             return false;
-        return room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All).Any(enemy => enemy.healthHaver.IsBoss);
+        if (room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> enemies)
+            return false;
+        return enemies.Any(enemy => enemy && enemy.healthHaver && enemy.healthHaver.IsBoss);
     }
 
     public override void DoEffect(PlayerController user)
