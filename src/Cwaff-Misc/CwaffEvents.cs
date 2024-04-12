@@ -73,7 +73,9 @@ public static class CwaffEvents // global custom events we can listen for
             if (gm == null || !(gsm?.IsInSession ?? false))
                 return;
 
-            _OnFirstFloor = gsm.GetSessionStatValue(TrackedStats.TIME_PLAYED) < 0.1f;
+            _OnFirstFloor =
+                (gsm.GetSessionStatValue(TrackedStats.TIME_PLAYED) < 0.1f) &&
+                GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName == "tt_castle";
             if (_OnFirstFloor && OnRunStart != null)
                 OnRunStart(gm.PrimaryPlayer, gm.SecondaryPlayer, gm.CurrentGameMode);
 

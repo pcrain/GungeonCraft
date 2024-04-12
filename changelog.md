@@ -6,6 +6,7 @@
 - Fixed Magunet charge particles getting stuck in the air when switched or dropped while charging
 - Fixed softlock caused by getting hit after dropping Warrior's Gi and starting a new floor
 - Fixed Ticonderogun being able to hit invulnerable enemies
+- Fixed insurance chests spawning past the first floor when continuing a saved run
 
 ## 1.11.2 (2024-04-07)
 
