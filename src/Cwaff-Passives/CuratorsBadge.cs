@@ -5,12 +5,12 @@ namespace CwaffingTheGungy;
         - handle teleporting out of rooms or otherwise leaving them unceremoniously
 */
 
-public class CuratorsBadge : PassiveItem
+public class CustodiansBadge : PassiveItem
 {
-    public static string ItemName         = "Curator's Badge";
+    public static string ItemName         = "Custodian's Badge";
     public static string ShortDescription = "Neat and Tidy";
-    public static string LongDescription  = "Rewards extra shells for leaving minor breakables unscathed after each combat encounter.";
-    public static string Lore             = "The role of Gungeon Curator has been unfilled since the hiring of the Gungeon Janitorial Crew, who rendered the position mostly obsolete. The pay is mediocre, the working conditions are rather dangerous, and the job itself is surprisingly difficult. However, for adventurers who happen to be passing through the Gungeon, earning a few extra shells before inevitably getting fired for breaking everything with a BSG just might help pay for that extra piece of armor -- which will promptly be lost by stumbling into a pit.";
+    public static string LongDescription  = "Rewards extra shells for leaving minor breakables unscathed after each combat encounter. Incurs one strike after letting more than 70% of breakables in a room break. Disappears after incurring three strikes.";
+    public static string Lore             = "The role of Gungeon Custodian has been unfilled since the hiring of the Gungeon Janitorial Crew, who rendered the position mostly obsolete. The pay is mediocre, the working conditions are rather dangerous, and the job itself is surprisingly difficult. However, for adventurers who happen to be passing through the Gungeon, earning a few extra shells before inevitably getting fired for breaking everything with a BSG just might help pay for that extra piece of armor -- which will promptly be lost by stumbling into a pit.";
 
     internal const int   _MAX_CHANCES      = 3;
     internal const float _FAIL_THRESHOLD   = 0.3f;
@@ -38,7 +38,7 @@ public class CuratorsBadge : PassiveItem
 
     public static void Init()
     {
-        PickupObject item  = Lazy.SetupPassive<CuratorsBadge>(ItemName, ShortDescription, LongDescription, Lore);
+        PickupObject item  = Lazy.SetupPassive<CustodiansBadge>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality       = ItemQuality.D;
     }
 

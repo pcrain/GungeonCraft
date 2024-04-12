@@ -327,7 +327,7 @@ public class Initialisation : BaseUnityPlugin
                     RatPoison.Init();
                     JohnsWick.Init();
                     Gyroscope.Init();
-                    CuratorsBadge.Init();
+                    CustodiansBadge.Init();
                     CreditCard.Init();
                     LibraryCardtridge.Init();
                     BlankChecks.Init();

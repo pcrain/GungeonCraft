@@ -9,6 +9,8 @@
 - Fixed insurance chests spawning past the first floor when continuing a saved run
 - Fixed null deref in Borrowed Time due to checking for whether non-existing rooms are combat rooms
 - Fixed random invalid operation exceptions when trying to use Borrowed Time
+- Renamed Curator's Badge to Custodian's Badge, since I apparently forgot the difference between the two
+- Updated description of Custodian's Badge to mention removal from inventory after letting too many brekables break
 
 ## 1.11.2 (2024-04-07)
 
