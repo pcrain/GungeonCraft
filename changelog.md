@@ -12,6 +12,7 @@
 - Renamed Curator's Badge to Custodian's Badge, since I apparently forgot the difference between the two
 - Updated description of Custodian's Badge to mention removal from inventory after letting too many brekables break
 - Added Ballot to list of items purchasable for free by Library Cardtridge
+- Made chicks spawned by Hatchling Gun no longer deal obscene collision damage to enemies
 
 ## 1.11.2 (2024-04-07)
 
