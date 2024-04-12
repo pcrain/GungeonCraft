@@ -60,7 +60,7 @@ public class ChestScanner : PlayerItem
         if (!this._nearestChest)
             return;
 
-        this._nearestChest.DetermineContents(user, 0);
+        this._nearestChest.DetermineContents(user, 0); //NOTE: could use vanilla PredictContents() method like Brave New World and Detective Mode synergies
         this._nearestChest.gameObject.AddComponent<ScannedChest>();
     }
 }
