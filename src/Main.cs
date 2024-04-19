@@ -84,14 +84,10 @@ public class Initialisation : BaseUnityPlugin
             Instance = this;
             Harmony harmony = new Harmony(C.MOD_GUID);
 
-            #region Set up Early Harmony Patches (async, but needed as soon as atlases and shaders are loaded)
-                System.Diagnostics.Stopwatch setupEarlyHarmonyWatch = null;
-                Thread setupEarlyHarmonyThread = new Thread(() => {
-                    setupEarlyHarmonyWatch = System.Diagnostics.Stopwatch.StartNew();
-                    AtlasHelper.InitSetupPatches(harmony);
-                    setupEarlyHarmonyWatch.Stop();
-                });
-                setupEarlyHarmonyThread.Start();
+            #region Set up Early Harmony Patches (needs to be synchronous due to call to AmmonomiconController.ForceInstance)
+                System.Diagnostics.Stopwatch setupEarlyHarmonyWatch = System.Diagnostics.Stopwatch.StartNew();
+                AtlasHelper.InitSetupPatches(harmony);
+                setupEarlyHarmonyWatch.Stop();
             #endregion
 
             #region Set up Late Harmony Patches (async, nothing else is needed until floor loading patches)
@@ -141,11 +137,6 @@ public class Initialisation : BaseUnityPlugin
                 ShaderCache.Acquire("Daikon Forge/Default UI Shader");
                 setupShadersWatch.Stop();
             #endregion
-
-            System.Diagnostics.Stopwatch awaitEarlyHarmonyWatch = System.Diagnostics.Stopwatch.StartNew();
-            // We have to wait for Harmony to finish early patches before we can do anything else
-            setupEarlyHarmonyThread.Join();
-            awaitEarlyHarmonyWatch.Stop();
 
             #region Round 1 Config (could be async since it's mostly hooks and database stuff where no sprites are needed, but it's fast enough that we just leave it sync)
                 System.Diagnostics.Stopwatch setupConfig1Watch = System.Diagnostics.Stopwatch.StartNew();
@@ -492,11 +483,10 @@ public class Initialisation : BaseUnityPlugin
             ETGModConsole.Log($"Yay! :D Initialized <color=#{ColorUtility.ToHtmlStringRGB(C.MOD_COLOR).ToLower()}>{C.MOD_NAME} v{C.MOD_VERSION}</color> in "+(watch.ElapsedMilliseconds/1000.0f)+" seconds");
             if (C.DEBUG_BUILD)
             {
-                ETGModConsole.Log($"  {setupEarlyHarmonyWatch.ElapsedMilliseconds, 5}ms ASYNC setupEarlyHarmony");
+                ETGModConsole.Log($"  {setupEarlyHarmonyWatch.ElapsedMilliseconds, 5}ms       setupEarlyHarmony");
                 ETGModConsole.Log($"  {setupLateHarmonyWatch.ElapsedMilliseconds,  5}ms ASYNC setupLateHarmony ");
                 ETGModConsole.Log($"  {setupAtlasesWatch.ElapsedMilliseconds,      5}ms       setupAtlases     ");
                 ETGModConsole.Log($"  {setupShadersWatch.ElapsedMilliseconds,      5}ms       setupShaders     ");
-                ETGModConsole.Log($"  {awaitEarlyHarmonyWatch.ElapsedMilliseconds, 5}ms       awaitEarlyHarmony");
                 ETGModConsole.Log($"  {setupConfig1Watch.ElapsedMilliseconds,      5}ms       setupConfig1     ");
                 ETGModConsole.Log($"  {setupConfig2Watch.ElapsedMilliseconds,      5}ms       setupConfig2     ");
                 ETGModConsole.Log($"  {setupAudioWatch.ElapsedMilliseconds,        5}ms ASYNC setupAudio       ");
