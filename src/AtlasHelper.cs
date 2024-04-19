@@ -136,11 +136,6 @@ public static class AtlasHelper
     return _PackedTextures.TryGetValue(s.Split('/').Last(), out tk2dSpriteDefinition value) ? value : null;
   }
 
-  internal static readonly tk2dSpriteCollectionData _ProjectileCollection  = ETGMod.Databases.Items.ProjectileCollection;
-  internal static readonly tk2dSpriteCollectionData _AmmonomiconCollection = AmmonomiconController.ForceInstance.EncounterIconCollection;
-  internal static readonly tk2dSpriteCollectionData _ItemCollection        = ETGMod.Databases.Items.ItemCollection;
-  internal static readonly tk2dSpriteCollectionData _WeaponCollection      = ETGMod.Databases.Items.WeaponCollection;
-
   /// <summary>Load a packed texture from a resource string</summary>
   public static void LoadPackedTextureResource(Texture2D atlas, Dictionary<string, tk2dSpriteDefinition.AttachPoint[]> attachPoints, string metaDataResourcePath)
   {
@@ -209,10 +204,10 @@ public static class AtlasHelper
       }
     }
 
-    AddSpritesToCollection(newDefs: projectileSprites,  collection: _ProjectileCollection);
-    AddSpritesToCollection(newDefs: ammonomiconSprites, collection: _AmmonomiconCollection);
-    AddSpritesToCollection(newDefs: itemSprites,        collection: _ItemCollection);
-    AddSpritesToCollection(newDefs: weaponSprites,      collection: _WeaponCollection, attachPoints: weaponAttachPoints);
+    AddSpritesToCollection(newDefs: projectileSprites,  collection: ETGMod.Databases.Items.ProjectileCollection);
+    AddSpritesToCollection(newDefs: ammonomiconSprites, collection: AmmonomiconController.ForceInstance.EncounterIconCollection);
+    AddSpritesToCollection(newDefs: itemSprites,        collection: ETGMod.Databases.Items.ItemCollection);
+    AddSpritesToCollection(newDefs: weaponSprites,      collection: ETGMod.Databases.Items.WeaponCollection, attachPoints: weaponAttachPoints);
     AddSpritesToCollection(newDefs: miscSprites,        collection: VFX.Collection); // NOTE: all miscellaneous sprites go into the VFX collection
   }
 
