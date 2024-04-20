@@ -12,8 +12,9 @@ public class Glockarina : AdvancedGunBehavior
     internal const string _SariaSpriteUI = $"{C.MOD_PREFIX}:_GlockSariaSpriteUI";
     internal const string _EmptySpriteUI = $"{C.MOD_PREFIX}:_GlockEmptySpriteUI";
 
-    private const float _DEAD_ZONE_SQR = 4f;
-    private const float _DECOY_LIFE    = 2f;
+    private const float _MOUSE_DEAD_ZONE_SQR      = 4f;
+    private const float _CONTROLLER_DEAD_ZONE_SQR = 0.16f;
+    private const float _DECOY_LIFE               = 2f;
 
     internal enum Mode {
         DEFAULT,  // no special effects
@@ -192,9 +193,10 @@ public class Glockarina : AdvancedGunBehavior
             return;
 
         // Get a note based on the direction the player is aiming
-        Vector2 aimVec = player.IsKeyboardAndMouse() ? (player.unadjustedAimPoint.XY() - player.CenterPosition) : player.m_activeActions.Aim.Vector;
+        bool onKeyboard = player.IsKeyboardAndMouse();
+        Vector2 aimVec = onKeyboard ? (player.unadjustedAimPoint.XY() - player.CenterPosition) : player.m_activeActions.Aim.Vector;
         Note note = Note.A;
-        if (aimVec.sqrMagnitude > _DEAD_ZONE_SQR)
+        if (aimVec.sqrMagnitude > (onKeyboard ? _MOUSE_DEAD_ZONE_SQR : _CONTROLLER_DEAD_ZONE_SQR))
         {
             float aimAngle = aimVec.ToAngle().Clamp180();
             if (Mathf.Abs(aimAngle) < 45)
