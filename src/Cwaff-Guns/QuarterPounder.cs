@@ -9,8 +9,6 @@ public class QuarterPounder : AdvancedGunBehavior
 
     internal static GameObject _MidasParticleVFX;
 
-    private int _lastMoney = -1;
-
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<QuarterPounder>(ItemName, ShortDescription, LongDescription, Lore);
@@ -55,8 +53,6 @@ public class QuarterPounder : AdvancedGunBehavior
     private void AdjustAmmoToMoney()
     {
         int money = GameManager.Instance.PrimaryPlayer.carriedConsumables.Currency;
-        if (money == this._lastMoney)
-            return;
         this.gun.CurrentAmmo = money;
         if (this.gun.ClipShotsRemaining > money)
             this.gun.ClipShotsRemaining = money;
@@ -68,7 +64,6 @@ public class MidasProjectile : MonoBehaviour
     private const float _SHEEN_WIDTH = 20.0f;
     internal static Color _Gold      = new Color(1f,1f,0f,1f);
     internal static Color _White     = new Color(1f,1f,1f,1f);
-    internal static Dictionary<string, Texture2D> _GoldenTextures = new();
 
     private void Start()
     {
@@ -77,22 +72,19 @@ public class MidasProjectile : MonoBehaviour
     }
 
     private static tk2dSpriteCollectionData _GoldSpriteCollection = null;
+    internal static Dictionary<string, int> _GoldenSprites = new();
     private void OnWillKillEnemy(Projectile bullet, SpeculativeRigidbody enemy)
     {
         if (!enemy.aiActor || !enemy.healthHaver || enemy.healthHaver.IsBoss || enemy.healthHaver.IsSubboss)
             return; // don't do anything to bosses //NOTE: technically works on most bosses, but causes problems with Dragun and who knows what modded bosses...so just disabling
 
-        Texture2D goldSprite;
-        if (_GoldenTextures.ContainsKey(enemy.aiActor.EnemyGuid))
-            goldSprite = _GoldenTextures[enemy.aiActor.EnemyGuid]; // If we've already computed a texture for this enemy, don't do it again
-        else
+        _GoldSpriteCollection ??= SpriteBuilder.ConstructCollection(new(), "goldcollection");
+        GameObject g = new();
+        if (!_GoldenSprites.TryGetValue(enemy.aiActor.EnemyGuid, out int spriteId))
         {
-            goldSprite = Lazy.GetTexturedEnemyIdleAnimation(enemy.aiActor, _Gold, 0.3f, _White, _SHEEN_WIDTH);
-            _GoldenTextures[enemy.aiActor.EnemyGuid] = goldSprite; // Cache the texture for this enemy for later
+            Texture2D goldSprite = Lazy.GetTexturedEnemyIdleAnimation(enemy.aiActor, _Gold, 0.3f, _White, _SHEEN_WIDTH);
+            spriteId = _GoldenSprites[enemy.aiActor.EnemyGuid] = SpriteBuilder.AddSpriteToCollection(goldSprite, _GoldSpriteCollection, "goldsprite"); //NOTE: this doesn't use PackerHelper since it's done at runtime
         }
-        GameObject g                        = new();
-        _GoldSpriteCollection             ??= SpriteBuilder.ConstructCollection(g, "goldcollection");
-        int spriteId                        = SpriteBuilder.AddSpriteToCollection(goldSprite, _GoldSpriteCollection, "goldsprite"); //NOTE: this doesn't use PackerHelper since it's done at runtime
         tk2dBaseSprite sprite               = g.AddComponent<tk2dSprite>();
             sprite.SetSprite(_GoldSpriteCollection, spriteId);
             sprite.PlaceAtPositionByAnchor(enemy.sprite.WorldCenter.ToVector3ZisY(), Anchor.MiddleCenter);
@@ -102,7 +94,6 @@ public class MidasProjectile : MonoBehaviour
             sprite.renderLayer            = enemy.sprite.renderLayer;
             sprite.UpdateZDepth();
         PixelCollider pixelCollider = new PixelCollider();
-            pixelCollider.Enabled                = false;
             pixelCollider.CollisionLayer         = CollisionLayer.PlayerBlocker;
             pixelCollider.Enabled                = true;
             pixelCollider.IsTrigger              = false; //true;
