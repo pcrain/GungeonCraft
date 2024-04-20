@@ -3,6 +3,8 @@
 ## 1.11.5 (2024-04-20)
 
 - Fixed null deref due to Plot Armor checking whether a non-existent room is a boss foyer
+- Fixed null deref in Ki Blast when trying to apply knockback to enemies without KnockbackDoers
+- Fixed null deref in Ki Blast when used against the Dragun
 
 ## 1.11.4 (2024-04-12)
 

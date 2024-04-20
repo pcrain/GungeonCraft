@@ -165,14 +165,14 @@ public class KiBlastBehavior : MonoBehaviour
             return; //don't want enemies to just be able to spam reflect
 
         AIActor enemy = otherRigidbody.GetComponent<AIActor>();
-        if (enemy == null || this._projectile.baseData.damage >= enemy.healthHaver.GetCurrentHealth())
+        if (!enemy || !enemy.healthHaver || this._projectile.baseData.damage >= enemy.healthHaver.GetCurrentHealth())
             return; //don't reflect if our target is not an enemy or if the blast is stronger than them
 
         // Apply damage to the enemy
         enemy.healthHaver.ApplyDamage(this._projectile.baseData.damage, this._projectile.Direction, "Ki Blast",
-            CoreDamageTypes.None, DamageCategory.Collision,
-            false, null, true);
-        enemy.healthHaver.knockbackDoer.ApplyKnockback(this._projectile.Direction, this._projectile.baseData.force);
+            CoreDamageTypes.None, DamageCategory.Collision, false, null, true);
+        if (enemy.healthHaver.knockbackDoer is KnockbackDoer kbd)
+            kbd.ApplyKnockback(this._projectile.Direction, this._projectile.baseData.force);
 
         // Skip the normal collision
         PhysicsEngine.SkipCollision = true;
@@ -183,7 +183,7 @@ public class KiBlastBehavior : MonoBehaviour
             p.Owner               = enemy;
             p.collidesWithPlayer  = true;
             p.collidesWithEnemies = false;
-        this._arc.SetNewTarget(this._owner.sprite.WorldCenter);
+        this._arc.SetNewTarget(this._owner.CenterPosition);
 
         // Update sounds and animations
         EasyTrailBullet trail = p.gameObject.GetComponent<EasyTrailBullet>();
@@ -205,13 +205,13 @@ public class KiBlastBehavior : MonoBehaviour
         ++this._numReflections;
         this.reflected = false;
         this._timeSinceLastReflect = 0.0f;
-        this._projectile.baseData.damage = this._startingDamage*Mathf.Pow(_Scaling,this._numReflections);
+        this._projectile.baseData.damage = this._startingDamage * Mathf.Pow(_Scaling, this._numReflections);
 
         this._projectile.Owner = player;
         // p.AdjustPlayerProjectileTint(Color.green, 2, 0.1f);
         this._projectile.collidesWithPlayer = false;
         this._projectile.collidesWithEnemies = true;
-        this._arc.SetNewTarget(enemy.sprite.WorldCenter);
+        this._arc.SetNewTarget(enemy.CenterPosition);
 
         // this._projectile.SetAnimation(KiBlast._KiSprite);
         EasyTrailBullet trail = this._projectile.gameObject.GetComponent<EasyTrailBullet>();
@@ -222,11 +222,11 @@ public class KiBlastBehavior : MonoBehaviour
         this._projectile.gameObject.Play("ki_blast_sound_stop_all");
         this._projectile.gameObject.PlayUnique("ki_blast_return_sound");
         int enemiesToCheck = 10;
-        while (enemy.healthHaver.currentHealth <= 0 && --enemiesToCheck >= 0)
+        while ((!enemy || !enemy.healthHaver || enemy.healthHaver.currentHealth <= 0) && --enemiesToCheck >= 0)
             enemy = enemy.GetAbsoluteParentRoom().GetRandomActiveEnemy(false);
         SlashDoer.DoSwordSlash(
-            player.sprite.WorldCenter,
-            (enemy.CenterPosition-player.sprite.WorldCenter).ToAngle(),
+            player.CenterPosition,
+            (enemy.CenterPosition - player.CenterPosition).ToAngle(),
             this._projectile.Owner,
             _BasicSlashData);
     }
