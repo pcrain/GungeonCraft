@@ -23,7 +23,7 @@ public class PlotArmor : PassiveItem
     public override void Update()
     {
         base.Update();
-        if (!this.Owner)
+        if (!this.Owner || !this.Owner.healthHaver)
             return;
 
         RoomHandler room = this.Owner.CurrentRoom;
@@ -31,7 +31,7 @@ public class PlotArmor : PassiveItem
             return;
 
         this._lastVisitedRoom = room;
-        if (room.hasEverBeenVisited || room != ChestTeleporterItem.FindBossFoyer())
+        if (room == null || room.hasEverBeenVisited || room != ChestTeleporterItem.FindBossFoyer())
             return;
 
         int minArmor = _MIN_PLAYER_ARMOR + (this.Owner.ForceZeroHealthState ? 1 : 0);
@@ -48,7 +48,7 @@ public class PlotArmor : PassiveItem
             bool success;
             Vector2 armorSpot = room.GetCenteredVisibleClearSpot(2, 2, out success).ToVector2();
             if (!success)
-                armorSpot = this.Owner.sprite.WorldCenter;
+                armorSpot = this.Owner.CenterPosition;
             LootEngine.SpawnItem(ItemHelper.Get(Items.Armor).gameObject, armorSpot, Vector2.zero, 0f, true, true, false);
         }
     }

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.11.5 (2024-04-20)
+
+- Fixed null deref due to Plot Armor checking whether a non-existent room is a boss foyer
+
 ## 1.11.4 (2024-04-12)
 
 - Fixed null deref due to Gorgun Eye scanning for enemies without an active room
