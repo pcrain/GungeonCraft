@@ -35,6 +35,7 @@ def applyGunDataOverrides(gunData):
   gunData["Vacuum Cleaner"]["range"]     = "N/A"
   gunData["Vacuum Cleaner"]["knockback"] = "N/A"
   gunData["Pincushion"]["firerate"]      = "0.02" # 1/60, rounded
+  gunData["Pincushion"]["damage"]        = "0.5" # as set by _NEEDLE_DAMAGE
 
 def main():
   passiveData = scanPassives()
