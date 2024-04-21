@@ -2,10 +2,30 @@
 
 ## 1.11.5 (2024-04-20)
 
+#### Bugfixes:
 - Fixed null deref due to Plot Armor checking whether a non-existent room is a boss foyer
 - Fixed null deref in Ki Blast when trying to apply knockback to enemies without KnockbackDoers
 - Fixed null deref in Ki Blast when used against the Dragun
 - Fixed not being able to play the Glockarina when using a controller
+- Prevented Quarter Pounder from creating duplicate gold sprites for enemy types that have already been transmuted to gold
+
+#### Balance Changes:
+- Buffed Glocakrina's base damage from 4 to 7.5
+- Buffed Magunet's debris damage from 1 to 2
+- Buffed Magunet's corpse damage from 10 to 30
+- Buffed Jugglernaut's fire rate from 1.0 seconds to 0.4 seconds
+- Increased Jugglernaut's ammo from 150 to 240
+- Pistol Whip now only passively increases curse by 2 instead of 3
+- Enemies transmuted with Quarter Pounder now drop an extra casing upon death
+- Aimu Hakurei can now build graze even when it's not the active gun
+- Doubled Sub Machine Gun's charm chance, making enemies at 50% health or less 100% susceptible to charm
+- Changed Scotsman's quality from A to B
+- Changed Ammo Conservation Manual's quality from B to C
+- Changed Dead Ringer's quality from A to B
+- Changed Gyroscope's quality from A to B
+- Changed Amazon Primer's quality from A to B
+- Changed Chest Scanner's quality from B to C
+- Removed Insurance Policy from normal item pool (so it can only be purchased at Insurance Shop)
 
 ## 1.11.4 (2024-04-12)
 

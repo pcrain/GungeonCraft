@@ -233,7 +233,7 @@ public class MagnetParticle : MonoBehaviour
         p.specRigidbody       = body;
         p.Owner               = this._gun.CurrentOwner;
         p.Shooter             = p.Owner.specRigidbody;
-        p.baseData.damage     = this._debris.IsCorpse ? 10f : 1f;
+        p.baseData.damage     = this._debris.IsCorpse ? 30f : 2f;
         p.baseData.range      = 1000000f;
         p.baseData.speed      = velocity.magnitude;
         p.baseData.force      = 50f;

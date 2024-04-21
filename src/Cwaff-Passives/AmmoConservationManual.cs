@@ -14,7 +14,7 @@ public class AmmoConservationManual : PassiveItem
     public static void Init()
     {
         PickupObject item = Lazy.SetupPassive<AmmoConservationManual>(ItemName, ShortDescription, LongDescription, Lore);
-        item.quality      = ItemQuality.B;
+        item.quality      = ItemQuality.C;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
     }
 

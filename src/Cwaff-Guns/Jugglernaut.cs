@@ -33,7 +33,7 @@ public class Jugglernaut : AdvancedGunBehavior
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Jugglernaut>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 150, shootFps: 30, reloadFps: 40, preventRotation: true);
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 240, shootFps: 30, reloadFps: 40, preventRotation: true);
             _JuggleAnimations = new(){
                 gun.QuickUpdateGunAnimation("1_gun", returnToIdle: false),
                 gun.QuickUpdateGunAnimation("2_gun", returnToIdle: false),
@@ -85,7 +85,7 @@ public class Jugglernaut : AdvancedGunBehavior
             gun.reloadAnimation         = null; // animation shouldn't change when reloading
             gun.shootAnimation          = null; // animation shouldn't change when firing
 
-        gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 1.0f, shootStyle: ShootStyle.SemiAutomatic, damage: 10.0f, speed: 70.0f,
+        gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.4f, shootStyle: ShootStyle.SemiAutomatic, damage: 10.0f, speed: 70.0f,
           sprite: "jugglernaut_ball", fps: 12, scale: 0.5f, anchor: Anchor.MiddleLeft));
     }
 

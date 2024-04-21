@@ -19,7 +19,7 @@ public class Kevlar
             moddedItems            : new(),
             roomPath               : $"{C.MOD_INT_NAME}/Resources/Rooms/insurance.newroom",
             allowDupes             : true, // allow multiple insurance policies
-            costModifier           : 3f / 9f, // insurance should cost 3/9 of 90 == 30 casings
+            allowExcluded          : true, // insurance policies are excluded items
             spawnChance            : 1.0f,
             spawnPrerequisite      : CwaffPrerequisites.INSURANCE_PREREQUISITE,
             prequisiteValidator    : PlayerHasGoodItem,

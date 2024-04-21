@@ -12,7 +12,7 @@ public class AmazonPrimer : PlayerItem
     public static void Init()
     {
         PlayerItem item = Lazy.SetupActive<AmazonPrimer>(ItemName, ShortDescription, LongDescription, Lore);
-        item.quality      = ItemQuality.A;
+        item.quality      = ItemQuality.B;
         item.consumable   = true;
         item.CanBeDropped = true;
 

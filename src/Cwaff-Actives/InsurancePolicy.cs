@@ -39,10 +39,12 @@ public class InsurancePolicy : PlayerItem
     public static void Init()
     {
         PlayerItem item = Lazy.SetupActive<InsurancePolicy>(ItemName, ShortDescription, LongDescription, Lore);
-        item.quality      = ItemQuality.A;
-        item.consumable   = true;
-        item.CanBeDropped = true;
-        item.CanBeSold    = false;  // no reselling insurance!
+        item.quality        = ItemQuality.SPECIAL;
+        item.consumable     = true;
+        item.CanBeDropped   = true;
+        item.CanBeSold      = false;  // no reselling insurance!
+        item.UsesCustomCost = true;
+        item.CustomCost     = 30;
         item.SetCooldownType(ItemBuilder.CooldownType.Timed, 0.5f);
 
         _InsuranceVFXRobot      = VFX.Create("insurance_policy_robot_vfx",      fps: 1, loops: true, anchor: Anchor.MiddleCenter);

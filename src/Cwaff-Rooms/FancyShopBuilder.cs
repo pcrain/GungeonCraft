@@ -37,7 +37,7 @@ public static class FancyShopBuilder
     float spawnChance = 1f, Vector2? carpetOffset = null, int? idleFps = null, int? talkFps = null, bool loopTalk = true,
     CwaffPrerequisites spawnPrerequisite = CwaffPrerequisites.NONE, SpawnCondition prequisiteValidator = null, string voice = null,
     List<String> genericDialog = null, List<String> stopperDialog = null, List<String> purchaseDialog = null, List<String> stolenDialog = null,
-    List<String> noSaleDialog = null, List<String> introDialog = null, List<String> attackedDialog = null, bool allowDupes = false,
+    List<String> noSaleDialog = null, List<String> introDialog = null, List<String> attackedDialog = null, bool allowDupes = false, bool allowExcluded = false,
     float mainPoolChance = 0.0f, Vector3? talkPointOffset = null, Vector3? npcPosition = null, List<Vector3> itemPositions = null,
     bool exactlyOncePerRun = true, int allowedTilesets = 127, float costModifier = 1f, bool canBeRobbed = true, bool flipTowardsPlayer = true,
     Func<CustomShopController, PlayerController, int, bool> customCanBuy = null,
@@ -114,7 +114,7 @@ public static class FancyShopBuilder
       percentChanceForMainPool          : mainPoolChance,
       prerequisites                     : dungeonPrerequisites.ToArray(), // used by RegisterShopRoom(), but we're manually calling AddInjection() for now
       fortunesFavorRadius               : 2,
-      poolType                          : allowDupes ? CustomShopController.ShopItemPoolType.DUPES : CustomShopController.ShopItemPoolType.DEFAULT,
+      poolType                          : allowExcluded ? CustomShopController.ShopItemPoolType.DUPES_AND_NOEXCLUSION : (allowDupes ?  CustomShopController.ShopItemPoolType.DUPES : CustomShopController.ShopItemPoolType.DEFAULT),
       RainbowModeImmunity               : false,
       hitboxSize                        : new IntVector2(Mathf.RoundToInt(C.PIXELS_PER_TILE * baseDef.boundsDataExtents.x), _RigidBodyHeight),
       hitboxOffset                      : (C.PIXELS_PER_TILE * baseDef.position0.XY()).ToIntVector2() + _RigidBodyOffset

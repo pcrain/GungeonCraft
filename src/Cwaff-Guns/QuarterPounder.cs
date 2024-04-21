@@ -4,7 +4,7 @@ public class QuarterPounder : AdvancedGunBehavior
 {
     public static string ItemName         = "Quarter Pounder";
     public static string ShortDescription = "Pay Per Pew";
-    public static string LongDescription  = "Uses casings as ammo. Fires high-powered projectiles that transmute enemies to gold upon death.";
+    public static string LongDescription  = "Uses casings as ammo. Fires high-powered projectiles that transmute enemies to gold upon death, spawning an extra casing.";
     public static string Lore             = "Legend says that Dionysus granted King Midas' wish that everything he touched would turn to gold. Midas was overjoyed at first, but upon turning his food and daughter to gold, realized his wish was ill thought out, and eventually died of starvation.\n\nThe average person might interpret King Midas as a cautionary tale to be mindful of what you wish for. One gunsmith, however, heard the tale and thought, \"wow, turning my enemies to gold sure would be useful!\". Despite completely missing the moral of King Midas, the gunsmith did succeed in forging a rather powerful weapon, proving that the meaning of art is indeed up to the beholder.";
 
     internal static GameObject _MidasParticleVFX;
@@ -116,8 +116,8 @@ public class MidasProjectile : MonoBehaviour
 
         // if (enemy.aiActor.IsABoss()) // Unsure why this doesn't trigger normally, but this seems to fix it
         //     enemy.aiActor.ParentRoom.HandleRoomClearReward(); //TODO: it's possible non-boss room rewards also don't spawn if final enemy is midas'd...look into later
+        LootEngine.SpawnCurrency(enemy.aiActor.CenterPosition, 1);
         enemy.aiActor.EraseFromExistenceWithRewards(true);
-
     }
 }
 

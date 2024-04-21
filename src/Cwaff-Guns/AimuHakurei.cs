@@ -4,7 +4,7 @@ public class AimuHakurei : AdvancedGunBehavior
 {
     public static string ItemName         = "Aimu Hakurei";
     public static string ShortDescription = "Highly Responsive";
-    public static string LongDescription  = "Fires a variety of projectiles based on its current level. Grazing nearby enemy projectiles while the gun is active increases the graze counter, with the gun's level increasing at 10, 30, 60, and 100 graze. Reloading toggles focus mode, which slows down time to enable precision grazing. Focus mode is cancelled by reloading, firing, dodge rolling, or switching guns.";
+    public static string LongDescription  = "Fires a variety of projectiles based on its current level. Passively grants the ability to graze enemy projectiles while in the inventory, with the gun's level increasing at 10, 30, 60, and 100 graze. Reloading toggles focus mode, which slows down time to enable precision grazing. Focus mode is cancelled by reloading, firing, dodge rolling, or switching guns. Graze naturally decays over time and cannot be gained while invulnerable.";
     public static string Lore             = "One of the finest weapons ever crafted in Gunsokyo, a land whose denizens are renowned for their otherworldly bullet-dodging abilities that would put most Gungeoneers to shame. The potential dakka output of this gun is enough to keep up even with these impressive abilities. However, the Gunsokyo warriors being the showboats that they are, reaching this gun's full potential requires placing oneself in some rather precarious situations, making it a weapon of truly ludicrous risk and reward.";
 
     internal const float _GRAZE_THRES              = 1.5f;  // max distance from player a projectile can be to count as grazed
@@ -236,7 +236,7 @@ public class AimuHakurei : AdvancedGunBehavior
     private static Dictionary<Projectile, float> _GrazeTimeDict = new();
     private void UpdateGraze()
     {
-        if (this.Owner is not PlayerController pc)
+        if (!this || this.Owner is not PlayerController pc)
             return; // if our owner isn't a player, we have nothing to do
 
         if (this.graze > 0 && (this._lastDecayTime + _GRAZE_DECAY_RATE <= BraveTime.ScaledTimeSinceStartup))
@@ -248,8 +248,6 @@ public class AimuHakurei : AdvancedGunBehavior
 
         if (!pc.healthHaver || !pc.healthHaver.IsVulnerable)
             return; // can't graze if we're invincible, that's cheating!!!
-        if (pc.CurrentGun != this.gun)
-            return; // if this isn't our active gun, we can't benefit from grazing
 
         Vector2 ppos = pc.sprite.WorldCenter;
         Vector2 bottom = pc.sprite.WorldBottomCenter;

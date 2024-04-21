@@ -13,7 +13,7 @@ public class ChestScanner : PlayerItem
     public static void Init()
     {
         PlayerItem item = Lazy.SetupActive<ChestScanner>(ItemName, ShortDescription, LongDescription, Lore);
-        item.quality      = ItemQuality.B;
+        item.quality      = ItemQuality.C;
         ItemBuilder.SetCooldownType(item, ItemBuilder.CooldownType.Timed, 1);
         item.consumable   = false;
         item.CanBeDropped = true;

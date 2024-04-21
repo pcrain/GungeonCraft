@@ -21,7 +21,7 @@ public class DeadRinger : PassiveItem
     public static void Init()
     {
         PickupObject item = Lazy.SetupPassive<DeadRinger>(ItemName, ShortDescription, LongDescription, Lore);
-        item.quality      = ItemQuality.A;
+        item.quality      = ItemQuality.B;
         _CorpsePrefab     = BraveResources.Load("Global Prefabs/PlayerCorpse") as GameObject;
     }
 
