@@ -8,6 +8,9 @@ public static class CwaffSynergies
     public static List<string>            _SynergyNames = Enumerable.Repeat<string>(null, _NUM_SYNERGIES).ToList();         // list of friendly names of synergies
     public static List<string>            _SynergyEnums = new(Enum.GetNames(typeof(Synergy)));                              // list of enum names of synergies
     public static List<int>               _SynergyIds   = Enumerable.Repeat<int>(0, _NUM_SYNERGIES).ToList();               // list of ids of synergies in the AdvancedSynergyEntry database
+    public static HashSet<int>            _MasteryIds   = new();                                                            // Set of fake item ids corresponding to mastery tokens
+
+    internal static GameObject _MasteryVFX = null;
 
     public static void Init()
     {
@@ -16,10 +19,19 @@ public static class CwaffSynergies
               This is to ensure that our automatic item tips generation script parses it correctly.
         */
 
+      #region Synergies
         // Makes Drifter's Headgear dash 20% longer and reflect bullets
         NewSynergy(HYPE_YOURSELF_UP, "Hype Yourself Up", new[]{IName(DriftersHeadgear.ItemName), "hyper_light_blaster"});
+      #endregion
+
+      #region Masteries
+        // Grandmaster no longer shoots pawns, only major pieces
+        NewMastery<Grandmaster, MasteryOfGrandmaster>(MASTERY_GRANDMASTER, Grandmaster.ItemName);
+      #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
+
+        _MasteryVFX = VFX.Create("mastery_character_vfx", fps: 16, loops: false, anchor: Anchor.LowerCenter, emissivePower: 100f, emissiveColour: Color.red);
     }
 
     private static void SanityCheckAllSynergiesHaveBeenInitialized()
@@ -43,6 +55,75 @@ public static class CwaffSynergies
         _SynergyIds[index]   = GameManager.Instance.SynergyManager.synergies.Length - 1;
     }
 
+    private static void NewMastery<G, T>(Synergy synergy, string gunName) where G : AdvancedGunBehavior where T : MasteryDummyItem
+    {
+        if (Lazy.GetModdedItem(IName(gunName)) is not Gun gun || gun.GetComponent<G>() is not G g)
+        {
+            ETGModConsole.Log($"tried to get mastery for non-gun {gunName}");
+            return;
+        }
+
+        if (g is not IGunMastery gm)
+        {
+            ETGModConsole.Log($"tried to get master for {gunName}, which has no mastery");
+            return;
+        }
+
+        FakeItem.Create<T>();
+
+        string itemName = typeof(T).Name;
+        string baseItemName = itemName.Replace("-", "").Replace(".", "").Replace(" ", "_").ToLower();  //get saner gun name for commands
+        string internalName = C.MOD_PREFIX+":"+baseItemName;
+        NewSynergy(synergy, $"{gun.EncounterNameOrDisplayName} Mastery", new string[2]{IDs.InternalNames[gun.gunName], internalName});
+        _MasteryIds.Add(FakeItem.Acquire<T>().PickupObjectId);
+    }
+
+    /// <summary>Adds some code after calling RebuildSynergies() to check if any of the new synergies are masteries, and if so, plays the appropriate VFX / skips the remaining notifications</summary>
+    [HarmonyPatch(typeof(PlayerStats), nameof(PlayerStats.RecalculateSynergies))]
+    private class RecalculateMasteriesPatch
+    {
+        [HarmonyILManipulator]
+        private static void RecalculateMasteriesIL(ILContext il)
+        {
+            ILCursor cursor = new ILCursor(il);
+            if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<AdvancedSynergyDatabase>("RebuildSynergies")))
+                return;
+            cursor.Emit(OpCodes.Ldarg_0); // PlayerStats instance
+            cursor.Emit(OpCodes.Ldarg_1); // PlayerController owner
+            cursor.Emit(OpCodes.Call, typeof(RecalculateMasteriesPatch).GetMethod("CheckForNewMasteries", BindingFlags.Static | BindingFlags.NonPublic));
+            ILLabel continueAsNormalLabel = cursor.DefineLabel();
+            cursor.Emit(OpCodes.Brfalse, continueAsNormalLabel);
+            cursor.Emit(OpCodes.Ret);
+            cursor.MarkLabel(continueAsNormalLabel);
+        }
+
+        private static bool CheckForNewMasteries(PlayerStats stats, PlayerController owner)
+        {
+            for (int i = 0; i < owner.ActiveExtraSynergies.Count; i++)
+            {
+                int synId = owner.ActiveExtraSynergies[i];
+                if (!(!GameManager.Instance.SynergyManager.synergies[synId].SuppressVFX && GameManager.Instance.SynergyManager.synergies[synId].ActivationStatus != SynergyEntry.SynergyActivation.INACTIVE && !stats.PreviouslyActiveSynergies.Contains(synId)))
+                    continue;
+
+                AdvancedSynergyEntry advancedSynergyEntry = GameManager.Instance.SynergyManager.synergies[synId];
+                if (advancedSynergyEntry.MandatoryItemIDs == null || advancedSynergyEntry.MandatoryItemIDs.Count == 0 || !_MasteryIds.Contains(advancedSynergyEntry.MandatoryItemIDs[0]))
+                    continue; // definitely not a mastery
+
+                owner.gameObject.Play("the_sound_of_mastering_a_weapon");
+                owner.PlayEffectOnActor(_MasteryVFX, new Vector3(0f, 0.5f, 0f));
+                // if (advancedSynergyEntry.ActivationStatus != SynergyEntry.SynergyActivation.INACTIVE && !string.IsNullOrEmpty(advancedSynergyEntry.NameKey))
+                //     GameUIRoot.Instance.notificationController.AttemptSynergyAttachment(advancedSynergyEntry);
+                GameStatsManager.Instance.HandleEncounteredSynergy(synId);
+
+                stats.PreviouslyActiveSynergies.Clear();
+                stats.PreviouslyActiveSynergies.AddRange(owner.ActiveExtraSynergies);
+                return true; // skip remainder of original function
+            }
+
+            return false; // continue with remainder of original function
+        }
+    }
+
     private static string IName(string itemName)
     {
         return IDs.InternalNames[itemName];
@@ -59,6 +140,15 @@ public static class CwaffSynergies
     }
 }
 
+public interface IGunMastery
+{
+
+}
+
+public class MasteryDummyItem : FakeItem {}
+
 public enum Synergy {
     HYPE_YOURSELF_UP,
+
+    MASTERY_GRANDMASTER,
 };

@@ -1,6 +1,8 @@
 ﻿namespace CwaffingTheGungy;
 
-public class Grandmaster : AdvancedGunBehavior
+internal class MasteryOfGrandmaster : MasteryDummyItem {}
+
+public class Grandmaster : AdvancedGunBehavior, IGunMastery
 {
     public static string ItemName         = "Grandmaster";
     public static string ShortDescription = "Mate in Gun";

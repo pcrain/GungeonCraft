@@ -108,6 +108,7 @@ public static class Lazy
         ETGMod.Databases.Items.Add(item);
 
         item.encounterTrackable.journalData.SuppressInAmmonomicon = true; //don't show up in ammonomicon
+        item.encounterTrackable.m_doNotificationOnEncounter = false; // don't display a notification when picked up
         item.quality = ItemQuality.SPECIAL;                   // don't show up as rewards
         item.ShouldBeExcludedFromShops               = true;  // don't show up in shops
         item.encounterTrackable.SuppressInInventory  = true;  // don't show up in inventory
