@@ -2,7 +2,7 @@
 
 internal class MasteryOfGrandmaster : MasteryDummyItem {}
 
-public class Grandmaster : AdvancedGunBehavior, IGunMastery
+public class Grandmaster : AdvancedGunBehavior
 {
     public static string ItemName         = "Grandmaster";
     public static string ShortDescription = "Mate in Gun";
@@ -343,6 +343,16 @@ public class PlayChessBehavior : MonoBehaviour
         ChessPieces.Queen, // 1 queen (and 0 kings for now)
     };
 
+    private static readonly List<ChessPieces> _MasteredPiecePool = new() {
+        ChessPieces.Rook,
+        ChessPieces.Rook, // 2 rooks
+        ChessPieces.Bishop,
+        ChessPieces.Bishop, // 2 bishops
+        ChessPieces.Knight,
+        ChessPieces.Knight, // 2 knights
+        ChessPieces.Queen, // 1 queen (and 0 kings for now)
+    };
+
     private void Start()
     {
         this._projectile = base.GetComponent<Projectile>();
@@ -350,7 +360,7 @@ public class PlayChessBehavior : MonoBehaviour
         if (!this._owner)
             return;
 
-        switch(_PiecePool.ChooseRandom())
+        switch((this._owner.PlayerHasActiveSynergy(Synergy.MASTERY_GRANDMASTER) ? _MasteredPiecePool : _PiecePool).ChooseRandom())
         {
             case ChessPieces.Pawn:   this._piece = this._projectile.gameObject.AddComponent<PawnPiece>();   break;
             case ChessPieces.Rook:   this._piece = this._projectile.gameObject.AddComponent<RookPiece>();   break;

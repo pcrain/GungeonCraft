@@ -26,7 +26,7 @@ public static class CwaffSynergies
 
       #region Masteries
         // Grandmaster no longer shoots pawns, only major pieces
-        NewMastery<Grandmaster, MasteryOfGrandmaster>(MASTERY_GRANDMASTER, Grandmaster.ItemName);
+        NewMastery<MasteryOfGrandmaster>(MASTERY_GRANDMASTER, Grandmaster.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -55,19 +55,10 @@ public static class CwaffSynergies
         _SynergyIds[index]   = GameManager.Instance.SynergyManager.synergies.Length - 1;
     }
 
-    private static void NewMastery<G, T>(Synergy synergy, string gunName) where G : AdvancedGunBehavior where T : MasteryDummyItem
+    private static void NewMastery<T>(Synergy synergy, string gunName) where T : MasteryDummyItem
     {
-        if (Lazy.GetModdedItem(IName(gunName)) is not Gun gun || gun.GetComponent<G>() is not G g)
-        {
-            ETGModConsole.Log($"tried to get mastery for non-gun {gunName}");
+        if (Lazy.GetModdedItem(IName(gunName)) is not Gun gun)
             return;
-        }
-
-        if (g is not IGunMastery gm)
-        {
-            ETGModConsole.Log($"tried to get master for {gunName}, which has no mastery");
-            return;
-        }
 
         FakeItem.Create<T>();
 
@@ -140,15 +131,15 @@ public static class CwaffSynergies
     }
 }
 
-public interface IGunMastery
+public class MasteryDummyItem : FakeItem
 {
 
 }
 
-public class MasteryDummyItem : FakeItem {}
-
 public enum Synergy {
+    // Synergies
     HYPE_YOURSELF_UP,
 
+    // Masteries
     MASTERY_GRANDMASTER,
 };

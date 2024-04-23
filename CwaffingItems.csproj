@@ -227,6 +227,7 @@
     <Compile Include="src\Cwaff-Misc\CwaffHats.cs"/>
     <Compile Include="src\Cwaff-Misc\HeckedMode.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffHUD.cs"/>
+    <Compile Include="src\Cwaff-Misc\CwaffMasteries.cs"/>
     <Compile Include="src\VFXToolbox.cs"/>
     <Compile Include="src\Main.cs"/>
     <Compile Include="src\CwaffConfig.cs"/>
