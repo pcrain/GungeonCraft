@@ -42,10 +42,10 @@ public static class CwaffSynergies
                 ETGModConsole.Log($"<color=#ffff88ff>WARNING: haven't initialized custom synergy {_SynergyEnums[i]}</color>");
     }
 
-    private static void NewSynergy(Synergy synergy, string name, string[] mandatory, string[] optional = null)
+    private static void NewSynergy(Synergy synergy, string name, string[] mandatory, string[] optional = null, bool ignoreLichEyeBullets = false)
     {
         // Register the AdvancedSynergyEntry so that the game knows about it
-        CustomSynergies.Add(name, mandatory.ToList(), optional?.ToList());
+        RegisterSynergy(name, mandatory.ToList(), optional?.ToList(), ignoreLichEyeBullets);
         // Get the enum index of our synergy
         int index            = (int)synergy;
         // Extend the base game's CustomSynergyType enum to make room for our new synergy
@@ -54,6 +54,56 @@ public static class CwaffSynergies
         _SynergyNames[index] = name;
         // Get the actual ID of our synergy entry in the AdvancedSynergyDatabase, which doesn't necessarily match the CustomSynergyType enum
         _SynergyIds[index]   = GameManager.Instance.SynergyManager.synergies.Length - 1;
+    }
+
+    public static AdvancedSynergyEntry RegisterSynergy(string name, List<string> mandatoryConsoleIDs, List<string> optionalConsoleIDs = null, bool ignoreLichEyeBullets = false)
+    {
+        List<int> itemIDs    = new();
+        List<int> gunIDs     = new();
+        List<int> optItemIDs = new();
+        List<int> optGunIDs  = new();
+        foreach (var id in mandatoryConsoleIDs)
+        {
+            PickupObject pickup = Gungeon.Game.Items[id];
+            if (pickup && pickup.GetComponent<Gun>())
+                gunIDs.Add(pickup.PickupObjectId);
+            else if (pickup && (pickup.GetComponent<PlayerItem>() || pickup.GetComponent<PassiveItem>()))
+                itemIDs.Add(pickup.PickupObjectId);
+        }
+
+        if (optionalConsoleIDs != null)
+        {
+            foreach (var id in optionalConsoleIDs)
+            {
+                PickupObject pickup = Gungeon.Game.Items[id];
+                if (pickup && pickup.GetComponent<Gun>())
+                    optGunIDs.Add(pickup.PickupObjectId);
+                else if (pickup && (pickup.GetComponent<PlayerItem>() || pickup.GetComponent<PassiveItem>()))
+                    optItemIDs.Add(pickup.PickupObjectId);
+            }
+        }
+
+        // Add our synergy's name to the string manager so it displays properly when activated
+        string nameKey = $"#{name.ToID().ToUpperInvariant()}";
+        ETGMod.Databases.Strings.Synergy.Set(nameKey, name);
+
+        AdvancedSynergyEntry entry = new AdvancedSynergyEntry()
+        {
+            NameKey              = nameKey,
+            MandatoryItemIDs     = itemIDs,
+            MandatoryGunIDs      = gunIDs,
+            OptionalItemIDs      = optItemIDs,
+            OptionalGunIDs       = optGunIDs,
+            bonusSynergies       = new List<CustomSynergyType>(),
+            statModifiers        = new List<StatModifier>(),
+            IgnoreLichEyeBullets = ignoreLichEyeBullets,
+        };
+
+
+        int oldLength = GameManager.Instance.SynergyManager.synergies.Length;
+        Array.Resize(ref GameManager.Instance.SynergyManager.synergies, oldLength + 1);
+        GameManager.Instance.SynergyManager.synergies[oldLength] = entry;
+        return entry;
     }
 
     private static void NewMastery<T>(Synergy synergy, string gunName) where T : MasteryDummyItem
@@ -66,7 +116,11 @@ public static class CwaffSynergies
         string itemName = typeof(T).Name;
         string baseItemName = itemName.Replace("-", "").Replace(".", "").Replace(" ", "_").ToLower();  //get saner gun name for commands
         string internalName = C.MOD_PREFIX+":"+baseItemName;
-        NewSynergy(synergy, $"{gun.EncounterNameOrDisplayName} Mastery", new string[2]{IDs.InternalNames[gun.gunName], internalName});
+        NewSynergy(
+            synergy              : synergy,
+            name                 : $"{gun.EncounterNameOrDisplayName} Mastery",
+            mandatory            : new string[2]{IDs.InternalNames[gun.gunName], internalName},
+            ignoreLichEyeBullets : true);
         int tokenId = FakeItem.Acquire<T>().PickupObjectId;
         _MasteryIds.Add(tokenId);
         _MasteryGuns[gun.PickupObjectId] = tokenId;
