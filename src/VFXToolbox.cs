@@ -16,11 +16,13 @@ public static class VFX
 
     public static GameObject LaserSightPrefab;
     public static GameObject MiniPickup;
+    public static GameObject MasterySigil;
 
     public static void Init()
     {
         LaserSightPrefab = LoadHelper.LoadAssetFromAnywhere("assets/resourcesbundle/global vfx/vfx_lasersight.prefab") as GameObject;
         MiniPickup = VFX.Create("mini_pickup", 12, loops: false, anchor: Anchor.MiddleCenter);
+        MasterySigil = VFX.Create("mastery_sigil", fps: 2);
     }
 
     /// <summary>

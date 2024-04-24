@@ -90,7 +90,7 @@ public static class CwaffMasteries
           if (gun.GetComponent<MasteryRitualComponent>() is not MasteryRitualComponent ritComp)
             return;
 
-          ritComp.DestroyEmitter();
+          ritComp.DisableEffects();
           if (MasteryRitualComponent._RitualGuns.Contains(ritComp))
             MasteryRitualComponent._RitualGuns.Remove(ritComp);
           UnityEngine.Object.Destroy(ritComp);
@@ -110,12 +110,17 @@ public static class CwaffMasteries
 
 public class MasteryRitualComponent : MonoBehaviour
 {
+  private const float _SIGIL_SPIN_SPEED = 0.5f;
+  private const float _PARTICLE_SPIN_SPEED = 1.4f;
+
   private static GameObject _CatalystNiceParticleSytem = null;
   private static GameObject _MasteryNiceParticleSytem = null;
   internal static List<MasteryRitualComponent> _RitualGuns = new();
 
-  private Gun gun = null;
+  private Gun _gun = null;
   private ParticleSystem _ps = null;
+  private GameObject _sigil = null;
+  private float _spinSpeed = 1.0f;
 
   public static bool CheckRequirementsSatisfiedForMasteryRitual(out MasteryRitualComponent ritualTarget)
   {
@@ -209,25 +214,25 @@ public class MasteryRitualComponent : MonoBehaviour
   {
     if (CheckRequirementsSatisfiedForMasteryRitual(out MasteryRitualComponent ritualTarget))
     {
-      foreach (MasteryRitualComponent gun in _RitualGuns)
+      foreach (MasteryRitualComponent ritComp in _RitualGuns)
       {
         if (!blankUser)
         {
-          gun.StartEmitter(gun == ritualTarget);
+          ritComp.EnableEffects(ritComp == ritualTarget);
           continue;
         }
-        gun.DestroyEmitter();
-        if (gun == ritualTarget)
-          blankUser.AcquireMastery(gun.GetComponent<Gun>());
+        ritComp.DisableEffects();
+        if (ritComp == ritualTarget)
+          blankUser.AcquireMastery(ritComp.GetComponent<Gun>());
         else
-          gun.BurnAway();
+          ritComp.BurnAway();
       }
     }
     else
     {
-      foreach (MasteryRitualComponent gun in _RitualGuns)
-        if (gun)
-          gun.DestroyEmitter();
+      foreach (MasteryRitualComponent ritComp in _RitualGuns)
+        if (ritComp)
+          ritComp.DisableEffects();
     }
   }
 
@@ -278,9 +283,11 @@ public class MasteryRitualComponent : MonoBehaviour
       ParticleSystem ps = psnewPrefab.GetComponent<ParticleSystem>();
       // ETGModConsole.Log($"was using shader {psObj.GetComponent<ParticleSystemRenderer>().material.shader.name}");
 
+      float absSpeed = Mathf.Abs(arcSpeed);
+
       ParticleSystem.MainModule main = ps.main;
       main.duration                = 3600f;
-      main.startLifetime           = 1.15f; // slightly higher than spin speed
+      main.startLifetime           = 0.15f + (1f / absSpeed); // slightly higher than one rotation
       main.startSpeed              = 0.25f;
       main.startSize               = 0.0625f;
       main.scalingMode             = ParticleSystemScalingMode.Local;
@@ -289,6 +296,10 @@ public class MasteryRitualComponent : MonoBehaviour
       main.startRotationMultiplier = 0f;
       main.maxParticles            = 200;
       main.startColor              = particleColor;
+
+      ParticleSystem.ForceOverLifetimeModule force = ps.forceOverLifetime;
+      force.y = 6f;
+      force.z = 15f;
 
       ParticleSystem.RotationOverLifetimeModule rotl = ps.rotationOverLifetime;
       rotl.enabled = false;
@@ -305,11 +316,11 @@ public class MasteryRitualComponent : MonoBehaviour
       colm.color = new ParticleSystem.MinMaxGradient(g); // looks jank
 
       ParticleSystem.EmissionModule em = ps.emission;
-      em.rateOverTime = 60f;
+      em.rateOverTime = 30f * absSpeed;
 
       ParticleSystemRenderer psr = psnewPrefab.GetComponent<ParticleSystemRenderer>();
       psr.material.SetFloat("_InvFade", 3.0f);
-      psr.material.SetFloat("_EmissionGain", 0.8f);
+      psr.material.SetFloat("_EmissionGain", 0.9f);
       psr.material.SetColor("_EmissionColor", particleColor);
       psr.material.SetColor("_DiffuseColor", particleColor);
       psr.sortingLayerName = "Foreground";
@@ -349,53 +360,78 @@ public class MasteryRitualComponent : MonoBehaviour
       return psnewPrefab;
   }
 
-  public void StartEmitter(bool isMasteryTarget)
+  public void EnableEffects(bool isMasteryTarget)
   {
-      if (!this.gun)
-        this.gun = base.GetComponent<Gun>();
-      if (!this.gun || !this.gun.sprite)
+      if (!this.isActiveAndEnabled)
+      {
+        // Lazy.DebugWarn("Enabling effects on inactive ritual component");
+        this.enabled = true;
+      }
+      if (!this._gun)
+        this._gun = base.GetComponent<Gun>();
+      if (!this._gun || !this._gun.sprite)
         return;
 
-      _CatalystNiceParticleSytem ??= MakeNiceParticleSystem(new Color(0.75f, 0.75f, 0.5f), arcSpeed: 1f);
-      _MasteryNiceParticleSytem  ??= MakeNiceParticleSystem(new Color(1.0f, 0.75f, 0.75f), arcSpeed: -1f);
+      _CatalystNiceParticleSytem ??= MakeNiceParticleSystem(new Color(0.75f, 0.75f, 0.5f), arcSpeed: _PARTICLE_SPIN_SPEED);
+      _MasteryNiceParticleSytem  ??= MakeNiceParticleSystem(new Color(1.0f, 0.75f, 0.75f), arcSpeed: -_PARTICLE_SPIN_SPEED);
 
-      if (this._ps)
-        UnityEngine.Object.Destroy(this._ps.gameObject);
+      DisableEffects();
+
+      this._spinSpeed = isMasteryTarget ? -_SIGIL_SPIN_SPEED : _SIGIL_SPIN_SPEED;
 
       GameObject psObj         = UnityEngine.Object.Instantiate(isMasteryTarget ? _MasteryNiceParticleSytem : _CatalystNiceParticleSytem);
-      psObj.transform.position = this.gun.sprite.WorldCenter;
+      psObj.transform.position = this._gun.sprite.WorldCenter;
       psObj.transform.parent   = base.gameObject.transform;
 
       this._ps                         = psObj.GetComponent<ParticleSystem>();
       ParticleSystem.ShapeModule shape = this._ps.shape;
-      Bounds bounds                    = this.gun.sprite.GetBounds();
+      Bounds bounds                    = this._gun.sprite.GetBounds();
       shape.radius                     = 0.25f + shape.radiusThickness + Mathf.Max(bounds.extents.x, bounds.extents.y);
+      ParticleSystem.EmissionModule em = this._ps.emission;
+      em.rateOverTime = 32f * shape.radius * _PARTICLE_SPIN_SPEED; // adjust for larger guns
+
+      this._sigil = SpawnManager.SpawnVFX(VFX.MasterySigil, psObj.transform.position, Quaternion.identity, ignoresPools: true);
+      this._sigil.SetAlphaImmediate(0.5f);
+      this._sigil.transform.parent = base.gameObject.transform;
+      tk2dSprite sigilSprite = this._sigil.GetComponent<tk2dSprite>();
+      sigilSprite.HeightOffGround = -5f;
+      sigilSprite.UpdateZDepth();
   }
 
-  public void DestroyEmitter()
+  public void DisableEffects()
   {
-    if (!this._ps)
-      return;
-
-    this._ps.Stop(true);
-    this._ps.gameObject.transform.parent = null;
-    this._ps.gameObject.ExpireIn(3f);
-    this._ps = null;
+    if (this._ps)
+    {
+      this._ps.Stop(true);
+      this._ps.gameObject.transform.parent = null;
+      this._ps.gameObject.ExpireIn(3f);
+      this._ps = null;
+    }
+    if (this._sigil)
+    {
+      this._sigil.transform.parent = null;
+      UnityEngine.Object.Destroy(this._sigil);
+      this._sigil = null;
+    }
   }
 
   private void Update()
   {
-    if (!this.gun || this.gun.CurrentOwner != null)
+    if (!this._gun)
+      this._gun = base.GetComponent<Gun>();
+    if (!this._gun || this._gun.CurrentOwner != null)
     {
       // ETGModConsole.Log($"selfdestructing");
       UnityEngine.Object.Destroy(this);
+      return;
     }
+    if (this._sigil)
+      this._sigil.transform.rotation = (this._spinSpeed * 360f * BraveTime.ScaledTimeSinceStartup).EulerZ();
   }
 
   private void OnDestroy()
   {
-    // ETGModConsole.Log($"getting destroyed");
-    DestroyEmitter();
+    DisableEffects();
     if (_RitualGuns.Contains(this))
       _RitualGuns.Remove(this);
     UpdateMasteryRitualStatus(blankUser: null);
@@ -403,7 +439,7 @@ public class MasteryRitualComponent : MonoBehaviour
 
   private void Start()
   {
-    this.gun = base.GetComponent<Gun>();
+    this._gun = base.GetComponent<Gun>();
   }
 
   private void BurnAway()
@@ -419,18 +455,11 @@ public class MasteryRitualComponent : MonoBehaviour
       burnSprite.StartCoroutine(BurnAway_CR(burnSprite));
     }
 
-
     // Destroy our gun component
     if (base.transform.parent is Transform parent)
-    {
-      ETGModConsole.Log($"destroying parent");
       UnityEngine.Object.Destroy(parent.gameObject);
-    }
-    else
-    {
-      ETGModConsole.Log($"destroying self");
+    else // shouldn't reach this
       UnityEngine.Object.Destroy(base.gameObject);
-    }
   }
 
   private static IEnumerator BurnAway_CR(tk2dBaseSprite sprite)
