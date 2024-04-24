@@ -2,74 +2,11 @@ namespace CwaffingTheGungy;
 
 /* TODO:
     - only allow ritual once per run
-    - disable spawning of mastery tokens through console outside debug builds
     - actually make decent masteries
 */
 
 public static class CwaffMasteries
 {
-    private static Transform CreateEmptySprite(tk2dBaseSprite target)
-    {
-        GameObject gameObject = new GameObject("suck image");
-        gameObject.layer = target.gameObject.layer;
-        tk2dSprite tk2dSprite2 = gameObject.AddComponent<tk2dSprite>();
-        gameObject.transform.parent = SpawnManager.Instance.VFX;
-        tk2dSprite2.SetSprite(target.sprite.Collection, target.sprite.spriteId);
-        tk2dSprite2.transform.position = target.sprite.transform.position;
-        GameObject gameObject2 = new GameObject("image parent");
-        gameObject2.transform.position = tk2dSprite2.WorldCenter;
-        tk2dSprite2.transform.parent = gameObject2.transform;
-        // if (target.optionalPalette != null)
-        //     tk2dSprite2.renderer.material.SetTexture("_PaletteTex", target.optionalPalette);
-        return gameObject2.transform;
-    }
-
-    private static IEnumerator Evaporate(tk2dBaseSprite target, Vector2 motionDirection, bool useBase = false, float duration = 10f)
-    {
-        float elapsed = 0f;
-
-        Transform copyTransform = useBase ? target.gameObject.transform : CreateEmptySprite(target);
-        tk2dBaseSprite copySprite = useBase ? target : copyTransform.GetComponentInChildren<tk2dSprite>();
-        target.renderer.material.shader = ShaderCache.Acquire("Brave/LitCutoutUber");
-        target.usesOverrideMaterial = true;
-        SpriteOutlineManager.RemoveOutlineFromSprite(target);
-        // GameObject ParticleSystemToSpawn = (ItemHelper.Get(Items.CombinedRifle) as Gun).alternateVolley.projectiles[0].projectiles[0].GetComponent<CombineEvaporateEffect>().ParticleSystemToSpawn;
-        // GameObject gameObject = UnityEngine.Object.Instantiate(ParticleSystemToSpawn, copySprite.WorldCenter.ToVector3ZisY(), Quaternion.identity);
-        // ParticleSystem component = gameObject.GetComponent<ParticleSystem>();
-        // Dissect.DumpFieldsAndProperties<ParticleSystem>(component);
-        // var main = component.main;
-        // main.duration = duration;
-        // gameObject.transform.parent = copyTransform;
-        // if ((bool)copySprite)
-        // {
-        //     gameObject.transform.position = copySprite.WorldCenter;
-        //     Bounds bounds = copySprite.GetBounds();
-        //     ParticleSystem.ShapeModule shape = component.shape;
-        //     shape.scale = new Vector3(bounds.extents.x * 2f, bounds.extents.y * 2f, 0.125f);
-        // }
-        copySprite.renderer.material.DisableKeyword("TINTING_OFF");
-        copySprite.renderer.material.EnableKeyword("TINTING_ON");
-        copySprite.renderer.material.DisableKeyword("EMISSIVE_OFF");
-        copySprite.renderer.material.EnableKeyword("EMISSIVE_ON");
-        copySprite.renderer.material.DisableKeyword("BRIGHTNESS_CLAMP_ON");
-        copySprite.renderer.material.EnableKeyword("BRIGHTNESS_CLAMP_OFF");
-        copySprite.renderer.material.SetFloat("_EmissiveThresholdSensitivity", 5f);
-        copySprite.renderer.material.SetFloat("_EmissiveColorPower", 1f);
-        int emId = Shader.PropertyToID("_EmissivePower");
-        copySprite.renderer.material.SetFloat(emId, 0f);
-        while (elapsed < duration)
-        {
-            elapsed += BraveTime.DeltaTime;
-            // float t = elapsed / duration;
-            // copySprite.renderer.material.SetFloat(emId, Mathf.Lerp(0f, 10f, 1f - t));
-            copySprite.renderer.material.SetFloat("_BurnAmount", Mathf.Abs(Mathf.Sin(3f * elapsed)));
-            copyTransform.position += motionDirection.ToVector3ZisY().normalized * BraveTime.DeltaTime * 1f;
-            yield return null;
-        }
-        if (!useBase)
-            UnityEngine.Object.Destroy(copyTransform.gameObject);
-    }
-
     /// <summary>Update mastery ritual requirements whenever a gun is manually dropped by the player</summary>
     [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.ForceDropGun))]
     private class ManuallyDropGunPatch

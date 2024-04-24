@@ -42,10 +42,10 @@ public static class CwaffSynergies
                 ETGModConsole.Log($"<color=#ffff88ff>WARNING: haven't initialized custom synergy {_SynergyEnums[i]}</color>");
     }
 
-    private static void NewSynergy(Synergy synergy, string name, string[] mandatory, string[] optional = null, bool ignoreLichEyeBullets = false)
+    private static void NewSynergy(Synergy synergy, string name, string[] mandatory, string[] optional = null, bool ignoreLichEyeBullets = false, int masteryId = -1)
     {
         // Register the AdvancedSynergyEntry so that the game knows about it
-        RegisterSynergy(name, mandatory.ToList(), optional?.ToList(), ignoreLichEyeBullets);
+        RegisterSynergy(name, mandatory.ToList(), optional?.ToList(), ignoreLichEyeBullets, masteryId);
         // Get the enum index of our synergy
         int index            = (int)synergy;
         // Extend the base game's CustomSynergyType enum to make room for our new synergy
@@ -56,7 +56,7 @@ public static class CwaffSynergies
         _SynergyIds[index]   = GameManager.Instance.SynergyManager.synergies.Length - 1;
     }
 
-    public static AdvancedSynergyEntry RegisterSynergy(string name, List<string> mandatoryConsoleIDs, List<string> optionalConsoleIDs = null, bool ignoreLichEyeBullets = false)
+    public static AdvancedSynergyEntry RegisterSynergy(string name, List<string> mandatoryConsoleIDs, List<string> optionalConsoleIDs = null, bool ignoreLichEyeBullets = false, int masteryId = -1)
     {
         List<int> itemIDs    = new();
         List<int> gunIDs     = new();
@@ -70,6 +70,8 @@ public static class CwaffSynergies
             else if (pickup && (pickup.GetComponent<PlayerItem>() || pickup.GetComponent<PassiveItem>()))
                 itemIDs.Add(pickup.PickupObjectId);
         }
+        if (masteryId >= 0)
+            itemIDs.Add(masteryId);
 
         if (optionalConsoleIDs != null)
         {
@@ -112,16 +114,13 @@ public static class CwaffSynergies
             return;
 
         FakeItem.Create<T>();
-
-        string itemName = typeof(T).Name;
-        string baseItemName = itemName.Replace("-", "").Replace(".", "").Replace(" ", "_").ToLower();  //get saner gun name for commands
-        string internalName = C.MOD_PREFIX+":"+baseItemName;
+        int tokenId = FakeItem.Acquire<T>().PickupObjectId;
         NewSynergy(
             synergy              : synergy,
             name                 : $"{gun.EncounterNameOrDisplayName} Mastery",
-            mandatory            : new string[2]{IDs.InternalNames[gun.gunName], internalName},
+            mandatory            : new string[1]{IDs.InternalNames[gun.gunName]},
+            masteryId            : tokenId,
             ignoreLichEyeBullets : true);
-        int tokenId = FakeItem.Acquire<T>().PickupObjectId;
         _MasteryIds.Add(tokenId);
         _MasteryGuns[gun.PickupObjectId] = tokenId;
     }
@@ -167,6 +166,9 @@ public static class CwaffSynergies
 
         private static bool CheckForNewMasteries(PlayerStats stats, PlayerController owner)
         {
+            // if (!owner.AcceptingAnyInput)  //NOTE: this is a vanilla bug with synergies, so disabling for now
+            //     return false; // probably reloading a save or something, don't play any vfx
+
             for (int i = 0; i < owner.ActiveExtraSynergies.Count; i++)
             {
                 int synId = owner.ActiveExtraSynergies[i];

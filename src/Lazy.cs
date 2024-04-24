@@ -101,7 +101,8 @@ public static class Lazy
         FakeItem item = sprite.AddComponent<TItemSpecific>();
 
         ETGMod.Databases.Items.SetupItem(item, itemName);
-        Gungeon.Game.Items.Add(internalName, item);  //TODO: after moving away from Alexandria Synergies, can `if (C.DEBUG_BUILD)` this to stop it from appearing in console
+        if (C.DEBUG_BUILD) // only allow spawning fake items through console in debug mode
+            Gungeon.Game.Items.Add(internalName, item);
 
         item.itemName = itemName;
         item.encounterTrackable.EncounterGuid = $"{C.MOD_PREFIX}-{baseItemName}"; //create a unique guid for the item
