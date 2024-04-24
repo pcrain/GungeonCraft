@@ -1,8 +1,6 @@
 namespace CwaffingTheGungy;
 
-
 /* TODO:
-    - get ui mastery icon working
     - only allow ritual once per run
     - disable spawning of mastery tokens through console outside debug builds
     - actually make decent masteries
@@ -72,6 +70,7 @@ public static class CwaffMasteries
             UnityEngine.Object.Destroy(copyTransform.gameObject);
     }
 
+    /// <summary>Update mastery ritual requirements whenever a gun is manually dropped by the player</summary>
     [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.ForceDropGun))]
     private class ManuallyDropGunPatch
     {
@@ -82,6 +81,7 @@ public static class CwaffMasteries
         }
     }
 
+    /// <summary>Update mastery ritual requirements whenever a gun is picked up by the player</summary>
     [HarmonyPatch(typeof(GunInventory), nameof(GunInventory.AddGunToInventory))]
     private class PickUpGunPatch
     {
@@ -97,6 +97,7 @@ public static class CwaffMasteries
         }
     }
 
+    /// <summary>Attempt to complete the mastery ritual whenever the player uses a consumable blank</summary>
     [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.DoConsumableBlank))]
     private class UsedBlankPatch
     {
@@ -106,10 +107,40 @@ public static class CwaffMasteries
               MasteryRitualComponent.UpdateMasteryRitualStatus(blankUser: __instance);
         }
     }
+
+    /// <summary>Allow gun names displayed on the UI to process markup</summary>
+    [HarmonyPatch(typeof(GameUIRoot), nameof(GameUIRoot.UpdateGunDataInternal))]
+    private class AllowGunDisplayNameMarkupPatch
+    {
+        static void Prefix(GameUIRoot __instance, PlayerController targetPlayer, GunInventory inventory, int inventoryShift, GameUIAmmoController targetAmmoController, int labelTarget)
+        {
+          if (__instance.gunNameLabels != null)
+            __instance.gunNameLabels[labelTarget].ProcessMarkup = true; // make sure we can process markup on "Mastered " text
+        }
+    }
+
+    /// <summary>Add "Mastered" before mastered guns when displaying gun cards</summary>
+    [HarmonyPatch(typeof(EncounterTrackable), nameof(EncounterTrackable.GetModifiedDisplayName))]
+    private class DisplayMasteryInGunNamePatch
+    {
+        static void Postfix(EncounterTrackable __instance, ref string __result)
+        {
+            if (__instance.GetComponent<Gun>() is not Gun gun)
+              return;
+            if (gun.CurrentOwner is not PlayerController player)
+              return;
+            if (!gun.IsMasterable())
+              return;
+            if (!player.HasPassiveItem(gun.MasteryTokenId()))
+              return;
+            __result = $"[color #dd6666]Mastered[/color] {__result}";
+        }
+    }
 }
 
 public class MasteryRitualComponent : MonoBehaviour
 {
+  private const float _BURN_TIME = 1.0f;
   private const float _SIGIL_SPIN_SPEED = 0.5f;
   private const float _PARTICLE_SPIN_SPEED = 1.4f;
 
@@ -478,10 +509,9 @@ public class MasteryRitualComponent : MonoBehaviour
       sprite.renderer.material.SetFloat("_EmissivePower", 10f);
 
       // Fade away
-      float burnTime = 0.5f;
-      for (float elapsed = 0f; elapsed < burnTime; elapsed += BraveTime.DeltaTime)
+      for (float elapsed = 0f; elapsed < _BURN_TIME; elapsed += BraveTime.DeltaTime)
       {
-          float percentDone = elapsed / burnTime;
+          float percentDone = elapsed / _BURN_TIME;
           sprite.renderer.material.SetFloat("_BurnAmount", percentDone);
           yield return null;
       }
