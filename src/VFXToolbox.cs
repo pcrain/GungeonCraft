@@ -559,7 +559,7 @@ public static class VFX
 // Helper class for making movable / fadeable  VFX
 public class FancyVFX : MonoBehaviour
 {
-    public tk2dSprite sprite;
+    public tk2dBaseSprite sprite;
 
     private GameObject _vfx           = null;
     private Vector3    _velocity      = Vector3.zero;
@@ -803,9 +803,7 @@ public class FancyVFX : MonoBehaviour
             return null;
 
         // GameObject g = UnityEngine.Object.Instantiate(new GameObject(), osprite.WorldCenter, osprite.transform.rotation);
-        tk2dSprite sprite = Lazy.SpriteObject(osprite.collection, osprite.spriteId);
-            sprite.transform.rotation = osprite.transform.rotation;
-            sprite.PlaceAtPositionByAnchor(osprite.WorldCenter, Anchor.MiddleCenter);
+        tk2dBaseSprite sprite = osprite.DuplicateInWorld();
 
         FancyVFX fv = sprite.AddComponent<FancyVFX>();
             fv.sprite = sprite;

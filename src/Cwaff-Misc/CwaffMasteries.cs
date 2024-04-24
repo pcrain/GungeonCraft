@@ -1,5 +1,13 @@
 namespace CwaffingTheGungy;
 
+
+/* TODO:
+    - get ui mastery icon working
+    - only allow ritual once per run
+    - disable spawning of mastery tokens through console outside debug builds
+    - actually make decent masteries
+*/
+
 public static class CwaffMasteries
 {
     private static Transform CreateEmptySprite(tk2dBaseSprite target)
@@ -159,13 +167,20 @@ public class MasteryRitualComponent : MonoBehaviour
     // Requirement #4: the middle gun must have a mastery
     if (centerGun.GetComponentInChildren<Gun>() is not Gun gun)
       return false; // should never happen, error state
-    if (!gun.HasMastery())
+    if (!gun.IsMasterable())
     {
       // Lazy.DebugLog($"Failed req #4: center gun {gun.EncounterNameOrDisplayName} does not have a mastery available");
-      return false; //TODO: check if the player already has a mastery for the gun
+      return false;
     }
 
-    // Requirement #5: at least one of the guns being sacrificed must have a an equal or greater quality than the gun being mastered
+    // Requirement #5: the player must not already have the mastery for that gun
+    if (GameManager.Instance.AnyPlayerHasPickupID(gun.MasteryTokenId()))
+    {
+      // Lazy.DebugLog($"Failed req #5: player already has mastery for {gun.EncounterNameOrDisplayName}");
+      return false;
+    }
+
+    // Requirement #6: at least one of the guns being sacrificed must have a an equal or greater quality than the gun being mastered
     bool worthySacrifice = false;
     int neededQuality = gun.QualityGrade();
     foreach (MasteryRitualComponent comp in roomGuns)
@@ -181,7 +196,7 @@ public class MasteryRitualComponent : MonoBehaviour
     }
     if (!worthySacrifice)
     {
-      // Lazy.DebugLog($"Failed req #5: one of the guns being sacrificed must have a quality equal to or greater than the gun being mastered");
+      // Lazy.DebugLog($"Failed req #6: one of the guns being sacrificed must have a quality equal to or greater than the gun being mastered");
       return false;
     }
 
@@ -201,6 +216,7 @@ public class MasteryRitualComponent : MonoBehaviour
           gun.StartEmitter(gun == ritualTarget);
           continue;
         }
+        gun.DestroyEmitter();
         if (gun == ritualTarget)
           blankUser.AcquireMastery(gun.GetComponent<Gun>());
         else
@@ -256,18 +272,11 @@ public class MasteryRitualComponent : MonoBehaviour
   private static GameObject MakeNiceParticleSystem(Color particleColor, float arcSpeed)
   {
       GameObject psBasePrefab = (ItemHelper.Get(Items.CombinedRifle) as Gun).alternateVolley.projectiles[0].projectiles[0].GetComponent<CombineEvaporateEffect>().ParticleSystemToSpawn;
-      if (!psBasePrefab)
-      {
-        ETGModConsole.Log($"no base prefab");
-        return null;
-      }
       GameObject psnewPrefab = UnityEngine.Object.Instantiate(psBasePrefab).RegisterPrefab();
       //NOTE: look at CombineSparks.prefab for reference
       //NOTE: uses shader https://github.com/googlearchive/soundstagevr/blob/master/Assets/third_party/Sonic%20Ether/Shaders/SEParticlesAdditive.shader
       ParticleSystem ps = psnewPrefab.GetComponent<ParticleSystem>();
       // ETGModConsole.Log($"was using shader {psObj.GetComponent<ParticleSystemRenderer>().material.shader.name}");
-      // psObj.GetComponent<ParticleSystemRenderer>().material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
-      // psObj.GetComponent<ParticleSystemRenderer>().material.SetFloat("_EmissivePower", 15f);
 
       ParticleSystem.MainModule main = ps.main;
       main.duration                = 3600f;
@@ -296,7 +305,7 @@ public class MasteryRitualComponent : MonoBehaviour
       colm.color = new ParticleSystem.MinMaxGradient(g); // looks jank
 
       ParticleSystem.EmissionModule em = ps.emission;
-      em.rateOverTime = 30f;
+      em.rateOverTime = 60f;
 
       ParticleSystemRenderer psr = psnewPrefab.GetComponent<ParticleSystemRenderer>();
       psr.material.SetFloat("_InvFade", 3.0f);
@@ -348,7 +357,7 @@ public class MasteryRitualComponent : MonoBehaviour
         return;
 
       _CatalystNiceParticleSytem ??= MakeNiceParticleSystem(new Color(0.75f, 0.75f, 0.5f), arcSpeed: 1f);
-      _MasteryNiceParticleSytem  ??= MakeNiceParticleSystem(new Color(1.0f, 0.5f, 0.5f), arcSpeed: -1f);
+      _MasteryNiceParticleSytem  ??= MakeNiceParticleSystem(new Color(1.0f, 0.75f, 0.75f), arcSpeed: -1f);
 
       if (this._ps)
         UnityEngine.Object.Destroy(this._ps.gameObject);
@@ -386,8 +395,9 @@ public class MasteryRitualComponent : MonoBehaviour
   private void OnDestroy()
   {
     // ETGModConsole.Log($"getting destroyed");
-    if (this._ps)
-      UnityEngine.Object.Destroy(this._ps.gameObject);
+    DestroyEmitter();
+    if (_RitualGuns.Contains(this))
+      _RitualGuns.Remove(this);
     UpdateMasteryRitualStatus(blankUser: null);
   }
 
@@ -398,33 +408,35 @@ public class MasteryRitualComponent : MonoBehaviour
 
   private void BurnAway()
   {
-    StartCoroutine(BurnAway_CR());
-  }
-
-  private IEnumerator BurnAway_CR()
-  {
-      // Clean up particle system
-      if (this._ps)
-        this._ps.Stop(true, ParticleSystemStopBehavior.StopEmitting);
-      this._ps = null;
-
-      // If we have no gun, something went wrong, so destroy the base gameObject immediately
-      if (!this.gun)
-        this.gun = base.GetComponent<Gun>();
-      if (!this.gun)
-      {
-        UnityEngine.Object.Destroy(base.gameObject);
-        yield break;
-      }
-
+    if (base.GetComponent<Gun>() is Gun gun)
+    {
       // Deregister ourselves as a room interactable if necessary
       RoomHandler room = base.gameObject.transform.position.GetAbsoluteRoom();
-      if (room != null)
-        room.DeregisterInteractable(this.gun);
+      if (room != null && room.IsRegistered(gun))
+        room.DeregisterInteractable(gun);
 
+      tk2dBaseSprite burnSprite = gun.sprite.DuplicateInWorld();
+      burnSprite.StartCoroutine(BurnAway_CR(burnSprite));
+    }
+
+
+    // Destroy our gun component
+    if (base.transform.parent is Transform parent)
+    {
+      ETGModConsole.Log($"destroying parent");
+      UnityEngine.Object.Destroy(parent.gameObject);
+    }
+    else
+    {
+      ETGModConsole.Log($"destroying self");
+      UnityEngine.Object.Destroy(base.gameObject);
+    }
+  }
+
+  private static IEnumerator BurnAway_CR(tk2dBaseSprite sprite)
+  {
       // Set up shaders
-      tk2dBaseSprite sprite = this.gun.sprite;
-      SpriteOutlineManager.RemoveOutlineFromSprite(sprite);
+      // SpriteOutlineManager.RemoveOutlineFromSprite(sprite);
       sprite.renderer.material.DisableKeyword("TINTING_OFF");
       sprite.renderer.material.EnableKeyword("TINTING_ON");
       sprite.renderer.material.DisableKeyword("EMISSIVE_OFF");
@@ -436,18 +448,15 @@ public class MasteryRitualComponent : MonoBehaviour
       sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitCutoutUber");
       sprite.renderer.material.SetFloat("_EmissivePower", 10f);
 
-      // Destroy our gun component
-      UnityEngine.Object.Destroy(this.gun);
-      this.gun = null;
-
       // Fade away
-      for (float elapsed = 0f; elapsed < 1f; elapsed += BraveTime.DeltaTime)
+      float burnTime = 0.5f;
+      for (float elapsed = 0f; elapsed < burnTime; elapsed += BraveTime.DeltaTime)
       {
-          float percentDone = elapsed / 1f;
+          float percentDone = elapsed / burnTime;
           sprite.renderer.material.SetFloat("_BurnAmount", percentDone);
           yield return null;
       }
-      UnityEngine.Object.Destroy(base.gameObject);
+      UnityEngine.Object.Destroy(sprite.gameObject);
       yield break;
   }
 }

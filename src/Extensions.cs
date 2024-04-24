@@ -1919,4 +1919,13 @@ public static class Extensions
   {
     return p.transform.right.XY().ToAngle();
   }
+
+  /// <summary>Creates a GameObject with a sprite in the exact same location as an original sprite</summary>
+  public static tk2dBaseSprite DuplicateInWorld(this tk2dBaseSprite osprite)
+  {
+    tk2dBaseSprite sprite = Lazy.SpriteObject(osprite.collection, osprite.spriteId);
+    sprite.transform.rotation = osprite.transform.rotation;
+    sprite.PlaceAtPositionByAnchor(osprite.WorldCenter, Anchor.MiddleCenter);
+    return sprite;
+  }
 }

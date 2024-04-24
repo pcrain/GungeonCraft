@@ -214,7 +214,7 @@ public class KaliProjectile : MonoBehaviour
         body.aiActor.EraseFromExistence(true);
     }
 
-    private static IEnumerator CriticalGlow(tk2dSprite sprite)
+    private static IEnumerator CriticalGlow(tk2dBaseSprite sprite)
     {
         Material m = sprite.renderer.material;
         for (float elapsed = 0f; elapsed < 0.5f; elapsed += BraveTime.DeltaTime)

@@ -72,14 +72,19 @@ public static class CwaffSynergies
         _MasteryGuns[gun.PickupObjectId] = tokenId;
     }
 
-    public static bool HasMastery(this Gun gun)
+    public static bool IsMasterable(this Gun gun)
     {
         return _MasteryGuns.ContainsKey(gun.PickupObjectId);
     }
 
+    public static int MasteryTokenId(this Gun gun)
+    {
+        return _MasteryGuns[gun.PickupObjectId];
+    }
+
     public static void AcquireMastery(this PlayerController player, Gun gun)
     {
-        if (gun && gun.HasMastery())
+        if (gun && gun.IsMasterable())
             player.AcquireFakeItem(_MasteryGuns[gun.PickupObjectId]);
         else if (gun)
             Lazy.DebugWarn($"Trying to acquire mastery for {gun.EncounterNameOrDisplayName}, which doesn't have a mastery!");
