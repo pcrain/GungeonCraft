@@ -9,6 +9,7 @@ public static class CwaffSynergies
     public static List<string>            _SynergyEnums = new(Enum.GetNames(typeof(Synergy)));                              // list of enum names of synergies
     public static List<int>               _SynergyIds   = Enumerable.Repeat<int>(0, _NUM_SYNERGIES).ToList();               // list of ids of synergies in the AdvancedSynergyEntry database
     public static HashSet<int>            _MasteryIds   = new();                                                            // Set of fake item ids corresponding to mastery tokens
+    public static Dictionary<int,int>     _MasteryGuns  = new();                                                            // Dictionary of gun pickup ids to their mastery token ids
 
     internal static GameObject _MasteryVFX = null;
 
@@ -66,7 +67,24 @@ public static class CwaffSynergies
         string baseItemName = itemName.Replace("-", "").Replace(".", "").Replace(" ", "_").ToLower();  //get saner gun name for commands
         string internalName = C.MOD_PREFIX+":"+baseItemName;
         NewSynergy(synergy, $"{gun.EncounterNameOrDisplayName} Mastery", new string[2]{IDs.InternalNames[gun.gunName], internalName});
-        _MasteryIds.Add(FakeItem.Acquire<T>().PickupObjectId);
+        int tokenId = FakeItem.Acquire<T>().PickupObjectId;
+        _MasteryIds.Add(tokenId);
+        _MasteryGuns[gun.PickupObjectId] = tokenId;
+    }
+
+    public static bool HasMastery(this Gun gun)
+    {
+        return _MasteryGuns.ContainsKey(gun.PickupObjectId);
+    }
+
+    public static void AcquireMastery(this PlayerController player, Gun gun)
+    {
+        if (gun && gun.HasMastery())
+            player.AcquireFakeItem(_MasteryGuns[gun.PickupObjectId]);
+        else if (gun)
+            Lazy.DebugWarn($"Trying to acquire mastery for {gun.EncounterNameOrDisplayName}, which doesn't have a mastery!");
+        else
+            Lazy.DebugWarn($"Trying to acquire mastery for null gun!");
     }
 
     /// <summary>Adds some code after calling RebuildSynergies() to check if any of the new synergies are masteries, and if so, plays the appropriate VFX / skips the remaining notifications</summary>

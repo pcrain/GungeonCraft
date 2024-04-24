@@ -1811,11 +1811,24 @@ public static class Extensions
       );
   }
 
-  /// <summary>Acquire a fake item and put it in a player's inventory</summary>
+  /// <summary>Acquire a fake item and put it in a player's inventory (generic version)</summary>
   public static T AcquireFakeItem<T>(this PlayerController player) where T : FakeItem
   {
     GameObject gameObject = UnityEngine.Object.Instantiate(FakeItem.Acquire<T>().gameObject);
     T fakePassive = gameObject.GetComponent<T>();
+    EncounterTrackable trackable = fakePassive.GetComponent<EncounterTrackable>();
+    if (trackable)
+      trackable.DoNotificationOnEncounter = false;
+    fakePassive.suppressPickupVFX = true;
+    fakePassive.Pickup(player);
+    return fakePassive;
+  }
+
+  /// <summary>Acquire a fake item and put it in a player's inventory (id version)</summary>
+  public static FakeItem AcquireFakeItem(this PlayerController player, int id)
+  {
+    GameObject gameObject = UnityEngine.Object.Instantiate(FakeItem.Acquire(id).gameObject);
+    FakeItem fakePassive = gameObject.GetComponent<FakeItem>();
     EncounterTrackable trackable = fakePassive.GetComponent<EncounterTrackable>();
     if (trackable)
       trackable.DoNotificationOnEncounter = false;
