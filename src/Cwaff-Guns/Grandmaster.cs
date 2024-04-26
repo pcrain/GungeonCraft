@@ -15,6 +15,14 @@ public class Grandmaster : AdvancedGunBehavior
     internal static tk2dSpriteAnimationClip _KnightSprite;
     internal static tk2dSpriteAnimationClip _QueenSprite;
     internal static tk2dSpriteAnimationClip _KingSprite;
+    internal static tk2dSpriteAnimationClip _BlackPawnSprite;
+    internal static tk2dSpriteAnimationClip _BlackRookSprite;
+    internal static tk2dSpriteAnimationClip _BlackBishopSprite;
+    internal static tk2dSpriteAnimationClip _BlackKnightSprite;
+    internal static tk2dSpriteAnimationClip _BlackQueenSprite;
+    internal static tk2dSpriteAnimationClip _BlackKingSprite;
+
+    internal static Projectile _Projectile;
 
     public static void Add()
     {
@@ -22,7 +30,7 @@ public class Grandmaster : AdvancedGunBehavior
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.0f, ammo: 350, shootFps: 24, reloadFps: 16,
                 muzzleFrom: Items.Mailbox, fireAudio: "chess_gun_fire", reloadAudio: "chess_gun_reload");
 
-        gun.InitProjectile(GunData.New(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true,
+        _Projectile = gun.InitProjectile(GunData.New(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true,
             speed: 30f, damage: 5.5f, force: 9f, range: 1000f, shouldRotate: false
           )).AddAnimations(
             AnimatedBullet.Create(refClip: ref _PawnSprite,   name: "chess_pawn",   scale: 0.8f, anchor: Anchor.MiddleCenter),
@@ -30,8 +38,42 @@ public class Grandmaster : AdvancedGunBehavior
             AnimatedBullet.Create(refClip: ref _BishopSprite, name: "chess_bishop", scale: 0.8f, anchor: Anchor.MiddleCenter),
             AnimatedBullet.Create(refClip: ref _KnightSprite, name: "chess_knight", scale: 0.8f, anchor: Anchor.MiddleCenter),
             AnimatedBullet.Create(refClip: ref _QueenSprite,  name: "chess_queen",  scale: 0.8f, anchor: Anchor.MiddleCenter),
-            AnimatedBullet.Create(refClip: ref _KingSprite,   name: "chess_king",   scale: 0.8f, anchor: Anchor.MiddleCenter)
+            AnimatedBullet.Create(refClip: ref _KingSprite,   name: "chess_king",   scale: 0.8f, anchor: Anchor.MiddleCenter),
+            AnimatedBullet.Create(refClip: ref _BlackPawnSprite,   name: "chess_pawn_black",   scale: 0.8f, anchor: Anchor.MiddleCenter),
+            AnimatedBullet.Create(refClip: ref _BlackRookSprite,   name: "chess_rook_black",   scale: 0.8f, anchor: Anchor.MiddleCenter),
+            AnimatedBullet.Create(refClip: ref _BlackBishopSprite, name: "chess_bishop_black", scale: 0.8f, anchor: Anchor.MiddleCenter),
+            AnimatedBullet.Create(refClip: ref _BlackKnightSprite, name: "chess_knight_black", scale: 0.8f, anchor: Anchor.MiddleCenter),
+            AnimatedBullet.Create(refClip: ref _BlackQueenSprite,  name: "chess_queen_black",  scale: 0.8f, anchor: Anchor.MiddleCenter),
+            AnimatedBullet.Create(refClip: ref _BlackKingSprite,   name: "chess_king_black",   scale: 0.8f, anchor: Anchor.MiddleCenter)
           ).Attach<PlayChessBehavior>();
+    }
+
+    public override void OnDestroy()
+    {
+        if (this.Player)
+            this.Player.OnReloadedGun -= OnGrandmasterReloaded;
+    }
+
+    protected override void OnPickedUpByPlayer(PlayerController player)
+    {
+        base.OnPickedUpByPlayer(player);
+        player.OnReloadedGun += OnGrandmasterReloaded;
+    }
+
+    protected override void OnPostDroppedByPlayer(PlayerController player)
+    {
+        player.OnReloadedGun -= OnGrandmasterReloaded;
+        base.OnPostDroppedByPlayer(player);
+    }
+
+    private static void OnGrandmasterReloaded(PlayerController usingPlayer, Gun usedGun)
+    {
+        if (usedGun.GetComponent<Grandmaster>() is not Grandmaster gm)
+            return;
+        if (!usingPlayer.PlayerHasActiveSynergy(Synergy.MASTERY_GRANDMASTER))
+            return;
+        // for (int i = 0; i < 5; ++i)
+        //     usedGun.ForceFireProjectile(usedGun.DefaultModule.projectiles[0]);
     }
 }
 
@@ -62,13 +104,17 @@ public abstract class ChessPiece : MonoBehaviour
 
     protected AIActor _targetEnemy    = null;  // which enemy, if any, we're currently targeting
     protected bool _twoPhaseMove      = false; // whether the piece moves in two phases; true only for knight
+    protected bool _mastered          = false; // whether Grandmaster has been mastered
+    protected float _moveTime         = 0.0f;
+    protected float _pauseTime        = 0.0f;
+    protected bool _spawnBlack        = false;
 
     private void Update()
     {
         this._lifetime += BraveTime.DeltaTime;
         if (this._movePhase == 0)
         {
-            if (this._lifetime >= _BaseMovePause)
+            if (this._lifetime >= this._pauseTime)
             {
                 StartMoving();
                 this._trail.Enable();
@@ -81,29 +127,40 @@ public abstract class ChessPiece : MonoBehaviour
         }
         else if (this._twoPhaseMove && this._movePhase == 1)
         {
-            if (this._lifetime >= _BaseMoveTime)
+            if (this._lifetime >= this._moveTime)
             {
                 this._projectile.SendInDirection(this._targetVec.SmallerComponent(), true);
                 this._movePhase = 2; // very intentionally not resetting lifetime here
             }
         }
-        else if (this._lifetime >= (_BaseMoveTime * this._movePhase)) // double the wait time for knight moves
+        else if (this._lifetime >= (this._moveTime * this._movePhase)) // double the wait time for knight moves
         {
             StopMoving();
             this._trail.Disable();
             this._projectile.collidesWithEnemies = false;
             this._movePhase                      = 0;
             this._lifetime                       = 0.0f;
+            if (this._spawnBlack)
+            {
+                this._spawnBlack = false;
+                Projectile p = VolleyUtility.ShootSingleProjectile(
+                    Grandmaster._Projectile, this._projectile.SafeCenter, -this._targetVec.ToAngle(), false, this._owner);
+                p.GetComponent<PlayChessBehavior>().isBlackPiece = true;
+            }
         }
     }
 
-    public virtual void Setup(Projectile projectile, PlayerController owner)
+    public virtual void Setup(Projectile projectile, PlayerController owner, bool isBlackPiece)
     {
         this._projectile = projectile;
         this._owner      = owner;
+        this._mastered   = this._owner.PlayerHasActiveSynergy(Synergy.MASTERY_GRANDMASTER);
+        this._spawnBlack = this._mastered && !isBlackPiece;
 
         this._sprite     = GetSprite();
-        this._speed      = ComputeSpeed(GetMoveDistance(), GetMoveTime());
+        this._moveTime   = _BaseMoveTime * (this._mastered ? 0.5f : 1f);
+        this._pauseTime  = _BaseMovePause * (this._mastered ? 0.5f : 1f);
+        this._speed      = GetMoveDistance() / (_BaseMoveTime * C.FPS);
 
         this._trail = this._projectile.gameObject.AddComponent<EasyTrailBullet>();
             this._trail.StartWidth = 0.2f;
@@ -118,11 +175,8 @@ public abstract class ChessPiece : MonoBehaviour
         UpdateCreate();
     }
 
-    protected float ComputeSpeed(float dist, float time) => dist / (time * C.FPS);
-
     protected abstract tk2dSpriteAnimationClip GetSprite();
     protected abstract float GetMoveDistance();
-    protected abstract float GetMoveTime();
     protected abstract Color GetTrailColor();
 
     protected virtual Vector2? ChooseNewTarget() => null; // don't change target by default
@@ -134,7 +188,7 @@ public abstract class ChessPiece : MonoBehaviour
         if (this._target is Vector2 target)
         {
             this._targetVec = target - this._projectile.sprite.WorldCenter;
-            float adjSpeed = this._targetVec.magnitude / _BaseMoveTime;
+            float adjSpeed = this._targetVec.magnitude / this._moveTime;
             this._projectile.SetSpeed(Mathf.Min(this._speed, adjSpeed));
         }
         else
@@ -229,9 +283,8 @@ public abstract class ChessPiece : MonoBehaviour
 }
 
 public class PawnPiece   : ChessPiece {
-    protected override tk2dSpriteAnimationClip GetSprite() => Grandmaster._PawnSprite;
+    protected override tk2dSpriteAnimationClip GetSprite() => this._spawnBlack ? Grandmaster._BlackPawnSprite : Grandmaster._PawnSprite;
     protected override float GetMoveDistance()             => _BaseMoveDist;
-    protected override float GetMoveTime()                 => _BaseMoveTime;
     protected override Color GetTrailColor()               => Color.white;
 }
 
@@ -239,9 +292,8 @@ public class RookPiece : ChessPiece
 {
     private static readonly List<float> _AnglesOf90 = new(){0f, 90f, 180f, 270f};
 
-    protected override tk2dSpriteAnimationClip GetSprite()         => Grandmaster._RookSprite;
+    protected override tk2dSpriteAnimationClip GetSprite()         => this._spawnBlack ? Grandmaster._BlackRookSprite : Grandmaster._RookSprite;
     protected override float GetMoveDistance()                     => 450f;
-    protected override float GetMoveTime()                         => ChessPiece._BaseMoveTime;
     protected override Color GetTrailColor()                       => Color.magenta;
     protected override IEnumerable<float> GetValidAnglesForPiece() => _AnglesOf90;
     protected override Vector2? ChooseNewTarget()                  => ScanForTarget();
@@ -257,9 +309,8 @@ public class BishopPiece : ChessPiece
 {
     private static readonly List<float> _AnglesOf45 = new(){45f, 135f, 225f, 315f};
 
-    protected override tk2dSpriteAnimationClip GetSprite()         => Grandmaster._BishopSprite;
+    protected override tk2dSpriteAnimationClip GetSprite()         => this._spawnBlack ? Grandmaster._BlackBishopSprite : Grandmaster._BishopSprite;
     protected override float GetMoveDistance()                     => 350f;
-    protected override float GetMoveTime()                         => ChessPiece._BaseMoveTime;
     protected override Color GetTrailColor()                       => Color.cyan;
     protected override IEnumerable<float> GetValidAnglesForPiece() => _AnglesOf45;
     protected override Vector2? ChooseNewTarget()                  => ScanForTarget();
@@ -275,9 +326,8 @@ public class KnightPiece : ChessPiece
 {
     private static List<float> _AnglesOf30 = new(){30f, 60f, 120f, 150f, 210f, 240f, 300f, 330f};
 
-    protected override tk2dSpriteAnimationClip GetSprite()         => Grandmaster._KnightSprite;
+    protected override tk2dSpriteAnimationClip GetSprite()         => this._spawnBlack ? Grandmaster._BlackKnightSprite : Grandmaster._KnightSprite;
     protected override float GetMoveDistance()                     => 200f;
-    protected override float GetMoveTime()                         => ChessPiece._BaseMoveTime;
     protected override Color GetTrailColor()                       => Color.green;
     protected override IEnumerable<float> GetValidAnglesForPiece() => _AnglesOf30;
     protected override Vector2? ChooseNewTarget()                  => ScanForTarget();
@@ -297,9 +347,8 @@ public class QueenPiece : ChessPiece
 {
     private static List<float> _AnglesOf45And90 = new(){0f, 45f, 90f, 135f, 180f, 225f, 270f, 315f};
 
-    protected override tk2dSpriteAnimationClip GetSprite()         => Grandmaster._QueenSprite;
+    protected override tk2dSpriteAnimationClip GetSprite()         => this._spawnBlack ? Grandmaster._BlackQueenSprite : Grandmaster._QueenSprite;
     protected override float GetMoveDistance()                     => 500f;
-    protected override float GetMoveTime()                         => ChessPiece._BaseMoveTime;
     protected override Color GetTrailColor()                       => Color.yellow;
     protected override IEnumerable<float> GetValidAnglesForPiece() => _AnglesOf45And90;
     protected override Vector2? ChooseNewTarget()                  => ScanForTarget();
@@ -321,6 +370,8 @@ public class QueenPiece : ChessPiece
 
 public class PlayChessBehavior : MonoBehaviour
 {
+    public bool isBlackPiece = false;
+
     private Projectile _projectile  = null;
     private PlayerController _owner = null;
     private ChessPiece _piece       = null;
@@ -371,6 +422,6 @@ public class PlayChessBehavior : MonoBehaviour
             default:                 this._piece = this._projectile.gameObject.AddComponent<PawnPiece>();   break;
         }
 
-        this._piece.Setup(this._projectile, this._owner);
+        this._piece.Setup(this._projectile, this._owner, isBlackPiece);
     }
 }

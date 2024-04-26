@@ -26,7 +26,7 @@ public static class CwaffSynergies
       #endregion
 
       #region Masteries
-        // Grandmaster no longer shoots pawns, only major pieces
+        // Grandmaster shoots an additional black piece with every shot, no longer shoots pawns, and moves pieces twice as fast
         NewMastery<MasteryOfGrandmaster>(MASTERY_GRANDMASTER, Grandmaster.ItemName);
       #endregion
 
