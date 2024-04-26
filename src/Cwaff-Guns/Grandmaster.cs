@@ -108,6 +108,7 @@ public abstract class ChessPiece : MonoBehaviour
     protected float _moveTime         = 0.0f;
     protected float _pauseTime        = 0.0f;
     protected bool _spawnBlack        = false;
+    protected bool _isBlack           = false;
 
     private void Update()
     {
@@ -156,11 +157,13 @@ public abstract class ChessPiece : MonoBehaviour
         this._owner      = owner;
         this._mastered   = this._owner.PlayerHasActiveSynergy(Synergy.MASTERY_GRANDMASTER);
         this._spawnBlack = this._mastered && !isBlackPiece;
+        this._isBlack    = isBlackPiece;
 
         this._sprite     = GetSprite();
         this._moveTime   = _BaseMoveTime * (this._mastered ? 0.5f : 1f);
         this._pauseTime  = _BaseMovePause * (this._mastered ? 0.5f : 1f);
         this._speed      = GetMoveDistance() / (_BaseMoveTime * C.FPS);
+        this._movePhase  = this._twoPhaseMove ? 2 : 1;
 
         this._trail = this._projectile.gameObject.AddComponent<EasyTrailBullet>();
             this._trail.StartWidth = 0.2f;
@@ -193,7 +196,8 @@ public abstract class ChessPiece : MonoBehaviour
         }
         else
         {
-            this._targetVec = this._speed * GetBestValidAngleForPiece(this._projectile.m_currentDirection.ToAngle()).ToVector();
+            if (!this._twoPhaseMove || this._targetVec.LargerComponent().sqrMagnitude == 0)
+                this._targetVec = this._speed * GetBestValidAngleForPiece(this._projectile.m_currentDirection.ToAngle()).ToVector();
             this._projectile.SetSpeed(this._speed);
         }
 
@@ -283,7 +287,7 @@ public abstract class ChessPiece : MonoBehaviour
 }
 
 public class PawnPiece   : ChessPiece {
-    protected override tk2dSpriteAnimationClip GetSprite() => this._spawnBlack ? Grandmaster._BlackPawnSprite : Grandmaster._PawnSprite;
+    protected override tk2dSpriteAnimationClip GetSprite() => this._isBlack ? Grandmaster._BlackPawnSprite : Grandmaster._PawnSprite;
     protected override float GetMoveDistance()             => _BaseMoveDist;
     protected override Color GetTrailColor()               => Color.white;
 }
@@ -292,7 +296,7 @@ public class RookPiece : ChessPiece
 {
     private static readonly List<float> _AnglesOf90 = new(){0f, 90f, 180f, 270f};
 
-    protected override tk2dSpriteAnimationClip GetSprite()         => this._spawnBlack ? Grandmaster._BlackRookSprite : Grandmaster._RookSprite;
+    protected override tk2dSpriteAnimationClip GetSprite()         => this._isBlack ? Grandmaster._BlackRookSprite : Grandmaster._RookSprite;
     protected override float GetMoveDistance()                     => 450f;
     protected override Color GetTrailColor()                       => Color.magenta;
     protected override IEnumerable<float> GetValidAnglesForPiece() => _AnglesOf90;
@@ -309,7 +313,7 @@ public class BishopPiece : ChessPiece
 {
     private static readonly List<float> _AnglesOf45 = new(){45f, 135f, 225f, 315f};
 
-    protected override tk2dSpriteAnimationClip GetSprite()         => this._spawnBlack ? Grandmaster._BlackBishopSprite : Grandmaster._BishopSprite;
+    protected override tk2dSpriteAnimationClip GetSprite()         => this._isBlack ? Grandmaster._BlackBishopSprite : Grandmaster._BishopSprite;
     protected override float GetMoveDistance()                     => 350f;
     protected override Color GetTrailColor()                       => Color.cyan;
     protected override IEnumerable<float> GetValidAnglesForPiece() => _AnglesOf45;
@@ -326,7 +330,7 @@ public class KnightPiece : ChessPiece
 {
     private static List<float> _AnglesOf30 = new(){30f, 60f, 120f, 150f, 210f, 240f, 300f, 330f};
 
-    protected override tk2dSpriteAnimationClip GetSprite()         => this._spawnBlack ? Grandmaster._BlackKnightSprite : Grandmaster._KnightSprite;
+    protected override tk2dSpriteAnimationClip GetSprite()         => this._isBlack ? Grandmaster._BlackKnightSprite : Grandmaster._KnightSprite;
     protected override float GetMoveDistance()                     => 200f;
     protected override Color GetTrailColor()                       => Color.green;
     protected override IEnumerable<float> GetValidAnglesForPiece() => _AnglesOf30;
@@ -347,7 +351,7 @@ public class QueenPiece : ChessPiece
 {
     private static List<float> _AnglesOf45And90 = new(){0f, 45f, 90f, 135f, 180f, 225f, 270f, 315f};
 
-    protected override tk2dSpriteAnimationClip GetSprite()         => this._spawnBlack ? Grandmaster._BlackQueenSprite : Grandmaster._QueenSprite;
+    protected override tk2dSpriteAnimationClip GetSprite()         => this._isBlack ? Grandmaster._BlackQueenSprite : Grandmaster._QueenSprite;
     protected override float GetMoveDistance()                     => 500f;
     protected override Color GetTrailColor()                       => Color.yellow;
     protected override IEnumerable<float> GetValidAnglesForPiece() => _AnglesOf45And90;
