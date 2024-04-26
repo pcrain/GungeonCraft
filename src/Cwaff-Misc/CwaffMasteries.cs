@@ -1,6 +1,7 @@
 namespace CwaffingTheGungy;
 
 /* TODO:
+    - add some kind of signifier for guns that have masteries
     - only allow ritual once per run
     - actually make decent masteries
 */
@@ -345,6 +346,8 @@ public class MasteryRitualComponent : MonoBehaviour
 
       DisableEffects();
 
+      if (isMasteryTarget)
+        base.gameObject.Play("mastery_ritual_activate_sound");
       this._spinSpeed = isMasteryTarget ? -_SIGIL_SPIN_SPEED : _SIGIL_SPIN_SPEED;
 
       GameObject psObj         = UnityEngine.Object.Instantiate(isMasteryTarget ? _MasteryNiceParticleSytem : _CatalystNiceParticleSytem);

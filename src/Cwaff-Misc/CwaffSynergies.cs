@@ -138,7 +138,10 @@ public static class CwaffSynergies
     public static void AcquireMastery(this PlayerController player, Gun gun)
     {
         if (gun && gun.IsMasterable())
+        {
             player.AcquireFakeItem(_MasteryGuns[gun.PickupObjectId]);
+            player.gameObject.Play("mastery_ritual_complete_sound");
+        }
         else if (gun)
             Lazy.DebugWarn($"Trying to acquire mastery for {gun.EncounterNameOrDisplayName}, which doesn't have a mastery!");
         else

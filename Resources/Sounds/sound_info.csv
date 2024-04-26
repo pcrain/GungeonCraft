@@ -158,3 +158,5 @@ sub_machine_gun_fire_sound,-4.5,1,sound
 sub_machine_gun_reload_sound,3.0,1,sound
 adrenaline_tank_damage_sound,2.5,1,sound
 the_sound_of_mastering_a_weapon,-2.0,1,sound
+mastery_ritual_activate_sound,6.0,1,sound
+mastery_ritual_complete_sound,3.0,1,sound
