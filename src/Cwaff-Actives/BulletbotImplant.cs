@@ -21,6 +21,7 @@ public class BulletbotImplant : PlayerItem
         item.consumable = true;
         item.canStack   = false;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
+        item.AddToSubShop(ModdedShopType.Handy);
 
         FakeItem.Create<UsedBulletbotImplant>();
     }

@@ -13,6 +13,7 @@ public class BionicFinger : PassiveItem
         item.quality       = ItemQuality.C;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
         item.AddToSubShop(ModdedShopType.Rusty);
+        item.AddToSubShop(ModdedShopType.Handy);
     }
 
     [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.HandleGunFiringInternal))]

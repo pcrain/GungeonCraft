@@ -10,6 +10,8 @@ namespace CwaffingTheGungy;
         omitb:Rusty               // poor quality items (not necessarily D tier)
         omitb:Ironside            // armour and defense themed items
         omitb:Boomhildr           // explosive themed items
+
+        ski:Arms_Dealer           // body implants and transplants that can physically replace organs
 */
 
 public enum ModdedShopType {
@@ -18,6 +20,7 @@ public enum ModdedShopType {
     Rusty,      //OMITB
     Boomhildr,  //OMITB
     Ironside,   //OMITB
+    Handy   ,   //Knife to a Gunfight
 };
 
 public static class ModdedShopItemAdder
@@ -46,6 +49,7 @@ public static class ModdedShopItemAdder
         _ModdedShopNameMap["omitb:Rusty"]        = ModdedShopType.Rusty;
         _ModdedShopNameMap["omitb:Boomhildr"]    = ModdedShopType.Boomhildr;
         _ModdedShopNameMap["omitb:Ironside"]     = ModdedShopType.Ironside;
+        _ModdedShopNameMap["ski:Arms_Dealer"]    = ModdedShopType.Handy;
     }
 
     // Extension method for adding items to modded subshops (delayed until first level is loaded, then used by AddOurItemsToModdedShops())
@@ -113,6 +117,8 @@ public static class ModdedShopItemAdder
         {
             // See if the assembly contains a reference to the shop api
             Type perModShopApi        = assembly.GetType("NpcApi.ShopAPI");
+            if (perModShopApi == null)
+                perModShopApi = assembly.GetType("NpcApi.ItsDaFuckinShopApi");
             Type perModShopController = assembly.GetType("NpcApi.CustomShopController");
             if (perModShopApi == null || perModShopController == null)
                 continue;
@@ -136,31 +142,37 @@ public static class ModdedShopItemAdder
             }
 
             // Look through all of the mod's shops, see if we know about any of them, and add our items to each of them as needed
-            foreach(KeyValuePair<string, GameObject> entry in builtShops)
-            {
-                if (entry.Value.GetComponent<BaseShopController>()?.shopItems is not GenericLootTable shopItems)
-                    continue;
-                if (C.DEBUG_BUILD)
-                    ETGModConsole.Log($"    found shop {entry.Key}");
-                if (!_ModdedShopNameMap.ContainsKey(entry.Key))
-                    continue;
-
-                // if (C.DEBUG_BUILD)
-                // {
-                //     foreach(WeightedGameObject item in shopItems.GetCompiledRawItems())
-                //         ETGModConsole.Log($"      contains {item.pickupId} == {PickupObjectDatabase.GetById(item.pickupId).EncounterNameOrDisplayName} with weight {item.weight}");
-                // }
-
-                foreach(int itemToAdd in _ModdedShopItems[_ModdedShopNameMap[entry.Key]])
-                {
-                    if (C.DEBUG_BUILD)
-                        ETGModConsole.Log($"      adding {itemToAdd} == {PickupObjectDatabase.GetById(itemToAdd).EncounterNameOrDisplayName} with weight 1");
-                    shopItems.AddItemToPool(itemToAdd);
-                }
-            }
+            AddOurItemsToModdedShops(builtShops);
         }
+        AddOurItemsToModdedShops(Alexandria.NPCAPI.ShopAPI.builtShops);
         watch.Stop();
         if (C.DEBUG_BUILD)
             ETGModConsole.Log($"  initialized modded shop items in "+(watch.ElapsedMilliseconds/1000.0f)+" seconds");
+    }
+
+    private static void AddOurItemsToModdedShops(Dictionary<string, GameObject> builtShops)
+    {
+        foreach(KeyValuePair<string, GameObject> entry in builtShops)
+        {
+            if (entry.Value.GetComponent<BaseShopController>()?.shopItems is not GenericLootTable shopItems)
+                continue;
+            if (C.DEBUG_BUILD)
+                ETGModConsole.Log($"    found shop {entry.Key}");
+            if (!_ModdedShopNameMap.ContainsKey(entry.Key))
+                continue;
+
+            // if (C.DEBUG_BUILD)
+            // {
+            //     foreach(WeightedGameObject item in shopItems.GetCompiledRawItems())
+            //         ETGModConsole.Log($"      contains {item.pickupId} == {PickupObjectDatabase.GetById(item.pickupId).EncounterNameOrDisplayName} with weight {item.weight}");
+            // }
+
+            foreach(int itemToAdd in _ModdedShopItems[_ModdedShopNameMap[entry.Key]])
+            {
+                if (C.DEBUG_BUILD)
+                    ETGModConsole.Log($"      adding {itemToAdd} == {PickupObjectDatabase.GetById(itemToAdd).EncounterNameOrDisplayName} with weight 1");
+                shopItems.AddItemToPool(itemToAdd);
+            }
+        }
     }
 }

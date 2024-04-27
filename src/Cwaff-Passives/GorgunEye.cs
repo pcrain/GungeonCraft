@@ -21,6 +21,7 @@ public class GorgunEye : PassiveItem
         PickupObject item = Lazy.SetupPassive<GorgunEye>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.B;
         item.AddToSubShop(ItemBuilder.ShopType.Cursula);
+        item.AddToSubShop(ModdedShopType.Handy);
 
         _GorgunTint = new GameActorHealthEffect()
         {
