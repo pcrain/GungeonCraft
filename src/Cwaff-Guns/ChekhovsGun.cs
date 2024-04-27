@@ -79,7 +79,8 @@ public class ChekhovsGun : AdvancedGunBehavior
                 ++ammoToRestore;
         }
         this._extantBullets.Clear();
-        ammoToRestore /= 2;
+        if (!player.PlayerHasActiveSynergy(Synergy.MASTERY_CHEKHOVS_GUN))
+            ammoToRestore /= 2;
         this.gun.GainAmmo(ammoToRestore);
     }
 }
@@ -95,10 +96,13 @@ public class ChekhovBullet : MonoBehaviour
     private GameObject _gunVfx           = null;
 
     public bool isAFreebie               = false;
+    public bool mastered                 = false;
 
     private void Start()
     {
         this._projectile = base.GetComponent<Projectile>();
+        if (this._projectile.Owner is PlayerController pc)
+            this.mastered = pc.PlayerHasActiveSynergy(Synergy.MASTERY_CHEKHOVS_GUN);
         StartCoroutine(PlotDevice(this._projectile.transform.right.XY()));
     }
 
@@ -136,12 +140,13 @@ public class ChekhovBullet : MonoBehaviour
         this._gunVfx.GetComponent<tk2dSprite>().PlaceAtRotatedPositionByAnchor(start, Anchor.MiddleCenter);
 
         float lifeTime = 0.0f;
-        while (lifeTime < _MIN_FREEZE_TIME)
-        {
-            lifeTime += BraveTime.DeltaTime;
-            this._gunVfx.SetAlpha(Mathf.Max(0.1f, 1f - lifeTime));
-            yield return null;
-        }
+        if (!this.mastered)
+            while (lifeTime < _MIN_FREEZE_TIME)
+            {
+                lifeTime += BraveTime.DeltaTime;
+                this._gunVfx.SetAlpha(Mathf.Max(0.1f, 1f - lifeTime));
+                yield return null;
+            }
 
         // Phase 2: wait for an enemy to walk into view
         float lastScan = 0.0f;

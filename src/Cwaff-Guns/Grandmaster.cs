@@ -1,7 +1,5 @@
 ﻿namespace CwaffingTheGungy;
 
-internal class MasteryOfGrandmaster : MasteryDummyItem {}
-
 public class Grandmaster : AdvancedGunBehavior
 {
     public static string ItemName         = "Grandmaster";
@@ -70,10 +68,6 @@ public class Grandmaster : AdvancedGunBehavior
     {
         if (usedGun.GetComponent<Grandmaster>() is not Grandmaster gm)
             return;
-        if (!usingPlayer.PlayerHasActiveSynergy(Synergy.MASTERY_GRANDMASTER))
-            return;
-        // for (int i = 0; i < 5; ++i)
-        //     usedGun.ForceFireProjectile(usedGun.DefaultModule.projectiles[0]);
     }
 }
 

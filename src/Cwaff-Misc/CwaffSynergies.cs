@@ -28,6 +28,8 @@ public static class CwaffSynergies
       #region Masteries
         // Grandmaster shoots an additional black piece with every shot, no longer shoots pawns, and moves pieces twice as fast
         NewMastery<MasteryOfGrandmaster>(MASTERY_GRANDMASTER, Grandmaster.ItemName);
+        // Chekhov's gun has no minimum fire time and restores all unfired shots at the end of the room
+        NewMastery<MasteryOfChekhovsGun>(MASTERY_CHEKHOVS_GUN, ChekhovsGun.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -213,10 +215,10 @@ public static class CwaffSynergies
     }
 }
 
-public class MasteryDummyItem : FakeItem
-{
-
-}
+// Dummy classes for masteries
+public class MasteryDummyItem : FakeItem { }
+internal class MasteryOfGrandmaster : MasteryDummyItem {}
+internal class MasteryOfChekhovsGun : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -224,4 +226,5 @@ public enum Synergy {
 
     // Masteries
     MASTERY_GRANDMASTER,
+    MASTERY_CHEKHOVS_GUN,
 };
