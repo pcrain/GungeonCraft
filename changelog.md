@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.12.0 (Future)
+
+- Added masteries! (documentation TBD)
+- Added 18 new hats
+- Fixed issue with knight pieces fired from Grandmaster getting stuck in infinite loops when no enemies are around
+- Fixed Aimu Hakurei being able to build graze off of co-op partner's bullets
+
 ## 1.11.5 (2024-04-20)
 
 #### Bugfixes:

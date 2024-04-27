@@ -253,7 +253,7 @@ public class AimuHakurei : AdvancedGunBehavior
         Vector2 bottom = pc.sprite.WorldBottomCenter;
         foreach (Projectile p in StaticReferenceManager.AllProjectiles)
         {
-            if (!p.isActiveAndEnabled || !p.sprite || !p.sprite.renderer || !p.sprite.renderer.enabled || !p.collidesWithPlayer || p.Owner == this.Owner)
+            if (!p.isActiveAndEnabled || !p.sprite || !p.sprite.renderer || !p.sprite.renderer.enabled || !p.collidesWithPlayer || p.Owner is PlayerController)
                 continue; // if the projectile can't collide with us, we're not impressed
             if ((p.SafeCenter - ppos).sqrMagnitude >= _GRAZE_THRES_SQUARED)
                 continue; // bullet's too far away, so doesn't need to be considered
