@@ -77,6 +77,25 @@ public static class CwaffHats
       EasyHat(name: "squire_helmet",         offset: new IntVector2( 0, -5), onEyes: true/*, depth: Hat.HatDepthType.ALWAYS_IN_FRONT*/);
       EasyHat(name: "jackolantern",          offset: new IntVector2( 0, -2), displayName: "Jack O'Lantern");
       EasyHat(name: "pizza_hat",             offset: new IntVector2( 0, -3));
+
+      EasyHat(name: "bicorne",               offset: new IntVector2( 0, -3));
+      EasyHat(name: "chicken",               offset: new IntVector2( 0, -1));
+      EasyHat(name: "coonskin",              offset: new IntVector2(-3, -5));
+      EasyHat(name: "daisy",                 offset: new IntVector2( 0, -1));
+      EasyHat(name: "discovered",            offset: new IntVector2( 0,  1));
+      EasyHat(name: "doug_hat",              offset: new IntVector2( 0, -2));
+      EasyHat(name: "dunce_cap",             offset: new IntVector2(-5, -4));
+      EasyHat(name: "fez",                   offset: new IntVector2( 0, -1));
+      EasyHat(name: "fish",                  offset: new IntVector2( 0, -3));
+      EasyHat(name: "gameboy",               offset: new IntVector2( 0, -1));
+      EasyHat(name: "nurse_hat",             offset: new IntVector2( 0, -2));
+      EasyHat(name: "propeller_cap",         offset: new IntVector2( 0, -2));
+      EasyHat(name: "saucepan",              offset: new IntVector2(-4, -1));
+      EasyHat(name: "shellmet",              offset: new IntVector2( 0, -3));
+      EasyHat(name: "siren",                 offset: new IntVector2( 0, -1), fps: 6);
+      EasyHat(name: "sorceress_hat",         offset: new IntVector2( 0, -1));
+      EasyHat(name: "tv_antennae",           offset: new IntVector2( 0, 0), displayName: "TV Antennae");
+      EasyHat(name: "viking_helmet",         offset: new IntVector2( 0, -3));
     }
 
     private static void EasyHat(string name, IntVector2? offset = null, bool onEyes = false, int fps = 1, bool locked = false, string displayName = null, bool excluded = false, bool? autoFlip = null, Hat.HatDepthType? depth = null)
