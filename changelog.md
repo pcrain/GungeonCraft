@@ -6,6 +6,7 @@
 - Added 18 new hats
 - Fixed issue with knight pieces fired from Grandmaster getting stuck in infinite loops when no enemies are around
 - Fixed Aimu Hakurei being able to build graze off of co-op partner's bullets
+- Fixed null deref in Safety Gloves due to trying to play VFX above despawned enemies
 
 ## 1.11.5 (2024-04-20)
 

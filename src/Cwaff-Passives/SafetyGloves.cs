@@ -44,12 +44,14 @@ public class SafetyGloves : PassiveItem
             return;
         if (!gun.CanGainAmmo || gun.InfiniteAmmo || gun.LocalInfiniteAmmo || gun.CurrentAmmo == gun.AdjustedMaxAmmo)
             return;
+        if (pc.GetAbsoluteParentRoom() is not RoomHandler room)
+            return;
 
         Vector2 ppos         = pc.sprite.WorldCenter;
         float gunAngle       = pc.m_currentGunAngle;
         AIActor closestEnemy = null;
         float closestDist    = _REACH_SQR;
-        foreach(AIActor enemy in pc.GetAbsoluteParentRoom()?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All).EmptyIfNull())
+        foreach(AIActor enemy in room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All).EmptyIfNull())
         {
             if (!enemy || !Enemies.BulletKinVariants.Contains(enemy.EnemyGuid))
                 continue; // enemy is not one we should be targeting
@@ -69,11 +71,14 @@ public class SafetyGloves : PassiveItem
         if (!closestEnemy)
             return;
 
-        if (!(pc.m_activeActions?.InteractAction?.WasPressed ?? false))
+        bool interacted = (pc.m_activeActions != null) && pc.m_activeActions.InteractAction.WasPressed;
+        if (!interacted)
         {
             this._shouldClearVfx = false;
-            this._extantVfx ??= SpawnManager.SpawnVFX(_HandlingVFX, closestEnemy.sprite.WorldTopCenter + new Vector2(0f, 0.5f), Quaternion.identity);
-            this._extantVfx.transform.position = closestEnemy.sprite.WorldTopCenter.HoverAt(amplitude: 0.25f, frequency: 10f, offset: 0.5f);
+            Vector2 pos = (closestEnemy.sprite != null) ? closestEnemy.sprite.WorldTopCenter : closestEnemy.CenterPosition;
+            if (!this._extantVfx)
+                this._extantVfx = SpawnManager.SpawnVFX(_HandlingVFX);
+            this._extantVfx.transform.position = pos.HoverAt(amplitude: 0.25f, frequency: 10f, offset: 0.5f);
             return;
         }
 
