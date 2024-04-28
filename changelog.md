@@ -8,6 +8,7 @@
 - Fixed Aimu Hakurei being able to build graze off of co-op partner's bullets
 - Fixed null deref in Safety Gloves due to trying to play VFX above despawned enemies
 - Bulletbot Implant, Bionic Finger, and Gorgun's Eye can now spawn in Handy's shop from [Knife to a Gunfight](https://thunderstore.io/c/enter-the-gungeon/p/Skilotar/Knife_to_a_Gunfight/)!
+- Fixed visual bug with misaligned muzzle flash for Holy Water Gun 
 
 ## 1.11.5 (2024-04-20)
 
