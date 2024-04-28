@@ -1,0 +1,128 @@
+namespace CwaffingTheGungy;
+
+
+/* TODO:
+    - coffee goop O:
+*/
+
+public class Overdose : AdvancedGunBehavior
+{
+    public static string ItemName         = "Overdose";
+    public static string ShortDescription = "TBD";
+    public static string LongDescription  = "TBD";
+    public static string Lore             = "TBD";
+
+    internal static OverdoseEffect _OverdoseEffect = null;
+
+    public static void Add()
+    {
+        Gun gun = Lazy.SetupGun<Overdose>(ItemName, ShortDescription, LongDescription, Lore);
+            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.BEAM, reloadTime: 1.0f, ammo: 100, audioFrom: Items.MegaDouser, defaultAudio: true);
+            gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
+            gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
+
+        //TODO: refactor to use new DamageAdjuster class to apply different damage to Jammed enemies
+        Projectile projectile = gun.InitProjectile(GunData.New(baseProjectile: Items.MegaDouser.Projectile(), clipSize: -1, shootStyle: ShootStyle.Beam,
+            ammoType: GameUIAmmoType.AmmoType.BEAM, damage: 1f, speed: 50.0f, force: 0.0f)).Attach<OverdoseJuice>();
+
+        _OverdoseEffect = new OverdoseEffect() {
+            TintColor                = new Color(0.25f, 0.125f, 0.0f, 1.0f),
+            DeathTintColor           = new Color(0.25f, 0.125f, 0.0f, 1.0f),
+            AppliesTint              = true,
+            AppliesDeathTint         = true,
+            AffectsEnemies           = true,
+            duration                 = 10000000,
+            effectIdentifier         = "Overdose",
+            stackMode                = GameActorEffect.EffectStackingMode.DarkSoulsAccumulate,
+            };
+
+        //HACK: this is necessary when copying Mega Douser to avoid weird beam offsets from walls...why???
+        projectile.gameObject.transform.localScale = Vector3.one;
+        projectile.gameObject.transform.localPosition = Vector3.zero;
+
+        BasicBeamController beamComp = projectile.SetupBeamSprites(
+          spriteName: "overdose", fps: 20, dims: new Vector2(15, 15), impactDims: new Vector2(7, 7));
+            beamComp.TimeToStatus = 0f; // apply our status effect immediately
+
+            beamComp.sprite.usesOverrideMaterial = true;
+            beamComp.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
+            beamComp.sprite.renderer.material.SetFloat("_EmissivePower", 3f);
+            // fix some animation glitches (don't blindly copy paste; need to be set on a case by case basis depending on your beam's needs)
+            beamComp.muzzleAnimation = beamComp.beamStartAnimation;  //use start animation for muzzle animation, make start animation null
+            beamComp.beamStartAnimation = null;
+            beamComp.interpolateStretchedBones = false; // causes weird graphical glitches whether it's enabled or not, but enabled is worse
+    }
+
+    /// <summary>Allow beams to apply arbitrary status effects</summary>
+    [HarmonyPatch(typeof(BasicBeamController), nameof(BasicBeamController.FrameUpdate))]
+    private class BeamApplyArbitraryStatusEffectPatch
+    {
+        [HarmonyILManipulator]
+        private static void BeamApplyArbitraryStatusEffectIL(ILContext il)
+        {
+            ILCursor cursor = new ILCursor(il);
+
+            if (!cursor.TryGotoNext(MoveType.Before,
+              instr => instr.MatchCall<BraveBehaviour>("get_projectile"),
+              instr => instr.MatchLdfld<Projectile>("AppliesSpeedModifier")))
+                return;
+
+            // BeamController is already on the stack here
+            cursor.Emit(OpCodes.Ldloc_S, (byte)30); // V_30 == the enemy gameActor
+            cursor.Emit(OpCodes.Call, typeof(BeamApplyArbitraryStatusEffectPatch).GetMethod("ApplyExtraBeamStatusEffects", BindingFlags.Static | BindingFlags.NonPublic));
+            cursor.Emit(OpCodes.Ldarg_0); // put the BeamController back on the call stack
+        }
+
+        private static void ApplyExtraBeamStatusEffects(BeamController beam, GameActor gameActor)
+        {
+            // ETGModConsole.Log($"applying extra status effects");
+            foreach (GameActorEffect effect in beam.projectile.statusEffectsToApply)
+                if (UnityEngine.Random.value < BraveMathCollege.SliceProbability(beam.statusEffectChance, BraveTime.DeltaTime))
+                    gameActor.ApplyEffect(effect);
+        }
+    }
+}
+
+public class OverdoseJuice : MonoBehaviour
+{
+    private void Start()
+    {
+        base.GetComponent<Projectile>().statusEffectsToApply.Add(Overdose._OverdoseEffect);
+    }
+}
+
+public class OverdoseEffect : GameActorEffect
+{
+    private const float _ACCUM_RATE = 0.5f;
+    private const float _DAMAGE_RATE = 4.0f;
+
+    public override void OnEffectApplied(GameActor actor, RuntimeGameActorEffectData effectData, float partialAmount = 1f)
+    {
+    }
+
+    public override void OnDarkSoulsAccumulate(GameActor actor, RuntimeGameActorEffectData effectData, float partialAmount = 1f, Projectile sourceProjectile = null)
+    {
+        if (actor is not AIActor enemy)
+            return;
+        effectData.accumulator += partialAmount * _ACCUM_RATE * BraveTime.DeltaTime;
+        enemy.LocalTimeScale = 1f + effectData.accumulator;
+        // ETGModConsole.Log($"caffeinated with strength {this._caffeineStrength}");
+    }
+
+    public override void EffectTick(GameActor actor, RuntimeGameActorEffectData effectData)
+    {
+        if (actor is not AIActor enemy)
+            return;
+        float dosage = _DAMAGE_RATE * effectData.accumulator;
+        enemy.healthHaver.ApplyDamage(
+            damage         : dosage * dosage * BraveTime.DeltaTime,
+            direction      : Vector2.zero,
+            sourceName     : this.effectIdentifier,
+            damageTypes    : CoreDamageTypes.None,
+            damageCategory : DamageCategory.DamageOverTime);
+    }
+
+    public override void OnEffectRemoved(GameActor actor, RuntimeGameActorEffectData effectData)
+    {
+    }
+}

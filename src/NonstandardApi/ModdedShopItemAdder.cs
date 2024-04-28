@@ -144,6 +144,7 @@ public static class ModdedShopItemAdder
             // Look through all of the mod's shops, see if we know about any of them, and add our items to each of them as needed
             AddOurItemsToModdedShops(builtShops);
         }
+        // Add our items to shops registered through Alexandria
         AddOurItemsToModdedShops(Alexandria.NPCAPI.ShopAPI.builtShops);
         watch.Stop();
         if (C.DEBUG_BUILD)

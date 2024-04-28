@@ -145,6 +145,7 @@
     <Compile Include="src\Cwaff-Guns\KiBlast.cs"/>
     <Compile Include="src\Cwaff-Guns\Blackjack.cs"/>
     <Compile Include="src\Cwaff-Guns\Vladimir.cs"/>
+    <Compile Include="src\Cwaff-Guns\Overdose.cs"/>
     <Compile Include="src\Cwaff-Guns\Outbreak.cs"/>
     <Compile Include="src\Cwaff-Guns\SeltzerPelter.cs"/>
     <Compile Include="src\Cwaff-Guns\SoulKaliber.cs"/>
