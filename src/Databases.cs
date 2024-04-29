@@ -1091,10 +1091,13 @@ public static class EasyGoopDefinitions  // mostly stolen from NN
     public static GoopDefinition BlobulonGoopDef;
     public static GoopDefinition WebGoop;
     public static GoopDefinition WaterGoop;
+    public static GoopDefinition CharmGoopDef;
+    public static GoopDefinition GreenFireDef;
+    public static GoopDefinition CheeseDef;
+
+    //Cwaff Goops
     public static GoopDefinition SeltzerGoop;
-    public static GoopDefinition CharmGoopDef = ItemHelper.Get(Items.FairyWings)?.GetComponent<WingsItem>()?.RollGoop;
-    public static GoopDefinition GreenFireDef = (ItemHelper.Get(Items.FlameHandMaximizeSpell) as Gun).DefaultModule.projectiles[0].GetComponent<GoopModifier>().goopDefinition;
-    public static GoopDefinition CheeseDef    = (ItemHelper.Get(Items.ChamberGunRatLair) as Gun).DefaultModule.projectiles[0].GetComponent<GoopModifier>().goopDefinition;
+    public static GoopDefinition CoffeeGoop;
 
     public static List<GoopDefinition> ColorGoops = new List<GoopDefinition>();
     public static List<Color> ColorGoopColors     = new List<Color>
@@ -1148,6 +1151,11 @@ public static class EasyGoopDefinitions  // mostly stolen from NN
         WebGoop         = baseGoops[4];
         WaterGoop       = baseGoops[5];
 
+        //Define item-based goops
+        CharmGoopDef = ItemHelper.Get(Items.FairyWings)?.GetComponent<WingsItem>()?.RollGoop;
+        GreenFireDef = (ItemHelper.Get(Items.FlameHandMaximizeSpell) as Gun).DefaultModule.projectiles[0].GetComponent<GoopModifier>().goopDefinition;
+        CheeseDef    = (ItemHelper.Get(Items.ChamberGunRatLair) as Gun).DefaultModule.projectiles[0].GetComponent<GoopModifier>().goopDefinition;
+
         //Define colored water goop for paintball gun
         for (int i = 0; i < ColorGoopColors.Count; i++)
         {
@@ -1157,10 +1165,31 @@ public static class EasyGoopDefinitions  // mostly stolen from NN
             ColorGoops.Add(g);
         }
 
+        //Set up Seltzer Pelter goop
         SeltzerGoop = UnityEngine.Object.Instantiate<GoopDefinition>(WaterGoop);
             SeltzerGoop.CanBeElectrified = true;
             SeltzerGoop.usesAmbientGoopFX = true;
             SeltzerGoop.ambientGoopFXChance = 0.004f;
             SeltzerGoop.ambientGoopFX = VFX.CreatePool("seltzer_sparkles", fps: 10, loops: false, scale: 0.5f, anchor: Anchor.MiddleCenter);
+
+        //Set up Overdose goop
+        CoffeeGoop = UnityEngine.Object.Instantiate<GoopDefinition>(WaterGoop);
+            CoffeeGoop.baseColor32                      = Overdose._OverdoseTint;
+            CoffeeGoop.CanBeElectrified                 = false;
+            CoffeeGoop.usesAmbientGoopFX                = true;
+            CoffeeGoop.ambientGoopFXChance              = 0.0015f;
+            CoffeeGoop.ambientGoopFX                    = VFX.CreatePool("coffee_bubbles", fps: 20, loops: false, scale: 0.5f, anchor: Anchor.MiddleCenter);
+            CoffeeGoop.AppliesSpeedModifierContinuously = true;
+            CoffeeGoop.SpeedModifierEffect = new GameActorCaffeineGoopEffect(){
+                AffectsPlayers               = true,
+                AffectsEnemies               = false,
+                effectIdentifier             = "coffee goop",
+                stackMode                    = GameActorEffect.EffectStackingMode.Refresh,
+                duration                     = 0.05f,
+                maxStackedDuration           = 0.05f,
+                SpeedMultiplier              = 1.5f,
+                CooldownMultiplier           = 1f,
+                OnlyAffectPlayerWhenGrounded = true,
+            };
     }
 }

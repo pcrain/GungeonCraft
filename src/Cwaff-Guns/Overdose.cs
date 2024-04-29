@@ -13,6 +13,7 @@ public class Overdose : AdvancedGunBehavior
     public static string Lore             = "TBD";
 
     internal static OverdoseEffect _OverdoseEffect = null;
+    internal static Color _OverdoseTint = new Color(0.25f, 0.125f, 0.0f, 1.0f);
 
     public static void Add()
     {
@@ -21,19 +22,18 @@ public class Overdose : AdvancedGunBehavior
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
-        //TODO: refactor to use new DamageAdjuster class to apply different damage to Jammed enemies
         Projectile projectile = gun.InitProjectile(GunData.New(baseProjectile: Items.MegaDouser.Projectile(), clipSize: -1, shootStyle: ShootStyle.Beam,
             ammoType: GameUIAmmoType.AmmoType.BEAM, damage: 1f, speed: 50.0f, force: 0.0f)).Attach<OverdoseJuice>();
 
         _OverdoseEffect = new OverdoseEffect() {
-            TintColor                = new Color(0.25f, 0.125f, 0.0f, 1.0f),
-            DeathTintColor           = new Color(0.25f, 0.125f, 0.0f, 1.0f),
-            AppliesTint              = true,
-            AppliesDeathTint         = true,
-            AffectsEnemies           = true,
-            duration                 = 10000000,
-            effectIdentifier         = "Overdose",
-            stackMode                = GameActorEffect.EffectStackingMode.DarkSoulsAccumulate,
+            TintColor        = _OverdoseTint,
+            DeathTintColor   = _OverdoseTint,
+            AppliesTint      = true,
+            AppliesDeathTint = true,
+            AffectsEnemies   = true,
+            duration         = 10000000,
+            effectIdentifier = "Overdose",
+            stackMode        = GameActorEffect.EffectStackingMode.DarkSoulsAccumulate,
             };
 
         //HACK: this is necessary when copying Mega Douser to avoid weird beam offsets from walls...why???
@@ -43,6 +43,7 @@ public class Overdose : AdvancedGunBehavior
         BasicBeamController beamComp = projectile.SetupBeamSprites(
           spriteName: "overdose", fps: 20, dims: new Vector2(15, 15), impactDims: new Vector2(7, 7));
             beamComp.TimeToStatus = 0f; // apply our status effect immediately
+            beamComp.GetComponent<GoopModifier>().goopDefinition = EasyGoopDefinitions.CoffeeGoop;
 
             beamComp.sprite.usesOverrideMaterial = true;
             beamComp.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
@@ -96,17 +97,12 @@ public class OverdoseEffect : GameActorEffect
     private const float _ACCUM_RATE = 0.5f;
     private const float _DAMAGE_RATE = 4.0f;
 
-    public override void OnEffectApplied(GameActor actor, RuntimeGameActorEffectData effectData, float partialAmount = 1f)
-    {
-    }
-
     public override void OnDarkSoulsAccumulate(GameActor actor, RuntimeGameActorEffectData effectData, float partialAmount = 1f, Projectile sourceProjectile = null)
     {
         if (actor is not AIActor enemy)
             return;
         effectData.accumulator += partialAmount * _ACCUM_RATE * BraveTime.DeltaTime;
         enemy.LocalTimeScale = 1f + effectData.accumulator;
-        // ETGModConsole.Log($"caffeinated with strength {this._caffeineStrength}");
     }
 
     public override void EffectTick(GameActor actor, RuntimeGameActorEffectData effectData)
@@ -121,8 +117,48 @@ public class OverdoseEffect : GameActorEffect
             damageTypes    : CoreDamageTypes.None,
             damageCategory : DamageCategory.DamageOverTime);
     }
+}
+
+public class GameActorCaffeineGoopEffect : GameActorSpeedEffect
+{
+    private static StatModifier[] _CaffeineGoopBuffs = null;
+
+    public override void OnEffectApplied(GameActor actor, RuntimeGameActorEffectData effectData, float partialAmount = 1f)
+    {
+        base.OnEffectApplied(actor, effectData, partialAmount);
+        if (actor is not PlayerController player)
+            return;
+        if (SpeedMultiplier == 1f)
+            return;
+        _CaffeineGoopBuffs ??= new[] {  //NOTE: speed handled by base GameActorSpeedEffect
+            new StatModifier(){
+                amount      = 1.2f,
+                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
+                statToBoost = PlayerStats.StatType.RateOfFire,
+            },
+            new StatModifier(){
+                amount      = 1.2f,
+                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
+                statToBoost = PlayerStats.StatType.DodgeRollSpeedMultiplier,
+            },
+            new StatModifier(){
+                amount      = 0.8f,
+                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
+                statToBoost = PlayerStats.StatType.ReloadSpeed,
+            },
+        };
+        foreach (StatModifier stat in _CaffeineGoopBuffs)
+            player.ownerlessStatModifiers.Add(stat);
+    }
 
     public override void OnEffectRemoved(GameActor actor, RuntimeGameActorEffectData effectData)
     {
+        base.OnEffectRemoved(actor, effectData);
+        if (actor is not PlayerController player)
+            return;
+        if (SpeedMultiplier == 1f)
+            return;
+        foreach (StatModifier stat in _CaffeineGoopBuffs)
+            player.ownerlessStatModifiers.Remove(stat);
     }
 }
