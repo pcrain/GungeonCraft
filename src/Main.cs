@@ -350,6 +350,7 @@ public class Initialisation : BaseUnityPlugin
                     ReflexAmmolet.Init();
                     // Protractor.Init();  // unfinished
                     // PlaybulletMagazine.Init();
+                    ScavengingArms.Init();
                     setupPassivesWatch.Stop();
                 // });
                 // setupPassivesThread.Start();

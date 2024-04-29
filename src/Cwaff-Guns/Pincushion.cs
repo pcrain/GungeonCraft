@@ -52,27 +52,7 @@ public class Pincushion : AdvancedGunBehavior
         projectile.SendInDirection((projectile.OriginalDirection() + spread*(2f*UnityEngine.Random.value - 1f)).ToVector(), false);
     }
 
-    [HarmonyPatch(typeof(MinorBreakable), nameof(MinorBreakable.OnPreCollision))]
-    private class VeryFragileProjectilePatch
-    {
-        [HarmonyILManipulator]
-        private static void VeryFragileIL(ILContext il)
-        {
-            ILCursor cursor = new ILCursor(il);
-
-            if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchStloc(0)))
-                return;
-
-            // Skip past the part where the MinorBreakable actually breaks if we have the VeryFragileProjectile component
-            ILLabel projectileIsNotFragileLabel = cursor.DefineLabel();
-            cursor.Emit(OpCodes.Ldloc_0);
-            cursor.Emit(OpCodes.Call, typeof(Pincushion).GetMethod("BreakFragileProjectiles", BindingFlags.Static | BindingFlags.NonPublic));
-            cursor.Emit(OpCodes.Brfalse, projectileIsNotFragileLabel);
-            cursor.Emit(OpCodes.Ret);
-            cursor.MarkLabel(projectileIsNotFragileLabel);
-        }
-    }
-
+    // NOTE: called by patch in CwaffPatches
     private static bool BreakFragileProjectiles(Projectile p)
     {
         if (p == null)

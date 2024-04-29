@@ -52,6 +52,7 @@
     <Compile Include="src\Cwaff-Passives\AstralProjector.cs"/>
     <Compile Include="src\Cwaff-Passives\RatPoison.cs"/>
     <Compile Include="src\Cwaff-Passives\BlankChecks.cs"/>
+    <Compile Include="src\Cwaff-Passives\ScavengingArms.cs"/>
     <Compile Include="src\Cwaff-Passives\LibraryCardtridge.cs"/>
     <Compile Include="src\Cwaff-Passives\ReserveAmmolet.cs"/>
     <Compile Include="src\Cwaff-Passives\GorgunEye.cs"/>
@@ -226,6 +227,7 @@
     <Compile Include="src\Cwaff-Misc\CwaffSynergies.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffEvents.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffHats.cs"/>
+    <Compile Include="src\Cwaff-Misc\CwaffPatches.cs"/>
     <Compile Include="src\Cwaff-Misc\HeckedMode.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffHUD.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffMasteries.cs"/>
