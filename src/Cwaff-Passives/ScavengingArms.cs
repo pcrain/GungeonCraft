@@ -7,7 +7,7 @@ public class ScavengingArms : PassiveItem
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
 
-    private const float _FIND_AMMO_CHANCE     = 0.1f;
+    private const float _FIND_AMMO_CHANCE     = 0.05f;
     private const float _AMMO_PERCENT_TO_GAIN = 0.1f;
 
     private static GameObject _SmallAmmoPickup;

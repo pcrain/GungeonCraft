@@ -273,6 +273,7 @@ public class Initialisation : BaseUnityPlugin
                     Breegull.Add();
                     SubMachineGun.Add();
                     Overdose.Add();
+                    Nycterian.Add();
                     setupGunsWatch.Stop();
                 // });
                 // setupGunsThread.Start();
