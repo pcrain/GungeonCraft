@@ -694,4 +694,28 @@ public static class Lazy
         }
         return result;
     }
+
+    /// <summary>Create a basic decoy object (adapted from MindControlEffect.cs)</summary>
+    public static GameObject CreateDecoy(Vector3 position)
+    {
+        GameObject decoyObject = new GameObject("fake target");
+        NonActor m_fakeActor = decoyObject.AddComponent<NonActor>();
+        m_fakeActor.HasShadow = false;
+
+        SpeculativeRigidbody body = decoyObject.AddComponent<SpeculativeRigidbody>();
+        body.CollideWithTileMap = false;
+        body.CollideWithOthers  = false;
+        body.CanBeCarried       = false;
+        body.CanBePushed        = false;
+        body.CanCarry           = false;
+        body.PixelColliders = new List<PixelCollider>(){new PixelCollider(){
+            ColliderGenerationMode = PixelCollider.PixelColliderGeneration.Manual,
+            CollisionLayer         = CollisionLayer.TileBlocker,
+            ManualWidth            = 4,
+            ManualHeight           = 4,
+        }};
+
+        decoyObject.transform.position = position;
+        return decoyObject;
+    }
 }

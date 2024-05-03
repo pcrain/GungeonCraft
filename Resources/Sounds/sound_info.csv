@@ -160,3 +160,6 @@ adrenaline_tank_damage_sound,2.5,1,sound
 the_sound_of_mastering_a_weapon,-2.0,1,sound
 mastery_ritual_activate_sound,6.0,1,sound
 mastery_ritual_complete_sound,3.0,1,sound
+bat_screech_sound,1.0,1,sound
+nycterian_shoot_sound,-1.0,1,sound
+nycterian_reload_sound,7.0,1,sound

@@ -199,6 +199,7 @@ public class AlienNailgun : AdvancedGunBehavior
     //NOTE: makes sure AIActor is set properly on bullet scripts; should probably factor out CheckFromReplicantOwner() and moved to a better location later
     //NOTE: could be useful for Schrodinger's Gat -> might want to set up an event listener
     //WARNING: doesn't seem to work properly on large Bullats
+    //NOTE: magically fixed itself no later than 2024-05-01???
     [HarmonyPatch(typeof(AIBulletBank), nameof(AIBulletBank.BulletSpawnedHandler))]
     private class GetRealProjectileOwnerPatch
     {
