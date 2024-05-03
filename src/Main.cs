@@ -353,6 +353,7 @@ public class Initialisation : BaseUnityPlugin
                     // PlaybulletMagazine.Init();
                     ScavengingArms.Init();
                     ArmorPiercingRounds.Init();
+                    SteadyHands.Init();
                     setupPassivesWatch.Stop();
                 // });
                 // setupPassivesThread.Start();
