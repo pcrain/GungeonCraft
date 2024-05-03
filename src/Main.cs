@@ -352,6 +352,7 @@ public class Initialisation : BaseUnityPlugin
                     // Protractor.Init();  // unfinished
                     // PlaybulletMagazine.Init();
                     ScavengingArms.Init();
+                    ArmorPiercingRounds.Init();
                     setupPassivesWatch.Stop();
                 // });
                 // setupPassivesThread.Start();

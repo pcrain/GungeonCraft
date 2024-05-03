@@ -52,6 +52,7 @@
     <Compile Include="src\Cwaff-Passives\AstralProjector.cs"/>
     <Compile Include="src\Cwaff-Passives\RatPoison.cs"/>
     <Compile Include="src\Cwaff-Passives\BlankChecks.cs"/>
+    <Compile Include="src\Cwaff-Passives\ArmorPiercingRounds.cs"/>
     <Compile Include="src\Cwaff-Passives\ScavengingArms.cs"/>
     <Compile Include="src\Cwaff-Passives\LibraryCardtridge.cs"/>
     <Compile Include="src\Cwaff-Passives\ReserveAmmolet.cs"/>
