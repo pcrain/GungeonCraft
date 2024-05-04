@@ -41,16 +41,30 @@ public class CwaffDungeons
         return Flows[internalName];
     }
 
+    /// <summary>Fixes a bug where returning to the breach deletes the floor, thanks Bunny!</summary>
+    [HarmonyPatch(typeof(GameManager), nameof(GameManager.LoadCustomLevel))]
+    private class ReregisterOurCustomLevelIfNecessaryPatch
+    {
+        static void Prefix(GameManager __instance, string custom)
+        {
+            if (!Flows.TryGetValue(custom, out CwaffDungeons dungeonData))
+                return;  // not trying to load one of our custom flows, so not our problem
+            if (dungeonData.gameLevelDefinition == null || GameManager.Instance.customFloors.Contains(dungeonData.gameLevelDefinition))
+                return;  // our flow is already know about by the game manager, so nothing to be done
+            // Lazy.DebugLog($"reinjecting floor {custom} in new GameManager instance");
+            GameManager.Instance.customFloors.Add(dungeonData.gameLevelDefinition);
+        }
+    }
+
     [HarmonyPatch(typeof(DungeonDatabase), nameof(DungeonDatabase.GetOrLoadByName))]
     private class GetOrLoadCustomDungeonPatch
     {
         static bool Prefix(string name, ref Dungeon __result)
         {
-            CwaffDungeons dungeonData;
             // Lazy.DebugLog($"attempting to find custom flow with name {name}");
-            if (!Flows.TryGetValue(name, out dungeonData))
-                return true; // fall back on original method
-            Lazy.DebugLog($"  found {name}!!");
+            if (!Flows.TryGetValue(name, out CwaffDungeons dungeonData))
+                return true; // fall back on original method if it's not one of our flows
+            // Lazy.DebugLog($"  found {name}!!");
 
             if (dungeonData.gameLevelDefinition != null && !GameManager.Instance.customFloors.Contains(dungeonData.gameLevelDefinition))
                 GameManager.Instance.customFloors.Add(dungeonData.gameLevelDefinition); // fixes a bug where returning to the breach deletes the floor, thanks Bunny!

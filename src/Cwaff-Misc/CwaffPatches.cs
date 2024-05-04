@@ -59,9 +59,6 @@ static class ProjectileHandleDamagePatches
         ILCursor cursor = new ILCursor(il);
         VariableDefinition shouldPierce = il.DeclareLocal<bool>();
 
-        // if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchStindI1()))  // move after the "out" parameter setup
-        //     return;
-
         cursor.Emit(OpCodes.Ldarg_0); // load Projectile this onto stack
         cursor.Emit(OpCodes.Ldarg_1); // load SpeculativeRigidbody rigidbody onto stack
         cursor.Emit(OpCodes.Call, typeof(ArmorPiercingRounds).GetMethod("PossiblyDisableArmor", BindingFlags.Static | BindingFlags.NonPublic));
