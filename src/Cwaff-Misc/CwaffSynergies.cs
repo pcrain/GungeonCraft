@@ -30,6 +30,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfGrandmaster>(MASTERY_GRANDMASTER, Grandmaster.ItemName);
         // Chekhov's gun has no minimum fire time and restores all unfired shots at the end of the room
         NewMastery<MasteryOfChekhovsGun>(MASTERY_CHEKHOVS_GUN, ChekhovsGun.ItemName);
+        // Pincushion's pins phase through minor breakables and the gun itself no longer increases in spread
+        NewMastery<MasteryOfPincushion>(MASTERY_PINCUSHION, Pincushion.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -219,6 +221,7 @@ public static class CwaffSynergies
 public class MasteryDummyItem : FakeItem { }
 internal class MasteryOfGrandmaster : MasteryDummyItem {}
 internal class MasteryOfChekhovsGun : MasteryDummyItem {}
+internal class MasteryOfPincushion : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -227,4 +230,5 @@ public enum Synergy {
     // Masteries
     MASTERY_GRANDMASTER,
     MASTERY_CHEKHOVS_GUN,
+    MASTERY_PINCUSHION,
 };

@@ -166,6 +166,11 @@ public class Commands
                 GameManager.Instance.MainCameraController.SetManualControl(_DebugCameraLock, true);
             }
 
+            if (Input.GetKeyDown(KeyCode.M)) // acquire mastery token for current gun
+            {
+                GameManager.Instance.PrimaryPlayer.AcquireMastery(GameManager.Instance.PrimaryPlayer.CurrentGun);
+            }
+
             return true;
         }
     }

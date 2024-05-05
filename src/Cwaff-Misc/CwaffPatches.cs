@@ -16,7 +16,7 @@ static class MinorBreakablePrecollisionPatches
         // Skip past the part where the MinorBreakable actually breaks if we have the VeryFragileProjectile component
         ILLabel projectileIsNotFragileLabel = cursor.DefineLabel();
         cursor.Emit(OpCodes.Ldloc_0);
-        cursor.Emit(OpCodes.Call, typeof(Pincushion).GetMethod("BreakFragileProjectiles", BindingFlags.Static | BindingFlags.NonPublic));
+        cursor.Emit(OpCodes.Call, typeof(VeryFragileProjectile).GetMethod("IsVeryFragile", BindingFlags.Static | BindingFlags.Public));
         cursor.Emit(OpCodes.Brfalse, projectileIsNotFragileLabel);
         cursor.Emit(OpCodes.Ret);
         cursor.MarkLabel(projectileIsNotFragileLabel);

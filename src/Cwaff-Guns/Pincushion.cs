@@ -47,21 +47,18 @@ public class Pincushion : AdvancedGunBehavior
         base.PostProcessProjectile(projectile);
         if (this.Owner as PlayerController is not PlayerController pc)
             return;
-        float spread = _MIN_SPREAD + _DLT_SPREAD * (1f - ((float)this.gun.ClipShotsRemaining / (float)this.gun.ClipCapacity));
+
+        float spread = _MIN_SPREAD;
+        if (pc.PlayerHasActiveSynergy(Synergy.MASTERY_PINCUSHION))
+        {
+            if (projectile.GetComponent<VeryFragileProjectile>() is VeryFragileProjectile vfp)
+                vfp.phasesThroughBreakables = true;
+        }
+        else
+            spread += _DLT_SPREAD * (1f - ((float)this.gun.ClipShotsRemaining / (float)this.gun.ClipCapacity));
+
         spread *= pc.AccuracyMult();
         projectile.SendInDirection((projectile.OriginalDirection() + spread*(2f*UnityEngine.Random.value - 1f)).ToVector(), false);
-    }
-
-    // NOTE: called by patch in CwaffPatches
-    private static bool BreakFragileProjectiles(Projectile p)
-    {
-        if (p == null)
-            return false;
-        if (p.GetComponent<VeryFragileProjectile>() is not VeryFragileProjectile fragile)
-            return false;
-
-        fragile.breakNextCollision = true;
-        return true;
     }
 }
 
@@ -69,6 +66,7 @@ public class VeryFragileProjectile : MonoBehaviour
 {
     private Projectile _projectile = null;
     public bool breakNextCollision = false;
+    public bool phasesThroughBreakables = false;
 
     private void Start()
     {
@@ -82,6 +80,8 @@ public class VeryFragileProjectile : MonoBehaviour
     {
         if (other.GetComponent<AIActor>())
             this._projectile.baseData.damage = Pincushion._NEEDLE_DAMAGE;
+        else if (this.phasesThroughBreakables)
+            PhysicsEngine.SkipCollision = true;
         else
             this.breakNextCollision = true;
     }
@@ -89,5 +89,11 @@ public class VeryFragileProjectile : MonoBehaviour
     private void OnCollision(CollisionData data) {
         if (this.breakNextCollision)
             this._projectile.DieInAir(suppressInAirEffects: true);
+    }
+
+    // NOTE: called by patch in CwaffPatches
+    public static bool IsVeryFragile(Projectile p)
+    {
+        return p && p.GetComponent<VeryFragileProjectile>();
     }
 }
