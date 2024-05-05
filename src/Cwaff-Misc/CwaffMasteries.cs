@@ -52,8 +52,10 @@ public static class CwaffMasteries
     {
         static void Prefix(GameUIRoot __instance, PlayerController targetPlayer, GunInventory inventory, int inventoryShift, GameUIAmmoController targetAmmoController, int labelTarget)
         {
-          if (__instance.gunNameLabels != null)
-            __instance.gunNameLabels[labelTarget].ProcessMarkup = true; // make sure we can process markup on "Mastered " text
+          if (__instance.gunNameLabels == null)
+            return;
+          __instance.gunNameLabels[labelTarget].ProcessMarkup = true; // make sure we can process markup on "Mastered " text
+          __instance.gunNameLabels[labelTarget].AutoHeight = true; // make sure we can have multiple lines
         }
     }
 
@@ -69,9 +71,10 @@ public static class CwaffMasteries
               return;
             if (!gun.IsMasterable())
               return;
-            if (!player.HasPassiveItem(gun.MasteryTokenId()))
-              return;
-            __result = $"[color #dd6666]Mastered[/color] {__result}";
+            if (player.HasPassiveItem(gun.MasteryTokenId()))
+              __result = $"[color #dd6666]Mastered[/color]\n{__result}";
+            else
+              __result = $"[color #888888]Normal[/color]\n{__result}";
         }
     }
 }

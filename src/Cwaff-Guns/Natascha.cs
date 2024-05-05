@@ -153,7 +153,10 @@ public class Natascha : AdvancedGunBehavior
         gun.AdjustAnimation(gun.shootAnimation, fps: ComputeAnimationSpeed());
 
         this.gun.RemoveStatFromGun(PlayerStats.StatType.MovementSpeed);
-        this.gun.AddStatToGun(PlayerStats.StatType.MovementSpeed, 1f / (float)Math.Sqrt(this._speedMult), StatModifier.ModifyMethod.MULTIPLICATIVE);
+        if (this.Player.PlayerHasActiveSynergy(Synergy.MASTERY_NATASCHA))
+            this.gun.AddStatToGun(PlayerStats.StatType.MovementSpeed, 1f, StatModifier.ModifyMethod.MULTIPLICATIVE);
+        else
+            this.gun.AddStatToGun(PlayerStats.StatType.MovementSpeed, 1f / (float)Math.Sqrt(this._speedMult), StatModifier.ModifyMethod.MULTIPLICATIVE);
         //HACK: if we rebuild our stats while firing, certain projectile modifiers like scattershot or backup gun make the gun fire once per frame, so work around that
         NataschaMovementSpeedPatch.skipRebuildingGunVolleys = true;
         this.Player.stats.RecalculateStats(this.Player);

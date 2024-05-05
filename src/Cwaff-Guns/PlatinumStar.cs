@@ -176,6 +176,7 @@ public class JojoReferenceHandler : MonoBehaviour
                 pp.gameObject.SetLayerRecursively(LayerMask.NameToLayer("Unfaded"));
         Pixelator.Instance.saturation = 0f;
         AkSoundEngine.PostEvent("Stop_SND_All", pc.gameObject);
+        AkSoundEngine.StopAll();
     }
 
     private static void ResumeTime()

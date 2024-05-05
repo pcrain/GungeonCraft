@@ -34,6 +34,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfPincushion>(MASTERY_PINCUSHION, Pincushion.ItemName);
         // Enemies and projectiles are completely halted while souls are active
         NewMastery<MasteryOfPlatinumStar>(MASTERY_PLATINUM_STAR, PlatinumStar.ItemName);
+        // Movement penalty is removed
+        NewMastery<MasteryOfNatascha>(MASTERY_NATASCHA, Natascha.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -225,6 +227,7 @@ internal class MasteryOfGrandmaster : MasteryDummyItem {}
 internal class MasteryOfChekhovsGun : MasteryDummyItem {}
 internal class MasteryOfPincushion : MasteryDummyItem {}
 internal class MasteryOfPlatinumStar : MasteryDummyItem {}
+internal class MasteryOfNatascha : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -235,4 +238,5 @@ public enum Synergy {
     MASTERY_CHEKHOVS_GUN,
     MASTERY_PINCUSHION,
     MASTERY_PLATINUM_STAR,
+    MASTERY_NATASCHA,
 };
