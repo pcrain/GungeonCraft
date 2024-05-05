@@ -32,6 +32,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfChekhovsGun>(MASTERY_CHEKHOVS_GUN, ChekhovsGun.ItemName);
         // Pincushion's pins phase through minor breakables and the gun itself no longer increases in spread
         NewMastery<MasteryOfPincushion>(MASTERY_PINCUSHION, Pincushion.ItemName);
+        // Enemies and projectiles are completely halted while souls are active
+        NewMastery<MasteryOfPlatinumStar>(MASTERY_PLATINUM_STAR, PlatinumStar.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -222,6 +224,7 @@ public class MasteryDummyItem : FakeItem { }
 internal class MasteryOfGrandmaster : MasteryDummyItem {}
 internal class MasteryOfChekhovsGun : MasteryDummyItem {}
 internal class MasteryOfPincushion : MasteryDummyItem {}
+internal class MasteryOfPlatinumStar : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -231,4 +234,5 @@ public enum Synergy {
     MASTERY_GRANDMASTER,
     MASTERY_CHEKHOVS_GUN,
     MASTERY_PINCUSHION,
+    MASTERY_PLATINUM_STAR,
 };

@@ -23,7 +23,8 @@ public class PlatinumStar : AdvancedGunBehavior
 
         _OraBullet = Items.Polaris.CloneProjectile(GunData.New(damage: 1.0f, speed: 75.0f, force: 0.1f, range: 3.0f, shouldRotate: true
           )).AddAnimations(AnimatedBullet.Create(name: "ora_fist_fast", fps: 12, scale: 0.33f, anchor: Anchor.MiddleRight)
-          ).Attach<PierceProjModifier>(pierce => pierce.penetration = 999);
+          ).Attach<PierceProjModifier>(pierce => pierce.penetration = 999
+          ).Attach<ImmuneToTimestop>();
     }
 
     // public override void OnPostFired(PlayerController player, Gun gun)
@@ -78,6 +79,8 @@ public class PlatinumStar : AdvancedGunBehavior
     }
 }
 
+public class ImmuneToTimestop : MonoBehaviour {}
+
 public class PlatinumProjectile : MonoBehaviour
 {
     private Projectile _projectile;
@@ -93,10 +96,107 @@ public class PlatinumProjectile : MonoBehaviour
         this._bankedDamage               = this._projectile.baseData.damage;
         this._projectile.baseData.damage = 0f;
 
-        this._projectile.OnHitEnemy += (Projectile p, SpeculativeRigidbody enemy, bool _) => {
-            p.gameObject.Play("soul_kaliber_impact");
-            enemy.gameObject.GetOrAddComponent<OraOra>().BankDamage(this._bankedDamage, this._angle);
-        };
+        this._projectile.OnHitEnemy += this.OnHitEnemy;
+    }
+
+    private void OnHitEnemy(Projectile p, SpeculativeRigidbody enemy, bool killed)
+    {
+        p.gameObject.Play("soul_kaliber_impact");
+        enemy.gameObject.GetOrAddComponent<OraOra>().BankDamage(this._bankedDamage, this._angle);
+    }
+}
+
+public class JojoReferenceHandler : MonoBehaviour
+{
+    private static JojoReferenceHandler _instance = null;
+    private float _timestopTime                   = 0.0f;
+    private bool _timeIsStopped                   = false;
+
+    private static JojoReferenceHandler Instance {
+        get {
+            if (!_instance)
+                _instance = GameManager.Instance.AddComponent<JojoReferenceHandler>();
+            return _instance;
+        }
+    }
+
+    /// <summary>Freeze all projectiles while time is stopped</summary>
+    [HarmonyPatch(typeof(Projectile), nameof(Projectile.LocalTimeScale), MethodType.Getter)]
+    private class PatchNamePatch
+    {
+        static bool Prefix(Projectile __instance, ref float __result)
+        {
+            if (!Instance._timeIsStopped)
+                return true; // call the original method
+            if (__instance.GetComponent<ImmuneToTimestop>())
+                return true; // call the original method
+            __result = 0.0f; // change the original result for all bullets not from Platinum Star
+            return false; // skip the original method
+        }
+    }
+
+    public static bool TimeIsFrozen() => Instance._timeIsStopped;
+    public static void RefreshTimeStop(float duration = 0.5f)
+    {
+        if (duration <= 0.0f)
+            return;
+        if (Instance._timestopTime < duration)
+            Instance._timestopTime = duration;
+        if (!Instance._timeIsStopped)
+            StopTime();
+        Instance._timeIsStopped = true;
+    }
+
+    private void Update()
+    {
+        if (!_timeIsStopped)
+            return;
+        if ((_timestopTime -= BraveTime.DeltaTime) > 0.0f)
+            return;
+        _timestopTime = 0.0f;
+        ResumeTime();
+        _timeIsStopped = false;
+    }
+
+    private static void StopTime()
+    {
+        if (GameManager.Instance.BestActivePlayer is not PlayerController pc)
+            return;
+        if (pc.CurrentRoom is not RoomHandler room)
+            return;
+        if (room.activeEnemies is not List<AIActor> enemies)
+            return;
+        foreach (AIActor enemy in enemies)
+            if (enemy)
+                enemy.LocalTimeScale = 0.0f;
+
+        Pixelator.Instance.DoFinalNonFadedLayer = true;
+        foreach (PlayerController pp in GameManager.Instance.AllPlayers)
+            if (pp)
+                pp.gameObject.SetLayerRecursively(LayerMask.NameToLayer("Unfaded"));
+        Pixelator.Instance.saturation = 0f;
+        AkSoundEngine.PostEvent("Stop_SND_All", pc.gameObject);
+    }
+
+    private static void ResumeTime()
+    {
+        if (GameManager.Instance.BestActivePlayer is not PlayerController pc)
+            return;
+        if (pc.CurrentRoom is not RoomHandler room)
+            return;
+        if (room.activeEnemies is not List<AIActor> enemies)
+            return;
+        foreach (AIActor enemy in enemies)
+            if (enemy)
+                enemy.LocalTimeScale = 1.0f;
+
+        Pixelator.Instance.DoFinalNonFadedLayer = false;
+        foreach (PlayerController pp in GameManager.Instance.AllPlayers)
+            if (pp)
+                pp.gameObject.SetLayerRecursively(LayerMask.NameToLayer("FG_Reflection"));
+        Pixelator.Instance.saturation = 1f;
+        GameManager.Instance.DungeonMusicController.ResetForNewFloor(GameManager.Instance.Dungeon);
+        GameManager.Instance.DungeonMusicController.NotifyEnteredNewRoom(room);
     }
 }
 
@@ -145,22 +245,21 @@ public class OraOra : MonoBehaviour
 
     private IEnumerator OraOraOraOra(PlayerController pc)
     {
-        if (this._enemy?.healthHaver is not HealthHaver hh)
+        bool doTimeFreeze = pc.PlayerHasActiveSynergy(Synergy.MASTERY_PLATINUM_STAR);
+        float lumpDamage = doTimeFreeze ? (_BURST_SIZE * _bankedDamage.Sum()) : 0f;
+
+        if (!this._enemy || this._enemy.healthHaver is not HealthHaver hh)
         {
             UnityEngine.GameObject.Destroy(this);
             yield break;
         }
 
-        while (!(this._enemy?.sprite && this._enemy.sprite.renderer.enabled && hh.IsVulnerable))
+        while (!(this._enemy && this._enemy.sprite && this._enemy.sprite.renderer.enabled && hh.IsVulnerable))
         {
-            if (!this._enemy || !hh || !hh.IsAlive)
+            if (!hh || !hh.IsAlive)
                 yield break;
             yield return null;
         }
-
-        BehaviorSpeculator spec = this._enemy.behaviorSpeculator;
-        if (spec && !spec.ImmuneToStun)
-            spec.Stun(1f);
 
         Vector2 enemySize = this._enemy.sprite.GetBounds().size.XY();
         float radius      = 0.5f * Mathf.Max(enemySize.x, enemySize.y);
@@ -179,6 +278,12 @@ public class OraOra : MonoBehaviour
             standSprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/HologramShader");
         this._stand = standSprite.gameObject;
 
+        if (doTimeFreeze)
+        {
+            this._stand.SetLayerRecursively(LayerMask.NameToLayer("Unfaded"));
+            JojoReferenceHandler.RefreshTimeStop();
+        }
+
         for (float elapsed = BraveTime.DeltaTime; elapsed < _MOVE_TIME; elapsed += BraveTime.DeltaTime)
         {
             float percentDone = elapsed / _MOVE_TIME;
@@ -190,9 +295,10 @@ public class OraOra : MonoBehaviour
 
         float baseDelay = _HIT_DELAY;
         int numBursts = bankedDamage.Count();
+        BehaviorSpeculator spec = this._enemy.behaviorSpeculator;
         for (int i = 0; i < numBursts; ++i)
         {
-            if (!(this._enemy?.healthHaver?.IsAlive ?? false))
+            if (!(this._enemy && this._enemy.healthHaver && this._enemy.healthHaver.IsAlive))
                 break;
             float damage = bankedDamage[i];
             bool lastBurst = (i == (numBursts - 1));
@@ -209,7 +315,7 @@ public class OraOra : MonoBehaviour
                     proj.Owner                                    = pc;
                     proj.Shooter                                  = pc.specRigidbody;
                     proj.gameObject.SetAlphaImmediate(0.3f);
-                    proj.baseData.damage                          = damage;
+                    proj.baseData.damage                          = doTimeFreeze ? 0 : damage;
                     proj.specRigidbody.CollideWithTileMap         = false;
                     if (lastHit)
                     {
@@ -227,7 +333,9 @@ public class OraOra : MonoBehaviour
                     proj.SendInDirection(angleVec, false);
                     proj.gameObject.PlayUnique("ora_fist_fire");
 
-                if (spec && !spec.ImmuneToStun)
+                if (doTimeFreeze)
+                    JojoReferenceHandler.RefreshTimeStop();
+                else if (spec && !spec.ImmuneToStun)
                     spec.UpdateStun(1f);
                 yield return new WaitForSeconds(baseDelay);
             }
@@ -241,9 +349,23 @@ public class OraOra : MonoBehaviour
             standSprite.PlaceAtPositionByAnchor(Vector2.Lerp(finalPos, pc.sprite.WorldCenter, percentDone), Anchor.MiddleCenter);
             yield return null;
         }
-
         UnityEngine.Object.Destroy(this._stand);
         this._stand = null;
+
+        if (doTimeFreeze)
+        {
+            while (JojoReferenceHandler.TimeIsFrozen())
+                yield return null;
+            if (this._enemy && hh && hh.IsAlive)
+            {
+                this._enemy.LocalTimeScale = 1.0f;
+                hh.ApplyDamage(lumpDamage, Vector2.zero, PlatinumStar.ItemName, CoreDamageTypes.Void, DamageCategory.Normal,
+                    ignoreInvulnerabilityFrames: true, ignoreDamageCaps: true);
+                if (spec && !spec.ImmuneToStun)
+                    spec.UpdateStun(1f);
+            }
+        }
+
         this._activated = false;
         yield break;
     }
