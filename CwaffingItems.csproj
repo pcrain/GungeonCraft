@@ -50,8 +50,8 @@
     <Compile Include="src\Cwaff-Passives\PlotArmor.cs"/>
     <Compile Include="src\Cwaff-Passives\EchoChamber.cs"/>
     <Compile Include="src\Cwaff-Passives\AstralProjector.cs"/>
-    <Compile Include="src\Cwaff-Passives\SteadyHands.cs"/>
     <Compile Include="src\Cwaff-Passives\RatPoison.cs"/>
+    <Compile Include="src\Cwaff-Passives\MMReloading.cs"/>
     <Compile Include="src\Cwaff-Passives\BlankChecks.cs"/>
     <Compile Include="src\Cwaff-Passives\ArmorPiercingRounds.cs"/>
     <Compile Include="src\Cwaff-Passives\ScavengingArms.cs"/>

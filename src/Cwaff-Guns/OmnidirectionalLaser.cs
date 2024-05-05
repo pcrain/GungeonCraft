@@ -93,7 +93,7 @@ public class OmnidirectionalLaser : AdvancedGunBehavior
             ETGModConsole.Log($"new backside");
             this._backside = Lazy.SpriteObject(
                 spriteColl: this.gun.sprite.Collection,
-                spriteId: this.gun.sprite.Collection.GetSpriteIdByName($"{this.gun.InternalName()}_idle_back_001"));
+                spriteId: this.gun.sprite.Collection.GetSpriteIdByName($"{this.gun.InternalSpriteName()}_idle_back_001"));
             this._backside.transform.position = gun.transform.position;
             this._backside.transform.parent = gun.transform;
             this._backside.HeightOffGround = -0.5f;
@@ -170,7 +170,7 @@ public class OmnidirectionalLaser : AdvancedGunBehavior
             return;
 
         // play the fire animation at all times while the gun is being held
-        tk2dSpriteAnimationClip clip = gun.spriteAnimator.GetClipByName($"{gun.InternalName()}_fire");
+        tk2dSpriteAnimationClip clip = gun.spriteAnimator.GetClipByName($"{gun.InternalSpriteName()}_fire");
         if (gun.spriteAnimator.currentClip != clip)
         {
             gun.spriteAnimator.currentClip = clip;

@@ -9,8 +9,8 @@ public class Overdose : AdvancedGunBehavior
 {
     public static string ItemName         = "Overdose";
     public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string LongDescription  = "Fires a stream of coffee that inflicts a stacking caffeinated status on enemies, increasing their speed and inflicting damage over time";
+    public static string Lore             = "This gun was designed to answer one simple question: 'what would happen if you filled a water gun with espresso?' While the gun's designer may have been the first and only person to ever ask this question, it turns out many of the Gundead are actually very sensitive to caffeine and enter a berserker-like state when exposed to it. Assuming you can stay out of their warpath, the caffeine quickly takes its toll on even the most resilient among the Gundead.";
 
     internal static OverdoseEffect _OverdoseEffect = null;
     internal static Color _OverdoseTint = new Color(0.25f, 0.125f, 0.0f, 1.0f);

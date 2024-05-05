@@ -21,11 +21,11 @@ public static class Lazy
 
     private static ProjectileModule _BaseModule = (ItemHelper.Get(Items._38Special) as Gun).DefaultModule;
     /// <summary>Perform basic initialization for a new passive, active, or gun item definition.</summary>
-    public static TItemClass SetupItem<TItemClass, TItemSpecific>(string itemName, string spritePath, string shortDescription, string longDescription, string lore, bool hideFromAmmonomicon = false)
+    public static TItemClass SetupItem<TItemClass, TItemSpecific>(string itemName, string shortDescription, string longDescription, string lore, bool hideFromAmmonomicon = false)
         where TItemClass : PickupObject   // must be PickupObject for passive items, PlayerItem for active items, or Gun for guns
         where TItemSpecific : TItemClass  // must be a subclass of TItemClass
     {
-        string baseItemName = itemName.Replace("-", "").Replace(".", "").Replace(" ", "_").ToLower();  //get saner gun name for commands
+        string baseItemName = itemName.InternalName();  //get saner gun name for commands
         string internalName = C.MOD_PREFIX+":"+baseItemName;
         string ammonomiconSprite;
         IDs.InternalNames[itemName] = internalName;
@@ -35,31 +35,31 @@ public static class Lazy
         if (typeof(TItemClass) == typeof(Gun))
         {
             GameObject go          = UnityEngine.Object.Instantiate(ItemHelper.Get(Items.PeaShooter).gameObject);
-            go.name                = spritePath;
+            go.name                = baseItemName;
+            ammonomiconSprite      = $"{baseItemName}_ammonomicon";
 
             Gun gun                = go.GetComponent<Gun>();
             gun.gunName            = itemName;
-            gun.gunSwitchGroup     = spritePath;
+            gun.gunSwitchGroup     = baseItemName;
             gun.modifiedVolley     = null;
             gun.singleModule       = null;
             gun.RawSourceVolley    = ScriptableObject.CreateInstance<ProjectileVolleyData>();
             gun.Volley.projectiles = new List<ProjectileModule>(){ProjectileModule.CreateClone(_BaseModule, inheritGuid: false)};
             gun.QuickUpdateGunAnimations(); // includes setting the default sprite
 
-            ammonomiconSprite = $"{spritePath}_ammonomicon";
             item = gun as TItemClass;
         }
         else
         {
-            GameObject obj = new GameObject(itemName).RegisterPrefab();
+            GameObject obj    = new GameObject(itemName).RegisterPrefab();
+            ammonomiconSprite = $"{baseItemName}_icon";
 
             tk2dSpriteCollectionData coll = ETGMod.Databases.Items.ItemCollection;
             tk2dSprite sprite = obj.AddComponent<tk2dSprite>();
-            sprite.SetSprite(coll, coll.GetSpriteIdByName(spritePath));
+            sprite.SetSprite(coll, coll.GetSpriteIdByName(ammonomiconSprite));
             sprite.SortingOrder = 0;
             sprite.IsPerpendicular = true;
 
-            ammonomiconSprite = spritePath;
             item = obj.AddComponent<TItemSpecific>();
         }
 
@@ -93,7 +93,7 @@ public static class Lazy
     public static FakeItem SetupFakeItem<TItemSpecific>() where TItemSpecific : FakeItem
     {
         string itemName = typeof(TItemSpecific).Name;
-        string baseItemName = itemName.Replace("-", "").Replace(".", "").Replace(" ", "_").ToLower();  //get saner gun name for commands
+        string baseItemName = itemName.InternalName();  //get saner gun name for commands
         string internalName = C.MOD_PREFIX+":"+baseItemName;
 
         tk2dSprite sprite = Lazy.SpriteObject(ETGMod.Databases.Items.ItemCollection, 0).RegisterPrefab();
@@ -128,7 +128,7 @@ public static class Lazy
     public static PickupObject SetupPassive<T>(string itemName, string shortDescription, string longDescription, string lore, bool hideFromAmmonomicon = false)
         where T : PickupObject
     {
-        return SetupItem<PickupObject, T>(itemName, $"{itemName.SafeName()}_icon", shortDescription, longDescription, lore, hideFromAmmonomicon: hideFromAmmonomicon);
+        return SetupItem<PickupObject, T>(itemName, shortDescription, longDescription, lore, hideFromAmmonomicon: hideFromAmmonomicon);
     }
 
     /// <summary>
@@ -137,7 +137,7 @@ public static class Lazy
     public static PlayerItem SetupActive<T>(string itemName, string shortDescription, string longDescription, string lore, bool hideFromAmmonomicon = false)
         where T : PlayerItem
     {
-        return SetupItem<PlayerItem, T>(itemName, $"{itemName.SafeName()}_icon", shortDescription, longDescription, lore, hideFromAmmonomicon: hideFromAmmonomicon);
+        return SetupItem<PlayerItem, T>(itemName, shortDescription, longDescription, lore, hideFromAmmonomicon: hideFromAmmonomicon);
     }
 
     /// <summary>
@@ -146,7 +146,7 @@ public static class Lazy
     public static Gun SetupGun<T>(string gunName, string shortDescription, string longDescription, string lore, bool hideFromAmmonomicon = false)
         where T : Alexandria.ItemAPI.AdvancedGunBehavior
     {
-        Gun gun = SetupItem<Gun, Gun>(gunName, gunName.SafeName(), shortDescription, longDescription, lore, hideFromAmmonomicon: hideFromAmmonomicon);
+        Gun gun = SetupItem<Gun, Gun>(gunName, shortDescription, longDescription, lore, hideFromAmmonomicon: hideFromAmmonomicon);
         gun.gameObject.AddComponent<T>();
         _GunSpriteCollection ??= gun.sprite.collection; // need to initialize at least once
 

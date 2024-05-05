@@ -4,8 +4,8 @@ public class ScavengingArms : PassiveItem
 {
     public static string ItemName         = "Scavenging Arms";
     public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string LongDescription  = "Room decorations (crates, statues, etc.) have a chance of spawning a small ammo pickup when broken by running or rolling into them. Each pickup restores 10% of a single gun's ammo";
+    public static string Lore             = "Scavenging is a lost art in the age of shops, guaranteed chests, and random loot drops. After all, why would anyone risk their life drawing fire away from the miscellaneous objects littering the Gungeon on the off chance that some of it may be salvageable as a couple extra rounds of ammunition?\n\nHubris. The answer is hubris.";
 
     private const float _FIND_AMMO_CHANCE     = 0.05f;
     private const float _AMMO_PERCENT_TO_GAIN = 0.1f;
@@ -19,16 +19,15 @@ public class ScavengingArms : PassiveItem
         item.quality      = ItemQuality.D;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
-        _ScavengingArmsId   = item.PickupObjectId;
-        tk2dSpriteAnimationClip clip = VFX.Create("blue_ammobox_pickup", fps: 8).GetComponent<tk2dSpriteAnimator>().library.clips[0];
-        _SmallAmmoPickup = ItemHelper.Get(Items.PartialAmmo).gameObject.ClonePrefab();
-        AmmoPickup ap = _SmallAmmoPickup.GetComponent<AmmoPickup>();
-        ap.SpreadAmmoCurrentGunPercent = _AMMO_PERCENT_TO_GAIN;
-        ap.SpreadAmmoOtherGunsPercent = 0.0f;
+        _ScavengingArmsId = item.PickupObjectId;
+        _SmallAmmoPickup  = ItemHelper.Get(Items.PartialAmmo).gameObject.ClonePrefab();
 
-        ap.spriteAnimator.library.clips[0] = clip;
-        ap.spriteAnimator.defaultClipId = 0;
-        ap.spriteAnimator.deferNextStartClip = false;
+        AmmoPickup ap = _SmallAmmoPickup.GetComponent<AmmoPickup>();
+            ap.SpreadAmmoCurrentGunPercent       = _AMMO_PERCENT_TO_GAIN;
+            ap.SpreadAmmoOtherGunsPercent        = 0.0f;
+            ap.spriteAnimator.library.clips[0]   = VFX.Create("blue_ammobox_pickup", fps: 8).GetComponent<tk2dSpriteAnimator>().library.clips[0];
+            ap.spriteAnimator.defaultClipId      = 0;
+            ap.spriteAnimator.deferNextStartClip = false;
 
         // ap.minimapIcon.GetComponent<tk2dSprite>().SetSprite(VFX.Collection, clip.frames[0].spriteId);
         ap.minimapIcon = null; //TODO: nuking the minimap icon since i can't find the base game reference...put back later if i can make a good-looking new one

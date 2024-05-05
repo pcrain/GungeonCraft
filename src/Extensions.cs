@@ -924,7 +924,7 @@ public static class Extensions
   /// <summary>Set up custom ammo types from default resource paths</summary>
   public static void SetupCustomAmmoClip(this ProjectileModule mod, GunData b)
   {
-      string clipname    = b.gun.EncounterNameOrDisplayName.SafeName();
+      string clipname    = b.gun.EncounterNameOrDisplayName.InternalName();
       // if (C.DEBUG_BUILD)
       //   ETGModConsole.Log($"  getting clip {$"{clipname}_clip"}");
       mod.ammoType       = GameUIAmmoType.AmmoType.CUSTOM;
@@ -1042,22 +1042,16 @@ public static class Extensions
     return component.gameObject.GetOrAddComponent<T>();
   }
 
-  /// <summary>Get the internal sprite name for each gun (keep in parity with SetupItem())</summary>
-  public static string InternalName(this Gun gun)
+  /// <summary>Get the internal name for a string</summary>
+  public static string InternalName(this string s)
   {
-    return gun.gunName.Replace("-", "").Replace(".", "").Replace(" ", "_").ToLower(); // keep in parity with SetupItem()
+    return s.Replace("-", "").Replace(".", "").Replace(":", "").Replace("'","").Replace(" ", "_").ToLower(); // keep in parity with SetupItem()
   }
 
   /// <summary>Get the internal sprite name for each gun (keep in parity with SetupItem())</summary>
   public static string InternalSpriteName(this Gun gun)
   {
-    return gun.InternalName().Replace("'",""); // keep in parity with SetupItem()
-  }
-
-  /// <summary>Get the internal name of an item / gun corresponding to its sprite</summary>
-  public static string SafeName(this string s)
-  {
-    return s.Replace(" ", "_").Replace("'","").Replace(".","").ToLower();
+    return gun.gunName.InternalName(); // keep in parity with SetupItem()
   }
 
   /// <summary>Force a gun to render on top of the player (call this in LateUpdate())</summary>

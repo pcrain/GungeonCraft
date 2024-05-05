@@ -1,11 +1,11 @@
 namespace CwaffingTheGungy;
 
-public class SteadyHands : PassiveItem
+public class MMReloading : PassiveItem
 {
-    public static string ItemName         = "Steady Hands";
+    public static string ItemName         = "MM: Reloading";
     public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string LongDescription  = "Guns reload 33% faster while standing still.";
+    public static string Lore             = "Gungeoneers aren't particularly good at multitasking -- as evidenced by the number of ridiculous ways they tend to get hit while exploring -- and countless hours spent reloading while running around has ingrained rather subpar reloading techniques deeply into their muscle memory. A quick refresher from the Reloading chapter of Manuel's Manual is more than enough for most Gungeoneers to instill some semblance of discipline into their reloading practices.";
 
     public static int ID;
 
@@ -13,7 +13,7 @@ public class SteadyHands : PassiveItem
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<SteadyHands>(ItemName, ShortDescription, LongDescription, Lore);
+        PickupObject item = Lazy.SetupPassive<MMReloading>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
@@ -26,9 +26,9 @@ public class SteadyHands : PassiveItem
             return 1.0f;
         if (pc.m_playerCommandedDirection != Vector2.zero)
             return 1.0f;
-        if (!pc.HasPassiveItem(SteadyHands.ID))
+        if (!pc.HasPassiveItem(MMReloading.ID))
             return 1.0f;
-        return SteadyHands._RELOAD_FACTOR;
+        return MMReloading._RELOAD_FACTOR;
     }
 
     private static float ModifyVisualReloadSpeedIfIdle(GameUIReloadBarController c)
@@ -37,9 +37,9 @@ public class SteadyHands : PassiveItem
             return 1.0f;
         if (pc.m_playerCommandedDirection != Vector2.zero)
             return 1.0f;
-        if (!pc.HasPassiveItem(SteadyHands.ID))
+        if (!pc.HasPassiveItem(MMReloading.ID))
             return 1.0f;
-        return SteadyHands._RELOAD_FACTOR;
+        return MMReloading._RELOAD_FACTOR;
     }
 
     /// <summary>Increase reload speed while standing still</summary>
@@ -57,7 +57,7 @@ public class SteadyHands : PassiveItem
             cursor.Emit(OpCodes.Ldarg_0);  // load enumerator type
             // load actual Gun from "$this" field
             cursor.Emit(OpCodes.Ldfld, AccessTools.GetDeclaredFields(original.DeclaringType).Find(f => f.Name == "$this"));
-            cursor.Emit(OpCodes.Call, typeof(SteadyHands).GetMethod("ModifyReloadSpeedIfIdle", BindingFlags.Static | BindingFlags.NonPublic));
+            cursor.Emit(OpCodes.Call, typeof(MMReloading).GetMethod("ModifyReloadSpeedIfIdle", BindingFlags.Static | BindingFlags.NonPublic));
             cursor.Emit(OpCodes.Mul);  // multiply deltatime by the steady hands reload factor
         }
     }
@@ -77,7 +77,7 @@ public class SteadyHands : PassiveItem
             cursor.Emit(OpCodes.Ldarg_0);  // load enumerator type
             // load actual GameUIReloadBarController from "$this" field
             cursor.Emit(OpCodes.Ldfld, AccessTools.GetDeclaredFields(original.DeclaringType).Find(f => f.Name == "$this"));
-            cursor.Emit(OpCodes.Call, typeof(SteadyHands).GetMethod("ModifyVisualReloadSpeedIfIdle", BindingFlags.Static | BindingFlags.NonPublic));
+            cursor.Emit(OpCodes.Call, typeof(MMReloading).GetMethod("ModifyVisualReloadSpeedIfIdle", BindingFlags.Static | BindingFlags.NonPublic));
             cursor.Emit(OpCodes.Mul);  // multiply deltatime by the steady hands reload factor
         }
     }
