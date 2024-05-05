@@ -144,11 +144,11 @@
     <Compile Include="src\Cwaff-Guns\Blamethrower.cs"/>
     <Compile Include="src\Cwaff-Guns\HandCannon.cs"/>
     <Compile Include="src\Cwaff-Guns\Glockarina.cs"/>
+    <Compile Include="src\Cwaff-Guns\MacchiAuto.cs"/>
     <Compile Include="src\Cwaff-Guns\SubtractorBeam.cs"/>
     <Compile Include="src\Cwaff-Guns\KiBlast.cs"/>
     <Compile Include="src\Cwaff-Guns\Blackjack.cs"/>
     <Compile Include="src\Cwaff-Guns\Vladimir.cs"/>
-    <Compile Include="src\Cwaff-Guns\Overdose.cs"/>
     <Compile Include="src\Cwaff-Guns\Outbreak.cs"/>
     <Compile Include="src\Cwaff-Guns\SeltzerPelter.cs"/>
     <Compile Include="src\Cwaff-Guns\SoulKaliber.cs"/>

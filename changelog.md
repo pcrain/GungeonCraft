@@ -2,7 +2,7 @@
 
 ## 1.12.0 (Future)
 
-- Added Overdose, Nycterian, Scavenging Armx, Armor Piercing Rounds, and Steady Hands
+- Added Macchi Auto, Nycterian, Scavenging Armx, Armor Piercing Rounds, and Steady Hands
 - Added mastery ritual! (documentation TBD)
 - Added masteries for Grandmaster, Chekhov's Gun, Pincushion, Platinum Star, and Natascha
 - Added 18 new hats

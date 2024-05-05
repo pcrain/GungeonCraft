@@ -1,13 +1,8 @@
 namespace CwaffingTheGungy;
 
-
-/* TODO:
-    - coffee goop O:
-*/
-
-public class Overdose : AdvancedGunBehavior
+public class MacchiAuto : AdvancedGunBehavior
 {
-    public static string ItemName         = "Overdose";
+    public static string ItemName         = "Macchi Auto";
     public static string ShortDescription = "TBD";
     public static string LongDescription  = "Fires a stream of coffee that inflicts a stacking caffeinated status on enemies, increasing their speed and inflicting damage over time";
     public static string Lore             = "This gun was designed to answer one simple question: 'what would happen if you filled a water gun with espresso?' While the gun's designer may have been the first and only person to ever ask this question, it turns out many of the Gundead are actually very sensitive to caffeine and enter a berserker-like state when exposed to it. Assuming you can stay out of their warpath, the caffeine quickly takes its toll on even the most resilient among the Gundead.";
@@ -17,7 +12,7 @@ public class Overdose : AdvancedGunBehavior
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Overdose>(ItemName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<MacchiAuto>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.BEAM, reloadTime: 1.0f, ammo: 100, audioFrom: Items.MegaDouser, defaultAudio: true);
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
@@ -32,7 +27,7 @@ public class Overdose : AdvancedGunBehavior
             AppliesDeathTint = true,
             AffectsEnemies   = true,
             duration         = 10000000,
-            effectIdentifier = "Overdose",
+            effectIdentifier = ItemName,
             stackMode        = GameActorEffect.EffectStackingMode.DarkSoulsAccumulate,
             };
 
@@ -88,14 +83,14 @@ public class OverdoseJuice : MonoBehaviour
 {
     private void Start()
     {
-        base.GetComponent<Projectile>().statusEffectsToApply.Add(Overdose._OverdoseEffect);
+        base.GetComponent<Projectile>().statusEffectsToApply.Add(MacchiAuto._OverdoseEffect);
     }
 }
 
 public class OverdoseEffect : GameActorEffect
 {
     private const float _ACCUM_RATE = 0.5f;
-    private const float _DAMAGE_RATE = 4.0f;
+    private const float _DAMAGE_RATE = 8.0f;
 
     public override void OnDarkSoulsAccumulate(GameActor actor, RuntimeGameActorEffectData effectData, float partialAmount = 1f, Projectile sourceProjectile = null)
     {

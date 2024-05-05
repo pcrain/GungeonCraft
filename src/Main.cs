@@ -272,7 +272,7 @@ public class Initialisation : BaseUnityPlugin
                     RCLauncher.Add();
                     Breegull.Add();
                     SubMachineGun.Add();
-                    Overdose.Add();
+                    MacchiAuto.Add();
                     Nycterian.Add();
                     setupGunsWatch.Stop();
                 // });

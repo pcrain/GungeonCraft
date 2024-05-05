@@ -1174,7 +1174,7 @@ public static class EasyGoopDefinitions  // mostly stolen from NN
 
         //Set up Overdose goop
         CoffeeGoop = UnityEngine.Object.Instantiate<GoopDefinition>(WaterGoop);
-            CoffeeGoop.baseColor32                      = Overdose._OverdoseTint;
+            CoffeeGoop.baseColor32                      = MacchiAuto._OverdoseTint;
             CoffeeGoop.CanBeElectrified                 = false;
             CoffeeGoop.usesAmbientGoopFX                = true;
             CoffeeGoop.ambientGoopFXChance              = 0.0015f;
