@@ -14,7 +14,7 @@ namespace CwaffingTheGungy;
 public class ArmorPiercingRounds : PassiveItem
 {
     public static string ItemName         = "Armor Piercing Rounds";
-    public static string ShortDescription = "TBD";
+    public static string ShortDescription = "Bored to Death";
     public static string LongDescription  = "Projectiles ignore the invulnerable phases of most enemies. Does not break boss DPS caps.";
     public static string Lore             = "A handful of the Gungeon's denizens have been gifted with various means of protecting themselves from the thousands of bullets, lasers, foam darts, and T-shirts fired their way on a daily basis. Bullet researchers have known for years that most of these defenses are thwarted by a heavy yet crude application of torque to projectiles, but lobbying from Big Arma has largely suppressed this knowledge from the general public in order to sell beefier and more impressive guns.";
 

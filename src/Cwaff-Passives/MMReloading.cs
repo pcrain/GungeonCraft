@@ -3,7 +3,7 @@ namespace CwaffingTheGungy;
 public class MMReloading : PassiveItem
 {
     public static string ItemName         = "MM: Reloading";
-    public static string ShortDescription = "TBD";
+    public static string ShortDescription = "Chapter 1";
     public static string LongDescription  = "Guns reload 33% faster while standing still.";
     public static string Lore             = "Gungeoneers aren't particularly good at multitasking -- as evidenced by the number of ridiculous ways they tend to get hit while exploring -- and countless hours spent reloading while running around has ingrained rather subpar reloading techniques deeply into their muscle memory. A quick refresher from the Reloading chapter of Manuel's Manual is more than enough for most Gungeoneers to instill some semblance of discipline into their reloading practices.";
 

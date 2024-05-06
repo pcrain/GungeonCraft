@@ -3,7 +3,7 @@
 public class Nycterian : AdvancedGunBehavior
 {
     public static string ItemName         = "Nycterian";
-    public static string ShortDescription = "TBD";
+    public static string ShortDescription = "Locate the Echoes";
     public static string LongDescription  = "Fires bats that occasionally screech while airborne. Screeches have a chance to draw fire from nearby enemies, with the chance decreasing with distance.";
     public static string Lore             = "Bats. Flittery, noisy, but usually not explosive or otherwise as harmful as their Bullat cousins. They're still weighty enough to pack a punch when launched at high velocity, and their incessant screeching can be weaponized as a useful distraction, making them the 7th most effective blind mammalian projectile known to modern ammunition specialists.";
 
