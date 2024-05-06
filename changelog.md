@@ -1,17 +1,20 @@
 # Changelog
 
-## 1.12.0 (Future)
+## 1.12.0 (2024-05-05)
 
+#### Features and Polish:
 - Added Macchi Auto, Nycterian, Scavenging Arm, Armor Piercing Rounds, and MM: Reloading
-- Added mastery ritual! (documentation TBD)
+- Added gun mastery system
 - Added masteries for Grandmaster, Chekhov's Gun, Pincushion, Platinum Star, and Natascha
 - Added 18 new hats
+- Bulletbot Implant, Bionic Finger, and Gorgun's Eye can now spawn in Handy's shop from [Knife to a Gunfight](https://thunderstore.io/c/enter-the-gungeon/p/Skilotar/Knife_to_a_Gunfight/)!
+
+#### Bugfixes and Misc:
 - Fixed issue with knight pieces fired from Grandmaster getting stuck in infinite loops when no enemies are around
 - Fixed Aimu Hakurei being able to build graze off of co-op partner's bullets
 - Fixed null deref in Safety Gloves due to trying to play VFX above despawned enemies
-- Bulletbot Implant, Bionic Finger, and Gorgun's Eye can now spawn in Handy's shop from [Knife to a Gunfight](https://thunderstore.io/c/enter-the-gungeon/p/Skilotar/Knife_to_a_Gunfight/)!
 - Fixed visual bug with misaligned muzzle flash for Holy Water Gun 
-- Fixed bug (for the second time) where loading the secret floor after returning to the breach would cause an infinite loading screen
+- Fixed bug (for the second time) where loading the secret floor after returning to the Breach would cause an infinite loading screen
 - Lowered volume on Natascha spinup sound
 
 ## 1.11.5 (2024-04-20)

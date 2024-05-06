@@ -9,9 +9,9 @@
 
 ### Features
 
-- 99 new items, including
-	+ 50 new guns
-	+ 32 new passive items
+- 104 new items, including
+	+ 52 new guns
+	+ 35 new passive items
 	+ 17 new active items
 - Lore for all new guns and items
 - 85 stylish cosmetic hats, accessible via a new hat room near Winchester in the Breach
@@ -23,6 +23,7 @@
 - Vanilla bugfixes
 - You can pet Junior \o/
 - You can become the greatest janitor the Gungeon has ever seen O:
+- And more!
 
 ### Goals
 
@@ -43,10 +44,10 @@
 
 * Found a Bug?
 	- [Open an Issue on GitHub](https://github.com/pcrain/GungeonCraft/issues)! Please bear in mind that I work on this in my free time for fun, so I might not fix every bug, but I'll do my best to get to all of the important ones. C:
-* Balance or Feature Suggestion?
-	- [Submit it here!](https://github.com/pcrain/GungeonCraft/issues/1) I'm always open to more ideas, but I also have a spreadsheet with 160 or so ideas in it already, so no guarantees I get around to everything. O:
 * Where do I find the new boss?
 	- Try talking to Bello a few dozen times! He'll give you a hint eventually (dialogue is RNG and I can't find a way around it D: ).
+* Why does my gun say "Normal" above it?
+	- Try beating the new boss :>
 
 ### Wiki
 
