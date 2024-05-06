@@ -34,7 +34,7 @@ public class SansNPC : BossNPC
         "idle", "idle", "sans_laugh");
       yield return Converse("since you're here, wanna try my little test?",
         "idle_glance", "idle_glance", "sans_laugh");
-      yield return Converse("if you can manage to land a few hits on me, i'll give you something cool",
+      yield return Converse("if you can manage to land a few hits on me, i'll tell you a secret",
         "shrug", "shrug", "sans_laugh");
       yield return Converse("i don't have any guns on me, but i'll try to make it interesting",
         "idle", "idle", "sans_laugh");
@@ -64,7 +64,6 @@ public class SansNPC : BossNPC
     }
     else
     {
-      this.ShowText("alright, suit yourself!", autoContinueTimer: 1f);
       yield return Converse("alright, suit yourself",
         "shrug_calm", "shrug_calm", "sans_laugh");
       yield return Converse("i'll be here if you change your mind",
@@ -75,7 +74,7 @@ public class SansNPC : BossNPC
 
   protected override IEnumerator DefeatedScript()
   {
-    this.ShowText("good stuff, kid", autoContinueTimer: 1f);
+    this.ShowText("good stuff, kid. come here", autoContinueTimer: 1f);
     yield return new WaitForSeconds(1f);
     // this.ShowText("take this treasure chest", autoContinueTimer: 1f);
     // yield return new WaitForSeconds(1f);
@@ -90,6 +89,22 @@ public class SansNPC : BossNPC
       "shrug", "shrug", "sans_laugh");
     yield return Converse("the item in that chest is all yours",
       "idle", "idle", "sans_laugh");
+    yield return Converse("as for that secret...",
+        "idle", "idle", "sans_laugh");
+    yield return Converse("have you ever come across a {wj}Normal{w} gun?",
+        "idle", "idle", "sans_laugh");
+    yield return Converse("i don't mean a standard or ordinary gun, but a {wj}Normal{w} gun",
+        "shrug_calm", "shrug_calm", "sans_laugh");
+    yield return Converse("i've heard if you drop a {wj}Normal{w} gun inside a triangle of 3 other guns...",
+        "idle", "idle", "sans_laugh");
+    yield return Converse("something cool might happen depending on the combined strength of the guns",
+        "idle_glance", "idle_glance", "sans_laugh");
+    yield return Converse("if something cool DOES happen, try using a blank",
+        "idle", "idle", "sans_laugh");
+    yield return Converse("what, you think i'm making all of this up?",
+        "idle", "idle", "sans_laugh");
+    yield return Converse("eh, could be",
+        "idle_glance", "idle_glance", "sans_laugh");
     yield return Converse("let's do this again some time",
       "shrug", "shrug", "sans_laugh");
     SetAnimation("idle");
