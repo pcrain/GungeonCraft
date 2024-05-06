@@ -123,7 +123,8 @@ public static class CwaffSynergies
 
         FakeItem.Create<T>();
         int tokenId = FakeItem.Acquire<T>().PickupObjectId;
-        NewSynergy(
+        //NOTE: next line can't begin with NewSynergy or itemtips script gets messed up
+        /**/ NewSynergy(
             synergy              : synergy,
             name                 : $"{gun.EncounterNameOrDisplayName} Mastery",
             mandatory            : new string[1]{IDs.InternalNames[gun.gunName]},

@@ -4,7 +4,7 @@ public class ScavengingArms : PassiveItem
 {
     public static string ItemName         = "Scavenging Arms";
     public static string ShortDescription = "Loot Boxes";
-    public static string LongDescription  = "Room decorations (crates, statues, etc.) have a chance of spawning a small ammo pickup when broken by running or rolling into them. Each pickup restores 10% of a single gun's ammo";
+    public static string LongDescription  = "Room decorations (crates, statues, etc.) have a chance of spawning a small ammo pickup when broken by running or rolling into them. Each pickup restores 10% of a single gun's ammo.";
     public static string Lore             = "Scavenging is a lost art in the age of shops, guaranteed chests, and random loot drops. After all, why would anyone risk their life drawing fire away from the miscellaneous objects littering the Gungeon on the off chance that some of it may be salvageable as a couple extra rounds of ammunition?\n\nHubris. The answer is hubris.";
 
     private const float _FIND_AMMO_CHANCE     = 0.05f;
@@ -16,7 +16,7 @@ public class ScavengingArms : PassiveItem
     public static void Init()
     {
         PickupObject item = Lazy.SetupPassive<ScavengingArms>(ItemName, ShortDescription, LongDescription, Lore);
-        item.quality      = ItemQuality.D;
+        item.quality      = ItemQuality.C;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
         _ScavengingArmsId = item.PickupObjectId;

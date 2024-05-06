@@ -7,6 +7,8 @@ public class Nycterian : AdvancedGunBehavior
     public static string LongDescription  = "Fires bats that occasionally screech while airborne. Screeches have a chance to draw fire from nearby enemies, with the chance decreasing with distance.";
     public static string Lore             = "Bats. Flittery, noisy, but usually not explosive or otherwise as harmful as their Bullat cousins. They're still weighty enough to pack a punch when launched at high velocity, and their incessant screeching can be weaponized as a useful distraction, making them the 7th most effective blind mammalian projectile known to modern ammunition specialists.";
 
+    internal static GameObject _DistractedVFX;
+
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Nycterian>(ItemName, ShortDescription, LongDescription, Lore);
@@ -15,6 +17,8 @@ public class Nycterian : AdvancedGunBehavior
 
         gun.InitProjectile(GunData.New(clipSize: 10, cooldown: 0.19f, shootStyle: ShootStyle.SemiAutomatic, scale: 1.5f,
           damage: 7.0f, speed: 27.0f, range: 100.0f, sprite: "bat_projectile", fps: 12)).Attach<BatProjectile>();
+        _DistractedVFX = VFX.Create("distracted_vfx",
+            fps: 18, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 1, emissiveColour: Color.magenta);
     }
 }
 
@@ -89,14 +93,23 @@ public class DecoyEcho : MonoBehaviour
         SpeculativeRigidbody body = base.gameObject.GetComponent<SpeculativeRigidbody>();
         foreach (AIActor enemy in activeEnemies)
         {
-            if (!enemy)
+            if (!enemy || !enemy.IsHostileAndNotABoss(canBeNeutral: true))
                 continue;
             float dist = (base.transform.position.XY() - enemy.CenterPosition).magnitude;
             if (dist > _DECOY_MAX_DIST)
                 continue;
             float decoyChance = Mathf.InverseLerp(_DECOY_MAX_DIST, _DECOY_MIN_DIST, dist);
-            if ((decoyChance * decoyChance) >= UnityEngine.Random.value)
-                enemy.OverrideTarget = body;
+            if ((decoyChance * decoyChance) < UnityEngine.Random.value)
+                continue;
+
+            enemy.OverrideTarget = body;
+            GameObject vfx = SpawnManager.SpawnVFX(Nycterian._DistractedVFX, enemy.sprite.WorldTopCenter + new Vector2(0f, 1f), Quaternion.identity, ignoresPools: true);
+                tk2dSprite sprite = vfx.GetComponent<tk2dSprite>();
+                    sprite.HeightOffGround = 1f;
+                vfx.transform.parent = enemy.sprite.transform;
+                vfx.AddComponent<GlowAndFadeOut>().Setup(
+                    fadeInTime: 0.15f, glowInTime: 0.10f, glowOutTime: 0.10f, fadeOutTime: 0.15f, maxEmit: 50f, destroy: true);
+            enemy.gameObject.PlayUnique("distracted_sound");
         }
     }
 
