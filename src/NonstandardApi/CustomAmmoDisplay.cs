@@ -7,7 +7,7 @@ public abstract class CustomAmmoDisplay : MonoBehaviour
     // must be public
     public static bool DoAmmoOverride(GameUIAmmoController uic, GunInventory guns)
     {
-        if (guns?.CurrentGun?.GetComponent<CustomAmmoDisplay>() is not CustomAmmoDisplay ammoDisplay)
+        if (guns == null || !guns.CurrentGun || guns.CurrentGun.GetComponent<CustomAmmoDisplay>() is not CustomAmmoDisplay ammoDisplay)
           return false; // no custom ammo override, so use the vanilla behavior
         if (!ammoDisplay.DoCustomAmmoDisplay(uic))
           return false; // custom ammo override does not want to change vanilla behavior
@@ -45,7 +45,6 @@ public abstract class CustomAmmoDisplay : MonoBehaviour
         private static void CustomAmmoCountDisplayIL(ILContext il)
         {
             ILCursor cursor = new ILCursor(il);
-            // cursor.DumpILOnce("CustomAmmoCountDisplayIL");
 
             if (!cursor.TryGotoNext(MoveType.Before,
               instr => instr.MatchLdarg(0),
@@ -66,7 +65,6 @@ public abstract class CustomAmmoDisplay : MonoBehaviour
             cursor.Emit(OpCodes.Call, typeof(CustomAmmoDisplay).GetMethod("DoAmmoOverride")); // replace with our own custom hook
             cursor.Emit(OpCodes.Brtrue, skipPoint); // skip over all the logic for doing normal updates to the ammo counter
             cursor.Emit(OpCodes.Ldarg_0); // replace 0th parameter -> GameUIAmmoController
-            // cursor.Emit(OpCodes.Pop);
         }
     }
 }

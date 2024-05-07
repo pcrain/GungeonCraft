@@ -179,7 +179,6 @@ public class Initialisation : BaseUnityPlugin
 
             #region Hats
                 System.Diagnostics.Stopwatch setupHatsWatch = System.Diagnostics.Stopwatch.StartNew();
-                // Hat Setup
                 CwaffHats.Init();
                 setupHatsWatch.Stop();
             #endregion
@@ -206,162 +205,129 @@ public class Initialisation : BaseUnityPlugin
             #endregion
 
             #region Guns
-                System.Diagnostics.Stopwatch setupGunsWatch = null;
-                // Thread setupGunsThread = new Thread(() => {
-                    setupGunsWatch = System.Diagnostics.Stopwatch.StartNew();
+                System.Diagnostics.Stopwatch setupGunsWatch = System.Diagnostics.Stopwatch.StartNew();
 
-                    IronMaid.Add();
-                    Natascha.Add();
-                    PaintballCannon.Add();
-                    // DerailGun.Add(); unfinished
-                    // PopcornGun.Add(); no sprite
-                    Tranquilizer.Add();
-                    // LastResort.Add(); no sprite
-                    // MasterSword.Add(); unfinished
-                    // Encircler.Add(); no sprite
-                    // Nug.Add(); no sprite
-                    SoulKaliber.Add();
-                    // GamblersFallacy.Add(); no sprite
-                    // GasterBlaster.Add(); no sprite
-                    // Commitment.Add(); no sprite
-                    // HeadCannon.Add(); unfinished
-                    // Telefragger.Add(); no sprite
-                    // Kinsurrection.Add(); unfinished
-                    // SpinCycle.Add(); no sprite
-                    // TimingGun.Add(); unfinished
-                    KiBlast.Add();
-                    Deadline.Add();
-                    BBGun.Add();
-                    Bouncer.Add();
-                    Grandmaster.Add();
-                    QuarterPounder.Add();
-                    // DeathNote.Add(); unfinished
-                    HolyWaterGun.Add();
-                    Alyx.Add();
-                    VacuumCleaner.Add();
-                    Gunbrella.Add();
-                    Blackjack.Add();
-                    SchrodingersGat.Add();
-                    // Taomislav.Add(); unfinished
-                    RacketLauncher.Add();
-                    Outbreak.Add();
-                    HandCannon.Add();
-                    HatchlingGun.Add();
-                    Ticonderogun.Add();
-                    IceCreamGun.Add(); //NOTE: adding this here because it's a pseudo-gun and it ruins threading if initialized with other items
-                    AimuHakurei.Add();
-                    SeltzerPelter.Add();
-                    Missiletoe.Add();
-                    PlatinumStar.Add();
-                    PistolWhip.Add();
-                    Jugglernaut.Add();
-                    SubtractorBeam.Add();
-                    Alligator.Add();
-                    Lightwing.Add();
-                    KingsLaw.Add();
-                    Pincushion.Add();
-                    Crapshooter.Add();
-                    CarpetBomber.Add();
-                    Uppskeruvel.Add();
-                    Glockarina.Add();
-                    Magunet.Add();
-                    Wavefront.Add();
-                    Scotsman.Add();
-                    ChekhovsGun.Add();
-                    Vladimir.Add();
-                    Blamethrower.Add();
-                    Suncaster.Add();
-                    KALI.Add();
-                    AlienNailgun.Add();
-                    OmnidirectionalLaser.Add();
-                    RCLauncher.Add();
-                    Breegull.Add();
-                    SubMachineGun.Add();
-                    MacchiAuto.Add();
-                    Nycterian.Add();
-                    setupGunsWatch.Stop();
-                // });
-                // setupGunsThread.Start();
+                IronMaid.Add();
+                Natascha.Add();
+                PaintballCannon.Add();
+                Tranquilizer.Add();
+                SoulKaliber.Add();
+                KiBlast.Add();
+                Deadline.Add();
+                BBGun.Add();
+                Bouncer.Add();
+                Grandmaster.Add();
+                QuarterPounder.Add();
+                HolyWaterGun.Add();
+                Alyx.Add();
+                VacuumCleaner.Add();
+                Gunbrella.Add();
+                Blackjack.Add();
+                SchrodingersGat.Add();
+                RacketLauncher.Add();
+                Outbreak.Add();
+                HandCannon.Add();
+                HatchlingGun.Add();
+                Ticonderogun.Add();
+                IceCreamGun.Add(); //NOTE: adding this here because it's a pseudo-gun and it ruins threading if initialized with other items
+                AimuHakurei.Add();
+                SeltzerPelter.Add();
+                Missiletoe.Add();
+                PlatinumStar.Add();
+                PistolWhip.Add();
+                Jugglernaut.Add();
+                SubtractorBeam.Add();
+                Alligator.Add();
+                Lightwing.Add();
+                KingsLaw.Add();
+                Pincushion.Add();
+                Crapshooter.Add();
+                CarpetBomber.Add();
+                Uppskeruvel.Add();
+                Glockarina.Add();
+                Magunet.Add();
+                Wavefront.Add();
+                Scotsman.Add();
+                ChekhovsGun.Add();
+                Vladimir.Add();
+                Blamethrower.Add();
+                Suncaster.Add();
+                KALI.Add();
+                AlienNailgun.Add();
+                OmnidirectionalLaser.Add();
+                RCLauncher.Add();
+                Breegull.Add();
+                SubMachineGun.Add();
+                MacchiAuto.Add();
+                Nycterian.Add();
+
+                setupGunsWatch.Stop();
             #endregion
 
             #region Actives
-                System.Diagnostics.Stopwatch setupActivesWatch = null;
-                // Thread setupActivesThread = new Thread(() => {
-                    setupActivesWatch = System.Diagnostics.Stopwatch.StartNew();
+                System.Diagnostics.Stopwatch setupActivesWatch = System.Diagnostics.Stopwatch.StartNew();
 
-                    BorrowedTime.Init();
-                    BulletThatCanKillTheFuture.Init();
-                    GunPowderer.Init();
-                    AmazonPrimer.Init();
-                    EmergencySiren.Init();
-                    Itemfinder.Init();
-                    KalibersJustice.Init();
-                    GasterBlaster.Init();
-                    StackOfTorches.Init();
-                    InsurancePolicy.Init();
-                    IceCream.Init();
-                    // GungeonitePickaxe.Init();
-                    ChamberJammer.Init();
-                    Cuppajoe.Init();
-                    StopSign.Init();
-                    GunSynthesizer.Init();
-                    ChestScanner.Init();
-                    BulletbotImplant.Init();
+                BorrowedTime.Init();
+                BulletThatCanKillTheFuture.Init();
+                GunPowderer.Init();
+                AmazonPrimer.Init();
+                EmergencySiren.Init();
+                Itemfinder.Init();
+                KalibersJustice.Init();
+                GasterBlaster.Init();
+                StackOfTorches.Init();
+                InsurancePolicy.Init();
+                IceCream.Init();
+                ChamberJammer.Init();
+                Cuppajoe.Init();
+                StopSign.Init();
+                GunSynthesizer.Init();
+                ChestScanner.Init();
+                BulletbotImplant.Init();
 
-                    setupActivesWatch.Stop();
-                // });
-                // setupActivesThread.Start();
+                setupActivesWatch.Stop();
             #endregion
 
             #region Passives
-                System.Diagnostics.Stopwatch setupPassivesWatch = null;
-                // Thread setupPassivesThread = new Thread(() => {
-                    setupPassivesWatch = System.Diagnostics.Stopwatch.StartNew();
-                    // Shine.Init(); unfinished
-                    // Superstitious.Init(); unfinished
-                    DriftersHeadgear.Init();
-                    // Siphon.Init(); unfinished
-                    // ZoolandersDiary.Init(); unfinished / mediocre
-                    RatPoison.Init();
-                    JohnsWick.Init();
-                    Gyroscope.Init();
-                    CustodiansBadge.Init();
-                    CreditCard.Init();
-                    LibraryCardtridge.Init();
-                    BlankChecks.Init();
-                    DeadRinger.Init();
-                    VoodooDoll.Init();
-                    CampingSupplies.Init();
-                    WeddingRing.Init();
-                    GorgunEye.Init();
-                    UtilityVest.Init();
-                    WarriorsGi.Init();
-                    CatEarHeadband.Init();
-                    Blazer.Init();
-                    PlotArmor.Init();
-                    FourDBullets.Init();
-                    AstralProjector.Init();
-                    EchoChamber.Init();
-                    BionicFinger.Init();
-                    BubbleWand.Init();
-                    AdrenalineShot.Init();
-                    StuntHelmet.Init();
-                    ComfySlippers.Init();
-                    // DisplayStand.Init();  // scrapped since discouraging item use is not very fun
-                    SafetyGloves.Init();
-                    DrabOutfit.Init();
-                    RingOfDefenestration.Init();
-                    AmmoConservationManual.Init();
-                    ReserveAmmolet.Init();
-                    ReflexAmmolet.Init();
-                    // Protractor.Init();  // unfinished
-                    // PlaybulletMagazine.Init();
-                    ScavengingArms.Init();
-                    ArmorPiercingRounds.Init();
-                    MMReloading.Init();
-                    setupPassivesWatch.Stop();
-                // });
-                // setupPassivesThread.Start();
+                System.Diagnostics.Stopwatch setupPassivesWatch = System.Diagnostics.Stopwatch.StartNew();
+
+                DriftersHeadgear.Init();
+                RatPoison.Init();
+                JohnsWick.Init();
+                Gyroscope.Init();
+                CustodiansBadge.Init();
+                CreditCard.Init();
+                LibraryCardtridge.Init();
+                BlankChecks.Init();
+                DeadRinger.Init();
+                VoodooDoll.Init();
+                CampingSupplies.Init();
+                WeddingRing.Init();
+                GorgunEye.Init();
+                UtilityVest.Init();
+                WarriorsGi.Init();
+                CatEarHeadband.Init();
+                Blazer.Init();
+                PlotArmor.Init();
+                FourDBullets.Init();
+                AstralProjector.Init();
+                EchoChamber.Init();
+                BionicFinger.Init();
+                BubbleWand.Init();
+                AdrenalineShot.Init();
+                StuntHelmet.Init();
+                ComfySlippers.Init();
+                SafetyGloves.Init();
+                DrabOutfit.Init();
+                RingOfDefenestration.Init();
+                AmmoConservationManual.Init();
+                ReserveAmmolet.Init();
+                ReflexAmmolet.Init();
+                ScavengingArms.Init();
+                ArmorPiercingRounds.Init();
+                MMReloading.Init();
+
+                setupPassivesWatch.Stop();
             #endregion
 
             #region UI Sprites (cannot be async, must set up textures on main thread)
@@ -440,51 +406,33 @@ public class Initialisation : BaseUnityPlugin
             #endregion
 
             #region Bosses yo (not async for now due to needing to load boss card textures)
-                System.Diagnostics.Stopwatch setupBossesWatch = null;
-                // Thread setupBossesThread = new Thread(() => {
-                    setupBossesWatch = System.Diagnostics.Stopwatch.StartNew();
-                    SansBoss.Init();
-                    setupBossesWatch.Stop();
-                // });
-                // setupBossesThread.Start();
+                System.Diagnostics.Stopwatch setupBossesWatch = System.Diagnostics.Stopwatch.StartNew();
+                SansBoss.Init();
+                setupBossesWatch.Stop();
             #endregion
 
             // Need to wait for all items and SaveAPI to be loaded before setting up synergies and shops
             System.Diagnostics.Stopwatch awaitItemsWatch = System.Diagnostics.Stopwatch.StartNew();
-            // setupActivesThread.Join();
-            // setupPassivesThread.Join();
-            // setupGunsThread.Join();
             setupSaveThread.Join();
             awaitItemsWatch.Stop();
 
             #region Synergies (not async due to safety concerns + it's fast already)
-                System.Diagnostics.Stopwatch setupSynergiesWatch = null;
-                // Thread setupSynergiesThread = new Thread(() => {
-                    setupSynergiesWatch = System.Diagnostics.Stopwatch.StartNew();
-
-                    CwaffSynergies.Init();
-                    setupSynergiesWatch.Stop();
-                // });
-                // setupSynergiesThread.Start();
+                System.Diagnostics.Stopwatch setupSynergiesWatch = System.Diagnostics.Stopwatch.StartNew();
+                CwaffSynergies.Init();
+                setupSynergiesWatch.Stop();
             #endregion
 
             #region Shop NPCs (can't be async due to post-load barter table setup issues causing null derefs)
-                System.Diagnostics.Stopwatch setupShopsWatch = null;
-                // Thread setupShopsThread = new Thread(() => {
-                    setupShopsWatch = System.Diagnostics.Stopwatch.StartNew();
-                    // InsuranceBoi.Init();
-                    Cammy.Init();
-                    Bart.Init();
-                    Kevlar.Init();
-                    setupShopsWatch.Stop();
-                // });
-                // setupShopsThread.Start();
+                System.Diagnostics.Stopwatch setupShopsWatch = System.Diagnostics.Stopwatch.StartNew();
+                Cammy.Init();
+                Bart.Init();
+                Kevlar.Init();
+                setupShopsWatch.Stop();
             #endregion
 
             #region Wait for remaining async stuff to finish up
                 System.Diagnostics.Stopwatch awaitAsyncWatch = System.Diagnostics.Stopwatch.StartNew();
                 setupAudioThread.Join();
-                // setupSynergiesThread.Join();
                 awaitAsyncWatch.Stop();
             #endregion
 
@@ -517,14 +465,6 @@ public class Initialisation : BaseUnityPlugin
                 ETGModConsole.Log($"allocated {(newMemory - oldMemory).ToString("N0")} bytes of memory along the way");
                 ETGModMainBehaviour.Instance.gameObject.Play("vc_kirby_appeal01");
             }
-
-            // Debug.LogError("Gungy o.o!");
-            // Debug.LogAssertion("Gungy o.o!");
-            // Debug.LogWarning("Gungy o.o!");
-            // Debug.Log("Gungy o.o!");
-            // Debug.LogException("Gungy o.o!");
-            // foreach (tk2dSpriteDefinition def in AmmonomiconController.ForceInstance.EncounterIconCollection.spriteDefinitions)
-            //     ETGModConsole.Log($"  def: {def.name}");
         }
         catch (Exception e)
         {

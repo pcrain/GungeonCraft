@@ -91,7 +91,6 @@
     <Compile Include="src\Cwaff-Enemies\PathableBullet.cs"/>
     <Compile Include="src\Cwaff-Rooms\FancyShopBuilder.cs"/>
     <Compile Include="src\Extensions.cs"/>
-    <Compile Include="src\Cwaff-NPCs\Bombo.cs"/>
     <Compile Include="src\Cwaff-NPCs\Kevlar.cs"/>
     <Compile Include="src\Cwaff-NPCs\Cammy.cs"/>
     <Compile Include="src\Cwaff-NPCs\WhiteMageScrapped.cs"/>
@@ -195,7 +194,6 @@
     <Compile Include="src\NonstandardApi\ModdedShopItemAdder.cs"/>
     <Compile Include="src\NonstandardApi\CustomAmmoDisplay.cs"/>
     <Compile Include="src\NonstandardApi\FloorDebrisManager.cs"/>
-    <Compile Include="src\NonstandardApi\FakeShopItem.cs"/>
     <Compile Include="src\NonstandardApi\GungoSaveAPI\SpecialPickupObject.cs"/>
     <Compile Include="src\NonstandardApi\GungoSaveAPI\SaveTools.cs"/>
     <Compile Include="src\NonstandardApi\GungoSaveAPI\JammedEnemyState.cs"/>
