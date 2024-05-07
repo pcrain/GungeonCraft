@@ -151,7 +151,7 @@ public class MasteryRitualComponent : MonoBehaviour
     }
 
     // Requirement #5: the player must not already have the mastery for that gun
-    if (GameManager.Instance.AnyPlayerHasPickupID(gun.MasteryTokenId()))
+    if (Lazy.AnyoneHas(gun.MasteryTokenId()))
     {
       // Lazy.DebugLog($"Failed req #5: player already has mastery for {gun.EncounterNameOrDisplayName}");
       return false;

@@ -14,7 +14,6 @@ public class GungeonitePickaxe : CwaffActive
     internal static VFXPool _VFXDustPoof;
     internal static HashSet<IntVector2> _RebuiltChunks = new();
 
-    private static int _PickaxeId;
     private static readonly List<IntVector2> _NeighborDirs = new(){
         IntVector2.Right,IntVector2.UpRight,IntVector2.Up,IntVector2.UpLeft,IntVector2.Left,IntVector2.DownLeft,IntVector2.Down,IntVector2.DownRight};
 
@@ -33,8 +32,6 @@ public class GungeonitePickaxe : CwaffActive
         item.SetCooldownType(ItemBuilder.CooldownType.Timed, 0.5f);
 
         _VFXDustPoof = (ItemHelper.Get(Items.Drill) as PlayerItem).GetComponent<PaydayDrillItem>().VFXDustPoof;
-
-        _PickaxeId = item.PickupObjectId;
 
         // new Hook(
         //     typeof(TK2DDungeonAssembler).GetMethod("BuildFloorEdgeBorderTiles", BindingFlags.Instance | BindingFlags.NonPublic),
@@ -64,7 +61,7 @@ public class GungeonitePickaxe : CwaffActive
 
     private static void BuildFloorEdgeBorderTilesSanityCheck(FloorEdgeBorderDelegate orig, TK2DDungeonAssembler assembler, CellData current, Dungeon d, tk2dTileMap map, int ix, int iy)
     {
-        if (GameManager.Instance.AnyPlayerHasPickupID(_PickaxeId))
+        if (Lazy.AnyoneHasActive<GungeonitePickaxe>())
             MyBuildFloorEdgeBorderTiles(assembler, current, d, map, ix, iy);
         else
             orig(assembler, current, d, map, ix, iy);

@@ -6,7 +6,6 @@ public class RingOfDefenestration : CwaffPassive
     public static string ShortDescription = "Babies AND Bathwater";
     public static string LongDescription  = "Pushing an enemy into a pit has an 80% chance to spawn casings and a 20% chance to spawn a random pickup.";
     public static string Lore             = "Every warrior worth their salt occasionally tosses their opponents out of a window or moving vehicle to plummet towards their doom. While stylish and assertive, this maneuver unfortunately makes it very difficult to retrieve any loot the victims may have been carrying. This ring represents a pact with the Pit Lord to return any loot carried by those sacrificed to the pits of the Gungeon.";
-    public static int    ID;
 
     internal static readonly List<IntVector2> _RewardWeights = new() {
         new(-3,                     40), // 3 shells
@@ -23,7 +22,6 @@ public class RingOfDefenestration : CwaffPassive
     {
         PickupObject item = Lazy.SetupPassive<RingOfDefenestration>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
-        ID                = item.PickupObjectId;
     }
 
     [HarmonyPatch(typeof(GameStatsManager), nameof(GameStatsManager.RegisterStatChange))]
@@ -31,7 +29,7 @@ public class RingOfDefenestration : CwaffPassive
     {
         static void Postfix(TrackedStats stat, float value)
         {
-            if (stat != TrackedStats.ENEMIES_KILLED_WITH_PITS || !GameManager.Instance.AnyPlayerHasPickupID(ID))
+            if (stat != TrackedStats.ENEMIES_KILLED_WITH_PITS || !Lazy.AnyoneHas<RingOfDefenestration>())
                 return;
 
             int pickupID = _RewardWeights.GetWeightedPickupID();  //REFACTOR: change to GetWeighted(), doesn't need to be pickup IDs

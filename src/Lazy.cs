@@ -718,4 +718,112 @@ public static class Lazy
         decoyObject.transform.position = position;
         return decoyObject;
     }
+
+    /// <summary>Check if any player has a passive item</summary>
+    public static bool AnyoneHas<T>() where T : PassiveItem
+    {
+      if (GameManager.Instance.PrimaryPlayer is not PlayerController p1)
+        return false;
+      for (int i = 0; i < p1.passiveItems.Count; ++i)
+        if (p1.passiveItems[i] is T)
+          return true;
+      if (GameManager.Instance.CurrentGameType != GameManager.GameType.COOP_2_PLAYER)
+        return false;
+      if (GameManager.Instance.SecondaryPlayer is not PlayerController p2)
+        return false;
+      for (int i = 0; i < p2.passiveItems.Count; ++i)
+        if (p2.passiveItems[i] is T)
+          return true;
+      return false;
+    }
+
+    /// <summary>Check if any player has a passive item by id</summary>
+    public static bool AnyoneHas(int id)
+    {
+      if (GameManager.Instance.PrimaryPlayer is not PlayerController p1)
+        return false;
+      for (int i = 0; i < p1.passiveItems.Count; ++i)
+        if (p1.passiveItems[i].PickupObjectId == id)
+          return true;
+      if (GameManager.Instance.CurrentGameType != GameManager.GameType.COOP_2_PLAYER)
+        return false;
+      if (GameManager.Instance.SecondaryPlayer is not PlayerController p2)
+        return false;
+      for (int i = 0; i < p2.passiveItems.Count; ++i)
+        if (p2.passiveItems[i].PickupObjectId == id)
+          return true;
+      return false;
+    }
+
+    /// <summary>Check if any player has an active item</summary>
+    public static bool AnyoneHasActive<T>() where T : PlayerItem
+    {
+      if (GameManager.Instance.PrimaryPlayer is not PlayerController p1)
+        return false;
+      for (int i = 0; i < p1.activeItems.Count; ++i)
+        if (p1.activeItems[i] is T)
+          return true;
+      if (GameManager.Instance.CurrentGameType != GameManager.GameType.COOP_2_PLAYER)
+        return false;
+      if (GameManager.Instance.SecondaryPlayer is not PlayerController p2)
+        return false;
+      for (int i = 0; i < p2.activeItems.Count; ++i)
+        if (p2.activeItems[i] is T)
+          return true;
+      return false;
+    }
+
+    /// <summary>Check if any player has an active item by id</summary>
+    public static bool AnyoneHasActive(int id)
+    {
+      if (GameManager.Instance.PrimaryPlayer is not PlayerController p1)
+        return false;
+      for (int i = 0; i < p1.activeItems.Count; ++i)
+        if (p1.activeItems[i].PickupObjectId == id)
+          return true;
+      if (GameManager.Instance.CurrentGameType != GameManager.GameType.COOP_2_PLAYER)
+        return false;
+      if (GameManager.Instance.SecondaryPlayer is not PlayerController p2)
+        return false;
+      for (int i = 0; i < p2.activeItems.Count; ++i)
+        if (p2.activeItems[i].PickupObjectId == id)
+          return true;
+      return false;
+    }
+
+    /// <summary>Check if any player has a gun</summary>
+    public static bool AnyoneHasGun<T>() where T : Gun
+    {
+      if (GameManager.Instance.PrimaryPlayer is not PlayerController p1)
+        return false;
+      for (int i = 0; i < p1.inventory.AllGuns.Count; ++i)
+        if (p1.inventory.AllGuns[i] is T)
+          return true;
+      if (GameManager.Instance.CurrentGameType != GameManager.GameType.COOP_2_PLAYER)
+        return false;
+      if (GameManager.Instance.SecondaryPlayer is not PlayerController p2)
+        return false;
+      for (int i = 0; i < p2.inventory.AllGuns.Count; ++i)
+        if (p2.inventory.AllGuns[i] is T)
+          return true;
+      return false;
+    }
+
+    /// <summary>Check if any player has a gun by id</summary>
+    public static bool AnyoneHasGun(int id)
+    {
+      if (GameManager.Instance.PrimaryPlayer is not PlayerController p1)
+        return false;
+      for (int i = 0; i < p1.inventory.AllGuns.Count; ++i)
+        if (p1.inventory.AllGuns[i].PickupObjectId == id)
+          return true;
+      if (GameManager.Instance.CurrentGameType != GameManager.GameType.COOP_2_PLAYER)
+        return false;
+      if (GameManager.Instance.SecondaryPlayer is not PlayerController p2)
+        return false;
+      for (int i = 0; i < p2.inventory.AllGuns.Count; ++i)
+        if (p2.inventory.AllGuns[i].PickupObjectId == id)
+          return true;
+      return false;
+    }
 }

@@ -18,8 +18,6 @@ public class AstralProjector : CwaffPassive
     private Shader _originalShader;
     private RoomHandler _phasedRoom;
 
-    private static int _AstralProjectorId;
-
     private static Vector2 _LastSanePosition = Vector2.zero;
 
     public static void Init()
@@ -27,8 +25,6 @@ public class AstralProjector : CwaffPassive
         PickupObject item  = Lazy.SetupPassive<AstralProjector>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality       = ItemQuality.A;
         item.AddToSubShop(ModdedShopType.TimeTrader);
-
-        _AstralProjectorId   = item.PickupObjectId;
     }
 
     public override void Pickup(PlayerController player)
@@ -159,7 +155,7 @@ public class AstralProjector : CwaffPassive
 
     public static float PreventRigidbodyCastDuringHandlePlayerInput(PlayerController pc, float inValue)
     {
-        if (pc.passiveItems.Contains(_AstralProjectorId))
+        if (pc.HasPassive<AstralProjector>())
             return inValue > 0 ? 999f : -999f; // replace the value we're checking against with something absurdly high so we avoid doing RigidBodyCasts
         return inValue; // return the original value
     }

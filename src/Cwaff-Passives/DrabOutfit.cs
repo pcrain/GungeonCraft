@@ -7,15 +7,11 @@ public class DrabOutfit : CwaffPassive
     public static string LongDescription  = "Sets Magnificence stat to 0 while in inventory, increasing the frequency of red and black chest spawns.";
     public static string Lore             = "This garment seems to go slightly out of its way to be as plain and boring as possible. It does not go completely out of its way, however, as that would actually make it notable in some sense. Which it certainly isn't.";
 
-    private static int _DrabOutfitId;
-
     public static void Init()
     {
         PickupObject item = Lazy.SetupPassive<DrabOutfit>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.D;
         item.AddToSubShop(ModdedShopType.Rusty);
-
-        _DrabOutfitId   = item.PickupObjectId;
     }
 
     [HarmonyPatch(typeof(FloorRewardData), nameof(FloorRewardData.DetermineCurrentMagnificence))]
@@ -23,7 +19,7 @@ public class DrabOutfit : CwaffPassive
     {
         static bool Prefix(bool isGenerationForMagnificence, ref float __result)
         {
-            if (!GameManager.Instance.AnyPlayerHasPickupID(_DrabOutfitId))
+            if (!Lazy.AnyoneHas<DrabOutfit>())
                 return true;
 
             __result = 0f;  // set magnificence to 0

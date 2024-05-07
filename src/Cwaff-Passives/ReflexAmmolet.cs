@@ -19,7 +19,7 @@ public class ReflexAmmolet : CwaffBlankModificationItem
     [HarmonyPatch(typeof(SilencerInstance), nameof(SilencerInstance.TriggerSilencer))]
     private class ReflexAmmoletReflectPatch
     {
-        private static bool BlankShouldReflect(bool orig, PlayerController user) => orig || user.GetPassive<ReflexAmmolet>();
+        private static bool BlankShouldReflect(bool orig, PlayerController user) => orig || user.HasPassive<ReflexAmmolet>();
 
         [HarmonyILManipulator]
         private static void ReflexAmmoletIL(ILContext il)
@@ -44,7 +44,7 @@ public class ReflexAmmolet : CwaffBlankModificationItem
     [HarmonyPatch(typeof(SilencerInstance), nameof(SilencerInstance.DestroyBulletsInRange))]
     private class ReflexAmmoletSpeedPatch
     {
-        private static float ReflectSpeed(float orig, PlayerController user) => user.GetPassive<ReflexAmmolet>() ? 50f : orig;
+        private static float ReflectSpeed(float orig, PlayerController user) => user.HasPassive<ReflexAmmolet>() ? 50f : orig;
 
         [HarmonyILManipulator]
         private static void ReflexAmmoletIL(ILContext il)

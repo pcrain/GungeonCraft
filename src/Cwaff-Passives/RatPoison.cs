@@ -6,7 +6,6 @@ public class RatPoison : CwaffPassive
     public static string ShortDescription = "Swiper no Swiping";
     public static string LongDescription  = "Completely prevents the Resourceful Rat from stealing items.";
     public static string Lore             = "The Hegemony has invested hundreds of thousands of credits into researching both diplomatic and military means of discouraging the Resourceful Rat's thievery. It turns out that splashing some pickle juice on your items is enough to keep the rodent at bay indefinitely, though the lingering odor is far from pleasant.";
-    public static int    ID;
 
     public static void Init()
     {
@@ -15,8 +14,6 @@ public class RatPoison : CwaffPassive
         item.IgnoredByRat                  = true;
         item.ClearIgnoredByRatFlagOnPickup = false;
         item.AddToSubShop(ItemBuilder.ShopType.Cursula);
-
-        ID = item.PickupObjectId;
     }
 
     [HarmonyPatch(typeof(PickupObject), nameof(PickupObject.ShouldBeTakenByRat))]
@@ -24,7 +21,7 @@ public class RatPoison : CwaffPassive
     {
         static bool Prefix(Vector2 point, ref bool __result)
         {
-            if (!GameManager.Instance.AnyPlayerHasPickupID(ID))
+            if (Lazy.AnyoneHas<RatPoison>())
                 return true;
 
             __result = false;  // don't let rat take any items

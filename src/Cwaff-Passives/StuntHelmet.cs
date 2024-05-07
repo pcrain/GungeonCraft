@@ -83,15 +83,12 @@ public class StuntHelmet : CwaffPassive
 
     private static bool PlayerHasStuntHelmet(PlayerController player)
     {
-        if (!player)
-            return false;
-        return player.GetPassive<StuntHelmet>();
+        return player && player.HasPassive<StuntHelmet>();
     }
 
     private static void DoStuntHelmetBoost(PlayerController player)
     {
-        if (!player || player.GetPassive<StuntHelmet>() is not StuntHelmet helmet)
-            return;
+        StuntHelmet helmet = player.GetPassive<StuntHelmet>();
         if (helmet._extantDamageBoostCoroutine != null)
         {
             player.ownerlessStatModifiers.Remove(_StuntStats);

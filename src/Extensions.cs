@@ -439,16 +439,58 @@ public static class Extensions
   }
 
   /// <summary>Get a passive item owned by the player</summary>
-  public static T GetPassive<T>(this PlayerController p) where T : PassiveItem
-    => p.passiveItems.Find(item => item is T) as T;
+  public static bool HasPassive<T>(this PlayerController p) where T : PassiveItem
+  {
+    for (int i = 0; i < p.passiveItems.Count; ++i)
+      if (p.passiveItems[i] is T)
+        return true;
+    return false;
+  }
 
   /// <summary>Get an active item owned by the player</summary>
-  public static T GetActive<T>(this PlayerController p)  where T : PlayerItem
-    => p.activeItems.Find(item => item is T) as T;
+  public static bool HasActive<T>(this PlayerController p) where T : PlayerItem
+  {
+    for (int i = 0; i < p.activeItems.Count; ++i)
+      if (p.activeItems[i] is T)
+        return true;
+    return false;
+  }
 
   /// <summary>Get a gun owned by the player</summary>
-  public static T GetGun<T>(this PlayerController p)     where T : Gun
-    => p.inventory.AllGuns.Find(item => item is T) as T;
+  public static bool HasGun<T>(this PlayerController p) where T : Gun
+  {
+    for (int i = 0; i < p.inventory.AllGuns.Count; ++i)
+      if (p.inventory.AllGuns[i] is T)
+        return true;
+    return false;
+  }
+
+  /// <summary>Get a passive item owned by the player</summary>
+  public static T GetPassive<T>(this PlayerController p) where T : PassiveItem
+  {
+    for (int i = 0; i < p.passiveItems.Count; ++i)
+      if (p.passiveItems[i] is T t)
+        return t;
+    return null;
+  }
+
+  /// <summary>Get an active item owned by the player</summary>
+  public static T GetActive<T>(this PlayerController p) where T : PlayerItem
+  {
+    for (int i = 0; i < p.activeItems.Count; ++i)
+      if (p.activeItems[i] is T t)
+        return t;
+    return null;
+  }
+
+  /// <summary>Get a gun owned by the player</summary>
+  public static T GetGun<T>(this PlayerController p) where T : Gun
+  {
+    for (int i = 0; i < p.inventory.AllGuns.Count; ++i)
+      if (p.inventory.AllGuns[i] is T t)
+        return t;
+    return null;
+  }
 
   /// <summary>Clamps a float between two numbers (default 0 and 1)</summary>
   public static float Clamp(this float f, float min = 0f, float max = 1f)

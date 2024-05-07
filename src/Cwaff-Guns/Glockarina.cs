@@ -90,7 +90,7 @@ public class Glockarina : CwaffGun
 
     private static void OnChestOpen()
     {
-        if (GameManager.Instance.AnyPlayerHasPickupID(_GlockarinaPickupID))
+        if (Lazy.AnyoneHasGun(_GlockarinaPickupID))
             GameManager.Instance.gameObject.Play("zelda_chest_sound");
     }
 

@@ -47,14 +47,14 @@ public class DisplayStand : CwaffPassive
 
     private static void OnPickupActive(Action<PlayerItem, PlayerController> orig, PlayerItem active, PlayerController player)
     {
-        if (player.HasPassiveItem(displayStandId) && !active.m_pickedUpThisRun)
+        if (player.HasPassive<DisplayStand>() && !active.m_pickedUpThisRun)
             active.gameObject.AddComponent<PristineItem>();
         orig(active, player);
     }
 
     private static void OnPickupGun(Action<Gun, PlayerController> orig, Gun gun, PlayerController player)
     {
-        if (player.HasPassiveItem(displayStandId) && !gun.HasBeenPickedUp)
+        if (player.HasPassive<DisplayStand>() && !gun.HasBeenPickedUp)
             gun.gameObject.AddComponent<PristineGun>();
         orig(gun, player);
     }

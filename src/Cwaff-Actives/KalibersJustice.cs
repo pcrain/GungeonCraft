@@ -310,7 +310,7 @@ public class KalibersJustice : CwaffActive
             Need keysNeed = new Need(NeedType.Keys);
             int keys = GameManager.Instance.PrimaryPlayer.carriedConsumables.KeyBullets;
             bool infKeys = GameManager.Instance.PrimaryPlayer.carriedConsumables.InfiniteKeys;
-            bool hasAkey47 = GameManager.Instance.AnyPlayerHasPickupID((int)Items.Akey47);
+            bool hasAkey47 = Lazy.AnyoneHasGun((int)Items.Akey47);
             if (infKeys || hasAkey47) keysNeed.status = NeedStatus.Enough;
             else if (keys == 0)       keysNeed.status = NeedStatus.Minimal;
             else if (keys <= 2)       keysNeed.status = NeedStatus.Lacking;

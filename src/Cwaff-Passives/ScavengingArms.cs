@@ -11,7 +11,6 @@ public class ScavengingArms : CwaffPassive
     private const float _AMMO_PERCENT_TO_GAIN = 0.1f;
 
     private static GameObject _SmallAmmoPickup;
-    private static int _ScavengingArmsId;
 
     public static void Init()
     {
@@ -19,7 +18,6 @@ public class ScavengingArms : CwaffPassive
         item.quality      = ItemQuality.C;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
-        _ScavengingArmsId = item.PickupObjectId;
         _SmallAmmoPickup  = ItemHelper.Get(Items.PartialAmmo).gameObject.ClonePrefab();
 
         AmmoPickup ap = _SmallAmmoPickup.GetComponent<AmmoPickup>();
@@ -40,7 +38,7 @@ public class ScavengingArms : CwaffPassive
             return; // unlucky :/
         if (otherRigidBody.GetComponent<PlayerController>() is not PlayerController player)
             return; // not broken by player
-        if (!player.HasPassiveItem(_ScavengingArmsId))
+        if (!player.HasPassive<ScavengingArms>())
             return; // no scavenging arms
         if (player.CurrentGun.InfiniteAmmo || player.CurrentGun.LocalInfiniteAmmo || !player.CurrentGun.CanGainAmmo)
             return; // gun can't gain ammo

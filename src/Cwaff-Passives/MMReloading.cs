@@ -7,8 +7,6 @@ public class MMReloading : CwaffPassive
     public static string LongDescription  = "Guns reload 33% faster while standing still.";
     public static string Lore             = "Gungeoneers aren't particularly good at multitasking -- as evidenced by the number of ridiculous ways they tend to get hit while exploring -- and countless hours spent reloading while running around has ingrained rather subpar reloading techniques deeply into their muscle memory. A quick refresher from the Reloading chapter of Manuel's Manual is more than enough for most Gungeoneers to instill some semblance of discipline into their reloading practices.";
 
-    public static int ID;
-
     private const float _RELOAD_FACTOR = 1.33f;
 
     public static void Init()
@@ -16,8 +14,6 @@ public class MMReloading : CwaffPassive
         PickupObject item = Lazy.SetupPassive<MMReloading>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
-
-        ID = item.PickupObjectId;
     }
 
     private static float ModifyReloadSpeedIfIdle(Gun gun)
@@ -26,7 +22,7 @@ public class MMReloading : CwaffPassive
             return 1.0f;
         if (pc.m_playerCommandedDirection != Vector2.zero)
             return 1.0f;
-        if (!pc.HasPassiveItem(MMReloading.ID))
+        if (!pc.HasPassive<MMReloading>())
             return 1.0f;
         return MMReloading._RELOAD_FACTOR;
     }
@@ -37,7 +33,7 @@ public class MMReloading : CwaffPassive
             return 1.0f;
         if (pc.m_playerCommandedDirection != Vector2.zero)
             return 1.0f;
-        if (!pc.HasPassiveItem(MMReloading.ID))
+        if (!pc.HasPassive<MMReloading>())
             return 1.0f;
         return MMReloading._RELOAD_FACTOR;
     }

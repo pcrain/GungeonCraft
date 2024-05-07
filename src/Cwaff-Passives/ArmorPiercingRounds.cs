@@ -18,8 +18,6 @@ public class ArmorPiercingRounds : CwaffPassive
     public static string LongDescription  = "Projectiles ignore the invulnerable phases of most enemies. Does not break boss DPS caps.";
     public static string Lore             = "A handful of the Gungeon's denizens have been gifted with various means of protecting themselves from the thousands of bullets, lasers, foam darts, and T-shirts fired their way on a daily basis. Bullet researchers have known for years that most of these defenses are thwarted by a heavy yet crude application of torque to projectiles, but lobbying from Big Arma has largely suppressed this knowledge from the general public in order to sell beefier and more impressive guns.";
 
-    public static int    ID;
-
     internal static GameObject _PierceVFX = null;
 
     public static void Init()
@@ -29,14 +27,12 @@ public class ArmorPiercingRounds : CwaffPassive
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
         _PierceVFX = VFX.Create("armor_pierce_effect", fps: 40, loops: false);
-
-        ID = item.PickupObjectId;
     }
 
     // NOTE: called by patch in CwaffPatches
     private static bool PossiblyDisableArmor(Projectile p, SpeculativeRigidbody body)
     {
-        if (!(p && p.Owner is PlayerController player && player.HasPassiveItem(ArmorPiercingRounds.ID)))
+        if (!(p && p.Owner is PlayerController player && player.HasPassive<ArmorPiercingRounds>()))
             return false;
 
         bool playPierceSound = false;

@@ -43,7 +43,7 @@ public class BionicFinger : CwaffPassive
 
     private static float OverrideSemiAutoCooldown(PlayerController pc)
     {
-      if (pc.GetPassive<BionicFinger>())
+      if (pc.HasPassive<BionicFinger>())
           return 0f; // replace the value we're checking against with 0f to completely remove semi-automatic fake cooldown
       return BraveInput.ControllerFakeSemiAutoCooldown; // return the original value
     }

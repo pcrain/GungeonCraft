@@ -27,7 +27,7 @@ public class BlankChecks : CwaffPassive
     {
         static void Prefix(PlayerController __instance)
         {
-            if (!__instance.GetPassive<BlankChecks>())
+            if (!__instance.HasPassive<BlankChecks>())
                 return; // if we don't have Blank Checks, we have nothing to do
             if (__instance.Blanks > 0)
                 return; // if we have more than 1 blank, we have nothing to do

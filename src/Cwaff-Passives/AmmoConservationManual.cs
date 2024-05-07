@@ -32,8 +32,7 @@ public class AmmoConservationManual : CwaffPassive
 
         static void Postfix(AmmoPickup __instance, PlayerController player, float __state)
         {
-            AmmoConservationManual manual = player.GetPassive<AmmoConservationManual>();
-            if (!manual)
+            if (player.GetPassive<AmmoConservationManual>() is not AmmoConservationManual manual)
                 return;
             float currentAmmoPercent = __state;
 
