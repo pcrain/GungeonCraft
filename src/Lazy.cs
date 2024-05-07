@@ -151,9 +151,11 @@ public static class Lazy
         _GunSpriteCollection ??= gun.sprite.collection; // need to initialize at least once
 
         #region Auto-setup barrelOffset from Casing attach point
-            foreach (tk2dSpriteDefinition.AttachPoint a in gun.AttachPointsForClip(gun.idleAnimation).EmptyIfNull())
-                if (a.name == "Casing")
-                    gun.barrelOffset.transform.localPosition = a.position;
+            tk2dSpriteDefinition.AttachPoint[] aps = gun.AttachPointsForClip(gun.idleAnimation);
+            if (aps != null)
+                for (int i = 0; i < aps.Length; ++i)
+                    if (aps[i].name == "Casing")
+                        gun.barrelOffset.transform.localPosition = aps[i].position;
         #endregion
 
         #region Set up trimmed idle sprites so we don't have wonky hitboxes for very large animations

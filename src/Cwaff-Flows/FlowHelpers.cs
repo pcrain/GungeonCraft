@@ -25,16 +25,15 @@ public static class FlowHelpers {
 		dungeonFlow.phantomRoomTable = flow.phantomRoomTable;
 		dungeonFlow.subtypeRestrictions = flow.subtypeRestrictions;
 		dungeonFlow.evolvedRoomTable = flow.evolvedRoomTable;
-		ReflectionHelpers.ReflectSetField(typeof(DungeonFlow), "m_firstNodeGuid", ReflectionHelpers.ReflectGetField<string>(typeof(DungeonFlow), "m_firstNodeGuid", flow), dungeonFlow);
+		dungeonFlow.m_firstNodeGuid = flow.m_firstNodeGuid;
 		dungeonFlow.flowInjectionData = flow.flowInjectionData;
 		dungeonFlow.sharedInjectionData = flow.sharedInjectionData;
-		ReflectionHelpers.ReflectSetField(typeof(DungeonFlow), "m_nodeGuids", new List<string>(ReflectionHelpers.ReflectGetField<List<string>>(typeof(DungeonFlow), "m_nodeGuids", flow)), dungeonFlow);
-		List<DungeonFlowNode> list = new List<DungeonFlowNode>();
-		ReflectionHelpers.ReflectSetField(typeof(DungeonFlow), "m_nodes", list, dungeonFlow);
+		dungeonFlow.m_nodeGuids = flow.m_nodeGuids;
+		dungeonFlow.m_nodes = new List<DungeonFlowNode>();
 		foreach (DungeonFlowNode node in flow.AllNodes) {
 			DungeonFlowNode dungeonFlowNode = DuplicateDungeonFlowNode(node);
 			dungeonFlowNode.flow = dungeonFlow;
-			list.Add(dungeonFlowNode);
+			dungeonFlow.m_nodes.Add(dungeonFlowNode);
 		}
 		return dungeonFlow;
 	}

@@ -712,16 +712,6 @@ public static class Extensions
     gun.shellCasing = (ItemHelper.Get(otherGun) as Gun).shellCasing;
   }
 
-
-  public static bool Contains(this List<PassiveItem> items, int itemId)
-  {
-    foreach(PassiveItem item in items)
-      if (item.PickupObjectId == itemId)
-        return true;
-
-    return false;
-  }
-
   // Gets the actual rectangle corresponding to the the outermost walls of a room
   //   - Useful for boss fights
   //   - Useful for phasing checks
@@ -1232,15 +1222,6 @@ public static class Extensions
   public static GameObject AirImpactVFX(this Items item, int proj = 0)
     => (ItemHelper.Get(item) as Gun).DefaultModule.projectiles[proj].hitEffects.overrideMidairDeathVFX;
 
-  /// <summary>Append a string to all strings in a list</summary>
-  public static List<string> AppendAll(this List<string> strings, string suffix)
-  {
-    List<string> newStrings = new();
-    foreach (string s in strings)
-      newStrings.Add(s+suffix);
-    return newStrings;
-  }
-
   /// <summary>Destroy a GameObject if it is non-null</summary>
   public static void SafeDestroy(this GameObject g)
   {
@@ -1664,11 +1645,10 @@ public static class Extensions
   public static tk2dSpriteAnimationFrame[] CreateAnimationFrames(this tk2dSpriteCollectionData collection, List<string> frameNames)
   {
     tk2dSpriteAnimationFrame[] frames = new tk2dSpriteAnimationFrame[frameNames.Count];
-    int i = 0;
-    foreach (string name in frameNames)
-      frames[i++] = new(){
+    for (int i = 0; i < frames.Length; ++i)
+      frames[i] = new(){
         spriteCollection = collection,
-        spriteId         = collection.spriteNameLookupDict[name],
+        spriteId         = collection.spriteNameLookupDict[frameNames[i]],
       };
     return frames;
   }

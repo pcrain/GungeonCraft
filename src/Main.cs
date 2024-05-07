@@ -174,9 +174,14 @@ public class Initialisation : BaseUnityPlugin
                 CwaffTweaks.Init();
                 // Hecked Mode Tribute Statues
                 HeckedShrine.Init();
-                // Hat Test
-                CwaffHats.Init();
                 setupConfig2Watch.Stop();
+            #endregion
+
+            #region Hats
+                System.Diagnostics.Stopwatch setupHatsWatch = System.Diagnostics.Stopwatch.StartNew();
+                // Hat Setup
+                CwaffHats.Init();
+                setupHatsWatch.Stop();
             #endregion
 
             #region Audio (Async)
@@ -494,6 +499,7 @@ public class Initialisation : BaseUnityPlugin
                 ETGModConsole.Log($"  {setupShadersWatch.ElapsedMilliseconds,      5}ms       setupShaders     ");
                 ETGModConsole.Log($"  {setupConfig1Watch.ElapsedMilliseconds,      5}ms       setupConfig1     ");
                 ETGModConsole.Log($"  {setupConfig2Watch.ElapsedMilliseconds,      5}ms       setupConfig2     ");
+                ETGModConsole.Log($"  {setupHatsWatch.ElapsedMilliseconds,         5}ms       setupHats        ");
                 ETGModConsole.Log($"  {setupAudioWatch.ElapsedMilliseconds,        5}ms ASYNC setupAudio       ");
                 ETGModConsole.Log($"  {setupSaveWatch.ElapsedMilliseconds,         5}ms ASYNC setupSave        ");
                 ETGModConsole.Log($"  {setupGunsWatch.ElapsedMilliseconds,         5}ms       setupGuns        ");

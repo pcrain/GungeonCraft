@@ -2,7 +2,7 @@ namespace CwaffingTheGungy;
 
 public class C // constants and common variables
 {
-    public static readonly bool DEBUG_BUILD = false; // set to false for release builds (must be readonly instead of const to avoid build warnings)
+    public static readonly bool DEBUG_BUILD = true; // set to false for release builds (must be readonly instead of const to avoid build warnings)
 
     public const string MOD_NAME     = "GungeonCraft";
     public const string MOD_INT_NAME = "CwaffingTheGungy";
@@ -56,7 +56,6 @@ public static class ResMap // Resource map from PNG stem names to lists of paths
     // Builds a resource map from every PNG embedded in the assembly
     public static void Build()
     {
-        var watch = System.Diagnostics.Stopwatch.StartNew();
         Dictionary<string, string[]> tempMap = new ();
         // Get the name of each PNG resource and stuff it into a sorted array by its index number
         foreach(string s in AtlasHelper._PackedTextures.Keys)
@@ -99,17 +98,6 @@ public static class ResMap // Resource map from PNG stem names to lists of paths
 
         // Hint to the GC we want to unload the tempMap
         tempMap = null;
-
-        // Debug sanity check
-        // foreach(KeyValuePair<string, List<string>> entry in _ResMap)
-        // {
-        //     ETGModConsole.Log($"{entry.Key} ->");
-        //     foreach (string s in entry.Value)
-        //         ETGModConsole.Log($"  {s}");
-        // }
-        watch.Stop();
-        if (C.DEBUG_BUILD)
-            ETGModConsole.Log($"Built resource map in {watch.ElapsedMilliseconds} milliseconds");
     }
 }
 
@@ -123,14 +111,10 @@ public static class Dissect // reflection helper methods for being a lazy dumdum
 
     public static void DumpFieldsAndProperties<T>(T o)
     {
-        // Type type = o.GetType();
-        Type type = typeof(T);
-        foreach (var f in type.GetFields())
+        foreach (var f in typeof(T).GetFields())
             Console.WriteLine(String.Format("field {0} = {1}", f.Name, f.GetValue(o)));
         foreach(PropertyDescriptor d in TypeDescriptor.GetProperties(o))
             Console.WriteLine(" prop {0} = {1}", d.Name, d.GetValue(o));
-        // foreach(EventDescriptor ev in TypeDescriptor.GetEvents(o))
-        //     Console.WriteLine(" event {0} = {1}", ev.Name, ev.GetValue(o));
     }
 
     public static void CompareFieldsAndProperties<T>(T o1, T o2)
@@ -277,32 +261,6 @@ public static class Dissect // reflection helper methods for being a lazy dumdum
         }
         ETGModConsole.Log($"  could not find asset {name} in any bundle!");
         return null;
-    }
-
-    public static void FindDefaultResource<T>(string name)
-        where T : MonoBehaviour
-    {
-        foreach (string bundle in _Bundles)
-        {
-            if (ResourceManager.LoadAssetBundle(bundle).LoadAsset<T>(name) == null)
-                continue;
-            // if (C.DEBUG_BUILD)
-            //     ETGModConsole.Log($"found asset {name} in bundle {bundle}");
-            break;
-        }
-    }
-}
-
-public static class ReflectionHelpers // reflection helpers ultimately stolen from apache
-{
-    public static T ReflectGetField<T>(Type classType, string fieldName, object o = null) {
-        FieldInfo field = classType.GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | ((o != null) ? BindingFlags.Instance : BindingFlags.Static));
-        return (T)field.GetValue(o);
-    }
-
-    public static void ReflectSetField<T>(Type classType, string fieldName, T value, object o = null) {
-        FieldInfo field = classType.GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | ((o != null) ? BindingFlags.Instance : BindingFlags.Static));
-        field.SetValue(o, value);
     }
 }
 

@@ -86,11 +86,11 @@ public static class ModdedShopItemAdder
         _OurShopsInitialized = true;
 
         if (C.DEBUG_BUILD)
-            ETGModConsole.Log($"scanning custom items: ");
+            Debug.Log($"scanning custom items: ");
         foreach (GameObject shop in FancyShopBuilder.DelayedModdedLootAdditions.Keys)
         {
             if (C.DEBUG_BUILD)
-                ETGModConsole.Log($"  looking in shop {shop.name}");
+                Debug.Log($"  looking in shop {shop.name}");
             GenericLootTable lootTable = shop.GetComponent<BaseShopController>().shopItems;
             foreach (string moddedItem in FancyShopBuilder.DelayedModdedLootAdditions[shop])
             {
@@ -98,7 +98,7 @@ public static class ModdedShopItemAdder
                 if (!moddedPickup)
                     continue; // mod not loaded or item not found
                 if (C.DEBUG_BUILD)
-                    ETGModConsole.Log($"    adding modded item {moddedPickup.EncounterNameOrDisplayName} to shop");
+                    Debug.Log($"    adding modded item {moddedPickup.EncounterNameOrDisplayName} to shop");
                 lootTable.AddItemToPool(moddedPickup.PickupObjectId);
             }
         }
@@ -123,7 +123,7 @@ public static class ModdedShopItemAdder
             if (perModShopApi == null || perModShopController == null)
                 continue;
             if (C.DEBUG_BUILD)
-                ETGModConsole.Log($"  found assembly: {assembly.GetName().Name}");
+                Debug.Log($"  found assembly: {assembly.GetName().Name}");
 
             // See if the assembly has actually defined builtShops
             FieldInfo builtShopsInfo = perModShopApi.GetField("builtShops", BindingFlags.Public | BindingFlags.Static);
@@ -158,7 +158,7 @@ public static class ModdedShopItemAdder
             if (entry.Value.GetComponent<BaseShopController>()?.shopItems is not GenericLootTable shopItems)
                 continue;
             if (C.DEBUG_BUILD)
-                ETGModConsole.Log($"    found shop {entry.Key}");
+                Debug.Log($"    found shop {entry.Key}");
             if (!_ModdedShopNameMap.ContainsKey(entry.Key))
                 continue;
 
@@ -171,7 +171,7 @@ public static class ModdedShopItemAdder
             foreach(int itemToAdd in _ModdedShopItems[_ModdedShopNameMap[entry.Key]])
             {
                 if (C.DEBUG_BUILD)
-                    ETGModConsole.Log($"      adding {itemToAdd} == {PickupObjectDatabase.GetById(itemToAdd).EncounterNameOrDisplayName} with weight 1");
+                    Debug.Log($"      adding {itemToAdd} == {PickupObjectDatabase.GetById(itemToAdd).EncounterNameOrDisplayName} with weight 1");
                 shopItems.AddItemToPool(itemToAdd);
             }
         }

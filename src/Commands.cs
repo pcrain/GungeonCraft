@@ -24,34 +24,7 @@ public class Commands
         ETGModConsole.Commands.AddGroup("oo", delegate (string[] args)
         {
             Lazy.CreateHoveringGun(GameManager.Instance.PrimaryPlayer);
-            // MenuMaster.RebuildOptionsPanels();
-            // OneOffDebugDungeonFlow.CreateAndWarp("boomhildr");
-            // ETGModConsole.Log("<size=100><color=#ff0000ff>Please specify a command. Type 'nn help' for a list of commands.</color></size>", false);
         });
-        ETGModConsole.Commands.AddGroup("ff", delegate (string[] args)
-        {
-            // MenuMaster.RebuildOptionsPanels();
-            // OneOffDebugDungeonFlow.CreateAndWarp("boomhildr");
-            // ETGModConsole.Log("<size=100><color=#ff0000ff>Please specify a command. Type 'nn help' for a list of commands.</color></size>", false);
-        });
-        ETGModConsole.Commands.AddGroup("shaderfix", delegate (string[] args)
-        {
-            foreach (DebrisObject debris in StaticReferenceManager.AllDebris)
-            {
-                if (debris.GetComponentInChildren<PickupObject>() is not PickupObject pickup)
-                    continue;
-                pickup.sprite.usesOverrideMaterial = true;
-                pickup.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
-            }
-        });
-        // Boss time o.o
-        // ETGModConsole.Commands.AddGroup("bb", delegate (string[] args)
-        // {
-        //   PlayerController player = GameManager.Instance.PrimaryPlayer;
-        //   AIActor orLoadByGuid = EnemyDatabase.GetOrLoadByGuid(RoomMimic.guid);
-        //   AIActor aiactor = AIActor.Spawn(orLoadByGuid, player.gameObject.transform.position, player.gameObject.transform.position.GetAbsoluteRoom(), true, AIActor.AwakenAnimationType.Default, true);
-        //   aiactor.GetComponent<GenericIntroDoer>().TriggerSequence(player);
-        // });
         // Shader test
         ETGModConsole.Commands.AddGroup("shader", delegate (string[] args)
         {
@@ -91,56 +64,6 @@ public class Commands
         {
             GameManager.Instance.LoadCustomLevel(SansDungeon.INTERNAL_NAME);
         });
-        // Another base command for loading my latest debug flow
-        // ETGModConsole.Commands.AddGroup("ff", delegate (string[] args)
-        // {
-        //     FlowCommands.LoadFlowFunction(new string[]{"Simplest"});
-        // });
-        // Another base command for testing npc shenanigans
-        ETGModConsole.Commands.AddGroup("tt", delegate (string[] args)
-        {
-            var bundle = ResourceManager.LoadAssetBundle("shared_auto_001");
-            // foreach (string s in bundle.GetAllAssetNames())
-            //     ETGModConsole.Log(s);
-            GameObject gk = bundle.LoadAsset<GameObject>("npc_gunslingking");
-            bundle = null;
-            // return;
-            PlayerController p1 = GameManager.Instance.PrimaryPlayer;
-            Vector3 v3 = p1.CurrentRoom.GetRandomVisibleClearSpot(1, 1).ToVector3();
-
-            foreach (AdvancedShrineController a in StaticReferenceManager.AllAdvancedShrineControllers)
-            {
-                if (a.IsLegendaryHeroShrine && a.transform.position.GetAbsoluteRoom() == p1.CurrentRoom)
-                {
-                    ETGModConsole.Log("found it!");
-                    v3 = a.transform.position + (new Vector2(a.sprite.GetCurrentSpriteDef().position3.x/2,-8)).ToVector3YUp(0);
-                }
-            }
-
-            GameObject bombyboi = SpawnObjectManager.SpawnObject(Bombo.npcobj,v3);
-            GameObject bombyPos = new GameObject("ItemPoint3");
-                bombyPos.transform.parent = bombyboi.transform;
-                bombyPos.transform.position = v3 + new Vector3(2.625f, 1f, 1f);
-            GameObject bombyItem = new GameObject("Fake shop item test");
-                bombyItem.transform.parent        = bombyPos.transform;
-                bombyItem.transform.localPosition = Vector3.zero;
-                bombyItem.transform.position      = Vector3.zero;
-            GameObject bombyPickup;
-                if (UnityEngine.Random.Range(0,2) == 0)
-                    bombyPickup = LootEngine.GetItemOfTypeAndQuality<PickupObject>(
-                                    ItemQuality.S, GameManager.Instance.RewardManager.GunsLootTable, false).gameObject;
-                else
-                    bombyPickup = LootEngine.GetItemOfTypeAndQuality<PickupObject>(
-                                    ItemQuality.S, GameManager.Instance.RewardManager.ItemsLootTable, false).gameObject;
-                PickupObject po = bombyPickup.GetComponent<PickupObject>();
-            FakeShopItem fsi = bombyItem.AddComponent<FakeShopItem>();
-                if (!p1.CurrentRoom.IsRegistered(fsi))
-                    p1.CurrentRoom.RegisterInteractable(fsi);
-                fsi.purchasingScript = bombyboi.GetComponent<Bombo>().StrikeADealScript;
-                fsi.Initialize(po);
-
-            // gk.GetComponent<TalkDoerLite>().InstantiateObject(p1.CurrentRoom,p1.CurrentRoom.GetRandomVisibleClearSpot(1, 1));
-        });
     }
 
     [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.HandlePlayerInput))]
@@ -150,7 +73,7 @@ public class Commands
         {
             if (!C.DEBUG_BUILD)
                 return true; // disable debug keys in non-debug builds
-            if (!Input.GetKey(KeyCode.LeftControl))
+            if (!Input.GetKey(KeyCode.RightControl))
                 return true; // all debug keys require left control to be held
 
             if (Input.GetKeyDown(KeyCode.S)) // debug stealth
