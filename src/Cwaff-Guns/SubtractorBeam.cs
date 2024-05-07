@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class SubtractorBeam : AdvancedGunBehavior
+public class SubtractorBeam : CwaffGun
 {
     public static string ItemName         = "Subtractor Beam";
     public static string ShortDescription = "What's the Difference?";

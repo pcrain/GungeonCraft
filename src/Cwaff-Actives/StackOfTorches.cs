@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class StackOfTorches : PlayerItem
+public class StackOfTorches : CwaffActive
 {
     public static string ItemName         = "Stack of Torches";
     public static string ShortDescription = "Back in the Mines";

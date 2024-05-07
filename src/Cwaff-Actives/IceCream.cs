@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class IceCream : PlayerItem
+public class IceCream : CwaffActive
 {
     public static string ItemName         = "Ice Cream";
     public static string ShortDescription = "Frozen Treat to Warm the Heart";
@@ -46,7 +46,7 @@ public class IceCream : PlayerItem
     }
 }
 
-public class IceCreamGun : AdvancedGunBehavior
+public class IceCreamGun : CwaffGun
 {
     public static string ItemName         = "Ice Cream Gun";
     public static string ShortDescription = ":>";

@@ -1,6 +1,6 @@
 ﻿// namespace CwaffingTheGungy;
 //
-//     public class HeadCannon : AdvancedGunBehavior
+//     public class HeadCannon : CwaffGun
 //     {
 //         public static string gunName          = "Head Cannon";
 //         public static string spriteName       = "multiplicator";

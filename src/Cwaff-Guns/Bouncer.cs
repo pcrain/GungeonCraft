@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class Bouncer : AdvancedGunBehavior
+public class Bouncer : CwaffGun
 {
     public static string ItemName         = "Bouncer";
     public static string ShortDescription = "Rebound to Go Wrong";

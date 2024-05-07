@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class Protractor : PlayerItem
+public class Protractor : CwaffActive
 {
     public static string ItemName         = "Protractor";
     public static string ShortDescription = "Lines of Defense";

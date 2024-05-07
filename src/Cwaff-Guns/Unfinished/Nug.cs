@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class Nug : AdvancedGunBehavior
+public class Nug : CwaffGun
 {
     public static string ItemName         = "Nug";
     public static string ShortDescription = "Noegnug Eht Retne";

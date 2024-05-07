@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class UtilityVest : PassiveItem
+public class UtilityVest : CwaffPassive
 {
     public static string ItemName         = "Utility Vest";
     public static string ShortDescription = "Pocket Protector";

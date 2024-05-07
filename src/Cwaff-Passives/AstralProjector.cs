@@ -2,7 +2,7 @@ namespace CwaffingTheGungy;
 
 //TODO: look into cellData.isRoomInternal
 
-public class AstralProjector : PassiveItem
+public class AstralProjector : CwaffPassive
 {
     public static string ItemName         = "Astral Projector";
     public static string ShortDescription = "Enter the Gungeon's Walls";

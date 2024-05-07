@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class Telefragger : AdvancedGunBehavior
+public class Telefragger : CwaffGun
 {
     public static string ItemName         = "Telefragger";
     public static string ShortDescription = "Voip";

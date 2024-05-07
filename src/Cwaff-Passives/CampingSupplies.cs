@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class CampingSupplies : PassiveItem
+public class CampingSupplies : CwaffPassive
 {
     public static string ItemName         = "Camping Supplies";
     public static string ShortDescription = "In for the Long Gun";

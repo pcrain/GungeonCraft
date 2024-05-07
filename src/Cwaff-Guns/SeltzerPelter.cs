@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class SeltzerPelter : AdvancedGunBehavior
+public class SeltzerPelter : CwaffGun
 {
     public static string ItemName         = "Seltzer Pelter";
     public static string ShortDescription = "Shaken, not Stirred";

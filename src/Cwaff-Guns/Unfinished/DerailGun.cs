@@ -6,7 +6,7 @@ TODO (hardest to easiest):
     - tweak stats
 */
 
-public class DerailGun : AdvancedGunBehavior
+public class DerailGun : CwaffGun
 {
     public static string ItemName         = "Derail Gun";
     public static string ShortDescription = "I Choo Choose You";

@@ -4,7 +4,7 @@ namespace CwaffingTheGungy;
     - make sure killed enemies serialize properly on game saves and reloads
 */
 
-public class BulletThatCanKillTheFuture : PlayerItem
+public class BulletThatCanKillTheFuture : CwaffActive
 {
     public static string ItemName         = "Bullet That Can Kill the Future";
     public static string ShortDescription = "Seriously, Don't Miss";

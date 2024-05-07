@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class WeddingRing : PassiveItem
+public class WeddingRing : CwaffPassive
 {
     public static string ItemName         = "Wedding Ring";
     public static string ShortDescription = "Commitment";

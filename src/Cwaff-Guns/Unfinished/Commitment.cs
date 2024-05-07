@@ -8,7 +8,7 @@
         m_player.inventory.GunLocked.SetOverride("spren gun", true);
 */
 
-public class Commitment : AdvancedGunBehavior
+public class Commitment : CwaffGun
 {
     public static string ItemName         = "Commitment";
     public static string ShortDescription = "Going Until It's Gone";

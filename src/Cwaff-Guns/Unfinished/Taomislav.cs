@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class Taomislav : AdvancedGunBehavior
+public class Taomislav : CwaffGun
 {
     public static string ItemName         = "Taomislav";
     public static string ShortDescription = "TBD";

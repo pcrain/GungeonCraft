@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class JohnsWick : PassiveItem
+public class JohnsWick : CwaffPassive
 {
     public static string ItemName         = "John's Wick";
     public static string ShortDescription = "No Dogs Harmed";

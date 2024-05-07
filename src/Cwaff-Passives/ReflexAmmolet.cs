@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class ReflexAmmolet : BlankModificationItem
+public class ReflexAmmolet : CwaffBlankModificationItem
 {
     public static string ItemName         = "Reflex Ammolet";
     public static string ShortDescription = "Blanks Return Fire";

@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class Cuppajoe : PlayerItem
+public class Cuppajoe : CwaffActive
 {
     public static string ItemName         = "Cuppajoe";
     public static string ShortDescription = "Not A Morning Person";

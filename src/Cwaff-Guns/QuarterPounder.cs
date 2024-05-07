@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class QuarterPounder : AdvancedGunBehavior
+public class QuarterPounder : CwaffGun
 {
     public static string ItemName         = "Quarter Pounder";
     public static string ShortDescription = "Pay Per Pew";

@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class AdrenalineShot : PassiveItem
+public class AdrenalineShot : CwaffPassive
 {
     public static string ItemName         = "Adrenaline Shot";
     public static string ShortDescription = "Just a Little Longer";

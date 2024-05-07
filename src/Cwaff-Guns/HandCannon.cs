@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class HandCannon : AdvancedGunBehavior
+public class HandCannon : CwaffGun
 {
     public static string ItemName         = "Hand Cannon";
     public static string ShortDescription = "Fire Arms";

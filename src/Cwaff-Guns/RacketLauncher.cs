@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class RacketLauncher : AdvancedGunBehavior
+public class RacketLauncher : CwaffGun
 {
     public static string ItemName         = "Racket Launcher";
     public static string ShortDescription = "Paddle to the Metal";

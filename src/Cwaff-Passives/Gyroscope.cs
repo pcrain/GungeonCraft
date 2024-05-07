@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class Gyroscope : PassiveItem
+public class Gyroscope : CwaffPassive
 {
     public static string ItemName         = "Gyroscope";
     public static string ShortDescription = "Spin to Win";

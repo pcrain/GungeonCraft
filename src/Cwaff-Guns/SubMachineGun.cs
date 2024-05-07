@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class SubMachineGun : AdvancedGunBehavior
+public class SubMachineGun : CwaffGun
 {
     public static string ItemName         = "Sub Machine Gun";
     public static string ShortDescription = "The Hero You Deserve";

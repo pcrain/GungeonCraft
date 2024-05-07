@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class ReserveAmmolet : BlankModificationItem
+public class ReserveAmmolet : CwaffBlankModificationItem
 {
     public static string ItemName         = "Reserve Ammolet";
     public static string ShortDescription = "Blanks Restore Ammo";

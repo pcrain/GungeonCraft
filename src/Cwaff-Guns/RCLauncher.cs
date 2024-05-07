@@ -5,7 +5,7 @@
     -
 */
 
-public class RCLauncher : AdvancedGunBehavior
+public class RCLauncher : CwaffGun
 {
     public static string ItemName         = "R.C. Launcher";
     public static string ShortDescription = "Pedal to the Metal";

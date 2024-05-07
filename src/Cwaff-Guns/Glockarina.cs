@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class Glockarina : AdvancedGunBehavior
+public class Glockarina : CwaffGun
 {
     public static string ItemName         = "Glockarina";
     public static string ShortDescription = "ShOOT 'em Up";

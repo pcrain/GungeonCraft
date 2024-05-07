@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class RingOfDefenestration : PassiveItem
+public class RingOfDefenestration : CwaffPassive
 {
     public static string ItemName         = "Ring of Defenestration";
     public static string ShortDescription = "Babies AND Bathwater";

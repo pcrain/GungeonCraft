@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class Suncaster : AdvancedGunBehavior
+public class Suncaster : CwaffGun
 {
     public static string ItemName         = "Suncaster";
     public static string ShortDescription = "Reflaktive";

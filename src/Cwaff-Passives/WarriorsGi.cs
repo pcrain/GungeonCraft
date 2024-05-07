@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class WarriorsGi : PassiveItem
+public class WarriorsGi : CwaffPassive
 {
     public static string ItemName         = "Warrior's Gi";
     public static string ShortDescription = "Going Further Beyond";

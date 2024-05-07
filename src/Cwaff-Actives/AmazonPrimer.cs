@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class AmazonPrimer : PlayerItem
+public class AmazonPrimer : CwaffActive
 {
     public static string ItemName         = "Amazon Primer";
     public static string ShortDescription = "Cancel Any* Time!";

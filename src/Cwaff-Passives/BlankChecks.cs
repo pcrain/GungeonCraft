@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class BlankChecks : PassiveItem
+public class BlankChecks : CwaffPassive
 {
     public static string ItemName         = "Blank Checks";
     public static string ShortDescription = "Write-off";

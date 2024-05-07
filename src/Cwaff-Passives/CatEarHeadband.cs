@@ -4,7 +4,7 @@ namespace CwaffingTheGungy;
     - Look into logic in ConsumableStealthItem
 */
 
-public class CatEarHeadband : PassiveItem
+public class CatEarHeadband : CwaffPassive
 {
     public static string ItemName         = "Cat Ear Headband";
     public static string ShortDescription = "Stealthy Entrances";

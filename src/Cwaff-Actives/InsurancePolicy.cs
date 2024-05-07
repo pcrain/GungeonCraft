@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class InsurancePolicy : PlayerItem
+public class InsurancePolicy : CwaffActive
 {
     public static string ItemName         = "Insurance Policy";
     public static string ShortDescription = "Kill Your Past, not Your Future";

@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class MasterSword : AdvancedGunBehavior
+public class MasterSword : CwaffGun
 {
     public static string ItemName         = "Master Sword";
     public static string ShortDescription = "Dangerous Alone";

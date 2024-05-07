@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class Breegull : AdvancedGunBehavior
+public class Breegull : CwaffGun
 {
     public static string ItemName         = "Breegull";
     public static string ShortDescription = "Rare Wares";

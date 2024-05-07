@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class Blamethrower : AdvancedGunBehavior
+public class Blamethrower : CwaffGun
 {
     public static string ItemName         = "Blamethrower";
     public static string ShortDescription = "Take It Up with HR";

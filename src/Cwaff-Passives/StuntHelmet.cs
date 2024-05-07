@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class StuntHelmet : PassiveItem
+public class StuntHelmet : CwaffPassive
 {
     public static string ItemName         = "Stunt Helmet";
     public static string ShortDescription = "Aim for the Bushes";

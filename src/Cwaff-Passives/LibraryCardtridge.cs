@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class LibraryCardtridge : PassiveItem
+public class LibraryCardtridge : CwaffPassive
 {
     public static string ItemName         = "Library Cardtridge";
     public static string ShortDescription = "Knowledge is Firepower";

@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class Grandmaster : AdvancedGunBehavior
+public class Grandmaster : CwaffGun
 {
     public static string ItemName         = "Grandmaster";
     public static string ShortDescription = "Mate in Gun";

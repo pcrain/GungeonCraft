@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class VacuumCleaner : AdvancedGunBehavior
+public class VacuumCleaner : CwaffGun
 {
     public static string ItemName         = "Vacuum Cleaner";
     public static string ShortDescription = "Lean Mean Cleaning Machine";

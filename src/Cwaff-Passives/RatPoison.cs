@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class RatPoison : PassiveItem
+public class RatPoison : CwaffPassive
 {
     public static string ItemName         = "Rat Poison";
     public static string ShortDescription = "Swiper no Swiping";

@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class PaintballCannon : AdvancedGunBehavior
+public class PaintballCannon : CwaffGun
 {
     public static string ItemName         = "Paintball Cannon";
     public static string ShortDescription = "The T is Silent";

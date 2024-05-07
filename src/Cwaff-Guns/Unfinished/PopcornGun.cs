@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class PopcornGun : AdvancedGunBehavior
+public class PopcornGun : CwaffGun
 {
     public static string ItemName         = "Popcorn Gun";
     public static string ShortDescription = "The Weasel";

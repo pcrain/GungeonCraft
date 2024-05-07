@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class Itemfinder : PlayerItem
+public class Itemfinder : CwaffActive
 {
     public static string ItemName         = "Itemfinder";
     public static string ShortDescription = "Scavenger Hunt";

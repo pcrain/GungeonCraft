@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class FourDBullets : PassiveItem
+public class FourDBullets : CwaffPassive
 {
     public static string ItemName         = "4D Bullets";
     public static string ShortDescription = "No-Clipping Clips"; //"Thinking Outside the Tesseract";

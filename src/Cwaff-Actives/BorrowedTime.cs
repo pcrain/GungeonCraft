@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class BorrowedTime : PlayerItem
+public class BorrowedTime : CwaffActive
 {
     public static string ItemName         = "Borrowed Time";
     public static string ShortDescription = "Mafuba";

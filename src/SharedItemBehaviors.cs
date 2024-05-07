@@ -35,7 +35,7 @@ public class Expiration : MonoBehaviour  // kill projectile after a fixed amount
 }
 
 /// <summary>Class for fake items that don't show up in inventory or ammonomicon, but can persistently update and get serialized during midgame saves</summary>
-public class FakeItem : PassiveItem
+public class FakeItem : CwaffPassive
 {
     private static Dictionary<Type, FakeItem> _Prefabs     = new();
     private static Dictionary<int, FakeItem>  _PrefabsById = new();

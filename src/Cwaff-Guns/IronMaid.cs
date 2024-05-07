@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class IronMaid : AdvancedGunBehavior
+public class IronMaid : CwaffGun
 {
     public static string ItemName         = "Iron Maid";
     public static string ShortDescription = "Night of Knives";

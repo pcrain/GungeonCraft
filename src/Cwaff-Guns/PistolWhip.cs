@@ -5,7 +5,7 @@
     - Make Pistol Whip projectiles respect players' stats
 */
 
-public class PistolWhip : AdvancedGunBehavior
+public class PistolWhip : CwaffGun
 {
     public static string ItemName         = "Pistol Whip";
     public static string ShortDescription = "What a Horrible Night";

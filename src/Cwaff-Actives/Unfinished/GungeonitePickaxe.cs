@@ -2,7 +2,7 @@ namespace CwaffingTheGungy;
 
 using tk2dRuntime.TileMap;
 
-public class GungeonitePickaxe : PlayerItem
+public class GungeonitePickaxe : CwaffActive
 {
     public static string ItemName         = "Gungeonite Pickaxe";
     public static string ShortDescription = "So We Back in the Mines";

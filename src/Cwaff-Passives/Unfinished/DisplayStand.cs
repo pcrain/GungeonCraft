@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class DisplayStand : PassiveItem
+public class DisplayStand : CwaffPassive
 {
     public static string ItemName         = "Display Stand";
     public static string ShortDescription = "TBD";

@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class Blazer : PassiveItem
+public class Blazer : CwaffPassive
 {
     public static string ItemName         = "Blazer";
     public static string ShortDescription = "Get 'em While It's Hot";

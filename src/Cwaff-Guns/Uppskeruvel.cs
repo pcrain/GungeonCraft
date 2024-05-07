@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class Uppskeruvel : AdvancedGunBehavior
+public class Uppskeruvel : CwaffGun
 {
     public static string ItemName         = "Uppskeruvel";
     public static string ShortDescription = "Aimless Souls";

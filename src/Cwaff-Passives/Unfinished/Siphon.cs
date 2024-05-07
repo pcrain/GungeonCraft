@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class Siphon : PassiveItem
+public class Siphon : CwaffPassive
 {
     public static string ItemName         = "Siphon";
     // public static string SpritePath       = "88888888_icon";

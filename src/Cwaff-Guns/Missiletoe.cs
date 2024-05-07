@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class Missiletoe : AdvancedGunBehavior
+public class Missiletoe : CwaffGun
 {
     public static string ItemName         = "Missiletoe";
     public static string ShortDescription = "O Tannenbomb";

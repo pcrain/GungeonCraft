@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class CreditCard : PassiveItem
+public class CreditCard : CwaffPassive
 {
     public static string ItemName         = "Credit Card";
     public static string ShortDescription = "Shop 'til You Drop";

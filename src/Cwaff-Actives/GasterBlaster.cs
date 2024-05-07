@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class GasterBlaster : PlayerItem
+public class GasterBlaster : CwaffActive
 {
     public static string ItemName         = "Gaster Blaster";
     public static string ShortDescription = "Use Your Best Attack First";

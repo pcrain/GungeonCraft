@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class KALI : AdvancedGunBehavior
+public class KALI : CwaffGun
 {
     public static string ItemName         = "K.A.L.I.";
     public static string ShortDescription = "Fission";

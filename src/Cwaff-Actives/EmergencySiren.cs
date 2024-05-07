@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class EmergencySiren : PlayerItem
+public class EmergencySiren : CwaffActive
 {
     public static string ItemName         = "Emergency Siren";
     public static string ShortDescription = "WEE WOO! WEE WOO!";

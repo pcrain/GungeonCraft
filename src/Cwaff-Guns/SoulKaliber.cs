@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class SoulKaliber : AdvancedGunBehavior
+public class SoulKaliber : CwaffGun
 {
     public static string ItemName         = "Soul Kaliber";
     public static string ShortDescription = "Gundead or Alive";

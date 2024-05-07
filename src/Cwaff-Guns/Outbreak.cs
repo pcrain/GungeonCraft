@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class Outbreak : AdvancedGunBehavior
+public class Outbreak : CwaffGun
 {
     public static string ItemName         = "Outbreak";
     public static string ShortDescription = "Going Viral";

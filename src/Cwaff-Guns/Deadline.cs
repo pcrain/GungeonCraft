@@ -3,7 +3,7 @@
 //TODO: disable auto aim
 //TODO: fix rare hitscan issues
 
-public class Deadline : AdvancedGunBehavior
+public class Deadline : CwaffGun
 {
     public static string ItemName         = "Deadline";
     public static string ShortDescription = "Mission Improbable";

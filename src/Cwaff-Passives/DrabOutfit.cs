@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class DrabOutfit : PassiveItem
+public class DrabOutfit : CwaffPassive
 {
     public static string ItemName         = "Drab Outfit";
     public static string ShortDescription = "Completely Unremarkable";

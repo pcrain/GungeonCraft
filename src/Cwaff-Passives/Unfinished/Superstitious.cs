@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class Superstitious : PassiveItem
+public class Superstitious : CwaffPassive
 {
     public static string ItemName         = "Superstitious";
     // public static string SpritePath       = "88888888_icon";

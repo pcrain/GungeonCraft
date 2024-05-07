@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class DeathNote : AdvancedGunBehavior
+public class DeathNote : CwaffGun
 {
     public static string ItemName         = "Death Note";
     public static string ShortDescription = "Notably Dangerous";

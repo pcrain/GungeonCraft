@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class SafetyGloves : PassiveItem
+public class SafetyGloves : CwaffPassive
 {
     public static string ItemName         = "Safety Gloves";
     public static string ShortDescription = "Handling with Care";

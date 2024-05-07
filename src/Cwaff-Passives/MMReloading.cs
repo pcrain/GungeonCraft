@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class MMReloading : PassiveItem
+public class MMReloading : CwaffPassive
 {
     public static string ItemName         = "MM: Reloading";
     public static string ShortDescription = "Chapter 1";

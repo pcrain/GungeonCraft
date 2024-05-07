@@ -4,7 +4,7 @@ namespace CwaffingTheGungy;
     - nothing for now :D
 */
 
-public class AlienNailgun : AdvancedGunBehavior
+public class AlienNailgun : CwaffGun
 {
     public static string ItemName         = "Alien Nailgun";
     public static string ShortDescription = "Attack, Adapt, Assimilate";

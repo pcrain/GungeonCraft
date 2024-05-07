@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class Encircler : AdvancedGunBehavior
+public class Encircler : CwaffGun
 {
     public static string ItemName         = "Encircler";
     public static string ShortDescription = "Sir Cumference's Own";

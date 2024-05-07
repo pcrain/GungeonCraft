@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class ChamberJammer : PlayerItem
+public class ChamberJammer : CwaffActive
 {
     public static string ItemName         = "Chamber Jammer";
     public static string ShortDescription = "Jam it All";

@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class Magunet : AdvancedGunBehavior
+public class Magunet : CwaffGun
 {
     public static string ItemName         = "Magunet";
     public static string ShortDescription = "An Attractive Option";

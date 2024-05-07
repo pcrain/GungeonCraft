@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class PlatinumStar : AdvancedGunBehavior
+public class PlatinumStar : CwaffGun
 {
     public static string ItemName         = "Platinum Star";
     public static string ShortDescription = "Unbreakable";

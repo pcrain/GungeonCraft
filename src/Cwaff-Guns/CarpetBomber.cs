@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class CarpetBomber : AdvancedGunBehavior
+public class CarpetBomber : CwaffGun
 {
     public static string ItemName         = "Carpet Bomber";
     public static string ShortDescription = "Rugged Terrain";

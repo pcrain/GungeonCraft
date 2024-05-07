@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class AimuHakurei : AdvancedGunBehavior
+public class AimuHakurei : CwaffGun
 {
     public static string ItemName         = "Aimu Hakurei";
     public static string ShortDescription = "Highly Responsive";

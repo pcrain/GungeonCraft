@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class Blackjack : AdvancedGunBehavior
+public class Blackjack : CwaffGun
 {
     public static string ItemName         = "Blackjack";
     public static string ShortDescription = "Gambit's Queens";

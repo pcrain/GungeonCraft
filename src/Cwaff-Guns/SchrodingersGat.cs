@@ -6,7 +6,7 @@ namespace CwaffingTheGungy;
     - use new owner detection pioneered by alien nail gun for quantum detection
 */
 
-public class SchrodingersGat : AdvancedGunBehavior
+public class SchrodingersGat : CwaffGun
 {
     public static string ItemName         = "Schrodinger's Gat";
     public static string ShortDescription = "Proba-ballistic";

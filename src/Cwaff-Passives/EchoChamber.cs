@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class EchoChamber : PassiveItem
+public class EchoChamber : CwaffPassive
 {
     public static string ItemName         = "Echo Chamber";
     public static string ShortDescription = "Primed and Corrupted";

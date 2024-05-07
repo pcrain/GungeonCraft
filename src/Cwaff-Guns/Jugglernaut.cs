@@ -9,7 +9,7 @@
     - juggling order:   red, blue, yellow, green, purple, orange
 */
 
-public class Jugglernaut : AdvancedGunBehavior
+public class Jugglernaut : CwaffGun
 {
     public static string ItemName         = "Jugglernaut";
     public static string ShortDescription = "Balancing Act";

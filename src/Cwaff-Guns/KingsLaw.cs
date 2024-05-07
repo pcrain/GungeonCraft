@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class KingsLaw : AdvancedGunBehavior
+public class KingsLaw : CwaffGun
 {
     public static string ItemName         = "King's Law";
     public static string ShortDescription = "Accept Your Fate";

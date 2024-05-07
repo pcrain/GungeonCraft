@@ -4,7 +4,7 @@ namespace CwaffingTheGungy;
     - figure out nicely drawing while out of bounds
 */
 
-public class Gunbrella : AdvancedGunBehavior
+public class Gunbrella : CwaffGun
 {
     public static string ItemName         = "Gunbrella";
     public static string ShortDescription = "Cloudy with a Chance of Pain";

@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class DriftersHeadgear : PassiveItem
+public class DriftersHeadgear : CwaffPassive
 {
     public static string ItemName         = "Drifter's Headgear";
     public static string ShortDescription = "Hyper Light Dodger";

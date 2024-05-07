@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class Alligator : AdvancedGunBehavior
+public class Alligator : CwaffGun
 {
     public static string ItemName         = "Alligator";
     public static string ShortDescription = "Shockingly Effective";

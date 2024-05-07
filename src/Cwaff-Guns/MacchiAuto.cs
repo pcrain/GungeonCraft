@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class MacchiAuto : AdvancedGunBehavior
+public class MacchiAuto : CwaffGun
 {
     public static string ItemName         = "Macchi Auto";
     public static string ShortDescription = "Espresso Shots";

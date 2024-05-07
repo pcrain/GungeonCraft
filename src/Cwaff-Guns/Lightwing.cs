@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class Lightwing : AdvancedGunBehavior
+public class Lightwing : CwaffGun
 {
     public static string ItemName         = "Lightwing";
     public static string ShortDescription = "Falcon Captain";

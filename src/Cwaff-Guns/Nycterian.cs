@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class Nycterian : AdvancedGunBehavior
+public class Nycterian : CwaffGun
 {
     public static string ItemName         = "Nycterian";
     public static string ShortDescription = "Locate the Echoes";

@@ -5,7 +5,7 @@ namespace CwaffingTheGungy;
     - refactor player variable to use builtin variable
 */
 
-public class Ticonderogun : AdvancedGunBehavior
+public class Ticonderogun : CwaffGun
 {
     public static string ItemName         = "Ticonderogun";
     public static string ShortDescription = "A Picture is Worth 1000 Swords";

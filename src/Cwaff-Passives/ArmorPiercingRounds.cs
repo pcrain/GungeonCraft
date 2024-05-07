@@ -11,7 +11,7 @@ namespace CwaffingTheGungy;
     - Gunreaper       - pierces room clear invulnerability (HealthHaver PreventAllDamage)
 */
 
-public class ArmorPiercingRounds : PassiveItem
+public class ArmorPiercingRounds : CwaffPassive
 {
     public static string ItemName         = "Armor Piercing Rounds";
     public static string ShortDescription = "Bored to Death";

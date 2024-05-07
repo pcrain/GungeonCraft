@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class KalibersJustice : PlayerItem
+public class KalibersJustice : CwaffActive
 {
     public static string ItemName         = "Kaliber's Justice";
     public static string ShortDescription = "Knows What You Need";

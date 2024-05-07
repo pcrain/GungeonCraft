@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class StopSign : PlayerItem
+public class StopSign : CwaffActive
 {
     public static string ItemName         = "Stop Sign";
     public static string ShortDescription = "Believing";

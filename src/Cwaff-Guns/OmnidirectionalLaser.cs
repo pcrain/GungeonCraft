@@ -5,7 +5,7 @@
     - add extra pointer mechanics maybe
 */
 
-public class OmnidirectionalLaser : AdvancedGunBehavior
+public class OmnidirectionalLaser : CwaffGun
 {
     public static string ItemName         = "Omnidirectional Laser";
     public static string ShortDescription = "Hula Hooplah";

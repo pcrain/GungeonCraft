@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class KiBlast : AdvancedGunBehavior
+public class KiBlast : CwaffGun
 {
     public static string ItemName         = "Ki Blast";
     public static string ShortDescription = "Dragunball Z";

@@ -5,7 +5,7 @@ namespace CwaffingTheGungy;
     -
 */
 
-public class BulletbotImplant : PlayerItem
+public class BulletbotImplant : CwaffActive
 {
     public static string ItemName         = "Bulletbot Implant";
     public static string ShortDescription = "Loyal Gunpanions"; //How to Train your Dragun

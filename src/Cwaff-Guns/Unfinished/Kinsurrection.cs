@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class Kinsurrection : AdvancedGunBehavior
+public class Kinsurrection : CwaffGun
 {
     public static string ItemName         = "Kinsurrection";
     public static string ShortDescription = "Friendliest Fire";

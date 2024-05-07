@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class ChestScanner : PlayerItem
+public class ChestScanner : CwaffActive
 {
     public static string ItemName         = "Chest Scanner";
     public static string ShortDescription = "Try Before You Buy";

@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class Wavefront : AdvancedGunBehavior
+public class Wavefront : CwaffGun
 {
     public static string ItemName         = "Wavefront";
     public static string ShortDescription = "Particle-larly Interesting";

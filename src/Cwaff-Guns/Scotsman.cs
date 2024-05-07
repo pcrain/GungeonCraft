@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class Scotsman : AdvancedGunBehavior
+public class Scotsman : CwaffGun
 {
     public static string ItemName         = "Scotsman";
     public static string ShortDescription = "Situationally Sticky";

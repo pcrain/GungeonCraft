@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class Crapshooter : AdvancedGunBehavior
+public class Crapshooter : CwaffGun
 {
     public static string ItemName         = "Crapshooter";
     public static string ShortDescription = "Reloaded Dice";

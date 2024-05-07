@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class AmmoConservationManual : PassiveItem
+public class AmmoConservationManual : CwaffPassive
 {
     public static string ItemName         = "Ammo Conservation Manual";
     public static string ShortDescription = "Waste Not, Want Not";

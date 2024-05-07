@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class BubbleWand : PassiveItem
+public class BubbleWand : CwaffPassive
 {
     public static string ItemName         = "Bubble Wand";
     public static string ShortDescription = "Bring It Around Town";

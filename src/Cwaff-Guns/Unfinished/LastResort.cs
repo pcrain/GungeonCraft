@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class LastResort : AdvancedGunBehavior
+public class LastResort : CwaffGun
 {
     public static string ItemName         = "Last Resort";
     public static string ShortDescription = "Way Past Plan B";

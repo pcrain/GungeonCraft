@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class Alyx : AdvancedGunBehavior
+public class Alyx : CwaffGun
 {
     public static string ItemName         = "Alyx";
     public static string ShortDescription = "Welcome to the New Age";

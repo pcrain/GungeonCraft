@@ -5,7 +5,7 @@ namespace CwaffingTheGungy;
         - handle teleporting out of rooms or otherwise leaving them unceremoniously
 */
 
-public class CustodiansBadge : PassiveItem
+public class CustodiansBadge : CwaffPassive
 {
     public static string ItemName         = "Custodian's Badge";
     public static string ShortDescription = "Neat and Tidy";

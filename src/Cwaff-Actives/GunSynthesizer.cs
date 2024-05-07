@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class GunSynthesizer : PlayerItem
+public class GunSynthesizer : CwaffActive
 {
     public static string ItemName         = "Gun Synthesizer";
     public static string ShortDescription = "Transient Guns, Lasting Damage";

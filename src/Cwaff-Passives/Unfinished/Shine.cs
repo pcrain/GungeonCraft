@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class Shine : PassiveItem
+public class Shine : CwaffPassive
 {
     public static string ItemName         = "Shine";
     // public static string SpritePath       = "88888888_icon";

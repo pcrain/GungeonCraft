@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class Pincushion : AdvancedGunBehavior
+public class Pincushion : CwaffGun
 {
     public static string ItemName         = "Pincushion";
     public static string ShortDescription = "Needless Violence";

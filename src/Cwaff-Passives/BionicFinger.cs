@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class BionicFinger : PassiveItem
+public class BionicFinger : CwaffPassive
 {
     public static string ItemName         = "Bionic Finger";
     public static string ShortDescription = "Trigger Happiest";

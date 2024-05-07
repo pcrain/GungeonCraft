@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class GunPowderer : PlayerItem
+public class GunPowderer : CwaffActive
 {
     public static string ItemName         = "Gun Powderer";
     public static string ShortDescription = "Mortar and Pistol";

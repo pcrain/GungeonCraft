@@ -1,6 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
-public class GamblersFallacy : AdvancedGunBehavior
+public class GamblersFallacy : CwaffGun
 {
     public static string ItemName         = "Gambler's Fallacy";
     public static string ShortDescription = "This Time for Sure!";

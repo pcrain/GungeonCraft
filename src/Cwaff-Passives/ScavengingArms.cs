@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class ScavengingArms : PassiveItem
+public class ScavengingArms : CwaffPassive
 {
     public static string ItemName         = "Scavenging Arms";
     public static string ShortDescription = "Loot Boxes";

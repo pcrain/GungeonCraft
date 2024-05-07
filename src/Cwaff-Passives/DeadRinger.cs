@@ -4,7 +4,7 @@ namespace CwaffingTheGungy;
     - Look into logic in ConsumableStealthItem
 */
 
-public class DeadRinger : PassiveItem
+public class DeadRinger : CwaffPassive
 {
     public static string ItemName         = "Dead Ringer";
     public static string ShortDescription = "Tactical Defeat";

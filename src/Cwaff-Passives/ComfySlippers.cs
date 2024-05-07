@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class ComfySlippers : PassiveItem
+public class ComfySlippers : CwaffPassive
 {
     public static string ItemName         = "Comfy Slippers";
     public static string ShortDescription = "Furry Foot Friends";

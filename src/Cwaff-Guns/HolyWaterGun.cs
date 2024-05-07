@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class HolyWaterGun : AdvancedGunBehavior
+public class HolyWaterGun : CwaffGun
 {
     public static string ItemName         = "Holy Water Gun";
     public static string ShortDescription = "Water, Gun, & Holy Soak";

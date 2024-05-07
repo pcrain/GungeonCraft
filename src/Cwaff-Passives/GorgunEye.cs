@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class GorgunEye : PassiveItem
+public class GorgunEye : CwaffPassive
 {
     public static string ItemName         = "Gorgun Eye";
     public static string ShortDescription = "Staredown";

@@ -6,7 +6,7 @@
     - add visuals for the chains
 */
 
-public class SpinCycle : AdvancedGunBehavior
+public class SpinCycle : CwaffGun
 {
     public static string ItemName         = "Spin Cycle";
     public static string ShortDescription = "Bring it Around Town";

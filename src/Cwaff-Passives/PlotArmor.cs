@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class PlotArmor : PassiveItem
+public class PlotArmor : CwaffPassive
 {
     public static string ItemName         = "Plot Armor";
     public static string ShortDescription = "Can't Die Yet";
