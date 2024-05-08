@@ -594,8 +594,7 @@ public static class Extensions
   /// <summary>Set an audio event for a specific frame of a gun's animation</summary>
   public static void SetGunAudio(this Gun gun, string name = null, string audio = "", int frame = 0)
   {
-    tk2dSpriteAnimationFrame aframe;
-    aframe = gun.spriteAnimator.GetClipByName(name).frames[frame];
+    tk2dSpriteAnimationFrame aframe = gun.spriteAnimator.GetClipByName(name).frames[frame];
     aframe.triggerEvent = !string.IsNullOrEmpty(audio);
     aframe.eventAudio = audio;
   }

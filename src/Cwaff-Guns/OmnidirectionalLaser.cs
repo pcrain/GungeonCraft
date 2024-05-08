@@ -185,6 +185,7 @@ public class OmnidirectionalLaser : CwaffGun
 
     public override void OnSwitchedAwayFromThisGun()
     {
+        base.OnSwitchedAwayFromThisGun();
         if (!this.PlayerOwner)
             return;
         if (this._backside && this._backside.renderer)
@@ -196,7 +197,6 @@ public class OmnidirectionalLaser : CwaffGun
             this._reticle.SetAlpha(0.0f);
         // this._reticle.renderer.enabled = false;  //NOTE: doesn't work since it's parented
         this.PlayerOwner.forceAimPoint = null;
-        base.OnSwitchedAwayFromThisGun();
     }
 
     public override void PostProcessProjectile(Projectile projectile)

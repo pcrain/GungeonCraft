@@ -37,6 +37,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem
   // public abstract string Lore             { get; }
   public override void OnPlayerPickup(PlayerController player)
   {
+    base.OnPlayerPickup(player);
     player.GunChanged -= OnGunsChanged;
     player.GunChanged += OnGunsChanged;
   }
@@ -60,6 +61,14 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem
   /// </summary>
   public virtual void OnSwitchedToThisGun()
   {
+    this.gun.PreventNormalFireAudio = true;
+    string fireAudio = gun.spriteAnimator.GetClipByName(gun.shootAnimation).frames[0].eventAudio;
+    if (!string.IsNullOrEmpty(fireAudio))
+    {
+      // if (C.DEBUG_BUILD)
+      //   ETGModConsole.Log($"custom fire audio initialized for {this.gun.EncounterNameOrDisplayName}");
+      this.gun.OverrideNormalFireAudioEvent = fireAudio;
+    }
   }
 
   /// <summary>
