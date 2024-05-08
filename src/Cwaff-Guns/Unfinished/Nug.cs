@@ -63,14 +63,14 @@ public class Nug : CwaffGun
     public override void OnPlayerPickup(PlayerController player)
     {
         base.OnPlayerPickup(player);
-        if (!this.EverPickedUp)
-        {
-            if (gun)
-            {
-                gun.ClipShotsRemaining = 1;
-                gun.CurrentAmmo = 1;
-            }
-        }
+        // if (firstTimePickedUp)
+        // {
+        //     if (gun)
+        //     {
+        //         gun.ClipShotsRemaining = 1;
+        //         gun.CurrentAmmo = 1;
+        //     }
+        // }
     }
 
     public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)

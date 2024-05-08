@@ -48,7 +48,7 @@ public class Alyx : CwaffGun
 
     public override void OnPlayerPickup(PlayerController player)
     {
-        if (!this.EverPickedUp)
+        if (timeAtLastRecalc == 0.0f)
         {
             this.gun.SetBaseMaxAmmo(_BASE_MAX_AMMO);
             this.gun.CurrentAmmo = _BASE_MAX_AMMO;

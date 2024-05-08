@@ -27,8 +27,8 @@ public class SchrodingersGat : CwaffGun
 
     public override void OnPlayerPickup(PlayerController player)
     {
-        if (!this.EverPickedUp)
-            StaticReferenceManager.ProjectileAdded += CheckFromQuantumEnemyOwner;
+        StaticReferenceManager.ProjectileAdded -= CheckFromQuantumEnemyOwner;
+        StaticReferenceManager.ProjectileAdded += CheckFromQuantumEnemyOwner;
         base.OnPlayerPickup(player);
     }
 

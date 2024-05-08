@@ -106,11 +106,10 @@ public class Glockarina : CwaffGun
 
     public override void OnPlayerPickup(PlayerController player)
     {
-        if (!this.EverPickedUp)
-            this._electricImmunity = new DamageTypeModifier {
-                damageType = CoreDamageTypes.Electric,
-                damageMultiplier = 0f,
-            };
+        this._electricImmunity ??= new DamageTypeModifier {
+            damageType = CoreDamageTypes.Electric,
+            damageMultiplier = 0f,
+        };
         base.OnPlayerPickup(player);
         UpdateMode();
     }

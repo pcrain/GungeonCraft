@@ -216,8 +216,8 @@ public class AlienNailgun : CwaffGun
 
     public override void OnPlayerPickup(PlayerController player)
     {
-        if (!this.EverPickedUp)
-            StaticReferenceManager.ProjectileAdded += CheckFromReplicantOwner;
+        StaticReferenceManager.ProjectileAdded -= CheckFromReplicantOwner;
+        StaticReferenceManager.ProjectileAdded += CheckFromReplicantOwner;
         base.OnPlayerPickup(player);
         player.OnRoomClearEvent += DestroyReplicants;
     }
