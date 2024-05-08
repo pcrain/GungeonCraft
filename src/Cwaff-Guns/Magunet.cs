@@ -50,10 +50,10 @@ public class Magunet : CwaffGun
         base.OnSwitchedAwayFromThisGun();
     }
 
-    protected override void OnPostDroppedByPlayer(PlayerController player)
+    public override void OnDroppedByPlayer(PlayerController player)
     {
         CeaseCharging();
-        base.OnPostDroppedByPlayer(player);
+        base.OnDroppedByPlayer(player);
     }
 
     public override void OnDestroy()
@@ -75,7 +75,7 @@ public class Magunet : CwaffGun
         this._wasCharging = false;
     }
 
-    protected override void Update()
+    public override void Update()
     {
         base.Update();
         if (BraveTime.DeltaTime == 0.0f)

@@ -48,20 +48,20 @@ public class Grandmaster : CwaffGun
 
     public override void OnDestroy()
     {
-        if (this.Player)
-            this.Player.OnReloadedGun -= OnGrandmasterReloaded;
+        if (this.PlayerOwner)
+            this.PlayerOwner.OnReloadedGun -= OnGrandmasterReloaded;
     }
 
-    protected override void OnPickedUpByPlayer(PlayerController player)
+    public override void OnPlayerPickup(PlayerController player)
     {
-        base.OnPickedUpByPlayer(player);
+        base.OnPlayerPickup(player);
         player.OnReloadedGun += OnGrandmasterReloaded;
     }
 
-    protected override void OnPostDroppedByPlayer(PlayerController player)
+    public override void OnDroppedByPlayer(PlayerController player)
     {
         player.OnReloadedGun -= OnGrandmasterReloaded;
-        base.OnPostDroppedByPlayer(player);
+        base.OnDroppedByPlayer(player);
     }
 
     private static void OnGrandmasterReloaded(PlayerController usingPlayer, Gun usedGun)

@@ -116,9 +116,9 @@ public class SpinCycle : CwaffGun
         base.OnSwitchedToThisGun();
     }
 
-    protected override void OnPickedUpByPlayer(PlayerController player)
+    public override void OnPlayerPickup(PlayerController player)
     {
-        base.OnPickedUpByPlayer(player);
+        base.OnPlayerPickup(player);
         player.OnRollStarted += this.OnDodgeRoll;
         if (this.gun == player.CurrentGun)
             SetupBallAndChain(player);
@@ -129,9 +129,9 @@ public class SpinCycle : CwaffGun
         DestroyBallAndChain();
     }
 
-    protected override void OnPostDroppedByPlayer(PlayerController player)
+    public override void OnDroppedByPlayer(PlayerController player)
     {
-        base.OnPostDroppedByPlayer(player);
+        base.OnDroppedByPlayer(player);
         player.OnRollStarted -= this.OnDodgeRoll;
         DestroyBallAndChain();
     }
@@ -139,10 +139,10 @@ public class SpinCycle : CwaffGun
     public override void OnSwitchedAwayFromThisGun()
     {
         DestroyBallAndChain();
-        if (!this.Player)
+        if (!this.PlayerOwner)
             return;
-        this.Player.m_overrideGunAngle = null;
-        RecomputePlayerSpeed(this.Player,1.0f);
+        this.PlayerOwner.m_overrideGunAngle = null;
+        RecomputePlayerSpeed(this.PlayerOwner,1.0f);
         base.OnSwitchedAwayFromThisGun();
     }
 
@@ -180,7 +180,7 @@ public class SpinCycle : CwaffGun
         p.stats.RecalculateStats(p, false, false);
     }
 
-    protected override void Update()
+    public override void Update()
     {
         base.Update();
         if (this.gun.CurrentOwner is not PlayerController p)

@@ -31,27 +31,27 @@ public class IronMaid : CwaffGun
     public override void OnSwitchedToThisGun()
     {
         base.OnSwitchedToThisGun();
-        LaunchAllBullets(this.Player);
+        LaunchAllBullets(this.PlayerOwner);
     }
 
-    protected override void OnPostDroppedByPlayer(PlayerController player)
+    public override void OnDroppedByPlayer(PlayerController player)
     {
         LaunchAllBullets(player);
         player.OnReceivedDamage -= LaunchAllBullets;
-        base.OnPostDroppedByPlayer(player);
+        base.OnDroppedByPlayer(player);
     }
 
     public override void OnDestroy()
     {
-        if (this.Player)
-            LaunchAllBullets(this.Player);
+        if (this.PlayerOwner)
+            LaunchAllBullets(this.PlayerOwner);
         base.OnDestroy();
     }
 
     public override void OnSwitchedAwayFromThisGun()
     {
         base.OnSwitchedAwayFromThisGun();
-        LaunchAllBullets(this.Player);
+        LaunchAllBullets(this.PlayerOwner);
     }
 
     public int GetNextIndex()
@@ -76,12 +76,12 @@ public class IronMaid : CwaffGun
         this._nextIndex = 0;
     }
 
-    protected override void Update()
+    public override void Update()
     {
         base.Update();
         if (GameManager.Instance.IsLoadingLevel)
             return;
-        if (this.Player is not PlayerController pc)
+        if (this.PlayerOwner is not PlayerController pc)
             return;
 
         this._whereIsThePlayerLooking =

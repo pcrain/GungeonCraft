@@ -55,19 +55,19 @@ public class Ticonderogun : CwaffGun
         _RunePrefab = VFX.Create("pencil_runes", 0.01f, loops: false, anchor: Anchor.MiddleCenter); // FPS must be nonzero or sprites don't update properly
     }
 
-    protected override void OnPickedUpByPlayer(PlayerController player)
+    public override void OnPlayerPickup(PlayerController player)
     {
-        base.OnPickedUpByPlayer(player);
+        base.OnPlayerPickup(player);
         this._owner = player;
     }
 
-    protected override void OnPostDroppedByPlayer(PlayerController player)
+    public override void OnDroppedByPlayer(PlayerController player)
     {
         this._owner = null;
-        base.OnPostDroppedByPlayer(player);
+        base.OnDroppedByPlayer(player);
     }
 
-    protected override void Update()
+    public override void Update()
     {
         base.Update();
         if (!this._owner || BraveTime.DeltaTime == 0.0f)
@@ -187,8 +187,8 @@ public class Ticonderogun : CwaffGun
         GameManager.Instance.MainCameraController.SetManualControl(true, true);
         GameManager.Instance.MainCameraController.OverridePosition = this._cameraPositionAtChargeStart;
 
-        this._playerPositionAtChargeStart = this.Owner.sprite.WorldCenter;
-        this._adjustedAimPoint = this._playerPositionAtChargeStart + (this.Owner as PlayerController).m_currentGunAngle.ToVector(1f);
+        this._playerPositionAtChargeStart = this.GenericOwner.sprite.WorldCenter;
+        this._adjustedAimPoint = this._playerPositionAtChargeStart + (this.GenericOwner as PlayerController).m_currentGunAngle.ToVector(1f);
 
         this._isCharging = true;
     }
@@ -300,7 +300,7 @@ public class Ticonderogun : CwaffGun
         GameManager.Instance.MainCameraController.SetManualControl(usingMouse, true);
         if (usingMouse)
             GameManager.Instance.MainCameraController.OverridePosition =
-                this._cameraPositionAtChargeStart + (this.Owner.sprite.WorldCenter - this._playerPositionAtChargeStart);
+                this._cameraPositionAtChargeStart + (this.GenericOwner.sprite.WorldCenter - this._playerPositionAtChargeStart);
 
         // Don't draw or update anything if we've barely moved the cursor
         if (this._lastCursorPos.HasValue && (pencilPos - this._lastCursorPos.Value).magnitude < _MIN_SEGMENT_DIST)

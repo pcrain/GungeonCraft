@@ -45,7 +45,7 @@ public class Pincushion : CwaffGun
     public override void PostProcessProjectile(Projectile projectile)
     {
         base.PostProcessProjectile(projectile);
-        if (this.Owner as PlayerController is not PlayerController pc)
+        if (this.GenericOwner as PlayerController is not PlayerController pc)
             return;
 
         float spread = _MIN_SPREAD;

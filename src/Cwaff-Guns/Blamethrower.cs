@@ -28,22 +28,22 @@ public class Blamethrower : CwaffGun
         _ScapeGoatVFX = VFX.Create("goat_vfx", fps: 16, loops: true, scale: 1f, anchor: Anchor.MiddleCenter);
     }
 
-    protected override void OnPickedUpByPlayer(PlayerController player)
+    public override void OnPlayerPickup(PlayerController player)
     {
-        base.OnPickedUpByPlayer(player);
+        base.OnPlayerPickup(player);
         player.OnReceivedDamage += this.OnReceivedDamage;
     }
 
-    protected override void OnPostDroppedByPlayer(PlayerController player)
+    public override void OnDroppedByPlayer(PlayerController player)
     {
         player.OnReceivedDamage -= this.OnReceivedDamage;
-        base.OnPostDroppedByPlayer(player);
+        base.OnDroppedByPlayer(player);
     }
 
     public override void OnDestroy()
     {
-        if (this.Player)
-            this.Player.OnReceivedDamage -= this.OnReceivedDamage;
+        if (this.PlayerOwner)
+            this.PlayerOwner.OnReceivedDamage -= this.OnReceivedDamage;
         base.OnDestroy();
     }
 

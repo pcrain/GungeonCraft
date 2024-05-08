@@ -60,10 +60,10 @@ public class Nug : CwaffGun
         return fakeprojectile;
     }
 
-    protected override void OnPickedUpByPlayer(PlayerController player)
+    public override void OnPlayerPickup(PlayerController player)
     {
-        base.OnPickedUpByPlayer(player);
-        if (!everPickedUpByPlayer)
+        base.OnPlayerPickup(player);
+        if (!this.EverPickedUp)
         {
             if (gun)
             {

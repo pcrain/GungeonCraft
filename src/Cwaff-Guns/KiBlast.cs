@@ -52,7 +52,7 @@ public class KiBlast : CwaffGun
     public override void OnSwitchedToThisGun()
     {
         base.OnSwitchedToThisGun();
-        if (this.Owner is not PlayerController player)
+        if (this.GenericOwner is not PlayerController player)
             return;
         player.ToggleGunRenderers(false, ItemName);
     }
@@ -60,7 +60,7 @@ public class KiBlast : CwaffGun
     public override void OnSwitchedAwayFromThisGun()
     {
         base.OnSwitchedAwayFromThisGun();
-        if (this.Owner is not PlayerController player)
+        if (this.GenericOwner is not PlayerController player)
             return;
         player.ToggleGunRenderers(true, ItemName);
     }
@@ -73,16 +73,16 @@ public class KiBlast : CwaffGun
         player.ToggleGunRenderers(false, ItemName);
     }
 
-    protected override void OnPostDroppedByPlayer(PlayerController player)
+    public override void OnDroppedByPlayer(PlayerController player)
     {
         player.ToggleGunRenderers(true, ItemName);
-        base.OnPostDroppedByPlayer(player);
+        base.OnDroppedByPlayer(player);
     }
 
     public override void OnDestroy()
     {
-        if (this.Player)
-            this.Player.ToggleGunRenderers(true, ItemName);
+        if (this.PlayerOwner)
+            this.PlayerOwner.ToggleGunRenderers(true, ItemName);
         base.OnDestroy();
     }
 
@@ -105,12 +105,12 @@ public class KiBlast : CwaffGun
         closestBlast?.ReturnFromPlayer(player);
     }
 
-    protected override void Update()
+    public override void Update()
     {
         base.Update();
-        if (!this.Player)
+        if (!this.PlayerOwner)
             return;
-        this.Player.ToggleGunRenderers(!this.gun.isActiveAndEnabled, ItemName);
+        this.PlayerOwner.ToggleGunRenderers(!this.gun.isActiveAndEnabled, ItemName);
     }
 }
 

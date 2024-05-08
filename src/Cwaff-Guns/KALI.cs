@@ -72,12 +72,12 @@ public class KALI : CwaffGun
         _IonizeVFX = VFX.Create("kali_ionize_particle", fps: 7, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 100f);
     }
 
-    protected override void Update()
+    public override void Update()
     {
         base.Update();
         if (BraveTime.DeltaTime == 0.0f)
             return;
-        if (this.Owner is not PlayerController)
+        if (this.GenericOwner is not PlayerController)
             return;
 
         if (!this.gun.IsCharging)
@@ -119,9 +119,9 @@ public class KALI : CwaffGun
         this.gun.sprite.gameObject.SetGlowiness(25f + 25f * newChargeLevel);
     }
 
-    protected override void OnPickedUpByPlayer(PlayerController player)
+    public override void OnPlayerPickup(PlayerController player)
     {
-        base.OnPickedUpByPlayer(player);
+        base.OnPlayerPickup(player);
         this._timeShifter.SafeDestroy();
         this._timeShifter = new GameObject();
         this._timeShifter.AddComponent<KaliTimeshifter>();
@@ -129,9 +129,9 @@ public class KALI : CwaffGun
         this.gun.sprite.gameObject.SetGlowiness(0f);
     }
 
-    protected override void OnPostDroppedByPlayer(PlayerController player)
+    public override void OnDroppedByPlayer(PlayerController player)
     {
-        base.OnPostDroppedByPlayer(player);
+        base.OnDroppedByPlayer(player);
         this._timeShifter.SafeDestroy();
     }
 

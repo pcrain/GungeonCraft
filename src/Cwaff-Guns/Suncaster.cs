@@ -101,9 +101,9 @@ public class Suncaster : CwaffGun
         this._lastChargeTime = BraveTime.ScaledTimeSinceStartup; // reset charge timer after firing
     }
 
-    protected override void OnPostDroppedByPlayer(PlayerController player)
+    public override void OnDroppedByPlayer(PlayerController player)
     {
-        base.OnPostDroppedByPlayer(player);
+        base.OnDroppedByPlayer(player);
         foreach (SuncasterPrism prism in this.extantPrisms)
           prism.Selfdestruct();
         this.extantPrisms.Clear();
@@ -117,11 +117,11 @@ public class Suncaster : CwaffGun
         base.OnDestroy();
     }
 
-    protected override void Update()
+    public override void Update()
     {
         base.Update();
         gun.sprite.gameObject.SetGlowiness(10f + 40f * Mathf.Abs(Mathf.Sin(10f * BraveTime.ScaledTimeSinceStartup)));
-        if (!this.Player)
+        if (!this.PlayerOwner)
             return;
 
         float now = BraveTime.ScaledTimeSinceStartup;

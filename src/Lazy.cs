@@ -144,7 +144,7 @@ public static class Lazy
     /// Perform basic initialization for a new gun definition.
     /// </summary>
     public static Gun SetupGun<T>(string gunName, string shortDescription, string longDescription, string lore, bool hideFromAmmonomicon = false)
-        where T : Alexandria.ItemAPI.AdvancedGunBehavior
+        where T : GunBehaviour
     {
         Gun gun = SetupItem<Gun, Gun>(gunName, shortDescription, longDescription, lore, hideFromAmmonomicon: hideFromAmmonomicon);
         gun.gameObject.AddComponent<T>();

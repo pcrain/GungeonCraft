@@ -34,10 +34,10 @@ public class SubtractorBeam : CwaffGun
           }).Attach<SubtractorProjectile>();
     }
 
-    protected override void OnPostDroppedByPlayer(PlayerController player)
+    public override void OnDroppedByPlayer(PlayerController player)
     {
         WhoAreTheyAgain();
-        base.OnPostDroppedByPlayer(player);
+        base.OnDroppedByPlayer(player);
     }
 
     public override void OnDestroy()
@@ -52,10 +52,10 @@ public class SubtractorBeam : CwaffGun
         base.OnSwitchedAwayFromThisGun();
     }
 
-    protected override void Update()
+    public override void Update()
     {
         base.Update();
-        if ((this.Owner is not PlayerController player) || !player.healthHaver || player.healthHaver.IsDead)
+        if ((this.GenericOwner is not PlayerController player) || !player.healthHaver || player.healthHaver.IsDead)
             WhoAreTheyAgain();
         else
             YouShallKnowTheirNames();
@@ -83,7 +83,7 @@ public class SubtractorBeam : CwaffGun
     private void YouShallKnowTheirNames()
     {
         UpdateNametags(true);
-        if (!this.Owner || this.Owner.GetAbsoluteParentRoom() is not RoomHandler room)
+        if (!this.GenericOwner || this.GenericOwner.GetAbsoluteParentRoom() is not RoomHandler room)
             return;
 
         foreach (AIActor enemy in room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All).EmptyIfNull())

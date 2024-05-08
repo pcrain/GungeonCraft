@@ -232,27 +232,6 @@ public static class Extensions
     return Quaternion.Euler(0f, 0f, BraveMathCollege.Atan2Degrees(self));
   }
 
-  /// <summary>Add custom firing audio to a gun</summary>
-  public static void SetFireAudio<T>(this T agun, string audioEventName = null)
-    where T : Alexandria.ItemAPI.AdvancedGunBehavior
-  {
-    agun.preventNormalFireAudio = true;
-    if (audioEventName is not null)
-      agun.overrideNormalFireAudio = audioEventName;
-    // agun.OverrideNormalFireAudioEvent = audioEventName;
-    // agun.GetComponent<tk2dSpriteAnimator>().GetClipByName(agun.shootAnimation).frames[0].triggerEvent = true;
-    // agun.GetComponent<tk2dSpriteAnimator>().GetClipByName(agun.shootAnimation).frames[0].eventAudio = audioEventName;
-  }
-
-  /// <summary>Add custom reloading audio to a gun</summary>
-  public static void SetReloadAudio<T>(this T agun, string audioEventName = null)
-    where T : Alexandria.ItemAPI.AdvancedGunBehavior
-  {
-    agun.preventNormalReloadAudio  = true;
-    if (audioEventName is not null)
-      agun.overrideNormalReloadAudio = audioEventName;
-  }
-
   /// <summary>Loop a gun's animation</summary>
   public static void LoopAnimation(this Gun gun, string animationName, int loopStart = 0)
   {
@@ -607,12 +586,6 @@ public static class Extensions
   /// <summary>Clear a gun's default audio events</summary>
   public static void ClearDefaultAudio(this Gun gun)
   {
-    if (gun.GetComponent<Alexandria.ItemAPI.AdvancedGunBehavior>() is Alexandria.ItemAPI.AdvancedGunBehavior agun)
-    {
-      agun.SetFireAudio();
-      agun.SetReloadAudio();
-    }
-
     gun.gunSwitchGroup = (ItemHelper.Get(Items.Banana) as Gun).gunSwitchGroup; // banana has silent reload and charge audio
     gun.PreventNormalFireAudio = true;
     gun.OverrideNormalFireAudioEvent = "";
@@ -638,14 +611,6 @@ public static class Extensions
   public static void SetFireAudio(this Gun gun, string audio = "", int frame = 0)
   {
     gun.SetGunAudio(name: gun.shootAnimation, audio: audio, frame: frame);
-    // gun.PreventNormalFireAudio = true;
-    // gun.OverrideNormalFireAudioEvent = audio;
-
-    if (gun.GetComponent<Alexandria.ItemAPI.AdvancedGunBehavior>() is Alexandria.ItemAPI.AdvancedGunBehavior agun)
-    {
-      agun.preventNormalFireAudio = true;
-      agun.overrideNormalFireAudio = audio;
-    }
   }
   public static void SetFireAudio(this Gun gun, string audio = "", params int[] frames)
   {

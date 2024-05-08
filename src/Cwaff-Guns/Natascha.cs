@@ -33,11 +33,11 @@ public class Natascha : CwaffGun
           sprite: "natascha_bullet", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter));
     }
 
-    protected override void Update()
+    public override void Update()
     {
         base.Update();
 
-        if (this.Owner is not PlayerController player)
+        if (this.GenericOwner is not PlayerController player)
             return;
 
         if (player.IsDodgeRolling || (!this._maintainSpinup && !this.gun.IsFiring))
@@ -86,17 +86,17 @@ public class Natascha : CwaffGun
         }
     }
 
-    protected override void OnPickedUpByPlayer(PlayerController player)
+    public override void OnPlayerPickup(PlayerController player)
     {
-        base.OnPickedUpByPlayer(player);
+        base.OnPlayerPickup(player);
         player.OnRollStarted += this.OnDodgeRoll;
         this._maintainSpinup = false;
         ResetSpinup();
     }
 
-    protected override void OnPostDroppedByPlayer(PlayerController player)
+    public override void OnDroppedByPlayer(PlayerController player)
     {
-        base.OnPostDroppedByPlayer(player);
+        base.OnDroppedByPlayer(player);
         player.OnRollStarted -= this.OnDodgeRoll;
         this._maintainSpinup = false;
         ResetSpinup();
@@ -104,8 +104,8 @@ public class Natascha : CwaffGun
 
     public override void OnDestroy()
     {
-        if (this.Player)
-            this.Player.OnRollStarted -= this.OnDodgeRoll;
+        if (this.PlayerOwner)
+            this.PlayerOwner.OnRollStarted -= this.OnDodgeRoll;
         base.OnDestroy();
     }
 
@@ -131,7 +131,7 @@ public class Natascha : CwaffGun
     //TODO: this might be useful for other guns
     private int ComputeAnimationSpeed()
     {
-        float fireMultiplier = this.Player.stats.GetStatValue(PlayerStats.StatType.RateOfFire) * this.GetSpinupFireRate();
+        float fireMultiplier = this.PlayerOwner.stats.GetStatValue(PlayerStats.StatType.RateOfFire) * this.GetSpinupFireRate();
         float cooldownTime   = (this.gun.DefaultModule.cooldownTime + this.gun.gunCooldownModifier) / fireMultiplier;
         float fps            = ((float)_FIRE_ANIM_FRAMES / cooldownTime);
         return 1 + Mathf.CeilToInt(fps); // add 1 to FPS to make sure the animation doesn't skip a loop
@@ -139,7 +139,7 @@ public class Natascha : CwaffGun
 
     private void ResetSpinup(float speedMult = 1.0f)
     {
-        if (!this.Player)
+        if (!this.PlayerOwner)
             return;
 
         if (this._speedMult > 1.0f && speedMult == 1.0f)
@@ -153,13 +153,13 @@ public class Natascha : CwaffGun
         gun.AdjustAnimation(gun.shootAnimation, fps: ComputeAnimationSpeed());
 
         this.gun.RemoveStatFromGun(PlayerStats.StatType.MovementSpeed);
-        if (this.Player.PlayerHasActiveSynergy(Synergy.MASTERY_NATASCHA))
+        if (this.PlayerOwner.PlayerHasActiveSynergy(Synergy.MASTERY_NATASCHA))
             this.gun.AddStatToGun(PlayerStats.StatType.MovementSpeed, 1f, StatModifier.ModifyMethod.MULTIPLICATIVE);
         else
             this.gun.AddStatToGun(PlayerStats.StatType.MovementSpeed, 1f / (float)Math.Sqrt(this._speedMult), StatModifier.ModifyMethod.MULTIPLICATIVE);
         //HACK: if we rebuild our stats while firing, certain projectile modifiers like scattershot or backup gun make the gun fire once per frame, so work around that
         NataschaMovementSpeedPatch.skipRebuildingGunVolleys = true;
-        this.Player.stats.RecalculateStats(this.Player);
+        this.PlayerOwner.stats.RecalculateStats(this.PlayerOwner);
         NataschaMovementSpeedPatch.skipRebuildingGunVolleys = false;
     }
 

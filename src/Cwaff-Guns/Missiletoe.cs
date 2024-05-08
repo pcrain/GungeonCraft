@@ -191,10 +191,10 @@ public class Missiletoe : CwaffGun
         }
     }
 
-    protected override void OnPickup(GameActor owner)
+    public override void OnPlayerPickup(PlayerController player)
     {
         RecalculateClip();
-        base.OnPickup(owner);
+        base.OnPlayerPickup(player);
     }
 
     public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
@@ -206,9 +206,9 @@ public class Missiletoe : CwaffGun
         base.OnReloadPressed(player, gun, manualReload);
     }
 
-    public override void OnAmmoChangedSafe(PlayerController player, Gun gun)
+    public override void OnAmmoChanged(PlayerController player, Gun gun)
     {
-        base.OnAmmoChangedSafe(player, gun);
+        base.OnAmmoChanged(player, gun);
         RecalculateClip();  // fixings a bug where clip size resets to 1 when picking up ammo
     }
 
@@ -233,7 +233,7 @@ public class Missiletoe : CwaffGun
             if (_BannedQualities.Contains(pickup.quality))
                 continue;
 
-            float pickupDist = (debris.sprite.WorldCenter - this.Owner.sprite.WorldCenter).magnitude;
+            float pickupDist = (debris.sprite.WorldCenter - this.GenericOwner.sprite.WorldCenter).magnitude;
             if (pickupDist >= nearestDist)
                 continue;
 

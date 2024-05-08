@@ -41,9 +41,9 @@ public class HolyWaterGun : CwaffGun
         _ExorcismParticleVFX = VFX.Create("exorcism_particles", fps: 12, loops: false, anchor: Anchor.MiddleCenter, emissivePower: 2);
     }
 
-    protected override void OnPickup(GameActor owner)
+    public override void OnPlayerPickup(PlayerController player)
     {
-        base.OnPickup(owner);
+        base.OnPlayerPickup(player);
 
         foreach (AIActor enemy in StaticReferenceManager.AllEnemies)
             OnEnemySpawn(enemy);

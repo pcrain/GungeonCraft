@@ -74,9 +74,9 @@ public class OmnidirectionalLaser : CwaffGun
 
     private void CreateRenderersIfNecessary()
     {
-        if (!this.Player)
+        if (!this.PlayerOwner)
             return;
-        if (this.Player.CurrentInputState != PlayerInputState.AllInput)
+        if (this.PlayerOwner.CurrentInputState != PlayerInputState.AllInput)
             return; // don't create a renderer until we're in full control of our character
 
         if (!this._reticle)
@@ -117,7 +117,7 @@ public class OmnidirectionalLaser : CwaffGun
         base.OnDestroy();
     }
 
-    protected override void Update()
+    public override void Update()
     {
         base.Update();
         CreateRenderersIfNecessary();
@@ -128,7 +128,7 @@ public class OmnidirectionalLaser : CwaffGun
         if (!this._reticle || !this._backside)
             return; // nothing to do
 
-        if (!this.Player) // if we have no player, remove our render parent since it can be destroyed and cause ghost sprites when picked back up
+        if (!this.PlayerOwner) // if we have no player, remove our render parent since it can be destroyed and cause ghost sprites when picked back up
         {
             this._backside.transform.position = this.gun.transform.position;
             this._backside.transform.parent = null;
@@ -154,7 +154,7 @@ public class OmnidirectionalLaser : CwaffGun
             return;
         }
 
-        this._reticle.SetAlpha(this.Player ? 1.0f : 0.0f);
+        this._reticle.SetAlpha(this.PlayerOwner ? 1.0f : 0.0f);
         if (!this._backside.transform.parent)
         {
             this._backside.transform.parent = this.gun.transform;
@@ -166,7 +166,7 @@ public class OmnidirectionalLaser : CwaffGun
         this._backside.sprite.SetSprite(_BackSpriteIds[frame]);
         this.gun.barrelOffset.localPosition = _BarrelOffsets[frame];  //NOTE: update the barrel offset for each specific frame
 
-        if (!this.Player)
+        if (!this.PlayerOwner)
             return;
 
         // play the fire animation at all times while the gun is being held
@@ -180,12 +180,12 @@ public class OmnidirectionalLaser : CwaffGun
         //NOTE: using a 22.5 degree offset from straight down (270) so the middle of each animation frame corresponds to the visual angle,
         //      rather than the beginning of the animation frame corresponding to that angle
         this._laserAngle = (292.5f - (45f * this.gun.spriteAnimator.clipTime)).ToVector();
-        this._reticle.transform.position = this.Player.CenterPosition + 1.5f * this._laserAngle;
+        this._reticle.transform.position = this.PlayerOwner.CenterPosition + 1.5f * this._laserAngle;
     }
 
     public override void OnSwitchedAwayFromThisGun()
     {
-        if (!this.Player)
+        if (!this.PlayerOwner)
             return;
         if (this._backside && this._backside.renderer)
         {
@@ -195,7 +195,7 @@ public class OmnidirectionalLaser : CwaffGun
         if (this._reticle)
             this._reticle.SetAlpha(0.0f);
         // this._reticle.renderer.enabled = false;  //NOTE: doesn't work since it's parented
-        this.Player.forceAimPoint = null;
+        this.PlayerOwner.forceAimPoint = null;
         base.OnSwitchedAwayFromThisGun();
     }
 

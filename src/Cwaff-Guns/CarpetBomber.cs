@@ -83,10 +83,10 @@ public class CarpetBomber : CwaffGun
         };
     }
 
-    protected override void Update()
+    public override void Update()
     {
         base.Update();
-        if (this.Player) // Synchronize ammo clips between projectile modules as necessary
+        if (this.PlayerOwner) // Synchronize ammo clips between projectile modules as necessary
             this.gun.SynchronizeReloadAcrossAllModules();
     }
 }

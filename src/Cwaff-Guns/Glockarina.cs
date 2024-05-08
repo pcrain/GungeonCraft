@@ -96,7 +96,7 @@ public class Glockarina : CwaffGun
 
     private void UpdateMode()
     {
-        if (this.Owner is not PlayerController pc)
+        if (this.GenericOwner is not PlayerController pc)
             return;
         if (this._mode == Mode.STORM && !pc.healthHaver.damageTypeModifiers.Contains(this._electricImmunity))
             pc.healthHaver.damageTypeModifiers.Add(this._electricImmunity);
@@ -104,20 +104,20 @@ public class Glockarina : CwaffGun
             pc.healthHaver.damageTypeModifiers.Remove(this._electricImmunity);
     }
 
-    protected override void OnPickedUpByPlayer(PlayerController player)
+    public override void OnPlayerPickup(PlayerController player)
     {
-        if (!everPickedUpByPlayer)
+        if (!this.EverPickedUp)
             this._electricImmunity = new DamageTypeModifier {
                 damageType = CoreDamageTypes.Electric,
                 damageMultiplier = 0f,
             };
-        base.OnPickedUpByPlayer(player);
+        base.OnPlayerPickup(player);
         UpdateMode();
     }
 
-    protected override void OnPostDroppedByPlayer(PlayerController player)
+    public override void OnDroppedByPlayer(PlayerController player)
     {
-        base.OnPostDroppedByPlayer(player);
+        base.OnDroppedByPlayer(player);
 
         if (player.healthHaver.damageTypeModifiers.Contains(this._electricImmunity))
             player.healthHaver.damageTypeModifiers.Remove(this._electricImmunity);
@@ -125,10 +125,10 @@ public class Glockarina : CwaffGun
 
     public override void OnDestroy()
     {
-        if (this.Player && this.Player.healthHaver)
+        if (this.PlayerOwner && this.PlayerOwner.healthHaver)
         {
-            if (this.Player.healthHaver.damageTypeModifiers.Contains(this._electricImmunity))
-                this.Player.healthHaver.damageTypeModifiers.Remove(this._electricImmunity);
+            if (this.PlayerOwner.healthHaver.damageTypeModifiers.Contains(this._electricImmunity))
+                this.PlayerOwner.healthHaver.damageTypeModifiers.Remove(this._electricImmunity);
         }
         base.OnDestroy();
     }
@@ -136,7 +136,7 @@ public class Glockarina : CwaffGun
     // Returns true if we handled a special song, false if we pass it along
     private bool HandleSpecialSong(Mode song)
     {
-        if (this.Owner is not PlayerController player)
+        if (this.GenericOwner is not PlayerController player)
             return false;
 
         switch (song)
@@ -270,7 +270,7 @@ public class Glockarina : CwaffGun
 
         for (int i = 0; i < 6; ++i)
         {
-            FancyVFX fv2 = FancyVFX.Spawn(prefab: _NoteVFXPrefab, position: this.Owner.sprite.WorldTopCenter,
+            FancyVFX fv2 = FancyVFX.Spawn(prefab: _NoteVFXPrefab, position: this.GenericOwner.sprite.WorldTopCenter,
                 velocity: UnityEngine.Random.Range(45f + 15f * i, 45f + 15f * (i + 1)).ToVector(4f), lifetime: 0.65f, fadeOutTime: 0.4f);
             fv2.sprite.SetSprite(fv2.GetComponent<tk2dSpriteAnimator>().currentClip.frames[UnityEngine.Random.Range(0,5)].spriteId);
         }
@@ -308,7 +308,7 @@ public class Glockarina : CwaffGun
     }
 
     private static float _LastReloadNoteSpriteTime = 0.0f;
-    protected override void Update()
+    public override void Update()
     {
         base.Update();
         if (BraveTime.DeltaTime == 0.0f)
@@ -321,7 +321,7 @@ public class Glockarina : CwaffGun
         if (frame < 4 || frame > 12)
             return; // don't play notes from the ocarina unless it's near our character's face
         _LastReloadNoteSpriteTime = BraveTime.ScaledTimeSinceStartup;
-        FancyVFX fv = FancyVFX.Spawn(_NoteVFXPrefab, position: this.Owner.sprite.WorldTopCenter,
+        FancyVFX fv = FancyVFX.Spawn(_NoteVFXPrefab, position: this.GenericOwner.sprite.WorldTopCenter,
             velocity: UnityEngine.Random.Range(45f,135f).ToVector(4f), lifetime: 0.65f, fadeOutTime: 0.4f);
         fv.sprite.SetSprite(fv.GetComponent<tk2dSpriteAnimator>().currentClip.frames[UnityEngine.Random.Range(0,5)].spriteId);
     }

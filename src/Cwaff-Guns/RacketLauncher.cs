@@ -25,16 +25,16 @@ public class RacketLauncher : CwaffGun
           )).Attach<TennisBall>(); // DestroyMode must be set at creation time
     }
 
-    protected override void OnPickedUpByPlayer(PlayerController player)
+    public override void OnPlayerPickup(PlayerController player)
     {
-        base.OnPickedUpByPlayer(player);
+        base.OnPlayerPickup(player);
         gun.SetAnimationFPS(gun.idleAnimation, _IDLE_FPS); // don't need to use SetIdleAnimationFPS() outside of Initializer
         gun.spriteAnimator.Play();
     }
 
-    protected override void OnPostDroppedByPlayer(PlayerController player)
+    public override void OnDroppedByPlayer(PlayerController player)
     {
-        base.OnPostDroppedByPlayer(player);
+        base.OnDroppedByPlayer(player);
         gun.SetAnimationFPS(gun.idleAnimation, 0); // don't need to use SetIdleAnimationFPS() outside of Initializer
         gun.spriteAnimator.StopAndResetFrameToDefault();
     }
@@ -65,8 +65,9 @@ public class RacketLauncher : CwaffGun
         return Lazy.NoProjectile();
     }
 
-    public override void OnAmmoChangedSafe(PlayerController player, Gun gun)
+    public override void OnAmmoChanged(PlayerController player, Gun gun)
     {
+        base.OnAmmoChanged(player, gun);
         gun.ClipShotsRemaining = gun.CurrentAmmo;
     }
 

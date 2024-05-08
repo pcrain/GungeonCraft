@@ -41,29 +41,30 @@ public class PlatinumStar : CwaffGun
     //     // m3.SetFloat("_PixelWidth", 5.0f);
     // }
 
-    public override void OnReload(PlayerController player, Gun gun)
+    public override void OnReloadPressed(PlayerController player, Gun gun, bool manual)
     {
-        base.OnReload(player, gun);
-        gun.muzzleFlashEffects.DestroyAll(); // since we're preventing gun rotation on reload, the muzzle vfx look weird, so just disable them
-        LaunchAllBullets(this.Player);
+        base.OnReloadPressed(player, gun, manual);
+        LaunchAllBullets(this.PlayerOwner);
+        if (gun.IsReloading)
+            gun.muzzleFlashEffects.DestroyAll(); // since we're preventing gun rotation on reload, the muzzle vfx look weird, so just disable them
     }
 
     public override void OnSwitchedToThisGun()
     {
         base.OnSwitchedToThisGun();
-        LaunchAllBullets(this.Player);
+        LaunchAllBullets(this.PlayerOwner);
     }
 
     public override void OnDropped()
     {
         base.OnDropped();
-        LaunchAllBullets(this.Player);
+        LaunchAllBullets(this.PlayerOwner);
     }
 
     public override void OnSwitchedAwayFromThisGun()
     {
         base.OnSwitchedAwayFromThisGun();
-        LaunchAllBullets(this.Player);
+        LaunchAllBullets(this.PlayerOwner);
     }
 
     private void LaunchAllBullets(PlayerController pc)
@@ -72,7 +73,7 @@ public class PlatinumStar : CwaffGun
             if (enemy && enemy.GetComponent<OraOra>() is OraOra oraora) oraora.OraOraOra(pc);
     }
 
-    protected override void Update()
+    public override void Update()
     {
         base.Update();
         this.gun.preventRotation = (this.gun.spriteAnimator.currentClip.name == this.gun.reloadAnimation);

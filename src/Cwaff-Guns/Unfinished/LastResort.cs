@@ -53,16 +53,16 @@ public class LastResort : CwaffGun
         lastResortBaseProjectile = projectile;
     }
 
-    public override bool CollectedAmmoPickup(PlayerController player, Gun self, AmmoPickup pickup)
-    {
-        pickup.ForcePickupWithoutGainingAmmo(player);
-        return false;
-    }
+    // public override bool CollectedAmmoPickup(PlayerController player, Gun self, AmmoPickup pickup)
+    // {
+    //     pickup.ForcePickupWithoutGainingAmmo(player);
+    //     return false;
+    // }
 
-    protected override void Update()
+    public override void Update()
     {
         base.Update();
-        if (!this.Player)
+        if (!this.PlayerOwner)
             return;
         // TODO: hack to detect reset gun stat changes, find a better way later
         if (this.gun.DefaultModule.projectiles[0].baseData.damage == 0f)
@@ -78,8 +78,8 @@ public class LastResort : CwaffGun
         // overrideMidairDeathVFX will make implicit use of CreatePoolFromVFXGameObject
         VFXPool v = VFX.CreatePoolFromVFXGameObject((ItemHelper.Get(Items.MagicLamp) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
 
-        Vector2 ppos = this.Player.sprite.WorldCenter;
-        float pangle = this.Player.CurrentGun.gunAngle;
+        Vector2 ppos = this.PlayerOwner.sprite.WorldCenter;
+        float pangle = this.PlayerOwner.CurrentGun.gunAngle;
         int numInCircle = 7;
         for (int i = 0; i < numInCircle; ++i)
         {
@@ -88,18 +88,18 @@ public class LastResort : CwaffGun
         }
     }
 
-    protected override void OnPickedUpByPlayer(PlayerController player)
+    public override void OnPlayerPickup(PlayerController player)
     {
-        base.OnPickedUpByPlayer(player);
+        base.OnPlayerPickup(player);
         ComputeLastResortStats();
     }
 
     private void ComputeLastResortStats()
     {
-        if (!this.Player)
+        if (!this.PlayerOwner)
             return;
         int ammoless = 0;
-        foreach (Gun gun in this.Player.inventory.AllGuns)
+        foreach (Gun gun in this.PlayerOwner.inventory.AllGuns)
         {
             if (!(gun == this.gun || gun.InfiniteAmmo || gun.ammo > 0))
                 ++ammoless;
@@ -109,12 +109,12 @@ public class LastResort : CwaffGun
         this.gun.reloadTime                        = 2.0f / (float)Math.Pow(1.5,ammoless);
         this.gun.DefaultModule.cooldownTime        = 0.4f / (float)Math.Pow(1.5,ammoless);
         this.gun.DefaultModule.numberOfShotsInClip = 4 * (1+ammoless);
-        this.overrideNormalFireAudio = "Play_WPN_blasphemy_shot_01";
+        // this.overrideNormalFireAudio = "Play_WPN_blasphemy_shot_01";
         if (ammoless > 0)
         {
             this.gameObject.Play("Play_OBJ_silenceblank_small_01");
-            this.Player.ShowOverheadVFX(lastResortLevelSprites[ammoless-1], 1);
+            this.PlayerOwner.ShowOverheadVFX(lastResortLevelSprites[ammoless-1], 1);
         }
-        this.Player.ShowOverheadAnimatedVFX(_PumpChargeAnimationName, 2);
+        this.PlayerOwner.ShowOverheadAnimatedVFX(_PumpChargeAnimationName, 2);
     }
 }

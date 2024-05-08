@@ -123,9 +123,9 @@ public class Jugglernaut : CwaffGun
         }
     }
 
-    protected override void OnPickedUpByPlayer(PlayerController player)
+    public override void OnPlayerPickup(PlayerController player)
     {
-        base.OnPickedUpByPlayer(player);
+        base.OnPlayerPickup(player);
 
         player.healthHaver.OnDamaged += DroppingTheBall;
 
@@ -135,9 +135,9 @@ public class Jugglernaut : CwaffGun
         gun.sprite.gameObject.SetGlowiness(0f);
     }
 
-    protected override void OnPostDroppedByPlayer(PlayerController player)
+    public override void OnDroppedByPlayer(PlayerController player)
     {
-        base.OnPostDroppedByPlayer(player);
+        base.OnDroppedByPlayer(player);
 
         player.healthHaver.OnDamaged -= DroppingTheBall;
 
@@ -148,8 +148,8 @@ public class Jugglernaut : CwaffGun
 
     public override void OnDestroy()
     {
-        if (this.Player && this.Player.healthHaver)
-            this.Player.healthHaver.OnDamaged -= DroppingTheBall;
+        if (this.PlayerOwner && this.PlayerOwner.healthHaver)
+            this.PlayerOwner.healthHaver.OnDamaged -= DroppingTheBall;
         base.OnDestroy();
     }
 
@@ -158,7 +158,7 @@ public class Jugglernaut : CwaffGun
         if (this._juggledEnemies.Count() == 0)
             return;
 
-        this.Player.gameObject.Play("juggle_drop_sound");
+        this.PlayerOwner.gameObject.Play("juggle_drop_sound");
         ResetJuggle();
     }
 

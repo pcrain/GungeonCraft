@@ -31,22 +31,22 @@ public class ChekhovsGun : CwaffGun
         _ChekhovGunFireVFX = VFX.Create("chekhovs_gun_fire_vfx", 12, loops: false, anchor: Anchor.UpperRight);
     }
 
-    protected override void OnPickedUpByPlayer(PlayerController player)
+    public override void OnPlayerPickup(PlayerController player)
     {
-        base.OnPickedUpByPlayer(player);
+        base.OnPlayerPickup(player);
         player.OnRoomClearEvent += this.OnRoomClear;
     }
 
-    protected override void OnPostDroppedByPlayer(PlayerController player)
+    public override void OnDroppedByPlayer(PlayerController player)
     {
         player.OnRoomClearEvent -= this.OnRoomClear;
-        base.OnPostDroppedByPlayer(player);
+        base.OnDroppedByPlayer(player);
     }
 
     public override void OnDestroy()
     {
-        if (this.Player)
-            this.Player.OnRoomClearEvent -= this.OnRoomClear;
+        if (this.PlayerOwner)
+            this.PlayerOwner.OnRoomClearEvent -= this.OnRoomClear;
         base.OnDestroy();
     }
 

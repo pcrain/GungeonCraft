@@ -40,10 +40,10 @@ public class Vladimir : CwaffGun
         _AbsorbVFX = VFX.Create("vladimir_impale_projectile_vfx", fps: 2, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 1f);
     }
 
-    protected override void Update()
+    public override void Update()
     {
         base.Update();
-        if (this.Owner is not PlayerController pc)
+        if (this.GenericOwner is not PlayerController pc)
             return;
 
         UpdateOffsets();
@@ -153,7 +153,7 @@ public class Vladimir : CwaffGun
 
     public void Impale(AIActor enemy)
     {
-        if (this.Owner is not PlayerController pc)
+        if (this.GenericOwner is not PlayerController pc)
             return;
         if (!(enemy?.IsHostileAndNotABoss() ?? false) || (enemy.behaviorSpeculator?.ImmuneToStun ?? true))
             return;
@@ -171,7 +171,7 @@ public class Vladimir : CwaffGun
         this._skeweredEnemies.Remove(enemy);
         enemy.GetComponent<ImpaledOnGunBehaviour>().SafeDestroy();
         enemy.behaviorSpeculator?.ResetStun(duration: 1f, createVFX: true);
-        enemy.specRigidbody?.MoveTowardsTargetOrWall(start: this.Owner.CenterPosition, target: this.gun.barrelOffset.position.XY());
+        enemy.specRigidbody?.MoveTowardsTargetOrWall(start: this.GenericOwner.CenterPosition, target: this.gun.barrelOffset.position.XY());
         enemy.knockbackDoer?.ApplyKnockback(direction: launchDir, force: _LAUNCH_FORCE);
     }
 

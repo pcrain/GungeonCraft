@@ -44,7 +44,7 @@ public class Gunbrella : CwaffGun
             fps: 12, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 10, emissiveColour: Color.cyan, scale: 0.75f);
     }
 
-    protected override void Update()
+    public override void Update()
     {
         base.Update();
         if (BraveTime.DeltaTime == 0.0f)
@@ -84,7 +84,7 @@ public class Gunbrella : CwaffGun
 
     private void UpdateCharge()
     {
-        if (this.Owner is not PlayerController player)
+        if (this.GenericOwner is not PlayerController player)
             return;
 
         if (this._curChargeTime == 0.0f)
@@ -151,7 +151,7 @@ public class Gunbrella : CwaffGun
     public override void PostProcessProjectile(Projectile projectile)
     {
         base.PostProcessProjectile(projectile);
-        if (this.Owner is not PlayerController player)
+        if (this.GenericOwner is not PlayerController player)
             return;
 
         projectile.GetComponent<GunbrellaProjectile>().Setup();

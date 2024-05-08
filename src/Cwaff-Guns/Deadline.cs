@@ -88,16 +88,16 @@ public class Deadline : CwaffGun
         base.OnSwitchedAwayFromThisGun();
     }
 
-    protected override void OnPickedUpByPlayer(PlayerController player)
+    public override void OnPlayerPickup(PlayerController player)
     {
-        base.OnPickedUpByPlayer(player);
+        base.OnPlayerPickup(player);
         EnableLaserSight();
     }
 
-    protected override void OnPostDroppedByPlayer(PlayerController player)
+    public override void OnDroppedByPlayer(PlayerController player)
     {
         DisableLaserSights();
-        base.OnPostDroppedByPlayer(player);
+        base.OnDroppedByPlayer(player);
     }
 
     public override void OnDestroy()
@@ -176,10 +176,10 @@ public class Deadline : CwaffGun
     // Using LateUpdate() here instead of Update() so laser sight is updated correctly without jittering
     private void LateUpdate()
     {
-        if (!this.Player)
+        if (!this.PlayerOwner)
             return;
 
-        if (this.Player.m_hideGunRenderers.Value)
+        if (this.PlayerOwner.m_hideGunRenderers.Value)
         {
             if (this._debugLaserSight)
                 this._debugLaserSight.GetComponent<tk2dTiledSprite>().renderer.enabled = false;

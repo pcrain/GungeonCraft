@@ -77,7 +77,7 @@ public class AlienNailgun : CwaffGun
 
     private void SwitchEnemyToSpawn(string guid, bool isNew = false)
     {
-        if (this.Player is not PlayerController pc)
+        if (this.PlayerOwner is not PlayerController pc)
             return;
         this._targetGuid = guid;
 
@@ -99,14 +99,14 @@ public class AlienNailgun : CwaffGun
             this._preview.Play("replicant_select_sound");
     }
 
-    protected override void Update()
+    public override void Update()
     {
         base.Update();
-        if (!this.Player)
+        if (!this.PlayerOwner)
             return;
         if (BraveTime.DeltaTime == 0.0f)
             return;
-        if (!this.gun.IsCharging || !this.Player.IsInCombat)
+        if (!this.gun.IsCharging || !this.PlayerOwner.IsInCombat)
         {
             StopReconstruction();
             this.gun.SynchronizeReloadAcrossAllModules();
@@ -124,7 +124,7 @@ public class AlienNailgun : CwaffGun
     private IEnumerator ReconstructFromDNA(string guid)
     {
         // delay before reconstruction begins
-        Vector2 position = this.Player.CenterPosition;
+        Vector2 position = this.PlayerOwner.CenterPosition;
         for (float elapsed = 0f; elapsed < _RECONSTRUCT_DELAY; elapsed += BraveTime.DeltaTime)
             yield return null;
 
@@ -134,8 +134,8 @@ public class AlienNailgun : CwaffGun
         {
             while (timer > _FRAGMENT_GAP)
             {
-                Vector2 startPos = (this.Player && this.Player.CurrentGun)
-                    ? this.Player.CurrentGun.barrelOffset.position
+                Vector2 startPos = (this.PlayerOwner && this.PlayerOwner.CurrentGun)
+                    ? this.PlayerOwner.CurrentGun.barrelOffset.position
                     : position + Lazy.RandomVector(4f);
                 GameObject fragment = CreateEnemyFragment(guid, i, position, startPos, _FRAGMENT_SPAWN_TIME);
                 this._fragments.Add(fragment);
@@ -147,8 +147,8 @@ public class AlienNailgun : CwaffGun
             yield return null;
         }
         yield return new WaitForSeconds(_FRAGMENT_SPAWN_TIME);
-        if (this.Player)
-            this.Player.gameObject.Play("replicant_created_sound");
+        if (this.PlayerOwner)
+            this.PlayerOwner.gameObject.Play("replicant_created_sound");
 
         // finish reconstruction process
         AIActor replicant = AIActor.Spawn(
@@ -214,20 +214,20 @@ public class AlienNailgun : CwaffGun
         }
     }
 
-    protected override void OnPickedUpByPlayer(PlayerController player)
+    public override void OnPlayerPickup(PlayerController player)
     {
-        if (!this.everPickedUpByPlayer)
+        if (!this.EverPickedUp)
             StaticReferenceManager.ProjectileAdded += CheckFromReplicantOwner;
-        base.OnPickedUpByPlayer(player);
+        base.OnPlayerPickup(player);
         player.OnRoomClearEvent += DestroyReplicants;
     }
 
-    protected override void OnPostDroppedByPlayer(PlayerController player)
+    public override void OnDroppedByPlayer(PlayerController player)
     {
         player.OnRoomClearEvent -= DestroyReplicants;
         StopReconstruction();
         DestroyReplicants(player);
-        base.OnPostDroppedByPlayer(player);
+        base.OnDroppedByPlayer(player);
     }
 
     public override void OnSwitchedAwayFromThisGun()

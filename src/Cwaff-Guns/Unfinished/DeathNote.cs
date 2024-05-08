@@ -25,9 +25,9 @@ public class DeathNote : CwaffGun
         Projectile projectile = gun.InitFirstProjectile(GunData.New());
     }
 
-    protected override void OnPostDroppedByPlayer(PlayerController player)
+    public override void OnDroppedByPlayer(PlayerController player)
     {
-        base.OnPostDroppedByPlayer(player);
+        base.OnDroppedByPlayer(player);
         WhoAreTheyAgain();
     }
 
@@ -37,7 +37,7 @@ public class DeathNote : CwaffGun
         base.OnSwitchedAwayFromThisGun();
     }
 
-    protected override void Update()
+    public override void Update()
     {
         base.Update();
         YouShallKnowTheirNames();
@@ -66,7 +66,7 @@ public class DeathNote : CwaffGun
     {
         UpdateNametags(true);
 
-        List<AIActor> activeEnemies = this.Owner.GetAbsoluteParentRoom().GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
+        List<AIActor> activeEnemies = this.GenericOwner.GetAbsoluteParentRoom().GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
         if (activeEnemies == null)
             return;
 

@@ -66,17 +66,17 @@ public class Uppskeruvel : CwaffGun
         _UppskeruvelId = gun.PickupObjectId;
     }
 
-    protected override void OnPickup(GameActor owner)
+    public override void OnPlayerPickup(PlayerController player)
     {
         GameManager.Instance.OnNewLevelFullyLoaded += this.OnNewFloor;
         StartCoroutine(SpawnSoulsOnceWeCanMove());
-        base.OnPickup(owner);
+        base.OnPlayerPickup(player);
     }
 
-    protected override void OnPostDroppedByPlayer(PlayerController player)
+    public override void OnDroppedByPlayer(PlayerController player)
     {
         GameManager.Instance.OnNewLevelFullyLoaded -= this.OnNewFloor;
-        base.OnPostDroppedByPlayer(player);
+        base.OnDroppedByPlayer(player);
         StopAllCoroutines();
         this._spawningSouls = false;
         DestroyExtantCombatSouls();
@@ -117,13 +117,13 @@ public class Uppskeruvel : CwaffGun
         if (this._spawningSouls)
             yield break;
         this._spawningSouls = true;
-        while (this.Player)
+        while (this.PlayerOwner)
         {
-            if (this.Player.AcceptingNonMotionInput)
+            if (this.PlayerOwner.AcceptingNonMotionInput)
                 break;
             yield return null;
         }
-        if (!this.Player)
+        if (!this.PlayerOwner)
             yield break;
 
         RecalculateLevel();
@@ -193,9 +193,9 @@ public class Uppskeruvel : CwaffGun
 
     private UppskeruvelCombatSoul SpawnCombatSoul()
     {
-        UppskeruvelCombatSoul soul = Uppskeruvel._CombatSoulPrefab.Instantiate(this.Player.CenterPosition).GetComponent<UppskeruvelCombatSoul>();
+        UppskeruvelCombatSoul soul = Uppskeruvel._CombatSoulPrefab.Instantiate(this.PlayerOwner.CenterPosition).GetComponent<UppskeruvelCombatSoul>();
         this._extantSouls.Add(soul);
-        soul.Setup(this.Player, this);
+        soul.Setup(this.PlayerOwner, this);
         return soul;
     }
 

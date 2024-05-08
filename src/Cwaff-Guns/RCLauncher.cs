@@ -59,7 +59,7 @@ public class RCLauncher : CwaffGun
         };
     }
 
-    protected override void Update()
+    public override void Update()
     {
         base.Update();
         this.gun.reloadTime = _FULL_RELOAD_TIME * (1f - (float)this.gun.ClipShotsRemaining / (float)this.gun.ClipCapacity);

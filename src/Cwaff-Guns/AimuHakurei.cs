@@ -89,25 +89,25 @@ public class AimuHakurei : CwaffGun
         SetFocus(false);
     }
 
-    protected override void OnPickedUpByPlayer(PlayerController player)
+    public override void OnPlayerPickup(PlayerController player)
     {
-        base.OnPickedUpByPlayer(player);
+        base.OnPlayerPickup(player);
         this.graze                   = 0; // reset graze when dropped
         this.gun.CurrentStrengthTier = 0;
         SetFocus(false);
         player.OnRollStarted += this.OnDodgeRoll;
     }
 
-    protected override void OnPostDroppedByPlayer(PlayerController player)
+    public override void OnDroppedByPlayer(PlayerController player)
     {
-        base.OnPostDroppedByPlayer(player);
+        base.OnDroppedByPlayer(player);
         player.OnRollStarted -= this.OnDodgeRoll;
     }
 
     public override void OnDestroy()
     {
-        if (this.Player)
-            this.Player.OnRollStarted -= this.OnDodgeRoll;
+        if (this.PlayerOwner)
+            this.PlayerOwner.OnRollStarted -= this.OnDodgeRoll;
         if (this._decayCoroutine != null)
         {
             StopCoroutine(this._decayCoroutine);
@@ -136,7 +136,7 @@ public class AimuHakurei : CwaffGun
     {
         base.OnSwitchedAwayFromThisGun();
         if (this._decayCoroutine == null)
-            this._decayCoroutine = this.Owner.StartCoroutine(DecayWhileInactive());
+            this._decayCoroutine = this.GenericOwner.StartCoroutine(DecayWhileInactive());
         SetFocus(false);
     }
 
@@ -155,12 +155,12 @@ public class AimuHakurei : CwaffGun
         this.gun.CanBeDropped = !focus;
         BraveTime.SetTimeScaleMultiplier(focus ? 0.65f : 1.0f, base.gameObject);
         if (this._focused)
-            this.Owner.gameObject.Play("aimu_focus_sound");
+            this.GenericOwner.gameObject.Play("aimu_focus_sound");
 
         this.gun.RemoveStatFromGun(PlayerStats.StatType.MovementSpeed);
         // NOTE: since time is slowed down, the player's effective speed is 0.65 * 0.65. This is intentional
         this.gun.AddStatToGun(PlayerStats.StatType.MovementSpeed, focus ? 0.65f : 1.0f, StatModifier.ModifyMethod.MULTIPLICATIVE);
-        this.Player.stats.RecalculateStats(this.Player);
+        this.PlayerOwner.stats.RecalculateStats(this.PlayerOwner);
     }
 
     private IEnumerator DecayWhileInactive()
@@ -205,10 +205,10 @@ public class AimuHakurei : CwaffGun
             trail.EndColor   = trailColor ?? Color.Lerp(Color.magenta, Color.red, 0.5f);
     }
 
-    protected override void Update()
+    public override void Update()
     {
         base.Update();
-        if (this.Owner is PlayerController pc && pc.CurrentInputState != PlayerInputState.AllInput)
+        if (this.GenericOwner is PlayerController pc && pc.CurrentInputState != PlayerInputState.AllInput)
             SetFocus(false);
         UpdateGraze();
     }
@@ -218,7 +218,7 @@ public class AimuHakurei : CwaffGun
         while (this.gun.CurrentStrengthTier < _GRAZE_TIER_THRESHOLDS.Count() && this.graze >= _GRAZE_TIER_THRESHOLDS[this.gun.CurrentStrengthTier])
         {
             ++this.gun.CurrentStrengthTier;
-            this.Owner.gameObject.Play("aimu_power_up_sound");
+            this.GenericOwner.gameObject.Play("aimu_power_up_sound");
             this.gun.gameObject.SetGlowiness(this.gun.CurrentStrengthTier * this.gun.CurrentStrengthTier);
         }
     }
@@ -236,7 +236,7 @@ public class AimuHakurei : CwaffGun
     private static Dictionary<Projectile, float> _GrazeTimeDict = new();
     private void UpdateGraze()
     {
-        if (!this || this.Owner is not PlayerController pc)
+        if (!this || this.GenericOwner is not PlayerController pc)
             return; // if our owner isn't a player, we have nothing to do
 
         if (this.graze > 0 && (this._lastDecayTime + _GRAZE_DECAY_RATE <= BraveTime.ScaledTimeSinceStartup))

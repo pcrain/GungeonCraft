@@ -62,14 +62,14 @@ public class Commitment : CwaffGun
         }
     }
 
-    protected override void Update()
+    public override void Update()
     {
         base.Update();
-        if (!this.Player)
+        if (!this.PlayerOwner)
             return;
         bool forceOn             = this.committed && (this.gun.CurrentAmmo > 0);
-        this.Player.m_preventItemSwitching = forceOn;
-        this.Player.forceFireDown          = forceOn;
+        this.PlayerOwner.m_preventItemSwitching = forceOn;
+        this.PlayerOwner.forceFireDown          = forceOn;
 
         // p.forceFire = true;
         // p.m_handleDodgeRollStartThisFrame = false;
@@ -83,23 +83,23 @@ public class Commitment : CwaffGun
         // }
     }
 
-    protected override void OnPostDroppedByPlayer(PlayerController player)
+    public override void OnDroppedByPlayer(PlayerController player)
     {
         if (this.committed)
         {
             this.committed = false;
             player.forceFireDown = false;
         }
-        base.OnPostDroppedByPlayer(player);
+        base.OnDroppedByPlayer(player);
         ETGModConsole.Log("Dropped gun");
     }
 
     public override void OnSwitchedAwayFromThisGun()
     {
-        if (this.committed && this.Player)
+        if (this.committed && this.PlayerOwner)
         {
-            while (this.Player.inventory.CurrentGun.PickupObjectId != this.gun.PickupObjectId)
-                this.Player.inventory.ChangeGun(1, false, false);
+            while (this.PlayerOwner.inventory.CurrentGun.PickupObjectId != this.gun.PickupObjectId)
+                this.PlayerOwner.inventory.ChangeGun(1, false, false);
             ETGModConsole.Log("Forcing gun back to Commitment");
         }
         base.OnSwitchedAwayFromThisGun();

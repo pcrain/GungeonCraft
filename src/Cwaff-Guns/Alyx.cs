@@ -32,20 +32,13 @@ public class Alyx : CwaffGun
           poison: 1.0f, fire: 1.0f, sprite: "alyx_projectile", fps: 16, scale: 0.5625f, anchor: Anchor.MiddleCenter, spawnSound: "alyx_shoot_sound", uniqueSounds: true));
     }
 
-    public override void Start()
+    private void Start()
     {
-        base.Start();
         gun.sprite.gameObject.SetGlowiness(50f);
         RecalculateAmmo();
     }
 
-    protected override void NonCurrentGunUpdate()
-    {
-        base.NonCurrentGunUpdate();
-        RecalculateAmmo();
-    }
-
-    protected override void Update()
+    public override void Update()
     {
         base.Update();
         Material m = gun.sprite.renderer.material;
@@ -53,15 +46,15 @@ public class Alyx : CwaffGun
         RecalculateAmmo();
     }
 
-    protected override void OnPickup(GameActor owner)
+    public override void OnPlayerPickup(PlayerController player)
     {
-        if (!this.everPickedUpByPlayer)
+        if (!this.EverPickedUp)
         {
             this.gun.SetBaseMaxAmmo(_BASE_MAX_AMMO);
             this.gun.CurrentAmmo = _BASE_MAX_AMMO;
             this.timeAtLastRecalc = BraveTime.ScaledTimeSinceStartup;
         }
-        base.OnPickup(owner);
+        base.OnPlayerPickup(player);
         RecalculateAmmo();
         if (this._decayCoroutine != null)
         {
@@ -85,7 +78,7 @@ public class Alyx : CwaffGun
     {
         base.OnSwitchedAwayFromThisGun();
         if (this._decayCoroutine == null)
-            this._decayCoroutine = this.Owner.StartCoroutine(DecayWhileInactive());
+            this._decayCoroutine = this.GenericOwner.StartCoroutine(DecayWhileInactive());
     }
 
     public override void OnDestroy()
@@ -123,7 +116,7 @@ public class Alyx : CwaffGun
         int newAmmo = ComputeExponentialDecay((float)this.gun.CurrentAmmo, _AMMO_DECAY_LAMBDA, timeSinceLastRecalc);
         int newMaxAmmo = ComputeExponentialDecay((float)this.gun.GetBaseMaxAmmo(), _GUN_DECAY_LAMBDA, timeSinceLastRecalc);
 
-        PlayerController player = this.Owner as PlayerController;
+        PlayerController player = this.GenericOwner as PlayerController;
         // If we've decayed at all, create poison goop under our feet
         if (newAmmo < this.gun.CurrentAmmo || newMaxAmmo < this.gun.GetBaseMaxAmmo())
         {

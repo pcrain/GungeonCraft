@@ -36,7 +36,7 @@ public class VacuumCleaner : CwaffGun
     {
         if (UnityEngine.Random.value > _AMMO_CHANCE)
             return; // Make sure we restore any ammo at all
-        if (this.Owner is not PlayerController player)
+        if (this.GenericOwner is not PlayerController player)
             return; // Make sure our owner is a player
 
         // Look for guns missing any ammo whatsoever
@@ -60,7 +60,7 @@ public class VacuumCleaner : CwaffGun
         this.gun.gameObject.Play("vacuum_process_ammo_sound");
     }
 
-    protected override void Update()
+    public override void Update()
     {
         base.Update();
         if (BraveTime.DeltaTime == 0.0f)

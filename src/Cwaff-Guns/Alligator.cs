@@ -33,22 +33,22 @@ public class Alligator : CwaffGun
         _ClipVFX             = VFX.Create("alligator_clamped_vfx", fps: 2, loops: true, anchor: Anchor.MiddleCenter);
     }
 
-    protected override void OnPickedUpByPlayer(PlayerController player)
+    public override void OnPlayerPickup(PlayerController player)
     {
-        if (!everPickedUpByPlayer)
+        if (!this.EverPickedUp)
             this._electricImmunity = new DamageTypeModifier {
                 damageType = CoreDamageTypes.Electric,
                 damageMultiplier = 0f,
             };
-        base.OnPickedUpByPlayer(player);
+        base.OnPlayerPickup(player);
 
         if (!player.healthHaver.damageTypeModifiers.Contains(this._electricImmunity))
             player.healthHaver.damageTypeModifiers.Add(this._electricImmunity);
     }
 
-    protected override void OnPostDroppedByPlayer(PlayerController player)
+    public override void OnDroppedByPlayer(PlayerController player)
     {
-        base.OnPostDroppedByPlayer(player);
+        base.OnDroppedByPlayer(player);
 
         if (player.healthHaver.damageTypeModifiers.Contains(this._electricImmunity))
             player.healthHaver.damageTypeModifiers.Remove(this._electricImmunity);
@@ -56,15 +56,15 @@ public class Alligator : CwaffGun
 
     public override void OnDestroy()
     {
-        if (this.Player && this.Player.healthHaver)
+        if (this.PlayerOwner && this.PlayerOwner.healthHaver)
         {
-            if (this.Player.healthHaver.damageTypeModifiers.Contains(this._electricImmunity))
-                this.Player.healthHaver.damageTypeModifiers.Remove(this._electricImmunity);
+            if (this.PlayerOwner.healthHaver.damageTypeModifiers.Contains(this._electricImmunity))
+                this.PlayerOwner.healthHaver.damageTypeModifiers.Remove(this._electricImmunity);
         }
         base.OnDestroy();
     }
 
-    protected override void Update()
+    public override void Update()
     {
         base.Update();
 

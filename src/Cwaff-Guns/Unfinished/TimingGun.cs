@@ -66,10 +66,10 @@ public class TimingGun : CwaffGun
         return timingProjectiles[this.curCharge];
     }
 
-    protected override void Update()
+    public override void Update()
     {
         base.Update();
-        if (!this.Player)
+        if (!this.PlayerOwner)
             return;
 
         if (++this.curSpin != spinSpeed)

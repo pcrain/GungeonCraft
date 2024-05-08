@@ -121,12 +121,12 @@ public class KingsLaw : CwaffGun
         return this._curBatch;
     }
 
-    protected override void Update()
+    public override void Update()
     {
         base.Update();
         if (BraveTime.DeltaTime == 0.0f)
             return;
-        if (this.Owner is not PlayerController)
+        if (this.GenericOwner is not PlayerController)
             return;
 
         if (this._extantMuzzleRune == null)

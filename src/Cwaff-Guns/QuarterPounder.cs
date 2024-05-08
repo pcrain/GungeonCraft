@@ -23,9 +23,9 @@ public class QuarterPounder : CwaffGun
             fps: 8, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 5);
     }
 
-    protected override void OnPickedUpByPlayer(PlayerController player)
+    public override void OnPlayerPickup(PlayerController player)
     {
-        base.OnPickedUpByPlayer(player);
+        base.OnPlayerPickup(player);
         AdjustAmmoToMoney();
     }
 
@@ -35,10 +35,10 @@ public class QuarterPounder : CwaffGun
         AdjustAmmoToMoney();
     }
 
-    protected override void Update()
+    public override void Update()
     {
         base.Update();
-        if (!this.Player)
+        if (!this.PlayerOwner)
             return;
         AdjustAmmoToMoney();
     }
