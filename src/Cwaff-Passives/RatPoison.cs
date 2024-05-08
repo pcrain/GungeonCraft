@@ -21,7 +21,7 @@ public class RatPoison : CwaffPassive
     {
         static bool Prefix(Vector2 point, ref bool __result)
         {
-            if (Lazy.AnyoneHas<RatPoison>())
+            if (!Lazy.AnyoneHas<RatPoison>())
                 return true;
 
             __result = false;  // don't let rat take any items
