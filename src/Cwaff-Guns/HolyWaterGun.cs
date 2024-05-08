@@ -47,10 +47,11 @@ public class HolyWaterGun : CwaffGun
 
         foreach (AIActor enemy in StaticReferenceManager.AllEnemies)
             OnEnemySpawn(enemy);
-        ETGMod.AIActor.OnPreStart += this.OnEnemySpawn;
+        ETGMod.AIActor.OnPreStart -= OnEnemySpawn;
+        ETGMod.AIActor.OnPreStart += OnEnemySpawn;
     }
 
-    private void OnEnemySpawn(AIActor enemy)
+    private static void OnEnemySpawn(AIActor enemy)
     {
         enemy.gameObject.GetOrAddComponent<Exorcisable>();  // add a dummy component for exorcism checks below
     }
