@@ -74,7 +74,6 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem
 
   public virtual void OnActualReload(PlayerController player, Gun gun, bool manual)
   {
-
   }
 }
 

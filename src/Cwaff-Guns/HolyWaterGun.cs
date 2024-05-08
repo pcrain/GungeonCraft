@@ -19,7 +19,6 @@ public class HolyWaterGun : CwaffGun
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
 
-        //TODO: refactor to use new DamageAdjuster class to apply different damage to Jammed enemies
         Projectile projectile = gun.InitProjectile(GunData.New(baseProjectile: Items.MegaDouser.Projectile(), clipSize: -1, shootStyle: ShootStyle.Beam,
             ammoType: GameUIAmmoType.AmmoType.BEAM, damage: Exorcisable._EXORCISM_DPS, speed: 50.0f, force: 15.0f)).Attach<ExorcismJuice>();
             projectile.BlackPhantomDamageMultiplier = _JAMMED_DAMAGE_MULT;
