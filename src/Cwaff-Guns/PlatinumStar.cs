@@ -123,7 +123,7 @@ public class JojoReferenceHandler : MonoBehaviour
 
     /// <summary>Freeze all projectiles while time is stopped</summary>
     [HarmonyPatch(typeof(Projectile), nameof(Projectile.LocalTimeScale), MethodType.Getter)]
-    private class PatchNamePatch
+    private class ProjectileLocalTimeScalePatch
     {
         static bool Prefix(Projectile __instance, ref float __result)
         {

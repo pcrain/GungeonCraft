@@ -61,11 +61,9 @@ public class SeltzerPelter : CwaffGun
             gmod.goopDefinition         = EasyGoopDefinitions.SeltzerGoop;
     }
 
-    public override void OnReloadPressed(PlayerController player, Gun gun, bool manual)
+    public override void OnActualReload(PlayerController player, Gun gun, bool manual)
     {
-        base.OnReloadPressed(player, gun, manual);
-        if (!gun.IsReloading)
-            return;
+        base.OnActualReload(player, gun, manual);
 
         this._loadedCanIndex = UnityEngine.Random.Range(0, _ReloadAnimations.Count());
         gun.spriteAnimator.Stop();

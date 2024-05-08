@@ -31,6 +31,7 @@ public abstract class CwaffActive: PlayerItem, ICwaffItem
 
 public abstract class CwaffGun: GunBehaviour, ICwaffItem
 {
+  public bool hasReloaded = true;
   // public abstract string ItemName         { get; }
   // public abstract string ShortDescription { get; }
   // public abstract string LongDescription  { get; }
@@ -62,13 +63,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem
   public virtual void OnSwitchedToThisGun()
   {
     this.gun.PreventNormalFireAudio = true;
-    string fireAudio = gun.spriteAnimator.GetClipByName(gun.shootAnimation).frames[0].eventAudio;
-    if (!string.IsNullOrEmpty(fireAudio))
-    {
-      // if (C.DEBUG_BUILD)
-      //   ETGModConsole.Log($"custom fire audio initialized for {this.gun.EncounterNameOrDisplayName}");
-      this.gun.OverrideNormalFireAudioEvent = fireAudio;
-    }
+    this.gun.OverrideNormalFireAudioEvent = gun.spriteAnimator.GetClipByName(gun.shootAnimation).frames[0].eventAudio;
   }
 
   /// <summary>
@@ -76,6 +71,26 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem
   /// </summary>
   public virtual void OnSwitchedAwayFromThisGun()
   {
+  }
+
+  public override void Update()
+  {
+    if (this.gun && !this.gun.IsReloading)
+        this.hasReloaded = true;
+  }
+
+  public override void OnReloadPressed(PlayerController player, Gun gun, bool manual)
+  {
+    if (this.hasReloaded && gun.IsReloading)
+    {
+      OnActualReload(player, gun, manual);
+      this.hasReloaded = false;
+    }
+  }
+
+  public virtual void OnActualReload(PlayerController player, Gun gun, bool manual)
+  {
+
   }
 }
 
