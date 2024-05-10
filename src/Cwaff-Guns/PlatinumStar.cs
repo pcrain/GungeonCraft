@@ -338,7 +338,7 @@ public class OraOra : MonoBehaviour
                 if (doTimeFreeze)
                     JojoReferenceHandler.RefreshTimeStop();
                 else if (spec && !spec.ImmuneToStun)
-                    spec.UpdateStun(1f);
+                    spec.Stun(1f);
                 yield return new WaitForSeconds(baseDelay);
             }
             baseDelay = Mathf.Max(baseDelay - _DELAY_DECAY, 0.02f);
@@ -364,7 +364,7 @@ public class OraOra : MonoBehaviour
                 hh.ApplyDamage(lumpDamage, Vector2.zero, PlatinumStar.ItemName, CoreDamageTypes.Void, DamageCategory.Normal,
                     ignoreInvulnerabilityFrames: true, ignoreDamageCaps: true);
                 if (spec && !spec.ImmuneToStun)
-                    spec.UpdateStun(1f);
+                    spec.Stun(1f);
             }
         }
 
