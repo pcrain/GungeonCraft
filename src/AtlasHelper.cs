@@ -160,15 +160,16 @@ public static class AtlasHelper
         string[] pathName = tokens[0].Split('/'); // trim off path and extension
         string collName   = pathName.First();
         string spriteName = pathName.Last().Split('.').First();  // trim off path and extension
-        int x = Int32.Parse(tokens[1]);
-        int y = Int32.Parse(tokens[2]);
-        int w = Int32.Parse(tokens[3]);
-        int h = Int32.Parse(tokens[4]);
-        int ox = Int32.Parse(tokens[5]);
-        int oy = Int32.Parse(tokens[6]);
-        int ow = Int32.Parse(tokens[7]);
-        int oh = Int32.Parse(tokens[8]);
-        tk2dSpriteDefinition def = _PackedTextures[spriteName] = atlas.SpriteDefFromSegment(spriteName, x, y, w, h, ox, oy, ow, oh);
+        tk2dSpriteDefinition def = _PackedTextures[spriteName] = atlas.SpriteDefFromSegment(
+            spriteName : spriteName,
+            x          : Int32.Parse(tokens[1]),
+            y          : Int32.Parse(tokens[2]),
+            w          : Int32.Parse(tokens[3]),
+            h          : Int32.Parse(tokens[4]),
+            ox         : Int32.Parse(tokens[5]),
+            oy         : Int32.Parse(tokens[6]),
+            ow         : Int32.Parse(tokens[7]),
+            oh         : Int32.Parse(tokens[8]));
 
         if (collName == "ProjectileCollection")
         {
@@ -227,10 +228,10 @@ public static class AtlasHelper
         collection.spriteNameLookupDict[def.name] = i;
         i++;
       }
-
-      // Add attach points if they're available
       if (attachPoints == null)
         return new IntVector2(oldLength, newDefs.Count);
+
+      // Add attach points if they're available
       for (int j = 0; j < attachPoints.Count; ++j)
       {
         tk2dSpriteDefinition.AttachPoint[] aps = attachPoints[j];

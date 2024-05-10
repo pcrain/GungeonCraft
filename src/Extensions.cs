@@ -324,21 +324,27 @@ public static class Extensions
   /// <summary>Check if an enemy is hostile</summary>
   public static bool IsHostile(this AIActor e, bool canBeDead = false, bool canBeNeutral = false)
   {
-    HealthHaver h = e?.healthHaver;
+    if (!e)
+      return false;
+    HealthHaver h = e.healthHaver;
     return e && !e.IsGone && e.IsWorthShootingAt && (canBeNeutral || !e.IsHarmlessEnemy) && h && (canBeDead || (h.IsAlive && !h.IsDead)) && !h.isPlayerCharacter;
   }
 
   /// <summary>Check if an enemy is hostile and a non-boss</summary>
   public static bool IsHostileAndNotABoss(this AIActor e, bool canBeDead = false, bool canBeNeutral = false)
   {
-    HealthHaver h = e?.healthHaver;
+    if (!e)
+      return false;
+    HealthHaver h = e.healthHaver;
     return e && !e.IsGone && e.IsWorthShootingAt && (canBeNeutral || !e.IsHarmlessEnemy) && h && !h.IsBoss && !h.IsSubboss &&  (canBeDead || (h.IsAlive && !h.IsDead)) && !h.isPlayerCharacter;
   }
 
   /// <summary>Check if an enemy is a boss</summary>
   public static bool IsABoss(this AIActor e, bool canBeDead = false)
   {
-    HealthHaver h = e?.healthHaver;
+    if (!e)
+      return false;
+    HealthHaver h = e.healthHaver;
     return e && !e.IsGone && e.IsWorthShootingAt && h && (h.IsBoss || h.IsSubboss) && (canBeDead || (h.IsAlive && !h.IsDead));
   }
 
@@ -912,8 +918,6 @@ public static class Extensions
   public static void FullyRefreshBehaviors(this BehaviorSpeculator self)
   {
     self.m_behaviors.Clear();
-    if (self.aiActor == null)
-      ETGModConsole.Log($"  null actor!");
     self.RefreshBehaviors();
   }
 
@@ -921,10 +925,7 @@ public static class Extensions
   public static void SetupCustomAmmoClip(this ProjectileModule mod, GunData b)
   {
       string clipname    = b.gun.EncounterNameOrDisplayName.InternalName();
-      // if (C.DEBUG_BUILD)
-      //   ETGModConsole.Log($"  getting clip {$"{clipname}_clip"}");
       mod.ammoType       = GameUIAmmoType.AmmoType.CUSTOM;
-      // mod.customAmmoType = CustomClipAmmoTypeToolbox.AddCustomAmmoType($"{clipname}_clip", ResMap.Get($"{clipname}_clipfull")[0], ResMap.Get($"{clipname}_clipempty")[0]);
       mod.customAmmoType = AtlasHelper.AddCustomAmmoType($"{clipname}_clip", ResMap.Get($"{clipname}_clipfull")[0], ResMap.Get($"{clipname}_clipempty")[0]);
   }
 
@@ -933,13 +934,10 @@ public static class Extensions
   {
     if (data == EventArgs.Empty || data.ModifiedDamage <= 0f || !hh.IsVulnerable)
       return false; // if we weren't going to take damage anyway, nothing to do
-
     if (hh.Armor > 1 || hh.GetCurrentHealth() > data.ModifiedDamage)
       return false; // no character is one hit from death in this situation
-
     if (hh.Armor == 1 && hh.GetCurrentHealth() > 0)
       return false; // we have both armor and health, so we are not the robot, and we are fine
-
     return true;
   }
 
@@ -961,7 +959,7 @@ public static class Extensions
   /// <summary>Add a shader to a gameObject, and return the material for that shader</summary>
   public static Material GetOrAddShader(this GameObject g, Shader shader, bool atBeginning = true)
   {
-    if (g?.GetComponent<MeshRenderer>() is not MeshRenderer component)
+    if (!g || g.GetComponent<MeshRenderer>() is not MeshRenderer component)
       return null;
     Material[] array = component.sharedMaterials;
     for (int i = 0; i < array.Length; i++)
@@ -986,11 +984,8 @@ public static class Extensions
   public static bool IsPositionElectrified(this DeadlyDeadlyGoopManager goopManager, Vector2 position)
   {
     IntVector2 key = (position / DeadlyDeadlyGoopManager.GOOP_GRID_SIZE).ToIntVector2(VectorConversions.Floor);
-    DeadlyDeadlyGoopManager.GoopPositionData value;
-    if (goopManager.m_goopedCells.TryGetValue(key, out value) && value.remainingLifespan > goopManager.goopDefinition.fadePeriod)
-    {
+    if (goopManager.m_goopedCells.TryGetValue(key, out var value) && value.remainingLifespan > goopManager.goopDefinition.fadePeriod)
       return value.IsElectrified;
-    }
     return false;
   }
 
@@ -1023,7 +1018,7 @@ public static class Extensions
   /// <summary>Returns true if a projectile was fired from a gun without depleting ammo</summary>
   public static bool FiredForFree(this Projectile proj, Gun gun, ProjectileModule mod)
   {
-    return (mod.ammoCost == 0 || gun.InfiniteAmmo || gun.LocalInfiniteAmmo /*|| gun.CanGainAmmo*/ || ((proj.Owner as PlayerController)?.InfiniteAmmo?.Value ?? false));
+    return (mod.ammoCost == 0 || gun.InfiniteAmmo || gun.LocalInfiniteAmmo || ((proj.Owner as PlayerController)?.InfiniteAmmo?.Value ?? false));
   }
 
   /// <summary>Add a component to an existing component's GameObject and return the component</summary>
@@ -1407,7 +1402,7 @@ public static class Extensions
     // animator.deferNextStartClip = false;
     animator.SetSprite(
       spriteCollection: frames[0].spriteCollection,
-      spriteId: (frame >= 0) ? frame : frames[UnityEngine.Random.Range(0, frames.Count())].spriteId);
+      spriteId: (frame >= 0) ? frame : frames[UnityEngine.Random.Range(0, frames.Length)].spriteId);
     animator.Pause(); // stop animating immediately after creation so we can stick with our initial sprite
   }
 
@@ -1703,43 +1698,6 @@ public static class Extensions
       p.collidesWithPlayer = false;  // doesn't actually do anything directly, but semantically it's nice to set this
       foreach (PixelCollider pc in p.specRigidbody.PixelColliders) // actually does the heavy lifting
           pc.CollisionLayerIgnoreOverride |= CollisionMask.LayerToMask(CollisionLayer.PlayerHitBox);
-  }
-
-  /// <summary>Get true owner of projectile, including those that came from bullet scripts</summary>
-  public static GameActor GetTrueActor(this Projectile p)
-  {
-    // ETGModConsole.Log($"check performed");
-    if (p.GetComponent<BulletScriptBehavior>() is not BulletScriptBehavior bsb)
-      return p.Owner;
-    // ETGModConsole.Log($"owned by {p.OwnerName}");
-    // Dissect.DumpComponents(p.gameObject);
-    // Dissect.DumpFieldsAndProperties<Projectile>(p);
-    if (bsb.bullet == null)
-      return null;
-    // Dissect.DumpFieldsAndProperties<Bullet>(bsb.bullet);
-    // if (bsb.aiActor) ETGModConsole.Log($"actor");
-    // if (bsb.aiShooter) ETGModConsole.Log($"shooter");
-    // if (bsb.bulletBank) ETGModConsole.Log($"bank");
-    // if (bsb.gameActor) ETGModConsole.Log($"gameactor");
-    // if (bsb.encounterTrackable) ETGModConsole.Log($"encounterTrackable");
-    // ETGModConsole.Log($"checked bullet script {bsb.bullet?.BulletBank?.ActorName ?? "unknown"}");
-    return bsb.bullet?.BulletBank?.aiActor;
-  }
-
-  /// <summary>Swaps the x and y components of a Vector2 if a boolean is set</summary>
-  public static Vector2 TransposeIf(this Vector2 self, bool condition)
-  {
-    if (condition)
-      return new Vector2(self.y, self.x);
-    return self;
-  }
-
-  /// <summary>Swaps the x and y components of a Vector3 if a boolean is set</summary>
-  public static Vector3 TransposeIf(this Vector3 self, bool condition)
-  {
-    if (condition)
-      return new Vector3(self.y, self.x, self.z);
-    return self;
   }
 
   /// <summary>Spawns an enemy in and skips the awakening animation + all other startup behaviors</summary>

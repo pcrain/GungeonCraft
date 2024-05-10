@@ -2,12 +2,8 @@ namespace CwaffingTheGungy;
 
 public static class CwaffTweaks
 {
-    private static DirectionalAnimation dogPettingAnimation;
-
     public static void Init()
     {
-        GetDogPettingAnimation();
-
         //Make Wolf pettable
         string[] defaultCompanions = new string[] {
             "wolf",
@@ -24,20 +20,9 @@ public static class CwaffTweaks
         }
     }
 
-    private static void GetDogPettingAnimation()
-    {
-        CompanionItem doggo = Gungeon.Game.Items["dog"].GetComponent<CompanionItem>();
-        AIActor doggoai = EnemyDatabase.GetOrLoadByGuid(doggo.CompanionGuid);
-        CompanionController doggocontroller =
-            doggoai.gameObject.GetOrAddComponent<CompanionController>();
-        foreach(AIAnimator.NamedDirectionalAnimation n in doggocontroller.sprite.aiAnimator.OtherAnimations)
-        {
-            if (n.name != "pet")
-                continue;
-            dogPettingAnimation = n.anim;
-            break;
-        }
-    }
+    private static DirectionalAnimation GetDogPettingAnimation() =>
+        EnemyDatabase.GetOrLoadByGuid(ItemHelper.Get(Items.Dog).GetComponent<CompanionItem>().CompanionGuid)
+            .aiAnimator.OtherAnimations.Find(n => n.name == "pet").anim;
 
     public static void MakePettable(this CompanionItem ci, string[] pettingAnimation = null, string[] pettingAnimationLeft = null)
     {
@@ -84,13 +69,13 @@ public static class CwaffTweaks
             cc.sprite.aiAnimator.OtherAnimations.Add(newOtheranim);
 
         }
-        else //...or just copy it from the dog while testing
-        {
-            cc.sprite.aiAnimator.OtherAnimations.Add(new AIAnimator.NamedDirectionalAnimation {
-                name = "pet",
-                anim = dogPettingAnimation,
-            });
-        }
+        // else //...or just copy it from the dog while testing
+        // {
+        //     cc.sprite.aiAnimator.OtherAnimations.Add(new AIAnimator.NamedDirectionalAnimation {
+        //         name = "pet",
+        //         anim = GetDogPettingAnimation(),
+        //     });
+        // }
 
 
         // wolfyboiai.animationAudioEvents = doggoai.animationAudioEvents;

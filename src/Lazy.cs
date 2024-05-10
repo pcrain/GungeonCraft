@@ -514,16 +514,6 @@ public static class Lazy
         return BitConverter.Int64BitsToDouble(((long)tmp2) << 32);
     }
 
-    /// <summary>Set up a UI sprite from the provided resource paths</summary>
-    // public static dfSprite SetupUISprite(List<string> resourcePaths)
-    // {
-    //     dfSprite uiSprite = CustomClipAmmoTypeToolbox.SetupDfSpriteFromTexture<dfSprite>(
-    //         new GameObject().RegisterPrefab(),
-    //         ResourceExtractor.GetTextureFromResource(resourcePaths[0] + ".png"),
-    //         ShaderCache.Acquire("Daikon Forge/Default UI Shader"));
-    //     return uiSprite;
-    // }
-
     /// <summary>Get a modded item by id, returning null if it doesn't exit</summary>
     public static PickupObject GetModdedItem(string itemName)
     {
@@ -691,7 +681,7 @@ public static class Lazy
         {
             if (list == null)
                 continue;
-            foreach (T t in list)
+            foreach (T t in list) //TODO: could maybe use addrange
                 result.Add(t);
         }
         return result;
