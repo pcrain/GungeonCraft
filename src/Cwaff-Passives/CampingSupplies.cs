@@ -164,8 +164,5 @@ public class CampingSupplies : CwaffPassive
             debris.bounceCount             = 2;
             debris.canRotate               = true;
             debris.Trigger(startingForce, startingHeight);
-
-        Invoke("BeginBeamFire", 0.75f); // make sure this is at least as long as the rail's lifetime
-        Invoke("Expire", 2f); // make sure this is at least as long as the rail's lifetime
     }
 }
