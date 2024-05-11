@@ -69,7 +69,7 @@ public class Glockarina : CwaffGun
         Decoy decoy = _DecoyPrefab.GetComponent<Decoy>();
             decoy.DeathExplosionTimer = _DECOY_LIFE;
 
-        _NoteVFXPrefab = VFX.Create("note_vfx", 0.01f, loops: false, anchor: Anchor.MiddleCenter); // FPS must be nonzero or sprites don't update properly
+        _NoteVFXPrefab = VFX.Create("note_vfx", fps: 0.01f, loops: false, anchor: Anchor.MiddleCenter); // FPS must be nonzero or sprites don't update properly
 
         _GlockarinaPickupID = gun.PickupObjectId;
     }
@@ -185,12 +185,8 @@ public class Glockarina : CwaffGun
         return false;
     }
 
-    public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
+    public override void OnFullClipReload(PlayerController player, Gun gun)
     {
-        base.OnReloadPressed(player, gun, manualReload);
-        if (gun.IsReloading || !manualReload || (gun.ClipShotsRemaining < gun.ClipCapacity))
-            return;
-
         // Get a note based on the direction the player is aiming
         bool onKeyboard = player.IsKeyboardAndMouse();
         Vector2 aimVec = onKeyboard ? (player.unadjustedAimPoint.XY() - player.CenterPosition) : player.m_activeActions.Aim.Vector;

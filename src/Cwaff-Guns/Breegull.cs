@@ -89,11 +89,8 @@ public class Breegull : CwaffGun
         return projectile;
     }
 
-    public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
+    public override void OnFullClipReload(PlayerController player, Gun gun)
     {
-        base.OnReloadPressed(player, gun, manualReload);
-        if (gun.IsReloading || !manualReload || (gun.ClipShotsRemaining < gun.ClipCapacity))
-            return;
         this._currentEggType = (this._currentEggType + 1) % _Eggs.Count;
         UpdateEggs(playSound: true);
     }

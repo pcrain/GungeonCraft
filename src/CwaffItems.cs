@@ -16,7 +16,7 @@ public abstract class CwaffActive: PlayerItem, ICwaffItem
 {
 }
 
-public abstract class CwaffGun: GunBehaviour, ICwaffItem
+public abstract class CwaffGun: GunBehaviour, ICwaffItem/*, ILevelLoadedListener*/
 {
   public bool hasReloaded = true;
 
@@ -70,11 +70,25 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem
       OnActualReload(player, gun, manual);
       this.hasReloaded = false;
     }
+    if (player.AcceptingNonMotionInput && !gun.IsReloading && manual && (gun.ClipShotsRemaining >= gun.ClipCapacity))
+    {
+      OnFullClipReload(player, gun);
+    }
   }
 
+  /// <summary>Called when the player actually initiates an ammo-repleneshing reload</summary>
   public virtual void OnActualReload(PlayerController player, Gun gun, bool manual)
   {
   }
+
+  public virtual void OnFullClipReload(PlayerController player, Gun gun)
+  {
+
+  }
+
+  // public void BraveOnLevelWasLoaded()
+  // {
+  // }
 }
 
 public abstract class CwaffBlankModificationItem: BlankModificationItem, ICwaffItem

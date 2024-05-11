@@ -60,17 +60,14 @@ public class AlienNailgun : CwaffGun
         projectile.AddComponent<ExtractDNAOnKill>().Setup(this);
     }
 
-    public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
+    public override void OnFullClipReload(PlayerController player, Gun gun)
     {
-        base.OnReloadPressed(player, gun, manualReload);
-        if (gun.IsReloading || !manualReload || (gun.ClipShotsRemaining < gun.ClipCapacity))
-            return;
-        if (player.IsDodgeRolling || !player.AcceptingNonMotionInput)
+        if (player.IsDodgeRolling)
             return;
         if (this._registeredEnemies.Count == 0)
             return;
 
-        if (this._preview) // only cycle if the preview is already visiblew, otherwise just show the current selection
+        if (this._preview) // only cycle if the preview is already visible, otherwise just show the current selection
             this._spawnIndex = (this._spawnIndex + 1) % this._registeredEnemies.Count;
         SwitchEnemyToSpawn(this._registeredEnemies[this._spawnIndex]);
     }
