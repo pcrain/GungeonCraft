@@ -18,6 +18,8 @@ dotnet35path="$(pwd)/_dotNETFramework/v3.5"      #Path to .NET 3.5 developer ass
 USEXTERNALASSEMBLY=0                             #Whether to use the external Assembly-Csharp.dll or the one bundled in the source directory
 UPDATEDLLS=0                                     #Set to 1 if any new DLLS are added to make sure they're copied correctly to bin/Debug
 #Could not get the external assembly working ):
+shaderfile="cwaffshaders"
+shaderassetpath="/home/pretzel/workspace/gungy-shaders/Gungy Shaders/Assets/AssetBundles/${shaderfile}"
 projectversion="$(cat 'src/Common.cs' | grep 'MOD_VERSION' | cut -f 2 -d '"')"
 debugbuild="$( [ "false" == "$(cat 'src/Common.cs' | grep -m1 'DEBUG_BUILD' | cut -f 2 -d '=' | cut -f 1 -d ';' | tr -d ' ')" ]; echo "$?" )"
 manifesttemplate=`cat <<HERE
@@ -141,6 +143,18 @@ echo -e "[${GRN}>${BLN}] Regenerating attach point data"
 jq -r -n \
   'reduce inputs as $s (.; . += [($s.attachPoints[1:] | [(input_filename | split("/")[-1] | sub("\\.json$";"") ), (.[] | .name, .position.x, .position.y)])]) | map(@tsv)[]' \
   ./RawResources/WeaponCollection/*.json > ./Resources/Atlases/attach_points.tsv
+
+#Check for shader updates
+echo -e "[${GRN}>${BLN}] Checking for shader updates"
+if [ -e "${shaderassetpath}" ]; then
+  m1="$(md5sum "./Resources/${shaderfile}" | cut -f 1 -d ' ')"
+  m2="$(md5sum "${shaderassetpath}" | cut -f 1 -d ' ')"
+  if [ "${m1}" != "${m2}" ]; then
+    rebuild=1
+    echo -e "[${GRN}>${BLN}]   Shader asset bundle changed, re-copying"
+    /bin/cp "${shaderassetpath}" "./Resources/${shaderfile}"
+  fi
+fi
 
 #Source files
 echo -e "[${GRN}>${BLN}] Scanning for source files"

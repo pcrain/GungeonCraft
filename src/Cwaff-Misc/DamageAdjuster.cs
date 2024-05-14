@@ -3,6 +3,7 @@ namespace CwaffingTheGungy;
 /// <summary>Class that allows projectiles to adjust their damage upon colliding with an enemy.</summary>
 public abstract class DamageAdjuster : MonoBehaviour
 {
+    // NOTE: called by patch in CwaffPatches
     private static float AdjustDamageStatic(float currentDamage, Projectile proj, SpeculativeRigidbody body)
     {
         if (body.GetComponent<AIActor>() is not AIActor enemy)

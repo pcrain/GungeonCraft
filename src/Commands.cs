@@ -9,7 +9,7 @@ public class Commands
     {
         if (!C.DEBUG_BUILD)
             return; // do nothing in non-debug builds
-
+        //
         // Base command for doing whatever I'm testing at the moment
         ETGModConsole.Commands.AddGroup("gg", delegate (string[] args)
         {
@@ -22,10 +22,20 @@ public class Commands
             // ETGModConsole.Log("<size=100><color=#ff0000ff>Please specify a command. Type 'nn help' for a list of commands.</color></size>", false);
         });
         ETGModConsole.Commands.AddGroup("oo", delegate (string[] args)
-        {
+        {//
             Lazy.CreateHoveringGun(GameManager.Instance.PrimaryPlayer);
         });
-        // Shader test
+        // Shader tests
+        ETGModConsole.Commands.AddGroup("shiny", delegate (string[] args)
+        {
+            tk2dBaseSprite s = GameManager.Instance.PrimaryPlayer.sprite;
+            // s.usesOverrideMaterial = true;
+            ETGModConsole.Log($"switching shader");
+            SpriteOutlineManager.RemoveOutlineFromSprite(s);
+            s.renderer.material.shader = Initialisation.TestShader;
+            s.renderer.material.SetTexture("_ShaderTex", Initialisation.TestShaderTexture);
+            ETGModConsole.Log($"  done");
+        });
         ETGModConsole.Commands.AddGroup("shader", delegate (string[] args)
         {
             if (args == null || args.Length < 1)
