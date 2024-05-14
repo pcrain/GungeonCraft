@@ -31,7 +31,7 @@ public class Commands
             tk2dBaseSprite s = GameManager.Instance.PrimaryPlayer.sprite;
             // s.usesOverrideMaterial = true;
             ETGModConsole.Log($"switching shader");
-            SpriteOutlineManager.RemoveOutlineFromSprite(s);
+            // SpriteOutlineManager.RemoveOutlineFromSprite(s);
             s.renderer.material.shader = Initialisation.TestShader;
             s.renderer.material.SetTexture("_ShaderTex", Initialisation.TestShaderTexture);
             ETGModConsole.Log($"  done");

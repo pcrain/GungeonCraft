@@ -82,16 +82,12 @@ public class Initialisation : BaseUnityPlugin
                     ShaderBundle = AssetBundle.LoadFromStream(stream);
                     foreach (string s in ShaderBundle.GetAllAssetNames())
                         ETGModConsole.Log($"  found asset {s}");
-                    // TestShader = ShaderBundle.LoadAsset<Shader>("assets/shaderforge/example assets/shaders/refraction.shader");
-                    // TestShader = ShaderBundle.LoadAsset<Shader>("assets/shaderforge/example assets/shaders/badshader.shader");
-                    TestShader = ShaderBundle.LoadAsset<Shader>("assets/shaderforge/example assets/shaders/sillyshader.shader");
+                    TestShader = ShaderBundle.LoadAsset<Shader>("assets/sillyshader.shader");
                     if (TestShader != null)
-                        ETGModConsole.Log($"loaded a {(TestShader.isSupported ? "supported" : "NON SUPPORTED")} shader! :D");
-                    TestShaderTexture = ShaderBundle.LoadAsset<Texture2D>("assets/shaderforge/example assets/textures/sf_noise_clouds_01.png");
+                        ETGModConsole.Log($"loaded a shader! :D");
+                    TestShaderTexture = ShaderBundle.LoadAsset<Texture2D>("assets/sf_noise_clouds_01.png");
                     if (TestShaderTexture != null)
                         ETGModConsole.Log($"loaded a texture! :D");
-                    if (ShaderCache.Acquire("assets/shaderforge/example assets/shaders/badshader.shader") != null)
-                        ETGModConsole.Log($"loaded a cached shader! :D");
                 }
                 else
                     ETGModConsole.Log($" null shader stream D:");
