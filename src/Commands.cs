@@ -28,12 +28,23 @@ public class Commands
         // Shader tests
         ETGModConsole.Commands.AddGroup("shiny", delegate (string[] args)
         {
-            tk2dBaseSprite s = GameManager.Instance.PrimaryPlayer.sprite;
-            // s.usesOverrideMaterial = true;
+
+            // ETGModConsole.Log($"player shader name is {GameManager.Instance.PrimaryPlayer.sprite.renderer.material.shader.name}");
+            // ETGModConsole.Log($"   gun shader name is {GameManager.Instance.PrimaryPlayer.CurrentGun.sprite.renderer.material.shader.name}");
             ETGModConsole.Log($"switching shader");
             // SpriteOutlineManager.RemoveOutlineFromSprite(s);
+
+            tk2dBaseSprite s = GameManager.Instance.PrimaryPlayer.sprite;
             s.renderer.material.shader = Initialisation.TestShader;
             s.renderer.material.SetTexture("_ShaderTex", Initialisation.TestShaderTexture);
+            // s.UpdateZDepth();
+
+            tk2dBaseSprite s2 = GameManager.Instance.PrimaryPlayer.CurrentGun.sprite;
+            s2.usesOverrideMaterial = true;
+            s2.renderer.material.shader = Initialisation.TestShader;
+            s2.renderer.material.SetTexture("_ShaderTex", Initialisation.TestShaderTexture);
+            // s.UpdateZDepth();
+
             ETGModConsole.Log($"  done");
         });
         ETGModConsole.Commands.AddGroup("shader", delegate (string[] args)

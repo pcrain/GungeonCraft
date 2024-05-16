@@ -82,7 +82,8 @@ public class Initialisation : BaseUnityPlugin
                     ShaderBundle = AssetBundle.LoadFromStream(stream);
                     foreach (string s in ShaderBundle.GetAllAssetNames())
                         ETGModConsole.Log($"  found asset {s}");
-                    TestShader = ShaderBundle.LoadAsset<Shader>("assets/sillyshader.shader");
+                    // TestShader = ShaderBundle.LoadAsset<Shader>("assets/sillyshader.shader");
+                    TestShader = ShaderBundle.LoadAsset<Shader>("assets/electroshader.shader");
                     if (TestShader != null)
                         ETGModConsole.Log($"loaded a shader! :D");
                     TestShaderTexture = ShaderBundle.LoadAsset<Texture2D>("assets/sf_noise_clouds_01.png");
