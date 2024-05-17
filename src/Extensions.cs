@@ -147,6 +147,10 @@ public static class Extensions
     return UnityEngine.Object.Instantiate(self).RegisterPrefab(deactivate, markFake, dontUnload).gameObject;
   }
 
+  //BUG: this randomly completely breaks initialization on MacOS and Linux sometimes
+  //     - Aimu Hakurei uses this directly and causes a starup crash for Kelmar (Linux) and mdgrve (MacOS)
+  //     - Breegull calls this indirectly through Gun.CloneProjectile -> Projectile.Clone -> Projectile.CloneSpecial -> Projectile.ClonePrefab
+  //         While Missiletoe also calls Gun.CloneProjectile, its DefaultModule.projectiles[0] hasn't been changed, while Breegull has called InitProjectile()
   /// <summary>Instantiate a prefab and clone it as a new prefab, with generic support</summary>
   public static T ClonePrefab<T>(this T self, bool deactivate = true, bool markFake = true, bool dontUnload = true)
     where T : Component
