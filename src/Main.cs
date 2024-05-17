@@ -436,7 +436,6 @@ public class Initialisation : BaseUnityPlugin
                 awaitAsyncWatch.Stop();
             #endregion
 
-            C._ModSetupFinished = true;
             watch.Stop();
             ETGModConsole.Log($"Yay! :D Initialized <color=#{ColorUtility.ToHtmlStringRGB(C.MOD_COLOR).ToLower()}>{C.MOD_NAME} v{C.MOD_VERSION}</color> in "+(watch.ElapsedMilliseconds/1000.0f)+" seconds");
             if (C.DEBUG_BUILD)
@@ -472,6 +471,10 @@ public class Initialisation : BaseUnityPlugin
         {
             ETGModConsole.Log(e.Message);
             ETGModConsole.Log(e.StackTrace);
+        }
+        finally
+        {
+            C._ModSetupFinished = true; // make sure setup-specific harmony patches get disabled even if an error occurs
         }
     }
 
