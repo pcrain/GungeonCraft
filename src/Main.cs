@@ -260,6 +260,7 @@ public class Initialisation : BaseUnityPlugin
                 SubMachineGun.Add();
                 MacchiAuto.Add();
                 Nycterian.Add();
+                Maestro.Add();
 
                 setupGunsWatch.Stop();
             #endregion
@@ -464,7 +465,7 @@ public class Initialisation : BaseUnityPlugin
                 ETGModConsole.Log($"allocated {(newMemory - oldMemory).ToString("N0")} bytes of memory along the way");
                 ETGModMainBehaviour.Instance.gameObject.Play("vc_kirby_appeal01");
                 //HACK: disable ETG debug log
-                Application.logMessageReceived -= ETGModDebugLogMenu.Logger;
+                // Application.logMessageReceived -= ETGModDebugLogMenu.Logger;
             }
         }
         catch (Exception e)

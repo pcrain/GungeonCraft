@@ -14,6 +14,8 @@ public static class CwaffEvents // global custom events we can listen for
     public static Action OnNewFloorFullyLoaded;
     // Runs whenever the first floor is started and fully loaded
     public static Action OnFirstFloorFullyLoaded;
+    // Runs whenever a bullet is spawned from an AIBulletBank and an owner is assigned to the projectile
+    public static Action<Projectile> OnBankBulletOwnerAssigned;
 
     internal static bool _OnFirstFloor = false;
     internal static bool _AllModsLoaded = false;
@@ -90,5 +92,25 @@ public static class CwaffEvents // global custom events we can listen for
             OnNewFloorFullyLoaded();
         if (_OnFirstFloor && OnFirstFloorFullyLoaded != null)
             OnFirstFloorFullyLoaded();
+    }
+
+    //NOTE: makes sure AIActor is set properly on bullet scripts; should probably factor out CheckFromReplicantOwner() and moved to a better location later
+    //NOTE: could be useful for Schrodinger's Gat -> might want to set up an event listener
+    //WARNING: doesn't seem to work properly on large Bullats
+    //NOTE: magically fixed itself no later than 2024-05-01???
+    //NOTE: ^ wrong. banked projectiles get their owners properly set eventually, but not at the time that StaticReferenceManager.ProjectileAdded is called
+    [HarmonyPatch(typeof(AIBulletBank), nameof(AIBulletBank.BulletSpawnedHandler))]
+    private class GetRealProjectileOwnerPatch
+    {
+        public static void Postfix(AIBulletBank __instance, Bullet bullet)
+        {
+            if (__instance.aiActor is not AIActor actor)
+                return;
+            if ((bullet == null) || (bullet.Parent == null) || bullet.Parent.GetComponent<Projectile>() is not Projectile p)
+                return;
+            p.Owner = actor;
+            if (OnBankBulletOwnerAssigned != null)
+                OnBankBulletOwnerAssigned(p);
+        }
     }
 }

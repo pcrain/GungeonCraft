@@ -1870,4 +1870,19 @@ public static class Extensions
     sprite.PlaceAtPositionByAnchor(osprite.WorldCenter, Anchor.MiddleCenter);
     return sprite;
   }
+
+  /// <summary>Freezes a projectile and launches it with a short delay</summary>
+  public static void FreezeAndLaunchWithDelay(this Projectile p, float delay, float speed, string sound = null)
+  {
+    p.StartCoroutine(FreezeAndLaunchWithDelay_CR(p, delay, speed, sound));
+  }
+
+  public static IEnumerator FreezeAndLaunchWithDelay_CR(Projectile p, float delay, float speed, string sound = null)
+  {
+    p.Speed = 0.001f;
+    yield return new WaitForSeconds(delay);
+    p.Speed = speed;
+    if (sound != null)
+      p.gameObject.Play(sound);
+  }
 }

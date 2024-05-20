@@ -172,6 +172,7 @@
     <Compile Include="src\Cwaff-Guns\BBGun.cs"/>
     <Compile Include="src\Cwaff-Guns\OmnidirectionalLaser.cs"/>
     <Compile Include="src\Cwaff-Guns\Gunbrella.cs"/>
+    <Compile Include="src\Cwaff-Guns\Maestro.cs"/>
     <Compile Include="src\Cwaff-Guns\Jugglernaut.cs"/>
     <Compile Include="src\Cwaff-Guns\KALI.cs"/>
     <Compile Include="src\Cwaff-Guns\SubMachineGun.cs"/>
