@@ -183,6 +183,7 @@
     <Compile Include="src\Cwaff-Guns\Bouncer.cs"/>
     <Compile Include="src\Cwaff-Guns\Alligator.cs"/>
     <Compile Include="src\Cwaff-Guns\HolyWaterGun.cs"/>
+    <Compile Include="src\Cwaff-Guns\Starmageddon.cs"/>
     <Compile Include="src\Cwaff-Guns\Uppskeruvel.cs"/>
     <Compile Include="src\Cwaff-Guns\Alyx.cs"/>
     <Compile Include="src\Cwaff-Guns\AlienNailGun.cs"/>

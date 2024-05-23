@@ -1623,3 +1623,49 @@ public class FlippedCarryPixelOffset : MonoBehaviour
         }
     }
 }
+
+/// <summary>Class to allow for easy manual movement and manipulation of projectiles</summary>
+public class ManualMotionModule : ProjectileAndBeamMotionModule
+{
+    public override void Move(Projectile source, Transform projectileTransform, tk2dBaseSprite projectileSprite, SpeculativeRigidbody specRigidbody, ref float m_timeElapsed, ref Vector2 m_currentDirection, bool Inverted, bool shouldRotate)
+    {
+        // Vector2 vector = ((!projectileSprite) ? projectileTransform.position.XY() : projectileSprite.WorldCenter);
+        // if (!m_initialized)
+        // {
+        //     m_initialized        = true;
+        //     m_initialRightVector = ((!shouldRotate) ? m_currentDirection : projectileTransform.right.XY());
+        //     m_initialUpVector    = ((!shouldRotate) ? (Quaternion.Euler(0f, 0f, 90f) * m_currentDirection) : projectileTransform.up);
+        //     m_radius             = UnityEngine.Random.Range(MinRadius, MaxRadius);
+        //     m_currentAngle       = m_initialRightVector.ToAngle();
+        // }
+
+        // m_timeElapsed        += BraveTime.DeltaTime;
+        // float radius         = m_radius;
+        // float num            = source.Speed * BraveTime.DeltaTime;
+        // float num2           = num / ((float)Math.PI * 2f * radius) * 360f;
+        // m_currentAngle       += num2;
+        // Vector2 targetCenter = ((!usesAlternateOrbitTarget) ? source.Owner.CenterPosition : alternateOrbitTarget.UnitCenter);
+        // Vector2 vector2      = targetCenter + (Quaternion.Euler(0f, 0f, m_currentAngle) * Vector2.right * radius).XY();
+        // Vector2 velocity     = (vector2 - vector) / BraveTime.DeltaTime;
+        // m_currentDirection   = velocity.normalized;
+        // if (shouldRotate)
+        // {
+        //     float num7 = m_currentDirection.ToAngle();
+        //     if (float.IsNaN(num7) || float.IsInfinity(num7))
+        //         num7 = 0f;
+        //     projectileTransform.localRotation = Quaternion.Euler(0f, 0f, num7);
+        // }
+        // specRigidbody.Velocity = velocity;
+        // if (float.IsNaN(specRigidbody.Velocity.magnitude) || Mathf.Approximately(specRigidbody.Velocity.magnitude, 0f))
+        //     source.DieInAir();
+    }
+
+    public override void UpdateDataOnBounce(float angleDiff)
+    {
+    }
+
+    public override Vector2 GetBoneOffset(BasicBeamController.BeamBone bone, BeamController sourceBeam, bool inverted)
+    {
+        return Vector2.zero;
+    }
+}

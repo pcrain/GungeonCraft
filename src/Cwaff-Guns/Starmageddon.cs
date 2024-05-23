@@ -1,0 +1,261 @@
+﻿namespace CwaffingTheGungy;
+
+public class Starmageddon : CwaffGun
+{
+    public static string ItemName         = "Starmageddon";
+    public static string ShortDescription = "TBD";
+    public static string LongDescription  = "TBD";
+    public static string Lore             = "TBD";
+
+    private int        _nextIndex        = 0;
+    private int        _curBatch         = 0;
+    private GameObject _extantMuzzleRune = null;
+    private float      _muzzleRuneAlpha  = 0.0f;
+
+    public static void Add()
+    {
+        Gun gun = Lazy.SetupGun<Starmageddon>(ItemName, ShortDescription, LongDescription, Lore);
+            gun.SetAttributes(quality: ItemQuality.S, gunClass: GunClass.FULLAUTO, reloadTime: 1.0f, ammo: 900, shootFps: 2);
+
+        gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.125f, angleVariance: 15.0f,
+          shootStyle: ShootStyle.Automatic, damage: 3.0f, speed: 60.0f, range: 999999f, spawnSound: "tomislav_shoot",
+          sprite: "starmageddon_bullet", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter, useDummyChargeModule: true,
+          // overrideColliderPixelSizes: new IntVector2(128, 128), //BUG: large hitboxes apparently lag the game????
+          shrapnelVFX: VFX.Create("starmageddon_shrapnel"), shrapnelCount: 5
+          )
+        ).Attach<StarmageddonProjectile>();
+    }
+
+    public override void Update()
+    {
+        base.Update();
+        if (BraveTime.DeltaTime == 0.0f)
+            return;
+        if (this.GenericOwner is not PlayerController)
+            return;
+
+        if (this._extantMuzzleRune == null)
+        {
+            this._extantMuzzleRune = SpawnManager.SpawnVFX(KingsLaw._RuneMuzzle, this.gun.barrelOffset.transform.position, Quaternion.identity);
+            this._extantMuzzleRune.SetAlphaImmediate(0.0f);
+            this._extantMuzzleRune.transform.parent = this.gun.barrelOffset;
+        }
+
+        if (this.gun.IsCharging)
+        {
+            this._muzzleRuneAlpha = Mathf.Min(1f, this._muzzleRuneAlpha + 2f * BraveTime.DeltaTime);
+            this._extantMuzzleRune.SetAlpha(Mathf.Clamp01(this._muzzleRuneAlpha));
+            this._extantMuzzleRune.transform.localRotation = (-KingsLaw._RUNE_ROT_MID * BraveTime.ScaledTimeSinceStartup).EulerZ();
+            return;
+        }
+
+        if (!this.gun.IsReloading && this.gun.ClipShotsRemaining < Mathf.Min(this.gun.ClipCapacity, this.gun.CurrentAmmo))
+            this.gun.Reload(); // force reload while we're not at max clip capacity
+
+        this._muzzleRuneAlpha = Mathf.Max(0f, this._muzzleRuneAlpha - 4f * BraveTime.DeltaTime);
+        this._extantMuzzleRune.SetAlpha(Mathf.Clamp01(this._muzzleRuneAlpha));
+
+        Reset();
+        // Synchronize ammo clips between projectile modules as necessary
+        // (don't do while charging or bullets will all be forcibly released)
+        this.gun.SynchronizeReloadAcrossAllModules();
+    }
+
+    public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
+    {
+        base.OnReloadPressed(player, gun, manualReload);
+        Reset();
+    }
+
+    public override void OnSwitchedToThisGun()
+    {
+        base.OnSwitchedToThisGun();
+        Reset();
+    }
+
+    public override void OnDropped()
+    {
+        base.OnDropped();
+        Reset();
+    }
+
+    public override void OnSwitchedAwayFromThisGun()
+    {
+        base.OnSwitchedAwayFromThisGun();
+        Reset();
+    }
+
+    private void Reset()
+    {
+        if (this._nextIndex == 0)
+            return;
+
+        this._nextIndex = 0;
+        ++this._curBatch;
+    }
+
+    public int GetNextIndex() => this._nextIndex++;
+    public int GetBatch() => this._curBatch;
+}
+
+public class StarmageddonProjectile : MonoBehaviour
+{
+    private const float ROT_PER_SEC = 2f;    // rotation speed of star sprites
+    private const float REV_PER_SEC = 0.44f; // revolution speed of stars around player
+    private const float _SPREAD = 2.5f;  // spread for falling stars
+
+    private PlayerController _owner                 = null;
+    private Projectile       _projectile            = null;
+    private int              _index                 = 0;
+    private int              _batch                 = 0;
+    private bool             _naturalSpawn          = false;
+    private float            _spawnTime             = 0f;
+
+    private State _state = State.NEUTRAL;
+
+    private enum State {
+        NEUTRAL,
+        ORBITING,
+        RISING,
+        HANGING,
+        FALLING,
+    }
+
+    private void Start()
+    {
+        this._projectile = base.GetComponent<Projectile>();
+        this._owner      = this._projectile.Owner as PlayerController;
+        this._spawnTime = BraveTime.ScaledTimeSinceStartup;
+
+        if (!this._owner)
+            return; // shouldn't happen, but just be safe
+
+        // this._projectile.specRigidbody.OnPreRigidbodyCollision += OnPreRigidbodyCollision;
+        // this._projectile.OverrideMotionModule = new ManualMotionModule();
+
+        StartCoroutine(ShootForTheStars());
+    }
+
+    // private void OnPreRigidbodyCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
+    // {
+    //     if (otherRigidbody.GetComponent<AIActor>() is not AIActor actor)
+    //         return;
+    //     if (!actor.healthHaver || actor.healthHaver.IsDead)
+    //         PhysicsEngine.SkipCollision = true;
+    // }
+
+    private void Update()
+    {
+        if (!this._projectile)
+            return;
+        this._projectile.transform.localRotation = (-ROT_PER_SEC * 360f * (BraveTime.ScaledTimeSinceStartup - this._spawnTime)).EulerZ();
+    }
+
+    private IEnumerator ShootForTheStars()
+    {
+        // Phase 1 -- initial fire
+        if (this._owner.CurrentGun.GetComponent<Starmageddon>() is Starmageddon sm)
+        {
+            this._index = sm.GetNextIndex();
+            this._batch = sm.GetBatch();
+            this._naturalSpawn = true;
+        }
+        else
+            sm = null;
+        this._projectile.specRigidbody.CollideWithTileMap = false;
+        this._projectile.specRigidbody.CollideWithOthers = false;
+        this._projectile.specRigidbody.Reinitialize();
+        yield return new WaitForSeconds(0.125f);
+
+        // Phase 2 -- orbiting the player
+        this._state = State.ORBITING;
+        this._projectile.SetSpeed(0.01f);
+        float radius = this._projectile.DistanceToOwner() * UnityEngine.Random.Range(0.92f, 1.08f);
+        float angle = this._projectile.AngleFromOwner();
+        if (this._naturalSpawn)
+            for (float elapsed = 0f; this._state == State.ORBITING; elapsed += BraveTime.DeltaTime)
+            {
+                if (!this._owner)
+                {
+                    this._projectile.DieInAir();
+                    yield break;
+                }
+                if (!sm || sm.GetBatch() != this._batch)
+                {
+                    this._state = State.RISING;
+                    break;
+                }
+
+                Vector2 oldPos = this._projectile.specRigidbody.Position.GetPixelVector2();
+                Vector2 newPos = this._owner.CenterPosition + (angle + 360f * REV_PER_SEC * elapsed).Clamp360().ToVector(radius);
+                this._projectile.specRigidbody.Position = new Position(newPos);
+                Vector2 vel = (newPos - oldPos);
+                this._projectile.specRigidbody.Velocity = vel;
+                this._projectile.specRigidbody.UpdateColliderPositions();
+                yield return null;
+            }
+
+        // Phase 3 -- launching to the stars
+        this._state = State.RISING;
+        yield return new WaitForSeconds(0.25f * UnityEngine.Random.value);
+        this._projectile.sprite.HeightOffGround = 10f; // max, 100 doesn't render
+        this._projectile.sprite.UpdateZDepth();
+        this._projectile.sprite.renderLayer = 3; // 2 is same as Mourning Star laser, 3 is Gatling Gull outro doer
+        DepthLookupManager.ProcessRenderer(
+            this._projectile.sprite.renderer, DepthLookupManager.GungeonSortingLayer.FOREGROUND);
+
+        this._projectile.SetSpeed(200f);
+        this._projectile.SendInDirection(Vector2.up, true);
+        this._projectile.baseData.range = float.MaxValue;
+
+        // Phase 4 -- hang time
+        yield return new WaitForSeconds(0.5f);
+
+        // Phase 5 -- falling on enemies
+        this._state = State.FALLING;
+        GameActor target = FindTarget();
+        Vector2 targetPos = target.CenterPosition + Lazy.RandomVector(_SPREAD * UnityEngine.Random.value);
+        float fallSpeed = 150f.AddRandomSpread(10f);
+        float fallAngle = 270f.AddRandomSpread(24f);
+        float fallTime = 0.35f.AddRandomSpread(0.25f);
+        Vector2 fallFromPos = targetPos - fallAngle.ToVector(fallTime * fallSpeed);
+        this._projectile.specRigidbody.Position = new Position(fallFromPos);
+        this._projectile.specRigidbody.UpdateColliderPositions();
+        this._projectile.SetSpeed(fallSpeed);
+        this._projectile.SendInDirection(fallAngle.ToVector(), true);
+        for (float elapsed = 0f; elapsed < (fallTime - 0.02f); elapsed += BraveTime.DeltaTime)
+        {
+            if (target)
+            {
+                Vector2 delta = target.CenterPosition - this._projectile.specRigidbody.Position.GetPixelVector2();
+                this._projectile.SetSpeed(delta.magnitude / (fallTime - elapsed));
+                this._projectile.SendInDirection(delta, true);
+            }
+            yield return null;
+        }
+        // this._projectile.specRigidbody.Position = new Position(targetPos);
+        this._projectile.specRigidbody.CollideWithOthers = true;
+        this._projectile.specRigidbody.Reinitialize();
+        yield return null;
+
+        this._projectile.DieInAir();
+    }
+
+    /// <summary>Select a random target, weighted by inverse square distance to player</summary>
+    private GameActor FindTarget()
+    {
+        RoomHandler room = GameManager.Instance.PrimaryPlayer.CurrentRoom;
+        if (room == null || room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> enemies)
+            return this._owner;
+        List<AIActor> livingEnemies = new();
+        List<Vector2> weights = new();
+        int i = 0;
+        foreach(AIActor enemy in enemies)
+            if (enemy && enemy.healthHaver && enemy.healthHaver.IsAlive)
+            {
+                livingEnemies.Add(enemy);
+                weights.Add(new(i++, 1f / (enemy.CenterPosition - this._owner.CenterPosition).sqrMagnitude));
+            }
+        return (livingEnemies.Count == 0) ? this._owner :  livingEnemies[weights.WeightedRandom()];
+    }
+}

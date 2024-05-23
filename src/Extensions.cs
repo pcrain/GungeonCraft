@@ -1205,13 +1205,23 @@ public static class Extensions
     objects.Clear();
   }
 
-  /// <summary>Select a pickup id from a weighted list</summary>
-  public static int GetWeightedPickupID(this List<IntVector2> weights)
+  /// <summary>Select an item from a weighted list of (index, weight) pairs</summary>
+  public static int WeightedRandom(this List<IntVector2> weights)
   {
     int targetWeight = UnityEngine.Random.Range(0, weights.Sum(item => item.y));
     foreach (IntVector2 weight in weights)
       if ((targetWeight -= weight.y) < 0)
         return weight.x;
+    return 0;
+  }
+
+  /// <summary>Select an item from a weighted list of (index, weight) pairs</summary>
+  public static int WeightedRandom(this List<Vector2> weights)
+  {
+    float targetWeight = UnityEngine.Random.Range(0, weights.Sum(item => item.y));
+    foreach (Vector2 weight in weights)
+      if ((targetWeight -= weight.y) < 0)
+        return (int)weight.x;
     return 0;
   }
 
@@ -1876,13 +1886,28 @@ public static class Extensions
   {
     p.StartCoroutine(FreezeAndLaunchWithDelay_CR(p, delay, speed, sound));
   }
-
-  public static IEnumerator FreezeAndLaunchWithDelay_CR(Projectile p, float delay, float speed, string sound = null)
+  private static IEnumerator FreezeAndLaunchWithDelay_CR(Projectile p, float delay, float speed, string sound = null)
   {
     p.Speed = 0.001f;
     yield return new WaitForSeconds(delay);
     p.Speed = speed;
     if (sound != null)
       p.gameObject.Play(sound);
+  }
+
+  /// <summary>Returns the distance from a projectile to its owner. Returns -1f if the projectile has no owner.</summary>
+  public static float DistanceToOwner(this Projectile p)
+  {
+    if (p.Owner)
+      return (p.Owner.CenterPosition - p.SafeCenter).magnitude;
+    return -1f;
+  }
+
+  /// <summary>Returns the angle from a projectile's owner to the projectile. Returns -1f if the projectile has no owner.</summary>
+  public static float AngleFromOwner(this Projectile p)
+  {
+    if (p.Owner)
+      return (p.SafeCenter - p.Owner.CenterPosition).ToAngle();
+    return -1f;
   }
 }

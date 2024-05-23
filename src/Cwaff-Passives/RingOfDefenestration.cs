@@ -32,7 +32,7 @@ public class RingOfDefenestration : CwaffPassive
             if (stat != TrackedStats.ENEMIES_KILLED_WITH_PITS || !Lazy.AnyoneHas<RingOfDefenestration>())
                 return;
 
-            int pickupID = _RewardWeights.GetWeightedPickupID();  //REFACTOR: change to GetWeighted(), doesn't need to be pickup IDs
+            int pickupID = _RewardWeights.WeightedRandom();
             if (pickupID < 0) // currency
                 LootEngine.SpawnCurrency(GameManager.Instance.BestActivePlayer.CenterPosition, -pickupID);
             else

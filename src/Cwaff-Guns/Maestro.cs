@@ -49,7 +49,7 @@ public class Maestro : CwaffGun
         {
             if (!p || !p.isActiveAndEnabled)
                 continue;
-            if (p.Owner == targetEnemy)
+            if (p.Owner == targetEnemy || p.Owner is PlayerController)
                 continue;
             if (!p.GetComponent<MaestroProjectile>()) //NOTE: checking it this way allows us to redirect projectiles with dead owners
                 continue;
