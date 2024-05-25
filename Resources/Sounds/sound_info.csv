@@ -165,3 +165,5 @@ nycterian_shoot_sound,-1.0,1,sound
 nycterian_reload_sound,7.0,1,sound
 armor_pierced_sound,-2.0,1,sound
 distracted_sound,-2.0,1,sound
+frisbee_spin_sound_alt,-10.0,1,sound
+frisbee_bounce_sound,-4.5,1,sound

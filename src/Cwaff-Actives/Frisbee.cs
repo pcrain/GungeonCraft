@@ -3,19 +3,10 @@ namespace CwaffingTheGungy;
 using System;
 using static FrisbeeBehaviour.State;
 
-
-/* TODO:
-    - don't allow throwing frisbee too close to the wall (or it can get stuck)
-    - improve collision masks
-    - add sounds
-    - add better frisbee with spinning animation
-    - add invulnerability
-*/
-
 public class Frisbee : CwaffActive
 {
     public static string ItemName         = "Frisbee";
-    public static string ShortDescription = "";
+    public static string ShortDescription = "Well-inspired";
     public static string LongDescription  = "";
     public static string Lore             = "";
 
@@ -24,7 +15,9 @@ public class Frisbee : CwaffActive
 
     internal static GameObject _FrisbeePrefab = null;
 
+    private PlayerController _owner = null;
     private FrisbeeBehaviour _frisbee = null;
+
     private FrisbeeBehaviour.State _state => _frisbee ? _frisbee._state : FrisbeeBehaviour.State.INACTIVE;
 
     public static void Init()
@@ -59,7 +52,7 @@ public class Frisbee : CwaffActive
             case INACTIVE:
                 if (!this._frisbee)
                     this._frisbee = _FrisbeePrefab.Instantiate(user.CenterPosition).GetComponent<FrisbeeBehaviour>();
-                this._frisbee.Launch(user.m_lastNonzeroCommandedDirection.ToAngle().Quantize(90f, VectorConversions.Round));
+                this._frisbee.Launch(user);
                 break;
             case FLYING:
             case DROPPED:
@@ -87,7 +80,49 @@ public class Frisbee : CwaffActive
     public override void Update()
     {
         base.Update();
-        this.CanBeDropped = this._state == INACTIVE;
+        this.CanBeDropped = (this._state == INACTIVE);
+    }
+
+    public override void Pickup(PlayerController player)
+    {
+        this._owner = player;
+        this._owner.specRigidbody.OnPreRigidbodyCollision -= this.OnPreRigidbodyCollision;
+        this._owner.specRigidbody.OnPreRigidbodyCollision += this.OnPreRigidbodyCollision;
+        base.Pickup(player);
+    }
+
+    private void OnPreRigidbodyCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
+    {
+        if (this._state != RIDDEN)
+            return;
+        if (otherRigidbody.GetComponent<Projectile>() is not Projectile proj)
+            return;
+        if (proj.Owner is PlayerController)
+            return;
+        PassiveReflectItem.ReflectBullet(
+            p                       : proj,
+            retargetReflectedBullet : true,
+            newOwner                : myRigidbody.gameActor,
+            minReflectedBulletSpeed : 30f,
+            scaleModifier           : 1f,
+            damageModifier          : 1f,
+            spread                  : 0f);
+        PhysicsEngine.SkipCollision = true;
+    }
+
+    public override void OnPreDrop(PlayerController player)
+    {
+        if (this._owner)
+            this._owner.specRigidbody.OnPreRigidbodyCollision -= this.OnPreRigidbodyCollision;
+        this._owner = null;
+        base.OnPreDrop(player);
+    }
+
+    public override void OnDestroy()
+    {
+        if (this._owner)
+            this._owner.specRigidbody.OnPreRigidbodyCollision -= this.OnPreRigidbodyCollision;
+        base.OnDestroy();
     }
 }
 
@@ -102,10 +137,14 @@ public class FrisbeeBehaviour : MonoBehaviour
     }
 
     private const float _FRISBEE_SPEED = 20f;
+    private const float _SOUND_RATE = 0.16f;
 
     internal State _state = State.INACTIVE;
+    private PlayerController _owner = null;
     private PlayerController _rider = null;
     private SpeculativeRigidbody _body = null;
+    private float _soundTimer = 0.0f;
+    private int _framesSinceLastCollision = 9999;
 
     private void Awake()
     {
@@ -117,7 +156,14 @@ public class FrisbeeBehaviour : MonoBehaviour
 
     private void OnRigidbodyCollision(CollisionData rigidbodyCollision)
     {
+        if (this._framesSinceLastCollision < 2)
+        {
+            Catch();
+            return;
+        }
+        this._framesSinceLastCollision = 0;
         PhysicsEngine.PostSliceVelocity = _FRISBEE_SPEED * rigidbodyCollision.Normal.ToAngle().Quantize(90f, VectorConversions.Round).ToVector();
+        base.gameObject.PlayOnce("frisbee_bounce_sound");
     }
 
     private void Start()
@@ -127,14 +173,36 @@ public class FrisbeeBehaviour : MonoBehaviour
 
     private void OnTileCollision(CollisionData tileCollision)
     {
+        if (this._framesSinceLastCollision < 2)
+        {
+            Catch();
+            return;
+        }
+        this._framesSinceLastCollision = 0;
+        if (this._owner && this._state == FLYING && this._body.UnitCenter.GetAbsoluteRoom() != this._owner.CurrentRoom)
+        {
+            Catch();
+            return;
+        }
         PhysicsEngine.PostSliceVelocity = _FRISBEE_SPEED * tileCollision.Normal.ToAngle().Quantize(90f, VectorConversions.Round).ToVector();
+        base.gameObject.PlayOnce("frisbee_bounce_sound");
     }
 
     private void OnPreRigidbodyCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
     {
-
-        if (otherRigidbody.GetComponent<GameActor>())
+        if (otherRigidbody.majorBreakable && otherRigidbody.majorBreakable.IsSecretDoor)
+        {
+            // NOTE: this is dog roll code, idk why they do it 3 times but i'm scared it'll break if i don't
+            otherRigidbody.gameObject.Play("Play_OBJ_wall_reveal_01");
+            otherRigidbody.majorBreakable.ApplyDamage(damage: 1E+10f, sourceDirection: Vector2.zero, isSourceEnemy: false, isExplosion: true, ForceDamageOverride: true);
+            otherRigidbody.majorBreakable.ApplyDamage(damage: 1E+10f, sourceDirection: Vector2.zero, isSourceEnemy: false, isExplosion: true, ForceDamageOverride: true);
+            otherRigidbody.majorBreakable.ApplyDamage(damage: 1E+10f, sourceDirection: Vector2.zero, isSourceEnemy: false, isExplosion: true, ForceDamageOverride: true);
+        }
+        if (otherRigidbody.minorBreakable)
             PhysicsEngine.SkipCollision = true;
+        else if (otherRigidbody.GetComponent<GameActor>())
+            PhysicsEngine.SkipCollision = true;
+
         if (this._state != FLYING)
             return;
         if (otherRigidbody.GetComponent<PlayerController>() is not PlayerController pc)
@@ -156,52 +224,77 @@ public class FrisbeeBehaviour : MonoBehaviour
         pc.CurrentInputState = PlayerInputState.NoMovement;
         pc.knockbackDoer.ClearContinuousKnockbacks();
         pc.specRigidbody.Velocity = Vector2.zero;
-        // pc.SetIsFlying(true, Frisbee.ItemName);
         pc.FallingProhibited = true;
-        pc.IsGunLocked = true;
+        // pc.IsGunLocked = true;
         this._body.RegisterCarriedRigidbody(pc.specRigidbody);
 
         UpdateRider();
     }
 
-    public void RollOff()
+    public void Launch(PlayerController user)
     {
-        PlayerController pc = this._rider;
-        pc.m_overrideGunAngle = null;
-        pc.forceAimPoint = null;
-        pc.ClearInputOverride(Frisbee.ItemName);
-        pc.FallingProhibited = false;
-        pc.IsGunLocked = false;
-        this._body.DeregisterCarriedRigidbody(pc.specRigidbody);
-        pc.CurrentInputState = PlayerInputState.AllInput;
-        pc.ForceStartDodgeRoll();
-        Catch();
-    }
-
-    public void Launch(float angle)
-    {
+        this._owner = user;
+        float launchAngle = user.m_currentGunAngle.Quantize(90f, VectorConversions.Round);
         this._state = FLYING;
-        this._body.Velocity = angle.ToVector(_FRISBEE_SPEED);
+        this._soundTimer = 0.0f;
+        this._body.CorrectForWalls();
+        this._body.Velocity = launchAngle.ToVector(_FRISBEE_SPEED);
+        base.gameObject.PlayOnce("frisbee_throw_sound");
     }
 
     public void Catch()
     {
+        if (this._rider is PlayerController pc)
+        {
+            pc.m_overrideGunAngle = null;
+            pc.forceAimPoint = null;
+            pc.ClearInputOverride(Frisbee.ItemName);
+            pc.FallingProhibited = false;
+            // pc.IsGunLocked = false;
+            this._body.DeregisterCarriedRigidbody(pc.specRigidbody);
+            if (!pc.healthHaver.IsDead)
+            {
+                pc.specRigidbody.CorrectForWalls(andRigidBodies: true);
+                pc.CurrentInputState = PlayerInputState.AllInput;
+                pc.ForceStartDodgeRoll();
+            }
+        }
+
         this._state = COOLDOWN;
+        this._rider = null;
+        LootEngine.DoDefaultItemPoof(this._body.UnitBottomCenter);
         UnityEngine.Object.Destroy(this.gameObject);
         // play catch sound
     }
 
     private void Update()
     {
-        if (this._state != RIDDEN || !this._rider || this._rider.healthHaver.IsDead)
+        if (this._state != FLYING && this._state != RIDDEN)
             return;
+
+        ++this._framesSinceLastCollision;
+        if ((this._soundTimer += BraveTime.DeltaTime) > _SOUND_RATE)
+        {
+            this._soundTimer = 0.0f;
+            base.gameObject.PlayOnce("frisbee_spin_sound_alt");
+        }
+
+        base.GetComponent<tk2dSprite>().transform.localRotation = AngleFromFrisbeeAnimation().EulerZ();
+        if (this._state != RIDDEN || !this._rider)
+            return;
+
+        if (this._rider.healthHaver.IsDead)
+        {
+            Catch();
+            return;
+        }
 
         GungeonActions activeActions = BraveInput.GetInstanceForPlayer(this._rider.PlayerIDX).ActiveActions;
         if (!activeActions.DodgeRollAction.WasPressed || this._rider.WasPausedThisFrame)
             return;
         if (activeActions.Move.Vector.magnitude <= 0.1f)
             return;
-        RollOff();
+        Catch();
     }
 
     private void LateUpdate()
@@ -226,5 +319,22 @@ public class FrisbeeBehaviour : MonoBehaviour
     private float AngleFromFrisbeeAnimation()
     {
         return (720f * BraveTime.ScaledTimeSinceStartup).Clamp180();
+    }
+
+}
+
+/// <summary>Patch to make FlippableCovers not spew debug warnings when we're riding a frisbee above them (more generally, when we're in a NoMovement state).</summary>
+[HarmonyPatch(typeof(FlippableCover), nameof(FlippableCover.GetFlipDirection))]
+internal static class FlippableCoverPatch
+{
+    static bool Prefix(FlippableCover __instance, SpeculativeRigidbody flipperRigidbody, ref DungeonData.Direction __result)
+    {
+        if (flipperRigidbody.GetComponent<PlayerController>() is not PlayerController pc)
+            return true; // call the original method
+        if (pc.CurrentInputState != PlayerInputState.NoMovement)
+            return true; // call the original method
+
+          __result = DungeonData.Direction.NORTH; // change the original result
+        return false;    // skip the original method
     }
 }
