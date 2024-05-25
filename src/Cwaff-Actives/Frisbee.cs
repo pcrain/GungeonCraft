@@ -202,6 +202,13 @@ public class FrisbeeBehaviour : MonoBehaviour
             PhysicsEngine.SkipCollision = true;
         else if (otherRigidbody.GetComponent<GameActor>())
             PhysicsEngine.SkipCollision = true;
+        else if (otherRigidbody.transform.parent && otherRigidbody.transform.parent.GetComponent<DungeonDoorController>() is DungeonDoorController door)
+        {
+            if (!door.IsOpen && !door.isLocked && this._state == RIDDEN)
+                door.Open();
+            if (door.IsOpen)
+                PhysicsEngine.SkipCollision = true;
+        }
 
         if (this._state != FLYING)
             return;
