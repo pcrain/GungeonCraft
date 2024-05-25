@@ -286,6 +286,7 @@ public class Initialisation : BaseUnityPlugin
                 GunSynthesizer.Init();
                 ChestScanner.Init();
                 BulletbotImplant.Init();
+                Frisbee.Init();
 
                 setupActivesWatch.Stop();
             #endregion

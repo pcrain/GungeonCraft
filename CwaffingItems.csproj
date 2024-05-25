@@ -103,6 +103,7 @@
     <Compile Include="src\Cwaff-Actives\Unfinished\Protractor.cs"/>
     <Compile Include="src\Cwaff-Actives\ChamberJammer.cs"/>
     <Compile Include="src\Cwaff-Actives\BulletThatCanKillTheFuture.cs"/>
+    <Compile Include="src\Cwaff-Actives\Frisbee.cs"/>
     <Compile Include="src\Cwaff-Actives\GunPowderer.cs"/>
     <Compile Include="src\Cwaff-Actives\BorrowedTime.cs"/>
     <Compile Include="src\Cwaff-Actives\StackOfTorches.cs"/>
