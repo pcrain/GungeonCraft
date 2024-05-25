@@ -1910,4 +1910,18 @@ public static class Extensions
       return (p.SafeCenter - p.Owner.CenterPosition).ToAngle();
     return -1f;
   }
+
+  /// <summary>Get an idle animation for a player spaced every 60 degrees</summary>
+  public static string GetEvenlySpacedIdleAnimation(this PlayerController pc, float a)
+  {
+      string s;
+      float absa = Mathf.Abs(a);
+      if (absa < 60f || absa > 120f)
+        s = (a > 0) ? "idle_bw" : "idle";
+      else
+        s = (a > 0) ? "idle_backward" : "idle_forward";
+      if (pc.UseArmorlessAnim)
+        s += "_armorless";
+      return s;
+  }
 }

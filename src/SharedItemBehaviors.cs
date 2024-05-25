@@ -1272,20 +1272,21 @@ public class RotateIntoPositionBehavior : MonoBehaviour
     }
 }
 
+//BUG: destroying these without breaking the game is rather hard...look into it later
 public class Nametag : MonoBehaviour
 {
     private Text _nametag; // Reference to the Text component.
-    private AIActor _actor;
+    private GameActor _actor;
     private GameObject _canvasGo;
     private GameObject _textGo;
 
     private static int _NumNames = 0;
     private static Font _Font;
 
-    public void Setup()
+    public void Setup(TextAnchor anchor = TextAnchor.UpperCenter)
     {
         _Font ??= Resources.GetBuiltinResource(typeof(Font), "Arial.ttf") as Font;
-        this._actor = base.GetComponent<AIActor>();
+        this._actor = base.GetComponent<GameActor>();
 
         // Create Canvas GameObject.
         this._canvasGo = new GameObject();
@@ -1303,7 +1304,7 @@ public class Nametag : MonoBehaviour
         this._nametag.font      = _Font;
         this._nametag.text      = "";
         this._nametag.fontSize  = 32;
-        this._nametag.alignment = TextAnchor.UpperCenter;
+        this._nametag.alignment = anchor;
         this._nametag.color     = Color.green;
         this._nametag.gameObject.AddComponent<Outline>().effectColor = Color.black;
 
@@ -1341,6 +1342,14 @@ public class Nametag : MonoBehaviour
         UnityEngine.Object.Destroy(this._canvasGo);
         UnityEngine.Object.Destroy(this._textGo);
         UnityEngine.Object.Destroy(this);
+    }
+
+    private void OnDestroy()
+    {
+        if (this._canvasGo)
+            UnityEngine.Object.Destroy(this._canvasGo);
+        if (this._textGo)
+            UnityEngine.Object.Destroy(this._textGo);
     }
 
     public void SetEnabled(bool v)

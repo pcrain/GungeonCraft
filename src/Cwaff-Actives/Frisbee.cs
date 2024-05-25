@@ -3,6 +3,15 @@ namespace CwaffingTheGungy;
 using System;
 using static FrisbeeBehaviour.State;
 
+
+/* TODO:
+    - don't allow throwing frisbee too close to the wall (or it can get stuck)
+    - improve collision masks
+    - add sounds
+    - add better frisbee with spinning animation
+    - add invulnerability
+*/
+
 public class Frisbee : CwaffActive
 {
     public static string ItemName         = "Frisbee";
@@ -23,7 +32,7 @@ public class Frisbee : CwaffActive
         PlayerItem item = Lazy.SetupActive<Frisbee>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality    = ItemQuality.D;
         item.consumable = false;
-        item.SetCooldownType(ItemBuilder.CooldownType.Timed, 1f);
+        item.SetCooldownType(ItemBuilder.CooldownType.Timed, 0.2f);
 
         _FrisbeePrefab = VFX.Create("frisbee_vfx", fps: 8, loops: true, anchor: Anchor.MiddleCenter);
         _FrisbeePrefab.AddComponent<FrisbeeBehaviour>();
@@ -33,10 +42,10 @@ public class Frisbee : CwaffActive
         body.CollideWithOthers    = true;
         body.PixelColliders       = new List<PixelCollider>(){new(){
           ColliderGenerationMode = PixelCollider.PixelColliderGeneration.Manual,
-          ManualOffsetX          = -6,  //TODO: adjust these from suncaster prism to frisbee dimensions
-          ManualOffsetY          = -18,
-          ManualWidth            = 13,
-          ManualHeight           = 24,
+          ManualOffsetX          = -7,  //TODO: adjust frisbee dimensions once sprite is finalized
+          ManualOffsetY          = -7,
+          ManualWidth            = 14,
+          ManualHeight           = 14,
           CollisionLayer         = CollisionLayer.Projectile,
           Enabled                = true,
           IsTrigger              = false,
@@ -50,11 +59,7 @@ public class Frisbee : CwaffActive
             case INACTIVE:
                 if (!this._frisbee)
                     this._frisbee = _FrisbeePrefab.Instantiate(user.CenterPosition).GetComponent<FrisbeeBehaviour>();
-                this._frisbee.Launch(user.m_lastNonzeroCommandedDirection.ToAngle().Quantize(45f, VectorConversions.Round));
-                break;
-            case RIDDEN:
-            this._frisbee.RollOff();
-                this._frisbee.Catch();
+                this._frisbee.Launch(user.m_lastNonzeroCommandedDirection.ToAngle().Quantize(90f, VectorConversions.Round));
                 break;
             case FLYING:
             case DROPPED:
@@ -72,11 +77,17 @@ public class Frisbee : CwaffActive
         {
             case INACTIVE : return true;
             case FLYING   : return (this._frisbee.GetComponent<tk2dSprite>().WorldCenter - user.CenterPosition).sqrMagnitude < GRAB_RANGE_SQR;
-            case RIDDEN   : return true;
+            case RIDDEN   : return false;
             case DROPPED  : return (this._frisbee.GetComponent<tk2dSprite>().WorldCenter - user.CenterPosition).sqrMagnitude < GRAB_RANGE_SQR;
             case COOLDOWN : return false;
         }
         return true;
+    }
+
+    public override void Update()
+    {
+        base.Update();
+        this.CanBeDropped = this._state == INACTIVE;
     }
 }
 
@@ -95,28 +106,35 @@ public class FrisbeeBehaviour : MonoBehaviour
     internal State _state = State.INACTIVE;
     private PlayerController _rider = null;
     private SpeculativeRigidbody _body = null;
-    private int _preride = 0;
 
     private void Awake()
     {
         this._body = base.GetComponent<SpeculativeRigidbody>();
         this._body.OnPreRigidbodyCollision += this.OnPreRigidbodyCollision;
+        this._body.OnRigidbodyCollision += this.OnRigidbodyCollision;
         this._body.OnTileCollision += this.OnTileCollision;
+    }
+
+    private void OnRigidbodyCollision(CollisionData rigidbodyCollision)
+    {
+        PhysicsEngine.PostSliceVelocity = _FRISBEE_SPEED * rigidbodyCollision.Normal.ToAngle().Quantize(90f, VectorConversions.Round).ToVector();
     }
 
     private void Start()
     {
-        base.GetComponent<tk2dSprite>().HeightOffGround = -2f;
+        base.GetComponent<tk2dSprite>().HeightOffGround = 0.4f;
     }
 
     private void OnTileCollision(CollisionData tileCollision)
     {
-        PhysicsEngine.PostSliceVelocity = _FRISBEE_SPEED * tileCollision.Normal;
+        PhysicsEngine.PostSliceVelocity = _FRISBEE_SPEED * tileCollision.Normal.ToAngle().Quantize(90f, VectorConversions.Round).ToVector();
     }
 
     private void OnPreRigidbodyCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
     {
-        PhysicsEngine.SkipCollision = true;
+
+        if (otherRigidbody.GetComponent<GameActor>())
+            PhysicsEngine.SkipCollision = true;
         if (this._state != FLYING)
             return;
         if (otherRigidbody.GetComponent<PlayerController>() is not PlayerController pc)
@@ -131,40 +149,32 @@ public class FrisbeeBehaviour : MonoBehaviour
         this._state = RIDDEN;
         this._rider = pc;
 
-        this._preride = 120;
-        // Vector2 center = base.GetComponent<tk2dSprite>().WorldCenter - this._rider.sprite.GetRelativePositionFromAnchor(Anchor.LowerCenter);
-        // pc.specRigidbody.Reinitialize();
-        // pc.gameObject.transform.localPosition = Vector3.zero;
-        // pc.gameObject.transform.position = center;
-        // pc.sprite.transform.position     = center;
-        // pc.transform.position            = center;
-        // pc.gameObject.transform.parent = this._body.transform;
-        // pc.specRigidbody.Reinitialize();
-
-        // pc.gameObject.transform.position =
-        //     base.GetComponent<tk2dSprite>().WorldCenter - this._rider.sprite.GetRelativePositionFromAnchor(Anchor.LowerCenter);
-        // pc.specRigidbody.Reinitialize();
-
         if (pc.knockbackDoer)
             pc.knockbackDoer.ClearContinuousKnockbacks();
         if (pc.IsDodgeRolling)
             pc.ForceStopDodgeRoll();
-
         pc.CurrentInputState = PlayerInputState.NoMovement;
         pc.knockbackDoer.ClearContinuousKnockbacks();
         pc.specRigidbody.Velocity = Vector2.zero;
-        pc.SetIsFlying(true, Frisbee.ItemName);
-
-        Vector2 center = base.GetComponent<tk2dSprite>().WorldCenter - this._rider.sprite.GetRelativePositionFromAnchor(Anchor.LowerCenter);
-        pc.transform.position = center;
+        // pc.SetIsFlying(true, Frisbee.ItemName);
+        pc.FallingProhibited = true;
+        pc.IsGunLocked = true;
         this._body.RegisterCarriedRigidbody(pc.specRigidbody);
+
+        UpdateRider();
     }
 
     public void RollOff()
     {
         PlayerController pc = this._rider;
+        pc.m_overrideGunAngle = null;
+        pc.forceAimPoint = null;
         pc.ClearInputOverride(Frisbee.ItemName);
-        pc.SetIsFlying(true, Frisbee.ItemName);
+        pc.FallingProhibited = false;
+        pc.IsGunLocked = false;
+        this._body.DeregisterCarriedRigidbody(pc.specRigidbody);
+        pc.CurrentInputState = PlayerInputState.AllInput;
+        pc.ForceStartDodgeRoll();
         Catch();
     }
 
@@ -181,69 +191,40 @@ public class FrisbeeBehaviour : MonoBehaviour
         // play catch sound
     }
 
-    private void UpdateRider()
-    {
-        if (this._state == RIDDEN && this._rider)
-        {
-            PlayerController pc   = this._rider;
-            Vector2 center        = base.GetComponent<tk2dSprite>().WorldCenter + this._rider.transform.position.XY() - this._rider.specRigidbody.UnitBottomCenter;
-            pc.transform.position = center;
-            pc.specRigidbody.Reinitialize();
-        }
-    }
-
     private void Update()
     {
-        // UpdateRider();
+        if (this._state != RIDDEN || !this._rider || this._rider.healthHaver.IsDead)
+            return;
+
+        GungeonActions activeActions = BraveInput.GetInstanceForPlayer(this._rider.PlayerIDX).ActiveActions;
+        if (!activeActions.DodgeRollAction.WasPressed || this._rider.WasPausedThisFrame)
+            return;
+        if (activeActions.Move.Vector.magnitude <= 0.1f)
+            return;
+        RollOff();
     }
 
     private void LateUpdate()
     {
         UpdateRider();
-        return;
+    }
 
-        if (this._state != FLYING && this._state != RIDDEN)
+    private void UpdateRider()
+    {
+        if (this._state != RIDDEN || !this._rider || this._rider.healthHaver.IsDead)
             return;
 
-        if (this._state == RIDDEN && this._rider)
-        {
-            // if (this._repositioned > 0)
-            // {
-            //     Vector2 myPos = base.GetComponent<tk2dSprite>().WorldCenter;
-            //     // this._rider.gameObject.transform.parent = null;
-            //     this._rider.gameObject.transform.position = myPos - this._rider.sprite.GetRelativePositionFromAnchor(Anchor.LowerCenter);
-            //     // this._rider.gameObject.transform.parent = this._body.transform;
-            //     --this._repositioned;
-            // }
-            // this._rider.specRigidbody.Reinitialize();
+        float angle = AngleFromFrisbeeAnimation();
+        this._rider.m_overrideGunAngle = angle;
+        this._rider.forceAimPoint = this._rider.sprite.WorldCenter + angle.ToVector();
+        this._rider.spriteAnimator.PlayFromFrame(this._rider.GetEvenlySpacedIdleAnimation(angle), frame: 0);
+        this._rider.spriteAnimator.UpdateAnimation(GameManager.INVARIANT_DELTA_TIME);
+        this._rider.transform.position = base.GetComponent<tk2dSprite>().WorldCenter + this._rider.transform.position.XY() - this._rider.specRigidbody.UnitBottomCenter + new Vector2(0.125f, 0.0f);
+        this._rider.specRigidbody.Reinitialize();
+    }
 
-            // if (this._preride)
-            // {
-            //     // ETGModConsole.Log($"preride");
-            //     PlayerController pc = this._rider;
-
-            //     Vector2 center = base.GetComponent<tk2dSprite>().WorldCenter - this._rider.sprite.GetRelativePositionFromAnchor(Anchor.LowerCenter);
-            //     pc.specRigidbody.Reinitialize();
-            //     pc.gameObject.transform.localPosition = Vector3.zero;
-            //     pc.gameObject.transform.position = center;
-            //     pc.sprite.transform.position     = center;
-            //     pc.transform.position            = center;
-            //     pc.gameObject.transform.parent = this._body.transform;
-            //     pc.specRigidbody.Position = new Position(center);
-            //     pc.specRigidbody.Reinitialize();
-            // }
-
-            // PlayerController pc = this._rider;
-
-            // Vector2 center = base.GetComponent<tk2dSprite>().WorldCenter - this._rider.sprite.GetRelativePositionFromAnchor(Anchor.LowerCenter);
-            // // pc.specRigidbody.Reinitialize();
-            // pc.gameObject.transform.localPosition = Vector3.zero;
-            // pc.gameObject.transform.position = center;
-            // pc.sprite.transform.position     = center;
-            // pc.transform.position            = center;
-            // pc.gameObject.transform.parent = this._body.transform;
-            // pc.specRigidbody.Position = new Position(center);
-            // pc.specRigidbody.Reinitialize();
-        }
+    private float AngleFromFrisbeeAnimation()
+    {
+        return (720f * BraveTime.ScaledTimeSinceStartup).Clamp180();
     }
 }
