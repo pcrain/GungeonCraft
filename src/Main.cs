@@ -260,7 +260,7 @@ public class Initialisation : BaseUnityPlugin
                 SubMachineGun.Add();
                 MacchiAuto.Add();
                 Nycterian.Add();
-                // Maestro.Add();
+                Maestro.Add();
                 Starmageddon.Add();
 
                 setupGunsWatch.Stop();

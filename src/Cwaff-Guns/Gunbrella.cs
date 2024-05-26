@@ -254,12 +254,7 @@ public class GunbrellaProjectile : MonoBehaviour
     private IEnumerator TakeToTheSkies()
     {
         // Phase 1 / 4 -- become intangible and launch to the skies
-        this._projectile.sprite.HeightOffGround = 10f; // max, 100 doesn't render
-        this._projectile.sprite.UpdateZDepth();
-        this._projectile.sprite.renderLayer = 3; // 2 is same as Mourning Star laser, 3 is Gatling Gull outro doer
-        DepthLookupManager.ProcessRenderer(
-            this._projectile.sprite.renderer, DepthLookupManager.GungeonSortingLayer.FOREGROUND);
-
+        this._projectile.gameObject.SetLayerRecursively(LayerMask.NameToLayer("Unoccluded"));
         Vector2 targetLaunchVelocity = (85f + 10f*UnityEngine.Random.value).ToVector(1f);
         this._projectile.IgnoreTileCollisionsFor(_TIME_TO_REACH_TARGET);
         this._projectile.SetSpeed(_LAUNCH_SPEED);
