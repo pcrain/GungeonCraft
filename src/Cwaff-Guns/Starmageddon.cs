@@ -7,23 +7,27 @@ public class Starmageddon : CwaffGun
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
 
-    private int        _nextIndex        = 0;
-    private int        _curBatch         = 0;
-    private GameObject _extantMuzzleRune = null;
-    private float      _muzzleRuneAlpha  = 0.0f;
+    internal static TrailController _StarmageddonTrailPrefab = null;
+
+    private int _nextIndex = 0;
+    private int _curBatch  = 0;
 
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Starmageddon>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.S, gunClass: GunClass.FULLAUTO, reloadTime: 1.0f, ammo: 900, shootFps: 2);
+            gun.SetAttributes(quality: ItemQuality.S, gunClass: GunClass.FULLAUTO, reloadTime: 1.0f, ammo: 900, shootFps: 20, chargeFps: 20, reloadFps: 30);
+            gun.LoopAnimation(gun.reloadAnimation);
 
-        gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.125f, angleVariance: 15.0f,
-          shootStyle: ShootStyle.Automatic, damage: 3.0f, speed: 60.0f, range: 999999f, spawnSound: "tomislav_shoot",
+        gun.InitProjectile(GunData.New(clipSize: 30, cooldown: 0.125f, angleVariance: 15.0f,
+          shootStyle: ShootStyle.Automatic, damage: 6.0f, speed: 60.0f, range: 999999f, spawnSound: "starmageddon_fire_sound",
           sprite: "starmageddon_bullet", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter, useDummyChargeModule: true,
           // overrideColliderPixelSizes: new IntVector2(128, 128), //BUG: large hitboxes apparently lag the game????
           shrapnelVFX: VFX.Create("starmageddon_shrapnel"), shrapnelCount: 5
           )
         ).Attach<StarmageddonProjectile>();
+
+        _StarmageddonTrailPrefab = VFX.CreateTrailObject(ResMap.Get("starmageddon_trail")[0], new Vector2(23, 4), new Vector2(0, 0),
+            ResMap.Get("starmageddon_trail"), 60, cascadeTimer: C.FRAME, softMaxLength: 1f, destroyOnEmpty: true);
     }
 
     public override void Update()
@@ -33,27 +37,14 @@ public class Starmageddon : CwaffGun
             return;
         if (this.GenericOwner is not PlayerController)
             return;
-
-        if (this._extantMuzzleRune == null)
-        {
-            this._extantMuzzleRune = SpawnManager.SpawnVFX(KingsLaw._RuneMuzzle, this.gun.barrelOffset.transform.position, Quaternion.identity);
-            this._extantMuzzleRune.SetAlphaImmediate(0.0f);
-            this._extantMuzzleRune.transform.parent = this.gun.barrelOffset;
-        }
-
         if (this.gun.IsCharging)
-        {
-            this._muzzleRuneAlpha = Mathf.Min(1f, this._muzzleRuneAlpha + 2f * BraveTime.DeltaTime);
-            this._extantMuzzleRune.SetAlpha(Mathf.Clamp01(this._muzzleRuneAlpha));
-            this._extantMuzzleRune.transform.localRotation = (-KingsLaw._RUNE_ROT_MID * BraveTime.ScaledTimeSinceStartup).EulerZ();
             return;
-        }
 
         if (!this.gun.IsReloading && this.gun.ClipShotsRemaining < Mathf.Min(this.gun.ClipCapacity, this.gun.CurrentAmmo))
+        {
+            base.gameObject.PlayOnce("starmageddon_reload_sound");
             this.gun.Reload(); // force reload while we're not at max clip capacity
-
-        this._muzzleRuneAlpha = Mathf.Max(0f, this._muzzleRuneAlpha - 4f * BraveTime.DeltaTime);
-        this._extantMuzzleRune.SetAlpha(Mathf.Clamp01(this._muzzleRuneAlpha));
+        }
 
         Reset();
         // Synchronize ammo clips between projectile modules as necessary
@@ -127,22 +118,19 @@ public class StarmageddonProjectile : MonoBehaviour
         this._owner      = this._projectile.Owner as PlayerController;
         this._spawnTime = BraveTime.ScaledTimeSinceStartup;
 
+        this._projectile.OnDestruction += this.OnProjectileDestruction;
+
         if (!this._owner)
             return; // shouldn't happen, but just be safe
-
-        // this._projectile.specRigidbody.OnPreRigidbodyCollision += OnPreRigidbodyCollision;
-        // this._projectile.OverrideMotionModule = new ManualMotionModule();
 
         StartCoroutine(ShootForTheStars());
     }
 
-    // private void OnPreRigidbodyCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
-    // {
-    //     if (otherRigidbody.GetComponent<AIActor>() is not AIActor actor)
-    //         return;
-    //     if (!actor.healthHaver || actor.healthHaver.IsDead)
-    //         PhysicsEngine.SkipCollision = true;
-    // }
+    private void OnProjectileDestruction(Projectile p)
+    {
+        p.gameObject.Play("starmageddon_bullet_impact_sound_1");
+        p.gameObject.Play("starmageddon_bullet_impact_sound_2");
+    }
 
     private void Update()
     {
@@ -153,6 +141,10 @@ public class StarmageddonProjectile : MonoBehaviour
 
     private IEnumerator ShootForTheStars()
     {
+        // Setup
+        this._projectile.gameObject.SetLayerRecursively(LayerMask.NameToLayer("Unoccluded"));
+        this._projectile.sprite.SetGlowiness(glowAmount: 70f, glowColor: Color.yellow);
+
         // Phase 1 -- initial fire
         if (this._owner.CurrentGun.GetComponent<Starmageddon>() is Starmageddon sm)
         {
@@ -207,9 +199,19 @@ public class StarmageddonProjectile : MonoBehaviour
         this._projectile.SetSpeed(200f);
         this._projectile.SendInDirection(Vector2.up, true);
         this._projectile.baseData.range = float.MaxValue;
+        TrailController tc = this._projectile.AddTrailToProjectileInstance(Starmageddon._StarmageddonTrailPrefab);
+        tc.gameObject.SetGlowiness(10f);
+        yield return null; // wait a frame so we can properly set the trails to unoccluded without being overwritten
+        tc.gameObject.SetLayerRecursively(LayerMask.NameToLayer("Unoccluded"));
+        tc.gameObject.transform.position = tc.gameObject.transform.position.XY().ToVector3ZisY(100f);
+        DepthLookupManager.ProcessRenderer(
+            tc.sprite.renderer, DepthLookupManager.GungeonSortingLayer.FOREGROUND);
 
         // Phase 4 -- hang time
-        yield return new WaitForSeconds(0.5f);
+        this._projectile.gameObject.Play("starmageddon_bullet_launch_sound");
+        yield return new WaitForSeconds(0.25f);
+        this._projectile.gameObject.Play("starmageddon_bullet_fall_sound");
+        yield return new WaitForSeconds(0.25f);
 
         // Phase 5 -- falling on enemies
         this._state = State.FALLING;

@@ -167,3 +167,9 @@ armor_pierced_sound,-2.0,1,sound
 distracted_sound,-2.0,1,sound
 frisbee_spin_sound_alt,-10.0,1,sound
 frisbee_bounce_sound,-4.5,1,sound
+starmageddon_bullet_fall_sound,-0.5,1,sound
+starmageddon_bullet_impact_sound_1,-0.5,1,sound
+starmageddon_bullet_impact_sound_2,-0.5,1,sound
+starmageddon_bullet_launch_sound,-1.5,1,sound
+starmageddon_fire_sound,-2.5,1,sound
+starmageddon_reload_sound,-2.0,1,sound
