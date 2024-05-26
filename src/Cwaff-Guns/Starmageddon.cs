@@ -225,7 +225,7 @@ public class StarmageddonProjectile : MonoBehaviour
         this._projectile.specRigidbody.UpdateColliderPositions();
         this._projectile.SetSpeed(fallSpeed);
         this._projectile.SendInDirection(fallAngle.ToVector(), true);
-        for (float elapsed = 0f; elapsed < (fallTime - 0.02f); elapsed += BraveTime.DeltaTime)
+        for (float elapsed = 0f; elapsed < (fallTime - BraveTime.DeltaTime); elapsed += BraveTime.DeltaTime)
         {
             if (target)
             {
