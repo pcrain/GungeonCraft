@@ -81,6 +81,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem/*, ILevelLoadedListener
   {
   }
 
+  /// <summary>Called when the player manually initiates a reload with a full clip</summary>
   public virtual void OnFullClipReload(PlayerController player, Gun gun)
   {
 

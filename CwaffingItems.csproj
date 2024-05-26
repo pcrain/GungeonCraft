@@ -135,6 +135,7 @@
     <Compile Include="src\Cwaff-Guns\Unfinished\Commitment.cs"/>
     <Compile Include="src\Cwaff-Guns\Unfinished\HeadCannon.cs"/>
     <Compile Include="src\Cwaff-Guns\Unfinished\MasterSword.cs"/>
+    <Compile Include="src\Cwaff-Guns\Unfinished\MaestroOld.cs"/>
     <Compile Include="src\Cwaff-Guns\Unfinished\Kinsurrection.cs"/>
     <Compile Include="src\Cwaff-Guns\Unfinished\TimingGun.cs"/>
     <Compile Include="src\Cwaff-Guns\Unfinished\DerailGun.cs"/>
