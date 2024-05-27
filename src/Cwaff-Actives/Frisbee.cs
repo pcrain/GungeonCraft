@@ -33,16 +33,19 @@ public class Frisbee : CwaffActive
         body.CanBePushed          = true;
         body.CollideWithTileMap   = true;
         body.CollideWithOthers    = true;
-        body.PixelColliders       = new List<PixelCollider>(){new(){
-          ColliderGenerationMode = PixelCollider.PixelColliderGeneration.Manual,
-          ManualOffsetX          = -7,  //TODO: adjust frisbee dimensions once sprite is finalized
-          ManualOffsetY          = -7,
-          ManualWidth            = 14,
-          ManualHeight           = 14,
-          CollisionLayer         = CollisionLayer.Projectile,
-          Enabled                = true,
-          IsTrigger              = false,
-        }};
+        body.ReflectProjectiles   = true;
+        body.PixelColliders       = new List<PixelCollider>();
+        for (int i = 0; i < 2; ++i)
+            body.PixelColliders.Add(new(){
+              ColliderGenerationMode = PixelCollider.PixelColliderGeneration.Manual,
+              ManualOffsetX          = -7,  //TODO: adjust frisbee dimensions once sprite is finalized
+              ManualOffsetY          = -7,
+              ManualWidth            = 14,
+              ManualHeight           = 14,
+              CollisionLayer         = (i == 0) ? CollisionLayer.Projectile : CollisionLayer.EnemyBulletBlocker,
+              Enabled                = true,
+              IsTrigger              = false,
+            });
     }
 
     public override void DoEffect(PlayerController user)
@@ -169,6 +172,7 @@ public class FrisbeeBehaviour : MonoBehaviour
     private void Start()
     {
         base.GetComponent<tk2dSprite>().HeightOffGround = 0.4f;
+        this._body.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.HighObstacle)); // make it collidable with enemy projectiles
     }
 
     private void OnTileCollision(CollisionData tileCollision)
@@ -210,6 +214,20 @@ public class FrisbeeBehaviour : MonoBehaviour
                 PhysicsEngine.SkipCollision = true;
         }
 
+        if (otherRigidbody.GetComponent<Projectile>() is Projectile proj && proj.Owner is not PlayerController)
+        {
+            PassiveReflectItem.ReflectBullet(
+                p                       : proj,
+                retargetReflectedBullet : true,
+                newOwner                : this._owner,
+                minReflectedBulletSpeed : 30f,
+                scaleModifier           : 1f,
+                damageModifier          : 1f,
+                spread                  : 0f);
+            PhysicsEngine.SkipCollision = true;
+            return;
+        }
+
         if (this._state != FLYING)
             return;
         if (otherRigidbody.GetComponent<PlayerController>() is not PlayerController pc)
@@ -232,7 +250,7 @@ public class FrisbeeBehaviour : MonoBehaviour
         pc.knockbackDoer.ClearContinuousKnockbacks();
         pc.specRigidbody.Velocity = Vector2.zero;
         pc.FallingProhibited = true;
-        // pc.IsGunLocked = true;
+        pc.IsGunLocked = true;
         this._body.RegisterCarriedRigidbody(pc.specRigidbody);
 
         UpdateRider();
@@ -257,7 +275,7 @@ public class FrisbeeBehaviour : MonoBehaviour
             pc.forceAimPoint = null;
             pc.ClearInputOverride(Frisbee.ItemName);
             pc.FallingProhibited = false;
-            // pc.IsGunLocked = false;
+            pc.IsGunLocked = false;
             this._body.DeregisterCarriedRigidbody(pc.specRigidbody);
             if (!pc.healthHaver.IsDead)
             {
@@ -271,7 +289,6 @@ public class FrisbeeBehaviour : MonoBehaviour
         this._rider = null;
         LootEngine.DoDefaultItemPoof(this._body.UnitBottomCenter);
         UnityEngine.Object.Destroy(this.gameObject);
-        // play catch sound
     }
 
     private void Update()
