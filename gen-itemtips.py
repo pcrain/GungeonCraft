@@ -53,7 +53,8 @@ def main():
               break
             elif "ItemName" in line:
               name = line.split('"')[1]
-              iid = f"{modprefix}:"+name.replace("-", "").replace(".", "").replace(" ", "_").lower()
+              #NOTE: this needs to be kept in sync with the InternalName() function in Extensions.cs
+              iid = f"{modprefix}:"+name.replace("-", "").replace(".", "").replace("'", "").replace(":", "").replace(" ", "_").lower()
               # print(f"NAME: {name} ({iid})")
         if None in [iid, name, desc]:
           raise Exception(f"failed to get item data for {f}")
