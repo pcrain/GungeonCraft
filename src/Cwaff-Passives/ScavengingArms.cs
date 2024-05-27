@@ -23,12 +23,17 @@ public class ScavengingArms : CwaffPassive
         AmmoPickup ap = _SmallAmmoPickup.GetComponent<AmmoPickup>();
             ap.SpreadAmmoCurrentGunPercent       = _AMMO_PERCENT_TO_GAIN;
             ap.SpreadAmmoOtherGunsPercent        = 0.0f;
-            ap.spriteAnimator.library.clips[0]   = VFX.Create("blue_ammobox_pickup", fps: 8).GetComponent<tk2dSpriteAnimator>().library.clips[0];
-            ap.spriteAnimator.defaultClipId      = 0;
+
+            // shenanigans for adding a new clip
+            int oldLength = ap.spriteAnimator.library.clips.Length;
+            Array.Resize(ref ap.spriteAnimator.library.clips, oldLength + 1);
+            ap.spriteAnimator.library.clips[oldLength] = VFX.Create("blue_ammobox_pickup", fps: 8).GetComponent<tk2dSpriteAnimator>().library.clips[0];
+            ap.spriteAnimator.defaultClipId      = oldLength;
             ap.spriteAnimator.deferNextStartClip = false;
 
         // ap.minimapIcon.GetComponent<tk2dSprite>().SetSprite(VFX.Collection, clip.frames[0].spriteId);
         ap.minimapIcon = null; //TODO: nuking the minimap icon since i can't find the base game reference...put back later if i can make a good-looking new one
+        // ETGMod.Databases.Items.Add(ap);
     }
 
     // NOTE: called by patch in CwaffPatches
