@@ -109,10 +109,13 @@ public class CampingSupplies : CwaffPassive
         this._activeCampfire         = null;
         this._campfirePos            = Vector3.zero;
         this._timeSinceMoving        = 0.0f;
-        this._campLevel              = 0;
         this._campMod.amount         = 1.0f;
         this.passiveStatModifiers[0] = this._campMod;
-        player.stats.RecalculateStats(player, false, false);
+        if (this._campLevel > 0)
+        {
+            this._campLevel              = 0;
+            player.stats.RecalculateStats(player, false, false);
+        }
     }
 
     private void RecalculateStats(PlayerController player)
