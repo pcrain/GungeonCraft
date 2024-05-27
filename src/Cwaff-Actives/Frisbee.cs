@@ -7,8 +7,8 @@ public class Frisbee : CwaffActive
 {
     public static string ItemName         = "Frisbee";
     public static string ShortDescription = "Well-inspired";
-    public static string LongDescription  = "";
-    public static string Lore             = "";
+    public static string LongDescription  = "Launches a disc that bounces between walls indefinitely until caught or entering another room. Passively reflects bullets while in flight. Can reveal secret rooms. Rolling onto the disc allows the player to ride the disc, disabling guns but granting immunity to projectiles.";
+    public static string Lore             = "A toy fit for children, dogs, and blobs of all ages. Its sturdy construction and inexplicable propensity for infinite flight open up all sorts of possibilties such as...well...maybe it'd be more fun to figure them out for yourself.";
 
     private const float GRAB_RANGE = 2f;
     private const float GRAB_RANGE_SQR = GRAB_RANGE * GRAB_RANGE;

@@ -3,9 +3,9 @@
 public class Maestro : CwaffGun
 {
     public static string ItemName         = "Maestro";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string ShortDescription = "Guided by the Winds";
+    public static string LongDescription  = "Redirects enemy projectiles near the cursor towards the targeted enemy while fire is held. Reloading changes the targeted enemy to the enemy closest to the cursor. On controller, projectiles and enemies are targeted uses angle from aim instead of distance from the cursor. Redirected projectiles cannot harm the player.";
+    public static string Lore             = "A conductor's baton that was lost at sea near Dragun's Roost long ago, eventually finding its way into the Gungeon via the sewers. Though unable to fire projectiles itself, it grants its wielder the ability to redirect projectiles by bending the ether around them, providing excellent offensive and defensive utility alike.";
 
     private const float _MAX_PROJECTILE_TARGET_ANGLE  = 20f; // for controller
     private const float _MAX_PROJECTILE_TARGET_RADIUS = 3f;  // for mouse
@@ -27,13 +27,12 @@ public class Maestro : CwaffGun
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Maestro>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARM, reloadTime: 0.0f, ammo: 500, shootFps: 24,
-                muzzleFrom: Items.FaceMelter, doesScreenShake: false);
-            gun.usesContinuousFireAnimation = true;
-            gun.LoopAnimation(gun.shootAnimation);
+            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.CHARM, reloadTime: 0.0f, ammo: 500, shootFps: 24,
+                muzzleFrom: Items.FaceMelter, doesScreenShake: false, continuousFire: true, curse: 1f);
+            gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
 
         gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.2f, angleVariance: 15.0f,
-          shootStyle: ShootStyle.Automatic, damage: 9f, speed: 60.0f,
+          shootStyle: ShootStyle.Automatic, damage: 9f, speed: 60.0f, ammoType: GameUIAmmoType.AmmoType.BEAM,
           sprite: "maestro_bullet", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter));
 
         _RuneEnemy      = VFX.Create("maestro_target_enemy_vfx", fps: 2);

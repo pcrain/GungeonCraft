@@ -3,9 +3,9 @@
 public class Starmageddon : CwaffGun
 {
     public static string ItemName         = "Starmageddon";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string ShortDescription = "Heavenly Wrath";
+    public static string LongDescription  = "Fires projectiles that orbit the player while fire is held. Projectiles ascend when fire is released and fall upon semi-random enemies after a short delay. Enemies closer to the player are more likely to be targeted.";
+    public static string Lore             = "A mythical weapon feared and revered by many as the 'Gun That Shall Fire the Final Shot', it is said to launch projectiles heavenward and rain meteoric destruction upon the lands. Fortunately for humanity, the weapon's projectiles only get to ascend about 50 feet before hitting the Gungeon's ceiling, making it a rare example of a gun that is actually *weakened* by the Gungeon's magic.";
 
     internal static TrailController _StarmageddonTrailPrefab = null;
 
