@@ -86,7 +86,7 @@ public class EchoProjectileSpawner : MonoBehaviour
 
     public IEnumerator DelayedTrigger_CR()
     {
-        GameObject v = SpawnManager.SpawnVFX(EchoChamber._EchoPrefab, this._echoPosition, Quaternion.identity);
+        GameObject v = SpawnManager.SpawnVFX(EchoChamber._EchoPrefab, this._echoPosition, Quaternion.identity); //TODO: should this ignore pools
             v.ExpireIn(seconds: 2.0f, fadeFor: 2.0f, startAlpha: 0.25f, shrink: true);
 
         float baseDamageScale = 0.5f;

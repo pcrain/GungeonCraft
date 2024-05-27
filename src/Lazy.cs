@@ -514,6 +514,14 @@ public static class Lazy
         return BitConverter.Int64BitsToDouble(((long)tmp2) << 32);
     }
 
+    // https://martin.ankerl.com/2007/10/04/optimized-pow-approximation-for-java-and-c-c/
+    /// <summary>Compute a fast approximation for a^0.5</summary>
+    public static double FastSqrt(double a) {
+        int tmp = (int)(BitConverter.DoubleToInt64Bits(a) >> 32);
+        int tmp2 = (int)(0.5 * (tmp - 1072632447) + 1072632447);
+        return BitConverter.Int64BitsToDouble(((long)tmp2) << 32);
+    }
+
     /// <summary>Get a modded item by id, returning null if it doesn't exit</summary>
     public static PickupObject GetModdedItem(string itemName)
     {
