@@ -18,7 +18,7 @@ public class Pincushion : CwaffGun
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Pincushion>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.BEAM, reloadTime: 1.8f, ammo: 10000, doesScreenShake: false,
+            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.FULLAUTO, reloadTime: 1.8f, ammo: 10000, doesScreenShake: false,
                 shootFps: 30, reloadFps: 24);
             gun.SetReloadAudio("pincushion_reload_start_sound", 0);
             gun.SetReloadAudio("pincushion_reload_sound", 8, 13, 18, 23, 28, 35);

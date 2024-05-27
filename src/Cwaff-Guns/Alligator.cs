@@ -19,7 +19,7 @@ public class Alligator : CwaffGun
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Alligator>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.CHARGE, reloadTime: 2.0f, ammo: 300, shootFps: 20, reloadFps: 10,
+            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.CHARGE, reloadTime: 2.0f, ammo: 300, shootFps: 20, reloadFps: 16,
                 muzzleVFX: "muzzle_alligator", muzzleFps: 60, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter, muzzleEmission: 50f,
                 fireAudio: "alligator_shoot_sound", reloadAudio: "alligator_reload_sound");
 
