@@ -173,3 +173,11 @@ starmageddon_bullet_impact_sound_2,-0.5,1,sound
 starmageddon_bullet_launch_sound,-1.5,1,sound
 starmageddon_fire_sound,-2.5,1,sound
 starmageddon_reload_sound,-2.0,1,sound
+maestro_fire_sound_looped,-20.0,0,sound
+maestro_target_sound,-7.0,1,sound
+maestro_launch_sound,-2.0,1,sound
+maestro_launch_asharp,-4.0,1,sound
+maestro_launch_csharp,-4.0,1,sound
+maestro_launch_dsharp,-4.0,1,sound
+maestro_launch_fsharp,-4.0,1,sound
+maestro_launch_gsharp,-4.0,1,sound
