@@ -101,11 +101,10 @@ public class MasteryRitualComponent : MonoBehaviour
     if (GameManager.Instance.BestActivePlayer is not PlayerController player)
       return false;
 
-    // Requirement #1: room must be valid and have no enemies
-    RoomHandler room = player.CurrentRoom;
-    if (room == null || room.GetActiveEnemiesCount(RoomHandler.ActiveEnemyType.All) != 0)
+    // Requirement #1: room must be valid and unsealed
+    if (player.CurrentRoom is not RoomHandler room || room.IsSealed)
     {
-      // Lazy.DebugLog($"Failed req #1: player must be in a real room with no enemies");
+      // Lazy.DebugLog($"Failed req #1: player must be in a real, unsealed room");
       return false; //
     }
 
