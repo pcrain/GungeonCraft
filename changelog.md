@@ -1,9 +1,35 @@
 # Changelog
 
+## 1.13.0 (2024-05-27)
+
+#### Features and Polish:
+- Added Frisbee, Maestro, and Starmageddon
+	- Maestro sprite thanks to Dallan!
+
+#### Balance Changes:
+- Changed Pincushion's class from BEAM to FULLAUTO
+- Made Suncaster's prisms bounce off walls 
+
+#### Bugfixes and Misc:
+- Made logic for cleaning up temporary startup patches execute even if startup horrendously fails for some reason, preventing other mods from breaking
+- Added failsafe to prevent Suncaster prisms from getting stuck inside walls or other objects
+- Prevented Camping Supplies from recalculating stats every single frame while moving
+- Fixed Holy Water gun registering duplicate enemy events every time it was dropped and picked up
+- Fixed Macchi Auto Ammonomicon icon to match in-game sprite
+- Fixed Camping Supplies causing lag by trying to invoke a non-existent method
+- Fixed accidental removal of stunning behavior from Platinum Star
+- Fixed sprites for 50-casing pickups being replaced by Scavenging Arms' small ammo pickup sprites
+- Fixed mastery ritual not working in certain rooms that it should've worked in
+- Fixed item tips breakage for items with colons and apostrophes in their names
+- Slightly sped up Alligator's reload animation so it actually finishes playing
+- Removed occlusion from Gunbrella projectiles to increase their visibility and make them look nicer
+- Tweaked Chamber Jammer's description for clarity
+
 ## 1.12.0 (2024-05-05)
 
 #### Features and Polish:
 - Added Macchi Auto, Nycterian, Scavenging Arm, Armor Piercing Rounds, and MM: Reloading
+	- Armor Piercing Rounds and MM: Reloading sprites thanks to Dallan!
 - Added gun mastery system
 - Added masteries for Grandmaster, Chekhov's Gun, Pincushion, Platinum Star, and Natascha
 - Added 18 new hats

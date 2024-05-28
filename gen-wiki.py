@@ -77,7 +77,7 @@ def findPattern(text, patt, default = "???", resolveVars = False):
   return resolveVariable(res, text)
 
 def cleanItemName(item):
-  return item.replace(" ","_").replace(".","").replace("'","").lower()
+  return item.replace(" ","_").replace(".","").replace("'","").replace(":","").replace("-","").lower()
 
 def imageFor(filepath):
   return f"""[[File:{filepath}]]"""
