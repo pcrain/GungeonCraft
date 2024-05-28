@@ -1678,3 +1678,63 @@ public class ManualMotionModule : ProjectileAndBeamMotionModule
         return Vector2.zero;
     }
 }
+
+/// <summary>Class to draw an animated targeting line between two points (currently unused, relocated from Maestro for code cleanup purposes)</summary>
+public class AnimatedTargetingLine
+{
+    private const float _MAX_SEGMENTS = 30;
+
+    private float          _segmentPhaseTime = 0.25f;
+    private float          _segmentSpacing   = 1.0f;
+    private GameObject     _lineSegmentVFX   = null;
+    private List<FancyVFX> _targetLine       = new();
+    private float          _baseAlpha        = 1f;
+
+    public AnimatedTargetingLine(float segmentPhaseTime, float segmentSpacing, GameObject lineSegmentVFX, List<FancyVFX> targetLine, float baseAlpha)
+    {
+        this._segmentPhaseTime = segmentPhaseTime;
+        this._segmentSpacing   = segmentSpacing;
+        this._lineSegmentVFX   = lineSegmentVFX;
+        this._targetLine       = targetLine;
+        this._baseAlpha        = baseAlpha;
+    }
+
+    private void UpdateTargetingLine(Vector2 start, Vector2 end)
+    {
+        Vector2 delta   = (end - start);
+        float mag       = delta.magnitude;
+        Vector2 dir     = delta / mag;
+        int numSegments = Mathf.FloorToInt(Mathf.Min(mag / this._segmentSpacing, _MAX_SEGMENTS));
+        float offset    = (BraveTime.ScaledTimeSinceStartup % this._segmentPhaseTime) / this._segmentPhaseTime;
+        for (int i = this._targetLine.Count; i < _MAX_SEGMENTS; ++i)
+        {
+            FancyVFX fv = FancyVFX.Spawn(this._lineSegmentVFX, start/*, rotation: Lazy.RandomEulerZ()*/);
+            fv.GetComponent<tk2dSpriteAnimator>().PlayFromFrame(i % 4);
+            this._targetLine.Add(fv);
+        }
+        for (int i = 0; i < numSegments; ++i)
+        {
+            Vector2 pos = start + ((i + 1 - offset) * this._segmentSpacing * dir);
+            if (!this._targetLine[i])
+            {
+                FancyVFX fv = FancyVFX.Spawn(this._lineSegmentVFX, pos/*, rotation: Lazy.RandomEulerZ()*/);
+                fv.GetComponent<tk2dSpriteAnimator>().PlayFromFrame(i % 4);
+                this._targetLine[i] = fv;
+            }
+            tk2dBaseSprite sprite = this._targetLine[i].sprite;
+            sprite.renderer.enabled = true;
+            float alpha;
+            if (i == 0)
+                alpha = 1f - offset;
+            else if (i == numSegments - 1)
+                alpha = offset;
+            else
+                alpha = 1f;
+            sprite.renderer.SetAlpha(alpha * this._baseAlpha);
+            sprite.transform.position = pos;
+        }
+        for (int i = numSegments; i < Mathf.Min(this._targetLine.Count, _MAX_SEGMENTS); ++i)
+            if (this._targetLine[i])
+               this._targetLine[i].sprite.renderer.enabled = false;
+    }
+}

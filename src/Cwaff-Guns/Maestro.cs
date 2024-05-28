@@ -14,7 +14,6 @@ public class Maestro : CwaffGun
 
     internal static GameObject _RuneEnemy               = null;
     internal static GameObject _RuneProjectile          = null;
-    // internal static GameObject _LineParticleVFX         = null;
     internal static List<Vector3> _ShootBarrelOffsets  = new();
 
     private int        _targetEnemyIndex    = 0;
@@ -22,7 +21,6 @@ public class Maestro : CwaffGun
     private Projectile _targetProjectile    = null;
     private GameObject _enemyTargetVFX      = null;
     private GameObject _projectileTargetVFX = null;
-    // private List<FancyVFX> _targetLine      = new();
 
     public static void Add()
     {
@@ -37,8 +35,6 @@ public class Maestro : CwaffGun
 
         _RuneEnemy      = VFX.Create("maestro_target_enemy_vfx", fps: 2);
         _RuneProjectile = VFX.Create("maestro_target_projectile_vfx", fps: 2);
-
-        // _LineParticleVFX = VFX.Create("maestro_particles", fps: 12, loops: true, anchor: Anchor.MiddleCenter);
 
         _ShootBarrelOffsets  = gun.GetBarrelOffsetsForAnimation(gun.shootAnimation);
     }
@@ -116,8 +112,7 @@ public class Maestro : CwaffGun
                 if (angleFromAim > _MAX_PROJECTILE_TARGET_ANGLE)
                     continue;
                 float distFromGun = (float)Lazy.FastSqrt(delta.sqrMagnitude);
-                // "closeness" is distance from gun times angle from aim -> can still hit far away projectiles, but need accurate aim
-                closenessWeight = distFromGun * angleFromAim;
+                closenessWeight = distFromGun * angleFromAim; // weight using both angle and distance -> can still hit far away projectiles, but need accurate aim
             }
             if (closenessWeight > closest)
                 continue;
@@ -235,55 +230,7 @@ public class Maestro : CwaffGun
             this._projectileTargetVFX.transform.position = this.PlayerOwner.CenterPosition;
             this._projectileTargetVFX.SetAlpha(0.0f);
         }
-
-        // UpdateTargetingLine();
     }
-
-    // NOTE: super useful code i might want later, but doesn't quite fit on this weapon
-    // private void UpdateTargetingLine()
-    // {
-    //     const float SEG_PHASE_TIME = 0.25f;
-    //     const float SEG_SPACING    = 1.0f;
-
-    //     bool haveTarget = this._targetProjectile != null;
-    //     Vector2 start   = this.gun.barrelOffset.transform.position.XY();
-    //     Vector2 end     = haveTarget ? this._targetProjectile.transform.position : start.ToNearestWall(out Vector2 _, this.gun.CurrentAngle);
-    //     Vector2 delta   = (end - start);
-    //     float mag       = delta.magnitude;
-    //     Vector2 dir     = delta / mag;
-    //     int numSegments = Mathf.FloorToInt(Mathf.Min(mag / SEG_SPACING, _MAX_STEPS));
-    //     float offset    = (BraveTime.ScaledTimeSinceStartup % SEG_PHASE_TIME) / SEG_PHASE_TIME;
-    //     for (int i = this._targetLine.Count; i < _MAX_STEPS; ++i)
-    //     {
-    //         FancyVFX fv = FancyVFX.Spawn(_LineParticleVFX, start, rotation: Lazy.RandomEulerZ());
-    //         fv.GetComponent<tk2dSpriteAnimator>().PlayFromFrame(i % 4);
-    //         this._targetLine.Add(fv);
-    //     }
-    //     for (int i = 0; i < numSegments; ++i)
-    //     {
-    //         Vector2 pos = start + ((i + 1 - offset) * SEG_SPACING * dir);
-    //         if (!this._targetLine[i])
-    //         {
-    //             FancyVFX fv = FancyVFX.Spawn(_LineParticleVFX, pos, rotation: Lazy.RandomEulerZ());
-    //             fv.GetComponent<tk2dSpriteAnimator>().PlayFromFrame(i % 4);
-    //             this._targetLine[i] = fv;
-    //         }
-    //         tk2dBaseSprite sprite = this._targetLine[i].sprite;
-    //         sprite.renderer.enabled = true;
-    //         float alpha;
-    //         if (i == 0)
-    //             alpha = 1f - offset;
-    //         else if (i == numSegments - 1)
-    //             alpha = offset;
-    //         else
-    //             alpha = 1f;
-    //         sprite.renderer.SetAlpha(alpha * (haveTarget ? 1f : 0.125f));
-    //         sprite.transform.position = pos;
-    //     }
-    //     for (int i = numSegments; i < Mathf.Min(this._targetLine.Count, _MAX_STEPS); ++i)
-    //         if (this._targetLine[i])
-    //            this._targetLine[i].sprite.renderer.enabled = false;
-    // }
 
     public override void Update()
     {
@@ -341,15 +288,6 @@ public class Maestro : CwaffGun
             UnityEngine.Object.Destroy(this._enemyTargetVFX);
         if (this._projectileTargetVFX)
             UnityEngine.Object.Destroy(this._projectileTargetVFX);
-        // for (int i = 0; i < Mathf.Min(this._targetLine.Count, _MAX_STEPS); ++i)
-        // {
-        //     if (!this._targetLine[i])
-        //         continue;
-        //     if (destroyed)
-        //         UnityEngine.Object.Destroy(this._targetLine[i]);
-        //     else
-        //         this._targetLine[i].sprite.renderer.enabled = false;
-        // }
     }
 
     public override void OnSwitchedAwayFromThisGun()
