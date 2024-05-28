@@ -91,6 +91,7 @@ public class Suncaster : CwaffGun
           return;
         GameObject prism = _PrismPrefab.Instantiate(position: gun.barrelOffset.position);
         prism.AddComponent<SuncasterPrism>().Setup(player, this, room, gun.CurrentAngle.ToVector(_PRISM_LAUNCH_SPEED));
+        prism.GetComponent<SpeculativeRigidbody>().CorrectForWalls(andRigidBodies: true);
     }
 
     public override void PostProcessProjectile(Projectile projectile)
@@ -348,11 +349,11 @@ public class SuncasterPrism : MonoBehaviour, IPlayerInteractable
 
       this._body = gameObject.GetComponent<SpeculativeRigidbody>();
       this._body.OnPreRigidbodyCollision += this.OnPreCollision;
-      // this._body.OnCollision        += this.OnCollision;  //TODO: figure out why this doesn't properly bounce off walls
+      this._body.OnCollision += this.OnCollision;
       this._body.Velocity = this._velocity;
       this._body.RegisterTemporaryCollisionException(owner.specRigidbody);
-      if (GameManager.Instance.CurrentGameType == GameManager.GameType.COOP_2_PLAYER)
-        this._body.RegisterTemporaryCollisionException(GameManager.Instance.GetOtherPlayer(owner)?.specRigidbody);
+      if (GameManager.Instance.GetOtherPlayer(owner) is PlayerController otherPlayer)
+        this._body.RegisterTemporaryCollisionException(otherPlayer.specRigidbody);
 
       this._gun = gun;
       if (this._gun)
@@ -376,19 +377,24 @@ public class SuncasterPrism : MonoBehaviour, IPlayerInteractable
         PhysicsEngine.SkipCollision = true;  // don't block AIActors
     }
 
-    private void OnCollision(CollisionData collision)
+    private void OnCollision(CollisionData rigidbodyCollision)
     {
-      if (collision.collisionType != CollisionData.CollisionType.TileMap)
+      if (rigidbodyCollision.CollidedX && rigidbodyCollision.CollidedY)
+      {
+        Selfdestruct(); // stuck inside something
         return;
-      // ETGModConsole.Log($"handling normal {collision.Normal}");
-      // ETGModConsole.Log($"  old velocity {this._body.Velocity}");
-      // this._body.transform.position -= (C.PIXELS_PER_TILE * collision.NewPixelsToMove.ToVector2()).ToVector3ZUp();
-      // this._body.Reinitialize();
-      this._body.Velocity = new Vector2(
-        x: this._body.Velocity.x * (collision.CollidedX ? -1f : 1f),
-        y: this._body.Velocity.y * (collision.CollidedY ? -1f : 1f)
-        );
-      // ETGModConsole.Log($"  new velocity {this._body.Velocity}");
+      }
+      if (rigidbodyCollision.collisionType != CollisionData.CollisionType.TileMap)
+        return; // nothing else to do unless we have a tile collision (need to be pushable by player)
+
+      SpeculativeRigidbody body = rigidbodyCollision.MyRigidbody;
+      Vector2 normal            = rigidbodyCollision.Normal;
+      Vector2 newVel            = body.Velocity;
+      if (rigidbodyCollision.CollidedX)
+        newVel = newVel.WithX(-body.Velocity.x);
+      else
+        newVel = newVel.WithY(-body.Velocity.y);
+      PhysicsEngine.PostSliceVelocity = newVel;
     }
 
     private void OnDestroy()
