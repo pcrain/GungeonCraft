@@ -772,7 +772,8 @@ public static class Extensions
     Items audioFrom = Items.Banana, bool defaultAudio = false, bool infiniteAmmo = false, bool canGainAmmo = true, bool canReloadNoMatterAmmo = false, bool? doesScreenShake = null,
     int? idleFps = null, int? shootFps = null, int? reloadFps = null, int? chargeFps = null, int? introFps = null, string fireAudio = null, string reloadAudio = null, string introAudio = null,
     int loopChargeAt = -1, int loopReloadAt = -1, int loopFireAt = -1, Items? muzzleFrom = null, bool modulesAreTiers = false, string muzzleVFX = null, int muzzleFps = 60,
-    float muzzleScale = 1.0f, Anchor muzzleAnchor = Anchor.MiddleLeft, float muzzleEmission = -1f, IntVector2? carryOffset = null, bool preventRotation = false, float curse = 0f, bool continuousFire = false)
+    float muzzleScale = 1.0f, Anchor muzzleAnchor = Anchor.MiddleLeft, float muzzleEmission = -1f, IntVector2? carryOffset = null, bool preventRotation = false, float curse = 0f, bool continuousFire = false,
+    bool dynamicBarrelOffsets = false)
   {
     gun.quality = quality;
     gun.reloadTime = reloadTime;
@@ -797,6 +798,9 @@ public static class Extensions
       gun.usesContinuousFireAnimation = true;
       gun.LoopAnimation(gun.shootAnimation);
     }
+
+    if (dynamicBarrelOffsets)
+      CwaffGun.SetUpDynamicBarrelOffsets(gun);
 
     if (curse != 0f)
       gun.AddStatToGun(PlayerStats.StatType.Curse, curse, StatModifier.ModifyMethod.ADDITIVE);

@@ -18,13 +18,42 @@ public abstract class CwaffActive: PlayerItem, ICwaffItem
 
 public abstract class CwaffGun: GunBehaviour, ICwaffItem/*, ILevelLoadedListener*/
 {
-  public bool hasReloaded = true;
+  private static Dictionary<string, Dictionary<string, List<Vector3>>> _BarrelOffsetCache = new();
+
+  private bool                              _hasReloaded               = true;  // whether we have finished reloading
+  private bool                              _usesDynamicBarrelPosition = false; // whether the gun uses dynamic barrel offsets
+  private Dictionary<string, List<Vector3>> _barrelOffsets             = null;  // list of dynamic barrel offsets for each of a gun's animations
+  private Vector3                           _defaultBarrelOffset       = Vector3.zero; // the default barrel offset for guns with dynamic offsets
+
+  public static void SetUpDynamicBarrelOffsets(Gun gun)
+  {
+    var d = _BarrelOffsetCache[gun.DisplayName] = new();
+    //WARNING: can't to idle animation since it breaks loading with trimmed sprites
+    SetUpDynamicBarrelOffsetsForAnimation(d, gun, gun.chargeAnimation);
+    SetUpDynamicBarrelOffsetsForAnimation(d, gun, gun.reloadAnimation);
+    SetUpDynamicBarrelOffsetsForAnimation(d, gun, gun.shootAnimation);
+  }
+
+  private static void SetUpDynamicBarrelOffsetsForAnimation(Dictionary<string, List<Vector3>> d, Gun gun, string anim)
+  {
+    if (!string.IsNullOrEmpty(anim))
+      d[anim] = gun.GetBarrelOffsetsForAnimation(anim);
+  }
 
   public override void OnPlayerPickup(PlayerController player)
   {
     base.OnPlayerPickup(player);
+
     player.GunChanged -= OnGunsChanged;
     player.GunChanged += OnGunsChanged;
+
+    // Load dynamic barrel offsets if we have any registered
+    if (_BarrelOffsetCache.TryGetValue(this.gun.DisplayName, out var barrelOffsets))
+    {
+      this._usesDynamicBarrelPosition = true;
+      this._defaultBarrelOffset       = this.gun.barrelOffset.localPosition;
+      this._barrelOffsets             = barrelOffsets;
+    }
   }
 
   /// <summary>
@@ -60,15 +89,28 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem/*, ILevelLoadedListener
   public override void Update()
   {
     if (this.gun && !this.gun.IsReloading)
-        this.hasReloaded = true;
+        this._hasReloaded = true;
+    if (this._usesDynamicBarrelPosition)
+      AdjustBarrelPosition();
+  }
+
+  private void AdjustBarrelPosition()
+  {
+    tk2dSpriteAnimator animator = this.gun.spriteAnimator;
+    if (this._barrelOffsets.TryGetValue(animator.currentClip.name, out List<Vector3> offsets))
+      this.gun.barrelOffset.localPosition = offsets[animator.CurrentFrame];
+    else
+      this.gun.barrelOffset.localPosition = this._defaultBarrelOffset;
+    if (this.gun.sprite.FlipY)
+      this.gun.barrelOffset.localPosition = this.gun.barrelOffset.localPosition.WithY(-this.gun.barrelOffset.localPosition.y);
   }
 
   public override void OnReloadPressed(PlayerController player, Gun gun, bool manual)
   {
-    if (this.hasReloaded && gun.IsReloading)
+    if (this._hasReloaded && gun.IsReloading)
     {
       OnActualReload(player, gun, manual);
-      this.hasReloaded = false;
+      this._hasReloaded = false;
     }
     if (player.AcceptingNonMotionInput && !gun.IsReloading && manual && (gun.ClipShotsRemaining >= gun.ClipCapacity))
     {

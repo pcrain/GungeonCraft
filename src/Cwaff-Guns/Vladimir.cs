@@ -23,7 +23,7 @@ public class Vladimir : CwaffGun
         Gun gun = Lazy.SetupGun<Vladimir>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.1f, ammo: 100,
               infiniteAmmo: true, canReloadNoMatterAmmo: true, fireAudio: "vladimir_fire_sound", muzzleVFX: "muzzle_vladimir",
-              muzzleFps: 30, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter, curse: 1f);
+              muzzleFps: 30, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter, curse: 1f, dynamicBarrelOffsets: true);
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
 
         // TODO: make our own impact vfx
@@ -33,10 +33,6 @@ public class Vladimir : CwaffGun
         ).Attach<VladimirProjectile>(
         );
 
-        // _IdleBarrelOffsets   = gun.GetBarrelOffsetsForAnimation(gun.idleAnimation);  //WARNING: this breaks animation loading with trimmed sprites
-        _ShootBarrelOffsets  = gun.GetBarrelOffsetsForAnimation(gun.shootAnimation);
-        _ChargeBarrelOffsets = gun.GetBarrelOffsetsForAnimation(gun.chargeAnimation);
-
         _AbsorbVFX = VFX.Create("vladimir_impale_projectile_vfx", fps: 2, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 1f);
     }
 
@@ -45,8 +41,6 @@ public class Vladimir : CwaffGun
         base.Update();
         if (this.GenericOwner is not PlayerController pc)
             return;
-
-        UpdateOffsets();
 
         Vector2 gunPos = this.gun.barrelOffset.position.XY();
         Vector2 gunVec = this.gun.CurrentAngle.ToVector(0.5f);
@@ -93,22 +87,6 @@ public class Vladimir : CwaffGun
         }
         bool gunLocked = (this._skeweredEnemies.Count > 0);
         pc.inventory.GunLocked.SetOverride(ItemName, gunLocked);
-    }
-
-    private void UpdateOffsets()
-    {
-        tk2dSpriteAnimator anim = gun.spriteAnimator;
-        if (anim.IsPlaying(gun.shootAnimation))
-            gun.barrelOffset.localPosition = _ShootBarrelOffsets[anim.CurrentFrame];
-        // else if (anim.IsPlaying(gun.idleAnimation))
-        //     gun.barrelOffset.localPosition = _IdleBarrelOffsets[anim.CurrentFrame];
-        else if (anim.IsPlaying(gun.chargeAnimation))
-            gun.barrelOffset.localPosition = _ChargeBarrelOffsets[anim.CurrentFrame];
-        else
-            gun.barrelOffset.localPosition = _ShootBarrelOffsets[0];
-
-        if (gun.sprite.FlipY)
-            gun.barrelOffset.localPosition = gun.barrelOffset.localPosition.WithY(-gun.barrelOffset.localPosition.y);
     }
 
     public override void OnPostFired(PlayerController player, Gun gun)

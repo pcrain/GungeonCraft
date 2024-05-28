@@ -14,7 +14,6 @@ public class Maestro : CwaffGun
 
     internal static GameObject _RuneEnemy               = null;
     internal static GameObject _RuneProjectile          = null;
-    internal static List<Vector3> _ShootBarrelOffsets  = new();
 
     private int        _targetEnemyIndex    = 0;
     private AIActor    _targetEnemy         = null;
@@ -26,7 +25,7 @@ public class Maestro : CwaffGun
     {
         Gun gun = Lazy.SetupGun<Maestro>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.CHARM, reloadTime: 0.0f, ammo: 500, shootFps: 24,
-                muzzleFrom: Items.FaceMelter, doesScreenShake: false, continuousFire: true, curse: 1f);
+                muzzleFrom: Items.FaceMelter, doesScreenShake: false, continuousFire: true, curse: 1f, dynamicBarrelOffsets: true);
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
 
         gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.2f, angleVariance: 15.0f,
@@ -35,8 +34,6 @@ public class Maestro : CwaffGun
 
         _RuneEnemy      = VFX.Create("maestro_target_enemy_vfx", fps: 2);
         _RuneProjectile = VFX.Create("maestro_target_projectile_vfx", fps: 2);
-
-        _ShootBarrelOffsets  = gun.GetBarrelOffsetsForAnimation(gun.shootAnimation);
     }
 
     private void RedirectProjectile(Projectile p, AIActor targetEnemy, float damage)
@@ -246,20 +243,8 @@ public class Maestro : CwaffGun
         this._targetProjectile = GetTargetProjectile();
         DetermineTargetEnemyIfNecessary();
         UpdateTargetingVFXIfNecessary();
-        AdjustBarrelOffsets();
         if (this.gun.m_isCurrentlyFiring)
             Lazy.PlaySoundUntilDeathOrTimeout("maestro_fire_sound_looped", base.gameObject, 0.05f);
-    }
-
-    private void AdjustBarrelOffsets()
-    {
-        tk2dSpriteAnimator anim = gun.spriteAnimator;
-        if (anim.IsPlaying(gun.shootAnimation))
-            gun.barrelOffset.localPosition = _ShootBarrelOffsets[anim.CurrentFrame];
-        else
-            gun.barrelOffset.localPosition = _ShootBarrelOffsets[0];
-        if (gun.sprite.FlipY)
-            gun.barrelOffset.localPosition = gun.barrelOffset.localPosition.WithY(-gun.barrelOffset.localPosition.y);
     }
 
     private static bool IsUntargetable(AIActor enemy)

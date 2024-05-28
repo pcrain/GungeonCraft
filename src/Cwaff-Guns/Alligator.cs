@@ -11,8 +11,6 @@ public class Alligator : CwaffGun
     internal static GameObject _ClipVFX                = null;
     internal static readonly Color _RedClipColor       = Color.Lerp(Color.red, Color.magenta, 0.25f);
     internal static readonly Color _BlackClipColor     = Color.Lerp(Color.black, Color.blue, 0.25f);
-    internal static List<Vector3> _ShootBarrelOffsets  = new();
-    internal static List<Vector3> _ReloadBarrelOffsets = new();
 
     private DamageTypeModifier _electricImmunity = null;
 
@@ -21,14 +19,12 @@ public class Alligator : CwaffGun
         Gun gun = Lazy.SetupGun<Alligator>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.CHARGE, reloadTime: 2.0f, ammo: 300, shootFps: 20, reloadFps: 16,
                 muzzleVFX: "muzzle_alligator", muzzleFps: 60, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter, muzzleEmission: 50f,
-                fireAudio: "alligator_shoot_sound", reloadAudio: "alligator_reload_sound");
+                fireAudio: "alligator_shoot_sound", reloadAudio: "alligator_reload_sound", dynamicBarrelOffsets: true);
 
         gun.InitProjectile(GunData.New(clipSize: 8, cooldown: 0.4f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, customClip: true,
           damage: 1.0f, speed: 36.0f, sprite: "alligator_projectile", fps: 2, anchor: Anchor.MiddleCenter
           )).Attach<AlligatorProjectile>();
 
-        _ShootBarrelOffsets  = gun.GetBarrelOffsetsForAnimation(gun.shootAnimation);
-        _ReloadBarrelOffsets = gun.GetBarrelOffsetsForAnimation(gun.reloadAnimation);
         _SparkVFX            = VFX.Create("spark_vfx", fps: 16, loops: true, anchor: Anchor.MiddleCenter, scale: 0.35f, emissivePower: 50f);
         _ClipVFX             = VFX.Create("alligator_clamped_vfx", fps: 2, loops: true, anchor: Anchor.MiddleCenter);
     }
@@ -61,24 +57,6 @@ public class Alligator : CwaffGun
                 this.PlayerOwner.healthHaver.damageTypeModifiers.Remove(this._electricImmunity);
         }
         base.OnDestroy();
-    }
-
-    public override void Update()
-    {
-        base.Update();
-
-        // ETGModConsole.Log($"    CURRENT ID {gun.sprite.spriteId}");
-
-        tk2dSpriteAnimator anim = gun.spriteAnimator;
-        if (anim.IsPlaying(gun.shootAnimation))
-            gun.barrelOffset.localPosition = _ShootBarrelOffsets[anim.CurrentFrame];
-        else if (anim.IsPlaying(gun.reloadAnimation))
-            gun.barrelOffset.localPosition = _ReloadBarrelOffsets[anim.CurrentFrame];
-        else
-            gun.barrelOffset.localPosition = _ShootBarrelOffsets[0];
-
-        if (gun.sprite.FlipY)
-            gun.barrelOffset.localPosition = gun.barrelOffset.localPosition.WithY(-gun.barrelOffset.localPosition.y);
     }
 }
 
