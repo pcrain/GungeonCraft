@@ -335,7 +335,7 @@ public static class Lazy
     public static Texture2D GetTexturedEnemyIdleAnimation(AIActor enemy, Color blendColor, float blendAmount, Color? sheenColor = null, float sheenWidth = 20.0f)
     {
         // Get the best idle sprite for the enemy
-        tk2dSpriteDefinition bestIdleSprite = enemy.sprite.collection.spriteDefinitions[CwaffToolbox.GetIdForBestIdleAnimation(enemy)];
+        tk2dSpriteDefinition bestIdleSprite = enemy.sprite.collection.spriteDefinitions[GetIdForBestIdleAnimation(enemy)];
         // If the x coordinate of the first two UVs match, we're using a rotated sprite
         bool isRotated = (bestIdleSprite.uvs[0].x == bestIdleSprite.uvs[1].x);
         // Remove the texture from the sprite sheet
@@ -825,5 +825,56 @@ public static class Lazy
         if (p2.inventory.AllGuns[i].PickupObjectId == id)
           return true;
       return false;
+    }
+
+    /// <summary>Gets the best idle animation for the given enemy</summary>
+    public static int GetIdForBestIdleAnimation(AIActor enemy)
+    {
+        int bestMatchStrength = 0;
+        int bestSpriteId = -1;
+
+        tk2dSpriteDefinition[] defs = enemy.sprite.collection.spriteDefinitions;
+        for (int i = 0; i < defs.Length; ++i)
+        {
+            tk2dSpriteDefinition sd = defs[i];
+            int matchStrength = 0;
+            if (sd.name.Contains("001"))
+            {
+                if (sd.name.Contains("idle_f"))
+                    matchStrength = 5;
+                else if (sd.name.Contains("idle_right") || sd.name.Contains("idle_r"))
+                    matchStrength = 4;
+                else if (sd.name.Contains("idle_left") || sd.name.Contains("idle_l"))
+                    matchStrength = 3;
+                else if (sd.name.Contains("idle") || sd.name.Contains("fire") || sd.name.Contains("run_right") || sd.name.Contains("right_run"))
+                    matchStrength = 2;
+                else if (sd.name.Contains("death") || sd.name.Contains("left") || sd.name.Contains("right"))
+                    matchStrength = 1;
+                if (matchStrength > bestMatchStrength)
+                {
+                  bestMatchStrength = matchStrength;
+                  bestSpriteId = i;
+                  if (bestMatchStrength == 5)
+                    break;
+                }
+            }
+        }
+        if (bestSpriteId == -1)
+        {
+            bestSpriteId = enemy.sprite.spriteId;
+            // ETGModConsole.Log("  no matches, options: ");
+            for (int i = 0; i < defs.Length; ++i)
+            {
+                tk2dSpriteDefinition sd = defs[i];
+                // if (sd.name.Contains("001"))
+                //     ETGModConsole.Log("    "+sd.name);
+            }
+        }
+        else
+        {
+            // ETGModConsole.Log("  found "+defs[bestSpriteId].name);
+        }
+
+        return bestSpriteId;
     }
 }

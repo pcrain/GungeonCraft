@@ -189,7 +189,6 @@
     <Compile Include="src\Cwaff-Guns\Uppskeruvel.cs"/>
     <Compile Include="src\Cwaff-Guns\Alyx.cs"/>
     <Compile Include="src\Cwaff-Guns\AlienNailGun.cs"/>
-    <Compile Include="src\PlayerToolbox.cs"/>
     <Compile Include="src\Cwaff-Flows\FlowHelpers.cs"/>
     <Compile Include="src\Cwaff-Flows\CwaffDungeons.cs"/>
     <Compile Include="src\Cwaff-Flows\SansDungeon.cs"/>

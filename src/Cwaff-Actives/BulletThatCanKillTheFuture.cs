@@ -11,9 +11,11 @@ public class BulletThatCanKillTheFuture : CwaffActive
     public static string LongDescription  = "Any enemy shot with Bullet That Can Kill the Future will not spawn for the rest of the run.";
     public static string Lore             = "Very little is known about this bullet, as few know it exists at all. It was originally given to Bello by a mysterious blue-clad skeleton, who claims to have found it behind the Hero Shrine in the Keep of the Lead Lord. It's almost as if it's calling out to be fired.";
 
-    internal static string _BelloItemHint = "A blue-clad skeleton stopped by earlier for some armor. I saw him walk behind the Hero Shrine and haven't seen him since.";
-    internal static tk2dBaseSprite _Sprite = null;
-    internal static bool _BulletSpawnedThisRun = false;
+    internal static string _BelloItemHint       = "A blue-clad skeleton stopped by earlier for some armor. I saw him walk behind the Hero Shrine and haven't seen him since.";
+    internal static tk2dBaseSprite _Sprite      = null;
+    internal static bool _BulletSpawnedThisRun  = false;
+    internal static string _EnemyWithoutAFuture = "";
+    internal static Texture2D _EeveeTexture     = null;
 
     private PlayerController _owner = null;
 
@@ -25,11 +27,18 @@ public class BulletThatCanKillTheFuture : CwaffActive
         item.CanBeDropped = true;
 
         _Sprite = item.sprite;
-        CwaffEvents.OnRunStart += (_, _, _) => _BulletSpawnedThisRun = false;
+        CwaffEvents.OnRunStart += ResetBTCKTF;
         CwaffEvents.OnNewFloorFullyLoaded += SpawnFutureBullet;
 
-        // ETGMod.Databases.Strings.Core.AddComplex("#SHOP_RUNBASEDMULTILINE_GENERIC", "more words");
         ETGMod.Databases.Strings.Core.AddComplex("#SHOP_RUNBASEDMULTILINE_STOPPER", _BelloItemHint);
+
+        _EeveeTexture = ResourceManager.LoadAssetBundle("shared_auto_001").LoadAsset<Texture2D>("nebula_reducednoise");
+    }
+
+    private static void ResetBTCKTF(PlayerController arg1, PlayerController arg2, GameManager.GameMode arg3)
+    {
+        _BulletSpawnedThisRun = false;
+        _EnemyWithoutAFuture = "";
     }
 
     private static void SpawnFutureBullet()
@@ -268,7 +277,7 @@ public class BulletThatCanKillTheFuture : CwaffActive
         bool killedOwnFuture = (pdist < Mathf.Min(2f, victimDistance));
         if (!killedOwnFuture && victim != null)
         {
-            CwaffToolbox.EnemyWithoutAFuture = victim.EnemyGuid;
+            _EnemyWithoutAFuture = victim.EnemyGuid;
             Lazy.CustomNotification("Future Erased", victim.GetActorName(), _Sprite);
             // ETGModConsole.Log("future erased for "+victim.EnemyGuid);
             VFXPool vfx = VFX.CreatePoolFromVFXGameObject((ItemHelper.Get(Items.MagicLamp) as Gun
@@ -284,7 +293,7 @@ public class BulletThatCanKillTheFuture : CwaffActive
                 if (!a.IsHostileAndNotABoss())
                     continue;
 
-                CwaffToolbox.Memorialize(a);
+                Memorialize(a);
                 UnityEngine.Object.Destroy(a.gameObject);
             }
 
@@ -349,6 +358,56 @@ public class BulletThatCanKillTheFuture : CwaffActive
             __instance.UsesOverrideTargetFloor = false;
             GameManager.Instance.InjectedLevelName = _NameOfPreviousFloor;
             _ShouldReturnToPreviousFloor = false;
+        }
+    }
+
+    [HarmonyPatch(typeof(AIActor), nameof(AIActor.Start))]
+    private class MemorializeFuturelessEnemiesPatch
+    {
+        static bool Prefix(AIActor __instance)
+        {
+            if (string.IsNullOrEmpty(_EnemyWithoutAFuture) || __instance.EnemyGuid != _EnemyWithoutAFuture)
+                return true;
+
+            Memorialize(__instance);
+            UnityEngine.Object.Destroy(__instance.gameObject);
+            return false; // skip original check
+        }
+    }
+
+    public static void Memorialize(AIActor enemy)
+    {
+        tk2dSprite sprite = new GameObject().AddComponent<tk2dSprite>();
+        sprite.SetSprite(enemy.sprite.collection, Lazy.GetIdForBestIdleAnimation(enemy));
+        sprite.FlipX = enemy.sprite.FlipX;
+        sprite.PlaceAtPositionByAnchor(enemy.sprite.transform.position, sprite.FlipX ? Anchor.LowerRight : Anchor.LowerLeft);
+        sprite.StartCoroutine(Flicker(sprite));
+    }
+
+    public static IEnumerator Flicker(tk2dSprite gsprite)
+    {
+        gsprite.renderer.enabled = true;
+        gsprite.OverrideMaterialMode = tk2dBaseSprite.SpriteMaterialOverrideMode.OVERRIDE_MATERIAL_COMPLEX;
+        gsprite.usesOverrideMaterial = true;
+
+        gsprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/GlitchEevee");
+            gsprite.renderer.material.SetTexture("_EeveeTex", _EeveeTexture);
+            gsprite.renderer.material.SetFloat("_WaveIntensity", 0.9f);
+            gsprite.renderer.material.SetFloat("_ColorIntensity", 0.95f);
+        gsprite.renderer.sharedMaterial.shader = ShaderCache.Acquire("Brave/Internal/GlitchEevee");
+            gsprite.renderer.sharedMaterial.SetTexture("_EeveeTex", _EeveeTexture);
+            gsprite.renderer.sharedMaterial.SetFloat("_WaveIntensity", 0.9f);
+            gsprite.renderer.sharedMaterial.SetFloat("_ColorIntensity", 0.95f);
+
+        gsprite.color = AfterImageHelpers.afterImageGray.WithAlpha(0.5f);
+        gsprite.enabled = true;
+        gsprite.UpdateZDepth();
+        while (gsprite)
+        {
+            yield return new WaitForSeconds(0.05f);
+            gsprite.renderer.enabled = true;
+            yield return null;
+            gsprite.renderer.enabled = false;
         }
     }
 }
