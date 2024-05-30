@@ -73,11 +73,6 @@ public class CwaffProjectile : MonoBehaviour
       // enter destroy code here
     }
 
-    private void SpawnShrapnel()
-    {
-
-    }
-
     /// <summary>Prevent projectiles from being affected by Orbital Bullets if preventOrbiting is set</summary>
     [HarmonyPatch(typeof(GunVolleyModificationItem), nameof(GunVolleyModificationItem.HandleStartOrbit))]
     private class PreventOrbitingProjectilePatch
