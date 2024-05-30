@@ -97,7 +97,7 @@ public class HLDRoll : CustomDodgeRoll
             p.Shooter = this.owner.specRigidbody;
 
             p.gameObject.AddComponent<FakeProjectileComponent>();
-            p.gameObject.AddComponent<Expiration>().expirationTimer = DISOWN_TIME+FADE_TIME;
+            p.gameObject.AddComponent<ProjectileExpiration>().expirationTimer = DISOWN_TIME+FADE_TIME;
 
             OwnerConnectLightningModifier oclm = p.gameObject.AddComponent<OwnerConnectLightningModifier>();
                 oclm.linkPrefab = DriftersHeadgear._LinkVFXPrefab;

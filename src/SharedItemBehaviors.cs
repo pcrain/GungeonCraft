@@ -14,25 +14,67 @@ public class FakeProjectileComponent : MonoBehaviour
     }
 }
 
-public class Expiration : MonoBehaviour  // kill projectile after a fixed amount of time
+/// <summary>Kill a projectile after a fixed amount of time</summary>
+public class ProjectileExpiration : MonoBehaviour
 {
     public float expirationTimer = 1f;
 
-    // dummy component
     private void Start()
     {
-        Projectile p = base.GetComponent<Projectile>();
-        if (expirationTimer == 0f)
-            Expire();
-        else
-            Invoke("Expire", expirationTimer);
+        if (expirationTimer > 0)
+        {
+            StartCoroutine(Expire(expirationTimer));
+            return;
+        }
+        if (base.gameObject.GetComponent<Projectile>() is Projectile p)
+            p.DieInAir(true,false,false,true);
     }
 
-    private void Expire()
+    private IEnumerator Expire(float expirationTimer)
     {
-        this.gameObject.GetComponent<Projectile>()?.DieInAir(true,false,false,true);
+        yield return new WaitForSeconds(expirationTimer);
+        if (base.gameObject.GetComponent<Projectile>() is Projectile p)
+            p.DieInAir(true,false,false,true);
     }
 }
+
+  /// <summary>destroy a game object after a fixed amount of time, with optional fadeout</summary>
+  public class Expiration : MonoBehaviour
+  {
+    public void ExpireIn(float seconds, float fadeFor = 0f, float startAlpha = 1f, bool shrink = false)
+    {
+      this.StartCoroutine(Expire(seconds, fadeFor, startAlpha, shrink));
+    }
+
+    private IEnumerator Expire(float seconds, float fadeFor = 0f, float startAlpha = 1f, bool shrink = false)
+    {
+      if (startAlpha < 1f)
+        this.gameObject.SetAlphaImmediate(startAlpha);
+      float startXScale = this.gameObject.transform.localScale.x;
+      float startYScale = this.gameObject.transform.localScale.y;
+      if (fadeFor == 0f)
+      {
+        yield return new WaitForSeconds(seconds);
+        UnityEngine.Object.Destroy(this.gameObject);
+        yield break;
+      }
+
+      float lifeLeft = seconds;
+      while (lifeLeft > 0)
+      {
+        lifeLeft -= BraveTime.DeltaTime;
+        float percentAlive = Mathf.Min(1f,lifeLeft / fadeFor);
+        this.gameObject.SetAlpha(startAlpha * percentAlive);
+        if (shrink)
+        {
+          this.gameObject.transform.localScale = new Vector3(percentAlive * startXScale, percentAlive * startYScale, 1.0f);
+        }
+        yield return null;
+      }
+      UnityEngine.Object.Destroy(this.gameObject);
+      yield break;
+    }
+  }
 
 /// <summary>Class for fake items that don't show up in inventory or ammonomicon, but can persistently update and get serialized during midgame saves</summary>
 public class FakeItem : CwaffPassive

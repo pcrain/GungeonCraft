@@ -436,7 +436,7 @@ public static class Lazy
             _NullProjectilePrefab.damageTypes         = CoreDamageTypes.None;
             _NullProjectilePrefab.collidesWithEnemies = false;
             _NullProjectilePrefab.collidesWithPlayer  = false;
-            _NullProjectilePrefab.gameObject.AddComponent<Expiration>().expirationTimer = 0f;
+            _NullProjectilePrefab.gameObject.AddComponent<ProjectileExpiration>().expirationTimer = 0f;
         }
         return _NullProjectilePrefab;
     }
