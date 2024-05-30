@@ -220,7 +220,6 @@
     <Compile Include="src\NonstandardApi\SpriteTrailController.cs"/>
     <Compile Include="src\NonstandardApi\GunBuilder.cs"/>
     <Compile Include="src\NonstandardApi\MiniInteractable.cs"/>
-    <Compile Include="src\NonstandardApi\BeamHelpers.cs"/>
     <Compile Include="src\NonstandardApi\CwaffProjectile.cs"/>
     <Compile Include="src\NonstandardApi\DamageAdjuster.cs"/>
     <Compile Include="src\NonstandardApi\Cwaff-GenericNPC.cs"/>
@@ -244,6 +243,7 @@
     <EmbeddedResource Include="Resources\Atlases\atlas_1.png"/>
     <EmbeddedResource Include="Resources\Atlases\atlas_1.atlas"/>
     <EmbeddedResource Include="Resources\Sounds\CwaffingTheGungy.bnk"/>
+    <EmbeddedResource Include="Resources\Sounds\sound_info.bnk"/>
     <EmbeddedResource Include="Resources\Rooms\barter.newroom"/>
     <EmbeddedResource Include="Resources\Rooms\petshop.newroom"/>
     <EmbeddedResource Include="Resources\Rooms\insurance.newroom"/>
