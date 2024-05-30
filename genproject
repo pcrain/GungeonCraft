@@ -8,11 +8,11 @@
 namespace="CwaffingTheGungy"                     #namespace used throughout source code; need to change for my own mod eventually
 projectname="GungeonCraft"                       #name of the DLL to create
 projfile="./CwaffingItems.csproj"                #the name of the csproj file to generate
-sourcechecksums="./_${namespace}-checksums-src"  #file containing checksums of all source files to determine recompilation
-gfxchecksums="./_${namespace}-checksums-gfx"     #file containing checksums of all graphics to determine rebuilding atlases
-audiochecksums="./_${namespace}-checksums-audio" #file containing checksums of all audio files to determine rebuilding audio bank
-externalupdate="./_${namespace}-externalupdate"  #file containing the last time an external resource was added
-audioupdate="./_${namespace}-audioupdate"        #file containing the last time an audio resource / csv was added / updated
+sourcechecksums="./obj/_${namespace}-checksums-src"  #file containing checksums of all source files to determine recompilation
+gfxchecksums="./obj/_${namespace}-checksums-gfx"     #file containing checksums of all graphics to determine rebuilding atlases
+audiochecksums="./obj/_${namespace}-checksums-audio" #file containing checksums of all audio files to determine rebuilding audio bank
+externalupdate="./obj/_${namespace}-externalupdate"  #file containing the last time an external resource was added
+audioupdate="./obj/_${namespace}-audioupdate"        #file containing the last time an audio resource / csv was added / updated
 dllname="./bin/Debug/${projectname}.dll"         #DLL name is directly based on the project name
 dotnet35path="$(pwd)/_dotNETFramework/v3.5"      #Path to .NET 3.5 developer assemblies (from NUGet)
 USEXTERNALASSEMBLY=0                             #Whether to use the external Assembly-Csharp.dll or the one bundled in the source directory
