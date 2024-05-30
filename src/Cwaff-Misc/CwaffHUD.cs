@@ -139,8 +139,8 @@ public class HUDElement
     public float updateFreq = 1.0f/60.0f;
 
     private float timeSinceLastUpdate = 0f;
-    private static Texture2D defaultIcon =
-        ResourceExtractor.GetTextureFromResource($"{C.MOD_INT_NAME}/Resources/HUD/Coolness.png");
+    // private static Texture2D defaultIcon =
+    //     ResourceExtractor.GetTextureFromResource($"{C.MOD_INT_NAME}/Resources/HUD/Coolness.png");
 
     public HUDElement(string name, string initText = null, string initIconPath = null, bool addImmediately = true)
     {
@@ -159,8 +159,8 @@ public class HUDElement
         }
         else
         {
-            icon = new SImage(defaultIcon);
-            icon.Foreground = icon.Foreground.WithAlpha(0);
+            // icon = new SImage(defaultIcon);
+            // icon.Foreground = icon.Foreground.WithAlpha(0);
             // icon.Visible = false;
         }
 

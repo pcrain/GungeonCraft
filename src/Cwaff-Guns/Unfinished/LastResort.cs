@@ -38,17 +38,17 @@ public class LastResort : CwaffGun
         Projectile p0 = projectile.Clone(GunData.New(damage: 2.0f));
         lastResortProjectiles.Add(p0);
 
-        VFX.RegisterVFX(_PumpChargeAnimationName, ResMap.Get("PumpChargeMeter"),
-            fps: 4, loops: true, anchor: Anchor.LowerCenter);
+        // VFX.RegisterVFX(_PumpChargeAnimationName, ResMap.Get("PumpChargeMeter"),
+        //     fps: 4, loops: true, anchor: Anchor.LowerCenter);
 
         // 1+ guns without ammo (scale stats from last projectile)
-        for(int i = 1; i < 5; ++i)
-        {
-            Projectile po      = lastResortProjectiles[i-1];
-            Projectile pi      = po.Clone(GunData.New(damage: po.baseData.damage * 2, speed: po.baseData.speed * 2, range: po.baseData.range * 2));
-            lastResortProjectiles.Add(pi);
-            lastResortLevelSprites.Add("PumpChargeMeter"+i);
-        }
+        // for(int i = 1; i < 5; ++i)
+        // {
+        //     Projectile po      = lastResortProjectiles[i-1];
+        //     Projectile pi      = po.Clone(GunData.New(damage: po.baseData.damage * 2, speed: po.baseData.speed * 2, range: po.baseData.range * 2));
+        //     lastResortProjectiles.Add(pi);
+        //     lastResortLevelSprites.Add("PumpChargeMeter"+i);
+        // }
 
         lastResortBaseProjectile = projectile;
     }
