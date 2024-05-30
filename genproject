@@ -104,11 +104,11 @@ fi
 
 #Regenerate audio sources if necessary
 echo -e "[${GRN}>${BLN}] Checking for changes to audio files"
-lastmodifiedaudio="$(find "Resources" -type f -path "*.wav" -o -path "*.csv" -printf "%T+\n" | sort -nr | head -n 1)"
+lastmodifiedaudio="$(find "RawResources/Sounds" -type f -path "*.wav" -o -path "*.csv" -printf "%T+\n" | sort -nr | head -n 1)"
 # lastmodifiedaudio="$(find "Resources" -type f -path "*.wav" -o -type f -path "*.ogg" -o -path "*.csv" -printf "%T+\n" | sort -nr | head -n 1)"
 updateaudio=0
-audiodata="$(/bin/ls -Al "Resources/Sounds/" | grep -vE "(^total|.bnk$)")"
-if [ ! -e "./Resources/Sounds/${namespace}.bnk" ]; then
+audiodata="$(/bin/ls -Al "RawResources/Sounds/" | grep -vE "(^total|.bnk$)")"
+if [ ! -e "./Resources/${namespace}.bnk" ]; then
   echo -e "[${GRN}>${BLN}]   Audio bank does not exist, regenerating sound bank"
   updateaudio=1
 elif [ ! -e "${audiochecksums}" ]; then
@@ -130,7 +130,8 @@ fi
 if [ $updateaudio -eq 1 ]; then
   rebuild=1
   echo -e "[${GRN}>${BLN}] Regenerating audio bank"
-  ./gen-gungeon-audio-bank.py -Ovr -s "./Resources/Sounds/sound_info.csv" "./Resources/Sounds" "${namespace}"
+  #BUG: gen-gungeon-audio-bank.py thinks paths beginning with . aren't absolute and prepend the current working directory
+  ./gen-gungeon-audio-bank.py -Ovr -s "./RawResources/Sounds/sound_info.csv" "./RawResources/Sounds" "$(pwd)/Resources/${namespace}.bnk"
 
   echo -e "[${GRN}>${BLN}]   Regenerating checksums for audio files"
   echo "$audiodata" > "${audiochecksums}"
