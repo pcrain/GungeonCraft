@@ -97,7 +97,7 @@ public class Scotsman : CwaffGun
             return;
         }
 
-        this._targetingReticle ??= Instantiate<GameObject>(_ScotsmanReticle, base.transform.position, Quaternion.identity);
+        this._targetingReticle ??= UnityEngine.Object.Instantiate(_ScotsmanReticle, base.transform.position, Quaternion.identity);
         Vector2 rawAim = player.m_activeActions.Aim.Vector;
         bool showReticle = ((rawAim != Vector2.zero) && (rawAim.sqrMagnitude > 0.02f));
         if (showReticle)

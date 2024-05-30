@@ -313,7 +313,7 @@ public class Deadline : CwaffGun
             _MyLasers[closestIndex].InitiateDeathSequenceAt(closestPosition.ToVector3ZisY(-1f),true);
             ETGModMainBehaviour.Instance.gameObject.Play("gaster_blaster_sound_effect");
 
-            new FakeExplosion(Instantiate<GameObject>(_SplodeVFX, closestPosition, Quaternion.identity));
+            new FakeExplosion(UnityEngine.Object.Instantiate(_SplodeVFX, closestPosition, Quaternion.identity));
         }
 
         for (int i = _MyLasers.Count - 1; i >= 0; i--)

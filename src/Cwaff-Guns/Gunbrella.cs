@@ -78,7 +78,7 @@ public class Gunbrella : CwaffGun
         if (this._targetingReticle)
             return;
 
-        this._targetingReticle = Instantiate<GameObject>(_RainReticle, base.transform.position, Quaternion.identity);
+        this._targetingReticle = UnityEngine.Object.Instantiate(_RainReticle, base.transform.position, Quaternion.identity);
         this._targetingReticle.SetAlphaImmediate(0.0f); // avoid bug where setting alpha on newly created object is delayed by one frame
     }
 

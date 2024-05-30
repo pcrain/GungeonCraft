@@ -299,7 +299,7 @@ public static class VFX
             extantSprites[gunOwner] = new List<GameObject>();
         gunOwner.StopAllOverheadVFX();
 
-        GameObject newSprite = UnityEngine.Object.Instantiate<GameObject>(animations[name]);
+        GameObject newSprite = UnityEngine.Object.Instantiate(animations[name]);
 
         tk2dBaseSprite baseSprite = newSprite.GetComponent<tk2dBaseSprite>();
         newSprite.transform.parent = gunOwner.transform;

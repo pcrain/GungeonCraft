@@ -79,7 +79,7 @@ public class TimingGun : CwaffGun
         this.curCharge = (this.curCharge+1) % maxCharge;
         if (theCounter != null)
             UnityEngine.Object.Destroy(theCounter);
-        // theCounter = Instantiate<GameObject>(
+        // theCounter = UnityEngine.Object.Instantiate(
         //                 VFX.animations[curCharge.ToString()],
         //                 this.Player.specRigidbody.sprite.WorldTopCenter + new Vector2(0f,0.5f),
         //                 Quaternion.identity,

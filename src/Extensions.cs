@@ -97,8 +97,7 @@ public static class Extensions
   }
 
   /// <summary>Register a game object as a prefab, with generic support</summary>
-  public static T RegisterPrefab<T>(this T self, bool deactivate = true, bool markFake = true, bool dontUnload = true)
-    where T : Component
+  public static T RegisterPrefab<T>(this T self, bool deactivate = true, bool markFake = true, bool dontUnload = true) where T : Component
   {
     self.gameObject.RegisterPrefab(deactivate, markFake, dontUnload);
     return self;
@@ -110,15 +109,12 @@ public static class Extensions
     return UnityEngine.Object.Instantiate(self).RegisterPrefab(deactivate, markFake, dontUnload).gameObject;
   }
 
-  //BUG: this randomly completely breaks initialization on MacOS and Linux sometimes
-  //     - Aimu Hakurei uses this directly and causes a starup crash for Kelmar (Linux) and mdgrve (MacOS)
-  //     - Breegull calls this indirectly through Gun.CloneProjectile -> Projectile.Clone -> Projectile.CloneSpecial -> Projectile.ClonePrefab
-  //         While Missiletoe also calls Gun.CloneProjectile, its DefaultModule.projectiles[0] hasn't been changed, while Breegull has called InitProjectile()
+  // WARNING: the old version of this method using Instantiate<T> completely breaks if UnityEngine.CoreModule.MTGAPIPatcher.mm.dll is missing.
+  // this should never happen if modded gungeon is installed properly, but has caused headache-inducing issues in the past, so be warned: https://github.com/pcrain/GungeonCraft/issues/8
   /// <summary>Instantiate a prefab and clone it as a new prefab, with generic support</summary>
-  public static T ClonePrefab<T>(this T self, bool deactivate = true, bool markFake = true, bool dontUnload = true)
-    where T : Component
+  public static T ClonePrefab<T>(this T self, bool deactivate = true, bool markFake = true, bool dontUnload = true) where T : Component
   {
-    return UnityEngine.Object.Instantiate<T>(self).RegisterPrefab<T>(deactivate, markFake, dontUnload);
+    return UnityEngine.Object.Instantiate(self.gameObject).RegisterPrefab(deactivate, markFake, dontUnload).GetComponent<T>();
   }
 
   /// <summary>Convert degrees to a Vector2 angle</summary>

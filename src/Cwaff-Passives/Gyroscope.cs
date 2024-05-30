@@ -186,7 +186,7 @@ public class GyroscopeRoll : CustomDodgeRoll
             this.owner.OnRealPlayerDeath += this.OnReceivedDamage;
             this.stumbleClip = null;
 
-            this.tornadoVFX = Instantiate<GameObject>(
+            this.tornadoVFX = UnityEngine.Object.Instantiate(
                 Gyroscope._TornadoVFX, this.owner.specRigidbody.UnitBottomCenter, Quaternion.identity);
             tk2dSpriteAnimator tornadoAnimator = this.tornadoVFX.GetComponent<tk2dSpriteAnimator>();
                 tornadoAnimator.sprite.transform.parent = this.owner.transform;
