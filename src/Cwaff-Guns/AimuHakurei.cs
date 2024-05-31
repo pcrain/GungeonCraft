@@ -41,8 +41,8 @@ public class AimuHakurei : CwaffGun
         _ProjBase = gun.InitFirstProjectile(GunData.New(damage: 8f, speed: 44f, range: 100f, force: 3f));
 
         Projectile beamProj = Items._38Special.CloneProjectile(GunData.New(damage: 16.0f, speed: 300.0f, spawnSound: "aimu_beam_sound_2"));
-            TrailController tc = beamProj.AddTrailToProjectilePrefab(spritePath: ResMap.Get("aimu_beam_mid")[0],
-                animPaths: ResMap.Get("aimu_beam_mid"), animFPS: 60, startAnimPaths: ResMap.Get("aimu_beam_start"), startAnimFPS: 60, softMaxLength: 1f, cascadeTimer: C.FRAME, destroyOnEmpty: true,
+            TrailController tc = beamProj.AddTrailToProjectilePrefab(
+                "aimu_beam_mid", fps: 60, startAnim: "aimu_beam_start", softMaxLength: 1f, cascadeTimer: C.FRAME, destroyOnEmpty: true,
                 dispersalPrefab: Items.FlashRay.AsGun().DefaultModule.projectiles[0].GetComponentInChildren<TrailController>().DispersalParticleSystemPrefab);
             beamProj.SetAllImpactVFX(VFX.CreatePool("aimu_beam_impact", fps: 20, loops: false, scale: 1.0f, anchor: Anchor.MiddleCenter));
 

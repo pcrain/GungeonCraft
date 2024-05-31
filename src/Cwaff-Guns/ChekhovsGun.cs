@@ -23,8 +23,7 @@ public class ChekhovsGun : CwaffGun
           damage: 15f, range: 1000f, speed: 200f, sprite: "chekhov_projectile", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter)
         ).Attach<ChekhovBullet>();
 
-        _ChekhovTrailPrefab = VFX.CreateTrailObject(spritePath: ResMap.Get("chekhov_trail_mid")[0],
-            animPaths: ResMap.Get("chekhov_trail_mid"), animFPS: 60, startAnimPaths: ResMap.Get("chekhov_trail_start"), startAnimFPS: 60, cascadeTimer: C.FRAME, destroyOnEmpty: true);
+        _ChekhovTrailPrefab = VFX.CreateTrailObject("chekhov_trail_mid", fps: 60, startAnim: "chekhov_trail_start", cascadeTimer: C.FRAME, destroyOnEmpty: true);
 
         //WARNING: don't use actual gun animations for VFX or the actual gun's sprites can get messed up
         _ChekhovGunVFX = VFX.Create("chekhovs_gun_idle_vfx", 12, loops: true, anchor: Anchor.UpperRight);

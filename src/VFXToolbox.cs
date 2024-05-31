@@ -424,15 +424,14 @@ public static class VFX
     }
 
     // yoinked and adapted from SomeBunny
-    public static TrailController CreateTrailObject(string spritePath, List<string> animPaths = null, int animFPS = -1,
-        List<string> startAnimPaths = null, int startAnimFPS = -1, float timeTillAnimStart = -1, float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false,
-        GameObject dispersalPrefab = null)
+    public static TrailController CreateTrailObject(string spriteName, int fps = -1, string startAnim = null, float timeTillAnimStart = -1,
+        float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false, GameObject dispersalPrefab = null)
     {
       try
       {
-          // GameObject newTrailObject = UnityEngine.Object.Instantiate(new GameObject()).RegisterPrefab();
+          List<string> animPaths = ResMap.Get(spriteName);
+          string spritePath = animPaths[0];
           GameObject newTrailObject = new GameObject().RegisterPrefab();
-          // FakePrefab.InstantiateAndFakeprefab(newTrailObject);
           newTrailObject.name = "trailObject";
 
           int spriteID = ETGMod.Databases.Items.ProjectileCollection.GetSpriteIdByName(spritePath);
@@ -455,7 +454,7 @@ public static class VFX
           // ---------------- Sets up the animation for the main part of the trail
           if (animPaths != null)
           {
-              SetupBeamPart(animation, animPaths, "trail_mid", animFPS, null, null, def.colliderVertices);
+              SetupBeamPart(animation, animPaths, "trail_mid", fps, null, null, def.colliderVertices);
               trail.animation = "trail_mid";
               trail.usesAnimation = true;
           }
@@ -465,9 +464,9 @@ public static class VFX
               trail.usesAnimation = false;
           }
 
-          if (startAnimPaths != null)
+          if (startAnim != null)
           {
-              SetupBeamPart(animation, startAnimPaths, "trail_start", startAnimFPS, null, null, def.colliderVertices);
+              SetupBeamPart(animation, ResMap.Get(startAnim), "trail_start", fps, null, null, def.colliderVertices);
               trail.startAnimation = "trail_start";
               trail.usesStartAnimation = true;
           }
@@ -495,13 +494,13 @@ public static class VFX
     }
 
     // lazily copied from above, refactor later?
-    public static SpriteTrailController CreateSpriteTrailObject(string spritePath, List<string> animPaths = null, int animFPS = -1, List<string> startAnimPaths = null, int startAnimFPS = -1, float timeTillAnimStart = -1, float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false)
+    public static SpriteTrailController CreateSpriteTrailObject(string spriteName, int fps = -1, string startAnim = null, float timeTillAnimStart = -1, float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false)
     {
       try
       {
-          // GameObject newTrailObject = UnityEngine.Object.Instantiate(new GameObject()).RegisterPrefab();
+          List<string> animPaths = ResMap.Get(spriteName);
+          string spritePath = animPaths[0];
           GameObject newTrailObject = new GameObject().RegisterPrefab();
-          // FakePrefab.InstantiateAndFakeprefab(newTrailObject);
           newTrailObject.name = "trailObject";
 
           int spriteID = ETGMod.Databases.Items.ProjectileCollection.GetSpriteIdByName(spritePath);
@@ -524,7 +523,7 @@ public static class VFX
           // ---------------- Sets up the animation for the main part of the trail
           if (animPaths != null)
           {
-              SetupBeamPart(animation, animPaths, "trail_mid", animFPS, null, null, def.colliderVertices);
+              SetupBeamPart(animation, animPaths, "trail_mid", fps, null, null, def.colliderVertices);
               trail.animation = "trail_mid";
               trail.usesAnimation = true;
           }
@@ -534,9 +533,9 @@ public static class VFX
               trail.usesAnimation = false;
           }
 
-          if (startAnimPaths != null)
+          if (startAnim != null)
           {
-              SetupBeamPart(animation, startAnimPaths, "trail_start", startAnimFPS, null, null, def.colliderVertices);
+              SetupBeamPart(animation, ResMap.Get(startAnim), "trail_start", fps, null, null, def.colliderVertices);
               trail.startAnimation = "trail_start";
               trail.usesStartAnimation = true;
           }
