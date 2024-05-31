@@ -66,8 +66,8 @@ public class OmnidirectionalLaser : CwaffGun
         gun.InitProjectile(GunData.New(sprite: "omnilaser_projectile", clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
             speed: 200f, damage: 16f, spawnSound: "omnilaser_shoot_sound", uniqueSounds: true));
 
-        _OmniTrailPrefab = VFX.CreateTrailObject(ResMap.Get("omnilaser_projectile_trail")[0], new Vector2(23, 4), new Vector2(0, 0),
-            ResMap.Get("omnilaser_projectile_trail"), 60, cascadeTimer: C.FRAME, softMaxLength: 1f, destroyOnEmpty: true);
+        _OmniTrailPrefab = VFX.CreateTrailObject(spritePath: ResMap.Get("omnilaser_projectile_trail")[0],
+            animPaths: ResMap.Get("omnilaser_projectile_trail"), animFPS: 60, cascadeTimer: C.FRAME, softMaxLength: 1f, destroyOnEmpty: true);
 
         _OmniReticle = VFX.Create("omnilaser_reticle");
     }

@@ -424,7 +424,7 @@ public static class VFX
     }
 
     // yoinked and adapted from SomeBunny
-    public static TrailController CreateTrailObject(string spritePath, Vector2 colliderDimensions, Vector2 colliderOffsets, List<string> animPaths = null, int animFPS = -1,
+    public static TrailController CreateTrailObject(string spritePath, List<string> animPaths = null, int animFPS = -1,
         List<string> startAnimPaths = null, int startAnimFPS = -1, float timeTillAnimStart = -1, float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false,
         GameObject dispersalPrefab = null)
     {
@@ -434,10 +434,6 @@ public static class VFX
           GameObject newTrailObject = new GameObject().RegisterPrefab();
           // FakePrefab.InstantiateAndFakeprefab(newTrailObject);
           newTrailObject.name = "trailObject";
-          float convertedColliderX = colliderDimensions.x / 16f;
-          float convertedColliderY = colliderDimensions.y / 16f;
-          float convertedOffsetX = colliderOffsets.x / 16f;
-          float convertedOffsetY = colliderOffsets.y / 16f;
 
           int spriteID = ETGMod.Databases.Items.ProjectileCollection.GetSpriteIdByName(spritePath);
           tk2dTiledSprite tiledSprite = newTrailObject.GetOrAddComponent<tk2dTiledSprite>();
@@ -445,8 +441,8 @@ public static class VFX
           tiledSprite.SetSprite(ETGMod.Databases.Items.ProjectileCollection, spriteID);
           tk2dSpriteDefinition def = tiledSprite.GetCurrentSpriteDef();
           def.colliderVertices = new Vector3[]{
-              new Vector3(convertedOffsetX, convertedOffsetY, 0f),
-              new Vector3(convertedColliderX, convertedColliderY, 0f)
+              Vector3.zero,
+              def.untrimmedBoundsDataExtents
           };
 
           tk2dSpriteAnimator animator = newTrailObject.GetOrAddComponent<tk2dSpriteAnimator>();
@@ -499,7 +495,7 @@ public static class VFX
     }
 
     // lazily copied from above, refactor later?
-    public static SpriteTrailController CreateSpriteTrailObject(string spritePath, Vector2 colliderDimensions, Vector2 colliderOffsets, List<string> animPaths = null, int animFPS = -1, List<string> startAnimPaths = null, int startAnimFPS = -1, float timeTillAnimStart = -1, float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false)
+    public static SpriteTrailController CreateSpriteTrailObject(string spritePath, List<string> animPaths = null, int animFPS = -1, List<string> startAnimPaths = null, int startAnimFPS = -1, float timeTillAnimStart = -1, float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false)
     {
       try
       {
@@ -507,10 +503,6 @@ public static class VFX
           GameObject newTrailObject = new GameObject().RegisterPrefab();
           // FakePrefab.InstantiateAndFakeprefab(newTrailObject);
           newTrailObject.name = "trailObject";
-          float convertedColliderX = colliderDimensions.x / 16f;
-          float convertedColliderY = colliderDimensions.y / 16f;
-          float convertedOffsetX = colliderOffsets.x / 16f;
-          float convertedOffsetY = colliderOffsets.y / 16f;
 
           int spriteID = ETGMod.Databases.Items.ProjectileCollection.GetSpriteIdByName(spritePath);
           tk2dTiledSprite tiledSprite = newTrailObject.GetOrAddComponent<tk2dTiledSprite>();
@@ -518,8 +510,8 @@ public static class VFX
           tiledSprite.SetSprite(ETGMod.Databases.Items.ProjectileCollection, spriteID);
           tk2dSpriteDefinition def = tiledSprite.GetCurrentSpriteDef();
           def.colliderVertices = new Vector3[]{
-              new Vector3(convertedOffsetX, convertedOffsetY, 0f),
-              new Vector3(convertedColliderX, convertedColliderY, 0f)
+              Vector3.zero,
+              def.untrimmedBoundsDataExtents
           };
 
           tk2dSpriteAnimator animator = newTrailObject.GetOrAddComponent<tk2dSpriteAnimator>();

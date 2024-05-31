@@ -19,10 +19,10 @@ public class SubtractorBeam : CwaffGun
             gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.FULLAUTO, reloadTime: 1.25f, ammo: 300, idleFps: 10, shootFps: 24, reloadFps: 30,
                 muzzleVFX: "muzzle_subtractor_beam", muzzleFps: 30, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter, reloadAudio: "subtractor_beam_reload_sound");
 
-        _GreenTrailPrefab = VFX.CreateTrailObject(ResMap.Get("subtractor_beam_mid")[0], new Vector2(20, 4), new Vector2(0, 0),
-            ResMap.Get("subtractor_beam_mid"), 60, ResMap.Get("subtractor_beam_start"), 60, softMaxLength: 1f, cascadeTimer: C.FRAME, destroyOnEmpty: true);
-        _RedTrailPrefab = VFX.CreateTrailObject(ResMap.Get("subtractor_beam_red_mid")[0], new Vector2(20, 4), new Vector2(0, 0),
-            ResMap.Get("subtractor_beam_red_mid"), 60, ResMap.Get("subtractor_beam_red_start"), 60, softMaxLength: 1f, cascadeTimer: C.FRAME, destroyOnEmpty: true);
+        _GreenTrailPrefab = VFX.CreateTrailObject(spritePath: ResMap.Get("subtractor_beam_mid")[0],
+            animPaths: ResMap.Get("subtractor_beam_mid"), animFPS: 60, startAnimPaths: ResMap.Get("subtractor_beam_start"), startAnimFPS: 60, softMaxLength: 1f, cascadeTimer: C.FRAME, destroyOnEmpty: true);
+        _RedTrailPrefab = VFX.CreateTrailObject(spritePath: ResMap.Get("subtractor_beam_red_mid")[0],
+            animPaths: ResMap.Get("subtractor_beam_red_mid"), animFPS: 60, startAnimPaths: ResMap.Get("subtractor_beam_red_start"), startAnimFPS: 60, softMaxLength: 1f, cascadeTimer: C.FRAME, destroyOnEmpty: true);
         _HitEffects = VFX.Create("subtractor_beam_hit_effect", 12, loops: true,
             scale: 0.5f, anchor: Anchor.MiddleCenter, emissivePower: 10f);
 

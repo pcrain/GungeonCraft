@@ -802,14 +802,12 @@ public static class Extensions
   }
 
   /// <summary>Create a prefab trail and add it to a prefab projectile</summary>
-  public static TrailController AddTrailToProjectilePrefab(this Projectile target, string spritePath, Vector2 colliderDimensions, Vector2 colliderOffsets, List<string> animPaths = null,
+  public static TrailController AddTrailToProjectilePrefab(this Projectile target, string spritePath, List<string> animPaths = null,
     int animFPS = -1, List<string> startAnimPaths = null, int startAnimFPS = -1, float timeTillAnimStart = -1, float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false,
     GameObject dispersalPrefab = null)
   {
       TrailController trail = VFX.CreateTrailObject(
           spritePath         : spritePath,
-          colliderDimensions : colliderDimensions,
-          colliderOffsets    : colliderOffsets,
           animPaths          : animPaths,
           animFPS            : animFPS,
           startAnimPaths     : startAnimPaths,

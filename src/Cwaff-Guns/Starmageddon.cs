@@ -26,8 +26,8 @@ public class Starmageddon : CwaffGun
           )
         ).Attach<StarmageddonProjectile>();
 
-        _StarmageddonTrailPrefab = VFX.CreateTrailObject(ResMap.Get("starmageddon_trail")[0], new Vector2(23, 4), new Vector2(0, 0),
-            ResMap.Get("starmageddon_trail"), 60, cascadeTimer: C.FRAME, softMaxLength: 1f, destroyOnEmpty: true);
+        _StarmageddonTrailPrefab = VFX.CreateTrailObject(spritePath: ResMap.Get("starmageddon_trail")[0],
+            animPaths: ResMap.Get("starmageddon_trail"), animFPS: 60, cascadeTimer: C.FRAME, softMaxLength: 1f, destroyOnEmpty: true);
     }
 
     public override void Update()
