@@ -13,7 +13,6 @@ public class PopcornGun : CwaffGun
     {
         Gun gun = Lazy.SetupGun<PopcornGun>(ItemName, ShortDescription, LongDescription, Lore);
 
-        gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
         gun.DefaultModule.ammoCost            = 1;
         gun.DefaultModule.shootStyle          = ShootStyle.SemiAutomatic;
         gun.DefaultModule.sequenceStyle       = ProjectileSequenceStyle.Random;

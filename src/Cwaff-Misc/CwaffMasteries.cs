@@ -247,7 +247,7 @@ public class MasteryRitualComponent : MonoBehaviour
 
   private static GameObject MakeNiceParticleSystem(Color particleColor, float arcSpeed)
   {
-      GameObject psBasePrefab = (ItemHelper.Get(Items.CombinedRifle) as Gun).alternateVolley.projectiles[0].projectiles[0].GetComponent<CombineEvaporateEffect>().ParticleSystemToSpawn;
+      GameObject psBasePrefab = Items.CombinedRifle.AsGun().alternateVolley.projectiles[0].projectiles[0].GetComponent<CombineEvaporateEffect>().ParticleSystemToSpawn;
       GameObject psnewPrefab = UnityEngine.Object.Instantiate(psBasePrefab).RegisterPrefab();
       //NOTE: look at CombineSparks.prefab for reference
       //NOTE: uses shader https://github.com/googlearchive/soundstagevr/blob/master/Assets/third_party/Sonic%20Ether/Shaders/SEParticlesAdditive.shader

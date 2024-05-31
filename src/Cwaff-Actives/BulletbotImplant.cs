@@ -134,7 +134,7 @@ public class BulletbotImplant : CwaffActive
             if (this._armed)
                 return;
 
-            Gun gunToArm           = ItemHelper.Get(this._gunId) as Gun;
+            Gun gunToArm           = this._gunId.AsGun();
             AIShooter shooter      = companion.EnableGunShooting(gunToArm);
             shooter.ArmToTheTeeth(gunToArm);
             shooter.Initialize();

@@ -143,8 +143,7 @@ public class BorrowedTime : CwaffActive
 
         // Capture enemies for later
         base.sprite.SetSprite(_FullId);
-        VFXPool vfx = VFX.CreatePoolFromVFXGameObject((ItemHelper.Get(Items.MagicLamp) as Gun
-            ).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
+        VFXPool vfx = VFX.CreatePoolFromVFXGameObject(Items.MagicLamp.AsGun().DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
         gameObject.Play("borrowed_time_capture_sound");
         for (int n = activeEnemies.Count - 1; n >= 0; --n)
         {

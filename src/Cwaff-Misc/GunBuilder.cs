@@ -300,7 +300,7 @@ public static class GunBuilder
     p.SpeedApplyChance     = b.slow;
     p.AppliesSpeedModifier = b.slow > 0.0f;
     if (p.AppliesSpeedModifier)
-      p.speedEffect = (ItemHelper.Get(Items.TripleCrossbow) as Gun).DefaultModule.projectiles[0].speedEffect;
+      p.speedEffect = Items.TripleCrossbow.AsGun().DefaultModule.projectiles[0].speedEffect;
 
     return p;
   }
@@ -417,13 +417,13 @@ public static class GunBuilder
   /// <summary>Clone and return a projectile from a specific gun (Items version)</summary>
   public static Projectile CloneProjectile(this Items gunItem, GunData b = null)
   {
-      return (ItemHelper.Get(gunItem) as Gun).DefaultModule.projectiles[0].Clone(b);
+      return gunItem.AsGun().DefaultModule.projectiles[0].Clone(b);
   }
 
   /// <summary>Returns a projectile from a specific gun (Items version)</summary>
   public static Projectile Projectile(this Items gunItem)
   {
-      return (ItemHelper.Get(gunItem) as Gun).DefaultModule.projectiles[0];
+      return gunItem.AsGun().DefaultModule.projectiles[0];
   }
 
   /// <summary>Set basic attributes for a projectile module and return it</summary>

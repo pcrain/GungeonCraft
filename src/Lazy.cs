@@ -19,7 +19,7 @@ public static class Lazy
         ETGModConsole.Log($"<color=#ffffaaff>{text}</color>");
     }
 
-    private static ProjectileModule _BaseModule = (ItemHelper.Get(Items._38Special) as Gun).DefaultModule;
+    private static ProjectileModule _BaseModule = null;
     /// <summary>Perform basic initialization for a new passive, active, or gun item definition.</summary>
     public static TItemClass SetupItem<TItemClass, TItemSpecific>(string itemName, string shortDescription, string longDescription, string lore, bool hideFromAmmonomicon = false)
         where TItemClass : PickupObject   // must be PickupObject for passive items, PlayerItem for active items, or Gun for guns
@@ -34,6 +34,8 @@ public static class Lazy
 
         if (typeof(TItemClass) == typeof(Gun))
         {
+            _BaseModule ??= Items._38Special.AsGun().DefaultModule;
+
             GameObject go          = UnityEngine.Object.Instantiate(ItemHelper.Get(Items.PeaShooter).gameObject);
             go.name                = baseItemName;
             ammonomiconSprite      = $"{baseItemName}_ammonomicon";

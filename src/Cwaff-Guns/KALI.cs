@@ -26,14 +26,11 @@ public class KALI : CwaffGun
         _KaliProjectile = gun.InitProjectile(GunData.New(range: 9999f, force: 3f, cooldown: 0.1f, collidesWithProjectiles: true,
           clipSize: 1, sprite: "kali_projectile", shootStyle: ShootStyle.Charged)
         ).Attach<PierceProjModifier>(pierce => { pierce.penetration = 999; pierce.penetratesBreakables = true; }
-        // ).Attach<BounceProjModifier>(bounce => { bounce.numberOfBounces = Mathf.Max(bounce.numberOfBounces, 99); }
         );
             TrailController tc = _KaliProjectile.AddTrailToProjectilePrefab(ResMap.Get("kali_trail")[0], new Vector2(15, 6), new Vector2(7, 3),
-                ResMap.Get("kali_trail"), 60, cascadeTimer: C.FRAME, softMaxLength: 1f, destroyOnEmpty: false);
-                tc.UsesDispersalParticles = true;
-                tc.DispersalParticleSystemPrefab = (ItemHelper.Get(Items.FlashRay) as Gun).DefaultModule.projectiles[0].GetComponentInChildren<TrailController>().DispersalParticleSystemPrefab;
+                ResMap.Get("kali_trail"), 60, cascadeTimer: C.FRAME, softMaxLength: 1f, destroyOnEmpty: false,
+                dispersalPrefab: Items.FlashRay.AsGun().DefaultModule.projectiles[0].GetComponentInChildren<TrailController>().DispersalParticleSystemPrefab);
                 tc.gameObject.AddComponent<TrailControllerHotfix.Fix>(); //NOTE: high speed projectiles don't always collide with walls cleanly in vanilla, so patch that
-            // p.SetAllImpactVFX(VFX.CreatePool("gaster_beam_impact", fps: 20, loops: false, scale: 1.0f, anchor: Anchor.MiddleCenter));
 
         ProjectileModule mod = gun.DefaultModule;
         mod.projectiles.Clear();

@@ -13,7 +13,6 @@ public class GamblersFallacy : CwaffGun
     {
         Gun gun = Lazy.SetupGun<GamblersFallacy>(ItemName, ShortDescription, LongDescription, Lore);
 
-        gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
         gun.DefaultModule.ammoCost            = 1;
         gun.DefaultModule.shootStyle          = ShootStyle.Automatic;
         gun.DefaultModule.sequenceStyle       = ProjectileSequenceStyle.Random;
@@ -44,8 +43,7 @@ public class GamblersFallacy : CwaffGun
         {
             ETGModConsole.Log("1 in 33 O:");
             // deal damage
-            vfx ??= VFX.CreatePoolFromVFXGameObject(
-                (ItemHelper.Get(Items.MagicLamp) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
+            vfx ??= VFX.CreatePoolFromVFXGameObject(Items.MagicLamp.AsGun().DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
 
             Vector2 position = player.sprite.WorldCenter;
             for (int i = 0; i < 4; ++i)

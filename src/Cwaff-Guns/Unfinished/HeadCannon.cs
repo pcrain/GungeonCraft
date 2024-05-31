@@ -12,7 +12,6 @@
 //             Gun gun = Lazy.InitGunFromStrings(gunName, spriteName, projectileName, shortDescription, longDescription);
 //             var comp = gun.gameObject.AddComponent<HeadCannon>();
 
-//             gun.gunSwitchGroup                    = (ItemHelper.Get(Items.198) as Gun).gunSwitchGroup;
 //             gun.DefaultModule.ammoCost            = 1;
 //             gun.DefaultModule.shootStyle          = ShootStyle.Automatic;
 //             gun.DefaultModule.sequenceStyle       = ProjectileSequenceStyle.Random;
@@ -43,7 +42,7 @@
 //         private void Start()
 //         {
 //             if (vfx == null)
-//                 vfx = VFX.CreatePoolFromVFXGameObject((ItemHelper.Get(Items.MagicLamp) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
+//                 vfx = VFX.CreatePoolFromVFXGameObject((Items.MagicLamp.AsGun()).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
 
 //             this.m_projectile = base.GetComponent<Projectile>();
 //             // this.m_projectile.BulletScriptSettings.surviveTileCollisions = true;

@@ -40,10 +40,10 @@ public class GunSynthesizer : CwaffActive
     {
         Gun gun = PickupObjectDatabase.GetRandomGun();
         if (!gun)
-            gun = ItemHelper.Get(Items.Ak47) as Gun; // fallback in case we can't actually get a proper gun
+            gun = Items.Ak47.AsGun(); // fallback in case we can't actually get a proper gun
         MakeSyntheticGun(gun, user);
 
-        // MakeSyntheticGun(ItemHelper.Get(Items.PrototypeRailgun) as Gun, user);
+        // MakeSyntheticGun(Items.PrototypeRailgun.AsGun(), user);
         // MakeSyntheticGun(PickupObjectDatabase.GetById(IDs.Pickups["deadline"]).GetComponent<Gun>(), user);
         this.m_activeDuration  = _SYNTH_LIFETIME;
         this.m_activeElapsed   = 0f;

@@ -109,7 +109,7 @@ public static class Extensions
     return UnityEngine.Object.Instantiate(self).RegisterPrefab(deactivate, markFake, dontUnload).gameObject;
   }
 
-  // WARNING: the old version of this method using Instantiate<T> completely breaks if UnityEngine.CoreModule.MTGAPIPatcher.mm.dll is missing.
+  // WARNING: the old version of this method using Instantiate<T> (where T isn't GameObject) completely breaks if UnityEngine.CoreModule.MTGAPIPatcher.mm.dll is missing.
   // this should never happen if modded gungeon is installed properly, but has caused headache-inducing issues in the past, so be warned: https://github.com/pcrain/GungeonCraft/issues/8
   /// <summary>Instantiate a prefab and clone it as a new prefab, with generic support</summary>
   public static T ClonePrefab<T>(this T self, bool deactivate = true, bool markFake = true, bool dontUnload = true) where T : Component
@@ -555,7 +555,7 @@ public static class Extensions
   /// <summary>Clear a gun's default audio events</summary>
   public static void ClearDefaultAudio(this Gun gun)
   {
-    gun.gunSwitchGroup = (ItemHelper.Get(Items.Banana) as Gun).gunSwitchGroup; // banana has silent reload and charge audio
+    gun.gunSwitchGroup = Items.Banana.AsGun().gunSwitchGroup; // banana has silent reload and charge audio
     gun.PreventNormalFireAudio = true;
     gun.OverrideNormalFireAudioEvent = "";
   }
@@ -627,7 +627,7 @@ public static class Extensions
 
   public static void SetMuzzleVFX(this Gun gun, Items gunToCopyFrom, bool onlyCopyBasicEffects = true)
   {
-    Gun otherGun = ItemHelper.Get(gunToCopyFrom) as Gun;
+    Gun otherGun = gunToCopyFrom.AsGun();
     if (!otherGun)
       return;
 
@@ -642,7 +642,7 @@ public static class Extensions
 
   public static void SetCasing(this Gun gun, Items otherGun)
   {
-    gun.shellCasing = (ItemHelper.Get(otherGun) as Gun).shellCasing;
+    gun.shellCasing = otherGun.AsGun().shellCasing;
   }
 
   // Gets the actual rectangle corresponding to the the outermost walls of a room
@@ -741,7 +741,7 @@ public static class Extensions
     gun.CurrentAmmo = gun.GetBaseMaxAmmo(); // necessary iff gun basemaxammo > 1000
 
     gun.preventRotation = preventRotation;
-    gun.gunSwitchGroup = (ItemHelper.Get(audioFrom) as Gun).gunSwitchGroup;
+    gun.gunSwitchGroup = audioFrom.AsGun().gunSwitchGroup;
     gun.InfiniteAmmo = infiniteAmmo;
     gun.CanGainAmmo = canGainAmmo;
     gun.CanReloadNoMatterAmmo = canReloadNoMatterAmmo;
@@ -802,10 +802,24 @@ public static class Extensions
   }
 
   /// <summary>Create a prefab trail and add it to a prefab projectile</summary>
-  public static TrailController AddTrailToProjectilePrefab(this Projectile target, string spritePath, Vector2 colliderDimensions, Vector2 colliderOffsets, List<string> animPaths = null, int animFPS = -1, List<string> startAnimPaths = null, int startAnimFPS = -1, float timeTillAnimStart = -1, float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false)
+  public static TrailController AddTrailToProjectilePrefab(this Projectile target, string spritePath, Vector2 colliderDimensions, Vector2 colliderOffsets, List<string> animPaths = null,
+    int animFPS = -1, List<string> startAnimPaths = null, int startAnimFPS = -1, float timeTillAnimStart = -1, float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false,
+    GameObject dispersalPrefab = null)
   {
       TrailController trail = VFX.CreateTrailObject(
-        spritePath, colliderDimensions, colliderOffsets, animPaths, animFPS, startAnimPaths, startAnimFPS, timeTillAnimStart, cascadeTimer, softMaxLength, destroyOnEmpty);
+          spritePath         : spritePath,
+          colliderDimensions : colliderDimensions,
+          colliderOffsets    : colliderOffsets,
+          animPaths          : animPaths,
+          animFPS            : animFPS,
+          startAnimPaths     : startAnimPaths,
+          startAnimFPS       : startAnimFPS,
+          timeTillAnimStart  : timeTillAnimStart,
+          cascadeTimer       : cascadeTimer,
+          softMaxLength      : softMaxLength,
+          destroyOnEmpty     : destroyOnEmpty,
+          dispersalPrefab    : dispersalPrefab
+          );
       trail.gameObject.SetActive(true); // parent projectile is deactivated, so we want to re-activate ourselves so we display correctly when the projectile becomes active
       trail.gameObject.transform.parent = target.transform;
       return trail;
@@ -1138,21 +1152,21 @@ public static class Extensions
 
   /// <summary>Get impact VFX from a specific Gun as a VFXPool</summary>
   public static VFXPool EnemyImpactPool(this Items item, int proj = 0)
-    => (ItemHelper.Get(item) as Gun).DefaultModule.projectiles[proj].hitEffects.enemy;
+    => item.AsGun().DefaultModule.projectiles[proj].hitEffects.enemy;
   public static VFXPool HorizontalImpactPool(this Items item, int proj = 0)
-    => (ItemHelper.Get(item) as Gun).DefaultModule.projectiles[proj].hitEffects.tileMapHorizontal;
+    => item.AsGun().DefaultModule.projectiles[proj].hitEffects.tileMapHorizontal;
   public static VFXPool VerticalImpactPool(this Items item, int proj = 0)
-    => (ItemHelper.Get(item) as Gun).DefaultModule.projectiles[proj].hitEffects.tileMapVertical;
+    => item.AsGun().DefaultModule.projectiles[proj].hitEffects.tileMapVertical;
 
   /// <summary>Get impact VFX from a specific Gun as a GameObject</summary>
   public static GameObject EnemyImpactVFX(this Items item, int proj = 0)
-    => (ItemHelper.Get(item) as Gun).DefaultModule.projectiles[proj].hitEffects.enemy.effects[0].effects[0].effect;
+    => item.AsGun().DefaultModule.projectiles[proj].hitEffects.enemy.effects[0].effects[0].effect;
   public static GameObject HorizontalImpactVFX(this Items item, int proj = 0)
-    => (ItemHelper.Get(item) as Gun).DefaultModule.projectiles[proj].hitEffects.tileMapHorizontal.effects[0].effects[0].effect;
+    => item.AsGun().DefaultModule.projectiles[proj].hitEffects.tileMapHorizontal.effects[0].effects[0].effect;
   public static GameObject VerticalImpactVFX(this Items item, int proj = 0)
-    => (ItemHelper.Get(item) as Gun).DefaultModule.projectiles[proj].hitEffects.tileMapVertical.effects[0].effects[0].effect;
+    => item.AsGun().DefaultModule.projectiles[proj].hitEffects.tileMapVertical.effects[0].effects[0].effect;
   public static GameObject AirImpactVFX(this Items item, int proj = 0)
-    => (ItemHelper.Get(item) as Gun).DefaultModule.projectiles[proj].hitEffects.overrideMidairDeathVFX;
+    => item.AsGun().DefaultModule.projectiles[proj].hitEffects.overrideMidairDeathVFX;
 
   /// <summary>Destroy a GameObject if it is non-null</summary>
   public static void SafeDestroy(this GameObject g)
@@ -1915,4 +1929,11 @@ public static class Extensions
       }
     Debug.LogError("FREEZE AVERTED!  TELL CAPTAIN PRETZEL!  (you're welcome) 147");
   }
+
+  /// <summary>Gets the gun corresponding to an item from the pickup database</summary>
+  public static Gun AsGun(this Items item) => ItemHelper.Get(item) as Gun;
+  /// <summary>Gets the active item corresponding to an item from the pickup database</summary>
+  public static PlayerItem AsActive(this Items item) => ItemHelper.Get(item) as PlayerItem;
+  /// <summary>Gets the passive item corresponding to an item from the pickup database</summary>
+  public static PassiveItem AsPassive(this Items item) => ItemHelper.Get(item) as PassiveItem;
 }

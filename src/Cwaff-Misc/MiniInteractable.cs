@@ -26,7 +26,7 @@ public class MiniInteractable : BraveBehaviour, IPlayerInteractable
 
   private void InitializeInternal(tk2dSpriteCollectionData collection, int spriteId)
   {
-    this.effect = (ItemHelper.Get(Items.MagicLamp) as Gun).DefaultModule.projectiles[0].hitEffects.tileMapVertical;
+    this.effect = Items.MagicLamp.AsGun().DefaultModule.projectiles[0].hitEffects.tileMapVertical;
 
     base.gameObject.AddComponent<tk2dSprite>();
     base.sprite.SetSprite(collection, spriteId);

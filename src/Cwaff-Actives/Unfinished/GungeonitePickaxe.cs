@@ -31,7 +31,7 @@ public class GungeonitePickaxe : CwaffActive
         item.CanBeDropped = true;
         item.SetCooldownType(ItemBuilder.CooldownType.Timed, 0.5f);
 
-        _VFXDustPoof = (ItemHelper.Get(Items.Drill) as PlayerItem).GetComponent<PaydayDrillItem>().VFXDustPoof;
+        _VFXDustPoof = Items.Drill.AsActive().GetComponent<PaydayDrillItem>().VFXDustPoof;
 
         // new Hook(
         //     typeof(TK2DDungeonAssembler).GetMethod("BuildFloorEdgeBorderTiles", BindingFlags.Instance | BindingFlags.NonPublic),

@@ -375,7 +375,7 @@ public static class HeckedMode
                 replacementGunId = (Items)HeckedModeGunWhiteList[UnityEngine.Random.Range(0, _FirstWeakGun)];
             else
                 replacementGunId = (Items)HeckedModeGunWhiteList.ChooseRandom();
-            __instance.HeckedShootGunBehavior(ItemHelper.Get(replacementGunId) as Gun);
+            __instance.HeckedShootGunBehavior(replacementGunId.AsGun());
         }
     }
 

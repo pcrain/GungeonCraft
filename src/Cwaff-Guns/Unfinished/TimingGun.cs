@@ -21,7 +21,6 @@ public class TimingGun : CwaffGun
     {
         Gun gun = Lazy.SetupGun<TimingGun>(ItemName, ShortDescription, LongDescription, Lore);
 
-        gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
         gun.DefaultModule.shootStyle          = ShootStyle.Automatic;
         gun.DefaultModule.sequenceStyle       = ProjectileSequenceStyle.Random;
         gun.quality                           = ItemQuality.C;

@@ -280,8 +280,7 @@ public class BulletThatCanKillTheFuture : CwaffActive
             _EnemyWithoutAFuture = victim.EnemyGuid;
             Lazy.CustomNotification("Future Erased", victim.GetActorName(), _Sprite);
             // ETGModConsole.Log("future erased for "+victim.EnemyGuid);
-            VFXPool vfx = VFX.CreatePoolFromVFXGameObject((ItemHelper.Get(Items.MagicLamp) as Gun
-                ).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
+            VFXPool vfx = VFX.CreatePoolFromVFXGameObject(Items.MagicLamp.AsGun().DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
                 vfx.SpawnAtPosition(
                     victim.sprite.WorldCenter.ToVector3ZisY(-1f), /* -1 = above player sprite */
                     0, null, null, null, -0.05f);

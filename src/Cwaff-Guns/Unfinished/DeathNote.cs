@@ -13,7 +13,6 @@ public class DeathNote : CwaffGun
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<DeathNote>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
             gun.DefaultModule.ammoCost            = 1;
             gun.DefaultModule.shootStyle          = ShootStyle.Automatic;
             gun.DefaultModule.sequenceStyle       = ProjectileSequenceStyle.Random;

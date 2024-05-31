@@ -235,8 +235,7 @@ public class KalibersJustice : CwaffActive
                 break;
         }
 
-        GameObject vfx =
-            (ItemHelper.Get(Items.MagicLamp) as Gun).DefaultModule.projectiles[0].hitEffects.tileMapVertical.effects[0].effects[0].effect;
+        GameObject vfx = Items.MagicLamp.AsGun().DefaultModule.projectiles[0].hitEffects.tileMapVertical.effects[0].effects[0].effect;
         for (int i = 0; i < 8; ++i)
         {
             float angle = 45f * i;

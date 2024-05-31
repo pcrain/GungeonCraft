@@ -17,7 +17,6 @@ public class LastResort : CwaffGun
     {
         Gun gun = Lazy.SetupGun<LastResort>(ItemName, ShortDescription, LongDescription, Lore);
 
-        gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
         gun.DefaultModule.shootStyle          = ShootStyle.Automatic;
         gun.DefaultModule.sequenceStyle       = ProjectileSequenceStyle.Random;
         gun.quality                           = ItemQuality.C;
@@ -74,9 +73,9 @@ public class LastResort : CwaffGun
         base.OnSwitchedToThisGun();
         ComputeLastResortStats();
 
-        Gun g = (ItemHelper.Get(Items.MagicLamp) as Gun);
+        Gun g = Items.MagicLamp.AsGun();
         // overrideMidairDeathVFX will make implicit use of CreatePoolFromVFXGameObject
-        VFXPool v = VFX.CreatePoolFromVFXGameObject((ItemHelper.Get(Items.MagicLamp) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
+        VFXPool v = VFX.CreatePoolFromVFXGameObject(Items.MagicLamp.AsGun().DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
 
         Vector2 ppos = this.PlayerOwner.sprite.WorldCenter;
         float pangle = this.PlayerOwner.CurrentGun.gunAngle;

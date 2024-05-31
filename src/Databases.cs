@@ -1152,9 +1152,9 @@ public static class EasyGoopDefinitions  // mostly stolen from NN
         WaterGoop       = baseGoops[5];
 
         //Define item-based goops
-        CharmGoopDef = ItemHelper.Get(Items.FairyWings)?.GetComponent<WingsItem>()?.RollGoop;
-        GreenFireDef = (ItemHelper.Get(Items.FlameHandMaximizeSpell) as Gun).DefaultModule.projectiles[0].GetComponent<GoopModifier>().goopDefinition;
-        CheeseDef    = (ItemHelper.Get(Items.ChamberGunRatLair) as Gun).DefaultModule.projectiles[0].GetComponent<GoopModifier>().goopDefinition;
+        CharmGoopDef = ItemHelper.Get(Items.FairyWings).GetComponent<WingsItem>().RollGoop;
+        GreenFireDef = Items.FlameHandMaximizeSpell.AsGun().DefaultModule.projectiles[0].GetComponent<GoopModifier>().goopDefinition;
+        CheeseDef    = Items.ChamberGunRatLair.AsGun().DefaultModule.projectiles[0].GetComponent<GoopModifier>().goopDefinition;
 
         //Define colored water goop for paintball gun
         for (int i = 0; i < ColorGoopColors.Count; i++)

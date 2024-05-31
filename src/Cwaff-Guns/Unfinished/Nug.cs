@@ -17,7 +17,6 @@ public class Nug : CwaffGun
         Gun gun = Lazy.SetupGun<Nug>(ItemName, ShortDescription, LongDescription, Lore);
 
         gun.muzzleFlashEffects.type           = VFXPoolType.None;
-        gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
         gun.DefaultModule.ammoCost            = 0;
         gun.DefaultModule.shootStyle          = ShootStyle.SemiAutomatic;
         gun.DefaultModule.sequenceStyle       = ProjectileSequenceStyle.Random;

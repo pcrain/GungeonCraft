@@ -102,7 +102,7 @@ public class WhipChainStart : MonoBehaviour
         if (!owner)
             return;
 
-        gunSprite ??= (ItemHelper.Get(Items.Magnum) as Gun).sprite;
+        gunSprite ??= Items.Magnum.AsGun().sprite;
         this._owner = owner;
         this._angle = angle;
         this._links = new();

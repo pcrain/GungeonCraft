@@ -423,8 +423,10 @@ public static class VFX
         yield break;
     }
 
-    // yoinked from SomeBunny
-    public static TrailController CreateTrailObject(string spritePath, Vector2 colliderDimensions, Vector2 colliderOffsets, List<string> animPaths = null, int animFPS = -1, List<string> startAnimPaths = null, int startAnimFPS = -1, float timeTillAnimStart = -1, float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false)
+    // yoinked and adapted from SomeBunny
+    public static TrailController CreateTrailObject(string spritePath, Vector2 colliderDimensions, Vector2 colliderOffsets, List<string> animPaths = null, int animFPS = -1,
+        List<string> startAnimPaths = null, int startAnimFPS = -1, float timeTillAnimStart = -1, float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false,
+        GameObject dispersalPrefab = null)
     {
       try
       {
@@ -475,6 +477,12 @@ public static class VFX
           }
           else
               trail.usesStartAnimation = false;
+
+          if (dispersalPrefab)
+          {
+            trail.UsesDispersalParticles = true;
+            trail.DispersalParticleSystemPrefab = dispersalPrefab;
+          }
 
           //Trail Variables
           if (softMaxLength > 0) { trail.usesSoftMaxLength = true; trail.softMaxLength = softMaxLength; }

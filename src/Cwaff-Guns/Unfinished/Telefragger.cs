@@ -11,7 +11,6 @@ public class Telefragger : CwaffGun
     {
         Gun gun = Lazy.SetupGun<Telefragger>(ItemName, ShortDescription, LongDescription, Lore);
 
-        gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
         gun.DefaultModule.ammoCost            = 1;
         gun.DefaultModule.shootStyle          = ShootStyle.Automatic;
         gun.DefaultModule.sequenceStyle       = ProjectileSequenceStyle.Random;
@@ -39,7 +38,7 @@ public class HeadCannonBullets : MonoBehaviour
 
     private void Start()
     {
-        vfx ??= VFX.CreatePoolFromVFXGameObject((ItemHelper.Get(Items.MagicLamp) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
+        vfx ??= VFX.CreatePoolFromVFXGameObject(Items.MagicLamp.AsGun().DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
 
         this.m_projectile = base.GetComponent<Projectile>();
         if (this.m_projectile?.Owner is PlayerController)

@@ -21,7 +21,6 @@ public class MasterSword : CwaffGun
         gun.quality                              = ItemQuality.D;
         gun.gunClass                             = GunClass.SILLY;
         gun.DefaultModule.ammoType               = GameUIAmmoType.AmmoType.BEAM;
-        gun.gunSwitchGroup                       = (ItemHelper.Get(Items.Blasphemy) as Gun).gunSwitchGroup;
         gun.InfiniteAmmo                         = true;
         gun.SetAnimationFPS(gun.shootAnimation, 12);
 

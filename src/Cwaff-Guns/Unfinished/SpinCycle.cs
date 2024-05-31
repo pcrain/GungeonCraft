@@ -24,7 +24,6 @@ public class SpinCycle : CwaffGun
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<SpinCycle>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.gunSwitchGroup                    = (ItemHelper.Get(Items.GunslingersAshes) as Gun).gunSwitchGroup;
             gun.DefaultModule.ammoCost            = 1;
             gun.DefaultModule.shootStyle          = ShootStyle.SemiAutomatic;
             gun.DefaultModule.sequenceStyle       = ProjectileSequenceStyle.Random;
@@ -73,8 +72,8 @@ public class SpinCycle : CwaffGun
             chainBeam.interpolateStretchedBones        = true;
             chainBeam.ContinueBeamArtToWall            = true;
 
-        _Vfx = VFX.CreatePoolFromVFXGameObject((ItemHelper.Get(Items.MagicLamp) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
-        _Vfx2 = (ItemHelper.Get(Items.TearJerker) as Gun).muzzleFlashEffects;
+        _Vfx = VFX.CreatePoolFromVFXGameObject(Items.MagicLamp.AsGun().DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
+        _Vfx2 = Items.TearJerker.AsGun().muzzleFlashEffects;
     }
 
     private void SetupBallAndChain(PlayerController p)

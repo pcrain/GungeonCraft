@@ -805,9 +805,9 @@ public static class SlashDoer // stolen from NN
 public class SlashData : ScriptableObject // stolen from NN
 {
     public bool doVFX = true;
-    public VFXPool VFX = (ItemHelper.Get(Items.Blasphemy) as Gun).muzzleFlashEffects;
+    public VFXPool VFX = Items.Blasphemy.AsGun().muzzleFlashEffects;
     public bool doHitVFX = true;
-    public VFXPool hitVFX = (ItemHelper.Get(Items.Blasphemy) as Gun).DefaultModule.projectiles[0].hitEffects.enemy;
+    public VFXPool hitVFX = Items.Blasphemy.AsGun().DefaultModule.projectiles[0].hitEffects.enemy;
     public SlashDoer.ProjInteractMode projInteractMode = SlashDoer.ProjInteractMode.IGNORE;
     public float playerKnockbackForce = 5;
     public float enemyKnockbackForce = 10;

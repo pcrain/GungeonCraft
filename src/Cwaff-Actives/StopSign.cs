@@ -36,7 +36,7 @@ public class StopSign : CwaffActive
             AppliesTint        = false,
             AppliesDeathTint   = false,
             AppliesOutlineTint = false,
-            OverheadVFX        = (ItemHelper.Get(Items.TripleCrossbow) as Gun).DefaultModule.projectiles[0].speedEffect.OverheadVFX,
+            OverheadVFX        = Items.TripleCrossbow.AsGun().DefaultModule.projectiles[0].speedEffect.OverheadVFX,
             PlaysVFXOnActor    = false,
         };
     }
