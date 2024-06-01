@@ -193,6 +193,7 @@
     <Compile Include="src\Cwaff-Guns\Maestro.cs"/>
     <Compile Include="src\Cwaff-Guns\Jugglernaut.cs"/>
     <Compile Include="src\Cwaff-Guns\KALI.cs"/>
+    <Compile Include="src\Cwaff-Guns\AlienNailgun.cs"/>
     <Compile Include="src\Cwaff-Guns\SubMachineGun.cs"/>
     <Compile Include="src\Cwaff-Guns\Grandmaster.cs"/>
     <Compile Include="src\Cwaff-Guns\Tranquilizer.cs"/>
@@ -204,7 +205,6 @@
     <Compile Include="src\Cwaff-Guns\Starmageddon.cs"/>
     <Compile Include="src\Cwaff-Guns\Uppskeruvel.cs"/>
     <Compile Include="src\Cwaff-Guns\Alyx.cs"/>
-    <Compile Include="src\Cwaff-Guns\AlienNailGun.cs"/>
     <Compile Include="src\Cwaff-Flows\FlowHelpers.cs"/>
     <Compile Include="src\Cwaff-Flows\CwaffDungeons.cs"/>
     <Compile Include="src\Cwaff-Flows\SansDungeon.cs"/>

@@ -251,7 +251,7 @@ public class Insured : MonoBehaviour
         if (this.dropped)
             UpdateVFX();
 
-        bool dropped = !GameManager.Instance.AnyPlayerHasPickupID(this._pickupId);
+        bool dropped = RoomHandler.unassignedInteractableObjects.Contains(this._pickup as IPlayerInteractable);
         if (this.dropped == dropped)
             return; // cached state is the same
 
