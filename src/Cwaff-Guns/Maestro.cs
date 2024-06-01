@@ -18,7 +18,6 @@ public class Maestro : CwaffGun
     private int        _targetEnemyIndex    = 0;
     private AIActor    _targetEnemy         = null;
     private Projectile _targetProjectile    = null;
-    private GameObject _enemyTargetVFX      = null;
     private GameObject _projectileTargetVFX = null;
 
     public static void Add()
@@ -33,8 +32,23 @@ public class Maestro : CwaffGun
           sprite: "maestro_bullet", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter));
 
         _RuneEnemy      = VFX.Create("maestro_target_enemy_vfx", fps: 2);
+        CwaffReticle reticle = gun.AddComponent<CwaffReticle>();
+            reticle.reticleVFX        = _RuneEnemy;
+            reticle.reticleAlpha      = 0.5f;
+            reticle.fadeInTime        = 0f;
+            reticle.fadeOutTime       = 0f;
+            reticle.smoothLerp        = true;
+            reticle.hideNormalReticle = false;
+            reticle.maxDistance       = 0f;
+            reticle.controllerScale   = 1f;
+            reticle.rotateSpeed       = 270f;
+            reticle.visibility        = CwaffReticle.Visibility.WITHTARGET;
+            reticle.targetObjFunc     = null; //NOTE: set on pickup
+
         _RuneProjectile = VFX.Create("maestro_target_projectile_vfx", fps: 2);
     }
+
+    private GameObject GetTargetEnemy(CwaffReticle reticle) => this._targetEnemy ? this._targetEnemy.gameObject : null;
 
     private void RedirectProjectile(Projectile p, AIActor targetEnemy, float damage)
     {
@@ -194,28 +208,12 @@ public class Maestro : CwaffGun
 
     private void UpdateTargetingVFXIfNecessary()
     {
-        if (!this._enemyTargetVFX)
-        {
-            this._enemyTargetVFX = SpawnManager.SpawnVFX(Maestro._RuneEnemy, this.gun.barrelOffset.transform.position, Quaternion.identity);
-            this._enemyTargetVFX.SetAlphaImmediate(0.5f);
-        }
         if (!this._projectileTargetVFX)
         {
             this._projectileTargetVFX = SpawnManager.SpawnVFX(Maestro._RuneProjectile, this.gun.barrelOffset.transform.position, Quaternion.identity);
             this._projectileTargetVFX.SetAlphaImmediate(0.75f);
         }
 
-        if (this._targetEnemy)
-        {
-            this._enemyTargetVFX.transform.localRotation = (270f * BraveTime.ScaledTimeSinceStartup).EulerZ();
-            this._enemyTargetVFX.transform.position = Vector2.Lerp(this._enemyTargetVFX.transform.position, this._targetEnemy.CenterPosition, 0.33f);
-            this._enemyTargetVFX.SetAlpha(0.5f);
-        }
-        else
-        {
-            this._enemyTargetVFX.transform.position = this.PlayerOwner.CenterPosition;
-            this._enemyTargetVFX.SetAlpha(0.0f);
-        }
         if (this._targetProjectile)
         {
             this._projectileTargetVFX.transform.localRotation = (270f * BraveTime.ScaledTimeSinceStartup).EulerZ();
@@ -269,10 +267,14 @@ public class Maestro : CwaffGun
 
     private void CleanUpVFX(bool destroyed = false)
     {
-        if (this._enemyTargetVFX)
-            UnityEngine.Object.Destroy(this._enemyTargetVFX);
         if (this._projectileTargetVFX)
             UnityEngine.Object.Destroy(this._projectileTargetVFX);
+    }
+
+    public override void OnPlayerPickup(PlayerController player)
+    {
+        base.OnPlayerPickup(player);
+        gun.GetComponent<CwaffReticle>().targetObjFunc = GetTargetEnemy;
     }
 
     public override void OnSwitchedAwayFromThisGun()

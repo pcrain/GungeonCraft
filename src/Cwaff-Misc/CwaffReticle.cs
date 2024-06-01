@@ -76,11 +76,13 @@ public class CwaffReticle : MonoBehaviour
   {
     if (!this._extantVfx)
     {
-      this._extantVfx = UnityEngine.Object.Instantiate(this.reticleVFX);
+      this._extantVfx = UnityEngine.Object.Instantiate(this.reticleVFX, this._gun.gun.barrelOffset.transform.position, Quaternion.identity);
       this._extantVfx.SetAlphaImmediate(0.0f);
     }
 
-    switch (this.visibility)
+    if (!this._player.AcceptingNonMotionInput)
+      this._visible = false;
+    else switch (this.visibility)
     {
       case DEFAULT:    this._visible = this._player.IsKeyboardAndMouse() ? true : this._player.m_activeActions.Aim.Vector.sqrMagnitude > 0.02f; break;
       case CONTROLLER: this._visible = this._player.IsKeyboardAndMouse() ? false : this._player.m_activeActions.Aim.Vector.sqrMagnitude > 0.02f; break;
@@ -114,18 +116,21 @@ public class CwaffReticle : MonoBehaviour
     if (this.rotateSpeed > 0)
       this._extantVfx.transform.localRotation = (this.rotateSpeed * BraveTime.ScaledTimeSinceStartup).EulerZ();
 
-    if (!this._visible)
-      return;
+    // if (!this._visible)
+    //   return;
 
     if (this.targetObjFunc != null)
     {
       this._targetObject = this.targetObjFunc(this);
-      if (this._targetObject.GetComponent<GameActor>() is GameActor actor)
-        this._targetPos = actor.CenterPosition;
-      if (this._targetObject.GetComponent<Projectile>() is Projectile proj)
-        this._targetPos = proj.SafeCenter;
-      else if (this._targetObject != null)
-        this._targetPos = this._targetObject.transform.position;
+      if (this._targetObject)
+      {
+        if (this._targetObject.GetComponent<GameActor>() is GameActor actor)
+          this._targetPos = actor.CenterPosition;
+        else if (this._targetObject.GetComponent<Projectile>() is Projectile proj)
+          this._targetPos = proj.SafeCenter;
+        else
+          this._targetPos = this._targetObject.transform.position;
+      }
     }
     else if (this.targetPosFunc != null)
     {
@@ -151,9 +156,9 @@ public class CwaffReticle : MonoBehaviour
 
   private void HandlePositioning()
   {
-    if (!this._visible)
-      return;
-    this._currentPos = this.smoothLerp ? Vector2.Lerp(this._currentPos, this._targetPos, 0.33f * BraveTime.DeltaTime) : this._targetPos;
+    if (!this._visible && (this._fadeProgress <= 0.0f))
+      this._targetPos = this._player.CenterPosition; // reset position when invisible
+    this._currentPos = this.smoothLerp ? Vector2.Lerp(this._currentPos, this._targetPos, (float)Lazy.FastPow(0.33, C.FPS * BraveTime.DeltaTime)) : this._targetPos;
     this._extantVfx.transform.position = this._currentPos;
   }
 }
