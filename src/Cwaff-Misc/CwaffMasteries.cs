@@ -71,7 +71,7 @@ public static class CwaffMasteries
               return;
             if (!gun.IsMasterable())
               return;
-            if (player.HasPassiveItem(gun.MasteryTokenId()))
+            if (player.HasPassive(gun.MasteryTokenId()))
               __result = $"[color #dd6666]Mastered[/color]\n{__result}";
             else
               __result = $"[color #888888]Normal[/color]\n{__result}";

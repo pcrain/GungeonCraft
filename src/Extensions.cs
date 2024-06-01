@@ -440,6 +440,15 @@ public static class Extensions
     return null;
   }
 
+  /// <summary>Get a passive item owned by the player by id</summary>
+  public static bool HasPassive(this PlayerController p, int id)
+  {
+    for (int i = 0; i < p.passiveItems.Count; ++i)
+      if (p.passiveItems[i].PickupObjectId == id)
+        return true;
+    return false;
+  }
+
   /// <summary>Clamps a float between two numbers (default 0 and 1)</summary>
   public static float Clamp(this float f, float min = 0f, float max = 1f)
   {
