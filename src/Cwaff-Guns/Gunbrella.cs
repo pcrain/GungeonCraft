@@ -23,7 +23,6 @@ public class Gunbrella : CwaffGun
     private GameObject _targetingReticle = null;
     private float _curChargeTime         = 0.0f;
     private Vector2 _chargeStartPos      = Vector2.zero;
-    private float _chargeStartAngle      = 0.0f;
     private int _nextProjectileNumber    = 0;
 
     public static void Add()
@@ -42,6 +41,18 @@ public class Gunbrella : CwaffGun
 
         _RainReticle = VFX.Create("gunbrella_target_reticle",
             fps: 12, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 10, emissiveColour: Color.cyan, scale: 0.75f);
+
+        CwaffReticle reticle = gun.AddComponent<CwaffReticle>();
+            reticle.reticleVFX        = _RainReticle;
+            reticle.reticleAlpha      = 1f;
+            reticle.fadeInTime        = _MIN_CHARGE_TIME;
+            reticle.fadeOutTime       = 0.25f;
+            reticle.smoothLerp        = false;
+            reticle.hideNormalReticle = false;
+            reticle.maxDistance       = _MAX_RETICLE_RANGE;
+            reticle.controllerScale   = 1f + _MAX_RETICLE_RANGE;
+            reticle.rotateSpeed       = 0f;
+            reticle.visibility        = CwaffReticle.Visibility.CHARGING;
     }
 
     public override void Update()
@@ -52,34 +63,12 @@ public class Gunbrella : CwaffGun
 
         if (!this.gun.IsCharging)
         {
-            EndCharge();
+            this._curChargeTime = 0.0f;
             return;
         }
 
         Lazy.PlaySoundUntilDeathOrTimeout(soundName: "gunbrella_charge_sound", source: this.gun.gameObject, timer: 0.05f);  //TODO: could maybe be handled better
-
-        if (this._curChargeTime == 0.0f)
-            BeginCharge();
         UpdateCharge();
-        this._curChargeTime += BraveTime.DeltaTime;
-    }
-
-    // Using LateUpdate() here so alpha is updated correctly
-    private void LateUpdate()
-    {
-        this._targetingReticle?.SetAlpha(_MAX_ALPHA * Mathf.Min(1.0f, this._curChargeTime / _MIN_CHARGE_TIME));
-    }
-
-    private void BeginCharge()
-    {
-        this._nextProjectileNumber = 0;
-        this._chargeStartPos   = this.gun.barrelOffset.PositionVector2();
-        this._chargeStartAngle = this.gun.CurrentAngle;
-        if (this._targetingReticle)
-            return;
-
-        this._targetingReticle = UnityEngine.Object.Instantiate(_RainReticle, base.transform.position, Quaternion.identity);
-        this._targetingReticle.SetAlphaImmediate(0.0f); // avoid bug where setting alpha on newly created object is delayed by one frame
     }
 
     private void UpdateCharge()
@@ -88,65 +77,24 @@ public class Gunbrella : CwaffGun
             return;
 
         if (this._curChargeTime == 0.0f)
-            BeginCharge();
+        {
+            this._nextProjectileNumber = 0;
+            this._chargeStartPos   = this.gun.barrelOffset.PositionVector2();
+        }
 
-        // smoothly handle reticle postion, compensating extra distance for controller users
-        Vector2 gunPos       = this.gun.barrelOffset.PositionVector2();
-        Vector2 newTargetPos =
-            player.IsKeyboardAndMouse() ? player.unadjustedAimPoint.XY() : player.sprite.WorldCenter + (1f + _MAX_RETICLE_RANGE) * player.m_activeActions.Aim.Vector;
-        Vector2 gunDelta     = (newTargetPos - gunPos);
-        if (gunDelta.magnitude > _MAX_RETICLE_RANGE)
-            newTargetPos = gunPos + _MAX_RETICLE_RANGE * gunDelta.normalized;
-
-        // if (!GameManager.Instance.Dungeon.data.CheckInBoundsAndValid(newTargetPos.ToVector3ZUp().IntXY(VectorConversions.Floor)))
-        //     return;
-
-        if (newTargetPos.GetAbsoluteRoom() != gunPos.GetAbsoluteRoom())
-            return; // aiming outside the room
-
-        this._chargeStartPos = newTargetPos;
-        this._targetingReticle.transform.position = this._chargeStartPos;
+        this._chargeStartPos = base.GetComponent<CwaffReticle>().GetTargetPos();
+        // constrain to the current room
+        if (!GameManager.Instance.Dungeon.data.CheckInBoundsAndValid(this._chargeStartPos.ToIntVector2(VectorConversions.Floor)))
+        {
+            Vector2 gunPos = this.gun.barrelOffset.PositionVector2();
+            this._chargeStartPos = gunPos.ToNearestWall(out Vector2 normal, (this._chargeStartPos - gunPos).ToAngle(), 0f);
+        }
+        this._curChargeTime += BraveTime.DeltaTime;
     }
 
-    private void EndCharge()
-    {
-        this._curChargeTime = 0.0f;
-        DestroyReticle();
-    }
+    public Vector2 GetReticleCenter() => this._chargeStartPos;
 
-    public override void OnSwitchedAwayFromThisGun()
-    {
-        base.OnSwitchedAwayFromThisGun();
-        DestroyReticle();
-    }
-
-    public override void OnDropped()
-    {
-        base.OnDropped();
-        DestroyReticle();
-    }
-
-    public override void OnDestroy()
-    {
-        DestroyReticle();
-        base.OnDestroy();
-    }
-
-    private void DestroyReticle()
-    {
-        this._targetingReticle.SafeDestroy();
-        this._targetingReticle = null;
-    }
-
-    public Vector2 GetReticleCenter()
-    {
-        return this._chargeStartPos;
-    }
-
-    public int GetProjectileNumber()
-    {
-        return this._nextProjectileNumber++;
-    }
+    public int GetProjectileNumber() => this._nextProjectileNumber++;
 
     public override void PostProcessProjectile(Projectile projectile)
     {

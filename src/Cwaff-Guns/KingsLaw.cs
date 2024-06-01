@@ -90,9 +90,9 @@ public class KingsLaw : CwaffGun
         this._extantMuzzleRune?.SetAlphaImmediate(0f);
     }
 
-    public override void OnDropped()
+    public override void OnDroppedByPlayer(PlayerController player)
     {
-        base.OnDropped();
+        base.OnDroppedByPlayer(player);
         Reset();
     }
 

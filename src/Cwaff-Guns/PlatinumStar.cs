@@ -55,9 +55,9 @@ public class PlatinumStar : CwaffGun
         LaunchAllBullets(this.PlayerOwner);
     }
 
-    public override void OnDropped()
+    public override void OnDroppedByPlayer(PlayerController player)
     {
-        base.OnDropped();
+        base.OnDroppedByPlayer(player);
         LaunchAllBullets(this.PlayerOwner);
     }
 

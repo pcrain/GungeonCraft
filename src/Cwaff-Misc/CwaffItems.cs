@@ -84,6 +84,15 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem/*, ILevelLoadedListener
   /// </summary>
   public virtual void OnSwitchedAwayFromThisGun()
   {
+    if (base.gameObject.GetComponent<CwaffReticle>() is CwaffReticle ret)
+      ret.HideImmediately();
+  }
+
+  public override void OnDroppedByPlayer(PlayerController player)
+  {
+      base.OnDroppedByPlayer(player);
+      if (base.gameObject.GetComponent<CwaffReticle>() is CwaffReticle ret)
+        ret.HideImmediately();
   }
 
   public override void Update()

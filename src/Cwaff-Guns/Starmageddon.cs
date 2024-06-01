@@ -63,9 +63,9 @@ public class Starmageddon : CwaffGun
         Reset();
     }
 
-    public override void OnDropped()
+    public override void OnDroppedByPlayer(PlayerController player)
     {
-        base.OnDropped();
+        base.OnDroppedByPlayer(player);
         Reset();
     }
 

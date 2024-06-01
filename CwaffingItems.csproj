@@ -212,6 +212,7 @@
     <Compile Include="src\Cwaff-Flows\FlowPrefabs.cs"/>
     <Compile Include="src\Databases.cs"/>
     <Compile Include="src\SharedItemBehaviors.cs"/>
+    <Compile Include="src\Cwaff-Misc\CwaffReticle.cs"/>
     <Compile Include="src\Cwaff-Misc\ModdedShopItemAdder.cs"/>
     <Compile Include="src\Cwaff-Misc\CustomAmmoDisplay.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffGenericNPC.cs"/>
