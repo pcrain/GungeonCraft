@@ -2,6 +2,10 @@ namespace CwaffingTheGungy;
 
 using static CwaffReticle.Visibility;
 
+// dummy classes to help differentiate for weapons that use multiple types (e.g., Maestro)
+public class CwaffEnemyReticle : CwaffReticle {}
+public class CwaffProjectileReticle : CwaffReticle {}
+
 public class CwaffReticle : MonoBehaviour
 {
   public enum Visibility
@@ -158,7 +162,7 @@ public class CwaffReticle : MonoBehaviour
   {
     if (!this._visible && (this._fadeProgress <= 0.0f))
       this._targetPos = this._player.CenterPosition; // reset position when invisible
-    this._currentPos = this.smoothLerp ? Vector2.Lerp(this._currentPos, this._targetPos, (float)Lazy.FastPow(0.33, C.FPS * BraveTime.DeltaTime)) : this._targetPos;
+    this._currentPos = this.smoothLerp ? Lazy.SmoothestLerp(this._currentPos, this._targetPos, 16f) : this._targetPos;
     this._extantVfx.transform.position = this._currentPos;
   }
 }

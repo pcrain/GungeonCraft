@@ -12,13 +12,9 @@ public class Maestro : CwaffGun
     private const float _SQR_TARGET_RADIUS            = _MAX_PROJECTILE_TARGET_RADIUS * _MAX_PROJECTILE_TARGET_RADIUS;
     private const int   _MAX_STEPS                    = 30;
 
-    internal static GameObject _RuneEnemy               = null;
-    internal static GameObject _RuneProjectile          = null;
-
     private int        _targetEnemyIndex    = 0;
     private AIActor    _targetEnemy         = null;
     private Projectile _targetProjectile    = null;
-    private GameObject _projectileTargetVFX = null;
 
     public static void Add()
     {
@@ -31,24 +27,42 @@ public class Maestro : CwaffGun
           shootStyle: ShootStyle.Automatic, damage: 9f, speed: 60.0f, ammoType: GameUIAmmoType.AmmoType.BEAM,
           sprite: "maestro_bullet", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter));
 
-        _RuneEnemy      = VFX.Create("maestro_target_enemy_vfx", fps: 2);
-        CwaffReticle reticle = gun.AddComponent<CwaffReticle>();
-            reticle.reticleVFX        = _RuneEnemy;
-            reticle.reticleAlpha      = 0.5f;
-            reticle.fadeInTime        = 0f;
-            reticle.fadeOutTime       = 0f;
-            reticle.smoothLerp        = true;
-            reticle.hideNormalReticle = false;
-            reticle.maxDistance       = 0f;
-            reticle.controllerScale   = 1f;
-            reticle.rotateSpeed       = 270f;
-            reticle.visibility        = CwaffReticle.Visibility.WITHTARGET;
-            reticle.targetObjFunc     = null; //NOTE: set on pickup
+        CwaffEnemyReticle enemyReticle = gun.AddComponent<CwaffEnemyReticle>();
+            enemyReticle.reticleVFX        = VFX.Create("maestro_target_enemy_vfx", fps: 2);
+            enemyReticle.reticleAlpha      = 0.5f;
+            enemyReticle.fadeInTime        = 0f;
+            enemyReticle.fadeOutTime       = 0f;
+            enemyReticle.smoothLerp        = true;
+            enemyReticle.hideNormalReticle = false;
+            enemyReticle.maxDistance       = 0f;
+            enemyReticle.controllerScale   = 1f;
+            enemyReticle.rotateSpeed       = 270f;
+            enemyReticle.visibility        = CwaffReticle.Visibility.WITHTARGET;
+            enemyReticle.targetObjFunc     = null; //NOTE: set on pickup
 
-        _RuneProjectile = VFX.Create("maestro_target_projectile_vfx", fps: 2);
+        CwaffProjectileReticle projReticle = gun.AddComponent<CwaffProjectileReticle>();
+            projReticle.reticleVFX        = VFX.Create("maestro_target_projectile_vfx", fps: 2);
+            projReticle.reticleAlpha      = 0.75f;
+            projReticle.fadeInTime        = 0f;
+            projReticle.fadeOutTime       = 0f;
+            projReticle.smoothLerp        = true;
+            projReticle.hideNormalReticle = false;
+            projReticle.maxDistance       = 0f;
+            projReticle.controllerScale   = 1f;
+            projReticle.rotateSpeed       = 270f;
+            projReticle.visibility        = CwaffReticle.Visibility.WITHTARGET;
+            projReticle.targetObjFunc     = null; //NOTE: set on pickup
     }
 
     private GameObject GetTargetEnemy(CwaffReticle reticle) => this._targetEnemy ? this._targetEnemy.gameObject : null;
+    private GameObject GetTargetProjectile(CwaffReticle reticle) => this._targetProjectile ? this._targetProjectile.gameObject : null;
+
+    public override void OnPlayerPickup(PlayerController player)
+    {
+        base.OnPlayerPickup(player);
+        gun.GetComponent<CwaffEnemyReticle>().targetObjFunc = GetTargetEnemy;
+        gun.GetComponent<CwaffProjectileReticle>().targetObjFunc = GetTargetProjectile;
+    }
 
     private void RedirectProjectile(Projectile p, AIActor targetEnemy, float damage)
     {
@@ -206,41 +220,16 @@ public class Maestro : CwaffGun
             base.gameObject.PlayOnce("maestro_target_sound");
     }
 
-    private void UpdateTargetingVFXIfNecessary()
-    {
-        if (!this._projectileTargetVFX)
-        {
-            this._projectileTargetVFX = SpawnManager.SpawnVFX(Maestro._RuneProjectile, this.gun.barrelOffset.transform.position, Quaternion.identity);
-            this._projectileTargetVFX.SetAlphaImmediate(0.75f);
-        }
-
-        if (this._targetProjectile)
-        {
-            this._projectileTargetVFX.transform.localRotation = (270f * BraveTime.ScaledTimeSinceStartup).EulerZ();
-            this._projectileTargetVFX.transform.position = Vector2.Lerp(this._projectileTargetVFX.transform.position, this._targetProjectile.SafeCenter, 0.33f);
-            this._projectileTargetVFX.SetAlpha(0.75f);
-        }
-        else
-        {
-            this._projectileTargetVFX.transform.position = this.PlayerOwner.CenterPosition;
-            this._projectileTargetVFX.SetAlpha(0.0f);
-        }
-    }
-
     public override void Update()
     {
         base.Update();
         if (!this.PlayerOwner)
             return;
         if (!this.PlayerOwner.AcceptingNonMotionInput)
-        {
-            CleanUpVFX();
             return;
-        }
 
         this._targetProjectile = GetTargetProjectile();
         DetermineTargetEnemyIfNecessary();
-        UpdateTargetingVFXIfNecessary();
         if (this.gun.m_isCurrentlyFiring)
             Lazy.PlaySoundUntilDeathOrTimeout("maestro_fire_sound_looped", base.gameObject, 0.05f);
     }
@@ -263,35 +252,5 @@ public class Maestro : CwaffGun
         if (this._targetProjectile)
             RedirectProjectile(this._targetProjectile, this._targetEnemy, projectile.baseData.damage);
         projectile.DieInAir(suppressInAirEffects: true, allowActorSpawns: false, allowProjectileSpawns: false, killedEarly: false);
-    }
-
-    private void CleanUpVFX(bool destroyed = false)
-    {
-        if (this._projectileTargetVFX)
-            UnityEngine.Object.Destroy(this._projectileTargetVFX);
-    }
-
-    public override void OnPlayerPickup(PlayerController player)
-    {
-        base.OnPlayerPickup(player);
-        gun.GetComponent<CwaffReticle>().targetObjFunc = GetTargetEnemy;
-    }
-
-    public override void OnSwitchedAwayFromThisGun()
-    {
-        base.OnSwitchedAwayFromThisGun();
-        CleanUpVFX();
-    }
-
-    public override void OnDroppedByPlayer(PlayerController player)
-    {
-        base.OnDroppedByPlayer(player);
-        CleanUpVFX();
-    }
-
-    public override void OnDestroy()
-    {
-        CleanUpVFX(destroyed: true);
-        base.OnDestroy();
     }
 }

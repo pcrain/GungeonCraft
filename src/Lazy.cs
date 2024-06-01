@@ -879,4 +879,18 @@ public static class Lazy
 
         return bestSpriteId;
     }
+
+
+    /// <summary>Smoother Lerping over Deltatime, from "Lerp Smoothing is Broken": https://www.youtube.com/watch?v=LSNQuFEDOyQ</summary>
+    public static float SmoothestLerp(float a, float b, float r)
+    {
+        return b + (a - b) * Mathf.Exp(-BraveTime.DeltaTime * r);
+    }
+
+    /// <summary>Vector2 version of above</summary>
+    public static Vector2 SmoothestLerp(Vector2 a, Vector2 b, float r)
+    {
+        float exp = Mathf.Exp(-BraveTime.DeltaTime * r);
+        return new Vector2(b.x + (a.x - b.x) * exp, b.y + (a.y - b.y) * exp);
+    }
 }
