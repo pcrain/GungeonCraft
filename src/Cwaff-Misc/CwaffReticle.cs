@@ -7,6 +7,7 @@ public class CwaffReticle : MonoBehaviour
   public enum Visibility
   {
     DEFAULT, // reticle is always visible while the gun's default reticle is active
+    CONTROLLER, // reticle is always visible on controller while the gun's default reticle is active, and is invisible on mouse and keyboard
     CHARGING, // reticle is only visible when charging
     WITHTARGET, // reticle is only visible when it has a valid target GameObject
     ALWAYS, // reticle is always visible while the gun is active, regardless of whether the default reticle is active
@@ -68,10 +69,8 @@ public class CwaffReticle : MonoBehaviour
       this._extantVfx.transform.position = this._gun.PlayerOwner.CenterPosition;
   }
 
-  public Vector2 GetTargetPos()
-  {
-    return this._targetPos;
-  }
+  public Vector2 GetTargetPos() => this._targetPos;
+  public bool IsVisible() => this._visible;
 
   private void HandleVisibility()
   {
@@ -84,6 +83,7 @@ public class CwaffReticle : MonoBehaviour
     switch (this.visibility)
     {
       case DEFAULT:    this._visible = this._player.IsKeyboardAndMouse() ? true : this._player.m_activeActions.Aim.Vector.sqrMagnitude > 0.02f; break;
+      case CONTROLLER: this._visible = this._player.IsKeyboardAndMouse() ? false : this._player.m_activeActions.Aim.Vector.sqrMagnitude > 0.02f; break;
       case CHARGING:   this._visible = this._gun.gun.IsCharging; break;
       case WITHTARGET: this._visible = this._targetObject != null; break;
       case ALWAYS:     this._visible = true; break;

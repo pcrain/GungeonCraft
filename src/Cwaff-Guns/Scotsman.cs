@@ -15,7 +15,6 @@ public class Scotsman : CwaffGun
     internal List<Stickybomb> _extantStickies = new();
 
     private Vector2 _aimPoint                = Vector2.zero;
-    private GameObject _targetingReticle     = null;
     private int _nextIndex                   = 0;
     private Vector2 _whereIsThePlayerLooking = Vector2.zero;
 
@@ -31,6 +30,17 @@ public class Scotsman : CwaffGun
           damage: 5.0f, speed: 40.0f, sprite: "stickybomb_projectile", fps: 12, anchor: Anchor.MiddleCenter)).Attach<Stickybomb>();
 
         _ScotsmanReticle = VFX.Create("scotsman_reticle", fps: 12, loops: true, anchor: Anchor.MiddleCenter);
+        CwaffReticle reticle = gun.AddComponent<CwaffReticle>();
+            reticle.reticleVFX        = _ScotsmanReticle;
+            reticle.reticleAlpha      = 1f;
+            reticle.fadeInTime        = 0f;
+            reticle.fadeOutTime       = 0f;
+            reticle.smoothLerp        = false;
+            reticle.hideNormalReticle = true;
+            reticle.maxDistance       = -1f;
+            reticle.controllerScale   = _MAX_RETICLE_RANGE;
+            reticle.rotateSpeed       = 0f;
+            reticle.visibility        = CwaffReticle.Visibility.CONTROLLER;
 
         // Initialize our explosion data
         _ScotsmanExplosion = new ExplosionData()
@@ -65,8 +75,6 @@ public class Scotsman : CwaffGun
     {
         if (this.GenericOwner is PlayerController pc)
             pc.forceAimPoint = null;
-        this._targetingReticle.SafeDestroy();
-        this._targetingReticle = null;
         base.OnSwitchedAwayFromThisGun();
     }
 
@@ -74,7 +82,6 @@ public class Scotsman : CwaffGun
     {
         if (this.PlayerOwner)
             this.PlayerOwner.forceAimPoint = null;
-        this._targetingReticle.SafeDestroy();
         base.OnDestroy();
     }
 
@@ -92,26 +99,16 @@ public class Scotsman : CwaffGun
             Vector2 gunPos = player.CurrentGun.barrelOffset.PositionVector2();
             if ((this._aimPoint - player.CenterPosition).sqrMagnitude < 32f)
                 this._aimPoint = gunPos + player.m_currentGunAngle.ToVector(1f);
-            this._targetingReticle.SafeDestroy();
-            this._targetingReticle = null;
             return;
         }
 
-        this._targetingReticle ??= UnityEngine.Object.Instantiate(_ScotsmanReticle, base.transform.position, Quaternion.identity);
-        Vector2 rawAim = player.m_activeActions.Aim.Vector;
-        bool showReticle = ((rawAim != Vector2.zero) && (rawAim.sqrMagnitude > 0.02f));
-        if (showReticle)
+        if (base.GetComponent<CwaffReticle>() is CwaffReticle reticle && reticle.IsVisible())
         {
-            this._aimPoint = player.CenterPosition + _MAX_RETICLE_RANGE * rawAim;
+            this._aimPoint = reticle.GetTargetPos();
             player.forceAimPoint = this._aimPoint;
-            this._targetingReticle.SetAlpha(1.0f);
         }
         else
-        {
             this._aimPoint = player.CenterPosition + player.m_currentGunAngle.ToVector(_MAX_RETICLE_RANGE);
-            this._targetingReticle.SetAlpha(0.0f);
-        }
-        this._targetingReticle.transform.position = this._aimPoint;
     }
 
     public override void PostProcessProjectile(Projectile projectile)

@@ -20,7 +20,6 @@ public class Gunbrella : CwaffGun
 
     internal static GameObject _RainReticle;
 
-    private GameObject _targetingReticle = null;
     private float _curChargeTime         = 0.0f;
     private Vector2 _chargeStartPos      = Vector2.zero;
     private int _nextProjectileNumber    = 0;
