@@ -157,6 +157,7 @@ public class AlienNailgun : CwaffGun
             );
         if (replicant)
         {
+            replicant.PreventBlackPhantom = true;
             replicant.SpawnInInstantly();
             replicant.sprite.PlaceAtPositionByAnchor(position, Anchor.MiddleCenter);
             replicant.specRigidbody.Initialize();
