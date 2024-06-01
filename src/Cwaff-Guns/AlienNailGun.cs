@@ -224,6 +224,7 @@ public class AlienNailgun : CwaffGun
         if (!_Replicants.Contains(enemy))
             return;
         p.StopCollidingWithPlayers();
+        p.collidesWithEnemies = true;
         p.AddComponent<ReplicantProjectile>();
     }
 
