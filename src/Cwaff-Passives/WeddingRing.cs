@@ -5,7 +5,7 @@ public class WeddingRing : CwaffPassive
     public static string ItemName         = "Wedding Ring";
     public static string ShortDescription = "Commitment";
     public static string LongDescription  = "Every enemy killed without switching guns grants 1% boosts to damage, reload speed, and chance not to consume ammo, up to a maximum of 50% each. Boosts are reset upon firing another gun.";
-    public static string Lore             = "Whether it is legal and/or ethical to marry a gun has been the topic of a surprising number of conversations in the Breach and the Gungeon, with the general consensus seeming to be: \"well...um...probably, yes, but it's weird as heck!\" Regardless of its legality, ethicality, or sanity, more than one Gungeoneer has slapped a wedding ring on their favorite gun. And whether attributable to the placebo effect, madness, or empirical results, these gunnymooners have reported that their loyalty brings out the best in both them and their guns.";
+    public static string Lore             = "Whether it is legal and/or ethical to marry a gun has been the topic of a surprising number of conversations in the Breach and the Gungeon, with the general consensus seeming to be: \"well...um...probably, yes, but it's weird as heck!\" Regardless of its legality, ethics, or sanity, more than one Gungeoneer has slapped a wedding ring on their favorite gun. And whether attributable to the placebo effect, madness, or empirical results, these gunnymooners have reported that their loyalty brings out the best in both them and their guns.";
 
     private const float _BONUS_PER_KILL     = 0.01f;
     private const float _MAX_BONUS          = 1.50f;

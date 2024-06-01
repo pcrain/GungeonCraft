@@ -4,7 +4,7 @@ public class Maestro : CwaffGun
 {
     public static string ItemName         = "Maestro";
     public static string ShortDescription = "Guided by the Winds";
-    public static string LongDescription  = "Redirects enemy projectiles near the cursor towards the targeted enemy while fire is held. Reloading changes the targeted enemy to the enemy closest to the cursor. On controller, projectiles and enemies are targeted uses angle from aim instead of distance from the cursor. Redirected projectiles cannot harm the player.";
+    public static string LongDescription  = "Redirects enemy projectiles near the cursor towards the targeted enemy while fire is held. Reloading changes the targeted enemy to the enemy closest to the cursor. On controller, projectiles and enemies are targeted using angle from aim instead of distance from the cursor. Redirected projectiles cannot harm the player.";
     public static string Lore             = "A conductor's baton that was lost at sea near Dragun's Roost long ago, eventually finding its way into the Gungeon via the sewers. Though unable to fire projectiles itself, it grants its wielder the ability to redirect projectiles by bending the ether around them, providing excellent offensive and defensive utility alike.";
 
     private const float _MAX_PROJECTILE_TARGET_ANGLE  = 20f; // for controller

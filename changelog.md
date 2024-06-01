@@ -28,7 +28,7 @@
 ## 1.12.0 (2024-05-05)
 
 #### Features and Polish:
-- Added Macchi Auto, Nycterian, Scavenging Arm, Armor Piercing Rounds, and MM: Reloading
+- Added Macchi Auto, Nycterian, Scavenging Arms, Armor Piercing Rounds, and MM: Reloading
 	- Armor Piercing Rounds and MM: Reloading sprites thanks to Dallan!
 - Added gun mastery system
 - Added masteries for Grandmaster, Chekhov's Gun, Pincushion, Platinum Star, and Natascha

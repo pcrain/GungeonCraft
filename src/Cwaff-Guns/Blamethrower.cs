@@ -143,7 +143,7 @@ public class BlamethrowerProjectile : MonoBehaviour
         if (p.Owner is not PlayerController player)
             return;
 
-        // if we succesfully blame the scapegoat, return some armor
+        // if we successfully blame the scapegoat, return some armor
         ScapeGoat scapeGoat = enemy.GetComponent<ScapeGoat>();
         if (killed && scapeGoat)
             scapeGoat.TakeTheBlame(player);

@@ -5,7 +5,7 @@ public class CreditCard : CwaffPassive
     public static string ItemName         = "Credit Card";
     public static string ShortDescription = "Shop 'til You Drop";
     public static string LongDescription  = "Grants 500 shells while picked up. Grants 1 curse for every 50 shells below 500, and 1 coolness for every 50 shells above 500. Cannot be dropped when possessing fewer than 500 shells.";
-    public static string Lore             = "Perhaps the greatest emblem of 20th century economics, this handly little piece of plastic gives unprecedented purchasing power for all of your Gungeon needs. Comes with the teensiest of interest rates, charged directly to your soul for your convenience.";
+    public static string Lore             = "Perhaps the greatest emblem of 20th century economics, this handy little piece of plastic gives unprecedented purchasing power for all of your Gungeon needs. Comes with the teensiest of interest rates, charged directly to your soul for your convenience.";
 
     internal const int _BASE_CREDIT  = 500;
     internal const int _CREDIT_DELTA = 50;

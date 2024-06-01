@@ -11,7 +11,7 @@ public class SchrodingersGat : CwaffGun
     public static string ItemName         = "Schrodinger's Gat";
     public static string ShortDescription = "Proba-ballistic";
     public static string LongDescription  = "Fires bullets that leave enemies in a quantum state until they are observed by either dealing or receiving damage. Once observed, enemies have a 50% chance of already being dead, revealing themselves and their projectiles as illusions. Bullets from this gun cannot affect the same enemy twice.";
-    public static string Lore             = "Famously used by a mad scientist who would often fire dozens of rounds into a locked box with an animal inside, claiming it was both alive and dead until the box was opened. That scientist eventually landed in prison on charges for kidnapping and murdering dozens of pet cats, insisting \"we don't know if I kidnapped and murdered dozens of cats until we observe it!\" throughout the entire court procedings.";
+    public static string Lore             = "Famously used by a mad scientist who would often fire dozens of rounds into a locked box with an animal inside, claiming it was both alive and dead until the box was opened. That scientist eventually landed in prison on charges for kidnapping and murdering dozens of pet cats, insisting \"we don't know if I kidnapped and murdered dozens of cats until we observe it!\" throughout the entire court proceedings.";
 
     private float _speedMult                      = 1.0f;
 
