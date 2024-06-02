@@ -1109,7 +1109,7 @@ public static class Extensions
       // Compute a direct velocity from redirecting all of our momentum towards our target
       Vector2 newDirectVelocity = (naturalVelocity.magnitude + accel) * towardsTarget.normalized;
       // Take a weighted average
-      return Vector2.Lerp(newDirectVelocity, newNaturalVelocity, lerpFactor);
+      return Vector2.Lerp(newDirectVelocity, newNaturalVelocity, lerpFactor); //TODO: framereate dependent lerp
   }
 
   /// <summary>Get Debris objects within a cone of vision from some reference position, optionally checking at most limit debris</summary>

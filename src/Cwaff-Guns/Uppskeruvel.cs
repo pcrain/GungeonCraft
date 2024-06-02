@@ -325,7 +325,7 @@ public class UppskeruvelLostSoul : MonoBehaviour
             Vector2 deltaNorm = delta.normalized;
             this._homeSpeed += _HOME_ACCEL * BraveTime.DeltaTime;
             // Weighted average of natural and direct velocity towards player
-            this._velocity = this._homeSpeed * Vector2.Lerp((this._velocity.normalized + deltaNorm).normalized, deltaNorm, 0.2f);
+            this._velocity = this._homeSpeed * Vector2.Lerp((this._velocity.normalized + deltaNorm).normalized, deltaNorm, 0.2f); //TODO: framereate dependent lerp
             this._basePos += (this._velocity * BraveTime.DeltaTime).ToVector3ZUp();
             base.transform.position = this._basePos.HoverAt(amplitude: _BOB_HEIGHT, frequency: _BOB_SPEED);
 
@@ -454,9 +454,10 @@ public class UppskeruvelCombatSoul : MonoBehaviour
 
     private void GlideTowardsTarget()
     {
+        const float SQR_PIXEL = C.PIXEL_SIZE * C.PIXEL_SIZE;
         // Get a point between our current position and target
-        Vector2 halfDist = Vector2.Lerp(this._basePos, this._targetPos, 0.9f) - this._basePos.XY();
-        if (halfDist.magnitude < C.PIXEL_SIZE)
+        Vector2 halfDist = Vector2.Lerp(this._basePos, this._targetPos, 0.9f) - this._basePos.XY(); //TODO: framereate dependent lerp
+        if (halfDist.sqrMagnitude < SQR_PIXEL)
             this._basePos = this._targetPos; // snap immediately
         else
             this._basePos += (BraveTime.DeltaTime / _HALF_TIME) * halfDist.ToVector3ZUp();

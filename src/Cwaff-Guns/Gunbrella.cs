@@ -45,9 +45,10 @@ public class Gunbrella : CwaffGun
     public override void Update()
     {
         base.Update();
+        if (this.GenericOwner is not PlayerController player)
+            return;
         if (BraveTime.DeltaTime == 0.0f)
             return;
-
         if (!this.gun.IsCharging)
         {
             this._curChargeTime = 0.0f;
@@ -55,23 +56,15 @@ public class Gunbrella : CwaffGun
         }
 
         Lazy.PlaySoundUntilDeathOrTimeout(soundName: "gunbrella_charge_sound", source: this.gun.gameObject, timer: 0.05f);  //TODO: could maybe be handled better
-        UpdateCharge();
-    }
-
-    private void UpdateCharge()
-    {
-        if (this.GenericOwner is not PlayerController player)
-            return;
 
         if (this._curChargeTime == 0.0f)
         {
             this._nextProjectileNumber = 0;
-            this._chargeStartPos   = this.gun.barrelOffset.PositionVector2();
+            this._chargeStartPos = this.gun.barrelOffset.PositionVector2();
         }
 
         this._chargeStartPos = base.GetComponent<CwaffReticle>().GetTargetPos();
-        // constrain to the current room
-        if (!GameManager.Instance.Dungeon.data.CheckInBoundsAndValid(this._chargeStartPos.ToIntVector2(VectorConversions.Floor)))
+        if (!GameManager.Instance.Dungeon.data.CheckInBoundsAndValid(this._chargeStartPos.ToIntVector2(VectorConversions.Floor))) // constrain to current room
         {
             Vector2 gunPos = this.gun.barrelOffset.PositionVector2();
             this._chargeStartPos = gunPos.ToNearestWall(out Vector2 normal, (this._chargeStartPos - gunPos).ToAngle(), 0f);
@@ -79,18 +72,15 @@ public class Gunbrella : CwaffGun
         this._curChargeTime += BraveTime.DeltaTime;
     }
 
-    public Vector2 GetReticleCenter() => this._chargeStartPos;
-
-    public int GetProjectileNumber() => this._nextProjectileNumber++;
-
     public override void PostProcessProjectile(Projectile projectile)
     {
         base.PostProcessProjectile(projectile);
-        if (this.GenericOwner is not PlayerController player)
-            return;
-
-        projectile.GetComponent<GunbrellaProjectile>().Setup();
+        if (this.PlayerOwner)
+            projectile.GetComponent<GunbrellaProjectile>().Setup();
     }
+
+    public Vector2 GetReticleCenter() => this._chargeStartPos;
+    public int GetProjectileNumber() => this._nextProjectileNumber++;
 }
 
 public class GunbrellaProjectile : MonoBehaviour
