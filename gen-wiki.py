@@ -44,7 +44,9 @@ def main():
   activeData = scanActives()
   WIKI_PARAMS["actives"] = "".join([ACTIVE_TEMPLATE.format(**v) for k,v in activeData.items()])
 
-  gunData = scanGuns()
+  masteryData = scanMasteries()
+
+  gunData = scanGuns(masteryData)
   applyGunDataOverrides(gunData)
   WIKI_PARAMS["guns"] = "".join([GUN_TEMPLATE.format(**v) for k,v in gunData.items()])
 
@@ -200,13 +202,27 @@ def scanActives():
     data[itemname] = entry
   return data
 
-def scanGuns():
+def scanMasteries():
+  data = {}
+  masteryFile = os.path.join(SOURCE_DIR, "Cwaff-Misc", "CwaffSynergies.cs")
+  lines = readAllLines(masteryFile).split("\n")
+  mrx = re.compile(r"""^\s*NewMastery.*,\s*([A-Za-z0-9]+)\.ItemName""")
+  for i, line in enumerate(lines):
+    if not (r := mrx.match(line)):
+      continue
+    gun = r.groups()[0]
+    desc = re.sub(r"""^\s*//\s*""","", lines[i-1])
+    data[gun] = desc
+  return data
+
+def scanGuns(masteryData):
   # clipSize: -1
   data = {}
   for f in getSourceFiles(os.path.join(SOURCE_DIR,"Cwaff-Guns")):
     text = readAllLines(f)
     itemname = findPattern(text, r"""ItemName\s*=\s*\"(.*)\";""")
     entry = {
+      "classname"   : findPattern(text, r"""public class (.*) : CwaffGun"""),
       "filename"    : imageFor(iconForGun(itemname, nameOnly = True)),
       "size"        : "42",
       "itemname"    : itemname,
@@ -223,7 +239,11 @@ def scanGuns():
       "reloadspeed" : computeReloadTime(text),
       "spread"      : findPattern(text, r"""angleVariance\s*:\s*(.*?)(?:\.0)?f?[,\)]""", default="10"), # spread of pea shooter, the default gun
       "description" : makePrettyDescription(findPattern(text, r"""LongDescription\s*=\s*\"(.*)\";""")),
+      "mastery"     : "",
       }
+    masteryDesc = masteryData.get(entry["classname"], None)
+    if masteryDesc is not None:
+      entry["mastery"] = f"{MASTERY_TEMPLATE}{masteryDesc}"
     data[itemname] = entry
   return data
 
@@ -294,8 +314,10 @@ GUN_TEMPLATE='''
 |{firerate}
 |{reloadspeed}
 |{spread}
-|{description}
+|{description}{mastery}
 '''
+
+MASTERY_TEMPLATE='''<br/>[[File:Mastery.png]] <b><span style="color:#ee6099">Mastery</span></b>: '''
 
 NPC_TEMPLATE='''
 |- style="vertical-align:middle; height: 128px;"

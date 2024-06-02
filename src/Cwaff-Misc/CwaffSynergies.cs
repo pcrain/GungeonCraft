@@ -26,15 +26,15 @@ public static class CwaffSynergies
       #endregion
 
       #region Masteries
-        // Grandmaster shoots an additional black piece with every shot, no longer shoots pawns, and moves pieces twice as fast
+        // Grandmaster shoots an additional black piece with every shot, no longer shoots pawns, and moves pieces twice as fast.
         NewMastery<MasteryOfGrandmaster>(MASTERY_GRANDMASTER, Grandmaster.ItemName);
-        // Chekhov's gun has no minimum fire time and restores all unfired shots at the end of the room
+        // Chekhov's Gun has no minimum fire time and restores all unfired shots at the end of the room.
         NewMastery<MasteryOfChekhovsGun>(MASTERY_CHEKHOVS_GUN, ChekhovsGun.ItemName);
-        // Pincushion's pins phase through minor breakables and the gun itself no longer increases in spread
+        // Pincushion's pins phase through minor breakables and the gun itself no longer increases in spread.
         NewMastery<MasteryOfPincushion>(MASTERY_PINCUSHION, Pincushion.ItemName);
-        // Enemies and projectiles are completely halted while souls are active
+        // Enemies and projectiles are completely halted while souls are active.
         NewMastery<MasteryOfPlatinumStar>(MASTERY_PLATINUM_STAR, PlatinumStar.ItemName);
-        // Movement penalty is removed
+        // Movement penalty is removed.
         NewMastery<MasteryOfNatascha>(MASTERY_NATASCHA, Natascha.ItemName);
       #endregion
 
