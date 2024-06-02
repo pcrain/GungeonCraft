@@ -25,6 +25,7 @@ public class Frisbee : CwaffActive
         PlayerItem item = Lazy.SetupActive<Frisbee>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality    = ItemQuality.D;
         item.consumable = false;
+        item.usableDuringDodgeRoll = true;
         item.SetCooldownType(ItemBuilder.CooldownType.Timed, 0.2f);
 
         _FrisbeePrefab = VFX.Create("frisbee_vfx", fps: 8, loops: true, anchor: Anchor.MiddleCenter);
@@ -336,7 +337,7 @@ public class FrisbeeBehaviour : MonoBehaviour
         this._rider.forceAimPoint = this._rider.sprite.WorldCenter + angle.ToVector();
         this._rider.spriteAnimator.PlayFromFrame(this._rider.GetEvenlySpacedIdleAnimation(angle), frame: 0);
         this._rider.spriteAnimator.UpdateAnimation(GameManager.INVARIANT_DELTA_TIME);
-        this._rider.transform.position = base.GetComponent<tk2dSprite>().WorldCenter + this._rider.transform.position.XY() - this._rider.specRigidbody.UnitBottomCenter + new Vector2(0.125f, 0.0f);
+        this._rider.transform.position = (base.GetComponent<tk2dSprite>().WorldCenter + this._rider.transform.position.XY() - this._rider.SpriteBottomCenter.XY()).Quantize(0.0625f);
         this._rider.specRigidbody.Reinitialize();
     }
 

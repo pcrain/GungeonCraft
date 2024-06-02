@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.13.1 (TBD)
+
+- Fixed several small typos in Ammonomicon descriptions and lore
+- Fixed certain projectiles from Alien Nailgun replicants not dealing damage
+- Prevented Alien Nailgun from spawning Jammed enemies
+- Frisbee can now be instantly ridden if used during a dodge roll
+- Fixed weird Frisbee-riding offsets on some characters
+- Fixed Insurance Policy issue where insuring an item would visually mark all items of the same type as insured
+- Tweaked reticle rendering code for Gunbrella, Scotsman, and Maestro to make things look a little nicer
+
 ## 1.13.0 (2024-05-27)
 
 #### Features and Polish:
