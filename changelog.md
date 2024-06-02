@@ -13,6 +13,7 @@
 - Killing a Jammed enemy with the Holy Water Gun now reduces curse by 0.5 instead of 1.
 - Lowered volume for Scotsman shooting and detonation sounds
 - Alligator now builds charge slightly faster while moving over carpeted floors
+- Tweaking Camping Supplies' campfire sprite to be a little less washed-out
 
 ## 1.13.0 (2024-05-27)
 
