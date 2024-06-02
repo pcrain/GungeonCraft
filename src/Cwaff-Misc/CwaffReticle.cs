@@ -22,11 +22,10 @@ public class CwaffReticle : MonoBehaviour
   public float      fadeInTime        = 0.0f;  // the amount of time we spend fading in when spawned (0.0 == instant)
   public float      fadeOutTime       = 0.0f;  // the amount of time we spend fading out when despawned (0.0 == instant)
   public bool       smoothLerp        = false; // whether the reticle smoothly lerps to its target
-  public bool       hideNormalReticle = false; // whether the normal reticle should be shown while the reticle is visible
   public float      maxDistance       = -1f;   // maximum distance the reticle can be from the player (-1 == no max)
   public float      controllerScale   = 1f;    // on controller, determines how the reticle scales with aim distance
   public float      rotateSpeed       = 0f;    // how quickly the reticle rotates
-  public Visibility visibility        = Visibility.ALWAYS; // when the reticle is visible
+  public Visibility visibility        = Visibility.DEFAULT; // when the reticle is visible
   public Func<CwaffReticle, GameObject> targetObjFunc = null; // optional custom object targeting function; if null, uses targetPosFunc instead
   public Func<CwaffReticle, Vector2> targetPosFunc = null; // optional custom position targeting function; if null, follows the mouse / controller aim direction
 

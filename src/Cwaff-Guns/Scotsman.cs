@@ -10,7 +10,6 @@ public class Scotsman : CwaffGun
     private const float _MAX_RETICLE_RANGE = 16f;
 
     internal static ExplosionData _ScotsmanExplosion = null;
-    internal static GameObject _ScotsmanReticle = null;
 
     internal List<Stickybomb> _extantStickies = new();
 
@@ -28,19 +27,8 @@ public class Scotsman : CwaffGun
 
         gun.InitProjectile(GunData.New(clipSize: 20, cooldown: 0.22f, shootStyle: ShootStyle.SemiAutomatic,
           damage: 5.0f, speed: 40.0f, sprite: "stickybomb_projectile", fps: 12, anchor: Anchor.MiddleCenter)).Attach<Stickybomb>();
-
-        _ScotsmanReticle = VFX.Create("scotsman_reticle", fps: 12, loops: true, anchor: Anchor.MiddleCenter);
-        CwaffReticle reticle = gun.AddComponent<CwaffReticle>();
-            reticle.reticleVFX        = _ScotsmanReticle;
-            reticle.reticleAlpha      = 1f;
-            reticle.fadeInTime        = 0f;
-            reticle.fadeOutTime       = 0f;
-            reticle.smoothLerp        = false;
-            reticle.hideNormalReticle = true;
-            reticle.maxDistance       = -1f;
-            reticle.controllerScale   = _MAX_RETICLE_RANGE;
-            reticle.rotateSpeed       = 0f;
-            reticle.visibility        = CwaffReticle.Visibility.CONTROLLER;
+        gun.AddReticle<CwaffReticle>(reticleVFX : VFX.Create("scotsman_reticle", fps: 12, loops: true, anchor: Anchor.MiddleCenter),
+            controllerScale : _MAX_RETICLE_RANGE, visibility : CwaffReticle.Visibility.CONTROLLER);
 
         // Initialize our explosion data
         _ScotsmanExplosion = new ExplosionData()

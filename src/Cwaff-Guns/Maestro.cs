@@ -26,32 +26,10 @@ public class Maestro : CwaffGun
         gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.2f, angleVariance: 15.0f,
           shootStyle: ShootStyle.Automatic, damage: 9f, speed: 60.0f, ammoType: GameUIAmmoType.AmmoType.BEAM,
           sprite: "maestro_bullet", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter));
-
-        CwaffEnemyReticle enemyReticle = gun.AddComponent<CwaffEnemyReticle>();
-            enemyReticle.reticleVFX        = VFX.Create("maestro_target_enemy_vfx", fps: 2);
-            enemyReticle.reticleAlpha      = 0.5f;
-            enemyReticle.fadeInTime        = 0f;
-            enemyReticle.fadeOutTime       = 0f;
-            enemyReticle.smoothLerp        = true;
-            enemyReticle.hideNormalReticle = false;
-            enemyReticle.maxDistance       = 0f;
-            enemyReticle.controllerScale   = 1f;
-            enemyReticle.rotateSpeed       = 270f;
-            enemyReticle.visibility        = CwaffReticle.Visibility.WITHTARGET;
-            enemyReticle.targetObjFunc     = null; //NOTE: set on pickup
-
-        CwaffProjectileReticle projReticle = gun.AddComponent<CwaffProjectileReticle>();
-            projReticle.reticleVFX        = VFX.Create("maestro_target_projectile_vfx", fps: 2);
-            projReticle.reticleAlpha      = 0.75f;
-            projReticle.fadeInTime        = 0f;
-            projReticle.fadeOutTime       = 0f;
-            projReticle.smoothLerp        = true;
-            projReticle.hideNormalReticle = false;
-            projReticle.maxDistance       = 0f;
-            projReticle.controllerScale   = 1f;
-            projReticle.rotateSpeed       = 270f;
-            projReticle.visibility        = CwaffReticle.Visibility.WITHTARGET;
-            projReticle.targetObjFunc     = null; //NOTE: set on pickup
+        gun.AddReticle<CwaffEnemyReticle>(reticleVFX : VFX.Create("maestro_target_enemy_vfx", fps: 2),
+            reticleAlpha  : 0.5f, smoothLerp : true, rotateSpeed : 270f, visibility : CwaffReticle.Visibility.WITHTARGET);
+        gun.AddReticle<CwaffProjectileReticle>(reticleVFX : VFX.Create("maestro_target_projectile_vfx", fps: 2),
+            reticleAlpha : 0.75f, smoothLerp : true, rotateSpeed : 270f, visibility : CwaffReticle.Visibility.WITHTARGET);
     }
 
     private GameObject GetTargetEnemy(CwaffReticle reticle) => this._targetEnemy ? this._targetEnemy.gameObject : null;

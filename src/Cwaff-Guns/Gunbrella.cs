@@ -18,8 +18,6 @@ public class Gunbrella : CwaffGun
     private const float _MAX_RETICLE_RANGE = 10f;
     private const float _MAX_ALPHA         = 0.5f;
 
-    internal static GameObject _RainReticle;
-
     private float _curChargeTime         = 0.0f;
     private Vector2 _chargeStartPos      = Vector2.zero;
     private int _nextProjectileNumber    = 0;
@@ -38,20 +36,10 @@ public class Gunbrella : CwaffGun
 
         gun.DefaultModule.ammoCost = 1; // everything defaults to 0, so make sure the default module costs 1 ammo
 
-        _RainReticle = VFX.Create("gunbrella_target_reticle",
-            fps: 12, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 10, emissiveColour: Color.cyan, scale: 0.75f);
-
-        CwaffReticle reticle = gun.AddComponent<CwaffReticle>();
-            reticle.reticleVFX        = _RainReticle;
-            reticle.reticleAlpha      = 1f;
-            reticle.fadeInTime        = _MIN_CHARGE_TIME;
-            reticle.fadeOutTime       = 0.25f;
-            reticle.smoothLerp        = false;
-            reticle.hideNormalReticle = false;
-            reticle.maxDistance       = _MAX_RETICLE_RANGE;
-            reticle.controllerScale   = 1f + _MAX_RETICLE_RANGE;
-            reticle.rotateSpeed       = 0f;
-            reticle.visibility        = CwaffReticle.Visibility.CHARGING;
+        gun.AddReticle<CwaffReticle>(
+            reticleVFX : VFX.Create("gunbrella_target_reticle", fps: 12, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 10, emissiveColour: Color.cyan, scale: 0.75f),
+            fadeInTime : _MIN_CHARGE_TIME, fadeOutTime : 0.25f, maxDistance : _MAX_RETICLE_RANGE, controllerScale : 1f + _MAX_RETICLE_RANGE,
+            visibility : CwaffReticle.Visibility.CHARGING);
     }
 
     public override void Update()
