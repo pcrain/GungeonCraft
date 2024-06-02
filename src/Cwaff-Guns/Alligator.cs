@@ -4,7 +4,7 @@ public class Alligator : CwaffGun
 {
     public static string ItemName         = "Alligator";
     public static string ShortDescription = "Shockingly Effective";
-    public static string LongDescription  = "Fires clips that clamp onto enemies and periodically channel electricity from the player. Energy output is proportional to the player's damage stat, and increases further while rolling or while in electrified goop. Each clip channels the full energy output, and up to 8 clips can be attached to each enemy. Passively grants electric immunity while in inventory.";
+    public static string LongDescription  = "Fires clips that clamp onto enemies and periodically channel electricity from the player. Energy output is proportional to the player's damage stat, and increases further while rolling, walking over carpet, or standing in electrified goop. Each clip channels the full energy output, and up to 8 clips can be attached to each enemy. Passively grants electric immunity while in inventory.";
     public static string Lore             = "Most of the Gundead are either made of metal or carrying metal weaponry on them, making them rather hilariously susceptible to contact with live wires. Thanks to some fancy electrical engineering far beyond your comprehension, the Alligator allows you to channel the ambient static electricity you passively collect directly into the bodies of anything you can clip onto. Outside the Gungeon, it also doubles as an extremely handy tool for do-it-yourself home wiring projects.";
 
     internal static GameObject _SparkVFX               = null;
@@ -94,6 +94,7 @@ public class AlligatorCableHandler : MonoBehaviour
     const float _SPARK_TRAVEL_TIME        = 0.3f;
     const float _ELECTRIFIED_ENERGY_BONUS = 4.0f;
     const float _ROLLING_ENERGY_BONUS     = 3.0f;
+    const float _CARPET_ENERGY_BONUS      = 1.5f;
 
     private static bool[] _PlayerElectrified                            = {false, false};
     private static float[] _LastElectrifiedCheck                        = {0f, 0f};
@@ -206,6 +207,9 @@ public class AlligatorCableHandler : MonoBehaviour
             energyOutput *= _ROLLING_ENERGY_BONUS;
         if (_PlayerElectrified[this._ownerId])
             energyOutput *= _ELECTRIFIED_ENERGY_BONUS;
+        else if (this._owner.specRigidbody.Velocity.sqrMagnitude > 0.1f // else to avoid stacking with water tiles
+          && GameManager.Instance.Dungeon.GetFloorTypeFromPosition(this._owner.specRigidbody.UnitBottomCenter) == CellVisualData.CellFloorType.Carpet)
+            energyOutput *= _CARPET_ENERGY_BONUS;
 
         _PlayerEnergyProductionRate[this._ownerId] = energyOutput;
     }

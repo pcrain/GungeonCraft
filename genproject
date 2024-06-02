@@ -70,7 +70,8 @@ includes+=('<Reference Include="System" />') #needed for LinkedList
 #Regenerate atlases if necessary
 echo -e "[${GRN}>${BLN}] Checking for changes to sprites"
 updategfx=0
-gfxdata="$(/bin/ls -RAl "RawResources/" | grep -vE "(^total|.json$)")"
+# gfxdata="$(/bin/ls -RAl "RawResources/" | grep -vE "(^total|.json$|.wav$|.bnk$|.csv$)")"
+gfxdata="$(/bin/ls -RAl "RawResources/" | grep -E "(\.png$)")"
 if [ ! -e "${gfxchecksums}" ]; then
   echo -e "[${GRN}>${BLN}]   Graphics checksum file does not exist, rebuilding sprite atlases"
   updategfx=1

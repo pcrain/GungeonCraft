@@ -181,3 +181,5 @@ maestro_launch_csharp,-4.0,1,sound
 maestro_launch_dsharp,-4.0,1,sound
 maestro_launch_fsharp,-4.0,1,sound
 maestro_launch_gsharp,-4.0,1,sound
+stickybomblauncher_shoot,-10.0,1,sound
+stickybomblauncher_det,-6.0,1,sound

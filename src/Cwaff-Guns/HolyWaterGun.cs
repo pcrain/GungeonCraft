@@ -4,7 +4,7 @@ public class HolyWaterGun : CwaffGun
 {
     public static string ItemName         = "Holy Water Gun";
     public static string ShortDescription = "Water, Gun, & Holy Soak";
-    public static string LongDescription  = "Deals quadruple damage to the Jammed. Killing a Jammed enemy reduces curse by 1.";
+    public static string LongDescription  = "Deals quadruple damage to the Jammed. Killing a Jammed enemy reduces curse by 0.5.";
     public static string Lore             = "Rumored to have been used in exorcisms by the High Priest back while he was still the Low Priest. While the exact composition of the holy water is unknown, scientists have been able to reasonably ascertain the fluid contains koi pond water, primer, rat saliva, and moonshine. In any case, it has proven extremely effective at exorcising the Jammed and nauseating everyone else.";
 
     internal const float _JAMMED_DAMAGE_MULT = 4f;
@@ -82,7 +82,7 @@ public class ExorcismJuice : MonoBehaviour
             return;
 
         pc.ownerlessStatModifiers.Add(new StatModifier() {
-            amount      = -1f,
+            amount      = -0.5f,
             modifyType  = StatModifier.ModifyMethod.ADDITIVE,
             statToBoost = PlayerStats.StatType.Curse,
             });

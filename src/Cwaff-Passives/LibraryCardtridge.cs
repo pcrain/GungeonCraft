@@ -114,9 +114,11 @@ public class LibraryCardtridge : CwaffPassive
     {
         if (!_DidLateInit)
         {
-            // Add modded items to the book items list
-            // _BookItemIDs.Add(IDs.Pickups["zoolanders_diary"]);
-            _BookItemIDs.Add(IDs.Pickups["ammo_conservation_manual"]);
+            // Add my modded items to the book items list
+            _BookItemIDs.Add(IDs.Pickups[AmmoConservationManual.ItemName.InternalName()]);
+            _BookItemIDs.Add(IDs.Pickups[MMReloading.ItemName.InternalName()]);
+            _BookItemIDs.Add(IDs.Pickups[BlankChecks.ItemName.InternalName()]);
+            //TODO: Add other modded items to the book items list
             _DidLateInit = true;
         }
 

@@ -9,6 +9,10 @@
 - Fixed weird Frisbee-riding offsets on some characters
 - Fixed Insurance Policy issue where insuring an item would visually mark all items of the same type as insured
 - Tweaked reticle rendering code for Gunbrella, Scotsman, and Maestro to make things look a little nicer
+- Added MM: Reloading and BlankChecks to list of items made free by Library Cardtridge
+- Killing a Jammed enemy with the Holy Water Gun now reduces curse by 0.5 instead of 1.
+- Lowered volume for Scotsman shooting and detonation sounds
+- Alligator now builds charge slightly faster while moving over carpeted floors
 
 ## 1.13.0 (2024-05-27)
 
