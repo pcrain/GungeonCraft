@@ -14,6 +14,7 @@
 - Lowered volume for Scotsman shooting and detonation sounds
 - Alligator now builds charge slightly faster while moving over carpeted floors
 - Tweaking Camping Supplies' campfire sprite to be a little less washed-out
+- Added 2 new synergies
 
 ## 1.13.0 (2024-05-27)
 

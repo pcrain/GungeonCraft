@@ -38,6 +38,14 @@ public class PlotArmor : CwaffPassive
         int currentArmor = (int)this.Owner.healthHaver.Armor;
         int armorToGain = Mathf.Max(_MIN_ARMOR_TO_GIVE, minArmor - currentArmor);
         this.Owner.StartCoroutine(SpawnSomeArmor(room, armorToGain));
+
+        if (!this.Owner.PlayerHasActiveSynergy(Synergy.DEUS_EX_MACHINA))
+            return;
+        if (this.Owner.GetGun<ChekhovsGun>() is not ChekhovsGun chekhovGun)
+            return;
+        Gun gun = chekhovGun.gun;
+        gun.GainAmmo(gun.AdjustedMaxAmmo - gun.CurrentAmmo);
+        this.Owner.gameObject.Play("chekhovs_gun_launch_sound_alt");
     }
 
     private IEnumerator SpawnSomeArmor(RoomHandler room, int armorToGain)

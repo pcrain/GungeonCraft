@@ -432,10 +432,10 @@ public static class Extensions
   }
 
   /// <summary>Get a gun owned by the player</summary>
-  public static T GetGun<T>(this PlayerController p) where T : Gun
+  public static T GetGun<T>(this PlayerController p) where T : GunBehaviour
   {
     for (int i = 0; i < p.inventory.AllGuns.Count; ++i)
-      if (p.inventory.AllGuns[i] is T t)
+      if (p.inventory.AllGuns[i].gameObject.GetComponent<T>() is T t)
         return t;
     return null;
   }
