@@ -224,6 +224,7 @@ public static class CwaffSynergies
     }
 }
 
+
 // Dummy classes for masteries
 public class MasteryDummyItem : FakeItem { }
 internal class MasteryOfGrandmaster : MasteryDummyItem {}

@@ -318,7 +318,7 @@ public static class DuctTapeSaveLoadHotfix
 }
 
 // Fix guns with extremely large animations having enormous pickup ranges and appearing very weirdly
-//   on pedestals, in chests, in shops, and when picked up or dropped
+//   on pedestals, in chests, in shops, when picked up or dropped, and when completing a synergy
 public static class LargeGunAnimationHotfix
 {
     internal const string _TRIM_ANIMATION = "idle_trimmed";
@@ -508,6 +508,22 @@ public static class LargeGunAnimationHotfix
                 gun.spriteAnimator.Play(fixedIdleAnimation);  // play the gun's fixed (trimmed) idle animation when dropped
                 gun.sprite.PlaceAtPositionByAnchor(center, Anchor.MiddleCenter);
             }
+        }
+    }
+
+    /// <summary>Our guns show up funny in synergy notifications unless we use trimmed sprites, so fix that here</summary>
+    [HarmonyPatch(typeof(UINotificationController), nameof(UINotificationController.SetupSynergySprite))]
+    private class SetupSynergySpritePatch
+    {
+        static void Postfix(UINotificationController __instance, tk2dSpriteCollectionData collection, int spriteId)
+        {
+            string spriteName = collection.spriteDefinitions[spriteId].name;
+            if (!spriteName.EndsWith("_idle_001"))
+                return;
+            string trimmedSpriteName = spriteName.Replace("_001", "_trimmed_001");
+            int trimmedId = collection.GetSpriteIdByName(trimmedSpriteName, defaultValue: -1);
+            if (trimmedId != -1)
+                __instance.notificationSynergySprite.SetSprite(collection, trimmedId);
         }
     }
 }
