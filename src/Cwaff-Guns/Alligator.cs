@@ -95,6 +95,7 @@ public class AlligatorCableHandler : MonoBehaviour
     const float _ELECTRIFIED_ENERGY_BONUS = 4.0f;
     const float _ROLLING_ENERGY_BONUS     = 3.0f;
     const float _CARPET_ENERGY_BONUS      = 1.5f;
+    const float _ELECTRIC_SLIDE_ENERGY_BONUS = 3.0f;
 
     private static bool[] _PlayerElectrified                            = {false, false};
     private static float[] _LastElectrifiedCheck                        = {0f, 0f};
@@ -209,7 +210,11 @@ public class AlligatorCableHandler : MonoBehaviour
             energyOutput *= _ELECTRIFIED_ENERGY_BONUS;
         else if (this._owner.specRigidbody.Velocity.sqrMagnitude > 0.1f // else to avoid stacking with water tiles
           && GameManager.Instance.Dungeon.GetFloorTypeFromPosition(this._owner.specRigidbody.UnitBottomCenter) == CellVisualData.CellFloorType.Carpet)
+        {
             energyOutput *= _CARPET_ENERGY_BONUS;
+            if (this._owner.PlayerHasActiveSynergy(Synergy.ELECTRIC_SLIDE))
+                energyOutput *= _ELECTRIC_SLIDE_ENERGY_BONUS;
+        }
 
         _PlayerEnergyProductionRate[this._ownerId] = energyOutput;
     }

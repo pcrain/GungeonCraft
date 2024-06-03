@@ -21,8 +21,10 @@ public static class CwaffSynergies
         */
 
       #region Synergies
-        // Gives Drifter's Headgear a 20% longer dash that reflect bullets
+        // Gives Drifter's Headgear a 20% longer dash that reflects bullets.
         NewSynergy(HYPE_YOURSELF_UP, "Hype Yourself Up", new[]{IName(DriftersHeadgear.ItemName), "hyper_light_blaster"});
+        // Alligator's energy output is tripled while standing on carpet.
+        NewSynergy(ELECTRIC_SLIDE, "Electric Slide", new[]{IName(Alligator.ItemName), IName(ComfySlippers.ItemName)});
       #endregion
 
       #region Masteries
@@ -233,6 +235,7 @@ internal class MasteryOfNatascha : MasteryDummyItem {}
 public enum Synergy {
     // Synergies
     HYPE_YOURSELF_UP,
+    ELECTRIC_SLIDE,
 
     // Masteries
     MASTERY_GRANDMASTER,
