@@ -25,9 +25,11 @@ public class Suncaster : CwaffGun
 
     [SerializeField] // make sure we keep this when the gun is dropped and picked back up
     private float _lastChargeTime            = 0.0f;
+    private bool _cachedSolarFlairSynergy    = false;
 
     public List<SuncasterPrism> extantPrisms = new();
     public int maxPrisms                     = _BASE_MAX_PRISMS;
+
 
     public static void Add()
     {
@@ -124,12 +126,14 @@ public class Suncaster : CwaffGun
 
         float now = BraveTime.ScaledTimeSinceStartup;
         float elapsed = (now - this._lastChargeTime);
-        if (elapsed >= _CHARGE_RATE)
+        float effectiveChargeRate = _CHARGE_RATE * (this._cachedSolarFlairSynergy ? 0.5f : 1.0f);
+        if (elapsed >= effectiveChargeRate)
         {
-          int ammoToRestore = Mathf.FloorToInt(elapsed / _CHARGE_RATE);  // account for ammo gained / lost while inactive
-          this._lastChargeTime += _CHARGE_RATE * ammoToRestore;
+          int ammoToRestore = Mathf.FloorToInt(elapsed / effectiveChargeRate);  // account for ammo gained / lost while inactive
+          this._lastChargeTime += effectiveChargeRate * ammoToRestore;
           if (this.gun.CurrentAmmo < this.gun.AdjustedMaxAmmo)
             this.gun.ammo = Math.Min(this.gun.ammo + ammoToRestore, this.gun.AdjustedMaxAmmo);
+          this._cachedSolarFlairSynergy = this.PlayerOwner.PlayerHasActiveSynergy(Synergy.SOLAR_FLAIR);
         }
         // if we have less than the ammo required to shoot a charge shot, make the charge time obscenely long
         this.gun.DefaultModule.chargeProjectiles[1].ChargeTime = (this.gun.ammo >= _CHARGE_AMMO_COST) ? _CHARGE_TIME : 3600f;

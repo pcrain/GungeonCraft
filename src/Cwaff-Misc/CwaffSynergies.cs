@@ -27,6 +27,8 @@ public static class CwaffSynergies
         NewSynergy(ELECTRIC_SLIDE, "Electric Slide", new[]{IName(Alligator.ItemName), IName(ComfySlippers.ItemName)});
         // Chekhov's Gun's ammo is fully restored before each boss fight
         NewSynergy(DEUS_EX_MACHINA, "Deus Ex Machina", new[]{IName(ChekhovsGun.ItemName), IName(PlotArmor.ItemName)});
+        // Suncaster replenishes ammo twice as quickly
+        NewSynergy(SOLAR_FLAIR, "Solar Flair", new[]{IName(Suncaster.ItemName), "sunlight_javelin"});
       #endregion
 
       #region Masteries
@@ -240,6 +242,7 @@ public enum Synergy {
     HYPE_YOURSELF_UP,
     ELECTRIC_SLIDE,
     DEUS_EX_MACHINA,
+    SOLAR_FLAIR,
 
     // Masteries
     MASTERY_GRANDMASTER,
