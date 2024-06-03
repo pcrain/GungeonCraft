@@ -141,6 +141,17 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem/*, ILevelLoadedListener
   // public void BraveOnLevelWasLoaded()
   // {
   // }
+
+  /// <summary>Thrown guns don't count as dropped or destroyed, leading to bugs with certain guns that handle cleanup when dropped, so handle it manually</summary>
+  [HarmonyPatch(typeof(Gun), nameof(Gun.ThrowGun))]
+  private class ThrowGunCountsAsDroppedGunPatch
+  {
+      static void Prefix(Gun __instance)
+      {
+        if ((__instance.GetComponent<CwaffGun>() is CwaffGun cg) && (cg.PlayerOwner is PlayerController player))
+          cg.OnDroppedByPlayer(player);
+      }
+  }
 }
 
 public abstract class CwaffBlankModificationItem: BlankModificationItem, ICwaffItem

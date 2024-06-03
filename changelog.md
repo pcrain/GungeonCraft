@@ -15,6 +15,7 @@
 - Alligator now builds charge slightly faster while moving over carpeted floors
 - Tweaking Camping Supplies' campfire sprite to be a little less washed-out
 - Added 3 new synergies!
+- Fixed null deref caused by throwing Suncaster while prisms are deployed
 
 ## 1.13.0 (2024-05-27)
 
