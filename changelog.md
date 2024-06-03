@@ -2,20 +2,25 @@
 
 ## 1.13.1 (TBD)
 
-- Fixed several small typos in Ammonomicon descriptions and lore
-- Fixed certain projectiles from Alien Nailgun replicants not dealing damage
+#### Features and Polish:
+- Added 3 new synergies!
+
+#### Balance Changes:
 - Prevented Alien Nailgun from spawning Jammed enemies
 - Frisbee can now be instantly ridden if used during a dodge roll
+- Added MM: Reloading and Blank Checks to list of items made free by Library Cardtridge
+- Killing a Jammed enemy with the Holy Water Gun now reduces curse by 0.5 instead of 1
+- Alligator now builds charge slightly faster while moving over carpeted floors
+
+#### Bugfixes and Misc:
+- Fixed null deref caused by throwing Suncaster while prisms are deployed
+- Fixed certain projectiles from Alien Nailgun replicants not dealing damage
 - Fixed weird Frisbee-riding offsets on some characters
 - Fixed Insurance Policy issue where insuring an item would visually mark all items of the same type as insured
-- Tweaked reticle rendering code for Gunbrella, Scotsman, and Maestro to make things look a little nicer
-- Added MM: Reloading and BlankChecks to list of items made free by Library Cardtridge
-- Killing a Jammed enemy with the Holy Water Gun now reduces curse by 0.5 instead of 1.
-- Lowered volume for Scotsman shooting and detonation sounds
-- Alligator now builds charge slightly faster while moving over carpeted floors
+- Fixed several small typos in Ammonomicon descriptions and lore
 - Tweaking Camping Supplies' campfire sprite to be a little less washed-out
-- Added 3 new synergies!
-- Fixed null deref caused by throwing Suncaster while prisms are deployed
+- Lowered volume for Scotsman's shooting and detonation sounds
+- Tweaked reticle rendering code for Gunbrella, Scotsman, and Maestro to make things look a little nicer
 
 ## 1.13.0 (2024-05-27)
 

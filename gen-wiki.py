@@ -23,6 +23,7 @@ You can download the mod or read more about it [https://thunderstore.io/c/enter-
 
 VANILLA_ITEMS = {
   "hyper_light_blaster" : ("Hyper Light Blaster", "Hyper_Light_Blaster.png"),
+  "sunlight_javelin"    : ("Sunlight Javelin", "Sunlight_Javelin.png"),
 }
 
 def applyGunDataOverrides(gunData):
@@ -275,7 +276,9 @@ def scanSynergies(passives, actives, guns):
       "description" : desc,
       }
     data[synergyname] = entry
-  return data
+
+  # Sort synergies by name before returning
+  return { k : data[k] for k in sorted(data.keys())}
 
 def scanGuns(masteryData):
   # clipSize: -1

@@ -19,7 +19,8 @@
 - Bartering Shop: trades 3 random D-A tier items for any higher-tiered item. Guaranteed to spawn on the second or third floor each run
 - Insurance Shop: sells insurance policies that let you carry items over to the next run. Guaranteed to spawn after starting a floor holding an A or S tier item
 - Hecked Mode: randomize enemies' guns for a truly hecked playing experience. Enable it in Options -> Mod Config -> GungeonCraft -> Hecked Mode
-- A new boss!
+- A new secret boss
+- Almost 5 new synergies
 - Vanilla bugfixes
 - You can pet Junior \o/
 - You can become the greatest janitor the Gungeon has ever seen O:
