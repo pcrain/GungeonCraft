@@ -21,7 +21,7 @@ public static class CwaffSynergies
         */
 
       #region Synergies
-        // Makes Drifter's Headgear dash 20% longer and reflect bullets
+        // Gives Drifter's Headgear a 20% longer dash that reflect bullets
         NewSynergy(HYPE_YOURSELF_UP, "Hype Yourself Up", new[]{IName(DriftersHeadgear.ItemName), "hyper_light_blaster"});
       #endregion
 

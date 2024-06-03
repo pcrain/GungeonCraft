@@ -7,7 +7,6 @@ ITEM_SPRITE_DIR = "/home/pretzel/workspace/gungy-cwaffing/RawResources/ItemSprit
 GUN_SPRITE_DIR = "/home/pretzel/workspace/gungy-cwaffing/RawResources/Ammonomicon Encounter Icon Collection/"
 
 WIKI_PARAMS = {
-  # "thing" : "world",
   "summary" :
 '''
 GungeonCraft is a content mod for Enter the Gungeon, focused primarily on weapons, items, and NPCs that introduce novel and engaging mechanics.
@@ -16,8 +15,14 @@ You can download the mod or read more about it [https://thunderstore.io/c/enter-
 
 <b>NOTE: the contents of this page are generated automatically using a script.</b> Manual edits might be overwritten (sorry)! Please contact Captain Pretzel in the Mod the Gungeon Discord if anything looks amiss!
 ''',
+
   "iconwidth" : "88px",
+
   "tablestyle" : '''class="wikitable sortable mw-collapsible" style="text-align:center; width: 100%;"''',
+}
+
+VANILLA_ITEMS = {
+  "hyper_light_blaster" : ("Hyper Light Blaster", "Hyper_Light_Blaster.png"),
 }
 
 def applyGunDataOverrides(gunData):
@@ -38,17 +43,20 @@ def applyGunDataOverrides(gunData):
   gunData["Pincushion"]["damage"]        = "0.5" # as set by _NEEDLE_DAMAGE
 
 def main():
-  passiveData = scanPassives()
+  passiveData, passiveDataByClass = scanPassives()
   WIKI_PARAMS["passives"] = "".join([PASSIVE_TEMPLATE.format(**v) for k,v in passiveData.items()])
 
-  activeData = scanActives()
+  activeData, activeDataByClass = scanActives()
   WIKI_PARAMS["actives"] = "".join([ACTIVE_TEMPLATE.format(**v) for k,v in activeData.items()])
 
   masteryData = scanMasteries()
 
-  gunData = scanGuns(masteryData)
+  gunData, gunDataByClass = scanGuns(masteryData)
   applyGunDataOverrides(gunData)
   WIKI_PARAMS["guns"] = "".join([GUN_TEMPLATE.format(**v) for k,v in gunData.items()])
+
+  synergyData = scanSynergies(passiveDataByClass, activeDataByClass, gunDataByClass)
+  WIKI_PARAMS["synergies"] = "".join([SYNERGY_TEMPLATE.format(**v) for k,v in synergyData.items()])
 
   npcData = getNPCs()
   WIKI_PARAMS["npcs"] = "".join([NPC_TEMPLATE.format(**v) for k,v in npcData.items()])
@@ -172,10 +180,13 @@ def makePrettyDescription(text):
 
 def scanPassives():
   data = {}
+  classdata = {}
   for f in getSourceFiles(os.path.join(SOURCE_DIR,"Cwaff-Passives")):
     text = readAllLines(f)
     itemname = findPattern(text, r"""ItemName\s*=\s*\"(.*)\";""")
+    classname = findPattern(text, r"""public class (.*) : Cwaff""")
     entry = {
+      "classname"   : classname,
       "filename"    : imageFor(iconForItem(itemname, nameOnly = True)),
       "size"        : "42",
       "itemname"    : itemname,
@@ -183,14 +194,18 @@ def scanPassives():
       "description" : makePrettyDescription(findPattern(text, r"""LongDescription\s*=\s*\"(.*)\";""")),
       }
     data[itemname] = entry
-  return data
+    classdata[classname] = entry
+  return data, classdata
 
 def scanActives():
   data = {}
+  classdata = {}
   for f in getSourceFiles(os.path.join(SOURCE_DIR,"Cwaff-Actives")):
     text = readAllLines(f)
     itemname = findPattern(text, r"""ItemName\s*=\s*\"(.*)\";""")
+    classname = findPattern(text, r"""public class (.*) : Cwaff""")
     entry = {
+      "classname"   : classname,
       "filename"    : imageFor(iconForItem(itemname, nameOnly = True)),
       "size"        : "42",
       "itemname"    : itemname,
@@ -200,7 +215,8 @@ def scanActives():
       "numuses"     : computeUses(text),
       }
     data[itemname] = entry
-  return data
+    classdata[classname] = entry
+  return data, classdata
 
 def scanMasteries():
   data = {}
@@ -215,14 +231,62 @@ def scanMasteries():
     data[gun] = desc
   return data
 
+def scanSynergies(passives, actives, guns):
+  data = {}
+  synergyFile = os.path.join(SOURCE_DIR, "Cwaff-Misc", "CwaffSynergies.cs")
+  lines = readAllLines(synergyFile).split("\n")
+  srx = re.compile(r"""^\s*NewSynergy.*?,\s*\"([^,]+)\",\s*new\[\]\{(.*)\}""")
+  for i, line in enumerate(lines):
+    if not (r := srx.match(line)):
+      continue
+    synergyname = r.groups()[0]
+    mandatories = [s.strip() for s in r.groups()[1].split(",")]
+    filenames = []
+    itemnames = []
+    for m in mandatories:
+      if m.startswith("IName"): # one of our items
+        itemname = m.split("(")[1].split(".")[0]
+        if (e := passives.get(itemname, None)) is not None:
+          filenames.append(e["filename"])
+          itemnames.append(e["itemname"])
+          continue
+        if (e := actives.get(itemname, None)) is not None:
+          filenames.append(e["filename"])
+          itemnames.append(e["itemname"])
+          continue
+        if (e := guns.get(itemname, None)) is not None:
+          filenames.append(e["filename"])
+          itemnames.append(e["itemname"])
+          continue
+        continue
+      if (e := VANILLA_ITEMS.get(m.replace('"',""), None)) is not None:
+          filenames.append(f"""[[File:{e[1]}]]""")
+          itemnames.append(e[0])
+    if len(filenames) < 2:
+      continue
+    desc = re.sub(r"""^\s*//\s*""","", lines[i-1])
+    # data[gun] = desc
+    entry = {
+      "synergyname" : synergyname,
+      "filename1"   : filenames[0],
+      "item1"       : itemnames[0],
+      "filename2"   : filenames[1],
+      "item2"       : itemnames[1],
+      "description" : desc,
+      }
+    data[synergyname] = entry
+  return data
+
 def scanGuns(masteryData):
   # clipSize: -1
   data = {}
+  classdata = {}
   for f in getSourceFiles(os.path.join(SOURCE_DIR,"Cwaff-Guns")):
     text = readAllLines(f)
     itemname = findPattern(text, r"""ItemName\s*=\s*\"(.*)\";""")
+    classname = findPattern(text, r"""public class (.*) : Cwaff""")
     entry = {
-      "classname"   : findPattern(text, r"""public class (.*) : CwaffGun"""),
+      "classname"   : classname,
       "filename"    : imageFor(iconForGun(itemname, nameOnly = True)),
       "size"        : "42",
       "itemname"    : itemname,
@@ -245,7 +309,8 @@ def scanGuns(masteryData):
     if masteryDesc is not None:
       entry["mastery"] = f"{MASTERY_TEMPLATE}{masteryDesc}"
     data[itemname] = entry
-  return data
+    classdata[classname] = entry
+  return data, classdata
 
 def getNPCs():
   return {
@@ -317,6 +382,14 @@ GUN_TEMPLATE='''
 |{description}{mastery}
 '''
 
+SYNERGY_TEMPLATE='''
+|-
+|{synergyname}
+|<div style="min-height: 56px; transform-origin: top; transform: scale(2);">{filename1}</div>{item1}
+|<div style="min-height: 56px; transform-origin: top; transform: scale(2);">{filename2}</div>{item2}
+|{description}
+'''
+
 MASTERY_TEMPLATE='''<br/>[[File:Mastery.png]] <b><span style="color:#ee6099">Mastery</span></b>: '''
 
 NPC_TEMPLATE='''
@@ -373,6 +446,15 @@ WIKI_TEMPLATE='''
 !style="width: 48px;"|Quality
 !Effect
 {passives}
+|}}
+
+== Synergies ==
+
+{{| {tablestyle}
+!style="width: {iconwidth}"|Name
+!colspan="2"|Items
+!Effect
+{synergies}
 |}}
 
 == NPCs ==
