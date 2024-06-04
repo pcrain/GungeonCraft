@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.13.1 (TBD)
+## 1.13.1 (2024-06-02)
 
 #### Features and Polish:
 - Added 3 new synergies!
@@ -18,7 +18,7 @@
 - Fixed weird Frisbee-riding offsets on some characters
 - Fixed Insurance Policy issue where insuring an item would visually mark all items of the same type as insured
 - Fixed several small typos in Ammonomicon descriptions and lore
-- Tweaking Camping Supplies' campfire sprite to be a little less washed-out
+- Tweaked Camping Supplies' campfire sprite to be a little less washed-out
 - Lowered volume for Scotsman's shooting and detonation sounds
 - Tweaked reticle rendering code for Gunbrella, Scotsman, and Maestro to make things look a little nicer
 

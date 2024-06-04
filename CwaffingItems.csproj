@@ -194,6 +194,7 @@
     <Compile Include="src\Cwaff-Guns\Jugglernaut.cs"/>
     <Compile Include="src\Cwaff-Guns\KALI.cs"/>
     <Compile Include="src\Cwaff-Guns\AlienNailgun.cs"/>
+    <Compile Include="src\Cwaff-Guns\Wallcrawler.cs"/>
     <Compile Include="src\Cwaff-Guns\SubMachineGun.cs"/>
     <Compile Include="src\Cwaff-Guns\Grandmaster.cs"/>
     <Compile Include="src\Cwaff-Guns\Tranquilizer.cs"/>

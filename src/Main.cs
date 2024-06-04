@@ -251,6 +251,7 @@ public class Initialisation : BaseUnityPlugin
                 Nycterian.Add();
                 Maestro.Add();
                 Starmageddon.Add();
+                Wallcrawler.Add();
 
                 setupGunsWatch.Stop();
             #endregion

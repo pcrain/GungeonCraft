@@ -1506,7 +1506,7 @@ public static class Extensions
     => pos.XY().HoverAt(amplitude: amplitude, frequency: frequency, offset: offset, phase: phase).ToVector3ZisY();
 
   /// <summary>Set up a SpeculativeRigidBody for a VFX sprite based on the sprite's dimensions, FlipX status, and Anchor</summary>
-  public static SpeculativeRigidbody AutoRigidBody(this GameObject g, Anchor anchor, bool canBePushed = false)
+  public static SpeculativeRigidbody AutoRigidBody(this GameObject g, Anchor anchor, CollisionLayer clayer = CollisionLayer.HighObstacle, bool canBePushed = false)
   {
     SpeculativeRigidbody body = g.AddComponent<SpeculativeRigidbody>();
 
@@ -1522,7 +1522,7 @@ public static class Extensions
       ManualOffsetY          = spriteOffsets.y,
       ManualWidth            = spriteSize.x,
       ManualHeight           = spriteSize.y,
-      CollisionLayer         = CollisionLayer.HighObstacle,
+      CollisionLayer         = clayer,
       Enabled                = true,
       IsTrigger              = false,
     }};
@@ -1932,6 +1932,42 @@ public static class Extensions
         }
       }
     Debug.LogError("FREEZE AVERTED!  TELL CAPTAIN PRETZEL!  (you're welcome) 147");
+  }
+
+  /// <summary>Push a rigidbody into a wall in a specific direction, backs it out once pixel, and returns the number of pixels we moved</summary>
+  public static int PushAgainstWalls(this SpeculativeRigidbody body, IntVector2 direction)
+  {
+    if (PhysicsEngine.Instance.OverlapCast(body, null, true, false, null, null, false, null, null))
+      return 0;
+    Vector2 vector = body.transform.position.XY();
+    for (int pixels = 1; pixels <= 64; ++pixels)
+    {
+      body.transform.position = vector + PhysicsEngine.PixelToUnit(direction * pixels);
+      body.Reinitialize();
+      if (PhysicsEngine.Instance.OverlapCast(body, null, true, false, null, null, false, null, null))
+      {
+        --pixels;
+        body.transform.position = vector + PhysicsEngine.PixelToUnit(direction * pixels);
+        body.Reinitialize();
+        return pixels;
+      }
+    }
+    Debug.LogError("FREEZE AVERTED!  TELL CAPTAIN PRETZEL!  (you're welcome) 148");
+    return -1;
+  }
+
+  /// <summary>Check if a rigidbody is against a wall in a specific direction</summary>
+  public static bool IsAgainstWall(this SpeculativeRigidbody body, IntVector2 direction)
+  {
+    if (PhysicsEngine.Instance.OverlapCast(body, null, true, false, null, null, false, null, null))
+      return true;
+    Vector2 oldPos = body.transform.position.XY();
+    body.transform.position = oldPos + PhysicsEngine.PixelToUnit(direction);
+    body.Reinitialize();
+    bool result = PhysicsEngine.Instance.OverlapCast(body, null, true, false, null, null, false, null, null);
+    body.transform.position = oldPos;
+    body.Reinitialize();
+    return result;
   }
 
   /// <summary>Gets the gun corresponding to an item from the pickup database</summary>
