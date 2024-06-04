@@ -1912,7 +1912,7 @@ public static class Extensions
       return s;
   }
 
-  /// <summary>Push a rigidboy out of walls, prioritizing movement towards the center of a room</summary>
+  /// <summary>Push a rigidbody out of walls, prioritizing movement towards the center of a room</summary>
   public static void CorrectForWalls(this SpeculativeRigidbody body, bool andRigidBodies = false)
   {
     if (!PhysicsEngine.Instance.OverlapCast(body, null, true, andRigidBodies, null, null, false, null, null))
@@ -1934,20 +1934,37 @@ public static class Extensions
     Debug.LogError("FREEZE AVERTED!  TELL CAPTAIN PRETZEL!  (you're welcome) 147");
   }
 
+  /// <summary>Push a rigidbody out of a wall towards a specific direction, returning the number of pixels that were moved</summary>
+  public static int PullOutOfWall(this SpeculativeRigidbody body, IntVector2 pushDirection)
+  {
+    if (!PhysicsEngine.Instance.OverlapCast(body, null, true, false, null, null, false, null, null))
+      return 0;
+    Vector2 vector = body.transform.position.XY();
+    for (int pixels = 1; pixels <= 200; ++pixels)
+    {
+      body.transform.position = vector + PhysicsEngine.PixelToUnit(pushDirection * pixels);
+      body.Reinitialize();
+      if (!PhysicsEngine.Instance.OverlapCast(body, null, true, false, null, null, false, null, null))
+        return pixels;
+    }
+    Debug.LogError("FREEZE AVERTED!  TELL CAPTAIN PRETZEL!  (you're welcome) 147");
+    return -1;
+  }
+
   /// <summary>Push a rigidbody into a wall in a specific direction, backs it out once pixel, and returns the number of pixels we moved</summary>
-  public static int PushAgainstWalls(this SpeculativeRigidbody body, IntVector2 direction)
+  public static int PushAgainstWalls(this SpeculativeRigidbody body, IntVector2 pushDirection)
   {
     if (PhysicsEngine.Instance.OverlapCast(body, null, true, false, null, null, false, null, null))
       return 0;
     Vector2 vector = body.transform.position.XY();
     for (int pixels = 1; pixels <= 64; ++pixels)
     {
-      body.transform.position = vector + PhysicsEngine.PixelToUnit(direction * pixels);
+      body.transform.position = vector + PhysicsEngine.PixelToUnit(pushDirection * pixels);
       body.Reinitialize();
       if (PhysicsEngine.Instance.OverlapCast(body, null, true, false, null, null, false, null, null))
       {
         --pixels;
-        body.transform.position = vector + PhysicsEngine.PixelToUnit(direction * pixels);
+        body.transform.position = vector + PhysicsEngine.PixelToUnit(pushDirection * pixels);
         body.Reinitialize();
         return pixels;
       }
@@ -1957,12 +1974,12 @@ public static class Extensions
   }
 
   /// <summary>Check if a rigidbody is against a wall in a specific direction</summary>
-  public static bool IsAgainstWall(this SpeculativeRigidbody body, IntVector2 direction)
+  public static bool IsAgainstWall(this SpeculativeRigidbody body, IntVector2 pushDirection)
   {
     if (PhysicsEngine.Instance.OverlapCast(body, null, true, false, null, null, false, null, null))
       return true;
     Vector2 oldPos = body.transform.position.XY();
-    body.transform.position = oldPos + PhysicsEngine.PixelToUnit(direction);
+    body.transform.position = oldPos + PhysicsEngine.PixelToUnit(pushDirection);
     body.Reinitialize();
     bool result = PhysicsEngine.Instance.OverlapCast(body, null, true, false, null, null, false, null, null);
     body.transform.position = oldPos;

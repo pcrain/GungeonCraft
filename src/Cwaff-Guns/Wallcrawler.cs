@@ -12,84 +12,148 @@ public class Wallcrawler : CwaffGun
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Wallcrawler>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 0.9f, ammo: 600, shootFps: 14, reloadFps: 4);
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 0.9f, ammo: 320, shootFps: 14, reloadFps: 4);
 
-        _WallCrawlerPrefab = VFX.Create("wallcrawler", fps: 7, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 5f);
-        SpeculativeRigidbody body = _WallCrawlerPrefab.AutoRigidBody(anchor: Anchor.MiddleCenter, clayer: CollisionLayer.Projectile);
-            body.CollideWithOthers = false;
+        Projectile p = gun.InitProjectile(GunData.New(clipSize: 8, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, damage: 6.5f,
+          sprite: "wallcrawler_projectile", fps: 12, anchor: Anchor.MiddleLeft)).Attach<WallcrawlerProjectile>();
+            p.pierceMinorBreakables = true;
+
+        _WallCrawlerPrefab = VFX.Create("spider_turret", fps: 16, loops: true, scale: 0.75f, anchor: Anchor.MiddleCenter, emissivePower: 1f);
+        _WallCrawlerPrefab.AutoRigidBody(anchor: Anchor.MiddleCenter, clayer: CollisionLayer.Projectile);
         _WallCrawlerPrefab.AddComponent<Crawlyboi>();
-
-        ETGModConsole.Commands.AddGroup("ww", delegate (string[] args)
-        {
-            RoomHandler room = GameManager.Instance.PrimaryPlayer.CurrentRoom;
-            if (room == null)
-                return;
-
-            // get the cell under the player
-            IntVector2 playerPos = GameManager.Instance.PrimaryPlayer.specRigidbody.UnitBottomCenter.ToIntVector2(VectorConversions.Floor);
-            Dungeon d = GameManager.Instance.Dungeon;
-            if (!d.data.CheckInBoundsAndValid(playerPos))
-            {
-                ETGModConsole.Log($"out of bounds!");
-                return;
-            }
-            // ETGModConsole.Log($"current cell at {playerPos} is {CellType(d.data[playerPos])}");
-            // ETGModConsole.Log($"left    cell at {playerPos + IntVector2.Left} is {CellType(d.data[playerPos + IntVector2.Left])}");
-            // ETGModConsole.Log($"right   cell at {playerPos + IntVector2.Right} is {CellType(d.data[playerPos + IntVector2.Right])}");
-            // ETGModConsole.Log($"up      cell at {playerPos + IntVector2.Up} is {CellType(d.data[playerPos + IntVector2.Up])}");
-            // ETGModConsole.Log($"down    cell at {playerPos + IntVector2.Down} is {CellType(d.data[playerPos + IntVector2.Down])}");
-
-            UnityEngine.Object.Instantiate(_WallCrawlerPrefab, GameManager.Instance.PrimaryPlayer.CenterPosition, Quaternion.identity);
-        });
-    }
-
-    private static string CellType(IntVector2 pos)
-    {
-        return GameManager.Instance.Dungeon.data[pos].type switch {
-            Dungeonator.CellType.WALL  => "wall",
-            Dungeonator.CellType.PIT   => "pit",
-            Dungeonator.CellType.FLOOR => "floor",
-            _                          => "???",
-            };
     }
 }
 
 
+public class WallcrawlerProjectile : MonoBehaviour
+{
+    private Projectile _projectile;
+    private PlayerController _owner;
+    private void Start()
+    {
+        this._projectile = base.GetComponent<Projectile>();
+        this._owner = this._projectile.Owner as PlayerController;
+        SpeculativeRigidbody body = base.GetComponent<SpeculativeRigidbody>();
+        body.OnTileCollision += this.OnTileCollision;
+    }
+
+    private void OnTileCollision(CollisionData tileCollision)
+    {
+        //NOTE: quantization needed or SpeculativeRigidBody rounding math doesn't push out of walls correctly
+        GameObject go = UnityEngine.Object.Instantiate(Wallcrawler._WallCrawlerPrefab, tileCollision.Contact.Quantize(0.0625f), Quaternion.identity);
+        go.GetComponent<Crawlyboi>().Setup(this._owner, tileCollision.Normal, this._projectile.specRigidbody.Velocity, this._projectile.baseData.damage);
+        this._projectile.DieInAir();
+    }
+}
+
 public class Crawlyboi : MonoBehaviour
 {
-    private const float _SPEED = 10f;
+    private const float _SPEED        = 10f;
+    private const float _SHOOT_TIMER  = 0.45f;
+    private const float _EXPIRE_TIMER = 8f;
+    private const float _SIGHT_CONE   = 40f; // 80-degree cone
 
     private SpeculativeRigidbody _body;
     private tk2dSprite _sprite;
     private Vector2 _velocity;
     private Vector2 _wallNormal;
     private bool _hitWall = false;
-    // private IntVector2 _cellIndex;
+    private float _shootTimer = 0.0f;
+    private float _expireTimer = 0.0f;
+    private PlayerController _owner;
+    private float _rotateDir;
+    private float _damage;
 
-    private void Start()
+    public void Setup(PlayerController owner, Vector2 normal, Vector2 projVelocity, float damage)
     {
-        ETGModConsole.Log($"spawned at {base.transform.position}");
-        this._body = base.GetComponent<SpeculativeRigidbody>();
-        this._sprite = base.GetComponent<tk2dSprite>();
-            this._sprite.HeightOffGround = 3f;
-            this._sprite.UpdateZDepth();
+        if (this._hitWall)
+            return;
 
-        this._wallNormal = Vector2.zero;
-        this._body.OnTileCollision += this.OnTileCollision;
-        this._body.OnPostRigidbodyMovement += this.OnPostRigidbodyMovement;
-        this._velocity = GameManager.Instance.PrimaryPlayer.CurrentGun.gunAngle.Clamp360().Quantize(90f, VectorConversions.Round).ToVector();
+        bool clockwise  = ((-normal).ToAngle().RelAngleTo(projVelocity.ToAngle()) < 0f);
+        this._rotateDir = clockwise ? 90f : -90f;
+
+        this._hitWall    = true;
+        this._owner      = owner;
+        this._damage     = damage;
+        this._wallNormal = normal;
+        this._velocity   = normal.Rotate(this._rotateDir);
+
+        this._sprite = base.GetComponent<tk2dSprite>();
+        this._sprite.HeightOffGround = 3f;
+        this._sprite.UpdateZDepth();
+
+        this._body = base.GetComponent<SpeculativeRigidbody>();
+        this._body.transform.position = base.transform.position;
         this._body.Velocity = _SPEED * this._velocity;
+        this._body.Reinitialize();
+        IntVector2 intNormal = normal.ToIntVector2();
+        this._body.PushAgainstWalls(-intNormal);
+        this._body.PullOutOfWall(intNormal);
+        this._body.OnTileCollision         += this.OnTileCollision;
+        this._body.OnPreRigidbodyCollision += this.OnPreRigidbodyCollision;
+        this._body.OnPostRigidbodyMovement += this.OnPostRigidbodyMovement;
+    }
+
+    private void Update()
+    {
+        this._sprite.transform.rotation = this._wallNormal.EulerZ();
+        if ((this._expireTimer += BraveTime.DeltaTime) >= _EXPIRE_TIMER)
+        {
+            Explode();
+            return;
+        }
+        if ((this._shootTimer += BraveTime.DeltaTime) < _SHOOT_TIMER)
+            return;
+
+        Vector2 shootPoint = base.transform.position.XY() + this._wallNormal;
+        Vector2? enemyPos = Lazy.NearestEnemyWithinConeOfVision(shootPoint, this._wallNormal.ToAngle(), _SIGHT_CONE, useNearestAngleInsteadOfDistance: true);
+        if (!enemyPos.HasValue)
+            return;
+
+        this._shootTimer = 0f;
+
+        Quaternion aimDir = (enemyPos.HasValue ? (enemyPos.Value - shootPoint) : this._wallNormal).EulerZ();
+
+        Projectile proj = SpawnManager.SpawnProjectile(
+            prefab   : PistolWhip._PistolWhipProjectile.gameObject,
+            position : shootPoint,
+            rotation : aimDir).GetComponent<Projectile>();
+
+        proj.collidesWithPlayer  = false;
+        proj.collidesWithEnemies = true;
+        proj.baseData.damage     = this._damage;
+        proj.Owner               = this._owner;
+        proj.Shooter             = this._owner.specRigidbody;
+
+        proj.SetSpeed(50f);
+        this._owner.gameObject.PlayOnce("chess_gun_fire");
+    }
+
+    private void Explode()
+    {
+        Exploder.Explode(base.transform.position, Scotsman._ScotsmanExplosion, Vector2.zero, ignoreQueues: true);
+        UnityEngine.Object.Destroy(base.gameObject);
+    }
+
+    private void OnPreRigidbodyCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
+    {
+        PhysicsEngine.SkipCollision = true;
+        if (!otherRigidbody)
+            return;
+        if (otherRigidbody.GetComponent<AIActor>() ||
+            otherRigidbody.GetComponent<MajorBreakable>() ||
+            (otherRigidbody.transform.parent && otherRigidbody.transform.parent.GetComponent<DungeonDoorController>()))
+            Explode();
     }
 
     private void OnTileCollision(CollisionData tileCollision)
     {
         Vector2 oldNormal = this._wallNormal;
         if (oldNormal == Vector2.zero)
-            oldNormal = tileCollision.Normal.Rotate(90f);
+            oldNormal = tileCollision.Normal.Rotate(this._rotateDir);
         this._wallNormal = tileCollision.Normal;
         this._velocity = oldNormal.normalized;
         PhysicsEngine.PostSliceVelocity = _SPEED * this._velocity;
-        this._hitWall = true;
     }
 
     private void OnPostRigidbodyMovement(SpeculativeRigidbody specRigidbody, Vector2 unitDelta, IntVector2 pixelDelta)
@@ -111,27 +175,3 @@ public class Crawlyboi : MonoBehaviour
         this._body.Velocity = _SPEED * this._velocity;
     }
 }
-
-/* wall crawling logic
-    - check next position in our current movement direction
-    - if we run into a wall
-        - snap to the wall
-        - update our current wall
-        - continue along that wall
-        - go to top
-    - if we run into an obstacle that is not a wall
-        - snap to obstacle while still hugging wall
-        - reverse direction
-        - go to top
-    - if our old wall is no longer next to us
-        - if another wall is next to us
-            - update our current wall
-            - go to top
-        - snap diagonally to outer corner of wall
-        - update our current wall
-        - continue along that wall
-        - go to top
-    - if our current wall is still next to us
-        - move to next position
-        - continue
-*/
