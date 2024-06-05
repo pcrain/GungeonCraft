@@ -183,8 +183,9 @@ maestro_launch_fsharp,-4.0,1,sound
 maestro_launch_gsharp,-4.0,1,sound
 stickybomblauncher_shoot,-10.0,1,sound
 stickybomblauncher_det,-6.0,1,sound
-wallcrawler_deploy_sound_alt,0.5,1,sound
-wallcrawler_deploy_sound_alt_b,0.5,1,sound
-wallcrawler_fire_sound,-5.5,1,sound
-wallcrawler_turret_shoot_sound,2.0,1,sound
-wallcrawler_turret_crawl_sound,-1.5,1,sound
+widowmaker_deploy_sound_alt,0.5,1,sound
+widowmaker_deploy_sound_alt_b,0.5,1,sound
+widowmaker_fire_sound,-6.0,1,sound
+widowmaker_turret_shoot_sound,2.0,1,sound
+widowmaker_turret_crawl_sound,-1.5,1,sound
+widowmaker_reload_sound,2.0,1,sound

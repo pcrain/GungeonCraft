@@ -1,37 +1,45 @@
 ﻿namespace CwaffingTheGungy;
 
-/* TODO:
-    - gun animations
-*/
-
-public class Wallcrawler : CwaffGun
+public class Widowmaker : CwaffGun
 {
-    public static string ItemName         = "Wallcrawler";
+    public static string ItemName         = "Widowmaker";
     public static string ShortDescription = "TBD";
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
 
     private const float _SCALE = 0.75f;
 
-    internal static GameObject _WallCrawlerPrefab = null;
+    internal static GameObject _WidowmakerPrefab = null;
+    internal static Projectile _WidowTurretProjectile = null;
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<Wallcrawler>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 1.4f, ammo: 320, shootFps: 14, reloadFps: 4, fireAudio: "wallcrawler_fire_sound");
+        Gun gun = Lazy.SetupGun<Widowmaker>(ItemName, ShortDescription, LongDescription, Lore);
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 1.4f, ammo: 320, shootFps: 20, reloadFps: 12, fireAudio: "widowmaker_fire_sound");
+            gun.SetReloadAudio("widowmaker_reload_sound", 0, 4, 8, 10, 12, 14);
 
         Projectile p = gun.InitProjectile(GunData.New(clipSize: 5, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic, damage: 3.5f,
-          sprite: "wallcrawler_projectile", fps: 12, scale: _SCALE, anchor: Anchor.MiddleLeft)).Attach<WallcrawlerProjectile>();
+          sprite: "widowmaker_projectile", fps: 12, scale: _SCALE, anchor: Anchor.MiddleLeft)).Attach<WidowmakerProjectile>();
             p.pierceMinorBreakables = true;
 
-        _WallCrawlerPrefab = VFX.Create("spider_turret", fps: 16, loops: true, scale: _SCALE, anchor: Anchor.MiddleCenter, emissivePower: 1f);
-        _WallCrawlerPrefab.AddAnimation("deploy", "wallcrawler_deploy_vfx", fps: 12, loops: false, anchor: Anchor.MiddleCenter, emissivePower: 1f);
-        _WallCrawlerPrefab.AutoRigidBody(anchor: Anchor.MiddleCenter, clayer: CollisionLayer.Projectile);
-        _WallCrawlerPrefab.AddComponent<Crawlyboi>();
+        _WidowmakerPrefab = VFX.Create("spider_turret", fps: 16, loops: true, scale: _SCALE, anchor: Anchor.MiddleCenter, emissivePower: 1f);
+        _WidowmakerPrefab.AddAnimation("deploy", "widowmaker_deploy_vfx", fps: 12, loops: false, anchor: Anchor.MiddleCenter, emissivePower: 1f);
+        _WidowmakerPrefab.AutoRigidBody(anchor: Anchor.MiddleCenter, clayer: CollisionLayer.Projectile);
+        _WidowmakerPrefab.AddComponent<Crawlyboi>();
+
+        _WidowTurretProjectile = Items.Ak47.CloneProjectile(GunData.New(damage: 15.0f, speed: 80.0f, force: 10.0f, range: 80.0f
+          )).Attach<EasyTrailBullet>(trail => {
+            trail.TrailPos   = trail.transform.position;
+            trail.StartWidth = 0.3f;
+            trail.EndWidth   = 0.05f;
+            trail.LifeTime   = 0.07f;
+            trail.BaseColor  = ExtendedColours.paleYellow;
+            trail.EndColor   = Color.Lerp(ExtendedColours.paleYellow, Color.white, 0.25f);
+          });
     }
 }
 
-public class WallcrawlerProjectile : MonoBehaviour
+public class WidowmakerProjectile : MonoBehaviour
 {
     private const float _MIN_TRAVEL_TIME = 0.02f; // if we fire projectile directly inside a wall, our crawlers can get stuck and cause issues
 
@@ -54,7 +62,7 @@ public class WallcrawlerProjectile : MonoBehaviour
             return; // we were probably fired while inside a wall and all sorts of jank can happen, so don't let it
 
         //NOTE: quantization needed or SpeculativeRigidBody rounding math doesn't push out of walls correctly
-        UnityEngine.Object.Instantiate(Wallcrawler._WallCrawlerPrefab, tileCollision.Contact.Quantize(0.0625f), Quaternion.identity)
+        UnityEngine.Object.Instantiate(Widowmaker._WidowmakerPrefab, tileCollision.Contact.Quantize(0.0625f), Quaternion.identity)
             .GetComponent<Crawlyboi>().Setup(this._owner, tileCollision.Normal, this._projectile.specRigidbody.Velocity, this._projectile.baseData.damage);
         this._projectile.DieInAir();
     }
@@ -68,6 +76,7 @@ public class Crawlyboi : MonoBehaviour
     private const float _EXPIRE_TIMER = 8f;
     private const float _SIGHT_CONE   = 90f; // 180-degree cone
     private const float _SIGHT_DIST   = 12f;
+    private const int   _STUCK_FRAMES = 5; // number of frames we can go without moving until we're considered stuck
 
     private SpeculativeRigidbody _body;
     private tk2dSprite _sprite;
@@ -80,6 +89,9 @@ public class Crawlyboi : MonoBehaviour
     private PlayerController _owner;
     private float _rotateDir;
     private float _damage;
+    private bool _oddStep;
+    private Vector3 _lastPosition;
+    private int _stuckFrames = 0;
 
     public void Setup(PlayerController owner, Vector2 wallNormal, Vector2 projVelocity, float damage)
     {
@@ -110,12 +122,14 @@ public class Crawlyboi : MonoBehaviour
     private void Start()
     {
         base.GetComponent<tk2dSpriteAnimator>().Play("deploy");
-        // base.gameObject.Play("wallcrawler_deploy_sound_alt_b");
-        base.gameObject.Play("wallcrawler_deploy_sound_alt");
+        base.gameObject.Play("widowmaker_deploy_sound_alt");
     }
 
     private void Update()
     {
+        if (BraveTime.DeltaTime == 0.0f)
+            return;
+
         this._sprite.transform.rotation = this._wallNormal.EulerZ();
 
         if (!this._deployed)
@@ -127,6 +141,18 @@ public class Crawlyboi : MonoBehaviour
             this._deployed = true;
         }
 
+        if (base.transform.position == this._lastPosition)
+        {
+            if ((++this._stuckFrames) >= _STUCK_FRAMES)
+            {
+                Explode();
+                return;
+            }
+        }
+        else
+            this._stuckFrames = 0;
+        this._lastPosition = base.transform.position;
+
         if ((this._expireTimer += BraveTime.DeltaTime) >= _EXPIRE_TIMER)
         {
             Explode();
@@ -135,7 +161,8 @@ public class Crawlyboi : MonoBehaviour
         if ((this._soundTimer += BraveTime.DeltaTime) > _SOUND_TIMER)
         {
             this._soundTimer = 0.0f;
-            base.gameObject.Play("wallcrawler_turret_crawl_sound");
+            base.gameObject.PlayUnique(_oddStep ? "widowmaker_turret_crawl_sound_2" : "widowmaker_turret_crawl_sound");
+            this._oddStep = !this._oddStep;
         }
         if ((this._shootTimer += BraveTime.DeltaTime) < _SHOOT_TIMER)
             return;
@@ -151,7 +178,7 @@ public class Crawlyboi : MonoBehaviour
             return;
 
         Projectile proj = SpawnManager.SpawnProjectile(
-            prefab   : PistolWhip._PistolWhipProjectile.gameObject,
+            prefab   : Widowmaker._WidowTurretProjectile.gameObject,
             position : shootPoint,
             rotation : (enemyPos.Value - shootPoint).EulerZ()).GetComponent<Projectile>();
         proj.collidesWithPlayer  = false;
@@ -162,7 +189,7 @@ public class Crawlyboi : MonoBehaviour
 
         proj.SetSpeed(50f);
         // this._owner.gameObject.PlayOnce("chess_gun_fire");
-        base.gameObject.Play("wallcrawler_turret_shoot_sound");
+        base.gameObject.PlayUnique("widowmaker_turret_shoot_sound");
         this._shootTimer = 0f;
     }
 
@@ -174,16 +201,12 @@ public class Crawlyboi : MonoBehaviour
 
     private void OnPreRigidbodyCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
     {
-        if (!otherRigidbody)
-        {
-            PhysicsEngine.SkipCollision = true;
-            return;
-        }
-        if (otherRigidbody.GetComponent<MajorBreakable>() || (otherRigidbody.transform.parent && otherRigidbody.transform.parent.GetComponent<DungeonDoorController>()))
+        if ((otherRigidbody.transform.parent && otherRigidbody.transform.parent.GetComponent<DungeonDoorController>() is DungeonDoorController ddc))
             return; // do not skip collision
 
         PhysicsEngine.SkipCollision = true;
-        if (otherRigidbody.GetComponent<AIActor>() || !this._body.IsAgainstWall(-this._wallNormal.ToIntVector2()))
+        //NOTE: checking the name against "secret exit collider" is how vanilla gungeon blocks projectiles from the Oubilette entrance...rip
+        if (otherRigidbody.name.StartsWith("secret exit collider") || (otherRigidbody.GetComponent<MajorBreakable>() || otherRigidbody.GetComponent<AIActor>() || !this._body.IsAgainstWall(-this._wallNormal.ToIntVector2())))
         {
             Explode();
             return;
