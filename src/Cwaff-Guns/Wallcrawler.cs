@@ -1,5 +1,9 @@
 ﻿namespace CwaffingTheGungy;
 
+/* TODO:
+    - gun animations
+*/
+
 public class Wallcrawler : CwaffGun
 {
     public static string ItemName         = "Wallcrawler";
@@ -7,118 +11,149 @@ public class Wallcrawler : CwaffGun
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
 
+    private const float _SCALE = 0.75f;
+
     internal static GameObject _WallCrawlerPrefab = null;
 
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Wallcrawler>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 0.9f, ammo: 320, shootFps: 14, reloadFps: 4);
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 1.4f, ammo: 320, shootFps: 14, reloadFps: 4, fireAudio: "wallcrawler_fire_sound");
 
-        Projectile p = gun.InitProjectile(GunData.New(clipSize: 8, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, damage: 6.5f,
-          sprite: "wallcrawler_projectile", fps: 12, anchor: Anchor.MiddleLeft)).Attach<WallcrawlerProjectile>();
+        Projectile p = gun.InitProjectile(GunData.New(clipSize: 5, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic, damage: 3.5f,
+          sprite: "wallcrawler_projectile", fps: 12, scale: _SCALE, anchor: Anchor.MiddleLeft)).Attach<WallcrawlerProjectile>();
             p.pierceMinorBreakables = true;
 
-        _WallCrawlerPrefab = VFX.Create("spider_turret", fps: 16, loops: true, scale: 0.75f, anchor: Anchor.MiddleCenter, emissivePower: 1f);
+        _WallCrawlerPrefab = VFX.Create("spider_turret", fps: 16, loops: true, scale: _SCALE, anchor: Anchor.MiddleCenter, emissivePower: 1f);
+        _WallCrawlerPrefab.AddAnimation("deploy", "wallcrawler_deploy_vfx", fps: 12, loops: false, anchor: Anchor.MiddleCenter, emissivePower: 1f);
         _WallCrawlerPrefab.AutoRigidBody(anchor: Anchor.MiddleCenter, clayer: CollisionLayer.Projectile);
         _WallCrawlerPrefab.AddComponent<Crawlyboi>();
     }
 }
 
-
 public class WallcrawlerProjectile : MonoBehaviour
 {
+    private const float _MIN_TRAVEL_TIME = 0.02f; // if we fire projectile directly inside a wall, our crawlers can get stuck and cause issues
+
     private Projectile _projectile;
     private PlayerController _owner;
+    private float _startTime;
+
     private void Start()
     {
         this._projectile = base.GetComponent<Projectile>();
         this._owner = this._projectile.Owner as PlayerController;
         SpeculativeRigidbody body = base.GetComponent<SpeculativeRigidbody>();
+        this._startTime = BraveTime.ScaledTimeSinceStartup;
         body.OnTileCollision += this.OnTileCollision;
     }
 
     private void OnTileCollision(CollisionData tileCollision)
     {
+        if ((BraveTime.ScaledTimeSinceStartup - this._startTime) < _MIN_TRAVEL_TIME)
+            return; // we were probably fired while inside a wall and all sorts of jank can happen, so don't let it
+
         //NOTE: quantization needed or SpeculativeRigidBody rounding math doesn't push out of walls correctly
-        GameObject go = UnityEngine.Object.Instantiate(Wallcrawler._WallCrawlerPrefab, tileCollision.Contact.Quantize(0.0625f), Quaternion.identity);
-        go.GetComponent<Crawlyboi>().Setup(this._owner, tileCollision.Normal, this._projectile.specRigidbody.Velocity, this._projectile.baseData.damage);
+        UnityEngine.Object.Instantiate(Wallcrawler._WallCrawlerPrefab, tileCollision.Contact.Quantize(0.0625f), Quaternion.identity)
+            .GetComponent<Crawlyboi>().Setup(this._owner, tileCollision.Normal, this._projectile.specRigidbody.Velocity, this._projectile.baseData.damage);
         this._projectile.DieInAir();
     }
 }
 
 public class Crawlyboi : MonoBehaviour
 {
-    private const float _SPEED        = 10f;
-    private const float _SHOOT_TIMER  = 0.45f;
+    private const float _CRAWL_SPEED  = 10f;
+    private const float _SHOOT_TIMER  = 0.4f;
+    private const float _SOUND_TIMER  = 0.18f;
     private const float _EXPIRE_TIMER = 8f;
-    private const float _SIGHT_CONE   = 40f; // 80-degree cone
+    private const float _SIGHT_CONE   = 90f; // 180-degree cone
+    private const float _SIGHT_DIST   = 12f;
 
     private SpeculativeRigidbody _body;
     private tk2dSprite _sprite;
     private Vector2 _velocity;
     private Vector2 _wallNormal;
-    private bool _hitWall = false;
+    private bool _deployed = false;
     private float _shootTimer = 0.0f;
+    private float _soundTimer = 0.0f;
     private float _expireTimer = 0.0f;
     private PlayerController _owner;
     private float _rotateDir;
     private float _damage;
 
-    public void Setup(PlayerController owner, Vector2 normal, Vector2 projVelocity, float damage)
+    public void Setup(PlayerController owner, Vector2 wallNormal, Vector2 projVelocity, float damage)
     {
-        if (this._hitWall)
-            return;
+        bool clockwise  = ((-wallNormal).ToAngle().RelAngleTo(projVelocity.ToAngle()) > 0f);
+        this._rotateDir = clockwise ? -90f : 90f;
 
-        bool clockwise  = ((-normal).ToAngle().RelAngleTo(projVelocity.ToAngle()) < 0f);
-        this._rotateDir = clockwise ? 90f : -90f;
-
-        this._hitWall    = true;
         this._owner      = owner;
         this._damage     = damage;
-        this._wallNormal = normal;
-        this._velocity   = normal.Rotate(this._rotateDir);
+        this._wallNormal = wallNormal;
+        this._velocity   = wallNormal.Rotate(this._rotateDir);
 
         this._sprite = base.GetComponent<tk2dSprite>();
         this._sprite.HeightOffGround = 3f;
+        this._sprite.transform.rotation = this._wallNormal.EulerZ();
         this._sprite.UpdateZDepth();
 
         this._body = base.GetComponent<SpeculativeRigidbody>();
         this._body.transform.position = base.transform.position;
-        this._body.Velocity = _SPEED * this._velocity;
         this._body.Reinitialize();
-        IntVector2 intNormal = normal.ToIntVector2();
-        this._body.PushAgainstWalls(-intNormal);
-        this._body.PullOutOfWall(intNormal);
+        this._body.PullOutOfWall(wallNormal.ToIntVector2());
         this._body.OnTileCollision         += this.OnTileCollision;
         this._body.OnPreRigidbodyCollision += this.OnPreRigidbodyCollision;
+        this._body.OnRigidbodyCollision    += this.OnRigidbodyCollision;
         this._body.OnPostRigidbodyMovement += this.OnPostRigidbodyMovement;
+
+    }
+
+    private void Start()
+    {
+        base.GetComponent<tk2dSpriteAnimator>().Play("deploy");
+        // base.gameObject.Play("wallcrawler_deploy_sound_alt_b");
+        base.gameObject.Play("wallcrawler_deploy_sound_alt");
     }
 
     private void Update()
     {
         this._sprite.transform.rotation = this._wallNormal.EulerZ();
+
+        if (!this._deployed)
+        {
+            if (base.GetComponent<tk2dSpriteAnimator>().IsPlaying("deploy"))
+                return;
+            base.GetComponent<tk2dSpriteAnimator>().Play("start");
+            this._body.Velocity = _CRAWL_SPEED * this._velocity;
+            this._deployed = true;
+        }
+
         if ((this._expireTimer += BraveTime.DeltaTime) >= _EXPIRE_TIMER)
         {
             Explode();
             return;
         }
+        if ((this._soundTimer += BraveTime.DeltaTime) > _SOUND_TIMER)
+        {
+            this._soundTimer = 0.0f;
+            base.gameObject.Play("wallcrawler_turret_crawl_sound");
+        }
         if ((this._shootTimer += BraveTime.DeltaTime) < _SHOOT_TIMER)
             return;
 
         Vector2 shootPoint = base.transform.position.XY() + this._wallNormal;
-        Vector2? enemyPos = Lazy.NearestEnemyWithinConeOfVision(shootPoint, this._wallNormal.ToAngle(), _SIGHT_CONE, useNearestAngleInsteadOfDistance: true);
+        Vector2? enemyPos = Lazy.NearestEnemyWithinConeOfVision(
+            start                            : shootPoint,
+            coneAngle                        : this._wallNormal.ToAngle(),
+            maxDeviation                     : _SIGHT_CONE,
+            maxDistance                      : _SIGHT_DIST,
+            useNearestAngleInsteadOfDistance : true);
         if (!enemyPos.HasValue)
             return;
-
-        this._shootTimer = 0f;
-
-        Quaternion aimDir = (enemyPos.HasValue ? (enemyPos.Value - shootPoint) : this._wallNormal).EulerZ();
 
         Projectile proj = SpawnManager.SpawnProjectile(
             prefab   : PistolWhip._PistolWhipProjectile.gameObject,
             position : shootPoint,
-            rotation : aimDir).GetComponent<Projectile>();
-
+            rotation : (enemyPos.Value - shootPoint).EulerZ()).GetComponent<Projectile>();
         proj.collidesWithPlayer  = false;
         proj.collidesWithEnemies = true;
         proj.baseData.damage     = this._damage;
@@ -126,7 +161,9 @@ public class Crawlyboi : MonoBehaviour
         proj.Shooter             = this._owner.specRigidbody;
 
         proj.SetSpeed(50f);
-        this._owner.gameObject.PlayOnce("chess_gun_fire");
+        // this._owner.gameObject.PlayOnce("chess_gun_fire");
+        base.gameObject.Play("wallcrawler_turret_shoot_sound");
+        this._shootTimer = 0f;
     }
 
     private void Explode()
@@ -137,28 +174,46 @@ public class Crawlyboi : MonoBehaviour
 
     private void OnPreRigidbodyCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
     {
-        PhysicsEngine.SkipCollision = true;
         if (!otherRigidbody)
+        {
+            PhysicsEngine.SkipCollision = true;
             return;
-        if (otherRigidbody.GetComponent<AIActor>() ||
-            otherRigidbody.GetComponent<MajorBreakable>() ||
-            (otherRigidbody.transform.parent && otherRigidbody.transform.parent.GetComponent<DungeonDoorController>()))
+        }
+        if (otherRigidbody.GetComponent<MajorBreakable>() || (otherRigidbody.transform.parent && otherRigidbody.transform.parent.GetComponent<DungeonDoorController>()))
+            return; // do not skip collision
+
+        PhysicsEngine.SkipCollision = true;
+        if (otherRigidbody.GetComponent<AIActor>() || !this._body.IsAgainstWall(-this._wallNormal.ToIntVector2()))
+        {
             Explode();
+            return;
+        }
     }
 
+    /// <summary>Reverse direction when colliding with unknown objects</summary>
+    private void OnRigidbodyCollision(CollisionData rigidbodyCollision)
+    {
+        if (!this._body.IsAgainstWall(-this._wallNormal.ToIntVector2()))
+        {
+            Explode();
+            return;
+        }
+        this._velocity = -this._velocity;
+        PhysicsEngine.PostSliceVelocity = _CRAWL_SPEED * this._velocity;
+    }
+
+    /// <summary>wrap along inner walls</summary>
     private void OnTileCollision(CollisionData tileCollision)
     {
-        Vector2 oldNormal = this._wallNormal;
-        if (oldNormal == Vector2.zero)
-            oldNormal = tileCollision.Normal.Rotate(this._rotateDir);
+        this._velocity = this._wallNormal.normalized;
         this._wallNormal = tileCollision.Normal;
-        this._velocity = oldNormal.normalized;
-        PhysicsEngine.PostSliceVelocity = _SPEED * this._velocity;
+        PhysicsEngine.PostSliceVelocity = _CRAWL_SPEED * this._velocity;
     }
 
+    /// <summary>wrap along outer walls, if necessary</summary>
     private void OnPostRigidbodyMovement(SpeculativeRigidbody specRigidbody, Vector2 unitDelta, IntVector2 pixelDelta)
     {
-        if (!this._hitWall)
+        if (!this._deployed)
             return; // don't do anything until we've hit a wall once
         if (this._body.IsAgainstWall(-this._wallNormal.ToIntVector2()))
             return; // if we're already up against a wall, no adjustments are needed
@@ -172,6 +227,6 @@ public class Crawlyboi : MonoBehaviour
         this._wallNormal = this._velocity.normalized;
         // set the new velocity
         this._velocity = newVelocity;
-        this._body.Velocity = _SPEED * this._velocity;
+        this._body.Velocity = _CRAWL_SPEED * this._velocity;
     }
 }

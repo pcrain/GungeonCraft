@@ -459,11 +459,12 @@ public static class Lazy
     }
 
     /// <summary>Determine position of the nearest enemy inside a cone of vision from position start within maxDeviation degree of coneAngle</summary>
-    public static Vector2? NearestEnemyWithinConeOfVision(Vector2 start, float coneAngle, float maxDeviation, bool useNearestAngleInsteadOfDistance, bool ignoreWalls = false)
+    public static Vector2? NearestEnemyWithinConeOfVision(Vector2 start, float coneAngle, float maxDeviation, float maxDistance = 100f, bool useNearestAngleInsteadOfDistance = true, bool ignoreWalls = false)
     {
         bool foundTarget   = false;
         float bestAngle    = maxDeviation;
-        float bestDist     = 9999f;
+        float maxSqrDist   = maxDistance * maxDistance;
+        float bestSqrDist  = maxSqrDist;
         Vector2 bestTarget = Vector2.zero;
         foreach (AIActor enemy in start.GetAbsoluteRoom()?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All).EmptyIfNull())
         {
@@ -477,16 +478,18 @@ public static class Lazy
             float angleDeviation = Mathf.Abs((coneAngle - angle).Clamp180());
             if (angleDeviation > maxDeviation)
                 continue;
-            float dist           = delta.magnitude;
+            float sqrDist        = delta.sqrMagnitude;
+            if (sqrDist > maxSqrDist)
+                continue;
             bool bestSoFar       = useNearestAngleInsteadOfDistance
                 ? (angleDeviation < bestAngle)
-                : (dist < bestDist);
+                : (sqrDist < bestSqrDist);
             if (!bestSoFar)
                 continue;
             foundTarget = true;
             bestTarget  = tentativeTarget;
             bestAngle   = angleDeviation;
-            bestDist    = dist;
+            bestSqrDist    = sqrDist;
         }
         return foundTarget ? bestTarget : null;
     }
@@ -494,7 +497,8 @@ public static class Lazy
     /// <summary>Determine position of the nearest enemy to position start</summary>
     public static Vector2? NearestEnemy(Vector2 start, float coneAngle, bool useNearestAngleInsteadOfDistance = false, bool ignoreWalls = false)
     {
-        return NearestEnemyWithinConeOfVision(start, coneAngle, 360f, useNearestAngleInsteadOfDistance, ignoreWalls);
+        return NearestEnemyWithinConeOfVision(start: start, coneAngle: coneAngle, maxDeviation: 360f,
+            useNearestAngleInsteadOfDistance: useNearestAngleInsteadOfDistance, ignoreWalls: ignoreWalls);
     }
 
     /// <summary>Spawn a chest with a single guaranteed item inside of it</summary>

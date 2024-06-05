@@ -25,6 +25,51 @@ public static class VFX
         MasterySigil = VFX.Create("mastery_sigil", fps: 2);
     }
 
+    /// <summary>Register an animation for a VFX object</summary>
+    public static tk2dSpriteAnimationClip NewAnimation(this GameObject vfxObject, string animName, List<string> spritePaths, float fps = 2, bool loops = true, int loopStart = -1,
+        Anchor anchor = Anchor.MiddleCenter, float emissivePower = -1, Color? emissiveColour = null)
+    {
+        tk2dSpriteAnimationClip clip = new tk2dSpriteAnimationClip() {
+            name      = animName,
+            fps       = fps,
+            frames    = new tk2dSpriteAnimationFrame[spritePaths.Count],
+            loopStart = loopStart,
+            wrapMode  =
+                (loopStart > 0) ? tk2dSpriteAnimationClip.WrapMode.LoopSection :
+                loops           ? tk2dSpriteAnimationClip.WrapMode.Loop : tk2dSpriteAnimationClip.WrapMode.Once
+        };
+
+        Shader shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+        tk2dSpriteDefinition defaultDef = Collection.spriteDefinitions[vfxObject.GetComponent<tk2dSprite>().spriteId];
+        for (int i = 0; i < spritePaths.Count; i++)
+        {
+            int frameSpriteId             = Collection.GetSpriteIdByName(spritePaths[i]);
+            tk2dSpriteDefinition frameDef = Collection.spriteDefinitions[frameSpriteId];
+            frameDef.BetterConstructOffsetsFromAnchor(anchor);
+            frameDef.colliderVertices = defaultDef.colliderVertices; //NOTE: this overrides any prespecified collider vertices, unsure we want this
+            frameDef.material.shader = shader; //NOTE: materialInst is the same as material for all of our sprites, so we don't need to adjust it separately
+            if (emissivePower > 0) {
+                frameDef.material.SetFloat("_EmissivePower", emissivePower);
+                frameDef.material.SetFloat("_EmissiveColorPower", 1.55f);
+            }
+            if (emissiveColour != null)
+                frameDef.material.SetColor("_EmissiveColor", (Color)emissiveColour);
+            clip.frames[i] = new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = Collection };
+        }
+        return clip;
+    }
+
+    public static void AddAnimation(this GameObject vfxObject, string animName, string baseSpriteName, float fps = 2, bool loops = true, int loopStart = -1,
+        Anchor anchor = Anchor.MiddleCenter, float emissivePower = -1, Color? emissiveColour = null)
+    {
+        tk2dSpriteAnimationClip clip = vfxObject.NewAnimation(animName: animName, spritePaths: ResMap.Get(baseSpriteName), fps: fps, loops: loops,
+            loopStart: loopStart, anchor: anchor, emissivePower: emissivePower, emissiveColour: emissiveColour);
+        tk2dSpriteAnimation library = vfxObject.GetComponent<tk2dSpriteAnimation>();
+        int oldSize = library.clips.Length;
+        Array.Resize(ref library.clips, oldSize + 1);
+        library.clips[oldSize] = clip;
+    }
+
     /// <summary>
     /// Generically register a VFX as a GameObject (animated sprite), VFXComplex, or VFXPool
     /// </summary>
@@ -55,32 +100,9 @@ public static class VFX
             defaultDef.colliderVertices = new Vector3[]{Vector3.zero, defaultDef.position3}; //NOTE: the original code for this was wrong and probably unused
         sprite.SetSprite(Collection, spriteId);
 
-        tk2dSpriteAnimationClip clip = new tk2dSpriteAnimationClip() {
-            name      = "start",
-            fps       = fps,
-            frames    = new tk2dSpriteAnimationFrame[spritePaths.Count],
-            loopStart = loopStart,
-            wrapMode  =
-                (loopStart > 0) ? tk2dSpriteAnimationClip.WrapMode.LoopSection :
-                loops           ? tk2dSpriteAnimationClip.WrapMode.Loop : tk2dSpriteAnimationClip.WrapMode.Once
-        };
-
+        tk2dSpriteAnimationClip clip = vfxEffect.NewAnimation(animName: "start", spritePaths: spritePaths, fps: fps, loops: loops, loopStart: loopStart,
+            anchor: anchor, emissivePower: emissivePower, emissiveColour: emissiveColour);
         Shader shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-        for (int i = 0; i < spritePaths.Count; i++)
-        {
-            int frameSpriteId             = Collection.GetSpriteIdByName(spritePaths[i]);
-            tk2dSpriteDefinition frameDef = Collection.spriteDefinitions[frameSpriteId];
-            frameDef.BetterConstructOffsetsFromAnchor(anchor);
-            frameDef.colliderVertices = defaultDef.colliderVertices; //NOTE: this overrides any prespecified collider vertices, unsure we want this
-            frameDef.material.shader = shader; //NOTE: materialInst is the same as material for all of our sprites, so we don't need to adjust it separately
-            if (emissivePower > 0) {
-                frameDef.material.SetFloat("_EmissivePower", emissivePower);
-                frameDef.material.SetFloat("_EmissiveColorPower", 1.55f);
-            }
-            if (emissiveColour != null)
-                frameDef.material.SetColor("_EmissiveColor", (Color)emissiveColour);
-            clip.frames[i] = new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = Collection };
-        }
         if (emissivePower > 0) {
             sprite.renderer.material.shader = shader;
             sprite.renderer.material.SetFloat("_EmissivePower", emissivePower);

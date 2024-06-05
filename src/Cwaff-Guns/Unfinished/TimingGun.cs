@@ -45,9 +45,9 @@ public class TimingGun : CwaffGun
         for (int i = 0; i < 10; ++i)
         {
             string istring = i.ToString();
-            VFX.RegisterVFX(istring, new List<string>() {
-                    $"{C.MOD_INT_NAME}/Resources/MiscVFX/Numbers/"+istring,
-                }, 1, loops: false, anchor: Anchor.LowerCenter, persist: true);
+            // VFX.RegisterVFX(istring, new List<string>() {
+            //         $"{C.MOD_INT_NAME}/Resources/MiscVFX/Numbers/"+istring,
+            //     }, 1, loops: false, anchor: Anchor.LowerCenter, persist: true);
         }
 
         // 1+ guns without ammo (scale stats from last projectile)
