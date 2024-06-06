@@ -9,16 +9,20 @@ public class VacuumCleaner : CwaffGun
 
     internal static GameObject _VacuumVFX = null;
 
-    internal const float _REACH       =  8.00f; // how far (in tiles) the gun reaches
-    internal const float _SPREAD      =    10f; // width (in degrees) of how wide our cone of suction is at the end of our reach
-    internal const float _ACCEL_SEC   =  1.80f; // speed (in tiles per second) at which debris accelerates towards the gun near the end of the gun's reach
-    internal const float _UPDATE_RATE =   0.1f; // amount of time between debris checks / updates
-    internal const float _AMMO_CHANCE =  0.01f; // percent chance debris restores ammo
-    internal const float _AMMO_AMT    =  0.01f; // percent ammo restored to a random gun selected with _AMMO_CHANCE per debris
+    internal const float _REACH            =  8.00f; // how far (in tiles) the gun reaches
+    internal const float _SPREAD           =    10f; // width (in degrees) of how wide our cone of suction is at the end of our reach
+    internal const float _ACCEL_SEC        =  1.80f; // speed (in tiles per second) at which debris accelerates towards the gun near the end of the gun's reach
+    internal const float _UPDATE_RATE      =   0.1f; // amount of time between debris checks / updates
+    internal const float _AMMO_CHANCE      =  0.01f; // percent chance debris restores ammo
+    internal const float _HIGH_AMMO_CHANCE =  0.04f; // percent chance debris restores ammo with Scavengest synergy
+    internal const float _AMMO_AMT         =  0.01f; // percent ammo restored to a random gun selected with _AMMO_CHANCE per debris
+    internal const float _CASING_CHANCE    =  0.01f; // percent chance debris grants a casing with the Cleanup Crew synergy
+    internal const int   _FLOOR_CASINGS    =     20; // max number of casings that can be picked up this floor
 
     internal const float _SQR_REACH   = _REACH * _REACH; // avoid an unnecessary sqrt() by using sqrmagnitude
 
     private int _debrisSucked = 0;
+    private int _casingsThisFloor = 0;
 
     public static void Add()
     {
@@ -32,16 +36,39 @@ public class VacuumCleaner : CwaffGun
         _VacuumVFX = VFX.Create("vacuum_wind_sprite_a", fps: 30, loops: true, loopStart: 6, anchor: Anchor.MiddleCenter, scale: 0.5f);
     }
 
+    public override void OnPlayerPickup(PlayerController player)
+    {
+        base.OnPlayerPickup(player);
+        CwaffEvents.OnNewFloorFullyLoaded += this.OnNewFloorReached;
+    }
+
+    public override void OnDroppedByPlayer(PlayerController player)
+    {
+        base.OnDroppedByPlayer(player);
+        CwaffEvents.OnNewFloorFullyLoaded -= this.OnNewFloorReached;
+    }
+
+    public override void OnDestroy()
+    {
+        CwaffEvents.OnNewFloorFullyLoaded -= this.OnNewFloorReached;
+        base.OnDestroy();
+    }
+
+    private void OnNewFloorReached()
+    {
+        if (C.DEBUG_BUILD)
+            ETGModConsole.Log($"resetting casings from {this._casingsThisFloor} to 0");
+        this._casingsThisFloor = 0;
+    }
+
     private void MaybeRestoreAmmo()
     {
-        if (UnityEngine.Random.value > _AMMO_CHANCE)
+        if (UnityEngine.Random.value > (this.PlayerOwner.PlayerHasActiveSynergy(Synergy.SCAVENGEST) ? _HIGH_AMMO_CHANCE : _AMMO_CHANCE))
             return; // Make sure we restore any ammo at all
-        if (this.GenericOwner is not PlayerController player)
-            return; // Make sure our owner is a player
 
         // Look for guns missing any ammo whatsoever
         List<Gun> candidates = new();
-        foreach (Gun g in player.inventory.AllGuns)
+        foreach (Gun g in this.PlayerOwner.inventory.AllGuns)
         {
             if (!g.InfiniteAmmo && g.CanGainAmmo && g.CurrentAmmo < g.AdjustedMaxAmmo)
                 candidates.Add(g);
@@ -63,6 +90,8 @@ public class VacuumCleaner : CwaffGun
     public override void Update()
     {
         base.Update();
+        if (this.PlayerOwner is not PlayerController player)
+            return;
         if (BraveTime.DeltaTime == 0.0f)
             return;
         if (!this.gun.IsCharging)
@@ -101,6 +130,13 @@ public class VacuumCleaner : CwaffGun
             debris.gameObject.AddComponent<VacuumParticle>().Setup(this.gun, (debris.gameObject.transform.position.XY() - gunpos).magnitude);
             ++this._debrisSucked;
             MaybeRestoreAmmo();
+            if ((UnityEngine.Random.value <= _CASING_CHANCE) && player.PlayerHasActiveSynergy(Synergy.CLEANUP_CREW) && this._casingsThisFloor < _FLOOR_CASINGS)
+            {
+                ++this._casingsThisFloor;
+                if (C.DEBUG_BUILD)
+                    ETGModConsole.Log($"got casing {_casingsThisFloor} / 20");
+                LootEngine.SpawnCurrency(this.PlayerOwner.CenterPosition, 1);
+            }
         }
     }
 }

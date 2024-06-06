@@ -1,5 +1,9 @@
 # Changelog
 
+## TBD
+
+- Added 7 new synergies!
+
 ## 1.13.1 (2024-06-02)
 
 #### Features and Polish:

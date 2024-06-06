@@ -198,10 +198,12 @@ public class Uppskeruvel : CwaffGun
         return soul;
     }
 
-    public static void DropLostSouls(AIActor enemy)
+    public static void DropLostSouls(AIActor enemy, bool hasSoulSearchingSynergy = false)
     {
         Vector2 ppos = enemy.CenterPosition;
         int soulsToSpawn = Mathf.Min(_MAX_DROPS, Mathf.CeilToInt(_SOULS_PER_HEALTH * (enemy.healthHaver?.GetMaxHealth() ?? 0)));
+        if (hasSoulSearchingSynergy)
+            soulsToSpawn *= 2;
         for (int i = 0; i < soulsToSpawn; ++i)
         {
             float angle = Lazy.RandomAngle();
@@ -260,7 +262,7 @@ public class UppskeruvelProjectile : MonoBehaviour
     {
         this._projectile = base.GetComponent<Projectile>();
         this._owner = this._projectile.Owner as PlayerController;
-        if (this._owner.CurrentGun.GetComponent<Uppskeruvel>() is not Uppskeruvel uppies)
+        if (!this._owner || !this._owner.CurrentGun || this._owner.CurrentGun.GetComponent<Uppskeruvel>() is not Uppskeruvel uppies)
             return;
 
         this._gun = uppies;
@@ -280,7 +282,7 @@ public class UppskeruvelProjectile : MonoBehaviour
         if (!(enemy?.aiActor?.IsHostile() ?? false))
             return; // avoid processing effect for non-hostile enemies
 
-        Uppskeruvel.DropLostSouls(enemy.aiActor);
+        Uppskeruvel.DropLostSouls(enemy.aiActor, this._owner.PlayerHasActiveSynergy(Synergy.SOUL_SEARCHING));
     }
 }
 

@@ -41,6 +41,7 @@
     <None Include="packages.config"/>
     <Reference Include="System"/>
     <Compile Include="src\Cwaff-Passives\StuntHelmet.cs"/>
+    <Compile Include="src\Cwaff-Passives\CustodiansBadge.cs"/>
     <Compile Include="src\Cwaff-Passives\Unfinished\Superstitious.cs"/>
     <Compile Include="src\Cwaff-Passives\Unfinished\Siphon.cs"/>
     <Compile Include="src\Cwaff-Passives\Unfinished\Shine.cs"/>
@@ -68,7 +69,6 @@
     <Compile Include="src\Cwaff-Passives\BionicFinger.cs"/>
     <Compile Include="src\Cwaff-Passives\UtilityVest.cs"/>
     <Compile Include="src\Cwaff-Passives\SafetyGloves.cs"/>
-    <Compile Include="src\Cwaff-Passives\CuratorsBadge.cs"/>
     <Compile Include="src\Cwaff-Passives\Blazer.cs"/>
     <Compile Include="src\Cwaff-Passives\AdrenalineShot.cs"/>
     <Compile Include="src\Cwaff-Passives\CampingSupplies.cs"/>

@@ -188,7 +188,6 @@ public class Crawlyboi : MonoBehaviour
         proj.Shooter             = this._owner.specRigidbody;
 
         proj.SetSpeed(50f);
-        // this._owner.gameObject.PlayOnce("chess_gun_fire");
         base.gameObject.PlayUnique("widowmaker_turret_shoot_sound");
         this._shootTimer = 0f;
     }
@@ -207,10 +206,7 @@ public class Crawlyboi : MonoBehaviour
         PhysicsEngine.SkipCollision = true;
         //NOTE: checking the name against "secret exit collider" is how vanilla gungeon blocks projectiles from the Oubilette entrance...rip
         if (otherRigidbody.name.StartsWith("secret exit collider") || (otherRigidbody.GetComponent<MajorBreakable>() || otherRigidbody.GetComponent<AIActor>() || !this._body.IsAgainstWall(-this._wallNormal.ToIntVector2())))
-        {
             Explode();
-            return;
-        }
     }
 
     /// <summary>Reverse direction when colliding with unknown objects</summary>

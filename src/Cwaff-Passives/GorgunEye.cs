@@ -78,7 +78,11 @@ public class GorgunEye : CwaffPassive
         if (closestEnemy != this._afflictedEnemy)
         {
             if (this._afflictedEnemy)
+            {
                 this._afflictedEnemy.RemoveEffect(_EFFECT_NAME);
+                if (player.PlayerHasActiveSynergy(Synergy.BLANK_STARE) && this._afflictedEnemy.behaviorSpeculator is BehaviorSpeculator bs && !bs.ImmuneToStun)
+                    bs.Stun(1f);
+            }
             if (closestEnemy)
             {
                 closestEnemy.ApplyEffect(_GorgunTint);

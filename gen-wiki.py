@@ -24,6 +24,9 @@ You can download the mod or read more about it [https://thunderstore.io/c/enter-
 VANILLA_ITEMS = {
   "hyper_light_blaster" : ("Hyper Light Blaster", "Hyper_Light_Blaster.png"),
   "sunlight_javelin"    : ("Sunlight Javelin", "Sunlight_Javelin.png"),
+  "laser_lotus"         : ("Laser Lotus", "Laser_Lotus.png"),
+  "bubble_blaster"      : ("Bubble Blaster", "Bubble_Blaster.png"),
+  "gun_soul"            : ("Gun Soul", "Gun_Soul.png"),
 }
 
 def applyGunDataOverrides(gunData):

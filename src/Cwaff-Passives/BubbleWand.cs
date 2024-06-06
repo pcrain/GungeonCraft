@@ -19,7 +19,13 @@ public class BubbleWand : CwaffPassive
     {
         static void Prefix(AIActor __instance)
         {
-            if (Lazy.AnyoneHas<BubbleWand>() && Lazy.CoinFlip())
+            if (!Lazy.AnyoneHas<BubbleWand>())
+                return;
+            if (Lazy.CoinFlip())
+                __instance.ReplaceGun(Items.BubbleBlaster);
+            else if (GameManager.Instance.PrimaryPlayer.PlayerHasActiveSynergy(Synergy.DUBBLE_BUBBLE) && Lazy.CoinFlip())
+                __instance.ReplaceGun(Items.BubbleBlaster);
+            else if (GameManager.Instance.CurrentGameType == GameManager.GameType.COOP_2_PLAYER && GameManager.Instance.SecondaryPlayer.PlayerHasActiveSynergy(Synergy.DUBBLE_BUBBLE) && Lazy.CoinFlip())
                 __instance.ReplaceGun(Items.BubbleBlaster);
         }
     }

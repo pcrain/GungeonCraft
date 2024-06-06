@@ -95,18 +95,31 @@ public class AimuHakurei : CwaffGun
         this.gun.CurrentStrengthTier = 0;
         SetFocus(false);
         player.OnRollStarted += this.OnDodgeRoll;
+        player.OnReceivedDamage += this.OnReceivedDamage;
+    }
+
+    private void OnReceivedDamage(PlayerController player)
+    {
+        if (!player.PlayerHasActiveSynergy(Synergy.LOTUS_LAND_STORY))
+            return;
+        this.graze = _GRAZE_MAX;
+        PowerUp();
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
     {
         base.OnDroppedByPlayer(player);
         player.OnRollStarted -= this.OnDodgeRoll;
+        player.OnReceivedDamage -= this.OnReceivedDamage;
     }
 
     public override void OnDestroy()
     {
         if (this.PlayerOwner)
+        {
             this.PlayerOwner.OnRollStarted -= this.OnDodgeRoll;
+            this.PlayerOwner.OnReceivedDamage -= this.OnReceivedDamage;
+        }
         if (this._decayCoroutine != null)
         {
             StopCoroutine(this._decayCoroutine);
@@ -217,7 +230,7 @@ public class AimuHakurei : CwaffGun
         while (this.gun.CurrentStrengthTier < _GRAZE_TIER_THRESHOLDS.Count() && this.graze >= _GRAZE_TIER_THRESHOLDS[this.gun.CurrentStrengthTier])
         {
             ++this.gun.CurrentStrengthTier;
-            this.GenericOwner.gameObject.Play("aimu_power_up_sound");
+            this.GenericOwner.gameObject.PlayOnce("aimu_power_up_sound");
             this.gun.gameObject.SetGlowiness(this.gun.CurrentStrengthTier * this.gun.CurrentStrengthTier);
         }
     }
