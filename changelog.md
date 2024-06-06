@@ -2,7 +2,10 @@
 
 ## TBD
 
+- Added Widowmaker
 - Added 7 new synergies!
+- Fixed Bubble Wand being able to give Bubble Blasters to bosses
+- Fixed Bubble Wand throwing null derefs for enemies that try to predict the player's postion
 
 ## 1.13.1 (2024-06-02)
 

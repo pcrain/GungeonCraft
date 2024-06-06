@@ -969,6 +969,10 @@ public static class HeckedMode
                 continue;
             pewpew.WeaponType         = WeaponType.AIShooterProjectile;
             pewpew.OverrideBulletName = null;
+            //NOTE: the next two lines fix a null deref in FindPredictedTargetPosition()
+            pewpew.LeadChance         = 0f;
+            pewpew.LeadAmount         = 0f;
+
         }
 
         shooter.Initialize();

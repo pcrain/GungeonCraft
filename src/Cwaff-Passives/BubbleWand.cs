@@ -21,6 +21,8 @@ public class BubbleWand : CwaffPassive
         {
             if (!Lazy.AnyoneHas<BubbleWand>())
                 return;
+            if (__instance.healthHaver is not HealthHaver hh || hh.IsBoss || hh.IsSubboss)
+                return;
             if (Lazy.CoinFlip())
                 __instance.ReplaceGun(Items.BubbleBlaster);
             else if (GameManager.Instance.PrimaryPlayer.PlayerHasActiveSynergy(Synergy.DUBBLE_BUBBLE) && Lazy.CoinFlip())
