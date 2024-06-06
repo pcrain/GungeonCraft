@@ -34,12 +34,14 @@ public class CustodiansBadge : CwaffPassive
 
     private int curRoomBreakables = 0;
     private int maxRoomBreakables = 0;
-    private int chancesLeft       = _MAX_CHANCES;
+
+    public int chancesLeft       = _MAX_CHANCES;
 
     public static void Init()
     {
         PickupObject item  = Lazy.SetupPassive<CustodiansBadge>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality       = ItemQuality.D;
+        item.CanBeDropped  = false;
     }
 
     public override void Pickup(PlayerController player)
@@ -53,6 +55,7 @@ public class CustodiansBadge : CwaffPassive
         }
         base.Pickup(player);
 
+        this.chancesLeft = _MAX_CHANCES;
         string s = _MSG_JOIN + _SIGNATURE;
         CustomNoteDoer.CreateNote(player.sprite.WorldCenter, s);
     }
