@@ -20,7 +20,7 @@ public class Kevlar
             roomPath               : $"{C.MOD_INT_NAME}/Resources/Rooms/insurance.newroom",
             allowDupes             : true, // allow multiple insurance policies
             allowExcluded          : true, // insurance policies are excluded items
-            spawnChance            : 1.0f,
+            spawnChanceEachRun     : 1.0f,
             spawnPrerequisite      : CwaffPrerequisites.INSURANCE_PREREQUISITE,
             prequisiteValidator    : PlayerHasGoodItem,
             idleFps                : 2,

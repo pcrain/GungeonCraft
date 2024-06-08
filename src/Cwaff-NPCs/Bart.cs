@@ -19,6 +19,8 @@ public class Bart
 
         $"#BARTER_SHOP_SIGN".SetupDBStrings(new(){"HOW TO BARTER:\n\ndrop an item whose quality is\nat least the quality shown on\nthe item you wish to trade for."});
 
+        bool fixedSpawn = CwaffConfig._Gunfig.Value(CwaffConfig._SHOP_KEY) == "Classic";
+
         FancyShopData shop = FancyShopBuilder.MakeFancyShop(
             npcName                : "bart",
             shopItems              : shopItems,
@@ -26,11 +28,11 @@ public class Bart
             roomPath               : $"{C.MOD_INT_NAME}/Resources/Rooms/barter.newroom",
             allowDupes             : false,
             costModifier           : 1f,
-            spawnChance            : 1.0f,
+            spawnChanceEachRun     : fixedSpawn ? 1.0f : 0.33f,
             spawnPrerequisite      : CwaffPrerequisites.BARTER_SHOP_PREREQUISITE,
-            // Guaranteed spawn on 2nd or 3rd floor
-            allowedTilesets        : (int)( GlobalDungeonData.ValidTilesets.GUNGEON | GlobalDungeonData.ValidTilesets.MINEGEON ),
-            prequisiteValidator    : OnSecondOrThirdFloor,
+            // Guaranteed spawn on 2nd or 3rd floor in classic mode, any floor otherwise
+            allowedTilesets        : fixedSpawn ? ((int)( GlobalDungeonData.ValidTilesets.GUNGEON | GlobalDungeonData.ValidTilesets.MINEGEON )) : 127,
+            prequisiteValidator    : fixedSpawn ? OnSecondOrThirdFloor : null,
             idleFps                : 6,
             talkFps                : 6,
             flipTowardsPlayer      : false,

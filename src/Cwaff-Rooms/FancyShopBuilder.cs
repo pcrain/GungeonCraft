@@ -34,7 +34,7 @@ public static class FancyShopBuilder
   private static List<string> _DefaultLine = new(){"Buy somethin', will ya!"};
 
   public static FancyShopData MakeFancyShop(string npcName, List<int> shopItems, string roomPath, List<string> moddedItems = null,
-    float spawnChance = 1f, Vector2? carpetOffset = null, int? idleFps = null, int? talkFps = null, bool loopTalk = true,
+    float spawnChanceEachRun = 1f, Vector2? carpetOffset = null, int? idleFps = null, int? talkFps = null, bool loopTalk = true,
     CwaffPrerequisites spawnPrerequisite = CwaffPrerequisites.NONE, SpawnCondition prequisiteValidator = null, string voice = null,
     List<String> genericDialog = null, List<String> stopperDialog = null, List<String> purchaseDialog = null, List<String> stolenDialog = null,
     List<String> noSaleDialog = null, List<String> introDialog = null, List<String> attackedDialog = null, bool allowDupes = false, bool allowExcluded = false,
@@ -142,7 +142,7 @@ public static class FancyShopBuilder
       prerequisites        : dungeonPrerequisites,
       injectorName         : $"{npcName}'s Shop Room",
       selectionWeight      : 1,
-      chanceToSpawn        : spawnChance,
+      chanceToSpawnEachRun : spawnChanceEachRun,
       addSingularPlaceable : shop,
       XFromCenter          : 0,
       YFromCenter          : 0,
@@ -504,7 +504,7 @@ public static class FancyShopBuilder
   }
 
   public static void InjectRoomIntoUniquePool(PrototypeDungeonRoom protoroom, string injectionAnnotation, List<ProceduralFlowModifierData.FlowModifierPlacementType> placementRules, float chanceToLock, List<DungeonPrerequisite> prerequisites,
-     string injectorName, float selectionWeight = 1, float chanceToSpawn = 1, GameObject addSingularPlaceable = null, float XFromCenter = 0, float YFromCenter = 0, bool oncePerRun = false, int allowedTilesets = 127)
+     string injectorName, float selectionWeight = 1, float chanceToSpawnEachRun = 1, GameObject addSingularPlaceable = null, float XFromCenter = 0, float YFromCenter = 0, bool oncePerRun = false, int allowedTilesets = 127)
   {
       if (addSingularPlaceable != null)
       {
@@ -544,7 +544,7 @@ public static class FancyShopBuilder
       {
           annotation                             = injectionAnnotation,
           DEBUG_FORCE_SPAWN                      = false,
-          OncePerRun                             = oncePerRun,
+          OncePerRun                             = oncePerRun, // whether only one ProceduralFlowModifierData in InjectionData gets spawned on the current run
           placementRules                         = new List<ProceduralFlowModifierData.FlowModifierPlacementType>(placementRules),
           roomTable                              = null,
           exactRoom                              = protoroom,
@@ -552,7 +552,7 @@ public static class FancyShopBuilder
           RequiresMasteryToken                   = false,
           chanceToLock                           = chanceToLock,
           selectionWeight                        = selectionWeight,
-          chanceToSpawn                          = chanceToSpawn,  // chance this paricular room will spawn from the current SharedInjectionData room pool
+          chanceToSpawn                          = 1.0f,  // chance this particular room will spawn from the current SharedInjectionData room pool
           RequiredValidPlaceable                 = null,
           prerequisites                          = prerequisites.ToArray(),
           CanBeForcedSecret                      = true,
@@ -578,12 +578,10 @@ public static class FancyShopBuilder
         PreventInjectionOfFailedPrerequisites = false,
         IsNPCCell                             = false,
         IgnoreUnmetPrerequisiteEntries        = false,
-        OnlyOne                               = oncePerRun,
+        OnlyOne                               = oncePerRun,  // whether only one ProceduralFlowModifierData in InjectionData gets spawned on the current floor
         ChanceToSpawnOne                      = 1.0f /* / numValidTilesets*/,  // chance the MetaInjection will spawn this sharedInjection data on the current floor
-        AttachedInjectionData                 = new List<SharedInjectionData>(),
-        InjectionData                         = new List<ProceduralFlowModifierData> {
-            injection
-        }
+        AttachedInjectionData                 = new(),
+        InjectionData                         = new() { injection }
       };
       // Lazy.DebugLog($"  there are {numValidTilesets} valid tilesets for this shop");
 
@@ -591,7 +589,7 @@ public static class FancyShopBuilder
         injectionData                    = injector,
         MinToAppearPerRun                = oncePerRun ? 1 : numValidTilesets, // corresponds to how many floors this room will try to spawn on, not how many instances of the room will spawn on the floor
         MaxToAppearPerRun                = oncePerRun ? 1 : numValidTilesets, // if this number is lower than the number of enabled tilesets in validTilesets, everything will break
-        OverallChanceToTrigger           = 1f, // chance this particular MetaInjectionDataEntry is present in the current run at all
+        OverallChanceToTrigger           = chanceToSpawnEachRun, // chance this particular MetaInjectionDataEntry is present in the current run at all
         UsesUnlockedChanceToTrigger      = false,
         UnlockedChancesToTrigger         = new MetaInjectionUnlockedChanceEntry[0]{},
         UsesWeightedNumberToAppearPerRun = false,

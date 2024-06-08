@@ -288,7 +288,7 @@ public static class HeckedMode
 
     public readonly static int _FirstWeakGun = HeckedModeGunWhiteList.IndexOf((int)Items.MakeshiftCannon);
 
-    internal static readonly string _CONFIG_KEY = "Hecked Mode";
+    internal const string _CONFIG_KEY = "Hecked Mode";
 
     public static void Init()
     {

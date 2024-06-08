@@ -6,6 +6,10 @@
 - Added 7 new synergies!
 - Fixed Bubble Wand being able to give Bubble Blasters to bosses
 - Fixed Bubble Wand throwing null derefs for enemies that try to predict the player's postion
+- Made Custodian's Badge undroppable to avoid cheesing for infinite casing chances
+- Made Companion and Barter Shops spawn on random floors by default
+	- Added configuration option to toggle shop spawning behavior back to old "classic" version
+- Fixed misaligned sprites for Companion Shop owner
 
 ## 1.13.1 (2024-06-02)
 
@@ -33,7 +37,7 @@
 
 #### Features and Polish:
 - Added Frisbee, Maestro, and Starmageddon
-	- Maestro sprite thanks to Dallan!
+	- Maestro and Starmageddon sprites thanks to Dallan!
 
 #### Balance Changes:
 - Changed Pincushion's class from BEAM to FULLAUTO

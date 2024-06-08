@@ -74,6 +74,8 @@ public class Cammy
         //     moddedItems.Add("cg:alyx");
         // }
 
+        bool fixedSpawn = CwaffConfig._Gunfig.Value(CwaffConfig._SHOP_KEY) == "Classic";
+
         FancyShopData shop = FancyShopBuilder.MakeFancyShop(
             npcName                : "cammy",
             shopItems              : shopItems,
@@ -81,19 +83,19 @@ public class Cammy
             roomPath               : $"{C.MOD_INT_NAME}/Resources/Rooms/petshop.newroom",
             allowDupes             : false,
             costModifier           : 0.7f,
-            spawnChance            : 1.0f,
-            spawnPrerequisite      : CwaffPrerequisites.WHITE_MAGE_PREREQUISITE,
-            // Guaranteed spawn on 1st floor
-            allowedTilesets        : (int)( GlobalDungeonData.ValidTilesets.CASTLEGEON ),
-            prequisiteValidator    : CwaffPrerequisite.OnFirstFloor,
+            spawnChanceEachRun     : fixedSpawn ? 1.0f : 0.33f,
+            spawnPrerequisite      : CwaffPrerequisites.COMPANION_SHOP_PREREQUISITE,
+            // Guaranteed spawn on 1st floor in classic mode, any floor otherwise
+            allowedTilesets        : fixedSpawn ? ((int)( GlobalDungeonData.ValidTilesets.CASTLEGEON )) : 127,
+            prequisiteValidator    : fixedSpawn ? CwaffPrerequisite.OnFirstFloor : null,
             idleFps                : 6,
             talkFps                : 4,
             flipTowardsPlayer      : false,
-            // prequisiteValidator    : null,
             // talkPointOffset        : C.PIXEL_SIZE * new Vector2(7, 22),
             talkPointOffset        : C.PIXEL_SIZE * new Vector2(19, 52),
             // npcPosition            : C.PIXEL_SIZE * new Vector2(10, 60),
-            npcPosition            : C.PIXEL_SIZE * new Vector2(-3, 44),
+            // npcPosition            : C.PIXEL_SIZE * new Vector2(-3, 44),
+            npcPosition            : C.PIXEL_SIZE * new Vector2(0, 44),
             carpetOffset           : C.PIXEL_SIZE * new Vector2(-23, 0),
             itemPositions          : ShopAPI.defaultItemPositions.ShiftAll(C.PIXEL_SIZE * new Vector2(-25, 0)),
             exactlyOncePerRun      : true, //NOTE: necessary to make sure the validator doesn't have to do any heavy lifting (possibly makes validator redundant?)

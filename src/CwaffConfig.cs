@@ -4,6 +4,8 @@ public static class CwaffConfig
 {
   internal static Gunfig _Gunfig = null;
 
+  internal const string _SHOP_KEY = "Shop Spawning Behaviour";
+
   public static void Init()
   {
     _Gunfig = Gunfig.Get("GungeonCraft".WithColor(C.MOD_COLOR));
@@ -21,6 +23,19 @@ public static class CwaffConfig
         "Enemies spawn with completely random guns.\nNot for the faint of heart.\nTakes effect next run.".Green(),
         // "All enemies have strong guns and ignore stealth.\nAll bosses are jammed. All chests are fused.\nShop prices x10. Takes effect next run.".Green(),
         }
+      );
+
+    _Gunfig.AddScrollBox(
+      key     : _SHOP_KEY,
+      options : new(){
+        "Default",
+        "Classic".Yellow(),
+        },
+      info    : new(){
+        "Companion and Barter shops spawn randomly.\n\nTakes effect on game restart.".Green(),
+        "Companion shop always spawns on floor 1.\nBarter shop always spawns on floor 2/3.\nTakes effect on game restart.".Green(),
+        },
+      updateType: Gunfig.Update.OnRestart
       );
 
       // "All enemies are armed to the teeth.\nNowhere is safe.\nTakes effect next run.".Green(),
