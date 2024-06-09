@@ -201,6 +201,8 @@ public class KiBlastBehavior : MonoBehaviour
             return;
         if (this._projectile.Owner is not AIActor enemy)
             return;
+        if (player.CurrentRoom is not RoomHandler room)
+            return;
 
         ++this._numReflections;
         this.reflected = false;
@@ -223,12 +225,13 @@ public class KiBlastBehavior : MonoBehaviour
         this._projectile.gameObject.PlayUnique("ki_blast_return_sound");
         int enemiesToCheck = 10;
         while ((!enemy || !enemy.healthHaver || enemy.healthHaver.currentHealth <= 0) && --enemiesToCheck >= 0)
-            enemy = enemy.GetAbsoluteParentRoom().GetRandomActiveEnemy(false);
+            enemy = room.GetRandomActiveEnemy(false);
+        float angle = enemy ? (enemy.CenterPosition - player.CenterPosition).ToAngle() : Lazy.RandomAngle();
         SlashDoer.DoSwordSlash(
-            player.CenterPosition,
-            (enemy.CenterPosition - player.CenterPosition).ToAngle(),
-            this._projectile.Owner,
-            _BasicSlashData);
+            position        : player.CenterPosition,
+            angle           : angle,
+            owner           : this._projectile.Owner,
+            slashParameters : _BasicSlashData);
     }
 
     private void Update()
