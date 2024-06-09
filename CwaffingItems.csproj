@@ -40,6 +40,7 @@
   <ItemGroup>
     <None Include="packages.config"/>
     <Reference Include="System"/>
+    <Compile Include="src\Cwaff-Passives\Calculator.cs"/>
     <Compile Include="src\Cwaff-Passives\StuntHelmet.cs"/>
     <Compile Include="src\Cwaff-Passives\CustodiansBadge.cs"/>
     <Compile Include="src\Cwaff-Passives\Unfinished\Superstitious.cs"/>

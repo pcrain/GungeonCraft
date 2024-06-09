@@ -2,7 +2,7 @@
 
 ## TBD
 
-- Added Widowmaker and MM: Aiming
+- Added Widowmaker, MM: Aiming, and Calculator
 - Added 7 new synergies!
 - Added masteries for Hand Cannon, Schrodinger's Gat, Hatchling Gun, Crapshooter, and Holy Water Gun
 - Fixed Bubble Wand being able to give Bubble Blasters to bosses

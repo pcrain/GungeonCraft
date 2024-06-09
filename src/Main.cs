@@ -320,6 +320,7 @@ public class Initialisation : BaseUnityPlugin
                 ArmorPiercingRounds.Init();
                 MMReloading.Init();
                 MMAiming.Init();
+                Calculator.Init();
 
                 setupPassivesWatch.Stop();
             #endregion
