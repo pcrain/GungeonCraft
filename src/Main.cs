@@ -319,6 +319,7 @@ public class Initialisation : BaseUnityPlugin
                 ScavengingArms.Init();
                 ArmorPiercingRounds.Init();
                 MMReloading.Init();
+                MMAiming.Init();
 
                 setupPassivesWatch.Stop();
             #endregion
