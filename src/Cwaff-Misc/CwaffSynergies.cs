@@ -56,14 +56,16 @@ public static class CwaffSynergies
         NewMastery<MasteryOfPlatinumStar>(MASTERY_PLATINUM_STAR, PlatinumStar.ItemName);
         // Movement penalty is removed.
         NewMastery<MasteryOfNatascha>(MASTERY_NATASCHA, Natascha.ItemName);
-        // Spawns two hands that clap enemies, dealing double damage and stunning them for 10 seconds
+        // Spawns two hands that clap enemies, dealing double damage and stunning them for 10 seconds.
         NewMastery<MasteryOfHandCannon>(MASTERY_HAND_CANNON, HandCannon.ItemName);
-        // Projectiles immediately observe enemies, effectively giving a 50% chance to instantly kill and enemy and remove all their projectiles
+        // Projectiles immediately observe enemies, effectively giving a 50% chance to instantly kill and enemy and remove all their projectiles.
         NewMastery<MasteryOfSchrodingersGat>(MASTERY_SCHRODINGERS_GAT, SchrodingersGat.ItemName);
-        // Chicks spawn jammed and deal contact damage to enemies
+        // Chicks spawn jammed and deal contact damage to enemies.
         NewMastery<MasteryOfHatchlingGun>(MASTERY_HATCHLING_GUN, HatchlingGun.ItemName);
-        // Die face no longer resets to 1 when firing, allowing you to hold fire on whatever face you want
+        // Die face no longer resets to 1 when firing, allowing you to hold fire on whatever face you want.
         NewMastery<MasteryOfCrapshooter>(MASTERY_CRAPSHOOTER, Crapshooter.ItemName);
+        // Holy Water Gun deals 16x damage to Jammed enemies. Killing Jammed enemies creates pools of holy goop that give infinite ammo while active.
+        NewMastery<MasteryOfHolyWaterGun>(MASTERY_HOLY_WATER_GUN, HolyWaterGun.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -261,6 +263,7 @@ internal class MasteryOfHandCannon : MasteryDummyItem {}
 internal class MasteryOfSchrodingersGat : MasteryDummyItem {}
 internal class MasteryOfHatchlingGun : MasteryDummyItem {}
 internal class MasteryOfCrapshooter : MasteryDummyItem {}
+internal class MasteryOfHolyWaterGun : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -286,4 +289,5 @@ public enum Synergy {
     MASTERY_SCHRODINGERS_GAT,
     MASTERY_HATCHLING_GUN,
     MASTERY_CRAPSHOOTER,
+    MASTERY_HOLY_WATER_GUN,
 };

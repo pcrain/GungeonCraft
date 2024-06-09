@@ -1098,6 +1098,7 @@ public static class EasyGoopDefinitions  // mostly stolen from NN
     //Cwaff Goops
     public static GoopDefinition SeltzerGoop;
     public static GoopDefinition CoffeeGoop;
+    public static GoopDefinition HolyGoop;
 
     public static List<GoopDefinition> ColorGoops = new List<GoopDefinition>();
     public static List<Color> ColorGoopColors     = new List<Color>
@@ -1172,7 +1173,7 @@ public static class EasyGoopDefinitions  // mostly stolen from NN
             SeltzerGoop.ambientGoopFXChance = 0.004f;
             SeltzerGoop.ambientGoopFX = VFX.CreatePool("seltzer_sparkles", fps: 10, loops: false, scale: 0.5f, anchor: Anchor.MiddleCenter);
 
-        //Set up Overdose goop
+        //Set up Macchi Auto goop
         CoffeeGoop = UnityEngine.Object.Instantiate<GoopDefinition>(WaterGoop);
             CoffeeGoop.baseColor32                      = MacchiAuto._OverdoseTint;
             CoffeeGoop.CanBeElectrified                 = false;
@@ -1190,6 +1191,28 @@ public static class EasyGoopDefinitions  // mostly stolen from NN
                 SpeedMultiplier              = 1.5f,
                 CooldownMultiplier           = 1f,
                 OnlyAffectPlayerWhenGrounded = true,
+            };
+
+        //Set up Holy Water Gun mastery goop
+        HolyGoop = UnityEngine.Object.Instantiate<GoopDefinition>(CharmGoopDef);
+            HolyGoop.CanBeElectrified = true;
+            HolyGoop.usesAmbientGoopFX = true;
+            HolyGoop.ambientGoopFXChance = 0.004f;
+            HolyGoop.ambientGoopFX = VFX.CreatePool("seltzer_sparkles", fps: 10, loops: false, scale: 0.5f, anchor: Anchor.MiddleCenter);
+            HolyGoop.AppliesSpeedModifierContinuously = true;
+            HolyGoop.eternal = true;
+            HolyGoop.AppliesCharm = false;
+            HolyGoop.lifespan = 20f;
+            HolyGoop.SpeedModifierEffect = new GameActorHolyGoopEffect(){
+                AffectsPlayers               = true,
+                AffectsEnemies               = false,
+                effectIdentifier             = "coffee goop",
+                stackMode                    = GameActorEffect.EffectStackingMode.Refresh,
+                duration                     = 0.25f,
+                maxStackedDuration           = 0.25f,
+                SpeedMultiplier              = 1f, //NOTE: use a 1.0 speed multiplier since this isn't a true speed effect
+                CooldownMultiplier           = 1f,
+                OnlyAffectPlayerWhenGrounded = false,
             };
     }
 }

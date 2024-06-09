@@ -4,7 +4,7 @@
 
 - Added Widowmaker
 - Added 7 new synergies!
-- Added masteries for Hand Cannon, Schrodinger's Gat, Hatchling Gun, and Crapshooter
+- Added masteries for Hand Cannon, Schrodinger's Gat, Hatchling Gun, Crapshooter, and Holy Water Gun
 - Fixed Bubble Wand being able to give Bubble Blasters to bosses
 - Fixed Bubble Wand throwing null derefs for enemies that try to predict the player's postion
 - Made Custodian's Badge undroppable to avoid cheesing for infinite casing chances

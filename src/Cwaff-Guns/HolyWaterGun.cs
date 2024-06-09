@@ -8,6 +8,7 @@ public class HolyWaterGun : CwaffGun
     public static string Lore             = "Rumored to have been used in exorcisms by the High Priest back while he was still the Low Priest. While the exact composition of the holy water is unknown, scientists have been able to reasonably ascertain the fluid contains koi pond water, primer, rat saliva, and moonshine. In any case, it has proven extremely effective at exorcising the Jammed and nauseating everyone else.";
 
     internal const float _JAMMED_DAMAGE_MULT = 4f;
+    internal const float _MASTERY_JAMMED_DAMAGE_MULT = 16f;
 
     internal static Dictionary<string, Texture2D> _GhostTextures = new();
     internal static GameObject _ExorcismParticleVFX = null;
@@ -58,12 +59,19 @@ public class HolyWaterGun : CwaffGun
 
 public class ExorcismJuice : MonoBehaviour
 {
+    private const float _HOLY_GOOP_RADIUS = 5f;
+
     private Projectile _projectile;
     private PlayerController _owner;
+    private bool _mastered = false;
     private void Start()
     {
         this._projectile = base.GetComponent<Projectile>();
         this._owner = this._projectile.Owner as PlayerController;
+
+        this._mastered = this._owner && this._owner.PlayerHasActiveSynergy(Synergy.MASTERY_HOLY_WATER_GUN);
+        if (this._mastered)
+            this._projectile.BlackPhantomDamageMultiplier = HolyWaterGun._MASTERY_JAMMED_DAMAGE_MULT;
 
         this._projectile.OnHitEnemy += ExorciseTheJammed;
     }
@@ -108,6 +116,13 @@ public class ExorcismJuice : MonoBehaviour
             sprite.transform.rotation = enemy.sprite.transform.rotation;
             sprite.PlaceAtRotatedPositionByAnchor(pos, Anchor.MiddleCenter);
         g.AddComponent<GhostlyDeath>().Setup(beam.Direction);
+
+        if (this._mastered)
+        {
+            pc.gameObject.Play("holy_sound");
+            if (DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.HolyGoop) is DeadlyDeadlyGoopManager holyGooper)
+                holyGooper.AddGoopCircle(pos, _HOLY_GOOP_RADIUS);
+        }
     }
 }
 
@@ -194,5 +209,33 @@ public class GhostlyDeath : MonoBehaviour
         }
         this._sprite.transform.position += this._velocity;
         this._sprite.renderer.SetAlpha(1f - (this._lifetime / _FADE_TIME));
+    }
+}
+
+public class GameActorHolyGoopEffect : GameActorSpeedEffect
+{
+    private static StatModifier[] _CaffeineGoopBuffs = null;
+
+    public override void OnEffectApplied(GameActor actor, RuntimeGameActorEffectData effectData, float partialAmount = 1f)
+    {
+        base.OnEffectApplied(actor, effectData, partialAmount);
+        if (actor is not PlayerController player)
+            return;
+        player.InfiniteAmmo.AddOverride("Holy Goop");
+        Material[] array = player.SetOverrideShader(ShaderCache.Acquire("Brave/Internal/RainbowChestShader"));
+        for (int i = 0; i < array.Length; i++)
+            if (array[i] != null)
+                array[i].SetFloat("_AllColorsToggle", 1f);
+        player.healthHaver.IsVulnerable = false;
+    }
+
+    public override void OnEffectRemoved(GameActor actor, RuntimeGameActorEffectData effectData)
+    {
+        base.OnEffectRemoved(actor, effectData);
+        if (actor is not PlayerController player)
+            return;
+        player.InfiniteAmmo.RemoveOverride("Holy Goop");
+        player.ClearOverrideShader();
+        player.healthHaver.IsVulnerable = true;
     }
 }
