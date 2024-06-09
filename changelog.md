@@ -21,6 +21,7 @@
 	- Now uses Ki as ammo, which recovers over time while the player is not shooting
 	- Reflected projectiles now have yellow trails so they look less like enemy bullets
 	- Clarified in description that projectiles can break boss DPS caps (this was always true, but never mentioned)
+- Reduced volume on Magunet's attract sound
 
 ## 1.13.1 (2024-06-02)
 
