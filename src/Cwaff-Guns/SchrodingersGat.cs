@@ -72,10 +72,17 @@ public class SchrodingersGatProjectile : MonoBehaviour
     private void Start()
     {
         base.GetComponent<Projectile>().specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
-        base.GetComponent<Projectile>().OnHitEnemy += (Projectile p, SpeculativeRigidbody enemy, bool _) => {
-            if (enemy.GetComponent<AIActor>()?.IsHostileAndNotABoss() ?? false)
-                enemy.aiActor.gameObject.GetOrAddComponent<SchrodingersStat>();
-        };
+        base.GetComponent<Projectile>().OnHitEnemy += this.OnHitEnemy;
+    }
+
+    private void OnHitEnemy(Projectile p, SpeculativeRigidbody body, bool _)
+    {
+        if (body.GetComponent<AIActor>() is AIActor enemy && enemy.IsHostileAndNotABoss() && !enemy.gameObject.GetComponent<SchrodingersStat>())
+        {
+            SchrodingersStat ss = enemy.gameObject.AddComponent<SchrodingersStat>();
+            if (p.Owner is PlayerController pc && pc.PlayerHasActiveSynergy(Synergy.MASTERY_SCHRODINGERS_GAT))
+                ss.Observe();
+        }
     }
 
     private void OnPreCollision(SpeculativeRigidbody me, PixelCollider myPixelCollider, SpeculativeRigidbody other, PixelCollider otherPixelCollider)
@@ -91,8 +98,8 @@ public class SchrodingersStat : MonoBehaviour
 {
     private const float _FLICKER_SPEED = 0.05f;
 
+    private bool _observed = false;
     private bool _actuallyDead;
-    private bool _observed;
     private bool _doneUpdating;
     private bool _enemyVisible;
     private AIActor _enemy;
@@ -103,14 +110,18 @@ public class SchrodingersStat : MonoBehaviour
     private void Start()
     {
         this._enemy                        = base.GetComponent<AIActor>();
-        this._observed                     = false;
         this._doneUpdating                 = false;
         this._enemyVisible                 = true;
         this._actuallyDead                 = Lazy.CoinFlip();
-        this._enemy.healthHaver.OnDamaged += this.OnDamaged;
         this._renderer                     = this._enemy.GetComponent<Renderer>();
         this._flickerTimer                 = 0.0f;
-        this._flickerCR                    = StartCoroutine(Quantum());
+
+        if (this._observed)
+        {
+            Observe();
+            base.gameObject.Play("schrodinger_bullet_hit");
+            return;
+        }
 
         if (this._actuallyDead)
         {
@@ -119,7 +130,36 @@ public class SchrodingersStat : MonoBehaviour
                 SchrodingersGat.CheckFromQuantumEnemyOwner(p);
         }
 
+        this._enemy.healthHaver.OnDamaged += this.OnDamaged;
+        this._flickerCR = StartCoroutine(Quantum());
         base.gameObject.Play("schrodinger_bullet_hit");
+    }
+
+    public void Observe()
+    {
+        this._observed = true;
+        this._enemy.healthHaver.OnDamaged -= this.OnDamaged;
+        if (!this._actuallyDead)
+            return;
+
+        this._enemy.DeregisterOverrideColor(SchrodingersGat.ItemName);
+        for (int i = StaticReferenceManager.AllProjectiles.Count - 1; i >=0; --i)
+        {
+            Projectile p = StaticReferenceManager.AllProjectiles[i];
+            if (!p || !p.sprite || p.Owner != this._enemy)
+                continue;
+            FancyVFX fv = FancyVFX.FromCurrentFrame(p.sprite);
+                fv.Setup(Vector2.zero, 1.0f, 1.0f);
+                fv.StartCoroutine(PhaseOut(fv, Vector2.right, 25f, 90f));
+            p.DieInAir();
+        }
+
+        FancyVFX fe = FancyVFX.FromCurrentFrame(this._enemy.sprite);
+            fe.Setup(Vector2.zero, 1.0f, 1.0f);
+            fe.StartCoroutine(PhaseOut(fe, Vector2.right, 25f, 90f));
+
+        base.gameObject.Play("schrodinger_dead_sound");
+        this._enemy.EraseFromExistenceWithRewards(false);
     }
 
     private void OnPreCollision(SpeculativeRigidbody me, PixelCollider myPixelCollider, SpeculativeRigidbody other, PixelCollider otherPixelCollider)
@@ -174,32 +214,8 @@ public class SchrodingersStat : MonoBehaviour
 
     private void OnDamaged(float resultValue, float maxValue, CoreDamageTypes damageTypes, DamageCategory damageCategory, Vector2 damageDirection)
     {
-        if (!this._enemy)
-            return;
-
-        this._observed = true;
-        this._enemy.healthHaver.OnDamaged -= this.OnDamaged;
-        if (!this._actuallyDead)
-            return;
-
-        this._enemy.DeregisterOverrideColor(SchrodingersGat.ItemName);
-        for (int i = StaticReferenceManager.AllProjectiles.Count - 1; i >=0; --i)
-        {
-            Projectile p = StaticReferenceManager.AllProjectiles[i];
-            if (!p || !p.sprite || p.Owner != this._enemy)
-                continue;
-            FancyVFX fv = FancyVFX.FromCurrentFrame(p.sprite);
-                fv.Setup(Vector2.zero, 1.0f, 1.0f);
-                fv.StartCoroutine(PhaseOut(fv, Vector2.right, 25f, 90f));
-            p.DieInAir();
-        }
-
-        FancyVFX fe = FancyVFX.FromCurrentFrame(this._enemy.sprite);
-            fe.Setup(Vector2.zero, 1.0f, 1.0f);
-            fe.StartCoroutine(PhaseOut(fe, Vector2.right, 25f, 90f));
-
-        base.gameObject.Play("schrodinger_dead_sound");
-        this._enemy.EraseFromExistenceWithRewards(false);
+        if (this._enemy)
+            Observe();
     }
 
     private static IEnumerator PhaseOut(FancyVFX fe, Vector2 direction, float amplitude, float frequency)

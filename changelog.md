@@ -4,7 +4,7 @@
 
 - Added Widowmaker
 - Added 7 new synergies!
-- Added mastery for Hand Cannon
+- Added masteries for Hand Cannon and Schrodinger's Gat
 - Fixed Bubble Wand being able to give Bubble Blasters to bosses
 - Fixed Bubble Wand throwing null derefs for enemies that try to predict the player's postion
 - Made Custodian's Badge undroppable to avoid cheesing for infinite casing chances

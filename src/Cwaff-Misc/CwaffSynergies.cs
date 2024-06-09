@@ -58,6 +58,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfNatascha>(MASTERY_NATASCHA, Natascha.ItemName);
         // Spawns two hands that clap enemies, dealing double damage and stunning them for 10 seconds
         NewMastery<MasteryOfHandCannon>(MASTERY_HAND_CANNON, HandCannon.ItemName);
+        // Projectiles immediately observe enemies, effectively giving a 50% chance to instantly kill and enemy and remove all their projectiles
+        NewMastery<MasteryOfSchrodingersGat>(MASTERY_SCHRODINGERS_GAT, SchrodingersGat.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -253,6 +255,7 @@ internal class MasteryOfPincushion : MasteryDummyItem {}
 internal class MasteryOfPlatinumStar : MasteryDummyItem {}
 internal class MasteryOfNatascha : MasteryDummyItem {}
 internal class MasteryOfHandCannon : MasteryDummyItem {}
+internal class MasteryOfSchrodingersGat : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -275,4 +278,5 @@ public enum Synergy {
     MASTERY_PLATINUM_STAR,
     MASTERY_NATASCHA,
     MASTERY_HAND_CANNON,
+    MASTERY_SCHRODINGERS_GAT,
 };
