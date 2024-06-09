@@ -1826,7 +1826,7 @@ public static class Extensions
       anim.AnimationEventTriggered += action;
       tk2dSpriteAnimationFrame f = anim.DefaultClip.frames[frame];
         f.triggerEvent = true;
-        f.eventAudio   = "slappp_sound";
+        f.eventAudio   = sound;
   }
 
   /// <summary>Increases a player's curse</summary>

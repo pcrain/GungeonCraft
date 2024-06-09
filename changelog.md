@@ -4,11 +4,12 @@
 
 - Added Widowmaker
 - Added 7 new synergies!
+- Added mastery for Hand Cannon
 - Fixed Bubble Wand being able to give Bubble Blasters to bosses
 - Fixed Bubble Wand throwing null derefs for enemies that try to predict the player's postion
 - Made Custodian's Badge undroppable to avoid cheesing for infinite casing chances
 - Made Companion and Barter Shops spawn on random floors by default
-	- Added configuration option to toggle shop spawning behavior back to old "classic" version
+	- Added configuration option to toggle "classic" guaranteed shop spawns
 - Fixed misaligned sprites for Companion Shop owner
 
 ## 1.13.1 (2024-06-02)

@@ -56,6 +56,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfPlatinumStar>(MASTERY_PLATINUM_STAR, PlatinumStar.ItemName);
         // Movement penalty is removed.
         NewMastery<MasteryOfNatascha>(MASTERY_NATASCHA, Natascha.ItemName);
+        // Spawns two hands that clap enemies, dealing double damage and stunning them for 10 seconds
+        NewMastery<MasteryOfHandCannon>(MASTERY_HAND_CANNON, HandCannon.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -250,6 +252,7 @@ internal class MasteryOfChekhovsGun : MasteryDummyItem {}
 internal class MasteryOfPincushion : MasteryDummyItem {}
 internal class MasteryOfPlatinumStar : MasteryDummyItem {}
 internal class MasteryOfNatascha : MasteryDummyItem {}
+internal class MasteryOfHandCannon : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -271,4 +274,5 @@ public enum Synergy {
     MASTERY_PINCUSHION,
     MASTERY_PLATINUM_STAR,
     MASTERY_NATASCHA,
+    MASTERY_HAND_CANNON,
 };

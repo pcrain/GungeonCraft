@@ -35,6 +35,7 @@ public class SlappProjectile : MonoBehaviour
     private const int   _SLAPPP_FRAME         = 8;   // frame 8 is the meat of the slappp animation
     private const float _SLAPPP_FORCE         = 300f;
     private const float _SLAPPP_STUN          = 2f;
+    private const float _CLAPPP_STUN          = 10f;
     private const float _SLAPP_RADIUS_SQUARED = 9f;
 
     private Projectile _projectile = null;
@@ -43,12 +44,17 @@ public class SlappProjectile : MonoBehaviour
     private bool       _flipped    = false;
     private float      _slapDamage = 0f;
     private FancyVFX   _vfx        = null;
+    private bool       _isMastered = false;
 
     private void Start()
     {
         this._projectile = base.GetComponent<Projectile>();
-        this._flipped    = this._projectile.Owner ? this._projectile.Owner.sprite.FlipX : false;
-        this._slapDamage = this._projectile.baseData.damage;
+        if (this._projectile.Owner is not PlayerController player)
+            return;
+
+        this._flipped    = player.sprite.FlipX;
+        this._isMastered = player.PlayerHasActiveSynergy(Synergy.MASTERY_HAND_CANNON);
+        this._slapDamage = this._projectile.baseData.damage * (this._isMastered ? 2f : 1f);
         this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
     }
 
@@ -68,7 +74,18 @@ public class SlappProjectile : MonoBehaviour
             fadeOutTime : 0.20f,
             parent      : enemy.sprite.transform);
         this._vfx.sprite.FlipY = this._flipped; //smack in the opposite direction by flipping vertically, not horizontally
-        this._vfx.gameObject.AddAnimationEvent(SlapppEvent, _SLAPPP_FRAME, "slappp_sound");
+        this._vfx.gameObject.AddAnimationEvent(SlapppEvent, _SLAPPP_FRAME, this._isMastered ? "clappp_sound" : "slappp_sound");
+        if (this._isMastered)
+        {
+            FancyVFX otherHand = FancyVFX.SpawnUnpooled(
+                prefab      : HandCannon._SlapppAnimation,
+                position    : this._projectile.sprite.transform.position,
+                rotation    : this._projectile.sprite.transform.rotation,
+                lifetime    : 0.5f,
+                fadeOutTime : 0.20f,
+                parent      : enemy.sprite.transform);
+            otherHand.sprite.FlipY = !this._flipped;
+        }
         this._projectile.DieInAir(suppressInAirEffects: true, allowActorSpawns: false, allowProjectileSpawns: false, killedEarly: false);
     }
 
@@ -89,10 +106,10 @@ public class SlappProjectile : MonoBehaviour
                 continue;
 
             hh.ApplyDamage(this._slapDamage, Vector2.zero, "SLAPPP", CoreDamageTypes.None, DamageCategory.Collision, true);
-            if (!hh.IsBoss && !hh.IsSubboss && enemy.knockbackDoer is KnockbackDoer kb)
+            if (!this._isMastered && !hh.IsBoss && !hh.IsSubboss && enemy.knockbackDoer is KnockbackDoer kb)
                 kb.ApplyKnockback(this._slapAngle, _SLAPPP_FORCE);
             if (enemy.behaviorSpeculator && !enemy.behaviorSpeculator.ImmuneToStun)
-                enemy.behaviorSpeculator.Stun(_SLAPPP_STUN);
+                enemy.behaviorSpeculator.Stun(this._isMastered ? _CLAPPP_STUN : _SLAPPP_STUN);
         }
         UnityEngine.Object.Destroy(this);
     }
