@@ -12,7 +12,8 @@
 	- Added configuration option to toggle "classic" guaranteed shop spawns
 - Fixed misaligned sprites for Companion Shop owner
 - Chicks spawned by Hatchling Gun no longer vanish immediately when colliding with enemies at specific angles
-- Fixed null deref in ReturnFromPlayer() in Ki Blast
+- Fixed null deref in Ki Blast caused by trying to redirect projectiles to nonexistent enemies
+- Fixed null deref in Subtractor Beam caused by trying to get the room of nonexistent owners
 
 ## 1.13.1 (2024-06-02)
 

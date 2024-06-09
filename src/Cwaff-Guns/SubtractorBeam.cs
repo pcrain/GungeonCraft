@@ -83,7 +83,7 @@ public class SubtractorBeam : CwaffGun
     private void YouShallKnowTheirNames()
     {
         UpdateNametags(true);
-        if (!this.GenericOwner || this.GenericOwner.GetAbsoluteParentRoom() is not RoomHandler room)
+        if (!this.PlayerOwner || this.PlayerOwner.CurrentRoom is not RoomHandler room)
             return;
 
         foreach (AIActor enemy in room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All).EmptyIfNull())
