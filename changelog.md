@@ -4,13 +4,14 @@
 
 - Added Widowmaker
 - Added 7 new synergies!
-- Added masteries for Hand Cannon, Schrodinger's Gat, and Hatchling Gun
+- Added masteries for Hand Cannon, Schrodinger's Gat, Hatchling Gun, and Crapshooter
 - Fixed Bubble Wand being able to give Bubble Blasters to bosses
 - Fixed Bubble Wand throwing null derefs for enemies that try to predict the player's postion
 - Made Custodian's Badge undroppable to avoid cheesing for infinite casing chances
 - Made Companion and Barter Shops spawn on random floors by default
 	- Added configuration option to toggle "classic" guaranteed shop spawns
 - Fixed misaligned sprites for Companion Shop owner
+- Chicks spawned by Hatchling Gun no longer vanish immediately when colliding with enemies at specific angles
 
 ## 1.13.1 (2024-06-02)
 

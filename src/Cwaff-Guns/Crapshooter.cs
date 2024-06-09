@@ -17,6 +17,7 @@ public class Crapshooter : CwaffGun
     };
 
     private int _nextRoll = 0; // 1 lower than the die face value
+    private float _freezeTimer = 0.0f;
 
     public static void Add()
     {
@@ -45,6 +46,10 @@ public class Crapshooter : CwaffGun
     public override void PostProcessProjectile(Projectile projectile)
     {
         base.PostProcessProjectile(projectile);
+
+        if (this.PlayerOwner && this.PlayerOwner.PlayerHasActiveSynergy(Synergy.MASTERY_CRAPSHOOTER))
+            this._freezeTimer = 0.25f; //NOTE: needs to be long enough that idle animation doesn't play in between shots
+
         base.gameObject.Play(_DiceSounds.ChooseRandom());
         projectile.SetFrame(this._nextRoll);
         projectile.DestroyMode = Projectile.ProjectileDestroyMode.BecomeDebris;
@@ -100,11 +105,14 @@ public class Crapshooter : CwaffGun
 
     private void LateUpdate()
     {
+        this.gun.RenderInFrontOfPlayer();
+        if ((this._freezeTimer -= BraveTime.DeltaTime) > 0.0f)
+            return;
+
         if (this.gun.spriteAnimator.currentClip.name == this.gun.idleAnimation)
             this._nextRoll = this.gun.spriteAnimator.CurrentFrame;
         else
             this._nextRoll = 0;
-        this.gun.RenderInFrontOfPlayer();
     }
 }
 

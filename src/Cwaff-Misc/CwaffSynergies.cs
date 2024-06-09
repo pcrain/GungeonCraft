@@ -62,6 +62,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfSchrodingersGat>(MASTERY_SCHRODINGERS_GAT, SchrodingersGat.ItemName);
         // Chicks spawn jammed and deal contact damage to enemies
         NewMastery<MasteryOfHatchlingGun>(MASTERY_HATCHLING_GUN, HatchlingGun.ItemName);
+        // Die face no longer resets to 1 when firing, allowing you to hold fire on whatever face you want
+        NewMastery<MasteryOfCrapshooter>(MASTERY_CRAPSHOOTER, Crapshooter.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -258,6 +260,7 @@ internal class MasteryOfNatascha : MasteryDummyItem {}
 internal class MasteryOfHandCannon : MasteryDummyItem {}
 internal class MasteryOfSchrodingersGat : MasteryDummyItem {}
 internal class MasteryOfHatchlingGun : MasteryDummyItem {}
+internal class MasteryOfCrapshooter : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -281,5 +284,6 @@ public enum Synergy {
     MASTERY_NATASCHA,
     MASTERY_HAND_CANNON,
     MASTERY_SCHRODINGERS_GAT,
-    MASTERY_HATCHLING_GUN
+    MASTERY_HATCHLING_GUN,
+    MASTERY_CRAPSHOOTER,
 };
