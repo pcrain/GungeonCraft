@@ -253,17 +253,17 @@ public static class CwaffSynergies
 }
 
 // Dummy classes for masteries
-public class MasteryDummyItem : FakeItem { }
-internal class MasteryOfGrandmaster : MasteryDummyItem {}
-internal class MasteryOfChekhovsGun : MasteryDummyItem {}
-internal class MasteryOfPincushion : MasteryDummyItem {}
-internal class MasteryOfPlatinumStar : MasteryDummyItem {}
-internal class MasteryOfNatascha : MasteryDummyItem {}
-internal class MasteryOfHandCannon : MasteryDummyItem {}
+public   class MasteryDummyItem         : FakeItem { }
+internal class MasteryOfGrandmaster     : MasteryDummyItem {}
+internal class MasteryOfChekhovsGun     : MasteryDummyItem {}
+internal class MasteryOfPincushion      : MasteryDummyItem {}
+internal class MasteryOfPlatinumStar    : MasteryDummyItem {}
+internal class MasteryOfNatascha        : MasteryDummyItem {}
+internal class MasteryOfHandCannon      : MasteryDummyItem {}
 internal class MasteryOfSchrodingersGat : MasteryDummyItem {}
-internal class MasteryOfHatchlingGun : MasteryDummyItem {}
-internal class MasteryOfCrapshooter : MasteryDummyItem {}
-internal class MasteryOfHolyWaterGun : MasteryDummyItem {}
+internal class MasteryOfHatchlingGun    : MasteryDummyItem {}
+internal class MasteryOfCrapshooter     : MasteryDummyItem {}
+internal class MasteryOfHolyWaterGun    : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies

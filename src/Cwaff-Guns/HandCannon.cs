@@ -11,6 +11,7 @@ public class HandCannon : CwaffGun
     private const float _CHARGE_LOOP_FRAME = 11f;
 
     internal static GameObject _SlapppAnimation;
+    internal static GameObject _ClapppShockwave;
 
     public static void Add()
     {
@@ -27,6 +28,8 @@ public class HandCannon : CwaffGun
           chargeTime: _CHARGE_TIME)).Attach<SlappProjectile>();
 
         _SlapppAnimation = VFX.Create("slappp_vfx", fps: 30, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f);
+
+        _ClapppShockwave = Items.ChargeShot.AsGun().muzzleFlashEffects.effects[0].effects[0].effect;
     }
 }
 
@@ -65,7 +68,9 @@ public class SlappProjectile : MonoBehaviour
 
         PhysicsEngine.SkipCollision = true;
         this._slapVictim = enemy;
-        this._slapAngle = this._projectile.Direction.Rotate(this._flipped ? -90f : 90f);
+        this._slapAngle = this._isMastered
+            ? this._projectile.Direction
+            : this._projectile.Direction.Rotate(this._flipped ? -90f : 90f);
         this._vfx = FancyVFX.SpawnUnpooled( //NOTE: absolutely MUST ignore pools or VFX objects with preexisting FancyVFX components might get reused
             prefab      : HandCannon._SlapppAnimation,
             position    : this._projectile.sprite.transform.position,
@@ -106,10 +111,15 @@ public class SlappProjectile : MonoBehaviour
                 continue;
 
             hh.ApplyDamage(this._slapDamage, Vector2.zero, "SLAPPP", CoreDamageTypes.None, DamageCategory.Collision, true);
-            if (!this._isMastered && !hh.IsBoss && !hh.IsSubboss && enemy.knockbackDoer is KnockbackDoer kb)
+            if (!hh.IsBoss && !hh.IsSubboss && enemy.knockbackDoer is KnockbackDoer kb)
                 kb.ApplyKnockback(this._slapAngle, _SLAPPP_FORCE);
             if (enemy.behaviorSpeculator && !enemy.behaviorSpeculator.ImmuneToStun)
                 enemy.behaviorSpeculator.Stun(this._isMastered ? _CLAPPP_STUN : _SLAPPP_STUN);
+            GameObject go = SpawnManager.SpawnVFX(HandCannon._ClapppShockwave, victimPos, Quaternion.identity, ignoresPools: true);
+            tk2dSprite sprite = go.GetComponent<tk2dSprite>();
+            if (this._isMastered)
+                sprite.scale = new Vector3(3f, 3f, 1f);
+            sprite.PlaceAtScaledPositionByAnchor(this._vfx.sprite.WorldCenter, Anchor.MiddleCenter);
         }
         UnityEngine.Object.Destroy(this);
     }
