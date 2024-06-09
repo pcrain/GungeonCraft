@@ -4,22 +4,28 @@ public class KiBlast : CwaffGun
 {
     public static string ItemName         = "Ki Blast";
     public static string ShortDescription = "Dragunball Z";
-    public static string LongDescription  = "Fires alternating ki blasts that may be reflected by sufficiently strong enemies. Reloading reflects the nearest ki blast back at the enemy, amplifying the damage after every successive reflect.";
+    public static string LongDescription  = "Fires alternating ki blasts that may be reflected by sufficiently strong enemies. Reloading reflects the nearest ki blast back at the enemy, amplifying the damage after every successive reflect. Reflected projectiles are not affected by DPS caps.";
     public static string Lore             = "Harnessing one's ki is an art form that has been taught for millennia, yet mastered by exceptionally few. Among the already small number of those able to effectively harness ki, even fewer have successfully weaponized it, and among them, only one has brought that power to the Gungeon. That Gungeoneer unfortunately got absolutely incinerated by a flamethrower they didn't see jutting out of the wall, but to this very day, the ki they released upon their untimely demise occasionally manifests itself as a weapon for others passing through the Gungeon.";
 
     internal static string _FireLeftAnim;
     internal static string _FireRightAnim;
 
-    private static float _KiReflectRange = 3.0f;
+    private const float _KI_REFLECT_RANGE = 3.0f;
+    private const float _KI_REFLECT_RANGE_SQR = _KI_REFLECT_RANGE * _KI_REFLECT_RANGE;
+    private const float _MAX_RECHARGE_TIME = 0.5f;
+    private const float _MIN_RECHARGE_TIME = 0.05f;
+    private const float _RECHARGE_DECAY = 0.9f;
 
     private Vector2 _currentTarget = Vector2.zero;
 
     public float nextKiBlastSign = 1;  //1 to deviate right, -1 to deviate left
+    private float _rechargeTimer = 0.0f;
+    private float _nextRecharge = 0.0f;
 
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<KiBlast>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 999, infiniteAmmo: true, idleFps: 10,
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 20, canGainAmmo: false, idleFps: 10,
                 fireAudio: "ki_blast_sound", muzzleVFX: "muzzle_ki_blast", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleLeft);
             _FireLeftAnim  = gun.shootAnimation;
             _FireRightAnim = gun.QuickUpdateGunAnimation("fire_alt", returnToIdle: true);
@@ -41,12 +47,16 @@ public class KiBlast : CwaffGun
           }).Attach<ArcTowardsTargetBehavior>(
           ).Attach<KiBlastBehavior>(  //TODO: KiBlastBehavior must init before ArcTowardsTargetBehavior so we can call Setup() before Start()
           );
+
+        gun.gameObject.AddComponent<KiBlastAmmoDisplay>();
     }
 
     public override void OnPostFired(PlayerController player, Gun gun)
     {
         base.OnPostFired(player, gun);
         gun.shootAnimation = (this.nextKiBlastSign > 0 ? _FireRightAnim : _FireLeftAnim);
+        this._rechargeTimer = 0.0f;
+        this._nextRecharge = _MAX_RECHARGE_TIME;
     }
 
     public override void OnSwitchedToThisGun()
@@ -89,20 +99,21 @@ public class KiBlast : CwaffGun
     public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
     {
         base.OnReloadPressed(player, gun, manualReload);
-        float closestDistance = _KiReflectRange;
+        float closestDistanceSqr = _KI_REFLECT_RANGE_SQR;
         KiBlastBehavior closestBlast = null;
         foreach (Projectile p in StaticReferenceManager.AllProjectiles)
         {
             KiBlastBehavior k = p.GetComponent<KiBlastBehavior>();
             if (k == null || (!k.reflected))
                 continue;
-            float distanceToPlayer = Vector2.Distance(player.sprite.WorldCenter,p.sprite.WorldCenter);
-            if (distanceToPlayer > closestDistance)
+            float sqrDist = (player.CenterPosition - p.SafeCenter).sqrMagnitude;
+            if (sqrDist > closestDistanceSqr)
                 continue;
-            closestDistance = distanceToPlayer;
+            closestDistanceSqr = sqrDist;
             closestBlast = k;
         }
-        closestBlast?.ReturnFromPlayer(player);
+        if (closestBlast)
+            closestBlast.ReturnFromPlayer(player);
     }
 
     public override void Update()
@@ -111,6 +122,40 @@ public class KiBlast : CwaffGun
         if (!this.PlayerOwner)
             return;
         this.PlayerOwner.ToggleGunRenderers(!this.gun.isActiveAndEnabled, ItemName);
+        if (this.gun.CurrentAmmo >= this.gun.AdjustedMaxAmmo)
+            return;
+        this._rechargeTimer += BraveTime.DeltaTime;
+        if (this._rechargeTimer < this._nextRecharge)
+            return;
+        this._rechargeTimer -= this._nextRecharge;
+        this._nextRecharge = Mathf.Max(this._nextRecharge * _RECHARGE_DECAY, _MIN_RECHARGE_TIME);
+        this.gun.ammo = Math.Min(this.gun.ammo + 1, this.gun.AdjustedMaxAmmo);
+    }
+}
+
+public class KiBlastAmmoDisplay : CustomAmmoDisplay
+{
+    private Gun              _gun     = null;
+    private KiBlast          _kiblast = null;
+    private PlayerController _owner   = null;
+
+    private void Start()
+    {
+        this._gun       = base.GetComponent<Gun>();
+        this._kiblast   = this._gun.GetComponent<KiBlast>();
+        this._owner     = this._gun.CurrentOwner as PlayerController;
+    }
+
+    public override bool DoCustomAmmoDisplay(GameUIAmmoController uic)
+    {
+        if (!this._owner)
+            return false;
+
+        uic.SetAmmoCountLabelColor(Color.cyan);
+        uic.GunAmmoCountLabel.AutoHeight = true; // enable multiline text
+        uic.GunAmmoCountLabel.ProcessMarkup = true; // enable multicolor text
+        uic.GunAmmoCountLabel.Text = $"{this._gun.CurrentAmmo} Ki";
+        return true;
     }
 }
 
@@ -187,8 +232,8 @@ public class KiBlastBehavior : MonoBehaviour
 
         // Update sounds and animations
         EasyTrailBullet trail = p.gameObject.GetComponent<EasyTrailBullet>();
-            trail.BaseColor = Color.red;
-            trail.EndColor = Color.red;
+            trail.BaseColor = Color.yellow;
+            trail.EndColor = Color.yellow;
             trail.UpdateTrail();
 
         this._projectile.gameObject.Play("ki_blast_sound_stop_all");

@@ -15,6 +15,12 @@
 - Fixed null deref in Ki Blast caused by trying to redirect projectiles to nonexistent enemies
 - Fixed null deref in Subtractor Beam caused by trying to get the room of nonexistent owners
 - Added impact VFX to Hand Cannon's projectiles
+- Overhauled Ki Blast:
+	- Changed quality from B to A
+	- Changed ammo from infinite to 20
+	- Now uses Ki as ammo, which recovers over time while the player is not shooting
+	- Reflected projectiles now have yellow trails so they look less like enemy bullets
+	- Clarified in description that projectiles can break boss DPS caps (this was always true, but never mentioned)
 
 ## 1.13.1 (2024-06-02)
 
