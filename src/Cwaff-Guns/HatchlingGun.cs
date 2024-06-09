@@ -25,9 +25,11 @@ public class HatchlingProjectile : MonoBehaviour
 {
     private const float _HATCH_CHANCE = 1.0f;
     private const float _PATH_INTERVAL = 10.0f;
+    private const float _COLLISION_DAMAGE = 10.0f; // when jammed
 
     private Projectile _projectile;
     private PlayerController _owner;
+    private GameObject _hatchling;
 
     private void Start()
     {
@@ -35,7 +37,19 @@ public class HatchlingProjectile : MonoBehaviour
         this._owner = this._projectile.Owner as PlayerController;
 
         if (this._owner)
+        {
             this._projectile.OnDestruction += this.Hatch;
+            this._projectile.GetComponent<SpeculativeRigidbody>().OnRigidbodyCollision += this.OnRigidbodyCollision;
+        }
+    }
+
+    private void OnRigidbodyCollision(CollisionData obj)
+    {
+        if (!this._hatchling)
+            return;
+        if (!obj.OtherRigidbody || obj.OtherRigidbody.GetComponent<AIActor>() is not AIActor)
+            return;
+        this._hatchling.GetComponent<SpeculativeRigidbody>().RegisterTemporaryCollisionException(obj.OtherRigidbody, 0.5f);
     }
 
     // Code adapted from CompanionItem::CreateCompanion()
@@ -45,12 +59,15 @@ public class HatchlingProjectile : MonoBehaviour
             return;
 
         // Create a baby chicken
-        GameObject chickum = AIActor.Spawn(EnemyDatabase.GetOrLoadByGuid(Enemies.Cucco), (Vector2)p.LastPosition, p.transform.position.GetAbsoluteRoom(), true).gameObject;
+        GameObject chickum = this._hatchling = AIActor.Spawn(EnemyDatabase.GetOrLoadByGuid(Enemies.Cucco), (Vector2)p.LastPosition, p.transform.position.GetAbsoluteRoom(), true).gameObject;
         CompanionController cc = chickum.GetOrAddComponent<CompanionController>();
+
+        bool ownerHasMastery = this._owner.PlayerHasActiveSynergy(Synergy.MASTERY_HATCHLING_GUN);
 
         // From CompanionItem.Initialize()
         cc.m_owner                        = this._owner; // original was player
-        cc.aiActor.CollisionDamage        = 0f;
+        cc.aiActor.ForceBlackPhantom      = ownerHasMastery;
+        cc.aiActor.CollisionDamage        = ownerHasMastery ? _COLLISION_DAMAGE : 0f;
         cc.aiActor.IsHarmlessEnemy        = true;
         cc.aiActor.IsWorthShootingAt      = false;
         cc.aiActor.IsNormalEnemy          = false;
@@ -58,13 +75,9 @@ public class HatchlingProjectile : MonoBehaviour
         cc.aiActor.CanTargetPlayers       = false;
         cc.aiActor.CanTargetEnemies       = true;  // original was true
         cc.aiActor.State                  = AIActor.ActorState.Normal;
-        cc.healthHaver.OnDamaged += (float resultValue, float maxValue, CoreDamageTypes damageTypes, DamageCategory damageCategory, Vector2 damageDirection) => {
-            cc.gameObject.Play("bird_chirp");
-            UnityEngine.Object.Destroy(cc.gameObject);
-        };
         cc.aiActor.ParentRoom = p.transform.position.GetAbsoluteRoom(); // needed to avoid null deref for MoveErraticallyBehavior
 
-        if (cc.specRigidbody is SpeculativeRigidbody srb)
+        if (cc.GetComponent<SpeculativeRigidbody>() is SpeculativeRigidbody srb)
         {
             srb.AddCollisionLayerIgnoreOverride(CollisionMask.LayerToMask(CollisionLayer.PlayerHitBox, CollisionLayer.PlayerCollider));
             PhysicsEngine.Instance.RegisterOverlappingGhostCollisionExceptions(srb);
@@ -96,10 +109,15 @@ public class HatchlingProjectile : MonoBehaviour
         cc.aiActor.procedurallyOutlined = false; // procedural outlining doesn't respect scale, so remove it
         cc.aiActor.HasShadow = false; // don't cast a blob shadow on the ground to save some rendering juice
 
-        // Make it yellow
+        // Make it yellow (if it's not jammed)
         cc.sprite.usesOverrideMaterial = true;
-        cc.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-        cc.aiActor.RegisterOverrideColor(new Color(1.0f, 1.0f, 0.0f, 0.5f) , "little chicky");
+        if (!ownerHasMastery)
+        {
+            cc.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+            cc.aiActor.RegisterOverrideColor(new Color(1.0f, 1.0f, 0.0f, 0.5f) , "little chicky");
+        }
+        else
+            cc.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitCutoutUberPhantom");
 
         // Add HatchlingBehavior
         cc.gameObject.AddComponent<HatchlingBehavior>().Setup(this._owner);
@@ -125,6 +143,22 @@ public class HatchlingBehavior : MonoBehaviour
         this._startRoom = this.gameObject.transform.position.GetAbsoluteRoom();
         this._actor = base.gameObject.GetComponent<AIActor>();
         base.gameObject.Play("bird_chirp");
+        base.GetComponent<HealthHaver>().OnDamaged += this.OnDamaged;
+        base.GetComponent<SpeculativeRigidbody>().OnCollision += this.OnCollision;
+    }
+
+    private void OnCollision(CollisionData obj)
+    {
+        if (!obj.OtherRigidbody || obj.OtherRigidbody.GetComponent<AIActor>() is not AIActor enemy)
+            return;
+        base.gameObject.Play("bird_chirp");
+        UnityEngine.Object.Destroy(base.gameObject);
+    }
+
+    private void OnDamaged(float resultValue, float maxValue, CoreDamageTypes damageTypes, DamageCategory damageCategory, Vector2 damageDirection)
+    {
+        base.gameObject.Play("bird_chirp");
+        UnityEngine.Object.Destroy(base.gameObject);
     }
 
     public void Setup(PlayerController pc)

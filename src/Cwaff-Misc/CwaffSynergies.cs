@@ -60,6 +60,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfHandCannon>(MASTERY_HAND_CANNON, HandCannon.ItemName);
         // Projectiles immediately observe enemies, effectively giving a 50% chance to instantly kill and enemy and remove all their projectiles
         NewMastery<MasteryOfSchrodingersGat>(MASTERY_SCHRODINGERS_GAT, SchrodingersGat.ItemName);
+        // Chicks spawn jammed and deal contact damage to enemies
+        NewMastery<MasteryOfHatchlingGun>(MASTERY_HATCHLING_GUN, HatchlingGun.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -246,7 +248,6 @@ public static class CwaffSynergies
     }
 }
 
-
 // Dummy classes for masteries
 public class MasteryDummyItem : FakeItem { }
 internal class MasteryOfGrandmaster : MasteryDummyItem {}
@@ -256,6 +257,7 @@ internal class MasteryOfPlatinumStar : MasteryDummyItem {}
 internal class MasteryOfNatascha : MasteryDummyItem {}
 internal class MasteryOfHandCannon : MasteryDummyItem {}
 internal class MasteryOfSchrodingersGat : MasteryDummyItem {}
+internal class MasteryOfHatchlingGun : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -279,4 +281,5 @@ public enum Synergy {
     MASTERY_NATASCHA,
     MASTERY_HAND_CANNON,
     MASTERY_SCHRODINGERS_GAT,
+    MASTERY_HATCHLING_GUN
 };
