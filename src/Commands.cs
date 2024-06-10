@@ -14,7 +14,7 @@ public class Commands
         ETGModConsole.Commands.AddGroup("gg", delegate (string[] args)
         {
             DebrisObject debris = LootEngine.SpawnItem(
-                PickupObjectDatabase.GetById(IDs.Pickups["calculator"]).gameObject,
+                PickupObjectDatabase.GetById(IDs.Pickups["zag"]).gameObject,
                 GameManager.Instance.PrimaryPlayer.CenterPosition,
                 Vector2.zero,
                 0);

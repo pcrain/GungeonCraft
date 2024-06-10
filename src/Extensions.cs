@@ -1974,12 +1974,12 @@ public static class Extensions
   }
 
   /// <summary>Check if a rigidbody is against a wall in a specific direction</summary>
-  public static bool IsAgainstWall(this SpeculativeRigidbody body, IntVector2 pushDirection)
+  public static bool IsAgainstWall(this SpeculativeRigidbody body, IntVector2 pushDirection, int pixels = 1)
   {
     if (PhysicsEngine.Instance.OverlapCast(body, null, true, false, null, null, false, null, null))
       return true;
     Vector2 oldPos = body.transform.position.XY();
-    body.transform.position = oldPos + PhysicsEngine.PixelToUnit(pushDirection);
+    body.transform.position = oldPos + PhysicsEngine.PixelToUnit(pushDirection * pixels);
     body.Reinitialize();
     bool result = PhysicsEngine.Instance.OverlapCast(body, null, true, false, null, null, false, null, null);
     body.transform.position = oldPos;
@@ -2011,5 +2011,12 @@ public static class Extensions
     reticle.visibility      = visibility;
     reticle.targetObjFunc   = targetObjFunc;
     reticle.targetPosFunc   = targetPosFunc;
+  }
+
+  /// <summary>Check if a rigid body is the Oubilette entrance disguised as a wall, because it causes a lot of problems</summary>
+  public static bool IsActuallyOubiletteEntranceRoom(this SpeculativeRigidbody body)
+  {
+    //NOTE: checking the name against "secret exit collider" is how vanilla gungeon blocks projectiles from the Oubilette entrance...rip
+    return body.name.StartsWith("secret exit collider");
   }
 }

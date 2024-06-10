@@ -204,8 +204,7 @@ public class Crawlyboi : MonoBehaviour
             return; // do not skip collision
 
         PhysicsEngine.SkipCollision = true;
-        //NOTE: checking the name against "secret exit collider" is how vanilla gungeon blocks projectiles from the Oubilette entrance...rip
-        if (otherRigidbody.name.StartsWith("secret exit collider") || (otherRigidbody.GetComponent<MajorBreakable>() || otherRigidbody.GetComponent<AIActor>() || !this._body.IsAgainstWall(-this._wallNormal.ToIntVector2())))
+        if (otherRigidbody.IsActuallyOubiletteEntranceRoom() || (otherRigidbody.GetComponent<MajorBreakable>() || otherRigidbody.GetComponent<AIActor>() || !this._body.IsAgainstWall(-this._wallNormal.ToIntVector2())))
             Explode();
     }
 

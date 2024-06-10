@@ -252,6 +252,7 @@ public class Initialisation : BaseUnityPlugin
                 Maestro.Add();
                 Starmageddon.Add();
                 Widowmaker.Add();
+                Zag.Add();
 
                 setupGunsWatch.Stop();
             #endregion
