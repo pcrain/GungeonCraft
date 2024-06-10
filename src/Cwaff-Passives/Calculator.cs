@@ -5,7 +5,7 @@ public class Calculator : CwaffPassive
     public static string ItemName         = "Calculator";
     public static string ShortDescription = "Fudging the Numbers";
     public static string LongDescription  = "Stackable active items come in double their normal stack size.";
-    public static string Lore             = "TBD";
+    public static string Lore             = "An ordinary calculator, lost by one of ACNE corporation's accountants. Due to their short term memory and extreme reliance on technology for doing basic arithmetic, it's unlikely that the contents of the Gungeon shipments they're in charge of will be properly accounted for in the foreseeable future. Fortunately, ACNE's 'when in doubt, ship it out!' policy means any accounting errors usually err on the side of more free stuff for the Gungeon.";
 
     public static void Init()
     {

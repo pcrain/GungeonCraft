@@ -3,9 +3,9 @@
 public class Widowmaker : CwaffGun
 {
     public static string ItemName         = "Widowmaker";
-    public static string ShortDescription = "Crawlmonger";
+    public static string ShortDescription = "Itsy Bitsy Turrets";
     public static string LongDescription  = "Fires pods that deploy spider drones upon colliding with a wall. Drones will crawl along walls and shoot enemies within their range.";
-    public static string Lore             = "";
+    public static string Lore             = "Much like the black widow is one of the deadliest known spiders on earth, the Widowmaker is one of the deadliest known firearms with spider-based projectiles. The first model of the weapon failed every safety test thrown at it, while the second model ended up permanently dismembering its own creator. The penultimate model had ironed out all issues besides a slight gunpowder leak and the drones becoming  sentient and conspiring against humanity, but fortunately, these were fixed in the fourteenth and final model.";
 
     private const float _SCALE = 0.75f;
 

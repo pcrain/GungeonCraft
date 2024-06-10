@@ -261,8 +261,7 @@ public class FrisbeeBehaviour : MonoBehaviour
     public void Launch(PlayerController user)
     {
         this._owner = user;
-        GungeonActions activeActions = BraveInput.GetInstanceForPlayer(user.PlayerIDX).ActiveActions;
-        Vector2 moveVec = activeActions.Move.Vector;
+        Vector2 moveVec = user.m_activeActions.Move.Vector;
         float launchAngle = ((moveVec.sqrMagnitude > 0.1f)
             ? moveVec.ToAngle()
             : user.m_currentGunAngle).Quantize(90f, VectorConversions.Round);

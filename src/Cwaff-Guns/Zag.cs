@@ -3,9 +3,9 @@
 public class Zag : CwaffGun
 {
     public static string ItemName         = "Zag";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string ShortDescription = "Ziggin'";
+    public static string LongDescription  = "Fires bullets that will attempt to navigate around walls to seek out enemies and home in when perpendicular to them.";
+    public static string Lore             = "An unusual combination of cutting-edge projectile technology housed in a cheap, barebones firearm. Given that the projectiles are self-propelled, self-stabilized, and self-guided before even leaving the barrel, the housing is largely incidental. Even so, one would think that any manufacturer willing to spend a fortune on state-of-the-art projectiles could spare a few extra casings for a more shock absorbant grip.";
 
     internal static TrailController _ZagTrailPrefab = null;
     internal static GameObject _ZagZigVFX = null;
