@@ -54,15 +54,24 @@ public class AstralProjector : CwaffPassive
         PrototypeDungeonRoom.RoomCategory.EXIT,
     };
 
+    private static bool IsBossFoyer(RoomHandler room)
+    {
+        for (int i = 0; i < room.connectedRooms.Count; i++)
+            if (room.connectedRooms[i].area.PrototypeRoomCategory == PrototypeDungeonRoom.RoomCategory.BOSS)
+                return true;
+        return false;
+    }
+
     private bool CanStartPhase()
     {
         if (!this.Owner)
             return false; // can't phase if we're not owner
         if (this.Owner.CurrentInputState != PlayerInputState.AllInput && !this._intangible)
             return false; // can't phase if we're not fully mobile, unless we're in our intangible phase
-        if (_BannedRoomTypes.Contains(this.Owner.CurrentRoom.area.PrototypeRoomCategory))
+        RoomHandler room = this.Owner.CurrentRoom;
+        if (_BannedRoomTypes.Contains(room.area.PrototypeRoomCategory) || IsBossFoyer(room))
             return false; // can only phase in normal rooms
-        if (this.Owner.CurrentRoom.area.IsProceduralRoom || (this.Owner.CurrentRoom.area.proceduralCells?.Count ?? 0) > 0)
+        if (room.area.IsProceduralRoom || (room.area.proceduralCells?.Count ?? 0) > 0)
             return false; // can only phase in non-procedural rooms
         return true;
     }
