@@ -13,10 +13,11 @@ public class Zag : CwaffGun
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Zag>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 0.75f, ammo: 400, shootFps: 24, reloadFps: 24,
-                fireAudio: "knife_gun_launch", reloadAudio: "knife_gun_reload");
+            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 0.8f, ammo: 400, shootFps: 30, reloadFps: 40,
+                fireAudio: "zag_zig_sound", reloadAudio: "zag_zig_sound");
+            gun.LoopAnimation(gun.reloadAnimation);
 
-        gun.InitProjectile(GunData.New(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
+        gun.InitProjectile(GunData.New(clipSize: 9, cooldown: 0.125f, shootStyle: ShootStyle.SemiAutomatic,
           damage: 5.0f, speed: 40.0f, sprite: "zag_bullet", fps: 8, anchor: Anchor.MiddleCenter)).Attach<ZagProjectile>();
 
         _ZagTrailPrefab = VFX.CreateTrailObject("zag_trail_mid", fps: 30, cascadeTimer: C.FRAME, destroyOnEmpty: true);
@@ -98,7 +99,7 @@ public class ZagProjectile : MonoBehaviour
             fadeOutTime   : 0.4f);
         this._projectile.SendInDirection(dirVec: newDir, resetDistance: true, updateRotation: true);
         base.gameObject.PlayUnique("zag_zig_sound");
-        if (this._trail)
+        if (this._trail && base.GetComponent<SpeculativeRigidbody>())
             this._trail.DisconnectFromSpecRigidbody();
         this._trail = this._projectile.AddTrailToProjectileInstance(Zag._ZagTrailPrefab);
         this._trail.gameObject.SetGlowiness(10f);

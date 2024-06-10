@@ -2019,4 +2019,10 @@ public static class Extensions
     //NOTE: checking the name against "secret exit collider" is how vanilla gungeon blocks projectiles from the Oubilette entrance...rip
     return body.name.StartsWith("secret exit collider");
   }
+
+  /// <summary>Returns true if the Player is at a location where they would effectively be stuck under normal circumstances</summary>
+  public static bool IsEffectivelyOutOfBounds(this PlayerController player)
+  {
+    return false; //BUG: need to implement this so Frisbee can't clip behind Bello's shop
+  }
 }
