@@ -13,7 +13,7 @@ public class Zag : CwaffGun
     public static void Add()
     {
         Gun gun = Lazy.SetupGun<Zag>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 0.8f, ammo: 400, shootFps: 30, reloadFps: 40,
+            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.PISTOL, reloadTime: 0.8f, ammo: 400, shootFps: 30, reloadFps: 40,
                 fireAudio: "zag_zig_sound", reloadAudio: "zag_zig_sound");
             gun.LoopAnimation(gun.reloadAnimation);
 

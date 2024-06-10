@@ -1,32 +1,37 @@
 # Changelog
 
-## 1.14.0 (TBD)
+## 1.14.0 (2024-06-10)
 
+#### Features and Polish:
 - Added Widowmaker, MM: Aiming, Calculator, and Zag
 	- MM: Aiming and Calculator sprites thanks to Dallan
-- Added 7 new synergies!
 - Added masteries for Hand Cannon, Schrodinger's Gat, Hatchling Gun, Crapshooter, and Holy Water Gun
-- Fixed Bubble Wand being able to give Bubble Blasters to bosses
-- Fixed Bubble Wand throwing null derefs for enemies that try to predict the player's postion
-- Made Custodian's Badge undroppable to avoid cheesing for infinite casing chances
-- Made Companion and Barter Shops spawn on random floors by default
-	- Added configuration option to toggle "classic" guaranteed shop spawns
-- Fixed misaligned sprites for Companion Shop owner
-- Chicks spawned by Hatchling Gun no longer vanish immediately when colliding with enemies at specific angles
-- Fixed null deref in Ki Blast caused by trying to redirect projectiles to nonexistent enemies
-- Fixed null deref in Subtractor Beam caused by trying to get the room of nonexistent owners
-- Added impact VFX to Hand Cannon's projectiles
+- Added 7 new synergies!
+
+#### Balance Changes:
 - Overhauled Ki Blast:
 	- Changed quality from B to A
 	- Changed ammo from infinite to 20
 	- Now uses Ki as ammo, which recovers over time while the player is not shooting
 	- Reflected projectiles now have yellow trails so they look less like enemy bullets
 	- Clarified in description that projectiles can break boss DPS caps (this was always true, but never mentioned)
-- Reduced volume on Magunet's attract sound
-- Fixed Astral Projector being able to phase around boss doors and skip boss triggers
-- Fixed null deref when switching to Jugglernaut caused by trying to find a nonexistent animation
-- Fixed Frisbee being rideable over Bello's shop counter, leading to getting stuck out of bounds
+- Made Companion and Barter Shops spawn on random floors by default
+	- Added configuration option to toggle "classic" guaranteed shop spawns
+- Made Custodian's Badge undroppable to avoid cheesing for infinite casing chances
 - Frisbee is now launched in the player's current movement direction if they are moving
+
+#### Bugfixes and Misc:
+- Fixed null deref in Ki Blast caused by trying to redirect projectiles to nonexistent enemies
+- Fixed null deref in Subtractor Beam caused by trying to get the room of nonexistent owners
+- Fixed null deref when switching to Jugglernaut caused by trying to find a nonexistent animation
+- Fixed Astral Projector allowing the player to phase around boss doors and skip boss triggers
+- Fixed Frisbee being rideable over Bello's shop counter, leading to getting stuck out of bounds
+- Fixed Bubble Wand being able to give Bubble Blasters to bosses
+- Fixed Bubble Wand throwing null derefs for enemies that try to predict the player's postion
+- Fixed misaligned sprites for Companion Shop owner
+- Fixed chicks spawned by Hatchling Gun vanishing immediately when colliding with enemies at specific angles
+- Added impact VFX to Hand Cannon's projectiles
+- Reduced volume on Magunet's attract sound
 
 ## 1.13.1 (2024-06-02)
 

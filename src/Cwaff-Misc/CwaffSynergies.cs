@@ -29,19 +29,19 @@ public static class CwaffSynergies
         NewSynergy(DEUS_EX_MACHINA, "Deus Ex Machina", new[]{IName(ChekhovsGun.ItemName), IName(PlotArmor.ItemName)});
         // Suncaster replenishes ammo twice as quickly.
         NewSynergy(SOLAR_FLAIR, "Solar Flair", new[]{IName(Suncaster.ItemName), "sunlight_javelin"});
-        // 4D Bullets no longer have a damage penalty when firing bullets through walls
+        // 4D Bullets no longer have a damage penalty when firing bullets through walls.
         NewSynergy(PROJECTING_MUCH, "Projecting, Much?", new[]{IName(FourDBullets.ItemName), IName(AstralProjector.ItemName)});
-        // Aimu Hakurei's charge is instantly set to MAX upon getting hit
+        // Aimu Hakurei's charge is instantly set to MAX upon getting hit.
         NewSynergy(LOTUS_LAND_STORY, "Lotus Land Story", new[]{IName(AimuHakurei.ItemName), "laser_lotus"});
-        // Enemies stunned by Gorgun's Eye remain stunned for a second after looking away
+        // Enemies stunned by Gorgun's Eye remain stunned for a second after looking away.
         NewSynergy(BLANK_STARE, "Blank Stare", new[]{IName(GorgunEye.ItemName), IName(BlankChecks.ItemName)});
-        // Enemies have a 75% chance of having their gun replaced by a Bubble Blaster instead of a 50% chance
+        // Enemies have a 75% chance of having their gun replaced by a Bubble Blaster instead of a 50% chance.
         NewSynergy(DUBBLE_BUBBLE, "Dubble Bubble", new[]{IName(BubbleWand.ItemName), "bubble_blaster"});
-        // Enemies drop twice as many souls when killed with Uppskeruvel
+        // Enemies drop twice as many souls when killed with Uppskeruvel.
         NewSynergy(SOUL_SEARCHING, "Soul Searching", new[]{IName(Uppskeruvel.ItemName), "gun_soul"});
-        // Vacuuming debris occasionally generates casing (up to 20 per floor)
+        // Vacuuming debris occasionally generates casing (up to 20 per floor).
         NewSynergy(CLEANUP_CREW, "Cleanup Crew", new[]{IName(VacuumCleaner.ItemName), IName(CustodiansBadge.ItemName)});
-        // Vacuum's chance to restore ammo is increased to 4%
+        // Vacuum's chance to restore ammo is increased to 4%.
         NewSynergy(SCAVENGEST, "Scavengest", new[]{IName(VacuumCleaner.ItemName), IName(ScavengingArms.ItemName)});
       #endregion
 
@@ -58,13 +58,13 @@ public static class CwaffSynergies
         NewMastery<MasteryOfNatascha>(MASTERY_NATASCHA, Natascha.ItemName);
         // Spawns two hands that clap enemies, dealing double damage and stunning them for 10 seconds.
         NewMastery<MasteryOfHandCannon>(MASTERY_HAND_CANNON, HandCannon.ItemName);
-        // Projectiles immediately observe enemies, effectively giving a 50% chance to instantly kill and enemy and remove all their projectiles.
+        // Projectiles immediately observe enemies, effectively giving a 50% chance to instantly kill any enemy and remove all their projectiles.
         NewMastery<MasteryOfSchrodingersGat>(MASTERY_SCHRODINGERS_GAT, SchrodingersGat.ItemName);
         // Chicks spawn jammed and deal contact damage to enemies.
         NewMastery<MasteryOfHatchlingGun>(MASTERY_HATCHLING_GUN, HatchlingGun.ItemName);
-        // Die face no longer resets to 1 when firing, allowing you to hold fire on whatever face you want.
+        // Die faces no longer resets to 1 when firing, allowing you to hold fire on whatever face you want.
         NewMastery<MasteryOfCrapshooter>(MASTERY_CRAPSHOOTER, Crapshooter.ItemName);
-        // Holy Water Gun deals 16x damage to Jammed enemies. Killing Jammed enemies creates pools of holy goop that give infinite ammo while active.
+        // Holy Water Gun deals 16x damage to Jammed enemies. Killing Jammed enemies creates pools of holy goop that grant invulnerability and infinite ammo while active.
         NewMastery<MasteryOfHolyWaterGun>(MASTERY_HOLY_WATER_GUN, HolyWaterGun.ItemName);
       #endregion
 

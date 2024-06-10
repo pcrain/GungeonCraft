@@ -9,9 +9,9 @@
 
 ### Features
 
-- 107 new items, including
-	+ 54 new guns
-	+ 35 new passive items
+- 111 new items, including
+	+ 56 new guns
+	+ 37 new passive items
 	+ 18 new active items
 - Lore for all new guns and items
 - 85 stylish cosmetic hats, accessible via a new hat room near Winchester in the Breach
@@ -20,7 +20,6 @@
 - Insurance Shop: sells insurance policies that let you carry items over to the next run. Guaranteed to spawn after starting a floor holding an A or S tier item
 - Hecked Mode: randomize enemies' guns for a truly hecked playing experience. Enable it in Options -> Mod Config -> GungeonCraft -> Hecked Mode
 - A new secret boss
-- Almost 5 new synergies
 - Vanilla bugfixes
 - You can pet Junior \o/
 - You can become the greatest janitor the Gungeon has ever seen O:

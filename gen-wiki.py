@@ -239,7 +239,7 @@ def scanSynergies(passives, actives, guns):
   data = {}
   synergyFile = os.path.join(SOURCE_DIR, "Cwaff-Misc", "CwaffSynergies.cs")
   lines = readAllLines(synergyFile).split("\n")
-  srx = re.compile(r"""^\s*NewSynergy.*?,\s*\"([^,]+)\",\s*new\[\]\{(.*)\}""")
+  srx = re.compile(r"""^\s*NewSynergy.*?,\s*\"([^\"]+)\",\s*new\[\]\{(.*)\}""")
   for i, line in enumerate(lines):
     if not (r := srx.match(line)):
       continue
