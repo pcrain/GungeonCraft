@@ -26,6 +26,7 @@
 - Fixed Astral Projector being able to phase around boss doors and skip boss triggers
 - Fixed null deref when switching to Jugglernaut caused by trying to find a nonexistent animation
 - Fixed Frisbee being rideable over Bello's shop counter, leading to getting stuck out of bounds
+- Frisbee is now launched in the player's current movement direction if they are moving
 
 ## 1.13.1 (2024-06-02)
 
