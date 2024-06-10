@@ -23,6 +23,7 @@
 	- Clarified in description that projectiles can break boss DPS caps (this was always true, but never mentioned)
 - Reduced volume on Magunet's attract sound
 - Fixed Astral Projector being able to phase around boss doors and skip boss triggers
+- Fixed null deref when switching to Jugglernaut caused by trying to find a nonexistent animation
 
 ## 1.13.1 (2024-06-02)
 

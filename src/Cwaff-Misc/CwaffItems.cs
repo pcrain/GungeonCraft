@@ -76,7 +76,8 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem/*, ILevelLoadedListener
   public virtual void OnSwitchedToThisGun()
   {
     this.gun.PreventNormalFireAudio = true;
-    this.gun.OverrideNormalFireAudioEvent = gun.spriteAnimator.GetClipByName(gun.shootAnimation).frames[0].eventAudio;
+    if (gun.spriteAnimator.GetClipByName(gun.shootAnimation) is tk2dSpriteAnimationClip clip)
+      this.gun.OverrideNormalFireAudioEvent = clip.frames[0].eventAudio;
   }
 
   /// <summary>
