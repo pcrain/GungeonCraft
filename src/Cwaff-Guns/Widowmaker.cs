@@ -3,9 +3,9 @@
 public class Widowmaker : CwaffGun
 {
     public static string ItemName         = "Widowmaker";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string ShortDescription = "Crawlmonger";
+    public static string LongDescription  = "Fires pods that deploy spider drones upon colliding with a wall. Drones will crawl along walls and shoot enemies within their range.";
+    public static string Lore             = "";
 
     private const float _SCALE = 0.75f;
 
@@ -76,7 +76,7 @@ public class Crawlyboi : MonoBehaviour
     private const float _EXPIRE_TIMER = 8f;
     private const float _SIGHT_CONE   = 90f; // 180-degree cone
     private const float _SIGHT_DIST   = 12f;
-    private const int   _STUCK_FRAMES = 5; // number of frames we can go without moving until we're considered stuck
+    private const float _STUCK_TIME   = 0.15f; // amount of time we can go without moving until we're considered stuck
 
     private SpeculativeRigidbody _body;
     private tk2dSprite _sprite;
@@ -91,7 +91,7 @@ public class Crawlyboi : MonoBehaviour
     private float _damage;
     private bool _oddStep;
     private Vector3 _lastPosition;
-    private int _stuckFrames = 0;
+    private float _stuckTime = 0f;
 
     public void Setup(PlayerController owner, Vector2 wallNormal, Vector2 projVelocity, float damage)
     {
@@ -143,14 +143,14 @@ public class Crawlyboi : MonoBehaviour
 
         if (base.transform.position == this._lastPosition)
         {
-            if ((++this._stuckFrames) >= _STUCK_FRAMES)
+            if ((this._stuckTime += BraveTime.DeltaTime) >= _STUCK_TIME)
             {
                 Explode();
                 return;
             }
         }
         else
-            this._stuckFrames = 0;
+            this._stuckTime = 0f;
         this._lastPosition = base.transform.position;
 
         if ((this._expireTimer += BraveTime.DeltaTime) >= _EXPIRE_TIMER)
