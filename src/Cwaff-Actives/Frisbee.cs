@@ -153,6 +153,7 @@ public class FrisbeeBehaviour : MonoBehaviour
     private void Awake()
     {
         this._body = base.GetComponent<SpeculativeRigidbody>();
+        this._body.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.LowObstacle)); // prevent phasing over, e.g., shop counter
         this._body.OnPreRigidbodyCollision += this.OnPreRigidbodyCollision;
         this._body.OnRigidbodyCollision += this.OnRigidbodyCollision;
         this._body.OnTileCollision += this.OnTileCollision;

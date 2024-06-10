@@ -1,8 +1,9 @@
 # Changelog
 
-## TBD
+## 1.14.0 (TBD)
 
 - Added Widowmaker, MM: Aiming, Calculator, and Zag
+	- MM: Aiming and Calculator sprites thanks to Dallan
 - Added 7 new synergies!
 - Added masteries for Hand Cannon, Schrodinger's Gat, Hatchling Gun, Crapshooter, and Holy Water Gun
 - Fixed Bubble Wand being able to give Bubble Blasters to bosses
@@ -24,6 +25,7 @@
 - Reduced volume on Magunet's attract sound
 - Fixed Astral Projector being able to phase around boss doors and skip boss triggers
 - Fixed null deref when switching to Jugglernaut caused by trying to find a nonexistent animation
+- Fixed Frisbee being rideable over Bello's shop counter, leading to getting stuck out of bounds
 
 ## 1.13.1 (2024-06-02)
 
