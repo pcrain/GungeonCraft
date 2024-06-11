@@ -1,5 +1,9 @@
 # Changelog
 
+## TBD
+
+- Make visual effects for Uppskeruvel, Magunet, and Vacuum Cleaner framerate independent
+
 ## 1.14.0 (2024-06-10)
 
 #### Features and Polish:

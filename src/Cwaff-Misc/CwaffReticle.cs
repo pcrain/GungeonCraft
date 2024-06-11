@@ -119,9 +119,6 @@ public class CwaffReticle : MonoBehaviour
     if (this.rotateSpeed > 0)
       this._extantVfx.transform.localRotation = (this.rotateSpeed * BraveTime.ScaledTimeSinceStartup).EulerZ();
 
-    // if (!this._visible)
-    //   return;
-
     if (this.targetObjFunc != null)
     {
       this._targetObject = this.targetObjFunc(this);

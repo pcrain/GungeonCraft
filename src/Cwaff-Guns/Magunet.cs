@@ -324,11 +324,11 @@ public class MagnetParticle : MonoBehaviour
         }
 
         // Home towards the magnet
-        this._velocity = this._sprite.transform.position.XY().LerpNaturalAndDirectVelocity(
+        this._velocity = this._sprite.transform.position.XY().LerpDirectAndNaturalVelocity(
             target          : this._gun.barrelOffset.position,
             naturalVelocity : this._velocity,
             accel           : VacuumCleaner._ACCEL_SEC * BraveTime.DeltaTime,
-            lerpFactor      : 0.5f);
+            lerpFactor      : 1f);
         this.gameObject.transform.position += (this._velocity * C.FPS * BraveTime.DeltaTime).ToVector3ZUp(0f);
     }
 }

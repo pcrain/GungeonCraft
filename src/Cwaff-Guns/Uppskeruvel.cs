@@ -327,7 +327,7 @@ public class UppskeruvelLostSoul : MonoBehaviour
             Vector2 deltaNorm = delta.normalized;
             this._homeSpeed += _HOME_ACCEL * BraveTime.DeltaTime;
             // Weighted average of natural and direct velocity towards player
-            this._velocity = this._homeSpeed * Vector2.Lerp((this._velocity.normalized + deltaNorm).normalized, deltaNorm, 0.2f); //TODO: framereate dependent lerp
+            this._velocity = this._homeSpeed * Lazy.SmoothestLerp((this._velocity.normalized + deltaNorm).normalized, deltaNorm, 10f);
             this._basePos += (this._velocity * BraveTime.DeltaTime).ToVector3ZUp();
             base.transform.position = this._basePos.HoverAt(amplitude: _BOB_HEIGHT, frequency: _BOB_SPEED);
 
@@ -457,21 +457,19 @@ public class UppskeruvelCombatSoul : MonoBehaviour
     private void GlideTowardsTarget()
     {
         const float SQR_PIXEL = C.PIXEL_SIZE * C.PIXEL_SIZE;
-        // Get a point between our current position and target
-        Vector2 halfDist = Vector2.Lerp(this._basePos, this._targetPos, 0.9f) - this._basePos.XY(); //TODO: framereate dependent lerp
-        if (halfDist.sqrMagnitude < SQR_PIXEL)
-            this._basePos = this._targetPos; // snap immediately
+        if ((this._targetPos - this._basePos).sqrMagnitude < SQR_PIXEL)
+            this._basePos = this._targetPos; // snap immediately if within a pixel of our target
         else
-            this._basePos += (BraveTime.DeltaTime / _HALF_TIME) * halfDist.ToVector3ZUp();
+            this._basePos = Lazy.SmoothestLerp(this._basePos, this._targetPos, 10f);
     }
 
     private void HomeTowardsTarget()
     {
-        this._velocity = this._basePos.XY().LerpNaturalAndDirectVelocity(
+        this._velocity = this._basePos.XY().LerpDirectAndNaturalVelocity(
             target          : this._targetPos,
             naturalVelocity : this._velocity,
             accel           : _ACCEL_SEC * BraveTime.DeltaTime,
-            lerpFactor      : 0.1f);
+            lerpFactor      : 1f);
         this._basePos += this._velocity.ToVector3ZUp();
     }
 
