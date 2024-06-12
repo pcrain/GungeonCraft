@@ -4,6 +4,11 @@
 
 - Make visual effects for Uppskeruvel, Magunet, and Vacuum Cleaner framerate independent
 - Fixed gun sprites sometimes being flipped upside down when finishing a Gyroscope dodge roll
+- Overhauled Jugglernaut:
+	- Changed projectile sprites to match the juggled gun sprites
+	- Added animations for dropping current juggle combo
+	- Added projectile impact sounds
+	- Added circus music :D
 
 ## 1.14.0 (2024-06-10)
 

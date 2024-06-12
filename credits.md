@@ -21,13 +21,14 @@ I have no artistic talent beyond making minor sprite and sound edits, so all bas
 * More item sprites from various games including Knights in the Nightmare, Blaze Union, Pokemon, Dragonball Z: Buu's Fury, and Minecraft
 * [SPOILERS] boss sprites [by askywalker from Spriter's Resource](https://www.spriters-resource.com/custom_edited/undertalecustoms/sheet/126792/)
 * [SPOILERS] boss card art [by synistersyrup from DeviantArt](https://www.deviantart.com/synistersyrup/art/Sans-Uses-Flirt-665517108)
-* [SPOILERS] boss music [by tomori](https://www.youtube.com/watch?v=pC_7lrh6mGs)
 * Other item and effect sprites from various games on the [Spriter's Resource](https://www.spriters-resource.com/) and from [OpenGameArt.org](https://opengameart.org)
 * Thunderstore preview icon by Lynceus
 	
 ### Sounds
 
 * A few sounds from [OpenGameArt.org](https://opengameart.org), and the rest from various games including Paper Mario 64 / TTYD, Terraria, Super Smash Bros. Melee, The Elder Scrolls: Morrowind, Dragonball Z Budokai Tenkaichi 3, Donkey Kong 64, Kirby: Squeak Squad, Minecraft, Undertale, and The Legend of Zelda: The Minish Cap 
+* [SPOILERS] boss music [by tomori](https://www.youtube.com/watch?v=pC_7lrh6mGs)
+* Circus music from [Entry of the Gladiators Commodore 64, 6581 Clown Music](https://www.youtube.com/watch?v=ZnHwPX2WxZs)
 
 ## Special Thanks
 

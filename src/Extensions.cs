@@ -1403,7 +1403,7 @@ public static class Extensions
     // animator.deferNextStartClip = false;
     animator.SetSprite(
       spriteCollection: frames[0].spriteCollection,
-      spriteId: (frame >= 0) ? frame : frames[UnityEngine.Random.Range(0, frames.Length)].spriteId);
+      spriteId: frames[(frame >= 0) ? frame : UnityEngine.Random.Range(0, frames.Length)].spriteId);
     animator.Pause(); // stop animating immediately after creation so we can stick with our initial sprite
   }
 

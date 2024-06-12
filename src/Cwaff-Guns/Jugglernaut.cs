@@ -17,12 +17,21 @@ public class Jugglernaut : CwaffGun
     public static string Lore             = "Somehow even more impressive and dangerous than juggling swords, gun juggling is a burgeoning art form among Gungeoneers trying to justify their ever-growing collections of guns. Several enthusiasts have attempted at various points to establish gun juggling as a mainstream circus act, an international olympic sport, and a legitimate martial art, with each of these attempts resulting in some variation of the response: 'absolutely not, and please stop throwing those things around near us, it's terrifying and we're scared for our lives.'";
 
     internal const int _IDLE_FPS = 16;
+    internal const float _DEBRIS_GLOW = 500f;
 
     internal static List<string> _JuggleAnimations;
-    internal static List<float> _MinEmission = new(){0f, 10f, 50f, 100f, 200f, 400f};
+    internal static List<float> _MinEmission = new(){10f, 50f, 100f, 200f, 300f, 400f};
     internal static string _TrueIdleAnimation;
     internal static IntVector2 _CarryOffset        = new IntVector2(-14, -8);
     internal static IntVector2 _FlippedCarryOffset = new IntVector2(21, -8);
+    internal static List<Color> _Colors = new(){
+        Color.red,
+        Color.blue,
+        Color.yellow,
+        Color.green,
+        new Color(1.0f, 0.647f, 0.0f, 1.0f),
+        new Color(0.627f, 0.125f, 0.941f),
+    };
 
     private int _juggleLevel = 0;
     private Coroutine _glowRoutine = null;
@@ -86,7 +95,7 @@ public class Jugglernaut : CwaffGun
             gun.shootAnimation          = null; // animation shouldn't change when firing
 
         gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.4f, shootStyle: ShootStyle.SemiAutomatic, damage: 10.0f, speed: 70.0f,
-          sprite: "jugglernaut_ball", fps: 12, scale: 0.5f, anchor: Anchor.MiddleLeft));
+          sprite: "jugglernaut_projectile", fps: 2,  anchor: Anchor.MiddleCenter, shouldRotate: false, deathSound: "wall_thunk"));
     }
 
     /// <summary>Make sure Jugglernaut appears correctly in the weapons panel</summary>
@@ -127,11 +136,10 @@ public class Jugglernaut : CwaffGun
     {
         base.OnPlayerPickup(player);
 
-        player.healthHaver.OnDamaged += DroppingTheBall;
+        player.healthHaver.OnDamaged += OnPlayerDamaged;
 
+        gun.spriteAnimator.StopAndResetFrameToDefault();
         ResetJuggle();
-        gun.spriteAnimator.currentClip = gun.spriteAnimator.GetClipByName(_JuggleAnimations[0]);
-        gun.spriteAnimator.Play();
         gun.sprite.gameObject.SetGlowiness(0f);
     }
 
@@ -139,7 +147,7 @@ public class Jugglernaut : CwaffGun
     {
         base.OnDroppedByPlayer(player);
 
-        player.healthHaver.OnDamaged -= DroppingTheBall;
+        player.healthHaver.OnDamaged -= OnPlayerDamaged;
 
         ResetJuggle();
         gun.spriteAnimator.currentClip = gun.spriteAnimator.GetClipByName(_TrueIdleAnimation);
@@ -149,38 +157,69 @@ public class Jugglernaut : CwaffGun
     public override void OnDestroy()
     {
         if (this.PlayerOwner && this.PlayerOwner.healthHaver)
-            this.PlayerOwner.healthHaver.OnDamaged -= DroppingTheBall;
+            this.PlayerOwner.healthHaver.OnDamaged -= OnPlayerDamaged;
         base.OnDestroy();
     }
 
-    private void DroppingTheBall(float resultValue, float maxValue, CoreDamageTypes damageTypes, DamageCategory damageCategory, Vector2 damageDirection)
+    private void OnPlayerDamaged(float resultValue, float maxValue, CoreDamageTypes damageTypes, DamageCategory damageCategory, Vector2 damageDirection)
     {
-        if (this._juggledEnemies.Count() == 0)
-            return;
+        if (this.PlayerOwner)
+            ResetJuggle();
+    }
 
-        this.PlayerOwner.gameObject.Play("juggle_drop_sound");
-        ResetJuggle();
+    private void DropGuns(PlayerController player, int oldGuns, int newGuns)
+    {
+        if (newGuns >= oldGuns)
+            return;
+        Vector2 pos = player.CenterPosition;
+        tk2dSpriteAnimationClip clip = this.gun.DefaultModule.projectiles[0].sprite.GetComponent<tk2dSpriteAnimator>().DefaultClip;
+        for (int i = newGuns; i < oldGuns; ++i)
+        {
+            GameObject debrisObject = new GameObject();
+                debrisObject.transform.position = pos;
+            tk2dSprite sprite = debrisObject.AddComponent<tk2dSprite>();
+                sprite.SetSprite(clip.frames[i].spriteCollection, clip.frames[i].spriteId);
+                sprite.SetGlowiness(glowAmount: _DEBRIS_GLOW);
+            debrisObject.AutoRigidBody(Anchor.MiddleCenter, CollisionLayer.Pickup);
+            DebrisObject debris = debrisObject.AddComponent<DebrisObject>();
+
+            debris.angularVelocity         = 45;
+            debris.angularVelocityVariance = 20;
+            debris.decayOnBounce           = 0.5f;
+            debris.bounceCount             = 2;
+            debris.canRotate               = true;
+            debris.shouldUseSRBMotion      = true;
+            debris.sprite                  = sprite;
+            debris.animatePitFall          = true;
+            // debris.audioEventName          = "monkey_tennis_bounce_first";
+            debris.AssignFinalWorldDepth(-0.5f);
+            debris.Trigger(Lazy.RandomVector(4f), 1f);
+        }
     }
 
     public override void OnSwitchedToThisGun()
     {
         base.OnSwitchedToThisGun();
+        gun.spriteAnimator.StopAndResetFrameToDefault();
         ResetJuggle();
     }
 
     public override void OnSwitchedAwayFromThisGun()
     {
         base.OnSwitchedAwayFromThisGun();
-        ResetJuggle();
+        if (this.PlayerOwner)
+            ResetJuggle();
     }
 
     public override void PostProcessProjectile(Projectile projectile)
     {
         base.PostProcessProjectile(projectile);
-        projectile.gameObject.AddComponent<JugglernautProjectile>().Setup(this);
+        int spriteId = UnityEngine.Random.Range(0, 1 + this._juggleLevel);
+        projectile.gameObject.AddComponent<JugglernautProjectile>().Setup(this, spriteId);
         projectile.baseData.damage *= (1f + this._juggleLevel);
+        projectile.DestroyMode = Projectile.ProjectileDestroyMode.BecomeDebris;
 
-        gun.gameObject.PlayOnce("alyx_shoot_sound"); // necessary here since the gun doesn't use a fire animation and won't trigger a fire audio event
+        gun.gameObject.PlayOnce("jugglernaut_throw_sound"); // necessary here since the gun doesn't use a fire animation and won't trigger a fire audio event
     }
 
     public void RegisterEnemyHit(AIActor enemy)
@@ -219,11 +258,22 @@ public class Jugglernaut : CwaffGun
             this._glowRoutine = gun.StartCoroutine(GlowUp());
         }
         else
+        {
             gun.sprite.renderer.material.SetFloat("_EmissivePower", _MinEmission[this._juggleLevel]);
+            if (this._juggleLevel < oldLevel)
+            {
+                if (this._juggledEnemies.Count() == 0)
+                    this.PlayerOwner.gameObject.Play("juggle_drop_sound");
+                DropGuns(player: this.PlayerOwner, oldGuns: 1 + oldLevel, newGuns: 1 + this._juggleLevel);
+            }
+        }
+        UpdateIdleAnimation();
+    }
 
+    private void UpdateIdleAnimation()
+    {
         gun.idleAnimation = _JuggleAnimations[this._juggleLevel];
         gun.spriteAnimator.currentClip = gun.spriteAnimator.GetClipByName(gun.idleAnimation);
-        gun.spriteAnimator.StopAndResetFrameToDefault();
         gun.spriteAnimator.Play();
         gun.sprite.usesOverrideMaterial = true;
     }
@@ -253,26 +303,65 @@ public class Jugglernaut : CwaffGun
         }
         yield break;
     }
+
+    public override void Update()
+    {
+        base.Update();
+        if (this.PlayerOwner is not PlayerController pc)
+            return;
+        Lazy.PlaySoundUntilDeathOrTimeout("circus_music", pc.gameObject, 0.1f);
+        UpdateIdleAnimation(); // fixes idle animation not playing when picked up, not sure why this is necessary
+    }
 }
 
 public class JugglernautProjectile : MonoBehaviour
 {
+    private const float _ROT_RATE = 24f;
     private Projectile _projectile;
     private PlayerController _owner;
     private Jugglernaut _jugglernaut;
+    private float _rotation;
+    private int _frame;
 
-    public void Setup(Jugglernaut jugglernaut)
+    public void Setup(Jugglernaut jugglernaut, int frame)
     {
         this._projectile  = base.GetComponent<Projectile>();
         this._owner       = this._projectile.Owner as PlayerController;
         this._jugglernaut = jugglernaut;
+        this._frame       = frame;
 
         this._projectile.OnHitEnemy += OnHitEnemy;
     }
 
+    private void Start()
+    {
+        this._projectile.PickFrame(this._frame);
+        this._rotation = 360f * UnityEngine.Random.value; // randomize the starting rotation
+
+        Color c = Jugglernaut._Colors[this._frame];
+        // EasyTrailBullet trail = this._projectile.gameObject.AddComponent<EasyTrailBullet>();
+        //     trail.StartWidth = 0.2f;
+        //     trail.EndWidth   = 0.1f;
+        //     trail.LifeTime   = 0.1f;
+        //     trail.BaseColor  = c;
+        //     trail.StartColor = Color.Lerp(c, Color.white, 0.5f);
+        //     trail.EndColor   = c;
+
+        this._projectile.sprite.SetGlowiness(glowAmount: Jugglernaut._DEBRIS_GLOW);
+        // SpriteOutlineManager.AddOutlineToSprite(this._projectile.sprite, c);
+    }
+
+    private void Update()
+    {
+        if (!this._projectile || !this._projectile.specRigidbody)
+            return;
+        this._rotation += Mathf.Sign(this._projectile.specRigidbody.Velocity.x) * _ROT_RATE * this._projectile.baseData.speed * BraveTime.DeltaTime;
+        this._projectile.transform.localRotation = this._rotation.EulerZ();
+    }
+
     private void OnHitEnemy(Projectile bullet, SpeculativeRigidbody body, bool killed)
     {
-        if (body.aiActor is AIActor enemy)
-            this._jugglernaut?.RegisterEnemyHit(enemy);
+        if (this._jugglernaut && body.aiActor is AIActor enemy)
+            this._jugglernaut.RegisterEnemyHit(enemy);
     }
 }
