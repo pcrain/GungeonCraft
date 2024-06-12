@@ -139,7 +139,6 @@ public class WarriorsGi : CwaffPassive
     {
         base.MidGameSerialize(data);
         int p1Zenkai = GameManager.Instance.PrimaryPlayer?.gameObject?.GetOrAddComponent<ZenkaiAura>()?._zenkaiLevel ?? 0;
-        ETGModConsole.Log($"  saving zenkai {p1Zenkai}");
         data.Add(p1Zenkai);
         if (GameManager.Instance.CurrentGameType == GameManager.GameType.COOP_2_PLAYER)
         {
