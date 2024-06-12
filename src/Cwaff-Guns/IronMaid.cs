@@ -7,8 +7,11 @@ public class IronMaid : CwaffGun
     public static string LongDescription  = "Bullets quickly decelerate and enter stasis after firing. Reloading or switching to a different gun releases all bullets towards the nearest wall or enemy in the player's line of sight.";
     public static string Lore             = "An urban legend tells the story of a Gungeoneer who happened upon a cosmic rift deep in the Gungeon. Upon entering the rift, they found themselves in a great mansion guarded by a maid who wielded no guns, yet produced more bullets than the mind could comprehend. After holding their own for all of 1.3 seconds, the Gungeoneer was overwhelmed by knife-like projectiles that appeared out of nowhere in seeming defiance of time and space. The Gungeoneer awoke to find themself back in the Breach, with this gun lying by their side as the only evidence of their journey.";
 
+    private const float _MAX_AIM_DEV = 8f; // we must be aiming within 8 degrees of an enemy to autotarget
+
     private int _nextIndex = 0;
     private Vector2 _whereIsThePlayerLooking;
+    private AIActor _targetEnemy;
 
     public static void Add()
     {
@@ -20,6 +23,19 @@ public class IronMaid : CwaffGun
 
         gun.InitProjectile(GunData.New(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true,
           damage: 5.0f, speed: 40.0f, sprite: "kunai", fps: 12, anchor: Anchor.MiddleCenter)).Attach<RainCheckBullets>();
+
+        gun.AddReticle<CwaffReticle>(reticleVFX : VFX.BasicReticle, reticleAlpha : 0.2f, visibility : CwaffReticle.Visibility.ALWAYS);
+    }
+
+    private GameObject GetTargetEnemy(CwaffReticle reticle) => this.CurrentTargetEnemy()?.gameObject;
+    private Vector2 GetTargetPos(CwaffReticle reticle) => this.PointWherePlayerIsLooking();
+    public AIActor CurrentTargetEnemy() => this._targetEnemy ? this._targetEnemy : null; // unity safe null check for ?. purposes
+    public Vector2 PointWherePlayerIsLooking() => this._targetEnemy ? this._targetEnemy.CenterPosition : this._whereIsThePlayerLooking;
+
+    public override void OnPlayerPickup(PlayerController player)
+    {
+        base.OnPlayerPickup(player);
+        gun.GetComponent<CwaffReticle>().targetPosFunc = GetTargetPos;
     }
 
     public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
@@ -76,6 +92,36 @@ public class IronMaid : CwaffGun
         this._nextIndex = 0;
     }
 
+    private AIActor SwitchTargetEnemy()
+    {
+        if (this.PlayerOwner is not PlayerController pc)
+            return null;
+        if (pc.CurrentRoom is not RoomHandler room)
+            return null;
+        if (room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> enemiesInRoom)
+            return null;
+        if (enemiesInRoom.Count == 0)
+            return null;
+
+        AIActor target = null;
+        float closest = _MAX_AIM_DEV;
+        Vector2 gunPos = this.gun.barrelOffset.PositionVector2();
+        float aimAngle = pc.m_currentGunAngle;
+        foreach (AIActor enemy in enemiesInRoom)
+        {
+            if (!enemy.IsHostile(canBeNeutral: true))
+                continue;
+            Vector2 delta = (enemy.CenterPosition - gunPos);
+            float angleFromAim = Mathf.Abs(delta.ToAngle().RelAngleTo(aimAngle));
+            if (angleFromAim > closest)
+                continue;
+
+            target = enemy;
+            closest = angleFromAim;
+        }
+        return target;
+    }
+
     public override void Update()
     {
         base.Update();
@@ -84,13 +130,9 @@ public class IronMaid : CwaffGun
         if (this.PlayerOwner is not PlayerController pc)
             return;
 
-        this._whereIsThePlayerLooking =
-            Raycast.ToNearestWallOrEnemyOrObject(pc.sprite.WorldCenter, pc.CurrentGun.CurrentAngle);
-    }
-
-    public Vector2 PointWherePlayerIsLooking()
-    {
-        return this._whereIsThePlayerLooking;
+        this._targetEnemy = SwitchTargetEnemy();
+        if (!this._targetEnemy)
+            this._whereIsThePlayerLooking = Raycast.ToNearestWallOrEnemyOrObject(pc.sprite.WorldCenter, pc.CurrentGun.CurrentAngle);
     }
 }
 
@@ -145,9 +187,11 @@ public class RainCheckBullets : MonoBehaviour
         this._wasEverInStasis = true;
         Vector2 pos = this._projectile.sprite.WorldCenter;
         Vector2 targetDir = this._projectile.Direction;
+        AIActor targetEnemy = null;
         while (this._raincheck)
         {
-            targetDir = this._raincheck.PointWherePlayerIsLooking() - pos;
+            targetEnemy = this._raincheck.CurrentTargetEnemy();
+            targetDir = (targetEnemy ? targetEnemy.CenterPosition : this._raincheck.PointWherePlayerIsLooking()) - pos;
             _projectile.SendInDirection(targetDir, true); // rotate the projectile
             if (this._launchSequenceStarted)
                 break; // awkward loop construct to make sure we set our targetDir at least once
@@ -160,6 +204,11 @@ public class RainCheckBullets : MonoBehaviour
         this._moveTimer = _GLOW_TIME;
         while (this._moveTimer > 0)
         {
+            if (targetEnemy)
+            {
+                targetDir = targetEnemy.CenterPosition - pos;
+                _projectile.SendInDirection(targetDir, true); // rotate the projectile
+            }
             float glowAmount = (_GLOW_TIME - this._moveTimer) / _GLOW_TIME;
             m.SetFloat("_EmissivePower", _BASE_GLOW + glowAmount * _GLOW_MAX);
             this._moveTimer -= BraveTime.DeltaTime;
@@ -170,6 +219,11 @@ public class RainCheckBullets : MonoBehaviour
         this._moveTimer = _LAUNCH_DELAY * this._index;
         while (this._moveTimer > 0)
         {
+            if (targetEnemy)
+            {
+                targetDir = targetEnemy.CenterPosition - pos;
+                _projectile.SendInDirection(targetDir, true); // rotate the projectile
+            }
             this._moveTimer -= BraveTime.DeltaTime;
             yield return null;
         }

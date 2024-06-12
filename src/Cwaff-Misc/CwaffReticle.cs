@@ -17,15 +17,16 @@ public class CwaffReticle : MonoBehaviour
     ALWAYS, // reticle is always visible while the gun is active, regardless of whether the default reticle is active
   }
 
-  public GameObject reticleVFX        = null;  // prefab VFX used for displaying the reticle
-  public float      reticleAlpha      = 1f;    // alpha of the reticle when fully visible
-  public float      fadeInTime        = 0.0f;  // the amount of time we spend fading in when spawned (0.0 == instant)
-  public float      fadeOutTime       = 0.0f;  // the amount of time we spend fading out when despawned (0.0 == instant)
-  public bool       smoothLerp        = false; // whether the reticle smoothly lerps to its target
-  public float      maxDistance       = -1f;   // maximum distance the reticle can be from the player (-1 == no max)
-  public float      controllerScale   = 1f;    // on controller, determines how the reticle scales with aim distance
-  public float      rotateSpeed       = 0f;    // how quickly the reticle rotates
-  public Visibility visibility        = Visibility.DEFAULT; // when the reticle is visible
+  public GameObject reticleVFX          = null;  // prefab VFX used for displaying the reticle
+  public float      reticleAlpha        = 1f;    // alpha of the reticle when fully visible
+  public float      fadeInTime          = 0.0f;  // the amount of time we spend fading in when spawned (0.0 == instant)
+  public float      fadeOutTime         = 0.0f;  // the amount of time we spend fading out when despawned (0.0 == instant)
+  public bool       smoothLerp          = false; // whether the reticle smoothly lerps to its target
+  public bool       aimFromPlayerCenter = false; // if true, aim is relative to player center; if false, aim is relative to barrel offset
+  public float      maxDistance         = -1f;   // maximum distance the reticle can be from the player (-1 == no max)
+  public float      controllerScale     = 1f;    // on controller, determines how the reticle scales with aim distance
+  public float      rotateSpeed         = 0f;    // how quickly the reticle rotates
+  public Visibility visibility          = Visibility.DEFAULT; // when the reticle is visible
   public Func<CwaffReticle, GameObject> targetObjFunc = null; // optional custom object targeting function; if null, uses targetPosFunc instead
   public Func<CwaffReticle, Vector2> targetPosFunc = null; // optional custom position targeting function; if null, follows the mouse / controller aim direction
 
@@ -87,7 +88,7 @@ public class CwaffReticle : MonoBehaviour
       this._visible = false;
     else switch (this.visibility)
     {
-      case DEFAULT:    this._visible = this._player.IsKeyboardAndMouse() ? true : this._player.m_activeActions.Aim.Vector.sqrMagnitude > 0.02f; break;
+      case DEFAULT:    this._visible = this._player.IsKeyboardAndMouse() ? true  : this._player.m_activeActions.Aim.Vector.sqrMagnitude > 0.02f; break;
       case CONTROLLER: this._visible = this._player.IsKeyboardAndMouse() ? false : this._player.m_activeActions.Aim.Vector.sqrMagnitude > 0.02f; break;
       case CHARGING:   this._visible = this._gun.gun.IsCharging; break;
       case WITHTARGET: this._visible = this._targetObject != null; break;
@@ -131,23 +132,19 @@ public class CwaffReticle : MonoBehaviour
         else
           this._targetPos = this._targetObject.transform.position;
       }
+      else if (this.targetPosFunc != null)  // use targetPosFunc as fallback when targetObjFunc fails
+        this._targetPos = this.targetPosFunc(this);
     }
     else if (this.targetPosFunc != null)
-    {
       this._targetPos = this.targetPosFunc(this);
-    }
     else if (!this._player.IsKeyboardAndMouse())
-    {
       this._targetPos = this._player.sprite.WorldCenter + this.controllerScale * this._player.m_activeActions.Aim.Vector;
-    }
     else
-    {
       this._targetPos = this._player.unadjustedAimPoint.XY();
-    }
 
     if (this.maxDistance > 0)
     {
-      Vector2 centerPos = this._player.sprite.WorldCenter;
+      Vector2 centerPos = this.aimFromPlayerCenter ? this._player.sprite.WorldCenter : this._gun.gun.barrelOffset.transform.position;
       Vector2 delta = (this._targetPos - centerPos);
       if (delta.sqrMagnitude > (this.maxDistance * this.maxDistance))
         this._targetPos = centerPos + this.maxDistance * delta.normalized;
