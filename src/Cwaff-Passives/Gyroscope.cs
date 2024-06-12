@@ -401,6 +401,8 @@ public class GyroscopeRoll : CustomDodgeRoll
             this.owner.ClearInputOverride("gyrostumble");
             this.owner.m_overrideGunAngle = null;
             this.owner.forceAimPoint = null;
+            if (this.owner.CurrentGun is Gun gun) // fix upside down gun sprites when starting a dodge roll facing right and ending facing left
+                gun.HandleSpriteFlip(this.owner.SpriteFlipped);
             this.owner.spriteAnimator.Stop();
             this.owner.spriteAnimator.Play(this.owner.spriteAnimator.GetClipByName("idle_front"));
             this.owner.healthHaver.IsVulnerable = true;

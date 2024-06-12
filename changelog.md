@@ -3,6 +3,7 @@
 ## TBD
 
 - Make visual effects for Uppskeruvel, Magunet, and Vacuum Cleaner framerate independent
+- Fixed gun sprites sometimes being flipped upside down when finishing a Gyroscope dodge roll
 
 ## 1.14.0 (2024-06-10)
 
