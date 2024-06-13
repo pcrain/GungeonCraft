@@ -31,7 +31,7 @@ public class Suncaster : CwaffGun
     public int maxPrisms                     = _BASE_MAX_PRISMS;
 
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<Suncaster>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.S, gunClass: GunClass.FIRE, reloadTime: 0.0f, ammo: 30,

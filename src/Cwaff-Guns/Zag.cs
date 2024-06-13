@@ -10,7 +10,7 @@ public class Zag : CwaffGun
     internal static TrailController _ZagTrailPrefab = null;
     internal static GameObject _ZagZigVFX = null;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<Zag>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.PISTOL, reloadTime: 0.8f, ammo: 400, shootFps: 30, reloadFps: 40,

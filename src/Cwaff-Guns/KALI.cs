@@ -18,7 +18,7 @@ public class KALI : CwaffGun
     private int _chargeLevel = -1;
     private float _timeCharging = 0f;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<KALI>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 0.1f, ammo: 200, fireAudio: "kali_shoot_sound");

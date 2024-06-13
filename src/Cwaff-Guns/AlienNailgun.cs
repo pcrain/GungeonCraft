@@ -32,7 +32,7 @@ public class AlienNailgun : CwaffGun
     private List<GameObject> _fragments     = new();
     private GameObject _preview             = null;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<AlienNailgun>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 0.7f, ammo: 480, idleFps: 24, shootFps: 24, reloadFps: 60,

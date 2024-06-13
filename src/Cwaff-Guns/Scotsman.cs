@@ -17,7 +17,7 @@ public class Scotsman : CwaffGun
     private int _nextIndex                   = 0;
     private Vector2 _whereIsThePlayerLooking = Vector2.zero;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<Scotsman>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 2.00f, ammo: 300, canReloadNoMatterAmmo: true,

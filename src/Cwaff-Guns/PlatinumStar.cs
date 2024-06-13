@@ -9,7 +9,7 @@ public class PlatinumStar : CwaffGun
 
     internal static Projectile _OraBullet;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<PlatinumStar>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.PISTOL, reloadTime: 1f, ammo: 480, shootFps: 20, reloadFps: 40,

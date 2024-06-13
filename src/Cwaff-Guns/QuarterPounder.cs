@@ -9,7 +9,7 @@ public class QuarterPounder : CwaffGun
 
     internal static GameObject _MidasParticleVFX;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<QuarterPounder>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.RIFLE, reloadTime: 1.1f, ammo: 9999, canGainAmmo: false,

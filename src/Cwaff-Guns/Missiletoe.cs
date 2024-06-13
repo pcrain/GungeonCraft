@@ -47,7 +47,7 @@ public class Missiletoe : CwaffGun
     public List<PickupObject> wrappedGifts = new();
     public List<ItemQuality> wrappedQualities = new();
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<Missiletoe>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARM, reloadTime: 1.0f, ammo: 300, canReloadNoMatterAmmo: true,

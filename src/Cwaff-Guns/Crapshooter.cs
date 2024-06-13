@@ -19,7 +19,7 @@ public class Crapshooter : CwaffGun
     private int _nextRoll = 0; // 1 lower than the die face value
     private float _freezeTimer = 0.0f;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<Crapshooter>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.PISTOL, reloadTime: 1.5f, ammo: 300, idleFps: 6, shootFps: 24,

@@ -11,7 +11,7 @@ public class Blamethrower : CwaffGun
     internal static GameObject _BlameTrail = null;
     internal static GameObject _ScapeGoatVFX = null;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<Blamethrower>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARM, reloadTime: 0.0f, ammo: 300,

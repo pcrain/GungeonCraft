@@ -16,7 +16,7 @@ public class Natascha : CwaffGun
     private float _speedMult     = 1.0f;
     private bool _maintainSpinup = false;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<Natascha>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f, ammo: 1500,

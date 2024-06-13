@@ -24,7 +24,7 @@ public class VacuumCleaner : CwaffGun
     private int _debrisSucked = 0;
     private int _casingsThisFloor = 0;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<VacuumCleaner>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.CHARGE, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true, chargeFps: 16);

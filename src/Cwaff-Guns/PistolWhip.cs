@@ -15,7 +15,7 @@ public class PistolWhip : CwaffGun
     internal static Projectile _PistolWhipProjectile;
     internal static Projectile _PistolButtProjectile;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<PistolWhip>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 0.01f, ammo: 100, shootFps: 30, reloadFps: 40, curse: 2f, infiniteAmmo: true);

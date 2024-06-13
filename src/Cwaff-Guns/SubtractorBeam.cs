@@ -13,7 +13,7 @@ public class SubtractorBeam : CwaffGun
     internal static TrailController _RedTrailPrefab;
     internal static GameObject _HitEffects;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<SubtractorBeam>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.FULLAUTO, reloadTime: 1.25f, ammo: 300, idleFps: 10, shootFps: 24, reloadFps: 30,

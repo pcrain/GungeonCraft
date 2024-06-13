@@ -26,7 +26,7 @@ public class Magunet : CwaffGun
     private bool  _wasCharging     = false;
     private GameObject _extantChargeVFX = null;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<Magunet>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true,

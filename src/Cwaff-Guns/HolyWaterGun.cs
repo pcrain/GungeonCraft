@@ -13,7 +13,7 @@ public class HolyWaterGun : CwaffGun
     internal static Dictionary<string, Texture2D> _GhostTextures = new();
     internal static GameObject _ExorcismParticleVFX = null;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<HolyWaterGun>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.BEAM, reloadTime: 1.0f, ammo: 100, audioFrom: Items.MegaDouser, defaultAudio: true);

@@ -30,7 +30,7 @@ public class OmnidirectionalLaser : CwaffGun
     private int _currentFps = _BASE_FPS;
     private float _timeSinceLastShot = 0.0f;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<OmnidirectionalLaser>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 250,

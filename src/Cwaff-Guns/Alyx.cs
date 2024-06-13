@@ -20,7 +20,7 @@ public class Alyx : CwaffGun
 
     public float timeAtLastRecalc   = 0.0f; // must be public so it serializes properly when dropped / picked up
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<Alyx>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.FULLAUTO, reloadTime: 0.5f, ammo: _BASE_MAX_AMMO,

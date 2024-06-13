@@ -12,7 +12,7 @@ public class Tranquilizer : CwaffGun
     internal static GameObject _TranqImpactVFX = null;
     internal static GameObject _SleepImpactVFX = null;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<Tranquilizer>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.POISON, reloadTime: 1.2f, ammo: 80, shootFps: 30, reloadFps: 40,

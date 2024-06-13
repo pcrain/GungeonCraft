@@ -10,7 +10,7 @@ public class BBGun : CwaffGun
     private static readonly float[] _CHARGE_LEVELS  = {0.25f,0.5f,1.0f,2.0f};
     private float                   _lastCharge     = 0.0f;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<BBGun>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 0.5f, ammo: 3, canGainAmmo: false,

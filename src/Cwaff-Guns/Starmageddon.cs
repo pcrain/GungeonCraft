@@ -12,7 +12,7 @@ public class Starmageddon : CwaffGun
     private int _nextIndex = 0;
     private int _curBatch  = 0;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<Starmageddon>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.S, gunClass: GunClass.FULLAUTO, reloadTime: 1.0f, ammo: 900, shootFps: 20, chargeFps: 20, reloadFps: 30);

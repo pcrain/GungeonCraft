@@ -12,7 +12,7 @@ public class Bouncer : CwaffGun
     internal const float          _FORCE_FACTOR   = 0.5f; // % of speed converted to force
     internal const float          _ACCELERATION   = 1.9f;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<Bouncer>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.PISTOL, reloadTime: 1.3f, ammo: 300, shootFps: 14, reloadFps: 30,

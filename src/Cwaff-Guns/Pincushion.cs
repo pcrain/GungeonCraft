@@ -15,7 +15,7 @@ public class Pincushion : CwaffGun
 
     internal static VFXPool _Microdust;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<Pincushion>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.FULLAUTO, reloadTime: 1.8f, ammo: 10000, doesScreenShake: false,

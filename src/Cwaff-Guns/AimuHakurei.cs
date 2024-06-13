@@ -26,7 +26,7 @@ public class AimuHakurei : CwaffGun
     private Coroutine _decayCoroutine = null;
     private bool _focused = false;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<AimuHakurei>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f,

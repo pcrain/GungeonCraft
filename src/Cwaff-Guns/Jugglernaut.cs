@@ -39,7 +39,7 @@ public class Jugglernaut : CwaffGun
     private bool _cachedFlipped = false;
     private bool _firstSpriteCheck = true;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<Jugglernaut>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 240, shootFps: 30, reloadFps: 40, preventRotation: true);

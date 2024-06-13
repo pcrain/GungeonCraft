@@ -13,7 +13,7 @@ public class Outbreak : CwaffGun
 
     internal readonly bool _INFECT_TOWARDS_CURSOR = true;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<Outbreak>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 1.2f, ammo: 300, shootFps: 24, reloadFps: 20,

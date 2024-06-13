@@ -22,7 +22,7 @@ public class KiBlast : CwaffGun
     private float _rechargeTimer = 0.0f;
     private float _nextRecharge = 0.0f;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<KiBlast>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 20, canGainAmmo: false, idleFps: 10,

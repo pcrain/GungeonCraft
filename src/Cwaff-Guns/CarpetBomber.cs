@@ -18,7 +18,7 @@ public class CarpetBomber : CwaffGun
 
     internal static ExplosionData _CarpetExplosion = null;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<CarpetBomber>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.5f, ammo: 360, shootFps: 30, reloadFps: 20,

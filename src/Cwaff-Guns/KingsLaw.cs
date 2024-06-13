@@ -25,7 +25,7 @@ public class KingsLaw : CwaffGun
     private GameObject _extantMuzzleRune = null;
     private float      _muzzleRuneAlpha  = 0.0f;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<KingsLaw>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARGE, reloadTime: 0.75f, ammo: 700, doesScreenShake: false, reloadAudio: "knife_gun_reload");

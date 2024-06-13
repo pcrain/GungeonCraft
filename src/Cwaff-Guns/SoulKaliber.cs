@@ -7,7 +7,7 @@ public class SoulKaliber : CwaffGun
     public static string LongDescription  = "Fires projectiles that give enemies the soul link status effect. All soul linked enemies receive damage when any one of them is hit.";
     public static string Lore             = "A traveling missionary of Kaliber was once rudely interrupted mid-sermon by a bandit army of sword-wielding heathens. With no weapons on hand to defend their congregation, the missionary prayed to the goddess for a firearm to deliver them from impending doom. Kaliber asked an acolyte to prepare and deliver one of her strongest guns; the acolyte, however, accidentally dropped the gun and its ammunition while loading it. The ammo rained down rather harmlessly on the bandits' heads, but by some miracle, the gun itself managed to bludgeon one of the bandits, knocking all of them out in the process.";
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<SoulKaliber>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.1f, ammo: 250, shootFps: 24, reloadFps: 12,

@@ -55,7 +55,7 @@ public class IceCreamGun : CwaffGun
 
     internal static int _IceCreamGunId;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<IceCreamGun>(ItemName, ShortDescription, LongDescription, Lore, hideFromAmmonomicon: true);
             gun.SetAttributes(quality: ItemQuality.SPECIAL, gunClass: GunClass.SILLY, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true);

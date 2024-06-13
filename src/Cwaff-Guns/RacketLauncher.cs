@@ -13,7 +13,7 @@ public class RacketLauncher : CwaffGun
 
     private List<TennisBall> _extantTennisBalls = new();
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<RacketLauncher>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: _AMMO, canReloadNoMatterAmmo: true,

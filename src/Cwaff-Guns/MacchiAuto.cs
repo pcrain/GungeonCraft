@@ -10,7 +10,7 @@ public class MacchiAuto : CwaffGun
     internal static OverdoseEffect _OverdoseEffect = null;
     internal static Color _OverdoseTint = new Color(0.25f, 0.125f, 0.0f, 1.0f);
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<MacchiAuto>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.BEAM, reloadTime: 1.0f, ammo: 100, audioFrom: Items.MegaDouser, defaultAudio: true);

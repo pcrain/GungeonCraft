@@ -43,7 +43,7 @@ public class Ticonderogun : CwaffGun
     private List<Vector2> _extantPoints          = new();
     private List<GameObject> _extantSprites      = new();
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<Ticonderogun>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.0f, ammo: 150, shootFps: 1, reloadFps: 1, chargeFps: 24, curse: 2f);

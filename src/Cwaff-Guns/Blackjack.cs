@@ -15,7 +15,7 @@ public class Blackjack : CwaffGun
     internal static tk2dSpriteAnimationClip _BulletSprite;
     internal static tk2dSpriteAnimationClip _BackSprite;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<Blackjack>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.8f, ammo: _AMMO, canGainAmmo: false,

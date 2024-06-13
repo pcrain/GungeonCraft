@@ -13,7 +13,7 @@ public class ChekhovsGun : CwaffGun
 
     private List<ChekhovBullet> _extantBullets          = new();
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<ChekhovsGun>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 0.75f, ammo: 200, shootFps: 16, reloadFps: 16,

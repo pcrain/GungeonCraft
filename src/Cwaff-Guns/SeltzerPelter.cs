@@ -12,7 +12,7 @@ public class SeltzerPelter : CwaffGun
 
     private int _loadedCanIndex = 0;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<SeltzerPelter>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.0f, ammo: 150, shootFps: 36, muzzleFrom: Items.Mailbox);

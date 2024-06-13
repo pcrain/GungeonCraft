@@ -13,7 +13,7 @@ public class IronMaid : CwaffGun
     private Vector2 _whereIsThePlayerLooking;
     private AIActor _targetEnemy;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<IronMaid>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 0.75f, ammo: 400, shootFps: 24, reloadFps: 24,

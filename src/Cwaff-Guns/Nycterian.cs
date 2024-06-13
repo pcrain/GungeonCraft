@@ -9,7 +9,7 @@ public class Nycterian : CwaffGun
 
     internal static GameObject _DistractedVFX;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<Nycterian>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 1.1f, ammo: 425, shootFps: 20, reloadFps: 20,

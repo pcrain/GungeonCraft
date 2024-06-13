@@ -22,7 +22,7 @@ public class Gunbrella : CwaffGun
     private Vector2 _chargeStartPos      = Vector2.zero;
     private int _nextProjectileNumber    = 0;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<Gunbrella>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARGE, reloadTime: 1.0f, ammo: 60, shootFps: 60, chargeFps: 16,

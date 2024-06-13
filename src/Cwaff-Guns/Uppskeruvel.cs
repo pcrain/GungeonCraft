@@ -33,7 +33,7 @@ public class Uppskeruvel : CwaffGun
     private List<int> _usedIndices = new();
     private UppskeruvelCombatSoul[] _soulTracker = Enumerable.Repeat((UppskeruvelCombatSoul)null, _MAX_SOULS).ToArray();
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<Uppskeruvel>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARM, reloadTime: 1.25f, ammo: 400, shootFps: 24, reloadFps: 30,

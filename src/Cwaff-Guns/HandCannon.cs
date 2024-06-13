@@ -13,7 +13,7 @@ public class HandCannon : CwaffGun
     internal static GameObject _SlapppAnimation;
     internal static GameObject _ClapppShockwave;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<HandCannon>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 0.75f, ammo: 100, shootFps: 30,

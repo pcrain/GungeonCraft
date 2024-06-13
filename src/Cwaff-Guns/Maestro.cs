@@ -16,7 +16,7 @@ public class Maestro : CwaffGun
     private AIActor    _targetEnemy         = null;
     private Projectile _targetProjectile    = null;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<Maestro>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.CHARM, reloadTime: 0.0f, ammo: 500, shootFps: 24,

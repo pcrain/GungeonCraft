@@ -18,7 +18,7 @@ public class Vladimir : CwaffGun
     private List<AIActor> _skeweredEnemies             = new();
     private int _power                                 = 0;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<Vladimir>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.1f, ammo: 100,

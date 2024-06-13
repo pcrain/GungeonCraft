@@ -12,7 +12,7 @@ public class Lightwing : CwaffGun
     internal static tk2dSpriteAnimationClip _RetrievingSprite = null;
     internal static tk2dSpriteAnimationClip _ReturningSprite  = null;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<Lightwing>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.0f, ammo: 120, shootFps: 32, reloadFps: 30,

@@ -31,7 +31,7 @@ public class Breegull : CwaffGun
         public int ammo;
     }
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<Breegull>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.0f, ammo: 320, shootFps: 20, reloadFps: 12,

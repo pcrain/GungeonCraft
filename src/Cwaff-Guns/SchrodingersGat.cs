@@ -15,7 +15,7 @@ public class SchrodingersGat : CwaffGun
 
     private float _speedMult                      = 1.0f;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<SchrodingersGat>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f, ammo: 250, idleFps: 24, shootFps: 24);

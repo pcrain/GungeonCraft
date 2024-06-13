@@ -9,7 +9,7 @@ public class SubMachineGun : CwaffGun
 
     internal static GameObject _NourishVFX;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<SubMachineGun>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.CHARM, reloadTime: 1.5f, ammo: 200, shootFps: 20, reloadFps: 10,

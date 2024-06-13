@@ -22,7 +22,7 @@ public class Grandmaster : CwaffGun
 
     internal static Projectile _Projectile;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<Grandmaster>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.0f, ammo: 350, shootFps: 24, reloadFps: 16,

@@ -54,7 +54,7 @@ public class Glockarina : CwaffGun
     private List<Note> _lastNotes = new();
     private DamageTypeModifier _electricImmunity = null;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<Glockarina>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.2f, ammo: 400, canReloadNoMatterAmmo: true,

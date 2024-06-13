@@ -20,7 +20,7 @@ public class Deadline : CwaffGun
     private GameObject _myLaserSight = null;
     private GameObject _debugLaserSight = null;
 
-    public static void Add()
+    public static void Init()
     {
         Gun gun = Lazy.SetupGun<Deadline>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 0.9f, ammo: 64, idleFps: 10, shootFps: 20,
