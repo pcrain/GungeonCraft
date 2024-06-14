@@ -22,10 +22,11 @@ public class Blackjack : CwaffGun
                 shootFps: 30, reloadFps: 30, muzzleFrom: Items.Mailbox, reloadAudio: "card_shuffle_sound");
 
         gun.InitProjectile(GunData.New(clipSize: _CLIP_SIZE, cooldown: 0.16f, angleVariance: 24.0f, shootStyle: ShootStyle.Automatic,
-          customClip: true, damage: 8f, speed: 22f, range: 999f
+          customClip: true, damage: 6f, speed: 22f, range: 999f
           )).AddAnimations(
             AnimatedBullet.Create(refClip: ref _BulletSprite, name: "playing_card",      fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft),
             AnimatedBullet.Create(refClip: ref _BackSprite,   name: "playing_card_back", fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft)
+          ).SetAllImpactVFX(VFX.CreatePool("blackjack_card_impact_vfx", fps: 16, loops: false, scale: 0.75f, anchor: Anchor.MiddleCenter)
           ).Attach<ThrownCard>();
     }
 
@@ -68,6 +69,7 @@ public class ThrownCard : MonoBehaviour
         this._owner = this._projectile.Owner as PlayerController;
 
         this._projectile.OnDestruction += CreatePlayingCardPickup;
+        this._projectile.specRigidbody.OnCollision += this.OnCollision;
 
         // don't use an emissive / tinted shader so we can turn off the glowing yellow tint effect
         // this._projectile.sprite.usesOverrideMaterial = true; // keep this off so we still get nice lighting
@@ -77,12 +79,7 @@ public class ThrownCard : MonoBehaviour
             bounce.numberOfBounces     = 1;
             bounce.chanceToDieOnBounce = 0f;
             bounce.onlyBounceOffTiles  = false;
-            bounce.OnBounce += () => {
-                this._lifetime = this._timeAtMaxPower; // force falter next frame for Helix Bullets compatibility
-                this._bounced = true;
-                this._projectile.m_usesNormalMoveRegardless = true; // ignore Helix projectiles and other motion modifiers after bouncing
-                this._projectile.baseData.speed *= 0.4f;
-            };
+            bounce.OnBounce += this.OnBounce;
 
         CalculateStatsFromPlayerStats();
 
@@ -92,6 +89,19 @@ public class ThrownCard : MonoBehaviour
         this._startAngle = this._projectile.OriginalDirection();
 
         this._projectile.gameObject.PlayUnique("card_throw_sound");
+    }
+
+    private void OnCollision(CollisionData obj)
+    {
+        base.gameObject.Play("blackjack_card_impact_sound");
+    }
+
+    private void OnBounce()
+    {
+        this._lifetime = this._timeAtMaxPower; // force falter next frame for Helix Bullets compatibility
+        this._bounced = true;
+        this._projectile.m_usesNormalMoveRegardless = true; // ignore Helix projectiles and other motion modifiers after bouncing
+        this._projectile.baseData.speed *= 0.4f;
     }
 
     private void CalculateStatsFromPlayerStats()

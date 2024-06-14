@@ -105,7 +105,7 @@ public sealed class GunData
   /// <param name="overrideProjectilesToCopyFrom">[Unknown]</param>
 
   /// <param name="bossDamageMult"></param>
-  /// <param name="destroySound"></param>
+  /// <param name="destroySound">Sound event for when projectile is destroyed (Vanilla, no special properties)</param>
   /// <param name="shouldRotate"></param>
   /// <param name="barrageSize"></param>
   /// <param name="shouldFlipHorizontally"></param>
@@ -115,7 +115,7 @@ public sealed class GunData
 
   /// <param name="spawnSound"></param>
   /// <param name="stopSoundOnDeath"></param>
-  /// <param name="deathSound"></param>
+  /// <param name="deathSound">Sound event for when projectile is destroyed (custom, can be unique)</param>
   /// <param name="uniqueSounds"></param>
   /// <param name="shrapnelVFX"></param>
   /// <param name="shrapnelCount"></param>
