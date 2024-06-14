@@ -4,7 +4,7 @@ public class Blackjack : CwaffGun
 {
     public static string ItemName         = "Blackjack";
     public static string ShortDescription = "Gambit's Queens";
-    public static string LongDescription  = "Fires cards whose range increase with accuracy. Ammo can only be regained by picking up cards from the floor.";
+    public static string LongDescription  = "Fires cards whose speed, range, and damage increase with accuracy. Ammo can only be regained by picking up cards from the floor.";
     public static string Lore             = "Many would argue that cards do not make the best projectiles for a gun...and many would largely be correct, as their lack of raw power and aerodynamics make them rather weak and unreliable in the hands of a novice. The most proficient and well-prepared duelists, however, have demonstrated that a single deck of cards is more than capable of dealing with the Gungeon's greatest threats.";
 
     private const int _DECK_SIZE = 52; // need to finish up individual playing cards later
@@ -22,7 +22,7 @@ public class Blackjack : CwaffGun
                 shootFps: 30, reloadFps: 30, muzzleFrom: Items.Mailbox, reloadAudio: "card_shuffle_sound");
 
         gun.InitProjectile(GunData.New(clipSize: _CLIP_SIZE, cooldown: 0.16f, angleVariance: 24.0f, shootStyle: ShootStyle.Automatic,
-          customClip: true, damage: 8f, speed: 18f, range: 999f
+          customClip: true, damage: 8f, speed: 22f, range: 999f
           )).AddAnimations(
             AnimatedBullet.Create(refClip: ref _BulletSprite, name: "playing_card",      fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft),
             AnimatedBullet.Create(refClip: ref _BackSprite,   name: "playing_card_back", fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft)
@@ -97,9 +97,11 @@ public class ThrownCard : MonoBehaviour
     private void CalculateStatsFromPlayerStats()
     {
         float acc            = this._owner.AccuracyMult();
-        float inverseRootAcc = Mathf.Sqrt(1.0f / acc);
-        this._timeAtMaxPower = _BASE_LIFE * inverseRootAcc * UnityEngine.Random.Range(0.8f, 1.2f);
-        this._projectile.baseData.damage *= inverseRootAcc;
+        float inverseRootAcc = Mathf.Sqrt(1.0f / Mathf.Max(0.1f, acc));
+        this._timeAtMaxPower = _BASE_LIFE * UnityEngine.Random.Range(0.8f, 1.2f);
+        this._projectile.baseData.damage *= Mathf.Clamp(inverseRootAcc, 1f, 3f);
+        this._projectile.baseData.speed *= inverseRootAcc;
+        this._projectile.UpdateSpeed();
     }
 
     private void Update()

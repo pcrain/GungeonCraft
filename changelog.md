@@ -11,6 +11,10 @@
 	- Added circus music :D
 - Added targeting reticle to Iron Maid
 - Made Iron Maid projectiles launch towards target enemy's current position at time of launch (rather than their old position at time of reload)
+- Blackjack's projectiles now scale in speed with accuracy
+- Clarified in Blackjack's description that projectile damage scales with accuracy (this was always true, but never mentioned)
+- Fixed potential division by zero error in Blackjack if used by a character with perfect accuracy
+- Increased Blackjack projectile speed from 18 to 22
 
 ## 1.14.0 (2024-06-10)
 
