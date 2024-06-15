@@ -100,8 +100,11 @@ public class PhaseThroughInnerWallsBehavior : MonoBehaviour
 
     private void DoPhaseFX()
     {
+        if (!this._projectile)
+            return;
+
         this._phased = true;
-        if (this._owner && !this._owner.PlayerHasActiveSynergy(Synergy.MASTERY_CHEKHOVS_GUN))
+        if (this._owner && !this._owner.PlayerHasActiveSynergy(Synergy.PROJECTING_MUCH))
             this._projectile.baseData.damage *= FourDBullets._PHASE_DAMAGE_SCALING;
 
         tk2dBaseSprite sprite = this._projectile.sprite;

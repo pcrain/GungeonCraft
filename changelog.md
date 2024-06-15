@@ -18,6 +18,8 @@
 	- Added projectile impact sounds and vfx
 - Added targeting reticle to Iron Maid
 - Made Iron Maid projectiles launch towards target enemy's current position at time of launch (rather than their old position at time of reload)
+- Fixed Projecting, Much? synergy being completely nonfunctional due to 4D bullets checking for the wrong synergy
+- Fixed null deref in 4D Bullets caused by trying to apply a shader to a nonexistent sprite
 
 ## 1.14.0 (2024-06-10)
 
