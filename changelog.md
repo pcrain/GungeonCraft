@@ -1,24 +1,30 @@
 # Changelog
 
-## TBD
+## 1.14.1 (2024-06-14)
 
-- Make visual effects for Uppskeruvel, Magunet, and Vacuum Cleaner framerate independent
-- Fixed gun sprites sometimes being flipped upside down when finishing a Gyroscope dodge roll
+#### Balance Changes and Polish:
+
 - Overhauled Jugglernaut:
 	- Changed projectile sprites to match the juggled gun sprites
 	- Added animations for dropping current juggle combo
 	- Added projectile impact sounds
 	- Added circus music :D
 - Overhauled Blackjack:
-	- Blackjack's projectiles now scale in speed with accuracy
+	- Blackjack's projectile speed now scales with the player's accuracy stat
 	- Clarified in Blackjack's description that projectile damage scales with accuracy (this was always true, but never mentioned)
-	- Fixed potential division by zero error in Blackjack if used by a character with perfect accuracy
 	- Increased base speed of Blackjack's projectiles from 18 to 22
 	- Reduced base damage of Blackjack's projectiles from 8 to 6
-	- Added projectile impact sounds and vfx
-- Added targeting reticle to Iron Maid
-- Made Iron Maid projectiles launch towards target enemy's current position at time of launch (rather than their old position at time of reload)
-- Fixed Projecting, Much? synergy being completely nonfunctional due to 4D bullets checking for the wrong synergy
+	- Added projectile impact sounds 
+	- Added projectile impact particles
+- Tweaked Iron Maid:
+	- Added targeting reticle to Iron Maid
+	- Made Iron Maid projectiles launch towards target enemy's current position at time of launch (rather than their old position at time of reload)
+- Made visual effects for Uppskeruvel, Magunet, and Vacuum Cleaner framerate independent
+
+#### Bugfixes and Misc:
+- Fixed potential division by zero error in Blackjack if used by a character with perfect accuracy
+- Fixed gun sprites sometimes being flipped upside down when finishing a Gyroscope dodge roll
+- Fixed "Projecting, Much?" synergy being completely nonfunctional due to 4D Bullets checking for the wrong synergy
 - Fixed null deref in 4D Bullets caused by trying to apply a shader to a nonexistent sprite
 
 ## 1.14.0 (2024-06-10)
