@@ -44,7 +44,7 @@ public class VoodooDoll : CwaffPassive
     {
         if (_VoodooDollEffectHappening)
             return; // avoid recursive damage
-        if (!(enemy?.aiActor?.IsHostile(canBeDead: true) ?? false))
+        if (!enemy || !enemy.aiActor || !enemy.aiActor.IsHostile(canBeDead: true))
             return; // avoid processing effect for non-hostile enemies
 
         _VoodooDollEffectHappening = true;
@@ -54,25 +54,34 @@ public class VoodooDoll : CwaffPassive
 
     private void DoVoodooDollEffect(float damage, HealthHaver enemy)
     {
+        if (enemy.aiActor.GetAbsoluteParentRoom() is not RoomHandler room)
+            return;
+        if (room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> activeEnemies)
+            return;
+
         string myGuid = enemy.aiActor.EnemyGuid;
-        List<AIActor> activeEnemies = enemy.aiActor.GetAbsoluteParentRoom().GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
-        foreach (AIActor other in activeEnemies)
+        for (int n = activeEnemies.Count - 1; n >= 0; --n)
         {
-            if (!(other?.IsHostileAndNotABoss() ?? false))
+            AIActor other = activeEnemies[n];
+            if (!other || !other.IsHostileAndNotABoss())
                 continue; // don't care about inactive or dead enemies
             if (other.EnemyGuid != myGuid)
                 continue; // don't care about non-matching enemies
             if (other == enemy.aiActor)
                 continue; // don't care about matching ourself
 
-            other.healthHaver?.ApplyDamage(damage, Vector2.zero, "Voodoo Doll", CoreDamageTypes.Magic, DamageCategory.Unstoppable,
-                ignoreInvulnerabilityFrames: true, ignoreDamageCaps: false);
+            if (other.healthHaver)
+                other.healthHaver.ApplyDamage(damage, Vector2.zero, "Voodoo Doll", CoreDamageTypes.Magic, DamageCategory.Unstoppable,
+                    ignoreInvulnerabilityFrames: true, ignoreDamageCaps: false);
 
-            bool flip = Lazy.CoinFlip();
-            Vector2 ppos = flip ? other.sprite.WorldTopRight : other.sprite.WorldTopLeft;
-            FancyVFX f = FancyVFX.Spawn(_VoodooGhostVFX, ppos, 0f.EulerZ(),
-                velocity: Vector2.zero, lifetime: 0.4f, fadeOutTime: 0.4f);
-                f.GetComponent<tk2dSprite>().FlipX = flip;
+            if (other.sprite)
+            {
+                bool flip = Lazy.CoinFlip();
+                Vector2 ppos = flip ? other.sprite.WorldTopRight : other.sprite.WorldTopLeft;
+                FancyVFX f = FancyVFX.Spawn(_VoodooGhostVFX, ppos, 0f.EulerZ(),
+                    velocity: Vector2.zero, lifetime: 0.4f, fadeOutTime: 0.4f);
+                    f.GetComponent<tk2dSprite>().FlipX = flip;
+            }
         }
     }
 
