@@ -1,5 +1,9 @@
 # Changelog
 
+## TBD
+- Fixed null deref in 4D Bullets caused by trying to apply a shader to a nonexistent sprite (for real this time)
+
+
 ## 1.14.1 (2024-06-14)
 
 #### Balance Changes and Polish:

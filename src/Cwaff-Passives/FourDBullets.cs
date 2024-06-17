@@ -107,9 +107,11 @@ public class PhaseThroughInnerWallsBehavior : MonoBehaviour
         if (this._owner && !this._owner.PlayerHasActiveSynergy(Synergy.PROJECTING_MUCH))
             this._projectile.baseData.damage *= FourDBullets._PHASE_DAMAGE_SCALING;
 
-        tk2dBaseSprite sprite = this._projectile.sprite;
-        sprite.usesOverrideMaterial = true;
-        sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/HologramShader");
+        if (this._projectile.sprite is tk2dBaseSprite sprite)
+        {
+            sprite.usesOverrideMaterial = true;
+            sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/HologramShader");
+        }
         base.gameObject.PlayUnique("phase_through_wall_sound");
     }
 }
