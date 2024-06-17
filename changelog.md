@@ -2,7 +2,7 @@
 
 ## TBD
 - Fixed null deref in 4D Bullets caused by trying to apply a shader to a nonexistent sprite (for real this time)
-
+- Fixed null derefs in Comfy Slippers and Safety Gloves due to trying to update while levels are loading
 
 ## 1.14.1 (2024-06-14)
 

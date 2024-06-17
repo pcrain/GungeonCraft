@@ -28,6 +28,8 @@ public class SafetyGloves : CwaffPassive
     public override void Update()
     {
         base.Update();
+        if (!GameManager.HasInstance || GameManager.Instance.IsLoadingLevel || GameManager.IsReturningToBreach)
+            return;
 
         if (this._extantVfx != null && this._shouldClearVfx)
         {
