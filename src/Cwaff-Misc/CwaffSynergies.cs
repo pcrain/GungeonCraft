@@ -29,7 +29,7 @@ public static class CwaffSynergies
         NewSynergy(DEUS_EX_MACHINA, "Deus Ex Machina", new[]{IName(ChekhovsGun.ItemName), IName(PlotArmor.ItemName)});
         // Suncaster replenishes ammo twice as quickly.
         NewSynergy(SOLAR_FLAIR, "Solar Flair", new[]{IName(Suncaster.ItemName), "sunlight_javelin"});
-        // 4D Bullets no longer have a damage penalty when firing bullets through walls.
+        // Bullets no longer have a damage penalty when fired through walls.
         NewSynergy(PROJECTING_MUCH, "Projecting, Much?", new[]{IName(FourDBullets.ItemName), IName(AstralProjector.ItemName)});
         // Aimu Hakurei's charge is instantly set to MAX upon getting hit.
         NewSynergy(LOTUS_LAND_STORY, "Lotus Land Story", new[]{IName(AimuHakurei.ItemName), "laser_lotus"});
@@ -39,7 +39,7 @@ public static class CwaffSynergies
         NewSynergy(DUBBLE_BUBBLE, "Dubble Bubble", new[]{IName(BubbleWand.ItemName), "bubble_blaster"});
         // Enemies drop twice as many souls when killed with Uppskeruvel.
         NewSynergy(SOUL_SEARCHING, "Soul Searching", new[]{IName(Uppskeruvel.ItemName), "gun_soul"});
-        // Vacuuming debris occasionally generates casing (up to 20 per floor).
+        // Vacuuming debris occasionally generates casings (up to 20 per floor).
         NewSynergy(CLEANUP_CREW, "Cleanup Crew", new[]{IName(VacuumCleaner.ItemName), IName(CustodiansBadge.ItemName)});
         // Vacuum's chance to restore ammo is increased to 4%.
         NewSynergy(SCAVENGEST, "Scavengest", new[]{IName(VacuumCleaner.ItemName), IName(ScavengingArms.ItemName)});
