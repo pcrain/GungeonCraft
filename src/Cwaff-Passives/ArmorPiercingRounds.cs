@@ -46,8 +46,11 @@ public class ArmorPiercingRounds : CwaffPassive
         {
             playPierceSound |= hh.PreventAllDamage; // Lead Cube, Flesh Cube, and Gunreaper
             hh.PreventAllDamage = false;
-            playPierceSound |= hh.minimumHealth > 0; // Bloodbulon and Shambling Round
-            hh.minimumHealth = 0;
+            if (!hh.IsBoss && !hh.IsSubboss) // prevent issues with modded bosses
+            {
+                playPierceSound |= hh.minimumHealth > 0; // Bloodbulon and Shambling Round
+                hh.minimumHealth = 0;
+            }
         }
         if (body.GetComponent<BehaviorSpeculator>() is BehaviorSpeculator bs)
         {
