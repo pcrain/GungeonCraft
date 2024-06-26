@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.14.3 (TBD)
+
+- Fixed Zag projectiles not pathfinding properly when targeting enemies while in contact with a wall
+
 ## 1.14.2 (2024-06-17)
 
 - Fixed null deref in 4D Bullets caused by trying to apply a shader to a nonexistent sprite (for real this time)

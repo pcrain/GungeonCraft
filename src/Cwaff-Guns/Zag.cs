@@ -135,12 +135,10 @@ public class ZagProjectile : MonoBehaviour
             if (!ipoint.HasValue)
                 continue;
             float sqrDist = (ppos - ipoint.Value).sqrMagnitude; // closest orthogonally
-            // float sqrDist = (ppos - enemy.CenterPosition).sqrMagnitude; // closest overall (need to adjust _MAX_DIST_SQR if i ever use this)
             if (sqrDist > closest)
                 continue;
-            if (!ppos.HasLineOfSight(ipoint.Value))
-                continue;
-            if (!enemy.CenterPosition.HasLineOfSight(ipoint.Value))
+            Vector2 adjustForWallPos = ppos + (enemy.CenterPosition - ppos).normalized; // push projectile's effective position out of the wall a bit
+            if (!enemy.CenterPosition.HasLineOfSight(adjustForWallPos))
                 continue;
             closest = sqrDist;
             target = enemy;
@@ -168,6 +166,8 @@ public class ZagProjectile : MonoBehaviour
 
     private void Update()
     {
+        if (BraveTime.DeltaTime == 0.0f)
+            return;
         StraightenOut();
         Reorient();
         if (this._hasTarget || !this._straightened)
@@ -175,6 +175,7 @@ public class ZagProjectile : MonoBehaviour
         if (FindClosestPerpendicularEnemy(this._projectile.SafeCenter, this._projectile.Direction.ToAngle(), out Vector2 ipoint) is not AIActor target)
             return;
         this._hasTarget = true;
+        this._blockedByWall = false;
         this._projectile.specRigidbody.Position = new Position(ipoint);
         this._projectile.specRigidbody.UpdateColliderPositions();
         DoZigZag(target.CenterPosition - ipoint);
