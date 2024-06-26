@@ -21,7 +21,7 @@ public class Starmageddon : CwaffGun
         gun.InitProjectile(GunData.New(clipSize: 30, cooldown: 0.125f, angleVariance: 15.0f,
           shootStyle: ShootStyle.Automatic, damage: 6.0f, speed: 60.0f, range: 999999f, spawnSound: "starmageddon_fire_sound",
           sprite: "starmageddon_bullet", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter, useDummyChargeModule: true,
-          // overrideColliderPixelSizes: new IntVector2(128, 128), //BUG: large hitboxes apparently lag the game????
+          // overrideColliderPixelSizes: new IntVector2(128, 128), //WARNING: large hitboxes apparently lag the game????
           shrapnelVFX: VFX.Create("starmageddon_shrapnel"), shrapnelCount: 5
           )
         ).Attach<StarmageddonProjectile>();

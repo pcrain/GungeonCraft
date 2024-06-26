@@ -2022,8 +2022,9 @@ public static class Extensions
   }
 
   /// <summary>Returns true if the Player is at a location where they would effectively be stuck under normal circumstances</summary>
+  /// <remarks>NOT IMPLEMENTED</remarks>
   public static bool IsEffectivelyOutOfBounds(this PlayerController player)
   {
-    return false; //BUG: need to implement this so Frisbee can't clip behind Bello's shop
+    return false; //TODO: originally needed so Frisbee couldn't clip behind Bello's shop, but that was fixed...should still be implemented at some point
   }
 }

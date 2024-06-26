@@ -38,7 +38,7 @@ public class ChamberJammer : CwaffActive
         float percentAmmoToLose = Mathf.Min(0.9f, 1f - (float)gun.CurrentAmmo / (float)gun.AdjustedMaxAmmo);
         gun.gameObject.AddComponent<ChamberEaterAmmoDisplay>().Setup(percentAmmoToLose);
         gun.gameObject.AddComponent<ChamberJammedBehavior>().Setup(percentAmmoToLose);
-        gun.SetBaseMaxAmmo(Mathf.CeilToInt((1f - percentAmmoToLose) * gun.GetBaseMaxAmmo()));
+        gun.SetBaseMaxAmmo(Mathf.CeilToInt((1f - percentAmmoToLose) * gun.GetBaseMaxAmmo())); //BUG: does not persist on save and reload
 
         float amountToBoostDamage = 1f / (1f - percentAmmoToLose);
         gun.AddCurrentGunStatModifier(PlayerStats.StatType.Damage, amountToBoostDamage, StatModifier.ModifyMethod.MULTIPLICATIVE);

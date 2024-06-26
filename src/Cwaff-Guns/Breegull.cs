@@ -65,8 +65,8 @@ public class Breegull : CwaffGun
         _EggNormal = gun.InitProjectile(GunData.New(sprite: "breegull_projectile_normal", clipSize: 10, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic, damage: 5.0f,
             shrapnelVFX: VFX.Create("breegull_impact_normal"), shrapnelCount: 10, deathSound: "egg_hit_enemy_sound"));
 
-        //BUG: CloneProjectile from anything other than a vanilla gun causes weird issues on MacOS and Linux???
-        //     Can maybe be circumvented by setting up each sprite individually? (actually just has to do with missing DLL / patch for generic Instantiate())
+        //WARNING: CloneProjectile from anything other than a vanilla gun causes weird issues on MacOS and Linux???
+        //         Can maybe be circumvented by setting up each sprite individually? (actually just has to do with missing DLL / patch for generic Instantiate())
         _EggFire      = gun.CloneProjectile(GunData.New(sprite: "breegull_projectile_fire", shrapnelVFX: VFX.Create("breegull_impact_fire"), fire: 0.5f));
         _EggGrenade   = gun.CloneProjectile(GunData.New(sprite: "breegull_projectile_grenade", shrapnelVFX: VFX.Create("breegull_impact_grenade"))
             ).Attach<ExplosiveModifier>(ex => ex.explosionData = Explosions.DefaultLarge);
@@ -106,7 +106,7 @@ public class Breegull : CwaffGun
     private void UpdateEggs(bool playSound = false)
     {
         EggData e = _Eggs[this._currentEggType];
-        this.gun.DefaultModule.ammoCost = e.ammo;  //BUG: with certain items, the ammo cost here seems to be ignored
+        this.gun.DefaultModule.ammoCost = e.ammo;  //BUG: with certain items, the ammo cost here seems to be ignored...can't replicate though
         if (playSound)
             base.gameObject.Play(e.sound);
     }

@@ -1314,7 +1314,7 @@ public class RotateIntoPositionBehavior : MonoBehaviour
     }
 }
 
-//BUG: destroying these without breaking the game is rather hard...look into it later
+//TODO: destroying these without breaking the game is rather hard...look into it later
 public class Nametag : MonoBehaviour
 {
     private Text _nametag; // Reference to the Text component.
