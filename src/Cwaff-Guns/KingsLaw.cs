@@ -87,7 +87,8 @@ public class KingsLaw : CwaffGun
         base.OnSwitchedToThisGun();
         Reset();
         this._muzzleRuneAlpha = 0f;
-        this._extantMuzzleRune?.SetAlphaImmediate(0f);
+        if (this._extantMuzzleRune)
+            this._extantMuzzleRune.SetAlphaImmediate(0f);
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
