@@ -18,7 +18,7 @@
 - Companion Shop: sells 3 random unlocked companions at a 30% discount
 - Bartering Shop: trades 3 random D-A tier items for any higher-tiered item
 - Insurance Shop: sells insurance policies that let you carry items over to the next run
-- Hecked Mode: randomize enemies' guns for a truly hecked playing experience. Enable it in Options -> Mod Config -> GungeonCraft -> Hecked Mode
+- Hecked Mode: randomize enemies' guns for a truly hecked playing experience (enabled via the Mod Config menu)
 - A new secret boss
 - Vanilla bugfixes
 - You can pet Junior \o/
