@@ -99,7 +99,7 @@ public class ZagProjectile : MonoBehaviour
             fadeOutTime   : 0.4f);
         this._projectile.SendInDirection(dirVec: newDir, resetDistance: true, updateRotation: true);
         base.gameObject.PlayUnique("zag_zig_sound");
-        if (this._trail && base.GetComponent<SpeculativeRigidbody>())
+        if (this._trail && this._trail.specRigidbody)
             this._trail.DisconnectFromSpecRigidbody();
         this._trail = this._projectile.AddTrailToProjectileInstance(Zag._ZagTrailPrefab);
         this._trail.gameObject.SetGlowiness(10f);

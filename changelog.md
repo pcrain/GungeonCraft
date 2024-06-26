@@ -3,6 +3,7 @@
 ## 1.14.3 (TBD)
 
 - Fixed Zag projectiles not pathfinding properly when targeting enemies while in contact with a wall
+- Fixed null deref due to Zag projectile trails trying to disconnect from nonexistent bodies
 
 ## 1.14.2 (2024-06-17)
 
