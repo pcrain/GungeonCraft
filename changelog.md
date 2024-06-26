@@ -5,6 +5,7 @@
 - Fixed Zag projectiles not pathfinding properly when targeting enemies while in contact with a wall
 - Fixed null deref due to Zag projectile trails trying to disconnect from nonexistent bodies
 - Fixed null deref when switching to King's Law caused by trying to set the alpha of nonexistent muzzle VFX
+- Fixed Chamber Jammer's effects not persisting when reloading a midgame save
 
 ## 1.14.2 (2024-06-17)
 

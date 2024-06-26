@@ -13,6 +13,8 @@ public class ChamberJammer : CwaffActive
         item.quality      = ItemQuality.C;
         item.consumable   = true;
         item.CanBeDropped = true;
+
+        FakeItem.Create<UsedChamberJammer>();
     }
 
     public override bool CanBeUsed(PlayerController user)
@@ -37,12 +39,8 @@ public class ChamberJammer : CwaffActive
 
         float percentAmmoToLose = Mathf.Min(0.9f, 1f - (float)gun.CurrentAmmo / (float)gun.AdjustedMaxAmmo);
         gun.gameObject.AddComponent<ChamberEaterAmmoDisplay>().Setup(percentAmmoToLose);
-        gun.gameObject.AddComponent<ChamberJammedBehavior>().Setup(percentAmmoToLose);
-        gun.SetBaseMaxAmmo(Mathf.CeilToInt((1f - percentAmmoToLose) * gun.GetBaseMaxAmmo())); //BUG: does not persist on save and reload
 
-        float amountToBoostDamage = 1f / (1f - percentAmmoToLose);
-        gun.AddCurrentGunStatModifier(PlayerStats.StatType.Damage, amountToBoostDamage, StatModifier.ModifyMethod.MULTIPLICATIVE);
-        user.stats.RecalculateStats(user);
+        user.AcquireFakeItem<UsedChamberJammer>().Setup(user.PlayerIDX, gun.PickupObjectId, percentAmmoToLose);
 
         GlobalSparksDoer.DoRadialParticleBurst(
             400, user.sprite.WorldBottomLeft.ToVector3ZisY(), user.sprite.WorldTopRight.ToVector3ZisY(),
@@ -50,6 +48,87 @@ public class ChamberJammer : CwaffActive
             systemType: GlobalSparksDoer.SparksType.BLACK_PHANTOM_SMOKE);
 
         user.gameObject.Play("chamber_eater_activate_sound");
+    }
+}
+
+/// <summary>Dummy item for storing data between saves</summary>
+internal class UsedChamberJammer : FakeItem
+{
+    private static List<UsedChamberJammer> _ActiveJammers = new();
+
+    private int _playerId;
+    private int _gunId;
+    private float _percentAmmoToLose;
+    private bool _deserialized = false; // whether we were just deserialized
+    //WARNING: deserialization doesn't seem to work right with multiple copies of an item -> n copies of an item results in n*n deserializations, and all
+    //         copies of an item are given the attributes of the final item deserialized. so, we get around this vanilla bug by using an index
+
+    public void Setup(int playerId, int gunId, float percentAmmoToLose)
+    {
+        this._playerId          = playerId;
+        this._gunId             = gunId;
+        this._percentAmmoToLose = percentAmmoToLose;
+        DoJamEffect();
+    }
+
+    private void DoJamEffect()
+    {
+        PlayerController user = GameManager.Instance.PrimaryPlayer;
+        if (GameManager.Instance.CurrentGameType == GameManager.GameType.COOP_2_PLAYER && user.PlayerIDX != this._playerId)
+            user = GameManager.Instance.SecondaryPlayer;
+        Gun jammedGun = null;
+        foreach (Gun g in user.inventory.AllGuns)
+        {
+            if (g.PickupObjectId == this._gunId)
+            {
+                jammedGun = g;
+                break;
+            }
+        }
+        if (!jammedGun)
+        {
+            Lazy.DebugWarn($"Failed to find gun with id {this._gunId} in player {1 + this._playerId}'s inventory!");
+            return;
+        }
+
+        jammedGun.gameObject.AddComponent<ChamberJammedBehavior>().Setup(this._percentAmmoToLose);
+        jammedGun.SetBaseMaxAmmo(Mathf.CeilToInt((1f - this._percentAmmoToLose) * jammedGun.GetBaseMaxAmmo())); //BUG: does not persist on save and reload
+        float amountToBoostDamage = 1f / (1f - this._percentAmmoToLose);
+        jammedGun.AddCurrentGunStatModifier(PlayerStats.StatType.Damage, amountToBoostDamage, StatModifier.ModifyMethod.MULTIPLICATIVE);
+        user.stats.RecalculateStats(user);
+    }
+
+    public override void OnDestroy()
+    {
+        _ActiveJammers.Remove(this);
+        base.OnDestroy();
+    }
+
+    public override void Pickup(PlayerController player)
+    {
+        base.Pickup(player);
+        _ActiveJammers.Add(this);
+    }
+
+    public override void MidGameSerialize(List<object> data)
+    {
+        base.MidGameSerialize(data);
+        data.Add(_ActiveJammers.IndexOf(this)); // index of the item in _ActiveImplants, used to work around a vanilla bug where all copies of a passive item get the same data
+        data.Add(this._playerId);
+        data.Add(this._gunId);
+        data.Add(this._percentAmmoToLose);
+    }
+
+    public override void MidGameDeserialize(List<object> data)
+    {
+        base.MidGameDeserialize(data);
+        int index = (int)data[0];
+        if (index != _ActiveJammers.IndexOf(this))
+            return; // work around vanilla deserialization of multiple copies of the same passive item
+        this._playerId          = (int)data[1];
+        this._gunId             = (int)data[2];
+        this._percentAmmoToLose = (float)data[3];
+        DoJamEffect();
     }
 }
 
