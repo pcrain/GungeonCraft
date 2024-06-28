@@ -1,5 +1,9 @@
 # Changelog
 
+## TBD
+
+- Fixed R.C. Launcher projectiles slowing down too much at higher frame rates
+
 ## 1.14.3 (2024-06-26)
 
 - Fixed Zag projectiles not pathfinding properly when targeting enemies while in contact with a wall

@@ -1,10 +1,5 @@
 ﻿namespace CwaffingTheGungy;
 
-/*
-   TODO
-    -
-*/
-
 public class RCLauncher : CwaffGun
 {
     public static string ItemName         = "R.C. Launcher";
@@ -116,13 +111,14 @@ public class RCProjectileBehavior : MonoBehaviour
 /// <summary>Guided projectile that doesn't depend on sprite rotation like the base game's InputGuidedProjectile does</summary>
 public class RCGuidedProjectile : Projectile
 {
+    private const float FRICTION = 0.99f;
+
     private static List<Projectile> _ExtantCars = new();
 
     public float trackingSpeed = 45f;
     public float minSpeed      = -1f;
     public float accel         = -1f;
     public float dumbfireTime  = 0f;
-    public float turnFriction  = 0.1f;
     public bool followTheLeader = false;
     public Func<Projectile, Vector2?> overrideTargetFunc;
 
@@ -163,11 +159,7 @@ public class RCGuidedProjectile : Projectile
                 float z = base.specRigidbody.Velocity.ToAngle();
                 float z2 = Mathf.MoveTowardsAngle(z, targetAngle, trackingSpeed * BraveTime.DeltaTime);
                 base.specRigidbody.Velocity = (Quaternion.Euler(0f, 0f, z2) * new Vector2(baseData.speed, 0f));
-                if (this.turnFriction > 0f)
-                {
-                    float frictionFactor = Mathf.Abs( (z2 - z).Clamp180() ) / 180f;
-                    this.ApplyFriction(1f - (turnFriction * frictionFactor));
-                }
+                this.ApplyFriction(FRICTION);
             }
             else
                 base.specRigidbody.Velocity = baseData.speed * targetVector.normalized;
