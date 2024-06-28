@@ -25,7 +25,7 @@ public class RCLauncher : CwaffGun
         gun.InitSpecialProjectile<RCGuidedProjectile>(GunData.New(sprite: "rc_car_projectile", clipSize: 7, cooldown: 0.1f,
             shootStyle: ShootStyle.SemiAutomatic, speed: 20f, damage: 9f, range: 9999f,
             shouldRotate: false, shouldFlipHorizontally: false, shouldFlipVertically: false,
-            spawnSound: "rc_car_engine_sound", stopSoundOnDeath: true, deathSound: "rc_car_crash_sound")
+            spawnSound: "rc_car_engine_sound", stopSoundOnDeath: true, destroySound: "rc_car_crash_sound")
         ).Attach<RCGuidedProjectile>(igp => {
             igp.dumbfireTime          = 0.2f;
             igp.trackingSpeed         = 360f;

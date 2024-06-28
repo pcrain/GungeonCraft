@@ -32,7 +32,7 @@ public class KingsLaw : CwaffGun
             gun.AddToSubShop(ModdedShopType.TimeTrader);
 
         gun.InitProjectile(GunData.New(clipSize: 20, shootStyle: ShootStyle.Automatic, damage: 7.5f, speed: 40.0f, range: 999999f, force: 9f, customClip: true,
-          cooldown: _SPAWN_RATE, sprite: "kings_law_projectile", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter, spawnSound: "snd_undynedis",
+          cooldown: _SPAWN_RATE, sprite: "kings_law_projectile", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter, spawnSound: "snd_undynedis", hitSound: "knife_gun_hit",
           useDummyChargeModule: true, shouldRotate: false)).Attach<KingsLawBullets>();
 
         // Projectiles should spawn in semi-circles around some offset point behind the player, filling in each
@@ -185,7 +185,7 @@ public class KingsLawBullets : MonoBehaviour
     private void Start()
     {
         this._projectile = base.GetComponent<Projectile>();
-        this._owner      = _projectile.Owner as PlayerController;
+        this._owner      = this._projectile.Owner as PlayerController;
 
         if (!this._owner)
             return; // shouldn't happen, but just be safe
@@ -203,9 +203,6 @@ public class KingsLawBullets : MonoBehaviour
         this._offsetMag    = baseOffset.y;
         this._offsetRing   = baseOffset.z;
 
-        this._projectile.specRigidbody.OnCollision += (_) => {
-            this._projectile.gameObject.Play("knife_gun_hit");
-        };
         this._projectile.specRigidbody.OnPreRigidbodyCollision += SkipCorpseCollisions;
 
         StartCoroutine(TheLaw());
@@ -219,9 +216,7 @@ public class KingsLawBullets : MonoBehaviour
 
     private void SkipCorpseCollisions(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
     {
-        if (otherRigidbody.GetComponent<AIActor>() is not AIActor actor)
-            return;
-        if (!actor.healthHaver || actor.healthHaver.IsDead)
+        if (otherRigidbody.GetComponent<AIActor>() is AIActor actor && (!actor.healthHaver || actor.healthHaver.IsDead))
             PhysicsEngine.SkipCollision = true;
     }
 
@@ -311,7 +306,7 @@ public class KingsLawBullets : MonoBehaviour
         this._projectile.gameObject.Play("knife_gun_launch");
 
         // Post-launch: wait for the projectiles to pass the player's original point at their launch, then re-enable tile collision
-        while (this._owner && (this._projectile?.isActiveAndEnabled ?? false))
+        while (this._owner && this._projectile && this._projectile.isActiveAndEnabled)
         {
             float angleToPlayerOriginalPosition = (this._projectile.transform.position.XY() - originalPlayerPosition).ToAngle();
             if (angleToPlayerOriginalPosition.IsNearAngle(targetAngle, 90f))

@@ -92,7 +92,7 @@ internal class UsedChamberJammer : FakeItem
         }
 
         jammedGun.gameObject.AddComponent<ChamberJammedBehavior>().Setup(this._percentAmmoToLose);
-        jammedGun.SetBaseMaxAmmo(Mathf.CeilToInt((1f - this._percentAmmoToLose) * jammedGun.GetBaseMaxAmmo())); //BUG: does not persist on save and reload
+        jammedGun.SetBaseMaxAmmo(Mathf.CeilToInt((1f - this._percentAmmoToLose) * jammedGun.GetBaseMaxAmmo()));
         float amountToBoostDamage = 1f / (1f - this._percentAmmoToLose);
         jammedGun.AddCurrentGunStatModifier(PlayerStats.StatType.Damage, amountToBoostDamage, StatModifier.ModifyMethod.MULTIPLICATIVE);
         user.stats.RecalculateStats(user);
@@ -113,7 +113,7 @@ internal class UsedChamberJammer : FakeItem
     public override void MidGameSerialize(List<object> data)
     {
         base.MidGameSerialize(data);
-        data.Add(_ActiveJammers.IndexOf(this)); // index of the item in _ActiveImplants, used to work around a vanilla bug where all copies of a passive item get the same data
+        data.Add(_ActiveJammers.IndexOf(this)); // index of the item in _ActiveJammers, used to work around a vanilla bug where all copies of a passive item get the same data
         data.Add(this._playerId);
         data.Add(this._gunId);
         data.Add(this._percentAmmoToLose);

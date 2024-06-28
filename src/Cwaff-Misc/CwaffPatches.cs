@@ -118,4 +118,33 @@ static class ProjectileHandleDamagePatches
 
         // ETGModConsole.Log($"  patch applied");
     }
+
+    [HarmonyPatch(typeof(Projectile), nameof(Projectile.OnRigidbodyCollision))]
+    static class ProjectileOnRigidbodyCollisionPatches
+    {
+        //NOTE: used by CwaffProjectile to allow playing enemy / object impact sounds without the Play_WPN_..._impact_01 format
+        [HarmonyILManipulator]
+        private static void ImpactSoundIL(ILContext il)
+        {
+            ILCursor cursor = new ILCursor(il);
+            if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCall<Projectile>("HandleKnockback")))
+                return;
+            if (!cursor.TryGotoNext(MoveType.Before, instr => instr.MatchLdloc(5))) // v_5 == flag == whether we hit an enemy (true) or other object (false)
+                return;
+
+            cursor.Emit(OpCodes.Ldarg_0); // this Projectile
+            cursor.Emit(OpCodes.Ldloc_S, (byte)5); // v_5 == flag == whether we hit an enemy (true) or other object (false)
+            cursor.Emit(OpCodes.Call, typeof(CwaffProjectile).GetMethod("PlayCollisionSounds", BindingFlags.Static | BindingFlags.NonPublic));
+        }
+    }
+
+    [HarmonyPatch(typeof(Projectile), nameof(Projectile.OnTileCollision))]
+    static class ProjectileOnTileCollisionPatches
+    {
+        //NOTE: used by CwaffProjectile to allow playing enemy / object impact sounds without the Play_WPN_..._impact_01 format
+        static void Prefix(Projectile __instance)
+        {
+            CwaffProjectile.PlayCollisionSounds(__instance, false);
+        }
+    }
 }

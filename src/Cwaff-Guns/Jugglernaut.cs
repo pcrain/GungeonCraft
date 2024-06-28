@@ -95,7 +95,7 @@ public class Jugglernaut : CwaffGun
             gun.shootAnimation          = null; // animation shouldn't change when firing
 
         gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.4f, shootStyle: ShootStyle.SemiAutomatic, damage: 10.0f, speed: 70.0f,
-          sprite: "jugglernaut_projectile", fps: 2,  anchor: Anchor.MiddleCenter, shouldRotate: false, deathSound: "wall_thunk"));
+          sprite: "jugglernaut_projectile", fps: 2,  anchor: Anchor.MiddleCenter, shouldRotate: false, destroySound: "wall_thunk"));
     }
 
     /// <summary>Make sure Jugglernaut appears correctly in the weapons panel</summary>

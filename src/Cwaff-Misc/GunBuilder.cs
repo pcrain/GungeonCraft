@@ -56,7 +56,6 @@ public sealed class GunData
 
   public string spawnSound;
   public bool? stopSoundOnDeath;
-  public string deathSound;
   public bool? uniqueSounds;
   public GameObject shrapnelVFX;
   public int? shrapnelCount;
@@ -64,6 +63,9 @@ public sealed class GunData
   public float? shrapnelMaxVelocity;
   public float? shrapnelLifetime;
   public bool? preventOrbiting;
+  public string hitSound;
+  public string hitEnemySound;
+  public string hitWallSound;
 
   /// <summary>Pseudo-constructor holding most setup information required for a single projectile gun.</summary>
   /// <param name="gun">The gun we're attaching to (can be null, only used for custom clip sprite name resolution for now).</param>
@@ -105,7 +107,7 @@ public sealed class GunData
   /// <param name="overrideProjectilesToCopyFrom">[Unknown]</param>
 
   /// <param name="bossDamageMult"></param>
-  /// <param name="destroySound">Sound event for when projectile is destroyed (Vanilla, no special properties)</param>
+  /// <param name="destroySound">Sound event for when projectile is destroyed</param>
   /// <param name="shouldRotate"></param>
   /// <param name="barrageSize"></param>
   /// <param name="shouldFlipHorizontally"></param>
@@ -115,7 +117,6 @@ public sealed class GunData
 
   /// <param name="spawnSound"></param>
   /// <param name="stopSoundOnDeath"></param>
-  /// <param name="deathSound">Sound event for when projectile is destroyed (custom, can be unique)</param>
   /// <param name="uniqueSounds"></param>
   /// <param name="shrapnelVFX"></param>
   /// <param name="shrapnelCount"></param>
@@ -123,14 +124,18 @@ public sealed class GunData
   /// <param name="shrapnelMaxVelocity"></param>
   /// <param name="shrapnelLifetime"></param>
   /// <param name="preventOrbiting"></param>
+  /// <param name="hitSound">fallback if hitEnemySound and/or hitWallSound is not specified</param>
+  /// <param name="hitEnemySound"></param>
+  /// <param name="hitWallSound"></param>
   public static GunData New(Gun gun = null, Projectile baseProjectile = null, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
     ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1, GameUIAmmoType.AmmoType? ammoType = null,
     bool customClip = false, float? damage = null, float? speed = null, float? force = null, float? range = null, float? recoil = null, float poison = 0.0f, float fire = 0.0f, float freeze = 0.0f, float slow = 0.0f,
     bool? collidesWithEnemies = null, bool? ignoreDamageCaps = null, bool? collidesWithProjectiles = null, bool? surviveRigidbodyCollisions = null, bool? collidesWithTilemap = null,
     string sprite = null, int fps = 2, Anchor anchor = Anchor.MiddleCenter, float scale = 1.0f, bool anchorsChangeColliders = true, bool fixesScales = true, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null,
     IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null, float bossDamageMult = 1.0f, string destroySound = null, bool? shouldRotate = null, int barrageSize = 1,
-    bool? shouldFlipHorizontally = null, bool? shouldFlipVertically = null, bool useDummyChargeModule = false, bool invisibleProjectile = false, string spawnSound = null, bool? stopSoundOnDeath = null, string deathSound = null,
-    bool? uniqueSounds = null, GameObject shrapnelVFX = null, int? shrapnelCount = null, float? shrapnelMinVelocity = null, float? shrapnelMaxVelocity = null, float? shrapnelLifetime = null, bool? preventOrbiting = null
+    bool? shouldFlipHorizontally = null, bool? shouldFlipVertically = null, bool useDummyChargeModule = false, bool invisibleProjectile = false, string spawnSound = null, bool? stopSoundOnDeath = null,
+    bool? uniqueSounds = null, GameObject shrapnelVFX = null, int? shrapnelCount = null, float? shrapnelMinVelocity = null, float? shrapnelMaxVelocity = null, float? shrapnelLifetime = null, bool? preventOrbiting = null,
+    string hitSound = null, string hitEnemySound = null, string hitWallSound = null
     )
   {
       _Instance.gun                           = gun; // set by InitSpecialProjectile()
@@ -178,7 +183,6 @@ public sealed class GunData
       _Instance.invisibleProjectile           = invisibleProjectile;
       _Instance.spawnSound                    = spawnSound;
       _Instance.stopSoundOnDeath              = stopSoundOnDeath;
-      _Instance.deathSound                    = deathSound;
       _Instance.uniqueSounds                  = uniqueSounds;
       _Instance.shrapnelVFX                   = shrapnelVFX;
       _Instance.shrapnelCount                 = shrapnelCount;
@@ -186,6 +190,9 @@ public sealed class GunData
       _Instance.shrapnelMaxVelocity           = shrapnelMaxVelocity;
       _Instance.shrapnelLifetime              = shrapnelLifetime;
       _Instance.preventOrbiting               = preventOrbiting;
+      _Instance.hitSound                      = hitSound;
+      _Instance.hitEnemySound                 = hitEnemySound;
+      _Instance.hitWallSound                  = hitWallSound;
       return _Instance;
   }
 }
@@ -269,7 +276,6 @@ public static class GunBuilder
     CwaffProjectile c = p.GetOrAddComponent<CwaffProjectile>();
       c.spawnSound          = b.spawnSound          ?? c.spawnSound;
       c.stopSoundOnDeath    = b.stopSoundOnDeath    ?? c.stopSoundOnDeath;
-      c.deathSound          = b.deathSound          ?? c.deathSound;
       c.uniqueSounds        = b.uniqueSounds        ?? c.uniqueSounds;
       c.shrapnelVFX         = b.shrapnelVFX         ?? c.shrapnelVFX;
       c.shrapnelCount       = b.shrapnelCount       ?? c.shrapnelCount;
@@ -281,6 +287,8 @@ public static class GunBuilder
     // Non-defaulted
     p.BossDamageMultiplier                            = b.bossDamageMult;
     p.onDestroyEventName                              = b.destroySound;
+    p.enemyImpactEventName                            = b.hitEnemySound ?? b.hitSound;
+    p.objectImpactEventName                           = b.hitWallSound ?? b.hitSound;
 
     p.PoisonApplyChance = b.poison;
     p.AppliesPoison     = b.poison > 0.0f;

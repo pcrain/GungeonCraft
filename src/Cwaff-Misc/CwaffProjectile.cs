@@ -6,7 +6,6 @@ public class CwaffProjectile : MonoBehaviour
     // sane defaults
     public string spawnSound         = null;
     public bool stopSoundOnDeath     = false;
-    public string deathSound         = null;
     public bool uniqueSounds         = false;
     public GameObject shrapnelVFX    = null;
     public int shrapnelCount         = 10;
@@ -57,12 +56,6 @@ public class CwaffProjectile : MonoBehaviour
       #region Sound Handling
         if (stopSoundOnDeath && !string.IsNullOrEmpty(spawnSound))
           base.gameObject.Play($"{spawnSound}_stop");
-        if (!string.IsNullOrEmpty(deathSound))
-        {
-          if (uniqueSounds)
-            base.gameObject.Play($"{deathSound}_stop_all");
-          base.gameObject.Play(deathSound);
-        }
       #endregion
 
       UnityEngine.Object.Destroy(this);  // clean up after ourselves when the projectile is destroyed
@@ -71,6 +64,17 @@ public class CwaffProjectile : MonoBehaviour
     private void OnDestroy()
     {
       // enter destroy code here
+    }
+
+    /// <summary>Vanilla code only plays events with the format "Play_WPN_" + enemyImpactEventName + "_impact_01" , so just play the raw events here</summary>
+    internal static void PlayCollisionSounds(Projectile p, bool hitEnemy)
+    {
+      if (!GameManager.AUDIO_ENABLED)
+        return;
+      if (hitEnemy && !string.IsNullOrEmpty(p.enemyImpactEventName))
+        AkSoundEngine.PostEvent(p.enemyImpactEventName, p.gameObject);
+      else if (!hitEnemy && !string.IsNullOrEmpty(p.objectImpactEventName))
+        AkSoundEngine.PostEvent(p.objectImpactEventName, p.gameObject);
     }
 
     /// <summary>Prevent projectiles from being affected by Orbital Bullets if preventOrbiting is set</summary>
