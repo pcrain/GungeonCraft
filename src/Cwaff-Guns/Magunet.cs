@@ -114,7 +114,7 @@ public class Magunet : CwaffGun
         foreach(DebrisObject debris in gunpos.DebrisWithinCone(_SQR_REACH, this.gun.CurrentAngle, _SPREAD, limit: 100))
         {
             if (debris.gameObject.GetComponent<MagnetParticle>())
-                continue; // already added a vacuum particle component
+                continue; // already added a magnet particle component
             if (debris.gameObject.GetComponent<Projectile>())
                 continue; // can't vacuum active projectiles
 
@@ -191,13 +191,20 @@ public class MagnetParticle : MonoBehaviour
         this._debris        = base.gameObject.GetComponent<DebrisObject>();
         this._isDebris      = this._debris != null;
         this._sprite        = this._isDebris ? this._debris.sprite : base.gameObject.GetComponent<tk2dSprite>();
+        if (!this._sprite)
+        {
+            ETGModConsole.Log($"PAIN");
+            this._sprite = base.gameObject.GetComponent<tk2dSprite>();
+            if (!this._sprite)
+                ETGModConsole.Log($" DOUBLE PAIN");
+        }
         this._startScaleX   = this._sprite.scale.x;
         this._startScaleY   = this._sprite.scale.y;
         this._startAngle    = offsetAngle;
 
         // get rid of any previously-cached speculativerigidbody information so that enemies we've previously
         //   collided with don't detect us as the same projectile and ignore us
-        if (this._debris?.specRigidbody)
+        if (this._debris && this._debris.specRigidbody)
         {
             UnityEngine.Object.Destroy(this._debris.specRigidbody);
             this._debris.specRigidbody = null;
@@ -208,15 +215,9 @@ public class MagnetParticle : MonoBehaviour
     private void LaunchDebrisInStasis(Vector2 velocity)
     {
         int collisionWidth = 8;
-        this._debris.specRigidbody ??= this._debris.gameObject.GetOrAddComponent<SpeculativeRigidbody>();
-        SpeculativeRigidbody body = this._debris.specRigidbody;
-        if (!body)
-        {
-            // ETGModConsole.Log($"SHOULD NEVER HAPPEN 3");
-            UnityEngine.Object.Destroy(base.gameObject); //TODO: this does indeed happen, figure out why
-            return;
-        }
-
+        if (base.gameObject.GetComponent<SpeculativeRigidbody>() is SpeculativeRigidbody srb)
+            UnityEngine.Object.Destroy(srb);
+        SpeculativeRigidbody body = this._debris.specRigidbody = base.gameObject.AddComponent<SpeculativeRigidbody>();
         body.CollideWithTileMap = true;
         body.CollideWithOthers  = true;
         body.PixelColliders     = new List<PixelCollider>{new(){
@@ -229,7 +230,7 @@ public class MagnetParticle : MonoBehaviour
             ManualHeight           = collisionWidth,
         }};
 
-        DebrisProjectile p    = this._debris.gameObject.AddComponent<DebrisProjectile>();
+        DebrisProjectile p    = base.gameObject.AddComponent<DebrisProjectile>();
         p.specRigidbody       = body;
         p.Owner               = this._gun.CurrentOwner;
         p.Shooter             = p.Owner.specRigidbody;
@@ -237,7 +238,7 @@ public class MagnetParticle : MonoBehaviour
         p.baseData.range      = 1000000f;
         p.baseData.speed      = velocity.magnitude;
         p.baseData.force      = 50f;
-        p.DestroyMode         = Projectile.ProjectileDestroyMode.DestroyComponent;
+        p.DestroyMode         = Projectile.ProjectileDestroyMode.BecomeDebris;
         p.collidesWithPlayer  = false;
         p.ManualControl       = true; // let debris velocity take care of movement
         p.OnHitEnemy         += OnHitEnemy;
@@ -250,15 +251,17 @@ public class MagnetParticle : MonoBehaviour
         this._debris.m_currentPosition    = this.gameObject.transform.position.WithZ(0f);
         this._debris.m_transform.rotation = this.gameObject.transform.rotation;
         this._debris.enabled              = true;
+        if (!this._debris.sprite)
+            this._debris.sprite = this._sprite;  // debris sometimes forgets its cached sprite because of course it does D:
         this._debris.ApplyVelocity(velocity);
 
         UnityEngine.Object.Destroy(this);
     }
 
-    private void OnHitEnemy(Projectile bullet, SpeculativeRigidbody body, bool what)
+    private static void OnHitEnemy(Projectile bullet, SpeculativeRigidbody body, bool what)
     {
         SpawnManager.SpawnVFX(
-            prefab: this._debris.IsCorpse ? Magunet._DebrisBigImpactVFX : Magunet._DebrisImpactVFX,
+            prefab: body.gameObject.GetComponent<DebrisObject>().IsCorpse ? Magunet._DebrisBigImpactVFX : Magunet._DebrisImpactVFX,
             position: body.UnitCenter + Lazy.RandomVector(0.5f),
             rotation: Quaternion.identity);
         UnityEngine.Object.Destroy(bullet.gameObject);
@@ -274,6 +277,11 @@ public class MagnetParticle : MonoBehaviour
         if (!this._isDebris)
         {
             this._lifetime += BraveTime.DeltaTime;
+            if (!this._gun || this._lifetime > _MAX_LIFE)
+            {
+                UnityEngine.GameObject.Destroy(base.gameObject);
+                return;
+            }
             float percentLeft = 1f - this._lifetime / _MAX_LIFE;
             float lerpFactor = percentLeft * percentLeft;
             float curAngle = (this._gun.CurrentAngle + this._startAngle);
@@ -281,8 +289,6 @@ public class MagnetParticle : MonoBehaviour
                 curAngle.Clamp360().ToVector(lerpFactor * this._startDistance);
             this._sprite.transform.rotation = curAngle.EulerZ();
             this._sprite.scale = new Vector3(this._startScaleX * lerpFactor, this._startScaleY * lerpFactor, 1f);
-            if (!this._gun || this._lifetime > _MAX_LIFE)
-                UnityEngine.GameObject.Destroy(base.gameObject);
             return;
         }
 
@@ -292,8 +298,8 @@ public class MagnetParticle : MonoBehaviour
             if (this._inStasis)
             {
                 float launchAngle = this._statisAngle * (Magunet._SPREAD / 180f);
-                LaunchDebrisInStasis((this._gun.CurrentAngle + launchAngle)
-                    .ToVector(UnityEngine.Random.Range(_MIN_LAUNCH_SPEED, _MAX_LAUNCH_SPEED)));
+                float gunAngle = this._gun ? this._gun.CurrentAngle : Lazy.RandomAngle();
+                LaunchDebrisInStasis((gunAngle + launchAngle).ToVector(UnityEngine.Random.Range(_MIN_LAUNCH_SPEED, _MAX_LAUNCH_SPEED)));
                 return;
             }
             UnityEngine.Object.Destroy(this);

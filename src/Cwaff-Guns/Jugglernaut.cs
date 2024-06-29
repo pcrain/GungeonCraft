@@ -331,24 +331,35 @@ public class JugglernautProjectile : MonoBehaviour
         this._frame       = frame;
 
         this._projectile.OnHitEnemy += OnHitEnemy;
+        this._projectile.OnBecameDebris += OnBecameDebris;
+    }
+
+    private void OnDestroy()
+    {
+        CleanupSelf();
+    }
+
+    private void CleanupSelf()
+    {
+        if (this._projectile)
+        {
+            this._projectile.OnHitEnemy -= OnHitEnemy;
+            this._projectile.OnBecameDebris -= OnBecameDebris;
+            this._projectile = null;
+        }
+    }
+
+    private void OnBecameDebris(DebrisObject obj)
+    {
+        CleanupSelf();
+        UnityEngine.Object.Destroy(this);
     }
 
     private void Start()
     {
         this._projectile.PickFrame(this._frame);
         this._rotation = 360f * UnityEngine.Random.value; // randomize the starting rotation
-
-        Color c = Jugglernaut._Colors[this._frame];
-        // EasyTrailBullet trail = this._projectile.gameObject.AddComponent<EasyTrailBullet>();
-        //     trail.StartWidth = 0.2f;
-        //     trail.EndWidth   = 0.1f;
-        //     trail.LifeTime   = 0.1f;
-        //     trail.BaseColor  = c;
-        //     trail.StartColor = Color.Lerp(c, Color.white, 0.5f);
-        //     trail.EndColor   = c;
-
         this._projectile.sprite.SetGlowiness(glowAmount: Jugglernaut._DEBRIS_GLOW);
-        // SpriteOutlineManager.AddOutlineToSprite(this._projectile.sprite, c);
     }
 
     private void Update()

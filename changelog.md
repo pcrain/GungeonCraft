@@ -4,6 +4,7 @@
 
 - Fixed R.C. Launcher projectiles slowing down too much at higher frame rates
 - Fixed drop Jugglernaut guns having collision that can interfere with the player's movement
+- Fixed several null derefs caused by Magunet debris projectiles not resetting their sprites properly when launched
 
 ## 1.14.3 (2024-06-26)
 
