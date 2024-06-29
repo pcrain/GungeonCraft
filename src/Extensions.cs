@@ -558,7 +558,7 @@ public static class Extensions
   /// <summary>Check if enemies are actively spawning in a room</summary>
   public static bool NewWaveOfEnemiesIsSpawning(this RoomHandler room)
   {
-    foreach (AIActor enemy in room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All))
+    foreach (AIActor enemy in room.SafeGetEnemiesInRoom())
       if (!enemy.isActiveAndEnabled || !enemy.IsValid || !enemy.HasBeenAwoken)
         return true;
     return false;
@@ -2049,5 +2049,36 @@ public static class Extensions
   public static bool IsEffectivelyOutOfBounds(this PlayerController player)
   {
     return false; //TODO: originally needed so Frisbee couldn't clip behind Bello's shop, but that was fixed...should still be implemented at some point
+  }
+
+  /// <summary>Get all active enemies in a room, returning an empty list instead of null when the target is invalid</summary>
+  private static readonly List<AIActor> _NoEnemies = Enumerable.Empty<AIActor>().ToList();
+  public static List<AIActor> SafeGetEnemiesInRoom(this RoomHandler room)
+  {
+    if (room == null)
+      return _NoEnemies;
+    if (room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> enemies)
+      return _NoEnemies;
+    return enemies;
+  }
+
+  /// <summary>Get all active enemies in a room given a Vector3 position, returning an empty list instead of null when the target is invalid</summary>
+  public static List<AIActor> SafeGetEnemiesInRoom(this Vector3 pos)
+  {
+    if (pos.XY().GetAbsoluteRoom() is not RoomHandler room)
+      return _NoEnemies;
+    if (room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> enemies)
+      return _NoEnemies;
+    return enemies;
+  }
+
+  /// <summary>Get all active enemies in a room given a Vector2 position, returning an empty list instead of null when the target is invalid</summary>
+  public static List<AIActor> SafeGetEnemiesInRoom(this Vector2 pos)
+  {
+    if (pos.GetAbsoluteRoom() is not RoomHandler room)
+      return _NoEnemies;
+    if (room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> enemies)
+      return _NoEnemies;
+    return enemies;
   }
 }

@@ -49,9 +49,7 @@ public class Blamethrower : CwaffGun
 
     private void OnReceivedDamage(PlayerController player)
     {
-        if (player.CurrentRoom is not RoomHandler room)
-            return;
-        if (room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> enemies)
+        if (player.CurrentRoom.SafeGetEnemiesInRoom() is not List<AIActor> enemies)
             return;
         if (enemies.Count == 0)
             return;

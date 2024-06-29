@@ -120,14 +120,10 @@ public class ZagProjectile : MonoBehaviour
     private static AIActor FindClosestPerpendicularEnemy(Vector2 ppos, float trajectory, out Vector2 trueIpoint)
     {
         trueIpoint = Vector2.zero;
-        if (ppos.GetAbsoluteRoom() is not RoomHandler room)
-            return null;
-        if (room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> enemies)
-            return null;
         Vector2 trajVector = trajectory.ToVector();
         float closest = _MAX_DIST_SQR;
         AIActor target = null;
-        foreach (AIActor enemy in enemies)
+        foreach (AIActor enemy in ppos.SafeGetEnemiesInRoom())
         {
             if (!enemy || !enemy.IsHostile(canBeNeutral: true))
                 continue;

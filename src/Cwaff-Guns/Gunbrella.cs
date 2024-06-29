@@ -119,6 +119,8 @@ public class GunbrellaProjectile : MonoBehaviour
     {
         this._projectile = base.GetComponent<Projectile>();
         this._owner = this._projectile.Owner as PlayerController;
+        if (!this._owner)
+            return;
 
         if (_LastLaunchTime < BraveTime.ScaledTimeSinceStartup)
         {
@@ -136,9 +138,8 @@ public class GunbrellaProjectile : MonoBehaviour
         {
             this._extraDelay = _DELAY * (_LastLaunchIndex++);
             AIActor target   = null;
-            RoomHandler room = this._owner.CurrentRoom;
-            List<AIActor> enemies = (room != null) ? room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) : null;
-            if (enemies != null && enemies.Count > 0)
+            List<AIActor> enemies = this._owner.CurrentRoom.SafeGetEnemiesInRoom();
+            if (enemies.Count > 0)
             {
                 const int TRIES = 10;
                 for (int i = 0; i < TRIES; ++i)

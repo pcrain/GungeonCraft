@@ -64,12 +64,9 @@ public class DeathNote : CwaffGun
     private void YouShallKnowTheirNames()
     {
         UpdateNametags(true);
-
-        List<AIActor> activeEnemies = this.GenericOwner.GetAbsoluteParentRoom().GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
-        if (activeEnemies == null)
+        if (!this.PlayerOwner)
             return;
-
-        foreach (AIActor enemy in activeEnemies)
+        foreach (AIActor enemy in this.PlayerOwner.CurrentRoom.SafeGetEnemiesInRoom())
         {
             if (!enemy || !enemy.specRigidbody || enemy.IsGone || !enemy.healthHaver || enemy.healthHaver.IsDead)
                 continue;

@@ -103,14 +103,11 @@ public class Ticonderogun : CwaffGun
     private void CheckIfEnemiesAreEncircled(Vector2 hullCenter)
     {
         base.gameObject.Play("pencil_circle_sound");
-        if (!this._owner || this._owner.CurrentRoom == null)
+        if (!this._owner)
             return;
-        List<AIActor> activeEnemies = this._owner.CurrentRoom.GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
-        if (activeEnemies == null)
-            return; // TODO: not sure why we don't need to do this check elsewhere
 
         List<AIActor> theEncircled = new();
-        foreach (AIActor enemy in activeEnemies)
+        foreach (AIActor enemy in this._owner.CurrentRoom.SafeGetEnemiesInRoom())
             if (enemy && enemy.IsHostile(canBeNeutral: true) && enemy.sprite && enemy.sprite.WorldCenter.IsPointInPolygonHull(this._extantPoints))
                 theEncircled.Add(enemy);
         if (theEncircled.Count == 0)
@@ -210,15 +207,13 @@ public class Ticonderogun : CwaffGun
     // Choose the enemy with the smallest angle from our aim point that is also within _MAX_CONTROLLER_DIST
     private AIActor ChooseNewTarget()
     {
-        if (this._owner.CurrentRoom is not RoomHandler room)
-            return null;
-        if (room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> activeEnemies)
+        if (!this._owner)
             return null;
 
         float aimAngle = this._owner.m_currentGunAngle;
         float minDelta = _AUTOTARGET_MAX_DELTA;
         AIActor bestEnemy = null;
-        foreach (AIActor enemy in activeEnemies)
+        foreach (AIActor enemy in this._owner.CurrentRoom.SafeGetEnemiesInRoom())
         {
             if (!enemy || !enemy.IsHostile(canBeNeutral: true))
                 continue;

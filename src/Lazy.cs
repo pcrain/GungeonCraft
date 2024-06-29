@@ -446,17 +446,12 @@ public static class Lazy
     /// <summary>Determine whether any enemy is in an line between start and end (does not account for walls)</summary>
     public static bool AnyEnemyInLineOfSight(Vector2 start, Vector2 end, bool canBeNeutral = true)
     {
-        if (start.GetAbsoluteRoom() is not RoomHandler room)
-            return false;
-        if (room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> enemies)
-            return false;
-        Vector2 intersection = Vector2.zero;
-        foreach (AIActor enemy in enemies)
+        foreach (AIActor enemy in start.SafeGetEnemiesInRoom())
         {
             if (!enemy.IsHostile(canBeNeutral: canBeNeutral))
                 continue;
             PixelCollider collider = enemy.specRigidbody.HitboxPixelCollider;
-            if (BraveUtility.LineIntersectsAABB(start, end, collider.UnitBottomLeft, collider.UnitDimensions, out intersection))
+            if (BraveUtility.LineIntersectsAABB(start, end, collider.UnitBottomLeft, collider.UnitDimensions, out Vector2 intersection))
                 return true;
         }
         return false;
@@ -465,21 +460,16 @@ public static class Lazy
     /// <summary>Determine position of the nearest enemy inside a cone of vision from position start within maxDeviation degree of coneAngle</summary>
     public static Vector2? NearestEnemyWithinConeOfVision(Vector2 start, float coneAngle, float maxDeviation, float maxDistance = 100f, bool useNearestAngleInsteadOfDistance = true, bool ignoreWalls = false)
     {
-        if (start.GetAbsoluteRoom() is not RoomHandler room)
-            return null;
-        if (room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> enemies)
-            return null;
-
         bool foundTarget   = false;
         float bestAngle    = maxDeviation;
         float maxSqrDist   = maxDistance * maxDistance;
         float bestSqrDist  = maxSqrDist;
         Vector2 bestTarget = Vector2.zero;
-        foreach (AIActor enemy in enemies)
+        foreach (AIActor enemy in start.SafeGetEnemiesInRoom())
         {
             if (!enemy.IsHostile(canBeNeutral: true))
                 continue;
-            Vector2 tentativeTarget = enemy.sprite.WorldCenter;
+            Vector2 tentativeTarget = enemy.CenterPosition;
             if (!ignoreWalls && !start.HasLineOfSight(tentativeTarget))
                 continue;
             Vector2 delta        = (tentativeTarget - start);

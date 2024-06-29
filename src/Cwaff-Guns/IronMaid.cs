@@ -96,18 +96,12 @@ public class IronMaid : CwaffGun
     {
         if (this.PlayerOwner is not PlayerController pc)
             return null;
-        if (pc.CurrentRoom is not RoomHandler room)
-            return null;
-        if (room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> enemiesInRoom)
-            return null;
-        if (enemiesInRoom.Count == 0)
-            return null;
 
         AIActor target = null;
         float closest = _MAX_AIM_DEV;
         Vector2 gunPos = this.gun.barrelOffset.PositionVector2();
         float aimAngle = pc.m_currentGunAngle;
-        foreach (AIActor enemy in enemiesInRoom)
+        foreach (AIActor enemy in pc.CurrentRoom.SafeGetEnemiesInRoom())
         {
             if (!enemy.IsHostile(canBeNeutral: true))
                 continue;

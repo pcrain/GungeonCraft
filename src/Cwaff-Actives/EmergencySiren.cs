@@ -75,7 +75,7 @@ public class EmergencySiren : CwaffActive
     {
         this._anyEnemyInRoomDied = false;
         this._anyGunFiredInRoom = false;
-        foreach (AIActor enemy in Lazy.CurrentRoom().GetActiveEnemies(RoomHandler.ActiveEnemyType.All))
+        foreach (AIActor enemy in Lazy.CurrentRoom().SafeGetEnemiesInRoom())
             enemy.healthHaver.OnPreDeath += OnEnemyKilled;
     }
 
@@ -98,8 +98,7 @@ public class EmergencySiren : CwaffActive
         RoomHandler room = user.CurrentRoom;
         room.UnsealRoom();
 
-        List<AIActor> activeEnemies = room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
-        foreach (AIActor enemy in activeEnemies)
+        foreach (AIActor enemy in room.SafeGetEnemiesInRoom())
         {
             if (!enemy)
                 continue; // stupid grenades D:

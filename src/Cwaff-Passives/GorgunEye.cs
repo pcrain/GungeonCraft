@@ -41,16 +41,12 @@ public class GorgunEye : CwaffPassive
         base.Update();
         if (this.Owner is not PlayerController player)
             return;
-        if (player.CurrentRoom is not RoomHandler room)
-            return;
-        if (room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> enemies)
-            return;
 
         Vector2 ppos         = player.sprite.WorldCenter;
         float gunAngle       = player.m_currentGunAngle;
         AIActor closestEnemy = null;
         float closestDist    = 999999f;
-        foreach(AIActor enemy in enemies)
+        foreach(AIActor enemy in player.CurrentRoom.SafeGetEnemiesInRoom())
         {
             if (!enemy || !enemy.IsHostileAndNotABoss())
                 continue; // enemy is not one we should be targeting

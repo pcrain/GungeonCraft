@@ -44,7 +44,7 @@ public class BossController : DungeonPlaceableBehaviour, IPlaceConfigurable
   public void ConfigureOnPlacement(RoomHandler room)
   {
     AIActor theBoss = null;
-    foreach (AIActor enemy in room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All))
+    foreach (AIActor enemy in room.SafeGetEnemiesInRoom())
       if (enemy.EnemyGuid == this.enemyGuid)
       {
         theBoss = enemy;

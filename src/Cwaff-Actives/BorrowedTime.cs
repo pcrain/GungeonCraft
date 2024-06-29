@@ -112,11 +112,9 @@ public class BorrowedTime : CwaffActive
 
     private bool CheckIfBossIsPresent()
     {
-        if (this._owner.CurrentRoom is not RoomHandler room)
+        if (!this._owner || this._owner.CurrentRoom is not RoomHandler room)
             return false;
-        if (room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> enemies)
-            return false;
-        return enemies.Any(enemy => enemy && enemy.healthHaver && enemy.healthHaver.IsBoss);
+        return room.SafeGetEnemiesInRoom().Any(enemy => enemy && enemy.healthHaver && enemy.healthHaver.IsBoss);
     }
 
     public override void DoEffect(PlayerController user)
@@ -130,10 +128,7 @@ public class BorrowedTime : CwaffActive
         if (curRoom != this._lastCheckedRoom)
             return; // this should never happen in theory
 
-        List<AIActor> activeEnemies = curRoom.GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
-        if (activeEnemies == null)
-            return;
-
+        List<AIActor> activeEnemies = curRoom.SafeGetEnemiesInRoom();
         if (activeEnemies.Count == 0)
         {
             if (this._borrowedEnemies.Count > 0 && user.GetAbsoluteParentRoom() != null)

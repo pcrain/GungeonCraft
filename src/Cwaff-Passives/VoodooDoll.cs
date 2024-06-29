@@ -54,10 +54,9 @@ public class VoodooDoll : CwaffPassive
 
     private void DoVoodooDollEffect(float damage, HealthHaver enemy)
     {
-        if (enemy.aiActor.GetAbsoluteParentRoom() is not RoomHandler room)
+        if (!enemy || !enemy.aiActor)
             return;
-        if (room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> activeEnemies)
-            return;
+        List<AIActor> activeEnemies = enemy.aiActor.GetAbsoluteParentRoom().SafeGetEnemiesInRoom();
 
         string myGuid = enemy.aiActor.EnemyGuid;
         for (int n = activeEnemies.Count - 1; n >= 0; --n)

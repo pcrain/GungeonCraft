@@ -53,7 +53,7 @@ public class SafetyGloves : CwaffPassive
         float gunAngle       = pc.m_currentGunAngle;
         AIActor closestEnemy = null;
         float closestDist    = _REACH_SQR;
-        foreach(AIActor enemy in room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All).EmptyIfNull())
+        foreach(AIActor enemy in room.SafeGetEnemiesInRoom())
         {
             if (!enemy || !Enemies.BulletKinVariants.Contains(enemy.EnemyGuid))
                 continue; // enemy is not one we should be targeting

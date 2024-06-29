@@ -23,13 +23,8 @@ public class IceCream : CwaffActive
 
     public override bool CanBeUsed(PlayerController user)
     {
-        if (user.CurrentRoom is not RoomHandler room)
-            return false;
-        if (room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> roomEnemies)
-            return false;
-
-        Vector2 ppos = user.sprite.WorldCenter;
-        foreach (AIActor enemy in roomEnemies)
+        Vector2 ppos = user.CenterPosition;
+        foreach (AIActor enemy in user.CurrentRoom.SafeGetEnemiesInRoom())
             if (HappyIceCreamHaver.NeedsIceCream(enemy) && ((enemy.sprite.WorldCenter - ppos).sqrMagnitude <= HappyIceCreamHaver._SHARE_RANGE_SQUARED))
                 return base.CanBeUsed(user);
 
@@ -38,13 +33,8 @@ public class IceCream : CwaffActive
 
     public override void DoEffect(PlayerController user)
     {
-        if (user.CurrentRoom is not RoomHandler room)
-            return;
-        if (room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> roomEnemies)
-            return;
-
-        Vector2 ppos = user.sprite.WorldCenter;
-        foreach (AIActor enemy in roomEnemies)
+        Vector2 ppos = user.CenterPosition;
+        foreach (AIActor enemy in user.CurrentRoom.SafeGetEnemiesInRoom())
             if (HappyIceCreamHaver.NeedsIceCream(enemy) && ((enemy.sprite.WorldCenter - ppos).sqrMagnitude <= HappyIceCreamHaver._SHARE_RANGE_SQUARED))
                 HappyIceCreamHaver.ShareIceCream(enemy);
     }
@@ -287,30 +277,25 @@ public class TargetPourSoulsWithoutIceCreamBehavior : TargetBehaviorBase  //TODO
     internal static GameActor NearestEnemyThatReallyNeedsIceCream(AIActor iceCreamHaver)
     {
         Vector2 pos = iceCreamHaver.sprite.WorldCenter;
-        List<AIActor> enemies = null;
-        if (pos.GetAbsoluteRoom() is RoomHandler room)
-            enemies = room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
-
         GameActor target = null;
         float bestDist = 9999f;
-        if (enemies != null)
-            foreach (AIActor other in enemies)
+        foreach (AIActor other in pos.SafeGetEnemiesInRoom())
+        {
+            if (other == iceCreamHaver)
+                continue;
+            if (!HappyIceCreamHaver.NeedsIceCream(other))
+                continue;
+            float dist = (pos - other.sprite.WorldCenter).sqrMagnitude;
+            if (dist > bestDist)
+                continue;
+            if (dist < HappyIceCreamHaver._SHARE_RANGE_SQUARED)
             {
-                if (other == iceCreamHaver)
-                    continue;
-                if (!HappyIceCreamHaver.NeedsIceCream(other))
-                    continue;
-                float dist = (pos - other.sprite.WorldCenter).sqrMagnitude;
-                if (dist > bestDist)
-                    continue;
-                if (dist < HappyIceCreamHaver._SHARE_RANGE_SQUARED)
-                {
-                    HappyIceCreamHaver.ShareIceCream(other);
-                    continue;
-                }
-                bestDist = dist;
-                target = other;
+                HappyIceCreamHaver.ShareIceCream(other);
+                continue;
             }
+            bestDist = dist;
+            target = other;
+        }
         if (target)
             return target;
 

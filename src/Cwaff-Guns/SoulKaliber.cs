@@ -97,9 +97,9 @@ public class SoulLinkStatus : MonoBehaviour
             _SoulLinkEffectHappening = true;
 
             AIActor enemy = hh.aiActor;
-            List<AIActor> activeEnemies = enemy.GetAbsoluteParentRoom().GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
-            if (activeEnemies == null)
+            if (!enemy)
                 return;
+            List<AIActor> activeEnemies = enemy.GetAbsoluteParentRoom().SafeGetEnemiesInRoom();
 
             bool shouldPlaySound = false;
             for (int i = activeEnemies.Count - 1; i >=0; --i)

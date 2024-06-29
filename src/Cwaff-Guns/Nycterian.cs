@@ -86,12 +86,10 @@ public class DecoyEcho : MonoBehaviour
         base.gameObject.ExpireIn(_DECOY_TIME);
         if (GameManager.Instance.Dungeon.GetRoomFromPosition(base.transform.position.IntXY(VectorConversions.Floor)) is not RoomHandler room)
             return;
-        if (room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> activeEnemies)
-            return;
-        this._room = room;
 
+        this._room = room;
         SpeculativeRigidbody body = base.gameObject.GetComponent<SpeculativeRigidbody>();
-        foreach (AIActor enemy in activeEnemies)
+        foreach (AIActor enemy in room.SafeGetEnemiesInRoom())
         {
             if (!enemy || !enemy.IsHostileAndNotABoss(canBeNeutral: true))
                 continue;
@@ -117,10 +115,8 @@ public class DecoyEcho : MonoBehaviour
     {
         if (this._room == null)
             return;
-        if (this._room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> activeEnemies)
-            return;
         SpeculativeRigidbody body = base.gameObject.GetComponent<SpeculativeRigidbody>();
-        foreach (AIActor enemy in activeEnemies)
+        foreach (AIActor enemy in this._room.SafeGetEnemiesInRoom())
             if (enemy && enemy.OverrideTarget == body)
                 enemy.OverrideTarget = null;
     }

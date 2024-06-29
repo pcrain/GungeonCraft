@@ -145,9 +145,7 @@ public class Glockarina : CwaffGun
                     return false; // can't nuke enemies under 1/3 ammo
                 if (player.CurrentRoom == null || player.CurrentRoom.area.PrototypeRoomCategory == PrototypeDungeonRoom.RoomCategory.BOSS)
                     return false; // can't insta-clear boss rooms
-                List<AIActor> activeEnemies = player.CurrentRoom.GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
-                if (activeEnemies == null || activeEnemies.Count == 0)
-                    return false; // can't insta-clear rooms that are already clear
+                List<AIActor> activeEnemies = player.CurrentRoom.SafeGetEnemiesInRoom();
                 player.CurrentRoom.ClearReinforcementLayers();
                 for (int i = activeEnemies.Count - 1; i >= 0; --i)
                 {

@@ -43,12 +43,8 @@ public class StopSign : CwaffActive
 
     public override void DoEffect(PlayerController user)
     {
-        if (user.CurrentRoom is not RoomHandler room)
-            return;
-        if (room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> enemies)
-            return;
         bool didAnything = false;
-        foreach (AIActor enemy in enemies)
+        foreach (AIActor enemy in user.CurrentRoom.SafeGetEnemiesInRoom())
         {
             if (!enemy || !enemy.IsHostile(canBeNeutral: true))
                 continue;

@@ -679,9 +679,7 @@ public static class SlashDoer // stolen from NN
         if (roomHandler == null) return;
         if (SlasherIsPlayerOrFriendly(owner))
         {
-            List<AIActor> activeEnemies = roomHandler.GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
-            if (activeEnemies == null) return;
-
+            List<AIActor> activeEnemies = roomHandler.SafeGetEnemiesInRoom();
             for (int i = 0; i < activeEnemies.Count; i++)
             {
                 AIActor aiactor = activeEnemies[i];

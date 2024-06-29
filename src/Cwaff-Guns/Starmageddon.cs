@@ -245,13 +245,10 @@ public class StarmageddonProjectile : MonoBehaviour
     /// <summary>Select a random target, weighted by inverse square distance to player</summary>
     private GameActor FindTarget()
     {
-        RoomHandler room = GameManager.Instance.PrimaryPlayer.CurrentRoom;
-        if (room == null || room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> enemies)
-            return this._owner;
         List<AIActor> livingEnemies = new();
         List<Vector2> weights = new();
         int i = 0;
-        foreach(AIActor enemy in enemies)
+        foreach(AIActor enemy in GameManager.Instance.BestActivePlayer.CurrentRoom.SafeGetEnemiesInRoom())
             if (enemy && enemy.healthHaver && enemy.healthHaver.IsAlive)
             {
                 livingEnemies.Add(enemy);
