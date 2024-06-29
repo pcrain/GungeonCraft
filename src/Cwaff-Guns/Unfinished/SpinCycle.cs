@@ -79,7 +79,7 @@ public class SpinCycle : CwaffGun
     private void SetupBallAndChain(PlayerController p)
     {
         _theCurBall = SpawnManager.SpawnProjectile(
-          _TheProtoBall.gameObject, p.sprite.WorldCenter, Quaternion.Euler(0f, 0f, 0f), true
+          _TheProtoBall.gameObject, p.CenterPosition, Quaternion.Euler(0f, 0f, 0f), true
           ).GetComponent<Projectile>();
             _theCurBall.Owner = p;
             _theCurBall.Shooter = p.specRigidbody;
@@ -235,7 +235,7 @@ public class SpinCycle : CwaffGun
         _theCurBall.collidesWithEnemies = true;
         _theCurBall.collidesWithPlayer = false;
         Vector2 ppos =
-            (p.sprite.WorldCenter+BraveMathCollege.DegreesToVector(this.forcedDirection,curChainLength+15f/C.PIXELS_PER_TILE)) // 15 == beam sprite length
+            (p.CenterPosition + BraveMathCollege.DegreesToVector(this.forcedDirection,curChainLength+15f/C.PIXELS_PER_TILE)) // 15 == beam sprite length
             .ToVector3ZisY(-1f);
 
         Vector2 oldPos = _theCurBall.specRigidbody.Position.GetPixelVector2();
@@ -248,7 +248,7 @@ public class SpinCycle : CwaffGun
 
     private void DrawVFXWithRespectToPlayerAngle(PlayerController p, float angle, float mag)
     {
-        Vector2 ppos   = p.sprite.WorldCenter;
+        Vector2 ppos   = p.CenterPosition;
         float segments = Mathf.Floor(Mathf.Min(_MAX_CHAIN_SEGMENTS,mag/_MIN_GAP_BETWEEN_SEGMENTS));
         float gap      = mag/segments;
         for(int i = 0 ; i < segments; ++i )

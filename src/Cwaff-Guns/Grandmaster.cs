@@ -184,7 +184,7 @@ public abstract class ChessPiece : MonoBehaviour
         this._target = ChooseNewTarget();
         if (this._target is Vector2 target)
         {
-            this._targetVec = target - this._projectile.sprite.WorldCenter;
+            this._targetVec = target - this._projectile.SafeCenter;
             float adjSpeed = this._targetVec.magnitude / this._moveTime;
             this._projectile.SetSpeed(Mathf.Min(this._speed, adjSpeed));
         }
@@ -232,14 +232,14 @@ public abstract class ChessPiece : MonoBehaviour
         {
             if (!this._targetEnemy.healthHaver.IsDead)
             {
-                float bestAngle = GetBestValidAngleForPiece((this._targetEnemy.sprite.WorldCenter - this._projectile.sprite.WorldCenter).ToAngle());
-                return Lazy.PointOrthognalTo(this._projectile.sprite.WorldCenter, this._targetEnemy.sprite.WorldCenter, bestAngle.ToVector());
+                float bestAngle = GetBestValidAngleForPiece((this._targetEnemy.CenterPosition - this._projectile.SafeCenter).ToAngle());
+                return Lazy.PointOrthognalTo(this._projectile.SafeCenter, this._targetEnemy.CenterPosition, bestAngle.ToVector());
             }
             this._targetEnemy = null; // reset our target and march onward
         }
 
         // Get our position and direction
-        Vector2 ppos = this._projectile.sprite.WorldCenter;
+        Vector2 ppos = this._projectile.SafeCenter;
 
         // Find the closest viable enemy == one which we can move into the line of sight
         Vector2? closestViableEnemyPosition = null;
@@ -251,7 +251,7 @@ public abstract class ChessPiece : MonoBehaviour
                 continue; // we only care about normal, alive, hostile enemies
 
             // Get the enemy's position and distance
-            Vector2 epos = enemy.sprite.WorldCenter;
+            Vector2 epos = enemy.CenterPosition;
             float edist  = (epos - ppos).magnitude;
             if (edist >= closestEnemyDistance)
                 continue; // we only care about the closest enemy

@@ -140,7 +140,7 @@ public class SeltzerProjectile : MonoBehaviour
 
     private void CreateBeam()
     {
-        GameObject theBeamObject = SpawnManager.SpawnProjectile(SeltzerPelter._BubbleBeam.gameObject, this._canProjectile.sprite.WorldCenter, Quaternion.identity);
+        GameObject theBeamObject = SpawnManager.SpawnProjectile(SeltzerPelter._BubbleBeam.gameObject, this._canProjectile.SafeCenter, Quaternion.identity);
         Projectile beamProjectile = theBeamObject.GetComponent<Projectile>();
             beamProjectile.Owner = this._owner;
 
@@ -148,7 +148,7 @@ public class SeltzerProjectile : MonoBehaviour
             this._beam.Owner       = this._owner;
             this._beam.HitsPlayers = false;
             this._beam.HitsEnemies = true;
-            this._beam.Origin      = this._canProjectile.sprite.WorldCenter;
+            this._beam.Origin      = this._canProjectile.SafeCenter;
             this._beam.Direction   = -this._canProjectile.sprite.transform.rotation.z.ToVector();
     }
 
@@ -217,7 +217,7 @@ public class SeltzerProjectile : MonoBehaviour
                 p.SetSpeed(newSpeed.magnitude);
                 p.SendInDirection(newSpeed, false, false);
                 p.SetRotation(newSpeed.ToAngle());
-                seltzer._beam.Origin = p.sprite.WorldCenter;
+                seltzer._beam.Origin = p.SafeCenter;
                 seltzer._beam.Direction = -p.LastVelocity;
                 seltzer._beam.LateUpdatePosition(seltzer._beam.Origin);
                 yield return null;
@@ -250,7 +250,7 @@ public class SeltzerProjectile : MonoBehaviour
                 seltzer._rotationRate += rotIncrease * BraveTime.DeltaTime;
                 curAngle += seltzer._rotationRate * C.FPS * BraveTime.DeltaTime;
                 p.SetRotation(curAngle);
-                seltzer._beam.Origin = p.sprite.WorldCenter;
+                seltzer._beam.Origin = p.SafeCenter;
                 seltzer._beam.Direction = -curAngle.ToVector();
                 seltzer._beam.LateUpdatePosition(seltzer._beam.Origin);
                 yield return null;

@@ -160,7 +160,7 @@ public class ArcTowardsTargetBehavior : MonoBehaviour
 
         this._targetAngle  = this._projectile.Direction.ToAngle();
         this._targetPos    = Raycast.ToNearestWallOrEnemyOrObject(
-            this._owner.sprite.WorldCenter,
+            this._owner.CenterPosition,
             this._targetAngle);
 
         this._arcAngle = arcAngle;
@@ -607,7 +607,7 @@ public static class SlashDoer // stolen from NN
             Projectile projectile2 = allProjectiles2[j];
             if (ProjectileIsValid(projectile2, owner))
             {
-                Vector2 projectileCenter = projectile2.sprite.WorldCenter;
+                Vector2 projectileCenter = projectile2.SafeCenter;
                 if (ObjectWasHitBySlash(projectileCenter, arcOrigin, slashAngle, slashRange, degreesOfSlash))
                 {
                     if (slashParameters.OnHitBullet != null) slashParameters.OnHitBullet(projectile2);

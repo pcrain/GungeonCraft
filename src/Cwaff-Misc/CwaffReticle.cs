@@ -138,13 +138,13 @@ public class CwaffReticle : MonoBehaviour
     else if (this.targetPosFunc != null)
       this._targetPos = this.targetPosFunc(this);
     else if (!this._player.IsKeyboardAndMouse())
-      this._targetPos = this._player.sprite.WorldCenter + this.controllerScale * this._player.m_activeActions.Aim.Vector;
+      this._targetPos = this._player.CenterPosition + this.controllerScale * this._player.m_activeActions.Aim.Vector;
     else
       this._targetPos = this._player.unadjustedAimPoint.XY();
 
     if (this.maxDistance > 0)
     {
-      Vector2 centerPos = this.aimFromPlayerCenter ? this._player.sprite.WorldCenter : this._gun.gun.barrelOffset.transform.position;
+      Vector2 centerPos = this.aimFromPlayerCenter ? this._player.CenterPosition : this._gun.gun.barrelOffset.transform.position;
       Vector2 delta = (this._targetPos - centerPos);
       if (delta.sqrMagnitude > (this.maxDistance * this.maxDistance))
         this._targetPos = centerPos + this.maxDistance * delta.normalized;

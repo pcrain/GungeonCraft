@@ -90,7 +90,7 @@ public class HLDRoll : CustomDodgeRoll
             return;
         Projectile p = SpawnManager.SpawnProjectile(
           DriftersHeadgear._LightningProjectile.gameObject,
-          this.owner.sprite.WorldCenter,
+          this.owner.CenterPosition,
           Quaternion.Euler(0f, 0f, this.owner.m_currentGunAngle),
           true).GetComponent<Projectile>();
             p.Owner = this.owner;
@@ -125,7 +125,7 @@ public class HLDRoll : CustomDodgeRoll
             float mag = UnityEngine.Random.Range(0.3f,1.25f);
             SpawnManager.SpawnVFX(
                 dusts.rollLandDustup,
-                this.owner.sprite.WorldCenter + BraveMathCollege.DegreesToVector(dir, mag),
+                this.owner.CenterPosition + BraveMathCollege.DegreesToVector(dir, mag),
                 Quaternion.Euler(0f, 0f, rot));
         }
 
@@ -135,7 +135,7 @@ public class HLDRoll : CustomDodgeRoll
             this.owner.PlayerAfterImage();
             timer += BraveTime.DeltaTime;
             this.owner.specRigidbody.Velocity = vel;
-            GameManager.Instance.Dungeon.dungeonDustups.InstantiateLandDustup(this.owner.sprite.WorldCenter);
+            GameManager.Instance.Dungeon.dungeonDustups.InstantiateLandDustup(this.owner.CenterPosition);
             yield return null;
             if (this.owner.IsFalling)
             {
@@ -153,7 +153,7 @@ public class HLDRoll : CustomDodgeRoll
                 float mag = UnityEngine.Random.Range(0.3f,1.0f);
                 SpawnManager.SpawnVFX(
                     dusts.rollLandDustup,
-                    this.owner.sprite.WorldCenter + BraveMathCollege.DegreesToVector(dir, mag),
+                    this.owner.CenterPosition + BraveMathCollege.DegreesToVector(dir, mag),
                     Quaternion.Euler(0f, 0f, rot));
             }
         }

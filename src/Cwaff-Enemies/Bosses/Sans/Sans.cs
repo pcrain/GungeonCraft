@@ -146,7 +146,7 @@ public partial class SansBoss : AIActor
 
     private void FlipSpriteIfNecessary(bool? overrideFlip = null)
     {
-      base.sprite.FlipX  = overrideFlip ?? (GameManager.Instance.BestActivePlayer.sprite.WorldBottomCenter.x < base.specRigidbody.UnitBottomCenter.x);
+      base.sprite.FlipX  = overrideFlip ?? (GameManager.Instance.BestActivePlayer.SpriteBottomCenter.x < base.specRigidbody.UnitBottomCenter.x);
       Vector3 spriteSize = base.sprite.GetUntrimmedBounds().size;
       Vector3 offset     = Vector3.zero.WithX(spriteSize.x / (base.sprite.FlipX ? 2f : -2f));
       base.sprite.transform.localPosition = (Vector3)base.specRigidbody.UnitBottomCenter/*.RoundToInt()*/ + offset;

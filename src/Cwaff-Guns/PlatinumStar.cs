@@ -290,7 +290,7 @@ public class OraOra : MonoBehaviour
         {
             float percentDone = elapsed / _MOVE_TIME;
             standSprite.PlaceAtPositionByAnchor(
-                Vector2.Lerp(pc.sprite.WorldCenter, this._enemy.sprite.WorldCenter - bankedAngles[0].ToVector(offset + 0.5f), percentDone),
+                Vector2.Lerp(pc.CenterPosition, this._enemy.CenterPosition - bankedAngles[0].ToVector(offset + 0.5f), percentDone),
                 Anchor.MiddleCenter);
             yield return null;
         }
@@ -305,14 +305,14 @@ public class OraOra : MonoBehaviour
             float damage = bankedDamage[i];
             bool lastBurst = (i == (numBursts - 1));
             standSprite.SetSprite(pc.spriteAnimator.GetClipByName(Lazy.GetBaseIdleAnimationName(pc, bankedAngles[i])).frames[0].spriteId);
-            standSprite.PlaceAtPositionByAnchor(this._enemy.sprite.WorldCenter - bankedAngles[i].ToVector(offset + 0.5f), Anchor.MiddleCenter);
+            standSprite.PlaceAtPositionByAnchor(this._enemy.CenterPosition - bankedAngles[i].ToVector(offset + 0.5f), Anchor.MiddleCenter);
             standSprite.FlipX = (Mathf.Abs(bankedAngles[i].Clamp180()) > 90f);
             for (int j = 0; j < _BURST_SIZE; ++j)
             {
                 bool lastHit     = lastBurst && j == (_BURST_SIZE - 1);
                 float angle      = (bankedAngles[i] + UnityEngine.Random.Range(-_ANGLE_VARIANCE, _ANGLE_VARIANCE)).Clamp360();
                 Vector2 angleVec = angle.ToVector(offset);
-                Vector2 startPos = this._enemy.sprite.WorldCenter - angleVec;
+                Vector2 startPos = this._enemy.CenterPosition - angleVec;
                 Projectile proj  = SpawnManager.SpawnProjectile(PlatinumStar._OraBullet.gameObject, startPos, angle.EulerZ()).GetComponent<Projectile>();
                     proj.Owner                                    = pc;
                     proj.Shooter                                  = pc.specRigidbody;
@@ -348,7 +348,7 @@ public class OraOra : MonoBehaviour
         for (float elapsed = BraveTime.DeltaTime; elapsed < _MOVE_TIME; elapsed += BraveTime.DeltaTime)
         {
             float percentDone = elapsed / _MOVE_TIME;
-            standSprite.PlaceAtPositionByAnchor(Vector2.Lerp(finalPos, pc.sprite.WorldCenter, percentDone), Anchor.MiddleCenter);
+            standSprite.PlaceAtPositionByAnchor(Vector2.Lerp(finalPos, pc.CenterPosition, percentDone), Anchor.MiddleCenter);
             yield return null;
         }
         UnityEngine.Object.Destroy(this._stand);

@@ -141,7 +141,7 @@ public class DeadRinger : CwaffPassive
     private void DoSmokeAroundPlayer(int amount)
     {
         GameObject smokePrefab = ResourceCache.Acquire("Global VFX/VFX_Item_Spawn_Poof") as GameObject;
-        Vector2 ppos = this.Owner.sprite.WorldCenter;
+        Vector2 ppos = this.Owner.CenterPosition;
         for (int i = 0; i < amount; ++i)
             smokePrefab.Instantiate(position: (ppos + Lazy.RandomVector( UnityEngine.Random.Range(0f,0.5f))), anchor: Anchor.MiddleCenter);
     }

@@ -48,7 +48,7 @@ public class RacketLauncher : CwaffGun
             gun.ClipShotsRemaining = gun.CurrentAmmo;
             return projectile;
         }
-        Vector2 racketpos = gun.GunPlayerOwner().sprite.WorldCenter;
+        Vector2 racketpos = gun.GunPlayerOwner().CenterPosition;
         foreach (TennisBall ball in this._extantTennisBalls)
         {
             if (!ball.Whackable())
@@ -172,7 +172,7 @@ public class TennisBall : MonoBehaviour
 
     public Vector2 Position()
     {
-        return this._projectile.sprite.WorldCenter;
+        return this._projectile.SafeCenter;
     }
 
     public void DieInAir()
@@ -256,7 +256,7 @@ public class TennisBall : MonoBehaviour
             return;
         }
         this._returning = true;
-        float dirToOwner = (this._owner.sprite.WorldCenter - this._projectile.sprite.WorldCenter).ToAngle();
+        float dirToOwner = (this._owner.CenterPosition - this._projectile.SafeCenter).ToAngle();
         float acc = this._owner.AccuracyMult();
         this._projectile.SendInDirection(dirToOwner.AddRandomSpread(_SPREAD * Mathf.Sqrt(acc)).ToVector(), true);
         this._projectile.gameObject.Play("racket_hit");
@@ -264,7 +264,7 @@ public class TennisBall : MonoBehaviour
 
     private void HomeTowardsTarget(Vector2 targetPos, Vector2 curVelocity)
     {
-        Vector2 targetVelocity = (targetPos - this._projectile.sprite.WorldCenter).normalized;
+        Vector2 targetVelocity = (targetPos - this._projectile.SafeCenter).normalized;
         if (this._returning && (Mathf.Abs(curVelocity.ToAngle().Clamp360() - targetVelocity.ToAngle().Clamp360()) > _MAX_DEVIATION))
         {
             this._missedPlayer = true;
@@ -284,7 +284,7 @@ public class TennisBall : MonoBehaviour
         // Returning to the player
         if (this._returning)
         {
-            HomeTowardsTarget(this._owner.sprite.WorldCenter, curVelocity);
+            HomeTowardsTarget(this._owner.CenterPosition, curVelocity);
             return;
         }
 

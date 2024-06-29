@@ -96,7 +96,7 @@ public class BorrowedTime : CwaffActive
             PhysicsEngine.Instance.RegisterOverlappingGhostCollisionExceptions(TargetActor.specRigidbody, null, false);
 
             gameObject.Play("Play_OBJ_chestwarp_use_01");
-            SpawnManager.SpawnVFX(tpvfx, TargetActor.sprite.WorldCenter, Quaternion.identity, true);
+            SpawnManager.SpawnVFX(tpvfx, TargetActor.CenterPosition, Quaternion.identity, true);
             yield return new WaitForSeconds(0.05f);
         }
         if (!this._owner.CurrentRoom.IsSealed)
@@ -146,7 +146,7 @@ public class BorrowedTime : CwaffActive
             if (!otherEnemy || !otherEnemy.IsHostileAndNotABoss() || otherEnemy.IsBlackPhantom)
                 continue;
 
-            Vector2 center = otherEnemy.sprite.WorldCenter;
+            Vector2 center = otherEnemy.CenterPosition;
             const int NUM_VFX = 7;
             for (int i = 0; i < NUM_VFX; ++i)
                 vfx.SpawnAtPosition(

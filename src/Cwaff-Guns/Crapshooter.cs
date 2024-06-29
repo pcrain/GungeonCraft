@@ -63,8 +63,8 @@ public class Crapshooter : CwaffGun
                 break;
             case 3: // explosive dice
                 projectile.baseData.damage *= 3f;
-                projectile.OnDestruction += (Projectile p) => Exploder.Explode(
-                    p.sprite.WorldCenter, Bouncer._MiniExplosion, p.Direction);
+                projectile.OnDestruction += (Projectile p) => Exploder.Explode( //TODO: refactor to use normal method
+                    p.SafeCenter, Bouncer._MiniExplosion, p.Direction);
                 break;
             case 4: // homing dice
                 projectile.baseData.damage *= 4f;

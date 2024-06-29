@@ -62,7 +62,7 @@ public class UtilityVest : CwaffPassive
         this.Owner.ForceBlank();
         this.Owner.healthHaver.TriggerInvulnerabilityPeriod();
 
-        DebrisObject debris = Lazy.MakeDebrisFromSprite(item.sprite, this.Owner.sprite.WorldCenter, new Vector2(4f, 4f));
+        DebrisObject debris = Lazy.MakeDebrisFromSprite(item.sprite, this.Owner.CenterPosition, new Vector2(4f, 4f));
             debris.doesDecay     = true;
             debris.decayOnBounce = 0.5f;
             debris.bounceCount   = 1;

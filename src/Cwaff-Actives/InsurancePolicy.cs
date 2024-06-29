@@ -165,7 +165,7 @@ public class InsurancePolicy : CwaffActive
             if (pickup.PickupObjectId == _InsurancePickupId)
                 continue;  // can't insure insurance!!! (leads to weird graphical glitches)
 
-            float pickupDist = (debris.sprite.WorldCenter - user.sprite.WorldCenter).magnitude;
+            float pickupDist = (debris.sprite.WorldCenter - user.CenterPosition).magnitude;
             if (pickupDist >= nearestDist)
                 continue;
 

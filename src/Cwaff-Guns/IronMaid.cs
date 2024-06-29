@@ -126,7 +126,7 @@ public class IronMaid : CwaffGun
 
         this._targetEnemy = SwitchTargetEnemy();
         if (!this._targetEnemy)
-            this._whereIsThePlayerLooking = Raycast.ToNearestWallOrEnemyOrObject(pc.sprite.WorldCenter, pc.CurrentGun.CurrentAngle);
+            this._whereIsThePlayerLooking = Raycast.ToNearestWallOrEnemyOrObject(pc.CenterPosition, pc.CurrentGun.CurrentAngle);
     }
 }
 
@@ -179,7 +179,7 @@ public class RainCheckBullets : MonoBehaviour
         // Phase 2 / 5 -- the freeze
         this._projectile.SetSpeed(0.01f);
         this._wasEverInStasis = true;
-        Vector2 pos = this._projectile.sprite.WorldCenter;
+        Vector2 pos = this._projectile.SafeCenter;
         Vector2 targetDir = this._projectile.Direction;
         AIActor targetEnemy = null;
         while (this._raincheck)

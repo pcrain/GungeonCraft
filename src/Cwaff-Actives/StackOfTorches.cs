@@ -68,14 +68,14 @@ public class StackOfTorches : CwaffActive
     {
         // Do some calculations to figure out whether we should place our torch on the floor or on the wall
         float gunAngle    = user.m_currentGunAngle;
-        Vector2 target    = Raycast.ToNearestWall(user.sprite.WorldCenter, gunAngle);
-        Vector2 delta     = (target - user.sprite.WorldCenter);
+        Vector2 target    = Raycast.ToNearestWall(user.CenterPosition, gunAngle);
+        Vector2 delta     = (target - user.CenterPosition);
         bool placeOnFloor = delta.magnitude > _MAX_WALL_DIST;
 
         // Actually create the torch
         if (placeOnFloor)
         {
-            _Torches.ChooseRandom().Instantiate(position: user.sprite.WorldCenter + _MAX_WALL_DIST * delta.normalized, anchor: Anchor.MiddleCenter);
+            _Torches.ChooseRandom().Instantiate(position: user.CenterPosition + _MAX_WALL_DIST * delta.normalized, anchor: Anchor.MiddleCenter);
             base.gameObject.Play("mc_torch_place");
         }
         else

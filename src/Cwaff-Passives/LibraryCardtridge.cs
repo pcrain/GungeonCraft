@@ -86,7 +86,7 @@ public class LibraryCardtridge : CwaffPassive
         enemy.IgnoreForRoomClear = true;
         enemy.ParentRoom.ResetEnemyHPPercentage();
         enemy.ApplyEffect(_CharmEffect);
-        enemy.healthHaver.OnDeath += (_) => Exploder.Explode(enemy.sprite.WorldCenter, _BookExplosion, Vector2.zero);
+        enemy.healthHaver.OnDeath += (_) => Exploder.Explode(enemy.CenterPosition, _BookExplosion, Vector2.zero);
     }
 
     private void OnEnemySpawn(AIActor enemy)

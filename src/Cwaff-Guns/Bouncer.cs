@@ -92,7 +92,7 @@ public class HarmlessUntilBounce : MonoBehaviour
     private void OnDestruction(Projectile p)
     {
         if (this._currentBounces == this._maxBounces) // explode only on final bounce
-            Exploder.Explode(p.sprite.WorldCenter, Bouncer._MiniExplosion, p.Direction);
+            Exploder.Explode(p.SafeCenter, Bouncer._MiniExplosion, p.Direction);
     }
 
     private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)

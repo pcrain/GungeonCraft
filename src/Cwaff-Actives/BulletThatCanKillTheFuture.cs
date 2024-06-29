@@ -274,7 +274,7 @@ public class BulletThatCanKillTheFuture : CwaffActive
         }
 
         // Check if player is reasonably close to the crosshair, and make magic happen if so
-        float pdist = Vector2.Distance(clockhair.transform.PositionVector2(), interactor.sprite.WorldCenter);
+        float pdist = Vector2.Distance(clockhair.transform.PositionVector2(), interactor.CenterPosition);
         bool killedOwnFuture = (pdist < Mathf.Min(2f, victimDistance));
         if (!killedOwnFuture && victim != null)
         {
@@ -283,7 +283,7 @@ public class BulletThatCanKillTheFuture : CwaffActive
             // ETGModConsole.Log("future erased for "+victim.EnemyGuid);
             VFXPool vfx = VFX.CreatePoolFromVFXGameObject(Items.MagicLamp.AsGun().DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
                 vfx.SpawnAtPosition(
-                    victim.sprite.WorldCenter.ToVector3ZisY(-1f), /* -1 = above player sprite */
+                    victim.CenterPosition.ToVector3ZisY(-1f), /* -1 = above player sprite */
                     0, null, null, null, -0.05f);
 
             foreach (AIActor a in StaticReferenceManager.AllEnemies)

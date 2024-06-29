@@ -49,7 +49,7 @@ public class SafetyGloves : CwaffPassive
         if (pc.GetAbsoluteParentRoom() is not RoomHandler room)
             return;
 
-        Vector2 ppos         = pc.sprite.WorldCenter;
+        Vector2 ppos         = pc.CenterPosition;
         float gunAngle       = pc.m_currentGunAngle;
         AIActor closestEnemy = null;
         float closestDist    = _REACH_SQR;

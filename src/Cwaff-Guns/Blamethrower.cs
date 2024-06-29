@@ -136,7 +136,7 @@ public class BlamethrowerProjectile : MonoBehaviour
     {
         base.gameObject.Play("blamethrower_impact_sound");
 
-        FancyVFX.SpawnBurst(prefab: Blamethrower._BlameImpact, numToSpawn: 2, basePosition: enemy.sprite.WorldCenter,
+        FancyVFX.SpawnBurst(prefab: Blamethrower._BlameImpact, numToSpawn: 2, basePosition: enemy.UnitCenter,
             positionVariance: 1f, baseVelocity: 10f * Vector2.up, velocityVariance: 5f, velType: FancyVFX.Vel.Radial,
             lifetime: 0.5f, fadeOutTime: 0.5f, randomFrame: true);
 
@@ -162,7 +162,7 @@ public class BlamethrowerProjectile : MonoBehaviour
         if ((this._vfxTimer += BraveTime.DeltaTime) < _VFX_RATE)
             return;
         this._vfxTimer -= _VFX_RATE;
-        FancyVFX.Spawn(Blamethrower._BlameTrail, this._projectile.sprite.WorldCenter.ToVector3ZisY(-1f), velocity: 0.2f * this._projectile.LastVelocity,
+        FancyVFX.Spawn(Blamethrower._BlameTrail, this._projectile.SafeCenter.ToVector3ZisY(-1f), velocity: 0.2f * this._projectile.LastVelocity,
             rotation: this._projectile.LastVelocity.EulerZ(), lifetime: 0.18f, fadeOutTime: 0.15f);
     }
 }

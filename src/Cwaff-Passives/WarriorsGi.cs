@@ -216,7 +216,7 @@ public class ZenkaiAura : MonoBehaviour
             return;
 
         this._saiyan.gameObject.Play("dbz_spark_sound");
-        GameObject v = SpawnManager.SpawnVFX(WarriorsGi._SaiyanSpark, (this._saiyan.sprite.WorldCenter + Lazy.RandomVector(0.3f)).ToVector3ZUp(10f), Lazy.RandomEulerZ());
+        GameObject v = SpawnManager.SpawnVFX(WarriorsGi._SaiyanSpark, (this._saiyan.CenterPosition + Lazy.RandomVector(0.3f)).ToVector3ZUp(10f), Lazy.RandomEulerZ());
             tk2dSprite sprite = v.GetComponent<tk2dSprite>();
             sprite.HeightOffGround = 10f;
             // DepthLookupManager.AssignRendererToSortingLayer(sprite.renderer, DepthLookupManager.GungeonSortingLayer.FOREGROUND);
@@ -267,7 +267,7 @@ public class ZenkaiAura : MonoBehaviour
         ++this._zenkaiLevel;
 
         this._extantAura.SafeDestroy();
-        this._extantAura                  = SpawnManager.SpawnVFX(WarriorsGi._ZenkaiAura, this._saiyan.sprite.WorldBottomCenter, Quaternion.identity);
+        this._extantAura                  = SpawnManager.SpawnVFX(WarriorsGi._ZenkaiAura, this._saiyan.SpriteBottomCenter, Quaternion.identity);
         this._extantAura.transform.parent = this._saiyan.transform;
         this._auraLife                    = _AURA_LIFE;
         this._nextSparkTime               =

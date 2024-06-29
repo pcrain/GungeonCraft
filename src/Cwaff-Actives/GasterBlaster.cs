@@ -73,12 +73,12 @@ public class GasterBlaster : CwaffActive
         const float SWING_RADIUS = 16f;
 
         float angle = this._owner.m_currentGunAngle;
-        // Vector2 targetPos = this._owner.sprite.WorldCenter - BraveMathCollege.DegreesToVector(angle, 4f);
-        Vector2 targetPos = this._owner.sprite.WorldCenter.ToNearestWallOrObject((180f + angle).Clamp180(), 0f);
-        Vector2 delta = targetPos - this._owner.sprite.WorldCenter;
-        targetPos = this._owner.sprite.WorldCenter + (delta.magnitude - 1f).Clamp(0f, 2f) * delta.normalized;
+        // Vector2 targetPos = this._owner.CenterPosition - BraveMathCollege.DegreesToVector(angle, 4f);
+        Vector2 targetPos = this._owner.CenterPosition.ToNearestWallOrObject((180f + angle).Clamp180(), 0f);
+        Vector2 delta = targetPos - this._owner.CenterPosition;
+        targetPos = this._owner.CenterPosition + (delta.magnitude - 1f).Clamp(0f, 2f) * delta.normalized;
 
-        GameObject blaster = SpawnManager.SpawnVFX(_GasterBlaster, this._owner.sprite.WorldCenter.ToVector3ZUp(10f), Quaternion.identity);
+        GameObject blaster = SpawnManager.SpawnVFX(_GasterBlaster, this._owner.CenterPosition.ToVector3ZUp(10f), Quaternion.identity);
         RotateIntoPositionBehavior rotcomp = blaster.AddComponent<RotateIntoPositionBehavior>();
             rotcomp.m_radius       = SWING_RADIUS;
             rotcomp.m_fulcrum      = targetPos + BraveMathCollege.DegreesToVector(angle, SWING_RADIUS);

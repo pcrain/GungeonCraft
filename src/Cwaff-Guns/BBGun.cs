@@ -90,7 +90,7 @@ public class TheBB : MonoBehaviour
     {
         MiniInteractable mi = MiniInteractable.CreateInteractableAtPosition(
           this._projectile.sprite,
-          this._projectile.sprite.WorldCenter,
+          this._projectile.SafeCenter,
           BBInteractScript);
             mi.doHover = true;
             mi.sprite.SetGlowiness(glowAmount: _BASE_EMISSION, glowColor: Color.magenta);

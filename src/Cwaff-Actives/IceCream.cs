@@ -25,7 +25,7 @@ public class IceCream : CwaffActive
     {
         Vector2 ppos = user.CenterPosition;
         foreach (AIActor enemy in user.CurrentRoom.SafeGetEnemiesInRoom())
-            if (HappyIceCreamHaver.NeedsIceCream(enemy) && ((enemy.sprite.WorldCenter - ppos).sqrMagnitude <= HappyIceCreamHaver._SHARE_RANGE_SQUARED))
+            if (HappyIceCreamHaver.NeedsIceCream(enemy) && ((enemy.CenterPosition - ppos).sqrMagnitude <= HappyIceCreamHaver._SHARE_RANGE_SQUARED))
                 return base.CanBeUsed(user);
 
         return false;
@@ -35,7 +35,7 @@ public class IceCream : CwaffActive
     {
         Vector2 ppos = user.CenterPosition;
         foreach (AIActor enemy in user.CurrentRoom.SafeGetEnemiesInRoom())
-            if (HappyIceCreamHaver.NeedsIceCream(enemy) && ((enemy.sprite.WorldCenter - ppos).sqrMagnitude <= HappyIceCreamHaver._SHARE_RANGE_SQUARED))
+            if (HappyIceCreamHaver.NeedsIceCream(enemy) && ((enemy.CenterPosition - ppos).sqrMagnitude <= HappyIceCreamHaver._SHARE_RANGE_SQUARED))
                 HappyIceCreamHaver.ShareIceCream(enemy);
     }
 }
@@ -189,12 +189,12 @@ public class HappyIceCreamHaver : MonoBehaviour
 
         if (this._enemy.behaviorSpeculator.PlayerTarget is not AIActor iceCreamNeeder)
         {
-            shooter.OverrideAimPoint = GameManager.Instance.BestActivePlayer.sprite.WorldCenter;
+            shooter.OverrideAimPoint = GameManager.Instance.BestActivePlayer.CenterPosition;
             return;
         }
 
         shooter.OverrideAimPoint = iceCreamNeeder.transform.position.XY();
-        if ((this._enemy.sprite.WorldCenter - iceCreamNeeder.sprite.WorldCenter).sqrMagnitude < _SHARE_RANGE_SQUARED)
+        if ((this._enemy.CenterPosition - iceCreamNeeder.CenterPosition).sqrMagnitude < _SHARE_RANGE_SQUARED)
             if (NeedsIceCream(iceCreamNeeder))
                 ShareIceCream(iceCreamNeeder);
     }
@@ -276,7 +276,7 @@ public class TargetPourSoulsWithoutIceCreamBehavior : TargetBehaviorBase  //TODO
 
     internal static GameActor NearestEnemyThatReallyNeedsIceCream(AIActor iceCreamHaver)
     {
-        Vector2 pos = iceCreamHaver.sprite.WorldCenter;
+        Vector2 pos = iceCreamHaver.CenterPosition;
         GameActor target = null;
         float bestDist = 9999f;
         foreach (AIActor other in pos.SafeGetEnemiesInRoom())
@@ -285,7 +285,7 @@ public class TargetPourSoulsWithoutIceCreamBehavior : TargetBehaviorBase  //TODO
                 continue;
             if (!HappyIceCreamHaver.NeedsIceCream(other))
                 continue;
-            float dist = (pos - other.sprite.WorldCenter).sqrMagnitude;
+            float dist = (pos - other.CenterPosition).sqrMagnitude;
             if (dist > bestDist)
                 continue;
             if (dist < HappyIceCreamHaver._SHARE_RANGE_SQUARED)
@@ -300,7 +300,7 @@ public class TargetPourSoulsWithoutIceCreamBehavior : TargetBehaviorBase  //TODO
             return target;
 
         PlayerController bestPlayer = GameManager.Instance.BestActivePlayer;
-        Vector2 bestPlayerPos       = bestPlayer.sprite.WorldCenter;
+        Vector2 bestPlayerPos       = bestPlayer.CenterPosition;
         if ((pos-bestPlayerPos).sqrMagnitude < HappyIceCreamHaver._SEEK_PLAYER_RANGE_SQUARED)
             return bestPlayer; // target the player if we have no good enemy target and they're in range
 

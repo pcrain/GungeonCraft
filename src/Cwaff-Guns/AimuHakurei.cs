@@ -261,8 +261,8 @@ public class AimuHakurei : CwaffGun
         if (!pc.healthHaver || !pc.healthHaver.IsVulnerable)
             return; // can't graze if we're invincible, that's cheating!!!
 
-        Vector2 ppos = pc.sprite.WorldCenter;
-        Vector2 bottom = pc.sprite.WorldBottomCenter;
+        Vector2 ppos = pc.CenterPosition;
+        Vector2 bottom = pc.SpriteBottomCenter;
         foreach (Projectile p in StaticReferenceManager.AllProjectiles)
         {
             if (!p.isActiveAndEnabled || !p.sprite || !p.sprite.renderer || !p.sprite.renderer.enabled || !p.collidesWithPlayer || p.Owner is PlayerController)

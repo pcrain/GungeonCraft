@@ -104,7 +104,7 @@ public class ExorcismJuice : MonoBehaviour
             ghostSprite = Lazy.GetTexturedEnemyIdleAnimation(enemy, new Color(1f,1f,1f,1f), 0.3f);
             HolyWaterGun._GhostTextures[enemy.EnemyGuid] = ghostSprite; // Cache the texture for this enemy for later
         }
-        Vector3 pos                         = enemy.sprite.WorldCenter.ToVector3ZisY(-10f);
+        Vector3 pos                         = enemy.CenterPosition.ToVector3ZisY(-10f);
         GameObject g                        = UnityEngine.Object.Instantiate(new GameObject(), pos, Quaternion.identity);
         tk2dSpriteCollectionData collection = SpriteBuilder.ConstructCollection(g, "ghostcollection");
         int spriteId                        = SpriteBuilder.AddSpriteToCollection(ghostSprite, collection, "ghostsprite");  //NOTE: this doesn't use PackerHelper since it's done at runtime
@@ -163,7 +163,7 @@ public class Exorcisable : MonoBehaviour
         // Create particles
         if (UnityEngine.Random.Range(0f, 1f) < 0.25f)
         {
-            Vector2 ppos = this._enemy.sprite.WorldCenter;
+            Vector2 ppos = this._enemy.CenterPosition;
             float angle = Lazy.RandomAngle();
             Vector2 finalpos = ppos + BraveMathCollege.DegreesToVector(angle, magnitude: 1f);
             FancyVFX.Spawn(HolyWaterGun._ExorcismParticleVFX, finalpos.ToVector3ZisY(-1f), Lazy.RandomEulerZ(),

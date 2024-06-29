@@ -77,7 +77,7 @@ public class LastResort : CwaffGun
         // overrideMidairDeathVFX will make implicit use of CreatePoolFromVFXGameObject
         VFXPool v = VFX.CreatePoolFromVFXGameObject(Items.MagicLamp.AsGun().DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
 
-        Vector2 ppos = this.PlayerOwner.sprite.WorldCenter;
+        Vector2 ppos = this.PlayerOwner.CenterPosition;
         float pangle = this.PlayerOwner.CurrentGun.gunAngle;
         int numInCircle = 7;
         for (int i = 0; i < numInCircle; ++i)

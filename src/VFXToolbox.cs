@@ -288,7 +288,7 @@ public static class VFX
         GameObject newSprite = new GameObject(name, new Type[] { typeof(tk2dSprite) }) { layer = 0 };
         // newSprite.transform.position = (gunOwner.transform.position + new Vector3(0.5f, 2));
         newSprite.transform.position = new Vector3(
-            gunOwner.sprite.WorldCenter.x,
+            gunOwner.CenterPosition.x,
             gunOwner.sprite.WorldTopCenter.y + PIXELS_ABOVE_HEAD/C.PIXELS_PER_TILE);
         tk2dSprite overheadSprite = newSprite.AddComponent<tk2dSprite>();
         extantSprites[gunOwner].Add(newSprite);
@@ -328,14 +328,14 @@ public static class VFX
         tk2dBaseSprite baseSprite = newSprite.GetComponent<tk2dBaseSprite>();
         newSprite.transform.parent = gunOwner.transform;
         newSprite.transform.position = new Vector3(
-            gunOwner.sprite.WorldCenter.x,
+            gunOwner.CenterPosition.x,
             gunOwner.sprite.WorldTopCenter.y + PIXELS_ABOVE_HEAD/C.PIXELS_PER_TILE);
 
         extantSprites[gunOwner].Add(baseSprite.gameObject);
 
         Bounds bounds = gunOwner.sprite.GetBounds();
         Vector3 vector = gunOwner.transform.position + new Vector3((bounds.max.x + bounds.min.x) / 2f, bounds.max.y, 0f).Quantize(0.0625f);
-        newSprite.transform.position = gunOwner.sprite.WorldCenter.ToVector3ZUp(0f).WithY(vector.y);
+        newSprite.transform.position = gunOwner.CenterPosition.ToVector3ZUp(0f).WithY(vector.y);
         baseSprite.HeightOffGround = 0.5f;
 
         gunOwner.sprite.AttachRenderer(baseSprite);
@@ -1111,7 +1111,7 @@ public class OrbitalEffect : MonoBehaviour
         // Spawn orbitals
         for (int i = 0; i < this._numOrbitals; ++i)
             this._orbitals.Add(SpawnManager.SpawnVFX(
-                vfx, this._enemy.sprite.WorldCenter.ToVector3ZisY(-1), Quaternion.identity));
+                vfx, this._enemy.CenterPosition.ToVector3ZisY(-1), Quaternion.identity));
         UpdateOrbitals();
 
         this._didSetup = true;
@@ -1129,7 +1129,7 @@ public class OrbitalEffect : MonoBehaviour
     public void AddOrbital(GameObject vfx)
     {
         this._orbitals.Add(SpawnManager.SpawnVFX(
-            vfx, this._enemy.sprite.WorldCenter.ToVector3ZisY(-1), Quaternion.identity));
+            vfx, this._enemy.CenterPosition.ToVector3ZisY(-1), Quaternion.identity));
         this._numOrbitals += 1;
         this._orbitalGap   = 360.0f / (float)this._numOrbitals;
     }
@@ -1189,7 +1189,7 @@ public class OrbitalEffect : MonoBehaviour
             Vector2 offset = new Vector2(1.5f * this._enemyGirth * avec.x, 0.75f * this._enemyGirth * avec.y + OverheadOffset());
             if (this._bobAmount > 0)
                 offset += new Vector2(0f, this._bobAmount * Mathf.Sin(radAngle));
-            g.transform.position = (this._enemy.sprite.WorldCenter + offset).ToVector3ZisY(angle < 180 ? z : -z);
+            g.transform.position = (this._enemy.CenterPosition + offset).ToVector3ZisY(angle < 180 ? z : -z);
             if (this._rotates)
                 g.transform.rotation = angle.EulerZ();
             if (this._flips)

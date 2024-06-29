@@ -45,7 +45,7 @@ public class GamblersFallacy : CwaffGun
             // deal damage
             vfx ??= VFX.CreatePoolFromVFXGameObject(Items.MagicLamp.AsGun().DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
 
-            Vector2 position = player.sprite.WorldCenter;
+            Vector2 position = player.CenterPosition;
             for (int i = 0; i < 4; ++i)
             {
                 Vector2 finalpos = position + BraveMathCollege.DegreesToVector(90*i,1);
@@ -60,7 +60,7 @@ public class GamblersFallacy : CwaffGun
         {
             ETGModConsole.Log("1 in 10 O:");
             var enemyToSpawn = EnemyDatabase.GetOrLoadByGuid(Enemies.Gunreaper);
-            Vector2 position = player.sprite.WorldCenter;
+            Vector2 position = player.CenterPosition;
             AIActor TargetActor = AIActor.Spawn(
                 enemyToSpawn, position, GameManager.Instance.Dungeon.data.GetAbsoluteRoomFromPosition(
                     position.ToIntVector2()), true, AIActor.AwakenAnimationType.Default, true);

@@ -340,7 +340,7 @@ public class FrisbeeBehaviour : MonoBehaviour
 
         float angle = AngleFromFrisbeeAnimation();
         this._rider.m_overrideGunAngle = angle;
-        this._rider.forceAimPoint = this._rider.sprite.WorldCenter + angle.ToVector();
+        this._rider.forceAimPoint = this._rider.CenterPosition + angle.ToVector();
         this._rider.spriteAnimator.PlayFromFrame(this._rider.GetEvenlySpacedIdleAnimation(angle), frame: 0);
         this._rider.spriteAnimator.UpdateAnimation(GameManager.INVARIANT_DELTA_TIME);
         this._rider.transform.position = (base.GetComponent<tk2dSprite>().WorldCenter + this._rider.transform.position.XY() - this._rider.SpriteBottomCenter.XY()).Quantize(0.0625f);

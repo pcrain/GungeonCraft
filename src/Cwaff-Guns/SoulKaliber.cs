@@ -136,7 +136,7 @@ public class SoulLinkStatus : MonoBehaviour
             return false; // don't play any sounds
 
         this._lastVfxTime = BraveTime.ScaledTimeSinceStartup;
-        FancyVFX.SpawnBurst(prefab: _SoulLinkSoulVFX, numToSpawn: _NUM_HIT_PARTICLES, basePosition: this._enemy.sprite.WorldCenter,
+        FancyVFX.SpawnBurst(prefab: _SoulLinkSoulVFX, numToSpawn: _NUM_HIT_PARTICLES, basePosition: this._enemy.CenterPosition,
             positionVariance: 1f, baseVelocity: _SOUL_PART_SPEED * Vector2.up, lifetime: 0.5f, fadeOutTime: 0.5f,
             emissivePower: 50f, emissiveColor: Color.white);
         return true; // now we can play sounds

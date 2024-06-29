@@ -233,7 +233,7 @@ public class Missiletoe : CwaffGun
             if (_BannedQualities.Contains(pickup.quality))
                 continue;
 
-            float pickupDist = (debris.sprite.WorldCenter - this.GenericOwner.sprite.WorldCenter).magnitude;
+            float pickupDist = (debris.sprite.WorldCenter - this.GenericOwner.CenterPosition).magnitude;
             if (pickupDist >= nearestDist)
                 continue;
 
@@ -378,7 +378,7 @@ public class ChristmasSparkleDoer : MonoBehaviour
             return;
 
         this._lifetime -= _SPARKLE_TIME;
-        SpawnManager.SpawnVFX(Missiletoe._SparklePrefab, this._projectile.sprite.WorldCenter, Lazy.RandomEulerZ())
+        SpawnManager.SpawnVFX(Missiletoe._SparklePrefab, this._projectile.SafeCenter, Lazy.RandomEulerZ())
             .ExpireIn(_SPARKLE_LIFE, _SPARKLE_FADE, shrink: false);
     }
 }

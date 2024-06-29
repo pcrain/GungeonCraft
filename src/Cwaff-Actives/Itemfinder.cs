@@ -60,7 +60,7 @@ public class Itemfinder : CwaffActive
         bool nearAnyTreasure = false;
         foreach (TreasureLocation t in _Treasure)
         {
-            float sqrdist = (t.location - user.sprite.WorldCenter).sqrMagnitude;
+            float sqrdist = (t.location - user.CenterPosition).sqrMagnitude;
             if (sqrdist < _CLOSE_DISTANCE_SQR)
             {
                 nearAnyTreasure = true;
@@ -84,7 +84,7 @@ public class Itemfinder : CwaffActive
         float nearestSqrDist = _CLOSE_DISTANCE_SQR;
         foreach (TreasureLocation t in _Treasure)
         {
-            float sqrdist = (t.location - user.sprite.WorldCenter).sqrMagnitude;
+            float sqrdist = (t.location - user.CenterPosition).sqrMagnitude;
             if (sqrdist < nearestSqrDist)
             {
                 nearestSqrDist = sqrdist;

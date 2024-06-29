@@ -69,7 +69,7 @@ public class PopcornBehavior : MonoBehaviour
 
             Projectile other = SpawnManager.SpawnProjectile(
                 PopcornGun.gunprojectile.gameObject,
-                this.m_projectile.sprite.WorldCenter,
+                this.m_projectile.SafeCenter,
                 Quaternion.Euler(0f, 0f, otherAngle),
                 true).GetComponent<Projectile>();
             if (!other)

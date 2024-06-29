@@ -204,7 +204,7 @@ public partial class SansBoss : AIActor
     private const int COUNT = 57;
     private IEnumerator DoTheThing(float start, int version)
     {
-      Vector2 middle       = theBoss.sprite.WorldCenter;
+      Vector2 middle       = theBoss.CenterPosition;
       PathCircle theCircle = new PathCircle(middle,2f);
       int i                = 0;
       int waitTime         = (version == 1 ? 5 : 4);
@@ -313,10 +313,10 @@ public partial class SansBoss : AIActor
 
       Vector2 delta    = (target - p.CenterPosition);
       Vector2 gravity  = GRAVITY*delta.normalized;
-      Vector2 gravityB = GRAVITY*(target - theBoss.sprite.WorldCenter).normalized;
+      Vector2 gravityB = GRAVITY*(target - theBoss.CenterPosition).normalized;
       Vector2 baseVel  = -VELOCITY * gravityB;
       Speed s = new Speed(BASESPEED,SpeedType.Absolute);
-      Offset o = Offset.OverridePosition(theBoss.sprite.WorldCenter);
+      Offset o = Offset.OverridePosition(theBoss.CenterPosition);
       theBoss.gameObject.Play("sans_laugh");
       for(int i = 0; i < COUNT; ++i)
       {
@@ -472,7 +472,7 @@ public partial class SansBoss : AIActor
         for (int j = 0; j < COUNTPERSIDE; ++j)
         {
           float launchAngle = sideAngle + SPREADSPAN * ((1f+j) / (1f+COUNTPERSIDE) - 0.5f);
-          this.Fire(Offset.OverridePosition(theBoss.sprite.WorldCenter), new Direction(launchAngle.Clamp180(),DirectionType.Absolute), new Speed(SPEED,SpeedType.Absolute), new SquareBullet(GOFRAMES, FINALDELAY));
+          this.Fire(Offset.OverridePosition(theBoss.CenterPosition), new Direction(launchAngle.Clamp180(),DirectionType.Absolute), new Speed(SPEED,SpeedType.Absolute), new SquareBullet(GOFRAMES, FINALDELAY));
           yield return this.Wait(SHOTDELAY);
         }
         yield return this.Wait(SIDEDELAY);

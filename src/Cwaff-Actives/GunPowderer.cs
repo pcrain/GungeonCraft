@@ -31,7 +31,7 @@ public class GunPowderer : CwaffActive
             if (p.GetComponent<Gun>() is not Gun gun)
                 continue;
 
-            float gunDist = (gun.sprite.WorldCenter - user.sprite.WorldCenter).magnitude;
+            float gunDist = (gun.sprite.WorldCenter - user.CenterPosition).magnitude;
             if (gunDist >= nearestDist)
                 continue;
 

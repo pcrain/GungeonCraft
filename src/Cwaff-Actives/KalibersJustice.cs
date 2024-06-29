@@ -183,7 +183,7 @@ public class KalibersJustice : CwaffActive
 
         // Figure out what blessing we're receiving
         Need whatToReceive = receiveList.ChooseRandom<Need>();
-        Vector2 where = user.sprite.WorldCenter;
+        Vector2 where = user.CenterPosition;
         switch(whatToReceive.type)
         {
             case NeedType.Health:

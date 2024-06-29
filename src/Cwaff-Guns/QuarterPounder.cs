@@ -87,7 +87,7 @@ public class MidasProjectile : MonoBehaviour
         }
         tk2dBaseSprite sprite               = g.AddComponent<tk2dSprite>();
             sprite.SetSprite(_GoldSpriteCollection, spriteId);
-            sprite.PlaceAtPositionByAnchor(enemy.sprite.WorldCenter.ToVector3ZisY(), Anchor.MiddleCenter);
+            sprite.PlaceAtPositionByAnchor(enemy.UnitCenter.ToVector3ZisY(), Anchor.MiddleCenter);
             sprite.HeightOffGround        = enemy.sprite.HeightOffGround;
             sprite.depthUsesTrimmedBounds = enemy.sprite.depthUsesTrimmedBounds;
             sprite.SortingOrder           = enemy.sprite.SortingOrder;

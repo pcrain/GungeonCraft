@@ -105,7 +105,7 @@ public class SlappProjectile : MonoBehaviour
         {
             if (!enemy || !enemy.isActiveAndEnabled)
                 continue;
-            if ((enemy.sprite.WorldCenter - victimPos).sqrMagnitude > _SLAPP_RADIUS_SQUARED)
+            if ((enemy.CenterPosition - victimPos).sqrMagnitude > _SLAPP_RADIUS_SQUARED)
                 continue;
             if (enemy.healthHaver is not HealthHaver hh)
                 continue;

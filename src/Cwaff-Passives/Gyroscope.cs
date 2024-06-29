@@ -120,7 +120,7 @@ public class GyroscopeRoll : CustomDodgeRoll
         }
 
         this.owner.m_overrideGunAngle = this.forcedDirection;
-        this.owner.forceAimPoint = this.owner.sprite.WorldCenter + BraveMathCollege.DegreesToVector(this.forcedDirection);
+        this.owner.forceAimPoint = this.owner.CenterPosition + BraveMathCollege.DegreesToVector(this.forcedDirection);
     }
 
     private void OnReceivedDamage(PlayerController p)
@@ -190,7 +190,7 @@ public class GyroscopeRoll : CustomDodgeRoll
                 Gyroscope._TornadoVFX, this.owner.specRigidbody.UnitBottomCenter, Quaternion.identity);
             tk2dSpriteAnimator tornadoAnimator = this.tornadoVFX.GetComponent<tk2dSpriteAnimator>();
                 tornadoAnimator.sprite.transform.parent = this.owner.transform;
-                tornadoAnimator.sprite.transform.position = this.owner.sprite.WorldBottomCenter;
+                tornadoAnimator.sprite.transform.position = this.owner.SpriteBottomCenter;
                 tornadoAnimator.sprite.usesOverrideMaterial = true;
                 tornadoAnimator.renderer.SetAlpha(0.0f);
         #endregion
@@ -237,13 +237,13 @@ public class GyroscopeRoll : CustomDodgeRoll
                     float mag = UnityEngine.Random.Range(0.3f,1.25f);
                     SpawnManager.SpawnVFX(
                         dusts.rollLandDustup,
-                        this.owner.sprite.WorldCenter - BraveMathCollege.DegreesToVector(dir, mag),
+                        this.owner.CenterPosition - BraveMathCollege.DegreesToVector(dir, mag),
                         Quaternion.Euler(0f, 0f, rot));
                 }
                 if (chargePercent >= DIZZY_THRES)
                 {
                     tornadoCurAlpha = TORNADO_ALPHA * (chargePercent - DIZZY_THRES) / (1.0f - DIZZY_THRES);
-                    tornadoAnimator.sprite.transform.position = this.owner.sprite.WorldBottomCenter;
+                    tornadoAnimator.sprite.transform.position = this.owner.SpriteBottomCenter;
                     tornadoAnimator.renderer.SetAlpha(tornadoCurAlpha);
                 }
 
@@ -300,11 +300,11 @@ public class GyroscopeRoll : CustomDodgeRoll
                     float mag = UnityEngine.Random.Range(0.3f,1.25f);
                     SpawnManager.SpawnVFX(
                         dusts.rollLandDustup,
-                        this.owner.sprite.WorldCenter - BraveMathCollege.DegreesToVector(dir, mag),
+                        this.owner.CenterPosition - BraveMathCollege.DegreesToVector(dir, mag),
                         Quaternion.Euler(0f, 0f, rot));
                 }
 
-                tornadoAnimator.sprite.transform.position = this.owner.sprite.WorldBottomCenter;
+                tornadoAnimator.sprite.transform.position = this.owner.SpriteBottomCenter;
                 ExtinguishFire();
                 yield return null;
             }

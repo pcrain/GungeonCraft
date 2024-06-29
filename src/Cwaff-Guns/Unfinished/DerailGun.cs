@@ -184,7 +184,7 @@ public class ExplodeOnImpact : MonoBehaviour
     }
     private void OnDestruction(Projectile obj)
     {
-        Vector2 deathPos = this.m_projectile.sprite.WorldCenter;
+        Vector2 deathPos = this.m_projectile.SafeCenter;
         Exploder.Explode(deathPos, DerailGun.bigTrainExplosion, Vector2.zero);
     }
 }

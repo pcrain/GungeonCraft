@@ -108,7 +108,7 @@ public class Ticonderogun : CwaffGun
 
         List<AIActor> theEncircled = new();
         foreach (AIActor enemy in this._owner.CurrentRoom.SafeGetEnemiesInRoom())
-            if (enemy && enemy.IsHostile(canBeNeutral: true) && enemy.sprite && enemy.sprite.WorldCenter.IsPointInPolygonHull(this._extantPoints))
+            if (enemy && enemy.IsHostile(canBeNeutral: true) && enemy.CenterPosition.IsPointInPolygonHull(this._extantPoints))
                 theEncircled.Add(enemy);
         if (theEncircled.Count == 0)
             return;  // return early if we haven't actually done anything
@@ -140,7 +140,7 @@ public class Ticonderogun : CwaffGun
         {
             Vector2 offset = Lazy.RandomVector(0.3f);
             Vector2 velocity = 2f * offset.normalized;
-            FancyVFX fv = FancyVFX.Spawn(_RunePrefab, position: enemy.sprite.WorldCenter + offset, rotation: Quaternion.identity, velocity: velocity,
+            FancyVFX fv = FancyVFX.Spawn(_RunePrefab, position: enemy.CenterPosition + offset, rotation: Quaternion.identity, velocity: velocity,
                 lifetime: 1f, fadeOutTime: 1f, parent: enemy.sprite.transform);
             tk2dSpriteAnimator anim = fv.GetComponent<tk2dSpriteAnimator>();
             int newSpriteId = anim.currentClip.frames[UnityEngine.Random.Range(0, anim.currentClip.frames.Count())].spriteId;
@@ -184,7 +184,7 @@ public class Ticonderogun : CwaffGun
         GameManager.Instance.MainCameraController.SetManualControl(true, true);
         GameManager.Instance.MainCameraController.OverridePosition = this._cameraPositionAtChargeStart;
 
-        this._playerPositionAtChargeStart = this.GenericOwner.sprite.WorldCenter;
+        this._playerPositionAtChargeStart = this.GenericOwner.CenterPosition;
         this._adjustedAimPoint = this._playerPositionAtChargeStart + (this.GenericOwner as PlayerController).m_currentGunAngle.ToVector(1f);
 
         this._isCharging = true;
@@ -217,7 +217,7 @@ public class Ticonderogun : CwaffGun
         {
             if (!enemy || !enemy.IsHostile(canBeNeutral: true))
                 continue;
-            Vector2 enemyDelta = (enemy.CenterPosition - this._owner.sprite.WorldCenter);
+            Vector2 enemyDelta = (enemy.CenterPosition - this._owner.CenterPosition);
             if (enemyDelta.magnitude > _MAX_CONTROLLER_DIST)
                 continue;
             float enemyAngle = enemyDelta.ToAngle();
@@ -288,7 +288,7 @@ public class Ticonderogun : CwaffGun
         }
 
         // Figure out if we should add a new point to our list
-        Vector2 playerPos = this._owner.sprite.WorldCenter;
+        Vector2 playerPos = this._owner.CenterPosition;
         Vector2 pencilPos = GetControllerTrackingVector();
 
         // Stabilize the camera while we're using this weapon on keyboard and mouse
@@ -296,7 +296,7 @@ public class Ticonderogun : CwaffGun
         GameManager.Instance.MainCameraController.SetManualControl(usingMouse, true);
         if (usingMouse)
             GameManager.Instance.MainCameraController.OverridePosition =
-                this._cameraPositionAtChargeStart + (this.GenericOwner.sprite.WorldCenter - this._playerPositionAtChargeStart);
+                this._cameraPositionAtChargeStart + (this.GenericOwner.CenterPosition - this._playerPositionAtChargeStart);
 
         // Don't draw or update anything if we've barely moved the cursor
         if (this._lastCursorPos.HasValue && (pencilPos - this._lastCursorPos.Value).magnitude < _MIN_SEGMENT_DIST)

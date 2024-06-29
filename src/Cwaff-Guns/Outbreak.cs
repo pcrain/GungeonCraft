@@ -38,7 +38,7 @@ public class Outbreak : CwaffGun
         bool found = false;
         Vector2 target = Vector2.zero;
         if (_INFECT_TOWARDS_CURSOR)
-            target = player.sprite.WorldCenter.ToNearestWallOrEnemyOrObject(player.m_currentGunAngle, 1f);
+            target = player.CenterPosition.ToNearestWallOrEnemyOrObject(player.m_currentGunAngle, 1f);
 
         foreach (AIActor enemy in StaticReferenceManager.AllEnemies) //REFACTOR: limit this to current room
         {
@@ -48,12 +48,12 @@ public class Outbreak : CwaffGun
             float infectAngle = player.m_currentGunAngle;
             if (_INFECT_TOWARDS_CURSOR)
             {
-                Vector2 delta = target - enemy.sprite.WorldCenter;
+                Vector2 delta = target - enemy.CenterPosition;
                 if (delta.sqrMagnitude > 1f) // prevents random angles from enemies targeting themselves
                     infectAngle = delta.ToAngle();
             }
             Projectile p = VolleyUtility.ShootSingleProjectile(
-                _InfectionProjectile, enemy.sprite.WorldCenter /*enemy.GunPivot.PositionVector2()*/, infectAngle, false, player);
+                _InfectionProjectile, enemy.CenterPosition /*enemy.GunPivot.PositionVector2()*/, infectAngle, false, player);
             p.specRigidbody.RegisterSpecificCollisionException(enemy.specRigidbody);
         }
         if (found)
@@ -82,7 +82,7 @@ public class InfectionBehavior : MonoBehaviour
         if (UnityEngine.Random.value > 0.3f)
             return;
 
-        FancyVFX.Spawn(Outbreak._OutbreakSmokeVFX, this._projectile.sprite.WorldCenter.ToVector3ZisY(-1f), Lazy.RandomEulerZ(),
+        FancyVFX.Spawn(Outbreak._OutbreakSmokeVFX, this._projectile.SafeCenter.ToVector3ZisY(-1f), Lazy.RandomEulerZ(),
             velocity: Lazy.RandomVector(0.1f), lifetime: 0.3f, fadeOutTime: 0.6f);
     }
 }

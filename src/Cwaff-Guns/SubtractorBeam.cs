@@ -158,7 +158,7 @@ public class SubtractorProjectile : MonoBehaviour
             return;
         }
 
-        FancyVFX.SpawnBurst(prefab: SubtractorBeam._HitEffects, numToSpawn: _NUM_HIT_PARTICLES, basePosition: enemy.sprite.WorldCenter,
+        FancyVFX.SpawnBurst(prefab: SubtractorBeam._HitEffects, numToSpawn: _NUM_HIT_PARTICLES, basePosition: enemy.CenterPosition,
             positionVariance: 1f, baseVelocity: Vector2.zero, velocityVariance: 1f, velType: FancyVFX.Vel.Radial,
             lifetime: 0.5f, fadeOutTime: 0.5f);
 

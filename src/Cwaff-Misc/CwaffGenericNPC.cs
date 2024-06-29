@@ -379,7 +379,7 @@ public class FlipsToFacePlayer : MonoBehaviour
 
   private void FlipSpriteIfNecessary()
   {
-    this._animator.sprite.FlipX = GameManager.Instance.BestActivePlayer.sprite.WorldBottomCenter.x < this._centerX;
+    this._animator.sprite.FlipX = GameManager.Instance.BestActivePlayer.SpriteBottomCenter.x < this._centerX;
     if (this._animator.sprite.FlipX == this._cachedFlipped)
       return;
 
@@ -391,7 +391,7 @@ public class FlipsToFacePlayer : MonoBehaviour
 
   // private void FlipSpriteIfNecessaryClose()
   // {
-  //   this._animator.sprite.FlipX = GameManager.Instance.BestActivePlayer.sprite.WorldBottomCenter.x < this._centerX;
+  //   this._animator.sprite.FlipX = GameManager.Instance.BestActivePlayer.SpriteBottomCenter.x < this._centerX;
   //   if (this._animator.sprite.FlipX == this._cachedFlipped)
   //     return;
 

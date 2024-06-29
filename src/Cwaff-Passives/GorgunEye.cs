@@ -42,7 +42,7 @@ public class GorgunEye : CwaffPassive
         if (this.Owner is not PlayerController player)
             return;
 
-        Vector2 ppos         = player.sprite.WorldCenter;
+        Vector2 ppos         = player.CenterPosition;
         float gunAngle       = player.m_currentGunAngle;
         AIActor closestEnemy = null;
         float closestDist    = 999999f;
@@ -53,7 +53,7 @@ public class GorgunEye : CwaffPassive
             if (!enemy.behaviorSpeculator || enemy.behaviorSpeculator.ImmuneToStun)
                 continue; // enemy cannot be stunned
 
-            Vector2 epos  = enemy.sprite.WorldCenter;
+            Vector2 epos  = enemy.CenterPosition;
             Vector2 delta = epos - ppos;
             if (!delta.IsNearAngle(gunAngle, _CONE_RADIUS))
                 continue; // enemy is not within our vision range

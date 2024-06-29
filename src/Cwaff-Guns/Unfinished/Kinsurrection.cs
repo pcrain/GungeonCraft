@@ -58,7 +58,7 @@ public class BulletKinLauncher : MonoBehaviour
 
         SpeculativeRigidbody specRigidBody = this.m_projectile.specRigidbody;
 
-        Vector2 position = this.m_projectile.sprite.WorldCenter;
+        Vector2 position = this.m_projectile.SafeCenter;
 
         this.m_bullet_kin = AIActor.Spawn(
             bulletkin, position, GameManager.Instance.Dungeon.data.GetAbsoluteRoomFromPosition(
@@ -105,7 +105,7 @@ public class EnemyIsTheProjectileBehavior : MonoBehaviour
             return;
         }
         this.m_projectile.specRigidbody.Position =
-            new Position(this.target_enemy.sprite.WorldCenter);
+            new Position(this.target_enemy.CenterPosition);
     }
 
     public void Initialize(AIActor target)

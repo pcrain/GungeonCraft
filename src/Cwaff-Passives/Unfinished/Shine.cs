@@ -43,12 +43,12 @@ public class Shine : CwaffPassive
     {
         this.isShining = true;
         theShine = UnityEngine.Object.Instantiate(
-            _ShineVFX, player.specRigidbody.sprite.WorldCenter, Quaternion.identity, player.specRigidbody.transform);
+            _ShineVFX, player.CenterPosition, Quaternion.identity, player.specRigidbody.transform);
         this.Update();
-        // VFX.SpawnVFXPool("Shine",player.specRigidbody.sprite.WorldCenter, relativeTo: player.gameObject);
-        // VFX.SpawnVFXPool("Shine", player.specRigidbody.sprite.WorldCenter);
+        // VFX.SpawnVFXPool("Shine",player.specRigidbody.UnitCenter, relativeTo: player.gameObject);
+        // VFX.SpawnVFXPool("Shine", player.specRigidbody.UnitCenter);
 
-        // theShine = UnityEngine.Object.Instantiate(VFX.animations["Shine"], player.sprite.WorldCenter, Quaternion.identity, player.specRigidbody.transform);
+        // theShine = UnityEngine.Object.Instantiate(VFX.animations["Shine"], player.CenterPosition, Quaternion.identity, player.specRigidbody.transform);
         m_usedOverrideMaterial = player.sprite.usesOverrideMaterial;
         player.sprite.usesOverrideMaterial = true;
         player.SetOverrideShader(ShaderCache.Acquire("Brave/ItemSpecific/MetalSkinShader"));

@@ -152,7 +152,7 @@ public class EchoingProjectile : MonoBehaviour
         this._projectile = base.GetComponent<Projectile>();
         this._owner      = this._projectile.Owner as PlayerController;
 
-        GameObject g = UnityEngine.Object.Instantiate(new GameObject(), this._projectile.sprite.WorldCenter, this._projectile.sprite.transform.rotation);
+        GameObject g = UnityEngine.Object.Instantiate(new GameObject(), this._projectile.SafeCenter, this._projectile.sprite.transform.rotation);
         this._spawner = g.AddComponent<EchoProjectileSpawner>();
         this._spawner
             .Setup(this._projectile, this._owner)

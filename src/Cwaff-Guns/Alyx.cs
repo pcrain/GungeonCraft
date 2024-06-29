@@ -123,7 +123,7 @@ public class Alyx : CwaffGun
             if (DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.PoisonDef) is DeadlyDeadlyGoopManager gooper)
             {
                 if (player)
-                    gooper.AddGoopCircle(player.sprite.WorldBottomCenter - player.m_currentGunAngle.ToVector(1f), 0.75f);
+                    gooper.AddGoopCircle(player.SpriteBottomCenter.XY() - player.m_currentGunAngle.ToVector(1f), 0.75f);
                 else
                     gooper.AddGoopCircle(this.gun.sprite.WorldCenter, 1f);
             }

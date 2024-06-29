@@ -57,7 +57,7 @@ public class CustodiansBadge : CwaffPassive
 
         this.chancesLeft = _MAX_CHANCES;
         string s = _MSG_JOIN + _SIGNATURE;
-        CustomNoteDoer.CreateNote(player.sprite.WorldCenter, s);
+        CustomNoteDoer.CreateNote(player.CenterPosition, s);
     }
 
     public override DebrisObject Drop(PlayerController player)
