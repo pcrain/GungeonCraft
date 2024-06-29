@@ -537,7 +537,7 @@ public class UppskeruvelCombatSoul : MonoBehaviour
                 if ((this._basePos - this._targetPos).sqrMagnitude < 2f)
                 {
                     this._enemy.healthHaver.ApplyDamage(Uppskeruvel._DAMAGE_PER_SOUL, this._velocity, "Uppskeruvel Soul", CoreDamageTypes.None, DamageCategory.Collision);
-                    if (this._enemy && this._enemy.healthHaver && this._enemy.healthHaver.IsDead)
+                    if (this._enemy.healthHaver.IsDead)
                         Uppskeruvel.DropLostSouls(this._enemy);
                     SpawnManager.SpawnVFX(Uppskeruvel._SoulExplodePrefab, this._targetPos.XY() + Lazy.RandomVector(0.4f), Quaternion.identity);
                     base.gameObject.PlayUnique("soul_impact_sound");

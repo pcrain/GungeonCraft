@@ -104,8 +104,7 @@ public class MiniInteractable : BraveBehaviour, IPlayerInteractable
 
   public override void OnDestroy()
   {
-    if (RoomHandler.unassignedInteractableObjects.Contains(this))
-        RoomHandler.unassignedInteractableObjects.Remove(this);
+    RoomHandler.unassignedInteractableObjects.TryRemove(this);
     base.OnDestroy();
   }
 

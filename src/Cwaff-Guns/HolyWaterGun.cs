@@ -149,17 +149,6 @@ public class Exorcisable : MonoBehaviour
         if (beam.GetComponent<ExorcismJuice>() is not ExorcismJuice exorcism)
             return;
 
-        // Can't quite get this to work, just uses a black sprite :\
-        // foreach (tk2dBaseSprite sprite in this._enemy.healthHaver.bodySprites)
-        // {
-        //     if (!sprite)
-        //         continue;
-        //     sprite.usesOverrideMaterial = true;
-        //     sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitCutoutUber");
-        //     sprite.renderer.material.SetFloat("_CircleAmount", 1f);
-        //     sprite.gameObject.GetOrAddComponent<Encircler>();
-        // }
-
         // Create particles
         if (UnityEngine.Random.Range(0f, 1f) < 0.25f)
         {

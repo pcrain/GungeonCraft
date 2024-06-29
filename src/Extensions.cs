@@ -2081,4 +2081,18 @@ public static class Extensions
       return _NoEnemies;
     return enemies;
   }
+
+  /// <summary>Adds an item to a list if it doesn't already contain it</summary>
+  public static void AddUnique<T>(this List<T> list, T item)
+  {
+    if (!list.Contains(item))
+      list.Add(item);
+  }
+
+  /// <summary>Removes an item from a list if it already contains it</summary>
+  public static void TryRemove<T>(this List<T> list, T item)
+  {
+    if (list.Contains(item))
+      list.Remove(item);
+  }
 }

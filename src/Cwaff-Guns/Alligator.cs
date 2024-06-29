@@ -36,26 +36,19 @@ public class Alligator : CwaffGun
             damageMultiplier = 0f,
         };
         base.OnPlayerPickup(player);
-
-        if (!player.healthHaver.damageTypeModifiers.Contains(this._electricImmunity))
-            player.healthHaver.damageTypeModifiers.Add(this._electricImmunity);
+        player.healthHaver.damageTypeModifiers.AddUnique(this._electricImmunity);
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
     {
         base.OnDroppedByPlayer(player);
-
-        if (player.healthHaver.damageTypeModifiers.Contains(this._electricImmunity))
-            player.healthHaver.damageTypeModifiers.Remove(this._electricImmunity);
+        player.healthHaver.damageTypeModifiers.TryRemove(this._electricImmunity);
     }
 
     public override void OnDestroy()
     {
-        if (this.PlayerOwner && this.PlayerOwner.healthHaver)
-        {
-            if (this.PlayerOwner.healthHaver.damageTypeModifiers.Contains(this._electricImmunity))
-                this.PlayerOwner.healthHaver.damageTypeModifiers.Remove(this._electricImmunity);
-        }
+        if (this.PlayerOwner)
+            this.PlayerOwner.healthHaver.damageTypeModifiers.TryRemove(this._electricImmunity);
         base.OnDestroy();
     }
 }

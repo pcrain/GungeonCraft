@@ -924,11 +924,9 @@ public static class HeckedMode
                 if (shooter.healthHaver)
                 {
                     tk2dSprite hcsprite = hc.GetComponent<tk2dSprite>();
-                    if (shooter.healthHaver.bodySprites.Contains(hcsprite))
-                        shooter.healthHaver.bodySprites.Remove(hcsprite);
+                    shooter.healthHaver.bodySprites.TryRemove(hcsprite);
                 }
-                if (shooter.m_attachedHands.Contains(hc))
-                    shooter.m_attachedHands.Remove(hc);
+                shooter.m_attachedHands.TryRemove(hc);
                 // hc.attachPoint = null;
                 shooter.CurrentGun.GetSprite().DetachRenderer(hc.sprite);
                 // UnityEngine.Object.Destroy(hc);

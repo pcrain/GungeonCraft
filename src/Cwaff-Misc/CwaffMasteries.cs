@@ -29,8 +29,7 @@ public static class CwaffMasteries
             return;
 
           ritComp.DisableEffects();
-          if (MasteryRitualComponent._RitualGuns.Contains(ritComp))
-            MasteryRitualComponent._RitualGuns.Remove(ritComp);
+          MasteryRitualComponent._RitualGuns.TryRemove(ritComp);
           UnityEngine.Object.Destroy(ritComp);
         }
     }
@@ -405,8 +404,7 @@ public class MasteryRitualComponent : MonoBehaviour
   private void OnDestroy()
   {
     DisableEffects();
-    if (_RitualGuns.Contains(this))
-      _RitualGuns.Remove(this);
+    _RitualGuns.TryRemove(this);
     UpdateMasteryRitualStatus(blankUser: null);
   }
 

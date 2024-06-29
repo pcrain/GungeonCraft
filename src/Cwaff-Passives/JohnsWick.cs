@@ -49,15 +49,13 @@ public class JohnsWick : CwaffPassive
 
         this.passiveStatModifiers = _flameOff;
         player.PostProcessProjectile += this.PostProcessProjectile;
-        if (!player.healthHaver.damageTypeModifiers.Contains(this._fireResistance))
-            player.healthHaver.damageTypeModifiers.Add(this._fireResistance);
+        player.healthHaver.damageTypeModifiers.AddUnique(this._fireResistance);
     }
 
     public override DebrisObject Drop(PlayerController player)
     {
         player.PostProcessProjectile -= this.PostProcessProjectile;
-        if (player.healthHaver.damageTypeModifiers.Contains(this._fireResistance))
-            player.healthHaver.damageTypeModifiers.Remove(this._fireResistance);
+        player.healthHaver.damageTypeModifiers.TryRemove(this._fireResistance);
         return base.Drop(player);
     }
 
@@ -66,8 +64,7 @@ public class JohnsWick : CwaffPassive
         if (this.Owner)
         {
             this.Owner.PostProcessProjectile -= this.PostProcessProjectile;
-            if (this.Owner.healthHaver && this.Owner.healthHaver.damageTypeModifiers.Contains(this._fireResistance))
-                this.Owner.healthHaver.damageTypeModifiers.Remove(this._fireResistance);
+            this.Owner.healthHaver.damageTypeModifiers.TryRemove(this._fireResistance);
         }
         base.OnDestroy();
     }

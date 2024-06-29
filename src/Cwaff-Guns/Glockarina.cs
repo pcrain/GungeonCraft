@@ -98,10 +98,10 @@ public class Glockarina : CwaffGun
     {
         if (this.GenericOwner is not PlayerController pc)
             return;
-        if (this._mode == Mode.STORM && !pc.healthHaver.damageTypeModifiers.Contains(this._electricImmunity))
-            pc.healthHaver.damageTypeModifiers.Add(this._electricImmunity);
-        if (this._mode != Mode.STORM && pc.healthHaver.damageTypeModifiers.Contains(this._electricImmunity))
-            pc.healthHaver.damageTypeModifiers.Remove(this._electricImmunity);
+        if (this._mode == Mode.STORM)
+            pc.healthHaver.damageTypeModifiers.AddUnique(this._electricImmunity);
+        else
+            pc.healthHaver.damageTypeModifiers.TryRemove(this._electricImmunity);
     }
 
     public override void OnPlayerPickup(PlayerController player)
@@ -117,18 +117,13 @@ public class Glockarina : CwaffGun
     public override void OnDroppedByPlayer(PlayerController player)
     {
         base.OnDroppedByPlayer(player);
-
-        if (player.healthHaver.damageTypeModifiers.Contains(this._electricImmunity))
-            player.healthHaver.damageTypeModifiers.Remove(this._electricImmunity);
+        player.healthHaver.damageTypeModifiers.TryRemove(this._electricImmunity);
     }
 
     public override void OnDestroy()
     {
-        if (this.PlayerOwner && this.PlayerOwner.healthHaver)
-        {
-            if (this.PlayerOwner.healthHaver.damageTypeModifiers.Contains(this._electricImmunity))
-                this.PlayerOwner.healthHaver.damageTypeModifiers.Remove(this._electricImmunity);
-        }
+        if (this.PlayerOwner)
+            this.PlayerOwner.healthHaver.damageTypeModifiers.TryRemove(this._electricImmunity);
         base.OnDestroy();
     }
 

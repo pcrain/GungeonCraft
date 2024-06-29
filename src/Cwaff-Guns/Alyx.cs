@@ -116,14 +116,13 @@ public class Alyx : CwaffGun
         int newAmmo = ComputeExponentialDecay((float)this.gun.CurrentAmmo, _AMMO_DECAY_LAMBDA, timeSinceLastRecalc);
         int newMaxAmmo = ComputeExponentialDecay((float)this.gun.GetBaseMaxAmmo(), _GUN_DECAY_LAMBDA, timeSinceLastRecalc);
 
-        PlayerController player = this.GenericOwner as PlayerController;
         // If we've decayed at all, create poison goop under our feet
         if (newAmmo < this.gun.CurrentAmmo || newMaxAmmo < this.gun.GetBaseMaxAmmo())
         {
             if (DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.PoisonDef) is DeadlyDeadlyGoopManager gooper)
             {
-                if (player)
-                    gooper.AddGoopCircle(player.SpriteBottomCenter.XY() - player.m_currentGunAngle.ToVector(1f), 0.75f);
+                if (this.PlayerOwner)
+                    gooper.AddGoopCircle(this.PlayerOwner.SpriteBottomCenter.XY() - this.PlayerOwner.m_currentGunAngle.ToVector(1f), 0.75f);
                 else
                     gooper.AddGoopCircle(this.gun.sprite.WorldCenter, 1f);
             }
@@ -135,8 +134,8 @@ public class Alyx : CwaffGun
         if (newMaxAmmo > _MIN_AMMO_TO_PERSIST)
             return;
 
-        if (player)
-            player.inventory.DestroyGun(this.gun);
+        if (this.PlayerOwner)
+            this.PlayerOwner.inventory.DestroyGun(this.gun);
         else // vanish in a puff of smoke on the ground
         {
             Lazy.DoSmokeAt(this.gun.sprite.WorldCenter);
