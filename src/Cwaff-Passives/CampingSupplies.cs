@@ -9,7 +9,7 @@ public class CampingSupplies : CwaffPassive
 
     private static float[] _CampTimes = { 0.00f, 2.00f, 5.00f, 10.0f }; // how long we stand still before each bonus kicks in
     private static float[] _CampMults = { 1.00f, 1.30f, 1.60f, 1.90f }; // bonus at each camp level
-    private static int _MaxCampLevel  = _CampMults.Count() - 1;
+    private static int _MaxCampLevel  = _CampMults.Length - 1;
     private static GameObject _BonfirePrefab;
     private static GameObject _SmokePrefab;
     private static GameObject[] _CampfirePrefabs;

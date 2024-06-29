@@ -43,7 +43,7 @@ public class Protractor : CwaffActive
     public override void DoEffect(PlayerController user)
     {
       Vector2 ppos = user.CenterPosition;
-      if (this._vertices.Count() > 0)
+      if (this._vertices.Count > 0)
       {
         Vector2 lastPos = this._vertices.Last();
         GameObject line = FancyLine(lastPos, ppos, 0.1f);

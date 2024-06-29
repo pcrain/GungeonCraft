@@ -367,7 +367,7 @@ public static class LargeGunAnimationHotfix
             return;
 
         tk2dSpriteAnimationClip idleClip = gun.GetTrimmedIdleAnimation();
-        if (idleClip == null || idleClip.frames == null || idleClip.frames.Count() == 0)
+        if (idleClip == null || idleClip.frames == null || idleClip.frames.Length == 0)
             return;  // the idle animation clip is missing frames, so there's nothing to do
 
         item.sprite.SetSprite(idleClip.frames[0].spriteCollection, idleClip.frames[0].spriteId);
@@ -398,7 +398,7 @@ public static class LargeGunAnimationHotfix
             return;
 
         tk2dSpriteAnimationClip idleClip = gun.GetTrimmedIdleAnimation();
-        if (idleClip == null || idleClip.frames == null || idleClip.frames.Count() == 0)
+        if (idleClip == null || idleClip.frames == null || idleClip.frames.Length == 0)
             return;  // the idle animation clip is missing frames, so there's nothing to do
 
         item.sprite.SetSprite(idleClip.frames[0].spriteCollection, idleClip.frames[0].spriteId);
@@ -446,7 +446,7 @@ public static class LargeGunAnimationHotfix
             return;  // the gun doesn't have a trimmed idle animation, so there's nothing to do
 
         tk2dSpriteAnimationClip idleClip = gun.GetTrimmedIdleAnimation();
-        if (idleClip == null || idleClip.frames == null || idleClip.frames.Count() == 0)
+        if (idleClip == null || idleClip.frames == null || idleClip.frames.Length == 0)
             return;  // the idle animation clip is missing frames, so there's nothing to do
 
         // actually adjust the sprite to display properly on the reward pedestal

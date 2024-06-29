@@ -59,7 +59,7 @@ public class Jugglernaut : CwaffGun
             gun.AddFlippedCarryPixelOffsets(offset: _CarryOffset, flippedOffset: _FlippedCarryOffset);
 
             string tossSound = "juggle_toss_sound";
-            for (int i = 0; i < _JuggleAnimations.Count(); ++i)
+            for (int i = 0; i < _JuggleAnimations.Count; ++i)
             {
                 gun.SetAnimationFPS(_JuggleAnimations[i], _IDLE_FPS);
                 gun.SetGunAudio(_JuggleAnimations[i], tossSound, frame: 5);
@@ -223,7 +223,7 @@ public class Jugglernaut : CwaffGun
     public void RegisterEnemyHit(AIActor enemy)
     {
         // scan backwards until we find the enemy in our list, then remove it an all previous enemies
-        for (int i = this._juggledEnemies.Count() - 1; i >= 0; --i)
+        for (int i = this._juggledEnemies.Count - 1; i >= 0; --i)
         {
             if (this._juggledEnemies[i] != enemy)
                 continue;
@@ -245,7 +245,7 @@ public class Jugglernaut : CwaffGun
     private void UpdateLevel(bool returnIfUnchanged = false)
     {
         int oldLevel = this._juggleLevel;
-        this._juggleLevel = Mathf.Clamp(this._juggledEnemies.Count() - 1, 0, _JuggleAnimations.Count() - 1);
+        this._juggleLevel = Mathf.Clamp(this._juggledEnemies.Count - 1, 0, _JuggleAnimations.Count - 1);
         if (returnIfUnchanged && this._juggleLevel == oldLevel)
             return;
 
@@ -260,7 +260,7 @@ public class Jugglernaut : CwaffGun
             gun.sprite.renderer.material.SetFloat("_EmissivePower", _MinEmission[this._juggleLevel]);
             if (this._juggleLevel < oldLevel)
             {
-                if (this._juggledEnemies.Count() == 0)
+                if (this._juggledEnemies.Count == 0)
                     this.PlayerOwner.gameObject.Play("juggle_drop_sound");
                 DropGuns(player: this.PlayerOwner, oldGuns: 1 + oldLevel, newGuns: 1 + this._juggleLevel);
             }

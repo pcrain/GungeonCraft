@@ -137,7 +137,7 @@ public class InsurancePolicy : CwaffActive
 
         LoadInsuredItems();
         ClearInsuredItemsFile();
-        if (_InsuredItems.Count() == 0)
+        if (_InsuredItems.Count == 0)
             yield break;
 
         bool success;

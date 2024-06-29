@@ -65,7 +65,7 @@ public class SeltzerPelter : CwaffGun
     {
         base.OnActualReload(player, gun, manual);
 
-        this._loadedCanIndex = UnityEngine.Random.Range(0, _ReloadAnimations.Count());
+        this._loadedCanIndex = UnityEngine.Random.Range(0, _ReloadAnimations.Count);
         gun.spriteAnimator.Stop();
         gun.spriteAnimator.Play(_ReloadAnimations[this._loadedCanIndex]);
     }

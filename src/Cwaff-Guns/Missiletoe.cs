@@ -254,12 +254,12 @@ public class Missiletoe : CwaffGun
         wrappedQualities.Add(ItemQuality.D);  // make sure our list has at least one item
         _shuffledQualities = wrappedQualities.CopyAndShuffle();
         wrappedQualities.Pop();
-        this.gun.DefaultModule.numberOfShotsInClip = _shuffledQualities.Count();
+        this.gun.DefaultModule.numberOfShotsInClip = _shuffledQualities.Count;
     }
 
     private void UnwrapPresent()
     {
-        if (wrappedGifts.Count() == 0)
+        if (wrappedGifts.Count == 0)
             return;
         PickupObject gift = wrappedGifts.Pop();
         wrappedQualities.Pop();

@@ -75,7 +75,7 @@ public static class CwaffSynergies
 
     private static void SanityCheckAllSynergiesHaveBeenInitialized()
     {
-        for (int i = 0; i < _SynergyNames.Count(); ++i)
+        for (int i = 0; i < _SynergyNames.Count; ++i)
             if (_SynergyNames[i] == null)
                 ETGModConsole.Log($"<color=#ffff88ff>WARNING: haven't initialized custom synergy {_SynergyEnums[i]}</color>");
     }

@@ -114,7 +114,7 @@ public class Ticonderogun : CwaffGun
             return;  // return early if we haven't actually done anything
 
         // Compute the damage we need to do base
-        float damage = ComputeCircleDamage(hullCenter, theEncircled.Count());
+        float damage = ComputeCircleDamage(hullCenter, theEncircled.Count);
         foreach (AIActor enemy in theEncircled)
             DoEncirclingMagic(enemy, damage);
     }
@@ -143,7 +143,7 @@ public class Ticonderogun : CwaffGun
             FancyVFX fv = FancyVFX.Spawn(_RunePrefab, position: enemy.CenterPosition + offset, rotation: Quaternion.identity, velocity: velocity,
                 lifetime: 1f, fadeOutTime: 1f, parent: enemy.sprite.transform);
             tk2dSpriteAnimator anim = fv.GetComponent<tk2dSpriteAnimator>();
-            int newSpriteId = anim.currentClip.frames[UnityEngine.Random.Range(0, anim.currentClip.frames.Count())].spriteId;
+            int newSpriteId = anim.currentClip.frames[UnityEngine.Random.Range(0, anim.currentClip.frames.Length)].spriteId;
             fv.sprite.SetSprite(newSpriteId);
         }
     }
@@ -365,7 +365,7 @@ public static class HullHelper
 
         points = new List<Vector2>(points);  // make a copy so we don't modify in place
 
-        int n = points.Count(), k = 0;
+        int n = points.Count, k = 0;
         List<Vector2> H = new List<Vector2>(new Vector2[2 * n]);
 
         points.Sort((a, b) =>

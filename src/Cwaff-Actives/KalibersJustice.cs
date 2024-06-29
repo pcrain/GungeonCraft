@@ -331,7 +331,7 @@ public class KalibersJustice : CwaffActive
 
         #region Ammo
             Need ammoNeed = new Need(NeedType.Ammo);
-            int gunsWithAmmo = user.inventory.AllGuns.Count();
+            int gunsWithAmmo = user.inventory.AllGuns.Count;
             float averageGunAmmoPercent = 0.0f;
             foreach (Gun g in user.inventory.AllGuns)
             {

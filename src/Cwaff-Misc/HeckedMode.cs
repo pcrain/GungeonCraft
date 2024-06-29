@@ -886,11 +886,11 @@ public static class HeckedMode
     //     ETGModConsole.Log($"  equipped gun is {shooter.EquippedGun.name}");
     //     ETGModConsole.Log($"  current gun is {shooter.CurrentGun.name}");
     //     ETGModConsole.Log($"  handObject is {shooter.handObject != null}");
-    //     for (int i = shooter.sprite.attachedRenderers.Count() - 1; i >= 0; --i)
+    //     for (int i = shooter.sprite.attachedRenderers.Count - 1; i >= 0; --i)
     //         ETGModConsole.Log($"    sprite attached: {shooter.sprite.attachedRenderers[i].name}");
-    //     for (int i = shooter.CurrentGun.GetSprite().attachedRenderers.Count() - 1; i >= 0; --i)
+    //     for (int i = shooter.CurrentGun.GetSprite().attachedRenderers.Count - 1; i >= 0; --i)
     //         ETGModConsole.Log($"    gun attached: {shooter.CurrentGun.GetSprite().attachedRenderers[i].name}");
-    //     for (int i = shooter.m_attachedHands.Count() - 1; i >= 0; --i)
+    //     for (int i = shooter.m_attachedHands.Count - 1; i >= 0; --i)
     //         ETGModConsole.Log($"    hands attached: {shooter.m_attachedHands[i].name}");
 
     //     for (int i = shooter.transform.childCount - 1; i >= 0; --i)

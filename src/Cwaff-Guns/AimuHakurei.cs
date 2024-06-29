@@ -191,7 +191,7 @@ public class AimuHakurei : CwaffGun
             gun: gun, ammoCost: 0, clipSize: -1, cooldown: C.FRAME * fireRate, angleVariance: 15f - (2 * level),
             shootStyle: ShootStyle.Burst, sequenceStyle: ProjectileSequenceStyle.Ordered, customClip: true));
         mod.projectiles         = projectiles;
-        mod.burstShotCount      = mod.projectiles.Count();
+        mod.burstShotCount      = mod.projectiles.Count;
         mod.burstCooldownTime   = C.FRAME * fireRate;
         return mod;
     }
@@ -227,7 +227,7 @@ public class AimuHakurei : CwaffGun
 
     private void PowerUp()
     {
-        while (this.gun.CurrentStrengthTier < _GRAZE_TIER_THRESHOLDS.Count() && this.graze >= _GRAZE_TIER_THRESHOLDS[this.gun.CurrentStrengthTier])
+        while (this.gun.CurrentStrengthTier < _GRAZE_TIER_THRESHOLDS.Length && this.graze >= _GRAZE_TIER_THRESHOLDS[this.gun.CurrentStrengthTier])
         {
             ++this.gun.CurrentStrengthTier;
             this.GenericOwner.gameObject.PlayOnce("aimu_power_up_sound");

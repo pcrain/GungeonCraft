@@ -217,7 +217,7 @@ public static class Lazy
     public static List<AIAnimator.NamedDirectionalAnimation> EasyNamedDirectionalAnimations(string[] animNameList)
     {
         var theList = new List<AIAnimator.NamedDirectionalAnimation>();
-        for(int i = 0; i < animNameList.Count(); ++i)
+        for(int i = 0; i < animNameList.Length; ++i)
         {
             string anim = animNameList[i];
             theList.Add(new AIAnimator.NamedDirectionalAnimation() {

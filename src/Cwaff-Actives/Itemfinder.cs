@@ -110,7 +110,7 @@ public class Itemfinder : CwaffActive
         _RoomsOnFloor = GameManager.Instance.Dungeon.data.rooms.CopyAndShuffle();
 
         float treasureVal = UnityEngine.Random.value;
-        for (int i = 0; i < _TREASURE_CHANCES.Count(); ++i)
+        for (int i = 0; i < _TREASURE_CHANCES.Length; ++i)
         {
             if (treasureVal > _TREASURE_CHANCES[i])
                 break;

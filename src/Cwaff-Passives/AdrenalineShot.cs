@@ -58,7 +58,7 @@ public class AdrenalineShot : CwaffPassive
     //     if (!hh || hh.m_player is not PlayerController player)
     //         return;
 
-    //     int nHearts = guihc.extantHearts.Count();
+    //     int nHearts = guihc.extantHearts.Count;
     //     if (nHearts == 0)
     //         return; // we have nothing to do if there are no hearts
 
@@ -66,7 +66,7 @@ public class AdrenalineShot : CwaffPassive
     //         nHearts = 0; // if we don't have this item, we have 0 adrenaline hearts
 
     //     AdrenalineHeartOverlay overlay = guihc.gameObject.GetOrAddComponent<AdrenalineHeartOverlay>();
-    //     int aHearts = overlay.adrenalineHearts.Count();
+    //     int aHearts = overlay.adrenalineHearts.Count;
     //     if (aHearts == nHearts)
     //         return; // if our current and cached hearts are the same, we have nothing to do
 

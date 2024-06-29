@@ -25,8 +25,8 @@ public class Alligator : CwaffGun
           damage: 1.0f, speed: 36.0f, sprite: "alligator_projectile", fps: 2, anchor: Anchor.MiddleCenter
           )).Attach<AlligatorProjectile>();
 
-        _SparkVFX            = VFX.Create("spark_vfx", fps: 16, loops: true, anchor: Anchor.MiddleCenter, scale: 0.35f, emissivePower: 50f);
-        _ClipVFX             = VFX.Create("alligator_clamped_vfx", fps: 2, loops: true, anchor: Anchor.MiddleCenter);
+        _SparkVFX = VFX.Create("spark_vfx", fps: 16, loops: true, anchor: Anchor.MiddleCenter, scale: 0.35f, emissivePower: 50f);
+        _ClipVFX  = VFX.Create("alligator_clamped_vfx", fps: 2, loops: true, anchor: Anchor.MiddleCenter);
     }
 
     public override void OnPlayerPickup(PlayerController player)
@@ -59,7 +59,7 @@ public class AlligatorProjectile : MonoBehaviour
 
     private void Start()
     {
-        Projectile p = GetComponent<Projectile>();
+        Projectile p = base.gameObject.GetComponent<Projectile>();
             p.OnHitEnemy += HandleHitEnemy;
         AlligatorCableHandler cable = base.gameObject.AddComponent<AlligatorCableHandler>();
             cable.Initialize(p.Owner as PlayerController, null, p.transform, p.specRigidbody.HitboxPixelCollider.UnitCenter - p.transform.position.XY());
@@ -72,7 +72,7 @@ public class AlligatorProjectile : MonoBehaviour
             return;
         if (body.healthHaver is not HealthHaver hh)
             return;
-        if (!aiActor.IsHostile(canBeNeutral: true) || aiActor.gameObject.GetComponents<AlligatorCableHandler>().Count() >= _MAX_CLIPS_PER_ENEMY)
+        if (!aiActor.IsHostile(canBeNeutral: true) || aiActor.gameObject.GetComponents<AlligatorCableHandler>().Length >= _MAX_CLIPS_PER_ENEMY)
             return;
         AlligatorCableHandler cable = aiActor.gameObject.AddComponent<AlligatorCableHandler>();
             cable.Initialize(projectile.Owner as PlayerController, aiActor, aiActor.transform, aiActor.CenterPosition - aiActor.transform.position.XY());
@@ -245,7 +245,7 @@ public class AlligatorCableHandler : MonoBehaviour
         this._clippyboi.SafeDestroy();
         if (this._stringFilter)
             UnityEngine.Object.Destroy(this._stringFilter.gameObject);
-        for (int i = 0; i < _extantSparks.Count(); ++i)
+        for (int i = 0; i < _extantSparks.Count; ++i)
             UnityEngine.Object.Destroy(this._extantSparks[i]);
     }
 
@@ -282,7 +282,7 @@ public class AlligatorCableHandler : MonoBehaviour
             this._extantSpawnTimes.Add(curTime);
         }
 
-        for (int i = _extantSparks.Count() - 1; i >= 0; --i)
+        for (int i = _extantSparks.Count - 1; i >= 0; --i)
         {
             if (!this._enemy || !this._enemy.healthHaver)
                 break;  // can happen if a previous spark killed the enemy

@@ -238,7 +238,7 @@ public class OraOra : MonoBehaviour
 
     public void OraOraOra(PlayerController pc)
     {
-        if (this._activated || this._bankedDamage.Count() == 0)
+        if (this._activated || this._bankedDamage.Count == 0)
             return;
 
         this._activated = true;
@@ -296,7 +296,7 @@ public class OraOra : MonoBehaviour
         }
 
         float baseDelay = _HIT_DELAY;
-        int numBursts = bankedDamage.Count();
+        int numBursts = bankedDamage.Count;
         BehaviorSpeculator spec = this._enemy.behaviorSpeculator;
         for (int i = 0; i < numBursts; ++i)
         {
