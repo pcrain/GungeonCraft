@@ -95,7 +95,7 @@ public class Jugglernaut : CwaffGun
             gun.shootAnimation          = null; // animation shouldn't change when firing
 
         gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.4f, shootStyle: ShootStyle.SemiAutomatic, damage: 10.0f, speed: 70.0f,
-          sprite: "jugglernaut_projectile", fps: 2,  anchor: Anchor.MiddleCenter, shouldRotate: false, destroySound: "wall_thunk"));
+          sprite: "jugglernaut_projectile", fps: 2,  anchor: Anchor.MiddleCenter, shouldRotate: false, spawnSound: "jugglernaut_throw_sound", destroySound: "wall_thunk"));
     }
 
     /// <summary>Make sure Jugglernaut appears correctly in the weapons panel</summary>
@@ -201,14 +201,14 @@ public class Jugglernaut : CwaffGun
     {
         base.OnSwitchedToThisGun();
         gun.spriteAnimator.StopAndResetFrameToDefault();
-        ResetJuggle();
+        ResetJuggle(); //WARNING: possibly need to delete one of these due to bug where jugglernaut drops combo seemingly out of nowhere, but might be fixed already
     }
 
     public override void OnSwitchedAwayFromThisGun()
     {
         base.OnSwitchedAwayFromThisGun();
         if (this.PlayerOwner)
-            ResetJuggle();
+            ResetJuggle(); //WARNING: possibly need to delete one of these due to bug where jugglernaut drops combo seemingly out of nowhere, but might be fixed already
     }
 
     public override void PostProcessProjectile(Projectile projectile)
@@ -218,8 +218,6 @@ public class Jugglernaut : CwaffGun
         projectile.gameObject.AddComponent<JugglernautProjectile>().Setup(this, spriteId);
         projectile.baseData.damage *= (1f + this._juggleLevel);
         projectile.DestroyMode = Projectile.ProjectileDestroyMode.BecomeDebris;
-
-        gun.gameObject.PlayOnce("jugglernaut_throw_sound"); // necessary here since the gun doesn't use a fire animation and won't trigger a fire audio event
     }
 
     public void RegisterEnemyHit(AIActor enemy)
@@ -372,7 +370,7 @@ public class JugglernautProjectile : MonoBehaviour
 
     private void OnHitEnemy(Projectile bullet, SpeculativeRigidbody body, bool killed)
     {
-        if (this._jugglernaut && body.aiActor is AIActor enemy)
+        if (this._projectile && this._jugglernaut && body.aiActor is AIActor enemy)
             this._jugglernaut.RegisterEnemyHit(enemy);
     }
 }

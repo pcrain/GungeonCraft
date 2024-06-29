@@ -191,13 +191,6 @@ public class MagnetParticle : MonoBehaviour
         this._debris        = base.gameObject.GetComponent<DebrisObject>();
         this._isDebris      = this._debris != null;
         this._sprite        = this._isDebris ? this._debris.sprite : base.gameObject.GetComponent<tk2dSprite>();
-        if (!this._sprite)
-        {
-            ETGModConsole.Log($"PAIN");
-            this._sprite = base.gameObject.GetComponent<tk2dSprite>();
-            if (!this._sprite)
-                ETGModConsole.Log($" DOUBLE PAIN");
-        }
         this._startScaleX   = this._sprite.scale.x;
         this._startScaleY   = this._sprite.scale.y;
         this._startAngle    = offsetAngle;
