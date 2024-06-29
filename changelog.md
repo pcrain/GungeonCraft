@@ -3,6 +3,7 @@
 ## TBD
 
 - Fixed R.C. Launcher projectiles slowing down too much at higher frame rates
+- Fixed drop Jugglernaut guns having collision that can interfere with the player's movement
 
 ## 1.14.3 (2024-06-26)
 

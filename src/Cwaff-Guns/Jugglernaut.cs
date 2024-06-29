@@ -180,7 +180,7 @@ public class Jugglernaut : CwaffGun
             tk2dSprite sprite = debrisObject.AddComponent<tk2dSprite>();
                 sprite.SetSprite(clip.frames[i].spriteCollection, clip.frames[i].spriteId);
                 sprite.SetGlowiness(glowAmount: _DEBRIS_GLOW);
-            debrisObject.AutoRigidBody(Anchor.MiddleCenter, CollisionLayer.Pickup);
+            debrisObject.AutoRigidBody(Anchor.MiddleCenter, CollisionLayer.TileBlocker);
             DebrisObject debris = debrisObject.AddComponent<DebrisObject>();
 
             debris.angularVelocity         = 45;
