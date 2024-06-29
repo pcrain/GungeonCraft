@@ -167,10 +167,7 @@ public class WhipChainStart : MonoBehaviour
             float absRange       = Mathf.Abs(maxDistance) / _WHIP_RANGE;
             float maxAmp         = (flipped ? -_MAX_AMP : _MAX_AMP) * (1f - (absRange * absRange));
             float linkDistance   = maxDistance * _INVLINKS;
-            Vector3 basePos      =
-                this._owner?.primaryHand.transform.position
-                ?? this._owner?.sprite.WorldCenter
-                ?? Vector3.zero;
+            Vector3 basePos      = this._owner ? this._owner.primaryHand.transform.position : Vector3.zero;
             Vector2 segBegin = Vector2.zero;
             Vector2 segEnd   = Vector2.zero;
 

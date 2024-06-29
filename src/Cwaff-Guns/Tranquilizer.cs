@@ -47,7 +47,7 @@ public class TranquilizerBehavior : MonoBehaviour
 
     private void OnHitEnemy(Projectile p, SpeculativeRigidbody enemy, bool killed)
     {
-        if (!(enemy.aiActor?.IsHostileAndNotABoss() ?? false) || (enemy.behaviorSpeculator?.ImmuneToStun ?? true))
+        if (!enemy.aiActor || !enemy.aiActor.IsHostileAndNotABoss() || !enemy.behaviorSpeculator || enemy.behaviorSpeculator.ImmuneToStun)
             return;
         if (enemy.aiActor.gameObject.GetComponent<EnemyTranquilizedBehavior>() is EnemyTranquilizedBehavior tranq)
             tranq.timeUntilStun -= 3f;
@@ -72,7 +72,7 @@ public class TranquilizerBehavior : MonoBehaviour
         private void Start()
         {
             this._enemy = base.GetComponent<AIActor>();
-            if ((this._enemy?.healthHaver?.currentHealth ?? 0) <= 0)
+            if (!this._enemy || !this._enemy.healthHaver || this._enemy.healthHaver.currentHealth <= 0)
                 return;
 
             this._orb = this._enemy.gameObject.AddComponent<OrbitalEffect>();
@@ -93,7 +93,8 @@ public class TranquilizerBehavior : MonoBehaviour
         private void Permastun()
         {
             this._stunned = true;
-            this._enemy.behaviorSpeculator?.Stun(_STUN_TIME, createVFX: false);
+            if (this._enemy.behaviorSpeculator)
+                this._enemy.behaviorSpeculator.Stun(_STUN_TIME, createVFX: false);
             this._enemy.IgnoreForRoomClear         = true;
             this._enemy.CollisionDamage            = 0f;
             this._enemy.CollisionKnockbackStrength = 0f;

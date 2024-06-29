@@ -165,7 +165,8 @@ public class LightwingProjectile : MonoBehaviour
                     haveTarget = false;
                 break;
             case State.RETRIEVING:
-                if (!this._targetProjectile || !this._targetProjectile.isActiveAndEnabled || !(this._targetProjectile.sprite?.renderer.enabled ?? false))
+                tk2dBaseSprite sprite = this._targetProjectile ? this._targetProjectile.sprite : null;
+                if (!sprite || !sprite.renderer.enabled || !this._targetProjectile.isActiveAndEnabled)
                 {
                     this._targetProjectile = null;
                     // first try to find a projectile to latch onto
@@ -190,14 +191,14 @@ public class LightwingProjectile : MonoBehaviour
                         return;
                     }
                 }
-                targetPos = this._targetProjectile.sprite?.WorldCenter ?? this._targetProjectile.transform.position.XY();
+                targetPos = this._targetProjectile.SafeCenter;
                 break;
         }
 
         float relTime = C.FPS * BraveTime.DeltaTime;
         if (haveTarget)
         {
-            Vector2 targetDir  = targetPos - this._projectile.sprite?.WorldCenter ?? this._projectile.transform.position.XY();
+            Vector2 targetDir  = targetPos - this._projectile.SafeCenter;
             if (this._state == State.RETURNING && targetDir.sqrMagnitude < 1f)
             {
                 DissipateNearPlayer();
@@ -221,7 +222,7 @@ public class LightwingProjectile : MonoBehaviour
 
     private void OnCollision(CollisionData collision)
     {
-        if (collision.OtherRigidbody?.gameObject is not GameObject other)
+        if (!collision.OtherRigidbody || collision.OtherRigidbody.gameObject is not GameObject other)
             return;
 
         if (other.GetComponent<Projectile>() is Projectile projectile)

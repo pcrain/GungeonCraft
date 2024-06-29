@@ -151,7 +151,8 @@ public class BulletThatCanKillTheFuture : CwaffActive
             frozenEnemies[a] = a.State;
             a.State = AIActor.ActorState.Inactive;
             a.specRigidbody.OnPreMovement += FreezeInPlace;
-            a.knockbackDoer?.SetImmobile(true, ItemName);
+            if (a.knockbackDoer)
+                a.knockbackDoer.SetImmobile(true, ItemName);
         }
 
         // Do normal crosshair logic minus some unneeded steps
@@ -263,7 +264,8 @@ public class BulletThatCanKillTheFuture : CwaffActive
                 continue;
             a.State = frozenEnemies[a];
             a.specRigidbody.OnPreMovement -= FreezeInPlace;
-            a.knockbackDoer?.SetImmobile(false, ItemName);
+            if (a.knockbackDoer)
+                a.knockbackDoer.SetImmobile(false, ItemName);
             float dist = Vector2.Distance(clockhair.transform.PositionVector2(),a.transform.PositionVector2());
             if (dist < victimDistance)
             {

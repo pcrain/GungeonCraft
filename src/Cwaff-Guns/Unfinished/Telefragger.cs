@@ -41,7 +41,7 @@ public class HeadCannonBullets : MonoBehaviour
         vfx ??= VFX.CreatePoolFromVFXGameObject(Items.MagicLamp.AsGun().DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
 
         this.m_projectile = base.GetComponent<Projectile>();
-        if (this.m_projectile?.Owner is PlayerController)
+        if (this.m_projectile && this.m_projectile.Owner is PlayerController)
             this.m_owner = this.m_projectile.Owner as PlayerController;
 
         SpeculativeRigidbody specRigidBody = this.m_projectile.specRigidbody;
@@ -52,7 +52,7 @@ public class HeadCannonBullets : MonoBehaviour
     private void OnCollision(CollisionData tileCollision)
     {
 
-        if (tileCollision?.OtherRigidbody?.gameObject?.GetComponent<AIActor>() != null)
+        if (tileCollision == null || !tileCollision.OtherRigidbody || !tileCollision.OtherRigidbody.gameObject || !tileCollision.OtherRigidbody.gameObject.GetComponent<AIActor>())
             return; //ignore collisions with enemies, we only care about walls
 
         PhysicsEngine.PostSliceVelocity     = new Vector2?(default(Vector2));

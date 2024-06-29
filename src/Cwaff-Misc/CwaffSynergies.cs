@@ -83,7 +83,7 @@ public static class CwaffSynergies
     private static void NewSynergy(Synergy synergy, string name, string[] mandatory, string[] optional = null, bool ignoreLichEyeBullets = false, int masteryId = -1)
     {
         // Register the AdvancedSynergyEntry so that the game knows about it
-        RegisterSynergy(name, mandatory.ToList(), optional?.ToList(), ignoreLichEyeBullets, masteryId);
+        RegisterSynergy(name, mandatory.ToList(), (optional != null) ? optional.ToList() : null, ignoreLichEyeBullets, masteryId);
         // Get the enum index of our synergy
         int index            = (int)synergy;
         // Extend the base game's CustomSynergyType enum to make room for our new synergy

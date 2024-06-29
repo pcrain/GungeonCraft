@@ -59,11 +59,12 @@ public class SchrodingersEnemyProjectile : MonoBehaviour
 
     private void OnPreCollision(SpeculativeRigidbody me, PixelCollider myPixelCollider, SpeculativeRigidbody other, PixelCollider otherPixelCollider)
     {
-        if (other?.gameActor is not PlayerController pc)
+        if (!other || other.gameActor is not PlayerController pc)
             return;
         PhysicsEngine.SkipCollision = true;
         this._enemy.healthHaver.ApplyDamage(9999f, Vector2.zero, "Quantum", CoreDamageTypes.Void, DamageCategory.Unstoppable, true, null, true);
-        this._projectile?.DieInAir();
+        if (this._projectile)
+            this._projectile.DieInAir();
     }
 }
 
@@ -164,7 +165,7 @@ public class SchrodingersStat : MonoBehaviour
 
     private void OnPreCollision(SpeculativeRigidbody me, PixelCollider myPixelCollider, SpeculativeRigidbody other, PixelCollider otherPixelCollider)
     {
-        if (other?.gameActor is not PlayerController pc)
+        if (!other || other.gameActor is not PlayerController pc)
             return;
         PhysicsEngine.SkipCollision = true;
         this._enemy.healthHaver.ApplyDamage(9999f, Vector2.zero, "Quantum", CoreDamageTypes.Void, DamageCategory.Unstoppable, true, null, true);

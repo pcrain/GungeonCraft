@@ -443,8 +443,8 @@ public class WrappableGift : MonoBehaviour
                 this._pickup = UnityEngine.Object.Instantiate(oldPickup);
                 // Duct-taped guns aren't actually serialized, so we need to do this manually
                 this._pickup.GetComponent<Gun>().DuctTapeMergedGunIDs = oldPickup.GetComponent<Gun>().DuctTapeMergedGunIDs;
-                if (oldPickup.transform.parent != null)
-                    UnityEngine.Object.Destroy(oldPickup.transform.parent?.gameObject);
+                if (oldPickup.transform.parent is Transform parent)
+                    UnityEngine.Object.Destroy(parent.gameObject);
                 else
                     UnityEngine.Object.Destroy(oldPickup);
             }

@@ -112,10 +112,8 @@ public class Scotsman : CwaffGun
     {
         List<Stickybomb> remainingStickies = new();
         foreach (Stickybomb sticky in this._extantStickies)
-        {
-            if (!(sticky?.Detonate(pc) ?? true))
+            if (sticky && sticky.Detonate(pc))
                 remainingStickies.Add(sticky);
-        }
         this._extantStickies = remainingStickies;
     }
 }
@@ -183,10 +181,10 @@ public class Stickybomb : MonoBehaviour
         this._stuck = true;
     }
 
-    private void StickToSurface(CollisionData rigidbodyCollision)
+    private void StickToSurface(CollisionData coll)
     {
-        StickToSurface(rigidbodyCollision.Contact);
-        if (rigidbodyCollision.OtherRigidbody?.GetComponent<AIActor>() is not AIActor enemy)
+        StickToSurface(coll.Contact);
+        if (!coll.OtherRigidbody || coll.OtherRigidbody.GetComponent<AIActor>() is not AIActor enemy)
             return;
 
         this._stuckEnemy = enemy;
@@ -196,7 +194,7 @@ public class Stickybomb : MonoBehaviour
 
     private void Update()
     {
-        if (!this._stuckEnemy?.specRigidbody)
+        if (!this._stuckEnemy || !this._stuckEnemy.specRigidbody)
             return;
 
         this._projectile.specRigidbody.Position = new Position(this._stickPoint + this._stuckEnemy.specRigidbody.transform.position.XY());

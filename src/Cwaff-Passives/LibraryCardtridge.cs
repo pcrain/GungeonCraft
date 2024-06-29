@@ -153,10 +153,12 @@ public class LibraryCardtridge : CwaffPassive
     {
         foreach (BaseShopController shop in StaticReferenceManager.AllShops.EmptyIfNull())
         {
-            foreach(ShopItemController shopItem in shop?.m_itemControllers.EmptyIfNull())
+            if (!shop || shop.m_itemControllers == null)
+                continue;
+            foreach(ShopItemController shopItem in shop.m_itemControllers)
             {
                 // Only apply discounts to whitelisted items
-                if (!shopItem?.item || !_BookItemIDs.Contains(shopItem.item.PickupObjectId))
+                if (!shopItem || !shopItem.item || !_BookItemIDs.Contains(shopItem.item.PickupObjectId))
                     continue;
 
                 // Don't apply discount to things with special currency

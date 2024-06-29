@@ -188,7 +188,9 @@ public class AlligatorCableHandler : MonoBehaviour
         _LastElectrifiedCheck[this._ownerId] = now;
         _PlayerElectrified[this._ownerId]    = false;
         RoomHandler absoluteRoomFromPosition = GameManager.Instance.Dungeon.data.GetAbsoluteRoomFromPosition(this._owner.specRigidbody.UnitCenter.ToIntVector2());
-        foreach (DeadlyDeadlyGoopManager goopManager in absoluteRoomFromPosition?.RoomGoops.EmptyIfNull())
+        if (absoluteRoomFromPosition == null || absoluteRoomFromPosition.RoomGoops == null)
+            return;
+        foreach (DeadlyDeadlyGoopManager goopManager in absoluteRoomFromPosition.RoomGoops)
             if (goopManager.IsPositionElectrified(this._owner.specRigidbody.UnitCenter))
             {
                 _PlayerElectrified[this._ownerId] = true;
@@ -221,7 +223,7 @@ public class AlligatorCableHandler : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (!this._owner || (this._targetingEnemy && !(this._enemy?.healthHaver?.IsAlive ?? false)))
+        if (!this._owner || (this._targetingEnemy && !(this._enemy && this._enemy.healthHaver && this._enemy.healthHaver.IsAlive)))
             UnityEngine.Object.Destroy(this);
 
         if (!this._startTransform || !this._endTransform)

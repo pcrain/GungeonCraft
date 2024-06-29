@@ -72,7 +72,7 @@ public class InfectionBehavior : MonoBehaviour
     {
         this._projectile = base.GetComponent<Projectile>();
         this._projectile.OnHitEnemy += (Projectile _, SpeculativeRigidbody enemy, bool _) => {
-            if (enemy.aiActor?.IsHostileAndNotABoss() ?? false)
+            if (enemy.aiActor && enemy.aiActor.IsHostileAndNotABoss())
                 enemy.aiActor.gameObject.GetOrAddComponent<InfectedBehavior>();
         };
     }
@@ -94,7 +94,7 @@ public class InfectedBehavior : MonoBehaviour
     private void Start()
     {
         this._enemy = base.GetComponent<AIActor>();
-        if ((this._enemy?.healthHaver?.currentHealth ?? 0) <= 0)
+        if (!this._enemy || !this._enemy.healthHaver || this._enemy.healthHaver.currentHealth <= 0)
             return;
 
         this._enemy.gameObject.Play("outbreak_infect_sound");

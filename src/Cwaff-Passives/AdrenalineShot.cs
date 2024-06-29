@@ -55,7 +55,7 @@ public class AdrenalineShot : CwaffPassive
     // private static void UpdateHealth(Action<GameUIHeartController, HealthHaver> orig, GameUIHeartController guihc, HealthHaver hh)
     // {
     //     orig(guihc, hh);
-    //     if (hh?.m_player is not PlayerController player)
+    //     if (!hh || hh.m_player is not PlayerController player)
     //         return;
 
     //     int nHearts = guihc.extantHearts.Count();
@@ -73,7 +73,9 @@ public class AdrenalineShot : CwaffPassive
     //     float scale = Pixelator.Instance.CurrentTileScale;
 
     //     // Remove old hearts as necessary (all hearts except the first have a grandparent that manages them)
-    //     dfControl heartManager = guihc.extantHearts[0].Parent?.Parent ?? guihc.extantHearts[0].Parent;
+    //     dfControl heartManager = guihc.extantHearts[0].Parent;
+    //     if (heartManager.Parent)
+    //         heartManager = heartManager.Parent;
     //     if (!heartManager) // should never happen
     //     {
     //         if (C.DEBUG_BUILD)

@@ -72,7 +72,7 @@ public static class CwaffEvents // global custom events we can listen for
         {
             GameManager gm = GameManager.Instance;
             GameStatsManager gsm = GameStatsManager.Instance;
-            if (gm == null || !(gsm?.IsInSession ?? false))
+            if (gm == null || gsm == null || !gsm.IsInSession)
                 return;
 
             _OnFirstFloor =

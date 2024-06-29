@@ -89,12 +89,12 @@ public class KalibersJustice : CwaffActive
 
     private void DoTrade(PlayerController user, List<Need> offerList, List<Need> receiveList, bool big)
     {
-        if ((receiveList?.Count ?? 0) == 0)
+        if (receiveList == null || receiveList.Count == 0)
             return; // this should never happen, but bail out just in case
 
         // Figure out what item we're giving and give it
         Need? whatToOffer = null;
-        if ((offerList?.Count ?? 0) > 0)
+        if (offerList != null && offerList.Count > 0)
         {
             whatToOffer = offerList.ChooseRandom<Need>();
             switch(whatToOffer.Value.type)
@@ -245,7 +245,7 @@ public class KalibersJustice : CwaffActive
         user.gameObject.Play("Play_OBJ_dice_bless_01");
         Lazy.CustomNotification(
             "Kaliber's Justice",
-            $"Offered {whatToOffer?.type ?? NeedType.Nothing}, Received {whatToReceive.type}",
+            $"Offered {(whatToOffer.HasValue ? whatToOffer.Value.type : NeedType.Nothing)}, Received {whatToReceive.type}",
             this.sprite);
     }
 
@@ -357,8 +357,8 @@ public class KalibersJustice : CwaffActive
         #region Guns
             Need gunsNeed = new Need(NeedType.Guns);
             int numGuns = user.inventory.AllGuns.Count;
-            ItemQuality bestGunQuality =
-                user.inventory.AllGuns.HighestQualityItem()?.quality ?? ItemQuality.D;
+            ItemQuality bestGunQuality = (user.inventory.AllGuns.HighestQualityItem() is PickupObject pg)
+                ? pg.quality : ItemQuality.D;
             if      (numGuns <= 2 || bestGunQuality == ItemQuality.D) gunsNeed.status = NeedStatus.Minimal;
             else if (numGuns <= 4 || bestGunQuality == ItemQuality.C) gunsNeed.status = NeedStatus.Lacking;
             else if (numGuns <= 6 || bestGunQuality == ItemQuality.B) gunsNeed.status = NeedStatus.Enough;
@@ -370,8 +370,8 @@ public class KalibersJustice : CwaffActive
         #region Passives
             Need passivesNeed = new Need(NeedType.Passives);
             int numPassives = user.passiveItems.Count;
-            ItemQuality bestPassiveQuality =
-                user.passiveItems.HighestQualityItem()?.quality ?? ItemQuality.D;
+            ItemQuality bestPassiveQuality = (user.passiveItems.HighestQualityItem() is PickupObject pp)
+                ? pp.quality : ItemQuality.D;
             if      (numPassives < 2 || bestPassiveQuality == ItemQuality.D) passivesNeed.status = NeedStatus.Minimal;
             else if (numPassives < 4 || bestPassiveQuality == ItemQuality.C) passivesNeed.status = NeedStatus.Lacking;
             else if (numPassives < 6 || bestPassiveQuality == ItemQuality.B) passivesNeed.status = NeedStatus.Enough;
@@ -383,8 +383,8 @@ public class KalibersJustice : CwaffActive
         #region Actives
             Need activesNeed = new Need(NeedType.Actives);
             int numActives = user.activeItems.Count;
-            ItemQuality bestActiveQuality =
-                user.activeItems.HighestQualityItem()?.quality ?? ItemQuality.D;
+            ItemQuality bestActiveQuality = (user.activeItems.HighestQualityItem() is PickupObject pa)
+                ? pa.quality : ItemQuality.D;
             if (user.activeItems.Count == 1 && user.activeItems[0] == this)
                 activesNeed.status = NeedStatus.Enough;
             else if (numActives  < 2 || bestActiveQuality == ItemQuality.D) activesNeed.status = NeedStatus.Lacking;

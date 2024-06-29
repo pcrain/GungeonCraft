@@ -102,7 +102,7 @@ public class WeddingRing : CwaffPassive
 
     private void LateUpdate()
     {
-        if (!this._refundAmmo || (this.Owner?.CurrentGun == null))
+        if (!this._refundAmmo || !this.Owner || !this.Owner.CurrentGun)
             return;
 
         this._refundAmmo = false;

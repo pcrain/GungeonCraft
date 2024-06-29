@@ -146,7 +146,7 @@ public class Glockarina : CwaffGun
                 if (player.CurrentRoom == null || player.CurrentRoom.area.PrototypeRoomCategory == PrototypeDungeonRoom.RoomCategory.BOSS)
                     return false; // can't insta-clear boss rooms
                 List<AIActor> activeEnemies = player.CurrentRoom.GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
-                if ((activeEnemies?.Count ?? 0) == 0)
+                if (activeEnemies == null || activeEnemies.Count == 0)
                     return false; // can't insta-clear rooms that are already clear
                 player.CurrentRoom.ClearReinforcementLayers();
                 for (int i = activeEnemies.Count - 1; i >= 0; --i)
@@ -168,7 +168,7 @@ public class Glockarina : CwaffGun
                 return false;
 
             case Mode.PRELUDE:
-                if (!(player.CurrentRoom?.CanTeleportFromRoom() ?? false))
+                if (player.CurrentRoom == null || !player.CurrentRoom.CanTeleportFromRoom())
                     return false;
                 foreach (RoomHandler room in GameManager.Instance.Dungeon.data.rooms)
                 {
@@ -396,7 +396,7 @@ public class SlowNearbyBullets : MonoBehaviour
             if (sqrDistance > _REACH_SQR)
                 continue;
 
-            if (p.GetComponent<BulletScriptBehavior>()?.bullet is Bullet bullet)
+            if (p.GetComponent<BulletScriptBehavior>() is BulletScriptBehavior bsb && bsb.bullet is Bullet bullet)
                 bullet.Speed *= _BULLET_TIME_SCALE;
             else
                 p.MultiplySpeed(_BULLET_TIME_SCALE);
@@ -421,6 +421,7 @@ public class CreateDecoyOnKill : MonoBehaviour
     private void OnWillKillEnemy(Projectile bullet, SpeculativeRigidbody enemy)
     {
         GameObject decoy = Glockarina._DecoyPrefab.Instantiate(position: enemy.UnitCenter.ToVector3ZUp(), anchor: Anchor.LowerCenter);
-        decoy.GetComponent<SpeculativeRigidbody>()?.RegisterGhostCollisionException(this._owner.specRigidbody);
+        if (decoy.GetComponent<SpeculativeRigidbody>() is SpeculativeRigidbody body)
+            body.RegisterGhostCollisionException(this._owner.specRigidbody);
     }
 }

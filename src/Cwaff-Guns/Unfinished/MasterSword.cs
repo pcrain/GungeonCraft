@@ -43,13 +43,13 @@ public class MasterSword : CwaffGun
         // foreach (tk2dSpriteAnimationFrame frame in reloadClip.frames)
         // {
         //     tk2dSpriteDefinition def = frame.spriteCollection.spriteDefinitions[frame.spriteId];
-        //     def?.MakeOffset(new Vector2(-0.81f, -2.18f));
+        //     def.MakeOffset(new Vector2(-0.81f, -2.18f));
         // }
         // tk2dSpriteAnimationClip fireClip = gun.GetComponent<tk2dSpriteAnimator>().GetClipByName(gun.shootAnimation);
         // foreach (tk2dSpriteAnimationFrame frame in fireClip.frames)
         // {
         //     tk2dSpriteDefinition def = frame.spriteCollection.spriteDefinitions[frame.spriteId];
-        //     def?.MakeOffset(new Vector2(-0.81f, -2.18f));
+        //     def.MakeOffset(new Vector2(-0.81f, -2.18f));
         // }
     }
 }

@@ -52,7 +52,7 @@ public class GorgunEye : CwaffPassive
         float closestDist    = 999999f;
         foreach(AIActor enemy in enemies)
         {
-            if (!enemy.IsHostileAndNotABoss())
+            if (!enemy || !enemy.IsHostileAndNotABoss())
                 continue; // enemy is not one we should be targeting
             if (!enemy.behaviorSpeculator || enemy.behaviorSpeculator.ImmuneToStun)
                 continue; // enemy cannot be stunned

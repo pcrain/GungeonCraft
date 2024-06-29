@@ -252,7 +252,7 @@ public class KingsLawBullets : MonoBehaviour
 
         // Phase 2 / 5 -- the freeze (skipped if the projectile didn't spawn with King's Law)
         if (this._owner.CurrentGun && this._owner.CurrentGun.GetComponent<KingsLaw>() is KingsLaw k)
-            while (this._naturalSpawn && this._owner && this._owner.CurrentGun && this._owner.CurrentGun.GetComponent<KingsLaw>() && (this._owner.CurrentGun?.IsCharging ?? false))
+            while (this._naturalSpawn && this._owner && this._owner.CurrentGun is Gun gun && gun.IsCharging && gun.GetComponent<KingsLaw>())
             {
                 if (!k || this._batch != k.GetBatch())
                     break; // King's Law has disappeared or moved onto a new batch, so launch our current projectiles

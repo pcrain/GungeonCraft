@@ -120,11 +120,13 @@ public class Alyx : CwaffGun
         // If we've decayed at all, create poison goop under our feet
         if (newAmmo < this.gun.CurrentAmmo || newMaxAmmo < this.gun.GetBaseMaxAmmo())
         {
-            DeadlyDeadlyGoopManager poisonGooper = DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.PoisonDef); // can be null sometimes???
-            if (player)
-                poisonGooper?.AddGoopCircle(player.sprite.WorldBottomCenter - player.m_currentGunAngle.ToVector(1f), 0.75f);
-            else
-                poisonGooper?.AddGoopCircle(this.gun.sprite.WorldCenter, 1f);
+            if (DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.PoisonDef) is DeadlyDeadlyGoopManager gooper)
+            {
+                if (player)
+                    gooper.AddGoopCircle(player.sprite.WorldBottomCenter - player.m_currentGunAngle.ToVector(1f), 0.75f);
+                else
+                    gooper.AddGoopCircle(this.gun.sprite.WorldCenter, 1f);
+            }
         }
 
         this.gun.CurrentAmmo = newAmmo;

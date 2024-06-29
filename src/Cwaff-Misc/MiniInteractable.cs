@@ -36,7 +36,8 @@ public class MiniInteractable : BraveBehaviour, IPlayerInteractable
     base.sprite.transform.position = base.sprite.transform.position.Quantize(0.0625f);
     DepthLookupManager.ProcessRenderer(base.sprite.renderer);
     tk2dSprite componentInParent = base.transform.parent.gameObject.GetComponentInParent<tk2dSprite>();
-    componentInParent?.AttachRenderer(base.sprite);
+    if (componentInParent)
+      componentInParent.AttachRenderer(base.sprite);
     // SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black, 0.1f, 0.05f);
     base.sprite.ignoresTiltworldDepth = true;
     // if (scaledOutline)
@@ -65,13 +66,11 @@ public class MiniInteractable : BraveBehaviour, IPlayerInteractable
 
   private void ItemOnPreRigidbodyCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
   {
-    // if (otherRigidbody?.PrimaryPixelCollider?.CollisionLayer != CollisionLayer.Projectile)
       PhysicsEngine.SkipCollision = true;
   }
 
   private void Update()
   {
-    // PickupObject.HandlePickupCurseParticles(base.sprite, 1f);
     if (doVFX)
       UpdateVFX();
     if (doHover)

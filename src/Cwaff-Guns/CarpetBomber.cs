@@ -114,7 +114,8 @@ public class CarpetProjectile : MonoBehaviour
             p.transform.position, CarpetBomber._CarpetExplosion, p.Direction, ignoreQueues: true);
         if (this._projectile.specRigidbody)
             this._projectile.specRigidbody.OnRigidbodyCollision += (CollisionData rigidbodyCollision) => {
-                this._grenade?.Redirect(rigidbodyCollision.Normal);
+                if (this._grenade)
+                    this._grenade.Redirect(rigidbodyCollision.Normal);
                 OnGroundBounce();
             };
     }

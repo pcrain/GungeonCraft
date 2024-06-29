@@ -43,8 +43,12 @@ public class StopSign : CwaffActive
 
     public override void DoEffect(PlayerController user)
     {
+        if (user.CurrentRoom is not RoomHandler room)
+            return;
+        if (room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> enemies)
+            return;
         bool didAnything = false;
-        foreach (AIActor enemy in user.CurrentRoom?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All).EmptyIfNull())
+        foreach (AIActor enemy in enemies)
         {
             if (!enemy || !enemy.IsHostile(canBeNeutral: true))
                 continue;
@@ -54,7 +58,7 @@ public class StopSign : CwaffActive
                 continue;
             if (enemy.GetComponent<StoppedInTheirTracks>())
                 continue;
-            FancyVFX.Spawn(_StopSignVFX, (enemy.sprite?.WorldTopCenter ?? enemy.CenterPosition) + new Vector2(0, 1f),
+            FancyVFX.Spawn(_StopSignVFX, (enemy.sprite ? enemy.sprite.WorldTopCenter : enemy.CenterPosition) + new Vector2(0, 1f),
                 lifetime: 0.25f, fadeOutTime: 0.5f, endScale: 2f, height: 1f);
             enemy.behaviorSpeculator.Stun(2f);
             enemy.ApplyEffect(_SpeedEffect);

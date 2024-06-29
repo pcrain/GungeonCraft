@@ -67,9 +67,9 @@ public class Vladimir : CwaffGun
             for (int j = StaticReferenceManager.AllProjectiles.Count - 1; j >= 0; --j)
             {
                 Projectile proj = StaticReferenceManager.AllProjectiles[j];
-                if (!proj.isActiveAndEnabled)
+                if (!proj | !proj.isActiveAndEnabled)
                     continue;
-                if (proj?.specRigidbody is not SpeculativeRigidbody body)
+                if (proj.specRigidbody is not SpeculativeRigidbody body)
                     continue;
                 // if (!collider.AABBOverlaps(body.PrimaryPixelCollider))
                 if (!proj.sprite.Overlaps(enemy.sprite))
@@ -97,7 +97,7 @@ public class Vladimir : CwaffGun
         for (int i = this._skeweredEnemies.Count - 1; i >=0; --i)
         {
             AIActor enemy = this._skeweredEnemies[i];
-            if (enemy?.healthHaver is not HealthHaver hh)
+            if (!enemy || enemy.healthHaver is not HealthHaver hh)
                 continue;
             hh.ApplyDamage(damage: damage, direction: launchDir, sourceName: ItemName,
                 damageTypes: CoreDamageTypes.None, damageCategory: DamageCategory.Normal);
@@ -121,7 +121,7 @@ public class Vladimir : CwaffGun
         // proj.collidesWithPlayer  = false;
         // foreach (AIActor enemy in this._skeweredEnemies)
         // {
-        //     if (enemy?.specRigidbody)
+        //     if (enemy && enemy.specRigidbody)
         //         proj.specRigidbody.RegisterSpecificCollisionException(enemy.specRigidbody);
         // }
         // player.gameObject.Play("whip_crack_sound");
@@ -133,7 +133,7 @@ public class Vladimir : CwaffGun
     {
         if (this.GenericOwner is not PlayerController pc)
             return;
-        if (!(enemy?.IsHostileAndNotABoss() ?? false) || (enemy.behaviorSpeculator?.ImmuneToStun ?? true))
+        if (!enemy || !enemy.IsHostileAndNotABoss() || !enemy.behaviorSpeculator || enemy.behaviorSpeculator.ImmuneToStun)
             return;
         if (enemy.GetComponent<ImpaledOnGunBehaviour>())
             return;
@@ -148,9 +148,12 @@ public class Vladimir : CwaffGun
     {
         this._skeweredEnemies.Remove(enemy);
         enemy.GetComponent<ImpaledOnGunBehaviour>().SafeDestroy();
-        enemy.behaviorSpeculator?.ResetStun(duration: 1f, createVFX: true);
-        enemy.specRigidbody?.MoveTowardsTargetOrWall(start: this.GenericOwner.CenterPosition, target: this.gun.barrelOffset.position.XY());
-        enemy.knockbackDoer?.ApplyKnockback(direction: launchDir, force: _LAUNCH_FORCE);
+        if (enemy.behaviorSpeculator)
+            enemy.behaviorSpeculator.ResetStun(duration: 1f, createVFX: true);
+        if (enemy.specRigidbody)
+            enemy.specRigidbody.MoveTowardsTargetOrWall(start: this.GenericOwner.CenterPosition, target: this.gun.barrelOffset.position.XY());
+        if (enemy.knockbackDoer)
+            enemy.knockbackDoer.ApplyKnockback(direction: launchDir, force: _LAUNCH_FORCE);
     }
 
     public void AbsorbProjectile(Projectile p)
@@ -184,7 +187,7 @@ public class VladimirProjectile : MonoBehaviour
         this._projectile = base.GetComponent<Projectile>();
         this._projectile.sprite.renderer.enabled = false; // projectile shouldn't be visible since it's just a hitbox
         this._owner = this._projectile.Owner as PlayerController;
-        if (this._owner?.CurrentGun?.GetComponent<Vladimir>() is not Vladimir v)
+        if (!this._owner || !this._owner.CurrentGun || this._owner.CurrentGun.GetComponent<Vladimir>() is not Vladimir v)
             return;
 
         this._gun = v;
@@ -214,7 +217,7 @@ public class VladimirProjectile : MonoBehaviour
 
     private void OnHitEnemy(Projectile p, SpeculativeRigidbody enemy, bool killed)
     {
-        if (!killed)
-            this._gun.Impale(enemy?.aiActor);
+        if (!killed && enemy)
+            this._gun.Impale(enemy.aiActor);
     }
 }

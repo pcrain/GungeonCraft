@@ -634,7 +634,7 @@ public static class SlashDoer // stolen from NN
             for (int k = allMinorBreakables.Count - 1; k >= 0; k--)
             {
                 MinorBreakable minorBreakable = allMinorBreakables[k];
-                if (minorBreakable?.specRigidbody)
+                if (minorBreakable && minorBreakable.specRigidbody)
                 {
                     if (!minorBreakable.IsBroken && minorBreakable.sprite)
                     {

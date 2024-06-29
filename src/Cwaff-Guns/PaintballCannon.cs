@@ -55,7 +55,9 @@ public class PaintballColorizer : MonoBehaviour
             duration                 = 10000000,
             effectIdentifier         = "Paintballed",
             };
-        enemy.aiActor?.RemoveEffect("Paintballed");
-        enemy.aiActor?.ApplyEffect(tint);
+        if (!enemy.aiActor)
+            return;
+        enemy.aiActor.RemoveEffect("Paintballed");
+        enemy.aiActor.ApplyEffect(tint);
     }
 }

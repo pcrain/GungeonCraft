@@ -155,7 +155,9 @@ public static class ModdedShopItemAdder
     {
         foreach(KeyValuePair<string, GameObject> entry in builtShops)
         {
-            if (entry.Value.GetComponent<BaseShopController>()?.shopItems is not GenericLootTable shopItems)
+            if (entry.Value.GetComponent<BaseShopController>() is not BaseShopController bsc)
+                continue;
+            if (bsc.shopItems is not GenericLootTable shopItems)
                 continue;
             if (C.DEBUG_BUILD)
                 Debug.Log($"    found shop {entry.Key}");

@@ -27,9 +27,9 @@ public class IronMaid : CwaffGun
         gun.AddReticle<CwaffReticle>(reticleVFX : VFX.BasicReticle, reticleAlpha : 0.2f, visibility : CwaffReticle.Visibility.ALWAYS);
     }
 
-    private GameObject GetTargetEnemy(CwaffReticle reticle) => this.CurrentTargetEnemy()?.gameObject;
+    private GameObject GetTargetEnemy(CwaffReticle reticle) => this._targetEnemy ? this._targetEnemy.gameObject : null;
     private Vector2 GetTargetPos(CwaffReticle reticle) => this.PointWherePlayerIsLooking();
-    public AIActor CurrentTargetEnemy() => this._targetEnemy ? this._targetEnemy : null; // unity safe null check for ?. purposes
+    public AIActor CurrentTargetEnemy() => this._targetEnemy ? this._targetEnemy : null;
     public Vector2 PointWherePlayerIsLooking() => this._targetEnemy ? this._targetEnemy.CenterPosition : this._whereIsThePlayerLooking;
 
     public override void OnPlayerPickup(PlayerController player)

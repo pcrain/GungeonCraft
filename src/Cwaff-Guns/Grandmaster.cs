@@ -237,6 +237,10 @@ public abstract class ChessPiece : MonoBehaviour
             }
             this._targetEnemy = null; // reset our target and march onward
         }
+        if (this._projectile.transform.position.GetAbsoluteRoom() is not RoomHandler room)
+            return null;
+        if (room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> enemies)
+            return null;
 
         // Get our position and direction
         Vector2 ppos = this._projectile.sprite.WorldCenter;
@@ -245,7 +249,7 @@ public abstract class ChessPiece : MonoBehaviour
         Vector2? closestViableEnemyPosition = null;
         float closestEnemyDistance = 999999f;
         // float closestOrthoDistance = 999999f;
-        foreach (AIActor enemy in this._projectile.transform.position.GetAbsoluteRoom()?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All).EmptyIfNull())
+        foreach (AIActor enemy in enemies)
         {
             if (!enemy.IsNormalEnemy || !enemy.healthHaver || enemy.IsHarmlessEnemy)
                 continue; // we only care about normal, alive, hostile enemies

@@ -331,7 +331,7 @@ public static class LargeGunAnimationHotfix
 
     private static tk2dSpriteAnimationClip GetTrimmedIdleAnimation(this Gun gun)
     {
-        return gun.spriteAnimator?.GetClipByName($"{gun.InternalSpriteName()}_{_TRIM_ANIMATION}");
+        return gun.spriteAnimator ? gun.spriteAnimator.GetClipByName($"{gun.InternalSpriteName()}_{_TRIM_ANIMATION}") : null;
     }
 
     [HarmonyPatch(typeof(ShopItemController), nameof(ShopItemController.InitializeInternal))]
@@ -474,7 +474,7 @@ public static class LargeGunAnimationHotfix
 
     private static void FixGunsFromChest(PickupObject pickup, tk2dSprite sprite)
     {
-        if ((pickup as Gun)?.GetTrimmedIdleAnimation() is tk2dSpriteAnimationClip trimmed)
+        if ((pickup is Gun gun) && (gun.GetTrimmedIdleAnimation() is tk2dSpriteAnimationClip trimmed))
             sprite.SetSprite(trimmed.frames[0].spriteCollection, trimmed.frames[0].spriteId);
     }
 
@@ -663,7 +663,7 @@ public static class DragunFightHotfix
             Debug.Log($" healthhaver is invalid at boss trigger zone, tell pretzel");
             return hh;
         }
-        if (hh?.aiActor == null)
+        if (!hh || !hh.aiActor)
             return hh;
         if (!hh.IsBoss || (hh.GetComponent<GenericIntroDoer>() is not GenericIntroDoer gid))
             return hh;

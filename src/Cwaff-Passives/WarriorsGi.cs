@@ -126,7 +126,7 @@ public class WarriorsGi : CwaffPassive
     private void RecalculatePower(PlayerController player)
     {
         ZenkaiAura z = player.gameObject.GetOrAddComponent<ZenkaiAura>();
-        int newPower = z?.GetPower() ?? 0;
+        int newPower = z ? z.GetPower() : 0;
         this._rateOfFireStat.amount     = _FIRE_RATE_MULT[newPower];
         this._movementSpeedStat.amount  = _MOVEMENT_MULT[newPower];
         this._dodgeRollSpeedStat.amount = _DODGE_MULT[newPower];
@@ -138,11 +138,11 @@ public class WarriorsGi : CwaffPassive
     public override void MidGameSerialize(List<object> data)
     {
         base.MidGameSerialize(data);
-        int p1Zenkai = GameManager.Instance.PrimaryPlayer?.gameObject?.GetOrAddComponent<ZenkaiAura>()?._zenkaiLevel ?? 0;
+        int p1Zenkai = (GameManager.Instance.PrimaryPlayer is PlayerController p1) ? p1.gameObject.GetOrAddComponent<ZenkaiAura>()._zenkaiLevel : 0;
         data.Add(p1Zenkai);
         if (GameManager.Instance.CurrentGameType == GameManager.GameType.COOP_2_PLAYER)
         {
-            int p2Zenkai = GameManager.Instance.SecondaryPlayer?.gameObject?.GetOrAddComponent<ZenkaiAura>()?._zenkaiLevel ?? 0;
+            int p2Zenkai = (GameManager.Instance.SecondaryPlayer is PlayerController p2) ? p2.gameObject.GetOrAddComponent<ZenkaiAura>()._zenkaiLevel : 0;
             data.Add(p2Zenkai);
         }
     }
@@ -152,11 +152,10 @@ public class WarriorsGi : CwaffPassive
         base.MidGameDeserialize(data);
 
         int p1ZenkaiLevel = (int)data[0];
-        if (p1ZenkaiLevel > 0)
+        if (p1ZenkaiLevel > 0 && GameManager.Instance.PrimaryPlayer is PlayerController p1)
         {
-            ZenkaiAura z = GameManager.Instance.PrimaryPlayer?.gameObject?.GetOrAddComponent<ZenkaiAura>();
-            if (z)
-                z._zenkaiLevel = p1ZenkaiLevel;
+            if (p1.gameObject.GetOrAddComponent<ZenkaiAura>() is ZenkaiAura z1)
+                z1._zenkaiLevel = p1ZenkaiLevel;
             if (GameManager.Instance.PrimaryPlayer.passiveItems.Contains(this))
                 RecalculatePower(GameManager.Instance.PrimaryPlayer);
         }
@@ -164,11 +163,10 @@ public class WarriorsGi : CwaffPassive
             return;
 
         int p2ZenkaiLevel = (int)data[1];
-        if (p2ZenkaiLevel > 0)
+        if (p2ZenkaiLevel > 0 && GameManager.Instance.SecondaryPlayer is PlayerController p2)
         {
-            ZenkaiAura z = GameManager.Instance.SecondaryPlayer?.gameObject?.GetOrAddComponent<ZenkaiAura>();
-            if (z)
-                z._zenkaiLevel = p2ZenkaiLevel;
+            if (p2.gameObject.GetOrAddComponent<ZenkaiAura>() is ZenkaiAura z2)
+                z2._zenkaiLevel = p2ZenkaiLevel;
             if (GameManager.Instance.SecondaryPlayer.passiveItems.Contains(this))
                 RecalculatePower(GameManager.Instance.SecondaryPlayer);
         }

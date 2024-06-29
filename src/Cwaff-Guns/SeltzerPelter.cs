@@ -110,7 +110,7 @@ public class SeltzerProjectile : MonoBehaviour
 
     private void OnRigidbodyCollision(CollisionData rigidbodyCollision)
     {
-        if (!this?._canProjectile)
+        if (!this || !this._canProjectile)
             return;
         this._canProjectile.SendInDirection(rigidbodyCollision.Normal, false);
 
@@ -154,9 +154,10 @@ public class SeltzerProjectile : MonoBehaviour
 
     private void RestartBeamOnBounce()
     {
-        if (this?._canProjectile)
+        if (this._canProjectile)
             this._canProjectile.baseData.speed *= 0.5f;
-        this._beam?.CeaseAttack();
+        if (this._beam)
+            this._beam.CeaseAttack();
         this._beam = null;
         base.gameObject.Play("seltzer_pelter_collide_sound");
     }
@@ -168,7 +169,8 @@ public class SeltzerProjectile : MonoBehaviour
 
     private void DestroyBeam(Projectile p)
     {
-        this._beam?.CeaseAttack();
+        if (this._beam)
+            this._beam.CeaseAttack();
     }
 
     private const float SPRAY_TIME = 2f;

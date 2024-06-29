@@ -71,7 +71,7 @@ public class AstralProjector : CwaffPassive
         RoomHandler room = this.Owner.CurrentRoom;
         if (_BannedRoomTypes.Contains(room.area.PrototypeRoomCategory) || IsBossFoyer(room))
             return false; // can only phase in normal rooms
-        if (room.area.IsProceduralRoom || (room.area.proceduralCells?.Count ?? 0) > 0)
+        if (room.area.IsProceduralRoom || (room.area.proceduralCells != null && room.area.proceduralCells.Count > 0))
             return false; // can only phase in non-procedural rooms
         return true;
     }

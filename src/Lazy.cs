@@ -446,8 +446,12 @@ public static class Lazy
     /// <summary>Determine whether any enemy is in an line between start and end (does not account for walls)</summary>
     public static bool AnyEnemyInLineOfSight(Vector2 start, Vector2 end, bool canBeNeutral = true)
     {
+        if (start.GetAbsoluteRoom() is not RoomHandler room)
+            return false;
+        if (room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> enemies)
+            return false;
         Vector2 intersection = Vector2.zero;
-        foreach (AIActor enemy in start.GetAbsoluteRoom()?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All).EmptyIfNull())
+        foreach (AIActor enemy in enemies)
         {
             if (!enemy.IsHostile(canBeNeutral: canBeNeutral))
                 continue;
@@ -461,12 +465,17 @@ public static class Lazy
     /// <summary>Determine position of the nearest enemy inside a cone of vision from position start within maxDeviation degree of coneAngle</summary>
     public static Vector2? NearestEnemyWithinConeOfVision(Vector2 start, float coneAngle, float maxDeviation, float maxDistance = 100f, bool useNearestAngleInsteadOfDistance = true, bool ignoreWalls = false)
     {
+        if (start.GetAbsoluteRoom() is not RoomHandler room)
+            return null;
+        if (room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> enemies)
+            return null;
+
         bool foundTarget   = false;
         float bestAngle    = maxDeviation;
         float maxSqrDist   = maxDistance * maxDistance;
         float bestSqrDist  = maxSqrDist;
         Vector2 bestTarget = Vector2.zero;
-        foreach (AIActor enemy in start.GetAbsoluteRoom()?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All).EmptyIfNull())
+        foreach (AIActor enemy in enemies)
         {
             if (!enemy.IsHostile(canBeNeutral: true))
                 continue;
@@ -489,7 +498,7 @@ public static class Lazy
             foundTarget = true;
             bestTarget  = tentativeTarget;
             bestAngle   = angleDeviation;
-            bestSqrDist    = sqrDist;
+            bestSqrDist = sqrDist;
         }
         return foundTarget ? bestTarget : null;
     }

@@ -136,8 +136,9 @@ public class GunbrellaProjectile : MonoBehaviour
         {
             this._extraDelay = _DELAY * (_LastLaunchIndex++);
             AIActor target   = null;
-            List<AIActor> enemies = this._owner.CurrentRoom?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All).EmptyIfNull().ToList();
-            if (enemies.Count > 0)
+            RoomHandler room = this._owner.CurrentRoom;
+            List<AIActor> enemies = (room != null) ? room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) : null;
+            if (enemies != null && enemies.Count > 0)
             {
                 const int TRIES = 10;
                 for (int i = 0; i < TRIES; ++i)

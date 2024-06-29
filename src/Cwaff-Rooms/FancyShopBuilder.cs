@@ -92,7 +92,7 @@ public static class FancyShopBuilder
       talkPointOffset                   : talkPointOffset ?? ShopAPI.defaultTalkPointOffset,
       npcPosition                       : npcPosition ?? ShopAPI.defaultNpcPosition,
       voiceBox                          : ShopAPI.VoiceBoxes.OLD_MAN,
-      itemPositions                     : itemPositions?.ToArray() ?? ShopAPI.defaultItemPositions,
+      itemPositions                     : (itemPositions != null) ? itemPositions.ToArray() : ShopAPI.defaultItemPositions,
       costModifier                      : costModifier,
       giveStatsOnPurchase               : false,
       statsToGiveOnPurchase             : null,
@@ -689,8 +689,10 @@ public class ForceOutOfStockOnFailedSteal : MonoBehaviour
 
         foreach (Transform child in base.transform)
         {
-            CustomShopItemController[] shopItems =child?.gameObject?.GetComponentsInChildren<CustomShopItemController>();
-            if ((shopItems?.Length ?? 0) == 0)
+            if (!child || !child.gameObject)
+              continue;
+            CustomShopItemController[] shopItems = child.gameObject.GetComponentsInChildren<CustomShopItemController>();
+            if (shopItems == null || shopItems.Length == 0)
                 continue;
             if (shopItems[0] is not CustomShopItemController shopItem)
                 continue;

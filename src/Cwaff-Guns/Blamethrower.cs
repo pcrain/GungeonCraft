@@ -49,20 +49,22 @@ public class Blamethrower : CwaffGun
 
     private void OnReceivedDamage(PlayerController player)
     {
-        if (player.CurrentRoom?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> enemies)
+        if (player.CurrentRoom is not RoomHandler room)
             return;
-        if (enemies.Count() == 0)
+        if (room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> enemies)
+            return;
+        if (enemies.Count == 0)
             return;
 
         const int TRIES = 10;
         for (int i = 0; i < TRIES; ++i)
         {
             AIActor enemy = enemies.ChooseRandom();
-            if (!enemy || !enemy.IsHostileAndNotABoss())
+            if (!enemy || !enemy.gameObject || !enemy.IsHostileAndNotABoss())
                 continue;
             if (enemy.GetComponent<EnemyBlamedBehavior>())
                 continue;  // can't scapegoat the same enemy twice
-            enemy.gameObject?.GetOrAddComponent<ScapeGoat>();
+            enemy.gameObject.GetOrAddComponent<ScapeGoat>();
             break;
         }
     }
@@ -150,7 +152,7 @@ public class BlamethrowerProjectile : MonoBehaviour
 
         if ((UnityEngine.Random.value > _FEAR_CHANCE) && !scapeGoat)
             return;  // if we fail the fear check and we're not already a designated scapegoat, we're done
-        if (!(enemy.aiActor?.IsHostileAndNotABoss() ?? false))
+        if (!enemy.aiActor || !enemy.aiActor.IsHostileAndNotABoss())
             return;
         if (enemy.GetComponent<EnemyBlamedBehavior>())
             return;
@@ -193,7 +195,7 @@ internal class EnemyBlamedBehavior : MonoBehaviour
     public void Setup(Projectile p)
     {
         AIActor enemy = base.GetComponent<AIActor>();
-        if ((enemy?.healthHaver?.currentHealth ?? 0) <= 0)
+        if (!enemy || !enemy.healthHaver || enemy.healthHaver.currentHealth <= 0)
             return;
         if (p.Owner is not PlayerController player)
             return;

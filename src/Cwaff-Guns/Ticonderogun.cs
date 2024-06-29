@@ -210,8 +210,9 @@ public class Ticonderogun : CwaffGun
     // Choose the enemy with the smallest angle from our aim point that is also within _MAX_CONTROLLER_DIST
     private AIActor ChooseNewTarget()
     {
-        List<AIActor> activeEnemies = this._owner.CurrentRoom?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
-        if (activeEnemies == null)
+        if (this._owner.CurrentRoom is not RoomHandler room)
+            return null;
+        if (room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> activeEnemies)
             return null;
 
         float aimAngle = this._owner.m_currentGunAngle;
@@ -219,9 +220,9 @@ public class Ticonderogun : CwaffGun
         AIActor bestEnemy = null;
         foreach (AIActor enemy in activeEnemies)
         {
-            if (enemy?.sprite == null || !enemy.IsHostile(canBeNeutral: true))
+            if (!enemy || !enemy.IsHostile(canBeNeutral: true))
                 continue;
-            Vector2 enemyDelta = (enemy.sprite.WorldCenter - this._owner.sprite.WorldCenter);
+            Vector2 enemyDelta = (enemy.CenterPosition - this._owner.sprite.WorldCenter);
             if (enemyDelta.magnitude > _MAX_CONTROLLER_DIST)
                 continue;
             float enemyAngle = enemyDelta.ToAngle();
@@ -244,7 +245,7 @@ public class Ticonderogun : CwaffGun
 
         // If we're using a controller, determine if we should be tracking a specific enemy
         bool restartCharge = false;
-        if (!(this._trackedEnemy?.IsHostile(canBeNeutral: true) ?? false))
+        if (!this._trackedEnemy || !this._trackedEnemy.IsHostile(canBeNeutral: true))
         {
             this._trackedEnemy = ChooseNewTarget();
             if (this._trackedEnemy)
@@ -252,9 +253,9 @@ public class Ticonderogun : CwaffGun
         }
 
         // If we're tracking an enemy, set our target based on the enemy's position and our cursor direction
-        if (this._trackedEnemy?.sprite != null)
+        if (this._trackedEnemy)
         {
-            Vector2 target = this._trackedEnemy.sprite.WorldCenter + _ENEMY_TRACK_RADIUS * this._owner.m_activeActions.Aim.Vector;
+            Vector2 target = this._trackedEnemy.CenterPosition + _ENEMY_TRACK_RADIUS * this._owner.m_activeActions.Aim.Vector;
             if (restartCharge)
                 ResetCharge(target);
             this._adjustedAimPoint = target; // set our adjusted aim point for when we stop tracking the enemy
@@ -263,9 +264,9 @@ public class Ticonderogun : CwaffGun
 
         // If we're not tracking an enemy, we're just freehanding input
         this._adjustedAimPoint += this._owner.m_activeActions.Aim.Vector * _TRACKING_SPEED * BraveTime.DeltaTime;
-        Vector2 delta = this._adjustedAimPoint - this._owner.sprite.WorldCenter;
+        Vector2 delta = this._adjustedAimPoint - this._owner.CenterPosition;
         if (delta.magnitude > _MAX_CONTROLLER_DIST)
-            this._adjustedAimPoint = this._owner.sprite.WorldCenter + (_MAX_CONTROLLER_DIST * delta.normalized);
+            this._adjustedAimPoint = this._owner.CenterPosition + (_MAX_CONTROLLER_DIST * delta.normalized);
         return this._adjustedAimPoint;
     }
 
@@ -364,7 +365,7 @@ public static class HullHelper
 
     public static List<Vector2> GetConvexHull(this List<Vector2> points)
     {
-        if ((points?.Count() ?? 0) <= 1)
+        if (points == null || points.Count <= 1)
             return points;
 
         points = new List<Vector2>(points);  // make a copy so we don't modify in place

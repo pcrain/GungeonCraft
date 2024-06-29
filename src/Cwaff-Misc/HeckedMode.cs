@@ -385,8 +385,8 @@ public static class HeckedMode
         static void Postfix(AIShooter __instance)
         {
             // ETGModConsole.Log($"    initializing aishooter for {shooter.aiActor.ActorName}");
-            // ETGModConsole.Log($"      EquippedGun {shooter.EquippedGun?.EncounterNameOrDisplayName}");
-            // ETGModConsole.Log($"      CurrentGun {shooter.CurrentGun?.EncounterNameOrDisplayName}");
+            // ETGModConsole.Log($"      EquippedGun {(shooter.EquippedGun ? shooter.EquippedGun.EncounterNameOrDisplayName : 'null')}");
+            // ETGModConsole.Log($"      CurrentGun {(shooter.CurrentGun ? shooter.CurrentGun.EncounterNameOrDisplayName : 'null')}");
             if (!__instance || __instance.CurrentGun is not Gun gun)
                 return;
             gun.GetComponent<HoveringGunSynergyProcessor>().SafeDestroy();                 // fix Blooper, etc.
@@ -585,15 +585,15 @@ public static class HeckedMode
         me.gunAttachPoint    = g.transform;
         // me.gunAttachPoint          = other.gunAttachPoint;
 
-        // me.volleyShootPosition     = null; //me.gameObject.AddChild(new GameObject());// other.volleyShootPosition?.position ?? Vector3.zero;
-        // me.volleyShellTransform    = null; //me.gameObject.AddChild(new GameObject());// other.volleyShellTransform?.position ?? Vector3.zero;
-        // me.gunAttachPoint          = null; //me.gameObject.AddChild(new GameObject());// other.gunAttachPoint?.position ?? Vector3.zero;
-        // me.bulletScriptAttachPoint = null; //me.gameObject.AddChild(new GameObject());// other.bulletScriptAttachPoint?.position ?? Vector3.zero;
+        // me.volleyShootPosition     = null; //me.gameObject.AddChild(new GameObject());// other.volleyShootPosition ? other.volleyShootPosition.position : Vector3.zero;
+        // me.volleyShellTransform    = null; //me.gameObject.AddChild(new GameObject());// other.volleyShellTransform ? other.volleyShellTransform.position : Vector3.zero;
+        // me.gunAttachPoint          = null; //me.gameObject.AddChild(new GameObject());// other.gunAttachPoint ? other.gunAttachPoint.position : Vector3.zero;
+        // me.bulletScriptAttachPoint = null; //me.gameObject.AddChild(new GameObject());// other.bulletScriptAttachPoint ? other.bulletScriptAttachPoint.position : Vector3.zero;
 
-        // me.volleyShootPosition.position     = other.volleyShootPosition?.position ?? Vector3.zero;
-        // me.volleyShellTransform.position    = other.volleyShellTransform?.position ?? Vector3.zero;
-        // me.gunAttachPoint.position          = other.gunAttachPoint?.position ?? Vector3.zero;
-        // me.bulletScriptAttachPoint.position = other.bulletScriptAttachPoint?.position ?? Vector3.zero;
+        // me.volleyShootPosition.position     = other.volleyShootPosition ? other.volleyShootPosition.position : Vector3.zero;
+        // me.volleyShellTransform.position    = other.volleyShellTransform ? other.volleyShellTransform.position : Vector3.zero;
+        // me.gunAttachPoint.position          = other.gunAttachPoint ? other.gunAttachPoint.position : Vector3.zero;
+        // me.bulletScriptAttachPoint.position = other.bulletScriptAttachPoint ? other.bulletScriptAttachPoint.position : Vector3.zero;
     }
 
     private static ShootGunBehavior CopyShootGunBehavior(this ShootGunBehavior other)
@@ -762,11 +762,11 @@ public static class HeckedMode
     {
         ProjectileModule mod = replacementGun.DefaultModule;
         Projectile defaultProjectile = (
-          ((mod.shootStyle == ShootStyle.Charged) && ((mod.chargeProjectiles?.Count ?? 0) > 0))
+          ((mod.shootStyle == ShootStyle.Charged) && mod.chargeProjectiles != null && mod.chargeProjectiles.Count > 0)
             ? mod.FirstValidChargeProjectile()
             : mod.projectiles[0]
           )
-          ?? replacementGun.singleModule?.projectiles.SafeFirst()
+          ?? ((replacementGun.singleModule != null) ? replacementGun.singleModule.projectiles.SafeFirst() : null)
           ?? throw new Exception($"failed to get Hecked Mode projectile for gun {replacementGun.EncounterNameOrDisplayName}");
 
         shooter.equippedGunId = replacementGun.PickupObjectId;
@@ -866,13 +866,13 @@ public static class HeckedMode
             shooter = enemy.EnableGunShooting(replacementGun);
         }
 
-        // if (replacementGun?.DefaultModule?.projectiles?[0] is not Projectile)
+        // if (!replacementGun || !replacementGun.DefaultModule || replacementGun.DefaultModule.projectiles == null || replacementGun.DefaultModule.projectiles[0] is not Projectile)
         // {
         //     Lazy.DebugLog($"failed to initialize default projectiles for enemy");
         //     return;
         // }
 
-        // if (shooter?.behaviorSpeculator?.AttackBehaviors is not List<AttackBehaviorBase>)
+        // if (!shooter || !shooter.behaviorSpeculator || shooter.behaviorSpeculator.AttackBehaviors is not List<AttackBehaviorBase>)
         // {
         //     Lazy.DebugLog($"failed to initialize attack behaviors for enemy");
         //     return;

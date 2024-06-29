@@ -71,17 +71,6 @@ public class RacketLauncher : CwaffGun
         gun.ClipShotsRemaining = gun.CurrentAmmo;
     }
 
-    // Old reload behavior to clear all balls when reloading
-    // public override void OnReloadPressedSafe(PlayerController player, Gun gun, bool manualReload)
-    // {
-    //     if (!manualReload)
-    //         return;
-    //     base.OnReloadPressedSafe(player, gun, manualReload);
-    //     for (int i = this._extantTennisBalls.Count - 1; i >= 0; --i)
-    //         this._extantTennisBalls[i]?.DieInAir();
-    //     this._extantTennisBalls.Clear();
-    // }
-
     public void AddExtantTennisBall(TennisBall tennisBall)
     {
         this._extantTennisBalls.Add(tennisBall);

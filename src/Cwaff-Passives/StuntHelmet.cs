@@ -100,7 +100,9 @@ public class StuntHelmet : CwaffPassive
     private static IEnumerator HandleDamageBoost(PlayerController target, StuntHelmet helmet)
     {
         target.gameObject.PlayUnique("stunt_time");
-        SpriteOutlineManager.GetOutlineMaterial(target.sprite)?.SetColor("_OverrideColor", new Color(128f, 0f, 16f));
+        Material mat = SpriteOutlineManager.GetOutlineMaterial(target.sprite);
+        if (mat)
+            mat.SetColor("_OverrideColor", new Color(128f, 0f, 16f));
         target.ownerlessStatModifiers.Add(_StuntStats);
         target.stats.RecalculateStats(target);
 
@@ -111,7 +113,8 @@ public class StuntHelmet : CwaffPassive
                 yield break;
         }
 
-        SpriteOutlineManager.GetOutlineMaterial(target.sprite)?.SetColor("_OverrideColor", new Color(0f, 0f, 0f));
+        if (mat)
+            mat.SetColor("_OverrideColor", new Color(0f, 0f, 0f));
         target.ownerlessStatModifiers.Remove(_StuntStats);
         target.stats.RecalculateStats(target);
 

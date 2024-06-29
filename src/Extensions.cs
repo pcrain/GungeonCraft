@@ -314,35 +314,48 @@ public static class Extensions
   /// <summary>Set the Alpha of a GameObject's sprite</summary>
   public static void SetAlpha(this GameObject g, float a)
   {
-    g.GetComponent<Renderer>()?.SetAlpha(a);
+    Renderer r = g.GetComponent<Renderer>();
+    if (r)
+      r.SetAlpha(a);
   }
 
   /// <summary>Set the Alpha of a Component's sprite (attached to the base component)</summary>
   public static void SetAlpha(this Component c, float a)
   {
-    c.GetComponent<Renderer>()?.SetAlpha(a);
+    Renderer r = c.gameObject.GetComponent<Renderer>();
+    if (r)
+      r.SetAlpha(a);
   }
 
   /// <summary>Set the Alpha of a GameObject's sprite immediately and avoid the 1-frame opacity delay upon creation</summary>
   public static void SetAlphaImmediate(this GameObject g, float a)
   {
-    g.GetComponent<Renderer>()?.SetAlpha(a);
-    g.GetComponent<tk2dSpriteAnimator>()?.LateUpdate();
+    Renderer r = g.GetComponent<Renderer>();
+    if (!r)
+      return;
+    r.SetAlpha(a);
+    tk2dSpriteAnimator animator = g.GetComponent<tk2dSpriteAnimator>();
+    if (animator)
+      animator.LateUpdate();
   }
 
   /// <summary>Set the Alpha of a Component's sprite immediately and avoid the 1-frame opacity delay upon creation</summary>
   public static void SetAlphaImmediate(this Component c, float a)
   {
-    c.GetComponent<Renderer>()?.SetAlpha(a);
-    c.GetComponent<tk2dSpriteAnimator>()?.LateUpdate();
+    Renderer r = c.gameObject.GetComponent<Renderer>();
+    if (!r)
+      return;
+    r.SetAlpha(a);
+    tk2dSpriteAnimator animator = c.gameObject.GetComponent<tk2dSpriteAnimator>();
+    if (animator)
+      animator.LateUpdate();
   }
 
   /// <summary>Add emissiveness to a game object</summary>
   public static void SetGlowiness(this GameObject g, float a)
   {
-    if (g.GetComponent<tk2dBaseSprite>() is not tk2dBaseSprite sprite)
-      return;
-    sprite.SetGlowiness(a);
+    if (g.GetComponent<tk2dBaseSprite>() is tk2dBaseSprite sprite)
+      sprite.SetGlowiness(a);
   }
 
   public static void SetGlowiness(this tk2dBaseSprite sprite, float glowAmount, Color? glowColor = null, Color? overrideColor = null, bool clampBrightness = true)
@@ -381,7 +394,7 @@ public static class Extensions
           yield return item;
       foreach(PickupObject item in player.activeItems)
           yield return item;
-      foreach(PickupObject item in player.inventory?.AllGuns.EmptyIfNull())
+      foreach(PickupObject item in player.inventory.AllGuns)
           yield return item;
       yield break;
   }
@@ -935,16 +948,16 @@ public static class Extensions
   /// <summary>Remove a shader from a gameObject</summary>
   public static void RemoveShader(this GameObject g, Shader shader)
   {
-    if (g?.GetComponent<MeshRenderer>() is not MeshRenderer component)
+    if (!g || g.GetComponent<MeshRenderer>() is not MeshRenderer mr)
       return;
-    Material[] sharedMaterials = component.sharedMaterials;
+    Material[] sharedMaterials = mr.sharedMaterials;
     List<Material> list = new List<Material>();
     for (int i = 0; i < sharedMaterials.Length; i++)
     {
       if (sharedMaterials[i].shader != shader)
         list.Add(sharedMaterials[i]);
     }
-    component.sharedMaterials = list.ToArray();
+    mr.sharedMaterials = list.ToArray();
   }
 
   /// <summary>Add a shader to a gameObject, and return the material for that shader</summary>
@@ -1009,7 +1022,9 @@ public static class Extensions
   /// <summary>Returns true if a projectile was fired from a gun without depleting ammo</summary>
   public static bool FiredForFree(this Projectile proj, Gun gun, ProjectileModule mod)
   {
-    return (mod.ammoCost == 0 || gun.InfiniteAmmo || gun.LocalInfiniteAmmo || ((proj.Owner as PlayerController)?.InfiniteAmmo?.Value ?? false));
+    if (proj.Owner is PlayerController pc && pc.InfiniteAmmo.Value)
+      return true;
+    return (mod.ammoCost == 0 || gun.InfiniteAmmo || gun.LocalInfiniteAmmo);
   }
 
   /// <summary>Add a component to an existing component's GameObject and return the component</summary>
@@ -1021,7 +1036,7 @@ public static class Extensions
   /// <summary>Returns or adds a component to an existing component's GameObject and return the component</summary>
   public static T GetOrAddComponent<T>(this Component component) where T : MonoBehaviour
   {
-    return component.gameObject.GetOrAddComponent<T>();
+    return (component.gameObject is not GameObject g) ? null : (g.GetComponent<T>() is not T t) ? g.AddComponent<T>() : t;
   }
 
   /// <summary>Get the internal name for a string</summary>
@@ -1085,16 +1100,21 @@ public static class Extensions
   /// <summary>Find a custom shop item currently under consideration by player</summary>
   public static CustomShopItemController GetTargetedItemByPlayer(this CustomShopController shop, PlayerController player)
   {
-      if (!shop?.transform)
-        return null;
+      if (!player || !shop || !shop.transform)
+          return null;
+      if (player.m_lastInteractionTarget is not IPlayerInteractable target)
+          return null;
       foreach (Transform child in shop.transform)
       {
-          CustomShopItemController[] shopItems =child?.gameObject?.GetComponentsInChildren<CustomShopItemController>();
-          if ((shopItems?.Length ?? 0) == 0)
+          if (!child || !child.gameObject)
+              continue;
+          if (child.gameObject.GetComponentsInChildren<CustomShopItemController>() is not CustomShopItemController[] shopItems)
+              continue;
+          if (shopItems.Length == 0)
               continue;
           if (shopItems[0] is not CustomShopItemController shopItem)
               continue;
-          if (player?.m_lastInteractionTarget?.Equals(shopItem) ?? false)
+          if (target.Equals(shopItem))
               return shopItem;
       }
       return null;
@@ -1215,14 +1235,14 @@ public static class Extensions
   /// <summary>Get the first element of a list if possible, returning null otherwise</summary>
   public static T SafeFirst<T>(this List<T> c)
   {
-    return ((c?.Count ?? 0) == 0) ? default(T) : c[0];
+    return (c == null || c.Count == 0) ? default(T) : c[0];
   }
 
   /// <summary>Get the first element of a list if possible, returning null otherwise</summary>
   public static Projectile FirstValidChargeProjectile(this ProjectileModule mod)
   {
     List<ChargeProjectile> c = mod.chargeProjectiles;
-    if ((c?.Count ?? 0) == 0)
+    if (c == null)
       return null;
     foreach (ChargeProjectile cp in c)
     {
@@ -1391,7 +1411,8 @@ public static class Extensions
       sprite.PlaceAtPositionByAnchor(pos, anchor.Value);
       if (quantize)
         sprite.transform.position = sprite.transform.position.Quantize(0.0625f);
-      g.GetComponent<SpeculativeRigidbody>()?.Reinitialize();
+      if (g.GetComponent<SpeculativeRigidbody>() is SpeculativeRigidbody body)
+        body.Reinitialize();
     }
     return g;
   }

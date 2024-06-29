@@ -103,8 +103,10 @@ public class EmergencySiren : CwaffActive
         {
             if (!enemy)
                 continue; // stupid grenades D:
-            enemy.behaviorSpeculator?.InterruptAndDisable();
-            enemy.knockbackDoer?.SetImmobile(true, "emergency_siren");
+            if (enemy.behaviorSpeculator)
+                enemy.behaviorSpeculator.InterruptAndDisable();
+            if (enemy.knockbackDoer)
+                enemy.knockbackDoer.SetImmobile(true, "emergency_siren");
             if (enemy.healthHaver)
             {
                 enemy.healthHaver.IsVulnerable = false;
@@ -121,7 +123,10 @@ public class EmergencySiren : CwaffActive
 
         ReadOnlyCollection<Projectile> allProjectiles = StaticReferenceManager.AllProjectiles;
         for (int num = allProjectiles.Count - 1; num >= 0; num--)
-            allProjectiles[num]?.DieInAir();
+        {
+            if (allProjectiles[num])
+                allProjectiles[num].DieInAir();
+        }
 
         this._roomToReset = room;
         this.passiveStatModifiers = _EmergencyMods;
@@ -191,8 +196,8 @@ public class EmergencySiren : CwaffActive
                 if (!aIActor)
                     continue;
 
-                if ((bool)aIActor.behaviorSpeculator)
-                    aIActor.behaviorSpeculator?.InterruptAndDisable();
+                if (aIActor.behaviorSpeculator)
+                    aIActor.behaviorSpeculator.InterruptAndDisable();
                 if (aIActor.healthHaver.IsBoss && aIActor.healthHaver.IsAlive)
                     aIActor.healthHaver.EndBossState(false);
                 UnityEngine.Object.Destroy(aIActor.gameObject);
@@ -203,10 +208,12 @@ public class EmergencySiren : CwaffActive
         foreach (TalkDoerLite talker in room.GetComponentsInRoom<TalkDoerLite>())
             talker.SendPlaymakerEvent("resetRoomLikeDarkSouls");
 
-        for (int m = 0; m < (room.bossTriggerZones?.Count ?? 0); m++)
-            room.bossTriggerZones[m].HasTriggered = false;
+        if (room.bossTriggerZones != null)
+            for (int m = 0; m < room.bossTriggerZones.Count; m++)
+                room.bossTriggerZones[m].HasTriggered = false;
 
-        room.remainingReinforcementLayers?.Clear();
+        if (room.remainingReinforcementLayers != null)
+            room.remainingReinforcementLayers.Clear();
         room.visibility = RoomHandler.VisibilityStatus.REOBSCURED;
         room.PreventStandardRoomReward = true;
 

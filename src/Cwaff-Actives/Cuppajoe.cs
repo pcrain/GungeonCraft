@@ -173,7 +173,7 @@ internal class Caffeination : MonoBehaviour
     {
         static bool Prefix(PlayerController __instance, Vector2 v, float gunAngle, bool invertThresholds, bool forceTwoHands, ref string __result)
         {
-            if (__instance.GetComponent<Caffeination>()?._state != Caffeination.State.CAFFEINATED)
+            if (__instance.GetComponent<Caffeination>() is not Caffeination caff || caff._state != Caffeination.State.CAFFEINATED)
                 return true;
 
             __result = GetCaffeinatedAnimationName(__instance, v, gunAngle, invertThresholds, forceTwoHands);

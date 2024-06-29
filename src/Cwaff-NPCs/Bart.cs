@@ -176,12 +176,14 @@ public class BarteringPriceFixer : MonoBehaviour
 {
     private void Start()
     {
-        if (base.gameObject?.transform?.parent is not Transform shopTransform)
+        if (!base.gameObject || !base.gameObject.transform || base.gameObject.transform.parent is not Transform shopTransform)
             return;
         foreach (Transform child in shopTransform)
         {
-            CustomShopItemController[] shopItems =child?.gameObject?.GetComponentsInChildren<CustomShopItemController>();
-            if ((shopItems?.Length ?? 0) == 0)
+            if (!child || !child.gameObject)
+                continue;
+            CustomShopItemController[] shopItems = child.gameObject.GetComponentsInChildren<CustomShopItemController>();
+            if (shopItems == null || shopItems.Length == 0)
                 continue;
             if (shopItems[0] is not CustomShopItemController shopItem)
                 continue;

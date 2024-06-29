@@ -283,7 +283,7 @@ public class AimuHakurei : CwaffGun
             if (this.graze < _GRAZE_MAX)
                 ++this.graze;
 
-            FancyVFX.Spawn(AimuHakurei._GrazeVFX, bottom, Quaternion.identity, parent: pc.sprite?.transform,
+            FancyVFX.Spawn(AimuHakurei._GrazeVFX, bottom, Quaternion.identity, parent: pc.sprite ? pc.sprite.transform : null,
                 velocity: 5f * Vector2.up, lifetime: 0.2f, fadeOutTime: 0.4f, emissiveColor: Color.white);
 
             PowerUp();

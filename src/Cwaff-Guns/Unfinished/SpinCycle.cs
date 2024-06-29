@@ -101,11 +101,13 @@ public class SpinCycle : CwaffGun
 
     private void DestroyBallAndChain()
     {
-        this._theCurBall?.DieInAir(true,false,false,true);
+        if (this._theCurBall)
+            this._theCurBall.DieInAir(true,false,false,true);
         this._theCurBall = null;
         if (!tieProjectilePositionToBeam)
             return;
-        this._theCurChain?.DestroyBeam();
+        if (this._theCurChain)
+            this._theCurChain.DestroyBeam();
         this._theCurChain = null;
     }
 

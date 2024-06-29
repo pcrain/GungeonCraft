@@ -112,7 +112,7 @@ public class MidasProjectile : MonoBehaviour
             s.PixelColliders.Add(pixelCollider);
             s.Initialize();
         g.AddComponent<GoldenDeath>();
-        // g.GetOrAddShader(Shader.Find("Brave/ItemSpecific/LootGlintAdditivePass"))?.SetColor("_OverrideColor", Color.yellow);
+        // g.GetOrAddShader(Shader.Find("Brave/ItemSpecific/LootGlintAdditivePass")).SetColor("_OverrideColor", Color.yellow);
 
         // if (enemy.aiActor.IsABoss()) // Unsure why this doesn't trigger normally, but this seems to fix it
         //     enemy.aiActor.ParentRoom.HandleRoomClearReward(); //TODO: it's possible non-boss room rewards also don't spawn if final enemy is midas'd...look into later

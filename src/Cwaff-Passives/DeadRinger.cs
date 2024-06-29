@@ -89,7 +89,8 @@ public class DeadRinger : CwaffPassive
     // copied and simplified from DoEffect() of CardboardBoxItem.cs
     private void BecomeInvisible()
     {
-        this.Owner.CurrentGun?.CeaseAttack(false);
+        if (this.Owner.CurrentGun)
+            this.Owner.CurrentGun.CeaseAttack(false);
         this.Owner.OnDidUnstealthyAction += BreakStealth;
         this.Owner.PostProcessProjectile += SneakAttackProcessor;
         // if (!CanAnyBossOrNPCSee(this.Owner)) // don't need this check, we can feign death in front of them
@@ -133,7 +134,7 @@ public class DeadRinger : CwaffPassive
     {
         if (JustBecameStealthy())
             return; // don't get sneak attack bonus immediately unless we become unstealthed
-        if (this.Owner?.IsStealthed ?? false)
+        if (this.Owner && this.Owner.IsStealthed)
             proj.baseData.damage *= _DEAD_RINGER_DAMAGE_MULT;
     }
 

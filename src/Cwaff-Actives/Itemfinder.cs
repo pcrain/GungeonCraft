@@ -128,7 +128,7 @@ public class Itemfinder : CwaffActive
 
     private bool IsViableTreasureRoom(RoomHandler room)
     {
-        if (room?.area == null)
+        if (room == null || room.area == null)
             return false;
         if (room.area.PrototypeRoomCategory != PrototypeDungeonRoom.RoomCategory.NORMAL && room.area.PrototypeRoomCategory != PrototypeDungeonRoom.RoomCategory.HUB)
             return false;

@@ -147,7 +147,7 @@ public class GyroscopeRoll : CustomDodgeRoll
 
     private void BounceAwayEnemies(SpeculativeRigidbody myRigidbody, PixelCollider myCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherCollider)
     {
-        if (!otherRigidbody?.aiActor?.healthHaver || otherRigidbody.aiActor.healthHaver.IsDead)
+        if (!otherRigidbody || !otherRigidbody.aiActor || !otherRigidbody.aiActor.healthHaver || otherRigidbody.aiActor.healthHaver.IsDead)
             return;
         AIActor aIActor = otherRigidbody.aiActor;
         Vector2 myNewVelocity, theirNewVelocity;

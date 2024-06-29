@@ -26,7 +26,9 @@ public class GunPowderer : CwaffActive
         {
             if (!debris.IsPickupObject)
                 continue;
-            if (debris.GetComponentInChildren<PickupObject>()?.GetComponent<Gun>() is not Gun gun)
+            if (debris.GetComponentInChildren<PickupObject>() is not PickupObject p)
+                continue;
+            if (p.GetComponent<Gun>() is not Gun gun)
                 continue;
 
             float gunDist = (gun.sprite.WorldCenter - user.sprite.WorldCenter).magnitude;

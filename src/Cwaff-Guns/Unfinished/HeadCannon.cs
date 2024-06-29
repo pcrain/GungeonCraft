@@ -56,17 +56,17 @@
 //             specRigidBody.OnCollision += this.OnCollision;
 //         }
 
-//         private void OnCollision(CollisionData tileCollision)
+//         private void OnCollision(CollisionData coll)
 //         {
 
-//             if (tileCollision.OtherRigidbody?.gameObject?.GetComponent<AIActor>() != null)
+//             if (!coll.OtherRigidbody || !coll.OtherRigidbody.gameObject || !coll.OtherRigidbody.gameObject.GetComponent<AIActor>())
 //                 return; //ignore collisions with enemies, we only care about walls
 
 //             PhysicsEngine.PostSliceVelocity     = new Vector2?(default(Vector2));
 //             SpeculativeRigidbody specRigidbody  = this.m_projectile.specRigidbody;
 //             specRigidbody.OnCollision          -= this.OnCollision;
 
-//             this.TeleportPlayerToPosition(this.m_owner, tileCollision.PostCollisionUnitCenter);
+//             this.TeleportPlayerToPosition(this.m_owner, coll.PostCollisionUnitCenter);
 //             this.m_projectile.DieInAir();
 //         }
 

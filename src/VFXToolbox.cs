@@ -1139,7 +1139,7 @@ public class OrbitalEffect : MonoBehaviour
         if (!this._didSetup)
             return;
 
-        if (this._enemy?.healthHaver?.IsDead ?? true)
+        if (!this._enemy || !this._enemy.healthHaver || this._enemy.healthHaver.IsDead)
         {
             HandleEnemyDied();
             return;

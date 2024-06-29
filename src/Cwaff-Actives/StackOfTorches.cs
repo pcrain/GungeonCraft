@@ -60,8 +60,8 @@ public class StackOfTorches : CwaffActive
         IntVector2 bestRewardLocation = room.GetBestRewardLocation(new IntVector2(2, 1));
         if (GameStatsManager.Instance.IsRainbowRun)
             LootEngine.SpawnBowlerNote(GameManager.Instance.RewardManager.BowlerNoteChest, bestRewardLocation.ToCenterVector2(), room, true);
-        else
-            room.SpawnRoomRewardChest(null, bestRewardLocation)?.ForceUnlock();
+        else if (room.SpawnRoomRewardChest(null, bestRewardLocation) is Chest chest)
+            chest.ForceUnlock();
     }
 
     public override void DoEffect(PlayerController user)
@@ -94,13 +94,15 @@ public class StackOfTorches : CwaffActive
         int roomTorches = ++_TorchesInRoom[room];
 
         // Once we've placed at least one torch, we should have at most one remaining wave of reinforcements
-        int numReinforcements = (room.remainingReinforcementLayers?.Count ?? 0);
-        while(numReinforcements > 1)
-            room.remainingReinforcementLayers.RemoveAt(--numReinforcements);
-
-        // It should take anywhere between 1-4 total torches to remove the remaining reinforcement waves for a room
-        if (numReinforcements > 0 && (0.25f * roomTorches) >= UnityEngine.Random.value)
-            room.ClearReinforcementLayers();
+        if (room.remainingReinforcementLayers is List<PrototypeRoomObjectLayer> layers)
+        {
+            int numReinforcements = layers.Count;
+            while(numReinforcements > 1)
+                room.remainingReinforcementLayers.RemoveAt(--numReinforcements);
+            // It should take anywhere between 1-4 total torches to remove the remaining reinforcement waves for a room
+            if (numReinforcements > 0 && (0.25f * roomTorches) >= UnityEngine.Random.value)
+                room.ClearReinforcementLayers();
+        }
 
         // Each torch should also have a 25% chance or so to remove the darkness effect
         if (room.IsDarkAndTerrifying && UnityEngine.Random.value <= _CHANCE_TO_END_DARK_ROOM)

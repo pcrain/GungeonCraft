@@ -141,7 +141,8 @@ public class Uppskeruvel : CwaffGun
         this._usedIndices.Clear();
 
         foreach (UppskeruvelCombatSoul soul in this._extantSouls)
-            soul?.Despawn();
+            if (soul)
+                soul.Despawn();
         this._extantSouls.Clear();
     }
 
@@ -201,7 +202,7 @@ public class Uppskeruvel : CwaffGun
     public static void DropLostSouls(AIActor enemy, bool hasSoulSearchingSynergy = false)
     {
         Vector2 ppos = enemy.CenterPosition;
-        int soulsToSpawn = Mathf.Min(_MAX_DROPS, Mathf.CeilToInt(_SOULS_PER_HEALTH * (enemy.healthHaver?.GetMaxHealth() ?? 0)));
+        int soulsToSpawn = Mathf.Min(_MAX_DROPS, enemy.healthHaver ? Mathf.CeilToInt(_SOULS_PER_HEALTH * enemy.healthHaver.GetMaxHealth()) : 0);
         if (hasSoulSearchingSynergy)
             soulsToSpawn *= 2;
         for (int i = 0; i < soulsToSpawn; ++i)
@@ -272,14 +273,14 @@ public class UppskeruvelProjectile : MonoBehaviour
 
     private void OnHitEnemy(Projectile bullet, SpeculativeRigidbody enemy, bool killed)
     {
-        if (!enemy?.aiActor || killed)
+        if (!enemy || !enemy.aiActor || killed)
             return;
         this._gun.LaunchAvailableSouls(enemy.aiActor);
     }
 
     private void OnWillKillEnemy(Projectile bullet, SpeculativeRigidbody enemy)
     {
-        if (!(enemy?.aiActor?.IsHostile() ?? false))
+        if (!enemy || !enemy.aiActor || !enemy.aiActor.IsHostile())
             return; // avoid processing effect for non-hostile enemies
 
         Uppskeruvel.DropLostSouls(enemy.aiActor, this._owner.PlayerHasActiveSynergy(Synergy.SOUL_SEARCHING));
@@ -337,7 +338,8 @@ public class UppskeruvelLostSoul : MonoBehaviour
             if (delta.sqrMagnitude > _PICKUP_RADIUS_SQR)
                 return;
 
-            this._owner.FindGun<Uppskeruvel>()?.AcquireSoul();
+            if (this._owner.FindGun<Uppskeruvel>() is Uppskeruvel upp)
+                upp.AcquireSoul();
             base.gameObject.PlayUnique("pickup_poe_soul_sound");
             float rotOffset = 90f * UnityEngine.Random.value;
             for (int i = 0; i < 4; ++i)
@@ -511,7 +513,7 @@ public class UppskeruvelCombatSoul : MonoBehaviour
                 GlideTowardsTarget();
                 break;
             case State.PRELAUNCH:
-                if (!(this._enemy?.healthHaver?.IsAlive ?? false))
+                if (!this._enemy || !this._enemy.healthHaver || !this._enemy.healthHaver.IsAlive)
                 {
                     this._state = State.FOLLOWING; // if we lost our target before getting to it, revert to following
                     break;
@@ -525,7 +527,7 @@ public class UppskeruvelCombatSoul : MonoBehaviour
                 GlideTowardsTarget();
                 break;
             case State.SEEKING:
-                if (!(this._enemy?.healthHaver?.IsAlive ?? false))
+                if (!this._enemy || !this._enemy.healthHaver || !this._enemy.healthHaver.IsAlive)
                 {
                     this._state = State.FOLLOWING; // if we lost our target before getting to it, revert to following
                     break;
@@ -534,8 +536,8 @@ public class UppskeruvelCombatSoul : MonoBehaviour
                 HomeTowardsTarget();
                 if ((this._basePos - this._targetPos).sqrMagnitude < 2f)
                 {
-                    this._enemy?.healthHaver?.ApplyDamage(Uppskeruvel._DAMAGE_PER_SOUL, this._velocity, "Uppskeruvel Soul", CoreDamageTypes.None, DamageCategory.Collision);
-                    if (this._enemy?.healthHaver?.IsDead ?? false)
+                    this._enemy.healthHaver.ApplyDamage(Uppskeruvel._DAMAGE_PER_SOUL, this._velocity, "Uppskeruvel Soul", CoreDamageTypes.None, DamageCategory.Collision);
+                    if (this._enemy && this._enemy.healthHaver && this._enemy.healthHaver.IsDead)
                         Uppskeruvel.DropLostSouls(this._enemy);
                     SpawnManager.SpawnVFX(Uppskeruvel._SoulExplodePrefab, this._targetPos.XY() + Lazy.RandomVector(0.4f), Quaternion.identity);
                     base.gameObject.PlayUnique("soul_impact_sound");

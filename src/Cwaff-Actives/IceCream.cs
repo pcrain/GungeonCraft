@@ -23,7 +23,9 @@ public class IceCream : CwaffActive
 
     public override bool CanBeUsed(PlayerController user)
     {
-        if (user.CurrentRoom?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> roomEnemies)
+        if (user.CurrentRoom is not RoomHandler room)
+            return false;
+        if (room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> roomEnemies)
             return false;
 
         Vector2 ppos = user.sprite.WorldCenter;
@@ -36,7 +38,9 @@ public class IceCream : CwaffActive
 
     public override void DoEffect(PlayerController user)
     {
-        if (user.CurrentRoom?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> roomEnemies)
+        if (user.CurrentRoom is not RoomHandler room)
+            return;
+        if (room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> roomEnemies)
             return;
 
         Vector2 ppos = user.sprite.WorldCenter;
@@ -147,7 +151,7 @@ public class HappyIceCreamHaver : MonoBehaviour
 
     private void AdjustBehaviors()
     {
-        if (this._enemy.aiShooter?.behaviorSpeculator is not BehaviorSpeculator bs)
+        if (!this._enemy.aiShooter || this._enemy.aiShooter.behaviorSpeculator is not BehaviorSpeculator bs)
             return;
 
         bs.AttackBehaviors   = new();
@@ -207,7 +211,9 @@ public class HappyIceCreamHaver : MonoBehaviour
 
     internal static bool NeedsIceCream(AIActor enemy)
     {
-        if (enemy?.aiShooter?.behaviorSpeculator?.AttackBehaviors == null)
+        if (!enemy || !enemy.aiShooter || !enemy.aiShooter.behaviorSpeculator)
+            return false;
+        if (enemy.aiShooter.behaviorSpeculator.AttackBehaviors == null)
             return false;
         if (enemy.GetComponent<HappyIceCreamHaver>())
             return false;
@@ -272,34 +278,39 @@ public class TargetPourSoulsWithoutIceCreamBehavior : TargetBehaviorBase  //TODO
 
         m_losTimer = SearchInterval;
         m_behaviorSpeculator.PlayerTarget = NearestEnemyThatReallyNeedsIceCream(m_aiActor);
-        if (m_behaviorSpeculator.PlayerTarget)
-            m_aiShooter?.AimAtPoint(m_behaviorSpeculator.PlayerTarget.CenterPosition);
+        if (m_behaviorSpeculator.PlayerTarget && m_aiShooter)
+            m_aiShooter.AimAtPoint(m_behaviorSpeculator.PlayerTarget.CenterPosition);
 
         return BehaviorResult.SkipRemainingClassBehaviors;
     }
 
     internal static GameActor NearestEnemyThatReallyNeedsIceCream(AIActor iceCreamHaver)
     {
+        Vector2 pos = iceCreamHaver.sprite.WorldCenter;
+        List<AIActor> enemies = null;
+        if (pos.GetAbsoluteRoom() is RoomHandler room)
+            enemies = room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
+
         GameActor target = null;
         float bestDist = 9999f;
-        Vector2 pos = iceCreamHaver.sprite.WorldCenter;
-        foreach (AIActor other in pos.GetAbsoluteRoom()?.GetActiveEnemies(RoomHandler.ActiveEnemyType.All).EmptyIfNull())
-        {
-            if (other == iceCreamHaver)
-                continue;
-            if (!HappyIceCreamHaver.NeedsIceCream(other))
-                continue;
-            float dist = (pos - other.sprite.WorldCenter).sqrMagnitude;
-            if (dist > bestDist)
-                continue;
-            if (dist < HappyIceCreamHaver._SHARE_RANGE_SQUARED)
+        if (enemies != null)
+            foreach (AIActor other in enemies)
             {
-                HappyIceCreamHaver.ShareIceCream(other);
-                continue;
+                if (other == iceCreamHaver)
+                    continue;
+                if (!HappyIceCreamHaver.NeedsIceCream(other))
+                    continue;
+                float dist = (pos - other.sprite.WorldCenter).sqrMagnitude;
+                if (dist > bestDist)
+                    continue;
+                if (dist < HappyIceCreamHaver._SHARE_RANGE_SQUARED)
+                {
+                    HappyIceCreamHaver.ShareIceCream(other);
+                    continue;
+                }
+                bestDist = dist;
+                target = other;
             }
-            bestDist = dist;
-            target = other;
-        }
         if (target)
             return target;
 
