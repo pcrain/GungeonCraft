@@ -25,19 +25,51 @@ public class PaintballCannon : CwaffGun
             g.InFlightSpawnFrequency = 0.01f;
           });
     }
+
+    public override void PostProcessProjectile(Projectile projectile)
+    {
+        if (this.PlayerOwner && this.PlayerOwner.PlayerHasActiveSynergy(Synergy.MASTERY_PAINTBALL_CANNON))
+            projectile.GetComponent<PaintballColorizer>().mastered = true;
+    }
 }
 
 public class PaintballColorizer : MonoBehaviour
 {
+    private enum Goop { CHARM, FIRE, CHEESE, ELECTRIC, POISON, WATER, WEB, ICE };
+
     private Color _tint;
+
+    public bool mastered = false;
 
     private void Start()
     {
         Projectile p = base.GetComponent<Projectile>();
 
         int i = UnityEngine.Random.Range(0, EasyGoopDefinitions.ColorGoopColors.Count);
+        Goop g = (Goop)i;
         this._tint = EasyGoopDefinitions.ColorGoopColors[i];
-        p.GetComponent<GoopModifier>().goopDefinition = EasyGoopDefinitions.ColorGoops[i];
+        GoopModifier gm = p.GetComponent<GoopModifier>();
+        if (this.mastered)
+        {
+            gm.CollisionSpawnRadius *= 2f;
+            gm.goopDefinition = g switch {
+                Goop.CHARM    => EasyGoopDefinitions.CharmGoopDef, // pink   == charm
+                Goop.FIRE     => EasyGoopDefinitions.FireDef,      // red    == fire
+                Goop.CHEESE   => EasyGoopDefinitions.CheeseDef,    // orange == cheese
+                Goop.ELECTRIC => EasyGoopDefinitions.WaterGoop,    // yellow == electrified water
+                Goop.POISON   => EasyGoopDefinitions.PoisonDef,    // green  == poison
+                Goop.WATER    => EasyGoopDefinitions.WaterGoop,    // blue   == water
+                Goop.WEB      => EasyGoopDefinitions.WebGoop,      // purple == web
+                Goop.ICE      => EasyGoopDefinitions.WaterGoop,    // cyan   == ice
+                _ => throw new NotSupportedException(),
+            };
+            if (g == Goop.ELECTRIC)
+                p.damageTypes |= CoreDamageTypes.Electric;
+            else if (g == Goop.ICE)
+                p.damageTypes |= CoreDamageTypes.Ice;
+        }
+        else
+            gm.goopDefinition = EasyGoopDefinitions.ColorGoops[i];
 
         p.AdjustPlayerProjectileTint(_tint, priority: 1);
         p.OnHitEnemy += this.OnHitEnemy;

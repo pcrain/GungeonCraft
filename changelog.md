@@ -2,7 +2,7 @@
 
 ## TBD
 
-- Added mastery for Vacuum Cleaner
+- Added masteries for Vacuum Cleaner and Paintball Cannon
 - Added indicator for amount of debris vacuumed to Vacuum Cleaner ammo display
 - Vacuum Cleaner debris is now processed when it is actually absorbed, rather than when it is suctioned
 

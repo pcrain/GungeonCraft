@@ -68,6 +68,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfHolyWaterGun>(MASTERY_HOLY_WATER_GUN, HolyWaterGun.ItemName);
         // Every Junk vacuumed produces a full ammo box, and every 16 corpses vacuumed produces a piece of armor
         NewMastery<MasteryOfVacuumCleaner>(MASTERY_VACUUM_CLEANER, VacuumCleaner.ItemName);
+        // Projectiles spawn status effect goops corresponding to their color while in flight and upon impact
+        NewMastery<MasteryOfPaintballCannon>(MASTERY_PAINTBALL_CANNON, PaintballCannon.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -267,6 +269,7 @@ internal class MasteryOfHatchlingGun    : MasteryDummyItem {}
 internal class MasteryOfCrapshooter     : MasteryDummyItem {}
 internal class MasteryOfHolyWaterGun    : MasteryDummyItem {}
 internal class MasteryOfVacuumCleaner   : MasteryDummyItem {}
+internal class MasteryOfPaintballCannon : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -294,4 +297,5 @@ public enum Synergy {
     MASTERY_CRAPSHOOTER,
     MASTERY_HOLY_WATER_GUN,
     MASTERY_VACUUM_CLEANER,
+    MASTERY_PAINTBALL_CANNON,
 };
