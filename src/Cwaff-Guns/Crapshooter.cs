@@ -43,6 +43,11 @@ public class Crapshooter : CwaffGun
           );
     }
 
+    private void Explode(Projectile p)
+    {
+        Exploder.Explode(p.SafeCenter, Bouncer._MiniExplosion, p.Direction);
+    }
+
     public override void PostProcessProjectile(Projectile projectile)
     {
         base.PostProcessProjectile(projectile);
@@ -63,8 +68,7 @@ public class Crapshooter : CwaffGun
                 break;
             case 3: // explosive dice
                 projectile.baseData.damage *= 3f;
-                projectile.OnDestruction += (Projectile p) => Exploder.Explode( //TODO: refactor to use normal method
-                    p.SafeCenter, Bouncer._MiniExplosion, p.Direction);
+                projectile.OnDestruction += this.Explode;
                 break;
             case 4: // homing dice
                 projectile.baseData.damage *= 4f;
@@ -123,16 +127,14 @@ public class DiceProjectile : MonoBehaviour
     private const float _ROTATION_COEFF = 20f;
     private const float _ROT_RATE       = _ROTATION_COEFF * 360f;
 
-    private Projectile _projectile     = null;
-    private PlayerController _owner    = null;
-    private GrenadeProjectile _grenade = null;
-    private float _rotation            = 0.0f;
+    private GrenadeProjectile _projectile = null;
+    private PlayerController _owner       = null;
+    private float _rotation               = 0.0f;
 
     private void Start()
     {
-        this._projectile = base.GetComponent<Projectile>();
+        this._projectile = base.GetComponent<GrenadeProjectile>();
         this._owner = this._projectile.Owner as PlayerController;
-        this._grenade = base.GetComponent<GrenadeProjectile>();
 
         this._projectile.spriteAnimator.Stop(); // use our default animation frame
         this._projectile.baseData.speed *= 0.95f + 1.05f * UnityEngine.Random.value; // randomize the velocity slightly
@@ -141,10 +143,10 @@ public class DiceProjectile : MonoBehaviour
 
     private void Update()
     {
-        if (!this._projectile || !this._grenade)
+        if (!this._projectile)
             return;
 
-        float newHeight = this._grenade.m_currentHeight + (this._grenade.m_current3DVelocity.z + this._projectile.LocalDeltaTime * -10f) * this._projectile.LocalDeltaTime;
+        float newHeight = this._projectile.m_currentHeight + (this._projectile.m_current3DVelocity.z + this._projectile.LocalDeltaTime * -10f) * this._projectile.LocalDeltaTime;
         if (newHeight < 0) // we just bounced, so play some nice dice sounds
             base.gameObject.Play(Crapshooter._DiceSounds.ChooseRandom());
 

@@ -349,6 +349,9 @@ public class Initialisation : BaseUnityPlugin
                     "breegull_grenade_ui",      Breegull._GrenadeUI,
                     "breegull_ice_ui",          Breegull._IceUI,
                     "breegull_normal_ui",       Breegull._NormalUI,
+
+                    "debris_ui",                VacuumCleaner._DebrisUI,
+                    "corpse_ui",                VacuumCleaner._CorpseUI,
                 });
                 setupUIWatch.Stop();
             #endregion

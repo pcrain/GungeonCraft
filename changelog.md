@@ -2,6 +2,10 @@
 
 ## TBD
 
+- Added mastery for Vacuum Cleaner
+- Added indicator for amount of debris vacuumed to Vacuum Cleaner ammo display
+- Vacuum Cleaner debris is now processed when it is actually absorbed, rather than when it is suctioned
+
 - Fixed R.C. Launcher projectiles slowing down too much at higher frame rates
 - Fixed drop Jugglernaut guns having collision that can interfere with the player's movement
 - Fixed several null derefs caused by Magunet debris projectiles not resetting their sprites properly when launched

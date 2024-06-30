@@ -1134,7 +1134,7 @@ public static class Extensions
 
   /// <summary>Get Debris objects within a cone of vision from some reference position, optionally checking at most limit debris</summary>
   private static int _nextDebris = 0;
-  public static IEnumerable<DebrisObject> DebrisWithinCone(this Vector2 start, float squareReach, float angle, float spread, int limit = -1)
+  public static IEnumerable<DebrisObject> DebrisWithinCone(this Vector2 start, float squareReach, float angle, float spread, int limit = -1, bool allowJunk = false)
   {
       int total = StaticReferenceManager.AllDebris.Count;
       if (total == 0)
@@ -1163,6 +1163,7 @@ public static class Extensions
           if (!debris || !debris.isActiveAndEnabled || !debris.HasBeenTriggered)
               continue; // not triggered yet
           if (debris.IsPickupObject || debris.Priority == EphemeralObject.EphemeralPriority.Critical)
+            if (!allowJunk || !debris.IsPickupObject || (debris.GetComponent<PickupObject>().PickupObjectId != (int)Items.Junk))
               continue; // don't vacuum up important objects
           Vector2 deltaVec = (debris.gameObject.transform.position.XY() - start);
           if (deltaVec.sqrMagnitude > squareReach || !deltaVec.ToAngle().IsNearAngle(angle, spread))

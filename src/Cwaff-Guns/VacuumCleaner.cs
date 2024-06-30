@@ -8,6 +8,8 @@ public class VacuumCleaner : CwaffGun
     public static string Lore             = "Over time, the Gungeon naturally accrues a substantial amount of shrapnel, corpses, and other garbage as Gungeoneers fight their way through hordes of Gundead. The Gungeon's relatively pristine state as each new adventurer begins their descent is thanks largely to the Gungeon Janitorial Crew, whose work largely goes unnoticed and unthanked. Observing how adventurers had a penchant for using guns with flashy particle effects, one cunning janitor modified a few vacuum cleaners to electrify the latent argon in the Gungeon, creating some fancy green eddies in the air as the vacuums are running. The janitor stuffed a few of these modified vacuums in chests, hoping adventurers would be distracted enough by the particles to not notice the complete lack of damage as they unwittingly cleaned the dungeon and made the GJC's lives a little easier.";
 
     internal static GameObject _VacuumVFX = null;
+    internal static string _CorpseUI      = $"{C.MOD_PREFIX}:_CorpseUI";
+    internal static string _DebrisUI      = $"{C.MOD_PREFIX}:_DebrisUI";
 
     internal const float _REACH            =  8.00f; // how far (in tiles) the gun reaches
     internal const float _SPREAD           =    10f; // width (in degrees) of how wide our cone of suction is at the end of our reach
@@ -18,11 +20,14 @@ public class VacuumCleaner : CwaffGun
     internal const float _AMMO_AMT         =  0.01f; // percent ammo restored to a random gun selected with _AMMO_CHANCE per debris
     internal const float _CASING_CHANCE    =  0.01f; // percent chance debris grants a casing with the Cleanup Crew synergy
     internal const int   _FLOOR_CASINGS    =     20; // max number of casings that can be picked up this floor
+    internal const int   _CORPSE_PER_ARMOR =     16; // number of corpses we need to absorb before producing armor
 
     internal const float _SQR_REACH   = _REACH * _REACH; // avoid an unnecessary sqrt() by using sqrmagnitude
 
-    private int _debrisSucked = 0;
     private int _casingsThisFloor = 0;
+
+    public int debrisSucked = 0;
+    public int corpsesSucked = 0;
 
     public static void Init()
     {
@@ -30,6 +35,8 @@ public class VacuumCleaner : CwaffGun
             gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.CHARGE, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true, chargeFps: 16);
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
             gun.AddToSubShop(ModdedShopType.Rusty);
+
+        gun.gameObject.AddComponent<VacuumAmmoDisplay>();
 
         gun.InitProjectile(GunData.New(clipSize: -1, shootStyle: ShootStyle.Charged, ammoType: GameUIAmmoType.AmmoType.BEAM, chargeTime: float.MaxValue)); // absurdly high charge value so we never actually shoot
 
@@ -56,8 +63,6 @@ public class VacuumCleaner : CwaffGun
 
     private void OnNewFloorReached()
     {
-        if (C.DEBUG_BUILD)
-            ETGModConsole.Log($"resetting casings from {this._casingsThisFloor} to 0");
         this._casingsThisFloor = 0;
     }
 
@@ -101,18 +106,19 @@ public class VacuumCleaner : CwaffGun
         Lazy.PlaySoundUntilDeathOrTimeout(soundName: "suction_loop", source: this.gun.gameObject, timer: 0.05f);
 
         Vector2 gunpos = this.gun.barrelOffset.position;
+        bool mastered = player.PlayerHasActiveSynergy(Synergy.MASTERY_VACUUM_CLEANER);
 
         // Particle effect creation logic should not be tied to framerate
         if (UnityEngine.Random.value < 0.66f * (BraveTime.DeltaTime * C.FPS))
         {
             float angleFromGun = this.gun.CurrentAngle + UnityEngine.Random.Range(-_SPREAD, _SPREAD);
             GameObject o = SpawnManager.SpawnVFX(_VacuumVFX, (gunpos + angleFromGun.ToVector(_REACH)).ToVector3ZUp(), Lazy.RandomEulerZ());
-            o.AddComponent<VacuumParticle>().Setup(this.gun, _REACH);
+            o.AddComponent<VacuumParticle>().Setup(this, _REACH);
         }
 
         float minAngle = this.gun.CurrentAngle - _SPREAD;
         float maxAngle = this.gun.CurrentAngle + _SPREAD;
-        foreach(DebrisObject debris in gunpos.DebrisWithinCone(_SQR_REACH, this.gun.CurrentAngle, _SPREAD, limit: 100))
+        foreach(DebrisObject debris in gunpos.DebrisWithinCone(_SQR_REACH, this.gun.CurrentAngle, _SPREAD, limit: 100, allowJunk: mastered))
         {
             if (debris.gameObject.GetComponent<VacuumParticle>())
                 continue; // already added a vacuum particle component
@@ -127,16 +133,79 @@ public class VacuumCleaner : CwaffGun
             debris.enabled = false;
 
             // Actually add the VacuumParticle component to it
-            debris.gameObject.AddComponent<VacuumParticle>().Setup(this.gun, (debris.gameObject.transform.position.XY() - gunpos).magnitude);
-            ++this._debrisSucked;
-            MaybeRestoreAmmo();
-            if ((UnityEngine.Random.value <= _CASING_CHANCE) && player.PlayerHasActiveSynergy(Synergy.CLEANUP_CREW) && this._casingsThisFloor < _FLOOR_CASINGS)
-            {
-                ++this._casingsThisFloor;
-                if (C.DEBUG_BUILD)
-                    ETGModConsole.Log($"got casing {_casingsThisFloor} / 20");
-                LootEngine.SpawnCurrency(this.PlayerOwner.CenterPosition, 1);
-            }
+            debris.gameObject.AddComponent<VacuumParticle>().Setup(this, (debris.gameObject.transform.position.XY() - gunpos).magnitude);
+        }
+    }
+
+    public void ProcessDebris(DebrisObject debris)
+    {
+        if (this.PlayerOwner is not PlayerController player)
+            return;
+
+        ++this.debrisSucked;
+        MaybeRestoreAmmo();
+        if ((UnityEngine.Random.value <= _CASING_CHANCE) && player.PlayerHasActiveSynergy(Synergy.CLEANUP_CREW) && this._casingsThisFloor < _FLOOR_CASINGS)
+        {
+            ++this._casingsThisFloor;
+            LootEngine.SpawnCurrency(player.CenterPosition, 1);
+        }
+
+        if (!player.PlayerHasActiveSynergy(Synergy.MASTERY_VACUUM_CLEANER))
+            return;
+
+        if (debris.IsCorpse && ((++corpsesSucked) >= _CORPSE_PER_ARMOR))
+        {
+            // ETGModConsole.Log($"got corpse");
+            this.gun.gameObject.Play("vacuum_process_armor_sound");
+            corpsesSucked -= _CORPSE_PER_ARMOR;
+            LootEngine.SpawnItem(ItemHelper.Get(Items.Armor).gameObject, player.CenterPosition, Vector2.zero, 0f, true, true, false);
+        }
+        if (debris.IsPickupObject && debris.GetComponent<PickupObject>() is PickupObject pickup && pickup.PickupObjectId == (int)Items.Junk)
+        {
+            // ETGModConsole.Log($"got junk");
+            this.gun.gameObject.Play("vacuum_process_armor_sound");
+            LootEngine.SpawnItem(ItemHelper.Get(Items.Ammo).gameObject, player.CenterPosition, Vector2.zero, 0f, true, true, false);
+        }
+    }
+
+    public override void MidGameSerialize(List<object> data, int i)
+    {
+        base.MidGameSerialize(data, i);
+        data.Add(this.debrisSucked);
+    }
+
+    public override void MidGameDeserialize(List<object> data, ref int i)
+    {
+        base.MidGameDeserialize(data, ref i);
+        this.debrisSucked = (int)data[i++];
+    }
+
+    private class VacuumAmmoDisplay : CustomAmmoDisplay
+    {
+        private VacuumCleaner _vac;
+        private PlayerController _owner;
+
+        private void Start()
+        {
+            Gun gun     = base.GetComponent<Gun>();
+            this._vac   = gun.GetComponent<VacuumCleaner>();
+            this._owner = gun.CurrentOwner as PlayerController;
+        }
+
+        public override bool DoCustomAmmoDisplay(GameUIAmmoController uic)
+        {
+            if (!this._owner)
+                return false;
+
+            uic.SetAmmoCountLabelColor(Color.white);
+            uic.GunAmmoCountLabel.AutoHeight = true; // enable multiline text
+            uic.GunAmmoCountLabel.ProcessMarkup = true; // enable multicolor text
+
+            if (this._owner.PlayerHasActiveSynergy(Synergy.MASTERY_VACUUM_CLEANER))
+                uic.GunAmmoCountLabel.Text = $"[sprite \"{VacuumCleaner._CorpseUI}\"]x{this._vac.corpsesSucked}\n[sprite \"{VacuumCleaner._DebrisUI}\"]x{this._vac.debrisSucked}";
+            else
+                uic.GunAmmoCountLabel.Text = $"[sprite \"{VacuumCleaner._DebrisUI}\"]x{this._vac.debrisSucked}";
+            return true;
         }
     }
 }
@@ -150,6 +219,7 @@ public class VacuumParticle : MonoBehaviour
     private const float _MAX_ALPHA          = 0.5f;
     private const float _DLT_ALPHA          = 0.01f;
 
+    private VacuumCleaner _vac     = null;
     private Gun _gun               = null;
     private tk2dBaseSprite _sprite = null;
     private float _accel           = 0.0f;
@@ -162,9 +232,10 @@ public class VacuumParticle : MonoBehaviour
     private float _startScaleX     = 1.0f;
     private float _startScaleY     = 1.0f;
 
-    public void Setup(Gun g, float startDistance = 0.0f)
+    public void Setup(VacuumCleaner vac, float startDistance = 0.0f)
     {
-        this._gun           = g;
+        this._vac           = vac;
+        this._gun           = vac.gun;
         this._startDistance = startDistance;
         this._debris        = base.gameObject.GetComponent<DebrisObject>();
         this._isDebris      = this._debris != null;
@@ -178,6 +249,11 @@ public class VacuumParticle : MonoBehaviour
     {
         if (BraveTime.DeltaTime == 0.0f)
             return; // nothing to do if time isn't passing
+        if (!this._vac)
+        {
+            UnityEngine.GameObject.Destroy(base.gameObject);
+            return; // our vacuum cleaner no longer exists for some reason, so bail out
+        }
 
         // handle particle fading logic exclusive to the vacuum particles
         if (!this._isDebris)
@@ -196,6 +272,8 @@ public class VacuumParticle : MonoBehaviour
         float mag = towardsVacuum.magnitude;
         if (mag < _MIN_DIST_TO_VACUUM)
         {
+            if (this._isDebris)
+                this._vac.ProcessDebris(this._debris);
             UnityEngine.GameObject.Destroy(base.gameObject);
             return;
         }

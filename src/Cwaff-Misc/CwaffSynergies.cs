@@ -66,6 +66,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfCrapshooter>(MASTERY_CRAPSHOOTER, Crapshooter.ItemName);
         // Holy Water Gun deals 16x damage to Jammed enemies. Killing Jammed enemies creates pools of holy goop that grant invulnerability and infinite ammo while active.
         NewMastery<MasteryOfHolyWaterGun>(MASTERY_HOLY_WATER_GUN, HolyWaterGun.ItemName);
+        // Every Junk vacuumed produces a full ammo box, and every 16 corpses vacuumed produces a piece of armor
+        NewMastery<MasteryOfVacuumCleaner>(MASTERY_VACUUM_CLEANER, VacuumCleaner.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -264,6 +266,7 @@ internal class MasteryOfSchrodingersGat : MasteryDummyItem {}
 internal class MasteryOfHatchlingGun    : MasteryDummyItem {}
 internal class MasteryOfCrapshooter     : MasteryDummyItem {}
 internal class MasteryOfHolyWaterGun    : MasteryDummyItem {}
+internal class MasteryOfVacuumCleaner   : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -290,4 +293,5 @@ public enum Synergy {
     MASTERY_HATCHLING_GUN,
     MASTERY_CRAPSHOOTER,
     MASTERY_HOLY_WATER_GUN,
+    MASTERY_VACUUM_CLEANER,
 };

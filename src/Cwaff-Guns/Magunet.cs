@@ -111,7 +111,7 @@ public class Magunet : CwaffGun
             }
         }
 
-        foreach(DebrisObject debris in gunpos.DebrisWithinCone(_SQR_REACH, this.gun.CurrentAngle, _SPREAD, limit: 100))
+        foreach(DebrisObject debris in gunpos.DebrisWithinCone(_SQR_REACH, this.gun.CurrentAngle, _SPREAD, limit: 100, allowJunk: false))
         {
             if (debris.gameObject.GetComponent<MagnetParticle>())
                 continue; // already added a magnet particle component
