@@ -43,6 +43,8 @@ public static class CwaffSynergies
         NewSynergy(CLEANUP_CREW, "Cleanup Crew", new[]{IName(VacuumCleaner.ItemName), IName(CustodiansBadge.ItemName)});
         // Vacuum's chance to restore ammo is increased to 4%.
         NewSynergy(SCAVENGEST, "Scavengest", new[]{IName(VacuumCleaner.ItemName), IName(ScavengingArms.ItemName)});
+        // When taking an otherwise fatal hit, if the player has at least 100 casings, damage is negated and the player loses 100 casings instead.
+        NewSynergy(DEATH_AND_TAXES, "Death and Taxes", new[]{IName(CreditCard.ItemName), IName(BlankChecks.ItemName)});
       #endregion
 
       #region Masteries
@@ -293,6 +295,7 @@ public enum Synergy {
     SOUL_SEARCHING,
     CLEANUP_CREW,
     SCAVENGEST,
+    DEATH_AND_TAXES,
 
     // Masteries
     MASTERY_GRANDMASTER,

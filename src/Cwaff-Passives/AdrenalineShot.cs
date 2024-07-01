@@ -186,37 +186,9 @@ public class AdrenalineShot : CwaffPassive
 
         data.ModifiedDamage = 0f;
         hh.TriggerInvulnerabilityPeriod();
-        DoFlash(hh);
+        Lazy.DoDamagedFlash(hh);
         if (!this._adrenalineActive)
             ActivateAdrenaline();
-    }
-
-    // yoinked from HealthHaver.ApplyDamageDirectional()
-    private void DoFlash(HealthHaver hh)
-    {
-        if (!(hh.flashesOnDamage && hh.spriteAnimator != null && !hh.m_isFlashing))
-            return;
-
-        if (hh.m_flashOnHitCoroutine != null)
-            hh.StopCoroutine(hh.m_flashOnHitCoroutine);
-        hh.m_flashOnHitCoroutine = null;
-        if (hh.materialsToFlash == null)
-        {
-            hh.materialsToFlash = new List<Material>();
-            hh.outlineMaterialsToFlash = new List<Material>();
-            hh.sourceColors = new List<Color>();
-        }
-        if ((bool)hh.gameActor)
-            for (int k = 0; k < hh.materialsToFlash.Count; k++)
-                hh.materialsToFlash[k].SetColor("_OverrideColor", hh.gameActor.CurrentOverrideColor);
-        if (hh.outlineMaterialsToFlash != null)
-            for (int l = 0; l < hh.outlineMaterialsToFlash.Count; l++)
-            {
-                if (l >= hh.sourceColors.Count)
-                    break;
-                hh.outlineMaterialsToFlash[l].SetColor("_OverrideColor", hh.sourceColors[l]);
-            }
-        hh.m_flashOnHitCoroutine = hh.StartCoroutine(hh.FlashOnHit(DamageCategory.Normal, null));
     }
 
     private void ActivateAdrenaline()

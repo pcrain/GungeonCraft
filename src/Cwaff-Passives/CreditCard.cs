@@ -7,8 +7,9 @@ public class CreditCard : CwaffPassive
     public static string LongDescription  = "Grants 500 shells while picked up. Grants 1 curse for every 50 shells below 500, and 1 coolness for every 50 shells above 500. Cannot be dropped when possessing fewer than 500 shells.";
     public static string Lore             = "Perhaps the greatest emblem of 20th century economics, this handy little piece of plastic gives unprecedented purchasing power for all of your Gungeon needs. Comes with the teensiest of interest rates, charged directly to your soul for your convenience.";
 
-    internal const int _BASE_CREDIT  = 500;
-    internal const int _CREDIT_DELTA = 50;
+    internal const int _BASE_CREDIT      = 500;
+    internal const int _CHEAT_DEATH_COST = 100;
+    internal const int _CREDIT_DELTA     = 50;
 
     private int oldCurrency       = 0;
     private StatModifier curseMod = null;
@@ -37,6 +38,7 @@ public class CreditCard : CwaffPassive
         }
 
         base.Pickup(player);
+        player.healthHaver.ModifyDamage += this.OnTakeDamage;
         oldCurrency = _BASE_CREDIT;
         GameManager.Instance.PrimaryPlayer.carriedConsumables.Currency += _BASE_CREDIT;
         UpdateCreditScore();
@@ -45,7 +47,33 @@ public class CreditCard : CwaffPassive
     public override DebrisObject Drop(PlayerController player)
     {
         GameManager.Instance.PrimaryPlayer.carriedConsumables.Currency -= _BASE_CREDIT;
+        player.healthHaver.ModifyDamage -= this.OnTakeDamage;
         return base.Drop(player);
+    }
+
+    public override void OnDestroy()
+    {
+        if (this.Owner)
+            this.Owner.healthHaver.ModifyDamage -= this.OnTakeDamage;
+        base.OnDestroy();
+    }
+
+    private void OnTakeDamage(HealthHaver hh, HealthHaver.ModifyDamageEventArgs data)
+    {
+        if (!hh.PlayerWillDieFromHit(data))
+            return;
+        if (hh.GetComponent<PlayerController>() is not PlayerController player)
+            return;
+        if (player.carriedConsumables.Currency < _CHEAT_DEATH_COST)
+            return;
+        if (!player.PlayerHasActiveSynergy(Synergy.DEATH_AND_TAXES))
+            return;
+        player.carriedConsumables.Currency -= _CHEAT_DEATH_COST;
+
+        data.ModifiedDamage = 0f;
+        hh.TriggerInvulnerabilityPeriod();
+        Lazy.DoDamagedFlash(hh);
+        player.DoGenericItemActivation(this);
     }
 
     public override void Update()

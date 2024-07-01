@@ -928,4 +928,32 @@ public static class Lazy
         silencerInstance.TriggerSilencer(pos, 20f, radius, _BlankVFXPrefab, 0f, 3f, 3f, 3f, 30f, 3f, additionalTimeAtMaxRadius, user, false);
         AkSoundEngine.PostEvent("Play_OBJ_silenceblank_small_01", gameObject);
     }
+
+    /// <summary>Do a brief flash after taking damage [yoinked from HealthHaver.ApplyDamageDirectional()]</summary>
+    public static void DoDamagedFlash(HealthHaver hh)
+    {
+        if (!(hh.flashesOnDamage && hh.spriteAnimator != null && !hh.m_isFlashing))
+            return;
+
+        if (hh.m_flashOnHitCoroutine != null)
+            hh.StopCoroutine(hh.m_flashOnHitCoroutine);
+        hh.m_flashOnHitCoroutine = null;
+        if (hh.materialsToFlash == null)
+        {
+            hh.materialsToFlash = new List<Material>();
+            hh.outlineMaterialsToFlash = new List<Material>();
+            hh.sourceColors = new List<Color>();
+        }
+        if ((bool)hh.gameActor)
+            for (int k = 0; k < hh.materialsToFlash.Count; k++)
+                hh.materialsToFlash[k].SetColor("_OverrideColor", hh.gameActor.CurrentOverrideColor);
+        if (hh.outlineMaterialsToFlash != null)
+            for (int l = 0; l < hh.outlineMaterialsToFlash.Count; l++)
+            {
+                if (l >= hh.sourceColors.Count)
+                    break;
+                hh.outlineMaterialsToFlash[l].SetColor("_OverrideColor", hh.sourceColors[l]);
+            }
+        hh.m_flashOnHitCoroutine = hh.StartCoroutine(hh.FlashOnHit(DamageCategory.Normal, null));
+    }
 }
