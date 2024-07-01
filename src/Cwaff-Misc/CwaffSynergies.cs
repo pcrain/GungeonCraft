@@ -45,6 +45,10 @@ public static class CwaffSynergies
         NewSynergy(SCAVENGEST, "Scavengest", new[]{IName(VacuumCleaner.ItemName), IName(ScavengingArms.ItemName)});
         // When taking an otherwise fatal hit, if the player has at least 100 casings, damage is negated and the player loses 100 casings instead.
         NewSynergy(DEATH_AND_TAXES, "Death and Taxes", new[]{IName(CreditCard.ItemName), IName(BlankChecks.ItemName)});
+        // Spawns a decoy when feigning death.
+        NewSynergy(DEAD_MAN_STANDING, "Dead Man Standing", new[]{IName(DeadRinger.ItemName), "decoy"});
+        // Spawns an explosive decoy when feigning death.
+        NewSynergy(DEAD_MAN_EXPANDING, "Dead Man Expanding", new[]{IName(DeadRinger.ItemName), "explosive_decoy"});
       #endregion
 
       #region Masteries
@@ -296,6 +300,8 @@ public enum Synergy {
     CLEANUP_CREW,
     SCAVENGEST,
     DEATH_AND_TAXES,
+    DEAD_MAN_STANDING,
+    DEAD_MAN_EXPANDING,
 
     // Masteries
     MASTERY_GRANDMASTER,

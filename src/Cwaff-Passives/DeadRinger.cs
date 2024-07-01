@@ -12,9 +12,12 @@ public class DeadRinger : CwaffPassive
     public static string Lore             = "Developed by the French government for use by their elite secret agents in case of their inevitable failure, this marvelous gadget takes making lemonade out of lemons to the next level.";
 
     internal const float _DEAD_RINGER_DAMAGE_MULT = 10.0f;
-    internal const float _LENIENCE = 0.75f; // minimum time after getting hit we can decloak (to prevent instantly losing cloak in panic)
+    internal const float _LENIENCE                = 0.75f; // minimum time after getting hit we can decloak (to prevent instantly losing cloak in panic)
+    internal const float _DECOY_LIFE              = 3f;
 
     internal static GameObject _CorpsePrefab;
+    internal static GameObject _DecoyPrefab;
+    internal static GameObject _ExplosiveDecoyPrefab;
 
     private float _lastActivationTime = 0.0f;
 
@@ -23,6 +26,12 @@ public class DeadRinger : CwaffPassive
         PickupObject item = Lazy.SetupPassive<DeadRinger>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.B;
         _CorpsePrefab     = BraveResources.Load("Global Prefabs/PlayerCorpse") as GameObject;
+
+        _DecoyPrefab = ItemHelper.Get(Items.Decoy).GetComponent<SpawnObjectPlayerItem>().objectToSpawn.ClonePrefab();
+        _DecoyPrefab.GetComponent<Decoy>().DeathExplosionTimer = _DECOY_LIFE;
+
+        _ExplosiveDecoyPrefab = ItemHelper.Get(Items.ExplosiveDecoy).GetComponent<SpawnObjectPlayerItem>().objectToSpawn.ClonePrefab();
+        _ExplosiveDecoyPrefab.GetComponent<Decoy>().DeathExplosionTimer = _DECOY_LIFE;
     }
 
     public override void Pickup(PlayerController player)
@@ -59,6 +68,18 @@ public class DeadRinger : CwaffPassive
     private void FeignDeath()
     {
         this.Owner.gameObject.Play("spy_uncloak_feigndeath");
+        if (this.Owner.HasSynergy(Synergy.DEAD_MAN_EXPANDING))
+        {
+            GameObject decoy = DeadRinger._ExplosiveDecoyPrefab.Instantiate(position: this.Owner.SpriteBottomCenter, anchor: Anchor.LowerCenter);
+            if (decoy.GetComponent<SpeculativeRigidbody>() is SpeculativeRigidbody body)
+                body.RegisterGhostCollisionException(this.Owner.specRigidbody);
+        }
+        else if (this.Owner.HasSynergy(Synergy.DEAD_MAN_STANDING))
+        {
+            GameObject decoy = DeadRinger._DecoyPrefab.Instantiate(position: this.Owner.SpriteBottomCenter, anchor: Anchor.LowerCenter);
+            if (decoy.GetComponent<SpeculativeRigidbody>() is SpeculativeRigidbody body)
+                body.RegisterGhostCollisionException(this.Owner.specRigidbody);
+        }
         StartCoroutine(AnimateTheCorpse(this.Owner));
     }
 
