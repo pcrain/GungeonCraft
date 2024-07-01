@@ -74,6 +74,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfGunbrella>(MASTERY_GUNBRELLA, Gunbrella.ItemName);
         // Alyx decays four times slower and passively grants poison immunity
         NewMastery<MasteryOfAlyx>(MASTERY_ALYX, Alyx.ItemName);
+        // Pistol Whip can hit enemies closer than its max range, and after killing an enemy, will trigger a mini blank for the next 3 attacks.
+        NewMastery<MasteryOfPistolWhip>(MASTERY_PISTOL_WHIP, PistolWhip.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -276,6 +278,7 @@ internal class MasteryOfVacuumCleaner   : MasteryDummyItem {}
 internal class MasteryOfPaintballCannon : MasteryDummyItem {}
 internal class MasteryOfGunbrella       : MasteryDummyItem {}
 internal class MasteryOfAlyx            : MasteryDummyItem {}
+internal class MasteryOfPistolWhip      : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -306,4 +309,5 @@ public enum Synergy {
     MASTERY_PAINTBALL_CANNON,
     MASTERY_GUNBRELLA,
     MASTERY_ALYX,
+    MASTERY_PISTOL_WHIP,
 };

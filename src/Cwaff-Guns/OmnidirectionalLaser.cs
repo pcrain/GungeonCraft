@@ -201,7 +201,7 @@ public class OmnidirectionalLaser : CwaffGun
     public override void PostProcessProjectile(Projectile projectile)
     {
         base.PostProcessProjectile(projectile);
-        Vector2? targetPos = Lazy.NearestEnemyWithinConeOfVision(
+        Vector2? targetPos = Lazy.NearestEnemyPosWithinConeOfVision(
             start                            : this.gun.barrelOffset.position,
             coneAngle                        : projectile.OriginalDirection(),
             maxDeviation                     : _LOCKON_FACTOR * this._currentFps, // between 16 and 64 degrees of lock-on

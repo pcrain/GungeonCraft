@@ -2,7 +2,7 @@
 
 ## TBD
 
-- Added masteries for Vacuum Cleaner, Paintball Cannon, Gunbrella, and Alyx
+- Added masteries for Vacuum Cleaner, Paintball Cannon, Gunbrella, Alyx, and Pistol Whip
 - Added indicator for amount of debris vacuumed to Vacuum Cleaner ammo display
 - Vacuum Cleaner debris is now processed when it is actually absorbed, rather than when it is suctioned
 - Tweaked Gunbrella projectiles so that they actually fall closer to the reticle rather than overshooting it
@@ -10,6 +10,7 @@
 - Made each of the 16 separate projectiles fired by Gunbrella cost 1 ammo, and increased Gunbrella's ammo from 60 to 960 to compensate
 - Made reticle for Gunbrella render behind objects
 - Added trails to Gunbrella projectiles
+- Fixed impact particles for Pistol Whip's melee hit not appearing after the first time it is used
 
 - Fixed R.C. Launcher projectiles slowing down too much at higher frame rates
 - Fixed drop Jugglernaut guns having collision that can interfere with the player's movement

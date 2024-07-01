@@ -448,7 +448,7 @@ public static class Lazy
     {
         foreach (AIActor enemy in start.SafeGetEnemiesInRoom())
         {
-            if (!enemy.IsHostile(canBeNeutral: canBeNeutral))
+            if (!enemy.IsHostile(canBeNeutral: canBeNeutral) || !enemy.specRigidbody)
                 continue;
             PixelCollider collider = enemy.specRigidbody.HitboxPixelCollider;
             if (BraveUtility.LineIntersectsAABB(start, end, collider.UnitBottomLeft, collider.UnitDimensions, out Vector2 intersection))
@@ -457,8 +457,29 @@ public static class Lazy
         return false;
     }
 
+    /// <summary>Determine whether any enemy is in an line between start and end (does not account for walls)</summary>
+    public static AIActor NearestEnemyInLineOfSight(Vector2 start, Vector2 end, bool canBeNeutral = true)
+    {
+        AIActor nearest = null;
+        float nearestSqrDist = float.MaxValue;
+        foreach (AIActor enemy in start.SafeGetEnemiesInRoom())
+        {
+            if (!enemy.IsHostile(canBeNeutral: canBeNeutral) || !enemy.specRigidbody)
+                continue;
+            PixelCollider collider = enemy.specRigidbody.HitboxPixelCollider;
+            if (!BraveUtility.LineIntersectsAABB(start, end, collider.UnitBottomLeft, collider.UnitDimensions, out Vector2 intersection))
+                continue;
+            float sqrDist = (enemy.CenterPosition - start).sqrMagnitude;
+            if (sqrDist > nearestSqrDist)
+                continue;
+            nearestSqrDist = sqrDist;
+            nearest = enemy;
+        }
+        return nearest;
+    }
+
     /// <summary>Determine position of the nearest enemy inside a cone of vision from position start within maxDeviation degree of coneAngle</summary>
-    public static Vector2? NearestEnemyWithinConeOfVision(Vector2 start, float coneAngle, float maxDeviation, float maxDistance = 100f, bool useNearestAngleInsteadOfDistance = true, bool ignoreWalls = false)
+    public static Vector2? NearestEnemyPosWithinConeOfVision(Vector2 start, float coneAngle, float maxDeviation, float maxDistance = 100f, bool useNearestAngleInsteadOfDistance = true, bool ignoreWalls = false)
     {
         bool foundTarget   = false;
         float bestAngle    = maxDeviation;
@@ -494,9 +515,9 @@ public static class Lazy
     }
 
     /// <summary>Determine position of the nearest enemy to position start</summary>
-    public static Vector2? NearestEnemy(Vector2 start, float coneAngle, bool useNearestAngleInsteadOfDistance = false, bool ignoreWalls = false)
+    public static Vector2? NearestEnemyPos(Vector2 start, float coneAngle, bool useNearestAngleInsteadOfDistance = false, bool ignoreWalls = false)
     {
-        return NearestEnemyWithinConeOfVision(start: start, coneAngle: coneAngle, maxDeviation: 360f,
+        return NearestEnemyPosWithinConeOfVision(start: start, coneAngle: coneAngle, maxDeviation: 360f,
             useNearestAngleInsteadOfDistance: useNearestAngleInsteadOfDistance, ignoreWalls: ignoreWalls);
     }
 
@@ -895,5 +916,16 @@ public static class Lazy
     {
         float exp = Mathf.Exp(-BraveTime.DeltaTime * r);
         return new Vector2(b.x + (a.x - b.x) * exp, b.y + (a.y - b.y) * exp);
+    }
+
+    private static GameObject _BlankVFXPrefab = null;
+    /// <summary>Trigger a mini blank effect at a specific position (adapted from PlayerOrbitalFollower.cs)</summary>
+    public static void DoMicroBlankAt(Vector2 pos, PlayerController user = null, float radius = 4f, float additionalTimeAtMaxRadius = 0.25f)
+    {
+        _BlankVFXPrefab ??= (GameObject)BraveResources.Load("Global VFX/BlankVFX_Ghost");
+        GameObject gameObject = new GameObject("silencer");
+        SilencerInstance silencerInstance = gameObject.AddComponent<SilencerInstance>();
+        silencerInstance.TriggerSilencer(pos, 20f, radius, _BlankVFXPrefab, 0f, 3f, 3f, 3f, 30f, 3f, additionalTimeAtMaxRadius, user, false);
+        AkSoundEngine.PostEvent("Play_OBJ_silenceblank_small_01", gameObject);
     }
 }

@@ -352,6 +352,7 @@ public class Initialisation : BaseUnityPlugin
 
                     "debris_ui",                VacuumCleaner._DebrisUI,
                     "corpse_ui",                VacuumCleaner._CorpseUI,
+                    "mini_blank_ui",            PistolWhip._MiniBlankUI,
                 });
                 setupUIWatch.Stop();
             #endregion

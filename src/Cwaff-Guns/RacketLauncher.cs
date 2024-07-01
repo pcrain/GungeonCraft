@@ -289,7 +289,7 @@ public class TennisBall : MonoBehaviour
         }
 
         // Homing in on nearest enemy
-        Vector2? maybeTarget = Lazy.NearestEnemyWithinConeOfVision(
+        Vector2? maybeTarget = Lazy.NearestEnemyPosWithinConeOfVision(
             start                            : this._projectile.transform.position,
             coneAngle                        : curVelocity.ToAngle().Clamp360(),
             maxDeviation                     : _MAX_DEVIATION,

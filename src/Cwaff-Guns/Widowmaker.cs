@@ -168,7 +168,7 @@ public class Crawlyboi : MonoBehaviour
             return;
 
         Vector2 shootPoint = base.transform.position.XY() + this._wallNormal;
-        Vector2? enemyPos = Lazy.NearestEnemyWithinConeOfVision(
+        Vector2? enemyPos = Lazy.NearestEnemyPosWithinConeOfVision(
             start                            : shootPoint,
             coneAngle                        : this._wallNormal.ToAngle(),
             maxDeviation                     : _SIGHT_CONE,

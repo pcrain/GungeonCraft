@@ -28,7 +28,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem/*, ILevelLoadedListener
   public static void SetUpDynamicBarrelOffsets(Gun gun)
   {
     var d = _BarrelOffsetCache[gun.DisplayName] = new();
-    //WARNING: can't to idle animation since it breaks loading with trimmed sprites
+    //WARNING: can't do idle animation since it breaks loading with trimmed sprites
     SetUpDynamicBarrelOffsetsForAnimation(d, gun, gun.chargeAnimation);
     SetUpDynamicBarrelOffsetsForAnimation(d, gun, gun.reloadAnimation);
     SetUpDynamicBarrelOffsetsForAnimation(d, gun, gun.shootAnimation);
