@@ -6,6 +6,7 @@
 - Added indicator for amount of debris vacuumed to Vacuum Cleaner ammo display
 - Vacuum Cleaner debris is now processed when it is actually absorbed, rather than when it is suctioned
 - Tweaked Gunbrella projectiles so that they actually fall closer to the reticle rather than overshooting it
+- Reduced Gunbrella projectile damage from 16 to 8 since it hits more often now
 - Made each of the 16 separate projectiles fired by Gunbrella cost 1 ammo, and increased Gunbrella's ammo from 60 to 960 to compensate
 - Made reticle for Gunbrella render behind objects
 - Added trails to Gunbrella projectiles

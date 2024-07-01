@@ -14,7 +14,7 @@ public class Gunbrella : CwaffGun
     private const float _MIN_CHARGE_TIME   = 0.75f;
     private const int   _BARRAGE_SIZE      = 16;
     private const float _BARRAGE_DELAY     = 0.04f;
-    private const float _PROJ_DAMAGE       = 16f;
+    private const float _PROJ_DAMAGE       = 8f;
     private const float _MAX_RETICLE_RANGE = 10f;
     private const float _MAX_ALPHA         = 0.5f;
 
