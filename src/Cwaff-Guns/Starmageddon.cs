@@ -203,8 +203,7 @@ public class StarmageddonProjectile : MonoBehaviour
         yield return null; // wait a frame so we can properly set the trails to unoccluded without being overwritten
         tc.gameObject.SetLayerRecursively(LayerMask.NameToLayer("Unoccluded"));
         tc.gameObject.transform.position = tc.gameObject.transform.position.XY().ToVector3ZisY(100f);
-        DepthLookupManager.ProcessRenderer(
-            tc.sprite.renderer, DepthLookupManager.GungeonSortingLayer.FOREGROUND);
+        DepthLookupManager.ProcessRenderer(tc.sprite.renderer, DepthLookupManager.GungeonSortingLayer.FOREGROUND);
 
         // Phase 4 -- hang time
         this._projectile.gameObject.Play("starmageddon_bullet_launch_sound");

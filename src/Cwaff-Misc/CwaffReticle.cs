@@ -23,6 +23,7 @@ public class CwaffReticle : MonoBehaviour
   public float      fadeOutTime         = 0.0f;  // the amount of time we spend fading out when despawned (0.0 == instant)
   public bool       smoothLerp          = false; // whether the reticle smoothly lerps to its target
   public bool       aimFromPlayerCenter = false; // if true, aim is relative to player center; if false, aim is relative to barrel offset
+  public bool       background          = false; // whether the reticle draws in the background
   public float      maxDistance         = -1f;   // maximum distance the reticle can be from the player (-1 == no max)
   public float      controllerScale     = 1f;    // on controller, determines how the reticle scales with aim distance
   public float      rotateSpeed         = 0f;    // how quickly the reticle rotates
@@ -81,6 +82,8 @@ public class CwaffReticle : MonoBehaviour
     if (!this._extantVfx)
     {
       this._extantVfx = UnityEngine.Object.Instantiate(this.reticleVFX, this._gun.gun.barrelOffset.transform.position, Quaternion.identity);
+      if (this.background)
+        this._extantVfx.SetLayerRecursively(LayerMask.NameToLayer("BG_Critical"));
       this._extantVfx.SetAlphaImmediate(0.0f);
     }
 

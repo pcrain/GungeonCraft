@@ -38,14 +38,13 @@ public class Gunbrella : CwaffGun
           )).SetAllImpactVFX(VFX.CreatePool("icicle_crash_particles", fps: 30, loops: false, anchor: Anchor.MiddleCenter, scale: 0.35f)
           ).Attach<GunbrellaProjectile>();
 
-        // set up Mastery module
         _MasteryModule = new ProjectileModule(){projectiles = new(){ gun.DefaultModule.projectiles[0] }}.SetAttributes(GunData.New(
             gun: gun, ammoCost: 1, clipSize: -1, cooldown: 0.05f, shootStyle: ShootStyle.Automatic, sequenceStyle: ProjectileSequenceStyle.Ordered, customClip: true));
 
         gun.AddReticle<CwaffReticle>(
             reticleVFX : VFX.Create("gunbrella_target_reticle", fps: 12, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 10, emissiveColour: Color.cyan, scale: 0.75f),
-            fadeInTime : _MIN_CHARGE_TIME, fadeOutTime : 0.25f, maxDistance : _MAX_RETICLE_RANGE, controllerScale : 1f + _MAX_RETICLE_RANGE,
-            visibility : CwaffReticle.Visibility.CHARGING);
+            reticleAlpha: 0.25f, fadeInTime : _MIN_CHARGE_TIME, fadeOutTime : 0.25f, maxDistance : _MAX_RETICLE_RANGE, controllerScale : 1f + _MAX_RETICLE_RANGE,
+            visibility : CwaffReticle.Visibility.CHARGING, background: true);
     }
 
     public override void Update()
@@ -242,6 +241,15 @@ public class GunbrellaProjectile : MonoBehaviour
         this._projectile.specRigidbody.Position = new Position(offsetTarget + (fallTime * launchSpeed) * (-targetFallVelocity));
         this._projectile.specRigidbody.UpdateColliderPositions();
         this._projectile.SendInDirection(targetFallVelocity, true);
+
+        EasyTrailBullet trail = this._projectile.gameObject.AddComponent<EasyTrailBullet>();
+            trail.StartWidth = 0.2f;
+            trail.EndWidth   = 0.01f;
+            trail.LifeTime   = 0.1f;
+            trail.BaseColor  = Color.cyan.WithAlpha(0.6f);
+            trail.StartColor = Color.cyan.WithAlpha(0.6f);
+            trail.EndColor   = Color.cyan.WithAlpha(0.2f);
+
         while (this._lifetime + BraveTime.DeltaTime < fallTime) // stop a frame early so we can collide with enemies on our last frame
         {
             this._lifetime += BraveTime.DeltaTime;
