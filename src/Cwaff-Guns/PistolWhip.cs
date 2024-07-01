@@ -102,8 +102,27 @@ public class PistolButtProjectile : MonoBehaviour  //TODO: possibly reuse this a
 {
     private void Start()
     {
-        base.gameObject.GetComponent<Projectile>().sprite.renderer.enabled = false;
+        Projectile p = base.gameObject.GetComponent<Projectile>();
+        p.sprite.renderer.enabled = false;
+        if (p.Owner is PlayerController player && player.HasSynergy(Synergy.WICKED_CHILD))
+        {
+            p.BlackPhantomDamageMultiplier = 2f; // for jammed bosses, normal enemies are instantly killed so this is a moot point
+            p.OnHitEnemy += this.OnHitEnemy;
+        }
         StartCoroutine(ExpireInTwoFrames()); // needs two frames to actually be able to hit anyone
+    }
+
+    private void OnHitEnemy(Projectile p, SpeculativeRigidbody other, bool killed)
+    {
+        if (other.GetComponent<AIActor>() is not AIActor enemy)
+            return;
+        if (!enemy.IsBlackPhantom)
+            return;
+        if (enemy.healthHaver is not HealthHaver hh)
+            return;
+        if (hh.IsBoss || hh.IsSubboss)
+            return;
+        hh.ApplyDamage(damage: 9999f, direction: p.Direction, sourceName: "Doesn't Belong in this World", damageTypes: CoreDamageTypes.Magic);
     }
 
     private IEnumerator ExpireInTwoFrames()

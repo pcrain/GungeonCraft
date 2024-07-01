@@ -51,6 +51,8 @@ public static class CwaffSynergies
         NewSynergy(DEAD_MAN_EXPANDING, "Dead Man Expanding", new[]{IName(DeadRinger.ItemName), "explosive_decoy"});
         // Semi-automatic weapons have perfect accuracy.
         NewSynergy(AIM_BOTS, "Aim Bots", new[]{IName(BionicFinger.ItemName), "nanomachines"});
+        // Pistol Whip's melee hit deals double damage to Jammed bosses and minibosses, and instantly smites all other Jammed enemies
+        NewSynergy(WICKED_CHILD, "Wicked Child", new[]{IName(PistolWhip.ItemName), IName(HolyWaterGun.ItemName)});
       #endregion
 
       #region Masteries
@@ -305,6 +307,7 @@ public enum Synergy {
     DEAD_MAN_STANDING,
     DEAD_MAN_EXPANDING,
     AIM_BOTS,
+    WICKED_CHILD,
 
     // Masteries
     MASTERY_GRANDMASTER,

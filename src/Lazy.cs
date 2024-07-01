@@ -853,6 +853,22 @@ public static class Lazy
       return false;
     }
 
+    /// <summary>Check if any player has a synergy active</summary>
+    public static bool AnyoneHasSynergy(Synergy synergy)
+    {
+      if (GameManager.Instance.PrimaryPlayer is not PlayerController p1)
+        return false;
+      if (p1.HasSynergy(synergy))
+        return true;
+      if (GameManager.Instance.CurrentGameType != GameManager.GameType.COOP_2_PLAYER)
+        return false;
+      if (GameManager.Instance.SecondaryPlayer is not PlayerController p2)
+        return false;
+      if (p2.HasSynergy(synergy))
+        return true;
+      return false;
+    }
+
     /// <summary>Gets the best idle animation for the given enemy</summary>
     public static int GetIdForBestIdleAnimation(AIActor enemy)
     {
