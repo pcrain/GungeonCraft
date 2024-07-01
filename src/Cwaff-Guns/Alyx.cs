@@ -45,7 +45,7 @@ public class Alyx : CwaffGun
         Material m = gun.sprite.renderer.material;
         m.SetFloat("_EmissivePower", 50f + 100f * Mathf.Abs(Mathf.Sin(BraveTime.ScaledTimeSinceStartup)));
         RecalculateAmmo();
-        if (this.PlayerOwner && this.PlayerOwner.PlayerHasActiveSynergy(Synergy.MASTERY_ALYX))
+        if (this.PlayerOwner && this.PlayerOwner.HasSynergy(Synergy.MASTERY_ALYX))
             this.PlayerOwner.healthHaver.damageTypeModifiers.AddUnique(this._poisonImmunity);
     }
 
@@ -128,7 +128,7 @@ public class Alyx : CwaffGun
             return;
         this.timeAtLastRecalc = BraveTime.ScaledTimeSinceStartup;
 
-        float decayFactor = (this.PlayerOwner && this.PlayerOwner.PlayerHasActiveSynergy(Synergy.MASTERY_ALYX)) ? 0.25f : 1.0f;
+        float decayFactor = (this.PlayerOwner && this.PlayerOwner.HasSynergy(Synergy.MASTERY_ALYX)) ? 0.25f : 1.0f;
         int newAmmo = ComputeExponentialDecay((float)this.gun.CurrentAmmo, decayFactor * _AMMO_DECAY_LAMBDA, timeSinceLastRecalc);
         int newMaxAmmo = ComputeExponentialDecay((float)this.gun.GetBaseMaxAmmo(), decayFactor * _GUN_DECAY_LAMBDA, timeSinceLastRecalc);
 

@@ -283,7 +283,7 @@ public class UppskeruvelProjectile : MonoBehaviour
         if (!enemy || !enemy.aiActor || !enemy.aiActor.IsHostile())
             return; // avoid processing effect for non-hostile enemies
 
-        Uppskeruvel.DropLostSouls(enemy.aiActor, this._owner.PlayerHasActiveSynergy(Synergy.SOUL_SEARCHING));
+        Uppskeruvel.DropLostSouls(enemy.aiActor, this._owner.HasSynergy(Synergy.SOUL_SEARCHING));
     }
 }
 

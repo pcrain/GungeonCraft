@@ -33,7 +33,7 @@ public class DriftersHeadgear : CwaffPassive
             return;
 
         this._dodgeRoller.isHyped =
-            this.Owner.PlayerHasActiveSynergy(Synergy.HYPE_YOURSELF_UP);
+            this.Owner.HasSynergy(Synergy.HYPE_YOURSELF_UP);
     }
 
     private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherCollider)

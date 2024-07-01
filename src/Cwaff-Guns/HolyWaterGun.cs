@@ -69,7 +69,7 @@ public class ExorcismJuice : MonoBehaviour
         this._projectile = base.GetComponent<Projectile>();
         this._owner = this._projectile.Owner as PlayerController;
 
-        this._mastered = this._owner && this._owner.PlayerHasActiveSynergy(Synergy.MASTERY_HOLY_WATER_GUN);
+        this._mastered = this._owner && this._owner.HasSynergy(Synergy.MASTERY_HOLY_WATER_GUN);
         if (this._mastered)
             this._projectile.BlackPhantomDamageMultiplier = HolyWaterGun._MASTERY_JAMMED_DAMAGE_MULT;
 

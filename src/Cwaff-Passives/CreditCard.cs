@@ -66,7 +66,7 @@ public class CreditCard : CwaffPassive
             return;
         if (player.carriedConsumables.Currency < _CHEAT_DEATH_COST)
             return;
-        if (!player.PlayerHasActiveSynergy(Synergy.DEATH_AND_TAXES))
+        if (!player.HasSynergy(Synergy.DEATH_AND_TAXES))
             return;
         player.carriedConsumables.Currency -= _CHEAT_DEATH_COST;
 

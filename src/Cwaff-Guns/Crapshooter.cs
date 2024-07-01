@@ -52,7 +52,7 @@ public class Crapshooter : CwaffGun
     {
         base.PostProcessProjectile(projectile);
 
-        if (this.PlayerOwner && this.PlayerOwner.PlayerHasActiveSynergy(Synergy.MASTERY_CRAPSHOOTER))
+        if (this.PlayerOwner && this.PlayerOwner.HasSynergy(Synergy.MASTERY_CRAPSHOOTER))
             this._freezeTimer = 0.25f; //NOTE: needs to be long enough that idle animation doesn't play in between shots
 
         base.gameObject.Play(_DiceSounds.ChooseRandom());

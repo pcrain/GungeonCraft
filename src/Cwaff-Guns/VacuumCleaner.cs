@@ -68,7 +68,7 @@ public class VacuumCleaner : CwaffGun
 
     private void MaybeRestoreAmmo()
     {
-        if (UnityEngine.Random.value > (this.PlayerOwner.PlayerHasActiveSynergy(Synergy.SCAVENGEST) ? _HIGH_AMMO_CHANCE : _AMMO_CHANCE))
+        if (UnityEngine.Random.value > (this.PlayerOwner.HasSynergy(Synergy.SCAVENGEST) ? _HIGH_AMMO_CHANCE : _AMMO_CHANCE))
             return; // Make sure we restore any ammo at all
 
         // Look for guns missing any ammo whatsoever
@@ -106,7 +106,7 @@ public class VacuumCleaner : CwaffGun
         Lazy.PlaySoundUntilDeathOrTimeout(soundName: "suction_loop", source: this.gun.gameObject, timer: 0.05f);
 
         Vector2 gunpos = this.gun.barrelOffset.position;
-        bool mastered = player.PlayerHasActiveSynergy(Synergy.MASTERY_VACUUM_CLEANER);
+        bool mastered = player.HasSynergy(Synergy.MASTERY_VACUUM_CLEANER);
 
         // Particle effect creation logic should not be tied to framerate
         if (UnityEngine.Random.value < 0.66f * (BraveTime.DeltaTime * C.FPS))
@@ -144,13 +144,13 @@ public class VacuumCleaner : CwaffGun
 
         ++this.debrisSucked;
         MaybeRestoreAmmo();
-        if ((UnityEngine.Random.value <= _CASING_CHANCE) && player.PlayerHasActiveSynergy(Synergy.CLEANUP_CREW) && this._casingsThisFloor < _FLOOR_CASINGS)
+        if ((UnityEngine.Random.value <= _CASING_CHANCE) && player.HasSynergy(Synergy.CLEANUP_CREW) && this._casingsThisFloor < _FLOOR_CASINGS)
         {
             ++this._casingsThisFloor;
             LootEngine.SpawnCurrency(player.CenterPosition, 1);
         }
 
-        if (!player.PlayerHasActiveSynergy(Synergy.MASTERY_VACUUM_CLEANER))
+        if (!player.HasSynergy(Synergy.MASTERY_VACUUM_CLEANER))
             return;
 
         if (debris.IsCorpse && ((++corpsesSucked) >= _CORPSE_PER_ARMOR))
@@ -201,7 +201,7 @@ public class VacuumCleaner : CwaffGun
             uic.GunAmmoCountLabel.AutoHeight = true; // enable multiline text
             uic.GunAmmoCountLabel.ProcessMarkup = true; // enable multicolor text
 
-            if (this._owner.PlayerHasActiveSynergy(Synergy.MASTERY_VACUUM_CLEANER))
+            if (this._owner.HasSynergy(Synergy.MASTERY_VACUUM_CLEANER))
                 uic.GunAmmoCountLabel.Text = $"[sprite \"{VacuumCleaner._CorpseUI}\"]x{this._vac.corpsesSucked}\n[sprite \"{VacuumCleaner._DebrisUI}\"]x{this._vac.debrisSucked}";
             else
                 uic.GunAmmoCountLabel.Text = $"[sprite \"{VacuumCleaner._DebrisUI}\"]x{this._vac.debrisSucked}";

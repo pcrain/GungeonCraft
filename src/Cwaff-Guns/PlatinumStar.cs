@@ -247,7 +247,7 @@ public class OraOra : MonoBehaviour
 
     private IEnumerator OraOraOraOra(PlayerController pc)
     {
-        bool doTimeFreeze = pc.PlayerHasActiveSynergy(Synergy.MASTERY_PLATINUM_STAR);
+        bool doTimeFreeze = pc.HasSynergy(Synergy.MASTERY_PLATINUM_STAR);
         float lumpDamage = doTimeFreeze ? (_BURST_SIZE * _bankedDamage.Sum()) : 0f;
 
         if (!this._enemy || this._enemy.healthHaver is not HealthHaver hh)

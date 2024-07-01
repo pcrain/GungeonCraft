@@ -104,7 +104,7 @@ public class PhaseThroughInnerWallsBehavior : MonoBehaviour
             return;
 
         this._phased = true;
-        if (this._owner && !this._owner.PlayerHasActiveSynergy(Synergy.PROJECTING_MUCH))
+        if (this._owner && !this._owner.HasSynergy(Synergy.PROJECTING_MUCH))
             this._projectile.baseData.damage *= FourDBullets._PHASE_DAMAGE_SCALING;
 
         if (this._projectile.sprite is tk2dBaseSprite sprite)

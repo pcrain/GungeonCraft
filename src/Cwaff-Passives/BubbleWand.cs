@@ -25,9 +25,9 @@ public class BubbleWand : CwaffPassive
                 return;
             if (Lazy.CoinFlip())
                 __instance.ReplaceGun(Items.BubbleBlaster);
-            else if (GameManager.Instance.PrimaryPlayer.PlayerHasActiveSynergy(Synergy.DUBBLE_BUBBLE) && Lazy.CoinFlip())
+            else if (GameManager.Instance.PrimaryPlayer.HasSynergy(Synergy.DUBBLE_BUBBLE) && Lazy.CoinFlip())
                 __instance.ReplaceGun(Items.BubbleBlaster);
-            else if (GameManager.Instance.CurrentGameType == GameManager.GameType.COOP_2_PLAYER && GameManager.Instance.SecondaryPlayer.PlayerHasActiveSynergy(Synergy.DUBBLE_BUBBLE) && Lazy.CoinFlip())
+            else if (GameManager.Instance.CurrentGameType == GameManager.GameType.COOP_2_PLAYER && GameManager.Instance.SecondaryPlayer.HasSynergy(Synergy.DUBBLE_BUBBLE) && Lazy.CoinFlip())
                 __instance.ReplaceGun(Items.BubbleBlaster);
         }
     }

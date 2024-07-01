@@ -62,7 +62,7 @@ public class HatchlingProjectile : MonoBehaviour
         GameObject chickum = this._hatchling = AIActor.Spawn(EnemyDatabase.GetOrLoadByGuid(Enemies.Cucco), (Vector2)p.LastPosition, p.transform.position.GetAbsoluteRoom(), true).gameObject;
         CompanionController cc = chickum.GetOrAddComponent<CompanionController>();
 
-        bool ownerHasMastery = this._owner.PlayerHasActiveSynergy(Synergy.MASTERY_HATCHLING_GUN);
+        bool ownerHasMastery = this._owner.HasSynergy(Synergy.MASTERY_HATCHLING_GUN);
 
         // From CompanionItem.Initialize()
         cc.m_owner                        = this._owner; // original was player

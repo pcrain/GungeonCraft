@@ -207,7 +207,7 @@ public class AlligatorCableHandler : MonoBehaviour
           && GameManager.Instance.Dungeon.GetFloorTypeFromPosition(this._owner.specRigidbody.UnitBottomCenter) == CellVisualData.CellFloorType.Carpet)
         {
             energyOutput *= _CARPET_ENERGY_BONUS;
-            if (this._owner.PlayerHasActiveSynergy(Synergy.ELECTRIC_SLIDE))
+            if (this._owner.HasSynergy(Synergy.ELECTRIC_SLIDE))
                 energyOutput *= _ELECTRIC_SLIDE_ENERGY_BONUS;
         }
 

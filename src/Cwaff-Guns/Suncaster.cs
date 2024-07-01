@@ -133,7 +133,7 @@ public class Suncaster : CwaffGun
           this._lastChargeTime += effectiveChargeRate * ammoToRestore;
           if (this.gun.CurrentAmmo < this.gun.AdjustedMaxAmmo)
             this.gun.ammo = Math.Min(this.gun.ammo + ammoToRestore, this.gun.AdjustedMaxAmmo);
-          this._cachedSolarFlairSynergy = this.PlayerOwner.PlayerHasActiveSynergy(Synergy.SOLAR_FLAIR);
+          this._cachedSolarFlairSynergy = this.PlayerOwner.HasSynergy(Synergy.SOLAR_FLAIR);
         }
         // if we have less than the ammo required to shoot a charge shot, make the charge time obscenely long
         this.gun.DefaultModule.chargeProjectiles[1].ChargeTime = (this.gun.ammo >= _CHARGE_AMMO_COST) ? _CHARGE_TIME : 3600f;

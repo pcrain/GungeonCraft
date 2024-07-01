@@ -56,7 +56,7 @@ public class SlappProjectile : MonoBehaviour
             return;
 
         this._flipped    = player.sprite.FlipX;
-        this._isMastered = player.PlayerHasActiveSynergy(Synergy.MASTERY_HAND_CANNON);
+        this._isMastered = player.HasSynergy(Synergy.MASTERY_HAND_CANNON);
         this._slapDamage = this._projectile.baseData.damage * (this._isMastered ? 2f : 1f);
         this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
     }

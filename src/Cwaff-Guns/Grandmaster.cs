@@ -149,7 +149,7 @@ public abstract class ChessPiece : MonoBehaviour
     {
         this._projectile = projectile;
         this._owner      = owner;
-        this._mastered   = this._owner.PlayerHasActiveSynergy(Synergy.MASTERY_GRANDMASTER);
+        this._mastered   = this._owner.HasSynergy(Synergy.MASTERY_GRANDMASTER);
         this._spawnBlack = this._mastered && !isBlackPiece;
         this._isBlack    = isBlackPiece;
 
@@ -409,7 +409,7 @@ public class PlayChessBehavior : MonoBehaviour
         if (!this._owner)
             return;
 
-        switch((this._owner.PlayerHasActiveSynergy(Synergy.MASTERY_GRANDMASTER) ? _MasteredPiecePool : _PiecePool).ChooseRandom())
+        switch((this._owner.HasSynergy(Synergy.MASTERY_GRANDMASTER) ? _MasteredPiecePool : _PiecePool).ChooseRandom())
         {
             case ChessPieces.Pawn:   this._piece = this._projectile.gameObject.AddComponent<PawnPiece>();   break;
             case ChessPieces.Rook:   this._piece = this._projectile.gameObject.AddComponent<RookPiece>();   break;

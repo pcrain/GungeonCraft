@@ -54,7 +54,7 @@ public class Gunbrella : CwaffGun
             return;
         if (BraveTime.DeltaTime == 0.0f)
             return;
-        this._mastered = player.PlayerHasActiveSynergy(Synergy.MASTERY_GUNBRELLA);
+        this._mastered = player.HasSynergy(Synergy.MASTERY_GUNBRELLA);
         if (this._mastered && !this._masteryVolleyReplaced)
         {
             ProjectileVolleyData projectileVolleyData = ScriptableObject.CreateInstance<ProjectileVolleyData>();

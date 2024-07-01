@@ -258,7 +258,7 @@ public static class CwaffSynergies
         return _SynergyNames[(int)synergy];
     }
 
-    public static bool PlayerHasActiveSynergy(this PlayerController player, Synergy synergy)
+    public static bool HasSynergy(this PlayerController player, Synergy synergy)
     {
         return player.ActiveExtraSynergies.Contains((int)_SynergyIds[(int)synergy]);
     }

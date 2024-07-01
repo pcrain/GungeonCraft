@@ -78,7 +78,7 @@ public class ChekhovsGun : CwaffGun
                 ++ammoToRestore;
         }
         this._extantBullets.Clear();
-        if (!player.PlayerHasActiveSynergy(Synergy.MASTERY_CHEKHOVS_GUN))
+        if (!player.HasSynergy(Synergy.MASTERY_CHEKHOVS_GUN))
             ammoToRestore /= 2;
         this.gun.GainAmmo(ammoToRestore);
     }
@@ -101,7 +101,7 @@ public class ChekhovBullet : MonoBehaviour
     {
         this._projectile = base.GetComponent<Projectile>();
         if (this._projectile.Owner is PlayerController pc)
-            this.mastered = pc.PlayerHasActiveSynergy(Synergy.MASTERY_CHEKHOVS_GUN);
+            this.mastered = pc.HasSynergy(Synergy.MASTERY_CHEKHOVS_GUN);
         StartCoroutine(PlotDevice(this._projectile.transform.right.XY()));
     }
 

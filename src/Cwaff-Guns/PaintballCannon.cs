@@ -28,7 +28,7 @@ public class PaintballCannon : CwaffGun
 
     public override void PostProcessProjectile(Projectile projectile)
     {
-        if (this.PlayerOwner && this.PlayerOwner.PlayerHasActiveSynergy(Synergy.MASTERY_PAINTBALL_CANNON))
+        if (this.PlayerOwner && this.PlayerOwner.HasSynergy(Synergy.MASTERY_PAINTBALL_CANNON))
             projectile.GetComponent<PaintballColorizer>().mastered = true;
     }
 }

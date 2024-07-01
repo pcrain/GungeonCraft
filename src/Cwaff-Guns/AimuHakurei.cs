@@ -100,7 +100,7 @@ public class AimuHakurei : CwaffGun
 
     private void OnReceivedDamage(PlayerController player)
     {
-        if (!player.PlayerHasActiveSynergy(Synergy.LOTUS_LAND_STORY))
+        if (!player.HasSynergy(Synergy.LOTUS_LAND_STORY))
             return;
         this.graze = _GRAZE_MAX;
         PowerUp();

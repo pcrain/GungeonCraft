@@ -86,7 +86,7 @@ public class PistolWhip : CwaffGun
 
         public override bool DoCustomAmmoDisplay(GameUIAmmoController uic)
         {
-            if (!this._owner || !this._owner.PlayerHasActiveSynergy(Synergy.MASTERY_PISTOL_WHIP))
+            if (!this._owner || !this._owner.HasSynergy(Synergy.MASTERY_PISTOL_WHIP))
                 return false;
 
             uic.SetAmmoCountLabelColor(Color.white);
@@ -193,7 +193,7 @@ public class WhipChainStart : MonoBehaviour
         int phase = 1;
         bool spawnProjectile = false;
         float whipRange = _WHIP_RANGE;
-        bool mastered = this._owner.PlayerHasActiveSynergy(Synergy.MASTERY_PISTOL_WHIP);
+        bool mastered = this._owner.HasSynergy(Synergy.MASTERY_PISTOL_WHIP);
         if (mastered)
         {
             Vector2 start  = this._owner.primaryHand.transform.position;

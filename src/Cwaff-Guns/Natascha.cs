@@ -153,7 +153,7 @@ public class Natascha : CwaffGun
         gun.AdjustAnimation(gun.shootAnimation, fps: ComputeAnimationSpeed());
 
         this.gun.RemoveStatFromGun(PlayerStats.StatType.MovementSpeed);
-        if (this.PlayerOwner.PlayerHasActiveSynergy(Synergy.MASTERY_NATASCHA))
+        if (this.PlayerOwner.HasSynergy(Synergy.MASTERY_NATASCHA))
             this.gun.AddStatToGun(PlayerStats.StatType.MovementSpeed, 1f, StatModifier.ModifyMethod.MULTIPLICATIVE);
         else
             this.gun.AddStatToGun(PlayerStats.StatType.MovementSpeed, 1f / (float)Math.Sqrt(this._speedMult), StatModifier.ModifyMethod.MULTIPLICATIVE);

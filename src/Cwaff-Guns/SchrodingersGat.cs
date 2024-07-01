@@ -81,7 +81,7 @@ public class SchrodingersGatProjectile : MonoBehaviour
         if (body.GetComponent<AIActor>() is AIActor enemy && enemy.IsHostileAndNotABoss() && !enemy.gameObject.GetComponent<SchrodingersStat>())
         {
             SchrodingersStat ss = enemy.gameObject.AddComponent<SchrodingersStat>();
-            if (p.Owner is PlayerController pc && pc.PlayerHasActiveSynergy(Synergy.MASTERY_SCHRODINGERS_GAT))
+            if (p.Owner is PlayerController pc && pc.HasSynergy(Synergy.MASTERY_SCHRODINGERS_GAT))
                 ss.Observe();
         }
     }
