@@ -548,7 +548,7 @@ public static class Lazy
         return BitConverter.Int64BitsToDouble(((long)tmp2) << 32);
     }
 
-    /// <summary>Get a modded item by id, returning null if it doesn't exit</summary>
+    /// <summary>Get a modded item by id, returning null if it doesn't exist</summary>
     public static PickupObject GetModdedItem(string itemName)
     {
         return Gungeon.Game.Items.GetSafe(itemName);
