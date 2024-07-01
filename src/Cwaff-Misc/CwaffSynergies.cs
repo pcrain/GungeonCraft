@@ -53,6 +53,8 @@ public static class CwaffSynergies
         NewSynergy(AIM_BOTS, "Aim Bots", new[]{IName(BionicFinger.ItemName), "nanomachines"});
         // Pistol Whip's melee hit deals double damage to Jammed bosses and minibosses, and instantly smites all other Jammed enemies
         NewSynergy(WICKED_CHILD, "Wicked Child", new[]{IName(PistolWhip.ItemName), IName(HolyWaterGun.ItemName)});
+        // Enemies with guns that are charmed by Sub Machine Gun are given a Heroine.
+        NewSynergy(I_NEED_A_HERO, "I Need a Hero", new[]{IName(SubMachineGun.ItemName), "heroine"});
       #endregion
 
       #region Masteries
@@ -308,6 +310,7 @@ public enum Synergy {
     DEAD_MAN_EXPANDING,
     AIM_BOTS,
     WICKED_CHILD,
+    I_NEED_A_HERO,
 
     // Masteries
     MASTERY_GRANDMASTER,

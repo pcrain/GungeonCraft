@@ -26,9 +26,12 @@ public class SubMachineGun : CwaffGun
 
 public class NourishingProjectile : MonoBehaviour
 {
+    private Projectile _proj = null;
+
     private void Start()
     {
-        base.GetComponent<Projectile>().OnHitEnemy += this.OnHitEnemy;
+        this._proj = base.GetComponent<Projectile>();
+        this._proj.OnHitEnemy += this.OnHitEnemy;
     }
 
     private void OnHitEnemy(Projectile p, SpeculativeRigidbody body, bool killed)
@@ -43,6 +46,9 @@ public class NourishingProjectile : MonoBehaviour
         enemy.ApplyEffect((ItemHelper.Get(Items.YellowChamber) as YellowChamberItem).CharmEffect);
         if (enemy.CanTargetPlayers || !enemy.CanTargetEnemies)
             return; // failed to apply charm
+
+        if (this._proj.Owner is PlayerController player && player.HasSynergy(Synergy.I_NEED_A_HERO))
+            enemy.ReplaceGun(Items.Heroine);
 
         hh.FullHeal();
         GameObject vfx = SpawnManager.SpawnVFX(SubMachineGun._NourishVFX, enemy.sprite.WorldTopCenter + new Vector2(0f, 1f), Quaternion.identity, ignoresPools: true);
