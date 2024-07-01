@@ -118,33 +118,67 @@ static class ProjectileHandleDamagePatches
 
         // ETGModConsole.Log($"  patch applied");
     }
+}
 
-    [HarmonyPatch(typeof(Projectile), nameof(Projectile.OnRigidbodyCollision))]
-    static class ProjectileOnRigidbodyCollisionPatches
+[HarmonyPatch(typeof(Projectile), nameof(Projectile.OnRigidbodyCollision))]
+static class ProjectileOnRigidbodyCollisionPatches
+{
+    //NOTE: used by CwaffProjectile to allow playing enemy / object impact sounds without the Play_WPN_..._impact_01 format
+    [HarmonyILManipulator]
+    private static void ImpactSoundIL(ILContext il)
     {
-        //NOTE: used by CwaffProjectile to allow playing enemy / object impact sounds without the Play_WPN_..._impact_01 format
-        [HarmonyILManipulator]
-        private static void ImpactSoundIL(ILContext il)
-        {
-            ILCursor cursor = new ILCursor(il);
-            if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCall<Projectile>("HandleKnockback")))
-                return;
-            if (!cursor.TryGotoNext(MoveType.Before, instr => instr.MatchLdloc(5))) // v_5 == flag == whether we hit an enemy (true) or other object (false)
-                return;
+        ILCursor cursor = new ILCursor(il);
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCall<Projectile>("HandleKnockback")))
+            return;
+        if (!cursor.TryGotoNext(MoveType.Before, instr => instr.MatchLdloc(5))) // v_5 == flag == whether we hit an enemy (true) or other object (false)
+            return;
 
-            cursor.Emit(OpCodes.Ldarg_0); // this Projectile
-            cursor.Emit(OpCodes.Ldloc_S, (byte)5); // v_5 == flag == whether we hit an enemy (true) or other object (false)
-            cursor.Emit(OpCodes.Call, typeof(CwaffProjectile).GetMethod("PlayCollisionSounds", BindingFlags.Static | BindingFlags.NonPublic));
-        }
+        cursor.Emit(OpCodes.Ldarg_0); // this Projectile
+        cursor.Emit(OpCodes.Ldloc_S, (byte)5); // v_5 == flag == whether we hit an enemy (true) or other object (false)
+        cursor.Emit(OpCodes.Call, typeof(CwaffProjectile).GetMethod("PlayCollisionSounds", BindingFlags.Static | BindingFlags.NonPublic));
+    }
+}
+
+[HarmonyPatch(typeof(Projectile), nameof(Projectile.OnTileCollision))]
+static class ProjectileOnTileCollisionPatches
+{
+    //NOTE: used by CwaffProjectile to allow playing enemy / object impact sounds without the Play_WPN_..._impact_01 format
+    static void Prefix(Projectile __instance)
+    {
+        CwaffProjectile.PlayCollisionSounds(__instance, false);
+    }
+}
+
+[HarmonyPatch(typeof(Gun), nameof(Gun.ShootSingleProjectile))]
+static class ShootSingleProjectilePatch
+{
+    // NOTE: used by MMAiming to increase reload speed while standing still
+    [HarmonyILManipulator]
+    private static void ReduceSpreadWhenIdleIL(ILContext il, MethodBase original)
+    {
+        ILCursor cursor = new ILCursor(il);
+
+        if (!cursor.TryGotoNext(MoveType.After,
+            instr => instr.MatchLdcI4(2),
+            instr => instr.MatchCallvirt<PlayerStats>("GetStatValue")))
+            return;
+
+        cursor.Emit(OpCodes.Ldloc_0);  // load PlayerController type
+        cursor.Emit(OpCodes.Call, typeof(MMAiming).GetMethod("ModifySpreadIfIdle", BindingFlags.Static | BindingFlags.NonPublic));
     }
 
-    [HarmonyPatch(typeof(Projectile), nameof(Projectile.OnTileCollision))]
-    static class ProjectileOnTileCollisionPatches
+    // NOTE: used by Bionic Finger synergy to reduce spread while firing semiautomatic weapons
+    [HarmonyILManipulator]
+    private static void AimBotZeroSpreadIL(ILContext il, MethodBase original)
     {
-        //NOTE: used by CwaffProjectile to allow playing enemy / object impact sounds without the Play_WPN_..._impact_01 format
-        static void Prefix(Projectile __instance)
-        {
-            CwaffProjectile.PlayCollisionSounds(__instance, false);
-        }
+        ILCursor cursor = new ILCursor(il);
+
+        if (!cursor.TryGotoNext(MoveType.After,
+            instr => instr.MatchLdcI4(2),
+            instr => instr.MatchCallvirt<PlayerStats>("GetStatValue")))
+            return;
+
+        cursor.Emit(OpCodes.Ldloc_0);  // load PlayerController type
+        cursor.Emit(OpCodes.Call, typeof(BionicFinger).GetMethod("ModifySpreadIfSemiautomatic", BindingFlags.Static | BindingFlags.NonPublic));
     }
 }

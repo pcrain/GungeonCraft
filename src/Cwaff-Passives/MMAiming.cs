@@ -16,30 +16,12 @@ public class MMAiming : CwaffPassive
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
     }
 
+    // NOTE: called by patch in CwaffPatches
     private static float ModifySpreadIfIdle(float oldSpread, PlayerController player)
     {
         // if (player.m_playerCommandedDirection != Vector2.zero) //NOTE: this happens inside HandlePlayerInput(), where m_playerCommandedDirection is always zero
         if ((player.m_activeActions.Move.Vector.sqrMagnitude > 0.1f) || !player.HasPassive<MMAiming>())
             return oldSpread;
         return _SPREAD_FACTOR * oldSpread;
-    }
-
-    /// <summary>Increase reload speed while standing still</summary>
-    [HarmonyPatch(typeof(Gun), nameof(Gun.ShootSingleProjectile))]
-    private class ReduceSpreadWhenIdlePatch
-    {
-        [HarmonyILManipulator]
-        private static void ReduceSpreadWhenIdleIL(ILContext il, MethodBase original)
-        {
-            ILCursor cursor = new ILCursor(il);
-
-            if (!cursor.TryGotoNext(MoveType.After,
-                instr => instr.MatchLdcI4(2),
-                instr => instr.MatchCallvirt<PlayerStats>("GetStatValue")))
-                return;
-
-            cursor.Emit(OpCodes.Ldloc_0);  // load PlayerController type
-            cursor.Emit(OpCodes.Call, typeof(MMAiming).GetMethod("ModifySpreadIfIdle", BindingFlags.Static | BindingFlags.NonPublic));
-        }
     }
 }

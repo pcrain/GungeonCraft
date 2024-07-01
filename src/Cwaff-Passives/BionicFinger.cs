@@ -23,7 +23,6 @@ public class BionicFinger : CwaffPassive
         private static void HandleGunFiringInternalIL(ILContext il)
         {
             ILCursor cursor = new ILCursor(il);
-            // cursor.DumpIL("HandlePlayerPhasingInputIL");
             while (cursor.TryGotoNext(MoveType.After, instr => instr.MatchAdd(), instr => instr.MatchStfld<PlayerController>("m_controllerSemiAutoTimer")))
             {
                 /* the next four instructions after this point are as follows
@@ -47,25 +46,12 @@ public class BionicFinger : CwaffPassive
           return 0f; // replace the value we're checking against with 0f to completely remove semi-automatic fake cooldown
       return BraveInput.ControllerFakeSemiAutoCooldown; // return the original value
     }
+
+    // NOTE: called by patch in CwaffPatches
+    private static float ModifySpreadIfSemiautomatic(float oldSpread, PlayerController player)
+    {
+        if (!player.CurrentGun || player.CurrentGun.DefaultModule.shootStyle != ShootStyle.SemiAutomatic)
+            return oldSpread;
+        return player.HasSynergy(Synergy.AIM_BOTS) ? 0f : oldSpread;
+    }
 }
-
-// ***old code for setting up new break labels. turned out not to be necessary, but keeping around for reference and posterity
-
-// ILLabel vanillaTarget = null; // set up a new label for our new branch point
-// cursor.Next.Next.Next.MatchBleUn(out vanillaTarget); //mark the vanilla branch point for later
-// if (vanillaTarget != null)
-//     ETGModConsole.Log($"  found vanila break target at {vanillaTarget.Target.Offset}");
-// ILCursor cursor2 = new ILCursor(il); //cursor.Clone();
-// cursor2.GotoLabel(vanillaTarget, MoveType.AfterLabel); // move to the vanilla branch point
-// ILLabel replacementLabel = cursor2.MarkLabel(); // mark our own label
-// cursor2.Index = 0;
-// while (cursor2.TryGotoNext(MoveType.Before, instr => instr.MatchBleUn(vanillaTarget)))
-// {
-//     ETGModConsole.Log($"    replacing vanilla label at {cursor2.Next.Offset}");
-//     cursor2.Remove();
-//     cursor2.Emit(OpCodes.Ble_Un, replacementLabel);
-// }
-// cursor.Emit(OpCodes.Ble_Un, replacementLabel); // branch to our replacement target
-
-// Hex number conversions
-// var offset = int.Parse(match.Groups[1].Value, System.Globalization.NumberStyles.HexNumber);

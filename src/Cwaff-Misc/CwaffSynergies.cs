@@ -49,6 +49,8 @@ public static class CwaffSynergies
         NewSynergy(DEAD_MAN_STANDING, "Dead Man Standing", new[]{IName(DeadRinger.ItemName), "decoy"});
         // Spawns an explosive decoy when feigning death.
         NewSynergy(DEAD_MAN_EXPANDING, "Dead Man Expanding", new[]{IName(DeadRinger.ItemName), "explosive_decoy"});
+        // Semi-automatic weapons have perfect accuracy.
+        NewSynergy(AIM_BOTS, "Aim Bots", new[]{IName(BionicFinger.ItemName), "nanomachines"});
       #endregion
 
       #region Masteries
@@ -302,6 +304,7 @@ public enum Synergy {
     DEATH_AND_TAXES,
     DEAD_MAN_STANDING,
     DEAD_MAN_EXPANDING,
+    AIM_BOTS,
 
     // Masteries
     MASTERY_GRANDMASTER,
