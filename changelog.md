@@ -2,7 +2,7 @@
 
 ## TBD
 
-- Added masteries for Vacuum Cleaner, Paintball Cannon, and Gunbrella
+- Added masteries for Vacuum Cleaner, Paintball Cannon, Gunbrella, and Alyx
 - Added indicator for amount of debris vacuumed to Vacuum Cleaner ammo display
 - Vacuum Cleaner debris is now processed when it is actually absorbed, rather than when it is suctioned
 - Tweaked Gunbrella projectiles so that they actually fall closer to the reticle rather than overshooting it

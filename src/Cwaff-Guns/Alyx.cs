@@ -16,6 +16,7 @@ public class Alyx : CwaffGun
     internal static readonly float _AMMO_DECAY_LAMBDA = Mathf.Log(2) / _AMMO_HALF_LIFE_SECS;
     internal static readonly float _GUN_DECAY_LAMBDA  = Mathf.Log(2) / _GUN_HALF_LIFE_SECS;
 
+    private DamageTypeModifier _poisonImmunity = null;
     private Coroutine _decayCoroutine = null;
 
     public float timeAtLastRecalc   = 0.0f; // must be public so it serializes properly when dropped / picked up
@@ -44,10 +45,16 @@ public class Alyx : CwaffGun
         Material m = gun.sprite.renderer.material;
         m.SetFloat("_EmissivePower", 50f + 100f * Mathf.Abs(Mathf.Sin(BraveTime.ScaledTimeSinceStartup)));
         RecalculateAmmo();
+        if (this.PlayerOwner && this.PlayerOwner.PlayerHasActiveSynergy(Synergy.MASTERY_ALYX))
+            this.PlayerOwner.healthHaver.damageTypeModifiers.AddUnique(this._poisonImmunity);
     }
 
     public override void OnPlayerPickup(PlayerController player)
     {
+        this._poisonImmunity ??= new DamageTypeModifier {
+            damageType = CoreDamageTypes.Poison,
+            damageMultiplier = 0f,
+        };
         if (timeAtLastRecalc == 0.0f)
         {
             this.gun.SetBaseMaxAmmo(_BASE_MAX_AMMO);
@@ -81,6 +88,12 @@ public class Alyx : CwaffGun
             this._decayCoroutine = this.GenericOwner.StartCoroutine(DecayWhileInactive());
     }
 
+    public override void OnDroppedByPlayer(PlayerController player)
+    {
+        base.OnDroppedByPlayer(player);
+        player.healthHaver.damageTypeModifiers.TryRemove(this._poisonImmunity);
+    }
+
     public override void OnDestroy()
     {
         if (this._decayCoroutine != null)
@@ -88,6 +101,8 @@ public class Alyx : CwaffGun
             StopCoroutine(this._decayCoroutine);
             this._decayCoroutine = null;
         }
+        if (this.PlayerOwner)
+            this.PlayerOwner.healthHaver.damageTypeModifiers.TryRemove(this._poisonImmunity);
         base.OnDestroy();
     }
 
@@ -113,8 +128,9 @@ public class Alyx : CwaffGun
             return;
         this.timeAtLastRecalc = BraveTime.ScaledTimeSinceStartup;
 
-        int newAmmo = ComputeExponentialDecay((float)this.gun.CurrentAmmo, _AMMO_DECAY_LAMBDA, timeSinceLastRecalc);
-        int newMaxAmmo = ComputeExponentialDecay((float)this.gun.GetBaseMaxAmmo(), _GUN_DECAY_LAMBDA, timeSinceLastRecalc);
+        float decayFactor = (this.PlayerOwner && this.PlayerOwner.PlayerHasActiveSynergy(Synergy.MASTERY_ALYX)) ? 0.25f : 1.0f;
+        int newAmmo = ComputeExponentialDecay((float)this.gun.CurrentAmmo, decayFactor * _AMMO_DECAY_LAMBDA, timeSinceLastRecalc);
+        int newMaxAmmo = ComputeExponentialDecay((float)this.gun.GetBaseMaxAmmo(), decayFactor * _GUN_DECAY_LAMBDA, timeSinceLastRecalc);
 
         // If we've decayed at all, create poison goop under our feet
         if (newAmmo < this.gun.CurrentAmmo || newMaxAmmo < this.gun.GetBaseMaxAmmo())

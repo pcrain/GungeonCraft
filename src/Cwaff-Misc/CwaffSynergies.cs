@@ -72,6 +72,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfPaintballCannon>(MASTERY_PAINTBALL_CANNON, PaintballCannon.ItemName);
         // Gunbrella fires a constant stream of projectiles at the cursor
         NewMastery<MasteryOfGunbrella>(MASTERY_GUNBRELLA, Gunbrella.ItemName);
+        // Alyx decays four times slower and passively grants poison immunity
+        NewMastery<MasteryOfAlyx>(MASTERY_ALYX, Alyx.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -273,6 +275,7 @@ internal class MasteryOfHolyWaterGun    : MasteryDummyItem {}
 internal class MasteryOfVacuumCleaner   : MasteryDummyItem {}
 internal class MasteryOfPaintballCannon : MasteryDummyItem {}
 internal class MasteryOfGunbrella       : MasteryDummyItem {}
+internal class MasteryOfAlyx            : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -302,4 +305,5 @@ public enum Synergy {
     MASTERY_VACUUM_CLEANER,
     MASTERY_PAINTBALL_CANNON,
     MASTERY_GUNBRELLA,
+    MASTERY_ALYX,
 };
