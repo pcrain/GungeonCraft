@@ -90,7 +90,7 @@ public class CwaffReticle : MonoBehaviour
     {
       case DEFAULT:    this._visible = this._player.IsKeyboardAndMouse() ? true  : this._player.m_activeActions.Aim.Vector.sqrMagnitude > 0.02f; break;
       case CONTROLLER: this._visible = this._player.IsKeyboardAndMouse() ? false : this._player.m_activeActions.Aim.Vector.sqrMagnitude > 0.02f; break;
-      case CHARGING:   this._visible = this._gun.gun.IsCharging; break;
+      case CHARGING:   this._visible = this._gun.gun.IsCharging || this._gun.gun.IsFiring; break;
       case WITHTARGET: this._visible = this._targetObject != null; break;
       case ALWAYS:     this._visible = true; break;
     }

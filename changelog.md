@@ -2,9 +2,11 @@
 
 ## TBD
 
-- Added masteries for Vacuum Cleaner and Paintball Cannon
+- Added masteries for Vacuum Cleaner, Paintball Cannon, and Gunbrella
 - Added indicator for amount of debris vacuumed to Vacuum Cleaner ammo display
 - Vacuum Cleaner debris is now processed when it is actually absorbed, rather than when it is suctioned
+- Tweaked Gunbrella projectiles so that they actually fall closer to the reticle rather than overshooting it
+- Made each of the 16 separate projectiles fired by Gunbrella cost 1 ammo, and increased Gunbrella's ammo from 60 to 960 to compensate
 
 - Fixed R.C. Launcher projectiles slowing down too much at higher frame rates
 - Fixed drop Jugglernaut guns having collision that can interfere with the player's movement

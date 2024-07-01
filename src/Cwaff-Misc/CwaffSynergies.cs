@@ -70,6 +70,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfVacuumCleaner>(MASTERY_VACUUM_CLEANER, VacuumCleaner.ItemName);
         // Projectiles spawn status effect goops corresponding to their color while in flight and upon impact
         NewMastery<MasteryOfPaintballCannon>(MASTERY_PAINTBALL_CANNON, PaintballCannon.ItemName);
+        // Gunbrella fires a constant stream of projectiles at the cursor
+        NewMastery<MasteryOfGunbrella>(MASTERY_GUNBRELLA, Gunbrella.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -270,6 +272,7 @@ internal class MasteryOfCrapshooter     : MasteryDummyItem {}
 internal class MasteryOfHolyWaterGun    : MasteryDummyItem {}
 internal class MasteryOfVacuumCleaner   : MasteryDummyItem {}
 internal class MasteryOfPaintballCannon : MasteryDummyItem {}
+internal class MasteryOfGunbrella       : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -298,4 +301,5 @@ public enum Synergy {
     MASTERY_HOLY_WATER_GUN,
     MASTERY_VACUUM_CLEANER,
     MASTERY_PAINTBALL_CANNON,
+    MASTERY_GUNBRELLA,
 };
