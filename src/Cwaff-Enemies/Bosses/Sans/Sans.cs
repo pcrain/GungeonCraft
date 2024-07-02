@@ -149,7 +149,7 @@ public partial class SansBoss : AIActor
       base.sprite.FlipX  = overrideFlip ?? (GameManager.Instance.BestActivePlayer.SpriteBottomCenter.x < base.specRigidbody.UnitBottomCenter.x);
       Vector3 spriteSize = base.sprite.GetUntrimmedBounds().size;
       Vector3 offset     = Vector3.zero.WithX(spriteSize.x / (base.sprite.FlipX ? 2f : -2f));
-      base.sprite.transform.localPosition = (Vector3)base.specRigidbody.UnitBottomCenter/*.RoundToInt()*/ + offset;
+      base.sprite.transform.localPosition = (Vector3)base.specRigidbody.UnitBottomCenter.Quantize(C.PIXEL_SIZE) + offset;
       if (aura != null)
         aura.transform.localPosition = new Vector3(0,spriteSize.y / 2,0) - offset;
     }
