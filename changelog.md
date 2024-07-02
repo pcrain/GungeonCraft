@@ -14,7 +14,7 @@
 - Added trails to Gunbrella projectiles
 - Fixed impact particles for Pistol Whip's melee hit not appearing after the first time it is used
 - Fixed sprites for [REDACTED] being jittery on some GPUs
-
+- Fixed [REDACTED] from using a certain attack too close to walls, making it undodgeable
 - Fixed R.C. Launcher projectiles slowing down too much at higher frame rates
 - Fixed drop Jugglernaut guns having collision that can interfere with the player's movement
 - Fixed several null derefs caused by Magunet debris projectiles not resetting their sprites properly when launched
