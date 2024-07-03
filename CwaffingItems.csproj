@@ -142,6 +142,7 @@
     <Compile Include="src\Cwaff-Guns\VacuumCleaner.cs"/>
     <Compile Include="src\Cwaff-Guns\Magunet.cs"/>
     <Compile Include="src\Cwaff-Guns\IronMaid.cs"/>
+    <Compile Include="src\Cwaff-Guns\BlasTechF4.cs"/>
     <Compile Include="src\Cwaff-Guns\ChekhovsGun.cs"/>
     <Compile Include="src\Cwaff-Guns\AimuHakurei.cs"/>
     <Compile Include="src\Cwaff-Guns\Unfinished\DeathNote.cs"/>

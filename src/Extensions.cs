@@ -2097,4 +2097,89 @@ public static class Extensions
     if (list.Contains(item))
       list.Remove(item);
   }
+
+  /// <summary>Get an appropriate angle for the current projectile</summary>
+  public static float GetAngleForProjectile(this PlayerController player, ProjectileModule mod = null)
+  {
+      if (player.CurrentGun is not Gun gun)
+          return player.m_overrideGunAngle ?? player.m_currentGunAngle;
+      return gun.gunAngle + (mod ?? gun.DefaultModule).GetAngleForShot(1f, player.stats.GetStatValue(PlayerStats.StatType.Accuracy));
+  }
+
+  /// <summary>Returns whether a projectile is on a collision path with an enemy, optionally including walls, pixel perfect collision, and outsetting our hitbox</summary>
+  public static bool WouldCollideWithEnemy(this Projectile projectile, float angle, bool accountForWalls = true, bool pixelPerfect = false, int outset = 0)
+  {
+      Vector2 ppos                     = projectile.transform.position.XY();
+      IntVector2 pixelDelta            = accountForWalls
+        ? PhysicsEngine.UnitToPixel(ppos.ToNearestWall(out Vector2 normal, angle, minDistance: 1) - ppos)
+        : PhysicsEngine.UnitToPixel(angle.ToVector(20f));
+      PixelCollider projectileCollider = projectile.specRigidbody.PrimaryPixelCollider;
+      foreach (AIActor enemy in ppos.SafeGetEnemiesInRoom())
+      {
+          if (!enemy.IsHostile(canBeNeutral: true) || !enemy.specRigidbody)
+              continue;
+          PixelCollider collider = enemy.specRigidbody.HitboxPixelCollider;
+          if (accountForWalls && !ppos.HasLineOfSight(collider.UnitCenter))
+              continue; // avoid more expensive linear cast if possible
+          if (projectileCollider.FastLinearCast(collider, pixelDelta, pixelPerfect: pixelPerfect, outset: outset))
+            return true;
+      }
+      return false;
+  }
+
+  private static readonly List<PixelCollider.StepData> _Steps = new();
+  /// <summary>Fast version of LinearCast that doesn't allocate a LinearCastResult, with optional imprecise collision and hitbox outset collision</summary>
+  public static bool FastLinearCast(this PixelCollider myCollider, PixelCollider otherCollider, IntVector2 pixelsToMove, bool pixelPerfect = false, int outset = 0)
+  {
+      PhysicsEngine.PixelMovementGenerator(pixelsToMove, _Steps);
+      return myCollider.FastLinearCast(otherCollider, pixelsToMove, _Steps, pixelPerfect, outset);
+  }
+
+  /// <summary>Fast version of LinearCast that doesn't allocate a LinearCastResult, with optional imprecise collision and hitbox outset collision</summary>
+  public static bool FastLinearCast(this PixelCollider myCollider, PixelCollider otherCollider, IntVector2 pixelsToMove, List<PixelCollider.StepData> stepList, bool pixelPerfect = false, int outset = 0)
+  {
+      if (!myCollider.Enabled)
+          return false;
+      if (otherCollider.DirectionIgnorer != null && otherCollider.DirectionIgnorer(pixelsToMove))
+          return false;
+
+      IntVector2 myPos  = myCollider.m_position;
+      IntVector2 myDims = myCollider.m_dimensions;
+      if (outset > 0) // outset our hitbox dimensions a bit
+      {
+        myPos  -= new IntVector2(outset, outset);
+        myDims += new IntVector2(2 * outset, 2 * outset);
+      }
+
+      IntVector2 totalDelta = IntVector2.Zero;
+      IntVector2 posDelta   = otherCollider.m_position - myPos;
+      for (int i = 0; i < stepList.Count; i++)
+      {
+          IntVector2 deltaPos = stepList[i].deltaPos;
+          IntVector2 stepPos = myPos + totalDelta + deltaPos;
+          if (!IntVector2.AABBOverlap(stepPos, myDims, otherCollider.Position, otherCollider.Dimensions))
+          {
+            totalDelta += deltaPos;
+            continue;
+          }
+          if (!pixelPerfect)
+            return true; // only care about overlapping rectangles
+
+          IntVector2 minPos = IntVector2.Max(IntVector2.Zero, otherCollider.Position - stepPos);
+          IntVector2 maxPos = IntVector2.Min(myDims - IntVector2.One, otherCollider.UpperRight - stepPos);
+          for (int j = minPos.x; j <= maxPos.x; j++)
+          {
+              for (int k = minPos.y; k <= maxPos.y; k++)
+              {
+                  if (!myCollider.m_bestPixels[j, k])
+                      continue;
+                  IntVector2 pos = new IntVector2(j, k) - posDelta + totalDelta + deltaPos;
+                  if (pos.x >= 0 && pos.x < otherCollider.Dimensions.x && pos.y >= 0 && pos.y < otherCollider.Dimensions.y && otherCollider[pos])
+                    return true;
+              }
+          }
+          totalDelta += deltaPos;
+      }
+      return false;
+  }
 }

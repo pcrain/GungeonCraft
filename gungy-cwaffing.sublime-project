@@ -7,13 +7,19 @@
         "*.sublime-project",
         "packages.config",
         "*~",
+        ".project",
+        "_CwaffingTheGungy*"
       ],
       "folder_exclude_patterns":
       [
           "_old/",
+          "_dotNETFramework/",
+          "_thunderstore_package/",
           "bin/",
           "obj/",
           "packages/",
+          "previews/",
+          ".todo/",
       ],
       "path": ".",
     }

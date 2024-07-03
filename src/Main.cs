@@ -253,6 +253,7 @@ public class Initialisation : BaseUnityPlugin
                 Starmageddon.Init();
                 Widowmaker.Init();
                 Zag.Init();
+                BlasTechF4.Init();
 
                 setupGunsWatch.Stop();
             #endregion

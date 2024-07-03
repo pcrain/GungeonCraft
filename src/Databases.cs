@@ -1081,7 +1081,6 @@ public static class Explosions
     //     ItemHelper.Get(Items.Decoy).GetComponent<SpawnObjectPlayerItem>().objectToSpawn.GetComponent<Decoy>().DeathExplosion;
 }
 
-
 public static class EasyGoopDefinitions  // mostly stolen from NN
 {
     //Basegame Goops

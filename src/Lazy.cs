@@ -444,13 +444,15 @@ public static class Lazy
     }
 
     /// <summary>Determine whether any enemy is in an line between start and end (does not account for walls)</summary>
-    public static bool AnyEnemyInLineOfSight(Vector2 start, Vector2 end, bool canBeNeutral = true)
+    public static bool AnyEnemyInLineOfSight(Vector2 start, Vector2 end, bool canBeNeutral = true, bool accountForWalls = false)
     {
         foreach (AIActor enemy in start.SafeGetEnemiesInRoom())
         {
             if (!enemy.IsHostile(canBeNeutral: canBeNeutral) || !enemy.specRigidbody)
                 continue;
             PixelCollider collider = enemy.specRigidbody.HitboxPixelCollider;
+            if (accountForWalls && !start.HasLineOfSight(collider.UnitCenter))
+                continue;
             if (BraveUtility.LineIntersectsAABB(start, end, collider.UnitBottomLeft, collider.UnitDimensions, out Vector2 intersection))
                 return true;
         }
