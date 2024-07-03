@@ -49,13 +49,6 @@ public class ChekhovsGun : CwaffGun
         base.OnDestroy();
     }
 
-    public override Projectile OnPreFireProjectileModifier(Gun gun, Projectile projectile, ProjectileModule mod)
-    {
-        if (projectile.GetComponent<ChekhovBullet>() is ChekhovBullet cb)
-            cb.isAFreebie = projectile.FiredForFree(gun, mod);
-        return projectile;
-    }
-
     public override void PostProcessProjectile(Projectile projectile)
     {
         if (projectile.GetComponent<ChekhovBullet>() is ChekhovBullet cb)
@@ -74,7 +67,7 @@ public class ChekhovsGun : CwaffGun
             if (!projectile.isActiveAndEnabled)
                 continue;
             projectile.DieInAir(false, false, false, true);
-            if (!cb.isAFreebie)
+            if (!projectile.FiredForFree())
                 ++ammoToRestore;
         }
         this._extantBullets.Clear();
@@ -94,7 +87,6 @@ public class ChekhovBullet : MonoBehaviour
     private GameObject _sightline        = null;
     private GameObject _gunVfx           = null;
 
-    public bool isAFreebie               = false;
     public bool mastered                 = false;
 
     private void Start()

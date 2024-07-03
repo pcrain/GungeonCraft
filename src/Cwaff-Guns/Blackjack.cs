@@ -29,17 +29,6 @@ public class Blackjack : CwaffGun
           ).SetAllImpactVFX(VFX.CreatePool("blackjack_card_impact_vfx", fps: 16, loops: false, scale: 0.75f, anchor: Anchor.MiddleCenter)
           ).Attach<ThrownCard>();
     }
-
-    public override Projectile OnPreFireProjectileModifier(Gun gun, Projectile projectile, ProjectileModule mod)
-    {
-        if (projectile.GetComponent<ThrownCard>() is not ThrownCard tc)
-            return projectile;
-        if (gun.CurrentOwner is not PlayerController player)
-            return projectile;
-
-        tc.isAFreebie = projectile.FiredForFree(gun, mod);
-        return projectile;
-    }
 }
 
 public class ThrownCard : MonoBehaviour
@@ -60,8 +49,6 @@ public class ThrownCard : MonoBehaviour
     private float            _startScale       = 1f;
     private float            _startAngle       = 0f;
     private bool             _bounced          = false;
-
-    public bool isAFreebie = true; // false if we fired directly from the gun and it cost us ammo, true otherwise
 
     private void Start()
     {
@@ -150,7 +137,7 @@ public class ThrownCard : MonoBehaviour
 
     private void CreatePlayingCardPickup(Projectile p)
     {
-        if (this.isAFreebie)
+        if (p.FiredForFree())
             return; // don't create free ammo from, e.g., scattershot
 
         MiniInteractable mi = MiniInteractable.CreateInteractableAtPosition(

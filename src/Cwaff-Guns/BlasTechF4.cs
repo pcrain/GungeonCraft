@@ -3,7 +3,7 @@
 public class BlasTechF4 : CwaffGun
 {
     public static string ItemName         = "BlasTech F-4";
-    public static string ShortDescription = "TBD";
+    public static string ShortDescription = "Imperial Quality";
     public static string LongDescription  = "TBD";
     public static string Lore             = "The BlasTech Alternating F-4 Rifle...";
 

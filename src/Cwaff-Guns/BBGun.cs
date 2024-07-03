@@ -37,17 +37,6 @@ public class BBGun : CwaffGun
                 ChargeTime = _CHARGE_LEVELS[i],
             });
     }
-
-    public override Projectile OnPreFireProjectileModifier(Gun gun, Projectile projectile, ProjectileModule mod)
-    {
-        if (projectile.GetComponent<TheBB>() is not TheBB bb)
-            return projectile;
-        if (gun.CurrentOwner is not PlayerController player)
-            return projectile;
-
-        bb.isAFreebie = projectile.FiredForFree(gun, mod);
-        return projectile;
-    }
 }
 
 public class TheBB : MonoBehaviour
@@ -60,8 +49,6 @@ public class TheBB : MonoBehaviour
     private const float _BASE_ANIM_SPEED    = 2.0f;
     private const float _BOUNCE_SPEED_DECAY = 0.9f;
 
-    public bool isAFreebie = true; // false if we fired directly from the gun and it cost us ammo, true otherwise
-
     private Projectile _projectile;
     private PlayerController _owner;
     private float _maxSpeed = 0f;
@@ -71,7 +58,7 @@ public class TheBB : MonoBehaviour
         this._projectile = base.GetComponent<Projectile>();
         this._owner = this._projectile.Owner as PlayerController;
 
-        if (!this.isAFreebie)
+        if (!this._projectile.FiredForFree())
             this._projectile.OnDestruction += CreateInteractible;
         this._maxSpeed = this._projectile.baseData.speed;
 
