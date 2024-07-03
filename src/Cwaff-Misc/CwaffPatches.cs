@@ -181,4 +181,20 @@ static class ShootSingleProjectilePatch
         cursor.Emit(OpCodes.Ldloc_0);  // load PlayerController type
         cursor.Emit(OpCodes.Call, typeof(BionicFinger).GetMethod("ModifySpreadIfSemiautomatic", BindingFlags.Static | BindingFlags.NonPublic));
     }
+
+    // NOTE: used by CwaffProjectile to determine if a projectile was fired for free
+    [HarmonyILManipulator]
+    private static void CheckFreebieIL(ILContext il, MethodBase original)
+    {
+        ILCursor cursor = new ILCursor(il);
+
+        if (!cursor.TryGotoNext(MoveType.After,
+            instr => instr.MatchCall<Gun>("ApplyCustomAmmunitionsToProjectile")))
+            return;
+
+        cursor.Emit(OpCodes.Ldloc_S, (byte)10);  // V_10 == our projectile
+        cursor.Emit(OpCodes.Ldarg_0);  // load Gun
+        cursor.Emit(OpCodes.Ldarg_1);  // load ProjectileModule
+        cursor.Emit(OpCodes.Call, typeof(CwaffProjectile).GetMethod("DetermineIfFiredForFree", BindingFlags.Static | BindingFlags.NonPublic));
+    }
 }

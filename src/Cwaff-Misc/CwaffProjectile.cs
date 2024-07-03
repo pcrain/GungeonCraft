@@ -13,6 +13,7 @@ public class CwaffProjectile : MonoBehaviour
     public float shrapnelMaxVelocity = 8f;
     public float shrapnelLifetime    = 0.3f;
     public bool preventOrbiting      = false;
+    public bool firedForFree         = true;
 
     private Projectile _projectile;
     private PlayerController _owner;
@@ -75,6 +76,29 @@ public class CwaffProjectile : MonoBehaviour
         AkSoundEngine.PostEvent(p.enemyImpactEventName, p.gameObject);
       else if (!hitEnemy && !string.IsNullOrEmpty(p.objectImpactEventName))
         AkSoundEngine.PostEvent(p.objectImpactEventName, p.gameObject);
+    }
+
+    // NOTE: called by patch in CwaffPatches
+    internal static void DetermineIfFiredForFree(Projectile p, Gun gun, ProjectileModule module)
+    {
+      if (p.gameObject.GetComponent<CwaffProjectile>() is not CwaffProjectile cp)
+        return;
+      if (gun.InfiniteAmmo)
+      {
+        cp.firedForFree = true;
+        return;
+      }
+
+      if (gun.modifiedFinalVolley != null && module == gun.modifiedFinalVolley.projectiles[0])
+        module = gun.DefaultModule;
+      int cost = module.ammoCost;
+      if (module.shootStyle == ProjectileModule.ShootStyle.Charged)
+      {
+        ProjectileModule.ChargeProjectile chargeProjectile = module.GetChargeProjectile(gun.m_moduleData[module].chargeTime);
+        if (chargeProjectile.UsesAmmo)
+          cost = chargeProjectile.AmmoCost;
+      }
+      cp.firedForFree = (cost == 0);
     }
 
     /// <summary>Prevent projectiles from being affected by Orbital Bullets if preventOrbiting is set</summary>

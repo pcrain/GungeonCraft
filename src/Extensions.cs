@@ -2182,4 +2182,10 @@ public static class Extensions
       }
       return false;
   }
+
+  /// <summary>Determine if a projectile was fired for free</summary>
+  public static bool FiredForFree(this Projectile p)
+  {
+    return p.gameObject.GetComponent<CwaffProjectile>() is CwaffProjectile c && c.firedForFree;
+  }
 }
