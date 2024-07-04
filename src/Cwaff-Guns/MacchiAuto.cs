@@ -35,8 +35,7 @@ public class MacchiAuto : CwaffGun
         projectile.gameObject.transform.localScale = Vector3.one;
         projectile.gameObject.transform.localPosition = Vector3.zero;
 
-        BasicBeamController beamComp = projectile.SetupBeamSprites(
-          spriteName: "overdose", fps: 20, dims: new Vector2(15, 15), impactDims: new Vector2(7, 7));
+        BasicBeamController beamComp = projectile.SetupBeamSprites(spriteName: "overdose", fps: 20, dims: new Vector2(15, 15), impactDims: new Vector2(7, 7));
             beamComp.TimeToStatus = 0f; // apply our status effect immediately
             beamComp.GetComponent<GoopModifier>().goopDefinition = EasyGoopDefinitions.CoffeeGoop;
 

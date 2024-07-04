@@ -279,6 +279,7 @@ public class Initialisation : BaseUnityPlugin
                 ChestScanner.Init();
                 BulletbotImplant.Init();
                 Frisbee.Init();
+                Telefragger.Init();
 
                 setupActivesWatch.Stop();
             #endregion

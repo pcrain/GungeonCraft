@@ -160,7 +160,6 @@
     <Compile Include="src\Cwaff-Guns\Unfinished\TimingGun.cs"/>
     <Compile Include="src\Cwaff-Guns\Unfinished\DerailGun.cs"/>
     <Compile Include="src\Cwaff-Guns\Unfinished\SpinCycle.cs"/>
-    <Compile Include="src\Cwaff-Guns\Unfinished\Telefragger.cs"/>
     <Compile Include="src\Cwaff-Guns\PlatinumStar.cs"/>
     <Compile Include="src\Cwaff-Guns\Crapshooter.cs"/>
     <Compile Include="src\Cwaff-Guns\Blamethrower.cs"/>
@@ -211,6 +210,7 @@
     <Compile Include="src\Cwaff-Guns\Starmageddon.cs"/>
     <Compile Include="src\Cwaff-Guns\Uppskeruvel.cs"/>
     <Compile Include="src\Cwaff-Guns\Alyx.cs"/>
+    <Compile Include="src\Cwaff-Guns\Telefragger.cs"/>
     <Compile Include="src\Cwaff-Flows\FlowHelpers.cs"/>
     <Compile Include="src\Cwaff-Flows\CwaffDungeons.cs"/>
     <Compile Include="src\Cwaff-Flows\SansDungeon.cs"/>
