@@ -68,7 +68,9 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
                 aIAnimator.spriteAnimator  = spriteAnimator;
                 aIAnimator.OtherAnimations = Lazy.EasyNamedDirectionalAnimations(animNames.ToArray());
 
-            SpeculativeRigidbody rigidbody = ShopAPI.GenerateOrAddToRigidBody(npcObj, CollisionLayer.BulletBlocker, PixelCollider.PixelColliderGeneration.Manual, true, true, true, false, false, false, false, true, new IntVector2(20, 18), new IntVector2(5, 0));
+            //HACK: hitbox sizes are hardcoded, do better later when i have more time
+            SpeculativeRigidbody rigidbody = ShopAPI.GenerateOrAddToRigidBody(npcObj, CollisionLayer.LowObstacle, PixelCollider.PixelColliderGeneration.Manual, true, true, true, false, false, false, false, true, new IntVector2(20, 18), new IntVector2(5, 0));
+            rigidbody.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.BulletBlocker));
 
             FancyNPC ci = npcObj.AddComponent<T>() as FancyNPC;
                 ci.talkPointAdjustment = talkPointAdjust.HasValue ? talkPointAdjust.Value : Vector3.zero;

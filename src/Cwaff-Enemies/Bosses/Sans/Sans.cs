@@ -46,7 +46,7 @@ public partial class SansBoss : AIActor
     bb.CreateBulletAttack<HesitantBulletWallScript>(fireAnim: "throw_down",  cooldown: 0.25f, attackCooldown: 0.15f);
     bb.CreateBulletAttack<SquareBulletScript>      (fireAnim: "throw_left",  cooldown: 0.25f, attackCooldown: 0.15f);
     bb.CreateBulletAttack<ChainBulletScript>       (fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
-    bb.CreateBulletAttack<WallSlamScript>          (fireAnim: "laugh",       cooldown: 0.25f, attackCooldown: 0.15f);
+    bb.CreateBulletAttack<WallSlamScript>          (fireAnim: "laugh",       cooldown: 0.25f, attackCooldown: 0.15f);  //TODO: refactor to use CreateSequentialAttack and CustomTeleportBehavior
     bb.CreateBulletAttack<SineWaveScript>          (fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
     bb.CreateBulletAttack<OrangeAndBlueScript>     (fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
     bb.CreateBulletAttack<WiggleWaveScript>        (fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
@@ -148,10 +148,11 @@ public partial class SansBoss : AIActor
     {
       base.sprite.FlipX  = overrideFlip ?? (GameManager.Instance.BestActivePlayer.SpriteBottomCenter.x < base.specRigidbody.UnitBottomCenter.x);
       Vector3 spriteSize = base.sprite.GetUntrimmedBounds().size;
-      Vector3 offset     = Vector3.zero.WithX(spriteSize.x / (base.sprite.FlipX ? 2f : -2f));
-      base.sprite.transform.localPosition = (Vector3)base.specRigidbody.UnitBottomCenter.Quantize(C.PIXEL_SIZE) + offset;
+      Vector2 offset     = new Vector2(spriteSize.x / (base.sprite.FlipX ? 2f : -2f), 0f);
+      base.sprite.transform.localPosition = (base.specRigidbody.UnitBottomCenter.Quantize(C.PIXEL_SIZE) + offset).ToVector3ZisY(0f);
+      base.sprite.UpdateZDepth();
       if (aura != null)
-        aura.transform.localPosition = new Vector3(0,spriteSize.y / 2,0) - offset;
+        aura.transform.localPosition = new Vector3(-offset.x ,spriteSize.y / 2,0);
     }
 
     public void FinishedIntro()
