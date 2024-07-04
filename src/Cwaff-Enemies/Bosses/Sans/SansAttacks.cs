@@ -281,6 +281,8 @@ public partial class SansBoss : AIActor
     private const int   SHOTDELAY = 3;
     private const int   SLAMS     = 5;
     private const int   SLAMDELAY = 60;
+    private const int   TELEDELAY = 20;
+    private const int   MERCYTIME = 5;
 
     private PathRect slamBoundsPath;
 
@@ -289,7 +291,8 @@ public partial class SansBoss : AIActor
       this.slamBoundsPath = new PathRect(base.roomSlamBounds);
 
       bool vertical = Lazy.CoinFlip();
-      FluidBulletInfo f = Run(DoTheThing(Lazy.CoinFlip() ? (vertical ? "up" : "left") : (vertical ? "down" : "right")));
+      FluidBulletInfo f = Run(TeleportToCenter())
+        .Then(DoTheThing(Lazy.CoinFlip() ? (vertical ? "up" : "left") : (vertical ? "down" : "right")));
       for (int i = 1 ; i < SLAMS; ++i)
       {
         vertical = (!vertical);
@@ -297,6 +300,41 @@ public partial class SansBoss : AIActor
       }
 
       return f.Finish();
+    }
+
+    private IEnumerator TeleportToCenter()
+    {
+      theBoss.gameObject.Play(SOUND_TELEPORT);
+      theBoss.aiAnimator.PlayUntilFinished("teleport_out");
+      while (theBoss.aiAnimator.IsPlaying("teleport_out"))
+        yield return Wait(1);
+
+      Vector2 oldPos = theBoss.Position.XY();
+      theBoss.specRigidbody.CollideWithOthers = false;
+      theBoss.IsGone = true;
+      theBoss.sprite.renderer.enabled = false;
+      yield return Wait(TELEDELAY);
+
+      theBoss.specRigidbody.CollideWithOthers = true;
+      theBoss.IsGone = false;
+      theBoss.sprite.renderer.enabled = true;
+
+      Vector2 newPos = base.roomFullBounds.center - theBoss.sprite.GetRelativePositionFromAnchor(Anchor.MiddleCenter);
+      Vector2 delta = (newPos-oldPos);
+      for(int i = 0; i < 10; ++i)
+        SpawnDust(oldPos + (i/10.0f) * delta + Lazy.RandomVector(UnityEngine.Random.Range(0.3f,1.25f)));
+
+      theBoss.transform.position = newPos;
+      theBoss.specRigidbody.Reinitialize();
+
+      theBoss.gameObject.Play(SOUND_TELEPORT);
+      theBoss.aiAnimator.PlayUntilFinished("teleport_in");
+      while (theBoss.aiAnimator.IsPlaying("teleport_in"))
+        yield return Wait(1);
+
+      yield return Wait(MERCYTIME);
+
+      yield break;
     }
 
     private IEnumerator DoTheThing(string direction)
