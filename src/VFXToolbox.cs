@@ -581,9 +581,11 @@ public static class VFX
     }
 
     // modification of GenerateBeamPrefab() from Planetside of Gunymede
-    public static BasicBeamController FixedGenerateBeamPrefab(this Projectile projectile, string spritePath, Vector2 colliderDimensions, Vector2 colliderOffsets, List<string> beamAnimationPaths = null, int beamFPS = -1, List<string> impactVFXAnimationPaths = null, int beamImpactFPS = -1, Vector2? impactVFXColliderDimensions = null, Vector2? impactVFXColliderOffsets = null, List<string> endVFXAnimationPaths = null, int beamEndFPS = -1, Vector2? endVFXColliderDimensions = null, Vector2? endVFXColliderOffsets = null, List<string> muzzleVFXAnimationPaths = null, int beamMuzzleFPS = -1, Vector2? muzzleVFXColliderDimensions = null, Vector2? muzzleVFXColliderOffsets = null, bool glows = false,
-       bool canTelegraph = false, List<string> beamTelegraphAnimationPaths = null, int beamtelegraphFPS = -1, List<string> beamStartTelegraphAnimationPaths = null, int beamStartTelegraphFPS = -1, List<string> beamEndTelegraphAnimationPaths = null, int beamEndTelegraphFPS = -1, float telegraphTime = 1,
-        bool canDissipate = false, List<string> beamDissipateAnimationPaths = null, int beamDissipateFPS = -1, List<string> beamStartDissipateAnimationPaths = null, int beamStartDissipateFPS = -1, List<string> beamEndDissipateAnimationPaths = null, int beamEndDissipateFPS = -1, float dissipateTime = 1)
+    public static BasicBeamController FixedGenerateBeamPrefab(this Projectile projectile, string spritePath, Vector2 colliderDimensions, Vector2 colliderOffsets, List<string> beamAnimationPaths = null, int beamFPS = -1, List<string> impactVFXAnimationPaths = null, int beamImpactFPS = -1, Vector2? impactVFXColliderDimensions = null, Vector2? impactVFXColliderOffsets = null,
+        List<string> endVFXAnimationPaths = null, int beamEndFPS = -1, Vector2? endVFXColliderDimensions = null, Vector2? endVFXColliderOffsets = null, List<string> startVFXAnimationPaths = null, int beamStartFPS = -1, Vector2? startVFXColliderDimensions = null, Vector2? startVFXColliderOffsets = null, bool glows = false,
+        bool canTelegraph = false, List<string> beamTelegraphAnimationPaths = null, int beamtelegraphFPS = -1, List<string> beamStartTelegraphAnimationPaths = null, int beamStartTelegraphFPS = -1, List<string> beamEndTelegraphAnimationPaths = null, int beamEndTelegraphFPS = -1, float telegraphTime = 1,
+        bool canDissipate = false, List<string> beamDissipateAnimationPaths = null, int beamDissipateFPS = -1, List<string> beamStartDissipateAnimationPaths = null, int beamStartDissipateFPS = -1, List<string> beamEndDissipateAnimationPaths = null, int beamEndDissipateFPS = -1, float dissipateTime = 1,
+        List<string> chargeVFXAnimationPaths = null, int beamChargeFPS = -1, Vector2? chargeVFXColliderDimensions = null, Vector2? chargeVFXColliderOffsets = null, bool loopCharge = true)
     {
         try
         {
@@ -660,10 +662,18 @@ public static class VFX
                 beamController.impactAnimation = "beam_impact";
             }
 
-            //--------------Sets up the animation for the very start of the beam
-            if (muzzleVFXAnimationPaths != null && muzzleVFXColliderDimensions != null && muzzleVFXColliderOffsets != null)
+            //---------------Sets up the animaton for the VFX that plays when the beam is charging
+            if (chargeVFXAnimationPaths != null && chargeVFXColliderDimensions != null && chargeVFXColliderOffsets != null)
             {
-                SetupBeamPart(animation, muzzleVFXAnimationPaths, "beam_start", beamMuzzleFPS, (Vector2)muzzleVFXColliderDimensions, (Vector2)muzzleVFXColliderOffsets, anchorOverride: Anchor.MiddleCenter);
+                SetupBeamPart(animation, chargeVFXAnimationPaths, "beam_charge", beamChargeFPS, (Vector2)chargeVFXColliderDimensions, (Vector2)chargeVFXColliderOffsets, anchorOverride: Anchor.MiddleCenter,
+                    wrapMode: loopCharge ? tk2dSpriteAnimationClip.WrapMode.Loop : tk2dSpriteAnimationClip.WrapMode.Once);
+                beamController.chargeAnimation = "beam_charge";
+            }
+
+            //--------------Sets up the animation for the very start of the beam
+            if (startVFXAnimationPaths != null && startVFXColliderDimensions != null && startVFXColliderOffsets != null)
+            {
+                SetupBeamPart(animation, startVFXAnimationPaths, "beam_start", beamStartFPS, (Vector2)startVFXColliderDimensions, (Vector2)startVFXColliderOffsets/*, anchorOverride: Anchor.MiddleCenter*/);
                 beamController.beamStartAnimation = "beam_start";
             }
             else
@@ -760,7 +770,7 @@ public static class VFX
                 else
                 {
                     Vector2 actualDimensions = (Vector2)colliderDimensions;
-                    Vector2 actualOffsets = (Vector2)colliderDimensions;
+                    Vector2 actualOffsets = (Vector2)colliderOffsets;
                     frameDef.colliderVertices = new Vector3[]{
                         new Vector3(actualOffsets.x / 16, actualOffsets.y / 16, 0f),
                         new Vector3(actualDimensions.x / 16, actualDimensions.y / 16, 0f)

@@ -2,7 +2,7 @@
 
 ## TBD
 
-- Added Volcanic Ammolet and BlasTech F-4
+- Added Volcanic Ammolet, BlasTech F-4, and Telefragger
 - Added masteries for Vacuum Cleaner, Paintball Cannon, Gunbrella, Alyx, and Pistol Whip
 - Added 6 new synergies
 - Added indicator for amount of debris vacuumed to Vacuum Cleaner ammo display

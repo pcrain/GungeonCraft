@@ -358,15 +358,23 @@ public static class Extensions
       sprite.SetGlowiness(a);
   }
 
-  public static void SetGlowiness(this tk2dBaseSprite sprite, float glowAmount, Color? glowColor = null, Color? overrideColor = null, bool clampBrightness = true)
+  public static void SetGlowiness(this tk2dBaseSprite sprite, float glowAmount, Color? glowColor = null, Color? overrideColor = null, bool? clampBrightness = null)
   {
     sprite.usesOverrideMaterial = true;
     Material m = sprite.renderer.material;
     m.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-    if (!clampBrightness)
+    if (clampBrightness.HasValue)
     {
-      m.DisableKeyword("BRIGHTNESS_CLAMP_ON");
-      m.EnableKeyword("BRIGHTNESS_CLAMP_OFF");
+      if (!clampBrightness.Value)
+      {
+        m.DisableKeyword("BRIGHTNESS_CLAMP_ON");
+        m.EnableKeyword("BRIGHTNESS_CLAMP_OFF");
+      }
+      else
+      {
+        m.DisableKeyword("BRIGHTNESS_CLAMP_OFF");
+        m.EnableKeyword("BRIGHTNESS_CLAMP_ON");
+      }
     }
     m.SetFloat("_EmissivePower", glowAmount);
     if (glowColor is Color c)
@@ -1332,7 +1340,8 @@ public static class Extensions
   /// <summary>
   /// Perform basic initialization of beam sprites for a projectile, override the beam controller's existing sprites if they exist
   /// </summary>
-  public static BasicBeamController SetupBeamSprites(this Projectile projectile, string spriteName, int fps, Vector2 dims, Vector2? impactDims = null, int impactFps = -1)
+  public static BasicBeamController SetupBeamSprites(this Projectile projectile, string spriteName, int fps, Vector2 dims, Vector2? impactDims = null, int impactFps = -1,
+    int endFps = -1, int startFps = -1, int chargeFps = -1, bool loopCharge = true)
   {
       // Fix breakage with GenerateBeamPrefab() expecting a non-null specrigidbody (no longer necessary with FixedGenerateBeamPrefab())
       // projectile.specRigidbody = projectile.gameObject.GetOrAddComponent<SpeculativeRigidbody>();
@@ -1362,14 +1371,20 @@ public static class Extensions
           impactVFXColliderOffsets    : impactOffsets,
           //End
           endVFXAnimationPaths        : ResMap.Get($"{spriteName}_end", quietFailure: true),
-          beamEndFPS                  : fps,
+          beamEndFPS                  : (endFps > 0) ? endFps : fps,
           endVFXColliderDimensions    : dims,
           endVFXColliderOffsets       : offsets,
           //Beginning
-          muzzleVFXAnimationPaths     : ResMap.Get($"{spriteName}_start", quietFailure: true),
-          beamMuzzleFPS               : fps,
-          muzzleVFXColliderDimensions : dims,
-          muzzleVFXColliderOffsets    : offsets //,
+          startVFXAnimationPaths      : ResMap.Get($"{spriteName}_start", quietFailure: true),
+          beamStartFPS                : (startFps > 0) ? startFps : fps,
+          startVFXColliderDimensions  : dims,
+          startVFXColliderOffsets     : offsets,
+          //Charge
+          chargeVFXAnimationPaths     : ResMap.Get($"{spriteName}_charge", quietFailure: true),
+          beamChargeFPS               : (chargeFps > 0) ? chargeFps : fps,
+          chargeVFXColliderDimensions : dims,
+          chargeVFXColliderOffsets    : offsets,
+          loopCharge                  : loopCharge //,
           //Other Variables
           // glowAmount                  : 0f,
           // emissivecolouramt           : 0f

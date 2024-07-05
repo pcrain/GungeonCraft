@@ -196,3 +196,5 @@ wall_thunk,-2.5,1,sound
 blackjack_card_impact_sound,7.5,1,sound
 blastech_fire_sound,0.0,1,sound
 blastech_jam_sound,-2.0,1,sound
+telefragger_amp_up_sound,-3.0,1,sound
+telefragger_fire_loop_sound,-2.0,0,sound

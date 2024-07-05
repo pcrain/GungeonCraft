@@ -44,6 +44,7 @@ global using Gunfiguration;
 global using static ProjectileModule;      //ShootStyle, ProjectileSequenceStyle
 global using static tk2dBaseSprite;        //Anchor
 global using static PickupObject;          //ItemQuality
+global using static BasicBeamController;   //BeamState
 
 namespace CwaffingTheGungy;
 
@@ -490,4 +491,15 @@ public class Initialisation : BaseUnityPlugin
     //         __instance.forceContentIds = new(){IDs.Pickups["platinum_star"]}; // for debugging
     //     }
     // }
+}
+
+[HarmonyPatch(typeof(ProjectileTrapController), nameof(ProjectileTrapController.ShootProjectileInDirection))]
+class PatchNamePatch
+{
+    [HarmonyILManipulator]
+    private static void BeamApplyArbitraryStatusEffectIL(ILContext il)
+    {
+        ILCursor cursor = new ILCursor(il);
+        cursor.DumpIL();
+    }
 }
