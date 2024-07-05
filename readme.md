@@ -9,9 +9,9 @@
 
 ### Features
 
-- 111 new items, including
-	+ 56 new guns
-	+ 37 new passive items
+- 114 new items, including
+	+ 58 new guns
+	+ 38 new passive items
 	+ 18 new active items
 - Lore for all new guns and items
 - 85 stylish cosmetic hats, accessible via a new hat room near Winchester in the Breach

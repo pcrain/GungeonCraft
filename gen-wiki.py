@@ -2,9 +2,9 @@
 
 import os, re
 
-SOURCE_DIR = "/home/pretzel/workspace/gungy-cwaffing/src"
-ITEM_SPRITE_DIR = "/home/pretzel/workspace/gungy-cwaffing/RawResources/ItemSprites/"
-GUN_SPRITE_DIR = "/home/pretzel/workspace/gungy-cwaffing/RawResources/Ammonomicon Encounter Icon Collection/"
+SOURCE_DIR = os.path.join(os.getcwd(),"src")
+ITEM_SPRITE_DIR = os.path.join(os.getcwd(),"RawResources","ItemSprites/")
+GUN_SPRITE_DIR = os.path.join(os.getcwd(),"RawResources","Ammonomicon Encounter Icon Collection/")
 
 WIKI_PARAMS = {
   "summary" :
@@ -27,6 +27,10 @@ VANILLA_ITEMS = {
   "laser_lotus"         : ("Laser Lotus", "Laser_Lotus.png"),
   "bubble_blaster"      : ("Bubble Blaster", "Bubble_Blaster.png"),
   "gun_soul"            : ("Gun Soul", "Gun_Soul.png"),
+  "decoy"               : ("Decoy", "Decoy.png"),
+  "explosive_decoy"     : ("Explosive Decoy", "Explosive_Decoy.png"),
+  "nanomachines"        : ("Nanomachines", "Nanomachines.png"),
+  "heroine"             : ("Heroine", "Heroine.png"),
 }
 
 def applyGunDataOverrides(gunData):

@@ -492,14 +492,3 @@ public class Initialisation : BaseUnityPlugin
     //     }
     // }
 }
-
-[HarmonyPatch(typeof(ProjectileTrapController), nameof(ProjectileTrapController.ShootProjectileInDirection))]
-class PatchNamePatch
-{
-    [HarmonyILManipulator]
-    private static void BeamApplyArbitraryStatusEffectIL(ILContext il)
-    {
-        ILCursor cursor = new ILCursor(il);
-        cursor.DumpIL();
-    }
-}

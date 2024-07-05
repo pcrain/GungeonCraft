@@ -51,7 +51,7 @@ public static class CwaffSynergies
         NewSynergy(DEAD_MAN_EXPANDING, "Dead Man Expanding", new[]{IName(DeadRinger.ItemName), "explosive_decoy"});
         // Semi-automatic weapons have perfect accuracy.
         NewSynergy(AIM_BOTS, "Aim Bots", new[]{IName(BionicFinger.ItemName), "nanomachines"});
-        // Pistol Whip's melee hit deals double damage to Jammed bosses and minibosses, and instantly smites all other Jammed enemies
+        // Pistol Whip's melee hit deals double damage to Jammed bosses and minibosses, and instantly smites all other Jammed enemies.
         NewSynergy(WICKED_CHILD, "Wicked Child", new[]{IName(PistolWhip.ItemName), IName(HolyWaterGun.ItemName)});
         // Enemies with guns that are charmed by Sub Machine Gun are given a Heroine.
         NewSynergy(I_NEED_A_HERO, "I Need a Hero", new[]{IName(SubMachineGun.ItemName), "heroine"});
@@ -78,13 +78,13 @@ public static class CwaffSynergies
         NewMastery<MasteryOfCrapshooter>(MASTERY_CRAPSHOOTER, Crapshooter.ItemName);
         // Holy Water Gun deals 16x damage to Jammed enemies. Killing Jammed enemies creates pools of holy goop that grant invulnerability and infinite ammo while active.
         NewMastery<MasteryOfHolyWaterGun>(MASTERY_HOLY_WATER_GUN, HolyWaterGun.ItemName);
-        // Every Junk vacuumed produces a full ammo box, and every 16 corpses vacuumed produces a piece of armor
+        // Every Junk vacuumed produces a full ammo box, and every 16 corpses vacuumed produces a piece of armor.
         NewMastery<MasteryOfVacuumCleaner>(MASTERY_VACUUM_CLEANER, VacuumCleaner.ItemName);
-        // Projectiles spawn status effect goops corresponding to their color while in flight and upon impact
+        // Projectiles spawn status effect goops corresponding to their color while in flight and upon impact.
         NewMastery<MasteryOfPaintballCannon>(MASTERY_PAINTBALL_CANNON, PaintballCannon.ItemName);
-        // Gunbrella fires a constant stream of projectiles at the cursor
+        // Gunbrella fires a constant stream of projectiles at the cursor.
         NewMastery<MasteryOfGunbrella>(MASTERY_GUNBRELLA, Gunbrella.ItemName);
-        // Alyx decays four times slower and passively grants poison immunity
+        // Alyx decays four times slower and passively grants poison immunity.
         NewMastery<MasteryOfAlyx>(MASTERY_ALYX, Alyx.ItemName);
         // Pistol Whip can hit enemies closer than its max range, and after killing an enemy, will trigger a mini blank for the next 3 attacks.
         NewMastery<MasteryOfPistolWhip>(MASTERY_PISTOL_WHIP, PistolWhip.ItemName);

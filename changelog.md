@@ -1,27 +1,39 @@
 # Changelog
 
-## TBD
+## 1.15.0 (2024-07-05)
+
+#### Features:
 
 - Added Volcanic Ammolet, BlasTech F-4, and Telefragger
 - Added masteries for Vacuum Cleaner, Paintball Cannon, Gunbrella, Alyx, and Pistol Whip
 - Added 6 new synergies
-- Added indicator for amount of debris vacuumed to Vacuum Cleaner ammo display
-- Vacuum Cleaner debris is now processed when it is actually absorbed, rather than when it is suctioned
-- Tweaked Gunbrella projectiles so that they actually fall closer to the reticle rather than overshooting it
-- Reduced Gunbrella projectile damage from 16 to 8 since it hits more often now
-- Made each of the 16 separate projectiles fired by Gunbrella cost 1 ammo, and increased Gunbrella's ammo from 60 to 960 to compensate
-- Made reticle for Gunbrella render behind objects
-- Added trails to Gunbrella projectiles
+
+#### Balance Changes and Polish:
+
+- Overhauled Gunbrella:
+	- Tweaked Gunbrella projectiles so that they actually fall closer to the reticle rather than overshooting it
+		- Reduced Gunbrella projectile damage from 16 to 8 since it hits more accurately now
+	- Made each of the 16 separate projectiles fired by Gunbrella cost 1 ammo
+		- Increased Gunbrella's ammo from 60 to 960 to compensate for increased ammo usage
+	- Made reticle for Gunbrella render behind objects
+	- Added trails to Gunbrella projectiles
+
+- Tweaked Vacuum Cleaner:
+	- Added indicator for amount of debris vacuumed to Vacuum Cleaner ammo display
+	- Vacuum Cleaner debris is now processed when it is actually absorbed, rather than when it is suctioned
+
+#### Bugfixes and Misc:
+
 - Fixed impact particles for Pistol Whip's melee hit not appearing after the first time it is used
+- Fixed R.C. Launcher projectiles slowing down too much at higher frame rates
+- Fixed dropped Jugglernaut guns having collision that can interfere with the player's movement
+- Fixed (hopefully) issue with Jugglernaut occasionally dropping its combo for no apparent reason
+- Fixed [REDACTED] from using a certain attack too close to walls, making it undodgeable
 - Fixed sprites for [REDACTED] being jittery on some GPUs
 - Fixed sprites for [REDACTED] rendering too far above player before boss fight
-- Fixed [REDACTED] from using a certain attack too close to walls, making it undodgeable
-- Fixed R.C. Launcher projectiles slowing down too much at higher frame rates
-- Fixed drop Jugglernaut guns having collision that can interfere with the player's movement
-- Fixed several null derefs caused by Magunet debris projectiles not resetting their sprites properly when launched
-- Fixed (hopefully) issue with Jugglernaut occasionally dropping its combo for no apparent reason
+- Fixed enemies that self-destruct (e.g., Pinhead and Nitra) not functioning properly when spawned in with Alien Nailgun
 - Fixed several potential null derefs in guns and items that assume the player is standing in a valid room (as opposed to, e.g., a hallway)
-- Fixed enemies that self-destruct not functioning properly when spawned in with Alien Nailgun
+- Fixed several null derefs caused by Magunet debris projectiles not resetting their sprites properly when launched
 
 ## 1.14.3 (2024-06-26)
 
