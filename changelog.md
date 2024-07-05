@@ -21,6 +21,7 @@
 - Fixed several null derefs caused by Magunet debris projectiles not resetting their sprites properly when launched
 - Fixed (hopefully) issue with Jugglernaut occasionally dropping its combo for no apparent reason
 - Fixed several potential null derefs in guns and items that assume the player is standing in a valid room (as opposed to, e.g., a hallway)
+- Fixed enemies that self-destruct not functioning properly when spawned in with Alien Nailgun
 
 ## 1.14.3 (2024-06-26)
 

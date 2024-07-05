@@ -172,7 +172,7 @@ public class AlienNailgun : CwaffGun
             if (replicant.GetComponent<SpawnEnemyOnDeath>() is SpawnEnemyOnDeath seod)
                 seod.chanceToSpawn = 0.0f; // prevent enemies such as Blobulons from replicating on death
             if (replicant.healthHaver is HealthHaver hh)
-                hh.IsVulnerable = false; // can't be harmed
+                hh.PreventAllDamage = true; // can't be harmed normally (exceptions for, e.g., Pinhead or Nitra self-detonation)
             if (replicant.knockbackDoer is KnockbackDoer kb)
                 kb.SetImmobile(true, "replicant"); // can't be knocked back
             if (replicant.CurrentGun is Gun gun)
