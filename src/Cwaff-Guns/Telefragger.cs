@@ -4,8 +4,8 @@ public class Telefragger : CwaffGun
 {
     public static string ItemName          = "Telefragger";
     public static string ShortDescription  = "Voip";
-    public static string LongDescription   = "TBD";
-    public static string Lore              = "TBD";
+    public static string LongDescription   = "Fires a beam that teleports the player into an enemy on kill. Teleporting creates a mini blank effect at the destination and briefly grants invulernability and pit immunity. Will not teleport the player off screen in co-op.";
+    public static string Lore              = "Many years ago, a Gungeoneer named Jackson Doomquake gained notoriety for dropping firearms on the Gungeon's teleporters as bait for unsuspecting Bullet Kin. While teleporting into Bullet Kin all day proved to be an effective and ammo-efficient method of execution, it also provoked the ire of Bello, who allegedly lost several customers due to the clamor caused by his shop's teleporter constantly activating. The teleporter system was subsequently patched to prevent usage while any Gundead are around, but while Doomquake's exploits are no longer replicable, the Telefragger ensures the spirit of his antics live on.";
 
     private const float _HOVER_TIME        = 1.25f;
     private const float _FLICKER_PORTION   = 0.5f;
@@ -41,7 +41,7 @@ public class Telefragger : CwaffGun
 
         BasicBeamController beamComp = projectile.SetupBeamSprites(spriteName: "telefragger_beam", fps: 17,
             dims: new Vector2(32, 7), impactDims: new Vector2(15, 7), impactFps: 14, loopCharge: false);
-        beamComp.chargeDelay = 0.4f;
+        beamComp.chargeDelay = 0.4f; // <gun shoot animation loop point> / <shootFps>
         beamComp.sprite.usesOverrideMaterial = true;
         beamComp.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
         beamComp.sprite.renderer.material.SetFloat("_EmissivePower", 2f);
@@ -83,10 +83,7 @@ public class Telefragger : CwaffGun
     {
         base.Update();
         if (!SynchronizeSpriteWithBeam())
-        {
-            // base.gameObject.Play("telefragger_fire_loop_sound_stop");
             gun.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/PlayerShader");
-        }
 
         if (this.PlayerOwner && m_extantFloor)
             m_extantFloor.renderer.sharedMaterial.SetVector("_PlayerPos", this.PlayerOwner.CenterPosition.ToVector4());
@@ -121,6 +118,7 @@ public class Telefragger : CwaffGun
         player.StartCoroutine(DoPlayerTeleport(player, startPosition, target, 0.125f));
     }
 
+    // TODO: something in this method causes a _StencilVal warning in the debug log
     private IEnumerator DoPlayerTeleport(PlayerController player, Vector2 start, Vector2 end, float duration)
     {
         GameManager.Instance.MainCameraController.SetManualControl(true, true);
@@ -133,7 +131,7 @@ public class Telefragger : CwaffGun
         player.sprite.renderer.enabled = false;
         player.specRigidbody.enabled = false;
 
-        player.gameObject.Play("Play_OBJ_chestwarp_use_01");
+        player.gameObject.Play("Play_OBJ_teleport_depart_01");
         _TeleportVFX.SpawnAtPosition(start.ToVector3ZisY(-1f), 0, null, null, null, -0.05f);
         player.DoEasyBlank(end, EasyBlankType.MINI);
 
@@ -144,9 +142,9 @@ public class Telefragger : CwaffGun
             yield return null;
         }
 
-        player.gameObject.Play("Play_OBJ_chestwarp_use_01");
         yield return null;
 
+        player.gameObject.Play("Play_OBJ_teleport_depart_01");
         _TeleportVFX.SpawnAtPosition(end.ToVector3ZisY(-1f), 0, null, null, null, -0.05f);
         EnablePitSafety(player);
 

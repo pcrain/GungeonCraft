@@ -4,8 +4,8 @@ public class BlasTechF4 : CwaffGun
 {
     public static string ItemName         = "BlasTech F-4";
     public static string ShortDescription = "Imperial Quality";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "The BlasTech Alternating F-4 Rifle...";
+    public static string LongDescription  = "Rapidly fires strong, fast projectiles with absolutely zero side effects.";
+    public static string Lore             = "Based on the beloved E-11 model, the BlasTech Alternating F-4 Rifle improves upon the previous generation of blasters in power, speed, range, and precision. The difference in performance is so noticeable that regardless of a Gungeoneer's training or experience, each and every firefight will be more consistent than ever.";
 
     public static void Init()
     {

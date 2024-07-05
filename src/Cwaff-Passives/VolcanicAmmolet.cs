@@ -4,8 +4,8 @@ public class VolcanicAmmolet : CwaffBlankModificationItem
 {
     public static string ItemName         = "Volcanic Ammolet";
     public static string ShortDescription = "Blanks Detonate Projectiles";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string LongDescription  = "Blanks create miniature explosions at the center of each enemy projectile. Grants 1 additional blank per floor.";
+    public static string Lore             = "The very talented senior engineers at ACNE corporation's Mt. Fuji Headquarters have discovered how to harness the natural power of volcanoes in Ammolet format...at least that's what their marketing team would have you believe. The reality is that igniting the gunpowder inside projectiles when destroying them is trivial, and most Ammolets have mechanisms that inhibit projectile explosions as a safety feature to comply with local consumer laws. It seems ACNE's legal team has gotten around this by slapping a 'not for retail' label on the Ammolet and giving it away as a free gift with 65-casing glasses of water.";
 
     private const float NORMAL_EXPLOSION_DELAY = 0.125f; // normal explosion queue delay
     private const float QUICK_EXPLOSION_DELAY  = 0.03125f; // make VolcanicAmmolet queued explosions faster
@@ -15,7 +15,7 @@ public class VolcanicAmmolet : CwaffBlankModificationItem
     public static void Init()
     {
         PickupObject item = Lazy.SetupPassive<VolcanicAmmolet>(ItemName, ShortDescription, LongDescription, Lore);
-        item.quality      = ItemQuality.A;
+        item.quality      = ItemQuality.B;
         ItemBuilder.AddPassiveStatModifier(item, PlayerStats.StatType.AdditionalBlanksPerFloor, 1f, StatModifier.ModifyMethod.ADDITIVE);
         item.AddToSubShop(ItemBuilder.ShopType.OldRed);
     }
