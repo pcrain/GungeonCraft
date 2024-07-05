@@ -1951,24 +1951,24 @@ public static class Extensions
       return s;
   }
 
-  /// <summary>Push a rigidbody out of walls, prioritizing movement towards the center of a room</summary>
+  /// <summary>Push a rigidbody out of walls, preventing movement outside the current room</summary>
   public static void CorrectForWalls(this SpeculativeRigidbody body, bool andRigidBodies = false)
   {
     if (!PhysicsEngine.Instance.OverlapCast(body, null, true, andRigidBodies, null, null, false, null, null))
       return;
+    DungeonData dd = GameManager.Instance.Dungeon.data;
     Vector2 vector = body.transform.position.XY();
     IntVector2[] cardinalsAndOrdinals = IntVector2.CardinalsAndOrdinals;
     for (int pixels = 1; pixels <= 200; ++pixels)
       for (int i = 0; i < cardinalsAndOrdinals.Length; ++i)
       {
-        body.transform.position = vector + PhysicsEngine.PixelToUnit(cardinalsAndOrdinals[i] * pixels);
+        Vector2 newPos = vector + PhysicsEngine.PixelToUnit(cardinalsAndOrdinals[i] * pixels);
+        if (!dd.CheckInBoundsAndValid(newPos.ToIntVector2(VectorConversions.Floor)))
+          continue;
+        body.transform.position = newPos;
         body.Reinitialize();
         if (!PhysicsEngine.Instance.OverlapCast(body, null, true, andRigidBodies, null, null, false, null, null))
-        {
-          // if (C.DEBUG_BUILD)
-          //   ETGModConsole.Log($"corrected for walls by {pixels} pixels");
           return;
-        }
       }
     Debug.LogError("FREEZE AVERTED!  TELL CAPTAIN PRETZEL!  (you're welcome) 147");
   }

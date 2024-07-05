@@ -139,8 +139,8 @@ public class Telefragger : CwaffGun
 
         for (float timer = 0f; timer < duration; timer += BraveTime.DeltaTime)
         {
-            float percentLeft = 1f - timer / duration;
-            GameManager.Instance.MainCameraController.OverridePosition = (startCamPos + (1f - percentLeft * percentLeft) * deltaPos);
+            float percentDone = timer / duration;
+            GameManager.Instance.MainCameraController.OverridePosition = (startCamPos + (percentDone * percentDone) * deltaPos);
             yield return null;
         }
 
@@ -167,7 +167,7 @@ public class Telefragger : CwaffGun
         player.OnAboutToFall += this.HandleAboutToFall;
         this._invulnTime = _HOVER_TIME;
 
-        // enabled shaders
+        // enable shaders
         Material[] array = player.SetOverrideShader(ShaderCache.Acquire("Brave/Internal/RainbowChestShader"));
         for (int i = 0; i < array.Length; i++)
             if (array[i] != null)
@@ -266,6 +266,7 @@ public class TelefragJuice : MonoBehaviour
                 return; // don't teleport around in co-op if we're offscreen
             }
         }
+        this._owner.specRigidbody.RegisterTemporaryCollisionException(other, 2.0f); // could possibly be a permanent collision exception
         this._telefragger.TeleportPlayerToPosition(this._owner, targetPos);
     }
 }
