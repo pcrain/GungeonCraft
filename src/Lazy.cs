@@ -142,6 +142,7 @@ public static class Lazy
         return SetupItem<PlayerItem, T>(itemName, shortDescription, longDescription, lore, hideFromAmmonomicon: hideFromAmmonomicon);
     }
 
+    private static readonly List<Gun> _GunsToFinalize = new();
     /// <summary>
     /// Perform basic initialization for a new gun definition.
     /// </summary>
@@ -192,7 +193,15 @@ public static class Lazy
             gun.spriteAnimator.playAutomatically = true;
         #endregion
 
+        _GunsToFinalize.Add(gun);
         return gun;
+    }
+
+    public static void FinalizeGuns()
+    {
+        foreach (Gun gun in _GunsToFinalize)
+            EncounterDatabase.GetEntry(gun.encounterTrackable.EncounterGuid).shootStyleInt = (int)gun.DefaultModule.shootStyle;
+        _GunsToFinalize.Clear();
     }
 
     /// <summary>

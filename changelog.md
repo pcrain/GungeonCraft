@@ -24,6 +24,7 @@
 
 #### Bugfixes and Misc:
 
+- Fixed all GungeonCraft weapons appearing as "Semiautomatic" in the Ammonomicon
 - Fixed impact particles for Pistol Whip's melee hit not appearing after the first time it is used
 - Fixed R.C. Launcher projectiles slowing down too much at higher frame rates
 - Fixed dropped Jugglernaut guns having collision that can interfere with the player's movement
