@@ -45,7 +45,7 @@ public class GunPowderer : CwaffActive
     private void ConvertGunToAmmo(Gun gun)
     {
         float ammoPercent    = (float)gun.CurrentAmmo / (float)gun.AdjustedMaxAmmo;
-        int ammoBoxesToSpawn = Mathf.Max(1, Mathf.CeilToInt(ammoPercent * 5f));
+        int ammoBoxesToSpawn = Mathf.Clamp(Mathf.CeilToInt(ammoPercent * 5f), 1, 5);
 
         Vector2 spawnCenter = gun.sprite.WorldCenter;
         Lazy.DoSmokeAt(spawnCenter);
