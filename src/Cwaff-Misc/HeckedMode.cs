@@ -293,7 +293,7 @@ public static class HeckedMode
     public static void Init()
     {
         CwaffEvents.BeforeRunStart += SetupHeckedMode;  // load hecked mode status before the start of each run
-        CwaffEvents.OnFirstFloorFullyLoaded += OnFirstHeckedFloorLoaded;
+        CwaffEvents.OnKeepFullyLoaded += OnFirstHeckedFloorLoaded;
     }
 
     private static void SetupHeckedMode()

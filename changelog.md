@@ -1,5 +1,9 @@
 # Changelog
 
+## TBD
+
+- Made Insurance Policy chest spawn at the start of any run, even if the shortcut elevator is used
+
 ## 1.15.0 (2024-07-05)
 
 #### Features:

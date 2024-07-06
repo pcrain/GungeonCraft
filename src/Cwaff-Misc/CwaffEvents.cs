@@ -8,16 +8,23 @@ public static class CwaffEvents // global custom events we can listen for
     public static Action BeforeRunStart;
     // Runs when the previous run is cleaned up (on quick restarting or returning to the breach)
     public static Action OnCleanStart;
-    // Runs whenever a new run is started (floor may not be fully loaded)
-    public static Action<PlayerController, PlayerController, GameManager.GameMode> OnRunStart;
-    // Runs whenever a floor is started and fully loaded
+    // Runs whenever a new run is started from first floor (floor may not be fully loaded)
+    public static Action<PlayerController, PlayerController, GameManager.GameMode> OnRunStartFromFirstFloor;
+    // Runs whenever a new run is started from any floor (floor may not be fully loaded)
+    public static Action<PlayerController, PlayerController, GameManager.GameMode> OnRunStartFromAnyFloor;
+    // Runs whenever any floor is started and fully loaded
     public static Action OnNewFloorFullyLoaded;
-    // Runs whenever the first floor is started and fully loaded
-    public static Action OnFirstFloorFullyLoaded;
+    // Runs whenever the Keep of the Lead Lord is started and fully loaded, regardless of whether it's the start of a run
+    public static Action OnKeepFullyLoaded;
+    // Runs whenever the first floor of a new run is started and fully loaded, regardless of whether it's actually the Keep of the Lead Lord
+    public static Action OnFirstFloorOfRunFullyLoaded;
+    // Runs whenever the Keep of the Lead Lord is started and fully loaded at the start of a new run
+    public static Action OnKeepFullyLoadedForNewRun;
     // Runs whenever a bullet is spawned from an AIBulletBank and an owner is assigned to the projectile
     public static Action<Projectile> OnBankBulletOwnerAssigned;
 
     internal static bool _OnFirstFloor = false;
+    internal static bool _RunJustStarted = false;
     internal static bool _AllModsLoaded = false;
 
     [HarmonyPatch(typeof(FinalIntroSequenceManager), nameof(FinalIntroSequenceManager.Start))]
@@ -75,11 +82,15 @@ public static class CwaffEvents // global custom events we can listen for
             if (gm == null || gsm == null || !gsm.IsInSession)
                 return;
 
-            _OnFirstFloor =
-                (gsm.GetSessionStatValue(TrackedStats.TIME_PLAYED) < 0.1f) &&
-                GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName == "tt_castle";
-            if (_OnFirstFloor && OnRunStart != null)
-                OnRunStart(gm.PrimaryPlayer, gm.SecondaryPlayer, gm.CurrentGameMode);
+            _OnFirstFloor = GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName == "tt_castle";
+            _RunJustStarted = (gsm.GetSessionStatValue(TrackedStats.TIME_PLAYED) < 0.1f);
+            if (_RunJustStarted)
+            {
+                if (OnRunStartFromAnyFloor != null)
+                    OnRunStartFromAnyFloor(gm.PrimaryPlayer, gm.SecondaryPlayer, gm.CurrentGameMode);
+                if (_OnFirstFloor && OnRunStartFromFirstFloor != null)
+                    OnRunStartFromFirstFloor(gm.PrimaryPlayer, gm.SecondaryPlayer, gm.CurrentGameMode);
+            }
 
             gm.OnNewLevelFullyLoaded += OnNewFloorFullyLoadedTempHook;
         }
@@ -90,8 +101,12 @@ public static class CwaffEvents // global custom events we can listen for
         GameManager.Instance.OnNewLevelFullyLoaded -= OnNewFloorFullyLoadedTempHook;
         if (OnNewFloorFullyLoaded != null)
             OnNewFloorFullyLoaded();
-        if (_OnFirstFloor && OnFirstFloorFullyLoaded != null)
-            OnFirstFloorFullyLoaded();
+        if (_OnFirstFloor && OnKeepFullyLoaded != null)
+            OnKeepFullyLoaded();
+        if (_RunJustStarted && OnFirstFloorOfRunFullyLoaded != null)
+            OnFirstFloorOfRunFullyLoaded();
+        if (_OnFirstFloor && _RunJustStarted && OnKeepFullyLoadedForNewRun != null)
+            OnKeepFullyLoadedForNewRun();
     }
 
     //NOTE: makes sure AIActor is set properly on bullet scripts; should probably factor out CheckFromReplicantOwner() and moved to a better location later

@@ -83,7 +83,7 @@ public class InsurancePolicy : CwaffActive
         _InsuranceParticleVFX = VFX.Create("insurance_sparkle",
             fps: 8, loops: false, anchor: Anchor.MiddleCenter, emissivePower: 5);
 
-        CwaffEvents.OnFirstFloorFullyLoaded += InsuranceCheck;
+        CwaffEvents.OnFirstFloorOfRunFullyLoaded += InsuranceCheck;
     }
 
     internal static int GetSpriteIdForCharacter()

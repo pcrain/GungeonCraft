@@ -27,7 +27,7 @@ public class BulletThatCanKillTheFuture : CwaffActive
         item.CanBeDropped = true;
 
         _Sprite = item.sprite;
-        CwaffEvents.OnRunStart += ResetBTCKTF;
+        CwaffEvents.OnRunStartFromAnyFloor += ResetBTCKTF;
         CwaffEvents.OnNewFloorFullyLoaded += SpawnFutureBullet;
 
         ETGMod.Databases.Strings.Core.AddComplex("#SHOP_RUNBASEDMULTILINE_STOPPER", _BelloItemHint);

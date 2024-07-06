@@ -20,7 +20,7 @@ public class HeckedShrine : MonoBehaviour, IPlayerInteractable
       _RetrashAltShrine   = SetupShrine("retrash_alt_statue",  _RetrashAltText,   new Vector2( 4f, 3f), fancy: true);
       _LordfortressShrine = SetupShrine("lordfortress_statue", _LordfortressText, new Vector2( 6f, 3f), fancy: false);
 
-      CwaffEvents.OnFirstFloorFullyLoaded += SpawnInShrines;
+      CwaffEvents.OnKeepFullyLoaded += SpawnInShrines;
     }
 
     internal static HeckedShrine SetupShrine(string spritePath, string flavorText, Vector2 positionInRoom, bool fancy)
