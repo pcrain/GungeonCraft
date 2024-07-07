@@ -122,6 +122,7 @@ public class Cammy
                 "Sorry friend. D:",
                 },
             introDialog            : new(){
+                // $"[sprite \"soul_sprite_ui_icon\"]",
                 "Please consider adopting one of these beautiful babies!",
                 "Lots of lovely little companions looking for a home!",
                 "Welcome to the companion shop!",

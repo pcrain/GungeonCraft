@@ -493,4 +493,22 @@ public class Initialisation : BaseUnityPlugin
     //         __instance.forceContentIds = new(){IDs.Pickups["platinum_star"]}; // for debugging
     //     }
     // }
+
+    // [HarmonyPatch(typeof(GunInventory), nameof(GunInventory.FrameUpdate))]
+    // private static class PatchNamePatch
+    // {
+    //     private static System.Diagnostics.Stopwatch timer;
+    //     [HarmonyPriority(Priority.High)]
+    //     static void Prefix(GunInventory __instance)
+    //     {
+
+    //         timer = System.Diagnostics.Stopwatch.StartNew();
+    //     }
+
+    //     [HarmonyPriority(Priority.Low)]
+    //     static void Postfix(GunInventory __instance)
+    //     {
+    //         timer.Stop(); System.Console.WriteLine($"    {timer.ElapsedTicks,5}ticks for updating guns for {__instance.Owner?.name ?? "nobody"}");
+    //     }
+    // }
 }
