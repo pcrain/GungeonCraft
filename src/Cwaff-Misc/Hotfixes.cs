@@ -1,46 +1,48 @@
 namespace CwaffingTheGungy;
 
-// public static class GunBuilderHotfix
-// {
-//     [HarmonyPatch(typeof(GunExt), nameof(GunExt.UpdateAnimations))]
-//     private class GunUpdateAnimationsPatch
-//     {
-//         static bool Prefix(Gun gun, tk2dSpriteCollectionData collection)
-//         {
-//             collection ??= ETGMod.Databases.Items.WeaponCollection;
+// Prevent victory / death screen from displaying fake items (i.e., items suppressed from inventory)
+public static class AmmonomiconPageRendererHotfix
+{
+    [HarmonyPatch(typeof(AmmonomiconPageRenderer), nameof(AmmonomiconPageRenderer.InitializeDeathPageRight))]
+    private class SuppressFakeItemOnVictoryScreenPatch
+    {
+        [HarmonyILManipulator]
+        private static void VictoryScreenFakeItemIL(ILContext il)
+        {
+            ILCursor cursor = new ILCursor(il);
+            ILLabel passiveLoopEndLabel = cursor.DefineLabel();
 
-//             var clips = new List<tk2dSpriteAnimationClip>();
+            // Actually do the logic for suppressing the item if necessary
+            if (!cursor.TryGotoNext(MoveType.After,
+                instr => instr.MatchLdarg(0), // this == AmmonomiconPageRenderer instance
+                instr => instr.MatchLdloc((byte)6), // V_6 == playerController
+                instr => instr.MatchLdfld<PlayerController>("passiveItems") // increment iterator
+                ))
+                return;
+            cursor.Emit(OpCodes.Ldloc_S, (byte)12); // V_12 == m == iterator over passive items
+            cursor.Emit(OpCodes.Call, typeof(SuppressFakeItemOnVictoryScreenPatch).GetMethod("ShouldSuppressItemFromVictoryScreen", BindingFlags.Static | BindingFlags.NonPublic));
+            cursor.Emit(OpCodes.Brtrue, passiveLoopEndLabel);
+            // if we don't branch, repopulate the stack
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Emit(OpCodes.Ldloc_S, (byte)6);
+            cursor.Emit(OpCodes.Ldfld, typeof(PlayerController).GetField("passiveItems", BindingFlags.Instance | BindingFlags.Public));
 
-//             gun.idleAnimation = gun.UpdateAnimationAddClipsLater("idle", collection, clipsToAddLater: clips);
-//             // gun.dodgeAnimation = gun.UpdateAnimationAddClipsLater("dodge", collection, clipsToAddLater: clips);
-//             // gun.introAnimation = gun.UpdateAnimationAddClipsLater("intro", collection, true, clipsToAddLater: clips);
-//             // gun.emptyAnimation = gun.UpdateAnimationAddClipsLater("empty", collection, clipsToAddLater: clips);
-//             gun.shootAnimation = gun.UpdateAnimationAddClipsLater("fire", collection, true, clipsToAddLater: clips);
-//             gun.reloadAnimation = gun.UpdateAnimationAddClipsLater("reload", collection, true, clipsToAddLater: clips);
-//             gun.chargeAnimation = gun.UpdateAnimationAddClipsLater("charge", collection, clipsToAddLater: clips);
-//             // gun.outOfAmmoAnimation = gun.UpdateAnimationAddClipsLater("out_of_ammo", collection, clipsToAddLater: clips);
-//             // gun.dischargeAnimation = gun.UpdateAnimationAddClipsLater("discharge", collection, clipsToAddLater: clips);
-//             // gun.finalShootAnimation = gun.UpdateAnimationAddClipsLater("final_fire", collection, true, clipsToAddLater: clips);
-//             // gun.emptyReloadAnimation = gun.UpdateAnimationAddClipsLater("empty_reload", collection, true, clipsToAddLater: clips);
-//             // gun.criticalFireAnimation = gun.UpdateAnimationAddClipsLater("critical_fire", collection, true, clipsToAddLater: clips);
-//             // gun.enemyPreFireAnimation = gun.UpdateAnimationAddClipsLater("enemy_pre_fire", collection, clipsToAddLater: clips);
-//             // gun.alternateShootAnimation = gun.UpdateAnimationAddClipsLater("alternate_shoot", collection, true, clipsToAddLater: clips);
-//             // gun.alternateReloadAnimation = gun.UpdateAnimationAddClipsLater("alternate_reload", collection, true, clipsToAddLater: clips);
-//             // gun.alternateIdleAnimation = gun.UpdateAnimationAddClipsLater("alternate_idle", collection, clipsToAddLater: clips);
+            // Mark the beginning of the loop since the compiler puts it later in the IL code
+            if (!cursor.TryGotoNext(MoveType.Before,
+                instr => instr.MatchLdloc((byte)12), // V_12 == m == iterator over passive items
+                instr => instr.MatchLdcI4(1) // increment iterator
+                ))
+                return;
+            cursor.MarkLabel(passiveLoopEndLabel);
+        }
 
-//             if(clips.Count > 0)
-//             {
-//                 Array.Resize(ref gun.spriteAnimator.Library.clips, gun.spriteAnimator.Library.clips.Length + clips.Count);
-//                 for(int i = 0; i < clips.Count; i++)
-//                 {
-//                     gun.spriteAnimator.Library.clips[gun.spriteAnimator.Library.clips.Length - clips.Count + i] = clips[i];
-//                 }
-//             }
-
-//             return false;    // skip the original method
-//         }
-//     }
-// }
+        // need to pass in AmmonomiconPageRenderer because it's the first instruction at the top of the loop and IL gets very messy otherwise
+        private static bool ShouldSuppressItemFromVictoryScreen(AmmonomiconPageRenderer renderer, List<PassiveItem> items, int index)
+        {
+            return items[index].encounterTrackable && items[index].encounterTrackable.SuppressInInventory;
+        }
+    }
+}
 
 // Alexandria's method unnecessarily rebuilds the entire sprite dictionary after every sprite is added
 public static class SpriteBuilderHotfix
