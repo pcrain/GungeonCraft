@@ -18,7 +18,7 @@
     global using Mono.Cecil.Cil; //Instruction
     global using SGUI;
     global using FullSerializer;
-    global using HarmonyLib;
+    global using HarmonyLib; //
 
     global using Gungeon;
     global using Dungeonator;

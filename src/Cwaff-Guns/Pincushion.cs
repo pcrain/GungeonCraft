@@ -11,7 +11,7 @@ public class Pincushion : CwaffGun
     internal const float _MAX_SPREAD           = 45f;
     internal const float _MIN_SPREAD           = 8f;
     internal const float _DLT_SPREAD           = _MAX_SPREAD - _MIN_SPREAD;
-    internal const float _NEEDLE_DAMAGE        = 0.5f;
+    internal const float _NEEDLE_DAMAGE        = 0.35f;
 
     internal static VFXPool _Microdust;
 
@@ -27,7 +27,7 @@ public class Pincushion : CwaffGun
 
         gun.InitProjectile(GunData.New(clipSize: 1000 / _SIMULTANEOUS_BULLETS, cooldown: C.FRAME, angleVariance: 0.0f, shootStyle: ShootStyle.Automatic,
           damage: 0.0f, speed: 200.0f, force: 0.0f, range: 999f, bossDamageMult: 0.65f, sprite: "needle", fps: 12, spawnSound: "pincushion_fire",
-          anchor: Anchor.MiddleLeft, barrageSize: 4
+          anchor: Anchor.MiddleLeft, barrageSize: _SIMULTANEOUS_BULLETS
           )).SetAllImpactVFX(_Microdust
           ).Attach<VeryFragileProjectile>(
           ).Attach<EasyTrailBullet>(trail => {

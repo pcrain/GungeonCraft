@@ -30,7 +30,7 @@ public class CustomDodgeRoll : MonoBehaviour, ICustomDodgeRoll
     private class CustomDodgeRollPatch
     {
         static bool Prefix(ref PlayerController __instance, Vector2 direction, ref bool __result)
-        {
+        {//INVESTIGATE FOR SLOWDOWN
             PlayerController player = __instance;
             // Make sure we can actually have all of our movements available (fixes not being able to dodge roll in the Aimless Void)
             if (player.CurrentInputState != PlayerInputState.AllInput || !player.AcceptingNonMotionInput || player.IsDodgeRolling)

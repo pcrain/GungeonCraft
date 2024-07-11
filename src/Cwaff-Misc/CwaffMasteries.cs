@@ -63,7 +63,7 @@ public static class CwaffMasteries
     private class DisplayMasteryInGunNamePatch
     {
         static void Postfix(EncounterTrackable __instance, ref string __result)
-        {
+        {  //INVESTIGATE FOR SLOWDOWN
             if (__instance.GetComponent<Gun>() is not Gun gun)
               return;
             if (gun.CurrentOwner is not PlayerController player)
