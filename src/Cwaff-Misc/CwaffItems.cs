@@ -18,6 +18,7 @@ public abstract class CwaffActive: PlayerItem, ICwaffItem
 
 public abstract class CwaffGun: GunBehaviour, ICwaffItem/*, ILevelLoadedListener*/
 {
+  private const string _DEFAULT_BARREL_OFFSET = "__default";
   private static Dictionary<string, Dictionary<string, List<Vector3>>> _BarrelOffsetCache = new();
 
   private bool                              _hasReloaded               = true;  // whether we have finished reloading
@@ -29,9 +30,15 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem/*, ILevelLoadedListener
   {
     var d = _BarrelOffsetCache[gun.DisplayName] = new();
     //WARNING: can't do idle animation since it breaks loading with trimmed sprites
+    SetUpDefaultDynamicBarrelOffset(d, gun);
     SetUpDynamicBarrelOffsetsForAnimation(d, gun, gun.chargeAnimation);
     SetUpDynamicBarrelOffsetsForAnimation(d, gun, gun.reloadAnimation);
     SetUpDynamicBarrelOffsetsForAnimation(d, gun, gun.shootAnimation);
+  }
+
+  private static void SetUpDefaultDynamicBarrelOffset(Dictionary<string, List<Vector3>> d, Gun gun)
+  {
+    d[_DEFAULT_BARREL_OFFSET] = new(){ gun.barrelOffset.localPosition };
   }
 
   private static void SetUpDynamicBarrelOffsetsForAnimation(Dictionary<string, List<Vector3>> d, Gun gun, string anim)
@@ -51,8 +58,8 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem/*, ILevelLoadedListener
     if (_BarrelOffsetCache.TryGetValue(this.gun.DisplayName, out var barrelOffsets))
     {
       this._usesDynamicBarrelPosition = true;
-      this._defaultBarrelOffset       = this.gun.barrelOffset.localPosition;
       this._barrelOffsets             = barrelOffsets;
+      this._defaultBarrelOffset       = barrelOffsets[_DEFAULT_BARREL_OFFSET][0];
     }
   }
 

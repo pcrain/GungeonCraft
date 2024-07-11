@@ -6,6 +6,7 @@
 - Fixed Gun Powderer being able to spawn more than 5 ammo boxes
 - Fixed dummy items from appearing in the inventory on the victory / death screen
 - Reduced Pincushion projectile damage from 0.5 to 0.35
+- Fixed Alligator, Maestro, and Vladimir having extremely janky animations when dropped and picked back up
 
 ## 1.15.0 (2024-07-05)
 
