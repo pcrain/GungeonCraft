@@ -1,13 +1,13 @@
 # Changelog
 
-## TBD
+## 1.15.1 (2024-07-11)
 
 - Made Insurance Policy chest spawn at the start of any run, even if the shortcut elevator is used
+- Reduced Pincushion projectile damage from 0.5 to 0.35
 - Fixed Gun Powderer being able to spawn more than 5 ammo boxes
 - Fixed dummy items from appearing in the inventory on the victory / death screen
-- Reduced Pincushion projectile damage from 0.5 to 0.35
 - Fixed Alligator, Maestro, and Vladimir having extremely janky animations when dropped and picked back up
-- Fixed Missiletoe making items unable to be picked up if they are wrapped while bouncing on the ground after being dropped
+- Fixed Missiletoe making items unable to be picked up if they were wrapped during their ground-bounce animation after being dropped
 
 ## 1.15.0 (2024-07-05)
 
