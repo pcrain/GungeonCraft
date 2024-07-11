@@ -7,6 +7,7 @@
 - Fixed dummy items from appearing in the inventory on the victory / death screen
 - Reduced Pincushion projectile damage from 0.5 to 0.35
 - Fixed Alligator, Maestro, and Vladimir having extremely janky animations when dropped and picked back up
+- Fixed Missiletoe making items unable to be picked up if they are wrapped while bouncing on the ground after being dropped
 
 ## 1.15.0 (2024-07-05)
 

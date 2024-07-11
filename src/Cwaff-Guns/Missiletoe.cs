@@ -224,7 +224,7 @@ public class Missiletoe : CwaffGun
         float nearestDist = _MAX_DIST;
         foreach (DebrisObject debris in StaticReferenceManager.AllDebris)
         {
-            if (!debris.IsPickupObject)
+            if (!debris.IsPickupObject || !debris.onGround)
                 continue;
             if (debris.GetComponentInChildren<PickupObject>() is not PickupObject pickup)
                 continue;
