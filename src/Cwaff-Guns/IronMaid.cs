@@ -12,6 +12,7 @@ public class IronMaid : CwaffGun
     private int _nextIndex = 0;
     private Vector2 _whereIsThePlayerLooking;
     private AIActor _targetEnemy;
+    private LinkedList<IronMaidBullets> _bulletsInStasis = new();
 
     public static void Init()
     {
@@ -22,7 +23,7 @@ public class IronMaid : CwaffGun
             gun.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
         gun.InitProjectile(GunData.New(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true,
-          damage: 5.0f, speed: 40.0f, sprite: "kunai", fps: 12, anchor: Anchor.MiddleCenter)).Attach<RainCheckBullets>();
+          damage: 5.0f, speed: 40.0f, sprite: "kunai", fps: 12, anchor: Anchor.MiddleCenter, hitSound: "knife_gun_hit")).Attach<IronMaidBullets>();
 
         gun.AddReticle<CwaffReticle>(reticleVFX : VFX.BasicReticle, reticleAlpha : 0.2f, visibility : CwaffReticle.Visibility.ALWAYS, smoothLerp: true);
     }
@@ -83,12 +84,11 @@ public class IronMaid : CwaffGun
 
     private void LaunchAllBullets(PlayerController pc)
     {
-        foreach (Projectile projectile in StaticReferenceManager.AllProjectiles)
-        {
-            if (projectile.GetComponent<RainCheckBullets>() is not RainCheckBullets rcb)
-                continue;
-            rcb.StartLaunchSequenceForPlayer(pc);
-        }
+        int i = 0;
+        foreach (IronMaidBullets rcb in this._bulletsInStasis)
+            if (rcb)
+                rcb.StartLaunchSequence(i++);
+        this._bulletsInStasis.Clear();
         this._nextIndex = 0;
     }
 
@@ -128,9 +128,18 @@ public class IronMaid : CwaffGun
         if (!this._targetEnemy)
             this._whereIsThePlayerLooking = Raycast.ToNearestWallOrEnemyOrObject(pc.CenterPosition, pc.CurrentGun.CurrentAngle);
     }
+
+    public override void PostProcessProjectile(Projectile projectile)
+    {
+        base.PostProcessProjectile(projectile);
+        if (projectile.GetComponent<IronMaidBullets>() is not IronMaidBullets imb)
+            return;
+        imb.Setup(this);
+        this._bulletsInStasis.AddLast(imb);
+    }
 }
 
-public class RainCheckBullets : MonoBehaviour
+public class IronMaidBullets : MonoBehaviour
 {
     private const float _TIME_BEFORE_STASIS     = 0.2f;
     private const float _GLOW_TIME              = 0.5f;
@@ -141,30 +150,25 @@ public class RainCheckBullets : MonoBehaviour
 
     private PlayerController _owner;
     private Projectile       _projectile;
-    private IronMaid        _raincheck;
+    private IronMaid         _ironMaid;
     private float            _moveTimer;
     private bool             _launchSequenceStarted;
     private bool             _wasEverInStasis;
     private int              _index;
 
-    private void Start()
+    public void Setup(IronMaid ironMaid)
+    {
+        this._ironMaid = ironMaid;
+    }
+
+    private IEnumerator Start()
     {
         this._projectile            = base.GetComponent<Projectile>();
         this._owner                 = _projectile.Owner as PlayerController;
-        this._raincheck             = this._owner.CurrentGun.GetComponent<IronMaid>();
         this._launchSequenceStarted = false;
         this._wasEverInStasis       = false;
-        this._index                 = this._raincheck ? this._raincheck.GetNextIndex() : 0;
+        this._index                 = 0;
 
-        this._projectile.specRigidbody.OnCollision += (_) => {
-            this._projectile.gameObject.Play("knife_gun_hit");
-        };
-
-        StartCoroutine(TakeARainCheck());
-    }
-
-    private IEnumerator TakeARainCheck()
-    {
         // Phase 1 / 5 -- the initial fire
         this._projectile.sprite.SetGlowiness(glowAmount: _BASE_GLOW, glowColor: Color.cyan);
         this._moveTimer = _TIME_BEFORE_STASIS;
@@ -182,10 +186,10 @@ public class RainCheckBullets : MonoBehaviour
         Vector2 pos = this._projectile.SafeCenter;
         Vector2 targetDir = this._projectile.Direction;
         AIActor targetEnemy = null;
-        while (this._raincheck)
+        while (this._ironMaid)
         {
-            targetEnemy = this._raincheck.CurrentTargetEnemy();
-            targetDir = (targetEnemy ? targetEnemy.CenterPosition : this._raincheck.PointWherePlayerIsLooking()) - pos;
+            targetEnemy = this._ironMaid.CurrentTargetEnemy();
+            targetDir = (targetEnemy ? targetEnemy.CenterPosition : this._ironMaid.PointWherePlayerIsLooking()) - pos;
             _projectile.SendInDirection(targetDir, true); // rotate the projectile
             if (this._launchSequenceStarted)
                 break; // awkward loop construct to make sure we set our targetDir at least once
@@ -230,9 +234,9 @@ public class RainCheckBullets : MonoBehaviour
         yield break;
     }
 
-    public void StartLaunchSequenceForPlayer(PlayerController pc)
+    public void StartLaunchSequence(int index)
     {
-        if (pc == this._owner) // don't launch projectiles that don't belong to us
-            this._launchSequenceStarted = true;
+        this._index = index;
+        this._launchSequenceStarted = true;
     }
 }

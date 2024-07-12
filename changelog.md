@@ -6,6 +6,7 @@
 - Made movement smoother for Iron Maid's targeting reticle
 - Increased lock on range for Iron Maid's targeting reticle
 - Adjusted the volume of a few sounds
+- Fixed launch delay on Iron Maid's projectiles not accounting for projectiles that were destroyed while in stasis
 
 ## 1.15.1 (2024-07-11)
 
