@@ -2203,4 +2203,18 @@ public static class Extensions
   {
     return p.gameObject.GetComponent<CwaffProjectile>() is CwaffProjectile c && c.firedForFree;
   }
+
+  /// <summary>Check whether our secondary reload button was pressed</summary>
+  public static bool SecondaryReloadPressed(this PlayerController player)
+  {
+    if (CwaffConfig._SecondaryReload == CwaffConfig.SecondaryReloadKey.None)
+      return false;
+    if (BraveInput.GetInstanceForPlayer(player.PlayerIDX).ActiveActions.Device is not InControl.InputDevice device)
+      return false;
+    if (CwaffConfig._SecondaryReload == CwaffConfig.SecondaryReloadKey.Left)
+      return device.LeftStickButton.WasPressed;
+    if (CwaffConfig._SecondaryReload == CwaffConfig.SecondaryReloadKey.Right)
+      return device.RightStickButton.WasPressed;
+    return false;
+  }
 }

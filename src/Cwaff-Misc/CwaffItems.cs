@@ -160,6 +160,29 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem/*, ILevelLoadedListener
           cg.OnDroppedByPlayer(player);
       }
   }
+
+  /// <summary>Patch for detecting whether a secondary reload button is pressed</summary>
+  [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.HandlePlayerInput))]
+  private class SecondaryReloadPatch
+  {
+      [HarmonyILManipulator]
+      private static void SecondaryReloadIL(ILContext il)
+      {
+          ILCursor cursor = new ILCursor(il);
+          if (!cursor.TryGotoNext(MoveType.After,
+              instr => instr.MatchLdfld<GungeonActions>("ReloadAction"),
+              instr => instr.MatchCallvirt<InControl.OneAxisInputControl>("get_WasPressed")))
+              return;
+          cursor.Emit(OpCodes.Ldarg_0);
+          cursor.Emit(OpCodes.Call, typeof(SecondaryReloadPatch).GetMethod(nameof(SecondaryReloadPatch.CheckSecondaryReload), BindingFlags.Static | BindingFlags.NonPublic));
+          return;
+      }
+
+      private static bool CheckSecondaryReload(bool oldValue, PlayerController player)
+      {
+        return oldValue || player.SecondaryReloadPressed();
+      }
+  }
 }
 
 public abstract class CwaffBlankModificationItem: BlankModificationItem, ICwaffItem

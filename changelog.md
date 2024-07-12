@@ -1,5 +1,9 @@
 # Changelog
 
+## TBD
+
+- Added config option for secondary reload button on controller to make using some of the mod's guns easier
+
 ## 1.15.1 (2024-07-11)
 
 - Made Insurance Policy chest spawn at the start of any run, even if the shortcut elevator is used

@@ -5,14 +5,34 @@ public static class CwaffConfig
   internal static Gunfig _Gunfig = null;
 
   internal const string _SHOP_KEY = "Shop Spawning Behaviour";
+  internal const string _SECONDARY_RELOAD = "Secondary Reload Button";
+  internal const string _SECONDARY_RELOAD_DESC = "Change the ";
+
+  public enum SecondaryReloadKey { None, Left, Right }
+  internal static SecondaryReloadKey _SecondaryReload = SecondaryReloadKey.None;
 
   public static void Init()
   {
     _Gunfig = Gunfig.Get("GungeonCraft".WithColor(C.MOD_COLOR));
 
     _Gunfig.AddScrollBox(
+      key     : _SECONDARY_RELOAD,
+      options : new(){
+        "Disabled",
+        "Left Stick".Yellow(),
+        "Right Stick".Yellow(),
+        },
+      info    : new(){
+        "Disables all secondary reload buttons.\nRecommended if you reload with a trigger or bumper.".Green(),
+        "Pressing the left stick triggers a reload.\nRecommended if you reload with a face button.\nNot recommended with dual stick blanks.".Green(),
+        "Pressing the right stick triggers a reload.\nRecommended if you reload with a face button.\nNot recommended with dual stick blanks.".Green(),
+        },
+      callback: OnSecondaryReloadChange,
+      updateType: Gunfig.Update.Immediate
+      );
+
+    _Gunfig.AddScrollBox(
       key     : HeckedMode._CONFIG_KEY,
-      label   : "Hecked Mode",
       options : new(){
         "Disabled",
         "Hecked".Yellow(),
@@ -38,21 +58,20 @@ public static class CwaffConfig
       updateType: Gunfig.Update.OnRestart
       );
 
-      // "All enemies are armed to the teeth.\nNowhere is safe.\nTakes effect next run.".Green(),
+    // Make sure our initial keybind preferences are set up for seconday reload button
+    OnSecondaryReloadChange(_SECONDARY_RELOAD, _Gunfig.Value(_SECONDARY_RELOAD));
 
-    // for (int i = 0; i < 3; ++i)
-    // {
-    //   _Gunfig.AddToggle(key: "testCheck", label: "Hello there! :D".Cyan(), enabled: false, callback: (_, newVal) => ETGModConsole.Log($"it worked O: {(newVal == "1" ? "on" : "off")}") );
-    //   _Gunfig.AddLabel("A Label *O*".Magenta());
-    //   // config.AddScrollBox("testScroll", "Look at it Go!", options: new(){"this", "that", "the other"}, info: new(){"good", "bad\nbad\nbad", "ugly"},
-    //   //   callback: (_, newVal) => ETGModConsole.Log($"toggled to: {newVal}"));
-    //   // config.AddScrollBox("testScroll", "Line Test!", options: new(){"one", "two"}, info: new(){"one line", "two\nlines"},
-    //   //   callback: (_, newVal) => ETGModConsole.Log($"toggled to: {newVal}"));
-    //   _Gunfig.AddScrollBox(key: "testScroll", label: "Another Line Test!".Red(), options: new(){"one".Yellow(), "two"}, info: new(){"one line".Green(), "still one line"},
-    //     callback: (_, newVal) => ETGModConsole.Log($"toggled to: {newVal}"));
-    //   _Gunfig.AddScrollBox(key: "testScroll2", label: "Last Line Test!".Blue(), options: new(){"one", "two"},
-    //     callback: (_, newVal) => ETGModConsole.Log($"toggled to: {newVal}"));
-    //   _Gunfig.AddButton(key: "testButton", label: "Click me!", callback: (key, _) => ETGModConsole.Log($"{key} button clicked!"));
-    // }
+    // "All enemies are armed to the teeth.\nNowhere is safe.\nTakes effect next run.".Green(),
+  }
+
+  private static void OnSecondaryReloadChange(string key, string value)
+  {
+    ETGModConsole.Log($"changed secondary reload!");
+    if (value == "Left Stick")
+      _SecondaryReload = SecondaryReloadKey.Left;
+    else if (value == "Right Stick")
+      _SecondaryReload = SecondaryReloadKey.Right;
+    else
+      _SecondaryReload = SecondaryReloadKey.None;
   }
 }

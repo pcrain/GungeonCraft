@@ -257,7 +257,7 @@ public class Initialisation : BaseUnityPlugin
                 BlasTechF4.Init();
                 Telefragger.Init();
 
-                Lazy.FinalizeGuns(); // Make sure encountr trackables are finalized so shoot styles properly display in the Ammonomicon
+                Lazy.FinalizeGuns(); // Make sure encounter trackables are finalized so shoot styles properly display in the Ammonomicon
 
                 setupGunsWatch.Stop();
             #endregion
