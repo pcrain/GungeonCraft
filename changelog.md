@@ -3,6 +3,9 @@
 ## TBD
 
 - Added config option for secondary reload button on controller to make using some of the mod's guns easier
+- Made movement smoother for Iron Maid's targeting reticle
+- Increased lock on range for Iron Maid's targeting reticle
+- Adjusted the volume of a few sounds
 
 ## 1.15.1 (2024-07-11)
 

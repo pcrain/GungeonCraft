@@ -66,7 +66,6 @@ public static class CwaffConfig
 
   private static void OnSecondaryReloadChange(string key, string value)
   {
-    ETGModConsole.Log($"changed secondary reload!");
     if (value == "Left Stick")
       _SecondaryReload = SecondaryReloadKey.Left;
     else if (value == "Right Stick")
