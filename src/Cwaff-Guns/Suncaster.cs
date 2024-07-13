@@ -389,7 +389,6 @@ public class SuncasterPrism : MonoBehaviour, IPlayerInteractable
         return; // nothing else to do unless we have a tile collision (need to be pushable by player)
 
       SpeculativeRigidbody body = rigidbodyCollision.MyRigidbody;
-      Vector2 normal            = rigidbodyCollision.Normal;
       Vector2 newVel            = body.Velocity;
       if (rigidbodyCollision.CollidedX)
         newVel = newVel.WithX(-body.Velocity.x);

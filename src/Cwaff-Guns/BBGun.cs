@@ -85,7 +85,7 @@ public class TheBB : MonoBehaviour
 
     private void Update()
     {
-        float newSpeed = Mathf.Max(this._projectile.baseData.speed - _BB_SPEED_DECAY * BraveTime.DeltaTime,0.0001f);
+        float newSpeed = Mathf.Max(this._projectile.baseData.speed - _BB_SPEED_DECAY * BraveTime.DeltaTime, 0.0001f); //TODO: maybe use real friction
 
         Material m = this._projectile.sprite.renderer.material;
         m.SetFloat("_EmissivePower", _BASE_EMISSION + _EXTRA_EMISSION * (newSpeed / _maxSpeed));
