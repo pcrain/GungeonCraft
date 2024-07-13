@@ -4,7 +4,7 @@ public class GunPowderer : CwaffActive
 {
     public static string ItemName         = "Gun Powderer";
     public static string ShortDescription = "Mortar and Pistol";
-    public static string LongDescription  = "Converts the nearest dropped gun to 1-5 spread ammo boxes, depending on its remaining ammo percentage.";
+    public static string LongDescription  = "Converts the nearest dropped gun to 1-5 spread ammo boxes, depending on its quality and remaining ammo percentage.";
     public static string Lore             = "The art of gun powdering is relatively modern, despite the required implements all being rather primitive. This is perhaps because ammunition was in much higher supply in the Gungeon's early days, and powdering was largely unnecessary. Nowadays, resourceful Gungeoneers understand the value of smashing up their old and unused guns for ammo, and one can only hope they will eventually understand they wouldn't need so much ammo in the first place if they didn't miss 90% of their shots.";
 
     private const float _MAX_DIST = 5f;
@@ -12,7 +12,7 @@ public class GunPowderer : CwaffActive
     public static void Init()
     {
         PlayerItem item = Lazy.SetupActive<GunPowderer>(ItemName, ShortDescription, LongDescription, Lore);
-        item.quality      = ItemQuality.A;
+        item.quality      = ItemQuality.B;
         item.consumable   = false;
         item.CanBeDropped = true;
         item.SetCooldownType(ItemBuilder.CooldownType.Timed, 2f);
@@ -45,7 +45,7 @@ public class GunPowderer : CwaffActive
     private void ConvertGunToAmmo(Gun gun)
     {
         float ammoPercent    = (float)gun.CurrentAmmo / (float)gun.AdjustedMaxAmmo;
-        int ammoBoxesToSpawn = Mathf.Clamp(Mathf.CeilToInt(ammoPercent * 5f), 1, 5);
+        int ammoBoxesToSpawn = Mathf.Clamp(Mathf.Min(gun.QualityGrade(), Mathf.CeilToInt(ammoPercent * 5f)), 1, 5);
 
         Vector2 spawnCenter = gun.sprite.WorldCenter;
         Lazy.DoSmokeAt(spawnCenter);

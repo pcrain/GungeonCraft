@@ -8,6 +8,8 @@
 - Adjusted the volume of a few sounds
 - Fixed launch delay on Iron Maid's projectiles not accounting for projectiles that were destroyed while in stasis
 - Fixed ghost cables persisting if Alligator is dropped and picked back up
+- Made Gun Powderer take gun quality into account when determining how many ammo boxes to create
+	- Changed quality of Gun Powderer from A to B to compensate
 
 ## 1.15.1 (2024-07-11)
 
