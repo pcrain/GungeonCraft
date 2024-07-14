@@ -128,11 +128,6 @@ public class HatchlingBehavior : MonoBehaviour
 {
     private const float _CHECK_INTERVAL = 1.0f;
 
-    private const float _CAMERA_CACHE_INTERVAL = 1.0f;
-    private static float _LastCameraCacheTime = 0.0f;
-    private static Vector2 _CachedCameraMin;
-    private static Vector2 _CachedCameraMax;
-
     private RoomHandler _startRoom = null;
     private PlayerController _owner = null;
     private AIActor _actor = null;
@@ -175,17 +170,9 @@ public class HatchlingBehavior : MonoBehaviour
         if (this._owner.CurrentRoom == _startRoom)
             return; // don't despawn even if we're offscreen, so long as the player is in the room we spawned in
 
-        // Conservatively compute the camera coordinates at most once per frame
-        if (_LastCameraCacheTime != BraveTime.ScaledTimeSinceStartup)
-        {
-            _CachedCameraMin     = BraveUtility.ViewportToWorldpoint(new Vector2(0f, 0f), ViewportType.Gameplay);
-            _CachedCameraMax     = BraveUtility.ViewportToWorldpoint(new Vector2(1f, 1f), ViewportType.Gameplay);
-            _LastCameraCacheTime = BraveTime.ScaledTimeSinceStartup;
-        }
 
         // Check if we're offscreen, and destroy if so
-        Vector3 pos = this._actor.Position;
-        if (pos.x < _CachedCameraMin.x || pos.x > _CachedCameraMax.x || pos.y < _CachedCameraMin.y || pos.y > _CachedCameraMax.y)
+        if (!this._actor.Position.OnScreen())
             UnityEngine.Object.Destroy(base.gameObject);
     }
 }

@@ -22,6 +22,8 @@ public static class CwaffEvents // global custom events we can listen for
     public static Action OnKeepFullyLoadedForNewRun;
     // Runs whenever a bullet is spawned from an AIBulletBank and an owner is assigned to the projectile
     public static Action<Projectile> OnBankBulletOwnerAssigned;
+    // Runs whenever a player enters a new room (either / both of old and new room may be null)
+    public static Action<PlayerController, RoomHandler, RoomHandler> OnChangedRooms;
 
     internal static bool _OnFirstFloor = false;
     internal static bool _RunJustStarted = false;
@@ -126,6 +128,23 @@ public static class CwaffEvents // global custom events we can listen for
             p.Owner = actor;
             if (OnBankBulletOwnerAssigned != null)
                 OnBankBulletOwnerAssigned(p);
+        }
+    }
+
+
+    [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.LateUpdate))]
+    private class PlayerUpdatePatch
+    {
+        private static RoomHandler[] _LastRoom = {null, null};
+
+        static void Prefix(PlayerController __instance)
+        {
+            int id = __instance.PlayerIDX;
+            if (__instance.CurrentRoom == _LastRoom[id])
+                return;
+            if (OnChangedRooms != null)
+                OnChangedRooms(__instance, _LastRoom[id], __instance.CurrentRoom);
+            _LastRoom[id] = __instance.CurrentRoom;
         }
     }
 }

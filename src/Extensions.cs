@@ -2217,4 +2217,44 @@ public static class Extensions
       return device.RightStickButton.WasPressed;
     return false;
   }
+
+  private static float _LastCameraCacheTime;
+  private static Vector2 _CachedCameraMin;
+  private static Vector2 _CachedCameraMax;
+
+  /// <summary>Detect if a point is on screen</summary>
+  public static bool OnScreen(this Vector2 pos)
+  {
+      // Conservatively compute the camera coordinates at most once per frame
+      if (_LastCameraCacheTime != BraveTime.ScaledTimeSinceStartup)
+      {
+          _CachedCameraMin     = BraveUtility.ViewportToWorldpoint(Vector2.zero, ViewportType.Gameplay);
+          _CachedCameraMax     = BraveUtility.ViewportToWorldpoint(Vector2.one, ViewportType.Gameplay);
+          _LastCameraCacheTime = BraveTime.ScaledTimeSinceStartup;
+      }
+      if (pos.x < _CachedCameraMin.x || pos.x > _CachedCameraMax.x || pos.y < _CachedCameraMin.y || pos.y > _CachedCameraMax.y)
+          return false;
+      return true;
+  }
+
+  /// <summary>Detect if a point is on screen with a buffer</summary>
+  public static bool OnScreen(this Vector2 pos, float leeway)
+  {
+      // Conservatively compute the camera coordinates at most once per frame
+      if (_LastCameraCacheTime != BraveTime.ScaledTimeSinceStartup)
+      {
+          _CachedCameraMin     = BraveUtility.ViewportToWorldpoint(Vector2.zero, ViewportType.Gameplay);
+          _CachedCameraMax     = BraveUtility.ViewportToWorldpoint(Vector2.one, ViewportType.Gameplay);
+          _LastCameraCacheTime = BraveTime.ScaledTimeSinceStartup;
+      }
+      if (pos.x < _CachedCameraMin.x - leeway || pos.x > _CachedCameraMax.x + leeway || pos.y < _CachedCameraMin.y - leeway || pos.y > _CachedCameraMax.y + leeway)
+          return false;
+      return true;
+  }
+
+  /// <summary>Detect if a point is on screen, Vector3 version</summary>
+  public static bool OnScreen(this Vector3 pos) => pos.XY().OnScreen();
+
+  /// <summary>Detect if a point is on screen with a buffer, Vector3 version</summary>
+  public static bool OnScreen(this Vector3 pos, float leeway) => pos.XY().OnScreen(leeway);
 }
