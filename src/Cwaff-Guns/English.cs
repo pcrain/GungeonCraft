@@ -4,7 +4,6 @@ using System;
 using static BilliardBall.State;
 
 /* TODO:
-    - more ball colors
     - better sounds for charging
     - better sounds for firing
 
@@ -21,9 +20,14 @@ public class English : CwaffGun
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
 
-    private const float _CHARGE_PER_LEVEL = 0.5f;
-    private const int _MAX_CHARGE_LEVEL = 4;
-    private const float _MAX_GLOW = 50f;
+    private const float _CHARGE_PER_LEVEL = 0.4f;
+    private const int _MAX_CHARGE_LEVEL = 5;
+    private const int _MAX_PHANTOMS = (_MAX_CHARGE_LEVEL * (_MAX_CHARGE_LEVEL + 1)) / 2;
+    private const float _MAX_GLOW = 5f;
+    private const float _H_SPACE = 0.9375f;
+    private const float _V_SPACE = 0.9375f;
+
+    private static readonly int[] _BALL_ORDER = [8, 6, 11, 14, 7, 0, 5, 9, 2, 13, 10, 1, 12, 3, 4, 15];
 
     internal static GameObject _BilliardBallPhantom = null;
     internal static GameObject _BilliardBallPlaceholder = null;
@@ -45,7 +49,7 @@ public class English : CwaffGun
 
         _BilliardBall = gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.25f, angleVariance: 5.0f, chargeTime: 0f,
           shootStyle: ShootStyle.Charged, damage: 2.5f, speed: 81.0f, range: 9999f, spawnSound: "tomislav_shoot",
-          sprite: "billiard_ball", fps: 12, scale: 1.5f, anchor: Anchor.MiddleCenter)).Attach<BilliardBall>();
+          sprite: "billiard_ball_projectile", fps: 12, scale: 1.5f, anchor: Anchor.MiddleCenter)).Attach<BilliardBall>();
         _BilliardBall.collidesWithProjectiles = true;
         _BilliardBall.collidesOnlyWithPlayerProjectiles = true;
         _BilliardBall.hitEffects.alwaysUseMidair = true;
@@ -121,18 +125,19 @@ public class English : CwaffGun
     private void EnsurePhantoms()
     {
         if (this._phantoms == null)
-            this._phantoms = new(10);
+            this._phantoms = new(_MAX_PHANTOMS);
         if (this._placeholders == null)
-            this._placeholders = new(10);
-        for (int i = this._phantoms.Count; i < 10; ++i)
+            this._placeholders = new(_MAX_PHANTOMS);
+        for (int i = this._phantoms.Count; i < _MAX_PHANTOMS; ++i)
             this._phantoms.Add(null);
-        for (int i = this._placeholders.Count; i < 10; ++i)
+        for (int i = this._placeholders.Count; i < _MAX_PHANTOMS; ++i)
             this._placeholders.Add(null);
-        for (int i = 0; i < 10; ++i)
+        for (int i = 0; i < _MAX_PHANTOMS; ++i)
         {
             if (!this._phantoms[i])
             {
                 this._phantoms[i] = SpawnManager.SpawnVFX(_BilliardBallPhantom, base.transform.position, Quaternion.identity, ignoresPools: true);
+                this._phantoms[i].GetComponent<tk2dSpriteAnimator>().PickFrame(_BALL_ORDER[i]);
                 this._phantoms[i].SetActive(false);
             }
             if (!this._placeholders[i])
@@ -180,21 +185,21 @@ public class English : CwaffGun
         this._wasCharging = this.gun.IsCharging;
     }
 
-    private const float _H_SPACE = 0.9375f;
-    private const float _V_SPACE = 0.9375f;
     private Vector2 _BasePhantomOffset => this.gun.CurrentAngle.ToVector(_V_SPACE * 3f);
+
     private void UpdatePhantomBilliards()
     {
         if (this.PlayerOwner is not PlayerController player)
             return;
         Vector2 basePos = this.gun.barrelOffset.position;
+        bool valid = basePos.HasLineOfSight(basePos + _BasePhantomOffset);
         float baseAngle = this.gun.CurrentAngle;
         int i = 0;
         // arrange in a triangle
         Vector2 firstPos = _BasePhantomOffset;
         Vector2 baseVec;
         int d;
-        float glow = 0.5f + Mathf.Max(-0.5f, Mathf.Sin(2f * Mathf.PI * (this._chargeTime / _CHARGE_PER_LEVEL)));
+        float glow = valid ? 0.5f + Mathf.Max(-0.5f, Mathf.Sin(2f * Mathf.PI * (this._chargeTime / _CHARGE_PER_LEVEL))) : 0f;
         for (d = 0; d < this._chargeLevel; ++d)
         {
             baseVec = firstPos + baseAngle.ToVector(_V_SPACE * d);
@@ -205,6 +210,7 @@ public class English : CwaffGun
                 this._placeholders[i].SetActive(false);
                 this._phantoms[i].SetActive(true);
                 this._phantoms[i].transform.position = pos;
+                this._phantoms[i].GetComponent<tk2dSpriteAnimator>().PickFrame(valid ? _BALL_ORDER[i] : 7); // black eight ball if invalid
                 tk2dSprite sprite = this._phantoms[i].GetComponent<tk2dSprite>();
                 sprite.PlaceAtScaledPositionByAnchor(pos, Anchor.MiddleCenter);
                 sprite.renderer.material.SetFloat("_EmissivePower", _MAX_GLOW * glow);
@@ -237,6 +243,7 @@ public class English : CwaffGun
         if (barrelPos.HasLineOfSight(barrelPos + _BasePhantomOffset))
             MaterializePhantoms();
         DismissPhantoms();
+        projectile.SetFrame(15); // 15 == cue ball (0-indexed)
     }
 
     private void MaterializePhantoms()
@@ -252,6 +259,7 @@ public class English : CwaffGun
                 proj.collidesWithEnemies = true;
                 proj.collidesWithPlayer = false;
                 proj.baseData.speed = 0.01f;
+                proj.SetFrame(_BALL_ORDER[i]);
             projObj.GetComponent<BilliardBall>().Setup(firedManually: false);
         }
     }
@@ -324,14 +332,14 @@ public class BilliardBall : MonoBehaviour
         ACTIVATED,
     }
 
-    private const float _FRICTION         = 0.975f; // friction to apply when moving around
+    private const float _FRICTION         = 0.96f;  // friction to apply when moving around
     private const float _COLLISON_DAMPING = 0.9f;   // percent speed to keep on colliding with anything other than another ball
     private const float _MIN_SPEED        = 1.0f;   // minimum speed before being considered at rest
     private const int _MAX_COLLISIONS     = 10;     // number of times we can collide before disintegrating
-    private const int _RESTORE_COLLISIONS = 3;      // if a billiard is at rest and activated, resets _remainingCollisions to this
+    private const int _RESTORE_COLLISIONS = 5;      // if a billiard is at rest and activated, resets _remainingCollisions to this
     private const float _MERCY_TIME       = 0.5f;   // seconds before _MAX_COLLISIONS starts being counted
-    private const float _ROT_RATE         = 90f;
-    private const float _DAMAGE_SCALE     = 0.5f;
+    private const float _ROT_RATE         = 90f;    // animation speed for rotations
+    private const float _DAMAGE_SCALE     = 0.5f;   // base damage scaling relative to original basedata.damage
     internal const float _MAX_ADJUST      = 45f;    // adjust our angle by at most 45 degress to an actual enemy
 
     internal Projectile _projectile             = null;
@@ -396,7 +404,8 @@ public class BilliardBall : MonoBehaviour
             this._body.OnPreRigidbodyCollision -= this.OnPreCollision;
             return;
         }
-        if (otherRigidbody.gameObject.GetComponent<BilliardBall>() is not BilliardBall)
+        GameObject other = otherRigidbody.gameObject;
+        if (!other.GetComponent<BilliardBall>() && !other.GetComponent<AIActor>())
             PhysicsEngine.SkipCollision = true;
     }
 
@@ -462,9 +471,9 @@ public class BilliardBall : MonoBehaviour
         Vector2 newv1 = v1 - (Vector2.Dot(v1 - v2, posDiff) * invDistNorm) * posDiff;
         Vector2 newv2 = v2 - (Vector2.Dot(v2 - v1, -posDiff) * invDistNorm) * (-posDiff);
 
-        float newSpeed = Mathf.Sqrt(Mathf.Max(v1.sqrMagnitude, v2.sqrMagnitude, newv1.sqrMagnitude, newv2.sqrMagnitude));
+        float newSpeed = Mathf.Sqrt(Mathf.Max(v1.sqrMagnitude, v2.sqrMagnitude/*, newv1.sqrMagnitude, newv2.sqrMagnitude*/));
 
-        PhysicsEngine.PostSliceVelocity = newv1;
+        PhysicsEngine.PostSliceVelocity = newSpeed * newv1.normalized;
         this.Activate();
         this._projectile.baseData.speed = newSpeed;
         this._projectile.UpdateSpeed();
@@ -557,6 +566,7 @@ public class BilliardBall : MonoBehaviour
         this._projectile.enabled = true;
         this._body.CollideWithTileMap = true;
         this._projectile.collidesWithEnemies = true;
+        this._projectile.collidesWithProjectiles = true;
         this._projectile.UpdateCollisionMask();
         if (this._remainingCollisions < _RESTORE_COLLISIONS)
             this._remainingCollisions = _RESTORE_COLLISIONS;
@@ -572,6 +582,7 @@ public class BilliardBall : MonoBehaviour
         this._body.Velocity = Vector2.zero;
         this._body.CollideWithTileMap = false;
         this._projectile.collidesWithEnemies = false;
+        this._projectile.collidesWithProjectiles = false;
         this._projectile.UpdateCollisionMask();
         this._projectile.enabled = false;
         this._state = DEACTIVATED;

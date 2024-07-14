@@ -1436,7 +1436,7 @@ public static class Extensions
   /// <summary>Pick and pause on a frame (random if frame == -1) from a tk2dSpriteAnimator</summary>
   public static void PickFrame(this tk2dSpriteAnimator animator, int frame = -1)
   {
-    tk2dSpriteAnimationFrame[] frames = animator.currentClip.frames;
+    tk2dSpriteAnimationFrame[] frames = (animator.currentClip ?? animator.DefaultClip).frames;
     // animator.deferNextStartClip = false;
     animator.SetSprite(
       spriteCollection: frames[0].spriteCollection,
