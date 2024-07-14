@@ -199,3 +199,5 @@ blastech_jam_sound,-2.0,1,sound
 telefragger_amp_up_sound,-3.0,1,sound
 telefragger_fire_loop_sound,-2.0,0,sound
 zelda_chest_sound,6.0,1,sound
+billiard_first_strike_sound,5.0,1,sound
+billiard_materialize_sound,-7.0,1,sound

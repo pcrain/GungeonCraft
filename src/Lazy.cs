@@ -983,4 +983,10 @@ public static class Lazy
             }
         hh.m_flashOnHitCoroutine = hh.StartCoroutine(hh.FlashOnHit(DamageCategory.Normal, null));
     }
+
+    /// <summary>Make a list of size n filled with default values for a type</summary>
+    public static List<T> DefaultList<T>(int size)
+    {
+        return Enumerable.Repeat<T>(default, size).ToList();
+    }
 }
