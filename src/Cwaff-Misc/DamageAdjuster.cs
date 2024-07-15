@@ -5,11 +5,12 @@ public abstract class DamageAdjuster : MonoBehaviour
 {
     private static float AdjustDamageStatic(float currentDamage, Projectile proj, SpeculativeRigidbody body)
     {
-        if (proj.GetComponent<DamageAdjuster>() is not DamageAdjuster adj)
-            return currentDamage;
         if (body.GetComponent<AIActor>() is not AIActor enemy)
             return currentDamage;
-        return adj.AdjustDamage(currentDamage, proj, enemy);
+        float adjustedDamage = currentDamage;
+        foreach (DamageAdjuster adj in proj.GetComponents<DamageAdjuster>())
+            adjustedDamage = adj.AdjustDamage(adjustedDamage, proj, enemy);
+        return adjustedDamage;
     }
 
     protected abstract float AdjustDamage(float currentDamage, Projectile proj, AIActor enemy);

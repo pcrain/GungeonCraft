@@ -329,6 +329,7 @@ public class Initialisation : BaseUnityPlugin
                 MMAiming.Init();
                 Calculator.Init();
                 VolcanicAmmolet.Init();
+                TryhardSnacks.Init();
 
                 setupPassivesWatch.Stop();
             #endregion
