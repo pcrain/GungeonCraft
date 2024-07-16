@@ -120,6 +120,7 @@
     <Compile Include="src\Cwaff-Debug\OneOffDebugDungeonFlow.cs"/>
     <Compile Include="src\Common.cs"/>
     <Compile Include="src\Cwaff-Actives\AmazonPrimer.cs"/>
+    <Compile Include="src\Cwaff-Actives\WeightedRobes.cs"/>
     <Compile Include="src\Cwaff-Actives\Unfinished\GungeonitePickaxe.cs"/>
     <Compile Include="src\Cwaff-Actives\Unfinished\Protractor.cs"/>
     <Compile Include="src\Cwaff-Actives\ChamberJammer.cs"/>

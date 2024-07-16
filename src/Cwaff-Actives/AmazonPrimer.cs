@@ -107,10 +107,7 @@ public class PrimerSubscription : FakeItem
 
     private void DoPrimeVFX()
     {
-        this._primer.gameObject.Play("prime_sound");
-        GameObject v = SpawnManager.SpawnVFX(AmazonPrimer._PrimeLogo, this._primer.sprite.WorldTopCenter + new Vector2(0f, 0.5f), Quaternion.identity);
-            v.transform.parent = this._primer.transform;
-            v.ExpireIn(1f);
+        this._primer.FlashVFXAbovePlayer(AmazonPrimer._PrimeLogo, sound: "prime_sound");
     }
 
     public override void MidGameSerialize(List<object> data)

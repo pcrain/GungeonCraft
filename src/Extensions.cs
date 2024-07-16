@@ -2257,4 +2257,19 @@ public static class Extensions
 
   /// <summary>Detect if a point is on screen with a buffer, Vector3 version</summary>
   public static bool OnScreen(this Vector3 pos, float leeway) => pos.XY().OnScreen(leeway);
+
+  /// <summary>Helper for flashing VFX briefly above the player's head</summary>
+  public static void FlashVFXAbovePlayer(this PlayerController player, GameObject vfx, string sound = null, float time = 1.0f, bool glowAndFade = false)
+  {
+      GameObject v = SpawnManager.SpawnVFX(vfx, player.sprite.WorldTopCenter + new Vector2(0f, 0.5f), Quaternion.identity);
+      v.SetLayerRecursively(LayerMask.NameToLayer("Unoccluded"));
+      v.transform.parent = player.transform;
+      if (glowAndFade)
+        v.AddComponent<GlowAndFadeOut>().Setup(
+          fadeInTime: 0.15f, glowInTime: 0.20f, glowOutTime: 0.20f, fadeOutTime: 0.15f, maxEmit: 5f, destroy: true);
+      else
+        v.ExpireIn(time);
+      if (sound != null)
+        player.gameObject.Play(sound);
+  }
 }
