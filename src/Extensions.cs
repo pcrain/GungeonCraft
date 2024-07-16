@@ -800,10 +800,7 @@ public static class Extensions
       gun.carryPixelOffset = carryOffset.Value;
 
     if (idleFps.HasValue)
-    {
       gun.SetAnimationFPS(gun.GetOriginalIdleAnimationName(), idleFps.Value);
-      gun.SetAnimationFPS(gun.GetFixedIdleAnimationName(), idleFps.Value);
-    }
     if (shootFps.HasValue)   gun.SetAnimationFPS(gun.shootAnimation, shootFps.Value);
     if (reloadFps.HasValue)  gun.SetAnimationFPS(gun.reloadAnimation, reloadFps.Value);
     if (chargeFps.HasValue)  gun.SetAnimationFPS(gun.chargeAnimation, chargeFps.Value);
@@ -1887,12 +1884,6 @@ public static class Extensions
   public static string GetOriginalIdleAnimationName(this Gun gun)
   {
     return $"{gun.InternalSpriteName()}_idle";
-  }
-
-  /// <summary>Get the trimmed idle animation name for a gun</summary>
-  public static string GetFixedIdleAnimationName(this Gun gun)
-  {
-    return $"{gun.InternalSpriteName()}_{LargeGunAnimationHotfix._TRIM_ANIMATION}";
   }
 
   /// <summary>Get a Projectile's original direction for PostProcessProjectile purposes</summary>

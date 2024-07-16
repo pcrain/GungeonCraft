@@ -39,11 +39,6 @@ if [ $# -gt 0 ] && [ "$1" == "-t" ]; then
   thunderstore=1 #prepare for publishing on Thunderstore
 fi
 
-if [ $thunderstore -eq 1 ]; then
-  echo -e "[${GRN}>${BLN}] Trimming gun idle animations"
-  ./trim-idle-animations >/dev/null
-fi
-
 #Base directory we're copying our plugin to
 plugindir="/xmedia/pretzel/Steam/steamapps/common/Enter the Gungeon/BepInEx/plugins"
 pluginspritesdir="${plugindir}/sprites" #plugin sprite directory

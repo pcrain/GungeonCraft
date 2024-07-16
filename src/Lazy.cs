@@ -161,33 +161,6 @@ public static class Lazy
                         gun.barrelOffset.transform.localPosition = aps[i].position;
         #endregion
 
-        #region Set up trimmed idle sprites so we don't have wonky hitboxes for very large animations
-            gun.QuickUpdateGunAnimation(LargeGunAnimationHotfix._TRIM_ANIMATION, returnToIdle: true);
-            string fixedIdleAnimation = gun.GetFixedIdleAnimationName();
-            tk2dSpriteAnimationClip originalIdleClip = gun.spriteAnimator.GetClipByName(gun.idleAnimation);
-            int fixedIdleAnimationClipId = gun.spriteAnimator.GetClipIdByName(fixedIdleAnimation);
-            if (fixedIdleAnimationClipId != -1)
-            {
-                string originalIdleAnimation = gun.idleAnimation;
-                int fixedIdleAnimationSpriteId;
-                fixedIdleAnimationSpriteId = gun.spriteAnimator.GetClipByName(fixedIdleAnimation).frames[0].spriteId;
-
-                // Fix sprite animator
-                gun.SetAnimationFPS(fixedIdleAnimation, (int)originalIdleClip.fps);
-                gun.LoopAnimation(fixedIdleAnimation, originalIdleClip.loopStart);
-                gun.idleAnimation                = fixedIdleAnimation;
-                gun.spriteAnimator.defaultClipId = fixedIdleAnimationClipId;
-
-                // Fix pickup object sprite (handled by a Harmony patch now)
-                // gun.m_defaultSpriteID = fixedIdleAnimationSpriteId;
-                // gun.GetComponent<PickupObject>().sprite.spriteId = fixedIdleAnimationSpriteId;
-                // _GunSpriteCollection.SpriteIDsWithAttachPoints.Add(fixedIdleAnimationSpriteId);
-                // _GunSpriteCollection.SpriteDefinedAttachPoints.Add(new AttachPointData(gun.AttachPointsForClip(originalIdleAnimation)));
-            }
-            else if (C.DEBUG_BUILD)
-                ETGModConsole.Log($"  no fixed idle animation for {gunName}");
-        #endregion
-
         #region Auto-play idle animation
             gun.spriteAnimator.DefaultClipId = gun.spriteAnimator.GetClipIdByName(gun.idleAnimation);
             gun.spriteAnimator.playAutomatically = true;

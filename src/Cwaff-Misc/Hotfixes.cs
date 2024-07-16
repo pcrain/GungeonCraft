@@ -319,239 +319,40 @@ public static class DuctTapeSaveLoadHotfix
     }
 }
 
-// Fix guns with extremely large animations having enormous pickup ranges and appearing very weirdly
-//   on pedestals, in chests, in shops, when picked up or dropped, and when completing a synergy
-public static class LargeGunAnimationHotfix
+// Fix GungeonCraft guns with large idle frames having weird offsets from chests
+// NOTE: can technically remove the GetComponent<CwaffGun> check to fix vanilla items like Casey, but don't want to break other mods that
+//       rely on the existing behavior
+public static class BadItemOffsetsFromChestHotfix
 {
-    internal const string _TRIM_ANIMATION = "idle_trimmed";
-
-    private static tk2dSpriteAnimationClip GetTrimmedIdleAnimation(this Gun gun)
-    {
-        return gun.spriteAnimator ? gun.spriteAnimator.GetClipByName($"{gun.InternalSpriteName()}_{_TRIM_ANIMATION}") : null;
-    }
-
-    [HarmonyPatch(typeof(ShopItemController), nameof(ShopItemController.InitializeInternal))]
-    private class InitializeVanillaShopItemPatch // Fix oversized gun idle animations in vanilla shops and make sure they are aligned properly
-    {
-        [HarmonyILManipulator]
-        private static void OnInitializeVanillaShopItemIL(ILContext il)
-        {
-            ILCursor cursor = new ILCursor(il);
-            // cursor.DumpILOnce("OnInitializeVanillaShopItemIL");
-
-            if (!cursor.TryGotoNext(MoveType.Before,
-              instr => instr.MatchStfld<ShopItemController>("UseOmnidirectionalItemFacing"),
-              instr => instr.MatchLdarg(0),
-              instr => instr.MatchCall<BraveBehaviour>("get_sprite"),
-              instr => instr.MatchLdarg(0)
-              ))
-                return;
-
-            // skip past UseOmnidirectionalItemFacing and loading the ShopItemController, then proceed as with custom shop items
-            //   and finally replace the ShopItemController arg at the end
-            cursor.Index += 2;
-            cursor.Emit(OpCodes.Ldarg_1);  // PickupObject
-            cursor.Emit(OpCodes.Call, typeof(LargeGunAnimationHotfix).GetMethod("FixVanillaShopItemSpriteIfNecessary", BindingFlags.Static | BindingFlags.NonPublic));
-            cursor.Emit(OpCodes.Ldarg_0);  // ShopItemController
-            // ETGModConsole.Log($"  prepatched vanilla shop!");
-        }
-    }
-
-    private static void FixVanillaShopItemSpriteIfNecessary(ShopItemController item, PickupObject pickup)
-    {
-        if (pickup.GetComponent<Gun>() is not Gun gun)
-            return;
-
-        tk2dSpriteAnimationClip idleClip = gun.GetTrimmedIdleAnimation();
-        if (idleClip == null || idleClip.frames == null || idleClip.frames.Length == 0)
-            return;  // the idle animation clip is missing frames, so there's nothing to do
-
-        item.sprite.SetSprite(idleClip.frames[0].spriteCollection, idleClip.frames[0].spriteId);
-    }
-
-    [HarmonyPatch(typeof(CustomShopItemController), nameof(CustomShopItemController.InitializeInternal))]
-    private class InitializeCustomShopItemPatch // Fix oversized gun idle animations in custom shops and make sure they are aligned properly
-    {
-        [HarmonyILManipulator]
-        private static void OnInitializeCustomShopItemIL(ILContext il)
-        {
-            ILCursor cursor = new ILCursor(il);
-            // cursor.DumpILOnce("OnInitializeCustomShopItemIL");
-
-            if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchStfld<CustomShopItemController>("UseOmnidirectionalItemFacing")))
-                return;
-
-            cursor.Emit(OpCodes.Ldarg_0);  // CustomShopItemController
-            cursor.Emit(OpCodes.Ldarg_1);  // PickupObject
-            cursor.Emit(OpCodes.Call, typeof(LargeGunAnimationHotfix).GetMethod("FixCustomShopItemSpriteIfNecessary", BindingFlags.Static | BindingFlags.NonPublic));
-            // ETGModConsole.Log($"  prepatched custom shop!");
-        }
-    }
-
-    private static void FixCustomShopItemSpriteIfNecessary(CustomShopItemController item, PickupObject pickup)
-    {
-        if (pickup.GetComponent<Gun>() is not Gun gun)
-            return;
-
-        tk2dSpriteAnimationClip idleClip = gun.GetTrimmedIdleAnimation();
-        if (idleClip == null || idleClip.frames == null || idleClip.frames.Length == 0)
-            return;  // the idle animation clip is missing frames, so there's nothing to do
-
-        item.sprite.SetSprite(idleClip.frames[0].spriteCollection, idleClip.frames[0].spriteId);
-    }
-
-    [HarmonyPatch(typeof(RewardPedestal), nameof(RewardPedestal.DetermineContents))]
-    private class DetermineRewardPedestalContentsPatch // Fix oversized idle animations on reward pedestals
-    {
-        [HarmonyILManipulator]
-        private static void OnDetermineContentsIL(ILContext il)
-        {
-            ILCursor cursor = new ILCursor(il);
-            if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchStfld<RewardPedestal>("m_itemDisplaySprite")))
-                return;
-
-            cursor.Emit(OpCodes.Ldarg_0);
-            cursor.Emit(OpCodes.Call, typeof(LargeGunAnimationHotfix).GetMethod("FixRewardPedestalSpriteIfNecessary", BindingFlags.Static | BindingFlags.NonPublic));
-        }
-    }
-
-    // Use the first frame of the gun's (potentially trimmed) idle animation as its reward pedestal sprite
-    private static void FixRewardPedestalSpriteIfNecessary(RewardPedestal reward)
-    {
-        if (reward.contents.GetComponent<Gun>() is not Gun gun)
-            return;  // we don't have a gun, so there's nothing to do
-        if (!gun.idleAnimation.Contains(_TRIM_ANIMATION))
-            return;  // the gun doesn't have a trimmed idle animation, so there's nothing to do
-
-        tk2dSpriteAnimationClip idleClip = gun.GetTrimmedIdleAnimation();
-        if (idleClip == null || idleClip.frames == null || idleClip.frames.Length == 0)
-            return;  // the idle animation clip is missing frames, so there's nothing to do
-
-        // actually adjust the sprite to display properly on the reward pedestal
-        reward.m_itemDisplaySprite.SetSprite(idleClip.frames[0].spriteCollection, idleClip.frames[0].spriteId);
-    }
-
     [HarmonyPatch(typeof(Chest), nameof(Chest.PresentItem), MethodType.Enumerator)]
-    private class PresentItemPatch // Fix oversized idle animations in chests
+    private class BadItemOffsetsFromChestPatch
     {
         [HarmonyILManipulator]
-        private static void OnPresentItemIL(ILContext il)
+        private static void BadItemOffsetsFromChestIL(ILContext il)
         {
             ILCursor cursor = new ILCursor(il);
-            int spriteVal = -1;
-            if (!cursor.TryGotoNext(MoveType.After,
-                  instr => instr.MatchCall<tk2dSprite>("AddComponent"),
-                  instr => instr.MatchStloc(out spriteVal)))
-                return; //
-
-            cursor.Emit(OpCodes.Ldloc_3); // PickupObject
-            cursor.Emit(OpCodes.Ldloc, spriteVal);  //tk2dSprite
-            cursor.Emit(OpCodes.Call, typeof(LargeGunAnimationHotfix).GetMethod("FixGunsFromChest", BindingFlags.Static | BindingFlags.NonPublic));
-        }
-    }
-
-    private static void FixGunsFromChest(PickupObject pickup, tk2dSprite sprite)
-    {
-        if ((pickup is Gun gun) && (gun.GetTrimmedIdleAnimation() is tk2dSpriteAnimationClip trimmed))
-            sprite.SetSprite(trimmed.frames[0].spriteCollection, trimmed.frames[0].spriteId);
-    }
-
-    [HarmonyPatch(typeof(GunInventory), nameof(GunInventory.AddGunToInventory))]
-    private class AddGunToInventoryPatch // Change from the fixed to the normal idle animation when picking up a gun
-    {
-        static void Prefix(Gun gun, bool makeActive)
-        {
-            if (!gun)
+            if (!cursor.TryGotoNext(MoveType.Before,
+              instr => instr.MatchStloc((byte)7),  // V_7 == offset vector for chest sprite
+              instr => instr.MatchLdloc((byte)8))) // V_8 == sprite for our chest prize
                 return;
-            string fixedIdleAnimation = $"{gun.InternalSpriteName()}_{_TRIM_ANIMATION}";
-            if (gun.spriteAnimator.GetClipIdByName(fixedIdleAnimation) != -1)
-            {
-                gun.idleAnimation = $"{gun.InternalSpriteName()}_idle";  // restore the gun's original (untrimmed) idle animation when picked up
-                gun.spriteAnimator.defaultClipId = gun.spriteAnimator.GetClipIdByName(gun.idleAnimation);
-            }
-        }
-    }
 
-    [HarmonyPatch(typeof(Gun), nameof(Gun.DropGun))]
-    private class DropGunPatch // Change from the normal to the fixed idle animation when dropping a gun
-    {
-        static void Postfix(Gun __instance, float dropHeight)
-        {
-            Gun gun = __instance;
-            string fixedIdleAnimation = $"{gun.InternalSpriteName()}_{_TRIM_ANIMATION}";
-            if (gun.spriteAnimator.GetClipIdByName(fixedIdleAnimation) != -1)
-            {
-                Vector2 center = gun.sprite.WorldCenter;
-                gun.spriteAnimator.defaultClipId = gun.spriteAnimator.GetClipIdByName(fixedIdleAnimation);
-                gun.spriteAnimator.Play(fixedIdleAnimation);  // play the gun's fixed (trimmed) idle animation when dropped
-                gun.sprite.PlaceAtPositionByAnchor(center, Anchor.MiddleCenter);
-            }
+            ++cursor.Index; // move after stloc v_7
+            cursor.Emit(OpCodes.Ldloc_S, (byte)7); // V_7 == the original vector
+            cursor.Emit(OpCodes.Ldloc_S, (byte)3); // V_3 == the pickup object
+            cursor.Emit(OpCodes.Ldloc_S, (byte)8); // V_8 == sprite for our chest prize
+            cursor.Emit(OpCodes.Call, typeof(BadItemOffsetsFromChestPatch).GetMethod(nameof(BadItemOffsetsFromChestPatch.DetermineActualOffset),
+                BindingFlags.Static | BindingFlags.NonPublic));
+            cursor.Emit(OpCodes.Stloc_S, (byte)7); // store the new vector in V_7
         }
-    }
 
-    /// <summary>Our guns show up funny in synergy notifications unless we use trimmed sprites, so fix that here</summary>
-    [HarmonyPatch(typeof(UINotificationController), nameof(UINotificationController.SetupSynergySprite))]
-    private class SetupSynergySpritePatch
-    {
-        static void Postfix(UINotificationController __instance, tk2dSpriteCollectionData collection, int spriteId)
+        private static Vector3 DetermineActualOffset(Vector3 original, PickupObject p, tk2dSprite s)
         {
-            string spriteName = collection.spriteDefinitions[spriteId].name;
-            if (!spriteName.EndsWith("_idle_001"))
-                return;
-            string trimmedSpriteName = spriteName.Replace("_001", "_trimmed_001");
-            int trimmedId = collection.GetSpriteIdByName(trimmedSpriteName, defaultValue: -1);
-            if (trimmedId != -1)
-                __instance.notificationSynergySprite.SetSprite(collection, trimmedId);
+            if (p.gameObject.GetComponent<CwaffGun>())
+                return -s.GetRelativePositionFromAnchor(Anchor.LowerCenter);
+            return original;
         }
     }
 }
-
-// Fix softlock when one player dies in a payday drill room (can't get the bug to trigger consistently enough to test this, so disabling this for now)
-// public static class CoopDrillSoftlockHotfix
-// {
-//     // private static ILHook _CoopDrillSoftlockHotfixHook;
-
-//     public static void Init()
-//     {
-//         // _CoopDrillSoftlockHotfixHook = new ILHook(
-//         //     typeof(PaydayDrillItem).GetNestedType("<HandleTransitionToFallbackCombatRoom>c__Iterator1", BindingFlags.NonPublic | BindingFlags.Instance).GetMethod("MoveNext"),
-//         //     CoopDrillSoftlockHotfixHookIL
-//         //     );
-//     }
-
-//     private static void CoopDrillSoftlockHotfixHookIL(ILContext il)
-//     {
-//         ILCursor cursor = new ILCursor(il);
-//         // cursor.DumpILOnce("CoopDrillSoftlockHotfixHook");
-
-//         if (!cursor.TryGotoNext(MoveType.After,
-//           instr => instr.MatchCallvirt<Chest>("ForceUnlock"),
-//           instr => instr.MatchLdarg(0)
-//           ))
-//             return; // failed to find what we need
-
-//         ETGModConsole.Log($"found!");
-
-//         // partial fix
-//         cursor.Remove(); // remove loading false into our bool
-//         cursor.Emit(OpCodes.Ldc_I4_1); // load true into the bool instead so we can immediately skip the loop
-
-//         // debugging
-//         // cursor.Emit(OpCodes.Call, typeof(CoopDrillSoftlockHotfix).GetMethod("SanityCheck"));
-
-//         return;
-//     }
-
-//     public static void SanityCheck()
-//     {
-//         ETGModConsole.Log($"sanity checking");
-//         for (int j = 0; j < GameManager.Instance.AllPlayers.Length; j++)
-//         {
-//             ETGModConsole.Log($"position for player {j+1}");
-//             ETGModConsole.Log($"{GameManager.Instance.AllPlayers[j].CenterPosition}");
-//         }
-//     }
-// }
 
 // Fix player two not getting Turbo Mode speed buffs in Coop
 public static class CoopTurboModeHotfix

@@ -1,9 +1,0 @@
-#!/bin/bash
-#Helper script for creating trimmed versions of gun idle animations
-
-spritedir="./RawResources/WeaponCollection"
-while read -r line; do
-  weaponname="$(echo $line | rev | cut -f 3- -d'_' | rev)"
-  echo "  trimming $weaponname"
-  aseprite -bv "${spritedir}/${line}" --trim-sprite --save-as "${spritedir}/${weaponname}_idle_trimmed_{tagframe001}.png"
-done <<< $(find "${spritedir}" -type f | grep "idle_001.png" | rev | cut -f1 -d'/' | rev)
