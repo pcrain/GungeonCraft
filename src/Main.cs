@@ -135,9 +135,9 @@ public class Initialisation : BaseUnityPlugin
                 CwaffConfig.Init();
 
                 //Tools and Toolboxes
-                CwaffPrerequisite.Init();  // must be set up after CwaffEvents
+                CwaffPrerequisite.Init();  // must be set up after CwaffEvents (handled by Harmony.patchall())
                 // HUDController.Init(); // Need to load early (unused for now)
-                ModdedShopItemAdder.Init(); // must be set up after CwaffEvents
+                ModdedShopItemAdder.Init(); // must be set up after CwaffEvents (handled by Harmony.patchall())
 
                 //Commands and Other Console Utilities
                 Commands.Init();

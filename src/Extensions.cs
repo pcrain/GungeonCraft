@@ -2275,4 +2275,10 @@ public static class Extensions
       if (sound != null)
         player.gameObject.Play(sound);
   }
+
+  /// <summary>Extend an enum from a string</summary>
+  public static T ExtendEnum<T>(this string s) where T : System.Enum
+  {
+    return ETGModCompatibility.ExtendEnum<T>(C.MOD_PREFIX.ToUpper(), s);
+  }
 }

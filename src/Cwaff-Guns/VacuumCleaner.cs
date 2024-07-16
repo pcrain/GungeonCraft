@@ -32,7 +32,7 @@ public class VacuumCleaner : CwaffGun
     public static void Init()
     {
         Gun gun = Lazy.SetupGun<VacuumCleaner>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.CHARGE, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true,
+            gun.SetAttributes(quality: ItemQuality.D, gunClass: CwaffGunClass.UTILITY, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true,
                 chargeFps: 16, banFromBlessedRuns: true);
             gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
             gun.AddToSubShop(ModdedShopType.Rusty);

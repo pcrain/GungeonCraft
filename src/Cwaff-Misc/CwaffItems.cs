@@ -9,7 +9,7 @@ public abstract class CwaffPassive : PassiveItem, ICwaffItem
 {
   public override void Pickup(PlayerController player)
   {
-    if (!this.m_pickedUpThisRun)
+    if (!this.m_pickedUpThisRun) // must come before base.Pickup()
       OnFirstPickup(player);
     base.Pickup(player);
   }
@@ -24,7 +24,7 @@ public abstract class CwaffActive: PlayerItem, ICwaffItem
 {
   public override void Pickup(PlayerController player)
   {
-    if (!this.m_pickedUpThisRun)
+    if (!this.m_pickedUpThisRun) // must come before base.Pickup()
       OnFirstPickup(player);
     base.Pickup(player);
   }
@@ -68,7 +68,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem/*, ILevelLoadedListener
 
   public override void OnPlayerPickup(PlayerController player)
   {
-    if (!this.EverPickedUp)
+    if (!this.EverPickedUp) // must come before base.OnPlayerPickup()
       OnFirstPickup(player);
     base.OnPlayerPickup(player);
 

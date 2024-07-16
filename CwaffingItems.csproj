@@ -238,6 +238,7 @@
     <Compile Include="src\Cwaff-Misc\CwaffPatches.cs"/>
     <Compile Include="src\Cwaff-Misc\SpriteTrailController.cs"/>
     <Compile Include="src\Cwaff-Misc\HeckedMode.cs"/>
+    <Compile Include="src\Cwaff-Misc\CwaffEnums.cs"/>
     <Compile Include="src\Cwaff-Misc\GunBuilder.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffHUD.cs"/>
     <Compile Include="src\Cwaff-Misc\MiniInteractable.cs"/>
