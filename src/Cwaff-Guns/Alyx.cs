@@ -74,18 +74,12 @@ public class Alyx : CwaffGun
     {
         base.OnSwitchedToThisGun();
         RecalculateAmmo();
-        if (this._decayCoroutine != null)
-        {
-            StopCoroutine(this._decayCoroutine);
-            this._decayCoroutine = null;
-        }
     }
 
     public override void OnSwitchedAwayFromThisGun()
     {
         base.OnSwitchedAwayFromThisGun();
-        if (this._decayCoroutine == null)
-            this._decayCoroutine = this.GenericOwner.StartCoroutine(DecayWhileInactive());
+        this._decayCoroutine ??= this.PlayerOwner.StartCoroutine(DecayWhileInactive());
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
@@ -108,12 +102,13 @@ public class Alyx : CwaffGun
 
     private IEnumerator DecayWhileInactive()
     {
-        while (this && this.gameObject)
+        while (this && this.gameObject && this.PlayerOwner && this.PlayerOwner.CurrentGun != this)
         {
             if (GameManager.Instance && !GameManager.Instance.IsPaused && !GameManager.Instance.IsLoadingLevel)
                 RecalculateAmmo();
             yield return null;
         }
+        this._decayCoroutine = null;
     }
 
     internal static int ComputeExponentialDecay(float startAmount, float lambda, float timeElapsed)

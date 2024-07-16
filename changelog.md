@@ -14,7 +14,7 @@
 - Blacklisted several guns from blessed runs that had the potential to cause softlocks if obtained
 - Made BlasTech F-4 ignore boss damage caps
 - Fixed Wedding Ring being *completely nonfunctional* since version 1.0.0 D:
-- Fixed coroutine continue failure error in the debug console when switching to Aimu Hakurei 
+- Fixed coroutine continue failure error in the debug console when switching to Aimu Hakurei or Alyx
 - Rebalanced Vacuum Cleaner spawn rate by changing it from the CHARGE gun class to a new UTILITY gun class
 
 ## 1.15.1 (2024-07-11)
