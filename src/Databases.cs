@@ -1197,7 +1197,7 @@ public static class EasyGoopDefinitions  // mostly stolen from NN
             HolyGoop.CanBeElectrified = true;
             HolyGoop.usesAmbientGoopFX = true;
             HolyGoop.ambientGoopFXChance = 0.004f;
-            HolyGoop.ambientGoopFX = VFX.CreatePool("seltzer_sparkles", fps: 10, loops: false, scale: 0.5f, anchor: Anchor.MiddleCenter);
+            HolyGoop.ambientGoopFX = SeltzerGoop.ambientGoopFX;
             HolyGoop.AppliesSpeedModifierContinuously = true;
             HolyGoop.eternal = true;
             HolyGoop.AppliesCharm = false;
