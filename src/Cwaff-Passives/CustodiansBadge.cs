@@ -44,20 +44,18 @@ public class CustodiansBadge : CwaffPassive
         item.CanBeDropped  = false;
     }
 
-    public override void Pickup(PlayerController player)
+    public override void OnFirstPickup(PlayerController player)
     {
-        player.OnEnteredCombat += this.OnEnteredCombat;
-
-        if (this.m_pickedUpThisRun)
-        {
-            base.Pickup(player);
-            return;
-        }
-        base.Pickup(player);
-
+        base.OnFirstPickup(player);
         this.chancesLeft = _MAX_CHANCES;
         string s = _MSG_JOIN + _SIGNATURE;
         CustomNoteDoer.CreateNote(player.CenterPosition, s);
+    }
+
+    public override void Pickup(PlayerController player)
+    {
+        player.OnEnteredCombat += this.OnEnteredCombat;
+        base.Pickup(player);
     }
 
     public override DebrisObject Drop(PlayerController player)

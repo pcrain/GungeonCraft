@@ -2,18 +2,37 @@ namespace CwaffingTheGungy;
 
 public interface ICwaffItem
 {
-}
-
-public static class CwaffItem
-{
+  public void OnFirstPickup(PlayerController player);
 }
 
 public abstract class CwaffPassive : PassiveItem, ICwaffItem
 {
+  public override void Pickup(PlayerController player)
+  {
+    if (!this.m_pickedUpThisRun)
+      OnFirstPickup(player);
+    base.Pickup(player);
+  }
+
+  public virtual void OnFirstPickup(PlayerController player)
+  {
+
+  }
 }
 
 public abstract class CwaffActive: PlayerItem, ICwaffItem
 {
+  public override void Pickup(PlayerController player)
+  {
+    if (!this.m_pickedUpThisRun)
+      OnFirstPickup(player);
+    base.Pickup(player);
+  }
+
+  public virtual void OnFirstPickup(PlayerController player)
+  {
+
+  }
 }
 
 public abstract class CwaffGun: GunBehaviour, ICwaffItem/*, ILevelLoadedListener*/
@@ -49,6 +68,8 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem/*, ILevelLoadedListener
 
   public override void OnPlayerPickup(PlayerController player)
   {
+    if (!this.EverPickedUp)
+      OnFirstPickup(player);
     base.OnPlayerPickup(player);
 
     player.GunChanged -= OnGunsChanged;
@@ -61,6 +82,11 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem/*, ILevelLoadedListener
       this._barrelOffsets             = barrelOffsets;
       this._defaultBarrelOffset       = barrelOffsets[_DEFAULT_BARREL_OFFSET][0];
     }
+  }
+
+  public virtual void OnFirstPickup(PlayerController player)
+  {
+
   }
 
   /// <summary>
@@ -191,4 +217,9 @@ public abstract class CwaffBlankModificationItem: BlankModificationItem, ICwaffI
   // public abstract string ShortDescription { get; }
   // public abstract string LongDescription  { get; }
   // public abstract string Lore             { get; }
+
+  public virtual void OnFirstPickup(PlayerController player)
+  {
+
+  }
 }

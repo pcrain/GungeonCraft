@@ -17,7 +17,6 @@ public class WarriorsGi : CwaffPassive
     internal static GameObject _SaiyanSpark;
     internal static GameObject _ZenkaiAura;
 
-    private bool _initialized = false;
     private bool _canActivate = false;
 
     private StatModifier _rateOfFireStat     = null;
@@ -40,9 +39,6 @@ public class WarriorsGi : CwaffPassive
 
     public override void Pickup(PlayerController player)
     {
-        if (!this._initialized)
-            InitializeStats(player);
-
         base.Pickup(player);
         player.healthHaver.OnDamaged += this.OnDamaged;
         player.healthHaver.OnHealthChanged += this.OnHealthChanged;
@@ -50,7 +46,7 @@ public class WarriorsGi : CwaffPassive
         RecalculatePower(player);
     }
 
-    private void InitializeStats(PlayerController player)
+    public override void OnFirstPickup(PlayerController player)
     {
         this._rateOfFireStat = new StatModifier {
             amount      = 1.00f,
@@ -79,7 +75,6 @@ public class WarriorsGi : CwaffPassive
             this._damageStat,
             this._bossDamageStat,
         };
-        this._initialized = true;
     }
 
     public override DebrisObject Drop(PlayerController player)

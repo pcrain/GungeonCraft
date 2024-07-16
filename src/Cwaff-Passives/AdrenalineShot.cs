@@ -113,10 +113,14 @@ public class AdrenalineShot : CwaffPassive
     //     }
     // }
 
+    public override void OnFirstPickup(PlayerController player)
+    {
+        if (player.ForceZeroHealthState) // Robot + 0-health characters can't use this item, so just give them some money
+            LootEngine.SpawnCurrency(player.CenterPosition, _CASINGS_FOR_ROBOT);
+    }
+
     public override void Pickup(PlayerController player)
     {
-        if (!this.m_pickedUpThisRun && player.ForceZeroHealthState) // Robot + 0-health characters can't use this item, so just give them some money
-            LootEngine.SpawnCurrency(player.CenterPosition, _CASINGS_FOR_ROBOT);
         base.Pickup(player);
         if (!player.ForceZeroHealthState)
             player.healthHaver.ModifyDamage += this.OnTakeDamage;

@@ -2,6 +2,7 @@
 
 ## TBD
 
+- Added English, Tryhard Snacks, and Weighted Robes
 - Added secondary reload button config option to make using some of the mod's guns easier on controller
 - Made movement smoother for Iron Maid's targeting reticle
 - Increased lock on range for Iron Maid's targeting reticle

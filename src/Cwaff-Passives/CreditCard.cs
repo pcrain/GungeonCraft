@@ -22,21 +22,22 @@ public class CreditCard : CwaffPassive
         item.AddToSubShop(ItemBuilder.ShopType.Cursula);
     }
 
+    public override void OnFirstPickup(PlayerController player)
+    {
+        base.OnFirstPickup(player);
+        this.curseMod = new StatModifier();
+            curseMod.amount = 0f;
+            curseMod.modifyType = StatModifier.ModifyMethod.ADDITIVE;
+            curseMod.statToBoost = PlayerStats.StatType.Curse;
+        this.coolMod = new StatModifier();
+            coolMod.amount = 0f;
+            coolMod.modifyType = StatModifier.ModifyMethod.ADDITIVE;
+            coolMod.statToBoost = PlayerStats.StatType.Coolness;
+        this.passiveStatModifiers = new []{curseMod, coolMod};
+    }
+
     public override void Pickup(PlayerController player)
     {
-        if (!this.m_pickedUpThisRun)
-        {
-            this.curseMod = new StatModifier();
-                curseMod.amount = 0f;
-                curseMod.modifyType = StatModifier.ModifyMethod.ADDITIVE;
-                curseMod.statToBoost = PlayerStats.StatType.Curse;
-            this.coolMod = new StatModifier();
-                coolMod.amount = 0f;
-                coolMod.modifyType = StatModifier.ModifyMethod.ADDITIVE;
-                coolMod.statToBoost = PlayerStats.StatType.Coolness;
-            this.passiveStatModifiers = new []{curseMod, coolMod};
-        }
-
         base.Pickup(player);
         player.healthHaver.ModifyDamage += this.OnTakeDamage;
         oldCurrency = _BASE_CREDIT;

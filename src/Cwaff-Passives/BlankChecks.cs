@@ -15,11 +15,10 @@ public class BlankChecks : CwaffPassive
         item.AddToSubShop(ItemBuilder.ShopType.OldRed);
     }
 
-    public override void Pickup(PlayerController player)
+    public override void OnFirstPickup(PlayerController player)
     {
-        if (!this.m_pickedUpThisRun)
-            GameManager.Instance.PrimaryPlayer.Blanks += 1;
-        base.Pickup(player);
+        base.OnFirstPickup(player);
+        GameManager.Instance.PrimaryPlayer.Blanks += 1;
     }
 
     [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.DoConsumableBlank))]

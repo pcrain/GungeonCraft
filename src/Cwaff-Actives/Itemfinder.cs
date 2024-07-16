@@ -34,10 +34,14 @@ public class Itemfinder : CwaffActive
         _BlinkId  = item.sprite.collection.GetSpriteIdByName("itemfinder_blink_icon");
     }
 
+    public override void OnFirstPickup(PlayerController player)
+    {
+        base.OnFirstPickup(player);
+        InitializeTreasureForFloor();
+    }
+
     public override void Pickup(PlayerController player)
     {
-        if (!this.m_pickedUpThisRun)
-            InitializeTreasureForFloor();
         GameManager.Instance.OnNewLevelFullyLoaded -= InitializeTreasureForFloor; //TODO: look into whether this is necessary or not
         GameManager.Instance.OnNewLevelFullyLoaded += InitializeTreasureForFloor;
         base.Pickup(player);

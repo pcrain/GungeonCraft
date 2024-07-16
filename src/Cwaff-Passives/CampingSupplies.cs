@@ -54,10 +54,14 @@ public class CampingSupplies : CwaffPassive
 
     }
 
+    public override void OnFirstPickup(PlayerController player)
+    {
+        base.OnFirstPickup(player);
+        this.passiveStatModifiers = new StatModifier[] { this._campMod };
+    }
+
     public override void Pickup(PlayerController player)
     {
-        if (!m_pickedUpThisRun)
-            this.passiveStatModifiers = new StatModifier[] { this._campMod };
         base.Pickup(player);
         ResetStats(player);
     }

@@ -22,8 +22,9 @@ public class JohnsWick : CwaffPassive
         item.quality       = ItemQuality.C;
     }
 
-    private void OnFirstPickup()
+    public override void OnFirstPickup(PlayerController player)
     {
+        base.OnFirstPickup(player);
         this._flameOff = new StatModifier[]{};
         StatModifier s1 = new StatModifier {
             amount      = _MOVEMENT_BOOST,
@@ -43,10 +44,7 @@ public class JohnsWick : CwaffPassive
 
     public override void Pickup(PlayerController player)
     {
-        if (!this.m_pickedUpThisRun)
-            OnFirstPickup();
         base.Pickup(player);
-
         this.passiveStatModifiers = _flameOff;
         player.PostProcessProjectile += this.PostProcessProjectile;
         player.healthHaver.damageTypeModifiers.AddUnique(this._fireResistance);
