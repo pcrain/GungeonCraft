@@ -11,7 +11,7 @@ public class MMAiming : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<MMAiming>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item  = Lazy.SetupPassive<MMAiming>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
     }

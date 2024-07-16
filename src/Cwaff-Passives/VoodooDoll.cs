@@ -13,7 +13,7 @@ public class VoodooDoll : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<VoodooDoll>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item  = Lazy.SetupPassive<VoodooDoll>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.A;
         item.AddToSubShop(ItemBuilder.ShopType.Cursula);
 

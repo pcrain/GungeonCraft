@@ -127,10 +127,10 @@ public static class Lazy
     /// <summary>
     /// Perform basic initialization for a new passive item definition.
     /// </summary>
-    public static PickupObject SetupPassive<T>(string itemName, string shortDescription, string longDescription, string lore, bool hideFromAmmonomicon = false)
-        where T : PickupObject
+    public static PassiveItem SetupPassive<T>(string itemName, string shortDescription, string longDescription, string lore, bool hideFromAmmonomicon = false)
+        where T : PassiveItem
     {
-        return SetupItem<PickupObject, T>(itemName, shortDescription, longDescription, lore, hideFromAmmonomicon: hideFromAmmonomicon);
+        return SetupItem<PassiveItem, T>(itemName, shortDescription, longDescription, lore, hideFromAmmonomicon: hideFromAmmonomicon);
     }
 
     /// <summary>
@@ -988,5 +988,18 @@ public static class Lazy
     public static List<T> DefaultList<T>(int size)
     {
         return Enumerable.Repeat<T>(default, size).ToList();
+    }
+
+    /// <summary>Print a stat out</summary>
+    public static void PrintStat(StatModifier stat)
+    {
+        ETGModConsole.Log($"  have {(stat.modifyType == StatModifier.ModifyMethod.MULTIPLICATIVE ? "mul" : "add")} stat {stat.statToBoost} by {stat.amount}");
+    }
+
+    /// <summary>Print a player's ownerless stats</summary>
+    public static void PrintOwnerlessStats(PlayerController player)
+    {
+        foreach (StatModifier stat in player.ownerlessStatModifiers)
+            PrintStat(stat);
     }
 }

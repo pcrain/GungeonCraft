@@ -28,7 +28,7 @@ public class WarriorsGi : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<WarriorsGi>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item  = Lazy.SetupPassive<WarriorsGi>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.B;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
 

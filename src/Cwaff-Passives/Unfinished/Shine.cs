@@ -18,7 +18,7 @@ public class Shine : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<Shine>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item  = Lazy.SetupPassive<Shine>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
 
         noSpeed = new StatModifier

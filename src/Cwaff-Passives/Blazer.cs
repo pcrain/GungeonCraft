@@ -15,7 +15,7 @@ public class Blazer : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<Blazer>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item  = Lazy.SetupPassive<Blazer>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.A;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
 

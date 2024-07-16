@@ -17,7 +17,7 @@ public class SafetyGloves : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<SafetyGloves>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item  = Lazy.SetupPassive<SafetyGloves>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
 
         //WARNING: reusing ammonomicon icon screws up bounding box in ammonomicon

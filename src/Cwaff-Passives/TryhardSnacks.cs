@@ -11,7 +11,7 @@ public class TryhardSnacks : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item  = Lazy.SetupPassive<TryhardSnacks>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item   = Lazy.SetupPassive<TryhardSnacks>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality       = ItemQuality.B;
         CwaffEvents.OnNewFloorFullyLoaded += ResetEngageDictionary;
     }

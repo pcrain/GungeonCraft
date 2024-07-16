@@ -22,7 +22,7 @@ public class ArmorPiercingRounds : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<ArmorPiercingRounds>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item  = Lazy.SetupPassive<ArmorPiercingRounds>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.D;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
 

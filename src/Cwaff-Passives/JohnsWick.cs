@@ -18,7 +18,7 @@ public class JohnsWick : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item  = Lazy.SetupPassive<JohnsWick>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item   = Lazy.SetupPassive<JohnsWick>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality       = ItemQuality.C;
     }
 

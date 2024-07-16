@@ -15,7 +15,7 @@ public class LibraryCardtridge : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item  = Lazy.SetupPassive<LibraryCardtridge>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item   = Lazy.SetupPassive<LibraryCardtridge>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality       = ItemQuality.D;
         item.AddToSubShop(ItemBuilder.ShopType.Flynt);
         item.AddToSubShop(ModdedShopType.Talbert);

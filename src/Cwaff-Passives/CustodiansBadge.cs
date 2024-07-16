@@ -39,7 +39,7 @@ public class CustodiansBadge : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item  = Lazy.SetupPassive<CustodiansBadge>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item   = Lazy.SetupPassive<CustodiansBadge>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality       = ItemQuality.D;
         item.CanBeDropped  = false;
     }

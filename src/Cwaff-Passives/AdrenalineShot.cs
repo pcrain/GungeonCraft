@@ -23,7 +23,7 @@ public class AdrenalineShot : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<AdrenalineShot>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item  = Lazy.SetupPassive<AdrenalineShot>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
 

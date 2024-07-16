@@ -16,7 +16,7 @@ public class ComfySlippers : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<ComfySlippers>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item  = Lazy.SetupPassive<ComfySlippers>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.D;
         _ComfyBuffs       = new[]{
             new StatModifier {

@@ -22,7 +22,7 @@ public class AstralProjector : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item  = Lazy.SetupPassive<AstralProjector>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item   = Lazy.SetupPassive<AstralProjector>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality       = ItemQuality.A;
         item.AddToSubShop(ModdedShopType.TimeTrader);
     }

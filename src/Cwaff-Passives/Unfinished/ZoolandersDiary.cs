@@ -9,7 +9,7 @@ public class ZoolandersDiary : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<ZoolandersDiary>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item  = Lazy.SetupPassive<ZoolandersDiary>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
     }
 

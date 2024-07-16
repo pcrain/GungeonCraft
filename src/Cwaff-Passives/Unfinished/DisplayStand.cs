@@ -29,7 +29,7 @@ public class DisplayStand : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<DisplayStand>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item  = Lazy.SetupPassive<DisplayStand>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.D;
 
         displayStandId   = item.PickupObjectId;

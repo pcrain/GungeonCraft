@@ -34,7 +34,7 @@ public class CampingSupplies : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<CampingSupplies>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item  = Lazy.SetupPassive<CampingSupplies>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
 
         _SmokePrefab     = ResourceCache.Acquire("Global VFX/VFX_Item_Spawn_Poof") as GameObject;

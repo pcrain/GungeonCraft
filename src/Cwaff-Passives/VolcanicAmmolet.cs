@@ -14,7 +14,7 @@ public class VolcanicAmmolet : CwaffBlankModificationItem
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<VolcanicAmmolet>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item  = Lazy.SetupPassive<VolcanicAmmolet>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.B;
         ItemBuilder.AddPassiveStatModifier(item, PlayerStats.StatType.AdditionalBlanksPerFloor, 1f, StatModifier.ModifyMethod.ADDITIVE);
         item.AddToSubShop(ItemBuilder.ShopType.OldRed);

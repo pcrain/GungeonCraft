@@ -9,7 +9,7 @@ public class RatPoison : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item                  = Lazy.SetupPassive<RatPoison>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item                   = Lazy.SetupPassive<RatPoison>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality                       = ItemQuality.C;
         item.IgnoredByRat                  = true;
         item.ClearIgnoredByRatFlagOnPickup = false;

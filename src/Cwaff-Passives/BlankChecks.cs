@@ -9,7 +9,7 @@ public class BlankChecks : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item  = Lazy.SetupPassive<BlankChecks>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item   = Lazy.SetupPassive<BlankChecks>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality       = ItemQuality.B;
         item.AddToSubShop(ItemBuilder.ShopType.Cursula);
         item.AddToSubShop(ItemBuilder.ShopType.OldRed);

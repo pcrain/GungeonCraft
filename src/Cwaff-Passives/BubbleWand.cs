@@ -9,7 +9,7 @@ public class BubbleWand : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<BubbleWand>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item  = Lazy.SetupPassive<BubbleWand>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.B;
         item.AddToSubShop(ItemBuilder.ShopType.Goopton);
     }

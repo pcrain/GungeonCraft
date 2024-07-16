@@ -9,7 +9,7 @@ public class DrabOutfit : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<DrabOutfit>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item  = Lazy.SetupPassive<DrabOutfit>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.D;
         item.AddToSubShop(ModdedShopType.Rusty);
     }

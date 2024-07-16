@@ -9,7 +9,7 @@ public class BionicFinger : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item  = Lazy.SetupPassive<BionicFinger>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item   = Lazy.SetupPassive<BionicFinger>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality       = ItemQuality.C;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
         item.AddToSubShop(ModdedShopType.Rusty);

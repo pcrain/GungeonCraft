@@ -14,7 +14,7 @@ public class Gyroscope : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<Gyroscope>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item  = Lazy.SetupPassive<Gyroscope>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.B;
 
         var comp = item.gameObject.AddComponent<GyroscopeRoll>();

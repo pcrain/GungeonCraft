@@ -17,7 +17,7 @@ public class CatEarHeadband : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<CatEarHeadband>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item  = Lazy.SetupPassive<CatEarHeadband>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.B;
     }
 

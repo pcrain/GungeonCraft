@@ -11,7 +11,7 @@ public class FourDBullets : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item  = Lazy.SetupPassive<FourDBullets>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item   = Lazy.SetupPassive<FourDBullets>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality       = ItemQuality.A;
         item.AddToSubShop(ModdedShopType.TimeTrader);
     }

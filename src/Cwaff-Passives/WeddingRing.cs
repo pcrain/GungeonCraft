@@ -17,10 +17,10 @@ public class WeddingRing : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item  = Lazy.SetupPassive<WeddingRing>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item   = Lazy.SetupPassive<WeddingRing>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality       = ItemQuality.C;
         item.AddToSubShop(ModdedShopType.Rusty);
-        (item as PassiveItem).passiveStatModifiers = new StatModifier[] {
+        item.passiveStatModifiers = new StatModifier[] {
             new StatModifier {
                 amount      = 1.00f,
                 statToBoost = PlayerStats.StatType.ReloadSpeed,

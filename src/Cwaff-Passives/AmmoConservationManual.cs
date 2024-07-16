@@ -13,7 +13,7 @@ public class AmmoConservationManual : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<AmmoConservationManual>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item  = Lazy.SetupPassive<AmmoConservationManual>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
     }

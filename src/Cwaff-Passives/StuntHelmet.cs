@@ -17,7 +17,7 @@ public class StuntHelmet : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item  = Lazy.SetupPassive<StuntHelmet>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item   = Lazy.SetupPassive<StuntHelmet>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality       = ItemQuality.C;
         item.AddToSubShop(ModdedShopType.Boomhildr);
 

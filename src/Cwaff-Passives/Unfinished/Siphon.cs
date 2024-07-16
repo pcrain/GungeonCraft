@@ -23,7 +23,7 @@ public class Siphon : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<Siphon>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item  = Lazy.SetupPassive<Siphon>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.B;
     }
 

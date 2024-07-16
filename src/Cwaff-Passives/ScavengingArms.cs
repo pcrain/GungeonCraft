@@ -14,7 +14,7 @@ public class ScavengingArms : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<ScavengingArms>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item  = Lazy.SetupPassive<ScavengingArms>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
 

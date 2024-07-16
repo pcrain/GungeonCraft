@@ -20,7 +20,7 @@ public class RingOfDefenestration : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<RingOfDefenestration>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item  = Lazy.SetupPassive<RingOfDefenestration>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
     }
 

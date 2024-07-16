@@ -9,7 +9,7 @@ public class Calculator : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<Calculator>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item  = Lazy.SetupPassive<Calculator>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.B;
     }
 

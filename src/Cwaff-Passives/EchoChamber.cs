@@ -12,7 +12,7 @@ public class EchoChamber : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item  = Lazy.SetupPassive<EchoChamber>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item   = Lazy.SetupPassive<EchoChamber>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality       = ItemQuality.C;
 
         _FlakProjectile = (ItemHelper.Get(Items.FlakBullets) as ComplexProjectileModifier).CollisionSpawnProjectile;

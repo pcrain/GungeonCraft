@@ -14,7 +14,7 @@ public class PlotArmor : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<PlotArmor>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item  = Lazy.SetupPassive<PlotArmor>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.A;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
         item.AddToSubShop(ModdedShopType.Ironside);

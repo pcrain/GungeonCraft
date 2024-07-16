@@ -16,7 +16,7 @@ public class Superstitious : CwaffPassive
 
     public static void Init()
     {
-        PickupObject item = Lazy.SetupPassive<Superstitious>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item  = Lazy.SetupPassive<Superstitious>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
 
         els.Add(new HUDElement("Coolness","",$"{C.MOD_INT_NAME}/Resources/HUD/Coolness.png"));
