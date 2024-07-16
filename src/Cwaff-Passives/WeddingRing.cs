@@ -20,18 +20,7 @@ public class WeddingRing : CwaffPassive
         PickupObject item  = Lazy.SetupPassive<WeddingRing>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality       = ItemQuality.C;
         item.AddToSubShop(ModdedShopType.Rusty);
-    }
-
-    public override void Pickup(PlayerController player)
-    {
-        base.Pickup(player);
-        player.OnPreFireProjectileModifier += this.ChanceToRefundAmmo;
-        player.PostProcessProjectile += this.PostProcessProjectile;
-        player.OnKilledEnemy += this.OnKilledEnemy;
-        if (m_pickedUpThisRun)
-            return;
-
-        this.passiveStatModifiers = new StatModifier[] {
+        (item as PassiveItem).passiveStatModifiers = new StatModifier[] {
             new StatModifier {
                 amount      = 1.00f,
                 statToBoost = PlayerStats.StatType.ReloadSpeed,
@@ -45,6 +34,14 @@ public class WeddingRing : CwaffPassive
                 statToBoost = PlayerStats.StatType.DamageToBosses,
                 modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE},
         };
+    }
+
+    public override void Pickup(PlayerController player)
+    {
+        base.Pickup(player);
+        player.OnPreFireProjectileModifier += this.ChanceToRefundAmmo;
+        player.PostProcessProjectile += this.PostProcessProjectile;
+        player.OnKilledEnemy += this.OnKilledEnemy;
     }
 
     public override DebrisObject Drop(PlayerController player)

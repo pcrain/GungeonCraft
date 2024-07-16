@@ -12,6 +12,7 @@
 - Adjusted the volume of a few sounds
 - Blacklisted several guns from blessed runs that had the potential to cause softlocks if obtained
 - Made BlasTech F-4 ignore boss damage caps
+- Fixed Wedding Ring being *completely nonfunctional* since version 1.0.0 D:
 
 ## 1.15.1 (2024-07-11)
 

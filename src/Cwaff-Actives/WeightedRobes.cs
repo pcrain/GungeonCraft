@@ -195,10 +195,4 @@ public class WeightedRobes : CwaffActive, ILabelItem
 
         player.stats.RecalculateStats(player);
     }
-
-    private static void PrintStats(PlayerController player)
-    {
-        foreach (StatModifier stat in player.ownerlessStatModifiers)
-            ETGModConsole.Log($"  have {(stat.modifyType == StatModifier.ModifyMethod.MULTIPLICATIVE ? "mul" : "add")} stat {stat.statToBoost} by {stat.amount}");
-    }
 }
