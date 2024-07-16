@@ -140,6 +140,7 @@
     <Compile Include="src\Cwaff-Actives\GasterBlaster.cs"/>
     <Compile Include="src\Cwaff-Actives\InsurancePolicy.cs"/>
     <Compile Include="src\Cwaff-Actives\Itemfinder.cs"/>
+    <Compile Include="src\CwaffDebug.cs"/>
     <Compile Include="src\Cwaff-Guns\Lightwing.cs"/>
     <Compile Include="src\Cwaff-Guns\VacuumCleaner.cs"/>
     <Compile Include="src\Cwaff-Guns\Magunet.cs"/>

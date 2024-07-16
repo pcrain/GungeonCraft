@@ -325,12 +325,6 @@ public static class LargeGunAnimationHotfix
 {
     internal const string _TRIM_ANIMATION = "idle_trimmed";
 
-    // private static void OnDetermineChestContents(Action<Chest, PlayerController, int> orig, Chest chest, PlayerController player, int tierShift)
-    // {
-    //     chest.forceContentIds = new(){IDs.Pickups["platinum_star"]}; // for debugging
-    //     orig(chest, player, tierShift);
-    // }
-
     private static tk2dSpriteAnimationClip GetTrimmedIdleAnimation(this Gun gun)
     {
         return gun.spriteAnimator ? gun.spriteAnimator.GetClipByName($"{gun.InternalSpriteName()}_{_TRIM_ANIMATION}") : null;
@@ -406,16 +400,6 @@ public static class LargeGunAnimationHotfix
         item.sprite.SetSprite(idleClip.frames[0].spriteCollection, idleClip.frames[0].spriteId);
     }
 
-    // private static void DebugSetRewardPedestal(RewardPedestal reward)
-    // {
-    //     if (!C.DEBUG_BUILD)
-    //         return;
-    //     ETGModConsole.Log($"  SETTING REWARD PEDESTAL TO KNOWN BROKEN ITEM");
-    //     reward.contents = PickupObjectDatabase.GetById(IDs.Pickups["racket_launcher"]);
-    //     // reward.contents = PickupObjectDatabase.GetById(IDs.Pickups["outbreak"]);
-    //     // reward.contents = PickupObjectDatabase.GetById(IDs.Pickups["jugglernaut"]);
-    // }
-
     [HarmonyPatch(typeof(RewardPedestal), nameof(RewardPedestal.DetermineContents))]
     private class DetermineRewardPedestalContentsPatch // Fix oversized idle animations on reward pedestals
     {
@@ -423,14 +407,6 @@ public static class LargeGunAnimationHotfix
         private static void OnDetermineContentsIL(ILContext il)
         {
             ILCursor cursor = new ILCursor(il);
-
-            // if (C.DEBUG_BUILD)
-            //     if (cursor.TryGotoNext(MoveType.Before, instr => instr.MatchLdstr("Display Sprite")))
-            //     {
-            //         cursor.Emit(OpCodes.Ldarg_0);
-            //         cursor.Emit(OpCodes.Call, typeof(LargeGunAnimationHotfix).GetMethod("DebugSetRewardPedestal", BindingFlags.Static | BindingFlags.NonPublic));
-            //     }
-
             if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchStfld<RewardPedestal>("m_itemDisplaySprite")))
                 return;
 
