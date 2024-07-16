@@ -18,7 +18,8 @@ public class SchrodingersGat : CwaffGun
     public static void Init()
     {
         Gun gun = Lazy.SetupGun<SchrodingersGat>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f, ammo: 250, idleFps: 24, shootFps: 24);
+            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f, ammo: 250, idleFps: 24,
+                shootFps: 24, banFromBlessedRuns: true);
 
         gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.125f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, customClip: true,
           damage: 0.0f, speed: 32.0f, sprite: "schrodingers_gat_projectile", fps: 12, anchor: Anchor.MiddleCenter, spawnSound: "schrodingers_gat_fire_sound"

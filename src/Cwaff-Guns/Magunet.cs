@@ -30,7 +30,7 @@ public class Magunet : CwaffGun
     {
         Gun gun = Lazy.SetupGun<Magunet>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true,
-                chargeFps: 16, curse: 1f);
+                chargeFps: 16, curse: 1f, banFromBlessedRuns: true);
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
 
         //TODO: can possibly use dummy charge module here

@@ -10,7 +10,8 @@ public class BlasTechF4 : CwaffGun
     public static void Init()
     {
         Gun gun = Lazy.SetupGun<BlasTechF4>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.SHITTY, reloadTime: 0.75f, ammo: 1000, shootFps: 30, reloadFps: 12, muzzleFrom: Items.Mailbox);
+            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.SHITTY, reloadTime: 0.75f, ammo: 1000, shootFps: 30, reloadFps: 12,
+                muzzleFrom: Items.Mailbox, banFromBlessedRuns: true);
             gun.SetReloadAudio("blastech_jam_sound", 0, 2, 4, 5, 6);
 
         gun.InitProjectile(GunData.New(clipSize: 20, cooldown: 0.11f, shootStyle: ShootStyle.Automatic, damage: 20.0f, speed: 100f, range: 9999f, force: 12f)

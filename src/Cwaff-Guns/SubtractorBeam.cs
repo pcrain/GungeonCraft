@@ -17,7 +17,8 @@ public class SubtractorBeam : CwaffGun
     {
         Gun gun = Lazy.SetupGun<SubtractorBeam>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.FULLAUTO, reloadTime: 1.25f, ammo: 300, idleFps: 10, shootFps: 24, reloadFps: 30,
-                muzzleVFX: "muzzle_subtractor_beam", muzzleFps: 30, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter, reloadAudio: "subtractor_beam_reload_sound");
+                muzzleVFX: "muzzle_subtractor_beam", muzzleFps: 30, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter,
+                reloadAudio: "subtractor_beam_reload_sound", banFromBlessedRuns: true);
 
         _GreenTrailPrefab = VFX.CreateTrailObject("subtractor_beam_mid", fps: 60, startAnim: "subtractor_beam_start",
             softMaxLength: 1f, cascadeTimer: C.FRAME, destroyOnEmpty: true);

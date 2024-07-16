@@ -762,7 +762,7 @@ public static class Extensions
     int? idleFps = null, int? shootFps = null, int? reloadFps = null, int? chargeFps = null, int? introFps = null, string fireAudio = null, string reloadAudio = null, string introAudio = null,
     int loopChargeAt = -1, int loopReloadAt = -1, int loopFireAt = -1, Items? muzzleFrom = null, bool modulesAreTiers = false, string muzzleVFX = null, int muzzleFps = 60,
     float muzzleScale = 1.0f, Anchor muzzleAnchor = Anchor.MiddleLeft, float muzzleEmission = -1f, IntVector2? carryOffset = null, bool preventRotation = false, float curse = 0f, bool continuousFire = false,
-    bool dynamicBarrelOffsets = false)
+    bool dynamicBarrelOffsets = false, bool banFromBlessedRuns = false)
   {
     gun.quality = quality;
     gun.reloadTime = reloadTime;
@@ -781,6 +781,9 @@ public static class Extensions
 
     if (!defaultAudio)
       gun.ClearDefaultAudio();
+
+    if (banFromBlessedRuns)
+      gun.SetTag("exclude_blessed");
 
     if (continuousFire)
     {
