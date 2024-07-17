@@ -16,6 +16,8 @@
 - Fixed Wedding Ring being *completely nonfunctional* since version 1.0.0 D:
 - Fixed coroutine continue failure error in the debug console when switching to Aimu Hakurei or Alyx
 - Rebalanced Vacuum Cleaner spawn rate by changing it from the CHARGE gun class to a new UTILITY gun class
+- Fixed Racket Launcher's idle animation playing when found in a chest
+- Fixed vanilla bug where hovering guns shoot from the wrong place if created while the player is facing left
 
 ## 1.15.1 (2024-07-11)
 

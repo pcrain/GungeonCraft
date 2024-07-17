@@ -1,5 +1,21 @@
 namespace CwaffingTheGungy;
 
+// Fixes a vanilla bug where hovering guns shoot from the wrong place if created while the player is facing left
+public static class HoveringGunPatch
+{
+    [HarmonyPatch(typeof(HoveringGunController), nameof(HoveringGunController.Initialize))]
+    private class HoveringGunDoesntShootProperlyWhenCreatedWhileFacingLeftPatch
+    {
+        static void Postfix(HoveringGunController __instance)
+        {
+            if (!__instance.m_owner || !__instance.m_owner.sprite || !__instance.m_owner.sprite.FlipX)
+                return;
+            Transform t = __instance.m_shootPointTransform;
+            t.localPosition = t.localPosition.WithY(-t.localPosition.y);
+        }
+    }
+}
+
 // Prevent victory / death screen from displaying fake items (i.e., items suppressed from inventory)
 public static class AmmonomiconPageRendererHotfix
 {
