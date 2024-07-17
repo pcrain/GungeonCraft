@@ -50,7 +50,7 @@ public class Gunbrella : CwaffGun
     public override void Update()
     {
         base.Update();
-        if (this.GenericOwner is not PlayerController player)
+        if (this.PlayerOwner is not PlayerController player)
             return;
         if (BraveTime.DeltaTime == 0.0f)
             return;

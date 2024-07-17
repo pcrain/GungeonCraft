@@ -62,7 +62,7 @@ public class KiBlast : CwaffGun
     public override void OnSwitchedToThisGun()
     {
         base.OnSwitchedToThisGun();
-        if (this.GenericOwner is not PlayerController player)
+        if (this.PlayerOwner is not PlayerController player)
             return;
         player.ToggleGunRenderers(false, ItemName);
     }
@@ -70,7 +70,7 @@ public class KiBlast : CwaffGun
     public override void OnSwitchedAwayFromThisGun()
     {
         base.OnSwitchedAwayFromThisGun();
-        if (this.GenericOwner is not PlayerController player)
+        if (this.PlayerOwner is not PlayerController player)
             return;
         player.ToggleGunRenderers(true, ItemName);
     }

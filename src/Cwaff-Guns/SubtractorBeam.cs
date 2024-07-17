@@ -56,7 +56,7 @@ public class SubtractorBeam : CwaffGun
     public override void Update()
     {
         base.Update();
-        if ((this.GenericOwner is not PlayerController player) || !player.healthHaver || player.healthHaver.IsDead)
+        if ((this.PlayerOwner is not PlayerController player) || !player.healthHaver || player.healthHaver.IsDead)
             WhoAreTheyAgain();
         else
             YouShallKnowTheirNames();

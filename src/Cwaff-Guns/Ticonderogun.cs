@@ -184,8 +184,8 @@ public class Ticonderogun : CwaffGun
         GameManager.Instance.MainCameraController.SetManualControl(true, true);
         GameManager.Instance.MainCameraController.OverridePosition = this._cameraPositionAtChargeStart;
 
-        this._playerPositionAtChargeStart = this.GenericOwner.CenterPosition;
-        this._adjustedAimPoint = this._playerPositionAtChargeStart + (this.GenericOwner as PlayerController).m_currentGunAngle.ToVector(1f);
+        this._playerPositionAtChargeStart = this.PlayerOwner.CenterPosition;
+        this._adjustedAimPoint = this._playerPositionAtChargeStart + this.PlayerOwner.m_currentGunAngle.ToVector(1f);
 
         this._isCharging = true;
     }
@@ -296,7 +296,7 @@ public class Ticonderogun : CwaffGun
         GameManager.Instance.MainCameraController.SetManualControl(usingMouse, true);
         if (usingMouse)
             GameManager.Instance.MainCameraController.OverridePosition =
-                this._cameraPositionAtChargeStart + (this.GenericOwner.CenterPosition - this._playerPositionAtChargeStart);
+                this._cameraPositionAtChargeStart + (this.PlayerOwner.CenterPosition - this._playerPositionAtChargeStart);
 
         // Don't draw or update anything if we've barely moved the cursor
         if (this._lastCursorPos.HasValue && (pencilPos - this._lastCursorPos.Value).magnitude < _MIN_SEGMENT_DIST)

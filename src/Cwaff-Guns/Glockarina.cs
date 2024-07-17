@@ -96,7 +96,7 @@ public class Glockarina : CwaffGun
 
     private void UpdateMode()
     {
-        if (this.GenericOwner is not PlayerController pc)
+        if (this.PlayerOwner is not PlayerController pc)
             return;
         if (this._mode == Mode.STORM)
             pc.healthHaver.damageTypeModifiers.AddUnique(this._electricImmunity);
@@ -130,7 +130,7 @@ public class Glockarina : CwaffGun
     // Returns true if we handled a special song, false if we pass it along
     private bool HandleSpecialSong(Mode song)
     {
-        if (this.GenericOwner is not PlayerController player)
+        if (this.PlayerOwner is not PlayerController player)
             return false;
 
         switch (song)
@@ -258,7 +258,7 @@ public class Glockarina : CwaffGun
 
         for (int i = 0; i < 6; ++i)
         {
-            FancyVFX fv2 = FancyVFX.Spawn(prefab: _NoteVFXPrefab, position: this.GenericOwner.sprite.WorldTopCenter,
+            FancyVFX fv2 = FancyVFX.Spawn(prefab: _NoteVFXPrefab, position: player.sprite.WorldTopCenter,
                 velocity: UnityEngine.Random.Range(45f + 15f * i, 45f + 15f * (i + 1)).ToVector(4f), lifetime: 0.65f, fadeOutTime: 0.4f);
             fv2.sprite.SetSprite(fv2.GetComponent<tk2dSpriteAnimator>().currentClip.frames[UnityEngine.Random.Range(0,5)].spriteId);
         }
@@ -305,11 +305,13 @@ public class Glockarina : CwaffGun
             return;
         if ((BraveTime.ScaledTimeSinceStartup - _LastReloadNoteSpriteTime) < 0.1f)
             return;
+        if (!this.PlayerOwner)
+            return;
         int frame = this.gun.spriteAnimator.CurrentFrame;
         if (frame < 4 || frame > 12)
             return; // don't play notes from the ocarina unless it's near our character's face
         _LastReloadNoteSpriteTime = BraveTime.ScaledTimeSinceStartup;
-        FancyVFX fv = FancyVFX.Spawn(_NoteVFXPrefab, position: this.GenericOwner.sprite.WorldTopCenter,
+        FancyVFX fv = FancyVFX.Spawn(_NoteVFXPrefab, position: this.PlayerOwner.sprite.WorldTopCenter,
             velocity: UnityEngine.Random.Range(45f,135f).ToVector(4f), lifetime: 0.65f, fadeOutTime: 0.4f);
         fv.sprite.SetSprite(fv.GetComponent<tk2dSpriteAnimator>().currentClip.frames[UnityEngine.Random.Range(0,5)].spriteId);
     }

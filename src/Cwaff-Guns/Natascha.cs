@@ -37,7 +37,7 @@ public class Natascha : CwaffGun
     {
         base.Update();
 
-        if (this.GenericOwner is not PlayerController player)
+        if (this.PlayerOwner is not PlayerController player)
             return;
 
         if (player.IsDodgeRolling || (!this._maintainSpinup && !this.gun.IsFiring))

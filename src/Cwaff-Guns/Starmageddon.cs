@@ -34,7 +34,7 @@ public class Starmageddon : CwaffGun
         base.Update();
         if (BraveTime.DeltaTime == 0.0f)
             return;
-        if (this.GenericOwner is not PlayerController)
+        if (this.PlayerOwner is not PlayerController)
             return;
         if (this.gun.IsCharging)
             return;

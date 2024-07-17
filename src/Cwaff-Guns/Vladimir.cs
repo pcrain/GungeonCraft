@@ -39,7 +39,7 @@ public class Vladimir : CwaffGun
     public override void Update()
     {
         base.Update();
-        if (this.GenericOwner is not PlayerController pc)
+        if (this.PlayerOwner is not PlayerController pc)
             return;
 
         Vector2 gunPos = this.gun.barrelOffset.position.XY();
@@ -131,7 +131,7 @@ public class Vladimir : CwaffGun
 
     public void Impale(AIActor enemy)
     {
-        if (this.GenericOwner is not PlayerController pc)
+        if (this.PlayerOwner is not PlayerController pc)
             return;
         if (!enemy || !enemy.IsHostileAndNotABoss() || !enemy.behaviorSpeculator || enemy.behaviorSpeculator.ImmuneToStun)
             return;
@@ -151,7 +151,7 @@ public class Vladimir : CwaffGun
         if (enemy.behaviorSpeculator)
             enemy.behaviorSpeculator.ResetStun(duration: 1f, createVFX: true);
         if (enemy.specRigidbody)
-            enemy.specRigidbody.MoveTowardsTargetOrWall(start: this.GenericOwner.CenterPosition, target: this.gun.barrelOffset.position.XY());
+            enemy.specRigidbody.MoveTowardsTargetOrWall(start: this.PlayerOwner.CenterPosition, target: this.gun.barrelOffset.position.XY());
         if (enemy.knockbackDoer)
             enemy.knockbackDoer.ApplyKnockback(direction: launchDir, force: _LAUNCH_FORCE);
     }

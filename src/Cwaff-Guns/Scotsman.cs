@@ -61,7 +61,7 @@ public class Scotsman : CwaffGun
 
     public override void OnSwitchedAwayFromThisGun()
     {
-        if (this.GenericOwner is PlayerController pc)
+        if (this.PlayerOwner is PlayerController pc)
             pc.forceAimPoint = null;
         base.OnSwitchedAwayFromThisGun();
     }
@@ -76,7 +76,7 @@ public class Scotsman : CwaffGun
     public override void Update()
     {
         base.Update();
-        if (this.GenericOwner is not PlayerController player)
+        if (this.PlayerOwner is not PlayerController player)
             return;
 
         // smoothly handle reticle postion, compensating extra distance for controller users (modified from Gunbrella)
@@ -102,7 +102,7 @@ public class Scotsman : CwaffGun
     public override void PostProcessProjectile(Projectile projectile)
     {
         base.PostProcessProjectile(projectile);
-        if (this.GenericOwner is not PlayerController player)
+        if (this.PlayerOwner is not PlayerController player)
             return;
 
         projectile.GetComponent<Stickybomb>().Setup(this._aimPoint);

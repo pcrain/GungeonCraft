@@ -233,7 +233,7 @@ public class Missiletoe : CwaffGun
             if (_BannedQualities.Contains(pickup.quality))
                 continue;
 
-            float pickupDist = (debris.sprite.WorldCenter - this.GenericOwner.CenterPosition).magnitude;
+            float pickupDist = (debris.sprite.WorldCenter - this.PlayerOwner.CenterPosition).magnitude;
             if (pickupDist >= nearestDist)
                 continue;
 
