@@ -63,6 +63,7 @@
     <Compile Include="src\Cwaff-Passives\ReserveAmmolet.cs"/>
     <Compile Include="src\Cwaff-Passives\GorgunEye.cs"/>
     <Compile Include="src\Cwaff-Passives\ComfySlippers.cs"/>
+    <Compile Include="src\Cwaff-Passives\BulletproofTablecloth.cs"/>
     <Compile Include="src\Cwaff-Passives\DrabOutfit.cs"/>
     <Compile Include="src\Cwaff-Passives\CatEarHeadband.cs"/>
     <Compile Include="src\Cwaff-Passives\FourDBullets.cs"/>
