@@ -55,9 +55,6 @@ namespace CwaffingTheGungy;
 public class Initialisation : BaseUnityPlugin
 {
     public static Initialisation Instance;
-    public static Shader TestShader = null;
-    public static Texture2D TestShaderTexture = null;
-    public static AssetBundle ShaderBundle = null;
 
     public void Start()
     {
@@ -73,26 +70,6 @@ public class Initialisation : BaseUnityPlugin
             long oldMemory = currentProcess.WorkingSet64;
             if (C.DEBUG_BUILD)
                 ETGModConsole.Log("Cwaffing the Gungy initializing...");
-
-            const string SHADERBUNDLE = $"{C.MOD_INT_NAME}.Resources.cwaffshaders";
-            using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(SHADERBUNDLE))
-            {
-                if (stream != null)
-                {
-                    ShaderBundle = AssetBundle.LoadFromStream(stream);
-                    foreach (string s in ShaderBundle.GetAllAssetNames())
-                        ETGModConsole.Log($"  found asset {s}");
-                    // TestShader = ShaderBundle.LoadAsset<Shader>("assets/sillyshader.shader");
-                    TestShader = ShaderBundle.LoadAsset<Shader>("assets/electroshader.shader");
-                    if (TestShader != null)
-                        ETGModConsole.Log($"loaded a shader! :D");
-                    TestShaderTexture = ShaderBundle.LoadAsset<Texture2D>("assets/sf_noise_clouds_01.png");
-                    if (TestShaderTexture != null)
-                        ETGModConsole.Log($"loaded a texture! :D");
-                }
-                else
-                    ETGModConsole.Log($" null shader stream D:");
-            }
 
             Instance = this;
             Harmony harmony = new Harmony(C.MOD_GUID);
@@ -148,6 +125,7 @@ public class Initialisation : BaseUnityPlugin
                 ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
                 ShaderCache.Acquire("Brave/Internal/SimpleAlphaFadeUnlit");
                 ShaderCache.Acquire("Daikon Forge/Default UI Shader");
+                CwaffShaders.Init();
                 setupShadersWatch.Stop();
             #endregion
 

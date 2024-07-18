@@ -19,7 +19,9 @@ USEXTERNALASSEMBLY=0                             #Whether to use the external As
 UPDATEDLLS=0                                     #Set to 1 if any new DLLS are added to make sure they're copied correctly to bin/Debug
 #Could not get the external assembly working ):
 shaderfile="cwaffshaders"
-shaderassetpath="/home/pretzel/workspace/gungy-shaders/Gungy Shaders/Assets/AssetBundles/${shaderfile}"
+windowsshaderassetpath="/home/pretzel/workspace/gungeon-projects/gungy-shaders/Gungy Shaders/Assets/AssetBundles/Windows/${shaderfile}"
+macosshaderassetpath="/home/pretzel/workspace/gungeon-projects/gungy-shaders/Gungy Shaders/Assets/AssetBundles/OSX/${shaderfile}"
+linuxshaderassetpath="/home/pretzel/workspace/gungeon-projects/gungy-shaders/Gungy Shaders/Assets/AssetBundles/Linux/${shaderfile}"
 projectversion="$(cat 'src/Common.cs' | grep 'MOD_VERSION' | cut -f 2 -d '"')"
 debugbuild="$( [ "false" == "$(cat 'src/Common.cs' | grep -m1 'DEBUG_BUILD' | cut -f 2 -d '=' | cut -f 1 -d ';' | tr -d ' ')" ]; echo "$?" )"
 manifesttemplate=`cat <<HERE
@@ -146,13 +148,31 @@ jq -r -n \
 
 #Check for shader updates
 echo -e "[${GRN}>${BLN}] Checking for shader updates"
-if [ -e "${shaderassetpath}" ]; then
-  m1="$(md5sum "./Resources/${shaderfile}" | cut -f 1 -d ' ')"
-  m2="$(md5sum "${shaderassetpath}" | cut -f 1 -d ' ')"
+if [ -e "${linuxshaderassetpath}" ]; then
+  m1="$(md5sum "./Resources/${shaderfile}-linux" | cut -f 1 -d ' ')"
+  m2="$(md5sum "${linuxshaderassetpath}" | cut -f 1 -d ' ')"
   if [ "${m1}" != "${m2}" ]; then
     rebuild=1
-    echo -e "[${GRN}>${BLN}]   Shader asset bundle changed, re-copying"
-    /bin/cp "${shaderassetpath}" "./Resources/${shaderfile}"
+    echo -e "[${GRN}>${BLN}]   Linux shader asset bundle changed, re-copying"
+    /bin/cp "${linuxshaderassetpath}" "./Resources/${shaderfile}-linux"
+  fi
+fi
+if [ -e "${macosshaderassetpath}" ]; then
+  m1="$(md5sum "./Resources/${shaderfile}-macos" | cut -f 1 -d ' ')"
+  m2="$(md5sum "${macosshaderassetpath}" | cut -f 1 -d ' ')"
+  if [ "${m1}" != "${m2}" ]; then
+    rebuild=1
+    echo -e "[${GRN}>${BLN}]   MacOS shader asset bundle changed, re-copying"
+    /bin/cp "${macosshaderassetpath}" "./Resources/${shaderfile}-macos"
+  fi
+fi
+if [ -e "${windowsshaderassetpath}" ]; then
+  m1="$(md5sum "./Resources/${shaderfile}-windows" | cut -f 1 -d ' ')"
+  m2="$(md5sum "${windowsshaderassetpath}" | cut -f 1 -d ' ')"
+  if [ "${m1}" != "${m2}" ]; then
+    rebuild=1
+    echo -e "[${GRN}>${BLN}]   Windows shader asset bundle changed, re-copying"
+    /bin/cp "${windowsshaderassetpath}" "./Resources/${shaderfile}-windows"
   fi
 fi
 
