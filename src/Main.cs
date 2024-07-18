@@ -3,6 +3,7 @@
     global using System.Collections;
     global using System.Collections.Generic;
     global using System.Linq;
+    global using System.Text;
     global using System.Text.RegularExpressions;
     global using System.Reflection;
     global using System.Collections.ObjectModel;
@@ -367,6 +368,11 @@ public class Initialisation : BaseUnityPlugin
                     "debris_ui",                VacuumCleaner._DebrisUI,
                     "corpse_ui",                VacuumCleaner._CorpseUI,
                     "mini_blank_ui",            PistolWhip._MiniBlankUI,
+
+                    "slot_empty_ui",            Femtobyte._EmptyUI,
+                    "slot_empty_active_ui",     Femtobyte._EmptyActiveUI,
+                    "slot_full_ui",             Femtobyte._FullUI,
+                    "slot_full_active_ui",      Femtobyte._FullActiveUI,
                 });
                 setupUIWatch.Stop();
             #endregion

@@ -112,7 +112,7 @@ public sealed class GunData
   /// <param name="barrageSize"></param>
   /// <param name="shouldFlipHorizontally"></param>
   /// <param name="shouldFlipVertically"></param>
-  /// <param name="useDummyChargeModule"></param>
+  /// <param name="useDummyChargeModule">Cannot be the only projectile for a gun / not compatible with modules are tiers.</param>
   /// <param name="invisibleProjectile"></param>
 
   /// <param name="spawnSound"></param>

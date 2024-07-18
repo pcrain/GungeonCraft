@@ -19,6 +19,12 @@ public static class Lazy
         ETGModConsole.Log($"<color=#ffffaaff>{text}</color>");
     }
 
+    /// <summary>Warn with the console</summary>
+    public static void RuntimeWarn(string text)
+    {
+        ETGModConsole.Log($"<color=#ffffaaff>{text}</color>");
+    }
+
     private static ProjectileModule _BaseModule = null;
     /// <summary>Perform basic initialization for a new passive, active, or gun item definition.</summary>
     public static TItemClass SetupItem<TItemClass, TItemSpecific>(string itemName, string shortDescription, string longDescription, string lore, bool hideFromAmmonomicon = false)

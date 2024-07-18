@@ -2,11 +2,31 @@
 
 using static Femtobyte.HoldType;
 using static Femtobyte.HoldSize;
-using System;
 
-/* trap prefabs that might be of interest
-    - trap_spinning_log_vertical_resizable.prefab
-    - trap_spike_gungeon_2x2.prefab
+/* TODO:
+  Technical:
+    - targeting reticle for placement
+    - no overlaps when placing
+    - removing objects from slots
+    - make placeable objects limited
+    - adding objects to slots
+        - chests
+        - tables
+        - barrels
+        - minor pickups (hearts, armor, ammo)
+    - (maybe) prevent re-digitizing materialized objects
+    - (maybe) multislot spanning items
+
+  Presentational:
+    - interaction delay after placement
+    - better info on objects
+    - switch shader from screen to some kind of overlay
+    - better sounds
+    - gun animations
+    - gun shaders
+    - projectile animations
+    - projectile shaders
+    - save serialization
 */
 
 public class Femtobyte : CwaffGun
@@ -16,7 +36,12 @@ public class Femtobyte : CwaffGun
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
 
-    private const int _MAX_SLOTS = 8;
+    private const int _MAX_SLOTS = 12;
+
+    internal static string _EmptyUI       = $"{C.MOD_PREFIX}:_SlotEmptyUI";
+    internal static string _EmptyActiveUI = $"{C.MOD_PREFIX}:_SlotEmptyActiveUI";
+    internal static string _FullUI        = $"{C.MOD_PREFIX}:_SlotFullUI";
+    internal static string _FullActiveUI  = $"{C.MOD_PREFIX}:_SlotFullActiveUI";
 
     public enum HoldType { EMPTY, TABLE, BARREL, TRAP, CHEST, ENEMY, PICKUP }
     public enum HoldSize { SMALL, MEDIUM, LARGE, HUGE }
@@ -24,6 +49,8 @@ public class Femtobyte : CwaffGun
     public class DigitizedObject
     {
         public HoldType   type          = EMPTY;
+        public int        slotSpan      = 1;
+
         public GameObject prefab        = null;
 
         public List<int>  contents      = null;
@@ -33,7 +60,6 @@ public class Femtobyte : CwaffGun
         public bool       jammed        = false;
 
         public int        pickupID      = -1;
-        public int        slotSpan      = 1;
     }
 
     internal static readonly Dictionary<string, GameObject> _NameToPrefabMap = new(){
@@ -80,10 +106,30 @@ public class Femtobyte : CwaffGun
         { "coffin_horizontal",                     LoadHelper.LoadAssetFromAnywhere<GameObject>("coffin_horizontal") },
         { "coffin_vertical",                       LoadHelper.LoadAssetFromAnywhere<GameObject>("coffin_vertical") },
         { "table_horizontal",                      LoadHelper.LoadAssetFromAnywhere<GameObject>("table_horizontal") },
-        { "table_horizontal_stone",                LoadHelper.LoadAssetFromAnywhere<GameObject>("table_horizontal_stone") },
         { "table_vertical",                        LoadHelper.LoadAssetFromAnywhere<GameObject>("table_vertical") },
+        { "table_horizontal_stone",                LoadHelper.LoadAssetFromAnywhere<GameObject>("table_horizontal_stone") },
         { "table_vertical_stone",                  LoadHelper.LoadAssetFromAnywhere<GameObject>("table_vertical_stone") },
     };
+
+    public List<DigitizedObject> digitizedObjects = Enumerable.Repeat<DigitizedObject>(default, _MAX_SLOTS).ToList();
+    internal int _currentSlot = 0;
+
+    public static void Init()
+    {
+        Gun gun = Lazy.SetupGun<Femtobyte>(ItemName, ShortDescription, LongDescription, Lore);
+            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.RIFLE, reloadTime: 0.0f, ammo: 9999, canGainAmmo: false, infiniteAmmo: true,
+                shootFps: 24, reloadFps: 16, modulesAreTiers: true, fireAudio: "fire_coin_sound", banFromBlessedRuns: true);
+            //NOTE: modulesAreTiers with no 2nd module lets use switch to tier 1 to do cool alternate stuff without firing projectiles
+
+        gun.InitProjectile(GunData.New(clipSize: -1, angleVariance: 15.0f, shootStyle: ShootStyle.SemiAutomatic, damage: 20.0f, speed: 44.0f,
+          sprite: "femtobyte_projectile", fps: 2, anchor: Anchor.MiddleCenter)).Attach<FemtobyteProjectile>();
+
+        foreach (var kvpair in _NameToPrefabMap)
+            if (kvpair.Value == null)
+                ETGModConsole.Log($"  failed to load prefab for {kvpair.Key}");
+
+        gun.gameObject.AddComponent<FemtobyteAmmoDisplay>();
+    }
 
     private static bool IsWhiteListedTrap(GameObject bodyObject, out GameObject trapPrefab)
     {
@@ -93,9 +139,6 @@ public class Femtobyte : CwaffGun
             trapPrefab = null;
         return trapPrefab != null;
     }
-
-    public List<DigitizedObject> digitizedObjects = new();
-    private int _currentSlot = 0;
 
     private bool DigitizeEnemy(AIActor enemy)
     {
@@ -154,6 +197,10 @@ public class Femtobyte : CwaffGun
 
     public bool TryToDigitize(SpeculativeRigidbody body)
     {
+        DigitizedObject d = this.digitizedObjects[this._currentSlot];
+        if (d != null && d.type != EMPTY)
+            return false; // can't digitize if we don't have an available slot
+
         GameObject bodyObject = body.gameObject;
         if (bodyObject.GetComponent<AIActor>() is AIActor enemy)
             return DigitizeEnemy(enemy);
@@ -165,50 +212,107 @@ public class Femtobyte : CwaffGun
             return DigitizeBarrel(barrel);
         if (bodyObject.transform.parent is Transform tp && tp.gameObject.GetComponent<FlippableCover>() is FlippableCover table)
             return DigitizeTable(table);
-        if (IsWhiteListedTrap(bodyObject, out GameObject trapPrefab))
-            return DigitizeTrap(trapPrefab, body);
+
+        //TODO: traps are trickier to place where they didn't originally belong, so finish this later
+        // if (IsWhiteListedTrap(bodyObject, out GameObject trapPrefab))
+        //     return DigitizeTrap(trapPrefab, body);
+
         return false;
     }
 
-    public static void Init()
+    private void OnTriedToInitiateAttack(PlayerController player)
     {
-        Gun gun = Lazy.SetupGun<Femtobyte>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.RIFLE, reloadTime: 1.1f, ammo: 9999, canGainAmmo: false,
-                shootFps: 24, reloadFps: 16,  fireAudio: "fire_coin_sound", reloadAudio: "coin_gun_reload", banFromBlessedRuns: true);
-
-        gun.InitProjectile(GunData.New(clipSize: 10, angleVariance: 15.0f, shootStyle: ShootStyle.SemiAutomatic, damage: 20.0f, speed: 44.0f,
-          sprite: "femtobyte_projectile", fps: 2, anchor: Anchor.MiddleCenter)).Attach<FemtobyteProjectile>();
-
-        foreach (var kvpair in _NameToPrefabMap)
-        {
-            if (kvpair.Value == null)
-                ETGModConsole.Log($"  failed to load prefab for {kvpair.Key}");
-        }
+        if (this.gun.CurrentStrengthTier == 0)
+            return; // empty slot, do normal firing stuff
+        BraveInput.GetInstanceForPlayer(player.PlayerIDX).ConsumeButtonDown(GungeonActions.GungeonActionType.Shoot);
+        PlaceDigitizedObject();
     }
 
-    public override void OnFullClipReload(PlayerController player, Gun gun)
+    public string GetTitleForCurrentSlot()
     {
-        if (player.IsDodgeRolling)
-            return;
-        if (C.DEBUG_BUILD && digitizedObjects.Count == 0)
+        DigitizedObject d = this.digitizedObjects[this._currentSlot];
+        if (d == null)
+            return "Empty";
+        switch (d.type)
         {
-            // digitizedObjects.Add(new(){ type = TABLE, prefab = ExoticObjects.SteelTableHorizontal });
-            // digitizedObjects.Add(new(){ type = BARREL, prefab = _NameToPrefabMap["Red Barrel"] });
-            // digitizedObjects.Add(new(){ type = BARREL, prefab = _NameToPrefabMap["Blue Drum"] });
-            digitizedObjects.Add(new(){ type = CHEST, prefab = _NameToPrefabMap["chest_silver"], contents = [(int)Items.Akey47], locked = true });
+            case EMPTY:  return "Empty";
+            case CHEST:  return "Chest";
+            case ENEMY:  return "Enemy";
+            case PICKUP: return "Pickup";
+            case TRAP:   return "Trap";
+            case BARREL: return "Barrel";
+            case TABLE:  return "Table";
         }
-        if (digitizedObjects.Count == 0)
+        return "Unknown";
+    }
+
+    bool _DidDebugSetup = false;
+    public override void OnPlayerPickup(PlayerController player)
+    {
+        base.OnPlayerPickup(player);
+        player.OnTriedToInitiateAttack += this.OnTriedToInitiateAttack;
+        UpdateStrengthTier();
+        if (!C.DEBUG_BUILD || _DidDebugSetup)
             return;
 
+        _DidDebugSetup = true;
+        int i = 0;
+        this.digitizedObjects[i++] = new(){ type = TABLE, prefab = ExoticObjects.SteelTableHorizontal };
+        this.digitizedObjects[i++] = new(){ type = BARREL, prefab = _NameToPrefabMap["red barrel"] };
+        this.digitizedObjects[i++] = new(){ type = BARREL, prefab = _NameToPrefabMap["blue drum"] };
+        this.digitizedObjects[i++] = new(){ type = CHEST, prefab = _NameToPrefabMap["chest_silver"], contents = [(int)Items.Akey47], locked = true };
+        UpdateStrengthTier();
+    }
+
+    public override void OnDroppedByPlayer(PlayerController player)
+    {
+        player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
+        base.OnDroppedByPlayer(player);
+    }
+
+    public override void OnDestroy()
+    {
+        if (this.PlayerOwner)
+            this.PlayerOwner.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
+        base.OnDestroy();
+    }
+
+    // TODO: update mtgapi so that this actually works
+    public override void OnFirstPickup(PlayerController player)
+    {
+    }
+
+    private void UpdateStrengthTier()
+    {
+        DigitizedObject d = this.digitizedObjects[this._currentSlot];
+        this.gun.CurrentStrengthTier = (d == null || d.type == EMPTY) ? 0 : 1;
+    }
+
+    public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
+    {
+        if (!manualReload)
+            return;
+
+        this._currentSlot = (this._currentSlot + 1) % _MAX_SLOTS;
+        UpdateStrengthTier();
+        player.gameObject.Play("replicant_select_sound");
+    }
+
+    private void PlaceDigitizedObject()
+    {
         Vector2 placePoint = this.PlayerOwner.unadjustedAimPoint;
         RoomHandler room = placePoint.GetAbsoluteRoom();
         if (room == null)
             return;
+        if (digitizedObjects.Count != _MAX_SLOTS)
+        {
+            Lazy.RuntimeWarn("Digitized Object list is smaller than it should be; this should never happen");
+            return;
+        }
+        if (digitizedObjects[this._currentSlot] is not DigitizedObject d || d.type == EMPTY)
+            return;
 
-        // DigitizedObject d = digitizedObjects.Pop();
-        DigitizedObject d = digitizedObjects.First();
-        // ETGModConsole.Log($"spawning in {d.prefab.name} at cursor position {player.unadjustedAimPoint}");
-
+        ETGModConsole.Log($"spawning in {d.prefab.name} at cursor position {placePoint}");
         switch (d.type)
         {
             case TABLE:
@@ -269,6 +373,48 @@ public class Femtobyte : CwaffGun
         if (projectile.gameObject.GetComponent<FemtobyteProjectile>() is not FemtobyteProjectile fp)
             return;
         fp.Setup(this);
+    }
+
+    private class FemtobyteAmmoDisplay : CustomAmmoDisplay
+    {
+        private static StringBuilder _SB = new StringBuilder("", 1000);
+
+        private Femtobyte _femto;
+        private PlayerController _owner;
+
+        private void Start()
+        {
+            Gun gun     = base.GetComponent<Gun>();
+            this._femto = gun.GetComponent<Femtobyte>();
+            this._owner = gun.CurrentOwner as PlayerController;
+        }
+
+        public override bool DoCustomAmmoDisplay(GameUIAmmoController uic)
+        {
+            if (!this._owner)
+                return false;
+
+            uic.SetAmmoCountLabelColor(Color.white);
+            uic.GunAmmoCountLabel.AutoHeight = true; // enable multiline text
+            uic.GunAmmoCountLabel.ProcessMarkup = true; // enable multicolor text
+
+            _SB.Length = 0;
+            _SB.Append(this._femto.GetTitleForCurrentSlot());
+            _SB.Append("\n\n");
+            for (int i = 0; i < _MAX_SLOTS; ++i)
+            {
+                if (i == _MAX_SLOTS / 2)
+                    _SB.Append("\n");
+                DigitizedObject d = this._femto.digitizedObjects[i];
+                bool used = d != null && d.type != EMPTY;
+                if (used)
+                    _SB.AppendFormat("[sprite \"{0}\"]", i == this._femto._currentSlot ? Femtobyte._FullActiveUI : Femtobyte._FullUI);
+                else
+                    _SB.AppendFormat("[sprite \"{0}\"]", i == this._femto._currentSlot ? Femtobyte._EmptyActiveUI : Femtobyte._EmptyUI);
+            }
+            uic.GunAmmoCountLabel.Text = _SB.ToString();
+            return true;
+        }
     }
 }
 

@@ -68,6 +68,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem/*, ILevelLoadedListener
 
   public override void OnPlayerPickup(PlayerController player)
   {
+    ETGModConsole.Log($"ever picked up? {this.EverPickedUp}");
     if (!this.EverPickedUp) // must come before base.OnPlayerPickup()
       OnFirstPickup(player);
     base.OnPlayerPickup(player);
@@ -169,7 +170,6 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem/*, ILevelLoadedListener
   /// <summary>Called when the player manually initiates a reload with a full clip</summary>
   public virtual void OnFullClipReload(PlayerController player, Gun gun)
   {
-
   }
 
   // public void BraveOnLevelWasLoaded()
