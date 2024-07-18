@@ -258,6 +258,7 @@ public class Initialisation : BaseUnityPlugin
                 BlasTechF4.Init();
                 Telefragger.Init();
                 English.Init();
+                Femtobyte.Init();
 
                 Lazy.FinalizeGuns(); // Make sure encounter trackables are finalized so shoot styles properly display in the Ammonomicon
 
@@ -488,32 +489,4 @@ public class Initialisation : BaseUnityPlugin
             C._ModSetupFinished = true; // make sure setup-specific harmony patches get disabled even if an error occurs
         }
     }
-
-    // For Debugging chest stuff
-    // [HarmonyPatch(typeof(Chest), nameof(Chest.DetermineContents))]
-    // private class DetermineContentsPatch // Fix oversized gun idle animations in vanilla shops and make sure they are aligned properly
-    // {
-    //     private static void Prefix(Chest __instance, PlayerController player, int tierShift)
-    //     {
-    //         __instance.forceContentIds = new(){IDs.Pickups["platinum_star"]}; // for debugging
-    //     }
-    // }
-
-    // [HarmonyPatch(typeof(GunInventory), nameof(GunInventory.FrameUpdate))]
-    // private static class PatchNamePatch
-    // {
-    //     private static System.Diagnostics.Stopwatch timer;
-    //     [HarmonyPriority(Priority.High)]
-    //     static void Prefix(GunInventory __instance)
-    //     {
-
-    //         timer = System.Diagnostics.Stopwatch.StartNew();
-    //     }
-
-    //     [HarmonyPriority(Priority.Low)]
-    //     static void Postfix(GunInventory __instance)
-    //     {
-    //         timer.Stop(); System.Console.WriteLine($"    {timer.ElapsedTicks,5}ticks for updating guns for {__instance.Owner?.name ?? "nobody"}");
-    //     }
-    // }
 }

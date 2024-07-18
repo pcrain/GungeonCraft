@@ -173,6 +173,7 @@
     <Compile Include="src\Cwaff-Guns\SubtractorBeam.cs"/>
     <Compile Include="src\Cwaff-Guns\KiBlast.cs"/>
     <Compile Include="src\Cwaff-Guns\Blackjack.cs"/>
+    <Compile Include="src\Cwaff-Guns\Femtobyte.cs"/>
     <Compile Include="src\Cwaff-Guns\Vladimir.cs"/>
     <Compile Include="src\Cwaff-Guns\Zag.cs"/>
     <Compile Include="src\Cwaff-Guns\Outbreak.cs"/>

@@ -14,7 +14,7 @@ public class Commands
         ETGModConsole.Commands.AddGroup("gg", delegate (string[] args)
         {
             DebrisObject debris = LootEngine.SpawnItem(
-                PickupObjectDatabase.GetById(IDs.Pickups["bulletproof_tablecloth"]).gameObject,
+                PickupObjectDatabase.GetById(IDs.Pickups["femtobyte"]).gameObject,
                 GameManager.Instance.PrimaryPlayer.CenterPosition,
                 Vector2.zero,
                 0);
@@ -28,13 +28,9 @@ public class Commands
         // Shader tests
         ETGModConsole.Commands.AddGroup("shiny", delegate (string[] args)
         {
-
-            // ETGModConsole.Log($"player shader name is {GameManager.Instance.PrimaryPlayer.sprite.renderer.material.shader.name}");
-            // ETGModConsole.Log($"   gun shader name is {GameManager.Instance.PrimaryPlayer.CurrentGun.sprite.renderer.material.shader.name}");
-            ETGModConsole.Log($"switching shader");
-
-            CwaffShaders.Digitize(GameManager.Instance.PrimaryPlayer.sprite);
-            CwaffShaders.Digitize(GameManager.Instance.PrimaryPlayer.CurrentGun.sprite);
+            ETGModConsole.Log($"testing custom shader");
+            CwaffShaders.Digitize(GameManager.Instance.PrimaryPlayer.sprite, delay: 1.0f);
+            CwaffShaders.Digitize(GameManager.Instance.PrimaryPlayer.CurrentGun.sprite, delay: 1.0f);
         });
         ETGModConsole.Commands.AddGroup("shader", delegate (string[] args)
         {

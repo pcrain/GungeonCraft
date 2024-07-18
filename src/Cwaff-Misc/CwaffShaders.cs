@@ -38,16 +38,16 @@ public static class CwaffShaders
         }
     }
 
-    public static void Digitize(tk2dBaseSprite sprite, float time = 3.0f)
+    public static void Digitize(tk2dBaseSprite sprite, float delay = 0.0f)
     {
         tk2dSprite newSprite = new GameObject().AddComponent<tk2dSprite>();
         newSprite.SetSprite(sprite.collection, sprite.spriteId);
         newSprite.FlipX = sprite.FlipX;
-        newSprite.PlaceAtPositionByAnchor(sprite.transform.position, sprite.FlipX ? Anchor.LowerRight : Anchor.LowerLeft);
-        newSprite.StartCoroutine(Digitize_CR(newSprite, time));
+        newSprite.PlaceAtRotatedPositionByAnchor(sprite.WorldCenter, Anchor.MiddleCenter);
+        newSprite.StartCoroutine(Digitize_CR(newSprite, delay));
     }
 
-    public static IEnumerator Digitize_CR(tk2dSprite s, float time)
+    public static IEnumerator Digitize_CR(tk2dSprite s, float delay = 0.0f)
     {
         s.renderer.material.shader = CwaffShaders.BinarizeShader;
         s.renderer.material.SetTexture("_BinaryTex", CwaffShaders.BinaryTexture);
@@ -57,7 +57,8 @@ public static class CwaffShaders
         s.renderer.material.SetFloat("_ScrollSpeed", -3.0f);
         SpriteOutlineManager.RemoveOutlineFromSprite(s);
 
-        yield return new WaitForSeconds(1.0f);
+        if (delay > 0)
+            yield return new WaitForSeconds(delay);
 
         float phaseTime = 0.25f;
         for (float elapsed = 0f; elapsed < phaseTime; elapsed += BraveTime.DeltaTime)
