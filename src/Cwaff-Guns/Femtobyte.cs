@@ -2,11 +2,10 @@
 
 using static Femtobyte.HoldType;
 using static Femtobyte.HoldSize;
+using System;
 
 /* TODO:
   Technical:
-    - targeting reticle for placement
-    - no overlaps when placing
     - removing objects from slots
     - make placeable objects limited
     - adding objects to slots
@@ -14,13 +13,12 @@ using static Femtobyte.HoldSize;
         - tables
         - barrels
         - minor pickups (hearts, armor, ammo)
-    - (maybe) prevent re-digitizing materialized objects
+    - prevent re-digitizing materialized objects
     - (maybe) multislot spanning items
 
   Presentational:
     - interaction delay after placement
     - better info on objects
-    - switch shader from screen to some kind of overlay
     - better sounds
     - gun animations
     - gun shaders
@@ -36,7 +34,7 @@ public class Femtobyte : CwaffGun
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
 
-    private const int _MAX_SLOTS = 12;
+    private const int _MAX_SLOTS = 6;
 
     internal static string _EmptyUI       = $"{C.MOD_PREFIX}:_SlotEmptyUI";
     internal static string _EmptyActiveUI = $"{C.MOD_PREFIX}:_SlotEmptyActiveUI";
@@ -112,6 +110,8 @@ public class Femtobyte : CwaffGun
     };
 
     public List<DigitizedObject> digitizedObjects = Enumerable.Repeat<DigitizedObject>(default, _MAX_SLOTS).ToList();
+    private tk2dBaseSprite _placementPhantom = null;
+    private Material _placementMaterial = null;
     internal int _currentSlot = 0;
 
     public static void Init()
@@ -174,11 +174,11 @@ public class Femtobyte : CwaffGun
 
     private bool DigitizeTable(FlippableCover table)
     {
-        digitizedObjects.Add(new(){
-            type          = TABLE,
-            prefab        = ExoticObjects.SteelTableHorizontal, //TODO: use actual prefab
-            slotSpan      = 1,
-        });
+        // digitizedObjects.Add(new(){
+        //     type          = TABLE,
+        //     prefab        = ExoticObjects.SteelTableHorizontal, //TODO: use actual prefab
+        //     slotSpan      = 1,
+        // });
         CwaffShaders.Digitize(table.sprite);
         UnityEngine.Object.Destroy(table.gameObject);
         return true;
@@ -222,10 +222,45 @@ public class Femtobyte : CwaffGun
 
     private void OnTriedToInitiateAttack(PlayerController player)
     {
+        if (!player || player.CurrentGun != this.gun)
+            return; // inactive, do normal firing stuff
         if (this.gun.CurrentStrengthTier == 0)
             return; // empty slot, do normal firing stuff
         BraveInput.GetInstanceForPlayer(player.PlayerIDX).ConsumeButtonDown(GungeonActions.GungeonActionType.Shoot);
-        PlaceDigitizedObject();
+        Vector2 pos = player.unadjustedAimPoint;
+        if (!this.CanPlacePhantom(pos))
+            return;
+        PlaceDigitizedObject(pos);
+    }
+
+    private bool CanPlacePhantom(Vector2 pos, DigitizedObject d = null)
+    {
+        d ??= this.digitizedObjects[this._currentSlot];
+        if (d == null || !d.prefab || d.prefab.GetComponentInChildren<tk2dSprite>() is not tk2dSprite sprite)
+            return false;
+
+        Vector2 radius = 0.5f * sprite.GetBounds().extents;
+        foreach (ICollidableObject collidable in PhysicsEngine.Instance.GetOverlappingCollidableObjects(
+            min                    : pos - radius,
+            max                    : pos + radius,
+            collideWithTiles       : true,
+            collideWithRigidbodies : true,
+            layerMask              : null,
+            includeTriggers        : false
+            ))
+        {
+            if (collidable is not SpeculativeRigidbody body)
+                return false;  // tile, no good
+            GameObject go = body.gameObject;
+            if (go.GetComponent<MajorBreakable>())
+                return false;
+            if (go.GetComponent<GameActor>())
+                return false;
+            if (!go.GetComponent<MinorBreakable>() && !go.GetComponent<DebrisObject>())
+                return false;
+            // safe for now, continue
+        }
+        return true;
     }
 
     public string GetTitleForCurrentSlot()
@@ -266,21 +301,76 @@ public class Femtobyte : CwaffGun
 
     public override void OnDroppedByPlayer(PlayerController player)
     {
+        if (this._placementPhantom)
+            UnityEngine.Object.Destroy(this._placementPhantom);
         player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
         base.OnDroppedByPlayer(player);
+    }
+
+    public override void OnSwitchedAwayFromThisGun()
+    {
+        base.OnSwitchedAwayFromThisGun();
+        if (this._placementPhantom)
+            this._placementPhantom.gameObject.SetActive(false);
     }
 
     public override void OnDestroy()
     {
         if (this.PlayerOwner)
             this.PlayerOwner.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
+        if (this._placementPhantom)
+            UnityEngine.Object.Destroy(this._placementPhantom);
         base.OnDestroy();
     }
 
-    // TODO: update mtgapi so that this actually works
-    public override void OnFirstPickup(PlayerController player)
+    private static readonly Color _Valid = Color.Lerp(Color.green, Color.black, 0.35f);
+    private static readonly Color _Invalid = Color.Lerp(Color.red, Color.black, 0.35f);
+    public override void Update()
     {
+        base.Update();
+        if (this.PlayerOwner is not PlayerController player)
+            return;
+        if (!this._placementPhantom)
+        {
+            this._placementPhantom = Lazy.SpriteObject(player.sprite.collection, player.sprite.spriteId);
+            this._placementPhantom.usesOverrideMaterial = true;
+            Material m = this._placementMaterial = this._placementPhantom.gameObject.GetComponent<Renderer>().material;
+            // m.shader = CwaffShaders.DigitizeShader;
+            m.shader = CwaffShaders.UnlitDigitizeShader;
+            m.SetTexture("_BinaryTex", CwaffShaders.DigitizeTexture);
+            m.SetFloat("_BinarizeProgress", 1.0f);
+            m.SetFloat("_ColorizeProgress", 1.0f);
+            m.SetFloat("_FadeProgress", 0.0f);
+            m.SetFloat("_ScrollSpeed", -4.0f);
+            m.SetFloat("_HScrollSpeed", 0.35f);
+            m.SetColor("_Color", _Invalid);
+        }
+        if (this.gun.CurrentStrengthTier == 0)
+        {
+            this._placementPhantom.gameObject.SetActive(false);
+            return;
+        }
+
+        DigitizedObject d = this.digitizedObjects[this._currentSlot];
+        if (d == null || d.prefab == null)
+        {
+            this._placementPhantom.gameObject.SetActive(false);
+            return;
+        }
+
+        tk2dSprite prefabSprite = d.prefab.GetComponentInChildren<tk2dSprite>();
+        this._placementPhantom.gameObject.SetActive(true);
+        this._placementPhantom.SetSprite(prefabSprite.collection, prefabSprite.spriteId);
+        this._placementPhantom.PlaceAtPositionByAnchor(player.unadjustedAimPoint, Anchor.MiddleCenter);
+        if (!this._placementMaterial)
+            this._placementMaterial = this._placementPhantom.gameObject.GetComponent<Renderer>().material;
+        this._placementMaterial.SetColor("_Color", this.CanPlacePhantom(player.unadjustedAimPoint, d) ? _Valid : _Invalid);
     }
+
+    // TODO: update mtgapi so that this actually works
+    // public override void OnFirstPickup(PlayerController player)
+    // {
+    // }
 
     private void UpdateStrengthTier()
     {
@@ -298,15 +388,14 @@ public class Femtobyte : CwaffGun
         player.gameObject.Play("replicant_select_sound");
     }
 
-    private void PlaceDigitizedObject()
+    private void PlaceDigitizedObject(Vector2 placePoint)
     {
-        Vector2 placePoint = this.PlayerOwner.unadjustedAimPoint;
         RoomHandler room = placePoint.GetAbsoluteRoom();
         if (room == null)
             return;
         if (digitizedObjects.Count != _MAX_SLOTS)
         {
-            Lazy.RuntimeWarn("Digitized Object list is smaller than it should be; this should never happen");
+            Lazy.RuntimeWarn($"Digitized Object list is length {digitizedObjects.Count}, not what it should be; this should never happen");
             return;
         }
         if (digitizedObjects[this._currentSlot] is not DigitizedObject d || d.type == EMPTY)
@@ -324,6 +413,8 @@ public class Femtobyte : CwaffGun
                 room.RegisterInteractable(cover);
                 cover.ConfigureOnPlacement(room);
                 tableBody.Initialize();
+
+                tableBody.CorrectForWalls();
                 PhysicsEngine.Instance.RegisterOverlappingGhostCollisionExceptions(tableBody, null, false);
                 CwaffShaders.Materialize(tableSprite);
                 break;
@@ -336,16 +427,18 @@ public class Femtobyte : CwaffGun
                 room.RegisterInteractable(kickable);
                 kickable.ConfigureOnPlacement(room);
                 barrelBody.Initialize();
+
+                barrelBody.CorrectForWalls();
                 PhysicsEngine.Instance.RegisterOverlappingGhostCollisionExceptions(barrelBody, null, false);
                 CwaffShaders.Materialize(barrelSprite);
                 break;
             case CHEST:
                 GameObject chestObject = UnityEngine.Object.Instantiate(d.prefab, placePoint, Quaternion.identity);
                 Chest chest = chestObject.GetComponent<Chest>();
-                chest.Initialize();
                 tk2dBaseSprite chestSprite = chest.sprite;
+                chestObject.transform.position -= chestSprite.GetRelativePositionFromAnchor(Anchor.MiddleCenter).ToVector3ZUp();
                 chestSprite.UpdateZDepth();
-                chestSprite.PlaceAtPositionByAnchor(placePoint, Anchor.MiddleCenter);
+                chest.Initialize();
                 chest.MimicGuid = null;
                 chest.m_room = room;
                 chest.IsLocked = d.locked;
@@ -359,6 +452,8 @@ public class Femtobyte : CwaffGun
                         chest.contents.Add(PickupObjectDatabase.GetById(id));
                 }
                 room.RegisterInteractable(chest);
+
+                chest.specRigidbody.CorrectForWalls();
                 PhysicsEngine.Instance.RegisterOverlappingGhostCollisionExceptions(chest.specRigidbody);
                 CwaffShaders.Materialize(chestSprite);
                 break;
@@ -400,11 +495,11 @@ public class Femtobyte : CwaffGun
 
             _SB.Length = 0;
             _SB.Append(this._femto.GetTitleForCurrentSlot());
-            _SB.Append("\n\n");
+            _SB.Append("\n");
             for (int i = 0; i < _MAX_SLOTS; ++i)
             {
-                if (i == _MAX_SLOTS / 2)
-                    _SB.Append("\n");
+                // if (i == _MAX_SLOTS / 2)
+                //     _SB.Append("\n");
                 DigitizedObject d = this._femto.digitizedObjects[i];
                 bool used = d != null && d.type != EMPTY;
                 if (used)

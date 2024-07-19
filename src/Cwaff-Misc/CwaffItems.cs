@@ -68,7 +68,6 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem/*, ILevelLoadedListener
 
   public override void OnPlayerPickup(PlayerController player)
   {
-    ETGModConsole.Log($"ever picked up? {this.EverPickedUp}");
     if (!this.EverPickedUp) // must come before base.OnPlayerPickup()
       OnFirstPickup(player);
     base.OnPlayerPickup(player);

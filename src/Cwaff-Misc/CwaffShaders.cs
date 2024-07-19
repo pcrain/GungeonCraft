@@ -3,6 +3,7 @@ namespace CwaffingTheGungy;
 public static class CwaffShaders
 {
     public static Shader DigitizeShader = null;
+    public static Shader UnlitDigitizeShader = null;
     public static Texture2D DigitizeTexture = null;
 
     private static string GetShaderBundleNameForPlatform()
@@ -25,7 +26,7 @@ public static class CwaffShaders
             }
 
             AssetBundle shaderBundle = AssetBundle.LoadFromStream(stream);
-            // foreach (string s in ShaderBundle.GetAllAssetNames())
+            // foreach (string s in shaderBundle.GetAllAssetNames())
             //     ETGModConsole.Log($"  found asset {s}");
             // TestShader = ShaderBundle.LoadAsset<Shader>("assets/sillyshader.shader");
             // TestShader = ShaderBundle.LoadAsset<Shader>("assets/electroshader.shader");
@@ -33,6 +34,7 @@ public static class CwaffShaders
             // TestShaderTexture = ShaderBundle.LoadAsset<Texture2D>("assets/sf_noise_clouds_01.png");
             DigitizeShader = shaderBundle.LoadAsset<Shader>("assets/digitizeshader.shader");
             DigitizeTexture = shaderBundle.LoadAsset<Texture2D>("assets/bits.png");
+            UnlitDigitizeShader = shaderBundle.LoadAsset<Shader>("assets/digitizeshaderunlit.shader");
         }
     }
 
