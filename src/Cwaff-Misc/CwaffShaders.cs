@@ -79,16 +79,16 @@ public static class CwaffShaders
         if (delay > 0)
             yield return new WaitForSeconds(delay);
 
-        float phaseTime = 0.25f;
+        float phaseTime = 0.05f;
         for (float elapsed = 0f; elapsed < phaseTime; elapsed += BraveTime.DeltaTime)
         {
             float percentDone = elapsed / phaseTime;
             s.renderer.material.SetFloat("_BinarizeProgress", percentDone);
             yield return null;
         }
-        yield return new WaitForSeconds(0.25f);
+        yield return new WaitForSeconds(0.35f);
 
-        phaseTime = 0.25f;
+        phaseTime = 0.2f;
         s.renderer.material.SetFloat("_ScrollSpeed", -3.75f);
         for (float elapsed = 0f; elapsed < phaseTime; elapsed += BraveTime.DeltaTime)
         {
@@ -97,10 +97,10 @@ public static class CwaffShaders
             // s.renderer.material.SetFloat("_ScrollSpeed", 2.5f + 2.5f * percentDone);
             yield return null;
         }
-        yield return new WaitForSeconds(0.75f);
+        yield return new WaitForSeconds(0.2f);
 
-        phaseTime = 0.25f;
-        s.renderer.material.SetFloat("_ScrollSpeed", -4.5f);
+        phaseTime = 0.2f;
+        // s.renderer.material.SetFloat("_ScrollSpeed", -4.5f);
         for (float elapsed = 0f; elapsed < phaseTime; elapsed += BraveTime.DeltaTime)
         {
             float percentDone = elapsed / phaseTime;
@@ -123,7 +123,7 @@ public static class CwaffShaders
         s.renderer.material.SetFloat("_ColorizeProgress", 1.0f);
         s.renderer.material.SetFloat("_FadeProgress", 1.0f);
 
-        float phaseTime = 0.25f;
+        float phaseTime = 0.1f;
         s.renderer.material.SetFloat("_ScrollSpeed", -4.5f);
         for (float elapsed = 0f; elapsed < phaseTime; elapsed += BraveTime.DeltaTime)
         {
@@ -132,9 +132,9 @@ public static class CwaffShaders
             // s.renderer.material.SetFloat("_ScrollSpeed", 5f + 5f * percentDone);
             yield return null;
         }
-        yield return new WaitForSeconds(0.25f);
+        yield return new WaitForSeconds(0.4f);
 
-        phaseTime = 0.25f;
+        phaseTime = 0.15f;
         s.renderer.material.SetFloat("_ScrollSpeed", -3.75f);
         for (float elapsed = 0f; elapsed < phaseTime; elapsed += BraveTime.DeltaTime)
         {
@@ -143,9 +143,8 @@ public static class CwaffShaders
             // s.renderer.material.SetFloat("_ScrollSpeed", 2.5f + 2.5f * percentDone);
             yield return null;
         }
-        yield return new WaitForSeconds(0.75f);
 
-        phaseTime = 0.25f;
+        phaseTime = 0.1f;
         s.renderer.material.SetFloat("_ScrollSpeed", -3.0f);
         for (float elapsed = 0f; elapsed < phaseTime; elapsed += BraveTime.DeltaTime)
         {

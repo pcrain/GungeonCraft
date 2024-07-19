@@ -6,25 +6,21 @@ using System;
 
 /* TODO:
   Technical:
-    - removing objects from slots
-    - make placeable objects limited
     - adding objects to slots
         - chests
         - tables
         - barrels
+        - minor breakables
         - minor pickups (hearts, armor, ammo)
-    - prevent re-digitizing materialized objects
-    - (maybe) multislot spanning items
+    - removing objects from slots
+    - save serialization
+    - enemy mechanics
 
   Presentational:
-    - interaction delay after placement
-    - better info on objects
+    - projectile shaders
     - better sounds
     - gun animations
-    - gun shaders
     - projectile animations
-    - projectile shaders
-    - save serialization
 */
 
 public class Femtobyte : CwaffGun
@@ -43,13 +39,23 @@ public class Femtobyte : CwaffGun
 
     public enum HoldType { EMPTY, TABLE, BARREL, TRAP, CHEST, ENEMY, PICKUP }
     public enum HoldSize { SMALL, MEDIUM, LARGE, HUGE }
+    public class PrefabData
+    {
+        public string name;
+        public GameObject prefab;
+        public PrefabData(string name, GameObject prefab)
+        {
+            this.name = name;
+            this.prefab = prefab;
+        }
+    }
 
     public class DigitizedObject
     {
         public HoldType   type          = EMPTY;
         public int        slotSpan      = 1;
 
-        public GameObject prefab        = null;
+        public PrefabData data          = null;
 
         public List<int>  contents      = null;
         public bool       locked        = false;
@@ -60,53 +66,53 @@ public class Femtobyte : CwaffGun
         public int        pickupID      = -1;
     }
 
-    internal static readonly Dictionary<string, GameObject> _NameToPrefabMap = new(){
+    internal static readonly Dictionary<string, PrefabData> _NameToPrefabMap = new(){
         // Traps
-        {"trap_spinning_log_vertical_resizable",   ExoticObjects.Spinning_Log_Vertical },
-        {"trap_spinning_log_vertical_gungeon_2x5", ExoticObjects.Spinning_Log_Vertical }, // technically not the same
-        {"trap_spinning_log_vertical_gungeon_2x4", ExoticObjects.Spinning_Log_Vertical }, // technically not the same
-        {"trap_spinning_log_vertical_gungeon_2x8", ExoticObjects.Spinning_Log_Vertical }, // technically not the same
-        {"trap_spinning_log_horizontal_resizable", ExoticObjects.Spinning_Log_Horizontal },
-        {"trap_sawblade_omni_gungeon_2x2",         ExoticObjects.SawBlade },
-        {"minecart",                               ExoticObjects.Minecart },
-        {"minecart_turret",                        ExoticObjects.TurretMinecart },
-        {"skullfirespinner",                       ExoticObjects.FireBarTrap },
-        {"flamepipe_spraysdown",                   ExoticObjects.FlamePipeNorth },
-        {"flamepipe_spraysleft",                   ExoticObjects.FlamePipeEast },
-        {"flamepipe_spraysright",                  ExoticObjects.FlamePipeWest },
-        {"forge_hammer",                           LoadHelper.LoadAssetFromAnywhere<GameObject>("Forge_Hammer") },
+        // {"trap_spinning_log_vertical_resizable",   ExoticObjects.Spinning_Log_Vertical },
+        // {"trap_spinning_log_vertical_gungeon_2x5", ExoticObjects.Spinning_Log_Vertical }, // technically not the same
+        // {"trap_spinning_log_vertical_gungeon_2x4", ExoticObjects.Spinning_Log_Vertical }, // technically not the same
+        // {"trap_spinning_log_vertical_gungeon_2x8", ExoticObjects.Spinning_Log_Vertical }, // technically not the same
+        // {"trap_spinning_log_horizontal_resizable", ExoticObjects.Spinning_Log_Horizontal },
+        // {"trap_sawblade_omni_gungeon_2x2",         ExoticObjects.SawBlade },
+        // {"minecart",                               ExoticObjects.Minecart },
+        // {"minecart_turret",                        ExoticObjects.TurretMinecart },
+        // {"skullfirespinner",                       ExoticObjects.FireBarTrap },
+        // {"flamepipe_spraysdown",                   ExoticObjects.FlamePipeNorth },
+        // {"flamepipe_spraysleft",                   ExoticObjects.FlamePipeEast },
+        // {"flamepipe_spraysright",                  ExoticObjects.FlamePipeWest },
+        // {"forge_hammer",                           LoadHelper.LoadAssetFromAnywhere<GameObject>("Forge_Hammer") },
 
         // Barrels
-        {"red barrel"  ,                           LoadHelper.LoadAssetFromAnywhere<GameObject>("Red Barrel") },
-        {"red drum",                               LoadHelper.LoadAssetFromAnywhere<GameObject>("Red Drum") },
-        {"blue drum",                              LoadHelper.LoadAssetFromAnywhere<GameObject>("Blue Drum") },
-        {"purple drum",                            LoadHelper.LoadAssetFromAnywhere<GameObject>("Purple Drum") },
-        {"yellow drum",                            LoadHelper.LoadAssetFromAnywhere<GameObject>("Yellow Drum") },
+        {"red barrel"  ,                           new("Exposive Barrel", LoadHelper.LoadAssetFromAnywhere<GameObject>("Red Barrel")) },
+        {"red drum",                               new("Exposive Drum", LoadHelper.LoadAssetFromAnywhere<GameObject>("Red Drum")) },
+        {"blue drum",                              new("Water Drum", LoadHelper.LoadAssetFromAnywhere<GameObject>("Blue Drum")) },
+        {"purple drum",                            new("Oil Drum", LoadHelper.LoadAssetFromAnywhere<GameObject>("Purple Drum")) },
+        {"yellow drum",                            new("Poison Drum", LoadHelper.LoadAssetFromAnywhere<GameObject>("Yellow Drum")) },
 
         // Chests
-        {"chest_wood_two_items",                   GameManager.Instance.RewardManager.D_Chest.gameObject },
-        {"chest_silver",                           GameManager.Instance.RewardManager.C_Chest.gameObject },
-        {"chest_green",                            GameManager.Instance.RewardManager.B_Chest.gameObject },
-        {"chest_red",                              GameManager.Instance.RewardManager.A_Chest.gameObject },
-        {"chest_black",                            GameManager.Instance.RewardManager.S_Chest.gameObject },
-        {"chest_rainbow",                          GameManager.Instance.RewardManager.Rainbow_Chest.gameObject },
-        {"chest_synergy",                          GameManager.Instance.RewardManager.Synergy_Chest.gameObject },
-        {"truthchest",                             LoadHelper.LoadAssetFromAnywhere<GameObject>("TruthChest") },
-        {"chest_rat",                              LoadHelper.LoadAssetFromAnywhere<GameObject>("Chest_Rat") },
+        {"chest_wood_two_items",                   new("Brown Chest", GameManager.Instance.RewardManager.D_Chest.gameObject) },
+        {"chest_silver",                           new("Blue Chest", GameManager.Instance.RewardManager.C_Chest.gameObject) },
+        {"chest_green",                            new("Green Chest", GameManager.Instance.RewardManager.B_Chest.gameObject) },
+        {"chest_red",                              new("Red Chest", GameManager.Instance.RewardManager.A_Chest.gameObject) },
+        {"chest_black",                            new("Black Chest", GameManager.Instance.RewardManager.S_Chest.gameObject) },
+        {"chest_rainbow",                          new("Rainbow Chest", GameManager.Instance.RewardManager.Rainbow_Chest.gameObject) },
+        {"chest_synergy",                          new("Synergy Chest", GameManager.Instance.RewardManager.Synergy_Chest.gameObject) },
+        {"truthchest",                             new("Albern's Chest", LoadHelper.LoadAssetFromAnywhere<GameObject>("TruthChest")) },
+        {"chest_rat",                              new("Rat Chest", LoadHelper.LoadAssetFromAnywhere<GameObject>("Chest_Rat")) },
 
         // Tables
-        { "folding_table_vertical",                ItemHelper.Get(Items.PortableTableDevice).GetComponent<FoldingTableItem>().TableToSpawn.gameObject },
-        { "kingofthehillbox",                      LoadHelper.LoadAssetFromAnywhere<GameObject>("_ChallengeManager")
+        { "folding_table_vertical",                new("Folding Table", ItemHelper.Get(Items.PortableTableDevice).GetComponent<FoldingTableItem>().TableToSpawn.gameObject) },
+        { "kingofthehillbox",                      new("KotH Table", LoadHelper.LoadAssetFromAnywhere<GameObject>("_ChallengeManager")
                                                      .GetComponent<ChallengeManager>().PossibleChallenges[21].challenge.gameObject
-                                                     .GetComponent<ZoneControlChallengeModifier>().BoxPlaceable.variantTiers[0].nonDatabasePlaceable },
-        { "table_horizontal_steel",                ExoticObjects.SteelTableHorizontal },
-        { "table_vertical_steel",                  ExoticObjects.SteelTableVertical },
-        { "coffin_horizontal",                     LoadHelper.LoadAssetFromAnywhere<GameObject>("coffin_horizontal") },
-        { "coffin_vertical",                       LoadHelper.LoadAssetFromAnywhere<GameObject>("coffin_vertical") },
-        { "table_horizontal",                      LoadHelper.LoadAssetFromAnywhere<GameObject>("table_horizontal") },
-        { "table_vertical",                        LoadHelper.LoadAssetFromAnywhere<GameObject>("table_vertical") },
-        { "table_horizontal_stone",                LoadHelper.LoadAssetFromAnywhere<GameObject>("table_horizontal_stone") },
-        { "table_vertical_stone",                  LoadHelper.LoadAssetFromAnywhere<GameObject>("table_vertical_stone") },
+                                                     .GetComponent<ZoneControlChallengeModifier>().BoxPlaceable.variantTiers[0].nonDatabasePlaceable) },
+        { "table_horizontal_steel",                new("Steel Table H", ExoticObjects.SteelTableHorizontal) },
+        { "table_vertical_steel",                  new("Steel Table V", ExoticObjects.SteelTableVertical) },
+        { "coffin_horizontal",                     new("Coffin H", LoadHelper.LoadAssetFromAnywhere<GameObject>("coffin_horizontal")) },
+        { "coffin_vertical",                       new("Coffin V", LoadHelper.LoadAssetFromAnywhere<GameObject>("coffin_vertical")) },
+        { "table_horizontal",                      new("Wood Table H", LoadHelper.LoadAssetFromAnywhere<GameObject>("table_horizontal")) },
+        { "table_vertical",                        new("Wood Table V", LoadHelper.LoadAssetFromAnywhere<GameObject>("table_vertical")) },
+        { "table_horizontal_stone",                new("Stone Table H", LoadHelper.LoadAssetFromAnywhere<GameObject>("table_horizontal_stone")) },
+        { "table_vertical_stone",                  new("Stone Table V", LoadHelper.LoadAssetFromAnywhere<GameObject>("table_vertical_stone")) },
     };
 
     public List<DigitizedObject> digitizedObjects = Enumerable.Repeat<DigitizedObject>(default, _MAX_SLOTS).ToList();
@@ -131,7 +137,7 @@ public class Femtobyte : CwaffGun
         gun.gameObject.AddComponent<FemtobyteAmmoDisplay>();
     }
 
-    private static bool IsWhiteListedTrap(GameObject bodyObject, out GameObject trapPrefab)
+    private static bool IsWhiteListedTrap(GameObject bodyObject, out PrefabData trapPrefab)
     {
         string name = bodyObject.name.Replace("(Clone)","").TrimEnd().ToLowerInvariant();
         ETGModConsole.Log($"looking up {name} in trap whitelist");
@@ -236,7 +242,7 @@ public class Femtobyte : CwaffGun
     private bool CanPlacePhantom(Vector2 pos, DigitizedObject d = null)
     {
         d ??= this.digitizedObjects[this._currentSlot];
-        if (d == null || !d.prefab || d.prefab.GetComponentInChildren<tk2dSprite>() is not tk2dSprite sprite)
+        if (d == null || d.data == null || d.data.prefab == null || d.data.prefab.GetComponentInChildren<tk2dSprite>() is not tk2dSprite sprite)
             return false;
 
         Vector2 radius = 0.5f * sprite.GetBounds().extents;
@@ -268,6 +274,8 @@ public class Femtobyte : CwaffGun
         DigitizedObject d = this.digitizedObjects[this._currentSlot];
         if (d == null)
             return "Empty";
+        if (d.data != null && !d.data.name.IsNullOrWhiteSpace())
+            return d.data.name;
         switch (d.type)
         {
             case EMPTY:  return "Empty";
@@ -285,6 +293,7 @@ public class Femtobyte : CwaffGun
     public override void OnPlayerPickup(PlayerController player)
     {
         base.OnPlayerPickup(player);
+        AdjustGunShader(on: true);
         player.OnTriedToInitiateAttack += this.OnTriedToInitiateAttack;
         UpdateStrengthTier();
         if (!C.DEBUG_BUILD || _DidDebugSetup)
@@ -292,19 +301,39 @@ public class Femtobyte : CwaffGun
 
         _DidDebugSetup = true;
         int i = 0;
-        this.digitizedObjects[i++] = new(){ type = TABLE, prefab = ExoticObjects.SteelTableHorizontal };
-        this.digitizedObjects[i++] = new(){ type = BARREL, prefab = _NameToPrefabMap["red barrel"] };
-        this.digitizedObjects[i++] = new(){ type = BARREL, prefab = _NameToPrefabMap["blue drum"] };
-        this.digitizedObjects[i++] = new(){ type = CHEST, prefab = _NameToPrefabMap["chest_silver"], contents = [(int)Items.Akey47], locked = true };
+        this.digitizedObjects[i++] = new(){ type = TABLE,  data = _NameToPrefabMap["table_horizontal_steel"] };
+        this.digitizedObjects[i++] = new(){ type = BARREL, data = _NameToPrefabMap["red barrel"] };
+        this.digitizedObjects[i++] = new(){ type = BARREL, data = _NameToPrefabMap["blue drum"] };
+        this.digitizedObjects[i++] = new(){ type = CHEST,  data = _NameToPrefabMap["chest_silver"], contents = [(int)Items.Akey47], locked = true };
         UpdateStrengthTier();
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
     {
+        AdjustGunShader(on: false);
         if (this._placementPhantom)
             UnityEngine.Object.Destroy(this._placementPhantom);
         player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
         base.OnDroppedByPlayer(player);
+    }
+
+    public void AdjustGunShader(bool on)
+    {
+        Material m = this.gun.sprite.renderer.material;
+        if (!on)
+        {
+            this.gun.sprite.usesOverrideMaterial = false;
+            m.shader = ShaderCache.Acquire("Brave/PlayerShader");
+            return;
+        }
+        this.gun.sprite.usesOverrideMaterial = true;
+        m.shader = CwaffShaders.UnlitDigitizeShader;
+        m.SetTexture("_BinaryTex", CwaffShaders.DigitizeTexture);
+        m.SetFloat("_BinarizeProgress", 1.0f);
+        m.SetFloat("_ColorizeProgress", 0.0f);
+        m.SetFloat("_FadeProgress", 0.0f);
+        m.SetFloat("_ScrollSpeed", 1.5f);
+        m.SetFloat("_HScrollSpeed", 0.35f);
     }
 
     public override void OnSwitchedAwayFromThisGun()
@@ -352,13 +381,13 @@ public class Femtobyte : CwaffGun
         }
 
         DigitizedObject d = this.digitizedObjects[this._currentSlot];
-        if (d == null || d.prefab == null)
+        if (d == null || d.data == null || d.data.prefab == null)
         {
             this._placementPhantom.gameObject.SetActive(false);
             return;
         }
 
-        tk2dSprite prefabSprite = d.prefab.GetComponentInChildren<tk2dSprite>();
+        tk2dSprite prefabSprite = d.data.prefab.GetComponentInChildren<tk2dSprite>();
         this._placementPhantom.gameObject.SetActive(true);
         this._placementPhantom.SetSprite(prefabSprite.collection, prefabSprite.spriteId);
         this._placementPhantom.PlaceAtPositionByAnchor(player.unadjustedAimPoint, Anchor.MiddleCenter);
@@ -401,11 +430,10 @@ public class Femtobyte : CwaffGun
         if (digitizedObjects[this._currentSlot] is not DigitizedObject d || d.type == EMPTY)
             return;
 
-        ETGModConsole.Log($"spawning in {d.prefab.name} at cursor position {placePoint}");
         switch (d.type)
         {
             case TABLE:
-                GameObject table = UnityEngine.Object.Instantiate(d.prefab, placePoint, Quaternion.identity);
+                GameObject table = UnityEngine.Object.Instantiate(d.data.prefab, placePoint, Quaternion.identity);
                 tk2dSprite tableSprite = table.GetComponentInChildren<tk2dSprite>();
                 tableSprite.PlaceAtPositionByAnchor(placePoint, Anchor.MiddleCenter);
                 SpeculativeRigidbody tableBody = table.GetComponentInChildren<SpeculativeRigidbody>();
@@ -419,7 +447,7 @@ public class Femtobyte : CwaffGun
                 CwaffShaders.Materialize(tableSprite);
                 break;
             case BARREL:
-                GameObject barrel = UnityEngine.Object.Instantiate(d.prefab, placePoint, Quaternion.identity);
+                GameObject barrel = UnityEngine.Object.Instantiate(d.data.prefab, placePoint, Quaternion.identity);
                 tk2dSprite barrelSprite = barrel.GetComponentInChildren<tk2dSprite>();
                 barrelSprite.PlaceAtPositionByAnchor(placePoint, Anchor.MiddleCenter);
                 SpeculativeRigidbody barrelBody = barrel.GetComponentInChildren<SpeculativeRigidbody>();
@@ -433,7 +461,7 @@ public class Femtobyte : CwaffGun
                 CwaffShaders.Materialize(barrelSprite);
                 break;
             case CHEST:
-                GameObject chestObject = UnityEngine.Object.Instantiate(d.prefab, placePoint, Quaternion.identity);
+                GameObject chestObject = UnityEngine.Object.Instantiate(d.data.prefab, placePoint, Quaternion.identity);
                 Chest chest = chestObject.GetComponent<Chest>();
                 tk2dBaseSprite chestSprite = chest.sprite;
                 chestObject.transform.position -= chestSprite.GetRelativePositionFromAnchor(Anchor.MiddleCenter).ToVector3ZUp();
@@ -549,7 +577,8 @@ public class FemtobyteProjectile : MonoBehaviour
     private void TryToCollideWithPickups()
     {
         IPlayerInteractable nearestIxable = this._owner.CurrentRoom.GetNearestInteractable(this._projectile.SafeCenter, 1f, this._owner);
-        if (nearestIxable is not PickupObject pickup || pickup.IsBeingEyedByRat)
+        //BUG: this seems to cause issues near chests?
+        if (nearestIxable is not PickupObject pickup || pickup.IsBeingEyedByRat || !pickup.isActiveAndEnabled)
             return;
         if (pickup.GetComponent<SpeculativeRigidbody>() is not SpeculativeRigidbody body)
             return;
