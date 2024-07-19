@@ -1,6 +1,5 @@
 namespace CwaffingTheGungy;
 
-using System;
 using static FrisbeeBehaviour.State;
 
 public class Frisbee : CwaffActive

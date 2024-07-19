@@ -2272,4 +2272,25 @@ public static class Extensions
   {
     return ETGModCompatibility.ExtendEnum<T>(C.MOD_PREFIX.ToUpper(), s);
   }
+
+  /// <summary>Creates a stationary path for a pathmover object</summary>
+  public static void CreateDummyPath(this PathMover pathMover)
+  {
+      Vector2 pos = pathMover.gameObject.transform.position;
+      RoomHandler room = pos.GetAbsoluteRoom();
+      IntVector2 posInRoom = (pos - room.area.basePosition.ToVector2()).ToIntVector2();
+      SerializedPath serializedPath = new SerializedPath(posInRoom);
+      serializedPath.AddPosition(posInRoom);
+      serializedPath.wrapMode = SerializedPath.SerializedPathWrapMode.PingPong;
+      SerializedPathNode pathNode;
+      pathNode = serializedPath.nodes[0];
+          pathNode.placement = SerializedPathNode.SerializedNodePlacement.Center;
+          serializedPath.nodes[0] = pathNode;
+      pathNode = serializedPath.nodes[1];
+          pathNode.placement = SerializedPathNode.SerializedNodePlacement.Center;
+          serializedPath.nodes[1] = pathNode;
+      pathMover.RoomHandler = room;
+      pathMover.Path = serializedPath;
+      pathMover.PathStartNode = 0;
+  }
 }

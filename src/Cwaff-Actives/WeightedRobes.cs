@@ -1,6 +1,5 @@
 namespace CwaffingTheGungy;
 
-using System;
 using static WeightedRobes.EnemyType;
 
 public class WeightedRobes : CwaffActive, ILabelItem

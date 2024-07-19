@@ -6,29 +6,27 @@ using static Femtobyte.HoldSize;
 /* TODO:
   Technical:
     - save serialization
-    - enemy mechanics
 
   Presentational:
-    - projectile shaders
     - better sounds
-    - projectile animations
 */
 
 public class Femtobyte : CwaffGun
 {
     public static string ItemName         = "Femtobyte";
-    public static string ShortDescription = "TBD";
+    public static string ShortDescription = "Digital Storage";
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
 
     private const int _MAX_SLOTS = 6;
 
-    internal static string _EmptyUI       = $"{C.MOD_PREFIX}:_SlotEmptyUI";
-    internal static string _EmptyActiveUI = $"{C.MOD_PREFIX}:_SlotEmptyActiveUI";
-    internal static string _FullUI        = $"{C.MOD_PREFIX}:_SlotFullUI";
-    internal static string _FullActiveUI  = $"{C.MOD_PREFIX}:_SlotFullActiveUI";
+    internal const string _EmptyUI       = $"{C.MOD_PREFIX}:_SlotEmptyUI";
+    internal const string _EmptyActiveUI = $"{C.MOD_PREFIX}:_SlotEmptyActiveUI";
+    internal const string _FullUI        = $"{C.MOD_PREFIX}:_SlotFullUI";
+    internal const string _FullActiveUI  = $"{C.MOD_PREFIX}:_SlotFullActiveUI";
+    internal static GameObject _ImpactBits = null;
 
-    public enum HoldType { EMPTY, TABLE, BARREL, TRAP, CHEST, ENEMY, PICKUP }
+    public enum HoldType { EMPTY, TABLE, BARREL, SPECIAL, CHEST, ENEMY, PICKUP }
     public enum HoldSize { SMALL, MEDIUM, LARGE, HUGE }
     public class PrefabData
     {
@@ -69,20 +67,31 @@ public class Femtobyte : CwaffGun
     }
 
     internal static readonly Dictionary<string, PrefabData> _NameToPrefabMap = new(){
-        // Traps
-        // {"trap_spinning_log_vertical_resizable",   ExoticObjects.Spinning_Log_Vertical },
+        // Janky Traps (don't work sensibly, cause visual glitches or worse)
+        // {"minecart",                               new("Minecart", ExoticObjects.Minecart) },
+        // {"minecart_turret",                        new("Minecart Turret", ExoticObjects.TurretMinecart) },
+        // {"trap_spinning_log_vertical_resizable",   new("Spike Log V", ExoticObjects.Spinning_Log_Vertical) },
         // {"trap_spinning_log_vertical_gungeon_2x5", ExoticObjects.Spinning_Log_Vertical }, // technically not the same
         // {"trap_spinning_log_vertical_gungeon_2x4", ExoticObjects.Spinning_Log_Vertical }, // technically not the same
         // {"trap_spinning_log_vertical_gungeon_2x8", ExoticObjects.Spinning_Log_Vertical }, // technically not the same
         // {"trap_spinning_log_horizontal_resizable", ExoticObjects.Spinning_Log_Horizontal },
-        // {"trap_sawblade_omni_gungeon_2x2",         ExoticObjects.SawBlade },
-        // {"minecart",                               ExoticObjects.Minecart },
-        // {"minecart_turret",                        ExoticObjects.TurretMinecart },
-        // {"skullfirespinner",                       ExoticObjects.FireBarTrap },
-        // {"flamepipe_spraysdown",                   ExoticObjects.FlamePipeNorth },
-        // {"flamepipe_spraysleft",                   ExoticObjects.FlamePipeEast },
-        // {"flamepipe_spraysright",                  ExoticObjects.FlamePipeWest },
-        // {"forge_hammer",                           LoadHelper.LoadAssetFromAnywhere<GameObject>("Forge_Hammer") },
+
+        // Special
+        {"npc_gunbermuncher",                      new("Muncher", LoadHelper.LoadAssetFromAnywhere<SharedInjectionData>("Base Shared Injection Data")
+                                                     .AttachedInjectionData[2].InjectionData[0].exactRoom.placedObjects[11].nonenemyBehaviour.gameObject) },
+        {"npc_gunbermuncher_evil",                 new("Evil Muncher", GameManager.Instance.GlobalInjectionData.entries[3]
+                                                     .injectionData.InjectionData[5].exactRoom.placedObjects[0].nonenemyBehaviour.gameObject) },
+
+        // Traps
+        {"trap_sawblade_omni_gungeon_2x2",         new("Sawblade", ExoticObjects.SawBlade) },
+        {"skullfirespinner",                       new("Skull Fire Trap", ExoticObjects.FireBarTrap) },
+        {"flamepipe_spraysdown",                   new("Flame Pipe N", ExoticObjects.FlamePipeNorth) },
+        {"flamepipe_spraysleft",                   new("Flame Pipe E", ExoticObjects.FlamePipeEast) },
+        {"flamepipe_spraysright",                  new("Flame Pipe W", ExoticObjects.FlamePipeWest) },
+        {"forge_hammer",                           new("Forge Hammer", LoadHelper.LoadAssetFromAnywhere<GameObject>("Forge_Hammer")) },
+        {"brazier",                                new("Brazier", LoadHelper.LoadAssetFromAnywhere<SharedInjectionData>("Base Shared Injection Data")
+                                                     .InjectionData[1].roomTable.includedRooms.elements[6].room.placedObjects[4].placeableContents
+                                                     .variantTiers[0].nonDatabasePlaceable) },
 
         // Barrels
         {"red barrel"  ,                           new("Exposive Barrel", LoadHelper.LoadAssetFromAnywhere<GameObject>("Red Barrel")) },
@@ -127,24 +136,28 @@ public class Femtobyte : CwaffGun
     public static void Init()
     {
         Gun gun = Lazy.SetupGun<Femtobyte>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.RIFLE, reloadTime: 0.0f, ammo: 9999, canGainAmmo: false, infiniteAmmo: true,
-                shootFps: 24, reloadFps: 16, modulesAreTiers: true, fireAudio: "fire_coin_sound", banFromBlessedRuns: true);
+            gun.SetAttributes(quality: ItemQuality.C, gunClass: CwaffGunClass.UTILITY, reloadTime: 0.0f, ammo: 9999, canGainAmmo: false,
+                infiniteAmmo: true, shootFps: 24, reloadFps: 16, modulesAreTiers: true, fireAudio: "fire_coin_sound", banFromBlessedRuns: true);
             //NOTE: modulesAreTiers with no 2nd module lets use switch to tier 1 to do cool alternate stuff without firing projectiles
 
-        gun.InitProjectile(GunData.New(clipSize: -1, angleVariance: 15.0f, shootStyle: ShootStyle.SemiAutomatic, damage: 20.0f, speed: 44.0f,
-          sprite: "femtobyte_projectile", fps: 2, anchor: Anchor.MiddleCenter)).Attach<FemtobyteProjectile>();
+        Projectile proj = gun.InitProjectile(GunData.New(clipSize: -1, angleVariance: 2.0f, shootStyle: ShootStyle.SemiAutomatic, damage: 7.5f, speed: 90.0f,
+          cooldown: 0.4f, sprite: "femtobyte_projectile", fps: 2, anchor: Anchor.MiddleCenter)).Attach<FemtobyteProjectile>();
+        TrailController tc = proj.AddTrailToProjectilePrefab("femtobyte_beam", fps: 10, cascadeTimer: C.FRAME, softMaxLength: 1f, destroyOnEmpty: false);
+            tc.gameObject.AddComponent<TrailControllerHotfix.Fix>(); //NOTE: high speed projectiles don't always collide with walls cleanly in vanilla, so patch that
 
-        foreach (var kvpair in _NameToPrefabMap)
-            if (kvpair.Value == null)
-                ETGModConsole.Log($"  failed to load prefab for {kvpair.Key}");
+        _ImpactBits = VFX.Create("femtobyte_projectile_vfx", fps: 1, loops: false, anchor: Anchor.MiddleCenter);
 
         gun.gameObject.AddComponent<FemtobyteAmmoDisplay>();
+
+        // foreach (var kvpair in _NameToPrefabMap)
+        //     if (kvpair.Value == null || kvpair.Value.prefab == null)
+        //         ETGModConsole.Log($"  failed to load prefab for {kvpair.Key}");
     }
 
     private static bool IsWhiteListedPrefab(GameObject bodyObject, out PrefabData trapPrefab)
     {
         string name = bodyObject.name.Replace("(Clone)","").TrimEnd().ToLowerInvariant();
-        ETGModConsole.Log($"looking up {name} in prefab whitelist");
+        // ETGModConsole.Log($"looking up {name} in prefab whitelist");
         if (!_NameToPrefabMap.TryGetValue(name, out trapPrefab))
             trapPrefab = null;
         return trapPrefab != null;
@@ -155,23 +168,27 @@ public class Femtobyte : CwaffGun
         if (enemy.healthHaver is not HealthHaver hh || hh.IsDead || hh.IsBoss || hh.IsSubboss)
             return false;
         CwaffShaders.Digitize(enemy.sprite);
-        // enemy.EraseFromExistenceWithRewards();
-        enemy.EraseFromExistence();
+        enemy.EraseFromExistenceWithRewards();
         return true;
     }
 
     private bool DigitizePickup(PickupObject pickup, PrefabData data)
     {
-        if (pickup.PickupObjectId >= 0)
-            SetCurrentSlot(DigitizedObject.FromPickup(pickup));
-        if (pickup is PassiveItem passive)
-            passive.GetRidOfMinimapIcon();
-        else if (pickup is PlayerItem active)
-            active.GetRidOfMinimapIcon();
-        else if (pickup is HealthPickup health)
+        if (pickup.PickupObjectId < 0)
+            return false;
+
+        if (pickup is HealthPickup health)
             health.GetRidOfMinimapIcon();
         else if (pickup is AmmoPickup ammo)
             ammo.GetRidOfMinimapIcon();
+        else if (pickup is KeyBulletPickup key)
+            key.GetRidOfMinimapIcon();
+        else if (pickup is SilencerItem blank)
+            blank.GetRidOfMinimapIcon();
+        else
+            return false;
+
+        SetCurrentSlot(DigitizedObject.FromPickup(pickup));
         CwaffShaders.Digitize(pickup.sprite);
         UnityEngine.Object.Destroy(pickup.gameObject);
         return true;
@@ -222,9 +239,14 @@ public class Femtobyte : CwaffGun
         return true;
     }
 
-    private bool DigitizeGeneric(SpeculativeRigidbody body, PrefabData data)
+    private bool DigitizeSpecial(SpeculativeRigidbody body, PrefabData data)
     {
-        ETGModConsole.Log($"  got prefab {data.name} == {data.prefab.name}");
+        if (data.prefab != null)
+            SetCurrentSlot(new(){
+                type      = SPECIAL,
+                data      = data,
+            });
+        // ETGModConsole.Log($"  got prefab {data.name} == {data.prefab.name}");
         if (body.sprite is tk2dSlicedSprite sliced)
             CwaffShaders.Digitize<tk2dSlicedSprite>(sliced);
         else
@@ -260,7 +282,7 @@ public class Femtobyte : CwaffGun
         if (target.transform.parent is Transform tp && tp.gameObject.GetComponent<FlippableCover>() is FlippableCover table)
             return DigitizeTable(table, data);
         if (data != null && data.prefab != null)
-            return DigitizeGeneric(body, data); //TODO: traps are trickier to place where they didn't originally belong, so finish this later
+            return DigitizeSpecial(body, data); //TODO: traps are trickier to place where they didn't originally belong, so finish this later
 
         return false;
     }
@@ -286,13 +308,8 @@ public class Femtobyte : CwaffGun
 
         Vector2 radius = 0.5f * sprite.GetBounds().extents;
         foreach (ICollidableObject collidable in PhysicsEngine.Instance.GetOverlappingCollidableObjects(
-            min                    : pos - radius,
-            max                    : pos + radius,
-            collideWithTiles       : true,
-            collideWithRigidbodies : true,
-            layerMask              : null,
-            includeTriggers        : false
-            ))
+            min : pos - radius, max : pos + radius, collideWithTiles : true, collideWithRigidbodies : true,
+            layerMask : null, includeTriggers : false ))
         {
             if (collidable is not SpeculativeRigidbody body)
                 return false;  // tile, no good
@@ -321,7 +338,7 @@ public class Femtobyte : CwaffGun
             case CHEST:  return "Chest";
             case ENEMY:  return "Enemy";
             case PICKUP: return "Pickup";
-            case TRAP:   return "Trap";
+            case SPECIAL:   return "Trap";
             case BARREL: return "Barrel";
             case TABLE:  return "Table";
         }
@@ -335,17 +352,23 @@ public class Femtobyte : CwaffGun
         AdjustGunShader(on: true);
         player.OnTriedToInitiateAttack += this.OnTriedToInitiateAttack;
         UpdateCurrentSlot();
-        if (!C.DEBUG_BUILD || _DidDebugSetup)
-            return;
 
-        _DidDebugSetup = true;
-        int i = 0;
-        this.digitizedObjects[i++] = DigitizedObject.FromPickup(Items.Ak47.AsGun());
-        this.digitizedObjects[i++] = new(){ type = TABLE,  data = _NameToPrefabMap["table_horizontal_steel"] };
-        this.digitizedObjects[i++] = new(){ type = BARREL, data = _NameToPrefabMap["red barrel"] };
-        this.digitizedObjects[i++] = new(){ type = BARREL, data = _NameToPrefabMap["blue drum"] };
-        this.digitizedObjects[i++] = new(){ type = CHEST,  data = _NameToPrefabMap["chest_silver"], contents = [(int)Items.Akey47], locked = true };
-        UpdateCurrentSlot();
+        // if (!C.DEBUG_BUILD || _DidDebugSetup)
+        //     return;
+        // _DidDebugSetup = true;
+        // int i = 0;
+        // this.digitizedObjects[i++] = new(){ type = SPECIAL, data = _NameToPrefabMap["forge_hammer"] };
+        // this.digitizedObjects[i++] = new(){ type = SPECIAL, data = _NameToPrefabMap["trap_sawblade_omni_gungeon_2x2"] };
+        // this.digitizedObjects[i++] = new(){ type = SPECIAL, data = _NameToPrefabMap["skullfirespinner"] };
+        // this.digitizedObjects[i++] = new(){ type = SPECIAL, data = _NameToPrefabMap["flamepipe_spraysdown"] };
+        // this.digitizedObjects[i++] = DigitizedObject.FromPickup(Items.Ak47.AsGun());
+        // this.digitizedObjects[i++] = new(){ type = SPECIAL, data = _NameToPrefabMap["brazier"] };
+        // this.digitizedObjects[i++] = new(){ type = SPECIAL, data = _NameToPrefabMap["npc_gunbermuncher_evil"] };
+        // this.digitizedObjects[i++] = new(){ type = TABLE,  data = _NameToPrefabMap["table_horizontal_steel"] };
+        // this.digitizedObjects[i++] = new(){ type = BARREL, data = _NameToPrefabMap["red barrel"] };
+        // this.digitizedObjects[i++] = new(){ type = BARREL, data = _NameToPrefabMap["blue drum"] };
+        // this.digitizedObjects[i++] = new(){ type = CHEST,  data = _NameToPrefabMap["chest_silver"], contents = [(int)Items.Akey47], locked = true };
+        // UpdateCurrentSlot();
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
@@ -435,11 +458,6 @@ public class Femtobyte : CwaffGun
             this._placementMaterial = this._placementPhantom.gameObject.GetComponent<Renderer>().material;
         this._placementMaterial.SetColor("_Color", this.CanPlacePhantom(player.unadjustedAimPoint, d) ? _Valid : _Invalid);
     }
-
-    // TODO: update mtgapi so that this actually works
-    // public override void OnFirstPickup(PlayerController player)
-    // {
-    // }
 
     private void UpdateCurrentSlot()
     {
@@ -539,10 +557,30 @@ public class Femtobyte : CwaffGun
                 PhysicsEngine.Instance.RegisterOverlappingGhostCollisionExceptions(chest.specRigidbody);
                 CwaffShaders.Materialize(chestSprite);
                 break;
+            case SPECIAL:
+                GameObject trap = UnityEngine.Object.Instantiate(d.data.prefab, placePoint, Quaternion.identity);
+                tk2dSprite trapSprite = trap.GetComponentInChildren<tk2dSprite>();
+                trapSprite.PlaceAtPositionByAnchor(placePoint, Anchor.MiddleCenter);
+                if (trap.GetComponentInChildren<ForgeHammerController>() is ForgeHammerController forgeHammer)
+                    forgeHammer.DeactivateOnEnemiesCleared = false;
+                if (trap.GetComponentInChildren<IPlaceConfigurable>() is IPlaceConfigurable configurable)
+                    configurable.ConfigureOnPlacement(room);
+                if (trap.GetComponentInChildren<IPlayerInteractable>() is IPlayerInteractable interactable)
+                    room.RegisterInteractable(interactable);
+                if (trap.GetComponentInChildren<PathMover>() is PathMover pathMover)
+                    pathMover.CreateDummyPath();
+                if (trap.GetComponentInChildren<SpeculativeRigidbody>() is SpeculativeRigidbody trapBody)
+                    trapBody.Reinitialize();
+                if (trap.GetComponent<BraveBehaviour>() is BraveBehaviour bb)
+                    bb.RegenerateCache();
+
+                CwaffShaders.Materialize(trapSprite);
+                break;
             default:
                 break;
         }
 
+        SpawnBitBurst(placePoint, 20);
         digitizedObjects[this._currentSlot] = null;
         UpdateCurrentSlot();
     }
@@ -553,6 +591,13 @@ public class Femtobyte : CwaffGun
         if (projectile.gameObject.GetComponent<FemtobyteProjectile>() is not FemtobyteProjectile fp)
             return;
         fp.Setup(this);
+    }
+
+    public static void SpawnBitBurst(Vector2 pos, int howMany)
+    {
+        FancyVFX.SpawnBurst(prefab: _ImpactBits, numToSpawn: howMany, basePosition: pos,
+            positionVariance: 1f, baseVelocity: 10f * Vector2.up, velocityVariance: 5f, velType: FancyVFX.Vel.Radial,
+            lifetime: 0.5f, fadeOutTime: 0.5f, randomFrame: true);
     }
 
     private class FemtobyteAmmoDisplay : CustomAmmoDisplay
@@ -616,14 +661,50 @@ public class FemtobyteProjectile : MonoBehaviour
         this._projectile.specRigidbody.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.PlayerHitBox));
         this._projectile.specRigidbody.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.Trap));
         this._projectile.specRigidbody.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.Pickup));
+        this._projectile.specRigidbody.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.LowObstacle));
+        this._projectile.OnHitEnemy += this.OnHitEnemy;
+        this._projectile.OnWillKillEnemy += this.OnWillKillEnemy;
+
+        TrailController tc = base.gameObject.GetComponentInChildren<TrailController>();
+        tk2dBaseSprite trailSprite = tc.gameObject.GetComponent<tk2dBaseSprite>();
+            trailSprite.usesOverrideMaterial = true;
+            Material m = trailSprite.renderer.material;
+            m.shader = CwaffShaders.DigitizeShader;
+            m.SetTexture("_BinaryTex", CwaffShaders.DigitizeTexture);
+            m.SetFloat("_BinarizeProgress", 1.0f);
+            m.SetFloat("_ColorizeProgress", 1.0f);
+            m.SetFloat("_FadeProgress", 0.0f);
+            m.SetFloat("_ScrollSpeed", 3.5f);
+            m.SetFloat("_HScrollSpeed", 0.25f);
+            m.SetFloat("_Emission", 10f);
+    }
+
+    private void OnHitEnemy(Projectile p, SpeculativeRigidbody enemy, bool killed)
+    {
+        Femtobyte.SpawnBitBurst(enemy.UnitCenter, Mathf.Min((int)p.baseData.damage, 30));
+    }
+
+    private void OnWillKillEnemy(Projectile proj, SpeculativeRigidbody enemy)
+    {
+        if (enemy.GetComponent<HealthHaver>() is HealthHaver hh && !hh.IsBoss && !hh.IsSubboss)
+        {
+            Femtobyte.SpawnBitBurst(enemy.UnitCenter, 10);
+            this._femtobyte.TryToDigitize(enemy.gameObject);
+        }
     }
 
     private void OnPreRigidbodyCollision(SpeculativeRigidbody body, PixelCollider myCollider, SpeculativeRigidbody otherBody, PixelCollider otherCollider)
     {
         if (!this._owner || !this._projectile || !this._femtobyte || !otherBody)
             return;
+        if (otherBody.GetComponent<AIActor>())
+            return; // handled in OnWillKillEnemy
+        if (otherBody.GetComponent<HealthHaver>() is HealthHaver hh && (hh.IsBoss || hh.IsSubboss))
+            return; // handled in OnWillKillEnemy
+        Vector2 otherPos = otherBody.UnitCenter;
         if (!this._femtobyte.TryToDigitize(otherBody.gameObject))
             return;
+        Femtobyte.SpawnBitBurst(otherPos, 10);
         this._projectile.DieInAir(false, false, false, false);
         PhysicsEngine.SkipCollision = true;
     }
@@ -642,8 +723,10 @@ public class FemtobyteProjectile : MonoBehaviour
             ETGModConsole.Log($"near pickup {pp.EncounterNameOrDisplayName}");
         if (nearestIxable is not PickupObject pickup || pickup.IsBeingEyedByRat || !pickup.isActiveAndEnabled)
             return;
+        Vector2 otherPos = pickup.GetComponent<tk2dBaseSprite>().WorldCenter;
         if (!this._femtobyte.TryToDigitize(pickup.gameObject))
             return;
+        Femtobyte.SpawnBitBurst(otherPos, 5);
         this._projectile.DieInAir(false, false, false, false);
     }
 }
