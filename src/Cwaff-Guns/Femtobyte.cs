@@ -2,24 +2,15 @@
 
 using static Femtobyte.HoldType;
 using static Femtobyte.HoldSize;
-using System;
 
 /* TODO:
   Technical:
-    - adding objects to slots
-        - chests
-        - tables
-        - barrels
-        - minor breakables
-        - minor pickups (hearts, armor, ammo)
-    - removing objects from slots
     - save serialization
     - enemy mechanics
 
   Presentational:
     - projectile shaders
     - better sounds
-    - gun animations
     - projectile animations
 */
 
@@ -59,11 +50,22 @@ public class Femtobyte : CwaffGun
 
         public List<int>  contents      = null;
         public bool       locked        = false;
+        public bool       glitched      = false;
+        public bool       rainbow       = false;
 
         public string     enemyGuid     = null;
         public bool       jammed        = false;
 
         public int        pickupID      = -1;
+
+        public static DigitizedObject FromPickup(PickupObject pickup)
+        {
+            return new(){
+                type      = PICKUP,
+                pickupID  = pickup.PickupObjectId,
+                data      = new(pickup.EncounterNameOrDisplayName, PickupObjectDatabase.GetById(pickup.PickupObjectId).gameObject),
+            };
+        }
     }
 
     internal static readonly Dictionary<string, PrefabData> _NameToPrefabMap = new(){
@@ -119,6 +121,8 @@ public class Femtobyte : CwaffGun
     private tk2dBaseSprite _placementPhantom = null;
     private Material _placementMaterial = null;
     internal int _currentSlot = 0;
+    internal bool _displayNameDirty = false;
+    private bool _suppressNextClick = false;
 
     public static void Init()
     {
@@ -137,62 +141,90 @@ public class Femtobyte : CwaffGun
         gun.gameObject.AddComponent<FemtobyteAmmoDisplay>();
     }
 
-    private static bool IsWhiteListedTrap(GameObject bodyObject, out PrefabData trapPrefab)
+    private static bool IsWhiteListedPrefab(GameObject bodyObject, out PrefabData trapPrefab)
     {
         string name = bodyObject.name.Replace("(Clone)","").TrimEnd().ToLowerInvariant();
-        ETGModConsole.Log($"looking up {name} in trap whitelist");
+        ETGModConsole.Log($"looking up {name} in prefab whitelist");
         if (!_NameToPrefabMap.TryGetValue(name, out trapPrefab))
             trapPrefab = null;
         return trapPrefab != null;
     }
 
-    private bool DigitizeEnemy(AIActor enemy)
+    private bool DigitizeEnemy(AIActor enemy, PrefabData data)
     {
         if (enemy.healthHaver is not HealthHaver hh || hh.IsDead || hh.IsBoss || hh.IsSubboss)
             return false;
         CwaffShaders.Digitize(enemy.sprite);
-        enemy.EraseFromExistenceWithRewards();
+        // enemy.EraseFromExistenceWithRewards();
+        enemy.EraseFromExistence();
         return true;
     }
 
-    private bool DigitizePickup(PickupObject pickup)
+    private bool DigitizePickup(PickupObject pickup, PrefabData data)
     {
+        if (pickup.PickupObjectId >= 0)
+            SetCurrentSlot(DigitizedObject.FromPickup(pickup));
+        if (pickup is PassiveItem passive)
+            passive.GetRidOfMinimapIcon();
+        else if (pickup is PlayerItem active)
+            active.GetRidOfMinimapIcon();
+        else if (pickup is HealthPickup health)
+            health.GetRidOfMinimapIcon();
+        else if (pickup is AmmoPickup ammo)
+            ammo.GetRidOfMinimapIcon();
         CwaffShaders.Digitize(pickup.sprite);
         UnityEngine.Object.Destroy(pickup.gameObject);
         return true;
     }
 
-    private bool DigitizeChest(Chest chest)
+    private bool DigitizeChest(Chest chest, PrefabData data)
     {
-        if (chest.IsOpen || chest.IsBroken)
+        if (chest.IsOpen || chest.IsBroken || chest.IsMimic)
             return false;
+        if (data.prefab != null)
+            SetCurrentSlot(new(){
+                type      = CHEST,
+                data      = data,
+                locked    = chest.IsLocked,
+                glitched  = chest.IsGlitched,
+                rainbow   = chest.IsRainbowChest,
+                contents  = chest.contents != null ? chest.contents.Select(p => p ? p.PickupObjectId : -1).ToList() : null,
+            });
         CwaffShaders.Digitize(chest.sprite);
+        if (chest.GetAbsoluteParentRoom() is RoomHandler room)
+            room.DeregisterInteractable(chest);
+        chest.DeregisterChestOnMinimap();
         UnityEngine.Object.Destroy(chest.gameObject);
         return true;
     }
 
-    private bool DigitizeBarrel(KickableObject barrel)
+    private bool DigitizeBarrel(KickableObject barrel, PrefabData data)
     {
+        if (data.prefab != null)
+            SetCurrentSlot(new(){
+                type      = BARREL,
+                data      = data,
+            });
         CwaffShaders.Digitize(barrel.sprite);
         UnityEngine.Object.Destroy(barrel.gameObject);
         return true;
     }
 
-    private bool DigitizeTable(FlippableCover table)
+    private bool DigitizeTable(FlippableCover table, PrefabData data)
     {
-        // digitizedObjects.Add(new(){
-        //     type          = TABLE,
-        //     prefab        = ExoticObjects.SteelTableHorizontal, //TODO: use actual prefab
-        //     slotSpan      = 1,
-        // });
+        if (data.prefab != null)
+            SetCurrentSlot(new(){
+                type      = TABLE,
+                data      = data,
+            });
         CwaffShaders.Digitize(table.sprite);
         UnityEngine.Object.Destroy(table.gameObject);
         return true;
     }
 
-    private bool DigitizeTrap(GameObject trapPrefab, SpeculativeRigidbody body)
+    private bool DigitizeGeneric(SpeculativeRigidbody body, PrefabData data)
     {
-        ETGModConsole.Log($"  got prefab {trapPrefab.name}");
+        ETGModConsole.Log($"  got prefab {data.name} == {data.prefab.name}");
         if (body.sprite is tk2dSlicedSprite sliced)
             CwaffShaders.Digitize<tk2dSlicedSprite>(sliced);
         else
@@ -201,27 +233,34 @@ public class Femtobyte : CwaffGun
         return true;
     }
 
-    public bool TryToDigitize(SpeculativeRigidbody body)
+    private void SetCurrentSlot(DigitizedObject d)
+    {
+        this.digitizedObjects[this._currentSlot] = d;
+        this.PlayerOwner.gameObject.Play("replicant_select_new_sound");
+        UpdateCurrentSlot();
+    }
+
+    public bool TryToDigitize(GameObject target)
     {
         DigitizedObject d = this.digitizedObjects[this._currentSlot];
         if (d != null && d.type != EMPTY)
             return false; // can't digitize if we don't have an available slot
 
-        GameObject bodyObject = body.gameObject;
-        if (bodyObject.GetComponent<AIActor>() is AIActor enemy)
-            return DigitizeEnemy(enemy);
-        if (bodyObject.GetComponent<PickupObject>() is PickupObject pickup)
-            return DigitizePickup(pickup);
-        if (bodyObject.GetComponent<Chest>() is Chest chest)
-            return DigitizeChest(chest);
-        if (bodyObject.GetComponent<KickableObject>() is KickableObject barrel)
-            return DigitizeBarrel(barrel);
-        if (bodyObject.transform.parent is Transform tp && tp.gameObject.GetComponent<FlippableCover>() is FlippableCover table)
-            return DigitizeTable(table);
-
-        //TODO: traps are trickier to place where they didn't originally belong, so finish this later
-        // if (IsWhiteListedTrap(bodyObject, out GameObject trapPrefab))
-        //     return DigitizeTrap(trapPrefab, body);
+        SpeculativeRigidbody body = target.GetComponent<SpeculativeRigidbody>();
+        if (!IsWhiteListedPrefab(target, out PrefabData data))
+            data = null;
+        if (target.GetComponent<AIActor>() is AIActor enemy)
+            return DigitizeEnemy(enemy, data);
+        if (target.GetComponent<PickupObject>() is PickupObject pickup)
+            return DigitizePickup(pickup, data);
+        if (target.GetComponent<Chest>() is Chest chest)
+            return DigitizeChest(chest, data);
+        if (target.GetComponent<KickableObject>() is KickableObject barrel)
+            return DigitizeBarrel(barrel, data);
+        if (target.transform.parent is Transform tp && tp.gameObject.GetComponent<FlippableCover>() is FlippableCover table)
+            return DigitizeTable(table, data);
+        if (data != null && data.prefab != null)
+            return DigitizeGeneric(body, data); //TODO: traps are trickier to place where they didn't originally belong, so finish this later
 
         return false;
     }
@@ -232,11 +271,11 @@ public class Femtobyte : CwaffGun
             return; // inactive, do normal firing stuff
         if (this.gun.CurrentStrengthTier == 0)
             return; // empty slot, do normal firing stuff
-        BraveInput.GetInstanceForPlayer(player.PlayerIDX).ConsumeButtonDown(GungeonActions.GungeonActionType.Shoot);
         Vector2 pos = player.unadjustedAimPoint;
         if (!this.CanPlacePhantom(pos))
-            return;
+            return; // invalid position
         PlaceDigitizedObject(pos);
+        player.SuppressThisClick = true;
     }
 
     private bool CanPlacePhantom(Vector2 pos, DigitizedObject d = null)
@@ -295,17 +334,18 @@ public class Femtobyte : CwaffGun
         base.OnPlayerPickup(player);
         AdjustGunShader(on: true);
         player.OnTriedToInitiateAttack += this.OnTriedToInitiateAttack;
-        UpdateStrengthTier();
+        UpdateCurrentSlot();
         if (!C.DEBUG_BUILD || _DidDebugSetup)
             return;
 
         _DidDebugSetup = true;
         int i = 0;
+        this.digitizedObjects[i++] = DigitizedObject.FromPickup(Items.Ak47.AsGun());
         this.digitizedObjects[i++] = new(){ type = TABLE,  data = _NameToPrefabMap["table_horizontal_steel"] };
         this.digitizedObjects[i++] = new(){ type = BARREL, data = _NameToPrefabMap["red barrel"] };
         this.digitizedObjects[i++] = new(){ type = BARREL, data = _NameToPrefabMap["blue drum"] };
         this.digitizedObjects[i++] = new(){ type = CHEST,  data = _NameToPrefabMap["chest_silver"], contents = [(int)Items.Akey47], locked = true };
-        UpdateStrengthTier();
+        UpdateCurrentSlot();
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
@@ -401,10 +441,11 @@ public class Femtobyte : CwaffGun
     // {
     // }
 
-    private void UpdateStrengthTier()
+    private void UpdateCurrentSlot()
     {
         DigitizedObject d = this.digitizedObjects[this._currentSlot];
         this.gun.CurrentStrengthTier = (d == null || d.type == EMPTY) ? 0 : 1;
+        this._displayNameDirty = true;
     }
 
     public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
@@ -413,7 +454,7 @@ public class Femtobyte : CwaffGun
             return;
 
         this._currentSlot = (this._currentSlot + 1) % _MAX_SLOTS;
-        UpdateStrengthTier();
+        UpdateCurrentSlot();
         player.gameObject.Play("replicant_select_sound");
     }
 
@@ -432,6 +473,13 @@ public class Femtobyte : CwaffGun
 
         switch (d.type)
         {
+            case PICKUP:
+                GameObject pickup = LootEngine.SpawnItem(PickupObjectDatabase.GetById(d.pickupID).gameObject, placePoint, Vector2.zero, 0f, false, false, true).gameObject;
+                tk2dSprite pickupSprite = pickup.GetComponentInChildren<tk2dSprite>();
+                pickupSprite.PlaceAtPositionByAnchor(placePoint, Anchor.MiddleCenter);
+
+                CwaffShaders.Materialize(pickupSprite);
+                break;
             case TABLE:
                 GameObject table = UnityEngine.Object.Instantiate(d.data.prefab, placePoint, Quaternion.identity);
                 tk2dSprite tableSprite = table.GetComponentInChildren<tk2dSprite>();
@@ -477,9 +525,15 @@ public class Femtobyte : CwaffGun
                 {
                     chest.contents = new(d.contents.Count);
                     foreach (int id in d.contents)
-                        chest.contents.Add(PickupObjectDatabase.GetById(id));
+                        if (id >= 0)
+                            chest.contents.Add(PickupObjectDatabase.GetById(id));
                 }
                 room.RegisterInteractable(chest);
+                chest.RegisterChestOnMinimap(room);
+                if (d.glitched)
+                    chest.BecomeGlitchChest();
+                if (d.rainbow)
+                    chest.BecomeRainbowChest();
 
                 chest.specRigidbody.CorrectForWalls();
                 PhysicsEngine.Instance.RegisterOverlappingGhostCollisionExceptions(chest.specRigidbody);
@@ -488,6 +542,9 @@ public class Femtobyte : CwaffGun
             default:
                 break;
         }
+
+        digitizedObjects[this._currentSlot] = null;
+        UpdateCurrentSlot();
     }
 
     public override void PostProcessProjectile(Projectile projectile)
@@ -504,6 +561,7 @@ public class Femtobyte : CwaffGun
 
         private Femtobyte _femto;
         private PlayerController _owner;
+        private string _cachedDisplayName = null;
 
         private void Start()
         {
@@ -521,21 +579,23 @@ public class Femtobyte : CwaffGun
             uic.GunAmmoCountLabel.AutoHeight = true; // enable multiline text
             uic.GunAmmoCountLabel.ProcessMarkup = true; // enable multicolor text
 
-            _SB.Length = 0;
-            _SB.Append(this._femto.GetTitleForCurrentSlot());
-            _SB.Append("\n");
-            for (int i = 0; i < _MAX_SLOTS; ++i)
+            if (this._femto._displayNameDirty || this._cachedDisplayName.IsNullOrWhiteSpace())
             {
-                // if (i == _MAX_SLOTS / 2)
-                //     _SB.Append("\n");
-                DigitizedObject d = this._femto.digitizedObjects[i];
-                bool used = d != null && d.type != EMPTY;
-                if (used)
-                    _SB.AppendFormat("[sprite \"{0}\"]", i == this._femto._currentSlot ? Femtobyte._FullActiveUI : Femtobyte._FullUI);
-                else
-                    _SB.AppendFormat("[sprite \"{0}\"]", i == this._femto._currentSlot ? Femtobyte._EmptyActiveUI : Femtobyte._EmptyUI);
+                _SB.Length = 0;
+                _SB.Append(this._femto.GetTitleForCurrentSlot());
+                _SB.Append("\n");
+                for (int i = 0; i < _MAX_SLOTS; ++i)
+                {
+                    DigitizedObject d = this._femto.digitizedObjects[i];
+                    bool used = d != null && d.type != EMPTY;
+                    if (used)
+                        _SB.AppendFormat("[sprite \"{0}\"]", i == this._femto._currentSlot ? Femtobyte._FullActiveUI : Femtobyte._FullUI);
+                    else
+                        _SB.AppendFormat("[sprite \"{0}\"]", i == this._femto._currentSlot ? Femtobyte._EmptyActiveUI : Femtobyte._EmptyUI);
+                }
+                this._cachedDisplayName = _SB.ToString();
             }
-            uic.GunAmmoCountLabel.Text = _SB.ToString();
+            uic.GunAmmoCountLabel.Text = this._cachedDisplayName;
             return true;
         }
     }
@@ -555,13 +615,14 @@ public class FemtobyteProjectile : MonoBehaviour
         this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreRigidbodyCollision;
         this._projectile.specRigidbody.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.PlayerHitBox));
         this._projectile.specRigidbody.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.Trap));
+        this._projectile.specRigidbody.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.Pickup));
     }
 
     private void OnPreRigidbodyCollision(SpeculativeRigidbody body, PixelCollider myCollider, SpeculativeRigidbody otherBody, PixelCollider otherCollider)
     {
         if (!this._owner || !this._projectile || !this._femtobyte || !otherBody)
             return;
-        if (!this._femtobyte.TryToDigitize(otherBody))
+        if (!this._femtobyte.TryToDigitize(otherBody.gameObject))
             return;
         this._projectile.DieInAir(false, false, false, false);
         PhysicsEngine.SkipCollision = true;
@@ -577,12 +638,11 @@ public class FemtobyteProjectile : MonoBehaviour
     private void TryToCollideWithPickups()
     {
         IPlayerInteractable nearestIxable = this._owner.CurrentRoom.GetNearestInteractable(this._projectile.SafeCenter, 1f, this._owner);
-        //BUG: this seems to cause issues near chests?
+        if (nearestIxable is PickupObject pp)
+            ETGModConsole.Log($"near pickup {pp.EncounterNameOrDisplayName}");
         if (nearestIxable is not PickupObject pickup || pickup.IsBeingEyedByRat || !pickup.isActiveAndEnabled)
             return;
-        if (pickup.GetComponent<SpeculativeRigidbody>() is not SpeculativeRigidbody body)
-            return;
-        if (!this._femtobyte.TryToDigitize(body))
+        if (!this._femtobyte.TryToDigitize(pickup.gameObject))
             return;
         this._projectile.DieInAir(false, false, false, false);
     }
