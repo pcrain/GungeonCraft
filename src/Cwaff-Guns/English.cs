@@ -2,16 +2,12 @@
 
 using static BilliardBall.State;
 
-/* TODO:
-    ? add balls falling in pits
-*/
-
 public class English : CwaffGun
 {
     public static string ItemName         = "English";
     public static string ShortDescription = "Racking Up Frags";
-    public static string LongDescription  = "Fires a cue ball towards a rack of billiard balls that increases in size the longer the gun is charged. Billiard balls bounce off of walls, objects, and each other, dealing damage proportional to their velocity. Grounded billiard balls can be reactivated by other billiard balls.";
-    public static string Lore             = "TBD";
+    public static string LongDescription  = "Fires a cue ball towards a rack of billiard balls that grows as the gun is charged. Billiard balls bounce off of walls, objects, and each other, dealing damage proportional to their velocity. Grounded billiard balls can be reactivated by other billiard balls. Increases curse by 1 while in inventory.";
+    public static string Lore             = "This weapon appears to be an ordinary pool cue at first glance. The second, third, and fourth glances are much the same. The fifth glance, however, reveals a tiny spark at the tip of the cue, ready to materialize a cue ball with unforetold power and disregard for the conservation of momentum at the wielder's first intention to strike. The six glance reveals you have gone partially insane from staring at the tip of an ordinary pool cue for so long, and that it is, in fact, just an ordinary pool cue.";
 
     private const float _CHARGE_PER_LEVEL = 0.4f;
     private const int _MAX_CHARGE_LEVEL   = 5;
@@ -38,8 +34,9 @@ public class English : CwaffGun
     {
         Gun gun = Lazy.SetupGun<English>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.CHARGE, reloadTime: 0.9f, ammo: 960, shootFps: 40, chargeFps: 10,
-                muzzleFrom: Items.Mailbox, fireAudio: "billiard_first_strike_sound");
+                curse: 1f, muzzleFrom: Items.Mailbox, fireAudio: "billiard_first_strike_sound");
             gun.LoopAnimation(gun.chargeAnimation, loopStart: 5);
+            gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
 
         _BilliardBall = gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.25f, angleVariance: 5.0f, chargeTime: 0f,
           shootStyle: ShootStyle.Charged, damage: 2.5f, speed: 81.0f, range: 9999f,

@@ -5,7 +5,7 @@ public class BulletproofTablecloth : CwaffPassive
     public static string ItemName         = "Bulletproof Tablecloth";
     public static string ShortDescription = "Kevlar for Dinner";
     public static string LongDescription  = "Makes flippable tables immune to bullets and most other sources of damage.";
-    public static string Lore             = "TBD";
+    public static string Lore             = "Putting kevlar vests on tables is a somewhat unhinged idea that only a battle-hardened and brain-damaged individual who has spent inordinate amounts of time in the Gungeon could have concocted. Trorc happens to match all of those criteria, and perhaps unsurpringly, bulletproof tablecloths are his brain child. They're apparently popular enough for Trorc to continue selling them, and for what it's worth, they do their job extremely well...but does that job really need doing?";
 
     public static void Init()
     {

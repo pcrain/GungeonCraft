@@ -6,8 +6,8 @@ public class WeightedRobes : CwaffActive, ILabelItem
 {
     public static string ItemName         = "Weighted Robes";
     public static string ShortDescription = "Hide Your Power Level";
-    public static string LongDescription  = "Toggles weighted training when used. Each room cleared during weighted training increases your training level. Fire rate, reload speed, and movement speed are reduced proportional to training level while training is active, and increased proportional to training level while training is inactive. Bosses and minibosses increase training level more than normal enemies.";
-    public static string Lore             = "TBD";
+    public static string LongDescription  = "Toggles weighted training when used. Each room cleared while weighted training is active increases your training level. Fire rate, reload speed, and movement speed are reduced proportional to training level while training is active, and increased proportional to training level while training is inactive. Bosses and minibosses increase training level more than normal enemies.";
+    public static string Lore             = "These garments once belonged to King Triggolo, a nemesis-turned-ally of the great Gunsoku. Triggolo would often wear these robes during lesser gunfights to make them more physically difficult, allowing him to build speed and strength in preparation for more serious gunfights. He also had a habit of forgetting to remove them before said serious gunfights, leading to several injuries that could have been easily avoided.";
 
     private const int   _MAX_TRAINING = 50;
     private const float _FIRERATE     = 0.5f;

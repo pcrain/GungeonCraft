@@ -6,8 +6,8 @@ public class Femtobyte : CwaffGun
 {
     public static string ItemName         = "Femtobyte";
     public static string ShortDescription = "Digital Storage";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string LongDescription  = "Utility gun that fires projectiles that can digitize chests, tables, barrels, consumables, and certain other objects. Reloading cycles through digital slots. If the current slot is full, firing the gun will place the selected digitized object at the position of the reticle.";
+    public static string Lore             = "Gungeoneers can carry a seemingly unlimited number of firearms and trinkets on their persons without fear of encumbrance. This magical hammerspace can be expanded to include larger objects than ever thanks to recent advancements in techno-ballistics, which have enabled projectiles to download data from their environment to a computer embedded inside their host gun. While such projectiles have limited direct damage output, it's hard to beat the fun and effectiveness of materializing sawblades on top of unsuspecting Gundead.";
 
     private const int _MAX_SLOTS = 6;
 
