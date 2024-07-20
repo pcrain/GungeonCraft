@@ -27,7 +27,7 @@
 
 ### Goals
 
-- **Balance and Diversity**: all items and guns should be both fun and useful without being overpowered
+- **Balance and Diversity**: all items and guns should be fun, engaging, and useful in a variety of situations
 - **Fun New Mechanics**: most items and guns should offer their own distinct ways of interacting with the Gungeon
 - **Playstyle Variety**: defensive and strategic play should feel as rewarding as aggressive and proactive play
 
@@ -39,6 +39,7 @@
 * When saving and reloading a run, guns no longer lose any other guns duct-taped to them
 * Rooms that can only spawn once per run (e.g., specialty shops) are now properly marked as "not spawned this run" after a Quick Restart
 * Certain algorithms for shuffling the order of a list (e.g., for floor generation) will now randomly shuffle the first and last items in the list
+* Orbiting guns no longer shoot projectiles from a weird position if created while the player is facing left
 
 ### FAQ
 

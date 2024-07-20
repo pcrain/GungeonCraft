@@ -1,28 +1,37 @@
 # Changelog
 
-## TBD
+## 1.16.0 (2024-07-20)
+
+#### Features:
 
 - Added English, Tryhard Snacks, Weighted Robes, Bulletproof Tablecloth, and Femtobyte
 	- Tryhard Snacks, Bulletproof Tablecloth, and Femtobyte sprites thanks to Dallan!
-- Added secondary reload button config option to make using some of the mod's guns easier on controller
-- Made movement smoother for Iron Maid's targeting reticle
-- Increased lock on range for Iron Maid's targeting reticle
-- Fixed launch delay on Iron Maid's projectiles not accounting for projectiles that were destroyed while in stasis
-- Fixed ghost cables persisting if Alligator is dropped and picked back up
+	
+#### Balance Changes and Polish:
+
+- Added secondary reload button config option to make some of the mod's guns easier to use on controller
+- Made Insurance Shop spawn randomly like other shops by default
+	- Guaranteed spawns can be re-enabled in the Mod Config menu
 - Made Gun Powderer take gun quality into account when determining how many ammo boxes to create
 	- Changed quality of Gun Powderer from A to B to compensate
-- Adjusted the volume of a few sounds
-- Blacklisted several guns from blessed runs that had the potential to cause softlocks if obtained
-- Made BlasTech F-4 ignore boss damage caps
-- Fixed Wedding Ring being *completely nonfunctional* since version 1.0.0 D:
-- Fixed coroutine continue failure error in the debug console when switching to Aimu Hakurei or Alyx
+- Tweaked Iron Maid:
+	- Made movement smoother for Iron Maid's targeting reticle
+	- Increased lock on range for Iron Maid's targeting reticle
+	- Fixed launch delay on Iron Maid's projectiles not accounting for projectiles that were destroyed while in stasis
 - Rebalanced Vacuum Cleaner spawn rate by changing it from the CHARGE gun class to a new UTILITY gun class
+- Made BlasTech F-4 ignore boss damage caps
+	
+#### Bugfixes and Misc:
+
+- Fixed Wedding Ring being *completely nonfunctional* since version 1.0.0 D:
+- Fixed ghost cables persisting if Alligator is dropped and picked back up
+- Fixed coroutine continue failure error in the debug console when switching to Aimu Hakurei or Alyx
 - Fixed Racket Launcher's idle animation playing when found in a chest
 - Fixed vanilla bug where hovering guns shoot from the wrong place if created while the player is facing left
 - Fixed broken midgame save serialization of guns
-- Made Insurance Shop spawn randomly like other shops by default
-	- Guaranteed spawns can be re-enabled in the Mod Config menu
 - Fixed Companion Shop having a weird floor when spawned in the Mines
+- Blacklisted several guns from blessed runs that had the potential to cause softlocks if obtained
+- Adjusted the volume of a few sounds
 
 ## 1.15.1 (2024-07-11)
 

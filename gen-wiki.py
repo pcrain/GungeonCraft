@@ -474,7 +474,7 @@ WIKI_TEMPLATE='''
 !Name
 !Room Icon
 !Type
-!Spawn Condition
+!Spawn Condition (Classic)
 !style="width: 50%"|Description
 {npcs}
 |}}
