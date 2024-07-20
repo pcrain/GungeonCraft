@@ -2,7 +2,8 @@
 
 ## TBD
 
-- Added English, Tryhard Snacks, Weighted Robes, Bulletproof Tablecloth
+- Added English, Tryhard Snacks, Weighted Robes, Bulletproof Tablecloth, and Femtobyte
+	- Tryhard Snacks, Bulletproof Tablecloth, and Femtobyte sprites thanks to Dallan!
 - Added secondary reload button config option to make using some of the mod's guns easier on controller
 - Made movement smoother for Iron Maid's targeting reticle
 - Increased lock on range for Iron Maid's targeting reticle
@@ -34,6 +35,7 @@
 #### Features:
 
 - Added Volcanic Ammolet, BlasTech F-4, and Telefragger
+	- Volcanic Ammolet sprite thanks to Dallan!
 - Added masteries for Vacuum Cleaner, Paintball Cannon, Gunbrella, Alyx, and Pistol Whip
 - Added 6 new synergies
 
@@ -110,7 +112,7 @@
 
 #### Features and Polish:
 - Added Widowmaker, MM: Aiming, Calculator, and Zag
-	- MM: Aiming and Calculator sprites thanks to Dallan
+	- MM: Aiming and Calculator sprites thanks to Dallan!
 - Added masteries for Hand Cannon, Schrodinger's Gat, Hatchling Gun, Crapshooter, and Holy Water Gun
 - Added 7 new synergies!
 

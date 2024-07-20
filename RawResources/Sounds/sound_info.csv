@@ -203,3 +203,6 @@ billiard_first_strike_sound,5.0,1,sound
 billiard_materialize_sound,-7.0,1,sound
 the_sound_of_doing_some_training,-8.5,1,sound
 the_sound_of_training_finished,-8.0,1,sound
+femtobyte_digitize_sound,2.0,1,sound
+femtobyte_materialize_sound,2.0,1,sound
+femtobyte_shoot_sound,-3.0,1,sound

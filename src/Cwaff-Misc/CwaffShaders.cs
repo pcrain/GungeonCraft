@@ -59,11 +59,13 @@ public static class CwaffShaders
         newSprite.FlipX = sprite.FlipX;
         newSprite.PlaceAtRotatedPositionByAnchor(sprite.WorldCenter, Anchor.MiddleCenter);
         newSprite.StartCoroutine(Digitize_CR(newSprite, delay));
+        g.Play("femtobyte_digitize_sound");
     }
 
     public static void Materialize<T>(T sprite, float delay = 0.0f) where T : tk2dBaseSprite
     {
         sprite.StartCoroutine(Materialize_CR(sprite, delay));
+        sprite.gameObject.Play("femtobyte_materialize_sound");
     }
 
     public static IEnumerator Digitize_CR(tk2dBaseSprite s, float delay = 0.0f)

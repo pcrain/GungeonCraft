@@ -2,10 +2,6 @@
 
 using static Femtobyte.HoldType;
 
-/* TODO:
-    - better sounds
-*/
-
 public class Femtobyte : CwaffGun
 {
     public static string ItemName         = "Femtobyte";
@@ -134,7 +130,7 @@ public class Femtobyte : CwaffGun
     {
         Gun gun = Lazy.SetupGun<Femtobyte>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.C, gunClass: CwaffGunClass.UTILITY, reloadTime: 0.0f, ammo: 9999, canGainAmmo: false,
-                infiniteAmmo: true, shootFps: 24, reloadFps: 16, modulesAreTiers: true, fireAudio: "fire_coin_sound", banFromBlessedRuns: true);
+                infiniteAmmo: true, shootFps: 24, reloadFps: 16, modulesAreTiers: true, fireAudio: "femtobyte_shoot_sound", banFromBlessedRuns: true);
             //NOTE: modulesAreTiers with no 2nd module lets use switch to tier 1 to do cool alternate stuff without firing projectiles
 
         Projectile proj = gun.InitProjectile(GunData.New(clipSize: -1, angleVariance: 2.0f, shootStyle: ShootStyle.SemiAutomatic, damage: 7.5f, speed: 90.0f,
@@ -255,7 +251,6 @@ public class Femtobyte : CwaffGun
     private void SetCurrentSlot(DigitizedObject d)
     {
         this.digitizedObjects[this._currentSlot] = d;
-        this.PlayerOwner.gameObject.Play("replicant_select_new_sound");
         UpdateCurrentSlot();
     }
 
@@ -424,7 +419,6 @@ public class Femtobyte : CwaffGun
             this._placementPhantom = Lazy.SpriteObject(player.sprite.collection, player.sprite.spriteId);
             this._placementPhantom.usesOverrideMaterial = true;
             Material m = this._placementMaterial = this._placementPhantom.gameObject.GetComponent<Renderer>().material;
-            // m.shader = CwaffShaders.DigitizeShader;
             m.shader = CwaffShaders.UnlitDigitizeShader;
             m.SetTexture("_BinaryTex", CwaffShaders.DigitizeTexture);
             m.SetFloat("_BinarizeProgress", 1.0f);
