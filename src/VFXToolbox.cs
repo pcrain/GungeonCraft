@@ -812,13 +812,6 @@ public class FancyVFX : MonoBehaviour
         if (!this._setup)
             return;
 
-        if (!this._vfx)
-        {
-            //TODO: i don't think this can actually happen o.o
-            UnityEngine.Object.Destroy(this);
-            return;
-        }
-
         this._curLifeTime += BraveTime.DeltaTime;
         float percentDone = this._curLifeTime / this._maxLifeTime;
         if (percentDone >= 1.0f)
@@ -846,7 +839,6 @@ public class FancyVFX : MonoBehaviour
         }
     }
 
-    // todo: fading and emission are not simultaneously compatible
     public void Setup(Vector2 velocity, float lifetime = 0, float? fadeOutTime = null, Transform parent = null,
         float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false, float startScale = 1.0f, float endScale = 1.0f, float? height = null,
         bool randomFrame = false)

@@ -486,6 +486,12 @@ public class Initialisation : BaseUnityPlugin
                 //HACK: disable ETG debug log
                 // Application.logMessageReceived -= ETGModDebugLogMenu.Logger;
             }
+
+            if (C.DEBUG_BUILD)
+            {
+                // ETGModConsole.Log($"profiling Femtobyte");
+                // harmony.ProfileType<Femtobyte>();
+            }
         }
         catch (Exception e)
         {
