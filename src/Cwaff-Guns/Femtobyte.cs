@@ -1,13 +1,8 @@
 ﻿namespace CwaffingTheGungy;
 
 using static Femtobyte.HoldType;
-using static Femtobyte.HoldSize;
 
 /* TODO:
-  Technical:
-    - save serialization
-
-  Presentational:
     - better sounds
 */
 
@@ -27,14 +22,15 @@ public class Femtobyte : CwaffGun
     internal static GameObject _ImpactBits = null;
 
     public enum HoldType { EMPTY, TABLE, BARREL, SPECIAL, CHEST, ENEMY, PICKUP }
-    public enum HoldSize { SMALL, MEDIUM, LARGE, HUGE }
     public class PrefabData
     {
-        public string name;
+        public string prefabName;
+        public string displayName;
         public GameObject prefab;
-        public PrefabData(string name, GameObject prefab)
+        public PrefabData(string prefabName, string displayName, GameObject prefab)
         {
-            this.name = name;
+            this.prefabName = prefabName;
+            this.displayName = displayName;
             this.prefab = prefab;
         }
     }
@@ -42,26 +38,27 @@ public class Femtobyte : CwaffGun
     public class DigitizedObject
     {
         public HoldType   type          = EMPTY;
-        public int        slotSpan      = 1;
-
         public PrefabData data          = null;
-
+        // Chest stuff
         public List<int>  contents      = null;
         public bool       locked        = false;
         public bool       glitched      = false;
         public bool       rainbow       = false;
-
-        public string     enemyGuid     = null;
-        public bool       jammed        = false;
-
+        // Pickup stuff
         public int        pickupID      = -1;
+        // Enemy stuff (unused for now)
+        // public string     enemyGuid     = null;
+        // public bool       jammed        = false;
 
         public static DigitizedObject FromPickup(PickupObject pickup)
         {
             return new(){
                 type      = PICKUP,
                 pickupID  = pickup.PickupObjectId,
-                data      = new(pickup.EncounterNameOrDisplayName, PickupObjectDatabase.GetById(pickup.PickupObjectId).gameObject),
+                data      = new(
+                    prefabName: pickup.EncounterNameOrDisplayName,
+                    displayName: pickup.EncounterNameOrDisplayName,
+                    prefab: PickupObjectDatabase.GetById(pickup.PickupObjectId).gameObject),
             };
         }
     }
@@ -77,53 +74,53 @@ public class Femtobyte : CwaffGun
         // {"trap_spinning_log_horizontal_resizable", ExoticObjects.Spinning_Log_Horizontal },
 
         // Special
-        {"npc_gunbermuncher",                      new("Muncher", LoadHelper.LoadAssetFromAnywhere<SharedInjectionData>("Base Shared Injection Data")
+        {"npc_gunbermuncher",                      new("npc_gunbermuncher", "Muncher", LoadHelper.LoadAssetFromAnywhere<SharedInjectionData>("Base Shared Injection Data")
                                                      .AttachedInjectionData[2].InjectionData[0].exactRoom.placedObjects[11].nonenemyBehaviour.gameObject) },
-        {"npc_gunbermuncher_evil",                 new("Evil Muncher", GameManager.Instance.GlobalInjectionData.entries[3]
+        {"npc_gunbermuncher_evil",                 new("npc_gunbermuncher_evil", "Evil Muncher", GameManager.Instance.GlobalInjectionData.entries[3]
                                                      .injectionData.InjectionData[5].exactRoom.placedObjects[0].nonenemyBehaviour.gameObject) },
 
         // Traps
-        {"trap_sawblade_omni_gungeon_2x2",         new("Sawblade", ExoticObjects.SawBlade) },
-        {"skullfirespinner",                       new("Skull Fire Trap", ExoticObjects.FireBarTrap) },
-        {"flamepipe_spraysdown",                   new("Flame Pipe N", ExoticObjects.FlamePipeNorth) },
-        {"flamepipe_spraysleft",                   new("Flame Pipe E", ExoticObjects.FlamePipeEast) },
-        {"flamepipe_spraysright",                  new("Flame Pipe W", ExoticObjects.FlamePipeWest) },
-        {"forge_hammer",                           new("Forge Hammer", LoadHelper.LoadAssetFromAnywhere<GameObject>("Forge_Hammer")) },
-        {"brazier",                                new("Brazier", LoadHelper.LoadAssetFromAnywhere<SharedInjectionData>("Base Shared Injection Data")
+        {"trap_sawblade_omni_gungeon_2x2",         new("trap_sawblade_omni_gungeon_2x2", "Sawblade", ExoticObjects.SawBlade) },
+        {"skullfirespinner",                       new("skullfirespinner", "Skull Fire Trap", ExoticObjects.FireBarTrap) },
+        {"flamepipe_spraysdown",                   new("flamepipe_spraysdown", "Flame Pipe N", ExoticObjects.FlamePipeNorth) },
+        {"flamepipe_spraysleft",                   new("flamepipe_spraysleft", "Flame Pipe E", ExoticObjects.FlamePipeEast) },
+        {"flamepipe_spraysright",                  new("flamepipe_spraysright", "Flame Pipe W", ExoticObjects.FlamePipeWest) },
+        {"forge_hammer",                           new("forge_hammer", "Forge Hammer", LoadHelper.LoadAssetFromAnywhere<GameObject>("Forge_Hammer")) },
+        {"brazier",                                new("brazier", "Brazier", LoadHelper.LoadAssetFromAnywhere<SharedInjectionData>("Base Shared Injection Data")
                                                      .InjectionData[1].roomTable.includedRooms.elements[6].room.placedObjects[4].placeableContents
                                                      .variantTiers[0].nonDatabasePlaceable) },
 
         // Barrels
-        {"red barrel"  ,                           new("Exposive Barrel", LoadHelper.LoadAssetFromAnywhere<GameObject>("Red Barrel")) },
-        {"red drum",                               new("Exposive Drum", LoadHelper.LoadAssetFromAnywhere<GameObject>("Red Drum")) },
-        {"blue drum",                              new("Water Drum", LoadHelper.LoadAssetFromAnywhere<GameObject>("Blue Drum")) },
-        {"purple drum",                            new("Oil Drum", LoadHelper.LoadAssetFromAnywhere<GameObject>("Purple Drum")) },
-        {"yellow drum",                            new("Poison Drum", LoadHelper.LoadAssetFromAnywhere<GameObject>("Yellow Drum")) },
+        {"red barrel",                             new("red barrel", "Exposive Barrel", LoadHelper.LoadAssetFromAnywhere<GameObject>("Red Barrel")) },
+        {"red drum",                               new("red drum", "Exposive Drum", LoadHelper.LoadAssetFromAnywhere<GameObject>("Red Drum")) },
+        {"blue drum",                              new("blue drum", "Water Drum", LoadHelper.LoadAssetFromAnywhere<GameObject>("Blue Drum")) },
+        {"purple drum",                            new("purple drum", "Oil Drum", LoadHelper.LoadAssetFromAnywhere<GameObject>("Purple Drum")) },
+        {"yellow drum",                            new("yellow drum", "Poison Drum", LoadHelper.LoadAssetFromAnywhere<GameObject>("Yellow Drum")) },
 
         // Chests
-        {"chest_wood_two_items",                   new("Brown Chest", GameManager.Instance.RewardManager.D_Chest.gameObject) },
-        {"chest_silver",                           new("Blue Chest", GameManager.Instance.RewardManager.C_Chest.gameObject) },
-        {"chest_green",                            new("Green Chest", GameManager.Instance.RewardManager.B_Chest.gameObject) },
-        {"chest_red",                              new("Red Chest", GameManager.Instance.RewardManager.A_Chest.gameObject) },
-        {"chest_black",                            new("Black Chest", GameManager.Instance.RewardManager.S_Chest.gameObject) },
-        {"chest_rainbow",                          new("Rainbow Chest", GameManager.Instance.RewardManager.Rainbow_Chest.gameObject) },
-        {"chest_synergy",                          new("Synergy Chest", GameManager.Instance.RewardManager.Synergy_Chest.gameObject) },
-        {"truthchest",                             new("Albern's Chest", LoadHelper.LoadAssetFromAnywhere<GameObject>("TruthChest")) },
-        {"chest_rat",                              new("Rat Chest", LoadHelper.LoadAssetFromAnywhere<GameObject>("Chest_Rat")) },
+        {"chest_wood_two_items",                   new("chest_wood_two_items", "Brown Chest", GameManager.Instance.RewardManager.D_Chest.gameObject) },
+        {"chest_silver",                           new("chest_silver", "Blue Chest", GameManager.Instance.RewardManager.C_Chest.gameObject) },
+        {"chest_green",                            new("chest_green", "Green Chest", GameManager.Instance.RewardManager.B_Chest.gameObject) },
+        {"chest_red",                              new("chest_red", "Red Chest", GameManager.Instance.RewardManager.A_Chest.gameObject) },
+        {"chest_black",                            new("chest_black", "Black Chest", GameManager.Instance.RewardManager.S_Chest.gameObject) },
+        {"chest_rainbow",                          new("chest_rainbow", "Rainbow Chest", GameManager.Instance.RewardManager.Rainbow_Chest.gameObject) },
+        {"chest_synergy",                          new("chest_synergy", "Synergy Chest", GameManager.Instance.RewardManager.Synergy_Chest.gameObject) },
+        {"truthchest",                             new("truthchest", "Albern's Chest", LoadHelper.LoadAssetFromAnywhere<GameObject>("TruthChest")) },
+        {"chest_rat",                              new("chest_rat", "Rat Chest", LoadHelper.LoadAssetFromAnywhere<GameObject>("Chest_Rat")) },
 
         // Tables
-        { "folding_table_vertical",                new("Folding Table", ItemHelper.Get(Items.PortableTableDevice).GetComponent<FoldingTableItem>().TableToSpawn.gameObject) },
-        { "kingofthehillbox",                      new("KotH Table", LoadHelper.LoadAssetFromAnywhere<GameObject>("_ChallengeManager")
+        { "folding_table_vertical",                new("folding_table_vertical", "Folding Table", ItemHelper.Get(Items.PortableTableDevice).GetComponent<FoldingTableItem>().TableToSpawn.gameObject) },
+        { "kingofthehillbox",                      new("kingofthehillbox", "KotH Table", LoadHelper.LoadAssetFromAnywhere<GameObject>("_ChallengeManager")
                                                      .GetComponent<ChallengeManager>().PossibleChallenges[21].challenge.gameObject
                                                      .GetComponent<ZoneControlChallengeModifier>().BoxPlaceable.variantTiers[0].nonDatabasePlaceable) },
-        { "table_horizontal_steel",                new("Steel Table H", ExoticObjects.SteelTableHorizontal) },
-        { "table_vertical_steel",                  new("Steel Table V", ExoticObjects.SteelTableVertical) },
-        { "coffin_horizontal",                     new("Coffin H", LoadHelper.LoadAssetFromAnywhere<GameObject>("coffin_horizontal")) },
-        { "coffin_vertical",                       new("Coffin V", LoadHelper.LoadAssetFromAnywhere<GameObject>("coffin_vertical")) },
-        { "table_horizontal",                      new("Wood Table H", LoadHelper.LoadAssetFromAnywhere<GameObject>("table_horizontal")) },
-        { "table_vertical",                        new("Wood Table V", LoadHelper.LoadAssetFromAnywhere<GameObject>("table_vertical")) },
-        { "table_horizontal_stone",                new("Stone Table H", LoadHelper.LoadAssetFromAnywhere<GameObject>("table_horizontal_stone")) },
-        { "table_vertical_stone",                  new("Stone Table V", LoadHelper.LoadAssetFromAnywhere<GameObject>("table_vertical_stone")) },
+        { "table_horizontal_steel",                new("table_horizontal_steel", "Steel Table H", ExoticObjects.SteelTableHorizontal) },
+        { "table_vertical_steel",                  new("table_vertical_steel", "Steel Table V", ExoticObjects.SteelTableVertical) },
+        { "coffin_horizontal",                     new("coffin_horizontal", "Coffin H", LoadHelper.LoadAssetFromAnywhere<GameObject>("coffin_horizontal")) },
+        { "coffin_vertical",                       new("coffin_vertical", "Coffin V", LoadHelper.LoadAssetFromAnywhere<GameObject>("coffin_vertical")) },
+        { "table_horizontal",                      new("table_horizontal", "Wood Table H", LoadHelper.LoadAssetFromAnywhere<GameObject>("table_horizontal")) },
+        { "table_vertical",                        new("table_vertical", "Wood Table V", LoadHelper.LoadAssetFromAnywhere<GameObject>("table_vertical")) },
+        { "table_horizontal_stone",                new("table_horizontal_stone", "Stone Table H", LoadHelper.LoadAssetFromAnywhere<GameObject>("table_horizontal_stone")) },
+        { "table_vertical_stone",                  new("table_vertical_stone", "Stone Table V", LoadHelper.LoadAssetFromAnywhere<GameObject>("table_vertical_stone")) },
     };
 
     public List<DigitizedObject> digitizedObjects = Enumerable.Repeat<DigitizedObject>(default, _MAX_SLOTS).ToList();
@@ -330,8 +327,8 @@ public class Femtobyte : CwaffGun
         DigitizedObject d = this.digitizedObjects[this._currentSlot];
         if (d == null)
             return "Empty";
-        if (d.data != null && !d.data.name.IsNullOrWhiteSpace())
-            return d.data.name;
+        if (d.data != null && !d.data.displayName.IsNullOrWhiteSpace())
+            return d.data.displayName;
         switch (d.type)
         {
             case EMPTY:  return "Empty";
@@ -598,6 +595,91 @@ public class Femtobyte : CwaffGun
         FancyVFX.SpawnBurst(prefab: _ImpactBits, numToSpawn: howMany, basePosition: pos,
             positionVariance: 1f, baseVelocity: 10f * Vector2.up, velocityVariance: 5f, velType: FancyVFX.Vel.Radial,
             lifetime: 0.5f, fadeOutTime: 0.5f, randomFrame: true);
+    }
+
+    public override void MidGameSerialize(List<object> data, int i)
+    {
+        base.MidGameSerialize(data, i);
+
+        int numStored = 0;
+        foreach (DigitizedObject d in this.digitizedObjects)
+            if (d != null && d.type != EMPTY)
+                ++numStored;
+        data.Add(numStored);
+
+        for (int slot = 0; slot < this.digitizedObjects.Count; ++slot)
+        {
+            DigitizedObject d = this.digitizedObjects[slot];
+            if (d == null || d.type == EMPTY)
+                continue;
+            data.Add(slot);
+            data.Add((int)d.type);
+            switch (d.type)
+            {
+                case CHEST:
+                    data.Add(d.data.prefabName);
+                    data.Add(d.locked);
+                    data.Add(d.glitched);
+                    data.Add(d.rainbow);
+                    int numContents = d.contents != null ? d.contents.Count : 0;
+                    data.Add(numContents);
+                    for (int j = 0; j < numContents; ++j)
+                        data.Add(d.contents[j]);
+                    break;
+                case PICKUP:
+                    data.Add(d.pickupID);
+                    break;
+                default:
+                    data.Add(d.data.prefabName);
+                    break;
+            }
+        }
+    }
+
+    public override void MidGameDeserialize(List<object> saveData, ref int i)
+    {
+        base.MidGameDeserialize(saveData, ref i);
+        int numStored = (int)saveData[i++];
+        for (int n = 0; n < numStored; ++n)
+        {
+            int slot = (int)saveData[i++];
+            HoldType holdType = (HoldType)saveData[i++];
+            DigitizedObject d = this.digitizedObjects[n];
+            switch (holdType)
+            {
+                case CHEST:
+                    string chestPrefabName = (string)saveData[i++];
+                    bool locked = (bool)saveData[i++];
+                    bool glitched = (bool)saveData[i++];
+                    bool rainbow = (bool)saveData[i++];
+                    int numContents = (int)saveData[i++];
+                    List<int> contents = new List<int>(numContents);
+                    saveData.Add(numContents);
+                    for (int j = 0; j < numContents; ++j)
+                        contents.Add((int)saveData[i++]);
+                    this.digitizedObjects[slot] = new(){
+                        type = CHEST,
+                        data = _NameToPrefabMap[chestPrefabName],
+                        locked = locked,
+                        glitched = glitched,
+                        rainbow = rainbow,
+                        contents = contents.Count > 0 ? contents : null,
+                    };
+                    break;
+                case PICKUP:
+                    int pickupId = (int)saveData[i++];
+                    this.digitizedObjects[slot] = DigitizedObject.FromPickup(PickupObjectDatabase.GetById(pickupId));
+                    break;
+                default:
+                    string prefabName = (string)saveData[i++];
+                    this.digitizedObjects[slot] = new(){
+                        type = holdType,
+                        data = _NameToPrefabMap[prefabName],
+                    };
+                    break;
+            }
+        }
+        UpdateCurrentSlot();
     }
 
     private class FemtobyteAmmoDisplay : CustomAmmoDisplay

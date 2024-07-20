@@ -18,6 +18,7 @@
 - Rebalanced Vacuum Cleaner spawn rate by changing it from the CHARGE gun class to a new UTILITY gun class
 - Fixed Racket Launcher's idle animation playing when found in a chest
 - Fixed vanilla bug where hovering guns shoot from the wrong place if created while the player is facing left
+- Fixed broken midgame save serialization of guns
 
 ## 1.15.1 (2024-07-11)
 

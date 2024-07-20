@@ -35,7 +35,7 @@ public abstract class CwaffActive: PlayerItem, ICwaffItem
   }
 }
 
-public abstract class CwaffGun: GunBehaviour, ICwaffItem/*, ILevelLoadedListener*/
+public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILevelLoadedListener*/
 {
   private const string _DEFAULT_BARREL_OFFSET = "__default";
   private static Dictionary<string, Dictionary<string, List<Vector3>>> _BarrelOffsetCache = new();
