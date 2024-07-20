@@ -20,6 +20,8 @@
 - Fixed Racket Launcher's idle animation playing when found in a chest
 - Fixed vanilla bug where hovering guns shoot from the wrong place if created while the player is facing left
 - Fixed broken midgame save serialization of guns
+- Made Insurance Shop spawn randomly like other shops by default
+	- Guaranteed spawns can be re-enabled in the Mod Config menu
 
 ## 1.15.1 (2024-07-11)
 

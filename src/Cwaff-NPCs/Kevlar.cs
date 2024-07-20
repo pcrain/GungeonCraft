@@ -13,6 +13,8 @@ public class Kevlar
             IDs.Pickups["insurance_policy"],
         };
 
+        bool fixedSpawn = CwaffConfig._Gunfig.Value(CwaffConfig._SHOP_KEY) == "Classic";
+
         FancyShopData shop = FancyShopBuilder.MakeFancyShop(
             npcName                : "kevlar",
             shopItems              : shopItems,
@@ -20,9 +22,9 @@ public class Kevlar
             roomPath               : $"{C.MOD_INT_NAME}/Resources/Rooms/insurance.newroom",
             allowDupes             : true, // allow multiple insurance policies
             allowExcluded          : true, // insurance policies are excluded items
-            spawnChanceEachRun     : 1.0f,
+            spawnChanceEachRun     : fixedSpawn ? 1.0f : 0.33f,
             spawnPrerequisite      : CwaffPrerequisites.INSURANCE_PREREQUISITE,
-            prequisiteValidator    : PlayerHasGoodItem,
+            prequisiteValidator    : fixedSpawn ? PlayerHasGoodItem : null,
             idleFps                : 2,
             talkFps                : 8,
             loopTalk               : false,

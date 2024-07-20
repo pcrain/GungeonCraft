@@ -9,10 +9,10 @@
 
 ### Features
 
-- 114 new items, including
-	+ 58 new guns
-	+ 38 new passive items
-	+ 18 new active items
+- 119 new items, including
+	+ 60 new guns
+	+ 40 new passive items
+	+ 19 new active items
 - Lore for all new guns and items
 - 85 stylish cosmetic hats, accessible via a new hat room near Winchester in the Breach
 - Companion Shop: sells 3 random unlocked companions at a 30% discount

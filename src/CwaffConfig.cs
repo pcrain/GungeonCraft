@@ -52,8 +52,8 @@ public static class CwaffConfig
         "Classic".Yellow(),
         },
       info    : new(){
-        "Companion and Barter shops spawn randomly.\n\nTakes effect on game restart.".Green(),
-        "Companion shop always spawns on floor 1.\nBarter shop always spawns on floor 2/3.\nTakes effect on game restart.".Green(),
+        "Companion, Barter, and Insurance Shops\nspawn randomly.\nTakes effect on game restart.".Green(),
+        "Spawn Companion Shop floor 1, Barter Shop floor 2-3,\nand Insurance Shop with S or A tier item.\nTakes effect on game restart.".Green(),
         },
       updateType: Gunfig.Update.OnRestart
       );
