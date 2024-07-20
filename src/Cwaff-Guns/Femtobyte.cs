@@ -151,9 +151,7 @@ public class Femtobyte : CwaffGun
     {
         string name = bodyObject.name.Replace("(Clone)","").TrimEnd().ToLowerInvariant();
         // ETGModConsole.Log($"looking up {name} in prefab whitelist");
-        if (!_NameToPrefabMap.TryGetValue(name, out trapPrefab))
-            trapPrefab = null;
-        return trapPrefab != null;
+        return _NameToPrefabMap.TryGetValue(name, out trapPrefab);
     }
 
     private bool DigitizeEnemy(AIActor enemy, PrefabData data)
@@ -795,8 +793,6 @@ public class FemtobyteProjectile : MonoBehaviour
     private void TryToCollideWithPickups()
     {
         IPlayerInteractable nearestIxable = this._owner.CurrentRoom.GetNearestInteractable(this._projectile.SafeCenter, 1f, this._owner);
-        if (nearestIxable is PickupObject pp)
-            ETGModConsole.Log($"near pickup {pp.EncounterNameOrDisplayName}");
         if (nearestIxable is not PickupObject pickup || pickup.IsBeingEyedByRat || !pickup.isActiveAndEnabled)
             return;
         Vector2 otherPos = pickup.GetComponent<tk2dBaseSprite>().WorldCenter;

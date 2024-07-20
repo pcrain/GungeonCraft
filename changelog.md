@@ -22,6 +22,7 @@
 - Fixed broken midgame save serialization of guns
 - Made Insurance Shop spawn randomly like other shops by default
 	- Guaranteed spawns can be re-enabled in the Mod Config menu
+- Fixed Companion Shop having a weird floor when spawned in the Mines
 
 ## 1.15.1 (2024-07-11)
 
