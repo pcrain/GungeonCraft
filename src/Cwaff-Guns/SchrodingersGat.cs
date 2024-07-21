@@ -150,15 +150,13 @@ public class SchrodingersStat : MonoBehaviour
             Projectile p = StaticReferenceManager.AllProjectiles[i];
             if (!p || !p.sprite || p.Owner != this._enemy)
                 continue;
-            FancyVFX fv = FancyVFX.FromCurrentFrame(p.sprite);
-                fv.Setup(Vector2.zero, 1.0f, 1.0f);
-                fv.StartCoroutine(PhaseOut(fv, Vector2.right, 25f, 90f));
+            tk2dBaseSprite dupe = p.sprite.DuplicateInWorld();
+            dupe.StartCoroutine(PhaseOut(dupe, Vector2.right, 25f, 90f, 1.0f));
             p.DieInAir();
         }
 
-        FancyVFX fe = FancyVFX.FromCurrentFrame(this._enemy.sprite);
-            fe.Setup(Vector2.zero, 1.0f, 1.0f);
-            fe.StartCoroutine(PhaseOut(fe, Vector2.right, 25f, 90f));
+        tk2dBaseSprite edupe = this._enemy.sprite.DuplicateInWorld();
+        edupe.StartCoroutine(PhaseOut(edupe, Vector2.right, 25f, 90f, 1.0f));
 
         base.gameObject.Play("schrodinger_dead_sound");
         this._enemy.EraseFromExistenceWithRewards(false);
@@ -195,9 +193,8 @@ public class SchrodingersStat : MonoBehaviour
 
             if (UnityEngine.Random.value < 0.1f)  // create an afterimage
             {
-                FancyVFX fv = FancyVFX.FromCurrentFrame(this._enemy.sprite);
-                    fv.Setup(Vector2.zero, 0.5f, 0.5f);
-                    fv.StartCoroutine(PhaseOut(fv, Lazy.RandomVector(), 5f, 90f));
+                tk2dBaseSprite dupe = this._enemy.sprite.DuplicateInWorld();
+                dupe.StartCoroutine(PhaseOut(dupe, Lazy.RandomVector(), 5f, 90f, 0.5f));
             }
         }
     }
@@ -220,16 +217,17 @@ public class SchrodingersStat : MonoBehaviour
             Observe();
     }
 
-    private static IEnumerator PhaseOut(FancyVFX fe, Vector2 direction, float amplitude, float frequency)
+    private static IEnumerator PhaseOut(tk2dBaseSprite sprite, Vector2 direction, float amplitude, float frequency, float lifetime)
     {
-        fe.GetComponent<tk2dSprite>().color = Color.black;
-        float phase = 0f;
-        while (fe.gameObject)
+        sprite.color = Color.black;
+        for (float elapsed = 0f; elapsed < lifetime; elapsed += BraveTime.DeltaTime)
         {
-            phase += frequency * BraveTime.DeltaTime;
-            fe.transform.position += ((amplitude * Mathf.Sin(phase) * BraveTime.DeltaTime) * direction).ToVector3ZUp(0f);
+            float percentDone = elapsed / lifetime;
+            sprite.renderer.SetAlpha(1f - percentDone);
+            sprite.transform.position += ((amplitude * Mathf.Sin(frequency * elapsed) * BraveTime.DeltaTime) * direction).ToVector3ZUp(0f);
             yield return null;
         }
+        UnityEngine.Object.Destroy(sprite.gameObject);
         yield break;
     }
 }

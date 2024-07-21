@@ -1037,12 +1037,9 @@ public class CwaffVFX
                 m.SetFloat("_EmissivePower", emissivePower);
 
             Color emitColor = emissiveColor ?? Color.white;
-            // if (emissiveColor.HasValue)
-            {
-                m.SetFloat("_EmissiveColorPower", 1.55f);
-                m.SetColor("_EmissiveColor", emitColor);
-                m.SetColor("_OverrideColor", emitColor);
-            }
+            m.SetFloat("_EmissiveColorPower", 1.55f);
+            m.SetColor("_EmissiveColor", emitColor);
+            m.SetColor("_OverrideColor", emitColor);
         }
         else
         {
@@ -1105,11 +1102,6 @@ public class FancyVFX : MonoBehaviour
     private float      _endScale      = 1.0f;
     private bool       _changesScale  = false;
 
-    private void Start()
-    {
-        // ETGModConsole.Log($"created new fancy vfx {this.GetHashCode()}");
-    }
-
     private void LateUpdate()
     {
         if (!this._setup)
@@ -1137,12 +1129,11 @@ public class FancyVFX : MonoBehaviour
             float alpha = (this._curLifeTime - this._fadeStartTime) / this._fadeTotalTime;
             if (!this._fadeIn)
                 alpha = 1.0f - alpha;
-            // ETGModConsole.Log($"  setting alpha to {alpha}");
             this.sprite.renderer.SetAlpha(alpha);
         }
     }
 
-    public void Setup(Vector2 velocity, float lifetime = 0, float? fadeOutTime = null, Transform parent = null,
+    public void Setup(Vector2? velocity, float lifetime = 0, float? fadeOutTime = null, Transform parent = null,
         float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false, float startScale = 1.0f, float endScale = 1.0f, float? height = null,
         bool randomFrame = false)
     {
@@ -1151,7 +1142,7 @@ public class FancyVFX : MonoBehaviour
         this._curLifeTime = 0.0f;
         this._fadeIn = fadeIn;
 
-        this._velocity = (1.0f / C.PIXELS_PER_CELL) * velocity.ToVector3ZisY(0);
+        this._velocity = (1.0f / C.PIXELS_PER_CELL) * (velocity ?? Vector2.zero).ToVector3ZisY(0);
         this._maxLifeTime = (lifetime > 0) ? lifetime : 3600f;
         this._fadeOut = fadeOutTime.HasValue;
         if (this._fadeOut)
@@ -1179,12 +1170,9 @@ public class FancyVFX : MonoBehaviour
                 m.SetFloat("_EmissivePower", emissivePower);
 
             Color emitColor = emissiveColor ?? Color.white;
-            // if (emissiveColor.HasValue)
-            {
-                m.SetFloat("_EmissiveColorPower", 1.55f);
-                m.SetColor("_EmissiveColor", emitColor);
-                m.SetColor("_OverrideColor", emitColor);
-            }
+            m.SetFloat("_EmissiveColorPower", 1.55f);
+            m.SetColor("_EmissiveColor", emitColor);
+            m.SetColor("_OverrideColor", emitColor);
         }
 
         if (randomFrame)
@@ -1211,57 +1199,6 @@ public class FancyVFX : MonoBehaviour
         FancyVFX fv = v.AddComponent<FancyVFX>();
         fv.Setup(velocity ?? Vector2.zero, lifetime, fadeOutTime, parent, emissivePower, emissiveColor, fadeIn);
         return fv;
-    }
-
-    // Make a new FancyVFX from a GameObject's current sprite, frame, position, etc. (does not have a spriteanimator, use with caution)
-    public static FancyVFX FromCurrentFrame(tk2dBaseSprite osprite)
-    {
-        if (!osprite)
-            return null;
-
-        // GameObject g = UnityEngine.Object.Instantiate(new GameObject(), osprite.WorldCenter, osprite.transform.rotation);
-        tk2dBaseSprite sprite = osprite.DuplicateInWorld();
-
-        FancyVFX fv = sprite.AddComponent<FancyVFX>();
-            fv.sprite = sprite;
-        return fv;
-    }
-
-    private const float _MIN_SCALE      = 0.4f; // minimum scale our pickup can shrink down to
-    private const float _VANISH_PERCENT = 0.5f; // percent of the way through the wrap animation the pickup should vanish
-
-    // Make the FancyVFX arc smoothly from its current position to a target position
-    public void ArcTowards(float animLength, tk2dBaseSprite targetSprite, bool useBottom = false, float minScale = _MIN_SCALE, float vanishPercent = _VANISH_PERCENT)
-    {
-        // Setup the VFX object for the pickup
-        this.Setup(velocity: Vector2.zero, lifetime: animLength * vanishPercent, fadeOutTime: animLength * vanishPercent, fadeIn: false);
-
-        // Do the actual arcing
-        this.StartCoroutine(ArcTowards_CR(
-          animLength: animLength, targetSprite: targetSprite, useBottom: useBottom, minScale: minScale, vanishPercent: vanishPercent
-          ));
-    }
-
-    private IEnumerator ArcTowards_CR(float animLength, tk2dBaseSprite targetSprite, bool useBottom, float minScale, float vanishPercent)
-    {
-        // Suck the pickup into the present and wait for the animation to play out
-        Vector2 startPosition = this.sprite.WorldCenter;
-        float loopLength      = animLength * vanishPercent;
-        for (float elapsed = 0f; elapsed < loopLength; elapsed += BraveTime.DeltaTime)
-        {
-            if (!this)
-                break;
-
-            float percentDone                = Mathf.Clamp01(elapsed / loopLength);
-            float cubicLerp                  = Ease.OutCubic(percentDone);
-            Vector2 extraOffset              = new Vector2(0f, 2f * Mathf.Sin(Mathf.PI * cubicLerp));
-            Vector2 curPosition              = extraOffset + Vector2.Lerp(startPosition, useBottom ? targetSprite.WorldBottomCenter : targetSprite.WorldCenter, cubicLerp);
-            float scale                      = 1f - ((1f - minScale) * cubicLerp);
-            this.sprite.transform.localScale = new Vector3(scale, scale, 1f);
-            this.sprite.PlaceAtScaledPositionByAnchor(curPosition, Anchor.MiddleCenter);
-            yield return null;
-        }
-        yield break;
     }
 }
 

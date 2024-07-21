@@ -2302,4 +2302,37 @@ public static class Extensions
     linked.RemoveLast();
     return t;
   }
+
+  // Make a sprite arc smoothly from its current position to a target position
+  // minScale == minimum scale our pickup can shrink down to
+  // vanishPercent == percent of the way through the wrap animation the pickup should vanish
+  public static void ArcTowards(this tk2dBaseSprite sprite, float animLength, tk2dBaseSprite targetSprite, bool useBottom = false, float minScale = 0.4f, float vanishPercent = 0.5f)
+  {
+      sprite.StartCoroutine(ArcTowards_CR(sprite: sprite, animLength: animLength, targetSprite: targetSprite, useBottom: useBottom,
+        minScale: minScale, vanishPercent: vanishPercent));
+  }
+
+  private static IEnumerator ArcTowards_CR(tk2dBaseSprite sprite, float animLength, tk2dBaseSprite targetSprite, bool useBottom, float minScale, float vanishPercent)
+  {
+      // Suck the pickup into the present and wait for the animation to play out
+      Vector2 startPosition = sprite.WorldCenter;
+      float loopLength      = animLength * vanishPercent;
+      for (float elapsed = 0f; elapsed < loopLength; elapsed += BraveTime.DeltaTime)
+      {
+          if (!sprite)
+              break;
+
+          float percentDone                = Mathf.Clamp01(elapsed / loopLength);
+          float cubicLerp                  = Ease.OutCubic(percentDone);
+          Vector2 extraOffset              = new Vector2(0f, 2f * Mathf.Sin(Mathf.PI * cubicLerp));
+          Vector2 curPosition              = extraOffset + Vector2.Lerp(startPosition, useBottom ? targetSprite.WorldBottomCenter : targetSprite.WorldCenter, cubicLerp);
+          float scale                      = 1f - ((1f - minScale) * cubicLerp);
+          sprite.transform.localScale = new Vector3(scale, scale, 1f);
+          sprite.PlaceAtScaledPositionByAnchor(curPosition, Anchor.MiddleCenter);
+          sprite.renderer.SetAlpha(1f - loopLength);
+          yield return null;
+      }
+      UnityEngine.Object.Destroy(sprite.gameObject);
+      yield break;
+  }
 }

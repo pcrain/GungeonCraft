@@ -186,9 +186,9 @@ public class KaliProjectile : MonoBehaviour
             return;
         if (other.Owner is PlayerController)
             return;
-        FancyVFX glowyBoi = FancyVFX.FromCurrentFrame(other.sprite);
-        glowyBoi.sprite.SetGlowiness(300f, overrideColor: Color.cyan, glowColor: Color.cyan, clampBrightness: false);
-        glowyBoi.sprite.StartCoroutine(CriticalGlow(glowyBoi.sprite));
+        tk2dBaseSprite glowyBoi = other.sprite.DuplicateInWorld();
+        glowyBoi.SetGlowiness(300f, overrideColor: Color.cyan, glowColor: Color.cyan, clampBrightness: false);
+        glowyBoi.StartCoroutine(CriticalGlow(glowyBoi));
         other.DieInAir(suppressInAirEffects: true, allowActorSpawns: false, allowProjectileSpawns: false, killedEarly: true);
     }
 
@@ -204,9 +204,9 @@ public class KaliProjectile : MonoBehaviour
     {
         if (!body.aiActor || body.aiActor.IsABoss(canBeDead: true))
             return;
-        FancyVFX glowyBoi = FancyVFX.FromCurrentFrame(body.aiActor.sprite);
-        glowyBoi.sprite.SetGlowiness(300f, overrideColor: Color.cyan, glowColor: Color.cyan, clampBrightness: false);
-        glowyBoi.sprite.StartCoroutine(CriticalGlow(glowyBoi.sprite));
+        tk2dBaseSprite glowyBoi = body.aiActor.sprite.DuplicateInWorld();
+        glowyBoi.SetGlowiness(300f, overrideColor: Color.cyan, glowColor: Color.cyan, clampBrightness: false);
+        glowyBoi.StartCoroutine(CriticalGlow(glowyBoi));
         body.aiActor.EraseFromExistence(true);
     }
 

@@ -429,9 +429,9 @@ public class WrappableGift : MonoBehaviour
         float animLength       = Missiletoe._WrapAnimLength;
 
         // Create a VFX object for the pickup
-        FancyVFX pickupvfx = null;
+        tk2dBaseSprite pickupvfx = null;
         if (wrapping)
-            pickupvfx = FancyVFX.FromCurrentFrame(this._pickup.sprite);
+            pickupvfx = this._pickup.sprite.DuplicateInWorld();
 
         // Clone and destroy the pickup itself (logic is largely from Pickup() methods without actually picking items up)
         if (wrapping)
@@ -492,8 +492,7 @@ public class WrappableGift : MonoBehaviour
         // If we're wrapping the pickup, make it magically hover over to the present
         if (wrapping)
         {
-            pickupvfx.ArcTowards(
-              animLength: animLength, targetSprite: this._vfx.sprite, useBottom: true, minScale: _MIN_SCALE, vanishPercent: _VANISH_PERCENT);
+            pickupvfx.ArcTowards(animLength: animLength, targetSprite: this._vfx.sprite, useBottom: true, minScale: _MIN_SCALE, vanishPercent: _VANISH_PERCENT);
             yield break;
         }
 
