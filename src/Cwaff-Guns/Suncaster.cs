@@ -434,11 +434,11 @@ public class SuncasterPrism : MonoBehaviour, IPlayerInteractable
         // if (((this._last_trace + _TRACE_RATE) < BraveTime.ScaledTimeSinceStartup))
         // {
         //   this._last_trace = BraveTime.ScaledTimeSinceStartup;
-        //   FancyVFX.Spawn(Suncaster._TraceVFX, base.transform.position, velocity: 12f * this._angle, lifetime: 0.5f, fadeOutTime: 0.5f);
+        //   CwaffVFX.Spawn(Suncaster._TraceVFX, base.transform.position, velocity: 12f * this._angle, lifetime: 0.5f, fadeOutTime: 0.5f);
         //   // if (this._trace && this._owner)
         //   // {
         //   //   this._newAngle = this._owner.m_currentGunAngle.ToVector().normalized;
-        //   //   FancyVFX.Spawn(Suncaster._NewTraceVFX, base.transform.position, velocity: 12f * this._newAngle, lifetime: 0.5f, fadeOutTime: 0.5f);
+        //   //   CwaffVFX.Spawn(Suncaster._NewTraceVFX, base.transform.position, velocity: 12f * this._newAngle, lifetime: 0.5f, fadeOutTime: 0.5f);
         //   // }
         // }
     }

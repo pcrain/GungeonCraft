@@ -174,7 +174,7 @@ public class Missiletoe : CwaffGun
             case ItemQuality.B: return _GiftProjectileB;
             case ItemQuality.C: return _GiftProjectileC;
             case ItemQuality.D: return _GiftProjectileD;
-            default                        : return _GiftProjectileD;
+            default:            return _GiftProjectileD;
         }
     }
 
@@ -187,7 +187,7 @@ public class Missiletoe : CwaffGun
             case ItemQuality.B: return wrap ? _WrapVFXB : _UnwrapVFXB;
             case ItemQuality.C: return wrap ? _WrapVFXC : _UnwrapVFXC;
             case ItemQuality.D: return wrap ? _WrapVFXD : _UnwrapVFXD;
-            default                        : return wrap ? _WrapVFXD : _UnwrapVFXD;
+            default:            return wrap ? _WrapVFXD : _UnwrapVFXD;
         }
     }
 
@@ -391,7 +391,7 @@ public class WrappableGift : MonoBehaviour
 
     private static readonly Vector2 _EXTRA_OFFSET = new Vector2(0f, 0.75f); // make the pickup enter near the center of the present
 
-    private FancyVFX _vfx;
+    private GameObject _vfx;
     private tk2dBaseSprite _sprite;
     private tk2dSpriteAnimator _animator;
     private Vector3 _position;
@@ -412,10 +412,11 @@ public class WrappableGift : MonoBehaviour
         this._gun      = gun;
         this._position = position;
         this._pickup   = pickup;
-        this._vfx      = FancyVFX.SpawnUnpooled(Missiletoe.GetGiftVFX(pickup.quality, !unwrapping), this._position, Quaternion.identity,
-            velocity: Vector2.zero, lifetime: Missiletoe._WrapAnimLength + 0.5f, fadeOutTime: 0.25f);
-        this._sprite   = this._vfx.sprite;
-        this._animator = this._sprite.spriteAnimator;
+
+        this._vfx      = SpawnManager.SpawnVFX(Missiletoe.GetGiftVFX(pickup.quality, !unwrapping), this._position, Quaternion.identity, ignoresPools: true);
+        this._vfx.ExpireIn(Missiletoe._WrapAnimLength + 0.5f, fadeFor: 0.25f);
+        this._sprite   = this._vfx.GetComponent<tk2dBaseSprite>();
+        this._animator = this._vfx.GetComponent<tk2dSpriteAnimator>();
 
         StartCoroutine(WrapItUp(unwrapping));
     }
@@ -475,9 +476,9 @@ public class WrappableGift : MonoBehaviour
         }
 
         // Pause the gift's default animation and let it grow into existence first
-        this._vfx.gameObject.SetAlphaImmediate(0f); // make sure we start invisible to avoid first-frame glitches
+        this._vfx.SetAlphaImmediate(0f); // make sure we start invisible to avoid first-frame glitches
         yield return null;
-        this._vfx.gameObject.SetAlpha(1f);
+        this._vfx.SetAlpha(1f);
         this._animator.StopAndResetFrame();
         base.gameObject.Play("present_create_sound");
         for (float elapsed = 0f; elapsed < _GROW_TIME; elapsed += BraveTime.DeltaTime)
@@ -492,7 +493,7 @@ public class WrappableGift : MonoBehaviour
         // If we're wrapping the pickup, make it magically hover over to the present
         if (wrapping)
         {
-            pickupvfx.ArcTowards(animLength: animLength, targetSprite: this._vfx.sprite, useBottom: true, minScale: _MIN_SCALE, vanishPercent: _VANISH_PERCENT);
+            pickupvfx.ArcTowards(animLength: animLength, targetSprite: this._sprite, useBottom: true, minScale: _MIN_SCALE, vanishPercent: _VANISH_PERCENT);
             yield break;
         }
 

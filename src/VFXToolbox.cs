@@ -784,6 +784,7 @@ public static class VFX
     }
 }
 
+/// <summary>Custom implementation of lightweight pooled VFX to reduce garbage collection lag</summary>
 public class CwaffVFX
 {
     // pools
@@ -1081,124 +1082,6 @@ public class CwaffVFX
                 alpha = 1.0f - alpha;
             this._sprite.renderer.SetAlpha(alpha);
         }
-    }
-}
-
-// Helper class for making movable / fadeable  VFX
-public class FancyVFX : MonoBehaviour
-{
-    public tk2dBaseSprite sprite;
-
-    private GameObject _vfx           = null;
-    private Vector3    _velocity      = Vector3.zero;
-    private float      _curLifeTime   = 0.0f;
-    private bool       _fadeOut       = false;
-    private float      _fadeStartTime = 0.0f;
-    private float      _fadeTotalTime = 0.0f;
-    private float      _maxLifeTime   = 0.0f;
-    private bool       _setup         = false;
-    private bool       _fadeIn        = false;
-    private float      _startScale    = 1.0f;
-    private float      _endScale      = 1.0f;
-    private bool       _changesScale  = false;
-
-    private void LateUpdate()
-    {
-        if (!this._setup)
-            return;
-
-        this._curLifeTime += BraveTime.DeltaTime;
-        float percentDone = this._curLifeTime / this._maxLifeTime;
-        if (percentDone >= 1.0f)
-        {
-            this._vfx.SafeDestroy();
-            this._vfx = null;
-            UnityEngine.Object.Destroy(this);
-            return;
-        }
-
-        this.sprite.transform.position += this._velocity * C.FPS * BraveTime.DeltaTime;
-        if (this._changesScale)
-        {
-            float scale = Mathf.Lerp(this._startScale, this._endScale, percentDone);
-            this.sprite.transform.localScale = new Vector3(scale, scale, 1.0f);
-        }
-
-        if (this._fadeOut && this._curLifeTime > this._fadeStartTime)
-        {
-            float alpha = (this._curLifeTime - this._fadeStartTime) / this._fadeTotalTime;
-            if (!this._fadeIn)
-                alpha = 1.0f - alpha;
-            this.sprite.renderer.SetAlpha(alpha);
-        }
-    }
-
-    public void Setup(Vector2? velocity, float lifetime = 0, float? fadeOutTime = null, Transform parent = null,
-        float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false, float startScale = 1.0f, float endScale = 1.0f, float? height = null,
-        bool randomFrame = false)
-    {
-        this._vfx = base.gameObject;
-        this.sprite = this._vfx.GetComponent<tk2dSprite>();
-        this._curLifeTime = 0.0f;
-        this._fadeIn = fadeIn;
-
-        this._velocity = (1.0f / C.PIXELS_PER_CELL) * (velocity ?? Vector2.zero).ToVector3ZisY(0);
-        this._maxLifeTime = (lifetime > 0) ? lifetime : 3600f;
-        this._fadeOut = fadeOutTime.HasValue;
-        if (this._fadeOut)
-        {
-            this._fadeTotalTime = fadeOutTime.Value;
-            this._fadeStartTime = this._maxLifeTime - this._fadeTotalTime;
-            // ETGModConsole.Log($"setup with fade from {this._fadeStartTime} to {this._fadeTotalTime} with fadeIn {fadeIn}");
-        }
-        if (height.HasValue)
-        {
-            this.sprite.HeightOffGround = height.Value;
-            this.sprite.UpdateZDepth();
-        }
-        this.transform.parent = parent;
-
-        this._startScale   = startScale;
-        this._endScale     = endScale;
-        this._changesScale = this._startScale != this._endScale;
-
-        if (emissivePower > 0)
-        {
-            // this._sprite.usesOverrideMaterial = true;
-            Material m = this.sprite.renderer.material;
-                m.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-                m.SetFloat("_EmissivePower", emissivePower);
-
-            Color emitColor = emissiveColor ?? Color.white;
-            m.SetFloat("_EmissiveColorPower", 1.55f);
-            m.SetColor("_EmissiveColor", emitColor);
-            m.SetColor("_OverrideColor", emitColor);
-        }
-
-        if (randomFrame)
-            this._vfx.PickFrame();
-
-        this._setup = true;
-    }
-
-    /// <summary>Make a new FancyVFX from a normal SpawnManager.SpawnVFX, ignoring pools (necessary for adding custom components)</summary>
-    /// <param name="prefab">Prefab for the VFX we want to spawn</param>
-    /// <param name="position">Position at which the VFX is spawned</param>
-    /// <param name="rotation">Rotation of the VFX sprite.</param>
-    /// <param name="velocity">Velocity with which the VFX is launched</param>
-    /// <param name="lifetime">Time before VFX automatically despawn. Set to 0 for no automatic despawning.</param>
-    /// <param name="fadeOutTime">Time before VFX fade out to 0 alpha. If greater than lifetime, VFX will spawn in partially faded. Disabled if null.</param>
-    /// <param name="parent">If non-null, VFX will automatically move with the parent transform.</param>
-    /// <param name="emissivePower">Emissive power of the VFX. Ignored if fadeOutTime is non-null.</param>
-    /// <param name="emissiveColor">Emissive color of the VFX. Ignored if fadeOutTime is non-null.</param>
-    /// <param name="fadeIn">If true, VFX will fade in instead of fading out.</param>
-    public static FancyVFX SpawnUnpooled(GameObject prefab, Vector3 position, Quaternion? rotation = null,
-        Vector2? velocity = null, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false)
-    {
-        GameObject v = SpawnManager.SpawnVFX(prefab, position, rotation ?? Quaternion.identity, ignoresPools: true);
-        FancyVFX fv = v.AddComponent<FancyVFX>();
-        fv.Setup(velocity ?? Vector2.zero, lifetime, fadeOutTime, parent, emissivePower, emissiveColor, fadeIn);
-        return fv;
     }
 }
 

@@ -46,7 +46,7 @@ public class SlappProjectile : MonoBehaviour
     private Vector2    _slapAngle  = Vector2.zero;
     private bool       _flipped    = false;
     private float      _slapDamage = 0f;
-    private FancyVFX   _vfx        = null;
+    private GameObject _vfx        = null;
     private bool       _isMastered = false;
 
     private void Start()
@@ -71,25 +71,20 @@ public class SlappProjectile : MonoBehaviour
         this._slapAngle = this._isMastered
             ? this._projectile.Direction
             : this._projectile.Direction.Rotate(this._flipped ? -90f : 90f);
-        this._vfx = FancyVFX.SpawnUnpooled( //NOTE: absolutely MUST ignore pools or VFX objects with preexisting FancyVFX components might get reused
-            prefab      : HandCannon._SlapppAnimation,
-            position    : this._projectile.sprite.transform.position,
-            rotation    : this._projectile.sprite.transform.rotation,
-            lifetime    : 0.5f,
-            fadeOutTime : 0.20f,
-            parent      : enemy.sprite.transform);
-        this._vfx.sprite.FlipY = this._flipped; //smack in the opposite direction by flipping vertically, not horizontally
-        this._vfx.gameObject.AddAnimationEvent(SlapppEvent, _SLAPPP_FRAME, this._isMastered ? "clappp_sound" : "slappp_sound");
+        Transform pt = this._projectile.sprite.transform;
+        //NOTE: absolutely MUST ignore pools or VFX objects with preexisting components might get reused
+        this._vfx = SpawnManager.SpawnVFX(HandCannon._SlapppAnimation, pt.position, pt.rotation, ignoresPools: true);
+        this._vfx.transform.parent = enemy.sprite.transform;
+        this._vfx.ExpireIn(0.5f, fadeFor: 0.2f);
+        this._vfx.AddAnimationEvent(SlapppEvent, _SLAPPP_FRAME, this._isMastered ? "clappp_sound" : "slappp_sound");
+        this._vfx.GetComponent<tk2dSprite>().FlipY = this._flipped; //smack in the opposite direction by flipping vertically, not horizontally
         if (this._isMastered)
         {
-            FancyVFX otherHand = FancyVFX.SpawnUnpooled(
-                prefab      : HandCannon._SlapppAnimation,
-                position    : this._projectile.sprite.transform.position,
-                rotation    : this._projectile.sprite.transform.rotation,
-                lifetime    : 0.5f,
-                fadeOutTime : 0.20f,
-                parent      : enemy.sprite.transform);
-            otherHand.sprite.FlipY = !this._flipped;
+            GameObject otherHand = SpawnManager.SpawnVFX(HandCannon._SlapppAnimation, pt.position, pt.rotation, ignoresPools: true);
+            otherHand.transform.parent = enemy.sprite.transform;
+            otherHand.ExpireIn(0.5f, fadeFor: 0.2f);
+            otherHand.AddAnimationEvent(SlapppEvent, _SLAPPP_FRAME, this._isMastered ? "clappp_sound" : "slappp_sound");
+            otherHand.GetComponent<tk2dSprite>().FlipY = !this._flipped;
         }
         this._projectile.DieInAir(suppressInAirEffects: true, allowActorSpawns: false, allowProjectileSpawns: false, killedEarly: false);
     }
@@ -101,6 +96,7 @@ public class SlappProjectile : MonoBehaviour
             return;
 
         Vector2 victimPos = this._slapVictim.CenterPosition;
+        Vector2 impactPos = this._vfx.GetComponent<tk2dSprite>().WorldCenter;
         foreach (AIActor enemy in StaticReferenceManager.AllEnemies)
         {
             if (!enemy || !enemy.isActiveAndEnabled)
@@ -119,7 +115,7 @@ public class SlappProjectile : MonoBehaviour
             tk2dSprite sprite = go.GetComponent<tk2dSprite>();
             if (this._isMastered)
                 sprite.scale = new Vector3(3f, 3f, 1f);
-            sprite.PlaceAtScaledPositionByAnchor(this._vfx.sprite.WorldCenter, Anchor.MiddleCenter);
+            sprite.PlaceAtScaledPositionByAnchor(impactPos, Anchor.MiddleCenter);
         }
         UnityEngine.Object.Destroy(this);
     }

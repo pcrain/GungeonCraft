@@ -584,7 +584,6 @@ public class Femtobyte : CwaffGun
 
     public static void SpawnBitBurst(Vector2 pos, int howMany)
     {
-        // FancyVFX.SpawnBurst(prefab: _ImpactBits, numToSpawn: howMany, basePosition: pos,
         CwaffVFX.SpawnBurst(prefab: _ImpactBits, numToSpawn: howMany, basePosition: pos,
             positionVariance: 1f, baseVelocity: 10f * Vector2.up, velocityVariance: 5f, velType: CwaffVFX.Vel.Radial,
             lifetime: 0.5f, fadeOutTime: 0.5f, randomFrame: true);
