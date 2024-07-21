@@ -2293,4 +2293,12 @@ public static class Extensions
       pathMover.Path = serializedPath;
       pathMover.PathStartNode = 0;
   }
+
+  /// <summary>Return and remove the last element of a LinkedList</summary>
+  public static T Pop<T>(this LinkedList<T> linked)
+  {
+    T t = linked.Last();
+    linked.RemoveLast();
+    return t;
+  }
 }

@@ -784,6 +784,247 @@ public static class VFX
     }
 }
 
+public class CwaffVFX
+{
+    // pools
+    private static readonly LinkedList<CwaffVFX> _SpawnedVFX = new();
+    private static readonly LinkedList<CwaffVFX> _DespawnedVFX = new();
+
+    // locals
+    private GameObject _vfx;
+    private LinkedListNode<CwaffVFX> _node;
+    private tk2dSprite _sprite;
+    private tk2dSpriteAnimator _animator;
+    private tk2dSpriteAnimation _library;
+
+    private Vector3    _velocity      = Vector3.zero;
+    private float      _curLifeTime   = 0.0f;
+    private bool       _fadeOut       = false;
+    private float      _fadeStartTime = 0.0f;
+    private float      _fadeTotalTime = 0.0f;
+    private float      _maxLifeTime   = 0.0f;
+    private bool       _setup         = false;
+    private bool       _fadeIn        = false;
+    private float      _startScale    = 1.0f;
+    private float      _endScale      = 1.0f;
+    private bool       _changesScale  = false;
+    private bool       _shouldDespawn      = false;
+
+    private class CwaffVFXManager : MonoBehaviour
+    {
+        private void Update()
+        {
+            int numActive = _SpawnedVFX.Count;
+            // ETGModConsole.Log($"updating {numActive} active VFX");
+            LinkedListNode<CwaffVFX> current = _SpawnedVFX.First;
+            LinkedListNode<CwaffVFX> next;
+            for (int i = 0; i < numActive; ++i)
+            {
+                CwaffVFX c = current.Value;
+                if (c == null)
+                {
+                    ETGModConsole.Log($"bad 1");
+                    return;
+                }
+                next = current.Next;
+                c.ManualUpdate();
+                if (c._shouldDespawn)
+                {
+                    _SpawnedVFX.Remove(c._node);
+                    _DespawnedVFX.AddLast(c._node);
+                }
+                current = next;
+            }
+        }
+    }
+
+    // private constructor, can't spawn manually
+    private CwaffVFX()
+    {
+        this._vfx = new();
+        UnityEngine.Object.DontDestroyOnLoad(this._vfx); // make our pooled vfx last forever
+        this._node = null;
+        this._sprite = this._vfx.AddComponent<tk2dSprite>();
+        this._animator = this._vfx.AddComponent<tk2dSpriteAnimator>();
+        this._library = this._vfx.AddComponent<tk2dSpriteAnimation>();
+
+        this._animator.library = this._library;
+        this._animator.playAutomatically = true;
+    }
+
+    public static void Spawn(GameObject prefab, Vector3 position, Quaternion? rotation = null,
+        Vector2? velocity = null, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0, Color? emissiveColor = null,
+        bool fadeIn = false, float startScale = 1.0f, float endScale = 1.0f, float? height = null, bool randomFrame = false)
+    {
+        // TODO: be smarter about this later
+        GameManager.Instance.GetOrAddComponent<CwaffVFXManager>();
+
+        CwaffVFX c;
+        if (_DespawnedVFX.Count > 0)
+        {
+            c = _DespawnedVFX.Pop(); // reusing pooled vfx
+        }
+        else
+        {
+            ETGModConsole.Log($"creating new vfx {_SpawnedVFX.Count}");
+            c = new();
+        }
+        if (c._node == null)
+            c._node = _SpawnedVFX.AddLast(c);
+        else
+            _SpawnedVFX.AddLast(c._node);
+        c._shouldDespawn = false;
+        c.Setup(prefab, position, rotation ?? Quaternion.identity, velocity ?? Vector2.zero, lifetime, fadeOutTime, parent, emissivePower, emissiveColor, fadeIn, startScale, endScale, height, randomFrame);
+    }
+
+    private static void Despawn(CwaffVFX c)
+    {
+        c._shouldDespawn = true;
+        c._setup = false;
+        c._vfx.SetActive(false);
+    }
+
+    public static void SpawnBurst(GameObject prefab, int numToSpawn, Vector2 basePosition, float positionVariance = 0f, Vector2? baseVelocity = null, float minVelocity = 0f, float velocityVariance = 0f,
+        FancyVFX.Vel velType = FancyVFX.Vel.Random, FancyVFX.Rot rotType = FancyVFX.Rot.None, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0,
+        Color? emissiveColor = null, bool fadeIn = false, bool uniform = false, float startScale = 1.0f, float endScale = 1.0f, float? height = null, bool randomFrame = false)
+    {
+        Vector2 realBaseVelocity = baseVelocity ?? Vector2.zero;
+        float baseAngle = Lazy.RandomAngle();
+        for (int i = 0; i < numToSpawn; ++i)
+        {
+            float posOffsetAngle = uniform ? (baseAngle + 360f * ((float)i / numToSpawn)).Clamp360() : Lazy.RandomAngle();
+            Vector2 finalpos = (positionVariance > 0)
+                ? basePosition + posOffsetAngle.ToVector((uniform ? 1f : UnityEngine.Random.value) * positionVariance)
+                : basePosition;
+            Vector2 velocity = velType switch {
+                FancyVFX.Vel.Random     => realBaseVelocity + Lazy.RandomAngle().ToVector(minVelocity + UnityEngine.Random.value * velocityVariance),
+                FancyVFX.Vel.Radial     => realBaseVelocity + Lazy.RandomAngle().ToVector(minVelocity + velocityVariance),
+                FancyVFX.Vel.Away       => realBaseVelocity + posOffsetAngle.ToVector(minVelocity + UnityEngine.Random.value * velocityVariance),
+                FancyVFX.Vel.AwayRadial => realBaseVelocity + posOffsetAngle.ToVector(minVelocity + velocityVariance),
+                _              => realBaseVelocity,
+            };
+            Quaternion rot = rotType switch {
+                FancyVFX.Rot.Random   => UnityEngine.Random.Range(0f,360f).EulerZ(),
+                FancyVFX.Rot.Position => posOffsetAngle.EulerZ(),
+                FancyVFX.Rot.Velocity => velocity.EulerZ(),
+                _            => Quaternion.identity,
+                };
+            CwaffVFX.Spawn(
+                prefab        : prefab,
+                position      : finalpos,
+                rotation      : rot,
+                velocity      : velocity,
+                lifetime      : lifetime,
+                fadeIn        : fadeIn,
+                fadeOutTime   : fadeOutTime,
+                emissivePower : emissivePower,
+                emissiveColor : emissiveColor,
+                parent        : parent,
+                startScale    : startScale,
+                endScale      : endScale,
+                height        : height,
+                randomFrame   : randomFrame
+                );
+        }
+    }
+
+    public void Setup(GameObject prefab, Vector3 position, Quaternion? rotation = null,
+        Vector2? velocity = null, float lifetime = 0, float? fadeOutTime = null, Transform parent = null,
+        float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false, float startScale = 1.0f, float endScale = 1.0f, float? height = null,
+        bool randomFrame = false)
+    {
+        this._vfx.SetActive(true);
+        this._vfx.transform.position = position;
+        this._vfx.transform.localRotation = rotation ?? Quaternion.identity;
+
+        tk2dSprite          prefabSprite  = prefab.GetComponent<tk2dSprite>();
+        tk2dSpriteAnimator  prefabAnim    = prefab.GetComponent<tk2dSpriteAnimator>();
+        tk2dSpriteAnimation prefabLibrary = prefab.GetComponent<tk2dSpriteAnimation>();
+        this._sprite.SetSprite(prefabSprite.collection, prefabSprite.spriteId);
+        this._library.clips = prefabLibrary.clips;
+
+        // old stuff
+
+        this._curLifeTime = 0.0f;
+        this._fadeIn = fadeIn;
+
+        this._velocity = velocity.HasValue ? (1.0f / C.PIXELS_PER_CELL) * velocity.Value.ToVector3ZisY(0) : Vector3.zero;
+        this._maxLifeTime = (lifetime > 0) ? lifetime : 3600f;
+        this._fadeOut = fadeOutTime.HasValue;
+        if (this._fadeOut)
+        {
+            this._fadeTotalTime = fadeOutTime.Value;
+            this._fadeStartTime = this._maxLifeTime - this._fadeTotalTime;
+            // ETGModConsole.Log($"setup with fade from {this._fadeStartTime} to {this._fadeTotalTime} with fadeIn {fadeIn}");
+        }
+        if (height.HasValue)
+        {
+            this._sprite.HeightOffGround = height.Value;
+            this._sprite.UpdateZDepth();
+        }
+        this._vfx.transform.parent = parent;
+
+        this._sprite.scale = new Vector3(startScale, startScale, startScale);
+        this._startScale   = startScale;
+        this._endScale     = endScale;
+        this._changesScale = this._startScale != this._endScale;
+
+        if (emissivePower > 0)
+        {
+            // this._sprite.usesOverrideMaterial = true;
+            Material m = this._sprite.renderer.material;
+                m.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+                m.SetFloat("_EmissivePower", emissivePower);
+
+            Color emitColor = emissiveColor ?? Color.white;
+            // if (emissiveColor.HasValue)
+            {
+                m.SetFloat("_EmissiveColorPower", 1.55f);
+                m.SetColor("_EmissiveColor", emitColor);
+                m.SetColor("_OverrideColor", emitColor);
+            }
+        }
+        else
+        {
+            //TODO: handle non-emissive case
+        }
+
+        if (randomFrame)
+            this._animator.PickFrame();
+
+        this._setup = true;
+    }
+
+    private void ManualUpdate()
+    {
+        if (!this._setup)
+            return;
+
+        this._curLifeTime += BraveTime.DeltaTime;
+        float percentDone = this._curLifeTime / this._maxLifeTime;
+        if (percentDone >= 1.0f)
+        {
+            Despawn(this);
+            return;
+        }
+
+        this._sprite.transform.position += this._velocity * C.FPS * BraveTime.DeltaTime;
+        if (this._changesScale)
+        {
+            float scale = Mathf.Lerp(this._startScale, this._endScale, percentDone);
+            this._sprite.transform.localScale = new Vector3(scale, scale, 1.0f);
+        }
+
+        if (this._fadeOut && this._curLifeTime > this._fadeStartTime)
+        {
+            float alpha = (this._curLifeTime - this._fadeStartTime) / this._fadeTotalTime;
+            if (!this._fadeIn)
+                alpha = 1.0f - alpha;
+            this._sprite.renderer.SetAlpha(alpha);
+        }
+    }
+}
+
 // Helper class for making movable / fadeable  VFX
 public class FancyVFX : MonoBehaviour
 {
