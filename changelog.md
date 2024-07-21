@@ -1,5 +1,9 @@
 # Changelog
 
+## TBD
+
+- Optimized VFX creation code to reduce memory usage and lag spike frequency
+
 ## 1.16.0 (2024-07-20)
 
 #### Features:

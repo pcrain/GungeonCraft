@@ -787,20 +787,30 @@ public static class VFX
 /// <summary>Custom implementation of lightweight pooled VFX to reduce garbage collection lag</summary>
 public partial class CwaffVFX // public
 {
+    /// <summary>Rotation behavior of VFX spawned by SpawnBurst()</summary>
     public enum Rot
     {
-        None,     // do note rotate the VFX
-        Random,   // rotate the VFX randomly
-        Position, // rotation matches the VFX's position relative to the base position
-        Velocity, // rotation matches the VFX's velocity
+        ///<summary>Do note rotate the VFX.</summary>
+        None,
+        ///<summary>Rotate the VFX randomly.</summary>
+        Random,
+        ///<summary>Rotation matches the VFX's position relative to the base position.</summary>
+        Position,
+        ///<summary>Rotation matches the VFX's velocity.</summary>
+        Velocity,
     }
 
+    /// <summary>Velocity behavior of VFX spawned by SpawnBurst()</summary>
     public enum Vel
     {
-        Random,       // base velocity is augmented by a random vector with magnitude between 0 and velocityVariance
-        Radial,       // base velocity is augmented by a random vector with magnitude of exactly velocityVariance
-        Away,         // base velocity is augmented by a vector away from position with magnitude between 0 and velocityVariance
-        AwayRadial,   // base velocity is augmented by a vector away from position with magnitude of exactly velocityVariance
+        ///<summary>Base velocity is augmented by a random vector with magnitude between 0 and velocityVariance.</summary>
+        Random,
+        ///<summary>Base velocity is augmented by a random vector with magnitude of exactly velocityVariance.</summary>
+        Radial,
+        ///<summary>Base velocity is augmented by a vector away from position with magnitude between 0 and velocityVariance.</summary>
+        Away,
+        ///<summary>Base velocity is augmented by a vector away from position with magnitude of exactly velocityVariance.</summary>
+        AwayRadial,
     }
 
     /// <summary>Spawn a single FancyVFX from a normal SpawnManager.SpawnVFX</summary>
