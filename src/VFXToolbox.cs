@@ -785,79 +785,41 @@ public static class VFX
 }
 
 /// <summary>Custom implementation of lightweight pooled VFX to reduce garbage collection lag</summary>
-public class CwaffVFX
+public partial class CwaffVFX // public
 {
-    // pools
-    private static readonly LinkedList<CwaffVFX> _SpawnedVFX = new();
-    private static readonly LinkedList<CwaffVFX> _DespawnedVFX = new();
-
-    // locals
-    private GameObject _vfx;
-    private LinkedListNode<CwaffVFX> _node;
-    private tk2dSprite _sprite;
-    private tk2dSpriteAnimator _animator;
-    private tk2dSpriteAnimation _library;
-
-    private Vector3    _velocity      = Vector3.zero;
-    private float      _curLifeTime   = 0.0f;
-    private bool       _fadeOut       = false;
-    private float      _fadeStartTime = 0.0f;
-    private float      _fadeTotalTime = 0.0f;
-    private float      _maxLifeTime   = 0.0f;
-    private bool       _setup         = false;
-    private bool       _fadeIn        = false;
-    private float      _startScale    = 1.0f;
-    private float      _endScale      = 1.0f;
-    private bool       _changesScale  = false;
-    private bool       _shouldDespawn      = false;
-
-    internal class CwaffVFXManager : MonoBehaviour
+    public enum Rot
     {
-        [HarmonyPatch(typeof(GameManager), nameof(GameManager.LoadNextLevel))]
-        [HarmonyPatch(typeof(MainMenuController), nameof(MainMenuController.Start))]
-        private class CwaffVFXManagerAutostartPatch
-        {
-            static void Postfix()
-            {
-                // Lazy.DebugLog($"initializing CwaffVFXManager");
-                GameManager.Instance.GetOrAddComponent<CwaffVFXManager>();
-            }
-        }
-
-        private void Update()
-        {
-            int numActive = _SpawnedVFX.Count;
-            LinkedListNode<CwaffVFX> current = _SpawnedVFX.First;
-            for (int i = 0; i < numActive; ++i)
-            {
-                CwaffVFX c = current.Value;
-                LinkedListNode<CwaffVFX> next = current.Next;
-                c.ManualUpdate();
-                if (c._shouldDespawn)
-                {
-                    _SpawnedVFX.Remove(c._node);
-                    _DespawnedVFX.AddLast(c._node);
-                }
-                current = next;
-            }
-        }
+        None,     // do note rotate the VFX
+        Random,   // rotate the VFX randomly
+        Position, // rotation matches the VFX's position relative to the base position
+        Velocity, // rotation matches the VFX's velocity
     }
 
-    // private constructor, can't spawn manually
-    private CwaffVFX()
+    public enum Vel
     {
-        this._vfx = new();
-        UnityEngine.Object.DontDestroyOnLoad(this._vfx); // make our pooled vfx last forever
-        this._node = null;
-        this._sprite = this._vfx.AddComponent<tk2dSprite>();
-        this._animator = this._vfx.AddComponent<tk2dSpriteAnimator>();
-        this._library = this._vfx.AddComponent<tk2dSpriteAnimation>();
-
-        this._animator.library = this._library;
-        this._animator.playAutomatically = true;
-        ETGModConsole.Log($"created new vfx {_SpawnedVFX.Count}");
+        Random,       // base velocity is augmented by a random vector with magnitude between 0 and velocityVariance
+        Radial,       // base velocity is augmented by a random vector with magnitude of exactly velocityVariance
+        Away,         // base velocity is augmented by a vector away from position with magnitude between 0 and velocityVariance
+        AwayRadial,   // base velocity is augmented by a vector away from position with magnitude of exactly velocityVariance
     }
 
+    /// <summary>Spawn a single FancyVFX from a normal SpawnManager.SpawnVFX</summary>
+    /// <param name="prefab">Prefab for the VFX we want to spawn</param>
+    /// <param name="position">Position at which the VFX is spawned</param>
+    /// <param name="rotation">Rotation of the VFX sprite.</param>
+    /// <param name="velocity">Velocity with which the VFX is launched</param>
+    /// <param name="lifetime">Time before VFX automatically despawn. Set to 0 for no automatic despawning.</param>
+    /// <param name="fadeOutTime">Time before VFX fade out to 0 alpha. If greater than lifetime, VFX will spawn in partially faded. Disabled if null.</param>
+    /// <param name="emissivePower">Emissive power of the VFX. Ignored if fadeOutTime is non-null.</param>
+    /// <param name="emissiveColor">Emissive color of the VFX. Ignored if fadeOutTime is non-null.</param>
+    /// <param name="fadeIn">If true, VFX will fade in instead of fading out.</param>
+    /// <param name="startScale">Starting scale of the VFX sprite.</param>
+    /// <param name="endScale">Ending scale of the VFX sprite.</param>
+    /// <param name="height">Height of the VFX above the ground. Positive = in front of most things, negative = behind most things.</param>
+    /// <param name="randomFrame">If true, animation frames are treated as separate VFX, and one is selected at random.</param>
+    /// <param name="specificFrame">If >= 0, the animator is disabled and the VFX sprite is set to the specific frame of the animation.</param>
+    /// <param name="flipX">Whether the VFX sprite should be flipped on the X axis.</param>
+    /// <param name="flipY">Whether the VFX sprite should be flipped on the Y axis.</param>
     public static void Spawn(GameObject prefab, Vector3 position, Quaternion? rotation = null,
         Vector2? velocity = null, float lifetime = 0, float? fadeOutTime = null, float emissivePower = 0, Color? emissiveColor = null,
         bool fadeIn = false, float startScale = 1.0f, float endScale = 1.0f, float? height = null, bool randomFrame = false, int specificFrame = -1,
@@ -868,7 +830,6 @@ public class CwaffVFX
             c._node = _SpawnedVFX.AddLast(c);
         else
             _SpawnedVFX.AddLast(c._node);
-        c._shouldDespawn = false;
         c.Setup(
             prefab        : prefab,
             position      : position,
@@ -887,29 +848,6 @@ public class CwaffVFX
             flipX         : flipX,
             flipY         : flipY
             );
-    }
-
-    private static void Despawn(CwaffVFX c)
-    {
-        c._shouldDespawn = true;
-        c._setup = false;
-        c._vfx.SetActive(false);
-    }
-
-    public enum Rot
-    {
-        None,     // do note rotate the VFX
-        Random,   // rotate the VFX randomly
-        Position, // rotation matches the VFX's position relative to the base position
-        Velocity, // rotation matches the VFX's velocity
-    }
-
-    public enum Vel
-    {
-        Random,       // base velocity is augmented by a random vector with magnitude between 0 and velocityVariance
-        Radial,       // base velocity is augmented by a random vector with magnitude of exactly velocityVariance
-        Away,         // base velocity is augmented by a vector away from position with magnitude between 0 and velocityVariance
-        AwayRadial,   // base velocity is augmented by a vector away from position with magnitude of exactly velocityVariance
     }
 
     /// <summary>Spawn a burst of CwaffVFX</summary>
@@ -988,12 +926,98 @@ public class CwaffVFX
                 );
         }
     }
+}
+
+public partial class CwaffVFX // private
+{
+    // pools
+    private static readonly LinkedList<CwaffVFX> _SpawnedVFX = new();
+    private static readonly LinkedList<CwaffVFX> _DespawnedVFX = new();
+
+    // locals
+    private GameObject _vfx;
+    private LinkedListNode<CwaffVFX> _node;
+    private tk2dSprite _sprite;
+    private tk2dSpriteAnimator _animator;
+    private tk2dSpriteAnimation _library;
+    private Material _material;
+
+    private Vector3    _velocity      = Vector3.zero;
+    private float      _curLifeTime   = 0.0f;
+    private bool       _fadeOut       = false;
+    private float      _fadeStartTime = 0.0f;
+    private float      _fadeTotalTime = 0.0f;
+    private float      _maxLifeTime   = 0.0f;
+    private bool       _setup         = false;
+    private bool       _fadeIn        = false;
+    private float      _startScale    = 1.0f;
+    private float      _endScale      = 1.0f;
+    private bool       _changesScale  = false;
+    private bool       _shouldDespawn = false;
+
+    /// <summary>Manager for our pooled projectiles</summary>
+    private class CwaffVFXManager : MonoBehaviour
+    {
+        [HarmonyPatch(typeof(GameManager), nameof(GameManager.LoadNextLevel))]
+        [HarmonyPatch(typeof(MainMenuController), nameof(MainMenuController.Start))]
+        private class CwaffVFXManagerAutostartPatch
+        {
+            static void Postfix()
+            {
+                // Lazy.DebugLog($"initializing CwaffVFXManager");
+                GameManager.Instance.GetOrAddComponent<CwaffVFXManager>();
+            }
+        }
+
+        private void Update()
+        {
+            int numActive = _SpawnedVFX.Count;
+            LinkedListNode<CwaffVFX> current = _SpawnedVFX.First;
+            for (int i = 0; i < numActive; ++i)
+            {
+                CwaffVFX c = current.Value;
+                LinkedListNode<CwaffVFX> next = current.Next;
+                c.ManualUpdate();
+                if (c._shouldDespawn)
+                {
+                    _SpawnedVFX.Remove(c._node);
+                    _DespawnedVFX.AddLast(c._node);
+                }
+                current = next;
+            }
+        }
+    }
+
+    // private constructor, can't spawn manually
+    private CwaffVFX()
+    {
+        this._vfx = new();
+        UnityEngine.Object.DontDestroyOnLoad(this._vfx); // make our pooled vfx last forever
+        this._node = null;
+        this._sprite = this._vfx.AddComponent<tk2dSprite>();
+        this._animator = this._vfx.AddComponent<tk2dSpriteAnimator>();
+        this._library = this._vfx.AddComponent<tk2dSpriteAnimation>();
+        this._material = this._sprite.renderer.material;
+
+        this._animator.library = this._library;
+        this._animator.playAutomatically = true;
+        ETGModConsole.Log($"created new vfx {_SpawnedVFX.Count}");
+    }
+
+    /// <summary>Despawning is handled automatically and internally by the CwaffVFXManager</summary>
+    private static void Despawn(CwaffVFX c)
+    {
+        c._shouldDespawn = true;
+        c._setup = false;
+        c._vfx.SetActive(false);
+    }
 
     private void Setup(GameObject prefab, Vector3 position, Quaternion? rotation = null,
         Vector2? velocity = null, float lifetime = 0, float? fadeOutTime = null,
         float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false, float startScale = 1.0f, float endScale = 1.0f, float? height = null,
         bool randomFrame = false, int specificFrame = -1, bool flipX = false, bool flipY = false)
     {
+        this._shouldDespawn = false;
         this._vfx.SetActive(true);
         this._vfx.transform.position = position;
         this._vfx.transform.localRotation = rotation ?? Quaternion.identity;
@@ -1032,20 +1056,15 @@ public class CwaffVFX
 
         if (emissivePower > 0)
         {
-            // this._sprite.usesOverrideMaterial = true;
-            Material m = this._sprite.renderer.material;
-                m.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-                m.SetFloat("_EmissivePower", emissivePower);
-
             Color emitColor = emissiveColor ?? Color.white;
-            m.SetFloat("_EmissiveColorPower", 1.55f);
-            m.SetColor("_EmissiveColor", emitColor);
-            m.SetColor("_OverrideColor", emitColor);
+            this._material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+            this._material.SetFloat("_EmissivePower", emissivePower);
+            this._material.SetFloat("_EmissiveColorPower", 1.55f);
+            this._material.SetColor("_EmissiveColor", emitColor);
+            this._material.SetColor("_OverrideColor", emitColor);
         }
         else
-        {
-            //TODO: handle non-emissive case
-        }
+            this._material.shader = ShaderCache.Acquire("Brave/Internal/SimpleAlphaFadeUnlit");
 
         if (specificFrame >= 0)
             this._animator.PickFrame(frame: specificFrame);
