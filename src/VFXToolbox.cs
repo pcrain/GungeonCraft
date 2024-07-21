@@ -891,8 +891,55 @@ public class CwaffVFX
         c._vfx.SetActive(false);
     }
 
+    public enum Rot
+    {
+        None,     // do note rotate the VFX
+        Random,   // rotate the VFX randomly
+        Position, // rotation matches the VFX's position relative to the base position
+        Velocity, // rotation matches the VFX's velocity
+    }
+
+    public enum Vel
+    {
+        Random,       // base velocity is augmented by a random vector with magnitude between 0 and velocityVariance
+        Radial,       // base velocity is augmented by a random vector with magnitude of exactly velocityVariance
+        Away,         // base velocity is augmented by a vector away from position with magnitude between 0 and velocityVariance
+        AwayRadial,   // base velocity is augmented by a vector away from position with magnitude of exactly velocityVariance
+    }
+
+    /// <summary>Spawn a burst of CwaffVFX</summary>
+    /// <param name="prefab">Prefab for the VFX we want to spawn</param>
+    /// <param name="numToSpawn">Number of VFX to spawn</param>
+    /// <param name="basePosition">Anchor position from which all VFX are spawned relative to</param>
+    /// <param name="positionVariance">Maximum distance from the anchor position from which VFX will spawn</param>
+    /// <param name="baseVelocity">Anchor velocity for which all VFX are launched relative to</param>
+    /// <param name="minVelocity">Minimum magnitude of velocity for each individual VFX</param>
+    /// <param name="velocityVariance">Maximum magnitude of deviance for each individual VFX from the baseVelocity</param>
+    /// <param name="velType">Relation between baseVelocity and velocityVariance. Possible values:<br/><br/>
+    ///   Random: base velocity is augmented by a random vector with magnitude between 0 and velocityVariance<br/>
+    ///   Radial: base velocity is augmented by a random vector with magnitude of exactly velocityVariance<br/>
+    ///   Away: base velocity is augmented by a vector away from position with magnitude between 0 and velocityVariance<br/>
+    ///   AwayRadial base velocity is augmented by a vector away from position with magnitude of exactly velocityVariance<br/>
+    /// </param>
+    /// <param name="rotType">How the VFX are rotated. Possible values:<br/><br/>
+    ///   None: do note rotate the VFX<br/>
+    ///   Random: rotate the VFX randomly<br/>
+    ///   Position rotation matches the VFX's position relative to the base position<br/>
+    ///   Velocity rotation matches the VFX's velocity<br/>
+    /// </param>
+    /// <param name="lifetime">Time before VFX automatically despawn. Set to 0 for no automatic despawning.</param>
+    /// <param name="fadeOutTime">Time before VFX fade out to 0 alpha. If greater than lifetime, VFX will spawn in partially faded. Disabled if null.</param>
+    /// <param name="parent">If non-null, VFX will automatically move with the parent transform.</param>
+    /// <param name="emissivePower">Emissive power of the VFX. Ignored if fadeOutTime is non-null.</param>
+    /// <param name="emissiveColor">Emissive color of the VFX. Ignored if fadeOutTime is non-null.</param>
+    /// <param name="fadeIn">If true, VFX will fade in instead of fading out.</param>
+    /// <param name="uniform">If true, VFX will spawn with uniform angles around basePosition with magnitude positionVariance.</param>
+    /// <param name="startScale">Starting scale of the VFX sprite.</param>
+    /// <param name="endScale">Ending scale of the VFX sprite.</param>
+    /// <param name="height">Height of the VFX above the ground. Positive = in front of most things, negative = behind most things.</param>
+    /// <param name="randomFrame">If true, animation frames are treated as separate VFX, and one is selected at random.</param>
     public static void SpawnBurst(GameObject prefab, int numToSpawn, Vector2 basePosition, float positionVariance = 0f, Vector2? baseVelocity = null, float minVelocity = 0f, float velocityVariance = 0f,
-        FancyVFX.Vel velType = FancyVFX.Vel.Random, FancyVFX.Rot rotType = FancyVFX.Rot.None, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0,
+        Vel velType = Vel.Random, Rot rotType = Rot.None, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0,
         Color? emissiveColor = null, bool fadeIn = false, bool uniform = false, float startScale = 1.0f, float endScale = 1.0f, float? height = null, bool randomFrame = false)
     {
         Vector2 realBaseVelocity = baseVelocity ?? Vector2.zero;
@@ -904,16 +951,16 @@ public class CwaffVFX
                 ? basePosition + posOffsetAngle.ToVector((uniform ? 1f : UnityEngine.Random.value) * positionVariance)
                 : basePosition;
             Vector2 velocity = velType switch {
-                FancyVFX.Vel.Random     => realBaseVelocity + Lazy.RandomAngle().ToVector(minVelocity + UnityEngine.Random.value * velocityVariance),
-                FancyVFX.Vel.Radial     => realBaseVelocity + Lazy.RandomAngle().ToVector(minVelocity + velocityVariance),
-                FancyVFX.Vel.Away       => realBaseVelocity + posOffsetAngle.ToVector(minVelocity + UnityEngine.Random.value * velocityVariance),
-                FancyVFX.Vel.AwayRadial => realBaseVelocity + posOffsetAngle.ToVector(minVelocity + velocityVariance),
+                Vel.Random     => realBaseVelocity + Lazy.RandomAngle().ToVector(minVelocity + UnityEngine.Random.value * velocityVariance),
+                Vel.Radial     => realBaseVelocity + Lazy.RandomAngle().ToVector(minVelocity + velocityVariance),
+                Vel.Away       => realBaseVelocity + posOffsetAngle.ToVector(minVelocity + UnityEngine.Random.value * velocityVariance),
+                Vel.AwayRadial => realBaseVelocity + posOffsetAngle.ToVector(minVelocity + velocityVariance),
                 _              => realBaseVelocity,
             };
             Quaternion rot = rotType switch {
-                FancyVFX.Rot.Random   => UnityEngine.Random.Range(0f,360f).EulerZ(),
-                FancyVFX.Rot.Position => posOffsetAngle.EulerZ(),
-                FancyVFX.Rot.Velocity => velocity.EulerZ(),
+                Rot.Random   => UnityEngine.Random.Range(0f,360f).EulerZ(),
+                Rot.Position => posOffsetAngle.EulerZ(),
+                Rot.Velocity => velocity.EulerZ(),
                 _            => Quaternion.identity,
                 };
             CwaffVFX.Spawn(
@@ -948,7 +995,10 @@ public class CwaffVFX
         tk2dSpriteAnimator  prefabAnim    = prefab.GetComponent<tk2dSpriteAnimator>();
         tk2dSpriteAnimation prefabLibrary = prefab.GetComponent<tk2dSpriteAnimation>();
         this._sprite.SetSprite(prefabSprite.collection, prefabSprite.spriteId);
+        this._sprite.scale = prefabSprite.scale;
         this._library.clips = prefabLibrary.clips;
+        this._animator.defaultClipId = prefabAnim.defaultClipId;
+        this._animator.currentClip = this._animator.DefaultClip;
 
         this._curLifeTime = 0.0f;
         this._fadeIn      = fadeIn;
@@ -967,7 +1017,6 @@ public class CwaffVFX
         }
         this._vfx.transform.parent = parent;
 
-        this._sprite.scale = new Vector3(startScale, startScale, 1.0f);
         this._startScale   = startScale;
         this._endScale     = endScale;
         this._changesScale = this._startScale != this._endScale;
@@ -1157,97 +1206,6 @@ public class FancyVFX : MonoBehaviour
         FancyVFX fv = v.AddComponent<FancyVFX>();
         fv.Setup(velocity ?? Vector2.zero, lifetime, fadeOutTime, parent, emissivePower, emissiveColor, fadeIn, startScale, endScale, height, randomFrame);
         return fv;
-    }
-
-    public enum Rot
-    {
-        None,     // do note rotate the VFX
-        Random,   // rotate the VFX randomly
-        Position, // rotation matches the VFX's position relative to the base position
-        Velocity, // rotation matches the VFX's velocity
-    }
-
-    public enum Vel
-    {
-        Random,       // base velocity is augmented by a random vector with magnitude between 0 and velocityVariance
-        Radial,       // base velocity is augmented by a random vector with magnitude of exactly velocityVariance
-        Away,         // base velocity is augmented by a vector away from position with magnitude between 0 and velocityVariance
-        AwayRadial,   // base velocity is augmented by a vector away from position with magnitude of exactly velocityVariance
-    }
-
-    /// <summary>Spawn a burst of FancyVFX</summary>
-    /// <param name="prefab">Prefab for the VFX we want to spawn</param>
-    /// <param name="numToSpawn">Number of VFX to spawn</param>
-    /// <param name="basePosition">Anchor position from which all VFX are spawned relative to</param>
-    /// <param name="positionVariance">Maximum distance from the anchor position from which VFX will spawn</param>
-    /// <param name="baseVelocity">Anchor velocity for which all VFX are launched relative to</param>
-    /// <param name="minVelocity">Minimum magnitude of velocity for each individual VFX</param>
-    /// <param name="velocityVariance">Maximum magnitude of deviance for each individual VFX from the baseVelocity</param>
-    /// <param name="velType">Relation between baseVelocity and velocityVariance. Possible values:<br/><br/>
-    ///   Random: base velocity is augmented by a random vector with magnitude between 0 and velocityVariance<br/>
-    ///   Radial: base velocity is augmented by a random vector with magnitude of exactly velocityVariance<br/>
-    ///   Away: base velocity is augmented by a vector away from position with magnitude between 0 and velocityVariance<br/>
-    ///   AwayRadial base velocity is augmented by a vector away from position with magnitude of exactly velocityVariance<br/>
-    /// </param>
-    /// <param name="rotType">How the VFX are rotated. Possible values:<br/><br/>
-    ///   None: do note rotate the VFX<br/>
-    ///   Random: rotate the VFX randomly<br/>
-    ///   Position rotation matches the VFX's position relative to the base position<br/>
-    ///   Velocity rotation matches the VFX's velocity<br/>
-    /// </param>
-    /// <param name="lifetime">Time before VFX automatically despawn. Set to 0 for no automatic despawning.</param>
-    /// <param name="fadeOutTime">Time before VFX fade out to 0 alpha. If greater than lifetime, VFX will spawn in partially faded. Disabled if null.</param>
-    /// <param name="parent">If non-null, VFX will automatically move with the parent transform.</param>
-    /// <param name="emissivePower">Emissive power of the VFX. Ignored if fadeOutTime is non-null.</param>
-    /// <param name="emissiveColor">Emissive color of the VFX. Ignored if fadeOutTime is non-null.</param>
-    /// <param name="fadeIn">If true, VFX will fade in instead of fading out.</param>
-    /// <param name="uniform">If true, VFX will spawn with uniform angles around basePosition with magnitude positionVariance.</param>
-    /// <param name="startScale">Starting scale of the VFX sprite.</param>
-    /// <param name="endScale">Ending scale of the VFX sprite.</param>
-    /// <param name="height">Height of the VFX above the ground. Positive = in front of most things, negative = behind most things.</param>
-    /// <param name="randomFrame">If true, animation frames are treated as separate VFX, and one is selected at random.</param>
-    public static void SpawnBurst(GameObject prefab, int numToSpawn, Vector2 basePosition, float positionVariance = 0f, Vector2? baseVelocity = null, float minVelocity = 0f, float velocityVariance = 0f,
-        Vel velType = Vel.Random, Rot rotType = Rot.None, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0,
-        Color? emissiveColor = null, bool fadeIn = false, bool uniform = false, float startScale = 1.0f, float endScale = 1.0f, float? height = null, bool randomFrame = false)
-    {
-        Vector2 realBaseVelocity = baseVelocity ?? Vector2.zero;
-        float baseAngle = Lazy.RandomAngle();
-        for (int i = 0; i < numToSpawn; ++i)
-        {
-            float posOffsetAngle = uniform ? (baseAngle + 360f * ((float)i / numToSpawn)).Clamp360() : Lazy.RandomAngle();
-            Vector2 finalpos = (positionVariance > 0)
-                ? basePosition + posOffsetAngle.ToVector((uniform ? 1f : UnityEngine.Random.value) * positionVariance)
-                : basePosition;
-            Vector2 velocity = velType switch {
-                Vel.Random     => realBaseVelocity + Lazy.RandomAngle().ToVector(minVelocity + UnityEngine.Random.value * velocityVariance),
-                Vel.Radial     => realBaseVelocity + Lazy.RandomAngle().ToVector(minVelocity + velocityVariance),
-                Vel.Away       => realBaseVelocity + posOffsetAngle.ToVector(minVelocity + UnityEngine.Random.value * velocityVariance),
-                Vel.AwayRadial => realBaseVelocity + posOffsetAngle.ToVector(minVelocity + velocityVariance),
-                _              => realBaseVelocity,
-            };
-            Quaternion rot = rotType switch {
-                Rot.Random   => UnityEngine.Random.Range(0f,360f).EulerZ(),
-                Rot.Position => posOffsetAngle.EulerZ(),
-                Rot.Velocity => velocity.EulerZ(),
-                _            => Quaternion.identity,
-                };
-            FancyVFX.Spawn(
-                prefab        : prefab,
-                position      : finalpos,
-                rotation      : rot,
-                velocity      : velocity,
-                lifetime      : lifetime,
-                fadeIn        : fadeIn,
-                fadeOutTime   : fadeOutTime,
-                emissivePower : emissivePower,
-                emissiveColor : emissiveColor,
-                parent        : parent,
-                startScale    : startScale,
-                endScale      : endScale,
-                height        : height,
-                randomFrame   : randomFrame
-                );
-        }
     }
 
     // Make a new FancyVFX from a normal SpawnManager.SpawnVFX, ignoring pools (necessary for adding custom components)

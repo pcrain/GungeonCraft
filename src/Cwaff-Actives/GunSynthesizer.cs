@@ -77,7 +77,7 @@ public class GunSynthesizer : CwaffActive
         pc.inventory.GunChangeForgiveness = true;  // NOTE: only used by Metronome
         Gun synthGun = pc.inventory.AddGunToInventory(gun, true);
         this._currentSyntheticGun = synthGun.gameObject.AddComponent<SyntheticGun>();
-        FancyVFX.SpawnBurst(
+        CwaffVFX.SpawnBurst(
             prefab           : _SPAWN_VFX,
             numToSpawn       : _SPAWN_PARTICLES,
             basePosition     : synthGun.barrelOffset.position,
@@ -85,8 +85,8 @@ public class GunSynthesizer : CwaffActive
             baseVelocity     : null,
             minVelocity      : 15f,
             velocityVariance : 0f,
-            velType          : FancyVFX.Vel.Random,
-            rotType          : FancyVFX.Rot.None,
+            velType          : CwaffVFX.Vel.Random,
+            rotType          : CwaffVFX.Rot.None,
             lifetime         : 0.85f,
             fadeOutTime      : null, // NOTE: ruins the shader
             parent           : null,

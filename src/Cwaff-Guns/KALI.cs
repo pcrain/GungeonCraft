@@ -219,7 +219,7 @@ public class KaliProjectile : MonoBehaviour
             m.SetFloat("_EmissivePower", 300f + 2700f * percentDone);
             yield return null;
         }
-        FancyVFX.SpawnBurst(
+        CwaffVFX.SpawnBurst(
             prefab           : KALI._IonizeVFX,
             numToSpawn       : 50,
             basePosition     : sprite.WorldCenter,
@@ -227,8 +227,8 @@ public class KaliProjectile : MonoBehaviour
             baseVelocity     : null,
             minVelocity      : 40f,
             velocityVariance : 40f,
-            velType          : FancyVFX.Vel.Away,
-            rotType          : FancyVFX.Rot.None,
+            velType          : CwaffVFX.Vel.Away,
+            rotType          : CwaffVFX.Rot.None,
             lifetime         : 0.5f,
             parent           : null,
             emissivePower    : 300f,

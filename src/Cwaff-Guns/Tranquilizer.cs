@@ -57,8 +57,8 @@ public class TranquilizerBehavior : MonoBehaviour
 
     public void OnDestruction(Projectile p)
     {
-        FancyVFX.SpawnBurst(Tranquilizer._TranqImpactVFX, 4, p.SafeCenter, baseVelocity: Vector2.zero,
-            velocityVariance: 2f, velType: FancyVFX.Vel.AwayRadial, uniform: true, lifetime: 0.5f, fadeOutTime: 0.5f);
+        CwaffVFX.SpawnBurst(Tranquilizer._TranqImpactVFX, 4, p.SafeCenter, baseVelocity: Vector2.zero,
+            velocityVariance: 2f, velType: CwaffVFX.Vel.AwayRadial, uniform: true, lifetime: 0.5f, fadeOutTime: 0.5f);
     }
 
     private class EnemyTranquilizedBehavior : MonoBehaviour

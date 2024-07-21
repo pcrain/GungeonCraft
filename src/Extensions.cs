@@ -1820,15 +1820,15 @@ public static class Extensions
   {
       tk2dSpriteDefinition def = p.sprite.GetCurrentSpriteDef();
       Vector2 spriteSize       = def.position3 - def.position0;
-      FancyVFX.SpawnBurst(
+      CwaffVFX.SpawnBurst(
           prefab           : shrapnelVFX,
           numToSpawn       : shrapnelCount,
           basePosition     : p.transform.position,
           positionVariance : 0.5f * Mathf.Min(spriteSize.x, spriteSize.y),
           minVelocity      : shrapnelMinVelocity,
           velocityVariance : shrapnelMaxVelocity - shrapnelMinVelocity,
-          velType          : FancyVFX.Vel.Away,
-          rotType          : FancyVFX.Rot.Random,
+          velType          : CwaffVFX.Vel.Away,
+          rotType          : CwaffVFX.Rot.Random,
           lifetime         : shrapnelLifetime,
           fadeOutTime      : shrapnelLifetime
         );

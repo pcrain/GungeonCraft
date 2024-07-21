@@ -159,8 +159,8 @@ public class Vladimir : CwaffGun
     public void AbsorbProjectile(Projectile p)
     {
         this.gun.gameObject.Play("subtractor_beam_fire_sound");
-        FancyVFX.SpawnBurst(prefab: _AbsorbVFX, numToSpawn: 8, basePosition: p.SafeCenter, positionVariance: 0.2f,
-            baseVelocity: Vector2.zero, velocityVariance: 2f, velType: FancyVFX.Vel.AwayRadial, rotType: FancyVFX.Rot.None,
+        CwaffVFX.SpawnBurst(prefab: _AbsorbVFX, numToSpawn: 8, basePosition: p.SafeCenter, positionVariance: 0.2f,
+            baseVelocity: Vector2.zero, velocityVariance: 2f, velType: CwaffVFX.Vel.AwayRadial, rotType: CwaffVFX.Rot.None,
             lifetime: 0.5f, fadeOutTime: 0.5f, parent: null, emissivePower: 0f, emissiveColor: null, fadeIn: false,
             uniform: true, startScale: 1.0f, endScale: 1.0f, height: null);
         p.DieInAir(suppressInAirEffects: true, allowActorSpawns: false, allowProjectileSpawns: false, killedEarly: true);

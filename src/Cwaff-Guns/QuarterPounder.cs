@@ -153,9 +153,9 @@ public class GoldenDeath : MonoBehaviour
         this._sprite.renderer.material.SetFloat("_EmissiveColorPower", 1.55f);
         this._sprite.renderer.material.SetColor("_EmissiveColor", ExtendedColours.paleYellow);
 
-        FancyVFX.SpawnBurst(prefab: QuarterPounder._MidasParticleVFX, numToSpawn: _NUM_PARTICLES, basePosition: this._sprite.WorldCenter,
-            positionVariance: _PART_SPREAD, baseVelocity: Vector2.zero, velocityVariance: _PART_SPEED, velType: FancyVFX.Vel.Radial,
-            rotType: FancyVFX.Rot.Random, lifetime: _PART_LIFE, fadeOutTime: _PART_LIFE, emissivePower: _PART_EMIT, emissiveColor: Color.white);
+        CwaffVFX.SpawnBurst(prefab: QuarterPounder._MidasParticleVFX, numToSpawn: _NUM_PARTICLES, basePosition: this._sprite.WorldCenter,
+            positionVariance: _PART_SPREAD, baseVelocity: Vector2.zero, velocityVariance: _PART_SPEED, velType: CwaffVFX.Vel.Radial,
+            rotType: CwaffVFX.Rot.Random, lifetime: _PART_LIFE, fadeOutTime: _PART_LIFE, emissivePower: _PART_EMIT, emissiveColor: Color.white);
 
         base.gameObject.Play("turn_to_gold");
     }

@@ -136,8 +136,8 @@ public class BlamethrowerProjectile : MonoBehaviour
     {
         base.gameObject.Play("blamethrower_impact_sound");
 
-        FancyVFX.SpawnBurst(prefab: Blamethrower._BlameImpact, numToSpawn: 2, basePosition: enemy.UnitCenter,
-            positionVariance: 1f, baseVelocity: 10f * Vector2.up, velocityVariance: 5f, velType: FancyVFX.Vel.Radial,
+        CwaffVFX.SpawnBurst(prefab: Blamethrower._BlameImpact, numToSpawn: 2, basePosition: enemy.UnitCenter,
+            positionVariance: 1f, baseVelocity: 10f * Vector2.up, velocityVariance: 5f, velType: CwaffVFX.Vel.Radial,
             lifetime: 0.5f, fadeOutTime: 0.5f, randomFrame: true);
 
         if (p.Owner is not PlayerController player)
