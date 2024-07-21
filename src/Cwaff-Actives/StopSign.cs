@@ -54,7 +54,7 @@ public class StopSign : CwaffActive
                 continue;
             if (enemy.GetComponent<StoppedInTheirTracks>())
                 continue;
-            FancyVFX.Spawn(_StopSignVFX, (enemy.sprite ? enemy.sprite.WorldTopCenter : enemy.CenterPosition) + new Vector2(0, 1f),
+            CwaffVFX.Spawn(_StopSignVFX, (enemy.sprite ? enemy.sprite.WorldTopCenter : enemy.CenterPosition) + new Vector2(0, 1f),
                 lifetime: 0.25f, fadeOutTime: 0.5f, endScale: 2f, height: 1f);
             enemy.behaviorSpeculator.Stun(2f);
             enemy.ApplyEffect(_SpeedEffect);

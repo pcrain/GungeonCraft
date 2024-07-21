@@ -854,12 +854,13 @@ public class CwaffVFX
 
         this._animator.library = this._library;
         this._animator.playAutomatically = true;
-        // Lazy.DebugLog($"created new vfx {_SpawnedVFX.Count}");
+        ETGModConsole.Log($"created new vfx {_SpawnedVFX.Count}");
     }
 
     public static void Spawn(GameObject prefab, Vector3 position, Quaternion? rotation = null,
-        Vector2? velocity = null, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0, Color? emissiveColor = null,
-        bool fadeIn = false, float startScale = 1.0f, float endScale = 1.0f, float? height = null, bool randomFrame = false)
+        Vector2? velocity = null, float lifetime = 0, float? fadeOutTime = null, float emissivePower = 0, Color? emissiveColor = null,
+        bool fadeIn = false, float startScale = 1.0f, float endScale = 1.0f, float? height = null, bool randomFrame = false, int specificFrame = -1,
+        bool flipX = false, bool flipY = false)
     {
         CwaffVFX c = (_DespawnedVFX.Count > 0) ? _DespawnedVFX.Pop() : new();
         if (c._node == null)
@@ -874,14 +875,17 @@ public class CwaffVFX
             velocity      : velocity ?? Vector2.zero,
             lifetime      : lifetime,
             fadeOutTime   : fadeOutTime,
-            parent        : parent,  //TODO: verify parenting works properly
             emissivePower : emissivePower,
             emissiveColor : emissiveColor,
             fadeIn        : fadeIn,
             startScale    : startScale,
             endScale      : endScale,
             height        : height,
-            randomFrame   : randomFrame);
+            randomFrame   : randomFrame,
+            specificFrame : specificFrame,
+            flipX         : flipX,
+            flipY         : flipY
+            );
     }
 
     private static void Despawn(CwaffVFX c)
@@ -929,7 +933,6 @@ public class CwaffVFX
     /// </param>
     /// <param name="lifetime">Time before VFX automatically despawn. Set to 0 for no automatic despawning.</param>
     /// <param name="fadeOutTime">Time before VFX fade out to 0 alpha. If greater than lifetime, VFX will spawn in partially faded. Disabled if null.</param>
-    /// <param name="parent">If non-null, VFX will automatically move with the parent transform.</param>
     /// <param name="emissivePower">Emissive power of the VFX. Ignored if fadeOutTime is non-null.</param>
     /// <param name="emissiveColor">Emissive color of the VFX. Ignored if fadeOutTime is non-null.</param>
     /// <param name="fadeIn">If true, VFX will fade in instead of fading out.</param>
@@ -938,9 +941,12 @@ public class CwaffVFX
     /// <param name="endScale">Ending scale of the VFX sprite.</param>
     /// <param name="height">Height of the VFX above the ground. Positive = in front of most things, negative = behind most things.</param>
     /// <param name="randomFrame">If true, animation frames are treated as separate VFX, and one is selected at random.</param>
+    /// <param name="specificFrame">If >= 0, the animator is disabled and the VFX sprite is set to the specific frame of the animation.</param>
+    /// <param name="flipX">Whether the VFX sprite should be flipped on the X axis.</param>
+    /// <param name="flipY">Whether the VFX sprite should be flipped on the Y axis.</param>
     public static void SpawnBurst(GameObject prefab, int numToSpawn, Vector2 basePosition, float positionVariance = 0f, Vector2? baseVelocity = null, float minVelocity = 0f, float velocityVariance = 0f,
-        Vel velType = Vel.Random, Rot rotType = Rot.None, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0,
-        Color? emissiveColor = null, bool fadeIn = false, bool uniform = false, float startScale = 1.0f, float endScale = 1.0f, float? height = null, bool randomFrame = false)
+        Vel velType = Vel.Random, Rot rotType = Rot.None, float lifetime = 0, float? fadeOutTime = null, float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false,
+        bool uniform = false, float startScale = 1.0f, float endScale = 1.0f, float? height = null, bool randomFrame = false, int specificFrame = -1, bool flipX = false, bool flipY = false)
     {
         Vector2 realBaseVelocity = baseVelocity ?? Vector2.zero;
         float baseAngle = Lazy.RandomAngle();
@@ -973,19 +979,19 @@ public class CwaffVFX
                 fadeOutTime   : fadeOutTime,
                 emissivePower : emissivePower,
                 emissiveColor : emissiveColor,
-                parent        : parent,
                 startScale    : startScale,
                 endScale      : endScale,
                 height        : height,
-                randomFrame   : randomFrame
+                randomFrame   : randomFrame,
+                specificFrame : specificFrame
                 );
         }
     }
 
     private void Setup(GameObject prefab, Vector3 position, Quaternion? rotation = null,
-        Vector2? velocity = null, float lifetime = 0, float? fadeOutTime = null, Transform parent = null,
+        Vector2? velocity = null, float lifetime = 0, float? fadeOutTime = null,
         float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false, float startScale = 1.0f, float endScale = 1.0f, float? height = null,
-        bool randomFrame = false)
+        bool randomFrame = false, int specificFrame = -1, bool flipX = false, bool flipY = false)
     {
         this._vfx.SetActive(true);
         this._vfx.transform.position = position;
@@ -996,6 +1002,9 @@ public class CwaffVFX
         tk2dSpriteAnimation prefabLibrary = prefab.GetComponent<tk2dSpriteAnimation>();
         this._sprite.SetSprite(prefabSprite.collection, prefabSprite.spriteId);
         this._sprite.scale = prefabSprite.scale;
+        this._sprite.FlipX = flipX;
+        this._sprite.FlipY = flipY;
+        this._sprite.renderer.SetAlpha(1.0f);
         this._library.clips = prefabLibrary.clips;
         this._animator.defaultClipId = prefabAnim.defaultClipId;
         this._animator.currentClip = this._animator.DefaultClip;
@@ -1015,7 +1024,6 @@ public class CwaffVFX
             this._sprite.HeightOffGround = height.Value;
             this._sprite.UpdateZDepth();
         }
-        this._vfx.transform.parent = parent;
 
         this._startScale   = startScale;
         this._endScale     = endScale;
@@ -1041,7 +1049,9 @@ public class CwaffVFX
             //TODO: handle non-emissive case
         }
 
-        if (randomFrame)
+        if (specificFrame >= 0)
+            this._animator.PickFrame(frame: specificFrame);
+        else if (randomFrame)
             this._animator.PickFrame();
 
         this._setup = true;
@@ -1183,7 +1193,7 @@ public class FancyVFX : MonoBehaviour
         this._setup = true;
     }
 
-    /// <summary>Spawn a single FancyVFX from a normal SpawnManager.SpawnVFX</summary>
+    /// <summary>Make a new FancyVFX from a normal SpawnManager.SpawnVFX, ignoring pools (necessary for adding custom components)</summary>
     /// <param name="prefab">Prefab for the VFX we want to spawn</param>
     /// <param name="position">Position at which the VFX is spawned</param>
     /// <param name="rotation">Rotation of the VFX sprite.</param>
@@ -1194,21 +1204,6 @@ public class FancyVFX : MonoBehaviour
     /// <param name="emissivePower">Emissive power of the VFX. Ignored if fadeOutTime is non-null.</param>
     /// <param name="emissiveColor">Emissive color of the VFX. Ignored if fadeOutTime is non-null.</param>
     /// <param name="fadeIn">If true, VFX will fade in instead of fading out.</param>
-    /// <param name="startScale">Starting scale of the VFX sprite.</param>
-    /// <param name="endScale">Ending scale of the VFX sprite.</param>
-    /// <param name="height">Height of the VFX above the ground. Positive = in front of most things, negative = behind most things.</param>
-    /// <param name="randomFrame">If true, animation frames are treated as separate VFX, and one is selected at random.</param>
-    public static FancyVFX Spawn(GameObject prefab, Vector3 position, Quaternion? rotation = null,
-        Vector2? velocity = null, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0, Color? emissiveColor = null,
-        bool fadeIn = false, float startScale = 1.0f, float endScale = 1.0f, float? height = null, bool randomFrame = false)
-    {
-        GameObject v = SpawnManager.SpawnVFX(prefab, position, rotation ?? Quaternion.identity, ignoresPools: false);
-        FancyVFX fv = v.AddComponent<FancyVFX>();
-        fv.Setup(velocity ?? Vector2.zero, lifetime, fadeOutTime, parent, emissivePower, emissiveColor, fadeIn, startScale, endScale, height, randomFrame);
-        return fv;
-    }
-
-    // Make a new FancyVFX from a normal SpawnManager.SpawnVFX, ignoring pools (necessary for adding custom components)
     public static FancyVFX SpawnUnpooled(GameObject prefab, Vector3 position, Quaternion? rotation = null,
         Vector2? velocity = null, float lifetime = 0, float? fadeOutTime = null, Transform parent = null, float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false)
     {

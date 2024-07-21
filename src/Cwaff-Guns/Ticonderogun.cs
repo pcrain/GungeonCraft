@@ -136,16 +136,21 @@ public class Ticonderogun : CwaffGun
     {
         if (enemy.healthHaver.IsVulnerable)
             enemy.healthHaver.ApplyDamage(damage, Vector2.zero, ItemName, CoreDamageTypes.Magic, DamageCategory.Normal);
-        for (int i = 0; i < _NUM_RUNES; ++i)
-        {
-            Vector2 offset = Lazy.RandomVector(0.3f);
-            Vector2 velocity = 2f * offset.normalized;
-            FancyVFX fv = FancyVFX.Spawn(_RunePrefab, position: enemy.CenterPosition + offset, rotation: Quaternion.identity, velocity: velocity,
-                lifetime: 1f, fadeOutTime: 1f, parent: enemy.sprite.transform);
-            tk2dSpriteAnimator anim = fv.GetComponent<tk2dSpriteAnimator>();
-            int newSpriteId = anim.currentClip.frames[UnityEngine.Random.Range(0, anim.currentClip.frames.Length)].spriteId;
-            fv.sprite.SetSprite(newSpriteId);
-        }
+        CwaffVFX.SpawnBurst(
+            prefab           : _RunePrefab,
+            numToSpawn       : _NUM_RUNES,
+            basePosition     : enemy.CenterPosition,
+            positionVariance : 0.3f,
+            velocityVariance : 2f,
+            velType          : CwaffVFX.Vel.AwayRadial,
+            rotType          : CwaffVFX.Rot.None,
+            lifetime         : 1.0f,
+            fadeOutTime      : 1.0f,
+            emissivePower    : 0f,
+            fadeIn           : false,
+            uniform          : false,
+            randomFrame      : true
+          );
     }
 
     private void ResetCharge()

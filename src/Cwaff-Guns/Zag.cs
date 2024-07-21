@@ -90,7 +90,7 @@ public class ZagProjectile : MonoBehaviour
     private void DoZigZag(Vector2 newDir)
     {
         Vector2 backwards = -newDir;
-        FancyVFX.SpawnUnpooled(
+        CwaffVFX.Spawn(
             prefab        : Zag._ZagZigVFX,
             position      : base.transform.position,
             rotation      : backwards.EulerZ(),

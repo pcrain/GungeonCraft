@@ -1748,18 +1748,18 @@ public class AnimatedTargetingLine
         float offset    = (BraveTime.ScaledTimeSinceStartup % this._segmentPhaseTime) / this._segmentPhaseTime;
         for (int i = this._targetLine.Count; i < _MAX_SEGMENTS; ++i)
         {
-            FancyVFX fv = FancyVFX.Spawn(this._lineSegmentVFX, start/*, rotation: Lazy.RandomEulerZ()*/);
-            fv.GetComponent<tk2dSpriteAnimator>().PlayFromFrame(i % 4);
-            this._targetLine.Add(fv);
+            // FancyVFX fv = FancyVFX.Spawn(this._lineSegmentVFX, start/*, rotation: Lazy.RandomEulerZ()*/);
+            // fv.GetComponent<tk2dSpriteAnimator>().PlayFromFrame(i % 4);
+            // this._targetLine.Add(fv);
         }
         for (int i = 0; i < numSegments; ++i)
         {
             Vector2 pos = start + ((i + 1 - offset) * this._segmentSpacing * dir);
             if (!this._targetLine[i])
             {
-                FancyVFX fv = FancyVFX.Spawn(this._lineSegmentVFX, pos/*, rotation: Lazy.RandomEulerZ()*/);
-                fv.GetComponent<tk2dSpriteAnimator>().PlayFromFrame(i % 4);
-                this._targetLine[i] = fv;
+                // FancyVFX fv = FancyVFX.Spawn(this._lineSegmentVFX, pos/*, rotation: Lazy.RandomEulerZ()*/);
+                // fv.GetComponent<tk2dSpriteAnimator>().PlayFromFrame(i % 4);
+                // this._targetLine[i] = fv;
             }
             tk2dBaseSprite sprite = this._targetLine[i].sprite;
             sprite.renderer.enabled = true;

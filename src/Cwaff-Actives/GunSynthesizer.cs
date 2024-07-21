@@ -89,7 +89,6 @@ public class GunSynthesizer : CwaffActive
             rotType          : CwaffVFX.Rot.None,
             lifetime         : 0.85f,
             fadeOutTime      : null, // NOTE: ruins the shader
-            parent           : null,
             emissivePower    : 0f,
             emissiveColor    : null,
             fadeIn           : false,

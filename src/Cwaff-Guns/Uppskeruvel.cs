@@ -332,7 +332,7 @@ public class UppskeruvelLostSoul : MonoBehaviour
             this._basePos += (this._velocity * BraveTime.DeltaTime).ToVector3ZUp();
             base.transform.position = this._basePos.HoverAt(amplitude: _BOB_HEIGHT, frequency: _BOB_SPEED);
 
-            FancyVFX.Spawn(Outbreak._OutbreakSmokeVFX, base.transform.position, Lazy.RandomEulerZ(),
+            CwaffVFX.Spawn(Outbreak._OutbreakSmokeVFX, base.transform.position, Lazy.RandomEulerZ(),
                 velocity: Lazy.RandomVector(0.1f), lifetime: 0.25f, fadeOutTime: 0.5f);
 
             if (delta.sqrMagnitude > _PICKUP_RADIUS_SQR)
@@ -343,8 +343,8 @@ public class UppskeruvelLostSoul : MonoBehaviour
             base.gameObject.PlayUnique("pickup_poe_soul_sound");
             float rotOffset = 90f * UnityEngine.Random.value;
             for (int i = 0; i < 4; ++i)
-                FancyVFX.Spawn(Uppskeruvel._SoulCollectVFX, base.transform.position, Lazy.RandomEulerZ(),
-                  velocity: (rotOffset + 90f * i).ToVector(4f), lifetime: 0.5f, fadeOutTime: 0.75f);
+                CwaffVFX.Spawn(Uppskeruvel._SoulCollectVFX, base.transform.position, Lazy.RandomEulerZ(),
+                  velocity: (rotOffset + 90f * i).ToVector(4f), lifetime: 0.5f, fadeOutTime: 0.75f); //TODO: use SpawnBurst
             UnityEngine.Object.Destroy(base.gameObject);
             return;
         }

@@ -157,7 +157,7 @@ public class ChekhovBullet : MonoBehaviour
         this._projectile.AddTrailToProjectileInstance(ChekhovsGun._ChekhovTrailPrefab).gameObject.SetGlowiness(_TRAIL_GLOW);
         UnityEngine.Object.Destroy(this._sightline);
         this._sightline = null;
-        FancyVFX.Spawn(ChekhovsGun._ChekhovGunFireVFX, this._gunVfx.transform.position, this._gunVfx.transform.rotation,
+        CwaffVFX.Spawn(ChekhovsGun._ChekhovGunFireVFX, this._gunVfx.transform.position, this._gunVfx.transform.rotation,
             lifetime: 0.25f, fadeOutTime: 0.25f);
         UnityEngine.Object.Destroy(this._gunVfx);
         this._gunVfx = null;

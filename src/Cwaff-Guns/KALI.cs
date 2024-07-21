@@ -230,7 +230,6 @@ public class KaliProjectile : MonoBehaviour
             velType          : CwaffVFX.Vel.Away,
             rotType          : CwaffVFX.Rot.None,
             lifetime         : 0.5f,
-            parent           : null,
             emissivePower    : 300f,
             emissiveColor    : Color.cyan,
             fadeIn           : false,

@@ -82,7 +82,7 @@ public class InfectionBehavior : MonoBehaviour
         if (UnityEngine.Random.value > 0.3f)
             return;
 
-        FancyVFX.Spawn(Outbreak._OutbreakSmokeVFX, this._projectile.SafeCenter.ToVector3ZisY(-1f), Lazy.RandomEulerZ(),
+        CwaffVFX.Spawn(Outbreak._OutbreakSmokeVFX, this._projectile.SafeCenter.ToVector3ZisY(-1f), Lazy.RandomEulerZ(),
             velocity: Lazy.RandomVector(0.1f), lifetime: 0.3f, fadeOutTime: 0.6f);
     }
 }
@@ -105,7 +105,7 @@ public class InfectedBehavior : MonoBehaviour
         if (UnityEngine.Random.value > 0.02f)
             return;
 
-        FancyVFX.Spawn(Outbreak._OutbreakSmokeVFX, this._enemy.sprite.WorldTopCenter.ToVector3ZisY(-1f), Lazy.RandomEulerZ(),
+        CwaffVFX.Spawn(Outbreak._OutbreakSmokeVFX, this._enemy.sprite.WorldTopCenter.ToVector3ZisY(-1f), Lazy.RandomEulerZ(),
             velocity: Lazy.RandomVector(0.5f), lifetime: 0.3f, fadeOutTime: 0.6f);
     }
 }

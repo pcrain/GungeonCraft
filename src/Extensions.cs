@@ -1438,6 +1438,7 @@ public static class Extensions
   {
     tk2dSpriteAnimationFrame[] frames = (animator.currentClip ?? animator.DefaultClip).frames;
     // animator.deferNextStartClip = false;
+    animator.playAutomatically = false; //NOTE: necessary so pooled CwaffVFX don't always switch back to the first frame when newly-generated
     animator.SetSprite(
       spriteCollection: frames[0].spriteCollection,
       spriteId: frames[(frame >= 0) ? frame : UnityEngine.Random.Range(0, frames.Length)].spriteId);

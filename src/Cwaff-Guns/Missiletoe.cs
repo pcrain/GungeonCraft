@@ -412,7 +412,7 @@ public class WrappableGift : MonoBehaviour
         this._gun      = gun;
         this._position = position;
         this._pickup   = pickup;
-        this._vfx      = FancyVFX.Spawn(Missiletoe.GetGiftVFX(pickup.quality, !unwrapping), this._position, Quaternion.identity,
+        this._vfx      = FancyVFX.SpawnUnpooled(Missiletoe.GetGiftVFX(pickup.quality, !unwrapping), this._position, Quaternion.identity,
             velocity: Vector2.zero, lifetime: Missiletoe._WrapAnimLength + 0.5f, fadeOutTime: 0.25f);
         this._sprite   = this._vfx.sprite;
         this._animator = this._sprite.spriteAnimator;

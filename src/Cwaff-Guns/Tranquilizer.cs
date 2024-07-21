@@ -99,8 +99,8 @@ public class TranquilizerBehavior : MonoBehaviour
             this._enemy.CollisionDamage            = 0f;
             this._enemy.CollisionKnockbackStrength = 0f;
 
-            FancyVFX.Spawn(Tranquilizer._SleepImpactVFX, this._enemy.CenterPosition, Quaternion.identity,
-                lifetime: 0.5f, fadeOutTime: 1.0f, parent: this._enemy.transform, startScale: 0.25f, endScale: 2f, height: 10f);
+            CwaffVFX.Spawn(Tranquilizer._SleepImpactVFX, this._enemy.CenterPosition, Quaternion.identity,
+                lifetime: 0.5f, fadeOutTime: 1.0f, startScale: 0.25f, endScale: 2f, height: 10f);
             this._enemy.gameObject.Play("fall_asleep_sound");
             this._orb.ClearOrbitals();
             this._orb.SetupOrbitals(vfx: Tranquilizer._SleepyVFX, numOrbitals: 2, rps: 0.4f, isEmissive: false, isOverhead: true, rotates: false, flips: true, fades: true, bobAmount: 0.25f);
