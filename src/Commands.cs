@@ -104,6 +104,11 @@ public class Commands
                 GameManager.Instance.PrimaryPlayer.AcquireMastery(GameManager.Instance.PrimaryPlayer.CurrentGun);
             }
 
+            if (Input.GetKeyDown(KeyCode.B)) // toggle constructor profiler
+            {
+                ConstructorProfiler.Toggle();
+            }
+
             return true;
         }
     }
