@@ -97,7 +97,7 @@ public class ExorcismJuice : MonoBehaviour
         pc.stats.RecalculateStats(pc);
 
         Texture2D ghostSprite;
-        if (HolyWaterGun._GhostTextures.ContainsKey(enemy.EnemyGuid))
+        if (HolyWaterGun._GhostTextures.ContainsKey(enemy.EnemyGuid)) //TODO: why am i not just setting the alpha here???
             ghostSprite = HolyWaterGun._GhostTextures[enemy.EnemyGuid]; // If we've already computed a texture for this enemy, don't do it again
         else
         {

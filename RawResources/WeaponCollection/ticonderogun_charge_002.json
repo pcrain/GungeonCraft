@@ -9,7 +9,7 @@
     {
       ".": "arraytype",
       "name": "array",
-      "size": 3
+      "size": 4
     },
     {
       "name": "PrimaryHand",
@@ -25,6 +25,15 @@
       "position": {
         "x": 1.5,
         "y": 0.375,
+        "z": 0.0
+      },
+      "angle": 0.0
+    },
+    {
+      "name": "Clip",
+      "position": {
+        "x": 0.0,
+        "y": 0.0,
         "z": 0.0
       },
       "angle": 0.0

@@ -4,6 +4,7 @@ public static class CwaffShaders
 {
     public static Shader DigitizeShader = null;
     public static Shader UnlitDigitizeShader = null;
+    public static Shader GoldShader = null;
     public static Texture2D DigitizeTexture = null;
 
     private static string GetShaderBundleNameForPlatform()
@@ -35,6 +36,7 @@ public static class CwaffShaders
             DigitizeShader = shaderBundle.LoadAsset<Shader>("assets/digitizeshader.shader");
             DigitizeTexture = shaderBundle.LoadAsset<Texture2D>("assets/bits.png");
             UnlitDigitizeShader = shaderBundle.LoadAsset<Shader>("assets/digitizeshaderunlit.shader");
+            GoldShader = shaderBundle.LoadAsset<Shader>("assets/goldshader.shader");
         }
     }
 

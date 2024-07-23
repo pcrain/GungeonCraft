@@ -1011,7 +1011,7 @@ public partial class CwaffVFX // private
 
         this._animator.library = this._library;
         this._animator.playAutomatically = true;
-        ETGModConsole.Log($"created new vfx {_SpawnedVFX.Count}");
+        // ETGModConsole.Log($"created new vfx {_SpawnedVFX.Count}");
     }
 
     /// <summary>Despawning is handled automatically and internally by the CwaffVFXManager</summary>

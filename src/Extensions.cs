@@ -1545,6 +1545,7 @@ public static class Extensions
   public static Vector3 HoverAt(this Vector3 pos, float amplitude = 1f, float frequency = 6.28f, float offset = 0.0f, float phase = 0.0f)
     => pos.XY().HoverAt(amplitude: amplitude, frequency: frequency, offset: offset, phase: phase).ToVector3ZisY();
 
+  //WARNING: only works with our VFX and sprites, can't be used with basegame sprites or results in wonky hitboxes
   /// <summary>Set up a SpeculativeRigidBody for a VFX sprite based on the sprite's dimensions, FlipX status, and Anchor</summary>
   public static SpeculativeRigidbody AutoRigidBody(this GameObject g, Anchor anchor, CollisionLayer clayer = CollisionLayer.HighObstacle, bool canBePushed = false)
   {
@@ -1897,8 +1898,12 @@ public static class Extensions
   public static tk2dBaseSprite DuplicateInWorld(this tk2dBaseSprite osprite)
   {
     tk2dBaseSprite sprite = Lazy.SpriteObject(osprite.collection, osprite.spriteId);
-    sprite.transform.rotation = osprite.transform.rotation;
     sprite.PlaceAtPositionByAnchor(osprite.WorldCenter, Anchor.MiddleCenter);
+    sprite.HeightOffGround        = osprite.HeightOffGround;
+    sprite.depthUsesTrimmedBounds = osprite.depthUsesTrimmedBounds;
+    sprite.SortingOrder           = osprite.SortingOrder;
+    sprite.renderLayer            = osprite.renderLayer;
+    sprite.UpdateZDepth();
     return sprite;
   }
 

@@ -72,48 +72,32 @@ public class MidasProjectile : MonoBehaviour
         p.OnWillKillEnemy += this.OnWillKillEnemy;
     }
 
-    private static tk2dSpriteCollectionData _GoldSpriteCollection = null;
-    internal static Dictionary<string, int> _GoldenSprites = new();
     private void OnWillKillEnemy(Projectile bullet, SpeculativeRigidbody enemy)
     {
         if (!enemy.aiActor || !enemy.healthHaver || enemy.healthHaver.IsBoss || enemy.healthHaver.IsSubboss)
             return; // don't do anything to bosses //NOTE: technically works on most bosses, but causes problems with Dragun and who knows what modded bosses...so just disabling
 
-        _GoldSpriteCollection ??= SpriteBuilder.ConstructCollection(new(), "goldcollection");
-        GameObject g = new();
-        if (!_GoldenSprites.TryGetValue(enemy.aiActor.EnemyGuid, out int spriteId))
-        {
-            Texture2D goldSprite = Lazy.GetTexturedEnemyIdleAnimation(enemy.aiActor, _Gold, 0.3f, _White, _SHEEN_WIDTH);
-            spriteId = _GoldenSprites[enemy.aiActor.EnemyGuid] = SpriteBuilder.AddSpriteToCollection(goldSprite, _GoldSpriteCollection, "goldsprite"); //NOTE: this doesn't use PackerHelper since it's done at runtime
-        }
-        tk2dBaseSprite sprite               = g.AddComponent<tk2dSprite>();
-            sprite.SetSprite(_GoldSpriteCollection, spriteId);
-            sprite.PlaceAtPositionByAnchor(enemy.UnitCenter.ToVector3ZisY(), Anchor.MiddleCenter);
-            sprite.HeightOffGround        = enemy.sprite.HeightOffGround;
-            sprite.depthUsesTrimmedBounds = enemy.sprite.depthUsesTrimmedBounds;
-            sprite.SortingOrder           = enemy.sprite.SortingOrder;
-            sprite.renderLayer            = enemy.sprite.renderLayer;
-            sprite.UpdateZDepth();
+        tk2dBaseSprite sprite = enemy.aiActor.sprite.DuplicateInWorld();
+        GameObject statue = sprite.gameObject;
+
+        IntVector2 offset = (16f * (sprite.WorldBottomLeft - statue.transform.position.XY())).ToIntVector2(); // compute offsets to make speculative rigid body work correctly
         PixelCollider pixelCollider = new PixelCollider();
             pixelCollider.CollisionLayer         = CollisionLayer.PlayerBlocker;
             pixelCollider.Enabled                = true;
-            pixelCollider.IsTrigger              = false; //true;
+            pixelCollider.IsTrigger              = false;;
             pixelCollider.ColliderGenerationMode = PixelCollider.PixelColliderGeneration.Manual;
-            pixelCollider.ManualOffsetX          = 0;
-            pixelCollider.ManualOffsetY          = 0;
+            pixelCollider.ManualOffsetX          = offset.x;
+            pixelCollider.ManualOffsetY          = offset.y;
             pixelCollider.ManualWidth            = Mathf.CeilToInt(C.PIXELS_PER_TILE * sprite.GetBounds().size.x);
             pixelCollider.ManualHeight           = Mathf.CeilToInt(C.PIXELS_PER_TILE * sprite.GetBounds().size.y);
-        SpeculativeRigidbody s = g.AddComponent<SpeculativeRigidbody>();
+        SpeculativeRigidbody s = statue.AddComponent<SpeculativeRigidbody>();
             s.CanBePushed        = true;
             s.CanBeCarried       = true;
             s.CollideWithOthers  = true;
             s.CollideWithTileMap = false;
-            s.TK2DSprite         = sprite;
-            s.PixelColliders     = new List<PixelCollider>(1);
-            s.PixelColliders.Add(pixelCollider);
+            s.PixelColliders     = new List<PixelCollider>{pixelCollider};
             s.Initialize();
-        g.AddComponent<GoldenDeath>();
-        // g.GetOrAddShader(Shader.Find("Brave/ItemSpecific/LootGlintAdditivePass")).SetColor("_OverrideColor", Color.yellow);
+        statue.AddComponent<GoldenDeath>();
 
         // if (enemy.aiActor.IsABoss()) // Unsure why this doesn't trigger normally, but this seems to fix it
         //     enemy.aiActor.ParentRoom.HandleRoomClearReward(); //TODO: it's possible non-boss room rewards also don't spawn if final enemy is midas'd...look into later
@@ -126,7 +110,7 @@ public class GoldenDeath : MonoBehaviour
 {
     private const float _START_EMIT    = 30.0f;
     private const float _MAX_EMIT      = 50.0f;
-    private const float _MIN_EMIT      = 0.5f;
+    private const float _MIN_EMIT      = 0.0f;
     private const float _GROW_TIME     = 0.25f;
     private const float _DECAY_TIME    = 0.5f;
     private const int   _NUM_PARTICLES = 10;
@@ -146,12 +130,13 @@ public class GoldenDeath : MonoBehaviour
 
         this._sprite = base.gameObject.GetComponent<tk2dSprite>();
         this._sprite.usesOverrideMaterial = true;
-        this._sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
-        this._sprite.renderer.material.DisableKeyword("BRIGHTNESS_CLAMP_OFF");
-        this._sprite.renderer.material.EnableKeyword("BRIGHTNESS_CLAMP_ON");
-        this._sprite.renderer.material.SetFloat("_EmissivePower", _lifetime);
-        this._sprite.renderer.material.SetFloat("_EmissiveColorPower", 1.55f);
-        this._sprite.renderer.material.SetColor("_EmissiveColor", ExtendedColours.paleYellow);
+        this._sprite.renderer.material.shader = CwaffShaders.GoldShader;
+        // this._sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
+        // this._sprite.renderer.material.DisableKeyword("BRIGHTNESS_CLAMP_OFF");
+        // this._sprite.renderer.material.EnableKeyword("BRIGHTNESS_CLAMP_ON");
+        // this._sprite.renderer.material.SetFloat("_EmissivePower", _lifetime);
+        // this._sprite.renderer.material.SetFloat("_EmissiveColorPower", 1.55f);
+        // this._sprite.renderer.material.SetColor("_EmissiveColor", ExtendedColours.paleYellow);
 
         CwaffVFX.SpawnBurst(prefab: QuarterPounder._MidasParticleVFX, numToSpawn: _NUM_PARTICLES, basePosition: this._sprite.WorldCenter,
             positionVariance: _PART_SPREAD, baseVelocity: Vector2.zero, velocityVariance: _PART_SPEED, velType: CwaffVFX.Vel.Radial,

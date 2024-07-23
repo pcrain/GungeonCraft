@@ -29,8 +29,12 @@ public class Commands
         ETGModConsole.Commands.AddGroup("shiny", delegate (string[] args)
         {
             ETGModConsole.Log($"testing custom shader");
-            CwaffShaders.Digitize(GameManager.Instance.PrimaryPlayer.sprite, delay: 1.0f);
-            CwaffShaders.Digitize(GameManager.Instance.PrimaryPlayer.CurrentGun.sprite, delay: 1.0f);
+            // CwaffShaders.Digitize(GameManager.Instance.PrimaryPlayer.sprite, delay: 1.0f);
+            // CwaffShaders.Digitize(GameManager.Instance.PrimaryPlayer.CurrentGun.sprite, delay: 1.0f);
+            tk2dBaseSprite s = GameManager.Instance.PrimaryPlayer.sprite;
+            s.usesOverrideMaterial = true;
+            Material m = s.renderer.material;
+            m.shader = CwaffShaders.GoldShader;
         });
         ETGModConsole.Commands.AddGroup("shader", delegate (string[] args)
         {

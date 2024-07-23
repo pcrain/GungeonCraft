@@ -3,6 +3,7 @@
 ## TBD
 
 - Optimized VFX creation code to reduce memory usage and lag spike frequency
+- Updated Quarter Pounder's turn-to-gold effect to use actual shaders instead of ad-hoc sprites
 
 ## 1.16.0 (2024-07-20)
 
