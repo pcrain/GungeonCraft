@@ -1717,9 +1717,9 @@ public static class Extensions
       def.position2                  += offset;
       def.position3                  += offset;
       def.boundsDataCenter           += offset;
-      def.boundsDataExtents          += offset;
+      // def.boundsDataExtents          += offset;
       def.untrimmedBoundsDataCenter  += offset;
-      def.untrimmedBoundsDataExtents += offset;
+      // def.untrimmedBoundsDataExtents += offset;
       if (def.colliderVertices != null && def.colliderVertices.Length > 0 && changesCollider)
           def.colliderVertices[0] += offset;
   }

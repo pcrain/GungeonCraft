@@ -33,7 +33,7 @@ public class Kevlar
             talkPointOffset        : C.PIXEL_SIZE * new Vector2(26, 66),
             npcPosition            : C.PIXEL_SIZE * new Vector2(37, 80),
             itemPositions          : ShopAPI.defaultItemPositions.ShiftAll(C.PIXEL_SIZE * new Vector2(22, 20)),
-            exactlyOncePerRun      : false, //NOTE: necessary to spawn on the first floor prequisiteValidator is fulfilled
+            exactlyOncePerRun      : fixedSpawn ? false : true, //NOTE: must be false in classic mode to spawn as soon as the prequisiteValidator is fulfilled
             // voice                  : "sans", // will play audio "Play_CHR_<voice>_voice_01"
             genericDialog          : new(){
                 "Hath ye no desire to be heir to yourself? For a price, I will make it so.",

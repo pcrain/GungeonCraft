@@ -3,7 +3,9 @@
 ## TBD
 
 - Optimized VFX creation code to reduce memory usage and lag spike frequency
+- Optimized vanilla pointcast code to reduce memory usage and lag spike frequency
 - Updated Quarter Pounder's turn-to-gold effect to use actual shaders instead of ad-hoc sprites
+- Fixed Insurance Shop being able to spawn multiple times per run with new "Default" spawn setting
 
 ## 1.16.0 (2024-07-20)
 

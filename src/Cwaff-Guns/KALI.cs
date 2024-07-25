@@ -56,10 +56,8 @@ public class KALI : CwaffGun
 
         string chargeAnim1 = gun.QuickUpdateGunAnimation("charge", returnToIdle: false);
             gun.SetAnimationFPS(chargeAnim1, 20);
-            // gun.SetGunAudio(_ChargeBase, "kali_charge_sound", 0);
         string chargeAnim2 = gun.QuickUpdateGunAnimation("charge_more", returnToIdle: false);
             gun.SetAnimationFPS(chargeAnim2, 40);
-            // gun.SetGunAudio(_ChargeMore, "kali_charge_sound", 0);
         string chargeAnim3 = gun.QuickUpdateGunAnimation("charge_most", returnToIdle: false);
             gun.SetAnimationFPS(chargeAnim3, 60);
             gun.SetGunAudio(chargeAnim3, "kali_charge_sound", 0);
