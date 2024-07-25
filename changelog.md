@@ -2,6 +2,7 @@
 
 ## TBD
 
+- Added 3 new synergies
 - Optimized VFX creation code to reduce memory usage and lag spike frequency
 - Optimized vanilla pointcast code to reduce memory usage and lag spike frequency
 - Updated Quarter Pounder's turn-to-gold effect to use actual shaders instead of ad-hoc sprites

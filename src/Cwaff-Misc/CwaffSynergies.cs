@@ -1,5 +1,8 @@
 namespace CwaffingTheGungy;
+
 using static Synergy;
+using static PlayerStats;
+using static StatModifier;
 
 public static class CwaffSynergies
 {
@@ -55,6 +58,15 @@ public static class CwaffSynergies
         NewSynergy(WICKED_CHILD, "Wicked Child", new[]{IName(PistolWhip.ItemName), IName(HolyWaterGun.ItemName)});
         // Enemies with guns that are charmed by Sub Machine Gun are given a Heroine.
         NewSynergy(I_NEED_A_HERO, "I Need a Hero", new[]{IName(SubMachineGun.ItemName), "heroine"});
+        // Digitized chests are automatically unlocked when re-materialized.
+        NewSynergy(KEYGEN, "Keygen", new[]{IName(Femtobyte.ItemName), "master_of_unlocking"});
+        // Maestro reflects projectiles 50% faster.
+        NewSynergy(COMMON_TIME, "Common Time", new[]{IName(Maestro.ItemName), "metronome"})
+            .MultFireRate(1.5f);
+        // Movement speed is increased by 25% while Breegull is active
+        NewSynergy(TALON_TROT, "Talon Trot", new[]{IName(Breegull.ItemName), "backpack"})
+            .MultMoveSpeed(1.25f);
+
       #endregion
 
       #region Masteries
@@ -102,10 +114,10 @@ public static class CwaffSynergies
                 ETGModConsole.Log($"<color=#ffff88ff>WARNING: haven't initialized custom synergy {_SynergyEnums[i]}</color>");
     }
 
-    private static void NewSynergy(Synergy synergy, string name, string[] mandatory, string[] optional = null, bool ignoreLichEyeBullets = false, int masteryId = -1)
+    private static AdvancedSynergyEntry NewSynergy(Synergy synergy, string name, string[] mandatory, string[] optional = null, bool ignoreLichEyeBullets = false, int masteryId = -1)
     {
         // Register the AdvancedSynergyEntry so that the game knows about it
-        RegisterSynergy(name, mandatory.ToList(), (optional != null) ? optional.ToList() : null, ignoreLichEyeBullets, masteryId);
+        AdvancedSynergyEntry ase = RegisterSynergy(name, mandatory.ToList(), (optional != null) ? optional.ToList() : null, ignoreLichEyeBullets, masteryId);
         // Get the enum index of our synergy
         int index            = (int)synergy;
         // Extend the base game's CustomSynergyType enum to make room for our new synergy
@@ -114,6 +126,8 @@ public static class CwaffSynergies
         _SynergyNames[index] = name;
         // Get the actual ID of our synergy entry in the AdvancedSynergyDatabase, which doesn't necessarily match the CustomSynergyType enum
         _SynergyIds[index]   = GameManager.Instance.SynergyManager.synergies.Length - 1;
+        // Return the AdvancedSynergyEntry
+        return ase;
     }
 
     public static AdvancedSynergyEntry RegisterSynergy(string name, List<string> mandatoryConsoleIDs, List<string> optionalConsoleIDs = null, bool ignoreLichEyeBullets = false, int masteryId = -1)
@@ -272,6 +286,15 @@ public static class CwaffSynergies
     {
         return player.ActiveExtraSynergies.Contains((int)_SynergyIds[(int)synergy]);
     }
+
+    // stat fixer-uppers
+    public static StatModifier Mult(this StatType s, float a) => new(){statToBoost = s, modifyType = ModifyMethod.MULTIPLICATIVE, amount = a};
+    public static StatModifier Add(this StatType s, float a) => new(){statToBoost = s, modifyType = ModifyMethod.ADDITIVE, amount = a};
+
+    public static AdvancedSynergyEntry MultFireRate(this AdvancedSynergyEntry e, float a)
+        { e.statModifiers.Add(StatType.RateOfFire.Mult(a)); return e; }
+    public static AdvancedSynergyEntry MultMoveSpeed(this AdvancedSynergyEntry e, float a)
+        { e.statModifiers.Add(StatType.MovementSpeed.Mult(a)); return e; }
 }
 
 // Dummy classes for masteries
@@ -311,6 +334,9 @@ public enum Synergy {
     AIM_BOTS,
     WICKED_CHILD,
     I_NEED_A_HERO,
+    KEYGEN,
+    COMMON_TIME,
+    TALON_TROT,
 
     // Masteries
     MASTERY_GRANDMASTER,

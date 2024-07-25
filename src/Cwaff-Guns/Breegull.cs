@@ -7,7 +7,10 @@ public class Breegull : CwaffGun
     public static string LongDescription  = "Fires eggs with varying effects & (ammo costs). Reloading with a full clip cycles egg types:\n (1) Normal: no effect\n (2) Fire: ignites\n (5) Grenade: large explosion\n (2) Ice: freezes\n (4) Clockwork: homing";
     public static string Lore             = "With bear no more,\n  the bird's alone.\nAmidst the Gungeon's\n  walls of stone.\nArmed with her trusty\n  eggs and beak.\nShe'll help you kill\n  the past you seek.\n- Guntilda";
 
+    private const float TALON_TROT_TIMER = 0.16f;
+
     internal static GameObject _Shrapnel     = null;
+    internal static GameObject _TalonDust    = null;
     internal static Projectile _EggNormal    = null;
     internal static Projectile _EggFire      = null;
     internal static Projectile _EggGrenade   = null;
@@ -22,6 +25,8 @@ public class Breegull : CwaffGun
     internal static string _ClockworkUI = $"{C.MOD_PREFIX}:_ClockworkUI";
 
     internal int _currentEggType = 0;
+    private float _noiseTimer = 0.0f;
+    private bool _altNoise = false;
 
     internal class EggData
     {
@@ -82,6 +87,29 @@ public class Breegull : CwaffGun
             new EggData(){ projectile = _EggIce,       sound = "collect_egg_ice_sound",       ui = _IceUI,       ammo = 2, },
             new EggData(){ projectile = _EggClockwork, sound = "collect_egg_clockwork_sound", ui = _ClockworkUI, ammo = 4, },
         };
+
+        _TalonDust = VFX.Create("talon_trot_dust", fps: 30, loops: false);
+    }
+
+    public override void Update()
+    {
+        base.Update();
+        if (!this.PlayerOwner || !this.PlayerOwner.HasSynergy(Synergy.TALON_TROT))
+            return;
+        if (!this.gun.spriteAnimator.CurrentClip.name.Contains("idle"))
+            return;
+        if (!this.PlayerOwner.spriteAnimator.CurrentClip.name.Contains("run_"))
+        {
+            this._noiseTimer = 0.0f;
+            this._altNoise = false;
+            return;
+        }
+        if ((_noiseTimer += BraveTime.DeltaTime) < TALON_TROT_TIMER)
+            return;
+        this.PlayerOwner.gameObject.Play(_altNoise ? "kazooie_walk_b" : "kazooie_walk_a");
+        this._noiseTimer = 0.0f;
+        this._altNoise = !this._altNoise;
+        SpawnManager.SpawnVFX(_TalonDust, this.PlayerOwner.sprite.WorldBottomCenter, Quaternion.identity);
     }
 
     public override Projectile OnPreFireProjectileModifier(Gun gun, Projectile projectile, ProjectileModule mod)

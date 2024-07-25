@@ -1848,6 +1848,9 @@ public static class Extensions
       }).Name;
   }
 
+  /// <summary>Yoinked from Spapi, need to refactor later</summary>
+  // public static void EnumeratorSetField(this object obj, string name, object value) => obj.GetType().EnumeratorField(name).SetValue(obj, value);
+
   /// <summary>Declare a local variable in an ILManipulator</summary>
   public static VariableDefinition DeclareLocal<T>(this ILContext il)
   {
@@ -2340,4 +2343,8 @@ public static class Extensions
       UnityEngine.Object.Destroy(sprite.gameObject);
       yield break;
   }
+
+  /// <summary>Unity null safe version of GetComponent</summary>
+  public static T GetSafeComponent<T>(this GameObject g) where T : Component
+    => (g && g.GetComponent<T>() is T t) ? t : null;
 }

@@ -386,7 +386,7 @@ public static class Lazy
     }
 
     /// <summary>Create a pickup spawn poof VFX at the specified position</summary>
-    public static void DoPickupAt(Vector3 pos)
+    public static void DoPickupAt(Vector3 pos, bool playSound = true)
     {
         GameObject original = (GameObject)ResourceCache.Acquire("Global VFX/VFX_Item_Pickup");
           GameObject gameObject = UnityEngine.Object.Instantiate(original);
@@ -394,7 +394,8 @@ public static class Lazy
                 sprite.PlaceAtPositionByAnchor(pos, Anchor.MiddleCenter);
                 sprite.HeightOffGround = 6f;
                 sprite.UpdateZDepth();
-        gameObject.Play("Play_OBJ_item_pickup_01");
+        if (playSound)
+            gameObject.Play("Play_OBJ_item_pickup_01");
     }
 
     /// <summary>Create some debris from the current frame of the given sprite</summary>

@@ -193,7 +193,7 @@ public class Femtobyte : CwaffGun
             SetCurrentSlot(new(){
                 type      = CHEST,
                 data      = data,
-                locked    = chest.IsLocked,
+                locked    = chest.IsLocked && !this.PlayerOwner.HasSynergy(Synergy.KEYGEN),
                 glitched  = chest.IsGlitched,
                 rainbow   = chest.IsRainbowChest,
                 contents  = chest.contents != null ? chest.contents.Select(p => p ? p.PickupObjectId : -1).ToList() : null,
