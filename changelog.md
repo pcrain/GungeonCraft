@@ -9,6 +9,7 @@
 - Fixed Insurance Shop being able to spawn multiple times per run with new "Default" spawn setting
 - Fixed null dereference in Femtobyte due to checking for collisions with nonexistent objects
 - Fixed camera remaining static when switching away from or dropping Ticonderogun while firing it
+- (Re-)fixed gun sprites being partially white in synergy notifications
 
 ## 1.16.0 (2024-07-20)
 

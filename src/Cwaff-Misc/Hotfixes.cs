@@ -370,6 +370,23 @@ public static class BadItemOffsetsFromChestHotfix
     }
 }
 
+/// <summary>Our guns show up funny in synergy notifications unless we use trimmed sprites, so fix that here by using the ammonomicon sprite instead</summary>
+[HarmonyPatch(typeof(UINotificationController), nameof(UINotificationController.SetupSynergySprite))]
+public static class SetupSynergySpritePatch
+{
+    static void Postfix(UINotificationController __instance, tk2dSpriteCollectionData collection, int spriteId)
+    {
+        string spriteName = collection.spriteDefinitions[spriteId].name;
+        if (!spriteName.EndsWith("_idle_001"))
+            return;
+        string trimmedSpriteName = spriteName.Replace("_idle_001", "_ammonomicon");
+        tk2dSpriteCollectionData ammonomiconCollection = AmmonomiconController.ForceInstance.EncounterIconCollection;
+        int trimmedId = ammonomiconCollection.GetSpriteIdByName(trimmedSpriteName, defaultValue: -1);
+        if (trimmedId != -1)
+            __instance.notificationSynergySprite.SetSprite(ammonomiconCollection, trimmedId);
+    }
+}
+
 // Fix player two not getting Turbo Mode speed buffs in Coop
 public static class CoopTurboModeHotfix
 {
