@@ -7,6 +7,7 @@
 - Updated Quarter Pounder's turn-to-gold effect to use actual shaders instead of ad-hoc sprites
 - Fixed Insurance Shop being able to spawn multiple times per run with new "Default" spawn setting
 - Fixed null dereference in Femtobyte due to checking for collisions with nonexistent objects
+- Fixed camera remaining static when switching away from or dropping Ticonderogun while firing it
 
 ## 1.16.0 (2024-07-20)
 

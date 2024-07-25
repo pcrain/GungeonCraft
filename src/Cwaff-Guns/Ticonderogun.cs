@@ -63,8 +63,15 @@ public class Ticonderogun : CwaffGun
 
     public override void OnDroppedByPlayer(PlayerController player)
     {
+        EndCharge();
         this._owner = null;
         base.OnDroppedByPlayer(player);
+    }
+
+    public override void OnSwitchedAwayFromThisGun()
+    {
+        EndCharge();
+        base.OnSwitchedAwayFromThisGun();
     }
 
     public override void Update()
