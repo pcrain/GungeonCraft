@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class VolcanicAmmolet : CwaffBlankModificationItem
+public class VolcanicAmmolet : CwaffBlankModificationItem, ICustomBlankDoer
 {
     public static string ItemName         = "Volcanic Ammolet";
     public static string ShortDescription = "Blanks Detonate Projectiles";
@@ -20,23 +20,10 @@ public class VolcanicAmmolet : CwaffBlankModificationItem
         item.AddToSubShop(ItemBuilder.ShopType.OldRed);
     }
 
-    private void OnCustomBlankedProjectile(Projectile p)
+    public void OnCustomBlankedProjectile(Projectile p)
     {
         _ExplosionTimer = QUICK_EXPLOSION_DELAY;  // temporarily sets the queued explosion speed until the next time the queue is empty
         Exploder.Explode(p.transform.position, Scotsman._ScotsmanExplosion, Vector2.zero, ignoreQueues: false);
-    }
-
-    [HarmonyPatch(typeof(SilencerInstance), nameof(SilencerInstance.ProcessBlankModificationItemAdditionalEffects))]
-    private class AmmoAmmoletProcessBlankModificationPatch
-    {
-        static void Postfix(SilencerInstance __instance, BlankModificationItem bmi, Vector2 centerPoint, PlayerController user)
-        {
-            if (bmi is not VolcanicAmmolet volcanicAmmolet)
-                return;
-
-            __instance.UsesCustomProjectileCallback = true;
-            __instance.OnCustomBlankedProjectile += volcanicAmmolet.OnCustomBlankedProjectile;
-        }
     }
 
     // keep accelerated explosion queue rate until after our queue is depleted

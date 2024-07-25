@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class ReserveAmmolet : CwaffBlankModificationItem
+public class ReserveAmmolet : CwaffBlankModificationItem, ICustomBlankDoer
 {
     public static string ItemName         = "Reserve Ammolet";
     public static string ShortDescription = "Blanks Restore Ammo";
@@ -27,18 +27,5 @@ public class ReserveAmmolet : CwaffBlankModificationItem
         this._stashedAmmo = 0;
     }
 
-    private void OnCustomBlankedProjectile(Projectile p) => ++this._stashedAmmo;
-
-    [HarmonyPatch(typeof(SilencerInstance), nameof(SilencerInstance.ProcessBlankModificationItemAdditionalEffects))]
-    private class AmmoAmmoletProcessBlankModificationPatch
-    {
-        static void Postfix(SilencerInstance __instance, BlankModificationItem bmi, Vector2 centerPoint, PlayerController user)
-        {
-            if (bmi is not ReserveAmmolet ammoAmmolet)
-                return;
-
-            __instance.UsesCustomProjectileCallback = true;
-            __instance.OnCustomBlankedProjectile += ammoAmmolet.OnCustomBlankedProjectile;
-        }
-    }
+    public void OnCustomBlankedProjectile(Projectile p) => ++this._stashedAmmo;
 }

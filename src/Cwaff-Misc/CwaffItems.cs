@@ -222,3 +222,21 @@ public abstract class CwaffBlankModificationItem: BlankModificationItem, ICwaffI
 
   }
 }
+
+public interface ICustomBlankDoer
+{
+  public void OnCustomBlankedProjectile(Projectile p);
+
+  [HarmonyPatch(typeof(SilencerInstance), nameof(SilencerInstance.ProcessBlankModificationItemAdditionalEffects))]
+  private static class AmmoAmmoletProcessBlankModificationPatch
+  {
+      static void Postfix(SilencerInstance __instance, BlankModificationItem bmi, Vector2 centerPoint, PlayerController user)
+      {
+          if (bmi is not ICustomBlankDoer customBlankDoer)
+              return;
+
+          __instance.UsesCustomProjectileCallback = true;
+          __instance.OnCustomBlankedProjectile += customBlankDoer.OnCustomBlankedProjectile;
+      }
+  }
+}
