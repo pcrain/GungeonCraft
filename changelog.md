@@ -6,6 +6,7 @@
 - Optimized vanilla pointcast code to reduce memory usage and lag spike frequency
 - Updated Quarter Pounder's turn-to-gold effect to use actual shaders instead of ad-hoc sprites
 - Fixed Insurance Shop being able to spawn multiple times per run with new "Default" spawn setting
+- Fixed null dereference in Femtobyte due to checking for collisions with nonexistent objects
 
 ## 1.16.0 (2024-07-20)
 
