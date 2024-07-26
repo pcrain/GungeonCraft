@@ -286,7 +286,7 @@ public class Femtobyte : CwaffGun
         Vector2 pos = player.unadjustedAimPoint;
         if (!this.CanPlacePhantom(pos))
             return; // invalid position
-        PlaceDigitizedObject(pos);
+        MaterializeObject(pos);
         player.SuppressThisClick = true;
     }
 
@@ -347,9 +347,9 @@ public class Femtobyte : CwaffGun
         // if (!C.DEBUG_BUILD || _DidDebugSetup)
         //     return;
         // _DidDebugSetup = true;
-        // int i = 0;
+        int i = 0;
         // this.digitizedObjects[i++] = new(){ type = SPECIAL, data = _NameToPrefabMap["forge_hammer"] };
-        // this.digitizedObjects[i++] = new(){ type = SPECIAL, data = _NameToPrefabMap["trap_sawblade_omni_gungeon_2x2"] };
+        this.digitizedObjects[i++] = new(){ type = SPECIAL, data = _NameToPrefabMap["trap_sawblade_omni_gungeon_2x2"] };
         // this.digitizedObjects[i++] = new(){ type = SPECIAL, data = _NameToPrefabMap["skullfirespinner"] };
         // this.digitizedObjects[i++] = new(){ type = SPECIAL, data = _NameToPrefabMap["flamepipe_spraysdown"] };
         // this.digitizedObjects[i++] = DigitizedObject.FromPickup(Items.Ak47.AsGun());
@@ -359,7 +359,7 @@ public class Femtobyte : CwaffGun
         // this.digitizedObjects[i++] = new(){ type = BARREL, data = _NameToPrefabMap["red barrel"] };
         // this.digitizedObjects[i++] = new(){ type = BARREL, data = _NameToPrefabMap["blue drum"] };
         // this.digitizedObjects[i++] = new(){ type = CHEST,  data = _NameToPrefabMap["chest_silver"], contents = [(int)Items.Akey47], locked = true };
-        // UpdateCurrentSlot();
+        UpdateCurrentSlot();
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
@@ -466,7 +466,7 @@ public class Femtobyte : CwaffGun
         player.gameObject.Play("replicant_select_sound");
     }
 
-    private void PlaceDigitizedObject(Vector2 placePoint)
+    private void MaterializeObject(Vector2 placePoint)
     {
         RoomHandler room = placePoint.GetAbsoluteRoom();
         if (room == null)
@@ -496,9 +496,9 @@ public class Femtobyte : CwaffGun
                 FlippableCover cover = table.GetComponent<FlippableCover>();
                 room.RegisterInteractable(cover);
                 cover.ConfigureOnPlacement(room);
-                tableBody.Initialize();
 
                 tableBody.CorrectForWalls();
+                cover.gameObject.AddComponent<FlipOnStart>().flipper = this.PlayerOwner;
                 PhysicsEngine.Instance.RegisterOverlappingGhostCollisionExceptions(tableBody, null, false);
                 CwaffShaders.Materialize(tableSprite);
                 break;
@@ -559,6 +559,12 @@ public class Femtobyte : CwaffGun
                     room.RegisterInteractable(interactable);
                 if (trap.GetComponentInChildren<PathMover>() is PathMover pathMover)
                     pathMover.CreateDummyPath();
+                if (trap.GetComponentInChildren<PathingTrapController>() is PathingTrapController ptc)
+                {
+                    ptc.hitsEnemies = true;
+                    ptc.enemyDamage = Mathf.Max(20f, ptc.enemyDamage);
+                    ptc.enemyKnockbackStrength = 3f * ptc.knockbackStrength;
+                }
                 if (trap.GetComponentInChildren<SpeculativeRigidbody>() is SpeculativeRigidbody trapBody)
                     trapBody.Reinitialize();
                 if (trap.GetComponent<BraveBehaviour>() is BraveBehaviour bb)
@@ -801,5 +807,23 @@ public class FemtobyteProjectile : MonoBehaviour
             return;
         Femtobyte.SpawnBitBurst(otherPos, 5);
         this._projectile.DieInAir(false, false, false, false);
+    }
+}
+
+public class FlipOnStart : MonoBehaviour
+{
+    public PlayerController flipper = null;
+}
+
+/// <summary>Flips a table immediately after it's been set up</summary>
+[HarmonyPatch(typeof(FlippableCover), nameof(FlippableCover.Start))]
+static class FlippableCoverStartPatch
+{
+    static void Postfix(FlippableCover __instance)
+    {
+        if (__instance.gameObject.GetComponent<FlipOnStart>() is not FlipOnStart fs)
+            return;
+        __instance.Flip(fs.flipper.specRigidbody);
+        UnityEngine.Object.Destroy(fs);
     }
 }

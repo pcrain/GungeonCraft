@@ -1,5 +1,10 @@
 # Changelog
 
+## TBD
+
+- Femtobyte now flips tables on placement
+- Fixed sawblades spawned by Femtobyte having no collision with enemies
+
 ## 1.16.1 (2024-07-25)
 
 - Added 5 new synergies
