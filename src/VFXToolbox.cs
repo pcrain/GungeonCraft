@@ -390,8 +390,10 @@ public static class VFX
     // Opacity management
     public static void SetAlpha(this Renderer renderer, float newAlpha = 1.0f)
     {
+        if (!renderer.material)
+            return;
         // NOTE: might need to also make sure sprite has override material
-        if (renderer.material.shader.name != "Brave/Internal/SimpleAlphaFadeUnlit")
+        if (renderer.material.shader == null || renderer.material.shader.name != "Brave/Internal/SimpleAlphaFadeUnlit")
         {
             if (renderer.gameObject.GetComponent<tk2dSprite>() is tk2dSprite sprite)
                 sprite.usesOverrideMaterial = true;
