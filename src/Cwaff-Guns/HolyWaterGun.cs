@@ -24,10 +24,6 @@ public class HolyWaterGun : CwaffGun
             ammoType: GameUIAmmoType.AmmoType.BEAM, damage: Exorcisable._EXORCISM_DPS, speed: 50.0f, force: 15.0f)).Attach<ExorcismJuice>();
             projectile.BlackPhantomDamageMultiplier = _JAMMED_DAMAGE_MULT;
 
-        //HACK: this is necessary when copying Mega Douser to avoid weird beam offsets from walls...why???
-        projectile.gameObject.transform.localScale = Vector3.one;
-        projectile.gameObject.transform.localPosition = Vector3.zero;
-
         BasicBeamController beamComp = projectile.SetupBeamSprites(
           spriteName: "holy_water_gun", fps: 20, dims: new Vector2(15, 15), impactDims: new Vector2(7, 7));
             beamComp.sprite.usesOverrideMaterial = true;

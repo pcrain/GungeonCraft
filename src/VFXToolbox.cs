@@ -672,10 +672,10 @@ public static class VFX
                 beamController.chargeAnimation = "beam_charge";
             }
 
-            //--------------Sets up the animation for the very start of the beam
+            //--------------Sets up the animation for the very start of the beam (muzzle flash)
             if (startVFXAnimationPaths != null && startVFXColliderDimensions != null && startVFXColliderOffsets != null)
             {
-                SetupBeamPart(animation, startVFXAnimationPaths, "beam_start", beamStartFPS, (Vector2)startVFXColliderDimensions, (Vector2)startVFXColliderOffsets/*, anchorOverride: Anchor.MiddleCenter*/);
+                SetupBeamPart(animation, startVFXAnimationPaths, "beam_start", beamStartFPS, (Vector2)startVFXColliderDimensions, (Vector2)startVFXColliderOffsets, anchorOverride: Anchor.MiddleCenter);
                 beamController.beamStartAnimation = "beam_start";
             }
             else

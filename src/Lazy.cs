@@ -47,6 +47,7 @@ public static class Lazy
             ammonomiconSprite      = $"{baseItemName}_ammonomicon";
 
             Gun gun                = go.GetComponent<Gun>();
+            gun.barrelOffset.transform.localScale = Vector3.one; //NOTE: Pea Shooter has a scale of 0.9, 0.9, 0.9, which messes up trails
             gun.gunName            = itemName;
             gun.gunSwitchGroup     = baseItemName;
             gun.modifiedVolley     = null;
