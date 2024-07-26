@@ -16,6 +16,14 @@ public static class CwaffSynergies
 
     internal static GameObject _MasteryVFX = null;
 
+    //NOTE: needs to be done early so guns and items can reference synergy ids properly
+    public static void InitEnums()
+    {
+        // Extend the base game's CustomSynergyType enum to make room for our new synergy
+        for (int i = 0; i < _SynergyNames.Count; ++i)
+            _Synergies[i] = ETGModCompatibility.ExtendEnum<CustomSynergyType>(C.MOD_PREFIX.ToUpper(), _SynergyEnums[i]);
+    }
+
     public static void Init()
     {
         /* NOTE:
@@ -63,9 +71,13 @@ public static class CwaffSynergies
         // Maestro reflects projectiles 50% faster.
         NewSynergy(COMMON_TIME, "Common Time", new[]{IName(Maestro.ItemName), "metronome"})
             .MultFireRate(1.5f);
-        // Movement speed is increased by 25% while Breegull is active
+        // Movement speed is increased by 25% while Breegull is active.
         NewSynergy(TALON_TROT, "Talon Trot", new[]{IName(Breegull.ItemName), "backpack"})
             .MultMoveSpeed(1.25f);
+        // [REDACTED]
+        NewSynergy(BLASTECH_A1, "BlasTech A-1", new[]{IName(BlasTechF4.ItemName), "laser_sight"});
+        // Blackjack fires poker chips on either side of thrown cards.
+        NewSynergy(PIT_BOSS, "Pit Boss", new[]{IName(Blackjack.ItemName), "amulet_of_the_pit_lord"});
 
       #endregion
 
@@ -116,21 +128,19 @@ public static class CwaffSynergies
 
     private static AdvancedSynergyEntry NewSynergy(Synergy synergy, string name, string[] mandatory, string[] optional = null, bool ignoreLichEyeBullets = false, int masteryId = -1)
     {
-        // Register the AdvancedSynergyEntry so that the game knows about it
-        AdvancedSynergyEntry ase = RegisterSynergy(name, mandatory.ToList(), (optional != null) ? optional.ToList() : null, ignoreLichEyeBullets, masteryId);
         // Get the enum index of our synergy
-        int index            = (int)synergy;
-        // Extend the base game's CustomSynergyType enum to make room for our new synergy
-        _Synergies[index]    = ETGModCompatibility.ExtendEnum<CustomSynergyType>(C.MOD_PREFIX.ToUpper(), _SynergyEnums[index]);
+        int index = (int)synergy;
+        // Register the AdvancedSynergyEntry so that the game knows about it
+        AdvancedSynergyEntry ase = RegisterSynergy(_Synergies[index], name, mandatory.ToList(), (optional != null) ? optional.ToList() : null, ignoreLichEyeBullets, masteryId);
         // Index the friendly name of our synergy
         _SynergyNames[index] = name;
         // Get the actual ID of our synergy entry in the AdvancedSynergyDatabase, which doesn't necessarily match the CustomSynergyType enum
-        _SynergyIds[index]   = GameManager.Instance.SynergyManager.synergies.Length - 1;
+        _SynergyIds[index] = GameManager.Instance.SynergyManager.synergies.Length - 1;
         // Return the AdvancedSynergyEntry
         return ase;
     }
 
-    public static AdvancedSynergyEntry RegisterSynergy(string name, List<string> mandatoryConsoleIDs, List<string> optionalConsoleIDs = null, bool ignoreLichEyeBullets = false, int masteryId = -1)
+    public static AdvancedSynergyEntry RegisterSynergy(CustomSynergyType synergy, string name, List<string> mandatoryConsoleIDs, List<string> optionalConsoleIDs = null, bool ignoreLichEyeBullets = false, int masteryId = -1)
     {
         List<int> itemIDs    = new();
         List<int> gunIDs     = new();
@@ -170,11 +180,10 @@ public static class CwaffSynergies
             MandatoryGunIDs      = gunIDs,
             OptionalItemIDs      = optItemIDs,
             OptionalGunIDs       = optGunIDs,
-            bonusSynergies       = new List<CustomSynergyType>(),
+            bonusSynergies       = new(){synergy},
             statModifiers        = new List<StatModifier>(),
             IgnoreLichEyeBullets = ignoreLichEyeBullets,
         };
-
 
         int oldLength = GameManager.Instance.SynergyManager.synergies.Length;
         Array.Resize(ref GameManager.Instance.SynergyManager.synergies, oldLength + 1);
@@ -277,6 +286,11 @@ public static class CwaffSynergies
         return IDs.InternalNames[itemName];
     }
 
+    public static CustomSynergyType Synergy(this Synergy synergy)
+    {
+        return _Synergies[(int)synergy];
+    }
+
     public static string SynergyName(this Synergy synergy)
     {
         return _SynergyNames[(int)synergy];
@@ -295,6 +309,9 @@ public static class CwaffSynergies
         { e.statModifiers.Add(StatType.RateOfFire.Mult(a)); return e; }
     public static AdvancedSynergyEntry MultMoveSpeed(this AdvancedSynergyEntry e, float a)
         { e.statModifiers.Add(StatType.MovementSpeed.Mult(a)); return e; }
+    public static AdvancedSynergyEntry MultSpread(this AdvancedSynergyEntry e, float a)
+        { e.statModifiers.Add(StatType.Accuracy.Mult(a)); return e; }
+
 }
 
 // Dummy classes for masteries
@@ -337,6 +354,8 @@ public enum Synergy {
     KEYGEN,
     COMMON_TIME,
     TALON_TROT,
+    BLASTECH_A1,
+    PIT_BOSS,
 
     // Masteries
     MASTERY_GRANDMASTER,

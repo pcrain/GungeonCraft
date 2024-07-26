@@ -53,6 +53,9 @@ public sealed class GunData
   public bool? shouldFlipVertically;
   public bool  useDummyChargeModule;
   public bool  invisibleProjectile;
+  public float angleFromAim;
+  public bool ignoredForReloadPurposes;
+  public bool mirror;
 
   public string spawnSound;
   public bool? stopSoundOnDeath;
@@ -66,6 +69,7 @@ public sealed class GunData
   public string hitSound;
   public string hitEnemySound;
   public string hitWallSound;
+  public bool? becomeDebris;
 
   /// <summary>Pseudo-constructor holding most setup information required for a single projectile gun.</summary>
   /// <param name="gun">The gun we're attaching to (can be null, only used for custom clip sprite name resolution for now).</param>
@@ -127,6 +131,10 @@ public sealed class GunData
   /// <param name="hitSound">fallback if hitEnemySound and/or hitWallSound is not specified</param>
   /// <param name="hitEnemySound"></param>
   /// <param name="hitWallSound"></param>
+  /// <param name="becomeDebris"></param>
+  /// <param name="angleFromAim"></param>
+  /// <param name="ignoredForReloadPurposes"></param>
+  /// <param name="mirror"></param>
   public static GunData New(Gun gun = null, Projectile baseProjectile = null, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
     ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1, GameUIAmmoType.AmmoType? ammoType = null,
     bool customClip = false, float? damage = null, float? speed = null, float? force = null, float? range = null, float? recoil = null, float poison = 0.0f, float fire = 0.0f, float freeze = 0.0f, float slow = 0.0f,
@@ -135,7 +143,7 @@ public sealed class GunData
     IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null, float bossDamageMult = 1.0f, string destroySound = null, bool? shouldRotate = null, int barrageSize = 1,
     bool? shouldFlipHorizontally = null, bool? shouldFlipVertically = null, bool useDummyChargeModule = false, bool invisibleProjectile = false, string spawnSound = null, bool? stopSoundOnDeath = null,
     bool? uniqueSounds = null, GameObject shrapnelVFX = null, int? shrapnelCount = null, float? shrapnelMinVelocity = null, float? shrapnelMaxVelocity = null, float? shrapnelLifetime = null, bool? preventOrbiting = null,
-    string hitSound = null, string hitEnemySound = null, string hitWallSound = null
+    string hitSound = null, string hitEnemySound = null, string hitWallSound = null, bool? becomeDebris = null, float angleFromAim = 0.0f, bool ignoredForReloadPurposes = false, bool mirror = false
     )
   {
       _Instance.gun                           = gun; // set by InitSpecialProjectile()
@@ -193,6 +201,9 @@ public sealed class GunData
       _Instance.hitSound                      = hitSound;
       _Instance.hitEnemySound                 = hitEnemySound;
       _Instance.hitWallSound                  = hitWallSound;
+      _Instance.becomeDebris                  = becomeDebris;
+      _Instance.angleFromAim                  = angleFromAim;
+      _Instance.mirror                        = mirror;
       return _Instance;
   }
 }
@@ -239,10 +250,52 @@ public static class GunBuilder
     return proj;
   }
 
-  /// <summary>Generic version of InitProjectile, assuming we just want a normal projectile</summary>
+  /// <summary>Generic version of InitSpecialProjectile, assuming we just want a normal projectile</summary>
   public static Projectile InitProjectile(this Gun gun, GunData b = null)
   {
     return gun.InitSpecialProjectile<Projectile>(b);
+  }
+
+  /// <summary>Creates a module for standalone use without attaching it to a gun</summary>
+  public static ProjectileModule InitSpecialSingleProjectileModule<ProjectileType>(this ProjectileModule mod, GunData b = null)
+    where ProjectileType : Projectile
+  {
+    if (b == null || b.baseProjectile == null)
+    {
+      Lazy.RuntimeWarn($"Tried to run InitModule() with a valid base projectile, backing out.");
+      return mod;
+    }
+
+    // Set up the mod's default projectile and default projectile animation
+    mod.SetAttributes(b);
+    Projectile clone = b.baseProjectile.Clone(b);
+    if (clone is not ProjectileType proj)
+      proj = clone.ConvertToSpecialtyType<ProjectileType>();
+    mod.projectiles = new(){proj};
+
+    // Determine whether we have an invisible projectile
+    proj.sprite.renderer.enabled = !b.invisibleProjectile;
+
+    // Need to set up charge projectiles after both module and base projectile have been set up
+    if (b.shootStyle == ShootStyle.Charged)
+    {
+      mod.chargeProjectiles = new();
+      if (b.chargeTime >= 0) //WARNING: recently changed this from > to >=, verify nothing breaks
+      {
+        mod.chargeProjectiles.Add(new ProjectileModule.ChargeProjectile {
+          Projectile = proj,
+          ChargeTime = b.chargeTime,
+        });
+      }
+    }
+
+    return mod;
+  }
+
+  /// <summary>Generic version of InitModule, assuming we just want a normal projectile</summary>
+  public static ProjectileModule InitSingleProjectileModule(this ProjectileModule mod, GunData b = null)
+  {
+    return mod.InitSpecialSingleProjectileModule<Projectile>(b);
   }
 
   /// <summary>Clone, modify, and return a specific projectile</summary>
@@ -283,12 +336,13 @@ public static class GunBuilder
       c.shrapnelMaxVelocity = b.shrapnelMaxVelocity ?? c.shrapnelMaxVelocity;
       c.shrapnelLifetime    = b.shrapnelLifetime    ?? c.shrapnelLifetime;
       c.preventOrbiting     = b.preventOrbiting     ?? c.preventOrbiting;
+      c.becomeDebris        = b.becomeDebris        ?? c.becomeDebris;
 
     // Non-defaulted
-    p.BossDamageMultiplier                            = b.bossDamageMult;
-    p.onDestroyEventName                              = b.destroySound;
-    p.enemyImpactEventName                            = b.hitEnemySound ?? b.hitSound;
-    p.objectImpactEventName                           = b.hitWallSound ?? b.hitSound;
+    p.BossDamageMultiplier  = b.bossDamageMult;
+    p.onDestroyEventName    = b.destroySound;
+    p.enemyImpactEventName  = b.hitEnemySound ?? b.hitSound;
+    p.objectImpactEventName = b.hitWallSound ?? b.hitSound;
 
     p.PoisonApplyChance = b.poison;
     p.AppliesPoison     = b.poison > 0.0f;
@@ -442,9 +496,12 @@ public static class GunBuilder
       mod.numberOfShotsInClip = b.clipSize.Value;
     if (b.cooldown.HasValue)
       mod.cooldownTime        = b.cooldown.Value;
-    mod.ammoCost            = b.ammoCost;
-    mod.shootStyle          = b.shootStyle;
-    mod.sequenceStyle       = b.sequenceStyle;
+    mod.ammoCost                 = b.ammoCost;
+    mod.shootStyle               = b.shootStyle;
+    mod.sequenceStyle            = b.sequenceStyle;
+    mod.angleFromAim             = b.angleFromAim;
+    mod.ignoredForReloadPurposes = b.ignoredForReloadPurposes;
+    mod.mirror                   = b.mirror;
     if (b.angleVariance.HasValue)
       mod.angleVariance = b.angleVariance.Value;
     if (b.customClip)

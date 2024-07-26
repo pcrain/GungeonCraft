@@ -28,6 +28,10 @@ public class Blackjack : CwaffGun
             AnimatedBullet.Create(refClip: ref _BackSprite,   name: "playing_card_back", fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft)
           ).SetAllImpactVFX(VFX.CreatePool("blackjack_card_impact_vfx", fps: 16, loops: false, scale: 0.75f, anchor: Anchor.MiddleCenter)
           ).Attach<ThrownCard>();
+
+        gun.AddSynergyModules(Synergy.PIT_BOSS, new ProjectileModule().InitSingleProjectileModule(GunData.New(gun: gun, ammoCost: 0, clipSize: _CLIP_SIZE,
+          cooldown: 0.16f, shootStyle: ShootStyle.Automatic, customClip: true, angleFromAim: 20f, angleVariance: 5f, ignoredForReloadPurposes: true,
+          mirror: true, baseProjectile: Items._38Special.Projectile(), sprite: "chip_projectile", hitSound: "chess_move", becomeDebris: true)));
     }
 }
 

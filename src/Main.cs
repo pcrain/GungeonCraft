@@ -149,6 +149,9 @@ public class Initialisation : BaseUnityPlugin
                 // Game tweaks
                 HeckedMode.Init();
 
+                // Synergy enum setup
+                CwaffSynergies.InitEnums();
+
                 setupConfig1Watch.Stop();
             #endregion
 
@@ -486,12 +489,6 @@ public class Initialisation : BaseUnityPlugin
                 //HACK: disable ETG debug log
                 // if (C.DEBUG_BUILD)
                 //     Application.logMessageReceived -= ETGModDebugLogMenu.Logger;
-            }
-
-            if (C.DEBUG_BUILD)
-            {
-                // ETGModConsole.Log($"profiling Femtobyte");
-                // harmony.ProfileType<Femtobyte>();
             }
         }
         catch (Exception e)

@@ -14,6 +14,7 @@ public class CwaffProjectile : MonoBehaviour
     public float shrapnelLifetime    = 0.3f;
     public bool preventOrbiting      = false;
     public bool firedForFree         = true;
+    public bool becomeDebris         = false;
 
     private Projectile _projectile;
     private PlayerController _owner;
@@ -24,6 +25,9 @@ public class CwaffProjectile : MonoBehaviour
         this._owner = this._projectile.Owner as PlayerController;
 
         this._projectile.OnDestruction += OnProjectileDestroy;
+
+        if (becomeDebris)
+          this._projectile.DestroyMode = Projectile.ProjectileDestroyMode.BecomeDebris;
 
         #region Sound Handling
           if (!string.IsNullOrEmpty(spawnSound))

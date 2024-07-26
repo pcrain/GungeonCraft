@@ -32,6 +32,11 @@ public class BlasTechF4 : CwaffGun
         base.PostProcessProjectile(projectile);
         if (this.PlayerOwner is not PlayerController pc)
             return;
+        if (pc.HasSynergy(Synergy.BLASTECH_A1))
+        {
+            projectile.gameObject.PlayUnique("blastech_fire_sound");
+            return;
+        }
 
         const float MAX_DEVIATION = 30f;
         projectile.Start(); // NOTE: need to make sure projectile has a valid specrigidbody

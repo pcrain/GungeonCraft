@@ -2347,4 +2347,11 @@ public static class Extensions
   /// <summary>Unity null safe version of GetComponent</summary>
   public static T GetSafeComponent<T>(this GameObject g) where T : Component
     => (g && g.GetComponent<T>() is T t) ? t : null;
+
+  /// <summary>Adds projectile modules to a gun when a synergy is active</summary>
+  public static void AddSynergyModules(this Gun gun, Synergy s, params ProjectileModule[] modules)
+  {
+      gun.gameObject.AddComponent<VolleyModificationSynergyProcessor>().synergies =
+        [new(){RequiredSynergy = s.Synergy(), AddsModules = true, ModulesToAdd = modules}];
+  }
 }
