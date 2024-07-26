@@ -1,6 +1,6 @@
 # Changelog
 
-## TBD
+## 1.16.1 (2024-07-25)
 
 - Added 5 new synergies
 - Optimized VFX creation code to reduce memory usage and lag spike frequency

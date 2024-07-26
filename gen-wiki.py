@@ -22,15 +22,20 @@ You can download the mod or read more about it [https://thunderstore.io/c/enter-
 }
 
 VANILLA_ITEMS = {
-  "hyper_light_blaster" : ("Hyper Light Blaster", "Hyper_Light_Blaster.png"),
-  "sunlight_javelin"    : ("Sunlight Javelin", "Sunlight_Javelin.png"),
-  "laser_lotus"         : ("Laser Lotus", "Laser_Lotus.png"),
-  "bubble_blaster"      : ("Bubble Blaster", "Bubble_Blaster.png"),
-  "gun_soul"            : ("Gun Soul", "Gun_Soul.png"),
-  "decoy"               : ("Decoy", "Decoy.png"),
-  "explosive_decoy"     : ("Explosive Decoy", "Explosive_Decoy.png"),
-  "nanomachines"        : ("Nanomachines", "Nanomachines.png"),
-  "heroine"             : ("Heroine", "Heroine.png"),
+  "hyper_light_blaster"    : ("Hyper Light Blaster", "Hyper_Light_Blaster.png"),
+  "sunlight_javelin"       : ("Sunlight Javelin", "Sunlight_Javelin.png"),
+  "laser_lotus"            : ("Laser Lotus", "Laser_Lotus.png"),
+  "bubble_blaster"         : ("Bubble Blaster", "Bubble_Blaster.png"),
+  "gun_soul"               : ("Gun Soul", "Gun_Soul.png"),
+  "decoy"                  : ("Decoy", "Decoy.png"),
+  "explosive_decoy"        : ("Explosive Decoy", "Explosive_Decoy.png"),
+  "nanomachines"           : ("Nanomachines", "Nanomachines.png"),
+  "heroine"                : ("Heroine", "Heroine.png"),
+  "master_of_unlocking"    : ("Master of Unlocking", "Master_of_Unlocking.png"),
+  "metronome"              : ("Metronome", "Metronome.png"),
+  "backpack"               : ("Backpack", "Backpack.png"),
+  "laser_sight"            : ("Laser Sight", "Laser_Sight.png"),
+  "amulet_of_the_pit_lord" : ("Amulet of the Pit Lord", "Amulet_of_the_Pit_Lord.png"),
 }
 
 def applyGunDataOverrides(gunData):
