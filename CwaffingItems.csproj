@@ -317,7 +317,6 @@
     <Reference Include="UnityEngine.TilemapModule"/>
     <Reference Include="UnityEngine.ImageConversionModule"/>
     <Reference Include="MonoMod.Utils"/>
-    <Reference Include="Alexandria"/>
     <Reference Include="MonoMod.RuntimeDetour"/>
     <Reference Include="Assembly-CSharp"/>
     <Reference Include="PlayMaker"/>
@@ -329,6 +328,7 @@
     <Reference Include="Mono.Cecil"/>
     <Reference Include="Mono.Cecil.Pdb"/>
     <Reference Include="Mono.Cecil.Mdb"/>
+    <Reference Include="Alexandria"/>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
   <Import Project=".\packages\BepInEx.Core.5.4.21\build\BepInEx.Core.targets" Condition="Exists('.\packages\BepInEx.Core.5.4.21\build\BepInEx.Core.targets')"/>

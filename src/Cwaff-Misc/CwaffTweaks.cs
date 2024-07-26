@@ -15,8 +15,8 @@ public static class CwaffTweaks
             if (C.DEBUG_BUILD)
                 ETGModConsole.Log("Making "+c+" pettable");
             Gungeon.Game.Items[c].GetComponent<CompanionItem>().MakePettable(
-                ResMap.Get("wolf_pet").ToArray(),
-                ResMap.Get("wolf_pet_left").ToArray());
+                ResMap.Get("wolf_pet"),
+                ResMap.Get("wolf_pet_left"));
         }
     }
 
@@ -24,7 +24,7 @@ public static class CwaffTweaks
         EnemyDatabase.GetOrLoadByGuid(ItemHelper.Get(Items.Dog).GetComponent<CompanionItem>().CompanionGuid)
             .aiAnimator.OtherAnimations.Find(n => n.name == "pet").anim;
 
-    public static void MakePettable(this CompanionItem ci, string[] pettingAnimation = null, string[] pettingAnimationLeft = null)
+    public static void MakePettable(this CompanionItem ci, List<string> pettingAnimation = null, List<string> pettingAnimationLeft = null)
     {
         // Get the companion controller for the companion
         CompanionController cc =

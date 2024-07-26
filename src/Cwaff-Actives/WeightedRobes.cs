@@ -47,9 +47,8 @@ public class WeightedRobes : CwaffActive, ILabelItem
     {
         if (!this._owner)
             return string.Empty;
-        dfLabel label = GameUIRoot.Instance.itemControllers[this._owner.PlayerIDX].ItemCountLabel;
-        label.gameObject.transform.localPosition = label.gameObject.transform.localPosition.WithY(0.27f);
-        label.ProcessMarkup = true; //HACK: stuff in Alexandria eventually
+        Transform t = GameUIRoot.Instance.itemControllers[this._owner.PlayerIDX].ItemCountLabel.gameObject.transform;
+        t.localPosition = t.localPosition.WithY(0.27f);
         return $"[color #dd6666]{(int)((100f * this._trainingDone[this._owner.PlayerIDX]) / _MAX_TRAINING)}%[/color]";
     }
 

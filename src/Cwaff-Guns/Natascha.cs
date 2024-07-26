@@ -157,10 +157,8 @@ public class Natascha : CwaffGun
             this.gun.AddStatToGun(PlayerStats.StatType.MovementSpeed, 1f, StatModifier.ModifyMethod.MULTIPLICATIVE);
         else
             this.gun.AddStatToGun(PlayerStats.StatType.MovementSpeed, 1f / (float)Math.Sqrt(this._speedMult), StatModifier.ModifyMethod.MULTIPLICATIVE);
-        //HACK: if we rebuild our stats while firing, certain projectile modifiers like scattershot or backup gun make the gun fire once per frame, so work around that
-        NataschaMovementSpeedPatch.skipRebuildingGunVolleys = true;
-        this.PlayerOwner.stats.RecalculateStats(this.PlayerOwner);
-        NataschaMovementSpeedPatch.skipRebuildingGunVolleys = false;
+        //NOTE: if we rebuild our stats while firing, certain projectile modifiers like scattershot or backup gun make the gun fire once per frame, so work around that
+        this.PlayerOwner.stats.RecalculateStatsWithoutRebuildingGunVolleys(this.PlayerOwner); //Alexandria helper
     }
 
     public float GetSpinupFireRate() => (this._speedMult / (1f + _MAX_SPIN_UP));
@@ -197,17 +195,6 @@ public class Natascha : CwaffGun
             // cursor.Emit(OpCodes.Ldarg_0);  // load enumerator type
             // cursor.Emit(OpCodes.Ldfld, AccessTools.GetDeclaredFields(ot).Find(f => f.Name == "$this")); // load actual "$this" field
             // cursor.Emit(OpCodes.Call, typeof(Natascha).GetMethod("ModifyRateOfFire", BindingFlags.Static | BindingFlags.NonPublic));
-        }
-    }
-
-    /// <summary>Prevent gun volleys from being rebuilt when recalculating movement speed in Natascha's ResetSpinup() method</summary>
-    [HarmonyPatch(typeof(PlayerStats), nameof(PlayerStats.RebuildGunVolleys))]
-    private class NataschaMovementSpeedPatch
-    {
-        internal static bool skipRebuildingGunVolleys = false;
-        static bool Prefix(PlayerController owner)
-        {
-            return !skipRebuildingGunVolleys; // skip original method iff skipRebuildingGunVolleys is true
         }
     }
 }

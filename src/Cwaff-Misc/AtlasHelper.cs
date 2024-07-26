@@ -227,13 +227,14 @@ public static class AtlasHelper
 
       //Add definition to collection
       int oldLength = collection.spriteDefinitions.Length;
-      Array.Resize(ref collection.spriteDefinitions, oldLength + newDefs.Count);
-      int i = oldLength;
-      foreach (tk2dSpriteDefinition def in newDefs)
+      int n = newDefs.Count;
+      Array.Resize(ref collection.spriteDefinitions, oldLength + n);
+      for (int i = 0; i < n; ++i)
       {
-        collection.spriteDefinitions[i] = def;
-        collection.spriteNameLookupDict[def.name] = i;
-        i++;
+        tk2dSpriteDefinition def = newDefs[i];
+        int newPos = oldLength + i;
+        collection.spriteDefinitions[newPos] = def;
+        collection.spriteNameLookupDict[def.name] = newPos;
       }
       if (attachPoints == null)
         return new IntVector2(oldLength, newDefs.Count);
@@ -250,15 +251,16 @@ public static class AtlasHelper
         // ETGModConsole.Log($"setting attach points for {id} == {spriteName}");
       }
 
-      return new IntVector2(oldLength, newDefs.Count);
+      return new IntVector2(oldLength, n);
   }
 
   /// <summary>Helper method for adding multiple sprites to a collection at once (public path-based version). Returns the id of the first sprite added and the number of sprites added.</summary>
-  public static IntVector2 AddSpritesToCollection(IEnumerable<string> paths, tk2dSpriteCollectionData collection)
+  public static IntVector2 AddSpritesToCollection(List<string> paths, tk2dSpriteCollectionData collection)
   {
-    List<tk2dSpriteDefinition> defs = new();
-    foreach (string path in paths)
-      defs.Add(_PackedTextures[path]);
+    int n = paths.Count;
+    List<tk2dSpriteDefinition> defs = new(n);
+    for (int i = 0; i < n; ++i)
+      defs.Add(_PackedTextures[paths[i]]);
     return AddSpritesToCollection(defs, collection);
   }
 
