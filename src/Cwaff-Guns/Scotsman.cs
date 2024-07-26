@@ -111,10 +111,19 @@ public class Scotsman : CwaffGun
     private void DetonateStickies(PlayerController pc)
     {
         List<Stickybomb> remainingStickies = new();
+        bool anythingDetonated = false;
         foreach (Stickybomb sticky in this._extantStickies)
-            if (sticky && sticky.Detonate(pc))
+        {
+            if (!sticky)
+                continue;
+            if (sticky.Detonate(pc))
+                anythingDetonated = true;
+            else
                 remainingStickies.Add(sticky);
+        }
         this._extantStickies = remainingStickies;
+        if (anythingDetonated)
+            pc.gameObject.Play("stickybomblauncher_det");
     }
 }
 
@@ -236,7 +245,6 @@ public class Stickybomb : MonoBehaviour
         // Phase 3, primed for detonation
         for (int i = 0; i < 3; ++i)
         {
-            base.gameObject.Play("stickybomblauncher_det");
             this._projectile.sprite.SetGlowiness(glowAmount: _DET_GLOW, glowColor: Color.red);
             yield return new WaitForSeconds(_DET_TIMER / 6);
             this._projectile.sprite.SetGlowiness(glowAmount: _BASE_GLOW, glowColor: Color.red);
