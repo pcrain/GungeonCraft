@@ -291,9 +291,10 @@ public static class AnimatedBullet // stolen and modified from NN
 {
     private static int _ClipCounter = 0;
     private static HashSet<string> _KnownClips = new();
-    public static tk2dSpriteAnimationClip CreateProjectileAnimation(List<string> names, int fps, bool loops, List<float> pixelScales, List<bool> lighteneds, List<Anchor> anchors, List<bool> anchorsChangeColliders,
-        List<bool> fixesScales, List<Vector3?> manualOffsets, List<IntVector2?> overrideColliderPixelSizes, List<IntVector2?> overrideColliderOffsets, List<Projectile> overrideProjectilesToCopyFrom)
+    public static tk2dSpriteAnimationClip Create( string name, int fps = 2, Anchor anchor = Anchor.MiddleCenter, float scale = 1.0f, bool anchorsChangeColliders = true,
+        bool fixesScales = true, IntVector2? overrideColliderPixelSizes = null, IntVector2? overrideColliderOffsets = null)
     {
+        List<string> names = ResMap.Get(name).Base();
         if (_KnownClips.Contains(names[0]))
         {
             Lazy.DebugWarn($"  HEY! re-creating projectile sprite {names[0]}. If this is intentional, please reuse the original clip, don't create it twice.");
@@ -302,71 +303,38 @@ public static class AnimatedBullet // stolen and modified from NN
         tk2dSpriteAnimationClip clip = new(){
             name     = names[0]+"_clip",
             fps      = fps,
-            wrapMode = loops ? tk2dSpriteAnimationClip.WrapMode.Loop : tk2dSpriteAnimationClip.WrapMode.Once,
+            wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop,
             frames   = new tk2dSpriteAnimationFrame[names.Count],
         };
         tk2dSpriteCollectionData coll = ETGMod.Databases.Items.ProjectileCollection;
         for (int i = 0; i < names.Count; i++)
         {
             int spriteId = coll.inst.GetSpriteIdByName(names[i]);
-            float scale = pixelScales[i];
-            clip.frames[i] = new(){
-                spriteCollection = coll,
-                spriteId         = spriteId,
-            };
+            clip.frames[i] = new(){ spriteCollection = coll, spriteId = spriteId };
             tk2dSpriteDefinition def = coll.inst.spriteDefinitions[spriteId];
             if (scale != 1.0f)
                 def.ScaleBy(scale);
             //NOTE: set up default colliders, could maybe do at atlas build time but not all sprites need it, so doing it here for now on an as-needed basis
             def.colliderVertices = new Vector3[2]{
-                overrideColliderOffsets[i].HasValue
-                    ? C.PIXEL_SIZE * overrideColliderOffsets[i].Value.ToVector3()
+                overrideColliderOffsets.HasValue
+                    ? C.PIXEL_SIZE * overrideColliderOffsets.Value.ToVector3()
                     : def.position0, // offset
-                0.5f * (overrideColliderPixelSizes[i].HasValue
-                    ? (C.PIXEL_SIZE * overrideColliderPixelSizes[i].Value.ToVector3())
+                0.5f * (overrideColliderPixelSizes.HasValue
+                    ? (C.PIXEL_SIZE * overrideColliderPixelSizes.Value.ToVector3())
                     : def.boundsDataExtents) // radius
             };
-            def.BetterConstructOffsetsFromAnchor(anchors[i], fixesScales[i] ? def.position3 : null, fixesScales[i], anchorsChangeColliders[i]);
-            if (manualOffsets[i].HasValue)
-            {
-                Vector3 manualOffset = manualOffsets[i].Value;
-                def.position0 += manualOffset;
-                def.position1 += manualOffset;
-                def.position2 += manualOffset;
-                def.position3 += manualOffset;
-            }
+            def.BetterConstructOffsetsFromAnchor(anchor, fixesScales ? def.position3 : null, fixesScales, anchorsChangeColliders);
         }
         // Lazy.DebugLog($"  created clip {clip.name} with id {clip.frames[0].spriteId}");
         _KnownClips.Add(names[0]);
         return clip;
     }
 
-    public static tk2dSpriteAnimationClip Create(string name, int fps = 2, Anchor anchor = Anchor.MiddleCenter, float scale = 1.0f, bool anchorsChangeColliders = true,
-        bool fixesScales = true, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null, IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null)
-    {
-        List<string> names = ResMap.Get(name).Base();
-        int n = names.Count;
-        return CreateProjectileAnimation(
-            names                         : names,
-            fps                           : fps,
-            loops                         : true,
-            pixelScales                   : Enumerable.Repeat(scale,n).ToList(),
-            lighteneds                    : Enumerable.Repeat(false/*lighteneds*/,n).ToList(),
-            anchors                       : Enumerable.Repeat(anchor,n).ToList(),
-            anchorsChangeColliders        : Enumerable.Repeat(anchorsChangeColliders,n).ToList(),
-            fixesScales                   : Enumerable.Repeat(fixesScales,n).ToList(),
-            manualOffsets                 : Enumerable.Repeat<Vector3?>(manualOffsets,n).ToList(),
-            overrideColliderPixelSizes    : Enumerable.Repeat<IntVector2?>(overrideColliderPixelSizes,n).ToList(),
-            overrideColliderOffsets       : Enumerable.Repeat<IntVector2?>(overrideColliderOffsets,n).ToList(),
-            overrideProjectilesToCopyFrom : Enumerable.Repeat<Projectile>(overrideProjectilesToCopyFrom,n).ToList());
-    }
-
     public static tk2dSpriteAnimationClip Create(ref tk2dSpriteAnimationClip refClip, string name, int fps = 2, Anchor anchor = Anchor.MiddleCenter, float scale = 1.0f, bool anchorsChangeColliders = true,
-        bool fixesScales = true, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null, IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null)
+        bool fixesScales = true, IntVector2? overrideColliderPixelSizes = null, IntVector2? overrideColliderOffsets = null)
     {
         return refClip = AnimatedBullet.Create(name: name, fps: fps, anchor: anchor, scale: scale, anchorsChangeColliders: anchorsChangeColliders,
-            fixesScales: fixesScales, manualOffsets: manualOffsets, overrideColliderPixelSizes: overrideColliderPixelSizes,
-            overrideColliderOffsets: overrideColliderOffsets, overrideProjectilesToCopyFrom: overrideProjectilesToCopyFrom);
+            fixesScales: fixesScales, overrideColliderPixelSizes: overrideColliderPixelSizes, overrideColliderOffsets: overrideColliderOffsets);
     }
 
     public static void SetAnimation(this Projectile proj, tk2dSpriteAnimationClip clip, int frame = 0)
@@ -378,22 +346,21 @@ public static class AnimatedBullet // stolen and modified from NN
     public static void AddAnimation(this Projectile proj, tk2dSpriteAnimationClip clip, bool overwriteExisting = false)
     {
         if (proj.sprite.spriteAnimator == null)
-        {
             proj.sprite.spriteAnimator = proj.sprite.gameObject.AddComponent<tk2dSpriteAnimator>();
-        }
-        proj.sprite.spriteAnimator.playAutomatically = true;
-        if (proj.sprite.spriteAnimator.Library == null)
+        tk2dSpriteAnimator animator = proj.sprite.spriteAnimator;
+        if (animator.Library == null)
         {
-            proj.sprite.spriteAnimator.Library = proj.sprite.spriteAnimator.gameObject.AddComponent<tk2dSpriteAnimation>();
-            proj.sprite.spriteAnimator.Library.clips = new tk2dSpriteAnimationClip[0];
-            proj.sprite.spriteAnimator.Library.enabled = true;
+            animator.Library = animator.gameObject.AddComponent<tk2dSpriteAnimation>();
+            animator.Library.clips = new tk2dSpriteAnimationClip[0];
+            animator.Library.enabled = true;
         }
 
         if (overwriteExisting)
-            proj.sprite.spriteAnimator.Library.clips = new tk2dSpriteAnimationClip[] { clip };
+            animator.Library.clips = new tk2dSpriteAnimationClip[] { clip };
         else
-            proj.sprite.spriteAnimator.Library.clips = proj.sprite.spriteAnimator.Library.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
-        proj.sprite.spriteAnimator.deferNextStartClip = false;
+            animator.Library.clips = animator.Library.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
+        animator.playAutomatically = true;
+        animator.deferNextStartClip = false;
     }
 
     public static void AddDefaultAnimation(this Projectile proj, tk2dSpriteAnimationClip clip, int frame = 0, bool overwriteExisting = false)
@@ -408,8 +375,8 @@ public static class AnimatedBullet // stolen and modified from NN
             return; // if we haven't specified a sprite, make this a no-op
         proj.AddDefaultAnimation(AnimatedBullet.Create(
             name: b.sprite, fps: b.fps, anchor: b.anchor, scale: b.scale, anchorsChangeColliders: b.anchorsChangeColliders, fixesScales: b.fixesScales,
-            manualOffsets: b.manualOffsets, overrideColliderPixelSizes: b.overrideColliderPixelSizes, overrideColliderOffsets: b.overrideColliderOffsets,
-            overrideProjectilesToCopyFrom: b.overrideProjectilesToCopyFrom), frame: frame, overwriteExisting: true);
+            overrideColliderPixelSizes: b.overrideColliderPixelSizes, overrideColliderOffsets: b.overrideColliderOffsets),
+          frame: frame, overwriteExisting: true);
     }
 }
 

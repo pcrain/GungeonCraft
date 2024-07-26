@@ -41,10 +41,8 @@ public sealed class GunData
   public float scale;
   public bool anchorsChangeColliders;
   public bool fixesScales;
-  public Vector3? manualOffsets;
   public IntVector2? overrideColliderPixelSizes;
   public IntVector2? overrideColliderOffsets;
-  public Projectile overrideProjectilesToCopyFrom;
   public float bossDamageMult;
   public string destroySound;
   public bool? shouldRotate;
@@ -105,10 +103,8 @@ public sealed class GunData
   /// <param name="scale">The scale of the sprite in-game relative to its pixel size on disk.</param>
   /// <param name="anchorsChangeColliders">If true, colliders are adjusted to account for the sprite's anchor.</param>
   /// <param name="fixesScales">If true, colliders are adjusted to account for scaling.</param>
-  /// <param name="manualOffsets">[Unknown]</param>
   /// <param name="overrideColliderPixelSizes">If set, manually adjusts the size of the projectile's hitbox.</param>
   /// <param name="overrideColliderOffsets">If set, manually adjusts the offset of the projectile's hitbox.</param>
-  /// <param name="overrideProjectilesToCopyFrom">[Unknown]</param>
 
   /// <param name="bossDamageMult"></param>
   /// <param name="destroySound">Sound event for when projectile is destroyed</param>
@@ -139,8 +135,8 @@ public sealed class GunData
     ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1, GameUIAmmoType.AmmoType? ammoType = null,
     bool customClip = false, float? damage = null, float? speed = null, float? force = null, float? range = null, float? recoil = null, float poison = 0.0f, float fire = 0.0f, float freeze = 0.0f, float slow = 0.0f,
     bool? collidesWithEnemies = null, bool? ignoreDamageCaps = null, bool? collidesWithProjectiles = null, bool? surviveRigidbodyCollisions = null, bool? collidesWithTilemap = null,
-    string sprite = null, int fps = 2, Anchor anchor = Anchor.MiddleCenter, float scale = 1.0f, bool anchorsChangeColliders = true, bool fixesScales = true, Vector3? manualOffsets = null, IntVector2? overrideColliderPixelSizes = null,
-    IntVector2? overrideColliderOffsets = null, Projectile overrideProjectilesToCopyFrom = null, float bossDamageMult = 1.0f, string destroySound = null, bool? shouldRotate = null, int barrageSize = 1,
+    string sprite = null, int fps = 2, Anchor anchor = Anchor.MiddleCenter, float scale = 1.0f, bool anchorsChangeColliders = true, bool fixesScales = true, IntVector2? overrideColliderPixelSizes = null,
+    IntVector2? overrideColliderOffsets = null, float bossDamageMult = 1.0f, string destroySound = null, bool? shouldRotate = null, int barrageSize = 1,
     bool? shouldFlipHorizontally = null, bool? shouldFlipVertically = null, bool useDummyChargeModule = false, bool invisibleProjectile = false, string spawnSound = null, bool? stopSoundOnDeath = null,
     bool? uniqueSounds = null, GameObject shrapnelVFX = null, int? shrapnelCount = null, float? shrapnelMinVelocity = null, float? shrapnelMaxVelocity = null, float? shrapnelLifetime = null, bool? preventOrbiting = null,
     string hitSound = null, string hitEnemySound = null, string hitWallSound = null, bool? becomeDebris = null, float angleFromAim = 0.0f, bool ignoredForReloadPurposes = false, bool mirror = false
@@ -177,10 +173,8 @@ public sealed class GunData
       _Instance.scale                         = scale;
       _Instance.anchorsChangeColliders        = anchorsChangeColliders;
       _Instance.fixesScales                   = fixesScales;
-      _Instance.manualOffsets                 = manualOffsets;
       _Instance.overrideColliderPixelSizes    = overrideColliderPixelSizes;
       _Instance.overrideColliderOffsets       = overrideColliderOffsets;
-      _Instance.overrideProjectilesToCopyFrom = overrideProjectilesToCopyFrom;
       _Instance.bossDamageMult                = bossDamageMult;
       _Instance.destroySound                  = destroySound;
       _Instance.shouldRotate                  = shouldRotate;
