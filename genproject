@@ -13,7 +13,7 @@ gfxchecksums="./obj/_${namespace}-checksums-gfx"     #file containing checksums 
 audiochecksums="./obj/_${namespace}-checksums-audio" #file containing checksums of all audio files to determine rebuilding audio bank
 externalupdate="./obj/_${namespace}-externalupdate"  #file containing the last time an external resource was added
 audioupdate="./obj/_${namespace}-audioupdate"        #file containing the last time an audio resource / csv was added / updated
-dllname="./bin/Debug/${projectname}.dll"         #DLL name is directly based on the project name
+dllname="./bin/Debug/${projectname}.dll"         #Debug DLL name, directly based on the project name
 dotnet35path="$(pwd)/_dotNETFramework/v3.5"      #Path to .NET 3.5 developer assemblies (from NUGet)
 USEXTERNALASSEMBLY=0                             #Whether to use the external Assembly-Csharp.dll or the one bundled in the source directory
 UPDATEDLLS=0                                     #Set to 1 if any new DLLS are added to make sure they're copied correctly to bin/Debug
@@ -41,6 +41,7 @@ HERE`
 thunderstore=0
 if [ $# -gt 0 ] && [ "$1" == "-t" ]; then
   thunderstore=1 #prepare for publishing on Thunderstore
+  dllname="./bin/Release/${projectname}.dll" #Release DLL name
 fi
 
 #Base directory we're copying our plugin to
@@ -270,6 +271,7 @@ template=`cat <<'HERE'
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <LangVersion>latest</LangVersion>
@@ -279,6 +281,9 @@ template=`cat <<'HERE'
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <FrameworkPathOverride>%s</FrameworkPathOverride>
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
   <ItemGroup>
     %s
@@ -303,7 +308,7 @@ echo -e "[${GRN}>${BLN}] Substituting .csproj template"
 #Get old checksum of generated csproj file
 oldchecksum="$(md5sum "$projfile" | cut -f 1 -d ' ')"
 #Invoke the substitution and create our projects file
-printf "$template" "$namespace" "$projectname" "$dotnet35path" "$replace" | xmllint --format - > "${projfile}.new"
+printf "$template" "$namespace" "$projectname" "$dotnet35path" "$dotnet35path" "$replace" | xmllint --format - > "${projfile}.new"
 #Get new checksum of generated csproj file
 newchecksum="$(md5sum "${projfile}.new" | cut -f 1 -d ' ')"
 
@@ -363,7 +368,11 @@ if [ $rebuild -eq 1 ]; then
   #Actually rebuild the project
   echo -e "[${GRN}>${BLN}] Building project"
   # cat "${projfile}" | sed '/Assembly-CSharp-Full/,+3d' > "${projfile}.fixed"
-  dotnet build --no-restore -m -noLogo -warnAsMessage:"${nowarn}" -v:minimal -clp:"Summary" # "${projfile}.fixed"
+  if [ $thunderstore -eq 1 ]; then
+    dotnet build --no-restore -m -noLogo -warnAsMessage:"${nowarn}" -v:minimal -clp:"Summary" -property:Configuration=Release
+  else
+    dotnet build --no-restore -m -noLogo -warnAsMessage:"${nowarn}" -v:minimal -clp:"Summary"
+  fi
   error="$?"
   killall dotnet >/dev/null 2>&1 # fixes a dumb bug where the child process doesn't terminate...thanks microsoft D:
   # dotnet build -m -noLogo -warnAsMessage:"${nowarn}" -v:minimal -clp:"Summary;Verbosity=minimal"

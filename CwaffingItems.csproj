@@ -27,6 +27,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <LangVersion>latest</LangVersion>
@@ -36,6 +37,9 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <FrameworkPathOverride>/home/pretzel/workspace/gungeon-projects/gungy-cwaffing/_dotNETFramework/v3.5</FrameworkPathOverride>
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
   <ItemGroup>
     <None Include="packages.config"/>
@@ -119,7 +123,6 @@
     <Compile Include="src\Cwaff-NPCs\Cammy.cs"/>
     <Compile Include="src\Cwaff-NPCs\WhiteMageScrapped.cs"/>
     <Compile Include="src\Cwaff-NPCs\Bart.cs"/>
-    <Compile Include="src\Cwaff-Debug\OneOffDebugDungeonFlow.cs"/>
     <Compile Include="src\Common.cs"/>
     <Compile Include="src\Cwaff-Actives\AmazonPrimer.cs"/>
     <Compile Include="src\Cwaff-Actives\WeightedRobes.cs"/>
@@ -220,6 +223,7 @@
     <Compile Include="src\Cwaff-Guns\Telefragger.cs"/>
     <Compile Include="src\Cwaff-Flows\FlowHelpers.cs"/>
     <Compile Include="src\Cwaff-Flows\CwaffDungeons.cs"/>
+    <Compile Include="src\Cwaff-Flows\OneOffDebugDungeonFlow.cs"/>
     <Compile Include="src\Cwaff-Flows\SansDungeon.cs"/>
     <Compile Include="src\Cwaff-Flows\CwaffDungeonFlows.cs"/>
     <Compile Include="src\Cwaff-Flows\FlowPrefabs.cs"/>

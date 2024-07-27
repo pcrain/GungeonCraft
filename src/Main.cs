@@ -72,7 +72,13 @@ public class Initialisation : BaseUnityPlugin
             System.Diagnostics.Process currentProcess = System.Diagnostics.Process.GetCurrentProcess();
             long oldMemory = currentProcess.WorkingSet64;
             if (C.DEBUG_BUILD)
-                ETGModConsole.Log("Cwaffing the Gungy initializing...");
+            {
+                #if DEBUG
+                    ETGModConsole.Log("Cwaffing the Gungy initializing...[DEBUG BUILD]");
+                #else
+                    ETGModConsole.Log("Cwaffing the Gungy initializing...[RELEASE BUILD]");
+                #endif
+            }
 
             Instance = this;
             Harmony harmony = new Harmony(C.MOD_GUID);
