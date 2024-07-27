@@ -124,6 +124,7 @@ public static class Lazy
         item.encounterTrackable.SuppressInInventory  = true;  // don't show up in inventory
         item.encounterTrackable.IgnoreDifferentiator = true;  // don't care how many times we encounter it
         item.CanBeDropped                            = false; // can't be dropped
+        item.PersistsOnDeath                         = true;  // still can't be dropped
         item.CanBeSold                               = false; // can't be sold
         item.IgnoredByRat                            = true;  // can't be stolen
         item.ClearIgnoredByRatFlagOnPickup           = false; // still can't be stolen

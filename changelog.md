@@ -9,6 +9,7 @@
 - Fixed null deref caused by King's Law trying to set the alpha of nonexistent muzzle flashes
 - Updated required Alexandria version to 0.4.6 to fix a few hacky workarounds
 - Fixed some beam and sprite trails having weird offsets when moving at high speeds
+- Fixed potential bug with being able to drop dummy items on death during co-op mode
 
 ## 1.16.1 (2024-07-25)
 
