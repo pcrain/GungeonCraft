@@ -30,6 +30,7 @@
 - Reworked Tranquilizer:
 	- Tranquilized enemies now drop their guns with 5% of their ammo for the player to pickup
 	- Tranquilized enemies have a 25% chance to drop a small ammo pickup
+- Fixed vanilla bug with ammo display vfx rendering below final clip sprites
 
 ## 1.16.1 (2024-07-25)
 

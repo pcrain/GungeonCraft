@@ -1,8 +1,7 @@
 namespace CwaffingTheGungy;
 
-
-//TODO: patch AmmoBurstVFX rendering below final clip projectiles later
 // Fixes a vanilla bug with the background of final projectiles rendering above the foreground
+// Also fixes a vanilla bug with AmmoBurstVFX rendering below final clip projectiles
 [HarmonyPatch(typeof(GameUIAmmoController), nameof(GameUIAmmoController.UpdateAmmoUIForModule))]
 public static class GameUIAmmoControllerUpdateAmmoUIForModulePatch
 {
@@ -13,6 +12,8 @@ public static class GameUIAmmoControllerUpdateAmmoUIForModulePatch
         if (AddlModuleFGSprites == null || AddlModuleFGSprites.Count < 1)
             return;
         AddlModuleFGSprites[0].ZOrder = AddlModuleBGSprites[0].ZOrder + 1;
+        if (currentAmmoFGSprite != null)
+            currentAmmoFGSprite.ZOrder = AddlModuleFGSprites[0].ZOrder + 1;
     }
 }
 

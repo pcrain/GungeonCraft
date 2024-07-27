@@ -40,6 +40,7 @@
 * Rooms that can only spawn once per run (e.g., specialty shops) are now properly marked as "not spawned this run" after a Quick Restart
 * Certain algorithms for shuffling the order of a list (e.g., for floor generation) will now randomly shuffle the first and last items in the list
 * Orbiting guns no longer shoot projectiles from a weird position if created while the player is facing left
+* VFX that play on the ammo display when firing a gun no longer render behind final projectiles
 
 ### FAQ
 
