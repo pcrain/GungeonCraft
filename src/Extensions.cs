@@ -284,6 +284,38 @@ public static class Extensions
         p.SetAllImpactVFX(vfx);
   }
 
+  /// <summary>Copy a projectile's impact VFX from another projectile's across the board</summary>
+  public static Projectile CopyAllImpactVFX(this Projectile p, Projectile otherP)
+  {
+    ProjectileImpactVFXPool v = p.hitEffects = new();
+    ProjectileImpactVFXPool o = otherP.hitEffects;
+    v.alwaysUseMidair               = o.alwaysUseMidair;
+    v.tileMapHorizontal             = o.tileMapHorizontal;
+    v.deathTileMapHorizontal        = o.deathTileMapHorizontal;
+    v.tileMapVertical               = o.tileMapVertical;
+    v.deathTileMapVertical          = o.deathTileMapVertical;
+    v.enemy                         = o.enemy;
+    v.deathEnemy                    = o.deathEnemy;
+    v.suppressMidairDeathVfx        = o.suppressMidairDeathVfx;
+    v.overrideMidairDeathVFX        = o.overrideMidairDeathVFX;
+    v.midairInheritsRotation        = o.midairInheritsRotation;
+    v.midairInheritsVelocity        = o.midairInheritsVelocity;
+    v.midairInheritsFlip            = o.midairInheritsFlip;
+    v.overrideMidairZHeight         = o.overrideMidairZHeight;
+    v.overrideEarlyDeathVfx         = o.overrideEarlyDeathVfx;
+    v.HasProjectileDeathVFX         = o.HasProjectileDeathVFX;
+    v.CenterDeathVFXOnProjectile    = o.CenterDeathVFXOnProjectile;
+    v.suppressHitEffectsIfOffscreen = o.suppressHitEffectsIfOffscreen;
+    return p;
+  }
+
+  /// <summary>Copy a projectile's impact VFX across the board from another gun's default projectile (ItemHelper version)</summary>
+  public static Projectile CopyAllImpactVFX(this Projectile p, Items other)
+  {
+    p.CopyAllImpactVFX((ItemHelper.Get(other) as Gun).DefaultModule.projectiles[0]);
+    return p;
+  }
+
   /// <summary>Check if an enemy is hostile</summary>
   public static bool IsHostile(this AIActor e, bool canBeDead = false, bool canBeNeutral = false)
   {

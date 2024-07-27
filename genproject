@@ -13,7 +13,8 @@ gfxchecksums="./obj/_${namespace}-checksums-gfx"     #file containing checksums 
 audiochecksums="./obj/_${namespace}-checksums-audio" #file containing checksums of all audio files to determine rebuilding audio bank
 externalupdate="./obj/_${namespace}-externalupdate"  #file containing the last time an external resource was added
 audioupdate="./obj/_${namespace}-audioupdate"        #file containing the last time an audio resource / csv was added / updated
-dllname="./bin/Debug/${projectname}.dll"         #Debug DLL name, directly based on the project name
+# dllname="./bin/Debug/${projectname}.dll"         #Debug DLL name, directly based on the project name
+dllname="./bin/Release/${projectname}.dll"       #Release DLL name
 dotnet35path="$(pwd)/_dotNETFramework/v3.5"      #Path to .NET 3.5 developer assemblies (from NUGet)
 USEXTERNALASSEMBLY=0                             #Whether to use the external Assembly-Csharp.dll or the one bundled in the source directory
 UPDATEDLLS=0                                     #Set to 1 if any new DLLS are added to make sure they're copied correctly to bin/Debug
@@ -41,7 +42,7 @@ HERE`
 thunderstore=0
 if [ $# -gt 0 ] && [ "$1" == "-t" ]; then
   thunderstore=1 #prepare for publishing on Thunderstore
-  dllname="./bin/Release/${projectname}.dll" #Release DLL name
+  # dllname="./bin/Release/${projectname}.dll" #Release DLL name
 fi
 
 #Base directory we're copying our plugin to
@@ -134,7 +135,8 @@ if [ $updateaudio -eq 1 ]; then
   rebuild=1
   echo -e "[${GRN}>${BLN}] Regenerating audio bank"
   #BUG: gen-gungeon-audio-bank.py thinks paths beginning with . aren't absolute and prepend the current working directory
-  ./gen-gungeon-audio-bank.py -Ovr -s "./RawResources/Sounds/sound_info.csv" "./RawResources/Sounds" "$(pwd)/Resources/${namespace}.bnk"
+  ./gen-gungeon-audio-bank.py -Or -s "./RawResources/Sounds/sound_info.csv" "./RawResources/Sounds" "$(pwd)/Resources/${namespace}.bnk"
+  # ./gen-gungeon-audio-bank.py -Ovr -s "./RawResources/Sounds/sound_info.csv" "./RawResources/Sounds" "$(pwd)/Resources/${namespace}.bnk"
 
   echo -e "[${GRN}>${BLN}]   Regenerating checksums for audio files"
   echo "$audiodata" > "${audiochecksums}"
@@ -368,11 +370,11 @@ if [ $rebuild -eq 1 ]; then
   #Actually rebuild the project
   echo -e "[${GRN}>${BLN}] Building project"
   # cat "${projfile}" | sed '/Assembly-CSharp-Full/,+3d' > "${projfile}.fixed"
-  if [ $thunderstore -eq 1 ]; then
+  # if [ $thunderstore -eq 1 ]; then
     dotnet build --no-restore -m -noLogo -warnAsMessage:"${nowarn}" -v:minimal -clp:"Summary" -property:Configuration=Release
-  else
-    dotnet build --no-restore -m -noLogo -warnAsMessage:"${nowarn}" -v:minimal -clp:"Summary"
-  fi
+  # else
+  #   dotnet build --no-restore -m -noLogo -warnAsMessage:"${nowarn}" -v:minimal -clp:"Summary"
+  # fi
   error="$?"
   killall dotnet >/dev/null 2>&1 # fixes a dumb bug where the child process doesn't terminate...thanks microsoft D:
   # dotnet build -m -noLogo -warnAsMessage:"${nowarn}" -v:minimal -clp:"Summary;Verbosity=minimal"

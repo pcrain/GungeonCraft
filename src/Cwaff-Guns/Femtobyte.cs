@@ -134,7 +134,8 @@ public class Femtobyte : CwaffGun
             //NOTE: modulesAreTiers with no 2nd module lets use switch to tier 1 to do cool alternate stuff without firing projectiles
 
         Projectile proj = gun.InitProjectile(GunData.New(clipSize: -1, angleVariance: 2.0f, shootStyle: ShootStyle.SemiAutomatic, damage: 7.5f, speed: 90.0f,
-          cooldown: 0.4f, sprite: "femtobyte_projectile", fps: 2, anchor: Anchor.MiddleCenter)).Attach<FemtobyteProjectile>();
+            cooldown: 0.4f, sprite: "femtobyte_projectile", fps: 2, anchor: Anchor.MiddleCenter, hitEnemySound: "femtobyte_hit_enemy_sound"))
+          .Attach<FemtobyteProjectile>();
         proj.AddTrailToProjectilePrefab("femtobyte_beam", fps: 10, cascadeTimer: C.FRAME, softMaxLength: 1f, destroyOnEmpty: false);
 
         _ImpactBits = VFX.Create("femtobyte_projectile_vfx", fps: 1, loops: false, anchor: Anchor.MiddleCenter);
@@ -343,22 +344,24 @@ public class Femtobyte : CwaffGun
         player.OnTriedToInitiateAttack += this.OnTriedToInitiateAttack;
         UpdateCurrentSlot();
 
-        // if (!C.DEBUG_BUILD || _DidDebugSetup)
-        //     return;
-        // _DidDebugSetup = true;
-        int i = 0;
-        // this.digitizedObjects[i++] = new(){ type = SPECIAL, data = _NameToPrefabMap["forge_hammer"] };
-        this.digitizedObjects[i++] = new(){ type = SPECIAL, data = _NameToPrefabMap["trap_sawblade_omni_gungeon_2x2"] };
-        // this.digitizedObjects[i++] = new(){ type = SPECIAL, data = _NameToPrefabMap["skullfirespinner"] };
-        // this.digitizedObjects[i++] = new(){ type = SPECIAL, data = _NameToPrefabMap["flamepipe_spraysdown"] };
-        // this.digitizedObjects[i++] = DigitizedObject.FromPickup(Items.Ak47.AsGun());
-        // this.digitizedObjects[i++] = new(){ type = SPECIAL, data = _NameToPrefabMap["brazier"] };
-        // this.digitizedObjects[i++] = new(){ type = SPECIAL, data = _NameToPrefabMap["npc_gunbermuncher_evil"] };
-        // this.digitizedObjects[i++] = new(){ type = TABLE,  data = _NameToPrefabMap["table_horizontal_steel"] };
-        // this.digitizedObjects[i++] = new(){ type = BARREL, data = _NameToPrefabMap["red barrel"] };
-        // this.digitizedObjects[i++] = new(){ type = BARREL, data = _NameToPrefabMap["blue drum"] };
-        // this.digitizedObjects[i++] = new(){ type = CHEST,  data = _NameToPrefabMap["chest_silver"], contents = [(int)Items.Akey47], locked = true };
-        UpdateCurrentSlot();
+        #if DEBUG
+            // if (!C.DEBUG_BUILD || _DidDebugSetup)
+            //     return;
+            // _DidDebugSetup = true;
+            // int i = 0;
+            // this.digitizedObjects[i++] = new(){ type = SPECIAL, data = _NameToPrefabMap["forge_hammer"] };
+            // this.digitizedObjects[i++] = new(){ type = SPECIAL, data = _NameToPrefabMap["trap_sawblade_omni_gungeon_2x2"] };
+            // this.digitizedObjects[i++] = new(){ type = SPECIAL, data = _NameToPrefabMap["skullfirespinner"] };
+            // this.digitizedObjects[i++] = new(){ type = SPECIAL, data = _NameToPrefabMap["flamepipe_spraysdown"] };
+            // this.digitizedObjects[i++] = DigitizedObject.FromPickup(Items.Ak47.AsGun());
+            // this.digitizedObjects[i++] = new(){ type = SPECIAL, data = _NameToPrefabMap["brazier"] };
+            // this.digitizedObjects[i++] = new(){ type = SPECIAL, data = _NameToPrefabMap["npc_gunbermuncher_evil"] };
+            // this.digitizedObjects[i++] = new(){ type = TABLE,  data = _NameToPrefabMap["table_horizontal_steel"] };
+            // this.digitizedObjects[i++] = new(){ type = BARREL, data = _NameToPrefabMap["red barrel"] };
+            // this.digitizedObjects[i++] = new(){ type = BARREL, data = _NameToPrefabMap["blue drum"] };
+            // this.digitizedObjects[i++] = new(){ type = CHEST,  data = _NameToPrefabMap["chest_silver"], contents = [(int)Items.Akey47], locked = true };
+            // UpdateCurrentSlot();
+        #endif
     }
 
     public override void OnDroppedByPlayer(PlayerController player)

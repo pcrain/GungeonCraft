@@ -18,17 +18,17 @@ public class BBGun : CwaffGun
                 fireAudio: "Play_WPN_seriouscannon_shot_01", reloadAudio: "Play_ENM_flame_veil_01");
 
         Projectile p = gun.InitProjectile(GunData.New(
-          clipSize: 3, cooldown: 0.7f, angleVariance: 10.0f, shootStyle: ShootStyle.Charged, sequenceStyle: ProjectileSequenceStyle.Ordered,
-          customClip: true, speed: 20f, range: 999999f, sprite: "bball", fps: 20, anchor: Anchor.MiddleCenter,
-          anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(2, 2)) // prevent uneven colliders from glitching into walls
-        ).Attach<PierceProjModifier>(pierce => {
+            clipSize: 3, cooldown: 0.7f, angleVariance: 10.0f, shootStyle: ShootStyle.Charged, sequenceStyle: ProjectileSequenceStyle.Ordered,
+            customClip: true, speed: 20f, range: 999999f, sprite: "bball", fps: 20, anchor: Anchor.MiddleCenter, hitSound: "bb_impact_sound",
+            anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(2, 2))) // prevent uneven colliders from glitching into walls
+          .Attach<PierceProjModifier>(pierce => {
             pierce.penetration = Mathf.Max(pierce.penetration, 999);
-            pierce.penetratesBreakables = true;
-        }).Attach<BounceProjModifier>(bounce => {
+            pierce.penetratesBreakables = true; })
+          .Attach<BounceProjModifier>(bounce => {
             bounce.numberOfBounces               = Mathf.Max(bounce.numberOfBounces, 999);
             bounce.chanceToDieOnBounce           = 0f;
-            bounce.onlyBounceOffTiles            = true;
-        });
+            bounce.onlyBounceOffTiles            = true; })
+          .CopyAllImpactVFX(Items.Crestfaller);
 
         gun.DefaultModule.chargeProjectiles.Clear();
         for (int i = 0; i < _CHARGE_LEVELS.Length; i++)
@@ -71,6 +71,7 @@ public class TheBB : MonoBehaviour
     {
         this._projectile.MultiplySpeed(_BOUNCE_SPEED_DECAY);
         this._projectile.SendInDirection(this._projectile.m_currentDirection, resetDistance: false, updateRotation: true);
+        base.gameObject.Play("bb_impact_sound");
     }
 
     private void CreateInteractible(Projectile p)

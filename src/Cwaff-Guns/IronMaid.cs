@@ -22,8 +22,10 @@ public class IronMaid : CwaffGun
                 reloadAudio: "knife_gun_reload");
             gun.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
-        gun.InitProjectile(GunData.New(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true,
-          damage: 5.0f, speed: 40.0f, sprite: "kunai", fps: 12, anchor: Anchor.MiddleCenter, hitSound: "knife_gun_hit")).Attach<IronMaidBullets>();
+        gun.InitProjectile(GunData.New(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, damage: 5.0f, speed: 40.0f,
+            sprite: "kunai", fps: 12, anchor: Anchor.MiddleCenter, hitEnemySound: "knife_hit_enemy_sound", hitWallSound: "knife_hit_wall_sound"))
+          .CopyAllImpactVFX(Items.Thunderclap)
+          .Attach<IronMaidBullets>();
 
         gun.AddReticle<CwaffReticle>(reticleVFX : VFX.BasicReticle, reticleAlpha : 0.2f, visibility : CwaffReticle.Visibility.ALWAYS, smoothLerp: true);
     }

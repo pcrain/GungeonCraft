@@ -11,6 +11,9 @@
 - Updated required Alexandria version to 0.4.6 to fix a few hacky workarounds
 - Fixed some beam and sprite trails having weird offsets when moving at high speeds
 - Fixed potential bug with being able to drop dummy items on death during co-op mode
+- Added impact sounds and VFX for Paintball Cannon, B.B. Gun, BlasTech F-4, Femtobyte, Iron Maid, Uppskeruvel, and Zag
+- Added muzzle flashes for B.B. Gun, BlasTech F-4, and Zag
+- Added better custom projectile for BlasTech F-4
 
 ## 1.16.1 (2024-07-25)
 

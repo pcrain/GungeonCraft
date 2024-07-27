@@ -208,3 +208,9 @@ femtobyte_materialize_sound,-1.0,1,sound
 femtobyte_shoot_sound,-3.0,1,sound
 kazooie_walk_a,-5.5,1,sound
 kazooie_walk_b,-5.5,1,sound
+knife_hit_wall_sound,-4.5,1,sound
+knife_hit_enemy_sound,-5.0,1,sound
+paintball_impact_enemy_sound,-2.5,1,sound
+bb_impact_sound,2.5,1,sound
+generic_bullet_impact,-2.0,1,sound
+femtobyte_hit_enemy_sound,-2.0,1,sound

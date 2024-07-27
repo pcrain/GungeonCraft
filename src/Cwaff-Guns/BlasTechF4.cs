@@ -11,20 +11,21 @@ public class BlasTechF4 : CwaffGun
     {
         Gun gun = Lazy.SetupGun<BlasTechF4>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.SHITTY, reloadTime: 0.75f, ammo: 1000, shootFps: 30, reloadFps: 12,
-                muzzleFrom: Items.Mailbox, banFromBlessedRuns: true);
+              muzzleVFX: "muzzle_blastech", muzzleFps: 60, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleLeft, banFromBlessedRuns: true,
+              dynamicBarrelOffsets: true);
             gun.SetReloadAudio("blastech_jam_sound", 0, 2, 4, 5, 6);
 
-        gun.InitProjectile(GunData.New(clipSize: 20, cooldown: 0.11f, shootStyle: ShootStyle.Automatic,
-            damage: 20.0f, speed: 100f, range: 9999f, force: 12f, ignoreDamageCaps: true)
-        ).Attach<EasyTrailBullet>(trail => {
+        gun.InitProjectile(GunData.New(sprite: "blastech_projectile", clipSize: 20, cooldown: 0.11f, shootStyle: ShootStyle.Automatic,
+            damage: 20.0f, speed: 100f, range: 9999f, force: 12f, ignoreDamageCaps: true, scale: 0.5f, hitSound: "generic_bullet_impact"))
+        .Attach<EasyTrailBullet>(trail => {
           trail.TrailPos   = trail.transform.position;
           trail.StartWidth = 0.3f;
           trail.EndWidth   = 0.05f;
           trail.LifeTime   = 0.07f;
           trail.BaseColor  = ExtendedColours.purple;
           trail.StartColor = Color.Lerp(ExtendedColours.purple, Color.white, 0.25f);
-          trail.EndColor   = ExtendedColours.purple;
-        });
+          trail.EndColor   = ExtendedColours.purple; })
+        .SetAllImpactVFX((ItemHelper.Get(Items.WitchPistol) as Gun).DefaultModule.projectiles[0].hitEffects.enemy);
     }
 
     public override void PostProcessProjectile(Projectile projectile)
