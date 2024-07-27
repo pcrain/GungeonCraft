@@ -70,6 +70,7 @@ public class Uppskeruvel : CwaffGun
     public override void OnPlayerPickup(PlayerController player)
     {
         GameManager.Instance.OnNewLevelFullyLoaded += this.OnNewFloor;
+        player.OnAnyEnemyReceivedDamage += OnAnyEnemyReceivedDamage;
         StartCoroutine(SpawnSoulsOnceWeCanMove());
         base.OnPlayerPickup(player);
     }
@@ -77,6 +78,7 @@ public class Uppskeruvel : CwaffGun
     public override void OnDroppedByPlayer(PlayerController player)
     {
         GameManager.Instance.OnNewLevelFullyLoaded -= this.OnNewFloor;
+        player.OnAnyEnemyReceivedDamage -= OnAnyEnemyReceivedDamage;
         base.OnDroppedByPlayer(player);
         StopAllCoroutines();
         this._spawningSouls = false;
@@ -86,9 +88,27 @@ public class Uppskeruvel : CwaffGun
     public override void OnDestroy()
     {
         GameManager.Instance.OnNewLevelFullyLoaded -= this.OnNewFloor;
+        if (this.PlayerOwner)
+            this.PlayerOwner.OnAnyEnemyReceivedDamage -= OnAnyEnemyReceivedDamage;
         StopAllCoroutines();
         DestroyExtantCombatSouls();
         base.OnDestroy();
+    }
+
+    private void OnAnyEnemyReceivedDamage(float damage, bool fatal, HealthHaver enemy)
+    {
+        if (this.PlayerOwner is not PlayerController player)
+            return;
+        if (!player.HasSynergy(Synergy.MASTERY_UPPSKERUVEL))
+            return;
+        if (!enemy || enemy.aiActor is not AIActor actor)
+            return;
+        if (player.GetGun<Uppskeruvel>() is not Uppskeruvel upp)
+            return;
+        if (fatal)
+            Uppskeruvel.DropLostSouls(actor, player.HasSynergy(Synergy.SOUL_SEARCHING));
+        else
+            upp.LaunchAvailableSouls(actor);
     }
 
     public void AcquireSoul(int n = 1)
@@ -269,8 +289,11 @@ public class UppskeruvelProjectile : MonoBehaviour
             return;
 
         this._gun = uppies;
-        this._projectile.OnWillKillEnemy += this.OnWillKillEnemy;
-        this._projectile.OnHitEnemy += this.OnHitEnemy;
+        if (!this._owner.HasSynergy(Synergy.MASTERY_UPPSKERUVEL)) // if we have the mastery, this is handled at the PlayerController level
+        {
+            this._projectile.OnWillKillEnemy += this.OnWillKillEnemy;
+            this._projectile.OnHitEnemy += this.OnHitEnemy;
+        }
     }
 
     private void OnHitEnemy(Projectile bullet, SpeculativeRigidbody enemy, bool killed)

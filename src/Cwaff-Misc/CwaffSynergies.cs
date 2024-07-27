@@ -114,6 +114,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfPistolWhip>(MASTERY_PISTOL_WHIP, PistolWhip.ItemName);
         // Femtobyte gains the ability to digitze enemies and respawn them as allies later.
         NewMastery<MasteryOfFemtobyte>(MASTERY_FEMTOBYTE, Femtobyte.ItemName);
+        // Enemies drop souls and souls attack enemies regardless of active gun.
+        NewMastery<MasteryOfUppskeruvel>(MASTERY_UPPSKERUVEL, Uppskeruvel.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -334,6 +336,7 @@ internal class MasteryOfGunbrella       : MasteryDummyItem {}
 internal class MasteryOfAlyx            : MasteryDummyItem {}
 internal class MasteryOfPistolWhip      : MasteryDummyItem {}
 internal class MasteryOfFemtobyte       : MasteryDummyItem {}
+internal class MasteryOfUppskeruvel     : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -377,4 +380,5 @@ public enum Synergy {
     MASTERY_ALYX,
     MASTERY_PISTOL_WHIP,
     MASTERY_FEMTOBYTE,
+    MASTERY_UPPSKERUVEL,
 };
