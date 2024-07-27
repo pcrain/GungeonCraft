@@ -77,7 +77,7 @@ public class DecoyEcho : MonoBehaviour
 {
     private const float _DECOY_TIME     = 1f;
     private const float _DECOY_MIN_DIST = 2f;
-    private const float _DECOY_MAX_DIST = 8f;
+    private const float _DECOY_MAX_DIST = 10f;
 
     private RoomHandler _room = null;
 
@@ -97,7 +97,7 @@ public class DecoyEcho : MonoBehaviour
             if (dist > _DECOY_MAX_DIST)
                 continue;
             float decoyChance = Mathf.InverseLerp(_DECOY_MAX_DIST, _DECOY_MIN_DIST, dist);
-            if ((decoyChance * decoyChance) < UnityEngine.Random.value)
+            if (decoyChance < UnityEngine.Random.value)
                 continue;
 
             enemy.OverrideTarget = body;

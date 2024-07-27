@@ -85,7 +85,7 @@ public class OverdoseJuice : MonoBehaviour
 public class OverdoseEffect : GameActorEffect
 {
     private const float _ACCUM_RATE = 0.5f;
-    private const float _DAMAGE_RATE = 8.0f;
+    private const float _DAMAGE_RATE = 10.0f;
 
     public override void OnDarkSoulsAccumulate(GameActor actor, RuntimeGameActorEffectData effectData, float partialAmount = 1f, Projectile sourceProjectile = null)
     {

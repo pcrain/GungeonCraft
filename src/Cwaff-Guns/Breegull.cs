@@ -4,7 +4,7 @@ public class Breegull : CwaffGun
 {
     public static string ItemName         = "Breegull";
     public static string ShortDescription = "Rare Wares";
-    public static string LongDescription  = "Fires eggs with varying effects & (ammo costs). Reloading with a full clip cycles egg types:\n (1) Normal: no effect\n (2) Fire: ignites\n (5) Grenade: large explosion\n (2) Ice: freezes\n (4) Clockwork: homing";
+    public static string LongDescription  = "Fires eggs with varying effects & (ammo costs). Reloading with a full clip cycles egg types:\n (1) Normal: no effect\n (2) Fire: ignites\n (5) Grenade: large explosion\n (2) Ice: freezes\n (3) Clockwork: homing";
     public static string Lore             = "With bear no more,\n  the bird's alone.\nAmidst the Gungeon's\n  walls of stone.\nArmed with her trusty\n  eggs and beak.\nShe'll help you kill\n  the past you seek.\n- Guntilda";
 
     private const float TALON_TROT_TIMER = 0.16f;
@@ -39,7 +39,7 @@ public class Breegull : CwaffGun
     public static void Init()
     {
         Gun gun = Lazy.SetupGun<Breegull>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.0f, ammo: 320, shootFps: 20, reloadFps: 12,
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.0f, ammo: 480, shootFps: 20, reloadFps: 12,
                 introFps: 8, fireAudio: "breegull_shoot_sound", introAudio: "breegull_intro_sound", carryOffset: new IntVector2(6, 0));
             gun.SetReloadAudio("breegull_reload_sound", 0, 4, 8);
 
@@ -72,7 +72,7 @@ public class Breegull : CwaffGun
 
         //WARNING: CloneProjectile from anything other than a vanilla gun causes weird issues on MacOS and Linux???
         //         Can maybe be circumvented by setting up each sprite individually? (actually just has to do with missing DLL / patch for generic Instantiate())
-        _EggFire      = gun.CloneProjectile(GunData.New(sprite: "breegull_projectile_fire", shrapnelVFX: VFX.Create("breegull_impact_fire"), fire: 0.5f));
+        _EggFire      = gun.CloneProjectile(GunData.New(sprite: "breegull_projectile_fire", shrapnelVFX: VFX.Create("breegull_impact_fire"), fire: 1.0f));
         _EggGrenade   = gun.CloneProjectile(GunData.New(sprite: "breegull_projectile_grenade", shrapnelVFX: VFX.Create("breegull_impact_grenade"))
             ).Attach<ExplosiveModifier>(ex => ex.explosionData = Explosions.DefaultLarge);
         _EggIce       = gun.CloneProjectile(GunData.New(sprite: "breegull_projectile_ice", shrapnelVFX: VFX.Create("breegull_impact_ice"), freeze: 0.75f));
@@ -85,7 +85,7 @@ public class Breegull : CwaffGun
             new EggData(){ projectile = _EggFire,      sound = "collect_egg_fire_sound",      ui = _FireUI,      ammo = 2, },
             new EggData(){ projectile = _EggGrenade,   sound = "collect_egg_grenade_sound",   ui = _GrenadeUI,   ammo = 5, },
             new EggData(){ projectile = _EggIce,       sound = "collect_egg_ice_sound",       ui = _IceUI,       ammo = 2, },
-            new EggData(){ projectile = _EggClockwork, sound = "collect_egg_clockwork_sound", ui = _ClockworkUI, ammo = 4, },
+            new EggData(){ projectile = _EggClockwork, sound = "collect_egg_clockwork_sound", ui = _ClockworkUI, ammo = 3, },
         };
 
         _TalonDust = VFX.Create("talon_trot_dust", fps: 30, loops: false);

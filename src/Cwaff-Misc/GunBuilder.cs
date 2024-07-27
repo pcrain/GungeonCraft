@@ -67,6 +67,7 @@ public sealed class GunData
   public string hitEnemySound;
   public string hitWallSound;
   public bool? becomeDebris;
+  public bool? electric;
 
   /// <summary>Pseudo-constructor holding most setup information required for a single projectile gun.</summary>
   /// <param name="gun">The gun we're attaching to (can be null, only used for custom clip sprite name resolution for now).</param>
@@ -126,6 +127,7 @@ public sealed class GunData
   /// <param name="angleFromAim">The angle from the player's computed aim direction at which the projectile will launch.</param>
   /// <param name="ignoredForReloadPurposes">If true, prevents reload notifications when this projectile is created (useful for synergy bonus projectiles).</param>
   /// <param name="mirror">If true, the current projectile module will spawn another identical projectile with an opposite angleFromAim.</param>
+  /// <param name="electric">If true, adds the Electric damage type to the projectile.</param>
   public static GunData New(Gun gun = null, Projectile baseProjectile = null, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
     ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1, GameUIAmmoType.AmmoType? ammoType = null,
     bool customClip = false, float? damage = null, float? speed = null, float? force = null, float? range = null, float? recoil = null, float poison = 0.0f, float fire = 0.0f, float freeze = 0.0f, float slow = 0.0f,
@@ -134,7 +136,8 @@ public sealed class GunData
     IntVector2? overrideColliderOffsets = null, float bossDamageMult = 1.0f, string destroySound = null, bool? shouldRotate = null, int barrageSize = 1,
     bool? shouldFlipHorizontally = null, bool? shouldFlipVertically = null, bool useDummyChargeModule = false, bool invisibleProjectile = false, string spawnSound = null, bool? stopSoundOnDeath = null,
     bool? uniqueSounds = null, GameObject shrapnelVFX = null, int? shrapnelCount = null, float? shrapnelMinVelocity = null, float? shrapnelMaxVelocity = null, float? shrapnelLifetime = null, bool? preventOrbiting = null,
-    string hitSound = null, string hitEnemySound = null, string hitWallSound = null, bool? becomeDebris = null, float angleFromAim = 0.0f, bool ignoredForReloadPurposes = false, bool mirror = false
+    string hitSound = null, string hitEnemySound = null, string hitWallSound = null, bool? becomeDebris = null, float angleFromAim = 0.0f, bool ignoredForReloadPurposes = false, bool mirror = false,
+    bool? electric = null
     )
   {
       _Instance.gun                           = gun; // set by InitSpecialProjectile()
@@ -193,6 +196,7 @@ public sealed class GunData
       _Instance.becomeDebris                  = becomeDebris;
       _Instance.angleFromAim                  = angleFromAim;
       _Instance.mirror                        = mirror;
+      _Instance.electric                      = electric;
       return _Instance;
   }
 }
@@ -313,6 +317,13 @@ public static class GunBuilder
     {
       p.AppliesKnockbackToPlayer = true;
       p.PlayerKnockbackForce = b.recoil.Value;
+    }
+    if (b.electric.HasValue)
+    {
+      if (b.electric.Value)
+        p.damageTypes |= CoreDamageTypes.Electric;
+      else
+        p.damageTypes &= (~CoreDamageTypes.Electric);
     }
 
     CwaffProjectile c = p.GetOrAddComponent<CwaffProjectile>();

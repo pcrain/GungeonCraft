@@ -43,13 +43,13 @@ public class KALI : CwaffGun
                 Projectile = _KaliProjectile.Clone(GunData.New(damage: 50f, speed: 350f, recoil: 200f)
                   ).Attach<KaliProjectile>(k => k.SetChargeLevel(2)
                   ),
-                ChargeTime = 2.5f,
+                ChargeTime = 2f,
             },
             new(){
                 Projectile = _KaliProjectile.Clone(GunData.New(damage: 100f, speed: 700f, recoil: 400f)
                   ).Attach<KaliProjectile>(k => k.SetChargeLevel(3)
                   ),
-                ChargeTime = 4.5f,
+                ChargeTime = 3f,
             },
         };
 

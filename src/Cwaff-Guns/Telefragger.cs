@@ -7,7 +7,7 @@ public class Telefragger : CwaffGun
     public static string LongDescription   = "Fires a beam that teleports the player into an enemy on kill. Teleporting creates a mini blank effect at the destination and briefly grants invulernability and pit immunity. Will not teleport the player off screen in co-op.";
     public static string Lore              = "Many years ago, a Gungeoneer named Jackson Doomquake gained notoriety for dropping firearms on the Gungeon's teleporters as bait for unsuspecting Bullet Kin. While teleporting into Bullet Kin all day proved to be an effective and ammo-efficient method of execution, it also provoked the ire of Bello, who allegedly lost several customers due to the clamor caused by his shop's teleporter constantly activating. The teleporter system was subsequently patched to prevent usage while any Gundead are around, but while Doomquake's exploits are no longer replicable, the Telefragger ensures the spirit of his antics live on.";
 
-    private const float _HOVER_TIME        = 1.25f;
+    private const float _MERCY_TIME        = 1.5f;
     private const float _FLICKER_PORTION   = 0.5f;
     private const float _FLICKER_FREQ      = 0.1f;
     private const float _GLOW              = 50f;
@@ -163,7 +163,7 @@ public class Telefragger : CwaffGun
         if (!player)
             return;
         player.OnAboutToFall += this.HandleAboutToFall;
-        this._invulnTime = _HOVER_TIME;
+        this._invulnTime = _MERCY_TIME;
 
         // enable shaders
         Material[] array = player.SetOverrideShader(ShaderCache.Acquire("Brave/Internal/RainbowChestShader"));

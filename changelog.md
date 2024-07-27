@@ -14,6 +14,18 @@
 - Added impact sounds and VFX for Paintball Cannon, B.B. Gun, BlasTech F-4, Femtobyte, Iron Maid, Uppskeruvel, and Zag
 - Added muzzle flashes for B.B. Gun, BlasTech F-4, and Zag
 - Added better custom projectile for BlasTech F-4
+- Added Electric damage type to Zag projectiles
+- Increased Zag ammo from 400 to 600
+- Increased King's Law ammo from 700 to 1000
+- Increased Breegull's ammo from 320 to 480
+- Increased Breegull's fire egg ignition change from 50% to 100%
+- Reduced ammo cost of Breegull's clockwork egg from 4 to 3
+- Increased Macchi Auto's damage over time effect strength by about 50%
+- Increased Telefragger's post-teleport invulnerability time from 1.25s to 1.5s
+- Changed K.A.L.I.'s charge times from 1s, 2.5s, 4.5s to 1s, 2s, 3s
+- Increased Nycterian's max distraction range
+- Increased Nyterian's chance to distract enemies at all ranges
+- Fixed bad hand offset for one frame of Zag reload animation
 
 ## 1.16.1 (2024-07-25)
 
