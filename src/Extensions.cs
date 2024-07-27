@@ -959,7 +959,7 @@ public static class Extensions
     self.RefreshBehaviors();
   }
 
-  /// <summary>Set up custom ammo types from default resource paths</summary>
+  /// <summary>Set up custom ammo types from default resource paths and adds it to a projectile module</summary>
   public static void SetupCustomAmmoClip(this ProjectileModule mod, GunData b)
   {
       string clipname    = b.gun.EncounterNameOrDisplayName.InternalName();
@@ -2379,5 +2379,14 @@ public static class Extensions
   {
       gun.gameObject.AddComponent<VolleyModificationSynergyProcessor>().synergies =
         [new(){RequiredSynergy = s.Synergy(), AddsModules = true, ModulesToAdd = modules}];
+  }
+
+  /// <summary>Adds a final projectile to a gun when a synergy is active</summary>
+  public static void AddSynergyFinalProjectile(this Gun gun, Synergy s, Projectile newFinal, string clipName, int num = 1)
+  {
+      gun.gameObject.AddComponent<VolleyModificationSynergyProcessor>().synergies =
+        [new(){RequiredSynergy = s.Synergy(), SetsNumberFinalProjectiles = true, AddsNewFinalProjectile = true,
+          NewFinalProjectile = newFinal, NewFinalProjectileAmmoType = Lazy.SetupCustomAmmoClip(clipName),
+          NumberFinalProjectiles = num}];
   }
 }

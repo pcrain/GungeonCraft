@@ -116,6 +116,9 @@ public static class CwaffSynergies
         NewMastery<MasteryOfFemtobyte>(MASTERY_FEMTOBYTE, Femtobyte.ItemName);
         // Enemies drop souls and souls attack enemies regardless of active gun.
         NewMastery<MasteryOfUppskeruvel>(MASTERY_UPPSKERUVEL, Uppskeruvel.ItemName);
+        // Card speed is dramatically increased, and the last three projectiles of each clip are exploding jokers.
+        NewMastery<MasteryOfBlackjack>(MASTERY_BLACKJACK, Blackjack.ItemName)
+            .MultSpread(0.5f).MultClipSize(2f).MultFireRate(2f);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -195,15 +198,15 @@ public static class CwaffSynergies
         return entry;
     }
 
-    private static void NewMastery<T>(Synergy synergy, string gunName) where T : MasteryDummyItem
+    private static AdvancedSynergyEntry NewMastery<T>(Synergy synergy, string gunName) where T : MasteryDummyItem
     {
         if (Lazy.GetModdedItem(IName(gunName)) is not Gun gun)
-            return;
+            return null;
 
         FakeItem.Create<T>();
         int tokenId = FakeItem.Acquire<T>().PickupObjectId;
         //NOTE: next line can't begin with NewSynergy or itemtips script gets messed up
-        /**/ NewSynergy(
+        AdvancedSynergyEntry ase = NewSynergy(
             synergy              : synergy,
             name                 : $"{gun.EncounterNameOrDisplayName} Mastery",
             mandatory            : new string[1]{IDs.InternalNames[gun.gunName]},
@@ -211,6 +214,7 @@ public static class CwaffSynergies
             ignoreLichEyeBullets : true);
         _MasteryIds.Add(tokenId);
         _MasteryGuns[gun.PickupObjectId] = tokenId;
+        return ase;
     }
 
     public static bool IsMasterable(this Gun gun)
@@ -315,6 +319,8 @@ public static class CwaffSynergies
         { e.statModifiers.Add(StatType.MovementSpeed.Mult(a)); return e; }
     public static AdvancedSynergyEntry MultSpread(this AdvancedSynergyEntry e, float a)
         { e.statModifiers.Add(StatType.Accuracy.Mult(a)); return e; }
+    public static AdvancedSynergyEntry MultClipSize(this AdvancedSynergyEntry e, float a)
+        { e.statModifiers.Add(StatType.AdditionalClipCapacityMultiplier.Mult(a)); return e; }
 
 }
 
@@ -337,6 +343,7 @@ internal class MasteryOfAlyx            : MasteryDummyItem {}
 internal class MasteryOfPistolWhip      : MasteryDummyItem {}
 internal class MasteryOfFemtobyte       : MasteryDummyItem {}
 internal class MasteryOfUppskeruvel     : MasteryDummyItem {}
+internal class MasteryOfBlackjack       : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -381,4 +388,5 @@ public enum Synergy {
     MASTERY_PISTOL_WHIP,
     MASTERY_FEMTOBYTE,
     MASTERY_UPPSKERUVEL,
+    MASTERY_BLACKJACK,
 };

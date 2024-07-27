@@ -2,7 +2,7 @@
 
 ## TBD
 
-- Added masteries for Femtobyte and Uppskeruvel
+- Added masteries for Femtobyte, Uppskeruvel, and Blackjack
 - Reduced lag spikes even further by tweaking mod dll export settings
 - Femtobyte now flips tables on placement
 - Made detonation sound for Scotsman a constant volume instead of scaling with number of projectiles

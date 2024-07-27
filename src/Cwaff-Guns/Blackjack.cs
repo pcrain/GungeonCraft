@@ -14,24 +14,30 @@ public class Blackjack : CwaffGun
 
     internal static tk2dSpriteAnimationClip _BulletSprite;
     internal static tk2dSpriteAnimationClip _BackSprite;
+    internal static tk2dSpriteAnimationClip _RedSprite;
+    internal static tk2dSpriteAnimationClip _RedBackSprite;
 
     public static void Init()
     {
         Gun gun = Lazy.SetupGun<Blackjack>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.8f, ammo: _AMMO, canGainAmmo: false,
-                shootFps: 30, reloadFps: 30, muzzleFrom: Items.Mailbox, reloadAudio: "card_shuffle_sound");
+                shootFps: 30, reloadFps: 30, muzzleFrom: Items.Mailbox, reloadAudio: "card_shuffle_sound", fireAudio: "card_throw_sound");
 
-        gun.InitProjectile(GunData.New(clipSize: _CLIP_SIZE, cooldown: 0.16f, angleVariance: 24.0f, shootStyle: ShootStyle.Automatic,
+        Projectile p = gun.InitProjectile(GunData.New(clipSize: _CLIP_SIZE, cooldown: 0.16f, angleVariance: 24.0f, shootStyle: ShootStyle.Automatic,
           customClip: true, damage: 6f, speed: 22f, range: 999f, hitSound: "blackjack_card_impact_sound"
           )).AddAnimations(
-            AnimatedBullet.Create(refClip: ref _BulletSprite, name: "playing_card",      fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft),
-            AnimatedBullet.Create(refClip: ref _BackSprite,   name: "playing_card_back", fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft)
+            AnimatedBullet.Create(refClip: ref _BulletSprite,  name: "playing_card",          fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft),
+            AnimatedBullet.Create(refClip: ref _BackSprite,    name: "playing_card_back",     fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft),
+            AnimatedBullet.Create(refClip: ref _RedSprite,     name: "playing_card_red",      fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft),
+            AnimatedBullet.Create(refClip: ref _RedBackSprite, name: "playing_card_back_red", fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft)
           ).SetAllImpactVFX(VFX.CreatePool("blackjack_card_impact_vfx", fps: 16, loops: false, scale: 0.75f, anchor: Anchor.MiddleCenter)
           ).Attach<ThrownCard>();
 
         gun.AddSynergyModules(Synergy.PIT_BOSS, new ProjectileModule().InitSingleProjectileModule(GunData.New(gun: gun, ammoCost: 0, clipSize: _CLIP_SIZE,
           cooldown: 0.16f, shootStyle: ShootStyle.Automatic, customClip: true, angleFromAim: 20f, angleVariance: 5f, ignoredForReloadPurposes: true,
           mirror: true, baseProjectile: Items._38Special.Projectile(), sprite: "chip_projectile", hitSound: "chess_move", becomeDebris: true)));
+
+        gun.AddSynergyFinalProjectile(Synergy.MASTERY_BLACKJACK, p.Clone().Attach<ThrownCard>(t => t.explosive = true), "blackjack_red", _CLIP_SIZE);
     }
 }
 
@@ -40,6 +46,8 @@ public class ThrownCard : MonoBehaviour
     private const float _SPIN_SPEED = 2.0f;
     private const float _BASE_LIFE  = 0.33f;
     private const float _AIR_DRAG   = 0.94f;
+
+    public bool explosive = false;
 
     private Projectile       _projectile;
     private PlayerController _owner;
@@ -65,20 +73,27 @@ public class ThrownCard : MonoBehaviour
         // this._projectile.sprite.usesOverrideMaterial = true; // keep this off so we still get nice lighting
         this._projectile.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitBlendUber");
 
-        BounceProjModifier bounce = this._projectile.gameObject.GetOrAddComponent<BounceProjModifier>();
+        if (!this.explosive)
+        {
+            this._cardFront  = Blackjack._BulletSprite.GetFrame(0).spriteId;
+            this._cardBack   = Blackjack._BackSprite.GetFrame(0).spriteId;
+            BounceProjModifier bounce = this._projectile.gameObject.GetOrAddComponent<BounceProjModifier>();
             bounce.numberOfBounces     = 1;
             bounce.chanceToDieOnBounce = 0f;
             bounce.onlyBounceOffTiles  = false;
             bounce.OnBounce += this.OnBounce;
+        }
+        else
+        {
+            this._cardFront  = Blackjack._RedSprite.GetFrame(0).spriteId;
+            this._cardBack   = Blackjack._RedBackSprite.GetFrame(0).spriteId;
+            this._projectile.gameObject.AddComponent<ExplosiveModifier>().explosionData = Bouncer._MiniExplosion;
+        }
 
         CalculateStatsFromPlayerStats();
 
-        this._cardFront  = Blackjack._BulletSprite.GetFrame(0).spriteId;
-        this._cardBack   = Blackjack._BackSprite.GetFrame(0).spriteId;
         this._startScale = (Lazy.CoinFlip() ? -1f : 1f);
         this._startAngle = this._projectile.OriginalDirection();
-
-        this._projectile.gameObject.PlayUnique("card_throw_sound");
     }
 
     private void OnBounce()

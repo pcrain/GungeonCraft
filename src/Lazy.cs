@@ -986,4 +986,10 @@ public static class Lazy
         foreach (StatModifier stat in player.ownerlessStatModifiers)
             PrintStat(stat);
     }
+
+    /// <summary>Set up custom ammo types from default resource paths and returns it directly</summary>
+    public static string SetupCustomAmmoClip(string clipname)
+    {
+        return AtlasHelper.AddCustomAmmoType($"{clipname}_clip", ResMap.Get($"{clipname}_clipfull")[0], ResMap.Get($"{clipname}_clipempty")[0]);
+    }
 }

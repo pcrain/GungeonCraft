@@ -1,5 +1,21 @@
 namespace CwaffingTheGungy;
 
+
+//TODO: patch AmmoBurstVFX rendering below final clip projectiles later
+// Fixes a vanilla bug with the background of final projectiles rendering above the foreground
+[HarmonyPatch(typeof(GameUIAmmoController), nameof(GameUIAmmoController.UpdateAmmoUIForModule))]
+public static class GameUIAmmoControllerUpdateAmmoUIForModulePatch
+{
+    static void Postfix(GameUIAmmoController __instance, ref dfTiledSprite currentAmmoFGSprite, ref dfTiledSprite currentAmmoBGSprite, List<dfTiledSprite> AddlModuleFGSprites, List<dfTiledSprite> AddlModuleBGSprites, dfSprite ModuleTopCap, dfSprite ModuleBottomCap, ProjectileModule module, Gun currentGun, ref GameUIAmmoType.AmmoType cachedAmmoTypeForModule, ref string cachedCustomAmmoTypeForModule, ref int cachedShotsInClip, bool didChangeGun, int numberRemaining)
+    {
+        if (AddlModuleBGSprites == null || AddlModuleBGSprites.Count < 1)
+            return;
+        if (AddlModuleFGSprites == null || AddlModuleFGSprites.Count < 1)
+            return;
+        AddlModuleFGSprites[0].ZOrder = AddlModuleBGSprites[0].ZOrder + 1;
+    }
+}
+
 // Fixes a vanilla bug where hovering guns shoot from the wrong place if created while the player is facing left
 public static class HoveringGunPatch
 {
