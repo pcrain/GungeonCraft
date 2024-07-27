@@ -54,7 +54,6 @@ public sealed class GunData
   public float angleFromAim;
   public bool ignoredForReloadPurposes;
   public bool mirror;
-
   public string spawnSound;
   public bool? stopSoundOnDeath;
   public bool? uniqueSounds;
@@ -81,7 +80,6 @@ public sealed class GunData
   /// <param name="ammoCost">How much ammo is depleted per shot fired from a module.</param>
   /// <param name="ammoType">If using base game ammo clips, the type of ammo clip to use.</param>
   /// <param name="customClip">Whether to use a custom ammo clip</param>
-
   /// <param name="damage">The damage of the projectile.</param>
   /// <param name="speed">The speed of the projectile.</param>
   /// <param name="force">The force of the projectile.</param>
@@ -96,7 +94,6 @@ public sealed class GunData
   /// <param name="collidesWithProjectiles">If true, projectile will collide with other projectiles.</param>
   /// <param name="surviveRigidbodyCollisions">If true, projectile will not die upon colliding with an enemy or other rigid body.</param>
   /// <param name="collidesWithTilemap">If true, projectile will not die upon colliding with an enemy or other rigid body.</param>
-
   /// <param name="sprite">The base name of the sprite to use for the projectile.</param>
   /// <param name="fps">The number of frames per second for the projectile's default animation.</param>
   /// <param name="anchor">Where the projectile's effective center of mass is for rotation and muzzle offset purposes.</param>
@@ -105,32 +102,30 @@ public sealed class GunData
   /// <param name="fixesScales">If true, colliders are adjusted to account for scaling.</param>
   /// <param name="overrideColliderPixelSizes">If set, manually adjusts the size of the projectile's hitbox.</param>
   /// <param name="overrideColliderOffsets">If set, manually adjusts the offset of the projectile's hitbox.</param>
-
-  /// <param name="bossDamageMult"></param>
-  /// <param name="destroySound">Sound event for when projectile is destroyed</param>
-  /// <param name="shouldRotate"></param>
-  /// <param name="barrageSize"></param>
-  /// <param name="shouldFlipHorizontally"></param>
-  /// <param name="shouldFlipVertically"></param>
+  /// <param name="bossDamageMult">Multiplier for damage done to bosses.</param>
+  /// <param name="destroySound">Sound event for when projectile is destroyed.</param>
+  /// <param name="shouldRotate">Whether the projectile should rotate based on its velocity.</param>
+  /// <param name="barrageSize">The number of projectiles to fire simultaenously.</param>
+  /// <param name="shouldFlipHorizontally">Whether the projectile sprite should flip horizontally.</param>
+  /// <param name="shouldFlipVertically">Whether the projectile sprite should flip vertically.</param>
   /// <param name="useDummyChargeModule">Cannot be the only projectile for a gun / not compatible with modules are tiers.</param>
-  /// <param name="invisibleProjectile"></param>
-
-  /// <param name="spawnSound"></param>
-  /// <param name="stopSoundOnDeath"></param>
-  /// <param name="uniqueSounds"></param>
-  /// <param name="shrapnelVFX"></param>
-  /// <param name="shrapnelCount"></param>
-  /// <param name="shrapnelMinVelocity"></param>
-  /// <param name="shrapnelMaxVelocity"></param>
-  /// <param name="shrapnelLifetime"></param>
-  /// <param name="preventOrbiting"></param>
-  /// <param name="hitSound">fallback if hitEnemySound and/or hitWallSound is not specified</param>
-  /// <param name="hitEnemySound"></param>
-  /// <param name="hitWallSound"></param>
-  /// <param name="becomeDebris"></param>
-  /// <param name="angleFromAim"></param>
-  /// <param name="ignoredForReloadPurposes"></param>
-  /// <param name="mirror"></param>
+  /// <param name="invisibleProjectile">If true, the projectile is not rendered.</param>
+  /// <param name="spawnSound">The sound to play when the projectile is created.</param>
+  /// <param name="stopSoundOnDeath">If true, spawnSound will be stopped when the projectile is destroyed.</param>
+  /// <param name="uniqueSounds">If true, spawnSound will be stopped if another projectile is spawned.</param>
+  /// <param name="shrapnelVFX">The VFX object used for the projectile's shrapnel.</param>
+  /// <param name="shrapnelCount">The number of pieces of shrapnel to emit when the projectile is destroyed.</param>
+  /// <param name="shrapnelMinVelocity">Minimum magnitude of launched shrapnel velocity.</param>
+  /// <param name="shrapnelMaxVelocity">Maximum magnitude of launched shrapnel velocity.</param>
+  /// <param name="shrapnelLifetime">The amount of time shrapnel lasts before fading out.</param>
+  /// <param name="preventOrbiting">If true, the projectile will not be affected by Orbital Bullets or similar effects.</param>
+  /// <param name="hitSound">Fallback sound to play on collision if hitEnemySound and/or hitWallSound is not specified.</param>
+  /// <param name="hitEnemySound">The sound to play when the projectile collids with an enemy.</param>
+  /// <param name="hitWallSound">The sound to play when the projectile collids with a wall.</param>
+  /// <param name="becomeDebris">If true, the projectile will drop to the ground as a DebrisObject when destroyed.</param>
+  /// <param name="angleFromAim">The angle from the player's computed aim direction at which the projectile will launch.</param>
+  /// <param name="ignoredForReloadPurposes">If true, prevents reload notifications when this projectile is created (useful for synergy bonus projectiles).</param>
+  /// <param name="mirror">If true, the current projectile module will spawn another identical projectile with an opposite angleFromAim.</param>
   public static GunData New(Gun gun = null, Projectile baseProjectile = null, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
     ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1, GameUIAmmoType.AmmoType? ammoType = null,
     bool customClip = false, float? damage = null, float? speed = null, float? force = null, float? range = null, float? recoil = null, float poison = 0.0f, float fire = 0.0f, float freeze = 0.0f, float slow = 0.0f,

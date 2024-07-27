@@ -1321,7 +1321,7 @@ public class Nametag : MonoBehaviour
         rectTransform.localPosition = new Vector3(0, 0, 0);
         rectTransform.sizeDelta = new Vector2(500, 100); // make this big enough to fit a pretty big name
 
-        this._actor.healthHaver.OnPreDeath += (_) => HandleEnemyDied();
+        this._actor.healthHaver.OnPreDeath += HandleEnemyDied;
 
         UpdateWhileParentAlive();  // fixes rendering over the player instead of the enemy on the first frame
     }
@@ -1335,7 +1335,7 @@ public class Nametag : MonoBehaviour
     {
         if (!this._actor || !this._actor.healthHaver || this._actor.healthHaver.IsDead)
         {
-            HandleEnemyDied();
+            HandleEnemyDied(Vector2.zero);
             return false;
         }
 
@@ -1344,7 +1344,7 @@ public class Nametag : MonoBehaviour
         return true;
     }
 
-    private void HandleEnemyDied()
+    private void HandleEnemyDied(Vector2 _)
     {
         UnityEngine.Object.Destroy(this._canvasGo);
         UnityEngine.Object.Destroy(this._textGo);
