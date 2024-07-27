@@ -825,8 +825,8 @@ public partial class CwaffVFX // public
     /// <param name="emissivePower">Emissive power of the VFX. Ignored if fadeOutTime is non-null.</param>
     /// <param name="emissiveColor">Emissive color of the VFX. Ignored if fadeOutTime is non-null.</param>
     /// <param name="fadeIn">If true, VFX will fade in instead of fading out.</param>
-    /// <param name="startScale">Starting scale of the VFX sprite.</param>
-    /// <param name="endScale">Ending scale of the VFX sprite.</param>
+    /// <param name="startScale">If non-null, overrides the starting scale of the VFX sprite.</param>
+    /// <param name="endScale">If non-null, overrides the ending scale of the VFX sprite.</param>
     /// <param name="height">Height of the VFX above the ground. Positive = in front of most things, negative = behind most things.</param>
     /// <param name="randomFrame">If true, animation frames are treated as separate VFX, and one is selected at random.</param>
     /// <param name="specificFrame">If >= 0, the animator is disabled and the VFX sprite is set to the specific frame of the animation.</param>
@@ -834,7 +834,7 @@ public partial class CwaffVFX // public
     /// <param name="flipY">Whether the VFX sprite should be flipped on the Y axis.</param>
     public static void Spawn(GameObject prefab, Vector3 position, Quaternion? rotation = null,
         Vector2? velocity = null, float lifetime = 0, float? fadeOutTime = null, float emissivePower = 0, Color? emissiveColor = null,
-        bool fadeIn = false, float startScale = 1.0f, float endScale = 1.0f, float? height = null, bool randomFrame = false, int specificFrame = -1,
+        bool fadeIn = false, float? startScale = null, float? endScale = null, float? height = null, bool randomFrame = false, int specificFrame = -1,
         bool flipX = false, bool flipY = false)
     {
         CwaffVFX c = (_DespawnedVFX.Count > 0) ? _DespawnedVFX.Pop() : new();
@@ -897,7 +897,7 @@ public partial class CwaffVFX // public
     /// <param name="flipY">Whether the VFX sprite should be flipped on the Y axis.</param>
     public static void SpawnBurst(GameObject prefab, int numToSpawn, Vector2 basePosition, float positionVariance = 0f, Vector2? baseVelocity = null, float minVelocity = 0f, float velocityVariance = 0f,
         Vel velType = Vel.Random, Rot rotType = Rot.None, float lifetime = 0, float? fadeOutTime = null, float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false,
-        bool uniform = false, float startScale = 1.0f, float endScale = 1.0f, float? height = null, bool randomFrame = false, int specificFrame = -1, bool flipX = false, bool flipY = false)
+        bool uniform = false, float? startScale = null, float? endScale = null, float? height = null, bool randomFrame = false, int specificFrame = -1, bool flipX = false, bool flipY = false)
     {
         Vector2 realBaseVelocity = baseVelocity ?? Vector2.zero;
         float baseAngle = Lazy.RandomAngle();
@@ -1026,7 +1026,7 @@ public partial class CwaffVFX // private
 
     private void Setup(GameObject prefab, Vector3 position, Quaternion? rotation = null,
         Vector2? velocity = null, float lifetime = 0, float? fadeOutTime = null,
-        float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false, float startScale = 1.0f, float endScale = 1.0f, float? height = null,
+        float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false, float? startScale = null, float? endScale = null, float? height = null,
         bool randomFrame = false, int specificFrame = -1, bool flipX = false, bool flipY = false)
     {
         this._shouldDespawn = false;
@@ -1038,7 +1038,13 @@ public partial class CwaffVFX // private
         tk2dSpriteAnimator  prefabAnim    = prefab.GetComponent<tk2dSpriteAnimator>();
         tk2dSpriteAnimation prefabLibrary = prefab.GetComponent<tk2dSpriteAnimation>();
         this._sprite.SetSprite(prefabSprite.collection, prefabSprite.spriteId);
-        this._sprite.scale = prefabSprite.scale;
+        if (startScale.HasValue)
+        {
+            this._startScale = startScale.Value;
+            this._sprite.scale = new Vector3(this._startScale, this._startScale, 1f);
+        }
+        else
+            this._sprite.scale = prefabSprite.scale;
         this._sprite.FlipX = flipX;
         this._sprite.FlipY = flipY;
         this._sprite.renderer.SetAlpha(1.0f);
@@ -1062,9 +1068,9 @@ public partial class CwaffVFX // private
             this._sprite.UpdateZDepth();
         }
 
-        this._startScale   = startScale;
-        this._endScale     = endScale;
-        this._changesScale = this._startScale != this._endScale;
+        this._changesScale = endScale.HasValue;
+        if (this._changesScale)
+            this._endScale = endScale.Value;
 
         if (emissivePower > 0)
         {
@@ -1103,7 +1109,7 @@ public partial class CwaffVFX // private
         if (this._changesScale)
         {
             float scale = Mathf.Lerp(this._startScale, this._endScale, percentDone);
-            this._sprite.transform.localScale = new Vector3(scale, scale, 1.0f);
+            this._sprite.scale = new Vector3(scale, scale, 1.0f);
         }
 
         if (this._fadeOut && this._curLifeTime > this._fadeStartTime)

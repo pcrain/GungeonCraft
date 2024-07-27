@@ -10,7 +10,7 @@ public class ScavengingArms : CwaffPassive
     private const float _FIND_AMMO_CHANCE     = 0.05f;
     private const float _AMMO_PERCENT_TO_GAIN = 0.1f;
 
-    private static GameObject _SmallAmmoPickup;
+    internal static GameObject _SmallAmmoPickup;
 
     public static void Init()
     {

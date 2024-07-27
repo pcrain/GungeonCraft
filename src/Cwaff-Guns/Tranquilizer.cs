@@ -63,6 +63,9 @@ public class TranquilizerBehavior : MonoBehaviour
 
     private class EnemyTranquilizedBehavior : MonoBehaviour
     {
+        private const float _DROP_GUN_CHANCE  = 1.0f;
+        private const float _DROP_AMMO_CHANCE = 0.25f;
+
         private AIActor _enemy = null;
         private OrbitalEffect _orb = null;
         private bool _stunned = false;
@@ -94,7 +97,15 @@ public class TranquilizerBehavior : MonoBehaviour
         {
             this._stunned = true;
             if (this._enemy.behaviorSpeculator)
+            {
                 this._enemy.behaviorSpeculator.Stun(_STUN_TIME, createVFX: false);
+                this._enemy.behaviorSpeculator.OverrideBehaviors.Clear();
+                this._enemy.behaviorSpeculator.TargetBehaviors.Clear();
+                this._enemy.behaviorSpeculator.MovementBehaviors.Clear();
+                this._enemy.behaviorSpeculator.AttackBehaviors.Clear();
+                this._enemy.behaviorSpeculator.OtherBehaviors.Clear();
+                this._enemy.behaviorSpeculator.m_behaviors.Clear();
+            }
             this._enemy.IgnoreForRoomClear         = true;
             this._enemy.CollisionDamage            = 0f;
             this._enemy.CollisionKnockbackStrength = 0f;
@@ -104,6 +115,23 @@ public class TranquilizerBehavior : MonoBehaviour
             this._enemy.gameObject.Play("fall_asleep_sound");
             this._orb.ClearOrbitals();
             this._orb.SetupOrbitals(vfx: Tranquilizer._SleepyVFX, numOrbitals: 2, rps: 0.4f, isEmissive: false, isOverhead: true, rotates: false, flips: true, fades: true, bobAmount: 0.25f);
+
+            if (this._enemy.aiShooter is not AIShooter shooter)
+                return;
+
+            if (UnityEngine.Random.value <= _DROP_GUN_CHANCE && shooter.CurrentGun is Gun gun)
+            {
+                shooter.ToggleHandRenderers(false, "tranquilized");
+                if (shooter.m_cachedBraveBulletSource != null)
+                    shooter.m_cachedBraveBulletSource.enabled = false;
+                if (gun.DropGun().gameObject.GetComponentInChildren<Gun>() is Gun droppedGun)
+                    droppedGun.CurrentAmmo = Mathf.CeilToInt(0.05f * droppedGun.GetBaseMaxAmmo());
+            }
+            if (UnityEngine.Random.value <= _DROP_AMMO_CHANCE)
+            {
+                LootEngine.SpawnItem(ScavengingArms._SmallAmmoPickup, this._enemy.Position, Vector2.zero, 0f, false);
+            }
+            UnityEngine.Object.Destroy(shooter);
         }
     }
 }

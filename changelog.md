@@ -26,6 +26,9 @@
 - Increased Nycterian's max distraction range
 - Increased Nyterian's chance to distract enemies at all ranges
 - Fixed bad hand offset for one frame of Zag reload animation
+- Reworked Tranquilizer:
+	- Tranquilized enemies now drop their guns with 5% of their ammo for the player to pickup
+	- Tranquilized enemies have a 25% chance to drop a small ammo pickup
 
 ## 1.16.1 (2024-07-25)
 
