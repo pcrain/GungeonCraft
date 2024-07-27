@@ -114,9 +114,9 @@ public static class CwaffSynergies
         NewMastery<MasteryOfPistolWhip>(MASTERY_PISTOL_WHIP, PistolWhip.ItemName);
         // Femtobyte gains the ability to digitze enemies and respawn them as allies later.
         NewMastery<MasteryOfFemtobyte>(MASTERY_FEMTOBYTE, Femtobyte.ItemName);
-        // Enemies drop souls and souls attack enemies regardless of active gun.
+        // Enemies drop souls and souls attack enemies even when Uppskeruvel is not the active gun.
         NewMastery<MasteryOfUppskeruvel>(MASTERY_UPPSKERUVEL, Uppskeruvel.ItemName);
-        // Card speed is dramatically increased, and the last three projectiles of each clip are exploding jokers.
+        // Card speed is dramatically increased, clip size is doubled, and the last 13 cards in each clip become exploding jokers.
         NewMastery<MasteryOfBlackjack>(MASTERY_BLACKJACK, Blackjack.ItemName)
             .MultSpread(0.5f).MultClipSize(2f).MultFireRate(2f);
       #endregion

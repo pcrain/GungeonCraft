@@ -1,36 +1,49 @@
 # Changelog
 
-## TBD
+## 1.16.2 (2024-07-27)
+
+#### Features:
 
 - Added masteries for Femtobyte, Uppskeruvel, and Blackjack
-- Reduced lag spikes even further by tweaking mod dll export settings
-- Femtobyte now flips tables on placement
-- Made detonation sound for Scotsman a constant volume instead of scaling with number of projectiles
-- Fixed sawblades spawned by Femtobyte having no collision with enemies
-- Fixed Scotsman projectiles sometimes failing to detonate and lingering on the map
-- Fixed null deref caused by King's Law trying to set the alpha of nonexistent muzzle flashes
-- Updated required Alexandria version to 0.4.6 to fix a few hacky workarounds
-- Fixed some beam and sprite trails having weird offsets when moving at high speeds
-- Fixed potential bug with being able to drop dummy items on death during co-op mode
+
+#### Balance Changes:
+
+- Reworked Tranquilizer:
+	- Tranquilized enemies now drop their guns with 5% of their ammo for the player to pickup
+	- Tranquilized enemies with guns also have a 25% chance to drop a small ammo pickup
+	- Changed to UTILITY gun class
+- Tweaked Breegull:
+	- Increased Breegull's ammo from 320 to 480
+	- Increased Breegull's fire egg ignition change from 50% to 100%
+	- Reduced ammo cost of Breegull's clockwork egg from 4 to 3
+- Added Electric damage type to Zag projectiles
+- Increased Zag's ammo from 400 to 600
+- Increased King's Law's ammo from 700 to 1000
+- Increased Macchi Auto's damage over time effect strength by about 50%
+- Increased Telefragger's post-teleport invulnerability time from 1.25s to 1.5s
+- Changed K.A.L.I.'s charge times from (1s, 2.5s, 4.5s) to (1s, 2s, 3s)
+- Increased Nycterian's max distraction range
+- Increased Nyterian's chance to distract enemies at all ranges
+- Femtobyte now automatically flips any tables it materializes
+
+#### Polish:
+
 - Added impact sounds and VFX for Paintball Cannon, B.B. Gun, BlasTech F-4, Femtobyte, Iron Maid, Uppskeruvel, and Zag
 - Added muzzle flashes for B.B. Gun, BlasTech F-4, and Zag
 - Added better custom projectile for BlasTech F-4
-- Added Electric damage type to Zag projectiles
-- Increased Zag ammo from 400 to 600
-- Increased King's Law ammo from 700 to 1000
-- Increased Breegull's ammo from 320 to 480
-- Increased Breegull's fire egg ignition change from 50% to 100%
-- Reduced ammo cost of Breegull's clockwork egg from 4 to 3
-- Increased Macchi Auto's damage over time effect strength by about 50%
-- Increased Telefragger's post-teleport invulnerability time from 1.25s to 1.5s
-- Changed K.A.L.I.'s charge times from 1s, 2.5s, 4.5s to 1s, 2s, 3s
-- Increased Nycterian's max distraction range
-- Increased Nyterian's chance to distract enemies at all ranges
-- Fixed bad hand offset for one frame of Zag reload animation
-- Reworked Tranquilizer:
-	- Tranquilized enemies now drop their guns with 5% of their ammo for the player to pickup
-	- Tranquilized enemies have a 25% chance to drop a small ammo pickup
+- Made detonation sound for Scotsman a constant volume instead of scaling with number of projectiles
+
+#### Bugfixes and Misc:
+
+- Reduced lag spikes even further by tweaking mod dll export settings
+- Updated required Alexandria version to 0.4.6 to fix a few hacky workarounds
 - Fixed vanilla bug with ammo display vfx rendering below final clip sprites
+- Fixed sawblades spawned by Femtobyte having no collision with enemies
+- Fixed Scotsman projectiles sometimes failing to detonate and lingering on the map
+- Fixed null deref caused by King's Law trying to set the alpha of nonexistent muzzle flashes
+- Fixed some beam and sprite trails having weird offsets when moving at high speeds
+- Fixed potential bug with being able to drop dummy items on death during co-op mode
+- Fixed bad hand offset for one frame of Zag reload animation
 
 ## 1.16.1 (2024-07-25)
 
