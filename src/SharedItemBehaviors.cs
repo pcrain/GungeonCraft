@@ -1686,6 +1686,63 @@ public class ManualMotionModule : ProjectileAndBeamMotionModule
     }
 }
 
+/// <summary>Class for creating replicant enemies that temporarily fight on your side</summary>
+public static class Replicant
+{
+    public static AIActor Create(string guid, Vector2 position, Action<tk2dBaseSprite> shaderFunc, bool hasCollision)
+    {
+        AIActor replicant = AIActor.Spawn(
+            prefabActor     : EnemyDatabase.GetOrLoadByGuid(guid),
+            position        : position.ToIntVector2(VectorConversions.Floor),
+            source          : position.GetAbsoluteRoom(),
+            correctForWalls : true, //NOTE: could possibly be false, Chain Gunners don't have good offsets when spawned like this
+            awakenAnimType  : AIActor.AwakenAnimationType.Spawn
+            );
+        if (!replicant)
+            return null;
+
+        replicant.PreventBlackPhantom = true;
+        replicant.SpawnInInstantly();
+        replicant.sprite.PlaceAtPositionByAnchor(position, Anchor.MiddleCenter);
+        replicant.specRigidbody.Initialize();
+        replicant.specRigidbody.CollideWithTileMap = false;
+        if (hasCollision)
+        {
+            if (GameManager.Instance.PrimaryPlayer is PlayerController p1 && p1.specRigidbody)
+                replicant.specRigidbody.RegisterSpecificCollisionException(p1.specRigidbody);
+            if (GameManager.Instance.CurrentGameType == GameManager.GameType.COOP_2_PLAYER)
+                if (GameManager.Instance.SecondaryPlayer is PlayerController p2 && p2.specRigidbody)
+                    replicant.specRigidbody.RegisterSpecificCollisionException(p2.specRigidbody);
+        }
+        else
+        {
+            replicant.specRigidbody.CollideWithOthers = false;
+            replicant.specRigidbody.AddCollisionLayerIgnoreOverride(CollisionMask.LayerToMask(CollisionLayer.Projectile));
+        }
+        replicant.HitByEnemyBullets = false;
+        replicant.IgnoreForRoomClear = true;
+        replicant.IsHarmlessEnemy = true;
+        replicant.ApplyEffect(AlienNailgun._Charm);
+        shaderFunc(replicant.sprite);
+        if (replicant.GetComponent<SpawnEnemyOnDeath>() is SpawnEnemyOnDeath seod)
+            seod.chanceToSpawn = 0.0f; // prevent enemies such as Blobulons from replicating on death
+        if (replicant.healthHaver is HealthHaver hh)
+            hh.PreventAllDamage = true; // can't be harmed normally (exceptions for, e.g., Pinhead or Nitra self-detonation)
+        if (replicant.knockbackDoer is KnockbackDoer kb)
+            kb.SetImmobile(true, "replicant"); // can't be knocked back
+        if (replicant.CurrentGun is Gun gun)
+            shaderFunc(gun.sprite);
+        for (int i = 0; i < replicant.transform.childCount; ++i)
+        {
+            Transform child = replicant.transform.GetChild(i);
+            if (child.GetComponent<tk2dSprite>() is not tk2dSprite sprite)
+                continue;
+            shaderFunc(sprite);
+        }
+        return replicant;
+    }
+}
+
 /// <summary>Class to draw an animated targeting line between two points (currently unused, relocated from Maestro for code cleanup purposes)</summary>
 // public class AnimatedTargetingLine
 // {

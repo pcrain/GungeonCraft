@@ -118,6 +118,11 @@ public class AlienNailgun : CwaffGun
         this._dnaReconstruct ??= StartCoroutine(ReconstructFromDNA(this._targetGuid));
     }
 
+    private static void ApplyReplicantShaders(tk2dBaseSprite sprite)
+    {
+        sprite.MakeHolographic(green: true);
+    }
+
     private IEnumerator ReconstructFromDNA(string guid)
     {
         // delay before reconstruction begins
@@ -148,44 +153,9 @@ public class AlienNailgun : CwaffGun
             this.PlayerOwner.gameObject.Play("replicant_created_sound");
 
         // finish reconstruction process
-        AIActor replicant = AIActor.Spawn(
-            prefabActor     : EnemyDatabase.GetOrLoadByGuid(guid),
-            position        : position.ToIntVector2(VectorConversions.Floor),
-            source          : position.GetAbsoluteRoom(),
-            correctForWalls : true, //NOTE: could possibly be false, Chain Gunners don't have good offsets when spawned like this
-            awakenAnimType  : AIActor.AwakenAnimationType.Spawn
-            );
+        AIActor replicant = Replicant.Create(guid, position, ApplyReplicantShaders, hasCollision: false);
         if (replicant)
-        {
-            replicant.PreventBlackPhantom = true;
-            replicant.SpawnInInstantly();
-            replicant.sprite.PlaceAtPositionByAnchor(position, Anchor.MiddleCenter);
-            replicant.specRigidbody.Initialize();
-            replicant.specRigidbody.CollideWithOthers = false;
-            replicant.specRigidbody.CollideWithTileMap = false;
-            replicant.specRigidbody.AddCollisionLayerIgnoreOverride(CollisionMask.LayerToMask(CollisionLayer.Projectile));
-            replicant.HitByEnemyBullets = false;
-            replicant.IgnoreForRoomClear = true;
-            replicant.IsHarmlessEnemy = true;
-            replicant.ApplyEffect(AlienNailgun._Charm);
-            replicant.sprite.MakeHolographic(green: true);
-            if (replicant.GetComponent<SpawnEnemyOnDeath>() is SpawnEnemyOnDeath seod)
-                seod.chanceToSpawn = 0.0f; // prevent enemies such as Blobulons from replicating on death
-            if (replicant.healthHaver is HealthHaver hh)
-                hh.PreventAllDamage = true; // can't be harmed normally (exceptions for, e.g., Pinhead or Nitra self-detonation)
-            if (replicant.knockbackDoer is KnockbackDoer kb)
-                kb.SetImmobile(true, "replicant"); // can't be knocked back
-            if (replicant.CurrentGun is Gun gun)
-                gun.sprite.MakeHolographic(green: true);
-            for (int i = 0; i < replicant.transform.childCount; ++i)
-            {
-                Transform child = replicant.transform.GetChild(i);
-                if (child.GetComponent<tk2dSprite>() is not tk2dSprite sprite)
-                    continue;
-                sprite.MakeHolographic(green: true);
-            }
             _Replicants.Add(replicant);
-        }
         foreach (GameObject g in this._fragments)
             g.SafeDestroy();
         this._fragments.Clear();

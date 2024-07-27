@@ -112,6 +112,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfAlyx>(MASTERY_ALYX, Alyx.ItemName);
         // Pistol Whip can hit enemies closer than its max range, and after killing an enemy, will trigger a mini blank for the next 3 attacks.
         NewMastery<MasteryOfPistolWhip>(MASTERY_PISTOL_WHIP, PistolWhip.ItemName);
+        // Femtobyte gains the ability to digitze enemies and respawn them as allies later.
+        NewMastery<MasteryOfFemtobyte>(MASTERY_FEMTOBYTE, Femtobyte.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -331,6 +333,7 @@ internal class MasteryOfPaintballCannon : MasteryDummyItem {}
 internal class MasteryOfGunbrella       : MasteryDummyItem {}
 internal class MasteryOfAlyx            : MasteryDummyItem {}
 internal class MasteryOfPistolWhip      : MasteryDummyItem {}
+internal class MasteryOfFemtobyte       : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -373,4 +376,5 @@ public enum Synergy {
     MASTERY_GUNBRELLA,
     MASTERY_ALYX,
     MASTERY_PISTOL_WHIP,
+    MASTERY_FEMTOBYTE,
 };

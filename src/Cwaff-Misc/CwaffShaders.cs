@@ -64,10 +64,22 @@ public static class CwaffShaders
         g.Play("femtobyte_digitize_sound");
     }
 
-    public static void Materialize<T>(T sprite, float delay = 0.0f) where T : tk2dBaseSprite
+    public static void MaterializePartial(tk2dBaseSprite sprite)
+    {
+        sprite.StartCoroutine(Materialize_CR(sprite, 0.0f, partial: true));
+        sprite.gameObject.PlayUnique("femtobyte_materialize_sound");
+    }
+
+    public static void Materialize(tk2dBaseSprite sprite)
+    {
+        sprite.StartCoroutine(Materialize_CR(sprite, 0.0f));
+        sprite.gameObject.PlayUnique("femtobyte_materialize_sound");
+    }
+
+    public static void Materialize(tk2dBaseSprite sprite, float delay)
     {
         sprite.StartCoroutine(Materialize_CR(sprite, delay));
-        sprite.gameObject.Play("femtobyte_materialize_sound");
+        sprite.gameObject.PlayUnique("femtobyte_materialize_sound");
     }
 
     public static IEnumerator Digitize_CR(tk2dBaseSprite s, float delay = 0.0f)
@@ -116,7 +128,7 @@ public static class CwaffShaders
         UnityEngine.Object.Destroy(s.gameObject);
     }
 
-    public static IEnumerator Materialize_CR(tk2dBaseSprite s, float delay = 0.0f)
+    public static IEnumerator Materialize_CR(tk2dBaseSprite s, float delay = 0.0f, bool partial = false)
     {
         Shader oldShader = s.renderer.material.shader;
 
@@ -136,6 +148,8 @@ public static class CwaffShaders
             // s.renderer.material.SetFloat("_ScrollSpeed", 5f + 5f * percentDone);
             yield return null;
         }
+        if (partial)
+            yield break;
         yield return new WaitForSeconds(0.4f);
 
         phaseTime = 0.15f;

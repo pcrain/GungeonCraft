@@ -42,9 +42,9 @@ public class Femtobyte : CwaffGun
         public bool       rainbow       = false;
         // Pickup stuff
         public int        pickupID      = -1;
-        // Enemy stuff (unused for now)
-        // public string     enemyGuid     = null;
-        // public bool       jammed        = false;
+        // Enemy stuff (for mastery)
+        public string     enemyGuid     = null;
+        public bool       jammed        = false; // unused for now
 
         public static DigitizedObject FromPickup(PickupObject pickup)
         {
@@ -55,6 +55,21 @@ public class Femtobyte : CwaffGun
                     prefabName: pickup.EncounterNameOrDisplayName,
                     displayName: pickup.EncounterNameOrDisplayName,
                     prefab: PickupObjectDatabase.GetById(pickup.PickupObjectId).gameObject),
+            };
+        }
+
+        public static DigitizedObject FromEnemyGuid(string guid)
+        {
+            AIActor enemy = EnemyDatabase.GetOrLoadByGuid(guid);
+            if (!enemy)
+                return null;
+            return new(){
+                type      = ENEMY,
+                enemyGuid = guid,
+                data      = new(
+                    prefabName: enemy.ActorName,
+                    displayName: enemy.ActorName,
+                    prefab: enemy.gameObject),
             };
         }
     }
@@ -158,8 +173,14 @@ public class Femtobyte : CwaffGun
     {
         if (enemy.healthHaver is not HealthHaver hh || hh.IsDead || hh.IsBoss || hh.IsSubboss)
             return false;
+        if (this.PlayerOwner.HasSynergy(Synergy.MASTERY_FEMTOBYTE))
+            if (DigitizedObject.FromEnemyGuid(enemy.EnemyGuid) is DigitizedObject d)
+                SetCurrentSlot(d);
         CwaffShaders.Digitize(enemy.sprite);
-        enemy.EraseFromExistenceWithRewards();
+        if (enemy.gameObject.GetComponent<DigitizedEnemy>())
+            enemy.EraseFromExistence(); // no reward cheesing
+        else
+            enemy.EraseFromExistenceWithRewards();
         return true;
     }
 
@@ -518,6 +539,11 @@ public class Femtobyte : CwaffGun
                 PhysicsEngine.Instance.RegisterOverlappingGhostCollisionExceptions(barrelBody, null, false);
                 CwaffShaders.Materialize(barrelSprite);
                 break;
+            case ENEMY:
+                AIActor ai = Replicant.Create(d.enemyGuid, placePoint, CwaffShaders.MaterializePartial, hasCollision: true);
+                ai.gameObject.AddComponent<DigitizedEnemy>();
+                PhysicsEngine.Instance.RegisterOverlappingGhostCollisionExceptions(ai.specRigidbody, null, false);
+                break;
             case CHEST:
                 GameObject chestObject = UnityEngine.Object.Instantiate(d.data.prefab, placePoint, Quaternion.identity);
                 Chest chest = chestObject.GetComponent<Chest>();
@@ -627,6 +653,9 @@ public class Femtobyte : CwaffGun
                     for (int j = 0; j < numContents; ++j)
                         data.Add(d.contents[j]);
                     break;
+                case ENEMY:
+                    data.Add(d.enemyGuid);
+                    break;
                 case PICKUP:
                     data.Add(d.pickupID);
                     break;
@@ -666,6 +695,10 @@ public class Femtobyte : CwaffGun
                         rainbow = rainbow,
                         contents = contents.Count > 0 ? contents : null,
                     };
+                    break;
+                case ENEMY:
+                    string guid = (string)saveData[i++];
+                    this.digitizedObjects[slot] = DigitizedObject.FromEnemyGuid(guid);
                     break;
                 case PICKUP:
                     int pickupId = (int)saveData[i++];
@@ -780,10 +813,13 @@ public class FemtobyteProjectile : MonoBehaviour
     {
         if (!this._owner || !this._projectile || !this._femtobyte || !otherBody)
             return;
-        if (otherBody.GetComponent<AIActor>())
-            return; // handled in OnWillKillEnemy
-        if (otherBody.GetComponent<HealthHaver>() is HealthHaver hh && (hh.IsBoss || hh.IsSubboss))
-            return; // handled in OnWillKillEnemy
+        if (!otherBody.GetComponent<DigitizedEnemy>())
+        {
+            if (otherBody.GetComponent<AIActor>())
+                return; // handled in OnWillKillEnemy
+            if (otherBody.GetComponent<HealthHaver>() is HealthHaver hh && (hh.IsBoss || hh.IsSubboss))
+                return; // handled in OnWillKillEnemy
+        }
         Vector2 otherPos = otherBody.UnitCenter;
         if (!this._femtobyte.TryToDigitize(otherBody.gameObject))
             return;
@@ -811,6 +847,8 @@ public class FemtobyteProjectile : MonoBehaviour
         this._projectile.DieInAir(false, false, false, false);
     }
 }
+
+public class DigitizedEnemy : MonoBehaviour { }
 
 public class FlipOnStart : MonoBehaviour
 {
