@@ -114,19 +114,21 @@ public partial class SansBoss : AIActor
     {
       this.aiActor.bulletBank.Bullets.Add(_BoneBullet);
       base.aiActor.healthHaver.forcePreventVictoryMusic = true; // prevent default floor theme from playing on death
-      base.aiActor.healthHaver.OnPreDeath += (_) => {
-        FlipSpriteIfNecessary(overrideFlip: false);
-        GameManager.Instance.DungeonMusicController.LoopMusic(musicName: "sans", loopPoint: 48800, rewindAmount: 48800);
-        UnityEngine.Object.Destroy(aura.gameObject);
-        aura = null;
+      base.aiActor.healthHaver.OnPreDeath += OnPreDeath;
+    }
 
-        bool success;
-        Lazy.SpawnChestWithSpecificItem(
-          pickup: ItemHelper.Get((Items)GasterBlaster.ID),
-          position: GameManager.Instance.PrimaryPlayer.CurrentRoom.GetCenteredVisibleClearSpot(2, 2, out success),
-          overrideChestQuality: ItemQuality.S);
-        // GameManager.Instance.RewardManager.SpawnTotallyRandomChest(GameManager.Instance.PrimaryPlayer.CurrentRoom.GetRandomVisibleClearSpot(1, 1)).IsLocked = false;
-      };
+    private void OnPreDeath(Vector2 _)
+    {
+      FlipSpriteIfNecessary(overrideFlip: false);
+      GameManager.Instance.DungeonMusicController.LoopMusic(musicName: "sans", loopPoint: 48800, rewindAmount: 48800);
+      if (aura && aura.gameObject)
+        UnityEngine.Object.Destroy(aura.gameObject);
+      aura = null;
+
+      Lazy.SpawnChestWithSpecificItem(
+        pickup: ItemHelper.Get((Items)GasterBlaster.ID),
+        position: GameManager.Instance.PrimaryPlayer.CurrentRoom.GetCenteredVisibleClearSpot(2, 2, out bool success),
+        overrideChestQuality: ItemQuality.S);
     }
 
     private void LateUpdate() // movement is buggy if we use the regular Update() method
@@ -146,7 +148,9 @@ public partial class SansBoss : AIActor
 
     private void FlipSpriteIfNecessary(bool? overrideFlip = null)
     {
-      base.sprite.FlipX  = overrideFlip ?? (GameManager.Instance.BestActivePlayer.SpriteBottomCenter.x < base.specRigidbody.UnitBottomCenter.x);
+      if (!base.sprite || !base.specRigidbody)
+        return;
+      base.sprite.FlipX  = overrideFlip ?? (GameManager.Instance.BestActivePlayer.CenterPosition.x < base.specRigidbody.UnitBottomCenter.x);
       Vector3 spriteSize = base.sprite.GetUntrimmedBounds().size;
       Vector2 offset     = new Vector2(spriteSize.x / (base.sprite.FlipX ? 2f : -2f), 0f);
       base.sprite.transform.localPosition = (base.specRigidbody.UnitBottomCenter.Quantize(C.PIXEL_SIZE) + offset).ToVector3ZisY(0f);
