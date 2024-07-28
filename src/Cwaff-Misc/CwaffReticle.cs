@@ -140,7 +140,7 @@ public class CwaffReticle : MonoBehaviour
     }
     else if (this.targetPosFunc != null)
       this._targetPos = this.targetPosFunc(this);
-    else if (!this._player.IsKeyboardAndMouse())
+    else if (!this._player.IsKeyboardAndMouse())  //WARNING: this has caused a null dereference, but not sure how
       this._targetPos = this._player.CenterPosition + this.controllerScale * this._player.m_activeActions.Aim.Vector;
     else
       this._targetPos = this._player.unadjustedAimPoint.XY();

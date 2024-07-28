@@ -152,6 +152,8 @@ public class English : CwaffGun
             return;
         if (this.gun.IsCharging)
         {
+            if (!this._wasCharging)
+                EnsurePhantoms();
             if ((this._chargeTime += BraveTime.DeltaTime) > _CHARGE_PER_LEVEL)
             {
                 this._chargeTime -= _CHARGE_PER_LEVEL;

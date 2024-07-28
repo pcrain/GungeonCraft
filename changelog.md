@@ -1,5 +1,9 @@
 # Changelog
 
+## TBD
+
+- Fixed null deref caused by English trying to reuse despawned ball VFX after changing floors
+
 ## 1.16.2 (2024-07-27)
 
 #### Features:
@@ -13,9 +17,9 @@
 	- Tranquilized enemies with guns also have a 25% chance to drop a small ammo pickup
 	- Changed to UTILITY gun class
 - Tweaked Breegull:
-	- Increased Breegull's ammo from 320 to 480
-	- Increased Breegull's fire egg ignition change from 50% to 100%
-	- Reduced ammo cost of Breegull's clockwork egg from 4 to 3
+	- Increased ammo from 320 to 480
+	- Increased fire egg ignition chance from 50% to 100%
+	- Reduced ammo cost of clockwork egg from 4 to 3
 - Added Electric damage type to Zag projectiles
 - Increased Zag's ammo from 400 to 600
 - Increased King's Law's ammo from 700 to 1000
