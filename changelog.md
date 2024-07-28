@@ -5,6 +5,7 @@
 - Fixed null deref caused by English trying to reuse despawned ball VFX after changing floors
 - Fixed null deref in Scotsman and Maestro caused by trying to update targeting reticles during no-input states
 - Added extra line of dialog to [REDACTED] explaining [REDACTED] a litte better
+- Fixed null deref caused by Echo Chamber trying to read sprites from projectiles that don't have them (e.g., Heck Blaster)
 
 ## 1.16.2 (2024-07-27)
 

@@ -8,6 +8,7 @@ public class EchoChamber : CwaffPassive
     public static string Lore             = "Much like their owners, guns have memories, albeit limited and imperfect ones. The Hollowpoint that possesses this chamber is able to tap into these memories to manifest spectres of recently-fired projectiles. While the quality of these spectral projectiles may not be up to par with the originals in every conceivable way, one ought to count their blessings that the Hollowpoint is inadvertently helping at all.";
 
     internal static Projectile _FlakProjectile;
+    internal static tk2dSprite _DefaultSprite;
     internal static GameObject _EchoPrefab;
 
     public static void Init()
@@ -16,6 +17,7 @@ public class EchoChamber : CwaffPassive
         item.quality       = ItemQuality.C;
 
         _FlakProjectile = (ItemHelper.Get(Items.FlakBullets) as ComplexProjectileModifier).CollisionSpawnProjectile;
+        _DefaultSprite = Items.Ak47.Projectile().gameObject.GetComponentInChildren<tk2dSprite>();
         _EchoPrefab = VFX.Create("echo_effect", 16, loops: true, anchor: Anchor.MiddleCenter);
     }
 
@@ -75,8 +77,16 @@ public class EchoProjectileSpawner : MonoBehaviour
         this._echoRotates          = this._projectile.shouldRotate;
         this._echoPosition         = this._projectile.transform.position;
         this._echoRotation         = this._projectile.transform.rotation;
-        this._echoSpriteCollection = this._projectile.sprite.collection;
-        this._echoSpriteId         = this._projectile.sprite.spriteId;
+        if (this._projectile.sprite)
+        {
+            this._echoSpriteCollection = this._projectile.sprite.collection;
+            this._echoSpriteId         = this._projectile.sprite.spriteId;
+        }
+        else
+        {
+            this._echoSpriteCollection = EchoChamber._DefaultSprite.collection;
+            this._echoSpriteId         = EchoChamber._DefaultSprite.spriteId;
+        }
         this._echoVelocity         = this._projectile.baseData.speed * this._echoAngle.ToVector();
         this._echoDamage           = this._projectile.baseData.damage;
         this._echoRange            = this._projectile.baseData.range;
@@ -152,7 +162,8 @@ public class EchoingProjectile : MonoBehaviour
         this._projectile = base.GetComponent<Projectile>();
         this._owner      = this._projectile.Owner as PlayerController;
 
-        GameObject g = UnityEngine.Object.Instantiate(new GameObject(), this._projectile.SafeCenter, this._projectile.sprite.transform.rotation);
+        GameObject g = UnityEngine.Object.Instantiate(new GameObject(), this._projectile.SafeCenter,
+            this._projectile.sprite ? this._projectile.sprite.transform.rotation : Quaternion.identity);
         this._spawner = g.AddComponent<EchoProjectileSpawner>();
         this._spawner
             .Setup(this._projectile, this._owner)
