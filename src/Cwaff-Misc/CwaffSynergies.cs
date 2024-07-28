@@ -231,6 +231,7 @@ public static class CwaffSynergies
     {
         if (gun && gun.IsMasterable())
         {
+            //WARNING: if the mastery changes our clip size, the ui doesn't update for some reason (e.g., with Blackjack)...can't track down
             player.AcquireFakeItem(_MasteryGuns[gun.PickupObjectId]);
             player.gameObject.Play("mastery_ritual_complete_sound");
         }

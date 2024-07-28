@@ -101,7 +101,7 @@ public class Commands
 
             if (Input.GetKeyDown(KeyCode.M)) // acquire mastery token for current gun
             {
-                GameManager.Instance.PrimaryPlayer.AcquireMastery(GameManager.Instance.PrimaryPlayer.CurrentGun);
+                __instance.AcquireMastery(__instance.CurrentGun);
             }
 
             if (Input.GetKeyDown(KeyCode.B)) // toggle constructor profiler

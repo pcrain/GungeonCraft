@@ -101,6 +101,8 @@ public class SansNPC : BossNPC
         "idle_glance", "idle_glance", "sans_laugh");
     yield return Converse("if something cool DOES happen, try using a blank",
         "idle", "idle", "sans_laugh");
+    yield return Converse("and if nothing happens, maybe try dropping some stronger guns",
+        "shrug", "shrug", "sans_laugh");
     yield return Converse("what, you think i'm making all of this up?",
         "idle", "idle", "sans_laugh");
     yield return Converse("eh, could be",
