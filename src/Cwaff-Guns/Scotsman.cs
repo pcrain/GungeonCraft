@@ -76,7 +76,7 @@ public class Scotsman : CwaffGun
     public override void Update()
     {
         base.Update();
-        if (this.PlayerOwner is not PlayerController player)
+        if (this.PlayerOwner is not PlayerController player || !player.AcceptingNonMotionInput)
             return;
 
         // smoothly handle reticle postion, compensating extra distance for controller users (modified from Gunbrella)

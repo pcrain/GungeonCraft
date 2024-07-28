@@ -117,7 +117,7 @@ public class CwaffReticle : MonoBehaviour
 
   private void HandleTargeting()
   {
-    if (!this._extantVfx)
+    if (!this._extantVfx || !this._player.AcceptingNonMotionInput)
       return;
 
     if (this.rotateSpeed > 0)

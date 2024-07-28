@@ -3,6 +3,7 @@
 ## TBD
 
 - Fixed null deref caused by English trying to reuse despawned ball VFX after changing floors
+- Fixed null deref in Scotsman and Maestro caused by trying to update targeting reticles during no-input states
 
 ## 1.16.2 (2024-07-27)
 

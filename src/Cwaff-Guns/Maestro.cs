@@ -129,7 +129,7 @@ public class Maestro : CwaffGun
 
     private AIActor SwitchTargetEnemy()
     {
-        if (this.PlayerOwner is not PlayerController pc)
+        if (this.PlayerOwner is not PlayerController pc || !pc.AcceptingNonMotionInput)
             return null;
         List<AIActor> enemiesInRoom = pc.CurrentRoom.SafeGetEnemiesInRoom();
 
