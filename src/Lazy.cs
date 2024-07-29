@@ -75,7 +75,8 @@ public static class Lazy
         }
 
         ETGMod.Databases.Items.SetupItem(item, itemName);
-        Gungeon.Game.Items.Add(internalName, item);
+        if (!hideFromAmmonomicon || C.DEBUG_BUILD) // only allow spawning hidden items through console in debug mode
+            Gungeon.Game.Items.Add(internalName, item);
 
         item.itemName = itemName;
         item.encounterTrackable.journalData.AmmonomiconSprite = ammonomiconSprite;
