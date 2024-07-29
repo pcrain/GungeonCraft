@@ -5,7 +5,9 @@ public static class CwaffShaders
     public static Shader DigitizeShader = null;
     public static Shader UnlitDigitizeShader = null;
     public static Shader GoldShader = null;
+    public static Shader CosmicShader = null;
     public static Texture2D DigitizeTexture = null;
+    public static Texture2D StarsTexture = null;
 
     private static string GetShaderBundleNameForPlatform()
     {
@@ -37,6 +39,8 @@ public static class CwaffShaders
             DigitizeTexture = shaderBundle.LoadAsset<Texture2D>("assets/bits.png");
             UnlitDigitizeShader = shaderBundle.LoadAsset<Shader>("assets/digitizeshaderunlit.shader");
             GoldShader = shaderBundle.LoadAsset<Shader>("assets/goldshader.shader");
+            CosmicShader = shaderBundle.LoadAsset<Shader>("assets/cosmicshader.shader");
+            StarsTexture = shaderBundle.LoadAsset<Texture2D>("assets/startexture_cropped.png");
         }
     }
 
@@ -172,5 +176,35 @@ public static class CwaffShaders
         }
 
         s.renderer.material.shader = oldShader;
+    }
+
+    public static void Cosmify(tk2dBaseSprite s)
+    {
+        s.usesOverrideMaterial = true;
+        s.renderer.material.shader = CwaffShaders.CosmicShader;
+        s.renderer.material.SetTexture("_StarTex", CwaffShaders.StarsTexture);
+    }
+
+    [HarmonyPatch(typeof(AIActor), nameof(AIActor.Start))]
+    private class RandomCosmicKinPatch
+    {
+        private const float _COSMIFY_CHANCE = 0.0025f;
+
+        static void Postfix(AIActor __instance)
+        {
+            if (UnityEngine.Random.value > _COSMIFY_CHANCE)
+                return;
+            if (__instance.EnemyGuid != Enemies.BulletKin)
+                return;
+            if (__instance.sprite is not tk2dSprite sprite)
+                return;
+            Cosmify(sprite);
+            for (int i = 0; i < sprite.gameObject.transform.childCount; ++i)
+            {
+                Transform child = sprite.gameObject.transform.GetChild(i);
+                if (child.GetComponent<tk2dSprite>() is tk2dSprite csprite)
+                    Cosmify(csprite);
+            }
+        }
     }
 }
