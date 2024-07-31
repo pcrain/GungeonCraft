@@ -198,3 +198,27 @@ static class ShootSingleProjectilePatch
         cursor.Emit(OpCodes.Call, typeof(CwaffProjectile).GetMethod("DetermineIfFiredForFree", BindingFlags.Static | BindingFlags.NonPublic));
     }
 }
+
+[HarmonyPatch(typeof(PlayerItem), nameof(PlayerItem.DidDamage))]
+static class PlayerItemDidDamagePatch
+{
+    // NOTE: used by Alligator + Stuffed Star synergy to increase cooldown rate
+    public static void Prefix(PlayerItem __instance, PlayerController Owner, ref float damageDone)
+    {
+        if (!Owner)
+            return;
+        if (Owner.HasSynergy(Synergy.MR_ALLIGATOX))
+            damageDone *= 2f;
+    }
+}
+
+// protected void ApplyCooldown(PlayerController user)
+[HarmonyPatch(typeof(PlayerItem), nameof(PlayerItem.ApplyCooldown))]
+static class PlayerItemApplyCooldownPatch
+{
+    static void Postfix(PlayerItem __instance, PlayerController user)
+    {
+        if (__instance is GrapplingHookItem && user.HasSynergy(Synergy.BIONIC_COMMANDO))
+            __instance.ClearCooldowns();
+    }
+}

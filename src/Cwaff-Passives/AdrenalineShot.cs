@@ -11,6 +11,7 @@ public class AdrenalineShot : CwaffPassive
     internal const string _HalfHeartSpriteUI  = $"{C.MOD_PREFIX}:_AdrenalineHalfShotHeartSpriteUI";
     internal const string _EmptyHeartSpriteUI = $"{C.MOD_PREFIX}:_AdrenalineEmptyShotHeartSpriteUI";
 
+    internal const float _MAX_RUSH_TIME = 90f;
     internal const float _MAX_ADRENALINE_TIME = 60f;
     internal const float _MAX_ADRENALINE_LOSS = 4f; // loss from taking damage while under effects of adrenaline
     internal const int   _CASINGS_FOR_ROBOT   = 20;
@@ -182,7 +183,8 @@ public class AdrenalineShot : CwaffPassive
 
         if (this._adrenalineActive)
         {
-            this._adrenalineTimer -= _MAX_ADRENALINE_LOSS;
+            if (!this.Owner.HasSynergy(Synergy.ADRENALINE_RUSH))
+                this._adrenalineTimer -= _MAX_ADRENALINE_LOSS;
             if (this._adrenalineTimer <= 0)
                 return;
             hh.gameObject.Play("adrenaline_tank_damage_sound");
@@ -209,7 +211,7 @@ public class AdrenalineShot : CwaffPassive
         this.Owner.ChangeFlatColorOverride(faded);
         this.Owner.DoGenericItemActivation(this);
 
-        this._adrenalineTimer  = _MAX_ADRENALINE_TIME;
+        this._adrenalineTimer  = this.Owner.HasSynergy(Synergy.ADRENALINE_RUSH) ? _MAX_RUSH_TIME : _MAX_ADRENALINE_TIME;
     }
 
     private void OnHealthChanged(float resultValue, float maxValue)

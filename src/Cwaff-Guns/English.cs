@@ -1,5 +1,6 @@
 ﻿namespace CwaffingTheGungy;
 
+using System;
 using static BilliardBall.State;
 
 public class English : CwaffGun
@@ -332,6 +333,7 @@ public class BilliardBall : MonoBehaviour
 
         this._projectile.BulletScriptSettings.surviveRigidbodyCollisions = true;
         this._projectile.BulletScriptSettings.surviveTileCollisions      = true;
+        this._projectile.OnWillKillEnemy += this.OnWillKillEnemy;
 
         this._body.OnRigidbodyCollision    += this.OnRigidbodyCollision;
         this._body.OnRigidbodyCollision    += this.OnAnyCollision;
@@ -351,6 +353,12 @@ public class BilliardBall : MonoBehaviour
         English.AddExtantBilliard(this);
 
         this._setup = true;
+    }
+
+    private void OnWillKillEnemy(Projectile proj, SpeculativeRigidbody body)
+    {
+        if (proj.Owner is PlayerController player && player.HasSynergy(Synergy.BANK_SHOTS))
+            LootEngine.SpawnCurrency(proj.SafeCenter, 1, false, proj.m_currentDirection, 10f);
     }
 
     internal void UpdateCollisionStatus(RoomHandler newRoom)

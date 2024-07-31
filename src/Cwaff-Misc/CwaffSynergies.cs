@@ -78,7 +78,19 @@ public static class CwaffSynergies
         NewSynergy(BLASTECH_A1, "BlasTech A-1", new[]{IName(BlasTechF4.ItemName), "laser_sight"});
         // Blackjack fires poker chips on either side of thrown cards.
         NewSynergy(PIT_BOSS, "Pit Boss", new[]{IName(Blackjack.ItemName), "amulet_of_the_pit_lord"});
-
+        // K.A.L.I.'s charge rate is quadrupled.
+        NewSynergy(PARTICLE_ACCELERATOR_ACCELERATOR, "Particle Accelerator Accelerator", new[]{IName(KALI.ItemName), "singularity"})
+            .MultChargeRate(4f);
+        // Stuffed Star recharges twice as quickly.
+        NewSynergy(MR_ALLIGATOX, "Mr. Alligatox", new[]{IName(Alligator.ItemName), "stuffed_star"});
+        // Adrenaline Shot's critical state lasts for 90 seconds, and taking damage no longer decreases the countdown timer.
+        NewSynergy(ADRENALINE_RUSH, "Adrenaline Rush", new[]{IName(AdrenalineShot.ItemName), "shotgun_coffee"});
+        // Enemies killed with English's projectils drop an extra casing.
+        NewSynergy(BANK_SHOTS, "Bank Shots", new[]{IName(English.ItemName), "loot_bag"});
+        // Grappling Hook's cooldown is removed.
+        NewSynergy(BIONIC_COMMANDO, "Bionic Commando", new[]{IName(BionicFinger.ItemName), "grappling_hook"});
+        // Every blank used in a shop gives a 10% discount.
+        NewSynergy(BLANK_EXPRESSION, "Blank Expression", new[]{IName(BlankChecks.ItemName), "disarming_personality"});
       #endregion
 
       #region Masteries
@@ -322,6 +334,8 @@ public static class CwaffSynergies
         { e.statModifiers.Add(StatType.Accuracy.Mult(a)); return e; }
     public static AdvancedSynergyEntry MultClipSize(this AdvancedSynergyEntry e, float a)
         { e.statModifiers.Add(StatType.AdditionalClipCapacityMultiplier.Mult(a)); return e; }
+    public static AdvancedSynergyEntry MultChargeRate(this AdvancedSynergyEntry e, float a)
+        { e.statModifiers.Add(StatType.ChargeAmountMultiplier.Mult(a)); return e; }
 
 }
 
@@ -370,6 +384,12 @@ public enum Synergy {
     TALON_TROT,
     BLASTECH_A1,
     PIT_BOSS,
+    PARTICLE_ACCELERATOR_ACCELERATOR,
+    MR_ALLIGATOX,
+    ADRENALINE_RUSH,
+    BANK_SHOTS,
+    BIONIC_COMMANDO,
+    BLANK_EXPRESSION,
 
     // Masteries
     MASTERY_GRANDMASTER,
