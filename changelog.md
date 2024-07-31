@@ -2,6 +2,7 @@
 
 ## TBD
 
+- Added masteries for English and Iron Maid
 - Added 6 new synergies
 
 ## 1.16.3 (2024-07-28)

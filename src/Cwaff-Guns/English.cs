@@ -11,7 +11,8 @@ public class English : CwaffGun
     public static string Lore             = "This weapon appears to be an ordinary pool cue at first glance. The second, third, and fourth glances are much the same. The fifth glance, however, reveals a tiny spark at the tip of the cue, ready to materialize a cue ball with unforetold power and disregard for the conservation of momentum at the wielder's first intention to strike. The six glance reveals you have gone partially insane from staring at the tip of an ordinary pool cue for so long, and that it is, in fact, just an ordinary pool cue.";
 
     private const float _CHARGE_PER_LEVEL = 0.4f;
-    private const int _MAX_CHARGE_LEVEL   = 5;
+    private const int _MAX_CHARGE_LEVEL   = 7;
+    private const int _NORM_CHARGE_LEVEL  = 5;
     private const int _MAX_PHANTOMS       = 1 + (_MAX_CHARGE_LEVEL * (_MAX_CHARGE_LEVEL + 1)) / 2;
     private const float _MAX_GLOW         = 5f;
     private const float _H_SPACE          = 0.625f;
@@ -30,6 +31,7 @@ public class English : CwaffGun
     private bool _wasCharging              = false;
     private float _chargeTime              = 0.0f;
     private int _chargeLevel               = 0;
+    private int _currentMaxCharge          = 0;
 
     public static void Init()
     {
@@ -123,7 +125,7 @@ public class English : CwaffGun
             if (!this._phantoms[i])
             {
                 this._phantoms[i] = SpawnManager.SpawnVFX(_BilliardBallPhantom, base.transform.position, Quaternion.identity, ignoresPools: true);
-                this._phantoms[i].GetComponent<tk2dSpriteAnimator>().PickFrame(_BALL_ORDER[i]);
+                this._phantoms[i].GetComponent<tk2dSpriteAnimator>().PickFrame(_BALL_ORDER[i % 15]);
                 this._phantoms[i].SetActive(false);
             }
             if (!this._placeholders[i])
@@ -154,11 +156,15 @@ public class English : CwaffGun
         if (this.gun.IsCharging)
         {
             if (!this._wasCharging)
+            {
                 EnsurePhantoms();
+                this._currentMaxCharge = player.HasSynergy(Synergy.MASTERY_ENGLISH)
+                    ? _MAX_CHARGE_LEVEL : _NORM_CHARGE_LEVEL;
+            }
             if ((this._chargeTime += BraveTime.DeltaTime) > _CHARGE_PER_LEVEL)
             {
                 this._chargeTime -= _CHARGE_PER_LEVEL;
-                if (this._chargeLevel < _MAX_CHARGE_LEVEL)
+                if (this._chargeLevel < this._currentMaxCharge)
                 {
                     ++this._chargeLevel;
                     base.gameObject.Play("billiard_materialize_sound");
@@ -192,7 +198,7 @@ public class English : CwaffGun
         int d;
         int i = 0;
         float glow = canMaterialize ? 0.5f + Mathf.Max(-0.5f, Mathf.Sin(2f * Mathf.PI * (this._chargeTime / _CHARGE_PER_LEVEL))) : 0f;
-        int lastRow = Mathf.Min(this._chargeLevel + 1, _MAX_CHARGE_LEVEL);
+        int lastRow = Mathf.Min(this._chargeLevel + 1, this._currentMaxCharge);
         for (d = 0; d < lastRow; ++d)
         {
             baseVec = firstPos + baseAngle.ToVector(_V_SPACE * d);
@@ -205,7 +211,7 @@ public class English : CwaffGun
                     this._placeholders[i].SetActive(false);
                     this._phantoms[i].SetActive(true);
                     this._phantoms[i].transform.position = pos;
-                    this._phantoms[i].GetComponent<tk2dSpriteAnimator>().PickFrame(canMaterialize ? _BALL_ORDER[i] : 7); // black eight ball if invalid
+                    this._phantoms[i].GetComponent<tk2dSpriteAnimator>().PickFrame(canMaterialize ? _BALL_ORDER[i % 15] : 7); // black eight ball if invalid
                     tk2dSprite sprite = this._phantoms[i].GetComponent<tk2dSprite>();
                     sprite.PlaceAtScaledPositionByAnchor(pos, Anchor.MiddleCenter);
                     sprite.renderer.material.SetFloat("_EmissivePower", _MAX_GLOW * glow);
@@ -226,7 +232,7 @@ public class English : CwaffGun
             this._placeholders[i].SetActive(false);
             this._phantoms[i].SetActive(true);
             this._phantoms[i].transform.position = basePos;
-            this._phantoms[i].GetComponent<tk2dSpriteAnimator>().PickFrame(canMaterialize ? _BALL_ORDER[i] : 7); // black eight ball if invalid
+            this._phantoms[i].GetComponent<tk2dSpriteAnimator>().PickFrame(canMaterialize ? _BALL_ORDER[i % 15] : 7); // black eight ball if invalid
             tk2dSprite sprite = this._phantoms[i].GetComponent<tk2dSprite>();
             sprite.PlaceAtScaledPositionByAnchor(basePos, Anchor.MiddleCenter);
             sprite.renderer.material.SetFloat("_EmissivePower", _MAX_GLOW * glow);
@@ -261,7 +267,7 @@ public class English : CwaffGun
                 proj.Owner = this.PlayerOwner;
                 proj.collidesWithEnemies = true;
                 proj.collidesWithPlayer = false;
-                proj.SetFrame(_BALL_ORDER[i]);
+                proj.SetFrame(_BALL_ORDER[i % 15]);
             projObj.GetComponent<BilliardBall>().Setup(fired: false, failsafeLaunchAngle: i == 0 ? this.gun.CurrentAngle : null);
         }
         this.gun.LoseAmmo(numBalls);
