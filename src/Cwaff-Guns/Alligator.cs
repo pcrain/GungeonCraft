@@ -7,12 +7,25 @@ public class Alligator : CwaffGun
     public static string LongDescription  = "Fires clips that clamp onto enemies and periodically channel electricity from the player. Energy output is proportional to the player's damage stat, and increases further while rolling, walking over carpet, or standing in electrified goop. Each clip channels the full energy output, and up to 8 clips can be attached to each enemy. Passively grants electric immunity while in inventory.";
     public static string Lore             = "Most of the Gundead are either made of metal or carrying metal weaponry on them, making them rather hilariously susceptible to contact with live wires. Thanks to some fancy electrical engineering far beyond your comprehension, the Alligator allows you to channel the ambient static electricity you passively collect directly into the bodies of anything you can clip onto. Outside the Gungeon, it also doubles as an extremely handy tool for do-it-yourself home wiring projects.";
 
-    internal static GameObject _SparkVFX               = null;
-    internal static GameObject _ClipVFX                = null;
-    internal static readonly Color _RedClipColor       = Color.Lerp(Color.red, Color.magenta, 0.25f);
-    internal static readonly Color _BlackClipColor     = Color.Lerp(Color.black, Color.blue, 0.25f);
+    private const float _ELECTRIFIED_ENERGY_BONUS    = 4.0f;
+    private const float _ROLLING_ENERGY_BONUS        = 3.0f;
+    private const float _CARPET_ENERGY_BONUS         = 1.5f;
+    private const float _ELECTRIC_SLIDE_ENERGY_BONUS = 3.0f;
+    private const float _ELECTRIC_DECAY_FACTOR       = 1.0f;
 
-    private DamageTypeModifier _electricImmunity = null;
+    internal const string _ChargeUI                = $"{C.MOD_PREFIX}:_ChargeUI";
+    internal static GameObject _SparkVFX           = null;
+    internal static GameObject _ClipVFX            = null;
+    internal static readonly Color _RedClipColor   = Color.Lerp(Color.red, Color.magenta, 0.25f);
+    internal static readonly Color _BlackClipColor = Color.Lerp(Color.black, Color.blue, 0.25f);
+
+    public float energyProduction                   = 0f;
+
+    internal HashSet<AlligatorCableHandler> _cables = new();
+
+    private DamageTypeModifier _electricImmunity    = null;
+    private bool _ownerElectrified                  = false;
+    private float _lastElectrifyCheck               = 0.0f;
 
     public static void Init()
     {
@@ -22,8 +35,10 @@ public class Alligator : CwaffGun
                 fireAudio: "alligator_shoot_sound", reloadAudio: "alligator_reload_sound", dynamicBarrelOffsets: true);
 
         gun.InitProjectile(GunData.New(clipSize: 8, cooldown: 0.4f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, customClip: true,
-          damage: 1.0f, speed: 36.0f, sprite: "alligator_projectile", fps: 2, anchor: Anchor.MiddleCenter
+          damage: 1.0f, speed: 50.0f, sprite: "alligator_projectile", fps: 2, anchor: Anchor.MiddleCenter, electric: true
           )).Attach<AlligatorProjectile>();
+
+        gun.gameObject.AddComponent<AlligatorAmmoDisplay>();
 
         _SparkVFX = VFX.Create("spark_vfx", fps: 16, loops: true, anchor: Anchor.MiddleCenter, scale: 0.35f, emissivePower: 50f);
         _ClipVFX  = VFX.Create("alligator_clamped_vfx", fps: 2, loops: true, anchor: Anchor.MiddleCenter);
@@ -51,6 +66,90 @@ public class Alligator : CwaffGun
             this.PlayerOwner.healthHaver.damageTypeModifiers.TryRemove(this._electricImmunity);
         base.OnDestroy();
     }
+
+    public override void OwnedUpdate(GameActor owner, GunInventory inventory)
+    {
+        base.OwnedUpdate(owner, inventory);
+        if (!this.PlayerOwner)
+            return;
+        CheckIfOwnerIsElectrified();
+        CalculateEnergyProduction();
+    }
+
+    private void CalculateEnergyProduction()
+    {
+        float newProduction = 1.0f;
+
+        float now = BraveTime.ScaledTimeSinceStartup;
+        newProduction *= this.PlayerOwner.DamageMult();
+        if (this.PlayerOwner.IsDodgeRolling)
+            newProduction *= _ROLLING_ENERGY_BONUS;
+        if (this._ownerElectrified)
+            newProduction *= _ELECTRIFIED_ENERGY_BONUS;
+        else if (this.PlayerOwner.specRigidbody.Velocity.sqrMagnitude > 0.1f // else to avoid stacking with water tiles
+          && GameManager.Instance.Dungeon.GetFloorTypeFromPosition(this.PlayerOwner.specRigidbody.UnitBottomCenter) == CellVisualData.CellFloorType.Carpet)
+        {
+            newProduction *= _CARPET_ENERGY_BONUS;
+            if (this.PlayerOwner.HasSynergy(Synergy.ELECTRIC_SLIDE))
+                newProduction *= _ELECTRIC_SLIDE_ENERGY_BONUS;
+        }
+
+        if (newProduction >= this.energyProduction)
+            this.energyProduction = newProduction;
+        else
+        {
+            float decay = _ELECTRIC_DECAY_FACTOR;
+            if (this.PlayerOwner.HasSynergy(Synergy.MASTERY_ALLIGATOR))
+                decay *= 0.1f;
+            this.energyProduction = Mathf.Max(newProduction, Lazy.SmoothestLerp(this.energyProduction, 0, decay));
+        }
+    }
+
+    private void CheckIfOwnerIsElectrified()
+    {
+        float now = BraveTime.ScaledTimeSinceStartup;
+        if (now - this._lastElectrifyCheck < 0.1f)
+            return;
+
+        this._lastElectrifyCheck = now;
+        this._ownerElectrified = false;
+        RoomHandler room = this.PlayerOwner.CurrentRoom;
+        Vector2 pos = this.PlayerOwner.SpriteBottomCenter;
+        if (room == null || room.RoomGoops == null)
+            return;
+        foreach (DeadlyDeadlyGoopManager goopManager in room.RoomGoops)
+            if (goopManager.IsPositionElectrified(pos))
+            {
+                this._ownerElectrified = true;
+                break;
+            }
+    }
+
+    private class AlligatorAmmoDisplay : CustomAmmoDisplay
+    {
+        private Gun _gun;
+        private Alligator _alligator;
+        private PlayerController _owner;
+
+        private void Start()
+        {
+            this._gun       = base.GetComponent<Gun>();
+            this._alligator = this._gun.GetComponent<Alligator>();
+            this._owner     = this._gun.CurrentOwner as PlayerController;
+        }
+
+        public override bool DoCustomAmmoDisplay(GameUIAmmoController uic)
+        {
+            if (!this._owner)
+                return false;
+
+            uic.SetAmmoCountLabelColor(Color.white);
+            uic.GunAmmoCountLabel.AutoHeight = true; // enable multiline text
+            uic.GunAmmoCountLabel.ProcessMarkup = true; // enable multicolor text
+            uic.GunAmmoCountLabel.Text = $"[color #00ffff]{Mathf.RoundToInt(10f * this._alligator.energyProduction).ToString()}[/color][sprite \"{_ChargeUI}\"]\n{this._gun.CurrentAmmo}/{this._gun.AdjustedMaxAmmo}";
+            return true;
+        }
+    }
 }
 
 public class AlligatorProjectile : MonoBehaviour
@@ -61,9 +160,8 @@ public class AlligatorProjectile : MonoBehaviour
     {
         Projectile p = base.gameObject.GetComponent<Projectile>();
             p.OnHitEnemy += HandleHitEnemy;
-        AlligatorCableHandler cable = base.gameObject.AddComponent<AlligatorCableHandler>();
-            cable.Initialize(p.Owner as PlayerController, null, p.transform, p.specRigidbody.HitboxPixelCollider.UnitCenter - p.transform.position.XY());
-            cable._stringFilter.GetComponent<MeshRenderer>().material.SetColor("_OverrideColor", Alligator._RedClipColor);
+        base.gameObject.AddComponent<AlligatorCableHandler>()
+            .Initialize(p.Owner as PlayerController, null, p.transform, p.specRigidbody.HitboxPixelCollider.UnitCenter - p.transform.position.XY());
     }
 
     private void HandleHitEnemy(Projectile projectile, SpeculativeRigidbody body, bool _)
@@ -74,9 +172,8 @@ public class AlligatorProjectile : MonoBehaviour
             return;
         if (!aiActor.IsHostile(canBeNeutral: true) || aiActor.gameObject.GetComponents<AlligatorCableHandler>().Length >= _MAX_CLIPS_PER_ENEMY)
             return;
-        AlligatorCableHandler cable = aiActor.gameObject.AddComponent<AlligatorCableHandler>();
-            cable.Initialize(projectile.Owner as PlayerController, aiActor, aiActor.transform, aiActor.CenterPosition - aiActor.transform.position.XY());
-            cable._stringFilter.GetComponent<MeshRenderer>().material.SetColor("_OverrideColor", Alligator._RedClipColor);
+        aiActor.gameObject.AddComponent<AlligatorCableHandler>()
+            .Initialize(projectile.Owner as PlayerController, aiActor, aiActor.transform, aiActor.CenterPosition - aiActor.transform.position.XY());
     }
 }
 
@@ -85,32 +182,21 @@ public class AlligatorCableHandler : MonoBehaviour
 {
     const int _SEGMENTS                   = 10;
     const float _SPARK_TRAVEL_TIME        = 0.3f;
-    const float _ELECTRIFIED_ENERGY_BONUS = 4.0f;
-    const float _ROLLING_ENERGY_BONUS     = 3.0f;
-    const float _CARPET_ENERGY_BONUS      = 1.5f;
-    const float _ELECTRIC_SLIDE_ENERGY_BONUS = 3.0f;
 
-    private static bool[] _PlayerElectrified                            = {false, false};
-    private static float[] _LastElectrifiedCheck                        = {0f, 0f};
-    private static float[] _PlayerEnergyProductionRate                  = {1f, 1f};
-    private static float[] _LastEnergyCheck                             = {0f, 0f};
-    private static HashSet<AlligatorCableHandler>[] _PlayerExtantCables = {new(), new()};
-
-    public Transform _startTransform;
-    public Transform _endTransform;
-
-    public Mesh _mesh;
-    public Vector3[] _vertices;
-    public MeshFilter _stringFilter;
-
+    private MeshFilter _stringFilter;
+    private Transform _startTransform;
+    private Transform _endTransform;
+    private Mesh _mesh;
+    private Vector3[] _vertices;
     private PlayerController _owner     = null;
     private AIActor _enemy              = null;
     private int _ownerId                = -1;
-    private float _energyProduced       = 0f;
     private bool _targetingEnemy        = false;
     private GameObject _clippyboi       = null;
     private Vector2 _ownerOffset        = Vector2.zero;
     private Vector2 _endTransformOffset = Vector2.zero;
+    private float _energyProduced       = 0f;
+    private Alligator _alligator        = null;
 
     internal List<GameObject> _extantSparks = new();
     internal List<float> _extantSpawnTimes  = new();
@@ -148,14 +234,13 @@ public class AlligatorCableHandler : MonoBehaviour
         this._stringFilter.mesh       = _mesh;
         MeshRenderer meshRenderer     = gameObject.AddComponent<MeshRenderer>();
             meshRenderer.material     = BraveResources.Load("Global VFX/WhiteMaterial", ".mat") as Material;
-            // meshRenderer.material.SetColor("_OverrideColor", Color.black);
+            meshRenderer.material.SetColor("_OverrideColor", Alligator._RedClipColor);
 
         if (this._owner && this._targetingEnemy)
         {
             float now = BraveTime.ScaledTimeSinceStartup;
             this._extantSparks.Add(SpawnManager.SpawnVFX(Alligator._SparkVFX, this._startTransform.position, Quaternion.identity));
             this._extantSpawnTimes.Add(now);
-            this._energyProduced = 0;
 
             Vector3 spriteSize = this._enemy.sprite.GetBounds().size;
                 float randomXOffset = 0.25f * spriteSize.x * UnityEngine.Random.value * BraveUtility.RandomSign();
@@ -168,50 +253,13 @@ public class AlligatorCableHandler : MonoBehaviour
                 tk2dSprite clippySprite = this._clippyboi.GetComponent<tk2dSprite>();
                     clippySprite.HeightOffGround = 10f;
 
-            _PlayerExtantCables[this._ownerId].Add(this);
+            if (this._owner.CurrentGun.GetComponent<Alligator>() is Alligator a1)
+                this._alligator = a1;
+            else if (this._owner.GetGun<Alligator>() is Alligator a2)
+                this._alligator = a2;
+            if (this._alligator)
+                this._alligator._cables.Add(this);
         }
-    }
-
-    private void CheckIfOwnerIsElectrified()
-    {
-        float now = BraveTime.ScaledTimeSinceStartup;
-        if (now - _LastElectrifiedCheck[this._ownerId] < 0.1f)
-            return;
-
-        _LastElectrifiedCheck[this._ownerId] = now;
-        _PlayerElectrified[this._ownerId]    = false;
-        RoomHandler absoluteRoomFromPosition = GameManager.Instance.Dungeon.data.GetAbsoluteRoomFromPosition(this._owner.specRigidbody.UnitCenter.ToIntVector2());
-        if (absoluteRoomFromPosition == null || absoluteRoomFromPosition.RoomGoops == null)
-            return;
-        foreach (DeadlyDeadlyGoopManager goopManager in absoluteRoomFromPosition.RoomGoops)
-            if (goopManager.IsPositionElectrified(this._owner.specRigidbody.UnitCenter))
-            {
-                _PlayerElectrified[this._ownerId] = true;
-                break;
-            }
-    }
-
-    private void CalculateEnergyProduction()
-    {
-        float now = BraveTime.ScaledTimeSinceStartup;
-        if ((now - _LastEnergyCheck[this._ownerId]) < 0.01f)
-            return;
-        _LastEnergyCheck[this._ownerId] = now;
-
-        float energyOutput = this._owner.DamageMult();
-        if (this._owner.IsDodgeRolling)
-            energyOutput *= _ROLLING_ENERGY_BONUS;
-        if (_PlayerElectrified[this._ownerId])
-            energyOutput *= _ELECTRIFIED_ENERGY_BONUS;
-        else if (this._owner.specRigidbody.Velocity.sqrMagnitude > 0.1f // else to avoid stacking with water tiles
-          && GameManager.Instance.Dungeon.GetFloorTypeFromPosition(this._owner.specRigidbody.UnitBottomCenter) == CellVisualData.CellFloorType.Carpet)
-        {
-            energyOutput *= _CARPET_ENERGY_BONUS;
-            if (this._owner.HasSynergy(Synergy.ELECTRIC_SLIDE))
-                energyOutput *= _ELECTRIC_SLIDE_ENERGY_BONUS;
-        }
-
-        _PlayerEnergyProductionRate[this._ownerId] = energyOutput;
     }
 
     private void LateUpdate()
@@ -224,9 +272,6 @@ public class AlligatorCableHandler : MonoBehaviour
 
         if (!this._startTransform || !this._endTransform)
             return;
-
-        CheckIfOwnerIsElectrified();
-        CalculateEnergyProduction();
 
         Vector3 vector;
         Gun gun = this._owner.CurrentGun;
@@ -244,7 +289,8 @@ public class AlligatorCableHandler : MonoBehaviour
 
     private void OnDestroy()
     {
-        _PlayerExtantCables[this._ownerId].Remove(this);
+        if (this._alligator)
+            this._alligator._cables.Remove(this);
         this._clippyboi.SafeDestroy();
         if (this._stringFilter)
             UnityEngine.Object.Destroy(this._stringFilter.gameObject);
@@ -277,12 +323,15 @@ public class AlligatorCableHandler : MonoBehaviour
             return;
 
         float curTime = BraveTime.ScaledTimeSinceStartup;
-        this._energyProduced += _PlayerEnergyProductionRate[this._ownerId] * BraveTime.DeltaTime;
-        if (this._energyProduced >= 1f)
+        if (this._alligator && this._alligator.energyProduction > 0f)
         {
-            this._energyProduced -= 1f;
-            this._extantSparks.Add(SpawnManager.SpawnVFX(Alligator._SparkVFX, _startTransform.position, Quaternion.identity));
-            this._extantSpawnTimes.Add(curTime);
+            this._energyProduced += this._alligator.energyProduction * BraveTime.DeltaTime;
+            if (this._energyProduced > 1f)
+            {
+                this._energyProduced -= 1f;
+                this._extantSparks.Add(SpawnManager.SpawnVFX(Alligator._SparkVFX, _startTransform.position, Quaternion.identity));
+                this._extantSpawnTimes.Add(curTime);
+            }
         }
 
         for (int i = _extantSparks.Count - 1; i >= 0; --i)

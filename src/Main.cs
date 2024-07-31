@@ -382,6 +382,8 @@ public class Initialisation : BaseUnityPlugin
                     "slot_empty_active_ui",     Femtobyte._EmptyActiveUI,
                     "slot_full_ui",             Femtobyte._FullUI,
                     "slot_full_active_ui",      Femtobyte._FullActiveUI,
+
+                    "charge_ui",                Alligator._ChargeUI,
                 });
                 setupUIWatch.Stop();
             #endregion

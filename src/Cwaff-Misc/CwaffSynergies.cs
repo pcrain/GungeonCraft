@@ -135,6 +135,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfEnglish>(MASTERY_ENGLISH, English.ItemName);
         // Launches 3 knives at a time for no additional cost.
         NewMastery<MasteryOfIronMaid>(MASTERY_IRON_MAID, IronMaid.ItemName);
+        // Alligator's energy production rate decays to its base level more slowly when removed from an energy source.
+        NewMastery<MasteryOfAlligator>(MASTERY_ALLIGATOR, Alligator.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -365,6 +367,7 @@ internal class MasteryOfUppskeruvel     : MasteryDummyItem {}
 internal class MasteryOfBlackjack       : MasteryDummyItem {}
 internal class MasteryOfEnglish         : MasteryDummyItem {}
 internal class MasteryOfIronMaid        : MasteryDummyItem {}
+internal class MasteryOfAlligator       : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -418,4 +421,5 @@ public enum Synergy {
     MASTERY_BLACKJACK,
     MASTERY_ENGLISH,
     MASTERY_IRON_MAID,
+    MASTERY_ALLIGATOR,
 };

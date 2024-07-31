@@ -2,8 +2,13 @@
 
 ## TBD
 
-- Added masteries for English and Iron Maid
+- Added masteries for English, Iron Maid, and Alligator
 - Added 6 new synergies
+- Updated required MtG API version to 1.7.7 to simplify non-active gun update logic in a few places
+- Added Electric damage type to Alligator projectiles
+- Increased Alligator projectile speed from 36 to 50
+- Made Alligator electric charge output smoothly decay over time rather than jumping around
+- Added indicator for Alligator's current charge output to the ammo display
 
 ## 1.16.3 (2024-07-28)
 
