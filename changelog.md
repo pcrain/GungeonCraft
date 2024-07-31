@@ -9,6 +9,7 @@
 - Increased Alligator projectile speed from 36 to 50
 - Made Alligator electric charge output smoothly decay over time rather than jumping around
 - Added indicator for Alligator's current charge output to the ammo display
+- Added shader to visually indicate Alligator's charge level
 
 ## 1.16.3 (2024-07-28)
 

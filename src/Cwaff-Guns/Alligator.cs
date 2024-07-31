@@ -12,6 +12,7 @@ public class Alligator : CwaffGun
     private const float _CARPET_ENERGY_BONUS         = 1.5f;
     private const float _ELECTRIC_SLIDE_ENERGY_BONUS = 3.0f;
     private const float _ELECTRIC_DECAY_FACTOR       = 1.0f;
+    private const float _ENERGY_MULT                 = 10.0f;
 
     internal const string _ChargeUI                = $"{C.MOD_PREFIX}:_ChargeUI";
     internal static GameObject _SparkVFX           = null;
@@ -26,6 +27,7 @@ public class Alligator : CwaffGun
     private DamageTypeModifier _electricImmunity    = null;
     private bool _ownerElectrified                  = false;
     private float _lastElectrifyCheck               = 0.0f;
+    private Material _mat                           = null;
 
     public static void Init()
     {
@@ -51,12 +53,14 @@ public class Alligator : CwaffGun
             damageMultiplier = 0f,
         };
         base.OnPlayerPickup(player);
+        AdjustGunShader(on: true);
         player.healthHaver.damageTypeModifiers.AddUnique(this._electricImmunity);
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
     {
         base.OnDroppedByPlayer(player);
+        AdjustGunShader(on: false);
         player.healthHaver.damageTypeModifiers.TryRemove(this._electricImmunity);
     }
 
@@ -67,6 +71,22 @@ public class Alligator : CwaffGun
         base.OnDestroy();
     }
 
+    public void AdjustGunShader(bool on)
+    {
+        Material m = this._mat = this.gun.sprite.renderer.material;
+        if (!on)
+        {
+            this.gun.sprite.usesOverrideMaterial = false;
+            m.shader = ShaderCache.Acquire("Brave/PlayerShader");
+            return;
+        }
+        this.gun.sprite.usesOverrideMaterial = true;
+        m.shader = CwaffShaders.ElectricShader;
+        m.SetTexture("_ShaderTex", CwaffShaders.NoiseTexture);
+        m.SetFloat("_Strength", 6.0f);
+        m.SetFloat("_EmissivePower", 400f);
+    }
+
     public override void OwnedUpdate(GameActor owner, GunInventory inventory)
     {
         base.OwnedUpdate(owner, inventory);
@@ -74,6 +94,17 @@ public class Alligator : CwaffGun
             return;
         CheckIfOwnerIsElectrified();
         CalculateEnergyProduction();
+    }
+
+    public override void Update()
+    {
+        base.Update();
+        if (this._mat)
+        {
+            //NOTE: higher strength == lower brightness
+            float s = Mathf.Max(2.0f, 6.0f - Mathf.Log(Mathf.Max(_ENERGY_MULT * (this.energyProduction - 1f), 1f), 4));  // max brightness at 4^4 == 256 energy
+            this._mat.SetFloat("_Strength", s);
+        }
     }
 
     private void CalculateEnergyProduction()
@@ -146,7 +177,8 @@ public class Alligator : CwaffGun
             uic.SetAmmoCountLabelColor(Color.white);
             uic.GunAmmoCountLabel.AutoHeight = true; // enable multiline text
             uic.GunAmmoCountLabel.ProcessMarkup = true; // enable multicolor text
-            uic.GunAmmoCountLabel.Text = $"[color #00ffff]{Mathf.RoundToInt(10f * this._alligator.energyProduction).ToString()}[/color][sprite \"{_ChargeUI}\"]\n{this._gun.CurrentAmmo}/{this._gun.AdjustedMaxAmmo}";
+            string energy = Mathf.RoundToInt(_ENERGY_MULT * this._alligator.energyProduction).ToString();
+            uic.GunAmmoCountLabel.Text = $"[color #00ffff]{energy}[/color][sprite \"{_ChargeUI}\"]\n{this._gun.CurrentAmmo}/{this._gun.AdjustedMaxAmmo}";
             return true;
         }
     }
@@ -180,8 +212,8 @@ public class AlligatorProjectile : MonoBehaviour
 // modified from basegame ArbitraryCableDrawer
 public class AlligatorCableHandler : MonoBehaviour
 {
-    const int _SEGMENTS                   = 10;
-    const float _SPARK_TRAVEL_TIME        = 0.3f;
+    private const int _SEGMENTS            = 10;
+    private const float _SPARK_TRAVEL_TIME = 0.3f;
 
     private MeshFilter _stringFilter;
     private Transform _startTransform;

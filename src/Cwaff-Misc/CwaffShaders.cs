@@ -6,8 +6,10 @@ public static class CwaffShaders
     public static Shader UnlitDigitizeShader = null;
     public static Shader GoldShader = null;
     public static Shader CosmicShader = null;
+    public static Shader ElectricShader = null;
     public static Texture2D DigitizeTexture = null;
     public static Texture2D StarsTexture = null;
+    public static Texture2D NoiseTexture = null;
 
     private static string GetShaderBundleNameForPlatform()
     {
@@ -32,9 +34,9 @@ public static class CwaffShaders
             // foreach (string s in shaderBundle.GetAllAssetNames())
             //     ETGModConsole.Log($"  found asset {s}");
             // TestShader = ShaderBundle.LoadAsset<Shader>("assets/sillyshader.shader");
-            // TestShader = ShaderBundle.LoadAsset<Shader>("assets/electroshader.shader");
             // TestShader = ShaderBundle.LoadAsset<Shader>("assets/mirageshader.shader");
-            // TestShaderTexture = ShaderBundle.LoadAsset<Texture2D>("assets/sf_noise_clouds_01.png");
+            NoiseTexture = shaderBundle.LoadAsset<Texture2D>("assets/sf_noise_clouds_01.png");
+            ElectricShader = shaderBundle.LoadAsset<Shader>("assets/electroshader.shader");
             DigitizeShader = shaderBundle.LoadAsset<Shader>("assets/digitizeshader.shader");
             DigitizeTexture = shaderBundle.LoadAsset<Texture2D>("assets/bits.png");
             UnlitDigitizeShader = shaderBundle.LoadAsset<Shader>("assets/digitizeshaderunlit.shader");
