@@ -47,7 +47,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
 
   public static void SetUpDynamicBarrelOffsets(Gun gun)
   {
-    var d = _BarrelOffsetCache[gun.DisplayName] = new();
+    var d = _BarrelOffsetCache[gun.GetUnmodifiedDisplayName()] = new();
     //WARNING: can't do idle animation since it breaks loading with trimmed sprites
     SetUpDefaultDynamicBarrelOffset(d, gun);
     SetUpDynamicBarrelOffsetsForAnimation(d, gun, gun.chargeAnimation);
@@ -76,7 +76,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
     player.GunChanged += OnGunsChanged;
 
     // Load dynamic barrel offsets if we have any registered
-    if (_BarrelOffsetCache.TryGetValue(this.gun.DisplayName, out var barrelOffsets))
+    if (_BarrelOffsetCache.TryGetValue(this.gun.GetUnmodifiedDisplayName(), out var barrelOffsets))
     {
       this._usesDynamicBarrelPosition = true;
       this._barrelOffsets             = barrelOffsets;

@@ -2389,4 +2389,14 @@ public static class Extensions
           NewFinalProjectile = newFinal, NewFinalProjectileAmmoType = Lazy.SetupCustomAmmoClip(clipName),
           NumberFinalProjectiles = num}];
   }
+
+  /// <summary>Get a gun's display name without Gunderfury level or GungeonCraft mastery modifiers</summary>
+  public static string GetUnmodifiedDisplayName(this Gun gun)
+  {
+    if (gun.encounterTrackable is not EncounterTrackable et)
+      return string.Empty;
+    if (et.m_journalData is not JournalEntry je)
+      return string.Empty;
+    return je.GetPrimaryDisplayName();
+  }
 }
