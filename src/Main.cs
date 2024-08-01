@@ -136,13 +136,15 @@ public class Initialisation : BaseUnityPlugin
                 ModdedShopItemAdder.Init();
                 //Commands and Other Console Utilities
                 Commands.Init();
-                // Game tweaks
-                HeckedMode.Init();
                 // Synergy enum setup
                 CwaffSynergies.InitEnums();
+                // Shader setup
+                CwaffShaders.Init();
+                // Game tweaks
+                HeckedMode.Init();
                 // Basic VFX Setup
                 VFX.Init();
-                //Status Effect Setup
+                // Status Effect Setup
                 SoulLinkStatus.Init();
                 //Goop Setup
                 EasyGoopDefinitions.DefineDefaultGoops();
