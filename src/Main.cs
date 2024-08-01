@@ -126,18 +126,6 @@ public class Initialisation : BaseUnityPlugin
                 setupAtlasesWatch.Stop();
             #endregion
 
-            //NOTE: add any new shaders we ever need to use here
-            #region Acquire Shaders (absolutely cannot be async when calling Shader.Find(), but once they're cached we're fine)
-                System.Diagnostics.Stopwatch setupShadersWatch = System.Diagnostics.Stopwatch.StartNew();
-                ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-                ShaderCache.Acquire("Brave/Internal/SinglePassOutline");
-                ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
-                ShaderCache.Acquire("Brave/Internal/SimpleAlphaFadeUnlit");
-                ShaderCache.Acquire("Daikon Forge/Default UI Shader");
-                CwaffShaders.Init();
-                setupShadersWatch.Stop();
-            #endregion
-
             #region Round 1 Config (could be async since it's mostly hooks and database stuff where no sprites are needed, but it's fast enough that we just leave it sync)
                 System.Diagnostics.Stopwatch setupConfig1Watch = System.Diagnostics.Stopwatch.StartNew();
 
@@ -436,7 +424,6 @@ public class Initialisation : BaseUnityPlugin
                 ETGModConsole.Log($"  {setupEarlyHarmonyWatch.ElapsedMilliseconds, 5}ms       setupEarlyHarmony");
                 ETGModConsole.Log($"  {setupLateHarmonyWatch.ElapsedMilliseconds,  5}ms ASYNC setupLateHarmony ");
                 ETGModConsole.Log($"  {setupAtlasesWatch.ElapsedMilliseconds,      5}ms       setupAtlases     ");
-                ETGModConsole.Log($"  {setupShadersWatch.ElapsedMilliseconds,      5}ms       setupShaders     ");
                 ETGModConsole.Log($"  {setupConfig1Watch.ElapsedMilliseconds,      5}ms       setupConfig1     ");
                 ETGModConsole.Log($"  {setupConfig2Watch.ElapsedMilliseconds,      5}ms       setupConfig2     ");
                 ETGModConsole.Log($"  {setupHatsWatch.ElapsedMilliseconds,         5}ms       setupHats        ");
