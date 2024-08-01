@@ -2399,4 +2399,22 @@ public static class Extensions
       return string.Empty;
     return je.GetPrimaryDisplayName();
   }
+
+  /// <summary>Jumps to the next instruction a specific number of times, and moves after the final instance</summary>
+  public static bool JumpToNext(this ILCursor cursor, Func<Instruction, bool> match, int times = 1)
+  {
+    for(int i = 0; i < times; i++)
+      if (!cursor.TryGotoNext(MoveType.After, match))
+        return false;
+    return true;
+  }
+
+  /// <summary>Jumps to the next instruction a specific number of times, and moves before the final instance</summary>
+  public static bool JumpBeforeNext(this ILCursor cursor, Func<Instruction, bool> match, int times = 1)
+  {
+    for(int i = 0; i < times; i++)
+      if (!cursor.TryGotoNext(MoveType.Before, match))
+        return false;
+    return true;
+  }
 }

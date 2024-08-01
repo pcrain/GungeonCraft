@@ -2,7 +2,7 @@
 
 ## TBD
 
-- Added masteries for English, Iron Maid, and Alligator
+- Added masteries for English, Iron Maid, Alligator, and Quarter Pounder
 - Added 6 new synergies
 - Updated required MtG API version to 1.7.7 to simplify non-active gun update logic in a few places
 - Added Electric damage type to Alligator projectiles
@@ -10,6 +10,7 @@
 - Made Alligator electric charge output smoothly decay over time rather than jumping around
 - Added indicator for Alligator's current charge output to the ammo display
 - Added shader to visually indicate Alligator's charge level
+- Added impact sounds for Quarter Pounder projectiles
 
 ## 1.16.3 (2024-07-28)
 

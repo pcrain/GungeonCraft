@@ -137,6 +137,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfIronMaid>(MASTERY_IRON_MAID, IronMaid.ItemName);
         // Alligator's energy production rate decays to its base level more slowly when removed from an energy source.
         NewMastery<MasteryOfAlligator>(MASTERY_ALLIGATOR, Alligator.ItemName);
+        // Touching enemies that have been turned to gold causes them to explode in a burst of high damage gold projectiles that can turn other enemies to gold on kill.
+        NewMastery<MasteryOfQuarterPounder>(MASTERY_QUARTER_POUNDER, QuarterPounder.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -368,6 +370,7 @@ internal class MasteryOfBlackjack       : MasteryDummyItem {}
 internal class MasteryOfEnglish         : MasteryDummyItem {}
 internal class MasteryOfIronMaid        : MasteryDummyItem {}
 internal class MasteryOfAlligator       : MasteryDummyItem {}
+internal class MasteryOfQuarterPounder  : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -422,4 +425,5 @@ public enum Synergy {
     MASTERY_ENGLISH,
     MASTERY_IRON_MAID,
     MASTERY_ALLIGATOR,
+    MASTERY_QUARTER_POUNDER,
 };
