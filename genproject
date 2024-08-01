@@ -135,7 +135,7 @@ if [ $updateaudio -eq 1 ]; then
   rebuild=1
   echo -e "[${GRN}>${BLN}] Regenerating audio bank"
   #BUG: gen-gungeon-audio-bank.py thinks paths beginning with . aren't absolute and prepend the current working directory
-  ./gen-gungeon-audio-bank.py -Or -s "./RawResources/Sounds/sound_info.csv" "./RawResources/Sounds" "$(pwd)/Resources/${namespace}.bnk"
+  ./gen-gungeon-audio-bank.py -qOr -s "./RawResources/Sounds/sound_info.csv" "./RawResources/Sounds" "$(pwd)/Resources/${namespace}.bnk"
   # ./gen-gungeon-audio-bank.py -Ovr -s "./RawResources/Sounds/sound_info.csv" "./RawResources/Sounds" "$(pwd)/Resources/${namespace}.bnk"
 
   echo -e "[${GRN}>${BLN}]   Regenerating checksums for audio files"

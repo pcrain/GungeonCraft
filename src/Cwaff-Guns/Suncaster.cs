@@ -97,7 +97,6 @@ public class Suncaster : CwaffGun
     {
         base.PostProcessProjectile(projectile);
         projectile.GetComponent<SuncasterProjectile>().FiredFromGun(this);
-        // projectile.gameObject.Play("prism_refract_sound");
         this._lastChargeTime = BraveTime.ScaledTimeSinceStartup; // reset charge timer after firing
     }
 
@@ -302,7 +301,6 @@ public class SuncasterProjectile : MonoBehaviour
       this._proj.specRigidbody.UpdateColliderPositions();
 
       // stop audio events locally only on the prism object
-      // prism.gameObject.Play("prism_refract_sound_stop");
       // ...on second thought it's noisy, so stop them everywhere
       if ((_LastRefractSound + _REFRACT_SOUND_RATE) < BraveTime.ScaledTimeSinceStartup)
       {
