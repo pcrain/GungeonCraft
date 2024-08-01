@@ -126,38 +126,27 @@ public class Initialisation : BaseUnityPlugin
                 setupAtlasesWatch.Stop();
             #endregion
 
-            #region Round 1 Config (could be async since it's mostly hooks and database stuff where no sprites are needed, but it's fast enough that we just leave it sync)
-                System.Diagnostics.Stopwatch setupConfig1Watch = System.Diagnostics.Stopwatch.StartNew();
-
+            #region Initial Config (could be async since it's mostly hooks and database stuff where no sprites are needed, but it's fast enough that we just leave it sync)
+                System.Diagnostics.Stopwatch setupConfigWatch = System.Diagnostics.Stopwatch.StartNew();
                 // Load our configuration files
                 CwaffConfig.Init();
-
                 //Tools and Toolboxes
-                CwaffPrerequisite.Init();  // must be set up after CwaffEvents (handled by Harmony.patchall())
-                // HUDController.Init(); // Need to load early (unused for now)
-                ModdedShopItemAdder.Init(); // must be set up after CwaffEvents (handled by Harmony.patchall())
-
+                CwaffPrerequisite.Init();
+                // Modded Shop Item Setup
+                ModdedShopItemAdder.Init();
                 //Commands and Other Console Utilities
                 Commands.Init();
-
                 // Game tweaks
                 HeckedMode.Init();
-
                 // Synergy enum setup
                 CwaffSynergies.InitEnums();
-
-                setupConfig1Watch.Stop();
-            #endregion
-
-            #region Round 2 Config (Requires sprites and bundled asset loading, cannot be async)
-                System.Diagnostics.Stopwatch setupConfig2Watch = System.Diagnostics.Stopwatch.StartNew();
                 // Basic VFX Setup
-                VFX.Init(); //NOTE: accesses shared resource databases, so must be synchronous
+                VFX.Init();
                 //Status Effect Setup
                 SoulLinkStatus.Init();
                 //Goop Setup
                 EasyGoopDefinitions.DefineDefaultGoops();
-                // Boss Builder API //WARNING: moved from boss setup due to threading error in PathologicalGames.PoolManagerUtils.SetActive()
+                // Boss Builder API
                 BossBuilder.Init();
                 // Note Does Setup
                 CustomNoteDoer.Init();
@@ -165,7 +154,9 @@ public class Initialisation : BaseUnityPlugin
                 CwaffTweaks.Init();
                 // Hecked Mode Tribute Statues
                 HeckedShrine.Init();
-                setupConfig2Watch.Stop();
+                // HUD Stuff
+                // HUDController.Init();
+                setupConfigWatch.Stop();
             #endregion
 
             #region Hats
@@ -424,8 +415,7 @@ public class Initialisation : BaseUnityPlugin
                 ETGModConsole.Log($"  {setupEarlyHarmonyWatch.ElapsedMilliseconds, 5}ms       setupEarlyHarmony");
                 ETGModConsole.Log($"  {setupLateHarmonyWatch.ElapsedMilliseconds,  5}ms ASYNC setupLateHarmony ");
                 ETGModConsole.Log($"  {setupAtlasesWatch.ElapsedMilliseconds,      5}ms       setupAtlases     ");
-                ETGModConsole.Log($"  {setupConfig1Watch.ElapsedMilliseconds,      5}ms       setupConfig1     ");
-                ETGModConsole.Log($"  {setupConfig2Watch.ElapsedMilliseconds,      5}ms       setupConfig2     ");
+                ETGModConsole.Log($"  {setupConfigWatch.ElapsedMilliseconds,       5}ms       setupConfig      ");
                 ETGModConsole.Log($"  {setupHatsWatch.ElapsedMilliseconds,         5}ms       setupHats        ");
                 ETGModConsole.Log($"  {setupAudioWatch.ElapsedMilliseconds,        5}ms ASYNC setupAudio       ");
                 ETGModConsole.Log($"  {setupSaveWatch.ElapsedMilliseconds,         5}ms ASYNC setupSave        ");
