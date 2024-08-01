@@ -14,7 +14,6 @@ public class Alligator : CwaffGun
     private const float _ELECTRIC_DECAY_FACTOR       = 1.0f;
     private const float _ENERGY_MULT                 = 10.0f;
 
-    internal const string _ChargeUI                = $"{C.MOD_PREFIX}:_ChargeUI";
     internal static GameObject _SparkVFX           = null;
     internal static GameObject _ClipVFX            = null;
     internal static readonly Color _RedClipColor   = Color.Lerp(Color.red, Color.magenta, 0.25f);
@@ -178,7 +177,7 @@ public class Alligator : CwaffGun
             uic.GunAmmoCountLabel.AutoHeight = true; // enable multiline text
             uic.GunAmmoCountLabel.ProcessMarkup = true; // enable multicolor text
             string energy = Mathf.RoundToInt(_ENERGY_MULT * this._alligator.energyProduction).ToString();
-            uic.GunAmmoCountLabel.Text = $"[color #00ffff]{energy}[/color][sprite \"{_ChargeUI}\"]\n{this._gun.CurrentAmmo}/{this._gun.AdjustedMaxAmmo}";
+            uic.GunAmmoCountLabel.Text = $"[color #00ffff]{energy}[/color][sprite \"charge_ui\"]\n{this._gun.CurrentAmmo}/{this._gun.AdjustedMaxAmmo}";
             return true;
         }
     }

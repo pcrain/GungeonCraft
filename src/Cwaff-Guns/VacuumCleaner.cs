@@ -8,8 +8,6 @@ public class VacuumCleaner : CwaffGun
     public static string Lore             = "Over time, the Gungeon naturally accrues a substantial amount of shrapnel, corpses, and other garbage as Gungeoneers fight their way through hordes of Gundead. The Gungeon's relatively pristine state as each new adventurer begins their descent is thanks largely to the Gungeon Janitorial Crew, whose work largely goes unnoticed and unthanked. Observing how adventurers had a penchant for using guns with flashy particle effects, one cunning janitor modified a few vacuum cleaners to electrify the latent argon in the Gungeon, creating some fancy green eddies in the air as the vacuums are running. The janitor stuffed a few of these modified vacuums in chests, hoping adventurers would be distracted enough by the particles to not notice the complete lack of damage as they unwittingly cleaned the dungeon and made the GJC's lives a little easier.";
 
     internal static GameObject _VacuumVFX = null;
-    internal static string _CorpseUI      = $"{C.MOD_PREFIX}:_CorpseUI";
-    internal static string _DebrisUI      = $"{C.MOD_PREFIX}:_DebrisUI";
 
     internal const float _REACH            =  8.00f; // how far (in tiles) the gun reaches
     internal const float _SPREAD           =    10f; // width (in degrees) of how wide our cone of suction is at the end of our reach
@@ -203,9 +201,9 @@ public class VacuumCleaner : CwaffGun
             uic.GunAmmoCountLabel.ProcessMarkup = true; // enable multicolor text
 
             if (this._owner.HasSynergy(Synergy.MASTERY_VACUUM_CLEANER))
-                uic.GunAmmoCountLabel.Text = $"[sprite \"{VacuumCleaner._CorpseUI}\"]x{this._vac.corpsesSucked}\n[sprite \"{VacuumCleaner._DebrisUI}\"]x{this._vac.debrisSucked}";
+                uic.GunAmmoCountLabel.Text = $"[sprite \"corpse_ui\"]x{this._vac.corpsesSucked}\n[sprite \"debris_ui\"]x{this._vac.debrisSucked}";
             else
-                uic.GunAmmoCountLabel.Text = $"[sprite \"{VacuumCleaner._DebrisUI}\"]x{this._vac.debrisSucked}";
+                uic.GunAmmoCountLabel.Text = $"[sprite \"debris_ui\"]x{this._vac.debrisSucked}";
             return true;
         }
     }

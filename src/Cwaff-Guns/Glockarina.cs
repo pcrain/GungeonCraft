@@ -343,10 +343,10 @@ public class GlockarinaAmmoDisplay : CustomAmmoDisplay
         string uiString = null;
         switch(this._glock._mode)
         {
-            case Glockarina.Mode.STORM: uiString = Glockarina._StormSpriteUI; break;
-            case Glockarina.Mode.TIME:  uiString = Glockarina._TimeSpriteUI;  break;
-            case Glockarina.Mode.SARIA: uiString = Glockarina._SariaSpriteUI; break;
-            case Glockarina.Mode.EMPTY: uiString = Glockarina._EmptySpriteUI; break;
+            case Glockarina.Mode.STORM: uiString = "glockarina_storm_ui_icon"; break;
+            case Glockarina.Mode.TIME:  uiString = "glockarina_time_ui_icon";  break;
+            case Glockarina.Mode.SARIA: uiString = "glockarina_saria_ui_icon"; break;
+            case Glockarina.Mode.EMPTY: uiString = "glockarina_empty_ui_icon"; break;
             default:
                 return false;
         }

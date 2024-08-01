@@ -750,9 +750,9 @@ public class Femtobyte : CwaffGun
                     DigitizedObject d = this._femto.digitizedObjects[i];
                     bool used = d != null && d.type != EMPTY;
                     if (used)
-                        _SB.AppendFormat("[sprite \"{0}\"]", i == this._femto._currentSlot ? Femtobyte._FullActiveUI : Femtobyte._FullUI);
+                        _SB.AppendFormat("[sprite \"{0}\"]", i == this._femto._currentSlot ? "slot_full_active_ui" : "slot_full_ui");
                     else
-                        _SB.AppendFormat("[sprite \"{0}\"]", i == this._femto._currentSlot ? Femtobyte._EmptyActiveUI : Femtobyte._EmptyUI);
+                        _SB.AppendFormat("[sprite \"{0}\"]", i == this._femto._currentSlot ? "slot_empty_active_ui" : "slot_empty_ui");
                 }
                 this._cachedDisplayName = _SB.ToString();
             }

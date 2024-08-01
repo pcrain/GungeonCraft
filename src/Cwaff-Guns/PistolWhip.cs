@@ -12,7 +12,6 @@ public class PistolWhip : CwaffGun
     public static string Lore             = "Once wielded by elite foot soldiers in the army of the great Pharaoh Tutancannon, this weapon is contraband in modern gunfare. On top of flouting the Guneva Conventions with its absurd muzzle range and ability to reach around rather tall walls, it is also reported to have been cursed by Tutancannon himself on his deathbed, bound to unleash the foulest creatures upon those who would dare wield it within the Gungeon's chambers.";
 
     internal const int _MINI_BLANKS_ON_KILL = 3; // mini blanks to replenish on kill for mastery
-    internal const string _MiniBlankUI = $"{C.MOD_PREFIX}:__MiniBlankUI";
 
     internal static Projectile _PistolWhipProjectile;
     internal static Projectile _PistolButtProjectile;
@@ -92,7 +91,7 @@ public class PistolWhip : CwaffGun
             uic.SetAmmoCountLabelColor(Color.white);
             uic.GunAmmoCountLabel.AutoHeight = true; // enable multiline text
             uic.GunAmmoCountLabel.ProcessMarkup = true; // enable multicolor text
-            uic.GunAmmoCountLabel.Text = $"[sprite \"{PistolWhip._MiniBlankUI}\"]x{this.whip.miniBlanks}\n[sprite \"infinite-big\"]";
+            uic.GunAmmoCountLabel.Text = $"[sprite \"mini_blank_ui\"]x{this.whip.miniBlanks}\n[sprite \"infinite-big\"]";
             return true;
         }
     }

@@ -7,17 +7,9 @@ public static class AtlasHelper
     private static readonly Vector2 _TexelSize = new Vector2(0.0625f, 0.0625f);
 
     /// <summary>Batches UI sprite additions from an alternating list of texture paths and sprite names</summary>
-    public static void AddUISpriteBatch(List<string> pathsAndNames)
+    public static void AddUISpriteBatch(List<tk2dSpriteDefinition> defs)
     {
-      Assembly assembly = Assembly.GetCallingAssembly();
-      List<tk2dSpriteDefinition> defs = new();
-      List<string> names = new();
-      for (int i = 0; i < pathsAndNames.Count; i += 2)
-      {
-        defs.Add(AtlasHelper._PackedTextures[pathsAndNames[i]]);
-        names.Add(pathsAndNames[i+1]);
-      }
-      GameUIRoot.Instance.ConversationBar.portraitSprite.Atlas.AddMultipleItemsToAtlas(defs, names);
+      GameUIRoot.Instance.ConversationBar.portraitSprite.Atlas.AddMultipleItemsToAtlas(defs);
     }
 
     /// <summary>
@@ -25,12 +17,9 @@ public static class AtlasHelper
     /// </summary>
     /// <param name="atlas">The <see cref="dfAtlas"/> to add the new <see cref="dfAtlas.ItemInfo"/> to.</param>
     /// <param name="defs">List of textures to put in the new <see cref="dfAtlas.ItemInfo"/>.</param>
-    /// <param name="name">List of name for the new textures <see cref="dfAtlas.ItemInfo"/>. If a name is <see langword="null"/>, it will default to <paramref name="tex"/>'s name.</param>
     /// <returns>The built <see cref="dfAtlas.ItemInfo"/>.</returns>
-    public static List<dfAtlas.ItemInfo> AddMultipleItemsToAtlas(this dfAtlas atlas, List<tk2dSpriteDefinition> defs, List<string> names)
+    public static List<dfAtlas.ItemInfo> AddMultipleItemsToAtlas(this dfAtlas atlas, List<tk2dSpriteDefinition> defs)
     {
-        if (defs.Count != names.Count)
-          return null;
         List<dfAtlas.ItemInfo> items = new();
         int totalWidth = 0;
         int maxHeight = 0;
@@ -45,11 +34,7 @@ public static class AtlasHelper
         for (int i = 0; i < defs.Count; ++i)
         {
           tk2dSpriteDefinition def = defs[i];
-          string name = names[i];
-          if (string.IsNullOrEmpty(name))
-          {
-              name = def.name;
-          }
+          string name = def.name;
           if (atlas[name] != null)
           {
               items.Add(atlas[name]);
@@ -215,8 +200,9 @@ public static class AtlasHelper
     AddSpritesToCollection(newDefs: ammonomiconSprites, collection: AmmonomiconController.ForceInstance.EncounterIconCollection);
     AddSpritesToCollection(newDefs: itemSprites,        collection: ETGMod.Databases.Items.ItemCollection);
     AddSpritesToCollection(newDefs: weaponSprites,      collection: ETGMod.Databases.Items.WeaponCollection, attachPoints: weaponAttachPoints);
-    AddSpritesToCollection(newDefs: uiSprites,          collection: ((GameObject)ResourceCache.Acquire("ControllerButtonSprite")).GetComponent<tk2dBaseSprite>().Collection);
     AddSpritesToCollection(newDefs: miscSprites,        collection: VFX.Collection); // NOTE: all miscellaneous sprites go into the VFX collection
+    AddSpritesToCollection(newDefs: uiSprites,          collection: ((GameObject)ResourceCache.Acquire("ControllerButtonSprite")).GetComponent<tk2dBaseSprite>().Collection);
+    AddUISpriteBatch(uiSprites);
   }
 
   /// <summary>Helper method for adding multiple sprites to a collection at once. Returns the id of the first sprite added and the number of sprites added.</summary>

@@ -99,7 +99,7 @@ public class Initialisation : BaseUnityPlugin
                 setupLateHarmonyThread.Start();
             #endregion
 
-            #region Set up Packed Texture Atlases (absolutely cannot be async, handles the meat of texture loading)
+            #region Set up Packed Texture Atlases, including UI sprites (absolutely cannot be async, handles the meat of texture loading)
                 System.Diagnostics.Stopwatch setupAtlasesWatch = System.Diagnostics.Stopwatch.StartNew();
 
                 Assembly asmb = Assembly.GetExecutingAssembly();
@@ -350,44 +350,6 @@ public class Initialisation : BaseUnityPlugin
                 setupPassivesWatch.Stop();
             #endregion
 
-            #region UI Sprites (cannot be async, must set up textures on main thread)
-                System.Diagnostics.Stopwatch setupUIWatch = System.Diagnostics.Stopwatch.StartNew();
-                AtlasHelper.AddUISpriteBatch(new(){
-                    "barter_s_icon",            Bart._BarterSpriteS,
-                    "barter_a_icon",            Bart._BarterSpriteA,
-                    "barter_b_icon",            Bart._BarterSpriteB,
-                    "barter_c_icon",            Bart._BarterSpriteC,
-                    "soul_sprite_ui_icon",      Uppskeruvel._SoulSpriteUI,
-                    "prism_ui_icon",            Suncaster._PrismUI,
-                    "glockarina_storm_ui_icon", Glockarina._StormSpriteUI,
-                    "glockarina_time_ui_icon",  Glockarina._TimeSpriteUI,
-                    "glockarina_saria_ui_icon", Glockarina._SariaSpriteUI,
-                    "glockarina_empty_ui_icon", Glockarina._EmptySpriteUI,
-                    // needs to be three separate sprites or the UI breaks
-                    "adrenaline_heart",         AdrenalineShot._FullHeartSpriteUI,
-                    "adrenaline_heart",         AdrenalineShot._HalfHeartSpriteUI,
-                    "adrenaline_heart",         AdrenalineShot._EmptyHeartSpriteUI,
-
-                    "breegull_clockwork_ui",    Breegull._ClockworkUI,
-                    "breegull_fire_ui",         Breegull._FireUI,
-                    "breegull_grenade_ui",      Breegull._GrenadeUI,
-                    "breegull_ice_ui",          Breegull._IceUI,
-                    "breegull_normal_ui",       Breegull._NormalUI,
-
-                    "debris_ui",                VacuumCleaner._DebrisUI,
-                    "corpse_ui",                VacuumCleaner._CorpseUI,
-                    "mini_blank_ui",            PistolWhip._MiniBlankUI,
-
-                    "slot_empty_ui",            Femtobyte._EmptyUI,
-                    "slot_empty_active_ui",     Femtobyte._EmptyActiveUI,
-                    "slot_full_ui",             Femtobyte._FullUI,
-                    "slot_full_active_ui",      Femtobyte._FullActiveUI,
-
-                    "charge_ui",                Alligator._ChargeUI,
-                });
-                setupUIWatch.Stop();
-            #endregion
-
             // we have to wait for the rest of the harmony patches to finish before loading in floors
             System.Diagnostics.Stopwatch awaitLateHarmonyWatch = System.Diagnostics.Stopwatch.StartNew();
             setupLateHarmonyThread.Join();
@@ -483,7 +445,6 @@ public class Initialisation : BaseUnityPlugin
                 ETGModConsole.Log($"  {setupGunsWatch.ElapsedMilliseconds,         5}ms       setupGuns        ");
                 ETGModConsole.Log($"  {setupActivesWatch.ElapsedMilliseconds,      5}ms       setupActives     ");
                 ETGModConsole.Log($"  {setupPassivesWatch.ElapsedMilliseconds,     5}ms       setupPassives    ");
-                ETGModConsole.Log($"  {setupUIWatch.ElapsedMilliseconds,           5}ms       setupUI          ");
                 ETGModConsole.Log($"  {awaitLateHarmonyWatch.ElapsedMilliseconds,  5}ms       awaitLateHarmony ");
                 ETGModConsole.Log($"  {setupFloorsWatch.ElapsedMilliseconds,       5}ms       setupFloors      ");
                 ETGModConsole.Log($"  {setupBossesWatch.ElapsedMilliseconds,       5}ms       setupBosses      ");

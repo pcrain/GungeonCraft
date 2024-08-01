@@ -7,10 +7,6 @@ public class AdrenalineShot : CwaffPassive
     public static string LongDescription  = "Upon taking fatal damage, the player is put in a critical 0-health state and has 60 seconds to restore at least half a heart or exit the current floor. Taking any damage in this state decreases the countdown by 4 seconds. This item cannot be used by the Robot or other 0-health characters, and gives 20 casings instead.";
     public static string Lore             = "This otherwise normal-looking epinephrine injector has approximately 5 times the doctor-approved amount of adrenaline deemed necessary for your everyday anaphylaxis. While there's no telling what kinds of long-term effects that much adrenaline might have on your health, it's reasonable to assume it probably won't be worse than the short-term effects of having your vital organs punctured by bullets...probably.";
 
-    internal const string _FullHeartSpriteUI  = $"{C.MOD_PREFIX}:_AdrenalineFullShotHeartSpriteUI";
-    internal const string _HalfHeartSpriteUI  = $"{C.MOD_PREFIX}:_AdrenalineHalfShotHeartSpriteUI";
-    internal const string _EmptyHeartSpriteUI = $"{C.MOD_PREFIX}:_AdrenalineEmptyShotHeartSpriteUI";
-
     internal const float _MAX_RUSH_TIME = 90f;
     internal const float _MAX_ADRENALINE_TIME = 60f;
     internal const float _MAX_ADRENALINE_LOSS = 4f; // loss from taking damage while under effects of adrenaline
@@ -47,9 +43,9 @@ public class AdrenalineShot : CwaffPassive
                 return;
             if (!shot._adrenalineActive)
                 return;
-            __instance.m_currentFullHeartName  = _FullHeartSpriteUI;
-            __instance.m_currentHalfHeartName  = _HalfHeartSpriteUI;
-            __instance.m_currentEmptyHeartName = _EmptyHeartSpriteUI;
+            __instance.m_currentFullHeartName  = "adrenaline_heart_full_ui";
+            __instance.m_currentHalfHeartName  = "adrenaline_heart_half_ui";
+            __instance.m_currentEmptyHeartName = "adrenaline_heart_empty_ui";
         }
     }
 

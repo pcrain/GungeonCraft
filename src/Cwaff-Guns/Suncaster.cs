@@ -7,7 +7,6 @@ public class Suncaster : CwaffGun
     public static string LongDescription  = "Fires weak piercing beams of sunlight. Reload to toss a refractive prism. Uncharged shots that hit a prism will refract towards all other prisms. Charged shots continuously bounce between and refract off of all placed prisms for a short period. Prisms can be reclaimed by interacting with them or by entering a new room. Cannot gain ammo normally, but passively restores ammo over time.";
     public static string Lore             = "An exotic firearm feared throughout the galaxy for its potent solar projectiles. The absence of sunlight in the Gungeon dramatically reduces its ability to gather energy, yet it remains a force to be reckoned with once its energy stores are sufficient.";
 
-    internal const  string          _PrismUI                 = $"{C.MOD_PREFIX}:_PrismUI";  // need the string immediately for preloading in Main()
     internal const  int             _BASE_MAX_PRISMS         = 6;
     internal const  int             _PRISM_AMMO_COST         = 5;
     internal const  float           _PRISM_LAUNCH_SPEED      = 20f;
@@ -196,7 +195,7 @@ public class SuncasterAmmoDisplay : CustomAmmoDisplay
         uic.GunAmmoCountLabel.AutoHeight = true; // enable multiline text
         uic.GunAmmoCountLabel.ProcessMarkup = true; // enable multicolor text
         int prismsLeft = this._suncaster.maxPrisms - this._suncaster.extantPrisms.Count;
-        uic.GunAmmoCountLabel.Text = $"[sprite \"{Suncaster._PrismUI}\"][color #6666dd]x{prismsLeft}[/color]\n{this._gun.CurrentAmmo}";
+        uic.GunAmmoCountLabel.Text = $"[sprite \"prism_ui_icon\"][color #6666dd]x{prismsLeft}[/color]\n{this._gun.CurrentAmmo}";
         return true;
     }
 }

@@ -13,7 +13,6 @@ public class Uppskeruvel : CwaffGun
     internal const float _SOUL_LAUNCH_SPEED = 7f;
     internal const float _SOULS_PER_HEALTH  = 0.1f;
     internal const float _SPAWN_DELAY       = 0.1f;
-    internal const string _SoulSpriteUI     = $"{C.MOD_PREFIX}:_SoulSpriteUI";  // need the string immediately for preloading in Main()
 
     internal static int        _UppskeruvelId              = -1;
     internal static GameObject _LostSoulPrefab             = null;
@@ -270,7 +269,7 @@ public class UppskeruvelAmmoDisplay : CustomAmmoDisplay
         uic.SetAmmoCountLabelColor(Color.white);
         uic.GunAmmoCountLabel.AutoHeight = true; // enable multiline text
         uic.GunAmmoCountLabel.ProcessMarkup = true; // enable multicolor text
-        uic.GunAmmoCountLabel.Text = $"[sprite \"{Uppskeruvel._SoulSpriteUI}\"][color #6666dd]x{this._uppies.souls}[/color]\n{this._gun.CurrentAmmo}/{this._gun.AdjustedMaxAmmo}";
+        uic.GunAmmoCountLabel.Text = $"[sprite \"soul_sprite_ui_icon\"][color #6666dd]x{this._uppies.souls}[/color]\n{this._gun.CurrentAmmo}/{this._gun.AdjustedMaxAmmo}";
         return true;
     }
 }

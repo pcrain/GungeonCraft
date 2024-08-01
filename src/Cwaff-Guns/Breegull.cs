@@ -18,12 +18,6 @@ public class Breegull : CwaffGun
     internal static Projectile _EggClockwork = null;
     internal static List<EggData> _Eggs      = new();
 
-    internal static string _NormalUI    = $"{C.MOD_PREFIX}:_NormalUI";
-    internal static string _FireUI      = $"{C.MOD_PREFIX}:_FireUI";
-    internal static string _GrenadeUI   = $"{C.MOD_PREFIX}:_GrenadeUI";
-    internal static string _IceUI       = $"{C.MOD_PREFIX}:_IceUI";
-    internal static string _ClockworkUI = $"{C.MOD_PREFIX}:_ClockworkUI";
-
     internal int _currentEggType = 0;
     private float _noiseTimer = 0.0f;
     private bool _altNoise = false;
@@ -81,11 +75,11 @@ public class Breegull : CwaffGun
             ).Attach<HomingModifier>(home => { home.HomingRadius = 10f; home.AngularVelocity = 720f; });
 
         _Eggs = new List<EggData>() {
-            new EggData(){ projectile = _EggNormal,    sound = "collect_egg_normal_sound",    ui = _NormalUI,    ammo = 1, },
-            new EggData(){ projectile = _EggFire,      sound = "collect_egg_fire_sound",      ui = _FireUI,      ammo = 2, },
-            new EggData(){ projectile = _EggGrenade,   sound = "collect_egg_grenade_sound",   ui = _GrenadeUI,   ammo = 5, },
-            new EggData(){ projectile = _EggIce,       sound = "collect_egg_ice_sound",       ui = _IceUI,       ammo = 2, },
-            new EggData(){ projectile = _EggClockwork, sound = "collect_egg_clockwork_sound", ui = _ClockworkUI, ammo = 3, },
+            new EggData(){ projectile = _EggNormal,    sound = "collect_egg_normal_sound",    ui = "breegull_normal_ui",    ammo = 1, },
+            new EggData(){ projectile = _EggFire,      sound = "collect_egg_fire_sound",      ui = "breegull_fire_ui",      ammo = 2, },
+            new EggData(){ projectile = _EggGrenade,   sound = "collect_egg_grenade_sound",   ui = "breegull_grenade_ui",   ammo = 5, },
+            new EggData(){ projectile = _EggIce,       sound = "collect_egg_ice_sound",       ui = "breegull_ice_ui",       ammo = 2, },
+            new EggData(){ projectile = _EggClockwork, sound = "collect_egg_clockwork_sound", ui = "breegull_clockwork_ui", ammo = 3, },
         };
 
         _TalonDust = VFX.Create("talon_trot_dust", fps: 30, loops: false);

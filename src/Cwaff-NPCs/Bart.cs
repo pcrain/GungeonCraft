@@ -5,11 +5,6 @@ public class Bart
 {
     internal static GenericLootTable _BarterTable = null;
 
-    internal const string _BarterSpriteS = $"{C.MOD_PREFIX}:S_TIER_ITEM";  // need the strings immediately for preloading in Main()
-    internal const string _BarterSpriteA = $"{C.MOD_PREFIX}:A_TIER_ITEM";
-    internal const string _BarterSpriteB = $"{C.MOD_PREFIX}:B_TIER_ITEM";
-    internal const string _BarterSpriteC = $"{C.MOD_PREFIX}:C_TIER_ITEM";
-
     public static void Init()
     {
         // We need to find all loaded items, so defer initialization for now
@@ -190,11 +185,11 @@ public class BarteringPriceFixer : MonoBehaviour
             if (!shopItem.item)
                 continue;
             switch (shopItem.item.quality)
-            {
-                case ItemQuality.A: shopItem.customPriceSprite = Bart._BarterSpriteS; break;
-                case ItemQuality.B: shopItem.customPriceSprite = Bart._BarterSpriteA; break;
-                case ItemQuality.C: shopItem.customPriceSprite = Bart._BarterSpriteB; break;
-                case ItemQuality.D: shopItem.customPriceSprite = Bart._BarterSpriteC; break;
+            { // all trades are one tier down
+                case ItemQuality.A: shopItem.customPriceSprite = "barter_s_icon"; break;
+                case ItemQuality.B: shopItem.customPriceSprite = "barter_a_icon"; break;
+                case ItemQuality.C: shopItem.customPriceSprite = "barter_b_icon"; break;
+                case ItemQuality.D: shopItem.customPriceSprite = "barter_c_icon"; break;
             }
         }
     }
