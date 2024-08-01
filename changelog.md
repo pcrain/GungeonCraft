@@ -11,6 +11,7 @@
 - Added indicator for Alligator's current charge output to the ammo display
 - Added shader to visually indicate Alligator's charge level
 - Added impact sounds for Quarter Pounder projectiles
+- Fixed bad hand offset for one frame of Alligator reload animation
 
 ## 1.16.3 (2024-07-28)
 
