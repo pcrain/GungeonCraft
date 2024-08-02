@@ -85,13 +85,13 @@ public static class CwaffSynergies
         NewSynergy(MR_ALLIGATOX, "Mr. Alligatox", new[]{IName(Alligator.ItemName), "stuffed_star"});
         // Adrenaline Shot's critical state lasts for 90 seconds, and taking damage no longer decreases the countdown timer.
         NewSynergy(ADRENALINE_RUSH, "Adrenaline Rush", new[]{IName(AdrenalineShot.ItemName), "shotgun_coffee"});
-        // Enemies killed with English's projectils drop an extra casing.
+        // Enemies killed with English's projectiles drop an extra casing.
         NewSynergy(BANK_SHOTS, "Bank Shots", new[]{IName(English.ItemName), "loot_bag"});
         // Grappling Hook's cooldown is removed.
         NewSynergy(BIONIC_COMMANDO, "Bionic Commando", new[]{IName(BionicFinger.ItemName), "grappling_hook"});
         // Every blank used in a shop gives a 10% discount.
         NewSynergy(BLANK_EXPRESSION, "Blank Expression", new[]{IName(BlankChecks.ItemName), "disarming_personality"});
-        // Femtobyte's projectiles instantly kill any enemy of the last type killed by Femtobyte.
+        // Femtobyte instantly kills any enemy that matches the last type of enemy it killed.
         NewSynergy(LOOKUP_TABLE, "Lookup Table", new[]{IName(Femtobyte.ItemName), "portable_table_device"});
       #endregion
 
@@ -137,9 +137,9 @@ public static class CwaffSynergies
         NewMastery<MasteryOfEnglish>(MASTERY_ENGLISH, English.ItemName);
         // Launches 3 knives at a time for no additional cost.
         NewMastery<MasteryOfIronMaid>(MASTERY_IRON_MAID, IronMaid.ItemName);
-        // Alligator's energy production rate decays to its base level more slowly when removed from an energy source.
+        // Alligator's energy production rate decays to its base level much more slowly when removed from an energy source, maintaining high damage output for longer.
         NewMastery<MasteryOfAlligator>(MASTERY_ALLIGATOR, Alligator.ItemName);
-        // Touching enemies that have been turned to gold causes them to explode in a burst of high damage gold projectiles that can turn other enemies to gold on kill.
+        // Touching enemies that have been transmuted to gold causes them to explode in a burst of high damage gold projectiles that trasmute other enemies to gold on kill.
         NewMastery<MasteryOfQuarterPounder>(MASTERY_QUARTER_POUNDER, QuarterPounder.ItemName);
       #endregion
 

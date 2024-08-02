@@ -36,6 +36,13 @@ VANILLA_ITEMS = {
   "backpack"               : ("Backpack", "Backpack.png"),
   "laser_sight"            : ("Laser Sight", "Laser_Sight.png"),
   "amulet_of_the_pit_lord" : ("Amulet of the Pit Lord", "Amulet_of_the_Pit_Lord.png"),
+  "singularity"            : ("Singularity", "Singularity.png"),
+  "stuffed_star"           : ("Stuffed Star", "Stuffed_Star.png"),
+  "shotgun_coffee"         : ("Shotgun Coffee", "Shotgun_Coffee.png"),
+  "loot_bag"               : ("Loot Bag", "Loot_Bag.png"),
+  "grappling_hook"         : ("Grappling Hook", "Grappling_Hook.png"),
+  "disarming_personality"  : ("Disarming Personality", "Disarming_Personality.png"),
+  "portable_table_device"  : ("Portable Table Device", "Portable_Table_Device.png"),
 }
 
 def applyGunDataOverrides(gunData):
