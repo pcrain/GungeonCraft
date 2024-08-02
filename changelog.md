@@ -13,6 +13,7 @@
 - Added impact sounds for Quarter Pounder projectiles
 - Fixed bad hand offset for one frame of Alligator reload animation
 - Removed some debug console output spat out when firing English
+- Femtobyte now displays enemy names taken from the Ammonomicon instead of using their internal names
 
 ## 1.16.3 (2024-07-28)
 

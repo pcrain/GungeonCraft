@@ -2417,4 +2417,23 @@ public static class Extensions
         return false;
     return true;
   }
+
+  private static Dictionary<string, string> _EnemyNames = new();
+  /// <summary>Get an enemy's Ammonomicon display name from their guid</summary>
+  public static string AmmonomiconName(this string guid)
+  {
+    if (_EnemyNames.TryGetValue(guid, out string name))
+      return name;
+    if (EnemyDatabase.GetOrLoadByGuid(guid) is not AIActor enemy)
+      return _EnemyNames[guid] = string.Empty;
+    if (enemy.encounterTrackable is not EncounterTrackable trackable)
+      return _EnemyNames[guid] = enemy.ActorName ?? string.Empty;
+    if (trackable.journalData is not JournalEntry entry)
+      return _EnemyNames[guid] = enemy.ActorName ?? string.Empty;
+    if (string.IsNullOrEmpty(entry.PrimaryDisplayName))
+      return _EnemyNames[guid] = enemy.ActorName ?? string.Empty;
+    if (entry.PrimaryDisplayName[0] != '#')
+      return _EnemyNames[guid] = entry.PrimaryDisplayName;
+    return _EnemyNames[guid] = StringTableManager.GetEnemiesString(entry.PrimaryDisplayName);
+  }
 }
