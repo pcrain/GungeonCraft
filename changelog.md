@@ -1,5 +1,9 @@
 # Changelog
 
+## TBD
+
+- Prevented Femtobyte from being able to infinitely trigger table techs by repeatedly digitizing and materializing tables
+
 ## 1.16.4 (2024-08-01)
 
 #### Features:

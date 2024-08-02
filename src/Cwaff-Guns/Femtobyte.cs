@@ -881,7 +881,12 @@ static class FlippableCoverStartPatch
     {
         if (__instance.gameObject.GetComponent<FlipOnStart>() is not FlipOnStart fs)
             return;
-        __instance.Flip(fs.flipper.specRigidbody);
+        //NOTE: manual finessing here to prevent table techs from triggering
+        __instance.specRigidbody.PixelColliders[1].Enabled = true;
+        __instance.RemoveFromRoomHierarchy();
+        if (__instance.m_breakable)
+            __instance.m_breakable.TriggerTemporaryDestructibleVFXClear();
+        __instance.Flip(__instance.GetFlipDirection(fs.flipper.specRigidbody));
         UnityEngine.Object.Destroy(fs);
     }
 }
