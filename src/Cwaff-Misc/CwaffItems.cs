@@ -68,8 +68,6 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
 
   public override void OnPlayerPickup(PlayerController player)
   {
-    if (!this.EverPickedUp) // must come before base.OnPlayerPickup()
-      OnFirstPickup(player);
     base.OnPlayerPickup(player);
 
     player.GunChanged -= OnGunsChanged;
@@ -84,6 +82,22 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
     }
   }
 
+  [HarmonyPatch(typeof(GunInventory), nameof(GunInventory.CreateGunForAdd))]
+  private class GunInventoryCreateGunForAddPatch
+  {
+      static void Postfix(GunInventory __instance, Gun gunPrototype, ref Gun __result)
+      {
+        if (__result.HasBeenPickedUp)
+          return;
+        if (__instance.Owner is not PlayerController player)
+          return;
+        if (__result.GetComponent<CwaffGun>() is not CwaffGun cg)
+          return;
+        cg.OnFirstPickup(player);
+      }
+  }
+
+  /// <summary>Called the first time a gun is picked up by a player during a run</summary>
   public virtual void OnFirstPickup(PlayerController player)
   {
 

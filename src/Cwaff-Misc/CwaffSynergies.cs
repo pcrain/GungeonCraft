@@ -133,7 +133,7 @@ public static class CwaffSynergies
         // Card speed is dramatically increased, clip size is doubled, and the last 13 cards in each clip become exploding jokers.
         NewMastery<MasteryOfBlackjack>(MASTERY_BLACKJACK, Blackjack.ItemName)
             .MultSpread(0.5f).MultClipSize(2f).MultFireRate(2f);
-        // English can be charged two launch two additional rows of 6 and 7 balls, respectively.
+        // English can be charged to launch two additional rows of 6 and 7 balls, respectively.
         NewMastery<MasteryOfEnglish>(MASTERY_ENGLISH, English.ItemName);
         // Launches 3 knives at a time for no additional cost.
         NewMastery<MasteryOfIronMaid>(MASTERY_IRON_MAID, IronMaid.ItemName);

@@ -1287,7 +1287,6 @@ public static class Extensions
     return null;
   }
 
-  private static readonly SpeculativeRigidbody[] _NoRigidBodies = Enumerable.Empty<SpeculativeRigidbody>().ToArray();
   /// <summary>Determine whether a SpeculativeRigidBodsy is inside a wall</summary>
   public static bool InsideWall(this SpeculativeRigidbody body)
   {
@@ -1301,7 +1300,7 @@ public static class Extensions
       collideWithTriggers    : false,
       overridePosition       : null,
       rigidbodyExcluder      : null,
-      ignoreList             : _NoRigidBodies
+      ignoreList             : null
       );
   }
 
